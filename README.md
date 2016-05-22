@@ -1,8 +1,6 @@
 # RadMud
 ______________
 
-A post nuclear multi user dungeon written in C++.
-
 **Author**: Enrico Fraccaroli
 
 **Date**: 29 September 2014
@@ -31,11 +29,9 @@ Run the server like this:
 
 ______________
 ### Connecting
-The default behaviour is to listen for connections on port 4000 (change a constant in the code to alter this).
-
-To test the server you could connect to it like this:
-    
-    telnet localhost 4000
+Currently the only way to connect to the server is by using the client which I've written ad-hoc.
+It can be found at:
+https://github.com/Galfurian/RadClient
 
 ______________
 ### Change Log - For Developers
