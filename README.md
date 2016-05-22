@@ -5,32 +5,30 @@
 **Date**: 29 September 2014
 
 **Language**: C++
-
 ______________
 ### Description
 It's a Post Nuclear Multi User Dungeon made in C++.
 
 ______________
 ### Installation
-
 The necessary libraries, in order to compile are:
-
- * **pthread**
- * **sqlite3**
- * **lua**
- * **zlib**
+ * **pthread** (For npc non-blocking behaviour).
+ * **sqlite3** (For offline data storage).
+ * **lua** (For npc behaviour).
+ * **zlib** (For compressed communication).
 
 ______________
 ### Execution
 Run the server like this:
-
-    ./RadMud &
+```
+./RadMud
+```
 
 ______________
 ### Connecting
 Currently the only way to connect to the server is by using the client which I've written ad-hoc.
-It can be found at:
-https://github.com/Galfurian/RadClient
+
+It can be found at: https://github.com/Galfurian/RadClient
 
 ______________
 ### Change Log
