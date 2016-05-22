@@ -1,5 +1,4 @@
 # RadMud
-______________
 
 **Author**: Enrico Fraccaroli
 
