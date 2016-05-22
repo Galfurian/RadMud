@@ -33,7 +33,7 @@ It can be found at:
 https://github.com/Galfurian/RadClient
 
 ______________
-### Change Log - For Developers
+### Change Log
 #### Version 17 (14/09/2015)
  * **UPGRADE** [**Items**]
  	* We have achieved a stable items system, which allow to define for each item features like the material with which they have been made, its quality which influences a lot of its interactions with all the environment.
