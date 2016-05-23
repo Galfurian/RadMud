@@ -406,55 +406,57 @@ void ProcessPlayerName(Character * character, std::istream & sArgs)
     string input;
     getline(sArgs, input);
 
-    try
+    // Name can't be blank.
+    if (input.empty())
     {
-        // Name can't be blank.
-        if (input.empty())
-        {
-            throw runtime_error("Name cannot be blank.");
-        }
-        // Check if the user want to quit.
-        if (input == "quit")
-        {
-            player->closeConnection();
-        }
-        // Check if the give name contains valid characters.
-        if (input.find_first_not_of(kValidPlayerName) != string::npos)
-        {
-            throw runtime_error("That player name contains disallowed characters.");
-        }
-        // Check if the player is already connected.
-        if (Mud::getInstance().findPlayer(input))
-        {
-            throw runtime_error(input + " is already connected.");
-        }
-        // Check if the player has typed new.
-        if (ToLower(input) == "new")
-        {
-            AdvanceCharacterCreation(player, ConnectionState::AwaitingNewName);
-            return;
-        }
-        // Check if the player exists in the Database.
-        if (!Mud::getInstance().getDbms().searchPlayer(ToCapitals(input)))
-        {
-            throw runtime_error("That player doesen't exist.");
-        }
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingName, "Name cannot be blank.");
+        return;
     }
-    catch (runtime_error & e)
+
+    // Check if the user want to quit.
+    if (input == "quit")
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingName, e.what());
+        player->closeConnection();
+    }
+
+    // Check if the give name contains valid characters.
+    if (input.find_first_not_of(kValidPlayerName) != string::npos)
+    {
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingName,
+            "That player name contains disallowed characters.");
+        return;
+    }
+
+    // Check if the player is already connected.
+    if (Mud::getInstance().findPlayer(input))
+    {
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingName, input + " is already connected.");
+        return;
+    }
+
+    // Check if the player has typed new.
+    if (ToLower(input) == "new")
+    {
+        AdvanceCharacterCreation(player, ConnectionState::AwaitingNewName);
+        return;
+    }
+
+    // Check if the player exists in the Database.
+    if (!Mud::getInstance().getDbms().searchPlayer(ToCapitals(input)))
+    {
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingName, "That player doesen't exist.");
         return;
     }
 
     // Save the name of the player.
     player->name = ToCapitals(input);
+
     // Load player so we know the player_password etc.
     if (player->loadFromDB())
     {
         // Delete the loaded prompt, otherwise it will be shown.
         player->prompt = "";
-        // Disable echo of command client side.
-        //msg +=(const char*) echo_off_str);
+
         // Set to 0 the current password attempts.
         player->password_attempts = 0;
         player->sendMsg("Username is correct, now insert the password.\n");
@@ -669,9 +671,12 @@ void ProcessNewRace(Character * character, std::istream & sArgs)
         if (BeginWith(ToLower(input), "help"))
         {
             // Get the race number.
-            vector<string> args = GetWords(input);
-            int choice = atoi(args[1].c_str());
-
+            vector<string> arguments = GetWords(input);
+            if (arguments.size() != 2)
+            {
+                throw runtime_error("You have to specify the race number.");
+            }
+            int choice = ToInt(arguments[1].c_str());
             // Check for errors.
             if ((race = Mud::getInstance().findRace(choice)) == nullptr)
             {
@@ -746,60 +751,63 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
         {
             // Get the race number.
             vector<string> args = GetWords(input);
-            int choice = atoi(args[1].c_str());
-
-            help_msg += Telnet::cyan();
-            switch (choice)
+            if (args.size() != 2)
             {
-                case 1:
-                    help_msg += "Help about Strength.\n" + Telnet::italic();
-                    help_msg += "Strength is important for increasing the Carrying Weight and ";
-                    help_msg += "satisfying the minimum Strength requirements for some weapons and armors.";
-                    help_msg += Telnet::reset() + "\n";
-                    break;
-                case 2:
-                    help_msg += "Help about Agility.\n" + Telnet::italic();
-                    help_msg += "Besides increasing mobility in combat, it increases the recharge ";
-                    help_msg += "speed of all the weapons, as well as the ability to use light armor.";
-                    help_msg += Telnet::reset() + "\n";
-                    break;
-                case 3:
-                    help_msg += "Help about Perception.\n" + Telnet::italic();
-                    help_msg += "The ability to see, hear, taste and notice unusual things. ";
-                    help_msg += "A high Perception is important for a sharpshooter.";
-                    help_msg += Telnet::reset() + "\n";
-                    break;
-                case 4:
-                    help_msg += "Help about Constitution.\n" + Telnet::italic();
-                    help_msg += "Stamina and physical toughness. A character with a high Endurance ";
-                    help_msg += "will survive where others may not.";
-                    help_msg += Telnet::reset() + "\n";
-                    break;
-                case 5:
-                    help_msg += "Help about Intelligence.\n" + Telnet::italic();
-                    help_msg += "Knowledge, wisdom and the ability to think quickly, ";
-                    help_msg += "this attribute is important for any character.";
-                    help_msg += Telnet::reset() + "\n";
-                    break;
-                default:
-                    throw runtime_error("No help for that attribute.");
+                throw runtime_error("You have to specify the attribute number.");
+            }
+            int choice = ToInt(args[1]);
+            help_msg += Telnet::cyan();
+            if (choice == 1)
+            {
+                help_msg += "Help about Strength.\n" + Telnet::italic();
+                help_msg += "Strength is important for increasing the Carrying Weight and ";
+                help_msg += "satisfying the minimum Strength requirements for some weapons and armors.";
+                help_msg += Telnet::reset() + "\n";
+            }
+            else if (choice == 2)
+            {
+                help_msg += "Help about Agility.\n" + Telnet::italic();
+                help_msg += "Besides increasing mobility in combat, it increases the recharge ";
+                help_msg += "speed of all the weapons, as well as the ability to use light armor.";
+                help_msg += Telnet::reset() + "\n";
+            }
+            else if (choice == 3)
+            {
+                help_msg += "Help about Perception.\n" + Telnet::italic();
+                help_msg += "The ability to see, hear, taste and notice unusual things. ";
+                help_msg += "A high Perception is important for a sharpshooter.";
+                help_msg += Telnet::reset() + "\n";
+            }
+            else if (choice == 4)
+            {
+                help_msg += "Help about Constitution.\n" + Telnet::italic();
+                help_msg += "Stamina and physical toughness. A character with a high Endurance ";
+                help_msg += "will survive where others may not.";
+                help_msg += Telnet::reset() + "\n";
+            }
+            else if (choice == 5)
+            {
+                help_msg += "Help about Intelligence.\n" + Telnet::italic();
+                help_msg += "Knowledge, wisdom and the ability to think quickly, ";
+                help_msg += "this attribute is important for any character.";
+                help_msg += Telnet::reset() + "\n";
+            }
+            else
+            {
+                throw runtime_error("No help for that attribute.");
             }
             throw runtime_error(help_msg);
         }
         // Check if the player has not yet typed RESET.
         else if (ToLower(input) == "reset")
         {
-            help_msg += Telnet::cyan();
-            help_msg += "Attribute has been set by default.\n";
-
             player->remaining_points = 0;
             player->strength = player->race->strength;
             player->agility = player->race->agility;
             player->perception = player->race->perception;
             player->constitution = player->race->constitution;
             player->intelligence = player->race->intelligence;
-
-            throw runtime_error(help_msg);
+            throw runtime_error(Telnet::cyan() + "Attribute has been set by default.\n");
         }
         // Check if the player has not yet typed CONTINUE.
         else if (ToLower(input) != "continue")
