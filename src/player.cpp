@@ -190,6 +190,8 @@ bool Player::createOnDB()
     arguments.push_back(ToString(flags));
     arguments.push_back(ToString(health));
     arguments.push_back(ToString(stamina));
+    arguments.push_back(ToString(hunger));
+    arguments.push_back(ToString(thirst));
     arguments.push_back(ToString(rent_room));
     if (!Mud::getInstance().getDbms().insertInto("Player", arguments))
     {
@@ -244,6 +246,8 @@ bool Player::updateOnDB()
         value.push_back(std::make_pair("health", ToString(health)));
         value.push_back(std::make_pair("stamina", ToString(stamina)));
         value.push_back(std::make_pair("rent_room", ToString(rent_room)));
+        value.push_back(std::make_pair("hunger", ToString(hunger)));
+        value.push_back(std::make_pair("thirst", ToString(thirst)));
         where.push_back(std::make_pair("name", name));
 
         if (!Mud::getInstance().getDbms().updateInto("Player", value, where))

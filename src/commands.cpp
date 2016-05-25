@@ -24,6 +24,11 @@
 // Other Include.
 #include "mud.hpp"
 
+/// Player names must consist of characters from this list.
+const std::string kValidPlayerName = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
+/// Player descriptions must consist of characters from this list.
+const std::string kValidDescription = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ,.\n";
+
 void ProcessCommand(Character * character, std::istream &sArgs)
 {
     std::string command;
@@ -86,6 +91,1064 @@ void ProcessCommand(Character * character, std::istream &sArgs)
         }
     }
     character->sendMsg("\n");
+}
+
+void ProcessPlayerName(Character * character, std::istream & sArgs)
+{
+    Player * player = character->toPlayer();
+    std::string input;
+    getline(sArgs, input);
+
+    // Name can't be blank.
+    if (input.empty())
+    {
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingName, "Name cannot be blank.");
+    }
+    // Check if the player has typed new.
+    else if (ToLower(input) == "new")
+    {
+        AdvanceCharacterCreation(player, ConnectionState::AwaitingNewName);
+    }
+    // Check if the user want to quit.
+    else if (input == "quit")
+    {
+        player->closeConnection();
+    }
+    // Check if the give name contains valid characters.
+    else if (input.find_first_not_of(kValidPlayerName) != std::string::npos)
+    {
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingName,
+            "That player name contains disallowed characters.");
+    }
+    // Check if the player is already connected.
+    else if (Mud::getInstance().findPlayer(input))
+    {
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingName, input + " is already connected.");
+    }
+    // Check if the player exists in the Database.
+    else if (!Mud::getInstance().getDbms().searchPlayer(ToCapitals(input)))
+    {
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingName, "That player doesen't exist.");
+    }
+    else
+    {
+        // Save the name of the player.
+        player->name = ToCapitals(input);
+        // Load player so we know the player_password etc.
+        if (player->loadFromDB())
+        {
+            // Delete the loaded prompt, otherwise it will be shown.
+            player->prompt = "";
+            // Set to 0 the current password attempts.
+            player->password_attempts = 0;
+            player->sendMsg("Username is correct, now insert the password.\n");
+            AdvanceCharacterCreation(character, ConnectionState::AwaitingPassword);
+        }
+        else
+        {
+            player->closeConnection();
+        }
+    }
+}
+
+void ProcessPlayerPassword(Character * character, std::istream & sArgs)
+{
+    Player * player = character->toPlayer();
+    std::string input;
+    getline(sArgs, input);
+
+    // Check the correctness of the password.
+    if (input != player->password)
+    {
+        // Detect too many password attempts.
+        if (++player->password_attempts >= kMaxPasswordAttempts)
+        {
+            player->closeConnection();
+            player->sendMsg("Goodbye!\n");
+            player->sendMsg("Too many attempts to guess the password!\n");
+        }
+        else
+        {
+            AdvanceCharacterCreation(character, ConnectionState::AwaitingPassword, "Incorrect password.");
+        }
+    }
+    else
+    {
+        AdvanceCharacterCreation(character, ConnectionState::Playing);
+    }
+}
+
+void ProcessNewName(Character * character, std::istream & sArgs)
+{
+    Player * player = character->toPlayer();
+    std::string input;
+    getline(sArgs, input);
+
+    // Player_password can't be blank.
+    if (input.empty())
+    {
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewName, "Invalid input.");
+    }
+    // Check if the player has typed BACK.
+    else if (ToLower(input) == "back")
+    {
+        RollbackCharacterCreation(player, ConnectionState::AwaitingName);
+    }
+    // Check if the player has given bad characters.
+    else if (input.find_first_not_of(kValidPlayerName) != std::string::npos)
+    {
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewName,
+            "That player name contains disallowed characters.");
+    }
+    // Check for bad names here.
+    else if (Mud::getInstance().badNames.find(input) != Mud::getInstance().badNames.end())
+    {
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewName, "That name is not permitted.");
+    }
+    // Check if the player name has already been used.
+    else if (Mud::getInstance().getDbms().searchPlayer(ToCapitals(input)))
+    {
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewName,
+            "That player already exists, please choose another name.");
+    }
+    else
+    {
+        Room * spawnRoom = Mud::getInstance().findRoom(player->rent_room);
+        if (spawnRoom == nullptr)
+        {
+            spawnRoom = Mud::getInstance().findRoom(1000);
+        }
+        player->name = ToCapitals(input);
+        player->room = spawnRoom;
+        player->faction = Mud::getInstance().findFaction(1);
+        player->prompt_save = "[" + player->name + "]";
+        player->password_attempts = 0;
+        AdvanceCharacterCreation(player, ConnectionState::AwaitingNewPwd);
+    }
+}
+
+void ProcessNewPwd(Character * character, std::istream & sArgs)
+{
+    Player * player = character->toPlayer();
+    std::string input;
+    getline(sArgs, input);
+
+    // Player_password can't be blank.
+    if (input.empty())
+    {
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewPwd, "Invalid input.");
+    }
+    // Check if the player has typed BACK.
+    else if (ToLower(input) == "back")
+    {
+        RollbackCharacterCreation(player, ConnectionState::AwaitingNewName);
+    }
+    // Check if the player has given bad characters.
+    else if (input.find_first_not_of(kValidPlayerName) != std::string::npos)
+    {
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewPwd,
+            "Password cannot contain disallowed characters.");
+    }
+    else
+    {
+        player->password = input;
+        AdvanceCharacterCreation(player, ConnectionState::AwaitingNewPwdCon);
+    }
+}
+
+void ProcessNewPwdCon(Character * character, std::istream & sArgs)
+{
+    Player * player = character->toPlayer();
+    std::string input;
+    getline(sArgs, input);
+
+    // Check if the player has typed BACK.
+    if (ToLower(input) == "back")
+    {
+        RollbackCharacterCreation(player, ConnectionState::AwaitingNewPwd);
+    }
+    // Player_password must agree.
+    else if (input != player->password)
+    {
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewPwdCon,
+            "Password and confirmation do not agree.");
+    }
+    else
+    {
+        AdvanceCharacterCreation(player, ConnectionState::AwaitingNewStory);
+    }
+}
+
+void ProcessNewStory(Character * character, std::istream & sArgs)
+{
+    Player * player = character->toPlayer();
+    std::string input;
+    getline(sArgs, input);
+
+    // Player_password can't be blank.
+    if (input.empty())
+    {
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewStory, "Invalid input.");
+    }
+    // Check if the player has typed BACK.
+    else if (ToLower(input) == "back")
+    {
+        RollbackCharacterCreation(player, ConnectionState::AwaitingNewPwd);
+    }
+    // Check if the player has written 'continue' or NOT.
+    else if (input != "continue")
+    {
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewStory,
+            "Write 'continue' after you have readed the story.");
+    }
+    else
+    {
+        AdvanceCharacterCreation(player, ConnectionState::AwaitingNewRace);
+    }
+}
+
+void ProcessNewRace(Character * character, std::istream & sArgs)
+{
+    Player * player = character->toPlayer();
+
+    // Get the arguments of the command.
+    ArgumentList arguments = ParseArgs(sArgs);
+
+    // Player_password can't be blank.
+    if ((arguments.size() != 1) && (arguments.size() != 2))
+    {
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewRace, "Invalid input.");
+    }
+    // Check if the player has typed BACK.
+    else if (ToLower(arguments[0].first) == "back")
+    {
+        RollbackCharacterCreation(player, ConnectionState::AwaitingNewStory);
+    }
+    // If the player has insert help (race_number), show its help.
+    else if (BeginWith(ToLower(arguments[0].first), "help"))
+    {
+        if (arguments.size() == 2)
+        {
+            // Get the race.
+            Race * race = Mud::getInstance().findRace(ToInt(arguments[1].first));
+            if (race == nullptr)
+            {
+                AdvanceCharacterCreation(character, ConnectionState::AwaitingNewRace, "No help for that race.");
+            }
+            else if (!race->player_allow)
+            {
+                AdvanceCharacterCreation(character, ConnectionState::AwaitingNewRace, "No help for that race.");
+            }
+            else
+            {
+                std::string helpMessage;
+                helpMessage += "Help about " + race->name + ".\n";
+                helpMessage += "Strength     " + ToString(race->strength) + ".\n";
+                helpMessage += "Agility      " + ToString(race->agility) + ".\n";
+                helpMessage += "Perception   " + ToString(race->perception) + ".\n";
+                helpMessage += "Constitution " + ToString(race->constitution) + ".\n";
+                helpMessage += "Intelligence " + ToString(race->intelligence) + ".\n";
+                helpMessage += Telnet::italic() + race->description + Telnet::reset() + "\n";
+                AdvanceCharacterCreation(character, ConnectionState::AwaitingNewRace, helpMessage);
+            }
+
+        }
+        else
+        {
+            AdvanceCharacterCreation(character, ConnectionState::AwaitingNewRace,
+                "You have to specify the race number.");
+        }
+    }
+    else if (IsNumber(arguments[0].first))
+    {
+        // Get the race.
+        Race * race = Mud::getInstance().findRace(ToInt(arguments[0].first));
+        if (race == nullptr)
+        {
+            AdvanceCharacterCreation(character, ConnectionState::AwaitingNewRace, "Not a valid race.");
+        }
+        else if (!race->player_allow)
+        {
+            AdvanceCharacterCreation(character, ConnectionState::AwaitingNewRace, "Not a valid race.");
+        }
+        else
+        {
+            player->race = race;
+            player->health = race->constitution * 5;
+            player->stamina = race->constitution * 10;
+            player->strength = race->strength;
+            player->agility = race->agility;
+            player->perception = race->perception;
+            player->constitution = race->constitution;
+            player->intelligence = race->intelligence;
+            AdvanceCharacterCreation(player, ConnectionState::AwaitingNewAttr);
+        }
+    }
+}
+
+void ProcessNewAttr(Character * character, std::istream & sArgs)
+{
+    Player * player = character->toPlayer();
+
+    // Get the arguments of the command.
+    ArgumentList arguments = ParseArgs(sArgs);
+    // Player_password can't be blank.
+    if ((arguments.size() != 1) && (arguments.size() != 2))
+    {
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAttr, "Invalid input.");
+    }
+    // Check if the player has typed BACK.
+    else if (ToLower(arguments[0].first) == "back")
+    {
+        RollbackCharacterCreation(player, ConnectionState::AwaitingNewRace);
+    }
+    // Check if the player has not yet typed RESET.
+    else if (ToLower(arguments[0].first) == "reset")
+    {
+        player->remaining_points = 0;
+        player->strength = player->race->strength;
+        player->agility = player->race->agility;
+        player->perception = player->race->perception;
+        player->constitution = player->race->constitution;
+        player->intelligence = player->race->intelligence;
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAttr,
+            Telnet::cyan() + "Attribute has been set by default." + Telnet::reset() + "\n");
+    }
+    // If the player has insert help (attribute number), show its help.
+    else if (BeginWith(ToLower(arguments[0].first), "continue"))
+    {
+        AdvanceCharacterCreation(player, ConnectionState::AwaitingNewGender);
+    }
+    // If the player has insert help (attribute number), show its help.
+    else if (BeginWith(ToLower(arguments[0].first), "help"))
+    {
+        if (arguments.size() == 2)
+        {
+            std::string helpMessage;
+            if (arguments[1].first == "1")
+            {
+                helpMessage = "Help about Strength.\n" + Telnet::italic();
+                helpMessage += "Strength is important for increasing the Carrying Weight and ";
+                helpMessage += "satisfying the minimum Strength requirements for some weapons and armors.";
+                helpMessage += Telnet::reset() + "\n";
+            }
+            else if (arguments[1].first == "2")
+            {
+                helpMessage = "Help about Agility.\n" + Telnet::italic();
+                helpMessage += "Besides increasing mobility in combat, it increases the recharge ";
+                helpMessage += "speed of all the weapons, as well as the ability to use light armor.";
+                helpMessage += Telnet::reset() + "\n";
+            }
+            else if (arguments[1].first == "3")
+            {
+                helpMessage = "Help about Perception.\n" + Telnet::italic();
+                helpMessage += "The ability to see, hear, taste and notice unusual things. ";
+                helpMessage += "A high Perception is important for a sharpshooter.";
+                helpMessage += Telnet::reset() + "\n";
+            }
+            else if (arguments[1].first == "4")
+            {
+                helpMessage = "Help about Constitution.\n" + Telnet::italic();
+                helpMessage += "Stamina and physical toughness. A character with a high Endurance ";
+                helpMessage += "will survive where others may not.";
+                helpMessage += Telnet::reset() + "\n";
+            }
+            else if (arguments[1].first == "5")
+            {
+                helpMessage = "Help about Intelligence.\n" + Telnet::italic();
+                helpMessage += "Knowledge, wisdom and the ability to think quickly, ";
+                helpMessage += "this attribute is important for any character.";
+                helpMessage += Telnet::reset() + "\n";
+            }
+            else
+            {
+                helpMessage = "No help for that attribute.";
+            }
+            AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAttr, helpMessage);
+        }
+        else
+        {
+            AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAttr,
+                "You have to specify the attribute number.");
+        }
+    }
+    else
+    {
+        if (arguments.size() == 2)
+        {
+            std::string helpMessage;
+            int modifier = ToInt(arguments[1].first);
+            // Check for errors.
+            if (player->remaining_points < modifier)
+            {
+                helpMessage = "You don't have enough points left.";
+            }
+            else if (arguments[0].first == "1")
+            {
+                if ((player->strength + modifier) < (player->race->strength - 5))
+                {
+                    helpMessage = "Strength can't go below " + ToString((player->race->strength - 5)) + ".";
+                }
+                else if ((player->strength + modifier) > (player->race->strength + 5))
+                {
+                    helpMessage = "Strength can't go above " + ToString((player->race->strength + 5)) + ".";
+                }
+                else
+                {
+                    player->remaining_points -= modifier;
+                    player->strength += modifier;
+                }
+            }
+            else if (arguments[0].first == "2")
+            {
+                if ((player->agility + modifier) < (player->race->agility - 5))
+                {
+                    helpMessage = "Agility can't go below " + ToString((player->race->agility - 5)) + ".";
+                }
+                else if ((player->strength + modifier) > (player->race->strength + 5))
+                {
+                    helpMessage = "Agility can't go above " + ToString((player->race->agility + 5)) + ".";
+                }
+                else
+                {
+                    player->remaining_points -= modifier;
+                    player->agility += modifier;
+                }
+            }
+            else if (arguments[0].first == "3")
+            {
+                if ((player->perception + modifier) < (player->race->perception - 5))
+                {
+                    helpMessage = "Perception can't go below " + ToString((player->race->perception - 5)) + ".";
+                }
+                else if ((player->strength + modifier) > (player->race->strength + 5))
+                {
+                    helpMessage = "Perception can't go above " + ToString((player->race->perception + 5)) + ".";
+                }
+                else
+                {
+                    player->remaining_points -= modifier;
+                    player->perception += modifier;
+                }
+            }
+            else if (arguments[0].first == "4")
+            {
+                if ((player->constitution + modifier) < (player->race->constitution - 5))
+                {
+                    helpMessage = "Constitution can't go below " + ToString((player->race->constitution - 5)) + ".";
+                }
+                else if ((player->strength + modifier) > (player->race->strength + 5))
+                {
+                    helpMessage = "Constitution can't go above " + ToString((player->race->constitution + 5)) + ".";
+                }
+                else
+                {
+                    player->remaining_points -= modifier;
+                    player->constitution += modifier;
+                }
+            }
+            else if (arguments[0].first == "5")
+            {
+                if ((player->intelligence + modifier) < (player->race->intelligence - 5))
+                {
+                    helpMessage = "Intelligence can't go below " + ToString((player->race->intelligence - 5)) + ".";
+                }
+                else if ((player->strength + modifier) > (player->race->strength + 5))
+                {
+                    helpMessage = "Intelligence can't go above " + ToString((player->race->intelligence + 5)) + ".";
+                }
+                else
+                {
+                    player->remaining_points -= modifier;
+                    player->intelligence += modifier;
+                }
+            }
+            else
+            {
+                helpMessage = "Must select a valid attribute.";
+            }
+            AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAttr, helpMessage);
+        }
+        else
+        {
+            AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAttr, "Type [#attribute +/-(value)].");
+        }
+    }
+}
+
+void ProcessNewGender(Character * character, std::istream & sArgs)
+{
+    Player * player = character->toPlayer();
+    std::string input;
+    getline(sArgs, input);
+    // Check if the player has typed BACK.
+    if (ToLower(input) == "back")
+    {
+        RollbackCharacterCreation(player, ConnectionState::AwaitingNewAttr);
+    }
+    else if (input == "1")
+    {
+        player->sex = 1;
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAge);
+    }
+    else if (input == "2")
+    {
+        player->sex = 2;
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAge);
+    }
+    else
+    {
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewGender, "Not a valid gender.");
+    }
+}
+
+void ProcessNewAge(Character * character, std::istream & sArgs)
+{
+    Player * player = character->toPlayer();
+    std::string input;
+    getline(sArgs, input);
+    // Check if the player has typed BACK.
+    if (ToLower(input) == "back")
+    {
+        RollbackCharacterCreation(player, ConnectionState::AwaitingNewGender);
+    }
+    else if (!IsNumber(input))
+    {
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAge, "Not a valid age.");
+    }
+    else
+    {
+        int age = ToInt(input);
+        if (age < 18)
+        {
+            AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAge,
+                "A creature so young is not suitable for a world so wicked.");
+        }
+        else if (50 < age)
+        {
+            AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAge,
+                "Life expectancy in this world is 70 years, in order to still be competitive you can choose 50 years at most.");
+        }
+        else
+        {
+            player->age = age;
+            AdvanceCharacterCreation(player, ConnectionState::AwaitingNewDesc);
+        }
+    }
+}
+
+void ProcessNewDesc(Character * character, std::istream & sArgs)
+{
+    Player * player = character->toPlayer();
+    std::string input;
+    getline(sArgs, input);
+    // Player_password can't be blank.
+    if (input.empty())
+    {
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewDesc, "Invalid input.");
+    }
+    // Check if the player has typed BACK.
+    else if (ToLower(input) == "back")
+    {
+        RollbackCharacterCreation(player, ConnectionState::AwaitingNewAge);
+    }
+    // Check if the player has typed BACK.
+    else if (ToLower(input) == "skip")
+    {
+        player->description = "You see " + ToLower(player->name) + " here.";
+        AdvanceCharacterCreation(player, ConnectionState::AwaitingNewWeight);
+    }
+    // Check if the description contains bad characters.
+    else if (input.find_first_not_of(kValidDescription) != std::string::npos)
+    {
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewDesc,
+            "Description cannot contain disallowed characters.");
+    }
+    else
+    {
+        player->description = input;
+        AdvanceCharacterCreation(player, ConnectionState::AwaitingNewWeight);
+    }
+}
+
+void ProcessNewWeight(Character * character, std::istream & sArgs)
+{
+    Player * player = character->toPlayer();
+    std::string input;
+    getline(sArgs, input);
+    // Check if the player has typed BACK.
+    if (ToLower(input) == "back")
+    {
+        RollbackCharacterCreation(player, ConnectionState::AwaitingNewDesc);
+    }
+    else if (!IsNumber(input))
+    {
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewWeight, "Not a valid weight.");
+    }
+    else
+    {
+        int weight = ToInt(input);
+        if (weight < 40)
+        {
+            AdvanceCharacterCreation(character, ConnectionState::AwaitingNewWeight, "You can't be a feather.");
+        }
+        else if (120 < weight)
+        {
+            AdvanceCharacterCreation(character, ConnectionState::AwaitingNewWeight, "Too much.");
+        }
+        else
+        {
+            player->weight = weight;
+            AdvanceCharacterCreation(player, ConnectionState::AwaitingNewConfirm);
+        }
+    }
+}
+
+void ProcessNewConfirm(Character * character, std::istream & sArgs)
+{
+    Player * player = character->toPlayer();
+    std::string input;
+    getline(sArgs, input);
+
+    // Check if the player has typed BACK.
+    if (ToLower(input) == "back")
+    {
+        RollbackCharacterCreation(player, ConnectionState::AwaitingNewWeight);
+    }
+    // Check if the player has typed CONFIRM.
+    else if (ToLower(input) == "confirm")
+    {
+        // Set the last variables.
+        player->level = 0;
+        player->experience = 0;
+        player->flags = 0;
+        player->rent_room = 1000;
+        if (player->createOnDB())
+        {
+            AdvanceCharacterCreation(player, ConnectionState::Playing);
+        }
+        else
+        {
+            player->closeConnection();
+        }
+    }
+    else
+    {
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewConfirm,
+            "You must write 'confirm' if you agree.");
+    }
+}
+
+void NoMobile(Character * character)
+{
+    if (character->isMobile())
+    {
+        throw std::runtime_error("Npcs are not allowed to execute this command.\n");
+    }
+}
+
+void NoMore(Character * character, std::istream & sArgs)
+{
+    std::string sLine;
+    getline(sArgs, sLine);
+    if (!sLine.empty())
+    {
+        character->sendMsg("Unexpected input :'" + sLine + "'.\n");
+        throw std::runtime_error("");
+    }
+}
+
+void StopAction(Character * character)
+{
+    if ((character->action.getType() != ActionType::Wait) && (character->action.getType() != ActionType::NoAction))
+    {
+        character->doCommand("stop");
+    }
+}
+
+ArgumentList ParseArgs(std::istream & sArgs)
+{
+    ArgumentList arguments;
+    std::vector<std::string> words;
+
+    // Get the words from the input line.
+    std::string argumentsLine;
+    std::getline(sArgs, argumentsLine);
+    words = GetWords(argumentsLine);
+    for (auto it : words)
+    {
+        // Set one by default.
+        int number = 1;
+        // Extract the number.
+        ExtractNumber(it, number);
+        // Add the argument.
+        arguments.push_back(std::make_pair(it, number));
+    }
+    return arguments;
+}
+
+void LoadStates()
+{
+    // Step 0 - Insert name.
+    Mud::getInstance().addStateAction(ConnectionState::AwaitingName, ProcessPlayerName);
+    // Step 1.a  - Insert the password.
+    Mud::getInstance().addStateAction(ConnectionState::AwaitingPassword, ProcessPlayerPassword);
+    // Step 1.b  - Choose the Name.
+    Mud::getInstance().addStateAction(ConnectionState::AwaitingNewName, ProcessNewName);
+    // Step 2  - Choose the Password.
+    Mud::getInstance().addStateAction(ConnectionState::AwaitingNewPwd, ProcessNewPwd);
+    // Step 3  - Confirm the Password.
+    Mud::getInstance().addStateAction(ConnectionState::AwaitingNewPwdCon, ProcessNewPwdCon);
+    // Step 4  - Short story of the mud world.
+    Mud::getInstance().addStateAction(ConnectionState::AwaitingNewStory, ProcessNewStory);
+    // Step 5  - Choose the Race.
+    Mud::getInstance().addStateAction(ConnectionState::AwaitingNewRace, ProcessNewRace);
+    // Step 6  - Choose the Attributes.
+    Mud::getInstance().addStateAction(ConnectionState::AwaitingNewAttr, ProcessNewAttr);
+    // Step 7  - Choose the Gender.
+    Mud::getInstance().addStateAction(ConnectionState::AwaitingNewGender, ProcessNewGender);
+    // Step 8  - Choose the Age.
+    Mud::getInstance().addStateAction(ConnectionState::AwaitingNewAge, ProcessNewAge);
+    // Step 9  - Choose the description (optional).
+    Mud::getInstance().addStateAction(ConnectionState::AwaitingNewDesc, ProcessNewDesc);
+    // Step 10 - Choose the Weight.
+    Mud::getInstance().addStateAction(ConnectionState::AwaitingNewWeight, ProcessNewWeight);
+    // Step 11 - Confirm the character.
+    Mud::getInstance().addStateAction(ConnectionState::AwaitingNewConfirm, ProcessNewConfirm);
+
+    // Playing.
+    Mud::getInstance().addStateAction(ConnectionState::Playing, ProcessCommand);
+}
+
+void PrintChoices(Character * character)
+{
+    Player * player = character->toPlayer();
+    std::string preview = std::string();
+    preview += Telnet::clearScreen();
+    preview += "# ------------ Character Creation ------------ #\n";
+
+    // NAME
+    preview += "# Name         :";
+    if (!player->name.empty())
+    {
+        preview += player->name + Telnet::reset();
+    }
+    preview += "\n";
+
+    // PASSWORD
+    preview += "# Passowrd     :";
+    if (!player->password.empty())
+    {
+        for (unsigned int i = 0; i < player->password.size(); i++)
+            preview += "*";
+    }
+    preview += "\n";
+
+    // RACE
+    preview += "# Race         :";
+    if (player->race != nullptr)
+    {
+        preview += player->race->name + Telnet::reset();
+    }
+    preview += "\n";
+
+    // STRENGTH
+    preview += "# Strength     :";
+    if (player->strength > 0)
+    {
+        preview += ToString(player->strength) + Telnet::reset();
+    }
+    preview += "\n";
+
+    // AGILITY
+    preview += "# Agility      :";
+    if (player->agility > 0)
+    {
+        preview += ToString(player->agility) + Telnet::reset();
+    }
+    preview += "\n";
+
+    // PERCEPTION
+    preview += "# Perception   :";
+    if (player->perception > 0)
+    {
+        preview += ToString(player->perception) + Telnet::reset();
+    }
+    preview += "\n";
+
+    // CONSTITUTION
+    preview += "# Constitution :";
+    if (player->constitution > 0)
+    {
+        preview += ToString(player->constitution) + Telnet::reset();
+    }
+    preview += "\n";
+
+    // INTELLIGENCE
+    preview += "# Intelligence :";
+    if (player->intelligence > 0)
+    {
+        preview += ToString(player->intelligence) + Telnet::reset();
+    }
+    preview += "\n";
+
+    // SEX
+    preview += "# Sex          :" + player->getSexAsString() + "\n";
+
+    // AGE
+    preview += "# Age          :";
+    if (player->age > 0)
+    {
+        preview += ToString(player->age) + Telnet::reset();
+    }
+    preview += "\n";
+
+    // DESCRIPTION
+    preview += "# Description  :";
+    if (!player->description.empty())
+    {
+        preview += player->description + Telnet::reset();
+    }
+    preview += "\n";
+
+    // WEIGHT
+    preview += "# Weight       :";
+    if (player->weight > 0)
+    {
+        preview += ToString(player->weight) + Telnet::reset();
+    }
+    preview += "\n";
+    preview += "# -------------------------------------------- #\n";
+    player->sendMsg(preview);
+}
+
+void RollbackCharacterCreation(Character * character, ConnectionState new_state)
+{
+    Player * player = character->toPlayer();
+    // Change the player connection state with the received argument.
+    player->connection_state = new_state;
+    switch (new_state)
+    {
+        case ConnectionState::NoState:
+            break;
+        case ConnectionState::AwaitingName:
+            break;
+        case ConnectionState::AwaitingPassword:
+            break;
+        case ConnectionState::AwaitingNewName:
+            player->name = "";
+            break;
+        case ConnectionState::AwaitingNewPwd:
+            player->password = "";
+            break;
+        case ConnectionState::AwaitingNewPwdCon:
+            player->password = "";
+            break;
+        case ConnectionState::AwaitingNewStory:
+            break;
+        case ConnectionState::AwaitingNewRace:
+            player->race = nullptr;
+            player->health = 0;
+            player->stamina = 0;
+            player->strength = 0;
+            player->agility = 0;
+            player->perception = 0;
+            player->constitution = 0;
+            player->intelligence = 0;
+            player->remaining_points = 0;
+            break;
+        case ConnectionState::AwaitingNewAttr:
+            player->strength = player->race->strength;
+            player->agility = player->race->agility;
+            player->perception = player->race->perception;
+            player->constitution = player->race->constitution;
+            player->intelligence = player->race->intelligence;
+            break;
+        case ConnectionState::AwaitingNewGender:
+            player->sex = 0;
+            break;
+        case ConnectionState::AwaitingNewAge:
+            player->age = 0;
+            break;
+        case ConnectionState::AwaitingNewDesc:
+            player->description = "";
+            break;
+        case ConnectionState::AwaitingNewWeight:
+            player->weight = 0;
+            break;
+        case ConnectionState::Playing:
+        case ConnectionState::AwaitingNewConfirm:
+            player->sendMsg("It seems that this choiche has not been handled...");
+            player->closeConnection();
+            break;
+    }
+    AdvanceCharacterCreation(player, new_state);
+}
+
+void AdvanceCharacterCreation(Character * character, ConnectionState new_state, std::string message)
+{
+    Player * player = character->toPlayer();
+    // Change the player connection state with the received argument.
+    player->connection_state = new_state;
+    // The message that has to be sent.
+    std::string msg;
+    if (new_state == ConnectionState::Playing)
+    {
+        // Retrieve the saved prompt.
+        player->prompt = player->prompt_save;
+        // Entered the MUD.
+        player->enterGame();
+    }
+    else if (new_state == ConnectionState::AwaitingName)
+    {
+        msg += Telnet::clearScreen();
+        msg += "\nWelcome to RadMud. Version " + Telnet::green() + kVersion + Telnet::reset() + "!\n";
+        msg += Telnet::red();
+        msg += "#--------------------------------------------#\n";
+        msg += "                 XXXXXXXXXXXXX                \n";
+        msg += "      /'--_###XXXXXXXXXXXXXXXXXXX###_--'\\    \n";
+        msg += "      \\##/#/#XXXXXXXX /O\\ XXXXXXXX#\\'\\##/ \n";
+        msg += "       \\/#/#XXXXXXXXX \\O/ XXXXXXXXX#\\#\\/  \n";
+        msg += "        \\/##XXXXXXXXXX   XXXXXXXXXX##\\/     \n";
+        msg += "         ###XXXX  ''-.XXX.-''  XXXX###        \n";
+        msg += "           \\XXXX               XXXX/         \n";
+        msg += "             XXXXXXXXXXXXXXXXXXXXX            \n";
+        msg += "             XXXX XXXX X XXXX XXXX            \n";
+        msg += "             XXX # XXX X XXX # XXX            \n";
+        msg += "            /XXXX XXX XXX XXX XXXX\\          \n";
+        msg += "           ##XXXXXXX X   X XXXXXXX##          \n";
+        msg += "          ##   XOXXX X   X XXXOX   ##         \n";
+        msg += "          ##    #XXXX XXX XXX #    ##         \n";
+        msg += "           ##..##  XXXXXXXXX  ##..##          \n";
+        msg += "            ###      XXXXX     ####           \n";
+        msg += "#--------------------------------------------#\n";
+        msg += "| Created by : Enrico Fraccaroli.            |\n";
+        msg += "| Date       : 21 Agosto 2014                |\n";
+        msg += "#--------------------------------------------#\n";
+        msg += Telnet::reset();
+        msg += "# Enter your name, or type '" + Telnet::magenta() + "new" + Telnet::reset();
+        msg += "' in order to create a new character!\n";
+    }
+    else if (new_state == ConnectionState::AwaitingPassword)
+    {
+        // Nothing to do.
+    }
+    else if (new_state == ConnectionState::AwaitingNewName)
+    {
+        PrintChoices(player);
+        msg += "# " + Telnet::bold() + "Character's Name." + Telnet::reset() + "\n";
+        msg += "# Choose carefully, because this it's the only chance you have";
+        msg += " to pick a legendary name, maybe one day it will be whispered all over the lands.\n";
+        msg += "# Type [" + Telnet::magenta() + "back" + Telnet::reset() + "] to return to the login.\n";
+    }
+    else if (new_state == ConnectionState::AwaitingNewPwd)
+    {
+        PrintChoices(player);
+        msg += "# " + Telnet::bold() + "Character's Password." + Telnet::reset() + "\n";
+        msg += "# Choose a proper password, in order to protect the acces to your character.\n";
+        msg += "# Type [" + Telnet::magenta() + "back" + Telnet::reset() + "] to return to the previus step.\n";
+    }
+    else if (new_state == ConnectionState::AwaitingNewPwdCon)
+    {
+        msg += Telnet::green() + "Re-enter the password.." + Telnet::reset() + "\n";
+    }
+    else if (new_state == ConnectionState::AwaitingNewStory)
+    {
+        PrintChoices(player);
+        msg += "# The story of the Wasteland.\n";
+        msg += "#\n";
+        msg += "Year 374\n";
+        msg += "#\n";
+        msg += "# Type [" + Telnet::magenta() + "continue" + Telnet::reset() + "] to continue character creation.\n";
+        msg += "# Type [" + Telnet::magenta() + "back" + Telnet::reset() + "] to return to the previus step.\n";
+    }
+    else if (new_state == ConnectionState::AwaitingNewRace)
+    {
+        PrintChoices(player);
+        msg += "# " + Telnet::bold() + "Character's Race." + Telnet::reset() + "\n";
+        for (auto iterator : Mud::getInstance().mudRaces)
+        {
+            Race * race = &iterator.second;
+            if (race->player_allow) msg += "#    [" + ToString(race->vnum) + "] " + race->name + ".\n";
+        }
+        msg += "#\n";
+        msg += "# Choose one of the above race by typing the correspondent number.\n";
+        msg += "#\n";
+        msg += "# Type [" + Telnet::magenta() + "help [Number]" + Telnet::reset() + "]";
+        msg += " to read a brief description of the race.\n";
+        msg += "# Type [" + Telnet::magenta() + "back" + Telnet::reset() + "]";
+        msg += " to return to the previus step.\n";
+    }
+    else if (new_state == ConnectionState::AwaitingNewAttr)
+    {
+        PrintChoices(player);
+        msg += "# " + Telnet::bold() + "Character's Attributes." + Telnet::reset() + "\n";
+        msg += "#    [1] Strength     :" + ToString(player->strength) + "\n";
+        msg += "#    [2] Agility      :" + ToString(player->agility) + "\n";
+        msg += "#    [3] Perception   :" + ToString(player->perception) + "\n";
+        msg += "#    [4] Constitution :" + ToString(player->constitution) + "\n";
+        msg += "#    [5] Intelligence :" + ToString(player->intelligence) + "\n";
+        msg += "#\n";
+        msg += "# Remaining Points: " + Telnet::green() + ToString(player->remaining_points) + Telnet::reset() + "\n";
+        msg += "#\n";
+        msg += "# Type [" + Telnet::magenta() + "(number) +/-modifier" + Telnet::reset() + "]";
+        msg += " to decrease or increase the value of an attribute.\n";
+        msg += "# Type [" + Telnet::magenta() + "help (number)" + Telnet::reset() + "]";
+        msg += " to read a brief description of the attribute.\n";
+        msg += "# Type [" + Telnet::magenta() + "reset" + Telnet::reset() + "]";
+        msg += " to reset the values as default.\n";
+        msg += "# Type [" + Telnet::magenta() + "continue" + Telnet::reset() + "]";
+        msg += " to continue character creation.\n";
+        msg += "# Type [" + Telnet::magenta() + "back" + Telnet::reset() + "]";
+        msg += " to return to the previus step.\n";
+    }
+    else if (new_state == ConnectionState::AwaitingNewGender)
+    {
+        PrintChoices(player);
+        msg += "# " + Telnet::bold() + "Character's Gender." + Telnet::reset() + "\n";
+        msg += "#    [1] Male.\n";
+        msg += "#    [2] Female.\n";
+        msg += "#\n";
+        msg += "# Choose one of the above sex by typing the correspondent number.\n";
+        msg += "#\n";
+        msg += "# Type [" + Telnet::magenta() + "back" + Telnet::reset() + "] to return to the previus step.\n";
+    }
+    else if (new_state == ConnectionState::AwaitingNewAge)
+    {
+        PrintChoices(player);
+        msg += "# " + Telnet::bold() + "Character's Age." + Telnet::reset() + "\n";
+        msg += "# Choose the starting age of your character, be aware that during the game the time will pass.\n";
+        msg += "# Type [" + Telnet::magenta() + "back" + Telnet::reset() + "] to return to the previus step.\n";
+    }
+    else if (new_state == ConnectionState::AwaitingNewDesc)
+    {
+        PrintChoices(player);
+        msg += "# " + Telnet::bold() + "Character's Description." + Telnet::reset() + "\n";
+        msg += "# Insert a brief description of your character, its optional.\n";
+        msg += "# Type [" + Telnet::magenta() + "back" + Telnet::reset() + "] to return to the previus step.\n";
+        msg += "# Type [" + Telnet::magenta() + "skip" + Telnet::reset() + "] to just pass to the next step.\n";
+    }
+    else if (new_state == ConnectionState::AwaitingNewWeight)
+    {
+        PrintChoices(player);
+        msg += "# " + Telnet::bold() + "Character's Weight." + Telnet::reset() + "\n";
+        msg += "# Choose the wheight of your character.\n";
+        msg += "# Type [" + Telnet::magenta() + "back" + Telnet::reset() + "] to return to the previus step.\n";
+    }
+    else if (new_state == ConnectionState::AwaitingNewConfirm)
+    {
+        PrintChoices(player);
+        msg += "# Give a look to the information you have provided, now it's the right time";
+        msg += " to decide if you want to change something.\n";
+        msg += "# Type [" + Telnet::magenta() + "confirm" + Telnet::reset() + "] to conclude the character creation.\n";
+        msg += "# Type [" + Telnet::magenta() + "back" + Telnet::reset() + "]    to return to the previus step.\n";
+        msg += Telnet::green() + "Do you confirm? " + Telnet::reset() + "\n";
+    }
+    if (!message.empty())
+    {
+        msg += "# " + message + "\n";
+    }
+    player->sendMsg(msg);
 }
 
 void LoadCommands()

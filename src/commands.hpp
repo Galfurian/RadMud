@@ -24,7 +24,6 @@
 #include "profession.hpp"
 #include "utils.hpp"
 
-
 /// @brief Contains all the informations concerning a command, including its handler.
 class Command
 {
@@ -72,6 +71,42 @@ class Command
 /// @brief List of command arguments.
 typedef std::vector<std::pair<std::string, int> > ArgumentList;
 
+/// @defgroup ProcessStates Player state processing.
+/// @brief All the functions necessary to process players commands, from creation to gameplay.
+/// @{
+
+/// @brief Process commands when character is connected.
+/// @param character The character that execute the command.
+/// @param sArgs  Command arguments.
+void ProcessCommand(Character * character, std::istream &sArgs);
+/// Check player name.
+void ProcessPlayerName(Character * character, std::istream & sArgs);
+/// Check if the player password is correct.
+void ProcessPlayerPassword(Character * character, std::istream & sArgs);
+/// Step 1  - Choose the Name.
+void ProcessNewName(Character * character, std::istream & sArgs);
+/// Step 2  - Choose the Password.
+void ProcessNewPwd(Character * character, std::istream & sArgs);
+/// Step 3  - Confirm the Password.
+void ProcessNewPwdCon(Character * character, std::istream & sArgs);
+/// Step 4  - Short story of the mud world.
+void ProcessNewStory(Character * character, std::istream & sArgs);
+/// Step 5  - Choose the Race.
+void ProcessNewRace(Character * character, std::istream & sArgs);
+/// Step 6  - Choose the Attributes.
+void ProcessNewAttr(Character * character, std::istream & sArgs);
+/// Step 7  - Choose the Gender.
+void ProcessNewGender(Character * character, std::istream & sArgs);
+/// Step 8  - Choose the Age.
+void ProcessNewAge(Character * character, std::istream & sArgs);
+/// Step 9  - Choose the description (optional).
+void ProcessNewDesc(Character * character, std::istream & sArgs);
+/// Step 10 - Choose the Weight.
+void ProcessNewWeight(Character * character, std::istream & sArgs);
+/// Step 11 - Confirm the character.
+void ProcessNewConfirm(Character * character, std::istream & sArgs);
+///@}
+
 /// @brief Check if the executer of this command is a player.
 void NoMobile(Character * character);
 
@@ -83,6 +118,28 @@ void StopAction(Character * character);
 
 /// @brief Parse the arguments inside the given stream.
 ArgumentList ParseArgs(std::istream & sArgs);
+
+/// @brief Load all the possible player states.
+void LoadStates();
+
+/// @brief Print the values inserted until now.
+/// @param character The player whose creating a new character.
+void PrintChoices(Character * character);
+
+/// @brief Reset the informations inserted in the previous state.
+/// @param character The player whose creating a new character.
+/// @param new_state The step reached by this player.
+void RollbackCharacterCreation(Character * character, ConnectionState new_state);
+
+/// @brief Print the advancement in the character creation.
+/// @details If you want to introduce a new step, you have to insert it's text here.
+/// @param character The player whose creating a new character.
+/// @param con_state The step reached by this player.
+/// @param message   An optional message used only during error handling.
+void AdvanceCharacterCreation(Character * character, ConnectionState con_state, std::string message = "");
+
+/// @brief Map all the command to the respective std::string that the character can type.
+void LoadCommands();
 
 /// @defgroup ComInterfaces Commands List Interface.
 /// @brief All the functions necessary to handle the commands that a player can execute.
@@ -234,7 +291,6 @@ void DoLiquidInfo(Character * character, std::istream & sArgs);
 void DoProductionInfo(Character * character, std::istream & sArgs);
 /// Provide all the information regarding the given profession.
 void DoProfessionInfo(Character * character, std::istream & sArgs);
-
 /// List all the model used to define items.
 void DoModelList(Character * character, std::istream & sArgs);
 /// List all the items in the Mud.
@@ -276,13 +332,5 @@ void DoBuild(Character * character, std::istream &sArgs);
 /// Deconstruct something.
 void DoDeconstruct(Character * character, std::istream &sArgs);
 ///@}
-
-/// @brief Process commands when character is connected.
-/// @param character The character that execute the command.
-/// @param sArgs  Command arguments.
-void ProcessCommand(Character * character, std::istream &sArgs);
-
-/// @brief Map all the command to the respective std::string that the character can type.
-void LoadCommands();
 
 #endif

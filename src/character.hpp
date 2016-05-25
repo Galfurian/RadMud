@@ -356,7 +356,7 @@ class Character
 typedef std::vector<Character *> CharacterList;
 
 /// @brief An action handler for the character.
-typedef void (*ActionHandler)(Character * character, std::istream & args);
+typedef std::function<void(Character * character, std::istream & args)> ActionHandler;
 
 /// @brief Map of things to do for various connection states.
 typedef std::map<ConnectionState, ActionHandler> StateActionMap;

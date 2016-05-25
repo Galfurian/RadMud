@@ -29,54 +29,6 @@
 
 using namespace std;
 
-void NoMobile(Character * character)
-{
-    if (character->isMobile())
-    {
-        throw std::runtime_error("Npcs are not allowed to execute this command.\n");
-    }
-}
-
-void NoMore(Character * character, std::istream & sArgs)
-{
-    std::string sLine;
-    getline(sArgs, sLine);
-    if (!sLine.empty())
-    {
-        character->sendMsg("Unexpected input :'" + sLine + "'.\n");
-        throw std::runtime_error("");
-    }
-}
-
-void StopAction(Character * character)
-{
-    if ((character->action.getType() != ActionType::Wait) && (character->action.getType() != ActionType::NoAction))
-    {
-        character->doCommand("stop");
-    }
-}
-
-ArgumentList ParseArgs(std::istream & sArgs)
-{
-    ArgumentList arguments;
-    vector<string> words;
-
-    // Get the words from the input line.
-    string argumentsLine;
-    getline(sArgs, argumentsLine);
-    words = GetWords(argumentsLine);
-    for (auto it : words)
-    {
-        // Set one by default.
-        int number = 1;
-        // Extract the number.
-        ExtractNumber(it, number);
-        // Add the argument.
-        arguments.push_back(std::make_pair(it, number));
-    }
-    return arguments;
-}
-
 void DoDirection(Character * character, Direction direction)
 {
     // Check if the player it's already doing something.
