@@ -94,7 +94,6 @@ set(PROJECT_SRC
     ./src/skill.cpp
     ./src/sqlite/SQLiteDbms.cpp
     ./src/sqlite/SQLiteWrapper.cpp
-    ./src/states.cpp
     ./src/updater.cpp
     ./src/utilities/coordinates.cpp
     ./src/utilities/table.cpp
