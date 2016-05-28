@@ -23,8 +23,6 @@
 #include <chrono>
 #include <errno.h>
 
-#include "states.hpp"
-
 /// Input file descriptor.
 static fd_set in_set;
 /// Output file descriptor.
