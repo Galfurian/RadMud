@@ -22,6 +22,7 @@
 #include <chrono>
 
 #include "commands.hpp"
+#include "logger.hpp"
 #include "mud.hpp"
 // Other Include.
 #include "utils.hpp"
@@ -41,57 +42,57 @@ int FreeMudMemory();
 /// @return Errore code.
 int main(int argc, char ** argv)
 {
+    // Create a stopwatch for general timing information.
     Stopwatch<std::chrono::milliseconds> stopwatch("Main");
-    double timeBoot;
-    double timeUptime;
-    double timeShutdown;
-
-    PrintLogo();
-
-    ///////////////////////////////////////////////////////////////////////////
-    if (argc != 0)
+    // Open logging file.
+    if (!Logger::instance().openLog(kSystemDir + GetDate() + ".log"))
     {
-        for (int it = 0; it < argc; it++)
-        {
-            std::cout << argv[it] << std::endl;
-        }
+        std::cerr << "Can't create the logging file." << std::endl;
+        exit(1);
     }
-
+    // Print the mud logo.
+    PrintLogo();
+    // Start the stopwatch.
     stopwatch.start();
 
-    ///////////////////////////////////////////////////////////////////////////
-    LogMessage(kMSys, "Booting RadMud...");
-    LogMessage(kMSys, "    Loading Directions...");
+    Logger::log(LogLevel::Global, "Booting RadMud...");
+
+    Logger::log(LogLevel::Global, "    Loading Directions...");
     Mud::getInstance().addDirection("north", Direction::North);
     Mud::getInstance().addDirection("south", Direction::South);
     Mud::getInstance().addDirection("west", Direction::West);
     Mud::getInstance().addDirection("east", Direction::East);
     Mud::getInstance().addDirection("up", Direction::Up);
     Mud::getInstance().addDirection("down", Direction::Down);
-    LogMessage(kMSys, "    Loading Commands...");
+
+    Logger::log(LogLevel::Global, "    Loading Commands...");
     LoadCommands();
-    LogMessage(kMSys, "    Loading States...");
+
+    Logger::log(LogLevel::Global, "    Loading States...");
     LoadStates();
-    LogMessage(kMSys, "    Opening Database...");
+
+    Logger::log(LogLevel::Global, "    Opening Database...");
     if (!Mud::getInstance().getDbms().openDatabase())
     {
         LogError("Error opening database!");
         return 1;
     }
-    LogMessage(kMSys, "    Loading Tables...");
+
+    Logger::log(LogLevel::Global, "    Loading Tables...");
     if (!Mud::getInstance().getDbms().loadTables())
     {
-        LogMessage(kMSys, "Error loading tables!");
+        Logger::log(LogLevel::Global, "Error loading tables!");
         return 1;
     }
-    LogMessage(kMSys, "    Initializing Communications...");
+
+    Logger::log(LogLevel::Global, "    Initializing Communications...");
     if (!Mud::getInstance().initComunications())
     {
         LogError("Something gone wrong during initialization of comunication.");
         return 1;
     }
 
-    LogMessage(kMSys, "    Initializing Mud Variables...");
+    Logger::log(LogLevel::Global, "    Initializing Mud Variables...");
     if (InitMud())
     {
         LogError("Something gone wrong during initialization of mud.");
@@ -99,23 +100,21 @@ int main(int argc, char ** argv)
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    timeBoot = stopwatch.elapsed();
-    LogMessage(kMSys, "Booting Done (" + ToString(timeBoot) + ").");
-    LogMessage(kMSys, "");
+    double timeBoot = stopwatch.elapsed();
+    Logger::log(LogLevel::Global, "Booting Done (" + ToString(timeBoot) + ").");
 
     // Start the main loop which handle the players input/output.
     stopwatch.start();
     Mud::getInstance().mainLoop();
-    timeUptime = stopwatch.stop();
+    double timeUptime = stopwatch.stop();
 
     ///////////////////////////////////////////////////////////////////////////
     // Shutting down the mud.
-    LogMessage(kMSys, "");
-    LogMessage(kMSys, "Shutting down RadMud...");
+    Logger::log(LogLevel::Global, "Shutting down RadMud...");
     stopwatch.start();
 
     // Stop listening.
-    LogMessage(kMSys, "    Closing Communications...");
+    Logger::log(LogLevel::Global, "    Closing Communications...");
     Mud::getInstance().closeComunications();
 
     // Saving informations.
@@ -125,60 +124,60 @@ int main(int argc, char ** argv)
     FreeMudMemory();
 
     // Close database.
-    LogMessage(kMSys, "    Closing Database...");
+    Logger::log(LogLevel::Global, "    Closing Database...");
     if (!Mud::getInstance().getDbms().closeDatabase())
     {
         LogError("The database has not been closed correctly.");
     }
 
-    timeShutdown = stopwatch.stop();
-    LogMessage(kMSys, "Shutdown Completed.");
+    double timeShutdown = stopwatch.stop();
+    Logger::log(LogLevel::Global, "Shutdown Completed.");
     ///////////////////////////////////////////////////////////////////////////
     size_t bIn = Mud::getInstance().getUpdater().bandwidth_in;
     size_t bOut = Mud::getInstance().getUpdater().bandwidth_out;
     size_t bUnc = Mud::getInstance().getUpdater().bandwidth_uncompressed;
 
     // Print some statistics.
-    LogMessage(kMSys, "");
-    LogMessage(kMSys, "Statistics");
-    LogMessage(kMSys, "    Boot      : " + ToString(timeBoot) + " seconds.");
-    LogMessage(kMSys, "    Uptime    : " + ToString(timeUptime) + " seconds.");
-    LogMessage(kMSys, "    Shutdown  : " + ToString(timeShutdown) + " seconds.");
-    LogMessage(kMSys, "    Bandwidth :");
-    LogMessage(kMSys, "        In            = " + ToString(bIn) + " Bytes.");
-    LogMessage(kMSys, "        Output        = " + ToString(bOut) + " Bytes.");
-    LogMessage(kMSys, "        Uncompressed  = " + ToString(bUnc) + " Bytes.");
-    LogMessage(kMSys, "        Band. Saved   = " + ToString(bUnc - bOut) + " Bytes.");
-    LogMessage(kMSys, "");
-    LogMessage(kMSys, "Goodbye!");
-    LogMessage(kMSys, "#--------------------------------------------#");
+    Logger::log(LogLevel::Global, "");
+    Logger::log(LogLevel::Global, "Statistics");
+    Logger::log(LogLevel::Global, "    Boot      : " + ToString(timeBoot) + " seconds.");
+    Logger::log(LogLevel::Global, "    Uptime    : " + ToString(timeUptime) + " seconds.");
+    Logger::log(LogLevel::Global, "    Shutdown  : " + ToString(timeShutdown) + " seconds.");
+    Logger::log(LogLevel::Global, "    Bandwidth :");
+    Logger::log(LogLevel::Global, "        In            = " + ToString(bIn) + " Bytes.");
+    Logger::log(LogLevel::Global, "        Output        = " + ToString(bOut) + " Bytes.");
+    Logger::log(LogLevel::Global, "        Uncompressed  = " + ToString(bUnc) + " Bytes.");
+    Logger::log(LogLevel::Global, "        Band. Saved   = " + ToString(bUnc - bOut) + " Bytes.");
+    Logger::log(LogLevel::Global, "");
+    Logger::log(LogLevel::Global, "Goodbye!");
+    Logger::log(LogLevel::Global, "#--------------------------------------------#");
     return 0;
 }
 
 void PrintLogo()
 {
-    LogMessage(kMSys, "#--------------------------------------------#");
-    LogMessage(kMSys, "                 XXXXXXXXXXXXX                ");
-    LogMessage(kMSys, "      /'--_###XXXXXXXXXXXXXXXXXXX###_--'\\    ");
-    LogMessage(kMSys, "      \\##/#/#XXXXXXXXXXXXXXXXXXXXX#\\#\\##/  ");
-    LogMessage(kMSys, "       \\/#/#XXXXXXXXXXXXXXXXXXXXXXX#\\#\\/   ");
-    LogMessage(kMSys, "        \\/##XXXXXXXXXXXXXXXXXXXXXXX##\\/     ");
-    LogMessage(kMSys, "         ###XXXX  ''-.XXX.-''  XXXX###        ");
-    LogMessage(kMSys, "           \\XXXX               XXXX/         ");
-    LogMessage(kMSys, "             XXXXXXXXXXXXXXXXXXXXX            ");
-    LogMessage(kMSys, "             XXXX XXXX X XXXX XXXX            ");
-    LogMessage(kMSys, "             XXX # XXX X XXX # XXX            ");
-    LogMessage(kMSys, "            /XXXX XXX XXX XXX XXXX\\          ");
-    LogMessage(kMSys, "           ##XXXXXXX X   X XXXXXXX##          ");
-    LogMessage(kMSys, "          ##   XOXXX X   X XXXOX   ##         ");
-    LogMessage(kMSys, "          ##    #XXXX XXX XXX #    ##         ");
-    LogMessage(kMSys, "           ##..##  XXXXXXXXX  ##..##          ");
-    LogMessage(kMSys, "            ###      XXXXX     ####           ");
-    LogMessage(kMSys, "#--------------------------------------------#");
-    LogMessage(kMSys, "|                   RadMud                   |");
-    LogMessage(kMSys, "| Created by : Enrico Fraccaroli.            |");
-    LogMessage(kMSys, "| Date       : 29 September 2014             |");
-    LogMessage(kMSys, "#--------------------------------------------#");
+    Logger::log(LogLevel::Global, "#--------------------------------------------#");
+    Logger::log(LogLevel::Global, "                 XXXXXXXXXXXXX                ");
+    Logger::log(LogLevel::Global, "      /'--_###XXXXXXXXXXXXXXXXXXX###_--'\\    ");
+    Logger::log(LogLevel::Global, "      \\##/#/#XXXXXXXXXXXXXXXXXXXXX#\\#\\##/  ");
+    Logger::log(LogLevel::Global, "       \\/#/#XXXXXXXXXXXXXXXXXXXXXXX#\\#\\/   ");
+    Logger::log(LogLevel::Global, "        \\/##XXXXXXXXXXXXXXXXXXXXXXX##\\/     ");
+    Logger::log(LogLevel::Global, "         ###XXXX  ''-.XXX.-''  XXXX###        ");
+    Logger::log(LogLevel::Global, "           \\XXXX               XXXX/         ");
+    Logger::log(LogLevel::Global, "             XXXXXXXXXXXXXXXXXXXXX            ");
+    Logger::log(LogLevel::Global, "             XXXX XXXX X XXXX XXXX            ");
+    Logger::log(LogLevel::Global, "             XXX # XXX X XXX # XXX            ");
+    Logger::log(LogLevel::Global, "            /XXXX XXX XXX XXX XXXX\\          ");
+    Logger::log(LogLevel::Global, "           ##XXXXXXX X   X XXXXXXX##          ");
+    Logger::log(LogLevel::Global, "          ##   XOXXX X   X XXXOX   ##         ");
+    Logger::log(LogLevel::Global, "          ##    #XXXX XXX XXX #    ##         ");
+    Logger::log(LogLevel::Global, "           ##..##  XXXXXXXXX  ##..##          ");
+    Logger::log(LogLevel::Global, "            ###      XXXXX     ####           ");
+    Logger::log(LogLevel::Global, "#--------------------------------------------#");
+    Logger::log(LogLevel::Global, "|                   RadMud                   |");
+    Logger::log(LogLevel::Global, "| Created by : Enrico Fraccaroli.            |");
+    Logger::log(LogLevel::Global, "| Date       : 29 September 2014             |");
+    Logger::log(LogLevel::Global, "#--------------------------------------------#");
 }
 /// Initialize the mud.
 int InitMud()
@@ -187,12 +186,12 @@ int InitMud()
     unsigned int sSize = Mud::getInstance().getUpdater().secondSize;
     unsigned int hSize = Mud::getInstance().getUpdater().hourSize;
     unsigned int dSize = Mud::getInstance().getUpdater().daySize;
-    LogMessage(kMSys, "                                              ");
-    LogMessage(kMSys, "Mud Informations");
-    LogMessage(kMSys, "    Port          : " + ToString(kPort));
-    LogMessage(kMSys, "    Second Length : " + ToString(sSize) + " ms");
-    LogMessage(kMSys, "    Hour   Length : " + ToString(hSize) + " ms (" + ToString(hSize / 1000) + " s)");
-    LogMessage(kMSys, "    Day    Length : " + ToString(dSize) + " ms (" + ToString(dSize / 1000) + " s)");
+    Logger::log(LogLevel::Global, "                                              ");
+    Logger::log(LogLevel::Global, "Mud Informations");
+    Logger::log(LogLevel::Global, "    Port          : " + ToString(kPort));
+    Logger::log(LogLevel::Global, "    Second Length : " + ToString(sSize) + " ms");
+    Logger::log(LogLevel::Global, "    Hour   Length : " + ToString(hSize) + " ms (" + ToString(hSize / 1000) + " s)");
+    Logger::log(LogLevel::Global, "    Day    Length : " + ToString(dSize) + " ms (" + ToString(dSize / 1000) + " s)");
     return 0;
 }
 
@@ -200,11 +199,11 @@ int InitMud()
 int SaveMud()
 {
     Mud::getInstance().getDbms().beginTransaction();
-    LogMessage(kMSys, "    Saving information on Database for : Players...");
+    Logger::log(LogLevel::Global, "    Saving information on Database for : Players...");
     Mud::getInstance().savePlayers();
-    LogMessage(kMSys, "    Saving information on Database for : Items...");
+    Logger::log(LogLevel::Global, "    Saving information on Database for : Items...");
     Mud::getInstance().saveItems();
-    LogMessage(kMSys, "    Saving information on Database for : Rooms...");
+    Logger::log(LogLevel::Global, "    Saving information on Database for : Rooms...");
     Mud::getInstance().saveRooms();
     Mud::getInstance().getDbms().endTransaction();
     return 0;
@@ -213,43 +212,43 @@ int SaveMud()
 /// Delete all the instantiated classes in order to free used memory.
 int FreeMudMemory()
 {
-    LogMessage(kMSys, "    Freeing memory occupied by: Players...");
+    Logger::log(LogLevel::Global, "    Freeing memory occupied by: Players...");
     for (auto iterator : Mud::getInstance().mudPlayers)
     {
         delete (iterator);
     }
 
-    LogMessage(kMSys, "    Freeing memory occupied by: Mobiles...");
+    Logger::log(LogLevel::Global, "    Freeing memory occupied by: Mobiles...");
     for (auto iterator : Mud::getInstance().mudMobiles)
     {
         delete (iterator.second);
     }
 
-    LogMessage(kMSys, "    Freeing memory occupied by: Items...");
+    Logger::log(LogLevel::Global, "    Freeing memory occupied by: Items...");
     for (auto iterator : Mud::getInstance().mudItems)
     {
         delete (iterator);
     }
 
-    LogMessage(kMSys, "    Freeing memory occupied by: Rooms...");
+    Logger::log(LogLevel::Global, "    Freeing memory occupied by: Rooms...");
     for (auto iterator : Mud::getInstance().mudRooms)
     {
         delete (iterator.second);
     }
 
-    LogMessage(kMSys, "    Freeing memory occupied by: Areas...");
+    Logger::log(LogLevel::Global, "    Freeing memory occupied by: Areas...");
     for (auto iterator : Mud::getInstance().mudAreas)
     {
         delete (iterator.second);
     }
 
-    LogMessage(kMSys, "    Freeing memory occupied by: Writings...");
+    Logger::log(LogLevel::Global, "    Freeing memory occupied by: Writings...");
     for (auto iterator : Mud::getInstance().mudWritings)
     {
         delete (iterator.second);
     }
 
-    LogMessage(kMSys, "    Freeing memory occupied by: Corpses...");
+    Logger::log(LogLevel::Global, "    Freeing memory occupied by: Corpses...");
     for (auto iterator : Mud::getInstance().mudCorpses)
     {
         delete (iterator);

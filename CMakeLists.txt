@@ -100,6 +100,7 @@ set(PROJECT_SRC
     ./src/utils.cpp
     ./src/telnet.cpp
     ./src/combat.cpp
+    ./src/logger.cpp
 )
 
 find_package(Lua51 REQUIRED)

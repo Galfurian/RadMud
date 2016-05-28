@@ -282,26 +282,10 @@ void LogMessage(const int & level, const std::string & log, std::ostream & strea
     {
         return;
     }
-    std::string formatted_log = "[" + GetFormattedTime() + "]" + log;
+    std::string formatted_log = "[" + GetFormattedTime() + "][" + ToString(level) + "] " + log;
 
     // Output the message in the prompt.
     stream << formatted_log << std::endl;
-
-    // Save to file the log.
-    std::string filename = kSystemDir + GetDate() + ".log";
-
-    // Open the log file.
-    std::fstream outputFile(filename.c_str(), std::ios::app | std::ios::out);
-    if (!outputFile)
-    {
-        std::cerr << "Unable to generate log file.\n";
-    }
-    else
-    {
-        // Write the log message in the file.
-        outputFile << formatted_log << "\n";
-    }
-    outputFile.close();
 }
 
 void LogWarning(const std::string & log)
