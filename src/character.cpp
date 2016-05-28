@@ -500,7 +500,7 @@ Item * Character::findNearbyItem(std::string itemName, int & number)
     return item;
 }
 
-bool Character::findNearbyTools(ToolSet tools, ItemList & foundOnes)
+bool Character::findNearbyTools(ToolSet tools, ItemVector & foundOnes)
 {
     for (auto iterator : tools)
     {
@@ -538,7 +538,7 @@ bool Character::findNearbyTools(ToolSet tools, ItemList & foundOnes)
     return true;
 }
 
-bool Character::findNearbyResouces(IngredientMap ingredients, ItemList & foundOnes)
+bool Character::findNearbyResouces(IngredientMap ingredients, ItemVector & foundOnes)
 {
     for (auto iterator : ingredients)
     {
@@ -616,6 +616,7 @@ bool Character::addInventoryItem(Item * item)
     item->owner = this;
     // Add the item to the inventory.
     inventory.push_back(item);
+    LogMessage(kMSys, "Item '" + item->getName() + "' added to '" + this->getName() + "' inventory;");
     return true;
 }
 
@@ -626,13 +627,17 @@ bool Character::remInventoryItem(Item *item)
         LogError("[remInventoryItem] Item is a nullptr.");
         return false;
     }
-    if (remove_erase(inventory, item) == inventory.end())
+    else if (!FindErase(inventory, item))
     {
         LogError("[remInventoryItem] Error during item removal from inventory.");
         return false;
     }
-    item->owner = nullptr;
-    return true;
+    else
+    {
+        LogMessage(kMSys, "Item '" + item->getName() + "' removed from '" + this->getName() + "';");
+        item->owner = nullptr;
+        return true;
+    }
 }
 
 bool Character::canCarry(Item * item)
@@ -671,6 +676,7 @@ bool Character::addEquipmentItem(Item * item)
     item->owner = this;
     // Add the item to the equipment.
     equipment.push_back(item);
+    LogMessage(kMSys, "Item '" + item->getName() + "' added to '" + this->getName() + "' equipment;");
     return true;
 }
 
@@ -683,12 +689,17 @@ bool Character::remEquipmentItem(Item * item)
         return false;
     }
     // Try to remove the item from the equipment.
-    if (remove_erase(equipment, item) == equipment.end())
+    else if (!FindErase(equipment, item))
     {
-        LogError("[remEquipmentItem] Error during item removal from inventory.");
+        LogError("[remEquipmentItem] Error during item removal from equipment.");
         return false;
     }
-    return true;
+    else
+    {
+        LogMessage(kMSys, "Item '" + item->getName() + "' removed from '" + this->getName() + "';");
+        item->owner = nullptr;
+        return true;
+    }
 }
 
 bool Character::canWield(Item * item, std::string & message, EquipmentSlot & where)

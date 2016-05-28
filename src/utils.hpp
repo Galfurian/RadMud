@@ -25,6 +25,7 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <list>
 #include <zlib.h>
 #include <type_traits>
 #include <iostream>
@@ -282,17 +283,37 @@ void DeflateStream(std::vector<uint8_t> & uncompressed, std::vector<uint8_t> & c
 void InflateStream(std::vector<uint8_t> & compressed, std::vector<uint8_t> & uncompressed);
 
 /// @brief Remove an element from a vector.
-/// @param vec  The vector.
+/// @param v    The vector.
 /// @param item The element to remove.
-/// @return <b>True</b> if the remove is successful,<br><b>False</b> otherwise.
+/// @return <b>True</b> if the remove is successful,<br>
+///         <b>False</b> otherwise.
 /// Complexity: <b>Linear</b>.<br>
 /// Proportional to distance(target)s.
 template<typename T>
-inline typename std::vector<T>::iterator remove_erase(std::vector<T> & vec, const T & item)
+bool FindErase(std::vector<T> & v, const T & item)
 {
-    typename std::vector<T>::iterator it = vec.erase(std::remove(vec.begin(), vec.end(), item), vec.end());
-    vec.shrink_to_fit();
-    return it;
+    auto iterator = std::find(v.begin(), v.end(), item);
+    if (iterator != v.end())
+    {
+        v.erase(iterator);
+        v.shrink_to_fit();
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+template<typename T>
+typename std::list<T>::iterator FindErase(std::list<T> & l, const T & item)
+{
+    auto iterator = std::find(l.begin(), l.end(), item);
+    if (iterator != l.end())
+    {
+        iterator = l.erase(iterator, l.end());
+    }
+    return iterator;
 }
 
 /// @brief Remove an element from a set.
@@ -302,9 +323,9 @@ inline typename std::vector<T>::iterator remove_erase(std::vector<T> & vec, cons
 /// Complexity: <b>Linear</b>.<br>
 /// Proportional to distance(target)s.
 template<typename T>
-inline typename std::set<T>::iterator remove_erase(std::set<T> & set, const T & item)
+typename std::set<T>::iterator FindErase(std::set<T> & set, const T & item)
 {
-    typename std::set<T>::iterator it = set.find(item);
+    auto it = set.find(item);
     if (it != set.end())
     {
         set.erase(it);
@@ -319,9 +340,9 @@ inline typename std::set<T>::iterator remove_erase(std::set<T> & set, const T & 
 /// Complexity: <b>Log(n)</b>.<br>
 /// Where n is the number of members in the map.
 template<typename K, typename T>
-inline typename std::map<K, T>::iterator remove_erase(std::map<K, T> & map, const K & key)
+inline typename std::map<K, T>::iterator FindErase(std::map<K, T> & map, const K & key)
 {
-    typename std::map<K, T>::iterator it = map.find(key);
+    auto it = map.find(key);
     if (it != map.end())
     {
         map.erase(it);

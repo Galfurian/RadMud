@@ -142,7 +142,7 @@ bool SQLiteDbms::loadPlayer(Player * player)
     result->release();
 
     ///////////////////////////////////////////////////////////////////////////////
-    query = "SELECT item, position FROM ItemPlayer WHERE owner = \"" + player->getName() + "\";";
+    query = "SELECT item, position FROM ItemPlayer WHERE owner = \"" + player->name + "\";";
     // Execute the query.
     result = dbConnection.executeSelect(query.c_str());
     // Check the result.
@@ -162,7 +162,7 @@ bool SQLiteDbms::loadPlayer(Player * player)
     result->release();
 
     ///////////////////////////////////////////////////////////////////////////////
-    query = "SELECT skill,value FROM Advancement WHERE player=\"" + player->getName() + "\";";
+    query = "SELECT skill,value FROM Advancement WHERE player=\"" + player->name + "\";";
     // Execute the query.
     result = dbConnection.executeSelect(query.c_str());
     // Check the result.
@@ -388,30 +388,20 @@ bool LoadPlayerItems(ResultSet * result, Character * character)
         switch (slot)
         {
             case EquipmentSlot::Head:
-
             case EquipmentSlot::Torso:
-
             case EquipmentSlot::Back:
-
             case EquipmentSlot::Legs:
-
             case EquipmentSlot::Feet:
-
             case EquipmentSlot::RightHand:
-
             case EquipmentSlot::LeftHand:
                 // Change the slot of the item.
                 item->setCurrentSlot(slot);
-                // Set the owner.
-                item->owner = character;
                 // Add the item to the equipment.
-                character->equipment.push_back(item);
+                character->addEquipmentItem(item);
                 break;
             case EquipmentSlot::None:
-                // Set the owner.
-                item->owner = character;
                 // Add the item to the inventory.
-                character->inventory.push_back(item);
+                character->addInventoryItem(item);
                 break;
             default:
                 LogError("[LoadPlayerItems] Wrong equipment_slot value.");

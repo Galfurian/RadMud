@@ -80,9 +80,9 @@ class Character
         /// The current room the character is in.
         Room * room;
         /// Character's inventory.
-        ItemList inventory;
+        ItemVector inventory;
         /// Character's equipment.
-        ItemList equipment;
+        ItemVector equipment;
         /// Character's posture.
         CharacterPosture posture;
         /// Active effects on player.
@@ -209,13 +209,13 @@ class Character
         /// @param tools     The list of tools and their quantities.
         /// @param foundOnes The list of found tools.
         /// @return <b>True</b> if the operation goes well,<br><b>False</b> otherwise.
-        bool findNearbyTools(ToolSet tools, ItemList & foundOnes);
+        bool findNearbyTools(ToolSet tools, ItemVector & foundOnes);
 
         /// @brief Search the list of ingredients nearby the character.
         /// @param ingredients The list of ingredients and their quantities.
         /// @param foundOnes   The list of found ingredients.
         /// @return <b>True</b> if the operation goes well,<br><b>False</b> otherwise.
-        bool findNearbyResouces(IngredientMap ingredients, ItemList & foundOnes);
+        bool findNearbyResouces(IngredientMap ingredients, ItemVector & foundOnes);
 
         /// @brief Allows to check if an item is inside the inventory.
         /// @param item The item to search.

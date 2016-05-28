@@ -760,7 +760,7 @@ void DoOrganize(Character * character, std::istream & sArgs)
     }
     if (arguments.size() == 1)
     {
-        ItemList * list = &character->room->items;
+        ItemVector * list = &character->room->items;
         sort(list->begin(), list->end(), sorter);
         character->sendMsg("You have organized the room by " + sorterTag + ".\n");
         return; // Skip the rest of the function.
@@ -779,7 +779,7 @@ void DoOrganize(Character * character, std::istream & sArgs)
             return; // Skip the rest of the function.
         }
         // Organize the target container.
-        ItemList * list = &container->content;
+        ItemVector * list = &container->content;
         sort(list->begin(), list->end(), sorter);
         character->sendMsg("You have organized " + container->getName() + ", by " + sorterTag + ".\n");
     }

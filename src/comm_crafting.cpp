@@ -47,14 +47,14 @@ void DoProfession(Character * character, Profession * profession, std::istream &
         return;
     }
     // Search the needed tools.
-    ItemList usedTools;
+    ItemVector usedTools;
     if (!character->findNearbyTools(production->tools, usedTools))
     {
         character->sendMsg("You don't have the right tools.\n");
         return;
     }
     // Search the needed ingredients.
-    ItemList usedIngredients;
+    ItemVector usedIngredients;
     if (!character->findNearbyResouces(production->ingredients, usedIngredients))
     {
         character->sendMsg("You don't have enough material.\n");
@@ -131,14 +131,14 @@ void DoBuild(Character * character, std::istream & sArgs)
         return;
     }
     // Search the needed tools.
-    ItemList usedTools;
+    ItemVector usedTools;
     if (!character->findNearbyTools(schematics->tools, usedTools))
     {
         character->sendMsg("You don't have the right tools.\n");
         return;
     }
     // Search the needed ingredients.
-    ItemList usedIngredients;
+    ItemVector usedIngredients;
     if (!character->findNearbyResouces(schematics->ingredients, usedIngredients))
     {
         character->sendMsg("You don't have enough material.\n");

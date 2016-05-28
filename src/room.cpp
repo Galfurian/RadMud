@@ -99,8 +99,9 @@ void Room::addCharacter(Character * character)
 
 void Room::removeItem(Item * item)
 {
-    if (remove_erase(items, item) != items.end())
+    if (FindErase(items, item))
     {
+        LogMessage(kMSys, "Item '" + item->getName() + "' removed from '" + this->name + "';");
         item->room = nullptr;
     }
     else
@@ -111,8 +112,9 @@ void Room::removeItem(Item * item)
 
 void Room::removeBuilding(Item * item)
 {
-    if (remove_erase(items, item) != items.end())
+    if (FindErase(items, item))
     {
+        LogMessage(kMSys, "Building '" + item->getName() + "' removed from '" + this->name + "';");
         item->room = nullptr;
         ClearFlag(item->flags, ItemFlag::Built);
     }
@@ -124,7 +126,7 @@ void Room::removeBuilding(Item * item)
 
 void Room::removeCharacter(Character * character)
 {
-    if (remove_erase(characters, character) != characters.end())
+    if (FindErase(characters, character))
     {
         character->room = nullptr;
     }
@@ -262,9 +264,9 @@ Item * Room::findBuilding(int vnum)
     return nullptr;
 }
 
-ItemList Room::findBuildings(ModelType type)
+ItemVector Room::findBuildings(ModelType type)
 {
-    ItemList buildingsList;
+    ItemVector buildingsList;
     for (auto iterator : items)
     {
         if ((iterator->model->type == type) && HasFlag(iterator->flags, ItemFlag::Built))
@@ -448,7 +450,7 @@ bool Room::removeExit(Direction direction)
     {
         if (iterator->direction == direction)
         {
-            remove_erase(exits, iterator);
+            FindErase(exits, iterator);
             delete (iterator);
             return true;
         }

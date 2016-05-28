@@ -228,7 +228,7 @@ int FreeMudMemory()
     LogMessage(kMSys, "    Freeing memory occupied by: Items...");
     for (auto iterator : Mud::getInstance().mudItems)
     {
-        delete (iterator.second);
+        delete (iterator);
     }
 
     LogMessage(kMSys, "    Freeing memory occupied by: Rooms...");

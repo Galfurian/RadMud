@@ -81,6 +81,7 @@ bool Item::check(bool complete)
 
 void Item::destroy()
 {
+    LogMessage(kMErr, "Destroying item '" + this->getName() + "'");
     // Remove the item from the game, this means: Room, Player, Container.
     if (room != nullptr)
     {
@@ -104,6 +105,7 @@ void Item::destroy()
 
     if (this->model->type == ModelType::Corpse)
     {
+        LogMessage(kMErr, "Removing corpse '" + this->getName() + "' from MUD;");
         // Remove the item from the list of corpses.
         if (!Mud::getInstance().remCorpse(this))
         {
@@ -114,13 +116,18 @@ void Item::destroy()
     }
     else
     {
+        LogMessage(kMErr, "Removing item '" + this->getName() + "' from MUD;");
         // Remove the item from the mud.
         if (!Mud::getInstance().remItem(this))
         {
             LogError("Something gone wrong during item removal from mud.");
         }
+        LogMessage(kMErr, "Removing item '" + this->getName() + "' from DB;");
         // Remove the item from the database.
-        removeOnDB();
+        if (!this->removeOnDB())
+        {
+            LogError("Something gone wrong during item removal from DB.");
+        }
     }
     // Delete the item.
     delete (this);
@@ -488,9 +495,14 @@ bool Item::putInside(Item * item)
 
 void Item::takeOut(Item * item)
 {
-    if (remove_erase(content, item) != content.end())
+    if (FindErase(content, item))
     {
+        LogMessage(kMSys, "Item '" + item->getName() + "' taken out from '" + this->getName() + "';");
         item->container = nullptr;
+    }
+    else
+    {
+        LogError("Error during item removal from container.");
     }
 }
 
@@ -700,9 +712,9 @@ void Item::luaRegister(lua_State * L)
     .endClass();
 }
 
-ItemListCounted GroupItems(ItemList items)
+ItemVectorNumbered GroupItems(const ItemVector & items)
 {
-    ItemListCounted numberedItems;
+    ItemVectorNumbered numberedItems;
     for (auto it : items)
     {
         bool missing = true;

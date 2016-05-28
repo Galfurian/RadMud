@@ -108,7 +108,7 @@ class Mud
         /// List all the mobile.
         MobileMap mudMobiles;
         /// List of all items.
-        ItemMap mudItems;
+        ItemList mudItems;
         /// List of all the rooms.
         RoomMap mudRooms;
         /// List all the items model.

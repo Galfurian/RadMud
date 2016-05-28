@@ -460,7 +460,7 @@ void DoItemGet(Character * character, std::istream & sArgs)
     if (item->room != nullptr)
     {
         character->sendMsg("The item was in the room :" + item->room->name + "\n");
-        remove_erase(item->room->items, item);
+        FindErase(item->room->items, item);
         item->room = nullptr;
 
         // Remove the item from the table ItemRoom.
@@ -471,8 +471,8 @@ void DoItemGet(Character * character, std::istream & sArgs)
     else if (item->owner != nullptr)
     {
         character->sendMsg("The item was on the character :" + item->owner->getName() + "\n");
-        remove_erase(item->owner->inventory, item);
-        remove_erase(item->owner->equipment, item);
+        FindErase(item->owner->inventory, item);
+        FindErase(item->owner->equipment, item);
 
         item->owner = nullptr;
 
@@ -484,7 +484,7 @@ void DoItemGet(Character * character, std::istream & sArgs)
     else if (item->container != nullptr)
     {
         character->sendMsg("The item was inside the container:" + item->container->getName() + "\n");
-        remove_erase(item->container->content, item);
+        FindErase(item->container->content, item);
         item->container = nullptr;
 
         // Remove the item from the table Content.
@@ -1507,9 +1507,8 @@ void DoItemList(Character * character, std::istream & sArgs)
     table.addColumn("NAME", kAlignLeft);
     table.addColumn("TYPE", kAlignLeft);
     table.addColumn("LOCATION", kAlignLeft);
-    for (auto iterator : Mud::getInstance().mudItems)
+    for (auto item : Mud::getInstance().mudItems)
     {
-        Item * item = iterator.second;
         // Prepare the row.
         TableRow row;
         row.push_back(ToString(item->vnum));

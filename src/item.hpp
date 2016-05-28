@@ -20,6 +20,7 @@
 #define ITEM_HPP
 
 #include <vector>
+#include <list>
 #include <map>
 
 #include "liquid.hpp"
@@ -200,22 +201,19 @@ class Item
         }
 };
 
-/// Item list handler.
-typedef std::vector<Item *> ItemList;
+/// Vector of items.
+typedef std::vector<Item *> ItemVector;
 
 /// Vector of items with counter.
-typedef std::vector<std::pair<Item *, int>> ItemListCounted;
+typedef std::vector<std::pair<Item *, int>> ItemVectorNumbered;
 
-/// Item map handler.
-typedef std::map<int, Item *> ItemMap;
-
-/// ItemMap iterator.
-typedef ItemMap::iterator ItemMapIterator;
+/// List of items.
+typedef std::list<Item *> ItemList;
 
 /// @brief Return the list of items grouped.
 /// @param items The item list to group.
 /// @return A vector which has for each item listed the number of occurence of that item.
-ItemListCounted GroupItems(ItemList items);
+ItemVectorNumbered GroupItems(const ItemVector & items);
 
 /// It's a pointer to an ordering function for items.
 typedef bool (*ItemSorter)(Item * first, Item * second);

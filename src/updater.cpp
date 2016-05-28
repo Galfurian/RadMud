@@ -242,8 +242,9 @@ void MudUpdater::updateMobilesHour()
 
 void MudUpdater::updateItems()
 {
-    ItemList corpsesToDestroy;
-    for (auto it = Mud::getInstance().mudCorpses.begin(); it != Mud::getInstance().mudCorpses.end(); ++it)
+    ItemList itemToDestroy;
+    LogMessage(kMSys, "Updating corpses...");
+    for (ItemList::iterator it = Mud::getInstance().mudCorpses.begin(); it != Mud::getInstance().mudCorpses.end(); ++it)
     {
         Item * corpse = *it;
         if (HasFlag(corpse->model->flags, ModelFlag::Unbreakable))
@@ -254,19 +255,14 @@ void MudUpdater::updateItems()
         corpse->decayCondition();
         if (corpse->condition <= 0)
         {
-            corpsesToDestroy.push_back(corpse);
+            itemToDestroy.insert(itemToDestroy.end(), corpse);
         }
     }
-    for (auto it : corpsesToDestroy)
+    LogMessage(kMSys, "Updating items...");
+    for (ItemList::iterator it = Mud::getInstance().mudItems.begin(); it != Mud::getInstance().mudItems.end(); ++it)
     {
-        // Trigger destroy.
-        it->destroy();
-    }
-
-    ItemList itemsToDestroy;
-    for (auto it = Mud::getInstance().mudItems.begin(); it != Mud::getInstance().mudItems.end(); ++it)
-    {
-        Item * item = it->second;
+        Item * item = *it;
+        LogMessage(kMSys, "Updating '" + item->getName() + "'...");
         if (HasFlag(item->model->flags, ModelFlag::Unbreakable))
         {
             continue;
@@ -275,14 +271,15 @@ void MudUpdater::updateItems()
         item->decayCondition();
         if (item->condition <= 0)
         {
-            itemsToDestroy.push_back(item);
+            itemToDestroy.insert(itemToDestroy.end(), item);
         }
     }
-    for (auto it : itemsToDestroy)
+    for (auto it : itemToDestroy)
     {
-        // Trigger destroy.
+        FindErase(Mud::getInstance().mudItems, it);
         it->destroy();
     }
+    LogMessage(kMSys, "Done!");
 }
 
 void MudUpdater::performActions()

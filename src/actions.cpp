@@ -590,7 +590,7 @@ void Action::performCraft()
         actor->sendMsg("\nYou have failed your action.\n");
         return;
     }
-    ItemList toDestroy;
+    ItemVector toDestroy;
     for (auto it : usedTools)
     {
         // Update the condition of the involved objects.
@@ -610,7 +610,7 @@ void Action::performCraft()
     }
 
     Mud::getInstance().getDbms().beginTransaction();
-    ItemList createdItems;
+    ItemVector createdItems;
     for (unsigned int it = 0; it < production->outcome.second; ++it)
     {
         Model * outcomeMode = production->outcome.first;
@@ -713,7 +713,7 @@ void Action::performBuild()
         }
     }
 
-    ItemList toDestroy;
+    ItemVector toDestroy;
     for (auto iterator : usedTools)
     {
         // Update the condition of the involved objects.

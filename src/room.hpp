@@ -56,7 +56,7 @@ class Room
         /// List of exits.
         ExitList exits;
         /// List of items in the room.
-        ItemList items;
+        ItemVector items;
         /// List of characters in the room.
         CharacterList characters;
         /// Integer that describe the flags of the room.
@@ -133,7 +133,7 @@ class Room
         /// @brief Search for the buildings of the given type inside the room.
         /// @param type The type of the buildings.
         /// @return The buildings list.
-        ItemList findBuildings(ModelType type);
+        ItemVector findBuildings(ModelType type);
 
         /// @brief Search for the character in the room.
         /// @param target    The character to search.

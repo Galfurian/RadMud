@@ -67,9 +67,8 @@ bool Mud::savePlayers()
 bool Mud::saveItems()
 {
     bool result = true;
-    for (auto iterator : mudItems)
+    for (auto item : mudItems)
     {
-        Item * item = iterator.second;
         if (!item->updateOnDB())
         {
             LogError("Error saving item :" + ToString(item->vnum));
@@ -102,7 +101,7 @@ bool Mud::addPlayer(Player * player)
 }
 bool Mud::remPlayer(Player * player)
 {
-    return (remove_erase(mudPlayers, player) != mudPlayers.end());
+    return (FindErase(mudPlayers, player) != mudPlayers.end());
 }
 bool Mud::addMobile(Mobile * mobile)
 {
@@ -110,20 +109,17 @@ bool Mud::addMobile(Mobile * mobile)
 }
 bool Mud::remMobile(Mobile * mobile)
 {
-    return (remove_erase(mudMobiles, mobile->id) != mudMobiles.end());
+    return (FindErase(mudMobiles, mobile->id) != mudMobiles.end());
 }
 bool Mud::addItem(Item * item)
 {
-    bool result = mudItems.insert(std::make_pair(item->vnum, item)).second;
-    if (result)
-    {
-        _maxVnumItem = std::max(_maxVnumItem, item->vnum);
-    }
-    return result;
+    mudItems.insert(mudItems.end(), item);
+    _maxVnumItem = std::max(_maxVnumItem, item->vnum);
+    return true;
 }
 bool Mud::remItem(Item * item)
 {
-    return (remove_erase(mudItems, item->vnum) != mudItems.end());
+    return (FindErase(mudItems, item) != mudItems.end());
 }
 bool Mud::addRoom(Room * room)
 {
@@ -136,7 +132,7 @@ bool Mud::addRoom(Room * room)
 }
 bool Mud::remRoom(Room * room)
 {
-    return (remove_erase(mudRooms, room->vnum) != mudRooms.end());
+    return (FindErase(mudRooms, room->vnum) != mudRooms.end());
 }
 void Mud::addCorpse(Item * corpse)
 {
@@ -145,7 +141,7 @@ void Mud::addCorpse(Item * corpse)
 }
 bool Mud::remCorpse(Item * corpse)
 {
-    return (remove_erase(mudCorpses, corpse) != mudCorpses.end());
+    return (FindErase(mudCorpses, corpse) != mudCorpses.end());
 }
 bool Mud::addModel(Model & model)
 {
@@ -251,10 +247,12 @@ Model * Mud::findModel(int vnum)
 
 Item * Mud::findItem(int vnum)
 {
-    ItemMap::iterator iterator = mudItems.find(vnum);
-    if (iterator != mudItems.end())
+    for (auto iterator : mudItems)
     {
-        return iterator->second;
+        if (iterator->vnum == vnum)
+        {
+            return iterator;
+        }
     }
     return nullptr;
 }
