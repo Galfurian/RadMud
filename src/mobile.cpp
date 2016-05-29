@@ -19,14 +19,15 @@
 // Basic Include.
 #include "mobile.hpp"
 
-#include "constants.hpp"
 // Local Includes.
 
 // Other Include.
-#include "luabridge/LuaBridge.h"
-#include "lua/lua_script.hpp"
 #include "mud.hpp"
 #include "room.hpp"
+#include "logger.hpp"
+#include "constants.hpp"
+#include "lua/lua_script.hpp"
+#include "luabridge/LuaBridge.h"
 
 using namespace std;
 
@@ -50,7 +51,7 @@ Mobile::Mobile() :
 
 Mobile::~Mobile()
 {
-    LogMessage(kMDec, "Deleted: Mobile.");
+    Logger::log(LogLevel::Debug, "Deleted: Mobile.");
     // Delete the models loaded as equipment.
     for (auto item : equipment)
     {
@@ -81,7 +82,7 @@ void Mobile::respawn()
     // Log the room.
     this->room->sendToAll(this->getNameCapital() + " apear from somewhere.");
     // Log to the mud.
-    LogMessage(kMMud, "Respawning " + this->id);
+    Logger::log(LogLevel::Debug, "Respawning " + this->id);
 }
 
 bool Mobile::check()
@@ -215,7 +216,7 @@ bool Mobile::mobileThread(std::string event, Character * character, std::string 
         }
         catch (luabridge::LuaException const& e)
         {
-            LogError(e.what());
+            Logger::log(LogLevel::Error, e.what());
         }
     }
     catch (luabridge::LuaException const & e)

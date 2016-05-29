@@ -35,15 +35,16 @@
 #include <sstream>
 #include <iostream>
 
-#include "commands.hpp"
-#include "constants.hpp"
-#include "faction.hpp"
+// Other Include.
 #include "mud.hpp"
 #include "race.hpp"
+#include "utils.hpp"
+#include "logger.hpp"
 #include "telnet.hpp"
 #include "updater.hpp"
-// Other Include.
-#include "utils.hpp"
+#include "faction.hpp"
+#include "commands.hpp"
+#include "constants.hpp"
 
 using namespace std;
 
@@ -71,7 +72,7 @@ Player::Player(const int & _socket, const int & _port, const std::string & _addr
 
 Player::~Player()
 {
-    LogMessage(kMDec, "Deleted: Player.");
+    Logger::log(LogLevel::Debug, "Deleted: Player.");
     // Send outstanding text.
     this->processWrite();
     // Close connection if active.
@@ -195,7 +196,7 @@ bool Player::createOnDB()
     arguments.push_back(ToString(rent_room));
     if (!Mud::getInstance().getDbms().insertInto("Player", arguments))
     {
-        LogError("Something gone wrong during player creation on database.");
+        Logger::log(LogLevel::Error, "Something gone wrong during player creation on database.");
         return false;
     }
 
@@ -208,7 +209,7 @@ bool Player::createOnDB()
         arguments.push_back(ToString(iterator.second));
         if (!Mud::getInstance().getDbms().insertInto("Advancement", arguments))
         {
-            LogError("Something gone wrong during player Skill creation on database.");
+            Logger::log(LogLevel::Error, "Something gone wrong during player Skill creation on database.");
             return false;
         }
     }
@@ -252,14 +253,14 @@ bool Player::updateOnDB()
 
         if (!Mud::getInstance().getDbms().updateInto("Player", value, where))
         {
-            LogError("Error during Player's Information save.");
+            Logger::log(LogLevel::Error, "Error during Player's Information save.");
             return false;
         }
         for (auto iterator : inventory)
         {
             if (!iterator->updateOnDB())
             {
-                LogError("Error during Player's Inventory save.");
+                Logger::log(LogLevel::Error, "Error during Player's Inventory save.");
                 return false;
             }
         }
@@ -267,7 +268,7 @@ bool Player::updateOnDB()
         {
             if (!iterator->updateOnDB())
             {
-                LogError("Error during Player's Equipment save.");
+                Logger::log(LogLevel::Error, "Error during Player's Equipment save.");
                 return false;
             }
         }
@@ -280,7 +281,7 @@ bool Player::updateOnDB()
 
             if (!Mud::getInstance().getDbms().insertInto("Advancement", arguments, false, true))
             {
-                LogError("Error during Player's Skills save.");
+                Logger::log(LogLevel::Error, "Error during Player's Skills save.");
                 return false;
             }
         }
@@ -431,7 +432,7 @@ void Player::processRead()
         // Close the socket.
         Mud::getInstance().closeSocket(psocket);
         // Log the error.
-        LogError("Connection " + ToString(psocket) + " closed.");
+        Logger::log(LogLevel::Error, "Connection " + ToString(psocket) + " closed.");
         // Clear the socket.
         this->psocket = kNoSocketIndicator;
         // Close the connection.

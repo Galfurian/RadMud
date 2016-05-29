@@ -19,11 +19,12 @@
 // Basic Include.
 #include "generator.hpp"
 
-#include "constants.hpp"
 // Local Includes.
 
 // Other Include.
 #include "utils.hpp"
+#include "logger.hpp"
+#include "constants.hpp"
 
 using namespace std;
 
@@ -153,7 +154,7 @@ Generator::Generator()
 
 Generator::~Generator()
 {
-    LogMessage(kMDec, "Deleted: Generator.");
+    Logger::log(LogLevel::Debug, "Deleted: Generator.");
 }
 
 void Generator::generate(int phase, string zone, string status)
@@ -173,7 +174,7 @@ void Generator::generate(int phase, string zone, string status)
             }
             else
             {
-                LogError("Error during phase ONE of room generation.");
+                Logger::log(LogLevel::Error, "Error during phase ONE of room generation.");
             }
             break;
         case 2:
@@ -183,7 +184,7 @@ void Generator::generate(int phase, string zone, string status)
             }
             else
             {
-                LogError("Error during phase TWO of room generation.");
+                Logger::log(LogLevel::Error, "Error during phase TWO of room generation.");
             }
 
             break;
@@ -194,7 +195,7 @@ void Generator::generate(int phase, string zone, string status)
             }
             else
             {
-                LogError("Error during phase THREE of room generation.");
+                Logger::log(LogLevel::Error, "Error during phase THREE of room generation.");
             }
             break;
         case 4:
@@ -204,7 +205,7 @@ void Generator::generate(int phase, string zone, string status)
             }
             else
             {
-                LogError("Error during phase FOUR of room generation.");
+                Logger::log(LogLevel::Error, "Error during phase FOUR of room generation.");
             }
             break;
     }

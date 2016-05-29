@@ -21,12 +21,13 @@
 
 #include <algorithm>
 
-#include "character.hpp"
-#include "constants.hpp"
+// Other Include.
 #include "mud.hpp"
 #include "room.hpp"
-// Other Include.
 #include "utils.hpp"
+#include "logger.hpp"
+#include "character.hpp"
+#include "constants.hpp"
 
 Production::Production() :
         vnum(-1),
@@ -66,7 +67,7 @@ bool Production::setOutcome(const std::string & source)
 {
     if (source.empty())
     {
-        LogError("No outcome set.");
+        Logger::log(LogLevel::Error, "No outcome set.");
         return false;
     }
     std::vector<std::string> outcomeList = SplitString(source, ";");
@@ -83,7 +84,7 @@ bool Production::setOutcome(const std::string & source)
         outcome.first = Mud::getInstance().findModel(ToInt(outcomeInfo[0]));
         if (outcome.first == nullptr)
         {
-            LogError("Can't find the Outcome :" + outcomeInfo[0]);
+            Logger::log(LogLevel::Error, "Can't find the Outcome :" + outcomeInfo[0]);
             correct = false;
             break;
         }
@@ -91,7 +92,7 @@ bool Production::setOutcome(const std::string & source)
         outcome.second = ToInt(outcomeInfo[1]);
         if (outcome.second == 0)
         {
-            LogError("Can't find the quantity of the Outcome :" + outcomeInfo[0]);
+            Logger::log(LogLevel::Error, "Can't find the quantity of the Outcome :" + outcomeInfo[0]);
             correct = false;
             break;
         }
@@ -103,7 +104,7 @@ bool Production::setTool(const std::string & source)
 {
     if (source.empty())
     {
-        LogError("No tool set.");
+        Logger::log(LogLevel::Error, "No tool set.");
         return false;
     }
     std::vector<std::string> toolList = SplitString(source, ";");
@@ -114,7 +115,7 @@ bool Production::setTool(const std::string & source)
         ToolType toolType = static_cast<ToolType>(ToInt(iterator));
         if (toolType == ToolType::NoType)
         {
-            LogError("Can't find the Tool Type:" + iterator);
+            Logger::log(LogLevel::Error, "Can't find the Tool Type:" + iterator);
             correct = false;
             break;
         }
@@ -127,7 +128,7 @@ bool Production::setIngredient(const std::string & source)
 {
     if (source.empty())
     {
-        LogError("No outcome set.");
+        Logger::log(LogLevel::Error, "No outcome set.");
         return false;
     }
     // Split the string of ingredients.
@@ -147,7 +148,7 @@ bool Production::setIngredient(const std::string & source)
         ResourceType ingredient = static_cast<ResourceType>(ToInt(ingredientInfo[0]));
         if (ingredient == ResourceType::NoType)
         {
-            LogError("Can't find the Ingredient :" + ingredientInfo[0]);
+            Logger::log(LogLevel::Error, "Can't find the Ingredient :" + ingredientInfo[0]);
             correct = false;
             break;
         }
@@ -155,7 +156,7 @@ bool Production::setIngredient(const std::string & source)
         int quantity = ToInt(ingredientInfo[1]);
         if (quantity == 0)
         {
-            LogError("Can't find the quantity of the Outcome :" + ingredientInfo[0]);
+            Logger::log(LogLevel::Error, "Can't find the quantity of the Outcome :" + ingredientInfo[0]);
             correct = false;
             break;
         }

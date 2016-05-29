@@ -50,9 +50,9 @@ typedef std::chrono::time_point<std::chrono::system_clock> TimeClock;
 
 /// Allows to define a non-aborting assertion.
 #define SafeAssert(e) ( (e) ? true : (\
-    LogError("Assertion :"#e),\
-    LogError("File      :"+std::string(__FILE__)),\
-    LogError("Line      :"+ToString(__LINE__)),\
+    std::cerr << "Assertion :"#e<<"\n",\
+    std::cerr << "File      :"<<std::string(__FILE__)<<"\n",\
+    std::cerr << "Line      :"<<ToString(__LINE__)<<"\n",\
     false))
 
 /// @struct CommandHelp
@@ -179,6 +179,9 @@ std::string BoolToString(const bool & value);
 /// @return The resulting integer.
 int ToInt(const std::string & source);
 
+/// @brief Transform a numeric value into a string.
+/// @param value The value to turn into a string.
+/// @return The resulting string.
 template<typename ValueType>
 std::string ToString(const ValueType & value)
 {
@@ -194,6 +197,9 @@ std::string ToString(const ValueType & value)
     return stm.str();
 }
 
+/// @brief Transform a numeric value into a string.
+/// @param value The value to turn into a string.
+/// @return The resulting string.
 template<typename Enum>
 std::string EnumToString(const Enum & value)
 {
@@ -225,20 +231,6 @@ std::string AlignString(const std::string & source, const StringAlign & alignmen
 /// @param string_to_check The string to check.
 /// @return <b>True</b> if the string it's made of all ASCII characters.<br><b>False</b> otherwise.
 bool IsAllASCII(const char *string_to_check);
-
-/// @brief Provide a way to prompt every important message both in Console and to file.
-/// @param level  The category of the message.
-/// @param log    The message to log.
-/// @param stream The stream to which the log is shown.
-void LogMessage(const int & level, const std::string & log, std::ostream & stream = std::cout);
-
-/// @brief Provide a way to prompt a warning.
-/// @param log The warning message to log.
-void LogWarning(const std::string & log);
-
-/// @brief Provide a way to prompt an error.
-/// @param log The error message to log.
-void LogError(const std::string & log);
 
 /// @brief Generate a random integer between the defined range.
 /// @param nMin Min value.
@@ -305,6 +297,13 @@ bool FindErase(std::vector<T> & v, const T & item)
     }
 }
 
+/// @brief Remove an element from a list.
+/// @param l    The list.
+/// @param item The element to remove.
+/// @return <b>True</b> if the remove is successful,<br>
+///         <b>False</b> otherwise.
+/// Complexity: <b>Linear</b>.<br>
+/// Proportional to distance(target)s.
 template<typename T>
 typename std::list<T>::iterator FindErase(std::list<T> & l, const T & item)
 {

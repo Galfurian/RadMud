@@ -24,12 +24,13 @@
 #include <iosfwd>
 #include <ostream>
 
+// Other Include.
 #include "character.hpp"
 #include "constants.hpp"
 #include "item.hpp"
-// Other Include.
 #include "luabridge/LuaBridge.h"
 #include "room.hpp"
+#include "logger.hpp"
 
 using namespace std;
 
@@ -82,7 +83,7 @@ Area::Area() :
 
 Area::~Area()
 {
-    LogMessage(kMDec, "Deleted: Area.");
+    Logger::log(LogLevel::Debug, "Deleted: Area.");
 }
 
 bool Area::check()
@@ -109,17 +110,17 @@ bool Area::inBoundaries(unsigned int x, unsigned int y, unsigned int z)
             }
             else
             {
-                LogError("[Area::AddRoom] Wrong elevation.");
+                Logger::log(LogLevel::Error, "[Area::AddRoom] Wrong elevation.");
             }
         }
         else
         {
-            LogError("[Area::AddRoom] Wrong height.");
+            Logger::log(LogLevel::Error, "[Area::AddRoom] Wrong height.");
         }
     }
     else
     {
-        LogError("[Area::AddRoom] Wrong width.");
+        Logger::log(LogLevel::Error, "[Area::AddRoom] Wrong width.");
     }
     return false;
 }

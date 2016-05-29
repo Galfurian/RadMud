@@ -21,11 +21,12 @@
 
 #include <cmath>
 
-#include "constants.hpp"
+// Other Include.
 #include "mud.hpp"
 #include "room.hpp"
-// Other Include.
 #include "utils.hpp"
+#include "logger.hpp"
+#include "constants.hpp"
 
 Continent::Continent() :
         vnum(),
@@ -111,17 +112,17 @@ bool Continent::inBoundaries(unsigned int x, unsigned int y, unsigned int z)
             }
             else
             {
-                LogError("[Area::AddRoom] Wrong altitude.");
+                Logger::log(LogLevel::Error, "[Area::AddRoom] Wrong altitude.");
             }
         }
         else
         {
-            LogError("[Area::AddRoom] Wrong height.");
+            Logger::log(LogLevel::Error, "[Area::AddRoom] Wrong height.");
         }
     }
     else
     {
-        LogError("[Area::AddRoom] Wrong width.");
+        Logger::log(LogLevel::Error, "[Area::AddRoom] Wrong width.");
     }
     return false;
 }

@@ -21,6 +21,8 @@
 #include <sstream>
 #include <iomanip>
 
+#include "../logger.hpp"
+
 TableColumn::TableColumn(std::string _title, StringAlign _alignment, size_t _width) :
         title(_title),
         alignment(_alignment),
@@ -79,7 +81,7 @@ void Table::addRow(std::vector<std::string> row)
 {
     if (row.size() != columns.size())
     {
-        LogError("Column number and provided row cells are different.");
+        Logger::log(LogLevel::Warning, "Column number and provided row cells are different.");
         return;
     }
     for (size_t idx = 0; idx < columns.size(); ++idx)

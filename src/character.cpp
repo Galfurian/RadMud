@@ -25,13 +25,14 @@
 #include <list>
 #include <sstream>
 
+// Other Include.
+#include "mud.hpp"
+#include "logger.hpp"
 #include "commands.hpp"
 #include "constants.hpp"
-// Other Include.
-#include "luabridge/LuaBridge.h"
 #include "lua/lua_script.hpp"
-#include "mud.hpp"
 #include "sqlite/SQLiteDbms.hpp"
+#include "luabridge/LuaBridge.h"
 
 using namespace std;
 
@@ -66,7 +67,7 @@ Character::Character() :
 
 Character::~Character()
 {
-    LogMessage(kMDec, "Deleted: Character.");
+    Logger::log(LogLevel::Debug, "Deleted: Character.");
 }
 
 bool Character::setCharacteristic(const std::string & source)
@@ -235,7 +236,7 @@ void Character::updateResources()
                 gain = (max_health / 100) * 2;
                 break;
             case CharacterPosture::NoPosure:
-                LogWarning("No posture has been set.");
+                Logger::log(LogLevel::Warning, "No posture has been set.");
                 break;
         }
         if (gain == 0)
@@ -266,7 +267,7 @@ void Character::updateResources()
                 gain = (max_stamina / 100) * 2;
                 break;
             case CharacterPosture::NoPosure:
-                LogWarning("No posture has been set.");
+                Logger::log(LogLevel::Warning, "No posture has been set.");
                 break;
         }
         if (gain == 0)
@@ -306,7 +307,7 @@ Room * Character::canMoveTo(Direction direction, std::string & error)
     // If the direction is upstairs, check if there is a stair.
     if (direction == Direction::Up)
     {
-        LogMessage(kMSys, "Flags :" + ToString(destExit->flags));
+        Logger::log(LogLevel::Debug, "Flags :" + ToString(destExit->flags));
         if (!HasFlag(destExit->flags, ExitFlag::Stairs))
         {
             error = "You can't go upstairs, there are no stairs.";
@@ -363,13 +364,13 @@ void Character::moveTo(
     // Check if the current room exist.
     if (room == nullptr)
     {
-        LogError("Character::moveTo: room is a NULLPTR.");
+        Logger::log(LogLevel::Error, "Character::moveTo: room is a NULLPTR.");
         return;
     }
     // Check if the destination exist.
     if (destination == nullptr)
     {
-        LogError("Character::moveTo: DESTINATION is a NULLPTR.");
+        Logger::log(LogLevel::Error, "Character::moveTo: DESTINATION is a NULLPTR.");
         return;
     }
 
@@ -609,14 +610,14 @@ bool Character::addInventoryItem(Item * item)
 {
     if (item == nullptr)
     {
-        LogError("[addInventoryItem] Item is a nullptr.");
+        Logger::log(LogLevel::Error, "[addInventoryItem] Item is a nullptr.");
         return false;
     }
     // Set the owner of the item.
     item->owner = this;
     // Add the item to the inventory.
     inventory.push_back(item);
-    LogMessage(kMSys, "Item '" + item->getName() + "' added to '" + this->getName() + "' inventory;");
+    Logger::log(LogLevel::Debug, "Item '" + item->getName() + "' added to '" + this->getName() + "' inventory;");
     return true;
 }
 
@@ -624,17 +625,17 @@ bool Character::remInventoryItem(Item *item)
 {
     if (item == nullptr)
     {
-        LogError("[remInventoryItem] Item is a nullptr.");
+        Logger::log(LogLevel::Error, "[remInventoryItem] Item is a nullptr.");
         return false;
     }
     else if (!FindErase(inventory, item))
     {
-        LogError("[remInventoryItem] Error during item removal from inventory.");
+        Logger::log(LogLevel::Error, "[remInventoryItem] Error during item removal from inventory.");
         return false;
     }
     else
     {
-        LogMessage(kMSys, "Item '" + item->getName() + "' removed from '" + this->getName() + "';");
+        Logger::log(LogLevel::Debug, "Item '" + item->getName() + "' removed from '" + this->getName() + "';");
         item->owner = nullptr;
         return true;
     }
@@ -669,14 +670,14 @@ bool Character::addEquipmentItem(Item * item)
     // Check if the item exist.
     if (item == nullptr)
     {
-        LogError("[addEquipmentItem] Item is a nullptr.");
+        Logger::log(LogLevel::Error, "[addEquipmentItem] Item is a nullptr.");
         return false;
     }
     // Set the owner of the item.
     item->owner = this;
     // Add the item to the equipment.
     equipment.push_back(item);
-    LogMessage(kMSys, "Item '" + item->getName() + "' added to '" + this->getName() + "' equipment;");
+    Logger::log(LogLevel::Debug, "Item '" + item->getName() + "' added to '" + this->getName() + "' equipment;");
     return true;
 }
 
@@ -685,18 +686,18 @@ bool Character::remEquipmentItem(Item * item)
     // Check if the item exist.
     if (item == nullptr)
     {
-        LogError("[remEquipmentItem] Item is a nullptr.");
+        Logger::log(LogLevel::Error, "[remEquipmentItem] Item is a nullptr.");
         return false;
     }
     // Try to remove the item from the equipment.
     else if (!FindErase(equipment, item))
     {
-        LogError("[remEquipmentItem] Error during item removal from equipment.");
+        Logger::log(LogLevel::Error, "[remEquipmentItem] Error during item removal from equipment.");
         return false;
     }
     else
     {
-        LogMessage(kMSys, "Item '" + item->getName() + "' removed from '" + this->getName() + "';");
+        Logger::log(LogLevel::Debug, "Item '" + item->getName() + "' removed from '" + this->getName() + "';");
         item->owner = nullptr;
         return true;
     }
@@ -966,14 +967,13 @@ bool Character::canSee(Character * target)
 
 void Character::doCommand(const string & command)
 {
-    //LogMessage(kMMud, "[" + name + "]:\"" + command + "\"");
     std::istringstream is(command);
     ProcessCommand(this, is);
 }
 
 void Character::sendMsg(const std::string & message)
 {
-    LogError("[SEND_MESSAGE] Msg :" + message);
+    Logger::log(LogLevel::Error, "[SEND_MESSAGE] Msg :" + message);
 }
 
 void Character::triggerDeath()
@@ -993,7 +993,7 @@ Item * Character::createCorpse()
     Model * model = Mud::getInstance().findModel(1);
     if (model == nullptr)
     {
-        LogError("Can't find the model of CORPSE.");
+        Logger::log(LogLevel::Error, "Can't find the model of CORPSE.");
         return nullptr;
     }
 
@@ -1093,8 +1093,8 @@ void Character::loadScript(const std::string & scriptFilename)
 
     if (luaL_dofile(L, scriptFilename.c_str()) != LUA_OK)
     {
-        LogError("Can't open script+" + scriptFilename + ".");
-        LogError("Error :" + std::string(lua_tostring(L, -1)));
+        Logger::log(LogLevel::Error, "Can't open script+" + scriptFilename + ".");
+        Logger::log(LogLevel::Error, "Error :" + std::string(lua_tostring(L, -1)));
     }
 }
 

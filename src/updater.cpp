@@ -19,9 +19,11 @@
 // Basic Include.
 #include "updater.hpp"
 
+// Other Include.
+#include "mud.hpp"
+#include "logger.hpp"
 #include "actions.hpp"
 #include "constants.hpp"
-#include "mud.hpp"
 
 using namespace std;
 
@@ -125,7 +127,7 @@ void MudUpdater::updateTime()
             break;
         case 24:
             // Day length overflow, return to Morning.
-            LogMessage(kMMud, "A day has passed!");
+            Logger::log(LogLevel::Info, "A day has passed!");
             mudDayPhase = 0;
             mudHour = 0;
             break;
@@ -243,7 +245,7 @@ void MudUpdater::updateMobilesHour()
 void MudUpdater::updateItems()
 {
     ItemList itemToDestroy;
-    LogMessage(kMSys, "Updating corpses...");
+    Logger::log(LogLevel::Debug, "Updating corpses...");
     for (ItemList::iterator it = Mud::getInstance().mudCorpses.begin(); it != Mud::getInstance().mudCorpses.end(); ++it)
     {
         Item * corpse = *it;
@@ -258,11 +260,11 @@ void MudUpdater::updateItems()
             itemToDestroy.insert(itemToDestroy.end(), corpse);
         }
     }
-    LogMessage(kMSys, "Updating items...");
+    Logger::log(LogLevel::Debug, "Updating items...");
     for (ItemList::iterator it = Mud::getInstance().mudItems.begin(); it != Mud::getInstance().mudItems.end(); ++it)
     {
         Item * item = *it;
-        LogMessage(kMSys, "Updating '" + item->getName() + "'...");
+        Logger::log(LogLevel::Debug, "Updating '" + item->getName() + "'...");
         if (HasFlag(item->model->flags, ModelFlag::Unbreakable))
         {
             continue;
@@ -279,7 +281,7 @@ void MudUpdater::updateItems()
         FindErase(Mud::getInstance().mudItems, it);
         it->destroy();
     }
-    LogMessage(kMSys, "Done!");
+    Logger::log(LogLevel::Debug, "Done!");
 }
 
 void MudUpdater::performActions()

@@ -19,8 +19,10 @@
 // Basic Include.
 #include "actions.hpp"
 
-#include "constants.hpp"
+// Other Include.
 #include "mud.hpp"
+#include "logger.hpp"
+#include "constants.hpp"
 
 Action::Action(Character * _character) :
     type(ActionType::Wait), actor(_character), target(), itemTarget(), destination(), direction(Direction::None), production(), schematics(), craftMaterial(), usedTools(), usedIngredients(), actionCooldown(), opponents()
@@ -130,17 +132,17 @@ bool Action::setMove(Room * _destination, Direction _direction, unsigned int _co
     bool correct = true;
     if (_destination == nullptr)
     {
-        LogError("No destination has been set.");
+        Logger::log(LogLevel::Error, "No destination has been set.");
         correct = false;
     }
     if (_direction == Direction::None)
     {
-        LogError("No direction has been set.");
+        Logger::log(LogLevel::Error, "No direction has been set.");
         correct = false;
     }
     if (_cooldown == 0)
     {
-        LogError("No cooldown has been set.");
+        Logger::log(LogLevel::Error, "No cooldown has been set.");
         correct = false;
     }
     if (correct)
@@ -163,27 +165,27 @@ bool Action::setCraft(
     bool correct = true;
     if (_production == nullptr)
     {
-        LogError("No profession has been set.");
+        Logger::log(LogLevel::Error, "No profession has been set.");
         correct = false;
     }
     if (_usedTools.empty())
     {
-        LogError("No used tools have been set.");
+        Logger::log(LogLevel::Error, "No used tools have been set.");
         correct = false;
     }
     if (_usedIngredients.empty())
     {
-        LogError("No used ingredients have been set.");
+        Logger::log(LogLevel::Error, "No used ingredients have been set.");
         correct = false;
     }
     if (_craftMaterial == nullptr)
     {
-        LogError("No crafting material has been set.");
+        Logger::log(LogLevel::Error, "No crafting material has been set.");
         correct = false;
     }
     if (_cooldown == 0)
     {
-        LogError("No cooldown has been set.");
+        Logger::log(LogLevel::Error, "No cooldown has been set.");
         correct = false;
     }
     if (correct)
@@ -208,22 +210,22 @@ bool Action::setBuild(
     bool correct = true;
     if (_schematics == nullptr)
     {
-        LogError("No schematics have been set.");
+        Logger::log(LogLevel::Error, "No schematics have been set.");
         correct = false;
     }
     if (_itemTarget == nullptr)
     {
-        LogError("No item is set for the building.");
+        Logger::log(LogLevel::Error, "No item is set for the building.");
         correct = false;
     }
     if (_usedTools.empty())
     {
-        LogError("No used tools have been set.");
+        Logger::log(LogLevel::Error, "No used tools have been set.");
         correct = false;
     }
     if (_cooldown == 0)
     {
-        LogError("No cooldown has been set.");
+        Logger::log(LogLevel::Error, "No cooldown has been set.");
         correct = false;
     }
     if (correct)
@@ -242,7 +244,7 @@ bool Action::setCombat(Character * opponent)
 {
     if (opponent == nullptr)
     {
-        LogError("No opponent is set.");
+        Logger::log(LogLevel::Error, "No opponent is set.");
         return false;
     }
     // Set the initial aggro as the difference between the fighters levels.
@@ -351,7 +353,7 @@ void Action::performMine()
     if (itemTarget == nullptr)
     {
         // Log a warning.
-        LogWarning(actor->getName() + ":mine = Vein is a null pointer.");
+        Logger::log(LogLevel::Warning, actor->getName() + ":mine = Vein is a null pointer.");
         // Notify the character.
         actor->sendMsg("You have failed your action.\n");
         return;
@@ -362,7 +364,7 @@ void Action::performMine()
     if (product == nullptr)
     {
         // Log a warning.
-        LogWarning(actor->getName() + ":mine = Product is a null pointer.");
+        Logger::log(LogLevel::Warning, actor->getName() + ":mine = Product is a null pointer.");
         // Notify the character.
         actor->sendMsg("You have failed your action.\n");
         return;
@@ -373,7 +375,7 @@ void Action::performMine()
     if (material == nullptr)
     {
         // Log a warning.
-        LogWarning(actor->getName() + ":mine = Material is a null pointer.");
+        Logger::log(LogLevel::Warning, actor->getName() + ":mine = Material is a null pointer.");
         // Notify the character.
         actor->sendMsg("You have failed your action.\n");
         return;
@@ -385,7 +387,7 @@ void Action::performMine()
     if (newItem == nullptr)
     {
         // Log a warning.
-        LogWarning(actor->getName() + ":mine = The new item is a null pointer.");
+        Logger::log(LogLevel::Warning, actor->getName() + ":mine = The new item is a null pointer.");
         // Rollback the database.
         Mud::getInstance().getDbms().rollbackTransection();
         // Notify the character.
@@ -453,7 +455,7 @@ void Action::performChop()
     if (itemTarget == nullptr)
     {
         // Log a warning.
-        LogWarning(actor->getName() + ":chop = Tree is a null pointer.");
+        Logger::log(LogLevel::Warning, actor->getName() + ":chop = Tree is a null pointer.");
         // Notify the character.
         actor->sendMsg("\nYou have failed your action.\n");
         return;
@@ -464,7 +466,7 @@ void Action::performChop()
     if (product == nullptr)
     {
         // Log a warning.
-        LogWarning(actor->getName() + ":chop = Product is a null pointer.");
+        Logger::log(LogLevel::Warning, actor->getName() + ":chop = Product is a null pointer.");
         // Notify the character.
         actor->sendMsg("\nYou have failed your action.\n");
         return;
@@ -475,7 +477,7 @@ void Action::performChop()
     if (material == nullptr)
     {
         // Log a warning.
-        LogWarning(actor->getName() + ":chop = Material is a null pointer.");
+        Logger::log(LogLevel::Warning, actor->getName() + ":chop = Material is a null pointer.");
         // Notify the character.
         actor->sendMsg("\nYou have failed your action.\n");
         return;
@@ -487,7 +489,7 @@ void Action::performChop()
     if (newItem == nullptr)
     {
         // Log a warning.
-        LogWarning(actor->getName() + ":chop = The new item is a null pointer.");
+        Logger::log(LogLevel::Warning, actor->getName() + ":chop = The new item is a null pointer.");
         // Rollback the database.
         Mud::getInstance().getDbms().rollbackTransection();
         // Notify the character.
@@ -543,7 +545,7 @@ void Action::performCraft()
     if (production == nullptr)
     {
         // Log a warning.
-        LogWarning(actor->getName() + ":craft = Production is a null pointer.");
+        Logger::log(LogLevel::Warning, actor->getName() + ":craft = Production is a null pointer.");
         // Notify the character.
         actor->sendMsg("\nYou have failed your action.\n");
         return;
@@ -552,7 +554,7 @@ void Action::performCraft()
     if (usedIngredients.empty())
     {
         // Log a warning.
-        LogWarning(actor->getName() + ":craft = No ingredients.");
+        Logger::log(LogLevel::Warning, actor->getName() + ":craft = No ingredients.");
         // Notify the character.
         actor->sendMsg("\nYou have failed your action.\n");
         return;
@@ -563,7 +565,7 @@ void Action::performCraft()
         if (iterator == nullptr)
         {
             // Log a warning.
-            LogWarning(actor->getName() + ":craft = One ingredient is a null pointer.");
+            Logger::log(LogLevel::Warning, actor->getName() + ":craft = One ingredient is a null pointer.");
             // Notify the character.
             actor->sendMsg("\nYou have failed your action.\n");
             return;
@@ -574,7 +576,7 @@ void Action::performCraft()
         if (iterator == nullptr)
         {
             // Log a warning.
-            LogWarning(actor->getName() + ":craft = One tool is a null pointer.");
+            Logger::log(LogLevel::Warning, actor->getName() + ":craft = One tool is a null pointer.");
             // Notify the character.
             actor->sendMsg("\nYou have failed your action.\n");
             return;
@@ -585,7 +587,7 @@ void Action::performCraft()
     if (craftMaterial == nullptr)
     {
         // Log a warning.
-        LogWarning(actor->getName() + ":craft = Crafting material is a null pointer.");
+        Logger::log(LogLevel::Warning, actor->getName() + ":craft = Crafting material is a null pointer.");
         // Notify the character.
         actor->sendMsg("\nYou have failed your action.\n");
         return;
@@ -619,7 +621,7 @@ void Action::performCraft()
         if (newItem == nullptr)
         {
             // Log a warning.
-            LogWarning(actor->getName() + ":craft = New item is a null pointer.");
+            Logger::log(LogLevel::Warning, actor->getName() + ":craft = New item is a null pointer.");
             // Rollback the database.
             Mud::getInstance().getDbms().rollbackTransection();
             // Delete all the items created so far.
@@ -677,7 +679,7 @@ void Action::performBuild()
     if (schematics == nullptr)
     {
         // Log a warning.
-        LogWarning(actor->getName() + ":craft = Building is a null pointer.");
+        Logger::log(LogLevel::Warning, actor->getName() + ":craft = Building is a null pointer.");
         // Notify the character.
         actor->sendMsg("\nYou have failed your action.\n");
         // Reset the action values.
@@ -691,7 +693,7 @@ void Action::performBuild()
         if (iterator == nullptr)
         {
             // Log a warning.
-            LogWarning(actor->getName() + ":craft = One ingredient is a null pointer.");
+            Logger::log(LogLevel::Warning, actor->getName() + ":craft = One ingredient is a null pointer.");
             // Notify the character.
             actor->sendMsg("\nYou have failed your action.\n");
             // Reset the action values.
@@ -704,7 +706,7 @@ void Action::performBuild()
         if (iterator == nullptr)
         {
             // Log a warning.
-            LogWarning(actor->getName() + ":craft = One tool is a null pointer.");
+            Logger::log(LogLevel::Warning, actor->getName() + ":craft = One tool is a null pointer.");
             // Notify the character.
             actor->sendMsg("\nYou have failed your action.\n");
             // Reset the action values.
@@ -735,7 +737,7 @@ void Action::performBuild()
     if (schematics->buildingModel == nullptr)
     {
         // Log a warning.
-        LogWarning(actor->getName() + ":craft = The building model is a null pointer.");
+        Logger::log(LogLevel::Warning, actor->getName() + ":craft = The building model is a null pointer.");
         // Notify the character.
         actor->sendMsg("\nYou have failed your action.\n");
         // Reset the action values.

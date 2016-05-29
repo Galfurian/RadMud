@@ -19,13 +19,14 @@
 // Basic Include.
 #include "model.hpp"
 
-#include "constants.hpp"
 // Local Includes.
 
 // Other Include.
-#include "luabridge/LuaBridge.h"
-#include "material.hpp"
 #include "mud.hpp"
+#include "logger.hpp"
+#include "material.hpp"
+#include "constants.hpp"
+#include "luabridge/LuaBridge.h"
 
 using namespace std;
 
@@ -178,7 +179,7 @@ Item * Model::createItem(std::string maker, Material * composition, ItemQuality 
 
     if (!newItem->check())
     {
-        LogError("Cannot create the new item.");
+        Logger::log(LogLevel::Error, "Cannot create the new item.");
         // Delete the item.
         delete (newItem);
         // Return pointer to nothing.

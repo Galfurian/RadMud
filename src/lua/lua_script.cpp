@@ -19,6 +19,7 @@
 #include "lua_script.hpp"
 
 #include "../mud.hpp"
+#include "../logger.hpp"
 #include "../commands.hpp"
 #include "../constants.hpp"
 #include "../luabridge/LuaBridge.h"
@@ -27,7 +28,7 @@ void LuaLog(std::string message)
 {
     if (!message.empty())
     {
-        LogMessage(kMLua, "[LUA]" + message);
+        Logger::log(LogLevel::Info, "[LUA]" + message);
     }
 }
 
@@ -48,7 +49,7 @@ Item * LuaLoadItem(Character * maker, int vnumModel, int vnumMaterial, int intQu
 {
     if (maker == nullptr)
     {
-        LogError("Received null maker.");
+        Logger::log(LogLevel::Error, "Received null maker.");
         return nullptr;
     }
 
@@ -58,12 +59,12 @@ Item * LuaLoadItem(Character * maker, int vnumModel, int vnumMaterial, int intQu
 
     if (model == nullptr)
     {
-        LogError("Can't find model :" + ToString(vnumModel));
+        Logger::log(LogLevel::Error, "Can't find model :" + ToString(vnumModel));
         return nullptr;
     }
     if (material == nullptr)
     {
-        LogError("Can't find material :" + ToString(vnumMaterial));
+        Logger::log(LogLevel::Error, "Can't find material :" + ToString(vnumMaterial));
         return nullptr;
     }
 

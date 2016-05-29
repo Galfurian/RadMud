@@ -23,6 +23,7 @@
 #include "../constants.hpp"
 #include "../mud.hpp"
 #include "../utils.hpp"
+#include "../logger.hpp"
 
 using namespace std;
 
@@ -68,8 +69,8 @@ bool SQLiteDbms::openDatabase()
 {
     if (!dbConnection.openConnection(kDatabaseName, kSystemDir))
     {
-        LogError("Error code :" + ToString(dbConnection.getLastErrorCode()));
-        LogError("Last error :" + dbConnection.getLastErrorMsg());
+        Logger::log(LogLevel::Error, "Error code :" + ToString(dbConnection.getLastErrorCode()));
+        Logger::log(LogLevel::Error, "Last error :" + dbConnection.getLastErrorMsg());
         return false;
     }
     return true;
@@ -79,8 +80,8 @@ bool SQLiteDbms::closeDatabase()
 {
     if (!dbConnection.closeConnection())
     {
-        LogError("Error code :" + ToString(dbConnection.getLastErrorCode()));
-        LogError("Last error :" + dbConnection.getLastErrorMsg());
+        Logger::log(LogLevel::Error, "Error code :" + ToString(dbConnection.getLastErrorCode()));
+        Logger::log(LogLevel::Error, "Last error :" + dbConnection.getLastErrorMsg());
         return false;
     }
     return true;
@@ -90,7 +91,7 @@ bool SQLiteDbms::loadTables()
 {
     for (auto iterator : tableLoaders)
     {
-        LogMessage(kMDat, "        Loading Table: " + iterator.first + ".");
+        Logger::log(LogLevel::Info, "        Loading Table: " + iterator.first + ".");
         // Execute the query.
         ResultSet * result = dbConnection.executeSelect(("SELECT * FROM " + iterator.first + ";").c_str());
         // Check the result.
@@ -102,7 +103,7 @@ bool SQLiteDbms::loadTables()
         if (!iterator.second(result))
         {
             // Log an error.
-            LogError("Encountered an error during loading table: " + iterator.first);
+            Logger::log(LogLevel::Error, "Encountered an error during loading table: " + iterator.first);
             // release the resource.
             result->release();
             return false;
@@ -118,7 +119,7 @@ bool SQLiteDbms::loadPlayer(Player * player)
     Stopwatch<std::chrono::milliseconds> stopwatch("LoadPlayer");
     std::string query;
     ResultSet * result;
-    LogMessage(kMDat, "Loading player " + player->getName() + ".");
+    Logger::log(LogLevel::Info, "Loading player " + player->getName() + ".");
     stopwatch.start();
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -128,13 +129,13 @@ bool SQLiteDbms::loadPlayer(Player * player)
     // Check the result.
     if (result == nullptr)
     {
-        LogError("Result of query is empty.");
+        Logger::log(LogLevel::Error, "Result of query is empty.");
         return false;
     }
     // Call the rows parsing function.
     if (!LoadPlayerInformation(result, player))
     {
-        LogError("Encountered an error during loading Player Information.");
+        Logger::log(LogLevel::Error, "Encountered an error during loading Player Information.");
         result->release();
         return false;
     }
@@ -148,13 +149,13 @@ bool SQLiteDbms::loadPlayer(Player * player)
     // Check the result.
     if (result == nullptr)
     {
-        LogError("Result of query is empty.");
+        Logger::log(LogLevel::Error, "Result of query is empty.");
         return false;
     }
     // Call the rows parsing function.
     if (!LoadPlayerItems(result, player))
     {
-        LogError("Encountered an error during loading Player Items.");
+        Logger::log(LogLevel::Error, "Encountered an error during loading Player Items.");
         result->release();
         return false;
     }
@@ -168,13 +169,13 @@ bool SQLiteDbms::loadPlayer(Player * player)
     // Check the result.
     if (result == nullptr)
     {
-        LogError("Result of query is empty.");
+        Logger::log(LogLevel::Error, "Result of query is empty.");
         return false;
     }
     // Call the rows parsing function.
     if (!LoadPlayerSkill(result, player))
     {
-        LogError("Encountered an error during loading Player Skills.");
+        Logger::log(LogLevel::Error, "Encountered an error during loading Player Skills.");
         result->release();
         return false;
     }
@@ -185,13 +186,13 @@ bool SQLiteDbms::loadPlayer(Player * player)
     // Check the loaded player.
     if (!player->check())
     {
-        LogError("Error during error checking.");
+        Logger::log(LogLevel::Error, "Error during error checking.");
         return false;
     }
 
     ///////////////////////////////////////////////////////////////////////////////
     // Log the elapsed time.
-    LogMessage(kMDat, "Elapsed Time (" + ToString(stopwatch.elapsed()) + " ms).");
+    Logger::log(LogLevel::Info, "Elapsed Time (" + ToString(stopwatch.elapsed()) + " ms).");
 
     return true;
 }
@@ -316,7 +317,7 @@ bool LoadPlayerInformation(ResultSet * result, Player * player)
 {
     if (!result->next())
     {
-        LogError("No result from the query.");
+        Logger::log(LogLevel::Error, "No result from the query.");
         return false;
     }
 
@@ -349,7 +350,7 @@ bool LoadPlayerInformation(ResultSet * result, Player * player)
         player->room = Mud::getInstance().findRoom(player->rent_room);
         if (player->room == nullptr)
         {
-            LogError("No room has been set.");
+            Logger::log(LogLevel::Error, "No room has been set.");
             return false;
         }
     }
@@ -367,20 +368,20 @@ bool LoadPlayerItems(ResultSet * result, Character * character)
 
         if (item == nullptr)
         {
-            LogError("Item not found!");
+            Logger::log(LogLevel::Error, "Item not found!");
             return false;
         }
 
         if (item->room != nullptr)
         {
-            LogError("The item is no more available.");
+            Logger::log(LogLevel::Error, "The item is no more available.");
             return false;
         }
         if (item->owner != nullptr)
         {
             if (item->owner != character)
             {
-                LogError("The item is no more available.");
+                Logger::log(LogLevel::Error, "The item is no more available.");
                 return false;
             }
         }
@@ -404,7 +405,7 @@ bool LoadPlayerItems(ResultSet * result, Character * character)
                 character->addInventoryItem(item);
                 break;
             default:
-                LogError("[LoadPlayerItems] Wrong equipment_slot value.");
+                Logger::log(LogLevel::Error, "[LoadPlayerItems] Wrong equipment_slot value.");
                 return false;
                 break;
         }
@@ -436,12 +437,12 @@ bool LoadPlayerSkill(ResultSet * result, Player * player)
     }
     catch (std::runtime_error & e)
     {
-        LogError("    " + std::string(e.what()));
+        Logger::log(LogLevel::Error, "    " + std::string(e.what()));
         return false;
     }
     catch (std::bad_alloc & e)
     {
-        LogError("    " + std::string(e.what()));
+        Logger::log(LogLevel::Error, "    " + std::string(e.what()));
         return false;
     }
 
@@ -454,7 +455,7 @@ bool LoadBadName(ResultSet * result)
     {
         if (!Mud::getInstance().badNames.insert(result->getNextString()).second)
         {
-            LogError("Error during bad name loading.");
+            Logger::log(LogLevel::Error, "Error during bad name loading.");
             return false;
         }
     }
@@ -467,7 +468,7 @@ bool LoadBlockedIp(ResultSet * result)
     {
         if (!Mud::getInstance().blockedIPs.insert(result->getNextString()).second)
         {
-            LogError("Error during blocked ips loading.");
+            Logger::log(LogLevel::Error, "Error during blocked ips loading.");
             return false;
         }
     }
@@ -480,7 +481,7 @@ bool LoadNews(ResultSet * result)
     {
         if (!Mud::getInstance().mudNews.insert(std::make_pair(result->getNextString(), result->getNextString())).second)
         {
-            LogError("Error during news loading.");
+            Logger::log(LogLevel::Error, "Error during news loading.");
             return false;
         }
     }
@@ -495,19 +496,19 @@ bool LoadContent(ResultSet * result)
         Item * contained = Mud::getInstance().findItem(result->getNextInteger());
         if (container == nullptr)
         {
-            LogError("Can't find container item.");
+            Logger::log(LogLevel::Error, "Can't find container item.");
             return false;
         }
         if (contained == nullptr)
         {
-            LogError("Can't find contained item.");
+            Logger::log(LogLevel::Error, "Can't find contained item.");
             return false;
         }
         container->content.push_back(contained);
         contained->container = container;
         if (!contained->check(true))
         {
-            LogError("Error during error checking.");
+            Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
     }
@@ -531,7 +532,7 @@ bool LoadItem(ResultSet * result)
 
         if (!item->check())
         {
-            LogError("Error during error checking.");
+            Logger::log(LogLevel::Error, "Error during error checking.");
             delete (item);
             return false;
         }
@@ -539,7 +540,7 @@ bool LoadItem(ResultSet * result)
         // Add the item to the map of items.
         if (!Mud::getInstance().addItem(item))
         {
-            LogError("Error during item insertion.");
+            Logger::log(LogLevel::Error, "Error during item insertion.");
             delete (item);
             return false;
         }
@@ -560,12 +561,12 @@ bool LoadSkill(ResultSet * result)
         // Check the correctness.
         if (!skill.check())
         {
-            LogError("Error during error checking.");
+            Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
         if (!Mud::getInstance().addSkill(skill))
         {
-            LogError("Error during skill insertion.");
+            Logger::log(LogLevel::Error, "Error during skill insertion.");
             return false;
         }
     }
@@ -586,11 +587,11 @@ bool LoadFaction(ResultSet * result)
         // Check the correctness.
         if (!faction.check())
         {
-            LogError("Error during error checking.");
+            Logger::log(LogLevel::Error, "Error during error checking.");
         }
         if (!Mud::getInstance().addFaction(faction))
         {
-            LogError("Error during faction insertion.");
+            Logger::log(LogLevel::Error, "Error during faction insertion.");
             return false;
         }
     }
@@ -625,12 +626,12 @@ bool LoadModel(ResultSet * result)
         // Check the correctness.
         if (!model.check())
         {
-            LogError("Error during error checking.");
+            Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
         if (!Mud::getInstance().addModel(model))
         {
-            LogError("Error during model insertion.");
+            Logger::log(LogLevel::Error, "Error during model insertion.");
             return false;
         }
     }
@@ -658,12 +659,12 @@ bool LoadRace(ResultSet * result)
         // Check the correctness.
         if (!race.check())
         {
-            LogError("Error during error checking.");
+            Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
         if (!Mud::getInstance().addRace(race))
         {
-            LogError("Error during race insertion.");
+            Logger::log(LogLevel::Error, "Error during race insertion.");
             return false;
         }
     }
@@ -694,7 +695,7 @@ bool LoadMobile(ResultSet * result)
         mobile->level = result->getNextInteger();
         if (!mobile->setCharacteristic(result->getNextString()))
         {
-            LogError("Wrong characteristics.");
+            Logger::log(LogLevel::Error, "Wrong characteristics.");
             delete (mobile);
             return false;
         }
@@ -708,13 +709,13 @@ bool LoadMobile(ResultSet * result)
         // Check the correctness.
         if (!mobile->check())
         {
-            LogError("Error during error checking.");
+            Logger::log(LogLevel::Error, "Error during error checking.");
             delete (mobile);
             return false;
         }
         if (!Mud::getInstance().addMobile(mobile))
         {
-            LogError("Error during mobile insertion.");
+            Logger::log(LogLevel::Error, "Error during mobile insertion.");
             delete (mobile);
             return false;
         }
@@ -749,13 +750,13 @@ bool LoadRoom(ResultSet * result)
         // Check the correctness.
         if (!room->check())
         {
-            LogError("Error during error checking.");
+            Logger::log(LogLevel::Error, "Error during error checking.");
             delete (room);
             return false;
         }
         if (!Mud::getInstance().addRoom(room))
         {
-            LogError("Error during room insertion.");
+            Logger::log(LogLevel::Error, "Error during room insertion.");
             delete (room);
             return false;
         }
@@ -778,19 +779,19 @@ bool LoadExit(ResultSet * result)
         // Check the correctness.
         if (exit->source == nullptr)
         {
-            LogError("Can't find the source room.");
+            Logger::log(LogLevel::Error, "Can't find the source room.");
             delete (exit);
             return false;
         }
         if (exit->destination == nullptr)
         {
-            LogError("Can't find the destination room.");
+            Logger::log(LogLevel::Error, "Can't find the destination room.");
             delete (exit);
             return false;
         }
         if (!exit->check())
         {
-            LogError("Error during error checking.");
+            Logger::log(LogLevel::Error, "Error during error checking.");
             delete (exit);
             return false;
         }
@@ -810,12 +811,12 @@ bool LoadItemRoom(ResultSet * result)
         // Check the correctness.
         if (room == nullptr)
         {
-            LogError("Can't find the room.");
+            Logger::log(LogLevel::Error, "Can't find the room.");
             return false;
         }
         if (item == nullptr)
         {
-            LogError("Can't find the item.");
+            Logger::log(LogLevel::Error, "Can't find the item.");
             return false;
         }
         // Load the item inside the room.
@@ -829,7 +830,7 @@ bool LoadItemRoom(ResultSet * result)
         }
         if (!item->check(true))
         {
-            LogError("Error during error checking.");
+            Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
     }
@@ -854,12 +855,12 @@ bool LoadArea(ResultSet * result)
         // Check the correctness.
         if (!area->check())
         {
-            LogError("Error during error checking.");
+            Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
         if (!Mud::getInstance().addArea(area))
         {
-            LogError("Error during area insertion.");
+            Logger::log(LogLevel::Error, "Error during area insertion.");
             return false;
         }
     }
@@ -875,19 +876,19 @@ bool LoadAreaList(ResultSet * result)
         // Check the correctness.
         if (area == nullptr)
         {
-            LogError("Can't find the area.");
+            Logger::log(LogLevel::Error, "Can't find the area.");
             return false;
         }
         if (room == nullptr)
         {
-            LogError("Can't find the room.");
+            Logger::log(LogLevel::Error, "Can't find the room.");
             return false;
         }
         // Load the room inside the area.
         area->addRoom(room);
         if (!room->check(true))
         {
-            LogError("Wrong room data.");
+            Logger::log(LogLevel::Error, "Wrong room data.");
             return false;
         }
     }
@@ -909,12 +910,12 @@ bool LoadWriting(ResultSet * result)
         Item * item = Mud::getInstance().findItem(writing->vnum);
         if (item == nullptr)
         {
-            LogError("Can't find the item :" + ToString(writing->vnum));
+            Logger::log(LogLevel::Error, "Can't find the item :" + ToString(writing->vnum));
             return false;
         }
         if (!Mud::getInstance().addWriting(writing))
         {
-            LogError("Error during writing insertion.");
+            Logger::log(LogLevel::Error, "Error during writing insertion.");
             return false;
         }
     }
@@ -938,12 +939,12 @@ bool LoadContinent(ResultSet * result)
         // Check the correctness.
         if (!continent->check())
         {
-            LogError("Error during error checking.");
+            Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
         if (!Mud::getInstance().addContinent(continent))
         {
-            LogError("Error during continent insertion.");
+            Logger::log(LogLevel::Error, "Error during continent insertion.");
             return false;
         }
     }
@@ -967,12 +968,12 @@ bool LoadMaterial(ResultSet * result)
         // Check the correctness.
         if (!material.check())
         {
-            LogError("Error during error checking.");
+            Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
         if (!Mud::getInstance().addMaterial(material))
         {
-            LogError("Error during material insertion.");
+            Logger::log(LogLevel::Error, "Error during material insertion.");
             return false;
         }
     }
@@ -1001,12 +1002,12 @@ bool LoadProfession(ResultSet * result)
         // Check the correctness.
         if (!professions.check())
         {
-            LogError("Error during error checking.");
+            Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
         if (!Mud::getInstance().addProfession(professions))
         {
-            LogError("Error during professions insertion.");
+            Logger::log(LogLevel::Error, "Error during professions insertion.");
             return false;
         }
     }
@@ -1039,17 +1040,17 @@ bool LoadProduction(ResultSet * result)
         // Check the correctness.
         if (!check)
         {
-            LogError("The production is incorrect " + production.name);
+            Logger::log(LogLevel::Error, "The production is incorrect " + production.name);
             return false;
         }
         if (!production.check())
         {
-            LogError("Error during error checking.");
+            Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
         if (!Mud::getInstance().addProduction(production))
         {
-            LogError("Error during production insertion.");
+            Logger::log(LogLevel::Error, "Error during production insertion.");
             return false;
         }
     }
@@ -1069,12 +1070,12 @@ bool LoadLiquid(ResultSet * result)
         // Check the correctness.
         if (!liquid.check())
         {
-            LogError("Error during error checking.");
+            Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
         if (!Mud::getInstance().addLiquid(liquid))
         {
-            LogError("Error during liquid insertion.");
+            Logger::log(LogLevel::Error, "Error during liquid insertion.");
             return false;
         }
     }
@@ -1091,22 +1092,22 @@ bool LoadContentLiq(ResultSet * result)
         bool check = true;
         if (container == nullptr)
         {
-            LogError("Can't find container item.");
+            Logger::log(LogLevel::Error, "Can't find container item.");
             check = false;
         }
         if (liquid == nullptr)
         {
-            LogError("Can't find liquid.");
+            Logger::log(LogLevel::Error, "Can't find liquid.");
             check = false;
         }
         if (quantity <= 0)
         {
-            LogError("Liquid content quantity misplaced.");
+            Logger::log(LogLevel::Error, "Liquid content quantity misplaced.");
             check = false;
         }
         if (!check)
         {
-            LogError("Error during error checking.");
+            Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
         container->contentLiq.first = liquid;
@@ -1126,37 +1127,37 @@ bool LoadTravelPoint(ResultSet * result)
         bool check = true;
         if (sourceArea == nullptr)
         {
-            LogError("Can't find the source area.");
+            Logger::log(LogLevel::Error, "Can't find the source area.");
             check = false;
         }
         if (sourceRoom == nullptr)
         {
-            LogError("Can't find the source room.");
+            Logger::log(LogLevel::Error, "Can't find the source room.");
             check = false;
         }
         if (targetArea == nullptr)
         {
-            LogError("Can't find the target area.");
+            Logger::log(LogLevel::Error, "Can't find the target area.");
             check = false;
         }
         if (targetRoom == nullptr)
         {
-            LogError("Can't find the target room.");
+            Logger::log(LogLevel::Error, "Can't find the target room.");
             check = false;
         }
         if (!check)
         {
-            LogError("Error during error checking.");
+            Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
         if (!Mud::getInstance().addTravelPoint(sourceRoom, targetRoom))
         {
-            LogError("Error during TravelPoint insertion.");
+            Logger::log(LogLevel::Error, "Error during TravelPoint insertion.");
             return false;
         }
         if (!Mud::getInstance().addTravelPoint(targetRoom, sourceRoom))
         {
-            LogError("Error during TravelPoint insertion.");
+            Logger::log(LogLevel::Error, "Error during TravelPoint insertion.");
             return false;
         }
         SetFlag(sourceRoom->flags, RoomFlag::TravelPoint);
@@ -1188,7 +1189,7 @@ bool LoadBuilding(ResultSet * result)
         // ////////////////////////////////////////////////////////////////
         if (building.buildingModel == nullptr)
         {
-            LogError("Can't find the building model.");
+            Logger::log(LogLevel::Error, "Can't find the building model.");
             check = false;
             break;
         }
@@ -1196,7 +1197,7 @@ bool LoadBuilding(ResultSet * result)
         // ////////////////////////////////////////////////////////////////
         if (tools.empty())
         {
-            LogError("No tool set.");
+            Logger::log(LogLevel::Error, "No tool set.");
             check = false;
         }
         for (auto it : tools)
@@ -1204,7 +1205,7 @@ bool LoadBuilding(ResultSet * result)
             ToolType toolType = static_cast<ToolType>(it);
             if (toolType == ToolType::NoType)
             {
-                LogError("Can't find the Tool :" + ToString(it));
+                Logger::log(LogLevel::Error, "Can't find the Tool :" + ToString(it));
                 check = false;
                 break;
             }
@@ -1214,7 +1215,7 @@ bool LoadBuilding(ResultSet * result)
         // ////////////////////////////////////////////////////////////////
         if ((ingredients.size() % 2) != 0)
         {
-            LogError("Ingredients are not even.");
+            Logger::log(LogLevel::Error, "Ingredients are not even.");
             check = false;
         }
         for (std::vector<int>::iterator it = ingredients.begin(); it != ingredients.end(); it++)
@@ -1222,14 +1223,15 @@ bool LoadBuilding(ResultSet * result)
             ResourceType ingredient = static_cast<ResourceType>(*it);
             if (ingredient == ResourceType::NoType)
             {
-                LogError("Can't find the Ingredient :" + ToString(*it));
+                Logger::log(LogLevel::Error, "Can't find the Ingredient :" + ToString(*it));
                 check = false;
                 break;
             }
             ++it;
             if (it == ingredients.end())
             {
-                LogError("Can't find the quantity of the Ingredient :" + GetResourceTypeName(ingredient));
+                Logger::log(LogLevel::Error,
+                    "Can't find the quantity of the Ingredient :" + GetResourceTypeName(ingredient));
                 check = false;
                 break;
             }
@@ -1238,17 +1240,17 @@ bool LoadBuilding(ResultSet * result)
         // Check the correctness.
         if (!check)
         {
-            LogError("The building is incorrect " + building.name);
+            Logger::log(LogLevel::Error, "The building is incorrect " + building.name);
             return false;
         }
         if (!building.check())
         {
-            LogError("Error during error checking.");
+            Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
         if (!Mud::getInstance().addBuilding(building))
         {
-            LogError("Error during building insertion.");
+            Logger::log(LogLevel::Error, "Error during building insertion.");
             return false;
         }
     }

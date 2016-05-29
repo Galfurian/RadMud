@@ -20,12 +20,13 @@
 #include <istream>
 #include <time.h>
 
+// Other Include.
+#include "mud.hpp"
+#include "utils.hpp"
+#include "logger.hpp"
 #include "commands.hpp"
 #include "constants.hpp"
-#include "mud.hpp"
 #include "utilities/table.hpp"
-// Other Include.
-#include "utils.hpp"
 
 using namespace std;
 
@@ -61,7 +62,7 @@ void DoDirection(Character * character, Direction direction)
             speed = 6;
             break;
         case CharacterPosture::NoPosure:
-            LogWarning("No posture set.");
+            Logger::log(LogLevel::Error, "No posture set.");
             break;
         case CharacterPosture::Sit:
         case CharacterPosture::Rest:
@@ -147,7 +148,7 @@ void DoQuit(Character * character, std::istream & sArgs)
         // End of properly connected.
         player->closeConnection();
 
-        LogMessage(kMPla, "Player " + player->getName() + " has left the game.");
+        Logger::log(LogLevel::Global, "Player " + player->getName() + " has left the game.");
 
         if (player->room != nullptr)
         {

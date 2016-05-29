@@ -23,6 +23,8 @@
 #include <chrono>
 #include <errno.h>
 
+#include "logger.hpp"
+
 /// Input file descriptor.
 static fd_set in_set;
 /// Output file descriptor.
@@ -57,7 +59,7 @@ bool Mud::savePlayers()
         }
         if (!iterator->updateOnDB())
         {
-            LogError("Error saving player :" + iterator->getName());
+            Logger::log(LogLevel::Error, "Error saving player :" + iterator->getName());
             result = false;
         }
     }
@@ -71,7 +73,7 @@ bool Mud::saveItems()
     {
         if (!item->updateOnDB())
         {
-            LogError("Error saving item :" + ToString(item->vnum));
+            Logger::log(LogLevel::Error, "Error saving item :" + ToString(item->vnum));
             result = false;
             break;
         }
@@ -87,7 +89,7 @@ bool Mud::saveRooms()
         Room * room = iterator.second;
         if (!room->updateOnDB())
         {
-            LogError("Error saving room :" + ToString(room->vnum));
+            Logger::log(LogLevel::Error, "Error saving room :" + ToString(room->vnum));
             result = false;
             break;
         }
@@ -620,7 +622,7 @@ void Mud::removeInactivePlayers()
         // Get the player at the given position.
         Player * player = *iterator;
         // Log the action of removing.
-        LogMessage(kMSys, "Removing inactive player : " + player->getName());
+        Logger::log(LogLevel::Global, "Removing inactive player : " + player->getName());
         // Only if the player has successfully logged in, save its state on DB.
         if (player->logged_in)
         {
@@ -693,7 +695,7 @@ void Mud::processNewConnection()
             // Immediately close connections from blocked IP addresses.
             if (blockedIPs.find(address) != blockedIPs.end())
             {
-                LogMessage(kMSys, "Rejected connection from " + address + "!");
+                Logger::log(LogLevel::Global, "Rejected connection from " + address + "!");
                 closeSocket(socketFileDescriptor);
                 continue;
             }
@@ -703,19 +705,19 @@ void Mud::processNewConnection()
             // Insert the player in the list of players.
             addPlayer(player);
 
-            LogMessage(kMSys, "#--------- New Connection ---------#");
-            LogMessage(kMSys, "     Socket  : " + ToString(socketFileDescriptor));
-            LogMessage(kMSys, "     Address : " + address);
-            LogMessage(kMSys, "     Port    : " + ToString(port));
-            LogMessage(kMSys, "#----------------------------------#");
+            Logger::log(LogLevel::Global, "#--------- New Connection ---------#");
+            Logger::log(LogLevel::Global, "     Socket  : " + ToString(socketFileDescriptor));
+            Logger::log(LogLevel::Global, "     Address : " + address);
+            Logger::log(LogLevel::Global, "     Port    : " + ToString(port));
+            Logger::log(LogLevel::Global, "#----------------------------------#");
 
             // Prepare to receive the player name.
             AdvanceCharacterCreation(player, ConnectionState::AwaitingName);
         }
         catch (std::exception & e)
         {
-            LogError("Error during processing a new connection.");
-            LogError("Error : " + std::string(e.what()));
+            Logger::log(LogLevel::Error, "Error during processing a new connection.");
+            Logger::log(LogLevel::Error, "Error : " + std::string(e.what()));
             break;
         }
     }
@@ -900,7 +902,7 @@ void Mud::mainLoop()
     struct timeval timeoutVal;
     timeoutVal.tv_sec = 0; // seconds
     timeoutVal.tv_usec = 5e05;  // microseconds
-    LogMessage(kMSys, "Waiting for Connections...");
+    Logger::log(LogLevel::Global, "Waiting for Connections...");
     // Loop processing input, output, events.
     // We will go through this loop roughly every timeout seconds.
     do
@@ -974,6 +976,6 @@ void Mud::mainLoop()
 void Bailout(int signal)
 {
     std::cout << "\n";
-    LogMessage(kMSys, "Received signal " + ToString(signal) + "!");
+    Logger::log(LogLevel::Global, "Received signal " + ToString(signal) + "!");
     Mud::getInstance().shutDown();
 }

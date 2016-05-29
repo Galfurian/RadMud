@@ -74,28 +74,28 @@ int main(int argc, char ** argv)
     Logger::log(LogLevel::Global, "    Opening Database...");
     if (!Mud::getInstance().getDbms().openDatabase())
     {
-        LogError("Error opening database!");
+        Logger::log(LogLevel::Error, "Error opening database!");
         return 1;
     }
 
     Logger::log(LogLevel::Global, "    Loading Tables...");
     if (!Mud::getInstance().getDbms().loadTables())
     {
-        Logger::log(LogLevel::Global, "Error loading tables!");
+        Logger::log(LogLevel::Error, "Error loading tables!");
         return 1;
     }
 
     Logger::log(LogLevel::Global, "    Initializing Communications...");
     if (!Mud::getInstance().initComunications())
     {
-        LogError("Something gone wrong during initialization of comunication.");
+        Logger::log(LogLevel::Error, "Something gone wrong during initialization of comunication.");
         return 1;
     }
 
     Logger::log(LogLevel::Global, "    Initializing Mud Variables...");
     if (InitMud())
     {
-        LogError("Something gone wrong during initialization of mud.");
+        Logger::log(LogLevel::Error, "Something gone wrong during initialization of mud.");
         return 1;
     }
 
@@ -127,7 +127,7 @@ int main(int argc, char ** argv)
     Logger::log(LogLevel::Global, "    Closing Database...");
     if (!Mud::getInstance().getDbms().closeDatabase())
     {
-        LogError("The database has not been closed correctly.");
+        Logger::log(LogLevel::Error, "The database has not been closed correctly.");
     }
 
     double timeShutdown = stopwatch.stop();

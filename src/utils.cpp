@@ -34,6 +34,7 @@
 
 // Other Include.
 #include "constants.hpp"
+#include "logger.hpp"
 
 bool BeginWith(const std::string & source, const std::string & target)
 {
@@ -276,28 +277,6 @@ bool IsAllASCII(const char * string_to_check)
     return true;
 }
 
-void LogMessage(const int & level, const std::string & log, std::ostream & stream)
-{
-    if (!kLogFlags[level])
-    {
-        return;
-    }
-    std::string formatted_log = "[" + GetFormattedTime() + "][" + ToString(level) + "] " + log;
-
-    // Output the message in the prompt.
-    stream << formatted_log << std::endl;
-}
-
-void LogWarning(const std::string & log)
-{
-    LogMessage(kMWrn, "[WARNING]" + log);
-}
-
-void LogError(const std::string & log)
-{
-    LogMessage(kMErr, "[ERROR]" + log, std::cerr);
-}
-
 int RandInteger(const int & nMin, const int & nMax)
 {
     std::random_device rng;
@@ -370,7 +349,7 @@ std::string GetFileContents(const char * filename)
     else
     {
         contents = "";
-        LogError("Can't open :" + std::string(filename));
+        Logger::log(LogLevel::Error, "Can't open :" + std::string(filename));
     }
     return (contents);
 }
@@ -405,7 +384,7 @@ std::string GetAttributeName(const int & id, const bool & abbreviated)
 /// Check if the return code from Zlib is an error.
 #define ZCHECK_ERROR(err, msg)\
 if (err != Z_OK) {\
-    LogError(#msg" error: "#err);\
+    std::cerr << #msg" error: "#err"\n";\
     exit(1);\
 }\
 

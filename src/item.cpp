@@ -22,13 +22,14 @@
 #include <algorithm>
 #include <sstream>
 
-#include "constants.hpp"
-#include "defines.hpp"
 // Other Include.
-#include "luabridge/LuaBridge.h"
-#include "material.hpp"
 #include "mud.hpp"
 #include "utils.hpp"
+#include "logger.hpp"
+#include "defines.hpp"
+#include "material.hpp"
+#include "constants.hpp"
+#include "luabridge/LuaBridge.h"
 
 using namespace std;
 
@@ -51,7 +52,7 @@ Item::Item() :
 
 Item::~Item()
 {
-    LogMessage(kMDec, "Deleted: Item.");
+    Logger::log(LogLevel::Debug, "Deleted: Item.");
 }
 
 bool Item::check(bool complete)
@@ -74,14 +75,14 @@ bool Item::check(bool complete)
     //safe &= SafeAssert(currentSlot != EquipmentSlot::kNoEquipSlot);
     if (!safe)
     {
-        LogMessage(kMErr, "Item :" + ToString(vnum));
+        Logger::log(LogLevel::Error, "Item :" + ToString(vnum));
     }
     return safe;
 }
 
 void Item::destroy()
 {
-    LogMessage(kMErr, "Destroying item '" + this->getName() + "'");
+    Logger::log(LogLevel::Error, "Destroying item '" + this->getName() + "'");
     // Remove the item from the game, this means: Room, Player, Container.
     if (room != nullptr)
     {
@@ -105,28 +106,28 @@ void Item::destroy()
 
     if (this->model->type == ModelType::Corpse)
     {
-        LogMessage(kMErr, "Removing corpse '" + this->getName() + "' from MUD;");
+        Logger::log(LogLevel::Error, "Removing corpse '" + this->getName() + "' from MUD;");
         // Remove the item from the list of corpses.
         if (!Mud::getInstance().remCorpse(this))
         {
-            LogError("Something gone wrong during corpse removal from mud.");
+            Logger::log(LogLevel::Error, "Something gone wrong during corpse removal from mud.");
         }
         // Delete the auto-generated model for this corpse.
         delete (this->model);
     }
     else
     {
-        LogMessage(kMErr, "Removing item '" + this->getName() + "' from MUD;");
+        Logger::log(LogLevel::Error, "Removing item '" + this->getName() + "' from MUD;");
         // Remove the item from the mud.
         if (!Mud::getInstance().remItem(this))
         {
-            LogError("Something gone wrong during item removal from mud.");
+            Logger::log(LogLevel::Error, "Something gone wrong during item removal from mud.");
         }
-        LogMessage(kMErr, "Removing item '" + this->getName() + "' from DB;");
+        Logger::log(LogLevel::Error, "Removing item '" + this->getName() + "' from DB;");
         // Remove the item from the database.
         if (!this->removeOnDB())
         {
-            LogError("Something gone wrong during item removal from DB.");
+            Logger::log(LogLevel::Error, "Something gone wrong during item removal from DB.");
         }
     }
     // Delete the item.
@@ -154,7 +155,7 @@ bool Item::updateOnDB()
         where.push_back(std::make_pair("vnum", ToString(vnum)));
         if (!Mud::getInstance().getDbms().updateInto("Item", value, where))
         {
-            LogError("Can't save the item!");
+            Logger::log(LogLevel::Error, "Can't save the item!");
             return false;
         }
     }
@@ -167,7 +168,7 @@ bool Item::updateOnDB()
         arguments.push_back(ToString(vnum));
         if (!Mud::getInstance().getDbms().insertInto("ItemRoom", arguments))
         {
-            LogError("Can't save the item inside the room!");
+            Logger::log(LogLevel::Error, "Can't save the item inside the room!");
             return false;
         }
 
@@ -203,7 +204,7 @@ bool Item::updateOnDB()
             }
             if (!Mud::getInstance().getDbms().insertInto("ItemPlayer", arguments, false, true))
             {
-                LogError("Can't save the item possesed by the Player!");
+                Logger::log(LogLevel::Error, "Can't save the item possesed by the Player!");
                 return false;
             }
 
@@ -221,7 +222,7 @@ bool Item::updateOnDB()
         arguments.push_back(ToString(vnum));
         if (!Mud::getInstance().getDbms().insertInto("ItemContent", arguments))
         {
-            LogError("Can't save the item inside the container!");
+            Logger::log(LogLevel::Error, "Can't save the item inside the container!");
             return false;
         }
 
@@ -241,7 +242,7 @@ bool Item::updateOnDB()
             arguments.push_back(ToString(iterator->vnum));
             if (!Mud::getInstance().getDbms().insertInto("ItemContent", arguments))
             {
-                LogError("Can't save the contained item!");
+                Logger::log(LogLevel::Error, "Can't save the contained item!");
                 return false;
             }
         }
@@ -255,7 +256,7 @@ bool Item::updateOnDB()
         arguments.push_back(ToString(contentLiq.second));
         if (!Mud::getInstance().getDbms().insertInto("ItemContentLiq", arguments, false, true))
         {
-            LogError("Can't save the contained liquid!");
+            Logger::log(LogLevel::Error, "Can't save the contained liquid!");
             return false;
         }
     }
@@ -268,7 +269,7 @@ bool Item::removeOnDB()
     { std::make_pair("vnum", ToString(vnum)) });
     if (!result)
     {
-        LogError("Error during item removal from table Item.");
+        Logger::log(LogLevel::Error, "Error during item removal from table Item.");
     }
     return result;
 }
@@ -497,12 +498,12 @@ void Item::takeOut(Item * item)
 {
     if (FindErase(content, item))
     {
-        LogMessage(kMSys, "Item '" + item->getName() + "' taken out from '" + this->getName() + "';");
+        Logger::log(LogLevel::Debug, "Item '" + item->getName() + "' taken out from '" + this->getName() + "';");
         item->container = nullptr;
     }
     else
     {
-        LogError("Error during item removal from container.");
+        Logger::log(LogLevel::Error, "Error during item removal from container.");
     }
 }
 

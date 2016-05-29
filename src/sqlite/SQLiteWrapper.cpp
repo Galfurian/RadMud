@@ -19,6 +19,7 @@
 #include "SQLiteWrapper.hpp"
 
 #include "../constants.hpp"
+#include "../logger.hpp"
 #include "../utils.hpp"
 
 ResultSet::~ResultSet()
@@ -77,7 +78,7 @@ bool SQLiteWrapper::closeConnection()
             {
                 bool retry = false;
                 int numberOfRetries = 0;
-                LogError("Database busy, can't be closed.");
+                Logger::log(LogLevel::Error, "Database busy, can't be closed.");
                 do
                 {
                     errorCode = sqlite3_close(dbDetails.dbConnection);
@@ -111,8 +112,8 @@ ResultSet * SQLiteWrapper::executeSelect(const char * query)
     {
         errorMessage = sqlite3_errmsg(dbDetails.dbConnection);
         errorCode = sqlite3_finalize(dbDetails.dbStatement);
-        LogError("Error code :" + ToString(errorCode));
-        LogError("Last error :" + errorMessage);
+        Logger::log(LogLevel::Error, "Error code :" + ToString(errorCode));
+        Logger::log(LogLevel::Error, "Last error :" + errorMessage);
         return NULL;
     }
     else
@@ -135,8 +136,8 @@ unsigned int SQLiteWrapper::executeQuery(const char * query)
 
     if (errorCode != SQLITE_OK)
     {
-        LogError("Error code :" + ToString(errorCode));
-        LogError("Last error :" + errorMessage);
+        Logger::log(LogLevel::Error, "Error code :" + ToString(errorCode));
+        Logger::log(LogLevel::Error, "Last error :" + errorMessage);
         return 0;
     }
 
@@ -184,8 +185,8 @@ bool SQLiteWrapper::release()
 {
     if (sqlite3_finalize(dbDetails.dbStatement) != SQLITE_OK)
     {
-        LogError("Error code :" + ToString(errorCode));
-        LogError("Last error :" + errorMessage);
+        Logger::log(LogLevel::Error, "Error code :" + ToString(errorCode));
+        Logger::log(LogLevel::Error, "Last error :" + errorMessage);
         return false;
     }
     num_col = 0;

@@ -118,9 +118,9 @@ class Continent
         bool inBoundaries(Coordinates coord);
 
         /// @brief Get the room at the given coordinates.
-        /// @param y Coordinate on height axis.
         /// @param x Coordinate on width axis.
-        /// @param x Coordinate on elevation axis.
+        /// @param y Coordinate on height axis.
+        /// @param z Coordinate on altitude axis.
         /// @return The room at the selected spot.
         Room * getRoom(unsigned int y, unsigned int x, unsigned int z);
 
@@ -136,10 +136,11 @@ class Continent
         std::vector<std::string> drawFov(Room * room, unsigned int radius);
 
         /// @brief A faster but a little inacurate version of a FOV alforithm.
-        /// @param map    A 2D map, where the the Field of View will be drawn.
-        /// @param x      Coordinate on width axis.
-        /// @param y      Coordinate on height axis.
-        /// @param radius The radius of visibility of the character.
+        /// @param map      A 2D map, where the the Field of View will be drawn.
+        /// @param origin_x The x coordinate of the central room.
+        /// @param origin_y The y coordinate of the central room.
+        /// @param origin_z The z coordinate of the central room.
+        /// @param radius   The radius of visibility of the character.
         void fieldOfView(
             Map2D<ContinentTile> & map,
             unsigned int origin_x,
@@ -148,12 +149,14 @@ class Continent
             unsigned int radius);
 
         /// @brief A fast line of sight algorithm between two points.
-        /// @param map The map where the LOS algorithm has to write the line.
-        /// @param x0  The starting x coordinate.
-        /// @param y0  The starting y coordinate.
-        /// @param x1  The final x coordinate.
-        /// @param y1  The final y coordinate.
-        /// @param radius The radius of visibility of the character.
+        /// @param map      The map where the LOS algorithm has to write the line.
+        /// @param origin_x The x coordinate of the central room.
+        /// @param origin_y The y coordinate of the central room.
+        /// @param origin_z The z coordinate of the central room.
+        /// @param incr_x   The value of which the x coordiante must be incremented at each step.
+        /// @param incr_y   The value of which the y coordiante must be incremented at each step.
+        /// @param incr_z   The value of which the z coordiante must be incremented at each step.
+        /// @param radius   The radius of visibility of the character.
         void lineOfSight(
             Map2D<ContinentTile> & map,
             unsigned int origin_x,

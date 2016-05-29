@@ -22,12 +22,13 @@
 #include <algorithm>
 #include <cmath>
 
-#include "constants.hpp"
-#include "generator.hpp"
 // Other Include.
-#include "luabridge/LuaBridge.h"
 #include "mud.hpp"
 #include "telnet.hpp"
+#include "logger.hpp"
+#include "constants.hpp"
+#include "generator.hpp"
+#include "luabridge/LuaBridge.h"
 
 using namespace std;
 
@@ -101,12 +102,12 @@ void Room::removeItem(Item * item)
 {
     if (FindErase(items, item))
     {
-        LogMessage(kMSys, "Item '" + item->getName() + "' removed from '" + this->name + "';");
+        Logger::log(LogLevel::Debug, "Item '" + item->getName() + "' removed from '" + this->name + "';");
         item->room = nullptr;
     }
     else
     {
-        LogError("Error during item removal from room.");
+        Logger::log(LogLevel::Error, "Error during item removal from room.");
     }
 }
 
@@ -114,13 +115,13 @@ void Room::removeBuilding(Item * item)
 {
     if (FindErase(items, item))
     {
-        LogMessage(kMSys, "Building '" + item->getName() + "' removed from '" + this->name + "';");
+        Logger::log(LogLevel::Debug, "Building '" + item->getName() + "' removed from '" + this->name + "';");
         item->room = nullptr;
         ClearFlag(item->flags, ItemFlag::Built);
     }
     else
     {
-        LogError("Error during item removal from room.");
+        Logger::log(LogLevel::Error, "Error during item removal from room.");
     }
 }
 
@@ -132,7 +133,7 @@ void Room::removeCharacter(Character * character)
     }
     else
     {
-        LogError("Error during character removal from room.");
+        Logger::log(LogLevel::Error, "Error during character removal from room.");
     }
 }
 
@@ -196,7 +197,7 @@ bool Room::updateOnDB()
     where.push_back(std::make_pair("vnum", ToString(vnum)));
     if (!Mud::getInstance().getDbms().updateInto("Room", value, where))
     {
-        LogError("Can't save the room!");
+        Logger::log(LogLevel::Error, "Can't save the room!");
         return false;
     }
     return true;
@@ -206,12 +207,12 @@ bool Room::removeOnDB()
 {
     if (items.size() > 0)
     {
-        LogError("[Room::RemoveOnDB] There are still items in the room!");
+        Logger::log(LogLevel::Error, "[Room::RemoveOnDB] There are still items in the room!");
         return false;
     }
     if (characters.size() > 0)
     {
-        LogError("[Room::RemoveOnDB] There are still characters in the room!");
+        Logger::log(LogLevel::Error, "[Room::RemoveOnDB] There are still characters in the room!");
         return false;
     }
 
@@ -638,13 +639,13 @@ bool CreateRoom(Coordinates coord, Room * source_room)
     Generator generator;
 
     // Generate room description and name.
-    LogMessage(kMDev, "[CreateRoom] Generating room details...");
+    Logger::log(LogLevel::Info, "[CreateRoom] Generating room details...");
     details = generator.generateRoom("cavern", "normal");
     name = details.first;
     description = details.second;
 
     // Create a new room.
-    LogMessage(kMDev, "[CreateRoom] Setting up the room variables...");
+    Logger::log(LogLevel::Info, "[CreateRoom] Setting up the room variables...");
     new_room->vnum = Mud::getInstance().getMaxVnumRoom() + 1;
     new_room->area = source_room->area;
     new_room->coord = coord;
@@ -654,7 +655,7 @@ bool CreateRoom(Coordinates coord, Room * source_room)
     new_room->flags = 0;
 
     // Insert into table Room the newly created room.
-    LogMessage(kMDev, "[CreateRoom] Saving room details on the database...");
+    Logger::log(LogLevel::Info, "[CreateRoom] Saving room details on the database...");
     arguments.push_back(ToString(new_room->vnum));
     arguments.push_back(ToString(new_room->coord.x));
     arguments.push_back(ToString(new_room->coord.y));
@@ -682,7 +683,7 @@ bool CreateRoom(Coordinates coord, Room * source_room)
     ConnectRoom(new_room);
 
     // Add the created room to the room_map.
-    LogMessage(kMDev, "[CreateRoom] Adding the room to the global list...");
+    Logger::log(LogLevel::Info, "[CreateRoom] Adding the room to the global list...");
     Mud::getInstance().addRoom(new_room);
     new_room->area->addRoom(new_room);
 
@@ -694,7 +695,7 @@ void ConnectRoom(Room * room)
     Coordinates poss_coord, coord = room->coord;
     vector<string> arguments;
 
-    LogMessage(kMDev, "[ConnectRoom] Connecting the room to near rooms...");
+    Logger::log(LogLevel::Info, "[ConnectRoom] Connecting the room to near rooms...");
     for (auto iterator : Mud::getInstance().mudDirections)
     {
         // Get the coordinates.
