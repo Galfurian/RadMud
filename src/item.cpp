@@ -108,7 +108,7 @@ void Item::destroy()
     {
         Logger::log(LogLevel::Error, "Removing corpse '" + this->getName() + "' from MUD;");
         // Remove the item from the list of corpses.
-        if (!Mud::getInstance().remCorpse(this))
+        if (!Mud::instance().remCorpse(this))
         {
             Logger::log(LogLevel::Error, "Something gone wrong during corpse removal from mud.");
         }
@@ -119,7 +119,7 @@ void Item::destroy()
     {
         Logger::log(LogLevel::Error, "Removing item '" + this->getName() + "' from MUD;");
         // Remove the item from the mud.
-        if (!Mud::getInstance().remItem(this))
+        if (!Mud::instance().remItem(this))
         {
             Logger::log(LogLevel::Error, "Something gone wrong during item removal from mud.");
         }
@@ -153,7 +153,7 @@ bool Item::updateOnDB()
         value.push_back(std::make_pair("flag", ToString(flags)));
         QueryList where;
         where.push_back(std::make_pair("vnum", ToString(vnum)));
-        if (!Mud::getInstance().getDbms().updateInto("Item", value, where))
+        if (!SQLiteDbms::instance().updateInto("Item", value, where))
         {
             Logger::log(LogLevel::Error, "Can't save the item!");
             return false;
@@ -166,7 +166,7 @@ bool Item::updateOnDB()
         vector<string> arguments;
         arguments.push_back(ToString(room->vnum));
         arguments.push_back(ToString(vnum));
-        if (!Mud::getInstance().getDbms().insertInto("ItemRoom", arguments))
+        if (!SQLiteDbms::instance().insertInto("ItemRoom", arguments))
         {
             Logger::log(LogLevel::Error, "Can't save the item inside the room!");
             return false;
@@ -175,8 +175,8 @@ bool Item::updateOnDB()
         // Remove from ItemPlayer and ItemContent.
         QueryList where;
         where.push_back(std::make_pair("item", ToString(vnum)));
-        Mud::getInstance().getDbms().deleteFrom("ItemPlayer", where);
-        Mud::getInstance().getDbms().deleteFrom("ItemContent", where);
+        SQLiteDbms::instance().deleteFrom("ItemPlayer", where);
+        SQLiteDbms::instance().deleteFrom("ItemContent", where);
     }
     else if (owner != nullptr)
     {
@@ -185,9 +185,9 @@ bool Item::updateOnDB()
             // Remove from ItemContent and ItemRoom.
             QueryList where;
             where.push_back(std::make_pair("item", ToString(vnum)));
-            Mud::getInstance().getDbms().deleteFrom("ItemPlayer", where);
-            Mud::getInstance().getDbms().deleteFrom("ItemContent", where);
-            Mud::getInstance().getDbms().deleteFrom("ItemRoom", where);
+            SQLiteDbms::instance().deleteFrom("ItemPlayer", where);
+            SQLiteDbms::instance().deleteFrom("ItemContent", where);
+            SQLiteDbms::instance().deleteFrom("ItemRoom", where);
         }
         else
         {
@@ -202,7 +202,7 @@ bool Item::updateOnDB()
             {
                 arguments.push_back(ToString(0));
             }
-            if (!Mud::getInstance().getDbms().insertInto("ItemPlayer", arguments, false, true))
+            if (!SQLiteDbms::instance().insertInto("ItemPlayer", arguments, false, true))
             {
                 Logger::log(LogLevel::Error, "Can't save the item possesed by the Player!");
                 return false;
@@ -211,8 +211,8 @@ bool Item::updateOnDB()
             // Remove from ItemContent and ItemRoom.
             QueryList where;
             where.push_back(std::make_pair("item", ToString(vnum)));
-            Mud::getInstance().getDbms().deleteFrom("ItemContent", where);
-            Mud::getInstance().getDbms().deleteFrom("ItemRoom", where);
+            SQLiteDbms::instance().deleteFrom("ItemContent", where);
+            SQLiteDbms::instance().deleteFrom("ItemRoom", where);
         }
     }
     else if (container != nullptr)
@@ -220,7 +220,7 @@ bool Item::updateOnDB()
         vector<string> arguments;
         arguments.push_back(ToString(container->vnum));
         arguments.push_back(ToString(vnum));
-        if (!Mud::getInstance().getDbms().insertInto("ItemContent", arguments))
+        if (!SQLiteDbms::instance().insertInto("ItemContent", arguments))
         {
             Logger::log(LogLevel::Error, "Can't save the item inside the container!");
             return false;
@@ -229,8 +229,8 @@ bool Item::updateOnDB()
         // Remove from ItemPlayer and ItemRoom.
         QueryList where;
         where.push_back(std::make_pair("item", ToString(vnum)));
-        Mud::getInstance().getDbms().deleteFrom("ItemPlayer", where);
-        Mud::getInstance().getDbms().deleteFrom("ItemRoom", where);
+        SQLiteDbms::instance().deleteFrom("ItemPlayer", where);
+        SQLiteDbms::instance().deleteFrom("ItemRoom", where);
     }
     if (!content.empty())
     {
@@ -240,7 +240,7 @@ bool Item::updateOnDB()
             // Prepare the query arguments.
             arguments.push_back(ToString(vnum));
             arguments.push_back(ToString(iterator->vnum));
-            if (!Mud::getInstance().getDbms().insertInto("ItemContent", arguments))
+            if (!SQLiteDbms::instance().insertInto("ItemContent", arguments))
             {
                 Logger::log(LogLevel::Error, "Can't save the contained item!");
                 return false;
@@ -254,7 +254,7 @@ bool Item::updateOnDB()
         arguments.push_back(ToString(vnum));
         arguments.push_back(ToString(contentLiq.first->vnum));
         arguments.push_back(ToString(contentLiq.second));
-        if (!Mud::getInstance().getDbms().insertInto("ItemContentLiq", arguments, false, true))
+        if (!SQLiteDbms::instance().insertInto("ItemContentLiq", arguments, false, true))
         {
             Logger::log(LogLevel::Error, "Can't save the contained liquid!");
             return false;
@@ -265,7 +265,7 @@ bool Item::updateOnDB()
 
 bool Item::removeOnDB()
 {
-    bool result = Mud::getInstance().getDbms().deleteFrom("Item",
+    bool result = SQLiteDbms::instance().deleteFrom("Item",
     { std::make_pair("vnum", ToString(vnum)) });
     if (!result)
     {
@@ -483,7 +483,7 @@ bool Item::putInside(Item * item)
     std::vector<std::string> arguments;
     arguments.push_back(ToString(vnum));       // Container
     arguments.push_back(ToString(item->vnum)); // Content
-    if (!Mud::getInstance().getDbms().insertInto("ItemContent", arguments))
+    if (!SQLiteDbms::instance().insertInto("ItemContent", arguments))
     {
         return false;
     }
@@ -521,7 +521,7 @@ bool Item::pourIn(Liquid * liquid, int quantity)
         arguments.push_back(ToString(liquid->vnum)); // Content
         arguments.push_back(ToString(quantity));     // Quantity
         // Execute the insert.
-        if (!Mud::getInstance().getDbms().insertInto("ItemContentLiq", arguments))
+        if (!SQLiteDbms::instance().insertInto("ItemContentLiq", arguments))
         {
             return false;
         }
@@ -537,7 +537,7 @@ bool Item::pourIn(Liquid * liquid, int quantity)
         where.push_back(std::make_pair("container", ToString(vnum)));
         where.push_back(std::make_pair("content", ToString(liquid->vnum)));
         // Update value inside the database.
-        if (!Mud::getInstance().getDbms().updateInto("ItemContentLiq", value, where))
+        if (!SQLiteDbms::instance().updateInto("ItemContentLiq", value, where))
         {
             return false;
         }
@@ -570,7 +570,7 @@ bool Item::pourOut(unsigned int quantity)
             where.push_back(std::make_pair("container", ToString(vnum)));
             where.push_back(std::make_pair("content", ToString(contentLiq.first->vnum)));
             // If the container is empty, remove the entry from the liquid contained table.
-            Mud::getInstance().getDbms().deleteFrom("ItemContentLiq", where);
+            SQLiteDbms::instance().deleteFrom("ItemContentLiq", where);
             // Erase the key of the liquid.
             contentLiq.first = nullptr;
         }
@@ -583,7 +583,7 @@ bool Item::pourOut(unsigned int quantity)
             where.push_back(std::make_pair("content", ToString(contentLiq.first->vnum)));
             // Update value inside the database.
             // TODO: Check.
-            Mud::getInstance().getDbms().updateInto("ItemContentLiq", value, where);
+            SQLiteDbms::instance().updateInto("ItemContentLiq", value, where);
         }
         return true;
     }

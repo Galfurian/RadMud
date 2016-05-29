@@ -41,10 +41,21 @@ Mud::Mud() :
         _maxVnumItem(),
         _minVnumCorpses()
 {
+    // Nothing to do.
 }
 
 Mud::~Mud()
 {
+    // Nothing to do.
+}
+
+Mud & Mud::instance()
+{
+    // Since it's a static variable, if the class has already been created,
+    // It won't be created again. And it **is** thread-safe in C++11.
+    static Mud instance;
+    // Return a reference to our instance.
+    return instance;
 }
 
 bool Mud::savePlayers()
@@ -509,33 +520,6 @@ Direction Mud::findDirection(std::string direction, bool exact)
     return Direction::None;
 }
 
-Mud & Mud::getInstance()
-{
-    // Since it's a static variable, if the class has already been created,
-    // It won't be created again. And it **is** thread-safe in C++11.
-    static Mud instance;
-    // Return a reference to our instance.
-    return instance;
-}
-
-SQLiteDbms & Mud::getDbms()
-{
-    // Since it's a static variable, if the class has already been created,
-    // It won't be created again. And it **is** thread-safe in C++11.
-    static SQLiteDbms instance;
-    // Return a reference to our instance.
-    return instance;
-}
-
-MudUpdater & Mud::getUpdater()
-{
-    // Since it's a static variable, if the class has already been created,
-    // It won't be created again. And it **is** thread-safe in C++11.
-    static MudUpdater instance;
-    // Return a reference to our instance.
-    return instance;
-}
-
 CharacterList Mud::getCharacterList()
 {
     // Initialize the variables.
@@ -626,9 +610,9 @@ void Mud::removeInactivePlayers()
         // Only if the player has successfully logged in, save its state on DB.
         if (player->logged_in)
         {
-            getDbms().beginTransaction();
+            SQLiteDbms::instance().beginTransaction();
             player->updateOnDB();
-            getDbms().endTransaction();
+            SQLiteDbms::instance().endTransaction();
         }
         // Remove the player from the list of players.
         remPlayer(player);
@@ -908,25 +892,25 @@ void Mud::mainLoop()
     do
     {
         // Check if an hour has passed.
-        if (this->getUpdater().hasHourPassed())
+        if (MudUpdater::instance().hasHourPassed())
         {
             // Update mud time.
-            this->getUpdater().updateTime();
+            MudUpdater::instance().updateTime();
             // Update mud mobile.
-            this->getUpdater().updateMobilesHour();
+            MudUpdater::instance().updateMobilesHour();
             // Update items.
-            this->getUpdater().updateItems();
+            MudUpdater::instance().updateItems();
         }
-        if (this->getUpdater().hasTicPassed())
+        if (MudUpdater::instance().hasTicPassed())
         {
             // Update players.
-            this->getUpdater().updatePlayers();
+            MudUpdater::instance().updatePlayers();
             // Update mobiles.
-            this->getUpdater().updateMobiles();
+            MudUpdater::instance().updateMobiles();
         }
 
         // Perform characters pending actions.
-        this->getUpdater().performActions();
+        MudUpdater::instance().performActions();
 
         // Delete players who have closed their comms.
         this->removeInactivePlayers();
@@ -977,5 +961,5 @@ void Bailout(int signal)
 {
     std::cout << "\n";
     Logger::log(LogLevel::Global, "Received signal " + ToString(signal) + "!");
-    Mud::getInstance().shutDown();
+    Mud::instance().shutDown();
 }

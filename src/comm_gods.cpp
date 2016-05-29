@@ -33,8 +33,8 @@ void DoShutdown(Character * character, std::istream & sArgs)
     // Check no more input.
     NoMore(character, sArgs);
     // Send message to all the players.
-    Mud::getInstance().broadcastMsg(0, character->getNameCapital() + " has shut down the game!");
-    Mud::getInstance().shutDown();
+    Mud::instance().broadcastMsg(0, character->getNameCapital() + " has shut down the game!");
+    Mud::instance().shutDown();
 }
 
 void DoGoTo(Character * character, std::istream & sArgs)
@@ -46,7 +46,7 @@ void DoGoTo(Character * character, std::istream & sArgs)
         character->sendMsg("You have to provide a room vnum.");
         return;
     }
-    Room * destination = Mud::getInstance().findRoom(ToInt(arguments[0].first));
+    Room * destination = Mud::instance().findRoom(ToInt(arguments[0].first));
     if (destination == nullptr)
     {
         character->sendMsg("That room doesen't exists.\n");
@@ -75,10 +75,10 @@ void DoTransfer(Character * character, std::istream & sArgs)
     Character * target = nullptr;
     if (arguments.size() >= 1)
     {
-        target = Mud::getInstance().findPlayer(arguments[0].first);
+        target = Mud::instance().findPlayer(arguments[0].first);
         if (target == nullptr)
         {
-            target = Mud::getInstance().findMobile(arguments[0].first);
+            target = Mud::instance().findMobile(arguments[0].first);
             if (target == nullptr)
             {
                 character->sendMsg("Can't find the target character.\n");
@@ -116,7 +116,7 @@ void DoSetFlag(Character * character, std::istream & sArgs)
         character->sendMsg("You must provide a target and a flag.");
         return;
     }
-    Player * target = Mud::getInstance().findPlayer(arguments[0].first);
+    Player * target = Mud::instance().findPlayer(arguments[0].first);
     if (target == nullptr)
     {
         character->sendMsg("You can't find the player '" + arguments[0].first + "'.\n");
@@ -149,7 +149,7 @@ void DoClearFlag(Character * character, std::istream & sArgs)
         character->sendMsg("You must provide a target and a flag.");
         return;
     }
-    Player * target = Mud::getInstance().findPlayer(arguments[0].first);
+    Player * target = Mud::instance().findPlayer(arguments[0].first);
     if (target == nullptr)
     {
         character->sendMsg("You can't find the player '" + arguments[0].first + "'.\n");
@@ -182,7 +182,7 @@ void DoModelInfo(Character * character, std::istream & sArgs)
         character->sendMsg("You must insert a model vnum.\n");
         return;
     }
-    Model * model = Mud::getInstance().findModel(ToInt(arguments[0].first));
+    Model * model = Mud::instance().findModel(ToInt(arguments[0].first));
     if (model == nullptr)
     {
         character->sendMsg("Model not found.\n");
@@ -401,8 +401,8 @@ void DoItemCreate(Character * character, std::istream & sArgs)
         character->sendMsg("What do you want to create?\n");
         return; // Skip the rest of the function.
     }
-    Model * model = Mud::getInstance().findModel(ToInt(arguments[0].first));
-    Material * material = Mud::getInstance().findMaterial(ToInt(arguments[1].first));
+    Model * model = Mud::instance().findModel(ToInt(arguments[0].first));
+    Material * material = Mud::instance().findMaterial(ToInt(arguments[1].first));
     ItemQuality quality = ItemQuality::Normal;
     if (model == nullptr)
     {
@@ -445,7 +445,7 @@ void DoItemGet(Character * character, std::istream & sArgs)
         character->sendMsg("You must instert an item vnum.\n");
         return;
     }
-    Item * item = Mud::getInstance().findItem(ToInt(arguments[0].first));
+    Item * item = Mud::instance().findItem(ToInt(arguments[0].first));
     if (item == nullptr)
     {
         character->sendMsg("Invalid vnum.\n");
@@ -466,7 +466,7 @@ void DoItemGet(Character * character, std::istream & sArgs)
         // Remove the item from the table ItemRoom.
         QueryList where;
         where.push_back(std::make_pair("item", ToString(item->vnum)));
-        Mud::getInstance().getDbms().deleteFrom("ItemRoom", where);
+        SQLiteDbms::instance().deleteFrom("ItemRoom", where);
     }
     else if (item->owner != nullptr)
     {
@@ -479,7 +479,7 @@ void DoItemGet(Character * character, std::istream & sArgs)
         // Remove the item from the table ItemPlayer.
         QueryList where;
         where.push_back(std::make_pair("item", ToString(item->vnum)));
-        Mud::getInstance().getDbms().deleteFrom("ItemPlayer", where);
+        SQLiteDbms::instance().deleteFrom("ItemPlayer", where);
     }
     else if (item->container != nullptr)
     {
@@ -490,7 +490,7 @@ void DoItemGet(Character * character, std::istream & sArgs)
         // Remove the item from the table Content.
         QueryList where;
         where.push_back(std::make_pair("item", ToString(item->vnum)));
-        Mud::getInstance().getDbms().deleteFrom("ItemContent", where);
+        SQLiteDbms::instance().deleteFrom("ItemContent", where);
     }
     else
     {
@@ -516,7 +516,7 @@ void DoItemDestroy(Character * character, std::istream & sArgs)
         character->sendMsg("You must instert an item vnum.\n");
         return;
     }
-    Item * item = Mud::getInstance().findItem(ToInt(arguments[0].first));
+    Item * item = Mud::instance().findItem(ToInt(arguments[0].first));
     if (item == nullptr)
     {
         character->sendMsg("Invalid vnum.\n");
@@ -535,7 +535,7 @@ void DoItemInfo(Character * character, std::istream & sArgs)
         character->sendMsg("You must instert the item vnum or the name of the item inside the room.\n");
         return;
     }
-    Item * item = Mud::getInstance().findItem(ToInt(arguments[0].first));
+    Item * item = Mud::instance().findItem(ToInt(arguments[0].first));
     if (item == nullptr)
     {
         item = character->findNearbyItem(arguments[0].first, arguments[0].second);
@@ -593,7 +593,7 @@ void DoAreaInfo(Character * character, std::istream & sArgs)
         character->sendMsg("You must instert an area vnum.\n");
         return;
     }
-    Area * area = Mud::getInstance().findArea(ToInt(arguments[0].first));
+    Area * area = Mud::instance().findArea(ToInt(arguments[0].first));
     if (area == nullptr)
     {
         character->sendMsg("The selected area does not exist.");
@@ -623,7 +623,7 @@ void DoRoomInfo(Character * character, std::istream & sArgs)
     }
     else if (arguments.size() == 1)
     {
-        room = Mud::getInstance().findRoom(ToInt(arguments[0].first));
+        room = Mud::instance().findRoom(ToInt(arguments[0].first));
         if (room == nullptr)
         {
             character->sendMsg("Can't find the desired room.\n");
@@ -668,7 +668,7 @@ void DoRoomCreate(Character * character, std::istream & sArgs)
         return; // Skip the rest of the function.
     }
     // Check if it's a direction.
-    Direction direction = Mud::getInstance().findDirection(arguments[0].first, false);
+    Direction direction = Mud::instance().findDirection(arguments[0].first, false);
     if (direction == Direction::None)
     {
         character->sendMsg("You must insert a valid direction!\n");
@@ -720,7 +720,7 @@ void DoRoomDelete(Character * character, std::istream & sArgs)
         return; // Skip the rest of the function.
     }
     // Check if it's a direction.
-    Direction direction = Mud::getInstance().findDirection(arguments[0].first, false);
+    Direction direction = Mud::instance().findDirection(arguments[0].first, false);
     if (direction == Direction::None)
     {
         character->sendMsg("You must insert a valid direction!\n");
@@ -743,7 +743,7 @@ void DoRoomDelete(Character * character, std::istream & sArgs)
         return; // Skip the rest of the function.
     }
     // Remove the room from the list of rooms.
-    if (!Mud::getInstance().remRoom(targetRoom))
+    if (!Mud::instance().remRoom(targetRoom))
     {
         character->sendMsg("You cannot remove the room.\n");
         return; // Skip the rest of the function.
@@ -784,7 +784,7 @@ void DoRoomEdit(Character * character, std::istream & sArgs)
         QueryList where =
         { std::make_pair("vnum", ToString(room->vnum)) };
 
-        if (!Mud::getInstance().getDbms().updateInto("Room", value, where))
+        if (!SQLiteDbms::instance().updateInto("Room", value, where))
         {
             player->sendMsg("Command gone wrong.\n");
             return;
@@ -806,7 +806,7 @@ void DoRoomEdit(Character * character, std::istream & sArgs)
         QueryList where =
         { std::make_pair("vnum", ToString(room->vnum)) };
 
-        if (!Mud::getInstance().getDbms().updateInto("Room", value, where))
+        if (!SQLiteDbms::instance().updateInto("Room", value, where))
         {
             player->sendMsg("Command gone wrong.\n");
             return;
@@ -828,7 +828,7 @@ void DoRoomEdit(Character * character, std::istream & sArgs)
         { std::make_pair("name", input) };
         QueryList where =
         { std::make_pair("vnum", ToString(room->vnum)) };
-        if (!Mud::getInstance().getDbms().updateInto("Room", value, where))
+        if (!SQLiteDbms::instance().updateInto("Room", value, where))
         {
             player->sendMsg("Command gone wrong.\n");
             return;
@@ -907,7 +907,7 @@ void DoMobileInfo(Character * character, std::istream & sArgs)
         character->sendMsg("You must instert a mobile id.\n");
         return;
     }
-    Mobile * mobile = Mud::getInstance().findMobile(arguments[0].first);
+    Mobile * mobile = Mud::instance().findMobile(arguments[0].first);
     if (mobile == nullptr)
     {
         character->sendMsg("Mobile not found.\n");
@@ -1038,7 +1038,7 @@ void DoMobileLog(Character * character, std::istream &sArgs)
         character->sendMsg("You must provide a mobile id.\n");
         return;
     }
-    Mobile * mobile = Mud::getInstance().findMobile(arguments[0].first);
+    Mobile * mobile = Mud::instance().findMobile(arguments[0].first);
     if (mobile == nullptr)
     {
         character->sendMsg("Mobile not found.\n");
@@ -1116,7 +1116,7 @@ void DoModSkill(Character * character, std::istream & sArgs)
         character->sendMsg("Target not found.\n");
         return;
     }
-    Skill * skill = Mud::getInstance().findSkill(ToInt(arguments[1].first));
+    Skill * skill = Mud::instance().findSkill(ToInt(arguments[1].first));
     if (skill == nullptr)
     {
         character->sendMsg("Cannot find the desired skill.\n");
@@ -1253,7 +1253,7 @@ void DoPlayerInfo(Character * character, std::istream & sArgs)
         character->sendMsg("You must insert a valide player name.\n");
         return;
     }
-    Player * player = Mud::getInstance().findPlayer(arguments[0].first);
+    Player * player = Mud::instance().findPlayer(arguments[0].first);
     if (player == nullptr)
     {
         character->sendMsg("Player not found.\n");
@@ -1266,7 +1266,7 @@ void DoPlayerInfo(Character * character, std::istream & sArgs)
     msg += Telnet::yellow() + "    Prompt       " + Telnet::reset() + ":" + player->prompt + "\n";
     msg += Telnet::yellow() + "    Rent Room    " + Telnet::reset() + ":" + ToString(player->rent_room) + "\n";
     msg += Telnet::yellow() + "    Skills       " + Telnet::reset() + ":\n";
-    for (auto iterator : Mud::getInstance().mudSkills)
+    for (auto iterator : Mud::instance().mudSkills)
     {
         msg += "        " + iterator.second.name + "[" + ToString(player->skills[iterator.first]) + "]\n";
     }
@@ -1320,7 +1320,7 @@ void DoMaterialInfo(Character * character, std::istream & sArgs)
         character->sendMsg("You must insert a valide material vnum.\n");
         return;
     }
-    Material * material = Mud::getInstance().findMaterial(ToInt(arguments[0].first));
+    Material * material = Mud::instance().findMaterial(ToInt(arguments[0].first));
     if (material == nullptr)
     {
         character->sendMsg("Can't find the desire material.\n");
@@ -1356,7 +1356,7 @@ void DoLiquidCreate(Character * character, std::istream & sArgs)
         character->sendMsg("The item is not a container of liquids.\n");
         return;
     }
-    Liquid * liquid = Mud::getInstance().findLiquid(ToInt(arguments[1].first));
+    Liquid * liquid = Mud::instance().findLiquid(ToInt(arguments[1].first));
     if (liquid == nullptr)
     {
         character->sendMsg("Can't find the desire liquid.\n");
@@ -1387,7 +1387,7 @@ void DoLiquidInfo(Character * character, std::istream & sArgs)
         character->sendMsg("You must provide a liquid vnum.\n");
         return;
     }
-    Liquid * liquid = Mud::getInstance().findLiquid(ToInt(arguments[0].first));
+    Liquid * liquid = Mud::instance().findLiquid(ToInt(arguments[0].first));
     if (liquid == nullptr)
     {
         character->sendMsg("Can't find the desire liquid.\n");
@@ -1409,7 +1409,7 @@ void DoProductionInfo(Character * character, std::istream & sArgs)
         character->sendMsg("You must provide a production vnum.\n");
         return;
     }
-    Production * production = Mud::getInstance().findProduction(ToInt(arguments[0].first));
+    Production * production = Mud::instance().findProduction(ToInt(arguments[0].first));
     if (production == nullptr)
     {
         character->sendMsg("Can't find the desire production.\n");
@@ -1445,7 +1445,7 @@ void DoProfessionInfo(Character * character, std::istream & sArgs)
         character->sendMsg("You must provide a profession name.\n");
         return;
     }
-    Profession * profession = Mud::getInstance().findProfession(arguments[0].first);
+    Profession * profession = Mud::instance().findProfession(arguments[0].first);
     if (profession == nullptr)
     {
         character->sendMsg("Can't find the desire profession.\n");
@@ -1479,7 +1479,7 @@ void DoModelList(Character * character, std::istream & sArgs)
     table.addColumn("FLAGS", kAlignRight);
     table.addColumn("WEIGHT", kAlignRight);
     table.addColumn("PRICE", kAlignRight);
-    for (auto iterator : Mud::getInstance().mudModels)
+    for (auto iterator : Mud::instance().mudModels)
     {
         Model model = iterator.second;
         // Prepare the row.
@@ -1507,7 +1507,7 @@ void DoItemList(Character * character, std::istream & sArgs)
     table.addColumn("NAME", kAlignLeft);
     table.addColumn("TYPE", kAlignLeft);
     table.addColumn("LOCATION", kAlignLeft);
-    for (auto item : Mud::getInstance().mudItems)
+    for (auto item : Mud::instance().mudItems)
     {
         // Prepare the row.
         TableRow row;
@@ -1545,7 +1545,7 @@ void DoMobileList(Character * character, std::istream & sArgs)
     table.addColumn("ID", kAlignLeft);
     table.addColumn("NAME", kAlignLeft);
     table.addColumn("LOCATION", kAlignRight);
-    for (auto iterator : Mud::getInstance().mudMobiles)
+    for (auto iterator : Mud::instance().mudMobiles)
     {
         Mobile * mobile = iterator.second;
         // Prepare the row.
@@ -1574,7 +1574,7 @@ void DoPlayerList(Character * character, std::istream & sArgs)
     Table table;
     table.addColumn("NAME", kAlignLeft);
     table.addColumn("ROOM", kAlignLeft);
-    for (auto iterator : Mud::getInstance().mudPlayers)
+    for (auto iterator : Mud::instance().mudPlayers)
     {
         // If the player is not playing, continue.
         if (!iterator->isPlaying())
@@ -1601,7 +1601,7 @@ void DoAreaList(Character * character, std::istream & sArgs)
     table.addColumn("BUILDER", kAlignLeft);
     table.addColumn("CONTINENT", kAlignCenter);
     table.addColumn("ROOMS", kAlignCenter);
-    for (auto iterator : Mud::getInstance().mudAreas)
+    for (auto iterator : Mud::instance().mudAreas)
     {
         Area * area = iterator.second;
         // Prepare the row.
@@ -1627,7 +1627,7 @@ void DoRoomList(Character * character, std::istream & sArgs)
     table.addColumn("COORD", kAlignCenter);
     table.addColumn("TERRAIN", kAlignCenter);
     table.addColumn("NAME", kAlignLeft);
-    for (auto iterator : Mud::getInstance().mudRooms)
+    for (auto iterator : Mud::instance().mudRooms)
     {
         Room * room = iterator.second;
         // Prepare the row.
@@ -1663,7 +1663,7 @@ void DoRaceList(Character * character, std::istream & sArgs)
     table.addColumn("PERCEPTION", kAlignRight);
     table.addColumn("CONSTITUTION", kAlignRight);
     table.addColumn("INTELLIGENCE", kAlignRight);
-    for (auto iterator : Mud::getInstance().mudRaces)
+    for (auto iterator : Mud::instance().mudRaces)
     {
         Race * race = &iterator.second;
         // Prepare the row.
@@ -1689,7 +1689,7 @@ void DoFactionList(Character * character, std::istream & sArgs)
     Table table;
     table.addColumn("VNUM", kAlignCenter);
     table.addColumn("NAME", kAlignLeft);
-    for (auto iterator : Mud::getInstance().mudFactions)
+    for (auto iterator : Mud::instance().mudFactions)
     {
         Faction * faction = &iterator.second;
         // Prepare the row.
@@ -1710,7 +1710,7 @@ void DoSkillList(Character * character, std::istream & sArgs)
     table.addColumn("VNUM", kAlignCenter);
     table.addColumn("NAME", kAlignLeft);
     table.addColumn("ATTRIBUTE", kAlignLeft);
-    for (auto iterator : Mud::getInstance().mudSkills)
+    for (auto iterator : Mud::instance().mudSkills)
     {
         Skill * skill = &iterator.second;
         // Prepare the row.
@@ -1732,7 +1732,7 @@ void DoWritingList(Character * character, std::istream & sArgs)
     table.addColumn("VNUM", kAlignCenter);
     table.addColumn("AUTHOR", kAlignLeft);
     table.addColumn("TITLE", kAlignLeft);
-    for (auto iterator : Mud::getInstance().mudWritings)
+    for (auto iterator : Mud::instance().mudWritings)
     {
         Writing * writing = iterator.second;
         // Prepare the row.
@@ -1754,7 +1754,7 @@ void DoCorpseList(Character * character, std::istream & sArgs)
     table.addColumn("VNUM", kAlignRight);
     table.addColumn("NAME", kAlignLeft);
     table.addColumn("LOCATION", kAlignLeft);
-    for (auto item : Mud::getInstance().mudCorpses)
+    for (auto item : Mud::instance().mudCorpses)
     {
         // Prepare the row.
         TableRow row;
@@ -1799,7 +1799,7 @@ void DoMaterialList(Character * character, std::istream & sArgs)
     table.addColumn("WORTH", kAlignRight);
     table.addColumn("HARDNESS", kAlignRight);
     table.addColumn("LIGHTNESS", kAlignRight);
-    for (auto iterator : Mud::getInstance().mudMaterials)
+    for (auto iterator : Mud::instance().mudMaterials)
     {
         Material material = iterator.second;
         // Prepare the row.
@@ -1825,7 +1825,7 @@ void DoProfessionList(Character * character, std::istream & sArgs)
     table.addColumn("COMMAND", kAlignCenter);
     table.addColumn("POSTURE", kAlignCenter);
     table.addColumn("ACTION", kAlignCenter);
-    for (auto iterator : Mud::getInstance().mudProfessions)
+    for (auto iterator : Mud::instance().mudProfessions)
     {
         Profession * profession = &(iterator.second);
         // Prepare the row.
@@ -1849,7 +1849,7 @@ void DoProductionList(Character * character, std::istream & sArgs)
     table.addColumn("NAME", kAlignCenter);
     table.addColumn("PROFESSION", kAlignCenter);
     table.addColumn("DIFFICULTY", kAlignLeft);
-    for (auto iterator : Mud::getInstance().mudProductions)
+    for (auto iterator : Mud::instance().mudProductions)
     {
         Production * production = &(iterator.second);
         // Prepare the row.
@@ -1872,7 +1872,7 @@ void DoLiquidList(Character * character, std::istream & sArgs)
     table.addColumn("VNUM", kAlignCenter);
     table.addColumn("NAME", kAlignRight);
     table.addColumn("WORTH", kAlignRight);
-    for (auto iterator : Mud::getInstance().mudLiquids)
+    for (auto iterator : Mud::instance().mudLiquids)
     {
         Liquid liquid = iterator.second;
         // Prepare the row.
@@ -1896,7 +1896,7 @@ void DoBuildingList(Character * character, std::istream & sArgs)
     table.addColumn("DIFFICULTY", kAlignLeft);
     table.addColumn("TIME", kAlignCenter);
     table.addColumn("UNIQUE", kAlignCenter);
-    for (auto iterator : Mud::getInstance().mudBuildings)
+    for (auto iterator : Mud::instance().mudBuildings)
     {
         Building * building = &(iterator.second);
         // Prepare the row.

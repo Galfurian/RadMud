@@ -195,7 +195,7 @@ bool Room::updateOnDB()
     value.push_back(std::make_pair("flag", ToString(flags)));
     QueryList where;
     where.push_back(std::make_pair("vnum", ToString(vnum)));
-    if (!Mud::getInstance().getDbms().updateInto("Room", value, where))
+    if (!SQLiteDbms::instance().updateInto("Room", value, where))
     {
         Logger::log(LogLevel::Error, "Can't save the room!");
         return false;
@@ -217,7 +217,7 @@ bool Room::removeOnDB()
     }
 
     //----------Remove from Room-----------
-    Mud::getInstance().getDbms().deleteFrom("Room",
+    SQLiteDbms::instance().deleteFrom("Room",
     { std::make_pair("vnum", ToString(vnum)) });
     return true;
 }
@@ -573,7 +573,7 @@ void Room::sendToAll(string message, Character * source, Character * exception)
 
 void Room::connectExits()
 {
-    for (auto iterator : Mud::getInstance().mudDirections)
+    for (auto iterator : Mud::instance().mudDirections)
     {
         Coordinates nearCoord = GetCoordinates(iterator.second);
         if (area != nullptr)
@@ -646,7 +646,7 @@ bool CreateRoom(Coordinates coord, Room * source_room)
 
     // Create a new room.
     Logger::log(LogLevel::Info, "[CreateRoom] Setting up the room variables...");
-    new_room->vnum = Mud::getInstance().getMaxVnumRoom() + 1;
+    new_room->vnum = Mud::instance().getMaxVnumRoom() + 1;
     new_room->area = source_room->area;
     new_room->coord = coord;
     new_room->terrain = source_room->terrain;
@@ -664,7 +664,7 @@ bool CreateRoom(Coordinates coord, Room * source_room)
     arguments.push_back(new_room->name);
     arguments.push_back(new_room->description);
     arguments.push_back(ToString(new_room->flags));
-    if (!Mud::getInstance().getDbms().insertInto("Room", arguments))
+    if (!SQLiteDbms::instance().insertInto("Room", arguments))
     {
         return false;
     }
@@ -673,7 +673,7 @@ bool CreateRoom(Coordinates coord, Room * source_room)
     // Insert Room in AreaList.
     arguments.push_back(ToString(new_room->area->vnum));
     arguments.push_back(ToString(new_room->vnum));
-    if (!Mud::getInstance().getDbms().insertInto("AreaList", arguments))
+    if (!SQLiteDbms::instance().insertInto("AreaList", arguments))
     {
         return false;
     }
@@ -684,7 +684,7 @@ bool CreateRoom(Coordinates coord, Room * source_room)
 
     // Add the created room to the room_map.
     Logger::log(LogLevel::Info, "[CreateRoom] Adding the room to the global list...");
-    Mud::getInstance().addRoom(new_room);
+    Mud::instance().addRoom(new_room);
     new_room->area->addRoom(new_room);
 
     return true;
@@ -696,7 +696,7 @@ void ConnectRoom(Room * room)
     vector<string> arguments;
 
     Logger::log(LogLevel::Info, "[ConnectRoom] Connecting the room to near rooms...");
-    for (auto iterator : Mud::getInstance().mudDirections)
+    for (auto iterator : Mud::instance().mudDirections)
     {
         // Get the coordinates.
         poss_coord = GetCoordinates(iterator.second);
@@ -724,14 +724,14 @@ void ConnectRoom(Room * room)
             arguments.push_back(ToString(forward->destination->vnum));
             arguments.push_back(GetDirectionName(forward->direction));
             arguments.push_back(ToString(forward->flags));
-            Mud::getInstance().getDbms().insertInto("Exit", arguments);
+            SQLiteDbms::instance().insertInto("Exit", arguments);
             arguments.clear();
 
             arguments.push_back(ToString(backward->source->vnum));
             arguments.push_back(ToString(backward->destination->vnum));
             arguments.push_back(GetDirectionName(backward->direction));
             arguments.push_back(ToString(backward->flags));
-            Mud::getInstance().getDbms().insertInto("Exit", arguments);
+            SQLiteDbms::instance().insertInto("Exit", arguments);
             arguments.clear();
         }
     }

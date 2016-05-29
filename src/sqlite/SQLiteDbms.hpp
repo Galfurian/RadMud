@@ -95,12 +95,29 @@ bool LoadBuilding(ResultSet * result);
 /// @brief It's used to connect to a database and retrieve information as well as update them.
 class SQLiteDbms
 {
-    public:
+    private:
         /// @brief Constructor.
         SQLiteDbms();
 
         /// @brief Destructor.
         ~SQLiteDbms();
+
+    public:
+        /// @brief Disable Copy Construct.
+        SQLiteDbms(SQLiteDbms const &) = delete;
+
+        /// @brief Disable Move construct.
+        SQLiteDbms(SQLiteDbms &&) = delete;
+
+        /// @brief Disable Copy assign.
+        SQLiteDbms & operator=(SQLiteDbms const &) = delete;
+
+        /// @brief Disable Move assign.
+        SQLiteDbms & operator=(SQLiteDbms &&) = delete;
+
+        /// @brief Get the singleton istance of the DBMS.
+        /// @return The static and uniquie DBMS variable.
+        static SQLiteDbms & instance();
 
         /// @brief Open database connection.
         /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.

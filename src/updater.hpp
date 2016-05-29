@@ -22,12 +22,25 @@
 #include "constants.hpp"
 #include "utils.hpp"
 
+/// @brief Enumerator which identifies the day phase.
+typedef enum class DayPhases
+{
+    /// General logging level.
+    Morning,
+    /// Log events useful for back-tracing.
+    Day,
+    /// Log events useful for developers.
+    Dusk,
+    /// Log events which may lead to errors.
+    Night,
+} DayPhase;
+
 /// @brief Handle everything that it's considered dynamic inside the mud, like player or mobile.
 /// @details
 /// Even items could be considered dynamic, for example we can think about object's degradation.
 class MudUpdater
 {
-    public:
+    private:
         /// The number of bytes received from players.
         size_t bandwidth_in;
         /// The number of bytes sent to players.
@@ -52,7 +65,7 @@ class MudUpdater
         /// Mud current hour.
         unsigned int mudHour;
         /// Mud current day phase.
-        unsigned int mudDayPhase;
+        DayPhase mudDayPhase;
 
         /// @brief Constructor.
         MudUpdater();
@@ -60,11 +73,22 @@ class MudUpdater
         /// @brief Destructor.
         ~MudUpdater();
 
-        /// @brief Disable Copy Constructor.
+    public:
+        /// @brief Disable Copy Construct.
         MudUpdater(MudUpdater const &) = delete;
 
-        /// @brief Disable Assign Operator.
-        void operator=(MudUpdater const&) = delete;
+        /// @brief Disable Move construct.
+        MudUpdater(MudUpdater &&) = delete;
+
+        /// @brief Disable Copy assign.
+        MudUpdater & operator=(MudUpdater const &) = delete;
+
+        /// @brief Disable Move assign.
+        MudUpdater & operator=(MudUpdater &&) = delete;
+
+        /// @brief Get the singleton istance of the MudUpdater.
+        /// @return The static and uniquie MudUpdater variable.
+        static MudUpdater & instance();
 
         /// @brief Initialize the timers.
         void initTimers();
@@ -93,9 +117,42 @@ class MudUpdater
         /// @brief Perform pending actions.
         void performActions();
 
-        /// @brief Update bandwidth statistics.
-        void updateBandWidth(int type, const size_t & size);
+        /// @brief Update input bandwidth.
+        void updateBandIn(const size_t & size);
 
+        /// @brief Update output bandwidth.
+        void updateBandOut(const size_t & size);
+
+        /// @brief Update uncompressed bandwidth.
+        void updateBandUncompressed(const size_t & size);
+
+        /// @brief Provides the current mud day phase.
+        /// @return The enumberator which identifies the day phase.
+        DayPhase getDayPhase();
+
+        /// @brief Provides the size of a second in terms of milliseconds (MS).
+        /// @return The size of a second.
+        unsigned int getSecondSize();
+
+        /// @brief Provides the size of a hour in terms of milliseconds (MS).
+        /// @return The size of a hour.
+        unsigned int getHourSize();
+
+        /// @brief Provides the size of a day in terms of milliseconds (MS).
+        /// @return The size of a day.
+        unsigned int getDaySize();
+
+        /// @brief Provides the total input (from clients) bandwidth.
+        /// @return The input bandwidth.
+        size_t getBandIn();
+
+        /// @brief Provides the total output (to clients) bandwidth.
+        /// @return The output bandwidth.
+        size_t getBandOut();
+
+        /// @brief Provides the total uncompressed (to clients) bandwidth.
+        /// @return The uncompressed bandwidth.
+        size_t getBandUncompressed();
 };
 
 #endif

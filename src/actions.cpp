@@ -25,7 +25,19 @@
 #include "constants.hpp"
 
 Action::Action(Character * _character) :
-    type(ActionType::Wait), actor(_character), target(), itemTarget(), destination(), direction(Direction::None), production(), schematics(), craftMaterial(), usedTools(), usedIngredients(), actionCooldown(), opponents()
+        type(ActionType::Wait),
+        actor(_character),
+        target(),
+        itemTarget(),
+        destination(),
+        direction(Direction::None),
+        production(),
+        schematics(),
+        craftMaterial(),
+        usedTools(),
+        usedIngredients(),
+        actionCooldown(),
+        opponents()
 {
     // Nothing to do.
 }
@@ -359,7 +371,7 @@ void Action::performMine()
         return;
     }
     // Retrieve the product.
-    Model * product = Mud::getInstance().findModel(itemTarget->model->getNodeFunc().provides);
+    Model * product = Mud::instance().findModel(itemTarget->model->getNodeFunc().provides);
     // Check if the product exists.
     if (product == nullptr)
     {
@@ -381,7 +393,7 @@ void Action::performMine()
         return;
     }
     // Create the product.
-    Mud::getInstance().getDbms().beginTransaction();
+    SQLiteDbms::instance().beginTransaction();
     Item * newItem = product->createItem(actor->getName(), material, ItemQuality::Normal);
     // Check if the creation is not null.
     if (newItem == nullptr)
@@ -389,14 +401,14 @@ void Action::performMine()
         // Log a warning.
         Logger::log(LogLevel::Warning, actor->getName() + ":mine = The new item is a null pointer.");
         // Rollback the database.
-        Mud::getInstance().getDbms().rollbackTransection();
+        SQLiteDbms::instance().rollbackTransection();
         // Notify the character.
         actor->sendMsg("\nYou have failed your action.\n");
         // Delete the item.
         delete (newItem);
         return;
     }
-    Mud::getInstance().getDbms().endTransaction();
+    SQLiteDbms::instance().endTransaction();
     // Check if the character can carry the item.
     if (!actor->canCarry(newItem))
     {
@@ -461,7 +473,7 @@ void Action::performChop()
         return;
     }
     // Retrieve the product.
-    Model * product = Mud::getInstance().findModel(itemTarget->model->getNodeFunc().provides);
+    Model * product = Mud::instance().findModel(itemTarget->model->getNodeFunc().provides);
     // Check if the product exists.
     if (product == nullptr)
     {
@@ -483,7 +495,7 @@ void Action::performChop()
         return;
     }
     // Create the product.
-    Mud::getInstance().getDbms().beginTransaction();
+    SQLiteDbms::instance().beginTransaction();
     Item * newItem = product->createItem(actor->getName(), material, ItemQuality::Normal);
     // Check if the creation is not null.
     if (newItem == nullptr)
@@ -491,14 +503,14 @@ void Action::performChop()
         // Log a warning.
         Logger::log(LogLevel::Warning, actor->getName() + ":chop = The new item is a null pointer.");
         // Rollback the database.
-        Mud::getInstance().getDbms().rollbackTransection();
+        SQLiteDbms::instance().rollbackTransection();
         // Notify the character.
         actor->sendMsg("\nYou have failed your action.\n");
         // Delete the item.
         delete (newItem);
         return;
     }
-    Mud::getInstance().getDbms().endTransaction();
+    SQLiteDbms::instance().endTransaction();
 
     // Check if the character can carry the item.
     if (!actor->canCarry(newItem))
@@ -611,7 +623,7 @@ void Action::performCraft()
         it->destroy();
     }
 
-    Mud::getInstance().getDbms().beginTransaction();
+    SQLiteDbms::instance().beginTransaction();
     ItemVector createdItems;
     for (unsigned int it = 0; it < production->outcome.second; ++it)
     {
@@ -623,7 +635,7 @@ void Action::performCraft()
             // Log a warning.
             Logger::log(LogLevel::Warning, actor->getName() + ":craft = New item is a null pointer.");
             // Rollback the database.
-            Mud::getInstance().getDbms().rollbackTransection();
+            SQLiteDbms::instance().rollbackTransection();
             // Delete all the items created so far.
             for (auto createdItem : createdItems)
             {
@@ -635,7 +647,7 @@ void Action::performCraft()
         }
         createdItems.push_back(newItem);
     }
-    Mud::getInstance().getDbms().endTransaction();
+    SQLiteDbms::instance().endTransaction();
 
     // Add the created items into the character inventory.
     bool dropped = false;
@@ -744,11 +756,11 @@ void Action::performBuild()
         this->reset();
         return;
     }
-    Mud::getInstance().getDbms().beginTransaction();
+    SQLiteDbms::instance().beginTransaction();
     actor->remInventoryItem(itemTarget);
     actor->room->addBuilding(itemTarget);
     itemTarget->updateOnDB();
-    Mud::getInstance().getDbms().endTransaction();
+    SQLiteDbms::instance().endTransaction();
 
     // Send conclusion message.
     std::string msg;

@@ -78,7 +78,7 @@ Player::~Player()
     // Close connection if active.
     if (psocket != -1)
     {
-        Mud::getInstance().closeSocket(psocket);
+        Mud::instance().closeSocket(psocket);
     }
     for (auto iterator : inventory)
     {
@@ -109,8 +109,8 @@ bool Player::check()
     safe &= SafeAssert(rent_room >= 0);
     safe &= SafeAssert(connection_state != ConnectionState::NoState);
     //safe &= SafeAssert(!skills.empty());
-    //safe &= SafeAssert(skills.size() == Mud::getInstance().mudSkills.size());
-    for (auto iterator : Mud::getInstance().mudSkills)
+    //safe &= SafeAssert(skills.size() == Mud::instance().mudSkills.size());
+    for (auto iterator : Mud::instance().mudSkills)
     {
         std::map<int, unsigned int>::iterator iterator2 = skills.find(iterator.first);
         if (iterator2 == skills.end())
@@ -145,7 +145,7 @@ string Player::getAddress() const
 
 bool Player::checkConnection() const
 {
-    return !Mud::getInstance().isSocketClosed(psocket);
+    return !Mud::instance().isSocketClosed(psocket);
 }
 
 void Player::closeConnection()
@@ -194,7 +194,7 @@ bool Player::createOnDB()
     arguments.push_back(ToString(hunger));
     arguments.push_back(ToString(thirst));
     arguments.push_back(ToString(rent_room));
-    if (!Mud::getInstance().getDbms().insertInto("Player", arguments))
+    if (!SQLiteDbms::instance().insertInto("Player", arguments))
     {
         Logger::log(LogLevel::Error, "Something gone wrong during player creation on database.");
         return false;
@@ -207,7 +207,7 @@ bool Player::createOnDB()
         arguments.push_back(name);
         arguments.push_back(ToString(iterator.first));
         arguments.push_back(ToString(iterator.second));
-        if (!Mud::getInstance().getDbms().insertInto("Advancement", arguments))
+        if (!SQLiteDbms::instance().insertInto("Advancement", arguments))
         {
             Logger::log(LogLevel::Error, "Something gone wrong during player Skill creation on database.");
             return false;
@@ -218,7 +218,7 @@ bool Player::createOnDB()
 
 bool Player::loadFromDB()
 {
-    return Mud::getInstance().getDbms().loadPlayer(this);
+    return SQLiteDbms::instance().loadPlayer(this);
 }
 
 bool Player::updateOnDB()
@@ -251,7 +251,7 @@ bool Player::updateOnDB()
         value.push_back(std::make_pair("thirst", ToString(thirst)));
         where.push_back(std::make_pair("name", name));
 
-        if (!Mud::getInstance().getDbms().updateInto("Player", value, where))
+        if (!SQLiteDbms::instance().updateInto("Player", value, where))
         {
             Logger::log(LogLevel::Error, "Error during Player's Information save.");
             return false;
@@ -279,7 +279,7 @@ bool Player::updateOnDB()
             arguments.push_back(ToString(iterator.first));
             arguments.push_back(ToString(iterator.second));
 
-            if (!Mud::getInstance().getDbms().insertInto("Advancement", arguments, false, true))
+            if (!SQLiteDbms::instance().insertInto("Advancement", arguments, false, true))
             {
                 Logger::log(LogLevel::Error, "Error during Player's Skills save.");
                 return false;
@@ -317,7 +317,7 @@ bool Player::remInventoryItem(Item * item)
 {
     if (Character::remInventoryItem(item))
     {
-        Mud::getInstance().getDbms().deleteFrom("ItemPlayer",
+        SQLiteDbms::instance().deleteFrom("ItemPlayer",
         { std::make_pair("owner", name), std::make_pair("item", ToString(item->vnum)) });
         return true;
     }
@@ -332,7 +332,7 @@ bool Player::remEquipmentItem(Item * item)
 {
     if (Character::remEquipmentItem(item))
     {
-        Mud::getInstance().getDbms().deleteFrom("ItemPlayer",
+        SQLiteDbms::instance().deleteFrom("ItemPlayer",
         { std::make_pair("owner", name), std::make_pair("item", ToString(item->vnum)) });
         return true;
     }
@@ -349,7 +349,7 @@ void Player::triggerDeath()
     Character::triggerDeath();
 
     // Move the player to the default room.
-    if ((room = Mud::getInstance().findRoom(rent_room)) != nullptr)
+    if ((room = Mud::instance().findRoom(rent_room)) != nullptr)
     {
         room->addCharacter(this);
     }
@@ -373,7 +373,7 @@ void Player::enterGame()
 
     // Load the news.
     this->sendMsg("#---------------- Global News ----------------#\n");
-    for (it = Mud::getInstance().mudNews.rbegin(); it != Mud::getInstance().mudNews.rend(); ++it)
+    for (it = Mud::instance().mudNews.rbegin(); it != Mud::instance().mudNews.rend(); ++it)
     {
         this->sendMsg("Date :" + it->first + "\n");
         this->sendMsg(it->second + "\n");
@@ -401,7 +401,7 @@ void Player::enterGame()
 
 void Player::processInput(Player * player, const string & command)
 {
-    ActionHandler action = Mud::getInstance().findStateAction(player->connection_state);
+    ActionHandler action = Mud::instance().findStateAction(player->connection_state);
     std::istringstream is(command);
 
     try
@@ -430,7 +430,7 @@ void Player::processRead()
         // Print error.
         perror("Error during socket receive");
         // Close the socket.
-        Mud::getInstance().closeSocket(psocket);
+        Mud::instance().closeSocket(psocket);
         // Log the error.
         Logger::log(LogLevel::Error, "Connection " + ToString(psocket) + " closed.");
         // Clear the socket.
@@ -445,7 +445,7 @@ void Player::processRead()
     inbuf += string(&buffer[0], nRead);
 
     // Update received data.
-    Mud::getInstance().getUpdater().updateBandWidth(0, nRead);
+    MudUpdater::instance().updateBandIn(nRead);
 
     size_t iStart = inbuf.size();
     // Try to extract lines from the input buffer.
@@ -501,10 +501,10 @@ void Player::processWrite()
         int nWrite = send(psocket, (const char *) compressed.data(), compressed.size(), 0);
 
         // Update sent data.
-        Mud::getInstance().getUpdater().updateBandWidth(1, compressed.size());
+        Mud::instance().getUpdater().updateBandWidth(1, compressed.size());
 
         // Update uncompressed data.
-        Mud::getInstance().getUpdater().updateBandWidth(2, uncompressed.size());
+        Mud::instance().getUpdater().updateBandWidth(2, uncompressed.size());
 #else
         // Send to player.
         size_t nWrite = send(psocket, outbuf.c_str(), outbuf.size(), MSG_NOSIGNAL);
@@ -518,6 +518,8 @@ void Player::processWrite()
             LogWarning("Uncrompressed message is different from compressed one.");
         }
 #endif
+
+        MudUpdater::instance().updateBandOut(nWrite);
 
         // Check for bad write.
         if (nWrite <= 0)

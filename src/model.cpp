@@ -163,7 +163,7 @@ Item * Model::createItem(std::string maker, Material * composition, ItemQuality 
     Item * newItem = new Item();
 
     // Set the values of the new item.
-    newItem->vnum = Mud::getInstance().getMaxVnumItem() + 1;
+    newItem->vnum = Mud::instance().getMaxVnumItem() + 1;
     newItem->model = this;
     newItem->maker = maker;
     newItem->condition = condition;
@@ -196,14 +196,14 @@ Item * Model::createItem(std::string maker, Material * composition, ItemQuality 
     arguments.push_back(EnumToString(quality));
     arguments.push_back(ToString(flags));
 
-    if (Mud::getInstance().getDbms().insertInto("Item", arguments))
+    if (SQLiteDbms::instance().insertInto("Item", arguments))
     {
         // Insert into the item_list the new item.
-        Mud::getInstance().addItem(newItem);
+        Mud::instance().addItem(newItem);
     }
     else
     {
-        Mud::getInstance().getDbms().rollbackTransection();
+        SQLiteDbms::instance().rollbackTransection();
     }
 
     return newItem;

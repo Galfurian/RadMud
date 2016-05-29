@@ -51,7 +51,7 @@ void DoTake(Character * character, std::istream & sArgs)
         {
             bool takenSomething = false;
             auto untouchedList = character->room->items;
-            Mud::getInstance().getDbms().beginTransaction();
+            SQLiteDbms::instance().beginTransaction();
             for (auto iterator : untouchedList)
             {
                 // Check if the item is static.
@@ -78,7 +78,7 @@ void DoTake(Character * character, std::istream & sArgs)
                 // Notify that something has been taken.
                 takenSomething = true;
             }
-            Mud::getInstance().getDbms().endTransaction();
+            SQLiteDbms::instance().endTransaction();
             // Handle output only if the player has really taken something.
             if (!takenSomething)
             {
@@ -131,14 +131,14 @@ void DoTake(Character * character, std::istream & sArgs)
         // Add the item to the player's inventory.
         character->addInventoryItem(item);
         // Update the item on database.
-        Mud::getInstance().getDbms().beginTransaction();
+        SQLiteDbms::instance().beginTransaction();
         if (item->updateOnDB())
         {
-            Mud::getInstance().getDbms().endTransaction();
+            SQLiteDbms::instance().endTransaction();
         }
         else
         {
-            Mud::getInstance().getDbms().rollbackTransection();
+            SQLiteDbms::instance().rollbackTransection();
         }
         // Notify to player.
         character->sendMsg("You take " + Telnet::cyan() + ToLower(item->getName()) + Telnet::reset() + ".\n");
@@ -159,7 +159,7 @@ void DoTake(Character * character, std::istream & sArgs)
         {
             bool takenSomething = false;
             auto untouchedList = container->content;
-            Mud::getInstance().getDbms().beginTransaction();
+            SQLiteDbms::instance().beginTransaction();
             for (auto iterator : untouchedList)
             {
                 // Check if the item is static.
@@ -181,7 +181,7 @@ void DoTake(Character * character, std::istream & sArgs)
                 // Notify that something has been taken.
                 takenSomething = true;
             }
-            Mud::getInstance().getDbms().endTransaction();
+            SQLiteDbms::instance().endTransaction();
             // Handle output only if the player has really taken something.
             if (takenSomething)
             {
@@ -216,14 +216,14 @@ void DoTake(Character * character, std::istream & sArgs)
         // Add the item to the player's inventory.
         character->addInventoryItem(item);
         // Update the item on database.
-        Mud::getInstance().getDbms().beginTransaction();
+        SQLiteDbms::instance().beginTransaction();
         if (item->updateOnDB())
         {
-            Mud::getInstance().getDbms().endTransaction();
+            SQLiteDbms::instance().endTransaction();
         }
         else
         {
-            Mud::getInstance().getDbms().rollbackTransection();
+            SQLiteDbms::instance().rollbackTransection();
         }
 
         character->sendMsg(
@@ -263,7 +263,7 @@ void DoDrop(Character * character, std::istream & sArgs)
             return; // Skip the rest of the function.
         }
         auto untouchedList = character->inventory;
-        Mud::getInstance().getDbms().beginTransaction();
+        SQLiteDbms::instance().beginTransaction();
         for (auto iterator : untouchedList)
         {
             // Remove the item from the player's inventory.
@@ -273,7 +273,7 @@ void DoDrop(Character * character, std::istream & sArgs)
             // Update the item on database.
             iterator->updateOnDB();
         }
-        Mud::getInstance().getDbms().endTransaction();
+        SQLiteDbms::instance().endTransaction();
         character->sendMsg("You dropped all.\n");
         character->room->sendToAll(
             character->getNameCapital() + " has dropped all " + character->getPrononun() + " items.\n", character);
@@ -290,14 +290,14 @@ void DoDrop(Character * character, std::istream & sArgs)
     // Update the item iside the Database.
     character->remInventoryItem(item);
     character->room->addItem(item);
-    Mud::getInstance().getDbms().beginTransaction();
+    SQLiteDbms::instance().beginTransaction();
     if (item->updateOnDB())
     {
-        Mud::getInstance().getDbms().endTransaction();
+        SQLiteDbms::instance().endTransaction();
     }
     else
     {
-        Mud::getInstance().getDbms().rollbackTransection();
+        SQLiteDbms::instance().rollbackTransection();
     }
     // Active message.
     character->sendMsg("You drop " + Telnet::cyan() + ToLower(item->getName()) + Telnet::reset() + ".\n");
@@ -353,14 +353,14 @@ void DoGive(Character * character, std::istream & sArgs)
     // Check if the character is invisible.
     std::string viewdName = (HasFlag(character->flags, CharacterFlag::Invisible)) ? "Someone" : character->getNameCapital();
     // Update the item iside the Database.
-    Mud::getInstance().getDbms().beginTransaction();
+    SQLiteDbms::instance().beginTransaction();
     if (item->updateOnDB())
     {
-        Mud::getInstance().getDbms().endTransaction();
+        SQLiteDbms::instance().endTransaction();
     }
     else
     {
-        Mud::getInstance().getDbms().rollbackTransection();
+        SQLiteDbms::instance().rollbackTransection();
     }
     // GIVE Message.
     character->sendMsg(
@@ -510,14 +510,14 @@ void DoWield(Character * character, std::istream & sArgs)
     // Equip the item.
     character->addEquipmentItem(item);
     // Save the item on the Database.
-    Mud::getInstance().getDbms().beginTransaction();
+    SQLiteDbms::instance().beginTransaction();
     if (item->updateOnDB())
     {
-        Mud::getInstance().getDbms().endTransaction();
+        SQLiteDbms::instance().endTransaction();
     }
     else
     {
-        Mud::getInstance().getDbms().rollbackTransection();
+        SQLiteDbms::instance().rollbackTransection();
     }
     // Show the proper message.
     std::string message = "You wield " + Telnet::cyan() + ToLower(item->getName()) + Telnet::reset() + " ";
@@ -556,7 +556,7 @@ void DoWear(Character * character, std::istream & sArgs)
     {
         bool wearedSomething = false;
         auto untouchedList = character->inventory;
-        Mud::getInstance().getDbms().beginTransaction();
+        SQLiteDbms::instance().beginTransaction();
         for (auto iterator : untouchedList)
         {
             std::string errMessage;
@@ -573,7 +573,7 @@ void DoWear(Character * character, std::istream & sArgs)
             // Notify that something has been weared.
             wearedSomething = true;
         }
-        Mud::getInstance().getDbms().endTransaction();
+        SQLiteDbms::instance().endTransaction();
         // Handle output only if the player has really weared something.
         if (!wearedSomething)
         {
@@ -618,14 +618,14 @@ void DoWear(Character * character, std::istream & sArgs)
     // Add the item to the equipment.
     character->addEquipmentItem(item);
     // Update the item on database.
-    Mud::getInstance().getDbms().beginTransaction();
+    SQLiteDbms::instance().beginTransaction();
     if (item->updateOnDB())
     {
-        Mud::getInstance().getDbms().endTransaction();
+        SQLiteDbms::instance().endTransaction();
     }
     else
     {
-        Mud::getInstance().getDbms().rollbackTransection();
+        SQLiteDbms::instance().rollbackTransection();
     }
     // Notify to character.
     character->sendMsg("You wear " + Telnet::cyan() + ToLower(item->getName()) + Telnet::reset() + ".\n");
@@ -659,7 +659,7 @@ void DoRemove(Character * character, std::istream & sArgs)
             return; // Skip the rest of the function.
         }
         auto untouchedList = character->equipment;
-        Mud::getInstance().getDbms().beginTransaction();
+        SQLiteDbms::instance().beginTransaction();
         for (auto iterator : untouchedList)
         {
             // Remove the item from the player's equipment.
@@ -669,7 +669,7 @@ void DoRemove(Character * character, std::istream & sArgs)
             // Update the item on database.
             iterator->updateOnDB();
         }
-        Mud::getInstance().getDbms().endTransaction();
+        SQLiteDbms::instance().endTransaction();
         character->sendMsg("You have removed everything.\n");
         // Check if the character is invisible.
         character->room->sendToAll(character->getNameCapital() + " has undressed all he could.\n", character);
@@ -688,14 +688,14 @@ void DoRemove(Character * character, std::istream & sArgs)
     // Add the item to the inventory.
     character->addInventoryItem(item);
     // Update the item on database.
-    Mud::getInstance().getDbms().beginTransaction();
+    SQLiteDbms::instance().beginTransaction();
     if (item->updateOnDB())
     {
-        Mud::getInstance().getDbms().endTransaction();
+        SQLiteDbms::instance().endTransaction();
     }
     else
     {
-        Mud::getInstance().getDbms().rollbackTransection();
+        SQLiteDbms::instance().rollbackTransection();
     }
     // Notify the character.
     character->sendMsg("You remove " + Telnet::cyan() + ToLower(item->getName()) + Telnet::reset() + ".\n");
@@ -803,7 +803,7 @@ void DoOpen(Character * character, std::istream & sArgs)
         return; // Skip the rest of the function.
     }
     // Check if the character want to open something in onother direction.
-    Direction direction = Mud::getInstance().findDirection(arguments[0].first, false);
+    Direction direction = Mud::instance().findDirection(arguments[0].first, false);
     if (direction != Direction::None)
     {
         // Check if the direction exists.
@@ -892,7 +892,7 @@ void DoClose(Character * character, std::istream & sArgs)
         return; // Skip the rest of the function.
     }
     // Check if the character want to open something in onother direction.
-    Direction direction = Mud::getInstance().findDirection(arguments[0].first, false);
+    Direction direction = Mud::instance().findDirection(arguments[0].first, false);
     if (direction != Direction::None)
     {
         // Check if the direction exists.
@@ -1006,7 +1006,7 @@ void DoPut(Character * character, std::istream & sArgs)
             return;
         }
         auto originalList = character->inventory;
-        Mud::getInstance().getDbms().beginTransaction();
+        SQLiteDbms::instance().beginTransaction();
         for (auto iterator : originalList)
         {
             if (iterator == container)
@@ -1020,7 +1020,7 @@ void DoPut(Character * character, std::istream & sArgs)
             // Remove the item from the player's inventory.
             character->remInventoryItem(iterator);
         }
-        Mud::getInstance().getDbms().endTransaction();
+        SQLiteDbms::instance().endTransaction();
         character->sendMsg("You put everything you could in " + container->getName() + ".\n");
         return;
     }
@@ -1032,21 +1032,21 @@ void DoPut(Character * character, std::istream & sArgs)
         return;
     }
     // Try to put the item inside the container.
-    Mud::getInstance().getDbms().beginTransaction();
+    SQLiteDbms::instance().beginTransaction();
     if (!container->putInside(item))
     {
-        Mud::getInstance().getDbms().rollbackTransection();
+        SQLiteDbms::instance().rollbackTransection();
         character->sendMsg(container->getName() + " can't contain any more items.\n");
         return;
     }
     if (!character->remInventoryItem(item))
     {
         container->putInside(item);
-        Mud::getInstance().getDbms().endTransaction();
+        SQLiteDbms::instance().endTransaction();
         character->sendMsg("You can't let go " + item->getName() + ".\n");
         return;
     }
-    Mud::getInstance().getDbms().endTransaction();
+    SQLiteDbms::instance().endTransaction();
     // Notify to player.
     character->sendMsg(
         "You put " + Telnet::cyan() + ToLower(item->getName()) + Telnet::reset() + " inside " + Telnet::cyan()
@@ -1110,9 +1110,9 @@ void DoDrink(Character * character, std::istream & sArgs)
     // Take out the liquid.
     Liquid * liquid = container->contentLiq.first;
 
-    Mud::getInstance().getDbms().beginTransaction();
+    SQLiteDbms::instance().beginTransaction();
     bool result = container->pourOut(1);
-    Mud::getInstance().getDbms().endTransaction();
+    SQLiteDbms::instance().endTransaction();
 
     if (!result)
     {
@@ -1212,20 +1212,20 @@ void DoFill(Character * character, std::istream & sArgs)
         }
     }
 
-    Mud::getInstance().getDbms().beginTransaction();
+    SQLiteDbms::instance().beginTransaction();
     if (!source->pourOut(quantity))
     {
         character->sendMsg("You failed to take out the liquid from a" + source->getNameCapital() + ".\n");
-        Mud::getInstance().getDbms().endTransaction();
+        SQLiteDbms::instance().endTransaction();
         return; // Skip the rest of the function.
     }
     if (!container->pourIn(sourLiquid, quantity))
     {
         character->sendMsg("You failed to fill the container with the liquid.\n");
-        Mud::getInstance().getDbms().endTransaction();
+        SQLiteDbms::instance().endTransaction();
         return; // Skip the rest of the function.
     }
-    Mud::getInstance().getDbms().endTransaction();
+    SQLiteDbms::instance().endTransaction();
 
     character->sendMsg(
         "You fill " + container->getName() + " with the " + sourLiquid->getName() + " of " + source->getName() + "\n");
@@ -1322,20 +1322,20 @@ void DoPour(Character * character, std::istream & sArgs)
         }
     }
 
-    Mud::getInstance().getDbms().beginTransaction();
+    SQLiteDbms::instance().beginTransaction();
     if (!source->pourOut(quantity))
     {
         character->sendMsg("You failed to pour out the liquid from " + source->getNameCapital() + ".\n");
-        Mud::getInstance().getDbms().endTransaction();
+        SQLiteDbms::instance().endTransaction();
         return; // Skip the rest of the function.
     }
     if (!container->pourIn(sourLiquid, quantity))
     {
         character->sendMsg("You failed to pour the liquid into " + source->getNameCapital() + ".\n");
-        Mud::getInstance().getDbms().endTransaction();
+        SQLiteDbms::instance().endTransaction();
         return; // Skip the rest of the function.
     }
-    Mud::getInstance().getDbms().endTransaction();
+    SQLiteDbms::instance().endTransaction();
 
     character->sendMsg(
         "You pour " + sourLiquid->getName() + " of " + source->getName() + " into " + container->getName() + ".\n");

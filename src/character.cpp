@@ -990,7 +990,7 @@ void Character::triggerDeath()
 
 Item * Character::createCorpse()
 {
-    Model * model = Mud::getInstance().findModel(1);
+    Model * model = Mud::instance().findModel(1);
     if (model == nullptr)
     {
         Logger::log(LogLevel::Error, "Can't find the model of CORPSE.");
@@ -999,7 +999,7 @@ Item * Character::createCorpse()
 
     // Set the item.
     Item * corpse = new Item();
-    corpse->vnum = Mud::getInstance().getMinVnumCorpse() - 1;
+    corpse->vnum = Mud::instance().getMinVnumCorpse() - 1;
     corpse->model = new Model(*model);
     corpse->maker = "Death";
     corpse->condition = 120;
@@ -1037,7 +1037,7 @@ Item * Character::createCorpse()
     room->addItem(corpse);
 
     // Add the corpse to the mud.
-    Mud::getInstance().addCorpse(corpse);
+    Mud::instance().addCorpse(corpse);
 
     // Return the newly created corpse.
     return corpse;

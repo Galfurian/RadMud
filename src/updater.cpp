@@ -45,7 +45,7 @@ MudUpdater::MudUpdater() :
         hourSize(secondSize * 3600),
         daySize(secondSize * 86400),
         mudHour(),
-        mudDayPhase()
+        mudDayPhase(DayPhase::Morning)
 {
     // Nothing to do.
 }
@@ -53,6 +53,15 @@ MudUpdater::MudUpdater() :
 MudUpdater::~MudUpdater()
 {
     // Nothing to do.
+}
+
+MudUpdater & MudUpdater::instance()
+{
+    // Since it's a static variable, if the class has already been created,
+    // It won't be created again. And it **is** thread-safe in C++11.
+    static MudUpdater instance;
+    // Return a reference to our instance.
+    return instance;
 }
 
 void MudUpdater::initTimers()
@@ -102,33 +111,32 @@ void MudUpdater::updateTime()
     switch (mudHour)
     {
         default:
-            Mud::getInstance().broadcastMsg(0, Telnet::yellow() + "Another hour has passed." + Telnet::reset());
+            Mud::instance().broadcastMsg(0, Telnet::yellow() + "Another hour has passed." + Telnet::reset());
             break;
         case 0:
-            // MORNING
-            Mud::getInstance().broadcastMsg(0, Telnet::yellow() + "The sun rises from the east.\n" + Telnet::reset());
-            mudDayPhase = 0;
+            Mud::instance().broadcastMsg(0, Telnet::yellow() + "The sun rises from the east.\n" + Telnet::reset());
+            mudDayPhase = DayPhase::Morning;
             break;
         case 6:
             // DAY
-            Mud::getInstance().broadcastMsg(0, Telnet::yellow() + "The sun is just above you.\n" + Telnet::reset());
-            mudDayPhase = 1;
+            Mud::instance().broadcastMsg(0, Telnet::yellow() + "The sun is just above you.\n" + Telnet::reset());
+            mudDayPhase = DayPhase::Day;
             break;
         case 12:
             // DUSK
-            Mud::getInstance().broadcastMsg(0, Telnet::yellow() + "The sun begins to set.\n" + Telnet::reset());
-            mudDayPhase = 2;
+            Mud::instance().broadcastMsg(0, Telnet::yellow() + "The sun begins to set.\n" + Telnet::reset());
+            mudDayPhase = DayPhase::Dusk;
             break;
         case 18:
             // NIGHT
-            Mud::getInstance().broadcastMsg(0,
+            Mud::instance().broadcastMsg(0,
                 Telnet::yellow() + "The sun disappears behind the horizon, darkness engulfs you.\n" + Telnet::reset());
-            mudDayPhase = 3;
+            mudDayPhase = DayPhase::Night;
             break;
         case 24:
             // Day length overflow, return to Morning.
             Logger::log(LogLevel::Info, "A day has passed!");
-            mudDayPhase = 0;
+            mudDayPhase = DayPhase::Morning;
             mudHour = 0;
             break;
     }
@@ -136,7 +144,7 @@ void MudUpdater::updateTime()
 
 void MudUpdater::updatePlayers()
 {
-    for (auto iterator : Mud::getInstance().mudPlayers)
+    for (auto iterator : Mud::instance().mudPlayers)
     {
         // If the player is not playing, continue.
         if (!iterator->isPlaying())
@@ -170,7 +178,7 @@ void MudUpdater::updatePlayers()
 
 void MudUpdater::updateMobiles()
 {
-    for (auto iterator : Mud::getInstance().mudMobiles)
+    for (auto iterator : Mud::instance().mudMobiles)
     {
         Mobile * mobile = iterator.second;
         if (!mobile->alive)
@@ -211,7 +219,7 @@ void MudUpdater::updateMobiles()
 
 void MudUpdater::updateMobilesHour()
 {
-    for (auto iterator : Mud::getInstance().mudMobiles)
+    for (auto iterator : Mud::instance().mudMobiles)
     {
         if (iterator.second->alive)
         {
@@ -246,7 +254,7 @@ void MudUpdater::updateItems()
 {
     ItemList itemToDestroy;
     Logger::log(LogLevel::Debug, "Updating corpses...");
-    for (ItemList::iterator it = Mud::getInstance().mudCorpses.begin(); it != Mud::getInstance().mudCorpses.end(); ++it)
+    for (ItemList::iterator it = Mud::instance().mudCorpses.begin(); it != Mud::instance().mudCorpses.end(); ++it)
     {
         Item * corpse = *it;
         if (HasFlag(corpse->model->flags, ModelFlag::Unbreakable))
@@ -261,7 +269,7 @@ void MudUpdater::updateItems()
         }
     }
     Logger::log(LogLevel::Debug, "Updating items...");
-    for (ItemList::iterator it = Mud::getInstance().mudItems.begin(); it != Mud::getInstance().mudItems.end(); ++it)
+    for (ItemList::iterator it = Mud::instance().mudItems.begin(); it != Mud::instance().mudItems.end(); ++it)
     {
         Item * item = *it;
         Logger::log(LogLevel::Debug, "Updating '" + item->getName() + "'...");
@@ -278,7 +286,7 @@ void MudUpdater::updateItems()
     }
     for (auto it : itemToDestroy)
     {
-        FindErase(Mud::getInstance().mudItems, it);
+        FindErase(Mud::instance().mudItems, it);
         it->destroy();
     }
     Logger::log(LogLevel::Debug, "Done!");
@@ -286,7 +294,7 @@ void MudUpdater::updateItems()
 
 void MudUpdater::performActions()
 {
-    for (auto iterator : Mud::getInstance().mudPlayers)
+    for (auto iterator : Mud::instance().mudPlayers)
     {
         // If the player is not playing, continue.
         if (!iterator->isPlaying())
@@ -298,7 +306,7 @@ void MudUpdater::performActions()
         iterator->action.perform();
     }
 
-    for (auto iterator : Mud::getInstance().mudMobiles)
+    for (auto iterator : Mud::instance().mudMobiles)
     {
         Mobile * mobile = iterator.second;
         if (!mobile->alive)
@@ -318,18 +326,52 @@ void MudUpdater::performActions()
     }
 }
 
-void MudUpdater::updateBandWidth(int type, const size_t & size)
+void MudUpdater::updateBandIn(const size_t & size)
 {
-    if (type == 0)
-    {
-        bandwidth_in += size;
-    }
-    else if (type == 1)
-    {
-        bandwidth_out += size;
-    }
-    else if (type == 2)
-    {
-        bandwidth_uncompressed += size;
-    }
+    bandwidth_in += size;
+}
+
+void MudUpdater::updateBandOut(const size_t & size)
+{
+    bandwidth_out += size;
+}
+
+void MudUpdater::updateBandUncompressed(const size_t & size)
+{
+    bandwidth_uncompressed += size;
+}
+
+DayPhase MudUpdater::getDayPhase()
+{
+    return mudDayPhase;
+}
+
+unsigned int MudUpdater::getSecondSize()
+{
+    return secondSize;
+}
+
+unsigned int MudUpdater::getHourSize()
+{
+    return hourSize;
+}
+
+unsigned int MudUpdater::getDaySize()
+{
+    return daySize;
+}
+
+size_t MudUpdater::getBandIn()
+{
+    return bandwidth_in;
+}
+
+size_t MudUpdater::getBandOut()
+{
+    return bandwidth_out;
+}
+
+size_t MudUpdater::getBandUncompressed()
+{
+    return bandwidth_uncompressed;
 }

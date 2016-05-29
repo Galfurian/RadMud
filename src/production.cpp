@@ -81,7 +81,7 @@ bool Production::setOutcome(const std::string & source)
             correct = false;
         }
 
-        outcome.first = Mud::getInstance().findModel(ToInt(outcomeInfo[0]));
+        outcome.first = Mud::instance().findModel(ToInt(outcomeInfo[0]));
         if (outcome.first == nullptr)
         {
             Logger::log(LogLevel::Error, "Can't find the Outcome :" + outcomeInfo[0]);

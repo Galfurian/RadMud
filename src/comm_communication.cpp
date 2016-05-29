@@ -184,7 +184,7 @@ void DoBug(Character * character, std::istream & sArgs)
     arguments.push_back(ToString(character->room->vnum)); // Location
     arguments.push_back(message);
 
-    if (!Mud::getInstance().getDbms().insertInto("Board", arguments))
+    if (!SQLiteDbms::instance().insertInto("Board", arguments))
     {
         character->sendMsg("Something gone wrong during the storing of your bug.\n");
         return;
@@ -216,7 +216,7 @@ void DoIdea(Character * character, std::istream & sArgs)
     arguments.push_back(ToString(character->room->vnum)); // Location
     arguments.push_back(message);
 
-    if (!Mud::getInstance().getDbms().insertInto("Board", arguments))
+    if (!SQLiteDbms::instance().insertInto("Board", arguments))
     {
         character->sendMsg("Something gone wrong during the storing of your idea.\n");
         return;
@@ -246,7 +246,7 @@ void DoTypo(Character * character, std::istream & sArgs)
     arguments.push_back(ToString(character->room->vnum)); // Location
     arguments.push_back(message);
 
-    if (!Mud::getInstance().getDbms().insertInto("Board", arguments))
+    if (!SQLiteDbms::instance().insertInto("Board", arguments))
     {
         character->sendMsg("Something gone wrong during the storing of the Typo.\n");
         return;

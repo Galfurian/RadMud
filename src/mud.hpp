@@ -90,18 +90,26 @@ class Mud
     private:
         /// @brief Constructor.
         Mud();
+
         /// @brief Destructor.
         ~Mud();
 
     public:
         /// @brief Disable Copy Construct.
         Mud(Mud const &) = delete;
+
         /// @brief Disable Move construct.
         Mud(Mud &&) = delete;
+
         /// @brief Disable Copy assign.
         Mud & operator=(Mud const &) = delete;
+
         /// @brief Disable Move assign.
         Mud & operator=(Mud &&) = delete;
+
+        /// @brief Get the singleton istance of the Mud.
+        /// @return The static and uniquie Mud variable.
+        static Mud & instance();
 
         /// List of all connected players.
         PlayerList mudPlayers;
@@ -281,18 +289,6 @@ class Mud
         /// Find the direction.
         Direction findDirection(std::string direction, bool exact);
         ///@}
-
-        /// @brief Get the singleton istance of the Mud.
-        /// @return The static and uniquie Mud variable.
-        static Mud & getInstance();
-
-        /// @brief Get the singleton istance of the DMBS.
-        /// @return The static and uniquie DBMS variable.
-        static SQLiteDbms & getDbms();
-
-        /// @brief Get the singleton istance of the Updater.
-        /// @return The static and uniquie Updater variable.
-        static MudUpdater & getUpdater();
 
         /// @brief Return the list of all the players plus all the mobiles.
         /// @return The joined list of players and mobiles.

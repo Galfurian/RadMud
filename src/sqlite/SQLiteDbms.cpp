@@ -63,6 +63,16 @@ SQLiteDbms::SQLiteDbms()
 
 SQLiteDbms::~SQLiteDbms()
 {
+    // Nothing to do.
+}
+
+SQLiteDbms & SQLiteDbms::instance()
+{
+    // Since it's a static variable, if the class has already been created,
+    // It won't be created again. And it **is** thread-safe in C++11.
+    static SQLiteDbms instance;
+    // Return a reference to our instance.
+    return instance;
 }
 
 bool SQLiteDbms::openDatabase()
@@ -323,7 +333,7 @@ bool LoadPlayerInformation(ResultSet * result, Player * player)
 
     player->name = result->getNextString();
     player->password = result->getNextString();
-    player->race = Mud::getInstance().findRace(result->getNextInteger());
+    player->race = Mud::instance().findRace(result->getNextInteger());
     player->strength = result->getNextInteger();
     player->agility = result->getNextInteger();
     player->perception = result->getNextInteger();
@@ -333,10 +343,10 @@ bool LoadPlayerInformation(ResultSet * result, Player * player)
     player->age = result->getNextInteger();
     player->description = result->getNextString();
     player->weight = result->getNextInteger();
-    player->faction = Mud::getInstance().findFaction(result->getNextInteger());
+    player->faction = Mud::instance().findFaction(result->getNextInteger());
     player->level = result->getNextInteger();
     player->experience = result->getNextInteger();
-    player->room = Mud::getInstance().findRoom(result->getNextInteger());
+    player->room = Mud::instance().findRoom(result->getNextInteger());
     player->prompt = player->prompt_save = result->getNextString();
     player->flags = result->getNextInteger();
     player->health = result->getNextInteger();
@@ -347,7 +357,7 @@ bool LoadPlayerInformation(ResultSet * result, Player * player)
 
     if (player->room == nullptr)
     {
-        player->room = Mud::getInstance().findRoom(player->rent_room);
+        player->room = Mud::instance().findRoom(player->rent_room);
         if (player->room == nullptr)
         {
             Logger::log(LogLevel::Error, "No room has been set.");
@@ -363,7 +373,7 @@ bool LoadPlayerItems(ResultSet * result, Character * character)
     while (result->next())
     {
         // The pointer to the object.
-        Item * item = Mud::getInstance().findItem(result->getNextInteger());
+        Item * item = Mud::instance().findItem(result->getNextInteger());
         EquipmentSlot slot = static_cast<EquipmentSlot>(result->getNextInteger());
 
         if (item == nullptr)
@@ -419,7 +429,7 @@ bool LoadPlayerSkill(ResultSet * result, Player * player)
     {
         while (result->next())
         {
-            Skill * skill = Mud::getInstance().findSkill(result->getNextInteger());
+            Skill * skill = Mud::instance().findSkill(result->getNextInteger());
             unsigned int value = result->getNextInteger();
 
             if (skill == nullptr)
@@ -453,7 +463,7 @@ bool LoadBadName(ResultSet * result)
 {
     while (result->next())
     {
-        if (!Mud::getInstance().badNames.insert(result->getNextString()).second)
+        if (!Mud::instance().badNames.insert(result->getNextString()).second)
         {
             Logger::log(LogLevel::Error, "Error during bad name loading.");
             return false;
@@ -466,7 +476,7 @@ bool LoadBlockedIp(ResultSet * result)
 {
     while (result->next())
     {
-        if (!Mud::getInstance().blockedIPs.insert(result->getNextString()).second)
+        if (!Mud::instance().blockedIPs.insert(result->getNextString()).second)
         {
             Logger::log(LogLevel::Error, "Error during blocked ips loading.");
             return false;
@@ -479,7 +489,7 @@ bool LoadNews(ResultSet * result)
 {
     while (result->next())
     {
-        if (!Mud::getInstance().mudNews.insert(std::make_pair(result->getNextString(), result->getNextString())).second)
+        if (!Mud::instance().mudNews.insert(std::make_pair(result->getNextString(), result->getNextString())).second)
         {
             Logger::log(LogLevel::Error, "Error during news loading.");
             return false;
@@ -492,8 +502,8 @@ bool LoadContent(ResultSet * result)
 {
     while (result->next())
     {
-        Item * container = Mud::getInstance().findItem(result->getNextInteger());
-        Item * contained = Mud::getInstance().findItem(result->getNextInteger());
+        Item * container = Mud::instance().findItem(result->getNextInteger());
+        Item * contained = Mud::instance().findItem(result->getNextInteger());
         if (container == nullptr)
         {
             Logger::log(LogLevel::Error, "Can't find container item.");
@@ -523,10 +533,10 @@ bool LoadItem(ResultSet * result)
         Item * item = new Item();
         // Initialize the item.
         item->vnum = result->getNextInteger();
-        item->model = Mud::getInstance().findModel(result->getNextInteger());
+        item->model = Mud::instance().findModel(result->getNextInteger());
         item->maker = result->getNextString();
         item->condition = result->getNextInteger();
-        item->composition = Mud::getInstance().findMaterial(result->getNextInteger());
+        item->composition = Mud::instance().findMaterial(result->getNextInteger());
         item->quality = (ItemQuality) result->getNextInteger();
         item->flags = result->getNextInteger();
 
@@ -538,7 +548,7 @@ bool LoadItem(ResultSet * result)
         }
 
         // Add the item to the map of items.
-        if (!Mud::getInstance().addItem(item))
+        if (!Mud::instance().addItem(item))
         {
             Logger::log(LogLevel::Error, "Error during item insertion.");
             delete (item);
@@ -564,7 +574,7 @@ bool LoadSkill(ResultSet * result)
             Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
-        if (!Mud::getInstance().addSkill(skill))
+        if (!Mud::instance().addSkill(skill))
         {
             Logger::log(LogLevel::Error, "Error during skill insertion.");
             return false;
@@ -589,7 +599,7 @@ bool LoadFaction(ResultSet * result)
         {
             Logger::log(LogLevel::Error, "Error during error checking.");
         }
-        if (!Mud::getInstance().addFaction(faction))
+        if (!Mud::instance().addFaction(faction))
         {
             Logger::log(LogLevel::Error, "Error during faction insertion.");
             return false;
@@ -629,7 +639,7 @@ bool LoadModel(ResultSet * result)
             Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
-        if (!Mud::getInstance().addModel(model))
+        if (!Mud::instance().addModel(model))
         {
             Logger::log(LogLevel::Error, "Error during model insertion.");
             return false;
@@ -647,7 +657,7 @@ bool LoadRace(ResultSet * result)
         race.vnum = result->getNextInteger();
         race.name = result->getNextString();
         race.description = result->getNextString();
-        race.material = Mud::getInstance().findMaterial(result->getNextInteger());
+        race.material = Mud::instance().findMaterial(result->getNextInteger());
         race.setCharacteristic(result->getNextString());
         race.available_faction = GetIntVect(result->getNextString());
         race.player_allow = result->getNextInteger();
@@ -662,7 +672,7 @@ bool LoadRace(ResultSet * result)
             Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
-        if (!Mud::getInstance().addRace(race))
+        if (!Mud::instance().addRace(race))
         {
             Logger::log(LogLevel::Error, "Error during race insertion.");
             return false;
@@ -679,15 +689,15 @@ bool LoadMobile(ResultSet * result)
         Mobile * mobile = new Mobile();
         // Initialize the mobile.
         mobile->id = result->getNextString();
-        mobile->respawnRoom = Mud::getInstance().findRoom(result->getNextInteger());
+        mobile->respawnRoom = Mud::instance().findRoom(result->getNextInteger());
         mobile->room = mobile->respawnRoom;
         mobile->name = result->getNextString();
         mobile->keys = GetWords(result->getNextString());
         mobile->shortdesc = result->getNextString();
         mobile->staticdesc = result->getNextString();
         mobile->description = result->getNextString();
-        mobile->race = Mud::getInstance().findRace(result->getNextInteger());
-        mobile->faction = Mud::getInstance().findFaction(result->getNextInteger());
+        mobile->race = Mud::instance().findRace(result->getNextInteger());
+        mobile->faction = Mud::instance().findFaction(result->getNextInteger());
         mobile->sex = result->getNextInteger();
         mobile->weight = result->getNextInteger();
         mobile->actions = GetWords(result->getNextString());
@@ -713,7 +723,7 @@ bool LoadMobile(ResultSet * result)
             delete (mobile);
             return false;
         }
-        if (!Mud::getInstance().addMobile(mobile))
+        if (!Mud::instance().addMobile(mobile))
         {
             Logger::log(LogLevel::Error, "Error during mobile insertion.");
             delete (mobile);
@@ -754,7 +764,7 @@ bool LoadRoom(ResultSet * result)
             delete (room);
             return false;
         }
-        if (!Mud::getInstance().addRoom(room))
+        if (!Mud::instance().addRoom(room))
         {
             Logger::log(LogLevel::Error, "Error during room insertion.");
             delete (room);
@@ -771,8 +781,8 @@ bool LoadExit(ResultSet * result)
         // Create an empty exit.
         Exit * exit = new Exit();
         // Retrieve the rooms vnum.
-        exit->source = Mud::getInstance().findRoom(result->getNextInteger());
-        exit->destination = Mud::getInstance().findRoom(result->getNextInteger());
+        exit->source = Mud::instance().findRoom(result->getNextInteger());
+        exit->destination = Mud::instance().findRoom(result->getNextInteger());
         exit->direction = static_cast<Direction>(result->getNextInteger());
         exit->flags = result->getNextInteger();
 
@@ -805,8 +815,8 @@ bool LoadItemRoom(ResultSet * result)
 {
     while (result->next())
     {
-        Room * room = Mud::getInstance().findRoom(result->getNextInteger());
-        Item * item = Mud::getInstance().findItem(result->getNextInteger());
+        Room * room = Mud::instance().findRoom(result->getNextInteger());
+        Item * item = Mud::instance().findItem(result->getNextInteger());
 
         // Check the correctness.
         if (room == nullptr)
@@ -858,7 +868,7 @@ bool LoadArea(ResultSet * result)
             Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
-        if (!Mud::getInstance().addArea(area))
+        if (!Mud::instance().addArea(area))
         {
             Logger::log(LogLevel::Error, "Error during area insertion.");
             return false;
@@ -871,8 +881,8 @@ bool LoadAreaList(ResultSet * result)
 {
     while (result->next())
     {
-        Area * area = Mud::getInstance().findArea(result->getNextInteger());
-        Room * room = Mud::getInstance().findRoom(result->getNextInteger());
+        Area * area = Mud::instance().findArea(result->getNextInteger());
+        Room * room = Mud::instance().findRoom(result->getNextInteger());
         // Check the correctness.
         if (area == nullptr)
         {
@@ -907,13 +917,13 @@ bool LoadWriting(ResultSet * result)
         writing->author = result->getNextString();
         writing->content = result->getNextString();
         // Fid the item on which the writing is attached.
-        Item * item = Mud::getInstance().findItem(writing->vnum);
+        Item * item = Mud::instance().findItem(writing->vnum);
         if (item == nullptr)
         {
             Logger::log(LogLevel::Error, "Can't find the item :" + ToString(writing->vnum));
             return false;
         }
-        if (!Mud::getInstance().addWriting(writing))
+        if (!Mud::instance().addWriting(writing))
         {
             Logger::log(LogLevel::Error, "Error during writing insertion.");
             return false;
@@ -942,7 +952,7 @@ bool LoadContinent(ResultSet * result)
             Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
-        if (!Mud::getInstance().addContinent(continent))
+        if (!Mud::instance().addContinent(continent))
         {
             Logger::log(LogLevel::Error, "Error during continent insertion.");
             return false;
@@ -971,7 +981,7 @@ bool LoadMaterial(ResultSet * result)
             Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
-        if (!Mud::getInstance().addMaterial(material))
+        if (!Mud::instance().addMaterial(material))
         {
             Logger::log(LogLevel::Error, "Error during material insertion.");
             return false;
@@ -1005,7 +1015,7 @@ bool LoadProfession(ResultSet * result)
             Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
-        if (!Mud::getInstance().addProfession(professions))
+        if (!Mud::instance().addProfession(professions))
         {
             Logger::log(LogLevel::Error, "Error during professions insertion.");
             return false;
@@ -1026,7 +1036,7 @@ bool LoadProduction(ResultSet * result)
         // Initialize the Production.
         production.vnum = result->getNextInteger();
         production.name = result->getNextString();
-        production.profession = Mud::getInstance().findProfession(result->getNextString());
+        production.profession = Mud::instance().findProfession(result->getNextString());
         production.difficulty = result->getNextInteger();
         production.time = result->getNextInteger();
         production.assisted = result->getNextInteger();
@@ -1048,7 +1058,7 @@ bool LoadProduction(ResultSet * result)
             Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
-        if (!Mud::getInstance().addProduction(production))
+        if (!Mud::instance().addProduction(production))
         {
             Logger::log(LogLevel::Error, "Error during production insertion.");
             return false;
@@ -1073,7 +1083,7 @@ bool LoadLiquid(ResultSet * result)
             Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
-        if (!Mud::getInstance().addLiquid(liquid))
+        if (!Mud::instance().addLiquid(liquid))
         {
             Logger::log(LogLevel::Error, "Error during liquid insertion.");
             return false;
@@ -1086,8 +1096,8 @@ bool LoadContentLiq(ResultSet * result)
 {
     while (result->next())
     {
-        Item * container = Mud::getInstance().findItem(result->getNextInteger());
-        Liquid * liquid = Mud::getInstance().findLiquid(result->getNextInteger());
+        Item * container = Mud::instance().findItem(result->getNextInteger());
+        Liquid * liquid = Mud::instance().findLiquid(result->getNextInteger());
         int quantity = result->getNextInteger();
         bool check = true;
         if (container == nullptr)
@@ -1120,9 +1130,9 @@ bool LoadTravelPoint(ResultSet * result)
 {
     while (result->next())
     {
-        Area * sourceArea = Mud::getInstance().findArea(result->getNextInteger());
+        Area * sourceArea = Mud::instance().findArea(result->getNextInteger());
         Room * sourceRoom = sourceArea->getRoom(result->getNextInteger());
-        Area * targetArea = Mud::getInstance().findArea(result->getNextInteger());
+        Area * targetArea = Mud::instance().findArea(result->getNextInteger());
         Room * targetRoom = targetArea->getRoom(result->getNextInteger());
         bool check = true;
         if (sourceArea == nullptr)
@@ -1150,12 +1160,12 @@ bool LoadTravelPoint(ResultSet * result)
             Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
-        if (!Mud::getInstance().addTravelPoint(sourceRoom, targetRoom))
+        if (!Mud::instance().addTravelPoint(sourceRoom, targetRoom))
         {
             Logger::log(LogLevel::Error, "Error during TravelPoint insertion.");
             return false;
         }
-        if (!Mud::getInstance().addTravelPoint(targetRoom, sourceRoom))
+        if (!Mud::instance().addTravelPoint(targetRoom, sourceRoom))
         {
             Logger::log(LogLevel::Error, "Error during TravelPoint insertion.");
             return false;
@@ -1180,7 +1190,7 @@ bool LoadBuilding(ResultSet * result)
         building.time = result->getNextInteger();
         building.assisted = result->getNextInteger();
         std::vector<int> tools = GetIntVect(result->getNextString());
-        building.buildingModel = Mud::getInstance().findModel(result->getNextInteger());
+        building.buildingModel = Mud::instance().findModel(result->getNextInteger());
         std::vector<int> ingredients = GetIntVect(result->getNextString());
         building.unique = static_cast<bool>(result->getNextInteger());
 
@@ -1248,7 +1258,7 @@ bool LoadBuilding(ResultSet * result)
             Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
-        if (!Mud::getInstance().addBuilding(building))
+        if (!Mud::instance().addBuilding(building))
         {
             Logger::log(LogLevel::Error, "Error during building insertion.");
             return false;

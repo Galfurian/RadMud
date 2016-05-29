@@ -58,12 +58,12 @@ int main(int argc, char ** argv)
     Logger::log(LogLevel::Global, "Booting RadMud...");
 
     Logger::log(LogLevel::Global, "    Loading Directions...");
-    Mud::getInstance().addDirection("north", Direction::North);
-    Mud::getInstance().addDirection("south", Direction::South);
-    Mud::getInstance().addDirection("west", Direction::West);
-    Mud::getInstance().addDirection("east", Direction::East);
-    Mud::getInstance().addDirection("up", Direction::Up);
-    Mud::getInstance().addDirection("down", Direction::Down);
+    Mud::instance().addDirection("north", Direction::North);
+    Mud::instance().addDirection("south", Direction::South);
+    Mud::instance().addDirection("west", Direction::West);
+    Mud::instance().addDirection("east", Direction::East);
+    Mud::instance().addDirection("up", Direction::Up);
+    Mud::instance().addDirection("down", Direction::Down);
 
     Logger::log(LogLevel::Global, "    Loading Commands...");
     LoadCommands();
@@ -72,21 +72,21 @@ int main(int argc, char ** argv)
     LoadStates();
 
     Logger::log(LogLevel::Global, "    Opening Database...");
-    if (!Mud::getInstance().getDbms().openDatabase())
+    if (!SQLiteDbms::instance().openDatabase())
     {
         Logger::log(LogLevel::Error, "Error opening database!");
         return 1;
     }
 
     Logger::log(LogLevel::Global, "    Loading Tables...");
-    if (!Mud::getInstance().getDbms().loadTables())
+    if (!SQLiteDbms::instance().loadTables())
     {
         Logger::log(LogLevel::Error, "Error loading tables!");
         return 1;
     }
 
     Logger::log(LogLevel::Global, "    Initializing Communications...");
-    if (!Mud::getInstance().initComunications())
+    if (!Mud::instance().initComunications())
     {
         Logger::log(LogLevel::Error, "Something gone wrong during initialization of comunication.");
         return 1;
@@ -105,7 +105,7 @@ int main(int argc, char ** argv)
 
     // Start the main loop which handle the players input/output.
     stopwatch.start();
-    Mud::getInstance().mainLoop();
+    Mud::instance().mainLoop();
     double timeUptime = stopwatch.stop();
 
     ///////////////////////////////////////////////////////////////////////////
@@ -115,7 +115,7 @@ int main(int argc, char ** argv)
 
     // Stop listening.
     Logger::log(LogLevel::Global, "    Closing Communications...");
-    Mud::getInstance().closeComunications();
+    Mud::instance().closeComunications();
 
     // Saving informations.
     SaveMud();
@@ -125,7 +125,7 @@ int main(int argc, char ** argv)
 
     // Close database.
     Logger::log(LogLevel::Global, "    Closing Database...");
-    if (!Mud::getInstance().getDbms().closeDatabase())
+    if (!SQLiteDbms::instance().closeDatabase())
     {
         Logger::log(LogLevel::Error, "The database has not been closed correctly.");
     }
@@ -133,9 +133,9 @@ int main(int argc, char ** argv)
     double timeShutdown = stopwatch.stop();
     Logger::log(LogLevel::Global, "Shutdown Completed.");
     ///////////////////////////////////////////////////////////////////////////
-    size_t bIn = Mud::getInstance().getUpdater().bandwidth_in;
-    size_t bOut = Mud::getInstance().getUpdater().bandwidth_out;
-    size_t bUnc = Mud::getInstance().getUpdater().bandwidth_uncompressed;
+    size_t bIn = MudUpdater::instance().getBandIn();
+    size_t bOut = MudUpdater::instance().getBandOut();
+    size_t bUnc = MudUpdater::instance().getBandUncompressed();
 
     // Print some statistics.
     Logger::log(LogLevel::Global, "");
@@ -182,10 +182,12 @@ void PrintLogo()
 /// Initialize the mud.
 int InitMud()
 {
-    Mud::getInstance().getUpdater().initTimers();
-    unsigned int sSize = Mud::getInstance().getUpdater().secondSize;
-    unsigned int hSize = Mud::getInstance().getUpdater().hourSize;
-    unsigned int dSize = Mud::getInstance().getUpdater().daySize;
+    // Init the updated timers.
+    MudUpdater::instance().initTimers();
+    // Retrieve information about timing.
+    unsigned int sSize = MudUpdater::instance().getSecondSize();
+    unsigned int hSize = MudUpdater::instance().getHourSize();
+    unsigned int dSize = MudUpdater::instance().getDaySize();
     Logger::log(LogLevel::Global, "                                              ");
     Logger::log(LogLevel::Global, "Mud Informations");
     Logger::log(LogLevel::Global, "    Port          : " + ToString(kPort));
@@ -198,14 +200,14 @@ int InitMud()
 /// Save the mud informations.
 int SaveMud()
 {
-    Mud::getInstance().getDbms().beginTransaction();
+    SQLiteDbms::instance().beginTransaction();
     Logger::log(LogLevel::Global, "    Saving information on Database for : Players...");
-    Mud::getInstance().savePlayers();
+    Mud::instance().savePlayers();
     Logger::log(LogLevel::Global, "    Saving information on Database for : Items...");
-    Mud::getInstance().saveItems();
+    Mud::instance().saveItems();
     Logger::log(LogLevel::Global, "    Saving information on Database for : Rooms...");
-    Mud::getInstance().saveRooms();
-    Mud::getInstance().getDbms().endTransaction();
+    Mud::instance().saveRooms();
+    SQLiteDbms::instance().endTransaction();
     return 0;
 }
 
@@ -213,43 +215,43 @@ int SaveMud()
 int FreeMudMemory()
 {
     Logger::log(LogLevel::Global, "    Freeing memory occupied by: Players...");
-    for (auto iterator : Mud::getInstance().mudPlayers)
+    for (auto iterator : Mud::instance().mudPlayers)
     {
         delete (iterator);
     }
 
     Logger::log(LogLevel::Global, "    Freeing memory occupied by: Mobiles...");
-    for (auto iterator : Mud::getInstance().mudMobiles)
+    for (auto iterator : Mud::instance().mudMobiles)
     {
         delete (iterator.second);
     }
 
     Logger::log(LogLevel::Global, "    Freeing memory occupied by: Items...");
-    for (auto iterator : Mud::getInstance().mudItems)
+    for (auto iterator : Mud::instance().mudItems)
     {
         delete (iterator);
     }
 
     Logger::log(LogLevel::Global, "    Freeing memory occupied by: Rooms...");
-    for (auto iterator : Mud::getInstance().mudRooms)
+    for (auto iterator : Mud::instance().mudRooms)
     {
         delete (iterator.second);
     }
 
     Logger::log(LogLevel::Global, "    Freeing memory occupied by: Areas...");
-    for (auto iterator : Mud::getInstance().mudAreas)
+    for (auto iterator : Mud::instance().mudAreas)
     {
         delete (iterator.second);
     }
 
     Logger::log(LogLevel::Global, "    Freeing memory occupied by: Writings...");
-    for (auto iterator : Mud::getInstance().mudWritings)
+    for (auto iterator : Mud::instance().mudWritings)
     {
         delete (iterator.second);
     }
 
     Logger::log(LogLevel::Global, "    Freeing memory occupied by: Corpses...");
-    for (auto iterator : Mud::getInstance().mudCorpses)
+    for (auto iterator : Mud::instance().mudCorpses)
     {
         delete (iterator);
     }

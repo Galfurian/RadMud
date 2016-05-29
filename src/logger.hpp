@@ -51,6 +51,18 @@ class Logger
         ~Logger();
 
     public:
+        /// @brief Disable Copy Construct.
+        Logger(Logger const &) = delete;
+
+        /// @brief Disable Move construct.
+        Logger(Logger &&) = delete;
+
+        /// @brief Disable Copy assign.
+        Logger & operator=(Logger const &) = delete;
+
+        /// @brief Disable Move assign.
+        Logger & operator=(Logger &&) = delete;
+
         /// @brief Get the singleton istance of the Logger.
         /// @return The static and uniquie Logger variable.
         static Logger & instance();
@@ -77,18 +89,6 @@ class Logger
         /// @param level  The logging level.
         /// @return The enum which identifies the given logging level.
         static LogLevel castFromInt(const unsigned int & level);
-
-        /// @brief Disable Copy Construct.
-        Logger(Logger const &) = delete;
-
-        /// @brief Disable Move construct.
-        Logger(Logger &&) = delete;
-
-        /// @brief Disable Copy assign.
-        Logger & operator=(Logger const &) = delete;
-
-        /// @brief Disable Move assign.
-        Logger & operator=(Logger &&) = delete;
 
     private:
         /// @brief Provide the logging stream.

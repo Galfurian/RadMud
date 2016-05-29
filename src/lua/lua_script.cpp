@@ -53,8 +53,8 @@ Item * LuaLoadItem(Character * maker, int vnumModel, int vnumMaterial, int intQu
         return nullptr;
     }
 
-    Model * model = Mud::getInstance().findModel(vnumModel);
-    Material * material = Mud::getInstance().findMaterial(vnumMaterial);
+    Model * model = Mud::instance().findModel(vnumModel);
+    Material * material = Mud::instance().findMaterial(vnumMaterial);
     ItemQuality quality = static_cast<ItemQuality>(intQuality);
 
     if (model == nullptr)

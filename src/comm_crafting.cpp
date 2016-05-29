@@ -35,7 +35,7 @@ void DoProfession(Character * character, Profession * profession, std::istream &
         return;
     }
     // Search the production.
-    Production * production = Mud::getInstance().findProduction(arguments[0].first);
+    Production * production = Mud::instance().findProduction(arguments[0].first);
     if (production == nullptr)
     {
         character->sendMsg(profession->notFoundMessage + " '" + arguments[0].first + "'.\n");
@@ -124,7 +124,7 @@ void DoBuild(Character * character, std::istream & sArgs)
         character->sendMsg("What do you want to build?\n");
         return;
     }
-    Building * schematics = Mud::getInstance().findBuilding(arguments[0].first);
+    Building * schematics = Mud::instance().findBuilding(arguments[0].first);
     if (schematics == nullptr)
     {
         character->sendMsg("You don't know how to build '" + arguments[0].first + "'.\n");
@@ -181,7 +181,7 @@ void DoBuild(Character * character, std::istream & sArgs)
                 character->sendMsg("There are already something built here.\n");
                 return;
             }
-            Building * builtSchematics = Mud::getInstance().findBuilding(iterator->model->vnum);
+            Building * builtSchematics = Mud::instance().findBuilding(iterator->model->vnum);
             if (builtSchematics)
             {
                 if (builtSchematics->unique)
@@ -234,9 +234,9 @@ void DoDeconstruct(Character * character, std::istream & sArgs)
         character->sendMsg("You deconstruct " + item->getName() + ".\n");
         // Reset item flags.
         item->flags = 0;
-        Mud::getInstance().getDbms().beginTransaction();
+        SQLiteDbms::instance().beginTransaction();
         item->updateOnDB();
-        Mud::getInstance().getDbms().endTransaction();
+        SQLiteDbms::instance().endTransaction();
     }
     else
     {
@@ -259,7 +259,7 @@ void DoRead(Character * character, std::istream & sArgs)
         character->sendMsg("You can't find want you to read.\n");
         return;
     }
-    Writing * writing = Mud::getInstance().findWriting(item->vnum);
+    Writing * writing = Mud::instance().findWriting(item->vnum);
     if (writing == nullptr)
     {
         character->sendMsg("There is nothing written on " + item->getName() + ".\n");
