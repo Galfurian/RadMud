@@ -51,18 +51,15 @@ Mobile::Mobile() :
 
 Mobile::~Mobile()
 {
-    Logger::log(LogLevel::Debug, "Deleted: Mobile.");
-    // Delete the models loaded as equipment.
+    Logger::log(LogLevel::Debug, "Deleted: Mobile (" + this->getNameCapital() + ").");
     for (auto item : equipment)
     {
         delete (item);
     }
-    // Delete the models loaded in the inventory.
     for (auto item : inventory)
     {
         delete (item);
     }
-    // Remove the mobile from the room.
     if ((room != nullptr) && this->alive)
     {
         room->removeCharacter(this);

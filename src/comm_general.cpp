@@ -604,7 +604,7 @@ void DoServer(Character * character, std::istream & sArgs)
     NoMore(character, sArgs);
     character->sendMsg("    Mud         : RadMud.\n");
     character->sendMsg("    Version     : " + kVersion + "\n");
-    character->sendMsg("    Uptime      : " + ToString(difftime(time(NULL), Mud::instance().getBootTime())) + " s\n");
+    character->sendMsg("    Uptime      : " + ToString(Mud::instance().getUpTime()) + " s\n");
     character->sendMsg("\n");
     character->sendMsg("    Players     : " + ToString(Mud::instance().mudPlayers.size()) + "\n");
     character->sendMsg("    Mobiles     : " + ToString(Mud::instance().mudMobiles.size()) + "\n");

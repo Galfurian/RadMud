@@ -161,16 +161,24 @@ class Mud
         BuildingMap mudBuildings;
 
         /// @brief Update all the player on the database.
-        /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
+        /// @return <b>True</b> if the operations succeeded,<br>
+        ///         <b>False</b> Otherwise.
         bool savePlayers();
 
         /// @brief Update all the items on the database.
-        /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
+        /// @return <b>True</b> if the operations succeeded,<br>
+        ///         <b>False</b> Otherwise.
         bool saveItems();
 
         /// @brief Update all the rooms on the database.
-        /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
+        /// @return <b>True</b> if the operations succeeded,<br>
+        ///         <b>False</b> Otherwise.
         bool saveRooms();
+
+        /// @brief Update the mud dynimic information like: Players and Items.
+        /// @return <b>True</b> if the operations succeeded,<br>
+        ///         <b>False</b> Otherwise.
+        bool saveMud();
 
         /// @defgroup GlobalAddRemove Global Add and Remove Functions
         /// @brief All the functions necessary to add and remove objects from their correspondent global list.
@@ -290,49 +298,53 @@ class Mud
         Direction findDirection(std::string direction, bool exact);
         ///@}
 
-        /// @brief Return the list of all the players plus all the mobiles.
-        /// @return The joined list of players and mobiles.
-        CharacterList getCharacterList();
+        /// @brief Main processing loop.
+        /// @return <b>True</b> if there are no errors,<br>
+        ///         <b>False</b> otherwise.
+        bool runMud();
 
-        /// @brief Get the time value of when the mud has been booted.
-        /// @return The time value.
-        time_t getBootTime();
+        /// @brief Activate the signal for shutting down the mud.
+        void shutDownSignal();
+
+        /// @brief Function which checks if the provided socket is still open.
+        /// @param socket The socket that has to be checked.
+        /// @return <b>True</b> if the socket is still open,<br>
+        ///         <b>False</b> Otherwise.
+        bool checkSocket(const int & socket) const;
+
+        /// @brief Close a socket port.
+        /// @param socket The port to close.
+        /// @return <b>True</b> if the socket has been closed,<br>
+        ///         <b>False</b> Otherwise.
+        bool closeSocket(const int & socket) const;
+
+        /// @brief Get the totale uptime.
+        /// @return The uptime.
+        double getUpTime() const;
 
         /// @brief Returns the current maximum vnum used for rooms.
         /// @return The maximum rooms vnum.
-        int getMaxVnumRoom();
+        int getMaxVnumRoom() const;
 
         /// @brief Returns the current maximum vnum used for items.
         /// @return The maximum items vnum.
-        int getMaxVnumItem();
+        int getMaxVnumItem() const;
 
         /// @brief Returns the current minimum vnum used for corpses.
         /// @return The minimum corpses vnum.
-        int getMinVnumCorpse();
-
-        /// @brief Function which checks if the provided socket is closed.
-        /// @param socket The socket that has to be checked.
-        /// @return <b>True</b> if the socket is closed,<br>
-        ///         <b>False</b> Otherwise.
-        bool isSocketClosed(int socket);
+        int getMinVnumCorpse() const;
 
         /// @brief Send message to all connected players.
         /// @param level   The level of the player: 0 normal, 1 admin.
         /// @param message Message to send.
-        void broadcastMsg(int level, std::string message);
+        void broadcastMsg(const int & level, const std::string & message) const;
 
+    private:
         /// @brief Remove players that are disconnected or about to leave the MUD.
         void removeInactivePlayers();
 
         /// @brief New player has connected.
         void processNewConnection();
-
-        /// @brief Set up communications and get ready to listen for connection.
-        /// @return <b>true</b> if there is no error, <b>false</b> otherwise.
-        bool initComunications();
-
-        /// @brief Close listening port.
-        void closeComunications();
 
         /// @brief Handle all the comunication descriptor, it's the socket value.
         void setupDescriptor(Player * player);
@@ -340,17 +352,36 @@ class Mud
         /// @brief Handle communications with player using descriptor previusly set.
         void processDescriptor(Player * player);
 
-        /// @brief Close a socket port.
-        /// @param socket The port to close.
-        void closeSocket(int socket);
+        /// @brief Set up the mud variables.
+        /// @return <b>True</b> if there are no errors,<br>
+        ///         <b>False</b> otherwise.
+        bool initVariables();
+
+        /// @brief Load data from the database.
+        /// @return <b>True</b> if there are no errors,<br>
+        ///         <b>False</b> otherwise.
+        bool initDatabase();
+
+        /// @brief Set up communications and get ready to listen for connection.
+        /// @return <b>True</b> if there are no errors,<br>
+        ///         <b>False</b> otherwise.
+        bool initComunications();
+
+        /// @brief Close listening port.
+        /// @return <b>True</b> if there are no errors,<br>
+        ///         <b>False</b> otherwise.
+        bool closeComunications();
+
+        /// @brief Boot up the mud.
+        /// @return <b>True</b> if there are no errors,<br>
+        ///         <b>False</b> otherwise.
+        bool startMud();
 
         /// @brief Shut down the mud.
-        void shutDown();
+        /// @return <b>True</b> if there are no errors,<br>
+        ///         <b>False</b> otherwise.
+        bool stopMud();
 
-        /// @brief Main processing loop.
-        void mainLoop();
-
-    private:
         /// Socket for accepting new connections.
         int _servSocket;
         /// The max descriptor, in other terms, the max socket value.

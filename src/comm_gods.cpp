@@ -34,7 +34,7 @@ void DoShutdown(Character * character, std::istream & sArgs)
     NoMore(character, sArgs);
     // Send message to all the players.
     Mud::instance().broadcastMsg(0, character->getNameCapital() + " has shut down the game!");
-    Mud::instance().shutDown();
+    Mud::instance().shutDownSignal();
 }
 
 void DoGoTo(Character * character, std::istream & sArgs)

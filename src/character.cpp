@@ -67,7 +67,7 @@ Character::Character() :
 
 Character::~Character()
 {
-    Logger::log(LogLevel::Debug, "Deleted: Character.");
+    // Nothing to do.
 }
 
 bool Character::setCharacteristic(const std::string & source)

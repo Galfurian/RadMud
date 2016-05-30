@@ -52,7 +52,7 @@ Item::Item() :
 
 Item::~Item()
 {
-    Logger::log(LogLevel::Debug, "Deleted: Item.");
+    Logger::log(LogLevel::Debug, "Deleted: Item (" + this->getNameCapital() + ").");
 }
 
 bool Item::check(bool complete)

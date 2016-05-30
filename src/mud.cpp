@@ -32,6 +32,13 @@ static fd_set out_set;
 /// Exceptino file descriptor.
 static fd_set exc_set;
 
+void Bailout(int signal)
+{
+    std::cout << "\n";
+    Logger::log(LogLevel::Global, "Received signal " + ToString(signal) + "!");
+    Mud::instance().shutDownSignal();
+}
+
 Mud::Mud() :
         _servSocket(-1),
         _maxDesc(-1),
@@ -46,7 +53,41 @@ Mud::Mud() :
 
 Mud::~Mud()
 {
-    // Nothing to do.
+    Logger::log(LogLevel::Global, "Freeing memory occupied by: Players...");
+    for (auto iterator : Mud::instance().mudPlayers)
+    {
+        delete (iterator);
+    }
+    Logger::log(LogLevel::Global, "Freeing memory occupied by: Mobiles...");
+    for (auto iterator : Mud::instance().mudMobiles)
+    {
+        delete (iterator.second);
+    }
+    Logger::log(LogLevel::Global, "Freeing memory occupied by: Items...");
+    for (auto iterator : Mud::instance().mudItems)
+    {
+        delete (iterator);
+    }
+    Logger::log(LogLevel::Global, "Freeing memory occupied by: Rooms...");
+    for (auto iterator : Mud::instance().mudRooms)
+    {
+        delete (iterator.second);
+    }
+    Logger::log(LogLevel::Global, "Freeing memory occupied by: Areas...");
+    for (auto iterator : Mud::instance().mudAreas)
+    {
+        delete (iterator.second);
+    }
+    Logger::log(LogLevel::Global, "Freeing memory occupied by: Writings...");
+    for (auto iterator : Mud::instance().mudWritings)
+    {
+        delete (iterator.second);
+    }
+    Logger::log(LogLevel::Global, "Freeing memory occupied by: Corpses...");
+    for (auto iterator : Mud::instance().mudCorpses)
+    {
+        delete (iterator);
+    }
 }
 
 Mud & Mud::instance()
@@ -105,6 +146,20 @@ bool Mud::saveRooms()
             break;
         }
     }
+    return result;
+}
+
+bool Mud::saveMud()
+{
+    bool result = true;
+    SQLiteDbms::instance().beginTransaction();
+    Logger::log(LogLevel::Global, "Saving information on Database for : Players...");
+    result |= Mud::instance().savePlayers();
+    Logger::log(LogLevel::Global, "Saving information on Database for : Items...");
+    result |= Mud::instance().saveItems();
+    Logger::log(LogLevel::Global, "Saving information on Database for : Rooms...");
+    result |= Mud::instance().saveRooms();
+    SQLiteDbms::instance().endTransaction();
     return result;
 }
 
@@ -520,56 +575,147 @@ Direction Mud::findDirection(std::string direction, bool exact)
     return Direction::None;
 }
 
-CharacterList Mud::getCharacterList()
+bool Mud::runMud()
 {
-    // Initialize the variables.
-    CharacterList characters;
-    for (auto iterator : mudMobiles)
+    // Open logging file.
+    if (!Logger::instance().openLog(kSystemDir + GetDate() + ".log"))
     {
-        characters.push_back(iterator.second);
+        std::cerr << "Can't create the logging file." << std::endl;
+        return false;
     }
 
-    for (auto iterator : mudPlayers)
+    if (!this->startMud())
     {
-        // If the player is not playing, continue.
-        if (!iterator->isPlaying())
+        Logger::log(LogLevel::Error, "Something gone wrong during the boot.");
+        return false;
+    }
+    // Set up timeout interval.
+    struct timeval timeoutVal;
+    timeoutVal.tv_sec = 0; // seconds
+    timeoutVal.tv_usec = 5e05;  // microseconds
+    Logger::log(LogLevel::Global, "Waiting for Connections...");
+    // Loop processing input, output, events.
+    // We will go through this loop roughly every timeout seconds.
+    do
+    {
+        // Check if an hour has passed.
+        if (MudUpdater::instance().hasHourPassed())
         {
-            continue;
+            // Update mud time.
+            MudUpdater::instance().updateTime();
+            // Update mud mobile.
+            MudUpdater::instance().updateMobilesHour();
+            // Update items.
+            MudUpdater::instance().updateItems();
         }
-        characters.push_back(iterator);
+        if (MudUpdater::instance().hasTicPassed())
+        {
+            // Update players.
+            MudUpdater::instance().updatePlayers();
+            // Update mobiles.
+            MudUpdater::instance().updateMobiles();
+        }
+
+        // Perform characters pending actions.
+        MudUpdater::instance().performActions();
+
+        // Delete players who have closed their comms.
+        this->removeInactivePlayers();
+
+        // Get ready for "select" function.
+        FD_ZERO(&in_set);
+        FD_ZERO(&out_set);
+        FD_ZERO(&exc_set);
+
+        // Add our control socket, needed for new connections.
+        FD_SET(_servSocket, &in_set);
+
+        // Set the max file descriptor to the server socket.
+        _maxDesc = _servSocket;
+
+        // Set bits in in_set, out_set etc. for each connected player.
+        for (auto iterator : mudPlayers)
+        {
+            this->setupDescriptor(iterator);
+        }
+
+        // Check for activity, timeout after 'timeout' seconds.
+        int activity = select((_maxDesc + 1), &in_set, &out_set, &exc_set, &timeoutVal);
+        if ((activity < 0) && (errno != EINTR))
+        {
+            perror("Select");
+        }
+
+        // Check if there are new connections on control port.
+        if (FD_ISSET(_servSocket, &in_set))
+        {
+            this->processNewConnection();
+        }
+
+        // Handle all player input/output.
+        for (auto iterator : mudPlayers)
+        {
+            this->processDescriptor(iterator);
+        }
     }
+    while (!_shutdownSignal);
 
-    return characters;
+    if (!this->stopMud())
+    {
+        Logger::log(LogLevel::Error, "Something gone wrong during the shutdown.");
+        return false;
+    }
+    return true;
 }
 
-time_t Mud::getBootTime()
+void Mud::shutDownSignal()
 {
-    return _bootTime;
+    // Game over - Tell them all.
+    this->broadcastMsg(0, "\nGame is shutting down!\n");
+    _shutdownSignal = true;
 }
 
-int Mud::getMaxVnumRoom()
+bool Mud::checkSocket(const int & socket) const
+{
+    int error_code;
+    socklen_t error_code_size = sizeof(error_code);
+    return getsockopt(socket, SOL_SOCKET, SO_ERROR, &error_code, &error_code_size) == 0;
+}
+
+bool Mud::closeSocket(const int & socket) const
+{
+#ifdef __linux__
+    return close(socket) == 0;
+#elif __APPLE__
+    return close(socket) == 0;
+#elif __CYGWIN__
+    return close(socket) == 0;
+#elif _WIN32
+    return closesocket(socket) == 0;
+#endif
+}
+
+double Mud::getUpTime() const
+{
+    return difftime(time(NULL), _bootTime);
+}
+
+int Mud::getMaxVnumRoom() const
 {
     return _maxVnumRoom;
 }
 
-int Mud::getMaxVnumItem()
+int Mud::getMaxVnumItem() const
 {
     return _maxVnumItem;
 }
 
-int Mud::getMinVnumCorpse()
+int Mud::getMinVnumCorpse() const
 {
     return _minVnumCorpses;
 }
 
-bool Mud::isSocketClosed(int socket)
-{
-    int error_code;
-    socklen_t error_code_size = sizeof(error_code);
-    return getsockopt(socket, SOL_SOCKET, SO_ERROR, &error_code, &error_code_size) != 0;
-}
-
-void Mud::broadcastMsg(int level, std::string message)
+void Mud::broadcastMsg(const int & level, const std::string & message) const
 {
     for (auto iterator : mudPlayers)
     {
@@ -690,9 +836,9 @@ void Mud::processNewConnection()
             addPlayer(player);
 
             Logger::log(LogLevel::Global, "#--------- New Connection ---------#");
-            Logger::log(LogLevel::Global, "     Socket  : " + ToString(socketFileDescriptor));
-            Logger::log(LogLevel::Global, "     Address : " + address);
-            Logger::log(LogLevel::Global, "     Port    : " + ToString(port));
+            Logger::log(LogLevel::Global, " Socket  : " + ToString(socketFileDescriptor));
+            Logger::log(LogLevel::Global, " Address : " + address);
+            Logger::log(LogLevel::Global, " Port    : " + ToString(port));
             Logger::log(LogLevel::Global, "#----------------------------------#");
 
             // Prepare to receive the player name.
@@ -705,6 +851,88 @@ void Mud::processNewConnection()
             break;
         }
     }
+}
+
+void Mud::setupDescriptor(Player * player)
+{
+    // Don't bother if connection is closed.
+    if (player->checkConnection())
+    {
+        _maxDesc = std::max(_maxDesc, player->getSocket());
+        // Don't take input if they are closing down.
+        if (!player->closing)
+        {
+            FD_SET(player->getSocket(), &in_set);
+            FD_SET(player->getSocket(), &exc_set);
+        }
+        // We are only interested in writing to sockets we have something for.
+        if (player->hasPendingOutput())
+        {
+            FD_SET(player->getSocket(), &out_set);
+        }
+    }
+}
+
+void Mud::processDescriptor(Player * player)
+{
+    // Handle exceptions.
+    if (player->checkConnection())
+    {
+        if (FD_ISSET(player->getSocket(), &exc_set))
+        {
+            player->processException();
+        }
+    }
+    // Look for ones we can read from, provided they aren't closed.
+    if (player->checkConnection())
+    {
+        if (FD_ISSET(player->getSocket(), &in_set))
+        {
+            player->processRead();
+        }
+    }
+    // Look for ones we can write to, provided they aren't closed.
+    if (player->checkConnection())
+    {
+        if (FD_ISSET(player->getSocket(), &out_set))
+        {
+            player->processWrite();
+        }
+    }
+}
+
+bool Mud::initVariables()
+{
+    // First map all the mud directions.
+    Mud::instance().addDirection("north", Direction::North);
+    Mud::instance().addDirection("south", Direction::South);
+    Mud::instance().addDirection("west", Direction::West);
+    Mud::instance().addDirection("east", Direction::East);
+    Mud::instance().addDirection("up", Direction::Up);
+    Mud::instance().addDirection("down", Direction::Down);
+
+    // Init the updater timers.
+    MudUpdater::instance().initTimers();
+
+    // Set the boot time.
+    time(&_bootTime);
+
+    return true;
+}
+
+bool Mud::initDatabase()
+{
+    if (!SQLiteDbms::instance().openDatabase())
+    {
+        Logger::log(LogLevel::Error, "Error opening database!");
+        return false;
+    }
+    if (!SQLiteDbms::instance().loadTables())
+    {
+        Logger::log(LogLevel::Error, "Error loading tables!");
+        return false;
+    }
+    return true;
 }
 
 bool Mud::initComunications()
@@ -803,163 +1031,109 @@ bool Mud::initComunications()
     return true;
 }
 
-void Mud::closeComunications()
+bool Mud::closeComunications()
 {
     if (_servSocket != kNoSocketIndicator)
     {
-        closeSocket(_servSocket);
+        return this->closeSocket(_servSocket);
     }
+    return false;
 }
 
-void Mud::setupDescriptor(Player * player)
+bool Mud::startMud()
 {
-    // Don't bother if connection is closed.
-    if (player->checkConnection())
+    // Create a stopwatch for general timing information.
+    Stopwatch<std::chrono::milliseconds> stopwatch("Boot");
+    Logger::log(LogLevel::Global, "#--------------------------------------------#");
+    Logger::log(LogLevel::Global, "             XXXXXXXXXXXXX                ");
+    Logger::log(LogLevel::Global, "  /'--_###XXXXXXXXXXXXXXXXXXX###_--'\\    ");
+    Logger::log(LogLevel::Global, "  \\##/#/#XXXXXXXXXXXXXXXXXXXXX#\\#\\##/  ");
+    Logger::log(LogLevel::Global, "   \\/#/#XXXXXXXXXXXXXXXXXXXXXXX#\\#\\/   ");
+    Logger::log(LogLevel::Global, "    \\/##XXXXXXXXXXXXXXXXXXXXXXX##\\/     ");
+    Logger::log(LogLevel::Global, "     ###XXXX  ''-.XXX.-''  XXXX###        ");
+    Logger::log(LogLevel::Global, "       \\XXXX               XXXX/         ");
+    Logger::log(LogLevel::Global, "         XXXXXXXXXXXXXXXXXXXXX            ");
+    Logger::log(LogLevel::Global, "         XXXX XXXX X XXXX XXXX            ");
+    Logger::log(LogLevel::Global, "         XXX # XXX X XXX # XXX            ");
+    Logger::log(LogLevel::Global, "        /XXXX XXX XXX XXX XXXX\\          ");
+    Logger::log(LogLevel::Global, "       ##XXXXXXX X   X XXXXXXX##          ");
+    Logger::log(LogLevel::Global, "      ##   XOXXX X   X XXXOX   ##         ");
+    Logger::log(LogLevel::Global, "      ##    #XXXX XXX XXX #    ##         ");
+    Logger::log(LogLevel::Global, "       ##..##  XXXXXXXXX  ##..##          ");
+    Logger::log(LogLevel::Global, "        ###      XXXXX     ####           ");
+    Logger::log(LogLevel::Global, "#--------------------------------------------#");
+    Logger::log(LogLevel::Global, "|                   RadMud                   |");
+    Logger::log(LogLevel::Global, "| Created by : Enrico Fraccaroli.            |");
+    Logger::log(LogLevel::Global, "| Date       : 29 September 2014             |");
+    Logger::log(LogLevel::Global, "#--------------------------------------------#");
+    Logger::log(LogLevel::Global, "Booting...");
+    Logger::log(LogLevel::Global, "Initializing Mud Variables...");
+    if (!this->initVariables())
     {
-        _maxDesc = std::max(_maxDesc, player->getSocket());
-        // Don't take input if they are closing down.
-        if (!player->closing)
-        {
-            FD_SET(player->getSocket(), &in_set);
-            FD_SET(player->getSocket(), &exc_set);
-        }
-        // We are only interested in writing to sockets we have something for.
-        if (player->hasPendingOutput())
-        {
-            FD_SET(player->getSocket(), &out_set);
-        }
+        Logger::log(LogLevel::Error, "Something gone wrong during variables initialization.");
+        return false;
     }
-}
 
-void Mud::processDescriptor(Player * player)
-{
-    // Handle exceptions.
-    if (player->checkConnection())
+    Logger::log(LogLevel::Global, "Initializing Commands...");
+    LoadCommands();
+
+    Logger::log(LogLevel::Global, "Initializing States...");
+    LoadStates();
+
+    Logger::log(LogLevel::Global, "Initializing Database...");
+    if (!this->initDatabase())
     {
-        if (FD_ISSET(player->getSocket(), &exc_set))
-        {
-            player->processException();
-        }
+        Logger::log(LogLevel::Error, "Something gone wrong during database initialization.");
+        return false;
     }
 
-    // Look for ones we can read from, provided they aren't closed.
-    if (player->checkConnection())
+    Logger::log(LogLevel::Global, "Initializing Communications...");
+    if (!this->initComunications())
     {
-        if (FD_ISSET(player->getSocket(), &in_set))
-        {
-            player->processRead();
-        }
+        Logger::log(LogLevel::Error, "Something gone wrong during initialization of comunication.");
+        return false;
     }
 
-    // Look for ones we can write to, provided they aren't closed.
-    if (player->checkConnection())
+    Logger::log(LogLevel::Global, "Booting Done (" + ToString(stopwatch.elapsed()) + ").");
+    return true;
+}
+
+bool Mud::stopMud()
+{
+    Stopwatch<std::chrono::milliseconds> stopwatch("Shutdown");
+
+    Logger::log(LogLevel::Global, "Shutting down RadMud...");
+    Logger::log(LogLevel::Global, "Closing Communications...");
+    if (!Mud::instance().closeComunications())
     {
-        if (FD_ISSET(player->getSocket(), &out_set))
-        {
-            player->processWrite();
-        }
+        Logger::log(LogLevel::Error, "The communication has not been closed correctly.");
     }
-}
 
-void Mud::closeSocket(int socket)
-{
-#ifdef __linux__
-    close(socket);
-#elif __APPLE__
-    close(socket);
-#elif __CYGWIN__
-    close(socket);
-#elif _WIN32
-    closesocket(socket);
-#endif
-}
-
-void Mud::shutDown()
-{
-    _shutdownSignal = true;
-}
-
-void Mud::mainLoop()
-{
-    time(&_bootTime);
-    // Set up timeout interval.
-    struct timeval timeoutVal;
-    timeoutVal.tv_sec = 0; // seconds
-    timeoutVal.tv_usec = 5e05;  // microseconds
-    Logger::log(LogLevel::Global, "Waiting for Connections...");
-    // Loop processing input, output, events.
-    // We will go through this loop roughly every timeout seconds.
-    do
+    Logger::log(LogLevel::Global, "Saving Mud Information...");
+    if (!Mud::instance().saveMud())
     {
-        // Check if an hour has passed.
-        if (MudUpdater::instance().hasHourPassed())
-        {
-            // Update mud time.
-            MudUpdater::instance().updateTime();
-            // Update mud mobile.
-            MudUpdater::instance().updateMobilesHour();
-            // Update items.
-            MudUpdater::instance().updateItems();
-        }
-        if (MudUpdater::instance().hasTicPassed())
-        {
-            // Update players.
-            MudUpdater::instance().updatePlayers();
-            // Update mobiles.
-            MudUpdater::instance().updateMobiles();
-        }
-
-        // Perform characters pending actions.
-        MudUpdater::instance().performActions();
-
-        // Delete players who have closed their comms.
-        this->removeInactivePlayers();
-
-        // Get ready for "select" function.
-        FD_ZERO(&in_set);
-        FD_ZERO(&out_set);
-        FD_ZERO(&exc_set);
-
-        // Add our control socket, needed for new connections.
-        FD_SET(_servSocket, &in_set);
-
-        // Set the max file descriptor to the server socket.
-        _maxDesc = _servSocket;
-
-        // Set bits in in_set, out_set etc. for each connected player.
-        for (auto iterator : mudPlayers)
-        {
-            this->setupDescriptor(iterator);
-        }
-
-        // Check for activity, timeout after 'timeout' seconds.
-        int activity = select((_maxDesc + 1), &in_set, &out_set, &exc_set, &timeoutVal);
-        if ((activity < 0) && (errno != EINTR))
-        {
-            perror("Select");
-        }
-
-        // Check if there are new connections on control port.
-        if (FD_ISSET(_servSocket, &in_set))
-        {
-            this->processNewConnection();
-        }
-
-        // Handle all player input/output.
-        for (auto iterator : mudPlayers)
-        {
-            this->processDescriptor(iterator);
-        }
+        Logger::log(LogLevel::Error, "Somwthing has gone wrong during data saving.");
     }
-    while (!_shutdownSignal);
 
-    // Game over - Tell them all.
-    broadcastMsg(0, "\nGame shut down!\n");
-}
+    Logger::log(LogLevel::Global, "Closing Database...");
+    if (!SQLiteDbms::instance().closeDatabase())
+    {
+        Logger::log(LogLevel::Error, "The database has not been closed correctly.");
+    }
+    Logger::log(LogLevel::Global, "Shutdown Completed (" + ToString(stopwatch.elapsed()) + ").");
 
-void Bailout(int signal)
-{
-    std::cout << "\n";
-    Logger::log(LogLevel::Global, "Received signal " + ToString(signal) + "!");
-    Mud::instance().shutDown();
+    ///////////////////////////////////////////////////////////////////////////
+    size_t bIn = MudUpdater::instance().getBandIn();
+    size_t bOut = MudUpdater::instance().getBandOut();
+    size_t bUnc = MudUpdater::instance().getBandUncompressed();
+
+    // Print some statistics.
+    Logger::log(LogLevel::Info, "");
+    Logger::log(LogLevel::Info, "Statistics");
+    Logger::log(LogLevel::Info, "    In            = " + ToString(bIn) + " Bytes.");
+    Logger::log(LogLevel::Info, "    Output        = " + ToString(bOut) + " Bytes.");
+    Logger::log(LogLevel::Info, "    Uncompressed  = " + ToString(bUnc) + " Bytes.");
+    Logger::log(LogLevel::Info, "    Band. Saved   = " + ToString(bUnc - bOut) + " Bytes.");
+    Logger::log(LogLevel::Info, "");
+    return true;
 }

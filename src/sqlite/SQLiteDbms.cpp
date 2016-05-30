@@ -101,7 +101,7 @@ bool SQLiteDbms::loadTables()
 {
     for (auto iterator : tableLoaders)
     {
-        Logger::log(LogLevel::Info, "        Loading Table: " + iterator.first + ".");
+        Logger::log(LogLevel::Debug, "    Loading Table: " + iterator.first + ".");
         // Execute the query.
         ResultSet * result = dbConnection.executeSelect(("SELECT * FROM " + iterator.first + ";").c_str());
         // Check the result.
@@ -129,7 +129,7 @@ bool SQLiteDbms::loadPlayer(Player * player)
     Stopwatch<std::chrono::milliseconds> stopwatch("LoadPlayer");
     std::string query;
     ResultSet * result;
-    Logger::log(LogLevel::Info, "Loading player " + player->getName() + ".");
+    Logger::log(LogLevel::Debug, "Loading player " + player->getName() + ".");
     stopwatch.start();
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -202,7 +202,7 @@ bool SQLiteDbms::loadPlayer(Player * player)
 
     ///////////////////////////////////////////////////////////////////////////////
     // Log the elapsed time.
-    Logger::log(LogLevel::Info, "Elapsed Time (" + ToString(stopwatch.elapsed()) + " ms).");
+    Logger::log(LogLevel::Debug, "Elapsed Time (" + ToString(stopwatch.elapsed()) + " ms).");
 
     return true;
 }

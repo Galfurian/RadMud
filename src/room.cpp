@@ -50,6 +50,7 @@ Room::Room() :
 
 Room::~Room()
 {
+    Logger::log(LogLevel::Debug, "Deleted: Room (" + this->name + ").");
     // Remove all the exits.
     for (auto iterator : exits)
     {
@@ -84,6 +85,7 @@ void Room::addItem(Item * item)
 {
     items.push_back(item);
     item->room = this;
+    Logger::log(LogLevel::Debug, "Item '" + item->getName() + "' added to '" + this->name + "';");
 }
 
 void Room::addBuilding(Item * item)

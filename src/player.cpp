@@ -72,13 +72,18 @@ Player::Player(const int & _socket, const int & _port, const std::string & _addr
 
 Player::~Player()
 {
-    Logger::log(LogLevel::Debug, "Deleted: Player.");
-    // Send outstanding text.
+    Logger::log(LogLevel::Debug, "Deleted: Player (" + this->getNameCapital() + ").");
+
+    // Send the last values still in the outbuffer.
     this->processWrite();
+
     // Close connection if active.
-    if (psocket != -1)
+    if (this->checkConnection())
     {
-        Mud::instance().closeSocket(psocket);
+        if (!Mud::instance().closeSocket(psocket))
+        {
+            Logger::log(LogLevel::Error, "Something has gone wrong during player socket closure.");
+        }
     }
     for (auto iterator : inventory)
     {
@@ -145,7 +150,7 @@ string Player::getAddress() const
 
 bool Player::checkConnection() const
 {
-    return !Mud::instance().isSocketClosed(psocket);
+    return Mud::instance().checkSocket(psocket);
 }
 
 void Player::closeConnection()
@@ -430,7 +435,10 @@ void Player::processRead()
         // Print error.
         perror("Error during socket receive");
         // Close the socket.
-        Mud::instance().closeSocket(psocket);
+        if (Mud::instance().closeSocket(psocket))
+        {
+            Logger::log(LogLevel::Error, "Something has gone wrong during player socket closure.");
+        }
         // Log the error.
         Logger::log(LogLevel::Error, "Connection " + ToString(psocket) + " closed.");
         // Clear the socket.
