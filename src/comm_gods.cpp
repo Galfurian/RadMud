@@ -910,7 +910,19 @@ void DoMobileInfo(Character * character, std::istream & sArgs)
     Mobile * mobile = Mud::instance().findMobile(arguments[0].first);
     if (mobile == nullptr)
     {
-        character->sendMsg("Mobile not found.\n");
+        std::string msgFound;
+        for (auto it : Mud::instance().mudMobiles)
+        {
+            if (BeginWith(it.first, arguments[0].first))
+            {
+                if (msgFound.empty())
+                {
+                    msgFound += "May you meant:\n";
+                }
+                msgFound += "    " + it.first + "\n";
+            }
+        }
+        character->sendMsg("Mobile not found.\n" + msgFound);
         return;
     }
     std::string msg;
@@ -981,7 +993,7 @@ void DoMobileInfo(Character * character, std::istream & sArgs)
     {
         msg += "                [" + ToString(effect.expires) + "] " + effect.name + "\n";
     }
-    msg += Telnet::yellow() + "    Action       " + Telnet::reset() + ":" + GetActionTypeName(mobile->action.getType())
+    msg += Telnet::yellow() + "    Action       " + Telnet::reset() + ":" + GetActionTypeName(mobile->getAction()->getType())
         + "\n";
 
     character->sendMsg(msg);
@@ -1306,7 +1318,7 @@ void DoPlayerInfo(Character * character, std::istream & sArgs)
     {
         msg += "                [" + ToString(effect.expires) + "] " + effect.name + "\n";
     }
-    msg += Telnet::yellow() + "    Action       " + Telnet::reset() + ":" + GetActionTypeName(player->action.getType())
+    msg += Telnet::yellow() + "    Action       " + Telnet::reset() + ":" + GetActionTypeName(player->getAction()->getType())
         + "\n";
     character->sendMsg(msg);
 }

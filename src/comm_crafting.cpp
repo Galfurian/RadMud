@@ -98,7 +98,7 @@ void DoProfession(Character * character, Profession * profession, std::istream &
 
     // //////////////////////////////////////////
     // Prepare the action.
-    if (!character->action.setCraft(production, usedTools, usedIngredients, craftMaterial, production->time))
+    if (!character->getAction()->setCraft(production, usedTools, usedIngredients, craftMaterial, production->time))
     {
         character->sendMsg("You can't start the process of production.\n");
         return;
@@ -196,7 +196,7 @@ void DoBuild(Character * character, std::istream & sArgs)
 
     // //////////////////////////////////////////
     // Prepare the action.
-    if (!character->action.setBuild(schematics, building, usedTools, usedIngredients, schematics->time))
+    if (!character->getAction()->setBuild(schematics, building, usedTools, usedIngredients, schematics->time))
     {
         character->sendMsg("You can't start the building.\n");
         return;

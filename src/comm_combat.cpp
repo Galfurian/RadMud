@@ -32,18 +32,47 @@ void DoKill(Character * character, std::istream & sArgs)
     {
         character->sendMsg("You have to specify whom to kill.\n");
     }
-    else if (arguments.size() == 1)
+
+    // Retrieve the target.
+    Character * target = character->room->findCharacter(arguments[0].first, arguments[0].second, character);
+    if (!target)
     {
-        Character * target = character->room->findCharacter(arguments[0].first, arguments[0].second, character);
-        if (target)
-        {
-            if (character->canSee(target))
-            {
-                character->action.setCombat(target);
-                target->action.setCombat(character);
-                return;
-            }
-        }
         character->sendMsg("You don't see '" + arguments[0].first + "' anywhere.\n");
+        return;
+    }
+
+    // Check if the attacker can see the target.
+    if (!character->canSee(target))
+    {
+        character->sendMsg("You don't see '" + arguments[0].first + "' anywhere.\n");
+        return;
+    }
+
+    // Check if the character is already in combat.
+    if (character->getAction()->getType() == ActionType::Combat)
+    {
+        OpponentsList * opponents = character->getAction()->getOpponentsList();
+        // Check if the target is part of the same combat action, thus
+        //  check if is one of its opponents.
+        if (!opponents->hasOpponent(target))
+        {
+            character->sendMsg("You are already fighting!\n");
+            return;
+        }
+        if (opponents->moveToTopAggro(character))
+        {
+            character->sendMsg("You focus your attacks on " + target->getName() + "!\n");
+        }
+        else
+        {
+            character->sendMsg("You are already doing your best to kill " + target->getName() + "!\n");
+        }
+    }
+    else
+    {
+        // So, basically if a player attacks a Target and both are not involved
+        //  in any combat action, then we can start their combat action.
+        character->getAction()->setCombat(target);
+        target->getAction()->setCombat(character);
     }
 }

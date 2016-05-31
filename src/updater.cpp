@@ -303,7 +303,7 @@ void MudUpdater::performActions()
         }
 
         // ////////////////////////////////////////////////////////////////////
-        iterator->action.perform();
+        iterator->getAction()->perform();
     }
 
     for (auto iterator : Mud::instance().mudMobiles)
@@ -322,7 +322,7 @@ void MudUpdater::performActions()
             mobile->nextActionCooldown = end + std::chrono::seconds(RandInteger(30, 60));
         }
 
-        mobile->action.perform();
+        mobile->getAction()->perform();
     }
 }
 

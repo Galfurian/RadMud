@@ -54,12 +54,14 @@ class Aggression
 class OpponentsList
 {
     private:
+        /// Owner of the list.
+        Character * owner;
         /// List of aggressors.
         std::vector<Aggression> aggressionList;
 
     public:
         /// @brief Constructor.
-        OpponentsList();
+        OpponentsList(Character * _owner);
 
         /// @brief Add an opponent to the list.
         /// @param opponent
@@ -73,6 +75,12 @@ class OpponentsList
         ///         <b>False</b> otherwise.
         bool hasOpponents() const;
 
+        /// @brief Check if the list contains a specific opponent.
+        /// @param opponent The opponent to search.
+        /// @return <b>True</b> if the opponent has been found,<br>
+        ///         <b>False</b> otherwise.
+        bool hasOpponent(Character * opponent);
+
         /// @brief Returns the current top aggressor.
         /// @return The top aggressor.
         const Aggression & getTopAggro();
@@ -83,6 +91,17 @@ class OpponentsList
         /// @return <b>True</b> if the operation concluded successfuly,<br>
         ///         <b>False</b> otherwise.
         bool setAggro(Character * opponent, unsigned int newAggression);
+
+        /// @brief Allows to elect the given character as the opponent with
+        ///         the top level of aggro.
+        /// @param character The character to move on top of aggro list.
+        /// @return <b>True</b> if the operation concluded successfuly,<br>
+        ///         <b>False</b> otherwise.
+        bool moveToTopAggro(Character * character);
+
+        unsigned int getInitialAggro(Character * character);
+
+        unsigned int getAggro(Character * character);
 
     private:
         /// @brief Sort the list of opponents.

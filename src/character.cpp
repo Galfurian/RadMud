@@ -287,6 +287,11 @@ int Character::getViewDistance()
     return 3 + GetAbilityModifier(perception);
 }
 
+Action * Character::getAction()
+{
+    return &this->action;
+}
+
 Room * Character::canMoveTo(Direction direction, std::string & error)
 {
     // Check if the player it's in a non-walking position.

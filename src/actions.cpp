@@ -37,7 +37,7 @@ Action::Action(Character * _character) :
         usedTools(),
         usedIngredients(),
         actionCooldown(),
-        opponents()
+        opponents(_character)
 {
     // Nothing to do.
 }
@@ -50,6 +50,11 @@ Action::~Action()
 ActionType Action::getType()
 {
     return this->type;
+}
+
+OpponentsList * Action::getOpponentsList()
+{
+    return &opponents;
 }
 
 std::string Action::getDescription()
@@ -259,13 +264,10 @@ bool Action::setCombat(Character * opponent)
         Logger::log(LogLevel::Error, "No opponent is set.");
         return false;
     }
-    // Set the initial aggro as the difference between the fighters levels.
-    unsigned int initialAggro = ::abs(opponent->level - actor->level);
-
     // Add the opponent
-    if (!opponents.addOpponent(opponent, initialAggro))
+    if (!opponents.addOpponent(opponent, opponents.getInitialAggro(opponent)))
     {
-        actor->sendMsg("You are already fighting against " + opponent->getName());
+        Logger::log(LogLevel::Error, "Already fighting against '" + opponent->getName() + "'.");
         return false;
     }
 
@@ -781,7 +783,7 @@ void Action::performComb()
     }
     if (!opponents.hasOpponents())
     {
-        actor->sendMsg("You stop fighting.");
+        actor->sendMsg("You stop fighting.\n\n");
         this->reset();
     }
     // Get the top aggressor.
@@ -790,19 +792,19 @@ void Action::performComb()
     Character * opponent = aggression.aggressor;
     if (opponent == nullptr)
     {
-        actor->sendMsg("You stop fighting.");
+        actor->sendMsg("You stop fighting.\n\n");
         this->reset();
     }
     else
     {
         if (opponent->room->vnum != actor->room->vnum)
         {
-            actor->sendMsg("You stop fighting.");
+            actor->sendMsg("You stop fighting.\n\n");
             this->reset();
         }
         else
         {
-            actor->sendMsg("You attack '" + opponent->getName() + "', combat is not implemented.");
+            actor->sendMsg("You attack '" + opponent->getName() + "', combat is not implemented.\n\n");
             // Set the action cooldown.
             actionCooldown = std::chrono::system_clock::now() + std::chrono::seconds(this->getNextAttack());
         }

@@ -50,7 +50,6 @@ void DoDirection(Character * character, Direction direction)
     {
         case CharacterPosture::Stand:
             character->sendMsg("You start to go " + GetDirectionName(direction) + "...\n");
-            //character->action.cooldown = 30;
             speed = 2;
             break;
         case CharacterPosture::Crouch:
@@ -69,7 +68,7 @@ void DoDirection(Character * character, Direction direction)
             character->sendMsg("You can't move!\n");
             return;
     }
-    if (!character->action.setMove(destination, direction, speed))
+    if (!character->getAction()->setMove(destination, direction, speed))
     {
         character->sendMsg("You can't move.\n");
         return;
@@ -228,7 +227,7 @@ void DoStop(Character * character, std::istream & sArgs)
 {
     // Check no more input.
     NoMore(character, sArgs);
-    character->sendMsg(character->action.stop() + "\n");
+    character->sendMsg(character->getAction()->stop() + "\n");
 }
 
 void DoLook(Character * character, std::istream & sArgs)

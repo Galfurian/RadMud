@@ -78,6 +78,10 @@ class Action
         /// @return The type of action.
         ActionType getType();
 
+        /// @brief Provides the list of opponents.
+        /// @return The opponent list bind to this action.
+        OpponentsList * getOpponentsList();
+
         /// @brief Provides the description of the action.
         /// @return The string which describe the current action.
         std::string getDescription();

@@ -21,7 +21,8 @@
 #include "character.hpp"
 
 Aggression::Aggression(Character * _aggressor, unsigned int _aggression) :
-    aggressor(_aggressor), aggression(_aggression)
+        aggressor(_aggressor),
+        aggression(_aggression)
 {
     // Nothing to do.
 }
@@ -42,8 +43,9 @@ bool Aggression::operator==(const Character * source) const
     return (this->aggressor->getName() == source->name);
 }
 
-OpponentsList::OpponentsList() :
-    aggressionList()
+OpponentsList::OpponentsList(Character * _owner) :
+        owner(_owner),
+        aggressionList()
 {
     // Nothing to do.
 }
@@ -69,6 +71,20 @@ bool OpponentsList::hasOpponents() const
     return (!aggressionList.empty());
 }
 
+bool OpponentsList::hasOpponent(Character * opponent)
+{
+    bool ret = false;
+    for (auto it : aggressionList)
+    {
+        if (it == opponent)
+        {
+            ret = true;
+            break;
+        }
+    }
+    return ret;
+}
+
 const Aggression & OpponentsList::getTopAggro()
 {
     return (*aggressionList.begin());
@@ -86,6 +102,59 @@ bool OpponentsList::setAggro(Character * opponent, unsigned int newAggression)
         this->sortList();
         // Set return value to success.
         ret = true;
+    }
+    return ret;
+}
+
+bool OpponentsList::moveToTopAggro(Character * character)
+{
+    // First check if there are opponents.
+    if (!this->hasOpponents())
+    {
+        // Just add the opponent with the minimum value of aggro.
+        this->addOpponent(character, this->getInitialAggro(character));
+        return true;
+    }
+    // First check if the character is part of the opponents.
+    if (!this->hasOpponent(character))
+    {
+        this->addOpponent(character, this->getInitialAggro(character));
+    }
+    // Check if the character is already the top aggro.
+    if (this->getTopAggro() == character)
+    {
+        return false;
+    }
+    // Retrieve the top aggro.
+    unsigned int currentAggro = this->getAggro(character);
+    unsigned int topAggro = currentAggro;
+    for (auto it : this->aggressionList)
+    {
+        if (it.aggression > topAggro)
+        {
+            topAggro = it.aggression;
+        }
+    }
+    // Just set the aggro of the character enough to be put on the first place.
+    this->setAggro(character, topAggro + 1);
+    return true;
+}
+
+unsigned int OpponentsList::getInitialAggro(Character * character)
+{
+    return std::abs(owner->level - character->level);
+}
+
+unsigned int OpponentsList::getAggro(Character * character)
+{
+    unsigned int ret = 0;
+    for (auto it : aggressionList)
+    {
+        if (it == character)
+        {
+            ret = it.aggression;
+            break;
+        }
     }
     return ret;
 }

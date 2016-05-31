@@ -159,6 +159,10 @@ class Character
         /// @return The maximum radius of view.
         int getViewDistance();
 
+        /// @brief Provides a pointer to the Action object associated to this character.
+        /// @return A pointer to Action.
+        Action * getAction();
+
         /// @brief Check if the character can move in the given direction, if it's so, returns the room in that direction.
         /// @param direction The direction where to search the room.
         /// @param error     A pointer to a string which will contain the error message if the character cannot go in the given direction.
