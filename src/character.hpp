@@ -235,6 +235,13 @@ class Character
         /// @return The armor class.
         unsigned int getArmorClass();
 
+        /// @brief Function which checks if the character can attack with a weapon equipped
+        ///         in the given slot.
+        /// @param slot The slot in which the weapon should be.
+        /// @return <b>True</b> if the item is there,<br>
+        ///         <b>False</b> otherwise.
+        bool canAttackWith(const EquipmentSlot & slot);
+
         /// @brief Add the passed item to character's inventory.
         /// @param item The item to add to inventory.
         /// @return <b>True</b> if the operation goes well,<br><b>False</b> otherwise.
