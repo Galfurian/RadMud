@@ -23,6 +23,8 @@
 #include "combat.hpp"
 #include "utils.hpp"
 
+#include <queue>
+
 class Production;
 class Building;
 class Character;
@@ -60,6 +62,8 @@ class Action
         TimeClock actionCooldown;
         /// List of opponents.
         OpponentsList opponents;
+        /// Next combat action.
+        CombatAction nextCombatAction;
 
     public:
         /// @brief Constructor with init values.
@@ -107,7 +111,8 @@ class Action
         /// @param _craftMaterial   The material of the outcome.
         /// @param _cooldown        How many seconds are required to complete the action.
         /// @return <b>True</b> if it has correct values,<br> <b>False</b> otherwise.
-        bool setCraft(Production * _production,
+        bool setCraft(
+            Production * _production,
             std::vector<Item *> & _usedTools,
             std::vector<Item *> & _usedIngredients,
             Material * _craftMaterial,
@@ -120,22 +125,34 @@ class Action
         /// @param _usedIngredients The list of used ingredients.
         /// @param _cooldown        How many seconds are required to complete the action.
         /// @return <b>True</b> if it has correct values,<br> <b>False</b> otherwise.
-        bool setBuild(Building * _schematics,
+        bool setBuild(
+            Building * _schematics,
             Item * _itemTarget,
             std::vector<Item *> & _usedTools,
             std::vector<Item *> & _usedIngredients,
             unsigned int _cooldown);
 
         /// @brief Allows to set a combat action.
-        /// @param opponent The opponent.
+        /// @param opponent   The opponent.
+        /// @param nextAction The next action to execute in combat.
         /// @return <b>True</b> if correct values have been provided,<br>
         ///			<b>False</b> otherwise.
-        bool setCombat(Character * opponent);
+        bool setCombat(Character * opponent, const CombatAction & nextAction);
 
     private:
         /// @brief Returns the cooldown before next attack.
         /// @return The non-decreasing value of the cooldown.
         unsigned int getNextAttack();
+
+        /// @brief Returns the attack damage.
+        /// @return The value of the attack.
+        void performAttack(Character * opponent);
+
+        /// @brief Returns the attack damage.
+        /// @return The value of the attack.
+        unsigned int getWeaponDamageRoll(const EquipmentSlot & slot);
+
+        Character * getNextOpponent();
 
         /// @brief Check if the cooldown of the action is elapsed.
         /// @return <b>True</b> if the time has passed,<br> <b>False</b> otherwise.

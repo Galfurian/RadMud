@@ -216,7 +216,7 @@ void DoModelInfo(Character * character, std::istream & sArgs)
     msg += Telnet::yellow() + "Functions       " + Telnet::reset() + ": {";
     for (auto it : model->functions)
     {
-        msg += " " + it;
+        msg += " " + ToString(it);
     }
     msg += "}\n";
 

@@ -77,7 +77,7 @@ void Mobile::respawn()
     // Add the mobile to the respawn room.
     this->respawnRoom->addCharacter(this);
     // Log the room.
-    this->room->sendToAll(this->getNameCapital() + " apear from somewhere.");
+    this->room->sendToAll(this->getNameCapital() + " apear from somewhere.\n");
     // Log to the mud.
     Logger::log(LogLevel::Debug, "Respawning " + this->id);
 }

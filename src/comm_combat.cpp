@@ -72,7 +72,18 @@ void DoKill(Character * character, std::istream & sArgs)
     {
         // So, basically if a player attacks a Target and both are not involved
         //  in any combat action, then we can start their combat action.
-        character->getAction()->setCombat(target);
-        target->getAction()->setCombat(character);
+        bool attackerRes = character->getAction()->setCombat(target, CombatAction::BasicAttack);
+        bool defenderRes = target->getAction()->setCombat(character, CombatAction::BasicAttack);
+        if (attackerRes && defenderRes)
+        {
+            character->sendMsg("You attack " + target->getName() + "!\n");
+            target->sendMsg(character->getNameCapital() + " attacks you!\n");
+        }
+        else
+        {
+            character->sendMsg("You cannot attack " + target->getName() + ".\n");
+            character->getAction()->stop();
+            target->getAction()->stop();
+        }
     }
 }

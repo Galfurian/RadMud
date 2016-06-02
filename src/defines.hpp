@@ -157,6 +157,15 @@ typedef enum class MobileFlags
     NoViolent = 1
 } MobileFlag;
 
+/// The list of possible combat actions.
+typedef enum class CombatActions
+{
+    /// The combat move is to do nothing.
+    NoAction,
+    /// The action is a basic attack.
+    BasicAttack
+} CombatAction;
+
 // //////////////////////////////////////////////////////////////////
 // EXIT /////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////

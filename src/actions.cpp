@@ -37,7 +37,8 @@ Action::Action(Character * _character) :
         usedTools(),
         usedIngredients(),
         actionCooldown(),
-        opponents(_character)
+        opponents(_character),
+        nextCombatAction()
 {
     // Nothing to do.
 }
@@ -63,7 +64,7 @@ std::string Action::getDescription()
     switch (this->type)
     {
         case ActionType::NoAction:
-        case ActionType::Wait:
+            case ActionType::Wait:
             break;
         case ActionType::Move:
             msg = "moving";
@@ -257,13 +258,15 @@ bool Action::setBuild(
     return correct;
 }
 
-bool Action::setCombat(Character * opponent)
+bool Action::setCombat(Character * opponent, const CombatAction & nextAction)
 {
+    // Check if the opponent is provided.
     if (opponent == nullptr)
     {
         Logger::log(LogLevel::Error, "No opponent is set.");
         return false;
     }
+
     // Add the opponent
     if (!opponents.addOpponent(opponent, opponents.getInitialAggro(opponent)))
     {
@@ -273,10 +276,9 @@ bool Action::setCombat(Character * opponent)
 
     // Set the type of action to combat.
     type = ActionType::Combat;
-
+    nextCombatAction = nextAction;
     // Set the action cooldown.
     actionCooldown = std::chrono::system_clock::now() + std::chrono::seconds(this->getNextAttack());
-
     return true;
 }
 
@@ -291,31 +293,166 @@ unsigned int Action::getNextAttack()
     double carriedWeight = (actor->getCarryingWeight() / 2) * (base / 100);
 
     double equippedWeight = 0;
-    Item * rightHand = actor->findEquipmentSlotItem(EquipmentSlot::RightHand);
-    if (rightHand != nullptr)
+    Item * rh = actor->findEquipmentSlotItem(EquipmentSlot::RightHand);
+    if (rh != nullptr)
     {
-        if (rightHand->model->type == ModelType::Weapon)
+        if (rh->model->type == ModelType::Weapon)
         {
-            equippedWeight += rightHand->getWeight() * 2.5 * (base / 100);
+            equippedWeight += rh->getWeight() * 2.5 * (base / 100);
         }
-        else if (rightHand->model->type == ModelType::Shield)
+        else if (rh->model->type == ModelType::Shield)
         {
-            equippedWeight += rightHand->getWeight() * 3.0 * (base / 100);
+            equippedWeight += rh->getWeight() * 3.0 * (base / 100);
         }
     }
-    Item * leftHand = actor->findEquipmentSlotItem(EquipmentSlot::RightHand);
-    if (leftHand != nullptr)
+    Item * lh = actor->findEquipmentSlotItem(EquipmentSlot::LeftHand);
+    if (lh != nullptr)
     {
-        if (leftHand->model->type == ModelType::Weapon)
+        if (lh->model->type == ModelType::Weapon)
         {
-            equippedWeight += leftHand->getWeight() * 2.5 * (base / 100);
+            equippedWeight += lh->getWeight() * 2.5 * (base / 100);
         }
-        else if (leftHand->model->type == ModelType::Shield)
+        else if (lh->model->type == ModelType::Shield)
         {
-            equippedWeight += leftHand->getWeight() * 3.0 * (base / 100);
+            equippedWeight += lh->getWeight() * 3.0 * (base / 100);
         }
     }
-    return static_cast<unsigned int>(base - agility + weight + carriedWeight + equippedWeight);
+    unsigned int nextAttack = static_cast<unsigned int>(base - agility + weight + carriedWeight + equippedWeight);
+    Logger::log(LogLevel::Debug, actor->getNameCapital() + " will attack in " + ToString(nextAttack));
+    return nextAttack;
+}
+
+void Action::performAttack(Character * opponent)
+{
+    // Evaluate only once the armor class of the opponent.
+    unsigned int AC = opponent->getArmorClass();
+    // Evaluate only once the strenght modifier.
+    unsigned int STR = GetAbilityModifier((actor->strength + actor->effects.getStrMod()));
+    // Retrieve the items.
+    Item * rh = actor->findEquipmentSlotItem(EquipmentSlot::RightHand);
+    Item * lh = actor->findEquipmentSlotItem(EquipmentSlot::LeftHand);
+    // If there are no weapons equiped.
+    if ((rh == nullptr) && (lh == nullptr))
+    {
+        // Roll the attack.
+        unsigned int ATK = RandInteger(1, 20);
+        // Log the rolled value.
+        Logger::log(LogLevel::Debug, actor->getNameCapital() + " rolls a " + ToString(ATK) + " againts " + ToString(AC));
+        // Check if its a hit.
+        if (ATK < AC)
+        {
+            actor->sendMsg("You miss " + opponent->getName() + " with your fist.");
+            return;
+        }
+        // Roll the damage.
+        unsigned int DMG = RandInteger(1, 3) + STR;
+        // Log the rolled value.
+        Logger::log(LogLevel::Debug, actor->getNameCapital() + " hit for " + ToString(DMG));
+        actor->sendMsg("You hit " + opponent->getName() + " with your fist for " + ToString(DMG) + ".");
+        return;
+    }
+
+    // Check with which hand the character can attack.
+    bool rhCanAttack = actor->canAttackWith(EquipmentSlot::RightHand);
+    bool lhCanAttack = actor->canAttackWith(EquipmentSlot::LeftHand);
+    // If there is a weapon in the right hand.
+    if (rhCanAttack)
+    {
+        // Roll the attack.
+        unsigned int ATK = RandInteger(1, 20);
+        // Evaluate any kind of hit penality.
+        if (rhCanAttack && lhCanAttack)
+        {
+            // Apply any penality.
+            if (ATK > 4)
+            {
+                ATK -= 4;
+            }
+            else
+            {
+                ATK = 0;
+            }
+        }
+        // Log the rolled value.
+        Logger::log(LogLevel::Debug, actor->getNameCapital() + " rolls a " + ToString(ATK) + " againts " + ToString(AC));
+        // Check if its a hit.
+        if (ATK < AC)
+        {
+            actor->sendMsg("You miss " + opponent->getName() + " with " + rh->getName() + ".");
+            return;
+        }
+        // Roll the damage.
+        unsigned int DMG = 1;
+        DMG += RandInteger(rh->model->getWeaponFunc().minDamage, rh->model->getWeaponFunc().maxDamage);
+        if (HasFlag(rh->model->flags, ModelFlag::TwoHand))
+        {
+            DMG += STR * 1.5;
+        }
+        else
+        {
+            DMG += STR;
+        }
+        Logger::log(LogLevel::Debug, actor->getNameCapital() + " hit for " + ToString(DMG));
+        actor->sendMsg("You hit " + opponent->getName() + " with " + rh->getName() + " for " + ToString(DMG) + ".");
+    }
+
+    // If there is a weapon in the right hand.
+    if (lhCanAttack)
+    {
+        // Roll the attack.
+        unsigned int ATK = RandInteger(1, 20);
+        // Evaluate any kind of hit penality.
+        if (rhCanAttack && lhCanAttack)
+        {
+            // Apply any penality.
+            if (ATK > 4)
+            {
+                ATK -= 4;
+            }
+            else
+            {
+                ATK = 0;
+            }
+        }
+        // Log the rolled value.
+        Logger::log(LogLevel::Debug, actor->getNameCapital() + " rolls a " + ToString(ATK) + " againts " + ToString(AC));
+        // Check if its a hit.
+        if (ATK < AC)
+        {
+            actor->sendMsg("You miss " + opponent->getName() + " with " + lh->getName() + ".");
+            return;
+        }
+        // Roll the damage.
+        unsigned int DMG = 1;
+        DMG += RandInteger(lh->model->getWeaponFunc().minDamage, lh->model->getWeaponFunc().maxDamage);
+        DMG += STR * 0.5;
+        Logger::log(LogLevel::Debug, actor->getNameCapital() + " hit for " + ToString(DMG));
+        actor->sendMsg("You hit " + opponent->getName() + " with " + lh->getName() + " for " + ToString(DMG) + ".");
+    }
+
+    if (!rhCanAttack && !lhCanAttack)
+    {
+        actor->sendMsg("You do not have a valid weapon equipped.");
+    }
+}
+
+Character * Action::getNextOpponent()
+{
+    if (opponents.hasOpponents())
+    {
+        // Get the top aggressor.
+        const Aggression aggression = opponents.getTopAggro();
+        // Retrieve the opponent.
+        Character * opponent = aggression.aggressor;
+        if (opponent != nullptr)
+        {
+            if (opponent->room->vnum == actor->room->vnum)
+            {
+                return opponent;
+            }
+        }
+    }
+    return nullptr;
 }
 
 bool Action::checkElapsed()
@@ -781,34 +918,22 @@ void Action::performComb()
     {
         return;
     }
-    if (!opponents.hasOpponents())
+    // Check if the character has at least some opponents.
+    if (nextCombatAction == CombatAction::BasicAttack)
     {
-        actor->sendMsg("You stop fighting.\n\n");
-        this->reset();
-    }
-    // Get the top aggressor.
-    const Aggression aggression = opponents.getTopAggro();
-    // Retrieve the opponent.
-    Character * opponent = aggression.aggressor;
-    if (opponent == nullptr)
-    {
-        actor->sendMsg("You stop fighting.\n\n");
-        this->reset();
-    }
-    else
-    {
-        if (opponent->room->vnum != actor->room->vnum)
+        // Retrieve the opponent.
+        Character * opponent = this->getNextOpponent();
+        if (opponent != nullptr)
         {
-            actor->sendMsg("You stop fighting.\n\n");
-            this->reset();
-        }
-        else
-        {
-            actor->sendMsg("You attack '" + opponent->getName() + "', combat is not implemented.\n\n");
+            // Perform the attack.
+            this->performAttack(opponent);
             // Set the action cooldown.
             actionCooldown = std::chrono::system_clock::now() + std::chrono::seconds(this->getNextAttack());
+            return;
         }
     }
+    actor->sendMsg("You stop fighting.\n\n");
+    this->reset();
 }
 
 void Action::reset()
