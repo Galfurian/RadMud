@@ -19,6 +19,7 @@
 #ifndef LOGGER_HPP
 #define LOGGER_HPP
 
+#include <iostream>
 #include <fstream>
 
 /// @brief Enumerator which identifies the severity of the log entry.
@@ -90,6 +91,39 @@ class Logger
         /// @return The enum which identifies the given logging level.
         static LogLevel castFromInt(const unsigned int & level);
 
+        static void tlog(
+            LogLevel level,
+            std::string log)
+        {
+            std::string output("[" + Logger::levelToString(level) + "][" + Logger::getDateTime() + "] " + log + "\n");
+            if (Logger::getStream().is_open())
+            {
+                // Write the log message inside the file.
+                Logger::getStream() << output;
+            }
+            Logger::getOutputStream(level) << output;
+        }
+        template<typename T, typename ... Args>
+        static void tlog(
+            LogLevel level,
+            std::string log,
+            T first,
+            Args ... args)
+        {
+            for (size_t pos = 0; pos < log.size(); ++pos)
+            {
+                if (log.at(pos) == '%')
+                {
+                    std::cout << log << "\n";
+                    log.replace(pos, pos + 1, first);
+                    std::cout << log << "\n";
+                    // Call recursively.
+                    tlog(level, log, args...);
+                    break;
+                }
+            }
+        }
+
     private:
         /// @brief Provide the logging stream.
         /// @return A static std::fstream, which initially <b>is not opened</b>.
@@ -108,37 +142,5 @@ class Logger
         /// @return Logging level string.
         static std::string levelToString(const LogLevel & level);
 };
-
-template<typename T, typename ... Args>
-static void logT(const LogLevel & level, std::string log, const T & first, const Args & ... args)
-{
-    for (unsigned int pos = 0; pos < log.size(); ++pos)
-    {
-        if (log.at(pos) == '%')
-        {
-            Logger::log(level, first)
-            std::cout << ;
-            logT(level, log.substr(pos + 1, log.size()), args...);
-            break;
-        }
-        else
-        {
-            std::cout << log.at(pos);
-        }
-    }
-    //std::string output("[" + Logger::levelToString(level) + "][" + Logger::getDateTime() + "] " + log + "\n");
-    //Logger::getOutputStream(level) << output;
-}
-
-template<class ContainerA, class ... Containers>
-unsigned commonLength(unsigned len, const ContainerA &first, const Containers&... rest)
-{
-    unsigned firstLen = first.size();
-    if (len > firstLen)
-    {
-        len = firstLen;
-    }
-    return commonLength(len, rest...);
-}
 
 #endif /* SRC_LOGGER_HPP_ */
