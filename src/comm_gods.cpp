@@ -223,15 +223,15 @@ void DoModelInfo(Character * character, std::istream & sArgs)
     switch (model->type)
     {
         case ModelType::NoType:
-        {
+            {
             break;
         }
         case ModelType::Corpse:
-        {
+            {
             break;
         }
         case ModelType::Weapon:
-        {
+            {
             WeaponFunc func = model->getWeaponFunc();
             msg += Telnet::brown() + "Type            " + Telnet::reset() + ": " + GetWeaponTypeName(func.type) + "\n";
             msg += Telnet::brown() + "Minimum Damage  " + Telnet::reset() + ": " + ToString(func.minDamage) + "\n";
@@ -240,7 +240,7 @@ void DoModelInfo(Character * character, std::istream & sArgs)
             break;
         }
         case ModelType::Armor:
-        {
+            {
             ArmorFunc func = model->getArmorFunc();
             msg += Telnet::brown() + "Size            " + Telnet::reset() + ": " + GetArmorSizeName(func.size) + "\n";
             msg += Telnet::brown() + "Damage Absorb. " + Telnet::reset() + ": " + ToString(func.damageAbs) + "\n";
@@ -248,21 +248,21 @@ void DoModelInfo(Character * character, std::istream & sArgs)
             break;
         }
         case ModelType::Shield:
-        {
+            {
             ShieldFunc func = model->getShieldFunc();
             msg += Telnet::brown() + "Size            " + Telnet::reset() + ": " + GetShieldSizeName(func.size) + "\n";
             msg += Telnet::brown() + "Parry Chance    " + Telnet::reset() + ": " + ToString(func.parryChance) + "\n";
             break;
         }
         case ModelType::Projectile:
-        {
+            {
             ProjectileFunc func = model->getProjectileFunc();
             msg += Telnet::brown() + "Damage Bonus    " + Telnet::reset() + ": " + ToString(func.damageBonus) + "\n";
             msg += Telnet::brown() + "Range Bonus     " + Telnet::reset() + ": " + ToString(func.rangeBonus) + "\n";
             break;
         }
         case ModelType::Container:
-        {
+            {
             ContainerFunc func = model->getContainerFunc();
             msg += Telnet::brown() + "Max Weight      " + Telnet::reset() + ": " + ToString(func.maxWeight) + "\n";
             msg += Telnet::brown() + "Flags           " + Telnet::reset() + ": {" + GetContainerFlagString(func.flags)
@@ -272,7 +272,7 @@ void DoModelInfo(Character * character, std::istream & sArgs)
             break;
         }
         case ModelType::LiqContainer:
-        {
+            {
             LiqContainerFunc func = model->getLiqContainerFunc();
             msg += Telnet::brown() + "Max Weight      " + Telnet::reset() + ": " + ToString(func.maxWeight) + "\n";
             msg += Telnet::brown() + "Flags           " + Telnet::reset() + ": {"
@@ -280,40 +280,40 @@ void DoModelInfo(Character * character, std::istream & sArgs)
             break;
         }
         case ModelType::Tool:
-        {
+            {
             ToolFunc func = model->getToolFunc();
             msg += Telnet::brown() + "Type            " + Telnet::reset() + ": " + GetToolTypeName(func.type) + "\n";
             break;
         }
         case ModelType::Node:
-        {
+            {
             NodeFunc func = model->getNodeFunc();
             msg += Telnet::brown() + "Type            " + Telnet::reset() + ": " + GetNodeTypeName(func.type) + "\n";
             break;
         }
         case ModelType::Resource:
-        {
+            {
             ResourceFunc func = model->getResourceFunc();
             msg += Telnet::brown() + "Type            " + Telnet::reset() + ": " + GetResourceTypeName(func.type)
                 + "\n";
             break;
         }
         case ModelType::Seed:
-        {
+            {
             SeedFunc func = model->getSeedFunc();
             msg += Telnet::brown() + "Type            " + Telnet::reset() + ": " + GetSeedTypeName(func.type) + "\n";
             break;
         }
         case ModelType::Key:
-        {
+            {
             break;
         }
         case ModelType::Furniture:
-        {
+            {
             break;
         }
         case ModelType::Food:
-        {
+            {
             FoodFunc func = model->getFoodFunc();
             msg += Telnet::brown() + "Feeding         " + Telnet::reset() + ": " + ToString(func.hours) + "\n";
             msg += Telnet::brown() + "Flags           " + Telnet::reset() + ": {" + GetFoodFlagString(func.flags)
@@ -321,46 +321,46 @@ void DoModelInfo(Character * character, std::istream & sArgs)
             break;
         }
         case ModelType::Light:
-        {
+            {
             LightFunc func = model->getLightFunc();
             msg += Telnet::brown() + "Autonomy        " + Telnet::reset() + ": " + ToString(func.maxHours) + "\n";
             msg += Telnet::brown() + "Rechargeable    " + Telnet::reset() + ": " + ToString(func.policy) + "\n";
             break;
         }
         case ModelType::Vehicle:
-        {
+            {
             break;
         }
         case ModelType::Pen:
-        {
+            {
             break;
         }
         case ModelType::Book:
-        {
+            {
             BookFunc func = model->getBookFunc();
             msg += Telnet::brown() + "Capacity        " + Telnet::reset() + ": " + ToString(func.maxParchments) + "\n";
             break;
         }
         case ModelType::Rope:
-        {
+            {
             RopeFunc func = model->getRopeFunc();
             msg += Telnet::brown() + "Difficulty      " + Telnet::reset() + ": " + ToString(func.difficulty) + "\n";
             msg += Telnet::brown() + "Type            " + Telnet::reset() + ": " + ToString(func.type) + "\n";
             break;
         }
         case ModelType::Trash:
-        {
+            {
             break;
         }
         case ModelType::Mechanism:
-        {
+            {
             MechanismFunc func = model->getMechanismFunc();
             msg += Telnet::brown() + "Type            " + Telnet::reset() + ": " + GetMechanismTypeName(func.type)
                 + "\n";
             switch (func.type)
             {
                 case MechanismType::Door:
-                case MechanismType::Lock:
+                    case MechanismType::Lock:
                     msg += Telnet::brown() + "Key             " + Telnet::reset() + ": " + ToString(func.key) + "\n";
                     msg += Telnet::brown() + "Difficulty      " + Telnet::reset() + ": " + ToString(func.difficulty)
                         + "\n";
@@ -380,7 +380,7 @@ void DoModelInfo(Character * character, std::istream & sArgs)
             break;
         }
         case ModelType::Currency:
-        {
+            {
             break;
         }
     }
@@ -780,9 +780,9 @@ void DoRoomEdit(Character * character, std::istream & sArgs)
         }
 
         QueryList value =
-        { std::make_pair("description", input) };
+            { std::make_pair("description", input) };
         QueryList where =
-        { std::make_pair("vnum", ToString(room->vnum)) };
+            { std::make_pair("vnum", ToString(room->vnum)) };
 
         if (!SQLiteDbms::instance().updateInto("Room", value, where))
         {
@@ -802,9 +802,9 @@ void DoRoomEdit(Character * character, std::istream & sArgs)
             return;
         }
         QueryList value =
-        { std::make_pair("terrain", input) };
+            { std::make_pair("terrain", input) };
         QueryList where =
-        { std::make_pair("vnum", ToString(room->vnum)) };
+            { std::make_pair("vnum", ToString(room->vnum)) };
 
         if (!SQLiteDbms::instance().updateInto("Room", value, where))
         {
@@ -825,9 +825,9 @@ void DoRoomEdit(Character * character, std::istream & sArgs)
         }
 
         QueryList value =
-        { std::make_pair("name", input) };
+            { std::make_pair("name", input) };
         QueryList where =
-        { std::make_pair("vnum", ToString(room->vnum)) };
+            { std::make_pair("vnum", ToString(room->vnum)) };
         if (!SQLiteDbms::instance().updateInto("Room", value, where))
         {
             player->sendMsg("Command gone wrong.\n");
@@ -961,7 +961,7 @@ void DoMobileInfo(Character * character, std::istream & sArgs)
     msg += Telnet::green() + "# Chracter:\n" + Telnet::reset();
     msg += Telnet::yellow() + "    Proper Noun  " + Telnet::reset() + ":" + mobile->name + "\n";
     msg += Telnet::yellow() + "    Description  " + Telnet::reset() + ":" + mobile->description + "\n";
-    msg += Telnet::yellow() + "    Sex          " + Telnet::reset() + ":" + ToString(mobile->sex) + "\n";
+    msg += Telnet::yellow() + "    Gender       " + Telnet::reset() + ":" + GetGenderTypeName(mobile->gender) + "\n";
     msg += Telnet::yellow() + "    Weight       " + Telnet::reset() + ":" + ToString(mobile->weight) + "\n";
     msg += Telnet::yellow() + "    Level        " + Telnet::reset() + ":" + ToString(mobile->level) + "\n";
     msg += Telnet::yellow() + "    Flags        " + Telnet::reset() + ":" + ToString(mobile->flags) + "\n";
@@ -993,7 +993,8 @@ void DoMobileInfo(Character * character, std::istream & sArgs)
     {
         msg += "                [" + ToString(effect.expires) + "] " + effect.name + "\n";
     }
-    msg += Telnet::yellow() + "    Action       " + Telnet::reset() + ":" + GetActionTypeName(mobile->getAction()->getType())
+    msg += Telnet::yellow() + "    Action       " + Telnet::reset() + ":"
+        + GetActionTypeName(mobile->getAction()->getType())
         + "\n";
 
     character->sendMsg(msg);
@@ -1286,7 +1287,7 @@ void DoPlayerInfo(Character * character, std::istream & sArgs)
     msg += Telnet::green() + "# Chracter:\n" + Telnet::reset();
     msg += Telnet::yellow() + "    Proper Noun  " + Telnet::reset() + ":" + player->name + "\n";
     msg += Telnet::yellow() + "    Description  " + Telnet::reset() + ":" + player->description + "\n";
-    msg += Telnet::yellow() + "    Sex          " + Telnet::reset() + ":" + ToString(player->sex) + "\n";
+    msg += Telnet::yellow() + "    Gender       " + Telnet::reset() + ":" + GetGenderTypeName(player->gender) + "\n";
     msg += Telnet::yellow() + "    Weight       " + Telnet::reset() + ":" + ToString(player->weight) + "\n";
     msg += Telnet::yellow() + "    Level        " + Telnet::reset() + ":" + ToString(player->level) + "\n";
     msg += Telnet::yellow() + "    Flags        " + Telnet::reset() + ":" + ToString(player->flags) + "\n";
@@ -1318,7 +1319,8 @@ void DoPlayerInfo(Character * character, std::istream & sArgs)
     {
         msg += "                [" + ToString(effect.expires) + "] " + effect.name + "\n";
     }
-    msg += Telnet::yellow() + "    Action       " + Telnet::reset() + ":" + GetActionTypeName(player->getAction()->getType())
+    msg += Telnet::yellow() + "    Action       " + Telnet::reset() + ":"
+        + GetActionTypeName(player->getAction()->getType())
         + "\n";
     character->sendMsg(msg);
 }

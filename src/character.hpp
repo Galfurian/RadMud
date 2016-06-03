@@ -47,8 +47,8 @@ class Character
         std::string name;
         /// Character description.
         std::string description;
-        /// Character sex.
-        int sex;
+        /// Character gender.
+        GenderType gender;
         /// Character weight.
         int weight;
         /// Character level.
@@ -136,13 +136,13 @@ class Character
         /// @return The static description.
         std::string getStaticDesc();
 
-        /// @brief Return the sex of the character as a string.
-        /// @return The corresponding string that identify the character sex.
-        std::string getSexAsString();
+        /// @brief Return the correct pronoun of the character as a string.
+        /// @return The character pronoun.
+        std::string getPronoun();
 
         /// @brief Return the correct pronoun of the character as a string.
         /// @return The character pronoun.
-        std::string getPrononun();
+        std::string getPossessivePronoun();
 
         /// @brief Return the max health value.
         /// @return The maximum health for this character.
@@ -358,7 +358,7 @@ class Character
 
         /// @brief Operator used to order the character based on their name.
         bool operator<(const class Character & source) const
-        {
+            {
             return name < source.name;
         }
 };

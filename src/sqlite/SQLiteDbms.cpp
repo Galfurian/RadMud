@@ -339,7 +339,7 @@ bool LoadPlayerInformation(ResultSet * result, Player * player)
     player->perception = result->getNextInteger();
     player->constitution = result->getNextInteger();
     player->intelligence = result->getNextInteger();
-    player->sex = result->getNextInteger();
+    player->gender = static_cast<GenderType>(result->getNextInteger());
     player->age = result->getNextInteger();
     player->description = result->getNextString();
     player->weight = result->getNextInteger();
@@ -399,12 +399,12 @@ bool LoadPlayerItems(ResultSet * result, Character * character)
         switch (slot)
         {
             case EquipmentSlot::Head:
-            case EquipmentSlot::Torso:
-            case EquipmentSlot::Back:
-            case EquipmentSlot::Legs:
-            case EquipmentSlot::Feet:
-            case EquipmentSlot::RightHand:
-            case EquipmentSlot::LeftHand:
+                case EquipmentSlot::Torso:
+                case EquipmentSlot::Back:
+                case EquipmentSlot::Legs:
+                case EquipmentSlot::Feet:
+                case EquipmentSlot::RightHand:
+                case EquipmentSlot::LeftHand:
                 // Change the slot of the item.
                 item->setCurrentSlot(slot);
                 // Add the item to the equipment.
@@ -698,7 +698,7 @@ bool LoadMobile(ResultSet * result)
         mobile->description = result->getNextString();
         mobile->race = Mud::instance().findRace(result->getNextInteger());
         mobile->faction = Mud::instance().findFaction(result->getNextInteger());
-        mobile->sex = result->getNextInteger();
+        mobile->gender = static_cast<GenderType>(result->getNextInteger());
         mobile->weight = result->getNextInteger();
         mobile->actions = GetWords(result->getNextString());
         mobile->flags = result->getNextInteger();

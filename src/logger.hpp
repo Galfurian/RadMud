@@ -109,4 +109,36 @@ class Logger
         static std::string levelToString(const LogLevel & level);
 };
 
+template<typename T, typename ... Args>
+static void logT(const LogLevel & level, std::string log, const T & first, const Args & ... args)
+{
+    for (unsigned int pos = 0; pos < log.size(); ++pos)
+    {
+        if (log.at(pos) == '%')
+        {
+            Logger::log(level, first)
+            std::cout << ;
+            logT(level, log.substr(pos + 1, log.size()), args...);
+            break;
+        }
+        else
+        {
+            std::cout << log.at(pos);
+        }
+    }
+    //std::string output("[" + Logger::levelToString(level) + "][" + Logger::getDateTime() + "] " + log + "\n");
+    //Logger::getOutputStream(level) << output;
+}
+
+template<class ContainerA, class ... Containers>
+unsigned commonLength(unsigned len, const ContainerA &first, const Containers&... rest)
+{
+    unsigned firstLen = first.size();
+    if (len > firstLen)
+    {
+        len = firstLen;
+    }
+    return commonLength(len, rest...);
+}
+
 #endif /* SRC_LOGGER_HPP_ */

@@ -148,6 +148,17 @@ typedef enum class ActionTypes
     Combat
 } ActionType;
 
+/// The list of possible actions.
+typedef enum class GenderTypes
+{
+    /// The character has no gender (robot).
+    None,
+    /// The character is a female.
+    Female,
+    /// The character is a male.
+    Male
+} GenderType;
+
 /// Used to determine the flag of the character.
 typedef enum class MobileFlags
 {
@@ -797,6 +808,8 @@ std::string GetSeedTypeName(SeedType type);
 std::string GetMechanismTypeName(MechanismType type);
 /// Return the string describing the type of Action.
 std::string GetActionTypeName(ActionType type);
+/// Return the string describing the type of Gender.
+std::string GetGenderTypeName(GenderType type);
 ///@}
 
 /// @defgroup FlagsToList Flags to List of Strings.

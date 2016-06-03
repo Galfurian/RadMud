@@ -64,7 +64,7 @@ void DoDirection(Character * character, Direction direction)
             Logger::log(LogLevel::Error, "No posture set.");
             break;
         case CharacterPosture::Sit:
-        case CharacterPosture::Rest:
+            case CharacterPosture::Rest:
             character->sendMsg("You can't move!\n");
             return;
     }
@@ -180,7 +180,7 @@ void DoWho(Character * character, std::istream & sArgs)
             location = iterator->room->name;
         }
         table.addRow(
-        { iterator->getName(), location });
+            { iterator->getName(), location });
     }
     output += table.getTable();
     output += "# Total " + Telnet::yellow() + "Players" + Telnet::reset() + " :" + ToString(table.getNumRows()) + "\n";
@@ -517,8 +517,8 @@ void DoStatistics(Character * character, std::istream & sArgs)
 
     std::string msg;
     msg += Telnet::magenta() + "Name: " + Telnet::reset() + player->getName();
-    msg += Telnet::magenta() + " Race: " + Telnet::reset() + player->race->name + " (" + player->getSexAsString()
-        + ")\n";
+    msg += Telnet::magenta() + " Race: " + Telnet::reset() + player->race->name + "\n";
+    msg += Telnet::magenta() + "Gender: " + Telnet::reset() + GetGenderTypeName(player->gender) + "\n";
     msg += Telnet::magenta() + "Affiliation: " + Telnet::reset() + player->faction->name + "\n";
     msg += Telnet::magenta() + "Experience: " + Telnet::reset() + ToString(player->experience) + " px\n";
     msg += Telnet::magenta() + "Str " + Telnet::reset() + ToString(player->strength);

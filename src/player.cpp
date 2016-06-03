@@ -184,7 +184,7 @@ bool Player::createOnDB()
     arguments.push_back(ToString(perception));
     arguments.push_back(ToString(constitution));
     arguments.push_back(ToString(intelligence));
-    arguments.push_back(ToString(sex));
+    arguments.push_back(ToString(static_cast<int>(gender)));
     arguments.push_back(ToString(age));
     arguments.push_back(description);
     arguments.push_back(ToString(weight));
@@ -239,7 +239,7 @@ bool Player::updateOnDB()
         value.push_back(std::make_pair("per", ToString(perception)));
         value.push_back(std::make_pair("con", ToString(constitution)));
         value.push_back(std::make_pair("int", ToString(intelligence)));
-        value.push_back(std::make_pair("sex", ToString(sex)));
+        value.push_back(std::make_pair("gender", ToString(static_cast<int>(gender))));
         value.push_back(std::make_pair("age", ToString(age)));
         value.push_back(std::make_pair("description", description));
         value.push_back(std::make_pair("weight", ToString(weight)));
@@ -323,7 +323,7 @@ bool Player::remInventoryItem(Item * item)
     if (Character::remInventoryItem(item))
     {
         SQLiteDbms::instance().deleteFrom("ItemPlayer",
-        { std::make_pair("owner", name), std::make_pair("item", ToString(item->vnum)) });
+            { std::make_pair("owner", name), std::make_pair("item", ToString(item->vnum)) });
         return true;
     }
     return false;
@@ -338,7 +338,7 @@ bool Player::remEquipmentItem(Item * item)
     if (Character::remEquipmentItem(item))
     {
         SQLiteDbms::instance().deleteFrom("ItemPlayer",
-        { std::make_pair("owner", name), std::make_pair("item", ToString(item->vnum)) });
+            { std::make_pair("owner", name), std::make_pair("item", ToString(item->vnum)) });
         return true;
     }
     return false;

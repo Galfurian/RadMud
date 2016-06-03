@@ -87,7 +87,7 @@ void DoTake(Character * character, std::istream & sArgs)
             }
             character->sendMsg("You've picked up everything you could.\n");
             character->room->sendToAll(
-                character->getNameCapital() + " has picked up everything " + character->getPrononun() + " could.\n",
+                character->getNameCapital() + " has picked up everything " + character->getPronoun() + " could.\n",
                 character);
             return; // Skip the rest of the function.
         }
@@ -276,7 +276,7 @@ void DoDrop(Character * character, std::istream & sArgs)
         SQLiteDbms::instance().endTransaction();
         character->sendMsg("You dropped all.\n");
         character->room->sendToAll(
-            character->getNameCapital() + " has dropped all " + character->getPrononun() + " items.\n", character);
+            character->getNameCapital() + " has dropped all " + character->getPronoun() + " items.\n", character);
         return; // Skip the rest of the function.
     }
     // Get the item.

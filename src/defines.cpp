@@ -77,7 +77,7 @@ std::string GetDirectionName(Direction direction)
             output = "down";
             break;
         case Direction::None:
-        default:
+            default:
             output = "No Direction";
     }
     return output;
@@ -590,6 +590,12 @@ std::string GetActionTypeName(ActionType type)
             break;
     }
     return output;
+}
+std::string GetGenderTypeName(GenderType type)
+{
+    if (type == GenderType::Male) return "male";
+    if (type == GenderType::Female) return "female";
+    return "none";
 }
 
 std::string GetModelFlagString(int flags)

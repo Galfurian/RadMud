@@ -39,7 +39,7 @@ using namespace std;
 Character::Character() :
         name(),
         description(),
-        sex(),
+        gender(),
         weight(),
         level(),
         flags(),
@@ -94,7 +94,6 @@ bool Character::check()
     bool safe = true;
     safe = SafeAssert(!name.empty());
     safe = SafeAssert(!description.empty());
-    safe = SafeAssert(sex > 0);
     safe = SafeAssert(weight > 0);
     safe = SafeAssert(level >= 0);
     safe = SafeAssert(flags >= 0);
@@ -173,37 +172,25 @@ std::string Character::getStaticDesc()
     // Action
     if ((action.getType() != ActionType::NoAction) && (action.getType() != ActionType::Wait))
     {
-        desc += ", " + this->getPrononun() + " is ";
+        desc += ", " + this->getPronoun() + " is ";
         desc += action.getDescription();
     }
     desc += ".";
     return desc;
 }
 
-string Character::getSexAsString()
+string Character::getPronoun()
 {
-    switch (sex)
-    {
-        case 1:
-            return "male";
-        case 2:
-            return "female";
-        default:
-            return "none";
-    }
+    if (gender == GenderType::Male) return "he";
+    if (gender == GenderType::Female) return "she";
+    return "it";
 }
 
-string Character::getPrononun()
+string Character::getPossessivePronoun()
 {
-    switch (sex)
-    {
-        case 1:
-            return "he";
-        case 2:
-            return "she";
-        default:
-            return "none";
-    }
+    if (gender == GenderType::Male) return "his";
+    if (gender == GenderType::Female) return "hers";
+    return "its";
 }
 
 int Character::getMaxHealth()
@@ -231,8 +218,8 @@ void Character::updateResources()
                 gain = (max_health / 100) * 8;
                 break;
             case CharacterPosture::Prone:
-            case CharacterPosture::Crouch:
-            case CharacterPosture::Stand:
+                case CharacterPosture::Crouch:
+                case CharacterPosture::Stand:
                 gain = (max_health / 100) * 2;
                 break;
             case CharacterPosture::NoPosure:
@@ -262,8 +249,8 @@ void Character::updateResources()
                 gain = (max_stamina / 100) * 8;
                 break;
             case CharacterPosture::Prone:
-            case CharacterPosture::Crouch:
-            case CharacterPosture::Stand:
+                case CharacterPosture::Crouch:
+                case CharacterPosture::Stand:
                 gain = (max_stamina / 100) * 2;
                 break;
             case CharacterPosture::NoPosure:
@@ -929,7 +916,7 @@ string Character::getLook(Character * character)
     {
         output = "You look at " + character->getName() + ".\n";
         sent_be = "is";
-        sent_pronoun = character->getPrononun();
+        sent_pronoun = character->getPronoun();
     }
     else
     {

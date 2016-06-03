@@ -336,12 +336,17 @@ void Action::performAttack(Character * opponent)
     {
         // Roll the attack.
         unsigned int ATK = RandInteger(1, 20);
+
+        logT(LogLevel::Debug, "% rolls a % againts %.", actor->getNameCapital(), ToString(ATK), ToString(AC));
+
         // Log the rolled value.
-        Logger::log(LogLevel::Debug, actor->getNameCapital() + " rolls a " + ToString(ATK) + " againts " + ToString(AC));
+        Logger::log(LogLevel::Debug,
+            actor->getNameCapital() + " rolls a " + ToString(ATK) + " againts " + ToString(AC));
         // Check if its a hit.
         if (ATK < AC)
         {
             actor->sendMsg("You miss " + opponent->getName() + " with your fist.");
+            opponent->sendMsg(actor->getNameCapital() + " misses you with " + actor->getPossessivePronoun() + " fist.");
             return;
         }
         // Roll the damage.
@@ -349,6 +354,9 @@ void Action::performAttack(Character * opponent)
         // Log the rolled value.
         Logger::log(LogLevel::Debug, actor->getNameCapital() + " hit for " + ToString(DMG));
         actor->sendMsg("You hit " + opponent->getName() + " with your fist for " + ToString(DMG) + ".");
+        opponent->sendMsg(
+            actor->getNameCapital() + " hits you with " + actor->getPossessivePronoun() + " fist for " + ToString(DMG)
+                + ".");
         return;
     }
 
@@ -374,11 +382,15 @@ void Action::performAttack(Character * opponent)
             }
         }
         // Log the rolled value.
-        Logger::log(LogLevel::Debug, actor->getNameCapital() + " rolls a " + ToString(ATK) + " againts " + ToString(AC));
+        Logger::log(LogLevel::Debug,
+            actor->getNameCapital() + " rolls a " + ToString(ATK) + " againts " + ToString(AC));
         // Check if its a hit.
         if (ATK < AC)
         {
             actor->sendMsg("You miss " + opponent->getName() + " with " + rh->getName() + ".");
+            opponent->sendMsg(
+                actor->getNameCapital() + " misses you with " + actor->getPossessivePronoun() + " " + rh->getName()
+                    + ".");
             return;
         }
         // Roll the damage.
@@ -394,6 +406,9 @@ void Action::performAttack(Character * opponent)
         }
         Logger::log(LogLevel::Debug, actor->getNameCapital() + " hit for " + ToString(DMG));
         actor->sendMsg("You hit " + opponent->getName() + " with " + rh->getName() + " for " + ToString(DMG) + ".");
+        opponent->sendMsg(
+            actor->getNameCapital() + " hits you with " + actor->getPossessivePronoun() + " " + rh->getName() + " for "
+                + ToString(DMG) + ".");
     }
 
     // If there is a weapon in the right hand.
@@ -415,11 +430,15 @@ void Action::performAttack(Character * opponent)
             }
         }
         // Log the rolled value.
-        Logger::log(LogLevel::Debug, actor->getNameCapital() + " rolls a " + ToString(ATK) + " againts " + ToString(AC));
+        Logger::log(LogLevel::Debug,
+            actor->getNameCapital() + " rolls a " + ToString(ATK) + " againts " + ToString(AC));
         // Check if its a hit.
         if (ATK < AC)
         {
             actor->sendMsg("You miss " + opponent->getName() + " with " + lh->getName() + ".");
+            opponent->sendMsg(
+                actor->getNameCapital() + " misses you with " + actor->getPossessivePronoun() + " " + lh->getName()
+                    + ".");
             return;
         }
         // Roll the damage.
@@ -428,6 +447,9 @@ void Action::performAttack(Character * opponent)
         DMG += STR * 0.5;
         Logger::log(LogLevel::Debug, actor->getNameCapital() + " hit for " + ToString(DMG));
         actor->sendMsg("You hit " + opponent->getName() + " with " + lh->getName() + " for " + ToString(DMG) + ".");
+        opponent->sendMsg(
+            actor->getNameCapital() + " hits you with " + actor->getPossessivePronoun() + " " + lh->getName() + " for "
+                + ToString(DMG) + ".");
     }
 
     if (!rhCanAttack && !lhCanAttack)

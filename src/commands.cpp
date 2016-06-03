@@ -588,12 +588,12 @@ void ProcessNewGender(Character * character, std::istream & sArgs)
     }
     else if (input == "1")
     {
-        player->sex = 1;
+        player->gender = GenderType::Male;
         AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAge);
     }
     else if (input == "2")
     {
-        player->sex = 2;
+        player->gender = GenderType::Female;
         AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAge);
     }
     else
@@ -893,8 +893,8 @@ void PrintChoices(Character * character)
     }
     preview += "\n";
 
-    // SEX
-    preview += "# Sex          :" + player->getSexAsString() + "\n";
+    // GENDER
+    preview += "# Gender       :" + GetGenderTypeName(player->gender) + "\n";
 
     // AGE
     preview += "# Age          :";
@@ -966,7 +966,7 @@ void RollbackCharacterCreation(Character * character, ConnectionState new_state)
             player->intelligence = player->race->intelligence;
             break;
         case ConnectionState::AwaitingNewGender:
-            player->sex = 0;
+            player->gender = GenderType::None;
             break;
         case ConnectionState::AwaitingNewAge:
             player->age = 0;
@@ -978,7 +978,7 @@ void RollbackCharacterCreation(Character * character, ConnectionState new_state)
             player->weight = 0;
             break;
         case ConnectionState::Playing:
-        case ConnectionState::AwaitingNewConfirm:
+            case ConnectionState::AwaitingNewConfirm:
             player->sendMsg("It seems that this choiche has not been handled...");
             player->closeConnection();
             break;
@@ -1110,7 +1110,7 @@ void AdvanceCharacterCreation(Character * character, ConnectionState new_state, 
         msg += "#    [1] Male.\n";
         msg += "#    [2] Female.\n";
         msg += "#\n";
-        msg += "# Choose one of the above sex by typing the correspondent number.\n";
+        msg += "# Choose one of the above gender by typing the correspondent number.\n";
         msg += "#\n";
         msg += "# Type [" + Telnet::magenta() + "back" + Telnet::reset() + "] to return to the previus step.\n";
     }
