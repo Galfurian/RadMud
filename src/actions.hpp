@@ -60,8 +60,6 @@ class Action
         std::vector<Item *> usedIngredients;
         /// The time point in the future needed by the action to complete.
         TimeClock actionCooldown;
-        /// List of opponents.
-        OpponentsList opponents;
         /// Next combat action.
         CombatAction nextCombatAction;
 
@@ -81,10 +79,6 @@ class Action
         /// @brief Provides the type of the action.
         /// @return The type of action.
         ActionType getType();
-
-        /// @brief Provides the list of opponents.
-        /// @return The opponent list bind to this action.
-        OpponentsList * getOpponentsList();
 
         /// @brief Provides the description of the action.
         /// @return The string which describe the current action.
@@ -132,18 +126,17 @@ class Action
             std::vector<Item *> & _usedIngredients,
             unsigned int _cooldown);
 
+        bool setInCombat();
+
         /// @brief Allows to set a combat action.
-        /// @param opponent   The opponent.
         /// @param nextAction The next action to execute in combat.
         /// @return <b>True</b> if correct values have been provided,<br>
         ///			<b>False</b> otherwise.
-        bool setCombat(Character * opponent, const CombatAction & nextAction);
+        bool setNextCombatAction(const CombatAction & nextAction);
+
+        CombatAction getNextCombatAction() const;
 
     private:
-        /// @brief Returns the cooldown before next attack.
-        /// @return The non-decreasing value of the cooldown.
-        unsigned int getNextAttack();
-
         /// @brief Returns the attack damage.
         /// @return The value of the attack.
         void performAttack(Character * opponent);
@@ -151,8 +144,6 @@ class Action
         /// @brief Returns the attack damage.
         /// @return The value of the attack.
         unsigned int getWeaponDamageRoll(const EquipmentSlot & slot);
-
-        Character * getNextOpponent();
 
         /// @brief Check if the cooldown of the action is elapsed.
         /// @return <b>True</b> if the time has passed,<br> <b>False</b> otherwise.

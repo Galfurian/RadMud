@@ -37,7 +37,6 @@ Action::Action(Character * _character) :
         usedTools(),
         usedIngredients(),
         actionCooldown(),
-        opponents(_character),
         nextCombatAction()
 {
     // Nothing to do.
@@ -51,11 +50,6 @@ Action::~Action()
 ActionType Action::getType()
 {
     return this->type;
-}
-
-OpponentsList * Action::getOpponentsList()
-{
-    return &opponents;
 }
 
 std::string Action::getDescription()
@@ -258,68 +252,70 @@ bool Action::setBuild(
     return correct;
 }
 
-bool Action::setCombat(Character * opponent, const CombatAction & nextAction)
+bool Action::setInCombat()
 {
-    // Check if the opponent is provided.
-    if (opponent == nullptr)
+    if (this->type != ActionType::Wait)
     {
-        Logger::log(LogLevel::Error, "No opponent is set.");
         return false;
     }
-
-    // Add the opponent
-    if (!opponents.addOpponent(opponent, opponents.getInitialAggro(opponent)))
+    else
     {
-        Logger::log(LogLevel::Error, "Already fighting against '" + opponent->getName() + "'.");
-        return false;
+        this->type = ActionType::Combat;
+        return true;
     }
-
-    // Set the type of action to combat.
-    type = ActionType::Combat;
-    nextCombatAction = nextAction;
-    // Set the action cooldown.
-    actionCooldown = std::chrono::system_clock::now() + std::chrono::seconds(this->getNextAttack());
-    return true;
 }
 
-unsigned int Action::getNextAttack()
-{
-    unsigned int base = 6.0;
-    // The agility modifier.
-    double agility = (actor->agility + actor->effects.getAgiMod()) * 3.5 * (base / 100);
-    // The weight modifier.
-    double weight = actor->weight * (base / 100);
-    // The carried weight.
-    double carriedWeight = (actor->getCarryingWeight() / 2) * (base / 100);
+/*
+ bool Action::setOpponent(Character * opponent)
+ {
+ if (!opponents.addOpponent(opponent, opponents.getInitialAggro(opponent)))
+ {
+ Logger::log(LogLevel::Error, "Already fighting against '" + opponent->getName() + "'.");
+ return false;
+ }
+ return true;
+ }
+ */
 
-    double equippedWeight = 0;
-    Item * rh = actor->findEquipmentSlotItem(EquipmentSlot::RightHand);
-    if (rh != nullptr)
+bool Action::setNextCombatAction(const CombatAction & nextAction)
+{
+    if (!actor->opponents.hasOpponents())
     {
-        if (rh->model->type == ModelType::Weapon)
-        {
-            equippedWeight += rh->getWeight() * 2.5 * (base / 100);
-        }
-        else if (rh->model->type == ModelType::Shield)
-        {
-            equippedWeight += rh->getWeight() * 3.0 * (base / 100);
-        }
+        Logger::log(LogLevel::Error, "The list of opponents is empty.");
+        return false;
     }
-    Item * lh = actor->findEquipmentSlotItem(EquipmentSlot::LeftHand);
-    if (lh != nullptr)
+    if (type != ActionType::Combat)
     {
-        if (lh->model->type == ModelType::Weapon)
-        {
-            equippedWeight += lh->getWeight() * 2.5 * (base / 100);
-        }
-        else if (lh->model->type == ModelType::Shield)
-        {
-            equippedWeight += lh->getWeight() * 3.0 * (base / 100);
-        }
+        Logger::log(LogLevel::Error, "The character is not fighting.");
+        return false;
     }
-    unsigned int nextAttack = static_cast<unsigned int>(base - agility + weight + carriedWeight + equippedWeight);
-    Logger::log(LogLevel::Debug, actor->getNameCapital() + " will attack in " + ToString(nextAttack));
-    return nextAttack;
+    if (nextCombatAction == nextAction)
+    {
+        Logger::log(LogLevel::Error, "You're trying to set the same combat action.");
+        return false;
+    }
+    // Set the next combat action.
+    nextCombatAction = nextAction;
+    // Check if the character has at least some opponents.
+    if (nextCombatAction == CombatAction::BasicAttack)
+    {
+        // Set the action cooldown.
+        actionCooldown = std::chrono::system_clock::now() + std::chrono::seconds(actor->getNextAttack());
+    }
+    else if (nextCombatAction == CombatAction::Flee)
+    {
+        unsigned int base = 6.0;
+        // The agility modifier.
+        double agility = (actor->agility + actor->effects.getAgiMod()) * 3.5 * (base / 100);
+        // The weight modifier.
+        double weight = actor->weight * (base / 100);
+        // The carried weight.
+        double carriedWeight = (actor->getCarryingWeight() / 2) * (base / 100);
+        unsigned int fleeCooldown = static_cast<unsigned int>(base - agility + weight + carriedWeight);
+        // Set the action cooldown.
+        actionCooldown = std::chrono::system_clock::now() + std::chrono::seconds(fleeCooldown);
+    }
+    return true;
 }
 
 void Action::performAttack(Character * opponent)
@@ -462,23 +458,9 @@ void Action::performAttack(Character * opponent)
     }
 }
 
-Character * Action::getNextOpponent()
+CombatAction Action::getNextCombatAction() const
 {
-    if (opponents.hasOpponents())
-    {
-        // Get the top aggressor.
-        const Aggression aggression = opponents.getTopAggro();
-        // Retrieve the opponent.
-        Character * opponent = aggression.aggressor;
-        if (opponent != nullptr)
-        {
-            if (opponent->room->vnum == actor->room->vnum)
-            {
-                return opponent;
-            }
-        }
-    }
-    return nullptr;
+    return this->nextCombatAction;
 }
 
 bool Action::checkElapsed()
@@ -947,14 +929,52 @@ void Action::performComb()
     // Check if the character has at least some opponents.
     if (nextCombatAction == CombatAction::BasicAttack)
     {
+        // Reset the next combat action.
+        nextCombatAction = CombatAction::NoAction;
         // Retrieve the opponent.
-        Character * opponent = this->getNextOpponent();
+        Character * opponent = actor->getNextOpponent();
         if (opponent != nullptr)
         {
             // Perform the attack.
             this->performAttack(opponent);
-            // Set the action cooldown.
-            actionCooldown = std::chrono::system_clock::now() + std::chrono::seconds(this->getNextAttack());
+
+            // If the actor is a mobile, activate the script.
+            if (actor->isMobile())
+            {
+                actor->toMobile()->triggerEventFight(opponent);
+            }
+            this->setNextCombatAction(CombatAction::BasicAttack);
+            return;
+        }
+    }
+    else if (nextCombatAction == CombatAction::Flee)
+    {
+        // Reset the next combat action.
+        nextCombatAction = CombatAction::NoAction;
+        // Get the character chance of fleeing.
+        unsigned int fleeChance = RandInteger(0, 10);
+        fleeChance += GetAbilityModifier(actor->agility + actor->effects.getAgiMod());
+        // Base the escape level on how many enemies are surrounding the character.
+        unsigned int chaseLevel = 0;
+        for (unsigned int it = 0; it < actor->opponents.getSize(); ++it)
+        {
+            chaseLevel += RandInteger(0, 1);
+        }
+        if (fleeChance < chaseLevel)
+        {
+            actor->sendMsg("You were not able to escape from your attackers.\n");
+            this->setNextCombatAction(CombatAction::BasicAttack);
+            return;
+        }
+        else
+        {
+            Logger::log(LogLevel::Debug, "Choosing where to flee.");
+            int maxValue = static_cast<int>(actor->room->exits.size());
+            unsigned int randomExit = RandInteger(0, maxValue);
+            Exit * selected = actor->room->exits.at(randomExit);
+            actor->moveTo(selected->destination, actor->getNameCapital() + " flees from the battlefield.",
+                actor->getNameCapital() + " arives fleeing.",
+                "You flee from the battlefield.");
             return;
         }
     }

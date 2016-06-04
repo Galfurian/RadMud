@@ -217,7 +217,7 @@ bool Mobile::mobileThread(std::string event, Character * character, std::string 
     }
     catch (luabridge::LuaException const & e)
     {
-        std::cerr && e.what();
+        Logger::log(LogLevel::Error, e.what());
     }
 
     // Unlock the mutex.

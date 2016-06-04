@@ -91,6 +91,8 @@ class Character
         Action action;
         /// The lua_State associated with this character.
         lua_State * L;
+        /// List of opponents.
+        OpponentsList opponents;
 
         /// @brief Constructor.
         Character();
@@ -315,6 +317,12 @@ class Character
         /// @return <b>True</b> if the can see the other character,<br>
         ///         <b>False</b> otherwise.
         bool canSee(Character * target);
+
+        Character * getNextOpponent();
+
+        /// @brief Returns the cooldown before next attack.
+        /// @return The non-decreasing value of the cooldown.
+        unsigned int getNextAttack();
 
         /// @brief Handle character input.
         /// @param command Command that need to be handled.

@@ -60,7 +60,8 @@ Character::Character() :
         posture(CharacterPosture::Stand),
         effects(),
         action(this),
-        L(luaL_newstate())
+        L(luaL_newstate()),
+        opponents(this)
 {
     // Nothing to do.
 }
@@ -996,6 +997,65 @@ bool Character::canSee(Character * target)
         return false;
     }
     return true;
+}
+
+Character * Character::getNextOpponent()
+{
+    if (opponents.hasOpponents())
+    {
+        // Get the top aggressor.
+        const Aggression aggression = opponents.getTopAggro();
+        // Retrieve the opponent.
+        Character * opponent = aggression.aggressor;
+        if (opponent != nullptr)
+        {
+            if (opponent->room->vnum == room->vnum)
+            {
+                return opponent;
+            }
+        }
+    }
+    return nullptr;
+}
+
+unsigned int Character::getNextAttack()
+{
+    unsigned int BAS = 6.0;
+    // The agility modifier.
+    double AGI = (agility + effects.getAgiMod()) * 3.5 * (BAS / 100);
+    // The weight modifier.
+    double WGT = weight * (BAS / 100);
+    // The carried weight.
+    double CAR = (getCarryingWeight() / 2) * (BAS / 100);
+
+    double EQS = 0;
+    Item * rh = findEquipmentSlotItem(EquipmentSlot::RightHand);
+    if (rh != nullptr)
+    {
+        if (rh->model->type == ModelType::Weapon)
+        {
+            EQS += rh->getWeight() * 2.5 * (BAS / 100);
+        }
+        else if (rh->model->type == ModelType::Shield)
+        {
+            EQS += rh->getWeight() * 3.0 * (BAS / 100);
+        }
+    }
+    Item * lh = findEquipmentSlotItem(EquipmentSlot::LeftHand);
+    if (lh != nullptr)
+    {
+        if (lh->model->type == ModelType::Weapon)
+        {
+            EQS += lh->getWeight() * 2.5 * (BAS / 100);
+        }
+        else if (lh->model->type == ModelType::Shield)
+        {
+            EQS += lh->getWeight() * 3.0 * (BAS / 100);
+        }
+    }
+    unsigned int nextAttack = static_cast<unsigned int>(BAS - AGI + WGT + CAR + EQS);
+    Logger::log(LogLevel::Debug, getNameCapital() + " will attack in " + ToString(nextAttack));
+    return nextAttack;
 }
 
 void Character::doCommand(const string & command)

@@ -22,6 +22,7 @@ EventFight=function(self,character)
 	if ( (choice >= 20) and (choice < 60) )
 	then
 		self:doCommand("emote emits a terrible scream!");
+		self:doCommand("flee");
 	end
 end
 

@@ -174,7 +174,9 @@ typedef enum class CombatActions
     /// The combat move is to do nothing.
     NoAction,
     /// The action is a basic attack.
-    BasicAttack
+    BasicAttack,
+    /// The character tries to flee.
+    Flee
 } CombatAction;
 
 // //////////////////////////////////////////////////////////////////

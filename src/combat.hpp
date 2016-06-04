@@ -61,6 +61,9 @@ class OpponentsList
 
     public:
         /// @brief Constructor.
+        OpponentsList();
+
+        /// @brief Constructor.
         OpponentsList(Character * _owner);
 
         /// @brief Add an opponent to the list.
@@ -68,12 +71,14 @@ class OpponentsList
         /// @param itialAggression
         /// @return <b>True</b> if the operation concluded successfuly,<br>
         ///         <b>False</b> otherwise.
-        bool addOpponent(Character * opponent, unsigned int itialAggression);
+        bool addOpponent(Character * opponent, unsigned int itialAggression = 0);
 
         /// @brief Check if the list has some opponents.
         /// @return <b>True</b> if there are opponents,<br>
         ///         <b>False</b> otherwise.
         bool hasOpponents() const;
+
+        bool removeOpponent(Character * opponent);
 
         /// @brief Check if the list contains a specific opponent.
         /// @param opponent The opponent to search.
@@ -102,6 +107,8 @@ class OpponentsList
         unsigned int getInitialAggro(Character * character);
 
         unsigned int getAggro(Character * character);
+
+        std::size_t getSize();
 
     private:
         /// @brief Sort the list of opponents.

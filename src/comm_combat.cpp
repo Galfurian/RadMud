@@ -32,58 +32,126 @@ void DoKill(Character * character, std::istream & sArgs)
     {
         character->sendMsg("You have to specify whom to kill.\n");
     }
-
     // Retrieve the target.
     Character * target = character->room->findCharacter(arguments[0].first, arguments[0].second, character);
     if (!target)
     {
-        character->sendMsg("You don't see '" + arguments[0].first + "' anywhere.\n");
+        character->sendMsg("You don't see '%s' anywhere.\n", arguments[0].first);
         return;
     }
-
     // Check if the attacker can see the target.
     if (!character->canSee(target))
     {
-        character->sendMsg("You don't see '" + arguments[0].first + "' anywhere.\n");
+        character->sendMsg("You don't see '%s' anywhere.\n", arguments[0].first);
         return;
     }
+    ActionType characAction = character->getAction()->getType();
+    ActionType targetAction = target->getAction()->getType();
 
-    // Check if the character is already in combat.
-    if (character->getAction()->getType() == ActionType::Combat)
+    // Check if the two characters are both already in combat.
+    if (characAction == ActionType::Combat)
     {
-        OpponentsList * opponents = character->getAction()->getOpponentsList();
-        // Check if the target is part of the same combat action, thus
-        //  check if is one of its opponents.
-        if (!opponents->hasOpponent(target))
+        // Check if the character is trying to attack a target with which is not in combat.
+        if (!character->opponents.hasOpponent(target))
         {
-            character->sendMsg("You are already fighting!\n");
+            character->sendMsg("You have already your share of troubles!\n");
             return;
         }
-        if (opponents->moveToTopAggro(character))
+        // Set the target as a top aggro.
+        if (character->opponents.moveToTopAggro(target))
         {
-            character->sendMsg("You focus your attacks on " + target->getName() + "!\n");
+            character->sendMsg("You focus your attacks on %s!\n", target->getName());
         }
         else
         {
-            character->sendMsg("You are already doing your best to kill " + target->getName() + "!\n");
+            character->sendMsg("You are already doing your best to kill %s!\n", target->getName());
         }
+    }
+    // Check if the character is attacking a target which is already in combat.
+    else if ((characAction != ActionType::Combat) && (targetAction == ActionType::Combat))
+    {
+        // Let the characters enter the combat.
+        character->getAction()->setInCombat();
+        // Set the opponents.
+        if (!character->opponents.addOpponent(target))
+        {
+            character->sendMsg("You are already fighting againts %s.\n", target->getName());
+            return;
+        }
+        if (!target->opponents.addOpponent(character))
+        {
+            character->sendMsg("You were not ablet to attack %s.\n", target->getName());
+            character->opponents.removeOpponent(target);
+            return;
+        }
+        // Try to set the next combat action.
+        if (!character->getAction()->setNextCombatAction(CombatAction::BasicAttack))
+        {
+            character->sendMsg("You were not ablet to attack %s.\n", target->getName());
+            character->opponents.removeOpponent(target);
+            target->opponents.removeOpponent(character);
+            character->getAction()->stop();
+        }
+        character->sendMsg("You attack %s.\n", target->getName());
+        target->sendMsg("%s attacks you.\n\n", character->getNameCapital());
     }
     else
     {
-        // So, basically if a player attacks a Target and both are not involved
-        //  in any combat action, then we can start their combat action.
-        bool attackerRes = character->getAction()->setCombat(target, CombatAction::BasicAttack);
-        bool defenderRes = target->getAction()->setCombat(character, CombatAction::BasicAttack);
-        if (attackerRes && defenderRes)
+        // Let the characters enter the combat.
+        character->getAction()->setInCombat();
+        target->getAction()->setInCombat();
+
+        // Set the opponents.
+        if (!character->opponents.addOpponent(target))
         {
-            character->sendMsg("You attack " + target->getName() + "!\n");
-            target->sendMsg(character->getNameCapital() + " attacks you!\n");
+            character->sendMsg("You are already fighting againts %s.\n", target->getName());
+            return;
         }
-        else
+        if (!target->opponents.addOpponent(character))
         {
-            character->sendMsg("You cannot attack " + target->getName() + ".\n");
+            character->sendMsg("You were not ablet to attack %s.\n", target->getName());
+            character->opponents.removeOpponent(target);
+            return;
+        }
+        // Try to set the next combat action.
+        if (!character->getAction()->setNextCombatAction(CombatAction::BasicAttack))
+        {
+            character->sendMsg("You were not ablet to attack %s.\n", target->getName());
+            character->opponents.removeOpponent(target);
+            target->opponents.removeOpponent(character);
+            character->getAction()->stop();
+            target->getAction()->stop();
+            return;
+        }
+        if (!target->getAction()->setNextCombatAction(CombatAction::BasicAttack))
+        {
+            character->sendMsg("You were not ablet to attack %s.\n", target->getName());
+            character->opponents.removeOpponent(target);
+            target->opponents.removeOpponent(character);
             character->getAction()->stop();
             target->getAction()->stop();
         }
+        character->sendMsg("You attack %s.\n", target->getName());
+        target->sendMsg("%s attacks you.\n\n", character->getNameCapital());
     }
+}
+
+void DoFlee(Character * character, std::istream & sArgs)
+{
+    // Check that there are no more arguments.
+    NoMore(character, sArgs);
+    // Check if the character is in combat.
+    if (character->getAction()->getType() != ActionType::Combat)
+    {
+        character->sendMsg("You are not fighting.\n");
+        return;
+    }
+    // Check if the character is already trying to flee.
+    if (character->getAction()->getNextCombatAction() == CombatAction::Flee)
+    {
+        character->sendMsg("You are already trying to flee.\n");
+        return;
+    }
+    character->sendMsg("You prepare to flee...\n");
+    character->getAction()->setNextCombatAction(CombatAction::Flee);
 }

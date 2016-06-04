@@ -19,6 +19,7 @@
 #include "combat.hpp"
 #include "utils.hpp"
 #include "character.hpp"
+#include "logger.hpp"
 
 Aggression::Aggression(Character * _aggressor, unsigned int _aggression) :
         aggressor(_aggressor),
@@ -56,6 +57,10 @@ bool OpponentsList::addOpponent(Character * opponent, unsigned int itialAggressi
     auto iterator = std::find(aggressionList.begin(), aggressionList.end(), opponent);
     if (iterator == aggressionList.end())
     {
+        if (itialAggression == 0)
+        {
+            itialAggression = this->getInitialAggro(opponent);
+        }
         // Add the aggressor.
         aggressionList.push_back(Aggression(opponent, itialAggression));
         // Sort the list.
@@ -83,6 +88,17 @@ bool OpponentsList::hasOpponent(Character * opponent)
         }
     }
     return ret;
+}
+
+bool OpponentsList::removeOpponent(Character * opponent)
+{
+    auto iterator = std::find(aggressionList.begin(), aggressionList.end(), opponent);
+    if (iterator != aggressionList.end())
+    {
+        iterator = aggressionList.erase(iterator, aggressionList.end());
+        return true;
+    }
+    return false;
 }
 
 const Aggression & OpponentsList::getTopAggro()
@@ -157,6 +173,11 @@ unsigned int OpponentsList::getAggro(Character * character)
         }
     }
     return ret;
+}
+
+std::size_t OpponentsList::getSize()
+{
+    return this->aggressionList.size();
 }
 
 void OpponentsList::sortList()

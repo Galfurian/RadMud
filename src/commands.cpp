@@ -1488,6 +1488,13 @@ void LoadCommands()
         command.hndl = DoKill;
         Mud::instance().addCommand(command);
     }
+    {
+        command.name = "flee";
+        command.help = "Try to flee from combat.";
+        command.args = "";
+        command.hndl = DoFlee;
+        Mud::instance().addCommand(command);
+    }
 
     // ////////////////////////////////////////////////////////////////////////////////////////////
     // GODS COMMANDS
