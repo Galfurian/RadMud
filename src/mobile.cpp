@@ -92,7 +92,6 @@ bool Mobile::check()
     safe &= SafeAssert(!staticdesc.empty());
     safe &= SafeAssert(!actions.empty());
     safe &= SafeAssert(!lua_script.empty());
-    safe &= SafeAssert(lua_mutex.try_lock());
     return safe;
 }
 
