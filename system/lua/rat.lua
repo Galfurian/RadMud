@@ -7,68 +7,67 @@ local foundTree = false;
 -- Handle the actions when the character is created.
 EventInit=function(self)
 	-- Put event code here.
-	Mud.Log("["..self.name.."] (EventInit)");
 	self:doCommand("look");
 end
 
 -- Handle the actions when in combat.
 EventFight=function(self,character)
 	-- Put event code here.
-	Mud.Log("["..self.name.."] (EventFight) ["..character.name.."]");
+	local choice = Mud.Random(1, 100);
+	if (choice < 20)
+	then
+		self:doCommand("look "..character.name);
+		self:doCommand("say "..character.name.." I will kill you!");
+	end
+	if ( (choice >= 20) and (choice < 60) )
+	then
+		self:doCommand("emote emits a terrible scream!");
+	end
 end
 
 -- Handle the actions when a character enters the room.
 EventEnter=function(self, character)
 	-- Put event code here.
-	Mud.Log("["..self.name.."] (EventEnter) ["..character.name.."]");
 end
 
 -- Handle the actions when a character exits the room.
 EventExit=function(self, character)
 	-- Put event code here.
-	Mud.Log("["..self.name.."] (EventExit) ["..character.name.."]");
 end
 
 -- Handle conversation.
 EventMessage=function(self, character, message)
 	-- Put event code here.
-	Mud.Log("["..self.name.."] (EventMessage) ["..character.name.."] ["..message.."]");
 end
 
 -- Handle a random action.
 EventRandom=function(self)
 	-- Put event code here.
-	Mud.Log("["..self.name.."] (EventRandom)");
 end
 
 -- Handle the actions when is Morning.
 EventMorning=function(self)
 	-- Put event code here.
-	Mud.Log("["..self.name.."] (EventMorning)");
 end
 
 -- Handle the actions when is the middle of the day.
 EventDay=function(self)
 	-- Put event code here.
-	Mud.Log("["..self.name.."] (EventDay)");
 end
 
 -- Handle the actions when is Evening.
 EventDusk=function(self)
 	-- Put event code here.
-	Mud.Log("["..self.name.."] (EventDusk)");
 end
 
 -- Handle the actions when is Night.
 EventNight=function(self)
 	-- Put event code here.
-	Mud.Log("["..self.name.."] (EventNight)");
 end
 
 -- Handle the actions when the mobile dies.
 EventDeath=function(self)
 	-- Put event code here.
-	Mud.Log("["..self.name.."] (EventDeath)");
 end
 
 -- Handle the main behaviour of the character.
