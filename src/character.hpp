@@ -320,10 +320,6 @@ class Character
         /// @param command Command that need to be handled.
         void doCommand(const std::string & command);
 
-        /// @brief Send a message to the character.
-        /// @param message Message to send.
-        virtual void sendMsg(const std::string & message);
-
         /// @brief Handle what happend when this character die.
         virtual void triggerDeath();
 
@@ -360,6 +356,33 @@ class Character
         bool operator<(const class Character & source) const
             {
             return name < source.name;
+        }
+
+        /// @brief Send a message to the character.
+        /// @param msg Message to send.
+        virtual void sendMsg(const std::string & msg);
+
+        /// @brief Print to consol and to logging file the gievn string.
+        /// @param  level  The category of the message.
+        /// @param  log    The message to log.
+        /// @tparam T
+        template<typename ... Args>
+        void sendMsg(
+            const std::string & msg,
+            const std::string & first,
+            const Args & ... args)
+        {
+            std::string::size_type pos = msg.find("%s");
+            if (pos == std::string::npos)
+            {
+                sendMsg(msg);
+            }
+            else
+            {
+                std::string working(msg);
+                working.replace(pos, 2, first);
+                sendMsg(working, args ...);
+            }
         }
 };
 

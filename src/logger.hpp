@@ -74,11 +74,6 @@ class Logger
         ///         <b>False</b> otherwise.
         static bool openLog(const std::string & filename);
 
-        /// @brief Print to consol and to logging file the gievn string.
-        /// @param level  The category of the message.
-        /// @param log    The message to log.
-        static void log(const LogLevel & level, const std::string & log);
-
         /// @brief Retrieve the log and select only the line of the given logging level.
         /// @param level  The category of the message.
         /// @param result For efficiency, receive a reference to the result.
@@ -91,36 +86,32 @@ class Logger
         /// @return The enum which identifies the given logging level.
         static LogLevel castFromInt(const unsigned int & level);
 
-        static void tlog(
-            LogLevel level,
-            std::string log)
+        /// @brief Print to consol and to logging file the gievn string.
+        /// @param level  The category of the message.
+        /// @param log    The message to log.
+        static void log(const LogLevel & level, const std::string & msg);
+
+        /// @brief Print to consol and to logging file the gievn string.
+        /// @param  level  The category of the message.
+        /// @param  log    The message to log.
+        /// @tparam T
+        template<typename ... Args>
+        static void log(
+            const LogLevel & level,
+            const std::string & msg,
+            const std::string & first,
+            const Args & ... args)
         {
-            std::string output("[" + Logger::levelToString(level) + "][" + Logger::getDateTime() + "] " + log + "\n");
-            if (Logger::getStream().is_open())
+            std::string::size_type pos = msg.find("%s");
+            if (pos == std::string::npos)
             {
-                // Write the log message inside the file.
-                Logger::getStream() << output;
+                log(level, msg);
             }
-            Logger::getOutputStream(level) << output;
-        }
-        template<typename T, typename ... Args>
-        static void tlog(
-            LogLevel level,
-            std::string log,
-            T first,
-            Args ... args)
-        {
-            for (size_t pos = 0; pos < log.size(); ++pos)
+            else
             {
-                if (log.at(pos) == '%')
-                {
-                    std::cout << log << "\n";
-                    log.replace(pos, pos + 1, first);
-                    std::cout << log << "\n";
-                    // Call recursively.
-                    tlog(level, log, args...);
-                    break;
-                }
+                std::string working = msg;
+                working.replace(pos, 2, first);
+                log(level, working, args ...);
             }
         }
 

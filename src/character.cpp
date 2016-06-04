@@ -1004,11 +1004,6 @@ void Character::doCommand(const string & command)
     ProcessCommand(this, is);
 }
 
-void Character::sendMsg(const std::string & message)
-{
-    Logger::log(LogLevel::Error, "[SEND_MESSAGE] Msg :" + message);
-}
-
 void Character::triggerDeath()
 {
     // Create a corpse at the current position.
@@ -1106,6 +1101,8 @@ VectorHelper<Exit *> Character::luaGetExits()
 
 void Character::loadScript(const std::string & scriptFilename)
 {
+    Logger::log(LogLevel::Debug, "Loading script '%s'...", scriptFilename);
+
     // Open lua libraries.
     luaL_openlibs(L);
 
@@ -1167,4 +1164,9 @@ void Character::luaRegister(lua_State * L)
     .addData("rent_room", &Player::rent_room, false) //
     //std::map<int, unsigned int> skills;
     .endClass();
+}
+
+void Character::sendMsg(const std::string & msg)
+{
+    Logger::log(LogLevel::Error, "[SEND_MESSAGE] Msg :" + msg);
 }

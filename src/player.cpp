@@ -559,7 +559,7 @@ void Player::processException()
     std::cerr << "Exception on socket " << psocket << std::endl << std::endl;
 }
 
-void Player::sendMsg(const std::string & message)
+void Player::sendMsg(const std::string & msg)
 {
-    outbuf += message;
+    outbuf += msg;
 }

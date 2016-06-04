@@ -47,17 +47,6 @@ bool Logger::openLog(const std::string & filename)
     return Logger::getStream().is_open();
 }
 
-void Logger::log(const LogLevel & level, const std::string & log)
-{
-    std::string output("[" + Logger::levelToString(level) + "][" + Logger::getDateTime() + "] " + log + "\n");
-    if (Logger::getStream().is_open())
-    {
-        // Write the log message inside the file.
-        Logger::getStream() << output;
-    }
-    Logger::getOutputStream(level) << output;
-}
-
 bool Logger::getLog(const LogLevel & level, std::string & result)
 {
     if (Logger::getStream().is_open())
@@ -86,16 +75,22 @@ bool Logger::getLog(const LogLevel & level, std::string & result)
     {
         return false;
     }
-    // Without level check.
-    //Logger::getStream().seekg(0, std::ios::end);
-    //log.resize(Logger::getStream().tellg());
-    //Logger::getStream().seekg(0, std::ios::beg);
-    //Logger::getStream().read(&log[0], log.size());
 }
 
 LogLevel Logger::castFromInt(const unsigned int & level)
 {
     return static_cast<LogLevel>(level);
+}
+
+void Logger::log(const LogLevel & level, const std::string & msg)
+{
+    std::string output("[" + Logger::levelToString(level) + "][" + Logger::getDateTime() + "] " + msg + "\n");
+    if (Logger::getStream().is_open())
+    {
+        // Write the log message inside the file.
+        Logger::getStream() << output;
+    }
+    Logger::getOutputStream(level) << output;
 }
 
 std::fstream & Logger::getStream()

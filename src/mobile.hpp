@@ -93,8 +93,8 @@ class Mobile: public Character
         void reloadLua();
 
         /// @brief Output to player (any type).
-        /// @param message string String to sent.
-        void sendMsg(const std::string & message);
+        /// @param msg The string to sent.
+        void sendMsg(const std::string & msg);
 
         /// @brief A thread used to handle mobile actions.
         /// @param event     The event name.

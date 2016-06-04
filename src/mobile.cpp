@@ -170,15 +170,15 @@ void Mobile::reloadLua()
     this->triggerEventInit();
 }
 
-void Mobile::sendMsg(const std::string & message)
+void Mobile::sendMsg(const std::string & msg)
 {
     if (controller != NULL)
     {
-        controller->sendMsg(message);
+        controller->sendMsg(msg);
     }
     else
     {
-        message_buffer += message;
+        message_buffer += msg;
     }
 }
 

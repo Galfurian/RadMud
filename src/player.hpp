@@ -157,8 +157,8 @@ class Player: public Character
         void processException();
 
         /// @brief Output to player (any type).
-        /// @param message String to sent.
-        void sendMsg(const std::string & message);
+        /// @param msg String to sent.
+        void sendMsg(const std::string & msg);
 };
 
 /// Player map.
