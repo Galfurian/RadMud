@@ -244,20 +244,20 @@ std::string Model::getSpecificTypeName()
             output = GetMechanismTypeName(getMechanismFunc().type);
             break;
         case ModelType::NoType:
-        case ModelType::Key:
-        case ModelType::Furniture:
-        case ModelType::Food:
-        case ModelType::Light:
-        case ModelType::Vehicle:
-        case ModelType::Pen:
-        case ModelType::Book:
-        case ModelType::Rope:
-        case ModelType::Trash:
-        case ModelType::Container:
-        case ModelType::LiqContainer:
-        case ModelType::Projectile:
-        case ModelType::Corpse:
-        case ModelType::Currency:
+            case ModelType::Key:
+            case ModelType::Furniture:
+            case ModelType::Food:
+            case ModelType::Light:
+            case ModelType::Vehicle:
+            case ModelType::Pen:
+            case ModelType::Book:
+            case ModelType::Rope:
+            case ModelType::Trash:
+            case ModelType::Container:
+            case ModelType::LiqContainer:
+            case ModelType::Projectile:
+            case ModelType::Corpse:
+            case ModelType::Currency:
             break;
     }
     return output;
@@ -383,7 +383,7 @@ MechanismFunc Model::getMechanismFunc()
     switch (func.type)
     {
         case MechanismType::Door:
-        case MechanismType::Lock:
+            case MechanismType::Lock:
             func.key = functions[1];
             func.difficulty = functions[2];
             break;
@@ -415,5 +415,24 @@ void Model::luaRegister(lua_State * L)
 
 std::string Model::getTile(int offset)
 {
-    return ToString(tileSet) + ":" + ToString(tileId + offset);
+    if (Formatter::getFormat() == Formatter::TELNET)
+    {
+        return ToString(tileSet) + ":" + ToString(tileId + offset);
+    }
+    else
+    {
+        // TODO: Too easy this way.
+        if (type == ModelType::Armor)
+        {
+            return "a";
+        }
+        else if (type == ModelType::Weapon)
+        {
+            return "w";
+        }
+        else
+        {
+            return "i";
+        }
+    }
 }

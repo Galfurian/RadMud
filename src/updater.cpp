@@ -111,26 +111,26 @@ void MudUpdater::updateTime()
     switch (mudHour)
     {
         default:
-            Mud::instance().broadcastMsg(0, Telnet::yellow() + "Another hour has passed." + Telnet::reset());
+            Mud::instance().broadcastMsg(0, Formatter::yellow() + "Another hour has passed." + Formatter::reset());
             break;
         case 0:
-            Mud::instance().broadcastMsg(0, Telnet::yellow() + "The sun rises from the east.\n" + Telnet::reset());
+            Mud::instance().broadcastMsg(0, Formatter::yellow() + "The sun rises from the east.\n" + Formatter::reset());
             mudDayPhase = DayPhase::Morning;
             break;
         case 6:
             // DAY
-            Mud::instance().broadcastMsg(0, Telnet::yellow() + "The sun is just above you.\n" + Telnet::reset());
+            Mud::instance().broadcastMsg(0, Formatter::yellow() + "The sun is just above you.\n" + Formatter::reset());
             mudDayPhase = DayPhase::Day;
             break;
         case 12:
             // DUSK
-            Mud::instance().broadcastMsg(0, Telnet::yellow() + "The sun begins to set.\n" + Telnet::reset());
+            Mud::instance().broadcastMsg(0, Formatter::yellow() + "The sun begins to set.\n" + Formatter::reset());
             mudDayPhase = DayPhase::Dusk;
             break;
         case 18:
             // NIGHT
             Mud::instance().broadcastMsg(0,
-                Telnet::yellow() + "The sun disappears behind the horizon, darkness engulfs you.\n" + Telnet::reset());
+                Formatter::yellow() + "The sun disappears behind the horizon, darkness engulfs you.\n" + Formatter::reset());
             mudDayPhase = DayPhase::Night;
             break;
         case 24:

@@ -385,6 +385,135 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, unsigned int radius)
     return layers;
 }
 
+std::string Area::drawASCIIFov(Room * centerRoom, unsigned int radius)
+{
+    std::string result;
+    if (!this->inBoundaries(centerRoom->coord))
+    {
+        return result;
+    }
+    unsigned int origin_x = static_cast<unsigned int>(centerRoom->coord.x);
+    unsigned int origin_y = static_cast<unsigned int>(centerRoom->coord.y);
+    unsigned int origin_z = static_cast<unsigned int>(centerRoom->coord.z);
+
+    unsigned int min_x = 0;
+    if (origin_x > radius)
+    {
+        min_x = origin_x - radius;
+    }
+    else
+    {
+        min_x = 0;
+    }
+    unsigned int min_y = 0;
+    if (origin_y >= radius)
+    {
+        min_y = origin_y - radius;
+    }
+    else
+    {
+        min_y = 0;
+    }
+
+    // Create a 2D map of chararacters.
+    Map2D<char> map(radius * 2, radius * 2, kMapVoid);
+    // Evaluate the field of view.
+    this->fov(map, origin_x, origin_y, origin_z, radius);
+
+    // Prepare Living Creatures layer.
+    for (unsigned int y = (origin_y + radius); y > min_y; --y)
+    {
+        for (unsigned int x = min_x; x < (origin_x + radius); ++x)
+        {
+            Room * room = this->getRoom(x, y, origin_z);
+            // Retrieve the map tile.
+            MapTile mapTile = static_cast<MapTile>(map.get(x, y));
+            // The tile which has to be placed.
+            std::string tile;
+            if ((mapTile == kMapWalk) || (mapTile == kMapDoorOpen))
+            {
+                Room * room = this->getRoom(x, y, origin_z);
+                Exit * up = room->findExit(Direction::Up);
+                Exit * down = room->findExit(Direction::Down);
+                // VI  - WALKABLE
+                tile = '.';
+                // V   - OPEN DOOR
+                if (mapTile == kMapDoorOpen)
+                {
+                    Item * door = room->findDoor();
+                    if (door != nullptr)
+                    {
+                        tile = door->model->getTile(+3);
+                    }
+                }
+                // IV  - STAIRS
+                if ((up != nullptr) && (down != nullptr))
+                {
+                    if (HasFlag(up->flags, ExitFlag::Stairs) && HasFlag(down->flags, ExitFlag::Stairs))
+                    {
+                        tile = "X";
+                    }
+                }
+                else if (up != nullptr)
+                {
+                    if (HasFlag(up->flags, ExitFlag::Stairs))
+                    {
+                        tile = ">";
+                    }
+                }
+                else if (down != nullptr)
+                {
+                    if (HasFlag(down->flags, ExitFlag::Stairs))
+                    {
+                        tile = "<";
+                    }
+                    else
+                    {
+                        tile = ' ';
+                    }
+                }
+                // III - ITEMS
+                if (room->items.size() > 0)
+                {
+                    tile = room->items.back()->model->getTile();
+                }
+                // II  - CHARACTERS
+                if (room->characters.size() > 0)
+                {
+                    for (auto iterator : room->characters)
+                    {
+                        if (!HasFlag(iterator->flags, CharacterFlag::Invisible))
+                        {
+                            tile = iterator->race->getTile();
+                            break;
+                        }
+                    }
+                }
+                // I   - PLAYER
+                if ((origin_x == x) && (origin_y == y))
+                {
+                    tile = "@";
+                }
+            }
+            else if (mapTile == kMapDoor)
+            {
+                Item * door = room->findDoor();
+                if (door != nullptr)
+                {
+                    tile = door->model->getTile(+1);
+                }
+            }
+            else
+            {
+                tile = ' ';
+            }
+            result += tile;
+        }
+        result += "\n";
+    }
+    return result;
+}
+
 //-------------------------------------------------------------------
 void Area::fov(
     Map2D<char> & map,

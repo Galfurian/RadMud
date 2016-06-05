@@ -384,11 +384,11 @@ string Item::getLook()
 
     // Prepare : Name, Condition.
     //           Description.
-    output = "You look at " + Telnet::cyan() + getName() + Telnet::reset() + ", it" + getCondition();
-    output += Telnet::gray() + getDescription() + Telnet::reset() + "\n";
+    output = "You look at " + Formatter::cyan() + getName() + Formatter::reset() + ", it" + getCondition();
+    output += Formatter::gray() + getDescription() + Formatter::reset() + "\n";
     // Print the content.
     output += lookContent();
-    output += "It weights about " + Telnet::yellow() + ToString(getWeight()) + Telnet::reset() + " " + mud_measure
+    output += "It weights about " + Formatter::yellow() + ToString(getWeight()) + Formatter::reset() + " " + mud_measure
         + ".\n";
 
     return output;
@@ -617,7 +617,7 @@ string Item::lookContent()
     {
         if (content.empty())
         {
-            output += Telnet::italic() + "It's empty.\n" + Telnet::reset();
+            output += Formatter::italic() + "It's empty.\n" + Formatter::reset();
         }
         else
         {
@@ -627,16 +627,16 @@ string Item::lookContent()
                 std::string contentName = it.first->getNameCapital();
                 if (it.second > 1)
                 {
-                    output += " - " + Telnet::cyan() + contentName + Telnet::reset() + " [" + ToString(it.second)
+                    output += " - " + Formatter::cyan() + contentName + Formatter::reset() + " [" + ToString(it.second)
                         + "].\n";
                 }
                 else
                 {
-                    output += " - " + Telnet::cyan() + contentName + Telnet::reset() + ".\n";
+                    output += " - " + Formatter::cyan() + contentName + Formatter::reset() + ".\n";
                 }
             }
-            output += "Has been used " + Telnet::yellow() + ToString(getUsedSpace()) + Telnet::reset();
-            output += " out of " + Telnet::yellow() + ToString(getTotalSpace()) + Telnet::reset() + " " + mud_measure
+            output += "Has been used " + Formatter::yellow() + ToString(getUsedSpace()) + Formatter::reset();
+            output += " out of " + Formatter::yellow() + ToString(getTotalSpace()) + Formatter::reset() + " " + mud_measure
                 + ".\n";
         }
     }
@@ -644,7 +644,7 @@ string Item::lookContent()
     {
         if (contentLiq.first == nullptr)
         {
-            output += Telnet::italic() + "It does not contain any liquid.\n" + Telnet::reset();
+            output += Formatter::italic() + "It does not contain any liquid.\n" + Formatter::reset();
         }
         else
         {
@@ -666,7 +666,7 @@ string Item::lookContent()
             else if (percent >= 25) output += "It contains a little bit of ";
             else if (percent >= 0) output += "It contains some drops of ";
             else output += "It's empty, but you can see some ";
-            output += Telnet::cyan() + contentLiq.first->getName() + Telnet::reset() + ".\n";
+            output += Formatter::cyan() + contentLiq.first->getName() + Formatter::reset() + ".\n";
         }
     }
     return output;

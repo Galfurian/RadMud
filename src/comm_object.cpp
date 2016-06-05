@@ -141,10 +141,10 @@ void DoTake(Character * character, std::istream & sArgs)
             SQLiteDbms::instance().rollbackTransection();
         }
         // Notify to player.
-        character->sendMsg("You take " + Telnet::cyan() + ToLower(item->getName()) + Telnet::reset() + ".\n");
+        character->sendMsg("You take " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n");
         character->room->sendToAll(
-            character->getNameCapital() + " has picked up " + Telnet::cyan() + ToLower(item->getName())
-                + Telnet::reset() + ".\n", character);
+            character->getNameCapital() + " has picked up " + Formatter::cyan() + ToLower(item->getName())
+                + Formatter::reset() + ".\n", character);
         return; // Skip the rest of the function.
     }
     if (arguments.size() == 2)
@@ -227,13 +227,13 @@ void DoTake(Character * character, std::istream & sArgs)
         }
 
         character->sendMsg(
-            "You take out " + Telnet::cyan() + ToLower(item->getName()) + Telnet::reset() + " from " + Telnet::cyan()
-                + ToLower(container->getName()) + Telnet::reset() + ".\n");
+            "You take out " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + " from " + Formatter::cyan()
+                + ToLower(container->getName()) + Formatter::reset() + ".\n");
 
         // Check if the player is invisible.
         character->room->sendToAll(
-            character->getNameCapital() + " takes out " + Telnet::cyan() + ToLower(item->getName()) + Telnet::reset()
-                + " from " + Telnet::cyan() + ToLower(container->getName()) + Telnet::reset() + ".\n", character);
+            character->getNameCapital() + " takes out " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset()
+                + " from " + Formatter::cyan() + ToLower(container->getName()) + Formatter::reset() + ".\n", character);
     }
 }
 
@@ -300,9 +300,9 @@ void DoDrop(Character * character, std::istream & sArgs)
         SQLiteDbms::instance().rollbackTransection();
     }
     // Active message.
-    character->sendMsg("You drop " + Telnet::cyan() + ToLower(item->getName()) + Telnet::reset() + ".\n");
+    character->sendMsg("You drop " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n");
     character->room->sendToAll(
-        character->getNameCapital() + " has dropped " + Telnet::cyan() + ToLower(item->getName()) + Telnet::reset() + ".\n",
+        character->getNameCapital() + " has dropped " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n",
         character);
 }
 
@@ -364,13 +364,13 @@ void DoGive(Character * character, std::istream & sArgs)
     }
     // GIVE Message.
     character->sendMsg(
-        "You give " + Telnet::cyan() + ToLower(item->getName()) + Telnet::reset() + " to " + target->getName() + ".\n");
+        "You give " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + " to " + target->getName() + ".\n");
     // RECEIVE Message.
-    target->sendMsg(viewdName + " gives you " + Telnet::cyan() + ToLower(item->getName()) + Telnet::reset() + ".\n\n");
+    target->sendMsg(viewdName + " gives you " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n\n");
     // Check if the character is invisible.
     std::string broadcast;
     broadcast += character->getNameCapital() + " gives ";
-    broadcast += Telnet::cyan() + ToLower(item->getName()) + Telnet::reset() + " to ";
+    broadcast += Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + " to ";
     broadcast += target->getName() + ".\n";
     character->room->sendToAll(broadcast, character, target);
 }
@@ -390,53 +390,53 @@ void DoEquipments(Character * character, std::istream & sArgs)
 
     string output;
     // Print what is wearing.
-    output += Telnet::yellow() + "#------------ Equipment -----------#\n" + Telnet::reset();
+    output += Formatter::yellow() + "#------------ Equipment -----------#\n" + Formatter::reset();
     // Equipment Slot : HEAD
-    output += "    " + Telnet::yellow() + "Head" + Telnet::reset() + "       : ";
-    output += (head != nullptr) ? Telnet::cyan() + head->getNameCapital() : Telnet::gray() + "Nothing";
-    output += Telnet::reset() + ".\n";
+    output += "    " + Formatter::yellow() + "Head" + Formatter::reset() + "       : ";
+    output += (head != nullptr) ? Formatter::cyan() + head->getNameCapital() : Formatter::gray() + "Nothing";
+    output += Formatter::reset() + ".\n";
     // Equipment Slot : BACK
-    output += "    " + Telnet::yellow() + "Back" + Telnet::reset() + "       : ";
-    output += (back != nullptr) ? Telnet::cyan() + back->getNameCapital() : Telnet::gray() + "Nothing";
-    output += Telnet::reset() + ".\n";
+    output += "    " + Formatter::yellow() + "Back" + Formatter::reset() + "       : ";
+    output += (back != nullptr) ? Formatter::cyan() + back->getNameCapital() : Formatter::gray() + "Nothing";
+    output += Formatter::reset() + ".\n";
     // Equipment Slot : TORSO
-    output += "    " + Telnet::yellow() + "Torso" + Telnet::reset() + "      : ";
-    output += (torso != nullptr) ? Telnet::cyan() + torso->getNameCapital() : Telnet::gray() + "Nothing";
-    output += Telnet::reset() + ".\n";
+    output += "    " + Formatter::yellow() + "Torso" + Formatter::reset() + "      : ";
+    output += (torso != nullptr) ? Formatter::cyan() + torso->getNameCapital() : Formatter::gray() + "Nothing";
+    output += Formatter::reset() + ".\n";
     // Equipment Slot : LEGS
-    output += "    " + Telnet::yellow() + "Legs" + Telnet::reset() + "       : ";
-    output += (legs != nullptr) ? Telnet::cyan() + legs->getNameCapital() : Telnet::gray() + "Nothing";
-    output += Telnet::reset() + ".\n";
+    output += "    " + Formatter::yellow() + "Legs" + Formatter::reset() + "       : ";
+    output += (legs != nullptr) ? Formatter::cyan() + legs->getNameCapital() : Formatter::gray() + "Nothing";
+    output += Formatter::reset() + ".\n";
     // Equipment Slot : FEET
-    output += "    " + Telnet::yellow() + "Feet" + Telnet::reset() + "       : ";
-    output += (feet != nullptr) ? Telnet::cyan() + feet->getNameCapital() : Telnet::gray() + "Nothing";
-    output += Telnet::reset() + ".\n";
+    output += "    " + Formatter::yellow() + "Feet" + Formatter::reset() + "       : ";
+    output += (feet != nullptr) ? Formatter::cyan() + feet->getNameCapital() : Formatter::gray() + "Nothing";
+    output += Formatter::reset() + ".\n";
 
     // Print what is wielding.
     if (right != nullptr)
     {
         if (HasFlag(right->model->flags, ModelFlag::TwoHand))
         {
-            output += "    " + Telnet::yellow() + "Both Hands" + Telnet::reset() + " : ";
+            output += "    " + Formatter::yellow() + "Both Hands" + Formatter::reset() + " : ";
         }
         else
         {
-            output += "    " + Telnet::yellow() + "Right Hand" + Telnet::reset() + " : ";
+            output += "    " + Formatter::yellow() + "Right Hand" + Formatter::reset() + " : ";
         }
-        output += Telnet::cyan() + right->getNameCapital();
+        output += Formatter::cyan() + right->getNameCapital();
     }
     else
     {
-        output += "    " + Telnet::yellow() + "Right Hand" + Telnet::reset() + " : " + Telnet::gray() + "Nothing";
+        output += "    " + Formatter::yellow() + "Right Hand" + Formatter::reset() + " : " + Formatter::gray() + "Nothing";
     }
-    output += Telnet::reset() + ".\n";
+    output += Formatter::reset() + ".\n";
 
     if (left != nullptr)
     {
-        output += "    " + Telnet::yellow() + "Left Hand" + Telnet::reset() + "  : ";
-        output += Telnet::cyan() + left->getNameCapital() + Telnet::reset() + ".\n";
+        output += "    " + Formatter::yellow() + "Left Hand" + Formatter::reset() + "  : ";
+        output += Formatter::cyan() + left->getNameCapital() + Formatter::reset() + ".\n";
     }
-    output += Telnet::yellow() + "#----------------------------------#\n" + Telnet::reset();
+    output += Formatter::yellow() + "#----------------------------------#\n" + Formatter::reset();
 
     character->sendMsg(output);
 }
@@ -520,7 +520,7 @@ void DoWield(Character * character, std::istream & sArgs)
         SQLiteDbms::instance().rollbackTransection();
     }
     // Show the proper message.
-    std::string message = "You wield " + Telnet::cyan() + ToLower(item->getName()) + Telnet::reset() + " ";
+    std::string message = "You wield " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + " ";
     if (HasFlag(item->model->flags, ModelFlag::TwoHand))
     {
         message += "with both your hands.\n";
@@ -532,7 +532,7 @@ void DoWield(Character * character, std::istream & sArgs)
     character->sendMsg(message);
     // Notify to room.
     character->room->sendToAll(
-        character->getNameCapital() + " wields " + Telnet::cyan() + ToLower(item->getName()) + Telnet::reset() + ".\n", character);
+        character->getNameCapital() + " wields " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n", character);
 }
 
 void DoWear(Character * character, std::istream & sArgs)
@@ -628,9 +628,9 @@ void DoWear(Character * character, std::istream & sArgs)
         SQLiteDbms::instance().rollbackTransection();
     }
     // Notify to character.
-    character->sendMsg("You wear " + Telnet::cyan() + ToLower(item->getName()) + Telnet::reset() + ".\n");
+    character->sendMsg("You wear " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n");
     character->room->sendToAll(
-        character->getNameCapital() + " wears " + Telnet::cyan() + ToLower(item->getName()) + Telnet::reset() + ".\n", character);
+        character->getNameCapital() + " wears " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n", character);
 }
 
 void DoRemove(Character * character, std::istream & sArgs)
@@ -698,10 +698,10 @@ void DoRemove(Character * character, std::istream & sArgs)
         SQLiteDbms::instance().rollbackTransection();
     }
     // Notify the character.
-    character->sendMsg("You remove " + Telnet::cyan() + ToLower(item->getName()) + Telnet::reset() + ".\n");
+    character->sendMsg("You remove " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n");
     // Check if the player is invisible.
     character->room->sendToAll(
-        character->getNameCapital() + " removes " + Telnet::cyan() + ToLower(item->getName()) + Telnet::reset() + ".\n", character);
+        character->getNameCapital() + " removes " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n", character);
 }
 
 void DoInventory(Character * character, std::istream & sArgs)
@@ -709,7 +709,7 @@ void DoInventory(Character * character, std::istream & sArgs)
     NoMore(character, sArgs);
     if (character->inventory.empty())
     {
-        character->sendMsg(Telnet::gray() + "    You are carrying anything.\n" + Telnet::reset());
+        character->sendMsg(Formatter::gray() + "    You are carrying anything.\n" + Formatter::reset());
     }
     Table table = Table("Inventory");
     table.addColumn("Item", kAlignLeft);
@@ -725,7 +725,7 @@ void DoInventory(Character * character, std::istream & sArgs)
     std::string carried = ToString(character->getCarryingWeight());
     std::string maximum = ToString(character->getMaxCarryingWeight());
     character->sendMsg(
-        Telnet::yellow() + "\nTotal carrying weight: " + Telnet::reset() + carried + " of " + maximum + Telnet::reset()
+        Formatter::yellow() + "\nTotal carrying weight: " + Formatter::reset() + carried + " of " + maximum + Formatter::reset()
             + " " + mud_measure + ".\n");
 }
 
@@ -1049,13 +1049,13 @@ void DoPut(Character * character, std::istream & sArgs)
     SQLiteDbms::instance().endTransaction();
     // Notify to player.
     character->sendMsg(
-        "You put " + Telnet::cyan() + ToLower(item->getName()) + Telnet::reset() + " inside " + Telnet::cyan()
-            + ToLower(container->getName()) + Telnet::reset() + ".\n");
+        "You put " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + " inside " + Formatter::cyan()
+            + ToLower(container->getName()) + Formatter::reset() + ".\n");
 
     // Check if the player is invisible.
     character->room->sendToAll(
-        character->getNameCapital() + " puts " + Telnet::cyan() + ToLower(item->getName()) + Telnet::reset() + " inside "
-            + Telnet::cyan() + ToLower(container->getName()) + Telnet::reset() + ".\n", character);
+        character->getNameCapital() + " puts " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + " inside "
+            + Formatter::cyan() + ToLower(container->getName()) + Formatter::reset() + ".\n", character);
 }
 
 void DoDrink(Character * character, std::istream & sArgs)

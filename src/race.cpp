@@ -25,6 +25,7 @@
 // Other Include.
 #include "luabridge/LuaBridge.h"
 #include "utils.hpp"
+#include "formatter.hpp"
 
 Race::Race() :
         vnum(),
@@ -131,5 +132,12 @@ void Race::luaRegister(lua_State * L)
 
 std::string Race::getTile()
 {
-    return ToString(tileSet) + ":" + ToString(tileId);
+    if (Formatter::getFormat() == Formatter::TELNET)
+    {
+        return ToString(tileSet) + ":" + ToString(tileId);
+    }
+    else
+    {
+        return "c";
+    }
 }

@@ -24,9 +24,9 @@
 
 // Other Include.
 #include "mud.hpp"
-#include "telnet.hpp"
 #include "logger.hpp"
 #include "constants.hpp"
+#include "formatter.hpp"
 #include "generator.hpp"
 #include "luabridge/LuaBridge.h"
 
@@ -220,7 +220,7 @@ bool Room::removeOnDB()
 
     //----------Remove from Room-----------
     SQLiteDbms::instance().deleteFrom("Room",
-    { std::make_pair("vnum", ToString(vnum)) });
+        { std::make_pair("vnum", ToString(vnum)) });
     return true;
 }
 
@@ -466,7 +466,7 @@ string Room::getLook(Character * exception)
     string output = "";
 
     // The player want to look at the entire room.
-    output += Telnet::bold() + name + Telnet::reset() + "\n";
+    output += Formatter::bold() + name + Formatter::reset() + "\n";
     output += description + "\n";
 
     if (exits.empty())
@@ -477,24 +477,31 @@ string Room::getLook(Character * exception)
     {
         if (area != nullptr)
         {
-            std::vector<std::string> layers = area->drawFov(this, exception->getViewDistance());
-            output += Telnet::doClearMap();
-            for (auto layer : layers)
+            if (Formatter::getFormat() == Formatter::TELNET)
             {
-                output += Telnet::doDrawMap();
-                output += layer;
-                output += Telnet::dontDrawMap();
+                std::vector<std::string> layers = area->drawFov(this, exception->getViewDistance());
+                output += Formatter::doClearMap();
+                for (auto layer : layers)
+                {
+                    output += Formatter::doDrawMap();
+                    output += layer;
+                    output += Formatter::dontDrawMap();
+                }
+            }
+            else
+            {
+                output += area->drawASCIIFov(this, exception->getViewDistance());
             }
         }
         else if (continent != nullptr)
         {
             std::vector<std::string> layers = continent->drawFov(this, exception->getViewDistance());
-            output += Telnet::doClearMap();
+            output += Formatter::doClearMap();
             for (auto layer : layers)
             {
-                output += Telnet::doDrawMap();
+                output += Formatter::doDrawMap();
                 output += layer;
-                output += Telnet::dontDrawMap();
+                output += Formatter::dontDrawMap();
             }
         }
     }
@@ -517,12 +524,12 @@ string Room::getLook(Character * exception)
         // If there are more of this item, show the counter.
         if (it.second > 1)
         {
-            output += Telnet::cyan() + it.first->getNameCapital() + Telnet::reset() + " are here.["
+            output += Formatter::cyan() + it.first->getNameCapital() + Formatter::reset() + " are here.["
                 + ToString(it.second) + "]\n";
         }
         else
         {
-            output += Telnet::cyan() + it.first->getNameCapital() + Telnet::reset() + " is here.\n";
+            output += Formatter::cyan() + it.first->getNameCapital() + Formatter::reset() + " is here.\n";
         }
     }
 
@@ -534,7 +541,7 @@ string Room::getLook(Character * exception)
         {
             continue;
         }
-        output += Telnet::blue() + iterator->getStaticDesc() + Telnet::reset() + "\n";
+        output += Formatter::blue() + iterator->getStaticDesc() + Formatter::reset() + "\n";
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -545,7 +552,7 @@ string Room::getLook(Character * exception)
         {
             continue;
         }
-        output += Telnet::gray() + iterator->getStaticDesc() + Telnet::reset() + "\n";
+        output += Formatter::gray() + iterator->getStaticDesc() + Formatter::reset() + "\n";
     }
 
     return output;

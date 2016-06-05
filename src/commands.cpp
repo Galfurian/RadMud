@@ -348,7 +348,7 @@ void ProcessNewRace(Character * character, std::istream & sArgs)
                 helpMessage += "Perception   " + ToString(race->perception) + ".\n";
                 helpMessage += "Constitution " + ToString(race->constitution) + ".\n";
                 helpMessage += "Intelligence " + ToString(race->intelligence) + ".\n";
-                helpMessage += Telnet::italic() + race->description + Telnet::reset() + "\n";
+                helpMessage += Formatter::italic() + race->description + Formatter::reset() + "\n";
                 AdvanceCharacterCreation(character, ConnectionState::AwaitingNewRace, helpMessage);
             }
 
@@ -412,7 +412,7 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
         player->constitution = player->race->constitution;
         player->intelligence = player->race->intelligence;
         AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAttr,
-            Telnet::cyan() + "Attribute has been set by default." + Telnet::reset() + "\n");
+            Formatter::cyan() + "Attribute has been set by default." + Formatter::reset() + "\n");
     }
     // If the player has insert help (attribute number), show its help.
     else if (BeginWith(ToLower(arguments[0].first), "continue"))
@@ -427,38 +427,38 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
             std::string helpMessage;
             if (arguments[1].first == "1")
             {
-                helpMessage = "Help about Strength.\n" + Telnet::italic();
+                helpMessage = "Help about Strength.\n" + Formatter::italic();
                 helpMessage += "Strength is important for increasing the Carrying Weight and ";
                 helpMessage += "satisfying the minimum Strength requirements for some weapons and armors.";
-                helpMessage += Telnet::reset() + "\n";
+                helpMessage += Formatter::reset() + "\n";
             }
             else if (arguments[1].first == "2")
             {
-                helpMessage = "Help about Agility.\n" + Telnet::italic();
+                helpMessage = "Help about Agility.\n" + Formatter::italic();
                 helpMessage += "Besides increasing mobility in combat, it increases the recharge ";
                 helpMessage += "speed of all the weapons, as well as the ability to use light armor.";
-                helpMessage += Telnet::reset() + "\n";
+                helpMessage += Formatter::reset() + "\n";
             }
             else if (arguments[1].first == "3")
             {
-                helpMessage = "Help about Perception.\n" + Telnet::italic();
+                helpMessage = "Help about Perception.\n" + Formatter::italic();
                 helpMessage += "The ability to see, hear, taste and notice unusual things. ";
                 helpMessage += "A high Perception is important for a sharpshooter.";
-                helpMessage += Telnet::reset() + "\n";
+                helpMessage += Formatter::reset() + "\n";
             }
             else if (arguments[1].first == "4")
             {
-                helpMessage = "Help about Constitution.\n" + Telnet::italic();
+                helpMessage = "Help about Constitution.\n" + Formatter::italic();
                 helpMessage += "Stamina and physical toughness. A character with a high Endurance ";
                 helpMessage += "will survive where others may not.";
-                helpMessage += Telnet::reset() + "\n";
+                helpMessage += Formatter::reset() + "\n";
             }
             else if (arguments[1].first == "5")
             {
-                helpMessage = "Help about Intelligence.\n" + Telnet::italic();
+                helpMessage = "Help about Intelligence.\n" + Formatter::italic();
                 helpMessage += "Knowledge, wisdom and the ability to think quickly, ";
                 helpMessage += "this attribute is important for any character.";
-                helpMessage += Telnet::reset() + "\n";
+                helpMessage += Formatter::reset() + "\n";
             }
             else
             {
@@ -825,14 +825,14 @@ void PrintChoices(Character * character)
 {
     Player * player = character->toPlayer();
     std::string preview = std::string();
-    preview += Telnet::clearScreen();
+    preview += Formatter::clearScreen();
     preview += "# ------------ Character Creation ------------ #\n";
 
     // NAME
     preview += "# Name         :";
     if (!player->name.empty())
     {
-        preview += player->name + Telnet::reset();
+        preview += player->name + Formatter::reset();
     }
     preview += "\n";
 
@@ -849,7 +849,7 @@ void PrintChoices(Character * character)
     preview += "# Race         :";
     if (player->race != nullptr)
     {
-        preview += player->race->name + Telnet::reset();
+        preview += player->race->name + Formatter::reset();
     }
     preview += "\n";
 
@@ -857,7 +857,7 @@ void PrintChoices(Character * character)
     preview += "# Strength     :";
     if (player->strength > 0)
     {
-        preview += ToString(player->strength) + Telnet::reset();
+        preview += ToString(player->strength) + Formatter::reset();
     }
     preview += "\n";
 
@@ -865,7 +865,7 @@ void PrintChoices(Character * character)
     preview += "# Agility      :";
     if (player->agility > 0)
     {
-        preview += ToString(player->agility) + Telnet::reset();
+        preview += ToString(player->agility) + Formatter::reset();
     }
     preview += "\n";
 
@@ -873,7 +873,7 @@ void PrintChoices(Character * character)
     preview += "# Perception   :";
     if (player->perception > 0)
     {
-        preview += ToString(player->perception) + Telnet::reset();
+        preview += ToString(player->perception) + Formatter::reset();
     }
     preview += "\n";
 
@@ -881,7 +881,7 @@ void PrintChoices(Character * character)
     preview += "# Constitution :";
     if (player->constitution > 0)
     {
-        preview += ToString(player->constitution) + Telnet::reset();
+        preview += ToString(player->constitution) + Formatter::reset();
     }
     preview += "\n";
 
@@ -889,7 +889,7 @@ void PrintChoices(Character * character)
     preview += "# Intelligence :";
     if (player->intelligence > 0)
     {
-        preview += ToString(player->intelligence) + Telnet::reset();
+        preview += ToString(player->intelligence) + Formatter::reset();
     }
     preview += "\n";
 
@@ -900,7 +900,7 @@ void PrintChoices(Character * character)
     preview += "# Age          :";
     if (player->age > 0)
     {
-        preview += ToString(player->age) + Telnet::reset();
+        preview += ToString(player->age) + Formatter::reset();
     }
     preview += "\n";
 
@@ -908,7 +908,7 @@ void PrintChoices(Character * character)
     preview += "# Description  :";
     if (!player->description.empty())
     {
-        preview += player->description + Telnet::reset();
+        preview += player->description + Formatter::reset();
     }
     preview += "\n";
 
@@ -916,7 +916,7 @@ void PrintChoices(Character * character)
     preview += "# Weight       :";
     if (player->weight > 0)
     {
-        preview += ToString(player->weight) + Telnet::reset();
+        preview += ToString(player->weight) + Formatter::reset();
     }
     preview += "\n";
     preview += "# -------------------------------------------- #\n";
@@ -1002,9 +1002,9 @@ void AdvanceCharacterCreation(Character * character, ConnectionState new_state, 
     }
     else if (new_state == ConnectionState::AwaitingName)
     {
-        msg += Telnet::clearScreen();
-        msg += "\nWelcome to RadMud. Version " + Telnet::green() + kVersion + Telnet::reset() + "!\n";
-        msg += Telnet::red();
+        msg += Formatter::clearScreen();
+        msg += "\nWelcome to RadMud. Version " + Formatter::green() + kVersion + Formatter::reset() + "!\n";
+        msg += Formatter::red();
         msg += "#--------------------------------------------#\n";
         msg += "                 XXXXXXXXXXXXX                \n";
         msg += "      /'--_###XXXXXXXXXXXXXXXXXXX###_--'\\    \n";
@@ -1026,8 +1026,8 @@ void AdvanceCharacterCreation(Character * character, ConnectionState new_state, 
         msg += "| Created by : Enrico Fraccaroli.            |\n";
         msg += "| Date       : 21 Agosto 2014                |\n";
         msg += "#--------------------------------------------#\n";
-        msg += Telnet::reset();
-        msg += "# Enter your name, or type '" + Telnet::magenta() + "new" + Telnet::reset();
+        msg += Formatter::reset();
+        msg += "# Enter your name, or type '" + Formatter::magenta() + "new" + Formatter::reset();
         msg += "' in order to create a new character!\n";
     }
     else if (new_state == ConnectionState::AwaitingPassword)
@@ -1037,21 +1037,21 @@ void AdvanceCharacterCreation(Character * character, ConnectionState new_state, 
     else if (new_state == ConnectionState::AwaitingNewName)
     {
         PrintChoices(player);
-        msg += "# " + Telnet::bold() + "Character's Name." + Telnet::reset() + "\n";
+        msg += "# " + Formatter::bold() + "Character's Name." + Formatter::reset() + "\n";
         msg += "# Choose carefully, because this it's the only chance you have";
         msg += " to pick a legendary name, maybe one day it will be whispered all over the lands.\n";
-        msg += "# Type [" + Telnet::magenta() + "back" + Telnet::reset() + "] to return to the login.\n";
+        msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset() + "] to return to the login.\n";
     }
     else if (new_state == ConnectionState::AwaitingNewPwd)
     {
         PrintChoices(player);
-        msg += "# " + Telnet::bold() + "Character's Password." + Telnet::reset() + "\n";
+        msg += "# " + Formatter::bold() + "Character's Password." + Formatter::reset() + "\n";
         msg += "# Choose a proper password, in order to protect the acces to your character.\n";
-        msg += "# Type [" + Telnet::magenta() + "back" + Telnet::reset() + "] to return to the previus step.\n";
+        msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset() + "] to return to the previus step.\n";
     }
     else if (new_state == ConnectionState::AwaitingNewPwdCon)
     {
-        msg += Telnet::green() + "Re-enter the password.." + Telnet::reset() + "\n";
+        msg += Formatter::green() + "Re-enter the password.." + Formatter::reset() + "\n";
     }
     else if (new_state == ConnectionState::AwaitingNewStory)
     {
@@ -1060,13 +1060,13 @@ void AdvanceCharacterCreation(Character * character, ConnectionState new_state, 
         msg += "#\n";
         msg += "Year 374\n";
         msg += "#\n";
-        msg += "# Type [" + Telnet::magenta() + "continue" + Telnet::reset() + "] to continue character creation.\n";
-        msg += "# Type [" + Telnet::magenta() + "back" + Telnet::reset() + "] to return to the previus step.\n";
+        msg += "# Type [" + Formatter::magenta() + "continue" + Formatter::reset() + "] to continue character creation.\n";
+        msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset() + "] to return to the previus step.\n";
     }
     else if (new_state == ConnectionState::AwaitingNewRace)
     {
         PrintChoices(player);
-        msg += "# " + Telnet::bold() + "Character's Race." + Telnet::reset() + "\n";
+        msg += "# " + Formatter::bold() + "Character's Race." + Formatter::reset() + "\n";
         for (auto iterator : Mud::instance().mudRaces)
         {
             Race * race = &iterator.second;
@@ -1075,75 +1075,75 @@ void AdvanceCharacterCreation(Character * character, ConnectionState new_state, 
         msg += "#\n";
         msg += "# Choose one of the above race by typing the correspondent number.\n";
         msg += "#\n";
-        msg += "# Type [" + Telnet::magenta() + "help [Number]" + Telnet::reset() + "]";
+        msg += "# Type [" + Formatter::magenta() + "help [Number]" + Formatter::reset() + "]";
         msg += " to read a brief description of the race.\n";
-        msg += "# Type [" + Telnet::magenta() + "back" + Telnet::reset() + "]";
+        msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset() + "]";
         msg += " to return to the previus step.\n";
     }
     else if (new_state == ConnectionState::AwaitingNewAttr)
     {
         PrintChoices(player);
-        msg += "# " + Telnet::bold() + "Character's Attributes." + Telnet::reset() + "\n";
+        msg += "# " + Formatter::bold() + "Character's Attributes." + Formatter::reset() + "\n";
         msg += "#    [1] Strength     :" + ToString(player->strength) + "\n";
         msg += "#    [2] Agility      :" + ToString(player->agility) + "\n";
         msg += "#    [3] Perception   :" + ToString(player->perception) + "\n";
         msg += "#    [4] Constitution :" + ToString(player->constitution) + "\n";
         msg += "#    [5] Intelligence :" + ToString(player->intelligence) + "\n";
         msg += "#\n";
-        msg += "# Remaining Points: " + Telnet::green() + ToString(player->remaining_points) + Telnet::reset() + "\n";
+        msg += "# Remaining Points: " + Formatter::green() + ToString(player->remaining_points) + Formatter::reset() + "\n";
         msg += "#\n";
-        msg += "# Type [" + Telnet::magenta() + "(number) +/-modifier" + Telnet::reset() + "]";
+        msg += "# Type [" + Formatter::magenta() + "(number) +/-modifier" + Formatter::reset() + "]";
         msg += " to decrease or increase the value of an attribute.\n";
-        msg += "# Type [" + Telnet::magenta() + "help (number)" + Telnet::reset() + "]";
+        msg += "# Type [" + Formatter::magenta() + "help (number)" + Formatter::reset() + "]";
         msg += " to read a brief description of the attribute.\n";
-        msg += "# Type [" + Telnet::magenta() + "reset" + Telnet::reset() + "]";
+        msg += "# Type [" + Formatter::magenta() + "reset" + Formatter::reset() + "]";
         msg += " to reset the values as default.\n";
-        msg += "# Type [" + Telnet::magenta() + "continue" + Telnet::reset() + "]";
+        msg += "# Type [" + Formatter::magenta() + "continue" + Formatter::reset() + "]";
         msg += " to continue character creation.\n";
-        msg += "# Type [" + Telnet::magenta() + "back" + Telnet::reset() + "]";
+        msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset() + "]";
         msg += " to return to the previus step.\n";
     }
     else if (new_state == ConnectionState::AwaitingNewGender)
     {
         PrintChoices(player);
-        msg += "# " + Telnet::bold() + "Character's Gender." + Telnet::reset() + "\n";
+        msg += "# " + Formatter::bold() + "Character's Gender." + Formatter::reset() + "\n";
         msg += "#    [1] Male.\n";
         msg += "#    [2] Female.\n";
         msg += "#\n";
         msg += "# Choose one of the above gender by typing the correspondent number.\n";
         msg += "#\n";
-        msg += "# Type [" + Telnet::magenta() + "back" + Telnet::reset() + "] to return to the previus step.\n";
+        msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset() + "] to return to the previus step.\n";
     }
     else if (new_state == ConnectionState::AwaitingNewAge)
     {
         PrintChoices(player);
-        msg += "# " + Telnet::bold() + "Character's Age." + Telnet::reset() + "\n";
+        msg += "# " + Formatter::bold() + "Character's Age." + Formatter::reset() + "\n";
         msg += "# Choose the starting age of your character, be aware that during the game the time will pass.\n";
-        msg += "# Type [" + Telnet::magenta() + "back" + Telnet::reset() + "] to return to the previus step.\n";
+        msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset() + "] to return to the previus step.\n";
     }
     else if (new_state == ConnectionState::AwaitingNewDesc)
     {
         PrintChoices(player);
-        msg += "# " + Telnet::bold() + "Character's Description." + Telnet::reset() + "\n";
+        msg += "# " + Formatter::bold() + "Character's Description." + Formatter::reset() + "\n";
         msg += "# Insert a brief description of your character, its optional.\n";
-        msg += "# Type [" + Telnet::magenta() + "back" + Telnet::reset() + "] to return to the previus step.\n";
-        msg += "# Type [" + Telnet::magenta() + "skip" + Telnet::reset() + "] to just pass to the next step.\n";
+        msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset() + "] to return to the previus step.\n";
+        msg += "# Type [" + Formatter::magenta() + "skip" + Formatter::reset() + "] to just pass to the next step.\n";
     }
     else if (new_state == ConnectionState::AwaitingNewWeight)
     {
         PrintChoices(player);
-        msg += "# " + Telnet::bold() + "Character's Weight." + Telnet::reset() + "\n";
+        msg += "# " + Formatter::bold() + "Character's Weight." + Formatter::reset() + "\n";
         msg += "# Choose the wheight of your character.\n";
-        msg += "# Type [" + Telnet::magenta() + "back" + Telnet::reset() + "] to return to the previus step.\n";
+        msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset() + "] to return to the previus step.\n";
     }
     else if (new_state == ConnectionState::AwaitingNewConfirm)
     {
         PrintChoices(player);
         msg += "# Give a look to the information you have provided, now it's the right time";
         msg += " to decide if you want to change something.\n";
-        msg += "# Type [" + Telnet::magenta() + "confirm" + Telnet::reset() + "] to conclude the character creation.\n";
-        msg += "# Type [" + Telnet::magenta() + "back" + Telnet::reset() + "]    to return to the previus step.\n";
-        msg += Telnet::green() + "Do you confirm? " + Telnet::reset() + "\n";
+        msg += "# Type [" + Formatter::magenta() + "confirm" + Formatter::reset() + "] to conclude the character creation.\n";
+        msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset() + "]    to return to the previus step.\n";
+        msg += Formatter::green() + "Do you confirm? " + Formatter::reset() + "\n";
     }
     if (!message.empty())
     {

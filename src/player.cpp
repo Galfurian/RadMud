@@ -40,11 +40,11 @@
 #include "race.hpp"
 #include "utils.hpp"
 #include "logger.hpp"
-#include "telnet.hpp"
 #include "updater.hpp"
 #include "faction.hpp"
 #include "commands.hpp"
 #include "constants.hpp"
+#include "formatter.hpp"
 
 using namespace std;
 
@@ -370,11 +370,11 @@ void Player::triggerDeath()
 
 void Player::enterGame()
 {
-    this->sendMsg(Telnet::clearScreen());
+    this->sendMsg(Formatter::clearScreen());
     map<string, string>::reverse_iterator it;
 
     // Greet them.
-    this->sendMsg(Telnet::bold() + "Welcome, " + name + "!\n" + Telnet::reset());
+    this->sendMsg(Formatter::bold() + "Welcome, " + name + "!\n" + Formatter::reset());
 
     // Load the news.
     this->sendMsg("#---------------- Global News ----------------#\n");

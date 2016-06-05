@@ -190,30 +190,30 @@ void DoModelInfo(Character * character, std::istream & sArgs)
     }
 
     std::string msg;
-    msg += Telnet::yellow() + "Model Vnum      " + Telnet::reset() + ": " + ToString(model->vnum) + "\n";
-    msg += Telnet::yellow() + "Name            " + Telnet::reset() + ": " + model->name + "\n";
-    msg += Telnet::yellow() + "Article         " + Telnet::reset() + ": " + model->article + "\n";
-    msg += Telnet::yellow() + "Short Descr.    " + Telnet::reset() + ": " + model->shortdesc + "\n";
-    msg += Telnet::yellow() + "Keys            " + Telnet::reset() + ": {";
+    msg += Formatter::yellow() + "Model Vnum      " + Formatter::reset() + ": " + ToString(model->vnum) + "\n";
+    msg += Formatter::yellow() + "Name            " + Formatter::reset() + ": " + model->name + "\n";
+    msg += Formatter::yellow() + "Article         " + Formatter::reset() + ": " + model->article + "\n";
+    msg += Formatter::yellow() + "Short Descr.    " + Formatter::reset() + ": " + model->shortdesc + "\n";
+    msg += Formatter::yellow() + "Keys            " + Formatter::reset() + ": {";
     for (auto it : model->keys)
     {
         msg += " " + it;
     }
     msg += "}\n";
-    msg += Telnet::yellow() + "Description     " + Telnet::reset() + ": " + model->description + "\n";
-    msg += Telnet::yellow() + "Type            " + Telnet::reset() + ": " + GetModelTypeName(model->type) + "\n";
-    msg += Telnet::yellow() + "Slot            " + Telnet::reset() + ": " + GetEquipmentSlotName(model->slot) + "\n";
-    msg += Telnet::yellow() + "Flags           " + Telnet::reset() + ": " + GetModelFlagString(model->flags) + "\n";
-    msg += Telnet::yellow() + "Weight          " + Telnet::reset() + ": " + ToString(model->weight) + " " + mud_measure
+    msg += Formatter::yellow() + "Description     " + Formatter::reset() + ": " + model->description + "\n";
+    msg += Formatter::yellow() + "Type            " + Formatter::reset() + ": " + GetModelTypeName(model->type) + "\n";
+    msg += Formatter::yellow() + "Slot            " + Formatter::reset() + ": " + GetEquipmentSlotName(model->slot) + "\n";
+    msg += Formatter::yellow() + "Flags           " + Formatter::reset() + ": " + GetModelFlagString(model->flags) + "\n";
+    msg += Formatter::yellow() + "Weight          " + Formatter::reset() + ": " + ToString(model->weight) + " " + mud_measure
         + ".\n";
-    msg += Telnet::yellow() + "Price           " + Telnet::reset() + ": " + ToString(model->price) + " " + mud_currency
+    msg += Formatter::yellow() + "Price           " + Formatter::reset() + ": " + ToString(model->price) + " " + mud_currency
         + ".\n";
-    msg += Telnet::yellow() + "Condition       " + Telnet::reset() + ": " + ToString(model->condition) + "\n";
-    msg += Telnet::yellow() + "Decay           " + Telnet::reset() + ": " + ToString(model->decay) + "\n";
-    msg += Telnet::yellow() + "Material        " + Telnet::reset() + ": " + GetMaterialTypeName(model->material) + "\n";
-    msg += Telnet::yellow() + "Tile Set        " + Telnet::reset() + ": " + ToString(model->tileSet) + "\n";
-    msg += Telnet::yellow() + "Tile Id         " + Telnet::reset() + ": " + ToString(model->tileId) + "\n";
-    msg += Telnet::yellow() + "Functions       " + Telnet::reset() + ": {";
+    msg += Formatter::yellow() + "Condition       " + Formatter::reset() + ": " + ToString(model->condition) + "\n";
+    msg += Formatter::yellow() + "Decay           " + Formatter::reset() + ": " + ToString(model->decay) + "\n";
+    msg += Formatter::yellow() + "Material        " + Formatter::reset() + ": " + GetMaterialTypeName(model->material) + "\n";
+    msg += Formatter::yellow() + "Tile Set        " + Formatter::reset() + ": " + ToString(model->tileSet) + "\n";
+    msg += Formatter::yellow() + "Tile Id         " + Formatter::reset() + ": " + ToString(model->tileId) + "\n";
+    msg += Formatter::yellow() + "Functions       " + Formatter::reset() + ": {";
     for (auto it : model->functions)
     {
         msg += " " + ToString(it);
@@ -233,75 +233,75 @@ void DoModelInfo(Character * character, std::istream & sArgs)
         case ModelType::Weapon:
             {
             WeaponFunc func = model->getWeaponFunc();
-            msg += Telnet::brown() + "Type            " + Telnet::reset() + ": " + GetWeaponTypeName(func.type) + "\n";
-            msg += Telnet::brown() + "Minimum Damage  " + Telnet::reset() + ": " + ToString(func.minDamage) + "\n";
-            msg += Telnet::brown() + "Maximum Damage  " + Telnet::reset() + ": " + ToString(func.maxDamage) + "\n";
-            msg += Telnet::brown() + "Range           " + Telnet::reset() + ": " + ToString(func.range) + "\n";
+            msg += Formatter::brown() + "Type            " + Formatter::reset() + ": " + GetWeaponTypeName(func.type) + "\n";
+            msg += Formatter::brown() + "Minimum Damage  " + Formatter::reset() + ": " + ToString(func.minDamage) + "\n";
+            msg += Formatter::brown() + "Maximum Damage  " + Formatter::reset() + ": " + ToString(func.maxDamage) + "\n";
+            msg += Formatter::brown() + "Range           " + Formatter::reset() + ": " + ToString(func.range) + "\n";
             break;
         }
         case ModelType::Armor:
             {
             ArmorFunc func = model->getArmorFunc();
-            msg += Telnet::brown() + "Size            " + Telnet::reset() + ": " + GetArmorSizeName(func.size) + "\n";
-            msg += Telnet::brown() + "Damage Absorb. " + Telnet::reset() + ": " + ToString(func.damageAbs) + "\n";
-            msg += Telnet::brown() + "Allowed Anatom. " + Telnet::reset() + ": " + ToString(func.allowedAnatomy) + "\n";
+            msg += Formatter::brown() + "Size            " + Formatter::reset() + ": " + GetArmorSizeName(func.size) + "\n";
+            msg += Formatter::brown() + "Damage Absorb. " + Formatter::reset() + ": " + ToString(func.damageAbs) + "\n";
+            msg += Formatter::brown() + "Allowed Anatom. " + Formatter::reset() + ": " + ToString(func.allowedAnatomy) + "\n";
             break;
         }
         case ModelType::Shield:
             {
             ShieldFunc func = model->getShieldFunc();
-            msg += Telnet::brown() + "Size            " + Telnet::reset() + ": " + GetShieldSizeName(func.size) + "\n";
-            msg += Telnet::brown() + "Parry Chance    " + Telnet::reset() + ": " + ToString(func.parryChance) + "\n";
+            msg += Formatter::brown() + "Size            " + Formatter::reset() + ": " + GetShieldSizeName(func.size) + "\n";
+            msg += Formatter::brown() + "Parry Chance    " + Formatter::reset() + ": " + ToString(func.parryChance) + "\n";
             break;
         }
         case ModelType::Projectile:
             {
             ProjectileFunc func = model->getProjectileFunc();
-            msg += Telnet::brown() + "Damage Bonus    " + Telnet::reset() + ": " + ToString(func.damageBonus) + "\n";
-            msg += Telnet::brown() + "Range Bonus     " + Telnet::reset() + ": " + ToString(func.rangeBonus) + "\n";
+            msg += Formatter::brown() + "Damage Bonus    " + Formatter::reset() + ": " + ToString(func.damageBonus) + "\n";
+            msg += Formatter::brown() + "Range Bonus     " + Formatter::reset() + ": " + ToString(func.rangeBonus) + "\n";
             break;
         }
         case ModelType::Container:
             {
             ContainerFunc func = model->getContainerFunc();
-            msg += Telnet::brown() + "Max Weight      " + Telnet::reset() + ": " + ToString(func.maxWeight) + "\n";
-            msg += Telnet::brown() + "Flags           " + Telnet::reset() + ": {" + GetContainerFlagString(func.flags)
+            msg += Formatter::brown() + "Max Weight      " + Formatter::reset() + ": " + ToString(func.maxWeight) + "\n";
+            msg += Formatter::brown() + "Flags           " + Formatter::reset() + ": {" + GetContainerFlagString(func.flags)
                 + "}\n";
-            msg += Telnet::brown() + "Key Vnum        " + Telnet::reset() + ": " + ToString(func.keyVnum) + "\n";
-            msg += Telnet::brown() + "Lockpicking Lv. " + Telnet::reset() + ": " + ToString(func.difficulty) + "\n";
+            msg += Formatter::brown() + "Key Vnum        " + Formatter::reset() + ": " + ToString(func.keyVnum) + "\n";
+            msg += Formatter::brown() + "Lockpicking Lv. " + Formatter::reset() + ": " + ToString(func.difficulty) + "\n";
             break;
         }
         case ModelType::LiqContainer:
             {
             LiqContainerFunc func = model->getLiqContainerFunc();
-            msg += Telnet::brown() + "Max Weight      " + Telnet::reset() + ": " + ToString(func.maxWeight) + "\n";
-            msg += Telnet::brown() + "Flags           " + Telnet::reset() + ": {"
+            msg += Formatter::brown() + "Max Weight      " + Formatter::reset() + ": " + ToString(func.maxWeight) + "\n";
+            msg += Formatter::brown() + "Flags           " + Formatter::reset() + ": {"
                 + GetLiqContainerFlagString(func.flags) + "}\n";
             break;
         }
         case ModelType::Tool:
             {
             ToolFunc func = model->getToolFunc();
-            msg += Telnet::brown() + "Type            " + Telnet::reset() + ": " + GetToolTypeName(func.type) + "\n";
+            msg += Formatter::brown() + "Type            " + Formatter::reset() + ": " + GetToolTypeName(func.type) + "\n";
             break;
         }
         case ModelType::Node:
             {
             NodeFunc func = model->getNodeFunc();
-            msg += Telnet::brown() + "Type            " + Telnet::reset() + ": " + GetNodeTypeName(func.type) + "\n";
+            msg += Formatter::brown() + "Type            " + Formatter::reset() + ": " + GetNodeTypeName(func.type) + "\n";
             break;
         }
         case ModelType::Resource:
             {
             ResourceFunc func = model->getResourceFunc();
-            msg += Telnet::brown() + "Type            " + Telnet::reset() + ": " + GetResourceTypeName(func.type)
+            msg += Formatter::brown() + "Type            " + Formatter::reset() + ": " + GetResourceTypeName(func.type)
                 + "\n";
             break;
         }
         case ModelType::Seed:
             {
             SeedFunc func = model->getSeedFunc();
-            msg += Telnet::brown() + "Type            " + Telnet::reset() + ": " + GetSeedTypeName(func.type) + "\n";
+            msg += Formatter::brown() + "Type            " + Formatter::reset() + ": " + GetSeedTypeName(func.type) + "\n";
             break;
         }
         case ModelType::Key:
@@ -315,16 +315,16 @@ void DoModelInfo(Character * character, std::istream & sArgs)
         case ModelType::Food:
             {
             FoodFunc func = model->getFoodFunc();
-            msg += Telnet::brown() + "Feeding         " + Telnet::reset() + ": " + ToString(func.hours) + "\n";
-            msg += Telnet::brown() + "Flags           " + Telnet::reset() + ": {" + GetFoodFlagString(func.flags)
+            msg += Formatter::brown() + "Feeding         " + Formatter::reset() + ": " + ToString(func.hours) + "\n";
+            msg += Formatter::brown() + "Flags           " + Formatter::reset() + ": {" + GetFoodFlagString(func.flags)
                 + "}\n";
             break;
         }
         case ModelType::Light:
             {
             LightFunc func = model->getLightFunc();
-            msg += Telnet::brown() + "Autonomy        " + Telnet::reset() + ": " + ToString(func.maxHours) + "\n";
-            msg += Telnet::brown() + "Rechargeable    " + Telnet::reset() + ": " + ToString(func.policy) + "\n";
+            msg += Formatter::brown() + "Autonomy        " + Formatter::reset() + ": " + ToString(func.maxHours) + "\n";
+            msg += Formatter::brown() + "Rechargeable    " + Formatter::reset() + ": " + ToString(func.policy) + "\n";
             break;
         }
         case ModelType::Vehicle:
@@ -338,14 +338,14 @@ void DoModelInfo(Character * character, std::istream & sArgs)
         case ModelType::Book:
             {
             BookFunc func = model->getBookFunc();
-            msg += Telnet::brown() + "Capacity        " + Telnet::reset() + ": " + ToString(func.maxParchments) + "\n";
+            msg += Formatter::brown() + "Capacity        " + Formatter::reset() + ": " + ToString(func.maxParchments) + "\n";
             break;
         }
         case ModelType::Rope:
             {
             RopeFunc func = model->getRopeFunc();
-            msg += Telnet::brown() + "Difficulty      " + Telnet::reset() + ": " + ToString(func.difficulty) + "\n";
-            msg += Telnet::brown() + "Type            " + Telnet::reset() + ": " + ToString(func.type) + "\n";
+            msg += Formatter::brown() + "Difficulty      " + Formatter::reset() + ": " + ToString(func.difficulty) + "\n";
+            msg += Formatter::brown() + "Type            " + Formatter::reset() + ": " + ToString(func.type) + "\n";
             break;
         }
         case ModelType::Trash:
@@ -355,27 +355,27 @@ void DoModelInfo(Character * character, std::istream & sArgs)
         case ModelType::Mechanism:
             {
             MechanismFunc func = model->getMechanismFunc();
-            msg += Telnet::brown() + "Type            " + Telnet::reset() + ": " + GetMechanismTypeName(func.type)
+            msg += Formatter::brown() + "Type            " + Formatter::reset() + ": " + GetMechanismTypeName(func.type)
                 + "\n";
             switch (func.type)
             {
                 case MechanismType::Door:
                     case MechanismType::Lock:
-                    msg += Telnet::brown() + "Key             " + Telnet::reset() + ": " + ToString(func.key) + "\n";
-                    msg += Telnet::brown() + "Difficulty      " + Telnet::reset() + ": " + ToString(func.difficulty)
+                    msg += Formatter::brown() + "Key             " + Formatter::reset() + ": " + ToString(func.key) + "\n";
+                    msg += Formatter::brown() + "Difficulty      " + Formatter::reset() + ": " + ToString(func.difficulty)
                         + "\n";
                     break;
                 case MechanismType::Picklock:
-                    msg += Telnet::brown() + "Efficency       " + Telnet::reset() + ": " + ToString(func.efficency)
+                    msg += Formatter::brown() + "Efficency       " + Formatter::reset() + ": " + ToString(func.efficency)
                         + "\n";
                     break;
                 case MechanismType::Lever:
-                    msg += Telnet::brown() + "Command         " + Telnet::reset() + ": " + ToString(func.command)
+                    msg += Formatter::brown() + "Command         " + Formatter::reset() + ": " + ToString(func.command)
                         + "\n";
-                    msg += Telnet::brown() + "Target          " + Telnet::reset() + ": " + ToString(func.target) + "\n";
+                    msg += Formatter::brown() + "Target          " + Formatter::reset() + ": " + ToString(func.target) + "\n";
                     break;
                 case MechanismType::None:
-                    msg += Telnet::brown() + "None" + Telnet::reset() + "\n";
+                    msg += Formatter::brown() + "None" + Formatter::reset() + "\n";
             }
             break;
         }
@@ -432,7 +432,7 @@ void DoItemCreate(Character * character, std::istream & sArgs)
     }
     character->addInventoryItem(item);
     character->sendMsg(
-        "You produce " + Telnet::yellow() + item->getName() + Telnet::reset()
+        "You produce " + Formatter::yellow() + item->getName() + Formatter::reset()
             + " out of your apparently empty top hat.\n");
 }
 
@@ -600,15 +600,15 @@ void DoAreaInfo(Character * character, std::istream & sArgs)
         return;
     }
     std::string msg;
-    msg += Telnet::green() + "# Area Informations:\n" + Telnet::reset();
-    msg += Telnet::yellow() + " Vnum            " + Telnet::reset() + ":" + ToString(area->vnum) + "\n";
-    msg += Telnet::yellow() + " Name            " + Telnet::reset() + ":" + area->name + "\n";
-    msg += Telnet::yellow() + " Builder         " + Telnet::reset() + ":" + area->builder + "\n";
-    msg += Telnet::yellow() + " Continent       " + Telnet::reset() + ":" + area->continent + "\n";
-    msg += Telnet::yellow() + " Width           " + Telnet::reset() + ":" + ToString(area->width) + "\n";
-    msg += Telnet::yellow() + " Height          " + Telnet::reset() + ":" + ToString(area->height) + "\n";
-    msg += Telnet::yellow() + " Elevation       " + Telnet::reset() + ":" + ToString(area->elevation) + "\n";
-    msg += Telnet::yellow() + " Number of Rooms " + Telnet::reset() + ":" + ToString(area->numRooms) + "\n";
+    msg += Formatter::green() + "# Area Informations:\n" + Formatter::reset();
+    msg += Formatter::yellow() + " Vnum            " + Formatter::reset() + ":" + ToString(area->vnum) + "\n";
+    msg += Formatter::yellow() + " Name            " + Formatter::reset() + ":" + area->name + "\n";
+    msg += Formatter::yellow() + " Builder         " + Formatter::reset() + ":" + area->builder + "\n";
+    msg += Formatter::yellow() + " Continent       " + Formatter::reset() + ":" + area->continent + "\n";
+    msg += Formatter::yellow() + " Width           " + Formatter::reset() + ":" + ToString(area->width) + "\n";
+    msg += Formatter::yellow() + " Height          " + Formatter::reset() + ":" + ToString(area->height) + "\n";
+    msg += Formatter::yellow() + " Elevation       " + Formatter::reset() + ":" + ToString(area->elevation) + "\n";
+    msg += Formatter::yellow() + " Number of Rooms " + Formatter::reset() + ":" + ToString(area->numRooms) + "\n";
     character->sendMsg(msg);
 }
 
@@ -636,15 +636,15 @@ void DoRoomInfo(Character * character, std::istream & sArgs)
         return;
     }
     std::string msg;
-    msg += Telnet::green() + "# Room Informations:\n" + Telnet::reset();
-    msg += Telnet::yellow() + " Vnum        " + Telnet::reset() + ":" + ToString(room->vnum) + "\n";
-    msg += Telnet::yellow() + " X           " + Telnet::reset() + ":" + ToString(room->coord.x) + "\n";
-    msg += Telnet::yellow() + " Y           " + Telnet::reset() + ":" + ToString(room->coord.y) + "\n";
-    msg += Telnet::yellow() + " Z           " + Telnet::reset() + ":" + ToString(room->coord.z) + "\n";
-    msg += Telnet::yellow() + " Name        " + Telnet::reset() + ":" + room->name + "\n";
-    msg += Telnet::yellow() + " Description " + Telnet::reset() + ":" + room->description + "\n";
-    msg += Telnet::yellow() + " Terrain     " + Telnet::reset() + ":" + room->terrain + "\n";
-    msg += Telnet::yellow() + " Flags       " + Telnet::reset() + ":" + GetRoomFlagString(room->flags) + "\n";
+    msg += Formatter::green() + "# Room Informations:\n" + Formatter::reset();
+    msg += Formatter::yellow() + " Vnum        " + Formatter::reset() + ":" + ToString(room->vnum) + "\n";
+    msg += Formatter::yellow() + " X           " + Formatter::reset() + ":" + ToString(room->coord.x) + "\n";
+    msg += Formatter::yellow() + " Y           " + Formatter::reset() + ":" + ToString(room->coord.y) + "\n";
+    msg += Formatter::yellow() + " Z           " + Formatter::reset() + ":" + ToString(room->coord.z) + "\n";
+    msg += Formatter::yellow() + " Name        " + Formatter::reset() + ":" + room->name + "\n";
+    msg += Formatter::yellow() + " Description " + Formatter::reset() + ":" + room->description + "\n";
+    msg += Formatter::yellow() + " Terrain     " + Formatter::reset() + ":" + room->terrain + "\n";
+    msg += Formatter::yellow() + " Flags       " + Formatter::reset() + ":" + GetRoomFlagString(room->flags) + "\n";
     character->sendMsg(msg);
 }
 
@@ -926,74 +926,74 @@ void DoMobileInfo(Character * character, std::istream & sArgs)
         return;
     }
     std::string msg;
-    msg += Telnet::green() + "# Mobile:\n" + Telnet::reset();
-    msg += Telnet::yellow() + "    Mobile Id    " + Telnet::reset() + ":" + mobile->id + "\n";
-    msg += Telnet::yellow() + "    Spawn Room   " + Telnet::reset() + ":" + ToString(mobile->respawnRoom->vnum) + "\n";
-    msg += Telnet::yellow() + "    Keys         " + Telnet::reset() + ": {";
+    msg += Formatter::green() + "# Mobile:\n" + Formatter::reset();
+    msg += Formatter::yellow() + "    Mobile Id    " + Formatter::reset() + ":" + mobile->id + "\n";
+    msg += Formatter::yellow() + "    Spawn Room   " + Formatter::reset() + ":" + ToString(mobile->respawnRoom->vnum) + "\n";
+    msg += Formatter::yellow() + "    Keys         " + Formatter::reset() + ": {";
     for (auto it : mobile->keys)
     {
         msg += " " + it;
     }
     msg += "}\n";
-    msg += Telnet::yellow() + "    Short Desc   " + Telnet::reset() + ":" + mobile->shortdesc + "\n";
-    msg += Telnet::yellow() + "    Static Desc  " + Telnet::reset() + ":" + mobile->staticdesc + "\n";
-    msg += Telnet::yellow() + "    Actions      " + Telnet::reset() + ": {";
+    msg += Formatter::yellow() + "    Short Desc   " + Formatter::reset() + ":" + mobile->shortdesc + "\n";
+    msg += Formatter::yellow() + "    Static Desc  " + Formatter::reset() + ":" + mobile->staticdesc + "\n";
+    msg += Formatter::yellow() + "    Actions      " + Formatter::reset() + ": {";
     for (auto it : mobile->actions)
     {
         msg += " " + it;
     }
     msg += "}\n";
-    msg += Telnet::yellow() + "    Alive        " + Telnet::reset() + ":" + ToString(mobile->alive) + "\n";
+    msg += Formatter::yellow() + "    Alive        " + Formatter::reset() + ":" + ToString(mobile->alive) + "\n";
     if (!mobile->alive)
     {
         // Get the current time.
         TimeClock currentTime = std::chrono::system_clock::now();
         // Evaluate the elapsed time.
         long int respawn = std::chrono::duration_cast<std::chrono::seconds>(currentTime - mobile->nextRespawn).count();
-        msg += Telnet::yellow() + "    Respawn In   " + Telnet::reset() + ":" + ToString(respawn) + "\n";
+        msg += Formatter::yellow() + "    Respawn In   " + Formatter::reset() + ":" + ToString(respawn) + "\n";
     }
     if (mobile->controller != nullptr)
     {
-        msg += Telnet::red() + "    Controller   " + Telnet::reset() + ":" + mobile->controller->getName() + "\n";
+        msg += Formatter::red() + "    Controller   " + Formatter::reset() + ":" + mobile->controller->getName() + "\n";
     }
-    msg += Telnet::red() + "    Lua Script   " + Telnet::reset() + ":" + mobile->lua_script + "\n";
+    msg += Formatter::red() + "    Lua Script   " + Formatter::reset() + ":" + mobile->lua_script + "\n";
 
-    msg += Telnet::green() + "# Chracter:\n" + Telnet::reset();
-    msg += Telnet::yellow() + "    Proper Noun  " + Telnet::reset() + ":" + mobile->name + "\n";
-    msg += Telnet::yellow() + "    Description  " + Telnet::reset() + ":" + mobile->description + "\n";
-    msg += Telnet::yellow() + "    Gender       " + Telnet::reset() + ":" + GetGenderTypeName(mobile->gender) + "\n";
-    msg += Telnet::yellow() + "    Weight       " + Telnet::reset() + ":" + ToString(mobile->weight) + "\n";
-    msg += Telnet::yellow() + "    Level        " + Telnet::reset() + ":" + ToString(mobile->level) + "\n";
-    msg += Telnet::yellow() + "    Flags        " + Telnet::reset() + ":" + ToString(mobile->flags) + "\n";
-    msg += Telnet::yellow() + "    Race         " + Telnet::reset() + ":" + mobile->race->name + "\n";
-    msg += Telnet::yellow() + "    Faction      " + Telnet::reset() + ":" + mobile->faction->name + "\n";
-    msg += Telnet::yellow() + "    Health       " + Telnet::reset() + ":" + ToString(mobile->health) + "\n";
-    msg += Telnet::yellow() + "    Stamina      " + Telnet::reset() + ":" + ToString(mobile->stamina) + "\n";
-    msg += Telnet::yellow() + "    Hunger       " + Telnet::reset() + ":" + ToString(mobile->hunger) + "\n";
-    msg += Telnet::yellow() + "    Thirst       " + Telnet::reset() + ":" + ToString(mobile->thirst) + "\n";
-    msg += Telnet::yellow() + "    Strength     " + Telnet::reset() + ":" + ToString(mobile->strength) + "\n";
-    msg += Telnet::yellow() + "    Agility      " + Telnet::reset() + ":" + ToString(mobile->agility) + "\n";
-    msg += Telnet::yellow() + "    Perception   " + Telnet::reset() + ":" + ToString(mobile->perception) + "\n";
-    msg += Telnet::yellow() + "    Constitution " + Telnet::reset() + ":" + ToString(mobile->constitution) + "\n";
-    msg += Telnet::yellow() + "    Intelligence " + Telnet::reset() + ":" + ToString(mobile->intelligence) + "\n";
-    msg += Telnet::yellow() + "    Current Room " + Telnet::reset() + ":" + ToString(mobile->room->vnum) + "\n";
-    msg += Telnet::yellow() + "    Inventory    " + Telnet::reset() + ":\n";
+    msg += Formatter::green() + "# Chracter:\n" + Formatter::reset();
+    msg += Formatter::yellow() + "    Proper Noun  " + Formatter::reset() + ":" + mobile->name + "\n";
+    msg += Formatter::yellow() + "    Description  " + Formatter::reset() + ":" + mobile->description + "\n";
+    msg += Formatter::yellow() + "    Gender       " + Formatter::reset() + ":" + GetGenderTypeName(mobile->gender) + "\n";
+    msg += Formatter::yellow() + "    Weight       " + Formatter::reset() + ":" + ToString(mobile->weight) + "\n";
+    msg += Formatter::yellow() + "    Level        " + Formatter::reset() + ":" + ToString(mobile->level) + "\n";
+    msg += Formatter::yellow() + "    Flags        " + Formatter::reset() + ":" + ToString(mobile->flags) + "\n";
+    msg += Formatter::yellow() + "    Race         " + Formatter::reset() + ":" + mobile->race->name + "\n";
+    msg += Formatter::yellow() + "    Faction      " + Formatter::reset() + ":" + mobile->faction->name + "\n";
+    msg += Formatter::yellow() + "    Health       " + Formatter::reset() + ":" + ToString(mobile->health) + "\n";
+    msg += Formatter::yellow() + "    Stamina      " + Formatter::reset() + ":" + ToString(mobile->stamina) + "\n";
+    msg += Formatter::yellow() + "    Hunger       " + Formatter::reset() + ":" + ToString(mobile->hunger) + "\n";
+    msg += Formatter::yellow() + "    Thirst       " + Formatter::reset() + ":" + ToString(mobile->thirst) + "\n";
+    msg += Formatter::yellow() + "    Strength     " + Formatter::reset() + ":" + ToString(mobile->strength) + "\n";
+    msg += Formatter::yellow() + "    Agility      " + Formatter::reset() + ":" + ToString(mobile->agility) + "\n";
+    msg += Formatter::yellow() + "    Perception   " + Formatter::reset() + ":" + ToString(mobile->perception) + "\n";
+    msg += Formatter::yellow() + "    Constitution " + Formatter::reset() + ":" + ToString(mobile->constitution) + "\n";
+    msg += Formatter::yellow() + "    Intelligence " + Formatter::reset() + ":" + ToString(mobile->intelligence) + "\n";
+    msg += Formatter::yellow() + "    Current Room " + Formatter::reset() + ":" + ToString(mobile->room->vnum) + "\n";
+    msg += Formatter::yellow() + "    Inventory    " + Formatter::reset() + ":\n";
     for (Item * item : mobile->inventory)
     {
         msg += "        " + item->getName() + "\n";
     }
-    msg += Telnet::yellow() + "    Equipment    " + Telnet::reset() + ":\n";
+    msg += Formatter::yellow() + "    Equipment    " + Formatter::reset() + ":\n";
     for (Item * item : mobile->equipment)
     {
         msg += "        " + item->getName() + "\n";
     }
-    msg += Telnet::yellow() + "    Posture      " + Telnet::reset() + ":" + GetPostureName(mobile->posture) + "\n";
-    msg += Telnet::yellow() + "    Effects      " + Telnet::reset() + ":\n";
+    msg += Formatter::yellow() + "    Posture      " + Formatter::reset() + ":" + GetPostureName(mobile->posture) + "\n";
+    msg += Formatter::yellow() + "    Effects      " + Formatter::reset() + ":\n";
     for (auto effect : mobile->effects.activeEffects)
     {
         msg += "                [" + ToString(effect.expires) + "] " + effect.name + "\n";
     }
-    msg += Telnet::yellow() + "    Action       " + Telnet::reset() + ":"
+    msg += Formatter::yellow() + "    Action       " + Formatter::reset() + ":"
         + GetActionTypeName(mobile->getAction()->getType())
         + "\n";
 
@@ -1273,53 +1273,53 @@ void DoPlayerInfo(Character * character, std::istream & sArgs)
         return;
     }
     std::string msg;
-    msg += Telnet::green() + "# Player:\n" + Telnet::reset();
-    msg += Telnet::yellow() + "    Age          " + Telnet::reset() + ":" + ToString(player->age) + "\n";
-    msg += Telnet::yellow() + "    Experience   " + Telnet::reset() + ":" + ToString(player->experience) + "\n";
-    msg += Telnet::yellow() + "    Prompt       " + Telnet::reset() + ":" + player->prompt + "\n";
-    msg += Telnet::yellow() + "    Rent Room    " + Telnet::reset() + ":" + ToString(player->rent_room) + "\n";
-    msg += Telnet::yellow() + "    Skills       " + Telnet::reset() + ":\n";
+    msg += Formatter::green() + "# Player:\n" + Formatter::reset();
+    msg += Formatter::yellow() + "    Age          " + Formatter::reset() + ":" + ToString(player->age) + "\n";
+    msg += Formatter::yellow() + "    Experience   " + Formatter::reset() + ":" + ToString(player->experience) + "\n";
+    msg += Formatter::yellow() + "    Prompt       " + Formatter::reset() + ":" + player->prompt + "\n";
+    msg += Formatter::yellow() + "    Rent Room    " + Formatter::reset() + ":" + ToString(player->rent_room) + "\n";
+    msg += Formatter::yellow() + "    Skills       " + Formatter::reset() + ":\n";
     for (auto iterator : Mud::instance().mudSkills)
     {
         msg += "        " + iterator.second.name + "[" + ToString(player->skills[iterator.first]) + "]\n";
     }
 
-    msg += Telnet::green() + "# Chracter:\n" + Telnet::reset();
-    msg += Telnet::yellow() + "    Proper Noun  " + Telnet::reset() + ":" + player->name + "\n";
-    msg += Telnet::yellow() + "    Description  " + Telnet::reset() + ":" + player->description + "\n";
-    msg += Telnet::yellow() + "    Gender       " + Telnet::reset() + ":" + GetGenderTypeName(player->gender) + "\n";
-    msg += Telnet::yellow() + "    Weight       " + Telnet::reset() + ":" + ToString(player->weight) + "\n";
-    msg += Telnet::yellow() + "    Level        " + Telnet::reset() + ":" + ToString(player->level) + "\n";
-    msg += Telnet::yellow() + "    Flags        " + Telnet::reset() + ":" + ToString(player->flags) + "\n";
-    msg += Telnet::yellow() + "    Race         " + Telnet::reset() + ":" + player->race->name + "\n";
-    msg += Telnet::yellow() + "    Faction      " + Telnet::reset() + ":" + player->faction->name + "\n";
-    msg += Telnet::yellow() + "    Health       " + Telnet::reset() + ":" + ToString(player->health) + "\n";
-    msg += Telnet::yellow() + "    Stamina      " + Telnet::reset() + ":" + ToString(player->stamina) + "\n";
-    msg += Telnet::yellow() + "    Hunger       " + Telnet::reset() + ":" + ToString(player->hunger) + "\n";
-    msg += Telnet::yellow() + "    Thirst       " + Telnet::reset() + ":" + ToString(player->thirst) + "\n";
-    msg += Telnet::yellow() + "    Strength     " + Telnet::reset() + ":" + ToString(player->strength) + "\n";
-    msg += Telnet::yellow() + "    Agility      " + Telnet::reset() + ":" + ToString(player->agility) + "\n";
-    msg += Telnet::yellow() + "    Perception   " + Telnet::reset() + ":" + ToString(player->perception) + "\n";
-    msg += Telnet::yellow() + "    Constitution " + Telnet::reset() + ":" + ToString(player->constitution) + "\n";
-    msg += Telnet::yellow() + "    Intelligence " + Telnet::reset() + ":" + ToString(player->intelligence) + "\n";
-    msg += Telnet::yellow() + "    Current Room " + Telnet::reset() + ":" + ToString(player->room->vnum) + "\n";
-    msg += Telnet::yellow() + "    Inventory    " + Telnet::reset() + ":\n";
+    msg += Formatter::green() + "# Chracter:\n" + Formatter::reset();
+    msg += Formatter::yellow() + "    Proper Noun  " + Formatter::reset() + ":" + player->name + "\n";
+    msg += Formatter::yellow() + "    Description  " + Formatter::reset() + ":" + player->description + "\n";
+    msg += Formatter::yellow() + "    Gender       " + Formatter::reset() + ":" + GetGenderTypeName(player->gender) + "\n";
+    msg += Formatter::yellow() + "    Weight       " + Formatter::reset() + ":" + ToString(player->weight) + "\n";
+    msg += Formatter::yellow() + "    Level        " + Formatter::reset() + ":" + ToString(player->level) + "\n";
+    msg += Formatter::yellow() + "    Flags        " + Formatter::reset() + ":" + ToString(player->flags) + "\n";
+    msg += Formatter::yellow() + "    Race         " + Formatter::reset() + ":" + player->race->name + "\n";
+    msg += Formatter::yellow() + "    Faction      " + Formatter::reset() + ":" + player->faction->name + "\n";
+    msg += Formatter::yellow() + "    Health       " + Formatter::reset() + ":" + ToString(player->health) + "\n";
+    msg += Formatter::yellow() + "    Stamina      " + Formatter::reset() + ":" + ToString(player->stamina) + "\n";
+    msg += Formatter::yellow() + "    Hunger       " + Formatter::reset() + ":" + ToString(player->hunger) + "\n";
+    msg += Formatter::yellow() + "    Thirst       " + Formatter::reset() + ":" + ToString(player->thirst) + "\n";
+    msg += Formatter::yellow() + "    Strength     " + Formatter::reset() + ":" + ToString(player->strength) + "\n";
+    msg += Formatter::yellow() + "    Agility      " + Formatter::reset() + ":" + ToString(player->agility) + "\n";
+    msg += Formatter::yellow() + "    Perception   " + Formatter::reset() + ":" + ToString(player->perception) + "\n";
+    msg += Formatter::yellow() + "    Constitution " + Formatter::reset() + ":" + ToString(player->constitution) + "\n";
+    msg += Formatter::yellow() + "    Intelligence " + Formatter::reset() + ":" + ToString(player->intelligence) + "\n";
+    msg += Formatter::yellow() + "    Current Room " + Formatter::reset() + ":" + ToString(player->room->vnum) + "\n";
+    msg += Formatter::yellow() + "    Inventory    " + Formatter::reset() + ":\n";
     for (Item * item : player->inventory)
     {
         msg += "        " + item->getName() + "\n";
     }
-    msg += Telnet::yellow() + "    Equipment    " + Telnet::reset() + ":\n";
+    msg += Formatter::yellow() + "    Equipment    " + Formatter::reset() + ":\n";
     for (Item * item : player->equipment)
     {
         msg += "        " + item->getName() + "\n";
     }
-    msg += Telnet::yellow() + "    Posture      " + Telnet::reset() + ":" + GetPostureName(player->posture) + "\n";
-    msg += Telnet::yellow() + "    Effects      " + Telnet::reset() + ":\n";
+    msg += Formatter::yellow() + "    Posture      " + Formatter::reset() + ":" + GetPostureName(player->posture) + "\n";
+    msg += Formatter::yellow() + "    Effects      " + Formatter::reset() + ":\n";
     for (auto effect : player->effects.activeEffects)
     {
         msg += "                [" + ToString(effect.expires) + "] " + effect.name + "\n";
     }
-    msg += Telnet::yellow() + "    Action       " + Telnet::reset() + ":"
+    msg += Formatter::yellow() + "    Action       " + Formatter::reset() + ":"
         + GetActionTypeName(player->getAction()->getType())
         + "\n";
     character->sendMsg(msg);
@@ -1341,12 +1341,12 @@ void DoMaterialInfo(Character * character, std::istream & sArgs)
         return;
     }
     std::string msg;
-    msg += Telnet::yellow() + "Vnum            " + Telnet::reset() + ": " + ToString(material->vnum) + "\n";
-    msg += Telnet::yellow() + "Type            " + Telnet::reset() + ": " + GetMaterialTypeName(material->type) + "\n";
-    msg += Telnet::yellow() + "Name            " + Telnet::reset() + ": " + material->name + "\n";
-    msg += Telnet::yellow() + "Worth           " + Telnet::reset() + ": " + ToString(material->worth) + "\n";
-    msg += Telnet::yellow() + "Hardness        " + Telnet::reset() + ": " + ToString(material->hardness) + "\n";
-    msg += Telnet::yellow() + "Lightness       " + Telnet::reset() + ": " + ToString(material->lightness) + "\n";
+    msg += Formatter::yellow() + "Vnum            " + Formatter::reset() + ": " + ToString(material->vnum) + "\n";
+    msg += Formatter::yellow() + "Type            " + Formatter::reset() + ": " + GetMaterialTypeName(material->type) + "\n";
+    msg += Formatter::yellow() + "Name            " + Formatter::reset() + ": " + material->name + "\n";
+    msg += Formatter::yellow() + "Worth           " + Formatter::reset() + ": " + ToString(material->worth) + "\n";
+    msg += Formatter::yellow() + "Hardness        " + Formatter::reset() + ": " + ToString(material->hardness) + "\n";
+    msg += Formatter::yellow() + "Lightness       " + Formatter::reset() + ": " + ToString(material->lightness) + "\n";
     character->sendMsg(msg);
 }
 
@@ -1408,9 +1408,9 @@ void DoLiquidInfo(Character * character, std::istream & sArgs)
         return;
     }
     std::string msg;
-    msg += Telnet::yellow() + "Vnum            " + Telnet::reset() + ": " + ToString(liquid->vnum) + "\n";
-    msg += Telnet::yellow() + "Name            " + Telnet::reset() + ": " + liquid->getNameCapital() + "\n";
-    msg += Telnet::yellow() + "Worth           " + Telnet::reset() + ": " + ToString(liquid->worth) + "\n";
+    msg += Formatter::yellow() + "Vnum            " + Formatter::reset() + ": " + ToString(liquid->vnum) + "\n";
+    msg += Formatter::yellow() + "Name            " + Formatter::reset() + ": " + liquid->getNameCapital() + "\n";
+    msg += Formatter::yellow() + "Worth           " + Formatter::reset() + ": " + ToString(liquid->worth) + "\n";
     character->sendMsg(msg);
 }
 
@@ -1466,17 +1466,17 @@ void DoProfessionInfo(Character * character, std::istream & sArgs)
         return;
     }
     std::string msg;
-    msg += Telnet::yellow() + "Name          " + Telnet::reset() + ": " + profession->name + "\n";
-    msg += Telnet::yellow() + "Description   " + Telnet::reset() + ": " + profession->description + "\n";
-    msg += Telnet::yellow() + "Command       " + Telnet::reset() + ": " + profession->command + "\n";
-    msg += Telnet::yellow() + "Posture       " + Telnet::reset() + ": " + GetPostureName(profession->posture) + "\n";
-    msg += Telnet::yellow() + "Action        " + Telnet::reset() + ": " + profession->action + "\n";
-    msg += Telnet::yellow() + "    Start     " + Telnet::reset() + ": " + profession->startMessage + "\n";
-    msg += Telnet::yellow() + "    Finish    " + Telnet::reset() + ": " + profession->finishMessage + "\n";
-    msg += Telnet::yellow() + "    Success   " + Telnet::reset() + ": " + profession->successMessage + "\n";
-    msg += Telnet::yellow() + "    Failure   " + Telnet::reset() + ": " + profession->failureMessage + "\n";
-    msg += Telnet::yellow() + "    Interrupt " + Telnet::reset() + ": " + profession->interruptMessage + "\n";
-    msg += Telnet::yellow() + "    Not Found " + Telnet::reset() + ": " + profession->notFoundMessage + "\n";
+    msg += Formatter::yellow() + "Name          " + Formatter::reset() + ": " + profession->name + "\n";
+    msg += Formatter::yellow() + "Description   " + Formatter::reset() + ": " + profession->description + "\n";
+    msg += Formatter::yellow() + "Command       " + Formatter::reset() + ": " + profession->command + "\n";
+    msg += Formatter::yellow() + "Posture       " + Formatter::reset() + ": " + GetPostureName(profession->posture) + "\n";
+    msg += Formatter::yellow() + "Action        " + Formatter::reset() + ": " + profession->action + "\n";
+    msg += Formatter::yellow() + "    Start     " + Formatter::reset() + ": " + profession->startMessage + "\n";
+    msg += Formatter::yellow() + "    Finish    " + Formatter::reset() + ": " + profession->finishMessage + "\n";
+    msg += Formatter::yellow() + "    Success   " + Formatter::reset() + ": " + profession->successMessage + "\n";
+    msg += Formatter::yellow() + "    Failure   " + Formatter::reset() + ": " + profession->failureMessage + "\n";
+    msg += Formatter::yellow() + "    Interrupt " + Formatter::reset() + ": " + profession->interruptMessage + "\n";
+    msg += Formatter::yellow() + "    Not Found " + Formatter::reset() + ": " + profession->notFoundMessage + "\n";
     character->sendMsg(msg);
 }
 

@@ -943,49 +943,49 @@ string Character::getLook(Character * character)
     output += ToCapitals(sent_pronoun) + " " + sent_be + " wearing:\n";
 
     // Equipment Slot : HEAD
-    output += "    " + Telnet::yellow() + "Head" + Telnet::reset() + "       : ";
-    output += (head != nullptr) ? Telnet::cyan() + head->getNameCapital() : Telnet::gray() + "Nothing";
-    output += Telnet::reset() + ".\n";
+    output += "    " + Formatter::yellow() + "Head" + Formatter::reset() + "       : ";
+    output += (head != nullptr) ? Formatter::cyan() + head->getNameCapital() : Formatter::gray() + "Nothing";
+    output += Formatter::reset() + ".\n";
     // Equipment Slot : BACK
-    output += "    " + Telnet::yellow() + "Back" + Telnet::reset() + "       : ";
-    output += (back != nullptr) ? Telnet::cyan() + back->getNameCapital() : Telnet::gray() + "Nothing";
-    output += Telnet::reset() + ".\n";
+    output += "    " + Formatter::yellow() + "Back" + Formatter::reset() + "       : ";
+    output += (back != nullptr) ? Formatter::cyan() + back->getNameCapital() : Formatter::gray() + "Nothing";
+    output += Formatter::reset() + ".\n";
     // Equipment Slot : TORSO
-    output += "    " + Telnet::yellow() + "Torso" + Telnet::reset() + "      : ";
-    output += (torso != nullptr) ? Telnet::cyan() + torso->getNameCapital() : Telnet::gray() + "Nothing";
-    output += Telnet::reset() + ".\n";
+    output += "    " + Formatter::yellow() + "Torso" + Formatter::reset() + "      : ";
+    output += (torso != nullptr) ? Formatter::cyan() + torso->getNameCapital() : Formatter::gray() + "Nothing";
+    output += Formatter::reset() + ".\n";
     // Equipment Slot : LEGS
-    output += "    " + Telnet::yellow() + "Legs" + Telnet::reset() + "       : ";
-    output += (legs != nullptr) ? Telnet::cyan() + legs->getNameCapital() : Telnet::gray() + "Nothing";
-    output += Telnet::reset() + ".\n";
+    output += "    " + Formatter::yellow() + "Legs" + Formatter::reset() + "       : ";
+    output += (legs != nullptr) ? Formatter::cyan() + legs->getNameCapital() : Formatter::gray() + "Nothing";
+    output += Formatter::reset() + ".\n";
     // Equipment Slot : FEET
-    output += "    " + Telnet::yellow() + "Feet" + Telnet::reset() + "       : ";
-    output += (feet != nullptr) ? Telnet::cyan() + feet->getNameCapital() : Telnet::gray() + "Nothing";
-    output += Telnet::reset() + ".\n";
+    output += "    " + Formatter::yellow() + "Feet" + Formatter::reset() + "       : ";
+    output += (feet != nullptr) ? Formatter::cyan() + feet->getNameCapital() : Formatter::gray() + "Nothing";
+    output += Formatter::reset() + ".\n";
 
     // Print what is wielding.
     if (right != nullptr)
     {
         if (HasFlag(right->model->flags, ModelFlag::TwoHand))
         {
-            output += "    " + Telnet::yellow() + "Both Hands" + Telnet::reset() + " : ";
+            output += "    " + Formatter::yellow() + "Both Hands" + Formatter::reset() + " : ";
         }
         else
         {
-            output += "    " + Telnet::yellow() + "Right Hand" + Telnet::reset() + " : ";
+            output += "    " + Formatter::yellow() + "Right Hand" + Formatter::reset() + " : ";
         }
-        output += Telnet::cyan() + right->getNameCapital() + Telnet::reset() + ".\n";
+        output += Formatter::cyan() + right->getNameCapital() + Formatter::reset() + ".\n";
     }
     else
     {
-        output += "    " + Telnet::yellow() + "Right Hand" + Telnet::reset() + " : " + "Nothing";
+        output += "    " + Formatter::yellow() + "Right Hand" + Formatter::reset() + " : " + "Nothing";
     }
     output += ".\n";
 
     if (left != nullptr)
     {
-        output += "    " + Telnet::yellow() + "Left Hand" + Telnet::reset() + "  : ";
-        output += Telnet::cyan() + left->getNameCapital() + Telnet::reset() + ".\n";
+        output += "    " + Formatter::yellow() + "Left Hand" + Formatter::reset() + "  : ";
+        output += Formatter::cyan() + left->getNameCapital() + Formatter::reset() + ".\n";
     }
     return output;
 }

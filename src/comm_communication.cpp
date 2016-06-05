@@ -33,7 +33,8 @@ void DoSay(Character * character, std::istream & sArgs)
     getline(sArgs, message);
     if (message.empty())
     {
-        throw std::runtime_error("My dear friend, say what?\n");
+        character->sendMsg("My dear friend, say what?\n");
+        return;
     }
 
     // //////////////////////////////////////////
@@ -43,7 +44,8 @@ void DoSay(Character * character, std::istream & sArgs)
         std::vector<std::string> arguments = GetWords(message);
         if (arguments.size() <= 0)
         {
-            throw std::runtime_error("My dear friend, say what?\n");
+            character->sendMsg("My dear friend, say what?\n");
+            return;
         }
         target = arguments[0];
     }
@@ -55,7 +57,8 @@ void DoSay(Character * character, std::istream & sArgs)
 
     // //////////////////////////////////////////
     // Check if the speaker is invisible.
-    std::string chName = (HasFlag(character->flags, CharacterFlag::Invisible)) ? "Someone" : character->getNameCapital();
+    std::string chName =
+        (HasFlag(character->flags, CharacterFlag::Invisible)) ? "Someone" : character->getNameCapital();
 
     // //////////////////////////////////////////
     // Check if the character are talking to another character.
@@ -66,23 +69,23 @@ void DoSay(Character * character, std::istream & sArgs)
         message = message.substr(target.size(), message.size());
         if (message.empty())
         {
-            throw std::runtime_error("My dear friend, say what to " + receiver->getName() + "?\n");
+            character->sendMsg("My dear friend, say what to %s?\n", receiver->getName());
+            return;
         }
         // Eat the space between the name and the message.
         message = Trim(message, " ");
         // Player send.
-        character->sendMsg(
-            "You say to " + receiver->getName() + ", \"" + Telnet::cyan() + Telnet::italic() + message + Telnet::reset()
-                + "\"\n");
+        character->sendMsg("You say to %s, \"%s\"\n",
+            receiver->getName(), Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
 
         // Target receive.
-        receiver->sendMsg(
-            chName + " say to you, \"" + Telnet::cyan() + Telnet::italic() + message + Telnet::reset() + "\"\n\n");
+        receiver->sendMsg("%s say to you, \"%s\"\n\n",
+            chName, Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
 
         // Other in room.
         character->room->sendToAll(
-            chName + " says to " + receiver->getName() + ", \"" + Telnet::cyan() + Telnet::italic() + message
-                + Telnet::reset() + "\".\n", character, receiver);
+            chName + "%s says to " + receiver->getName() + ", \"" + Formatter::cyan() + Formatter::italic() + message
+                + Formatter::reset() + "\".\n", character, receiver);
 
         // If it's a mobile, activate the trigger.
         if (receiver->isMobile())
@@ -92,9 +95,11 @@ void DoSay(Character * character, std::istream & sArgs)
     }
     else
     {
-        character->sendMsg("You say \"" + Telnet::cyan() + Telnet::italic() + message + Telnet::reset() + "\".\n");
+        character->sendMsg(
+            "You say \"" + Formatter::cyan() + Formatter::italic() + message + Formatter::reset() + "\".\n");
         character->room->sendToAll(
-            chName + " says \"" + Telnet::cyan() + Telnet::italic() + message + Telnet::reset() + "\".\n", character);
+            chName + " says \"" + Formatter::cyan() + Formatter::italic() + message + Formatter::reset() + "\".\n",
+            character);
     }
 }
 
@@ -116,7 +121,8 @@ void DoWhisper(Character * character, std::istream & sArgs)
 
     // //////////////////////////////////////////
     // Check if the speaker is invisible.
-    std::string chName = (HasFlag(character->flags, CharacterFlag::Invisible)) ? "Someone" : character->getNameCapital();
+    std::string chName =
+        (HasFlag(character->flags, CharacterFlag::Invisible)) ? "Someone" : character->getNameCapital();
 
     // //////////////////////////////////////////
     // Check the existance of the target character.
@@ -138,8 +144,10 @@ void DoWhisper(Character * character, std::istream & sArgs)
     // //////////////////////////////////////////
     // Send the message.
     character->sendMsg(
-        Telnet::magenta() + "You whisper to " + receiver->getName() + ", " + Telnet::reset() + "\"" + message + "\"\n");
-    receiver->sendMsg(Telnet::magenta() + chName + " whisper to you, " + Telnet::reset() + "\"" + message + "\"\n\n");
+        Formatter::magenta() + "You whisper to " + receiver->getName() + ", " + Formatter::reset() + "\"" + message
+            + "\"\n");
+    receiver->sendMsg(
+        Formatter::magenta() + chName + " whisper to you, " + Formatter::reset() + "\"" + message + "\"\n\n");
 }
 
 void DoEmote(Character * character, std::istream & sArgs)
@@ -156,12 +164,13 @@ void DoEmote(Character * character, std::istream & sArgs)
 
     // //////////////////////////////////////////
     // Check if the character is invisible.
-    std::string chName = (HasFlag(character->flags, CharacterFlag::Invisible)) ? "Someone" : character->getNameCapital();
+    std::string chName =
+        (HasFlag(character->flags, CharacterFlag::Invisible)) ? "Someone" : character->getNameCapital();
 
     // //////////////////////////////////////////
     // Send the emote.
-    character->sendMsg(Telnet::yellow() + "You " + emote + Telnet::reset() + "\n");
-    character->room->sendToAll(Telnet::yellow() + chName + " " + emote + Telnet::reset() + "\n", character);
+    character->sendMsg(Formatter::yellow() + "You " + emote + Formatter::reset() + "\n");
+    character->room->sendToAll(Formatter::yellow() + chName + " " + emote + Formatter::reset() + "\n", character);
 }
 
 void DoBug(Character * character, std::istream & sArgs)

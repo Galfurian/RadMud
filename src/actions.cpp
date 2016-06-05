@@ -814,7 +814,7 @@ void Action::performCraft()
     // Send conclusion message.
     std::string msg;
     msg += "\n" + production->profession->finishMessage;
-    msg += " " + Telnet::yellow() + createdItems.back()->getName() + Telnet::reset() + ".\n\n";
+    msg += " " + Formatter::yellow() + createdItems.back()->getName() + Formatter::reset() + ".\n\n";
     actor->sendMsg(msg);
 
     if (dropped)
@@ -912,7 +912,7 @@ void Action::performBuild()
     // Send conclusion message.
     std::string msg;
     msg += "You have finished building";
-    msg += " " + Telnet::yellow() + schematics->buildingModel->getName() + Telnet::reset() + ".\n\n";
+    msg += " " + Formatter::yellow() + schematics->buildingModel->getName() + Formatter::reset() + ".\n\n";
     actor->sendMsg(msg);
 
     // Return the character in waiting status.

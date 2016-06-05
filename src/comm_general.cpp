@@ -183,7 +183,7 @@ void DoWho(Character * character, std::istream & sArgs)
             { iterator->getName(), location });
     }
     output += table.getTable();
-    output += "# Total " + Telnet::yellow() + "Players" + Telnet::reset() + " :" + ToString(table.getNumRows()) + "\n";
+    output += "# Total " + Formatter::yellow() + "Players" + Formatter::reset() + " :" + ToString(table.getNumRows()) + "\n";
     character->sendMsg(output);
 }
 
@@ -372,10 +372,10 @@ void DoHelp(Character * character, std::istream & sArgs)
             {
                 std::string msg;
                 msg += "Showing help for command :" + iterator.name + "\n";
-                msg += Telnet::yellow() + " Command   : " + Telnet::reset() + iterator.name + "\n";
-                msg += Telnet::yellow() + " Level     : " + Telnet::reset() + ToString(iterator.level) + "\n";
-                msg += Telnet::yellow() + " Arguments : " + Telnet::reset() + iterator.args + "\n";
-                msg += Telnet::yellow() + " Help      : " + Telnet::reset() + iterator.help + "\n";
+                msg += Formatter::yellow() + " Command   : " + Formatter::reset() + iterator.name + "\n";
+                msg += Formatter::yellow() + " Level     : " + Formatter::reset() + ToString(iterator.level) + "\n";
+                msg += Formatter::yellow() + " Arguments : " + Formatter::reset() + iterator.args + "\n";
+                msg += Formatter::yellow() + " Help      : " + Formatter::reset() + iterator.help + "\n";
                 character->sendMsg(msg);
                 return;
             }
@@ -396,26 +396,26 @@ void DoPrompt(Character * character, std::istream & sArgs)
     {
         player->sendMsg("Current prompt:\n");
         player->sendMsg(player->prompt + "\n");
-        player->sendMsg("Type " + Telnet::yellow() + "prompt help" + Telnet::reset() + " to read the guide.\n");
+        player->sendMsg("Type " + Formatter::yellow() + "prompt help" + Formatter::reset() + " to read the guide.\n");
         return;
     }
 
     if (GetWords(prompt)[0] == "help")
     {
-        player->sendMsg(Telnet::yellow() + "Prompt Help" + Telnet::reset() + "\n");
+        player->sendMsg(Formatter::yellow() + "Prompt Help" + Formatter::reset() + "\n");
         player->sendMsg("You can set the prompt you prefer, respectfully to this constraints:\n");
         player->sendMsg(" - Not more than 15 characters.\n");
         player->sendMsg("\n");
         player->sendMsg("You can use the following shortcuts in you prompt:\n");
-        player->sendMsg("    " + Telnet::italic() + "&n" + Telnet::reset() + " - Replace with player name.\n");
+        player->sendMsg("    " + Formatter::italic() + "&n" + Formatter::reset() + " - Replace with player name.\n");
         player->sendMsg(
-            "    " + Telnet::italic() + "&N" + Telnet::reset() + " - Replace with player name capitalized.\n");
+            "    " + Formatter::italic() + "&N" + Formatter::reset() + " - Replace with player name capitalized.\n");
         player->sendMsg(
-            "    " + Telnet::italic() + "&h" + Telnet::reset() + " - Replace with player current health.\n");
-        player->sendMsg("    " + Telnet::italic() + "&H" + Telnet::reset() + " - Replace with player max health.\n");
+            "    " + Formatter::italic() + "&h" + Formatter::reset() + " - Replace with player current health.\n");
+        player->sendMsg("    " + Formatter::italic() + "&H" + Formatter::reset() + " - Replace with player max health.\n");
         player->sendMsg(
-            "    " + Telnet::italic() + "&s" + Telnet::reset() + " - Replace with player current stamina.\n");
-        player->sendMsg("    " + Telnet::italic() + "&S" + Telnet::reset() + " - Replace with player max stamina.\n");
+            "    " + Formatter::italic() + "&s" + Formatter::reset() + " - Replace with player current stamina.\n");
+        player->sendMsg("    " + Formatter::italic() + "&S" + Formatter::reset() + " - Replace with player max stamina.\n");
         return;
     }
     player->prompt = prompt;
@@ -428,19 +428,19 @@ void DoTime(Character * character, std::istream & sArgs)
 
     if (MudUpdater::instance().getDayPhase() == DayPhase::Morning)
     {
-        character->sendMsg(Telnet::yellow() + "The sun has just risen.\n" + Telnet::reset());
+        character->sendMsg(Formatter::yellow() + "The sun has just risen.\n" + Formatter::reset());
     }
     else if (MudUpdater::instance().getDayPhase() == DayPhase::Day)
     {
-        character->sendMsg(Telnet::yellow() + "The sun is high in the sky.\n" + Telnet::reset());
+        character->sendMsg(Formatter::yellow() + "The sun is high in the sky.\n" + Formatter::reset());
     }
     else if (MudUpdater::instance().getDayPhase() == DayPhase::Dusk)
     {
-        character->sendMsg(Telnet::cyan() + "The sun is setting, the shadows begin to prevail.\n" + Telnet::reset());
+        character->sendMsg(Formatter::cyan() + "The sun is setting, the shadows begin to prevail.\n" + Formatter::reset());
     }
     else if (MudUpdater::instance().getDayPhase() == DayPhase::Night)
     {
-        character->sendMsg(Telnet::blue() + "The darkness surrounds you.\n" + Telnet::reset());
+        character->sendMsg(Formatter::blue() + "The darkness surrounds you.\n" + Formatter::reset());
     }
 }
 
@@ -516,28 +516,28 @@ void DoStatistics(Character * character, std::istream & sArgs)
     Player * player = character->toPlayer();
 
     std::string msg;
-    msg += Telnet::magenta() + "Name: " + Telnet::reset() + player->getName();
-    msg += Telnet::magenta() + " Race: " + Telnet::reset() + player->race->name + "\n";
-    msg += Telnet::magenta() + "Gender: " + Telnet::reset() + GetGenderTypeName(player->gender) + "\n";
-    msg += Telnet::magenta() + "Affiliation: " + Telnet::reset() + player->faction->name + "\n";
-    msg += Telnet::magenta() + "Experience: " + Telnet::reset() + ToString(player->experience) + " px\n";
-    msg += Telnet::magenta() + "Str " + Telnet::reset() + ToString(player->strength);
+    msg += Formatter::magenta() + "Name: " + Formatter::reset() + player->getName();
+    msg += Formatter::magenta() + " Race: " + Formatter::reset() + player->race->name + "\n";
+    msg += Formatter::magenta() + "Gender: " + Formatter::reset() + GetGenderTypeName(player->gender) + "\n";
+    msg += Formatter::magenta() + "Affiliation: " + Formatter::reset() + player->faction->name + "\n";
+    msg += Formatter::magenta() + "Experience: " + Formatter::reset() + ToString(player->experience) + " px\n";
+    msg += Formatter::magenta() + "Str " + Formatter::reset() + ToString(player->strength);
     msg += "(" + ToString(player->effects.getStrMod()) + ") | ";
-    msg += Telnet::magenta() + "Agi " + Telnet::reset() + ToString(player->agility);
+    msg += Formatter::magenta() + "Agi " + Formatter::reset() + ToString(player->agility);
     msg += "(" + ToString(player->effects.getAgiMod()) + ") | ";
-    msg += Telnet::magenta() + "Per " + Telnet::reset() + ToString(player->perception);
+    msg += Formatter::magenta() + "Per " + Formatter::reset() + ToString(player->perception);
     msg += "(" + ToString(player->effects.getPerMod()) + ") | ";
-    msg += Telnet::magenta() + "Con " + Telnet::reset() + ToString(player->constitution);
+    msg += Formatter::magenta() + "Con " + Formatter::reset() + ToString(player->constitution);
     msg += "(" + ToString(player->effects.getConMod()) + ") | ";
-    msg += Telnet::magenta() + "Int " + Telnet::reset() + ToString(player->intelligence);
+    msg += Formatter::magenta() + "Int " + Formatter::reset() + ToString(player->intelligence);
     msg += "(" + ToString(player->effects.getIntMod()) + ") \n";
-    msg += Telnet::magenta() + "Health " + Telnet::reset() + ToString(player->health) + "/"
+    msg += Formatter::magenta() + "Health " + Formatter::reset() + ToString(player->health) + "/"
         + ToString(player->getMaxHealth());
     msg += "(" + ToString(player->effects.getHealthMod()) + ") ";
-    msg += Telnet::magenta() + "Stamina " + Telnet::reset() + ToString(player->stamina) + "/"
+    msg += Formatter::magenta() + "Stamina " + Formatter::reset() + ToString(player->stamina) + "/"
         + ToString(player->getMaxStamina());
     msg += "(" + ToString(player->effects.getHealthMod()) + ")\n";
-    msg += Telnet::magenta() + "Armor Class " + Telnet::reset() + ToString(player->getArmorClass()) + "\n";
+    msg += Formatter::magenta() + "Armor Class " + Formatter::reset() + ToString(player->getArmorClass()) + "\n";
     msg += "You " + player->getHunger();
     msg += "You " + player->getThirst();
     msg += "You are " + GetPostureName(player->posture) + ".\n";
@@ -578,7 +578,7 @@ void DoSkills(Character * character, std::istream & sArgs)
     // Check no more input.
     NoMore(character, sArgs);
 
-    player->sendMsg("     ##    " + Telnet::yellow() + "LvL" + Telnet::green() + "    Skill" + Telnet::reset() + "\n");
+    player->sendMsg("     ##    " + Formatter::yellow() + "LvL" + Formatter::green() + "    Skill" + Formatter::reset() + "\n");
     for (auto iterator : player->skills)
     {
         Skill * skill = Mud::instance().findSkill(iterator.first);

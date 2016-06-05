@@ -111,6 +111,12 @@ class Area
         /// @return The map containing all the Information about the Field of View of a character.
         std::vector<std::string> drawFov(Room * centerRoom, unsigned int radius);
 
+        /// @brief Draw the Filed of View for a character (ASCII).
+        /// @param centerRoom The room from where the algorithm has to compute the Field of View.
+        /// @param radius     The radius of visibility of the character.
+        /// @return The map containing all the Information about the Field of View of a character.
+        std::string drawASCIIFov(Room * centerRoom, unsigned int radius);
+
         /// @brief Default version of a FOV alforithm.
         /// @param map      A 2D map, where the the Field of View will be drawn.
         /// @param origin_x The x coordinate of the central room.

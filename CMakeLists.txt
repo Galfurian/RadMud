@@ -97,7 +97,7 @@ set(PROJECT_SRC
     ./src/utilities/coordinates.cpp
     ./src/utilities/table.cpp
     ./src/utils.cpp
-    ./src/telnet.cpp
+    ./src/formatter.cpp
     ./src/combat.cpp
     ./src/logger.cpp
 )

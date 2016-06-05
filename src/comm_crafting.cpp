@@ -107,7 +107,7 @@ void DoProfession(Character * character, Profession * profession, std::istream &
     // //////////////////////////////////////////
     std::string charMsg;
     charMsg += profession->startMessage;
-    charMsg += " " + Telnet::yellow() + production->outcome.first->getName() + Telnet::reset() + ".\n";
+    charMsg += " " + Formatter::yellow() + production->outcome.first->getName() + Formatter::reset() + ".\n";
     character->sendMsg(charMsg);
 
     std::string roomMsg;
@@ -205,7 +205,7 @@ void DoBuild(Character * character, std::istream & sArgs)
     // //////////////////////////////////////////
     std::string charMsg;
     charMsg += "You start building";
-    charMsg += " " + Telnet::yellow() + schematics->buildingModel->getName() + Telnet::reset() + ".\n";
+    charMsg += " " + Formatter::yellow() + schematics->buildingModel->getName() + Formatter::reset() + ".\n";
     character->sendMsg(charMsg);
 
     // //////////////////////////////////////////

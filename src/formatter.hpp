@@ -1,5 +1,5 @@
-/// @file   telnet.hpp
-/// @brief  Define telnet class.
+/// @file   formatter.hpp
+/// @brief  Define the formatter class.
 /// @author Enrico Fraccaroli
 /// @date   Jan 25 2016
 /// @copyright
@@ -16,21 +16,15 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef TELNET_HPP
-#define TELNET_HPP
+#ifndef FORMATTER_HPP
+#define FORMATTER_HPP
 
 #include <string>
 
-/// @brief Telnet command generator.
-class Telnet
+/// @brief Multi-Format controller.
+class Formatter
 {
     private:
-        /// @brief Constructor.
-        Telnet();
-
-        /// @brief Constructor.
-        ~Telnet();
-
         /// List of telnet commands.
         enum TelnetChar
         {
@@ -77,15 +71,22 @@ class Telnet
             FORMAT = 100
         };
 
-        /// @brief Returns the string which identifies the start of a format section.
-        /// @return The IAC:DO:FORMAT command.
-        static std::string doFormat();
-
-        /// @brief Returns the string which identifies the end of a format section.
-        /// @return The IAC:DONT:FORMAT command.
-        static std::string dontFormat();
-
     public:
+        /// List of formats.
+        enum Format
+        {
+            ASCII,
+            TELNET
+        };
+
+        /// @brief Constructor.
+        Formatter();
+
+        /// @brief Constructor.
+        ~Formatter();
+
+        static Format getFormat();
+
         /// @brief Returns the string which identifies the command which clears the map.
         /// @return The IAC:DO:CLR_MAP command.
         static std::string doClearMap();
@@ -133,6 +134,16 @@ class Telnet
         /// @brief Change the font color to DarkGray from now on.
         static std::string darkGray();
         ///@}
+
+    private:
+
+        /// @brief Returns the string which identifies the start of a format section.
+        /// @return The IAC:DO:FORMAT command.
+        static std::string doFormat();
+
+        /// @brief Returns the string which identifies the end of a format section.
+        /// @return The IAC:DONT:FORMAT command.
+        static std::string dontFormat();
 };
 
-#endif
+#endif // FORMATTER_HPP
