@@ -26,9 +26,10 @@ Run the server like this:
 
 ______________
 ### Connecting
-Currently the only way to connect to the server is by using the client which I've written ad-hoc.
-
-It can be found at: https://github.com/Galfurian/RadClient
+Depending on the configuration of the server (Telnet, Ascii), there are two ways in order to connect to the mud:
+ * Through an ad-hoc client which can be found at: https://github.com/Galfurian/RadClient
+ * Using telnet with the following values:
+    * localhost:4000
 
 ______________
 ### Change Log
