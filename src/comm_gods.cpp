@@ -204,10 +204,8 @@ void DoModelInfo(Character * character, std::istream & sArgs)
     msg += Formatter::yellow() + "Type            " + Formatter::reset() + ": " + GetModelTypeName(model->type) + "\n";
     msg += Formatter::yellow() + "Slot            " + Formatter::reset() + ": " + GetEquipmentSlotName(model->slot) + "\n";
     msg += Formatter::yellow() + "Flags           " + Formatter::reset() + ": " + GetModelFlagString(model->flags) + "\n";
-    msg += Formatter::yellow() + "Weight          " + Formatter::reset() + ": " + ToString(model->weight) + " " + mud_measure
-        + ".\n";
-    msg += Formatter::yellow() + "Price           " + Formatter::reset() + ": " + ToString(model->price) + " " + mud_currency
-        + ".\n";
+    msg += Formatter::yellow() + "Weight          " + Formatter::reset() + ": " + ToString(model->weight) + " " + mud_measure + ".\n";
+    msg += Formatter::yellow() + "Price           " + Formatter::reset() + ": " + ToString(model->price) + " " + mud_currency + ".\n";
     msg += Formatter::yellow() + "Condition       " + Formatter::reset() + ": " + ToString(model->condition) + "\n";
     msg += Formatter::yellow() + "Decay           " + Formatter::reset() + ": " + ToString(model->decay) + "\n";
     msg += Formatter::yellow() + "Material        " + Formatter::reset() + ": " + GetMaterialTypeName(model->material) + "\n";
@@ -223,15 +221,15 @@ void DoModelInfo(Character * character, std::istream & sArgs)
     switch (model->type)
     {
         case ModelType::NoType:
-            {
+        {
             break;
         }
         case ModelType::Corpse:
-            {
+        {
             break;
         }
         case ModelType::Weapon:
-            {
+        {
             WeaponFunc func = model->getWeaponFunc();
             msg += Formatter::brown() + "Type            " + Formatter::reset() + ": " + GetWeaponTypeName(func.type) + "\n";
             msg += Formatter::brown() + "Minimum Damage  " + Formatter::reset() + ": " + ToString(func.minDamage) + "\n";
@@ -240,7 +238,7 @@ void DoModelInfo(Character * character, std::istream & sArgs)
             break;
         }
         case ModelType::Armor:
-            {
+        {
             ArmorFunc func = model->getArmorFunc();
             msg += Formatter::brown() + "Size            " + Formatter::reset() + ": " + GetArmorSizeName(func.size) + "\n";
             msg += Formatter::brown() + "Damage Absorb. " + Formatter::reset() + ": " + ToString(func.damageAbs) + "\n";
@@ -248,139 +246,136 @@ void DoModelInfo(Character * character, std::istream & sArgs)
             break;
         }
         case ModelType::Shield:
-            {
+        {
             ShieldFunc func = model->getShieldFunc();
             msg += Formatter::brown() + "Size            " + Formatter::reset() + ": " + GetShieldSizeName(func.size) + "\n";
             msg += Formatter::brown() + "Parry Chance    " + Formatter::reset() + ": " + ToString(func.parryChance) + "\n";
             break;
         }
         case ModelType::Projectile:
-            {
+        {
             ProjectileFunc func = model->getProjectileFunc();
             msg += Formatter::brown() + "Damage Bonus    " + Formatter::reset() + ": " + ToString(func.damageBonus) + "\n";
             msg += Formatter::brown() + "Range Bonus     " + Formatter::reset() + ": " + ToString(func.rangeBonus) + "\n";
             break;
         }
         case ModelType::Container:
-            {
+        {
             ContainerFunc func = model->getContainerFunc();
             msg += Formatter::brown() + "Max Weight      " + Formatter::reset() + ": " + ToString(func.maxWeight) + "\n";
-            msg += Formatter::brown() + "Flags           " + Formatter::reset() + ": {" + GetContainerFlagString(func.flags)
-                + "}\n";
+            msg += Formatter::brown() + "Flags           " + Formatter::reset() + ": {" + GetContainerFlagString(func.flags) + "}\n";
             msg += Formatter::brown() + "Key Vnum        " + Formatter::reset() + ": " + ToString(func.keyVnum) + "\n";
             msg += Formatter::brown() + "Lockpicking Lv. " + Formatter::reset() + ": " + ToString(func.difficulty) + "\n";
             break;
         }
         case ModelType::LiqContainer:
-            {
+        {
             LiqContainerFunc func = model->getLiqContainerFunc();
             msg += Formatter::brown() + "Max Weight      " + Formatter::reset() + ": " + ToString(func.maxWeight) + "\n";
-            msg += Formatter::brown() + "Flags           " + Formatter::reset() + ": {"
-                + GetLiqContainerFlagString(func.flags) + "}\n";
+            msg += Formatter::brown() + "Flags           " + Formatter::reset() + ": {" + GetLiqContainerFlagString(func.flags) + "}\n";
             break;
         }
         case ModelType::Tool:
-            {
+        {
             ToolFunc func = model->getToolFunc();
             msg += Formatter::brown() + "Type            " + Formatter::reset() + ": " + GetToolTypeName(func.type) + "\n";
             break;
         }
         case ModelType::Node:
-            {
+        {
             NodeFunc func = model->getNodeFunc();
             msg += Formatter::brown() + "Type            " + Formatter::reset() + ": " + GetNodeTypeName(func.type) + "\n";
             break;
         }
         case ModelType::Resource:
-            {
+        {
             ResourceFunc func = model->getResourceFunc();
-            msg += Formatter::brown() + "Type            " + Formatter::reset() + ": " + GetResourceTypeName(func.type)
-                + "\n";
+            msg += Formatter::brown() + "Type            " + Formatter::reset() + ": " + GetResourceTypeName(func.type) + "\n";
             break;
         }
         case ModelType::Seed:
-            {
+        {
             SeedFunc func = model->getSeedFunc();
             msg += Formatter::brown() + "Type            " + Formatter::reset() + ": " + GetSeedTypeName(func.type) + "\n";
             break;
         }
         case ModelType::Key:
-            {
+        {
             break;
         }
         case ModelType::Furniture:
-            {
+        {
             break;
         }
         case ModelType::Food:
-            {
+        {
             FoodFunc func = model->getFoodFunc();
             msg += Formatter::brown() + "Feeding         " + Formatter::reset() + ": " + ToString(func.hours) + "\n";
-            msg += Formatter::brown() + "Flags           " + Formatter::reset() + ": {" + GetFoodFlagString(func.flags)
-                + "}\n";
+            msg += Formatter::brown() + "Flags           " + Formatter::reset() + ": {" + GetFoodFlagString(func.flags) + "}\n";
             break;
         }
         case ModelType::Light:
-            {
+        {
             LightFunc func = model->getLightFunc();
             msg += Formatter::brown() + "Autonomy        " + Formatter::reset() + ": " + ToString(func.maxHours) + "\n";
             msg += Formatter::brown() + "Rechargeable    " + Formatter::reset() + ": " + ToString(func.policy) + "\n";
             break;
         }
         case ModelType::Vehicle:
-            {
+        {
             break;
         }
         case ModelType::Pen:
-            {
+        {
             break;
         }
         case ModelType::Book:
-            {
+        {
             BookFunc func = model->getBookFunc();
             msg += Formatter::brown() + "Capacity        " + Formatter::reset() + ": " + ToString(func.maxParchments) + "\n";
             break;
         }
         case ModelType::Rope:
-            {
+        {
             RopeFunc func = model->getRopeFunc();
             msg += Formatter::brown() + "Difficulty      " + Formatter::reset() + ": " + ToString(func.difficulty) + "\n";
             msg += Formatter::brown() + "Type            " + Formatter::reset() + ": " + ToString(func.type) + "\n";
             break;
         }
         case ModelType::Trash:
-            {
+        {
             break;
         }
         case ModelType::Mechanism:
-            {
+        {
             MechanismFunc func = model->getMechanismFunc();
-            msg += Formatter::brown() + "Type            " + Formatter::reset() + ": " + GetMechanismTypeName(func.type)
-                + "\n";
+            msg += Formatter::brown() + "Type            " + Formatter::reset() + ": " + GetMechanismTypeName(func.type) + "\n";
             switch (func.type)
             {
                 case MechanismType::Door:
-                    case MechanismType::Lock:
+                case MechanismType::Lock:
                     msg += Formatter::brown() + "Key             " + Formatter::reset() + ": " + ToString(func.key) + "\n";
-                    msg += Formatter::brown() + "Difficulty      " + Formatter::reset() + ": " + ToString(func.difficulty)
-                        + "\n";
+                    msg += Formatter::brown() + "Difficulty      " + Formatter::reset() + ": " + ToString(func.difficulty) + "\n";
                     break;
                 case MechanismType::Picklock:
-                    msg += Formatter::brown() + "Efficency       " + Formatter::reset() + ": " + ToString(func.efficency)
-                        + "\n";
+                    msg += Formatter::brown() + "Efficency       " + Formatter::reset() + ": " + ToString(func.efficency) + "\n";
                     break;
                 case MechanismType::Lever:
-                    msg += Formatter::brown() + "Command         " + Formatter::reset() + ": " + ToString(func.command)
-                        + "\n";
+                    msg += Formatter::brown() + "Command         " + Formatter::reset() + ": " + ToString(func.command) + "\n";
                     msg += Formatter::brown() + "Target          " + Formatter::reset() + ": " + ToString(func.target) + "\n";
                     break;
                 case MechanismType::None:
+                default:
                     msg += Formatter::brown() + "None" + Formatter::reset() + "\n";
             }
             break;
         }
         case ModelType::Currency:
-            {
+        {
+            break;
+        }
+        default:
+        {
             break;
         }
     }
@@ -432,8 +427,7 @@ void DoItemCreate(Character * character, std::istream & sArgs)
     }
     character->addInventoryItem(item);
     character->sendMsg(
-        "You produce " + Formatter::yellow() + item->getName() + Formatter::reset()
-            + " out of your apparently empty top hat.\n");
+        "You produce " + Formatter::yellow() + item->getName() + Formatter::reset() + " out of your apparently empty top hat.\n");
 }
 
 void DoItemGet(Character * character, std::istream & sArgs)
@@ -780,9 +774,9 @@ void DoRoomEdit(Character * character, std::istream & sArgs)
         }
 
         QueryList value =
-            { std::make_pair("description", input) };
+        { std::make_pair("description", input) };
         QueryList where =
-            { std::make_pair("vnum", ToString(room->vnum)) };
+        { std::make_pair("vnum", ToString(room->vnum)) };
 
         if (!SQLiteDbms::instance().updateInto("Room", value, where))
         {
@@ -802,9 +796,9 @@ void DoRoomEdit(Character * character, std::istream & sArgs)
             return;
         }
         QueryList value =
-            { std::make_pair("terrain", input) };
+        { std::make_pair("terrain", input) };
         QueryList where =
-            { std::make_pair("vnum", ToString(room->vnum)) };
+        { std::make_pair("vnum", ToString(room->vnum)) };
 
         if (!SQLiteDbms::instance().updateInto("Room", value, where))
         {
@@ -825,9 +819,9 @@ void DoRoomEdit(Character * character, std::istream & sArgs)
         }
 
         QueryList value =
-            { std::make_pair("name", input) };
+        { std::make_pair("name", input) };
         QueryList where =
-            { std::make_pair("vnum", ToString(room->vnum)) };
+        { std::make_pair("vnum", ToString(room->vnum)) };
         if (!SQLiteDbms::instance().updateInto("Room", value, where))
         {
             player->sendMsg("Command gone wrong.\n");
@@ -993,9 +987,7 @@ void DoMobileInfo(Character * character, std::istream & sArgs)
     {
         msg += "                [" + ToString(effect.expires) + "] " + effect.name + "\n";
     }
-    msg += Formatter::yellow() + "    Action       " + Formatter::reset() + ":"
-        + GetActionTypeName(mobile->getAction()->getType())
-        + "\n";
+    msg += Formatter::yellow() + "    Action       " + Formatter::reset() + ":" + GetActionTypeName(mobile->getAction()->getType()) + "\n";
 
     character->sendMsg(msg);
 }
@@ -1319,9 +1311,7 @@ void DoPlayerInfo(Character * character, std::istream & sArgs)
     {
         msg += "                [" + ToString(effect.expires) + "] " + effect.name + "\n";
     }
-    msg += Formatter::yellow() + "    Action       " + Formatter::reset() + ":"
-        + GetActionTypeName(player->getAction()->getType())
-        + "\n";
+    msg += Formatter::yellow() + "    Action       " + Formatter::reset() + ":" + GetActionTypeName(player->getAction()->getType()) + "\n";
     character->sendMsg(msg);
 }
 
@@ -1387,9 +1377,7 @@ void DoLiquidCreate(Character * character, std::istream & sArgs)
         character->sendMsg("The selected item can't contain that quantity of liquid.\n");
         return;
     }
-    character->sendMsg(
-        "You materialise " + ToString(quantity) + " units of " + liquid->getName() + " inside " + item->getName()
-            + ".\n");
+    character->sendMsg("You materialise " + ToString(quantity) + " units of " + liquid->getName() + " inside " + item->getName() + ".\n");
 }
 
 void DoLiquidInfo(Character * character, std::istream & sArgs)

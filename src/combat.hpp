@@ -66,36 +66,40 @@ class OpponentsList
         /// @brief Constructor.
         OpponentsList(Character * _owner);
 
-        /// @brief Add an opponent to the list.
-        /// @param opponent
-        /// @param itialAggression
+        /// @brief Tries to add the given character to the list of opponents.
+        /// @param character The opponent to add.
+        /// @param initAggro The initial value of aggression against the given opponent.
         /// @return <b>True</b> if the operation concluded successfuly,<br>
         ///         <b>False</b> otherwise.
-        bool addOpponent(Character * opponent, unsigned int itialAggression = 0);
+        bool addOpponent(Character * character, unsigned int initAggro = 0);
+
+        /// @brief Tries to remove the given character from the list of opponents.
+        /// @param character The opponent to remove.
+        /// @return <b>True</b> if the operation concluded successfuly,<br>
+        ///         <b>False</b> otherwise.
+        bool remOpponent(Character * character);
+
+        /// @brief Check if the list of opponents contains the given character.
+        /// @param character The opponent to search.
+        /// @return <b>True</b> if the opponent has been found,<br>
+        ///         <b>False</b> otherwise.
+        bool hasOpponent(Character * character);
 
         /// @brief Check if the list has some opponents.
         /// @return <b>True</b> if there are opponents,<br>
         ///         <b>False</b> otherwise.
         bool hasOpponents() const;
 
-        bool removeOpponent(Character * opponent);
-
-        /// @brief Check if the list contains a specific opponent.
-        /// @param opponent The opponent to search.
-        /// @return <b>True</b> if the opponent has been found,<br>
-        ///         <b>False</b> otherwise.
-        bool hasOpponent(Character * opponent);
-
-        /// @brief Returns the current top aggressor.
-        /// @return The top aggressor.
-        const Aggression & getTopAggro();
-
         /// @brief Allows to the a new aggression level to the given opponent.
-        /// @param opponent      The opponent
+        /// @param character      The opponent
         /// @param newAggression The new aggression level.
         /// @return <b>True</b> if the operation concluded successfuly,<br>
         ///         <b>False</b> otherwise.
-        bool setAggro(Character * opponent, unsigned int newAggression);
+        bool setAggro(Character * character, unsigned int newAggression);
+
+        /// @brief Returns the current top aggressor.
+        /// @return The top aggressor.
+        Aggression * getTopAggro();
 
         /// @brief Allows to elect the given character as the opponent with
         ///         the top level of aggro.
@@ -104,10 +108,17 @@ class OpponentsList
         ///         <b>False</b> otherwise.
         bool moveToTopAggro(Character * character);
 
+        /// @brief Given a character it returns the intial value of aggression against him.
+        /// @param character The other character.
+        /// @return The initial value of aggression.
         unsigned int getInitialAggro(Character * character);
 
+        /// @brief Provides the value of aggression againts a given character.
+        /// @param character The other character.
+        /// @return The value of aggression.
         unsigned int getAggro(Character * character);
 
+        /// @brief Provides the size of the aggessors list.
         std::size_t getSize();
 
     private:

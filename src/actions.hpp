@@ -126,6 +126,9 @@ class Action
             std::vector<Item *> & _usedIngredients,
             unsigned int _cooldown);
 
+        /// @brief Try to set the action to combat state.
+        /// @return <b>True</b> if the type was not Combat,<br>
+        ///         <b>False</b> otherwise.
         bool setInCombat();
 
         /// @brief Allows to set a combat action.
@@ -134,6 +137,7 @@ class Action
         ///			<b>False</b> otherwise.
         bool setNextCombatAction(const CombatAction & nextAction);
 
+        /// @brief Provides a copy of the next combat action.
         CombatAction getNextCombatAction() const;
 
     private:

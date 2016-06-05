@@ -107,24 +107,24 @@ bool Model::check()
     return true;
 }
 
-bool Model::replaceSymbols(std::string & source, Material * material, ItemQuality quality)
+bool Model::replaceSymbols(std::string & source, Material * itemMaterial, ItemQuality itemQuality)
 {
     bool modified = false;
-    if (material)
+    if (itemMaterial)
     {
         modified = true;
-        FindAndReplace(source, "&m", ToLower(material->name));
-        FindAndReplace(source, "&M", ToLower(material->article + ' ' + material->name));
+        FindAndReplace(source, "&m", ToLower(itemMaterial->name));
+        FindAndReplace(source, "&M", ToLower(itemMaterial->article + ' ' + itemMaterial->name));
     }
     else
     {
         FindAndReplace(source, "&m", "");
         FindAndReplace(source, "&M", "");
     }
-    if (quality != ItemQuality::Normal)
+    if (itemQuality != ItemQuality::Normal)
     {
         modified = true;
-        FindAndReplace(source, "&q", " " + ToLower(GetItemQualityName(quality)));
+        FindAndReplace(source, "&q", " " + ToLower(GetItemQualityName(itemQuality)));
     }
     else
     {
@@ -133,23 +133,23 @@ bool Model::replaceSymbols(std::string & source, Material * material, ItemQualit
     return modified;
 }
 
-std::string Model::getName(Material * material, ItemQuality quality)
+std::string Model::getName(Material * itemMaterial, ItemQuality itemQuality)
 {
     // Make a copy of the short description.
     std::string output = shortdesc;
     // Try to replace the symbols inside the short description.
-    if (!replaceSymbols(output, material, quality))
+    if (!replaceSymbols(output, itemMaterial, itemQuality))
     {
         output = article + " " + name;
     }
     return output;
 }
 
-std::string Model::getDescription(Material * material, ItemQuality quality)
+std::string Model::getDescription(Material * itemMaterial, ItemQuality itemQuality)
 {
     // Make a copy of the description.
     std::string output = description;
-    replaceSymbols(output, material, quality);
+    replaceSymbols(output, itemMaterial, itemQuality);
     return output;
 }
 
@@ -157,7 +157,7 @@ std::string Model::getDescription(Material * material, ItemQuality quality)
 // ITEM CREATION //////////////////////////////////////////
 ///////////////////////////////////////////////////////////
 
-Item * Model::createItem(std::string maker, Material * composition, ItemQuality quality)
+Item * Model::createItem(std::string maker, Material * composition, ItemQuality itemQuality)
 {
     // Instantiate the new item.
     Item * newItem = new Item();
@@ -168,7 +168,7 @@ Item * Model::createItem(std::string maker, Material * composition, ItemQuality 
     newItem->maker = maker;
     newItem->condition = condition;
     newItem->composition = composition;
-    newItem->quality = quality;
+    newItem->quality = itemQuality;
     newItem->flags = 0;
     newItem->room = nullptr;
     newItem->owner = nullptr;
@@ -193,7 +193,7 @@ Item * Model::createItem(std::string maker, Material * composition, ItemQuality 
     arguments.push_back(maker);
     arguments.push_back(ToString(condition));
     arguments.push_back(ToString(composition->vnum));
-    arguments.push_back(EnumToString(quality));
+    arguments.push_back(EnumToString(itemQuality));
     arguments.push_back(ToString(flags));
 
     if (SQLiteDbms::instance().insertInto("Item", arguments))
@@ -243,21 +243,22 @@ std::string Model::getSpecificTypeName()
         case ModelType::Mechanism:
             output = GetMechanismTypeName(getMechanismFunc().type);
             break;
+        default:
         case ModelType::NoType:
-            case ModelType::Key:
-            case ModelType::Furniture:
-            case ModelType::Food:
-            case ModelType::Light:
-            case ModelType::Vehicle:
-            case ModelType::Pen:
-            case ModelType::Book:
-            case ModelType::Rope:
-            case ModelType::Trash:
-            case ModelType::Container:
-            case ModelType::LiqContainer:
-            case ModelType::Projectile:
-            case ModelType::Corpse:
-            case ModelType::Currency:
+        case ModelType::Key:
+        case ModelType::Furniture:
+        case ModelType::Food:
+        case ModelType::Light:
+        case ModelType::Vehicle:
+        case ModelType::Pen:
+        case ModelType::Book:
+        case ModelType::Rope:
+        case ModelType::Trash:
+        case ModelType::Container:
+        case ModelType::LiqContainer:
+        case ModelType::Projectile:
+        case ModelType::Corpse:
+        case ModelType::Currency:
             break;
     }
     return output;
@@ -383,7 +384,7 @@ MechanismFunc Model::getMechanismFunc()
     switch (func.type)
     {
         case MechanismType::Door:
-            case MechanismType::Lock:
+        case MechanismType::Lock:
             func.key = functions[1];
             func.difficulty = functions[2];
             break;
@@ -394,6 +395,7 @@ MechanismFunc Model::getMechanismFunc()
             func.command = functions[1];
             func.target = functions[2];
             break;
+        default:
         case MechanismType::None:
             break;
     }

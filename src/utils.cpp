@@ -226,6 +226,7 @@ std::string AlignString(const std::string & source, const StringAlign & alignmen
     // Align the string.
     switch (alignment)
     {
+        default:
         case kAlignLeft:
             oss << ' ';
             // Set the width.

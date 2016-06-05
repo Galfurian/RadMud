@@ -78,9 +78,10 @@ class Mobile: public Character
         bool hasKey(const std::string & key);
 
         /// @brief Check if the mobile has the desired action set.
-        /// @param action The action to check.
-        /// @return <b>True</b> if the operations succeeded,<br><b>False</b> Otherwise.
-        bool hasAction(const std::string & action) const;
+        /// @param _action The action to check.
+        /// @return <b>True</b> if the operations succeeded,<br>
+        ///         <b>False</b> Otherwise.
+        bool hasAction(const std::string & _action) const;
 
         /// @brief Handle what happend when this mob die.
         void triggerDeath();

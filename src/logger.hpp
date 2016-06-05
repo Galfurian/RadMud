@@ -88,19 +88,16 @@ class Logger
 
         /// @brief Print to consol and to logging file the gievn string.
         /// @param level  The category of the message.
-        /// @param log    The message to log.
+        /// @param msg    The message to log.
         static void log(const LogLevel & level, const std::string & msg);
 
         /// @brief Print to consol and to logging file the gievn string.
-        /// @param  level  The category of the message.
-        /// @param  log    The message to log.
-        /// @tparam T
+        /// @param level The category of the message.
+        /// @param msg   The message to log.
+        /// @param first The first unpacked argument.
+        /// @param args  Packed arguments.
         template<typename ... Args>
-        static void log(
-            const LogLevel & level,
-            const std::string & msg,
-            const std::string & first,
-            const Args & ... args)
+        static void log(const LogLevel & level, const std::string & msg, const std::string & first, const Args & ... args)
         {
             std::string::size_type pos = msg.find("%s");
             if (pos == std::string::npos)

@@ -85,32 +85,31 @@ class Model
 
         /// @brief Given the argumtens the function replace the symbols inside the source string
         ///         using the provided arguments.
-        /// @param source   The source string.
-        /// @param material The material of which the model is made.
-        /// @param quality  The quality of the model.
+        /// @param source       The source string.
+        /// @param itemMaterial The material of which the model is made.
+        /// @param itemQuality  The quality of the model.
         /// @return <b>True</b> if something changed inside the string,<br>
         ///         <b>False</b> otherwise.
-        bool replaceSymbols(std::string & source, Material * material = nullptr, ItemQuality quality =
-            ItemQuality::Normal);
+        bool replaceSymbols(std::string & source, Material * itemMaterial = nullptr, ItemQuality itemQuality = ItemQuality::Normal);
 
         /// @brief Returns the name of the model depending on the passed arguments.
-        /// @param material The material of which the model is made.
-        /// @param quality  The quality of the model.
+        /// @param itemMaterial The material of which the model is made.
+        /// @param itemQuality  The quality of the model.
         /// @return The specific name of the model.
-        std::string getName(Material * material = nullptr, ItemQuality quality = ItemQuality::Normal);
+        std::string getName(Material * itemMaterial = nullptr, ItemQuality itemQuality = ItemQuality::Normal);
 
         /// @brief Returns the description of the model depending on the passed arguments.
-        /// @param material The material of which the model is made.
-        /// @param quality  The quality of the model.
+        /// @param itemMaterial The material of which the model is made.
+        /// @param itemQuality  The quality of the model.
         /// @return The specific description of the model.
-        std::string getDescription(Material * material = nullptr, ItemQuality quality = ItemQuality::Normal);
+        std::string getDescription(Material * itemMaterial = nullptr, ItemQuality itemQuality = ItemQuality::Normal);
 
         /// @brief Create a new item starting from this model.
         /// @param maker       The player that create the item.
         /// @param composition The composition of the item.
-        /// @param quality     The quality of the item.
+        /// @param itemQuality The quality of the item.
         /// @return The newly created item.
-        Item * createItem(std::string maker, Material * composition, ItemQuality quality);
+        Item * createItem(std::string maker, Material * composition, ItemQuality itemQuality);
 
         /// @brief Check if the item must be wielded.
         /// @return <b>True</b> if the item must be wielded,<br><b>False</b> Otherwise.

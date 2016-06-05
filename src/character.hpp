@@ -318,6 +318,8 @@ class Character
         ///         <b>False</b> otherwise.
         bool canSee(Character * target);
 
+        /// @brief Provides a pointer to the opponent on the top of the aggro list.
+        /// @return A pointer to the next opponent.
         Character * getNextOpponent();
 
         /// @brief Returns the cooldown before next attack.
@@ -371,9 +373,9 @@ class Character
         virtual void sendMsg(const std::string & msg);
 
         /// @brief Print to consol and to logging file the gievn string.
-        /// @param  level  The category of the message.
-        /// @param  log    The message to log.
-        /// @tparam T
+        /// @param msg   The message to send
+        /// @param first The first unpacked argument.
+        /// @param args  Packed arguments.
         template<typename ... Args>
         void sendMsg(
             const std::string & msg,

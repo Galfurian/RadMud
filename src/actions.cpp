@@ -57,8 +57,11 @@ std::string Action::getDescription()
     std::string msg;
     switch (this->type)
     {
+        default:
+            break;
         case ActionType::NoAction:
-            case ActionType::Wait:
+            break;
+        case ActionType::Wait:
             break;
         case ActionType::Move:
             msg = "moving";
@@ -87,6 +90,9 @@ std::string Action::stop()
     std::string msg;
     switch (this->type)
     {
+        default:
+            msg = "No action set.";
+            break;
         case ActionType::NoAction:
             msg = "No action set.";
             break;
@@ -135,6 +141,8 @@ void Action::perform()
         case ActionType::NoAction:
             break;
         case ActionType::Wait:
+            break;
+        default:
             break;
     }
 }

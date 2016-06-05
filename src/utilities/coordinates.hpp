@@ -51,7 +51,7 @@ class Coordinates
         /// @brief Add to the current Coordinates the right operand.
         /// @param right The right parameter.
         /// @return The new Coordinates.
-        Coordinates operator+(const Coordinates &right) const;
+        Coordinates operator+(const Coordinates & right) const;
 
         /// @brief Define operator <, less than.
         /// @param right The right parameter.

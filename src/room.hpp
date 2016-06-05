@@ -126,9 +126,9 @@ class Room
         Item * findBuilding(std::string target, int & number);
 
         /// @brief Search for the building in the room.
-        /// @param vnum The vnum of the building to search.
+        /// @param buildingVnum The vnum of the building to search.
         /// @return The building, if it's in the room.
-        Item * findBuilding(int vnum);
+        Item * findBuilding(int buildingVnum);
 
         /// @brief Search for the buildings of the given type inside the room.
         /// @param type The type of the buildings.

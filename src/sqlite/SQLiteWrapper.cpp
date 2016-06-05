@@ -216,13 +216,15 @@ std::string SQLiteWrapper::getDataString(unsigned int column)
         return "";
     }
     // Check the input in case is a valid value.
-    std::string value;
-    char * ptr = (char *) sqlite3_column_text(dbDetails.dbStatement, column);
+    const char * ptr = reinterpret_cast<const char *>(sqlite3_column_text(dbDetails.dbStatement, column));
     if (ptr)
     {
-        value = ptr;
+        return std::string(ptr);
     }
-    return value;
+    else
+    {
+        return "";
+    }
 }
 
 int SQLiteWrapper::getDataInteger(unsigned int column)
@@ -243,16 +245,18 @@ std::string SQLiteWrapper::getNextString()
         release();
         throw std::runtime_error("Number column exceded (" + ToString(currentColumn) + ">=" + ToString(num_col) + ").");
     }
-
     // Check the input in case is a valid value.
-    std::string value;
-    char * ptr = (char *) sqlite3_column_text(dbDetails.dbStatement, currentColumn);
+    const char * ptr = reinterpret_cast<const char *>(sqlite3_column_text(dbDetails.dbStatement, currentColumn));
+    // Increase the column index.
+    currentColumn += 1;
     if (ptr)
     {
-        value = ptr;
+        return std::string(ptr);
     }
-    currentColumn += 1;
-    return value;
+    else
+    {
+        return "";
+    }
 }
 
 int SQLiteWrapper::getNextInteger()
@@ -264,6 +268,7 @@ int SQLiteWrapper::getNextInteger()
         throw std::runtime_error("Number column exceded (" + ToString(currentColumn) + ">=" + ToString(num_col) + ").");
     }
     int value = sqlite3_column_int(dbDetails.dbStatement, currentColumn);
+    // Increase the column index.
     currentColumn += 1;
     return value;
 }
@@ -277,10 +282,14 @@ unsigned int SQLiteWrapper::getNextUnsignedInteger()
         throw std::runtime_error("Number column exceded (" + ToString(currentColumn) + ">=" + ToString(num_col) + ").");
     }
     int value = sqlite3_column_int(dbDetails.dbStatement, currentColumn);
+    // Increase the column index.
+    currentColumn += 1;
     if (value < 0)
     {
-        value = 0;
+        return 0;
     }
-    currentColumn += 1;
-    return static_cast<unsigned int>(value);
+    else
+    {
+        return static_cast<unsigned int>(value);
+    }
 }

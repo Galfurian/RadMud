@@ -113,12 +113,12 @@ bool Mobile::hasKey(const string & key)
     return found;
 }
 
-bool Mobile::hasAction(const string & action) const
+bool Mobile::hasAction(const string & _action) const
 {
     bool found = false;
     for (auto iterator : actions)
     {
-        if (BeginWith(iterator, action))
+        if (BeginWith(iterator, _action))
         {
             found = true;
         }
@@ -141,8 +141,7 @@ void Mobile::triggerDeath()
 bool Mobile::canRespawn()
 {
     // Return the check if the mobile can be respawned.
-    return (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - nextRespawn).count()
-        >= 0);
+    return (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - nextRespawn).count() >= 0);
 }
 
 void Mobile::reloadLua()

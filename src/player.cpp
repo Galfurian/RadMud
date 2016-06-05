@@ -406,12 +406,11 @@ void Player::enterGame()
 
 void Player::processInput(Player * player, const string & command)
 {
-    ActionHandler action = Mud::instance().findStateAction(player->connection_state);
+    ActionHandler _action = Mud::instance().findStateAction(player->connection_state);
     std::istringstream is(command);
-
     try
     {
-        action(player, is);
+        _action(player, is);
     }
     catch (std::runtime_error & e)
     {

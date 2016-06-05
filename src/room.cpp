@@ -220,7 +220,7 @@ bool Room::removeOnDB()
 
     //----------Remove from Room-----------
     SQLiteDbms::instance().deleteFrom("Room",
-        { std::make_pair("vnum", ToString(vnum)) });
+    { std::make_pair("vnum", ToString(vnum)) });
     return true;
 }
 
@@ -255,11 +255,11 @@ Item * Room::findBuilding(std::string target, int & number)
     }
     return nullptr;
 }
-Item * Room::findBuilding(int vnum)
+Item * Room::findBuilding(int buildingVnum)
 {
     for (auto iterator : items)
     {
-        if (iterator->vnum == vnum)
+        if (iterator->vnum == buildingVnum)
         {
             return iterator;
         }
@@ -524,8 +524,7 @@ string Room::getLook(Character * exception)
         // If there are more of this item, show the counter.
         if (it.second > 1)
         {
-            output += Formatter::cyan() + it.first->getNameCapital() + Formatter::reset() + " are here.["
-                + ToString(it.second) + "]\n";
+            output += Formatter::cyan() + it.first->getNameCapital() + Formatter::reset() + " are here.[" + ToString(it.second) + "]\n";
         }
         else
         {

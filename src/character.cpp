@@ -219,13 +219,15 @@ void Character::updateResources()
                 gain = (max_health / 100) * 8;
                 break;
             case CharacterPosture::Prone:
-                case CharacterPosture::Crouch:
-                case CharacterPosture::Stand:
+            case CharacterPosture::Crouch:
+            case CharacterPosture::Stand:
                 gain = (max_health / 100) * 2;
                 break;
             case CharacterPosture::NoPosure:
+            default:
                 Logger::log(LogLevel::Warning, "No posture has been set.");
                 break;
+
         }
         if (gain == 0)
         {
@@ -250,11 +252,12 @@ void Character::updateResources()
                 gain = (max_stamina / 100) * 8;
                 break;
             case CharacterPosture::Prone:
-                case CharacterPosture::Crouch:
-                case CharacterPosture::Stand:
+            case CharacterPosture::Crouch:
+            case CharacterPosture::Stand:
                 gain = (max_stamina / 100) * 2;
                 break;
             case CharacterPosture::NoPosure:
+            default:
                 Logger::log(LogLevel::Warning, "No posture has been set.");
                 break;
         }
@@ -348,11 +351,7 @@ Room * Character::canMoveTo(Direction direction, std::string & error)
     return destExit->destination;
 }
 
-void Character::moveTo(
-    Room * destination,
-    const std::string & msgDepart,
-    const std::string & msgArrive,
-    const std::string & msgChar)
+void Character::moveTo(Room * destination, const std::string & msgDepart, const std::string & msgArrive, const std::string & msgChar)
 {
     // Check if the current room exist.
     if (room == nullptr)
@@ -834,8 +833,7 @@ string Character::getHealthCondition(Character * character)
     // Determine the percentage of current health.
     if (character->health > 0)
     {
-        percent = static_cast<int>((100.0 * static_cast<double>(character->health))
-            / static_cast<double>(character->getMaxHealth()));
+        percent = static_cast<int>((100.0 * static_cast<double>(character->health)) / static_cast<double>(character->getMaxHealth()));
     }
     else
     {
@@ -1004,14 +1002,17 @@ Character * Character::getNextOpponent()
     if (opponents.hasOpponents())
     {
         // Get the top aggressor.
-        const Aggression aggression = opponents.getTopAggro();
-        // Retrieve the opponent.
-        Character * opponent = aggression.aggressor;
-        if (opponent != nullptr)
+        Aggression * aggression = opponents.getTopAggro();
+        if (aggression != nullptr)
         {
-            if (opponent->room->vnum == room->vnum)
+            // Retrieve the opponent.
+            Character * opponent = aggression->aggressor;
+            if (opponent != nullptr)
             {
-                return opponent;
+                if (opponent->room->vnum == room->vnum)
+                {
+                    return opponent;
+                }
             }
         }
     }

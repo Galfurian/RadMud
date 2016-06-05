@@ -81,15 +81,15 @@ void DoKill(Character * character, std::istream & sArgs)
         if (!target->opponents.addOpponent(character))
         {
             character->sendMsg("You were not ablet to attack %s.\n", target->getName());
-            character->opponents.removeOpponent(target);
+            character->opponents.remOpponent(target);
             return;
         }
         // Try to set the next combat action.
         if (!character->getAction()->setNextCombatAction(CombatAction::BasicAttack))
         {
             character->sendMsg("You were not ablet to attack %s.\n", target->getName());
-            character->opponents.removeOpponent(target);
-            target->opponents.removeOpponent(character);
+            character->opponents.remOpponent(target);
+            target->opponents.remOpponent(character);
             character->getAction()->stop();
         }
         character->sendMsg("You attack %s.\n", target->getName());
@@ -110,15 +110,15 @@ void DoKill(Character * character, std::istream & sArgs)
         if (!target->opponents.addOpponent(character))
         {
             character->sendMsg("You were not ablet to attack %s.\n", target->getName());
-            character->opponents.removeOpponent(target);
+            character->opponents.remOpponent(target);
             return;
         }
         // Try to set the next combat action.
         if (!character->getAction()->setNextCombatAction(CombatAction::BasicAttack))
         {
             character->sendMsg("You were not ablet to attack %s.\n", target->getName());
-            character->opponents.removeOpponent(target);
-            target->opponents.removeOpponent(character);
+            character->opponents.remOpponent(target);
+            target->opponents.remOpponent(character);
             character->getAction()->stop();
             target->getAction()->stop();
             return;
@@ -126,8 +126,8 @@ void DoKill(Character * character, std::istream & sArgs)
         if (!target->getAction()->setNextCombatAction(CombatAction::BasicAttack))
         {
             character->sendMsg("You were not ablet to attack %s.\n", target->getName());
-            character->opponents.removeOpponent(target);
-            target->opponents.removeOpponent(character);
+            character->opponents.remOpponent(target);
+            target->opponents.remOpponent(character);
             character->getAction()->stop();
             target->getAction()->stop();
         }

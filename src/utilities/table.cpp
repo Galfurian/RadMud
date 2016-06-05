@@ -62,7 +62,7 @@ Table::Table() :
         columns(),
         rows()
 {
-
+    // Nothing to do.
 }
 
 Table::Table(std::string _title) :
@@ -70,6 +70,12 @@ Table::Table(std::string _title) :
         columns(),
         rows()
 {
+    // Nothing to do.
+}
+
+Table::~Table()
+{
+    // Nothing to do.
 }
 
 void Table::addColumn(std::string columnTitle, StringAlign columnAlignment, size_t columnWidth)

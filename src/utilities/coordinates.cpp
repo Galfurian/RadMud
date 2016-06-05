@@ -20,11 +20,12 @@
 #include "../luabridge/LuaBridge.h"
 #include "../lua/lua_script.hpp"
 
-Coordinates::Coordinates()
+Coordinates::Coordinates() :
+        x(),
+        y(),
+        z()
 {
-    x = 0;
-    y = 0;
-    z = 0;
+    // Nothing to do.
 }
 
 Coordinates::Coordinates(const int _x, const int _y, const int _z) :
@@ -32,9 +33,10 @@ Coordinates::Coordinates(const int _x, const int _y, const int _z) :
         y(_y),
         z(_z)
 {
+    // Nothing to do.
 }
 
-Coordinates Coordinates::operator+(const Coordinates &right) const
+Coordinates Coordinates::operator+(const Coordinates & right) const
 {
     Coordinates coord;
     coord.x = x + right.x;

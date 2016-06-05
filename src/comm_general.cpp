@@ -60,13 +60,14 @@ void DoDirection(Character * character, Direction direction)
             character->sendMsg("You begin to crawl to " + GetDirectionName(direction) + "...\n");
             speed = 6;
             break;
-        case CharacterPosture::NoPosure:
-            Logger::log(LogLevel::Error, "No posture set.");
-            break;
         case CharacterPosture::Sit:
-            case CharacterPosture::Rest:
+        case CharacterPosture::Rest:
             character->sendMsg("You can't move!\n");
             return;
+        case CharacterPosture::NoPosure:
+        default:
+            Logger::log(LogLevel::Error, "No posture set.");
+            break;
     }
     if (!character->getAction()->setMove(destination, direction, speed))
     {
@@ -180,7 +181,7 @@ void DoWho(Character * character, std::istream & sArgs)
             location = iterator->room->name;
         }
         table.addRow(
-            { iterator->getName(), location });
+        { iterator->getName(), location });
     }
     output += table.getTable();
     output += "# Total " + Formatter::yellow() + "Players" + Formatter::reset() + " :" + ToString(table.getNumRows()) + "\n";
@@ -408,13 +409,10 @@ void DoPrompt(Character * character, std::istream & sArgs)
         player->sendMsg("\n");
         player->sendMsg("You can use the following shortcuts in you prompt:\n");
         player->sendMsg("    " + Formatter::italic() + "&n" + Formatter::reset() + " - Replace with player name.\n");
-        player->sendMsg(
-            "    " + Formatter::italic() + "&N" + Formatter::reset() + " - Replace with player name capitalized.\n");
-        player->sendMsg(
-            "    " + Formatter::italic() + "&h" + Formatter::reset() + " - Replace with player current health.\n");
+        player->sendMsg("    " + Formatter::italic() + "&N" + Formatter::reset() + " - Replace with player name capitalized.\n");
+        player->sendMsg("    " + Formatter::italic() + "&h" + Formatter::reset() + " - Replace with player current health.\n");
         player->sendMsg("    " + Formatter::italic() + "&H" + Formatter::reset() + " - Replace with player max health.\n");
-        player->sendMsg(
-            "    " + Formatter::italic() + "&s" + Formatter::reset() + " - Replace with player current stamina.\n");
+        player->sendMsg("    " + Formatter::italic() + "&s" + Formatter::reset() + " - Replace with player current stamina.\n");
         player->sendMsg("    " + Formatter::italic() + "&S" + Formatter::reset() + " - Replace with player max stamina.\n");
         return;
     }
@@ -531,11 +529,9 @@ void DoStatistics(Character * character, std::istream & sArgs)
     msg += "(" + ToString(player->effects.getConMod()) + ") | ";
     msg += Formatter::magenta() + "Int " + Formatter::reset() + ToString(player->intelligence);
     msg += "(" + ToString(player->effects.getIntMod()) + ") \n";
-    msg += Formatter::magenta() + "Health " + Formatter::reset() + ToString(player->health) + "/"
-        + ToString(player->getMaxHealth());
+    msg += Formatter::magenta() + "Health " + Formatter::reset() + ToString(player->health) + "/" + ToString(player->getMaxHealth());
     msg += "(" + ToString(player->effects.getHealthMod()) + ") ";
-    msg += Formatter::magenta() + "Stamina " + Formatter::reset() + ToString(player->stamina) + "/"
-        + ToString(player->getMaxStamina());
+    msg += Formatter::magenta() + "Stamina " + Formatter::reset() + ToString(player->stamina) + "/" + ToString(player->getMaxStamina());
     msg += "(" + ToString(player->effects.getHealthMod()) + ")\n";
     msg += Formatter::magenta() + "Armor Class " + Formatter::reset() + ToString(player->getArmorClass()) + "\n";
     msg += "You " + player->getHunger();

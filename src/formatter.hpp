@@ -85,6 +85,7 @@ class Formatter
         /// @brief Constructor.
         ~Formatter();
 
+        /// @brief Provides the format used by the Mud for the output.
         static Format getFormat();
 
         /// @brief Returns the string which identifies the command which clears the map.

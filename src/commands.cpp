@@ -117,8 +117,7 @@ void ProcessPlayerName(Character * character, std::istream & sArgs)
     // Check if the give name contains valid characters.
     else if (input.find_first_not_of(kValidPlayerName) != std::string::npos)
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingName,
-            "That player name contains disallowed characters.");
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingName, "That player name contains disallowed characters.");
     }
     // Check if the player is already connected.
     else if (Mud::instance().findPlayer(input))
@@ -197,8 +196,7 @@ void ProcessNewName(Character * character, std::istream & sArgs)
     // Check if the player has given bad characters.
     else if (input.find_first_not_of(kValidPlayerName) != std::string::npos)
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewName,
-            "That player name contains disallowed characters.");
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewName, "That player name contains disallowed characters.");
     }
     // Check for bad names here.
     else if (Mud::instance().badNames.find(input) != Mud::instance().badNames.end())
@@ -208,8 +206,7 @@ void ProcessNewName(Character * character, std::istream & sArgs)
     // Check if the player name has already been used.
     else if (SQLiteDbms::instance().searchPlayer(ToCapitals(input)))
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewName,
-            "That player already exists, please choose another name.");
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewName, "That player already exists, please choose another name.");
     }
     else
     {
@@ -246,8 +243,7 @@ void ProcessNewPwd(Character * character, std::istream & sArgs)
     // Check if the player has given bad characters.
     else if (input.find_first_not_of(kValidPlayerName) != std::string::npos)
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewPwd,
-            "Password cannot contain disallowed characters.");
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewPwd, "Password cannot contain disallowed characters.");
     }
     else
     {
@@ -270,8 +266,7 @@ void ProcessNewPwdCon(Character * character, std::istream & sArgs)
     // Player_password must agree.
     else if (input != player->password)
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewPwdCon,
-            "Password and confirmation do not agree.");
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewPwdCon, "Password and confirmation do not agree.");
     }
     else
     {
@@ -298,8 +293,7 @@ void ProcessNewStory(Character * character, std::istream & sArgs)
     // Check if the player has written 'continue' or NOT.
     else if (input != "continue")
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewStory,
-            "Write 'continue' after you have readed the story.");
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewStory, "Write 'continue' after you have readed the story.");
     }
     else
     {
@@ -355,8 +349,7 @@ void ProcessNewRace(Character * character, std::istream & sArgs)
         }
         else
         {
-            AdvanceCharacterCreation(character, ConnectionState::AwaitingNewRace,
-                "You have to specify the race number.");
+            AdvanceCharacterCreation(character, ConnectionState::AwaitingNewRace, "You have to specify the race number.");
         }
     }
     else if (IsNumber(arguments[0].first))
@@ -468,8 +461,7 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
         }
         else
         {
-            AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAttr,
-                "You have to specify the attribute number.");
+            AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAttr, "You have to specify the attribute number.");
         }
     }
     else
@@ -661,8 +653,7 @@ void ProcessNewDesc(Character * character, std::istream & sArgs)
     // Check if the description contains bad characters.
     else if (input.find_first_not_of(kValidDescription) != std::string::npos)
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewDesc,
-            "Description cannot contain disallowed characters.");
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewDesc, "Description cannot contain disallowed characters.");
     }
     else
     {
@@ -734,8 +725,7 @@ void ProcessNewConfirm(Character * character, std::istream & sArgs)
     }
     else
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewConfirm,
-            "You must write 'confirm' if you agree.");
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewConfirm, "You must write 'confirm' if you agree.");
     }
 }
 
@@ -760,8 +750,7 @@ void NoMore(Character * character, std::istream & sArgs)
 
 void StopAction(Character * character)
 {
-    if ((character->getAction()->getType() != ActionType::Wait)
-        && (character->getAction()->getType() != ActionType::NoAction))
+    if ((character->getAction()->getType() != ActionType::Wait) && (character->getAction()->getType() != ActionType::NoAction))
     {
         character->doCommand("stop");
     }
@@ -930,6 +919,8 @@ void RollbackCharacterCreation(Character * character, ConnectionState new_state)
     player->connection_state = new_state;
     switch (new_state)
     {
+        default:
+            break;
         case ConnectionState::NoState:
             break;
         case ConnectionState::AwaitingName:
@@ -978,7 +969,7 @@ void RollbackCharacterCreation(Character * character, ConnectionState new_state)
             player->weight = 0;
             break;
         case ConnectionState::Playing:
-            case ConnectionState::AwaitingNewConfirm:
+        case ConnectionState::AwaitingNewConfirm:
             player->sendMsg("It seems that this choiche has not been handled...");
             player->closeConnection();
             break;

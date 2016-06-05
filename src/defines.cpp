@@ -77,7 +77,7 @@ std::string GetDirectionName(Direction direction)
             output = "down";
             break;
         case Direction::None:
-            default:
+        default:
             output = "No Direction";
     }
     return output;
@@ -88,6 +88,10 @@ std::string GetPostureName(CharacterPosture posture)
     std::string output;
     switch (posture)
     {
+        default:
+        case CharacterPosture::NoPosure:
+            output = "noPosture";
+            break;
         case CharacterPosture::Stand:
             output = "standing";
             break;
@@ -103,9 +107,6 @@ std::string GetPostureName(CharacterPosture posture)
         case CharacterPosture::Rest:
             output = "resting";
             break;
-        case CharacterPosture::NoPosure:
-            output = "noPosture";
-            break;
     }
     return output;
 }
@@ -114,14 +115,13 @@ std::string GetCharacterFlagName(CharacterFlag flag)
 {
     switch (flag)
     {
+        default:
         case CharacterFlag::None:
             return "None";
         case CharacterFlag::IsGod:
             return "IsGod";
         case CharacterFlag::Invisible:
             return "Invisible";
-        default:
-            return "None";
     }
 }
 
@@ -130,6 +130,7 @@ std::string GetMaterialTypeName(MaterialType type)
     std::string output;
     switch (type)
     {
+        default:
         case MaterialType::NoType:
             output = "No Material Type";
             break;
@@ -172,6 +173,7 @@ std::string GetItemQualityName(ItemQuality quality)
     std::string output;
     switch (quality)
     {
+        default:
         case ItemQuality::None:
             output = "No Quality";
             break;
@@ -199,6 +201,7 @@ std::string GetModelTypeName(ModelType type)
     std::string output;
     switch (type)
     {
+        default:
         case ModelType::NoType:
             output = "No Model Type";
             break;
@@ -277,6 +280,10 @@ std::string GetEquipmentSlotName(EquipmentSlot slot)
     std::string output;
     switch (slot)
     {
+        default:
+        case EquipmentSlot::None:
+            output = "No Equipment Slot";
+            break;
         case EquipmentSlot::Head:
             output = "Head";
             break;
@@ -298,11 +305,6 @@ std::string GetEquipmentSlotName(EquipmentSlot slot)
         case EquipmentSlot::LeftHand:
             output = "Left Hand";
             break;
-        case EquipmentSlot::None:
-
-        default:
-            output = "No Equipment Slot";
-            break;
     }
     return output;
 }
@@ -312,6 +314,9 @@ std::string GetWeaponTypeName(WeaponType type)
     std::string output;
     switch (type)
     {
+        default:
+            output = "No Weapon Type";
+            break;
         case kPistol:
             output = "Pistol";
             break;
@@ -351,9 +356,6 @@ std::string GetWeaponTypeName(WeaponType type)
         case kUnarmed:
             output = "Unarmed";
             break;
-        default:
-            output = "No Weapon Type";
-            break;
     }
     return output;
 }
@@ -363,6 +365,9 @@ std::string GetArmorSizeName(ArmorSize size)
     std::string output;
     switch (size)
     {
+        default:
+            output = "No Armor Size";
+            break;
         case kASAll:
             output = "Universal Armor";
             break;
@@ -375,9 +380,6 @@ std::string GetArmorSizeName(ArmorSize size)
         case kASHeavy:
             output = "Heavy Armor";
             break;
-        default:
-            output = "No Armor Size";
-            break;
     }
     return output;
 }
@@ -387,6 +389,9 @@ std::string GetShieldSizeName(ShieldSize size)
     std::string output;
     switch (size)
     {
+        default:
+            output = "No Shield Size";
+            break;
         case kSSLight:
             output = "Light Shield";
             break;
@@ -395,9 +400,6 @@ std::string GetShieldSizeName(ShieldSize size)
             break;
         case kSSHeavy:
             output = "Heavy Shield";
-            break;
-        default:
-            output = "No Shield Size";
             break;
     }
     return output;
@@ -408,6 +410,7 @@ std::string GetToolTypeName(ToolType type)
     std::string output;
     switch (type)
     {
+        default:
         case ToolType::NoType:
             output = "No Tool Type";
             break;
@@ -447,9 +450,6 @@ std::string GetToolTypeName(ToolType type)
         case ToolType::Tinderbox:
             output = "Tinderbox";
             break;
-        default:
-            output = "No Tool Type";
-            break;
     }
     return output;
 }
@@ -459,6 +459,7 @@ std::string GetNodeTypeName(NodeType type)
     std::string output;
     switch (type)
     {
+        default:
         case NodeType::NoType:
             output = "No Node Type";
             break;
@@ -480,6 +481,7 @@ std::string GetResourceTypeName(ResourceType type)
     std::string output;
     switch (type)
     {
+        default:
         case ResourceType::NoType:
             output = "No Resource Type";
             break;
@@ -528,14 +530,14 @@ std::string GetSeedTypeName(SeedType type)
     std::string output;
     switch (type)
     {
+        default:
+            output = "No Seed Type";
+            break;
         case kSeedTree:
             output = "Tree Seed";
             break;
         case kSeedPlant:
             output = "Plant Seed";
-            break;
-        default:
-            output = "No Seed Type";
             break;
     }
     return output;
@@ -546,6 +548,10 @@ std::string GetMechanismTypeName(MechanismType type)
     std::string output;
     switch (type)
     {
+        default:
+        case MechanismType::None:
+            output = "No Mechanism Type";
+            break;
         case MechanismType::Door:
             output = "Door";
             break;
@@ -558,9 +564,6 @@ std::string GetMechanismTypeName(MechanismType type)
         case MechanismType::Lever:
             output = "Lever";
             break;
-        case MechanismType::None:
-            output = "No Mechanism Type";
-            break;
     }
     return output;
 }
@@ -570,6 +573,7 @@ std::string GetActionTypeName(ActionType type)
     std::string output;
     switch (type)
     {
+        default:
         case ActionType::NoAction:
             output = "No Action";
             break;
@@ -593,9 +597,22 @@ std::string GetActionTypeName(ActionType type)
 }
 std::string GetGenderTypeName(GenderType type)
 {
-    if (type == GenderType::Male) return "male";
-    if (type == GenderType::Female) return "female";
-    return "none";
+    std::string output;
+    switch (type)
+    {
+        default:
+        case GenderType::None:
+            output = "none";
+            break;
+        case GenderType::Male:
+            output = "male";
+            break;
+        case GenderType::Female:
+            output = "female";
+            break;
+
+    }
+    return output;
 }
 
 std::string GetModelFlagString(int flags)

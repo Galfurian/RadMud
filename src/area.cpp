@@ -432,7 +432,6 @@ std::string Area::drawASCIIFov(Room * centerRoom, unsigned int radius)
             std::string tile;
             if ((mapTile == kMapWalk) || (mapTile == kMapDoorOpen))
             {
-                Room * room = this->getRoom(x, y, origin_z);
                 Exit * up = room->findExit(Direction::Up);
                 Exit * down = room->findExit(Direction::Down);
                 // VI  - WALKABLE

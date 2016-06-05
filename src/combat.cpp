@@ -51,22 +51,47 @@ OpponentsList::OpponentsList(Character * _owner) :
     // Nothing to do.
 }
 
-bool OpponentsList::addOpponent(Character * opponent, unsigned int itialAggression)
+bool OpponentsList::addOpponent(Character * character, unsigned int initAggro)
 {
     bool ret = false;
-    auto iterator = std::find(aggressionList.begin(), aggressionList.end(), opponent);
+    auto iterator = std::find(aggressionList.begin(), aggressionList.end(), character);
     if (iterator == aggressionList.end())
     {
-        if (itialAggression == 0)
+        if (initAggro == 0)
         {
-            itialAggression = this->getInitialAggro(opponent);
+            initAggro = this->getInitialAggro(character);
         }
         // Add the aggressor.
-        aggressionList.push_back(Aggression(opponent, itialAggression));
+        aggressionList.push_back(Aggression(character, initAggro));
         // Sort the list.
         this->sortList();
         // Set return value to success.
         ret = true;
+    }
+    return ret;
+}
+
+bool OpponentsList::remOpponent(Character * character)
+{
+    auto iterator = std::find(aggressionList.begin(), aggressionList.end(), character);
+    if (iterator != aggressionList.end())
+    {
+        iterator = aggressionList.erase(iterator, aggressionList.end());
+        return true;
+    }
+    return false;
+}
+
+bool OpponentsList::hasOpponent(Character * character)
+{
+    bool ret = false;
+    for (auto it : aggressionList)
+    {
+        if (it == character)
+        {
+            ret = true;
+            break;
+        }
     }
     return ret;
 }
@@ -76,40 +101,10 @@ bool OpponentsList::hasOpponents() const
     return (!aggressionList.empty());
 }
 
-bool OpponentsList::hasOpponent(Character * opponent)
+bool OpponentsList::setAggro(Character * character, unsigned int newAggression)
 {
     bool ret = false;
-    for (auto it : aggressionList)
-    {
-        if (it == opponent)
-        {
-            ret = true;
-            break;
-        }
-    }
-    return ret;
-}
-
-bool OpponentsList::removeOpponent(Character * opponent)
-{
-    auto iterator = std::find(aggressionList.begin(), aggressionList.end(), opponent);
-    if (iterator != aggressionList.end())
-    {
-        iterator = aggressionList.erase(iterator, aggressionList.end());
-        return true;
-    }
-    return false;
-}
-
-const Aggression & OpponentsList::getTopAggro()
-{
-    return (*aggressionList.begin());
-}
-
-bool OpponentsList::setAggro(Character * opponent, unsigned int newAggression)
-{
-    bool ret = false;
-    auto iterator = std::find(aggressionList.begin(), aggressionList.end(), opponent);
+    auto iterator = std::find(aggressionList.begin(), aggressionList.end(), character);
     if (iterator != aggressionList.end())
     {
         // Set the new aggro.
@@ -122,22 +117,32 @@ bool OpponentsList::setAggro(Character * opponent, unsigned int newAggression)
     return ret;
 }
 
+Aggression * OpponentsList::getTopAggro()
+{
+    if (!aggressionList.empty())
+    {
+        return &(*aggressionList.begin());
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
 bool OpponentsList::moveToTopAggro(Character * character)
 {
-    // First check if there are opponents.
-    if (!this->hasOpponents())
-    {
-        // Just add the opponent with the minimum value of aggro.
-        this->addOpponent(character, this->getInitialAggro(character));
-        return true;
-    }
-    // First check if the character is part of the opponents.
+    // Check if the character is a valid opponent.
     if (!this->hasOpponent(character))
     {
-        this->addOpponent(character, this->getInitialAggro(character));
+        return false;
+    }
+    Aggression * topAggressor = this->getTopAggro();
+    if (topAggressor == nullptr)
+    {
+        return false;
     }
     // Check if the character is already the top aggro.
-    if (this->getTopAggro() == character)
+    if (topAggressor->aggressor == character)
     {
         return false;
     }
