@@ -26,6 +26,69 @@
 
 #include "utilities/coordinates.hpp"
 
+/// List of telnet commands.
+typedef enum class TelnetChars
+{
+    //OPTIONS
+    Echo = 1,
+    SuppressGoAhead = 3,
+    Status = 5,
+    TimingMark = 6,
+    TerminalType = 24,
+    NegotiateAboutWindowSize = 31,
+    TerminalSpeed = 32,
+    RemoteFlowControl = 33,
+    LineMode = 34,
+    EnvironmentVariables = 36,
+    NewEnvironmentOption = 39,
+    // MUD OPTIONS
+    /// Mud Terminal Type Standard
+    TTYPE = 24,
+    /// Mud Server Data Protocol
+    MSDP = 69,
+    /// MSDP Commands
+    MSDP_VAR = 1,
+    MSDP_VAL = 2,
+    MSDP_TABLE_OPEN = 3,
+    MSDP_TABLE_CLOSE = 4,
+    MSDP_ARRAY_OPEN = 5,
+    MSDP_ARRAY_CLOSE = 6,
+    /// Mud Server Status Protocol
+    MSSP = 70,
+    /// Mud Client Compression Protocol
+    MCCP = 86,
+    // NEGOTIATION 1
+    SubNegotiationEnd = 240,
+    NoOperation = 241,
+    DataMark = 242,
+    Break = 243,
+    InterruptProcess = 244,
+    AbortOutput = 245,
+    AreYouThere = 246,
+    EraseCharacter = 247,
+    EraseLine = 248,
+    GoAhead = 249,
+    SubnegotiationBegin = 250,
+    // NEGOTIATION 2
+    /// I will use option.
+    WILL = 251,
+    /// I wont use option.
+    WONT = 252,
+    /// Please, you use option
+    DO = 253,
+    /// Don't use option.
+    DONT = 254,
+    /// Interpret As Command
+    IAC = 255,
+    // RADMUD SPECIFIC
+    /// I will send the map.
+    DRAW_MAP = 91,
+    /// Please, clear the already drawn map.
+    CLR_MAP = 92,
+    /// I will send a format string.
+    FORMAT = 100
+} TelnetChar;
+
 /// The possible directions.
 typedef enum class Directions
 {
@@ -74,6 +137,8 @@ typedef enum class ConnectionStates
 {
     /// The player has no state.
     NoState,
+    /// The player is negotiating for MSDP.
+    NegotiatingMSDP,
     /// We want their player name.
     AwaitingName,
     /// We want their password.

@@ -19,8 +19,6 @@
 // Basic Include.
 #include "commands.hpp"
 
-#include <istream>
-
 // Other Include.
 #include "mud.hpp"
 
@@ -921,6 +919,8 @@ void RollbackCharacterCreation(Character * character, ConnectionState new_state)
     {
         default:
             break;
+        case ConnectionState::NegotiatingMSDP:
+            break;
         case ConnectionState::NoState:
             break;
         case ConnectionState::AwaitingName:
@@ -1275,7 +1275,7 @@ void LoadCommands()
     }
     {
         command.name = "travel";
-        command.help = "Allow the character to travel.";
+        command.help = "Allow the character to travel between areas.";
         command.args = "";
         command.hndl = DoTravel;
         Mud::instance().addCommand(command);

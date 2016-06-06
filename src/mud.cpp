@@ -24,6 +24,7 @@
 #include <errno.h>
 
 #include "logger.hpp"
+#include "protocol.hpp"
 
 /// Input file descriptor.
 static fd_set in_set;
@@ -841,8 +842,7 @@ void Mud::processNewConnection()
             Logger::log(LogLevel::Global, " Port    : " + ToString(port));
             Logger::log(LogLevel::Global, "#----------------------------------#");
 
-            // Prepare to receive the player name.
-            AdvanceCharacterCreation(player, ConnectionState::AwaitingName);
+            NegotiateMSDP(player);
         }
         catch (std::exception & e)
         {
@@ -1079,6 +1079,9 @@ bool Mud::startMud()
 
     Logger::log(LogLevel::Global, "Initializing States...");
     LoadStates();
+
+    Logger::log(LogLevel::Global, "Initializing MSDP States...");
+    LoadMSDPStates();
 
     Logger::log(LogLevel::Global, "Initializing Database...");
     if (!this->initDatabase())

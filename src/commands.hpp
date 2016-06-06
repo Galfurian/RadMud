@@ -22,7 +22,7 @@
 #include "character.hpp"
 #include "constants.hpp"
 #include "profession.hpp"
-#include "utils.hpp"
+#include <iosfwd>
 
 /// @brief Contains all the informations concerning a command, including its handler.
 class Command

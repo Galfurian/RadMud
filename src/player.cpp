@@ -62,7 +62,7 @@ Player::Player(const int & _socket, const int & _port, const std::string & _addr
         rent_room(),
         skills(),
         remaining_points(),
-        connection_state(),
+        connection_state(ConnectionState::NoState),
         password_attempts(),
         closing(),
         logged_in()
@@ -323,7 +323,7 @@ bool Player::remInventoryItem(Item * item)
     if (Character::remInventoryItem(item))
     {
         SQLiteDbms::instance().deleteFrom("ItemPlayer",
-            { std::make_pair("owner", name), std::make_pair("item", ToString(item->vnum)) });
+        { std::make_pair("owner", name), std::make_pair("item", ToString(item->vnum)) });
         return true;
     }
     return false;
@@ -338,7 +338,7 @@ bool Player::remEquipmentItem(Item * item)
     if (Character::remEquipmentItem(item))
     {
         SQLiteDbms::instance().deleteFrom("ItemPlayer",
-            { std::make_pair("owner", name), std::make_pair("item", ToString(item->vnum)) });
+        { std::make_pair("owner", name), std::make_pair("item", ToString(item->vnum)) });
         return true;
     }
     return false;
@@ -461,8 +461,15 @@ void Player::processRead()
         string::size_type i = inbuf.find('\n');
         if (i == string::npos)
         {
-            // No more at present.
-            break;
+            if (inbuf.empty())
+            {
+                // No more at present.
+                break;
+            }
+            else
+            {
+                i = inbuf.size() - 1;
+            }
         }
 
         // Extract first line.
