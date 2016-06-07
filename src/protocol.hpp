@@ -1,5 +1,5 @@
-/// @file   msdp.hpp
-/// @brief  Define the negotiation functions for MUD Server Data Protocol.
+/// @file   protocol.hpp
+/// @brief  Define the negotiation functions for MUD.
 /// @author Enrico Fraccaroli
 /// @date   Jun 5 2016
 /// @copyright
@@ -16,17 +16,19 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef MSDP_HPP
-#define MSDP_HPP
+#ifndef PROTOCOL_HPP
+#define PROTOCOL_HPP
 
 #include "character.hpp"
 #include <iosfwd>
 
+void LoadProtocolStates();
+
+bool ExtractCommand(const std::string & source, size_t & index, TelnetChar & command);
+
 void PrintCommands(const std::string & source);
 
-void LoadMSDPStates();
-
-void NegotiateMSDP(Character * character);
+void NegotiateProtocol(Character * character);
 
 void ProcessMSDP(Character * character, std::istream & sArgs);
 

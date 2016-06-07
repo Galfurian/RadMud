@@ -1,5 +1,5 @@
-/// @file   msdp.cpp
-/// @brief  Implement the negotiation functions for MUD Server Data Protocol.
+/// @file   protocol.cpp
+/// @brief  Implement the protocol negotiation functions.
 /// @author Enrico Fraccaroli
 /// @date   Jun 5 2016
 /// @copyright
@@ -20,9 +20,27 @@
 #include "logger.hpp"
 #include "mud.hpp"
 
-void LoadMSDPStates()
+void LoadProtocolStates()
 {
     Mud::instance().addStateAction(ConnectionState::NegotiatingMSDP, ProcessMSDP);
+}
+
+bool ExtractCommand(const std::string & source, size_t & index, TelnetChar & command)
+{
+    if (source.empty())
+    {
+        return false;
+    }
+    if (index > source.size())
+    {
+        return false;
+    }
+    if (!TelnetCharTest::is_value(source.at(index)))
+    {
+        return false;
+    }
+    command = static_cast<TelnetChar>(source.at(index));
+    return true;
 }
 
 void PrintCommands(const std::string & source)
@@ -51,7 +69,7 @@ void PrintCommands(const std::string & source)
         }
         else if (source[index] == static_cast<char>(TelnetChar::NegotiateAboutWindowSize))
         {
-            Logger::log(LogLevel::Debug, "NegotiateAboutWindowSize");
+            Logger::log(LogLevel::Debug, "NegotiateProtocolAboutWindowSize");
         }
         else if (source[index] == static_cast<char>(TelnetChar::TerminalSpeed))
         {
@@ -196,7 +214,7 @@ void PrintCommands(const std::string & source)
     }
 }
 
-void NegotiateMSDP(Character * character)
+void NegotiateProtocol(Character * character)
 {
     Player * player = character->toPlayer();
 

@@ -842,7 +842,7 @@ void Mud::processNewConnection()
             Logger::log(LogLevel::Global, " Port    : " + ToString(port));
             Logger::log(LogLevel::Global, "#----------------------------------#");
 
-            NegotiateMSDP(player);
+            NegotiateProtocol(player);
         }
         catch (std::exception & e)
         {
@@ -1081,7 +1081,7 @@ bool Mud::startMud()
     LoadStates();
 
     Logger::log(LogLevel::Global, "Initializing MSDP States...");
-    LoadMSDPStates();
+    LoadProtocolStates();
 
     Logger::log(LogLevel::Global, "Initializing Database...");
     if (!this->initDatabase())
