@@ -25,10 +25,12 @@
 #include <set>
 
 #include "utilities/coordinates.hpp"
+#include "utilities/enum_cheker.hpp"
 
 /// List of telnet commands.
 typedef enum class TelnetChars
 {
+    None = 0,
     //OPTIONS
     Echo = 1,
     SuppressGoAhead = 3,
@@ -88,6 +90,47 @@ typedef enum class TelnetChars
     /// I will send a format string.
     FORMAT = 100
 } TelnetChar;
+using TelnetCharTest = EnumCheck<TelnetChar,
+TelnetChar::Echo,
+TelnetChar::SuppressGoAhead,
+TelnetChar::Status,
+TelnetChar::TimingMark,
+TelnetChar::TerminalType,
+TelnetChar::NegotiateAboutWindowSize,
+TelnetChar::TerminalSpeed,
+TelnetChar::RemoteFlowControl,
+TelnetChar::LineMode,
+TelnetChar::EnvironmentVariables,
+TelnetChar::NewEnvironmentOption,
+TelnetChar::TTYPE,
+TelnetChar::MSDP,
+TelnetChar::MSDP_VAR,
+TelnetChar::MSDP_VAL,
+TelnetChar::MSDP_TABLE_OPEN,
+TelnetChar::MSDP_TABLE_CLOSE,
+TelnetChar::MSDP_ARRAY_OPEN,
+TelnetChar::MSDP_ARRAY_CLOSE,
+TelnetChar::MSSP,
+TelnetChar::MCCP,
+TelnetChar::SubNegotiationEnd,
+TelnetChar::NoOperation,
+TelnetChar::DataMark,
+TelnetChar::Break,
+TelnetChar::InterruptProcess,
+TelnetChar::AbortOutput,
+TelnetChar::AreYouThere,
+TelnetChar::EraseCharacter,
+TelnetChar::EraseLine,
+TelnetChar::GoAhead,
+TelnetChar::SubnegotiationBegin,
+TelnetChar::WILL,
+TelnetChar::WONT,
+TelnetChar::DO,
+TelnetChar::DONT,
+TelnetChar::IAC,
+TelnetChar::DRAW_MAP,
+TelnetChar::CLR_MAP,
+TelnetChar::FORMAT>;
 
 /// The possible directions.
 typedef enum class Directions
