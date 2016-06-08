@@ -156,9 +156,9 @@ find_package(ZLIB REQUIRED)
 find_package(Sqlite3 REQUIRED)
 
 include_directories(
-	${LUA_INCLUDE_DIRS}
-	${ZLIB_INCLUDE_DIRS}
-	${SQLITE3_INCLUDE_DIRS}
+	${LUA_INCLUDE_DIR}
+	${ZLIB_INCLUDE_DIR}
+	${SQLITE3_INCLUDE_DIR}
 	./src/luabridge
 	./src/utilities
 	./src/sqlite
