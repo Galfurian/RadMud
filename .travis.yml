@@ -7,7 +7,7 @@ os:
     - linux
 before_install:
     - sudo apt-get update  -qq
-    - sudo apt-get install -qq libpthread-stubs0-dev libsqlite3-dev liblua50-dev zlib1g-dev
+    - sudo apt-get install -qq libpthread-stubs0-dev libsqlite3-dev liblua5.1-0-dev zlib1g-dev
 script:
     - mkdir build
     - cd build
