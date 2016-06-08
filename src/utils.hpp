@@ -238,6 +238,25 @@ bool IsAllASCII(const char *string_to_check);
 /// @return The generated integer.
 int RandInteger(const int & nMin, const int & nMax);
 
+/// @brief Transform a numeric value into a string.
+/// @param value The value to turn into a string.
+/// @return The resulting string.
+template<typename ValueType>
+ValueType TRandInteger(const ValueType & lower_bound, const ValueType & upper_bound)
+{
+    static_assert((
+            std::is_same<ValueType, bool>::value ||
+            std::is_same<ValueType, int>::value ||
+            std::is_same<ValueType, long int>::value ||
+            std::is_same<ValueType, unsigned int>::value ||
+            std::is_same<ValueType, long unsigned int>::value ||
+            std::is_same<ValueType,double>::value), "template parameter is of the wrong type");
+
+    std::random_device rng;
+    std::uniform_int_distribution<ValueType> uid(lower_bound, upper_bound);
+    return uid(rng);
+}
+
 /// @brief Check if the string is a number.
 /// @param source The string to check.
 /// @return <b>True</b> if the string it's a number, <b>False</b> otherwise.
@@ -246,7 +265,7 @@ bool IsNumber(const std::string & source);
 /// @brief Return the modifier of the given ability.
 /// @param value The total ability value.
 /// @return The ability modifier.
-int GetAbilityModifier(const int & value);
+unsigned int GetAbilityModifier(const int & value);
 
 /// @brief Given a player target, eg.: 2.rat.<br>Extract the number <b>2</b>.
 /// @param source The source string.
@@ -364,9 +383,9 @@ class Stopwatch
         /// @brief Constructor.
         /// @param _header The header of the stopwatch.
         Stopwatch(std::string _header) :
-                header(_header),
-                timeStart(ClockT::now()),
-                timeEnd(ClockT::now())
+            header(_header),
+            timeStart(ClockT::now()),
+            timeEnd(ClockT::now())
         {
             // Nothing to do.
         }

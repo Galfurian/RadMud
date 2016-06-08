@@ -25,19 +25,19 @@
 #include "constants.hpp"
 
 Action::Action(Character * _character) :
-        type(ActionType::Wait),
-        actor(_character),
-        target(),
-        itemTarget(),
-        destination(),
-        direction(Direction::None),
-        production(),
-        schematics(),
-        craftMaterial(),
-        usedTools(),
-        usedIngredients(),
-        actionCooldown(),
-        nextCombatAction()
+    type(ActionType::Wait),
+    actor(_character),
+    target(),
+    itemTarget(),
+    destination(),
+    direction(Direction::None),
+    production(),
+    schematics(),
+    craftMaterial(),
+    usedTools(),
+    usedIngredients(),
+    actionCooldown(),
+    nextCombatAction()
 {
     // Nothing to do.
 }
@@ -312,7 +312,7 @@ bool Action::setNextCombatAction(const CombatAction & nextAction)
     }
     else if (nextCombatAction == CombatAction::Flee)
     {
-        unsigned int base = 6.0;
+        double base = 6.0;
         // The agility modifier.
         double agility = (actor->agility + actor->effects.getAgiMod()) * 3.5 * (base / 100);
         // The weight modifier.
@@ -339,26 +339,24 @@ void Action::performAttack(Character * opponent)
     if ((rh == nullptr) && (lh == nullptr))
     {
         // Roll the attack.
-        unsigned int ATK = RandInteger(1, 20);
+        unsigned int ATK = TRandInteger<unsigned int>(1, 20);
         // Log the rolled value.
         Logger::log(LogLevel::Debug, "%s rolls a %s against %s.", actor->getNameCapital(), ToString(ATK), ToString(AC));
         // Check if its a hit.
         if (ATK < AC)
         {
             actor->sendMsg("You miss %s with your fist.\n", opponent->getName());
-            opponent->sendMsg("%s misses you with %s fist.\n\n",
-                actor->getNameCapital(), actor->getPossessivePronoun());
+            opponent->sendMsg("%s misses you with %s fist.\n\n", actor->getNameCapital(),
+                actor->getPossessivePronoun());
             return;
         }
         // Roll the damage.
-        unsigned int DMG = RandInteger(1, 3) + STR;
+        unsigned int DMG = TRandInteger<unsigned int>(1, 3) + STR;
         // Log the rolled value.
         Logger::log(LogLevel::Debug, "%s hit %s for %s.", actor->getNameCapital(), opponent->getName(), ToString(DMG));
         actor->sendMsg("You hit %s with your fist for %s.\n", opponent->getName(), ToString(DMG));
-        opponent->sendMsg("%s hits you with %s fist for %s.\n\n",
-            actor->getNameCapital(),
-            actor->getPossessivePronoun(),
-            ToString(DMG));
+        opponent->sendMsg("%s hits you with %s fist for %s.\n\n", actor->getNameCapital(),
+            actor->getPossessivePronoun(), ToString(DMG));
         return;
     }
 
@@ -369,7 +367,7 @@ void Action::performAttack(Character * opponent)
     if (rhCanAttack)
     {
         // Roll the attack.
-        unsigned int ATK = RandInteger(1, 20);
+        unsigned int ATK = TRandInteger<unsigned int>(1, 20);
         // Evaluate any kind of hit penality.
         if (rhCanAttack && lhCanAttack)
         {
@@ -389,14 +387,13 @@ void Action::performAttack(Character * opponent)
         if (ATK < AC)
         {
             actor->sendMsg("You miss %s with %s.\n", opponent->getName(), rh->getName());
-            opponent->sendMsg("%s misses you with %s %s.\n\n",
-                actor->getNameCapital(), actor->getPossessivePronoun(),
+            opponent->sendMsg("%s misses you with %s %s.\n\n", actor->getNameCapital(), actor->getPossessivePronoun(),
                 rh->getName());
             return;
         }
         // Roll the damage.
         unsigned int DMG = 1;
-        DMG += RandInteger(rh->model->getWeaponFunc().minDamage, rh->model->getWeaponFunc().maxDamage);
+        DMG += TRandInteger<unsigned int>(rh->model->getWeaponFunc().minDamage, rh->model->getWeaponFunc().maxDamage);
         if (HasFlag(rh->model->flags, ModelFlag::TwoHand))
         {
             DMG += static_cast<unsigned int>(STR * 1.5);
@@ -406,13 +403,11 @@ void Action::performAttack(Character * opponent)
             DMG += STR;
         }
         // Log the damage.
-        Logger::log(LogLevel::Debug, "%s hit %s for %s with %s.",
-            actor->getNameCapital(), opponent->getName(),
+        Logger::log(LogLevel::Debug, "%s hit %s for %s with %s.", actor->getNameCapital(), opponent->getName(),
             ToString(DMG), rh->getName());
         // Send the messages to the characters.
         actor->sendMsg("You hit %s with your %s for %s.\n", opponent->getName(), rh->getName(), ToString(DMG));
-        opponent->sendMsg("%s hits you with %s %s for %s.\n\n",
-            actor->getNameCapital(), actor->getPossessivePronoun(),
+        opponent->sendMsg("%s hits you with %s %s for %s.\n\n", actor->getNameCapital(), actor->getPossessivePronoun(),
             rh->getName(), ToString(DMG));
     }
 
@@ -420,7 +415,7 @@ void Action::performAttack(Character * opponent)
     if (lhCanAttack)
     {
         // Roll the attack.
-        unsigned int ATK = RandInteger(1, 20);
+        unsigned int ATK = TRandInteger<unsigned int>(1, 20);
         // Evaluate any kind of hit penality.
         if (rhCanAttack && lhCanAttack)
         {
@@ -440,23 +435,20 @@ void Action::performAttack(Character * opponent)
         if (ATK < AC)
         {
             actor->sendMsg("You miss %s with %s.\n", opponent->getName(), lh->getName());
-            opponent->sendMsg("%s misses you with %s %s.\n\n",
-                actor->getNameCapital(), actor->getPossessivePronoun(),
+            opponent->sendMsg("%s misses you with %s %s.\n\n", actor->getNameCapital(), actor->getPossessivePronoun(),
                 lh->getName());
             return;
         }
         // Roll the damage.
         unsigned int DMG = 1;
-        DMG += RandInteger(lh->model->getWeaponFunc().minDamage, lh->model->getWeaponFunc().maxDamage);
+        DMG += TRandInteger<unsigned int>(lh->model->getWeaponFunc().minDamage, lh->model->getWeaponFunc().maxDamage);
         DMG += static_cast<unsigned int>(STR * 0.5);
         // Log the damage.
-        Logger::log(LogLevel::Debug, "%s hit %s for %s with %s.",
-            actor->getNameCapital(), opponent->getName(),
+        Logger::log(LogLevel::Debug, "%s hit %s for %s with %s.", actor->getNameCapital(), opponent->getName(),
             ToString(DMG), lh->getName());
         // Send the messages to the characters.
         actor->sendMsg("You hit %s with your %s for %s.\n", opponent->getName(), lh->getName(), ToString(DMG));
-        opponent->sendMsg("%s hits you with %s %s for %s.\n\n",
-            actor->getNameCapital(), actor->getPossessivePronoun(),
+        opponent->sendMsg("%s hits you with %s %s for %s.\n\n", actor->getNameCapital(), actor->getPossessivePronoun(),
             lh->getName(), ToString(DMG));
     }
 
@@ -960,13 +952,13 @@ void Action::performComb()
         // Reset the next combat action.
         nextCombatAction = CombatAction::NoAction;
         // Get the character chance of fleeing.
-        unsigned int fleeChance = RandInteger(0, 10);
+        unsigned int fleeChance = TRandInteger<unsigned int>(0, 10);
         fleeChance += GetAbilityModifier(actor->agility + actor->effects.getAgiMod());
         // Base the escape level on how many enemies are surrounding the character.
         unsigned int chaseLevel = 0;
         for (unsigned int it = 0; it < actor->opponents.getSize(); ++it)
         {
-            chaseLevel += RandInteger(0, 1);
+            chaseLevel += TRandInteger<unsigned int>(0, 1);
         }
         if (fleeChance < chaseLevel)
         {
@@ -977,12 +969,11 @@ void Action::performComb()
         else
         {
             Logger::log(LogLevel::Debug, "Choosing where to flee.");
-            int maxValue = static_cast<int>(actor->room->exits.size());
-            unsigned int randomExit = RandInteger(0, maxValue);
+            size_t maxValue = actor->room->exits.size();
+            size_t randomExit = TRandInteger<size_t>(0, maxValue);
             Exit * selected = actor->room->exits.at(randomExit);
             actor->moveTo(selected->destination, actor->getNameCapital() + " flees from the battlefield.",
-                actor->getNameCapital() + " arives fleeing.",
-                "You flee from the battlefield.");
+                actor->getNameCapital() + " arives fleeing.", "You flee from the battlefield.");
             return;
         }
     }

@@ -297,7 +297,7 @@ bool IsNumber(const std::string & source)
     return true;
 }
 
-int GetAbilityModifier(const int & value)
+unsigned int GetAbilityModifier(const int & value)
 {
     int modifier = 0;
     if ((value - 10) > 0)
