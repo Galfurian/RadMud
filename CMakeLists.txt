@@ -159,6 +159,7 @@ include_directories(
 	${LUA_INCLUDE_DIR}
 	${ZLIB_INCLUDE_DIR}
 	${SQLITE3_INCLUDE_DIR}
+	./src/luabridge/detail
 	./src/luabridge
 	./src/utilities
 	./src/sqlite
