@@ -24,7 +24,7 @@
 
 void LoadProtocolStates();
 
-bool ExtractCommand(const std::string & source, size_t & index, TelnetChar & command);
+bool ExtractCommand(const std::string & source, size_t & index, TelnetChar & command, std::string & buffer);
 
 void NegotiateProtocol(Character * character, const ConnectionState & nextState);
 
