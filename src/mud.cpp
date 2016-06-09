@@ -842,7 +842,8 @@ void Mud::processNewConnection()
             Logger::log(LogLevel::Global, " Port    : " + ToString(port));
             Logger::log(LogLevel::Global, "#----------------------------------#");
 
-            NegotiateProtocol(player);
+            // Activate the procedure of negotiation.
+            NegotiateProtocol(player, ConnectionState::NegotiatingMSDP);
         }
         catch (std::exception & e)
         {

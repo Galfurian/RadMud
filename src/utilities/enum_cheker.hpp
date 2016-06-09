@@ -47,7 +47,7 @@ class EnumCheck<EnumType, V, Next...> : private EnumCheck<EnumType, Next...>
         }
 
         template<typename IntType>
-        EnumType convert(IntType value)
+        static EnumType convert(IntType value)
         {
             if (!is_value(value))
             {

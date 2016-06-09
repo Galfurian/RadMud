@@ -26,10 +26,10 @@ void LoadProtocolStates();
 
 bool ExtractCommand(const std::string & source, size_t & index, TelnetChar & command);
 
-void PrintCommands(const std::string & source);
-
-void NegotiateProtocol(Character * character);
+void NegotiateProtocol(Character * character, const ConnectionState & nextState);
 
 void ProcessMSDP(Character * character, std::istream & sArgs);
+
+void ProcessMCCP(Character * character, std::istream & sArgs);
 
 #endif

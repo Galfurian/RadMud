@@ -32,10 +32,10 @@ typedef enum class TelnetChars
 {
     None = 0,
     //OPTIONS
-    Echo = 1,
-    SuppressGoAhead = 3,
-    Status = 5,
-    TimingMark = 6,
+    //Echo = 1,
+    //SuppressGoAhead = 3,
+    //Status = 5,
+    //TimingMark = 6,
     TerminalType = 24,
     NegotiateAboutWindowSize = 31,
     TerminalSpeed = 32,
@@ -91,10 +91,10 @@ typedef enum class TelnetChars
     FORMAT = 100
 } TelnetChar;
 using TelnetCharTest = EnumCheck<TelnetChar,
-TelnetChar::Echo,
-TelnetChar::SuppressGoAhead,
-TelnetChar::Status,
-TelnetChar::TimingMark,
+//TelnetChar::Echo,
+//TelnetChar::SuppressGoAhead,
+//TelnetChar::Status,
+//TelnetChar::TimingMark,
 TelnetChar::TerminalType,
 TelnetChar::NegotiateAboutWindowSize,
 TelnetChar::TerminalSpeed,
@@ -182,6 +182,8 @@ typedef enum class ConnectionStates
     NoState,
     /// The player is negotiating for MSDP.
     NegotiatingMSDP,
+    /// The player is negotiating for MCCP.
+    NegotiatingMCCP,
     /// We want their player name.
     AwaitingName,
     /// We want their password.
@@ -920,6 +922,8 @@ std::string GetMechanismTypeName(MechanismType type);
 std::string GetActionTypeName(ActionType type);
 /// Return the string describing the type of Gender.
 std::string GetGenderTypeName(GenderType type);
+/// Return the string describing the telnet character.
+std::string GetTelnetCharName(TelnetChar c);
 ///@}
 
 /// @defgroup FlagsToList Flags to List of Strings.
