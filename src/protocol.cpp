@@ -22,43 +22,41 @@
 
 void LoadProtocolStates()
 {
-    Mud::instance().addStateAction(ConnectionState::NegotiatingMSDP, ProcessMSDP);
-    Mud::instance().addStateAction(ConnectionState::NegotiatingMCCP, ProcessMCCP);
+    Mud::instance().addStateAction(ConnectionState::NegotiatingMSDP, ProcessTelnetCommand);
+    Mud::instance().addStateAction(ConnectionState::NegotiatingMCCP, ProcessTelnetCommand);
 }
 
 bool ExtractCommand(const std::string & source, size_t & index, TelnetChar & command, std::string & buffer)
 {
+    // Check if the source string is empty.
     if (source.empty())
     {
-        //Logger::log(LogLevel::Error, "Source empty!");
         return false;
     }
+    // Check if we've exceeded the string size.
     if (index >= source.size())
     {
-        //Logger::log(LogLevel::Error, "Index exceded!");
         return false;
     }
+    // Check if the character is a valid Telnet Character.
     if (!TelnetCharTest::is_value(source.at(index)))
     {
-        //Logger::log(LogLevel::Error, "Character is not valid!");
-        return false;
+        command = TelnetChar::None;
     }
-    // Retrieve the command.
-    command = static_cast<TelnetChar>(static_cast<unsigned char>(source.at(index)));
-    // Add the command to the buffer.
-    buffer += GetTelnetCharName(command) + " ";
-    // Increment the index.
-    index++;
+    else
+    {
+        // Retrieve the command.
+        command = static_cast<TelnetChar>(static_cast<Byte>(source.at(index)));
+        // Add the command to the buffer.
+        buffer += GetTelnetCharName(command) + " ";
+        // Increment the index.
+        index++;
+    }
     return true;
 }
 
 void NegotiateProtocol(Character * character, const ConnectionState & nextState)
 {
-    if (!character->isPlayer())
-    {
-        Logger::log(LogLevel::Error, "Negotiating for a non-player character");
-        return;
-    }
     // Cast the character to player.
     Player * player = character->toPlayer();
     // Set its next state.
@@ -68,9 +66,9 @@ void NegotiateProtocol(Character * character, const ConnectionState & nextState)
         Logger::log(LogLevel::Debug, "Sending  : IAC WILL MSDP");
         // IAC WILL MSDP
         std::string command;
-        command += static_cast<unsigned char>(TelnetChar::IAC);
-        command += static_cast<unsigned char>(TelnetChar::WILL);
-        command += static_cast<unsigned char>(TelnetChar::MSDP);
+        command += static_cast<Byte>(TelnetChar::IAC);
+        command += static_cast<Byte>(TelnetChar::WILL);
+        command += static_cast<Byte>(TelnetChar::MSDP);
         player->sendMsg(command);
     }
     else if (nextState == ConnectionState::NegotiatingMCCP)
@@ -78,205 +76,189 @@ void NegotiateProtocol(Character * character, const ConnectionState & nextState)
         Logger::log(LogLevel::Debug, "Sending  : IAC WILL MCCP");
         // IAC WILL MCCP
         std::string command;
-        command += static_cast<unsigned char>(TelnetChar::IAC);
-        command += static_cast<unsigned char>(TelnetChar::WILL);
-        command += static_cast<unsigned char>(TelnetChar::MCCP);
+        command += static_cast<Byte>(TelnetChar::IAC);
+        command += static_cast<Byte>(TelnetChar::WILL);
+        command += static_cast<Byte>(TelnetChar::MCCP);
         player->sendMsg(command);
     }
 }
 
-void ProcessMSDP(Character * character, std::istream & sArgs)
+void ProcessTelnetCommand(Character * character, std::istream & sArgs)
 {
+    // Cast the character to player.
+    Player * player = character->toPlayer();
     // Line which will contain the answer to IAC+WILL+MSDP
-    std::string line;
+    std::string source;
     // Retrieve the answer.
-    std::getline(sArgs, line);
+    std::getline(sArgs, source);
     // Get the size of the command.
-    size_t lineSize = line.size();
+    size_t sourceSize = source.size();
     // Prepare an index.
     size_t index = 0;
-    while (index < lineSize)
+    // Non telnet characters.
+    std::string content;
+    while (index < sourceSize)
     {
         std::string result;
         TelnetChar command;
-        if (ExtractCommand(line, index, command, result))
+        // Keep reading until we find an IAC.
+        while (index < sourceSize)
         {
+            if (!ExtractCommand(source, index, command, result))
+            {
+                break;
+            }
             if (command == TelnetChar::IAC)
             {
-                if (ExtractCommand(line, index, command, result))
+                break;
+            }
+            else
+            {
+                result.clear();
+                content += source[index];
+            }
+            index++;
+        }
+        // Read the next Byte.
+        if (!ExtractCommand(source, index, command, result))
+        {
+            break;
+        }
+        // If: DO
+        if (command == TelnetChar::DO)
+        {
+            if (!ExtractCommand(source, index, command, result))
+            {
+                if (player->connection_state == ConnectionState::NegotiatingMSDP)
                 {
-                    if (command == TelnetChar::DO)
+                    SetFlag(player->connectionFlags, ConnectionFlag::UseMSDP);
+                    Logger::log(LogLevel::Debug, "Positive acknowledgments for MSDP (%s).", result);
+                }
+                else if (player->connection_state == ConnectionState::NegotiatingMCCP)
+                {
+                    SetFlag(player->connectionFlags, ConnectionFlag::UseMCCP);
+                    Logger::log(LogLevel::Debug, "Positive acknowledgments for MCCP (%s).", result);
+                }
+                break;
+            }
+            if (command == TelnetChar::MSDP)
+            {
+                SetFlag(player->connectionFlags, ConnectionFlag::UseMSDP);
+                Logger::log(LogLevel::Debug, "Positive acknowledgments for MSDP (%s).", result);
+                continue;
+            }
+            else if (command == TelnetChar::MCCP)
+            {
+                SetFlag(player->connectionFlags, ConnectionFlag::UseMCCP);
+                Logger::log(LogLevel::Debug, "Positive acknowledgments for MCCP (%s).", result);
+                continue;
+            }
+            else if (command == TelnetChar::MSDP_VAR)
+            {
+                Logger::log(LogLevel::Debug, "Positive acknowledgments for MSDP_VAR (%s).", result);
+                continue;
+            }
+            else
+            {
+                Logger::log(LogLevel::Warning, "Unknown positive acknowledgments (%s).", result);
+            }
+        }
+        else if (command == TelnetChar::DONT)
+        {
+            if (!ExtractCommand(source, index, command, result))
+            {
+                Logger::log(LogLevel::Debug, "Negative acknowledgments (%s).", result);
+                break;
+            }
+            if (command == TelnetChar::MSDP)
+            {
+                Logger::log(LogLevel::Debug, "Negative acknowledgments for MSDP (%s).", result);
+                continue;
+            }
+            else if (command == TelnetChar::MCCP)
+            {
+                Logger::log(LogLevel::Debug, "Negative acknowledgments for MCCP (%s).", result);
+                continue;
+            }
+            else
+            {
+                Logger::log(LogLevel::Warning, "Unknown negative acknowledgments (%s).", result);
+            }
+        }
+        else if (command == TelnetChar::SubnegotiationBegin)
+        {
+            if (!ExtractCommand(source, index, command, result))
+            {
+                break;
+            }
+            if (command == TelnetChar::MSDP)
+            {
+                if (!ExtractCommand(source, index, command, result))
+                {
+                    break;
+                }
+                if (command == TelnetChar::MSDP_VAR)
+                {
+                    std::string variableName;
+                    for (size_t indexVal = index; indexVal < source.size(); ++indexVal)
                     {
-                        if (ExtractCommand(line, index, command, result))
+                        if (source[indexVal] != static_cast<char>(TelnetChar::MSDP_VAL))
                         {
-                            if (command == TelnetChar::MSDP)
-                            {
-                                if (character->isPlayer())
-                                {
-                                    // Cast the character to player.
-                                    Player * player = character->toPlayer();
-                                    SetFlag(player->connectionFlags, ConnectionFlag::UseMSDP);
-                                }
-                                Logger::log(LogLevel::Debug, "Received : " + result);
-                                continue;
-                            }
+                            variableName += source[indexVal];
                         }
                         else
                         {
-                            Logger::log(LogLevel::Debug, "Received : " + result);
-                            continue;
+                            break;
                         }
                     }
-                    else if (command == TelnetChar::DONT)
+                    result += "\"" + variableName + "\" ";
+                    result += "MSDP_VAL ";
+                    // Increment the index.
+                    index += variableName.size() + 1;
+                    std::string variableValue;
+                    for (size_t indexVal = index; indexVal < source.size(); ++indexVal)
                     {
-                        if (ExtractCommand(line, index, command, result))
+                        if (source[indexVal] != static_cast<char>(TelnetChar::IAC))
                         {
-                            if (command == TelnetChar::MSDP)
-                            {
-                                Logger::log(LogLevel::Debug, "Received : " + result);
-                                continue;
-                            }
+                            variableValue += source[indexVal];
                         }
                         else
                         {
-                            Logger::log(LogLevel::Debug, "Received : " + result);
-                            continue;
+                            break;
                         }
                     }
-                    else if (command == TelnetChar::SubnegotiationBegin)
-                    {
-                        if (ExtractCommand(line, index, command, result))
-                        {
-                            if (command == TelnetChar::MSDP)
-                            {
-                                if (ExtractCommand(line, index, command, result))
-                                {
-                                    if (command == TelnetChar::MSDP_VAR)
-                                    {
-                                        std::string variableName;
-                                        for (size_t indexVal = index; indexVal < line.size(); ++indexVal)
-                                        {
-                                            if (line[indexVal] != static_cast<char>(TelnetChar::MSDP_VAL))
-                                            {
-                                                variableName += line[indexVal];
-                                            }
-                                            else
-                                            {
-                                                break;
-                                            }
-                                        }
-                                        result += "\"" + variableName + "\" ";
-                                        result += "MSDP_VAL ";
-                                        // Increment the index.
-                                        index += variableName.size() + 1;
-                                        std::string variableValue;
-                                        for (size_t indexVal = index; indexVal < line.size(); ++indexVal)
-                                        {
-                                            if (line[indexVal] != static_cast<char>(TelnetChar::IAC))
-                                            {
-                                                variableValue += line[indexVal];
-                                            }
-                                            else
-                                            {
-                                                break;
-                                            }
-                                        }
-                                        result += "\"" + variableValue + "\" ";
-                                        result += "IAC";
-                                        // Increment the index.
-                                        index += variableValue.size() + 1;
-                                        // Add the variable to the player's list of msdp variables.
-                                        if (character->isPlayer())
-                                        {
-                                            // Cast the character to player.
-                                            Player * player = character->toPlayer();
-                                            player->msdpVariables[variableName] = variableValue;
-                                        }
-                                        Logger::log(LogLevel::Debug, "Received : " + result);
-                                        continue;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Logger::log(LogLevel::Warning, "Received an unknown character.");
-                    }
+                    result += "\"" + variableValue + "\" ";
+                    result += "IAC";
+                    // Increment the index.
+                    index += variableValue.size() + 1;
+                    player->msdpVariables[variableName] = variableValue;
+                    Logger::log(LogLevel::Debug, "Negotiated (%s).", result);
                 }
             }
         }
-        // Increment the index.
-        ++index;
+        else if (command == TelnetChar::WILL)
+        {
+            Logger::log(LogLevel::Debug, "Positive acknowledgments (%s).", result);
+        }
+        else if (command == TelnetChar::WONT)
+        {
+            Logger::log(LogLevel::Debug, "Positive acknowledgments (%s).", result);
+        }
+        index++;
     }
-    // Activate the procedure of negotiation.
-    NegotiateProtocol(character, ConnectionState::NegotiatingMCCP);
-}
-
-void ProcessMCCP(Character * character, std::istream & sArgs)
-{
-    // Line which will contain the answer to IAC+WILL+MSDP
-    std::string line;
-    // Retrieve the answer.
-    std::getline(sArgs, line);
-    // Get the size of the command.
-    size_t lineSize = line.size();
-    // Prepare an index.
-    size_t index = 0;
-    while (index < lineSize)
+    if (player->connection_state == ConnectionState::NegotiatingMSDP)
     {
-        std::string result;
-        TelnetChar command;
-        if (ExtractCommand(line, index, command, result))
-        {
-            if (command == TelnetChar::IAC)
-            {
-                if (ExtractCommand(line, index, command, result))
-                {
-                    if (command == TelnetChar::DO)
-                    {
-                        if (ExtractCommand(line, index, command, result))
-                        {
-                            if (command == TelnetChar::MCCP)
-                            {
-                                if (character->isPlayer())
-                                {
-                                    // Cast the character to player.
-                                    Player * player = character->toPlayer();
-                                    SetFlag(player->connectionFlags, ConnectionFlag::UseMCCP);
-                                }
-                                Logger::log(LogLevel::Debug, "Received : " + result);
-                                continue;
-                            }
-                        }
-                        else
-                        {
-                            Logger::log(LogLevel::Debug, "Received : " + result);
-                            continue;
-                        }
-                    }
-                    else if (command == TelnetChar::DONT)
-                    {
-                        if (ExtractCommand(line, index, command, result))
-                        {
-                            if (command == TelnetChar::MCCP)
-                            {
-                                Logger::log(LogLevel::Debug, "Received : " + result);
-                                continue;
-                            }
-                        }
-                        else
-                        {
-                            Logger::log(LogLevel::Debug, "Received : " + result);
-                            continue;
-                        }
-                    }
-                }
-            }
-        }
-        // Increment the index.
-        ++index;
+        // Activate the procedure of negotiation.
+        NegotiateProtocol(character, ConnectionState::NegotiatingMCCP);
     }
-    // Activate the procedure of login
-    AdvanceCharacterCreation(character, ConnectionState::AwaitingName);
+    else if (player->connection_state == ConnectionState::NegotiatingMCCP)
+    {
+        // Activate the procedure of login
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingName);
+    }
+    else
+    {
+        // Activate the procedure of login
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingName);
+    }
 }

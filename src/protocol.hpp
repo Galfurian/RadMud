@@ -22,14 +22,14 @@
 #include "character.hpp"
 #include <iosfwd>
 
+typedef unsigned char Byte; /* 8 bits */
+
 void LoadProtocolStates();
 
 bool ExtractCommand(const std::string & source, size_t & index, TelnetChar & command, std::string & buffer);
 
 void NegotiateProtocol(Character * character, const ConnectionState & nextState);
 
-void ProcessMSDP(Character * character, std::istream & sArgs);
-
-void ProcessMCCP(Character * character, std::istream & sArgs);
+void ProcessTelnetCommand(Character * character, std::istream & sArgs);
 
 #endif
