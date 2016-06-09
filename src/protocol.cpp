@@ -111,6 +111,12 @@ void ProcessMSDP(Character * character, std::istream & sArgs)
                         {
                             if (command == TelnetChar::MSDP)
                             {
+                                if (character->isPlayer())
+                                {
+                                    // Cast the character to player.
+                                    Player * player = character->toPlayer();
+                                    SetFlag(player->connectionFlags, ConnectionFlag::UseMSDP);
+                                }
                                 Logger::log(LogLevel::Debug, "Received : " + result);
                                 continue;
                             }
@@ -179,6 +185,13 @@ void ProcessMSDP(Character * character, std::istream & sArgs)
                                         result += "IAC";
                                         // Increment the index.
                                         index += variableValue.size() + 1;
+                                        // Add the variable to the player's list of msdp variables.
+                                        if (character->isPlayer())
+                                        {
+                                            // Cast the character to player.
+                                            Player * player = character->toPlayer();
+                                            player->msdpVariables[variableName] = variableValue;
+                                        }
                                         Logger::log(LogLevel::Debug, "Received : " + result);
                                         continue;
                                     }
@@ -226,6 +239,12 @@ void ProcessMCCP(Character * character, std::istream & sArgs)
                         {
                             if (command == TelnetChar::MCCP)
                             {
+                                if (character->isPlayer())
+                                {
+                                    // Cast the character to player.
+                                    Player * player = character->toPlayer();
+                                    SetFlag(player->connectionFlags, ConnectionFlag::UseMCCP);
+                                }
                                 Logger::log(LogLevel::Debug, "Received : " + result);
                                 continue;
                             }

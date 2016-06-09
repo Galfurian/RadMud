@@ -68,6 +68,10 @@ class Player: public Character
         bool closing;
         /// Determine if the player has successfully logged in.
         bool logged_in;
+        /// Connection flags.
+        int connectionFlags;
+        /// MSDP Variables.
+        std::map<std::string, std::string> msdpVariables;
 
         /// @brief Constructor.
         /// @param socket    Player socket.

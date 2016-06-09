@@ -214,6 +214,14 @@ typedef enum class ConnectionStates
     Playing
 } ConnectionState;
 
+/// Handle all the player's phases during login.
+typedef enum class ConnectionFlags
+{
+    None,
+    UseMSDP = 1,
+    UseMCCP = 2
+} ConnectionFlag;
+
 /// Used to determine the posture of the player.
 typedef enum class CharacterPostures
 {

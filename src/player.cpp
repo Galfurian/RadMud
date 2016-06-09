@@ -49,23 +49,25 @@
 using namespace std;
 
 Player::Player(const int & _socket, const int & _port, const std::string & _address) :
-        psocket(_socket),
-        port(_port),
-        address(_address),
-        outbuf(),
-        inbuf(),
-        password(),
-        age(),
-        experience(),
-        prompt(),
-        prompt_save(),
-        rent_room(),
-        skills(),
-        remaining_points(),
-        connection_state(ConnectionState::NoState),
-        password_attempts(),
-        closing(),
-        logged_in()
+    psocket(_socket),
+    port(_port),
+    address(_address),
+    outbuf(),
+    inbuf(),
+    password(),
+    age(),
+    experience(),
+    prompt(),
+    prompt_save(),
+    rent_room(),
+    skills(),
+    remaining_points(),
+    connection_state(ConnectionState::NoState),
+    password_attempts(),
+    closing(),
+    logged_in(),
+    connectionFlags(),
+    msdpVariables()
 {
     // Nothing to do.
 }

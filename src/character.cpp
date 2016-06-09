@@ -37,31 +37,31 @@
 using namespace std;
 
 Character::Character() :
-        name(),
-        description(),
-        gender(),
-        weight(),
-        level(),
-        flags(),
-        race(),
-        faction(),
-        health(),
-        stamina(),
-        hunger(100),
-        thirst(100),
-        strength(),
-        agility(),
-        perception(),
-        constitution(),
-        intelligence(),
-        room(),
-        inventory(),
-        equipment(),
-        posture(CharacterPosture::Stand),
-        effects(),
-        action(this),
-        L(luaL_newstate()),
-        opponents(this)
+    name(),
+    description(),
+    gender(),
+    weight(),
+    level(),
+    flags(),
+    race(),
+    faction(),
+    health(),
+    stamina(),
+    hunger(100),
+    thirst(100),
+    strength(),
+    agility(),
+    perception(),
+    constitution(),
+    intelligence(),
+    room(),
+    inventory(),
+    equipment(),
+    posture(CharacterPosture::Stand),
+    effects(),
+    action(this),
+    L(luaL_newstate()),
+    opponents(this)
 {
     // Nothing to do.
 }
@@ -351,7 +351,11 @@ Room * Character::canMoveTo(Direction direction, std::string & error)
     return destExit->destination;
 }
 
-void Character::moveTo(Room * destination, const std::string & msgDepart, const std::string & msgArrive, const std::string & msgChar)
+void Character::moveTo(
+    Room * destination,
+    const std::string & msgDepart,
+    const std::string & msgArrive,
+    const std::string & msgChar)
 {
     // Check if the current room exist.
     if (room == nullptr)
@@ -786,19 +790,19 @@ bool Character::canWield(Item * item, std::string & message, EquipmentSlot & whe
 
 bool Character::canWear(Item * item, std::string & message)
 {
-    bool canWear = false;
+    bool result = false;
     if (item->model->type == ModelType::Armor)
     {
-        canWear = true;
+        result = true;
     }
     else if (item->model->type == ModelType::Container)
     {
         if (item->getCurrentSlot() != EquipmentSlot::None)
         {
-            canWear = true;
+            result = true;
         }
     }
-    if (!canWear)
+    if (!result)
     {
         message = "The item is not meant to be weared.\n";
         return false;
@@ -833,7 +837,8 @@ string Character::getHealthCondition(Character * character)
     // Determine the percentage of current health.
     if (character->health > 0)
     {
-        percent = static_cast<int>((100.0 * static_cast<double>(character->health)) / static_cast<double>(character->getMaxHealth()));
+        percent = static_cast<int>((100.0 * static_cast<double>(character->health))
+            / static_cast<double>(character->getMaxHealth()));
     }
     else
     {

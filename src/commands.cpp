@@ -921,6 +921,8 @@ void RollbackCharacterCreation(Character * character, ConnectionState new_state)
             break;
         case ConnectionState::NegotiatingMSDP:
             break;
+        case ConnectionState::NegotiatingMCCP:
+            break;
         case ConnectionState::NoState:
             break;
         case ConnectionState::AwaitingName:
