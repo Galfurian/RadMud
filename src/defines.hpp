@@ -25,6 +25,112 @@
 #include <set>
 
 #include "utilities/coordinates.hpp"
+#include "utilities/enum_cheker.hpp"
+
+/// List of telnet commands.
+typedef enum class TelnetChars
+{
+    None = 0,
+    //OPTIONS
+    //Echo = 1,
+    //SuppressGoAhead = 3,
+    //Status = 5,
+    //TimingMark = 6,
+    TerminalType = 24,
+    NegotiateAboutWindowSize = 31,
+    TerminalSpeed = 32,
+    RemoteFlowControl = 33,
+    LineMode = 34,
+    EnvironmentVariables = 36,
+    NewEnvironmentOption = 39,
+    // MUD OPTIONS
+    /// Mud Terminal Type Standard
+    TTYPE = 24,
+    /// Mud Server Data Protocol
+    MSDP = 69,
+    /// MSDP Commands
+    MSDP_VAR = 1,
+    MSDP_VAL = 2,
+    MSDP_TABLE_OPEN = 3,
+    MSDP_TABLE_CLOSE = 4,
+    MSDP_ARRAY_OPEN = 5,
+    MSDP_ARRAY_CLOSE = 6,
+    /// Mud Server Status Protocol
+    MSSP = 70,
+    /// Mud Client Compression Protocol
+    MCCP = 86,
+    // NEGOTIATION 1
+    SubNegotiationEnd = 240,
+    NoOperation = 241,
+    DataMark = 242,
+    Break = 243,
+    InterruptProcess = 244,
+    AbortOutput = 245,
+    AreYouThere = 246,
+    EraseCharacter = 247,
+    EraseLine = 248,
+    GoAhead = 249,
+    SubnegotiationBegin = 250,
+    // NEGOTIATION 2
+    /// I will use option.
+    WILL = 251,
+    /// I wont use option.
+    WONT = 252,
+    /// Please, you use option
+    DO = 253,
+    /// Don't use option.
+    DONT = 254,
+    /// Interpret As Command
+    IAC = 255,
+    // RADMUD SPECIFIC
+    /// I will send the map.
+    DRAW_MAP = 91,
+    /// Please, clear the already drawn map.
+    CLR_MAP = 92,
+    /// I will send a format string.
+    FORMAT = 100
+} TelnetChar;
+using TelnetCharTest = EnumCheck<TelnetChar,
+//TelnetChar::Echo,
+//TelnetChar::SuppressGoAhead,
+//TelnetChar::Status,
+//TelnetChar::TimingMark,
+TelnetChar::TerminalType,
+TelnetChar::NegotiateAboutWindowSize,
+TelnetChar::TerminalSpeed,
+TelnetChar::RemoteFlowControl,
+TelnetChar::LineMode,
+TelnetChar::EnvironmentVariables,
+TelnetChar::NewEnvironmentOption,
+TelnetChar::TTYPE,
+TelnetChar::MSDP,
+TelnetChar::MSDP_VAR,
+TelnetChar::MSDP_VAL,
+TelnetChar::MSDP_TABLE_OPEN,
+TelnetChar::MSDP_TABLE_CLOSE,
+TelnetChar::MSDP_ARRAY_OPEN,
+TelnetChar::MSDP_ARRAY_CLOSE,
+TelnetChar::MSSP,
+TelnetChar::MCCP,
+TelnetChar::SubNegotiationEnd,
+TelnetChar::NoOperation,
+TelnetChar::DataMark,
+TelnetChar::Break,
+TelnetChar::InterruptProcess,
+TelnetChar::AbortOutput,
+TelnetChar::AreYouThere,
+TelnetChar::EraseCharacter,
+TelnetChar::EraseLine,
+TelnetChar::GoAhead,
+TelnetChar::SubnegotiationBegin,
+TelnetChar::WILL,
+TelnetChar::WONT,
+TelnetChar::DO,
+TelnetChar::DONT,
+TelnetChar::IAC,
+TelnetChar::DRAW_MAP,
+TelnetChar::CLR_MAP,
+TelnetChar::FORMAT>;
 
 /// The possible directions.
 typedef enum class Directions
@@ -74,6 +180,10 @@ typedef enum class ConnectionStates
 {
     /// The player has no state.
     NoState,
+    /// The player is negotiating for MSDP.
+    NegotiatingMSDP,
+    /// The player is negotiating for MCCP.
+    NegotiatingMCCP,
     /// We want their player name.
     AwaitingName,
     /// We want their password.
@@ -103,6 +213,14 @@ typedef enum class ConnectionStates
     /// This is the normal 'connected' mode.
     Playing
 } ConnectionState;
+
+/// Handle all the player's phases during login.
+typedef enum class ConnectionFlags
+{
+    None,
+    UseMSDP = 1,
+    UseMCCP = 2
+} ConnectionFlag;
 
 /// Used to determine the posture of the player.
 typedef enum class CharacterPostures
@@ -812,6 +930,8 @@ std::string GetMechanismTypeName(MechanismType type);
 std::string GetActionTypeName(ActionType type);
 /// Return the string describing the type of Gender.
 std::string GetGenderTypeName(GenderType type);
+/// Return the string describing the telnet character.
+std::string GetTelnetCharName(TelnetChar c);
 ///@}
 
 /// @defgroup FlagsToList Flags to List of Strings.

@@ -49,23 +49,25 @@
 using namespace std;
 
 Player::Player(const int & _socket, const int & _port, const std::string & _address) :
-        psocket(_socket),
-        port(_port),
-        address(_address),
-        outbuf(),
-        inbuf(),
-        password(),
-        age(),
-        experience(),
-        prompt(),
-        prompt_save(),
-        rent_room(),
-        skills(),
-        remaining_points(),
-        connection_state(),
-        password_attempts(),
-        closing(),
-        logged_in()
+    psocket(_socket),
+    port(_port),
+    address(_address),
+    outbuf(),
+    inbuf(),
+    password(),
+    age(),
+    experience(),
+    prompt(),
+    prompt_save(),
+    rent_room(),
+    skills(),
+    remaining_points(),
+    connection_state(ConnectionState::NoState),
+    password_attempts(),
+    closing(),
+    logged_in(),
+    connectionFlags(),
+    msdpVariables()
 {
     // Nothing to do.
 }
@@ -323,7 +325,7 @@ bool Player::remInventoryItem(Item * item)
     if (Character::remInventoryItem(item))
     {
         SQLiteDbms::instance().deleteFrom("ItemPlayer",
-            { std::make_pair("owner", name), std::make_pair("item", ToString(item->vnum)) });
+        { std::make_pair("owner", name), std::make_pair("item", ToString(item->vnum)) });
         return true;
     }
     return false;
@@ -338,7 +340,7 @@ bool Player::remEquipmentItem(Item * item)
     if (Character::remEquipmentItem(item))
     {
         SQLiteDbms::instance().deleteFrom("ItemPlayer",
-            { std::make_pair("owner", name), std::make_pair("item", ToString(item->vnum)) });
+        { std::make_pair("owner", name), std::make_pair("item", ToString(item->vnum)) });
         return true;
     }
     return false;
@@ -461,8 +463,15 @@ void Player::processRead()
         string::size_type i = inbuf.find('\n');
         if (i == string::npos)
         {
-            // No more at present.
-            break;
+            if (inbuf.empty())
+            {
+                // No more at present.
+                break;
+            }
+            else
+            {
+                i = inbuf.size() - 1;
+            }
         }
 
         // Extract first line.

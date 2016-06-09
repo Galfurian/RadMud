@@ -3,7 +3,7 @@
 cmake_minimum_required(VERSION 2.8.4 FATAL_ERROR)
 
 option(USE_CLANG       "build application with clang" OFF)
-option(FLAG_EVERYTHING "build with clang and set warning level to everything" OFF)
+option(FLAG_EVERYTHING "set a higher warning level" OFF)
 
 if(USE_CLANG)
     SET (CMAKE_C_COMPILER   "clang")
@@ -67,6 +67,7 @@ if(FLAG_EVERYTHING)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wsequence-point")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wshadow")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wsign-compare")
+		#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wsign-conversion")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wstack-protector")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wstrict-aliasing")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wstrict-aliasing=2")
@@ -149,6 +150,7 @@ set(PROJECT_SRC
     ./src/formatter.cpp
     ./src/combat.cpp
     ./src/logger.cpp
+    ./src/protocol.cpp
 )
 
 find_package(Lua51 REQUIRED)

@@ -615,6 +615,160 @@ std::string GetGenderTypeName(GenderType type)
     return output;
 }
 
+std::string GetTelnetCharName(TelnetChar c)
+{
+    std::string output;
+    if (c == TelnetChar::TerminalType)
+    {
+        output = "TerminalType";
+    }
+    else if (c == TelnetChar::NegotiateAboutWindowSize)
+    {
+        output = "NegotiateProtocolAboutWindowSize";
+    }
+    else if (c == TelnetChar::TerminalSpeed)
+    {
+        output = "TerminalSpeed";
+    }
+    else if (c == TelnetChar::RemoteFlowControl)
+    {
+        output = "RemoteFlowControl";
+    }
+    else if (c == TelnetChar::LineMode)
+    {
+        output = "LineMode";
+    }
+    else if (c == TelnetChar::EnvironmentVariables)
+    {
+        output = "EnvironmentVariables";
+    }
+    else if (c == TelnetChar::NewEnvironmentOption)
+    {
+        output = "NewEnvironmentOption";
+    }
+    else if (c == TelnetChar::TTYPE)
+    {
+        output = "TTYPE";
+    }
+    else if (c == TelnetChar::MSDP)
+    {
+        output = "MSDP";
+    }
+    else if (c == TelnetChar::MSDP_VAR)
+    {
+        output = "MSDP_VAR";
+    }
+    else if (c == TelnetChar::MSDP_VAL)
+    {
+        output = "MSDP_VAL";
+    }
+    else if (c == TelnetChar::MSDP_TABLE_OPEN)
+    {
+        output = "MSDP_TABLE_OPEN";
+    }
+    else if (c == TelnetChar::MSDP_TABLE_CLOSE)
+    {
+        output = "MSDP_TABLE_CLOSE";
+    }
+    else if (c == TelnetChar::MSDP_ARRAY_OPEN)
+    {
+        output = "MSDP_ARRAY_OPEN";
+    }
+    else if (c == TelnetChar::MSDP_ARRAY_CLOSE)
+    {
+        output = "MSDP_ARRAY_CLOSE";
+    }
+    else if (c == TelnetChar::MSSP)
+    {
+        output = "MSSP";
+    }
+    else if (c == TelnetChar::MCCP)
+    {
+        output = "MCCP";
+    }
+    else if (c == TelnetChar::SubNegotiationEnd)
+    {
+        output = "SubNegotiationEnd";
+    }
+    else if (c == TelnetChar::NoOperation)
+    {
+        output = "NoOperation";
+    }
+    else if (c == TelnetChar::DataMark)
+    {
+        output = "DataMark";
+    }
+    else if (c == TelnetChar::Break)
+    {
+        output = "Break";
+    }
+    else if (c == TelnetChar::InterruptProcess)
+    {
+        output = "InterruptProcess";
+    }
+    else if (c == TelnetChar::AbortOutput)
+    {
+        output = "AbortOutput";
+    }
+    else if (c == TelnetChar::AreYouThere)
+    {
+        output = "AreYouThere";
+    }
+    else if (c == TelnetChar::EraseCharacter)
+    {
+        output = "EraseCharacter";
+    }
+    else if (c == TelnetChar::EraseLine)
+    {
+        output = "EraseLine";
+    }
+    else if (c == TelnetChar::GoAhead)
+    {
+        output = "GoAhead";
+    }
+    else if (c == TelnetChar::SubnegotiationBegin)
+    {
+        output = "SubnegotiationBegin";
+    }
+    else if (c == TelnetChar::WILL)
+    {
+        output = "WILL";
+    }
+    else if (c == TelnetChar::WONT)
+    {
+        output = "WONT";
+    }
+    else if (c == TelnetChar::DO)
+    {
+        output = "DO";
+    }
+    else if (c == TelnetChar::DONT)
+    {
+        output = "DONT";
+    }
+    else if (c == TelnetChar::IAC)
+    {
+        output = "IAC";
+    }
+    else if (c == TelnetChar::DRAW_MAP)
+    {
+        output = "MDRAW_MAPSDP";
+    }
+    else if (c == TelnetChar::CLR_MAP)
+    {
+        output = "CLR_MAP";
+    }
+    else if (c == TelnetChar::FORMAT)
+    {
+        output = "FORMAT";
+    }
+    else
+    {
+        output = ToString(static_cast<int>(c));
+    }
+    return output;
+}
+
 std::string GetModelFlagString(int flags)
 {
     std::string flagList;

@@ -17,7 +17,7 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "formatter.hpp"
-#include "utils.hpp"
+#include "defines.hpp"
 
 Formatter::Formatter()
 {
