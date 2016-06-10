@@ -29,43 +29,105 @@ extern "C"
 #include "lualib.h"
 }
 
+#include "../luabridge/LuaBridge.h"
+
 /// Used to create and manage a tridimensional coordinates.
+template<typename CoordType>
 class Coordinates
 {
     public:
         /// Coordinate on the x axis.
-        int x;
+        CoordType x;
         /// Coordinate on the y axis.
-        int y;
+        CoordType y;
         /// Coordinate on the z axis.
-        int z;
+        CoordType z;
 
-        Coordinates();
+        Coordinates() :
+            x(),
+            y(),
+            z()
+        {
+            // Nothing to do.
+        }
 
         /// @brief It the constructor, needed to create a set of Coordinates.
         /// @param _x Coordinate on width axis.
         /// @param _y Coordinate on heigth axis.
         /// @param _z Coordinate on altitude axis.
-        Coordinates(const int _x, const int _y, const int _z);
+        Coordinates(const CoordType & _x, const CoordType & _y, const CoordType & _z) :
+            x(_x),
+            y(_y),
+            z(_z)
+        {
+            // Nothing to do.
+        }
 
         /// @brief Add to the current Coordinates the right operand.
         /// @param right The right parameter.
         /// @return The new Coordinates.
-        Coordinates operator+(const Coordinates & right) const;
+        template<typename OtherCoordType>
+        Coordinates<CoordType> operator+(const Coordinates<OtherCoordType> & right) const
+        {
+            Coordinates<CoordType> coord;
+            coord.x = x + right.x;
+            coord.y = y + right.y;
+            coord.z = z + right.z;
+            return coord;
+        }
 
         /// @brief Define operator <, less than.
         /// @param right The right parameter.
         /// @return True if left Coordinates are less than right Coordinates.
-        bool operator<(const Coordinates &right) const;
+        template<typename OtherCoordType>
+        bool operator<(const Coordinates<OtherCoordType> & right) const
+        {
+            if (x < right.x)
+            {
+                return true;
+            }
+            if (y < right.y)
+            {
+                return true;
+            }
+            if (z < right.z)
+            {
+                return true;
+            }
+            return false;
+        }
 
         /// @brief Define operator ==, equal.
         /// @param right The right parameter.
         /// @return True if left Coordinates are equal to the right Coordinates.
-        bool operator==(const Coordinates &right) const;
+        bool operator==(const Coordinates<CoordType> & right) const
+        {
+            if (x != right.x)
+            {
+                return false;
+            }
+            if (y != right.y)
+            {
+                return false;
+            }
+            if (z != right.z)
+            {
+                return false;
+            }
+            return true;
+        }
 
         /// @brief Function used to register inside the lua environment the class.
         /// @param L The lua environment.
-        static void luaRegister(lua_State * L);
+        static void luaRegister(lua_State * L)
+        {
+            luabridge::getGlobalNamespace(L) //
+            .beginClass < Coordinates < CoordType >> ("Coordinates") //
+            .addData("x", &Coordinates<CoordType>::x, false) //
+            .addData("y", &Coordinates<CoordType>::y, false) //
+            .addData("z", &Coordinates<CoordType>::z, false) //
+            .endClass();
+        }
 };
 
 #endif

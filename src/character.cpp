@@ -82,11 +82,11 @@ bool Character::setCharacteristic(const std::string & source)
     {
         return false;
     }
-    this->strength = ToInt(charList[0]);
-    this->agility = ToInt(charList[1]);
-    this->perception = ToInt(charList[2]);
-    this->constitution = ToInt(charList[3]);
-    this->intelligence = ToInt(charList[4]);
+    this->strength = ToNumber<unsigned int>(charList[0]);
+    this->agility = ToNumber<unsigned int>(charList[1]);
+    this->perception = ToNumber<unsigned int>(charList[2]);
+    this->constitution = ToNumber<unsigned int>(charList[3]);
+    this->intelligence = ToNumber<unsigned int>(charList[4]);
     return true;
 }
 
@@ -96,8 +96,6 @@ bool Character::check()
     safe = SafeAssert(!name.empty());
     safe = SafeAssert(!description.empty());
     safe = SafeAssert(weight > 0);
-    safe = SafeAssert(level >= 0);
-    safe = SafeAssert(flags >= 0);
     safe = SafeAssert(race != nullptr);
     safe = SafeAssert(faction != nullptr);
     safe = SafeAssert(health > 0);
@@ -194,22 +192,131 @@ string Character::getPossessivePronoun()
     return "its";
 }
 
-int Character::getMaxHealth()
+unsigned int Character::getStrength(bool withModifier)
 {
-    return (constitution * 5) + effects.getHealthMod();
+    if (!withModifier)
+    {
+        return this->strength;
+    }
+    int overall = static_cast<int>(this->strength) + effects.getStrMod();
+    if (overall <= 0)
+    {
+        return 0;
+    }
+    else
+    {
+        return static_cast<unsigned int>(overall);
+    }
 }
 
-int Character::getMaxStamina()
+unsigned int Character::getAgility(bool withModifier)
 {
-    return (constitution * 10) + effects.getStaminaMod();
+    if (!withModifier)
+    {
+        return this->agility;
+    }
+    int overall = static_cast<int>(this->agility) + effects.getAgiMod();
+    if (overall <= 0)
+    {
+        return 0;
+    }
+    else
+    {
+        return static_cast<unsigned int>(overall);
+    }
+}
+
+unsigned int Character::getPerception(bool withModifier)
+{
+    if (!withModifier)
+    {
+        return this->perception;
+    }
+    int overall = static_cast<int>(this->perception) + effects.getPerMod();
+    if (overall <= 0)
+    {
+        return 0;
+    }
+    else
+    {
+        return static_cast<unsigned int>(overall);
+    }
+}
+
+unsigned int Character::getConstitution(bool withModifier)
+{
+    if (!withModifier)
+    {
+        return this->constitution;
+    }
+    int overall = static_cast<int>(this->constitution) + effects.getConMod();
+    if (overall <= 0)
+    {
+        return 0;
+    }
+    else
+    {
+        return static_cast<unsigned int>(overall);
+    }
+}
+
+unsigned int Character::getIntelligence(bool withModifier)
+{
+    if (!withModifier)
+    {
+        return this->intelligence;
+    }
+    int overall = static_cast<int>(this->intelligence) + effects.getIntMod();
+    if (overall <= 0)
+    {
+        return 0;
+    }
+    else
+    {
+        return static_cast<unsigned int>(overall);
+    }
+}
+
+unsigned int Character::getMaxHealth(bool withModifier)
+{
+    if (!withModifier)
+    {
+        return (constitution * 5);
+    }
+    int overall = static_cast<int>(constitution * 5) + effects.getHealthMod();
+    if (overall <= 0)
+    {
+        return 0;
+    }
+    else
+    {
+        return static_cast<unsigned int>(overall);
+    }
+}
+
+unsigned int Character::getMaxStamina(bool withModifier)
+{
+    if (!withModifier)
+    {
+        return (constitution * 10);
+    }
+    int overall = static_cast<int>(constitution * 10) + effects.getStaminaMod();
+    if (overall <= 0)
+    {
+        return 0;
+    }
+    else
+    {
+        return static_cast<unsigned int>(overall);
+    }
 }
 
 void Character::updateResources()
 {
     if (health < getMaxHealth())
     {
-        int max_health = getMaxHealth();
-        int gain = 0;
+        unsigned int max_health = this->getMaxHealth();
+        unsigned int gain = 0;
         switch (posture)
         {
             case CharacterPosture::Sit:
@@ -241,8 +348,8 @@ void Character::updateResources()
     }
     if (stamina < getMaxStamina())
     {
-        int max_stamina = getMaxStamina();
-        int gain = 0;
+        unsigned int max_stamina = getMaxStamina();
+        unsigned int gain = 0;
         switch (posture)
         {
             case CharacterPosture::Sit:
@@ -273,7 +380,7 @@ void Character::updateResources()
     }
 }
 
-int Character::getViewDistance()
+unsigned int Character::getViewDistance()
 {
     return 3 + GetAbilityModifier(perception);
 }
@@ -622,7 +729,11 @@ unsigned int Character::getArmorClass()
         }
     }
     // + DEXTERITY MODIFIER
-    result += GetAbilityModifier(this->agility + this->effects.getAgiMod());
+    int overallAgility = static_cast<int>(this->agility) + this->effects.getAgiMod();
+    if (overallAgility > 0)
+    {
+        result += GetAbilityModifier(static_cast<unsigned int>(overallAgility));
+    }
     return result;
 }
 
@@ -680,12 +791,12 @@ bool Character::remInventoryItem(Item *item)
 
 bool Character::canCarry(Item * item)
 {
-    return ((getCarryingWeight() + item->getWeight()) < getMaxCarryingWeight());
+    return ((this->getCarryingWeight() + item->getWeight()) < this->getMaxCarryingWeight());
 }
 
-int Character::getCarryingWeight()
+unsigned int Character::getCarryingWeight()
 {
-    int carrying = 0;
+    unsigned int carrying = 0;
     for (auto iterator : inventory)
     {
         carrying += iterator->getWeight();
@@ -697,7 +808,7 @@ int Character::getCarryingWeight()
     return carrying;
 }
 
-int Character::getMaxCarryingWeight()
+unsigned int Character::getMaxCarryingWeight()
 {
     return (strength * 10);
 }
@@ -1026,9 +1137,9 @@ Character * Character::getNextOpponent()
 
 unsigned int Character::getNextAttack()
 {
-    unsigned int BAS = 6.0;
+    double BAS = 6.0;
     // The agility modifier.
-    double AGI = (agility + effects.getAgiMod()) * 3.5 * (BAS / 100);
+    double AGI = (static_cast<int>(agility) + effects.getAgiMod()) * 3.5 * (BAS / 100);
     // The weight modifier.
     double WGT = weight * (BAS / 100);
     // The carried weight.
@@ -1183,7 +1294,7 @@ void Character::loadScript(const std::string & scriptFilename)
     Item::luaRegister(L);
     Material::luaRegister(L);
     Race::luaRegister(L);
-    Coordinates::luaRegister(L);
+    Coordinates<unsigned int>::luaRegister(L);
     Exit::luaRegister(L);
     Room::luaRegister(L);
 

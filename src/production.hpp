@@ -37,9 +37,9 @@ class Production
         /// The profession needed to perform the production.
         Profession * profession;
         /// The difficulty of the production.
-        int difficulty;
+        unsigned int difficulty;
         /// The time required to perform the production.
-        int time;
+        unsigned int time;
         /// A flag which indicates if the maker can be assisted by someone.
         bool assisted;
         /// The outcome and its quantity.

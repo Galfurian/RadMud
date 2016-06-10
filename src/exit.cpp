@@ -30,10 +30,10 @@
 using namespace std;
 
 Exit::Exit() :
-        source(),
-        destination(),
-        direction(Direction::None),
-        flags()
+    source(),
+    destination(),
+    direction(Direction::None),
+    flags()
 {
 }
 
@@ -41,7 +41,7 @@ Exit::~Exit()
 {
 }
 
-Exit::Exit(Room * _source, Room * _destination, Direction _direction, int _flags)
+Exit::Exit(Room * _source, Room * _destination, Direction _direction, unsigned int _flags)
 {
     source = _source;
     destination = _destination;
@@ -54,7 +54,6 @@ bool Exit::check()
     assert(source != nullptr);
     assert(destination != nullptr);
     assert(direction != Direction::None);
-    assert(flags >= 0);
     return true;
 }
 

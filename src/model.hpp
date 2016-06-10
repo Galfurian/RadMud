@@ -52,9 +52,9 @@ class Model
         /// Store here the position where the model can be equipped.
         EquipmentSlot slot;
         /// Model flags.
-        int flags;
+        unsigned int flags;
         /// Model weight.
-        int weight;
+        unsigned int weight;
         /// Model price.
         int price;
         /// Model maximum condition.
@@ -68,7 +68,7 @@ class Model
         /// TileId of the icon.
         int tileId;
         /// Model functions.
-        std::vector<int> functions;
+        std::vector<unsigned int> functions;
 
         /// @brief Constructor.
         Model();
@@ -78,6 +78,13 @@ class Model
 
         /// @brief Destructor.
         ~Model();
+
+        /// @brief Given a source string, this function parse the string
+        ///         and sets the functions.
+        /// @param source Contains the list of functions.
+        /// @return <b>True</b> if the operation succeeded,<br>
+        ///         <b>False</b> otherwise.
+        bool setFunctions(std::string source);
 
         /// @brief Check the correctness of the model.
         /// @return <b>True</b> if the model has correct values,<br><b>False</b> otherwise.
@@ -90,7 +97,8 @@ class Model
         /// @param itemQuality  The quality of the model.
         /// @return <b>True</b> if something changed inside the string,<br>
         ///         <b>False</b> otherwise.
-        bool replaceSymbols(std::string & source, Material * itemMaterial = nullptr, ItemQuality itemQuality = ItemQuality::Normal);
+        bool replaceSymbols(std::string & source, Material * itemMaterial = nullptr, ItemQuality itemQuality =
+            ItemQuality::Normal);
 
         /// @brief Returns the name of the model depending on the passed arguments.
         /// @param itemMaterial The material of which the model is made.

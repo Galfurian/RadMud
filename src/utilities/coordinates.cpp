@@ -16,88 +16,45 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+/// @brief Define operator <, less than.
+/// @param right The right parameter.
+/// @return True if left Coordinates are less than right Coordinates.
+
 #include "coordinates.hpp"
-#include "../luabridge/LuaBridge.h"
-#include "../lua/lua_script.hpp"
 
-Coordinates::Coordinates() :
-        x(),
-        y(),
-        z()
+template<>
+template<>
+bool Coordinates<unsigned int>::operator<(const Coordinates<int> & right) const
 {
-    // Nothing to do.
+    if (static_cast<int>(x) < right.x)
+    {
+        return true;
+    }
+    if (static_cast<int>(y) < right.y)
+    {
+        return true;
+    }
+    if (static_cast<int>(z) < right.z)
+    {
+        return true;
+    }
+    return false;
 }
 
-Coordinates::Coordinates(const int _x, const int _y, const int _z) :
-        x(_x),
-        y(_y),
-        z(_z)
+template<>
+template<>
+Coordinates<unsigned int> Coordinates<unsigned int>::operator+(const Coordinates<int> & right) const
 {
-    // Nothing to do.
-}
-
-Coordinates Coordinates::operator+(const Coordinates & right) const
-{
-    Coordinates coord;
-    coord.x = x + right.x;
-    coord.y = y + right.y;
-    coord.z = z + right.z;
+    if ((*this) < right)
+    {
+        throw std::runtime_error("Wrong type of coordinates.");
+    }
+    Coordinates<unsigned int> coord;
+    coord.x = x + static_cast<unsigned int>(right.x);
+    coord.y = y + static_cast<unsigned int>(right.y);
+    coord.z = z + static_cast<unsigned int>(right.z);
     return coord;
 }
 
-bool Coordinates::operator<(const Coordinates &right) const
-{
-    if (x < right.x)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-    if (y < right.y)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-    if (z < right.z)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-
-    return true;
-}
-
-bool Coordinates::operator==(const Coordinates &right) const
-{
-    if (x != right.x)
-    {
-        return false;
-    }
-    if (y != right.y)
-    {
-        return false;
-    }
-    if (z != right.z)
-    {
-        return false;
-    }
-    return true;
-}
-
-void Coordinates::luaRegister(lua_State * L)
-{
-    luabridge::getGlobalNamespace(L) //
-    .beginClass<Coordinates>("Coordinates") //
-    .addData("x", &Coordinates::x, false) //
-    .addData("y", &Coordinates::y, false) //
-    .addData("z", &Coordinates::z, false) //
-    .endClass();
-}
+template class Coordinates<int> ;
+template class Coordinates<unsigned int> ;

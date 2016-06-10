@@ -26,28 +26,28 @@
 #include "utils.hpp"
 
 Building::Building() :
-        vnum(),
-        name(),
-        difficulty(),
-        time(),
-        assisted(),
-        tools(),
-        buildingModel(),
-        ingredients(),
-        unique()
+    vnum(),
+    name(),
+    difficulty(),
+    time(),
+    assisted(),
+    tools(),
+    buildingModel(),
+    ingredients(),
+    unique()
 {
 }
 
 Building::Building(const Building & source) :
-        vnum(source.vnum),
-        name(source.name),
-        difficulty(source.difficulty),
-        time(source.time),
-        assisted(source.assisted),
-        tools(source.tools),
-        buildingModel(source.buildingModel),
-        ingredients(source.ingredients),
-        unique(source.unique)
+    vnum(source.vnum),
+    name(source.name),
+    difficulty(source.difficulty),
+    time(source.time),
+    assisted(source.assisted),
+    tools(source.tools),
+    buildingModel(source.buildingModel),
+    ingredients(source.ingredients),
+    unique(source.unique)
 {
 }
 
@@ -83,4 +83,66 @@ std::string Building::getName()
 std::string Building::getNameCapital()
 {
     return name;
+}
+
+bool Building::setTool(const std::string & source)
+{
+    if (source.empty())
+    {
+        Logger::log(LogLevel::Error, "Tool list is empty.");
+        return false;
+    }
+    std::vector<std::string> toolList = SplitString(source, " ");
+    for (auto it : toolList)
+    {
+        int value = ToNumber<int>(it);
+        if (value < 0)
+        {
+            Logger::log(LogLevel::Error, "Tool list contains a negative value.");
+            return false;
+        }
+        ToolType toolType = static_cast<ToolType>(static_cast<unsigned int>(value));
+        if (toolType == ToolType::NoType)
+        {
+            Logger::log(LogLevel::Error, "Can't find the Tool :" + it);
+            return false;
+        }
+        tools.insert(toolType);
+    }
+    return true;
+}
+
+bool Building::setIngredient(const std::string & source)
+{
+    if (source.empty())
+    {
+        Logger::log(LogLevel::Error, "No outcome set.");
+        return false;
+    }
+    // Split the string of ingredients.
+    std::vector<std::string> ingredientList = SplitString(source, ";");
+    for (auto iterator : ingredientList)
+    {
+        // Split the string with the information about the ingredient.
+        std::vector<std::string> ingredientInfo = SplitString(iterator, "*");
+        if (ingredientInfo.size() != 2)
+        {
+            Logger::log(LogLevel::Error, "Ingredient is not composed by [Ingredient*Quantity]");
+            return false;
+        }
+        ResourceType ingredient = static_cast<ResourceType>(ToInt(ingredientInfo[0]));
+        if (ingredient == ResourceType::NoType)
+        {
+            Logger::log(LogLevel::Error, "Can't find the Ingredient :" + ingredientInfo[0]);
+            return false;
+        }
+        int quantity = ToInt(ingredientInfo[1]);
+        if (quantity <= 0)
+        {
+            Logger::log(LogLevel::Error, "Can't find the quantity of the Outcome :" + ingredientInfo[0]);
+            return false;
+        }
+        this->ingredients[ingredient] = static_cast<unsigned int>(quantity);
+    }
+    return true;
 }

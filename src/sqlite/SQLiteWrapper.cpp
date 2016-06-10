@@ -56,7 +56,6 @@ bool SQLiteWrapper::openConnection(std::string dbName, std::string dbDirectory)
             connected = false;
         }
     }
-
     errorCode = executeQuery("PRAGMA foreign_keys = ON;");
     if (errorCode != SQLITE_OK)
     {
@@ -124,7 +123,7 @@ ResultSet * SQLiteWrapper::executeSelect(const char * query)
     }
 }
 
-unsigned int SQLiteWrapper::executeQuery(const char * query)
+int SQLiteWrapper::executeQuery(const char * query)
 {
     if (!isConnected())
     {
@@ -140,7 +139,6 @@ unsigned int SQLiteWrapper::executeQuery(const char * query)
         Logger::log(LogLevel::Error, "Last error :" + errorMessage);
         return 0;
     }
-
     return sqlite3_total_changes(dbDetails.dbConnection);
 }
 
@@ -199,7 +197,7 @@ int SQLiteWrapper::getColumnCount()
     return num_col;
 }
 
-std::string SQLiteWrapper::getColumnName(unsigned int column)
+std::string SQLiteWrapper::getColumnName(const int & column)
 {
     if (column > num_col)
     {
@@ -208,7 +206,7 @@ std::string SQLiteWrapper::getColumnName(unsigned int column)
     return sqlite3_column_name(dbDetails.dbStatement, column);
 }
 
-std::string SQLiteWrapper::getDataString(unsigned int column)
+std::string SQLiteWrapper::getDataString(const int & column)
 {
     // Check if the given column is beyond the limit.
     if (column > num_col)
@@ -227,7 +225,7 @@ std::string SQLiteWrapper::getDataString(unsigned int column)
     }
 }
 
-int SQLiteWrapper::getDataInteger(unsigned int column)
+int SQLiteWrapper::getDataInteger(const int & column)
 {
     // Check if the given column is beyond the limit.
     if (column > num_col)

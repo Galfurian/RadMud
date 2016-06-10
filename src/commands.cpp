@@ -27,17 +27,22 @@ const std::string kValidPlayerName = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnop
 /// Player descriptions must consist of characters from this list.
 const std::string kValidDescription = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ,.\n";
 
-void ProcessCommand(Character * character, std::istream &sArgs)
+void ProcessCommand(Character * character, std::istream & sArgs)
 {
     std::string command;
-
+    if (!sArgs.good())
+    {
+        Logger::log(LogLevel::Fatal, "Possible fatal error in input.");
+        throw std::runtime_error("Huh?\n");
+    }
     // Get command, eat whitespace after it.
-    sArgs >> command >> std::ws;
-
+    sArgs >> command;
     if (command.empty())
     {
         throw std::runtime_error("Huh?\n");
     }
+    sArgs >> std::ws;
+
     // Check if it's a direction.
     Direction direction = Mud::instance().findDirection(command, false);
 
@@ -115,7 +120,8 @@ void ProcessPlayerName(Character * character, std::istream & sArgs)
     // Check if the give name contains valid characters.
     else if (input.find_first_not_of(kValidPlayerName) != std::string::npos)
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingName, "That player name contains disallowed characters.");
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingName,
+            "That player name contains disallowed characters.");
     }
     // Check if the player is already connected.
     else if (Mud::instance().findPlayer(input))
@@ -194,7 +200,8 @@ void ProcessNewName(Character * character, std::istream & sArgs)
     // Check if the player has given bad characters.
     else if (input.find_first_not_of(kValidPlayerName) != std::string::npos)
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewName, "That player name contains disallowed characters.");
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewName,
+            "That player name contains disallowed characters.");
     }
     // Check for bad names here.
     else if (Mud::instance().badNames.find(input) != Mud::instance().badNames.end())
@@ -204,7 +211,8 @@ void ProcessNewName(Character * character, std::istream & sArgs)
     // Check if the player name has already been used.
     else if (SQLiteDbms::instance().searchPlayer(ToCapitals(input)))
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewName, "That player already exists, please choose another name.");
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewName,
+            "That player already exists, please choose another name.");
     }
     else
     {
@@ -241,7 +249,8 @@ void ProcessNewPwd(Character * character, std::istream & sArgs)
     // Check if the player has given bad characters.
     else if (input.find_first_not_of(kValidPlayerName) != std::string::npos)
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewPwd, "Password cannot contain disallowed characters.");
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewPwd,
+            "Password cannot contain disallowed characters.");
     }
     else
     {
@@ -264,7 +273,8 @@ void ProcessNewPwdCon(Character * character, std::istream & sArgs)
     // Player_password must agree.
     else if (input != player->password)
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewPwdCon, "Password and confirmation do not agree.");
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewPwdCon,
+            "Password and confirmation do not agree.");
     }
     else
     {
@@ -291,7 +301,8 @@ void ProcessNewStory(Character * character, std::istream & sArgs)
     // Check if the player has written 'continue' or NOT.
     else if (input != "continue")
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewStory, "Write 'continue' after you have readed the story.");
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewStory,
+            "Write 'continue' after you have readed the story.");
     }
     else
     {
@@ -347,7 +358,8 @@ void ProcessNewRace(Character * character, std::istream & sArgs)
         }
         else
         {
-            AdvanceCharacterCreation(character, ConnectionState::AwaitingNewRace, "You have to specify the race number.");
+            AdvanceCharacterCreation(character, ConnectionState::AwaitingNewRace,
+                "You have to specify the race number.");
         }
     }
     else if (IsNumber(arguments[0].first))
@@ -459,7 +471,8 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
         }
         else
         {
-            AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAttr, "You have to specify the attribute number.");
+            AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAttr,
+                "You have to specify the attribute number.");
         }
     }
     else
@@ -475,82 +488,117 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
             }
             else if (arguments[0].first == "1")
             {
-                if ((player->strength + modifier) < (player->race->strength - 5))
+                int result = static_cast<int>(player->getStrength(false)) + modifier;
+                int upperBound = static_cast<int>(player->race->strength) + 5;
+                int lowerBound = static_cast<int>(player->race->strength) - 5;
+                if (lowerBound < 0)
                 {
-                    helpMessage = "Strength can't go below " + ToString((player->race->strength - 5)) + ".";
+                    lowerBound = 0;
                 }
-                else if ((player->strength + modifier) > (player->race->strength + 5))
+                if (result < lowerBound)
                 {
-                    helpMessage = "Strength can't go above " + ToString((player->race->strength + 5)) + ".";
+                    helpMessage = "Strength can't go below " + ToString(lowerBound) + ".";
+                }
+                else if (result > upperBound)
+                {
+                    helpMessage = "Strength can't go above " + ToString(upperBound) + ".";
                 }
                 else
                 {
                     player->remaining_points -= modifier;
-                    player->strength += modifier;
+                    player->strength = static_cast<unsigned int>(result);
                 }
             }
             else if (arguments[0].first == "2")
             {
-                if ((player->agility + modifier) < (player->race->agility - 5))
+                int result = static_cast<int>(player->getAgility(false)) + modifier;
+                int upperBound = static_cast<int>(player->race->agility) + 5;
+                int lowerBound = static_cast<int>(player->race->agility) - 5;
+                if (lowerBound < 0)
                 {
-                    helpMessage = "Agility can't go below " + ToString((player->race->agility - 5)) + ".";
+                    lowerBound = 0;
                 }
-                else if ((player->strength + modifier) > (player->race->strength + 5))
+                if (result < lowerBound)
                 {
-                    helpMessage = "Agility can't go above " + ToString((player->race->agility + 5)) + ".";
+                    helpMessage = "Agility can't go below " + ToString(lowerBound) + ".";
+                }
+                else if (result > upperBound)
+                {
+                    helpMessage = "Agility can't go above " + ToString(upperBound) + ".";
                 }
                 else
                 {
                     player->remaining_points -= modifier;
-                    player->agility += modifier;
+                    player->agility = static_cast<unsigned int>(result);
                 }
             }
             else if (arguments[0].first == "3")
             {
-                if ((player->perception + modifier) < (player->race->perception - 5))
+                int result = static_cast<int>(player->getPerception(false)) + modifier;
+                int upperBound = static_cast<int>(player->race->perception) + 5;
+                int lowerBound = static_cast<int>(player->race->perception) - 5;
+                if (lowerBound < 0)
                 {
-                    helpMessage = "Perception can't go below " + ToString((player->race->perception - 5)) + ".";
+                    lowerBound = 0;
                 }
-                else if ((player->strength + modifier) > (player->race->strength + 5))
+                if (result < lowerBound)
                 {
-                    helpMessage = "Perception can't go above " + ToString((player->race->perception + 5)) + ".";
+                    helpMessage = "Perception can't go below " + ToString(lowerBound) + ".";
+                }
+                else if (result > upperBound)
+                {
+                    helpMessage = "Perception can't go above " + ToString(upperBound) + ".";
                 }
                 else
                 {
                     player->remaining_points -= modifier;
-                    player->perception += modifier;
+                    player->perception = static_cast<unsigned int>(result);
                 }
             }
             else if (arguments[0].first == "4")
             {
-                if ((player->constitution + modifier) < (player->race->constitution - 5))
+                int result = static_cast<int>(player->getConstitution(false)) + modifier;
+                int upperBound = static_cast<int>(player->race->constitution) + 5;
+                int lowerBound = static_cast<int>(player->race->constitution) - 5;
+                if (lowerBound < 0)
                 {
-                    helpMessage = "Constitution can't go below " + ToString((player->race->constitution - 5)) + ".";
+                    lowerBound = 0;
                 }
-                else if ((player->strength + modifier) > (player->race->strength + 5))
+                if (result < lowerBound)
                 {
-                    helpMessage = "Constitution can't go above " + ToString((player->race->constitution + 5)) + ".";
+                    helpMessage = "Constitution can't go below " + ToString(lowerBound) + ".";
+                }
+                else if (result > upperBound)
+                {
+                    helpMessage = "Constitution can't go above " + ToString(upperBound) + ".";
                 }
                 else
                 {
                     player->remaining_points -= modifier;
-                    player->constitution += modifier;
+                    player->constitution = static_cast<unsigned int>(result);
                 }
             }
             else if (arguments[0].first == "5")
             {
-                if ((player->intelligence + modifier) < (player->race->intelligence - 5))
+                int result = static_cast<int>(player->getConstitution(false)) + modifier;
+                int upperBound = static_cast<int>(player->race->intelligence) + 5;
+                int lowerBound = static_cast<int>(player->race->intelligence) - 5;
+                if (lowerBound < 0)
                 {
-                    helpMessage = "Intelligence can't go below " + ToString((player->race->intelligence - 5)) + ".";
+                    lowerBound = 0;
                 }
-                else if ((player->strength + modifier) > (player->race->strength + 5))
+                if (result < lowerBound)
                 {
-                    helpMessage = "Intelligence can't go above " + ToString((player->race->intelligence + 5)) + ".";
+                    helpMessage = "Constitution can't go below " + ToString(lowerBound) + ".";
+                }
+                else if (result > upperBound)
+                {
+                    helpMessage = "Intelligence can't go above " + ToString(upperBound) + ".";
                 }
                 else
                 {
                     player->remaining_points -= modifier;
-                    player->intelligence += modifier;
+                    player->intelligence = static_cast<unsigned int>(result);
                 }
             }
             else
@@ -651,7 +699,8 @@ void ProcessNewDesc(Character * character, std::istream & sArgs)
     // Check if the description contains bad characters.
     else if (input.find_first_not_of(kValidDescription) != std::string::npos)
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewDesc, "Description cannot contain disallowed characters.");
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewDesc,
+            "Description cannot contain disallowed characters.");
     }
     else
     {
@@ -681,13 +730,13 @@ void ProcessNewWeight(Character * character, std::istream & sArgs)
         {
             AdvanceCharacterCreation(character, ConnectionState::AwaitingNewWeight, "You can't be a feather.");
         }
-        else if (120 < weight)
+        else if (weight > 120)
         {
             AdvanceCharacterCreation(character, ConnectionState::AwaitingNewWeight, "Too much.");
         }
         else
         {
-            player->weight = weight;
+            player->weight = static_cast<unsigned int>(weight);
             AdvanceCharacterCreation(player, ConnectionState::AwaitingNewConfirm);
         }
     }
@@ -723,7 +772,8 @@ void ProcessNewConfirm(Character * character, std::istream & sArgs)
     }
     else
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewConfirm, "You must write 'confirm' if you agree.");
+        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewConfirm,
+            "You must write 'confirm' if you agree.");
     }
 }
 
@@ -748,7 +798,8 @@ void NoMore(Character * character, std::istream & sArgs)
 
 void StopAction(Character * character)
 {
-    if ((character->getAction()->getType() != ActionType::Wait) && (character->getAction()->getType() != ActionType::NoAction))
+    if ((character->getAction()->getType() != ActionType::Wait)
+        && (character->getAction()->getType() != ActionType::NoAction))
     {
         character->doCommand("stop");
     }
@@ -1053,7 +1104,8 @@ void AdvanceCharacterCreation(Character * character, ConnectionState new_state, 
         msg += "#\n";
         msg += "Year 374\n";
         msg += "#\n";
-        msg += "# Type [" + Formatter::magenta() + "continue" + Formatter::reset() + "] to continue character creation.\n";
+        msg += "# Type [" + Formatter::magenta() + "continue" + Formatter::reset()
+            + "] to continue character creation.\n";
         msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset() + "] to return to the previus step.\n";
     }
     else if (new_state == ConnectionState::AwaitingNewRace)
@@ -1083,7 +1135,8 @@ void AdvanceCharacterCreation(Character * character, ConnectionState new_state, 
         msg += "#    [4] Constitution :" + ToString(player->constitution) + "\n";
         msg += "#    [5] Intelligence :" + ToString(player->intelligence) + "\n";
         msg += "#\n";
-        msg += "# Remaining Points: " + Formatter::green() + ToString(player->remaining_points) + Formatter::reset() + "\n";
+        msg += "# Remaining Points: " + Formatter::green() + ToString(player->remaining_points) + Formatter::reset()
+            + "\n";
         msg += "#\n";
         msg += "# Type [" + Formatter::magenta() + "(number) +/-modifier" + Formatter::reset() + "]";
         msg += " to decrease or increase the value of an attribute.\n";
@@ -1134,8 +1187,10 @@ void AdvanceCharacterCreation(Character * character, ConnectionState new_state, 
         PrintChoices(player);
         msg += "# Give a look to the information you have provided, now it's the right time";
         msg += " to decide if you want to change something.\n";
-        msg += "# Type [" + Formatter::magenta() + "confirm" + Formatter::reset() + "] to conclude the character creation.\n";
-        msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset() + "]    to return to the previus step.\n";
+        msg += "# Type [" + Formatter::magenta() + "confirm" + Formatter::reset()
+            + "] to conclude the character creation.\n";
+        msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset()
+            + "]    to return to the previus step.\n";
         msg += Formatter::green() + "Do you confirm? " + Formatter::reset() + "\n";
     }
     if (!message.empty())

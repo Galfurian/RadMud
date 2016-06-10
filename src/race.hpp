@@ -39,15 +39,15 @@ class Race
         /// The material of which are made the entity of this race.
         Material * material;
         /// The base strength value of the race.
-        int strength;
+        unsigned int strength;
         /// The base agility value of the race.
-        int agility;
+        unsigned int agility;
         /// The base perception value of the race.
-        int perception;
+        unsigned int perception;
         /// The base constitution value of the race.
-        int constitution;
+        unsigned int constitution;
         /// The base intelligence value of the race.
-        int intelligence;
+        unsigned int intelligence;
         /// The factions that a player of this race can choose.
         std::vector<int> available_faction;
         /// The flag that indicates if the race is selectable by the player during
@@ -75,7 +75,7 @@ class Race
         bool check();
 
         /// @brief Given a source string, this function parse the string
-        ///         and sets the rate characteristics.
+        ///         and sets the race characteristics.
         /// @param source Contains the list of characteristics.
         /// @return <b>True</b> if the operation succeeded,<br>
         ///         <b>False</b> otherwise.

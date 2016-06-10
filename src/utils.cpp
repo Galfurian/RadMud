@@ -297,14 +297,13 @@ bool IsNumber(const std::string & source)
     return true;
 }
 
-unsigned int GetAbilityModifier(const int & value)
+unsigned int GetAbilityModifier(const unsigned int & value)
 {
-    int modifier = 0;
-    if ((value - 10) > 0)
+    if (value <= 10)
     {
-        modifier = (value - 10) / 2;
+        return 0;
     }
-    return modifier;
+    return static_cast<unsigned int>((value - 10) / 2);
 }
 
 void ExtractNumber(std::string & source, int & number)
@@ -342,10 +341,14 @@ std::string GetFileContents(const char * filename)
     if (in)
     {
         in.seekg(0, std::ios::end);
-        contents.resize(in.tellg());
-        in.seekg(0, std::ios::beg);
-        in.read(&contents[0], contents.size());
-        in.close();
+        std::streamoff totalSize = in.tellg();
+        if (totalSize > 0)
+        {
+            contents.resize(static_cast<std::size_t>(totalSize));
+            in.seekg(0, std::ios::beg);
+            in.read(&contents[0], totalSize);
+            in.close();
+        }
     }
     else
     {

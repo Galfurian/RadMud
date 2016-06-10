@@ -73,17 +73,17 @@ struct CommandHelp
 /// @param flag  The flag to search.
 /// @return <b>True</b> if the value contain the flag, <br> <b>False</b> otherwise.
 template<typename Enum>
-bool HasFlag(int & flags, Enum flag)
+bool HasFlag(unsigned int & flags, Enum flag)
 {
     static_assert(std::is_enum<Enum>::value, "template parameter is not an enum type");
-    return (flags & static_cast<int>(flag)) != 0;
+    return (flags & static_cast<unsigned int>(flag)) != 0;
 }
 
 /// @brief Set the passed flag to the value.
 /// @param flags The destination value.
 /// @param flag  The flag to set.
 template<typename Enum>
-void SetFlag(int & flags, Enum flag)
+void SetFlag(unsigned int & flags, Enum flag)
 {
     static_assert(std::is_enum<Enum>::value, "template parameter is not an enum type");
     flags |= static_cast<unsigned int>(flag);
@@ -93,7 +93,7 @@ void SetFlag(int & flags, Enum flag)
 /// @param flags The destination value.
 /// @param flag  The flag to clear.
 template<typename Enum>
-void ClearFlag(int & flags, Enum flag)
+void ClearFlag(unsigned int & flags, Enum flag)
 {
     static_assert(std::is_enum<Enum>::value, "template parameter is not an enum type");
     flags &= ~static_cast<unsigned int>(flag);
@@ -155,6 +155,26 @@ std::vector<int> GetIntVect(const std::string & source);
 /// @return A vector containing the integers of the source string.
 std::vector<Byte> GetByteVect(const std::string & source);
 
+template<typename ValueType>
+std::vector<ValueType> GetNumberVect(const std::string & source)
+{
+    static_assert((
+            std::is_same<ValueType, bool>::value ||
+            std::is_same<ValueType, int>::value ||
+            std::is_same<ValueType, long int>::value ||
+            std::is_same<ValueType, unsigned int>::value ||
+            std::is_same<ValueType, long unsigned int>::value ||
+            std::is_same<ValueType,double>::value), "template parameter is of the wrong type");
+    std::stringstream line(source);
+    std::vector<ValueType> output_vector;
+    ValueType buffer;
+    while (line >> buffer)
+    {
+        output_vector.push_back(buffer);
+    }
+    return output_vector;
+}
+
 /// @brief Return the current timestamp as "Hours:Minute".
 /// @return The current timestamp.
 std::string GetFormattedTime();
@@ -178,6 +198,23 @@ std::string BoolToString(const bool & value);
 /// @param source The string to turn into an integer.
 /// @return The resulting integer.
 int ToInt(const std::string & source);
+
+/// @brief Transform a string into a numeric value.
+/// @param source The string to turn into a number.
+/// @return The number.
+template<typename ValueType>
+ValueType ToNumber(const std::string & source)
+{
+    static_assert((
+            std::is_same<ValueType, bool>::value ||
+            std::is_same<ValueType, int>::value ||
+            std::is_same<ValueType, long int>::value ||
+            std::is_same<ValueType, unsigned int>::value ||
+            std::is_same<ValueType, long unsigned int>::value ||
+            std::is_same<ValueType,double>::value), "template parameter is of the wrong type");
+    char * pEnd;
+    return static_cast<ValueType>(strtol(source.c_str(), &pEnd, 10));
+}
 
 /// @brief Transform a numeric value into a string.
 /// @param value The value to turn into a string.
@@ -265,7 +302,7 @@ bool IsNumber(const std::string & source);
 /// @brief Return the modifier of the given ability.
 /// @param value The total ability value.
 /// @return The ability modifier.
-unsigned int GetAbilityModifier(const int & value);
+unsigned int GetAbilityModifier(const unsigned int & value);
 
 /// @brief Given a player target, eg.: 2.rat.<br>Extract the number <b>2</b>.
 /// @param source The source string.

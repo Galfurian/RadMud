@@ -46,17 +46,17 @@ class ResultSet
         /// @brief Get the name of the given column.
         /// @param column The column number.
         /// @return The name of the column.
-        virtual std::string getColumnName(unsigned int column) = 0;
+        virtual std::string getColumnName(const int & column) = 0;
 
         /// @brief Get the given coloumn data as a string.
         /// @param column The column number.
         /// @return The string retrieved from the cell.
-        virtual std::string getDataString(unsigned int column) = 0;
+        virtual std::string getDataString(const int & column) = 0;
 
         /// @brief Get the given coloumn data as an integer.
         /// @param column The number of the column.
         /// @return The integer retrieved from the cell.
-        virtual int getDataInteger(unsigned int column) = 0;
+        virtual int getDataInteger(const int & column) = 0;
 
         /// @brief Get the next coloumn data as a string.
         /// @return The string retrieved from the cell.
@@ -99,7 +99,7 @@ class SQLiteWrapper: public ResultSet
         /// @brief This method is used to execute a INSERT/DELETE/UPDATE Query.
         /// @param query The query that has to be executed.
         /// @return The number of affected data by the query.
-        unsigned int executeQuery(const char * query);
+        int executeQuery(const char * query);
 
         /// @brief Begin a transaction.
         void beginTransaction();
@@ -147,10 +147,10 @@ class SQLiteWrapper: public ResultSet
         int errorCode;
 
         /// Number of column in the result set.
-        unsigned int num_col;
+        int num_col;
 
         /// Current column.
-        unsigned int currentColumn;
+        int currentColumn;
 
         /// SQLite Connection Details.
         DBDetails dbDetails;
@@ -158,9 +158,9 @@ class SQLiteWrapper: public ResultSet
         bool next();
         bool release();
         int getColumnCount();
-        std::string getColumnName(unsigned int column);
-        std::string getDataString(unsigned int column);
-        int getDataInteger(unsigned int column);
+        std::string getColumnName(const int & column);
+        std::string getDataString(const int & column);
+        int getDataInteger(const int & column);
         std::string getNextString();
         int getNextInteger();
         unsigned int getNextUnsignedInteger();

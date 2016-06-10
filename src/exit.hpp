@@ -37,7 +37,7 @@ class Exit
         /// The direction.
         Direction direction;
         /// The flags of the exit.
-        int flags;
+        unsigned int flags;
 
         /// Create an empty exit.
         Exit();
@@ -50,7 +50,7 @@ class Exit
         /// @param _destination The destination room.
         /// @param _direction   The direction of the exit.
         /// @param _flags       The exit flags.
-        Exit(Room * _source, Room * _destination, Direction _direction, int _flags);
+        Exit(Room * _source, Room * _destination, Direction _direction, unsigned int _flags);
 
         /// @brief Check the correctness of the exit.
         /// @return <b>True</b> if it has correct values,<br><b>False</b> otherwise.

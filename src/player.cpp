@@ -34,6 +34,7 @@
 #include <vector>
 #include <sstream>
 #include <iostream>
+#include <errno.h>
 
 // Other Include.
 #include "mud.hpp"
@@ -47,6 +48,8 @@
 #include "formatter.hpp"
 
 using namespace std;
+
+#define BUFSIZE 512
 
 Player::Player(const int & _socket, const int & _port, const std::string & _address) :
     psocket(_socket),
@@ -422,19 +425,16 @@ void Player::processInput(Player * player, const string & command)
 
 void Player::processRead()
 {
-    vector<char> buffer = vector<char>(8192);
-
+    char buffer[BUFSIZE];
     // Once closed, don't handle any pending input.
     if (closing)
     {
         return;
     }
-
-    ssize_t nRead = recv(psocket, &buffer[0], sizeof(buffer), MSG_DONTWAIT);
+    ssize_t nRead = recv(psocket, &buffer, BUFSIZE - 1, MSG_DONTWAIT);
     if (nRead <= 0)
     {
-        // Print error.
-        perror("Error during socket receive");
+        Logger::log(LogLevel::Error, "Socket recv failed: %s", ToString(errno));
         // Close the socket.
         if (Mud::instance().closeSocket(psocket))
         {
@@ -449,43 +449,15 @@ void Player::processRead()
         // Skip the rest of the function.
         return;
     }
-
-    // Add to input buffer.
-    inbuf += string(&buffer[0], nRead);
-
+    std::size_t uRead = static_cast<std::size_t>(nRead);
+    // Move the received data into the input buffer.
+    inbuf = std::string(buffer, uRead);
     // Update received data.
-    MudUpdater::instance().updateBandIn(nRead);
-
-    size_t iStart = inbuf.size();
-    // Try to extract lines from the input buffer.
-    while (true)
-    {
-        string::size_type i = inbuf.find('\n');
-        if (i == string::npos)
-        {
-            if (inbuf.empty())
-            {
-                // No more at present.
-                break;
-            }
-            else
-            {
-                i = inbuf.size() - 1;
-            }
-        }
-
-        // Extract first line.
-        std::string sLine = inbuf.substr(0, i);
-
-        // Get rest of string.
-        inbuf = inbuf.substr(i + 1, string::npos);
-
-        iStart += i + 1;
-
-        // Now, process it.
-        this->processInput(this, Trim(sLine));
-    }
-    inbuf[iStart] = '\0';
+    MudUpdater::instance().updateBandIn(uRead);
+    // Process the input.
+    this->processInput(this, Trim(inbuf));
+    // Null-terminate the buffer.
+    inbuf[uRead] = 0;
 }
 
 void Player::processWrite()
@@ -523,7 +495,7 @@ void Player::processWrite()
         Mud::instance().getUpdater().updateBandWidth(2, uncompressed.size());
 #else
         // Send to player.
-        size_t nWrite = send(psocket, outbuf.c_str(), outbuf.size(), MSG_NOSIGNAL);
+        ssize_t nWrite = send(psocket, outbuf.c_str(), outbuf.size(), MSG_NOSIGNAL);
 #endif
 #if 0
         // Decompress the sent data for checking.
@@ -534,8 +506,6 @@ void Player::processWrite()
             LogWarning("Uncrompressed message is different from compressed one.");
         }
 #endif
-
-        MudUpdater::instance().updateBandOut(nWrite);
 
         // Check for bad write.
         if (nWrite <= 0)
@@ -549,12 +519,14 @@ void Player::processWrite()
             }
             return;
         }
+        std::size_t uWritten = static_cast<std::size_t>(nWrite);
+        MudUpdater::instance().updateBandOut(uWritten);
 
         // Remove what we successfully sent from the buffer.
         outbuf.erase(0, outbuf.size());
 
         // If partial write, exit
-        if (nWrite < iLength)
+        if (uWritten < iLength)
         {
             break;
         }

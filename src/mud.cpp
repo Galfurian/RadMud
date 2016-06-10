@@ -41,13 +41,13 @@ void Bailout(int signal)
 }
 
 Mud::Mud() :
-        _servSocket(-1),
-        _maxDesc(-1),
-        _shutdownSignal(),
-        _bootTime(time(NULL)),
-        _maxVnumRoom(),
-        _maxVnumItem(),
-        _minVnumCorpses()
+    _servSocket(-1),
+    _maxDesc(-1),
+    _shutdownSignal(),
+    _bootTime(time(NULL)),
+    _maxVnumRoom(),
+    _maxVnumItem(),
+    _minVnumCorpses()
 {
     // Nothing to do.
 }
@@ -344,24 +344,6 @@ Room * Mud::findRoom(int vnum)
         return iterator->second;
     }
     return nullptr;
-}
-
-Room * Mud::findRoom(int x, int y, int z)
-{
-    for (auto iterator : mudRooms)
-    {
-        Room * room = iterator.second;
-        if (room->coord.x == x && room->coord.y == y && room->coord.z == z)
-        {
-            return room;
-        }
-    }
-    return nullptr;
-}
-
-Room * Mud::findRoom(Coordinates coord)
-{
-    return this->findRoom(coord.x, coord.y, coord.z);
 }
 
 Race * Mud::findRace(int vnum)

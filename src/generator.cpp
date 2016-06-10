@@ -97,7 +97,8 @@ Generator::Generator()
     auxiliary_vector.push_back("You are in @ROOM_NAME in some places the walls have metal veins.");
     auxiliary_vector.push_back(
         "The sound of your footsteps is magnified as you advance in the dark, in addition to the sound of your breath, they are the only sounds that you can perceive.");
-    auxiliary_vector.push_back("You've just come out of a crack, you look around for a while, you're finished in @ROOM_NAME.");
+    auxiliary_vector.push_back(
+        "You've just come out of a crack, you look around for a while, you're finished in @ROOM_NAME.");
     zones_description.insert(make_pair("cavern", auxiliary_vector));
     auxiliary_vector.clear();
 
@@ -125,7 +126,8 @@ Generator::Generator()
     auxiliary_vector.clear();
 
     // ICED
-    auxiliary_vector.push_back("The temperature has dropped sharply, you cold chills the blood begins to flow fatigue in your veins.");
+    auxiliary_vector.push_back(
+        "The temperature has dropped sharply, you cold chills the blood begins to flow fatigue in your veins.");
     auxiliary_vector.push_back(
         "A layer of frost covering everything, the air itself is permeated by a thin blanket of snow that due to the small streams of wind never drops to the ground.");
     auxiliary_vector.push_back(
@@ -136,7 +138,8 @@ Generator::Generator()
     // MAGMATIC
     auxiliary_vector.push_back(
         "A cascade of lava lights up the room slightly, this does not help you a lot to see, but the heat here makes it tiring to continue.");
-    auxiliary_vector.push_back("A river of lava passes under your feet as you advance on a natural bridge, you hope it lasts.");
+    auxiliary_vector.push_back(
+        "A river of lava passes under your feet as you advance on a natural bridge, you hope it lasts.");
     status_description.insert(make_pair("magmatic", auxiliary_vector));
     auxiliary_vector.clear();
 
@@ -161,7 +164,7 @@ void Generator::generate(int phase, string zone, string status)
         return;
     }
     unsigned int choices = static_cast<unsigned int>(auxiliary_vector.size());
-    unsigned int randomSeed = static_cast<unsigned int>(RandInteger(0, choices - 1));
+    unsigned int randomSeed = TRandInteger<unsigned int>(0, choices - 1);
     switch (phase)
     {
         default:

@@ -77,7 +77,7 @@ class Area
         /// @brief Check if the given coordinates is inside the boundaries.
         /// @param coord The coordinates to check.
         /// @return <b>True</b> if the coordinates are valid,<br><b>False</b> otherwise.
-        bool inBoundaries(Coordinates coord);
+        bool inBoundaries(Coordinates<unsigned int> coord);
 
         /// @brief Add the passed room to its coordinates inside the area.
         /// @param room The room that has to be added.
@@ -103,7 +103,7 @@ class Area
         /// @brief Find a room in a precise spot.
         /// @param coord The coordiantes where search the room.
         /// @return The room at the selected spot.
-        Room * getRoom(Coordinates coord);
+        Room * getRoom(Coordinates<unsigned int> coord);
 
         /// @brief Draw the Filed of View for a character.
         /// @param centerRoom The room from where the algorithm has to compute the Field of View.

@@ -53,28 +53,29 @@ bool Logger::getLog(const LogLevel & level, std::string & result)
     {
         // Clear the output string.
         result.clear();
-        // Resize the log string.
-        result.resize(Logger::getStream().tellg());
-        // Move the input position to the beginning of the string.
-        Logger::getStream().seekg(0, std::ios::beg);
-        // Create a string for storing the line.
-        std::string line;
-        // Create a string which contains the given level.
-        std::string logLevel = "[" + Logger::levelToString(level) + "]";
-        while (std::getline(Logger::getStream(), line))
+        std::streamoff totalSize = Logger::getStream().tellg();
+        if (totalSize > 0)
         {
-            // If the line starts with the sa
-            if (BeginWith(line, logLevel))
+            // Resize the log string.
+            result.resize(static_cast<std::size_t>(totalSize));
+            // Move the input position to the beginning of the string.
+            Logger::getStream().seekg(0, std::ios::beg);
+            // Create a string for storing the line.
+            std::string line;
+            // Create a string which contains the given level.
+            std::string logLevel = "[" + Logger::levelToString(level) + "]";
+            while (std::getline(Logger::getStream(), line))
             {
-                result.append(line + "\n");
+                // If the line starts with the sa
+                if (BeginWith(line, logLevel))
+                {
+                    result.append(line + "\n");
+                }
             }
+            return true;
         }
-        return true;
     }
-    else
-    {
-        return false;
-    }
+    return false;
 }
 
 LogLevel Logger::castFromInt(const unsigned int & level)

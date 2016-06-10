@@ -31,44 +31,44 @@
 using namespace std;
 
 Model::Model() :
-        vnum(),
-        name(),
-        article(),
-        shortdesc(),
-        keys(),
-        description(),
-        type(ModelType::NoType),
-        slot(EquipmentSlot::None),
-        flags(),
-        weight(),
-        price(),
-        condition(),
-        decay(),
-        material(MaterialType::NoType),
-        tileSet(),
-        tileId(),
-        functions()
+    vnum(),
+    name(),
+    article(),
+    shortdesc(),
+    keys(),
+    description(),
+    type(ModelType::NoType),
+    slot(EquipmentSlot::None),
+    flags(),
+    weight(),
+    price(),
+    condition(),
+    decay(),
+    material(MaterialType::NoType),
+    tileSet(),
+    tileId(),
+    functions()
 {
 }
 
 Model::Model(const Model & source) :
-        vnum(source.vnum),
-        name(source.name),
-        article(source.article),
-        shortdesc(source.shortdesc),
-        keys(source.keys),
-        description(source.description),
-        type(source.type),
-        slot(source.slot),
-        flags(source.flags),
-        weight(source.weight),
-        price(source.price),
-        condition(source.condition),
-        decay(source.decay),
-        material(source.material),
-        tileSet(source.tileSet),
-        tileId(source.tileId),
-        functions(source.functions)
+    vnum(source.vnum),
+    name(source.name),
+    article(source.article),
+    shortdesc(source.shortdesc),
+    keys(source.keys),
+    description(source.description),
+    type(source.type),
+    slot(source.slot),
+    flags(source.flags),
+    weight(source.weight),
+    price(source.price),
+    condition(source.condition),
+    decay(source.decay),
+    material(source.material),
+    tileSet(source.tileSet),
+    tileId(source.tileId),
+    functions(source.functions)
 {
     // Nothing to do.
 }
@@ -81,6 +81,31 @@ Model::~Model()
 ///////////////////////////////////////////////////////////
 // CHECKER ////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
+bool Model::setFunctions(std::string source)
+{
+    if (source.empty())
+    {
+        Logger::log(LogLevel::Error, "Function list is empty.");
+        return false;
+    }
+    std::vector<std::string> functionList = SplitString(source, " ");
+    if (functionList.size() != 6)
+    {
+        Logger::log(LogLevel::Error, "Function list contains the wrong number of parameters.");
+        return false;
+    }
+    for (auto it : functionList)
+    {
+        int value = ToNumber<int>(it);
+        if (value < 0)
+        {
+            Logger::log(LogLevel::Error, "Function list contains a negative value.");
+            return false;
+        }
+        functions.push_back(static_cast<unsigned int>(value));
+    }
+    return true;
+}
 
 bool Model::check()
 {
@@ -95,7 +120,6 @@ bool Model::check()
     {
         assert(slot != EquipmentSlot::None);
     }
-    assert(flags >= 0);
     assert(weight > 0);
     assert(price >= 0);
     assert(condition > 0);

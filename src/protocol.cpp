@@ -66,9 +66,9 @@ void NegotiateProtocol(Character * character, const ConnectionState & nextState)
         Logger::log(LogLevel::Debug, "Sending  : IAC WILL MSDP");
         // IAC WILL MSDP
         std::string command;
-        command += static_cast<Byte>(TelnetChar::IAC);
-        command += static_cast<Byte>(TelnetChar::WILL);
-        command += static_cast<Byte>(TelnetChar::MSDP);
+        command += static_cast<char>(TelnetChar::IAC);
+        command += static_cast<char>(TelnetChar::WILL);
+        command += static_cast<char>(TelnetChar::MSDP);
         player->sendMsg(command);
     }
     else if (nextState == ConnectionState::NegotiatingMCCP)
@@ -76,9 +76,9 @@ void NegotiateProtocol(Character * character, const ConnectionState & nextState)
         Logger::log(LogLevel::Debug, "Sending  : IAC WILL MCCP");
         // IAC WILL MCCP
         std::string command;
-        command += static_cast<Byte>(TelnetChar::IAC);
-        command += static_cast<Byte>(TelnetChar::WILL);
-        command += static_cast<Byte>(TelnetChar::MCCP);
+        command += static_cast<char>(TelnetChar::IAC);
+        command += static_cast<char>(TelnetChar::WILL);
+        command += static_cast<char>(TelnetChar::MCCP);
         player->sendMsg(command);
     }
 }

@@ -28,38 +28,38 @@
 #include "formatter.hpp"
 
 Race::Race() :
-        vnum(),
-        name(),
-        description(),
-        material(),
-        strength(),
-        agility(),
-        perception(),
-        constitution(),
-        intelligence(),
-        available_faction(),
-        player_allow(),
-        tileSet(),
-        tileId(),
-        corpseDescription()
+    vnum(),
+    name(),
+    description(),
+    material(),
+    strength(),
+    agility(),
+    perception(),
+    constitution(),
+    intelligence(),
+    available_faction(),
+    player_allow(),
+    tileSet(),
+    tileId(),
+    corpseDescription()
 {
 }
 
 Race::Race(const Race & source) :
-        vnum(source.vnum),
-        name(source.name),
-        description(source.description),
-        material(source.material),
-        strength(source.strength),
-        agility(source.agility),
-        perception(source.perception),
-        constitution(source.constitution),
-        intelligence(source.intelligence),
-        available_faction(source.available_faction),
-        player_allow(source.player_allow),
-        tileSet(source.tileSet),
-        tileId(source.tileId),
-        corpseDescription(source.corpseDescription)
+    vnum(source.vnum),
+    name(source.name),
+    description(source.description),
+    material(source.material),
+    strength(source.strength),
+    agility(source.agility),
+    perception(source.perception),
+    constitution(source.constitution),
+    intelligence(source.intelligence),
+    available_faction(source.available_faction),
+    player_allow(source.player_allow),
+    tileSet(source.tileSet),
+    tileId(source.tileId),
+    corpseDescription(source.corpseDescription)
 {
 }
 
@@ -94,11 +94,41 @@ bool Race::setCharacteristic(std::string source)
     {
         return false;
     }
-    this->strength = ToInt(charList[0]);
-    this->agility = ToInt(charList[1]);
-    this->perception = ToInt(charList[2]);
-    this->constitution = ToInt(charList[3]);
-    this->intelligence = ToInt(charList[4]);
+    int value = ToNumber<int>(charList[0]);
+    if (value < 0)
+    {
+        Logger::log(LogLevel::Error, "The list of characteristics contains a negative strength.");
+        return false;
+    }
+    this->strength = static_cast<unsigned int>(value);
+    value = ToNumber<int>(charList[1]);
+    if (value < 0)
+    {
+        Logger::log(LogLevel::Error, "The list of characteristics contains a negative agility.");
+        return false;
+    }
+    this->agility = static_cast<unsigned int>(value);
+    value = ToNumber<int>(charList[2]);
+    if (value < 0)
+    {
+        Logger::log(LogLevel::Error, "The list of characteristics contains a negative perception.");
+        return false;
+    }
+    this->perception = static_cast<unsigned int>(value);
+    value = ToNumber<int>(charList[3]);
+    if (value < 0)
+    {
+        Logger::log(LogLevel::Error, "The list of characteristics contains a negative constitution.");
+        return false;
+    }
+    this->constitution = static_cast<unsigned int>(value);
+    value = ToNumber<int>(charList[4]);
+    if (value < 0)
+    {
+        Logger::log(LogLevel::Error, "The list of characteristics contains a negative intelligence.");
+        return false;
+    }
+    this->intelligence = static_cast<unsigned int>(value);
     return true;
 }
 

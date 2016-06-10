@@ -34,19 +34,19 @@
 using namespace std;
 
 Item::Item() :
-        vnum(),
-        model(),
-        maker(),
-        condition(),
-        composition(),
-        quality(ItemQuality::None),
-        flags(),
-        room(),
-        owner(),
-        container(),
-        currentSlot(EquipmentSlot::None),
-        content(),
-        contentLiq()
+    vnum(),
+    model(),
+    maker(),
+    condition(),
+    composition(),
+    quality(ItemQuality::None),
+    flags(),
+    room(),
+    owner(),
+    container(),
+    currentSlot(EquipmentSlot::None),
+    content(),
+    contentLiq()
 {
 }
 
@@ -64,7 +64,6 @@ bool Item::check(bool complete)
     safe &= SafeAssert(condition > 0);
     safe &= SafeAssert(composition != nullptr);
     safe &= SafeAssert(quality != ItemQuality::None);
-    safe &= SafeAssert(flags >= 0);
     if (complete)
     {
         safe &= SafeAssert(!((room != nullptr) && (owner != nullptr)));
@@ -333,13 +332,13 @@ string Item::getCondition()
     return output;
 }
 
-int Item::getWeight()
+unsigned int Item::getWeight()
 {
     // Add the default weight of the model.
-    int totalWeight = model->weight;
+    unsigned int totalWeight = model->weight;
 
     // Add the addition weight due to the material.
-    totalWeight += static_cast<int>(static_cast<double>(model->weight / 100) * composition->lightness);
+    totalWeight += static_cast<unsigned int>(static_cast<double>(model->weight / 100) * composition->lightness);
 
     if (model->type == ModelType::Container)
     {
@@ -427,7 +426,7 @@ bool Item::isEmpty()
     }
 }
 
-int Item::getTotalSpace()
+unsigned int Item::getTotalSpace()
 {
     if (model->type == ModelType::Container)
     {
@@ -443,7 +442,7 @@ int Item::getTotalSpace()
     }
 }
 
-int Item::getUsedSpace()
+unsigned int Item::getUsedSpace()
 {
     unsigned int used = 0;
     if (model->type == ModelType::Container)
@@ -463,19 +462,23 @@ int Item::getUsedSpace()
     return used;
 }
 
-int Item::getFreeSpace()
+unsigned int Item::getFreeSpace()
 {
-    int free = getTotalSpace() - getUsedSpace();
-    if (free < 0)
+    unsigned int totalSpace = this->getTotalSpace();
+    unsigned int usedSpace = this->getUsedSpace();
+    if (totalSpace < usedSpace)
     {
         return 0;
     }
-    return static_cast<unsigned int>(free);
+    else
+    {
+        return totalSpace - usedSpace;
+    }
 }
 
 bool Item::putInside(Item * item)
 {
-    if (item->model->weight > getFreeSpace())
+    if (item->model->weight > this->getFreeSpace())
     {
         return false;
     }
@@ -507,9 +510,9 @@ void Item::takeOut(Item * item)
     }
 }
 
-bool Item::pourIn(Liquid * liquid, int quantity)
+bool Item::pourIn(Liquid * liquid, const unsigned int & quantity)
 {
-    if (quantity > getFreeSpace())
+    if (quantity > this->getFreeSpace())
     {
         return false;
     }
@@ -551,10 +554,10 @@ bool Item::pourIn(Liquid * liquid, int quantity)
     return true;
 }
 
-bool Item::pourOut(unsigned int quantity)
+bool Item::pourOut(const unsigned int & quantity)
 {
     // If the item has an Endless provision of liquid, don't do any check.
-    int modelFlags = model->getLiqContainerFunc().flags;
+    unsigned int modelFlags = model->getLiqContainerFunc().flags;
     if (HasFlag(modelFlags, LiqContainerFlag::Endless))
     {
         return true;
@@ -636,8 +639,8 @@ string Item::lookContent()
                 }
             }
             output += "Has been used " + Formatter::yellow() + ToString(getUsedSpace()) + Formatter::reset();
-            output += " out of " + Formatter::yellow() + ToString(getTotalSpace()) + Formatter::reset() + " " + mud_measure
-                + ".\n";
+            output += " out of " + Formatter::yellow() + ToString(getTotalSpace()) + Formatter::reset() + " "
+                + mud_measure + ".\n";
         }
     }
     else if (model->type == ModelType::LiqContainer)
@@ -650,7 +653,7 @@ string Item::lookContent()
         {
             int percent = 0;
 
-            int modelFlags = model->getLiqContainerFunc().flags;
+            unsigned int modelFlags = model->getLiqContainerFunc().flags;
             if (HasFlag(modelFlags, LiqContainerFlag::Endless))
             {
                 percent = 100;

@@ -29,15 +29,15 @@
 #include "constants.hpp"
 
 Continent::Continent() :
-        vnum(),
-        name(),
-        builder(),
-        width(),
-        height(),
-        txtMap(),
-        charMap(),
-        continentMap(),
-        tileSet()
+    vnum(),
+    name(),
+    builder(),
+    width(),
+    height(),
+    txtMap(),
+    charMap(),
+    continentMap(),
+    tileSet()
 {
 }
 
@@ -72,7 +72,7 @@ void Continent::init()
         room->vnum = -1;
         room->area = nullptr;
         room->continent = this;
-        room->coord = Coordinates(x, y, -1);
+        room->coord = Coordinates<unsigned int>(x, y, 0);
         room->terrain = "outside";
         room->name = "Travelling";
         room->description = "You are traveling along the continent.";
@@ -127,7 +127,7 @@ bool Continent::inBoundaries(unsigned int x, unsigned int y, unsigned int z)
     return false;
 }
 
-bool Continent::inBoundaries(Coordinates coord)
+bool Continent::inBoundaries(Coordinates<unsigned int> coord)
 {
     bool accepted = false;
     if ((coord.x > 0) && (coord.y > 0) && (coord.z > 0))
@@ -148,7 +148,7 @@ Room * Continent::getRoom(unsigned int x, unsigned int y, unsigned int z)
     return nullptr;
 }
 
-Room * Continent::getRoom(Coordinates coord)
+Room * Continent::getRoom(Coordinates<unsigned int> coord)
 {
     Room * room = nullptr;
     if ((coord.x > 0) && (coord.y > 0) && (coord.z > 0))

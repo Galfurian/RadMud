@@ -69,7 +69,7 @@ class Player: public Character
         /// Determine if the player has successfully logged in.
         bool logged_in;
         /// Connection flags.
-        int connectionFlags;
+        unsigned int connectionFlags;
         /// MSDP Variables.
         std::map<std::string, std::string> msdpVariables;
 
