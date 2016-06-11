@@ -373,10 +373,10 @@ class Character
         static void luaRegister(lua_State * L);
 
         /// @brief Operator used to order the character based on their name.
-        bool operator<(const class Character & source) const
-        {
-            return name < source.name;
-        }
+        bool operator<(const class Character & source) const;
+
+        /// @brief Operator used to order the character based on their name.
+        bool operator==(const class Character & source) const;
 
         /// @brief Send a message to the character.
         /// @param msg Message to send.
@@ -404,7 +404,7 @@ class Character
 };
 
 /// @brief Character list handler.
-typedef std::vector<Character *> CharacterList;
+typedef std::vector<Character *> CharacterVector;
 
 /// @brief An action handler for the character.
 typedef std::function<void(Character * character, std::istream & args)> ActionHandler;

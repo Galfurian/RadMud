@@ -145,16 +145,19 @@ void DoQuit(Character * character, std::istream & sArgs)
         // Say goodbye to player.
         player->sendMsg("See you next time!\n");
 
-        // End of properly connected.
-        player->closeConnection();
+        if (player->room != nullptr)
+        {
+            // Set the list of exceptions.
+            CharacterVector exceptions;
+            exceptions.push_back(character);
+            // Send the message inside the room.
+            player->room->sendToAll("Player " + player->getName() + " disappear in a puff of smoke.\n", exceptions);
+        }
 
         Logger::log(LogLevel::Global, "Player " + player->getName() + " has left the game.");
 
-        if (player->room != nullptr)
-        {
-            // Send to the other player in the room a message.
-            player->room->sendToAll("Player " + player->getName() + " disappear in a puff of smoke.\n", player);
-        }
+        // End of properly connected.
+        player->closeConnection();
     }
 }
 

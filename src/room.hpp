@@ -58,7 +58,7 @@ class Room
         /// List of items in the room.
         ItemVector items;
         /// List of characters in the room.
-        CharacterList characters;
+        CharacterVector characters;
         /// Integer that describe the flags of the room.
         unsigned int flags;
 
@@ -189,7 +189,7 @@ class Room
         /// @param message   The message to send.
         /// @param source    The source of the message.
         /// @param exception Another exception to the message.
-        void sendToAll(std::string message, Character * source = nullptr, Character * exception = nullptr);
+        void sendToAll(const std::string & message, const CharacterVector & exceptions);
 
         /// @brief Connect the current room with all the nearby rooms.
         void connectExits();
@@ -202,19 +202,13 @@ class Room
         /// @param right The comparison room.
         /// @return <b>True</b> if the room vnum is lesser than the other,<br>
         ///         <b>False</b> otherwise.
-        bool operator<(const Room & right) const
-        {
-            return vnum < right.vnum;
-        }
+        bool operator<(const Room & right) const;
 
         /// @brief Define operator eual.
         /// @param right The comparison room.
         /// @return <b>True</b> if this and the other room have the same vnum,<br>
         ///         <b>False</b> otherwise.
-        bool operator==(const Room & right) const
-        {
-            return vnum == right.vnum;
-        }
+        bool operator==(const Room & right) const;
 };
 
 /// @brief Create a room in the desired position.

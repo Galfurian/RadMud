@@ -395,7 +395,11 @@ void Player::enterGame()
     if (room != nullptr)
     {
         room->addCharacter(this);
-        room->sendToAll(name + " appears.\n", this);
+        // Set the list of exceptions.
+        CharacterVector exceptions;
+        exceptions.push_back(this);
+        // Send the message inside the room.
+        room->sendToAll(name + " appears.\n", exceptions);
     }
     else
     {

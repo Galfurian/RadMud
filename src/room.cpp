@@ -557,20 +557,13 @@ string Room::getLook(Character * exception)
     return output;
 }
 
-void Room::sendToAll(string message, Character * source, Character * exception)
+void Room::sendToAll(const std::string & message, const CharacterVector & exceptions)
 {
-    for (auto iterator : getAllPlayer(source))
+    for (auto iterator : characters)
     {
-        if (source)
+        if (!exceptions.empty())
         {
-            if (iterator == source)
-            {
-                continue;
-            }
-        }
-        if (exception)
-        {
-            if (iterator == exception)
+            if (std::find(exceptions.begin(), exceptions.end(), iterator) != exceptions.end())
             {
                 continue;
             }
@@ -640,6 +633,16 @@ void Room::luaRegister(lua_State * L)
     .addData("coord", &Room::coord, false) //
     .addData("terrain", &Room::terrain, false) //
     .endClass();
+}
+
+bool Room::operator<(const Room & right) const
+{
+    return vnum < right.vnum;
+}
+
+bool Room::operator==(const Room & right) const
+{
+    return vnum == right.vnum;
 }
 
 bool CreateRoom(Coordinates<unsigned int> coord, Room * source_room)

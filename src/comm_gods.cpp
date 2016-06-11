@@ -39,6 +39,7 @@ void DoShutdown(Character * character, std::istream & sArgs)
 
 void DoGoTo(Character * character, std::istream & sArgs)
 {
+    std::string msgDepart, msgArrive, msgChar;
     // Get the arguments of the command.
     ArgumentList arguments = ParseArgs(sArgs);
     if (arguments.size() != 1)
@@ -56,15 +57,18 @@ void DoGoTo(Character * character, std::istream & sArgs)
     // Check if the player it's already doing something.
     StopAction(character);
     // Prepare messages.
-    std::string msgDepart = character->getNameCapital() + " disappears in a puff of smoke!\n";
-    std::string msgArrive = character->getNameCapital() + " appears in a puff of smoke!\n";
-    std::string msgChar = "You go to room " + destination->name + ".\n";
+    msgDepart = character->getNameCapital();
+    msgDepart += " disappears in a puff of smoke!\n";
+    msgArrive = character->getNameCapital();
+    msgArrive += " appears in a puff of smoke!\n";
+    msgChar = "You go to room " + destination->name + ".\n";
     // Move player.
     character->moveTo(destination, msgDepart, msgArrive, msgChar);
 }
 
 void DoTransfer(Character * character, std::istream & sArgs)
 {
+    std::string msgDepart, msgArrive, msgChar;
     // Get the arguments of the command.
     ArgumentList arguments = ParseArgs(sArgs);
     if ((arguments.size() != 1) && (arguments.size() != 2))
@@ -99,12 +103,13 @@ void DoTransfer(Character * character, std::istream & sArgs)
     // Check if the player it's already doing something.
     StopAction(target);
     // Prepare messages.
-    std::string msgDepart = target->getNameCapital() + " is yanked away by unseen forces!";
-    std::string msgArrive = target->getNameCapital() + " appears breathlessly!";
-    std::string msgChar = "\n" + character->getNameCapital() + " transfers you to another room!\n";
+    msgDepart = target->getNameCapital() + " is yanked away by unseen forces!";
+    msgArrive = target->getNameCapital() + " appears breathlessly!";
+    msgChar = "\n" + character->getNameCapital();
+    msgChar += " transfers you to another room!\n";
     // Move player.
     target->moveTo(destination, msgDepart, msgArrive, msgChar);
-    character->sendMsg("You transfer " + target->getName() + " to room " + destination->name + ".\n");
+    character->sendMsg("You transfer %s to room %s.\n", target->getName(), destination->name);
 }
 
 void DoSetFlag(Character * character, std::istream & sArgs)
@@ -137,7 +142,7 @@ void DoSetFlag(Character * character, std::istream & sArgs)
     // Set the flag.
     SetFlag(target->flags, flag);
     // Send confirmation to the player.
-    character->sendMsg("You set the flag '" + GetCharacterFlagName(flag) + "' for " + target->getName() + "\n");
+    character->sendMsg("You set the flag '%s' for %s\n", GetCharacterFlagName(flag), target->getName());
 }
 
 void DoClearFlag(Character * character, std::istream & sArgs)
@@ -170,7 +175,7 @@ void DoClearFlag(Character * character, std::istream & sArgs)
     // Set the flag.
     ClearFlag(target->flags, flag);
     // Send confirmation to the player.
-    character->sendMsg("You clear the flag '" + GetCharacterFlagName(flag) + "' for " + target->getName() + "\n");
+    character->sendMsg("You clear the flag '%s' for %s\n", GetCharacterFlagName(flag), target->getName());
 }
 
 void DoModelInfo(Character * character, std::istream & sArgs)
@@ -401,20 +406,20 @@ void DoItemCreate(Character * character, std::istream & sArgs)
     ItemQuality quality = ItemQuality::Normal;
     if (model == nullptr)
     {
-        character->sendMsg("Cannot find the model '" + arguments[0].first + "'.\n");
+        character->sendMsg("Cannot find model '%s'.\n", arguments[0].first);
         return;
     }
     if (material == nullptr)
     {
-        character->sendMsg("Cannot find the material '" + arguments[1].first + ".\n");
+        character->sendMsg("Cannot find material '%s'.\n", arguments[1].first);
         return;
     }
     if (arguments.size() == 3)
     {
-        quality = static_cast<ItemQuality>(ToInt(arguments[2].first));
+        quality = static_cast<ItemQuality>(ToNumber<unsigned int>(arguments[2].first));
         if (quality == ItemQuality::None)
         {
-            character->sendMsg("Not a valid quality '" + arguments[2].first + "'.\n");
+            character->sendMsg("Not a valid quality.\n");
             return;
         }
     }
@@ -426,9 +431,8 @@ void DoItemCreate(Character * character, std::istream & sArgs)
         return;
     }
     character->addInventoryItem(item);
-    character->sendMsg(
-        "You produce " + Formatter::yellow() + item->getName() + Formatter::reset()
-            + " out of your apparently empty top hat.\n");
+    character->sendMsg("You produce '%s' out of your apparently empty top hat.\n",
+        Formatter::yellow() + item->getName() + Formatter::reset());
 }
 
 void DoItemGet(Character * character, std::istream & sArgs)
@@ -440,10 +444,11 @@ void DoItemGet(Character * character, std::istream & sArgs)
         character->sendMsg("You must instert an item vnum.\n");
         return;
     }
-    Item * item = Mud::instance().findItem(ToInt(arguments[0].first));
+    int itemVnum = ToNumber<int>(arguments[0].first);
+    Item * item = Mud::instance().findItem(itemVnum);
     if (item == nullptr)
     {
-        character->sendMsg("Invalid vnum.\n");
+        character->sendMsg("Invalid vnum (%s).\n", ToString(itemVnum));
         return;
     }
     // Check if the God player can carry the item.
@@ -454,52 +459,31 @@ void DoItemGet(Character * character, std::istream & sArgs)
     }
     if (item->room != nullptr)
     {
-        character->sendMsg("The item was in the room :" + item->room->name + "\n");
-        FindErase(item->room->items, item);
-        item->room = nullptr;
-
-        // Remove the item from the table ItemRoom.
-        QueryList where;
-        where.push_back(std::make_pair("item", ToString(item->vnum)));
-        SQLiteDbms::instance().deleteFrom("ItemRoom", where);
+        character->sendMsg("The item was inside the room '%s' (%s)\n", item->room->name, ToString(item->room->vnum));
+        item->room->removeItem(item);
+        item->updateOnDB();
     }
     else if (item->owner != nullptr)
     {
-        character->sendMsg("The item was on the character :" + item->owner->getName() + "\n");
+        character->sendMsg("The item was possessed by '%s'\n", item->owner->getName());
         FindErase(item->owner->inventory, item);
         FindErase(item->owner->equipment, item);
-
         item->owner = nullptr;
-
-        // Remove the item from the table ItemPlayer.
-        QueryList where;
-        where.push_back(std::make_pair("item", ToString(item->vnum)));
-        SQLiteDbms::instance().deleteFrom("ItemPlayer", where);
+        item->updateOnDB();
     }
     else if (item->container != nullptr)
     {
-        character->sendMsg("The item was inside the container:" + item->container->getName() + "\n");
-        FindErase(item->container->content, item);
-        item->container = nullptr;
-
-        // Remove the item from the table Content.
-        QueryList where;
-        where.push_back(std::make_pair("item", ToString(item->vnum)));
-        SQLiteDbms::instance().deleteFrom("ItemContent", where);
+        character->sendMsg("The item was inside the container '%s'\n", item->container->getName());
+        item->container->takeOut(item);
+        item->updateOnDB();
     }
     else
     {
-        character->sendMsg("The item was nowhere, but with your mighty power you have retrieved it.\n");
-    }
-    if (!character->isMobile())
-    {
-        character->toPlayer()->addInventoryItem(item);
-    }
-    else
-    {
-        character->addInventoryItem(item);
+        character->sendMsg("The item was nowhere!");
     }
     character->sendMsg("You materialize the desired object in your hands.\n");
+    character->addInventoryItem(item);
+    item->updateOnDB();
 }
 
 void DoItemDestroy(Character * character, std::istream & sArgs)
@@ -1026,7 +1010,7 @@ void DoMobileKill(Character * character, std::istream & sArgs)
     mobile->triggerDeath();
     // Notify the death.
     character->sendMsg("You snap your fingers.\n");
-    character->room->sendToAll(mobile->getNameCapital() + " fall to the ground dead.");
+    character->room->sendToAll(mobile->getNameCapital() + " fall to the ground dead.", CharacterVector());
 }
 
 void DoMobileReload(Character * character, std::istream & sArgs)

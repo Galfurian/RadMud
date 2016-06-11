@@ -496,8 +496,11 @@ void Character::moveTo(
         this->sendMsg(msgChar);
     }
 
+    // Set the list of exceptions.
+    CharacterVector exceptions;
+    exceptions.push_back(this);
     // Tell others where the character went and remove s/he from the old room.
-    room->sendToAll(msgDepart, this);
+    room->sendToAll(msgDepart, exceptions);
 
     // Remove the player from the current room.
     room->removeCharacter(this);
@@ -509,7 +512,7 @@ void Character::moveTo(
     this->doCommand("look");
 
     // Tell others s/he has arrived and move the character to the new room.
-    destination->sendToAll(msgArrive, this);
+    destination->sendToAll(msgArrive, exceptions);
 
     // Activate the entrance event for every mobile in the room.
     for (auto mobile : room->getAllMobile(this))
@@ -1341,6 +1344,16 @@ void Character::luaRegister(lua_State * L)
     .addData("rent_room", &Player::rent_room, false) //
     //std::map<int, unsigned int> skills;
     .endClass();
+}
+
+bool Character::operator<(const class Character & source) const
+{
+    return name < source.name;
+}
+
+bool Character::operator==(const class Character & source) const
+{
+    return name == source.name;
 }
 
 void Character::sendMsg(const std::string & msg)

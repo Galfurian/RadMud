@@ -231,6 +231,15 @@ bool Item::updateOnDB()
         SQLiteDbms::instance().deleteFrom("ItemPlayer", where);
         SQLiteDbms::instance().deleteFrom("ItemRoom", where);
     }
+    else
+    {
+        // Remove the item from almost any table.
+        QueryList where;
+        where.push_back(std::make_pair("item", ToString(vnum)));
+        SQLiteDbms::instance().deleteFrom("ItemPlayer", where);
+        SQLiteDbms::instance().deleteFrom("ItemRoom", where);
+        SQLiteDbms::instance().deleteFrom("ItemContent", where);
+    }
     if (!content.empty())
     {
         for (auto iterator : content)

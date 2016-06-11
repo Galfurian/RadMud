@@ -27,17 +27,17 @@
 #include "utils.hpp"
 
 Faction::Faction() :
-        vnum(),
-        name(),
-        description()
+    vnum(),
+    name(),
+    description()
 {
     // Nothing to do.
 }
 
 Faction::Faction(const Faction & source) :
-        vnum(source.vnum),
-        name(source.name),
-        description(source.description)
+    vnum(source.vnum),
+    name(source.name),
+    description(source.description)
 {
     // Nothing to do.
 }

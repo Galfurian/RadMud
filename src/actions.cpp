@@ -558,7 +558,11 @@ void Action::performMine()
     if (itemTarget->editCondition(-10))
     {
         actor->sendMsg("With your last blow, " + itemTarget->getName() + " crumbles into pieces..\n");
-        actor->room->sendToAll("The " + itemTarget->getName() + " crumbles into pieces.", actor);
+        // Set the list of exceptions.
+        CharacterVector exceptions;
+        exceptions.push_back(actor);
+        // Send the message inside the room.
+        actor->room->sendToAll("The " + itemTarget->getName() + " crumbles into pieces.", exceptions);
         // Destroy the vein.
         itemTarget->destroy();
     }
@@ -661,7 +665,11 @@ void Action::performChop()
     if (itemTarget->editCondition(-10))
     {
         actor->sendMsg("\nWith your last blow, " + itemTarget->getName() + " falls down..\n");
-        actor->room->sendToAll("The " + itemTarget->getName() + " falls down.", actor);
+        // Set the list of exceptions.
+        CharacterVector exceptions;
+        exceptions.push_back(actor);
+        // Send the message inside the room.
+        actor->room->sendToAll("The " + itemTarget->getName() + " falls down.", exceptions);
         // Destroy the vein.
         itemTarget->destroy();
     }

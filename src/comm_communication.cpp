@@ -75,17 +75,21 @@ void DoSay(Character * character, std::istream & sArgs)
         // Eat the space between the name and the message.
         message = Trim(message, " ");
         // Player send.
-        character->sendMsg("You say to %s, \"%s\"\n",
-            receiver->getName(), Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
+        character->sendMsg("You say to %s, \"%s\"\n", receiver->getName(),
+            Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
 
         // Target receive.
-        receiver->sendMsg("%s say to you, \"%s\"\n\n",
-            chName, Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
+        receiver->sendMsg("%s say to you, \"%s\"\n\n", chName,
+            Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
 
-        // Other in room.
+        // Set the list of exceptions.
+        CharacterVector exceptions;
+        exceptions.push_back(character);
+        exceptions.push_back(receiver);
+        // Send the message inside the room.
         character->room->sendToAll(
             chName + "%s says to " + receiver->getName() + ", \"" + Formatter::cyan() + Formatter::italic() + message
-                + Formatter::reset() + "\".\n", character, receiver);
+                + Formatter::reset() + "\".\n", exceptions);
 
         // If it's a mobile, activate the trigger.
         if (receiver->isMobile())
@@ -97,9 +101,13 @@ void DoSay(Character * character, std::istream & sArgs)
     {
         character->sendMsg(
             "You say \"" + Formatter::cyan() + Formatter::italic() + message + Formatter::reset() + "\".\n");
+        // Set the list of exceptions.
+        CharacterVector exceptions;
+        exceptions.push_back(character);
+        // Send the message inside the room.
         character->room->sendToAll(
             chName + " says \"" + Formatter::cyan() + Formatter::italic() + message + Formatter::reset() + "\".\n",
-            character);
+            exceptions);
     }
 }
 
@@ -170,7 +178,11 @@ void DoEmote(Character * character, std::istream & sArgs)
     // //////////////////////////////////////////
     // Send the emote.
     character->sendMsg(Formatter::yellow() + "You " + emote + Formatter::reset() + "\n");
-    character->room->sendToAll(Formatter::yellow() + chName + " " + emote + Formatter::reset() + "\n", character);
+    // Set the list of exceptions.
+    CharacterVector exceptions;
+    exceptions.push_back(character);
+    // Send the message inside the room.
+    character->room->sendToAll(Formatter::yellow() + chName + " " + emote + Formatter::reset() + "\n", exceptions);
 }
 
 void DoBug(Character * character, std::istream & sArgs)

@@ -112,7 +112,11 @@ void DoProfession(Character * character, Profession * profession, std::istream &
 
     std::string roomMsg;
     roomMsg += character->name + " has started " + production->profession->action + " something...\n";
-    character->room->sendToAll(roomMsg, character);
+    // Set the list of exceptions.
+    CharacterVector exceptions;
+    exceptions.push_back(character);
+    // Send the message inside the room.
+    character->room->sendToAll(roomMsg, exceptions);
 }
 
 void DoBuild(Character * character, std::istream & sArgs)
@@ -211,7 +215,11 @@ void DoBuild(Character * character, std::istream & sArgs)
     // //////////////////////////////////////////
     std::string roomMsg;
     roomMsg += character->name + " has started building something...\n";
-    character->room->sendToAll(roomMsg, character);
+    // Set the list of exceptions.
+    CharacterVector exceptions;
+    exceptions.push_back(character);
+    // Send the message inside the room.
+    character->room->sendToAll(roomMsg, exceptions);
 }
 
 void DoDeconstruct(Character * character, std::istream & sArgs)
