@@ -25,6 +25,15 @@
 /// SOFTWARE.
 ///----------------------------------------------------------------------------
 
+extern "C"
+{
+#include "lua.h"
+#include "lauxlib.h"
+#include "lualib.h"
+}
+
+#include <assert.h>
+
 // These are for Lua versions prior to 5.2.0.
 //
 #if LUA_VERSION_NUM < 502
@@ -59,19 +68,19 @@ inline int lua_compare(lua_State* L, int idx1, int idx2, int op)
     switch (op)
     {
         case LUA_OPEQ:
-            return lua_equal(L, idx1, idx2);
-            break;
+        return lua_equal(L, idx1, idx2);
+        break;
 
         case LUA_OPLT:
-            return lua_lessthan(L, idx1, idx2);
-            break;
+        return lua_lessthan(L, idx1, idx2);
+        break;
 
         case LUA_OPLE:
-            return lua_equal(L, idx1, idx2) || lua_lessthan(L, idx1, idx2);
-            break;
+        return lua_equal(L, idx1, idx2) || lua_lessthan(L, idx1, idx2);
+        break;
 
         default:
-            return 0;
+        return 0;
     };
 }
 
@@ -81,19 +90,9 @@ inline int get_length(lua_State* L, int idx)
 }
 
 #else
-inline int get_length (lua_State* L, int idx)
-{
-    lua_len (L, idx);
-    return int (luaL_checknumber (L, -1));
-}
+int get_length(lua_State* L, int idx);
 
-inline lua_State* get_main_thread( lua_State* thread )
-{
-    lua_rawgeti( thread, LUA_REGISTRYINDEX, LUA_RIDX_MAINTHREAD );
-    lua_State* L = lua_tothread( thread, -1 );
-    lua_pop( thread, 1 );
-    return L;
-}
+lua_State * get_main_thread(lua_State* thread);
 
 #endif
 
@@ -103,42 +102,17 @@ inline lua_State* get_main_thread( lua_State* thread )
 # define LUABRIDGE_LUA_OK LUA_OK
 #endif
 
-/** Get a table value, bypassing metamethods.
- */
-inline void rawgetfield(lua_State* L, int index, char const* key)
-{
-    assert(lua_istable(L, index));
-    index = lua_absindex(L, index);
-    lua_pushstring(L, key);
-    lua_rawget(L, index);
-}
+/// @brief Get a table value, bypassing metamethods.
+void rawgetfield(lua_State* L, int index, char const* key);
 
-/** Set a table value, bypassing metamethods.
- */
-inline void rawsetfield(lua_State* L, int index, char const* key)
-{
-    assert(lua_istable(L, index));
-    index = lua_absindex(L, index);
-    lua_pushstring(L, key);
-    lua_insert(L, -2);
-    lua_rawset(L, index);
-}
+/// @brief Set a table value, bypassing metamethods.
+void rawsetfield(lua_State* L, int index, char const* key);
 
-/** Returns true if the value is a full userdata (not light).
- */
-inline bool isfulluserdata(lua_State* L, int index)
-{
-    return lua_isuserdata(L, index) && !lua_islightuserdata(L, index);
-}
+/// @brief Returns true if the value is a full userdata (not light).
+bool isfulluserdata(lua_State* L, int index);
 
-/** Test lua_State objects for global equality.
-
- This can determine if two different lua_State objects really point
- to the same global state, such as when using coroutines.
-
- @note This is used for assertions.
- */
-inline bool equalstates(lua_State* L1, lua_State* L2)
-{
-    return lua_topointer(L1, LUA_REGISTRYINDEX) == lua_topointer(L2, LUA_REGISTRYINDEX);
-}
+/// @brief Test lua_State objects for global equality.
+/// @details This can determine if two different lua_State objects really point
+///           to the same global state, such as when using coroutines.
+/// @note This is used for assertions.
+bool equalstates(lua_State* L1, lua_State* L2);

@@ -155,6 +155,7 @@ set(PROJECT_SRC
     ./src/combat.cpp
     ./src/logger.cpp
     ./src/protocol.cpp
+    ./src/luabridge/detail/LuaHelpers.cpp
 )
 
 find_package(Lua51 REQUIRED)
