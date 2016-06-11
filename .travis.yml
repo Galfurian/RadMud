@@ -20,15 +20,6 @@ matrix:
           packages:
             - g++-5
       env: COMPILER=g++-5
-    - compiler: clang
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - h-rayflood/llvm
-          packages:
-            - clang-3.4
-      env: COMPILER=clang++-3.4
 
 before_install:
   - sudo apt-get update -qq
