@@ -175,9 +175,9 @@ add_executable(
 
 target_link_libraries(
 	${PROJECT_NAME}
+	${LUA_LIBRARIES}
+	${SQLITE3_LIBRARY}
 	pthread
-	sqlite3
-	lua
 	dl
 	z
 )
