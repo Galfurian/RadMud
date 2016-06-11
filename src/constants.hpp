@@ -30,53 +30,17 @@
 /// Enable or disable DEBUGGING messages.
 #define DEBUG 1
 
-/// Determine which message it's logged.
-static const std::vector<bool> kLogFlags =
-{ true,    // kMErr
-    true,  // kMWrn
-    true,  // kMSys
-    true,  // kMDat
-    true,  // kMMud
-    true,  // kMPla
-    true,  // kMDev
-    true,  // kMLua
-    false  // kMDec
-    };
-
-/// Error messages.
-static const int kMErr = 0;
-/// Warning messages.
-static const int kMWrn = 1;
-/// System messages.
-static const int kMSys = 2;
-/// Database messages.
-static const int kMDat = 3;
-/// Mud messages.
-static const int kMMud = 4;
-/// Player actions messages.
-static const int kMPla = 5;
-/// Developers actions messages.
-static const int kMDev = 6;
-/// Lua messages.
-static const int kMLua = 7;
-/// Deconstructor messages.
-static const int kMDec = 8;
-
 // ////////////////////////////////////////////////////////////////////////////
 // Global constants.
 // ////////////////////////////////////////////////////////////////////////////
 /// Server version.
 static const std::string kVersion = "15";
-/// Incoming connections port.
-static const int kPort = 4000;
 /// What room they start in.
 static const int kInitialRoom = 1000;
 /// Times they can try a password.
 static const int kMaxPasswordAttempts = 3;
 /// Mud weight measure.
 static const std::string mud_measure = "lbs";
-/// Mud coin name.
-static const std::string mud_currency = "coins";
 /// The maximum value of byte sent at time.
 static const int kMaxStream = 4096;
 /// Indicator for no socket connected.

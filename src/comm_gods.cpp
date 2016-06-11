@@ -190,226 +190,194 @@ void DoModelInfo(Character * character, std::istream & sArgs)
     }
 
     std::string msg;
-    msg += Formatter::yellow() + "Model Vnum      " + Formatter::reset() + ": " + ToString(model->vnum) + "\n";
-    msg += Formatter::yellow() + "Name            " + Formatter::reset() + ": " + model->name + "\n";
-    msg += Formatter::yellow() + "Article         " + Formatter::reset() + ": " + model->article + "\n";
-    msg += Formatter::yellow() + "Short Descr.    " + Formatter::reset() + ": " + model->shortdesc + "\n";
-    msg += Formatter::yellow() + "Keys            " + Formatter::reset() + ": {";
+    msg += Formatter::yellow() + "Model Vnum    " + Formatter::reset();
+    msg += ": " + ToString(model->vnum) + "\n";
+    msg += Formatter::yellow() + "Name          " + Formatter::reset();
+    msg += ": " + model->name + "\n";
+    msg += Formatter::yellow() + "Article       " + Formatter::reset();
+    msg += ": " + model->article + "\n";
+    msg += Formatter::yellow() + "Short Descr.  " + Formatter::reset();
+    msg += ": " + model->shortdesc + "\n";
+    msg += Formatter::yellow() + "Keys          " + Formatter::reset();
+    msg += ": {";
     for (auto it : model->keys)
     {
         msg += " " + it;
     }
     msg += "}\n";
-    msg += Formatter::yellow() + "Description     " + Formatter::reset() + ": " + model->description + "\n";
-    msg += Formatter::yellow() + "Type            " + Formatter::reset() + ": " + GetModelTypeName(model->type) + "\n";
-    msg += Formatter::yellow() + "Slot            " + Formatter::reset() + ": " + GetEquipmentSlotName(model->slot)
-        + "\n";
-    msg += Formatter::yellow() + "Flags           " + Formatter::reset() + ": " + GetModelFlagString(model->flags)
-        + "\n";
-    msg += Formatter::yellow() + "Weight          " + Formatter::reset() + ": " + ToString(model->weight) + " "
-        + mud_measure + ".\n";
-    msg += Formatter::yellow() + "Price           " + Formatter::reset() + ": " + ToString(model->price) + " "
-        + mud_currency + ".\n";
-    msg += Formatter::yellow() + "Condition       " + Formatter::reset() + ": " + ToString(model->condition) + "\n";
-    msg += Formatter::yellow() + "Decay           " + Formatter::reset() + ": " + ToString(model->decay) + "\n";
-    msg += Formatter::yellow() + "Material        " + Formatter::reset() + ": " + GetMaterialTypeName(model->material)
-        + "\n";
-    msg += Formatter::yellow() + "Tile Set        " + Formatter::reset() + ": " + ToString(model->tileSet) + "\n";
-    msg += Formatter::yellow() + "Tile Id         " + Formatter::reset() + ": " + ToString(model->tileId) + "\n";
-    msg += Formatter::yellow() + "Functions       " + Formatter::reset() + ": {";
+    msg += Formatter::yellow() + "Description   " + Formatter::reset();
+    msg += ": " + model->description + "\n";
+    msg += Formatter::yellow() + "Type          " + Formatter::reset();
+    msg += ": " + GetModelTypeName(model->type) + "\n";
+    msg += Formatter::yellow() + "Slot          " + Formatter::reset();
+    msg += ": " + GetEquipmentSlotName(model->slot) + "\n";
+    msg += Formatter::yellow() + "Flags         " + Formatter::reset();
+    msg += ": " + GetModelFlagString(model->flags) + "\n";
+    msg += Formatter::yellow() + "Weight        " + Formatter::reset();
+    msg += ": " + ToString(model->weight) + " " + mud_measure + ".\n";
+    msg += Formatter::yellow() + "Price         " + Formatter::reset();
+    msg += ": " + ToString(model->price) + ".\n";
+    msg += Formatter::yellow() + "Condition     " + Formatter::reset();
+    msg += ": " + ToString(model->condition) + "\n";
+    msg += Formatter::yellow() + "Decay         " + Formatter::reset();
+    msg += ": " + ToString(model->decay) + "\n";
+    msg += Formatter::yellow() + "Material      " + Formatter::reset();
+    msg += ": " + GetMaterialTypeName(model->material) + "\n";
+    msg += Formatter::yellow() + "Tile Set      " + Formatter::reset();
+    msg += ": " + ToString(model->tileSet) + "\n";
+    msg += Formatter::yellow() + "Tile Id       " + Formatter::reset();
+    msg += ": " + ToString(model->tileId) + "\n";
+    msg += Formatter::yellow() + "Functions     " + Formatter::reset();
+    msg += ": {";
     for (auto it : model->functions)
     {
         msg += " " + ToString(it);
     }
     msg += "}\n";
-
-    switch (model->type)
+    if (model->type == ModelType::Weapon)
     {
-        case ModelType::NoType:
+        WeaponFunc func = model->getWeaponFunc();
+        msg += Formatter::brown() + "Type          " + Formatter::reset();
+        msg += ": " + GetWeaponTypeName(func.type) + "\n";
+        msg += Formatter::brown() + "Minimum Damage  " + Formatter::reset();
+        msg += ": " + ToString(func.minDamage) + "\n";
+        msg += Formatter::brown() + "Maximum Damage  " + Formatter::reset();
+        msg += ": " + ToString(func.maxDamage) + "\n";
+        msg += Formatter::brown() + "Range           " + Formatter::reset();
+        msg += ": " + ToString(func.range) + "\n";
+    }
+    else if (model->type == ModelType::Armor)
+    {
+        ArmorFunc func = model->getArmorFunc();
+        msg += Formatter::brown() + "Size          " + Formatter::reset();
+        msg += ": " + GetArmorSizeName(func.size) + "\n";
+        msg += Formatter::brown() + "Damage Abs.   " + Formatter::reset();
+        msg += ": " + ToString(func.damageAbs) + "\n";
+        msg += Formatter::brown() + "Allowed Anatom. " + Formatter::reset();
+        msg += ": " + ToString(func.allowedAnatomy) + "\n";
+    }
+    else if (model->type == ModelType::Shield)
+    {
+        ShieldFunc func = model->getShieldFunc();
+        msg += Formatter::brown() + "Size            " + Formatter::reset();
+        msg += ": " + GetShieldSizeName(func.size) + "\n";
+        msg += Formatter::brown() + "Parry Chance    " + Formatter::reset();
+        msg += ": " + ToString(func.parryChance) + "\n";
+    }
+    else if (model->type == ModelType::Projectile)
+    {
+        ProjectileFunc func = model->getProjectileFunc();
+        msg += Formatter::brown() + "Damage Bonus    " + Formatter::reset();
+        msg += ": " + ToString(func.damageBonus) + "\n";
+        msg += Formatter::brown() + "Range Bonus     " + Formatter::reset();
+        msg += ": " + ToString(func.rangeBonus) + "\n";
+    }
+    else if (model->type == ModelType::Container)
+    {
+        ContainerFunc func = model->getContainerFunc();
+        msg += Formatter::brown() + "Max Weight      " + Formatter::reset();
+        msg += ": " + ToString(func.maxWeight) + "\n";
+        msg += Formatter::brown() + "Flags           " + Formatter::reset();
+        msg += ": {" + GetContainerFlagString(func.flags) + "}\n";
+        msg += Formatter::brown() + "Key Vnum        " + Formatter::reset();
+        msg += ": " + ToString(func.keyVnum) + "\n";
+        msg += Formatter::brown() + "Lockpicking Lv. " + Formatter::reset();
+        msg += ": " + ToString(func.difficulty) + "\n";
+    }
+    else if (model->type == ModelType::LiqContainer)
+    {
+        LiqContainerFunc func = model->getLiqContainerFunc();
+        msg += Formatter::brown() + "Max Weight      " + Formatter::reset();
+        msg += ": " + ToString(func.maxWeight) + "\n";
+        msg += Formatter::brown() + "Flags           " + Formatter::reset();
+        msg += ": {" + GetLiqContainerFlagString(func.flags) + "}\n";
+    }
+    else if (model->type == ModelType::Tool)
+    {
+        ToolFunc func = model->getToolFunc();
+        msg += Formatter::brown() + "Type            " + Formatter::reset();
+        msg += ": " + GetToolTypeName(func.type) + "\n";
+    }
+    else if (model->type == ModelType::Node)
+    {
+        NodeFunc func = model->getNodeFunc();
+        msg += Formatter::brown() + "Type            " + Formatter::reset();
+        msg += ": " + GetNodeTypeName(func.type) + "\n";
+    }
+    else if (model->type == ModelType::Resource)
+    {
+        ResourceFunc func = model->getResourceFunc();
+        msg += Formatter::brown() + "Type            " + Formatter::reset();
+        msg += ": " + GetResourceTypeName(func.type) + "\n";
+    }
+    else if (model->type == ModelType::Seed)
+    {
+        SeedFunc func = model->getSeedFunc();
+        msg += Formatter::brown() + "Type            " + Formatter::reset();
+        msg += ": " + GetSeedTypeName(func.type) + "\n";
+    }
+    else if (model->type == ModelType::Food)
+    {
+        FoodFunc func = model->getFoodFunc();
+        msg += Formatter::brown() + "Feeding         " + Formatter::reset();
+        msg += ": " + ToString(func.hours) + "\n";
+        msg += Formatter::brown() + "Flags           " + Formatter::reset();
+        msg += ": {" + GetFoodFlagString(func.flags) + "}\n";
+    }
+    else if (model->type == ModelType::Light)
+    {
+        LightFunc func = model->getLightFunc();
+        msg += Formatter::brown() + "Autonomy        " + Formatter::reset();
+        msg += ": " + ToString(func.maxHours) + "\n";
+        msg += Formatter::brown() + "Rechargeable    " + Formatter::reset();
+        msg += ": " + ToString(func.policy) + "\n";
+    }
+    else if (model->type == ModelType::Book)
+    {
+        BookFunc func = model->getBookFunc();
+        msg += Formatter::brown() + "Capacity        " + Formatter::reset();
+        msg += ": " + ToString(func.maxParchments) + "\n";
+    }
+    else if (model->type == ModelType::Rope)
+    {
+        RopeFunc func = model->getRopeFunc();
+        msg += Formatter::brown() + "Difficulty      " + Formatter::reset();
+        msg += ": " + ToString(func.difficulty) + "\n";
+        msg += Formatter::brown() + "Type            " + Formatter::reset();
+        msg += ": " + ToString(func.type) + "\n";
+    }
+    else if (model->type == ModelType::Mechanism)
+    {
+        MechanismFunc func = model->getMechanismFunc();
+        msg += Formatter::brown() + "Type            " + Formatter::reset();
+        msg += ": " + GetMechanismTypeName(func.type) + "\n";
+        if ((func.type == MechanismType::Door) || (func.type == MechanismType::Lock))
         {
-            break;
+            msg += Formatter::brown() + "Key             " + Formatter::reset();
+            msg += ": " + ToString(func.key) + "\n";
+            msg += Formatter::brown() + "Difficulty      " + Formatter::reset();
+            msg += ": " + ToString(func.difficulty) + "\n";
         }
-        case ModelType::Corpse:
+        else if (func.type == MechanismType::Picklock)
         {
-            break;
+            msg += Formatter::brown() + "Efficency       " + Formatter::reset();
+            msg += ": " + ToString(func.efficency) + "\n";
         }
-        case ModelType::Weapon:
+        else if (func.type == MechanismType::Lever)
         {
-            WeaponFunc func = model->getWeaponFunc();
-            msg += Formatter::brown() + "Type            " + Formatter::reset() + ": " + GetWeaponTypeName(func.type)
-                + "\n";
-            msg += Formatter::brown() + "Minimum Damage  " + Formatter::reset() + ": " + ToString(func.minDamage)
-                + "\n";
-            msg += Formatter::brown() + "Maximum Damage  " + Formatter::reset() + ": " + ToString(func.maxDamage)
-                + "\n";
-            msg += Formatter::brown() + "Range           " + Formatter::reset() + ": " + ToString(func.range) + "\n";
-            break;
+            msg += Formatter::brown() + "Command         " + Formatter::reset();
+            msg += ": " + ToString(func.command) + "\n";
+            msg += Formatter::brown() + "Target          " + Formatter::reset();
+            msg += ": " + ToString(func.target) + "\n";
         }
-        case ModelType::Armor:
+        else
         {
-            ArmorFunc func = model->getArmorFunc();
-            msg += Formatter::brown() + "Size            " + Formatter::reset() + ": " + GetArmorSizeName(func.size)
-                + "\n";
-            msg += Formatter::brown() + "Damage Absorb. " + Formatter::reset() + ": " + ToString(func.damageAbs) + "\n";
-            msg += Formatter::brown() + "Allowed Anatom. " + Formatter::reset() + ": " + ToString(func.allowedAnatomy)
-                + "\n";
-            break;
+            msg += Formatter::brown() + "None" + Formatter::reset() + "\n";
         }
-        case ModelType::Shield:
-        {
-            ShieldFunc func = model->getShieldFunc();
-            msg += Formatter::brown() + "Size            " + Formatter::reset() + ": " + GetShieldSizeName(func.size)
-                + "\n";
-            msg += Formatter::brown() + "Parry Chance    " + Formatter::reset() + ": " + ToString(func.parryChance)
-                + "\n";
-            break;
-        }
-        case ModelType::Projectile:
-        {
-            ProjectileFunc func = model->getProjectileFunc();
-            msg += Formatter::brown() + "Damage Bonus    " + Formatter::reset() + ": " + ToString(func.damageBonus)
-                + "\n";
-            msg += Formatter::brown() + "Range Bonus     " + Formatter::reset() + ": " + ToString(func.rangeBonus)
-                + "\n";
-            break;
-        }
-        case ModelType::Container:
-        {
-            ContainerFunc func = model->getContainerFunc();
-            msg += Formatter::brown() + "Max Weight      " + Formatter::reset() + ": " + ToString(func.maxWeight)
-                + "\n";
-            msg += Formatter::brown() + "Flags           " + Formatter::reset() + ": {"
-                + GetContainerFlagString(func.flags) + "}\n";
-            msg += Formatter::brown() + "Key Vnum        " + Formatter::reset() + ": " + ToString(func.keyVnum) + "\n";
-            msg += Formatter::brown() + "Lockpicking Lv. " + Formatter::reset() + ": " + ToString(func.difficulty)
-                + "\n";
-            break;
-        }
-        case ModelType::LiqContainer:
-        {
-            LiqContainerFunc func = model->getLiqContainerFunc();
-            msg += Formatter::brown() + "Max Weight      " + Formatter::reset() + ": " + ToString(func.maxWeight)
-                + "\n";
-            msg += Formatter::brown() + "Flags           " + Formatter::reset() + ": {"
-                + GetLiqContainerFlagString(func.flags) + "}\n";
-            break;
-        }
-        case ModelType::Tool:
-        {
-            ToolFunc func = model->getToolFunc();
-            msg += Formatter::brown() + "Type            " + Formatter::reset() + ": " + GetToolTypeName(func.type)
-                + "\n";
-            break;
-        }
-        case ModelType::Node:
-        {
-            NodeFunc func = model->getNodeFunc();
-            msg += Formatter::brown() + "Type            " + Formatter::reset() + ": " + GetNodeTypeName(func.type)
-                + "\n";
-            break;
-        }
-        case ModelType::Resource:
-        {
-            ResourceFunc func = model->getResourceFunc();
-            msg += Formatter::brown() + "Type            " + Formatter::reset() + ": " + GetResourceTypeName(func.type)
-                + "\n";
-            break;
-        }
-        case ModelType::Seed:
-        {
-            SeedFunc func = model->getSeedFunc();
-            msg += Formatter::brown() + "Type            " + Formatter::reset() + ": " + GetSeedTypeName(func.type)
-                + "\n";
-            break;
-        }
-        case ModelType::Key:
-        {
-            break;
-        }
-        case ModelType::Furniture:
-        {
-            break;
-        }
-        case ModelType::Food:
-        {
-            FoodFunc func = model->getFoodFunc();
-            msg += Formatter::brown() + "Feeding         " + Formatter::reset() + ": " + ToString(func.hours) + "\n";
-            msg += Formatter::brown() + "Flags           " + Formatter::reset() + ": {" + GetFoodFlagString(func.flags)
-                + "}\n";
-            break;
-        }
-        case ModelType::Light:
-        {
-            LightFunc func = model->getLightFunc();
-            msg += Formatter::brown() + "Autonomy        " + Formatter::reset() + ": " + ToString(func.maxHours) + "\n";
-            msg += Formatter::brown() + "Rechargeable    " + Formatter::reset() + ": " + ToString(func.policy) + "\n";
-            break;
-        }
-        case ModelType::Vehicle:
-        {
-            break;
-        }
-        case ModelType::Pen:
-        {
-            break;
-        }
-        case ModelType::Book:
-        {
-            BookFunc func = model->getBookFunc();
-            msg += Formatter::brown() + "Capacity        " + Formatter::reset() + ": " + ToString(func.maxParchments)
-                + "\n";
-            break;
-        }
-        case ModelType::Rope:
-        {
-            RopeFunc func = model->getRopeFunc();
-            msg += Formatter::brown() + "Difficulty      " + Formatter::reset() + ": " + ToString(func.difficulty)
-                + "\n";
-            msg += Formatter::brown() + "Type            " + Formatter::reset() + ": " + ToString(func.type) + "\n";
-            break;
-        }
-        case ModelType::Trash:
-        {
-            break;
-        }
-        case ModelType::Mechanism:
-        {
-            MechanismFunc func = model->getMechanismFunc();
-            msg += Formatter::brown() + "Type            " + Formatter::reset() + ": " + GetMechanismTypeName(func.type)
-                + "\n";
-            switch (func.type)
-            {
-                case MechanismType::Door:
-                case MechanismType::Lock:
-                    msg += Formatter::brown() + "Key             " + Formatter::reset() + ": " + ToString(func.key)
-                        + "\n";
-                    msg += Formatter::brown() + "Difficulty      " + Formatter::reset() + ": "
-                        + ToString(func.difficulty) + "\n";
-                    break;
-                case MechanismType::Picklock:
-                    msg += Formatter::brown() + "Efficency       " + Formatter::reset() + ": "
-                        + ToString(func.efficency) + "\n";
-                    break;
-                case MechanismType::Lever:
-                    msg += Formatter::brown() + "Command         " + Formatter::reset() + ": " + ToString(func.command)
-                        + "\n";
-                    msg += Formatter::brown() + "Target          " + Formatter::reset() + ": " + ToString(func.target)
-                        + "\n";
-                    break;
-                case MechanismType::None:
-                default:
-                    msg += Formatter::brown() + "None" + Formatter::reset() + "\n";
-            }
-            break;
-        }
-        case ModelType::Currency:
-        {
-            break;
-        }
-        default:
-        {
-            break;
-        }
+    }
+    else
+    {
+        msg += Formatter::brown() + "No Type" + Formatter::reset() + "\n";
     }
     character->sendMsg(msg);
 }

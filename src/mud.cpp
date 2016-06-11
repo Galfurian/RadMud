@@ -42,6 +42,7 @@ void Bailout(int signal)
 }
 
 Mud::Mud() :
+    mudPort(4000),
     _servSocket(-1),
     _maxDesc(-1),
     _shutdownSignal(),
@@ -989,7 +990,7 @@ bool Mud::initComunications()
     }
 
     socketAddress.sin_family = AF_INET;
-    socketAddress.sin_port = htons(kPort);
+    socketAddress.sin_port = htons(mudPort);
     socketAddress.sin_addr.s_addr = INADDR_ANY; // Change to listen on a specific adapter.
 
     // Bind the socket to our connection port.

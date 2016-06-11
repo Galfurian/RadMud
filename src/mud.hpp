@@ -88,6 +88,8 @@ extern "C"
 class Mud
 {
     private:
+        uint16_t mudPort;
+
         /// @brief Constructor.
         Mud();
 
