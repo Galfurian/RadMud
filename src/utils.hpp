@@ -34,6 +34,7 @@
 #include <cassert>
 #include <sstream>
 #include <type_traits>
+#include <random>
 
 /// 8 bits
 typedef unsigned char Byte;

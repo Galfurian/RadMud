@@ -39,6 +39,8 @@ struct Nil
 {
 };
 
+#include "LuaHelpers.h"
+
 //------------------------------------------------------------------------------
 /**
  Lightweight reference to a Lua object.
@@ -77,8 +79,8 @@ class LuaRef
                  @param count The number of stack entries to pop on destruction.
                  */
                 StackPop(lua_State* L, int count) :
-                        m_L(L),
-                        m_count(count)
+                    m_L(L),
+                    m_count(count)
                 {
                 }
 
@@ -112,9 +114,9 @@ class LuaRef
                  The key is popped off the stack.
                  */
                 Proxy(lua_State* L, int tableRef) :
-                        m_L(L),
-                        m_tableRef(tableRef),
-                        m_keyRef(luaL_ref(L, LUA_REGISTRYINDEX))
+                    m_L(L),
+                    m_tableRef(tableRef),
+                    m_keyRef(luaL_ref(L, LUA_REGISTRYINDEX))
                 {
                 }
 
@@ -127,8 +129,8 @@ class LuaRef
                  the Proxy parameter as a `const` reference.
                  */
                 Proxy(Proxy const& other) :
-                        m_L(other.m_L),
-                        m_tableRef(other.m_tableRef)
+                    m_L(other.m_L),
+                    m_tableRef(other.m_tableRef)
                 {
                     // If this assert goes off it means code is taking this path,
                     // which is better avoided.
@@ -172,7 +174,7 @@ class LuaRef
                     StackPop p(m_L, 1);
                     lua_rawgeti(m_L, LUA_REGISTRYINDEX, m_tableRef);
                     lua_rawgeti(m_L, LUA_REGISTRYINDEX, m_keyRef);
-                    Stack < T > ::push(m_L, v);
+                    Stack<T>::push(m_L, v);
                     lua_rawset(m_L, -3);
                     return *this;
                 }
@@ -189,7 +191,7 @@ class LuaRef
                     StackPop p(m_L, 1);
                     lua_rawgeti(m_L, LUA_REGISTRYINDEX, m_tableRef);
                     lua_rawgeti(m_L, LUA_REGISTRYINDEX, m_keyRef);
-                    Stack < T > ::push(m_L, v);
+                    Stack<T>::push(m_L, v);
                     lua_settable(m_L, -3);
                     return *this;
                 }
@@ -271,7 +273,7 @@ class LuaRef
                 {
                     StackPop p(m_L, 1);
                     push(m_L);
-                    return Stack < T > ::is_a(m_L, lua_gettop(m_L));
+                    return Stack<T>::is_a(m_L, lua_gettop(m_L));
                 }
 
                 //--------------------------------------------------------------------------
@@ -287,7 +289,7 @@ class LuaRef
                     // lua_gettop is used because Userdata::getClass() doesn't handle
                     // negative stack indexes.
                     //
-                    return Stack < T > ::get(m_L, lua_gettop(m_L));
+                    return Stack<T>::get(m_L, lua_gettop(m_L));
                 }
 
                 //--------------------------------------------------------------------------
@@ -325,7 +327,7 @@ class LuaRef
                 {
                     StackPop p(m_L, 2);
                     push(m_L);
-                    Stack < T > ::push(m_L, rhs);
+                    Stack<T>::push(m_L, rhs);
                     return lua_compare(m_L, -2, -1, LUA_OPEQ) == 1;
                 }
 
@@ -334,7 +336,7 @@ class LuaRef
                 {
                     StackPop p(m_L, 2);
                     push(m_L);
-                    Stack < T > ::push(m_L, rhs);
+                    Stack<T>::push(m_L, rhs);
                     return lua_compare(m_L, -2, -1, LUA_OPLT) == 1;
                 }
 
@@ -343,7 +345,7 @@ class LuaRef
                 {
                     StackPop p(m_L, 2);
                     push(m_L);
-                    Stack < T > ::push(m_L, rhs);
+                    Stack<T>::push(m_L, rhs);
                     return lua_compare(m_L, -2, -1, LUA_OPLE) == 1;
                 }
 
@@ -352,7 +354,7 @@ class LuaRef
                 {
                     StackPop p(m_L, 2);
                     push(m_L);
-                    Stack < T > ::push(m_L, rhs);
+                    Stack<T>::push(m_L, rhs);
                     return lua_compare(m_L, -1, -2, LUA_OPLT) == 1;
                 }
 
@@ -361,7 +363,7 @@ class LuaRef
                 {
                     StackPop p(m_L, 2);
                     push(m_L);
-                    Stack < T > ::push(m_L, rhs);
+                    Stack<T>::push(m_L, rhs);
                     return lua_compare(m_L, -1, -2, LUA_OPLE) == 1;
                 }
 
@@ -370,7 +372,7 @@ class LuaRef
                 {
                     StackPop p(m_L, 2);
                     push(m_L);
-                    Stack < T > ::push(m_L, rhs);
+                    Stack<T>::push(m_L, rhs);
                     return lua_rawequal(m_L, -1, -2) == 1;
                 }
                 /** @} */
@@ -399,7 +401,7 @@ class LuaRef
                 {
                     StackPop(m_L, 1);
                     push(m_L);
-                    Stack < T > ::push(m_L, key);
+                    Stack<T>::push(m_L, key);
                     lua_rawget(m_L, -2);
                     return LuaRef(m_L, FromStack());
                 }
@@ -414,7 +416,7 @@ class LuaRef
                 void append(T v) const
                 {
                     push(m_L);
-                    Stack < T > ::push(m_L, v);
+                    Stack<T>::push(m_L, v);
                     luaL_ref(m_L, -2);
                     lua_pop(m_L, 1);
                 }
@@ -452,7 +454,7 @@ class LuaRef
                 LuaRef const operator()(P1 p1) const
                 {
                     push(m_L);
-                    Stack < P1 > ::push(m_L, p1);
+                    Stack<P1>::push(m_L, p1);
                     LuaException::pcall(m_L, 1, 1);
                     return LuaRef(m_L, FromStack());
                 }
@@ -461,8 +463,8 @@ class LuaRef
                 LuaRef const operator()(P1 p1, P2 p2) const
                 {
                     push(m_L);
-                    Stack < P1 > ::push(m_L, p1);
-                    Stack < P2 > ::push(m_L, p2);
+                    Stack<P1>::push(m_L, p1);
+                    Stack<P2>::push(m_L, p2);
                     LuaException::pcall(m_L, 2, 1);
                     return LuaRef(m_L, FromStack());
                 }
@@ -471,9 +473,9 @@ class LuaRef
                 LuaRef const operator()(P1 p1, P2 p2, P3 p3) const
                 {
                     push(m_L);
-                    Stack < P1 > ::push(m_L, p1);
-                    Stack < P2 > ::push(m_L, p2);
-                    Stack < P3 > ::push(m_L, p3);
+                    Stack<P1>::push(m_L, p1);
+                    Stack<P2>::push(m_L, p2);
+                    Stack<P3>::push(m_L, p3);
                     LuaException::pcall(m_L, 3, 1);
                     return LuaRef(m_L, FromStack());
                 }
@@ -482,10 +484,10 @@ class LuaRef
                 LuaRef const operator()(P1 p1, P2 p2, P3 p3, P4 p4) const
                 {
                     push(m_L);
-                    Stack < P1 > ::push(m_L, p1);
-                    Stack < P2 > ::push(m_L, p2);
-                    Stack < P3 > ::push(m_L, p3);
-                    Stack < P4 > ::push(m_L, p4);
+                    Stack<P1>::push(m_L, p1);
+                    Stack<P2>::push(m_L, p2);
+                    Stack<P3>::push(m_L, p3);
+                    Stack<P4>::push(m_L, p4);
                     LuaException::pcall(m_L, 4, 1);
                     return LuaRef(m_L, FromStack());
                 }
@@ -494,11 +496,11 @@ class LuaRef
                 LuaRef const operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5) const
                 {
                     push(m_L);
-                    Stack < P1 > ::push(m_L, p1);
-                    Stack < P2 > ::push(m_L, p2);
-                    Stack < P3 > ::push(m_L, p3);
-                    Stack < P4 > ::push(m_L, p4);
-                    Stack < P5 > ::push(m_L, p5);
+                    Stack<P1>::push(m_L, p1);
+                    Stack<P2>::push(m_L, p2);
+                    Stack<P3>::push(m_L, p3);
+                    Stack<P4>::push(m_L, p4);
+                    Stack<P5>::push(m_L, p5);
                     LuaException::pcall(m_L, 5, 1);
                     return LuaRef(m_L, FromStack());
                 }
@@ -507,12 +509,12 @@ class LuaRef
                 LuaRef const operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6) const
                 {
                     push(m_L);
-                    Stack < P1 > ::push(m_L, p1);
-                    Stack < P2 > ::push(m_L, p2);
-                    Stack < P3 > ::push(m_L, p3);
-                    Stack < P4 > ::push(m_L, p4);
-                    Stack < P5 > ::push(m_L, p5);
-                    Stack < P6 > ::push(m_L, p6);
+                    Stack<P1>::push(m_L, p1);
+                    Stack<P2>::push(m_L, p2);
+                    Stack<P3>::push(m_L, p3);
+                    Stack<P4>::push(m_L, p4);
+                    Stack<P5>::push(m_L, p5);
+                    Stack<P6>::push(m_L, p6);
                     LuaException::pcall(m_L, 6, 1);
                     return LuaRef(m_L, FromStack());
                 }
@@ -521,13 +523,13 @@ class LuaRef
                 LuaRef const operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7) const
                 {
                     push(m_L);
-                    Stack < P1 > ::push(m_L, p1);
-                    Stack < P2 > ::push(m_L, p2);
-                    Stack < P3 > ::push(m_L, p3);
-                    Stack < P4 > ::push(m_L, p4);
-                    Stack < P5 > ::push(m_L, p5);
-                    Stack < P6 > ::push(m_L, p6);
-                    Stack < P7 > ::push(m_L, p7);
+                    Stack<P1>::push(m_L, p1);
+                    Stack<P2>::push(m_L, p2);
+                    Stack<P3>::push(m_L, p3);
+                    Stack<P4>::push(m_L, p4);
+                    Stack<P5>::push(m_L, p5);
+                    Stack<P6>::push(m_L, p6);
+                    Stack<P7>::push(m_L, p7);
                     LuaException::pcall(m_L, 7, 1);
                     return LuaRef(m_L, FromStack());
                 }
@@ -536,14 +538,14 @@ class LuaRef
                 LuaRef const operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8) const
                 {
                     push(m_L);
-                    Stack < P1 > ::push(m_L, p1);
-                    Stack < P2 > ::push(m_L, p2);
-                    Stack < P3 > ::push(m_L, p3);
-                    Stack < P4 > ::push(m_L, p4);
-                    Stack < P5 > ::push(m_L, p5);
-                    Stack < P6 > ::push(m_L, p6);
-                    Stack < P7 > ::push(m_L, p7);
-                    Stack < P8 > ::push(m_L, p8);
+                    Stack<P1>::push(m_L, p1);
+                    Stack<P2>::push(m_L, p2);
+                    Stack<P3>::push(m_L, p3);
+                    Stack<P4>::push(m_L, p4);
+                    Stack<P5>::push(m_L, p5);
+                    Stack<P6>::push(m_L, p6);
+                    Stack<P7>::push(m_L, p7);
+                    Stack<P8>::push(m_L, p8);
                     LuaException::pcall(m_L, 8, 1);
                     return LuaRef(m_L, FromStack());
                 }
@@ -573,7 +575,7 @@ class LuaRef
          @note The object is popped.
          */
         LuaRef(lua_State* L, FromStack) :
-                m_L(get_main_thread(L))
+            m_L(get_main_thread(L))
         {
             m_ref = luaL_ref(L, LUA_REGISTRYINDEX);
         }
@@ -588,7 +590,7 @@ class LuaRef
          @note The object is not popped.
          */
         LuaRef(lua_State* L, int index, FromStack) :
-                m_L(get_main_thread(L))
+            m_L(get_main_thread(L))
         {
             lua_pushvalue(L, index);
             m_ref = luaL_ref(L, LUA_REGISTRYINDEX);
@@ -600,8 +602,8 @@ class LuaRef
         //
         template<class T>
         LuaRef(T) :
-                m_L(),
-                m_ref()
+            m_L(),
+            m_ref()
         {
         }
 
@@ -632,8 +634,8 @@ class LuaRef
          The LuaRef may be assigned later.
          */
         LuaRef(lua_State* L) :
-                m_L(get_main_thread(L)),
-                m_ref(LUA_REFNIL)
+            m_L(get_main_thread(L)),
+            m_ref(LUA_REFNIL)
         {
         }
 
@@ -643,9 +645,9 @@ class LuaRef
          */
         template<class T>
         LuaRef(lua_State* L, T v) :
-                m_L(get_main_thread(L))
+            m_L(get_main_thread(L))
         {
-            Stack < T > ::push(m_L, v);
+            Stack<T>::push(m_L, v);
             m_ref = luaL_ref(m_L, LUA_REGISTRYINDEX);
         }
 
@@ -654,8 +656,8 @@ class LuaRef
          Create a reference to a table value.
          */
         LuaRef(Proxy const& v) :
-                m_L(v.state()),
-                m_ref(v.createRef())
+            m_L(v.state()),
+            m_ref(v.createRef())
         {
         }
 
@@ -664,8 +666,8 @@ class LuaRef
          Create a new reference to an existing reference.
          */
         LuaRef(LuaRef const& other) :
-                m_L(other.m_L),
-                m_ref(other.createRef())
+            m_L(other.m_L),
+            m_ref(other.createRef())
         {
         }
 
@@ -732,7 +734,7 @@ class LuaRef
         LuaRef& operator=(T rhs)
         {
             luaL_unref(m_L, LUA_REGISTRYINDEX, m_ref);
-            Stack < T > ::push(m_L, rhs);
+            Stack<T>::push(m_L, rhs);
             m_ref = luaL_ref(m_L, LUA_REGISTRYINDEX);
             return *this;
         }
@@ -904,7 +906,7 @@ class LuaRef
         {
             StackPop p(m_L, 1);
             push(m_L);
-            return Stack < T > ::is_a(m_L, lua_gettop(m_L));
+            return Stack<T>::is_a(m_L, lua_gettop(m_L));
         }
 
         /** @} */
@@ -922,7 +924,7 @@ class LuaRef
             // lua_gettop is used because Userdata::getClass() doesn't handle
             // negative stack indexes.
             //
-            return Stack < T > ::get(m_L, lua_gettop(m_L));
+            return Stack<T>::get(m_L, lua_gettop(m_L));
         }
 
         //----------------------------------------------------------------------------
@@ -960,7 +962,7 @@ class LuaRef
         {
             StackPop p(m_L, 2);
             push(m_L);
-            Stack < T > ::push(m_L, rhs);
+            Stack<T>::push(m_L, rhs);
             return lua_compare(m_L, -2, -1, LUA_OPEQ) == 1;
         }
 
@@ -969,7 +971,7 @@ class LuaRef
         {
             StackPop p(m_L, 2);
             push(m_L);
-            Stack < T > ::push(m_L, rhs);
+            Stack<T>::push(m_L, rhs);
             return lua_compare(m_L, -2, -1, LUA_OPLT) == 1;
         }
 
@@ -978,7 +980,7 @@ class LuaRef
         {
             StackPop p(m_L, 2);
             push(m_L);
-            Stack < T > ::push(m_L, rhs);
+            Stack<T>::push(m_L, rhs);
             return lua_compare(m_L, -2, -1, LUA_OPLE) == 1;
         }
 
@@ -987,7 +989,7 @@ class LuaRef
         {
             StackPop p(m_L, 2);
             push(m_L);
-            Stack < T > ::push(m_L, rhs);
+            Stack<T>::push(m_L, rhs);
             return lua_compare(m_L, -1, -2, LUA_OPLT) == 1;
         }
 
@@ -996,7 +998,7 @@ class LuaRef
         {
             StackPop p(m_L, 2);
             push(m_L);
-            Stack < T > ::push(m_L, rhs);
+            Stack<T>::push(m_L, rhs);
             return lua_compare(m_L, -1, -2, LUA_OPLE) == 1;
         }
 
@@ -1005,7 +1007,7 @@ class LuaRef
         {
             StackPop p(m_L, 2);
             push(m_L);
-            Stack < T > ::push(m_L, rhs);
+            Stack<T>::push(m_L, rhs);
             return lua_rawequal(m_L, -1, -2) == 1;
         }
         /** @} */
@@ -1020,7 +1022,7 @@ class LuaRef
         void append(T v) const
         {
             push(m_L);
-            Stack < T > ::push(m_L, v);
+            Stack<T>::push(m_L, v);
             luaL_ref(m_L, -2);
             lua_pop(m_L, 1);
         }
@@ -1047,7 +1049,7 @@ class LuaRef
         template<class T>
         Proxy operator[](T key) const
         {
-            Stack < T > ::push(m_L, key);
+            Stack<T>::push(m_L, key);
             return Proxy(m_L, m_ref);
         }
 
@@ -1071,7 +1073,7 @@ class LuaRef
         LuaRef const operator()(P1 p1) const
         {
             push(m_L);
-            Stack < P1 > ::push(m_L, p1);
+            Stack<P1>::push(m_L, p1);
             LuaException::pcall(m_L, 1, 1);
             return LuaRef(m_L, FromStack());
         }
@@ -1080,8 +1082,8 @@ class LuaRef
         LuaRef const operator()(P1 p1, P2 p2) const
         {
             push(m_L);
-            Stack < P1 > ::push(m_L, p1);
-            Stack < P2 > ::push(m_L, p2);
+            Stack<P1>::push(m_L, p1);
+            Stack<P2>::push(m_L, p2);
             LuaException::pcall(m_L, 2, 1);
             return LuaRef(m_L, FromStack());
         }
@@ -1090,9 +1092,9 @@ class LuaRef
         LuaRef const operator()(P1 p1, P2 p2, P3 p3) const
         {
             push(m_L);
-            Stack < P1 > ::push(m_L, p1);
-            Stack < P2 > ::push(m_L, p2);
-            Stack < P3 > ::push(m_L, p3);
+            Stack<P1>::push(m_L, p1);
+            Stack<P2>::push(m_L, p2);
+            Stack<P3>::push(m_L, p3);
             LuaException::pcall(m_L, 3, 1);
             return LuaRef(m_L, FromStack());
         }
@@ -1101,10 +1103,10 @@ class LuaRef
         LuaRef const operator()(P1 p1, P2 p2, P3 p3, P4 p4) const
         {
             push(m_L);
-            Stack < P1 > ::push(m_L, p1);
-            Stack < P2 > ::push(m_L, p2);
-            Stack < P3 > ::push(m_L, p3);
-            Stack < P4 > ::push(m_L, p4);
+            Stack<P1>::push(m_L, p1);
+            Stack<P2>::push(m_L, p2);
+            Stack<P3>::push(m_L, p3);
+            Stack<P4>::push(m_L, p4);
             LuaException::pcall(m_L, 4, 1);
             return LuaRef(m_L, FromStack());
         }
@@ -1113,11 +1115,11 @@ class LuaRef
         LuaRef const operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5) const
         {
             push(m_L);
-            Stack < P1 > ::push(m_L, p1);
-            Stack < P2 > ::push(m_L, p2);
-            Stack < P3 > ::push(m_L, p3);
-            Stack < P4 > ::push(m_L, p4);
-            Stack < P5 > ::push(m_L, p5);
+            Stack<P1>::push(m_L, p1);
+            Stack<P2>::push(m_L, p2);
+            Stack<P3>::push(m_L, p3);
+            Stack<P4>::push(m_L, p4);
+            Stack<P5>::push(m_L, p5);
             LuaException::pcall(m_L, 5, 1);
             return LuaRef(m_L, FromStack());
         }
@@ -1126,12 +1128,12 @@ class LuaRef
         LuaRef const operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6) const
         {
             push(m_L);
-            Stack < P1 > ::push(m_L, p1);
-            Stack < P2 > ::push(m_L, p2);
-            Stack < P3 > ::push(m_L, p3);
-            Stack < P4 > ::push(m_L, p4);
-            Stack < P5 > ::push(m_L, p5);
-            Stack < P6 > ::push(m_L, p6);
+            Stack<P1>::push(m_L, p1);
+            Stack<P2>::push(m_L, p2);
+            Stack<P3>::push(m_L, p3);
+            Stack<P4>::push(m_L, p4);
+            Stack<P5>::push(m_L, p5);
+            Stack<P6>::push(m_L, p6);
             LuaException::pcall(m_L, 6, 1);
             return LuaRef(m_L, FromStack());
         }
@@ -1140,13 +1142,13 @@ class LuaRef
         LuaRef const operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7) const
         {
             push(m_L);
-            Stack < P1 > ::push(m_L, p1);
-            Stack < P2 > ::push(m_L, p2);
-            Stack < P3 > ::push(m_L, p3);
-            Stack < P4 > ::push(m_L, p4);
-            Stack < P5 > ::push(m_L, p5);
-            Stack < P6 > ::push(m_L, p6);
-            Stack < P7 > ::push(m_L, p7);
+            Stack<P1>::push(m_L, p1);
+            Stack<P2>::push(m_L, p2);
+            Stack<P3>::push(m_L, p3);
+            Stack<P4>::push(m_L, p4);
+            Stack<P5>::push(m_L, p5);
+            Stack<P6>::push(m_L, p6);
+            Stack<P7>::push(m_L, p7);
             LuaException::pcall(m_L, 7, 1);
             return LuaRef(m_L, FromStack());
         }
@@ -1155,14 +1157,14 @@ class LuaRef
         LuaRef const operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8) const
         {
             push(m_L);
-            Stack < P1 > ::push(m_L, p1);
-            Stack < P2 > ::push(m_L, p2);
-            Stack < P3 > ::push(m_L, p3);
-            Stack < P4 > ::push(m_L, p4);
-            Stack < P5 > ::push(m_L, p5);
-            Stack < P6 > ::push(m_L, p6);
-            Stack < P7 > ::push(m_L, p7);
-            Stack < P8 > ::push(m_L, p8);
+            Stack<P1>::push(m_L, p1);
+            Stack<P2>::push(m_L, p2);
+            Stack<P3>::push(m_L, p3);
+            Stack<P4>::push(m_L, p4);
+            Stack<P5>::push(m_L, p5);
+            Stack<P6>::push(m_L, p6);
+            Stack<P7>::push(m_L, p7);
+            Stack<P8>::push(m_L, p8);
             LuaException::pcall(m_L, 8, 1);
             return LuaRef(m_L, FromStack());
         }

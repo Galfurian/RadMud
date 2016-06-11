@@ -2,13 +2,7 @@
 # Check CMAKE Version.
 cmake_minimum_required(VERSION 2.8.4 FATAL_ERROR)
 
-option(USE_CLANG       "build application with clang" OFF)
 option(FLAG_EVERYTHING "set a higher warning level" OFF)
-
-if(USE_CLANG)
-    SET (CMAKE_C_COMPILER   "clang")
-	SET (CMAKE_CXX_COMPILER "clang++")
-endif(USE_CLANG)
 
 #################################################
 # Create the project.
@@ -27,18 +21,18 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic-errors")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wconversion")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmessage-length=0")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
 
 if(FLAG_EVERYTHING)
-	if(USE_CLANG)
+	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++98-compat")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++98-compat-pedantic")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-global-constructors")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-exit-time-destructors")
-	else(USE_CLANG)
+	elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcast-align")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcast-qual")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wchar-subscripts")
@@ -91,7 +85,7 @@ if(FLAG_EVERYTHING)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wvolatile-register-var")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wwrite-strings")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wuninitialized")
-	endif(USE_CLANG)
+	endif()
 endif(FLAG_EVERYTHING)
 
 #################################################
