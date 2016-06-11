@@ -101,9 +101,9 @@ int get_length(lua_State* L, int idx);
 lua_State * get_main_thread(lua_State* thread);
 
 #ifndef LUA_OK
-# define LUABRIDGE_LUA_OK 0
+#define LUABRIDGE_LUA_OK 0
 #else
-# define LUABRIDGE_LUA_OK LUA_OK
+#define LUABRIDGE_LUA_OK LUA_OK
 #endif
 
 /// @brief Get a table value, bypassing metamethods.

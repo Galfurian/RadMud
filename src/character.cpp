@@ -1298,7 +1298,7 @@ void Character::loadScript(const std::string & scriptFilename)
     Exit::luaRegister(L);
     Room::luaRegister(L);
 
-    if (luaL_dofile(L, scriptFilename.c_str()) != LUA_OK)
+    if (luaL_dofile(L, scriptFilename.c_str()) != LUABRIDGE_LUA_OK)
     {
         Logger::log(LogLevel::Error, "Can't open script+" + scriptFilename + ".");
         Logger::log(LogLevel::Error, "Error :" + std::string(lua_tostring(L, -1)));
