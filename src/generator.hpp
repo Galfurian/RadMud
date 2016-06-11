@@ -19,33 +19,32 @@
 #ifndef GENERATOR_HPP
 #define GENERATOR_HPP
 
-#include <map>
-#include <set>
-#include <string>
-#include <utility>
-#include <vector>
-#include <cstdio>
+#include "defines.hpp"
 
 /// @brief Provides a method which generate a room description and name.
 class Generator
 {
     private:
-        /// Name of the room.
-        std::string name;
-        /// Additional status for the room's name.
-        std::string name_status;
-        /// Room description.
-        std::string description;
-        /// An auxiliary vector.
-        std::vector<std::string> auxiliary_vector;
-        /// List of all the zones name.
-        std::map<std::string, std::vector<std::string> > zones_names;
-        /// List of all the name's modification for all the status.
-        std::map<std::string, std::vector<std::string> > status_names;
-        /// List of all the zones descriptions.
-        std::map<std::string, std::vector<std::string> > zones_description;
-        /// List of all the description's modification for all the status.
-        std::map<std::string, std::vector<std::string> > status_description;
+        /// @brief Constructor.
+        Generator();
+
+        /// @brief Destructor.
+        ~Generator();
+
+        struct ZoneBaseNaming
+        {
+                std::string name;
+                std::vector<std::string> names;
+                std::vector<std::string> descriptions;
+        };
+        struct ZoneStatusNaming
+        {
+                std::string name;
+                std::vector<std::string> namesStatus;
+                std::vector<std::string> descriptionStatus;
+        };
+        std::map<AreaType, ZoneBaseNaming> mapBase;
+        std::map<AreaStatus, ZoneStatusNaming> mapStatus;
 
         /// @brief Generate the room name and description.
         /// @param phase  Phase of the generation process.
@@ -54,17 +53,33 @@ class Generator
         void generate(int phase, std::string zone, std::string status);
 
     public:
+        /// @brief Disable Copy Construct.
+        Generator(Generator const &) = delete;
 
-        /// @brief Constructor.
-        Generator();
+        /// @brief Disable Move construct.
+        Generator(Generator &&) = delete;
 
-        /// @brief Destructor.
-        ~Generator();
+        /// @brief Disable Copy assign.
+        Generator & operator=(Generator const &) = delete;
 
-        /// @brief Generate the room name and description.
-        /// @param d_zone   Zone of the desired room.
-        /// @param d_status Status of the desired room.
-        /// @return The name of the room and the description.
-        std::pair<std::string, std::string> generateRoom(std::string d_zone, std::string d_status);
+        /// @brief Disable Move assign.
+        Generator & operator=(Generator &&) = delete;
+
+        /// @brief Get the singleton istance of the Generator.
+        /// @return The static and uniquie Generator variable.
+        static Generator & instance();
+
+        /// @brief Generate the room name.
+        /// @param type   Type of zone.
+        /// @param status Status of the zone.
+        /// @return The name of the room.
+        std::string generateName(const AreaType & type, const AreaStatus & status);
+
+        /// @brief Generate the room description.
+        /// @param type     Type of zone.
+        /// @param status   Status of the zone.
+        /// @param roomName The name of the room.
+        /// @return The description of the room.
+        std::string generateDescription(const AreaType & type, const AreaStatus & status, const std::string & roomName);
 };
 #endif

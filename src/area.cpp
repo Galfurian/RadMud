@@ -77,7 +77,9 @@ Area::Area() :
     height(),
     elevation(),
     numRooms(),
-    tileSet()
+    tileSet(),
+    type(),
+    status()
 {
 }
 
@@ -134,8 +136,7 @@ bool Area::addRoom(Room * room)
 {
     if (this->inBoundaries(room->coord))
     {
-        if (areaMap.insert(std::make_pair(std::make_tuple(room->coord.x, room->coord.y, room->coord.z), room))
-            != areaMap.end())
+        if (areaMap.insert(std::make_pair(std::make_tuple(room->coord.x, room->coord.y, room->coord.z), room)) != areaMap.end())
         {
             // Set the room area to be this one.
             room->area = this;
@@ -192,8 +193,7 @@ Room * Area::getRoom(Coordinates<unsigned int> coord)
     Room * room = nullptr;
     if ((coord.x > 0) && (coord.y > 0) && (coord.z > 0))
     {
-        room = this->getRoom(static_cast<unsigned int>(coord.x), static_cast<unsigned int>(coord.y),
-            static_cast<unsigned int>(coord.z));
+        room = this->getRoom(static_cast<unsigned int>(coord.x), static_cast<unsigned int>(coord.y), static_cast<unsigned int>(coord.z));
     }
     return room;
 }
@@ -508,12 +508,7 @@ std::string Area::drawASCIIFov(Room * centerRoom, unsigned int radius)
 }
 
 //-------------------------------------------------------------------
-void Area::fov(
-    Map2D<char> & map,
-    unsigned int origin_x,
-    unsigned int origin_y,
-    unsigned int origin_z,
-    unsigned int radius)
+void Area::fov(Map2D<char> & map, unsigned int origin_x, unsigned int origin_y, unsigned int origin_z, unsigned int radius)
 {
     double incr_x = 0.0;
     double incr_y = 0.0;

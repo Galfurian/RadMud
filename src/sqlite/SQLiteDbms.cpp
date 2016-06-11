@@ -210,8 +210,7 @@ bool SQLiteDbms::loadPlayer(Player * player)
 bool SQLiteDbms::searchPlayer(string name)
 {
     bool outcome = false;
-    ResultSet * result = dbConnection.executeSelect(
-        ("SELECT count(*) FROM Player WHERE name=\"" + name + "\";").c_str());
+    ResultSet * result = dbConnection.executeSelect(("SELECT count(*) FROM Player WHERE name=\"" + name + "\";").c_str());
     if (result)
     {
         if (result->next())
@@ -862,6 +861,8 @@ bool LoadArea(ResultSet * result)
         area->height = result->getNextUnsignedInteger();
         area->elevation = result->getNextUnsignedInteger();
         area->tileSet = result->getNextInteger();
+        area->type = static_cast<AreaType>(result->getNextUnsignedInteger());
+        area->status = static_cast<AreaStatus>(result->getNextUnsignedInteger());
         // Check the correctness.
         if (!area->check())
         {

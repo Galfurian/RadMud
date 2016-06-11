@@ -25,6 +25,7 @@
 #include "utilities/coordinates.hpp"
 #include "utilities/map2D.hpp"
 #include "utilities/map3D.hpp"
+#include "defines.hpp"
 
 class Room;
 
@@ -56,6 +57,10 @@ class Area
         unsigned int numRooms;
         /// The tileset of the entire area.
         int tileSet;
+        /// The type of area.
+        AreaType type;
+        /// The status of the area.
+        AreaStatus status;
 
         /// Constructor.
         Area();
@@ -123,11 +128,7 @@ class Area
         /// @param origin_y The y coordinate of the central room.
         /// @param origin_z The z coordinate of the central room.
         /// @param radius   The radius of visibility of the character.
-        void fov(Map2D<char> & map,
-            unsigned int origin_x,
-            unsigned int origin_y,
-            unsigned int origin_z,
-            unsigned int radius);
+        void fov(Map2D<char> & map, unsigned int origin_x, unsigned int origin_y, unsigned int origin_z, unsigned int radius);
 
         /// @brief A simple line of sight algorithm.
         /// @param map      The map where the LOS algorithm has to write the line.
@@ -138,7 +139,8 @@ class Area
         /// @param incr_y   The value of which the y coordiante must be incremented at each step.
         /// @param incr_z   The value of which the z coordiante must be incremented at each step.
         /// @param radius   The radius of visibility.
-        void los(Map2D<char> & map,
+        void los(
+            Map2D<char> & map,
             unsigned int origin_x,
             unsigned int origin_y,
             unsigned int origin_z,
@@ -154,7 +156,8 @@ class Area
         /// @param target_x The target x coordinate.
         /// @param target_y The target y coordinate.
         /// @param target_z The target z coordinate.
-        bool fastInSight(unsigned int origin_x,
+        bool fastInSight(
+            unsigned int origin_x,
             unsigned int origin_y,
             unsigned int origin_z,
             unsigned int target_x,

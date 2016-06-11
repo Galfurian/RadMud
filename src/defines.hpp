@@ -155,6 +155,32 @@ typedef enum class Directions
 typedef std::map<std::string, Direction> DirectionMap;
 
 // //////////////////////////////////////////////////////////////////
+// AREA /////////////////////////////////////////////////////////////
+// //////////////////////////////////////////////////////////////////
+
+/// Used to determine the type of Zone.
+typedef enum class TypesOfAreas
+{
+    /// Identifies a cavern.
+    Cavern,
+    /// Identifies a region of the underdark.
+    Underdark
+} AreaType;
+
+/// Used to determine the status of a Zone.
+typedef enum class TypesOfAreaStatus
+{
+    /// The area has no environmentals status.
+    Normal,
+    /// The area is freezing.
+    Iced,
+    /// The area have vulcanic activities.
+    Magmatic,
+    /// The area is overrun by the vegetation.
+    Vegetal
+} AreaStatus;
+
+// //////////////////////////////////////////////////////////////////
 // ROOM /////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////
 

@@ -524,8 +524,7 @@ string Room::getLook(Character * exception)
         // If there are more of this item, show the counter.
         if (it.second > 1)
         {
-            output += Formatter::cyan() + it.first->getNameCapital() + Formatter::reset() + " are here.["
-                + ToString(it.second) + "]\n";
+            output += Formatter::cyan() + it.first->getNameCapital() + Formatter::reset() + " are here.[" + ToString(it.second) + "]\n";
         }
         else
         {
@@ -646,25 +645,16 @@ void Room::luaRegister(lua_State * L)
 bool CreateRoom(Coordinates<unsigned int> coord, Room * source_room)
 {
     Room * new_room = new Room();
-    pair<string, string> details;
     vector<string> arguments;
-    string name, description;
-    Generator generator;
-
-    // Generate room description and name.
-    Logger::log(LogLevel::Info, "[CreateRoom] Generating room details...");
-    details = generator.generateRoom("cavern", "normal");
-    name = details.first;
-    description = details.second;
 
     // Create a new room.
-    Logger::log(LogLevel::Info, "[CreateRoom] Setting up the room variables...");
+    Logger::log(LogLevel::Info, "[CreateRoom] Setting up the room...");
     new_room->vnum = Mud::instance().getMaxVnumRoom() + 1;
     new_room->area = source_room->area;
     new_room->coord = coord;
     new_room->terrain = source_room->terrain;
-    new_room->name = name;
-    new_room->description = description;
+    new_room->name = Generator::instance().generateName(source_room->area->type, source_room->area->status);
+    new_room->description = Generator::instance().generateDescription(source_room->area->type, source_room->area->status, new_room->name);
     new_room->flags = 0;
 
     // Insert into table Room the newly created room.
@@ -736,14 +726,14 @@ void ConnectRoom(Room * room)
             // Update the values on Database.
             arguments.push_back(ToString(forward->source->vnum));
             arguments.push_back(ToString(forward->destination->vnum));
-            arguments.push_back(GetDirectionName(forward->direction));
+            arguments.push_back(EnumToString(forward->direction));
             arguments.push_back(ToString(forward->flags));
             SQLiteDbms::instance().insertInto("Exit", arguments);
             arguments.clear();
 
             arguments.push_back(ToString(backward->source->vnum));
             arguments.push_back(ToString(backward->destination->vnum));
-            arguments.push_back(GetDirectionName(backward->direction));
+            arguments.push_back(EnumToString(backward->direction));
             arguments.push_back(ToString(backward->flags));
             SQLiteDbms::instance().insertInto("Exit", arguments);
             arguments.clear();
