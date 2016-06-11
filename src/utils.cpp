@@ -224,44 +224,43 @@ std::string AlignString(const std::string & source, const StringAlign & alignmen
     // Create a string stream.
     std::ostringstream oss;
     // Align the string.
-    switch (alignment)
+    if (alignment == StringAlign::Left)
     {
-        default:
-        case kAlignLeft:
+        oss << ' ';
+        // Set the width.
+        oss << std::setw(static_cast<int>(width) - 1);
+        // Set the alignment.
+        oss << std::left;
+        // Set the string.
+        oss << source;
+    }
+    else if (alignment == StringAlign::Center)
+    {
+        padding = static_cast<unsigned int>(width - source.size());
+        for (unsigned int i = 0; i < (padding / 2); i++)
+        {
             oss << ' ';
-            // Set the width.
-            oss << std::setw(static_cast<int>(width) - 1);
-            // Set the alignment.
-            oss << std::left;
-            // Set the string.
-            oss << source;
-            break;
-        case kAlignCenter:
-            padding = static_cast<unsigned int>(width - source.size());
-            for (unsigned int i = 0; i < (padding / 2); i++)
-            {
-                oss << ' ';
-            }
-            oss << source;
-            for (unsigned int i = 0; i < (padding / 2); i++)
-            {
-                oss << ' ';
-            }
-            // if odd #, add 1 space
-            if (padding > 0 && padding % 2 != 0)
-            {
-                oss << ' ';
-            }
-            break;
-        case kAlignRight:
-            // Set the width.
-            oss << std::setw(static_cast<int>(width) - 1);
-            // Set the alignment.
-            oss << std::right;
-            // Set the string.
-            oss << source;
+        }
+        oss << source;
+        for (unsigned int i = 0; i < (padding / 2); i++)
+        {
             oss << ' ';
-            break;
+        }
+        // if odd #, add 1 space
+        if (padding > 0 && padding % 2 != 0)
+        {
+            oss << ' ';
+        }
+    }
+    else if (alignment == StringAlign::Right)
+    {
+        // Set the width.
+        oss << std::setw(static_cast<int>(width) - 1);
+        // Set the alignment.
+        oss << std::right;
+        // Set the string.
+        oss << source;
+        oss << ' ';
     }
     return oss.str();
 }
@@ -360,29 +359,27 @@ std::string GetFileContents(const char * filename)
 
 std::string GetAttributeName(const int & id, const bool & abbreviated)
 {
-    std::string output;
-    switch (id)
+    if (id == 1)
     {
-        case 1:
-            output = (abbreviated) ? "Str" : "Strength";
-            break;
-        case 2:
-            output = (abbreviated) ? "Agi" : "Agility";
-            break;
-        case 3:
-            output = (abbreviated) ? "Per" : "Perception";
-            break;
-        case 4:
-            output = (abbreviated) ? "Con" : "Constitution";
-            break;
-        case 5:
-            output = (abbreviated) ? "Int" : "Intelligence";
-            break;
-        default:
-            output = (abbreviated) ? "Err:" + ToString(id) : "Error:" + ToString(id);
-            break;
+        return (abbreviated) ? "Str" : "Strength";
     }
-    return output;
+    else if (id == 2)
+    {
+        return (abbreviated) ? "Agi" : "Agility";
+    }
+    else if (id == 3)
+    {
+        return (abbreviated) ? "Per" : "Perception";
+    }
+    else if (id == 4)
+    {
+        return (abbreviated) ? "Con" : "Constitution";
+    }
+    else if (id == 5)
+    {
+        return (abbreviated) ? "Int" : "Intelligence";
+    }
+    return (abbreviated) ? "Err:" + ToString(id) : "Error:" + ToString(id);
 }
 
 /// Check if the return code from Zlib is an error.

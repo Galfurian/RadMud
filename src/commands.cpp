@@ -966,66 +966,53 @@ void RollbackCharacterCreation(Character * character, ConnectionState new_state)
     Player * player = character->toPlayer();
     // Change the player connection state with the received argument.
     player->connection_state = new_state;
-    switch (new_state)
+    if (new_state == ConnectionState::AwaitingNewName)
     {
-        default:
-            break;
-        case ConnectionState::NegotiatingMSDP:
-            break;
-        case ConnectionState::NegotiatingMCCP:
-            break;
-        case ConnectionState::NoState:
-            break;
-        case ConnectionState::AwaitingName:
-            break;
-        case ConnectionState::AwaitingPassword:
-            break;
-        case ConnectionState::AwaitingNewName:
-            player->name = "";
-            break;
-        case ConnectionState::AwaitingNewPwd:
-            player->password = "";
-            break;
-        case ConnectionState::AwaitingNewPwdCon:
-            player->password = "";
-            break;
-        case ConnectionState::AwaitingNewStory:
-            break;
-        case ConnectionState::AwaitingNewRace:
-            player->race = nullptr;
-            player->health = 0;
-            player->stamina = 0;
-            player->strength = 0;
-            player->agility = 0;
-            player->perception = 0;
-            player->constitution = 0;
-            player->intelligence = 0;
-            player->remaining_points = 0;
-            break;
-        case ConnectionState::AwaitingNewAttr:
-            player->strength = player->race->strength;
-            player->agility = player->race->agility;
-            player->perception = player->race->perception;
-            player->constitution = player->race->constitution;
-            player->intelligence = player->race->intelligence;
-            break;
-        case ConnectionState::AwaitingNewGender:
-            player->gender = GenderType::None;
-            break;
-        case ConnectionState::AwaitingNewAge:
-            player->age = 0;
-            break;
-        case ConnectionState::AwaitingNewDesc:
-            player->description = "";
-            break;
-        case ConnectionState::AwaitingNewWeight:
-            player->weight = 0;
-            break;
-        case ConnectionState::Playing:
-        case ConnectionState::AwaitingNewConfirm:
-            player->sendMsg("It seems that this choiche has not been handled...");
-            player->closeConnection();
-            break;
+        player->name = "";
+    }
+    else if (new_state == ConnectionState::AwaitingNewPwd)
+    {
+        player->password = "";
+    }
+    else if (new_state == ConnectionState::AwaitingNewPwdCon)
+    {
+        player->password = "";
+    }
+    else if (new_state == ConnectionState::AwaitingNewRace)
+    {
+        player->race = nullptr;
+        player->health = 0;
+        player->stamina = 0;
+        player->strength = 0;
+        player->agility = 0;
+        player->perception = 0;
+        player->constitution = 0;
+        player->intelligence = 0;
+        player->remaining_points = 0;
+    }
+    else if (new_state == ConnectionState::AwaitingNewAttr)
+    {
+        player->strength = player->race->strength;
+        player->agility = player->race->agility;
+        player->perception = player->race->perception;
+        player->constitution = player->race->constitution;
+        player->intelligence = player->race->intelligence;
+    }
+    else if (new_state == ConnectionState::AwaitingNewGender)
+    {
+        player->gender = GenderType::None;
+    }
+    else if (new_state == ConnectionState::AwaitingNewAge)
+    {
+        player->age = 0;
+    }
+    else if (new_state == ConnectionState::AwaitingNewDesc)
+    {
+        player->description = "";
+    }
+    else if (new_state == ConnectionState::AwaitingNewWeight)
+    {
+        player->weight = 0;
     }
     AdvanceCharacterCreation(player, new_state);
 }

@@ -19,18 +19,12 @@
 #ifndef ACTIONS_HPP
 #define ACTIONS_HPP
 
+#include "production.hpp"
+#include "building.hpp"
 #include "defines.hpp"
 #include "combat.hpp"
 #include "utils.hpp"
-
-#include <queue>
-
-class Production;
-class Building;
-class Character;
-class Item;
-class Room;
-class Material;
+#include "item.hpp"
 
 /// Used to determine what are the character doing.
 class Action
@@ -107,8 +101,8 @@ class Action
         /// @return <b>True</b> if it has correct values,<br> <b>False</b> otherwise.
         bool setCraft(
             Production * _production,
-            std::vector<Item *> & _usedTools,
-            std::vector<Item *> & _usedIngredients,
+            ItemVector & _usedTools,
+            ItemVector & _usedIngredients,
             Material * _craftMaterial,
             unsigned int _cooldown);
 
@@ -122,8 +116,8 @@ class Action
         bool setBuild(
             Building * _schematics,
             Item * _itemTarget,
-            std::vector<Item *> & _usedTools,
-            std::vector<Item *> & _usedIngredients,
+            ItemVector & _usedTools,
+            ItemVector & _usedIngredients,
             unsigned int _cooldown);
 
         /// @brief Try to set the action to combat state.

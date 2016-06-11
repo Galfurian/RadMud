@@ -782,9 +782,9 @@ void DoInventory(Character * character, std::istream & sArgs)
         character->sendMsg(Formatter::gray() + "    You are carrying anything.\n" + Formatter::reset());
     }
     Table table = Table("Inventory");
-    table.addColumn("Item", kAlignLeft);
-    table.addColumn("Quantity", kAlignRight);
-    table.addColumn("Weight", kAlignRight);
+    table.addColumn("Item", StringAlign::Left);
+    table.addColumn("Quantity", StringAlign::Right);
+    table.addColumn("Weight", StringAlign::Right);
     // List all the items in inventory
     for (auto it : GroupItems(character->inventory))
     {

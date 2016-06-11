@@ -54,69 +54,63 @@ ActionType Action::getType()
 
 std::string Action::getDescription()
 {
-    std::string msg;
-    switch (this->type)
+    if (this->type == ActionType::Move)
     {
-        default:
-            break;
-        case ActionType::NoAction:
-            break;
-        case ActionType::Wait:
-            break;
-        case ActionType::Move:
-            msg = "moving";
-            break;
-        case ActionType::Crafting:
-            if (this->production != nullptr)
-            {
-                if (this->production->profession != nullptr)
-                {
-                    msg = this->production->profession->action;
-                }
-            }
-            break;
-        case ActionType::Building:
-            msg = "building";
-            break;
-        case ActionType::Combat:
-            msg = "fighting";
-            break;
+        return "moving";
     }
-    return msg;
+    else if (this->type == ActionType::Crafting)
+    {
+        if (this->production != nullptr)
+        {
+            if (this->production->profession != nullptr)
+            {
+                return this->production->profession->action;
+            }
+        }
+    }
+    else if (this->type == ActionType::Building)
+    {
+        return "moving";
+    }
+    else if (this->type == ActionType::Combat)
+    {
+        return "fighting";
+    }
+    return "";
 }
 
 std::string Action::stop()
 {
     std::string msg;
-    switch (this->type)
+    if (this->type == ActionType::Wait)
     {
-        default:
-            msg = "No action set.";
-            break;
-        case ActionType::NoAction:
-            msg = "No action set.";
-            break;
-        case ActionType::Wait:
-            msg = "Excuse me sir, but you are doing nothing.";
-            break;
-        case ActionType::Move:
-            msg = "You stop moving.";
-            break;
-        case ActionType::Crafting:
-            if (this->production != nullptr)
+        msg = "Excuse me sir, but you are doing nothing.";
+    }
+    else if (this->type == ActionType::Move)
+    {
+        msg = "You stop moving.";
+    }
+    else if (this->type == ActionType::Crafting)
+    {
+        if (this->production != nullptr)
+        {
+            if (this->production->profession != nullptr)
             {
-                if (this->production->profession != nullptr)
-                {
-                    msg = this->production->profession->interruptMessage + ".";
-                }
+                msg = this->production->profession->interruptMessage + ".";
             }
-            break;
-        case ActionType::Building:
-            msg = "You stop building.";
-            break;
-        case ActionType::Combat:
-            msg = "You stop fighting.";
-            break;
+        }
+    }
+    else if (this->type == ActionType::Building)
+    {
+        msg = "You stop building.";
+    }
+    else if (this->type == ActionType::Combat)
+    {
+        msg = "You stop fighting.";
+    }
+    else
+    {
+        msg = "You stop whatever you were doing.";
     }
     this->reset();
     return msg;
@@ -124,26 +118,21 @@ std::string Action::stop()
 
 void Action::perform()
 {
-    switch (this->type)
+    if (this->type == ActionType::Move)
     {
-        case ActionType::Move:
-            this->performMove();
-            break;
-        case ActionType::Crafting:
-            this->performCraft();
-            break;
-        case ActionType::Building:
-            this->performBuild();
-            break;
-        case ActionType::Combat:
-            this->performComb();
-            break;
-        case ActionType::NoAction:
-            break;
-        case ActionType::Wait:
-            break;
-        default:
-            break;
+        this->performMove();
+    }
+    else if (this->type == ActionType::Crafting)
+    {
+        this->performCraft();
+    }
+    else if (this->type == ActionType::Building)
+    {
+        this->performBuild();
+    }
+    else if (this->type == ActionType::Combat)
+    {
+        this->performComb();
     }
 }
 
@@ -177,8 +166,8 @@ bool Action::setMove(Room * _destination, Direction _direction, unsigned int _co
 
 bool Action::setCraft(
     Production * _production,
-    std::vector<Item *> & _usedTools,
-    std::vector<Item *> & _usedIngredients,
+    ItemVector & _usedTools,
+    ItemVector & _usedIngredients,
     Material * _craftMaterial,
     unsigned int _cooldown)
 {
@@ -223,8 +212,8 @@ bool Action::setCraft(
 bool Action::setBuild(
     Building * _schematics,
     Item * _itemTarget,
-    std::vector<Item *> & _usedTools,
-    std::vector<Item *> & _usedIngredients,
+    ItemVector & _usedTools,
+    ItemVector & _usedIngredients,
     unsigned int _cooldown)
 {
     bool correct = true;

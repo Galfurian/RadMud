@@ -210,7 +210,8 @@ bool SQLiteDbms::loadPlayer(Player * player)
 bool SQLiteDbms::searchPlayer(string name)
 {
     bool outcome = false;
-    ResultSet * result = dbConnection.executeSelect(("SELECT count(*) FROM Player WHERE name=\"" + name + "\";").c_str());
+    ResultSet * result = dbConnection.executeSelect(
+        ("SELECT count(*) FROM Player WHERE name=\"" + name + "\";").c_str());
     if (result)
     {
         if (result->next())
@@ -394,29 +395,17 @@ bool LoadPlayerItems(ResultSet * result, Character * character)
                 return false;
             }
         }
-
-        switch (slot)
+        if (slot == EquipmentSlot::None)
         {
-            case EquipmentSlot::Head:
-            case EquipmentSlot::Torso:
-            case EquipmentSlot::Back:
-            case EquipmentSlot::Legs:
-            case EquipmentSlot::Feet:
-            case EquipmentSlot::RightHand:
-            case EquipmentSlot::LeftHand:
-                // Change the slot of the item.
-                item->setCurrentSlot(slot);
-                // Add the item to the equipment.
-                character->addEquipmentItem(item);
-                break;
-            case EquipmentSlot::None:
-                // Add the item to the inventory.
-                character->addInventoryItem(item);
-                break;
-            default:
-                Logger::log(LogLevel::Error, "[LoadPlayerItems] Wrong equipment_slot value.");
-                return false;
-                break;
+            // Add the item to the inventory.
+            character->addInventoryItem(item);
+        }
+        else
+        {
+            // Change the slot of the item.
+            item->setCurrentSlot(slot);
+            // Add the item to the equipment.
+            character->addEquipmentItem(item);
         }
     }
     return true;

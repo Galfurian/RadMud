@@ -503,34 +503,35 @@ typedef enum class ModelFlags
 // //////////////////////////////////////////////////////////////////
 
 /// Types of weapons.
-typedef enum WeaponTypes
+typedef enum class WeaponTypes
 {
+    None,
     /// [1]  Pistols that uses bullets
-    kPistol = 1,
+    Pistol,
     /// [2]  Rifles that uses bullets
-    kRifle,
+    Rifle,
     /// [3]  Shotguns
-    kShotgun,
+    Shotgun,
     /// [4]  Big guns, heavy weapons that uses bullets
-    kHeavyWeapon,
+    HeavyWeapon,
     /// [5]  Pistols that uses energy
-    kEnergyPistol,
+    EnergyPistol,
     /// [6]  Rifles that uses energy.
-    kEnergyRifle,
+    EnergyRifle,
     /// [7]  Big guns, heavy weapons that uses energy.
-    kEnergyHeavyWeapon,
+    EnergyHeavyWeapon,
     /// [8]  Granades
-    kGranade,
+    Granade,
     /// [9]  Placeble explosives
-    kPlaced,
+    Placed,
     /// [10] All sort of blades
-    kBladed,
+    Bladed,
     /// [11] All sort of blunt weapons
-    kBlunt,
+    Blunt,
     /// [12] Throwable weapons
-    kThrown,
+    Thrown,
     /// [13] Weapon to enanche unarmed fight
-    kUnarmed,
+    Unarmed,
 } WeaponType;
 
 /// The values associated to model of type Weapon.
@@ -551,16 +552,16 @@ struct WeaponFunc
 // //////////////////////////////////////////////////////////////////
 
 /// Sizes of armor.
-typedef enum ArmorSizes
+typedef enum class ArmorSizes
 {
     /// [0] All kind of size.
-    kASAll,
+    All,
     /// [1] Light Armor
-    kASLight,
+    Light,
     /// [2] Medium Armor
-    kASMedium,
+    Medium,
     /// [3] Heavy Armor
-    kASHeavy
+    Heavy
 } ArmorSize;
 
 /// The values associated to model of type Armor.
@@ -579,14 +580,16 @@ struct ArmorFunc
 // //////////////////////////////////////////////////////////////////
 
 /// Shield sizes.
-typedef enum ShieldSizes
+typedef enum class ShieldSizes
 {
+    /// [0] All kind of size.
+    All,
     /// [1] Light Shield
-    kSSLight = 1,
+    Light,
     /// [2] Medium Shield
-    kSSMedium,
+    Medium,
     /// [3] Heavy Shield
-    kSSHeavy
+    Heavy
 } ShieldSize;
 
 /// The values associated to model of type Shield.
@@ -786,12 +789,12 @@ typedef std::map<ResourceType, unsigned int> IngredientMap;
 // //////////////////////////////////////////////////////////////////
 
 /// Used to determine the type of the resource.
-typedef enum SeedTypes
+typedef enum class SeedTypes
 {
-    /// [1] The seed is used to plant a tree.
-    kSeedTree = 1,
-    /// [2] The seed is used to plant a plant.
-    kSeedPlant,
+    /// A generic seed.
+    Plant,
+    /// A seed used to plant a tree.
+    Tree,
 } SeedType;
 
 /// The values associated to model of type Seed.
@@ -939,9 +942,9 @@ std::string GetEquipmentSlotName(EquipmentSlot slot);
 /// Return the string describing the type of a Weapon.
 std::string GetWeaponTypeName(WeaponType type);
 /// Return the string describing the size of an Armor.
-std::string GetArmorSizeName(ArmorSize size);
+std::string GetArmorSizeName(ArmorSize armorSize);
 /// Return the string describing the size of a Shield.
-std::string GetShieldSizeName(ShieldSize size);
+std::string GetShieldSizeName(ShieldSize shieldSize);
 /// Return the string describing the type of a Tool.
 std::string GetToolTypeName(ToolType type);
 /// Return the string describing the type of a Node.

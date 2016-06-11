@@ -24,9 +24,9 @@
 #include "../logger.hpp"
 
 TableColumn::TableColumn(std::string _title, StringAlign _alignment, size_t _width) :
-        title(_title),
-        alignment(_alignment),
-        width(_width)
+    title(_title),
+    alignment(_alignment),
+    width(_width)
 {
     if (width == 0)
     {
@@ -58,17 +58,17 @@ void TableColumn::setWidth(size_t _width)
 }
 
 Table::Table() :
-        title(),
-        columns(),
-        rows()
+    title(),
+    columns(),
+    rows()
 {
     // Nothing to do.
 }
 
 Table::Table(std::string _title) :
-        title(_title),
-        columns(),
-        rows()
+    title(_title),
+    columns(),
+    rows()
 {
     // Nothing to do.
 }
@@ -146,7 +146,7 @@ std::string Table::getDivider()
 
 std::string Table::getTitle()
 {
-    return "#" + AlignString(title, kAlignCenter, getTotalWidth() + (columns.size() - 1)) + "#\n";
+    return "#" + AlignString(title, StringAlign::Center, getTotalWidth() + (columns.size() - 1)) + "#\n";
 }
 
 std::string Table::getHeaders()
@@ -154,7 +154,7 @@ std::string Table::getHeaders()
     std::string output;
     for (auto it : columns)
     {
-        output += "#" + AlignString(it.getTitle(), kAlignCenter, it.getWidth());
+        output += "#" + AlignString(it.getTitle(), StringAlign::Center, it.getWidth());
     }
     output += "#\n";
     return output;

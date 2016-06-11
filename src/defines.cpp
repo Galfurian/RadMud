@@ -55,718 +55,247 @@ Coordinates<int> GetCoordinates(Direction direction)
 
 std::string GetDirectionName(Direction direction)
 {
-    std::string output;
-    switch (direction)
-    {
-        case Direction::North:
-            output = "north";
-            break;
-        case Direction::South:
-            output = "south";
-            break;
-        case Direction::West:
-            output = "west";
-            break;
-        case Direction::East:
-            output = "east";
-            break;
-        case Direction::Up:
-            output = "up";
-            break;
-        case Direction::Down:
-            output = "down";
-            break;
-        case Direction::None:
-        default:
-            output = "No Direction";
-    }
-    return output;
+    if (direction == Direction::North) return "north";
+    if (direction == Direction::South) return "south";
+    if (direction == Direction::West) return "west";
+    if (direction == Direction::East) return "east";
+    if (direction == Direction::Up) return "up";
+    if (direction == Direction::Down) return "down";
+    return "none";
 }
 
 std::string GetPostureName(CharacterPosture posture)
 {
-    std::string output;
-    switch (posture)
-    {
-        default:
-        case CharacterPosture::NoPosure:
-            output = "noPosture";
-            break;
-        case CharacterPosture::Stand:
-            output = "standing";
-            break;
-        case CharacterPosture::Crouch:
-            output = "crouched";
-            break;
-        case CharacterPosture::Sit:
-            output = "sitting";
-            break;
-        case CharacterPosture::Prone:
-            output = "prone";
-            break;
-        case CharacterPosture::Rest:
-            output = "resting";
-            break;
-    }
-    return output;
+    if (posture == CharacterPosture::Stand) return "standing";
+    if (posture == CharacterPosture::Crouch) return "crouched";
+    if (posture == CharacterPosture::Sit) return "sitting";
+    if (posture == CharacterPosture::Prone) return "prone";
+    if (posture == CharacterPosture::Rest) return "resting";
+    return "none";
 }
 
 std::string GetCharacterFlagName(CharacterFlag flag)
 {
-    switch (flag)
-    {
-        default:
-        case CharacterFlag::None:
-            return "None";
-        case CharacterFlag::IsGod:
-            return "IsGod";
-        case CharacterFlag::Invisible:
-            return "Invisible";
-    }
+    if (flag == CharacterFlag::IsGod) return "IsGod";
+    if (flag == CharacterFlag::IsGod) return "Invisible";
+    return "None";
 }
 
 std::string GetMaterialTypeName(MaterialType type)
 {
-    std::string output;
-    switch (type)
-    {
-        default:
-        case MaterialType::NoType:
-            output = "No Material Type";
-            break;
-        case MaterialType::Metal:
-            output = "Metal";
-            break;
-        case MaterialType::Stone:
-            output = "Stone";
-            break;
-        case MaterialType::Wood:
-            output = "Wood";
-            break;
-        case MaterialType::Skin:
-            output = "Skin";
-            break;
-        case MaterialType::Cloth:
-            output = "Cloth";
-            break;
-        case MaterialType::Vegetable:
-            output = "Vegetable";
-            break;
-        case MaterialType::Meat:
-            output = "Meat";
-            break;
-        case MaterialType::Glass:
-            output = "Glass";
-            break;
-        case MaterialType::Paper:
-            output = "Paper";
-            break;
-        case MaterialType::Coal:
-            output = "Coal";
-            break;
-    }
-    return output;
+    if (type == MaterialType::Metal) return "Metal";
+    if (type == MaterialType::Stone) return "Stone";
+    if (type == MaterialType::Wood) return "Wood";
+    if (type == MaterialType::Skin) return "Skin";
+    if (type == MaterialType::Cloth) return "Cloth";
+    if (type == MaterialType::Vegetable) return "Vegetable";
+    if (type == MaterialType::Meat) return "Meat";
+    if (type == MaterialType::Glass) return "Glass";
+    if (type == MaterialType::Paper) return "Paper";
+    if (type == MaterialType::Coal) return "Coal";
+    return "No Material Type";
 }
 
 std::string GetItemQualityName(ItemQuality quality)
 {
-    std::string output;
-    switch (quality)
-    {
-        default:
-        case ItemQuality::None:
-            output = "No Quality";
-            break;
-        case ItemQuality::Disastrous:
-            output = "Disastrous";
-            break;
-        case ItemQuality::Poor:
-            output = "Poor";
-            break;
-        case ItemQuality::Normal:
-            output = "Normal";
-            break;
-        case ItemQuality::Fine:
-            output = "Fine";
-            break;
-        case ItemQuality::Masterful:
-            output = "Masterful";
-            break;
-    }
-    return output;
+    if (quality == ItemQuality::Disastrous) return "Disastrous";
+    if (quality == ItemQuality::Poor) return "Poor";
+    if (quality == ItemQuality::Normal) return "Normal";
+    if (quality == ItemQuality::Fine) return "Fine";
+    if (quality == ItemQuality::Masterful) return "Masterful";
+    if (quality == ItemQuality::Fine) return "Fine";
+    return "No Quality";
 }
 
 std::string GetModelTypeName(ModelType type)
 {
-    std::string output;
-    switch (type)
-    {
-        default:
-        case ModelType::NoType:
-            output = "No Model Type";
-            break;
-        case ModelType::Corpse:
-            output = "Corpse";
-            break;
-        case ModelType::Weapon:
-            output = "Weapon";
-            break;
-        case ModelType::Armor:
-            output = "Armor";
-            break;
-        case ModelType::Shield:
-            output = "Shield";
-            break;
-        case ModelType::Projectile:
-            output = "Projectile";
-            break;
-        case ModelType::Container:
-            output = "Container";
-            break;
-        case ModelType::LiqContainer:
-            output = "LiqContainer";
-            break;
-        case ModelType::Tool:
-            output = "Tool";
-            break;
-        case ModelType::Node:
-            output = "Node";
-            break;
-        case ModelType::Resource:
-            output = "Resource";
-            break;
-        case ModelType::Seed:
-            output = "Seed";
-            break;
-        case ModelType::Key:
-            output = "Key";
-            break;
-        case ModelType::Furniture:
-            output = "Furniture";
-            break;
-        case ModelType::Food:
-            output = "Food";
-            break;
-        case ModelType::Light:
-            output = "Light";
-            break;
-        case ModelType::Vehicle:
-            output = "Vehicle";
-            break;
-        case ModelType::Pen:
-            output = "Pen";
-            break;
-        case ModelType::Book:
-            output = "Book";
-            break;
-        case ModelType::Rope:
-            output = "Rope";
-            break;
-        case ModelType::Trash:
-            output = "Trash";
-            break;
-        case ModelType::Mechanism:
-            output = "Mechanism";
-            break;
-        case ModelType::Currency:
-            output = "Currency";
-            break;
-    }
-    return output;
+    if (type == ModelType::Corpse) return "Corpse";
+    if (type == ModelType::Weapon) return "Weapon";
+    if (type == ModelType::Armor) return "Armor";
+    if (type == ModelType::Shield) return "Shield";
+    if (type == ModelType::Projectile) return "Projectile";
+    if (type == ModelType::Container) return "Container";
+    if (type == ModelType::LiqContainer) return "LiqContainer";
+    if (type == ModelType::Tool) return "Tool";
+    if (type == ModelType::Node) return "Node";
+    if (type == ModelType::Resource) return "Resource";
+    if (type == ModelType::Seed) return "Seed";
+    if (type == ModelType::Key) return "Key";
+    if (type == ModelType::Furniture) return "Furniture";
+    if (type == ModelType::Food) return "Food";
+    if (type == ModelType::Light) return "Light";
+    if (type == ModelType::Vehicle) return "Vehicle";
+    if (type == ModelType::Pen) return "Pen";
+    if (type == ModelType::Book) return "Book";
+    if (type == ModelType::Rope) return "Rope";
+    if (type == ModelType::Trash) return "Trash";
+    if (type == ModelType::Mechanism) return "Mechanism";
+    if (type == ModelType::Currency) return "Currency";
+    return "No Model Type";
 }
 
 std::string GetEquipmentSlotName(EquipmentSlot slot)
 {
-    std::string output;
-    switch (slot)
-    {
-        default:
-        case EquipmentSlot::None:
-            output = "No Equipment Slot";
-            break;
-        case EquipmentSlot::Head:
-            output = "Head";
-            break;
-        case EquipmentSlot::Torso:
-            output = "Torso";
-            break;
-        case EquipmentSlot::Back:
-            output = "Back";
-            break;
-        case EquipmentSlot::Legs:
-            output = "Legs";
-            break;
-        case EquipmentSlot::Feet:
-            output = "Feet";
-            break;
-        case EquipmentSlot::RightHand:
-            output = "Right Hand";
-            break;
-        case EquipmentSlot::LeftHand:
-            output = "Left Hand";
-            break;
-    }
-    return output;
+    if (slot == EquipmentSlot::Head) return "Head";
+    if (slot == EquipmentSlot::Torso) return "Torso";
+    if (slot == EquipmentSlot::Back) return "Back";
+    if (slot == EquipmentSlot::Legs) return "Legs";
+    if (slot == EquipmentSlot::Feet) return "Feet";
+    if (slot == EquipmentSlot::RightHand) return "Right Hand";
+    if (slot == EquipmentSlot::LeftHand) return "Left Hand";
+    return "No Equipment Slot";
 }
 
 std::string GetWeaponTypeName(WeaponType type)
 {
-    std::string output;
-    switch (type)
-    {
-        default:
-            output = "No Weapon Type";
-            break;
-        case kPistol:
-            output = "Pistol";
-            break;
-        case kRifle:
-            output = "Rifle";
-            break;
-        case kShotgun:
-            output = "Shotgun";
-            break;
-        case kHeavyWeapon:
-            output = "Heavy Weapon";
-            break;
-        case kEnergyPistol:
-            output = "Energy Pistol";
-            break;
-        case kEnergyRifle:
-            output = "Energy Rifle";
-            break;
-        case kEnergyHeavyWeapon:
-            output = "Energy Heavy Weapon";
-            break;
-        case kGranade:
-            output = "Granade";
-            break;
-        case kPlaced:
-            output = "Placed";
-            break;
-        case kBladed:
-            output = "Bladed";
-            break;
-        case kBlunt:
-            output = "Blunt";
-            break;
-        case kThrown:
-            output = "Thrown";
-            break;
-        case kUnarmed:
-            output = "Unarmed";
-            break;
-    }
-    return output;
+    if (type == WeaponType::Pistol) return "Pistol";
+    if (type == WeaponType::Rifle) return "Rifle";
+    if (type == WeaponType::Shotgun) return "Shotgun";
+    if (type == WeaponType::HeavyWeapon) return "Heavy Weapon";
+    if (type == WeaponType::EnergyPistol) return "Energy Pistol";
+    if (type == WeaponType::EnergyRifle) return "Energy Rifle";
+    if (type == WeaponType::EnergyHeavyWeapon) return "Energy Heavy Weapon";
+    if (type == WeaponType::Granade) return "Granade";
+    if (type == WeaponType::Placed) return "Placed";
+    if (type == WeaponType::Bladed) return "Bladed";
+    if (type == WeaponType::Blunt) return "Blunt";
+    if (type == WeaponType::Thrown) return "Thrown";
+    if (type == WeaponType::Unarmed) return "Unarmed";
+    return "No Weapon Type";
 }
 
-std::string GetArmorSizeName(ArmorSize size)
+std::string GetArmorSizeName(ArmorSize armorSize)
 {
-    std::string output;
-    switch (size)
-    {
-        default:
-            output = "No Armor Size";
-            break;
-        case kASAll:
-            output = "Universal Armor";
-            break;
-        case kASLight:
-            output = "Light Armor";
-            break;
-        case kASMedium:
-            output = "Medium Armor";
-            break;
-        case kASHeavy:
-            output = "Heavy Armor";
-            break;
-    }
-    return output;
+    if (armorSize == ArmorSize::All) return "Universal Armor";
+    if (armorSize == ArmorSize::Light) return "Light Armor";
+    if (armorSize == ArmorSize::Medium) return "Medium Armor";
+    if (armorSize == ArmorSize::Heavy) return "Heavy Armor";
+    return "No Armor Size";
 }
 
-std::string GetShieldSizeName(ShieldSize size)
+std::string GetShieldSizeName(ShieldSize shieldSize)
 {
-    std::string output;
-    switch (size)
-    {
-        default:
-            output = "No Shield Size";
-            break;
-        case kSSLight:
-            output = "Light Shield";
-            break;
-        case kSSMedium:
-            output = "Medium Shield";
-            break;
-        case kSSHeavy:
-            output = "Heavy Shield";
-            break;
-    }
-    return output;
+    if (shieldSize == ShieldSize::All) return "Universal Shield";
+    if (shieldSize == ShieldSize::Light) return "Light Shield";
+    if (shieldSize == ShieldSize::Medium) return "Medium Shield";
+    if (shieldSize == ShieldSize::Heavy) return "Heavy Shield";
+    return "No Armor Size";
 }
 
 std::string GetToolTypeName(ToolType type)
 {
-    std::string output;
-    switch (type)
-    {
-        default:
-        case ToolType::NoType:
-            output = "No Tool Type";
-            break;
-        case ToolType::Pickaxe:
-            output = "Pickaxe";
-            break;
-        case ToolType::WoodcutterAxe:
-            output = "Woodcutter's Axe";
-            break;
-        case ToolType::Saw:
-            output = "Saw";
-            break;
-        case ToolType::PrecisionChisel:
-            output = "Precision Chisel";
-            break;
-        case ToolType::PlaneChisel:
-            output = "Plane Chisel";
-            break;
-        case ToolType::Hammer:
-            output = "Hammer";
-            break;
-        case ToolType::Forge:
-            output = "Forge";
-            break;
-        case ToolType::Anvil:
-            output = "Anvil";
-            break;
-        case ToolType::BlacksmithHammer:
-            output = "Blacksmith Hammer";
-            break;
-        case ToolType::Bellows:
-            output = "Bellows";
-            break;
-        case ToolType::Crucible:
-            output = "Crucible";
-            break;
-        case ToolType::Tinderbox:
-            output = "Tinderbox";
-            break;
-    }
-    return output;
+    if (type == ToolType::Pickaxe) return "Pickaxe";
+    if (type == ToolType::WoodcutterAxe) return "Woodcutter's Axe";
+    if (type == ToolType::Saw) return "Saw";
+    if (type == ToolType::PrecisionChisel) return "Precision Chisel";
+    if (type == ToolType::PlaneChisel) return "PickaPlane Chiselxe";
+    if (type == ToolType::Hammer) return "Hammer";
+    if (type == ToolType::Forge) return "Forge";
+    if (type == ToolType::Anvil) return "Anvil";
+    if (type == ToolType::BlacksmithHammer) return "Blacksmith Hammer";
+    if (type == ToolType::Bellows) return "Bellows";
+    if (type == ToolType::Crucible) return "Crucible";
+    if (type == ToolType::Tinderbox) return "Tinderbox";
+    return "No Tool Type";
 }
 
 std::string GetNodeTypeName(NodeType type)
 {
-    std::string output;
-    switch (type)
-    {
-        default:
-        case NodeType::NoType:
-            output = "No Node Type";
-            break;
-        case NodeType::Metal:
-            output = "Metal Node";
-            break;
-        case NodeType::Wood:
-            output = "Wood Node";
-            break;
-        case NodeType::Stone:
-            output = "Stone Node";
-            break;
-    }
-    return output;
+    if (type == NodeType::Metal) return "Metal Node";
+    if (type == NodeType::Wood) return "Wood Node";
+    if (type == NodeType::Stone) return "Stone Node";
+    if (type == NodeType::Metal) return "Metal Node";
+    return "No Node Type";
 }
 
 std::string GetResourceTypeName(ResourceType type)
 {
-    std::string output;
-    switch (type)
-    {
-        default:
-        case ResourceType::NoType:
-            output = "No Resource Type";
-            break;
-        case ResourceType::Coal:
-            output = "Natural Coal";
-            break;
-        case ResourceType::Ore:
-            output = "Metal Ore";
-            break;
-        case ResourceType::Bar:
-            output = "Metal Bar";
-            break;
-        case ResourceType::Log:
-            output = "Wood Log";
-            break;
-        case ResourceType::Plank:
-            output = "Wood Plank";
-            break;
-        case ResourceType::Tree:
-            output = "Tree";
-            break;
-        case ResourceType::Fastener:
-            output = "Fastener";
-            break;
-        case ResourceType::Leather:
-            output = "Leather";
-            break;
-        case ResourceType::Cloth:
-            output = "Cloth";
-            break;
-        case ResourceType::StoneBlock:
-            output = "Stone Block";
-            break;
-        case ResourceType::MetalVein:
-            output = "Metal Vein";
-            break;
-        case ResourceType::StoneMonolith:
-            output = "Stone Monolith";
-            break;
-    }
-    return output;
+    if (type == ResourceType::Coal) return "Natural Coal";
+    if (type == ResourceType::Ore) return "Metal Ore";
+    if (type == ResourceType::Bar) return "Metal Bar";
+    if (type == ResourceType::Log) return "Wood Log";
+    if (type == ResourceType::Plank) return "Wood Plank";
+    if (type == ResourceType::Tree) return "Tree";
+    if (type == ResourceType::Fastener) return "Fastener";
+    if (type == ResourceType::Leather) return "Leather";
+    if (type == ResourceType::Cloth) return "Cloth";
+    if (type == ResourceType::StoneBlock) return "Stone Block";
+    if (type == ResourceType::MetalVein) return "Metal Vein";
+    if (type == ResourceType::StoneMonolith) return "Stone Monolith";
+    return "No Resource Type";
 }
 
 std::string GetSeedTypeName(SeedType type)
 {
-    std::string output;
-    switch (type)
-    {
-        default:
-            output = "No Seed Type";
-            break;
-        case kSeedTree:
-            output = "Tree Seed";
-            break;
-        case kSeedPlant:
-            output = "Plant Seed";
-            break;
-    }
-    return output;
+    if (type == SeedType::Plant) return "Plant Seed";
+    if (type == SeedType::Tree) return "Tree Seed";
+    return "No Seed Type";
 }
 
 std::string GetMechanismTypeName(MechanismType type)
 {
-    std::string output;
-    switch (type)
-    {
-        default:
-        case MechanismType::None:
-            output = "No Mechanism Type";
-            break;
-        case MechanismType::Door:
-            output = "Door";
-            break;
-        case MechanismType::Lock:
-            output = "Lock";
-            break;
-        case MechanismType::Picklock:
-            output = "Picklock";
-            break;
-        case MechanismType::Lever:
-            output = "Lever";
-            break;
-    }
-    return output;
+    if (type == MechanismType::Door) return "Door";
+    if (type == MechanismType::Lock) return "Lock";
+    if (type == MechanismType::Picklock) return "Picklock";
+    if (type == MechanismType::Lever) return "Lever";
+    return "No Mechanism Type";
 }
 
 std::string GetActionTypeName(ActionType type)
 {
-    std::string output;
-    switch (type)
-    {
-        default:
-        case ActionType::NoAction:
-            output = "No Action";
-            break;
-        case ActionType::Wait:
-            output = "Waiting";
-            break;
-        case ActionType::Move:
-            output = "Moving";
-            break;
-        case ActionType::Crafting:
-            output = "Crafting";
-            break;
-        case ActionType::Building:
-            output = "Building";
-            break;
-        case ActionType::Combat:
-            output = "Fighting";
-            break;
-    }
-    return output;
+    if (type == ActionType::Wait) return "Waiting";
+    if (type == ActionType::Move) return "Moving";
+    if (type == ActionType::Crafting) return "Crafting";
+    if (type == ActionType::Building) return "Building";
+    if (type == ActionType::Combat) return "Fighting";
+    return "No Action";
 }
 std::string GetGenderTypeName(GenderType type)
 {
-    std::string output;
-    switch (type)
-    {
-        default:
-        case GenderType::None:
-            output = "none";
-            break;
-        case GenderType::Male:
-            output = "male";
-            break;
-        case GenderType::Female:
-            output = "female";
-            break;
-
-    }
-    return output;
+    if (type == GenderType::Male) return "Male";
+    if (type == GenderType::Female) return "Female";
+    return "none";
 }
 
 std::string GetTelnetCharName(TelnetChar c)
 {
-    std::string output;
-    if (c == TelnetChar::TerminalType)
-    {
-        output = "TerminalType";
-    }
-    else if (c == TelnetChar::NegotiateAboutWindowSize)
-    {
-        output = "NegotiateProtocolAboutWindowSize";
-    }
-    else if (c == TelnetChar::TerminalSpeed)
-    {
-        output = "TerminalSpeed";
-    }
-    else if (c == TelnetChar::RemoteFlowControl)
-    {
-        output = "RemoteFlowControl";
-    }
-    else if (c == TelnetChar::LineMode)
-    {
-        output = "LineMode";
-    }
-    else if (c == TelnetChar::EnvironmentVariables)
-    {
-        output = "EnvironmentVariables";
-    }
-    else if (c == TelnetChar::NewEnvironmentOption)
-    {
-        output = "NewEnvironmentOption";
-    }
-    else if (c == TelnetChar::TTYPE)
-    {
-        output = "TTYPE";
-    }
-    else if (c == TelnetChar::MSDP)
-    {
-        output = "MSDP";
-    }
-    else if (c == TelnetChar::MSDP_VAR)
-    {
-        output = "MSDP_VAR";
-    }
-    else if (c == TelnetChar::MSDP_VAL)
-    {
-        output = "MSDP_VAL";
-    }
-    else if (c == TelnetChar::MSDP_TABLE_OPEN)
-    {
-        output = "MSDP_TABLE_OPEN";
-    }
-    else if (c == TelnetChar::MSDP_TABLE_CLOSE)
-    {
-        output = "MSDP_TABLE_CLOSE";
-    }
-    else if (c == TelnetChar::MSDP_ARRAY_OPEN)
-    {
-        output = "MSDP_ARRAY_OPEN";
-    }
-    else if (c == TelnetChar::MSDP_ARRAY_CLOSE)
-    {
-        output = "MSDP_ARRAY_CLOSE";
-    }
-    else if (c == TelnetChar::MSSP)
-    {
-        output = "MSSP";
-    }
-    else if (c == TelnetChar::MCCP)
-    {
-        output = "MCCP";
-    }
-    else if (c == TelnetChar::SubNegotiationEnd)
-    {
-        output = "SubNegotiationEnd";
-    }
-    else if (c == TelnetChar::NoOperation)
-    {
-        output = "NoOperation";
-    }
-    else if (c == TelnetChar::DataMark)
-    {
-        output = "DataMark";
-    }
-    else if (c == TelnetChar::Break)
-    {
-        output = "Break";
-    }
-    else if (c == TelnetChar::InterruptProcess)
-    {
-        output = "InterruptProcess";
-    }
-    else if (c == TelnetChar::AbortOutput)
-    {
-        output = "AbortOutput";
-    }
-    else if (c == TelnetChar::AreYouThere)
-    {
-        output = "AreYouThere";
-    }
-    else if (c == TelnetChar::EraseCharacter)
-    {
-        output = "EraseCharacter";
-    }
-    else if (c == TelnetChar::EraseLine)
-    {
-        output = "EraseLine";
-    }
-    else if (c == TelnetChar::GoAhead)
-    {
-        output = "GoAhead";
-    }
-    else if (c == TelnetChar::SubnegotiationBegin)
-    {
-        output = "SubnegotiationBegin";
-    }
-    else if (c == TelnetChar::WILL)
-    {
-        output = "WILL";
-    }
-    else if (c == TelnetChar::WONT)
-    {
-        output = "WONT";
-    }
-    else if (c == TelnetChar::DO)
-    {
-        output = "DO";
-    }
-    else if (c == TelnetChar::DONT)
-    {
-        output = "DONT";
-    }
-    else if (c == TelnetChar::IAC)
-    {
-        output = "IAC";
-    }
-    else if (c == TelnetChar::DRAW_MAP)
-    {
-        output = "MDRAW_MAPSDP";
-    }
-    else if (c == TelnetChar::CLR_MAP)
-    {
-        output = "CLR_MAP";
-    }
-    else if (c == TelnetChar::FORMAT)
-    {
-        output = "FORMAT";
-    }
-    else
-    {
-        output = ToString(static_cast<int>(c));
-    }
-    return output;
+    if (c == TelnetChar::TerminalType) return "TerminalType";
+    if (c == TelnetChar::NegotiateAboutWindowSize) return "NegotiateAboutWindowSize";
+    if (c == TelnetChar::TerminalSpeed) return "TerminalSpeed";
+    if (c == TelnetChar::RemoteFlowControl) return "RemoteFlowControl";
+    if (c == TelnetChar::LineMode) return "LineMode";
+    if (c == TelnetChar::EnvironmentVariables) return "EnvironmentVariables";
+    if (c == TelnetChar::NewEnvironmentOption) return "NewEnvironmentOption";
+    if (c == TelnetChar::TTYPE) return "TTYPE";
+    if (c == TelnetChar::MSDP) return "MSDP";
+    if (c == TelnetChar::MSDP_VAR) return "MSDP_VAR";
+    if (c == TelnetChar::MSDP_VAL) return "MSDP_VAL";
+    if (c == TelnetChar::MSDP_TABLE_OPEN) return "MSDP_TABLE_OPEN";
+    if (c == TelnetChar::MSDP_TABLE_CLOSE) return "MSDP_TABLE_CLOSE";
+    if (c == TelnetChar::MSDP_ARRAY_OPEN) return "MSDP_ARRAY_OPEN";
+    if (c == TelnetChar::MSDP_ARRAY_CLOSE) return "MSDP_ARRAY_CLOSE";
+    if (c == TelnetChar::MSSP) return "MSSP";
+    if (c == TelnetChar::MCCP) return "MCCP";
+    if (c == TelnetChar::SubNegotiationEnd) return "SubNegotiationEnd";
+    if (c == TelnetChar::NoOperation) return "NoOperation";
+    if (c == TelnetChar::DataMark) return "DataMark";
+    if (c == TelnetChar::Break) return "Break";
+    if (c == TelnetChar::InterruptProcess) return "InterruptProcess";
+    if (c == TelnetChar::AbortOutput) return "AbortOutput";
+    if (c == TelnetChar::AreYouThere) return "AreYouThere";
+    if (c == TelnetChar::EraseCharacter) return "EraseCharacter";
+    if (c == TelnetChar::EraseLine) return "EraseLine";
+    if (c == TelnetChar::GoAhead) return "GoAhead";
+    if (c == TelnetChar::SubnegotiationBegin) return "SubnegotiationBegin";
+    if (c == TelnetChar::WILL) return "WILL";
+    if (c == TelnetChar::WONT) return "WONT";
+    if (c == TelnetChar::DO) return "DO";
+    if (c == TelnetChar::DONT) return "DONT";
+    if (c == TelnetChar::IAC) return "IAC";
+    if (c == TelnetChar::DRAW_MAP) return "DRAW_MAP";
+    if (c == TelnetChar::DRAW_MAP) return "DRAW_MAP";
+    if (c == TelnetChar::FORMAT) return "FORMAT";
+    return ToString(static_cast<int>(c));
 }
 
 std::string GetModelFlagString(unsigned int flags)

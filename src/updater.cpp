@@ -35,17 +35,17 @@ using namespace std;
 //    4320000 MS -> 1 DAY in real world.
 
 MudUpdater::MudUpdater() :
-        bandwidth_in(),
-        bandwidth_out(),
-        bandwidth_uncompressed(),
-        ticTime(std::chrono::system_clock::now()),
-        mudTime(std::chrono::system_clock::now()),
-        ticSize(30),
-        secondSize(50),
-        hourSize(secondSize * 3600),
-        daySize(secondSize * 86400),
-        mudHour(),
-        mudDayPhase(DayPhase::Morning)
+    bandwidth_in(),
+    bandwidth_out(),
+    bandwidth_uncompressed(),
+    ticTime(std::chrono::system_clock::now()),
+    mudTime(std::chrono::system_clock::now()),
+    ticSize(30),
+    secondSize(50),
+    hourSize(secondSize * 3600),
+    daySize(secondSize * 86400),
+    mudHour(),
+    mudDayPhase(DayPhase::Morning)
 {
     // Nothing to do.
 }
@@ -108,37 +108,30 @@ void MudUpdater::updateTime()
 {
     // Increment the current mud hour.
     mudHour++;
-    switch (mudHour)
+    if (mudHour == 6)
     {
-        default:
-            Mud::instance().broadcastMsg(0, Formatter::yellow() + "Another hour has passed." + Formatter::reset());
-            break;
-        case 0:
-            Mud::instance().broadcastMsg(0, Formatter::yellow() + "The sun rises from the east.\n" + Formatter::reset());
-            mudDayPhase = DayPhase::Morning;
-            break;
-        case 6:
-            // DAY
-            Mud::instance().broadcastMsg(0, Formatter::yellow() + "The sun is just above you.\n" + Formatter::reset());
-            mudDayPhase = DayPhase::Day;
-            break;
-        case 12:
-            // DUSK
-            Mud::instance().broadcastMsg(0, Formatter::yellow() + "The sun begins to set.\n" + Formatter::reset());
-            mudDayPhase = DayPhase::Dusk;
-            break;
-        case 18:
-            // NIGHT
-            Mud::instance().broadcastMsg(0,
-                Formatter::yellow() + "The sun disappears behind the horizon, darkness engulfs you.\n" + Formatter::reset());
-            mudDayPhase = DayPhase::Night;
-            break;
-        case 24:
-            // Day length overflow, return to Morning.
-            Logger::log(LogLevel::Info, "A day has passed!");
-            mudDayPhase = DayPhase::Morning;
-            mudHour = 0;
-            break;
+        Mud::instance().broadcastMsg(0, Formatter::yellow() + "The sun rises from the east.\n" + Formatter::reset());
+        mudDayPhase = DayPhase::Morning;
+    }
+    else if (mudHour == 12)
+    {
+        Mud::instance().broadcastMsg(0, Formatter::yellow() + "The sun is just above you.\n" + Formatter::reset());
+        mudDayPhase = DayPhase::Day;
+    }
+    else if (mudHour == 18)
+    {
+        Mud::instance().broadcastMsg(0, Formatter::yellow() + "The sun begins to set.\n" + Formatter::reset());
+        mudDayPhase = DayPhase::Dusk;
+    }
+    else if (mudHour == 24)
+    {
+        Mud::instance().broadcastMsg(0, Formatter::yellow() + "Darkness engulfs you.\n" + Formatter::reset());
+        mudDayPhase = DayPhase::Night;
+        mudHour = 0;
+    }
+    else
+    {
+        Mud::instance().broadcastMsg(0, Formatter::yellow() + "Another hour has passed." + Formatter::reset());
     }
 }
 
@@ -223,28 +216,25 @@ void MudUpdater::updateMobilesHour()
     {
         if (iterator.second->alive)
         {
-            switch (mudHour)
+            if (mudHour == 6)
             {
-                case 0:
-                    // MORNING
-                    iterator.second->triggerEventMorning();
-                    break;
-                case 6:
-                    // DAY
-                    iterator.second->triggerEventDay();
-                    break;
-                case 12:
-                    // DUSK
-                    iterator.second->triggerEventDusk();
-                    break;
-                case 18:
-                    // NIGHT
-                    iterator.second->triggerEventNight();
-                    break;
-                default:
-                    // EVERY HOUR
-                    iterator.second->triggerEventRandom();
-                    break;
+                iterator.second->triggerEventMorning();
+            }
+            else if (mudHour == 12)
+            {
+                iterator.second->triggerEventDay();
+            }
+            else if (mudHour == 18)
+            {
+                iterator.second->triggerEventDusk();
+            }
+            else if (mudHour == 24)
+            {
+                iterator.second->triggerEventNight();
+            }
+            else
+            {
+                iterator.second->triggerEventRandom();
             }
         }
     }

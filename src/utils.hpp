@@ -285,14 +285,14 @@ std::string EnumToString(const Enum & value)
 }
 
 /// Kinds of string alignment.
-typedef enum StringAlignments
+typedef enum class StringAlignments
 {
     /// Left alignment.
-    kAlignLeft,
+    Left,
     /// Center alignment.
-    kAlignCenter,
+    Center,
     /// Right alignment.
-    kAlignRight,
+    Right,
 } StringAlign;
 
 /// @brief Align the given string.

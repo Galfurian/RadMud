@@ -44,37 +44,33 @@ void DoDirection(Character * character, Direction direction)
     }
 
     // ////////////////////////////////////////////////////////////////////////
-    unsigned int speed = 2;
+    unsigned int speed;
     // Calculate the time needed to move.
-    switch (character->posture)
+    if (character->posture == CharacterPosture::Stand)
     {
-        case CharacterPosture::Stand:
-            character->sendMsg("You start to go " + GetDirectionName(direction) + "...\n");
-            speed = 2;
-            break;
-        case CharacterPosture::Crouch:
-            character->sendMsg("You move crouching towards " + GetDirectionName(direction) + "...\n");
-            speed = 4;
-            break;
-        case CharacterPosture::Prone:
-            character->sendMsg("You begin to crawl to " + GetDirectionName(direction) + "...\n");
-            speed = 6;
-            break;
-        case CharacterPosture::Sit:
-        case CharacterPosture::Rest:
-            character->sendMsg("You can't move!\n");
-            return;
-        case CharacterPosture::NoPosure:
-        default:
-            Logger::log(LogLevel::Error, "No posture set.");
-            break;
+        character->sendMsg("You start to go " + GetDirectionName(direction) + "...\n");
+        speed = 2;
+    }
+    else if (character->posture == CharacterPosture::Crouch)
+    {
+        character->sendMsg("You move crouching towards " + GetDirectionName(direction) + "...\n");
+        speed = 4;
+    }
+    else if (character->posture == CharacterPosture::Prone)
+    {
+        character->sendMsg("You begin to crawl to " + GetDirectionName(direction) + "...\n");
+        speed = 6;
+    }
+    else
+    {
+        character->sendMsg("You can't move!\n");
+        return;
     }
     if (!character->getAction()->setMove(destination, direction, speed))
     {
         character->sendMsg("You can't move.\n");
         return;
     }
-    // ////////////////////////////////////////////////////////////////////////
 }
 
 void DoTravel(Character * character, std::istream & sArgs)
@@ -167,8 +163,8 @@ void DoWho(Character * character, std::istream & sArgs)
     NoMore(character, sArgs);
 
     Table table = Table();
-    table.addColumn("Player", kAlignLeft);
-    table.addColumn("Location", kAlignLeft);
+    table.addColumn("Player", StringAlign::Left);
+    table.addColumn("Location", StringAlign::Left);
 
     std::string output;
     for (auto iterator : Mud::instance().mudPlayers)
@@ -348,7 +344,7 @@ void DoHelp(Character * character, std::istream & sArgs)
         Table commandTable = Table("Commands");
         for (size_t it = 0; it < numColumns; ++it)
         {
-            commandTable.addColumn("", kAlignLeft);
+            commandTable.addColumn("", StringAlign::Left);
         }
         TableRow row;
         for (auto it : Mud::instance().mudCommands)

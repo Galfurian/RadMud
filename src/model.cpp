@@ -241,49 +241,37 @@ bool Model::mustBeWielded()
 std::string Model::getSpecificTypeName()
 {
     std::string output;
-    switch (type)
+    if (type == ModelType::Weapon)
     {
-        case ModelType::Weapon:
-            output = GetWeaponTypeName(getWeaponFunc().type);
-            break;
-        case ModelType::Armor:
-            output = GetArmorSizeName(getArmorFunc().size);
-            break;
-        case ModelType::Shield:
-            output = GetShieldSizeName(getShieldFunc().size);
-            break;
-        case ModelType::Tool:
-            output = GetToolTypeName(getToolFunc().type);
-            break;
-        case ModelType::Node:
-            output = GetNodeTypeName(getNodeFunc().type);
-            break;
-        case ModelType::Resource:
-            output = GetResourceTypeName(getResourceFunc().type);
-            break;
-        case ModelType::Seed:
-            output = GetSeedTypeName(getSeedFunc().type);
-            break;
-        case ModelType::Mechanism:
-            output = GetMechanismTypeName(getMechanismFunc().type);
-            break;
-        default:
-        case ModelType::NoType:
-        case ModelType::Key:
-        case ModelType::Furniture:
-        case ModelType::Food:
-        case ModelType::Light:
-        case ModelType::Vehicle:
-        case ModelType::Pen:
-        case ModelType::Book:
-        case ModelType::Rope:
-        case ModelType::Trash:
-        case ModelType::Container:
-        case ModelType::LiqContainer:
-        case ModelType::Projectile:
-        case ModelType::Corpse:
-        case ModelType::Currency:
-            break;
+        output = GetWeaponTypeName(getWeaponFunc().type);
+    }
+    else if (type == ModelType::Armor)
+    {
+        output = GetArmorSizeName(getArmorFunc().size);
+    }
+    else if (type == ModelType::Shield)
+    {
+        output = GetShieldSizeName(getShieldFunc().size);
+    }
+    else if (type == ModelType::Tool)
+    {
+        output = GetToolTypeName(getToolFunc().type);
+    }
+    else if (type == ModelType::Node)
+    {
+        output = GetNodeTypeName(getNodeFunc().type);
+    }
+    else if (type == ModelType::Resource)
+    {
+        output = GetResourceTypeName(getResourceFunc().type);
+    }
+    else if (type == ModelType::Seed)
+    {
+        output = GetSeedTypeName(getSeedFunc().type);
+    }
+    else if (type == ModelType::Mechanism)
+    {
+        output = GetMechanismTypeName(getMechanismFunc().type);
     }
     return output;
 }
@@ -291,7 +279,7 @@ std::string Model::getSpecificTypeName()
 WeaponFunc Model::getWeaponFunc()
 {
     WeaponFunc func;
-    func.type = (WeaponType) functions[0];
+    func.type = static_cast<WeaponType>(functions[0]);
     func.minDamage = functions[1];
     func.maxDamage = functions[2];
     func.range = functions[3];
@@ -301,7 +289,7 @@ WeaponFunc Model::getWeaponFunc()
 ArmorFunc Model::getArmorFunc()
 {
     ArmorFunc func;
-    func.size = (ArmorSize) functions[0];
+    func.size = static_cast<ArmorSize>(functions[0]);
     func.damageAbs = functions[1];
     func.allowedAnatomy = functions[2];
     return func;
@@ -310,7 +298,7 @@ ArmorFunc Model::getArmorFunc()
 ShieldFunc Model::getShieldFunc()
 {
     ShieldFunc func;
-    func.size = (ShieldSize) functions[0];
+    func.size = static_cast<ShieldSize>(functions[0]);
     func.parryChance = functions[1];
     return func;
 }
@@ -344,14 +332,14 @@ LiqContainerFunc Model::getLiqContainerFunc()
 ToolFunc Model::getToolFunc()
 {
     ToolFunc func;
-    func.type = (ToolType) functions[0];
+    func.type = static_cast<ToolType>(functions[0]);
     return func;
 }
 
 NodeFunc Model::getNodeFunc()
 {
     NodeFunc func;
-    func.type = (NodeType) functions[0];
+    func.type = static_cast<NodeType>(functions[0]);
     func.provides = functions[1];
     return func;
 }
@@ -366,7 +354,7 @@ ResourceFunc Model::getResourceFunc()
 SeedFunc Model::getSeedFunc()
 {
     SeedFunc func;
-    func.type = (SeedType) functions[0];
+    func.type = static_cast<SeedType>(functions[0]);
     return func;
 }
 
@@ -405,23 +393,19 @@ MechanismFunc Model::getMechanismFunc()
 {
     MechanismFunc func;
     func.type = static_cast<MechanismType>(functions[0]);
-    switch (func.type)
+    if ((func.type == MechanismType::Door) || (func.type == MechanismType::Lock))
     {
-        case MechanismType::Door:
-        case MechanismType::Lock:
-            func.key = functions[1];
-            func.difficulty = functions[2];
-            break;
-        case MechanismType::Picklock:
-            func.efficency = functions[1];
-            break;
-        case MechanismType::Lever:
-            func.command = functions[1];
-            func.target = functions[2];
-            break;
-        default:
-        case MechanismType::None:
-            break;
+        func.key = functions[1];
+        func.difficulty = functions[2];
+    }
+    else if (func.type == MechanismType::Picklock)
+    {
+        func.efficency = functions[1];
+    }
+    else if (func.type == MechanismType::Lever)
+    {
+        func.command = functions[1];
+        func.target = functions[2];
     }
     return func;
 }

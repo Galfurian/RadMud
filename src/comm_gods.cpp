@@ -1478,14 +1478,14 @@ void DoModelList(Character * character, std::istream & sArgs)
     // Check no more input.
     NoMore(character, sArgs);
     Table table;
-    table.addColumn("VNUM", kAlignRight);
-    table.addColumn("NAME", kAlignLeft);
-    table.addColumn("TYPE", kAlignLeft);
-    table.addColumn("SPECIFIC", kAlignLeft);
-    table.addColumn("SLOT", kAlignLeft);
-    table.addColumn("FLAGS", kAlignRight);
-    table.addColumn("WEIGHT", kAlignRight);
-    table.addColumn("PRICE", kAlignRight);
+    table.addColumn("VNUM", StringAlign::Right);
+    table.addColumn("NAME", StringAlign::Left);
+    table.addColumn("TYPE", StringAlign::Left);
+    table.addColumn("SPECIFIC", StringAlign::Left);
+    table.addColumn("SLOT", StringAlign::Left);
+    table.addColumn("FLAGS", StringAlign::Right);
+    table.addColumn("WEIGHT", StringAlign::Right);
+    table.addColumn("PRICE", StringAlign::Right);
     for (auto iterator : Mud::instance().mudModels)
     {
         Model model = iterator.second;
@@ -1510,10 +1510,10 @@ void DoItemList(Character * character, std::istream & sArgs)
     // Check no more input.
     NoMore(character, sArgs);
     Table table;
-    table.addColumn("VNUM", kAlignRight);
-    table.addColumn("NAME", kAlignLeft);
-    table.addColumn("TYPE", kAlignLeft);
-    table.addColumn("LOCATION", kAlignLeft);
+    table.addColumn("VNUM", StringAlign::Right);
+    table.addColumn("NAME", StringAlign::Left);
+    table.addColumn("TYPE", StringAlign::Left);
+    table.addColumn("LOCATION", StringAlign::Left);
     for (auto item : Mud::instance().mudItems)
     {
         // Prepare the row.
@@ -1548,10 +1548,10 @@ void DoMobileList(Character * character, std::istream & sArgs)
     // Check no more input.
     NoMore(character, sArgs);
     Table table;
-    table.addColumn("ALIVE", kAlignCenter);
-    table.addColumn("ID", kAlignLeft);
-    table.addColumn("NAME", kAlignLeft);
-    table.addColumn("LOCATION", kAlignRight);
+    table.addColumn("ALIVE", StringAlign::Center);
+    table.addColumn("ID", StringAlign::Left);
+    table.addColumn("NAME", StringAlign::Left);
+    table.addColumn("LOCATION", StringAlign::Right);
     for (auto iterator : Mud::instance().mudMobiles)
     {
         Mobile * mobile = iterator.second;
@@ -1579,8 +1579,8 @@ void DoPlayerList(Character * character, std::istream & sArgs)
     // Check no more input.
     NoMore(character, sArgs);
     Table table;
-    table.addColumn("NAME", kAlignLeft);
-    table.addColumn("ROOM", kAlignLeft);
+    table.addColumn("NAME", StringAlign::Left);
+    table.addColumn("ROOM", StringAlign::Left);
     for (auto iterator : Mud::instance().mudPlayers)
     {
         // If the player is not playing, continue.
@@ -1603,11 +1603,11 @@ void DoAreaList(Character * character, std::istream & sArgs)
     // Check no more input.
     NoMore(character, sArgs);
     Table table;
-    table.addColumn("VNUM", kAlignCenter);
-    table.addColumn("NAME", kAlignLeft);
-    table.addColumn("BUILDER", kAlignLeft);
-    table.addColumn("CONTINENT", kAlignCenter);
-    table.addColumn("ROOMS", kAlignCenter);
+    table.addColumn("VNUM", StringAlign::Center);
+    table.addColumn("NAME", StringAlign::Left);
+    table.addColumn("BUILDER", StringAlign::Left);
+    table.addColumn("CONTINENT", StringAlign::Center);
+    table.addColumn("ROOMS", StringAlign::Center);
     for (auto iterator : Mud::instance().mudAreas)
     {
         Area * area = iterator.second;
@@ -1629,11 +1629,11 @@ void DoRoomList(Character * character, std::istream & sArgs)
     // Check no more input.
     NoMore(character, sArgs);
     Table table;
-    table.addColumn("VNUM", kAlignCenter);
-    table.addColumn("AREA", kAlignLeft);
-    table.addColumn("COORD", kAlignCenter);
-    table.addColumn("TERRAIN", kAlignCenter);
-    table.addColumn("NAME", kAlignLeft);
+    table.addColumn("VNUM", StringAlign::Center);
+    table.addColumn("AREA", StringAlign::Left);
+    table.addColumn("COORD", StringAlign::Center);
+    table.addColumn("TERRAIN", StringAlign::Center);
+    table.addColumn("NAME", StringAlign::Left);
     for (auto iterator : Mud::instance().mudRooms)
     {
         Room * room = iterator.second;
@@ -1662,14 +1662,14 @@ void DoRaceList(Character * character, std::istream & sArgs)
     // Check no more input.
     NoMore(character, sArgs);
     Table table;
-    table.addColumn("VNUM", kAlignCenter);
-    table.addColumn("NAME", kAlignLeft);
-    table.addColumn("ALLOWED", kAlignLeft);
-    table.addColumn("STRENGTH", kAlignRight);
-    table.addColumn("AGILITY", kAlignRight);
-    table.addColumn("PERCEPTION", kAlignRight);
-    table.addColumn("CONSTITUTION", kAlignRight);
-    table.addColumn("INTELLIGENCE", kAlignRight);
+    table.addColumn("VNUM", StringAlign::Center);
+    table.addColumn("NAME", StringAlign::Left);
+    table.addColumn("ALLOWED", StringAlign::Left);
+    table.addColumn("STRENGTH", StringAlign::Right);
+    table.addColumn("AGILITY", StringAlign::Right);
+    table.addColumn("PERCEPTION", StringAlign::Right);
+    table.addColumn("CONSTITUTION", StringAlign::Right);
+    table.addColumn("INTELLIGENCE", StringAlign::Right);
     for (auto iterator : Mud::instance().mudRaces)
     {
         Race * race = &iterator.second;
@@ -1694,8 +1694,8 @@ void DoFactionList(Character * character, std::istream & sArgs)
     // Check no more input.
     NoMore(character, sArgs);
     Table table;
-    table.addColumn("VNUM", kAlignCenter);
-    table.addColumn("NAME", kAlignLeft);
+    table.addColumn("VNUM", StringAlign::Center);
+    table.addColumn("NAME", StringAlign::Left);
     for (auto iterator : Mud::instance().mudFactions)
     {
         Faction * faction = &iterator.second;
@@ -1714,9 +1714,9 @@ void DoSkillList(Character * character, std::istream & sArgs)
     // Check no more input.
     NoMore(character, sArgs);
     Table table;
-    table.addColumn("VNUM", kAlignCenter);
-    table.addColumn("NAME", kAlignLeft);
-    table.addColumn("ATTRIBUTE", kAlignLeft);
+    table.addColumn("VNUM", StringAlign::Center);
+    table.addColumn("NAME", StringAlign::Left);
+    table.addColumn("ATTRIBUTE", StringAlign::Left);
     for (auto iterator : Mud::instance().mudSkills)
     {
         Skill * skill = &iterator.second;
@@ -1736,9 +1736,9 @@ void DoWritingList(Character * character, std::istream & sArgs)
     // Check no more input.
     NoMore(character, sArgs);
     Table table;
-    table.addColumn("VNUM", kAlignCenter);
-    table.addColumn("AUTHOR", kAlignLeft);
-    table.addColumn("TITLE", kAlignLeft);
+    table.addColumn("VNUM", StringAlign::Center);
+    table.addColumn("AUTHOR", StringAlign::Left);
+    table.addColumn("TITLE", StringAlign::Left);
     for (auto iterator : Mud::instance().mudWritings)
     {
         Writing * writing = iterator.second;
@@ -1758,9 +1758,9 @@ void DoCorpseList(Character * character, std::istream & sArgs)
     // Check no more input.
     NoMore(character, sArgs);
     Table table;
-    table.addColumn("VNUM", kAlignRight);
-    table.addColumn("NAME", kAlignLeft);
-    table.addColumn("LOCATION", kAlignLeft);
+    table.addColumn("VNUM", StringAlign::Right);
+    table.addColumn("NAME", StringAlign::Left);
+    table.addColumn("LOCATION", StringAlign::Left);
     for (auto item : Mud::instance().mudCorpses)
     {
         // Prepare the row.
@@ -1800,12 +1800,12 @@ void DoMaterialList(Character * character, std::istream & sArgs)
     // Check no more input.
     NoMore(character, sArgs);
     Table table;
-    table.addColumn("VNUM", kAlignRight);
-    table.addColumn("TYPE", kAlignCenter);
-    table.addColumn("NAME", kAlignLeft);
-    table.addColumn("WORTH", kAlignRight);
-    table.addColumn("HARDNESS", kAlignRight);
-    table.addColumn("LIGHTNESS", kAlignRight);
+    table.addColumn("VNUM", StringAlign::Right);
+    table.addColumn("TYPE", StringAlign::Center);
+    table.addColumn("NAME", StringAlign::Left);
+    table.addColumn("WORTH", StringAlign::Right);
+    table.addColumn("HARDNESS", StringAlign::Right);
+    table.addColumn("LIGHTNESS", StringAlign::Right);
     for (auto iterator : Mud::instance().mudMaterials)
     {
         Material material = iterator.second;
@@ -1828,10 +1828,10 @@ void DoProfessionList(Character * character, std::istream & sArgs)
     // Check no more input.
     NoMore(character, sArgs);
     Table table;
-    table.addColumn("NAME", kAlignCenter);
-    table.addColumn("COMMAND", kAlignCenter);
-    table.addColumn("POSTURE", kAlignCenter);
-    table.addColumn("ACTION", kAlignCenter);
+    table.addColumn("NAME", StringAlign::Center);
+    table.addColumn("COMMAND", StringAlign::Center);
+    table.addColumn("POSTURE", StringAlign::Center);
+    table.addColumn("ACTION", StringAlign::Center);
     for (auto iterator : Mud::instance().mudProfessions)
     {
         Profession * profession = &(iterator.second);
@@ -1852,10 +1852,10 @@ void DoProductionList(Character * character, std::istream & sArgs)
     // Check no more input.
     NoMore(character, sArgs);
     Table table;
-    table.addColumn("VNUM", kAlignCenter);
-    table.addColumn("NAME", kAlignCenter);
-    table.addColumn("PROFESSION", kAlignCenter);
-    table.addColumn("DIFFICULTY", kAlignLeft);
+    table.addColumn("VNUM", StringAlign::Center);
+    table.addColumn("NAME", StringAlign::Center);
+    table.addColumn("PROFESSION", StringAlign::Center);
+    table.addColumn("DIFFICULTY", StringAlign::Left);
     for (auto iterator : Mud::instance().mudProductions)
     {
         Production * production = &(iterator.second);
@@ -1876,9 +1876,9 @@ void DoLiquidList(Character * character, std::istream & sArgs)
     // Check no more input.
     NoMore(character, sArgs);
     Table table;
-    table.addColumn("VNUM", kAlignCenter);
-    table.addColumn("NAME", kAlignRight);
-    table.addColumn("WORTH", kAlignRight);
+    table.addColumn("VNUM", StringAlign::Center);
+    table.addColumn("NAME", StringAlign::Right);
+    table.addColumn("WORTH", StringAlign::Right);
     for (auto iterator : Mud::instance().mudLiquids)
     {
         Liquid liquid = iterator.second;
@@ -1898,11 +1898,11 @@ void DoBuildingList(Character * character, std::istream & sArgs)
     // Check no more input.
     NoMore(character, sArgs);
     Table table;
-    table.addColumn("VNUM", kAlignCenter);
-    table.addColumn("NAME", kAlignCenter);
-    table.addColumn("DIFFICULTY", kAlignLeft);
-    table.addColumn("TIME", kAlignCenter);
-    table.addColumn("UNIQUE", kAlignCenter);
+    table.addColumn("VNUM", StringAlign::Center);
+    table.addColumn("NAME", StringAlign::Center);
+    table.addColumn("DIFFICULTY", StringAlign::Left);
+    table.addColumn("TIME", StringAlign::Center);
+    table.addColumn("UNIQUE", StringAlign::Center);
     for (auto iterator : Mud::instance().mudBuildings)
     {
         Building * building = &(iterator.second);

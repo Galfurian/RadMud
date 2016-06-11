@@ -514,12 +514,13 @@ void Player::processWrite()
         // Check for bad write.
         if (nWrite <= 0)
         {
-            switch (errno)
+            if (errno == EPIPE)
             {
-                case EPIPE:
-                    perror("Sending on a closed connection...");
-                default:
-                    perror("Unknown error during Send...");
+                Logger::log(LogLevel::Error, "Sending on a closed connection...");
+            }
+            else
+            {
+                Logger::log(LogLevel::Error, "Unknown error during Send...");
             }
             return;
         }

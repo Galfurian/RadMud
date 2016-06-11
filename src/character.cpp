@@ -315,67 +315,42 @@ void Character::updateResources()
 {
     if (health < getMaxHealth())
     {
-        unsigned int max_health = this->getMaxHealth();
-        unsigned int gain = 0;
-        switch (posture)
+        unsigned int maxValue = this->getMaxHealth();
+        if (posture == CharacterPosture::Sit)
         {
-            case CharacterPosture::Sit:
-                gain = (max_health / 100) * 4;
-                break;
-            case CharacterPosture::Rest:
-                gain = (max_health / 100) * 8;
-                break;
-            case CharacterPosture::Prone:
-            case CharacterPosture::Crouch:
-            case CharacterPosture::Stand:
-                gain = (max_health / 100) * 2;
-                break;
-            case CharacterPosture::NoPosure:
-            default:
-                Logger::log(LogLevel::Warning, "No posture has been set.");
-                break;
-
+            health += (maxValue / 100) * 4;
         }
-        if (gain == 0)
+        else if (posture == CharacterPosture::Rest)
         {
-            gain = 1;
+            health += (maxValue / 100) * 8;
         }
-        health += gain;
-        if (health > max_health)
+        else
         {
-            health = max_health;
+            health += (maxValue / 100) * 2;
+        }
+        if (health > maxValue)
+        {
+            health = maxValue;
         }
     }
     if (stamina < getMaxStamina())
     {
-        unsigned int max_stamina = getMaxStamina();
-        unsigned int gain = 0;
-        switch (posture)
+        unsigned int maxValue = this->getMaxStamina();
+        if (posture == CharacterPosture::Sit)
         {
-            case CharacterPosture::Sit:
-                gain = (max_stamina / 100) * 4;
-                break;
-            case CharacterPosture::Rest:
-                gain = (max_stamina / 100) * 8;
-                break;
-            case CharacterPosture::Prone:
-            case CharacterPosture::Crouch:
-            case CharacterPosture::Stand:
-                gain = (max_stamina / 100) * 2;
-                break;
-            case CharacterPosture::NoPosure:
-            default:
-                Logger::log(LogLevel::Warning, "No posture has been set.");
-                break;
+            stamina += (maxValue / 100) * 4;
         }
-        if (gain == 0)
+        else if (posture == CharacterPosture::Rest)
         {
-            gain = 1;
+            stamina += (maxValue / 100) * 8;
         }
-        stamina += gain;
-        if (stamina > max_stamina)
+        else
         {
-            stamina = max_stamina;
+            stamina += (maxValue / 100) * 2;
+        }
+        if (stamina > maxValue)
+        {
+            stamina = maxValue;
         }
     }
 }
