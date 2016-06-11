@@ -47,9 +47,14 @@ bool Effect::update()
     return (expires <= 0);
 }
 
+bool Effect::operator<(const Effect & right) const
+{
+    return expires < right.expires;
+}
+
 EffectList::EffectList() :
-        activeEffects(),
-        pendingEffects()
+    activeEffects(),
+    pendingEffects()
 {
 }
 EffectList::~EffectList()
@@ -165,6 +170,7 @@ void EffectList::addPendingEffect(const Effect & effect)
     if (!present)
     {
         pendingEffects.push_back(effect);
+        this->sortList();
     }
 }
 
@@ -184,8 +190,9 @@ bool EffectList::effectActivate(std::vector<std::string> & messages)
         }
         if (!present)
         {
-            activeEffects.push_back(iterator);
             messages.push_back(iterator.messageActivate);
+            activeEffects.push_back(iterator);
+            this->sortList();
         }
     }
     pendingEffects.clear();
@@ -200,6 +207,7 @@ bool EffectList::effectUpdate(std::vector<std::string> & messages)
         {
             messages.push_back(iterator->messageExpire);
             iterator = activeEffects.erase(iterator);
+            this->sortList();
         }
         else
         {
@@ -207,4 +215,9 @@ bool EffectList::effectUpdate(std::vector<std::string> & messages)
         }
     }
     return (!messages.empty());
+}
+
+void EffectList::sortList()
+{
+    std::sort(activeEffects.begin(), activeEffects.end(), std::less<Effect>());
 }

@@ -59,8 +59,12 @@ class Effect
         ~Effect();
 
         /// @brief Update the cooldown of the effect.
-        /// @return <b>True</b> if the effect is expired,<br><b>False</b> otherwise.
+        /// @return <b>True</b> if the effect is expired,<br>
+        ///         <b>False</b> otherwise.
         bool update();
+
+        /// @brief Operator used to order the effect based on the remaining time.
+        bool operator<(const Effect & right) const;
 };
 
 /// @brief A class which allows to manage a buffer of Active and Pending effects.
@@ -127,6 +131,9 @@ class EffectList
         /// @param messages A vector of messages which is populated with the logs of the effects.
         /// @return <b>True</b> if there is a message to show,<br><b>False</b> otherwise.
         bool effectUpdate(std::vector<std::string> & messages);
+
+        /// @brief Sort the list of effects.
+        void sortList();
 };
 
 #endif
