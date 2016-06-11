@@ -140,6 +140,43 @@ std::string ToCapitals(const std::string & source);
 /// @return The splitted string.
 std::vector<std::string> SplitString(const std::string & source, const std::string & delimiter);
 
+template<typename T, typename std::enable_if<!std::is_integral<T>::value>::type>
+std::vector<T> SplitString(const std::string & source, const std::string & delimiter)
+{
+    std::vector<T> result;
+    size_t pos = 0;
+    std::string tmp = source;
+    while ((pos = tmp.find(delimiter)) != std::string::npos)
+    {
+        result.push_back(tmp.substr(0, pos));
+        tmp.erase(0, pos + delimiter.length());
+    }
+    if (!tmp.empty())
+    {
+        result.push_back(tmp);
+    }
+    return result;
+}
+
+template<typename T, typename std::enable_if<std::is_integral<T>::value>::type>
+std::vector<T> SplitString(const std::string & source, const std::string & delimiter)
+{
+    std::vector<T> result;
+    size_t pos = 0;
+    std::string tmp = source;
+    while ((pos = tmp.find(delimiter)) != std::string::npos)
+    {
+        char * pEnd;
+        result.push_back(static_cast<T>(strtol(tmp.substr(0, pos).c_str(), &pEnd, 10)));
+        tmp.erase(0, pos + delimiter.length());
+    }
+    if (!tmp.empty())
+    {
+        result.push_back(tmp);
+    }
+    return result;
+}
+
 /// @brief Get all the words in the source string.
 /// @param source The source string.
 /// @return A vector containing the words of the source string.

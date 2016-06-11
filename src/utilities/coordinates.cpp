@@ -22,39 +22,3 @@
 
 #include "coordinates.hpp"
 
-template<>
-template<>
-bool Coordinates<unsigned int>::operator<(const Coordinates<int> & right) const
-{
-    if (static_cast<int>(x) < right.x)
-    {
-        return true;
-    }
-    if (static_cast<int>(y) < right.y)
-    {
-        return true;
-    }
-    if (static_cast<int>(z) < right.z)
-    {
-        return true;
-    }
-    return false;
-}
-
-template<>
-template<>
-Coordinates<unsigned int> Coordinates<unsigned int>::operator+(const Coordinates<int> & right) const
-{
-    if ((*this) < right)
-    {
-        throw std::runtime_error("Wrong type of coordinates.");
-    }
-    Coordinates<unsigned int> coord;
-    coord.x = x + static_cast<unsigned int>(right.x);
-    coord.y = y + static_cast<unsigned int>(right.y);
-    coord.z = z + static_cast<unsigned int>(right.z);
-    return coord;
-}
-
-template class Coordinates<int> ;
-template class Coordinates<unsigned int> ;

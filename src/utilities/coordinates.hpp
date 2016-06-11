@@ -63,40 +63,6 @@ class Coordinates
             // Nothing to do.
         }
 
-        /// @brief Add to the current Coordinates the right operand.
-        /// @param right The right parameter.
-        /// @return The new Coordinates.
-        template<typename OtherCoordType>
-        Coordinates<CoordType> operator+(const Coordinates<OtherCoordType> & right) const
-        {
-            Coordinates<CoordType> coord;
-            coord.x = x + right.x;
-            coord.y = y + right.y;
-            coord.z = z + right.z;
-            return coord;
-        }
-
-        /// @brief Define operator <, less than.
-        /// @param right The right parameter.
-        /// @return True if left Coordinates are less than right Coordinates.
-        template<typename OtherCoordType>
-        bool operator<(const Coordinates<OtherCoordType> & right) const
-        {
-            if (x < right.x)
-            {
-                return true;
-            }
-            if (y < right.y)
-            {
-                return true;
-            }
-            if (z < right.z)
-            {
-                return true;
-            }
-            return false;
-        }
-
         /// @brief Define operator ==, equal.
         /// @param right The right parameter.
         /// @return True if left Coordinates are equal to the right Coordinates.
@@ -122,12 +88,50 @@ class Coordinates
         static void luaRegister(lua_State * L)
         {
             luabridge::getGlobalNamespace(L) //
-            .beginClass < Coordinates < CoordType >> ("Coordinates") //
+            .beginClass<Coordinates<CoordType>>("Coordinates") //
             .addData("x", &Coordinates<CoordType>::x, false) //
             .addData("y", &Coordinates<CoordType>::y, false) //
             .addData("z", &Coordinates<CoordType>::z, false) //
             .endClass();
         }
 };
+
+/// @brief Define operator <, less than.
+/// @param right The right parameter.
+/// @return True if left Coordinates are less than right Coordinates.
+template<typename CoordType, typename OtherCoordType>
+bool operator<(const Coordinates<CoordType> & left, const Coordinates<OtherCoordType> & right)
+{
+    if (static_cast<long int>(left.x) < static_cast<long int>(right.x))
+    {
+        return true;
+    }
+    if (static_cast<long int>(left.y) < static_cast<long int>(right.y))
+    {
+        return true;
+    }
+    if (static_cast<long int>(left.z) < static_cast<long int>(right.z))
+    {
+        return true;
+    }
+    return false;
+}
+
+/// @brief Add to the current Coordinates the right operand.
+/// @param right The right parameter.
+/// @return The new Coordinates.
+template<typename CoordType, typename OtherCoordType>
+Coordinates<CoordType> operator+(const Coordinates<CoordType> & left, const Coordinates<OtherCoordType> & right)
+{
+    if (left < right)
+    {
+        throw std::runtime_error("Wrong type of coordinates.");
+    }
+    Coordinates<CoordType> coord;
+    coord.x = static_cast<CoordType>(static_cast<long int>(left.x) + static_cast<long int>(right.x));
+    coord.y = static_cast<CoordType>(static_cast<long int>(left.y) + static_cast<long int>(right.y));
+    coord.z = static_cast<CoordType>(static_cast<long int>(left.z) + static_cast<long int>(right.z));
+    return coord;
+}
 
 #endif

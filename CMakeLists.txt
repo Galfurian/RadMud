@@ -27,9 +27,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic-errors")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wconversion")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmessage-length=0")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
 
 if(FLAG_EVERYTHING)
 	if(USE_CLANG)
@@ -149,6 +149,7 @@ set(PROJECT_SRC
     ./src/updater.cpp
     ./src/utilities/coordinates.cpp
     ./src/utilities/table.cpp
+    ./src/utilities/CMacroWrapper.cpp
     ./src/utils.cpp
     ./src/formatter.cpp
     ./src/combat.cpp
