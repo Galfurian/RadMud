@@ -152,7 +152,7 @@ set(PROJECT_SRC
     ./src/luabridge/detail/LuaHelpers.cpp
 )
 
-find_package(Lua51 REQUIRED)
+find_package(Lua52 REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(Sqlite3 REQUIRED)
 
