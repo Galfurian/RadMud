@@ -334,25 +334,25 @@ bool LoadPlayerInformation(ResultSet * result, Player * player)
     player->name = result->getNextString();
     player->password = result->getNextString();
     player->race = Mud::instance().findRace(result->getNextInteger());
-    player->strength = result->getNextInteger();
-    player->agility = result->getNextInteger();
-    player->perception = result->getNextInteger();
-    player->constitution = result->getNextInteger();
-    player->intelligence = result->getNextInteger();
+    player->strength = result->getNextUnsignedInteger();
+    player->agility = result->getNextUnsignedInteger();
+    player->perception = result->getNextUnsignedInteger();
+    player->constitution = result->getNextUnsignedInteger();
+    player->intelligence = result->getNextUnsignedInteger();
     player->gender = static_cast<GenderType>(result->getNextInteger());
     player->age = result->getNextInteger();
     player->description = result->getNextString();
-    player->weight = result->getNextInteger();
+    player->weight = result->getNextUnsignedInteger();
     player->faction = Mud::instance().findFaction(result->getNextInteger());
-    player->level = result->getNextInteger();
+    player->level = result->getNextUnsignedInteger();
     player->experience = result->getNextInteger();
     player->room = Mud::instance().findRoom(result->getNextInteger());
     player->prompt = player->prompt_save = result->getNextString();
-    player->flags = result->getNextInteger();
-    player->health = result->getNextInteger();
-    player->stamina = result->getNextInteger();
-    player->hunger = result->getNextInteger();
-    player->thirst = result->getNextInteger();
+    player->flags = result->getNextUnsignedInteger();
+    player->health = result->getNextUnsignedInteger();
+    player->stamina = result->getNextUnsignedInteger();
+    player->hunger = result->getNextUnsignedInteger();
+    player->thirst = result->getNextUnsignedInteger();
     player->rent_room = result->getNextInteger();
 
     if (player->room == nullptr)
@@ -399,12 +399,12 @@ bool LoadPlayerItems(ResultSet * result, Character * character)
         switch (slot)
         {
             case EquipmentSlot::Head:
-                case EquipmentSlot::Torso:
-                case EquipmentSlot::Back:
-                case EquipmentSlot::Legs:
-                case EquipmentSlot::Feet:
-                case EquipmentSlot::RightHand:
-                case EquipmentSlot::LeftHand:
+            case EquipmentSlot::Torso:
+            case EquipmentSlot::Back:
+            case EquipmentSlot::Legs:
+            case EquipmentSlot::Feet:
+            case EquipmentSlot::RightHand:
+            case EquipmentSlot::LeftHand:
                 // Change the slot of the item.
                 item->setCurrentSlot(slot);
                 // Add the item to the equipment.
@@ -430,7 +430,7 @@ bool LoadPlayerSkill(ResultSet * result, Player * player)
         while (result->next())
         {
             Skill * skill = Mud::instance().findSkill(result->getNextInteger());
-            unsigned int value = result->getNextInteger();
+            unsigned int value = result->getNextUnsignedInteger();
 
             if (skill == nullptr)
             {
@@ -538,7 +538,7 @@ bool LoadItem(ResultSet * result)
         item->condition = result->getNextInteger();
         item->composition = Mud::instance().findMaterial(result->getNextInteger());
         item->quality = (ItemQuality) result->getNextInteger();
-        item->flags = result->getNextInteger();
+        item->flags = result->getNextUnsignedInteger();
 
         if (!item->check())
         {
@@ -622,15 +622,15 @@ bool LoadModel(ResultSet * result)
         model.description = result->getNextString();
         model.type = (ModelType) result->getNextInteger();
         model.slot = (EquipmentSlot) result->getNextInteger();
-        model.flags = result->getNextInteger();
-        model.weight = result->getNextInteger();
+        model.flags = result->getNextUnsignedInteger();
+        model.weight = result->getNextUnsignedInteger();
         model.price = result->getNextInteger();
         model.condition = result->getNextInteger();
         model.decay = result->getNextInteger();
         model.material = (MaterialType) result->getNextInteger();
         model.tileSet = result->getNextInteger();
         model.tileId = result->getNextInteger();
-        model.functions = GetIntVect(result->getNextString());
+        model.setFunctions(result->getNextString());
         // Translate new_line.
         FindAndReplace(model.description, "%r", "\n");
         // Check the correctness.
@@ -699,10 +699,10 @@ bool LoadMobile(ResultSet * result)
         mobile->race = Mud::instance().findRace(result->getNextInteger());
         mobile->faction = Mud::instance().findFaction(result->getNextInteger());
         mobile->gender = static_cast<GenderType>(result->getNextInteger());
-        mobile->weight = result->getNextInteger();
+        mobile->weight = result->getNextUnsignedInteger();
         mobile->actions = GetWords(result->getNextString());
-        mobile->flags = result->getNextInteger();
-        mobile->level = result->getNextInteger();
+        mobile->flags = result->getNextUnsignedInteger();
+        mobile->level = result->getNextUnsignedInteger();
         if (!mobile->setCharacteristic(result->getNextString()))
         {
             Logger::log(LogLevel::Error, "Wrong characteristics.");
@@ -748,13 +748,13 @@ bool LoadRoom(ResultSet * result)
         Room * room = new Room();
         // Initialize the Room.
         room->vnum = result->getNextInteger();
-        room->coord.x = result->getNextInteger();
-        room->coord.y = result->getNextInteger();
-        room->coord.z = result->getNextInteger();
+        room->coord.x = result->getNextUnsignedInteger();
+        room->coord.y = result->getNextUnsignedInteger();
+        room->coord.z = result->getNextUnsignedInteger();
         room->terrain = result->getNextString();
         room->name = result->getNextString();
         room->description = result->getNextString();
-        room->flags = result->getNextInteger();
+        room->flags = result->getNextUnsignedInteger();
         // Translate new_line.
         FindAndReplace(room->description, "%r", "\n");
         // Check the correctness.
@@ -784,7 +784,7 @@ bool LoadExit(ResultSet * result)
         exit->source = Mud::instance().findRoom(result->getNextInteger());
         exit->destination = Mud::instance().findRoom(result->getNextInteger());
         exit->direction = static_cast<Direction>(result->getNextInteger());
-        exit->flags = result->getNextInteger();
+        exit->flags = result->getNextUnsignedInteger();
 
         // Check the correctness.
         if (exit->source == nullptr)
@@ -858,9 +858,9 @@ bool LoadArea(ResultSet * result)
         area->name = result->getNextString();
         area->builder = result->getNextString();
         area->continent = result->getNextString();
-        area->width = result->getNextInteger();
-        area->height = result->getNextInteger();
-        area->elevation = result->getNextInteger();
+        area->width = result->getNextUnsignedInteger();
+        area->height = result->getNextUnsignedInteger();
+        area->elevation = result->getNextUnsignedInteger();
         area->tileSet = result->getNextInteger();
         // Check the correctness.
         if (!area->check())
@@ -941,8 +941,8 @@ bool LoadContinent(ResultSet * result)
         continent->vnum = result->getNextInteger();
         continent->name = result->getNextString();
         continent->builder = result->getNextString();
-        continent->width = result->getNextInteger();
-        continent->height = result->getNextInteger();
+        continent->width = result->getNextUnsignedInteger();
+        continent->height = result->getNextUnsignedInteger();
         continent->txtMap = result->getNextString();
         // Add the continent to the map.
         continent->init();
@@ -1037,8 +1037,8 @@ bool LoadProduction(ResultSet * result)
         production.vnum = result->getNextInteger();
         production.name = result->getNextString();
         production.profession = Mud::instance().findProfession(result->getNextString());
-        production.difficulty = result->getNextInteger();
-        production.time = result->getNextInteger();
+        production.difficulty = result->getNextUnsignedInteger();
+        production.time = result->getNextUnsignedInteger();
         production.assisted = result->getNextInteger();
         check &= production.setOutcome(result->getNextString());
         check &= production.setTool(result->getNextString());
@@ -1098,7 +1098,7 @@ bool LoadContentLiq(ResultSet * result)
     {
         Item * container = Mud::instance().findItem(result->getNextInteger());
         Liquid * liquid = Mud::instance().findLiquid(result->getNextInteger());
-        int quantity = result->getNextInteger();
+        unsigned int quantity = result->getNextUnsignedInteger();
         bool check = true;
         if (container == nullptr)
         {
@@ -1110,7 +1110,7 @@ bool LoadContentLiq(ResultSet * result)
             Logger::log(LogLevel::Error, "Can't find liquid.");
             check = false;
         }
-        if (quantity <= 0)
+        if (quantity == 0)
         {
             Logger::log(LogLevel::Error, "Liquid content quantity misplaced.");
             check = false;
@@ -1186,72 +1186,18 @@ bool LoadBuilding(ResultSet * result)
 
         building.vnum = result->getNextInteger();
         building.name = result->getNextString();
-        building.difficulty = result->getNextInteger();
-        building.time = result->getNextInteger();
+        building.difficulty = result->getNextUnsignedInteger();
+        building.time = result->getNextUnsignedInteger();
         building.assisted = result->getNextInteger();
-        std::vector<int> tools = GetIntVect(result->getNextString());
+        building.setTool(result->getNextString());
         building.buildingModel = Mud::instance().findModel(result->getNextInteger());
-        std::vector<int> ingredients = GetIntVect(result->getNextString());
+        building.setIngredient(result->getNextString());
         building.unique = static_cast<bool>(result->getNextInteger());
 
-        // Checker flag.
-        bool check = true;
-        // ////////////////////////////////////////////////////////////////
         if (building.buildingModel == nullptr)
         {
             Logger::log(LogLevel::Error, "Can't find the building model.");
-            check = false;
             break;
-        }
-
-        // ////////////////////////////////////////////////////////////////
-        if (tools.empty())
-        {
-            Logger::log(LogLevel::Error, "No tool set.");
-            check = false;
-        }
-        for (auto it : tools)
-        {
-            ToolType toolType = static_cast<ToolType>(it);
-            if (toolType == ToolType::NoType)
-            {
-                Logger::log(LogLevel::Error, "Can't find the Tool :" + ToString(it));
-                check = false;
-                break;
-            }
-            building.tools.insert(toolType);
-        }
-
-        // ////////////////////////////////////////////////////////////////
-        if ((ingredients.size() % 2) != 0)
-        {
-            Logger::log(LogLevel::Error, "Ingredients are not even.");
-            check = false;
-        }
-        for (std::vector<int>::iterator it = ingredients.begin(); it != ingredients.end(); it++)
-        {
-            ResourceType ingredient = static_cast<ResourceType>(*it);
-            if (ingredient == ResourceType::NoType)
-            {
-                Logger::log(LogLevel::Error, "Can't find the Ingredient :" + ToString(*it));
-                check = false;
-                break;
-            }
-            ++it;
-            if (it == ingredients.end())
-            {
-                Logger::log(LogLevel::Error,
-                    "Can't find the quantity of the Ingredient :" + GetResourceTypeName(ingredient));
-                check = false;
-                break;
-            }
-            building.ingredients[ingredient] = *it;
-        }
-        // Check the correctness.
-        if (!check)
-        {
-            Logger::log(LogLevel::Error, "The building is incorrect " + building.name);
-            return false;
         }
         if (!building.check())
         {

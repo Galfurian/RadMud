@@ -68,16 +68,16 @@ typedef enum MapTiles
 } MapTile;
 
 Area::Area() :
-        vnum(),
-        name(),
-        builder(),
-        continent(),
-        areaMap(),
-        width(),
-        height(),
-        elevation(),
-        numRooms(),
-        tileSet()
+    vnum(),
+    name(),
+    builder(),
+    continent(),
+    areaMap(),
+    width(),
+    height(),
+    elevation(),
+    numRooms(),
+    tileSet()
 {
 }
 
@@ -125,15 +125,9 @@ bool Area::inBoundaries(unsigned int x, unsigned int y, unsigned int z)
     return false;
 }
 
-bool Area::inBoundaries(Coordinates coord)
+bool Area::inBoundaries(Coordinates<unsigned int> coord)
 {
-    bool accepted = false;
-    if ((coord.x > 0) && (coord.y > 0) && (coord.z > 0))
-    {
-        accepted = inBoundaries(static_cast<unsigned int>(coord.x), static_cast<unsigned int>(coord.y),
-            static_cast<unsigned int>(coord.z));
-    }
-    return accepted;
+    return this->inBoundaries(coord.x, coord.y, coord.z);
 }
 
 bool Area::addRoom(Room * room)
@@ -155,9 +149,9 @@ bool Area::addRoom(Room * room)
 
 void Area::remRoom(Room * room)
 {
-    int x = room->coord.x;
-    int y = room->coord.y;
-    int z = room->coord.z;
+    unsigned int x = room->coord.x;
+    unsigned int y = room->coord.y;
+    unsigned int z = room->coord.z;
 
     AreaMap::iterator it = areaMap.find(std::make_tuple(x, y, z));
 
@@ -193,7 +187,7 @@ Room * Area::getRoom(unsigned int x, unsigned int y, unsigned int z)
     return nullptr;
 }
 
-Room * Area::getRoom(Coordinates coord)
+Room * Area::getRoom(Coordinates<unsigned int> coord)
 {
     Room * room = nullptr;
     if ((coord.x > 0) && (coord.y > 0) && (coord.z > 0))
@@ -357,7 +351,7 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, unsigned int radius)
             }
             else if (mapTile == kMapWalk)
             {
-                Room * room = this->getRoom(x, y, centerRoom->coord.z);
+                Room * room = this->getRoom(x, y, origin_z);
 
                 // Check if there are creatures in the tile.
                 if (room->characters.size() > 0)
@@ -605,9 +599,9 @@ bool Area::fastInSight(
     unsigned int target_y,
     unsigned int target_z)
 {
-    unsigned int dx = target_x - origin_x;
-    unsigned int dy = target_y - origin_y;
-    unsigned int dz = target_z - origin_z;
+    int dx = static_cast<int>(target_x) - static_cast<int>(origin_x);
+    int dy = static_cast<int>(target_y) - static_cast<int>(origin_y);
+    int dz = static_cast<int>(target_z) - static_cast<int>(origin_z);
 
     double nx = dx;
     double ny = dy;
@@ -636,14 +630,28 @@ bool Area::fastInSight(
             if (change_x < change_z)
             {
                 // Next step is on X axis.
-                x += sign_x;
-                ix++;
+                if ((static_cast<int>(x) + sign_x) < 0)
+                {
+                    return false;
+                }
+                else
+                {
+                    x = static_cast<unsigned int>(static_cast<int>(x) + sign_x);
+                    ix++;
+                }
             }
             else
             {
                 // Next step is on Z axis.
-                z += sign_z;
-                iz++;
+                if ((static_cast<int>(z) + sign_z) < 0)
+                {
+                    return false;
+                }
+                else
+                {
+                    z = static_cast<unsigned int>(static_cast<int>(z) + sign_z);
+                    iz++;
+                }
             }
         }
         else
@@ -651,17 +659,30 @@ bool Area::fastInSight(
             if (change_y < change_z)
             {
                 // Next step is on Y axis.
-                y += sign_y;
-                iy++;
+                if ((static_cast<int>(y) + sign_y) < 0)
+                {
+                    return false;
+                }
+                else
+                {
+                    y = static_cast<unsigned int>(static_cast<int>(y) + sign_y);
+                    iy++;
+                }
             }
             else
             {
                 // Next step is on Z axis.
-                z += sign_z;
-                iz++;
+                if ((static_cast<int>(z) + sign_z) < 0)
+                {
+                    return false;
+                }
+                else
+                {
+                    z = static_cast<unsigned int>(static_cast<int>(z) + sign_z);
+                    iz++;
+                }
             }
         }
-
         if (this->getRoom(x, y, z) == nullptr)
         {
             return false;

@@ -273,18 +273,6 @@ bool Action::setInCombat()
     }
 }
 
-/*
- bool Action::setOpponent(Character * opponent)
- {
- if (!opponents.addOpponent(opponent, opponents.getInitialAggro(opponent)))
- {
- Logger::log(LogLevel::Error, "Already fighting against '" + opponent->getName() + "'.");
- return false;
- }
- return true;
- }
- */
-
 bool Action::setNextCombatAction(const CombatAction & nextAction)
 {
     if (!actor->opponents.hasOpponents())
@@ -314,7 +302,7 @@ bool Action::setNextCombatAction(const CombatAction & nextAction)
     {
         double base = 6.0;
         // The agility modifier.
-        double agility = (actor->agility + actor->effects.getAgiMod()) * 3.5 * (base / 100);
+        double agility = GetAbilityModifier(actor->getAgility()) * 3.5 * (base / 100);
         // The weight modifier.
         double weight = actor->weight * (base / 100);
         // The carried weight.
@@ -331,7 +319,7 @@ void Action::performAttack(Character * opponent)
     // Evaluate only once the armor class of the opponent.
     unsigned int AC = opponent->getArmorClass();
     // Evaluate only once the strenght modifier.
-    unsigned int STR = GetAbilityModifier((actor->strength + actor->effects.getStrMod()));
+    unsigned int STR = GetAbilityModifier(actor->getStrength());
     // Retrieve the items.
     Item * rh = actor->findEquipmentSlotItem(EquipmentSlot::RightHand);
     Item * lh = actor->findEquipmentSlotItem(EquipmentSlot::LeftHand);
@@ -518,7 +506,7 @@ void Action::performMine()
         return;
     }
     // Retrieve the product.
-    Model * product = Mud::instance().findModel(itemTarget->model->getNodeFunc().provides);
+    Model * product = Mud::instance().findModel(static_cast<int>(itemTarget->model->getNodeFunc().provides));
     // Check if the product exists.
     if (product == nullptr)
     {
@@ -620,7 +608,7 @@ void Action::performChop()
         return;
     }
     // Retrieve the product.
-    Model * product = Mud::instance().findModel(itemTarget->model->getNodeFunc().provides);
+    Model * product = Mud::instance().findModel(static_cast<int>(itemTarget->model->getNodeFunc().provides));
     // Check if the product exists.
     if (product == nullptr)
     {
@@ -953,7 +941,7 @@ void Action::performComb()
         nextCombatAction = CombatAction::NoAction;
         // Get the character chance of fleeing.
         unsigned int fleeChance = TRandInteger<unsigned int>(0, 10);
-        fleeChance += GetAbilityModifier(actor->agility + actor->effects.getAgiMod());
+        fleeChance += GetAbilityModifier(actor->getAgility());
         // Base the escape level on how many enemies are surrounding the character.
         unsigned int chaseLevel = 0;
         for (unsigned int it = 0; it < actor->opponents.getSize(); ++it)

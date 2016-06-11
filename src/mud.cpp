@@ -25,6 +25,7 @@
 
 #include "logger.hpp"
 #include "protocol.hpp"
+#include "utilities/CMacroWrapper.hpp"
 
 /// Input file descriptor.
 static fd_set in_set;
@@ -41,13 +42,13 @@ void Bailout(int signal)
 }
 
 Mud::Mud() :
-        _servSocket(-1),
-        _maxDesc(-1),
-        _shutdownSignal(),
-        _bootTime(time(NULL)),
-        _maxVnumRoom(),
-        _maxVnumItem(),
-        _minVnumCorpses()
+    _servSocket(-1),
+    _maxDesc(-1),
+    _shutdownSignal(),
+    _bootTime(time(NULL)),
+    _maxVnumRoom(),
+    _maxVnumItem(),
+    _minVnumCorpses()
 {
     // Nothing to do.
 }
@@ -346,24 +347,6 @@ Room * Mud::findRoom(int vnum)
     return nullptr;
 }
 
-Room * Mud::findRoom(int x, int y, int z)
-{
-    for (auto iterator : mudRooms)
-    {
-        Room * room = iterator.second;
-        if (room->coord.x == x && room->coord.y == y && room->coord.z == z)
-        {
-            return room;
-        }
-    }
-    return nullptr;
-}
-
-Room * Mud::findRoom(Coordinates coord)
-{
-    return this->findRoom(coord.x, coord.y, coord.z);
-}
-
 Race * Mud::findRace(int vnum)
 {
     RaceMap::iterator iterator = mudRaces.find(vnum);
@@ -629,7 +612,7 @@ bool Mud::runMud()
         FD_ZERO(&exc_set);
 
         // Add our control socket, needed for new connections.
-        FD_SET(_servSocket, &in_set);
+        CMacroWrapper::FdSet(_servSocket, &in_set);
 
         // Set the max file descriptor to the server socket.
         _maxDesc = _servSocket;
@@ -648,7 +631,7 @@ bool Mud::runMud()
         }
 
         // Check if there are new connections on control port.
-        if (FD_ISSET(_servSocket, &in_set))
+        if (CMacroWrapper::FdIsSet(_servSocket, &in_set))
         {
             this->processNewConnection();
         }
@@ -863,13 +846,13 @@ void Mud::setupDescriptor(Player * player)
         // Don't take input if they are closing down.
         if (!player->closing)
         {
-            FD_SET(player->getSocket(), &in_set);
-            FD_SET(player->getSocket(), &exc_set);
+            CMacroWrapper::FdSet(player->getSocket(), &in_set);
+            CMacroWrapper::FdSet(player->getSocket(), &exc_set);
         }
         // We are only interested in writing to sockets we have something for.
         if (player->hasPendingOutput())
         {
-            FD_SET(player->getSocket(), &out_set);
+            CMacroWrapper::FdSet(player->getSocket(), &out_set);
         }
     }
 }
@@ -879,7 +862,7 @@ void Mud::processDescriptor(Player * player)
     // Handle exceptions.
     if (player->checkConnection())
     {
-        if (FD_ISSET(player->getSocket(), &exc_set))
+        if (CMacroWrapper::FdIsSet(player->getSocket(), &exc_set))
         {
             player->processException();
         }
@@ -887,7 +870,7 @@ void Mud::processDescriptor(Player * player)
     // Look for ones we can read from, provided they aren't closed.
     if (player->checkConnection())
     {
-        if (FD_ISSET(player->getSocket(), &in_set))
+        if (CMacroWrapper::FdIsSet(player->getSocket(), &in_set))
         {
             player->processRead();
         }
@@ -895,7 +878,7 @@ void Mud::processDescriptor(Player * player)
     // Look for ones we can write to, provided they aren't closed.
     if (player->checkConnection())
     {
-        if (FD_ISSET(player->getSocket(), &out_set))
+        if (CMacroWrapper::FdIsSet(player->getSocket(), &out_set))
         {
             player->processWrite();
         }

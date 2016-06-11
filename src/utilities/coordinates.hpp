@@ -29,43 +29,109 @@ extern "C"
 #include "lualib.h"
 }
 
+#include "../luabridge/LuaBridge.h"
+
 /// Used to create and manage a tridimensional coordinates.
+template<typename CoordType>
 class Coordinates
 {
     public:
         /// Coordinate on the x axis.
-        int x;
+        CoordType x;
         /// Coordinate on the y axis.
-        int y;
+        CoordType y;
         /// Coordinate on the z axis.
-        int z;
+        CoordType z;
 
-        Coordinates();
+        Coordinates() :
+            x(),
+            y(),
+            z()
+        {
+            // Nothing to do.
+        }
 
         /// @brief It the constructor, needed to create a set of Coordinates.
         /// @param _x Coordinate on width axis.
         /// @param _y Coordinate on heigth axis.
         /// @param _z Coordinate on altitude axis.
-        Coordinates(const int _x, const int _y, const int _z);
-
-        /// @brief Add to the current Coordinates the right operand.
-        /// @param right The right parameter.
-        /// @return The new Coordinates.
-        Coordinates operator+(const Coordinates & right) const;
-
-        /// @brief Define operator <, less than.
-        /// @param right The right parameter.
-        /// @return True if left Coordinates are less than right Coordinates.
-        bool operator<(const Coordinates &right) const;
+        Coordinates(const CoordType & _x, const CoordType & _y, const CoordType & _z) :
+            x(_x),
+            y(_y),
+            z(_z)
+        {
+            // Nothing to do.
+        }
 
         /// @brief Define operator ==, equal.
         /// @param right The right parameter.
         /// @return True if left Coordinates are equal to the right Coordinates.
-        bool operator==(const Coordinates &right) const;
+        bool operator==(const Coordinates<CoordType> & right) const
+        {
+            if (x != right.x)
+            {
+                return false;
+            }
+            if (y != right.y)
+            {
+                return false;
+            }
+            if (z != right.z)
+            {
+                return false;
+            }
+            return true;
+        }
 
         /// @brief Function used to register inside the lua environment the class.
         /// @param L The lua environment.
-        static void luaRegister(lua_State * L);
+        static void luaRegister(lua_State * L)
+        {
+            luabridge::getGlobalNamespace(L) //
+            .beginClass<Coordinates<CoordType>>("Coordinates") //
+            .addData("x", &Coordinates<CoordType>::x, false) //
+            .addData("y", &Coordinates<CoordType>::y, false) //
+            .addData("z", &Coordinates<CoordType>::z, false) //
+            .endClass();
+        }
 };
+
+/// @brief Define operator <, less than.
+/// @param right The right parameter.
+/// @return True if left Coordinates are less than right Coordinates.
+template<typename CoordType, typename OtherCoordType>
+bool operator<(const Coordinates<CoordType> & left, const Coordinates<OtherCoordType> & right)
+{
+    if (static_cast<long int>(left.x) < static_cast<long int>(right.x))
+    {
+        return true;
+    }
+    if (static_cast<long int>(left.y) < static_cast<long int>(right.y))
+    {
+        return true;
+    }
+    if (static_cast<long int>(left.z) < static_cast<long int>(right.z))
+    {
+        return true;
+    }
+    return false;
+}
+
+/// @brief Add to the current Coordinates the right operand.
+/// @param right The right parameter.
+/// @return The new Coordinates.
+template<typename CoordType, typename OtherCoordType>
+Coordinates<CoordType> operator+(const Coordinates<CoordType> & left, const Coordinates<OtherCoordType> & right)
+{
+    if (left < right)
+    {
+        throw std::runtime_error("Wrong type of coordinates.");
+    }
+    Coordinates<CoordType> coord;
+    coord.x = static_cast<CoordType>(static_cast<long int>(left.x) + static_cast<long int>(right.x));
+    coord.y = static_cast<CoordType>(static_cast<long int>(left.y) + static_cast<long int>(right.y));
+    coord.z = static_cast<CoordType>(static_cast<long int>(left.z) + static_cast<long int>(right.z));
+    return coord;
+}
 
 #endif

@@ -33,17 +33,17 @@
 using namespace std;
 
 Room::Room() :
-        vnum(),
-        area(),
-        continent(),
-        coord(),
-        terrain(),
-        name(),
-        description(),
-        exits(),
-        items(),
-        characters(),
-        flags()
+    vnum(),
+    area(),
+    continent(),
+    coord(),
+    terrain(),
+    name(),
+    description(),
+    exits(),
+    items(),
+    characters(),
+    flags()
 {
     // Nothing to do.
 }
@@ -71,9 +71,9 @@ bool Room::check(bool complete)
         assert((area != nullptr) || (continent != nullptr));
         assert(!((area != nullptr) && (continent != nullptr)));
     }
-    assert((coord.x >= -100) && (coord.x <= 100));
-    assert((coord.y >= -100) && (coord.y <= 100));
-    assert((coord.z >= -100) && (coord.z <= 100));
+    assert(coord.x <= 100);
+    assert(coord.y <= 100);
+    assert(coord.z <= 100);
     assert(!terrain.empty());
     assert(!name.empty());
     assert(!description.empty());
@@ -524,7 +524,8 @@ string Room::getLook(Character * exception)
         // If there are more of this item, show the counter.
         if (it.second > 1)
         {
-            output += Formatter::cyan() + it.first->getNameCapital() + Formatter::reset() + " are here.[" + ToString(it.second) + "]\n";
+            output += Formatter::cyan() + it.first->getNameCapital() + Formatter::reset() + " are here.["
+                + ToString(it.second) + "]\n";
         }
         else
         {
@@ -583,7 +584,11 @@ void Room::connectExits()
 {
     for (auto iterator : Mud::instance().mudDirections)
     {
-        Coordinates nearCoord = GetCoordinates(iterator.second);
+        Coordinates<int> nearCoord = GetCoordinates(iterator.second);
+        if (coord < nearCoord)
+        {
+            continue;
+        }
         if (area != nullptr)
         {
             Room * near = area->getRoom(coord + nearCoord);
@@ -638,7 +643,7 @@ void Room::luaRegister(lua_State * L)
     .endClass();
 }
 
-bool CreateRoom(Coordinates coord, Room * source_room)
+bool CreateRoom(Coordinates<unsigned int> coord, Room * source_room)
 {
     Room * new_room = new Room();
     pair<string, string> details;
@@ -700,16 +705,17 @@ bool CreateRoom(Coordinates coord, Room * source_room)
 
 void ConnectRoom(Room * room)
 {
-    Coordinates poss_coord, coord = room->coord;
     vector<string> arguments;
-
     Logger::log(LogLevel::Info, "[ConnectRoom] Connecting the room to near rooms...");
     for (auto iterator : Mud::instance().mudDirections)
     {
-        // Get the coordinates.
-        poss_coord = GetCoordinates(iterator.second);
+        Coordinates<int> nearCoord = GetCoordinates(iterator.second);
+        if (room->coord < nearCoord)
+        {
+            continue;
+        }
         // Get the room at the given coordinates.
-        Room * near = room->area->getRoom(coord + poss_coord);
+        Room * near = room->area->getRoom(room->coord + nearCoord);
         if (near != nullptr)
         {
             // Create the two exits.

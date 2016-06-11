@@ -184,7 +184,8 @@ void DoWho(Character * character, std::istream & sArgs)
         { iterator->getName(), location });
     }
     output += table.getTable();
-    output += "# Total " + Formatter::yellow() + "Players" + Formatter::reset() + " :" + ToString(table.getNumRows()) + "\n";
+    output += "# Total " + Formatter::yellow() + "Players" + Formatter::reset() + " :" + ToString(table.getNumRows())
+        + "\n";
     character->sendMsg(output);
 }
 
@@ -409,11 +410,16 @@ void DoPrompt(Character * character, std::istream & sArgs)
         player->sendMsg("\n");
         player->sendMsg("You can use the following shortcuts in you prompt:\n");
         player->sendMsg("    " + Formatter::italic() + "&n" + Formatter::reset() + " - Replace with player name.\n");
-        player->sendMsg("    " + Formatter::italic() + "&N" + Formatter::reset() + " - Replace with player name capitalized.\n");
-        player->sendMsg("    " + Formatter::italic() + "&h" + Formatter::reset() + " - Replace with player current health.\n");
-        player->sendMsg("    " + Formatter::italic() + "&H" + Formatter::reset() + " - Replace with player max health.\n");
-        player->sendMsg("    " + Formatter::italic() + "&s" + Formatter::reset() + " - Replace with player current stamina.\n");
-        player->sendMsg("    " + Formatter::italic() + "&S" + Formatter::reset() + " - Replace with player max stamina.\n");
+        player->sendMsg(
+            "    " + Formatter::italic() + "&N" + Formatter::reset() + " - Replace with player name capitalized.\n");
+        player->sendMsg(
+            "    " + Formatter::italic() + "&h" + Formatter::reset() + " - Replace with player current health.\n");
+        player->sendMsg(
+            "    " + Formatter::italic() + "&H" + Formatter::reset() + " - Replace with player max health.\n");
+        player->sendMsg(
+            "    " + Formatter::italic() + "&s" + Formatter::reset() + " - Replace with player current stamina.\n");
+        player->sendMsg(
+            "    " + Formatter::italic() + "&S" + Formatter::reset() + " - Replace with player max stamina.\n");
         return;
     }
     player->prompt = prompt;
@@ -434,7 +440,8 @@ void DoTime(Character * character, std::istream & sArgs)
     }
     else if (MudUpdater::instance().getDayPhase() == DayPhase::Dusk)
     {
-        character->sendMsg(Formatter::cyan() + "The sun is setting, the shadows begin to prevail.\n" + Formatter::reset());
+        character->sendMsg(
+            Formatter::cyan() + "The sun is setting, the shadows begin to prevail.\n" + Formatter::reset());
     }
     else if (MudUpdater::instance().getDayPhase() == DayPhase::Night)
     {
@@ -519,19 +526,16 @@ void DoStatistics(Character * character, std::istream & sArgs)
     msg += Formatter::magenta() + "Gender: " + Formatter::reset() + GetGenderTypeName(player->gender) + "\n";
     msg += Formatter::magenta() + "Affiliation: " + Formatter::reset() + player->faction->name + "\n";
     msg += Formatter::magenta() + "Experience: " + Formatter::reset() + ToString(player->experience) + " px\n";
-    msg += Formatter::magenta() + "Str " + Formatter::reset() + ToString(player->strength);
-    msg += "(" + ToString(player->effects.getStrMod()) + ") | ";
-    msg += Formatter::magenta() + "Agi " + Formatter::reset() + ToString(player->agility);
-    msg += "(" + ToString(player->effects.getAgiMod()) + ") | ";
-    msg += Formatter::magenta() + "Per " + Formatter::reset() + ToString(player->perception);
-    msg += "(" + ToString(player->effects.getPerMod()) + ") | ";
-    msg += Formatter::magenta() + "Con " + Formatter::reset() + ToString(player->constitution);
-    msg += "(" + ToString(player->effects.getConMod()) + ") | ";
-    msg += Formatter::magenta() + "Int " + Formatter::reset() + ToString(player->intelligence);
-    msg += "(" + ToString(player->effects.getIntMod()) + ") \n";
-    msg += Formatter::magenta() + "Health " + Formatter::reset() + ToString(player->health) + "/" + ToString(player->getMaxHealth());
+    msg += Formatter::magenta() + "Str " + Formatter::reset() + ToString(player->getStrength());
+    msg += Formatter::magenta() + "Agi " + Formatter::reset() + ToString(player->getAgility());
+    msg += Formatter::magenta() + "Per " + Formatter::reset() + ToString(player->getPerception());
+    msg += Formatter::magenta() + "Con " + Formatter::reset() + ToString(player->getConstitution());
+    msg += Formatter::magenta() + "Int " + Formatter::reset() + ToString(player->getIntelligence());
+    msg += Formatter::magenta() + "Health " + Formatter::reset() + ToString(player->health) + "/"
+        + ToString(player->getMaxHealth());
     msg += "(" + ToString(player->effects.getHealthMod()) + ") ";
-    msg += Formatter::magenta() + "Stamina " + Formatter::reset() + ToString(player->stamina) + "/" + ToString(player->getMaxStamina());
+    msg += Formatter::magenta() + "Stamina " + Formatter::reset() + ToString(player->stamina) + "/"
+        + ToString(player->getMaxStamina());
     msg += "(" + ToString(player->effects.getHealthMod()) + ")\n";
     msg += Formatter::magenta() + "Armor Class " + Formatter::reset() + ToString(player->getArmorClass()) + "\n";
     msg += "You " + player->getHunger();
@@ -574,7 +578,8 @@ void DoSkills(Character * character, std::istream & sArgs)
     // Check no more input.
     NoMore(character, sArgs);
 
-    player->sendMsg("     ##    " + Formatter::yellow() + "LvL" + Formatter::green() + "    Skill" + Formatter::reset() + "\n");
+    player->sendMsg(
+        "     ##    " + Formatter::yellow() + "LvL" + Formatter::green() + "    Skill" + Formatter::reset() + "\n");
     for (auto iterator : player->skills)
     {
         Skill * skill = Mud::instance().findSkill(iterator.first);

@@ -16,88 +16,9 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+/// @brief Define operator <, less than.
+/// @param right The right parameter.
+/// @return True if left Coordinates are less than right Coordinates.
+
 #include "coordinates.hpp"
-#include "../luabridge/LuaBridge.h"
-#include "../lua/lua_script.hpp"
 
-Coordinates::Coordinates() :
-        x(),
-        y(),
-        z()
-{
-    // Nothing to do.
-}
-
-Coordinates::Coordinates(const int _x, const int _y, const int _z) :
-        x(_x),
-        y(_y),
-        z(_z)
-{
-    // Nothing to do.
-}
-
-Coordinates Coordinates::operator+(const Coordinates & right) const
-{
-    Coordinates coord;
-    coord.x = x + right.x;
-    coord.y = y + right.y;
-    coord.z = z + right.z;
-    return coord;
-}
-
-bool Coordinates::operator<(const Coordinates &right) const
-{
-    if (x < right.x)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-    if (y < right.y)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-    if (z < right.z)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-
-    return true;
-}
-
-bool Coordinates::operator==(const Coordinates &right) const
-{
-    if (x != right.x)
-    {
-        return false;
-    }
-    if (y != right.y)
-    {
-        return false;
-    }
-    if (z != right.z)
-    {
-        return false;
-    }
-    return true;
-}
-
-void Coordinates::luaRegister(lua_State * L)
-{
-    luabridge::getGlobalNamespace(L) //
-    .beginClass<Coordinates>("Coordinates") //
-    .addData("x", &Coordinates::x, false) //
-    .addData("y", &Coordinates::y, false) //
-    .addData("z", &Coordinates::z, false) //
-    .endClass();
-}

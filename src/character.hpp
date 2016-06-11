@@ -50,33 +50,33 @@ class Character
         /// Character gender.
         GenderType gender;
         /// Character weight.
-        int weight;
+        unsigned int weight;
         /// Character level.
-        int level;
+        unsigned int level;
         /// Character flags.
-        int flags;
+        unsigned int flags;
         /// The character race.
         Race * race;
         /// The character faction.
         Faction * faction;
         /// Character health value.
-        int health;
+        unsigned int health;
         /// Character stamina value.
-        int stamina;
+        unsigned int stamina;
         /// Character level of hunger
-        int hunger;
+        unsigned int hunger;
         /// Character level of thirst.
-        int thirst;
+        unsigned int thirst;
         /// Character strength value.
-        int strength;
+        unsigned int strength;
         /// Character agility value.
-        int agility;
+        unsigned int agility;
         /// Character perception value.
-        int perception;
+        unsigned int perception;
         /// Character constitution value.
-        int constitution;
+        unsigned int constitution;
         /// Character intelligence value.
-        int intelligence;
+        unsigned int intelligence;
         /// The current room the character is in.
         Room * room;
         /// Character's inventory.
@@ -146,20 +146,30 @@ class Character
         /// @return The character pronoun.
         std::string getPossessivePronoun();
 
+        unsigned int getStrength(bool withModifier = true);
+
+        unsigned int getAgility(bool withModifier = true);
+
+        unsigned int getPerception(bool withModifier = true);
+
+        unsigned int getConstitution(bool withModifier = true);
+
+        unsigned int getIntelligence(bool withModifier = true);
+
         /// @brief Return the max health value.
         /// @return The maximum health for this character.
-        int getMaxHealth();
+        unsigned int getMaxHealth(bool withModifier = true);
 
         /// @brief Return the max stamina value.
         /// @return The maximum stamina for this character.
-        int getMaxStamina();
+        unsigned int getMaxStamina(bool withModifier = true);
 
         /// @brief Manage the recovering of both health and stamina.
         void updateResources();
 
         /// @brief Evaluate the maximum distance at which the character can still see.
         /// @return The maximum radius of view.
-        int getViewDistance();
+        unsigned int getViewDistance();
 
         /// @brief Provides a pointer to the Action object associated to this character.
         /// @return A pointer to Action.
@@ -261,11 +271,11 @@ class Character
 
         /// @brief The total carrying weight for this character.
         /// @return The total carrying weight.
-        int getCarryingWeight();
+        unsigned int getCarryingWeight();
 
         /// @brief The maximum carrying weight for this character.
         /// @return The maximum carrying weight.
-        int getMaxCarryingWeight();
+        unsigned int getMaxCarryingWeight();
 
         /// @brief Equip the passed item.
         /// @param item The item to equip.
@@ -364,7 +374,7 @@ class Character
 
         /// @brief Operator used to order the character based on their name.
         bool operator<(const class Character & source) const
-            {
+        {
             return name < source.name;
         }
 
@@ -377,10 +387,7 @@ class Character
         /// @param first The first unpacked argument.
         /// @param args  Packed arguments.
         template<typename ... Args>
-        void sendMsg(
-            const std::string & msg,
-            const std::string & first,
-            const Args & ... args)
+        void sendMsg(const std::string & msg, const std::string & first, const Args & ... args)
         {
             std::string::size_type pos = msg.find("%s");
             if (pos == std::string::npos)

@@ -34,6 +34,7 @@
 #include <cassert>
 #include <sstream>
 #include <type_traits>
+#include <random>
 
 /// 8 bits
 typedef unsigned char Byte;
@@ -73,17 +74,17 @@ struct CommandHelp
 /// @param flag  The flag to search.
 /// @return <b>True</b> if the value contain the flag, <br> <b>False</b> otherwise.
 template<typename Enum>
-bool HasFlag(int & flags, Enum flag)
+bool HasFlag(unsigned int & flags, Enum flag)
 {
     static_assert(std::is_enum<Enum>::value, "template parameter is not an enum type");
-    return (flags & static_cast<int>(flag)) != 0;
+    return (flags & static_cast<unsigned int>(flag)) != 0;
 }
 
 /// @brief Set the passed flag to the value.
 /// @param flags The destination value.
 /// @param flag  The flag to set.
 template<typename Enum>
-void SetFlag(int & flags, Enum flag)
+void SetFlag(unsigned int & flags, Enum flag)
 {
     static_assert(std::is_enum<Enum>::value, "template parameter is not an enum type");
     flags |= static_cast<unsigned int>(flag);
@@ -93,7 +94,7 @@ void SetFlag(int & flags, Enum flag)
 /// @param flags The destination value.
 /// @param flag  The flag to clear.
 template<typename Enum>
-void ClearFlag(int & flags, Enum flag)
+void ClearFlag(unsigned int & flags, Enum flag)
 {
     static_assert(std::is_enum<Enum>::value, "template parameter is not an enum type");
     flags &= ~static_cast<unsigned int>(flag);
@@ -140,6 +141,43 @@ std::string ToCapitals(const std::string & source);
 /// @return The splitted string.
 std::vector<std::string> SplitString(const std::string & source, const std::string & delimiter);
 
+template<typename T, typename std::enable_if<!std::is_integral<T>::value>::type>
+std::vector<T> SplitString(const std::string & source, const std::string & delimiter)
+{
+    std::vector<T> result;
+    size_t pos = 0;
+    std::string tmp = source;
+    while ((pos = tmp.find(delimiter)) != std::string::npos)
+    {
+        result.push_back(tmp.substr(0, pos));
+        tmp.erase(0, pos + delimiter.length());
+    }
+    if (!tmp.empty())
+    {
+        result.push_back(tmp);
+    }
+    return result;
+}
+
+template<typename T, typename std::enable_if<std::is_integral<T>::value>::type>
+std::vector<T> SplitString(const std::string & source, const std::string & delimiter)
+{
+    std::vector<T> result;
+    size_t pos = 0;
+    std::string tmp = source;
+    while ((pos = tmp.find(delimiter)) != std::string::npos)
+    {
+        char * pEnd;
+        result.push_back(static_cast<T>(strtol(tmp.substr(0, pos).c_str(), &pEnd, 10)));
+        tmp.erase(0, pos + delimiter.length());
+    }
+    if (!tmp.empty())
+    {
+        result.push_back(tmp);
+    }
+    return result;
+}
+
 /// @brief Get all the words in the source string.
 /// @param source The source string.
 /// @return A vector containing the words of the source string.
@@ -154,6 +192,26 @@ std::vector<int> GetIntVect(const std::string & source);
 /// @param source The source string.
 /// @return A vector containing the integers of the source string.
 std::vector<Byte> GetByteVect(const std::string & source);
+
+template<typename ValueType>
+std::vector<ValueType> GetNumberVect(const std::string & source)
+{
+    static_assert((
+            std::is_same<ValueType, bool>::value ||
+            std::is_same<ValueType, int>::value ||
+            std::is_same<ValueType, long int>::value ||
+            std::is_same<ValueType, unsigned int>::value ||
+            std::is_same<ValueType, long unsigned int>::value ||
+            std::is_same<ValueType,double>::value), "template parameter is of the wrong type");
+    std::stringstream line(source);
+    std::vector<ValueType> output_vector;
+    ValueType buffer;
+    while (line >> buffer)
+    {
+        output_vector.push_back(buffer);
+    }
+    return output_vector;
+}
 
 /// @brief Return the current timestamp as "Hours:Minute".
 /// @return The current timestamp.
@@ -178,6 +236,23 @@ std::string BoolToString(const bool & value);
 /// @param source The string to turn into an integer.
 /// @return The resulting integer.
 int ToInt(const std::string & source);
+
+/// @brief Transform a string into a numeric value.
+/// @param source The string to turn into a number.
+/// @return The number.
+template<typename ValueType>
+ValueType ToNumber(const std::string & source)
+{
+    static_assert((
+            std::is_same<ValueType, bool>::value ||
+            std::is_same<ValueType, int>::value ||
+            std::is_same<ValueType, long int>::value ||
+            std::is_same<ValueType, unsigned int>::value ||
+            std::is_same<ValueType, long unsigned int>::value ||
+            std::is_same<ValueType,double>::value), "template parameter is of the wrong type");
+    char * pEnd;
+    return static_cast<ValueType>(strtol(source.c_str(), &pEnd, 10));
+}
 
 /// @brief Transform a numeric value into a string.
 /// @param value The value to turn into a string.
@@ -265,7 +340,7 @@ bool IsNumber(const std::string & source);
 /// @brief Return the modifier of the given ability.
 /// @param value The total ability value.
 /// @return The ability modifier.
-unsigned int GetAbilityModifier(const int & value);
+unsigned int GetAbilityModifier(const unsigned int & value);
 
 /// @brief Given a player target, eg.: 2.rat.<br>Extract the number <b>2</b>.
 /// @param source The source string.

@@ -608,7 +608,7 @@ struct ContainerFunc
         /// The maximum weight which this container can carry.
         unsigned int maxWeight;
         /// The flags of the container.
-        int flags;
+        unsigned int flags;
         /// The vnum of the key which opens this container.
         unsigned int keyVnum;
         /// The lockpicking difficulty.
@@ -638,7 +638,7 @@ struct LiqContainerFunc
         /// The maximum weight which this container can carry.
         unsigned int maxWeight;
         /// The flags of the container.
-        int flags;
+        unsigned int flags;
 };
 
 // //////////////////////////////////////////////////////////////////
@@ -708,7 +708,7 @@ struct NodeFunc
         /// Type of node.
         NodeType type;
         /// The vnum of the item provided during the extraction.
-        int provides;
+        unsigned int provides;
 };
 
 // //////////////////////////////////////////////////////////////////
@@ -796,7 +796,7 @@ struct FoodFunc
         /// Hours of feeding.
         unsigned int hours;
         /// The food flags.
-        int flags;
+        unsigned int flags;
 };
 
 // //////////////////////////////////////////////////////////////////
@@ -885,7 +885,7 @@ Direction GetDirection(std::string direction);
 /// @brief Given an enum of a possible direction, the function return the changing in terms of coordinates.
 /// @param direction The enum of the direction.
 /// @return The coordinates to that direction.
-Coordinates GetCoordinates(Direction direction);
+Coordinates<int> GetCoordinates(Direction direction);
 
 /// @brief Check if the passed flag is valid.
 /// @param flag The flag to check.
@@ -939,19 +939,19 @@ std::string GetTelnetCharName(TelnetChar c);
 /// @{
 
 /// Return a list of string containg the Model flags contained inside the value.
-std::string GetModelFlagString(int flags);
+std::string GetModelFlagString(unsigned int flags);
 /// Return a list of string containg the Room flags contained inside the value.
-std::string GetRoomFlagString(int flags);
+std::string GetRoomFlagString(unsigned int flags);
 /// Return a list of string containg the Character flags contained inside the value.
-std::string GetCharacterFlagString(int flags);
+std::string GetCharacterFlagString(unsigned int flags);
 /// Return a list of string containg the Exit flags contained inside the value.
-std::string GetExitFlagString(int flags);
+std::string GetExitFlagString(unsigned int flags);
 /// Return a list of string containg the Container flags contained inside the value.
-std::string GetContainerFlagString(int flags);
+std::string GetContainerFlagString(unsigned int flags);
 /// Return a list of string containg the Container of Liquids flags contained inside the value.
-std::string GetLiqContainerFlagString(int flags);
+std::string GetLiqContainerFlagString(unsigned int flags);
 /// Return a list of string containg the Food flags contained inside the value.
-std::string GetFoodFlagString(int flags);
+std::string GetFoodFlagString(unsigned int flags);
 ///@}
 
 #endif

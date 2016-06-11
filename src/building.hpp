@@ -32,9 +32,9 @@ class Building
         /// The name of the building.
         std::string name;
         /// The difficulty of the building.
-        int difficulty;
+        unsigned int difficulty;
         /// The time required to perform the building.
-        int time;
+        unsigned int time;
         /// A flag which indicates if the maker can be assisted by someone.
         bool assisted;
         /// The list of needed type of tools.
@@ -66,6 +66,20 @@ class Building
         /// @brief Return the name of the building with the first letter capitalized.
         /// @return The name of the building capitalized.
         std::string getNameCapital();
+
+        /// @brief Given a source string, this function parse the string
+        ///         and sets the tool.
+        /// @param source Contains the list of tools.
+        /// @return <b>True</b> if the operation succeeded,<br>
+        ///         <b>False</b> otherwise.
+        bool setTool(const std::string & source);
+
+        /// @brief Given a source string, this function parse the string
+        ///         and sets the tool.
+        /// @param source Contains the list of tools.
+        /// @return <b>True</b> if the operation succeeded,<br>
+        ///         <b>False</b> otherwise.
+        bool setIngredient(const std::string & source);
 };
 
 /// Building map handler.

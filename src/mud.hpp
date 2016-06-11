@@ -254,10 +254,6 @@ class Mud
         Area * findArea(int vnum);
         /// Find a room given its vnum.
         Room * findRoom(int vnum);
-        /// Find a room given its coordinates, separately.
-        Room * findRoom(int x, int y, int z);
-        /// Find a room given its coordinates, as a coordinates structure.
-        Room * findRoom(Coordinates coord);
         /// Find a race given its vnum.
         Race * findRace(int vnum);
         /// Find a race given its name.

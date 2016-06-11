@@ -227,13 +227,14 @@ void DoTake(Character * character, std::istream & sArgs)
         }
 
         character->sendMsg(
-            "You take out " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + " from " + Formatter::cyan()
-                + ToLower(container->getName()) + Formatter::reset() + ".\n");
+            "You take out " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + " from "
+                + Formatter::cyan() + ToLower(container->getName()) + Formatter::reset() + ".\n");
 
         // Check if the player is invisible.
         character->room->sendToAll(
-            character->getNameCapital() + " takes out " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset()
-                + " from " + Formatter::cyan() + ToLower(container->getName()) + Formatter::reset() + ".\n", character);
+            character->getNameCapital() + " takes out " + Formatter::cyan() + ToLower(item->getName())
+                + Formatter::reset() + " from " + Formatter::cyan() + ToLower(container->getName()) + Formatter::reset()
+                + ".\n", character);
     }
 }
 
@@ -302,8 +303,8 @@ void DoDrop(Character * character, std::istream & sArgs)
     // Active message.
     character->sendMsg("You drop " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n");
     character->room->sendToAll(
-        character->getNameCapital() + " has dropped " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n",
-        character);
+        character->getNameCapital() + " has dropped " + Formatter::cyan() + ToLower(item->getName())
+            + Formatter::reset() + ".\n", character);
 }
 
 void DoGive(Character * character, std::istream & sArgs)
@@ -351,7 +352,8 @@ void DoGive(Character * character, std::istream & sArgs)
         return; // Skip the rest of the function.
     }
     // Check if the character is invisible.
-    std::string viewdName = (HasFlag(character->flags, CharacterFlag::Invisible)) ? "Someone" : character->getNameCapital();
+    std::string viewdName =
+        (HasFlag(character->flags, CharacterFlag::Invisible)) ? "Someone" : character->getNameCapital();
     // Update the item iside the Database.
     SQLiteDbms::instance().beginTransaction();
     if (item->updateOnDB())
@@ -364,9 +366,11 @@ void DoGive(Character * character, std::istream & sArgs)
     }
     // GIVE Message.
     character->sendMsg(
-        "You give " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + " to " + target->getName() + ".\n");
+        "You give " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + " to " + target->getName()
+            + ".\n");
     // RECEIVE Message.
-    target->sendMsg(viewdName + " gives you " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n\n");
+    target->sendMsg(
+        viewdName + " gives you " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n\n");
     // Check if the character is invisible.
     std::string broadcast;
     broadcast += character->getNameCapital() + " gives ";
@@ -427,7 +431,8 @@ void DoEquipments(Character * character, std::istream & sArgs)
     }
     else
     {
-        output += "    " + Formatter::yellow() + "Right Hand" + Formatter::reset() + " : " + Formatter::gray() + "Nothing";
+        output += "    " + Formatter::yellow() + "Right Hand" + Formatter::reset() + " : " + Formatter::gray()
+            + "Nothing";
     }
     output += Formatter::reset() + ".\n";
 
@@ -532,7 +537,8 @@ void DoWield(Character * character, std::istream & sArgs)
     character->sendMsg(message);
     // Notify to room.
     character->room->sendToAll(
-        character->getNameCapital() + " wields " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n", character);
+        character->getNameCapital() + " wields " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset()
+            + ".\n", character);
 }
 
 void DoWear(Character * character, std::istream & sArgs)
@@ -630,7 +636,8 @@ void DoWear(Character * character, std::istream & sArgs)
     // Notify to character.
     character->sendMsg("You wear " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n");
     character->room->sendToAll(
-        character->getNameCapital() + " wears " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n", character);
+        character->getNameCapital() + " wears " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset()
+            + ".\n", character);
 }
 
 void DoRemove(Character * character, std::istream & sArgs)
@@ -701,7 +708,8 @@ void DoRemove(Character * character, std::istream & sArgs)
     character->sendMsg("You remove " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n");
     // Check if the player is invisible.
     character->room->sendToAll(
-        character->getNameCapital() + " removes " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n", character);
+        character->getNameCapital() + " removes " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset()
+            + ".\n", character);
 }
 
 void DoInventory(Character * character, std::istream & sArgs)
@@ -725,8 +733,8 @@ void DoInventory(Character * character, std::istream & sArgs)
     std::string carried = ToString(character->getCarryingWeight());
     std::string maximum = ToString(character->getMaxCarryingWeight());
     character->sendMsg(
-        Formatter::yellow() + "\nTotal carrying weight: " + Formatter::reset() + carried + " of " + maximum + Formatter::reset()
-            + " " + mud_measure + ".\n");
+        Formatter::yellow() + "\nTotal carrying weight: " + Formatter::reset() + carried + " of " + maximum
+            + Formatter::reset() + " " + mud_measure + ".\n");
 }
 
 void DoOrganize(Character * character, std::istream & sArgs)
@@ -1054,8 +1062,8 @@ void DoPut(Character * character, std::istream & sArgs)
 
     // Check if the player is invisible.
     character->room->sendToAll(
-        character->getNameCapital() + " puts " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + " inside "
-            + Formatter::cyan() + ToLower(container->getName()) + Formatter::reset() + ".\n", character);
+        character->getNameCapital() + " puts " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset()
+            + " inside " + Formatter::cyan() + ToLower(container->getName()) + Formatter::reset() + ".\n", character);
 }
 
 void DoDrink(Character * character, std::istream & sArgs)
@@ -1122,7 +1130,8 @@ void DoDrink(Character * character, std::istream & sArgs)
 
     character->sendMsg("You drink some " + liquid->getName() + " from " + container->getName() + ".\n");
     character->room->sendToAll(
-        character->getNameCapital() + " drinks some " + liquid->getName() + " from " + container->getName() + ".\n", character);
+        character->getNameCapital() + " drinks some " + liquid->getName() + " from " + container->getName() + ".\n",
+        character);
 }
 
 void DoFill(Character * character, std::istream & sArgs)
@@ -1200,10 +1209,10 @@ void DoFill(Character * character, std::istream & sArgs)
     }
 
     // Fill the container from the source.
-    int atDisposal = source->contentLiq.second;
-    int quantity = container->getFreeSpace();
+    unsigned int atDisposal = source->contentLiq.second;
+    unsigned int quantity = container->getFreeSpace();
 
-    int sourceFlags = source->model->getLiqContainerFunc().flags;
+    unsigned int sourceFlags = source->model->getLiqContainerFunc().flags;
     if (!HasFlag(sourceFlags, LiqContainerFlag::Endless))
     {
         if (atDisposal < quantity)
@@ -1232,7 +1241,8 @@ void DoFill(Character * character, std::istream & sArgs)
 
     // Check if the character is invisible.
     character->room->sendToAll(
-        character->getNameCapital() + " fills " + container->getName() + " from " + sourLiquid->getName() + ".\n", character);
+        character->getNameCapital() + " fills " + container->getName() + " from " + sourLiquid->getName() + ".\n",
+        character);
 }
 
 void DoPour(Character * character, std::istream & sArgs)
@@ -1310,10 +1320,10 @@ void DoPour(Character * character, std::istream & sArgs)
     }
 
     // Fill the container from the source.
-    int atDisposal = source->contentLiq.second;
-    int quantity = container->getFreeSpace();
+    unsigned int atDisposal = source->contentLiq.second;
+    unsigned int quantity = container->getFreeSpace();
 
-    int sourceFlags = source->model->getLiqContainerFunc().flags;
+    unsigned int sourceFlags = source->model->getLiqContainerFunc().flags;
     if (!HasFlag(sourceFlags, LiqContainerFlag::Endless))
     {
         if (atDisposal < quantity)

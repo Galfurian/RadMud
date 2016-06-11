@@ -2,13 +2,7 @@
 # Check CMAKE Version.
 cmake_minimum_required(VERSION 2.8.4 FATAL_ERROR)
 
-option(USE_CLANG       "build application with clang" OFF)
 option(FLAG_EVERYTHING "set a higher warning level" OFF)
-
-if(USE_CLANG)
-    SET (CMAKE_C_COMPILER   "clang")
-	SET (CMAKE_CXX_COMPILER "clang++")
-endif(USE_CLANG)
 
 #################################################
 # Create the project.
@@ -27,17 +21,18 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic-errors")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wconversion")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmessage-length=0")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
 
 if(FLAG_EVERYTHING)
-	if(USE_CLANG)
+	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++98-compat")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++98-compat-pedantic")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-global-constructors")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-exit-time-destructors")
-	else(USE_CLANG)
+	elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcast-align")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcast-qual")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wchar-subscripts")
@@ -66,8 +61,10 @@ if(FLAG_EVERYTHING)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wreturn-type")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wsequence-point")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wshadow")
+		#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Winline")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wredundant-decls")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wsign-compare")
-		#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wsign-conversion")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wsign-conversion")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wstack-protector")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wstrict-aliasing")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wstrict-aliasing=2")
@@ -88,7 +85,7 @@ if(FLAG_EVERYTHING)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wvolatile-register-var")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wwrite-strings")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wuninitialized")
-	endif(USE_CLANG)
+	endif()
 endif(FLAG_EVERYTHING)
 
 #################################################
@@ -146,14 +143,16 @@ set(PROJECT_SRC
     ./src/updater.cpp
     ./src/utilities/coordinates.cpp
     ./src/utilities/table.cpp
+    ./src/utilities/CMacroWrapper.cpp
     ./src/utils.cpp
     ./src/formatter.cpp
     ./src/combat.cpp
     ./src/logger.cpp
     ./src/protocol.cpp
+    ./src/luabridge/detail/LuaHelpers.cpp
 )
 
-find_package(Lua51 REQUIRED)
+find_package(Lua52 REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(Sqlite3 REQUIRED)
 
@@ -176,9 +175,9 @@ add_executable(
 
 target_link_libraries(
 	${PROJECT_NAME}
+	${LUA_LIBRARIES}
+	${SQLITE3_LIBRARY}
 	pthread
-	sqlite3
-	lua
 	dl
 	z
 )

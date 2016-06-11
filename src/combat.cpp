@@ -22,8 +22,8 @@
 #include "logger.hpp"
 
 Aggression::Aggression(Character * _aggressor, unsigned int _aggression) :
-        aggressor(_aggressor),
-        aggression(_aggression)
+    aggressor(_aggressor),
+    aggression(_aggression)
 {
     // Nothing to do.
 }
@@ -45,8 +45,8 @@ bool Aggression::operator==(const Character * source) const
 }
 
 OpponentsList::OpponentsList(Character * _owner) :
-        owner(_owner),
-        aggressionList()
+    owner(_owner),
+    aggressionList()
 {
     // Nothing to do.
 }
@@ -163,7 +163,14 @@ bool OpponentsList::moveToTopAggro(Character * character)
 
 unsigned int OpponentsList::getInitialAggro(Character * character)
 {
-    return std::abs(owner->level - character->level);
+    if (owner->level > character->level)
+    {
+        return (owner->level - character->level);
+    }
+    else
+    {
+        return (character->level - owner->level);
+    }
 }
 
 unsigned int OpponentsList::getAggro(Character * character)

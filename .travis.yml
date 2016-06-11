@@ -1,25 +1,30 @@
-language: cpp
+# Use new trusty images, should yield newer compilers and packages
 sudo: required
-compiler:
-    - clang
-    - gcc
-os:
-    - linux
+dist: precise
+language: cpp
+matrix:
+  include:
+    - compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
+      env: COMPILER=g++-4.9
+    - compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+      env: COMPILER=g++-5
+
 before_install:
-  # g++4.8.1
-  - if [ "$CXX" == "g++" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
-  # clang 3.4
-  - if [ "$CXX" == "clang++" ]; then sudo add-apt-repository -y ppa:h-rayflood/llvm; fi
   - sudo apt-get update -qq
-install:
-  # g++4.8.1
-  - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
-  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8"; fi
-  # clang 3.4
-  - if [ "$CXX" == "clang++" ]; then sudo apt-get install --allow-unauthenticated -qq clang-3.4; fi
-  - if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.4"; fi
-  - sudo apt-get install -qq libpthread-stubs0-dev libsqlite3-dev liblua5.1-0-dev zlib1g-dev
+  - sudo apt-get install -qq libpthread-stubs0-dev libsqlite3-dev lua5.2-dev zlib1g-dev
 script:
-    - mkdir build
-    - cd build
-    - cmake .. && make
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. && make

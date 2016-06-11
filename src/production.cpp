@@ -30,32 +30,32 @@
 #include "constants.hpp"
 
 Production::Production() :
-        vnum(-1),
-        name(),
-        profession(),
-        difficulty(-1),
-        time(-1),
-        assisted(),
-        outcome(std::make_pair(nullptr, -1)),
-        tools(),
-        ingredients(),
-        workbench(ToolType::NoType),
-        material(ResourceType::NoType)
+    vnum(-1),
+    name(),
+    profession(),
+    difficulty(),
+    time(),
+    assisted(),
+    outcome(),
+    tools(),
+    ingredients(),
+    workbench(ToolType::NoType),
+    material(ResourceType::NoType)
 {
 }
 
 Production::Production(const Production & source) :
-        vnum(source.vnum),
-        name(source.name),
-        profession(source.profession),
-        difficulty(source.difficulty),
-        time(source.time),
-        assisted(source.assisted),
-        outcome(source.outcome),
-        tools(source.tools),
-        ingredients(source.ingredients),
-        workbench(source.workbench),
-        material(source.material)
+    vnum(source.vnum),
+    name(source.name),
+    profession(source.profession),
+    difficulty(source.difficulty),
+    time(source.time),
+    assisted(source.assisted),
+    outcome(source.outcome),
+    tools(source.tools),
+    ingredients(source.ingredients),
+    workbench(source.workbench),
+    material(source.material)
 {
 }
 
@@ -88,14 +88,14 @@ bool Production::setOutcome(const std::string & source)
             correct = false;
             break;
         }
-
-        outcome.second = ToInt(outcomeInfo[1]);
-        if (outcome.second == 0)
+        int outcomeQuantity = ToInt(outcomeInfo[1]);
+        if (outcomeQuantity <= 0)
         {
             Logger::log(LogLevel::Error, "Can't find the quantity of the Outcome :" + outcomeInfo[0]);
             correct = false;
             break;
         }
+        outcome.second = static_cast<unsigned int>(outcomeQuantity);
     }
     return correct;
 }
@@ -129,7 +129,7 @@ bool Production::setIngredient(const std::string & source)
     if (source.empty())
     {
         Logger::log(LogLevel::Error, "No outcome set.");
-        return false;
+        return true;
     }
     // Split the string of ingredients.
     std::vector<std::string> ingredientList = SplitString(source, ";");
@@ -144,7 +144,6 @@ bool Production::setIngredient(const std::string & source)
             correct = false;
             break;
         }
-
         ResourceType ingredient = static_cast<ResourceType>(ToInt(ingredientInfo[0]));
         if (ingredient == ResourceType::NoType)
         {

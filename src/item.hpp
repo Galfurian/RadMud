@@ -48,7 +48,7 @@ class Item
         /// The quality of the item.
         ItemQuality quality;
         /// The item flags.
-        int flags;
+        unsigned int flags;
 
         /// Pointer to the room, where the item resides.
         Room * room;
@@ -109,7 +109,7 @@ class Item
 
         /// @brief Get the item weight, plus eventually contained item weight.
         /// @return The total weight of the item.
-        int getWeight();
+        unsigned int getWeight();
 
         /// @brief Return the name of the item.
         /// @return The name of the item.
@@ -138,15 +138,15 @@ class Item
 
         /// @brief Return the total space of the container.
         /// @return The total space as an integer.
-        int getTotalSpace();
+        unsigned int getTotalSpace();
 
         /// @brief Return the used space of the container.
         /// @return The used space as an integer.
-        int getUsedSpace();
+        unsigned int getUsedSpace();
 
         /// @brief Return the free space inside the container.
         /// @return The free unit of space as an integer.
-        int getFreeSpace();
+        unsigned int getFreeSpace();
 
         /// @brief Load an item inside the container and update the database.
         /// @param item The item to load in.
@@ -161,12 +161,12 @@ class Item
         /// @param liquid   The liquid to load in.
         /// @param quantity The quantity of liquid.
         /// @return <b>True</b> if the operation is a success,<br><b>False</b> otherwise.
-        bool pourIn(Liquid * liquid, int quantity);
+        bool pourIn(Liquid * liquid, const unsigned int & quantity);
 
         /// @brief Extract some liquid from the container and update the database.
         /// @param quantity The quantity of liquid.
         /// @return <b>True</b> if the operation is a success,<br><b>False</b> otherwise.
-        bool pourOut(unsigned int quantity);
+        bool pourOut(const unsigned int & quantity);
 
         /// @brief Search for the item inside the container.
         /// @param search_parameter The item to search.

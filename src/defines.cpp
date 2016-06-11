@@ -42,15 +42,15 @@ Direction GetDirection(std::string direction)
     if (direction == "down") return Direction::Down;
     return Direction::None;
 }
-Coordinates GetCoordinates(Direction direction)
+Coordinates<int> GetCoordinates(Direction direction)
 {
-    if (direction == Direction::North) return Coordinates(0, +1, 0);
-    if (direction == Direction::South) return Coordinates(0, -1, 0);
-    if (direction == Direction::West) return Coordinates(-1, 0, 0);
-    if (direction == Direction::East) return Coordinates(+1, 0, 0);
-    if (direction == Direction::Up) return Coordinates(0, 0, +1);
-    if (direction == Direction::Down) return Coordinates(0, 0, -1);
-    return Coordinates(0, 0, 0);
+    if (direction == Direction::North) return Coordinates<int>(0, +1, 0);
+    if (direction == Direction::South) return Coordinates<int>(0, -1, 0);
+    if (direction == Direction::West) return Coordinates<int>(-1, 0, 0);
+    if (direction == Direction::East) return Coordinates<int>(+1, 0, 0);
+    if (direction == Direction::Up) return Coordinates<int>(0, 0, +1);
+    if (direction == Direction::Down) return Coordinates<int>(0, 0, -1);
+    return Coordinates<int>(0, 0, 0);
 }
 
 std::string GetDirectionName(Direction direction)
@@ -769,7 +769,7 @@ std::string GetTelnetCharName(TelnetChar c)
     return output;
 }
 
-std::string GetModelFlagString(int flags)
+std::string GetModelFlagString(unsigned int flags)
 {
     std::string flagList;
     if (HasFlag(flags, ModelFlag::Static))
@@ -799,7 +799,7 @@ std::string GetModelFlagString(int flags)
     return flagList;
 }
 
-std::string GetRoomFlagString(int flags)
+std::string GetRoomFlagString(unsigned int flags)
 {
     std::string flagList;
     if (HasFlag(flags, RoomFlag::Rent))
@@ -824,7 +824,7 @@ std::string GetRoomFlagString(int flags)
     return flagList;
 }
 
-std::string GetCharacterFlagString(int flags)
+std::string GetCharacterFlagString(unsigned int flags)
 {
     std::string flagList;
     if (HasFlag(flags, CharacterFlag::IsGod))
@@ -839,7 +839,7 @@ std::string GetCharacterFlagString(int flags)
     return flagList;
 }
 
-std::string GetExitFlagString(int flags)
+std::string GetExitFlagString(unsigned int flags)
 {
     std::string flagList;
     if (HasFlag(flags, ExitFlag::NoMob))
@@ -859,7 +859,7 @@ std::string GetExitFlagString(int flags)
     return flagList;
 }
 
-std::string GetContainerFlagString(int flags)
+std::string GetContainerFlagString(unsigned int flags)
 {
     std::string flagList;
     if (HasFlag(flags, ContainerFlag::CanClose))
@@ -879,7 +879,7 @@ std::string GetContainerFlagString(int flags)
     return flagList;
 }
 
-std::string GetLiqContainerFlagString(int flags)
+std::string GetLiqContainerFlagString(unsigned int flags)
 {
     std::string flagList;
     if (HasFlag(flags, LiqContainerFlag::Poisoned))
@@ -899,7 +899,7 @@ std::string GetLiqContainerFlagString(int flags)
     return flagList;
 }
 
-std::string GetFoodFlagString(int flags)
+std::string GetFoodFlagString(unsigned int flags)
 {
     std::string flagList;
     if (HasFlag(flags, FoodFlag::Poisoned))

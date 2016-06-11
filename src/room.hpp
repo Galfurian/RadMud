@@ -46,7 +46,7 @@ class Room
         /// The continent where is located the room.
         Continent * continent;
         /// The current room coordinates.
-        Coordinates coord;
+        Coordinates<unsigned int> coord;
         /// The terrain where the room is situated.
         std::string terrain;
         /// The name of the room.
@@ -60,7 +60,7 @@ class Room
         /// List of characters in the room.
         CharacterList characters;
         /// Integer that describe the flags of the room.
-        int flags;
+        unsigned int flags;
 
         /// @brief Constructor.
         Room();
@@ -221,7 +221,7 @@ class Room
 /// @param coord       The coordinates where create the room.
 /// @param source_room During mining, the emthod uses source_room to connect rooms.
 /// @return <b>True</b> if the execution goes well,<br><b>False</b> otherwise.
-bool CreateRoom(Coordinates coord, Room * source_room = NULL);
+bool CreateRoom(Coordinates<unsigned int> coord, Room * source_room = NULL);
 
 /// @brief Connect the room with the near rooms.
 /// @param room The room to be connected.
