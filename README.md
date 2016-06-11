@@ -1,5 +1,6 @@
+[![Build Status](https://travis-ci.org/Galfurian/RadMud.svg?branch=master)](https://travis-ci.org/Galfurian/RadMud)
+
 # RadMud
-------------
 **Author**: Enrico Fraccaroli
 
 **Date**: 29 September 2014
