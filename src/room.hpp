@@ -243,7 +243,9 @@ bool CreateRoom(Coordinates<unsigned int> coord, Room * source_room = NULL);
 
 /// @brief Connect the room with the near rooms.
 /// @param room The room to be connected.
-void ConnectRoom(Room * room);
+/// @return <b>True</b> if the execution goes well,<br>
+///         <b>False</b> otherwise.
+bool ConnectRoom(Room * room);
 
 /// Room list handler.
 typedef std::vector<Room *> RoomList;

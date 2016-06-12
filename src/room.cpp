@@ -672,8 +672,13 @@ bool CreateRoom(Coordinates<unsigned int> coord, Room * source_room)
     arguments.push_back(new_room->name);
     arguments.push_back(new_room->description);
     arguments.push_back(ToString(new_room->flags));
+
+#if 0
+    // Start a transaction.
+    SQLiteDbms::instance().beginTransaction();
     if (!SQLiteDbms::instance().insertInto("Room", arguments))
     {
+        SQLiteDbms::instance().rollbackTransection();
         return false;
     }
     arguments.clear();
@@ -683,36 +688,87 @@ bool CreateRoom(Coordinates<unsigned int> coord, Room * source_room)
     arguments.push_back(ToString(new_room->vnum));
     if (!SQLiteDbms::instance().insertInto("AreaList", arguments))
     {
+        SQLiteDbms::instance().rollbackTransection();
         return false;
     }
     arguments.clear();
-
     // Update rooms connection if there is a source_room.
-    ConnectRoom(new_room);
+    if (!ConnectRoom(new_room))
+    {
+        SQLiteDbms::instance().rollbackTransection();
+        return false;
+    }
 
     // Add the created room to the room_map.
     Logger::log(LogLevel::Info, "[CreateRoom] Adding the room to the global list...");
-    Mud::instance().addRoom(new_room);
-    new_room->area->addRoom(new_room);
-
+    if (!Mud::instance().addRoom(new_room))
+    {
+        Logger::log(LogLevel::Error, "Cannot add the room to the mud.\n");
+        SQLiteDbms::instance().rollbackTransection();
+        return false;
+    }
+    if (!new_room->area->addRoom(new_room))
+    {
+        Logger::log(LogLevel::Error, "Cannot add the room to the area.\n");
+        SQLiteDbms::instance().rollbackTransection();
+        return false;
+    }
+    SQLiteDbms::instance().endTransaction();
+    return true;
+#endif
+    // Update rooms connection if there is a source_room.
+    if (!ConnectRoom(new_room))
+    {
+        return false;
+    }
+    Logger::log(LogLevel::Info, "[CreateRoom] Adding the room to the global list...");
+    if (!Mud::instance().addRoom(new_room))
+    {
+        Logger::log(LogLevel::Error, "Cannot add the room to the mud.\n");
+        return false;
+    }
+    if (!new_room->area->addRoom(new_room))
+    {
+        Logger::log(LogLevel::Error, "Cannot add the room to the area.\n");
+        return false;
+    }
     return true;
 }
 
-void ConnectRoom(Room * room)
+bool ConnectRoom(Room * room)
 {
     vector<string> arguments;
     Logger::log(LogLevel::Info, "[ConnectRoom] Connecting the room to near rooms...");
     for (auto iterator : Mud::instance().mudDirections)
     {
-        Coordinates<int> nearCoord = GetCoordinates(iterator.second);
-        if (room->coord < nearCoord)
+        // Get the coordinate modifier.
+        Coordinates<int> coordinatesModifier = GetCoordinates(iterator.second);
+        int finalX = (static_cast<int>(room->coord.x) + coordinatesModifier.x);
+        int finalY = (static_cast<int>(room->coord.y) + coordinatesModifier.y);
+        int finalZ = (static_cast<int>(room->coord.z) + coordinatesModifier.z);
+        if (finalX < 0)
         {
+            Logger::log(LogLevel::Error, "Out of Bound X :%s\n", ToString(finalX));
             continue;
         }
+        if (finalY < 0)
+        {
+            Logger::log(LogLevel::Error, "Out of Bound Y :%s\n", ToString(finalY));
+            continue;
+        }
+        if (finalZ < 0)
+        {
+            Logger::log(LogLevel::Error, "Out of Bound Z :%s\n", ToString(finalZ));
+            continue;
+        }
+        Coordinates<unsigned int> finalCoordinates = Coordinates<unsigned int>(static_cast<unsigned int>(finalX),
+            static_cast<unsigned int>(finalY), static_cast<unsigned int>(finalZ));
+        Logger::log(LogLevel::Error, "Searching room at: %s\n", finalCoordinates.toString());
         // Get the room at the given coordinates.
-        Room * near = room->area->getRoom(room->coord + nearCoord);
+        Room * near = room->area->getRoom(finalCoordinates);
         if (near != nullptr)
         {
+            Logger::log(LogLevel::Error, "Found a room:%s\n", near->name);
             // Create the two exits.
             Exit * forward = new Exit(room, near, iterator.second, 0);
             Exit * backward = new Exit(near, room, forward->getOppositeDirection(), 0);
@@ -727,7 +783,7 @@ void ConnectRoom(Room * room)
             // Insert in both the rooms exits the connection.
             room->exits.push_back(forward);
             near->exits.push_back(backward);
-
+#if 0
             // Update the values on Database.
             arguments.push_back(ToString(forward->source->vnum));
             arguments.push_back(ToString(forward->destination->vnum));
@@ -742,6 +798,8 @@ void ConnectRoom(Room * room)
             arguments.push_back(ToString(backward->flags));
             SQLiteDbms::instance().insertInto("Exit", arguments);
             arguments.clear();
+#endif
         }
     }
+    return true;
 }

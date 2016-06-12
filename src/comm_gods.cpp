@@ -587,7 +587,7 @@ void DoAreaInfo(Character * character, std::istream & sArgs)
     msg += Formatter::yellow() + " Width           " + Formatter::reset() + ":" + ToString(area->width) + "\n";
     msg += Formatter::yellow() + " Height          " + Formatter::reset() + ":" + ToString(area->height) + "\n";
     msg += Formatter::yellow() + " Elevation       " + Formatter::reset() + ":" + ToString(area->elevation) + "\n";
-    msg += Formatter::yellow() + " Number of Rooms " + Formatter::reset() + ":" + ToString(area->numRooms) + "\n";
+    msg += Formatter::yellow() + " Number of Rooms " + Formatter::reset() + ":" + ToString(area->areaMap.size()) + "\n";
     character->sendMsg(msg);
 }
 
@@ -653,13 +653,28 @@ void DoRoomCreate(Character * character, std::istream & sArgs)
         character->sendMsg("You must insert a valid direction!\n");
         return; // Skip the rest of the function.
     }
-    // Evaluate the new coordinates.
-    if (currentRoom->coord < GetCoordinates(direction))
+    // Get the coordinate modifier.
+    Coordinates<int> directionModifier = GetCoordinates(direction);
+    int finalX = (static_cast<int>(currentRoom->coord.x) + directionModifier.x);
+    int finalY = (static_cast<int>(currentRoom->coord.y) + directionModifier.y);
+    int finalZ = (static_cast<int>(currentRoom->coord.z) + directionModifier.z);
+    if (finalX < 0)
     {
-        character->sendMsg("You cannot create a room in that direction (out of bound)!\n");
+        character->sendMsg("You cannot create a room in that direction (Out of Bound X)!\n");
         return; // Skip the rest of the function.
     }
-    Coordinates<unsigned int> targetCoord = currentRoom->coord + GetCoordinates(direction);
+    if (finalY < 0)
+    {
+        character->sendMsg("You cannot create a room in that direction (Out of Bound Y)!\n");
+        return; // Skip the rest of the function.
+    }
+    if (finalZ < 0)
+    {
+        character->sendMsg("You cannot create a room in that direction (Out of Bound Z)!\n");
+        return; // Skip the rest of the function.
+    }
+    Coordinates<unsigned int> targetCoord = Coordinates<unsigned int>(static_cast<unsigned int>(finalX),
+        static_cast<unsigned int>(finalY), static_cast<unsigned int>(finalZ));
     // Find the room.
     Room * targetRoom = currentArea->getRoom(targetCoord);
     if (targetRoom)
@@ -677,12 +692,7 @@ void DoRoomCreate(Character * character, std::istream & sArgs)
         character->sendMsg("Sorry but you couldn't create the room.\n");
         return; // Skip the rest of the function.
     }
-    character->sendMsg("You have created a room at coordinates :\n");
-    std::string msg = "    [";
-    msg += ToString(targetCoord.x) + ";";
-    msg += ToString(targetCoord.y) + ";";
-    msg += ToString(targetCoord.z) + "]\n";
-    character->sendMsg(msg);
+    character->sendMsg("You have created a room at: %s\n", targetCoord.toString());
 }
 
 void DoRoomDelete(Character * character, std::istream & sArgs)
@@ -1617,7 +1627,7 @@ void DoAreaList(Character * character, std::istream & sArgs)
         row.push_back(area->name);
         row.push_back(area->builder);
         row.push_back(area->continent);
-        row.push_back(ToString(area->numRooms));
+        row.push_back(ToString(area->areaMap.size()));
         // Add the row to the table.
         table.addRow(row);
     }

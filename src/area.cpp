@@ -29,43 +29,10 @@
 #include "constants.hpp"
 #include "item.hpp"
 #include "luabridge/LuaBridge.h"
-#include "room.hpp"
 #include "logger.hpp"
+#include "room.hpp"
 
 using namespace std;
-
-/// The list of tiles used in the map.
-typedef enum MapTiles
-{
-    /// It's an empty tile.
-    kMapVoid = ' ',
-    // It's a wall tile.
-    //kMapWall = '#',
-    /// It's a walkable tile.
-    kMapWalk = '.',
-    /// It's the player.
-    kMapPlay = '@',
-    /// It's a mobile.
-    kMapMobile = 'M',
-    /// It's a player.
-    kMapPlayer = 'P',
-    /// It's an UpDown staris.
-    kMapUpDownStairs = 'x',
-    /// It's an Up staris.
-    kMapUpStairs = '>',
-    /// It's a Down staris.
-    kMapDownStairs = '<',
-    /// It's a Pit.
-    kMapPit = 'p',
-    /// It's a piece of equipment.
-    kMapEquipment = 'e',
-    /// It's a generic item.
-    kMapItem = 'i',
-    /// It's a door tile.
-    kMapDoor = 'D',
-    /// It's a door tile.
-    kMapDoorOpen = 'd',
-} MapTile;
 
 Area::Area() :
     vnum(),
@@ -76,7 +43,6 @@ Area::Area() :
     width(),
     height(),
     elevation(),
-    numRooms(),
     tileSet(),
     type(),
     status()
@@ -100,34 +66,12 @@ bool Area::check()
     return true;
 }
 
-bool Area::inBoundaries(unsigned int x, unsigned int y, unsigned int z)
+bool Area::inBoundaries(const unsigned int & x, const unsigned int & y, const unsigned int & z)
 {
-    if (x <= width)
-    {
-        if (y <= height)
-        {
-            if (z <= elevation)
-            {
-                return true;
-            }
-            else
-            {
-                Logger::log(LogLevel::Error, "[Area::AddRoom] Wrong elevation.");
-            }
-        }
-        else
-        {
-            Logger::log(LogLevel::Error, "[Area::AddRoom] Wrong height.");
-        }
-    }
-    else
-    {
-        Logger::log(LogLevel::Error, "[Area::AddRoom] Wrong width.");
-    }
-    return false;
+    return ((x <= width) && (y <= height) && (z <= elevation));
 }
 
-bool Area::inBoundaries(Coordinates<unsigned int> coord)
+bool Area::inBoundaries(const Coordinates<unsigned int> & coord)
 {
     return this->inBoundaries(coord.x, coord.y, coord.z);
 }
@@ -136,40 +80,32 @@ bool Area::addRoom(Room * room)
 {
     if (this->inBoundaries(room->coord))
     {
-        if (areaMap.insert(std::make_pair(std::make_tuple(room->coord.x, room->coord.y, room->coord.z), room))
-            != areaMap.end())
+        if (areaMap.set(room->coord.x, room->coord.y, room->coord.z, room))
         {
             // Set the room area to be this one.
             room->area = this;
-            // Increment the number of rooms.
-            numRooms++;
             return true;
         }
+        else
+        {
+            Logger::log(LogLevel::Error, "Room's insertion could not be completed %s.", room->coord.toString());
+        }
+    }
+    else
+    {
+        Logger::log(LogLevel::Error, "Room's coordiantes are not inside the boundaries %s.", room->coord.toString());
     }
     return false;
 }
 
-void Area::remRoom(Room * room)
+bool Area::remRoom(Room * room)
 {
-    unsigned int x = room->coord.x;
-    unsigned int y = room->coord.y;
-    unsigned int z = room->coord.z;
-
-    AreaMap::iterator it = areaMap.find(std::make_tuple(x, y, z));
-
-    // Remove the room from the map.
-    if (it != areaMap.end())
-    {
-        // Remove the room from the map.
-        areaMap.erase(it);
-        // Decrement the number of rooms.
-        numRooms--;
-    }
+    return (areaMap.erase(room->coord.x, room->coord.y, room->coord.z) != areaMap.end());
 }
 
 Room * Area::getRoom(int room_vnum)
 {
-    for (AreaMap::iterator it = areaMap.begin(); it != areaMap.end(); ++it)
+    for (Map3D<Room *>::iterator it = areaMap.begin(); it != areaMap.end(); ++it)
     {
         if (it->second->vnum == room_vnum)
         {
@@ -181,26 +117,18 @@ Room * Area::getRoom(int room_vnum)
 
 Room * Area::getRoom(unsigned int x, unsigned int y, unsigned int z)
 {
-    AreaMap::iterator it = areaMap.find(std::make_tuple(x, y, z));
-    if (it != areaMap.end())
-    {
-        return it->second;
-    }
-    return nullptr;
+    return areaMap.get(x, y, z);
 }
 
 Room * Area::getRoom(Coordinates<unsigned int> coord)
 {
-    Room * room = nullptr;
-    if ((coord.x > 0) && (coord.y > 0) && (coord.z > 0))
+    if (this->inBoundaries(coord))
     {
-        room = this->getRoom(static_cast<unsigned int>(coord.x), static_cast<unsigned int>(coord.y),
-            static_cast<unsigned int>(coord.z));
+        return this->getRoom(coord.x, coord.y, coord.z);
     }
-    return room;
+    return nullptr;
 }
 
-//-------------------------------------------------------------------
 std::vector<std::string> Area::drawFov(Room * centerRoom, unsigned int radius)
 {
     std::vector<std::string> layers(3);
@@ -217,35 +145,35 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, unsigned int radius)
     {
         min_x = origin_x - radius;
     }
-    else
+    unsigned int max_x = (origin_x + radius);
+    if (max_x > this->width)
     {
-        min_x = 0;
+        max_x = this->width;
     }
     unsigned int min_y = 0;
     if (origin_y >= radius)
     {
         min_y = origin_y - radius;
     }
-    else
+    unsigned int max_y = (origin_y + radius);
+    if (max_y > this->height)
     {
-        min_y = 0;
+        max_y = this->height;
     }
 
     // Create a 2D map of chararacters.
-    Map2D<char> map(radius * 2, radius * 2, kMapVoid);
+    Map2D<MapTile> map(radius * 2, radius * 2);
+
     // Evaluate the field of view.
     this->fov(map, origin_x, origin_y, origin_z, radius);
 
     // Prepare Enviroment layer.
-    for (unsigned int y = (origin_y + radius); y > min_y; --y)
+    for (unsigned int y = max_y; y > min_y; --y)
     {
-        for (unsigned int x = min_x; x < (origin_x + radius); ++x)
+        for (unsigned int x = min_x; x < max_x; ++x)
         {
-            MapTile mapTile = static_cast<MapTile>(map.get(x, y));
-
             std::string tileCode = " : ";
-
-            if ((mapTile == kMapWalk) || (mapTile == kMapDoorOpen))
+            if (map.get(x, y) == MapTile::Walkable)
             {
                 Room * room = this->getRoom(x, y, origin_z);
                 Exit * up = room->findExit(Direction::Up);
@@ -254,7 +182,6 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, unsigned int radius)
                 // By default set it to walkable tile.
                 tileCode = ToString(15) + ":" + ToString(this->tileSet + 0);
 
-                // III - Check if there are STAIRS in the tile.
                 if ((up != nullptr) && (down != nullptr))
                 {
                     if (HasFlag(up->flags, ExitFlag::Stairs) && HasFlag(down->flags, ExitFlag::Stairs))
@@ -281,9 +208,7 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, unsigned int radius)
                     }
                 }
             }
-
             layers[0] += tileCode;
-
             if (x != (origin_x + radius - 1))
             {
                 layers[0] += ",";
@@ -293,43 +218,32 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, unsigned int radius)
     }
 
     // Prepare Objects layer.
-    for (unsigned int y = (origin_y + radius); y > min_y; --y)
+    for (unsigned int y = max_y; y > min_y; --y)
     {
-        for (unsigned int x = min_x; x < (origin_x + radius); ++x)
+        for (unsigned int x = min_x; x < max_x; ++x)
         {
-            Room * room = this->getRoom(x, y, origin_z);
-
-            MapTile mapTile = static_cast<MapTile>(map.get(x, y));
-
             std::string tileCode = " : ";
-
-            if (mapTile == kMapWalk)
+            Room * room = this->getRoom(x, y, origin_z);
+            if ((map.get(x, y) != MapTile::Void) && (room != nullptr))
             {
-                // II  - Check if there are ITEMS in the tile.
-                if (room->items.size() > 0)
+                Item * door = room->findDoor();
+                if (!room->items.empty())
                 {
                     tileCode = room->items.back()->model->getTile();
                 }
-            }
-            else if (mapTile == kMapDoor)
-            {
-                Item * door = room->findDoor();
-                if (door != nullptr)
+                else if (door != nullptr)
                 {
-                    tileCode = door->model->getTile(+1);
+                    if (HasFlag(door->flags, ItemFlag::Closed))
+                    {
+                        tileCode = door->model->getTile(+1);
+                    }
+                    else
+                    {
+                        tileCode = door->model->getTile(+3);
+                    }
                 }
             }
-            else if (mapTile == kMapDoorOpen)
-            {
-                Item * door = room->findDoor();
-                if (door != nullptr)
-                {
-                    tileCode = door->model->getTile(+3);
-                }
-            }
-
             layers[1] += tileCode;
-
             if (x != (origin_x + radius - 1))
             {
                 layers[1] += ",";
@@ -339,24 +253,20 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, unsigned int radius)
     }
 
     // Prepare Living Creatures layer.
-    for (unsigned int y = (origin_y + radius); y > min_y; --y)
+    for (unsigned int y = max_y; y > min_y; --y)
     {
-        for (unsigned int x = min_x; x < (origin_x + radius); ++x)
+        for (unsigned int x = min_x; x < max_x; ++x)
         {
-            MapTile mapTile = static_cast<MapTile>(map.get(x, y));
-
             std::string tileCode = " : ";
-
             if ((origin_x == x) && (origin_y == y))
             {
                 tileCode = ToString(1) + ":" + ToString(480);
             }
-            else if (mapTile == kMapWalk)
+            else if (map.get(x, y) == MapTile::Walkable)
             {
                 Room * room = this->getRoom(x, y, origin_z);
-
                 // Check if there are creatures in the tile.
-                if (room->characters.size() > 0)
+                if (!room->characters.empty())
                 {
                     for (auto iterator : room->characters)
                     {
@@ -368,9 +278,7 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, unsigned int radius)
                     }
                 }
             }
-
             layers[2] += tileCode;
-
             if (x != (origin_x + radius - 1))
             {
                 layers[2] += ",";
@@ -397,48 +305,52 @@ std::string Area::drawASCIIFov(Room * centerRoom, unsigned int radius)
     {
         min_x = origin_x - radius;
     }
-    else
+    unsigned int max_x = (origin_x + radius);
+    if (max_x > this->width)
     {
-        min_x = 0;
+        max_x = this->width;
     }
     unsigned int min_y = 0;
     if (origin_y >= radius)
     {
         min_y = origin_y - radius;
     }
-    else
+    unsigned int max_y = (origin_y + radius);
+    if (max_y > this->height)
     {
-        min_y = 0;
+        max_y = this->height;
     }
 
     // Create a 2D map of chararacters.
-    Map2D<char> map(radius * 2, radius * 2, kMapVoid);
+    Map2D<MapTile> map(radius * 2, radius * 2);
     // Evaluate the field of view.
     this->fov(map, origin_x, origin_y, origin_z, radius);
 
     // Prepare Living Creatures layer.
-    for (unsigned int y = (origin_y + radius); y > min_y; --y)
+    for (unsigned int y = max_y; y > min_y; --y)
     {
-        for (unsigned int x = min_x; x < (origin_x + radius); ++x)
+        for (unsigned int x = min_x; x < max_x; ++x)
         {
-            Room * room = this->getRoom(x, y, origin_z);
-            // Retrieve the map tile.
-            MapTile mapTile = static_cast<MapTile>(map.get(x, y));
             // The tile which has to be placed.
-            std::string tile;
-            if ((mapTile == kMapWalk) || (mapTile == kMapDoorOpen))
+            std::string tile = " ";
+            Room * room = this->getRoom(x, y, origin_z);
+            if ((map.get(x, y) != MapTile::Void) && (room != nullptr))
             {
                 Exit * up = room->findExit(Direction::Up);
                 Exit * down = room->findExit(Direction::Down);
                 // VI  - WALKABLE
                 tile = '.';
                 // V   - OPEN DOOR
-                if (mapTile == kMapDoorOpen)
+                Item * door = room->findDoor();
+                if (door != nullptr)
                 {
-                    Item * door = room->findDoor();
-                    if (door != nullptr)
+                    if (HasFlag(door->flags, ItemFlag::Closed))
                     {
-                        tile = door->model->getTile(+3);
+                        tile = 'D';
+                    }
+                    else
+                    {
+                        tile = 'O';
                     }
                 }
                 // IV  - STAIRS
@@ -490,18 +402,6 @@ std::string Area::drawASCIIFov(Room * centerRoom, unsigned int radius)
                     tile = "@";
                 }
             }
-            else if (mapTile == kMapDoor)
-            {
-                Item * door = room->findDoor();
-                if (door != nullptr)
-                {
-                    tile = door->model->getTile(+1);
-                }
-            }
-            else
-            {
-                tile = ' ';
-            }
             result += tile;
         }
         result += "\n";
@@ -509,9 +409,8 @@ std::string Area::drawASCIIFov(Room * centerRoom, unsigned int radius)
     return result;
 }
 
-//-------------------------------------------------------------------
 void Area::fov(
-    Map2D<char> & map,
+    Map2D<MapTile> & map,
     unsigned int origin_x,
     unsigned int origin_y,
     unsigned int origin_z,
@@ -530,7 +429,7 @@ void Area::fov(
 }
 
 void Area::los(
-    Map2D<char> & map,
+    Map2D<MapTile> & map,
     unsigned int origin_x,
     unsigned int origin_y,
     unsigned int origin_z,
@@ -549,47 +448,39 @@ void Area::los(
         unsigned int curr_x = static_cast<unsigned int>(ox);
         unsigned int curr_y = static_cast<unsigned int>(oy);
         unsigned int curr_z = static_cast<unsigned int>(oz);
-
         // Check if out of boundaries.
-        if (this->inBoundaries(curr_x, curr_y, curr_z))
+        if (!this->inBoundaries(curr_x, curr_y, curr_z))
         {
-            // Get the room at the current coordinates.
-            Room * currentRoom = this->getRoom(curr_x, curr_y, curr_z);
-            if (currentRoom != nullptr)
+            Logger::log(LogLevel::Error, "Not in boundaries: %s %s %s\n", ToString(curr_x), ToString(curr_y),
+                ToString(curr_z));
+            map.set(curr_x, curr_y, MapTile::Void);
+            break;
+        }
+        // Get the room at the current coordinates.
+        Room * currentRoom = this->getRoom(curr_x, curr_y, curr_z);
+        if (currentRoom == nullptr)
+        {
+            Logger::log(LogLevel::Error, "No room at: %s %s %s\n", ToString(curr_x), ToString(curr_y),
+                ToString(curr_z));
+            map.set(curr_x, curr_y, MapTile::Void);
+            break;
+        }
+        // Check if there is a door.
+        Item * door = currentRoom->findDoor();
+        if (door != nullptr)
+        {
+            if (HasFlag(door->flags, ItemFlag::Closed))
             {
-                // Check if there is a door.
-                Item * door = currentRoom->findDoor();
-                if (door != nullptr)
-                {
-                    if (HasFlag(door->flags, ItemFlag::Closed))
-                    {
-                        map.set(curr_x, curr_y, kMapDoor);
-                        break;
-                    }
-                    else
-                    {
-                        map.set(curr_x, curr_y, kMapDoorOpen);
-                    }
-                }
-                else
-                {
-                    map.set(curr_x, curr_y, kMapWalk);
-                }
-
-                // Updated current coordinates.
-                ox += incr_x;
-                oy += incr_y;
-                oz += incr_z;
-            }
-            else
-            {
+                map.set(curr_x, curr_y, MapTile::ClosedDoor);
                 break;
             }
         }
-        else
-        {
-            break;
-        }
+        // Set the tile to visible.
+        map.set(curr_x, curr_y, MapTile::Walkable);
+        // Updated current coordinates.
+        ox += incr_x;
+        oy += incr_y;
+        oz += incr_z;
     }
 }
 

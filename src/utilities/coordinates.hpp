@@ -30,6 +30,7 @@ extern "C"
 }
 
 #include "../luabridge/LuaBridge.h"
+#include "../utils.hpp"
 
 /// Used to create and manage a tridimensional coordinates.
 template<typename CoordType>
@@ -81,6 +82,11 @@ class Coordinates
                 return false;
             }
             return true;
+        }
+
+        std::string toString() const
+        {
+            return "[X:" + ToString(x) + "; Y:" + ToString(y) + "; Z:" + ToString(z) + "]";
         }
 
         /// @brief Function used to register inside the lua environment the class.

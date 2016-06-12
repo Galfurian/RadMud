@@ -23,8 +23,8 @@
 #include <vector>
 
 #include "utilities/coordinates.hpp"
-#include "utilities/map2D.hpp"
 #include "utilities/map3D.hpp"
+#include "utilities/map2D.hpp"
 #include "defines.hpp"
 
 class Room;
@@ -33,8 +33,16 @@ class Room;
 class Area
 {
     private:
-        /// It's a multimap of rooms defined inside a 3D grid.
-        typedef std::multimap<std::tuple<int, int, int>, Room *> AreaMap;
+        /// The list of integer used to identify different obstacles inside the map.
+        typedef enum class MapTiles
+        {
+            /// It's an empty tile.
+            Void = 0,
+            /// It's a walkable tile.
+            Walkable = 1,
+            /// It's a closed door.
+            ClosedDoor = 2,
+        } MapTile;
 
     public:
         /// The virtual number of the area.
@@ -46,15 +54,13 @@ class Area
         /// The continent where the area is placed.
         std::string continent;
         /// The 3D grid of the map.
-        AreaMap areaMap;
+        Map3D<Room *> areaMap;
         /// The width of the area.
         unsigned int width;
         /// The height of the area.
         unsigned int height;
         /// The elevation of the area.
         unsigned int elevation;
-        /// The number of rooms.
-        unsigned int numRooms;
         /// The tileset of the entire area.
         int tileSet;
         /// The type of area.
@@ -76,22 +82,27 @@ class Area
         /// @param x Coordinate on width axis.
         /// @param y Coordinate on height axis.
         /// @param z Coordinate on altitude axis.
-        /// @return <b>True</b> if the coordinates are valid,<br><b>False</b> otherwise..
-        bool inBoundaries(unsigned int x, unsigned int y, unsigned int z);
+        /// @return <b>True</b> if the coordinates are valid,<br>
+        ///         <b>False</b> otherwise..
+        bool inBoundaries(const unsigned int & x, const unsigned int & y, const unsigned int & z);
 
         /// @brief Check if the given coordinates is inside the boundaries.
         /// @param coord The coordinates to check.
-        /// @return <b>True</b> if the coordinates are valid,<br><b>False</b> otherwise.
-        bool inBoundaries(Coordinates<unsigned int> coord);
+        /// @return <b>True</b> if the coordinates are valid,<br>
+        ///         <b>False</b> otherwise.
+        bool inBoundaries(const Coordinates<unsigned int> & coord);
 
         /// @brief Add the passed room to its coordinates inside the area.
         /// @param room The room that has to be added.
-        /// @return <b>True</b> if the room has been added,<br><b>False</b> otherwise.
+        /// @return <b>True</b> if the room has been added,<br>
+        ///         <b>False</b> otherwise.
         bool addRoom(Room * room);
 
         /// @brief Remove the passed room.
         /// @param room The room that has to be removed.
-        void remRoom(Room * room);
+        /// @return <b>True</b> if the room has been removed,<br>
+        ///         <b>False</b> otherwise.
+        bool remRoom(Room * room);
 
         /// @brief Find a room  given its vnum.
         /// @param room_vnum The vnum of the room.
@@ -129,7 +140,7 @@ class Area
         /// @param origin_z The z coordinate of the central room.
         /// @param radius   The radius of visibility of the character.
         void fov(
-            Map2D<char> & map,
+            Map2D<MapTile> & map,
             unsigned int origin_x,
             unsigned int origin_y,
             unsigned int origin_z,
@@ -145,7 +156,7 @@ class Area
         /// @param incr_z   The value of which the z coordiante must be incremented at each step.
         /// @param radius   The radius of visibility.
         void los(
-            Map2D<char> & map,
+            Map2D<MapTile> & map,
             unsigned int origin_x,
             unsigned int origin_y,
             unsigned int origin_z,

@@ -27,6 +27,8 @@ template<typename T>
 class Map3D
 {
     private:
+        typedef std::tuple<unsigned int, unsigned int, unsigned int> key_t;
+        typedef typename std::map<key_t, T> DataMatrix3D;
         /// Width of th map.
         unsigned width;
         /// Height of th map.
@@ -34,15 +36,19 @@ class Map3D
         /// Elevation of th map.
         unsigned elevation;
         /// Data contained inside the map.
-        std::map<std::tuple<int, int, int>, T> data;
+        DataMatrix3D data;
 
     public:
+        typedef typename DataMatrix3D::iterator iterator;
+
+        typedef typename DataMatrix3D::const_iterator const_iterator;
+
         /// @brief Constructor.
         Map3D() :
-                width(100),
-                height(100),
-                elevation(100),
-                data()
+            width(),
+            height(),
+            elevation(),
+            data()
         {
             // Nothing to do.
         }
@@ -52,10 +58,10 @@ class Map3D
         /// @param _height    The height of the 3D map.
         /// @param _elevation The elevation of the 3D map.
         Map3D(unsigned _width, unsigned _height, unsigned _elevation) :
-                width(_width),
-                height(_height),
-                elevation(_elevation),
-                data()
+            width(_width),
+            height(_height),
+            elevation(_elevation),
+            data()
         {
             // Nothing to do.
         }
@@ -66,10 +72,10 @@ class Map3D
         /// @param _elevation The elevation of the 3D map.
         /// @param value     The initial value of the cells.
         Map3D(unsigned _width, unsigned _height, unsigned _elevation, T value) :
-                width(_width),
-                height(_height),
-                elevation(_elevation),
-                data()
+            width(_width),
+            height(_height),
+            elevation(_elevation),
+            data()
         {
             for (unsigned z = 0; z < width; z++)
             {
@@ -89,24 +95,29 @@ class Map3D
             // Nothing to do.
         }
 
-        /// @brief Give an access to an object of given Coordinates3D.
-        /// @param x Coordinate on width.
-        /// @param y Coordinate on heigth.
-        /// @param z Coordinate on altitude.
-        /// @return The object at the given Coordinates3D.
-        T & operator()(unsigned x, unsigned y, unsigned z)
-        {
-            return data[std::make_tuple(x, y, z)];
-        }
-
         /// @brief Set the object at the given Coordinates3D.
         /// @param x     Coordinate on width.
         /// @param y     Coordinate on heigth.
         /// @param z     Coordinate on altitude.
         /// @param value The value that has to be set.
-        void set(unsigned x, unsigned y, unsigned z, T value)
+        bool set(unsigned x, unsigned y, unsigned z, T value)
         {
+#if 0
+            const key_t key = std::make_tuple(x, y, z);
+            auto ret = data.insert(std::make_pair(key, value));
+            if (!ret.second)
+            {
+                std::cout << "Not unique at " << ToString(x) << " " << ToString(y) << " " << ToString(z) << "\n";
+            }
+            else
+            {
+                std::cout << "Set at " << ToString(x) << " " << ToString(y) << " " << ToString(z) << "\n";
+            }
+            return ret.second;
+#else
             data[std::make_tuple(x, y, z)] = value;
+            return true;
+#endif
         }
 
         /// @brief Retrieve the object at the given Coordinates3D.
@@ -119,13 +130,29 @@ class Map3D
             return data[std::make_tuple(x, y, z)];
         }
 
-        /// @brief Erase the object at the given Coordinates3D.
+        /// @brief Erase the object at the given Coordinates3D and returns an iterator to the.
         /// @param x Coordinate on width axis.
         /// @param y Coordinate on heigth axis.
         /// @param z Coordinate on altitude axis.
-        void erase(unsigned x, unsigned y, unsigned z)
+        /// @return The object at the given Coordinates3D.
+        iterator erase(unsigned x, unsigned y, unsigned z)
         {
-            data[std::make_tuple(x, y, z)] = nullptr;
+            return FindErase(data, std::make_tuple(x, y, z));
+        }
+
+        iterator begin()
+        {
+            return data.begin();
+        }
+
+        iterator end()
+        {
+            return data.end();
+        }
+
+        size_t size()
+        {
+            return data.size();
         }
 
         /// Disable copy constructor.
