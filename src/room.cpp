@@ -524,7 +524,8 @@ string Room::getLook(Character * exception)
         // If there are more of this item, show the counter.
         if (it.second > 1)
         {
-            output += Formatter::cyan() + it.first->getNameCapital() + Formatter::reset() + " are here.[" + ToString(it.second) + "]\n";
+            output += Formatter::cyan() + it.first->getNameCapital() + Formatter::reset() + " are here.["
+                + ToString(it.second) + "]\n";
         }
         else
         {
@@ -657,7 +658,8 @@ bool CreateRoom(Coordinates<unsigned int> coord, Room * source_room)
     new_room->coord = coord;
     new_room->terrain = source_room->terrain;
     new_room->name = Generator::instance().generateName(source_room->area->type, source_room->area->status);
-    new_room->description = Generator::instance().generateDescription(source_room->area->type, source_room->area->status, new_room->name);
+    new_room->description = Generator::instance().generateDescription(source_room->area->type,
+        source_room->area->status, new_room->name);
     new_room->flags = 0;
 
     // Insert into table Room the newly created room.

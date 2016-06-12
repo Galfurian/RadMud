@@ -38,12 +38,12 @@ void DoProfession(Character * character, Profession * profession, std::istream &
     Production * production = Mud::instance().findProduction(arguments[0].first);
     if (production == nullptr)
     {
-        character->sendMsg(profession->notFoundMessage + " '" + arguments[0].first + "'.\n");
+        character->sendMsg("%s '%s'.\n", profession->notFoundMessage, arguments[0].first);
         return;
     }
     if (production->profession != profession)
     {
-        character->sendMsg(profession->notFoundMessage + " '" + arguments[0].first + "'.\n");
+        character->sendMsg("%s '%s'.\n", profession->notFoundMessage, arguments[0].first);
         return;
     }
     // Search the needed tools.
@@ -105,18 +105,15 @@ void DoProfession(Character * character, Profession * profession, std::istream &
     }
 
     // //////////////////////////////////////////
-    std::string charMsg;
-    charMsg += profession->startMessage;
-    charMsg += " " + Formatter::yellow() + production->outcome.first->getName() + Formatter::reset() + ".\n";
-    character->sendMsg(charMsg);
+    character->sendMsg("%s %s.\n", profession->startMessage,
+        Formatter::yellow() + production->outcome.first->getName() + Formatter::reset());
 
-    std::string roomMsg;
-    roomMsg += character->name + " has started " + production->profession->action + " something...\n";
     // Set the list of exceptions.
     CharacterVector exceptions;
     exceptions.push_back(character);
     // Send the message inside the room.
-    character->room->sendToAll(roomMsg, exceptions);
+    character->room->sendToAll("%s has started %s something...\n", exceptions, character->getNameCapital(),
+        production->profession->action);
 }
 
 void DoBuild(Character * character, std::istream & sArgs)
@@ -131,7 +128,7 @@ void DoBuild(Character * character, std::istream & sArgs)
     Building * schematics = Mud::instance().findBuilding(arguments[0].first);
     if (schematics == nullptr)
     {
-        character->sendMsg("You don't know how to build '" + arguments[0].first + "'.\n");
+        character->sendMsg("You don't know how to build '%s'.\n", arguments[0].first);
         return;
     }
     // Search the needed tools.
@@ -207,10 +204,8 @@ void DoBuild(Character * character, std::istream & sArgs)
     }
 
     // //////////////////////////////////////////
-    std::string charMsg;
-    charMsg += "You start building";
-    charMsg += " " + Formatter::yellow() + schematics->buildingModel->getName() + Formatter::reset() + ".\n";
-    character->sendMsg(charMsg);
+    character->sendMsg("You start building %s.\n",
+        Formatter::yellow() + schematics->buildingModel->getName() + Formatter::reset());
 
     // //////////////////////////////////////////
     std::string roomMsg;
@@ -239,16 +234,16 @@ void DoDeconstruct(Character * character, std::istream & sArgs)
     }
     if (HasFlag(item->flags, ItemFlag::Built))
     {
-        character->sendMsg("You deconstruct " + item->getName() + ".\n");
+        character->sendMsg("You deconstruct %s.\n", item->getName());
         // Reset item flags.
-        item->flags = 0;
+        ClearFlag(item->flags, ItemFlag::Built);
         SQLiteDbms::instance().beginTransaction();
         item->updateOnDB();
         SQLiteDbms::instance().endTransaction();
     }
     else
     {
-        character->sendMsg(item->getNameCapital() + " is not built.\n");
+        character->sendMsg("%s is not built.\n", item->getNameCapital());
     }
 }
 
@@ -270,18 +265,18 @@ void DoRead(Character * character, std::istream & sArgs)
     Writing * writing = Mud::instance().findWriting(item->vnum);
     if (writing == nullptr)
     {
-        character->sendMsg("There is nothing written on " + item->getName() + ".\n");
+        character->sendMsg("There is nothing written on %s.\n", item->getName());
         return;
     }
-    character->sendMsg("You start reading " + item->getName() + "...\n");
+    character->sendMsg("You start reading %s...\n", item->getName());
     if (!writing->title.empty())
     {
-        character->sendMsg("The title is '" + writing->title + "'.\n");
+        character->sendMsg("The title is '%s'.\n", writing->title);
     }
     character->sendMsg(writing->content + "\n");
     if (!writing->author.empty())
     {
-        character->sendMsg("The author apears to be '" + writing->author + "'.\n");
+        character->sendMsg("The author apears to be '%s'.\n", writing->author);
     }
 }
 

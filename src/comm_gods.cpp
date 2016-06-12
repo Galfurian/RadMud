@@ -1010,7 +1010,7 @@ void DoMobileKill(Character * character, std::istream & sArgs)
     mobile->triggerDeath();
     // Notify the death.
     character->sendMsg("You snap your fingers.\n");
-    character->room->sendToAll(mobile->getNameCapital() + " fall to the ground dead.", CharacterVector());
+    character->room->sendToAll("%s fall to the ground dead.", CharacterVector(), mobile->getNameCapital());
 }
 
 void DoMobileReload(Character * character, std::istream & sArgs)
@@ -1031,7 +1031,7 @@ void DoMobileReload(Character * character, std::istream & sArgs)
     // Reload the mob.
     mobile->reloadLua();
     // Notify.
-    character->sendMsg("Target(" + mobile->getName() + ") Script(" + mobile->lua_script + ")\n");
+    character->sendMsg("Target(%s) Script(%s)\n", mobile->getName(), mobile->lua_script);
 }
 void DoMobileLog(Character * character, std::istream &sArgs)
 {
@@ -1049,8 +1049,8 @@ void DoMobileLog(Character * character, std::istream &sArgs)
         return;
     }
     // Notify.
-    character->sendMsg("Target(" + mobile->getName() + ")\n");
-    character->sendMsg("Log:" + mobile->message_buffer + "\n");
+    character->sendMsg("Target(%s)\n", mobile->getName());
+    character->sendMsg("Log:\n%s\n", mobile->message_buffer);
 }
 
 void DoHurt(Character * character, std::istream & sArgs)
@@ -1071,8 +1071,15 @@ void DoHurt(Character * character, std::istream & sArgs)
     // Set health to 1.
     target->health = 1;
     // Notify.
-    character->sendMsg("You point your finger, " + target->getName() + " cry in pain.\n");
-    target->sendMsg(character->getNameCapital() + " points the finger towards you, you cry in pain.\n");
+    character->sendMsg("You point your finger, %s cry in pain.\n", target->getName());
+    target->sendMsg("%s points the finger towards you, you cry in pain.\n", character->getNameCapital());
+    // Set the list of exceptions.
+    CharacterVector exceptions;
+    exceptions.push_back(character);
+    exceptions.push_back(target);
+    // Send the message inside the room.
+    target->room->sendToAll("%s points the finger towards %s, %s cries in pain.\n", exceptions,
+        character->getNameCapital(), target->getName(), target->getPronoun());
 }
 
 void DoInvisibility(Character * character, std::istream & sArgs)
@@ -1147,11 +1154,9 @@ void DoModSkill(Character * character, std::istream & sArgs)
     target->skills[skill->vnum] = static_cast<unsigned int>(modified);
     // Notify.
     std::string msg;
-    msg += "You have successfully ";
-    msg += ((modifier > 0) ? "increased " : "decreased");
-    msg += " by " + ToString(modifier) + " the \"" + skill->name + "\" skill, ";
-    msg += "the new level is " + ToString(target->skills[skill->vnum]) + ".\n";
-    character->sendMsg(msg);
+    character->sendMsg("You have successfully %s by %s the \"%s\" skill, the new level is %s.\n",
+        ((modifier > 0) ? "increased " : "decreased"), ToString(modifier), skill->name,
+        ToString(target->skills[skill->vnum]));
 }
 
 void DoModAttr(Character * character, std::istream & sArgs)
@@ -1239,12 +1244,8 @@ void DoModAttr(Character * character, std::istream & sArgs)
         character->sendMsg("Bad attribute name, accepted : (str, agi, per, con, int).\n");
         return;
     }
-    std::string msg;
-    msg += "You have successfully ";
-    msg += std::string((modifier > 0) ? "increased" : "decreased");
-    msg += " by " + ToString(modifier);
-    msg += " the " + attrName + " of the target.";
-    character->sendMsg(msg);
+    character->sendMsg("You have successfully %s by %s the %s of the target.",
+        std::string((modifier > 0) ? "increased" : "decreased"), ToString(modifier), attrName);
 }
 
 void DoPlayerInfo(Character * character, std::istream & sArgs)
@@ -1379,9 +1380,8 @@ void DoLiquidCreate(Character * character, std::istream & sArgs)
         character->sendMsg("The selected item can't contain that quantity of liquid.\n");
         return;
     }
-    character->sendMsg(
-        "You materialise " + ToString(quantity) + " units of " + liquid->getName() + " inside " + item->getName()
-            + ".\n");
+    character->sendMsg("You materialise %s units of %s inside %s.\n", ToString(quantity), liquid->getName(),
+        item->getName());
 }
 
 void DoLiquidInfo(Character * character, std::istream & sArgs)

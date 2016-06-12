@@ -536,7 +536,7 @@ void Action::performMine()
     // Check if the character can carry the item.
     if (!actor->canCarry(newItem))
     {
-        actor->sendMsg(newItem->getName() + "is too heavy, it will be left on the ground.\n");
+        actor->sendMsg("%s is too heavy, it will be left on the ground.\n", newItem->getName());
         actor->room->addItem(newItem);
     }
     else
@@ -546,12 +546,12 @@ void Action::performMine()
     // Update the condition of the involved objects.
     if (itemTarget->editCondition(-10))
     {
-        actor->sendMsg("With your last blow, " + itemTarget->getName() + " crumbles into pieces..\n");
+        actor->sendMsg("With your last blow, %s crumbles into pieces.\n", itemTarget->getName());
         // Set the list of exceptions.
         CharacterVector exceptions;
         exceptions.push_back(actor);
         // Send the message inside the room.
-        actor->room->sendToAll("The " + itemTarget->getName() + " crumbles into pieces.", exceptions);
+        actor->room->sendToAll("%s crumbles into pieces.\n", exceptions, itemTarget->getNameCapital());
         // Destroy the vein.
         itemTarget->destroy();
     }
@@ -559,7 +559,7 @@ void Action::performMine()
     Item * tool = dynamic_cast<Item *>(usedTools.front());
     if (tool->editCondition(-1))
     {
-        actor->sendMsg(tool->getName() + " falls into pieces.");
+        actor->sendMsg("%s falls into pieces.\n", tool->getName());
         tool->destroy();
     }
 
@@ -643,7 +643,7 @@ void Action::performChop()
     // Check if the character can carry the item.
     if (!actor->canCarry(newItem))
     {
-        actor->sendMsg(newItem->getName() + "is too heavy, it will be left on the ground.\n");
+        actor->sendMsg("%s is too heavy, it will be left on the ground.\n", newItem->getName());
         actor->room->addItem(newItem);
     }
     else
@@ -653,12 +653,12 @@ void Action::performChop()
     // Update the condition of the involved objects.
     if (itemTarget->editCondition(-10))
     {
-        actor->sendMsg("\nWith your last blow, " + itemTarget->getName() + " falls down..\n");
+        actor->sendMsg("\nWith your last blow, %s falls down.\n", itemTarget->getName());
         // Set the list of exceptions.
         CharacterVector exceptions;
         exceptions.push_back(actor);
         // Send the message inside the room.
-        actor->room->sendToAll("The " + itemTarget->getName() + " falls down.", exceptions);
+        actor->room->sendToAll("%s falls down.", exceptions, itemTarget->getNameCapital());
         // Destroy the vein.
         itemTarget->destroy();
     }
@@ -666,7 +666,7 @@ void Action::performChop()
     Item * tool = dynamic_cast<Item *>(usedTools.front());
     if (tool->editCondition(-1))
     {
-        actor->sendMsg(tool->getName() + " falls into pieces.");
+        actor->sendMsg("%s falls into pieces.\n", tool->getName());
         tool->destroy();
     }
 
@@ -742,7 +742,7 @@ void Action::performCraft()
         // Update the condition of the involved objects.
         if (it->editCondition(-1))
         {
-            actor->sendMsg(it->getName() + " falls into pieces.");
+            actor->sendMsg("%s falls into pieces.\n", it->getName());
             toDestroy.push_back(it);
         }
     }
@@ -797,10 +797,8 @@ void Action::performCraft()
     }
 
     // Send conclusion message.
-    std::string msg;
-    msg += "\n" + production->profession->finishMessage;
-    msg += " " + Formatter::yellow() + createdItems.back()->getName() + Formatter::reset() + ".\n\n";
-    actor->sendMsg(msg);
+    actor->sendMsg("%s %s.\n\n", production->profession->finishMessage,
+        Formatter::yellow() + createdItems.back()->getName() + Formatter::reset());
 
     if (dropped)
     {
@@ -895,10 +893,8 @@ void Action::performBuild()
     SQLiteDbms::instance().endTransaction();
 
     // Send conclusion message.
-    std::string msg;
-    msg += "You have finished building";
-    msg += " " + Formatter::yellow() + schematics->buildingModel->getName() + Formatter::reset() + ".\n\n";
-    actor->sendMsg(msg);
+    actor->sendMsg("You have finished building %s.\n\n",
+        Formatter::yellow() + schematics->buildingModel->getName() + Formatter::reset());
 
     // Return the character in waiting status.
     this->reset();

@@ -188,7 +188,7 @@ string Character::getPronoun()
 string Character::getPossessivePronoun()
 {
     if (gender == GenderType::Male) return "his";
-    if (gender == GenderType::Female) return "hers";
+    if (gender == GenderType::Female) return "her";
     return "its";
 }
 

@@ -191,6 +191,30 @@ class Room
         /// @param exception Another exception to the message.
         void sendToAll(const std::string & message, const CharacterVector & exceptions);
 
+        /// @brief Print to consol and to logging file the gievn string.
+        /// @param msg   The message to send
+        /// @param first The first unpacked argument.
+        /// @param args  Packed arguments.
+        template<typename ... Args>
+        void sendToAll(
+            const std::string & message,
+            const CharacterVector & exceptions,
+            const std::string & first,
+            const Args & ... args)
+        {
+            std::string::size_type pos = message.find("%s");
+            if (pos == std::string::npos)
+            {
+                this->sendToAll(message, exceptions);
+            }
+            else
+            {
+                std::string working(message);
+                working.replace(pos, 2, first);
+                this->sendToAll(working, exceptions, args ...);
+            }
+        }
+
         /// @brief Connect the current room with all the nearby rooms.
         void connectExits();
 

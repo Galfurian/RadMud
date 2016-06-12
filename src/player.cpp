@@ -399,7 +399,7 @@ void Player::enterGame()
         CharacterVector exceptions;
         exceptions.push_back(this);
         // Send the message inside the room.
-        room->sendToAll(name + " appears.\n", exceptions);
+        room->sendToAll("%s appears.\n", exceptions, name);
     }
     else
     {

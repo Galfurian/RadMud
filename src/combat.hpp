@@ -61,9 +61,6 @@ class OpponentsList
 
     public:
         /// @brief Constructor.
-        OpponentsList();
-
-        /// @brief Constructor.
         OpponentsList(Character * _owner);
 
         /// @brief Tries to add the given character to the list of opponents.

@@ -116,6 +116,7 @@ void ProcessTelnetCommand(Character * character, std::istream & sArgs)
             {
                 result.clear();
                 content += source[index];
+                Logger::log(LogLevel::Debug, "Content '%s'.", ToString(static_cast<int>(source[index])));
             }
             index++;
         }

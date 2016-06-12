@@ -32,19 +32,19 @@
 using namespace std;
 
 Mobile::Mobile() :
-        id(),
-        respawnRoom(),
-        keys(),
-        shortdesc(),
-        staticdesc(),
-        actions(),
-        message_buffer(),
-        alive(),
-        nextRespawn(),
-        controller(),
-        lua_script(),
-        lua_mutex(),
-        nextActionCooldown()
+    id(),
+    respawnRoom(),
+    keys(),
+    shortdesc(),
+    staticdesc(),
+    actions(),
+    message_buffer(),
+    alive(),
+    nextRespawn(),
+    controller(),
+    lua_script(),
+    lua_mutex(),
+    nextActionCooldown()
 {
     // Nothing to do.
 }
@@ -80,7 +80,7 @@ void Mobile::respawn()
     CharacterVector exceptions;
     exceptions.push_back(this);
     // Send the message inside the room.
-    this->room->sendToAll(this->getNameCapital() + " apear from somewhere.\n", exceptions);
+    this->room->sendToAll("%s apear from somewhere.\n", exceptions, this->getNameCapital());
     // Log to the mud.
     Logger::log(LogLevel::Debug, "Respawning " + this->id);
 }
@@ -144,7 +144,8 @@ void Mobile::triggerDeath()
 bool Mobile::canRespawn()
 {
     // Return the check if the mobile can be respawned.
-    return (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - nextRespawn).count() >= 0);
+    return (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - nextRespawn).count()
+        >= 0);
 }
 
 void Mobile::reloadLua()

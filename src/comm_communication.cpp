@@ -87,10 +87,8 @@ void DoSay(Character * character, std::istream & sArgs)
         exceptions.push_back(character);
         exceptions.push_back(receiver);
         // Send the message inside the room.
-        character->room->sendToAll(
-            chName + "%s says to " + receiver->getName() + ", \"" + Formatter::cyan() + Formatter::italic() + message
-                + Formatter::reset() + "\".\n", exceptions);
-
+        character->room->sendToAll("%s says to %s, \"%s\".\n", exceptions, chName, receiver->getName(),
+            Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
         // If it's a mobile, activate the trigger.
         if (receiver->isMobile())
         {
@@ -99,15 +97,13 @@ void DoSay(Character * character, std::istream & sArgs)
     }
     else
     {
-        character->sendMsg(
-            "You say \"" + Formatter::cyan() + Formatter::italic() + message + Formatter::reset() + "\".\n");
+        character->sendMsg("You say \"%s\".\n", Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
         // Set the list of exceptions.
         CharacterVector exceptions;
         exceptions.push_back(character);
         // Send the message inside the room.
-        character->room->sendToAll(
-            chName + " says \"" + Formatter::cyan() + Formatter::italic() + message + Formatter::reset() + "\".\n",
-            exceptions);
+        character->room->sendToAll("%s says \"%s\".\n", exceptions, chName,
+            Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
     }
 }
 
@@ -151,11 +147,9 @@ void DoWhisper(Character * character, std::istream & sArgs)
 
     // //////////////////////////////////////////
     // Send the message.
-    character->sendMsg(
-        Formatter::magenta() + "You whisper to " + receiver->getName() + ", " + Formatter::reset() + "\"" + message
-            + "\"\n");
-    receiver->sendMsg(
-        Formatter::magenta() + chName + " whisper to you, " + Formatter::reset() + "\"" + message + "\"\n\n");
+    character->sendMsg("%sYou whisper to %s, %s\"%s\".\n", Formatter::magenta(), receiver->getName(),
+        Formatter::reset(), message);
+    receiver->sendMsg("%s whisper to you, %s\"%s\"\n\n", Formatter::magenta() + chName, Formatter::reset(), message);
 }
 
 void DoEmote(Character * character, std::istream & sArgs)
@@ -177,12 +171,12 @@ void DoEmote(Character * character, std::istream & sArgs)
 
     // //////////////////////////////////////////
     // Send the emote.
-    character->sendMsg(Formatter::yellow() + "You " + emote + Formatter::reset() + "\n");
+    character->sendMsg("%sYou %s\n", Formatter::yellow(), emote + Formatter::reset());
     // Set the list of exceptions.
     CharacterVector exceptions;
     exceptions.push_back(character);
     // Send the message inside the room.
-    character->room->sendToAll(Formatter::yellow() + chName + " " + emote + Formatter::reset() + "\n", exceptions);
+    character->room->sendToAll("%s %s\n", exceptions, Formatter::yellow() + chName, emote + Formatter::reset());
 }
 
 void DoBug(Character * character, std::istream & sArgs)
@@ -211,10 +205,10 @@ void DoBug(Character * character, std::istream & sArgs)
         return;
     }
     character->sendMsg("Bug posted on Board correctly.\n");
-    character->sendMsg("# Author   :" + character->getName() + "\n");
-    character->sendMsg("# Date     :" + GetDate() + "\n");
-    character->sendMsg("# Location :" + character->room->name + "\n");
-    character->sendMsg("# Message  :" + message + "\n");
+    character->sendMsg("# Author   :%s\n", character->getName());
+    character->sendMsg("# Date     :%s\n", GetDate());
+    character->sendMsg("# Location :%s\n", character->room->name);
+    character->sendMsg("# Message  :%s\n", message);
 }
 
 void DoIdea(Character * character, std::istream & sArgs)
@@ -243,8 +237,8 @@ void DoIdea(Character * character, std::istream & sArgs)
         return;
     }
     character->sendMsg("Idea posted on Board correctly.\n");
-    character->sendMsg("# Author   :" + character->getName() + "\n");
-    character->sendMsg("# Message  :" + message + "\n");
+    character->sendMsg("# Author   :%s\n", character->getName());
+    character->sendMsg("# Message  :%s\n", message);
 }
 
 void DoTypo(Character * character, std::istream & sArgs)
@@ -273,8 +267,8 @@ void DoTypo(Character * character, std::istream & sArgs)
         return;
     }
     character->sendMsg("Typo posted on Board correctly.\n");
-    character->sendMsg("# Author   :" + character->getName() + "\n");
-    character->sendMsg("# Date     :" + GetDate() + "\n");
-    character->sendMsg("# Location :" + character->room->name + "\n");
-    character->sendMsg("# Message  :" + message + "\n");
+    character->sendMsg("# Author   :%s\n", character->getName());
+    character->sendMsg("# Date     :%s\n", GetDate());
+    character->sendMsg("# Location :%s\n", character->room->name);
+    character->sendMsg("# Message  :%s\n", message);
 }

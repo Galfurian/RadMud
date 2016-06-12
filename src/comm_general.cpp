@@ -48,17 +48,17 @@ void DoDirection(Character * character, Direction direction)
     // Calculate the time needed to move.
     if (character->posture == CharacterPosture::Stand)
     {
-        character->sendMsg("You start to go " + GetDirectionName(direction) + "...\n");
+        character->sendMsg("You start to go %s...\n", GetDirectionName(direction));
         speed = 2;
     }
     else if (character->posture == CharacterPosture::Crouch)
     {
-        character->sendMsg("You move crouching towards " + GetDirectionName(direction) + "...\n");
+        character->sendMsg("You move crouching towards %s...\n", GetDirectionName(direction));
         speed = 4;
     }
     else if (character->posture == CharacterPosture::Prone)
     {
-        character->sendMsg("You begin to crawl to " + GetDirectionName(direction) + "...\n");
+        character->sendMsg("You begin to crawl to %s...\n", GetDirectionName(direction));
         speed = 6;
     }
     else
@@ -147,10 +147,10 @@ void DoQuit(Character * character, std::istream & sArgs)
             CharacterVector exceptions;
             exceptions.push_back(character);
             // Send the message inside the room.
-            player->room->sendToAll("Player " + player->getName() + " disappear in a puff of smoke.\n", exceptions);
+            player->room->sendToAll("Player %s disappear in a puff of smoke.\n", exceptions, player->getName());
         }
 
-        Logger::log(LogLevel::Global, "Player " + player->getName() + " has left the game.");
+        Logger::log(LogLevel::Global, "Player %s has left the game.", player->getName());
 
         // End of properly connected.
         player->closeConnection();
@@ -251,7 +251,7 @@ void DoLook(Character * character, std::istream & sArgs)
                 if (target->canSee(character))
                 {
                     // Notify to other character, that this one are looking at him.
-                    target->sendMsg(character->getNameCapital() + " look at you.\n\n");
+                    target->sendMsg("%s look at you.\n\n", character->getNameCapital());
                 }
                 return;
             }
@@ -262,7 +262,7 @@ void DoLook(Character * character, std::istream & sArgs)
             character->sendMsg(item->getLook());
             return;
         }
-        character->sendMsg("You don't see '" + arguments[0].first + "' anywhere.\n");
+        character->sendMsg("You don't see '%s' anywhere.\n", arguments[0].first);
     }
     else if (arguments.size() == 2)
     {
@@ -278,7 +278,7 @@ void DoLook(Character * character, std::istream & sArgs)
                 }
                 else
                 {
-                    character->sendMsg("You don't see " + arguments[0].first + " on " + target->getName() + ".\n");
+                    character->sendMsg("You don't see %s on %s.\n", arguments[0].first, target->getName());
                 }
                 return;
             }
@@ -295,17 +295,17 @@ void DoLook(Character * character, std::istream & sArgs)
                 }
                 else
                 {
-                    character->sendMsg("It's not insiede " + container->getName() + ".\n");
+                    character->sendMsg("It's not insiede %s.\n", container->getName());
                     return;
                 }
             }
             else
             {
-                character->sendMsg(container->getNameCapital() + " is not a container.\n");
+                character->sendMsg("%s is not a container.\n", container->getNameCapital());
                 return;
             }
         }
-        character->sendMsg("You don't see the container '" + arguments[1].first + "' anywhere.\n");
+        character->sendMsg("You don't see the container '%s' anywhere.\n", arguments[1].first);
     }
     else
     {
@@ -395,30 +395,24 @@ void DoPrompt(Character * character, std::istream & sArgs)
 
     if (prompt.empty())
     {
-        player->sendMsg("Current prompt:\n");
-        player->sendMsg(player->prompt + "\n");
-        player->sendMsg("Type " + Formatter::yellow() + "prompt help" + Formatter::reset() + " to read the guide.\n");
+        character->sendMsg("Current prompt:\n");
+        character->sendMsg("    %s\n", player->prompt);
+        character->sendMsg("Type %sprompt help %sto read the guide.\n", Formatter::yellow(), Formatter::reset());
         return;
     }
-
     if (GetWords(prompt)[0] == "help")
     {
-        player->sendMsg(Formatter::yellow() + "Prompt Help" + Formatter::reset() + "\n");
-        player->sendMsg("You can set the prompt you prefer, respectfully to this constraints:\n");
-        player->sendMsg(" - Not more than 15 characters.\n");
-        player->sendMsg("\n");
-        player->sendMsg("You can use the following shortcuts in you prompt:\n");
-        player->sendMsg("    " + Formatter::italic() + "&n" + Formatter::reset() + " - Replace with player name.\n");
-        player->sendMsg(
-            "    " + Formatter::italic() + "&N" + Formatter::reset() + " - Replace with player name capitalized.\n");
-        player->sendMsg(
-            "    " + Formatter::italic() + "&h" + Formatter::reset() + " - Replace with player current health.\n");
-        player->sendMsg(
-            "    " + Formatter::italic() + "&H" + Formatter::reset() + " - Replace with player max health.\n");
-        player->sendMsg(
-            "    " + Formatter::italic() + "&s" + Formatter::reset() + " - Replace with player current stamina.\n");
-        player->sendMsg(
-            "    " + Formatter::italic() + "&S" + Formatter::reset() + " - Replace with player max stamina.\n");
+        character->sendMsg(Formatter::yellow() + "Prompt Help" + Formatter::reset() + "\n");
+        character->sendMsg("You can set the prompt you prefer, respectfully to this constraints:\n");
+        character->sendMsg(" - Not more than 15 characters.\n");
+        character->sendMsg("\n");
+        character->sendMsg("You can use the following shortcuts in you prompt:\n");
+        character->sendMsg("    %s&n%s - Player name.\n", Formatter::italic(), Formatter::reset());
+        character->sendMsg("    %s&N%s - Player name capitalized.\n", Formatter::italic(), Formatter::reset());
+        character->sendMsg("    %s&h%s - Player current health.\n", Formatter::italic(), Formatter::reset());
+        character->sendMsg("    %s&H%s - Player max health.\n", Formatter::italic(), Formatter::reset());
+        character->sendMsg("    %s&s%s - Player current stamina.\n", Formatter::italic(), Formatter::reset());
+        character->sendMsg("    %s&S%s - Player max stamina.\n", Formatter::italic(), Formatter::reset());
         return;
     }
     player->prompt = prompt;
@@ -431,20 +425,20 @@ void DoTime(Character * character, std::istream & sArgs)
 
     if (MudUpdater::instance().getDayPhase() == DayPhase::Morning)
     {
-        character->sendMsg(Formatter::yellow() + "The sun has just risen.\n" + Formatter::reset());
+        character->sendMsg("%sThe sun has just risen.%s\n", Formatter::yellow(), Formatter::reset());
     }
     else if (MudUpdater::instance().getDayPhase() == DayPhase::Day)
     {
-        character->sendMsg(Formatter::yellow() + "The sun is high in the sky.\n" + Formatter::reset());
+        character->sendMsg("%sThe sun is high in the sky.%s\n", Formatter::yellow(), Formatter::reset());
     }
     else if (MudUpdater::instance().getDayPhase() == DayPhase::Dusk)
     {
-        character->sendMsg(
-            Formatter::cyan() + "The sun is setting, the shadows begin to prevail.\n" + Formatter::reset());
+        character->sendMsg("%sThe sun is setting, the shadows begin to prevail.%s\n", Formatter::cyan(),
+            Formatter::reset());
     }
     else if (MudUpdater::instance().getDayPhase() == DayPhase::Night)
     {
-        character->sendMsg(Formatter::blue() + "The darkness surrounds you.\n" + Formatter::reset());
+        character->sendMsg("%sThe darkness surrounds you.%s\n", Formatter::blue(), Formatter::reset());
     }
 }
 
@@ -525,11 +519,11 @@ void DoStatistics(Character * character, std::istream & sArgs)
     msg += Formatter::magenta() + "Gender: " + Formatter::reset() + GetGenderTypeName(player->gender) + "\n";
     msg += Formatter::magenta() + "Affiliation: " + Formatter::reset() + player->faction->name + "\n";
     msg += Formatter::magenta() + "Experience: " + Formatter::reset() + ToString(player->experience) + " px\n";
-    msg += Formatter::magenta() + "Str " + Formatter::reset() + ToString(player->getStrength());
-    msg += Formatter::magenta() + "Agi " + Formatter::reset() + ToString(player->getAgility());
-    msg += Formatter::magenta() + "Per " + Formatter::reset() + ToString(player->getPerception());
-    msg += Formatter::magenta() + "Con " + Formatter::reset() + ToString(player->getConstitution());
-    msg += Formatter::magenta() + "Int " + Formatter::reset() + ToString(player->getIntelligence());
+    msg += Formatter::magenta() + "Str " + Formatter::reset() + ToString(player->getStrength()) + " ";
+    msg += Formatter::magenta() + "Agi " + Formatter::reset() + ToString(player->getAgility()) + " ";
+    msg += Formatter::magenta() + "Per " + Formatter::reset() + ToString(player->getPerception()) + " ";
+    msg += Formatter::magenta() + "Con " + Formatter::reset() + ToString(player->getConstitution()) + " ";
+    msg += Formatter::magenta() + "Int " + Formatter::reset() + ToString(player->getIntelligence()) + " ";
     msg += Formatter::magenta() + "Health " + Formatter::reset() + ToString(player->health) + "/"
         + ToString(player->getMaxHealth());
     msg += "(" + ToString(player->effects.getHealthMod()) + ") ";
