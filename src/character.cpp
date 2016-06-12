@@ -1091,66 +1091,124 @@ bool Character::canSee(Character * target)
     return true;
 }
 
-Character * Character::getNextOpponent()
+unsigned int Character::getCooldown(CombatAction combatAction)
+{
+    double BASE = 6.0;
+    // The agility modifier.
+    double AGI = static_cast<double>(this->getAgility()) * 3.5 * (BASE / 100);
+    // The weight modifier.
+    double WGT = weight * (BASE / 100);
+    // The carried weight.
+    double CAR = (this->getCarryingWeight() / 2) * (BASE / 100);
+    // The cooldown.
+    unsigned int cooldown = 6;
+    if (combatAction == CombatAction::BasicAttack)
+    {
+        double EQS = 0;
+        Item * rh = findEquipmentSlotItem(EquipmentSlot::RightHand);
+        if (rh != nullptr)
+        {
+            if (rh->model->type == ModelType::Weapon)
+            {
+                EQS += rh->getWeight() * 2.5 * (BASE / 100);
+            }
+            else if (rh->model->type == ModelType::Shield)
+            {
+                EQS += rh->getWeight() * 3.0 * (BASE / 100);
+            }
+        }
+        Item * lh = findEquipmentSlotItem(EquipmentSlot::LeftHand);
+        if (lh != nullptr)
+        {
+            if (lh->model->type == ModelType::Weapon)
+            {
+                EQS += lh->getWeight() * 2.5 * (BASE / 100);
+            }
+            else if (lh->model->type == ModelType::Shield)
+            {
+                EQS += lh->getWeight() * 3.0 * (BASE / 100);
+            }
+        }
+        cooldown = static_cast<unsigned int>(BASE - AGI + WGT + CAR + EQS);
+    }
+    else if (combatAction == CombatAction::Flee)
+    {
+        cooldown = static_cast<unsigned int>(BASE - AGI + WGT + CAR);
+    }
+    Logger::log(LogLevel::Debug, "%s will act in %s.", this->getNameCapital(), ToString(cooldown));
+    return cooldown;
+}
+
+bool Character::isAtRange(Character * target, const unsigned int & range)
+{
+    if (target == nullptr)
+    {
+        Logger::log(LogLevel::Error, "Received a null target.");
+        return false;
+    }
+    if (this->room == nullptr)
+    {
+        Logger::log(LogLevel::Error, "Character has a null room.");
+        return false;
+    }
+    if (this->room->area == nullptr)
+    {
+        Logger::log(LogLevel::Error, "Character's room has a null area.");
+        return false;
+    }
+    if (target->room == nullptr)
+    {
+        Logger::log(LogLevel::Error, "Target has a null room.");
+        return false;
+    }
+    if (target->room->area == nullptr)
+    {
+        Logger::log(LogLevel::Error, "Target's room has a null area.");
+        return false;
+    }
+    if (this->room->area != target->room->area)
+    {
+        Logger::log(LogLevel::Error, "Character and Target are not in the same area.");
+        return false;
+    }
+    return this->room->area->fastInSight(this->room->coord, target->room->coord, range);
+}
+
+Character * Character::getNextOpponentAtRange(const unsigned int & range)
 {
     if (opponents.hasOpponents())
     {
-        // Get the top aggressor.
-        Aggression * aggression = opponents.getTopAggro();
-        if (aggression != nullptr)
+        for (auto iterator : opponents.aggressionList)
         {
-            // Retrieve the opponent.
-            Character * opponent = aggression->aggressor;
-            if (opponent != nullptr)
+            if (this->isAtRange(iterator.aggressor, range))
             {
-                if (opponent->room->vnum == room->vnum)
-                {
-                    return opponent;
-                }
+                return iterator.aggressor;
             }
         }
     }
     return nullptr;
 }
 
-unsigned int Character::getNextAttack()
+ItemVector Character::getActiveWeapons()
 {
-    double BAS = 6.0;
-    // The agility modifier.
-    double AGI = (static_cast<int>(agility) + effects.getAgiMod()) * 3.5 * (BAS / 100);
-    // The weight modifier.
-    double WGT = weight * (BAS / 100);
-    // The carried weight.
-    double CAR = (getCarryingWeight() / 2) * (BAS / 100);
-
-    double EQS = 0;
-    Item * rh = findEquipmentSlotItem(EquipmentSlot::RightHand);
-    if (rh != nullptr)
+    ItemVector ret;
+    if (this->canAttackWith(EquipmentSlot::RightHand))
     {
-        if (rh->model->type == ModelType::Weapon)
+        Item * weapon = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
+        if (weapon != nullptr)
         {
-            EQS += rh->getWeight() * 2.5 * (BAS / 100);
-        }
-        else if (rh->model->type == ModelType::Shield)
-        {
-            EQS += rh->getWeight() * 3.0 * (BAS / 100);
+            ret.push_back(weapon);
         }
     }
-    Item * lh = findEquipmentSlotItem(EquipmentSlot::LeftHand);
-    if (lh != nullptr)
+    if (this->canAttackWith(EquipmentSlot::LeftHand))
     {
-        if (lh->model->type == ModelType::Weapon)
+        Item * weapon = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
+        if (weapon != nullptr)
         {
-            EQS += lh->getWeight() * 2.5 * (BAS / 100);
-        }
-        else if (lh->model->type == ModelType::Shield)
-        {
-            EQS += lh->getWeight() * 3.0 * (BAS / 100);
+            ret.push_back(weapon);
         }
     }
-    unsigned int nextAttack = static_cast<unsigned int>(BAS - AGI + WGT + CAR + EQS);
-    Logger::log(LogLevel::Debug, getNameCapital() + " will attack in " + ToString(nextAttack));
-    return nextAttack;
+    return ret;
 }
 
 void Character::doCommand(const string & command)

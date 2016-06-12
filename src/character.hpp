@@ -328,13 +328,17 @@ class Character
         ///         <b>False</b> otherwise.
         bool canSee(Character * target);
 
+        /// @brief Given an action, it returns the necessary cooldown.
+        /// @return The non-decreasing value of the cooldown.
+        unsigned int getCooldown(CombatAction combatAction);
+
+        bool isAtRange(Character * target, const unsigned int & range);
+
         /// @brief Provides a pointer to the opponent on the top of the aggro list.
         /// @return A pointer to the next opponent.
-        Character * getNextOpponent();
+        Character * getNextOpponentAtRange(const unsigned int & range);
 
-        /// @brief Returns the cooldown before next attack.
-        /// @return The non-decreasing value of the cooldown.
-        unsigned int getNextAttack();
+        ItemVector getActiveWeapons();
 
         /// @brief Handle character input.
         /// @param command Command that need to be handled.
