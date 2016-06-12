@@ -136,7 +136,8 @@ bool Area::addRoom(Room * room)
 {
     if (this->inBoundaries(room->coord))
     {
-        if (areaMap.insert(std::make_pair(std::make_tuple(room->coord.x, room->coord.y, room->coord.z), room)) != areaMap.end())
+        if (areaMap.insert(std::make_pair(std::make_tuple(room->coord.x, room->coord.y, room->coord.z), room))
+            != areaMap.end())
         {
             // Set the room area to be this one.
             room->area = this;
@@ -193,7 +194,8 @@ Room * Area::getRoom(Coordinates<unsigned int> coord)
     Room * room = nullptr;
     if ((coord.x > 0) && (coord.y > 0) && (coord.z > 0))
     {
-        room = this->getRoom(static_cast<unsigned int>(coord.x), static_cast<unsigned int>(coord.y), static_cast<unsigned int>(coord.z));
+        room = this->getRoom(static_cast<unsigned int>(coord.x), static_cast<unsigned int>(coord.y),
+            static_cast<unsigned int>(coord.z));
     }
     return room;
 }
@@ -508,7 +510,12 @@ std::string Area::drawASCIIFov(Room * centerRoom, unsigned int radius)
 }
 
 //-------------------------------------------------------------------
-void Area::fov(Map2D<char> & map, unsigned int origin_x, unsigned int origin_y, unsigned int origin_z, unsigned int radius)
+void Area::fov(
+    Map2D<char> & map,
+    unsigned int origin_x,
+    unsigned int origin_y,
+    unsigned int origin_z,
+    unsigned int radius)
 {
     double incr_x = 0.0;
     double incr_y = 0.0;
@@ -592,29 +599,26 @@ bool Area::fastInSight(
     unsigned int origin_z,
     unsigned int target_x,
     unsigned int target_y,
-    unsigned int target_z)
+    unsigned int target_z,
+    unsigned int radius)
 {
     int dx = static_cast<int>(target_x) - static_cast<int>(origin_x);
     int dy = static_cast<int>(target_y) - static_cast<int>(origin_y);
     int dz = static_cast<int>(target_z) - static_cast<int>(origin_z);
-
     double nx = dx;
     double ny = dy;
     double nz = dz;
-
     int sign_x = dx > 0 ? 1 : -1;
     int sign_y = dy > 0 ? 1 : -1;
     int sign_z = dz > 0 ? 1 : -1;
-
     unsigned int x = origin_x;
     unsigned int y = origin_y;
     unsigned int z = origin_z;
-
     double ix = 0;
     double iy = 0;
     double iz = 0;
-
-    while ((ix < nx) || (iy < ny) || (iz < nz))
+    unsigned int step = 0;
+    while (((ix < nx) || (iy < ny) || (iz < nz)) && (step < radius))
     {
         double change_x = (0.5 + ix) / nx;
         double change_y = (0.5 + iy) / ny;
@@ -682,8 +686,14 @@ bool Area::fastInSight(
         {
             return false;
         }
+        step++;
     }
     return true;
+}
+
+bool Area::fastInSight(Coordinates<unsigned int> origin, Coordinates<unsigned int> target, unsigned int radius)
+{
+    return this->fastInSight(origin.x, origin.y, origin.z, target.x, target.y, target.z, radius);
 }
 
 void Area::luaRegister(lua_State * L)

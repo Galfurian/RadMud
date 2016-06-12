@@ -128,7 +128,12 @@ class Area
         /// @param origin_y The y coordinate of the central room.
         /// @param origin_z The z coordinate of the central room.
         /// @param radius   The radius of visibility of the character.
-        void fov(Map2D<char> & map, unsigned int origin_x, unsigned int origin_y, unsigned int origin_z, unsigned int radius);
+        void fov(
+            Map2D<char> & map,
+            unsigned int origin_x,
+            unsigned int origin_y,
+            unsigned int origin_z,
+            unsigned int radius);
 
         /// @brief A simple line of sight algorithm.
         /// @param map      The map where the LOS algorithm has to write the line.
@@ -156,13 +161,21 @@ class Area
         /// @param target_x The target x coordinate.
         /// @param target_y The target y coordinate.
         /// @param target_z The target z coordinate.
+        /// @param radius   The radius of visibility.
         bool fastInSight(
             unsigned int origin_x,
             unsigned int origin_y,
             unsigned int origin_z,
             unsigned int target_x,
             unsigned int target_y,
-            unsigned int target_z);
+            unsigned int target_z,
+            unsigned int radius);
+
+        /// @brief Determine if a coordinate is in sight from a starting one.
+        /// @param origin The coordinates of the origin.
+        /// @param origin The coordinates of the target room.
+        /// @param radius The radius of visibility.
+        bool fastInSight(Coordinates<unsigned int> origin, Coordinates<unsigned int> target, unsigned int radius);
 
         /// @brief Function used to register inside the lua environment the class.
         /// @param L The lua environment.
