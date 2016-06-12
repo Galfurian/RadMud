@@ -646,7 +646,7 @@ bool Room::operator==(const Room & right) const
     return vnum == right.vnum;
 }
 
-bool CreateRoom(Coordinates<unsigned int> coord, Room * source_room)
+bool CreateRoom(Coordinates<int> coord, Room * source_room)
 {
     Room * new_room = new Room();
     vector<string> arguments;
@@ -742,30 +742,9 @@ bool ConnectRoom(Room * room)
     for (auto iterator : Mud::instance().mudDirections)
     {
         // Get the coordinate modifier.
-        Coordinates<int> coordinatesModifier = GetCoordinates(iterator.second);
-        int finalX = (static_cast<int>(room->coord.x) + coordinatesModifier.x);
-        int finalY = (static_cast<int>(room->coord.y) + coordinatesModifier.y);
-        int finalZ = (static_cast<int>(room->coord.z) + coordinatesModifier.z);
-        if (finalX < 0)
-        {
-            Logger::log(LogLevel::Error, "Out of Bound X :%s\n", ToString(finalX));
-            continue;
-        }
-        if (finalY < 0)
-        {
-            Logger::log(LogLevel::Error, "Out of Bound Y :%s\n", ToString(finalY));
-            continue;
-        }
-        if (finalZ < 0)
-        {
-            Logger::log(LogLevel::Error, "Out of Bound Z :%s\n", ToString(finalZ));
-            continue;
-        }
-        Coordinates<unsigned int> finalCoordinates = Coordinates<unsigned int>(static_cast<unsigned int>(finalX),
-            static_cast<unsigned int>(finalY), static_cast<unsigned int>(finalZ));
-        Logger::log(LogLevel::Error, "Searching room at: %s\n", finalCoordinates.toString());
+        Coordinates<int> coordinates = room->coord + GetCoordinates(iterator.second);
         // Get the room at the given coordinates.
-        Room * near = room->area->getRoom(finalCoordinates);
+        Room * near = room->area->getRoom(coordinates);
         if (near != nullptr)
         {
             Logger::log(LogLevel::Error, "Found a room:%s\n", near->name);

@@ -169,7 +169,7 @@ class Character
 
         /// @brief Evaluate the maximum distance at which the character can still see.
         /// @return The maximum radius of view.
-        unsigned int getViewDistance();
+        int getViewDistance();
 
         /// @brief Provides a pointer to the Action object associated to this character.
         /// @return A pointer to Action.

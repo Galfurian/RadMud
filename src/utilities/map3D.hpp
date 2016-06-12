@@ -27,14 +27,14 @@ template<typename T>
 class Map3D
 {
     private:
-        typedef std::tuple<unsigned int, unsigned int, unsigned int> key_t;
+        typedef std::tuple<int, int, int> key_t;
         typedef typename std::map<key_t, T> DataMatrix3D;
         /// Width of th map.
-        unsigned width;
+        int width;
         /// Height of th map.
-        unsigned height;
+        int height;
         /// Elevation of th map.
-        unsigned elevation;
+        int elevation;
         /// Data contained inside the map.
         DataMatrix3D data;
 
@@ -57,7 +57,7 @@ class Map3D
         /// @param _width     The width of the 3D map.
         /// @param _height    The height of the 3D map.
         /// @param _elevation The elevation of the 3D map.
-        Map3D(unsigned _width, unsigned _height, unsigned _elevation) :
+        Map3D(int _width, int _height, int _elevation) :
             width(_width),
             height(_height),
             elevation(_elevation),
@@ -71,17 +71,17 @@ class Map3D
         /// @param _height    The height of the 3D map.
         /// @param _elevation The elevation of the 3D map.
         /// @param value     The initial value of the cells.
-        Map3D(unsigned _width, unsigned _height, unsigned _elevation, T value) :
+        Map3D(int _width, int _height, int _elevation, T value) :
             width(_width),
             height(_height),
             elevation(_elevation),
             data()
         {
-            for (unsigned z = 0; z < width; z++)
+            for (int z = 0; z < width; z++)
             {
-                for (unsigned y = 0; y < height; y++)
+                for (int y = 0; y < height; y++)
                 {
-                    for (unsigned x = 0; x < height; x++)
+                    for (int x = 0; x < height; x++)
                     {
                         data[std::make_tuple(z, y, x)] = value;
                     }
@@ -100,7 +100,7 @@ class Map3D
         /// @param y     Coordinate on heigth.
         /// @param z     Coordinate on altitude.
         /// @param value The value that has to be set.
-        bool set(unsigned x, unsigned y, unsigned z, T value)
+        bool set(int x, int y, int z, T value)
         {
 #if 0
             const key_t key = std::make_tuple(x, y, z);
@@ -125,7 +125,7 @@ class Map3D
         /// @param y Coordinate on heigth.
         /// @param z Coordinate on altitude.
         /// @return The object at the given Coordinates3D.
-        T & get(unsigned x, unsigned y, unsigned z)
+        T & get(int x, int y, int z)
         {
             return data[std::make_tuple(x, y, z)];
         }
@@ -135,7 +135,7 @@ class Map3D
         /// @param y Coordinate on heigth axis.
         /// @param z Coordinate on altitude axis.
         /// @return The object at the given Coordinates3D.
-        iterator erase(unsigned x, unsigned y, unsigned z)
+        iterator erase(int x, int y, int z)
         {
             return FindErase(data, std::make_tuple(x, y, z));
         }

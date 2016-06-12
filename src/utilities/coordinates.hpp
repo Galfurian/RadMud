@@ -84,6 +84,38 @@ class Coordinates
             return true;
         }
 
+        /// @brief Define operator <, less than.
+        /// @param right The right parameter.
+        /// @return True if left Coordinates are less than right Coordinates.
+        bool operator<(const Coordinates<CoordType> & right)
+        {
+            if (x < right.x)
+            {
+                return true;
+            }
+            if (y < right.y)
+            {
+                return true;
+            }
+            if (z < right.z)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// @brief Add to the current Coordinates the right operand.
+        /// @param right The right parameter.
+        /// @return The new Coordinates.
+        Coordinates<CoordType> operator+(const Coordinates<CoordType> & right)
+        {
+            Coordinates<CoordType> coord;
+            coord.x = x + right.x;
+            coord.y = y + right.y;
+            coord.z = z + right.z;
+            return coord;
+        }
+
         std::string toString() const
         {
             return "[X:" + ToString(x) + "; Y:" + ToString(y) + "; Z:" + ToString(z) + "]";
@@ -101,43 +133,5 @@ class Coordinates
             .endClass();
         }
 };
-
-/// @brief Define operator <, less than.
-/// @param right The right parameter.
-/// @return True if left Coordinates are less than right Coordinates.
-template<typename CoordType, typename OtherCoordType>
-bool operator<(const Coordinates<CoordType> & left, const Coordinates<OtherCoordType> & right)
-{
-    if (static_cast<long int>(left.x) < static_cast<long int>(right.x))
-    {
-        return true;
-    }
-    if (static_cast<long int>(left.y) < static_cast<long int>(right.y))
-    {
-        return true;
-    }
-    if (static_cast<long int>(left.z) < static_cast<long int>(right.z))
-    {
-        return true;
-    }
-    return false;
-}
-
-/// @brief Add to the current Coordinates the right operand.
-/// @param right The right parameter.
-/// @return The new Coordinates.
-template<typename CoordType, typename OtherCoordType>
-Coordinates<CoordType> operator+(const Coordinates<CoordType> & left, const Coordinates<OtherCoordType> & right)
-{
-    if (left < right)
-    {
-        throw std::runtime_error("Wrong type of coordinates.");
-    }
-    Coordinates<CoordType> coord;
-    coord.x = static_cast<CoordType>(static_cast<long int>(left.x) + static_cast<long int>(right.x));
-    coord.y = static_cast<CoordType>(static_cast<long int>(left.y) + static_cast<long int>(right.y));
-    coord.z = static_cast<CoordType>(static_cast<long int>(left.z) + static_cast<long int>(right.z));
-    return coord;
-}
 
 #endif

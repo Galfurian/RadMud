@@ -355,9 +355,9 @@ void Character::updateResources()
     }
 }
 
-unsigned int Character::getViewDistance()
+int Character::getViewDistance()
 {
-    return 3 + GetAbilityModifier(perception);
+    return 3 + static_cast<int>(GetAbilityModifier(perception));
 }
 
 Action * Character::getAction()
@@ -1330,7 +1330,7 @@ void Character::loadScript(const std::string & scriptFilename)
     Item::luaRegister(L);
     Material::luaRegister(L);
     Race::luaRegister(L);
-    Coordinates<unsigned int>::luaRegister(L);
+    Coordinates<int>::luaRegister(L);
     Exit::luaRegister(L);
     Room::luaRegister(L);
 

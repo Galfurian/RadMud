@@ -66,12 +66,16 @@ bool Area::check()
     return true;
 }
 
-bool Area::inBoundaries(const unsigned int & x, const unsigned int & y, const unsigned int & z)
+bool Area::inBoundaries(const int & x, const int & y, const int & z)
 {
-    return ((x <= width) && (y <= height) && (z <= elevation));
+    bool result = true;
+    result &= (x >= 0) && (x <= width);
+    result &= (y >= 0) && (y <= height);
+    result &= (z >= 0) && (z <= elevation);
+    return result;
 }
 
-bool Area::inBoundaries(const Coordinates<unsigned int> & coord)
+bool Area::inBoundaries(const Coordinates<int> & coord)
 {
     return this->inBoundaries(coord.x, coord.y, coord.z);
 }
@@ -115,12 +119,12 @@ Room * Area::getRoom(int room_vnum)
     return nullptr;
 }
 
-Room * Area::getRoom(unsigned int x, unsigned int y, unsigned int z)
+Room * Area::getRoom(int x, int y, int z)
 {
     return areaMap.get(x, y, z);
 }
 
-Room * Area::getRoom(Coordinates<unsigned int> coord)
+Room * Area::getRoom(Coordinates<int> coord)
 {
     if (this->inBoundaries(coord))
     {
@@ -129,48 +133,30 @@ Room * Area::getRoom(Coordinates<unsigned int> coord)
     return nullptr;
 }
 
-std::vector<std::string> Area::drawFov(Room * centerRoom, unsigned int radius)
+std::vector<std::string> Area::drawFov(Room * centerRoom, int radius)
 {
     std::vector<std::string> layers(3);
     if (!this->inBoundaries(centerRoom->coord))
     {
         return layers;
     }
-    unsigned int origin_x = static_cast<unsigned int>(centerRoom->coord.x);
-    unsigned int origin_y = static_cast<unsigned int>(centerRoom->coord.y);
-    unsigned int origin_z = static_cast<unsigned int>(centerRoom->coord.z);
-
-    unsigned int min_x = 0;
-    if (origin_x > radius)
-    {
-        min_x = origin_x - radius;
-    }
-    unsigned int max_x = (origin_x + radius);
-    if (max_x > this->width)
-    {
-        max_x = this->width;
-    }
-    unsigned int min_y = 0;
-    if (origin_y >= radius)
-    {
-        min_y = origin_y - radius;
-    }
-    unsigned int max_y = (origin_y + radius);
-    if (max_y > this->height)
-    {
-        max_y = this->height;
-    }
-
+    // Retrieve the coordinates of the room.
+    int origin_x = centerRoom->coord.x;
+    int origin_y = centerRoom->coord.y;
+    int origin_z = centerRoom->coord.z;
+    // Evaluate the minimum and maximum value for x and y.
+    int min_x = (origin_x < radius) ? 0 : (origin_x - radius);
+    int max_x = ((origin_x + radius) > this->width) ? this->width : (origin_x + radius);
+    int min_y = (origin_y < radius) ? 0 : (origin_y - radius);
+    int max_y = ((origin_y + radius - 1) > this->height) ? this->height : (origin_y + radius - 1);
     // Create a 2D map of chararacters.
     Map2D<MapTile> map(radius * 2, radius * 2);
-
     // Evaluate the field of view.
     this->fov(map, origin_x, origin_y, origin_z, radius);
-
     // Prepare Enviroment layer.
-    for (unsigned int y = max_y; y > min_y; --y)
+    for (int y = max_y; y >= min_y; --y)
     {
-        for (unsigned int x = min_x; x < max_x; ++x)
+        for (int x = min_x; x < max_x; ++x)
         {
             std::string tileCode = " : ";
             if (map.get(x, y) == MapTile::Walkable)
@@ -218,9 +204,9 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, unsigned int radius)
     }
 
     // Prepare Objects layer.
-    for (unsigned int y = max_y; y > min_y; --y)
+    for (int y = max_y; y > min_y; --y)
     {
-        for (unsigned int x = min_x; x < max_x; ++x)
+        for (int x = min_x; x < max_x; ++x)
         {
             std::string tileCode = " : ";
             Room * room = this->getRoom(x, y, origin_z);
@@ -253,9 +239,9 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, unsigned int radius)
     }
 
     // Prepare Living Creatures layer.
-    for (unsigned int y = max_y; y > min_y; --y)
+    for (int y = max_y; y > min_y; --y)
     {
-        for (unsigned int x = min_x; x < max_x; ++x)
+        for (int x = min_x; x < max_x; ++x)
         {
             std::string tileCode = " : ";
             if ((origin_x == x) && (origin_y == y))
@@ -289,47 +275,30 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, unsigned int radius)
     return layers;
 }
 
-std::string Area::drawASCIIFov(Room * centerRoom, unsigned int radius)
+std::string Area::drawASCIIFov(Room * centerRoom, int radius)
 {
     std::string result;
     if (!this->inBoundaries(centerRoom->coord))
     {
         return result;
     }
-    unsigned int origin_x = static_cast<unsigned int>(centerRoom->coord.x);
-    unsigned int origin_y = static_cast<unsigned int>(centerRoom->coord.y);
-    unsigned int origin_z = static_cast<unsigned int>(centerRoom->coord.z);
-
-    unsigned int min_x = 0;
-    if (origin_x > radius)
-    {
-        min_x = origin_x - radius;
-    }
-    unsigned int max_x = (origin_x + radius);
-    if (max_x > this->width)
-    {
-        max_x = this->width;
-    }
-    unsigned int min_y = 0;
-    if (origin_y >= radius)
-    {
-        min_y = origin_y - radius;
-    }
-    unsigned int max_y = (origin_y + radius);
-    if (max_y > this->height)
-    {
-        max_y = this->height;
-    }
-
+    // Retrieve the coordinates of the room.
+    int origin_x = centerRoom->coord.x;
+    int origin_y = centerRoom->coord.y;
+    int origin_z = centerRoom->coord.z;
+    // Evaluate the minimum and maximum value for x and y.
+    int min_x = (origin_x < radius) ? 0 : (origin_x - radius);
+    int max_x = ((origin_x + radius) > this->width) ? this->width : (origin_x + radius);
+    int min_y = (origin_y < radius) ? 0 : (origin_y - radius);
+    int max_y = ((origin_y + radius - 1) > this->height) ? this->height : (origin_y + radius - 1);
     // Create a 2D map of chararacters.
     Map2D<MapTile> map(radius * 2, radius * 2);
     // Evaluate the field of view.
     this->fov(map, origin_x, origin_y, origin_z, radius);
-
     // Prepare Living Creatures layer.
-    for (unsigned int y = max_y; y > min_y; --y)
+    for (int y = max_y; y >= min_y; --y)
     {
-        for (unsigned int x = min_x; x < max_x; ++x)
+        for (int x = min_x; x < max_x; ++x)
         {
             // The tile which has to be placed.
             std::string tile = " ";
@@ -346,10 +315,12 @@ std::string Area::drawASCIIFov(Room * centerRoom, unsigned int radius)
                 {
                     if (HasFlag(door->flags, ItemFlag::Closed))
                     {
+                        Logger::log(LogLevel::Error, "Found Door.");
                         tile = 'D';
                     }
                     else
                     {
+                        Logger::log(LogLevel::Error, "Found Open Door.");
                         tile = 'O';
                     }
                 }
@@ -358,6 +329,7 @@ std::string Area::drawASCIIFov(Room * centerRoom, unsigned int radius)
                 {
                     if (HasFlag(up->flags, ExitFlag::Stairs) && HasFlag(down->flags, ExitFlag::Stairs))
                     {
+                        Logger::log(LogLevel::Error, "Found UpDown.");
                         tile = "X";
                     }
                 }
@@ -365,6 +337,7 @@ std::string Area::drawASCIIFov(Room * centerRoom, unsigned int radius)
                 {
                     if (HasFlag(up->flags, ExitFlag::Stairs))
                     {
+                        Logger::log(LogLevel::Error, "Found Up.");
                         tile = ">";
                     }
                 }
@@ -372,16 +345,19 @@ std::string Area::drawASCIIFov(Room * centerRoom, unsigned int radius)
                 {
                     if (HasFlag(down->flags, ExitFlag::Stairs))
                     {
+                        Logger::log(LogLevel::Error, "Found Down.");
                         tile = "<";
                     }
                     else
                     {
+                        Logger::log(LogLevel::Error, "Found Pit.");
                         tile = ' ';
                     }
                 }
                 // III - ITEMS
                 if (room->items.size() > 0)
                 {
+                    Logger::log(LogLevel::Error, "Found Item.");
                     tile = room->items.back()->model->getTile();
                 }
                 // II  - CHARACTERS
@@ -391,8 +367,8 @@ std::string Area::drawASCIIFov(Room * centerRoom, unsigned int radius)
                     {
                         if (!HasFlag(iterator->flags, CharacterFlag::Invisible))
                         {
+                            Logger::log(LogLevel::Error, "Found Character.");
                             tile = iterator->race->getTile();
-                            break;
                         }
                     }
                 }
@@ -400,8 +376,10 @@ std::string Area::drawASCIIFov(Room * centerRoom, unsigned int radius)
                 if ((origin_x == x) && (origin_y == y))
                 {
                     tile = "@";
+                    Logger::log(LogLevel::Error, "Found player.");
                 }
             }
+            Logger::log(LogLevel::Error, "(%s;%s;%s)", ToString(x), ToString(y), ToString(origin_z));
             result += tile;
         }
         result += "\n";
@@ -409,12 +387,7 @@ std::string Area::drawASCIIFov(Room * centerRoom, unsigned int radius)
     return result;
 }
 
-void Area::fov(
-    Map2D<MapTile> & map,
-    unsigned int origin_x,
-    unsigned int origin_y,
-    unsigned int origin_z,
-    unsigned int radius)
+void Area::fov(Map2D<MapTile> & map, int origin_x, int origin_y, int origin_z, int radius)
 {
     double incr_x = 0.0;
     double incr_y = 0.0;
@@ -430,29 +403,26 @@ void Area::fov(
 
 void Area::los(
     Map2D<MapTile> & map,
-    unsigned int origin_x,
-    unsigned int origin_y,
-    unsigned int origin_z,
+    int origin_x,
+    int origin_y,
+    int origin_z,
     double incr_x,
     double incr_y,
     double incr_z,
-    unsigned int radius)
+    int radius)
 {
     double ox = origin_x + static_cast<double>(0.5f);
     double oy = origin_y + static_cast<double>(0.5f);
-    double oz = origin_z;
-
-    for (unsigned int i = 0; i < radius; ++i)
+    double oz = origin_z + static_cast<double>(0.5f);
+    for (int i = 0; i < radius; ++i)
     {
         // Transform into integer the coordinates.
-        unsigned int curr_x = static_cast<unsigned int>(ox);
-        unsigned int curr_y = static_cast<unsigned int>(oy);
-        unsigned int curr_z = static_cast<unsigned int>(oz);
+        int curr_x = static_cast<int>(ox);
+        int curr_y = static_cast<int>(oy);
+        int curr_z = static_cast<int>(oz);
         // Check if out of boundaries.
         if (!this->inBoundaries(curr_x, curr_y, curr_z))
         {
-            Logger::log(LogLevel::Error, "Not in boundaries: %s %s %s\n", ToString(curr_x), ToString(curr_y),
-                ToString(curr_z));
             map.set(curr_x, curr_y, MapTile::Void);
             break;
         }
@@ -460,8 +430,6 @@ void Area::los(
         Room * currentRoom = this->getRoom(curr_x, curr_y, curr_z);
         if (currentRoom == nullptr)
         {
-            Logger::log(LogLevel::Error, "No room at: %s %s %s\n", ToString(curr_x), ToString(curr_y),
-                ToString(curr_z));
             map.set(curr_x, curr_y, MapTile::Void);
             break;
         }
@@ -485,29 +453,29 @@ void Area::los(
 }
 
 bool Area::fastInSight(
-    unsigned int origin_x,
-    unsigned int origin_y,
-    unsigned int origin_z,
-    unsigned int target_x,
-    unsigned int target_y,
-    unsigned int target_z,
+    int origin_x,
+    int origin_y,
+    int origin_z,
+    int target_x,
+    int target_y,
+    int target_z,
     unsigned int radius)
 {
-    int dx = static_cast<int>(target_x) - static_cast<int>(origin_x);
-    int dy = static_cast<int>(target_y) - static_cast<int>(origin_y);
-    int dz = static_cast<int>(target_z) - static_cast<int>(origin_z);
+    int dx = target_x - origin_x;
+    int dy = target_y - origin_y;
+    int dz = target_z - origin_z;
     double nx = dx;
     double ny = dy;
     double nz = dz;
     int sign_x = dx > 0 ? 1 : -1;
     int sign_y = dy > 0 ? 1 : -1;
     int sign_z = dz > 0 ? 1 : -1;
-    unsigned int x = origin_x;
-    unsigned int y = origin_y;
-    unsigned int z = origin_z;
     double ix = 0;
     double iy = 0;
     double iz = 0;
+    int current_x = 0;
+    int current_y = 0;
+    int current_z = 0;
     unsigned int step = 0;
     while (((ix < nx) || (iy < ny) || (iz < nz)) && (step < radius))
     {
@@ -520,26 +488,26 @@ bool Area::fastInSight(
             if (change_x < change_z)
             {
                 // Next step is on X axis.
-                if ((static_cast<int>(x) + sign_x) < 0)
+                if ((current_x + sign_x) < 0)
                 {
                     return false;
                 }
                 else
                 {
-                    x = static_cast<unsigned int>(static_cast<int>(x) + sign_x);
+                    current_x += sign_x;
                     ix++;
                 }
             }
             else
             {
                 // Next step is on Z axis.
-                if ((static_cast<int>(z) + sign_z) < 0)
+                if ((current_z + sign_z) < 0)
                 {
                     return false;
                 }
                 else
                 {
-                    z = static_cast<unsigned int>(static_cast<int>(z) + sign_z);
+                    current_z += sign_z;
                     iz++;
                 }
             }
@@ -549,31 +517,31 @@ bool Area::fastInSight(
             if (change_y < change_z)
             {
                 // Next step is on Y axis.
-                if ((static_cast<int>(y) + sign_y) < 0)
+                if ((current_y + sign_y) < 0)
                 {
                     return false;
                 }
                 else
                 {
-                    y = static_cast<unsigned int>(static_cast<int>(y) + sign_y);
+                    current_y += sign_y;
                     iy++;
                 }
             }
             else
             {
                 // Next step is on Z axis.
-                if ((static_cast<int>(z) + sign_z) < 0)
+                if ((current_z + sign_z) < 0)
                 {
                     return false;
                 }
                 else
                 {
-                    z = static_cast<unsigned int>(static_cast<int>(z) + sign_z);
+                    current_z += sign_z;
                     iz++;
                 }
             }
         }
-        if (this->getRoom(x, y, z) == nullptr)
+        if (this->getRoom(current_x, current_y, current_z) == nullptr)
         {
             return false;
         }
@@ -582,7 +550,7 @@ bool Area::fastInSight(
     return true;
 }
 
-bool Area::fastInSight(Coordinates<unsigned int> origin, Coordinates<unsigned int> target, unsigned int radius)
+bool Area::fastInSight(Coordinates<int> origin, Coordinates<int> target, unsigned int radius)
 {
     return this->fastInSight(origin.x, origin.y, origin.z, target.x, target.y, target.z, radius);
 }

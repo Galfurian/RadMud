@@ -736,9 +736,9 @@ bool LoadRoom(ResultSet * result)
         Room * room = new Room();
         // Initialize the Room.
         room->vnum = result->getNextInteger();
-        room->coord.x = result->getNextUnsignedInteger();
-        room->coord.y = result->getNextUnsignedInteger();
-        room->coord.z = result->getNextUnsignedInteger();
+        room->coord.x = result->getNextInteger();
+        room->coord.y = result->getNextInteger();
+        room->coord.z = result->getNextInteger();
         room->terrain = result->getNextString();
         room->name = result->getNextString();
         room->description = result->getNextString();
@@ -846,9 +846,9 @@ bool LoadArea(ResultSet * result)
         area->name = result->getNextString();
         area->builder = result->getNextString();
         area->continent = result->getNextString();
-        area->width = result->getNextUnsignedInteger();
-        area->height = result->getNextUnsignedInteger();
-        area->elevation = result->getNextUnsignedInteger();
+        area->width = result->getNextInteger();
+        area->height = result->getNextInteger();
+        area->elevation = result->getNextInteger();
         area->tileSet = result->getNextInteger();
         area->type = static_cast<AreaType>(result->getNextUnsignedInteger());
         area->status = static_cast<AreaStatus>(result->getNextUnsignedInteger());
@@ -931,8 +931,8 @@ bool LoadContinent(ResultSet * result)
         continent->vnum = result->getNextInteger();
         continent->name = result->getNextString();
         continent->builder = result->getNextString();
-        continent->width = result->getNextUnsignedInteger();
-        continent->height = result->getNextUnsignedInteger();
+        continent->width = result->getNextInteger();
+        continent->height = result->getNextInteger();
         continent->txtMap = result->getNextString();
         // Add the continent to the map.
         continent->init();

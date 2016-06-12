@@ -28,9 +28,9 @@ class Map2D
 {
     private:
         /// Width of th map.
-        unsigned width;
+        int width;
         /// Height of th map.
-        unsigned height;
+        int height;
         /// Data contained inside the map.
         std::map<std::tuple<int, int>, T> data;
 
@@ -38,9 +38,9 @@ class Map2D
 
         /// @brief Constructor.
         Map2D() :
-                width(),
-                height(),
-                data()
+            width(),
+            height(),
+            data()
         {
             // Nothing to do.
         }
@@ -48,10 +48,10 @@ class Map2D
         /// @brief Constructor.
         /// @param _width  The width of the 2D map.
         /// @param _height The height of the 2D map.
-        Map2D(unsigned _width, unsigned _height) :
-                width(_width),
-                height(_height),
-                data()
+        Map2D(int _width, int _height) :
+            width(_width),
+            height(_height),
+            data()
         {
             // Nothing to do.
         }
@@ -60,14 +60,14 @@ class Map2D
         /// @param _width  The width of the 2D map.
         /// @param _height The height of the 2D map.
         /// @param value  The initial value of the cells.
-        Map2D(unsigned _width, unsigned _height, T value) :
-                width(_width),
-                height(_height),
-                data()
+        Map2D(int _width, int _height, T value) :
+            width(_width),
+            height(_height),
+            data()
         {
-            for (unsigned y = 0; y < width; y++)
+            for (int y = 0; y < width; y++)
             {
-                for (unsigned x = 0; x < height; x++)
+                for (int x = 0; x < height; x++)
                 {
                     data[std::make_tuple(y, x)] = value;
                 }
@@ -84,7 +84,7 @@ class Map2D
         /// @param x Coordinate on width axis.
         /// @param y Coordinate on heigth axis.
         /// @return The object at the given Coordinates2D.
-        T & operator()(unsigned x, unsigned y)
+        T & operator()(int x, int y)
         {
             return data[std::make_tuple(x, y)];
         }
@@ -93,7 +93,7 @@ class Map2D
         /// @param x     Coordinate on width axis.
         /// @param y     Coordinate on heigth axis.
         /// @param value The value that has to be set.
-        void set(unsigned x, unsigned y, T value)
+        void set(int x, int y, T value)
         {
             data[std::make_tuple(x, y)] = value;
         }
@@ -102,7 +102,7 @@ class Map2D
         /// @param x Coordinate on width axis.
         /// @param y Coordinate on heigth axis.
         /// @return The object at the given Coordinates2D.
-        T & get(unsigned x, unsigned y)
+        T & get(int x, int y)
         {
             return data[std::make_tuple(x, y)];
         }
@@ -110,7 +110,7 @@ class Map2D
         /// @brief Erase the object at the given Coordinates2D.
         /// @param x Coordinate on width axis.
         /// @param y Coordinate on heigth axis.
-        void erase(unsigned x, unsigned y)
+        void erase(int x, int y)
         {
             set(x, y, nullptr);
         }

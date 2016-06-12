@@ -654,37 +654,17 @@ void DoRoomCreate(Character * character, std::istream & sArgs)
         return; // Skip the rest of the function.
     }
     // Get the coordinate modifier.
-    Coordinates<int> directionModifier = GetCoordinates(direction);
-    int finalX = (static_cast<int>(currentRoom->coord.x) + directionModifier.x);
-    int finalY = (static_cast<int>(currentRoom->coord.y) + directionModifier.y);
-    int finalZ = (static_cast<int>(currentRoom->coord.z) + directionModifier.z);
-    if (finalX < 0)
+    Coordinates<int> targetCoord = currentRoom->coord + GetCoordinates(direction);
+    if (!currentArea->inBoundaries(targetCoord))
     {
-        character->sendMsg("You cannot create a room in that direction (Out of Bound X)!\n");
+        character->sendMsg("Sorry but in that direction you will go outside the boundaries.\n");
         return; // Skip the rest of the function.
     }
-    if (finalY < 0)
-    {
-        character->sendMsg("You cannot create a room in that direction (Out of Bound Y)!\n");
-        return; // Skip the rest of the function.
-    }
-    if (finalZ < 0)
-    {
-        character->sendMsg("You cannot create a room in that direction (Out of Bound Z)!\n");
-        return; // Skip the rest of the function.
-    }
-    Coordinates<unsigned int> targetCoord = Coordinates<unsigned int>(static_cast<unsigned int>(finalX),
-        static_cast<unsigned int>(finalY), static_cast<unsigned int>(finalZ));
     // Find the room.
     Room * targetRoom = currentArea->getRoom(targetCoord);
     if (targetRoom)
     {
         character->sendMsg("Sorry but in that direction there is already a room.\n");
-        return; // Skip the rest of the function.
-    }
-    if (!currentArea->inBoundaries(targetCoord))
-    {
-        character->sendMsg("Sorry but in that direction you will go outside the boundaries.\n");
         return; // Skip the rest of the function.
     }
     if (!CreateRoom(targetCoord, currentRoom))
@@ -726,7 +706,7 @@ void DoRoomDelete(Character * character, std::istream & sArgs)
         character->sendMsg("You cannot create a room in that direction (out of bound)!\n");
         return; // Skip the rest of the function.
     }
-    Coordinates<unsigned int> targetCoord = character->room->coord + GetCoordinates(direction);
+    Coordinates<int> targetCoord = character->room->coord + GetCoordinates(direction);
     // Find the room.
     Room * targetRoom = currentArea->getRoom(targetCoord);
     if (targetRoom == nullptr)

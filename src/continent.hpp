@@ -21,6 +21,7 @@
 
 #include "utilities/coordinates.hpp"
 #include "utilities/map2D.hpp"
+#include "utilities/map3D.hpp"
 
 class Room;
 
@@ -63,10 +64,6 @@ typedef enum class ContinentTiles
 /// @brief Holds details about a continent.
 class Continent
 {
-    private:
-        /// It's a multimap of rooms defined inside a 2D grid.
-        typedef std::map<std::tuple<int, int, int>, Room> ContinentMap;
-
     public:
         /// The virtual number of the continent.
         int vnum;
@@ -75,15 +72,17 @@ class Continent
         /// The name of the original builder of this continent.
         std::string builder;
         /// The width of the continent.
-        unsigned int width;
+        int width;
         /// The height of the continent.
-        unsigned int height;
+        int height;
+        /// The elevation of the continent.
+        int elevation;
         /// The textual version of the continent map.
         std::string txtMap;
         /// The grid of the continent map.
         Map2D<char> charMap;
         /// The map of rooms.
-        ContinentMap continentMap;
+        Map3D<Room> continentMap;
         /// The tileset of the entire continent.
         int tileSet;
 
@@ -109,31 +108,31 @@ class Continent
         /// @param z Coordinate on altitude axis.
         /// @return <b>True</b> if the coordinates are valid,<br>
         ///         <b>False</b> otherwise..
-        bool inBoundaries(unsigned int x, unsigned int y, unsigned int z);
+        bool inBoundaries(int x, int y, int z);
 
         /// @brief Check if the given coordinates is inside the boundaries.
         /// @param coord The coordinates to check.
         /// @return <b>True</b> if the coordinates are valid,<br>
         ///         <b>False</b> otherwise.
-        bool inBoundaries(Coordinates<unsigned int> coord);
+        bool inBoundaries(Coordinates<int> coord);
 
         /// @brief Get the room at the given coordinates.
         /// @param x Coordinate on width axis.
         /// @param y Coordinate on height axis.
         /// @param z Coordinate on altitude axis.
         /// @return The room at the selected spot.
-        Room * getRoom(unsigned int y, unsigned int x, unsigned int z);
+        Room * getRoom(int x, int y, int z);
 
         /// @brief Get the room at the given coordinates.
         /// @param coord The coordiantes where search the room.
         /// @return The room at the selected spot.
-        Room * getRoom(Coordinates<unsigned int> coord);
+        Room * getRoom(Coordinates<int> coord);
 
         /// @brief Draw the Filed of View for a character.
         /// @param room   The room from where the algorithm has to compute the Field of View.
         /// @param radius The radius of visibility of the character.
         /// @return The map containing all the Information about the Field of View of a character.
-        std::vector<std::string> drawFov(Room * room, unsigned int radius);
+        std::vector<std::string> drawFov(Room * room, int radius);
 
         /// @brief A faster but a little inacurate version of a FOV alforithm.
         /// @param map      A 2D map, where the the Field of View will be drawn.
@@ -141,12 +140,7 @@ class Continent
         /// @param origin_y The y coordinate of the central room.
         /// @param origin_z The z coordinate of the central room.
         /// @param radius   The radius of visibility of the character.
-        void fieldOfView(
-            Map2D<ContinentTile> & map,
-            unsigned int origin_x,
-            unsigned int origin_y,
-            unsigned int origin_z,
-            unsigned int radius);
+        void fieldOfView(Map2D<ContinentTile> & map, int origin_x, int origin_y, int origin_z, int radius);
 
         /// @brief A fast line of sight algorithm between two points.
         /// @param map      The map where the LOS algorithm has to write the line.
@@ -159,13 +153,13 @@ class Continent
         /// @param radius   The radius of visibility of the character.
         void lineOfSight(
             Map2D<ContinentTile> & map,
-            unsigned int origin_x,
-            unsigned int origin_y,
-            unsigned int origin_z,
+            int origin_x,
+            int origin_y,
+            int origin_z,
             double incr_x,
             double incr_y,
             double incr_z,
-            unsigned int radius);
+            int radius);
 };
 
 /// Continent list handler.

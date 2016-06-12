@@ -34,6 +34,7 @@ Continent::Continent() :
     builder(),
     width(),
     height(),
+    elevation(),
     txtMap(),
     charMap(),
     continentMap(),
@@ -57,7 +58,7 @@ bool Continent::check()
 
 void Continent::init()
 {
-    unsigned int y = 0, x = 0;
+    int y = 0, x = 0;
     for (char c : txtMap)
     {
         if (c == '\n')
@@ -68,11 +69,11 @@ void Continent::init()
         }
         charMap.set(x, y, c);
 
-        Room * room = &continentMap[std::make_tuple(x, y, 0)];
+        Room * room = &continentMap.get(x, y, 0);
         room->vnum = -1;
         room->area = nullptr;
         room->continent = this;
-        room->coord = Coordinates<unsigned int>(x, y, 0);
+        room->coord = Coordinates<int>(x, y, 0);
         room->terrain = "outside";
         room->name = "Travelling";
         room->description = "You are traveling along the continent.";
@@ -83,16 +84,16 @@ void Continent::init()
     {
         for (x = 0; x < width; x++)
         {
-            continentMap[std::make_tuple(x, y, 0)].connectExits();
+            continentMap.get(x, y, 0).connectExits();
         }
     }
 }
 
 void Continent::print()
 {
-    for (unsigned int y = 0; y < height; y++)
+    for (int y = 0; y < height; y++)
     {
-        for (unsigned int x = 0; x < width; x++)
+        for (int x = 0; x < width; x++)
         {
             printf("%c", charMap(x, y));
         }
@@ -100,108 +101,54 @@ void Continent::print()
     }
 }
 
-bool Continent::inBoundaries(unsigned int x, unsigned int y, unsigned int z)
+bool Continent::inBoundaries(int x, int y, int z)
 {
-    if (x <= width)
-    {
-        if (y <= height)
-        {
-            if (z == 0)
-            {
-                return true;
-            }
-            else
-            {
-                Logger::log(LogLevel::Error, "[Area::AddRoom] Wrong altitude.");
-            }
-        }
-        else
-        {
-            Logger::log(LogLevel::Error, "[Area::AddRoom] Wrong height.");
-        }
-    }
-    else
-    {
-        Logger::log(LogLevel::Error, "[Area::AddRoom] Wrong width.");
-    }
-    return false;
+    bool result = true;
+    result &= (x >= 0) && (x <= width);
+    result &= (y >= 0) && (y <= height);
+    result &= (z >= 0) && (y <= elevation);
+    return result;
 }
 
-bool Continent::inBoundaries(Coordinates<unsigned int> coord)
+bool Continent::inBoundaries(Coordinates<int> coord)
 {
-    bool accepted = false;
-    if ((coord.x > 0) && (coord.y > 0) && (coord.z > 0))
-    {
-        accepted = this->inBoundaries(static_cast<unsigned int>(coord.x), static_cast<unsigned int>(coord.y),
-            static_cast<unsigned int>(coord.z));
-    }
-    return accepted;
+    return this->inBoundaries(coord.x, coord.y, coord.z);
 }
 
-Room * Continent::getRoom(unsigned int x, unsigned int y, unsigned int z)
+Room * Continent::getRoom(int x, int y, int z)
 {
-    ContinentMap::iterator it = continentMap.find(std::make_tuple(x, y, z));
-    if (it != continentMap.end())
-    {
-        return &it->second;
-    }
-    return nullptr;
+    return &continentMap.get(x, y, z);
 }
 
-Room * Continent::getRoom(Coordinates<unsigned int> coord)
+Room * Continent::getRoom(Coordinates<int> coord)
 {
-    Room * room = nullptr;
-    if ((coord.x > 0) && (coord.y > 0) && (coord.z > 0))
-    {
-        room = this->getRoom(static_cast<unsigned int>(coord.x), static_cast<unsigned int>(coord.y),
-            static_cast<unsigned int>(coord.z));
-    }
-    return room;
+    return &continentMap.get(coord.x, coord.y, coord.z);
 }
 
-std::vector<std::string> Continent::drawFov(Room * centerRoom, unsigned int radius)
+std::vector<std::string> Continent::drawFov(Room * centerRoom, int radius)
 {
     std::vector<std::string> layers(3);
-
     if (!this->inBoundaries(centerRoom->coord))
     {
         return layers;
     }
-
-    unsigned int origin_x = static_cast<unsigned int>(centerRoom->coord.x);
-    unsigned int origin_y = static_cast<unsigned int>(centerRoom->coord.y);
-    unsigned int origin_z = static_cast<unsigned int>(centerRoom->coord.z);
-
-    unsigned int min_x = 0;
-    if (origin_x > radius)
-    {
-        min_x = origin_x - radius;
-    }
-    else
-    {
-        min_x = 0;
-    }
-    unsigned int min_y = 0;
-    if (origin_y >= radius)
-    {
-        min_y = origin_y - radius;
-    }
-    else
-    {
-        min_y = 0;
-    }
-
+    // Retrieve the coordinates of the room.
+    int origin_x = centerRoom->coord.x;
+    int origin_y = centerRoom->coord.y;
+    int origin_z = centerRoom->coord.z;
+    // Evaluate the minimum and maximum value for x and y.
+    int min_x = (origin_x < radius) ? 0 : (origin_x - radius);
+    int max_x = ((origin_x + radius) > this->width) ? this->width : (origin_x + radius);
+    int min_y = (origin_y < radius) ? 0 : (origin_y - radius);
+    int max_y = ((origin_y + radius) > this->height) ? this->height : (origin_y + radius);
     // Create a 2D map of chararacters.
-    Map2D<ContinentTile> map(radius * 2, radius * 2, ContinentTile::Void);
+    Map2D<ContinentTile> map(radius * 2, radius * 2);
     // Evaluate the field of view.
     this->fieldOfView(map, origin_x, origin_y, origin_z, radius);
-
     // Prepare Enviroment layer.
-
-    // Prepare Enviroment layer.
-    for (unsigned int y = (origin_y + radius); y > min_y; --y)
+    for (int y = max_y; y > min_y; --y)
     {
-        for (unsigned int x = min_x; x < (origin_x + radius); ++x)
+        for (int x = min_x; x < max_x; ++x)
         {
             ContinentTile tile = map.get(x, y);
             std::string tileCode = " : ";
@@ -254,9 +201,9 @@ std::vector<std::string> Continent::drawFov(Room * centerRoom, unsigned int radi
     }
 
     // Prepare Objects layer.
-    for (unsigned int y = (origin_y + radius); y > min_y; --y)
+    for (int y = max_y; y > min_y; --y)
     {
-        for (unsigned int x = min_x; x < (origin_x + radius); ++x)
+        for (int x = min_x; x < max_x; ++x)
         {
             Room * room = this->getRoom(x, y, origin_z);
 
@@ -300,9 +247,9 @@ std::vector<std::string> Continent::drawFov(Room * centerRoom, unsigned int radi
     }
 
     // Prepare Living Creatures layer.
-    for (unsigned int y = (origin_y + radius); y > min_y; --y)
+    for (int y = max_y; y > min_y; --y)
     {
-        for (unsigned int x = min_x; x < (origin_x + radius); ++x)
+        for (int x = min_x; x < max_x; ++x)
         {
             ContinentTile tile = map.get(x, y);
 
@@ -343,12 +290,7 @@ std::vector<std::string> Continent::drawFov(Room * centerRoom, unsigned int radi
     return layers;
 }
 
-void Continent::fieldOfView(
-    Map2D<ContinentTile> & map,
-    unsigned int origin_x,
-    unsigned int origin_y,
-    unsigned int origin_z,
-    unsigned int radius)
+void Continent::fieldOfView(Map2D<ContinentTile> & map, int origin_x, int origin_y, int origin_z, int radius)
 {
     double incr_x = 0.0;
     double incr_y = 0.0;
@@ -364,24 +306,24 @@ void Continent::fieldOfView(
 
 void Continent::lineOfSight(
     Map2D<ContinentTile> & map,
-    unsigned int origin_x,
-    unsigned int origin_y,
-    unsigned int origin_z,
+    int origin_x,
+    int origin_y,
+    int origin_z,
     double incr_x,
     double incr_y,
     double incr_z,
-    unsigned int radius)
+    int radius)
 {
     double ox = origin_x + static_cast<double>(0.5f);
     double oy = origin_y + static_cast<double>(0.5f);
     double oz = origin_z;
 
-    for (unsigned int i = 0; i < radius; ++i)
+    for (int i = 0; i < radius; ++i)
     {
         // Transform into integer the coordinates.
-        unsigned int curr_x = static_cast<unsigned int>(ox);
-        unsigned int curr_y = static_cast<unsigned int>(oy);
-        unsigned int curr_z = static_cast<unsigned int>(oz);
+        int curr_x = static_cast<int>(ox);
+        int curr_y = static_cast<int>(oy);
+        int curr_z = static_cast<int>(oz);
 
         // Check if out of boundaries.
         if (!this->inBoundaries(curr_x, curr_y, curr_z))

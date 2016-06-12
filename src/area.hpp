@@ -36,12 +36,13 @@ class Area
         /// The list of integer used to identify different obstacles inside the map.
         typedef enum class MapTiles
         {
+            None,
             /// It's an empty tile.
-            Void = 0,
+            Void,
             /// It's a walkable tile.
-            Walkable = 1,
+            Walkable,
             /// It's a closed door.
-            ClosedDoor = 2,
+            ClosedDoor,
         } MapTile;
 
     public:
@@ -56,11 +57,11 @@ class Area
         /// The 3D grid of the map.
         Map3D<Room *> areaMap;
         /// The width of the area.
-        unsigned int width;
+        int width;
         /// The height of the area.
-        unsigned int height;
+        int height;
         /// The elevation of the area.
-        unsigned int elevation;
+        int elevation;
         /// The tileset of the entire area.
         int tileSet;
         /// The type of area.
@@ -84,13 +85,13 @@ class Area
         /// @param z Coordinate on altitude axis.
         /// @return <b>True</b> if the coordinates are valid,<br>
         ///         <b>False</b> otherwise..
-        bool inBoundaries(const unsigned int & x, const unsigned int & y, const unsigned int & z);
+        bool inBoundaries(const int & x, const int & y, const int & z);
 
         /// @brief Check if the given coordinates is inside the boundaries.
         /// @param coord The coordinates to check.
         /// @return <b>True</b> if the coordinates are valid,<br>
         ///         <b>False</b> otherwise.
-        bool inBoundaries(const Coordinates<unsigned int> & coord);
+        bool inBoundaries(const Coordinates<int> & coord);
 
         /// @brief Add the passed room to its coordinates inside the area.
         /// @param room The room that has to be added.
@@ -114,24 +115,24 @@ class Area
         /// @param y Coordinate on height axis.
         /// @param z Coordinate on altitude axis.
         /// @return The room at the selected spot.
-        Room * getRoom(unsigned int x, unsigned int y, unsigned int z);
+        Room * getRoom(int x, int y, int z);
 
         /// @brief Find a room in a precise spot.
         /// @param coord The coordiantes where search the room.
         /// @return The room at the selected spot.
-        Room * getRoom(Coordinates<unsigned int> coord);
+        Room * getRoom(Coordinates<int> coord);
 
         /// @brief Draw the Filed of View for a character.
         /// @param centerRoom The room from where the algorithm has to compute the Field of View.
         /// @param radius     The radius of visibility of the character.
         /// @return The map containing all the Information about the Field of View of a character.
-        std::vector<std::string> drawFov(Room * centerRoom, unsigned int radius);
+        std::vector<std::string> drawFov(Room * centerRoom, int radius);
 
         /// @brief Draw the Filed of View for a character (ASCII).
         /// @param centerRoom The room from where the algorithm has to compute the Field of View.
         /// @param radius     The radius of visibility of the character.
         /// @return The map containing all the Information about the Field of View of a character.
-        std::string drawASCIIFov(Room * centerRoom, unsigned int radius);
+        std::string drawASCIIFov(Room * centerRoom, int radius);
 
         /// @brief Default version of a FOV alforithm.
         /// @param map      A 2D map, where the the Field of View will be drawn.
@@ -139,12 +140,7 @@ class Area
         /// @param origin_y The y coordinate of the central room.
         /// @param origin_z The z coordinate of the central room.
         /// @param radius   The radius of visibility of the character.
-        void fov(
-            Map2D<MapTile> & map,
-            unsigned int origin_x,
-            unsigned int origin_y,
-            unsigned int origin_z,
-            unsigned int radius);
+        void fov(Map2D<MapTile> & map, int origin_x, int origin_y, int origin_z, int radius);
 
         /// @brief A simple line of sight algorithm.
         /// @param map      The map where the LOS algorithm has to write the line.
@@ -157,13 +153,13 @@ class Area
         /// @param radius   The radius of visibility.
         void los(
             Map2D<MapTile> & map,
-            unsigned int origin_x,
-            unsigned int origin_y,
-            unsigned int origin_z,
+            int origin_x,
+            int origin_y,
+            int origin_z,
             double incr_x,
             double incr_y,
             double incr_z,
-            unsigned int radius);
+            int radius);
 
         /// @brief Determine if a coordinate is in sight from a starting one.
         /// @param origin_x The x coordinate of the central room.
@@ -174,19 +170,19 @@ class Area
         /// @param target_z The target z coordinate.
         /// @param radius   The radius of visibility.
         bool fastInSight(
-            unsigned int origin_x,
-            unsigned int origin_y,
-            unsigned int origin_z,
-            unsigned int target_x,
-            unsigned int target_y,
-            unsigned int target_z,
+            int origin_x,
+            int origin_y,
+            int origin_z,
+            int target_x,
+            int target_y,
+            int target_z,
             unsigned int radius);
 
         /// @brief Determine if a coordinate is in sight from a starting one.
         /// @param origin The coordinates of the origin.
         /// @param origin The coordinates of the target room.
         /// @param radius The radius of visibility.
-        bool fastInSight(Coordinates<unsigned int> origin, Coordinates<unsigned int> target, unsigned int radius);
+        bool fastInSight(Coordinates<int> origin, Coordinates<int> target, unsigned int radius);
 
         /// @brief Function used to register inside the lua environment the class.
         /// @param L The lua environment.
