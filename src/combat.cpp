@@ -67,6 +67,7 @@ bool OpponentsList::addOpponent(Character * character, unsigned int initAggro)
         this->sortList();
         // Set return value to success.
         ret = true;
+        Logger::log(LogLevel::Debug, "%s engage %s", owner->getNameCapital(), character->getName());
     }
     return ret;
 }
@@ -76,6 +77,7 @@ bool OpponentsList::remOpponent(Character * character)
     auto iterator = std::find(aggressionList.begin(), aggressionList.end(), character);
     if (iterator != aggressionList.end())
     {
+        Logger::log(LogLevel::Debug, "%s disengage %s", owner->getNameCapital(), character->getName());
         iterator = aggressionList.erase(iterator, aggressionList.end());
         return true;
     }
@@ -190,6 +192,21 @@ unsigned int OpponentsList::getAggro(Character * character)
 std::size_t OpponentsList::getSize()
 {
     return this->aggressionList.size();
+}
+
+void OpponentsList::checkList()
+{
+    for (std::vector<Aggression>::iterator it = aggressionList.begin(); it != aggressionList.end();)
+    {
+        if (it->aggressor == nullptr)
+        {
+            it = aggressionList.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
 }
 
 void OpponentsList::sortList()

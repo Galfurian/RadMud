@@ -53,6 +53,7 @@ class Aggression
 /// @brief Data structure used to store an ordered list of opponents during a combat.
 class OpponentsList
 {
+        friend class Character;
     private:
         /// Owner of the list.
         Character * owner;
@@ -117,6 +118,9 @@ class OpponentsList
 
         /// @brief Provides the size of the aggessors list.
         std::size_t getSize();
+
+        /// @brief Check and clear the list from possible disconnected players.
+        void checkList();
 
     private:
         /// @brief Sort the list of opponents.
