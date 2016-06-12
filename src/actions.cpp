@@ -274,165 +274,11 @@ bool Action::setNextCombatAction(const CombatAction & nextAction)
         Logger::log(LogLevel::Error, "The character is not fighting.");
         return false;
     }
-    if (nextCombatAction == nextAction)
-    {
-        Logger::log(LogLevel::Error, "You're trying to set the same combat action.");
-        return false;
-    }
     // Set the next combat action.
     nextCombatAction = nextAction;
-    // Check if the character has at least some opponents.
-    if (nextCombatAction == CombatAction::BasicAttack)
-    {
-        // Set the action cooldown.
-        actionCooldown = std::chrono::system_clock::now() + std::chrono::seconds(actor->getNextAttack());
-    }
-    else if (nextCombatAction == CombatAction::Flee)
-    {
-        double base = 6.0;
-        // The agility modifier.
-        double agility = GetAbilityModifier(actor->getAgility()) * 3.5 * (base / 100);
-        // The weight modifier.
-        double weight = actor->weight * (base / 100);
-        // The carried weight.
-        double carriedWeight = (actor->getCarryingWeight() / 2) * (base / 100);
-        unsigned int fleeCooldown = static_cast<unsigned int>(base - agility + weight + carriedWeight);
-        // Set the action cooldown.
-        actionCooldown = std::chrono::system_clock::now() + std::chrono::seconds(fleeCooldown);
-    }
+    // Set the action cooldown.
+    actionCooldown = std::chrono::system_clock::now() + std::chrono::seconds(actor->getCooldown(nextCombatAction));
     return true;
-}
-
-void Action::performAttack(Character * opponent)
-{
-    // Evaluate only once the armor class of the opponent.
-    unsigned int AC = opponent->getArmorClass();
-    // Evaluate only once the strenght modifier.
-    unsigned int STR = GetAbilityModifier(actor->getStrength());
-    // Retrieve the items.
-    Item * rh = actor->findEquipmentSlotItem(EquipmentSlot::RightHand);
-    Item * lh = actor->findEquipmentSlotItem(EquipmentSlot::LeftHand);
-    // If there are no weapons equiped.
-    if ((rh == nullptr) && (lh == nullptr))
-    {
-        // Roll the attack.
-        unsigned int ATK = TRandInteger<unsigned int>(1, 20);
-        // Log the rolled value.
-        Logger::log(LogLevel::Debug, "%s rolls a %s against %s.", actor->getNameCapital(), ToString(ATK), ToString(AC));
-        // Check if its a hit.
-        if (ATK < AC)
-        {
-            actor->sendMsg("You miss %s with your fist.\n", opponent->getName());
-            opponent->sendMsg("%s misses you with %s fist.\n\n", actor->getNameCapital(),
-                actor->getPossessivePronoun());
-            return;
-        }
-        // Roll the damage.
-        unsigned int DMG = TRandInteger<unsigned int>(1, 3) + STR;
-        // Log the rolled value.
-        Logger::log(LogLevel::Debug, "%s hit %s for %s.", actor->getNameCapital(), opponent->getName(), ToString(DMG));
-        actor->sendMsg("You hit %s with your fist for %s.\n", opponent->getName(), ToString(DMG));
-        opponent->sendMsg("%s hits you with %s fist for %s.\n\n", actor->getNameCapital(),
-            actor->getPossessivePronoun(), ToString(DMG));
-        return;
-    }
-
-    // Check with which hand the character can attack.
-    bool rhCanAttack = actor->canAttackWith(EquipmentSlot::RightHand);
-    bool lhCanAttack = actor->canAttackWith(EquipmentSlot::LeftHand);
-    // If there is a weapon in the right hand.
-    if (rhCanAttack)
-    {
-        // Roll the attack.
-        unsigned int ATK = TRandInteger<unsigned int>(1, 20);
-        // Evaluate any kind of hit penality.
-        if (rhCanAttack && lhCanAttack)
-        {
-            // Apply any penality.
-            if (ATK > 4)
-            {
-                ATK -= 4;
-            }
-            else
-            {
-                ATK = 0;
-            }
-        }
-        // Log the rolled value.
-        Logger::log(LogLevel::Debug, "%s rolls a %s against %s.", actor->getNameCapital(), ToString(ATK), ToString(AC));
-        // Check if its a hit.
-        if (ATK < AC)
-        {
-            actor->sendMsg("You miss %s with %s.\n", opponent->getName(), rh->getName());
-            opponent->sendMsg("%s misses you with %s %s.\n\n", actor->getNameCapital(), actor->getPossessivePronoun(),
-                rh->getName());
-            return;
-        }
-        // Roll the damage.
-        unsigned int DMG = 1;
-        DMG += TRandInteger<unsigned int>(rh->model->getWeaponFunc().minDamage, rh->model->getWeaponFunc().maxDamage);
-        if (HasFlag(rh->model->flags, ModelFlag::TwoHand))
-        {
-            DMG += static_cast<unsigned int>(STR * 1.5);
-        }
-        else
-        {
-            DMG += STR;
-        }
-        // Log the damage.
-        Logger::log(LogLevel::Debug, "%s hit %s for %s with %s.", actor->getNameCapital(), opponent->getName(),
-            ToString(DMG), rh->getName());
-        // Send the messages to the characters.
-        actor->sendMsg("You hit %s with your %s for %s.\n", opponent->getName(), rh->getName(), ToString(DMG));
-        opponent->sendMsg("%s hits you with %s %s for %s.\n\n", actor->getNameCapital(), actor->getPossessivePronoun(),
-            rh->getName(), ToString(DMG));
-    }
-
-    // If there is a weapon in the right hand.
-    if (lhCanAttack)
-    {
-        // Roll the attack.
-        unsigned int ATK = TRandInteger<unsigned int>(1, 20);
-        // Evaluate any kind of hit penality.
-        if (rhCanAttack && lhCanAttack)
-        {
-            // Apply any penality.
-            if (ATK > 4)
-            {
-                ATK -= 4;
-            }
-            else
-            {
-                ATK = 0;
-            }
-        }
-        // Log the rolled value.
-        Logger::log(LogLevel::Debug, "%s rolls a %s against %s.", actor->getNameCapital(), ToString(ATK), ToString(AC));
-        // Check if its a hit.
-        if (ATK < AC)
-        {
-            actor->sendMsg("You miss %s with %s.\n", opponent->getName(), lh->getName());
-            opponent->sendMsg("%s misses you with %s %s.\n\n", actor->getNameCapital(), actor->getPossessivePronoun(),
-                lh->getName());
-            return;
-        }
-        // Roll the damage.
-        unsigned int DMG = 1;
-        DMG += TRandInteger<unsigned int>(lh->model->getWeaponFunc().minDamage, lh->model->getWeaponFunc().maxDamage);
-        DMG += static_cast<unsigned int>(STR * 0.5);
-        // Log the damage.
-        Logger::log(LogLevel::Debug, "%s hit %s for %s with %s.", actor->getNameCapital(), opponent->getName(),
-            ToString(DMG), lh->getName());
-        // Send the messages to the characters.
-        actor->sendMsg("You hit %s with your %s for %s.\n", opponent->getName(), lh->getName(), ToString(DMG));
-        opponent->sendMsg("%s hits you with %s %s for %s.\n\n", actor->getNameCapital(), actor->getPossessivePronoun(),
-            lh->getName(), ToString(DMG));
-    }
-
-    if (!rhCanAttack && !lhCanAttack)
-    {
-        actor->sendMsg("You do not have a valid weapon equipped.");
-    }
 }
 
 CombatAction Action::getNextCombatAction() const
@@ -907,59 +753,30 @@ void Action::performComb()
     {
         return;
     }
-    // Check if the character has at least some opponents.
+    // The sequence is the following:
+    //  1. Check the list of opponents.
+    //  2. Get the target. It could eighter be the top aggro or an allied.
+    //  3. Check if the target is at range (depending on the action).
+    //  4. If not return to 2.
+    //  5. Otherwise perform the action.
+
+    // Check the list of opponents.
+    actor->opponents.checkList();
     if (nextCombatAction == CombatAction::BasicAttack)
     {
-        // Reset the next combat action.
-        nextCombatAction = CombatAction::NoAction;
-        // Retrieve the opponent.
-        Character * opponent = actor->getNextOpponent();
-        if (opponent != nullptr)
-        {
-            // Perform the attack.
-            this->performAttack(opponent);
-
-            // If the actor is a mobile, activate the script.
-            if (actor->isMobile())
-            {
-                actor->toMobile()->triggerEventFight(opponent);
-            }
-            this->setNextCombatAction(CombatAction::BasicAttack);
-            return;
-        }
+        // Perform the combat action.
+        this->performCombatAction(nextCombatAction);
     }
     else if (nextCombatAction == CombatAction::Flee)
     {
-        // Reset the next combat action.
-        nextCombatAction = CombatAction::NoAction;
-        // Get the character chance of fleeing.
-        unsigned int fleeChance = TRandInteger<unsigned int>(0, 10);
-        fleeChance += GetAbilityModifier(actor->getAgility());
-        // Base the escape level on how many enemies are surrounding the character.
-        unsigned int chaseLevel = 0;
-        for (unsigned int it = 0; it < actor->opponents.getSize(); ++it)
-        {
-            chaseLevel += TRandInteger<unsigned int>(0, 1);
-        }
-        if (fleeChance < chaseLevel)
-        {
-            actor->sendMsg("You were not able to escape from your attackers.\n");
-            this->setNextCombatAction(CombatAction::BasicAttack);
-            return;
-        }
-        else
-        {
-            Logger::log(LogLevel::Debug, "Choosing where to flee.");
-            size_t maxValue = actor->room->exits.size();
-            size_t randomExit = TRandInteger<size_t>(0, maxValue);
-            Exit * selected = actor->room->exits.at(randomExit);
-            actor->moveTo(selected->destination, actor->getNameCapital() + " flees from the battlefield.",
-                actor->getNameCapital() + " arives fleeing.", "You flee from the battlefield.");
-            return;
-        }
+        // Perform the combat action.
+        this->performCombatAction(nextCombatAction);
     }
-    actor->sendMsg("You stop fighting.\n\n");
-    this->reset();
+    else
+    {
+        actor->sendMsg("You stop fighting.\n\n");
+        this->reset();
+    }
 }
 
 void Action::reset()
@@ -974,4 +791,85 @@ void Action::reset()
     craftMaterial = nullptr;
     usedTools.clear();
     usedIngredients.clear();
+}
+
+void Action::performCombatAction(const CombatAction & move)
+{
+    if (move == CombatAction::BasicAttack)
+    {
+        ItemVector activeWeapons = actor->getActiveWeapons();
+        if (activeWeapons.empty())
+        {
+            actor->sendMsg("You do not have a valid weapon equipped.\n");
+        }
+        else
+        {
+            for (auto iterator : activeWeapons)
+            {
+                WeaponFunc wFun = iterator->model->getWeaponFunc();
+                // Get the top aggro enemy at range.
+                Character * enemy = actor->getNextOpponentAtRange(wFun.range);
+                if (enemy == nullptr)
+                {
+                    continue;
+                }
+                // Roll the attack.
+                unsigned int ATK = TRandInteger<unsigned int>(1, 20);
+                // Evaluate the armor class of the enemy.
+                unsigned int AC = enemy->getArmorClass();
+                // Log the rolled value.
+                Logger::log(LogLevel::Debug, "%s rolls a %s against %s.", actor->getNameCapital(), ToString(ATK),
+                    ToString(AC));
+                // Check if its a hit.
+                if (ATK < AC)
+                {
+                    actor->sendMsg("You miss %s with %s.\n", enemy->getName(), iterator->getName());
+                    enemy->sendMsg("%s misses you with %s.\n\n", actor->getNameCapital(), iterator->getName());
+                }
+                else
+                {
+                    // Roll the damage.
+                    unsigned int DMG = 1;
+                    DMG += TRandInteger<unsigned int>(wFun.minDamage, wFun.maxDamage);
+                    // Log the damage.
+                    Logger::log(LogLevel::Debug, "%s hit %s for %s with %s.", actor->getNameCapital(), enemy->getName(),
+                        ToString(DMG), iterator->getName());
+                    // Send the messages to the characters.
+                    actor->sendMsg("You hit %s with %s for %s.\n", enemy->getName(), iterator->getName(),
+                        ToString(DMG));
+                    enemy->sendMsg("%s hits you with %s for %s.\n\n", actor->getNameCapital(), iterator->getName(),
+                        ToString(DMG));
+                }
+            }
+        }
+    }
+    else if (move == CombatAction::Flee)
+    {
+        // Get the character chance of fleeing (D20).
+        unsigned int fleeChance = TRandInteger<unsigned int>(0, 20) + GetAbilityModifier(actor->getAgility());
+        // Base the escape level on how many enemies are surrounding the character.
+        if (fleeChance < static_cast<unsigned int>(actor->opponents.getSize()))
+        {
+            actor->sendMsg("You were not able to escape from your attackers.\n");
+        }
+        else
+        {
+            size_t randomExit = TRandInteger<size_t>(0, actor->room->exits.size() - 1);
+            Exit * selected = actor->room->exits.at(randomExit);
+            if (selected == nullptr)
+            {
+                Logger::log(LogLevel::Error, "Selected null exit during action Flee.");
+                actor->sendMsg("You were not able to escape from your attackers.\n");
+            }
+            else
+            {
+                actor->moveTo(selected->destination, actor->getNameCapital() + " flees from the battlefield.\n\n",
+                    actor->getNameCapital() + " arives fleeing.\n\n", "You flee from the battlefield.\n");
+                this->setNextCombatAction(CombatAction::NoAction);
+                return;
+            }
+        }
+    }
+    // By default set the next combat action to basic attack.
+    this->setNextCombatAction(CombatAction::BasicAttack);
 }

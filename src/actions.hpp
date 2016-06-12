@@ -135,13 +135,6 @@ class Action
         CombatAction getNextCombatAction() const;
 
     private:
-        /// @brief Returns the attack damage.
-        /// @return The value of the attack.
-        void performAttack(Character * opponent);
-
-        /// @brief Returns the attack damage.
-        /// @return The value of the attack.
-        unsigned int getWeaponDamageRoll(const EquipmentSlot & slot);
 
         /// @brief Check if the cooldown of the action is elapsed.
         /// @return <b>True</b> if the time has passed,<br> <b>False</b> otherwise.
@@ -167,6 +160,10 @@ class Action
 
         /// @brief This function resets the action.
         void reset();
+
+        /// @brief Returns the attack damage.
+        /// @return The value of the attack.
+        void performCombatAction(const CombatAction & move);
 
 };
 
