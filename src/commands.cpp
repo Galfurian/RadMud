@@ -798,10 +798,15 @@ void NoMore(Character * character, std::istream & sArgs)
 
 void StopAction(Character * character)
 {
-    if ((character->getAction()->getType() != ActionType::Wait)
-        && (character->getAction()->getType() != ActionType::NoAction))
+    if ((character->getAction()->getType() != ActionType::Wait))
     {
-        character->doCommand("stop");
+        if (character->getAction()->getType() != ActionType::NoAction)
+        {
+            if (character->getAction()->getType() != ActionType::Combat)
+            {
+                character->doCommand("stop");
+            }
+        }
     }
 }
 
