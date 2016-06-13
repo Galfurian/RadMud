@@ -447,6 +447,24 @@ Item * Room::findDoor()
     }
     return nullptr;
 }
+std::vector<Direction> Room::getAvailableDirections()
+{
+    std::vector<Direction> directions;
+    for (auto iterator : exits)
+    {
+        directions.push_back(iterator->direction);
+    }
+    return directions;
+}
+bool Room::addExit(Exit * exit)
+{
+    if (this->findExit(exit->direction))
+    {
+        return false;
+    }
+    this->exits.push_back(exit);
+    return true;
+}
 bool Room::removeExit(Direction direction)
 {
     for (auto iterator : exits)
@@ -454,7 +472,6 @@ bool Room::removeExit(Direction direction)
         if (iterator->direction == direction)
         {
             FindErase(exits, iterator);
-            delete (iterator);
             return true;
         }
     }
@@ -616,10 +633,9 @@ void Room::connectExits()
                 // Create the two exits.
                 Exit * forward = new Exit(this, near, iterator.second, 0);
                 Exit * backward = new Exit(near, this, forward->getOppositeDirection(), 0);
-
                 // Insert in both the rooms exits the connection.
-                exits.push_back(forward);
-                near->exits.push_back(backward);
+                this->addExit(forward);
+                near->addExit(backward);
             }
         }
     }
@@ -628,7 +644,7 @@ void Room::connectExits()
 void Room::luaRegister(lua_State * L)
 {
     luabridge::getGlobalNamespace(L) //
-    .beginClass<Room>("Room") //
+    .beginClass < Room > ("Room") //
     .addData("vnum", &Room::vnum, false) //
     .addData("name", &Room::name, false) //
     .addData("coord", &Room::coord, false) //
@@ -649,7 +665,6 @@ bool Room::operator==(const Room & right) const
 bool CreateRoom(Coordinates<int> coord, Room * source_room)
 {
     Room * new_room = new Room();
-    vector<string> arguments;
 
     // Create a new room.
     Logger::log(LogLevel::Info, "[CreateRoom] Setting up the room...");
@@ -664,6 +679,7 @@ bool CreateRoom(Coordinates<int> coord, Room * source_room)
 
     // Insert into table Room the newly created room.
     Logger::log(LogLevel::Info, "[CreateRoom] Saving room details on the database...");
+    vector<string> arguments;
     arguments.push_back(ToString(new_room->vnum));
     arguments.push_back(ToString(new_room->coord.x));
     arguments.push_back(ToString(new_room->coord.y));
@@ -673,7 +689,6 @@ bool CreateRoom(Coordinates<int> coord, Room * source_room)
     arguments.push_back(new_room->description);
     arguments.push_back(ToString(new_room->flags));
 
-#if 0
     // Start a transaction.
     SQLiteDbms::instance().beginTransaction();
     if (!SQLiteDbms::instance().insertInto("Room", arguments))
@@ -681,24 +696,16 @@ bool CreateRoom(Coordinates<int> coord, Room * source_room)
         SQLiteDbms::instance().rollbackTransection();
         return false;
     }
-    arguments.clear();
 
     // Insert Room in AreaList.
-    arguments.push_back(ToString(new_room->area->vnum));
-    arguments.push_back(ToString(new_room->vnum));
-    if (!SQLiteDbms::instance().insertInto("AreaList", arguments))
+    vector<string> arguments2;
+    arguments2.push_back(ToString(new_room->area->vnum));
+    arguments2.push_back(ToString(new_room->vnum));
+    if (!SQLiteDbms::instance().insertInto("AreaList", arguments2))
     {
         SQLiteDbms::instance().rollbackTransection();
         return false;
     }
-    arguments.clear();
-    // Update rooms connection if there is a source_room.
-    if (!ConnectRoom(new_room))
-    {
-        SQLiteDbms::instance().rollbackTransection();
-        return false;
-    }
-
     // Add the created room to the room_map.
     Logger::log(LogLevel::Info, "[CreateRoom] Adding the room to the global list...");
     if (!Mud::instance().addRoom(new_room))
@@ -713,31 +720,22 @@ bool CreateRoom(Coordinates<int> coord, Room * source_room)
         SQLiteDbms::instance().rollbackTransection();
         return false;
     }
-    SQLiteDbms::instance().endTransaction();
-    return true;
-#endif
     // Update rooms connection if there is a source_room.
     if (!ConnectRoom(new_room))
     {
+        SQLiteDbms::instance().rollbackTransection();
         return false;
     }
-    Logger::log(LogLevel::Info, "[CreateRoom] Adding the room to the global list...");
-    if (!Mud::instance().addRoom(new_room))
-    {
-        Logger::log(LogLevel::Error, "Cannot add the room to the mud.\n");
-        return false;
-    }
-    if (!new_room->area->addRoom(new_room))
-    {
-        Logger::log(LogLevel::Error, "Cannot add the room to the area.\n");
-        return false;
-    }
+    SQLiteDbms::instance().endTransaction();
     return true;
 }
 
 bool ConnectRoom(Room * room)
 {
-    vector<string> arguments;
+    bool status = true;
+    RoomList connectedRooms;
+    ExitList generatedExits;
+
     Logger::log(LogLevel::Info, "[ConnectRoom] Connecting the room to near rooms...");
     for (auto iterator : Mud::instance().mudDirections)
     {
@@ -750,7 +748,9 @@ bool ConnectRoom(Room * room)
             Logger::log(LogLevel::Error, "Found a room:%s\n", near->name);
             // Create the two exits.
             Exit * forward = new Exit(room, near, iterator.second, 0);
-            Exit * backward = new Exit(near, room, forward->getOppositeDirection(), 0);
+            generatedExits.push_back(forward);
+            Exit *backward = new Exit(near, room, forward->getOppositeDirection(), 0);
+            generatedExits.push_back(backward);
 
             // In case the connection is Up/Down set the presence of stairs.
             if (iterator.second == Direction::Up || iterator.second == Direction::Down)
@@ -760,25 +760,56 @@ bool ConnectRoom(Room * room)
             }
 
             // Insert in both the rooms exits the connection.
-            room->exits.push_back(forward);
-            near->exits.push_back(backward);
-#if 0
+            room->addExit(forward);
+            connectedRooms.push_back(room);
+            near->addExit(forward);
+            connectedRooms.push_back(near);
+
             // Update the values on Database.
+            vector<string> arguments;
             arguments.push_back(ToString(forward->source->vnum));
             arguments.push_back(ToString(forward->destination->vnum));
             arguments.push_back(EnumToString(forward->direction));
             arguments.push_back(ToString(forward->flags));
-            SQLiteDbms::instance().insertInto("Exit", arguments);
-            arguments.clear();
+            if (!SQLiteDbms::instance().insertInto("Exit", arguments))
+            {
+                status = false;
+                break;
+            }
+            else
+            {
+                status = false;
+                break;
+            }
 
-            arguments.push_back(ToString(backward->source->vnum));
-            arguments.push_back(ToString(backward->destination->vnum));
-            arguments.push_back(EnumToString(backward->direction));
-            arguments.push_back(ToString(backward->flags));
-            SQLiteDbms::instance().insertInto("Exit", arguments);
-            arguments.clear();
-#endif
+            vector<string> arguments2;
+            arguments2.push_back(ToString(backward->source->vnum));
+            arguments2.push_back(ToString(backward->destination->vnum));
+            arguments2.push_back(EnumToString(backward->direction));
+            arguments2.push_back(ToString(backward->flags));
+            if (!SQLiteDbms::instance().insertInto("Exit", arguments2))
+            {
+                status = false;
+                break;
+            }
         }
     }
-    return true;
+    if (!status)
+    {
+        Logger::log(LogLevel::Error, "Disconnecting all the rooms.");
+        for (auto iterator : connectedRooms)
+        {
+            for (auto iterator2 : generatedExits)
+            {
+                if (iterator2->source == iterator)
+                {
+                    if (!iterator->removeExit(iterator2->direction))
+                    {
+                        Logger::log(LogLevel::Fatal, "I was not able to remove an unwanted exit.");
+                    }
+                }
+            }
+        }
+    }
+    return status;
 }

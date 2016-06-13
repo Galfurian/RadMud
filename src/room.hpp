@@ -156,6 +156,8 @@ class Room
         /// @return The mobile, if it's in the room.
         Mobile * findMobile(std::string target, int & number, Mobile * exception = nullptr);
 
+        bool addExit(Exit * exit);
+
         /// @brief Remove from the list of exits the one on the given direction.
         /// @param direction The direction to removed.
         /// @return <b>True</b> if the execution goes well,<br><b>False</b> otherwise.
@@ -179,6 +181,8 @@ class Room
         /// @brief Search for a built door inside the room.
         /// @return The contained door if there is one.
         Item * findDoor();
+
+        std::vector<Direction> getAvailableDirections();
 
         /// @brief Provide a detailed description of the room.
         /// @param exception The one who are looking.

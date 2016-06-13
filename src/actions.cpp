@@ -854,19 +854,23 @@ void Action::performCombatAction(const CombatAction & move)
         }
         else
         {
-            size_t randomExit = TRandInteger<size_t>(0, actor->room->exits.size() - 1);
-            Exit * selected = actor->room->exits.at(randomExit);
-            if (selected == nullptr)
+            std::vector<Direction> directions = actor->room->getAvailableDirections();
+            if (!directions.empty())
             {
-                Logger::log(LogLevel::Error, "Selected null exit during action Flee.");
-                actor->sendMsg("You were not able to escape from your attackers.\n");
-            }
-            else
-            {
-                actor->moveTo(selected->destination, actor->getNameCapital() + " flees from the battlefield.\n\n",
-                    actor->getNameCapital() + " arives fleeing.\n\n", "You flee from the battlefield.\n");
-                this->setNextCombatAction(CombatAction::NoAction);
-                return;
+                Direction randomDirection = directions.at(TRandInteger<size_t>(0, directions.size() - 1));
+                Exit * selected = actor->room->findExit(randomDirection);
+                if (selected == nullptr)
+                {
+                    Logger::log(LogLevel::Error, "Selected null exit during action Flee.");
+                    actor->sendMsg("You were not able to escape from your attackers.\n");
+                }
+                else
+                {
+                    actor->moveTo(selected->destination, actor->getNameCapital() + " flees from the battlefield.\n\n",
+                        actor->getNameCapital() + " arives fleeing.\n\n", "You flee from the battlefield.\n");
+                    this->setNextCombatAction(CombatAction::NoAction);
+                    return;
+                }
             }
         }
     }
