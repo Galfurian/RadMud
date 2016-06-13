@@ -29,6 +29,19 @@ end
 -- Handle the actions when a character enters the room.
 EventEnter=function(self, character)
 	-- Put event code here.
+	local choice = Mud.Random(1, 100);
+	if (choice >= 50)
+	then
+		self:doCommand("emote emits a terrible scream!");
+		-- Get the possible directions.
+		local exits = self.room:getExits();
+		if(exits:size() > 0)
+		then
+			local choosenExit = exits:at(Mud.Random(0,exits:size()-1));
+			-- Go to the next direction.
+			self:doCommand(choosenExit:getDirection());
+		end
+	end
 end
 
 -- Handle the actions when a character exits the room.

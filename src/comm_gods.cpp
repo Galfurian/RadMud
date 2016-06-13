@@ -700,13 +700,13 @@ void DoRoomDelete(Character * character, std::istream & sArgs)
         character->sendMsg("You must insert a valid direction!\n");
         return; // Skip the rest of the function.
     }
-    // Evaluate the new coordinates.
-    if (character->room->coord < GetCoordinates(direction))
+    // Get the coordinate modifier.
+    Coordinates<int> targetCoord = character->room->coord + GetCoordinates(direction);
+    if (!currentArea->inBoundaries(targetCoord))
     {
-        character->sendMsg("You cannot create a room in that direction (out of bound)!\n");
+        character->sendMsg("Sorry but in that direction you will go outside the boundaries.\n");
         return; // Skip the rest of the function.
     }
-    Coordinates<int> targetCoord = character->room->coord + GetCoordinates(direction);
     // Find the room.
     Room * targetRoom = currentArea->getRoom(targetCoord);
     if (targetRoom == nullptr)

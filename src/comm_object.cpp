@@ -946,26 +946,24 @@ void DoOpen(Character * character, std::istream & sArgs)
             // Send the message inside the room.
             character->room->sendToAll("%s closes a door.\n", exceptions, character->getNameCapital());
         }
-
-        for (auto destExit : destination->exits)
+        for (auto it : destination->exits)
         {
-            Room * otherSide = destExit->destination;
-            if (otherSide == nullptr)
+            if (it->destination == nullptr)
             {
                 continue;
             }
-            if (otherSide == character->room)
+            if (it->destination == character->room)
             {
                 continue;
             }
-            if (HasFlag(destExit->flags, ExitFlag::Hidden))
+            if (HasFlag(it->flags, ExitFlag::Hidden))
             {
                 // Show the action in the next room.
-                otherSide->sendToAll("Someone opens a secret passage from the other side.\n", CharacterVector());
+                it->destination->sendToAll("Someone opens a secret passage from the other side.\n", CharacterVector());
             }
             else
             {
-                otherSide->sendToAll("Someone opens a door from the other side.\n", CharacterVector());
+                it->destination->sendToAll("Someone opens a door from the other side.\n", CharacterVector());
             }
         }
     }
@@ -1048,27 +1046,25 @@ void DoClose(Character * character, std::istream & sArgs)
             // Send the message inside the room.
             character->room->sendToAll("%s closes a door.\n", exceptions, character->getNameCapital());
         }
-
-        for (auto destExit : destination->exits)
+        for (auto it : destination->exits)
         {
-            Room * otherSide = destExit->destination;
-            if (otherSide == nullptr)
+            if (it->destination == nullptr)
             {
                 continue;
             }
-            if (otherSide == character->room)
+            if (it->destination == character->room)
             {
                 continue;
             }
-            if (HasFlag(destExit->flags, ExitFlag::Hidden))
+            if (HasFlag(it->flags, ExitFlag::Hidden))
             {
                 // Send the message inside the room.
-                otherSide->sendToAll("Someone closes a secret passage from the other side.\n", CharacterVector());
+                it->destination->sendToAll("Someone closes a secret passage from the other side.\n", CharacterVector());
             }
             else
             {
                 // Send the message inside the room.
-                otherSide->sendToAll("Someone closes a door from the other side.\n", CharacterVector());
+                it->destination->sendToAll("Someone closes a door from the other side.\n", CharacterVector());
             }
         }
         return; // Skip the rest of the function.

@@ -21,6 +21,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <utility> // std::move
 
 // Other Include.
 #include "mud.hpp"
@@ -51,10 +52,13 @@ Room::Room() :
 Room::~Room()
 {
     Logger::log(LogLevel::Debug, "Deleted: Room (" + this->name + ").");
-    // Remove all the exits.
-    for (auto iterator : exits)
+    // TODO: Find a clever way. It's quite horrible this way.
+    for (auto it : exits)
     {
-        delete (iterator);
+        if (it->destination != nullptr)
+        {
+            it->destination->removeExit(InverDirection(it->direction));
+        }
     }
     // Remove the room from the area.
     if (area != nullptr)
@@ -398,11 +402,11 @@ Mobile * Room::findMobile(string target, int & number, Mobile * exception)
 
 Exit * Room::findExit(Direction direction)
 {
-    for (auto iterator : exits)
+    for (auto it : exits)
     {
-        if (iterator->direction == direction)
+        if (it->direction == direction)
         {
-            return iterator;
+            return &(*it);
         }
     }
     return nullptr;
@@ -410,24 +414,16 @@ Exit * Room::findExit(Direction direction)
 
 Exit * Room::findExit(std::string direction)
 {
-    Direction dir = GetDirection(direction);
-    for (auto iterator : exits)
-    {
-        if (iterator->direction == dir)
-        {
-            return iterator;
-        }
-    }
-    return nullptr;
+    return this->findExit(GetDirection(direction));
 }
 
 Exit * Room::findExit(Room * destination)
 {
-    for (auto iterator : exits)
+    for (auto it : exits)
     {
-        if (iterator->destination == destination)
+        if (it->destination == destination)
         {
-            return iterator;
+            return &(*it);
         }
     }
     return nullptr;
@@ -450,28 +446,28 @@ Item * Room::findDoor()
 std::vector<Direction> Room::getAvailableDirections()
 {
     std::vector<Direction> directions;
-    for (auto iterator : exits)
+    for (auto it : exits)
     {
-        directions.push_back(iterator->direction);
+        directions.push_back(it->direction);
     }
     return directions;
 }
-bool Room::addExit(Exit * exit)
+bool Room::addExit(std::shared_ptr<Exit> exit)
 {
     if (this->findExit(exit->direction))
     {
         return false;
     }
-    this->exits.push_back(exit);
+    this->exits.push_back(std::move(exit));
     return true;
 }
 bool Room::removeExit(Direction direction)
 {
-    for (auto iterator : exits)
+    for (auto it : exits)
     {
-        if (iterator->direction == direction)
+        if (it->direction == direction)
         {
-            FindErase(exits, iterator);
+            FindErase(this->exits, it);
             return true;
         }
     }
@@ -590,65 +586,25 @@ void Room::sendToAll(const std::string & message, const CharacterVector & except
     }
 }
 
-void Room::connectExits()
+VectorHelper<Exit *> Room::luaGetExits()
 {
-    for (auto iterator : Mud::instance().mudDirections)
+    VectorHelper<Exit *> ret;
+    for (auto it : this->exits)
     {
-        Coordinates<int> nearCoord = GetCoordinates(iterator.second);
-        if (coord < nearCoord)
-        {
-            continue;
-        }
-        if (area != nullptr)
-        {
-            Room * near = area->getRoom(coord + nearCoord);
-            if (near != nullptr)
-            {
-                // Create the two exits.
-                Exit * forward = new Exit(this, near, iterator.second, 0);
-                Exit * backward = new Exit(near, this, forward->getOppositeDirection(), 0);
-
-                // In case the connection is Up/Down set the presence of stairs.
-                if (iterator.second == Direction::Up || iterator.second == Direction::Down)
-                {
-                    SetFlag(forward->flags, ExitFlag::Stairs);
-                    SetFlag(backward->flags, ExitFlag::Stairs);
-                }
-
-                // Insert in both the rooms exits the connection.
-                exits.push_back(forward);
-                near->exits.push_back(backward);
-            }
-        }
-        else if (continent != nullptr)
-        {
-            Room * near = continent->getRoom(coord + nearCoord);
-
-            if (iterator.second == Direction::Up || iterator.second == Direction::Down)
-            {
-                continue;
-            }
-            if (near != nullptr)
-            {
-                // Create the two exits.
-                Exit * forward = new Exit(this, near, iterator.second, 0);
-                Exit * backward = new Exit(near, this, forward->getOppositeDirection(), 0);
-                // Insert in both the rooms exits the connection.
-                this->addExit(forward);
-                near->addExit(backward);
-            }
-        }
+        ret.push_back(it.get());
     }
+    return ret;
 }
 
 void Room::luaRegister(lua_State * L)
 {
     luabridge::getGlobalNamespace(L) //
-    .beginClass < Room > ("Room") //
+    .beginClass<Room>("Room") //
     .addData("vnum", &Room::vnum, false) //
     .addData("name", &Room::name, false) //
     .addData("coord", &Room::coord, false) //
     .addData("terrain", &Room::terrain, false) //
+    .addFunction("getExits", &Room::luaGetExits) //
     .endClass();
 }
 
@@ -724,6 +680,15 @@ bool CreateRoom(Coordinates<int> coord, Room * source_room)
     if (!ConnectRoom(new_room))
     {
         SQLiteDbms::instance().rollbackTransection();
+        if (!Mud::instance().remRoom(new_room))
+        {
+            Logger::log(LogLevel::Error, "During rollback I was not able to remove the room from the mud.\n");
+        }
+        if (!new_room->area->remRoom(new_room))
+        {
+            Logger::log(LogLevel::Error, "During rollback I was not able to remove the room from the area.\n");
+        }
+        delete (new_room);
         return false;
     }
     SQLiteDbms::instance().endTransaction();
@@ -733,9 +698,7 @@ bool CreateRoom(Coordinates<int> coord, Room * source_room)
 bool ConnectRoom(Room * room)
 {
     bool status = true;
-    RoomList connectedRooms;
-    ExitList generatedExits;
-
+    ExitVector generatedExits;
     Logger::log(LogLevel::Info, "[ConnectRoom] Connecting the room to near rooms...");
     for (auto iterator : Mud::instance().mudDirections)
     {
@@ -745,11 +708,10 @@ bool ConnectRoom(Room * room)
         Room * near = room->area->getRoom(coordinates);
         if (near != nullptr)
         {
-            Logger::log(LogLevel::Error, "Found a room:%s\n", near->name);
             // Create the two exits.
-            Exit * forward = new Exit(room, near, iterator.second, 0);
+            std::shared_ptr<Exit> forward = std::make_shared<Exit>(room, near, iterator.second, 0);
+            std::shared_ptr<Exit> backward = std::make_shared<Exit>(near, room, forward->getOppositeDirection(), 0);
             generatedExits.push_back(forward);
-            Exit *backward = new Exit(near, room, forward->getOppositeDirection(), 0);
             generatedExits.push_back(backward);
 
             // In case the connection is Up/Down set the presence of stairs.
@@ -761,9 +723,7 @@ bool ConnectRoom(Room * room)
 
             // Insert in both the rooms exits the connection.
             room->addExit(forward);
-            connectedRooms.push_back(room);
-            near->addExit(forward);
-            connectedRooms.push_back(near);
+            near->addExit(backward);
 
             // Update the values on Database.
             vector<string> arguments;
@@ -773,11 +733,7 @@ bool ConnectRoom(Room * room)
             arguments.push_back(ToString(forward->flags));
             if (!SQLiteDbms::instance().insertInto("Exit", arguments))
             {
-                status = false;
-                break;
-            }
-            else
-            {
+                Logger::log(LogLevel::Error, "I was not able to save an exit.");
                 status = false;
                 break;
             }
@@ -789,6 +745,7 @@ bool ConnectRoom(Room * room)
             arguments2.push_back(ToString(backward->flags));
             if (!SQLiteDbms::instance().insertInto("Exit", arguments2))
             {
+                Logger::log(LogLevel::Error, "I was not able to save an exit.");
                 status = false;
                 break;
             }
@@ -797,17 +754,11 @@ bool ConnectRoom(Room * room)
     if (!status)
     {
         Logger::log(LogLevel::Error, "Disconnecting all the rooms.");
-        for (auto iterator : connectedRooms)
+        for (auto exitIterator : generatedExits)
         {
-            for (auto iterator2 : generatedExits)
+            if (!exitIterator->unlink())
             {
-                if (iterator2->source == iterator)
-                {
-                    if (!iterator->removeExit(iterator2->direction))
-                    {
-                        Logger::log(LogLevel::Fatal, "I was not able to remove an unwanted exit.");
-                    }
-                }
+                Logger::log(LogLevel::Fatal, "I was not able to remove an unwanted exit.");
             }
         }
     }

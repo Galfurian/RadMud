@@ -128,7 +128,7 @@ void LuaRegisterUtils(lua_State * L)
     .endClass();
 
     luabridge::getGlobalNamespace(L) //
-    .beginClass<VectorHelper<Exit *>>("ExitVector") //
+    .beginClass<VectorHelper<Exit *> >("ExitVector") //
     .addFunction("size", &VectorHelper<Exit *>::size) //
     .addFunction("back", &VectorHelper<Exit *>::back) //
     .addFunction("front", &VectorHelper<Exit *>::front) //

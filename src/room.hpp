@@ -54,7 +54,7 @@ class Room
         /// A long description of the room.
         std::string description;
         /// List of exits.
-        ExitList exits;
+        ExitVector exits;
         /// List of items in the room.
         ItemVector items;
         /// List of characters in the room.
@@ -156,7 +156,7 @@ class Room
         /// @return The mobile, if it's in the room.
         Mobile * findMobile(std::string target, int & number, Mobile * exception = nullptr);
 
-        bool addExit(Exit * exit);
+        bool addExit(std::shared_ptr<Exit> exit);
 
         /// @brief Remove from the list of exits the one on the given direction.
         /// @param direction The direction to removed.
@@ -219,8 +219,10 @@ class Room
             }
         }
 
-        /// @brief Connect the current room with all the nearby rooms.
-        void connectExits();
+        /// @brief Returns the list of available exits from the current room
+        ///         using the vector structure made for lua environment.
+        /// @return The vector of exits.
+        VectorHelper<Exit *> luaGetExits();
 
         /// @brief Function used to register inside the lua environment the class.
         /// @param L The lua environment.

@@ -315,12 +315,10 @@ std::string Area::drawASCIIFov(Room * centerRoom, int radius)
                 {
                     if (HasFlag(door->flags, ItemFlag::Closed))
                     {
-                        Logger::log(LogLevel::Error, "Found Door.");
                         tile = 'D';
                     }
                     else
                     {
-                        Logger::log(LogLevel::Error, "Found Open Door.");
                         tile = 'O';
                     }
                 }
@@ -329,7 +327,6 @@ std::string Area::drawASCIIFov(Room * centerRoom, int radius)
                 {
                     if (HasFlag(up->flags, ExitFlag::Stairs) && HasFlag(down->flags, ExitFlag::Stairs))
                     {
-                        Logger::log(LogLevel::Error, "Found UpDown.");
                         tile = "X";
                     }
                 }
@@ -337,7 +334,6 @@ std::string Area::drawASCIIFov(Room * centerRoom, int radius)
                 {
                     if (HasFlag(up->flags, ExitFlag::Stairs))
                     {
-                        Logger::log(LogLevel::Error, "Found Up.");
                         tile = ">";
                     }
                 }
@@ -345,19 +341,16 @@ std::string Area::drawASCIIFov(Room * centerRoom, int radius)
                 {
                     if (HasFlag(down->flags, ExitFlag::Stairs))
                     {
-                        Logger::log(LogLevel::Error, "Found Down.");
                         tile = "<";
                     }
                     else
                     {
-                        Logger::log(LogLevel::Error, "Found Pit.");
                         tile = ' ';
                     }
                 }
                 // III - ITEMS
                 if (room->items.size() > 0)
                 {
-                    Logger::log(LogLevel::Error, "Found Item.");
                     tile = room->items.back()->model->getTile();
                 }
                 // II  - CHARACTERS
@@ -367,7 +360,6 @@ std::string Area::drawASCIIFov(Room * centerRoom, int radius)
                     {
                         if (!HasFlag(iterator->flags, CharacterFlag::Invisible))
                         {
-                            Logger::log(LogLevel::Error, "Found Character.");
                             tile = iterator->race->getTile();
                         }
                     }
@@ -376,10 +368,8 @@ std::string Area::drawASCIIFov(Room * centerRoom, int radius)
                 if ((origin_x == x) && (origin_y == y))
                 {
                     tile = "@";
-                    Logger::log(LogLevel::Error, "Found player.");
                 }
             }
-            Logger::log(LogLevel::Error, "(%s;%s;%s)", ToString(x), ToString(y), ToString(origin_z));
             result += tile;
         }
         result += "\n";

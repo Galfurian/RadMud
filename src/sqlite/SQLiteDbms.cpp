@@ -767,34 +767,31 @@ bool LoadExit(ResultSet * result)
     while (result->next())
     {
         // Create an empty exit.
-        Exit * exit = new Exit();
+        std::shared_ptr<Exit> newExit = std::make_shared<Exit>();
         // Retrieve the rooms vnum.
-        exit->source = Mud::instance().findRoom(result->getNextInteger());
-        exit->destination = Mud::instance().findRoom(result->getNextInteger());
-        exit->direction = static_cast<Direction>(result->getNextInteger());
-        exit->flags = result->getNextUnsignedInteger();
+        newExit->source = Mud::instance().findRoom(result->getNextInteger());
+        newExit->destination = Mud::instance().findRoom(result->getNextInteger());
+        newExit->direction = static_cast<Direction>(result->getNextInteger());
+        newExit->flags = result->getNextUnsignedInteger();
 
         // Check the correctness.
-        if (exit->source == nullptr)
+        if (newExit->source == nullptr)
         {
             Logger::log(LogLevel::Error, "Can't find the source room.");
-            delete (exit);
             return false;
         }
-        if (exit->destination == nullptr)
+        if (newExit->destination == nullptr)
         {
             Logger::log(LogLevel::Error, "Can't find the destination room.");
-            delete (exit);
             return false;
         }
-        if (!exit->check())
+        if (!newExit->check())
         {
             Logger::log(LogLevel::Error, "Error during error checking.");
-            delete (exit);
             return false;
         }
         // Push this exit into the list of exits of the source room.
-        exit->source->exits.push_back(exit);
+        newExit->source->addExit(newExit);
     }
     return true;
 }

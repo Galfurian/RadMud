@@ -40,10 +40,12 @@ Continent::Continent() :
     continentMap(),
     tileSet()
 {
+    // Nothing to do.
 }
 
 Continent::~Continent()
 {
+    // Nothing to do.
 }
 
 bool Continent::check()
@@ -58,35 +60,7 @@ bool Continent::check()
 
 void Continent::init()
 {
-    int y = 0, x = 0;
-    for (char c : txtMap)
-    {
-        if (c == '\n')
-        {
-            x = 0;
-            y++;
-            continue;
-        }
-        charMap.set(x, y, c);
-
-        Room * room = &continentMap.get(x, y, 0);
-        room->vnum = -1;
-        room->area = nullptr;
-        room->continent = this;
-        room->coord = Coordinates<int>(x, y, 0);
-        room->terrain = "outside";
-        room->name = "Travelling";
-        room->description = "You are traveling along the continent.";
-        room->flags = 0;
-        x++;
-    }
-    for (y = 0; y < height; y++)
-    {
-        for (x = 0; x < width; x++)
-        {
-            continentMap.get(x, y, 0).connectExits();
-        }
-    }
+    // Nothing to do.
 }
 
 void Continent::print()

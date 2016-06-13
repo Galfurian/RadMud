@@ -1303,15 +1303,6 @@ VectorHelper<Character *> Character::luaGetTargets()
     return VectorHelper<Character *>();
 }
 
-VectorHelper<Exit *> Character::luaGetExits()
-{
-    if (room != nullptr)
-    {
-        return VectorHelper<Exit *>(room->exits);
-    }
-    return VectorHelper<Exit *>();
-}
-
 void Character::loadScript(const std::string & scriptFilename)
 {
     Logger::log(LogLevel::Debug, "Loading script '%s'...", scriptFilename);
@@ -1355,7 +1346,6 @@ void Character::luaRegister(lua_State * L)
     .addFunction("equipmentRemove", &Character::remEquipmentItem) //
     .addFunction("doCommand", &Character::doCommand) //
     .addFunction("getTargets", &Character::luaGetTargets) //
-    .addFunction("getExits", &Character::luaGetExits) //
     .addFunction("isMobile", &Character::isMobile) //
     .endClass() //
     .deriveClass<Mobile, Character>("Mobile") //

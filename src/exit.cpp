@@ -35,18 +35,21 @@ Exit::Exit() :
     direction(Direction::None),
     flags()
 {
+    // Nothing to do.
+}
+
+Exit::Exit(Room * _source, Room * _destination, Direction _direction, unsigned int _flags) :
+    source(_source),
+    destination(_destination),
+    direction(_direction),
+    flags(_flags)
+{
+    // Nothing to do.
 }
 
 Exit::~Exit()
 {
-}
-
-Exit::Exit(Room * _source, Room * _destination, Direction _direction, unsigned int _flags)
-{
-    source = _source;
-    destination = _destination;
-    direction = _direction;
-    flags = _flags;
+    //Logger::log(LogLevel::Debug, "Deleted: Exit.");
 }
 
 bool Exit::check()
@@ -65,6 +68,23 @@ Direction Exit::getOppositeDirection()
 std::string Exit::getDirection()
 {
     return GetDirectionName(direction);
+}
+
+bool Exit::unlink() const
+{
+    if (source != nullptr)
+    {
+        if (source->removeExit(this->direction))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Exit::operator==(const Exit & right) const
+{
+    return (this->direction == right.direction);
 }
 
 void Exit::luaRegister(lua_State * L)

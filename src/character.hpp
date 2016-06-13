@@ -363,11 +363,6 @@ class Character
         /// @return The vector of targets.
         VectorHelper<Character *> luaGetTargets();
 
-        /// @brief Returns the list of available exits from the current room
-        ///         using the vector structure made for lua environment.
-        /// @return The vector of exits.
-        VectorHelper<Exit *> luaGetExits();
-
         /// @brief Starts a lua environment and loads the given script.
         /// @param scriptFilename The name of the script that has to be loaded.
         void loadScript(const std::string & scriptFilename);
