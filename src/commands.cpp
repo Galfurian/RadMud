@@ -1575,13 +1575,20 @@ void LoadCommands()
         command.hndl = DoVisible;
         Mud::instance().addCommand(command);
     }
+    {
+        command.name = "ginfo";
+        command.help = "Get information about a character.";
+        command.args = "(target)";
+        command.hndl = DoGodInfo;
+        Mud::instance().addCommand(command);
+    }
 
     // Interaction with Players.
     {
-        command.name = "pinfo";
-        command.help = "Return all the information concerning a player.";
+        command.name = "aggrolist";
+        command.help = "Provides the list of opponents of the given target.";
         command.args = "(Target)";
-        command.hndl = DoPlayerInfo;
+        command.hndl = DoAggroList;
         Mud::instance().addCommand(command);
     }
     {
@@ -1699,13 +1706,6 @@ void LoadCommands()
     }
 
     // Mobiles.
-    {
-        command.name = "imobile";
-        command.help = "Get information about a mobile.";
-        command.args = "(Mobile.id)";
-        command.hndl = DoMobileInfo;
-        Mud::instance().addCommand(command);
-    }
     {
         command.name = "kmobile";
         command.help = "Kill the desired mobile, in the same room.";

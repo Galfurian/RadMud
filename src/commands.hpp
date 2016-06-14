@@ -239,6 +239,8 @@ void DoShutdown(Character * character, std::istream & sArgs);
 void DoGoTo(Character * character, std::istream & sArgs);
 /// Transfer a character from room to room.
 void DoTransfer(Character * character, std::istream & sArgs);
+/// Get information about a character.
+void DoGodInfo(Character * character, std::istream &sArgs);
 /// Set a flag to a character.
 void DoSetFlag(Character * character, std::istream & sArgs);
 /// Remove a flag from the character.
@@ -263,8 +265,6 @@ void DoRoomCreate(Character * character, std::istream & sArgs);
 void DoRoomDelete(Character * character, std::istream & sArgs);
 /// Edit a room name or description.
 void DoRoomEdit(Character * character, std::istream & sArgs);
-/// Get information about a mobile.
-void DoMobileInfo(Character * character, std::istream & sArgs);
 /// Kill the desired mobile, in the same room.
 void DoMobileKill(Character * character, std::istream &sArgs);
 /// Reload the lua script for the target mobile, in the same room.
@@ -281,8 +281,8 @@ void DoVisible(Character * character, std::istream &sArgs);
 void DoModSkill(Character * character, std::istream &sArgs);
 /// Modify the value of the player attribute.
 void DoModAttr(Character * character, std::istream &sArgs);
-/// Get information about a player.
-void DoPlayerInfo(Character * character, std::istream &sArgs);
+/// Provides the list of opponents of the given target.
+void DoAggroList(Character * character, std::istream &sArgs);
 /// Provide all the information regarding the given material.
 void DoMaterialInfo(Character * character, std::istream & sArgs);
 /// Create the item with the given liquid inside a container.

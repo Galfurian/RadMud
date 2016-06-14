@@ -243,17 +243,6 @@ class Character
         /// @return <b>True</b> if the item is inside the equipment,<br><b>False</b> otherwise.
         bool hasEquipmentItem(Item * item);
 
-        /// @brief Provides the overall armor class.
-        /// @return The armor class.
-        unsigned int getArmorClass();
-
-        /// @brief Function which checks if the character can attack with a weapon equipped
-        ///         in the given slot.
-        /// @param slot The slot in which the weapon should be.
-        /// @return <b>True</b> if the item is there,<br>
-        ///         <b>False</b> otherwise.
-        bool canAttackWith(const EquipmentSlot & slot);
-
         /// @brief Add the passed item to character's inventory.
         /// @param item The item to add to inventory.
         /// @return <b>True</b> if the operation goes well,<br><b>False</b> otherwise.
@@ -328,9 +317,21 @@ class Character
         ///         <b>False</b> otherwise.
         bool canSee(Character * target);
 
+        // Combat functions.
+        /// @brief Provides the overall armor class.
+        /// @return The armor class.
+        unsigned int getArmorClass();
+
         /// @brief Given an action, it returns the necessary cooldown.
         /// @return The non-decreasing value of the cooldown.
         unsigned int getCooldown(CombatAction combatAction);
+
+        /// @brief Function which checks if the character can attack with a weapon equipped
+        ///         in the given slot.
+        /// @param slot The slot in which the weapon should be.
+        /// @return <b>True</b> if the item is there,<br>
+        ///         <b>False</b> otherwise.
+        bool canAttackWith(const EquipmentSlot & slot);
 
         bool isAtRange(Character * target, const unsigned int & range);
 

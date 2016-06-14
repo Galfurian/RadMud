@@ -291,8 +291,6 @@ void MudUpdater::performActions()
         {
             continue;
         }
-
-        // ////////////////////////////////////////////////////////////////////
         iterator->getAction()->perform();
     }
 
@@ -303,7 +301,6 @@ void MudUpdater::performActions()
         {
             continue;
         }
-
         auto end = std::chrono::system_clock::now();
         auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(mobile->nextActionCooldown - end).count();
         if (elapsed < 0)
@@ -311,7 +308,6 @@ void MudUpdater::performActions()
             mobile->triggerEventRandom();
             mobile->nextActionCooldown = end + std::chrono::seconds(RandInteger(30, 60));
         }
-
         mobile->getAction()->perform();
     }
 }

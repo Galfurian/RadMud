@@ -277,13 +277,31 @@ bool Action::setNextCombatAction(const CombatAction & nextAction)
     // Set the next combat action.
     nextCombatAction = nextAction;
     // Set the action cooldown.
-    actionCooldown = std::chrono::system_clock::now() + std::chrono::seconds(actor->getCooldown(nextCombatAction));
+    unsigned int cooldown = actor->getCooldown(nextCombatAction);
+    actionCooldown = std::chrono::system_clock::now() + std::chrono::seconds(cooldown);
+    Logger::log(LogLevel::Debug, "[%s] Next action in %s.", actor->getNameCapital(), ToString(cooldown));
     return true;
 }
 
 CombatAction Action::getNextCombatAction() const
 {
     return this->nextCombatAction;
+}
+
+void Action::reset()
+{
+    type = ActionType::Wait;
+    target = nullptr;
+    itemTarget = nullptr;
+    destination = nullptr;
+    direction = Direction::None;
+    production = nullptr;
+    schematics = nullptr;
+    craftMaterial = nullptr;
+    usedTools.clear();
+    usedIngredients.clear();
+    actionCooldown = std::chrono::system_clock::now();
+    nextCombatAction = CombatAction::NoAction;
 }
 
 bool Action::checkElapsed()
@@ -774,29 +792,17 @@ void Action::performComb()
     }
     else
     {
-        actor->sendMsg("You stop fighting.\n\n");
-        this->reset();
+        actor->sendMsg(this->stop());
     }
-}
-
-void Action::reset()
-{
-    type = ActionType::Wait;
-    target = nullptr;
-    itemTarget = nullptr;
-    destination = nullptr;
-    direction = Direction::None;
-    production = nullptr;
-    schematics = nullptr;
-    craftMaterial = nullptr;
-    usedTools.clear();
-    usedIngredients.clear();
 }
 
 void Action::performCombatAction(const CombatAction & move)
 {
+    // Retrive once and for all the name of the actor.
+    std::string nam = actor->getNameCapital();
     if (move == CombatAction::BasicAttack)
     {
+        Logger::log(LogLevel::Debug, "[%s] Perform a BasicAttack.", nam);
         ItemVector activeWeapons = actor->getActiveWeapons();
         if (activeWeapons.empty())
         {
@@ -813,31 +819,71 @@ void Action::performCombatAction(const CombatAction & move)
                 {
                     continue;
                 }
-                // Roll the attack.
+                // Natural roll for the attack.
                 unsigned int ATK = TRandInteger<unsigned int>(1, 20);
+                Logger::log(LogLevel::Debug, "[%s] Natural roll of %s.", nam, ToString(ATK));
+                if ((activeWeapons.size() > 1) && (ATK != 20))
+                {
+                    unsigned int penality = 0;
+                    if (iterator->currentSlot == EquipmentSlot::RightHand)
+                    {
+                        penality = 6;
+                    }
+                    else if (iterator->currentSlot == EquipmentSlot::LeftHand)
+                    {
+                        penality = 10;
+                    }
+                    Logger::log(LogLevel::Debug, "[%s] Suffer a %s penalty with its %s.", nam, ToString(penality),
+                        GetEquipmentSlotName(iterator->currentSlot));
+                    if (ATK < penality)
+                    {
+                        ATK = 0;
+                    }
+                    else
+                    {
+                        ATK -= penality;
+                    }
+                }
                 // Evaluate the armor class of the enemy.
                 unsigned int AC = enemy->getArmorClass();
-                // Log the rolled value.
-                Logger::log(LogLevel::Debug, "%s rolls a %s against %s.", actor->getNameCapital(), ToString(ATK),
-                    ToString(AC));
+                // Log the attack roll.
+                Logger::log(LogLevel::Debug, "[%s] Attack roll %s vs %s.", nam, ToString(ATK), ToString(AC));
                 // Check if its a hit.
-                if (ATK < AC)
+                if ((ATK < AC) && (ATK != 20))
                 {
                     actor->sendMsg("You miss %s with %s.\n", enemy->getName(), iterator->getName());
-                    enemy->sendMsg("%s misses you with %s.\n\n", actor->getNameCapital(), iterator->getName());
+                    enemy->sendMsg("%s misses you with %s.\n\n", nam, iterator->getName());
                 }
                 else
                 {
-                    // Roll the damage.
-                    unsigned int DMG = 1;
-                    DMG += TRandInteger<unsigned int>(wFun.minDamage, wFun.maxDamage);
+                    // Store the type of attack.
+                    std::string attackType;
+                    // Natural roll for the damage.
+                    unsigned int DMG = TRandInteger<unsigned int>(wFun.minDamage, wFun.maxDamage);
+                    Logger::log(LogLevel::Debug, "[%s] Rolls a damage of %s.", nam, ToString(DMG));
+                    // Check if the character is wielding a two-handed weapon.
+                    if (activeWeapons.size() == 1)
+                    {
+                        if (HasFlag(iterator->model->flags, ModelFlag::TwoHand))
+                        {
+                            unsigned int STR = GetAbilityModifier(actor->getStrength());
+                            DMG += STR + (STR / 2);
+                            Logger::log(LogLevel::Debug, "[%s] Add 1-1/2 times its Strength.", nam);
+                        }
+                    }
+                    // 20 is a critical.
+                    if (ATK == 20)
+                    {
+                        DMG *= 2;
+                        attackType = "critically";
+                    }
                     // Log the damage.
-                    Logger::log(LogLevel::Debug, "%s hit %s for %s with %s.", actor->getNameCapital(), enemy->getName(),
-                        ToString(DMG), iterator->getName());
+                    Logger::log(LogLevel::Debug, "[%s] Hits %s for with %s.", nam, enemy->getName(), ToString(DMG),
+                        iterator->getName());
                     // Send the messages to the characters.
-                    actor->sendMsg("You hit %s with %s for %s.\n", enemy->getName(), iterator->getName(),
+                    actor->sendMsg("You %s hit %s with %s for %s.\n", attackType, enemy->getName(), iterator->getName(),
                         ToString(DMG));
-                    enemy->sendMsg("%s hits you with %s for %s.\n\n", actor->getNameCapital(), iterator->getName(),
+                    enemy->sendMsg("%s %s hits you with %s for %s.\n\n", nam, attackType, iterator->getName(),
                         ToString(DMG));
                 }
             }
@@ -866,14 +912,17 @@ void Action::performCombatAction(const CombatAction & move)
                 }
                 else
                 {
-                    actor->moveTo(selected->destination, actor->getNameCapital() + " flees from the battlefield.\n\n",
-                        actor->getNameCapital() + " arives fleeing.\n\n", "You flee from the battlefield.\n");
-                    this->setNextCombatAction(CombatAction::NoAction);
+                    actor->sendMsg(this->stop());
+                    actor->moveTo(selected->destination, nam + " flees from the battlefield.\n\n",
+                        nam + " arives fleeing.\n\n", "You flee from the battlefield.\n");
                     return;
                 }
             }
         }
     }
     // By default set the next combat action to basic attack.
-    this->setNextCombatAction(CombatAction::BasicAttack);
+    if (!this->setNextCombatAction(CombatAction::BasicAttack))
+    {
+        actor->sendMsg(this->stop());
+    }
 }

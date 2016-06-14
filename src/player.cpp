@@ -357,13 +357,11 @@ void Player::triggerDeath()
 {
     // Call the method of the father class.
     Character::triggerDeath();
-
     // Move the player to the default room.
     if ((room = Mud::instance().findRoom(rent_room)) != nullptr)
     {
         room->addCharacter(this);
     }
-
     // Set values of health and stamina to 1.
     health = 1;
     stamina = 1;

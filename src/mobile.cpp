@@ -141,11 +141,16 @@ void Mobile::triggerDeath()
     this->triggerEventDeath();
 }
 
+int64_t Mobile::getRespawnTime()
+{
+    // Return the check if the mobile can be respawned.
+    return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - nextRespawn).count();
+}
+
 bool Mobile::canRespawn()
 {
     // Return the check if the mobile can be respawned.
-    return (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - nextRespawn).count()
-        >= 0);
+    return (this->getRespawnTime() >= 0);
 }
 
 void Mobile::reloadLua()

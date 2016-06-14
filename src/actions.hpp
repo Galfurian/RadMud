@@ -134,8 +134,10 @@ class Action
         /// @brief Provides a copy of the next combat action.
         CombatAction getNextCombatAction() const;
 
-    private:
+        /// @brief This function resets the action.
+        void reset();
 
+    private:
         /// @brief Check if the cooldown of the action is elapsed.
         /// @return <b>True</b> if the time has passed,<br> <b>False</b> otherwise.
         bool checkElapsed();
@@ -157,9 +159,6 @@ class Action
 
         /// @brief Perform a Comb action.
         void performComb();
-
-        /// @brief This function resets the action.
-        void reset();
 
         /// @brief Returns the attack damage.
         /// @return The value of the attack.

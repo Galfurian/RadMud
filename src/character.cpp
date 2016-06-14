@@ -677,61 +677,6 @@ bool Character::hasEquipmentItem(Item * item)
     return (std::find(equipment.begin(), equipment.end(), item) != equipment.end());
 }
 
-unsigned int Character::getArmorClass()
-{
-    // 10
-    unsigned int result = 10;
-    // + ARMOR BONUS
-    for (auto it : equipment)
-    {
-        if (it->model->type == ModelType::Armor)
-        {
-            result += it->model->getArmorFunc().damageAbs;
-        }
-    }
-    // + SHIELD BONUS
-    Item * rh = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
-    if (rh != nullptr)
-    {
-        if (rh->model->type == ModelType::Shield)
-        {
-            result += rh->model->getShieldFunc().parryChance;
-        }
-    }
-    Item * lh = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
-    if (lh != nullptr)
-    {
-        if (lh->model->type == ModelType::Shield)
-        {
-            result += lh->model->getShieldFunc().parryChance;
-        }
-    }
-    // + DEXTERITY MODIFIER
-    int overallAgility = static_cast<int>(this->agility) + this->effects.getAgiMod();
-    if (overallAgility > 0)
-    {
-        result += GetAbilityModifier(static_cast<unsigned int>(overallAgility));
-    }
-    return result;
-}
-
-bool Character::canAttackWith(const EquipmentSlot & slot)
-{
-    if ((slot == EquipmentSlot::RightHand) || (slot == EquipmentSlot::LeftHand))
-    {
-        Item * weapon = this->findEquipmentSlotItem(slot);
-        if (weapon != nullptr)
-        {
-            // Check if there is actually a weapon equiped.
-            if (weapon->model->type == ModelType::Weapon)
-            {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
 bool Character::addInventoryItem(Item * item)
 {
     if (item == nullptr)
@@ -1091,6 +1036,44 @@ bool Character::canSee(Character * target)
     return true;
 }
 
+unsigned int Character::getArmorClass()
+{
+    // 10
+    unsigned int result = 10;
+    // + ARMOR BONUS
+    for (auto it : equipment)
+    {
+        if (it->model->type == ModelType::Armor)
+        {
+            result += it->model->getArmorFunc().damageAbs;
+        }
+    }
+    // + SHIELD BONUS
+    Item * rh = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
+    if (rh != nullptr)
+    {
+        if (rh->model->type == ModelType::Shield)
+        {
+            result += rh->model->getShieldFunc().parryChance;
+        }
+    }
+    Item * lh = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
+    if (lh != nullptr)
+    {
+        if (lh->model->type == ModelType::Shield)
+        {
+            result += lh->model->getShieldFunc().parryChance;
+        }
+    }
+    // + DEXTERITY MODIFIER
+    int overallAgility = static_cast<int>(this->agility) + this->effects.getAgiMod();
+    if (overallAgility > 0)
+    {
+        result += GetAbilityModifier(static_cast<unsigned int>(overallAgility));
+    }
+    return result;
+}
+
 unsigned int Character::getCooldown(CombatAction combatAction)
 {
     double BASE = 6.0;
@@ -1135,8 +1118,24 @@ unsigned int Character::getCooldown(CombatAction combatAction)
     {
         cooldown = static_cast<unsigned int>(BASE - AGI + WGT + CAR);
     }
-    Logger::log(LogLevel::Debug, "%s will act in %s.", this->getNameCapital(), ToString(cooldown));
     return cooldown;
+}
+
+bool Character::canAttackWith(const EquipmentSlot & slot)
+{
+    if ((slot == EquipmentSlot::RightHand) || (slot == EquipmentSlot::LeftHand))
+    {
+        Item * weapon = this->findEquipmentSlotItem(slot);
+        if (weapon != nullptr)
+        {
+            // Check if there is actually a weapon equiped.
+            if (weapon->model->type == ModelType::Weapon)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 bool Character::isAtRange(Character * target, const unsigned int & range)
@@ -1220,8 +1219,11 @@ void Character::doCommand(const string & command)
 void Character::triggerDeath()
 {
     // Create a corpse at the current position.
-    createCorpse();
-
+    this->createCorpse();
+    // Reset the action of the character.
+    this->getAction()->reset();
+    // Reset the list of opponents.
+    this->opponents.aggressionList.clear();
     // Remove the character from the current room.
     if (room != nullptr)
     {

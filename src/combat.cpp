@@ -27,6 +27,10 @@ Aggression::Aggression(Character * _aggressor, unsigned int _aggression) :
 {
     // Nothing to do.
 }
+Aggression::~Aggression()
+{
+    Logger::log(LogLevel::Debug, "Deleted: Aggression.");
+}
 bool Aggression::operator>(const Aggression & source) const
 {
     return (this->aggression > source.aggression);
@@ -51,6 +55,11 @@ OpponentsList::OpponentsList(Character * _owner) :
     // Nothing to do.
 }
 
+OpponentsList::~OpponentsList()
+{
+    Logger::log(LogLevel::Debug, "Deleted: OpponentsList.");
+}
+
 bool OpponentsList::addOpponent(Character * character, unsigned int initAggro)
 {
     bool ret = false;
@@ -67,7 +76,8 @@ bool OpponentsList::addOpponent(Character * character, unsigned int initAggro)
         this->sortList();
         // Set return value to success.
         ret = true;
-        Logger::log(LogLevel::Debug, "%s engage %s", owner->getNameCapital(), character->getName());
+        Logger::log(LogLevel::Debug, "%s engage %s with %s.", owner->getNameCapital(), character->getName(),
+            ToString(initAggro));
     }
     return ret;
 }
@@ -198,7 +208,13 @@ void OpponentsList::checkList()
 {
     for (std::vector<Aggression>::iterator it = aggressionList.begin(); it != aggressionList.end();)
     {
+        // Check if the aggressor is null.
         if (it->aggressor == nullptr)
+        {
+            it = aggressionList.erase(it);
+        }
+        // Check if the aggressor is nowhere.
+        else if (it->aggressor->room == nullptr)
         {
             it = aggressionList.erase(it);
         }
@@ -207,6 +223,16 @@ void OpponentsList::checkList()
             ++it;
         }
     }
+}
+
+OpponentsList::iterator OpponentsList::begin()
+{
+    return this->aggressionList.begin();
+}
+
+OpponentsList::iterator OpponentsList::end()
+{
+    return this->aggressionList.end();
 }
 
 void OpponentsList::sortList()

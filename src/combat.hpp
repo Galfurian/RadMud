@@ -37,6 +37,8 @@ class Aggression
         /// @brief Constructor.
         Aggression(Character * _aggressor, unsigned int _aggression);
 
+        ~Aggression();
+
         /// @brief Operator used to order the aggressors based on the level of aggression.
         bool operator>(const Aggression & source) const;
 
@@ -54,15 +56,21 @@ class Aggression
 class OpponentsList
 {
         friend class Character;
+    public:
+        typedef typename std::vector<Aggression> AggressorVector;
+        typedef typename std::vector<Aggression>::iterator iterator;
+        typedef typename std::vector<Aggression>::const_iterator const_iterator;
     private:
         /// Owner of the list.
         Character * owner;
         /// List of aggressors.
-        std::vector<Aggression> aggressionList;
+        AggressorVector aggressionList;
 
     public:
         /// @brief Constructor.
         OpponentsList(Character * _owner);
+
+        ~OpponentsList();
 
         /// @brief Tries to add the given character to the list of opponents.
         /// @param character The opponent to add.
@@ -121,6 +129,10 @@ class OpponentsList
 
         /// @brief Check and clear the list from possible disconnected players.
         void checkList();
+
+        iterator begin();
+
+        iterator end();
 
     private:
         /// @brief Sort the list of opponents.

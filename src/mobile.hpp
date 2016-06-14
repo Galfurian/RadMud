@@ -88,6 +88,8 @@ class Mobile: public Character
 
         /// @brief Return the number of second until next respawn.
         /// @return Seconds until respawn.
+        int64_t getRespawnTime();
+
         bool canRespawn();
 
         /// @brief Reload the LUA enviroment of the mobile.
