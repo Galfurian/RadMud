@@ -166,17 +166,17 @@ class Room
         /// @brief Search for the desired exit in a direction, provided as an enumerator.
         /// @param direction The direction to search.
         /// @return The desired exit.
-        Exit * findExit(Direction direction);
+        std::shared_ptr<Exit> findExit(Direction direction);
 
         /// @brief Search for the desired exit in a direction, provided as a string.
         /// @param direction The direction to search.
         /// @return The desired exit.
-        Exit * findExit(std::string direction);
+        std::shared_ptr<Exit> findExit(std::string direction);
 
         /// @brief Search for the desired exit of this room.
         /// @param destination The destination room.
         /// @return The desired exit.
-        Exit * findExit(Room * destination);
+        std::shared_ptr<Exit> findExit(Room * destination);
 
         /// @brief Search for a built door inside the room.
         /// @return The contained door if there is one.

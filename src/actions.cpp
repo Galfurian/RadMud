@@ -858,7 +858,7 @@ void Action::performCombatAction(const CombatAction & move)
             if (!directions.empty())
             {
                 Direction randomDirection = directions.at(TRandInteger<size_t>(0, directions.size() - 1));
-                Exit * selected = actor->room->findExit(randomDirection);
+                std::shared_ptr<Exit> selected = actor->room->findExit(randomDirection);
                 if (selected == nullptr)
                 {
                     Logger::log(LogLevel::Error, "Selected null exit during action Flee.");

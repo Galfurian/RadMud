@@ -162,8 +162,8 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, int radius)
             if (map.get(x, y) == MapTile::Walkable)
             {
                 Room * room = this->getRoom(x, y, origin_z);
-                Exit * up = room->findExit(Direction::Up);
-                Exit * down = room->findExit(Direction::Down);
+                std::shared_ptr<Exit> up = room->findExit(Direction::Up);
+                std::shared_ptr<Exit> down = room->findExit(Direction::Down);
 
                 // By default set it to walkable tile.
                 tileCode = ToString(15) + ":" + ToString(this->tileSet + 0);
@@ -305,8 +305,8 @@ std::string Area::drawASCIIFov(Room * centerRoom, int radius)
             Room * room = this->getRoom(x, y, origin_z);
             if ((map.get(x, y) != MapTile::Void) && (room != nullptr))
             {
-                Exit * up = room->findExit(Direction::Up);
-                Exit * down = room->findExit(Direction::Down);
+                std::shared_ptr<Exit> up = room->findExit(Direction::Up);
+                std::shared_ptr<Exit> down = room->findExit(Direction::Down);
                 // VI  - WALKABLE
                 tile = '.';
                 // V   - OPEN DOOR

@@ -65,6 +65,21 @@ Direction Exit::getOppositeDirection()
     return InverDirection(direction);
 }
 
+std::shared_ptr<Exit> Exit::getOppositeExit()
+{
+    if (destination != nullptr)
+    {
+        for (auto it : destination->exits)
+        {
+            if (it->destination == this->source)
+            {
+                return it;
+            }
+        }
+    }
+    return nullptr;
+}
+
 std::string Exit::getDirection()
 {
     return GetDirectionName(direction);

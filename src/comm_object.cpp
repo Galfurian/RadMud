@@ -896,7 +896,7 @@ void DoOpen(Character * character, std::istream & sArgs)
     if (direction != Direction::None)
     {
         // Check if the direction exists.
-        Exit * roomExit = character->room->findExit(direction);
+        std::shared_ptr<Exit> roomExit = character->room->findExit(direction);
         if (roomExit == nullptr)
         {
             character->sendMsg("There is nothing in that direction.\n");
@@ -991,7 +991,7 @@ void DoClose(Character * character, std::istream & sArgs)
     if (direction != Direction::None)
     {
         // Check if the direction exists.
-        Exit * roomExit = character->room->findExit(direction);
+        std::shared_ptr<Exit> roomExit = character->room->findExit(direction);
         if (roomExit == nullptr)
         {
             character->sendMsg("There is nothing in that direction.\n");

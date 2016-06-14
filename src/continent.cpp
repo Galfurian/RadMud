@@ -130,8 +130,8 @@ std::vector<std::string> Continent::drawFov(Room * centerRoom, int radius)
             if ((tile == ContinentTile::Walk) || (tile == ContinentTile::DoorOpen))
             {
                 Room * room = this->getRoom(x, y, origin_z);
-                Exit * up = room->findExit(Direction::Up);
-                Exit * down = room->findExit(Direction::Down);
+                std::shared_ptr<Exit> up = room->findExit(Direction::Up);
+                std::shared_ptr<Exit> down = room->findExit(Direction::Down);
 
                 // By default set it to walkable tile.
                 tileCode = ToString(15) + ":" + ToString(this->tileSet + 0);

@@ -375,7 +375,7 @@ Room * Character::canMoveTo(Direction direction, std::string & error)
     }
 
     // Find the exit to the destination.
-    Exit * destExit = room->findExit(direction);
+    std::shared_ptr<Exit> destExit = room->findExit(direction);
     if (destExit == nullptr)
     {
         error = "You cannot go that way.";
@@ -412,7 +412,7 @@ Room * Character::canMoveTo(Direction direction, std::string & error)
     }
 
     // Check if the destination has a floor.
-    Exit * destDown = destExit->destination->findExit(Direction::Down);
+    std::shared_ptr<Exit> destDown = destExit->destination->findExit(Direction::Down);
     if (destDown != nullptr)
     {
         if (!HasFlag(destDown->flags, ExitFlag::Stairs))

@@ -61,6 +61,10 @@ class Exit
         /// @return The opposite direction.
         Direction getOppositeDirection();
 
+        /// @brief Get the exit on the opposite side.
+        /// @return The opposite exit.
+        std::shared_ptr<Exit> getOppositeExit();
+
         /// @brief Get the direction.
         /// @return The direction.
         std::string getDirection();

@@ -52,12 +52,12 @@ Room::Room() :
 Room::~Room()
 {
     Logger::log(LogLevel::Debug, "Deleted: Room (" + this->name + ").");
-    // TODO: Find a clever way. It's quite horrible this way.
     for (auto it : exits)
     {
-        if (it->destination != nullptr)
+        std::shared_ptr<Exit> oppositeExit = it->getOppositeExit();
+        if (oppositeExit != nullptr)
         {
-            it->destination->removeExit(InverDirection(it->direction));
+            oppositeExit->unlink();
         }
     }
     // Remove the room from the area.
@@ -400,30 +400,30 @@ Mobile * Room::findMobile(string target, int & number, Mobile * exception)
     return nullptr;
 }
 
-Exit * Room::findExit(Direction direction)
+std::shared_ptr<Exit> Room::findExit(Direction direction)
 {
     for (auto it : exits)
     {
         if (it->direction == direction)
         {
-            return &(*it);
+            return it;
         }
     }
     return nullptr;
 }
 
-Exit * Room::findExit(std::string direction)
+std::shared_ptr<Exit> Room::findExit(std::string direction)
 {
     return this->findExit(GetDirection(direction));
 }
 
-Exit * Room::findExit(Room * destination)
+std::shared_ptr<Exit> Room::findExit(Room * destination)
 {
     for (auto it : exits)
     {
         if (it->destination == destination)
         {
-            return &(*it);
+            return it;
         }
     }
     return nullptr;
