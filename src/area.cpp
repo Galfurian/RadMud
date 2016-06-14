@@ -292,7 +292,7 @@ std::string Area::drawASCIIFov(Room * centerRoom, int radius)
     int min_y = (origin_y < radius) ? 0 : (origin_y - radius);
     int max_y = ((origin_y + radius - 1) > this->height) ? this->height : (origin_y + radius - 1);
     // Create a 2D map of chararacters.
-    Map2D<MapTile> map(radius * 2, radius * 2);
+    Map2D<MapTile> map(radius * 2, radius * 2, MapTile::Void);
     // Evaluate the field of view.
     this->fov(map, origin_x, origin_y, origin_z, radius);
     // Prepare Living Creatures layer.
