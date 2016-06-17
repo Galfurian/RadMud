@@ -341,15 +341,25 @@ class Character
 
         ItemVector getActiveWeapons();
 
-        /// @brief Handle character input.
-        /// @param command Command that need to be handled.
-        void doCommand(const std::string & command);
+        bool hasStaminaToAttackWith(const EquipmentSlot & slot, unsigned int & consumed);
+
+        bool dealDamage(const unsigned int & value, const bool & force = false);
+
+        bool healDamage(const unsigned int & value, const bool & force = false);
+
+        bool consumeStamina(const unsigned int & value, const bool & force = false);
+
+        bool gainStamina(const unsigned int & value, const bool & force = false);
 
         /// @brief Handle what happend when this character die.
         virtual void triggerDeath();
 
         /// @brief Create a corpse on the ground.
         Item * createCorpse();
+
+        /// @brief Handle character input.
+        /// @param command Command that need to be handled.
+        void doCommand(const std::string & command);
 
         /// @brief Returns the character <b>statically</b> casted to player.
         /// @return The player version of the character.

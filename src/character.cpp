@@ -1210,10 +1210,101 @@ ItemVector Character::getActiveWeapons()
     return ret;
 }
 
-void Character::doCommand(const string & command)
+bool Character::hasStaminaToAttackWith(const EquipmentSlot & slot, unsigned int & consumed)
 {
-    std::istringstream is(command);
-    ProcessCommand(this, is);
+    if (this->canAttackWith(slot))
+    {
+        double BASE = (5.0 / 100);
+        // The strength modifier.
+        double STR = BASE * static_cast<double>(this->getStrength());
+        // The weight modifier.
+        double WGT = BASE * weight;
+        // The carried weight.
+        double CAR = BASE * (this->getCarryingWeight() / 2);
+        Item * item = findEquipmentSlotItem(EquipmentSlot::RightHand);
+        if (item != nullptr)
+        {
+            double EQS = BASE * item->getWeight();
+            Logger::log(LogLevel::Warning, "%s - %s + %s + %s", ToString(BASE), ToString(STR), ToString(CAR),
+                ToString(EQS));
+            BASE += -STR + WGT + CAR + EQS;
+            if (BASE > 0)
+            {
+                consumed = static_cast<unsigned int>(BASE);
+                if (this->stamina >= consumed)
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                Logger::log(LogLevel::Warning, "Evaluated cosumed stamina is below zero(%s).", ToString(BASE));
+            }
+        }
+        else
+        {
+            Logger::log(LogLevel::Warning, "No item at the given position.");
+        }
+    }
+    return false;
+}
+
+bool Character::dealDamage(const unsigned int & value, const bool & force)
+{
+    if (this->health >= value)
+    {
+        this->health -= value;
+        return true;
+    }
+    if (force)
+    {
+        this->health = 0;
+    }
+    return false;
+}
+
+bool Character::healDamage(const unsigned int & value, const bool & force)
+{
+    unsigned int maximum = this->getMaxHealth();
+    if ((this->health + value) <= maximum)
+    {
+        this->health += value;
+        return true;
+    }
+    if (force)
+    {
+        this->health = maximum;
+    }
+    return false;
+}
+
+bool Character::consumeStamina(const unsigned int & value, const bool & force)
+{
+    if (this->stamina >= value)
+    {
+        this->stamina -= value;
+        return true;
+    }
+    if (force)
+    {
+        this->stamina = 0;
+    }
+    return false;
+}
+
+bool Character::gainStamina(const unsigned int & value, const bool & force)
+{
+    unsigned int maximum = this->getMaxStamina();
+    if ((this->stamina + value) <= maximum)
+    {
+        this->stamina += value;
+        return true;
+    }
+    if (force)
+    {
+        this->stamina = maximum;
+    }
+    return false;
 }
 
 void Character::triggerDeath()
@@ -1286,6 +1377,12 @@ Item * Character::createCorpse()
     return corpse;
 }
 
+void Character::doCommand(const string & command)
+{
+    std::istringstream is(command);
+    ProcessCommand(this, is);
+}
+
 Player * Character::toPlayer()
 {
     return static_cast<Player *>(this);
@@ -1337,7 +1434,7 @@ void Character::loadScript(const std::string & scriptFilename)
 void Character::luaRegister(lua_State * L)
 {
     luabridge::getGlobalNamespace(L) //
-    .beginClass<Character>("Character") //
+    .beginClass < Character > ("Character") //
     .addData("name", &Character::name) //
     .addData("race", &Character::race) //
     .addData("faction", &Character::faction) //

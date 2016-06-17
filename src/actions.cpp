@@ -812,29 +812,50 @@ void Action::performCombatAction(const CombatAction & move)
         {
             for (auto iterator : activeWeapons)
             {
-                WeaponFunc wFun = iterator->model->getWeaponFunc();
+                // Get the weapon function.
+                WeaponFunc function = iterator->model->getWeaponFunc();
                 // Get the top aggro enemy at range.
-                Character * enemy = actor->getNextOpponentAtRange(wFun.range);
+                Character * enemy = actor->getNextOpponentAtRange(function.range);
                 if (enemy == nullptr)
                 {
+                    actor->sendMsg("You do not have opponents at reange for %s.\n", iterator->getName());
                     continue;
                 }
+                unsigned int consumedStamina;
+                if (!actor->hasStaminaToAttackWith(iterator->getCurrentSlot(), consumedStamina))
+                {
+                    actor->sendMsg("You are too tired to attack with %s.\n", iterator->getName());
+                    Logger::log(LogLevel::Debug, "[%s] Has %s stamina and needs %s.", nam, ToString(actor->stamina),
+                        ToString(consumedStamina));
+                    continue;
+                }
+                actor->consumeStamina(consumedStamina);
                 // Natural roll for the attack.
                 unsigned int ATK = TRandInteger<unsigned int>(1, 20);
+                // Log the rolled value.
                 Logger::log(LogLevel::Debug, "[%s] Natural roll of %s.", nam, ToString(ATK));
+                // Check if:
+                //  1. The number of active weapons is more than 1, then we have to apply
+                //      a penality to the attack roll.
+                //  2. The value is NOT a natural 20 (hit).
                 if ((activeWeapons.size() > 1) && (ATK != 20))
                 {
+                    // Evaluate the penality to the attack roll.
                     unsigned int penality = 0;
+                    // On the main hand the penality is 6.
                     if (iterator->currentSlot == EquipmentSlot::RightHand)
                     {
                         penality = 6;
                     }
+                    // On the off hand the penality is 10.
                     else if (iterator->currentSlot == EquipmentSlot::LeftHand)
                     {
                         penality = 10;
                     }
+                    // Log that we have applied a penality.
                     Logger::log(LogLevel::Debug, "[%s] Suffer a %s penalty with its %s.", nam, ToString(penality),
                         GetEquipmentSlotName(iterator->currentSlot));
+                    // Safely apply the penality.
                     if (ATK < penality)
                     {
                         ATK = 0;
@@ -846,9 +867,11 @@ void Action::performCombatAction(const CombatAction & move)
                 }
                 // Evaluate the armor class of the enemy.
                 unsigned int AC = enemy->getArmorClass();
-                // Log the attack roll.
+                // Log the overall attack roll.
                 Logger::log(LogLevel::Debug, "[%s] Attack roll %s vs %s.", nam, ToString(ATK), ToString(AC));
-                // Check if its a hit.
+                // Check if:
+                //  1. The attack roll is lesser than the armor class of the opponent.
+                //  2. The attack roll is not a natural 20.
                 if ((ATK < AC) && (ATK != 20))
                 {
                     actor->sendMsg("You miss %s with %s.\n", enemy->getName(), iterator->getName());
@@ -857,33 +880,37 @@ void Action::performCombatAction(const CombatAction & move)
                 else
                 {
                     // Store the type of attack.
-                    std::string attackType;
+                    std::string critical;
                     // Natural roll for the damage.
-                    unsigned int DMG = TRandInteger<unsigned int>(wFun.minDamage, wFun.maxDamage);
+                    unsigned int DMG = TRandInteger<unsigned int>(function.minDamage, function.maxDamage);
+                    // Log the damage roll.
                     Logger::log(LogLevel::Debug, "[%s] Rolls a damage of %s.", nam, ToString(DMG));
                     // Check if the character is wielding a two-handed weapon.
                     if (activeWeapons.size() == 1)
                     {
                         if (HasFlag(iterator->model->flags, ModelFlag::TwoHand))
                         {
+                            // Get the strenth modifier.
                             unsigned int STR = GetAbilityModifier(actor->getStrength());
+                            // Add to the damage rool one and half the strenth value.
                             DMG += STR + (STR / 2);
+                            // Log the additional damage.
                             Logger::log(LogLevel::Debug, "[%s] Add 1-1/2 times its Strength.", nam);
                         }
                     }
-                    // 20 is a critical.
+                    // If the character has rolled a natural 20, then multiply the damage by two.
                     if (ATK == 20)
                     {
                         DMG *= 2;
-                        attackType = "critically";
+                        critical = "critically";
                     }
                     // Log the damage.
                     Logger::log(LogLevel::Debug, "[%s] Hits %s for with %s.", nam, enemy->getName(), ToString(DMG),
                         iterator->getName());
                     // Send the messages to the characters.
-                    actor->sendMsg("You %s hit %s with %s for %s.\n", attackType, enemy->getName(), iterator->getName(),
+                    actor->sendMsg("You %s hit %s with %s for %s.\n", critical, enemy->getName(), iterator->getName(),
                         ToString(DMG));
-                    enemy->sendMsg("%s %s hits you with %s for %s.\n\n", nam, attackType, iterator->getName(),
+                    enemy->sendMsg("%s %s hits you with %s for %s.\n\n", nam, critical, iterator->getName(),
                         ToString(DMG));
                 }
             }
