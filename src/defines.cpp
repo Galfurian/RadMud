@@ -53,6 +53,16 @@ Coordinates<int> GetCoordinates(Direction direction)
     return Coordinates<int>(0, 0, 0);
 }
 
+std::string GetAbilityName(Ability ability)
+{
+    if (ability == Ability::Strength) return "strength";
+    if (ability == Ability::Agility) return "agility";
+    if (ability == Ability::Perception) return "perception";
+    if (ability == Ability::Constitution) return "constitution";
+    if (ability == Ability::Intelligence) return "intelligence";
+    return "none";
+}
+
 std::string GetDirectionName(Direction direction)
 {
     if (direction == Direction::North) return "north";

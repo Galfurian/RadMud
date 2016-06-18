@@ -66,6 +66,26 @@ Mobile::~Mobile()
     }
 }
 
+bool Mobile::setAbilities(const std::string & source)
+{
+    if (source.empty())
+    {
+        return false;
+    }
+    std::vector<std::string> charList = SplitString(source, ";");
+    if (charList.size() != 5)
+    {
+        return false;
+    }
+    bool result = true;
+    result &= this->setAbility(Ability::Strength, ToNumber<unsigned int>(charList[0]));
+    result &= this->setAbility(Ability::Agility, ToNumber<unsigned int>(charList[1]));
+    result &= this->setAbility(Ability::Perception, ToNumber<unsigned int>(charList[2]));
+    result &= this->setAbility(Ability::Constitution, ToNumber<unsigned int>(charList[3]));
+    result &= this->setAbility(Ability::Intelligence, ToNumber<unsigned int>(charList[4]));
+    return true;
+}
+
 void Mobile::respawn()
 {
     // Set the mobile to Alive.

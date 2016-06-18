@@ -27,6 +27,22 @@
 #include "utilities/coordinates.hpp"
 #include "utilities/enum_cheker.hpp"
 
+/// The list of character's abilities.
+typedef enum class Abilities
+{
+    Strength,
+    Agility,
+    Perception,
+    Constitution,
+    Intelligence
+} Ability;
+using AbilityTest = EnumCheck<Ability,
+Ability::Strength,
+Ability::Agility,
+Ability::Perception,
+Ability::Constitution,
+Ability::Intelligence>;
+
 /// List of telnet commands.
 typedef enum class TelnetChars
 {
@@ -925,6 +941,8 @@ bool ValidCharacterFlag(int flag);
 /// @brief All the functions necessary to transform into string an enum.
 /// @{
 
+/// Return the string describing the given ability.
+std::string GetAbilityName(Ability ability);
 /// Return the string describing the given direction.
 std::string GetDirectionName(Direction direction);
 /// Return the string describing the given posture.

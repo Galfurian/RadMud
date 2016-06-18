@@ -433,7 +433,9 @@ void DoTime(Character * character, std::istream & sArgs)
     }
     else if (MudUpdater::instance().getDayPhase() == DayPhase::Dusk)
     {
-        character->sendMsg("%sThe sun is setting, the shadows begin to prevail.%s\n", Formatter::cyan(),
+        character->sendMsg(
+            "%sThe sun is setting, the shadows begin to prevail.%s\n",
+            Formatter::cyan(),
             Formatter::reset());
     }
     else if (MudUpdater::instance().getDayPhase() == DayPhase::Night)
@@ -514,26 +516,53 @@ void DoStatistics(Character * character, std::istream & sArgs)
     Player * player = character->toPlayer();
 
     std::string msg;
-    msg += Formatter::magenta() + "Name: " + Formatter::reset() + player->getName();
-    msg += Formatter::magenta() + " Race: " + Formatter::reset() + player->race->name + "\n";
+    msg += Formatter::magenta() + "Name: " + Formatter::reset() + player->getName() + " ";
+    msg += Formatter::magenta() + "Race: " + Formatter::reset() + player->race->name + "\n";
     msg += Formatter::magenta() + "Gender: " + Formatter::reset() + GetGenderTypeName(player->gender) + "\n";
     msg += Formatter::magenta() + "Affiliation: " + Formatter::reset() + player->faction->name + "\n";
     msg += Formatter::magenta() + "Experience: " + Formatter::reset() + ToString(player->experience) + " px\n";
-    msg += Formatter::magenta() + "Str " + Formatter::reset() + ToString(player->getStrength()) + " ";
-    msg += Formatter::magenta() + "Agi " + Formatter::reset() + ToString(player->getAgility()) + " ";
-    msg += Formatter::magenta() + "Per " + Formatter::reset() + ToString(player->getPerception()) + " ";
-    msg += Formatter::magenta() + "Con " + Formatter::reset() + ToString(player->getConstitution()) + " ";
-    msg += Formatter::magenta() + "Int " + Formatter::reset() + ToString(player->getIntelligence()) + " ";
-    msg += Formatter::magenta() + "Health " + Formatter::reset() + ToString(player->health) + "/"
-        + ToString(player->getMaxHealth());
-    msg += "(" + ToString(player->effects.getHealthMod()) + ") ";
-    msg += Formatter::magenta() + "Stamina " + Formatter::reset() + ToString(player->stamina) + "/"
-        + ToString(player->getMaxStamina());
+
+    msg += Formatter::magenta() + "    Str " + Formatter::reset();
+    msg += ToString(player->getAbility(Ability::Strength, false));
+    msg += "(" + ToString(player->effects.getAbilityModifier(Ability::Strength)) + ")";
+    msg += "[" + ToString(player->getAbilityModifier(Ability::Strength)) + "]\n";
+
+    msg += Formatter::magenta() + "    Agi " + Formatter::reset();
+    msg += ToString(player->getAbility(Ability::Agility, false));
+    msg += "(" + ToString(player->effects.getAbilityModifier(Ability::Agility)) + ")";
+    msg += "[" + ToString(player->getAbilityModifier(Ability::Agility)) + "]\n";
+
+    msg += Formatter::magenta() + "    Per " + Formatter::reset();
+    msg += ToString(player->getAbility(Ability::Perception, false));
+    msg += "(" + ToString(player->effects.getAbilityModifier(Ability::Perception)) + ")";
+    msg += "[" + ToString(player->getAbilityModifier(Ability::Perception)) + "]\n";
+
+    msg += Formatter::magenta() + "    Con " + Formatter::reset();
+    msg += ToString(player->getAbility(Ability::Constitution, false));
+    msg += "(" + ToString(player->effects.getAbilityModifier(Ability::Constitution)) + ")";
+    msg += "[" + ToString(player->getAbilityModifier(Ability::Constitution)) + "]\n";
+
+    msg += Formatter::magenta() + "    Int " + Formatter::reset();
+    msg += ToString(player->getAbility(Ability::Intelligence, false));
+    msg += "(" + ToString(player->effects.getAbilityModifier(Ability::Intelligence)) + ")";
+    msg += "[" + ToString(player->getAbilityModifier(Ability::Intelligence)) + "]\n";
+
+    msg += Formatter::magenta() + "    Health " + Formatter::reset();
+    msg += ToString(player->health) + "/" + ToString(player->getMaxHealth());
     msg += "(" + ToString(player->effects.getHealthMod()) + ")\n";
-    msg += Formatter::magenta() + "Armor Class " + Formatter::reset() + ToString(player->getArmorClass()) + "\n";
+
+    msg += Formatter::magenta() + "    Stamina " + Formatter::reset();
+    msg += ToString(player->stamina) + "/" + ToString(player->getMaxStamina());
+    msg += "(" + ToString(player->effects.getHealthMod()) + ")\n";
+
+    msg += Formatter::magenta() + "    Armor Class " + Formatter::reset();
+    msg += ToString(player->getArmorClass()) + "\n";
+
     msg += "You " + player->getHunger();
     msg += "You " + player->getThirst();
+
     msg += "You are " + GetPostureName(player->posture) + ".\n";
+
     player->sendMsg(msg);
 }
 

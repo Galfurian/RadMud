@@ -19,19 +19,19 @@
 #include "effect.hpp"
 
 Effect::Effect(std::string _name, int _expires, std::string _messageActivate, std::string _messageFade) :
-        name(_name),
-        expires(_expires),
-        messageActivate(_messageActivate),
-        messageExpire(_messageFade),
-        health_mod(),
-        stamina_mod(),
-        str_mod(),
-        agi_mod(),
-        per_mod(),
-        con_mod(),
-        int_mod(),
-        hit_mod(),
-        dam_mod()
+    name(_name),
+    expires(_expires),
+    messageActivate(_messageActivate),
+    messageExpire(_messageFade),
+    health_mod(),
+    stamina_mod(),
+    str_mod(),
+    agi_mod(),
+    per_mod(),
+    con_mod(),
+    int_mod(),
+    hit_mod(),
+    dam_mod()
 {
     // Nothing to do.
 }
@@ -150,6 +150,35 @@ int EffectList::getDamMod()
         result += iterator.dam_mod;
     }
     return result;
+}
+
+int EffectList::getAbilityModifier(const Ability & ability)
+{
+    if (ability == Ability::Strength)
+    {
+        return this->getStrMod();
+    }
+    else if (ability == Ability::Agility)
+    {
+        return this->getAgiMod();
+    }
+    else if (ability == Ability::Perception)
+    {
+        return this->getPerMod();
+    }
+    else if (ability == Ability::Constitution)
+    {
+        return this->getConMod();
+    }
+    else if (ability == Ability::Intelligence)
+    {
+        return this->getIntMod();
+    }
+    else
+    {
+        Logger::log(LogLevel::Error, "Selected an invalid ability(%s).", EnumToString(ability));
+        return 0;
+    }
 }
 
 void EffectList::addPendingEffect(const Effect & effect)

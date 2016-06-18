@@ -46,6 +46,19 @@ void DoProfession(Character * character, Profession * profession, std::istream &
         character->sendMsg("%s '%s'.\n", profession->notFoundMessage, arguments[0].first);
         return;
     }
+    // Check if the actor has enough stamina to execute the action.
+    unsigned int consumedStamina;
+    if (!character->hasStaminaFor(consumedStamina, ActionType::Crafting))
+    {
+        character->sendMsg("You are too tired right now.\n");
+        Logger::log(
+            LogLevel::Debug,
+            "[%s] Has %s stamina and needs %s.",
+            character->getName(),
+            ToString(character->stamina),
+            ToString(consumedStamina));
+        return;
+    }
     // Search the needed tools.
     ItemVector usedTools;
     if (!character->findNearbyTools(production->tools, usedTools))
@@ -105,14 +118,19 @@ void DoProfession(Character * character, Profession * profession, std::istream &
     }
 
     // //////////////////////////////////////////
-    character->sendMsg("%s %s.\n", profession->startMessage,
+    character->sendMsg(
+        "%s %s.\n",
+        profession->startMessage,
         Formatter::yellow() + production->outcome.first->getName() + Formatter::reset());
 
     // Set the list of exceptions.
     CharacterVector exceptions;
     exceptions.push_back(character);
     // Send the message inside the room.
-    character->room->sendToAll("%s has started %s something...\n", exceptions, character->getNameCapital(),
+    character->room->sendToAll(
+        "%s has started %s something...\n",
+        exceptions,
+        character->getNameCapital(),
         production->profession->action);
 }
 
@@ -129,6 +147,19 @@ void DoBuild(Character * character, std::istream & sArgs)
     if (schematics == nullptr)
     {
         character->sendMsg("You don't know how to build '%s'.\n", arguments[0].first);
+        return;
+    }
+    // Check if the actor has enough stamina to execute the action.
+    unsigned int consumedStamina;
+    if (!character->hasStaminaFor(consumedStamina, ActionType::Building))
+    {
+        character->sendMsg("You are too tired right now.\n");
+        Logger::log(
+            LogLevel::Debug,
+            "[%s] Has %s stamina and needs %s.",
+            character->getName(),
+            ToString(character->stamina),
+            ToString(consumedStamina));
         return;
     }
     // Search the needed tools.
@@ -204,7 +235,8 @@ void DoBuild(Character * character, std::istream & sArgs)
     }
 
     // //////////////////////////////////////////
-    character->sendMsg("You start building %s.\n",
+    character->sendMsg(
+        "You start building %s.\n",
         Formatter::yellow() + schematics->buildingModel->getName() + Formatter::reset());
 
     // //////////////////////////////////////////
@@ -230,6 +262,19 @@ void DoDeconstruct(Character * character, std::istream & sArgs)
     if (item == nullptr)
     {
         character->sendMsg("You can't find want you to deconstruct.\n");
+        return;
+    }
+    // Check if the actor has enough stamina to execute the action.
+    unsigned int consumedStamina;
+    if (!character->hasStaminaFor(consumedStamina, ActionType::Building))
+    {
+        character->sendMsg("You are too tired right now.\n");
+        Logger::log(
+            LogLevel::Debug,
+            "[%s] Has %s stamina and needs %s.",
+            character->getName(),
+            ToString(character->stamina),
+            ToString(consumedStamina));
         return;
     }
     if (HasFlag(item->flags, ItemFlag::Built))

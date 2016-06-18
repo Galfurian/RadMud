@@ -67,16 +67,12 @@ class Character
         unsigned int hunger;
         /// Character level of thirst.
         unsigned int thirst;
-        /// Character strength value.
-        unsigned int strength;
-        /// Character agility value.
-        unsigned int agility;
-        /// Character perception value.
-        unsigned int perception;
-        /// Character constitution value.
-        unsigned int constitution;
-        /// Character intelligence value.
-        unsigned int intelligence;
+
+    private:
+        /// Character abilities.
+        std::map<Ability, unsigned int> abilities;
+
+    public:
         /// The current room the character is in.
         Room * room;
         /// Character's inventory.
@@ -106,11 +102,7 @@ class Character
         /// @brief Disable assign operator.
         Character& operator=(const Character&) = delete;
 
-        /// @brief Allows to pass a string which contains the characteristics.
-        /// @param source The string which containts the values
-        /// @return <b>True</b> if the string is correct,<br>
-        ///         <b>False</b> otherwise.
-        bool setCharacteristic(const std::string & source);
+        bool setAbility(Ability ability, unsigned int value);
 
         /// @brief Check the correctness of the character information.
         /// @return <b>True</b> if the information are correct,<br><b>False</b> otherwise.
@@ -146,23 +138,23 @@ class Character
         /// @return The character pronoun.
         std::string getPossessivePronoun();
 
-        unsigned int getStrength(bool withModifier = true);
+        unsigned int getAbility(const Ability & ability, bool withEffects = true);
 
-        unsigned int getAgility(bool withModifier = true);
+        unsigned int getAbilityModifier(const Ability & ability, bool withEffects = true);
 
-        unsigned int getPerception(bool withModifier = true);
-
-        unsigned int getConstitution(bool withModifier = true);
-
-        unsigned int getIntelligence(bool withModifier = true);
+        unsigned int getAbilityLog(
+            const Ability & ability,
+            const double & base,
+            const double & multiplier,
+            const bool & withEffects = true);
 
         /// @brief Return the max health value.
         /// @return The maximum health for this character.
-        unsigned int getMaxHealth(bool withModifier = true);
+        unsigned int getMaxHealth(bool withEffects = true);
 
         /// @brief Return the max stamina value.
         /// @return The maximum stamina for this character.
-        unsigned int getMaxStamina(bool withModifier = true);
+        unsigned int getMaxStamina(bool withEffects = true);
 
         /// @brief Manage the recovering of both health and stamina.
         void updateResources();
@@ -322,10 +314,6 @@ class Character
         /// @return The armor class.
         unsigned int getArmorClass();
 
-        /// @brief Given an action, it returns the necessary cooldown.
-        /// @return The non-decreasing value of the cooldown.
-        unsigned int getCooldown(CombatAction combatAction);
-
         /// @brief Function which checks if the character can attack with a weapon equipped
         ///         in the given slot.
         /// @param slot The slot in which the weapon should be.
@@ -341,7 +329,12 @@ class Character
 
         ItemVector getActiveWeapons();
 
-        bool hasStaminaToAttackWith(const EquipmentSlot & slot, unsigned int & consumed);
+        /// @brief Given an action, it returns the necessary cooldown.
+        /// @return The non-decreasing value of the cooldown.
+        unsigned int getCooldown(CombatAction combatAction);
+
+        bool hasStaminaFor(unsigned int & consumed, const ActionType & actionType, const CombatAction & combatAction =
+            CombatAction::NoAction, const EquipmentSlot & slot = EquipmentSlot::None);
 
         bool dealDamage(const unsigned int & value, const bool & force = false);
 

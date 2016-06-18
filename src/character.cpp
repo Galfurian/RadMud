@@ -49,11 +49,6 @@ Character::Character() :
     stamina(),
     hunger(100),
     thirst(100),
-    strength(),
-    agility(),
-    perception(),
-    constitution(),
-    intelligence(),
     room(),
     inventory(),
     equipment(),
@@ -71,23 +66,17 @@ Character::~Character()
     // Nothing to do.
 }
 
-bool Character::setCharacteristic(const std::string & source)
+bool Character::setAbility(Ability ability, unsigned int value)
 {
-    if (source.empty())
+    if (AbilityTest::is_value(ability))
     {
-        return false;
+        if (value <= 60)
+        {
+            abilities[ability] = value;
+            return true;
+        }
     }
-    std::vector<std::string> charList = SplitString(source, ";");
-    if (charList.size() != 5)
-    {
-        return false;
-    }
-    this->strength = ToNumber<unsigned int>(charList[0]);
-    this->agility = ToNumber<unsigned int>(charList[1]);
-    this->perception = ToNumber<unsigned int>(charList[2]);
-    this->constitution = ToNumber<unsigned int>(charList[3]);
-    this->intelligence = ToNumber<unsigned int>(charList[4]);
-    return true;
+    return false;
 }
 
 bool Character::check()
@@ -102,11 +91,16 @@ bool Character::check()
     safe = SafeAssert(stamina > 0);
     safe = SafeAssert(hunger > 0);
     safe = SafeAssert(thirst > 0);
-    safe = SafeAssert(strength > 0);
-    safe = SafeAssert(agility > 0);
-    safe = SafeAssert(perception > 0);
-    safe = SafeAssert(constitution > 0);
-    safe = SafeAssert(intelligence > 0);
+    safe = SafeAssert(abilities[Ability::Strength] > 0);
+    safe = SafeAssert(abilities[Ability::Strength] < 60);
+    safe = SafeAssert(abilities[Ability::Agility] > 0);
+    safe = SafeAssert(abilities[Ability::Agility] < 60);
+    safe = SafeAssert(abilities[Ability::Perception] > 0);
+    safe = SafeAssert(abilities[Ability::Perception] < 60);
+    safe = SafeAssert(abilities[Ability::Constitution] > 0);
+    safe = SafeAssert(abilities[Ability::Constitution] < 60);
+    safe = SafeAssert(abilities[Ability::Intelligence] > 0);
+    safe = SafeAssert(abilities[Ability::Intelligence] < 60);
     safe = SafeAssert(thirst > 0);
     safe = SafeAssert(room != nullptr);
     safe = SafeAssert(L != nullptr);
@@ -192,13 +186,71 @@ string Character::getPossessivePronoun()
     return "its";
 }
 
-unsigned int Character::getStrength(bool withModifier)
+unsigned int Character::getAbility(const Ability & ability, bool withEffects)
 {
-    if (!withModifier)
+    (void) withEffects;
+    if (AbilityTest::is_value(ability))
     {
-        return this->strength;
+        if (!withEffects)
+        {
+            return abilities[ability];
+        }
+        int overall = static_cast<int>(this->abilities[ability]) + effects.getAbilityModifier(ability);
+        if (overall <= 0)
+        {
+            return 0;
+        }
+        else if (overall > 60)
+        {
+            return 60;
+        }
+        else
+        {
+            return static_cast<unsigned int>(overall);
+        }
     }
-    int overall = static_cast<int>(this->strength) + effects.getStrMod();
+    else
+    {
+        return 0;
+    }
+}
+
+unsigned int Character::getAbilityModifier(const Ability & ability, bool withEffects)
+{
+    return GetAbilityModifier(this->getAbility(ability, withEffects));
+}
+
+unsigned int Character::getAbilityLog(
+    const Ability & ability,
+    const double & base,
+    const double & multiplier,
+    const bool & withEffects)
+{
+    // Value = Base + (Multiplier * log10(AbilityModifier))
+    double result = base;
+    double modifier = static_cast<double>(this->getAbilityModifier(ability, withEffects));
+    if (modifier > 0)
+    {
+        if (modifier > 25)
+        {
+            modifier = 25;
+        }
+        result += multiplier * log10(modifier);
+    }
+    return static_cast<unsigned int>(result);
+}
+
+unsigned int Character::getMaxHealth(bool withEffects)
+{
+    // Value = 100 + (10 * AbilityModifier(Constitution))
+    // MIN   = 100
+    // MAX   = 350
+    unsigned int BASE = 100 + (10 * this->getAbilityModifier(Ability::Constitution));
+    if (!withEffects)
+    {
+        return BASE;
+    }
+    int overall = static_cast<int>(BASE) + effects.getHealthMod();
     if (overall <= 0)
     {
         return 0;
@@ -209,98 +261,17 @@ unsigned int Character::getStrength(bool withModifier)
     }
 }
 
-unsigned int Character::getAgility(bool withModifier)
+unsigned int Character::getMaxStamina(bool withEffects)
 {
-    if (!withModifier)
+    // Value = 100 + (15 * AbilityModifier(Constitution))
+    // MIN   = 100
+    // MAX   = 475
+    unsigned int BASE = 100 + (15 * this->getAbilityModifier(Ability::Constitution));
+    if (!withEffects)
     {
-        return this->agility;
+        return BASE;
     }
-    int overall = static_cast<int>(this->agility) + effects.getAgiMod();
-    if (overall <= 0)
-    {
-        return 0;
-    }
-    else
-    {
-        return static_cast<unsigned int>(overall);
-    }
-}
-
-unsigned int Character::getPerception(bool withModifier)
-{
-    if (!withModifier)
-    {
-        return this->perception;
-    }
-    int overall = static_cast<int>(this->perception) + effects.getPerMod();
-    if (overall <= 0)
-    {
-        return 0;
-    }
-    else
-    {
-        return static_cast<unsigned int>(overall);
-    }
-}
-
-unsigned int Character::getConstitution(bool withModifier)
-{
-    if (!withModifier)
-    {
-        return this->constitution;
-    }
-    int overall = static_cast<int>(this->constitution) + effects.getConMod();
-    if (overall <= 0)
-    {
-        return 0;
-    }
-    else
-    {
-        return static_cast<unsigned int>(overall);
-    }
-}
-
-unsigned int Character::getIntelligence(bool withModifier)
-{
-    if (!withModifier)
-    {
-        return this->intelligence;
-    }
-    int overall = static_cast<int>(this->intelligence) + effects.getIntMod();
-    if (overall <= 0)
-    {
-        return 0;
-    }
-    else
-    {
-        return static_cast<unsigned int>(overall);
-    }
-}
-
-unsigned int Character::getMaxHealth(bool withModifier)
-{
-    if (!withModifier)
-    {
-        return (constitution * 5);
-    }
-    int overall = static_cast<int>(constitution * 5) + effects.getHealthMod();
-    if (overall <= 0)
-    {
-        return 0;
-    }
-    else
-    {
-        return static_cast<unsigned int>(overall);
-    }
-}
-
-unsigned int Character::getMaxStamina(bool withModifier)
-{
-    if (!withModifier)
-    {
-        return (constitution * 10);
-    }
-    int overall = static_cast<int>(constitution * 10) + effects.getStaminaMod();
+    int overall = static_cast<int>(BASE) + effects.getStaminaMod();
     if (overall <= 0)
     {
         return 0;
@@ -313,51 +284,39 @@ unsigned int Character::getMaxStamina(bool withModifier)
 
 void Character::updateResources()
 {
-    if (health < getMaxHealth())
+    unsigned int PosMod = 0;
+    if (posture == CharacterPosture::Sit)
     {
-        unsigned int maxValue = this->getMaxHealth();
-        if (posture == CharacterPosture::Sit)
-        {
-            health += (maxValue / 100) * 4;
-        }
-        else if (posture == CharacterPosture::Rest)
-        {
-            health += (maxValue / 100) * 8;
-        }
-        else
-        {
-            health += (maxValue / 100) * 2;
-        }
-        if (health > maxValue)
-        {
-            health = maxValue;
-        }
+        PosMod = 2;
     }
-    if (stamina < getMaxStamina())
+    else if (posture == CharacterPosture::Rest)
     {
-        unsigned int maxValue = this->getMaxStamina();
-        if (posture == CharacterPosture::Sit)
-        {
-            stamina += (maxValue / 100) * 4;
-        }
-        else if (posture == CharacterPosture::Rest)
-        {
-            stamina += (maxValue / 100) * 8;
-        }
-        else
-        {
-            stamina += (maxValue / 100) * 2;
-        }
-        if (stamina > maxValue)
-        {
-            stamina = maxValue;
-        }
+        PosMod = 4;
+    }
+    if (this->health < this->getMaxHealth())
+    {
+        unsigned int LogMod = this->getAbilityLog(Ability::Constitution, 0.0, 1.0);
+        // Value = 5 + ((1 + 3*LogMod(CON))*(1 + 2*PosMod))
+        // MIN   =  6.00
+        // MAX   = 51.74
+        this->healDamage(5 + ((1 + 3 * LogMod) * (1 + 2 * PosMod)), true);
+    }
+    if (this->stamina < this->getMaxStamina())
+    {
+        unsigned int LogMod = this->getAbilityLog(Ability::Constitution, 0.0, 1.0);
+        // Value = 5 + ((1 + 4*LogMod(CON))*(1 + 3*PosMod))
+        // MIN   =  6.00
+        // MAX   = 90.69
+        this->gainStamina(5 + ((1 + 4 * LogMod) * (1 + 3 * PosMod)), true);
     }
 }
 
 int Character::getViewDistance()
 {
-    return 3 + static_cast<int>(GetAbilityModifier(perception));
+    // Value = 3 + LogMod(PER)
+    // MIN   = 3.0
+    // MAX   = 7.2
+    return 3 + static_cast<int>(this->getAbilityLog(Ability::Perception, 0.0, 1.0));
 }
 
 Action * Character::getAction()
@@ -379,6 +338,20 @@ Room * Character::canMoveTo(Direction direction, std::string & error)
     if (destExit == nullptr)
     {
         error = "You cannot go that way.";
+        return nullptr;
+    }
+
+    unsigned int consumedStamina;
+    // Check if the actor has enough stamina to execute the action.
+    if (!this->hasStaminaFor(consumedStamina, ActionType::Move))
+    {
+        error = "You are too tired to move.\n";
+        Logger::log(
+            LogLevel::Debug,
+            "[%s] Has %s stamina and needs %s.",
+            this->getName(),
+            ToString(this->stamina),
+            ToString(consumedStamina));
         return nullptr;
     }
 
@@ -733,7 +706,10 @@ unsigned int Character::getCarryingWeight()
 
 unsigned int Character::getMaxCarryingWeight()
 {
-    return (strength * 10);
+    // Value = 50 + (AbilMod(STR) * 10)
+    // MIN   =  50
+    // MAX   = 300
+    return 50 + (this->getAbilityModifier(Ability::Strength) * 10);
 }
 
 bool Character::addEquipmentItem(Item * item)
@@ -1065,60 +1041,9 @@ unsigned int Character::getArmorClass()
             result += lh->model->getShieldFunc().parryChance;
         }
     }
-    // + DEXTERITY MODIFIER
-    int overallAgility = static_cast<int>(this->agility) + this->effects.getAgiMod();
-    if (overallAgility > 0)
-    {
-        result += GetAbilityModifier(static_cast<unsigned int>(overallAgility));
-    }
+    // + AGILITY MODIFIER
+    result += this->getAbilityModifier(Ability::Agility);
     return result;
-}
-
-unsigned int Character::getCooldown(CombatAction combatAction)
-{
-    double BASE = 6.0;
-    // The agility modifier.
-    double AGI = static_cast<double>(this->getAgility()) * 3.5 * (BASE / 100);
-    // The weight modifier.
-    double WGT = weight * (BASE / 100);
-    // The carried weight.
-    double CAR = (this->getCarryingWeight() / 2) * (BASE / 100);
-    // The cooldown.
-    unsigned int cooldown = 6;
-    if (combatAction == CombatAction::BasicAttack)
-    {
-        double EQS = 0;
-        Item * rh = findEquipmentSlotItem(EquipmentSlot::RightHand);
-        if (rh != nullptr)
-        {
-            if (rh->model->type == ModelType::Weapon)
-            {
-                EQS += rh->getWeight() * 2.5 * (BASE / 100);
-            }
-            else if (rh->model->type == ModelType::Shield)
-            {
-                EQS += rh->getWeight() * 3.0 * (BASE / 100);
-            }
-        }
-        Item * lh = findEquipmentSlotItem(EquipmentSlot::LeftHand);
-        if (lh != nullptr)
-        {
-            if (lh->model->type == ModelType::Weapon)
-            {
-                EQS += lh->getWeight() * 2.5 * (BASE / 100);
-            }
-            else if (lh->model->type == ModelType::Shield)
-            {
-                EQS += lh->getWeight() * 3.0 * (BASE / 100);
-            }
-        }
-        cooldown = static_cast<unsigned int>(BASE - AGI + WGT + CAR + EQS);
-    }
-    else if (combatAction == CombatAction::Flee)
-    {
-        cooldown = static_cast<unsigned int>(BASE - AGI + WGT + CAR);
-    }
-    return cooldown;
 }
 
 bool Character::canAttackWith(const EquipmentSlot & slot)
@@ -1210,27 +1135,206 @@ ItemVector Character::getActiveWeapons()
     return ret;
 }
 
-bool Character::hasStaminaToAttackWith(const EquipmentSlot & slot, unsigned int & consumed)
+unsigned int Character::getCooldown(CombatAction combatAction)
 {
-    if (this->canAttackWith(slot))
+    double BASE = 5.0;
+    // The strength modifier.
+    // MIN = 0.00
+    // MAX = 1.40
+    double AGI = this->getAbilityLog(Ability::Agility, 0.0, 1.0);
+    // The agility modifier.
+    // MIN = 0.00
+    // MAX = 1.40
+    double STR = this->getAbilityLog(Ability::Strength, 0.0, 1.0);
+    // The weight modifier.
+    // MIN =  0.80
+    // MAX =  2.51
+    double WGT = 0.8;
+    double WGTmod = this->weight;
+    if (WGTmod > 0)
     {
-        double BASE = (5.0 / 100);
-        // The strength modifier.
-        double STR = BASE * static_cast<double>(this->getStrength());
-        // The weight modifier.
-        double WGT = BASE * weight;
-        // The carried weight.
-        double CAR = BASE * (this->getCarryingWeight() / 2);
-        Item * item = findEquipmentSlotItem(EquipmentSlot::RightHand);
-        if (item != nullptr)
+        if (WGTmod > 320)
         {
-            double EQS = BASE * item->getWeight();
-            Logger::log(LogLevel::Warning, "%s - %s + %s + %s", ToString(BASE), ToString(STR), ToString(CAR),
-                ToString(EQS));
-            BASE += -STR + WGT + CAR + EQS;
-            if (BASE > 0)
+            WGTmod = 320;
+        }
+        WGT = log10(WGTmod);
+    }
+    // The carried weight.
+    // MIN =  0.00
+    // MAX =  2.48
+    double CAR = 0.0;
+    double CARmod = this->getCarryingWeight();
+    if (CARmod > 0)
+    {
+        if (CARmod > 300)
+        {
+            CARmod = 300;
+        }
+        CAR = log10(CARmod);
+    }
+    if (combatAction == CombatAction::BasicAttack)
+    {
+        double RHD = 0;
+        double LHD = 0;
+        if (this->canAttackWith(EquipmentSlot::RightHand))
+        {
+            // Right Hand Weapon
+            // MIN =  0.00
+            // MAX =  1.60
+            Item * weapon = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
+            double RHDmod = weapon->getWeight();
+            if (RHDmod > 0)
             {
-                consumed = static_cast<unsigned int>(BASE);
+                if (RHDmod > 40)
+                {
+                    RHDmod = 40;
+                }
+                RHD = log10(RHDmod);
+            }
+        }
+        if (this->canAttackWith(EquipmentSlot::LeftHand))
+        {
+            // Left Hand Weapon
+            // MIN =  0.00
+            // MAX =  1.60
+            Item * weapon = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
+            double LHDmod = weapon->getWeight();
+            if (LHDmod > 0)
+            {
+                if (LHDmod > 40)
+                {
+                    LHDmod = 40;
+                }
+                LHD = log10(LHDmod);
+            }
+        }
+        BASE += -STR - AGI + WGT + CAR + max(RHD, LHD);
+    }
+    else if (combatAction == CombatAction::Flee)
+    {
+        BASE += -STR - AGI + WGT + CAR;
+    }
+    return static_cast<unsigned int>(BASE);
+}
+
+bool Character::hasStaminaFor(
+    unsigned int & consumed,
+    const ActionType & actionType,
+    const CombatAction & combatAction,
+    const EquipmentSlot & slot)
+{
+    // The strength modifier.
+    // MIN = 0.0
+    // MAX = 2.8
+    double STR = this->getAbilityLog(Ability::Strength, 0.0, 2.0);
+    // The weight modifier.
+    // MIN = 0.80
+    // MAX = 1.25
+    double WGT = 0.8;
+    double WGTmod = this->weight;
+    if (WGTmod > 0)
+    {
+        if (WGTmod > 320)
+        {
+            WGTmod = 320;
+        }
+        WGT = (log10(WGTmod) / 2);
+    }
+    // The carried weight.
+    // MIN = 0.00
+    // MAX = 1.24
+    double CAR = 0.0;
+    double CARmod = this->getCarryingWeight();
+    if (CARmod > 0)
+    {
+        if (CARmod > 300)
+        {
+            CARmod = 300;
+        }
+        CAR = (log10(CARmod) / 2);
+    }
+    if ((actionType == ActionType::Move) || (actionType == ActionType::Building)
+        || (actionType == ActionType::Crafting))
+    {
+        double BASE = 3.0;
+        double RSLT = BASE - STR + WGT + CAR;
+        Logger::log(
+            LogLevel::Warning,
+            "Required Stamina : %s - %s + %s + %s = %s",
+            ToString(BASE),
+            ToString(STR),
+            ToString(WGT),
+            ToString(CAR),
+            ToString(RSLT));
+        if (RSLT > 0)
+        {
+            consumed = static_cast<unsigned int>(RSLT);
+            if (this->stamina >= consumed)
+            {
+                return true;
+            }
+        }
+        else
+        {
+            Logger::log(LogLevel::Warning, "Evaluated cosumed stamina is below zero(%s).", ToString(RSLT));
+        }
+    }
+    else if (actionType == ActionType::Combat)
+    {
+        if (combatAction == CombatAction::BasicAttack)
+        {
+            if (this->canAttackWith(slot))
+            {
+                double WPN = 0;
+                Item * weapon = this->findEquipmentSlotItem(slot);
+                double WPNmod = weapon->getWeight();
+                if (WPNmod > 0)
+                {
+                    if (WPNmod > 40)
+                    {
+                        WPNmod = 40;
+                    }
+                    WPN = log10(WPNmod); // min:0.0; max:1.60
+                }
+                double BASE = 5.0;
+                double RSLT = BASE - STR + WGT + CAR + WPN;
+                Logger::log(
+                    LogLevel::Warning,
+                    "Required Stamina : %s - %s + %s + %s = %s",
+                    ToString(BASE),
+                    ToString(STR),
+                    ToString(WGT),
+                    ToString(CAR),
+                    ToString(RSLT));
+                if (RSLT > 0)
+                {
+                    consumed = static_cast<unsigned int>(RSLT);
+                    if (this->stamina >= consumed)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    Logger::log(LogLevel::Warning, "Evaluated cosumed stamina is below zero(%s).", ToString(RSLT));
+                }
+            }
+        }
+        else if (combatAction == CombatAction::Flee)
+        {
+            double BASE = 3.0;
+            double RSLT = BASE - STR + WGT + CAR;
+            Logger::log(
+                LogLevel::Warning,
+                "Required Stamina : %s - %s + %s + %s = %s",
+                ToString(BASE),
+                ToString(STR),
+                ToString(WGT),
+                ToString(CAR),
+                ToString(RSLT));
+            if (RSLT > 0)
+            {
+                consumed = static_cast<unsigned int>(RSLT);
                 if (this->stamina >= consumed)
                 {
                     return true;
@@ -1238,12 +1342,8 @@ bool Character::hasStaminaToAttackWith(const EquipmentSlot & slot, unsigned int 
             }
             else
             {
-                Logger::log(LogLevel::Warning, "Evaluated cosumed stamina is below zero(%s).", ToString(BASE));
+                Logger::log(LogLevel::Warning, "Evaluated cosumed stamina is below zero(%s).", ToString(RSLT));
             }
-        }
-        else
-        {
-            Logger::log(LogLevel::Warning, "No item at the given position.");
         }
     }
     return false;
@@ -1434,7 +1534,7 @@ void Character::loadScript(const std::string & scriptFilename)
 void Character::luaRegister(lua_State * L)
 {
     luabridge::getGlobalNamespace(L) //
-    .beginClass < Character > ("Character") //
+    .beginClass<Character>("Character") //
     .addData("name", &Character::name) //
     .addData("race", &Character::race) //
     .addData("faction", &Character::faction) //

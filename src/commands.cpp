@@ -120,7 +120,9 @@ void ProcessPlayerName(Character * character, std::istream & sArgs)
     // Check if the give name contains valid characters.
     else if (input.find_first_not_of(kValidPlayerName) != std::string::npos)
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingName,
+        AdvanceCharacterCreation(
+            character,
+            ConnectionState::AwaitingName,
             "That player name contains disallowed characters.");
     }
     // Check if the player is already connected.
@@ -200,7 +202,9 @@ void ProcessNewName(Character * character, std::istream & sArgs)
     // Check if the player has given bad characters.
     else if (input.find_first_not_of(kValidPlayerName) != std::string::npos)
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewName,
+        AdvanceCharacterCreation(
+            character,
+            ConnectionState::AwaitingNewName,
             "That player name contains disallowed characters.");
     }
     // Check for bad names here.
@@ -211,7 +215,9 @@ void ProcessNewName(Character * character, std::istream & sArgs)
     // Check if the player name has already been used.
     else if (SQLiteDbms::instance().searchPlayer(ToCapitals(input)))
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewName,
+        AdvanceCharacterCreation(
+            character,
+            ConnectionState::AwaitingNewName,
             "That player already exists, please choose another name.");
     }
     else
@@ -249,7 +255,9 @@ void ProcessNewPwd(Character * character, std::istream & sArgs)
     // Check if the player has given bad characters.
     else if (input.find_first_not_of(kValidPlayerName) != std::string::npos)
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewPwd,
+        AdvanceCharacterCreation(
+            character,
+            ConnectionState::AwaitingNewPwd,
             "Password cannot contain disallowed characters.");
     }
     else
@@ -273,7 +281,9 @@ void ProcessNewPwdCon(Character * character, std::istream & sArgs)
     // Player_password must agree.
     else if (input != player->password)
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewPwdCon,
+        AdvanceCharacterCreation(
+            character,
+            ConnectionState::AwaitingNewPwdCon,
             "Password and confirmation do not agree.");
     }
     else
@@ -301,7 +311,9 @@ void ProcessNewStory(Character * character, std::istream & sArgs)
     // Check if the player has written 'continue' or NOT.
     else if (input != "continue")
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewStory,
+        AdvanceCharacterCreation(
+            character,
+            ConnectionState::AwaitingNewStory,
             "Write 'continue' after you have readed the story.");
     }
     else
@@ -358,7 +370,9 @@ void ProcessNewRace(Character * character, std::istream & sArgs)
         }
         else
         {
-            AdvanceCharacterCreation(character, ConnectionState::AwaitingNewRace,
+            AdvanceCharacterCreation(
+                character,
+                ConnectionState::AwaitingNewRace,
                 "You have to specify the race number.");
         }
     }
@@ -379,11 +393,11 @@ void ProcessNewRace(Character * character, std::istream & sArgs)
             player->race = race;
             player->health = race->constitution * 5;
             player->stamina = race->constitution * 10;
-            player->strength = race->strength;
-            player->agility = race->agility;
-            player->perception = race->perception;
-            player->constitution = race->constitution;
-            player->intelligence = race->intelligence;
+            player->setAbility(Ability::Strength, race->strength);
+            player->setAbility(Ability::Agility, race->agility);
+            player->setAbility(Ability::Perception, race->perception);
+            player->setAbility(Ability::Constitution, race->constitution);
+            player->setAbility(Ability::Intelligence, race->intelligence);
             AdvanceCharacterCreation(player, ConnectionState::AwaitingNewAttr);
         }
     }
@@ -409,12 +423,14 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
     else if (ToLower(arguments[0].first) == "reset")
     {
         player->remaining_points = 0;
-        player->strength = player->race->strength;
-        player->agility = player->race->agility;
-        player->perception = player->race->perception;
-        player->constitution = player->race->constitution;
-        player->intelligence = player->race->intelligence;
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAttr,
+        player->setAbility(Ability::Strength, player->race->strength);
+        player->setAbility(Ability::Agility, player->race->agility);
+        player->setAbility(Ability::Perception, player->race->perception);
+        player->setAbility(Ability::Constitution, player->race->constitution);
+        player->setAbility(Ability::Intelligence, player->race->intelligence);
+        AdvanceCharacterCreation(
+            character,
+            ConnectionState::AwaitingNewAttr,
             Formatter::cyan() + "Attribute has been set by default." + Formatter::reset() + "\n");
     }
     // If the player has insert help (attribute number), show its help.
@@ -471,7 +487,9 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
         }
         else
         {
-            AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAttr,
+            AdvanceCharacterCreation(
+                character,
+                ConnectionState::AwaitingNewAttr,
                 "You have to specify the attribute number.");
         }
     }
@@ -488,7 +506,7 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
             }
             else if (arguments[0].first == "1")
             {
-                int result = static_cast<int>(player->getStrength(false)) + modifier;
+                int result = static_cast<int>(player->getAbility(Ability::Strength, false)) + modifier;
                 int upperBound = static_cast<int>(player->race->strength) + 5;
                 int lowerBound = static_cast<int>(player->race->strength) - 5;
                 if (lowerBound < 0)
@@ -506,12 +524,12 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
                 else
                 {
                     player->remaining_points -= modifier;
-                    player->strength = static_cast<unsigned int>(result);
+                    player->setAbility(Ability::Strength, static_cast<unsigned int>(result));
                 }
             }
             else if (arguments[0].first == "2")
             {
-                int result = static_cast<int>(player->getAgility(false)) + modifier;
+                int result = static_cast<int>(player->getAbility(Ability::Agility, false)) + modifier;
                 int upperBound = static_cast<int>(player->race->agility) + 5;
                 int lowerBound = static_cast<int>(player->race->agility) - 5;
                 if (lowerBound < 0)
@@ -529,12 +547,12 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
                 else
                 {
                     player->remaining_points -= modifier;
-                    player->agility = static_cast<unsigned int>(result);
+                    player->setAbility(Ability::Agility, static_cast<unsigned int>(result));
                 }
             }
             else if (arguments[0].first == "3")
             {
-                int result = static_cast<int>(player->getPerception(false)) + modifier;
+                int result = static_cast<int>(player->getAbility(Ability::Perception, false)) + modifier;
                 int upperBound = static_cast<int>(player->race->perception) + 5;
                 int lowerBound = static_cast<int>(player->race->perception) - 5;
                 if (lowerBound < 0)
@@ -552,12 +570,12 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
                 else
                 {
                     player->remaining_points -= modifier;
-                    player->perception = static_cast<unsigned int>(result);
+                    player->setAbility(Ability::Perception, static_cast<unsigned int>(result));
                 }
             }
             else if (arguments[0].first == "4")
             {
-                int result = static_cast<int>(player->getConstitution(false)) + modifier;
+                int result = static_cast<int>(player->getAbility(Ability::Constitution, false)) + modifier;
                 int upperBound = static_cast<int>(player->race->constitution) + 5;
                 int lowerBound = static_cast<int>(player->race->constitution) - 5;
                 if (lowerBound < 0)
@@ -575,12 +593,12 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
                 else
                 {
                     player->remaining_points -= modifier;
-                    player->constitution = static_cast<unsigned int>(result);
+                    player->setAbility(Ability::Constitution, static_cast<unsigned int>(result));
                 }
             }
             else if (arguments[0].first == "5")
             {
-                int result = static_cast<int>(player->getConstitution(false)) + modifier;
+                int result = static_cast<int>(player->getAbility(Ability::Intelligence, false)) + modifier;
                 int upperBound = static_cast<int>(player->race->intelligence) + 5;
                 int lowerBound = static_cast<int>(player->race->intelligence) - 5;
                 if (lowerBound < 0)
@@ -598,7 +616,7 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
                 else
                 {
                     player->remaining_points -= modifier;
-                    player->intelligence = static_cast<unsigned int>(result);
+                    player->setAbility(Ability::Intelligence, static_cast<unsigned int>(result));
                 }
             }
             else
@@ -659,12 +677,16 @@ void ProcessNewAge(Character * character, std::istream & sArgs)
         int age = ToInt(input);
         if (age < 18)
         {
-            AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAge,
+            AdvanceCharacterCreation(
+                character,
+                ConnectionState::AwaitingNewAge,
                 "A creature so young is not suitable for a world so wicked.");
         }
         else if (50 < age)
         {
-            AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAge,
+            AdvanceCharacterCreation(
+                character,
+                ConnectionState::AwaitingNewAge,
                 "Life expectancy in this world is 70 years, in order to still be competitive you can choose 50 years at most.");
         }
         else
@@ -699,7 +721,9 @@ void ProcessNewDesc(Character * character, std::istream & sArgs)
     // Check if the description contains bad characters.
     else if (input.find_first_not_of(kValidDescription) != std::string::npos)
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewDesc,
+        AdvanceCharacterCreation(
+            character,
+            ConnectionState::AwaitingNewDesc,
             "Description cannot contain disallowed characters.");
     }
     else
@@ -772,7 +796,9 @@ void ProcessNewConfirm(Character * character, std::istream & sArgs)
     }
     else
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewConfirm,
+        AdvanceCharacterCreation(
+            character,
+            ConnectionState::AwaitingNewConfirm,
             "You must write 'confirm' if you agree.");
     }
 }
@@ -898,41 +924,41 @@ void PrintChoices(Character * character)
 
     // STRENGTH
     preview += "# Strength     :";
-    if (player->strength > 0)
+    if (player->getAbility(Ability::Strength, false) > 0)
     {
-        preview += ToString(player->strength) + Formatter::reset();
+        preview += ToString(player->getAbility(Ability::Strength, false)) + Formatter::reset();
     }
     preview += "\n";
 
     // AGILITY
     preview += "# Agility      :";
-    if (player->agility > 0)
+    if (player->getAbility(Ability::Agility, false) > 0)
     {
-        preview += ToString(player->agility) + Formatter::reset();
+        preview += ToString(player->getAbility(Ability::Agility, false)) + Formatter::reset();
     }
     preview += "\n";
 
     // PERCEPTION
     preview += "# Perception   :";
-    if (player->perception > 0)
+    if (player->getAbility(Ability::Perception, false) > 0)
     {
-        preview += ToString(player->perception) + Formatter::reset();
+        preview += ToString(player->getAbility(Ability::Perception, false)) + Formatter::reset();
     }
     preview += "\n";
 
     // CONSTITUTION
     preview += "# Constitution :";
-    if (player->constitution > 0)
+    if (player->getAbility(Ability::Constitution, false) > 0)
     {
-        preview += ToString(player->constitution) + Formatter::reset();
+        preview += ToString(player->getAbility(Ability::Constitution, false)) + Formatter::reset();
     }
     preview += "\n";
 
     // INTELLIGENCE
     preview += "# Intelligence :";
-    if (player->intelligence > 0)
+    if (player->getAbility(Ability::Intelligence, false) > 0)
     {
-        preview += ToString(player->intelligence) + Formatter::reset();
+        preview += ToString(player->getAbility(Ability::Intelligence, false)) + Formatter::reset();
     }
     preview += "\n";
 
@@ -988,20 +1014,20 @@ void RollbackCharacterCreation(Character * character, ConnectionState new_state)
         player->race = nullptr;
         player->health = 0;
         player->stamina = 0;
-        player->strength = 0;
-        player->agility = 0;
-        player->perception = 0;
-        player->constitution = 0;
-        player->intelligence = 0;
+        player->setAbility(Ability::Strength, 0);
+        player->setAbility(Ability::Agility, 0);
+        player->setAbility(Ability::Perception, 0);
+        player->setAbility(Ability::Constitution, 0);
+        player->setAbility(Ability::Intelligence, 0);
         player->remaining_points = 0;
     }
     else if (new_state == ConnectionState::AwaitingNewAttr)
     {
-        player->strength = player->race->strength;
-        player->agility = player->race->agility;
-        player->perception = player->race->perception;
-        player->constitution = player->race->constitution;
-        player->intelligence = player->race->intelligence;
+        player->setAbility(Ability::Strength, player->race->strength);
+        player->setAbility(Ability::Agility, player->race->agility);
+        player->setAbility(Ability::Perception, player->race->perception);
+        player->setAbility(Ability::Constitution, player->race->constitution);
+        player->setAbility(Ability::Intelligence, player->race->intelligence);
     }
     else if (new_state == ConnectionState::AwaitingNewGender)
     {
@@ -1121,11 +1147,11 @@ void AdvanceCharacterCreation(Character * character, ConnectionState new_state, 
     {
         PrintChoices(player);
         msg += "# " + Formatter::bold() + "Character's Attributes." + Formatter::reset() + "\n";
-        msg += "#    [1] Strength     :" + ToString(player->strength) + "\n";
-        msg += "#    [2] Agility      :" + ToString(player->agility) + "\n";
-        msg += "#    [3] Perception   :" + ToString(player->perception) + "\n";
-        msg += "#    [4] Constitution :" + ToString(player->constitution) + "\n";
-        msg += "#    [5] Intelligence :" + ToString(player->intelligence) + "\n";
+        msg += "#    [1] Strength     :" + ToString(player->getAbility(Ability::Strength, false)) + "\n";
+        msg += "#    [2] Agility      :" + ToString(player->getAbility(Ability::Agility, false)) + "\n";
+        msg += "#    [3] Perception   :" + ToString(player->getAbility(Ability::Perception, false)) + "\n";
+        msg += "#    [4] Constitution :" + ToString(player->getAbility(Ability::Constitution, false)) + "\n";
+        msg += "#    [5] Intelligence :" + ToString(player->getAbility(Ability::Intelligence, false)) + "\n";
         msg += "#\n";
         msg += "# Remaining Points: " + Formatter::green() + ToString(player->remaining_points) + Formatter::reset()
             + "\n";
@@ -1310,7 +1336,7 @@ void LoadCommands()
     }
     {
         command.name = "skills";
-        command.help = "Shows the playes abilities and their level.";
+        command.help = "Shows the playes skills and their level.";
         command.args = "";
         command.hndl = DoSkills;
         Mud::instance().addCommand(command);

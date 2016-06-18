@@ -19,6 +19,7 @@
 #ifndef EFFECT_HPP
 #define EFFECT_HPP
 
+#include "defines.hpp"
 #include "utils.hpp"
 
 /// @brief Allows to define an effect which can alter the status of a character.
@@ -37,7 +38,7 @@ class Effect
         int health_mod;
         /// Stamina modification.
         int stamina_mod;
-        /// Strenght modification.
+        /// Strength modification.
         int str_mod;
         /// Agility modification.
         int agi_mod;
@@ -117,6 +118,11 @@ class EffectList
         /// @brief Provides the overall damage modifier.
         /// @return The total modifier.
         int getDamMod();
+
+        /// @brief Provides the overall ability.
+        /// @param ability The ability.
+        /// @return The total modifier.
+        int getAbilityModifier(const Ability & ability);
 
         /// @brief Allows to add an effect to the buffer of pending effects.
         /// @param effect The one which has to be added to the buffer.

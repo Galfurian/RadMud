@@ -157,11 +157,21 @@ void DoGodInfo(Character * character, std::istream & sArgs)
     msg += Formatter::yellow() + "    Stamina " + Formatter::reset() + ":" + ToString(target->stamina) + "\n";
     msg += Formatter::yellow() + "    Hunger  " + Formatter::reset() + ":" + ToString(target->hunger) + "\n";
     msg += Formatter::yellow() + "    Thirst  " + Formatter::reset() + ":" + ToString(target->thirst) + "\n";
-    msg += Formatter::yellow() + "    STR     " + Formatter::reset() + ":" + ToString(target->strength) + "\n";
-    msg += Formatter::yellow() + "    AGI     " + Formatter::reset() + ":" + ToString(target->agility) + "\n";
-    msg += Formatter::yellow() + "    PER     " + Formatter::reset() + ":" + ToString(target->perception) + "\n";
-    msg += Formatter::yellow() + "    CON     " + Formatter::reset() + ":" + ToString(target->constitution) + "\n";
-    msg += Formatter::yellow() + "    INT     " + Formatter::reset() + ":" + ToString(target->intelligence) + "\n";
+    msg += Formatter::yellow() + "    STR     " + Formatter::reset() + ":";
+    msg += ToString(target->getAbility(Ability::Strength, false));
+    msg += "[" + ToString(target->effects.getAbilityModifier(Ability::Strength)) + "]\n";
+    msg += Formatter::yellow() + "    AGI     " + Formatter::reset() + ":";
+    msg += ToString(target->getAbility(Ability::Agility, false));
+    msg += "[" + ToString(target->effects.getAbilityModifier(Ability::Agility)) + "]\n";
+    msg += Formatter::yellow() + "    PER     " + Formatter::reset() + ":";
+    msg += ToString(target->getAbility(Ability::Perception, false));
+    msg += "[" + ToString(target->effects.getAbilityModifier(Ability::Perception)) + "]\n";
+    msg += Formatter::yellow() + "    CON     " + Formatter::reset() + ":";
+    msg += ToString(target->getAbility(Ability::Constitution, false));
+    msg += "[" + ToString(target->effects.getAbilityModifier(Ability::Constitution)) + "]\n";
+    msg += Formatter::yellow() + "    INT     " + Formatter::reset() + ":";
+    msg += ToString(target->getAbility(Ability::Intelligence, false));
+    msg += "[" + ToString(target->effects.getAbilityModifier(Ability::Intelligence)) + "]\n";
     msg += Formatter::yellow() + "    Room    " + Formatter::reset() + ":" + ToString(target->room->vnum) + "\n";
     msg += Formatter::yellow() + "    Posture " + Formatter::reset() + ":" + GetPostureName(target->posture) + "\n";
     msg += Formatter::yellow() + "    Inv     " + Formatter::reset() + ":\n";
@@ -548,7 +558,8 @@ void DoItemCreate(Character * character, std::istream & sArgs)
         return;
     }
     character->addInventoryItem(item);
-    character->sendMsg("You produce '%s' out of your apparently empty top hat.\n",
+    character->sendMsg(
+        "You produce '%s' out of your apparently empty top hat.\n",
         Formatter::yellow() + item->getName() + Formatter::reset());
 }
 
@@ -1081,8 +1092,12 @@ void DoHurt(Character * character, std::istream & sArgs)
     exceptions.push_back(character);
     exceptions.push_back(target);
     // Send the message inside the room.
-    target->room->sendToAll("%s points the finger towards %s, %s cries in pain.\n", exceptions,
-        character->getNameCapital(), target->getName(), target->getPronoun());
+    target->room->sendToAll(
+        "%s points the finger towards %s, %s cries in pain.\n",
+        exceptions,
+        character->getNameCapital(),
+        target->getName(),
+        target->getPronoun());
 }
 
 void DoInvisibility(Character * character, std::istream & sArgs)
@@ -1157,8 +1172,11 @@ void DoModSkill(Character * character, std::istream & sArgs)
     target->skills[skill->vnum] = static_cast<unsigned int>(modified);
     // Notify.
     std::string msg;
-    character->sendMsg("You have successfully %s by %s the \"%s\" skill, the new level is %s.\n",
-        ((modifier > 0) ? "increased " : "decreased"), ToString(modifier), skill->name,
+    character->sendMsg(
+        "You have successfully %s by %s the \"%s\" skill, the new level is %s.\n",
+        ((modifier > 0) ? "increased " : "decreased"),
+        ToString(modifier),
+        skill->name,
         ToString(target->skills[skill->vnum]));
 }
 
@@ -1186,69 +1204,49 @@ void DoModAttr(Character * character, std::istream & sArgs)
         character->sendMsg("You must insert a valid value.\n");
         return; // Skip the rest of the function.
     }
-    std::string attrName;
+    Ability ability;
     if (arguments[1].first == "str")
     {
-        int result = static_cast<int>(target->getStrength(false)) + modifier;
-        if ((result < 0) || (result > 100))
-        {
-            character->sendMsg("Attribute cannot go below 0 or above 100.");
-            return; // Skip the rest of the function.
-        }
-        character->strength = static_cast<unsigned int>(result);
-        attrName = "strength";
+        ability = Ability::Strength;
     }
     else if (arguments[1].first == "agi")
     {
-        int result = static_cast<int>(target->getAgility(false)) + modifier;
-        if ((result < 0) || (result > 100))
-        {
-            character->sendMsg("Attribute cannot go below 0 or above 100.");
-            return; // Skip the rest of the function.
-        }
-        character->agility = static_cast<unsigned int>(result);
-        attrName = "agility";
+        ability = Ability::Agility;
     }
     else if (arguments[1].first == "per")
     {
-        int result = static_cast<int>(target->getPerception(false)) + modifier;
-        if ((result < 0) || (result > 100))
-        {
-            character->sendMsg("Attribute cannot go below 0 or above 100.");
-            return; // Skip the rest of the function.
-        }
-        character->perception = static_cast<unsigned int>(result);
-        attrName = "perception";
+        ability = Ability::Perception;
     }
     else if (arguments[1].first == "con")
     {
-        int result = static_cast<int>(target->getConstitution(false)) + modifier;
-        if ((result < 0) || (result > 100))
-        {
-            character->sendMsg("Attribute cannot go below 0 or above 100.");
-            return; // Skip the rest of the function.
-        }
-        character->constitution = static_cast<unsigned int>(result);
-        attrName = "constitution";
+        ability = Ability::Constitution;
     }
     else if (arguments[1].first == "int")
     {
-        int result = static_cast<int>(target->getIntelligence(false)) + modifier;
-        if ((result < 0) || (result > 100))
-        {
-            character->sendMsg("Attribute cannot go below 0 or above 100.");
-            return; // Skip the rest of the function.
-        }
-        character->intelligence = static_cast<unsigned int>(result);
-        attrName = "intelligence";
+        ability = Ability::Intelligence;
     }
     else
     {
         character->sendMsg("Bad attribute name, accepted : (str, agi, per, con, int).\n");
         return;
     }
-    character->sendMsg("You have successfully %s by %s the %s of the target.",
-        std::string((modifier > 0) ? "increased" : "decreased"), ToString(modifier), attrName);
+    // Get the resulting ability value.
+    int result = static_cast<int>(target->getAbility(ability)) + modifier;
+    if (result < 0)
+    {
+        character->sendMsg("Attribute cannot go below 0.");
+        return; // Skip the rest of the function.
+    }
+    else if (!target->setAbility(ability, static_cast<unsigned int>(result)))
+    {
+        character->sendMsg("Attribute cannot go above 60.");
+        return; // Skip the rest of the function.
+    }
+    character->sendMsg(
+        "You have successfully %s by %s the %s of the target.",
+        std::string((modifier > 0) ? "increased" : "decreased"),
+        ToString(modifier),
+        GetAbilityName(ability));
 }
 
 void DoAggroList(Character * character, std::istream & sArgs)
@@ -1342,7 +1340,10 @@ void DoLiquidCreate(Character * character, std::istream & sArgs)
         character->sendMsg("The selected item can't contain that quantity of liquid.\n");
         return;
     }
-    character->sendMsg("You materialise %s units of %s inside %s.\n", ToString(quantity), liquid->getName(),
+    character->sendMsg(
+        "You materialise %s units of %s inside %s.\n",
+        ToString(quantity),
+        liquid->getName(),
         item->getName());
 }
 

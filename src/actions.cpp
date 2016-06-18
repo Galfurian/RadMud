@@ -317,6 +317,25 @@ void Action::performMove()
     {
         return;
     }
+
+    unsigned int consumedStamina;
+    // Check if the actor has enough stamina to execute the action.
+    if (!actor->hasStaminaFor(consumedStamina, ActionType::Crafting))
+    {
+        actor->sendMsg("You are too tired right now.\n");
+        Logger::log(
+            LogLevel::Debug,
+            "[%s] Has %s stamina and needs %s.",
+            actor->getName(),
+            ToString(actor->stamina),
+            ToString(consumedStamina));
+        this->reset();
+        return;
+    }
+
+    // Consume the stamina.
+    actor->consumeStamina(consumedStamina);
+
     // Define departure message.
     std::string msgDepart = actor->getNameCapital() + " goes " + GetDirectionName(direction) + ".\n";
     // Define arrival message.
@@ -549,6 +568,22 @@ void Action::performCraft()
         return;
     }
 
+    unsigned int consumedStamina;
+    // Check if the actor has enough stamina to execute the action.
+    if (!actor->hasStaminaFor(consumedStamina, ActionType::Crafting))
+    {
+        actor->sendMsg("You are too tired right now.\n");
+        Logger::log(
+            LogLevel::Debug,
+            "[%s] Has %s stamina and needs %s.",
+            actor->getName(),
+            ToString(actor->stamina),
+            ToString(consumedStamina));
+        return;
+    }
+    // Consume the stamina.
+    actor->consumeStamina(consumedStamina);
+
     // Check if the production is not a null pointer.
     if (production == nullptr)
     {
@@ -661,7 +696,9 @@ void Action::performCraft()
     }
 
     // Send conclusion message.
-    actor->sendMsg("%s %s.\n\n", production->profession->finishMessage,
+    actor->sendMsg(
+        "%s %s.\n\n",
+        production->profession->finishMessage,
         Formatter::yellow() + createdItems.back()->getName() + Formatter::reset());
 
     if (dropped)
@@ -680,6 +717,22 @@ void Action::performBuild()
     {
         return;
     }
+
+    unsigned int consumedStamina;
+    // Check if the actor has enough stamina to execute the action.
+    if (!actor->hasStaminaFor(consumedStamina, ActionType::Crafting))
+    {
+        actor->sendMsg("You are too tired right now.\n");
+        Logger::log(
+            LogLevel::Debug,
+            "[%s] Has %s stamina and needs %s.",
+            actor->getName(),
+            ToString(actor->stamina),
+            ToString(consumedStamina));
+        return;
+    }
+    // Consume the stamina.
+    actor->consumeStamina(consumedStamina);
 
     // Check the schematics.
     if (schematics == nullptr)
@@ -757,7 +810,8 @@ void Action::performBuild()
     SQLiteDbms::instance().endTransaction();
 
     // Send conclusion message.
-    actor->sendMsg("You have finished building %s.\n\n",
+    actor->sendMsg(
+        "You have finished building %s.\n\n",
         Formatter::yellow() + schematics->buildingModel->getName() + Formatter::reset());
 
     // Return the character in waiting status.
@@ -821,14 +875,25 @@ void Action::performCombatAction(const CombatAction & move)
                     actor->sendMsg("You do not have opponents at reange for %s.\n", iterator->getName());
                     continue;
                 }
+                // Will contain the required stamina.
                 unsigned int consumedStamina;
-                if (!actor->hasStaminaToAttackWith(iterator->getCurrentSlot(), consumedStamina))
+                // Check if the actor has enough stamina to execute the action.
+                if (!actor->hasStaminaFor(
+                    consumedStamina,
+                    ActionType::Combat,
+                    CombatAction::BasicAttack,
+                    iterator->getCurrentSlot()))
                 {
                     actor->sendMsg("You are too tired to attack with %s.\n", iterator->getName());
-                    Logger::log(LogLevel::Debug, "[%s] Has %s stamina and needs %s.", nam, ToString(actor->stamina),
+                    Logger::log(
+                        LogLevel::Debug,
+                        "[%s] Has %s stamina and needs %s.",
+                        nam,
+                        ToString(actor->stamina),
                         ToString(consumedStamina));
                     continue;
                 }
+                // Consume the stamina.
                 actor->consumeStamina(consumedStamina);
                 // Natural roll for the attack.
                 unsigned int ATK = TRandInteger<unsigned int>(1, 20);
@@ -853,7 +918,11 @@ void Action::performCombatAction(const CombatAction & move)
                         penality = 10;
                     }
                     // Log that we have applied a penality.
-                    Logger::log(LogLevel::Debug, "[%s] Suffer a %s penalty with its %s.", nam, ToString(penality),
+                    Logger::log(
+                        LogLevel::Debug,
+                        "[%s] Suffer a %s penalty with its %s.",
+                        nam,
+                        ToString(penality),
                         GetEquipmentSlotName(iterator->currentSlot));
                     // Safely apply the penality.
                     if (ATK < penality)
@@ -891,7 +960,7 @@ void Action::performCombatAction(const CombatAction & move)
                         if (HasFlag(iterator->model->flags, ModelFlag::TwoHand))
                         {
                             // Get the strenth modifier.
-                            unsigned int STR = GetAbilityModifier(actor->getStrength());
+                            unsigned int STR = actor->getAbilityModifier(Ability::Strength);
                             // Add to the damage rool one and half the strenth value.
                             DMG += STR + (STR / 2);
                             // Log the additional damage.
@@ -905,12 +974,25 @@ void Action::performCombatAction(const CombatAction & move)
                         critical = "critically";
                     }
                     // Log the damage.
-                    Logger::log(LogLevel::Debug, "[%s] Hits %s for with %s.", nam, enemy->getName(), ToString(DMG),
+                    Logger::log(
+                        LogLevel::Debug,
+                        "[%s] Hits %s for with %s.",
+                        nam,
+                        enemy->getName(),
+                        ToString(DMG),
                         iterator->getName());
                     // Send the messages to the characters.
-                    actor->sendMsg("You %s hit %s with %s for %s.\n", critical, enemy->getName(), iterator->getName(),
+                    actor->sendMsg(
+                        "You %s hit %s with %s for %s.\n",
+                        critical,
+                        enemy->getName(),
+                        iterator->getName(),
                         ToString(DMG));
-                    enemy->sendMsg("%s %s hits you with %s for %s.\n\n", nam, critical, iterator->getName(),
+                    enemy->sendMsg(
+                        "%s %s hits you with %s for %s.\n\n",
+                        nam,
+                        critical,
+                        iterator->getName(),
                         ToString(DMG));
                 }
             }
@@ -919,19 +1001,40 @@ void Action::performCombatAction(const CombatAction & move)
     else if (move == CombatAction::Flee)
     {
         // Get the character chance of fleeing (D20).
-        unsigned int fleeChance = TRandInteger<unsigned int>(0, 20) + GetAbilityModifier(actor->getAgility());
+        unsigned int fleeChance = TRandInteger<unsigned int>(0, 20);
+        fleeChance += actor->getAbilityModifier(Ability::Agility);
+        // Will contain the required stamina.
+        unsigned int consumedStamina;
         // Base the escape level on how many enemies are surrounding the character.
         if (fleeChance < static_cast<unsigned int>(actor->opponents.getSize()))
         {
             actor->sendMsg("You were not able to escape from your attackers.\n");
         }
+        // Check if the actor has enough stamina to execute the action.
+        else if (!actor->hasStaminaFor(consumedStamina, ActionType::Combat, CombatAction::Flee))
+        {
+            actor->sendMsg("You are too tired to flee.\n");
+            Logger::log(
+                LogLevel::Debug,
+                "[%s] Has %s stamina and needs %s.",
+                nam,
+                ToString(actor->stamina),
+                ToString(consumedStamina));
+        }
         else
         {
+            // Consume the stamina.
+            actor->consumeStamina(consumedStamina);
+            // Get the list of available directions.
             std::vector<Direction> directions = actor->room->getAvailableDirections();
+            // Check if there are some directions.
             if (!directions.empty())
             {
+                // Pick a random direction, from the poll of the available ones.
                 Direction randomDirection = directions.at(TRandInteger<size_t>(0, directions.size() - 1));
+                // Get the selected exit.
                 std::shared_ptr<Exit> selected = actor->room->findExit(randomDirection);
+                // Check that the picked exit is not a null pointer.
                 if (selected == nullptr)
                 {
                     Logger::log(LogLevel::Error, "Selected null exit during action Flee.");
@@ -939,9 +1042,14 @@ void Action::performCombatAction(const CombatAction & move)
                 }
                 else
                 {
+                    // Stop the current action.
                     actor->sendMsg(this->stop());
-                    actor->moveTo(selected->destination, nam + " flees from the battlefield.\n\n",
-                        nam + " arives fleeing.\n\n", "You flee from the battlefield.\n");
+                    // Move the actor to the random direction.
+                    actor->moveTo(
+                        selected->destination,
+                        nam + " flees from the battlefield.\n\n",
+                        nam + " arives fleeing.\n\n",
+                        "You flee from the battlefield.\n");
                     return;
                 }
             }

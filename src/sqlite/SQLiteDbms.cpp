@@ -334,11 +334,11 @@ bool LoadPlayerInformation(ResultSet * result, Player * player)
     player->name = result->getNextString();
     player->password = result->getNextString();
     player->race = Mud::instance().findRace(result->getNextInteger());
-    player->strength = result->getNextUnsignedInteger();
-    player->agility = result->getNextUnsignedInteger();
-    player->perception = result->getNextUnsignedInteger();
-    player->constitution = result->getNextUnsignedInteger();
-    player->intelligence = result->getNextUnsignedInteger();
+    player->setAbility(Ability::Strength, result->getNextUnsignedInteger());
+    player->setAbility(Ability::Agility, result->getNextUnsignedInteger());
+    player->setAbility(Ability::Perception, result->getNextUnsignedInteger());
+    player->setAbility(Ability::Constitution, result->getNextUnsignedInteger());
+    player->setAbility(Ability::Intelligence, result->getNextUnsignedInteger());
     player->gender = static_cast<GenderType>(result->getNextInteger());
     player->age = result->getNextInteger();
     player->description = result->getNextString();
@@ -691,7 +691,7 @@ bool LoadMobile(ResultSet * result)
         mobile->actions = GetWords(result->getNextString());
         mobile->flags = result->getNextUnsignedInteger();
         mobile->level = result->getNextUnsignedInteger();
-        if (!mobile->setCharacteristic(result->getNextString()))
+        if (!mobile->setAbilities(result->getNextString()))
         {
             Logger::log(LogLevel::Error, "Wrong characteristics.");
             delete (mobile);

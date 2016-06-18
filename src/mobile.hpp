@@ -69,6 +69,12 @@ class Mobile: public Character
 
         virtual bool isMobile();
 
+        /// @brief Allows to pass a string which contains the abilities.
+        /// @param source The string which containts the values
+        /// @return <b>True</b> if the string is correct,<br>
+        ///         <b>False</b> otherwise.
+        bool setAbilities(const std::string & source);
+
         /// @brief Initialize mobile.
         void respawn();
 
