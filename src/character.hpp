@@ -67,12 +67,8 @@ class Character
         unsigned int hunger;
         /// Character level of thirst.
         unsigned int thirst;
-
-    private:
         /// Character abilities.
         std::map<Ability, unsigned int> abilities;
-
-    public:
         /// The current room the character is in.
         Room * room;
         /// Character's inventory.
@@ -288,15 +284,21 @@ class Character
         /// @return Condition of this character.
         std::string getHealthCondition(Character * character = nullptr);
 
+        bool setThirst(int value);
+
+        bool setHunger(int value);
+
+        unsigned int getThirst();
+
+        unsigned int getHunger();
+
         /// @brief Get character level of thirst.
-        /// @param character The target character.
         /// @return Thirst of this character.
-        std::string getThirst(Character * character = nullptr);
+        std::string getThirstDesc();
 
         /// @brief Get character level of hunger.
-        /// @param character The target character.
         /// @return Hunger of this character.
-        std::string getHunger(Character * character = nullptr);
+        std::string getHungerDesc();
 
         /// @brief Provide a detailed description of the character.
         /// @param character The target character.
@@ -336,13 +338,21 @@ class Character
         bool hasStaminaFor(unsigned int & consumed, const ActionType & actionType, const CombatAction & combatAction =
             CombatAction::NoAction, const EquipmentSlot & slot = EquipmentSlot::None);
 
-        bool dealDamage(const unsigned int & value, const bool & force = false);
+        bool setHealth(const unsigned int & value, const bool & force = false);
 
-        bool healDamage(const unsigned int & value, const bool & force = false);
+        bool addHealth(const unsigned int & value, const bool & force = false);
 
-        bool consumeStamina(const unsigned int & value, const bool & force = false);
+        bool remHealth(const unsigned int & value, const bool & force = false);
 
-        bool gainStamina(const unsigned int & value, const bool & force = false);
+        unsigned int getHealth();
+
+        bool setStamina(const unsigned int & value, const bool & force = false);
+
+        bool addStamina(const unsigned int & value, const bool & force = false);
+
+        bool remStamina(const unsigned int & value, const bool & force = false);
+
+        unsigned int getStamina();
 
         /// @brief Handle what happend when this character die.
         virtual void triggerDeath();

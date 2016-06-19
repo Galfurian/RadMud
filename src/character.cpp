@@ -188,7 +188,6 @@ string Character::getPossessivePronoun()
 
 unsigned int Character::getAbility(const Ability & ability, bool withEffects)
 {
-    (void) withEffects;
     if (AbilityTest::is_value(ability))
     {
         if (!withEffects)
@@ -299,7 +298,7 @@ void Character::updateResources()
         // Value = 5 + ((1 + 3*LogMod(CON))*(1 + 2*PosMod))
         // MIN   =  6.00
         // MAX   = 51.74
-        this->healDamage(5 + ((1 + 3 * LogMod) * (1 + 2 * PosMod)), true);
+        this->addHealth(5 + ((1 + 3 * LogMod) * (1 + 2 * PosMod)), true);
     }
     if (this->stamina < this->getMaxStamina())
     {
@@ -307,7 +306,7 @@ void Character::updateResources()
         // Value = 5 + ((1 + 4*LogMod(CON))*(1 + 3*PosMod))
         // MIN   =  6.00
         // MAX   = 90.69
-        this->gainStamina(5 + ((1 + 4 * LogMod) * (1 + 3 * PosMod)), true);
+        this->addStamina(5 + ((1 + 4 * LogMod) * (1 + 3 * PosMod)), true);
     }
 }
 
@@ -870,53 +869,73 @@ string Character::getHealthCondition(Character * character)
     return condition;
 }
 
-std::string Character::getThirst(Character * character)
+bool Character::setThirst(int value)
 {
-    std::string output, sent_be, sent_have;
-
-    // Determine who is the examined character.
-    if (character != nullptr && character != this)
+    int result = static_cast<int>(this->thirst) + value;
+    if (result < 0)
     {
-        sent_be = "is";
-        sent_have = "has";
+        return false;
+    }
+    else if (result > 100)
+    {
+        this->thirst = 100;
     }
     else
     {
-        character = this;
-        sent_be = "are";
-        sent_have = "have";
+        this->thirst = static_cast<unsigned int>(result);
     }
-    int percent = static_cast<int>((100.0 * static_cast<double>(character->thirst)) / (100.0));
+    return true;
+}
 
+bool Character::setHunger(int value)
+{
+    int result = static_cast<int>(this->hunger) + value;
+    if (result < 0)
+    {
+        return false;
+    }
+    else if (result > 100)
+    {
+        this->hunger = 100;
+    }
+    else
+    {
+        this->hunger = static_cast<unsigned int>(result);
+    }
+    return true;
+}
+
+unsigned int Character::getThirst()
+{
+    return this->thirst;
+}
+
+unsigned int Character::getHunger()
+{
+    return this->hunger;
+}
+
+std::string Character::getThirstDesc()
+{
+    std::string output;
+    int percent = static_cast<int>((100.0 * static_cast<double>(this->thirst)) / (100.0));
     // Determine the correct description.
-    if (percent >= 90) output = sent_be + " not thirsty.\n";
-    else if (percent >= 60) output = sent_be + " quite thirsty.\n";
-    else if (percent >= 30) output = sent_be + " thirsty.\n";
-    else output = sent_be + " dying of thirst.\n";
+    if (percent >= 90) output = "are not thirsty.\n";
+    else if (percent >= 60) output = "are quite thirsty.\n";
+    else if (percent >= 30) output = "are thirsty.\n";
+    else output = "are dying of thirst.\n";
     return output;
 }
 
-std::string Character::getHunger(Character * character)
+std::string Character::getHungerDesc()
 {
-    std::string output, sent_be, sent_have;
-    // Determine who is the examined character.
-    if (character != nullptr && character != this)
-    {
-        sent_be = "is";
-        sent_have = "has";
-    }
-    else
-    {
-        character = this;
-        sent_be = "are";
-        sent_have = "have";
-    }
-    int percent = static_cast<int>((100.0 * static_cast<double>(character->hunger)) / (100.0));
+    std::string output;
+    int percent = static_cast<int>((100.0 * static_cast<double>(this->hunger)) / (100.0));
     // Determine the correct description.
-    if (percent >= 90) output = sent_be + " not hungry.\n";
-    else if (percent >= 60) output = sent_be + " quite hungry.\n";
-    else if (percent >= 30) output = sent_be + " hungry.\n";
-    else output = sent_be + " dying of hunger.\n";
+    if (percent >= 90) output = "are not hungry.\n";
+    else if (percent >= 60) output = "are quite hungry.\n";
+    else if (percent >= 30) output = "are hungry.\n";
+    else output = "are dying of hunger.\n";
     return output;
 }
 
@@ -1349,62 +1368,136 @@ bool Character::hasStaminaFor(
     return false;
 }
 
-bool Character::dealDamage(const unsigned int & value, const bool & force)
-{
-    if (this->health >= value)
-    {
-        this->health -= value;
-        return true;
-    }
-    if (force)
-    {
-        this->health = 0;
-    }
-    return false;
-}
-
-bool Character::healDamage(const unsigned int & value, const bool & force)
+bool Character::setHealth(const unsigned int & value, const bool & force)
 {
     unsigned int maximum = this->getMaxHealth();
-    if ((this->health + value) <= maximum)
+    if ((value > maximum) && (force))
     {
-        this->health += value;
-        return true;
+        if (force)
+        {
+            this->health = maximum;
+        }
+        else
+        {
+            return false;
+        }
     }
-    if (force)
-    {
-        this->health = maximum;
-    }
-    return false;
+    this->health = value;
+    return true;
 }
 
-bool Character::consumeStamina(const unsigned int & value, const bool & force)
+bool Character::addHealth(const unsigned int & value, const bool & force)
 {
-    if (this->stamina >= value)
+    unsigned int maximum = this->getMaxHealth();
+    unsigned int result = this->health + value;
+    if (result > maximum)
     {
-        this->stamina -= value;
-        return true;
+        if (force)
+        {
+            this->health = maximum;
+        }
+        else
+        {
+            return false;
+        }
     }
-    if (force)
+    else
     {
-        this->stamina = 0;
+        this->health = result;
     }
-    return false;
+    return true;
 }
 
-bool Character::gainStamina(const unsigned int & value, const bool & force)
+bool Character::remHealth(const unsigned int & value, const bool & force)
+{
+    int result = static_cast<int>(this->health) - static_cast<int>(value);
+    if (result < 0)
+    {
+        if (force)
+        {
+            this->health = 0;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else
+    {
+        this->health = static_cast<unsigned int>(result);
+    }
+    return true;
+}
+
+unsigned int Character::getHealth()
+{
+    return this->health;
+}
+
+bool Character::setStamina(const unsigned int & value, const bool & force)
 {
     unsigned int maximum = this->getMaxStamina();
-    if ((this->stamina + value) <= maximum)
+    if (value > maximum)
     {
-        this->stamina += value;
-        return true;
+        if (force)
+        {
+            this->stamina = maximum;
+        }
+        else
+        {
+            return false;
+        }
     }
-    if (force)
+    this->stamina = value;
+    return true;
+}
+
+bool Character::addStamina(const unsigned int & value, const bool & force)
+{
+    unsigned int maximum = this->getMaxStamina();
+    unsigned int result = this->stamina + value;
+    if (result > maximum)
     {
-        this->stamina = maximum;
+        if (force)
+        {
+            this->stamina = maximum;
+        }
+        else
+        {
+            return false;
+        }
     }
-    return false;
+    else
+    {
+        this->stamina = result;
+    }
+    return true;
+}
+
+bool Character::remStamina(const unsigned int & value, const bool & force)
+{
+    int result = static_cast<int>(this->stamina) - static_cast<int>(value);
+    if (result < 0)
+    {
+        if (force)
+        {
+            this->stamina = 0;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else
+    {
+        this->stamina = static_cast<unsigned int>(result);
+    }
+    return true;
+}
+
+unsigned int Character::getStamina()
+{
+    return this->stamina;
 }
 
 void Character::triggerDeath()

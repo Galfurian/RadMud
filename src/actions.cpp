@@ -327,14 +327,14 @@ void Action::performMove()
             LogLevel::Debug,
             "[%s] Has %s stamina and needs %s.",
             actor->getName(),
-            ToString(actor->stamina),
+            ToString(actor->getStamina()),
             ToString(consumedStamina));
         this->reset();
         return;
     }
 
     // Consume the stamina.
-    actor->consumeStamina(consumedStamina);
+    actor->addStamina(consumedStamina);
 
     // Define departure message.
     std::string msgDepart = actor->getNameCapital() + " goes " + GetDirectionName(direction) + ".\n";
@@ -577,12 +577,12 @@ void Action::performCraft()
             LogLevel::Debug,
             "[%s] Has %s stamina and needs %s.",
             actor->getName(),
-            ToString(actor->stamina),
+            ToString(actor->getStamina()),
             ToString(consumedStamina));
         return;
     }
     // Consume the stamina.
-    actor->consumeStamina(consumedStamina);
+    actor->remStamina(consumedStamina, true);
 
     // Check if the production is not a null pointer.
     if (production == nullptr)
@@ -727,12 +727,12 @@ void Action::performBuild()
             LogLevel::Debug,
             "[%s] Has %s stamina and needs %s.",
             actor->getName(),
-            ToString(actor->stamina),
+            ToString(actor->getStamina()),
             ToString(consumedStamina));
         return;
     }
     // Consume the stamina.
-    actor->consumeStamina(consumedStamina);
+    actor->remStamina(consumedStamina, true);
 
     // Check the schematics.
     if (schematics == nullptr)
@@ -889,12 +889,12 @@ void Action::performCombatAction(const CombatAction & move)
                         LogLevel::Debug,
                         "[%s] Has %s stamina and needs %s.",
                         nam,
-                        ToString(actor->stamina),
+                        ToString(actor->getStamina()),
                         ToString(consumedStamina));
                     continue;
                 }
                 // Consume the stamina.
-                actor->consumeStamina(consumedStamina);
+                actor->remStamina(consumedStamina, true);
                 // Natural roll for the attack.
                 unsigned int ATK = TRandInteger<unsigned int>(1, 20);
                 // Log the rolled value.
@@ -1018,13 +1018,13 @@ void Action::performCombatAction(const CombatAction & move)
                 LogLevel::Debug,
                 "[%s] Has %s stamina and needs %s.",
                 nam,
-                ToString(actor->stamina),
+                ToString(actor->getStamina()),
                 ToString(consumedStamina));
         }
         else
         {
             // Consume the stamina.
-            actor->consumeStamina(consumedStamina);
+            actor->remStamina(consumedStamina, true);
             // Get the list of available directions.
             std::vector<Direction> directions = actor->room->getAvailableDirections();
             // Check if there are some directions.

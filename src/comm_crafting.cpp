@@ -55,7 +55,7 @@ void DoProfession(Character * character, Profession * profession, std::istream &
             LogLevel::Debug,
             "[%s] Has %s stamina and needs %s.",
             character->getName(),
-            ToString(character->stamina),
+            ToString(character->getStamina()),
             ToString(consumedStamina));
         return;
     }
@@ -158,7 +158,7 @@ void DoBuild(Character * character, std::istream & sArgs)
             LogLevel::Debug,
             "[%s] Has %s stamina and needs %s.",
             character->getName(),
-            ToString(character->stamina),
+            ToString(character->getStamina()),
             ToString(consumedStamina));
         return;
     }
@@ -273,7 +273,7 @@ void DoDeconstruct(Character * character, std::istream & sArgs)
             LogLevel::Debug,
             "[%s] Has %s stamina and needs %s.",
             character->getName(),
-            ToString(character->stamina),
+            ToString(character->getStamina()),
             ToString(consumedStamina));
         return;
     }

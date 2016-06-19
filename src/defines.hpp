@@ -177,6 +177,7 @@ typedef std::map<std::string, Direction> DirectionMap;
 /// Used to determine the type of Zone.
 typedef enum class TypesOfAreas
 {
+    NoType,
     /// Identifies a cavern.
     Cavern,
     /// Identifies a region of the underdark.
@@ -186,6 +187,7 @@ typedef enum class TypesOfAreas
 /// Used to determine the status of a Zone.
 typedef enum class TypesOfAreaStatus
 {
+    NoStatus,
     /// The area has no environmentals status.
     Normal,
     /// The area is freezing.

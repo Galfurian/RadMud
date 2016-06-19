@@ -391,13 +391,13 @@ void ProcessNewRace(Character * character, std::istream & sArgs)
         else
         {
             player->race = race;
-            player->health = race->constitution * 5;
-            player->stamina = race->constitution * 10;
             player->setAbility(Ability::Strength, race->strength);
             player->setAbility(Ability::Agility, race->agility);
             player->setAbility(Ability::Perception, race->perception);
             player->setAbility(Ability::Constitution, race->constitution);
             player->setAbility(Ability::Intelligence, race->intelligence);
+            player->setHealth(player->getMaxHealth(), true);
+            player->setStamina(player->getMaxStamina(), true);
             AdvanceCharacterCreation(player, ConnectionState::AwaitingNewAttr);
         }
     }
@@ -1012,8 +1012,8 @@ void RollbackCharacterCreation(Character * character, ConnectionState new_state)
     else if (new_state == ConnectionState::AwaitingNewRace)
     {
         player->race = nullptr;
-        player->health = 0;
-        player->stamina = 0;
+        player->setHealth(0);
+        player->setStamina(0);
         player->setAbility(Ability::Strength, 0);
         player->setAbility(Ability::Agility, 0);
         player->setAbility(Ability::Perception, 0);

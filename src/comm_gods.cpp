@@ -153,10 +153,10 @@ void DoGodInfo(Character * character, std::istream & sArgs)
     msg += Formatter::yellow() + "    Flags   " + Formatter::reset() + ":" + ToString(target->flags) + "\n";
     msg += Formatter::yellow() + "    Race    " + Formatter::reset() + ":" + target->race->name + "\n";
     msg += Formatter::yellow() + "    Faction " + Formatter::reset() + ":" + target->faction->name + "\n";
-    msg += Formatter::yellow() + "    Health  " + Formatter::reset() + ":" + ToString(target->health) + "\n";
-    msg += Formatter::yellow() + "    Stamina " + Formatter::reset() + ":" + ToString(target->stamina) + "\n";
-    msg += Formatter::yellow() + "    Hunger  " + Formatter::reset() + ":" + ToString(target->hunger) + "\n";
-    msg += Formatter::yellow() + "    Thirst  " + Formatter::reset() + ":" + ToString(target->thirst) + "\n";
+    msg += Formatter::yellow() + "    Health  " + Formatter::reset() + ":" + ToString(target->getHealth()) + "\n";
+    msg += Formatter::yellow() + "    Stamina " + Formatter::reset() + ":" + ToString(target->getStamina()) + "\n";
+    msg += Formatter::yellow() + "    Hunger  " + Formatter::reset() + ":" + ToString(target->getHunger()) + "\n";
+    msg += Formatter::yellow() + "    Thirst  " + Formatter::reset() + ":" + ToString(target->getThirst()) + "\n";
     msg += Formatter::yellow() + "    STR     " + Formatter::reset() + ":";
     msg += ToString(target->getAbility(Ability::Strength, false));
     msg += "[" + ToString(target->effects.getAbilityModifier(Ability::Strength)) + "]\n";
@@ -1083,7 +1083,7 @@ void DoHurt(Character * character, std::istream & sArgs)
         return;
     }
     // Set health to 1.
-    target->health = 1;
+    target->setHealth(1);
     // Notify.
     character->sendMsg("You point your finger, %s cry in pain.\n", target->getName());
     target->sendMsg("%s points the finger towards you, you cry in pain.\n", character->getNameCapital());

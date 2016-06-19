@@ -32,20 +32,16 @@ SQLiteDbms::SQLiteDbms()
     tableLoaders.push_back(std::make_pair("BadName", LoadBadName));
     tableLoaders.push_back(std::make_pair("BlockedIp", LoadBlockedIp));
     tableLoaders.push_back(std::make_pair("News", LoadNews));
-
     tableLoaders.push_back(std::make_pair("Material", LoadMaterial));
-
     tableLoaders.push_back(std::make_pair("Skill", LoadSkill));
     tableLoaders.push_back(std::make_pair("Race", LoadRace));
     tableLoaders.push_back(std::make_pair("Faction", LoadFaction));
-
     tableLoaders.push_back(std::make_pair("Continent", LoadContinent));
     tableLoaders.push_back(std::make_pair("Area", LoadArea));
     tableLoaders.push_back(std::make_pair("Room", LoadRoom));
     tableLoaders.push_back(std::make_pair("Exit", LoadExit));
     tableLoaders.push_back(std::make_pair("AreaList", LoadAreaList));
     tableLoaders.push_back(std::make_pair("TravelPoint", LoadTravelPoint));
-
     tableLoaders.push_back(std::make_pair("Model", LoadModel));
     tableLoaders.push_back(std::make_pair("Liquid", LoadLiquid));
     tableLoaders.push_back(std::make_pair("Item", LoadItem));
@@ -53,10 +49,8 @@ SQLiteDbms::SQLiteDbms()
     tableLoaders.push_back(std::make_pair("ItemContentLiq", LoadContentLiq));
     tableLoaders.push_back(std::make_pair("ItemRoom", LoadItemRoom));
     tableLoaders.push_back(std::make_pair("Writings", LoadWriting));
-
     tableLoaders.push_back(std::make_pair("Profession", LoadProfession));
     tableLoaders.push_back(std::make_pair("Production", LoadProduction));
-
     tableLoaders.push_back(std::make_pair("Mobile", LoadMobile));
     tableLoaders.push_back(std::make_pair("Building", LoadBuilding));
 }
@@ -349,10 +343,10 @@ bool LoadPlayerInformation(ResultSet * result, Player * player)
     player->room = Mud::instance().findRoom(result->getNextInteger());
     player->prompt = player->prompt_save = result->getNextString();
     player->flags = result->getNextUnsignedInteger();
-    player->health = result->getNextUnsignedInteger();
-    player->stamina = result->getNextUnsignedInteger();
-    player->hunger = result->getNextUnsignedInteger();
-    player->thirst = result->getNextUnsignedInteger();
+    player->setHealth(result->getNextUnsignedInteger(), true);
+    player->setStamina(result->getNextUnsignedInteger(), true);
+    player->setHunger(result->getNextInteger());
+    player->setThirst(result->getNextInteger());
     player->rent_room = result->getNextInteger();
 
     if (player->room == nullptr)
@@ -699,8 +693,8 @@ bool LoadMobile(ResultSet * result)
         }
         mobile->lua_script = result->getNextString();
 
-        mobile->health = mobile->getMaxHealth();
-        mobile->stamina = mobile->getMaxStamina();
+        mobile->setHealth(mobile->getMaxHealth(), true);
+        mobile->setStamina(mobile->getMaxStamina(), true);
 
         // Translate new_line.
         FindAndReplace(mobile->description, "%r", "\n");
@@ -868,17 +862,19 @@ bool LoadAreaList(ResultSet * result)
 {
     while (result->next())
     {
-        Area * area = Mud::instance().findArea(result->getNextInteger());
-        Room * room = Mud::instance().findRoom(result->getNextInteger());
+        int areaVnum = result->getNextInteger();
+        int roomVnum = result->getNextInteger();
+        Area * area = Mud::instance().findArea(areaVnum);
+        Room * room = Mud::instance().findRoom(roomVnum);
         // Check the correctness.
         if (area == nullptr)
         {
-            Logger::log(LogLevel::Error, "Can't find the area.");
+            Logger::log(LogLevel::Error, "Can't find the area (%s).", ToString(areaVnum));
             return false;
         }
         if (room == nullptr)
         {
-            Logger::log(LogLevel::Error, "Can't find the room.");
+            Logger::log(LogLevel::Error, "Can't find the room (%s).", ToString(roomVnum));
             return false;
         }
         // Load the room inside the area.

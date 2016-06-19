@@ -548,18 +548,18 @@ void DoStatistics(Character * character, std::istream & sArgs)
     msg += "[" + ToString(player->getAbilityModifier(Ability::Intelligence)) + "]\n";
 
     msg += Formatter::magenta() + "    Health " + Formatter::reset();
-    msg += ToString(player->health) + "/" + ToString(player->getMaxHealth());
+    msg += ToString(player->getHealth()) + "/" + ToString(player->getMaxHealth());
     msg += "(" + ToString(player->effects.getHealthMod()) + ")\n";
 
     msg += Formatter::magenta() + "    Stamina " + Formatter::reset();
-    msg += ToString(player->stamina) + "/" + ToString(player->getMaxStamina());
+    msg += ToString(player->getStamina()) + "/" + ToString(player->getMaxStamina());
     msg += "(" + ToString(player->effects.getHealthMod()) + ")\n";
 
     msg += Formatter::magenta() + "    Armor Class " + Formatter::reset();
     msg += ToString(player->getArmorClass()) + "\n";
 
-    msg += "You " + player->getHunger();
-    msg += "You " + player->getThirst();
+    msg += "You " + player->getHungerDesc();
+    msg += "You " + player->getThirstDesc();
 
     msg += "You are " + GetPostureName(player->posture) + ".\n";
 

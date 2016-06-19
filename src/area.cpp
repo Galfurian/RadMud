@@ -63,6 +63,8 @@ bool Area::check()
     assert(width > 0);
     assert(height > 0);
     assert(elevation > 0);
+    assert(type != AreaType::NoType);
+    assert(status != AreaStatus::NoStatus);
     return true;
 }
 

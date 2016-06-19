@@ -199,10 +199,10 @@ bool Player::createOnDB()
     arguments.push_back(ToString(room->vnum));
     arguments.push_back(prompt);
     arguments.push_back(ToString(flags));
-    arguments.push_back(ToString(health));
-    arguments.push_back(ToString(stamina));
-    arguments.push_back(ToString(hunger));
-    arguments.push_back(ToString(thirst));
+    arguments.push_back(ToString(this->getHealth()));
+    arguments.push_back(ToString(this->getStamina()));
+    arguments.push_back(ToString(this->getHunger()));
+    arguments.push_back(ToString(this->getThirst()));
     arguments.push_back(ToString(rent_room));
     if (!SQLiteDbms::instance().insertInto("Player", arguments))
     {
@@ -254,11 +254,11 @@ bool Player::updateOnDB()
         value.push_back(std::make_pair("position", ToString(room->vnum)));
         value.push_back(std::make_pair("prompt", prompt));
         value.push_back(std::make_pair("flag", ToString(flags)));
-        value.push_back(std::make_pair("health", ToString(health)));
-        value.push_back(std::make_pair("stamina", ToString(stamina)));
+        value.push_back(std::make_pair("health", ToString(this->getHealth())));
+        value.push_back(std::make_pair("stamina", ToString(this->getStamina())));
         value.push_back(std::make_pair("rent_room", ToString(rent_room)));
-        value.push_back(std::make_pair("hunger", ToString(hunger)));
-        value.push_back(std::make_pair("thirst", ToString(thirst)));
+        value.push_back(std::make_pair("hunger", ToString(this->getHunger())));
+        value.push_back(std::make_pair("thirst", ToString(this->getThirst())));
         where.push_back(std::make_pair("name", name));
 
         if (!SQLiteDbms::instance().updateInto("Player", value, where))
@@ -308,10 +308,10 @@ void Player::sendPrompt()
     string readyPrompt = prompt + "\n";
     FindAndReplace(readyPrompt, "&n", ToLower(name));
     FindAndReplace(readyPrompt, "&N", name);
-    FindAndReplace(readyPrompt, "&h", ToString(health));
-    FindAndReplace(readyPrompt, "&H", ToString(getMaxHealth()));
-    FindAndReplace(readyPrompt, "&s", ToString(stamina));
-    FindAndReplace(readyPrompt, "&S", ToString(getMaxStamina()));
+    FindAndReplace(readyPrompt, "&h", ToString(this->getHealth()));
+    FindAndReplace(readyPrompt, "&H", ToString(this->getMaxHealth()));
+    FindAndReplace(readyPrompt, "&s", ToString(this->getStamina()));
+    FindAndReplace(readyPrompt, "&S", ToString(this->getMaxStamina()));
     // Send to the player his prompt.
     if (!closing)
     {
@@ -363,8 +363,8 @@ void Player::triggerDeath()
         room->addCharacter(this);
     }
     // Set values of health and stamina to 1.
-    health = 1;
-    stamina = 1;
+    this->setHealth(1, true);
+    this->setStamina(1, true);
 }
 
 ///////////////////////////////////////////////////////////

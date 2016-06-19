@@ -90,8 +90,8 @@ void Mobile::respawn()
 {
     // Set the mobile to Alive.
     this->alive = true;
-    this->health = this->getMaxHealth();
-    this->stamina = this->getMaxStamina();
+    this->setHealth(this->getMaxHealth(), true);
+    this->setStamina(this->getMaxStamina(), true);
     // Trigger the init lua function.
     this->triggerEventInit();
     // Add the mobile to the respawn room.
