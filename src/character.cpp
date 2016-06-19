@@ -82,28 +82,28 @@ bool Character::setAbility(Ability ability, unsigned int value)
 bool Character::check()
 {
     bool safe = true;
-    safe = SafeAssert(!name.empty());
-    safe = SafeAssert(!description.empty());
-    safe = SafeAssert(weight > 0);
-    safe = SafeAssert(race != nullptr);
-    safe = SafeAssert(faction != nullptr);
-    safe = SafeAssert(health > 0);
-    safe = SafeAssert(stamina > 0);
-    safe = SafeAssert(hunger > 0);
-    safe = SafeAssert(thirst > 0);
-    safe = SafeAssert(abilities[Ability::Strength] > 0);
-    safe = SafeAssert(abilities[Ability::Strength] < 60);
-    safe = SafeAssert(abilities[Ability::Agility] > 0);
-    safe = SafeAssert(abilities[Ability::Agility] < 60);
-    safe = SafeAssert(abilities[Ability::Perception] > 0);
-    safe = SafeAssert(abilities[Ability::Perception] < 60);
-    safe = SafeAssert(abilities[Ability::Constitution] > 0);
-    safe = SafeAssert(abilities[Ability::Constitution] < 60);
-    safe = SafeAssert(abilities[Ability::Intelligence] > 0);
-    safe = SafeAssert(abilities[Ability::Intelligence] < 60);
-    safe = SafeAssert(thirst > 0);
-    safe = SafeAssert(room != nullptr);
-    safe = SafeAssert(L != nullptr);
+    safe &= SafeAssert(!name.empty());
+    safe &= SafeAssert(!description.empty());
+    safe &= SafeAssert(weight > 0);
+    safe &= SafeAssert(race != nullptr);
+    safe &= SafeAssert(faction != nullptr);
+    safe &= SafeAssert(health > 0);
+    safe &= SafeAssert(stamina > 0);
+    safe &= SafeAssert(hunger > 0);
+    safe &= SafeAssert(thirst > 0);
+    safe &= SafeAssert(abilities[Ability::Strength] > 0);
+    safe &= SafeAssert(abilities[Ability::Strength] <= 60);
+    safe &= SafeAssert(abilities[Ability::Agility] > 0);
+    safe &= SafeAssert(abilities[Ability::Agility] <= 60);
+    safe &= SafeAssert(abilities[Ability::Perception] > 0);
+    safe &= SafeAssert(abilities[Ability::Perception] <= 60);
+    safe &= SafeAssert(abilities[Ability::Constitution] > 0);
+    safe &= SafeAssert(abilities[Ability::Constitution] <= 60);
+    safe &= SafeAssert(abilities[Ability::Intelligence] > 0);
+    safe &= SafeAssert(abilities[Ability::Intelligence] <= 60);
+    safe &= SafeAssert(thirst > 0);
+    safe &= SafeAssert(room != nullptr);
+    safe &= SafeAssert(L != nullptr);
     return safe;
 }
 
