@@ -21,8 +21,12 @@
 
 #include "../logger.hpp"
 
+/// @brief Class used to check whether a given enum is valid or not.
 template<typename EnumType, EnumType ... Values> class EnumCheck;
-template<typename EnumType> class EnumCheck<EnumType>
+
+/// @brief Class used to check whether a given enum is valid or not.
+template<typename EnumType>
+class EnumCheck<EnumType>
 {
     public:
         template<typename IntType>
@@ -32,7 +36,7 @@ template<typename EnumType> class EnumCheck<EnumType>
         }
 };
 
-/// @brief An enum checker
+/// @brief Class used to check whether a given enum is valid or not.
 template<typename EnumType, EnumType V, EnumType ... Next>
 class EnumCheck<EnumType, V, Next...> : private EnumCheck<EnumType, Next...>
 {

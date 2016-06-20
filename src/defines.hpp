@@ -25,7 +25,7 @@
 #include <set>
 
 #include "utilities/coordinates.hpp"
-#include "utilities/enum_cheker.hpp"
+#include "utilities/enum_checker.hpp"
 
 /// The list of character's abilities.
 typedef enum class Abilities
