@@ -49,33 +49,12 @@ Model::Model() :
     tileId(),
     functions()
 {
-}
-
-Model::Model(const Model & source) :
-    vnum(source.vnum),
-    name(source.name),
-    article(source.article),
-    shortdesc(source.shortdesc),
-    keys(source.keys),
-    description(source.description),
-    type(source.type),
-    slot(source.slot),
-    flags(source.flags),
-    weight(source.weight),
-    price(source.price),
-    condition(source.condition),
-    decay(source.decay),
-    material(source.material),
-    tileSet(source.tileSet),
-    tileId(source.tileId),
-    functions(source.functions)
-{
     // Nothing to do.
 }
 
 Model::~Model()
 {
-    // Nothing to do.
+    Logger::log(LogLevel::Debug, "Deleted model\t\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
 }
 
 ///////////////////////////////////////////////////////////
@@ -185,9 +164,15 @@ Item * Model::createItem(std::string maker, Material * composition, ItemQuality 
 {
     // Instantiate the new item.
     Item * newItem = new Item();
-
-    // Set the values of the new item.
-    newItem->vnum = Mud::instance().getMaxVnumItem() + 1;
+    // If the new item is a corpse, don't use the normal item's vnum.
+    if (this->type == ModelType::Corpse)
+    {
+        newItem->vnum = Mud::instance().getMinVnumCorpse() - 1;
+    }
+    else
+    {
+        newItem->vnum = Mud::instance().getMaxVnumItem() + 1;
+    }
     newItem->model = this;
     newItem->maker = maker;
     newItem->condition = condition;
@@ -200,6 +185,13 @@ Item * Model::createItem(std::string maker, Material * composition, ItemQuality 
     newItem->currentSlot = slot;
     newItem->content = std::vector<Item *>();
     newItem->contentLiq = LiquidContent();
+
+    // If the newly created item is a corpse, return it and don't save it on DB.
+    if (this->type == ModelType::Corpse)
+    {
+        Mud::instance().addCorpse(newItem);
+        return newItem;
+    }
 
     if (!newItem->check())
     {

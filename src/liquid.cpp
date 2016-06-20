@@ -27,24 +27,16 @@
 #include "utils.hpp"
 
 Liquid::Liquid() :
-        vnum(-1),
-        name(""),
-        worth(-1)
-{
-    // Nothing to do.
-}
-
-Liquid::Liquid(const Liquid & source) :
-        vnum(source.vnum),
-        name(source.name),
-        worth(source.worth)
+    vnum(),
+    name(),
+    worth()
 {
     // Nothing to do.
 }
 
 Liquid::~Liquid()
 {
-    // Nothing to do.
+    Logger::log(LogLevel::Debug, "Deleted liquid\t\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
 }
 
 bool Liquid::check()

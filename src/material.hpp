@@ -46,8 +46,17 @@ class Material
         /// @brief Constructor.
         Material();
 
-        /// @brief Copy Constructor.
-        Material(const Material & source);
+        /// @brief Disable Copy Construct.
+        Material(Material const &) = delete;
+
+        /// @brief Disable Move construct.
+        Material(Material &&) = delete;
+
+        /// @brief Disable Copy assign.
+        Material & operator=(Material const &) = delete;
+
+        /// @brief Disable Move assign.
+        Material & operator=(Material &&) = delete;
 
         /// @brief Destructor.
         ~Material();
@@ -62,9 +71,6 @@ class Material
 };
 
 /// Material map handler.
-typedef std::map<int, Material> MaterialMap;
-
-/// MaterialMap iterator.
-typedef MaterialMap::iterator MaterialMapIterator;
+typedef std::map<int, Material *> MaterialMap;
 
 #endif

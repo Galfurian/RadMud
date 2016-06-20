@@ -29,7 +29,7 @@ Aggression::Aggression(Character * _aggressor, unsigned int _aggression) :
 }
 Aggression::~Aggression()
 {
-    Logger::log(LogLevel::Debug, "Deleted: Aggression.");
+    // Nothing to do.
 }
 bool Aggression::operator>(const Aggression & source) const
 {
@@ -57,7 +57,7 @@ OpponentsList::OpponentsList(Character * _owner) :
 
 OpponentsList::~OpponentsList()
 {
-    Logger::log(LogLevel::Debug, "Deleted: OpponentsList.");
+    // Nothing to do.
 }
 
 bool OpponentsList::addOpponent(Character * character, unsigned int initAggro)
@@ -76,7 +76,11 @@ bool OpponentsList::addOpponent(Character * character, unsigned int initAggro)
         this->sortList();
         // Set return value to success.
         ret = true;
-        Logger::log(LogLevel::Debug, "%s engage %s with %s.", owner->getNameCapital(), character->getName(),
+        Logger::log(
+            LogLevel::Debug,
+            "%s engage %s with %s.",
+            owner->getNameCapital(),
+            character->getName(),
             ToString(initAggro));
     }
     return ret;

@@ -56,8 +56,17 @@ class Production
         /// @brief Constructor.
         Production();
 
-        /// @brief Copy Constructor.
-        Production(const Production & source);
+        /// @brief Disable Copy Construct.
+        Production(Production const &) = delete;
+
+        /// @brief Disable Move construct.
+        Production(Production &&) = delete;
+
+        /// @brief Disable Copy assign.
+        Production & operator=(Production const &) = delete;
+
+        /// @brief Disable Move assign.
+        Production & operator=(Production &&) = delete;
 
         /// @brief Destructor.
         ~Production();
@@ -95,9 +104,6 @@ class Production
 };
 
 /// Production map handler.
-typedef std::map<int, Production> ProductionMap;
-
-/// ProductionMap iterator.
-typedef ProductionMap::iterator ProductionMapIterator;
+typedef std::map<int, Production *> ProductionMap;
 
 #endif

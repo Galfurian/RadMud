@@ -77,8 +77,6 @@ Player::Player(const int & _socket, const int & _port, const std::string & _addr
 
 Player::~Player()
 {
-    Logger::log(LogLevel::Debug, "Deleted: Player (" + this->getNameCapital() + ").");
-
     // Send the last values still in the outbuffer.
     this->processWrite();
 
@@ -103,6 +101,7 @@ Player::~Player()
     {
         room->removeCharacter(this);
     }
+    Logger::log(LogLevel::Debug, "Deleted player\t\t\t\t(%s)", this->getNameCapital());
 }
 
 bool Player::check()

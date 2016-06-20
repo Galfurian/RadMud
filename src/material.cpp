@@ -27,32 +27,20 @@
 #include "utils.hpp"
 
 Material::Material() :
-        vnum(-1),
-        type(MaterialType::NoType),
-        name(),
-        article(),
-        worth(-1),
-        hardness(-1),
-        lightness(-1)
-{
-    // Nothing to do.
-}
-
-Material::Material(const Material & source) :
-        vnum(source.vnum),
-        type(source.type),
-        name(source.name),
-        article(source.article),
-        worth(source.worth),
-        hardness(source.hardness),
-        lightness(source.lightness)
+    vnum(),
+    type(MaterialType::NoType),
+    name(),
+    article(),
+    worth(),
+    hardness(),
+    lightness()
 {
     // Nothing to do.
 }
 
 Material::~Material()
 {
-    // Nothing to do.
+    Logger::log(LogLevel::Debug, "Deleted material\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
 }
 
 bool Material::check()

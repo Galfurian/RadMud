@@ -51,7 +51,6 @@ Room::Room() :
 
 Room::~Room()
 {
-    Logger::log(LogLevel::Debug, "Deleted: Room (" + this->name + ").");
     for (auto it : exits)
     {
         std::shared_ptr<Exit> oppositeExit = it->getOppositeExit();
@@ -65,6 +64,7 @@ Room::~Room()
     {
         area->remRoom(this);
     }
+    Logger::log(LogLevel::Debug, "Deleted room\t\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
 }
 
 bool Room::check(bool complete)

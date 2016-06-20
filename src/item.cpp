@@ -52,7 +52,7 @@ Item::Item() :
 
 Item::~Item()
 {
-    Logger::log(LogLevel::Debug, "Deleted: Item (" + this->getNameCapital() + ").");
+    Logger::log(LogLevel::Debug, "Deleted item\t\t[%s]\t\t(%s)", ToString(this->vnum), this->getNameCapital());
 }
 
 bool Item::check(bool complete)

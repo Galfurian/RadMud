@@ -1515,59 +1515,17 @@ void Character::triggerDeath()
     }
 }
 
-Item * Character::createCorpse()
+void Character::createCorpse()
 {
-    Model * model = Mud::instance().findModel(1);
-    if (model == nullptr)
-    {
-        Logger::log(LogLevel::Error, "Can't find the model of CORPSE.");
-        return nullptr;
-    }
-
-    // Set the item.
-    Item * corpse = new Item();
-    corpse->vnum = Mud::instance().getMinVnumCorpse() - 1;
-    corpse->model = new Model(*model);
-    corpse->maker = "Death";
-    corpse->condition = 120;
-    corpse->composition = race->material;
-    corpse->quality = ItemQuality::Normal;
-    corpse->flags = 0;
-    corpse->room = this->room;
-    corpse->owner = nullptr;
-    corpse->container = nullptr;
-    corpse->currentSlot = EquipmentSlot::None;
-    corpse->content = std::vector<Item *>();
-    corpse->contentLiq = LiquidContent();
-
-    // Set properly the corpse.
-    corpse->model->vnum = 1;
-    corpse->model->name = "corpse";
-    corpse->model->article = "a";
-    corpse->model->shortdesc = "the corpse of a " + ToLower(race->name); // TODO :FiX RACE NAME.
-    std::vector<std::string> newKeys = GetWords(race->name);
-    corpse->model->keys.insert(corpse->model->keys.end(), newKeys.begin(), newKeys.end());
-    corpse->model->description = race->corpseDescription;
-    corpse->model->type = ModelType::Corpse;
-    corpse->model->slot = EquipmentSlot::None;
-    corpse->model->flags = 0;
-    corpse->model->weight = this->weight;
-    corpse->model->price = 0;
-    corpse->model->condition = 120;
-    corpse->model->decay = 1;
-    corpse->model->material = race->material->type;
-    //corpse->model->tileSet = ; // TODO : Race specific corpse.
-    //corpse->model->tileId = ; // TODO : Race specific corpse.
-    //corpse->model->functions = ; // TODO : Race specific functions.
-
+    // Retrieve the model of the corpse.
+    Logger::log(LogLevel::Debug, "Retrieve the model of the corpse.");
+    Model * corpseModel = &race->corpse;
+    // Create a new corpse.
+    Logger::log(LogLevel::Debug, "Create a new corpse.");
+    Item * corpse = corpseModel->createItem(this->name, race->material, ItemQuality::Normal);
     // Add the corpse to the room.
+    Logger::log(LogLevel::Debug, "Add the corpse to the room.");
     room->addItem(corpse);
-
-    // Add the corpse to the mud.
-    Mud::instance().addCorpse(corpse);
-
-    // Return the newly created corpse.
-    return corpse;
 }
 
 void Character::doCommand(const string & command)

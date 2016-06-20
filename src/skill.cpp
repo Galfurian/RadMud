@@ -25,24 +25,18 @@
 // Other Include.
 #include "utils.hpp"
 
-Skill::Skill()
+Skill::Skill() :
+    vnum(),
+    name(),
+    description(),
+    attribute()
 {
-    vnum = -1;
-    name = "";
-    description = "";
-    attribute = -1;
-}
-
-Skill::Skill(const Skill & source)
-{
-    vnum = source.vnum;
-    name = source.name;
-    description = source.description;
-    attribute = source.attribute;
+    // Nothing to do.
 }
 
 Skill::~Skill()
 {
+    // Nothing to do.
 }
 
 bool Skill::check()

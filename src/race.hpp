@@ -23,8 +23,10 @@
 #include <string>
 #include <list>
 #include <map>
+
 #include "lua/lua_script.hpp"
 #include "material.hpp"
+#include "model.hpp"
 
 /// @brief Holds details about a race.
 class Race
@@ -32,6 +34,8 @@ class Race
     public:
         /// The race virtual number.
         int vnum;
+        /// The article for the race.
+        std::string article;
         /// The name of the race.
         std::string name;
         /// The description of the race.
@@ -57,22 +61,38 @@ class Race
         int tileSet;
         /// TileId of the icon.
         int tileId;
-        /// The corpse description.
-        std::string corpseDescription;
+        /// Corpse model.
+        Model corpse;
 
         /// @brief Constructor.
         Race();
 
-        /// @brief Copy Constructor.
-        Race(const Race & source);
+        /// @brief Disable Copy Construct.
+        Race(Race const &) = delete;
+
+        /// @brief Disable Move construct.
+        Race(Race &&) = delete;
+
+        /// @brief Disable Copy assign.
+        Race & operator=(Race const &) = delete;
+
+        /// @brief Disable Move assign.
+        Race & operator=(Race &&) = delete;
 
         /// @brief Destructor.
         ~Race();
+
+        /// @brief Initialize the corpse specific of this race.
+        /// @return <b>True</b> if the generated corpse has correct values,<br>
+        ///         <b>False</b> otherwise.
+        void initializeCorpse(const std::string & corpseDescription);
 
         /// @brief Check the correctness of the race.
         /// @return <b>True</b> if the race has correct values,<br>
         ///         <b>False</b> otherwise.
         bool check();
+
+        std::string getShortDescription(bool capital = false);
 
         /// @brief Given a source string, this function parse the string
         ///         and sets the race characteristics.
@@ -96,9 +116,9 @@ class Race
 };
 
 /// Race list handler.
-typedef std::vector<Race> RaceList;
+typedef std::vector<Race *> RaceList;
 
 /// Race map handler.
-typedef std::map<int, Race> RaceMap;
+typedef std::map<int, Race *> RaceMap;
 
 #endif

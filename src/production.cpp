@@ -42,25 +42,12 @@ Production::Production() :
     workbench(ToolType::NoType),
     material(ResourceType::NoType)
 {
-}
-
-Production::Production(const Production & source) :
-    vnum(source.vnum),
-    name(source.name),
-    profession(source.profession),
-    difficulty(source.difficulty),
-    time(source.time),
-    assisted(source.assisted),
-    outcome(source.outcome),
-    tools(source.tools),
-    ingredients(source.ingredients),
-    workbench(source.workbench),
-    material(source.material)
-{
+    // Nothing to do.
 }
 
 Production::~Production()
 {
+    Logger::log(LogLevel::Debug, "Deleted production\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
 }
 
 bool Production::setOutcome(const std::string & source)

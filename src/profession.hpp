@@ -55,8 +55,17 @@ class Profession
         /// @brief Constructor.
         Profession();
 
-        /// @brief Copy Constructor.
-        Profession(const Profession & source);
+        /// @brief Disable Copy Construct.
+        Profession(Profession const &) = delete;
+
+        /// @brief Disable Move construct.
+        Profession(Profession &&) = delete;
+
+        /// @brief Disable Copy assign.
+        Profession & operator=(Profession const &) = delete;
+
+        /// @brief Disable Move assign.
+        Profession & operator=(Profession &&) = delete;
 
         /// @brief Destructor.
         ~Profession();
@@ -75,9 +84,6 @@ class Profession
 };
 
 /// Profession map handler.
-typedef std::map<unsigned int, Profession> ProfessionMap;
-
-/// ProfessionMap iterator.
-typedef ProfessionMap::iterator ProfessionMapIterator;
+typedef std::map<unsigned int, Profession *> ProfessionMap;
 
 #endif

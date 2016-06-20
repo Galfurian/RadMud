@@ -73,8 +73,17 @@ class Model
         /// @brief Constructor.
         Model();
 
-        /// @brief Copy Constructor.
-        Model(const Model & source);
+        /// @brief Disable Copy Construct.
+        Model(Model const &) = delete;
+
+        /// @brief Disable Move construct.
+        Model(Model &&) = delete;
+
+        /// @brief Disable Copy assign.
+        Model & operator=(Model const &) = delete;
+
+        /// @brief Disable Move assign.
+        Model & operator=(Model &&) = delete;
 
         /// @brief Destructor.
         ~Model();
@@ -176,6 +185,6 @@ class Model
 typedef std::vector<Model *> ModelList;
 
 /// Model map handler.
-typedef std::map<int, Model> ModelMap;
+typedef std::map<int, Model *> ModelMap;
 
 #endif

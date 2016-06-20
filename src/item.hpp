@@ -49,7 +49,6 @@ class Item
         ItemQuality quality;
         /// The item flags.
         unsigned int flags;
-
         /// Pointer to the room, where the item resides.
         Room * room;
         /// Pointer to the character who owns this item.
@@ -66,14 +65,20 @@ class Item
         /// @brief Constructor - Create a new empty item.
         Item();
 
+        /// @brief Disable Copy Construct.
+        Item(Item const &) = delete;
+
+        /// @brief Disable Move construct.
+        Item(Item &&) = delete;
+
+        /// @brief Disable Copy assign.
+        Item & operator=(Item const &) = delete;
+
+        /// @brief Disable Move assign.
+        Item & operator=(Item &&) = delete;
+
         /// @brief Destructor - Is a method which is automatically invoked when the object is destroyed.
         ~Item();
-
-        /// @brief Disable copy.
-        Item(const Item&) = delete;
-
-        /// @brief Disable assignment.
-        Item & operator=(const Item&) = delete;
 
         /// @brief Check the correctness of the item.
         /// @return <b>True</b> if the item has correct values,<br><b>False</b> otherwise.

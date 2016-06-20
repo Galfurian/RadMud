@@ -39,8 +39,17 @@ class Skill
         /// @brief Constructor.
         Skill();
 
-        /// @brief Copy Constructor.
-        Skill(const Skill & source);
+        /// @brief Disable Copy Construct.
+        Skill(Skill const &) = delete;
+
+        /// @brief Disable Move construct.
+        Skill(Skill &&) = delete;
+
+        /// @brief Disable Copy assign.
+        Skill & operator=(Skill const &) = delete;
+
+        /// @brief Disable Move assign.
+        Skill & operator=(Skill &&) = delete;
 
         /// @brief Destructor.
         ~Skill();
@@ -51,6 +60,6 @@ class Skill
 };
 
 /// Map of skills with values.
-typedef std::map<int, Skill> SkillMap;
+typedef std::map<int, Skill *> SkillMap;
 
 #endif

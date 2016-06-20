@@ -39,17 +39,20 @@ class Faction
         /// @brief Contructor.
         Faction();
 
-        /// @brief Copy Constructor.
-        Faction(const Faction & source);
+        /// @brief Disable Copy Construct.
+        Faction(Faction const &) = delete;
+
+        /// @brief Disable Move construct.
+        Faction(Faction &&) = delete;
+
+        /// @brief Disable Copy assign.
+        Faction & operator=(Faction const &) = delete;
+
+        /// @brief Disable Move assign.
+        Faction & operator=(Faction &&) = delete;
 
         /// @brief Destructor.
         ~Faction();
-
-        /// @brief Contructor for a new faction.
-        /// @param _id          The identification number of the faction.
-        /// @param _name        The name of the faction.
-        /// @param _description The description of the faction.
-        Faction(int _id, std::string _name, std::string _description);
 
         /// @brief Check the correctness of the faction.
         /// @return <b>True</b> if the faction has correct values,<br><b>False</b> otherwise.
@@ -71,13 +74,7 @@ class Faction
 /// Faction list handler.
 typedef std::vector<Faction *> FactionList;
 
-/// FactionList iterator.
-typedef FactionList::iterator FactionListIterator;
-
 /// Faction map handler.
-typedef std::map<int, Faction> FactionMap;
-
-/// FactionMap iterator.
-typedef FactionMap::iterator FactionMapIterator;
+typedef std::map<int, Faction *> FactionMap;
 
 #endif

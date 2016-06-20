@@ -36,8 +36,17 @@ class Liquid
         /// @brief Constructor.
         Liquid();
 
-        /// @brief Copy Constructor.
-        Liquid(const Liquid & source);
+        /// @brief Disable Copy Construct.
+        Liquid(Liquid const &) = delete;
+
+        /// @brief Disable Move construct.
+        Liquid(Liquid &&) = delete;
+
+        /// @brief Disable Copy assign.
+        Liquid & operator=(Liquid const &) = delete;
+
+        /// @brief Disable Move assign.
+        Liquid & operator=(Liquid &&) = delete;
 
         /// @brief Destructor.
         ~Liquid();
@@ -59,9 +68,6 @@ class Liquid
 typedef std::pair<Liquid *, unsigned int> LiquidContent;
 
 /// Liquid map handler.
-typedef std::map<int, Liquid> LiquidMap;
-
-/// LiquidMap iterator.
-typedef LiquidMap::iterator LiquidMapIterator;
+typedef std::map<int, Liquid *> LiquidMap;
 
 #endif

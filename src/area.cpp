@@ -51,7 +51,7 @@ Area::Area() :
 
 Area::~Area()
 {
-    Logger::log(LogLevel::Debug, "Deleted: Area.");
+    Logger::log(LogLevel::Debug, "Deleted area\t\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
 }
 
 bool Area::check()

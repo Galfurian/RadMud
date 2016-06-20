@@ -202,7 +202,7 @@ void DoGodInfo(Character * character, std::istream & sArgs)
         msg += Formatter::yellow() + "    Skills  " + Formatter::reset() + ":\n";
         for (auto iterator : Mud::instance().mudSkills)
         {
-            msg += "        " + iterator.second.name + "[" + ToString(player->skills[iterator.first]) + "]\n";
+            msg += "        " + iterator.second->name + "[" + ToString(player->skills[iterator.first]) + "]\n";
         }
     }
     else if (target->isMobile())
@@ -1451,17 +1451,17 @@ void DoModelList(Character * character, std::istream & sArgs)
     table.addColumn("PRICE", StringAlign::Right);
     for (auto iterator : Mud::instance().mudModels)
     {
-        Model model = iterator.second;
+        Model * model = iterator.second;
         // Prepare the row.
         TableRow row;
-        row.push_back(ToString(model.vnum));
-        row.push_back(model.name);
-        row.push_back(GetModelTypeName(model.type));
-        row.push_back(model.getSpecificTypeName());
-        row.push_back(GetEquipmentSlotName(model.slot));
-        row.push_back(ToString(model.flags));
-        row.push_back(ToString(model.weight));
-        row.push_back(ToString(model.price));
+        row.push_back(ToString(model->vnum));
+        row.push_back(model->name);
+        row.push_back(GetModelTypeName(model->type));
+        row.push_back(model->getSpecificTypeName());
+        row.push_back(GetEquipmentSlotName(model->slot));
+        row.push_back(ToString(model->flags));
+        row.push_back(ToString(model->weight));
+        row.push_back(ToString(model->price));
         // Add the row to the table.
         table.addRow(row);
     }
@@ -1635,7 +1635,7 @@ void DoRaceList(Character * character, std::istream & sArgs)
     table.addColumn("INTELLIGENCE", StringAlign::Right);
     for (auto iterator : Mud::instance().mudRaces)
     {
-        Race * race = &iterator.second;
+        Race * race = iterator.second;
         // Prepare the row.
         TableRow row;
         row.push_back(ToString(race->vnum));
@@ -1661,11 +1661,10 @@ void DoFactionList(Character * character, std::istream & sArgs)
     table.addColumn("NAME", StringAlign::Left);
     for (auto iterator : Mud::instance().mudFactions)
     {
-        Faction * faction = &iterator.second;
         // Prepare the row.
         TableRow row;
-        row.push_back(ToString(faction->vnum));
-        row.push_back(faction->name);
+        row.push_back(ToString(iterator.second->vnum));
+        row.push_back(iterator.second->name);
         // Add the row to the table.
         table.addRow(row);
     }
@@ -1682,12 +1681,11 @@ void DoSkillList(Character * character, std::istream & sArgs)
     table.addColumn("ATTRIBUTE", StringAlign::Left);
     for (auto iterator : Mud::instance().mudSkills)
     {
-        Skill * skill = &iterator.second;
         // Prepare the row.
         TableRow row;
-        row.push_back(ToString(skill->vnum));
-        row.push_back(skill->name);
-        row.push_back(GetAttributeName(skill->attribute, true));
+        row.push_back(ToString(iterator.second->vnum));
+        row.push_back(iterator.second->name);
+        row.push_back(GetAttributeName(iterator.second->attribute, true));
         // Add the row to the table.
         table.addRow(row);
     }
@@ -1771,15 +1769,14 @@ void DoMaterialList(Character * character, std::istream & sArgs)
     table.addColumn("LIGHTNESS", StringAlign::Right);
     for (auto iterator : Mud::instance().mudMaterials)
     {
-        Material material = iterator.second;
         // Prepare the row.
         TableRow row;
-        row.push_back(ToString(material.vnum));
-        row.push_back(GetMaterialTypeName(material.type));
-        row.push_back(material.name);
-        row.push_back(ToString(material.worth));
-        row.push_back(ToString(material.hardness));
-        row.push_back(ToString(material.lightness));
+        row.push_back(ToString(iterator.second->vnum));
+        row.push_back(GetMaterialTypeName(iterator.second->type));
+        row.push_back(iterator.second->name);
+        row.push_back(ToString(iterator.second->worth));
+        row.push_back(ToString(iterator.second->hardness));
+        row.push_back(ToString(iterator.second->lightness));
         // Add the row to the table.
         table.addRow(row);
     }
@@ -1797,13 +1794,12 @@ void DoProfessionList(Character * character, std::istream & sArgs)
     table.addColumn("ACTION", StringAlign::Center);
     for (auto iterator : Mud::instance().mudProfessions)
     {
-        Profession * profession = &(iterator.second);
         // Prepare the row.
         TableRow row;
-        row.push_back(profession->name);
-        row.push_back(profession->command);
-        row.push_back(GetPostureName(profession->posture));
-        row.push_back(profession->action);
+        row.push_back(iterator.second->name);
+        row.push_back(iterator.second->command);
+        row.push_back(GetPostureName(iterator.second->posture));
+        row.push_back(iterator.second->action);
         // Add the row to the table.
         table.addRow(row);
     }
@@ -1821,13 +1817,12 @@ void DoProductionList(Character * character, std::istream & sArgs)
     table.addColumn("DIFFICULTY", StringAlign::Left);
     for (auto iterator : Mud::instance().mudProductions)
     {
-        Production * production = &(iterator.second);
         // Prepare the row.
         TableRow row;
-        row.push_back(ToString(production->vnum));
-        row.push_back(production->name);
-        row.push_back(production->profession->command);
-        row.push_back(ToString(production->difficulty));
+        row.push_back(ToString(iterator.second->vnum));
+        row.push_back(iterator.second->name);
+        row.push_back(iterator.second->profession->command);
+        row.push_back(ToString(iterator.second->difficulty));
         // Add the row to the table.
         table.addRow(row);
     }
@@ -1844,12 +1839,11 @@ void DoLiquidList(Character * character, std::istream & sArgs)
     table.addColumn("WORTH", StringAlign::Right);
     for (auto iterator : Mud::instance().mudLiquids)
     {
-        Liquid liquid = iterator.second;
         // Prepare the row.
         TableRow row;
-        row.push_back(ToString(liquid.vnum));
-        row.push_back(liquid.getNameCapital());
-        row.push_back(ToString(liquid.worth));
+        row.push_back(ToString(iterator.second->vnum));
+        row.push_back(iterator.second->getNameCapital());
+        row.push_back(ToString(iterator.second->worth));
         // Add the row to the table.
         table.addRow(row);
     }

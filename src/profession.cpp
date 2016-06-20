@@ -26,39 +26,25 @@
 #include "utils.hpp"
 
 Profession::Profession() :
-        vnum(),
-        name(),
-        description(),
-        command(),
-        posture(),
-        action(),
-        startMessage(),
-        finishMessage(),
-        successMessage(),
-        failureMessage(),
-        interruptMessage(),
-        notFoundMessage()
+    vnum(),
+    name(),
+    description(),
+    command(),
+    posture(),
+    action(),
+    startMessage(),
+    finishMessage(),
+    successMessage(),
+    failureMessage(),
+    interruptMessage(),
+    notFoundMessage()
 {
-}
-
-Profession::Profession(const Profession & source) :
-        vnum(source.vnum),
-        name(source.name),
-        description(source.description),
-        command(source.command),
-        posture(source.posture),
-        action(source.action),
-        startMessage(source.startMessage),
-        finishMessage(source.finishMessage),
-        successMessage(source.successMessage),
-        failureMessage(source.failureMessage),
-        interruptMessage(source.interruptMessage),
-        notFoundMessage(source.notFoundMessage)
-{
+    // Nothing to do.
 }
 
 Profession::~Profession()
 {
+    Logger::log(LogLevel::Debug, "Deleted profession\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
 }
 
 bool Profession::check()

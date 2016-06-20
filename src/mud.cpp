@@ -56,40 +56,70 @@ Mud::Mud() :
 
 Mud::~Mud()
 {
-    Logger::log(LogLevel::Global, "Freeing memory occupied by: Players...");
+    Logger::log(LogLevel::Global, "Freeing memory occupied by players...");
     for (auto iterator : Mud::instance().mudPlayers)
     {
         delete (iterator);
     }
-    Logger::log(LogLevel::Global, "Freeing memory occupied by: Mobiles...");
+    Logger::log(LogLevel::Global, "Freeing memory occupied by mobiles...");
     for (auto iterator : Mud::instance().mudMobiles)
     {
         delete (iterator.second);
     }
-    Logger::log(LogLevel::Global, "Freeing memory occupied by: Items...");
+    Logger::log(LogLevel::Global, "Freeing memory occupied by items...");
     for (auto iterator : Mud::instance().mudItems)
     {
         delete (iterator);
     }
-    Logger::log(LogLevel::Global, "Freeing memory occupied by: Rooms...");
+    Logger::log(LogLevel::Global, "Freeing memory occupied by rooms...");
     for (auto iterator : Mud::instance().mudRooms)
     {
         delete (iterator.second);
     }
-    Logger::log(LogLevel::Global, "Freeing memory occupied by: Areas...");
+    Logger::log(LogLevel::Global, "Freeing memory occupied by areas...");
     for (auto iterator : Mud::instance().mudAreas)
     {
         delete (iterator.second);
     }
-    Logger::log(LogLevel::Global, "Freeing memory occupied by: Writings...");
+    Logger::log(LogLevel::Global, "Freeing memory occupied by writings...");
     for (auto iterator : Mud::instance().mudWritings)
     {
         delete (iterator.second);
     }
-    Logger::log(LogLevel::Global, "Freeing memory occupied by: Corpses...");
+    Logger::log(LogLevel::Global, "Freeing memory occupied by corpses...");
     for (auto iterator : Mud::instance().mudCorpses)
     {
         delete (iterator);
+    }
+    Logger::log(LogLevel::Global, "Freeing memory occupied by models...");
+    for (auto iterator : Mud::instance().mudModels)
+    {
+        delete (iterator.second);
+    }
+    Logger::log(LogLevel::Global, "Freeing memory occupied by races...");
+    for (auto iterator : Mud::instance().mudRaces)
+    {
+        delete (iterator.second);
+    }
+    Logger::log(LogLevel::Global, "Freeing memory occupied by liquids...");
+    for (auto iterator : Mud::instance().mudLiquids)
+    {
+        delete (iterator.second);
+    }
+    Logger::log(LogLevel::Global, "Freeing memory occupied by professions...");
+    for (auto iterator : Mud::instance().mudProfessions)
+    {
+        delete (iterator.second);
+    }
+    Logger::log(LogLevel::Global, "Freeing memory occupied by productions...");
+    for (auto iterator : Mud::instance().mudProductions)
+    {
+        delete (iterator.second);
+    }
+    Logger::log(LogLevel::Global, "Freeing memory occupied by materials...");
+    for (auto iterator : Mud::instance().mudMaterials)
+    {
+        delete (iterator.second);
     }
 }
 
@@ -214,25 +244,41 @@ bool Mud::remCorpse(Item * corpse)
 {
     return (FindErase(mudCorpses, corpse) != mudCorpses.end());
 }
-bool Mud::addModel(Model & model)
+bool Mud::addModel(Model * model)
 {
-    return mudModels.insert(std::make_pair(model.vnum, model)).second;
+    if (model == nullptr)
+    {
+        return false;
+    }
+    return mudModels.insert(std::make_pair(model->vnum, model)).second;
 }
 bool Mud::addArea(Area * area)
 {
     return mudAreas.insert(std::make_pair(area->vnum, area)).second;
 }
-bool Mud::addRace(Race & race)
+bool Mud::addRace(Race * race)
 {
-    return mudRaces.insert(std::make_pair(race.vnum, race)).second;
+    if (race == nullptr)
+    {
+        return false;
+    }
+    return mudRaces.insert(std::make_pair(race->vnum, race)).second;
 }
-bool Mud::addFaction(Faction & faction)
+bool Mud::addFaction(Faction * faction)
 {
-    return mudFactions.insert(std::make_pair(faction.vnum, faction)).second;
+    if (faction == nullptr)
+    {
+        return false;
+    }
+    return mudFactions.insert(std::make_pair(faction->vnum, faction)).second;
 }
-bool Mud::addSkill(Skill & skill)
+bool Mud::addSkill(Skill * skill)
 {
-    return mudSkills.insert(std::make_pair(skill.vnum, skill)).second;
+    if (skill == nullptr)
+    {
+        return false;
+    }
+    return mudSkills.insert(std::make_pair(skill->vnum, skill)).second;
 }
 bool Mud::addWriting(Writing * writing)
 {
@@ -242,21 +288,37 @@ bool Mud::addContinent(Continent * continent)
 {
     return mudContinents.insert(std::make_pair(continent->vnum, continent)).second;
 }
-bool Mud::addMaterial(Material & material)
+bool Mud::addMaterial(Material * material)
 {
-    return mudMaterials.insert(std::make_pair(material.vnum, material)).second;
+    if (material == nullptr)
+    {
+        return false;
+    }
+    return mudMaterials.insert(std::make_pair(material->vnum, material)).second;
 }
-bool Mud::addProfession(Profession & profession)
+bool Mud::addProfession(Profession * profession)
 {
-    return mudProfessions.insert(std::make_pair(profession.vnum, profession)).second;
+    if (profession == nullptr)
+    {
+        return false;
+    }
+    return mudProfessions.insert(std::make_pair(profession->vnum, profession)).second;
 }
-bool Mud::addProduction(Production & production)
+bool Mud::addProduction(Production * production)
 {
-    return mudProductions.insert(std::make_pair(production.vnum, production)).second;
+    if (production == nullptr)
+    {
+        return false;
+    }
+    return mudProductions.insert(std::make_pair(production->vnum, production)).second;
 }
-bool Mud::addLiquid(Liquid & liquid)
+bool Mud::addLiquid(Liquid * liquid)
 {
-    return mudLiquids.insert(std::make_pair(liquid.vnum, liquid)).second;
+    if (liquid == nullptr)
+    {
+        return false;
+    }
+    return mudLiquids.insert(std::make_pair(liquid->vnum, liquid)).second;
 }
 bool Mud::addTravelPoint(Room * source, Room * target)
 {
@@ -311,9 +373,12 @@ Model * Mud::findModel(int vnum)
     ModelMap::iterator iterator = mudModels.find(vnum);
     if (iterator != mudModels.end())
     {
-        return &(iterator->second);
+        return iterator->second;
     }
-    else return nullptr;
+    else
+    {
+        return nullptr;
+    }
 }
 
 Item * Mud::findItem(int vnum)
@@ -353,7 +418,7 @@ Race * Mud::findRace(int vnum)
     RaceMap::iterator iterator = mudRaces.find(vnum);
     if (iterator != mudRaces.end())
     {
-        return &(iterator->second);
+        return iterator->second;
     }
     return nullptr;
 }
@@ -362,9 +427,9 @@ Race * Mud::findRace(std::string name)
 {
     for (RaceMap::iterator iterator = mudRaces.begin(); iterator != mudRaces.end(); ++iterator)
     {
-        if (ToLower(iterator->second.name) == ToLower(name))
+        if (ToLower(iterator->second->name) == ToLower(name))
         {
-            return &(iterator->second);
+            return iterator->second;
         }
     }
     return nullptr;
@@ -375,7 +440,7 @@ Faction * Mud::findFaction(int vnum)
     FactionMap::iterator iterator = mudFactions.find(vnum);
     if (iterator != mudFactions.end())
     {
-        return &(iterator->second);
+        return iterator->second;
     }
     return nullptr;
 }
@@ -384,9 +449,9 @@ Faction * Mud::findFaction(std::string name)
 {
     for (FactionMap::iterator iterator = mudFactions.begin(); iterator != mudFactions.end(); ++iterator)
     {
-        if (ToLower(iterator->second.name) == ToLower(name))
+        if (ToLower(iterator->second->name) == ToLower(name))
         {
-            return &(iterator->second);
+            return iterator->second;
         }
     }
     return nullptr;
@@ -397,7 +462,7 @@ Skill * Mud::findSkill(int vnum)
     SkillMap::iterator iterator = mudSkills.find(vnum);
     if (iterator != mudSkills.end())
     {
-        return &(iterator->second);
+        return iterator->second;
     }
     return nullptr;
 }
@@ -440,7 +505,7 @@ Material * Mud::findMaterial(int vnum)
     MaterialMap::iterator iterator = mudMaterials.find(vnum);
     if (iterator != mudMaterials.end())
     {
-        return &(iterator->second);
+        return iterator->second;
     }
     return nullptr;
 }
@@ -450,7 +515,7 @@ Profession * Mud::findProfession(unsigned int vnum)
     ProfessionMap::iterator iterator = mudProfessions.find(vnum);
     if (iterator != mudProfessions.end())
     {
-        return &(iterator->second);
+        return iterator->second;
     }
     return nullptr;
 }
@@ -459,9 +524,9 @@ Profession * Mud::findProfession(std::string command)
 {
     for (ProfessionMap::iterator iterator = mudProfessions.begin(); iterator != mudProfessions.end(); ++iterator)
     {
-        if (ToLower(iterator->second.command) == ToLower(command))
+        if (ToLower(iterator->second->command) == ToLower(command))
         {
-            return &(iterator->second);
+            return iterator->second;
         }
     }
     return nullptr;
@@ -472,7 +537,7 @@ Production * Mud::findProduction(int vnum)
     ProductionMap::iterator iterator = mudProductions.find(vnum);
     if (iterator != mudProductions.end())
     {
-        return &(iterator->second);
+        return iterator->second;
     }
     return nullptr;
 }
@@ -481,9 +546,9 @@ Production * Mud::findProduction(std::string name)
 {
     for (ProductionMap::iterator iterator = mudProductions.begin(); iterator != mudProductions.end(); ++iterator)
     {
-        if (ToLower(iterator->second.name) == ToLower(name))
+        if (ToLower(iterator->second->name) == ToLower(name))
         {
-            return &(iterator->second);
+            return iterator->second;
         }
     }
     return nullptr;
@@ -494,7 +559,7 @@ Liquid * Mud::findLiquid(int vnum)
     LiquidMap::iterator iterator = mudLiquids.find(vnum);
     if (iterator != mudLiquids.end())
     {
-        return &(iterator->second);
+        return iterator->second;
     }
     return nullptr;
 }

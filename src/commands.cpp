@@ -1132,8 +1132,11 @@ void AdvanceCharacterCreation(Character * character, ConnectionState new_state, 
         msg += "# " + Formatter::bold() + "Character's Race." + Formatter::reset() + "\n";
         for (auto iterator : Mud::instance().mudRaces)
         {
-            Race * race = &iterator.second;
-            if (race->player_allow) msg += "#    [" + ToString(race->vnum) + "] " + race->name + ".\n";
+            Race * race = iterator.second;
+            if (race->player_allow)
+            {
+                msg += "#    [" + ToString(race->vnum) + "] " + race->name + ".\n";
+            }
         }
         msg += "#\n";
         msg += "# Choose one of the above race by typing the correspondent number.\n";

@@ -358,7 +358,7 @@ class Character
         virtual void triggerDeath();
 
         /// @brief Create a corpse on the ground.
-        Item * createCorpse();
+        void createCorpse();
 
         /// @brief Handle character input.
         /// @param command Command that need to be handled.

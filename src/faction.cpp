@@ -34,24 +34,9 @@ Faction::Faction() :
     // Nothing to do.
 }
 
-Faction::Faction(const Faction & source) :
-    vnum(source.vnum),
-    name(source.name),
-    description(source.description)
-{
-    // Nothing to do.
-}
-
 Faction::~Faction()
 {
     // Nothing to do.
-}
-
-Faction::Faction(int _id, std::string _name, std::string _description)
-{
-    vnum = _id;
-    name = _name;
-    description = _description;
 }
 
 bool Faction::check()

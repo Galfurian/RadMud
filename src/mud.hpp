@@ -207,27 +207,27 @@ class Mud
         /// Remove the given corpse from the mud.
         bool remCorpse(Item * corpse);
         /// Add the given model to the mud.
-        bool addModel(Model & model);
+        bool addModel(Model * model);
         /// Add the given area to the mud.
         bool addArea(Area * area);
         /// Add the given race to the mud.
-        bool addRace(Race & race);
+        bool addRace(Race * race);
         /// Add the given faction to the mud.
-        bool addFaction(Faction & faction);
+        bool addFaction(Faction * faction);
         /// Add the given skill to the mud.
-        bool addSkill(Skill & skill);
+        bool addSkill(Skill * skill);
         /// Add the given writing to the mud.
         bool addWriting(Writing * writing);
         /// Add the given continent to the mud.
         bool addContinent(Continent * continent);
         /// Add the given material to the mud.
-        bool addMaterial(Material & material);
+        bool addMaterial(Material * material);
         /// Add the given profession to the mud.
-        bool addProfession(Profession & profession);
+        bool addProfession(Profession * profession);
         /// Add the given production to the mud.
-        bool addProduction(Production & production);
+        bool addProduction(Production * production);
         /// Add the given liquid to the mud.
-        bool addLiquid(Liquid & liquid);
+        bool addLiquid(Liquid * liquid);
         /// Add the given travel point to the mud.
         bool addTravelPoint(Room * source, Room * target);
         /// Add a command to the mud.

@@ -545,13 +545,13 @@ bool LoadSkill(ResultSet * result)
     while (result->next())
     {
         // Create an empty Skill.
-        Skill skill;
-        skill.vnum = result->getNextInteger();
-        skill.name = result->getNextString();
-        skill.description = result->getNextString();
-        skill.attribute = result->getNextInteger();
+        Skill * skill = new Skill();
+        skill->vnum = result->getNextInteger();
+        skill->name = result->getNextString();
+        skill->description = result->getNextString();
+        skill->attribute = result->getNextInteger();
         // Check the correctness.
-        if (!skill.check())
+        if (!skill->check())
         {
             Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
@@ -570,14 +570,14 @@ bool LoadFaction(ResultSet * result)
     while (result->next())
     {
         // Create an empty Faction.
-        Faction faction;
-        faction.vnum = result->getNextInteger();
-        faction.name = result->getNextString();
-        faction.description = result->getNextString();
+        Faction * faction = new Faction();
+        faction->vnum = result->getNextInteger();
+        faction->name = result->getNextString();
+        faction->description = result->getNextString();
         // Translate new_line.
-        FindAndReplace(faction.description, "%r", "\n");
+        FindAndReplace(faction->description, "%r", "\n");
         // Check the correctness.
-        if (!faction.check())
+        if (!faction->check())
         {
             Logger::log(LogLevel::Error, "Error during error checking.");
         }
@@ -595,28 +595,28 @@ bool LoadModel(ResultSet * result)
     while (result->next())
     {
         // Create an empty model.
-        Model model;
-        model.vnum = result->getNextInteger();
-        model.name = result->getNextString();
-        model.article = result->getNextString();
-        model.shortdesc = result->getNextString();
-        model.keys = GetWords(result->getNextString());
-        model.description = result->getNextString();
-        model.type = (ModelType) result->getNextInteger();
-        model.slot = (EquipmentSlot) result->getNextInteger();
-        model.flags = result->getNextUnsignedInteger();
-        model.weight = result->getNextUnsignedInteger();
-        model.price = result->getNextInteger();
-        model.condition = result->getNextInteger();
-        model.decay = result->getNextInteger();
-        model.material = (MaterialType) result->getNextInteger();
-        model.tileSet = result->getNextInteger();
-        model.tileId = result->getNextInteger();
-        model.setFunctions(result->getNextString());
+        Model * model = new Model();
+        model->vnum = result->getNextInteger();
+        model->name = result->getNextString();
+        model->article = result->getNextString();
+        model->shortdesc = result->getNextString();
+        model->keys = GetWords(result->getNextString());
+        model->description = result->getNextString();
+        model->type = (ModelType) result->getNextInteger();
+        model->slot = (EquipmentSlot) result->getNextInteger();
+        model->flags = result->getNextUnsignedInteger();
+        model->weight = result->getNextUnsignedInteger();
+        model->price = result->getNextInteger();
+        model->condition = result->getNextInteger();
+        model->decay = result->getNextInteger();
+        model->material = (MaterialType) result->getNextInteger();
+        model->tileSet = result->getNextInteger();
+        model->tileId = result->getNextInteger();
+        model->setFunctions(result->getNextString());
         // Translate new_line.
-        FindAndReplace(model.description, "%r", "\n");
+        FindAndReplace(model->description, "%r", "\n");
         // Check the correctness.
-        if (!model.check())
+        if (!model->check())
         {
             Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
@@ -635,21 +635,24 @@ bool LoadRace(ResultSet * result)
     while (result->next())
     {
         // Create an empty Race.
-        Race race;
-        race.vnum = result->getNextInteger();
-        race.name = result->getNextString();
-        race.description = result->getNextString();
-        race.material = Mud::instance().findMaterial(result->getNextInteger());
-        race.setCharacteristic(result->getNextString());
-        race.available_faction = GetIntVect(result->getNextString());
-        race.player_allow = result->getNextInteger();
-        race.tileSet = result->getNextInteger();
-        race.tileId = result->getNextInteger();
-        race.corpseDescription = result->getNextString();
+        Race * race = new Race();
+        race->vnum = result->getNextInteger();
+        race->article = result->getNextString();
+        race->name = result->getNextString();
+        race->description = result->getNextString();
+        race->material = Mud::instance().findMaterial(result->getNextInteger());
+        race->setCharacteristic(result->getNextString());
+        race->available_faction = GetIntVect(result->getNextString());
+        race->player_allow = result->getNextInteger();
+        race->tileSet = result->getNextInteger();
+        race->tileId = result->getNextInteger();
+        std::string corpseDescription = result->getNextString();
         // Translate new_line.
-        FindAndReplace(race.description, "%r", "\n");
+        FindAndReplace(race->description, "%r", "\n");
+        // Intialize the corpse.
+        race->initializeCorpse(corpseDescription);
         // Check the correctness.
-        if (!race.check())
+        if (!race->check())
         {
             Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
@@ -949,17 +952,17 @@ bool LoadMaterial(ResultSet * result)
     while (result->next())
     {
         // Create an empty Material.
-        Material material;
+        Material * material = new Material();
         // Intialize the material.
-        material.vnum = result->getNextInteger();
-        material.type = (MaterialType) result->getNextInteger();
-        material.name = result->getNextString();
-        material.article = result->getNextString();
-        material.worth = result->getNextInteger();
-        material.hardness = result->getNextInteger();
-        material.lightness = result->getNextInteger();
+        material->vnum = result->getNextInteger();
+        material->type = (MaterialType) result->getNextInteger();
+        material->name = result->getNextString();
+        material->article = result->getNextString();
+        material->worth = result->getNextInteger();
+        material->hardness = result->getNextInteger();
+        material->lightness = result->getNextInteger();
         // Check the correctness.
-        if (!material.check())
+        if (!material->check())
         {
             Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
@@ -978,22 +981,22 @@ bool LoadProfession(ResultSet * result)
     while (result->next())
     {
         // Create an empty Profession.
-        Profession professions;
+        Profession * professions = new Profession();
         // Initialize the profession.
-        professions.vnum = result->getNextUnsignedInteger();
-        professions.name = result->getNextString();
-        professions.description = result->getNextString();
-        professions.command = result->getNextString();
-        professions.posture = (CharacterPosture) result->getNextInteger();
-        professions.action = result->getNextString();
-        professions.startMessage = result->getNextString();
-        professions.finishMessage = result->getNextString();
-        professions.successMessage = result->getNextString();
-        professions.failureMessage = result->getNextString();
-        professions.interruptMessage = result->getNextString();
-        professions.notFoundMessage = result->getNextString();
+        professions->vnum = result->getNextUnsignedInteger();
+        professions->name = result->getNextString();
+        professions->description = result->getNextString();
+        professions->command = result->getNextString();
+        professions->posture = (CharacterPosture) result->getNextInteger();
+        professions->action = result->getNextString();
+        professions->startMessage = result->getNextString();
+        professions->finishMessage = result->getNextString();
+        professions->successMessage = result->getNextString();
+        professions->failureMessage = result->getNextString();
+        professions->interruptMessage = result->getNextString();
+        professions->notFoundMessage = result->getNextString();
         // Check the correctness.
-        if (!professions.check())
+        if (!professions->check())
         {
             Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
@@ -1015,28 +1018,28 @@ bool LoadProduction(ResultSet * result)
         bool check = true;
 
         // Create an empty Production.
-        Production production;
+        Production * production = new Production();
         // Initialize the Production.
-        production.vnum = result->getNextInteger();
-        production.name = result->getNextString();
-        production.profession = Mud::instance().findProfession(result->getNextString());
-        production.difficulty = result->getNextUnsignedInteger();
-        production.time = result->getNextUnsignedInteger();
-        production.assisted = result->getNextInteger();
-        check &= production.setOutcome(result->getNextString());
-        check &= production.setTool(result->getNextString());
-        check &= production.setIngredient(result->getNextString());
-        production.material = static_cast<ResourceType>(result->getNextInteger());
-        production.workbench = static_cast<ToolType>(result->getNextInteger());
+        production->vnum = result->getNextInteger();
+        production->name = result->getNextString();
+        production->profession = Mud::instance().findProfession(result->getNextString());
+        production->difficulty = result->getNextUnsignedInteger();
+        production->time = result->getNextUnsignedInteger();
+        production->assisted = result->getNextInteger();
+        check &= production->setOutcome(result->getNextString());
+        check &= production->setTool(result->getNextString());
+        check &= production->setIngredient(result->getNextString());
+        production->material = static_cast<ResourceType>(result->getNextInteger());
+        production->workbench = static_cast<ToolType>(result->getNextInteger());
 
         // ////////////////////////////////////////////////////////////////
         // Check the correctness.
         if (!check)
         {
-            Logger::log(LogLevel::Error, "The production is incorrect " + production.name);
+            Logger::log(LogLevel::Error, "The production is incorrect " + production->name);
             return false;
         }
-        if (!production.check())
+        if (!production->check())
         {
             Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
@@ -1055,13 +1058,13 @@ bool LoadLiquid(ResultSet * result)
     while (result->next())
     {
         // Create an empty Liquid.
-        Liquid liquid;
+        Liquid * liquid = new Liquid();
         // Load the liquid.
-        liquid.vnum = result->getNextInteger();
-        liquid.name = result->getNextString();
-        liquid.worth = result->getNextInteger();
+        liquid->vnum = result->getNextInteger();
+        liquid->name = result->getNextString();
+        liquid->worth = result->getNextInteger();
         // Check the correctness.
-        if (!liquid.check())
+        if (!liquid->check())
         {
             Logger::log(LogLevel::Error, "Error during error checking.");
             return false;

@@ -41,30 +41,35 @@ Race::Race() :
     player_allow(),
     tileSet(),
     tileId(),
-    corpseDescription()
+    corpse()
 {
-}
-
-Race::Race(const Race & source) :
-    vnum(source.vnum),
-    name(source.name),
-    description(source.description),
-    material(source.material),
-    strength(source.strength),
-    agility(source.agility),
-    perception(source.perception),
-    constitution(source.constitution),
-    intelligence(source.intelligence),
-    available_faction(source.available_faction),
-    player_allow(source.player_allow),
-    tileSet(source.tileSet),
-    tileId(source.tileId),
-    corpseDescription(source.corpseDescription)
-{
+    // Nothing to do.
 }
 
 Race::~Race()
 {
+    Logger::log(LogLevel::Debug, "Deleted race\t\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
+}
+
+void Race::initializeCorpse(const std::string & corpseDescription)
+{
+    corpse.vnum = 0;
+    corpse.name = "corpse";
+    corpse.article = "a";
+    corpse.shortdesc = "the corpse of " + this->getShortDescription();
+    corpse.keys.push_back("corpse");
+    corpse.keys.push_back(name);
+    corpse.description = corpseDescription;
+    corpse.type = ModelType::Corpse;
+    corpse.slot = EquipmentSlot::None;
+    corpse.flags = 0;
+    corpse.weight = 50;
+    corpse.price = 0;
+    corpse.condition = 10;
+    corpse.decay = 1;
+    corpse.material = this->material->type;
+    corpse.tileSet = this->tileSet;
+    corpse.tileId = this->tileId;
 }
 
 bool Race::check()
@@ -79,8 +84,18 @@ bool Race::check()
     assert(constitution > 0);
     assert(intelligence > 0);
     assert(!available_faction.empty());
-    assert(!corpseDescription.empty());
+    //assert(!corpseDescription.empty());
     return true;
+}
+
+std::string Race::getShortDescription(bool capital)
+{
+    std::string shortDescription = this->article + " " + this->name;
+    if (capital)
+    {
+        shortDescription[0] = static_cast<char>(toupper(shortDescription[0]));
+    }
+    return shortDescription;
 }
 
 bool Race::setCharacteristic(std::string source)

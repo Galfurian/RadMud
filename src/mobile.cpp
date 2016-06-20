@@ -51,7 +51,6 @@ Mobile::Mobile() :
 
 Mobile::~Mobile()
 {
-    Logger::log(LogLevel::Debug, "Deleted: Mobile (" + this->getNameCapital() + ").");
     for (auto item : equipment)
     {
         delete (item);
@@ -64,6 +63,7 @@ Mobile::~Mobile()
     {
         room->removeCharacter(this);
     }
+    Logger::log(LogLevel::Debug, "Deleted mobile\t\t\t\t(%s)", this->getNameCapital());
 }
 
 bool Mobile::setAbilities(const std::string & source)
