@@ -61,6 +61,8 @@ class Item
         std::vector<Item *> content;
         /// The liquid inside the container.
         LiquidContent contentLiq;
+        /// Customized weight.
+        unsigned int customWeight;
 
         /// @brief Constructor - Create a new empty item.
         Item();
@@ -112,9 +114,13 @@ class Item
         /// @return The condition of the item.
         std::string getCondition();
 
+        /// @brief Get the item weight.
+        /// @return The weight of just the item.
+        unsigned int getWeight(bool withMaterial);
+
         /// @brief Get the item weight, plus eventually contained item weight.
         /// @return The total weight of the item.
-        unsigned int getWeight();
+        unsigned int getTotalWeight();
 
         /// @brief Return the name of the item.
         /// @return The name of the item.

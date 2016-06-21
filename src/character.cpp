@@ -686,7 +686,7 @@ bool Character::remInventoryItem(Item *item)
 
 bool Character::canCarry(Item * item)
 {
-    return ((this->getCarryingWeight() + item->getWeight()) < this->getMaxCarryingWeight());
+    return ((this->getCarryingWeight() + item->getTotalWeight()) < this->getMaxCarryingWeight());
 }
 
 unsigned int Character::getCarryingWeight()
@@ -694,11 +694,11 @@ unsigned int Character::getCarryingWeight()
     unsigned int carrying = 0;
     for (auto iterator : inventory)
     {
-        carrying += iterator->getWeight();
+        carrying += iterator->getTotalWeight();
     }
     for (auto iterator : equipment)
     {
-        carrying += iterator->getWeight();
+        carrying += iterator->getTotalWeight();
     }
     return carrying;
 }
@@ -1201,7 +1201,7 @@ unsigned int Character::getCooldown(CombatAction combatAction)
             // MIN =  0.00
             // MAX =  1.60
             Item * weapon = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
-            double RHDmod = weapon->getWeight();
+            double RHDmod = weapon->getTotalWeight();
             if (RHDmod > 0)
             {
                 if (RHDmod > 40)
@@ -1217,7 +1217,7 @@ unsigned int Character::getCooldown(CombatAction combatAction)
             // MIN =  0.00
             // MAX =  1.60
             Item * weapon = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
-            double LHDmod = weapon->getWeight();
+            double LHDmod = weapon->getTotalWeight();
             if (LHDmod > 0)
             {
                 if (LHDmod > 40)
@@ -1306,7 +1306,7 @@ bool Character::hasStaminaFor(
             {
                 double WPN = 0;
                 Item * weapon = this->findEquipmentSlotItem(slot);
-                double WPNmod = weapon->getWeight();
+                double WPNmod = weapon->getTotalWeight();
                 if (WPNmod > 0)
                 {
                     if (WPNmod > 40)
@@ -1523,6 +1523,8 @@ void Character::createCorpse()
     // Create a new corpse.
     Logger::log(LogLevel::Debug, "Create a new corpse.");
     Item * corpse = corpseModel->createItem(this->name, race->material, ItemQuality::Normal);
+    // Set the weight of the new corpse.
+    corpse->customWeight = this->weight;
     // Add the corpse to the room.
     Logger::log(LogLevel::Debug, "Add the corpse to the room.");
     room->addItem(corpse);

@@ -46,7 +46,8 @@ Item::Item() :
     container(),
     currentSlot(EquipmentSlot::None),
     content(),
-    contentLiq()
+    contentLiq(),
+    customWeight()
 {
 }
 
@@ -341,13 +342,25 @@ string Item::getCondition()
     return output;
 }
 
-unsigned int Item::getWeight()
+unsigned int Item::getWeight(bool withMaterial)
+{
+    unsigned int result = this->model->weight;
+    if (this->customWeight != 0)
+    {
+        result = this->customWeight;
+    }
+    if (withMaterial)
+    {
+        // Add the addition weight due to the material.
+        result += static_cast<unsigned int>(static_cast<double>(result / 100) * composition->lightness);
+    }
+    return result;
+}
+
+unsigned int Item::getTotalWeight()
 {
     // Add the default weight of the model.
-    unsigned int totalWeight = model->weight;
-
-    // Add the addition weight due to the material.
-    totalWeight += static_cast<unsigned int>(static_cast<double>(model->weight / 100) * composition->lightness);
+    unsigned int totalWeight = this->getWeight(true);
 
     if (model->type == ModelType::Container)
     {
@@ -355,7 +368,7 @@ unsigned int Item::getWeight()
         {
             for (auto iterator : content)
             {
-                totalWeight += iterator->getWeight();
+                totalWeight += iterator->getTotalWeight();
             }
         }
     }
@@ -396,8 +409,8 @@ string Item::getLook()
     output += Formatter::gray() + getDescription() + Formatter::reset() + "\n";
     // Print the content.
     output += lookContent();
-    output += "It weights about " + Formatter::yellow() + ToString(getWeight()) + Formatter::reset() + " " + mud_measure
-        + ".\n";
+    output += "It weights about " + Formatter::yellow() + ToString(this->getTotalWeight()) + Formatter::reset() + " "
+        + mud_measure + ".\n";
 
     return output;
 }
@@ -767,5 +780,5 @@ bool OrderItemByName(Item * first, Item * second)
 
 bool OrderItemByWeight(Item * first, Item * second)
 {
-    return first->getWeight() < second->getWeight();
+    return first->getTotalWeight() < second->getTotalWeight();
 }
