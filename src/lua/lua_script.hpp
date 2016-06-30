@@ -44,14 +44,14 @@ class VectorHelper
     public:
         /// @brief Constructor.
         VectorHelper() :
-                vector()
+            vector()
         {
         }
 
         /// @brief Constructor.
         /// @param _vector The vector which has to be wrapped.
         VectorHelper(const std::vector<T> & _vector) :
-                vector(_vector)
+            vector(_vector)
         {
         }
 

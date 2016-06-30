@@ -306,7 +306,7 @@ void MudUpdater::performActions()
         if (elapsed < 0)
         {
             mobile->triggerEventRandom();
-            mobile->nextActionCooldown = end + std::chrono::seconds(RandInteger(30, 60));
+            mobile->nextActionCooldown = end + std::chrono::seconds(TRandInteger<int>(30, 60));
         }
         mobile->getAction()->perform();
     }

@@ -1641,11 +1641,11 @@ void DoRaceList(Character * character, std::istream & sArgs)
         row.push_back(ToString(race->vnum));
         row.push_back(race->name);
         row.push_back(BoolToString(race->player_allow));
-        row.push_back(ToString(race->strength));
-        row.push_back(ToString(race->agility));
-        row.push_back(ToString(race->perception));
-        row.push_back(ToString(race->constitution));
-        row.push_back(ToString(race->intelligence));
+        row.push_back(ToString(race->getAbility(Ability::Strength)));
+        row.push_back(ToString(race->getAbility(Ability::Agility)));
+        row.push_back(ToString(race->getAbility(Ability::Perception)));
+        row.push_back(ToString(race->getAbility(Ability::Constitution)));
+        row.push_back(ToString(race->getAbility(Ability::Intelligence)));
         // Add the row to the table.
         table.addRow(row);
     }

@@ -42,7 +42,7 @@ void LuaSleep(int sleepTime)
 
 int LuaRandom(int min, int max)
 {
-    return RandInteger(min, max);
+    return TRandInteger<int>(min, max);
 }
 
 Item * LuaLoadItem(Character * maker, int vnumModel, int vnumMaterial, int intQuality)

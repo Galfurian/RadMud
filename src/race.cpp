@@ -24,20 +24,17 @@
 
 // Other Include.
 #include "luabridge/LuaBridge.h"
-#include "utils.hpp"
 #include "formatter.hpp"
+#include "utils.hpp"
+#include "mud.hpp"
 
 Race::Race() :
     vnum(),
     name(),
     description(),
     material(),
-    strength(),
-    agility(),
-    perception(),
-    constitution(),
-    intelligence(),
-    available_faction(),
+    abilities(),
+    availableFaction(),
     player_allow(),
     tileSet(),
     tileId(),
@@ -78,13 +75,6 @@ bool Race::check()
     assert(!name.empty());
     assert(!description.empty());
     assert(material != nullptr);
-    assert(strength > 0);
-    assert(agility > 0);
-    assert(perception > 0);
-    assert(constitution > 0);
-    assert(intelligence > 0);
-    assert(!available_faction.empty());
-    //assert(!corpseDescription.empty());
     return true;
 }
 
@@ -98,60 +88,72 @@ std::string Race::getShortDescription(bool capital)
     return shortDescription;
 }
 
-bool Race::setCharacteristic(std::string source)
+bool Race::setAbilities(std::string source)
 {
     if (source.empty())
     {
         return false;
     }
-    std::vector<std::string> charList = SplitString(source, ";");
-    if (charList.size() != 5)
+    std::vector<std::string> abilityList = SplitString(source, ";");
+    if (abilityList.size() != 5)
     {
         return false;
     }
-    int value = ToNumber<int>(charList[0]);
-    if (value < 0)
+    for (unsigned int it = 0; it < abilityList.size(); ++it)
     {
-        Logger::log(LogLevel::Error, "The list of characteristics contains a negative strength.");
-        return false;
+        Ability ability = static_cast<Ability>(it);
+        abilities[ability] = ToNumber<unsigned int>(abilityList[it]);
     }
-    this->strength = static_cast<unsigned int>(value);
-    value = ToNumber<int>(charList[1]);
-    if (value < 0)
-    {
-        Logger::log(LogLevel::Error, "The list of characteristics contains a negative agility.");
-        return false;
-    }
-    this->agility = static_cast<unsigned int>(value);
-    value = ToNumber<int>(charList[2]);
-    if (value < 0)
-    {
-        Logger::log(LogLevel::Error, "The list of characteristics contains a negative perception.");
-        return false;
-    }
-    this->perception = static_cast<unsigned int>(value);
-    value = ToNumber<int>(charList[3]);
-    if (value < 0)
-    {
-        Logger::log(LogLevel::Error, "The list of characteristics contains a negative constitution.");
-        return false;
-    }
-    this->constitution = static_cast<unsigned int>(value);
-    value = ToNumber<int>(charList[4]);
-    if (value < 0)
-    {
-        Logger::log(LogLevel::Error, "The list of characteristics contains a negative intelligence.");
-        return false;
-    }
-    this->intelligence = static_cast<unsigned int>(value);
     return true;
+}
+
+bool Race::setAvailableFactions(const std::string & source)
+{
+    if (source.empty())
+    {
+        return false;
+    }
+    std::vector<std::string> factionList = SplitString(source, ";");
+    if (factionList.empty())
+    {
+        return false;
+    }
+    for (unsigned int it = 0; it < factionList.size(); ++it)
+    {
+        int factionVnum = ToNumber<int>(factionList[it]);
+        Faction * faction = Mud::instance().findFaction(factionVnum);
+        if (faction == nullptr)
+        {
+            Logger::log(LogLevel::Error, "Can't find the faction: %s.", factionList[it]);
+            return false;
+        }
+        availableFaction.push_back(faction);
+    }
+    return true;
+}
+
+unsigned int Race::getAbility(const Ability & ability)
+{
+    return abilities[ability];
+}
+
+unsigned int Race::getAbilityLua(const unsigned int & abilityNumber)
+{
+    if (AbilityTest::is_value(abilityNumber))
+    {
+        return abilities[static_cast<Ability>(abilityNumber)];
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 bool Race::factionAllowed(int factionVnum)
 {
-    for (unsigned int i = 0; i < available_faction.size(); i++)
+    for (unsigned int it = 0; it < availableFaction.size(); ++it)
     {
-        if (available_faction[i] == factionVnum)
+        if (availableFaction.at(it)->vnum == factionVnum)
         {
             return true;
         }
@@ -166,12 +168,8 @@ void Race::luaRegister(lua_State * L)
     .addData("vnum", &Race::vnum) //
     .addData("name", &Race::name) //
     .addData("material", &Race::material) //
-    .addData("strength", &Race::strength) //
-    .addData("agility", &Race::agility) //
-    .addData("perception", &Race::perception) //
-    .addData("constitution", &Race::constitution) //
-    .addData("intelligence", &Race::intelligence) //
-    .addData("available_faction", &Race::available_faction) //
+    .addFunction("getAbility", &Race::getAbilityLua) //
+    .addData("available_faction", &Race::availableFaction) //
     .endClass();
 }
 

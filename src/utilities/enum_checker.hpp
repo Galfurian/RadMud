@@ -29,6 +29,9 @@ template<typename EnumType>
 class EnumCheck<EnumType>
 {
     public:
+        /// @brief Checks whether the integral value is one of the valid enums.
+        /// @return <b>True</b> if the value is a valid enum,<br>
+        ///         <b>False</b> otherwise.
         template<typename IntType>
         static bool constexpr is_value(IntType)
         {
@@ -44,12 +47,19 @@ class EnumCheck<EnumType, V, Next...> : private EnumCheck<EnumType, Next...>
         using super = EnumCheck<EnumType, Next...>;
 
     public:
+        /// @brief Checks whether the integral value is one of the valid enums.
+        /// @param value The value to check.
+        /// @return <b>True</b> if the value is a valid enum,<br>
+        ///         <b>False</b> otherwise.
         template<typename IntType>
         static bool constexpr is_value(IntType value)
         {
             return value == static_cast<IntType>(V) || super::is_value(value);
         }
 
+        /// @brief Allows to convert the given value to one of the valid enums.
+        /// @param value The value to convert.
+        /// @return The enum version of the integral value.
         template<typename IntType>
         static EnumType convert(IntType value)
         {

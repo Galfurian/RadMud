@@ -358,11 +358,11 @@ void ProcessNewRace(Character * character, std::istream & sArgs)
             {
                 std::string helpMessage;
                 helpMessage += "Help about " + race->name + ".\n";
-                helpMessage += "Strength     " + ToString(race->strength) + ".\n";
-                helpMessage += "Agility      " + ToString(race->agility) + ".\n";
-                helpMessage += "Perception   " + ToString(race->perception) + ".\n";
-                helpMessage += "Constitution " + ToString(race->constitution) + ".\n";
-                helpMessage += "Intelligence " + ToString(race->intelligence) + ".\n";
+                helpMessage += "Strength     " + ToString(race->getAbility(Ability::Strength)) + ".\n";
+                helpMessage += "Agility      " + ToString(race->getAbility(Ability::Agility)) + ".\n";
+                helpMessage += "Perception   " + ToString(race->getAbility(Ability::Perception)) + ".\n";
+                helpMessage += "Constitution " + ToString(race->getAbility(Ability::Constitution)) + ".\n";
+                helpMessage += "Intelligence " + ToString(race->getAbility(Ability::Intelligence)) + ".\n";
                 helpMessage += Formatter::italic() + race->description + Formatter::reset() + "\n";
                 AdvanceCharacterCreation(character, ConnectionState::AwaitingNewRace, helpMessage);
             }
@@ -391,11 +391,11 @@ void ProcessNewRace(Character * character, std::istream & sArgs)
         else
         {
             player->race = race;
-            player->setAbility(Ability::Strength, race->strength);
-            player->setAbility(Ability::Agility, race->agility);
-            player->setAbility(Ability::Perception, race->perception);
-            player->setAbility(Ability::Constitution, race->constitution);
-            player->setAbility(Ability::Intelligence, race->intelligence);
+            player->setAbility(Ability::Strength, race->getAbility(Ability::Strength));
+            player->setAbility(Ability::Agility, race->getAbility(Ability::Agility));
+            player->setAbility(Ability::Perception, race->getAbility(Ability::Perception));
+            player->setAbility(Ability::Constitution, race->getAbility(Ability::Constitution));
+            player->setAbility(Ability::Intelligence, race->getAbility(Ability::Intelligence));
             player->setHealth(player->getMaxHealth(), true);
             player->setStamina(player->getMaxStamina(), true);
             AdvanceCharacterCreation(player, ConnectionState::AwaitingNewAttr);
@@ -423,11 +423,11 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
     else if (ToLower(arguments[0].first) == "reset")
     {
         player->remaining_points = 0;
-        player->setAbility(Ability::Strength, player->race->strength);
-        player->setAbility(Ability::Agility, player->race->agility);
-        player->setAbility(Ability::Perception, player->race->perception);
-        player->setAbility(Ability::Constitution, player->race->constitution);
-        player->setAbility(Ability::Intelligence, player->race->intelligence);
+        player->setAbility(Ability::Strength, player->race->getAbility(Ability::Strength));
+        player->setAbility(Ability::Agility, player->race->getAbility(Ability::Agility));
+        player->setAbility(Ability::Perception, player->race->getAbility(Ability::Perception));
+        player->setAbility(Ability::Constitution, player->race->getAbility(Ability::Constitution));
+        player->setAbility(Ability::Intelligence, player->race->getAbility(Ability::Intelligence));
         AdvanceCharacterCreation(
             character,
             ConnectionState::AwaitingNewAttr,
@@ -507,8 +507,8 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
             else if (arguments[0].first == "1")
             {
                 int result = static_cast<int>(player->getAbility(Ability::Strength, false)) + modifier;
-                int upperBound = static_cast<int>(player->race->strength) + 5;
-                int lowerBound = static_cast<int>(player->race->strength) - 5;
+                int upperBound = static_cast<int>(player->race->getAbility(Ability::Strength)) + 5;
+                int lowerBound = static_cast<int>(player->race->getAbility(Ability::Strength)) - 5;
                 if (lowerBound < 0)
                 {
                     lowerBound = 0;
@@ -530,8 +530,8 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
             else if (arguments[0].first == "2")
             {
                 int result = static_cast<int>(player->getAbility(Ability::Agility, false)) + modifier;
-                int upperBound = static_cast<int>(player->race->agility) + 5;
-                int lowerBound = static_cast<int>(player->race->agility) - 5;
+                int upperBound = static_cast<int>(player->race->getAbility(Ability::Agility)) + 5;
+                int lowerBound = static_cast<int>(player->race->getAbility(Ability::Agility)) - 5;
                 if (lowerBound < 0)
                 {
                     lowerBound = 0;
@@ -553,8 +553,8 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
             else if (arguments[0].first == "3")
             {
                 int result = static_cast<int>(player->getAbility(Ability::Perception, false)) + modifier;
-                int upperBound = static_cast<int>(player->race->perception) + 5;
-                int lowerBound = static_cast<int>(player->race->perception) - 5;
+                int upperBound = static_cast<int>(player->race->getAbility(Ability::Perception)) + 5;
+                int lowerBound = static_cast<int>(player->race->getAbility(Ability::Perception)) - 5;
                 if (lowerBound < 0)
                 {
                     lowerBound = 0;
@@ -576,8 +576,8 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
             else if (arguments[0].first == "4")
             {
                 int result = static_cast<int>(player->getAbility(Ability::Constitution, false)) + modifier;
-                int upperBound = static_cast<int>(player->race->constitution) + 5;
-                int lowerBound = static_cast<int>(player->race->constitution) - 5;
+                int upperBound = static_cast<int>(player->race->getAbility(Ability::Constitution)) + 5;
+                int lowerBound = static_cast<int>(player->race->getAbility(Ability::Constitution)) - 5;
                 if (lowerBound < 0)
                 {
                     lowerBound = 0;
@@ -599,8 +599,8 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
             else if (arguments[0].first == "5")
             {
                 int result = static_cast<int>(player->getAbility(Ability::Intelligence, false)) + modifier;
-                int upperBound = static_cast<int>(player->race->intelligence) + 5;
-                int lowerBound = static_cast<int>(player->race->intelligence) - 5;
+                int upperBound = static_cast<int>(player->race->getAbility(Ability::Intelligence)) + 5;
+                int lowerBound = static_cast<int>(player->race->getAbility(Ability::Intelligence)) - 5;
                 if (lowerBound < 0)
                 {
                     lowerBound = 0;
@@ -1023,11 +1023,11 @@ void RollbackCharacterCreation(Character * character, ConnectionState new_state)
     }
     else if (new_state == ConnectionState::AwaitingNewAttr)
     {
-        player->setAbility(Ability::Strength, player->race->strength);
-        player->setAbility(Ability::Agility, player->race->agility);
-        player->setAbility(Ability::Perception, player->race->perception);
-        player->setAbility(Ability::Constitution, player->race->constitution);
-        player->setAbility(Ability::Intelligence, player->race->intelligence);
+        player->setAbility(Ability::Strength, player->race->getAbility(Ability::Strength));
+        player->setAbility(Ability::Agility, player->race->getAbility(Ability::Agility));
+        player->setAbility(Ability::Perception, player->race->getAbility(Ability::Perception));
+        player->setAbility(Ability::Constitution, player->race->getAbility(Ability::Constitution));
+        player->setAbility(Ability::Intelligence, player->race->getAbility(Ability::Intelligence));
     }
     else if (new_state == ConnectionState::AwaitingNewGender)
     {

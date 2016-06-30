@@ -34,8 +34,8 @@ SQLiteDbms::SQLiteDbms()
     tableLoaders.push_back(std::make_pair("News", LoadNews));
     tableLoaders.push_back(std::make_pair("Material", LoadMaterial));
     tableLoaders.push_back(std::make_pair("Skill", LoadSkill));
-    tableLoaders.push_back(std::make_pair("Race", LoadRace));
     tableLoaders.push_back(std::make_pair("Faction", LoadFaction));
+    tableLoaders.push_back(std::make_pair("Race", LoadRace));
     tableLoaders.push_back(std::make_pair("Continent", LoadContinent));
     tableLoaders.push_back(std::make_pair("Area", LoadArea));
     tableLoaders.push_back(std::make_pair("Room", LoadRoom));
@@ -641,8 +641,8 @@ bool LoadRace(ResultSet * result)
         race->name = result->getNextString();
         race->description = result->getNextString();
         race->material = Mud::instance().findMaterial(result->getNextInteger());
-        race->setCharacteristic(result->getNextString());
-        race->available_faction = GetIntVect(result->getNextString());
+        race->setAbilities(result->getNextString());
+        race->setAvailableFactions(result->getNextString());
         race->player_allow = result->getNextInteger();
         race->tileSet = result->getNextInteger();
         race->tileId = result->getNextInteger();

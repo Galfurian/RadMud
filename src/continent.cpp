@@ -45,7 +45,7 @@ Continent::Continent() :
 
 Continent::~Continent()
 {
-    // Nothing to do.
+    Logger::log(LogLevel::Debug, "Deleted continent\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
 }
 
 bool Continent::check()

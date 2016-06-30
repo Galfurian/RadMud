@@ -27,7 +27,9 @@ template<typename T>
 class Map3D
 {
     private:
+        /// Structure used as key for the map.
         typedef std::tuple<int, int, int> key_t;
+        /// The structure of the 3d map.
         typedef typename std::map<key_t, T> DataMatrix3D;
         /// Width of th map.
         int width;
@@ -39,8 +41,9 @@ class Map3D
         DataMatrix3D data;
 
     public:
+        /// Iterator for the 3D structure.
         typedef typename DataMatrix3D::iterator iterator;
-
+        /// Const iterator for the 3D structure.
         typedef typename DataMatrix3D::const_iterator const_iterator;
 
         /// @brief Constructor.
@@ -140,16 +143,22 @@ class Map3D
             return FindErase(data, std::make_tuple(x, y, z));
         }
 
+        /// @brief Provides an iterator to the begin of the list of data.
+        /// @return An iterator to the begin of the 3D map.
         iterator begin()
         {
             return data.begin();
         }
 
+        /// @brief Provides an iterator to the end of the list of data.
+        /// @return An iterator to the end of the 3D map.
         iterator end()
         {
             return data.end();
         }
 
+        /// @brief Provides the size of the data.
+        /// @return The size of the 3D map.
         size_t size()
         {
             return data.size();

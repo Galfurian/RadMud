@@ -141,58 +141,14 @@ std::string ToCapitals(const std::string & source);
 /// @return The splitted string.
 std::vector<std::string> SplitString(const std::string & source, const std::string & delimiter);
 
-template<typename T, typename std::enable_if<!std::is_integral<T>::value>::type>
-std::vector<T> SplitString(const std::string & source, const std::string & delimiter)
-{
-    std::vector<T> result;
-    size_t pos = 0;
-    std::string tmp = source;
-    while ((pos = tmp.find(delimiter)) != std::string::npos)
-    {
-        result.push_back(tmp.substr(0, pos));
-        tmp.erase(0, pos + delimiter.length());
-    }
-    if (!tmp.empty())
-    {
-        result.push_back(tmp);
-    }
-    return result;
-}
-
-template<typename T, typename std::enable_if<std::is_integral<T>::value>::type>
-std::vector<T> SplitString(const std::string & source, const std::string & delimiter)
-{
-    std::vector<T> result;
-    size_t pos = 0;
-    std::string tmp = source;
-    while ((pos = tmp.find(delimiter)) != std::string::npos)
-    {
-        char * pEnd;
-        result.push_back(static_cast<T>(strtol(tmp.substr(0, pos).c_str(), &pEnd, 10)));
-        tmp.erase(0, pos + delimiter.length());
-    }
-    if (!tmp.empty())
-    {
-        result.push_back(tmp);
-    }
-    return result;
-}
-
 /// @brief Get all the words in the source string.
 /// @param source The source string.
 /// @return A vector containing the words of the source string.
 std::vector<std::string> GetWords(const std::string & source);
 
-/// @brief Get all the integers in the source string.
+/// @brief Get all the integral values inside the source string.
 /// @param source The source string.
-/// @return A vector containing the integers of the source string.
-std::vector<int> GetIntVect(const std::string & source);
-
-/// @brief Get all the integers in the source string.
-/// @param source The source string.
-/// @return A vector containing the integers of the source string.
-std::vector<Byte> GetByteVect(const std::string & source);
-
+/// @return A vector containing the retrieved integral values.
 template<typename ValueType>
 std::vector<ValueType> GetNumberVect(const std::string & source)
 {
@@ -307,17 +263,12 @@ std::string AlignString(const std::string & source, const StringAlign & alignmen
 /// @return <b>True</b> if the string it's made of all ASCII characters.<br><b>False</b> otherwise.
 bool IsAllASCII(const char *string_to_check);
 
-/// @brief Generate a random integer between the defined range.
-/// @param nMin Min value.
-/// @param nMax Max value.
-/// @return The generated integer.
-int RandInteger(const int & nMin, const int & nMax);
-
-/// @brief Transform a numeric value into a string.
-/// @param value The value to turn into a string.
-/// @return The resulting string.
+/// @brief Generate a random integral value between the defined range.
+/// @param lowerBound The lower bound for the random value.
+/// @param upperBound The upper bound for the random value.
+/// @return The generated random value.
 template<typename ValueType>
-ValueType TRandInteger(const ValueType & lower_bound, const ValueType & upper_bound)
+ValueType TRandInteger(const ValueType & lowerBound, const ValueType & upperBound)
 {
     static_assert((
             std::is_same<ValueType, bool>::value ||
@@ -328,7 +279,7 @@ ValueType TRandInteger(const ValueType & lower_bound, const ValueType & upper_bo
             std::is_same<ValueType,double>::value), "template parameter is of the wrong type");
 
     std::random_device rng;
-    std::uniform_int_distribution<ValueType> uid(lower_bound, upper_bound);
+    std::uniform_int_distribution<ValueType> uid(lowerBound, upperBound);
     return uid(rng);
 }
 

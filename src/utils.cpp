@@ -141,30 +141,6 @@ std::vector<std::string> GetWords(const std::string & source)
     return working;
 }
 
-std::vector<int> GetIntVect(const std::string & source)
-{
-    std::stringstream line(source);
-    std::vector<int> output_vector;
-    int buffer;
-    while (line >> buffer)
-    {
-        output_vector.push_back(buffer);
-    }
-    return output_vector;
-}
-
-std::vector<Byte> GetByteVect(const std::string & source)
-{
-    std::stringstream line(source);
-    std::vector<Byte> output_vector;
-    int buffer;
-    while (line >> buffer)
-    {
-        output_vector.push_back(static_cast<Byte>(buffer));
-    }
-    return output_vector;
-}
-
 std::string GetFormattedTime()
 {
     time_t now = time(NULL);
@@ -275,13 +251,6 @@ bool IsAllASCII(const char * string_to_check)
         }
     }
     return true;
-}
-
-int RandInteger(const int & nMin, const int & nMax)
-{
-    std::random_device rng;
-    std::uniform_int_distribution<int> uid(nMin, nMax);
-    return uid(rng);
 }
 
 bool IsNumber(const std::string & source)

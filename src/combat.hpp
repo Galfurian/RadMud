@@ -57,8 +57,11 @@ class OpponentsList
 {
         friend class Character;
     public:
+        /// Type of structure which contains aggressors.
         typedef typename std::vector<Aggression> AggressorVector;
+        /// Iterator for an aggressor vector.
         typedef typename std::vector<Aggression>::iterator iterator;
+        /// Constant iterator for an aggressor vector.
         typedef typename std::vector<Aggression>::const_iterator const_iterator;
     private:
         /// Owner of the list.
@@ -130,8 +133,12 @@ class OpponentsList
         /// @brief Check and clear the list from possible disconnected players.
         void checkList();
 
+        /// @brief Provides an iterator to the begin of the list of aggressors.
+        /// @return An iterator to the begin of the vector of aggressors.
         iterator begin();
 
+        /// @brief Provides an iterator to the end of the list of aggressors.
+        /// @return An iterator to the end of the vector of aggressors.
         iterator end();
 
     private:

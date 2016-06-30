@@ -96,6 +96,9 @@ class Mobile: public Character
         /// @return Seconds until respawn.
         int64_t getRespawnTime();
 
+        /// @brief Check if the mobile can be respawned.
+        /// @return <b>True</b> if it can be respawned,<br>
+        ///         <b>False</b> Otherwise.
         bool canRespawn();
 
         /// @brief Reload the LUA enviroment of the mobile.

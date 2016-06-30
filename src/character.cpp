@@ -66,19 +66,6 @@ Character::~Character()
     // Nothing to do.
 }
 
-bool Character::setAbility(Ability ability, unsigned int value)
-{
-    if (AbilityTest::is_value(ability))
-    {
-        if (value <= 60)
-        {
-            abilities[ability] = value;
-            return true;
-        }
-    }
-    return false;
-}
-
 bool Character::check()
 {
     bool safe = true;
@@ -186,6 +173,19 @@ string Character::getPossessivePronoun()
     return "its";
 }
 
+bool Character::setAbility(const Ability & ability, const unsigned int & value)
+{
+    if (value <= 60)
+    {
+        abilities[ability] = value;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 unsigned int Character::getAbility(const Ability & ability, bool withEffects)
 {
     if (AbilityTest::is_value(ability))
@@ -225,7 +225,6 @@ unsigned int Character::getAbilityLog(
     const double & multiplier,
     const bool & withEffects)
 {
-    // Value = Base + (Multiplier * log10(AbilityModifier))
     double result = base;
     double modifier = static_cast<double>(this->getAbilityModifier(ability, withEffects));
     if (modifier > 0)
@@ -1401,10 +1400,7 @@ bool Character::addHealth(const unsigned int & value, const bool & force)
             return false;
         }
     }
-    else
-    {
-        this->health = result;
-    }
+    this->health = result;
     return true;
 }
 
@@ -1422,10 +1418,7 @@ bool Character::remHealth(const unsigned int & value, const bool & force)
             return false;
         }
     }
-    else
-    {
-        this->health = static_cast<unsigned int>(result);
-    }
+    this->health = static_cast<unsigned int>(result);
     return true;
 }
 
@@ -1467,10 +1460,7 @@ bool Character::addStamina(const unsigned int & value, const bool & force)
             return false;
         }
     }
-    else
-    {
-        this->stamina = result;
-    }
+    this->stamina = result;
     return true;
 }
 
@@ -1488,10 +1478,7 @@ bool Character::remStamina(const unsigned int & value, const bool & force)
             return false;
         }
     }
-    else
-    {
-        this->stamina = static_cast<unsigned int>(result);
-    }
+    this->stamina = static_cast<unsigned int>(result);
     return true;
 }
 

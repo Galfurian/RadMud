@@ -31,19 +31,29 @@ class Generator
         /// @brief Destructor.
         ~Generator();
 
+        /// Struct used to characterize a zone.
         struct ZoneBaseNaming
         {
+                /// The name of the zone.
                 std::string name;
+                /// The list of names for rooms inside this kind of zone.
                 std::vector<std::string> names;
+                /// The list of descriptions for rooms inside this kind of zone.
                 std::vector<std::string> descriptions;
         };
+        /// Struct used to characterize a zone status.
         struct ZoneStatusNaming
         {
+                /// The name of the status.
                 std::string name;
+                /// The list of status for rooms inside this kind of zone.
                 std::vector<std::string> namesStatus;
+                /// The list of modified descriptions for rooms inside this kind of zone.
                 std::vector<std::string> descriptionStatus;
         };
+        /// Map between a type of area and the corresponding naming struct.
         std::map<AreaType, ZoneBaseNaming> mapBase;
+        /// Map between the status of an area and the corresponding status naming struct.
         std::map<AreaStatus, ZoneStatusNaming> mapStatus;
 
         /// @brief Generate the room name and description.

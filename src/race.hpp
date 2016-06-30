@@ -26,6 +26,7 @@
 
 #include "lua/lua_script.hpp"
 #include "material.hpp"
+#include "faction.hpp"
 #include "model.hpp"
 
 /// @brief Holds details about a race.
@@ -42,18 +43,10 @@ class Race
         std::string description;
         /// The material of which are made the entity of this race.
         Material * material;
-        /// The base strength value of the race.
-        unsigned int strength;
-        /// The base agility value of the race.
-        unsigned int agility;
-        /// The base perception value of the race.
-        unsigned int perception;
-        /// The base constitution value of the race.
-        unsigned int constitution;
-        /// The base intelligence value of the race.
-        unsigned int intelligence;
+        /// Base race abilities.
+        std::map<Ability, unsigned int> abilities;
         /// The factions that a player of this race can choose.
-        std::vector<int> available_faction;
+        FactionList availableFaction;
         /// The flag that indicates if the race is selectable by the player during
         ///  character creation.
         bool player_allow;
@@ -92,14 +85,34 @@ class Race
         ///         <b>False</b> otherwise.
         bool check();
 
+        /// @brief Return the short description of this race.
+        /// @param capital If true the return description starts with a capital.
+        /// @return The short description.
         std::string getShortDescription(bool capital = false);
 
         /// @brief Given a source string, this function parse the string
-        ///         and sets the race characteristics.
-        /// @param source Contains the list of characteristics.
+        ///         and sets the race abilities.
+        /// @param source Contains the list of abilities.
         /// @return <b>True</b> if the operation succeeded,<br>
         ///         <b>False</b> otherwise.
-        bool setCharacteristic(std::string source);
+        bool setAbilities(std::string source);
+
+        /// @brief Given a source string, this function parse the string
+        ///         and sets the list of available factions for this race.
+        /// @param source Contains the list of available factions.
+        /// @return <b>True</b> if the operation succeeded,<br>
+        ///         <b>False</b> otherwise.
+        bool setAvailableFactions(const std::string & source);
+
+        /// @brief Provides the value of the given ability.
+        /// @param ability The ability to retrieve.
+        /// @return The overall ability value.
+        unsigned int getAbility(const Ability & ability);
+
+        /// @brief Provides the value of the given ability IF the ability number is correct.
+        /// @param abilityNumber The ability to retrieve.
+        /// @return The overall ability value (if the number is not valid it returns 0).
+        unsigned int getAbilityLua(const unsigned int & abilityNumber);
 
         /// @brief Given a faction vnum, answer True if it's compatible with this race.
         /// @param factionVnum The given faction vnum.

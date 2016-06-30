@@ -49,8 +49,6 @@
 
 using namespace std;
 
-#define BUFSIZE 512
-
 Player::Player(const int & _socket, const int & _port, const std::string & _address) :
     psocket(_socket),
     port(_port),
@@ -423,6 +421,9 @@ void Player::processInput(Player * player, const string & command)
         sendMsg(std::string(e.what()) + "\n");
     }
 }
+
+/// Buffer used for the reading process.
+#define BUFSIZE 512
 
 void Player::processRead()
 {

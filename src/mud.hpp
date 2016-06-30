@@ -88,6 +88,7 @@ extern "C"
 class Mud
 {
     private:
+        /// The port at which the mud is listening.
         uint16_t mudPort;
 
         /// @brief Constructor.

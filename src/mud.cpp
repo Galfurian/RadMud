@@ -101,6 +101,11 @@ Mud::~Mud()
     {
         delete (iterator.second);
     }
+    Logger::log(LogLevel::Global, "Freeing memory occupied by factions...");
+    for (auto iterator : Mud::instance().mudFactions)
+    {
+        delete (iterator.second);
+    }
     Logger::log(LogLevel::Global, "Freeing memory occupied by liquids...");
     for (auto iterator : Mud::instance().mudLiquids)
     {
@@ -118,6 +123,16 @@ Mud::~Mud()
     }
     Logger::log(LogLevel::Global, "Freeing memory occupied by materials...");
     for (auto iterator : Mud::instance().mudMaterials)
+    {
+        delete (iterator.second);
+    }
+    Logger::log(LogLevel::Global, "Freeing memory occupied by continents...");
+    for (auto iterator : Mud::instance().mudContinents)
+    {
+        delete (iterator.second);
+    }
+    Logger::log(LogLevel::Global, "Freeing memory occupied by skills...");
+    for (auto iterator : Mud::instance().mudSkills)
     {
         delete (iterator.second);
     }

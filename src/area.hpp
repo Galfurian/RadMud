@@ -169,6 +169,8 @@ class Area
         /// @param target_y The target y coordinate.
         /// @param target_z The target z coordinate.
         /// @param radius   The radius of visibility.
+        /// @return <b>True</b> if the target room is in sight,<br>
+        ///         <b>False</b> otherwise.
         bool fastInSight(
             int origin_x,
             int origin_y,
@@ -180,8 +182,10 @@ class Area
 
         /// @brief Determine if a coordinate is in sight from a starting one.
         /// @param origin The coordinates of the origin.
-        /// @param origin The coordinates of the target room.
+        /// @param target The coordinates of the target room.
         /// @param radius The radius of visibility.
+        /// @return <b>True</b> if the target room is in sight,<br>
+        ///         <b>False</b> otherwise.
         bool fastInSight(Coordinates<int> origin, Coordinates<int> target, unsigned int radius);
 
         /// @brief Function used to register inside the lua environment the class.

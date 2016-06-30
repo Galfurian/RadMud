@@ -36,6 +36,7 @@ typedef enum class Abilities
     Constitution,
     Intelligence
 } Ability;
+/// Tester for ability enums.
 using AbilityTest = EnumCheck<Ability,
 Ability::Strength,
 Ability::Agility,
@@ -106,6 +107,7 @@ typedef enum class TelnetChars
     /// I will send a format string.
     FORMAT = 100
 } TelnetChar;
+/// Tester for telnet enums.
 using TelnetCharTest = EnumCheck<TelnetChar,
 //TelnetChar::Echo,
 //TelnetChar::SuppressGoAhead,

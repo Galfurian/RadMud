@@ -24,6 +24,7 @@
 
 // Other Include.
 #include "utils.hpp"
+#include "logger.hpp"
 
 Skill::Skill() :
     vnum(),
@@ -36,7 +37,7 @@ Skill::Skill() :
 
 Skill::~Skill()
 {
-    // Nothing to do.
+    Logger::log(LogLevel::Debug, "Deleted skill\t\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
 }
 
 bool Skill::check()

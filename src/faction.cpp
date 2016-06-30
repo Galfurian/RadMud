@@ -25,6 +25,7 @@
 // Other Include.
 #include "luabridge/LuaBridge.h"
 #include "utils.hpp"
+#include "logger.hpp"
 
 Faction::Faction() :
     vnum(),
@@ -36,7 +37,7 @@ Faction::Faction() :
 
 Faction::~Faction()
 {
-    // Nothing to do.
+    Logger::log(LogLevel::Debug, "Deleted faction\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
 }
 
 bool Faction::check()

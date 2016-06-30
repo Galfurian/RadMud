@@ -54,7 +54,8 @@ class Exit
         ~Exit();
 
         /// @brief Check the correctness of the exit.
-        /// @return <b>True</b> if it has correct values,<br><b>False</b> otherwise.
+        /// @return <b>True</b> if it has correct values,<br>
+        ///         <b>False</b> otherwise.
         bool check();
 
         /// @brief Get the opposite direction.
@@ -69,6 +70,9 @@ class Exit
         /// @return The direction.
         std::string getDirection();
 
+        /// @brief Unlink the current exit from its source.
+        /// @return <b>True</b> if the operation succeeded,<br>
+        ///         <b>False</b> otherwise.
         bool unlink() const;
 
         /// @brief Define operator eual.

@@ -156,6 +156,10 @@ class Room
         /// @return The mobile, if it's in the room.
         Mobile * findMobile(std::string target, int & number, Mobile * exception = nullptr);
 
+        /// @brief Add the provided exit to the room list of exits.
+        /// @param exit The exit to add to the list.
+        /// @return <b>True</b> if there is NO other exits in the same direction,<br>
+        ///         <b>False</b> otherwise.
         bool addExit(std::shared_ptr<Exit> exit);
 
         /// @brief Remove from the list of exits the one on the given direction.
@@ -182,6 +186,8 @@ class Room
         /// @return The contained door if there is one.
         Item * findDoor();
 
+        /// @brief Provides the list of directions where an exit is present.
+        /// @return Vector of directions.
         std::vector<Direction> getAvailableDirections();
 
         /// @brief Provide a detailed description of the room.
@@ -190,13 +196,13 @@ class Room
         std::string getLook(Character * exception);
 
         /// @brief Send a message to all the player in the room, can specify exceptions.
-        /// @param message   The message to send.
-        /// @param source    The source of the message.
-        /// @param exception Another exception to the message.
+        /// @param message    The message to send.
+        /// @param exceptions The list of exceptions.
         void sendToAll(const std::string & message, const CharacterVector & exceptions);
 
         /// @brief Print to consol and to logging file the gievn string.
-        /// @param msg   The message to send
+        /// @param message    The message to send.
+        /// @param exceptions The list of exceptions.
         /// @param first The first unpacked argument.
         /// @param args  Packed arguments.
         template<typename ... Args>

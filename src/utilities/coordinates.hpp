@@ -116,6 +116,8 @@ class Coordinates
             return coord;
         }
 
+        /// @brief Provides the string version of the coordinates.
+        /// @return A string representing the coordinates.
         std::string toString() const
         {
             return "[X:" + ToString(x) + "; Y:" + ToString(y) + "; Z:" + ToString(z) + "]";

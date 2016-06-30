@@ -8,6 +8,8 @@ local foundTree = false;
 EventInit=function(self)
 	-- Put event code here.
 	self:doCommand("look");
+	print(self.race.name);
+	print(self.race:getAbility(1));
 end
 
 -- Handle the actions when in combat.
