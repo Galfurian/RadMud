@@ -350,10 +350,10 @@ bool Player::remEquipmentItem(Item * item)
 // DEATH //////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
 
-void Player::triggerDeath()
+void Player::kill()
 {
     // Call the method of the father class.
-    Character::triggerDeath();
+    Character::kill();
     // Move the player to the default room.
     if ((room = Mud::instance().findRoom(rent_room)) != nullptr)
     {

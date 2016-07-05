@@ -54,8 +54,8 @@ class Action
         std::vector<Item *> usedIngredients;
         /// The time point in the future needed by the action to complete.
         TimeClock actionCooldown;
-        /// Next combat action.
-        CombatAction nextCombatAction;
+        /// The current combat action.
+        CombatAction combatAction;
 
     public:
         /// @brief Constructor with init values.
@@ -68,15 +68,19 @@ class Action
         Action(const Action & source) = delete;
 
         /// @brief Disable assign operator.
-        Action& operator=(const Action&) = delete;
+        Action & operator=(const Action&) = delete;
 
         /// @brief Provides the type of the action.
         /// @return The type of action.
-        ActionType getType();
+        ActionType getType() const;
+
+        /// @brief Provides a copy of the combat action.
+        /// @return The combat action.
+        CombatAction getCombatAction() const;
 
         /// @brief Provides the description of the action.
         /// @return The string which describe the current action.
-        std::string getDescription();
+        std::string getDescription() const;
 
         /// @brief Stops the current action and returns a string which describe the intterruption.
         /// @return The stopping description.
@@ -89,7 +93,8 @@ class Action
         /// @param _destination The destionation of the movement.
         /// @param _direction   The direction of the movement.
         /// @param _cooldown    How many seconds are required to complete the movement.
-        /// @return <b>True</b> if it has correct values,<br> <b>False</b> otherwise.
+        /// @return <b>True</b> if it has correct values,<br>
+        ///         <b>False</b> otherwise.
         bool setMove(Room * _destination, Direction _direction, unsigned int _cooldown);
 
         /// @brief Allows to set a crafting action.
@@ -98,7 +103,8 @@ class Action
         /// @param _usedIngredients The list of used ingredients.
         /// @param _craftMaterial   The material of the outcome.
         /// @param _cooldown        How many seconds are required to complete the action.
-        /// @return <b>True</b> if it has correct values,<br> <b>False</b> otherwise.
+        /// @return <b>True</b> if it has correct values,<br>
+        ///         <b>False</b> otherwise.
         bool setCraft(
             Production * _production,
             ItemVector & _usedTools,
@@ -112,7 +118,8 @@ class Action
         /// @param _usedTools       The list of used tools.
         /// @param _usedIngredients The list of used ingredients.
         /// @param _cooldown        How many seconds are required to complete the action.
-        /// @return <b>True</b> if it has correct values,<br> <b>False</b> otherwise.
+        /// @return <b>True</b> if it has correct values,<br>
+        ///         <b>False</b> otherwise.
         bool setBuild(
             Building * _schematics,
             Item * _itemTarget,
@@ -131,15 +138,13 @@ class Action
         ///			<b>False</b> otherwise.
         bool setNextCombatAction(const CombatAction & nextAction);
 
-        /// @brief Provides a copy of the next combat action.
-        CombatAction getNextCombatAction() const;
-
         /// @brief This function resets the action.
         void reset();
 
     private:
         /// @brief Check if the cooldown of the action is elapsed.
-        /// @return <b>True</b> if the time has passed,<br> <b>False</b> otherwise.
+        /// @return <b>True</b> if the time has passed,<br>
+        ///         <b>False</b> otherwise.
         bool checkElapsed();
 
         /// @brief Perform a Move action.

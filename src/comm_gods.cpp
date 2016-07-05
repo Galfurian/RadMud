@@ -1021,7 +1021,7 @@ void DoMobileKill(Character * character, std::istream & sArgs)
         return;
     }
     // Kill the mob.
-    mobile->triggerDeath();
+    mobile->kill();
     // Notify the death.
     character->sendMsg("You snap your fingers.\n");
     character->room->sendToAll("%s fall to the ground dead.", CharacterVector(), mobile->getNameCapital());

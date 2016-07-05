@@ -37,7 +37,7 @@ Action::Action(Character * _character) :
     usedTools(),
     usedIngredients(),
     actionCooldown(),
-    nextCombatAction()
+    combatAction()
 {
     // Nothing to do.
 }
@@ -47,12 +47,17 @@ Action::~Action()
     // Nothing to do.
 }
 
-ActionType Action::getType()
+ActionType Action::getType() const
 {
     return this->type;
 }
 
-std::string Action::getDescription()
+CombatAction Action::getCombatAction() const
+{
+    return this->combatAction;
+}
+
+std::string Action::getDescription() const
 {
     if (this->type == ActionType::Move)
     {
@@ -275,17 +280,12 @@ bool Action::setNextCombatAction(const CombatAction & nextAction)
         return false;
     }
     // Set the next combat action.
-    nextCombatAction = nextAction;
+    combatAction = nextAction;
     // Set the action cooldown.
-    unsigned int cooldown = actor->getCooldown(nextCombatAction);
+    unsigned int cooldown = actor->getCooldown(combatAction);
     actionCooldown = std::chrono::system_clock::now() + std::chrono::seconds(cooldown);
     Logger::log(LogLevel::Debug, "[%s] Next action in %s.", actor->getNameCapital(), ToString(cooldown));
     return true;
-}
-
-CombatAction Action::getNextCombatAction() const
-{
-    return this->nextCombatAction;
 }
 
 void Action::reset()
@@ -301,7 +301,7 @@ void Action::reset()
     usedTools.clear();
     usedIngredients.clear();
     actionCooldown = std::chrono::system_clock::now();
-    nextCombatAction = CombatAction::NoAction;
+    combatAction = CombatAction::NoAction;
 }
 
 bool Action::checkElapsed()
@@ -317,32 +317,31 @@ void Action::performMove()
     {
         return;
     }
-
+    // Create a variable which will contain the ammount of consumed stamina.
     unsigned int consumedStamina;
     // Check if the actor has enough stamina to execute the action.
-    if (!actor->hasStaminaFor(consumedStamina, ActionType::Crafting))
+    if (actor->hasStaminaFor(consumedStamina, ActionType::Move))
     {
+        // Consume the stamina.
+        actor->remStamina(consumedStamina);
+        // Move character.
+        actor->moveTo(
+            destination,
+            actor->getNameCapital() + " goes " + GetDirectionName(direction) + ".\n",
+            actor->getNameCapital() + " arives from " + GetDirectionName(InverDirection(direction)) + ".\n");
+    }
+    else
+    {
+        // Notify that the actor can't move because too tired.
         actor->sendMsg("You are too tired right now.\n");
+        // Debugging log.
         Logger::log(
             LogLevel::Debug,
             "[%s] Has %s stamina and needs %s.",
             actor->getName(),
             ToString(actor->getStamina()),
             ToString(consumedStamina));
-        this->reset();
-        return;
     }
-
-    // Consume the stamina.
-    actor->addStamina(consumedStamina);
-
-    // Define departure message.
-    std::string msgDepart = actor->getNameCapital() + " goes " + GetDirectionName(direction) + ".\n";
-    // Define arrival message.
-    std::string msgArrive = actor->getNameCapital() + " arives from " + GetDirectionName(InverDirection(direction))
-        + ".\n";
-    // Move character.
-    actor->moveTo(destination, msgDepart, msgArrive);
     // Return the character in waiting status.
     this->reset();
 }
@@ -834,15 +833,15 @@ void Action::performComb()
 
     // Check the list of opponents.
     actor->opponents.checkList();
-    if (nextCombatAction == CombatAction::BasicAttack)
+    if (combatAction == CombatAction::BasicAttack)
     {
         // Perform the combat action.
-        this->performCombatAction(nextCombatAction);
+        this->performCombatAction(combatAction);
     }
-    else if (nextCombatAction == CombatAction::Flee)
+    else if (combatAction == CombatAction::Flee)
     {
         // Perform the combat action.
-        this->performCombatAction(nextCombatAction);
+        this->performCombatAction(combatAction);
     }
     else
     {
@@ -994,6 +993,11 @@ void Action::performCombatAction(const CombatAction & move)
                         critical,
                         iterator->getName(),
                         ToString(DMG));
+                    // Procede and remove the damage from the health of the target.
+                    if (!enemy->remHealth(DMG))
+                    {
+                        enemy->kill();
+                    }
                 }
             }
         }

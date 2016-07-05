@@ -90,7 +90,7 @@ class Mobile: public Character
         bool hasAction(const std::string & _action) const;
 
         /// @brief Handle what happend when this mob die.
-        void triggerDeath();
+        void kill();
 
         /// @brief Return the number of second until next respawn.
         /// @return Seconds until respawn.

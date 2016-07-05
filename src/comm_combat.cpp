@@ -147,7 +147,7 @@ void DoFlee(Character * character, std::istream & sArgs)
         return;
     }
     // Check if the character is already trying to flee.
-    if (character->getAction()->getNextCombatAction() == CombatAction::Flee)
+    if (character->getAction()->getCombatAction() == CombatAction::Flee)
     {
         character->sendMsg("You are already trying to flee.\n");
         return;

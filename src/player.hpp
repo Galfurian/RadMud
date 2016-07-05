@@ -137,7 +137,7 @@ class Player: public Character
         bool remEquipmentItem(Item * item);
 
         /// @brief Handle what happend when this player die.
-        void triggerDeath();
+        void kill();
 
         /// @brief Handle player has entered the game.
         void enterGame();

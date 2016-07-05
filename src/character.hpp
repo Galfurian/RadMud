@@ -463,7 +463,7 @@ class Character
         unsigned int getStamina();
 
         /// @brief Handle what happend when this character die.
-        virtual void triggerDeath();
+        virtual void kill();
 
         /// @brief Create a corpse on the ground.
         void createCorpse();

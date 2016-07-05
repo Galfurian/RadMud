@@ -240,10 +240,8 @@ unsigned int Character::getAbilityLog(
 
 unsigned int Character::getMaxHealth(bool withEffects)
 {
-    // Value = 100 + (10 * AbilityModifier(Constitution))
-    // MIN   = 100
-    // MAX   = 350
-    unsigned int BASE = 100 + (10 * this->getAbilityModifier(Ability::Constitution));
+    // Value = 40 + (10 * AbilityModifier(Constitution))
+    unsigned int BASE = 40 + (10 * this->getAbilityModifier(Ability::Constitution));
     if (!withEffects)
     {
         return BASE;
@@ -261,10 +259,8 @@ unsigned int Character::getMaxHealth(bool withEffects)
 
 unsigned int Character::getMaxStamina(bool withEffects)
 {
-    // Value = 100 + (15 * AbilityModifier(Constitution))
-    // MIN   = 100
-    // MAX   = 475
-    unsigned int BASE = 100 + (15 * this->getAbilityModifier(Ability::Constitution));
+    // Value = 50 + (15 * AbilityModifier(Constitution))
+    unsigned int BASE = 50 + (15 * this->getAbilityModifier(Ability::Constitution));
     if (!withEffects)
     {
         return BASE;
@@ -1241,43 +1237,27 @@ bool Character::hasStaminaFor(
     const CombatAction & combatAction,
     const EquipmentSlot & slot)
 {
+    // BASE     [1]
+    // STRENGTH [0   to 2.80]
+    // WEIGHT   [1.6 to 2.51]
+    // CARRIED  [0   to 2.48]
+    // WEAPON   [0   to 1.60]
+    // The base value.
+    double BASE = 1.0;
     // The strength modifier.
-    // MIN = 0.0
-    // MAX = 2.8
-    double STR = this->getAbilityLog(Ability::Strength, 0.0, 2.0);
+    double STR = this->getAbilityLog(Ability::Strength, 0.0, 1.0);
     // The weight modifier.
-    // MIN = 0.80
-    // MAX = 1.25
-    double WGT = 0.8;
-    double WGTmod = this->weight;
-    if (WGTmod > 0)
-    {
-        if (WGTmod > 320)
-        {
-            WGTmod = 320;
-        }
-        WGT = (log10(WGTmod) / 2);
-    }
+    double WGT = (this->weight == 0) ? 0 : log10(this->weight);
     // The carried weight.
-    // MIN = 0.00
-    // MAX = 1.24
-    double CAR = 0.0;
-    double CARmod = this->getCarryingWeight();
-    if (CARmod > 0)
-    {
-        if (CARmod > 300)
-        {
-            CARmod = 300;
-        }
-        CAR = (log10(CARmod) / 2);
-    }
+    unsigned int carried = this->getCarryingWeight();
+    double CAR = (carried == 0) ? 0 : log10(carried);
+    // Partial result;
+    double RSLT = BASE - STR + WGT + CAR;
     if ((actionType == ActionType::Move) || (actionType == ActionType::Building)
         || (actionType == ActionType::Crafting))
     {
-        double BASE = 3.0;
-        double RSLT = BASE - STR + WGT + CAR;
         Logger::log(
-            LogLevel::Warning,
+            LogLevel::Debug,
             "Required Stamina : %s - %s + %s + %s = %s",
             ToString(BASE),
             ToString(STR),
@@ -1303,21 +1283,12 @@ bool Character::hasStaminaFor(
         {
             if (this->canAttackWith(slot))
             {
-                double WPN = 0;
                 Item * weapon = this->findEquipmentSlotItem(slot);
-                double WPNmod = weapon->getTotalWeight();
-                if (WPNmod > 0)
-                {
-                    if (WPNmod > 40)
-                    {
-                        WPNmod = 40;
-                    }
-                    WPN = log10(WPNmod); // min:0.0; max:1.60
-                }
-                double BASE = 5.0;
-                double RSLT = BASE - STR + WGT + CAR + WPN;
+                unsigned int wpnWeight = weapon->getTotalWeight();
+                double WPN = (wpnWeight == 0) ? 0 : log10(wpnWeight);
+                RSLT += WPN;
                 Logger::log(
-                    LogLevel::Warning,
+                    LogLevel::Debug,
                     "Required Stamina : %s - %s + %s + %s = %s",
                     ToString(BASE),
                     ToString(STR),
@@ -1340,10 +1311,8 @@ bool Character::hasStaminaFor(
         }
         else if (combatAction == CombatAction::Flee)
         {
-            double BASE = 3.0;
-            double RSLT = BASE - STR + WGT + CAR;
             Logger::log(
-                LogLevel::Warning,
+                LogLevel::Debug,
                 "Required Stamina : %s - %s + %s + %s = %s",
                 ToString(BASE),
                 ToString(STR),
@@ -1370,11 +1339,12 @@ bool Character::hasStaminaFor(
 bool Character::setHealth(const unsigned int & value, const bool & force)
 {
     unsigned int maximum = this->getMaxHealth();
-    if ((value > maximum) && (force))
+    if (value > maximum)
     {
         if (force)
         {
             this->health = maximum;
+            return true;
         }
         else
         {
@@ -1393,7 +1363,7 @@ bool Character::addHealth(const unsigned int & value, const bool & force)
     {
         if (force)
         {
-            this->health = maximum;
+            result = maximum;
         }
         else
         {
@@ -1411,7 +1381,7 @@ bool Character::remHealth(const unsigned int & value, const bool & force)
     {
         if (force)
         {
-            this->health = 0;
+            result = 0;
         }
         else
         {
@@ -1435,6 +1405,7 @@ bool Character::setStamina(const unsigned int & value, const bool & force)
         if (force)
         {
             this->stamina = maximum;
+            return true;
         }
         else
         {
@@ -1453,7 +1424,7 @@ bool Character::addStamina(const unsigned int & value, const bool & force)
     {
         if (force)
         {
-            this->stamina = maximum;
+            result = maximum;
         }
         else
         {
@@ -1471,7 +1442,7 @@ bool Character::remStamina(const unsigned int & value, const bool & force)
     {
         if (force)
         {
-            this->stamina = 0;
+            result = 0;
         }
         else
         {
@@ -1487,7 +1458,7 @@ unsigned int Character::getStamina()
     return this->stamina;
 }
 
-void Character::triggerDeath()
+void Character::kill()
 {
     // Create a corpse at the current position.
     this->createCorpse();

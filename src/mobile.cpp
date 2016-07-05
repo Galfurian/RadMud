@@ -149,10 +149,10 @@ bool Mobile::hasAction(const string & _action) const
     return found;
 }
 
-void Mobile::triggerDeath()
+void Mobile::kill()
 {
     // Call the method of the father class.
-    Character::triggerDeath();
+    Character::kill();
     // Set the mobile as dead.
     alive = false;
     // Set to 0 the cycle that this mobile has passed dead.
