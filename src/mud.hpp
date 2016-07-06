@@ -123,7 +123,7 @@ class Mud
         /// List of all the rooms.
         RoomMap mudRooms;
         /// List all the items model.
-        ModelMap mudModels;
+        ItemModelMap mudItemModels;
         /// List of all the areas.
         AreaMap mudAreas;
         /// List of all the races.
@@ -207,8 +207,8 @@ class Mud
         void addCorpse(Item * corpse);
         /// Remove the given corpse from the mud.
         bool remCorpse(Item * corpse);
-        /// Add the given model to the mud.
-        bool addModel(Model * model);
+        /// Add the given item model to the mud.
+        bool addItemModel(ItemModel * model);
         /// Add the given area to the mud.
         bool addArea(Area * area);
         /// Add the given race to the mud.
@@ -247,8 +247,8 @@ class Mud
 
         /// Find an item given its vnum.
         Item * findItem(int vnum);
-        /// Find a model given its vnum.
-        Model * findModel(int vnum);
+        /// Find an item model given its vnum.
+        ItemModel * findItemModel(int vnum);
         /// Find a mobile given his id.
         Mobile * findMobile(std::string id);
         /// Find a player given his name.

@@ -1,4 +1,4 @@
-/// @file   model.hpp
+/// @file   itemModel.hpp
 /// @brief  Define item model variables and methods.
 /// @author Enrico Fraccaroli
 /// @date   Mar 31 2015
@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef MODEL_HPP
-#define MODEL_HPP
+#pragma once
 
 #include <string>
 #include <vector>
@@ -25,68 +24,73 @@
 #include <map>
 
 #include "defines.hpp"
-#include "lua/lua_script.hpp"
+#include "../lua/lua_script.hpp"
 
 class Item;
 class Player;
 class Material;
 
 /// @brief Holds details about a model of item.
-class Model
+class ItemModel
 {
     public:
-        /// Model model vnum.
+        /// Unique vnum.
         int vnum;
-        /// Model name.
+        /// The model name.
         std::string name;
-        /// Model article.
+        /// The model article.
         std::string article;
-        /// Model short description.
+        /// The model short description.
         std::string shortdesc;
-        /// Model keys.
+        /// The model keys.
         std::vector<std::string> keys;
-        /// Model description.
+        /// The model description.
         std::string description;
-        /// Model type.
-        ModelType type;
+        /// The model type.
+        ModelType modelType;
         /// Store here the position where the model can be equipped.
         EquipmentSlot slot;
-        /// Model flags.
+        /// The model flags.
         unsigned int flags;
-        /// Model weight.
+        /// The model weight.
         unsigned int weight;
-        /// Model price.
+        /// The model price.
         int price;
-        /// Model maximum condition.
+        /// The model maximum condition.
         int condition;
-        /// Model maximum condition.
+        /// The model maximum condition.
         int decay;
-        /// Model's material.
+        /// The model's material.
         MaterialType material;
         /// TileSet of the icon.
         int tileSet;
         /// TileId of the icon.
         int tileId;
-        /// Model functions.
+        /// The model functions.
         std::vector<unsigned int> functions;
 
         /// @brief Constructor.
-        Model();
+        ItemModel();
 
         /// @brief Disable Copy Construct.
-        Model(Model const &) = delete;
+        ItemModel(ItemModel const &) = delete;
 
         /// @brief Disable Move construct.
-        Model(Model &&) = delete;
+        ItemModel(ItemModel &&) = delete;
 
         /// @brief Disable Copy assign.
-        Model & operator=(Model const &) = delete;
+        ItemModel & operator=(ItemModel const &) = delete;
 
         /// @brief Disable Move assign.
-        Model & operator=(Model &&) = delete;
+        ItemModel & operator=(ItemModel &&) = delete;
 
         /// @brief Destructor.
-        ~Model();
+        virtual ~ItemModel();
+
+        /// @return Provides the type of model.
+        virtual ModelType getType() const;
+
+        virtual bool setModel(const std::string & source) = 0;
 
         /// @brief Given a source string, this function parse the string
         ///         and sets the functions.
@@ -136,7 +140,7 @@ class Model
         /// @return The name of the model's type.
         std::string getSpecificTypeName();
 
-        /// @defgroup Model functions Extraction Methods.
+        /// @defgroup ItemModel functions Extraction Methods.
         /// @brief All the functions necessary to extract infomation regarding the functionality of a model.
         /// @{
 
@@ -181,10 +185,8 @@ class Model
         std::string getTile(int offset = 0);
 };
 
-/// Model vector handler.
-typedef std::vector<Model *> ModelList;
+/// ItemModel vector handler.
+typedef std::vector<ItemModel *> ItemModelList;
 
-/// Model map handler.
-typedef std::map<int, Model *> ModelMap;
-
-#endif
+/// ItemModel map handler.
+typedef std::map<int, ItemModel *> ItemModelMap;

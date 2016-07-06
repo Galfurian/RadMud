@@ -29,16 +29,16 @@
 #include "mud.hpp"
 
 Race::Race() :
-    vnum(),
-    name(),
-    description(),
-    material(),
-    abilities(),
-    availableFaction(),
-    player_allow(),
-    tileSet(),
-    tileId(),
-    corpse()
+        vnum(),
+        name(),
+        description(),
+        material(),
+        abilities(),
+        availableFaction(),
+        player_allow(),
+        tileSet(),
+        tileId(),
+        corpse()
 {
     // Nothing to do.
 }
@@ -57,7 +57,7 @@ void Race::initializeCorpse(const std::string & corpseDescription)
     corpse.keys.push_back("corpse");
     corpse.keys.push_back(name);
     corpse.description = corpseDescription;
-    corpse.type = ModelType::Corpse;
+    corpse.modelType = ModelType::Corpse;
     corpse.slot = EquipmentSlot::None;
     corpse.flags = 0;
     corpse.weight = 50;

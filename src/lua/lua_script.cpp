@@ -53,11 +53,11 @@ Item * LuaLoadItem(Character * maker, int vnumModel, int vnumMaterial, int intQu
         return nullptr;
     }
 
-    Model * model = Mud::instance().findModel(vnumModel);
+    ItemModel * itemModel = Mud::instance().findItemModel(vnumModel);
     Material * material = Mud::instance().findMaterial(vnumMaterial);
     ItemQuality quality = static_cast<ItemQuality>(intQuality);
 
-    if (model == nullptr)
+    if (itemModel == nullptr)
     {
         Logger::log(LogLevel::Error, "Can't find model :" + ToString(vnumModel));
         return nullptr;
@@ -72,15 +72,15 @@ Item * LuaLoadItem(Character * maker, int vnumModel, int vnumMaterial, int intQu
     Item * newItem = new Item();
     // Set the values of the new item.
     newItem->vnum = -1;
-    newItem->model = model;
+    newItem->model = itemModel;
     newItem->maker = maker->getName();
-    newItem->condition = model->condition;
+    newItem->condition = itemModel->condition;
     newItem->composition = material;
     newItem->quality = quality;
     newItem->room = nullptr;
     newItem->owner = nullptr;
     newItem->container = nullptr;
-    newItem->currentSlot = model->slot;
+    newItem->currentSlot = itemModel->slot;
     newItem->content = std::vector<Item *>();
     newItem->contentLiq = LiquidContent();
 

@@ -286,7 +286,7 @@ void DoLook(Character * character, std::istream & sArgs)
         Item * container = character->findNearbyItem(arguments[1].first, arguments[1].second);
         if (container)
         {
-            if (container->model->type == ModelType::Container)
+            if (container->model->getType() == ModelType::Container)
             {
                 Item * item = container->findContent(arguments[0].first, arguments[0].second);
                 if (item)
@@ -631,7 +631,7 @@ void DoServer(Character * character, std::istream & sArgs)
     character->sendMsg("    Players     : " + ToString(Mud::instance().mudPlayers.size()) + "\n");
     character->sendMsg("    Mobiles     : " + ToString(Mud::instance().mudMobiles.size()) + "\n");
     character->sendMsg("\n");
-    character->sendMsg("    Models      : " + ToString(Mud::instance().mudModels.size()) + "\n");
+    character->sendMsg("    Models      : " + ToString(Mud::instance().mudItemModels.size()) + "\n");
     character->sendMsg("    Items       : " + ToString(Mud::instance().mudItems.size()) + "\n");
     character->sendMsg("    Corpses     : " + ToString(Mud::instance().mudCorpses.size()) + "\n");
     character->sendMsg("\n");

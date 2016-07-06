@@ -1,4 +1,4 @@
-/// @file   model.cpp
+/// @file   itemModel.cpp
 /// @brief  Implements item model methods.
 /// @author Enrico Fraccaroli
 /// @date   Mar 31 2015
@@ -17,54 +17,55 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 // Basic Include.
-#include "model.hpp"
-
-// Local Includes.
-
-// Other Include.
-#include "mud.hpp"
-#include "logger.hpp"
-#include "material.hpp"
-#include "constants.hpp"
-#include "luabridge/LuaBridge.h"
+#include "../mud.hpp"
+#include "../logger.hpp"
+#include "../material.hpp"
+#include "../constants.hpp"
+#include "../luabridge/LuaBridge.h"
+#include "itemModel.hpp"
 
 using namespace std;
 
-Model::Model() :
-    vnum(),
-    name(),
-    article(),
-    shortdesc(),
-    keys(),
-    description(),
-    type(ModelType::NoType),
-    slot(EquipmentSlot::None),
-    flags(),
-    weight(),
-    price(),
-    condition(),
-    decay(),
-    material(MaterialType::NoType),
-    tileSet(),
-    tileId(),
-    functions()
+ItemModel::ItemModel() :
+        vnum(),
+        name(),
+        article(),
+        shortdesc(),
+        keys(),
+        description(),
+        modelType(),
+        slot(),
+        flags(),
+        weight(),
+        price(),
+        condition(),
+        decay(),
+        material(),
+        tileSet(),
+        tileId(),
+        functions()
 {
     // Nothing to do.
 }
 
-Model::~Model()
+ItemModel::~ItemModel()
 {
     Logger::log(LogLevel::Debug, "Deleted model\t\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
+}
+
+ModelType ItemModel::getType() const
+{
+    return ModelType::NoType;
 }
 
 ///////////////////////////////////////////////////////////
 // CHECKER ////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
-bool Model::setFunctions(std::string source)
+bool ItemModel::setFunctions(std::string source)
 {
     if (source.empty())
     {
-        Logger::log(LogLevel::Error, "Function list is empty.");
+        Logger::log(LogLevel::Error, "Function list is empty (%s).", this->name);
         return false;
     }
     std::vector<std::string> functionList = SplitString(source, " ");
@@ -86,7 +87,7 @@ bool Model::setFunctions(std::string source)
     return true;
 }
 
-bool Model::check()
+bool ItemModel::check()
 {
     assert(vnum > 0);
     assert(!name.empty());
@@ -94,8 +95,8 @@ bool Model::check()
     assert(!shortdesc.empty());
     assert(!keys.empty());
     assert(!description.empty());
-    assert(type != ModelType::NoType);
-    if ((type == ModelType::Armor) || (type == ModelType::Weapon))
+    assert(modelType != ModelType::NoType);
+    if ((modelType == ModelType::Armor) || (modelType == ModelType::Weapon))
     {
         assert(slot != EquipmentSlot::None);
     }
@@ -106,11 +107,10 @@ bool Model::check()
     assert(this->material != MaterialType::NoType);
     assert(tileSet >= 0);
     assert(tileId >= 0);
-    assert(!functions.empty());
     return true;
 }
 
-bool Model::replaceSymbols(std::string & source, Material * itemMaterial, ItemQuality itemQuality)
+bool ItemModel::replaceSymbols(std::string & source, Material * itemMaterial, ItemQuality itemQuality)
 {
     bool modified = false;
     if (itemMaterial)
@@ -136,7 +136,7 @@ bool Model::replaceSymbols(std::string & source, Material * itemMaterial, ItemQu
     return modified;
 }
 
-std::string Model::getName(Material * itemMaterial, ItemQuality itemQuality)
+std::string ItemModel::getName(Material * itemMaterial, ItemQuality itemQuality)
 {
     // Make a copy of the short description.
     std::string output = shortdesc;
@@ -148,7 +148,7 @@ std::string Model::getName(Material * itemMaterial, ItemQuality itemQuality)
     return output;
 }
 
-std::string Model::getDescription(Material * itemMaterial, ItemQuality itemQuality)
+std::string ItemModel::getDescription(Material * itemMaterial, ItemQuality itemQuality)
 {
     // Make a copy of the description.
     std::string output = description;
@@ -160,12 +160,12 @@ std::string Model::getDescription(Material * itemMaterial, ItemQuality itemQuali
 // ITEM CREATION //////////////////////////////////////////
 ///////////////////////////////////////////////////////////
 
-Item * Model::createItem(std::string maker, Material * composition, ItemQuality itemQuality)
+Item * ItemModel::createItem(std::string maker, Material * composition, ItemQuality itemQuality)
 {
     // Instantiate the new item.
     Item * newItem = new Item();
     // If the new item is a corpse, don't use the normal item's vnum.
-    if (this->type == ModelType::Corpse)
+    if (this->modelType == ModelType::Corpse)
     {
         newItem->vnum = Mud::instance().getMinVnumCorpse() - 1;
     }
@@ -187,7 +187,7 @@ Item * Model::createItem(std::string maker, Material * composition, ItemQuality 
     newItem->contentLiq = LiquidContent();
 
     // If the newly created item is a corpse, return it and don't save it on DB.
-    if (this->type == ModelType::Corpse)
+    if (this->modelType == ModelType::Corpse)
     {
         Mud::instance().addCorpse(newItem);
         return newItem;
@@ -225,50 +225,50 @@ Item * Model::createItem(std::string maker, Material * composition, ItemQuality 
     return newItem;
 }
 
-bool Model::mustBeWielded()
+bool ItemModel::mustBeWielded()
 {
     return ((slot == EquipmentSlot::RightHand) || (slot == EquipmentSlot::LeftHand));
 }
 
-std::string Model::getSpecificTypeName()
+std::string ItemModel::getSpecificTypeName()
 {
     std::string output;
-    if (type == ModelType::Weapon)
+    if (this->modelType == ModelType::Weapon)
     {
         output = GetWeaponTypeName(getWeaponFunc().type);
     }
-    else if (type == ModelType::Armor)
+    else if (this->modelType == ModelType::Armor)
     {
         output = GetArmorSizeName(getArmorFunc().size);
     }
-    else if (type == ModelType::Shield)
+    else if (this->modelType == ModelType::Shield)
     {
         output = GetShieldSizeName(getShieldFunc().size);
     }
-    else if (type == ModelType::Tool)
+    else if (this->modelType == ModelType::Tool)
     {
         output = GetToolTypeName(getToolFunc().type);
     }
-    else if (type == ModelType::Node)
+    else if (this->modelType == ModelType::Node)
     {
         output = GetNodeTypeName(getNodeFunc().type);
     }
-    else if (type == ModelType::Resource)
+    else if (modelType == ModelType::Resource)
     {
         output = GetResourceTypeName(getResourceFunc().type);
     }
-    else if (type == ModelType::Seed)
+    else if (modelType == ModelType::Seed)
     {
         output = GetSeedTypeName(getSeedFunc().type);
     }
-    else if (type == ModelType::Mechanism)
+    else if (modelType == ModelType::Mechanism)
     {
         output = GetMechanismTypeName(getMechanismFunc().type);
     }
     return output;
 }
 
-WeaponFunc Model::getWeaponFunc()
+WeaponFunc ItemModel::getWeaponFunc()
 {
     WeaponFunc func;
     func.type = static_cast<WeaponType>(functions[0]);
@@ -278,7 +278,7 @@ WeaponFunc Model::getWeaponFunc()
     return func;
 }
 
-ArmorFunc Model::getArmorFunc()
+ArmorFunc ItemModel::getArmorFunc()
 {
     ArmorFunc func;
     func.size = static_cast<ArmorSize>(functions[0]);
@@ -287,7 +287,7 @@ ArmorFunc Model::getArmorFunc()
     return func;
 }
 
-ShieldFunc Model::getShieldFunc()
+ShieldFunc ItemModel::getShieldFunc()
 {
     ShieldFunc func;
     func.size = static_cast<ShieldSize>(functions[0]);
@@ -295,7 +295,7 @@ ShieldFunc Model::getShieldFunc()
     return func;
 }
 
-ProjectileFunc Model::getProjectileFunc()
+ProjectileFunc ItemModel::getProjectileFunc()
 {
     ProjectileFunc func;
     func.damageBonus = functions[0];
@@ -303,7 +303,7 @@ ProjectileFunc Model::getProjectileFunc()
     return func;
 }
 
-ContainerFunc Model::getContainerFunc()
+ContainerFunc ItemModel::getContainerFunc()
 {
     ContainerFunc func;
     func.maxWeight = functions[0];
@@ -313,7 +313,7 @@ ContainerFunc Model::getContainerFunc()
     return func;
 }
 
-LiqContainerFunc Model::getLiqContainerFunc()
+LiqContainerFunc ItemModel::getLiqContainerFunc()
 {
     LiqContainerFunc func;
     func.maxWeight = functions[0];
@@ -321,14 +321,14 @@ LiqContainerFunc Model::getLiqContainerFunc()
     return func;
 }
 
-ToolFunc Model::getToolFunc()
+ToolFunc ItemModel::getToolFunc()
 {
     ToolFunc func;
     func.type = static_cast<ToolType>(functions[0]);
     return func;
 }
 
-NodeFunc Model::getNodeFunc()
+NodeFunc ItemModel::getNodeFunc()
 {
     NodeFunc func;
     func.type = static_cast<NodeType>(functions[0]);
@@ -336,21 +336,21 @@ NodeFunc Model::getNodeFunc()
     return func;
 }
 
-ResourceFunc Model::getResourceFunc()
+ResourceFunc ItemModel::getResourceFunc()
 {
     ResourceFunc func;
     func.type = static_cast<ResourceType>(functions[0]);
     return func;
 }
 
-SeedFunc Model::getSeedFunc()
+SeedFunc ItemModel::getSeedFunc()
 {
     SeedFunc func;
     func.type = static_cast<SeedType>(functions[0]);
     return func;
 }
 
-FoodFunc Model::getFoodFunc()
+FoodFunc ItemModel::getFoodFunc()
 {
     FoodFunc func;
     func.hours = functions[0];
@@ -358,7 +358,7 @@ FoodFunc Model::getFoodFunc()
     return func;
 }
 
-LightFunc Model::getLightFunc()
+LightFunc ItemModel::getLightFunc()
 {
     LightFunc func;
     func.maxHours = functions[0];
@@ -366,14 +366,14 @@ LightFunc Model::getLightFunc()
     return func;
 }
 
-BookFunc Model::getBookFunc()
+BookFunc ItemModel::getBookFunc()
 {
     BookFunc func;
     func.maxParchments = functions[0];
     return func;
 }
 
-RopeFunc Model::getRopeFunc()
+RopeFunc ItemModel::getRopeFunc()
 {
     RopeFunc func;
     func.type = functions[0];
@@ -381,7 +381,7 @@ RopeFunc Model::getRopeFunc()
     return func;
 }
 
-MechanismFunc Model::getMechanismFunc()
+MechanismFunc ItemModel::getMechanismFunc()
 {
     MechanismFunc func;
     func.type = static_cast<MechanismType>(functions[0]);
@@ -402,20 +402,20 @@ MechanismFunc Model::getMechanismFunc()
     return func;
 }
 
-void Model::luaRegister(lua_State * L)
+void ItemModel::luaRegister(lua_State * L)
 {
     luabridge::getGlobalNamespace(L) //
-    .beginClass<Model>("Model") //
-    .addData("vnum", &Model::vnum) //
-    .addData("type", &Model::type) //
-    .addData("weight", &Model::weight) //
-    .addData("price", &Model::price) //
-    .addData("condition", &Model::condition) //
-    .addData("decay", &Model::decay) //
+    .beginClass<ItemModel>("ItemModel") //
+    .addData("vnum", &ItemModel::vnum) //
+    .addData("type", &ItemModel::modelType) //
+    .addData("weight", &ItemModel::weight) //
+    .addData("price", &ItemModel::price) //
+    .addData("condition", &ItemModel::condition) //
+    .addData("decay", &ItemModel::decay) //
     .endClass();
 }
 
-std::string Model::getTile(int offset)
+std::string ItemModel::getTile(int offset)
 {
     if (Formatter::getFormat() == Formatter::TELNET)
     {
@@ -424,11 +424,11 @@ std::string Model::getTile(int offset)
     else
     {
         // TODO: Too easy this way.
-        if (type == ModelType::Armor)
+        if (modelType == ModelType::Armor)
         {
             return "a";
         }
-        else if (type == ModelType::Weapon)
+        else if (modelType == ModelType::Weapon)
         {
             return "w";
         }

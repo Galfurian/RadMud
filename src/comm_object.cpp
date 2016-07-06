@@ -555,7 +555,7 @@ void DoWield(Character * character, std::istream & sArgs)
     {
         character->sendMsg("This item it's not meant to be wield.\n");
         // In case the item must be weared, advise the player.
-        if (item->model->type == ModelType::Armor)
+        if (item->model->getType() == ModelType::Armor)
         {
             character->sendMsg("Try to wear it instead.\n");
         }
@@ -1093,7 +1093,7 @@ void DoPut(Character * character, std::istream & sArgs)
         character->sendMsg("You don't see any container named '" + arguments[1].first + "' here.\n");
         return;
     }
-    if (container->model->type != ModelType::Container)
+    if (container->model->getType() != ModelType::Container)
     {
         character->sendMsg("'%s' is not a container.\n", container->getName());
         return;
@@ -1209,7 +1209,7 @@ void DoDrink(Character * character, std::istream & sArgs)
 
     ///////////////////////////////////////////////////////////////////////////
     // Execute every necessary checks.
-    if (container->model->type != ModelType::LiqContainer)
+    if (container->model->getType() != ModelType::LiquidContainer)
     {
         character->sendMsg("%s is not a container for liquids.\n", container->getNameCapital());
         return;
@@ -1285,12 +1285,12 @@ void DoFill(Character * character, std::istream & sArgs)
     }
 
     // Check if the items are suitable source and container of liquids.
-    if (container->model->type != ModelType::LiqContainer)
+    if (container->model->getType() != ModelType::LiquidContainer)
     {
         character->sendMsg("%s is not a suitable container.\n", container->getNameCapital());
         return; // Skip the rest of the function.
     }
-    if (source->model->type != ModelType::LiqContainer)
+    if (source->model->getType() != ModelType::LiquidContainer)
     {
         character->sendMsg("%s is not a suitable source of liquids.\n", source->getNameCapital());
         return; // Skip the rest of the function.
@@ -1398,12 +1398,12 @@ void DoPour(Character * character, std::istream & sArgs)
     }
 
     // Check if the items are suitable source and container of liquids.
-    if (container->model->type != ModelType::LiqContainer)
+    if (container->model->getType() != ModelType::LiquidContainer)
     {
         character->sendMsg("%s is not a suitable container.\n", container->getNameCapital());
         return; // Skip the rest of the function.
     }
-    if (source->model->type != ModelType::LiqContainer)
+    if (source->model->getType() != ModelType::LiquidContainer)
     {
         character->sendMsg("%s is not a suitable source of liquids.\n", source->getNameCapital());
         return; // Skip the rest of the function.

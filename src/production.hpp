@@ -19,7 +19,8 @@
 #ifndef PRODUCTION_HPP
 #define PRODUCTION_HPP
 
-#include "model.hpp"
+#include "model/itemModel.hpp"
+
 class Profession;
 class Character;
 
@@ -43,7 +44,7 @@ class Production
         /// A flag which indicates if the maker can be assisted by someone.
         bool assisted;
         /// The outcome and its quantity.
-        std::pair<Model *, unsigned int> outcome;
+        std::pair<ItemModel *, unsigned int> outcome;
         /// The list of needed type of tools.
         ToolSet tools;
         /// The list of needed type of ingredients and their quantity.

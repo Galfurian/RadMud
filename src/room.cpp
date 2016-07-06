@@ -276,7 +276,7 @@ ItemVector Room::findBuildings(ModelType type)
     ItemVector buildingsList;
     for (auto iterator : items)
     {
-        if ((iterator->model->type == type) && HasFlag(iterator->flags, ItemFlag::Built))
+        if ((iterator->model->getType() == type) && HasFlag(iterator->flags, ItemFlag::Built))
         {
             buildingsList.push_back(iterator);
         }
@@ -432,7 +432,7 @@ Item * Room::findDoor()
 {
     for (auto iterator : items)
     {
-        if ((iterator->model->type == ModelType::Mechanism) && HasFlag(iterator->flags, ItemFlag::Built))
+        if ((iterator->model->getType() == ModelType::Mechanism) && HasFlag(iterator->flags, ItemFlag::Built))
         {
             MechanismFunc mechanismFunc = iterator->model->getMechanismFunc();
             if (mechanismFunc.type == MechanismType::Door)

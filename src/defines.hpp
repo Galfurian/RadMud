@@ -437,46 +437,42 @@ typedef enum class ModelTypes
     /// [1] A corpse, it's a knowledge for internal use.
     Corpse,
     /// [2] Any weapon.
-    Weapon,
+    Weapon, //
     /// [3] Any armor.
-    Armor,
+    Armor, //
     /// [4] A shield.
-    Shield,
+    Shield, //
     /// [5] Projectiles.
-    Projectile,
+    Projectile, //
     /// [6] A container for items.
-    Container,
+    Container, //
     /// [7] A container for liquids.
-    LiqContainer,
+    LiquidContainer, //
     /// [8] Any tool.
-    Tool,
+    Tool, //
     /// [9] Any node of resources.
-    Node,
+    Node, //
     /// [10] A resource.
-    Resource,
+    Resource, //
     /// [11] Any kind of seed.
-    Seed,
+    Seed, //
     /// [12] A key.
-    Key,
+    Key, //
     /// [13] A forniture (eg. chair, bed, painting, table and so on).
-    Furniture,
+    Furniture, //
     /// [14] A food.
-    Food,
+    Food, //
     /// [15] A source of light ((eg. torch, lamp, candle and so on).
-    Light,
+    Light, //
     /// [16] Any kind of vehicle.
-    Vehicle,
-    /// [17] A pen.
-    Pen,
-    /// [18] Container of parchements.
-    Book,
-    /// [19] A generic rope.
-    Rope,
-    /// [20] Anything which has no specific use.
-    Trash,
-    /// [21] Any kind of mechanism.
-    Mechanism,
-    /// [22] Any kind of currency.
+    Vehicle, //
+    /// [17] Container of parchements.
+    Book, //
+    /// [18] A generic rope.
+    Rope, //
+    /// [19] Any kind of mechanism.
+    Mechanism, //
+    /// [20] Any kind of currency.
     Currency
 } ModelType;
 
@@ -791,7 +787,11 @@ typedef enum class ResourceTypes
     /// [11] METAL_VEIN
     MetalVein,
     /// [12] STONE_MONOLITH
-    StoneMonolith
+    StoneMonolith,
+    /// [13] Pen
+    Pen,
+    /// [14] Trash (Anything which has no specific use)
+    Trash
 } ResourceType;
 
 /// The values associated to model of type Resource.

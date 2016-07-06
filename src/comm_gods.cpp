@@ -314,61 +314,61 @@ void DoModelInfo(Character * character, std::istream & sArgs)
         character->sendMsg("You must insert a model vnum.\n");
         return;
     }
-    Model * model = Mud::instance().findModel(ToInt(arguments[0].first));
-    if (model == nullptr)
+    ItemModel * itemModel = Mud::instance().findItemModel(ToInt(arguments[0].first));
+    if (itemModel == nullptr)
     {
-        character->sendMsg("Model not found.\n");
+        character->sendMsg("Item model not found.\n");
         return;
     }
 
     std::string msg;
-    msg += Formatter::yellow() + "Model Vnum    " + Formatter::reset();
-    msg += ": " + ToString(model->vnum) + "\n";
+    msg += Formatter::yellow() + "Vnum          " + Formatter::reset();
+    msg += ": " + ToString(itemModel->vnum) + "\n";
     msg += Formatter::yellow() + "Name          " + Formatter::reset();
-    msg += ": " + model->name + "\n";
+    msg += ": " + itemModel->name + "\n";
     msg += Formatter::yellow() + "Article       " + Formatter::reset();
-    msg += ": " + model->article + "\n";
+    msg += ": " + itemModel->article + "\n";
     msg += Formatter::yellow() + "Short Descr.  " + Formatter::reset();
-    msg += ": " + model->shortdesc + "\n";
+    msg += ": " + itemModel->shortdesc + "\n";
     msg += Formatter::yellow() + "Keys          " + Formatter::reset();
     msg += ": {";
-    for (auto it : model->keys)
+    for (auto it : itemModel->keys)
     {
         msg += " " + it;
     }
     msg += "}\n";
     msg += Formatter::yellow() + "Description   " + Formatter::reset();
-    msg += ": " + model->description + "\n";
+    msg += ": " + itemModel->description + "\n";
     msg += Formatter::yellow() + "Type          " + Formatter::reset();
-    msg += ": " + GetModelTypeName(model->type) + "\n";
+    msg += ": " + GetModelTypeName(itemModel->getType()) + "\n";
     msg += Formatter::yellow() + "Slot          " + Formatter::reset();
-    msg += ": " + GetEquipmentSlotName(model->slot) + "\n";
+    msg += ": " + GetEquipmentSlotName(itemModel->slot) + "\n";
     msg += Formatter::yellow() + "Flags         " + Formatter::reset();
-    msg += ": " + GetModelFlagString(model->flags) + "\n";
+    msg += ": " + GetModelFlagString(itemModel->flags) + "\n";
     msg += Formatter::yellow() + "Weight        " + Formatter::reset();
-    msg += ": " + ToString(model->weight) + " " + mud_measure + ".\n";
+    msg += ": " + ToString(itemModel->weight) + " " + mud_measure + ".\n";
     msg += Formatter::yellow() + "Price         " + Formatter::reset();
-    msg += ": " + ToString(model->price) + ".\n";
+    msg += ": " + ToString(itemModel->price) + ".\n";
     msg += Formatter::yellow() + "Condition     " + Formatter::reset();
-    msg += ": " + ToString(model->condition) + "\n";
+    msg += ": " + ToString(itemModel->condition) + "\n";
     msg += Formatter::yellow() + "Decay         " + Formatter::reset();
-    msg += ": " + ToString(model->decay) + "\n";
+    msg += ": " + ToString(itemModel->decay) + "\n";
     msg += Formatter::yellow() + "Material      " + Formatter::reset();
-    msg += ": " + GetMaterialTypeName(model->material) + "\n";
+    msg += ": " + GetMaterialTypeName(itemModel->material) + "\n";
     msg += Formatter::yellow() + "Tile Set      " + Formatter::reset();
-    msg += ": " + ToString(model->tileSet) + "\n";
+    msg += ": " + ToString(itemModel->tileSet) + "\n";
     msg += Formatter::yellow() + "Tile Id       " + Formatter::reset();
-    msg += ": " + ToString(model->tileId) + "\n";
+    msg += ": " + ToString(itemModel->tileId) + "\n";
     msg += Formatter::yellow() + "Functions     " + Formatter::reset();
     msg += ": {";
-    for (auto it : model->functions)
+    for (auto it : itemModel->functions)
     {
         msg += " " + ToString(it);
     }
     msg += "}\n";
-    if (model->type == ModelType::Weapon)
+    if (itemModel->getType() == ModelType::Weapon)
     {
-        WeaponFunc func = model->getWeaponFunc();
+        WeaponFunc func = itemModel->getWeaponFunc();
         msg += Formatter::brown() + "Type          " + Formatter::reset();
         msg += ": " + GetWeaponTypeName(func.type) + "\n";
         msg += Formatter::brown() + "Minimum Damage  " + Formatter::reset();
@@ -378,9 +378,9 @@ void DoModelInfo(Character * character, std::istream & sArgs)
         msg += Formatter::brown() + "Range           " + Formatter::reset();
         msg += ": " + ToString(func.range) + "\n";
     }
-    else if (model->type == ModelType::Armor)
+    else if (itemModel->getType() == ModelType::Armor)
     {
-        ArmorFunc func = model->getArmorFunc();
+        ArmorFunc func = itemModel->getArmorFunc();
         msg += Formatter::brown() + "Size          " + Formatter::reset();
         msg += ": " + GetArmorSizeName(func.size) + "\n";
         msg += Formatter::brown() + "Damage Abs.   " + Formatter::reset();
@@ -388,25 +388,25 @@ void DoModelInfo(Character * character, std::istream & sArgs)
         msg += Formatter::brown() + "Allowed Anatom. " + Formatter::reset();
         msg += ": " + ToString(func.allowedAnatomy) + "\n";
     }
-    else if (model->type == ModelType::Shield)
+    else if (itemModel->getType() == ModelType::Shield)
     {
-        ShieldFunc func = model->getShieldFunc();
+        ShieldFunc func = itemModel->getShieldFunc();
         msg += Formatter::brown() + "Size            " + Formatter::reset();
         msg += ": " + GetShieldSizeName(func.size) + "\n";
         msg += Formatter::brown() + "Parry Chance    " + Formatter::reset();
         msg += ": " + ToString(func.parryChance) + "\n";
     }
-    else if (model->type == ModelType::Projectile)
+    else if (itemModel->getType() == ModelType::Projectile)
     {
-        ProjectileFunc func = model->getProjectileFunc();
+        ProjectileFunc func = itemModel->getProjectileFunc();
         msg += Formatter::brown() + "Damage Bonus    " + Formatter::reset();
         msg += ": " + ToString(func.damageBonus) + "\n";
         msg += Formatter::brown() + "Range Bonus     " + Formatter::reset();
         msg += ": " + ToString(func.rangeBonus) + "\n";
     }
-    else if (model->type == ModelType::Container)
+    else if (itemModel->getType() == ModelType::Container)
     {
-        ContainerFunc func = model->getContainerFunc();
+        ContainerFunc func = itemModel->getContainerFunc();
         msg += Formatter::brown() + "Max Weight      " + Formatter::reset();
         msg += ": " + ToString(func.maxWeight) + "\n";
         msg += Formatter::brown() + "Flags           " + Formatter::reset();
@@ -416,71 +416,71 @@ void DoModelInfo(Character * character, std::istream & sArgs)
         msg += Formatter::brown() + "Lockpicking Lv. " + Formatter::reset();
         msg += ": " + ToString(func.difficulty) + "\n";
     }
-    else if (model->type == ModelType::LiqContainer)
+    else if (itemModel->getType() == ModelType::LiquidContainer)
     {
-        LiqContainerFunc func = model->getLiqContainerFunc();
+        LiqContainerFunc func = itemModel->getLiqContainerFunc();
         msg += Formatter::brown() + "Max Weight      " + Formatter::reset();
         msg += ": " + ToString(func.maxWeight) + "\n";
         msg += Formatter::brown() + "Flags           " + Formatter::reset();
         msg += ": {" + GetLiqContainerFlagString(func.flags) + "}\n";
     }
-    else if (model->type == ModelType::Tool)
+    else if (itemModel->getType() == ModelType::Tool)
     {
-        ToolFunc func = model->getToolFunc();
+        ToolFunc func = itemModel->getToolFunc();
         msg += Formatter::brown() + "Type            " + Formatter::reset();
         msg += ": " + GetToolTypeName(func.type) + "\n";
     }
-    else if (model->type == ModelType::Node)
+    else if (itemModel->getType() == ModelType::Node)
     {
-        NodeFunc func = model->getNodeFunc();
+        NodeFunc func = itemModel->getNodeFunc();
         msg += Formatter::brown() + "Type            " + Formatter::reset();
         msg += ": " + GetNodeTypeName(func.type) + "\n";
     }
-    else if (model->type == ModelType::Resource)
+    else if (itemModel->getType() == ModelType::Resource)
     {
-        ResourceFunc func = model->getResourceFunc();
+        ResourceFunc func = itemModel->getResourceFunc();
         msg += Formatter::brown() + "Type            " + Formatter::reset();
         msg += ": " + GetResourceTypeName(func.type) + "\n";
     }
-    else if (model->type == ModelType::Seed)
+    else if (itemModel->getType() == ModelType::Seed)
     {
-        SeedFunc func = model->getSeedFunc();
+        SeedFunc func = itemModel->getSeedFunc();
         msg += Formatter::brown() + "Type            " + Formatter::reset();
         msg += ": " + GetSeedTypeName(func.type) + "\n";
     }
-    else if (model->type == ModelType::Food)
+    else if (itemModel->getType() == ModelType::Food)
     {
-        FoodFunc func = model->getFoodFunc();
+        FoodFunc func = itemModel->getFoodFunc();
         msg += Formatter::brown() + "Feeding         " + Formatter::reset();
         msg += ": " + ToString(func.hours) + "\n";
         msg += Formatter::brown() + "Flags           " + Formatter::reset();
         msg += ": {" + GetFoodFlagString(func.flags) + "}\n";
     }
-    else if (model->type == ModelType::Light)
+    else if (itemModel->getType() == ModelType::Light)
     {
-        LightFunc func = model->getLightFunc();
+        LightFunc func = itemModel->getLightFunc();
         msg += Formatter::brown() + "Autonomy        " + Formatter::reset();
         msg += ": " + ToString(func.maxHours) + "\n";
         msg += Formatter::brown() + "Rechargeable    " + Formatter::reset();
         msg += ": " + ToString(func.policy) + "\n";
     }
-    else if (model->type == ModelType::Book)
+    else if (itemModel->getType() == ModelType::Book)
     {
-        BookFunc func = model->getBookFunc();
+        BookFunc func = itemModel->getBookFunc();
         msg += Formatter::brown() + "Capacity        " + Formatter::reset();
         msg += ": " + ToString(func.maxParchments) + "\n";
     }
-    else if (model->type == ModelType::Rope)
+    else if (itemModel->getType() == ModelType::Rope)
     {
-        RopeFunc func = model->getRopeFunc();
+        RopeFunc func = itemModel->getRopeFunc();
         msg += Formatter::brown() + "Difficulty      " + Formatter::reset();
         msg += ": " + ToString(func.difficulty) + "\n";
         msg += Formatter::brown() + "Type            " + Formatter::reset();
         msg += ": " + ToString(func.type) + "\n";
     }
-    else if (model->type == ModelType::Mechanism)
+    else if (itemModel->getType() == ModelType::Mechanism)
     {
-        MechanismFunc func = model->getMechanismFunc();
+        MechanismFunc func = itemModel->getMechanismFunc();
         msg += Formatter::brown() + "Type            " + Formatter::reset();
         msg += ": " + GetMechanismTypeName(func.type) + "\n";
         if ((func.type == MechanismType::Door) || (func.type == MechanismType::Lock))
@@ -528,10 +528,10 @@ void DoItemCreate(Character * character, std::istream & sArgs)
         character->sendMsg("What do you want to create?\n");
         return; // Skip the rest of the function.
     }
-    Model * model = Mud::instance().findModel(ToInt(arguments[0].first));
+    ItemModel * itemModel = Mud::instance().findItemModel(ToInt(arguments[0].first));
     Material * material = Mud::instance().findMaterial(ToInt(arguments[1].first));
     ItemQuality quality = ItemQuality::Normal;
-    if (model == nullptr)
+    if (itemModel == nullptr)
     {
         character->sendMsg("Cannot find model '%s'.\n", arguments[0].first);
         return;
@@ -551,7 +551,7 @@ void DoItemCreate(Character * character, std::istream & sArgs)
         }
     }
     // Create the item.
-    Item * item = model->createItem(character->getName(), material, quality);
+    Item * item = itemModel->createItem(character->getName(), material, quality);
     if (item == nullptr)
     {
         character->sendMsg("Creation failed.\n");
@@ -656,7 +656,7 @@ void DoItemInfo(Character * character, std::istream & sArgs)
     std::string msg;
     msg += "Vnum         : " + ToString(item->vnum) + "\n";
     msg += "Model        : [" + ToString(item->model->vnum) + "] " + item->getName() + ".\n";
-    msg += "Type         : " + GetModelTypeName(item->model->type) + "\n";
+    msg += "Type         : " + GetModelTypeName(item->model->getType()) + "\n";
     msg += "Maker        : " + item->maker + "\n";
     msg += "Condition    : " + ToString(item->condition) + " of " + ToString(item->model->condition) + "\n";
     msg += "Composition  : " + item->composition->name + " [" + ToString(item->composition->vnum) + "]\n";
@@ -1318,7 +1318,7 @@ void DoLiquidCreate(Character * character, std::istream & sArgs)
         character->sendMsg("Can't find the desire item.\n");
         return;
     }
-    if (item->model->type != ModelType::LiqContainer)
+    if (item->model->getType() != ModelType::LiquidContainer)
     {
         character->sendMsg("The item is not a container of liquids.\n");
         return;
@@ -1449,19 +1449,19 @@ void DoModelList(Character * character, std::istream & sArgs)
     table.addColumn("FLAGS", StringAlign::Right);
     table.addColumn("WEIGHT", StringAlign::Right);
     table.addColumn("PRICE", StringAlign::Right);
-    for (auto iterator : Mud::instance().mudModels)
+    for (auto iterator : Mud::instance().mudItemModels)
     {
-        Model * model = iterator.second;
+        ItemModel * itemModel = iterator.second;
         // Prepare the row.
         TableRow row;
-        row.push_back(ToString(model->vnum));
-        row.push_back(model->name);
-        row.push_back(GetModelTypeName(model->type));
-        row.push_back(model->getSpecificTypeName());
-        row.push_back(GetEquipmentSlotName(model->slot));
-        row.push_back(ToString(model->flags));
-        row.push_back(ToString(model->weight));
-        row.push_back(ToString(model->price));
+        row.push_back(ToString(itemModel->vnum));
+        row.push_back(itemModel->name);
+        row.push_back(GetModelTypeName(itemModel->getType()));
+        row.push_back(itemModel->getSpecificTypeName());
+        row.push_back(GetEquipmentSlotName(itemModel->slot));
+        row.push_back(ToString(itemModel->flags));
+        row.push_back(ToString(itemModel->weight));
+        row.push_back(ToString(itemModel->price));
         // Add the row to the table.
         table.addRow(row);
     }
@@ -1483,7 +1483,7 @@ void DoItemList(Character * character, std::istream & sArgs)
         TableRow row;
         row.push_back(ToString(item->vnum));
         row.push_back(item->getNameCapital());
-        row.push_back(GetModelTypeName(item->model->type));
+        row.push_back(GetModelTypeName(item->model->getType()));
         if (item->owner != nullptr)
         {
             row.push_back(" Owner  : " + item->owner->getName());

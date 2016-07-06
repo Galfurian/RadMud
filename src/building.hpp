@@ -21,7 +21,8 @@
 
 #include <string>
 #include <map>
-#include "model.hpp"
+
+#include "model/itemModel.hpp"
 
 /// @brief Holds details about a building.
 class Building
@@ -40,7 +41,7 @@ class Building
         /// The list of needed type of tools.
         ToolSet tools;
         /// The model that has to be built.
-        Model * buildingModel;
+        ItemModel * buildingModel;
         /// The list of needed type of ingredients and their quantity.
         IngredientMap ingredients;
         /// Flag which determine if in the same room only one of this building can be present.

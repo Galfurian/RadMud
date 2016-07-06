@@ -27,7 +27,7 @@
 #include "lua/lua_script.hpp"
 #include "material.hpp"
 #include "faction.hpp"
-#include "model.hpp"
+#include "model/corpseModel.hpp"
 
 /// @brief Holds details about a race.
 class Race
@@ -55,7 +55,7 @@ class Race
         /// TileId of the icon.
         int tileId;
         /// Corpse model.
-        Model corpse;
+        CorpseModel corpse;
 
         /// @brief Constructor.
         Race();

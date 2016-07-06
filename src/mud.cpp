@@ -91,8 +91,8 @@ Mud::~Mud()
     {
         delete (iterator);
     }
-    Logger::log(LogLevel::Global, "Freeing memory occupied by models...");
-    for (auto iterator : Mud::instance().mudModels)
+    Logger::log(LogLevel::Global, "Freeing memory occupied by item models...");
+    for (auto iterator : Mud::instance().mudItemModels)
     {
         delete (iterator.second);
     }
@@ -259,13 +259,13 @@ bool Mud::remCorpse(Item * corpse)
 {
     return (FindErase(mudCorpses, corpse) != mudCorpses.end());
 }
-bool Mud::addModel(Model * model)
+bool Mud::addItemModel(ItemModel * model)
 {
     if (model == nullptr)
     {
         return false;
     }
-    return mudModels.insert(std::make_pair(model->vnum, model)).second;
+    return mudItemModels.insert(std::make_pair(model->vnum, model)).second;
 }
 bool Mud::addArea(Area * area)
 {
@@ -383,10 +383,10 @@ Mobile * Mud::findMobile(std::string id)
     return nullptr;
 }
 
-Model * Mud::findModel(int vnum)
+ItemModel * Mud::findItemModel(int vnum)
 {
-    ModelMap::iterator iterator = mudModels.find(vnum);
-    if (iterator != mudModels.end())
+    ItemModelMap::iterator iterator = mudItemModels.find(vnum);
+    if (iterator != mudItemModels.end())
     {
         return iterator->second;
     }

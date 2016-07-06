@@ -377,7 +377,7 @@ void Action::performMine()
         return;
     }
     // Retrieve the product.
-    Model * product = Mud::instance().findModel(static_cast<int>(itemTarget->model->getNodeFunc().provides));
+    ItemModel * product = Mud::instance().findItemModel(static_cast<int>(itemTarget->model->getNodeFunc().provides));
     // Check if the product exists.
     if (product == nullptr)
     {
@@ -483,7 +483,7 @@ void Action::performChop()
         return;
     }
     // Retrieve the product.
-    Model * product = Mud::instance().findModel(static_cast<int>(itemTarget->model->getNodeFunc().provides));
+    ItemModel * product = Mud::instance().findItemModel(static_cast<int>(itemTarget->model->getNodeFunc().provides));
     // Check if the product exists.
     if (product == nullptr)
     {
@@ -657,9 +657,9 @@ void Action::performCraft()
     ItemVector createdItems;
     for (unsigned int it = 0; it < production->outcome.second; ++it)
     {
-        Model * outcomeMode = production->outcome.first;
+        ItemModel * outcomeModel = production->outcome.first;
         // Create the item.
-        Item * newItem = outcomeMode->createItem(actor->getName(), craftMaterial, ItemQuality::Normal);
+        Item * newItem = outcomeModel->createItem(actor->getName(), craftMaterial, ItemQuality::Normal);
         if (newItem == nullptr)
         {
             // Log a warning.

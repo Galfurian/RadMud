@@ -25,7 +25,7 @@
 
 #include "liquid.hpp"
 #include "lua/lua_script.hpp"
-#include "model.hpp"
+#include "model/itemModel.hpp"
 
 class Room;
 class Character;
@@ -38,7 +38,7 @@ class Item
         /// Item vnum.
         int vnum;
         /// Item model.
-        Model * model;
+        ItemModel * model;
         /// The player that created the item.
         std::string maker;
         /// In which condition is the item.

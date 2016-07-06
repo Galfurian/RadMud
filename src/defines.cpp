@@ -125,7 +125,7 @@ std::string GetModelTypeName(ModelType type)
     if (type == ModelType::Shield) return "Shield";
     if (type == ModelType::Projectile) return "Projectile";
     if (type == ModelType::Container) return "Container";
-    if (type == ModelType::LiqContainer) return "LiqContainer";
+    if (type == ModelType::LiquidContainer) return "LiquidContainer";
     if (type == ModelType::Tool) return "Tool";
     if (type == ModelType::Node) return "Node";
     if (type == ModelType::Resource) return "Resource";
@@ -135,10 +135,8 @@ std::string GetModelTypeName(ModelType type)
     if (type == ModelType::Food) return "Food";
     if (type == ModelType::Light) return "Light";
     if (type == ModelType::Vehicle) return "Vehicle";
-    if (type == ModelType::Pen) return "Pen";
     if (type == ModelType::Book) return "Book";
     if (type == ModelType::Rope) return "Rope";
-    if (type == ModelType::Trash) return "Trash";
     if (type == ModelType::Mechanism) return "Mechanism";
     if (type == ModelType::Currency) return "Currency";
     return "No Model Type";
@@ -232,6 +230,8 @@ std::string GetResourceTypeName(ResourceType type)
     if (type == ResourceType::StoneBlock) return "Stone Block";
     if (type == ResourceType::MetalVein) return "Metal Vein";
     if (type == ResourceType::StoneMonolith) return "Stone Monolith";
+    if (type == ResourceType::Pen) return "Pen";
+    if (type == ResourceType::Trash) return "Trash";
     return "No Resource Type";
 }
 

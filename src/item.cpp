@@ -104,7 +104,7 @@ void Item::destroy()
         container->takeOut(this);
     }
 
-    if (this->model->type == ModelType::Corpse)
+    if (this->model->getType() == ModelType::Corpse)
     {
         Logger::log(LogLevel::Error, "Removing corpse '" + this->getName() + "' from MUD;");
         // Remove the item from the list of corpses.
@@ -137,7 +137,7 @@ void Item::destroy()
 bool Item::updateOnDB()
 {
     // Check if the Item can be saved on the database.
-    if (model->type == ModelType::Corpse)
+    if (model->getType() == ModelType::Corpse)
     {
         return true;
     }
@@ -362,7 +362,7 @@ unsigned int Item::getTotalWeight()
     // Add the default weight of the model.
     unsigned int totalWeight = this->getWeight(true);
 
-    if (model->type == ModelType::Container)
+    if (model->getType() == ModelType::Container)
     {
         if (!this->isEmpty())
         {
@@ -372,7 +372,7 @@ unsigned int Item::getTotalWeight()
             }
         }
     }
-    else if (model->type == ModelType::LiqContainer)
+    else if (model->getType() == ModelType::LiquidContainer)
     {
         if (!this->isEmpty())
         {
@@ -421,7 +421,7 @@ bool Item::hasNodeType(NodeType nodeType)
     {
         return false;
     }
-    if (model->type != ModelType::Node)
+    if (model->getType() != ModelType::Node)
     {
         return false;
     }
@@ -434,11 +434,11 @@ bool Item::hasNodeType(NodeType nodeType)
 
 bool Item::isEmpty()
 {
-    if (model->type == ModelType::Container)
+    if (model->getType() == ModelType::Container)
     {
         return (content.size() == 0);
     }
-    else if (model->type == ModelType::LiqContainer)
+    else if (model->getType() == ModelType::LiquidContainer)
     {
         return (contentLiq.first == nullptr);
     }
@@ -450,11 +450,11 @@ bool Item::isEmpty()
 
 unsigned int Item::getTotalSpace()
 {
-    if (model->type == ModelType::Container)
+    if (model->getType() == ModelType::Container)
     {
         return model->getContainerFunc().maxWeight;
     }
-    else if (model->type == ModelType::LiqContainer)
+    else if (model->getType() == ModelType::LiquidContainer)
     {
         return model->getLiqContainerFunc().maxWeight;
     }
@@ -467,14 +467,14 @@ unsigned int Item::getTotalSpace()
 unsigned int Item::getUsedSpace()
 {
     unsigned int used = 0;
-    if (model->type == ModelType::Container)
+    if (model->getType() == ModelType::Container)
     {
         for (auto iterator : content)
         {
             used += iterator->model->weight;
         }
     }
-    else if (model->type == ModelType::LiqContainer)
+    else if (model->getType() == ModelType::LiquidContainer)
     {
         if (contentLiq.first != nullptr)
         {
@@ -638,7 +638,7 @@ Item * Item::findContent(std::string search_parameter, int & number)
 string Item::lookContent()
 {
     string output;
-    if (model->type == ModelType::Container)
+    if (model->getType() == ModelType::Container)
     {
         if (content.empty())
         {
@@ -665,7 +665,7 @@ string Item::lookContent()
                 + mud_measure + ".\n";
         }
     }
-    else if (model->type == ModelType::LiqContainer)
+    else if (model->getType() == ModelType::LiquidContainer)
     {
         if (contentLiq.first == nullptr)
         {

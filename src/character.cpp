@@ -37,26 +37,26 @@
 using namespace std;
 
 Character::Character() :
-    name(),
-    description(),
-    gender(),
-    weight(),
-    level(),
-    flags(),
-    race(),
-    faction(),
-    health(),
-    stamina(),
-    hunger(100),
-    thirst(100),
-    room(),
-    inventory(),
-    equipment(),
-    posture(CharacterPosture::Stand),
-    effects(),
-    action(this),
-    L(luaL_newstate()),
-    opponents(this)
+        name(),
+        description(),
+        gender(),
+        weight(),
+        level(),
+        flags(),
+        race(),
+        faction(),
+        health(),
+        stamina(),
+        hunger(100),
+        thirst(100),
+        room(),
+        inventory(),
+        equipment(),
+        posture(CharacterPosture::Stand),
+        effects(),
+        action(this),
+        L(luaL_newstate()),
+        opponents(this)
 {
     // Nothing to do.
 }
@@ -525,7 +525,7 @@ Item * Character::findEquipmentSlotTool(EquipmentSlot slot, ToolType type)
     {
         return nullptr;
     }
-    if (tool->model->type != ModelType::Tool)
+    if (tool->model->getType() != ModelType::Tool)
     {
         return nullptr;
     }
@@ -795,11 +795,11 @@ bool Character::canWield(Item * item, std::string & message, EquipmentSlot & whe
 bool Character::canWear(Item * item, std::string & message)
 {
     bool result = false;
-    if (item->model->type == ModelType::Armor)
+    if (item->model->getType() == ModelType::Armor)
     {
         result = true;
     }
-    else if (item->model->type == ModelType::Container)
+    else if (item->model->getType() == ModelType::Container)
     {
         if (item->getCurrentSlot() != EquipmentSlot::None)
         {
@@ -1033,7 +1033,7 @@ unsigned int Character::getArmorClass()
     // + ARMOR BONUS
     for (auto it : equipment)
     {
-        if (it->model->type == ModelType::Armor)
+        if (it->model->getType() == ModelType::Armor)
         {
             result += it->model->getArmorFunc().damageAbs;
         }
@@ -1042,7 +1042,7 @@ unsigned int Character::getArmorClass()
     Item * rh = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
     if (rh != nullptr)
     {
-        if (rh->model->type == ModelType::Shield)
+        if (rh->model->getType() == ModelType::Shield)
         {
             result += rh->model->getShieldFunc().parryChance;
         }
@@ -1050,7 +1050,7 @@ unsigned int Character::getArmorClass()
     Item * lh = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
     if (lh != nullptr)
     {
-        if (lh->model->type == ModelType::Shield)
+        if (lh->model->getType() == ModelType::Shield)
         {
             result += lh->model->getShieldFunc().parryChance;
         }
@@ -1068,7 +1068,7 @@ bool Character::canAttackWith(const EquipmentSlot & slot)
         if (weapon != nullptr)
         {
             // Check if there is actually a weapon equiped.
-            if (weapon->model->type == ModelType::Weapon)
+            if (weapon->model->getType() == ModelType::Weapon)
             {
                 return true;
             }
@@ -1477,10 +1477,9 @@ void Character::createCorpse()
 {
     // Retrieve the model of the corpse.
     Logger::log(LogLevel::Debug, "Retrieve the model of the corpse.");
-    Model * corpseModel = &race->corpse;
     // Create a new corpse.
     Logger::log(LogLevel::Debug, "Create a new corpse.");
-    Item * corpse = corpseModel->createItem(this->name, race->material, ItemQuality::Normal);
+    Item * corpse = race->corpse.createItem(this->name, race->material, ItemQuality::Normal);
     // Set the weight of the new corpse.
     corpse->customWeight = this->weight;
     // Add the corpse to the room.
@@ -1527,7 +1526,7 @@ void Character::loadScript(const std::string & scriptFilename)
     Character::luaRegister(L);
     Area::luaRegister(L);
     Faction::luaRegister(L);
-    Model::luaRegister(L);
+    ItemModel::luaRegister(L);
     Item::luaRegister(L);
     Material::luaRegister(L);
     Race::luaRegister(L);

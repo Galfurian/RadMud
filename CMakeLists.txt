@@ -105,6 +105,8 @@ endif()
 # Set Modules dir.
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
+add_subdirectory(src/model)
+
 set(PROJECT_SRC
     ./src/actions.cpp
     ./src/area.cpp
@@ -130,7 +132,6 @@ set(PROJECT_SRC
     ./src/main.cpp
     ./src/material.cpp
     ./src/mobile.cpp
-    ./src/model.cpp
     ./src/mud.cpp
     ./src/player.cpp
     ./src/production.cpp
@@ -150,6 +151,7 @@ set(PROJECT_SRC
     ./src/logger.cpp
     ./src/protocol.cpp
     ./src/luabridge/detail/LuaHelpers.cpp
+    ${MODEL_SRC}
 )
 
 find_package(Lua52 REQUIRED)
@@ -160,6 +162,7 @@ include_directories(
 	${LUA_INCLUDE_DIR}
 	${ZLIB_INCLUDE_DIR}
 	${SQLITE3_INCLUDE_DIR}
+	${MODEL_INC}
 	./src/luabridge/detail
 	./src/luabridge
 	./src/utilities
