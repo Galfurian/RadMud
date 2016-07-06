@@ -185,9 +185,9 @@ void DoGodInfo(Character * character, std::istream & sArgs)
         msg += "        " + it->getName() + "\n";
     }
     msg += Formatter::yellow() + "    Effects " + Formatter::reset() + ":\n";
-    for (auto it : target->effects.activeEffects)
+    for (EffectList::iterator it = target->effects.begin(); it != target->effects.end(); ++it)
     {
-        msg += "                [" + ToString(it.expires) + "] " + it.name + "\n";
+        msg += "                [" + ToString(it->expires) + "] " + it->name + "\n";
     }
     msg += Formatter::yellow() + "    Action  " + Formatter::reset() + ":"
         + GetActionTypeName(target->getAction()->getType()) + "\n";

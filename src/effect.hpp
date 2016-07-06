@@ -34,24 +34,16 @@ class Effect
         std::string messageActivate;
         /// Message to show when the effect ends.
         std::string messageExpire;
-        /// Health modification.
-        int health_mod;
-        /// Stamina modification.
-        int stamina_mod;
-        /// Strength modification.
-        int str_mod;
-        /// Agility modification.
-        int agi_mod;
-        /// Perception modification.
-        int per_mod;
-        /// Constitution modification.
-        int con_mod;
-        /// Intelligence modification.
-        int int_mod;
-        /// Hit chance modification.
-        int hit_mod;
-        /// Damage modification.
-        int dam_mod;
+        /// Health modifier.
+        int health;
+        /// Stamina modifier.
+        int stamina;
+        /// Abilities modifier.
+        std::map<Ability, unsigned int> abilities;
+        /// Hit chance modifier.
+        int hit;
+        /// Damage modifier.
+        int damage;
 
         /// @brief Constructor.
         Effect(std::string _name, int _expires, std::string _messageActivate, std::string _messageFade);
@@ -72,11 +64,20 @@ class Effect
 class EffectList
 {
     public:
-        /// A list of active effects.
-        std::vector<Effect> activeEffects;
-        /// A list of pending effects.
-        std::vector<Effect> pendingEffects;
+        /// Type of structure which contains effects.
+        typedef typename std::vector<Effect> EffectVector;
+        /// Iterator for an effects vector.
+        typedef typename std::vector<Effect>::iterator iterator;
+        /// Constant iterator for an effects vector.
+        typedef typename std::vector<Effect>::const_iterator const_iterator;
 
+    private:
+        /// The list of active effects.
+        EffectVector activeEffects;
+        /// The list of pending effects.
+        EffectVector pendingEffects;
+
+    public:
         /// @brief Constructor.
         EffectList();
 
@@ -90,26 +91,6 @@ class EffectList
         /// @brief Provides the overall stamina modifier.
         /// @return The total modifier.
         int getStaminaMod();
-
-        /// @brief Provides the overall stength modifier.
-        /// @return The total modifier.
-        int getStrMod();
-
-        /// @brief Provides the overall agility modifier.
-        /// @return The total modifier.
-        int getAgiMod();
-
-        /// @brief Provides the overall perception modifier.
-        /// @return The total modifier.
-        int getPerMod();
-
-        /// @brief Provides the overall constitution modifier.
-        /// @return The total modifier.
-        int getConMod();
-
-        /// @brief Provides the overall intelligence modifier.
-        /// @return The total modifier.
-        int getIntMod();
 
         /// @brief Provides the overall hit modifier.
         /// @return The total modifier.
@@ -140,6 +121,12 @@ class EffectList
 
         /// @brief Sort the list of effects.
         void sortList();
+
+        /// @brief Provides an iterator to the begin of the list of active effects.
+        iterator begin();
+
+        /// @brief Provides an iterator to the end of the list of active effects.
+        iterator end();
 };
 
 #endif

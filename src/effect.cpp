@@ -23,15 +23,11 @@ Effect::Effect(std::string _name, int _expires, std::string _messageActivate, st
     expires(_expires),
     messageActivate(_messageActivate),
     messageExpire(_messageFade),
-    health_mod(),
-    stamina_mod(),
-    str_mod(),
-    agi_mod(),
-    per_mod(),
-    con_mod(),
-    int_mod(),
-    hit_mod(),
-    dam_mod()
+    health(),
+    stamina(),
+    abilities(),
+    hit(),
+    damage()
 {
     // Nothing to do.
 }
@@ -65,9 +61,9 @@ EffectList::~EffectList()
 int EffectList::getHealthMod()
 {
     int result = 0;
-    for (auto iterator : activeEffects)
+    for (iterator it = activeEffects.begin(); it != activeEffects.end(); ++it)
     {
-        result += iterator.health_mod;
+        result += it->health;
     }
     return result;
 }
@@ -75,59 +71,9 @@ int EffectList::getHealthMod()
 int EffectList::getStaminaMod()
 {
     int result = 0;
-    for (auto iterator : activeEffects)
+    for (iterator it = activeEffects.begin(); it != activeEffects.end(); ++it)
     {
-        result += iterator.stamina_mod;
-    }
-    return result;
-}
-
-int EffectList::getStrMod()
-{
-    int result = 0;
-    for (auto iterator : activeEffects)
-    {
-        result += iterator.str_mod;
-    }
-    return result;
-}
-
-int EffectList::getAgiMod()
-{
-    int result = 0;
-    for (auto iterator : activeEffects)
-    {
-        result += iterator.agi_mod;
-    }
-    return result;
-}
-
-int EffectList::getPerMod()
-{
-    int result = 0;
-    for (auto iterator : activeEffects)
-    {
-        result += iterator.per_mod;
-    }
-    return result;
-}
-
-int EffectList::getConMod()
-{
-    int result = 0;
-    for (auto iterator : activeEffects)
-    {
-        result += iterator.con_mod;
-    }
-    return result;
-}
-
-int EffectList::getIntMod()
-{
-    int result = 0;
-    for (auto iterator : activeEffects)
-    {
-        result += iterator.int_mod;
+        result += it->stamina;
     }
     return result;
 }
@@ -135,9 +81,9 @@ int EffectList::getIntMod()
 int EffectList::getHitMod()
 {
     int result = 0;
-    for (auto iterator : activeEffects)
+    for (iterator it = activeEffects.begin(); it != activeEffects.end(); ++it)
     {
-        result += iterator.hit_mod;
+        result += it->hit;
     }
     return result;
 }
@@ -145,40 +91,21 @@ int EffectList::getHitMod()
 int EffectList::getDamMod()
 {
     int result = 0;
-    for (auto iterator : activeEffects)
+    for (iterator it = activeEffects.begin(); it != activeEffects.end(); ++it)
     {
-        result += iterator.dam_mod;
+        result += it->damage;
     }
     return result;
 }
 
 int EffectList::getAbilityModifier(const Ability & ability)
 {
-    if (ability == Ability::Strength)
+    int result = 0;
+    for (iterator it = activeEffects.begin(); it != activeEffects.end(); ++it)
     {
-        return this->getStrMod();
+        result += it->abilities[ability];
     }
-    else if (ability == Ability::Agility)
-    {
-        return this->getAgiMod();
-    }
-    else if (ability == Ability::Perception)
-    {
-        return this->getPerMod();
-    }
-    else if (ability == Ability::Constitution)
-    {
-        return this->getConMod();
-    }
-    else if (ability == Ability::Intelligence)
-    {
-        return this->getIntMod();
-    }
-    else
-    {
-        Logger::log(LogLevel::Error, "Selected an invalid ability(%s).", EnumToString(ability));
-        return 0;
-    }
+    return result;
 }
 
 void EffectList::addPendingEffect(const Effect & effect)
@@ -249,4 +176,14 @@ bool EffectList::effectUpdate(std::vector<std::string> & messages)
 void EffectList::sortList()
 {
     std::sort(activeEffects.begin(), activeEffects.end(), std::less<Effect>());
+}
+
+EffectList::iterator EffectList::begin()
+{
+    return activeEffects.begin();
+}
+
+EffectList::iterator EffectList::end()
+{
+    return activeEffects.end();
 }
