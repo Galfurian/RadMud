@@ -16,16 +16,17 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef PRODUCTION_HPP
-#define PRODUCTION_HPP
-
-#include "model/itemModel.hpp"
+#pragma once
 
 class Profession;
 class Character;
 
 #include <string>
 #include <map>
+
+#include "model/itemModel.hpp"
+#include "model/toolModel.hpp"
+#include "model/resourceModel.hpp"
 
 /// @brief Holds details about a production.
 class Production
@@ -106,5 +107,3 @@ class Production
 
 /// Production map handler.
 typedef std::map<int, Production *> ProductionMap;
-
-#endif

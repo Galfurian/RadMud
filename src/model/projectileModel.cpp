@@ -35,6 +35,11 @@ ModelType ProjectileModel::getType() const
     return ModelType::Projectile;
 }
 
+std::string ProjectileModel::getTypeName() const
+{
+    return "Projectile";
+}
+
 bool ProjectileModel::setModel(const std::string & source)
 {
     if (source.empty())

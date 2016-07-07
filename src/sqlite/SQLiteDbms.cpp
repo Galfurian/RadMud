@@ -118,7 +118,8 @@ bool SQLiteDbms::loadTables()
     {
         Logger::log(LogLevel::Debug, "    Loading Table: " + iterator.first + ".");
         // Execute the query.
-        ResultSet * result = dbConnection.executeSelect(("SELECT * FROM " + iterator.first + ";").c_str());
+        ResultSet * result = dbConnection.executeSelect(
+            ("SELECT * FROM " + iterator.first + ";").c_str());
         // Check the result.
         if (result == nullptr)
         {
@@ -128,7 +129,9 @@ bool SQLiteDbms::loadTables()
         if (!iterator.second(result))
         {
             // Log an error.
-            Logger::log(LogLevel::Error, "Encountered an error during loading table: " + iterator.first);
+            Logger::log(
+                LogLevel::Error,
+                "Encountered an error during loading table: " + iterator.first);
             // release the resource.
             result->release();
             return false;
@@ -241,7 +244,11 @@ bool SQLiteDbms::searchPlayer(string name)
     return outcome;
 }
 
-bool SQLiteDbms::insertInto(std::string table, std::vector<std::string> args, bool orIgnore, bool orReplace)
+bool SQLiteDbms::insertInto(
+    std::string table,
+    std::vector<std::string> args,
+    bool orIgnore,
+    bool orReplace)
 {
     stringstream stream;
     stream << "INSERT";
@@ -492,7 +499,8 @@ bool LoadNews(ResultSet * result)
 {
     while (result->next())
     {
-        if (!Mud::instance().mudNews.insert(std::make_pair(result->getNextString(), result->getNextString())).second)
+        if (!Mud::instance().mudNews.insert(
+            std::make_pair(result->getNextString(), result->getNextString())).second)
         {
             Logger::log(LogLevel::Error, "Error during news loading.");
             return false;
@@ -651,10 +659,10 @@ bool LoadModel(ResultSet * result)
         itemModel->name = result->getNextString();
         itemModel->article = result->getNextString();
         itemModel->shortdesc = result->getNextString();
-        itemModel->keys = SplitString(result->getNextString(), ";");
+        itemModel->keys = SplitString(result->getNextString(), " ");
         itemModel->description = result->getNextString();
         itemModel->slot = static_cast<EquipmentSlot>(result->getNextInteger());
-        itemModel->flags = result->getNextUnsignedInteger();
+        itemModel->modelFlags = result->getNextUnsignedInteger();
         itemModel->weight = result->getNextUnsignedInteger();
         itemModel->price = result->getNextInteger();
         itemModel->condition = result->getNextInteger();
@@ -775,9 +783,11 @@ bool LoadMobile(ResultSet * result)
         }
 
         // Set the respawn time.
-        mobile->nextRespawn = std::chrono::system_clock::now() + std::chrono::seconds(5 * mobile->level);
+        mobile->nextRespawn = std::chrono::system_clock::now()
+            + std::chrono::seconds(5 * mobile->level);
         // Set the next action time.
-        mobile->nextActionCooldown = std::chrono::system_clock::now() + std::chrono::seconds(10 * mobile->level);
+        mobile->nextActionCooldown = std::chrono::system_clock::now()
+            + std::chrono::seconds(10 * mobile->level);
         // Load its script.
         mobile->loadScript(kSystemDir + "lua/" + mobile->lua_script);
     }

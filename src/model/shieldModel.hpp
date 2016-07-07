@@ -20,6 +20,19 @@
 
 #include "itemModel.hpp"
 
+/// Shield sizes.
+typedef enum class ShieldSizes
+{
+    /// [0] All kind of size.
+    All,
+    /// [1] Light Shield
+    Light,
+    /// [2] Medium Shield
+    Medium,
+    /// [3] Heavy Shield
+    Heavy
+} ShieldSize;
+
 class ShieldModel: public ItemModel
 {
     public:
@@ -34,5 +47,15 @@ class ShieldModel: public ItemModel
 
         virtual ModelType getType() const;
 
+        virtual std::string getTypeName() const;
+
         virtual bool setModel(const std::string & source);
 };
+
+/// @addtogroup EnumToString
+/// @{
+
+/// Return the string describing the size of a Shield.
+std::string GetShieldSizeName(ShieldSize shieldSize);
+
+///@}

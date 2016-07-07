@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef GENERATOR_HPP
-#define GENERATOR_HPP
+#pragma once
 
 #include "defines.hpp"
 
@@ -90,6 +89,8 @@ class Generator
         /// @param status   Status of the zone.
         /// @param roomName The name of the room.
         /// @return The description of the room.
-        std::string generateDescription(const AreaType & type, const AreaStatus & status, const std::string & roomName);
+        std::string generateDescription(
+            const AreaType & type,
+            const AreaStatus & status,
+            const std::string & roomName);
 };
-#endif

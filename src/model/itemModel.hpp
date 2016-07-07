@@ -30,6 +30,27 @@ class Item;
 class Player;
 class Material;
 
+class ArmorModel;
+class BookModel;
+class ContainerModel;
+class CorpseModel;
+class CurrencyModel;
+class FoodModel;
+class FurnitureModel;
+class KeyModel;
+class LightModel;
+class LiquidContainerModel;
+class MechanismModel;
+class NodeModel;
+class ProjectileModel;
+class ResourceModel;
+class RopeModel;
+class SeedModel;
+class ShieldModel;
+class ToolModel;
+class VehicleModel;
+class WeaponModel;
+
 /// @brief Holds details about a model of item.
 class ItemModel
 {
@@ -51,7 +72,7 @@ class ItemModel
         /// Store here the position where the model can be equipped.
         EquipmentSlot slot;
         /// The model flags.
-        unsigned int flags;
+        unsigned int modelFlags;
         /// The model weight.
         unsigned int weight;
         /// The model price.
@@ -66,8 +87,6 @@ class ItemModel
         int tileSet;
         /// TileId of the icon.
         int tileId;
-        /// The model functions.
-        std::vector<unsigned int> functions;
 
         /// @brief Constructor.
         ItemModel();
@@ -90,14 +109,9 @@ class ItemModel
         /// @return Provides the type of model.
         virtual ModelType getType() const;
 
-        virtual bool setModel(const std::string & source) = 0;
+        virtual std::string getTypeName() const = 0;
 
-        /// @brief Given a source string, this function parse the string
-        ///         and sets the functions.
-        /// @param source Contains the list of functions.
-        /// @return <b>True</b> if the operation succeeded,<br>
-        ///         <b>False</b> otherwise.
-        bool setFunctions(std::string source);
+        virtual bool setModel(const std::string & source) = 0;
 
         /// @brief Check the correctness of the model.
         /// @return <b>True</b> if the model has correct values,<br><b>False</b> otherwise.
@@ -110,20 +124,24 @@ class ItemModel
         /// @param itemQuality  The quality of the model.
         /// @return <b>True</b> if something changed inside the string,<br>
         ///         <b>False</b> otherwise.
-        bool replaceSymbols(std::string & source, Material * itemMaterial = nullptr, ItemQuality itemQuality =
-            ItemQuality::Normal);
+        bool replaceSymbols(
+            std::string & source,
+            Material * itemMaterial = nullptr,
+            ItemQuality itemQuality = ItemQuality::Normal);
 
         /// @brief Returns the name of the model depending on the passed arguments.
         /// @param itemMaterial The material of which the model is made.
         /// @param itemQuality  The quality of the model.
         /// @return The specific name of the model.
-        std::string getName(Material * itemMaterial = nullptr, ItemQuality itemQuality = ItemQuality::Normal);
+        std::string getName(Material * itemMaterial = nullptr, ItemQuality itemQuality =
+            ItemQuality::Normal);
 
         /// @brief Returns the description of the model depending on the passed arguments.
         /// @param itemMaterial The material of which the model is made.
         /// @param itemQuality  The quality of the model.
         /// @return The specific description of the model.
-        std::string getDescription(Material * itemMaterial = nullptr, ItemQuality itemQuality = ItemQuality::Normal);
+        std::string getDescription(Material * itemMaterial = nullptr, ItemQuality itemQuality =
+            ItemQuality::Normal);
 
         /// @brief Create a new item starting from this model.
         /// @param maker       The player that create the item.
@@ -136,46 +154,6 @@ class ItemModel
         /// @return <b>True</b> if the item must be wielded,<br><b>False</b> Otherwise.
         bool mustBeWielded();
 
-        /// @brief Returns the name of the type of model.
-        /// @return The name of the model's type.
-        std::string getSpecificTypeName();
-
-        /// @defgroup ItemModel functions Extraction Methods.
-        /// @brief All the functions necessary to extract infomation regarding the functionality of a model.
-        /// @{
-
-        /// Parses the variable "functions" of a model and return information for a Weapon.
-        WeaponFunc getWeaponFunc();
-        /// Parses the variable "functions" of a model and return information for an Armor.
-        ArmorFunc getArmorFunc();
-        /// Parses the variable "functions" of a model and return information for a Shield.
-        ShieldFunc getShieldFunc();
-        /// Parses the variable "functions" of a model and return information for a Projectile.
-        ProjectileFunc getProjectileFunc();
-        /// Parses the variable "functions" of a model and return information for a Container.
-        ContainerFunc getContainerFunc();
-        /// Parses the variable "functions" of a model and return information for a Container of Liquids.
-        LiqContainerFunc getLiqContainerFunc();
-        /// Parses the variable "functions" of a model and return information for a Tool.
-        ToolFunc getToolFunc();
-        /// Parses the variable "functions" of a model and return information for a Node.
-        NodeFunc getNodeFunc();
-        /// Parses the variable "functions" of a model and return information for a Resource.
-        ResourceFunc getResourceFunc();
-        /// Parses the variable "functions" of a model and return information for a Seed.
-        SeedFunc getSeedFunc();
-        /// Parses the variable "functions" of a model and return information for a Food.
-        FoodFunc getFoodFunc();
-        /// Parses the variable "functions" of a model and return information for a Light.
-        LightFunc getLightFunc();
-        /// Parses the variable "functions" of a model and return information for a Book.
-        BookFunc getBookFunc();
-        /// Parses the variable "functions" of a model and return information for a Rope.
-        RopeFunc getRopeFunc();
-        /// Parses the variable "functions" of a model and return information for a Mechanism.
-        MechanismFunc getMechanismFunc();
-        ///@}
-
         /// @brief Function used to register inside the lua environment the class.
         /// @param L The lua environment.
         static void luaRegister(lua_State * L);
@@ -183,6 +161,48 @@ class ItemModel
         /// @brief Returns the tile of the model.
         /// @return The string which contains the code of the tile.
         std::string getTile(int offset = 0);
+
+    public:
+        /// @brief Returns the model <b>statically</b> casted to Armor.
+        ArmorModel * toArmor();
+        /// @brief Returns the model <b>statically</b> casted to Book.
+        BookModel * toBook();
+        /// @brief Returns the model <b>statically</b> casted to Container.
+        ContainerModel * toContainer();
+        /// @brief Returns the model <b>statically</b> casted to Corpse.
+        CorpseModel * toCorpse();
+        /// @brief Returns the model <b>statically</b> casted to Currency.
+        CurrencyModel * toCurrency();
+        /// @brief Returns the model <b>statically</b> casted to Food.
+        FoodModel * toFood();
+        /// @brief Returns the model <b>statically</b> casted to Furniture.
+        FurnitureModel * toFurniture();
+        /// @brief Returns the model <b>statically</b> casted to Key.
+        KeyModel * toKey();
+        /// @brief Returns the model <b>statically</b> casted to Light.
+        LightModel * toLight();
+        /// @brief Returns the model <b>statically</b> casted to Liquid Container.
+        LiquidContainerModel * toLiquidContainer();
+        /// @brief Returns the model <b>statically</b> casted to Mechanism.
+        MechanismModel * toMechanism();
+        /// @brief Returns the model <b>statically</b> casted to Node.
+        NodeModel * toNode();
+        /// @brief Returns the model <b>statically</b> casted to Projectile.
+        ProjectileModel * toProjectile();
+        /// @brief Returns the model <b>statically</b> casted to Resource.
+        ResourceModel * toResource();
+        /// @brief Returns the model <b>statically</b> casted to Rope.
+        RopeModel * toRope();
+        /// @brief Returns the model <b>statically</b> casted to Seed.
+        SeedModel * toSeed();
+        /// @brief Returns the model <b>statically</b> casted to Shield.
+        ShieldModel * toShield();
+        /// @brief Returns the model <b>statically</b> casted to Tool.
+        ToolModel * toTool();
+        /// @brief Returns the model <b>statically</b> casted to Vehicle.
+        VehicleModel * toVehicle();
+        /// @brief Returns the model <b>statically</b> casted to Weapon.
+        WeaponModel * toWeapon();
 };
 
 /// ItemModel vector handler.
@@ -190,3 +210,12 @@ typedef std::vector<ItemModel *> ItemModelList;
 
 /// ItemModel map handler.
 typedef std::map<int, ItemModel *> ItemModelMap;
+
+/// @defgroup FlagsToList Flags to List of Strings.
+/// @brief All the functions necessary to transform into a list of string a pool of flags.
+/// @{
+
+/// Return a list of string containg the Model flags contained inside the value.
+std::string GetModelFlagString(unsigned int flags);
+
+/// @}

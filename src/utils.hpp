@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef UTILS_HPP
-#define UTILS_HPP
+#pragma once
 
 #include <stdint.h>
 #include <algorithm>
@@ -450,4 +449,3 @@ class Stopwatch
             std::cout << header << " : " << elapsed() << std::endl;
         }
 };
-#endif

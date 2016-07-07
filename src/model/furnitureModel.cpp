@@ -33,6 +33,11 @@ ModelType FurnitureModel::getType() const
     return ModelType::Furniture;
 }
 
+std::string FurnitureModel::getTypeName() const
+{
+    return "Furniture";
+}
+
 bool FurnitureModel::setModel(const std::string & source)
 {
     std::vector<std::string> functionList = SplitString(source, " ");

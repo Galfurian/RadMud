@@ -20,6 +20,19 @@
 
 #include "itemModel.hpp"
 
+/// Sizes of armor.
+typedef enum class ArmorSizes
+{
+    /// [0] All kind of size.
+    All,
+    /// [1] Light Armor
+    Light,
+    /// [2] Medium Armor
+    Medium,
+    /// [3] Heavy Armor
+    Heavy
+} ArmorSize;
+
 class ArmorModel: public ItemModel
 {
     public:
@@ -36,5 +49,15 @@ class ArmorModel: public ItemModel
 
         virtual ModelType getType() const;
 
+        virtual std::string getTypeName() const;
+
         virtual bool setModel(const std::string & source);
 };
+
+/// @addtogroup EnumToString
+/// @{
+
+/// Return the string describing the size of an Armor.
+std::string GetArmorSizeName(ArmorSize armorSize);
+
+///@}

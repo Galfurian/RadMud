@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef PLAYER_HPP
-#define PLAYER_HPP
+#pragma once
 
 #include <ctime>
 #include <list>
@@ -167,5 +166,3 @@ class Player: public Character
 
 /// Player map.
 typedef std::set<Player *> PlayerList;
-
-#endif

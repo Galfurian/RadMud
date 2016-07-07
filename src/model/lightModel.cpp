@@ -35,6 +35,11 @@ ModelType LightModel::getType() const
     return ModelType::Light;
 }
 
+std::string LightModel::getTypeName() const
+{
+    return "Light";
+}
+
 bool LightModel::setModel(const std::string & source)
 {
     if (source.empty())

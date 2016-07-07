@@ -35,6 +35,11 @@ ModelType ShieldModel::getType() const
     return ModelType::Shield;
 }
 
+std::string ShieldModel::getTypeName() const
+{
+    return "Shield";
+}
+
 bool ShieldModel::setModel(const std::string & source)
 {
     if (source.empty())
@@ -45,10 +50,22 @@ bool ShieldModel::setModel(const std::string & source)
     std::vector<std::string> functionList = SplitString(source, " ");
     if (functionList.size() != 2)
     {
-        Logger::log(LogLevel::Error, "Wrong number of parameters for Shield Model (%s).", this->name);
+        Logger::log(
+            LogLevel::Error,
+            "Wrong number of parameters for Shield Model (%s).",
+            this->name);
         return false;
     }
     this->size = static_cast<ShieldSize>(ToNumber<unsigned int>(functionList[0]));
     this->parryChance = ToNumber<unsigned int>(functionList[1]);
     return true;
+}
+
+std::string GetShieldSizeName(ShieldSize shieldSize)
+{
+    if (shieldSize == ShieldSize::All) return "Universal Shield";
+    if (shieldSize == ShieldSize::Light) return "Light Shield";
+    if (shieldSize == ShieldSize::Medium) return "Medium Shield";
+    if (shieldSize == ShieldSize::Heavy) return "Heavy Shield";
+    return "No Armor Size";
 }

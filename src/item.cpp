@@ -31,29 +31,37 @@
 #include "constants.hpp"
 #include "luabridge/LuaBridge.h"
 
+#include "model/nodeModel.hpp"
+#include "model/containerModel.hpp"
+#include "model/liquidContainerModel.hpp"
+
 using namespace std;
 
 Item::Item() :
-    vnum(),
-    model(),
-    maker(),
-    condition(),
-    composition(),
-    quality(ItemQuality::None),
-    flags(),
-    room(),
-    owner(),
-    container(),
-    currentSlot(EquipmentSlot::None),
-    content(),
-    contentLiq(),
-    customWeight()
+        vnum(),
+        model(),
+        maker(),
+        condition(),
+        composition(),
+        quality(ItemQuality::None),
+        flags(),
+        room(),
+        owner(),
+        container(),
+        currentSlot(EquipmentSlot::None),
+        content(),
+        contentLiq(),
+        customWeight()
 {
 }
 
 Item::~Item()
 {
-    Logger::log(LogLevel::Debug, "Deleted item\t\t[%s]\t\t(%s)", ToString(this->vnum), this->getNameCapital());
+    Logger::log(
+        LogLevel::Debug,
+        "Deleted item\t\t[%s]\t\t(%s)",
+        ToString(this->vnum),
+        this->getNameCapital());
 }
 
 bool Item::check(bool complete)
@@ -291,6 +299,7 @@ bool Item::hasKey(string key)
         std::string name = iterator;
         // Replace the symbols inside name.
         model->replaceSymbols(name, composition, quality);
+        Logger::log(LogLevel::Debug, "Item name: %s", name);
         if (BeginWith(name, key))
         {
             return true;
@@ -352,7 +361,8 @@ unsigned int Item::getWeight(bool withMaterial)
     if (withMaterial)
     {
         // Add the addition weight due to the material.
-        result += static_cast<unsigned int>(static_cast<double>(result / 100) * composition->lightness);
+        result += static_cast<unsigned int>(static_cast<double>(result / 100)
+            * composition->lightness);
     }
     return result;
 }
@@ -405,12 +415,13 @@ string Item::getLook()
 
     // Prepare : Name, Condition.
     //           Description.
-    output = "You look at " + Formatter::cyan() + getName() + Formatter::reset() + ", it" + getCondition();
+    output = "You look at " + Formatter::cyan() + getName() + Formatter::reset() + ", it"
+        + getCondition();
     output += Formatter::gray() + getDescription() + Formatter::reset() + "\n";
     // Print the content.
     output += lookContent();
-    output += "It weights about " + Formatter::yellow() + ToString(this->getTotalWeight()) + Formatter::reset() + " "
-        + mud_measure + ".\n";
+    output += "It weights about " + Formatter::yellow() + ToString(this->getTotalWeight())
+        + Formatter::reset() + " " + mud_measure + ".\n";
 
     return output;
 }
@@ -425,7 +436,7 @@ bool Item::hasNodeType(NodeType nodeType)
     {
         return false;
     }
-    if (model->getNodeFunc().type != nodeType)
+    if (model->toNode()->nodeType != nodeType)
     {
         return false;
     }
@@ -452,11 +463,11 @@ unsigned int Item::getTotalSpace()
 {
     if (model->getType() == ModelType::Container)
     {
-        return model->getContainerFunc().maxWeight;
+        return model->toContainer()->maxWeight;
     }
     else if (model->getType() == ModelType::LiquidContainer)
     {
-        return model->getLiqContainerFunc().maxWeight;
+        return model->toLiquidContainer()->maxWeight;
     }
     else
     {
@@ -523,7 +534,9 @@ void Item::takeOut(Item * item)
 {
     if (FindErase(content, item))
     {
-        Logger::log(LogLevel::Debug, "Item '" + item->getName() + "' taken out from '" + this->getName() + "';");
+        Logger::log(
+            LogLevel::Debug,
+            "Item '" + item->getName() + "' taken out from '" + this->getName() + "';");
         item->container = nullptr;
     }
     else
@@ -578,9 +591,12 @@ bool Item::pourIn(Liquid * liquid, const unsigned int & quantity)
 
 bool Item::pourOut(const unsigned int & quantity)
 {
+    if (model->getType() != ModelType::LiquidContainer)
+    {
+        return false;
+    }
     // If the item has an Endless provision of liquid, don't do any check.
-    unsigned int modelFlags = model->getLiqContainerFunc().flags;
-    if (HasFlag(modelFlags, LiqContainerFlag::Endless))
+    if (HasFlag(model->toLiquidContainer()->liquidFlags, LiqContainerFlag::Endless))
     {
         return true;
     }
@@ -652,31 +668,31 @@ string Item::lookContent()
                 std::string contentName = it.first->getNameCapital();
                 if (it.second > 1)
                 {
-                    output += " - " + Formatter::cyan() + contentName + Formatter::reset() + " [" + ToString(it.second)
-                        + "].\n";
+                    output += " - " + Formatter::cyan() + contentName + Formatter::reset() + " ["
+                        + ToString(it.second) + "].\n";
                 }
                 else
                 {
                     output += " - " + Formatter::cyan() + contentName + Formatter::reset() + ".\n";
                 }
             }
-            output += "Has been used " + Formatter::yellow() + ToString(getUsedSpace()) + Formatter::reset();
-            output += " out of " + Formatter::yellow() + ToString(getTotalSpace()) + Formatter::reset() + " "
-                + mud_measure + ".\n";
+            output += "Has been used " + Formatter::yellow() + ToString(getUsedSpace())
+                + Formatter::reset();
+            output += " out of " + Formatter::yellow() + ToString(getTotalSpace())
+                + Formatter::reset() + " " + mud_measure + ".\n";
         }
     }
     else if (model->getType() == ModelType::LiquidContainer)
     {
         if (contentLiq.first == nullptr)
         {
-            output += Formatter::italic() + "It does not contain any liquid.\n" + Formatter::reset();
+            output += Formatter::italic() + "It does not contain any liquid.\n"
+                + Formatter::reset();
         }
         else
         {
             int percent = 0;
-
-            unsigned int modelFlags = model->getLiqContainerFunc().flags;
-            if (HasFlag(modelFlags, LiqContainerFlag::Endless))
+            if (HasFlag(this->model->toLiquidContainer()->liquidFlags, LiqContainerFlag::Endless))
             {
                 percent = 100;
             }

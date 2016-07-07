@@ -1,13 +1,13 @@
 #############################################
-# Model Namespace Include Directories
-set(MODEL_INC
+# Model Include Directories
+set(RADMUD_MODEL_INC
 	src/model
     PARENT_SCOPE
 )
 
 #############################################
-# Model Namespace Source Files
-set(MODEL_SRC
+# Model Source Files
+set(RADMUD_MODEL_SRC
 	./src/model/armorModel.cpp
 	./src/model/bookModel.cpp
 	./src/model/containerModel.cpp

@@ -20,6 +20,15 @@
 
 #include "itemModel.hpp"
 
+/// Used to determine the type of the resource.
+typedef enum class SeedTypes
+{
+    /// A generic seed.
+    Plant,
+    /// A seed used to plant a tree.
+    Tree,
+} SeedType;
+
 class SeedModel: public ItemModel
 {
     public:
@@ -32,5 +41,16 @@ class SeedModel: public ItemModel
 
         virtual ModelType getType() const;
 
+        virtual std::string getTypeName() const;
+
         virtual bool setModel(const std::string & source);
 };
+
+/// @addtogroup EnumToString
+/// @{
+
+/// Return the string describing the type of a Seed.
+std::string GetSeedTypeName(SeedType type);
+
+///@}
+

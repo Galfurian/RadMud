@@ -20,7 +20,7 @@
 
 FoodModel::FoodModel() :
         hours(),
-        flags()
+        foodFlags()
 {
     // Nothing to do.
 }
@@ -33,6 +33,11 @@ FoodModel::~FoodModel()
 ModelType FoodModel::getType() const
 {
     return ModelType::Food;
+}
+
+std::string FoodModel::getTypeName() const
+{
+    return "Food";
 }
 
 bool FoodModel::setModel(const std::string & source)
@@ -49,6 +54,15 @@ bool FoodModel::setModel(const std::string & source)
         return false;
     }
     this->hours = ToNumber<unsigned int>(functionList[0]);
-    this->flags = ToNumber<unsigned int>(functionList[1]);
+    this->foodFlags = ToNumber<unsigned int>(functionList[1]);
     return true;
+}
+
+std::string GetFoodFlagString(unsigned int flags)
+{
+    std::string flagList;
+    if (HasFlag(flags, FoodFlag::Poisoned)) flagList += "|Poisoned";
+    if (HasFlag(flags, FoodFlag::Raw)) flagList += "|Raw";
+    flagList += "|";
+    return flagList;
 }

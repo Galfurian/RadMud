@@ -20,13 +20,24 @@
 
 #include "itemModel.hpp"
 
+/// Used to determine the flag of the food.
+typedef enum class FoodFlags
+{
+    /// No flag.
+    None = 0,
+    /// Food is poisoned.
+    Poisoned = 1,
+    /// Food is not cocked.
+    Raw = 2,
+} FoodFlag;
+
 class FoodModel: public ItemModel
 {
     public:
         /// Hours of feeding.
         unsigned int hours;
         /// The food flags.
-        unsigned int flags;
+        unsigned int foodFlags;
 
         FoodModel();
 
@@ -34,5 +45,15 @@ class FoodModel: public ItemModel
 
         virtual ModelType getType() const;
 
+        virtual std::string getTypeName() const;
+
         virtual bool setModel(const std::string & source);
 };
+
+/// @addtogroup FlagsToList
+/// @{
+
+/// Return a list of string containg the Food flags contained inside the value.
+std::string GetFoodFlagString(unsigned int flags);
+
+/// @}

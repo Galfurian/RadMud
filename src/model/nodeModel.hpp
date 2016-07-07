@@ -20,6 +20,18 @@
 
 #include "itemModel.hpp"
 
+/// Used to determine the type of the node.
+typedef enum class NodeTypes
+{
+    NoType,
+    /// [1] The node is a METAL node.
+    Metal,
+    /// [2] The node is a WOOD node.
+    Wood,
+    /// [3] The node is a STONE node.
+    Stone
+} NodeType;
+
 class NodeModel: public ItemModel
 {
     public:
@@ -34,5 +46,16 @@ class NodeModel: public ItemModel
 
         virtual ModelType getType() const;
 
+        virtual std::string getTypeName() const;
+
         virtual bool setModel(const std::string & source);
 };
+
+/// @addtogroup EnumToString
+/// @{
+
+/// Return the string describing the type of a Node.
+std::string GetNodeTypeName(NodeType type);
+
+///@}
+

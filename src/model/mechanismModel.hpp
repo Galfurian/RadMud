@@ -20,6 +20,21 @@
 
 #include "itemModel.hpp"
 
+/// Used to determine the type of the resource.
+typedef enum class MechanismTypes
+{
+    /// No flag
+    None,
+    /// [1] The mechanism is a door.
+    Door,
+    /// [2] The mechanism is a lock.
+    Lock,
+    /// [3] The mechanism is a picklock.
+    Picklock,
+    /// [4] The mechanism is a lever.
+    Lever
+} MechanismType;
+
 class MechanismModel: public ItemModel
 {
     public:
@@ -42,5 +57,16 @@ class MechanismModel: public ItemModel
 
         virtual ModelType getType() const;
 
+        virtual std::string getTypeName() const;
+
         virtual bool setModel(const std::string & source);
 };
+
+/// @addtogroup EnumToString
+/// @{
+
+/// Return the string describing the type of a Mechanism.
+std::string GetMechanismTypeName(MechanismType type);
+
+///@}
+

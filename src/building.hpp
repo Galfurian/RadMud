@@ -16,13 +16,14 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef BUILDING_HPP
-#define BUILDING_HPP
+#pragma once
 
 #include <string>
 #include <map>
 
 #include "model/itemModel.hpp"
+#include "model/toolModel.hpp"
+#include "model/resourceModel.hpp"
 
 /// @brief Holds details about a building.
 class Building
@@ -88,5 +89,3 @@ typedef std::map<int, Building> BuildingMap;
 
 /// BuildingMap iterator.
 typedef BuildingMap::iterator BuildingMapIterator;
-
-#endif

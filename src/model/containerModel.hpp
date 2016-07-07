@@ -20,13 +20,26 @@
 
 #include "itemModel.hpp"
 
+/// Used to determine the flag of the container.
+typedef enum class ContainerFlags
+{
+    /// No flag.
+    None = 0,
+    /// Can be closed.
+    CanClose = 1,
+    /// Can be burgled.
+    CanBurgle = 2,
+    /// Can see inside even if closed.
+    CanSee = 4,
+} ContainerFlag;
+
 class ContainerModel: public ItemModel
 {
     public:
         /// The maximum weight which this container can carry.
         unsigned int maxWeight;
         /// The flags of the container.
-        unsigned int flags;
+        unsigned int containerFlags;
         /// The vnum of the key which opens this container.
         unsigned int keyVnum;
         /// The lockpicking difficulty.
@@ -38,5 +51,15 @@ class ContainerModel: public ItemModel
 
         virtual ModelType getType() const;
 
+        virtual std::string getTypeName() const;
+
         virtual bool setModel(const std::string & source);
 };
+
+/// @addtogroup FlagsToList
+/// @{
+
+/// Return a list of string containg the Container flags contained inside the value.
+std::string GetContainerFlagString(unsigned int flags);
+
+/// @}

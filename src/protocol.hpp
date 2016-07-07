@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef PROTOCOL_HPP
-#define PROTOCOL_HPP
+#pragma once
 
 #include "character.hpp"
 
@@ -43,5 +42,3 @@ void NegotiateProtocol(Character * character, const ConnectionState & nextState)
 /// @param character The character with which the protocol is negotiated.
 /// @param sArgs     The input stream containing from the character.
 void ProcessTelnetCommand(Character * character, std::istream & sArgs);
-
-#endif

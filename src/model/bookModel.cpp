@@ -34,6 +34,11 @@ ModelType BookModel::getType() const
     return ModelType::Book;
 }
 
+std::string BookModel::getTypeName() const
+{
+    return "Book";
+}
+
 bool BookModel::setModel(const std::string & source)
 {
     if (source.empty())

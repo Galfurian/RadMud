@@ -37,6 +37,11 @@ ModelType WeaponModel::getType() const
     return ModelType::Weapon;
 }
 
+std::string WeaponModel::getTypeName() const
+{
+    return "Weapon";
+}
+
 bool WeaponModel::setModel(const std::string & source)
 {
     if (source.empty())
@@ -47,7 +52,10 @@ bool WeaponModel::setModel(const std::string & source)
     std::vector<std::string> functionList = SplitString(source, " ");
     if (functionList.size() != 4)
     {
-        Logger::log(LogLevel::Error, "Wrong number of parameters for Weapon Model (%s).", this->name);
+        Logger::log(
+            LogLevel::Error,
+            "Wrong number of parameters for Weapon Model (%s).",
+            this->name);
         return false;
     }
     this->weaponType = static_cast<WeaponType>(ToNumber<unsigned int>(functionList[0]));
@@ -55,4 +63,22 @@ bool WeaponModel::setModel(const std::string & source)
     this->maxDamage = ToNumber<unsigned int>(functionList[2]);
     this->range = ToNumber<unsigned int>(functionList[3]);
     return true;
+}
+
+std::string GetWeaponTypeName(WeaponType type)
+{
+    if (type == WeaponType::Pistol) return "Pistol";
+    if (type == WeaponType::Rifle) return "Rifle";
+    if (type == WeaponType::Shotgun) return "Shotgun";
+    if (type == WeaponType::HeavyWeapon) return "Heavy Weapon";
+    if (type == WeaponType::EnergyPistol) return "Energy Pistol";
+    if (type == WeaponType::EnergyRifle) return "Energy Rifle";
+    if (type == WeaponType::EnergyHeavyWeapon) return "Energy Heavy Weapon";
+    if (type == WeaponType::Granade) return "Granade";
+    if (type == WeaponType::Placed) return "Placed";
+    if (type == WeaponType::Bladed) return "Bladed";
+    if (type == WeaponType::Blunt) return "Blunt";
+    if (type == WeaponType::Thrown) return "Thrown";
+    if (type == WeaponType::Unarmed) return "Unarmed";
+    return "No Weapon Type";
 }

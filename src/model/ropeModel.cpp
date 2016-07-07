@@ -35,6 +35,11 @@ ModelType RopeModel::getType() const
     return ModelType::Rope;
 }
 
+std::string RopeModel::getTypeName() const
+{
+    return "Rope";
+}
+
 bool RopeModel::setModel(const std::string & source)
 {
     if (source.empty())

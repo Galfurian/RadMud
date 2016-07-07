@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef FORMATTER_HPP
-#define FORMATTER_HPP
+#pragma once
 
 #include <string>
 
@@ -99,5 +98,3 @@ class Formatter
         /// @return The IAC:DONT:FORMAT command.
         static std::string dontFormat();
 };
-
-#endif // FORMATTER_HPP

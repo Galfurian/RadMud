@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef PROFESSION_HPP
-#define PROFESSION_HPP
+#pragma once
 
 #include <string>
 #include <map>
@@ -85,5 +84,3 @@ class Profession
 
 /// Profession map handler.
 typedef std::map<unsigned int, Profession *> ProfessionMap;
-
-#endif

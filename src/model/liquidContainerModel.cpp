@@ -20,7 +20,7 @@
 
 LiquidContainerModel::LiquidContainerModel() :
         maxWeight(),
-        flags()
+        liquidFlags()
 {
     // Nothing to do.
 }
@@ -35,6 +35,11 @@ ModelType LiquidContainerModel::getType() const
     return ModelType::LiquidContainer;
 }
 
+std::string LiquidContainerModel::getTypeName() const
+{
+    return "LiquidContainer";
+}
+
 bool LiquidContainerModel::setModel(const std::string & source)
 {
     if (source.empty())
@@ -45,10 +50,23 @@ bool LiquidContainerModel::setModel(const std::string & source)
     std::vector<std::string> functionList = SplitString(source, " ");
     if (functionList.size() != 2)
     {
-        Logger::log(LogLevel::Error, "Wrong number of parameters for Liquid Container Model (%s).", this->name);
+        Logger::log(
+            LogLevel::Error,
+            "Wrong number of parameters for Liquid Container Model (%s).",
+            this->name);
         return false;
     }
     this->maxWeight = ToNumber<unsigned int>(functionList[0]);
-    this->flags = ToNumber<unsigned int>(functionList[1]);
+    this->liquidFlags = ToNumber<unsigned int>(functionList[1]);
     return true;
+}
+
+std::string GetLiqContainerFlagString(unsigned int flags)
+{
+    std::string flagList;
+    if (HasFlag(flags, LiqContainerFlag::Poisoned)) flagList += "|Poisoned";
+    if (HasFlag(flags, LiqContainerFlag::Endless)) flagList += "|Endless";
+    if (HasFlag(flags, LiqContainerFlag::Destroy)) flagList += "|Destroy";
+    flagList += "|";
+    return flagList;
 }

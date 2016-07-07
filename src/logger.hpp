@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef LOGGER_HPP
-#define LOGGER_HPP
+#pragma once
 
 #include <iostream>
 #include <fstream>
@@ -130,5 +129,3 @@ class Logger
         /// @return Logging level string.
         static std::string levelToString(const LogLevel & level);
 };
-
-#endif /* SRC_LOGGER_HPP_ */

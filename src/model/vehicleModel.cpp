@@ -33,6 +33,11 @@ ModelType VehicleModel::getType() const
     return ModelType::Vehicle;
 }
 
+std::string VehicleModel::getTypeName() const
+{
+    return "Vehicle";
+}
+
 bool VehicleModel::setModel(const std::string & source)
 {
     if (source.empty())
@@ -43,7 +48,10 @@ bool VehicleModel::setModel(const std::string & source)
     std::vector<std::string> functionList = SplitString(source, " ");
     if (functionList.size() != 0)
     {
-        Logger::log(LogLevel::Error, "Wrong number of parameters for Vehicle Model (%s).", this->name);
+        Logger::log(
+            LogLevel::Error,
+            "Wrong number of parameters for Vehicle Model (%s).",
+            this->name);
         return false;
     }
     return true;

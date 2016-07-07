@@ -20,13 +20,26 @@
 
 #include "itemModel.hpp"
 
+/// Used to determine the flag of the container of liquid.
+typedef enum class LiqContainerFlags
+{
+    /// No flag.
+    None = 0,
+    /// Liquid is poisoned.
+    Poisoned = 1,
+    /// Content never ends.
+    Endless = 2,
+    /// Container is destroyed once emptied.
+    Destroy = 4,
+} LiqContainerFlag;
+
 class LiquidContainerModel: public ItemModel
 {
     public:
         /// The maximum weight which this container can carry.
         unsigned int maxWeight;
         /// The flags of the container.
-        unsigned int flags;
+        unsigned int liquidFlags;
 
         LiquidContainerModel();
 
@@ -34,5 +47,16 @@ class LiquidContainerModel: public ItemModel
 
         virtual ModelType getType() const;
 
+        virtual std::string getTypeName() const;
+
         virtual bool setModel(const std::string & source);
 };
+
+/// @addtogroup FlagsToList
+/// @{
+
+/// Return a list of string containg the Container of Liquids flags contained inside the value.
+std::string GetLiqContainerFlagString(unsigned int flags);
+
+/// @}
+

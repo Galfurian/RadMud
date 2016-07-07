@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef MUD_HPP
-#define MUD_HPP
+#pragma once
 
 #include "area.hpp"
 #include "building.hpp"
@@ -400,5 +399,3 @@ class Mud
 /// @brief Here when a signal is raised.
 /// @param signal Signal received from player.
 void Bailout(int signal);
-
-#endif

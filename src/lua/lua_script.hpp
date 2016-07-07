@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef LUA_SCRIPT_HPP
-#define LUA_SCRIPT_HPP
+#pragma once
 
 #include <string>
 #include <vector>
@@ -126,5 +125,3 @@ Item * LuaLoadItem(Character * maker, int vnumModel, int vnumMaterial, int intQu
 /// @brief Register in Lua all the functions.
 /// @param L The lua state.
 void LuaRegisterUtils(lua_State * L);
-
-#endif

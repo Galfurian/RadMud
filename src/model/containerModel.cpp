@@ -20,7 +20,7 @@
 
 ContainerModel::ContainerModel() :
         maxWeight(),
-        flags(),
+        containerFlags(),
         keyVnum(),
         difficulty()
 {
@@ -37,6 +37,11 @@ ModelType ContainerModel::getType() const
     return ModelType::Container;
 }
 
+std::string ContainerModel::getTypeName() const
+{
+    return "Container";
+}
+
 bool ContainerModel::setModel(const std::string & source)
 {
     if (source.empty())
@@ -47,12 +52,25 @@ bool ContainerModel::setModel(const std::string & source)
     std::vector<std::string> functionList = SplitString(source, " ");
     if (functionList.size() != 4)
     {
-        Logger::log(LogLevel::Error, "Wrong number of parameters for Container Model (%s).", this->name);
+        Logger::log(
+            LogLevel::Error,
+            "Wrong number of parameters for Container Model (%s).",
+            this->name);
         return false;
     }
     this->maxWeight = ToNumber<unsigned int>(functionList[0]);
-    this->flags = ToNumber<unsigned int>(functionList[1]);
+    this->containerFlags = ToNumber<unsigned int>(functionList[1]);
     this->keyVnum = ToNumber<unsigned int>(functionList[2]);
     this->difficulty = ToNumber<unsigned int>(functionList[3]);
     return true;
+}
+
+std::string GetContainerFlagString(unsigned int flags)
+{
+    std::string flagList;
+    if (HasFlag(flags, ContainerFlag::CanClose)) flagList += "|CanClose";
+    if (HasFlag(flags, ContainerFlag::CanBurgle)) flagList += "|CanBurgle";
+    if (HasFlag(flags, ContainerFlag::CanSee)) flagList += "|CanSee";
+    flagList += "|";
+    return flagList;
 }

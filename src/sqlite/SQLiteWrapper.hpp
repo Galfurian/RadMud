@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef  SQLITEWRAPPER_HPP
-#define  SQLITEWRAPPER_HPP
+#pragma once
 
 #include <string>
 #include <sqlite3.h>
@@ -165,5 +164,3 @@ class SQLiteWrapper: public ResultSet
         int getNextInteger();
         unsigned int getNextUnsignedInteger();
 };
-
-#endif

@@ -20,6 +20,40 @@
 
 #include "itemModel.hpp"
 
+/// Used to determine the type of the tool.
+typedef enum class ToolTypes
+{
+    ///
+    NoType = 0,
+    ///
+    Pickaxe = 1,
+    ///
+    WoodcutterAxe = 10,
+    ///
+    Saw = 11,
+    ///
+    PrecisionChisel = 12,
+    ///
+    Hammer = 20,
+    ///
+    PlaneChisel = 21,
+    ///
+    Forge = 30,
+    ///
+    Anvil = 31,
+    ///
+    BlacksmithHammer = 32,
+    ///
+    Bellows = 33,
+    ///
+    Crucible = 34,
+    ///
+    Tinderbox = 40
+} ToolType;
+
+/// Set of tool types.
+typedef std::set<ToolType> ToolSet;
+
 class ToolModel: public ItemModel
 {
     public:
@@ -32,5 +66,15 @@ class ToolModel: public ItemModel
 
         virtual ModelType getType() const;
 
+        virtual std::string getTypeName() const;
+
         virtual bool setModel(const std::string & source);
 };
+
+/// @addtogroup EnumToString
+/// @{
+
+/// Return the string describing the type of a Tool.
+std::string GetToolTypeName(ToolType type);
+
+///@}

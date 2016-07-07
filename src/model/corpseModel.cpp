@@ -33,6 +33,11 @@ ModelType CorpseModel::getType() const
     return ModelType::Corpse;
 }
 
+std::string CorpseModel::getTypeName() const
+{
+    return "Corpse";
+}
+
 bool CorpseModel::setModel(const std::string & source)
 {
     if (source.empty())
@@ -43,7 +48,10 @@ bool CorpseModel::setModel(const std::string & source)
     std::vector<std::string> functionList = SplitString(source, " ");
     if (functionList.size() != 0)
     {
-        Logger::log(LogLevel::Error, "Wrong number of parameters for Corpse Model (%s).", this->name);
+        Logger::log(
+            LogLevel::Error,
+            "Wrong number of parameters for Corpse Model (%s).",
+            this->name);
         return false;
     }
     return true;

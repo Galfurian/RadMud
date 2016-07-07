@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef CONSTANTS_HPP
-#define CONSTANTS_HPP
+#pragma once
 
 #include <ctime>
 #include <string>
@@ -43,4 +42,3 @@ static const std::string kDatabaseName = "radmud.db";
 /// Location of system files.
 static const std::string kSystemDir = "../system/";
 
-#endif

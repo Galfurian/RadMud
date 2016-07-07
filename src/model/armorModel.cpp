@@ -36,6 +36,11 @@ ModelType ArmorModel::getType() const
     return ModelType::Armor;
 }
 
+std::string ArmorModel::getTypeName() const
+{
+    return "Armor";
+}
+
 bool ArmorModel::setModel(const std::string & source)
 {
     if (source.empty())
@@ -46,11 +51,23 @@ bool ArmorModel::setModel(const std::string & source)
     std::vector<std::string> functionList = SplitString(source, " ");
     if (functionList.size() != 3)
     {
-        Logger::log(LogLevel::Error, "Wrong number of parameters for Armor Model (%s).", this->name);
+        Logger::log(
+            LogLevel::Error,
+            "Wrong number of parameters for Armor Model (%s).",
+            this->name);
         return false;
     }
     this->size = static_cast<ArmorSize>(ToNumber<unsigned int>(functionList[0]));
     this->damageAbs = ToNumber<unsigned int>(functionList[1]);
     this->allowedAnatomy = ToNumber<unsigned int>(functionList[2]);
     return true;
+}
+
+std::string GetArmorSizeName(ArmorSize armorSize)
+{
+    if (armorSize == ArmorSize::All) return "Universal Armor";
+    if (armorSize == ArmorSize::Light) return "Light Armor";
+    if (armorSize == ArmorSize::Medium) return "Medium Armor";
+    if (armorSize == ArmorSize::Heavy) return "Heavy Armor";
+    return "No Armor Size";
 }

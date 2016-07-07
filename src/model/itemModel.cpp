@@ -24,6 +24,27 @@
 #include "../luabridge/LuaBridge.h"
 #include "itemModel.hpp"
 
+#include "armorModel.hpp"
+#include "bookModel.hpp"
+#include "containerModel.hpp"
+#include "currencyModel.hpp"
+#include "foodModel.hpp"
+#include "furnitureModel.hpp"
+#include "itemModel.hpp"
+#include "keyModel.hpp"
+#include "lightModel.hpp"
+#include "liquidContainerModel.hpp"
+#include "mechanismModel.hpp"
+#include "nodeModel.hpp"
+#include "projectileModel.hpp"
+#include "resourceModel.hpp"
+#include "ropeModel.hpp"
+#include "seedModel.hpp"
+#include "shieldModel.hpp"
+#include "toolModel.hpp"
+#include "vehicleModel.hpp"
+#include "weaponModel.hpp"
+
 using namespace std;
 
 ItemModel::ItemModel() :
@@ -35,15 +56,14 @@ ItemModel::ItemModel() :
         description(),
         modelType(),
         slot(),
-        flags(),
+        modelFlags(),
         weight(),
         price(),
         condition(),
         decay(),
         material(),
         tileSet(),
-        tileId(),
-        functions()
+        tileId()
 {
     // Nothing to do.
 }
@@ -61,32 +81,6 @@ ModelType ItemModel::getType() const
 ///////////////////////////////////////////////////////////
 // CHECKER ////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
-bool ItemModel::setFunctions(std::string source)
-{
-    if (source.empty())
-    {
-        Logger::log(LogLevel::Error, "Function list is empty (%s).", this->name);
-        return false;
-    }
-    std::vector<std::string> functionList = SplitString(source, " ");
-    if (functionList.size() != 6)
-    {
-        Logger::log(LogLevel::Error, "Function list contains the wrong number of parameters.");
-        return false;
-    }
-    for (auto it : functionList)
-    {
-        int value = ToNumber<int>(it);
-        if (value < 0)
-        {
-            Logger::log(LogLevel::Error, "Function list contains a negative value.");
-            return false;
-        }
-        functions.push_back(static_cast<unsigned int>(value));
-    }
-    return true;
-}
-
 bool ItemModel::check()
 {
     assert(vnum > 0);
@@ -110,7 +104,10 @@ bool ItemModel::check()
     return true;
 }
 
-bool ItemModel::replaceSymbols(std::string & source, Material * itemMaterial, ItemQuality itemQuality)
+bool ItemModel::replaceSymbols(
+    std::string & source,
+    Material * itemMaterial,
+    ItemQuality itemQuality)
 {
     bool modified = false;
     if (itemMaterial)
@@ -210,7 +207,7 @@ Item * ItemModel::createItem(std::string maker, Material * composition, ItemQual
     arguments.push_back(ToString(condition));
     arguments.push_back(ToString(composition->vnum));
     arguments.push_back(EnumToString(itemQuality));
-    arguments.push_back(ToString(flags));
+    arguments.push_back(ToString(modelFlags));
 
     if (SQLiteDbms::instance().insertInto("Item", arguments))
     {
@@ -228,178 +225,6 @@ Item * ItemModel::createItem(std::string maker, Material * composition, ItemQual
 bool ItemModel::mustBeWielded()
 {
     return ((slot == EquipmentSlot::RightHand) || (slot == EquipmentSlot::LeftHand));
-}
-
-std::string ItemModel::getSpecificTypeName()
-{
-    std::string output;
-    if (this->modelType == ModelType::Weapon)
-    {
-        output = GetWeaponTypeName(getWeaponFunc().type);
-    }
-    else if (this->modelType == ModelType::Armor)
-    {
-        output = GetArmorSizeName(getArmorFunc().size);
-    }
-    else if (this->modelType == ModelType::Shield)
-    {
-        output = GetShieldSizeName(getShieldFunc().size);
-    }
-    else if (this->modelType == ModelType::Tool)
-    {
-        output = GetToolTypeName(getToolFunc().type);
-    }
-    else if (this->modelType == ModelType::Node)
-    {
-        output = GetNodeTypeName(getNodeFunc().type);
-    }
-    else if (modelType == ModelType::Resource)
-    {
-        output = GetResourceTypeName(getResourceFunc().type);
-    }
-    else if (modelType == ModelType::Seed)
-    {
-        output = GetSeedTypeName(getSeedFunc().type);
-    }
-    else if (modelType == ModelType::Mechanism)
-    {
-        output = GetMechanismTypeName(getMechanismFunc().type);
-    }
-    return output;
-}
-
-WeaponFunc ItemModel::getWeaponFunc()
-{
-    WeaponFunc func;
-    func.type = static_cast<WeaponType>(functions[0]);
-    func.minDamage = functions[1];
-    func.maxDamage = functions[2];
-    func.range = functions[3];
-    return func;
-}
-
-ArmorFunc ItemModel::getArmorFunc()
-{
-    ArmorFunc func;
-    func.size = static_cast<ArmorSize>(functions[0]);
-    func.damageAbs = functions[1];
-    func.allowedAnatomy = functions[2];
-    return func;
-}
-
-ShieldFunc ItemModel::getShieldFunc()
-{
-    ShieldFunc func;
-    func.size = static_cast<ShieldSize>(functions[0]);
-    func.parryChance = functions[1];
-    return func;
-}
-
-ProjectileFunc ItemModel::getProjectileFunc()
-{
-    ProjectileFunc func;
-    func.damageBonus = functions[0];
-    func.rangeBonus = functions[1];
-    return func;
-}
-
-ContainerFunc ItemModel::getContainerFunc()
-{
-    ContainerFunc func;
-    func.maxWeight = functions[0];
-    func.flags = functions[1];
-    func.keyVnum = functions[2];
-    func.difficulty = functions[3];
-    return func;
-}
-
-LiqContainerFunc ItemModel::getLiqContainerFunc()
-{
-    LiqContainerFunc func;
-    func.maxWeight = functions[0];
-    func.flags = functions[1];
-    return func;
-}
-
-ToolFunc ItemModel::getToolFunc()
-{
-    ToolFunc func;
-    func.type = static_cast<ToolType>(functions[0]);
-    return func;
-}
-
-NodeFunc ItemModel::getNodeFunc()
-{
-    NodeFunc func;
-    func.type = static_cast<NodeType>(functions[0]);
-    func.provides = functions[1];
-    return func;
-}
-
-ResourceFunc ItemModel::getResourceFunc()
-{
-    ResourceFunc func;
-    func.type = static_cast<ResourceType>(functions[0]);
-    return func;
-}
-
-SeedFunc ItemModel::getSeedFunc()
-{
-    SeedFunc func;
-    func.type = static_cast<SeedType>(functions[0]);
-    return func;
-}
-
-FoodFunc ItemModel::getFoodFunc()
-{
-    FoodFunc func;
-    func.hours = functions[0];
-    func.flags = functions[1];
-    return func;
-}
-
-LightFunc ItemModel::getLightFunc()
-{
-    LightFunc func;
-    func.maxHours = functions[0];
-    func.policy = functions[1];
-    return func;
-}
-
-BookFunc ItemModel::getBookFunc()
-{
-    BookFunc func;
-    func.maxParchments = functions[0];
-    return func;
-}
-
-RopeFunc ItemModel::getRopeFunc()
-{
-    RopeFunc func;
-    func.type = functions[0];
-    func.difficulty = functions[1];
-    return func;
-}
-
-MechanismFunc ItemModel::getMechanismFunc()
-{
-    MechanismFunc func;
-    func.type = static_cast<MechanismType>(functions[0]);
-    if ((func.type == MechanismType::Door) || (func.type == MechanismType::Lock))
-    {
-        func.key = functions[1];
-        func.difficulty = functions[2];
-    }
-    else if (func.type == MechanismType::Picklock)
-    {
-        func.efficency = functions[1];
-    }
-    else if (func.type == MechanismType::Lever)
-    {
-        func.command = functions[1];
-        func.target = functions[2];
-    }
-    return func;
 }
 
 void ItemModel::luaRegister(lua_State * L)
@@ -437,4 +262,116 @@ std::string ItemModel::getTile(int offset)
             return "i";
         }
     }
+}
+
+ArmorModel * ItemModel::toArmor()
+{
+    return static_cast<ArmorModel *>(this);
+}
+
+BookModel * ItemModel::toBook()
+{
+    return static_cast<BookModel *>(this);
+}
+
+ContainerModel * ItemModel::toContainer()
+{
+    return static_cast<ContainerModel *>(this);
+}
+
+CorpseModel * ItemModel::toCorpse()
+{
+    return static_cast<CorpseModel *>(this);
+}
+
+CurrencyModel * ItemModel::toCurrency()
+{
+    return static_cast<CurrencyModel *>(this);
+}
+
+FoodModel * ItemModel::toFood()
+{
+    return static_cast<FoodModel *>(this);
+}
+
+FurnitureModel * ItemModel::toFurniture()
+{
+    return static_cast<FurnitureModel *>(this);
+}
+
+KeyModel * ItemModel::toKey()
+{
+    return static_cast<KeyModel *>(this);
+}
+
+LightModel * ItemModel::toLight()
+{
+    return static_cast<LightModel *>(this);
+}
+
+LiquidContainerModel * ItemModel::toLiquidContainer()
+{
+    return static_cast<LiquidContainerModel *>(this);
+}
+
+MechanismModel * ItemModel::toMechanism()
+{
+    return static_cast<MechanismModel *>(this);
+}
+
+NodeModel * ItemModel::toNode()
+{
+    return static_cast<NodeModel *>(this);
+}
+
+ProjectileModel * ItemModel::toProjectile()
+{
+    return static_cast<ProjectileModel *>(this);
+}
+
+ResourceModel * ItemModel::toResource()
+{
+    return static_cast<ResourceModel *>(this);
+}
+
+RopeModel * ItemModel::toRope()
+{
+    return static_cast<RopeModel *>(this);
+}
+
+SeedModel * ItemModel::toSeed()
+{
+    return static_cast<SeedModel *>(this);
+}
+
+ShieldModel * ItemModel::toShield()
+{
+    return static_cast<ShieldModel *>(this);
+}
+
+ToolModel * ItemModel::toTool()
+{
+    return static_cast<ToolModel *>(this);
+}
+
+VehicleModel * ItemModel::toVehicle()
+{
+    return static_cast<VehicleModel *>(this);
+}
+
+WeaponModel * ItemModel::toWeapon()
+{
+    return static_cast<WeaponModel *>(this);
+}
+
+std::string GetModelFlagString(unsigned int flags)
+{
+    std::string flagList;
+    if (HasFlag(flags, ModelFlag::Static)) flagList += "|Static";
+    if (HasFlag(flags, ModelFlag::Invisible)) flagList += "|Invisible";
+    if (HasFlag(flags, ModelFlag::Unbreakable)) flagList += "|Unbreakable";
+    if (HasFlag(flags, ModelFlag::NoSaleable)) flagList += "|NoSaleable";
+    if (HasFlag(flags, ModelFlag::TwoHand)) flagList += "|TwoHand";
+    flagList += "|";
+    return flagList;
 }

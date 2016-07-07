@@ -59,7 +59,7 @@ void Race::initializeCorpse(const std::string & corpseDescription)
     corpse.description = corpseDescription;
     corpse.modelType = ModelType::Corpse;
     corpse.slot = EquipmentSlot::None;
-    corpse.flags = 0;
+    corpse.modelFlags = 0;
     corpse.weight = 50;
     corpse.price = 0;
     corpse.condition = 10;

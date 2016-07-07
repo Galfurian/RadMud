@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef COMBAT_HPP
-#define COMBAT_HPP
+#pragma once
 
 class Character;
 
@@ -148,5 +147,3 @@ class OpponentsList
         /// @brief Print the list of opponents.
         void printList();
 };
-
-#endif

@@ -34,6 +34,11 @@ ModelType SeedModel::getType() const
     return ModelType::Seed;
 }
 
+std::string SeedModel::getTypeName() const
+{
+    return "Seed";
+}
+
 bool SeedModel::setModel(const std::string & source)
 {
     if (source.empty())
@@ -49,4 +54,11 @@ bool SeedModel::setModel(const std::string & source)
     }
     this->seedType = static_cast<SeedType>(ToNumber<unsigned int>(functionList[0]));
     return true;
+}
+
+std::string GetSeedTypeName(SeedType type)
+{
+    if (type == SeedType::Plant) return "Plant Seed";
+    if (type == SeedType::Tree) return "Tree Seed";
+    return "No Seed Type";
 }

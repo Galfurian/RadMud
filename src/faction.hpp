@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef FACTION_HPP
-#define FACTION_HPP
+#pragma once
 
 #include <list>
 #include <string>
@@ -76,5 +75,3 @@ typedef std::vector<Faction *> FactionList;
 
 /// Faction map handler.
 typedef std::map<int, Faction *> FactionMap;
-
-#endif

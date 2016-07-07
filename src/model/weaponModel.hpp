@@ -20,6 +20,38 @@
 
 #include "itemModel.hpp"
 
+/// Types of weapons.
+typedef enum class WeaponTypes
+{
+    None,
+    /// [1]  Pistols that uses bullets
+    Pistol,
+    /// [2]  Rifles that uses bullets
+    Rifle,
+    /// [3]  Shotguns
+    Shotgun,
+    /// [4]  Big guns, heavy weapons that uses bullets
+    HeavyWeapon,
+    /// [5]  Pistols that uses energy
+    EnergyPistol,
+    /// [6]  Rifles that uses energy.
+    EnergyRifle,
+    /// [7]  Big guns, heavy weapons that uses energy.
+    EnergyHeavyWeapon,
+    /// [8]  Granades
+    Granade,
+    /// [9]  Placeble explosives
+    Placed,
+    /// [10] All sort of blades
+    Bladed,
+    /// [11] All sort of blunt weapons
+    Blunt,
+    /// [12] Throwable weapons
+    Thrown,
+    /// [13] Weapon to enanche unarmed fight
+    Unarmed,
+} WeaponType;
+
 class WeaponModel: public ItemModel
 {
     public:
@@ -38,5 +70,15 @@ class WeaponModel: public ItemModel
 
         virtual ModelType getType() const;
 
+        virtual std::string getTypeName() const;
+
         virtual bool setModel(const std::string & source);
 };
+
+/// @addtogroup EnumToString
+/// @{
+
+/// Return the string describing the type of a Weapon.
+std::string GetWeaponTypeName(WeaponType type);
+
+///@}

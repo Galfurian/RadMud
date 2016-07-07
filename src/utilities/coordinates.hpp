@@ -19,8 +19,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef COORDINATES_HPP
-#define COORDINATES_HPP
+#pragma once
 
 extern "C"
 {
@@ -135,5 +134,3 @@ class Coordinates
             .endClass();
         }
 };
-
-#endif

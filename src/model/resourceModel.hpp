@@ -20,6 +20,43 @@
 
 #include "itemModel.hpp"
 
+/// Used to determine the type of the resource.
+typedef enum class ResourceTypes
+{
+    NoType,
+    /// [1] COAL
+    Coal,
+    /// [2] ORE
+    Ore,
+    /// [3] BAR
+    Bar,
+    /// [4] LOG
+    Log,
+    /// [5] PLANK
+    Plank,
+    /// [6] TREE
+    Tree,
+    /// [7] FASTENER
+    Fastener,
+    /// [8] LEATHER
+    Leather,
+    /// [9] CLOTH
+    Cloth,
+    /// [10] STONE_BLOCK
+    StoneBlock,
+    /// [11] METAL_VEIN
+    MetalVein,
+    /// [12] STONE_MONOLITH
+    StoneMonolith,
+    /// [13] Pen
+    Pen,
+    /// [14] Trash (Anything which has no specific use)
+    Trash
+} ResourceType;
+
+/// Map which stores a type of resource and a quantity.
+typedef std::map<ResourceType, unsigned int> IngredientMap;
+
 class ResourceModel: public ItemModel
 {
     public:
@@ -32,5 +69,15 @@ class ResourceModel: public ItemModel
 
         virtual ModelType getType() const;
 
+        virtual std::string getTypeName() const;
+
         virtual bool setModel(const std::string & source);
 };
+
+/// @addtogroup EnumToString
+/// @{
+
+/// Return the string describing the type of a Resource.
+std::string GetResourceTypeName(ResourceType type);
+
+///@}

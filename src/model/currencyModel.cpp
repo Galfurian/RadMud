@@ -33,6 +33,11 @@ ModelType CurrencyModel::getType() const
     return ModelType::Currency;
 }
 
+std::string CurrencyModel::getTypeName() const
+{
+    return "Currency";
+}
+
 bool CurrencyModel::setModel(const std::string & source)
 {
     std::vector<std::string> functionList = SplitString(source, " ");

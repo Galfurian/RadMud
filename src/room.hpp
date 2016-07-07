@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef ROOM_HPP
-#define ROOM_HPP
+#pragma once
 
 #include <map>
 
@@ -34,6 +33,19 @@
 class Item;
 class Area;
 class Continent;
+
+/// Used to determine the flag of the room.
+typedef enum class RoomFlags
+{
+    /// A player can rent and disconnect.
+    Rent = 1,
+    /// Everyone here can't be harmful.
+    Peaceful = 2,
+    /// From here a player can travel to another location.
+    TravelPoint = 4,
+    /// It is a spawn room for players.
+    SpawnPoint = 8
+} RoomFlag;
 
 /// @brief Holds details about room.
 class Room
@@ -140,7 +152,10 @@ class Room
         /// @param number    Number of the character we are looking for.
         /// @param exception The character to skip in the search.
         /// @return The character, if it's in the room.
-        Character * findCharacter(std::string target, int & number, Character * exception = nullptr);
+        Character * findCharacter(
+            std::string target,
+            int & number,
+            Character * exception = nullptr);
 
         /// @brief Search for the player in the room.
         /// @param target    The player to search.
@@ -259,6 +274,14 @@ bool CreateRoom(Coordinates<int> coord, Room * source_room = NULL);
 ///         <b>False</b> otherwise.
 bool ConnectRoom(Room * room);
 
+/// @addtogroup FlagsToList
+/// @{
+
+/// Return a list of string containg the Room flags contained inside the value.
+std::string GetRoomFlagString(unsigned int flags);
+
+/// @}
+
 /// Room list handler.
 typedef std::vector<Room *> RoomList;
 
@@ -273,5 +296,3 @@ typedef RoomMap::iterator RoomMapIterator;
 
 /// Map of travelling points.
 typedef std::map<Room *, Room *> TravelPointMap;
-
-#endif

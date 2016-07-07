@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef RACE_HPP
-#define RACE_HPP
+#pragma once
 
 #include <vector>
 #include <string>
@@ -133,5 +132,3 @@ typedef std::vector<Race *> RaceList;
 
 /// Race map handler.
 typedef std::map<int, Race *> RaceMap;
-
-#endif

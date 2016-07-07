@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef COMMANDS_HPP
-#define COMMANDS_HPP
+#pragma once
 
 #include "character.hpp"
 #include "constants.hpp"
@@ -334,5 +333,3 @@ void DoBuild(Character * character, std::istream &sArgs);
 /// Deconstruct something.
 void DoDeconstruct(Character * character, std::istream &sArgs);
 ///@}
-
-#endif

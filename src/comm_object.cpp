@@ -24,6 +24,7 @@
 #include "mud.hpp"
 // Other Include.
 #include "utilities/table.hpp"
+#include "model/liquidContainerModel.hpp"
 
 using namespace std;
 
@@ -49,7 +50,7 @@ void DoTake(Character * character, std::istream & sArgs)
             for (auto iterator : untouchedList)
             {
                 // Check if the item is static.
-                if (HasFlag(iterator->model->flags, ModelFlag::Static))
+                if (HasFlag(iterator->model->modelFlags, ModelFlag::Static))
                 {
                     continue;
                 }
@@ -103,8 +104,11 @@ void DoTake(Character * character, std::istream & sArgs)
             CharacterVector exceptions;
             exceptions.push_back(character);
             // Send the message inside the room.
-            character->room->sendToAll("%s has picked up everything %s could.\n", exceptions,
-                character->getNameCapital(), character->getPronoun());
+            character->room->sendToAll(
+                "%s has picked up everything %s could.\n",
+                exceptions,
+                character->getNameCapital(),
+                character->getPronoun());
             return; // Skip the rest of the function.
         }
         Item * item = character->room->findItem(arguments[0].first, arguments[0].second);
@@ -131,7 +135,7 @@ void DoTake(Character * character, std::istream & sArgs)
             return; // Skip the rest of the function.
         }
         // Check if the item has the flag Static.
-        if (HasFlag(item->model->flags, ModelFlag::Static))
+        if (HasFlag(item->model->modelFlags, ModelFlag::Static))
         {
             character->sendMsg("You can't pick up %s!\n", item->getName());
             return; // Skip the rest of the function.
@@ -165,12 +169,17 @@ void DoTake(Character * character, std::istream & sArgs)
             return; // Skip the rest of the function.
         }
         // Notify to player.
-        character->sendMsg("You take %s.\n", Formatter::cyan() + ToLower(item->getName()) + Formatter::reset());
+        character->sendMsg(
+            "You take %s.\n",
+            Formatter::cyan() + ToLower(item->getName()) + Formatter::reset());
         // Set the list of exceptions.
         CharacterVector exceptions;
         exceptions.push_back(character);
         // Send the message inside the room.
-        character->room->sendToAll("%s has picked up %s.\n", exceptions, character->getNameCapital(),
+        character->room->sendToAll(
+            "%s has picked up %s.\n",
+            exceptions,
+            character->getNameCapital(),
             Formatter::cyan() + ToLower(item->getName()) + Formatter::reset());
         return; // Skip the rest of the function.
     }
@@ -189,7 +198,7 @@ void DoTake(Character * character, std::istream & sArgs)
             for (auto iterator : untouchedList)
             {
                 // Check if the item is static.
-                if (HasFlag(iterator->model->flags, ModelFlag::Static))
+                if (HasFlag(iterator->model->modelFlags, ModelFlag::Static))
                 {
                     continue;
                 }
@@ -238,8 +247,11 @@ void DoTake(Character * character, std::istream & sArgs)
             CharacterVector exceptions;
             exceptions.push_back(character);
             // Send the message inside the room.
-            character->room->sendToAll("%s has taken everything %s could from %s.\n", exceptions,
-                character->getNameCapital(), character->getPronoun(),
+            character->room->sendToAll(
+                "%s has taken everything %s could from %s.\n",
+                exceptions,
+                character->getNameCapital(),
+                character->getPronoun(),
                 Formatter::cyan() + ToLower(container->getName()) + Formatter::reset());
             return; // Skip the rest of the function.
         }
@@ -250,7 +262,7 @@ void DoTake(Character * character, std::istream & sArgs)
             return; // Skip the rest of the function.
         }
         // Check if the item has the flag kNoPick.
-        if (HasFlag(item->model->flags, ModelFlag::Static))
+        if (HasFlag(item->model->modelFlags, ModelFlag::Static))
         {
             character->sendMsg("You can't pick up this kind of items!\n");
             return; // Skip the rest of the function.
@@ -276,7 +288,8 @@ void DoTake(Character * character, std::istream & sArgs)
             SQLiteDbms::instance().rollbackTransection();
         }
 
-        character->sendMsg("You take out %s from %s.\n",
+        character->sendMsg(
+            "You take out %s from %s.\n",
             Formatter::cyan() + ToLower(item->getName()) + Formatter::reset(),
             Formatter::cyan() + ToLower(container->getName()) + Formatter::reset());
 
@@ -284,7 +297,10 @@ void DoTake(Character * character, std::istream & sArgs)
         CharacterVector exceptions;
         exceptions.push_back(character);
         // Send the message inside the room.
-        character->room->sendToAll("%s takes out %s from %s.\n", exceptions, character->getNameCapital(),
+        character->room->sendToAll(
+            "%s takes out %s from %s.\n",
+            exceptions,
+            character->getNameCapital(),
             Formatter::cyan() + ToLower(item->getName()) + Formatter::reset(),
             Formatter::cyan() + ToLower(container->getName()) + Formatter::reset());
     }
@@ -332,7 +348,10 @@ void DoDrop(Character * character, std::istream & sArgs)
         CharacterVector exceptions;
         exceptions.push_back(character);
         // Send the message inside the room.
-        character->room->sendToAll("%s has dropped all %s items.\n", exceptions, character->getNameCapital(),
+        character->room->sendToAll(
+            "%s has dropped all %s items.\n",
+            exceptions,
+            character->getNameCapital(),
             character->getPossessivePronoun());
         return; // Skip the rest of the function.
     }
@@ -357,12 +376,16 @@ void DoDrop(Character * character, std::istream & sArgs)
         SQLiteDbms::instance().rollbackTransection();
     }
     // Active message.
-    character->sendMsg("You drop " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n");
+    character->sendMsg(
+        "You drop " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n");
     // Set the list of exceptions.
     CharacterVector exceptions;
     exceptions.push_back(character);
     // Send the message inside the room.
-    character->room->sendToAll("%s has dropped %s.\n", exceptions, character->getNameCapital(),
+    character->room->sendToAll(
+        "%s has dropped %s.\n",
+        exceptions,
+        character->getNameCapital(),
         Formatter::cyan() + ToLower(item->getName()) + Formatter::reset());
 }
 
@@ -386,7 +409,10 @@ void DoGive(Character * character, std::istream & sArgs)
         return; // Skip the rest of the function.
     }
     // Get the target.
-    Character * target = character->room->findCharacter(arguments[1].first, arguments[1].second, character);
+    Character * target = character->room->findCharacter(
+        arguments[1].first,
+        arguments[1].second,
+        character);
     if (target == nullptr)
     {
         character->sendMsg("You don't see that person.\n");
@@ -401,18 +427,21 @@ void DoGive(Character * character, std::istream & sArgs)
     // Remove the item from the character inventory.
     if (!character->remInventoryItem(item))
     {
-        character->sendMsg("You cannot give " + item->getName() + " to " + target->getName() + ".\n");
+        character->sendMsg(
+            "You cannot give " + item->getName() + " to " + target->getName() + ".\n");
         return; // Skip the rest of the function.
     }
     // Add the item to the target inventory.
     if (!target->addInventoryItem(item))
     {
-        character->sendMsg("You cannot give " + item->getName() + " to " + target->getName() + ".\n");
+        character->sendMsg(
+            "You cannot give " + item->getName() + " to " + target->getName() + ".\n");
         return; // Skip the rest of the function.
     }
     // Check if the character is invisible.
     std::string viewdName =
-        (HasFlag(character->flags, CharacterFlag::Invisible)) ? "Someone" : character->getNameCapital();
+        (HasFlag(character->flags, CharacterFlag::Invisible)) ?
+            "Someone" : character->getNameCapital();
     // Update the item iside the Database.
     SQLiteDbms::instance().beginTransaction();
     if (item->updateOnDB())
@@ -424,10 +453,14 @@ void DoGive(Character * character, std::istream & sArgs)
         SQLiteDbms::instance().rollbackTransection();
     }
     // GIVE Message.
-    character->sendMsg("You give %s to %s.\n", Formatter::cyan() + ToLower(item->getName()) + Formatter::reset(),
+    character->sendMsg(
+        "You give %s to %s.\n",
+        Formatter::cyan() + ToLower(item->getName()) + Formatter::reset(),
         target->getName());
     // RECEIVE Message.
-    target->sendMsg("%s gives you %s.\n\n", viewdName,
+    target->sendMsg(
+        "%s gives you %s.\n\n",
+        viewdName,
         Formatter::cyan() + ToLower(item->getName()) + Formatter::reset());
     // Check if the character is invisible.
     std::string broadcast;
@@ -460,29 +493,39 @@ void DoEquipments(Character * character, std::istream & sArgs)
     output += Formatter::yellow() + "#------------ Equipment -----------#\n" + Formatter::reset();
     // Equipment Slot : HEAD
     output += "    " + Formatter::yellow() + "Head" + Formatter::reset() + "       : ";
-    output += (head != nullptr) ? Formatter::cyan() + head->getNameCapital() : Formatter::gray() + "Nothing";
+    output +=
+        (head != nullptr) ?
+            Formatter::cyan() + head->getNameCapital() : Formatter::gray() + "Nothing";
     output += Formatter::reset() + ".\n";
     // Equipment Slot : BACK
     output += "    " + Formatter::yellow() + "Back" + Formatter::reset() + "       : ";
-    output += (back != nullptr) ? Formatter::cyan() + back->getNameCapital() : Formatter::gray() + "Nothing";
+    output +=
+        (back != nullptr) ?
+            Formatter::cyan() + back->getNameCapital() : Formatter::gray() + "Nothing";
     output += Formatter::reset() + ".\n";
     // Equipment Slot : TORSO
     output += "    " + Formatter::yellow() + "Torso" + Formatter::reset() + "      : ";
-    output += (torso != nullptr) ? Formatter::cyan() + torso->getNameCapital() : Formatter::gray() + "Nothing";
+    output +=
+        (torso != nullptr) ?
+            Formatter::cyan() + torso->getNameCapital() : Formatter::gray() + "Nothing";
     output += Formatter::reset() + ".\n";
     // Equipment Slot : LEGS
     output += "    " + Formatter::yellow() + "Legs" + Formatter::reset() + "       : ";
-    output += (legs != nullptr) ? Formatter::cyan() + legs->getNameCapital() : Formatter::gray() + "Nothing";
+    output +=
+        (legs != nullptr) ?
+            Formatter::cyan() + legs->getNameCapital() : Formatter::gray() + "Nothing";
     output += Formatter::reset() + ".\n";
     // Equipment Slot : FEET
     output += "    " + Formatter::yellow() + "Feet" + Formatter::reset() + "       : ";
-    output += (feet != nullptr) ? Formatter::cyan() + feet->getNameCapital() : Formatter::gray() + "Nothing";
+    output +=
+        (feet != nullptr) ?
+            Formatter::cyan() + feet->getNameCapital() : Formatter::gray() + "Nothing";
     output += Formatter::reset() + ".\n";
 
     // Print what is wielding.
     if (right != nullptr)
     {
-        if (HasFlag(right->model->flags, ModelFlag::TwoHand))
+        if (HasFlag(right->model->modelFlags, ModelFlag::TwoHand))
         {
             output += "    " + Formatter::yellow() + "Both Hands" + Formatter::reset() + " : ";
         }
@@ -494,8 +537,8 @@ void DoEquipments(Character * character, std::istream & sArgs)
     }
     else
     {
-        output += "    " + Formatter::yellow() + "Right Hand" + Formatter::reset() + " : " + Formatter::gray()
-            + "Nothing";
+        output += "    " + Formatter::yellow() + "Right Hand" + Formatter::reset() + " : "
+            + Formatter::gray() + "Nothing";
     }
     output += Formatter::reset() + ".\n";
 
@@ -588,8 +631,9 @@ void DoWield(Character * character, std::istream & sArgs)
         SQLiteDbms::instance().rollbackTransection();
     }
     // Show the proper message.
-    std::string message = "You wield " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + " ";
-    if (HasFlag(item->model->flags, ModelFlag::TwoHand))
+    std::string message = "You wield " + Formatter::cyan() + ToLower(item->getName())
+        + Formatter::reset() + " ";
+    if (HasFlag(item->model->modelFlags, ModelFlag::TwoHand))
     {
         message += "with both your hands.\n";
     }
@@ -602,8 +646,12 @@ void DoWield(Character * character, std::istream & sArgs)
     CharacterVector exceptions;
     exceptions.push_back(character);
     // Send the message inside the room.
-    character->room->sendToAll("%s wields %s in %s %s.\n", exceptions, character->getNameCapital(),
-        Formatter::cyan() + ToLower(item->getName()) + Formatter::reset(), character->getPossessivePronoun(),
+    character->room->sendToAll(
+        "%s wields %s in %s %s.\n",
+        exceptions,
+        character->getNameCapital(),
+        Formatter::cyan() + ToLower(item->getName()) + Formatter::reset(),
+        character->getPossessivePronoun(),
         ToLower(item->getCurrentSlotName()));
 }
 
@@ -657,7 +705,10 @@ void DoWear(Character * character, std::istream & sArgs)
         CharacterVector exceptions;
         exceptions.push_back(character);
         // Send the message inside the room.
-        character->room->sendToAll("%s has weared all %s could.\n", exceptions, character->getNameCapital(),
+        character->room->sendToAll(
+            "%s has weared all %s could.\n",
+            exceptions,
+            character->getNameCapital(),
             character->getPronoun());
         return; // Skip the rest of the function.
     }
@@ -705,13 +756,18 @@ void DoWear(Character * character, std::istream & sArgs)
         SQLiteDbms::instance().rollbackTransection();
     }
     // Notify to character.
-    character->sendMsg("You wear " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n");
+    character->sendMsg(
+        "You wear " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n");
     // Set the list of exceptions.
     CharacterVector exceptions;
     exceptions.push_back(character);
     // Send the message inside the room.
-    character->room->sendToAll("%s wears %s on %s %s.\n", exceptions, character->getNameCapital(),
-        Formatter::cyan() + ToLower(item->getName()) + Formatter::reset(), character->getPossessivePronoun(),
+    character->room->sendToAll(
+        "%s wears %s on %s %s.\n",
+        exceptions,
+        character->getNameCapital(),
+        Formatter::cyan() + ToLower(item->getName()) + Formatter::reset(),
+        character->getPossessivePronoun(),
         ToLower(item->getCurrentSlotName()));
 }
 
@@ -757,7 +813,10 @@ void DoRemove(Character * character, std::istream & sArgs)
         CharacterVector exceptions;
         exceptions.push_back(character);
         // Send the message inside the room.
-        character->room->sendToAll("%s has undressed all he could.\n", exceptions, character->getNameCapital());
+        character->room->sendToAll(
+            "%s has undressed all he could.\n",
+            exceptions,
+            character->getNameCapital());
         return; // Skip the rest of the function.
     }
     // Get the item.
@@ -783,13 +842,18 @@ void DoRemove(Character * character, std::istream & sArgs)
         SQLiteDbms::instance().rollbackTransection();
     }
     // Notify the character.
-    character->sendMsg("You remove " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n");
+    character->sendMsg(
+        "You remove " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n");
     // Set the list of exceptions.
     CharacterVector exceptions;
     exceptions.push_back(character);
     // Send the message inside the room.
-    character->room->sendToAll("%s removes %s from %s %s.\n", exceptions, character->getNameCapital(),
-        Formatter::cyan() + ToLower(item->getName()) + Formatter::reset(), character->getPossessivePronoun(),
+    character->room->sendToAll(
+        "%s removes %s from %s %s.\n",
+        exceptions,
+        character->getNameCapital(),
+        Formatter::cyan() + ToLower(item->getName()) + Formatter::reset(),
+        character->getPossessivePronoun(),
         ToLower(item->getCurrentSlotName()));
 }
 
@@ -798,7 +862,8 @@ void DoInventory(Character * character, std::istream & sArgs)
     NoMore(character, sArgs);
     if (character->inventory.empty())
     {
-        character->sendMsg(Formatter::gray() + "    You are carrying anything.\n" + Formatter::reset());
+        character->sendMsg(
+            Formatter::gray() + "    You are carrying anything.\n" + Formatter::reset());
     }
     Table table = Table("Inventory");
     table.addColumn("Item", StringAlign::Left);
@@ -814,8 +879,8 @@ void DoInventory(Character * character, std::istream & sArgs)
     std::string carried = ToString(character->getCarryingWeight());
     std::string maximum = ToString(character->getMaxCarryingWeight());
     character->sendMsg(
-        Formatter::yellow() + "\nTotal carrying weight: " + Formatter::reset() + carried + " of " + maximum
-            + Formatter::reset() + " " + mud_measure + ".\n");
+        Formatter::yellow() + "\nTotal carrying weight: " + Formatter::reset() + carried + " of "
+            + maximum + Formatter::reset() + " " + mud_measure + ".\n");
 }
 
 void DoOrganize(Character * character, std::istream & sArgs)
@@ -870,7 +935,8 @@ void DoOrganize(Character * character, std::istream & sArgs)
         // Organize the target container.
         ItemVector * list = &container->content;
         sort(list->begin(), list->end(), sorter);
-        character->sendMsg("You have organized " + container->getName() + ", by " + sorterTag + ".\n");
+        character->sendMsg(
+            "You have organized " + container->getName() + ", by " + sorterTag + ".\n");
     }
     else
     {
@@ -935,7 +1001,10 @@ void DoOpen(Character * character, std::istream & sArgs)
             CharacterVector exceptions;
             exceptions.push_back(character);
             // Send the message inside the room.
-            character->room->sendToAll("%s opens a hidden door!\n", exceptions, character->getNameCapital());
+            character->room->sendToAll(
+                "%s opens a hidden door!\n",
+                exceptions,
+                character->getNameCapital());
         }
         else
         {
@@ -944,7 +1013,10 @@ void DoOpen(Character * character, std::istream & sArgs)
             CharacterVector exceptions;
             exceptions.push_back(character);
             // Send the message inside the room.
-            character->room->sendToAll("%s closes a door.\n", exceptions, character->getNameCapital());
+            character->room->sendToAll(
+                "%s closes a door.\n",
+                exceptions,
+                character->getNameCapital());
         }
         for (auto it : destination->exits)
         {
@@ -959,11 +1031,15 @@ void DoOpen(Character * character, std::istream & sArgs)
             if (HasFlag(it->flags, ExitFlag::Hidden))
             {
                 // Show the action in the next room.
-                it->destination->sendToAll("Someone opens a secret passage from the other side.\n", CharacterVector());
+                it->destination->sendToAll(
+                    "Someone opens a secret passage from the other side.\n",
+                    CharacterVector());
             }
             else
             {
-                it->destination->sendToAll("Someone opens a door from the other side.\n", CharacterVector());
+                it->destination->sendToAll(
+                    "Someone opens a door from the other side.\n",
+                    CharacterVector());
             }
         }
     }
@@ -1035,7 +1111,10 @@ void DoClose(Character * character, std::istream & sArgs)
             CharacterVector exceptions;
             exceptions.push_back(character);
             // Send the message inside the room.
-            character->room->sendToAll("%s closes a hidden door!\n", exceptions, character->getNameCapital());
+            character->room->sendToAll(
+                "%s closes a hidden door!\n",
+                exceptions,
+                character->getNameCapital());
         }
         else
         {
@@ -1044,7 +1123,10 @@ void DoClose(Character * character, std::istream & sArgs)
             CharacterVector exceptions;
             exceptions.push_back(character);
             // Send the message inside the room.
-            character->room->sendToAll("%s closes a door.\n", exceptions, character->getNameCapital());
+            character->room->sendToAll(
+                "%s closes a door.\n",
+                exceptions,
+                character->getNameCapital());
         }
         for (auto it : destination->exits)
         {
@@ -1059,12 +1141,16 @@ void DoClose(Character * character, std::istream & sArgs)
             if (HasFlag(it->flags, ExitFlag::Hidden))
             {
                 // Send the message inside the room.
-                it->destination->sendToAll("Someone closes a secret passage from the other side.\n", CharacterVector());
+                it->destination->sendToAll(
+                    "Someone closes a secret passage from the other side.\n",
+                    CharacterVector());
             }
             else
             {
                 // Send the message inside the room.
-                it->destination->sendToAll("Someone closes a door from the other side.\n", CharacterVector());
+                it->destination->sendToAll(
+                    "Someone closes a door from the other side.\n",
+                    CharacterVector());
             }
         }
         return; // Skip the rest of the function.
@@ -1090,7 +1176,8 @@ void DoPut(Character * character, std::istream & sArgs)
     Item * container = character->findNearbyItem(arguments[1].first, arguments[1].second);
     if (container == nullptr)
     {
-        character->sendMsg("You don't see any container named '" + arguments[1].first + "' here.\n");
+        character->sendMsg(
+            "You don't see any container named '" + arguments[1].first + "' here.\n");
         return;
     }
     if (container->model->getType() != ModelType::Container)
@@ -1128,8 +1215,12 @@ void DoPut(Character * character, std::istream & sArgs)
         CharacterVector exceptions;
         exceptions.push_back(character);
         // Send the message inside the room.
-        character->room->sendToAll("%s puts everything %s could inside %s.\n", exceptions, character->getNameCapital(),
-            character->getPronoun(), Formatter::cyan() + ToLower(container->getName()) + Formatter::reset());
+        character->room->sendToAll(
+            "%s puts everything %s could inside %s.\n",
+            exceptions,
+            character->getNameCapital(),
+            character->getPronoun(),
+            Formatter::cyan() + ToLower(container->getName()) + Formatter::reset());
         return;
     }
     Item * item = character->findInventoryItem(arguments[0].first, arguments[0].second);
@@ -1156,14 +1247,19 @@ void DoPut(Character * character, std::istream & sArgs)
     }
     SQLiteDbms::instance().endTransaction();
     // Notify to player.
-    character->sendMsg("You put %s inside %s.\n", Formatter::cyan() + ToLower(item->getName()) + Formatter::reset(),
+    character->sendMsg(
+        "You put %s inside %s.\n",
+        Formatter::cyan() + ToLower(item->getName()) + Formatter::reset(),
         Formatter::cyan() + ToLower(container->getName()) + Formatter::reset());
 
     // Set the list of exceptions.
     CharacterVector exceptions;
     exceptions.push_back(character);
     // Send the message inside the room.
-    character->room->sendToAll("%s puts %s inside %s.\n", exceptions, character->getNameCapital(),
+    character->room->sendToAll(
+        "%s puts %s inside %s.\n",
+        exceptions,
+        character->getNameCapital(),
         Formatter::cyan() + ToLower(item->getName()) + Formatter::reset(),
         Formatter::cyan() + ToLower(container->getName()) + Formatter::reset());
 }
@@ -1230,7 +1326,10 @@ void DoDrink(Character * character, std::istream & sArgs)
 
     if (!result)
     {
-        character->sendMsg("You were not able to drink some %s from %s.\n", liquid->getName(), container->getName());
+        character->sendMsg(
+            "You were not able to drink some %s from %s.\n",
+            liquid->getName(),
+            container->getName());
         return;
     }
 
@@ -1239,8 +1338,12 @@ void DoDrink(Character * character, std::istream & sArgs)
     CharacterVector exceptions;
     exceptions.push_back(character);
     // Send the message inside the room.
-    character->room->sendToAll("%s drinks some %s from %s.\n", exceptions, character->getNameCapital(),
-        liquid->getName(), container->getName());
+    character->room->sendToAll(
+        "%s drinks some %s from %s.\n",
+        exceptions,
+        character->getNameCapital(),
+        liquid->getName(),
+        container->getName());
 }
 
 void DoFill(Character * character, std::istream & sArgs)
@@ -1296,6 +1399,8 @@ void DoFill(Character * character, std::istream & sArgs)
         return; // Skip the rest of the function.
     }
 
+    LiquidContainerModel * liquidModelSource = source->model->toLiquidContainer();
+
     // Check if source is empty.
     if (source->isEmpty())
     {
@@ -1320,9 +1425,7 @@ void DoFill(Character * character, std::istream & sArgs)
     // Fill the container from the source.
     unsigned int atDisposal = source->contentLiq.second;
     unsigned int quantity = container->getFreeSpace();
-
-    unsigned int sourceFlags = source->model->getLiqContainerFunc().flags;
-    if (!HasFlag(sourceFlags, LiqContainerFlag::Endless))
+    if (!HasFlag(liquidModelSource->liquidFlags, LiqContainerFlag::Endless))
     {
         if (atDisposal < quantity)
         {
@@ -1333,7 +1436,9 @@ void DoFill(Character * character, std::istream & sArgs)
     SQLiteDbms::instance().beginTransaction();
     if (!source->pourOut(quantity))
     {
-        character->sendMsg("You failed to take out the liquid from a %s.\n", source->getNameCapital());
+        character->sendMsg(
+            "You failed to take out the liquid from a %s.\n",
+            source->getNameCapital());
         SQLiteDbms::instance().endTransaction();
         return; // Skip the rest of the function.
     }
@@ -1345,15 +1450,23 @@ void DoFill(Character * character, std::istream & sArgs)
     }
     SQLiteDbms::instance().endTransaction();
 
-    character->sendMsg("You fill %s with %s from %s.\n", container->getName(), sourLiquid->getName(),
+    character->sendMsg(
+        "You fill %s with %s from %s.\n",
+        container->getName(),
+        sourLiquid->getName(),
         source->getName());
 
     // Set the list of exceptions.
     CharacterVector exceptions;
     exceptions.push_back(character);
     // Send the message inside the room.
-    character->room->sendToAll("%s fills %s with %s from %s.\n", exceptions, character->getNameCapital(),
-        container->getName(), sourLiquid->getName(), source->getName());
+    character->room->sendToAll(
+        "%s fills %s with %s from %s.\n",
+        exceptions,
+        character->getNameCapital(),
+        container->getName(),
+        sourLiquid->getName(),
+        source->getName());
 }
 
 void DoPour(Character * character, std::istream & sArgs)
@@ -1408,6 +1521,7 @@ void DoPour(Character * character, std::istream & sArgs)
         character->sendMsg("%s is not a suitable source of liquids.\n", source->getNameCapital());
         return; // Skip the rest of the function.
     }
+    LiquidContainerModel * liquidModelSource = source->model->toLiquidContainer();
 
     // Check if source is empty.
     if (source->isEmpty())
@@ -1434,8 +1548,7 @@ void DoPour(Character * character, std::istream & sArgs)
     unsigned int atDisposal = source->contentLiq.second;
     unsigned int quantity = container->getFreeSpace();
 
-    unsigned int sourceFlags = source->model->getLiqContainerFunc().flags;
-    if (!HasFlag(sourceFlags, LiqContainerFlag::Endless))
+    if (!HasFlag(liquidModelSource->liquidFlags, LiqContainerFlag::Endless))
     {
         if (atDisposal < quantity)
         {
@@ -1446,24 +1559,35 @@ void DoPour(Character * character, std::istream & sArgs)
     SQLiteDbms::instance().beginTransaction();
     if (!source->pourOut(quantity))
     {
-        character->sendMsg("You failed to pour out the liquid from " + source->getNameCapital() + ".\n");
+        character->sendMsg(
+            "You failed to pour out the liquid from " + source->getNameCapital() + ".\n");
         SQLiteDbms::instance().endTransaction();
         return; // Skip the rest of the function.
     }
     if (!container->pourIn(sourLiquid, quantity))
     {
-        character->sendMsg("You failed to pour the liquid into " + source->getNameCapital() + ".\n");
+        character->sendMsg(
+            "You failed to pour the liquid into " + source->getNameCapital() + ".\n");
         SQLiteDbms::instance().endTransaction();
         return; // Skip the rest of the function.
     }
     SQLiteDbms::instance().endTransaction();
 
-    character->sendMsg("You pour %s of %s into %s.\n", sourLiquid->getName(), source->getName(), container->getName());
+    character->sendMsg(
+        "You pour %s of %s into %s.\n",
+        sourLiquid->getName(),
+        source->getName(),
+        container->getName());
 
     // Set the list of exceptions.
     CharacterVector exceptions;
     exceptions.push_back(character);
     // Send the message inside the room.
-    character->room->sendToAll("%s pour %s of %s into %s.\n", exceptions, character->getNameCapital(),
-        sourLiquid->getName(), source->getName(), container->getName());
+    character->room->sendToAll(
+        "%s pour %s of %s into %s.\n",
+        exceptions,
+        character->getNameCapital(),
+        sourLiquid->getName(),
+        source->getName(),
+        container->getName());
 }

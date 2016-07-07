@@ -35,6 +35,11 @@ ModelType NodeModel::getType() const
     return ModelType::Node;
 }
 
+std::string NodeModel::getTypeName() const
+{
+    return "Node";
+}
+
 bool NodeModel::setModel(const std::string & source)
 {
     if (source.empty())
@@ -51,4 +56,13 @@ bool NodeModel::setModel(const std::string & source)
     this->nodeType = static_cast<NodeType>(ToNumber<unsigned int>(functionList[0]));
     this->provides = ToNumber<unsigned int>(functionList[1]);
     return true;
+}
+
+std::string GetNodeTypeName(NodeType type)
+{
+    if (type == NodeType::Metal) return "Metal Node";
+    if (type == NodeType::Wood) return "Wood Node";
+    if (type == NodeType::Stone) return "Stone Node";
+    if (type == NodeType::Metal) return "Metal Node";
+    return "No Node Type";
 }

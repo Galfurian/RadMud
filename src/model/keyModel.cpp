@@ -33,6 +33,11 @@ ModelType KeyModel::getType() const
     return ModelType::Key;
 }
 
+std::string KeyModel::getTypeName() const
+{
+    return "Key";
+}
+
 bool KeyModel::setModel(const std::string & source)
 {
     if (source.empty())
