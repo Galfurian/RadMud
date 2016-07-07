@@ -108,6 +108,7 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 add_subdirectory(src/lua)
 add_subdirectory(src/model)
 add_subdirectory(src/sqlite)
+add_subdirectory(src/command)
 add_subdirectory(src/utilities)
 
 set(PROJECT_SRC
@@ -115,14 +116,6 @@ set(PROJECT_SRC
     ./src/area.cpp
     ./src/building.cpp
     ./src/character.cpp
-    ./src/comm_combat.cpp
-    ./src/comm_communication.cpp
-    ./src/comm_crafting.cpp
-    ./src/comm_gathering.cpp
-    ./src/comm_general.cpp
-    ./src/comm_gods.cpp
-    ./src/comm_object.cpp
-    ./src/commands.cpp
     ./src/continent.cpp
     ./src/defines.cpp
     ./src/effect.cpp
@@ -151,6 +144,7 @@ set(PROJECT_SRC
     ${RADMUD_LUA_SRC}
     ${RADMUD_MODEL_SRC}
     ${RADMUD_SQLITE_SRC}
+    ${RADMUD_COMMAND_SRC}
     ${RADMUD_UTILITIES_SRC}
 )
 
@@ -163,6 +157,7 @@ include_directories(
 	${ZLIB_INCLUDE_DIR}
 	${SQLITE3_INCLUDE_DIR}
 	${RADMUD_UTILITIES_INC}
+    ${RADMUD_COMMAND_INC}
 	${RADMUD_SQLITE_INC}
 	${RADMUD_MODEL_INC}
 	${RADMUD_LUA_INC}

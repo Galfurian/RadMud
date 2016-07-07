@@ -1,4 +1,4 @@
-/// @file   commands.hpp
+/// @file   command.hpp
 /// @brief  Define the methods used by the character in order to execute commands.
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2014
@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include "character.hpp"
-#include "constants.hpp"
-#include "profession.hpp"
+#include "../character.hpp"
+#include "../constants.hpp"
+#include "../profession.hpp"
 #include <iosfwd>
 
 /// @brief Contains all the informations concerning a command, including its handler.
@@ -42,7 +42,12 @@ class Command
         /// @param _help  The help message of the command.
         /// @param _args  The arguments of the command.
         /// @param _hndl  The handler of the command.
-        Command(int _level, std::string _name, std::string _help, std::string _args, ActionHandler _hndl) :
+        Command(
+            int _level,
+            std::string _name,
+            std::string _help,
+            std::string _args,
+            ActionHandler _hndl) :
                 level(_level),
                 name(_name),
                 help(_help),
@@ -135,7 +140,10 @@ void RollbackCharacterCreation(Character * character, ConnectionState new_state)
 /// @param character The player whose creating a new character.
 /// @param con_state The step reached by this player.
 /// @param message   An optional message used only during error handling.
-void AdvanceCharacterCreation(Character * character, ConnectionState con_state, std::string message = "");
+void AdvanceCharacterCreation(
+    Character * character,
+    ConnectionState con_state,
+    std::string message = "");
 
 /// @brief Map all the command to the respective std::string that the character can type.
 void LoadCommands();

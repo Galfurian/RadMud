@@ -1,4 +1,4 @@
-/// @file   combat.hpp
+/// @file   opponent.hpp
 /// @brief  Contains definition of combat classes.
 /// @author Enrico Fraccaroli
 /// @date   May 8 2016

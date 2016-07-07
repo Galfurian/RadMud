@@ -1,4 +1,4 @@
-/// @file   comm_general.cpp
+/// @file   general.cpp
 /// @brief  Implements <b>general commands</b> used by the player.
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2014
@@ -20,13 +20,13 @@
 #include <istream>
 #include <time.h>
 
+#include "command.hpp"
 // Other Include.
-#include "mud.hpp"
-#include "utils.hpp"
-#include "logger.hpp"
-#include "commands.hpp"
-#include "constants.hpp"
-#include "utilities/table.hpp"
+#include "../mud.hpp"
+#include "../utils.hpp"
+#include "../logger.hpp"
+#include "../constants.hpp"
+#include "../utilities/table.hpp"
 
 using namespace std;
 

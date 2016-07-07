@@ -16,14 +16,14 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#include "combat.hpp"
 #include "utils.hpp"
 #include "character.hpp"
 #include "logger.hpp"
+#include "opponent.hpp"
 
 Aggression::Aggression(Character * _aggressor, unsigned int _aggression) :
-    aggressor(_aggressor),
-    aggression(_aggression)
+        aggressor(_aggressor),
+        aggression(_aggression)
 {
     // Nothing to do.
 }
@@ -49,8 +49,8 @@ bool Aggression::operator==(const Character * source) const
 }
 
 OpponentsList::OpponentsList(Character * _owner) :
-    owner(_owner),
-    aggressionList()
+        owner(_owner),
+        aggressionList()
 {
     // Nothing to do.
 }
@@ -91,7 +91,11 @@ bool OpponentsList::remOpponent(Character * character)
     auto iterator = std::find(aggressionList.begin(), aggressionList.end(), character);
     if (iterator != aggressionList.end())
     {
-        Logger::log(LogLevel::Debug, "%s disengage %s", owner->getNameCapital(), character->getName());
+        Logger::log(
+            LogLevel::Debug,
+            "%s disengage %s",
+            owner->getNameCapital(),
+            character->getName());
         iterator = aggressionList.erase(iterator, aggressionList.end());
         return true;
     }

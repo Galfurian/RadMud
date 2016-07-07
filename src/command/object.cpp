@@ -1,4 +1,4 @@
-/// @file   comm_object.cpp
+/// @file   object.cpp
 /// @brief  Implements the methods used by the player in order to <b>interract with objects</b>.
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2014
@@ -16,15 +16,13 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-// Basic Include.
-#include <algorithm>
-#include <istream>
+#include "command.hpp"
 
-#include "commands.hpp"
-#include "mud.hpp"
-// Other Include.
-#include "utilities/table.hpp"
-#include "model/liquidContainerModel.hpp"
+#include "../mud.hpp"
+#include "../utilities/table.hpp"
+#include "../model/liquidContainerModel.hpp"
+
+#include <algorithm>
 
 using namespace std;
 

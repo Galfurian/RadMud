@@ -1,4 +1,4 @@
-/// @file   comm_communication.cpp
+/// @file   communication.cpp
 /// @brief  Implements the methods used by the player in order to <b>communicate</b>.
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2014
@@ -16,12 +16,8 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-// Basic Include.
-#include <istream>
-
-#include "commands.hpp"
-// Other Include.
-#include "mud.hpp"
+#include "command.hpp"
+#include "../mud.hpp"
 
 using namespace std;
 

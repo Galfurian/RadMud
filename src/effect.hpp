@@ -38,7 +38,7 @@ class Effect
         /// Stamina modifier.
         int stamina;
         /// Abilities modifier.
-        std::map<Ability, unsigned int> abilities;
+        std::map<Ability, int> abilities;
         /// Hit chance modifier.
         int hit;
         /// Damage modifier.

@@ -28,11 +28,11 @@
 // Other Include.
 #include "mud.hpp"
 #include "logger.hpp"
-#include "commands.hpp"
 #include "constants.hpp"
 #include "lua/lua_script.hpp"
 #include "sqlite/SQLiteDbms.hpp"
 #include "luabridge/LuaBridge.h"
+#include "command/command.hpp"
 
 #include "model/toolModel.hpp"
 #include "model/armorModel.hpp"

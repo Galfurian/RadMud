@@ -23,7 +23,7 @@
 #include <set>
 #include <map>
 
-#include "defines.hpp"
+#include "../defines.hpp"
 #include "../lua/lua_script.hpp"
 
 class Item;

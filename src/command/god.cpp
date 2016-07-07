@@ -1,4 +1,4 @@
-/// @file   comm_gods.cpp
+/// @file   gods.cpp
 /// @brief  Implements the methods used by <b>gods</b>.
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2014
@@ -19,10 +19,12 @@
 // Basic Include.
 #include <istream>
 
-#include "commands.hpp"
-#include "constants.hpp"
-#include "defines.hpp"
-#include "mud.hpp"
+#include "command.hpp"
+
+#include "../mud.hpp"
+#include "../defines.hpp"
+#include "../constants.hpp"
+#include "../utilities/table.hpp"
 #include "../model/armorModel.hpp"
 #include "../model/bookModel.hpp"
 #include "../model/containerModel.hpp"
@@ -43,7 +45,6 @@
 #include "../model/toolModel.hpp"
 #include "../model/vehicleModel.hpp"
 #include "../model/weaponModel.hpp"
-#include "utilities/table.hpp"
 
 using namespace std;
 

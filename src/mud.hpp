@@ -20,7 +20,6 @@
 
 #include "area.hpp"
 #include "building.hpp"
-#include "commands.hpp"
 #include "constants.hpp"
 #include "continent.hpp"
 #include "formatter.hpp"
@@ -30,10 +29,12 @@
 #include "profession.hpp"
 #include "room.hpp"
 #include "skill.hpp"
-#include "sqlite/SQLiteDbms.hpp"
 #include "updater.hpp"
-#include "utilities/table.hpp"
 #include "writing.hpp"
+
+#include "command/command.hpp"
+#include "sqlite/SQLiteDbms.hpp"
+#include "utilities/table.hpp"
 
 #ifdef __linux__
 #include <sys/select.h>

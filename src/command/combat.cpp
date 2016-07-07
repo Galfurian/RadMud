@@ -1,4 +1,4 @@
-/// @file   comm_combat.cpp
+/// @file   combat.cpp
 /// @brief  Implements the methods used by the character in order to <b>fight</b>.
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2014
@@ -17,9 +17,9 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 // Basic Include.
-#include "room.hpp"
-#include "commands.hpp"
-#include "constants.hpp"
+#include "command.hpp"
+#include "../room.hpp"
+#include "../constants.hpp"
 
 using namespace std;
 

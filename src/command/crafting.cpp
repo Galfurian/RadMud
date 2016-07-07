@@ -1,4 +1,4 @@
-/// @file   comm_crafting.cpp
+/// @file   crafting.cpp
 /// @brief  Implements the methods used by the player in order to <b>craft items</b>.
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2014
@@ -16,12 +16,9 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-// Basic Include.
-#include <istream>
-
-#include "commands.hpp"
-#include "mud.hpp"
-#include "model/resourceModel.hpp"
+#include "command.hpp"
+#include "../mud.hpp"
+#include "../model/resourceModel.hpp"
 
 using namespace std;
 

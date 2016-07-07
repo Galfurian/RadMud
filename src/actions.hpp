@@ -21,9 +21,9 @@
 #include "production.hpp"
 #include "building.hpp"
 #include "defines.hpp"
-#include "combat.hpp"
 #include "utils.hpp"
 #include "item.hpp"
+#include "opponent.hpp"
 
 /// The list of possible actions.
 typedef enum class ActionTypes

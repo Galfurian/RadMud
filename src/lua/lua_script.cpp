@@ -20,8 +20,8 @@
 
 #include "../mud.hpp"
 #include "../logger.hpp"
-#include "../commands.hpp"
 #include "../constants.hpp"
+#include "../command/command.hpp"
 #include "../luabridge/LuaBridge.h"
 
 void LuaLog(std::string message)

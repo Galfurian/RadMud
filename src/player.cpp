@@ -43,32 +43,31 @@
 #include "logger.hpp"
 #include "updater.hpp"
 #include "faction.hpp"
-#include "commands.hpp"
 #include "constants.hpp"
 #include "formatter.hpp"
 
 using namespace std;
 
 Player::Player(const int & _socket, const int & _port, const std::string & _address) :
-    psocket(_socket),
-    port(_port),
-    address(_address),
-    outbuf(),
-    inbuf(),
-    password(),
-    age(),
-    experience(),
-    prompt(),
-    prompt_save(),
-    rent_room(),
-    skills(),
-    remaining_points(),
-    connection_state(ConnectionState::NoState),
-    password_attempts(),
-    closing(),
-    logged_in(),
-    connectionFlags(),
-    msdpVariables()
+        psocket(_socket),
+        port(_port),
+        address(_address),
+        outbuf(),
+        inbuf(),
+        password(),
+        age(),
+        experience(),
+        prompt(),
+        prompt_save(),
+        rent_room(),
+        skills(),
+        remaining_points(),
+        connection_state(ConnectionState::NoState),
+        password_attempts(),
+        closing(),
+        logged_in(),
+        connectionFlags(),
+        msdpVariables()
 {
     // Nothing to do.
 }
@@ -162,7 +161,8 @@ void Player::closeConnection()
 
 bool Player::isPlaying() const
 {
-    return checkConnection() && (connection_state == ConnectionState::Playing) && (!closing) && logged_in;
+    return checkConnection() && (connection_state == ConnectionState::Playing) && (!closing)
+        && logged_in;
 }
 
 bool Player::hasPendingOutput() const
@@ -216,7 +216,9 @@ bool Player::createOnDB()
         arguments.push_back(ToString(iterator.second));
         if (!SQLiteDbms::instance().insertInto("Advancement", arguments))
         {
-            Logger::log(LogLevel::Error, "Something gone wrong during player Skill creation on database.");
+            Logger::log(
+                LogLevel::Error,
+                "Something gone wrong during player Skill creation on database.");
             return false;
         }
     }
@@ -236,11 +238,15 @@ bool Player::updateOnDB()
         value.push_back(std::make_pair("name", name));
         value.push_back(std::make_pair("password", password));
         value.push_back(std::make_pair("race", ToString(race->vnum)));
-        value.push_back(std::make_pair("str", ToString(this->getAbility(Ability::Strength, false))));
+        value.push_back(
+            std::make_pair("str", ToString(this->getAbility(Ability::Strength, false))));
         value.push_back(std::make_pair("agi", ToString(this->getAbility(Ability::Agility, false))));
-        value.push_back(std::make_pair("per", ToString(this->getAbility(Ability::Perception, false))));
-        value.push_back(std::make_pair("con", ToString(this->getAbility(Ability::Constitution, false))));
-        value.push_back(std::make_pair("int", ToString(this->getAbility(Ability::Intelligence, false))));
+        value.push_back(
+            std::make_pair("per", ToString(this->getAbility(Ability::Perception, false))));
+        value.push_back(
+            std::make_pair("con", ToString(this->getAbility(Ability::Constitution, false))));
+        value.push_back(
+            std::make_pair("int", ToString(this->getAbility(Ability::Intelligence, false))));
         value.push_back(std::make_pair("gender", ToString(static_cast<int>(gender))));
         value.push_back(std::make_pair("age", ToString(age)));
         value.push_back(std::make_pair("description", description));

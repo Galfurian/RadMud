@@ -1,4 +1,4 @@
-/// @file   comm_gathering.cpp
+/// @file   gathering.cpp
 /// @brief  Implements the methods used by the character in order to <b>gather materials</b>.
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2014
@@ -17,7 +17,7 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 // Basic Include.
-#include "commands.hpp"
+#include "command.hpp"
 
 // Local Includes.
 
