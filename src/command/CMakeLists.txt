@@ -14,7 +14,7 @@ set(RADMUD_COMMAND_SRC
 	./src/command/crafting.cpp
 	./src/command/gathering.cpp
 	./src/command/general.cpp
-	./src/command/gods.cpp
+	./src/command/god.cpp
 	./src/command/object.cpp
     PARENT_SCOPE
 )

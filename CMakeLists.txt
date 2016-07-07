@@ -137,7 +137,7 @@ set(PROJECT_SRC
     ./src/updater.cpp
     ./src/utils.cpp
     ./src/formatter.cpp
-    ./src/combat.cpp
+    ./src/opponent.cpp
     ./src/logger.cpp
     ./src/protocol.cpp
     ./src/luabridge/detail/LuaHelpers.cpp
