@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef CONTINENT_HPP
-#define CONTINENT_HPP
+#pragma once
 
 #include "utilities/coordinates.hpp"
 #include "utilities/map2D.hpp"
@@ -168,4 +167,3 @@ typedef std::vector<Continent *> ContinentList;
 /// Continent map handler.
 typedef std::map<int, Continent *> ContinentMap;
 
-#endif

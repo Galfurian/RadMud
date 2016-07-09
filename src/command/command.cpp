@@ -1,4 +1,4 @@
-/// @file   commands.cpp
+/// @file   command.cpp
 /// @brief  Implement the general methods needed to handle commands.
 /// @author Enrico Fraccaroli
 /// @date   Sep 8 2015
@@ -17,10 +17,8 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 // Basic Include.
-#include "commands.hpp"
-
-// Other Include.
-#include "mud.hpp"
+#include "command.hpp"
+#include "../mud.hpp"
 
 /// Player names must consist of characters from this list.
 const std::string kValidPlayerName = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
@@ -1625,6 +1623,13 @@ void LoadCommands()
         command.help = "Transfer another character here, or to another room.";
         command.args = "(Target) [Where]";
         command.hndl = DoTransfer;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "feast";
+        command.help = "Restores completely the health and the stamina of the target.";
+        command.args = "(Target)";
+        command.hndl = DoFeast;
         Mud::instance().addCommand(command);
     }
     {

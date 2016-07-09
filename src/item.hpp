@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef ITEM_HPP
-#define ITEM_HPP
+#pragma once
 
 #include <vector>
 #include <list>
@@ -25,7 +24,8 @@
 
 #include "liquid.hpp"
 #include "lua/lua_script.hpp"
-#include "model.hpp"
+#include "model/itemModel.hpp"
+#include "model/nodeModel.hpp"
 
 class Room;
 class Character;
@@ -38,7 +38,7 @@ class Item
         /// Item vnum.
         int vnum;
         /// Item model.
-        Model * model;
+        ItemModel * model;
         /// The player that created the item.
         std::string maker;
         /// In which condition is the item.
@@ -240,5 +240,3 @@ bool OrderItemByName(Item * first, Item * second);
 /// @param second The second item.
 /// @return <b>True</b> if the first item is lighter then the second.<br><b>False</b> otherwise.
 bool OrderItemByWeight(Item * first, Item * second);
-
-#endif

@@ -1,4 +1,4 @@
-/// @file   combat.hpp
+/// @file   opponent.hpp
 /// @brief  Contains definition of combat classes.
 /// @author Enrico Fraccaroli
 /// @date   May 8 2016
@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef COMBAT_HPP
-#define COMBAT_HPP
+#pragma once
 
 class Character;
 
@@ -133,6 +132,8 @@ class OpponentsList
         /// @brief Check and clear the list from possible disconnected players.
         void checkList();
 
+        void resetList();
+
         /// @brief Provides an iterator to the begin of the list of aggressors.
         /// @return An iterator to the begin of the vector of aggressors.
         iterator begin();
@@ -148,5 +149,3 @@ class OpponentsList
         /// @brief Print the list of opponents.
         void printList();
 };
-
-#endif

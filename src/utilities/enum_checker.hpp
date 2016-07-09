@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef ENUM_CHECKER_HPP
-#define ENUM_CHECKER_HPP
+#pragma once
 
 #include "../logger.hpp"
 
@@ -70,5 +69,3 @@ class EnumCheck<EnumType, V, Next...> : private EnumCheck<EnumType, Next...>
             return static_cast<EnumType>(value);
         }
 };
-
-#endif

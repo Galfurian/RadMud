@@ -16,14 +16,14 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#include "combat.hpp"
 #include "utils.hpp"
 #include "character.hpp"
 #include "logger.hpp"
+#include "opponent.hpp"
 
 Aggression::Aggression(Character * _aggressor, unsigned int _aggression) :
-    aggressor(_aggressor),
-    aggression(_aggression)
+        aggressor(_aggressor),
+        aggression(_aggression)
 {
     // Nothing to do.
 }
@@ -41,16 +41,16 @@ bool Aggression::operator<(const Aggression & source) const
 }
 bool Aggression::operator==(const Aggression & source) const
 {
-    return (this->aggressor->getName() == source.aggressor->getName());
+    return (this->aggressor->name == source.aggressor->name);
 }
 bool Aggression::operator==(const Character * source) const
 {
-    return (this->aggressor->getName() == source->name);
+    return (this->aggressor->name == source->name);
 }
 
 OpponentsList::OpponentsList(Character * _owner) :
-    owner(_owner),
-    aggressionList()
+        owner(_owner),
+        aggressionList()
 {
     // Nothing to do.
 }
@@ -91,7 +91,11 @@ bool OpponentsList::remOpponent(Character * character)
     auto iterator = std::find(aggressionList.begin(), aggressionList.end(), character);
     if (iterator != aggressionList.end())
     {
-        Logger::log(LogLevel::Debug, "%s disengage %s", owner->getNameCapital(), character->getName());
+        Logger::log(
+            LogLevel::Debug,
+            "%s disengage %s",
+            owner->getNameCapital(),
+            character->getName());
         iterator = aggressionList.erase(iterator, aggressionList.end());
         return true;
     }
@@ -210,21 +214,49 @@ std::size_t OpponentsList::getSize()
 
 void OpponentsList::checkList()
 {
-    for (std::vector<Aggression>::iterator it = aggressionList.begin(); it != aggressionList.end();)
+    auto temporaryList = aggressionList;
+    for (AggressorVector::iterator it = temporaryList.begin(); it != temporaryList.end(); ++it)
     {
         // Check if the aggressor is null.
         if (it->aggressor == nullptr)
         {
-            it = aggressionList.erase(it);
+            this->remOpponent(it->aggressor);
         }
         // Check if the aggressor is nowhere.
         else if (it->aggressor->room == nullptr)
         {
-            it = aggressionList.erase(it);
+            this->remOpponent(it->aggressor);
         }
-        else
+    }
+}
+
+void OpponentsList::resetList()
+{
+    auto temporaryList = aggressionList;
+    for (AggressorVector::iterator it = temporaryList.begin(); it != temporaryList.end(); ++it)
+    {
+        // Check if the aggressor is null.
+        if (it->aggressor == nullptr)
         {
-            ++it;
+            continue;
+        }
+        // Remove the owner from its list.
+        if (!it->aggressor->opponents.remOpponent(owner))
+        {
+            Logger::log(
+                LogLevel::Error,
+                "Could not remove %s from opponents of %s.",
+                owner->getName(),
+                it->aggressor->getName());
+        }
+        // Remove from this list the opponent.
+        if (!this->remOpponent(it->aggressor))
+        {
+            Logger::log(
+                LogLevel::Error,
+                "Could not remove %s from opponents of %s.",
+                it->aggressor->getName(),
+                owner->getName());
         }
     }
 }

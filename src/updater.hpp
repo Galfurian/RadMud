@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef UPDATE_HPP
-#define UPDATE_HPP
+#pragma once
 
 #include "constants.hpp"
 #include "utils.hpp"
@@ -154,5 +153,3 @@ class MudUpdater
         /// @return The uncompressed bandwidth.
         size_t getBandUncompressed();
 };
-
-#endif

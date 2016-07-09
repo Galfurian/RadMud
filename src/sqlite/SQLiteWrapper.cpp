@@ -46,7 +46,9 @@ bool SQLiteWrapper::openConnection(std::string dbName, std::string dbDirectory)
 
     connected = true;
 
-    errorCode = sqlite3_open((dbDetails.dbDirectory + dbDetails.dbName).c_str(), &(dbDetails.dbConnection));
+    errorCode = sqlite3_open(
+        (dbDetails.dbDirectory + dbDetails.dbName).c_str(),
+        &(dbDetails.dbConnection));
     errorMessage = reinterpret_cast<const char *>(sqlite3_errmsg(dbDetails.dbConnection));
 
     if (errorCode != SQLITE_OK)
@@ -107,7 +109,8 @@ ResultSet * SQLiteWrapper::executeSelect(const char * query)
     {
         return NULL;
     }
-    if (sqlite3_prepare_v2(dbDetails.dbConnection, query, -1, &dbDetails.dbStatement, NULL) != SQLITE_OK)
+    if (sqlite3_prepare_v2(dbDetails.dbConnection, query, -1, &dbDetails.dbStatement,
+    NULL) != SQLITE_OK)
     {
         errorMessage = sqlite3_errmsg(dbDetails.dbConnection);
         errorCode = sqlite3_finalize(dbDetails.dbStatement);
@@ -214,7 +217,9 @@ std::string SQLiteWrapper::getDataString(const int & column)
         return "";
     }
     // Check the input in case is a valid value.
-    const char * ptr = reinterpret_cast<const char *>(sqlite3_column_text(dbDetails.dbStatement, column));
+    const char * ptr = reinterpret_cast<const char *>(sqlite3_column_text(
+        dbDetails.dbStatement,
+        column));
     if (ptr)
     {
         return std::string(ptr);
@@ -241,10 +246,13 @@ std::string SQLiteWrapper::getNextString()
     if (currentColumn >= num_col)
     {
         release();
-        throw std::runtime_error("Number column exceded (" + ToString(currentColumn) + ">=" + ToString(num_col) + ").");
+        throw std::runtime_error(
+            "Number column exceded (" + ToString(currentColumn) + ">=" + ToString(num_col) + ").");
     }
     // Check the input in case is a valid value.
-    const char * ptr = reinterpret_cast<const char *>(sqlite3_column_text(dbDetails.dbStatement, currentColumn));
+    const char * ptr = reinterpret_cast<const char *>(sqlite3_column_text(
+        dbDetails.dbStatement,
+        currentColumn));
     // Increase the column index.
     currentColumn += 1;
     if (ptr)
@@ -263,7 +271,8 @@ int SQLiteWrapper::getNextInteger()
     if (currentColumn >= num_col)
     {
         release();
-        throw std::runtime_error("Number column exceded (" + ToString(currentColumn) + ">=" + ToString(num_col) + ").");
+        throw std::runtime_error(
+            "Number column exceded (" + ToString(currentColumn) + ">=" + ToString(num_col) + ").");
     }
     int value = sqlite3_column_int(dbDetails.dbStatement, currentColumn);
     // Increase the column index.
@@ -277,7 +286,8 @@ unsigned int SQLiteWrapper::getNextUnsignedInteger()
     if (currentColumn >= num_col)
     {
         release();
-        throw std::runtime_error("Number column exceded (" + ToString(currentColumn) + ">=" + ToString(num_col) + ").");
+        throw std::runtime_error(
+            "Number column exceded (" + ToString(currentColumn) + ">=" + ToString(num_col) + ").");
     }
     int value = sqlite3_column_int(dbDetails.dbStatement, currentColumn);
     // Increase the column index.

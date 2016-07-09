@@ -28,35 +28,40 @@
 // Other Include.
 #include "mud.hpp"
 #include "logger.hpp"
-#include "commands.hpp"
 #include "constants.hpp"
 #include "lua/lua_script.hpp"
 #include "sqlite/SQLiteDbms.hpp"
 #include "luabridge/LuaBridge.h"
+#include "command/command.hpp"
+
+#include "model/toolModel.hpp"
+#include "model/armorModel.hpp"
+#include "model/shieldModel.hpp"
+#include "model/resourceModel.hpp"
 
 using namespace std;
 
 Character::Character() :
-    name(),
-    description(),
-    gender(),
-    weight(),
-    level(),
-    flags(),
-    race(),
-    faction(),
-    health(),
-    stamina(),
-    hunger(100),
-    thirst(100),
-    room(),
-    inventory(),
-    equipment(),
-    posture(CharacterPosture::Stand),
-    effects(),
-    action(this),
-    L(luaL_newstate()),
-    opponents(this)
+        name(),
+        description(),
+        gender(),
+        weight(),
+        level(),
+        flags(),
+        race(),
+        faction(),
+        health(),
+        stamina(),
+        hunger(100),
+        thirst(100),
+        room(),
+        inventory(),
+        equipment(),
+        posture(CharacterPosture::Stand),
+        effects(),
+        action(this),
+        L(luaL_newstate()),
+        opponents(this)
 {
     // Nothing to do.
 }
@@ -69,28 +74,24 @@ Character::~Character()
 bool Character::check()
 {
     bool safe = true;
-    safe &= SafeAssert(!name.empty());
-    safe &= SafeAssert(!description.empty());
-    safe &= SafeAssert(weight > 0);
-    safe &= SafeAssert(race != nullptr);
-    safe &= SafeAssert(faction != nullptr);
-    safe &= SafeAssert(health > 0);
-    safe &= SafeAssert(stamina > 0);
-    safe &= SafeAssert(hunger > 0);
-    safe &= SafeAssert(thirst > 0);
-    safe &= SafeAssert(abilities[Ability::Strength] > 0);
-    safe &= SafeAssert(abilities[Ability::Strength] <= 60);
-    safe &= SafeAssert(abilities[Ability::Agility] > 0);
-    safe &= SafeAssert(abilities[Ability::Agility] <= 60);
-    safe &= SafeAssert(abilities[Ability::Perception] > 0);
-    safe &= SafeAssert(abilities[Ability::Perception] <= 60);
-    safe &= SafeAssert(abilities[Ability::Constitution] > 0);
-    safe &= SafeAssert(abilities[Ability::Constitution] <= 60);
-    safe &= SafeAssert(abilities[Ability::Intelligence] > 0);
-    safe &= SafeAssert(abilities[Ability::Intelligence] <= 60);
-    safe &= SafeAssert(thirst > 0);
-    safe &= SafeAssert(room != nullptr);
-    safe &= SafeAssert(L != nullptr);
+    safe &= CorrectAssert(!name.empty());
+    safe &= CorrectAssert(!description.empty());
+    safe &= CorrectAssert(weight > 0);
+    safe &= CorrectAssert(race != nullptr);
+    safe &= CorrectAssert(faction != nullptr);
+    safe &= CorrectAssert(abilities[Ability::Strength] > 0);
+    safe &= CorrectAssert(abilities[Ability::Strength] <= 60);
+    safe &= CorrectAssert(abilities[Ability::Agility] > 0);
+    safe &= CorrectAssert(abilities[Ability::Agility] <= 60);
+    safe &= CorrectAssert(abilities[Ability::Perception] > 0);
+    safe &= CorrectAssert(abilities[Ability::Perception] <= 60);
+    safe &= CorrectAssert(abilities[Ability::Constitution] > 0);
+    safe &= CorrectAssert(abilities[Ability::Constitution] <= 60);
+    safe &= CorrectAssert(abilities[Ability::Intelligence] > 0);
+    safe &= CorrectAssert(abilities[Ability::Intelligence] <= 60);
+    safe &= CorrectAssert(thirst > 0);
+    safe &= CorrectAssert(room != nullptr);
+    safe &= CorrectAssert(L != nullptr);
     return safe;
 }
 
@@ -152,14 +153,14 @@ std::string Character::getStaticDesc()
     // Action
     if ((action.getType() != ActionType::NoAction) && (action.getType() != ActionType::Wait))
     {
-        desc += ", " + this->getPronoun() + " is ";
+        desc += ", " + this->getSubjectPronoun() + " is ";
         desc += action.getDescription();
     }
     desc += ".";
     return desc;
 }
 
-string Character::getPronoun()
+string Character::getSubjectPronoun()
 {
     if (gender == GenderType::Male) return "he";
     if (gender == GenderType::Female) return "she";
@@ -171,6 +172,13 @@ string Character::getPossessivePronoun()
     if (gender == GenderType::Male) return "his";
     if (gender == GenderType::Female) return "her";
     return "its";
+}
+
+std::string Character::getObjectPronoun()
+{
+    if (gender == GenderType::Male) return "him";
+    if (gender == GenderType::Female) return "her";
+    return "it";
 }
 
 bool Character::setAbility(const Ability & ability, const unsigned int & value)
@@ -194,7 +202,8 @@ unsigned int Character::getAbility(const Ability & ability, bool withEffects)
         {
             return abilities[ability];
         }
-        int overall = static_cast<int>(this->abilities[ability]) + effects.getAbilityModifier(ability);
+        int overall = static_cast<int>(this->abilities[ability])
+            + effects.getAbilityModifier(ability);
         if (overall <= 0)
         {
             return 0;
@@ -279,6 +288,7 @@ unsigned int Character::getMaxStamina(bool withEffects)
 void Character::updateResources()
 {
     unsigned int PosMod = 0;
+    unsigned int LogMod = this->getAbilityLog(Ability::Constitution, 0.0, 1.0);
     if (posture == CharacterPosture::Sit)
     {
         PosMod = 2;
@@ -289,19 +299,11 @@ void Character::updateResources()
     }
     if (this->health < this->getMaxHealth())
     {
-        unsigned int LogMod = this->getAbilityLog(Ability::Constitution, 0.0, 1.0);
-        // Value = 5 + ((1 + 3*LogMod(CON))*(1 + 2*PosMod))
-        // MIN   =  6.00
-        // MAX   = 51.74
-        this->addHealth(5 + ((1 + 3 * LogMod) * (1 + 2 * PosMod)), true);
+        this->addHealth((1 + 3 * LogMod) * (1 + 2 * PosMod), true);
     }
     if (this->stamina < this->getMaxStamina())
     {
-        unsigned int LogMod = this->getAbilityLog(Ability::Constitution, 0.0, 1.0);
-        // Value = 5 + ((1 + 4*LogMod(CON))*(1 + 3*PosMod))
-        // MIN   =  6.00
-        // MAX   = 90.69
-        this->addStamina(5 + ((1 + 4 * LogMod) * (1 + 3 * PosMod)), true);
+        this->addStamina((1 + 4 * LogMod) * (1 + 3 * PosMod), true);
     }
 }
 
@@ -517,23 +519,21 @@ Item * Character::findEquipmentSlotItem(EquipmentSlot slot)
 Item * Character::findEquipmentSlotTool(EquipmentSlot slot, ToolType type)
 {
     Item * tool = findEquipmentSlotItem(slot);
-    if (tool == nullptr)
+    if (tool != nullptr)
     {
-        return nullptr;
+        if (tool->model != nullptr)
+        {
+            if (tool->model->getType() == ModelType::Tool)
+            {
+                ToolModel * toolModel = tool->model->toTool();
+                if (toolModel->toolType == type)
+                {
+                    return tool;
+                }
+            }
+        }
     }
-    if (tool->model == nullptr)
-    {
-        return nullptr;
-    }
-    if (tool->model->type != ModelType::Tool)
-    {
-        return nullptr;
-    }
-    if (tool->model->getToolFunc().type != type)
-    {
-        return nullptr;
-    }
-    return tool;
+    return nullptr;
 }
 
 Item * Character::findNearbyItem(std::string itemName, int & number)
@@ -549,39 +549,97 @@ Item * Character::findNearbyItem(std::string itemName, int & number)
     return item;
 }
 
-bool Character::findNearbyTools(ToolSet tools, ItemVector & foundOnes)
+Item * Character::findNearbyTool(
+    const ToolType & toolType,
+    const ItemVector & exceptions,
+    bool searchRoom,
+    bool searchInventory,
+    bool searchEquipment)
 {
-    for (auto iterator : tools)
+    if (searchRoom)
     {
-        bool found = false;
-        for (auto iterator2 : equipment)
+        for (auto iterator : room->items)
         {
-            ToolType itemToolType = iterator2->model->getToolFunc().type;
-            if (itemToolType == iterator)
+            if (iterator->model->getType() == ModelType::Tool)
             {
-                foundOnes.push_back(iterator2);
-                found = true;
-                break;
-            }
-        }
-        // If the ingredients are not enough, search even in the room.
-        if (!found)
-        {
-            for (auto iterator2 : inventory)
-            {
-                ToolType itemToolType = iterator2->model->getToolFunc().type;
-                if (itemToolType == iterator)
+                ToolModel * toolModel = iterator->model->toTool();
+                if (toolModel->toolType == toolType)
                 {
-                    foundOnes.push_back(iterator2);
-                    found = true;
-                    break;
+                    auto findIt = std::find(exceptions.begin(), exceptions.end(), iterator);
+                    if (findIt == exceptions.end())
+                    {
+                        return iterator;
+                    }
                 }
             }
         }
-        // If the ingredients are still not enough, return false.
-        if (!found)
+    }
+    if (searchInventory)
+    {
+        for (auto iterator : this->inventory)
+        {
+            if (iterator->model->getType() == ModelType::Tool)
+            {
+                ToolModel * toolModel = iterator->model->toTool();
+                if (toolModel->toolType == toolType)
+                {
+                    auto findIt = std::find(exceptions.begin(), exceptions.end(), iterator);
+                    if (findIt == exceptions.end())
+                    {
+                        return iterator;
+                    }
+                }
+            }
+        }
+    }
+    if (searchEquipment)
+    {
+        for (auto iterator : this->equipment)
+        {
+            if (iterator->model->getType() == ModelType::Tool)
+            {
+                ToolModel * toolModel = iterator->model->toTool();
+                if (toolModel->toolType == toolType)
+                {
+                    auto findIt = std::find(exceptions.begin(), exceptions.end(), iterator);
+                    if (findIt == exceptions.end())
+                    {
+                        return iterator;
+                    }
+                }
+            }
+        }
+    }
+    return nullptr;
+}
+
+bool Character::findNearbyTools(
+    ToolSet tools,
+    ItemVector & foundOnes,
+    bool searchRoom,
+    bool searchInventory,
+    bool searchEquipment)
+{
+    // TODO: Prepare a map with key the tool type and as value:
+    //  Option A: A bool which determine if the tool has been found.
+    //  Option B: A pointer to the found tool (more interesting, can pass to
+    //              this function as reference the map and then update it with
+    //              the found tools inside this function).
+    for (auto toolType : tools)
+    {
+        Item * tool = this->findNearbyTool(
+            toolType,
+            foundOnes,
+            searchRoom,
+            searchInventory,
+            searchEquipment);
+        if (tool == nullptr)
         {
             return false;
+        }
+        else
+        {
+            foundOnes.push_back(tool);
         }
     }
     return true;
@@ -589,38 +647,42 @@ bool Character::findNearbyTools(ToolSet tools, ItemVector & foundOnes)
 
 bool Character::findNearbyResouces(IngredientMap ingredients, ItemVector & foundOnes)
 {
-    for (auto iterator : ingredients)
+    for (auto ingredient : ingredients)
     {
         // Quantity of ingredients that has to be found.
-        unsigned int quantityNeeded = iterator.second;
-
-        for (auto iterator2 : inventory)
+        unsigned int quantityNeeded = ingredient.second;
+        for (auto iterator : inventory)
         {
-            ResourceType itemResourceType = iterator2->model->getResourceFunc().type;
-            if (itemResourceType == iterator.first)
+            if (iterator->model->getType() == ModelType::Resource)
             {
-                foundOnes.push_back(iterator2);
-                quantityNeeded--;
-                if (quantityNeeded == 0)
+                ResourceModel * resourceModel = iterator->model->toResource();
+                if (resourceModel->resourceType == ingredient.first)
                 {
-                    break;
-                }
-            }
-        }
-
-        // If the ingredients are not enough, search even in the room.
-        if (quantityNeeded > 0)
-        {
-            for (auto iterator2 : room->items)
-            {
-                ResourceType itemResourceType = iterator2->model->getResourceFunc().type;
-                if (itemResourceType == iterator.first)
-                {
-                    foundOnes.push_back(iterator2);
+                    foundOnes.push_back(iterator);
                     quantityNeeded--;
                     if (quantityNeeded == 0)
                     {
                         break;
+                    }
+                }
+            }
+        }
+        // If the ingredients are not enough, search even in the room.
+        if (quantityNeeded > 0)
+        {
+            for (auto iterator : room->items)
+            {
+                if (iterator->model->getType() == ModelType::Resource)
+                {
+                    ResourceModel * resourceModel = iterator->model->toResource();
+                    if (resourceModel->resourceType == ingredient.first)
+                    {
+                        foundOnes.push_back(iterator);
+                        quantityNeeded--;
+                        if (quantityNeeded == 0)
+                        {
+                            break;
+                        }
                     }
                 }
             }
@@ -655,7 +717,9 @@ bool Character::addInventoryItem(Item * item)
     item->owner = this;
     // Add the item to the inventory.
     inventory.push_back(item);
-    Logger::log(LogLevel::Debug, "Item '" + item->getName() + "' added to '" + this->getName() + "' inventory;");
+    Logger::log(
+        LogLevel::Debug,
+        "Item '" + item->getName() + "' added to '" + this->getName() + "' inventory;");
     return true;
 }
 
@@ -668,12 +732,16 @@ bool Character::remInventoryItem(Item *item)
     }
     else if (!FindErase(inventory, item))
     {
-        Logger::log(LogLevel::Error, "[remInventoryItem] Error during item removal from inventory.");
+        Logger::log(
+            LogLevel::Error,
+            "[remInventoryItem] Error during item removal from inventory.");
         return false;
     }
     else
     {
-        Logger::log(LogLevel::Debug, "Item '" + item->getName() + "' removed from '" + this->getName() + "';");
+        Logger::log(
+            LogLevel::Debug,
+            "Item '" + item->getName() + "' removed from '" + this->getName() + "';");
         item->owner = nullptr;
         return true;
     }
@@ -718,7 +786,9 @@ bool Character::addEquipmentItem(Item * item)
     item->owner = this;
     // Add the item to the equipment.
     equipment.push_back(item);
-    Logger::log(LogLevel::Debug, "Item '" + item->getName() + "' added to '" + this->getName() + "' equipment;");
+    Logger::log(
+        LogLevel::Debug,
+        "Item '" + item->getName() + "' added to '" + this->getName() + "' equipment;");
     return true;
 }
 
@@ -733,12 +803,16 @@ bool Character::remEquipmentItem(Item * item)
     // Try to remove the item from the equipment.
     else if (!FindErase(equipment, item))
     {
-        Logger::log(LogLevel::Error, "[remEquipmentItem] Error during item removal from equipment.");
+        Logger::log(
+            LogLevel::Error,
+            "[remEquipmentItem] Error during item removal from equipment.");
         return false;
     }
     else
     {
-        Logger::log(LogLevel::Debug, "Item '" + item->getName() + "' removed from '" + this->getName() + "';");
+        Logger::log(
+            LogLevel::Debug,
+            "Item '" + item->getName() + "' removed from '" + this->getName() + "';");
         item->owner = nullptr;
         return true;
     }
@@ -750,7 +824,7 @@ bool Character::canWield(Item * item, std::string & message, EquipmentSlot & whe
     Item * rightHand = findEquipmentSlotItem(EquipmentSlot::RightHand);
     // Gather the item in the left hand, if there is one.
     Item * leftHand = findEquipmentSlotItem(EquipmentSlot::LeftHand);
-    if (HasFlag(item->model->flags, ModelFlag::TwoHand))
+    if (HasFlag(item->model->modelFlags, ModelFlag::TwoHand))
     {
         if ((rightHand != nullptr) || (leftHand != nullptr))
         {
@@ -768,7 +842,7 @@ bool Character::canWield(Item * item, std::string & message, EquipmentSlot & whe
         }
         else if ((rightHand == nullptr) && (leftHand != nullptr))
         {
-            if (HasFlag(leftHand->model->flags, ModelFlag::TwoHand))
+            if (HasFlag(leftHand->model->modelFlags, ModelFlag::TwoHand))
             {
                 message = "You have both your hand occupied.\n";
                 return false;
@@ -777,7 +851,7 @@ bool Character::canWield(Item * item, std::string & message, EquipmentSlot & whe
         }
         else if ((rightHand != nullptr) && (leftHand == nullptr))
         {
-            if (HasFlag(rightHand->model->flags, ModelFlag::TwoHand))
+            if (HasFlag(rightHand->model->modelFlags, ModelFlag::TwoHand))
             {
                 message = "You have both your hand occupied.\n";
                 return false;
@@ -795,11 +869,11 @@ bool Character::canWield(Item * item, std::string & message, EquipmentSlot & whe
 bool Character::canWear(Item * item, std::string & message)
 {
     bool result = false;
-    if (item->model->type == ModelType::Armor)
+    if (item->model->getType() == ModelType::Armor)
     {
         result = true;
     }
-    else if (item->model->type == ModelType::Container)
+    else if (item->model->getType() == ModelType::Container)
     {
         if (item->getCurrentSlot() != EquipmentSlot::None)
         {
@@ -944,7 +1018,7 @@ string Character::getLook(Character * character)
     {
         output = "You look at " + character->getName() + ".\n";
         sent_be = "is";
-        sent_pronoun = character->getPronoun();
+        sent_pronoun = character->getSubjectPronoun();
     }
     else
     {
@@ -971,29 +1045,39 @@ string Character::getLook(Character * character)
 
     // Equipment Slot : HEAD
     output += "    " + Formatter::yellow() + "Head" + Formatter::reset() + "       : ";
-    output += (head != nullptr) ? Formatter::cyan() + head->getNameCapital() : Formatter::gray() + "Nothing";
+    output +=
+        (head != nullptr) ?
+            Formatter::cyan() + head->getNameCapital() : Formatter::gray() + "Nothing";
     output += Formatter::reset() + ".\n";
     // Equipment Slot : BACK
     output += "    " + Formatter::yellow() + "Back" + Formatter::reset() + "       : ";
-    output += (back != nullptr) ? Formatter::cyan() + back->getNameCapital() : Formatter::gray() + "Nothing";
+    output +=
+        (back != nullptr) ?
+            Formatter::cyan() + back->getNameCapital() : Formatter::gray() + "Nothing";
     output += Formatter::reset() + ".\n";
     // Equipment Slot : TORSO
     output += "    " + Formatter::yellow() + "Torso" + Formatter::reset() + "      : ";
-    output += (torso != nullptr) ? Formatter::cyan() + torso->getNameCapital() : Formatter::gray() + "Nothing";
+    output +=
+        (torso != nullptr) ?
+            Formatter::cyan() + torso->getNameCapital() : Formatter::gray() + "Nothing";
     output += Formatter::reset() + ".\n";
     // Equipment Slot : LEGS
     output += "    " + Formatter::yellow() + "Legs" + Formatter::reset() + "       : ";
-    output += (legs != nullptr) ? Formatter::cyan() + legs->getNameCapital() : Formatter::gray() + "Nothing";
+    output +=
+        (legs != nullptr) ?
+            Formatter::cyan() + legs->getNameCapital() : Formatter::gray() + "Nothing";
     output += Formatter::reset() + ".\n";
     // Equipment Slot : FEET
     output += "    " + Formatter::yellow() + "Feet" + Formatter::reset() + "       : ";
-    output += (feet != nullptr) ? Formatter::cyan() + feet->getNameCapital() : Formatter::gray() + "Nothing";
+    output +=
+        (feet != nullptr) ?
+            Formatter::cyan() + feet->getNameCapital() : Formatter::gray() + "Nothing";
     output += Formatter::reset() + ".\n";
 
     // Print what is wielding.
     if (right != nullptr)
     {
-        if (HasFlag(right->model->flags, ModelFlag::TwoHand))
+        if (HasFlag(right->model->modelFlags, ModelFlag::TwoHand))
         {
             output += "    " + Formatter::yellow() + "Both Hands" + Formatter::reset() + " : ";
         }
@@ -1005,7 +1089,8 @@ string Character::getLook(Character * character)
     }
     else
     {
-        output += "    " + Formatter::yellow() + "Right Hand" + Formatter::reset() + " : " + "Nothing";
+        output += "    " + Formatter::yellow() + "Right Hand" + Formatter::reset() + " : "
+            + "Nothing";
     }
     output += ".\n";
 
@@ -1033,26 +1118,26 @@ unsigned int Character::getArmorClass()
     // + ARMOR BONUS
     for (auto it : equipment)
     {
-        if (it->model->type == ModelType::Armor)
+        if (it->model->getType() == ModelType::Armor)
         {
-            result += it->model->getArmorFunc().damageAbs;
+            result += it->model->toArmor()->damageAbs;
         }
     }
     // + SHIELD BONUS
     Item * rh = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
     if (rh != nullptr)
     {
-        if (rh->model->type == ModelType::Shield)
+        if (rh->model->getType() == ModelType::Shield)
         {
-            result += rh->model->getShieldFunc().parryChance;
+            result += rh->model->toShield()->parryChance;
         }
     }
     Item * lh = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
     if (lh != nullptr)
     {
-        if (lh->model->type == ModelType::Shield)
+        if (lh->model->getType() == ModelType::Shield)
         {
-            result += lh->model->getShieldFunc().parryChance;
+            result += lh->model->toShield()->parryChance;
         }
     }
     // + AGILITY MODIFIER
@@ -1068,7 +1153,7 @@ bool Character::canAttackWith(const EquipmentSlot & slot)
         if (weapon != nullptr)
         {
             // Check if there is actually a weapon equiped.
-            if (weapon->model->type == ModelType::Weapon)
+            if (weapon->model->getType() == ModelType::Weapon)
             {
                 return true;
             }
@@ -1079,36 +1164,11 @@ bool Character::canAttackWith(const EquipmentSlot & slot)
 
 bool Character::isAtRange(Character * target, const unsigned int & range)
 {
-    if (target == nullptr)
-    {
-        Logger::log(LogLevel::Error, "Received a null target.");
-        return false;
-    }
-    if (this->room == nullptr)
-    {
-        Logger::log(LogLevel::Error, "Character has a null room.");
-        return false;
-    }
-    if (this->room->area == nullptr)
-    {
-        Logger::log(LogLevel::Error, "Character's room has a null area.");
-        return false;
-    }
-    if (target->room == nullptr)
-    {
-        Logger::log(LogLevel::Error, "Target has a null room.");
-        return false;
-    }
-    if (target->room->area == nullptr)
-    {
-        Logger::log(LogLevel::Error, "Target's room has a null area.");
-        return false;
-    }
-    if (this->room->area != target->room->area)
-    {
-        Logger::log(LogLevel::Error, "Character and Target are not in the same area.");
-        return false;
-    }
+    if (WrongAssert(target == nullptr)) return false;
+    if (WrongAssert(this->room == nullptr)) return false;
+    if (WrongAssert(this->room->area == nullptr)) return false;
+    if (WrongAssert(target->room == nullptr)) return false;
+    if (WrongAssert(target->room->area == nullptr)) return false;
     return this->room->area->fastInSight(this->room->coord, target->room->coord, range);
 }
 
@@ -1237,11 +1297,11 @@ bool Character::hasStaminaFor(
     const CombatAction & combatAction,
     const EquipmentSlot & slot)
 {
-    // BASE     [1]
-    // STRENGTH [0   to 2.80]
-    // WEIGHT   [1.6 to 2.51]
-    // CARRIED  [0   to 2.48]
-    // WEAPON   [0   to 1.60]
+    // BASE     [+1.0]
+    // STRENGTH [-0.0 to -2.80]
+    // WEIGHT   [+1.6 to +2.51]
+    // CARRIED  [+0.0 to +2.48]
+    // WEAPON   [+0.0 to +1.60]
     // The base value.
     double BASE = 1.0;
     // The strength modifier.
@@ -1274,7 +1334,10 @@ bool Character::hasStaminaFor(
         }
         else
         {
-            Logger::log(LogLevel::Warning, "Evaluated cosumed stamina is below zero(%s).", ToString(RSLT));
+            Logger::log(
+                LogLevel::Warning,
+                "Evaluated cosumed stamina is below zero(%s).",
+                ToString(RSLT));
         }
     }
     else if (actionType == ActionType::Combat)
@@ -1305,7 +1368,10 @@ bool Character::hasStaminaFor(
                 }
                 else
                 {
-                    Logger::log(LogLevel::Warning, "Evaluated cosumed stamina is below zero(%s).", ToString(RSLT));
+                    Logger::log(
+                        LogLevel::Warning,
+                        "Evaluated cosumed stamina is below zero(%s).",
+                        ToString(RSLT));
                 }
             }
         }
@@ -1329,7 +1395,10 @@ bool Character::hasStaminaFor(
             }
             else
             {
-                Logger::log(LogLevel::Warning, "Evaluated cosumed stamina is below zero(%s).", ToString(RSLT));
+                Logger::log(
+                    LogLevel::Warning,
+                    "Evaluated cosumed stamina is below zero(%s).",
+                    ToString(RSLT));
             }
         }
     }
@@ -1465,7 +1534,7 @@ void Character::kill()
     // Reset the action of the character.
     this->getAction()->reset();
     // Reset the list of opponents.
-    this->opponents.aggressionList.clear();
+    this->opponents.resetList();
     // Remove the character from the current room.
     if (room != nullptr)
     {
@@ -1477,10 +1546,9 @@ void Character::createCorpse()
 {
     // Retrieve the model of the corpse.
     Logger::log(LogLevel::Debug, "Retrieve the model of the corpse.");
-    Model * corpseModel = &race->corpse;
     // Create a new corpse.
     Logger::log(LogLevel::Debug, "Create a new corpse.");
-    Item * corpse = corpseModel->createItem(this->name, race->material, ItemQuality::Normal);
+    Item * corpse = race->corpse.createItem(this->name, race->material, ItemQuality::Normal);
     // Set the weight of the new corpse.
     corpse->customWeight = this->weight;
     // Add the corpse to the room.
@@ -1527,7 +1595,7 @@ void Character::loadScript(const std::string & scriptFilename)
     Character::luaRegister(L);
     Area::luaRegister(L);
     Faction::luaRegister(L);
-    Model::luaRegister(L);
+    ItemModel::luaRegister(L);
     Item::luaRegister(L);
     Material::luaRegister(L);
     Race::luaRegister(L);
@@ -1592,4 +1660,13 @@ bool Character::operator==(const class Character & source) const
 void Character::sendMsg(const std::string & msg)
 {
     Logger::log(LogLevel::Error, "[SEND_MESSAGE] Msg :" + msg);
+}
+
+std::string GetCharacterFlagString(unsigned int flags)
+{
+    std::string flagList;
+    if (HasFlag(flags, CharacterFlag::IsGod)) flagList += "|IsGod";
+    if (HasFlag(flags, CharacterFlag::Invisible)) flagList += "|Invisible";
+    flagList += "|";
+    return flagList;
 }

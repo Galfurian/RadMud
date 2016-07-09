@@ -16,12 +16,10 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef MUD_HPP
-#define MUD_HPP
+#pragma once
 
 #include "area.hpp"
 #include "building.hpp"
-#include "commands.hpp"
 #include "constants.hpp"
 #include "continent.hpp"
 #include "formatter.hpp"
@@ -31,10 +29,12 @@
 #include "profession.hpp"
 #include "room.hpp"
 #include "skill.hpp"
-#include "sqlite/SQLiteDbms.hpp"
 #include "updater.hpp"
-#include "utilities/table.hpp"
 #include "writing.hpp"
+
+#include "command/command.hpp"
+#include "sqlite/SQLiteDbms.hpp"
+#include "utilities/table.hpp"
 
 #ifdef __linux__
 #include <sys/select.h>
@@ -123,7 +123,7 @@ class Mud
         /// List of all the rooms.
         RoomMap mudRooms;
         /// List all the items model.
-        ModelMap mudModels;
+        ItemModelMap mudItemModels;
         /// List of all the areas.
         AreaMap mudAreas;
         /// List of all the races.
@@ -207,8 +207,8 @@ class Mud
         void addCorpse(Item * corpse);
         /// Remove the given corpse from the mud.
         bool remCorpse(Item * corpse);
-        /// Add the given model to the mud.
-        bool addModel(Model * model);
+        /// Add the given item model to the mud.
+        bool addItemModel(ItemModel * model);
         /// Add the given area to the mud.
         bool addArea(Area * area);
         /// Add the given race to the mud.
@@ -247,8 +247,8 @@ class Mud
 
         /// Find an item given its vnum.
         Item * findItem(int vnum);
-        /// Find a model given its vnum.
-        Model * findModel(int vnum);
+        /// Find an item model given its vnum.
+        ItemModel * findItemModel(int vnum);
         /// Find a mobile given his id.
         Mobile * findMobile(std::string id);
         /// Find a player given his name.
@@ -400,5 +400,3 @@ class Mud
 /// @brief Here when a signal is raised.
 /// @param signal Signal received from player.
 void Bailout(int signal);
-
-#endif

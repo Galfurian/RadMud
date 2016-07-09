@@ -31,48 +31,56 @@
 #include "constants.hpp"
 #include "luabridge/LuaBridge.h"
 
+#include "model/nodeModel.hpp"
+#include "model/containerModel.hpp"
+#include "model/liquidContainerModel.hpp"
+
 using namespace std;
 
 Item::Item() :
-    vnum(),
-    model(),
-    maker(),
-    condition(),
-    composition(),
-    quality(ItemQuality::None),
-    flags(),
-    room(),
-    owner(),
-    container(),
-    currentSlot(EquipmentSlot::None),
-    content(),
-    contentLiq(),
-    customWeight()
+        vnum(),
+        model(),
+        maker(),
+        condition(),
+        composition(),
+        quality(ItemQuality::None),
+        flags(),
+        room(),
+        owner(),
+        container(),
+        currentSlot(EquipmentSlot::None),
+        content(),
+        contentLiq(),
+        customWeight()
 {
 }
 
 Item::~Item()
 {
-    Logger::log(LogLevel::Debug, "Deleted item\t\t[%s]\t\t(%s)", ToString(this->vnum), this->getNameCapital());
+    Logger::log(
+        LogLevel::Debug,
+        "Deleted item\t\t[%s]\t\t(%s)",
+        ToString(this->vnum),
+        this->getNameCapital());
 }
 
 bool Item::check(bool complete)
 {
     bool safe = true;
-    safe &= SafeAssert(vnum > 0);
-    safe &= SafeAssert(model != nullptr);
-    safe &= SafeAssert(!maker.empty());
-    safe &= SafeAssert(condition > 0);
-    safe &= SafeAssert(composition != nullptr);
-    safe &= SafeAssert(quality != ItemQuality::None);
+    safe &= CorrectAssert(vnum > 0);
+    safe &= CorrectAssert(model != nullptr);
+    safe &= CorrectAssert(!maker.empty());
+    safe &= CorrectAssert(condition > 0);
+    safe &= CorrectAssert(composition != nullptr);
+    safe &= CorrectAssert(quality != ItemQuality::None);
     if (complete)
     {
-        safe &= SafeAssert(!((room != nullptr) && (owner != nullptr)));
-        safe &= SafeAssert(!((room != nullptr) && (container != nullptr)));
-        safe &= SafeAssert(!((owner != nullptr) && (container != nullptr)));
-        safe &= SafeAssert((room != nullptr) || (owner != nullptr) || (container != nullptr));
+        safe &= CorrectAssert(!((room != nullptr) && (owner != nullptr)));
+        safe &= CorrectAssert(!((room != nullptr) && (container != nullptr)));
+        safe &= CorrectAssert(!((owner != nullptr) && (container != nullptr)));
+        safe &= CorrectAssert((room != nullptr) || (owner != nullptr) || (container != nullptr));
     }
-    //safe &= SafeAssert(currentSlot != EquipmentSlot::kNoEquipSlot);
+    //safe &= CorrectAssert(currentSlot != EquipmentSlot::kNoEquipSlot);
     if (!safe)
     {
         Logger::log(LogLevel::Error, "Item :" + ToString(vnum));
@@ -104,7 +112,7 @@ void Item::destroy()
         container->takeOut(this);
     }
 
-    if (this->model->type == ModelType::Corpse)
+    if (this->model->getType() == ModelType::Corpse)
     {
         Logger::log(LogLevel::Error, "Removing corpse '" + this->getName() + "' from MUD;");
         // Remove the item from the list of corpses.
@@ -137,7 +145,7 @@ void Item::destroy()
 bool Item::updateOnDB()
 {
     // Check if the Item can be saved on the database.
-    if (model->type == ModelType::Corpse)
+    if (model->getType() == ModelType::Corpse)
     {
         return true;
     }
@@ -352,7 +360,8 @@ unsigned int Item::getWeight(bool withMaterial)
     if (withMaterial)
     {
         // Add the addition weight due to the material.
-        result += static_cast<unsigned int>(static_cast<double>(result / 100) * composition->lightness);
+        result += static_cast<unsigned int>(static_cast<double>(result / 100)
+            * composition->lightness);
     }
     return result;
 }
@@ -362,7 +371,7 @@ unsigned int Item::getTotalWeight()
     // Add the default weight of the model.
     unsigned int totalWeight = this->getWeight(true);
 
-    if (model->type == ModelType::Container)
+    if (model->getType() == ModelType::Container)
     {
         if (!this->isEmpty())
         {
@@ -372,7 +381,7 @@ unsigned int Item::getTotalWeight()
             }
         }
     }
-    else if (model->type == ModelType::LiqContainer)
+    else if (model->getType() == ModelType::LiquidContainer)
     {
         if (!this->isEmpty())
         {
@@ -405,12 +414,13 @@ string Item::getLook()
 
     // Prepare : Name, Condition.
     //           Description.
-    output = "You look at " + Formatter::cyan() + getName() + Formatter::reset() + ", it" + getCondition();
+    output = "You look at " + Formatter::cyan() + getName() + Formatter::reset() + ", it"
+        + getCondition();
     output += Formatter::gray() + getDescription() + Formatter::reset() + "\n";
     // Print the content.
     output += lookContent();
-    output += "It weights about " + Formatter::yellow() + ToString(this->getTotalWeight()) + Formatter::reset() + " "
-        + mud_measure + ".\n";
+    output += "It weights about " + Formatter::yellow() + ToString(this->getTotalWeight())
+        + Formatter::reset() + " " + mud_measure + ".\n";
 
     return output;
 }
@@ -421,11 +431,11 @@ bool Item::hasNodeType(NodeType nodeType)
     {
         return false;
     }
-    if (model->type != ModelType::Node)
+    if (model->getType() != ModelType::Node)
     {
         return false;
     }
-    if (model->getNodeFunc().type != nodeType)
+    if (model->toNode()->nodeType != nodeType)
     {
         return false;
     }
@@ -434,11 +444,11 @@ bool Item::hasNodeType(NodeType nodeType)
 
 bool Item::isEmpty()
 {
-    if (model->type == ModelType::Container)
+    if (model->getType() == ModelType::Container)
     {
         return (content.size() == 0);
     }
-    else if (model->type == ModelType::LiqContainer)
+    else if (model->getType() == ModelType::LiquidContainer)
     {
         return (contentLiq.first == nullptr);
     }
@@ -450,13 +460,13 @@ bool Item::isEmpty()
 
 unsigned int Item::getTotalSpace()
 {
-    if (model->type == ModelType::Container)
+    if (model->getType() == ModelType::Container)
     {
-        return model->getContainerFunc().maxWeight;
+        return model->toContainer()->maxWeight;
     }
-    else if (model->type == ModelType::LiqContainer)
+    else if (model->getType() == ModelType::LiquidContainer)
     {
-        return model->getLiqContainerFunc().maxWeight;
+        return model->toLiquidContainer()->maxWeight;
     }
     else
     {
@@ -467,14 +477,14 @@ unsigned int Item::getTotalSpace()
 unsigned int Item::getUsedSpace()
 {
     unsigned int used = 0;
-    if (model->type == ModelType::Container)
+    if (model->getType() == ModelType::Container)
     {
         for (auto iterator : content)
         {
             used += iterator->model->weight;
         }
     }
-    else if (model->type == ModelType::LiqContainer)
+    else if (model->getType() == ModelType::LiquidContainer)
     {
         if (contentLiq.first != nullptr)
         {
@@ -523,7 +533,9 @@ void Item::takeOut(Item * item)
 {
     if (FindErase(content, item))
     {
-        Logger::log(LogLevel::Debug, "Item '" + item->getName() + "' taken out from '" + this->getName() + "';");
+        Logger::log(
+            LogLevel::Debug,
+            "Item '" + item->getName() + "' taken out from '" + this->getName() + "';");
         item->container = nullptr;
     }
     else
@@ -578,9 +590,12 @@ bool Item::pourIn(Liquid * liquid, const unsigned int & quantity)
 
 bool Item::pourOut(const unsigned int & quantity)
 {
+    if (model->getType() != ModelType::LiquidContainer)
+    {
+        return false;
+    }
     // If the item has an Endless provision of liquid, don't do any check.
-    unsigned int modelFlags = model->getLiqContainerFunc().flags;
-    if (HasFlag(modelFlags, LiqContainerFlag::Endless))
+    if (HasFlag(model->toLiquidContainer()->liquidFlags, LiqContainerFlag::Endless))
     {
         return true;
     }
@@ -638,7 +653,7 @@ Item * Item::findContent(std::string search_parameter, int & number)
 string Item::lookContent()
 {
     string output;
-    if (model->type == ModelType::Container)
+    if (model->getType() == ModelType::Container)
     {
         if (content.empty())
         {
@@ -652,31 +667,31 @@ string Item::lookContent()
                 std::string contentName = it.first->getNameCapital();
                 if (it.second > 1)
                 {
-                    output += " - " + Formatter::cyan() + contentName + Formatter::reset() + " [" + ToString(it.second)
-                        + "].\n";
+                    output += " - " + Formatter::cyan() + contentName + Formatter::reset() + " ["
+                        + ToString(it.second) + "].\n";
                 }
                 else
                 {
                     output += " - " + Formatter::cyan() + contentName + Formatter::reset() + ".\n";
                 }
             }
-            output += "Has been used " + Formatter::yellow() + ToString(getUsedSpace()) + Formatter::reset();
-            output += " out of " + Formatter::yellow() + ToString(getTotalSpace()) + Formatter::reset() + " "
-                + mud_measure + ".\n";
+            output += "Has been used " + Formatter::yellow() + ToString(getUsedSpace())
+                + Formatter::reset();
+            output += " out of " + Formatter::yellow() + ToString(getTotalSpace())
+                + Formatter::reset() + " " + mud_measure + ".\n";
         }
     }
-    else if (model->type == ModelType::LiqContainer)
+    else if (model->getType() == ModelType::LiquidContainer)
     {
         if (contentLiq.first == nullptr)
         {
-            output += Formatter::italic() + "It does not contain any liquid.\n" + Formatter::reset();
+            output += Formatter::italic() + "It does not contain any liquid.\n"
+                + Formatter::reset();
         }
         else
         {
             int percent = 0;
-
-            unsigned int modelFlags = model->getLiqContainerFunc().flags;
-            if (HasFlag(modelFlags, LiqContainerFlag::Endless))
+            if (HasFlag(this->model->toLiquidContainer()->liquidFlags, LiqContainerFlag::Endless))
             {
                 percent = 100;
             }

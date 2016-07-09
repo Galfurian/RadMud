@@ -35,17 +35,17 @@ using namespace std;
 //    4320000 MS -> 1 DAY in real world.
 
 MudUpdater::MudUpdater() :
-    bandwidth_in(),
-    bandwidth_out(),
-    bandwidth_uncompressed(),
-    ticTime(std::chrono::system_clock::now()),
-    mudTime(std::chrono::system_clock::now()),
-    ticSize(30),
-    secondSize(50),
-    hourSize(secondSize * 3600),
-    daySize(secondSize * 86400),
-    mudHour(),
-    mudDayPhase(DayPhase::Morning)
+        bandwidth_in(),
+        bandwidth_out(),
+        bandwidth_uncompressed(),
+        ticTime(std::chrono::system_clock::now()),
+        mudTime(std::chrono::system_clock::now()),
+        ticSize(30),
+        secondSize(50),
+        hourSize(secondSize * 3600),
+        daySize(secondSize * 86400),
+        mudHour(),
+        mudDayPhase(DayPhase::Morning)
 {
     // Nothing to do.
 }
@@ -92,7 +92,8 @@ bool MudUpdater::hasHourPassed()
     // Get the current time.
     TimeClock currentTime = std::chrono::system_clock::now();
     // Return the check if a hour is passed.
-    if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - mudTime).count() >= hourSize)
+    if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - mudTime).count()
+        >= hourSize)
     {
         // Reset Mud Time.
         mudTime = std::chrono::system_clock::now();
@@ -110,28 +111,38 @@ void MudUpdater::updateTime()
     mudHour++;
     if (mudHour == 6)
     {
-        Mud::instance().broadcastMsg(0, Formatter::yellow() + "The sun rises from the east.\n" + Formatter::reset());
+        Mud::instance().broadcastMsg(
+            0,
+            Formatter::yellow() + "The sun rises from the east.\n" + Formatter::reset());
         mudDayPhase = DayPhase::Morning;
     }
     else if (mudHour == 12)
     {
-        Mud::instance().broadcastMsg(0, Formatter::yellow() + "The sun is just above you.\n" + Formatter::reset());
+        Mud::instance().broadcastMsg(
+            0,
+            Formatter::yellow() + "The sun is just above you.\n" + Formatter::reset());
         mudDayPhase = DayPhase::Day;
     }
     else if (mudHour == 18)
     {
-        Mud::instance().broadcastMsg(0, Formatter::yellow() + "The sun begins to set.\n" + Formatter::reset());
+        Mud::instance().broadcastMsg(
+            0,
+            Formatter::yellow() + "The sun begins to set.\n" + Formatter::reset());
         mudDayPhase = DayPhase::Dusk;
     }
     else if (mudHour == 24)
     {
-        Mud::instance().broadcastMsg(0, Formatter::yellow() + "Darkness engulfs you.\n" + Formatter::reset());
+        Mud::instance().broadcastMsg(
+            0,
+            Formatter::yellow() + "Darkness engulfs you.\n" + Formatter::reset());
         mudDayPhase = DayPhase::Night;
         mudHour = 0;
     }
     else
     {
-        Mud::instance().broadcastMsg(0, Formatter::yellow() + "Another hour has passed." + Formatter::reset());
+        Mud::instance().broadcastMsg(
+            0,
+            Formatter::yellow() + "Another hour has passed." + Formatter::reset());
     }
 }
 
@@ -244,10 +255,11 @@ void MudUpdater::updateItems()
 {
     ItemList itemToDestroy;
     Logger::log(LogLevel::Debug, "Updating corpses...");
-    for (ItemList::iterator it = Mud::instance().mudCorpses.begin(); it != Mud::instance().mudCorpses.end(); ++it)
+    for (ItemList::iterator it = Mud::instance().mudCorpses.begin();
+        it != Mud::instance().mudCorpses.end(); ++it)
     {
         Item * corpse = *it;
-        if (HasFlag(corpse->model->flags, ModelFlag::Unbreakable))
+        if (HasFlag(corpse->model->modelFlags, ModelFlag::Unbreakable))
         {
             continue;
         }
@@ -259,11 +271,12 @@ void MudUpdater::updateItems()
         }
     }
     Logger::log(LogLevel::Debug, "Updating items...");
-    for (ItemList::iterator it = Mud::instance().mudItems.begin(); it != Mud::instance().mudItems.end(); ++it)
+    for (ItemList::iterator it = Mud::instance().mudItems.begin();
+        it != Mud::instance().mudItems.end(); ++it)
     {
         Item * item = *it;
         Logger::log(LogLevel::Debug, "Updating '" + item->getName() + "'...");
-        if (HasFlag(item->model->flags, ModelFlag::Unbreakable))
+        if (HasFlag(item->model->modelFlags, ModelFlag::Unbreakable))
         {
             continue;
         }
@@ -302,7 +315,8 @@ void MudUpdater::performActions()
             continue;
         }
         auto end = std::chrono::system_clock::now();
-        auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(mobile->nextActionCooldown - end).count();
+        auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
+            mobile->nextActionCooldown - end).count();
         if (elapsed < 0)
         {
             mobile->triggerEventRandom();

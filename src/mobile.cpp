@@ -108,13 +108,13 @@ void Mobile::respawn()
 bool Mobile::check()
 {
     bool safe = Character::check();
-    safe &= SafeAssert(!id.empty());
-    safe &= SafeAssert(respawnRoom != nullptr);
-    safe &= SafeAssert(!keys.empty());
-    safe &= SafeAssert(!shortdesc.empty());
-    safe &= SafeAssert(!staticdesc.empty());
-    safe &= SafeAssert(!actions.empty());
-    safe &= SafeAssert(!lua_script.empty());
+    safe &= CorrectAssert(!id.empty());
+    safe &= CorrectAssert(respawnRoom != nullptr);
+    safe &= CorrectAssert(!keys.empty());
+    safe &= CorrectAssert(!shortdesc.empty());
+    safe &= CorrectAssert(!staticdesc.empty());
+    safe &= CorrectAssert(!actions.empty());
+    safe &= CorrectAssert(!lua_script.empty());
     return safe;
 }
 

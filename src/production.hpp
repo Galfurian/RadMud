@@ -16,15 +16,17 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef PRODUCTION_HPP
-#define PRODUCTION_HPP
+#pragma once
 
-#include "model.hpp"
 class Profession;
 class Character;
 
 #include <string>
 #include <map>
+
+#include "model/itemModel.hpp"
+#include "model/toolModel.hpp"
+#include "model/resourceModel.hpp"
 
 /// @brief Holds details about a production.
 class Production
@@ -43,7 +45,7 @@ class Production
         /// A flag which indicates if the maker can be assisted by someone.
         bool assisted;
         /// The outcome and its quantity.
-        std::pair<Model *, unsigned int> outcome;
+        std::pair<ItemModel *, unsigned int> outcome;
         /// The list of needed type of tools.
         ToolSet tools;
         /// The list of needed type of ingredients and their quantity.
@@ -105,5 +107,3 @@ class Production
 
 /// Production map handler.
 typedef std::map<int, Production *> ProductionMap;
-
-#endif

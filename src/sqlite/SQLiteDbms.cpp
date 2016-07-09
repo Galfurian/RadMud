@@ -25,6 +25,27 @@
 #include "../utils.hpp"
 #include "../logger.hpp"
 
+#include "../model/armorModel.hpp"
+#include "../model/bookModel.hpp"
+#include "../model/containerModel.hpp"
+#include "../model/currencyModel.hpp"
+#include "../model/foodModel.hpp"
+#include "../model/furnitureModel.hpp"
+#include "../model/itemModel.hpp"
+#include "../model/keyModel.hpp"
+#include "../model/lightModel.hpp"
+#include "../model/liquidContainerModel.hpp"
+#include "../model/mechanismModel.hpp"
+#include "../model/nodeModel.hpp"
+#include "../model/projectileModel.hpp"
+#include "../model/resourceModel.hpp"
+#include "../model/ropeModel.hpp"
+#include "../model/seedModel.hpp"
+#include "../model/shieldModel.hpp"
+#include "../model/toolModel.hpp"
+#include "../model/vehicleModel.hpp"
+#include "../model/weaponModel.hpp"
+
 using namespace std;
 
 SQLiteDbms::SQLiteDbms()
@@ -97,7 +118,8 @@ bool SQLiteDbms::loadTables()
     {
         Logger::log(LogLevel::Debug, "    Loading Table: " + iterator.first + ".");
         // Execute the query.
-        ResultSet * result = dbConnection.executeSelect(("SELECT * FROM " + iterator.first + ";").c_str());
+        ResultSet * result = dbConnection.executeSelect(
+            ("SELECT * FROM " + iterator.first + ";").c_str());
         // Check the result.
         if (result == nullptr)
         {
@@ -107,7 +129,9 @@ bool SQLiteDbms::loadTables()
         if (!iterator.second(result))
         {
             // Log an error.
-            Logger::log(LogLevel::Error, "Encountered an error during loading table: " + iterator.first);
+            Logger::log(
+                LogLevel::Error,
+                "Encountered an error during loading table: " + iterator.first);
             // release the resource.
             result->release();
             return false;
@@ -220,7 +244,11 @@ bool SQLiteDbms::searchPlayer(string name)
     return outcome;
 }
 
-bool SQLiteDbms::insertInto(std::string table, std::vector<std::string> args, bool orIgnore, bool orReplace)
+bool SQLiteDbms::insertInto(
+    std::string table,
+    std::vector<std::string> args,
+    bool orIgnore,
+    bool orReplace)
 {
     stringstream stream;
     stream << "INSERT";
@@ -471,7 +499,8 @@ bool LoadNews(ResultSet * result)
 {
     while (result->next())
     {
-        if (!Mud::instance().mudNews.insert(std::make_pair(result->getNextString(), result->getNextString())).second)
+        if (!Mud::instance().mudNews.insert(
+            std::make_pair(result->getNextString(), result->getNextString())).second)
         {
             Logger::log(LogLevel::Error, "Error during news loading.");
             return false;
@@ -515,7 +544,7 @@ bool LoadItem(ResultSet * result)
         Item * item = new Item();
         // Initialize the item.
         item->vnum = result->getNextInteger();
-        item->model = Mud::instance().findModel(result->getNextInteger());
+        item->model = Mud::instance().findItemModel(result->getNextInteger());
         item->maker = result->getNextString();
         item->condition = result->getNextInteger();
         item->composition = Mud::instance().findMaterial(result->getNextInteger());
@@ -594,36 +623,74 @@ bool LoadModel(ResultSet * result)
 {
     while (result->next())
     {
-        // Create an empty model.
-        Model * model = new Model();
-        model->vnum = result->getNextInteger();
-        model->name = result->getNextString();
-        model->article = result->getNextString();
-        model->shortdesc = result->getNextString();
-        model->keys = GetWords(result->getNextString());
-        model->description = result->getNextString();
-        model->type = (ModelType) result->getNextInteger();
-        model->slot = (EquipmentSlot) result->getNextInteger();
-        model->flags = result->getNextUnsignedInteger();
-        model->weight = result->getNextUnsignedInteger();
-        model->price = result->getNextInteger();
-        model->condition = result->getNextInteger();
-        model->decay = result->getNextInteger();
-        model->material = (MaterialType) result->getNextInteger();
-        model->tileSet = result->getNextInteger();
-        model->tileId = result->getNextInteger();
-        model->setFunctions(result->getNextString());
+        // Retrieve the vnum and the type of model.
+        int vnum = result->getNextInteger();
+        ModelType type = static_cast<ModelType>(result->getNextInteger());
+        // Create a pointer to the new item model.
+        ItemModel * itemModel;
+        // Call the contructor for the right type of model.
+        if (type == ModelType::Weapon) itemModel = new WeaponModel();
+        else if (type == ModelType::Armor) itemModel = new ArmorModel();
+        else if (type == ModelType::Shield) itemModel = new ShieldModel();
+        else if (type == ModelType::Projectile) itemModel = new ProjectileModel();
+        else if (type == ModelType::Container) itemModel = new ContainerModel();
+        else if (type == ModelType::Currency) itemModel = new CurrencyModel();
+        else if (type == ModelType::LiquidContainer) itemModel = new LiquidContainerModel();
+        else if (type == ModelType::Tool) itemModel = new ToolModel();
+        else if (type == ModelType::Node) itemModel = new NodeModel();
+        else if (type == ModelType::Resource) itemModel = new ResourceModel();
+        else if (type == ModelType::Seed) itemModel = new SeedModel();
+        else if (type == ModelType::Key) itemModel = new KeyModel();
+        else if (type == ModelType::Furniture) itemModel = new FurnitureModel();
+        else if (type == ModelType::Food) itemModel = new FoodModel();
+        else if (type == ModelType::Light) itemModel = new LightModel();
+        else if (type == ModelType::Vehicle) itemModel = new VehicleModel();
+        else if (type == ModelType::Book) itemModel = new BookModel();
+        else if (type == ModelType::Rope) itemModel = new RopeModel();
+        else if (type == ModelType::Mechanism) itemModel = new MechanismModel();
+        else
+        {
+            Logger::log(LogLevel::Error, "Wrong type of model %s.", ToString(vnum));
+            return false;
+        }
+        // Set the values of the new model.
+        itemModel->vnum = vnum;
+        itemModel->modelType = type;
+        itemModel->name = result->getNextString();
+        itemModel->article = result->getNextString();
+        itemModel->shortdesc = result->getNextString();
+        itemModel->keys = SplitString(result->getNextString(), " ");
+        itemModel->description = result->getNextString();
+        itemModel->slot = static_cast<EquipmentSlot>(result->getNextInteger());
+        itemModel->modelFlags = result->getNextUnsignedInteger();
+        itemModel->weight = result->getNextUnsignedInteger();
+        itemModel->price = result->getNextInteger();
+        itemModel->condition = result->getNextInteger();
+        itemModel->decay = result->getNextInteger();
+        itemModel->material = static_cast<MaterialType>(result->getNextInteger());
+        itemModel->tileSet = result->getNextInteger();
+        itemModel->tileId = result->getNextInteger();
+        if (!itemModel->setModel(result->getNextString()))
+        {
+            Logger::log(LogLevel::Error, "Error when setting the model.");
+            return false;
+        }
+        //if (!itemModel->setFunctions(result->getNextString()))
+        //{
+        //    Logger::log(LogLevel::Error, "Wrong number of function arguments %s.", ToString(vnum));
+        //    return false;
+        //}
         // Translate new_line.
-        FindAndReplace(model->description, "%r", "\n");
+        FindAndReplace(itemModel->description, "%r", "\n");
         // Check the correctness.
-        if (!model->check())
+        if (!itemModel->check())
         {
             Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
-        if (!Mud::instance().addModel(model))
+        if (!Mud::instance().addItemModel(itemModel))
         {
-            Logger::log(LogLevel::Error, "Error during model insertion.");
+            Logger::log(LogLevel::Error, "Error during itemModel insertion.");
             return false;
         }
     }
@@ -716,9 +783,11 @@ bool LoadMobile(ResultSet * result)
         }
 
         // Set the respawn time.
-        mobile->nextRespawn = std::chrono::system_clock::now() + std::chrono::seconds(5 * mobile->level);
+        mobile->nextRespawn = std::chrono::system_clock::now()
+            + std::chrono::seconds(5 * mobile->level);
         // Set the next action time.
-        mobile->nextActionCooldown = std::chrono::system_clock::now() + std::chrono::seconds(10 * mobile->level);
+        mobile->nextActionCooldown = std::chrono::system_clock::now()
+            + std::chrono::seconds(10 * mobile->level);
         // Load its script.
         mobile->loadScript(kSystemDir + "lua/" + mobile->lua_script);
     }
@@ -1176,13 +1245,13 @@ bool LoadBuilding(ResultSet * result)
         building.time = result->getNextUnsignedInteger();
         building.assisted = result->getNextInteger();
         building.setTool(result->getNextString());
-        building.buildingModel = Mud::instance().findModel(result->getNextInteger());
+        building.buildingModel = Mud::instance().findItemModel(result->getNextInteger());
         building.setIngredient(result->getNextString());
         building.unique = static_cast<bool>(result->getNextInteger());
 
         if (building.buildingModel == nullptr)
         {
-            Logger::log(LogLevel::Error, "Can't find the building model.");
+            Logger::log(LogLevel::Error, "Can't find the building itemModel.");
             break;
         }
         if (!building.check())

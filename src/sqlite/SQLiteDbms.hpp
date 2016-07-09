@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef SQLITEDBMS_HPP
-#define SQLITEDBMS_HPP
+#pragma once
 
 #include <functional>
 #include <vector>
@@ -147,7 +146,11 @@ class SQLiteDbms
         /// @param orIgnore  Flag used to enable the OR IGNORE option.
         /// @param orReplace Flag used to enable the OR REPLACE option.
         /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
-        bool insertInto(std::string table, std::vector<std::string> args, bool orIgnore = true, bool orReplace = false);
+        bool insertInto(
+            std::string table,
+            std::vector<std::string> args,
+            bool orIgnore = true,
+            bool orReplace = false);
 
         /// @brief Execute a Delete From query.
         /// @param table The name of the table.
@@ -180,5 +183,3 @@ class SQLiteDbms
         /// List of the tables with their loader.
         std::vector<std::pair<std::string, LoadingFunction> > tableLoaders;
 };
-
-#endif

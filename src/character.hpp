@@ -19,8 +19,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef CHARACTER_HPP
-#define CHARACTER_HPP
+#pragma once
 
 #include "actions.hpp"
 #include "defines.hpp"
@@ -124,13 +123,14 @@ class Character
         /// @return The static description.
         std::string getStaticDesc();
 
-        /// @brief Return the correct pronoun of the character as a string.
-        /// @return The character pronoun.
-        std::string getPronoun();
+        /// @brief Return the subject pronoun for the character.
+        std::string getSubjectPronoun();
 
-        /// @brief Return the correct pronoun of the character as a string.
-        /// @return The character pronoun.
+        /// @brief Return the possessive pronoun for the character.
         std::string getPossessivePronoun();
+
+        /// @brief Return the object pronoun for the character.
+        std::string getObjectPronoun();
 
         /// @brief Allows to set the value of a given ability.
         /// @param ability The ability to set.
@@ -239,11 +239,34 @@ class Character
         /// @return The item, if it's found.
         Item * findNearbyItem(std::string itemName, int & number);
 
+        /// @brief Search the given type of tool in the proximity of the character.
+        /// @param toolType        The type of tool that has to be searched.
+        /// @param exceptions      Items which cannot be selected.
+        /// @param searchRoom      Search inside the room.
+        /// @param searchInventory Search inside the character's inventory.
+        /// @param searchEquipment Search inside the character's equipment.
+        /// @return The searched tool.
+        Item * findNearbyTool(
+            const ToolType & toolType,
+            const ItemVector & exceptions,
+            bool searchRoom,
+            bool searchInventory,
+            bool searchEquipment);
+
         /// @brief Search the list of tools nearby the character.
-        /// @param tools     The list of tools and their quantities.
-        /// @param foundOnes The list of found tools.
-        /// @return <b>True</b> if the operation goes well,<br><b>False</b> otherwise.
-        bool findNearbyTools(ToolSet tools, ItemVector & foundOnes);
+        /// @param tools           The list of tools and their quantities.
+        /// @param foundOnes       The list of found tools.
+        /// @param searchRoom      Search inside the room.
+        /// @param searchInventory Search inside the character's inventory.
+        /// @param searchEquipment Search inside the character's equipment.
+        /// @return <b>True</b> if the operation goes well,<br>
+        ///         <b>False</b> otherwise.
+        bool findNearbyTools(
+            ToolSet tools,
+            ItemVector & foundOnes,
+            bool searchRoom,
+            bool searchInventory,
+            bool searchEquipment);
 
         /// @brief Search the list of ingredients nearby the character.
         /// @param ingredients The list of ingredients and their quantities.
@@ -391,8 +414,11 @@ class Character
         /// @param slot         The slot of the weapon used in the combat action.
         /// @return <b>True</b> if the character has enough stamina,<br>
         ///         <b>False</b> otherwise.
-        bool hasStaminaFor(unsigned int & consumed, const ActionType & actionType, const CombatAction & combatAction =
-            CombatAction::NoAction, const EquipmentSlot & slot = EquipmentSlot::None);
+        bool hasStaminaFor(
+            unsigned int & consumed,
+            const ActionType & actionType,
+            const CombatAction & combatAction = CombatAction::NoAction,
+            const EquipmentSlot & slot = EquipmentSlot::None);
 
         /// @brief Allows to SET the health value.
         /// @param value The value to set.
@@ -533,4 +559,10 @@ typedef std::function<void(Character * character, std::istream & args)> ActionHa
 /// @brief Map of things to do for various connection states.
 typedef std::map<ConnectionState, ActionHandler> StateActionMap;
 
-#endif
+/// @addtogroup FlagsToList
+/// @{
+
+/// Return a list of string containg the Character flags contained inside the value.
+std::string GetCharacterFlagString(unsigned int flags);
+
+/// @}

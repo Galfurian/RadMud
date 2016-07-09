@@ -17,8 +17,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef MAP2D_HPP
-#define MAP2D_HPP
+#pragma once
 
 #include <map>
 
@@ -121,4 +120,3 @@ class Map2D
         /// Disable assignment.
         Map2D & operator=(const Map2D<T> &) = delete;
 };
-#endif

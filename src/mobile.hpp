@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef MOBILE_HPP
-#define MOBILE_HPP
+#pragma once
 
 #include <list>
 #include <set>
@@ -165,5 +164,3 @@ typedef std::map<std::string, Mobile *> MobileMap;
 
 /// MobileMap iterator.
 typedef MobileMap::iterator MobileMapIterator;
-
-#endif

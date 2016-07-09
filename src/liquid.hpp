@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef LIQUID_HPP
-#define LIQUID_HPP
+#pragma once
 
 #include <map>
 #include "defines.hpp"
@@ -69,5 +68,3 @@ typedef std::pair<Liquid *, unsigned int> LiquidContent;
 
 /// Liquid map handler.
 typedef std::map<int, Liquid *> LiquidMap;
-
-#endif

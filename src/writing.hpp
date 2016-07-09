@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef WRITING_HPP
-#define WRITING_HPP
+#pragma once
 
 /// @brief Holds details about a writing.
 struct Writing
@@ -37,5 +36,3 @@ typedef std::map<int, Writing *> WritingMap;
 
 /// WritingMap iterator.
 typedef WritingMap::iterator WritingMapIterator;
-
-#endif

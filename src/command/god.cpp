@@ -1,4 +1,4 @@
-/// @file   comm_gods.cpp
+/// @file   gods.cpp
 /// @brief  Implements the methods used by <b>gods</b>.
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2014
@@ -19,12 +19,32 @@
 // Basic Include.
 #include <istream>
 
-#include "commands.hpp"
-#include "constants.hpp"
-#include "defines.hpp"
-#include "mud.hpp"
-// Other Include.
-#include "utilities/table.hpp"
+#include "command.hpp"
+
+#include "../mud.hpp"
+#include "../defines.hpp"
+#include "../constants.hpp"
+#include "../utilities/table.hpp"
+#include "../model/armorModel.hpp"
+#include "../model/bookModel.hpp"
+#include "../model/containerModel.hpp"
+#include "../model/currencyModel.hpp"
+#include "../model/foodModel.hpp"
+#include "../model/furnitureModel.hpp"
+#include "../model/itemModel.hpp"
+#include "../model/keyModel.hpp"
+#include "../model/lightModel.hpp"
+#include "../model/liquidContainerModel.hpp"
+#include "../model/mechanismModel.hpp"
+#include "../model/nodeModel.hpp"
+#include "../model/projectileModel.hpp"
+#include "../model/resourceModel.hpp"
+#include "../model/ropeModel.hpp"
+#include "../model/seedModel.hpp"
+#include "../model/shieldModel.hpp"
+#include "../model/toolModel.hpp"
+#include "../model/vehicleModel.hpp"
+#include "../model/weaponModel.hpp"
 
 using namespace std;
 
@@ -90,6 +110,14 @@ void DoTransfer(Character * character, std::istream & sArgs)
             }
         }
     }
+    if (target->isMobile())
+    {
+        if (!target->toMobile()->alive)
+        {
+            character->sendMsg("You cannot transfer a dead mobile.\n");
+            return;
+        }
+    }
     Room * destination = character->room;
     if (arguments.size() == 2)
     {
@@ -110,6 +138,28 @@ void DoTransfer(Character * character, std::istream & sArgs)
     // Move player.
     target->moveTo(destination, msgDepart, msgArrive, msgChar);
     character->sendMsg("You transfer %s to room %s.\n", target->getName(), destination->name);
+}
+
+void DoFeast(Character * character, std::istream & sArgs)
+{
+    // Get the arguments of the command.
+    ArgumentList arguments = ParseArgs(sArgs);
+    if (arguments.size() != 1)
+    {
+        character->sendMsg("You must insert a valide target.\n");
+        return;
+    }
+    Character * target = character->room->findCharacter(arguments[0].first, arguments[0].second);
+    if (target == nullptr)
+    {
+        character->sendMsg("You must provide a valide target.\n");
+        return;
+    }
+    target->setHealth(target->getMaxHealth(), true);
+    target->setStamina(target->getMaxStamina(), true);
+    target->setThirst(100);
+    target->setHunger(100);
+    target->sendMsg("A banquet with any kind of delicacy appears from nowhere!");
 }
 
 void DoGodInfo(Character * character, std::istream & sArgs)
@@ -145,18 +195,32 @@ void DoGodInfo(Character * character, std::istream & sArgs)
     }
     std::string msg;
     msg += Formatter::green() + "# Chracter:\n" + Formatter::reset();
-    msg += Formatter::yellow() + " Proper Noun  " + Formatter::reset() + ":" + target->name + "\n";
-    msg += Formatter::yellow() + "    Desc    " + Formatter::reset() + ":" + target->description + "\n";
-    msg += Formatter::yellow() + "    Gender  " + Formatter::reset() + ":" + GetGenderTypeName(target->gender) + "\n";
-    msg += Formatter::yellow() + "    Weight  " + Formatter::reset() + ":" + ToString(target->weight) + "\n";
-    msg += Formatter::yellow() + "    Level   " + Formatter::reset() + ":" + ToString(target->level) + "\n";
-    msg += Formatter::yellow() + "    Flags   " + Formatter::reset() + ":" + ToString(target->flags) + "\n";
-    msg += Formatter::yellow() + "    Race    " + Formatter::reset() + ":" + target->race->name + "\n";
-    msg += Formatter::yellow() + "    Faction " + Formatter::reset() + ":" + target->faction->name + "\n";
-    msg += Formatter::yellow() + "    Health  " + Formatter::reset() + ":" + ToString(target->getHealth()) + "\n";
-    msg += Formatter::yellow() + "    Stamina " + Formatter::reset() + ":" + ToString(target->getStamina()) + "\n";
-    msg += Formatter::yellow() + "    Hunger  " + Formatter::reset() + ":" + ToString(target->getHunger()) + "\n";
-    msg += Formatter::yellow() + "    Thirst  " + Formatter::reset() + ":" + ToString(target->getThirst()) + "\n";
+    msg += Formatter::yellow() + " Proper Noun  " + Formatter::reset() + ":";
+    msg += target->name + "\n";
+    msg += Formatter::yellow() + "    Desc    " + Formatter::reset() + ":";
+    msg += target->description + "\n";
+    msg += Formatter::yellow() + "    Gender  " + Formatter::reset() + ":";
+    msg += GetGenderTypeName(target->gender) + "\n";
+    msg += Formatter::yellow() + "    Weight  " + Formatter::reset() + ":";
+    msg += ToString(target->weight) + "\n";
+    msg += Formatter::yellow() + "    Level   " + Formatter::reset() + ":";
+    msg += ToString(target->level) + "\n";
+    msg += Formatter::yellow() + "    Flags   " + Formatter::reset() + ":";
+    msg += ToString(target->flags) + "\n";
+    msg += Formatter::yellow() + "    Race    " + Formatter::reset() + ":";
+    if (CorrectAssert(target->race != nullptr)) msg += target->race->name + "\n";
+    else msg += "NONE\n";
+    msg += Formatter::yellow() + "    Faction " + Formatter::reset() + ":";
+    if (CorrectAssert(target->faction != nullptr)) msg += target->faction->name + "\n";
+    else msg += "NONE\n";
+    msg += Formatter::yellow() + "    Health  " + Formatter::reset() + ":";
+    msg += ToString(target->getHealth()) + "\n";
+    msg += Formatter::yellow() + "    Stamina " + Formatter::reset() + ":";
+    msg += ToString(target->getStamina()) + "\n";
+    msg += Formatter::yellow() + "    Hunger  " + Formatter::reset() + ":";
+    msg += ToString(target->getHunger()) + "\n";
+    msg += Formatter::yellow() + "    Thirst  " + Formatter::reset() + ":";
+    msg += ToString(target->getThirst()) + "\n";
     msg += Formatter::yellow() + "    STR     " + Formatter::reset() + ":";
     msg += ToString(target->getAbility(Ability::Strength, false));
     msg += "[" + ToString(target->effects.getAbilityModifier(Ability::Strength)) + "]\n";
@@ -172,8 +236,11 @@ void DoGodInfo(Character * character, std::istream & sArgs)
     msg += Formatter::yellow() + "    INT     " + Formatter::reset() + ":";
     msg += ToString(target->getAbility(Ability::Intelligence, false));
     msg += "[" + ToString(target->effects.getAbilityModifier(Ability::Intelligence)) + "]\n";
-    msg += Formatter::yellow() + "    Room    " + Formatter::reset() + ":" + ToString(target->room->vnum) + "\n";
-    msg += Formatter::yellow() + "    Posture " + Formatter::reset() + ":" + GetPostureName(target->posture) + "\n";
+    msg += Formatter::yellow() + "    Room    " + Formatter::reset() + ":";
+    if (CorrectAssert(target->room != nullptr)) msg += ToString(target->room->vnum) + "\n";
+    else msg += "NONE\n";
+    msg += Formatter::yellow() + "    Posture " + Formatter::reset() + ":";
+    msg += GetPostureName(target->posture) + "\n";
     msg += Formatter::yellow() + "    Inv     " + Formatter::reset() + ":\n";
     for (auto it : target->inventory)
     {
@@ -189,52 +256,63 @@ void DoGodInfo(Character * character, std::istream & sArgs)
     {
         msg += "                [" + ToString(it->expires) + "] " + it->name + "\n";
     }
-    msg += Formatter::yellow() + "    Action  " + Formatter::reset() + ":"
-        + GetActionTypeName(target->getAction()->getType()) + "\n";
-
+    msg += Formatter::yellow() + "    Action  " + Formatter::reset() + ":";
+    msg += GetActionTypeName(target->getAction()->getType()) + "\n";
     if (target->isPlayer())
     {
         Player * player = target->toPlayer();
-        msg += Formatter::yellow() + "    Age     " + Formatter::reset() + ":" + ToString(player->age) + "\n";
-        msg += Formatter::yellow() + "    Exp     " + Formatter::reset() + ":" + ToString(player->experience) + "\n";
-        msg += Formatter::yellow() + "    Prompt  " + Formatter::reset() + ":" + player->prompt + "\n";
-        msg += Formatter::yellow() + "    Rent    " + Formatter::reset() + ":" + ToString(player->rent_room) + "\n";
+        msg += Formatter::yellow() + "    Age     " + Formatter::reset() + ":";
+        msg += ToString(player->age) + "\n";
+        msg += Formatter::yellow() + "    Exp     " + Formatter::reset() + ":";
+        msg += ToString(player->experience) + "\n";
+        msg += Formatter::yellow() + "    Prompt  " + Formatter::reset() + ":";
+        msg += player->prompt + "\n";
+        msg += Formatter::yellow() + "    Rent    " + Formatter::reset() + ":";
+        msg += ToString(player->rent_room) + "\n";
         msg += Formatter::yellow() + "    Skills  " + Formatter::reset() + ":\n";
         for (auto iterator : Mud::instance().mudSkills)
         {
-            msg += "        " + iterator.second->name + "[" + ToString(player->skills[iterator.first]) + "]\n";
+            msg += "        " + iterator.second->name + "[";
+            msg += ToString(player->skills[iterator.first]) + "]\n";
         }
     }
     else if (target->isMobile())
     {
         Mobile * m = target->toMobile();
-        msg += Formatter::yellow() + "    Id      " + Formatter::reset() + ":" + m->id + "\n";
-        msg += Formatter::yellow() + "    Spawn   " + Formatter::reset() + ":" + ToString(m->respawnRoom->vnum) + "\n";
+        msg += Formatter::yellow() + "    Id      " + Formatter::reset() + ":";
+        msg += m->id + "\n";
+        msg += Formatter::yellow() + "    Spawn   " + Formatter::reset() + ":";
+        msg += ToString(m->respawnRoom->vnum) + "\n";
         msg += Formatter::yellow() + "    Keys    " + Formatter::reset() + ": {";
         for (auto it : m->keys)
         {
             msg += " " + it;
         }
         msg += "}\n";
-        msg += Formatter::yellow() + "    Short   " + Formatter::reset() + ":" + m->shortdesc + "\n";
-        msg += Formatter::yellow() + "    Static  " + Formatter::reset() + ":" + m->staticdesc + "\n";
+        msg += Formatter::yellow() + "    Short   " + Formatter::reset() + ":";
+        msg += m->shortdesc + "\n";
+        msg += Formatter::yellow() + "    Static  " + Formatter::reset() + ":";
+        msg += m->staticdesc + "\n";
         msg += Formatter::yellow() + "    Actions " + Formatter::reset() + ": {";
         for (auto it : m->actions)
         {
             msg += " " + it;
         }
         msg += "}\n";
-        msg += Formatter::yellow() + "    Alive   " + Formatter::reset() + ":" + ToString(m->alive) + "\n";
+        msg += Formatter::yellow() + "    Alive   " + Formatter::reset() + ":";
+        msg += ToString(m->alive) + "\n";
         if (!m->alive)
         {
-            msg += Formatter::yellow() + "    Respawn " + Formatter::reset() + ":" + ToString(m->getRespawnTime())
-                + "\n";
+            msg += Formatter::yellow() + "    Respawn " + Formatter::reset() + ":";
+            msg += ToString(m->getRespawnTime()) + "\n";
         }
         if (m->controller != nullptr)
         {
-            msg += Formatter::red() + "    Controller " + Formatter::reset() + ":" + m->controller->getName() + "\n";
+            msg += Formatter::red() + "    Controller " + Formatter::reset() + ":";
+            msg += m->controller->getName() + "\n";
         }
-        msg += Formatter::red() + "    Lua Script   " + Formatter::reset() + ":" + m->lua_script + "\n";
+        msg += Formatter::red() + "    Lua Script   " + Formatter::reset() + ":";
+        msg += m->lua_script + "\n";
     }
     character->sendMsg(msg);
 }
@@ -269,7 +347,10 @@ void DoSetFlag(Character * character, std::istream & sArgs)
     // Set the flag.
     SetFlag(target->flags, flag);
     // Send confirmation to the player.
-    character->sendMsg("You set the flag '%s' for %s\n", GetCharacterFlagName(flag), target->getName());
+    character->sendMsg(
+        "You set the flag '%s' for %s\n",
+        GetCharacterFlagName(flag),
+        target->getName());
 }
 
 void DoClearFlag(Character * character, std::istream & sArgs)
@@ -302,7 +383,10 @@ void DoClearFlag(Character * character, std::istream & sArgs)
     // Set the flag.
     ClearFlag(target->flags, flag);
     // Send confirmation to the player.
-    character->sendMsg("You clear the flag '%s' for %s\n", GetCharacterFlagName(flag), target->getName());
+    character->sendMsg(
+        "You clear the flag '%s' for %s\n",
+        GetCharacterFlagName(flag),
+        target->getName());
 }
 
 void DoModelInfo(Character * character, std::istream & sArgs)
@@ -314,193 +398,187 @@ void DoModelInfo(Character * character, std::istream & sArgs)
         character->sendMsg("You must insert a model vnum.\n");
         return;
     }
-    Model * model = Mud::instance().findModel(ToInt(arguments[0].first));
-    if (model == nullptr)
+    ItemModel * itemModel = Mud::instance().findItemModel(ToInt(arguments[0].first));
+    if (itemModel == nullptr)
     {
-        character->sendMsg("Model not found.\n");
+        character->sendMsg("Item model not found.\n");
         return;
     }
 
     std::string msg;
-    msg += Formatter::yellow() + "Model Vnum    " + Formatter::reset();
-    msg += ": " + ToString(model->vnum) + "\n";
+    msg += Formatter::yellow() + "Vnum          " + Formatter::reset();
+    msg += ": " + ToString(itemModel->vnum) + "\n";
     msg += Formatter::yellow() + "Name          " + Formatter::reset();
-    msg += ": " + model->name + "\n";
+    msg += ": " + itemModel->name + "\n";
     msg += Formatter::yellow() + "Article       " + Formatter::reset();
-    msg += ": " + model->article + "\n";
+    msg += ": " + itemModel->article + "\n";
     msg += Formatter::yellow() + "Short Descr.  " + Formatter::reset();
-    msg += ": " + model->shortdesc + "\n";
+    msg += ": " + itemModel->shortdesc + "\n";
     msg += Formatter::yellow() + "Keys          " + Formatter::reset();
     msg += ": {";
-    for (auto it : model->keys)
+    for (auto it : itemModel->keys)
     {
         msg += " " + it;
     }
     msg += "}\n";
     msg += Formatter::yellow() + "Description   " + Formatter::reset();
-    msg += ": " + model->description + "\n";
+    msg += ": " + itemModel->description + "\n";
     msg += Formatter::yellow() + "Type          " + Formatter::reset();
-    msg += ": " + GetModelTypeName(model->type) + "\n";
+    msg += ": " + GetModelTypeName(itemModel->getType()) + "\n";
     msg += Formatter::yellow() + "Slot          " + Formatter::reset();
-    msg += ": " + GetEquipmentSlotName(model->slot) + "\n";
+    msg += ": " + GetEquipmentSlotName(itemModel->slot) + "\n";
     msg += Formatter::yellow() + "Flags         " + Formatter::reset();
-    msg += ": " + GetModelFlagString(model->flags) + "\n";
+    msg += ": " + GetModelFlagString(itemModel->modelFlags) + "\n";
     msg += Formatter::yellow() + "Weight        " + Formatter::reset();
-    msg += ": " + ToString(model->weight) + " " + mud_measure + ".\n";
+    msg += ": " + ToString(itemModel->weight) + " " + mud_measure + ".\n";
     msg += Formatter::yellow() + "Price         " + Formatter::reset();
-    msg += ": " + ToString(model->price) + ".\n";
+    msg += ": " + ToString(itemModel->price) + ".\n";
     msg += Formatter::yellow() + "Condition     " + Formatter::reset();
-    msg += ": " + ToString(model->condition) + "\n";
+    msg += ": " + ToString(itemModel->condition) + "\n";
     msg += Formatter::yellow() + "Decay         " + Formatter::reset();
-    msg += ": " + ToString(model->decay) + "\n";
+    msg += ": " + ToString(itemModel->decay) + "\n";
     msg += Formatter::yellow() + "Material      " + Formatter::reset();
-    msg += ": " + GetMaterialTypeName(model->material) + "\n";
+    msg += ": " + GetMaterialTypeName(itemModel->material) + "\n";
     msg += Formatter::yellow() + "Tile Set      " + Formatter::reset();
-    msg += ": " + ToString(model->tileSet) + "\n";
+    msg += ": " + ToString(itemModel->tileSet) + "\n";
     msg += Formatter::yellow() + "Tile Id       " + Formatter::reset();
-    msg += ": " + ToString(model->tileId) + "\n";
-    msg += Formatter::yellow() + "Functions     " + Formatter::reset();
-    msg += ": {";
-    for (auto it : model->functions)
+    msg += ": " + ToString(itemModel->tileId) + "\n";
+    if (itemModel->getType() == ModelType::Weapon)
     {
-        msg += " " + ToString(it);
-    }
-    msg += "}\n";
-    if (model->type == ModelType::Weapon)
-    {
-        WeaponFunc func = model->getWeaponFunc();
+        WeaponModel * subModel = itemModel->toWeapon();
         msg += Formatter::brown() + "Type          " + Formatter::reset();
-        msg += ": " + GetWeaponTypeName(func.type) + "\n";
+        msg += ": " + GetWeaponTypeName(subModel->weaponType) + "\n";
         msg += Formatter::brown() + "Minimum Damage  " + Formatter::reset();
-        msg += ": " + ToString(func.minDamage) + "\n";
+        msg += ": " + ToString(subModel->minDamage) + "\n";
         msg += Formatter::brown() + "Maximum Damage  " + Formatter::reset();
-        msg += ": " + ToString(func.maxDamage) + "\n";
+        msg += ": " + ToString(subModel->maxDamage) + "\n";
         msg += Formatter::brown() + "Range           " + Formatter::reset();
-        msg += ": " + ToString(func.range) + "\n";
+        msg += ": " + ToString(subModel->range) + "\n";
     }
-    else if (model->type == ModelType::Armor)
+    else if (itemModel->getType() == ModelType::Armor)
     {
-        ArmorFunc func = model->getArmorFunc();
+        ArmorModel * subModel = itemModel->toArmor();
         msg += Formatter::brown() + "Size          " + Formatter::reset();
-        msg += ": " + GetArmorSizeName(func.size) + "\n";
+        msg += ": " + GetArmorSizeName(subModel->size) + "\n";
         msg += Formatter::brown() + "Damage Abs.   " + Formatter::reset();
-        msg += ": " + ToString(func.damageAbs) + "\n";
+        msg += ": " + ToString(subModel->damageAbs) + "\n";
         msg += Formatter::brown() + "Allowed Anatom. " + Formatter::reset();
-        msg += ": " + ToString(func.allowedAnatomy) + "\n";
+        msg += ": " + ToString(subModel->allowedAnatomy) + "\n";
     }
-    else if (model->type == ModelType::Shield)
+    else if (itemModel->getType() == ModelType::Shield)
     {
-        ShieldFunc func = model->getShieldFunc();
+        ShieldModel * subModel = itemModel->toShield();
         msg += Formatter::brown() + "Size            " + Formatter::reset();
-        msg += ": " + GetShieldSizeName(func.size) + "\n";
+        msg += ": " + GetShieldSizeName(subModel->size) + "\n";
         msg += Formatter::brown() + "Parry Chance    " + Formatter::reset();
-        msg += ": " + ToString(func.parryChance) + "\n";
+        msg += ": " + ToString(subModel->parryChance) + "\n";
     }
-    else if (model->type == ModelType::Projectile)
+    else if (itemModel->getType() == ModelType::Projectile)
     {
-        ProjectileFunc func = model->getProjectileFunc();
+        ProjectileModel * subModel = itemModel->toProjectile();
         msg += Formatter::brown() + "Damage Bonus    " + Formatter::reset();
-        msg += ": " + ToString(func.damageBonus) + "\n";
+        msg += ": " + ToString(subModel->damageBonus) + "\n";
         msg += Formatter::brown() + "Range Bonus     " + Formatter::reset();
-        msg += ": " + ToString(func.rangeBonus) + "\n";
+        msg += ": " + ToString(subModel->rangeBonus) + "\n";
     }
-    else if (model->type == ModelType::Container)
+    else if (itemModel->getType() == ModelType::Container)
     {
-        ContainerFunc func = model->getContainerFunc();
+        ContainerModel * subModel = itemModel->toContainer();
         msg += Formatter::brown() + "Max Weight      " + Formatter::reset();
-        msg += ": " + ToString(func.maxWeight) + "\n";
+        msg += ": " + ToString(subModel->maxWeight) + "\n";
         msg += Formatter::brown() + "Flags           " + Formatter::reset();
-        msg += ": {" + GetContainerFlagString(func.flags) + "}\n";
+        msg += ": {" + GetContainerFlagString(subModel->containerFlags) + "}\n";
         msg += Formatter::brown() + "Key Vnum        " + Formatter::reset();
-        msg += ": " + ToString(func.keyVnum) + "\n";
+        msg += ": " + ToString(subModel->keyVnum) + "\n";
         msg += Formatter::brown() + "Lockpicking Lv. " + Formatter::reset();
-        msg += ": " + ToString(func.difficulty) + "\n";
+        msg += ": " + ToString(subModel->difficulty) + "\n";
     }
-    else if (model->type == ModelType::LiqContainer)
+    else if (itemModel->getType() == ModelType::LiquidContainer)
     {
-        LiqContainerFunc func = model->getLiqContainerFunc();
+        LiquidContainerModel * subModel = itemModel->toLiquidContainer();
         msg += Formatter::brown() + "Max Weight      " + Formatter::reset();
-        msg += ": " + ToString(func.maxWeight) + "\n";
+        msg += ": " + ToString(subModel->maxWeight) + "\n";
         msg += Formatter::brown() + "Flags           " + Formatter::reset();
-        msg += ": {" + GetLiqContainerFlagString(func.flags) + "}\n";
+        msg += ": {" + GetLiqContainerFlagString(subModel->liquidFlags) + "}\n";
     }
-    else if (model->type == ModelType::Tool)
+    else if (itemModel->getType() == ModelType::Tool)
     {
-        ToolFunc func = model->getToolFunc();
+        ToolModel * subModel = itemModel->toTool();
         msg += Formatter::brown() + "Type            " + Formatter::reset();
-        msg += ": " + GetToolTypeName(func.type) + "\n";
+        msg += ": " + GetToolTypeName(subModel->toolType) + "\n";
     }
-    else if (model->type == ModelType::Node)
+    else if (itemModel->getType() == ModelType::Node)
     {
-        NodeFunc func = model->getNodeFunc();
+        NodeModel * subModel = itemModel->toNode();
         msg += Formatter::brown() + "Type            " + Formatter::reset();
-        msg += ": " + GetNodeTypeName(func.type) + "\n";
+        msg += ": " + GetNodeTypeName(subModel->nodeType) + "\n";
     }
-    else if (model->type == ModelType::Resource)
+    else if (itemModel->getType() == ModelType::Resource)
     {
-        ResourceFunc func = model->getResourceFunc();
+        ResourceModel * subModel = itemModel->toResource();
         msg += Formatter::brown() + "Type            " + Formatter::reset();
-        msg += ": " + GetResourceTypeName(func.type) + "\n";
+        msg += ": " + GetResourceTypeName(subModel->resourceType) + "\n";
     }
-    else if (model->type == ModelType::Seed)
+    else if (itemModel->getType() == ModelType::Seed)
     {
-        SeedFunc func = model->getSeedFunc();
+        SeedModel * subModel = itemModel->toSeed();
         msg += Formatter::brown() + "Type            " + Formatter::reset();
-        msg += ": " + GetSeedTypeName(func.type) + "\n";
+        msg += ": " + GetSeedTypeName(subModel->seedType) + "\n";
     }
-    else if (model->type == ModelType::Food)
+    else if (itemModel->getType() == ModelType::Food)
     {
-        FoodFunc func = model->getFoodFunc();
+        FoodModel * subModel = itemModel->toFood();
         msg += Formatter::brown() + "Feeding         " + Formatter::reset();
-        msg += ": " + ToString(func.hours) + "\n";
+        msg += ": " + ToString(subModel->hours) + "\n";
         msg += Formatter::brown() + "Flags           " + Formatter::reset();
-        msg += ": {" + GetFoodFlagString(func.flags) + "}\n";
+        msg += ": {" + GetFoodFlagString(subModel->foodFlags) + "}\n";
     }
-    else if (model->type == ModelType::Light)
+    else if (itemModel->getType() == ModelType::Light)
     {
-        LightFunc func = model->getLightFunc();
+        LightModel * subModel = itemModel->toLight();
         msg += Formatter::brown() + "Autonomy        " + Formatter::reset();
-        msg += ": " + ToString(func.maxHours) + "\n";
+        msg += ": " + ToString(subModel->maxHours) + "\n";
         msg += Formatter::brown() + "Rechargeable    " + Formatter::reset();
-        msg += ": " + ToString(func.policy) + "\n";
+        msg += ": " + ToString(subModel->policy) + "\n";
     }
-    else if (model->type == ModelType::Book)
+    else if (itemModel->getType() == ModelType::Book)
     {
-        BookFunc func = model->getBookFunc();
+        BookModel * subModel = itemModel->toBook();
         msg += Formatter::brown() + "Capacity        " + Formatter::reset();
-        msg += ": " + ToString(func.maxParchments) + "\n";
+        msg += ": " + ToString(subModel->maxParchments) + "\n";
     }
-    else if (model->type == ModelType::Rope)
+    else if (itemModel->getType() == ModelType::Rope)
     {
-        RopeFunc func = model->getRopeFunc();
+        RopeModel * subModel = itemModel->toRope();
         msg += Formatter::brown() + "Difficulty      " + Formatter::reset();
-        msg += ": " + ToString(func.difficulty) + "\n";
+        msg += ": " + ToString(subModel->difficulty) + "\n";
         msg += Formatter::brown() + "Type            " + Formatter::reset();
-        msg += ": " + ToString(func.type) + "\n";
+        msg += ": " + ToString(subModel->ropeType) + "\n";
     }
-    else if (model->type == ModelType::Mechanism)
+    else if (itemModel->getType() == ModelType::Mechanism)
     {
-        MechanismFunc func = model->getMechanismFunc();
+        MechanismModel * subModel = itemModel->toMechanism();
         msg += Formatter::brown() + "Type            " + Formatter::reset();
-        msg += ": " + GetMechanismTypeName(func.type) + "\n";
-        if ((func.type == MechanismType::Door) || (func.type == MechanismType::Lock))
+        msg += ": " + GetMechanismTypeName(subModel->mechanismType) + "\n";
+        if ((subModel->mechanismType == MechanismType::Door)
+            || (subModel->mechanismType == MechanismType::Lock))
         {
             msg += Formatter::brown() + "Key             " + Formatter::reset();
-            msg += ": " + ToString(func.key) + "\n";
+            msg += ": " + ToString(subModel->key) + "\n";
             msg += Formatter::brown() + "Difficulty      " + Formatter::reset();
-            msg += ": " + ToString(func.difficulty) + "\n";
+            msg += ": " + ToString(subModel->difficulty) + "\n";
         }
-        else if (func.type == MechanismType::Picklock)
+        else if (subModel->mechanismType == MechanismType::Picklock)
         {
             msg += Formatter::brown() + "Efficency       " + Formatter::reset();
-            msg += ": " + ToString(func.efficency) + "\n";
+            msg += ": " + ToString(subModel->efficency) + "\n";
         }
-        else if (func.type == MechanismType::Lever)
+        else if (subModel->mechanismType == MechanismType::Lever)
         {
             msg += Formatter::brown() + "Command         " + Formatter::reset();
-            msg += ": " + ToString(func.command) + "\n";
+            msg += ": " + ToString(subModel->command) + "\n";
             msg += Formatter::brown() + "Target          " + Formatter::reset();
-            msg += ": " + ToString(func.target) + "\n";
+            msg += ": " + ToString(subModel->target) + "\n";
         }
         else
         {
@@ -528,10 +606,10 @@ void DoItemCreate(Character * character, std::istream & sArgs)
         character->sendMsg("What do you want to create?\n");
         return; // Skip the rest of the function.
     }
-    Model * model = Mud::instance().findModel(ToInt(arguments[0].first));
+    ItemModel * itemModel = Mud::instance().findItemModel(ToInt(arguments[0].first));
     Material * material = Mud::instance().findMaterial(ToInt(arguments[1].first));
     ItemQuality quality = ItemQuality::Normal;
-    if (model == nullptr)
+    if (itemModel == nullptr)
     {
         character->sendMsg("Cannot find model '%s'.\n", arguments[0].first);
         return;
@@ -551,7 +629,7 @@ void DoItemCreate(Character * character, std::istream & sArgs)
         }
     }
     // Create the item.
-    Item * item = model->createItem(character->getName(), material, quality);
+    Item * item = itemModel->createItem(character->getName(), material, quality);
     if (item == nullptr)
     {
         character->sendMsg("Creation failed.\n");
@@ -587,7 +665,10 @@ void DoItemGet(Character * character, std::istream & sArgs)
     }
     if (item->room != nullptr)
     {
-        character->sendMsg("The item was inside the room '%s' (%s)\n", item->room->name, ToString(item->room->vnum));
+        character->sendMsg(
+            "The item was inside the room '%s' (%s)\n",
+            item->room->name,
+            ToString(item->room->vnum));
         item->room->removeItem(item);
         item->updateOnDB();
     }
@@ -639,7 +720,8 @@ void DoItemInfo(Character * character, std::istream & sArgs)
     ArgumentList arguments = ParseArgs(sArgs);
     if (arguments.size() != 1)
     {
-        character->sendMsg("You must instert the item vnum or the name of the item inside the room.\n");
+        character->sendMsg(
+            "You must instert the item vnum or the name of the item inside the room.\n");
         return;
     }
     Item * item = Mud::instance().findItem(ToInt(arguments[0].first));
@@ -656,10 +738,12 @@ void DoItemInfo(Character * character, std::istream & sArgs)
     std::string msg;
     msg += "Vnum         : " + ToString(item->vnum) + "\n";
     msg += "Model        : [" + ToString(item->model->vnum) + "] " + item->getName() + ".\n";
-    msg += "Type         : " + GetModelTypeName(item->model->type) + "\n";
+    msg += "Type         : " + GetModelTypeName(item->model->getType()) + "\n";
     msg += "Maker        : " + item->maker + "\n";
-    msg += "Condition    : " + ToString(item->condition) + " of " + ToString(item->model->condition) + "\n";
-    msg += "Composition  : " + item->composition->name + " [" + ToString(item->composition->vnum) + "]\n";
+    msg += "Condition    : " + ToString(item->condition) + " of " + ToString(item->model->condition)
+        + "\n";
+    msg += "Composition  : " + item->composition->name + " [" + ToString(item->composition->vnum)
+        + "]\n";
     msg += "Quality      : " + GetItemQualityName(item->quality) + "\n";
     if (item->room != nullptr)
     {
@@ -671,20 +755,23 @@ void DoItemInfo(Character * character, std::istream & sArgs)
     }
     else if (item->container != nullptr)
     {
-        msg += "Inside       : " + item->container->getName() + " [" + ToString(item->container->vnum) + "]\n";
+        msg += "Inside       : " + item->container->getName() + " ["
+            + ToString(item->container->vnum) + "]\n";
     }
     if (!item->content.empty())
     {
         msg += "Content      :\n";
         for (auto iterator : item->content)
         {
-            msg += "             * " + iterator->getName() + " [" + ToString(iterator->vnum) + "]\n";
+            msg += "             * " + iterator->getName() + " [" + ToString(iterator->vnum)
+                + "]\n";
         }
     }
     if (item->contentLiq.first != nullptr)
     {
         msg += "Content Liq. : ";
-        msg += item->contentLiq.first->getNameCapital() + " [" + ToString(item->contentLiq.second) + "]\n";
+        msg += item->contentLiq.first->getNameCapital() + " [" + ToString(item->contentLiq.second)
+            + "]\n";
     }
     msg += "Current Slot : " + item->getCurrentSlotName() + "\n";
     // Send the formatted message.
@@ -708,14 +795,21 @@ void DoAreaInfo(Character * character, std::istream & sArgs)
     }
     std::string msg;
     msg += Formatter::green() + "# Area Informations:\n" + Formatter::reset();
-    msg += Formatter::yellow() + " Vnum            " + Formatter::reset() + ":" + ToString(area->vnum) + "\n";
+    msg += Formatter::yellow() + " Vnum            " + Formatter::reset() + ":"
+        + ToString(area->vnum) + "\n";
     msg += Formatter::yellow() + " Name            " + Formatter::reset() + ":" + area->name + "\n";
-    msg += Formatter::yellow() + " Builder         " + Formatter::reset() + ":" + area->builder + "\n";
-    msg += Formatter::yellow() + " Continent       " + Formatter::reset() + ":" + area->continent + "\n";
-    msg += Formatter::yellow() + " Width           " + Formatter::reset() + ":" + ToString(area->width) + "\n";
-    msg += Formatter::yellow() + " Height          " + Formatter::reset() + ":" + ToString(area->height) + "\n";
-    msg += Formatter::yellow() + " Elevation       " + Formatter::reset() + ":" + ToString(area->elevation) + "\n";
-    msg += Formatter::yellow() + " Number of Rooms " + Formatter::reset() + ":" + ToString(area->areaMap.size()) + "\n";
+    msg += Formatter::yellow() + " Builder         " + Formatter::reset() + ":" + area->builder
+        + "\n";
+    msg += Formatter::yellow() + " Continent       " + Formatter::reset() + ":" + area->continent
+        + "\n";
+    msg += Formatter::yellow() + " Width           " + Formatter::reset() + ":"
+        + ToString(area->width) + "\n";
+    msg += Formatter::yellow() + " Height          " + Formatter::reset() + ":"
+        + ToString(area->height) + "\n";
+    msg += Formatter::yellow() + " Elevation       " + Formatter::reset() + ":"
+        + ToString(area->elevation) + "\n";
+    msg += Formatter::yellow() + " Number of Rooms " + Formatter::reset() + ":"
+        + ToString(area->areaMap.size()) + "\n";
     character->sendMsg(msg);
 }
 
@@ -744,14 +838,20 @@ void DoRoomInfo(Character * character, std::istream & sArgs)
     }
     std::string msg;
     msg += Formatter::green() + "# Room Informations:\n" + Formatter::reset();
-    msg += Formatter::yellow() + " Vnum        " + Formatter::reset() + ":" + ToString(room->vnum) + "\n";
-    msg += Formatter::yellow() + " X           " + Formatter::reset() + ":" + ToString(room->coord.x) + "\n";
-    msg += Formatter::yellow() + " Y           " + Formatter::reset() + ":" + ToString(room->coord.y) + "\n";
-    msg += Formatter::yellow() + " Z           " + Formatter::reset() + ":" + ToString(room->coord.z) + "\n";
+    msg += Formatter::yellow() + " Vnum        " + Formatter::reset() + ":" + ToString(room->vnum)
+        + "\n";
+    msg += Formatter::yellow() + " X           " + Formatter::reset() + ":"
+        + ToString(room->coord.x) + "\n";
+    msg += Formatter::yellow() + " Y           " + Formatter::reset() + ":"
+        + ToString(room->coord.y) + "\n";
+    msg += Formatter::yellow() + " Z           " + Formatter::reset() + ":"
+        + ToString(room->coord.z) + "\n";
     msg += Formatter::yellow() + " Name        " + Formatter::reset() + ":" + room->name + "\n";
-    msg += Formatter::yellow() + " Description " + Formatter::reset() + ":" + room->description + "\n";
+    msg += Formatter::yellow() + " Description " + Formatter::reset() + ":" + room->description
+        + "\n";
     msg += Formatter::yellow() + " Terrain     " + Formatter::reset() + ":" + room->terrain + "\n";
-    msg += Formatter::yellow() + " Flags       " + Formatter::reset() + ":" + GetRoomFlagString(room->flags) + "\n";
+    msg += Formatter::yellow() + " Flags       " + Formatter::reset() + ":"
+        + GetRoomFlagString(room->flags) + "\n";
     character->sendMsg(msg);
 }
 
@@ -1024,7 +1124,10 @@ void DoMobileKill(Character * character, std::istream & sArgs)
     mobile->kill();
     // Notify the death.
     character->sendMsg("You snap your fingers.\n");
-    character->room->sendToAll("%s fall to the ground dead.", CharacterVector(), mobile->getNameCapital());
+    character->room->sendToAll(
+        "%s fall to the ground dead.",
+        CharacterVector(),
+        mobile->getNameCapital());
 }
 
 void DoMobileReload(Character * character, std::istream & sArgs)
@@ -1086,7 +1189,9 @@ void DoHurt(Character * character, std::istream & sArgs)
     target->setHealth(1);
     // Notify.
     character->sendMsg("You point your finger, %s cry in pain.\n", target->getName());
-    target->sendMsg("%s points the finger towards you, you cry in pain.\n", character->getNameCapital());
+    target->sendMsg(
+        "%s points the finger towards you, you cry in pain.\n",
+        character->getNameCapital());
     // Set the list of exceptions.
     CharacterVector exceptions;
     exceptions.push_back(character);
@@ -1097,7 +1202,7 @@ void DoHurt(Character * character, std::istream & sArgs)
         exceptions,
         character->getNameCapital(),
         target->getName(),
-        target->getPronoun());
+        target->getSubjectPronoun());
 }
 
 void DoInvisibility(Character * character, std::istream & sArgs)
@@ -1272,7 +1377,10 @@ void DoAggroList(Character * character, std::istream & sArgs)
     {
         if (aggressor.aggressor != nullptr)
         {
-            character->sendMsg("%s\t%s", ToString(aggressor.aggression), aggressor.aggressor->getNameCapital());
+            character->sendMsg(
+                "%s\t%s",
+                ToString(aggressor.aggression),
+                aggressor.aggressor->getNameCapital());
         }
     }
 }
@@ -1293,13 +1401,18 @@ void DoMaterialInfo(Character * character, std::istream & sArgs)
         return;
     }
     std::string msg;
-    msg += Formatter::yellow() + "Vnum            " + Formatter::reset() + ": " + ToString(material->vnum) + "\n";
-    msg += Formatter::yellow() + "Type            " + Formatter::reset() + ": " + GetMaterialTypeName(material->type)
+    msg += Formatter::yellow() + "Vnum            " + Formatter::reset() + ": "
+        + ToString(material->vnum) + "\n";
+    msg += Formatter::yellow() + "Type            " + Formatter::reset() + ": "
+        + GetMaterialTypeName(material->type) + "\n";
+    msg += Formatter::yellow() + "Name            " + Formatter::reset() + ": " + material->name
         + "\n";
-    msg += Formatter::yellow() + "Name            " + Formatter::reset() + ": " + material->name + "\n";
-    msg += Formatter::yellow() + "Worth           " + Formatter::reset() + ": " + ToString(material->worth) + "\n";
-    msg += Formatter::yellow() + "Hardness        " + Formatter::reset() + ": " + ToString(material->hardness) + "\n";
-    msg += Formatter::yellow() + "Lightness       " + Formatter::reset() + ": " + ToString(material->lightness) + "\n";
+    msg += Formatter::yellow() + "Worth           " + Formatter::reset() + ": "
+        + ToString(material->worth) + "\n";
+    msg += Formatter::yellow() + "Hardness        " + Formatter::reset() + ": "
+        + ToString(material->hardness) + "\n";
+    msg += Formatter::yellow() + "Lightness       " + Formatter::reset() + ": "
+        + ToString(material->lightness) + "\n";
     character->sendMsg(msg);
 }
 
@@ -1318,7 +1431,7 @@ void DoLiquidCreate(Character * character, std::istream & sArgs)
         character->sendMsg("Can't find the desire item.\n");
         return;
     }
-    if (item->model->type != ModelType::LiqContainer)
+    if (item->model->getType() != ModelType::LiquidContainer)
     {
         character->sendMsg("The item is not a container of liquids.\n");
         return;
@@ -1363,9 +1476,12 @@ void DoLiquidInfo(Character * character, std::istream & sArgs)
         return;
     }
     std::string msg;
-    msg += Formatter::yellow() + "Vnum            " + Formatter::reset() + ": " + ToString(liquid->vnum) + "\n";
-    msg += Formatter::yellow() + "Name            " + Formatter::reset() + ": " + liquid->getNameCapital() + "\n";
-    msg += Formatter::yellow() + "Worth           " + Formatter::reset() + ": " + ToString(liquid->worth) + "\n";
+    msg += Formatter::yellow() + "Vnum            " + Formatter::reset() + ": "
+        + ToString(liquid->vnum) + "\n";
+    msg += Formatter::yellow() + "Name            " + Formatter::reset() + ": "
+        + liquid->getNameCapital() + "\n";
+    msg += Formatter::yellow() + "Worth           " + Formatter::reset() + ": "
+        + ToString(liquid->worth) + "\n";
     character->sendMsg(msg);
 }
 
@@ -1385,23 +1501,26 @@ void DoProductionInfo(Character * character, std::istream & sArgs)
         return;
     }
     std::string msg;
-    msg += "Vnum            : " + ToString(production->vnum) + "\n";
-    msg += "Name            : " + production->name + "\n";
-    msg += "Profession      : " + production->profession->command + "\n";
-    msg += "Difficulty      : " + ToString(production->difficulty) + "\n";
-    msg += "Time            : " + ToString(production->time) + "\n";
-    msg += "Assisted        : " + ToString(production->assisted) + "\n";
-    msg += "Outcome         : " + production->outcome.first->name + "[" + ToString(production->outcome.second) + "\n";
-    msg += "Tools           :\n";
+    msg += "Vnum        : " + ToString(production->vnum) + "\n";
+    msg += "Name        : " + production->name + "\n";
+    msg += "Profession  : " + production->profession->command + "\n";
+    msg += "Difficulty  : " + ToString(production->difficulty) + "\n";
+    msg += "Time        : " + ToString(production->time) + "\n";
+    msg += "Assisted    : " + ToString(production->assisted) + "\n";
+    msg += "Outcome     : " + production->outcome.first->name + " * "
+        + ToString(production->outcome.second) + "\n";
+    msg += "Tools       :\n";
     for (auto iterator : production->tools)
     {
         msg += "                  " + GetToolTypeName(iterator) + "\n";
     }
-    msg += "Ingredients     :\n";
+    msg += "Ingredients :\n";
     for (auto iterator : production->ingredients)
     {
-        msg += "                  " + GetResourceTypeName(iterator.first) + "(" + ToString(iterator.second) + ")\n";
+        msg += "                  " + GetResourceTypeName(iterator.first) + "("
+            + ToString(iterator.second) + ")\n";
     }
+    msg += "Workbench   :" + GetToolTypeName(production->workbench) + "\n";
     character->sendMsg(msg);
 }
 
@@ -1421,18 +1540,28 @@ void DoProfessionInfo(Character * character, std::istream & sArgs)
         return;
     }
     std::string msg;
-    msg += Formatter::yellow() + "Name          " + Formatter::reset() + ": " + profession->name + "\n";
-    msg += Formatter::yellow() + "Description   " + Formatter::reset() + ": " + profession->description + "\n";
-    msg += Formatter::yellow() + "Command       " + Formatter::reset() + ": " + profession->command + "\n";
-    msg += Formatter::yellow() + "Posture       " + Formatter::reset() + ": " + GetPostureName(profession->posture)
+    msg += Formatter::yellow() + "Name          " + Formatter::reset() + ": " + profession->name
         + "\n";
-    msg += Formatter::yellow() + "Action        " + Formatter::reset() + ": " + profession->action + "\n";
-    msg += Formatter::yellow() + "    Start     " + Formatter::reset() + ": " + profession->startMessage + "\n";
-    msg += Formatter::yellow() + "    Finish    " + Formatter::reset() + ": " + profession->finishMessage + "\n";
-    msg += Formatter::yellow() + "    Success   " + Formatter::reset() + ": " + profession->successMessage + "\n";
-    msg += Formatter::yellow() + "    Failure   " + Formatter::reset() + ": " + profession->failureMessage + "\n";
-    msg += Formatter::yellow() + "    Interrupt " + Formatter::reset() + ": " + profession->interruptMessage + "\n";
-    msg += Formatter::yellow() + "    Not Found " + Formatter::reset() + ": " + profession->notFoundMessage + "\n";
+    msg += Formatter::yellow() + "Description   " + Formatter::reset() + ": "
+        + profession->description + "\n";
+    msg += Formatter::yellow() + "Command       " + Formatter::reset() + ": " + profession->command
+        + "\n";
+    msg += Formatter::yellow() + "Posture       " + Formatter::reset() + ": "
+        + GetPostureName(profession->posture) + "\n";
+    msg += Formatter::yellow() + "Action        " + Formatter::reset() + ": " + profession->action
+        + "\n";
+    msg += Formatter::yellow() + "    Start     " + Formatter::reset() + ": "
+        + profession->startMessage + "\n";
+    msg += Formatter::yellow() + "    Finish    " + Formatter::reset() + ": "
+        + profession->finishMessage + "\n";
+    msg += Formatter::yellow() + "    Success   " + Formatter::reset() + ": "
+        + profession->successMessage + "\n";
+    msg += Formatter::yellow() + "    Failure   " + Formatter::reset() + ": "
+        + profession->failureMessage + "\n";
+    msg += Formatter::yellow() + "    Interrupt " + Formatter::reset() + ": "
+        + profession->interruptMessage + "\n";
+    msg += Formatter::yellow() + "    Not Found " + Formatter::reset() + ": "
+        + profession->notFoundMessage + "\n";
     character->sendMsg(msg);
 }
 
@@ -1444,24 +1573,22 @@ void DoModelList(Character * character, std::istream & sArgs)
     table.addColumn("VNUM", StringAlign::Right);
     table.addColumn("NAME", StringAlign::Left);
     table.addColumn("TYPE", StringAlign::Left);
-    table.addColumn("SPECIFIC", StringAlign::Left);
     table.addColumn("SLOT", StringAlign::Left);
     table.addColumn("FLAGS", StringAlign::Right);
     table.addColumn("WEIGHT", StringAlign::Right);
     table.addColumn("PRICE", StringAlign::Right);
-    for (auto iterator : Mud::instance().mudModels)
+    for (auto iterator : Mud::instance().mudItemModels)
     {
-        Model * model = iterator.second;
+        ItemModel * itemModel = iterator.second;
         // Prepare the row.
         TableRow row;
-        row.push_back(ToString(model->vnum));
-        row.push_back(model->name);
-        row.push_back(GetModelTypeName(model->type));
-        row.push_back(model->getSpecificTypeName());
-        row.push_back(GetEquipmentSlotName(model->slot));
-        row.push_back(ToString(model->flags));
-        row.push_back(ToString(model->weight));
-        row.push_back(ToString(model->price));
+        row.push_back(ToString(itemModel->vnum));
+        row.push_back(itemModel->name);
+        row.push_back(itemModel->getTypeName());
+        row.push_back(GetEquipmentSlotName(itemModel->slot));
+        row.push_back(ToString(itemModel->modelFlags));
+        row.push_back(ToString(itemModel->weight));
+        row.push_back(ToString(itemModel->price));
         // Add the row to the table.
         table.addRow(row);
     }
@@ -1483,7 +1610,7 @@ void DoItemList(Character * character, std::istream & sArgs)
         TableRow row;
         row.push_back(ToString(item->vnum));
         row.push_back(item->getNameCapital());
-        row.push_back(GetModelTypeName(item->model->type));
+        row.push_back(GetModelTypeName(item->model->getType()));
         if (item->owner != nullptr)
         {
             row.push_back(" Owner  : " + item->owner->getName());
@@ -1611,7 +1738,9 @@ void DoRoomList(Character * character, std::istream & sArgs)
         {
             row.push_back("None");
         }
-        row.push_back(ToString(room->coord.x) + ' ' + ToString(room->coord.y) + ' ' + ToString(room->coord.z));
+        row.push_back(
+            ToString(room->coord.x) + ' ' + ToString(room->coord.y) + ' '
+                + ToString(room->coord.z));
         row.push_back(room->terrain);
         row.push_back(room->name);
         // Add the row to the table.

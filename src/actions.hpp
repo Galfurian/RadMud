@@ -16,15 +16,31 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef ACTIONS_HPP
-#define ACTIONS_HPP
+#pragma once
 
 #include "production.hpp"
 #include "building.hpp"
 #include "defines.hpp"
-#include "combat.hpp"
 #include "utils.hpp"
 #include "item.hpp"
+#include "opponent.hpp"
+
+/// The list of possible actions.
+typedef enum class ActionTypes
+{
+    /// The character is fighting.
+    NoAction,
+    /// The character is doing common action.
+    Wait,
+    /// The character is moving to another location.
+    Move,
+    /// The character is crafting something.
+    Crafting,
+    /// The character is crafting something.
+    Building,
+    /// The character is fighting.
+    Combat
+} ActionType;
 
 /// Used to determine what are the character doing.
 class Action
@@ -171,4 +187,10 @@ class Action
 
 };
 
-#endif
+/// @addtogroup EnumToString
+/// @{
+
+/// Return the string describing the type of Action.
+std::string GetActionTypeName(ActionType type);
+
+/// @}

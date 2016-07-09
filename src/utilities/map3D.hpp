@@ -17,8 +17,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef MAP3D_HPP
-#define MAP3D_HPP
+#pragma once
 
 #include <map>
 
@@ -170,5 +169,3 @@ class Map3D
         /// Disable assignment.
         Map3D & operator=(const Map3D<T> &) = delete;
 };
-
-#endif

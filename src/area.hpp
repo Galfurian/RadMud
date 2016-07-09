@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef AREA_HPP
-#define AREA_HPP
+#pragma once
 
 #include <string>
 #include <vector>
@@ -205,4 +204,3 @@ typedef std::map<int, Area *> AreaMap;
 /// AreaMap iterator.
 typedef AreaMap::iterator AreaMapIterator;
 
-#endif

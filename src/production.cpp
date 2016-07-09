@@ -30,24 +30,28 @@
 #include "constants.hpp"
 
 Production::Production() :
-    vnum(-1),
-    name(),
-    profession(),
-    difficulty(),
-    time(),
-    assisted(),
-    outcome(),
-    tools(),
-    ingredients(),
-    workbench(ToolType::NoType),
-    material(ResourceType::NoType)
+        vnum(-1),
+        name(),
+        profession(),
+        difficulty(),
+        time(),
+        assisted(),
+        outcome(),
+        tools(),
+        ingredients(),
+        workbench(ToolType::NoType),
+        material(ResourceType::NoType)
 {
     // Nothing to do.
 }
 
 Production::~Production()
 {
-    Logger::log(LogLevel::Debug, "Deleted production\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
+    Logger::log(
+        LogLevel::Debug,
+        "Deleted production\t[%s]\t\t(%s)",
+        ToString(this->vnum),
+        this->name);
 }
 
 bool Production::setOutcome(const std::string & source)
@@ -68,7 +72,7 @@ bool Production::setOutcome(const std::string & source)
             correct = false;
         }
 
-        outcome.first = Mud::instance().findModel(ToInt(outcomeInfo[0]));
+        outcome.first = Mud::instance().findItemModel(ToInt(outcomeInfo[0]));
         if (outcome.first == nullptr)
         {
             Logger::log(LogLevel::Error, "Can't find the Outcome :" + outcomeInfo[0]);
@@ -78,7 +82,9 @@ bool Production::setOutcome(const std::string & source)
         int outcomeQuantity = ToInt(outcomeInfo[1]);
         if (outcomeQuantity <= 0)
         {
-            Logger::log(LogLevel::Error, "Can't find the quantity of the Outcome :" + outcomeInfo[0]);
+            Logger::log(
+                LogLevel::Error,
+                "Can't find the quantity of the Outcome :" + outcomeInfo[0]);
             correct = false;
             break;
         }
@@ -142,7 +148,15 @@ bool Production::setIngredient(const std::string & source)
         int quantity = ToInt(ingredientInfo[1]);
         if (quantity == 0)
         {
-            Logger::log(LogLevel::Error, "Can't find the quantity of the Outcome :" + ingredientInfo[0]);
+            Logger::log(
+                LogLevel::Error,
+                "Can't find the quantity of the Outcome :" + ingredientInfo[0]);
+            correct = false;
+            break;
+        }
+        if (!this->ingredients.insert(std::make_pair(ingredient, quantity)).second)
+        {
+            Logger::log(LogLevel::Error, "Cannot insert the ingredient");
             correct = false;
             break;
         }

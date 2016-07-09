@@ -125,7 +125,7 @@ std::string GetModelTypeName(ModelType type)
     if (type == ModelType::Shield) return "Shield";
     if (type == ModelType::Projectile) return "Projectile";
     if (type == ModelType::Container) return "Container";
-    if (type == ModelType::LiqContainer) return "LiqContainer";
+    if (type == ModelType::LiquidContainer) return "LiquidContainer";
     if (type == ModelType::Tool) return "Tool";
     if (type == ModelType::Node) return "Node";
     if (type == ModelType::Resource) return "Resource";
@@ -135,10 +135,8 @@ std::string GetModelTypeName(ModelType type)
     if (type == ModelType::Food) return "Food";
     if (type == ModelType::Light) return "Light";
     if (type == ModelType::Vehicle) return "Vehicle";
-    if (type == ModelType::Pen) return "Pen";
     if (type == ModelType::Book) return "Book";
     if (type == ModelType::Rope) return "Rope";
-    if (type == ModelType::Trash) return "Trash";
     if (type == ModelType::Mechanism) return "Mechanism";
     if (type == ModelType::Currency) return "Currency";
     return "No Model Type";
@@ -154,111 +152,6 @@ std::string GetEquipmentSlotName(EquipmentSlot slot)
     if (slot == EquipmentSlot::RightHand) return "Right Hand";
     if (slot == EquipmentSlot::LeftHand) return "Left Hand";
     return "No Equipment Slot";
-}
-
-std::string GetWeaponTypeName(WeaponType type)
-{
-    if (type == WeaponType::Pistol) return "Pistol";
-    if (type == WeaponType::Rifle) return "Rifle";
-    if (type == WeaponType::Shotgun) return "Shotgun";
-    if (type == WeaponType::HeavyWeapon) return "Heavy Weapon";
-    if (type == WeaponType::EnergyPistol) return "Energy Pistol";
-    if (type == WeaponType::EnergyRifle) return "Energy Rifle";
-    if (type == WeaponType::EnergyHeavyWeapon) return "Energy Heavy Weapon";
-    if (type == WeaponType::Granade) return "Granade";
-    if (type == WeaponType::Placed) return "Placed";
-    if (type == WeaponType::Bladed) return "Bladed";
-    if (type == WeaponType::Blunt) return "Blunt";
-    if (type == WeaponType::Thrown) return "Thrown";
-    if (type == WeaponType::Unarmed) return "Unarmed";
-    return "No Weapon Type";
-}
-
-std::string GetArmorSizeName(ArmorSize armorSize)
-{
-    if (armorSize == ArmorSize::All) return "Universal Armor";
-    if (armorSize == ArmorSize::Light) return "Light Armor";
-    if (armorSize == ArmorSize::Medium) return "Medium Armor";
-    if (armorSize == ArmorSize::Heavy) return "Heavy Armor";
-    return "No Armor Size";
-}
-
-std::string GetShieldSizeName(ShieldSize shieldSize)
-{
-    if (shieldSize == ShieldSize::All) return "Universal Shield";
-    if (shieldSize == ShieldSize::Light) return "Light Shield";
-    if (shieldSize == ShieldSize::Medium) return "Medium Shield";
-    if (shieldSize == ShieldSize::Heavy) return "Heavy Shield";
-    return "No Armor Size";
-}
-
-std::string GetToolTypeName(ToolType type)
-{
-    if (type == ToolType::Pickaxe) return "Pickaxe";
-    if (type == ToolType::WoodcutterAxe) return "Woodcutter's Axe";
-    if (type == ToolType::Saw) return "Saw";
-    if (type == ToolType::PrecisionChisel) return "Precision Chisel";
-    if (type == ToolType::PlaneChisel) return "PickaPlane Chiselxe";
-    if (type == ToolType::Hammer) return "Hammer";
-    if (type == ToolType::Forge) return "Forge";
-    if (type == ToolType::Anvil) return "Anvil";
-    if (type == ToolType::BlacksmithHammer) return "Blacksmith Hammer";
-    if (type == ToolType::Bellows) return "Bellows";
-    if (type == ToolType::Crucible) return "Crucible";
-    if (type == ToolType::Tinderbox) return "Tinderbox";
-    return "No Tool Type";
-}
-
-std::string GetNodeTypeName(NodeType type)
-{
-    if (type == NodeType::Metal) return "Metal Node";
-    if (type == NodeType::Wood) return "Wood Node";
-    if (type == NodeType::Stone) return "Stone Node";
-    if (type == NodeType::Metal) return "Metal Node";
-    return "No Node Type";
-}
-
-std::string GetResourceTypeName(ResourceType type)
-{
-    if (type == ResourceType::Coal) return "Natural Coal";
-    if (type == ResourceType::Ore) return "Metal Ore";
-    if (type == ResourceType::Bar) return "Metal Bar";
-    if (type == ResourceType::Log) return "Wood Log";
-    if (type == ResourceType::Plank) return "Wood Plank";
-    if (type == ResourceType::Tree) return "Tree";
-    if (type == ResourceType::Fastener) return "Fastener";
-    if (type == ResourceType::Leather) return "Leather";
-    if (type == ResourceType::Cloth) return "Cloth";
-    if (type == ResourceType::StoneBlock) return "Stone Block";
-    if (type == ResourceType::MetalVein) return "Metal Vein";
-    if (type == ResourceType::StoneMonolith) return "Stone Monolith";
-    return "No Resource Type";
-}
-
-std::string GetSeedTypeName(SeedType type)
-{
-    if (type == SeedType::Plant) return "Plant Seed";
-    if (type == SeedType::Tree) return "Tree Seed";
-    return "No Seed Type";
-}
-
-std::string GetMechanismTypeName(MechanismType type)
-{
-    if (type == MechanismType::Door) return "Door";
-    if (type == MechanismType::Lock) return "Lock";
-    if (type == MechanismType::Picklock) return "Picklock";
-    if (type == MechanismType::Lever) return "Lever";
-    return "No Mechanism Type";
-}
-
-std::string GetActionTypeName(ActionType type)
-{
-    if (type == ActionType::Wait) return "Waiting";
-    if (type == ActionType::Move) return "Moving";
-    if (type == ActionType::Crafting) return "Crafting";
-    if (type == ActionType::Building) return "Building";
-    if (type == ActionType::Combat) return "Fighting";
-    return "No Action";
 }
 std::string GetGenderTypeName(GenderType type)
 {
@@ -306,149 +199,4 @@ std::string GetTelnetCharName(TelnetChar c)
     if (c == TelnetChar::DRAW_MAP) return "DRAW_MAP";
     if (c == TelnetChar::FORMAT) return "FORMAT";
     return ToString(static_cast<int>(c));
-}
-
-std::string GetModelFlagString(unsigned int flags)
-{
-    std::string flagList;
-    if (HasFlag(flags, ModelFlag::Static))
-    {
-        flagList += "Static";
-    }
-    if (HasFlag(flags, ModelFlag::Invisible))
-    {
-        if (!flagList.empty()) flagList += " ";
-        flagList += "Invisible";
-    }
-    if (HasFlag(flags, ModelFlag::Unbreakable))
-    {
-        if (!flagList.empty()) flagList += " ";
-        flagList += "Unbreakable";
-    }
-    if (HasFlag(flags, ModelFlag::NoSaleable))
-    {
-        if (!flagList.empty()) flagList += " ";
-        flagList += "NoSaleable";
-    }
-    if (HasFlag(flags, ModelFlag::TwoHand))
-    {
-        if (!flagList.empty()) flagList += " ";
-        flagList += "TwoHand";
-    }
-    return flagList;
-}
-
-std::string GetRoomFlagString(unsigned int flags)
-{
-    std::string flagList;
-    if (HasFlag(flags, RoomFlag::Rent))
-    {
-        flagList += "Rent";
-    }
-    if (HasFlag(flags, RoomFlag::Peaceful))
-    {
-        if (!flagList.empty()) flagList += " ";
-        flagList += "Peaceful";
-    }
-    if (HasFlag(flags, RoomFlag::TravelPoint))
-    {
-        if (!flagList.empty()) flagList += " ";
-        flagList += "TravelPoint";
-    }
-    if (HasFlag(flags, RoomFlag::SpawnPoint))
-    {
-        if (!flagList.empty()) flagList += " ";
-        flagList += "SpawnPoint";
-    }
-    return flagList;
-}
-
-std::string GetCharacterFlagString(unsigned int flags)
-{
-    std::string flagList;
-    if (HasFlag(flags, CharacterFlag::IsGod))
-    {
-        flagList += "IsGod";
-    }
-    if (HasFlag(flags, CharacterFlag::Invisible))
-    {
-        if (!flagList.empty()) flagList += " ";
-        flagList += "Invisible";
-    }
-    return flagList;
-}
-
-std::string GetExitFlagString(unsigned int flags)
-{
-    std::string flagList;
-    if (HasFlag(flags, ExitFlag::NoMob))
-    {
-        flagList += "NoMob";
-    }
-    if (HasFlag(flags, ExitFlag::Hidden))
-    {
-        if (!flagList.empty()) flagList += " ";
-        flagList += "Hidden";
-    }
-    if (HasFlag(flags, ExitFlag::Stairs))
-    {
-        if (!flagList.empty()) flagList += " ";
-        flagList += "Stairs";
-    }
-    return flagList;
-}
-
-std::string GetContainerFlagString(unsigned int flags)
-{
-    std::string flagList;
-    if (HasFlag(flags, ContainerFlag::CanClose))
-    {
-        flagList += "CanClose";
-    }
-    if (HasFlag(flags, ContainerFlag::CanBurgle))
-    {
-        if (!flagList.empty()) flagList += " ";
-        flagList += "CanBurgle";
-    }
-    if (HasFlag(flags, ContainerFlag::CanSee))
-    {
-        if (!flagList.empty()) flagList += " ";
-        flagList += "CanSee";
-    }
-    return flagList;
-}
-
-std::string GetLiqContainerFlagString(unsigned int flags)
-{
-    std::string flagList;
-    if (HasFlag(flags, LiqContainerFlag::Poisoned))
-    {
-        flagList += "Poisoned";
-    }
-    if (HasFlag(flags, LiqContainerFlag::Endless))
-    {
-        if (!flagList.empty()) flagList += " ";
-        flagList += "Endless";
-    }
-    if (HasFlag(flags, LiqContainerFlag::Destroy))
-    {
-        if (!flagList.empty()) flagList += " ";
-        flagList += "Destroy";
-    }
-    return flagList;
-}
-
-std::string GetFoodFlagString(unsigned int flags)
-{
-    std::string flagList;
-    if (HasFlag(flags, FoodFlag::Poisoned))
-    {
-        flagList += "Poisoned";
-    }
-    if (HasFlag(flags, FoodFlag::Raw))
-    {
-        if (!flagList.empty()) flagList += " ";
-        flagList += "Raw";
-    }
-    return flagList;
 }

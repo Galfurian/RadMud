@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef RACE_HPP
-#define RACE_HPP
+#pragma once
 
 #include <vector>
 #include <string>
@@ -27,7 +26,7 @@
 #include "lua/lua_script.hpp"
 #include "material.hpp"
 #include "faction.hpp"
-#include "model.hpp"
+#include "model/corpseModel.hpp"
 
 /// @brief Holds details about a race.
 class Race
@@ -55,7 +54,7 @@ class Race
         /// TileId of the icon.
         int tileId;
         /// Corpse model.
-        Model corpse;
+        CorpseModel corpse;
 
         /// @brief Constructor.
         Race();
@@ -133,5 +132,3 @@ typedef std::vector<Race *> RaceList;
 
 /// Race map handler.
 typedef std::map<int, Race *> RaceMap;
-
-#endif

@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef EFFECT_HPP
-#define EFFECT_HPP
+#pragma once
 
 #include "defines.hpp"
 #include "utils.hpp"
@@ -39,14 +38,18 @@ class Effect
         /// Stamina modifier.
         int stamina;
         /// Abilities modifier.
-        std::map<Ability, unsigned int> abilities;
+        std::map<Ability, int> abilities;
         /// Hit chance modifier.
         int hit;
         /// Damage modifier.
         int damage;
 
         /// @brief Constructor.
-        Effect(std::string _name, int _expires, std::string _messageActivate, std::string _messageFade);
+        Effect(
+            std::string _name,
+            int _expires,
+            std::string _messageActivate,
+            std::string _messageFade);
 
         /// @brief Destructor.
         ~Effect();
@@ -128,5 +131,3 @@ class EffectList
         /// @brief Provides an iterator to the end of the list of active effects.
         iterator end();
 };
-
-#endif

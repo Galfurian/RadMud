@@ -24,20 +24,23 @@
 #include "logger.hpp"
 #include "constants.hpp"
 
+#include "model/nodeModel.hpp"
+#include "model/weaponModel.hpp"
+
 Action::Action(Character * _character) :
-    type(ActionType::Wait),
-    actor(_character),
-    target(),
-    itemTarget(),
-    destination(),
-    direction(Direction::None),
-    production(),
-    schematics(),
-    craftMaterial(),
-    usedTools(),
-    usedIngredients(),
-    actionCooldown(),
-    combatAction()
+        type(ActionType::Wait),
+        actor(_character),
+        target(),
+        itemTarget(),
+        destination(),
+        direction(Direction::None),
+        production(),
+        schematics(),
+        craftMaterial(),
+        usedTools(),
+        usedIngredients(),
+        actionCooldown(),
+        combatAction()
 {
     // Nothing to do.
 }
@@ -284,7 +287,11 @@ bool Action::setNextCombatAction(const CombatAction & nextAction)
     // Set the action cooldown.
     unsigned int cooldown = actor->getCooldown(combatAction);
     actionCooldown = std::chrono::system_clock::now() + std::chrono::seconds(cooldown);
-    Logger::log(LogLevel::Debug, "[%s] Next action in %s.", actor->getNameCapital(), ToString(cooldown));
+    Logger::log(
+        LogLevel::Debug,
+        "[%s] Next action in %s.",
+        actor->getNameCapital(),
+        ToString(cooldown));
     return true;
 }
 
@@ -307,7 +314,8 @@ void Action::reset()
 bool Action::checkElapsed()
 {
     TimeClock currentTime = std::chrono::system_clock::now();
-    return (std::chrono::duration_cast<std::chrono::seconds>(actionCooldown - currentTime).count() <= 0);
+    return (std::chrono::duration_cast<std::chrono::seconds>(actionCooldown - currentTime).count()
+        <= 0);
 }
 
 void Action::performMove()
@@ -328,7 +336,8 @@ void Action::performMove()
         actor->moveTo(
             destination,
             actor->getNameCapital() + " goes " + GetDirectionName(direction) + ".\n",
-            actor->getNameCapital() + " arives from " + GetDirectionName(InverDirection(direction)) + ".\n");
+            actor->getNameCapital() + " arives from " + GetDirectionName(InverDirection(direction))
+                + ".\n");
     }
     else
     {
@@ -376,8 +385,17 @@ void Action::performMine()
         actor->sendMsg("You have failed your action.\n");
         return;
     }
+    if (itemTarget->model->getType() != ModelType::Node)
+    {
+        // Log a warning.
+        Logger::log(LogLevel::Warning, "%s:mine = Vein is node a node.", actor->getName());
+        // Notify the character.
+        actor->sendMsg("You have failed your action.\n");
+        return;
+    }
+    NodeModel * node = itemTarget->model->toNode();
     // Retrieve the product.
-    Model * product = Mud::instance().findModel(static_cast<int>(itemTarget->model->getNodeFunc().provides));
+    ItemModel * product = Mud::instance().findItemModel(static_cast<int>(node->provides));
     // Check if the product exists.
     if (product == nullptr)
     {
@@ -405,7 +423,9 @@ void Action::performMine()
     if (newItem == nullptr)
     {
         // Log a warning.
-        Logger::log(LogLevel::Warning, actor->getName() + ":mine = The new item is a null pointer.");
+        Logger::log(
+            LogLevel::Warning,
+            actor->getName() + ":mine = The new item is a null pointer.");
         // Rollback the database.
         SQLiteDbms::instance().rollbackTransection();
         // Notify the character.
@@ -433,7 +453,10 @@ void Action::performMine()
         CharacterVector exceptions;
         exceptions.push_back(actor);
         // Send the message inside the room.
-        actor->room->sendToAll("%s crumbles into pieces.\n", exceptions, itemTarget->getNameCapital());
+        actor->room->sendToAll(
+            "%s crumbles into pieces.\n",
+            exceptions,
+            itemTarget->getNameCapital());
         // Destroy the vein.
         itemTarget->destroy();
     }
@@ -482,8 +505,17 @@ void Action::performChop()
         actor->sendMsg("\nYou have failed your action.\n");
         return;
     }
+    if (itemTarget->model->getType() != ModelType::Node)
+    {
+        // Log a warning.
+        Logger::log(LogLevel::Warning, "%s:chop = Vein is node a node.", actor->getName());
+        // Notify the character.
+        actor->sendMsg("You have failed your action.\n");
+        return;
+    }
+    NodeModel * node = itemTarget->model->toNode();
     // Retrieve the product.
-    Model * product = Mud::instance().findModel(static_cast<int>(itemTarget->model->getNodeFunc().provides));
+    ItemModel * product = Mud::instance().findItemModel(static_cast<int>(node->provides));
     // Check if the product exists.
     if (product == nullptr)
     {
@@ -511,7 +543,9 @@ void Action::performChop()
     if (newItem == nullptr)
     {
         // Log a warning.
-        Logger::log(LogLevel::Warning, actor->getName() + ":chop = The new item is a null pointer.");
+        Logger::log(
+            LogLevel::Warning,
+            actor->getName() + ":chop = The new item is a null pointer.");
         // Rollback the database.
         SQLiteDbms::instance().rollbackTransection();
         // Notify the character.
@@ -607,7 +641,9 @@ void Action::performCraft()
         if (iterator == nullptr)
         {
             // Log a warning.
-            Logger::log(LogLevel::Warning, actor->getName() + ":craft = One ingredient is a null pointer.");
+            Logger::log(
+                LogLevel::Warning,
+                actor->getName() + ":craft = One ingredient is a null pointer.");
             // Notify the character.
             actor->sendMsg("\nYou have failed your action.\n");
             return;
@@ -618,7 +654,9 @@ void Action::performCraft()
         if (iterator == nullptr)
         {
             // Log a warning.
-            Logger::log(LogLevel::Warning, actor->getName() + ":craft = One tool is a null pointer.");
+            Logger::log(
+                LogLevel::Warning,
+                actor->getName() + ":craft = One tool is a null pointer.");
             // Notify the character.
             actor->sendMsg("\nYou have failed your action.\n");
             return;
@@ -629,7 +667,9 @@ void Action::performCraft()
     if (craftMaterial == nullptr)
     {
         // Log a warning.
-        Logger::log(LogLevel::Warning, actor->getName() + ":craft = Crafting material is a null pointer.");
+        Logger::log(
+            LogLevel::Warning,
+            actor->getName() + ":craft = Crafting material is a null pointer.");
         // Notify the character.
         actor->sendMsg("\nYou have failed your action.\n");
         return;
@@ -657,13 +697,18 @@ void Action::performCraft()
     ItemVector createdItems;
     for (unsigned int it = 0; it < production->outcome.second; ++it)
     {
-        Model * outcomeMode = production->outcome.first;
+        ItemModel * outcomeModel = production->outcome.first;
         // Create the item.
-        Item * newItem = outcomeMode->createItem(actor->getName(), craftMaterial, ItemQuality::Normal);
+        Item * newItem = outcomeModel->createItem(
+            actor->getName(),
+            craftMaterial,
+            ItemQuality::Normal);
         if (newItem == nullptr)
         {
             // Log a warning.
-            Logger::log(LogLevel::Warning, actor->getName() + ":craft = New item is a null pointer.");
+            Logger::log(
+                LogLevel::Warning,
+                actor->getName() + ":craft = New item is a null pointer.");
             // Rollback the database.
             SQLiteDbms::instance().rollbackTransection();
             // Delete all the items created so far.
@@ -702,7 +747,8 @@ void Action::performCraft()
 
     if (dropped)
     {
-        actor->sendMsg("Since you can't carry them, some of the items have been placed on the ground.\n\n");
+        actor->sendMsg(
+            "Since you can't carry them, some of the items have been placed on the ground.\n\n");
     }
 
     // Return the character in waiting status.
@@ -719,7 +765,7 @@ void Action::performBuild()
 
     unsigned int consumedStamina;
     // Check if the actor has enough stamina to execute the action.
-    if (!actor->hasStaminaFor(consumedStamina, ActionType::Crafting))
+    if (!actor->hasStaminaFor(consumedStamina, ActionType::Building))
     {
         actor->sendMsg("You are too tired right now.\n");
         Logger::log(
@@ -751,7 +797,9 @@ void Action::performBuild()
         if (iterator == nullptr)
         {
             // Log a warning.
-            Logger::log(LogLevel::Warning, actor->getName() + ":craft = One ingredient is a null pointer.");
+            Logger::log(
+                LogLevel::Warning,
+                actor->getName() + ":craft = One ingredient is a null pointer.");
             // Notify the character.
             actor->sendMsg("\nYou have failed your action.\n");
             // Reset the action values.
@@ -764,7 +812,9 @@ void Action::performBuild()
         if (iterator == nullptr)
         {
             // Log a warning.
-            Logger::log(LogLevel::Warning, actor->getName() + ":craft = One tool is a null pointer.");
+            Logger::log(
+                LogLevel::Warning,
+                actor->getName() + ":craft = One tool is a null pointer.");
             // Notify the character.
             actor->sendMsg("\nYou have failed your action.\n");
             // Reset the action values.
@@ -795,7 +845,9 @@ void Action::performBuild()
     if (schematics->buildingModel == nullptr)
     {
         // Log a warning.
-        Logger::log(LogLevel::Warning, actor->getName() + ":craft = The building model is a null pointer.");
+        Logger::log(
+            LogLevel::Warning,
+            actor->getName() + ":craft = The building model is a null pointer.");
         // Notify the character.
         actor->sendMsg("\nYou have failed your action.\n");
         // Reset the action values.
@@ -865,13 +917,14 @@ void Action::performCombatAction(const CombatAction & move)
         {
             for (auto iterator : activeWeapons)
             {
-                // Get the weapon function.
-                WeaponFunc function = iterator->model->getWeaponFunc();
+                WeaponModel * weapon = iterator->model->toWeapon();
                 // Get the top aggro enemy at range.
-                Character * enemy = actor->getNextOpponentAtRange(function.range);
+                Character * enemy = actor->getNextOpponentAtRange(weapon->range);
                 if (enemy == nullptr)
                 {
-                    actor->sendMsg("You do not have opponents at reange for %s.\n", iterator->getName());
+                    actor->sendMsg(
+                        "You do not have opponents at reange for %s.\n",
+                        iterator->getName());
                     continue;
                 }
                 // Will contain the required stamina.
@@ -936,13 +989,21 @@ void Action::performCombatAction(const CombatAction & move)
                 // Evaluate the armor class of the enemy.
                 unsigned int AC = enemy->getArmorClass();
                 // Log the overall attack roll.
-                Logger::log(LogLevel::Debug, "[%s] Attack roll %s vs %s.", nam, ToString(ATK), ToString(AC));
+                Logger::log(
+                    LogLevel::Debug,
+                    "[%s] Attack roll %s vs %s.",
+                    nam,
+                    ToString(ATK),
+                    ToString(AC));
                 // Check if:
                 //  1. The attack roll is lesser than the armor class of the opponent.
                 //  2. The attack roll is not a natural 20.
                 if ((ATK < AC) && (ATK != 20))
                 {
-                    actor->sendMsg("You miss %s with %s.\n", enemy->getName(), iterator->getName());
+                    actor->sendMsg(
+                        "You miss %s with %s.\n\n",
+                        enemy->getName(),
+                        iterator->getName());
                     enemy->sendMsg("%s misses you with %s.\n\n", nam, iterator->getName());
                 }
                 else
@@ -950,13 +1011,15 @@ void Action::performCombatAction(const CombatAction & move)
                     // Store the type of attack.
                     std::string critical;
                     // Natural roll for the damage.
-                    unsigned int DMG = TRandInteger<unsigned int>(function.minDamage, function.maxDamage);
+                    unsigned int DMG = TRandInteger<unsigned int>(
+                        weapon->minDamage,
+                        weapon->maxDamage);
                     // Log the damage roll.
                     Logger::log(LogLevel::Debug, "[%s] Rolls a damage of %s.", nam, ToString(DMG));
                     // Check if the character is wielding a two-handed weapon.
                     if (activeWeapons.size() == 1)
                     {
-                        if (HasFlag(iterator->model->flags, ModelFlag::TwoHand))
+                        if (HasFlag(iterator->model->modelFlags, ModelFlag::TwoHand))
                         {
                             // Get the strenth modifier.
                             unsigned int STR = actor->getAbilityModifier(Ability::Strength);
@@ -980,23 +1043,39 @@ void Action::performCombatAction(const CombatAction & move)
                         enemy->getName(),
                         ToString(DMG),
                         iterator->getName());
-                    // Send the messages to the characters.
-                    actor->sendMsg(
-                        "You %s hit %s with %s for %s.\n",
-                        critical,
-                        enemy->getName(),
-                        iterator->getName(),
-                        ToString(DMG));
-                    enemy->sendMsg(
-                        "%s %s hits you with %s for %s.\n\n",
-                        nam,
-                        critical,
-                        iterator->getName(),
-                        ToString(DMG));
                     // Procede and remove the damage from the health of the target.
                     if (!enemy->remHealth(DMG))
                     {
+                        actor->sendMsg(
+                            "You %s hit %s with %s and kill %s.\n\n",
+                            critical,
+                            enemy->getName(),
+                            iterator->getName(),
+                            enemy->getObjectPronoun());
+                        enemy->sendMsg(
+                            "%s %s hits you with %s and kill you.\n\n",
+                            nam,
+                            critical,
+                            iterator->getName());
+                        // The enemy has received the damage and now it is dead.
                         enemy->kill();
+                        continue;
+                    }
+                    else
+                    {
+                        // The enemy has received the damage but it is still alive.
+                        actor->sendMsg(
+                            "You %s hit %s with %s for %s.\n\n",
+                            critical,
+                            enemy->getName(),
+                            iterator->getName(),
+                            ToString(DMG));
+                        enemy->sendMsg(
+                            "%s %s hits you with %s for %s.\n\n",
+                            nam,
+                            critical,
+                            iterator->getName(),
+                            ToString(DMG));
                     }
                 }
             }
@@ -1035,7 +1114,8 @@ void Action::performCombatAction(const CombatAction & move)
             if (!directions.empty())
             {
                 // Pick a random direction, from the poll of the available ones.
-                Direction randomDirection = directions.at(TRandInteger<size_t>(0, directions.size() - 1));
+                Direction randomDirection = directions.at(
+                    TRandInteger<size_t>(0, directions.size() - 1));
                 // Get the selected exit.
                 std::shared_ptr<Exit> selected = actor->room->findExit(randomDirection);
                 // Check that the picked exit is not a null pointer.
@@ -1062,6 +1142,16 @@ void Action::performCombatAction(const CombatAction & move)
     // By default set the next combat action to basic attack.
     if (!this->setNextCombatAction(CombatAction::BasicAttack))
     {
-        actor->sendMsg(this->stop());
+        actor->sendMsg(this->stop() + "\n\n");
     }
+}
+
+std::string GetActionTypeName(ActionType type)
+{
+    if (type == ActionType::Wait) return "Waiting";
+    if (type == ActionType::Move) return "Moving";
+    if (type == ActionType::Crafting) return "Crafting";
+    if (type == ActionType::Building) return "Building";
+    if (type == ActionType::Combat) return "Fighting";
+    return "No Action";
 }

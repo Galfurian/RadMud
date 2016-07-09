@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef EXIT_HPP
-#define EXIT_HPP
+#pragma once
 
 #include <string>
 #include <vector>
@@ -89,4 +88,10 @@ class Exit
 /// Exit list handler.
 typedef std::vector<std::shared_ptr<Exit> > ExitVector;
 
-#endif
+/// @addtogroup FlagsToList
+/// @{
+
+/// Return a list of string containg the Exit flags contained inside the value.
+std::string GetExitFlagString(unsigned int flags);
+
+/// @}

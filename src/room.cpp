@@ -30,21 +30,22 @@
 #include "formatter.hpp"
 #include "generator.hpp"
 #include "luabridge/LuaBridge.h"
+#include "model/mechanismModel.hpp"
 
 using namespace std;
 
 Room::Room() :
-    vnum(),
-    area(),
-    continent(),
-    coord(),
-    terrain(),
-    name(),
-    description(),
-    exits(),
-    items(),
-    characters(),
-    flags()
+        vnum(),
+        area(),
+        continent(),
+        coord(),
+        terrain(),
+        name(),
+        description(),
+        exits(),
+        items(),
+        characters(),
+        flags()
 {
     // Nothing to do.
 }
@@ -108,7 +109,9 @@ void Room::removeItem(Item * item)
 {
     if (FindErase(items, item))
     {
-        Logger::log(LogLevel::Debug, "Item '" + item->getName() + "' removed from '" + this->name + "';");
+        Logger::log(
+            LogLevel::Debug,
+            "Item '" + item->getName() + "' removed from '" + this->name + "';");
         item->room = nullptr;
     }
     else
@@ -121,7 +124,9 @@ void Room::removeBuilding(Item * item)
 {
     if (FindErase(items, item))
     {
-        Logger::log(LogLevel::Debug, "Building '" + item->getName() + "' removed from '" + this->name + "';");
+        Logger::log(
+            LogLevel::Debug,
+            "Building '" + item->getName() + "' removed from '" + this->name + "';");
         item->room = nullptr;
         ClearFlag(item->flags, ItemFlag::Built);
     }
@@ -276,7 +281,7 @@ ItemVector Room::findBuildings(ModelType type)
     ItemVector buildingsList;
     for (auto iterator : items)
     {
-        if ((iterator->model->type == type) && HasFlag(iterator->flags, ItemFlag::Built))
+        if ((iterator->model->getType() == type) && HasFlag(iterator->flags, ItemFlag::Built))
         {
             buildingsList.push_back(iterator);
         }
@@ -432,12 +437,14 @@ Item * Room::findDoor()
 {
     for (auto iterator : items)
     {
-        if ((iterator->model->type == ModelType::Mechanism) && HasFlag(iterator->flags, ItemFlag::Built))
+        if (iterator->model->getType() == ModelType::Mechanism)
         {
-            MechanismFunc mechanismFunc = iterator->model->getMechanismFunc();
-            if (mechanismFunc.type == MechanismType::Door)
+            if (HasFlag(iterator->flags, ItemFlag::Built))
             {
-                return iterator;
+                if (iterator->model->toMechanism()->mechanismType == MechanismType::Door)
+                {
+                    return iterator;
+                }
             }
         }
     }
@@ -508,7 +515,9 @@ string Room::getLook(Character * exception)
         }
         else if (continent != nullptr)
         {
-            std::vector<std::string> layers = continent->drawFov(this, exception->getViewDistance());
+            std::vector<std::string> layers = continent->drawFov(
+                this,
+                exception->getViewDistance());
             output += Formatter::doClearMap();
             for (auto layer : layers)
             {
@@ -524,7 +533,7 @@ string Room::getLook(Character * exception)
     for (auto it : GroupItems(items))
     {
         // If the item is invisible, don't show it.
-        if (HasFlag(it.first->model->flags, ModelFlag::Invisible))
+        if (HasFlag(it.first->model->modelFlags, ModelFlag::Invisible))
         {
             continue;
         }
@@ -537,12 +546,13 @@ string Room::getLook(Character * exception)
         // If there are more of this item, show the counter.
         if (it.second > 1)
         {
-            output += Formatter::cyan() + it.first->getNameCapital() + Formatter::reset() + " are here.["
-                + ToString(it.second) + "]\n";
+            output += Formatter::cyan() + it.first->getNameCapital() + Formatter::reset()
+                + " are here.[" + ToString(it.second) + "]\n";
         }
         else
         {
-            output += Formatter::cyan() + it.first->getNameCapital() + Formatter::reset() + " is here.\n";
+            output += Formatter::cyan() + it.first->getNameCapital() + Formatter::reset()
+                + " is here.\n";
         }
     }
 
@@ -628,9 +638,13 @@ bool CreateRoom(Coordinates<int> coord, Room * source_room)
     new_room->area = source_room->area;
     new_room->coord = coord;
     new_room->terrain = source_room->terrain;
-    new_room->name = Generator::instance().generateName(source_room->area->type, source_room->area->status);
-    new_room->description = Generator::instance().generateDescription(source_room->area->type,
-        source_room->area->status, new_room->name);
+    new_room->name = Generator::instance().generateName(
+        source_room->area->type,
+        source_room->area->status);
+    new_room->description = Generator::instance().generateDescription(
+        source_room->area->type,
+        source_room->area->status,
+        new_room->name);
     new_room->flags = 0;
 
     // Insert into table Room the newly created room.
@@ -682,11 +696,15 @@ bool CreateRoom(Coordinates<int> coord, Room * source_room)
         SQLiteDbms::instance().rollbackTransection();
         if (!Mud::instance().remRoom(new_room))
         {
-            Logger::log(LogLevel::Error, "During rollback I was not able to remove the room from the mud.\n");
+            Logger::log(
+                LogLevel::Error,
+                "During rollback I was not able to remove the room from the mud.\n");
         }
         if (!new_room->area->remRoom(new_room))
         {
-            Logger::log(LogLevel::Error, "During rollback I was not able to remove the room from the area.\n");
+            Logger::log(
+                LogLevel::Error,
+                "During rollback I was not able to remove the room from the area.\n");
         }
         delete (new_room);
         return false;
@@ -710,7 +728,11 @@ bool ConnectRoom(Room * room)
         {
             // Create the two exits.
             std::shared_ptr<Exit> forward = std::make_shared<Exit>(room, near, iterator.second, 0);
-            std::shared_ptr<Exit> backward = std::make_shared<Exit>(near, room, forward->getOppositeDirection(), 0);
+            std::shared_ptr<Exit> backward = std::make_shared<Exit>(
+                near,
+                room,
+                forward->getOppositeDirection(),
+                0);
             generatedExits.push_back(forward);
             generatedExits.push_back(backward);
 
@@ -763,4 +785,15 @@ bool ConnectRoom(Room * room)
         }
     }
     return status;
+}
+
+std::string GetRoomFlagString(unsigned int flags)
+{
+    std::string flagList;
+    if (HasFlag(flags, RoomFlag::Rent)) flagList += "|Rent";
+    if (HasFlag(flags, RoomFlag::Peaceful)) flagList += "|Peaceful";
+    if (HasFlag(flags, RoomFlag::TravelPoint)) flagList += "|TravelPoint";
+    if (HasFlag(flags, RoomFlag::SpawnPoint)) flagList += "|SpawnPoint";
+    flagList += "|";
+    return flagList;
 }

@@ -17,8 +17,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef TABLE_HPP
-#define TABLE_HPP
+#pragma once
 
 #include <string>
 #include <vector>
@@ -121,5 +120,3 @@ class Table
         /// @return The total width.
         size_t getTotalWidth();
 };
-
-#endif

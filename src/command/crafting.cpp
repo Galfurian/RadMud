@@ -1,4 +1,4 @@
-/// @file   comm_crafting.cpp
+/// @file   crafting.cpp
 /// @brief  Implements the methods used by the player in order to <b>craft items</b>.
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2014
@@ -16,12 +16,9 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-// Basic Include.
-#include <istream>
-
-#include "commands.hpp"
-// Other Include.
-#include "mud.hpp"
+#include "command.hpp"
+#include "../mud.hpp"
+#include "../model/resourceModel.hpp"
 
 using namespace std;
 
@@ -61,7 +58,7 @@ void DoProfession(Character * character, Profession * profession, std::istream &
     }
     // Search the needed tools.
     ItemVector usedTools;
-    if (!character->findNearbyTools(production->tools, usedTools))
+    if (!character->findNearbyTools(production->tools, usedTools, false, true, true))
     {
         character->sendMsg("You don't have the right tools.\n");
         return;
@@ -76,31 +73,28 @@ void DoProfession(Character * character, Profession * profession, std::istream &
     // Search the needed workbench.
     if (production->workbench != ToolType::NoType)
     {
-        bool found = false;
-        for (auto it : character->room->items)
-        {
-            if (it->model->getToolFunc().type == production->workbench)
-            {
-                found = true;
-                break;
-            }
-        }
-        if (!found)
+        Item * workbench = character->findNearbyTool(production->workbench, ItemVector(),
+        true,
+        false,
+        false);
+        if (workbench == nullptr)
         {
             character->sendMsg("The proper workbench is not present.\n");
             return;
         }
     }
-
     // Search the production material among the selected ingredients.
     Material * craftMaterial = nullptr;
     for (auto iterator : usedIngredients)
     {
-        ResourceType itemResourceType = iterator->model->getResourceFunc().type;
-        if (itemResourceType == production->material)
+        if (iterator->model->getType() == ModelType::Resource)
         {
-            craftMaterial = iterator->composition;
-            break;
+            ResourceModel * resourceModel = iterator->model->toResource();
+            if (resourceModel->resourceType == production->material)
+            {
+                craftMaterial = iterator->composition;
+                break;
+            }
         }
     }
     if (craftMaterial == nullptr)
@@ -111,7 +105,12 @@ void DoProfession(Character * character, Profession * profession, std::istream &
 
     // //////////////////////////////////////////
     // Prepare the action.
-    if (!character->getAction()->setCraft(production, usedTools, usedIngredients, craftMaterial, production->time))
+    if (!character->getAction()->setCraft(
+        production,
+        usedTools,
+        usedIngredients,
+        craftMaterial,
+        production->time))
     {
         character->sendMsg("You can't start the process of production.\n");
         return;
@@ -164,7 +163,7 @@ void DoBuild(Character * character, std::istream & sArgs)
     }
     // Search the needed tools.
     ItemVector usedTools;
-    if (!character->findNearbyTools(schematics->tools, usedTools))
+    if (!character->findNearbyTools(schematics->tools, usedTools, true, true, true))
     {
         character->sendMsg("You don't have the right tools.\n");
         return;
@@ -228,7 +227,12 @@ void DoBuild(Character * character, std::istream & sArgs)
 
     // //////////////////////////////////////////
     // Prepare the action.
-    if (!character->getAction()->setBuild(schematics, building, usedTools, usedIngredients, schematics->time))
+    if (!character->getAction()->setBuild(
+        schematics,
+        building,
+        usedTools,
+        usedIngredients,
+        schematics->time))
     {
         character->sendMsg("You can't start the building.\n");
         return;

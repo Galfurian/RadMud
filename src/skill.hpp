@@ -16,8 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#ifndef SKILL_HPP
-#define SKILL_HPP
+#pragma once
 
 #include <string>
 #include <vector>
@@ -61,5 +60,3 @@ class Skill
 
 /// Map of skills with values.
 typedef std::map<int, Skill *> SkillMap;
-
-#endif
