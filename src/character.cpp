@@ -79,10 +79,6 @@ bool Character::check()
     safe &= SafeAssert(weight > 0);
     safe &= SafeAssert(race != nullptr);
     safe &= SafeAssert(faction != nullptr);
-    safe &= SafeAssert(health > 0);
-    safe &= SafeAssert(stamina > 0);
-    safe &= SafeAssert(hunger > 0);
-    safe &= SafeAssert(thirst > 0);
     safe &= SafeAssert(abilities[Ability::Strength] > 0);
     safe &= SafeAssert(abilities[Ability::Strength] <= 60);
     safe &= SafeAssert(abilities[Ability::Agility] > 0);
