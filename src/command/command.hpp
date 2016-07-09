@@ -246,6 +246,8 @@ void DoShutdown(Character * character, std::istream & sArgs);
 void DoGoTo(Character * character, std::istream & sArgs);
 /// Transfer a character from room to room.
 void DoTransfer(Character * character, std::istream & sArgs);
+/// Regain completely health and stamina.
+void DoFeast(Character * character, std::istream & sArgs);
 /// Get information about a character.
 void DoGodInfo(Character * character, std::istream &sArgs);
 /// Set a flag to a character.

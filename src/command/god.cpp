@@ -140,6 +140,28 @@ void DoTransfer(Character * character, std::istream & sArgs)
     character->sendMsg("You transfer %s to room %s.\n", target->getName(), destination->name);
 }
 
+void DoFeast(Character * character, std::istream & sArgs)
+{
+    // Get the arguments of the command.
+    ArgumentList arguments = ParseArgs(sArgs);
+    if (arguments.size() != 1)
+    {
+        character->sendMsg("You must insert a valide target.\n");
+        return;
+    }
+    Character * target = character->room->findCharacter(arguments[0].first, arguments[0].second);
+    if (target == nullptr)
+    {
+        character->sendMsg("You must provide a valide target.\n");
+        return;
+    }
+    target->setHealth(target->getMaxHealth(), true);
+    target->setStamina(target->getMaxStamina(), true);
+    target->setThirst(100);
+    target->setHunger(100);
+    target->sendMsg("A banquet with any kind of delicacy appears from nowhere!");
+}
+
 void DoGodInfo(Character * character, std::istream & sArgs)
 {
     // Get the arguments of the command.

@@ -1626,6 +1626,13 @@ void LoadCommands()
         Mud::instance().addCommand(command);
     }
     {
+        command.name = "feast";
+        command.help = "Restores completely the health and the stamina of the target.";
+        command.args = "(Target)";
+        command.hndl = DoFeast;
+        Mud::instance().addCommand(command);
+    }
+    {
         command.name = "sflag";
         command.help = "Sets a flag for a character.";
         command.args = "(Target) (Flag)";
