@@ -41,11 +41,11 @@ bool Aggression::operator<(const Aggression & source) const
 }
 bool Aggression::operator==(const Aggression & source) const
 {
-    return (this->aggressor->getName() == source.aggressor->getName());
+    return (this->aggressor->name == source.aggressor->name);
 }
 bool Aggression::operator==(const Character * source) const
 {
-    return (this->aggressor->getName() == source->name);
+    return (this->aggressor->name == source->name);
 }
 
 OpponentsList::OpponentsList(Character * _owner) :
