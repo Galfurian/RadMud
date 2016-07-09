@@ -281,6 +281,7 @@ unsigned int Character::getMaxStamina(bool withEffects)
 void Character::updateResources()
 {
     unsigned int PosMod = 0;
+    unsigned int LogMod = this->getAbilityLog(Ability::Constitution, 0.0, 1.0);
     if (posture == CharacterPosture::Sit)
     {
         PosMod = 2;
@@ -291,19 +292,11 @@ void Character::updateResources()
     }
     if (this->health < this->getMaxHealth())
     {
-        unsigned int LogMod = this->getAbilityLog(Ability::Constitution, 0.0, 1.0);
-        // Value = 5 + ((1 + 3*LogMod(CON))*(1 + 2*PosMod))
-        // MIN   =  6.00
-        // MAX   = 51.74
-        this->addHealth(5 + ((1 + 3 * LogMod) * (1 + 2 * PosMod)), true);
+        this->addHealth((1 + 3 * LogMod) * (1 + 2 * PosMod), true);
     }
     if (this->stamina < this->getMaxStamina())
     {
-        unsigned int LogMod = this->getAbilityLog(Ability::Constitution, 0.0, 1.0);
-        // Value = 5 + ((1 + 4*LogMod(CON))*(1 + 3*PosMod))
-        // MIN   =  6.00
-        // MAX   = 90.69
-        this->addStamina(5 + ((1 + 4 * LogMod) * (1 + 3 * PosMod)), true);
+        this->addStamina((1 + 4 * LogMod) * (1 + 3 * PosMod), true);
     }
 }
 
@@ -549,10 +542,12 @@ Item * Character::findNearbyItem(std::string itemName, int & number)
     return item;
 }
 
-Item * Character::findNearbyTool(const ToolType & toolType, const ItemVector & exceptions,
-bool searchRoom,
-bool searchInventory,
-bool searchEquipment)
+Item * Character::findNearbyTool(
+    const ToolType & toolType,
+    const ItemVector & exceptions,
+    bool searchRoom,
+    bool searchInventory,
+    bool searchEquipment)
 {
     if (searchRoom)
     {
@@ -611,10 +606,12 @@ bool searchEquipment)
     return nullptr;
 }
 
-bool Character::findNearbyTools(ToolSet tools, ItemVector & foundOnes,
-bool searchRoom,
-bool searchInventory,
-bool searchEquipment)
+bool Character::findNearbyTools(
+    ToolSet tools,
+    ItemVector & foundOnes,
+    bool searchRoom,
+    bool searchInventory,
+    bool searchEquipment)
 {
     // TODO: Prepare a map with key the tool type and as value:
     //  Option A: A bool which determine if the tool has been found.
@@ -1318,11 +1315,11 @@ bool Character::hasStaminaFor(
     const CombatAction & combatAction,
     const EquipmentSlot & slot)
 {
-    // BASE     [1]
-    // STRENGTH [0   to 2.80]
-    // WEIGHT   [1.6 to 2.51]
-    // CARRIED  [0   to 2.48]
-    // WEAPON   [0   to 1.60]
+    // BASE     [+1.0]
+    // STRENGTH [-0.0 to -2.80]
+    // WEIGHT   [+1.6 to +2.51]
+    // CARRIED  [+0.0 to +2.48]
+    // WEAPON   [+0.0 to +1.60]
     // The base value.
     double BASE = 1.0;
     // The strength modifier.
