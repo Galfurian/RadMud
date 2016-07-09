@@ -765,7 +765,7 @@ void Action::performBuild()
 
     unsigned int consumedStamina;
     // Check if the actor has enough stamina to execute the action.
-    if (!actor->hasStaminaFor(consumedStamina, ActionType::Crafting))
+    if (!actor->hasStaminaFor(consumedStamina, ActionType::Building))
     {
         actor->sendMsg("You are too tired right now.\n");
         Logger::log(
@@ -1000,7 +1000,10 @@ void Action::performCombatAction(const CombatAction & move)
                 //  2. The attack roll is not a natural 20.
                 if ((ATK < AC) && (ATK != 20))
                 {
-                    actor->sendMsg("You miss %s with %s.\n", enemy->getName(), iterator->getName());
+                    actor->sendMsg(
+                        "You miss %s with %s.\n\n",
+                        enemy->getName(),
+                        iterator->getName());
                     enemy->sendMsg("%s misses you with %s.\n\n", nam, iterator->getName());
                 }
                 else
@@ -1040,23 +1043,39 @@ void Action::performCombatAction(const CombatAction & move)
                         enemy->getName(),
                         ToString(DMG),
                         iterator->getName());
-                    // Send the messages to the characters.
-                    actor->sendMsg(
-                        "You %s hit %s with %s for %s.\n",
-                        critical,
-                        enemy->getName(),
-                        iterator->getName(),
-                        ToString(DMG));
-                    enemy->sendMsg(
-                        "%s %s hits you with %s for %s.\n\n",
-                        nam,
-                        critical,
-                        iterator->getName(),
-                        ToString(DMG));
                     // Procede and remove the damage from the health of the target.
                     if (!enemy->remHealth(DMG))
                     {
+                        actor->sendMsg(
+                            "You %s hit %s with %s and kill %s.\n\n",
+                            critical,
+                            enemy->getName(),
+                            iterator->getName(),
+                            enemy->getObjectPronoun());
+                        enemy->sendMsg(
+                            "%s %s hits you with %s and kill you.\n\n",
+                            nam,
+                            critical,
+                            iterator->getName());
+                        // The enemy has received the damage and now it is dead.
                         enemy->kill();
+                        continue;
+                    }
+                    else
+                    {
+                        // The enemy has received the damage but it is still alive.
+                        actor->sendMsg(
+                            "You %s hit %s with %s for %s.\n\n",
+                            critical,
+                            enemy->getName(),
+                            iterator->getName(),
+                            ToString(DMG));
+                        enemy->sendMsg(
+                            "%s %s hits you with %s for %s.\n\n",
+                            nam,
+                            critical,
+                            iterator->getName(),
+                            ToString(DMG));
                     }
                 }
             }
@@ -1123,7 +1142,7 @@ void Action::performCombatAction(const CombatAction & move)
     // By default set the next combat action to basic attack.
     if (!this->setNextCombatAction(CombatAction::BasicAttack))
     {
-        actor->sendMsg(this->stop());
+        actor->sendMsg(this->stop() + "\n\n");
     }
 }
 

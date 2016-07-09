@@ -67,20 +67,20 @@ Item::~Item()
 bool Item::check(bool complete)
 {
     bool safe = true;
-    safe &= SafeAssert(vnum > 0);
-    safe &= SafeAssert(model != nullptr);
-    safe &= SafeAssert(!maker.empty());
-    safe &= SafeAssert(condition > 0);
-    safe &= SafeAssert(composition != nullptr);
-    safe &= SafeAssert(quality != ItemQuality::None);
+    safe &= CorrectAssert(vnum > 0);
+    safe &= CorrectAssert(model != nullptr);
+    safe &= CorrectAssert(!maker.empty());
+    safe &= CorrectAssert(condition > 0);
+    safe &= CorrectAssert(composition != nullptr);
+    safe &= CorrectAssert(quality != ItemQuality::None);
     if (complete)
     {
-        safe &= SafeAssert(!((room != nullptr) && (owner != nullptr)));
-        safe &= SafeAssert(!((room != nullptr) && (container != nullptr)));
-        safe &= SafeAssert(!((owner != nullptr) && (container != nullptr)));
-        safe &= SafeAssert((room != nullptr) || (owner != nullptr) || (container != nullptr));
+        safe &= CorrectAssert(!((room != nullptr) && (owner != nullptr)));
+        safe &= CorrectAssert(!((room != nullptr) && (container != nullptr)));
+        safe &= CorrectAssert(!((owner != nullptr) && (container != nullptr)));
+        safe &= CorrectAssert((room != nullptr) || (owner != nullptr) || (container != nullptr));
     }
-    //safe &= SafeAssert(currentSlot != EquipmentSlot::kNoEquipSlot);
+    //safe &= CorrectAssert(currentSlot != EquipmentSlot::kNoEquipSlot);
     if (!safe)
     {
         Logger::log(LogLevel::Error, "Item :" + ToString(vnum));
@@ -299,7 +299,6 @@ bool Item::hasKey(string key)
         std::string name = iterator;
         // Replace the symbols inside name.
         model->replaceSymbols(name, composition, quality);
-        Logger::log(LogLevel::Debug, "Item name: %s", name);
         if (BeginWith(name, key))
         {
             return true;

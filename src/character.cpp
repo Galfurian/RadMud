@@ -74,24 +74,24 @@ Character::~Character()
 bool Character::check()
 {
     bool safe = true;
-    safe &= SafeAssert(!name.empty());
-    safe &= SafeAssert(!description.empty());
-    safe &= SafeAssert(weight > 0);
-    safe &= SafeAssert(race != nullptr);
-    safe &= SafeAssert(faction != nullptr);
-    safe &= SafeAssert(abilities[Ability::Strength] > 0);
-    safe &= SafeAssert(abilities[Ability::Strength] <= 60);
-    safe &= SafeAssert(abilities[Ability::Agility] > 0);
-    safe &= SafeAssert(abilities[Ability::Agility] <= 60);
-    safe &= SafeAssert(abilities[Ability::Perception] > 0);
-    safe &= SafeAssert(abilities[Ability::Perception] <= 60);
-    safe &= SafeAssert(abilities[Ability::Constitution] > 0);
-    safe &= SafeAssert(abilities[Ability::Constitution] <= 60);
-    safe &= SafeAssert(abilities[Ability::Intelligence] > 0);
-    safe &= SafeAssert(abilities[Ability::Intelligence] <= 60);
-    safe &= SafeAssert(thirst > 0);
-    safe &= SafeAssert(room != nullptr);
-    safe &= SafeAssert(L != nullptr);
+    safe &= CorrectAssert(!name.empty());
+    safe &= CorrectAssert(!description.empty());
+    safe &= CorrectAssert(weight > 0);
+    safe &= CorrectAssert(race != nullptr);
+    safe &= CorrectAssert(faction != nullptr);
+    safe &= CorrectAssert(abilities[Ability::Strength] > 0);
+    safe &= CorrectAssert(abilities[Ability::Strength] <= 60);
+    safe &= CorrectAssert(abilities[Ability::Agility] > 0);
+    safe &= CorrectAssert(abilities[Ability::Agility] <= 60);
+    safe &= CorrectAssert(abilities[Ability::Perception] > 0);
+    safe &= CorrectAssert(abilities[Ability::Perception] <= 60);
+    safe &= CorrectAssert(abilities[Ability::Constitution] > 0);
+    safe &= CorrectAssert(abilities[Ability::Constitution] <= 60);
+    safe &= CorrectAssert(abilities[Ability::Intelligence] > 0);
+    safe &= CorrectAssert(abilities[Ability::Intelligence] <= 60);
+    safe &= CorrectAssert(thirst > 0);
+    safe &= CorrectAssert(room != nullptr);
+    safe &= CorrectAssert(L != nullptr);
     return safe;
 }
 
@@ -153,14 +153,14 @@ std::string Character::getStaticDesc()
     // Action
     if ((action.getType() != ActionType::NoAction) && (action.getType() != ActionType::Wait))
     {
-        desc += ", " + this->getPronoun() + " is ";
+        desc += ", " + this->getSubjectPronoun() + " is ";
         desc += action.getDescription();
     }
     desc += ".";
     return desc;
 }
 
-string Character::getPronoun()
+string Character::getSubjectPronoun()
 {
     if (gender == GenderType::Male) return "he";
     if (gender == GenderType::Female) return "she";
@@ -172,6 +172,13 @@ string Character::getPossessivePronoun()
     if (gender == GenderType::Male) return "his";
     if (gender == GenderType::Female) return "her";
     return "its";
+}
+
+std::string Character::getObjectPronoun()
+{
+    if (gender == GenderType::Male) return "him";
+    if (gender == GenderType::Female) return "her";
+    return "it";
 }
 
 bool Character::setAbility(const Ability & ability, const unsigned int & value)
@@ -1011,7 +1018,7 @@ string Character::getLook(Character * character)
     {
         output = "You look at " + character->getName() + ".\n";
         sent_be = "is";
-        sent_pronoun = character->getPronoun();
+        sent_pronoun = character->getSubjectPronoun();
     }
     else
     {
@@ -1157,36 +1164,11 @@ bool Character::canAttackWith(const EquipmentSlot & slot)
 
 bool Character::isAtRange(Character * target, const unsigned int & range)
 {
-    if (target == nullptr)
-    {
-        Logger::log(LogLevel::Error, "Received a null target.");
-        return false;
-    }
-    if (this->room == nullptr)
-    {
-        Logger::log(LogLevel::Error, "Character has a null room.");
-        return false;
-    }
-    if (this->room->area == nullptr)
-    {
-        Logger::log(LogLevel::Error, "Character's room has a null area.");
-        return false;
-    }
-    if (target->room == nullptr)
-    {
-        Logger::log(LogLevel::Error, "Target has a null room.");
-        return false;
-    }
-    if (target->room->area == nullptr)
-    {
-        Logger::log(LogLevel::Error, "Target's room has a null area.");
-        return false;
-    }
-    if (this->room->area != target->room->area)
-    {
-        Logger::log(LogLevel::Error, "Character and Target are not in the same area.");
-        return false;
-    }
+    if (WrongAssert(target == nullptr)) return false;
+    if (WrongAssert(this->room == nullptr)) return false;
+    if (WrongAssert(this->room->area == nullptr)) return false;
+    if (WrongAssert(target->room == nullptr)) return false;
+    if (WrongAssert(target->room->area == nullptr)) return false;
     return this->room->area->fastInSight(this->room->coord, target->room->coord, range);
 }
 
@@ -1552,7 +1534,7 @@ void Character::kill()
     // Reset the action of the character.
     this->getAction()->reset();
     // Reset the list of opponents.
-    this->opponents.aggressionList.clear();
+    this->opponents.resetList();
     // Remove the character from the current room.
     if (room != nullptr)
     {

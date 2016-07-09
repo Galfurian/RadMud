@@ -123,13 +123,14 @@ class Character
         /// @return The static description.
         std::string getStaticDesc();
 
-        /// @brief Return the correct pronoun of the character as a string.
-        /// @return The character pronoun.
-        std::string getPronoun();
+        /// @brief Return the subject pronoun for the character.
+        std::string getSubjectPronoun();
 
-        /// @brief Return the correct pronoun of the character as a string.
-        /// @return The character pronoun.
+        /// @brief Return the possessive pronoun for the character.
         std::string getPossessivePronoun();
+
+        /// @brief Return the object pronoun for the character.
+        std::string getObjectPronoun();
 
         /// @brief Allows to set the value of a given ability.
         /// @param ability The ability to set.

@@ -106,7 +106,7 @@ void DoTake(Character * character, std::istream & sArgs)
                 "%s has picked up everything %s could.\n",
                 exceptions,
                 character->getNameCapital(),
-                character->getPronoun());
+                character->getSubjectPronoun());
             return; // Skip the rest of the function.
         }
         Item * item = character->room->findItem(arguments[0].first, arguments[0].second);
@@ -249,7 +249,7 @@ void DoTake(Character * character, std::istream & sArgs)
                 "%s has taken everything %s could from %s.\n",
                 exceptions,
                 character->getNameCapital(),
-                character->getPronoun(),
+                character->getSubjectPronoun(),
                 Formatter::cyan() + ToLower(container->getName()) + Formatter::reset());
             return; // Skip the rest of the function.
         }
@@ -707,7 +707,7 @@ void DoWear(Character * character, std::istream & sArgs)
             "%s has weared all %s could.\n",
             exceptions,
             character->getNameCapital(),
-            character->getPronoun());
+            character->getSubjectPronoun());
         return; // Skip the rest of the function.
     }
 
@@ -1217,7 +1217,7 @@ void DoPut(Character * character, std::istream & sArgs)
             "%s puts everything %s could inside %s.\n",
             exceptions,
             character->getNameCapital(),
-            character->getPronoun(),
+            character->getSubjectPronoun(),
             Formatter::cyan() + ToLower(container->getName()) + Formatter::reset());
         return;
     }

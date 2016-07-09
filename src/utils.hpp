@@ -48,12 +48,19 @@ typedef std::chrono::time_point<std::chrono::seconds> TimeSEC;
 /// Clock type of time.
 typedef std::chrono::time_point<std::chrono::system_clock> TimeClock;
 
-/// Allows to define a non-aborting assertion.
-#define SafeAssert(e) ( (e) ? true : (\
+/// Allows to define a non-aborting assertion for correct guards.
+#define CorrectAssert(e) ( (e) ? true : (\
     std::cerr << "Assertion :"#e<<"\n",\
     std::cerr << "File      :"<<std::string(__FILE__)<<"\n",\
     std::cerr << "Line      :"<<ToString(__LINE__)<<"\n",\
     false))
+
+/// Allows to define a non-aborting assertion for wrong guards.
+#define WrongAssert(e) ( (e) ? (\
+    std::cerr << "Assertion :"#e<<"\n",\
+    std::cerr << "File      :"<<std::string(__FILE__)<<"\n",\
+    std::cerr << "Line      :"<<ToString(__LINE__)<<"\n",\
+    true) : false)
 
 /// @struct CommandHelp
 /// @brief  Contains the string for showing a command help.

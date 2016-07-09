@@ -104,18 +104,18 @@ Player::~Player()
 bool Player::check()
 {
     bool safe = Character::check();
-    safe &= SafeAssert(psocket > 0);
-    safe &= SafeAssert(port > 0);
-    safe &= SafeAssert(!address.empty());
-    safe &= SafeAssert(!password.empty());
-    safe &= SafeAssert(age > 0);
-    safe &= SafeAssert(experience >= 0);
-    safe &= SafeAssert(!prompt.empty());
-    safe &= SafeAssert(!prompt_save.empty());
-    safe &= SafeAssert(rent_room >= 0);
-    safe &= SafeAssert(connection_state != ConnectionState::NoState);
-    //safe &= SafeAssert(!skills.empty());
-    //safe &= SafeAssert(skills.size() == Mud::instance().mudSkills.size());
+    safe &= CorrectAssert(psocket > 0);
+    safe &= CorrectAssert(port > 0);
+    safe &= CorrectAssert(!address.empty());
+    safe &= CorrectAssert(!password.empty());
+    safe &= CorrectAssert(age > 0);
+    safe &= CorrectAssert(experience >= 0);
+    safe &= CorrectAssert(!prompt.empty());
+    safe &= CorrectAssert(!prompt_save.empty());
+    safe &= CorrectAssert(rent_room >= 0);
+    safe &= CorrectAssert(connection_state != ConnectionState::NoState);
+    //safe &= CorrectAssert(!skills.empty());
+    //safe &= CorrectAssert(skills.size() == Mud::instance().mudSkills.size());
     for (auto iterator : Mud::instance().mudSkills)
     {
         std::map<int, unsigned int>::iterator iterator2 = skills.find(iterator.first);
@@ -124,9 +124,9 @@ bool Player::check()
             skills.insert(std::make_pair(iterator.first, 1));
         }
     }
-    safe &= SafeAssert(password_attempts >= 0);
-    safe &= SafeAssert(!closing);
-    safe &= SafeAssert(!logged_in);
+    safe &= CorrectAssert(password_attempts >= 0);
+    safe &= CorrectAssert(!closing);
+    safe &= CorrectAssert(!logged_in);
     return safe;
 }
 
