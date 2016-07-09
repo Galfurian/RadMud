@@ -110,6 +110,14 @@ void DoTransfer(Character * character, std::istream & sArgs)
             }
         }
     }
+    if (target->isMobile())
+    {
+        if (!target->toMobile()->alive)
+        {
+            character->sendMsg("You cannot transfer a dead mobile.\n");
+            return;
+        }
+    }
     Room * destination = character->room;
     if (arguments.size() == 2)
     {
