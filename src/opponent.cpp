@@ -214,21 +214,49 @@ std::size_t OpponentsList::getSize()
 
 void OpponentsList::checkList()
 {
-    for (std::vector<Aggression>::iterator it = aggressionList.begin(); it != aggressionList.end();)
+    auto temporaryList = aggressionList;
+    for (AggressorVector::iterator it = temporaryList.begin(); it != temporaryList.end(); ++it)
     {
         // Check if the aggressor is null.
         if (it->aggressor == nullptr)
         {
-            it = aggressionList.erase(it);
+            this->remOpponent(it->aggressor);
         }
         // Check if the aggressor is nowhere.
         else if (it->aggressor->room == nullptr)
         {
-            it = aggressionList.erase(it);
+            this->remOpponent(it->aggressor);
         }
-        else
+    }
+}
+
+void OpponentsList::resetList()
+{
+    auto temporaryList = aggressionList;
+    for (AggressorVector::iterator it = temporaryList.begin(); it != temporaryList.end(); ++it)
+    {
+        // Check if the aggressor is null.
+        if (it->aggressor == nullptr)
         {
-            ++it;
+            continue;
+        }
+        // Remove the owner from its list.
+        if (!it->aggressor->opponents.remOpponent(owner))
+        {
+            Logger::log(
+                LogLevel::Error,
+                "Could not remove %s from opponents of %s.",
+                owner->getName(),
+                it->aggressor->getName());
+        }
+        // Remove from this list the opponent.
+        if (!this->remOpponent(it->aggressor))
+        {
+            Logger::log(
+                LogLevel::Error,
+                "Could not remove %s from opponents of %s.",
+                it->aggressor->getName(),
+                owner->getName());
         }
     }
 }

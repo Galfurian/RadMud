@@ -132,6 +132,8 @@ class OpponentsList
         /// @brief Check and clear the list from possible disconnected players.
         void checkList();
 
+        void resetList();
+
         /// @brief Provides an iterator to the begin of the list of aggressors.
         /// @return An iterator to the begin of the vector of aggressors.
         iterator begin();
