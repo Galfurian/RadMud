@@ -1000,16 +1000,28 @@ void Action::performCombatAction(const CombatAction & move)
                 //  2. The attack roll is not a natural 20.
                 if ((ATK < AC) && (ATK != 20))
                 {
+                    // Notify the actor.
                     actor->sendMsg(
                         "You miss %s with %s.\n\n",
                         enemy->getName(),
                         iterator->getName());
+                    // Notify the enemy.
                     enemy->sendMsg("%s misses you with %s.\n\n", nam, iterator->getName());
+                    // Notify the others.
+                    CharacterVector exceptions;
+                    exceptions.push_back(actor);
+                    exceptions.push_back(enemy);
+                    enemy->room->sendToAll(
+                        "%s miss %s with %s.\n",
+                        exceptions,
+                        nam,
+                        enemy->getName(),
+                        iterator->getName());
                 }
                 else
                 {
                     // Store the type of attack.
-                    std::string critical;
+                    bool isCritical;
                     // Natural roll for the damage.
                     unsigned int DMG = TRandInteger<unsigned int>(
                         weapon->minDamage,
@@ -1033,7 +1045,7 @@ void Action::performCombatAction(const CombatAction & move)
                     if (ATK == 20)
                     {
                         DMG *= 2;
-                        critical = "critically";
+                        isCritical = true;
                     }
                     // Log the damage.
                     Logger::log(
@@ -1048,15 +1060,28 @@ void Action::performCombatAction(const CombatAction & move)
                     {
                         actor->sendMsg(
                             "You %s hit %s with %s and kill %s.\n\n",
-                            critical,
+                            (isCritical ? "critically" : ""),
                             enemy->getName(),
                             iterator->getName(),
                             enemy->getObjectPronoun());
+                        // Notify the enemy.
                         enemy->sendMsg(
                             "%s %s hits you with %s and kill you.\n\n",
                             nam,
-                            critical,
+                            (isCritical ? "critically" : ""),
                             iterator->getName());
+                        // Notify the others.
+                        CharacterVector exceptions;
+                        exceptions.push_back(actor);
+                        exceptions.push_back(enemy);
+                        enemy->room->sendToAll(
+                            "%s %s hits %s with %s and kill %s.\n",
+                            exceptions,
+                            nam,
+                            (isCritical ? "critically" : ""),
+                            enemy->getName(),
+                            iterator->getName(),
+                            enemy->getObjectPronoun());
                         // The enemy has received the damage and now it is dead.
                         enemy->kill();
                         continue;
@@ -1066,14 +1091,27 @@ void Action::performCombatAction(const CombatAction & move)
                         // The enemy has received the damage but it is still alive.
                         actor->sendMsg(
                             "You %s hit %s with %s for %s.\n\n",
-                            critical,
+                            (isCritical ? "critically" : ""),
                             enemy->getName(),
                             iterator->getName(),
                             ToString(DMG));
+                        // Notify the enemy.
                         enemy->sendMsg(
                             "%s %s hits you with %s for %s.\n\n",
                             nam,
-                            critical,
+                            (isCritical ? "critically" : ""),
+                            iterator->getName(),
+                            ToString(DMG));
+                        // Notify the others.
+                        CharacterVector exceptions;
+                        exceptions.push_back(actor);
+                        exceptions.push_back(enemy);
+                        enemy->room->sendToAll(
+                            "%s %s hits %s with %s for %s.\n",
+                            exceptions,
+                            nam,
+                            (isCritical ? "critically" : ""),
+                            enemy->getName(),
                             iterator->getName(),
                             ToString(DMG));
                     }

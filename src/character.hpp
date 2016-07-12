@@ -492,7 +492,8 @@ class Character
         virtual void kill();
 
         /// @brief Create a corpse on the ground.
-        void createCorpse();
+        /// @return A pointer to the corpse.
+        Item * createCorpse();
 
         /// @brief Handle character input.
         /// @param command Command that need to be handled.

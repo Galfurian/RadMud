@@ -1091,8 +1091,8 @@ string Character::getLook(Character * character)
     {
         output += "    " + Formatter::yellow() + "Right Hand" + Formatter::reset() + " : "
             + "Nothing";
+        output += ".\n";
     }
-    output += ".\n";
 
     if (left != nullptr)
     {
@@ -1530,7 +1530,21 @@ unsigned int Character::getStamina()
 void Character::kill()
 {
     // Create a corpse at the current position.
-    this->createCorpse();
+    Item * corpse = this->createCorpse();
+    // Transfer all the items from the character to the corpse.
+    auto tempInventory = this->inventory;
+    for (auto it = tempInventory.begin(); it != tempInventory.begin(); ++it)
+    {
+        this->remInventoryItem(*it);
+        corpse->content.push_back(*it);
+        (*it)->updateOnDB();
+    }
+    auto tempEquipment = this->equipment;
+    for (auto it = tempEquipment.begin(); it != tempEquipment.begin(); ++it)
+    {
+        this->remEquipmentItem(*it);
+        corpse->content.push_back(*it);
+    }
     // Reset the action of the character.
     this->getAction()->reset();
     // Reset the list of opponents.
@@ -1542,18 +1556,16 @@ void Character::kill()
     }
 }
 
-void Character::createCorpse()
+Item * Character::createCorpse()
 {
-    // Retrieve the model of the corpse.
-    Logger::log(LogLevel::Debug, "Retrieve the model of the corpse.");
-    // Create a new corpse.
-    Logger::log(LogLevel::Debug, "Create a new corpse.");
+    // Create the corpse.
     Item * corpse = race->corpse.createItem(this->name, race->material, ItemQuality::Normal);
     // Set the weight of the new corpse.
     corpse->customWeight = this->weight;
     // Add the corpse to the room.
-    Logger::log(LogLevel::Debug, "Add the corpse to the room.");
     room->addItem(corpse);
+    // Return the corpse.
+    return corpse;
 }
 
 void Character::doCommand(const string & command)

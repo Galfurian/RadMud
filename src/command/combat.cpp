@@ -33,7 +33,10 @@ void DoKill(Character * character, std::istream & sArgs)
         character->sendMsg("You have to specify whom to kill.\n");
     }
     // Retrieve the target.
-    Character * target = character->room->findCharacter(arguments[0].first, arguments[0].second, character);
+    Character * target = character->room->findCharacter(
+        arguments[0].first,
+        arguments[0].second,
+        character);
     if (!target)
     {
         character->sendMsg("You don't see '%s' anywhere.\n", arguments[0].first);
@@ -92,8 +95,19 @@ void DoKill(Character * character, std::istream & sArgs)
             target->opponents.remOpponent(character);
             character->getAction()->stop();
         }
+        // Notify the character.
         character->sendMsg("You attack %s.\n", target->getName());
+        // Notify the target.
         target->sendMsg("%s attacks you.\n\n", character->getNameCapital());
+        // Notify the others.
+        CharacterVector exceptions;
+        exceptions.push_back(character);
+        exceptions.push_back(target);
+        character->room->sendToAll(
+            "%s attacks %s.\n",
+            exceptions,
+            character->getNameCapital(),
+            target->getName());
     }
     else
     {
@@ -131,8 +145,19 @@ void DoKill(Character * character, std::istream & sArgs)
             character->getAction()->stop();
             target->getAction()->stop();
         }
+        // Notify the character.
         character->sendMsg("You attack %s.\n", target->getName());
+        // Notify the target.
         target->sendMsg("%s attacks you.\n\n", character->getNameCapital());
+        // Notify the others.
+        CharacterVector exceptions;
+        exceptions.push_back(character);
+        exceptions.push_back(target);
+        character->room->sendToAll(
+            "%s attacks %s.\n",
+            exceptions,
+            character->getNameCapital(),
+            target->getName());
     }
 }
 
