@@ -168,6 +168,13 @@ bool Item::updateOnDB()
         }
     }
 
+    // Remove the item from any auxiliary table.
+    QueryList where;
+    where.push_back(std::make_pair("item", ToString(vnum)));
+    SQLiteDbms::instance().deleteFrom("ItemPlayer", where);
+    SQLiteDbms::instance().deleteFrom("ItemRoom", where);
+    SQLiteDbms::instance().deleteFrom("ItemContent", where);
+
     // Save the item's position.
     if (room != nullptr)
     {
@@ -179,25 +186,10 @@ bool Item::updateOnDB()
             Logger::log(LogLevel::Error, "Can't save the item inside the room!");
             return false;
         }
-
-        // Remove from ItemPlayer and ItemContent.
-        QueryList where;
-        where.push_back(std::make_pair("item", ToString(vnum)));
-        SQLiteDbms::instance().deleteFrom("ItemPlayer", where);
-        SQLiteDbms::instance().deleteFrom("ItemContent", where);
     }
     else if (owner != nullptr)
     {
-        if (owner->isMobile())
-        {
-            // Remove from ItemContent and ItemRoom.
-            QueryList where;
-            where.push_back(std::make_pair("item", ToString(vnum)));
-            SQLiteDbms::instance().deleteFrom("ItemPlayer", where);
-            SQLiteDbms::instance().deleteFrom("ItemContent", where);
-            SQLiteDbms::instance().deleteFrom("ItemRoom", where);
-        }
-        else
+        if (owner->isPlayer())
         {
             vector<string> arguments;
             arguments.push_back(owner->name);
@@ -208,47 +200,30 @@ bool Item::updateOnDB()
             }
             else
             {
-                arguments.push_back(ToString(0));
+                arguments.push_back("0");
             }
             if (!SQLiteDbms::instance().insertInto("ItemPlayer", arguments, false, true))
             {
                 Logger::log(LogLevel::Error, "Can't save the item possesed by the Player!");
                 return false;
             }
-
-            // Remove from ItemContent and ItemRoom.
-            QueryList where;
-            where.push_back(std::make_pair("item", ToString(vnum)));
-            SQLiteDbms::instance().deleteFrom("ItemContent", where);
-            SQLiteDbms::instance().deleteFrom("ItemRoom", where);
         }
     }
     else if (container != nullptr)
     {
-        vector<string> arguments;
-        arguments.push_back(ToString(container->vnum));
-        arguments.push_back(ToString(vnum));
-        if (!SQLiteDbms::instance().insertInto("ItemContent", arguments))
+        if (container->model->getType() != ModelType::Corpse)
         {
-            Logger::log(LogLevel::Error, "Can't save the item inside the container!");
-            return false;
+            vector<string> arguments;
+            arguments.push_back(ToString(container->vnum));
+            arguments.push_back(ToString(vnum));
+            if (!SQLiteDbms::instance().insertInto("ItemContent", arguments))
+            {
+                Logger::log(LogLevel::Error, "Can't save the item inside the container!");
+                return false;
+            }
         }
+    }
 
-        // Remove from ItemPlayer and ItemRoom.
-        QueryList where;
-        where.push_back(std::make_pair("item", ToString(vnum)));
-        SQLiteDbms::instance().deleteFrom("ItemPlayer", where);
-        SQLiteDbms::instance().deleteFrom("ItemRoom", where);
-    }
-    else
-    {
-        // Remove the item from almost any table.
-        QueryList where;
-        where.push_back(std::make_pair("item", ToString(vnum)));
-        SQLiteDbms::instance().deleteFrom("ItemPlayer", where);
-        SQLiteDbms::instance().deleteFrom("ItemRoom", where);
-        SQLiteDbms::instance().deleteFrom("ItemContent", where);
-    }
     if (!content.empty())
     {
         for (auto iterator : content)
@@ -264,6 +239,7 @@ bool Item::updateOnDB()
             }
         }
     }
+
     if (contentLiq.first != nullptr)
     {
         vector<string> arguments;
