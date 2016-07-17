@@ -73,6 +73,11 @@ std::string CraftAction::stop()
 
 bool CraftAction::perform()
 {
+    // Check if the cooldown is ended.
+    if (!this->checkElapsed())
+    {
+        return false;
+    }
     // Check the character stamina.
     unsigned int consumedStamina;
     if (!this->checkHasStamina(consumedStamina))
