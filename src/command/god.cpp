@@ -1507,8 +1507,8 @@ void DoProductionInfo(Character * character, std::istream & sArgs)
     msg += "Difficulty  : " + ToString(production->difficulty) + "\n";
     msg += "Time        : " + ToString(production->time) + "\n";
     msg += "Assisted    : " + ToString(production->assisted) + "\n";
-    msg += "Outcome     : " + production->outcome.first->name + " * "
-        + ToString(production->outcome.second) + "\n";
+    msg += "Outcome     : " + production->outcome->name + "*" + ToString(production->quantity)
+        + "\n";
     msg += "Tools       :\n";
     for (auto iterator : production->tools)
     {

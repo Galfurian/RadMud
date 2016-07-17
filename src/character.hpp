@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "actions.hpp"
+#include "action/combatAction.hpp"
 #include "defines.hpp"
 #include "effect.hpp"
 #include "exit.hpp"
@@ -78,12 +78,12 @@ class Character
         CharacterPosture posture;
         /// Active effects on player.
         EffectList effects;
-        /// Character current action.
-        Action action;
         /// The lua_State associated with this character.
         lua_State * L;
         /// List of opponents.
         OpponentsList opponents;
+        /// Character current action.
+        std::shared_ptr<GeneralAction> generalAction;
 
         /// @brief Constructor.
         Character();
@@ -189,9 +189,9 @@ class Character
         /// @return The maximum radius of view.
         int getViewDistance();
 
-        /// @brief Provides a pointer to the Action object associated to this character.
-        /// @return A pointer to Action.
-        Action * getAction();
+        /// @brief Provides a pointer to the action object associated to this character.
+        /// @return A pointer to action.
+        std::shared_ptr<GeneralAction> getAction();
 
         /// @brief Check if the character can move in the given direction, if it's so, returns the room in that direction.
         /// @param direction The direction where to search the room.
@@ -405,7 +405,7 @@ class Character
 
         /// @brief Given an action, it returns the necessary cooldown.
         /// @return The non-decreasing value of the cooldown.
-        unsigned int getCooldown(CombatAction combatAction);
+        unsigned int getCooldown(CombatActionType combatAction);
 
         /// @brief Given an action, it returns the stamina required to execute it.
         /// @param consumed     The ammount of consumed stamina.
@@ -417,7 +417,7 @@ class Character
         bool hasStaminaFor(
             unsigned int & consumed,
             const ActionType & actionType,
-            const CombatAction & combatAction = CombatAction::NoAction,
+            const CombatActionType & combatAction = CombatActionType::NoAction,
             const EquipmentSlot & slot = EquipmentSlot::None);
 
         /// @brief Allows to SET the health value.

@@ -22,10 +22,10 @@
 // Other Include.
 #include "mud.hpp"
 #include "logger.hpp"
-#include "actions.hpp"
 #include "constants.hpp"
 
 using namespace std;
+using namespace std::chrono;
 
 // //////////////////////////////////////////////////////////
 // Timings Values
@@ -38,8 +38,8 @@ MudUpdater::MudUpdater() :
         bandwidth_in(),
         bandwidth_out(),
         bandwidth_uncompressed(),
-        ticTime(std::chrono::system_clock::now()),
-        mudTime(std::chrono::system_clock::now()),
+        ticTime(system_clock::now()),
+        mudTime(system_clock::now()),
         ticSize(30),
         secondSize(50),
         hourSize(secondSize * 3600),
@@ -66,19 +66,19 @@ MudUpdater & MudUpdater::instance()
 
 void MudUpdater::initTimers()
 {
-    ticTime = std::chrono::system_clock::now();
-    mudTime = std::chrono::system_clock::now();
+    ticTime = system_clock::now();
+    mudTime = system_clock::now();
 }
 
 bool MudUpdater::hasTicPassed()
 {
     // Get the current time.
-    TimeClock currentTime = std::chrono::system_clock::now();
+    TimeClock currentTime = system_clock::now();
     // Return the check if a tic has passed.
-    if (std::chrono::duration_cast<std::chrono::seconds>(currentTime - ticTime).count() >= ticSize)
+    if (duration_cast<seconds>(currentTime - ticTime).count() >= ticSize)
     {
         // Reset Tic Time.
-        ticTime = std::chrono::system_clock::now();
+        ticTime = system_clock::now();
         return true;
     }
     else
@@ -90,13 +90,12 @@ bool MudUpdater::hasTicPassed()
 bool MudUpdater::hasHourPassed()
 {
     // Get the current time.
-    TimeClock currentTime = std::chrono::system_clock::now();
+    TimeClock currentTime = system_clock::now();
     // Return the check if a hour is passed.
-    if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - mudTime).count()
-        >= hourSize)
+    if (duration_cast<milliseconds>(currentTime - mudTime).count() >= hourSize)
     {
         // Reset Mud Time.
-        mudTime = std::chrono::system_clock::now();
+        mudTime = system_clock::now();
         return true;
     }
     else
@@ -264,8 +263,7 @@ void MudUpdater::updateItems()
             continue;
         }
         // Trigger decay function.
-        corpse->decayCondition();
-        if (corpse->condition <= 0)
+        if (corpse->triggerDecay())
         {
             itemToDestroy.insert(itemToDestroy.end(), corpse);
         }
@@ -281,8 +279,7 @@ void MudUpdater::updateItems()
             continue;
         }
         // Trigger decay function.
-        item->decayCondition();
-        if (item->condition <= 0)
+        if (item->triggerDecay())
         {
             itemToDestroy.insert(itemToDestroy.end(), item);
         }
@@ -304,9 +301,19 @@ void MudUpdater::performActions()
         {
             continue;
         }
-        iterator->getAction()->perform();
+        if (iterator->getAction()->getType() == ActionType::Wait)
+        {
+            continue;
+        }
+        if (iterator->getAction()->perform())
+        {
+            iterator->generalAction = std::make_shared<GeneralAction>(iterator);
+        }
+        else if (iterator->getAction()->getActionStatus() == ActionStatus::Error)
+        {
+            iterator->generalAction = std::make_shared<GeneralAction>(iterator);
+        }
     }
-
     for (auto iterator : Mud::instance().mudMobiles)
     {
         Mobile * mobile = iterator.second;
@@ -314,15 +321,25 @@ void MudUpdater::performActions()
         {
             continue;
         }
-        auto end = std::chrono::system_clock::now();
-        auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
-            mobile->nextActionCooldown - end).count();
+        auto end = system_clock::now();
+        auto elapsed = duration_cast<seconds>(mobile->nextActionCooldown - end).count();
         if (elapsed < 0)
         {
             mobile->triggerEventRandom();
-            mobile->nextActionCooldown = end + std::chrono::seconds(TRandInteger<int>(30, 60));
+            mobile->nextActionCooldown = end + seconds(TRandInteger<int>(30, 60));
         }
-        mobile->getAction()->perform();
+        if (mobile->getAction()->getType() == ActionType::Wait)
+        {
+            continue;
+        }
+        if (mobile->getAction()->perform())
+        {
+            mobile->generalAction = std::make_shared<GeneralAction>(mobile);
+        }
+        else if (mobile->getAction()->getActionStatus() == ActionStatus::Error)
+        {
+            mobile->generalAction = std::make_shared<GeneralAction>(mobile);
+        }
     }
 }
 

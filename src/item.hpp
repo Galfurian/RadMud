@@ -102,13 +102,10 @@ class Item
         /// @return <b>True</b> if the operations succeeded,<br><b>False</b> Otherwise.
         bool hasKey(std::string key);
 
-        /// @brief Decrease the item condition and check if it reache 0.
-        /// @param degradation How much the item's condition must decrease.
-        /// @return <b>True</b> if condition <= 0, <b>False</b> otherwise.
-        bool editCondition(int degradation);
-
         /// @brief Trigger a decay cycle.
-        void decayCondition();
+        /// @return <b>True</b> if the item is destroyed,<br>
+        ///         <b>False</b> otherwise.
+        bool triggerDecay();
 
         /// @brief Get the item current condition in text.
         /// @return The condition of the item.

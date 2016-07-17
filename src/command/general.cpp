@@ -27,6 +27,7 @@
 #include "../logger.hpp"
 #include "../constants.hpp"
 #include "../utilities/table.hpp"
+#include "../action/moveAction.hpp"
 
 using namespace std;
 
@@ -66,9 +67,15 @@ void DoDirection(Character * character, Direction direction)
         character->sendMsg("You can't move!\n");
         return;
     }
-    if (!character->getAction()->setMove(destination, direction, speed))
+    character->generalAction = std::make_shared<MoveAction>(
+        character,
+        destination,
+        direction,
+        speed);
+    if (!character->generalAction->check())
     {
         character->sendMsg("You can't move.\n");
+        character->generalAction = std::make_shared<GeneralAction>(character);
         return;
     }
 }
@@ -147,7 +154,10 @@ void DoQuit(Character * character, std::istream & sArgs)
             CharacterVector exceptions;
             exceptions.push_back(character);
             // Send the message inside the room.
-            player->room->sendToAll("Player %s disappear in a puff of smoke.\n", exceptions, player->getName());
+            player->room->sendToAll(
+                "Player %s disappear in a puff of smoke.\n",
+                exceptions,
+                player->getName());
         }
 
         Logger::log(LogLevel::Global, "Player %s has left the game.", player->getName());
@@ -183,8 +193,8 @@ void DoWho(Character * character, std::istream & sArgs)
         { iterator->getName(), location });
     }
     output += table.getTable();
-    output += "# Total " + Formatter::yellow() + "Players" + Formatter::reset() + " :" + ToString(table.getNumRows())
-        + "\n";
+    output += "# Total " + Formatter::yellow() + "Players" + Formatter::reset() + " :"
+        + ToString(table.getNumRows()) + "\n";
     character->sendMsg(output);
 }
 
@@ -242,7 +252,10 @@ void DoLook(Character * character, std::istream & sArgs)
     }
     else if (arguments.size() == 1)
     {
-        Character * target = character->room->findCharacter(arguments[0].first, arguments[0].second, character);
+        Character * target = character->room->findCharacter(
+            arguments[0].first,
+            arguments[0].second,
+            character);
         if (target)
         {
             if (character->canSee(target))
@@ -266,7 +279,10 @@ void DoLook(Character * character, std::istream & sArgs)
     }
     else if (arguments.size() == 2)
     {
-        Character * target = character->room->findCharacter(arguments[1].first, arguments[1].second, character);
+        Character * target = character->room->findCharacter(
+            arguments[1].first,
+            arguments[1].second,
+            character);
         if (target)
         {
             if (character->canSee(target))
@@ -278,7 +294,10 @@ void DoLook(Character * character, std::istream & sArgs)
                 }
                 else
                 {
-                    character->sendMsg("You don't see %s on %s.\n", arguments[0].first, target->getName());
+                    character->sendMsg(
+                        "You don't see %s on %s.\n",
+                        arguments[0].first,
+                        target->getName());
                 }
                 return;
             }
@@ -373,10 +392,14 @@ void DoHelp(Character * character, std::istream & sArgs)
             {
                 std::string msg;
                 msg += "Showing help for command :" + iterator.name + "\n";
-                msg += Formatter::yellow() + " Command   : " + Formatter::reset() + iterator.name + "\n";
-                msg += Formatter::yellow() + " Level     : " + Formatter::reset() + ToString(iterator.level) + "\n";
-                msg += Formatter::yellow() + " Arguments : " + Formatter::reset() + iterator.args + "\n";
-                msg += Formatter::yellow() + " Help      : " + Formatter::reset() + iterator.help + "\n";
+                msg += Formatter::yellow() + " Command   : " + Formatter::reset() + iterator.name
+                    + "\n";
+                msg += Formatter::yellow() + " Level     : " + Formatter::reset()
+                    + ToString(iterator.level) + "\n";
+                msg += Formatter::yellow() + " Arguments : " + Formatter::reset() + iterator.args
+                    + "\n";
+                msg += Formatter::yellow() + " Help      : " + Formatter::reset() + iterator.help
+                    + "\n";
                 character->sendMsg(msg);
                 return;
             }
@@ -397,22 +420,41 @@ void DoPrompt(Character * character, std::istream & sArgs)
     {
         character->sendMsg("Current prompt:\n");
         character->sendMsg("    %s\n", player->prompt);
-        character->sendMsg("Type %sprompt help %sto read the guide.\n", Formatter::yellow(), Formatter::reset());
+        character->sendMsg(
+            "Type %sprompt help %sto read the guide.\n",
+            Formatter::yellow(),
+            Formatter::reset());
         return;
     }
     if (GetWords(prompt)[0] == "help")
     {
         character->sendMsg(Formatter::yellow() + "Prompt Help" + Formatter::reset() + "\n");
-        character->sendMsg("You can set the prompt you prefer, respectfully to this constraints:\n");
+        character->sendMsg(
+            "You can set the prompt you prefer, respectfully to this constraints:\n");
         character->sendMsg(" - Not more than 15 characters.\n");
         character->sendMsg("\n");
         character->sendMsg("You can use the following shortcuts in you prompt:\n");
         character->sendMsg("    %s&n%s - Player name.\n", Formatter::italic(), Formatter::reset());
-        character->sendMsg("    %s&N%s - Player name capitalized.\n", Formatter::italic(), Formatter::reset());
-        character->sendMsg("    %s&h%s - Player current health.\n", Formatter::italic(), Formatter::reset());
-        character->sendMsg("    %s&H%s - Player max health.\n", Formatter::italic(), Formatter::reset());
-        character->sendMsg("    %s&s%s - Player current stamina.\n", Formatter::italic(), Formatter::reset());
-        character->sendMsg("    %s&S%s - Player max stamina.\n", Formatter::italic(), Formatter::reset());
+        character->sendMsg(
+            "    %s&N%s - Player name capitalized.\n",
+            Formatter::italic(),
+            Formatter::reset());
+        character->sendMsg(
+            "    %s&h%s - Player current health.\n",
+            Formatter::italic(),
+            Formatter::reset());
+        character->sendMsg(
+            "    %s&H%s - Player max health.\n",
+            Formatter::italic(),
+            Formatter::reset());
+        character->sendMsg(
+            "    %s&s%s - Player current stamina.\n",
+            Formatter::italic(),
+            Formatter::reset());
+        character->sendMsg(
+            "    %s&S%s - Player max stamina.\n",
+            Formatter::italic(),
+            Formatter::reset());
         return;
     }
     player->prompt = prompt;
@@ -425,11 +467,17 @@ void DoTime(Character * character, std::istream & sArgs)
 
     if (MudUpdater::instance().getDayPhase() == DayPhase::Morning)
     {
-        character->sendMsg("%sThe sun has just risen.%s\n", Formatter::yellow(), Formatter::reset());
+        character->sendMsg(
+            "%sThe sun has just risen.%s\n",
+            Formatter::yellow(),
+            Formatter::reset());
     }
     else if (MudUpdater::instance().getDayPhase() == DayPhase::Day)
     {
-        character->sendMsg("%sThe sun is high in the sky.%s\n", Formatter::yellow(), Formatter::reset());
+        character->sendMsg(
+            "%sThe sun is high in the sky.%s\n",
+            Formatter::yellow(),
+            Formatter::reset());
     }
     else if (MudUpdater::instance().getDayPhase() == DayPhase::Dusk)
     {
@@ -440,7 +488,10 @@ void DoTime(Character * character, std::istream & sArgs)
     }
     else if (MudUpdater::instance().getDayPhase() == DayPhase::Night)
     {
-        character->sendMsg("%sThe darkness surrounds you.%s\n", Formatter::blue(), Formatter::reset());
+        character->sendMsg(
+            "%sThe darkness surrounds you.%s\n",
+            Formatter::blue(),
+            Formatter::reset());
     }
 }
 
@@ -518,9 +569,12 @@ void DoStatistics(Character * character, std::istream & sArgs)
     std::string msg;
     msg += Formatter::magenta() + "Name: " + Formatter::reset() + player->getName() + " ";
     msg += Formatter::magenta() + "Race: " + Formatter::reset() + player->race->name + "\n";
-    msg += Formatter::magenta() + "Gender: " + Formatter::reset() + GetGenderTypeName(player->gender) + "\n";
-    msg += Formatter::magenta() + "Affiliation: " + Formatter::reset() + player->faction->name + "\n";
-    msg += Formatter::magenta() + "Experience: " + Formatter::reset() + ToString(player->experience) + " px\n";
+    msg += Formatter::magenta() + "Gender: " + Formatter::reset()
+        + GetGenderTypeName(player->gender) + "\n";
+    msg += Formatter::magenta() + "Affiliation: " + Formatter::reset() + player->faction->name
+        + "\n";
+    msg += Formatter::magenta() + "Experience: " + Formatter::reset() + ToString(player->experience)
+        + " px\n";
 
     msg += Formatter::magenta() + "    Str " + Formatter::reset();
     msg += ToString(player->getAbility(Ability::Strength, false));
@@ -601,7 +655,8 @@ void DoSkills(Character * character, std::istream & sArgs)
     NoMore(character, sArgs);
 
     player->sendMsg(
-        "     ##    " + Formatter::yellow() + "LvL" + Formatter::green() + "    Skill" + Formatter::reset() + "\n");
+        "     ##    " + Formatter::yellow() + "LvL" + Formatter::green() + "    Skill"
+            + Formatter::reset() + "\n");
     for (auto iterator : player->skills)
     {
         Skill * skill = Mud::instance().findSkill(iterator.first);
@@ -631,11 +686,13 @@ void DoServer(Character * character, std::istream & sArgs)
     character->sendMsg("    Players     : " + ToString(Mud::instance().mudPlayers.size()) + "\n");
     character->sendMsg("    Mobiles     : " + ToString(Mud::instance().mudMobiles.size()) + "\n");
     character->sendMsg("\n");
-    character->sendMsg("    Models      : " + ToString(Mud::instance().mudItemModels.size()) + "\n");
+    character->sendMsg(
+        "    Models      : " + ToString(Mud::instance().mudItemModels.size()) + "\n");
     character->sendMsg("    Items       : " + ToString(Mud::instance().mudItems.size()) + "\n");
     character->sendMsg("    Corpses     : " + ToString(Mud::instance().mudCorpses.size()) + "\n");
     character->sendMsg("\n");
-    character->sendMsg("    Continents  : " + ToString(Mud::instance().mudContinents.size()) + "\n");
+    character->sendMsg(
+        "    Continents  : " + ToString(Mud::instance().mudContinents.size()) + "\n");
     character->sendMsg("    Areas       : " + ToString(Mud::instance().mudAreas.size()) + "\n");
     character->sendMsg("    Rooms       : " + ToString(Mud::instance().mudRooms.size()) + "\n");
     character->sendMsg("\n");
@@ -644,8 +701,10 @@ void DoServer(Character * character, std::istream & sArgs)
     character->sendMsg("    Skills      : " + ToString(Mud::instance().mudSkills.size()) + "\n");
     character->sendMsg("    Writings    : " + ToString(Mud::instance().mudWritings.size()) + "\n");
     character->sendMsg("    Materials   : " + ToString(Mud::instance().mudMaterials.size()) + "\n");
-    character->sendMsg("    Professions : " + ToString(Mud::instance().mudProfessions.size()) + "\n");
-    character->sendMsg("    Productions : " + ToString(Mud::instance().mudProductions.size()) + "\n");
+    character->sendMsg(
+        "    Professions : " + ToString(Mud::instance().mudProfessions.size()) + "\n");
+    character->sendMsg(
+        "    Productions : " + ToString(Mud::instance().mudProductions.size()) + "\n");
     character->sendMsg("    Schematics  : " + ToString(Mud::instance().mudBuildings.size()) + "\n");
     character->sendMsg("    Liquids     : " + ToString(Mud::instance().mudLiquids.size()) + "\n");
     character->sendMsg("    News        : " + ToString(Mud::instance().mudNews.size()) + "\n");

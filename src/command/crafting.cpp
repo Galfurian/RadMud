@@ -19,6 +19,8 @@
 #include "command.hpp"
 #include "../mud.hpp"
 #include "../model/resourceModel.hpp"
+#include "../action/buildAction.hpp"
+#include "../action/craftAction.hpp"
 
 using namespace std;
 
@@ -73,10 +75,12 @@ void DoProfession(Character * character, Profession * profession, std::istream &
     // Search the needed workbench.
     if (production->workbench != ToolType::NoType)
     {
-        Item * workbench = character->findNearbyTool(production->workbench, ItemVector(),
-        true,
-        false,
-        false);
+        Item * workbench = character->findNearbyTool(
+            production->workbench,
+            ItemVector(),
+            true,
+            false,
+            false);
         if (workbench == nullptr)
         {
             character->sendMsg("The proper workbench is not present.\n");
@@ -105,14 +109,17 @@ void DoProfession(Character * character, Profession * profession, std::istream &
 
     // //////////////////////////////////////////
     // Prepare the action.
-    if (!character->getAction()->setCraft(
+    character->generalAction = std::make_shared<CraftAction>(
+        character,
         production,
+        craftMaterial,
         usedTools,
         usedIngredients,
-        craftMaterial,
-        production->time))
+        production->time);
+    if (!character->generalAction->check())
     {
         character->sendMsg("You can't start the process of production.\n");
+        character->generalAction = std::make_shared<GeneralAction>(character);
         return;
     }
 
@@ -120,7 +127,7 @@ void DoProfession(Character * character, Profession * profession, std::istream &
     character->sendMsg(
         "%s %s.\n",
         profession->startMessage,
-        Formatter::yellow() + production->outcome.first->getName() + Formatter::reset());
+        Formatter::yellow() + production->outcome->getName() + Formatter::reset());
 
     // Set the list of exceptions.
     CharacterVector exceptions;
@@ -227,14 +234,17 @@ void DoBuild(Character * character, std::istream & sArgs)
 
     // //////////////////////////////////////////
     // Prepare the action.
-    if (!character->getAction()->setBuild(
+    character->generalAction = std::make_shared<BuildAction>(
+        character,
         schematics,
         building,
         usedTools,
         usedIngredients,
-        schematics->time))
+        schematics->time);
+    if (!character->generalAction->check())
     {
         character->sendMsg("You can't start the building.\n");
+        character->generalAction = std::make_shared<GeneralAction>(character);
         return;
     }
 

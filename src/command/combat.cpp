@@ -20,6 +20,7 @@
 #include "command.hpp"
 #include "../room.hpp"
 #include "../constants.hpp"
+#include "../action/combatAction.hpp"
 
 using namespace std;
 
@@ -73,8 +74,7 @@ void DoKill(Character * character, std::istream & sArgs)
     // Check if the character is attacking a target which is already in combat.
     else if ((characAction != ActionType::Combat) && (targetAction == ActionType::Combat))
     {
-        // Let the characters enter the combat.
-        character->getAction()->setInCombat();
+        std::shared_ptr<CombatAction> combatAction = std::make_shared<CombatAction>(character);
         // Set the opponents.
         if (!character->opponents.addOpponent(target))
         {
@@ -88,7 +88,7 @@ void DoKill(Character * character, std::istream & sArgs)
             return;
         }
         // Try to set the next combat action.
-        if (!character->getAction()->setNextCombatAction(CombatAction::BasicAttack))
+        if (!combatAction->setNextCombatAction(CombatActionType::BasicAttack))
         {
             character->sendMsg("You were not ablet to attack %s.\n", target->getName());
             character->opponents.remOpponent(target);
@@ -108,12 +108,16 @@ void DoKill(Character * character, std::istream & sArgs)
             exceptions,
             character->getNameCapital(),
             target->getName());
+
+        // Let the characters enter the combat.
+        character->generalAction = combatAction;
     }
     else
     {
-        // Let the characters enter the combat.
-        character->getAction()->setInCombat();
-        target->getAction()->setInCombat();
+        std::shared_ptr<CombatAction> characterCombatAction = std::make_shared<CombatAction>(
+            character);
+        std::shared_ptr<CombatAction> targetCombatAction = std::make_shared<CombatAction>(
+            character);
 
         // Set the opponents.
         if (!character->opponents.addOpponent(target))
@@ -128,7 +132,7 @@ void DoKill(Character * character, std::istream & sArgs)
             return;
         }
         // Try to set the next combat action.
-        if (!character->getAction()->setNextCombatAction(CombatAction::BasicAttack))
+        if (!characterCombatAction->setNextCombatAction(CombatActionType::BasicAttack))
         {
             character->sendMsg("You were not ablet to attack %s.\n", target->getName());
             character->opponents.remOpponent(target);
@@ -137,7 +141,7 @@ void DoKill(Character * character, std::istream & sArgs)
             target->getAction()->stop();
             return;
         }
-        if (!target->getAction()->setNextCombatAction(CombatAction::BasicAttack))
+        if (!targetCombatAction->setNextCombatAction(CombatActionType::BasicAttack))
         {
             character->sendMsg("You were not ablet to attack %s.\n", target->getName());
             character->opponents.remOpponent(target);
@@ -158,6 +162,10 @@ void DoKill(Character * character, std::istream & sArgs)
             exceptions,
             character->getNameCapital(),
             target->getName());
+
+        // Let the characters enter the combat.
+        character->generalAction = characterCombatAction;
+        target->generalAction = targetCombatAction;
     }
 }
 
@@ -171,12 +179,14 @@ void DoFlee(Character * character, std::istream & sArgs)
         character->sendMsg("You are not fighting.\n");
         return;
     }
+    auto combatAction = dynamic_pointer_cast<CombatAction>(character->getAction());
+
     // Check if the character is already trying to flee.
-    if (character->getAction()->getCombatAction() == CombatAction::Flee)
+    if (combatAction->getCombatActionType() == CombatActionType::Flee)
     {
         character->sendMsg("You are already trying to flee.\n");
         return;
     }
     character->sendMsg("You prepare to flee...\n");
-    character->getAction()->setNextCombatAction(CombatAction::Flee);
+    combatAction->setNextCombatAction(CombatActionType::Flee);
 }

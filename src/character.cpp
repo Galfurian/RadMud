@@ -59,9 +59,9 @@ Character::Character() :
         equipment(),
         posture(CharacterPosture::Stand),
         effects(),
-        action(this),
         L(luaL_newstate()),
-        opponents(this)
+        opponents(this),
+        generalAction(std::make_shared<GeneralAction>(this))
 {
     // Nothing to do.
 }
@@ -150,11 +150,10 @@ std::string Character::getStaticDesc()
         desc += " " + GetPostureName(posture);
     }
     desc += " here";
-    // Action
-    if ((action.getType() != ActionType::NoAction) && (action.getType() != ActionType::Wait))
+    if (generalAction->getType() != ActionType::Wait)
     {
         desc += ", " + this->getSubjectPronoun() + " is ";
-        desc += action.getDescription();
+        desc += generalAction->getDescription();
     }
     desc += ".";
     return desc;
@@ -315,9 +314,9 @@ int Character::getViewDistance()
     return 3 + static_cast<int>(this->getAbilityLog(Ability::Perception, 0.0, 1.0));
 }
 
-Action * Character::getAction()
+std::shared_ptr<GeneralAction> Character::getAction()
 {
-    return &this->action;
+    return this->generalAction;
 }
 
 Room * Character::canMoveTo(Direction direction, std::string & error)
@@ -1209,7 +1208,7 @@ ItemVector Character::getActiveWeapons()
     return ret;
 }
 
-unsigned int Character::getCooldown(CombatAction combatAction)
+unsigned int Character::getCooldown(CombatActionType combatAction)
 {
     double BASE = 5.0;
     // The strength modifier.
@@ -1246,7 +1245,7 @@ unsigned int Character::getCooldown(CombatAction combatAction)
         }
         CAR = log10(CARmod);
     }
-    if (combatAction == CombatAction::BasicAttack)
+    if (combatAction == CombatActionType::BasicAttack)
     {
         double RHD = 0;
         double LHD = 0;
@@ -1284,7 +1283,7 @@ unsigned int Character::getCooldown(CombatAction combatAction)
         }
         BASE += -STR - AGI + WGT + CAR + max(RHD, LHD);
     }
-    else if (combatAction == CombatAction::Flee)
+    else if (combatAction == CombatActionType::Flee)
     {
         BASE += -STR - AGI + WGT + CAR;
     }
@@ -1294,7 +1293,7 @@ unsigned int Character::getCooldown(CombatAction combatAction)
 bool Character::hasStaminaFor(
     unsigned int & consumed,
     const ActionType & actionType,
-    const CombatAction & combatAction,
+    const CombatActionType & combatAction,
     const EquipmentSlot & slot)
 {
     // BASE     [+1.0]
@@ -1342,7 +1341,7 @@ bool Character::hasStaminaFor(
     }
     else if (actionType == ActionType::Combat)
     {
-        if (combatAction == CombatAction::BasicAttack)
+        if (combatAction == CombatActionType::BasicAttack)
         {
             if (this->canAttackWith(slot))
             {
@@ -1375,7 +1374,7 @@ bool Character::hasStaminaFor(
                 }
             }
         }
-        else if (combatAction == CombatAction::Flee)
+        else if (combatAction == CombatActionType::Flee)
         {
             Logger::log(
                 LogLevel::Debug,
@@ -1546,7 +1545,7 @@ void Character::kill()
         corpse->content.push_back(*it);
     }
     // Reset the action of the character.
-    this->getAction()->reset();
+    this->generalAction = std::make_shared<GeneralAction>(this);
     // Reset the list of opponents.
     this->opponents.resetList();
     // Remove the character from the current room.
