@@ -61,7 +61,7 @@ Character::Character() :
         effects(),
         L(luaL_newstate()),
         opponents(this),
-        generalAction(std::make_shared<GeneralAction>(this))
+        action(std::make_shared<GeneralAction>(this))
 {
     // Nothing to do.
 }
@@ -150,10 +150,10 @@ std::string Character::getStaticDesc()
         desc += " " + GetPostureName(posture);
     }
     desc += " here";
-    if (generalAction->getType() != ActionType::Wait)
+    if (this->action->getType() != ActionType::Wait)
     {
         desc += ", " + this->getSubjectPronoun() + " is ";
-        desc += generalAction->getDescription();
+        desc += this->action->getDescription();
     }
     desc += ".";
     return desc;
@@ -314,9 +314,14 @@ int Character::getViewDistance()
     return 3 + static_cast<int>(this->getAbilityLog(Ability::Perception, 0.0, 1.0));
 }
 
+void Character::setAction(std::shared_ptr<GeneralAction> _action)
+{
+    this->action = _action;
+}
+
 std::shared_ptr<GeneralAction> Character::getAction()
 {
-    return this->generalAction;
+    return this->action;
 }
 
 Room * Character::canMoveTo(Direction direction, std::string & error)
@@ -1545,7 +1550,7 @@ void Character::kill()
         corpse->content.push_back(*it);
     }
     // Reset the action of the character.
-    this->generalAction = std::make_shared<GeneralAction>(this);
+    this->setAction(std::make_shared<GeneralAction>(this));
     // Reset the list of opponents.
     this->opponents.resetList();
     // Remove the character from the current room.

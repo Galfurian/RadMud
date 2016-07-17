@@ -83,7 +83,7 @@ class Character
         /// List of opponents.
         OpponentsList opponents;
         /// Character current action.
-        std::shared_ptr<GeneralAction> generalAction;
+        std::shared_ptr<GeneralAction> action;
 
         /// @brief Constructor.
         Character();
@@ -188,6 +188,8 @@ class Character
         /// @brief Evaluate the maximum distance at which the character can still see.
         /// @return The maximum radius of view.
         int getViewDistance();
+
+        void setAction(std::shared_ptr<GeneralAction> _action);
 
         /// @brief Provides a pointer to the action object associated to this character.
         /// @return A pointer to action.
