@@ -109,19 +109,21 @@ void DoProfession(Character * character, Profession * profession, std::istream &
 
     // //////////////////////////////////////////
     // Prepare the action.
-    character->generalAction = std::make_shared<CraftAction>(
+    std::shared_ptr<CraftAction> craftAction = std::make_shared<CraftAction>(
         character,
         production,
         craftMaterial,
         usedTools,
         usedIngredients,
         production->time);
-    if (!character->generalAction->check())
+    // Check the new action.
+    if (!craftAction->check())
     {
         character->sendMsg("You can't start the process of production.\n");
-        character->generalAction = std::make_shared<GeneralAction>(character);
         return;
     }
+    // Set the new action.
+    character->setAction(craftAction);
 
     // //////////////////////////////////////////
     character->sendMsg(
@@ -234,19 +236,21 @@ void DoBuild(Character * character, std::istream & sArgs)
 
     // //////////////////////////////////////////
     // Prepare the action.
-    character->generalAction = std::make_shared<BuildAction>(
+    std::shared_ptr<BuildAction> buildAction = std::make_shared<BuildAction>(
         character,
         schematics,
         building,
         usedTools,
         usedIngredients,
         schematics->time);
-    if (!character->generalAction->check())
+    // Check the new action.
+    if (!buildAction->check())
     {
         character->sendMsg("You can't start the building.\n");
-        character->generalAction = std::make_shared<GeneralAction>(character);
         return;
     }
+    // Set the new action.
+    character->setAction(buildAction);
 
     // //////////////////////////////////////////
     character->sendMsg(

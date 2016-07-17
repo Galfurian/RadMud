@@ -67,17 +67,20 @@ void DoDirection(Character * character, Direction direction)
         character->sendMsg("You can't move!\n");
         return;
     }
-    character->generalAction = std::make_shared<MoveAction>(
+
+    std::shared_ptr<MoveAction> moveAction = std::make_shared<MoveAction>(
         character,
         destination,
         direction,
         speed);
-    if (!character->generalAction->check())
+    // Check the new action.
+    if (!moveAction->check())
     {
         character->sendMsg("You can't move.\n");
-        character->generalAction = std::make_shared<GeneralAction>(character);
         return;
     }
+    // Set the new action.
+    character->setAction(moveAction);
 }
 
 void DoTravel(Character * character, std::istream & sArgs)

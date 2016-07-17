@@ -79,7 +79,8 @@ class CombatAction: public GeneralAction
 
     private:
 
-        /// @brief Returns the attack damage.
-        /// @return The value of the attack.
-        void performCombatAction(const CombatActionType & move);
+        /// @brief Performs the combat action.
+        /// @return <b>True</b> if the action is finished,<br>
+        ///         <b>False</b> otherwise.
+        bool performCombatAction(const CombatActionType & move);
 };

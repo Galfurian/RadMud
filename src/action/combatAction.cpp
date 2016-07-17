@@ -71,21 +71,16 @@ bool CombatAction::perform()
 
         // Check the list of opponents.
         actor->opponents.checkList();
-        if (combatAction == CombatActionType::BasicAttack)
+        if (combatAction != CombatActionType::NoAction)
         {
             // Perform the combat action.
-            this->performCombatAction(combatAction);
-        }
-        else if (combatAction == CombatActionType::Flee)
-        {
-            // Perform the combat action.
-            this->performCombatAction(combatAction);
+            return this->performCombatAction(combatAction);
         }
         else
         {
             actor->sendMsg(this->stop());
+            return true;
         }
-        return true;
     }
     return false;
 }
@@ -115,7 +110,7 @@ bool CombatAction::setNextCombatAction(const CombatActionType & nextAction)
     return true;
 }
 
-void CombatAction::performCombatAction(const CombatActionType & move)
+bool CombatAction::performCombatAction(const CombatActionType & move)
 {
     // Retrive once and for all the name of the actor.
     std::string nam = actor->getNameCapital();
@@ -386,7 +381,7 @@ void CombatAction::performCombatAction(const CombatActionType & move)
                         nam + " flees from the battlefield.\n\n",
                         nam + " arives fleeing.\n\n",
                         "You flee from the battlefield.\n");
-                    return;
+                    return true;
                 }
             }
         }
@@ -395,5 +390,7 @@ void CombatAction::performCombatAction(const CombatActionType & move)
     if (!this->setNextCombatAction(CombatActionType::BasicAttack))
     {
         actor->sendMsg(this->stop() + "\n\n");
+        return true;
     }
+    return false;
 }
