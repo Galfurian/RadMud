@@ -74,11 +74,6 @@ class CraftAction: public GeneralAction
         virtual ActionStatus perform();
 
     private:
-        /// @brief Checks if the character as the required amount of stamina.
-        /// @return <b>True</b> if the character can procede,<br>
-        ///         <b>False</b> otherwise.
-        bool checkHasStamina(unsigned int & consumed) const;
-
         /// @brief Checks the production.
         /// @return <b>True</b> if the production is available,<br>
         ///         <b>False</b> otherwise.
