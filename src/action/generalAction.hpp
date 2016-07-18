@@ -43,6 +43,8 @@ typedef enum class ActionTypes
 /// The list of possible actions.
 typedef enum class ActionStatus_t
 {
+    /// The action is finished.
+    Finished,
     /// The action is still running.
     Running,
     /// The action has encountered an error.
@@ -56,8 +58,6 @@ class GeneralAction
         Character * actor;
         /// The time point in the future needed by the action to complete.
         TimeClock actionCooldown;
-        /// The status of the action.
-        ActionStatus actionStatus;
 
     public:
         /// @brief Constructor.
@@ -92,12 +92,8 @@ class GeneralAction
         virtual std::string stop();
 
         /// @brief Performs the current action.
-        /// @return <b>True</b> if the action is finished,<br>
-        ///         <b>False</b> otherwise.
-        virtual bool perform();
-
-        ActionStatus getActionStatus() const;
-
+        /// @return the status after performing the action.
+        virtual ActionStatus perform();
 };
 
 /// @addtogroup EnumToString
