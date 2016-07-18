@@ -78,19 +78,20 @@ ActionStatus BuildAction::perform()
     {
         return ActionStatus::Running;
     }
-    // Check if the actor has enough stamina to execute the action.
-    unsigned int consumedStamina;
-    if (!actor->hasStaminaFor(consumedStamina, ActionType::Building))
-    {
-        actor->sendMsg("\nYou are too tired right now.\n");
-        return ActionStatus::Error;
-    }
+    // Check the values of the action.
     if (!checkBuilding() || !checkSchematics() || !checkTools() || !checkIngredients())
     {
         actor->sendMsg("\nYou have failed your action.\n");
         return ActionStatus::Error;
     }
-
+    // Get the amount of required stamina.
+    unsigned int consumedStamina = actor->getConsumedStaminaFor(ActionType::Building);
+    // Check if the actor has enough stamina to execute the action.
+    if (consumedStamina > actor->getStamina())
+    {
+        actor->sendMsg("\nYou are too tired right now.\n");
+        return ActionStatus::Error;
+    }
     // Consume the stamina.
     actor->remStamina(consumedStamina, true);
 

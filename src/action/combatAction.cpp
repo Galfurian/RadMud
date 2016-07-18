@@ -138,14 +138,13 @@ ActionStatus CombatAction::performCombatAction(const CombatActionType & move)
                         iterator->getName());
                     continue;
                 }
-                // Will contain the required stamina.
-                unsigned int consumedStamina;
-                // Check if the actor has enough stamina to execute the action.
-                if (!actor->hasStaminaFor(
-                    consumedStamina,
+                // Get the required stamina.
+                unsigned int consumedStamina = actor->getConsumedStaminaFor(
                     ActionType::Combat,
                     CombatActionType::BasicAttack,
-                    iterator->getCurrentSlot()))
+                    iterator->getCurrentSlot());
+                // Check if the actor has enough stamina to execute the action.
+                if (consumedStamina > actor->getStamina())
                 {
                     actor->sendMsg("You are too tired to attack with %s.\n", iterator->getName());
                     Logger::log(
@@ -335,15 +334,17 @@ ActionStatus CombatAction::performCombatAction(const CombatActionType & move)
         // Get the character chance of fleeing (D20).
         unsigned int fleeChance = TRandInteger<unsigned int>(0, 20);
         fleeChance += actor->getAbilityModifier(Ability::Agility);
-        // Will contain the required stamina.
-        unsigned int consumedStamina;
+        // Get the required stamina.
+        unsigned int consumedStamina = actor->getConsumedStaminaFor(
+            ActionType::Combat,
+            CombatActionType::Flee);
         // Base the escape level on how many enemies are surrounding the character.
         if (fleeChance < static_cast<unsigned int>(actor->opponents.getSize()))
         {
             actor->sendMsg("You were not able to escape from your attackers.\n");
         }
         // Check if the actor has enough stamina to execute the action.
-        else if (!actor->hasStaminaFor(consumedStamina, ActionType::Combat, CombatActionType::Flee))
+        else if (consumedStamina > actor->getStamina())
         {
             actor->sendMsg("You are too tired to flee.\n");
             Logger::log(

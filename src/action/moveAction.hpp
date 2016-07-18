@@ -62,4 +62,15 @@ class MoveAction: public GeneralAction
         /// @brief Performs the current action.
         /// @return the status after performing the action.
         virtual ActionStatus perform();
+
+    private:
+        /// @brief Checks the destination.
+        /// @return <b>True</b> if the destination is set,<br>
+        ///         <b>False</b> otherwise.
+        bool checkDestination() const;
+
+        /// @brief Checks the direction.
+        /// @return <b>True</b> if the direction is set,<br>
+        ///         <b>False</b> otherwise.
+        bool checkDirection() const;
 };

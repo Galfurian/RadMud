@@ -413,14 +413,11 @@ class Character
         unsigned int getCooldown(CombatActionType combatAction);
 
         /// @brief Given an action, it returns the stamina required to execute it.
-        /// @param consumed     The ammount of consumed stamina.
         /// @param actionType   The type of action.
         /// @param combatAction The type of combat action.
         /// @param slot         The slot of the weapon used in the combat action.
-        /// @return <b>True</b> if the character has enough stamina,<br>
-        ///         <b>False</b> otherwise.
-        bool hasStaminaFor(
-            unsigned int & consumed,
+        /// @return The ammount of consumed stamina.
+        unsigned int getConsumedStaminaFor(
             const ActionType & actionType,
             const CombatActionType & combatAction = CombatActionType::NoAction,
             const EquipmentSlot & slot = EquipmentSlot::None) const;
@@ -457,7 +454,7 @@ class Character
 
         /// @brief Get character level of health.
         /// @return Health of this character.
-        unsigned int getHealth();
+        unsigned int getHealth() const;
 
         /// @brief Allows to SET the stamina value.
         /// @param value The value to set.
@@ -491,7 +488,7 @@ class Character
 
         /// @brief Get character level of stamina.
         /// @return Stamina of this character.
-        unsigned int getStamina();
+        unsigned int getStamina() const;
 
         /// @brief Handle what happend when this character die.
         virtual void kill();

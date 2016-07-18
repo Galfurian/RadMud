@@ -46,16 +46,9 @@ void DoProfession(Character * character, Profession * profession, std::istream &
         return;
     }
     // Check if the actor has enough stamina to execute the action.
-    unsigned int consumedStamina;
-    if (!character->hasStaminaFor(consumedStamina, ActionType::Crafting))
+    if (character->getConsumedStaminaFor(ActionType::Crafting) > character->getStamina())
     {
         character->sendMsg("You are too tired right now.\n");
-        Logger::log(
-            LogLevel::Debug,
-            "[%s] Has %s stamina and needs %s.",
-            character->getName(),
-            ToString(character->getStamina()),
-            ToString(consumedStamina));
         return;
     }
     // Search the needed tools.
@@ -75,12 +68,10 @@ void DoProfession(Character * character, Profession * profession, std::istream &
     // Search the needed workbench.
     if (production->workbench != ToolType::NoType)
     {
-        Item * workbench = character->findNearbyTool(
-            production->workbench,
-            ItemVector(),
-            true,
-            false,
-            false);
+        Item * workbench = character->findNearbyTool(production->workbench, ItemVector(),
+        true,
+        false,
+        false);
         if (workbench == nullptr)
         {
             character->sendMsg("The proper workbench is not present.\n");
@@ -158,16 +149,9 @@ void DoBuild(Character * character, std::istream & sArgs)
         return;
     }
     // Check if the actor has enough stamina to execute the action.
-    unsigned int consumedStamina;
-    if (!character->hasStaminaFor(consumedStamina, ActionType::Building))
+    if (character->getConsumedStaminaFor(ActionType::Building) > character->getStamina())
     {
         character->sendMsg("You are too tired right now.\n");
-        Logger::log(
-            LogLevel::Debug,
-            "[%s] Has %s stamina and needs %s.",
-            character->getName(),
-            ToString(character->getStamina()),
-            ToString(consumedStamina));
         return;
     }
     // Search the needed tools.
@@ -283,16 +267,9 @@ void DoDeconstruct(Character * character, std::istream & sArgs)
         return;
     }
     // Check if the actor has enough stamina to execute the action.
-    unsigned int consumedStamina;
-    if (!character->hasStaminaFor(consumedStamina, ActionType::Building))
+    if (character->getConsumedStaminaFor(ActionType::Building) > character->getStamina())
     {
         character->sendMsg("You are too tired right now.\n");
-        Logger::log(
-            LogLevel::Debug,
-            "[%s] Has %s stamina and needs %s.",
-            character->getName(),
-            ToString(character->getStamina()),
-            ToString(consumedStamina));
         return;
     }
     if (HasFlag(item->flags, ItemFlag::Built))

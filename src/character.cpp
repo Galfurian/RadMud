@@ -331,17 +331,10 @@ bool Character::canMoveTo(Direction direction, std::string & error) const
         error = "You cannot go that way.";
         return false;
     }
-    unsigned int consumedStamina;
     // Check if the actor has enough stamina to execute the action.
-    if (!this->hasStaminaFor(consumedStamina, ActionType::Move))
+    if (this->getConsumedStaminaFor(ActionType::Move) > this->getStamina())
     {
         error = "You are too tired to move.\n";
-        Logger::log(
-            LogLevel::Debug,
-            "[%s] Has %s stamina and needs %s.",
-            this->getName(),
-            ToString(this->stamina),
-            ToString(consumedStamina));
         return false;
     }
     // If the direction is upstairs, check if there is a stair.
@@ -1276,8 +1269,7 @@ unsigned int Character::getCooldown(CombatActionType combatAction)
     return static_cast<unsigned int>(BASE);
 }
 
-bool Character::hasStaminaFor(
-    unsigned int & consumed,
+unsigned int Character::getConsumedStaminaFor(
     const ActionType & actionType,
     const CombatActionType & combatAction,
     const EquipmentSlot & slot) const
@@ -1298,32 +1290,17 @@ bool Character::hasStaminaFor(
     double CAR = (carried == 0) ? 0 : log10(carried);
     // Partial result;
     double RSLT = BASE - STR + WGT + CAR;
-    if ((actionType == ActionType::Move) || (actionType == ActionType::Building)
-        || (actionType == ActionType::Crafting))
+    if (actionType == ActionType::Move)
     {
-        Logger::log(
-            LogLevel::Debug,
-            "Required Stamina : %s - %s + %s + %s = %s",
-            ToString(BASE),
-            ToString(STR),
-            ToString(WGT),
-            ToString(CAR),
-            ToString(RSLT));
-        if (RSLT > 0)
-        {
-            consumed = static_cast<unsigned int>(RSLT);
-            if (this->stamina >= consumed)
-            {
-                return true;
-            }
-        }
-        else
-        {
-            Logger::log(
-                LogLevel::Warning,
-                "Evaluated cosumed stamina is below zero(%s).",
-                ToString(RSLT));
-        }
+        // Do something.
+    }
+    else if (actionType == ActionType::Building)
+    {
+        // Do something.
+    }
+    else if (actionType == ActionType::Crafting)
+    {
+        // Do something.
     }
     else if (actionType == ActionType::Combat)
     {
@@ -1335,59 +1312,14 @@ bool Character::hasStaminaFor(
                 unsigned int wpnWeight = weapon->getTotalWeight();
                 double WPN = (wpnWeight == 0) ? 0 : log10(wpnWeight);
                 RSLT += WPN;
-                Logger::log(
-                    LogLevel::Debug,
-                    "Required Stamina : %s - %s + %s + %s = %s",
-                    ToString(BASE),
-                    ToString(STR),
-                    ToString(WGT),
-                    ToString(CAR),
-                    ToString(RSLT));
-                if (RSLT > 0)
-                {
-                    consumed = static_cast<unsigned int>(RSLT);
-                    if (this->stamina >= consumed)
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    Logger::log(
-                        LogLevel::Warning,
-                        "Evaluated cosumed stamina is below zero(%s).",
-                        ToString(RSLT));
-                }
             }
         }
         else if (combatAction == CombatActionType::Flee)
         {
-            Logger::log(
-                LogLevel::Debug,
-                "Required Stamina : %s - %s + %s + %s = %s",
-                ToString(BASE),
-                ToString(STR),
-                ToString(WGT),
-                ToString(CAR),
-                ToString(RSLT));
-            if (RSLT > 0)
-            {
-                consumed = static_cast<unsigned int>(RSLT);
-                if (this->stamina >= consumed)
-                {
-                    return true;
-                }
-            }
-            else
-            {
-                Logger::log(
-                    LogLevel::Warning,
-                    "Evaluated cosumed stamina is below zero(%s).",
-                    ToString(RSLT));
-            }
+            // Do something.
         }
     }
-    return false;
+    return static_cast<unsigned int>(RSLT);
 }
 
 bool Character::setHealth(const unsigned int & value, const bool & force)
@@ -1446,7 +1378,7 @@ bool Character::remHealth(const unsigned int & value, const bool & force)
     return true;
 }
 
-unsigned int Character::getHealth()
+unsigned int Character::getHealth() const
 {
     return this->health;
 }
@@ -1507,7 +1439,7 @@ bool Character::remStamina(const unsigned int & value, const bool & force)
     return true;
 }
 
-unsigned int Character::getStamina()
+unsigned int Character::getStamina() const
 {
     return this->stamina;
 }

@@ -42,16 +42,8 @@ MoveAction::~MoveAction()
 bool MoveAction::check() const
 {
     bool correct = GeneralAction::check();
-    if (this->destination == nullptr)
-    {
-        Logger::log(LogLevel::Error, "No destination has been set.");
-        correct = false;
-    }
-    if (this->direction == Direction::None)
-    {
-        Logger::log(LogLevel::Error, "No direction has been set.");
-        correct = false;
-    }
+    correct &= this->checkDestination();
+    correct &= this->checkDirection();
     return correct;
 }
 
@@ -78,12 +70,20 @@ ActionStatus MoveAction::perform()
         return ActionStatus::Running;
     }
     // Create a variable which will contain the ammount of consumed stamina.
-    unsigned int consumedStamina;
+    std::string error;
     // Check if the actor has enough stamina to execute the action.
-    if (actor->hasStaminaFor(consumedStamina, ActionType::Move))
+    if (!actor->canMoveTo(direction, error))
     {
+        // Notify that the actor can't move because too tired.
+        actor->sendMsg(error + "\n");
+        return ActionStatus::Error;
+    }
+    else
+    {
+        // Get the amount of required stamina.
+        unsigned int consumedStamina = actor->getConsumedStaminaFor(ActionType::Building);
         // Consume the stamina.
-        actor->remStamina(consumedStamina);
+        actor->remStamina(consumedStamina, true);
         // Move character.
         actor->moveTo(
             destination,
@@ -91,17 +91,25 @@ ActionStatus MoveAction::perform()
             actor->getNameCapital() + " arives from " + GetDirectionName(InverDirection(direction))
                 + ".\n");
     }
-    else
-    {
-        // Notify that the actor can't move because too tired.
-        actor->sendMsg("You are too tired right now.\n");
-        // Debugging log.
-        Logger::log(
-            LogLevel::Debug,
-            "[%s] Has %s stamina and needs %s.",
-            actor->getName(),
-            ToString(actor->getStamina()),
-            ToString(consumedStamina));
-    }
     return ActionStatus::Finished;
+}
+
+bool MoveAction::checkDestination() const
+{
+    if (this->destination == nullptr)
+    {
+        Logger::log(LogLevel::Error, "No destination has been set.");
+        return false;
+    }
+    return true;
+}
+
+bool MoveAction::checkDirection() const
+{
+    if (this->direction == Direction::None)
+    {
+        Logger::log(LogLevel::Error, "No direction has been set.");
+        return false;
+    }
+    return true;
 }
