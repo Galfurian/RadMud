@@ -57,32 +57,34 @@ std::string CombatAction::stop()
     return "You stop fighting.";
 }
 
-bool CombatAction::perform()
+ActionStatus CombatAction::perform()
 {
     // Check if the cooldown is ended.
-    if (this->checkElapsed())
+    if (!this->checkElapsed())
     {
-        // The sequence is the following:
-        //  1. Check the list of opponents.
-        //  2. Get the target. It could eighter be the top aggro or an allied.
-        //  3. Check if the target is at range (depending on the action).
-        //  4. If not return to 2.
-        //  5. Otherwise perform the action.
-
-        // Check the list of opponents.
-        actor->opponents.checkList();
-        if (combatAction != CombatActionType::NoAction)
-        {
-            // Perform the combat action.
-            return this->performCombatAction(combatAction);
-        }
-        else
-        {
-            actor->sendMsg(this->stop());
-            return true;
-        }
+        return ActionStatus::Running;
     }
-    return false;
+
+    // The sequence is the following:
+    //  1. Check the list of opponents.
+    //  2. Get the target. It could eighter be the top aggro or an allied.
+    //  3. Check if the target is at range (depending on the action).
+    //  4. If not return to 2.
+    //  5. Otherwise perform the action.
+
+    // Check the list of opponents.
+    actor->opponents.checkList();
+
+    if (combatAction != CombatActionType::NoAction)
+    {
+        // Perform the combat action.
+        return this->performCombatAction(combatAction);
+    }
+    else
+    {
+        actor->sendMsg(this->stop());
+    }
+    return ActionStatus::Finished;
 }
 
 CombatActionType CombatAction::getCombatActionType() const
@@ -110,7 +112,7 @@ bool CombatAction::setNextCombatAction(const CombatActionType & nextAction)
     return true;
 }
 
-bool CombatAction::performCombatAction(const CombatActionType & move)
+ActionStatus CombatAction::performCombatAction(const CombatActionType & move)
 {
     // Retrive once and for all the name of the actor.
     std::string nam = actor->getNameCapital();
@@ -353,16 +355,14 @@ bool CombatAction::performCombatAction(const CombatActionType & move)
         }
         else
         {
-            // Consume the stamina.
-            actor->remStamina(consumedStamina, true);
             // Get the list of available directions.
             std::vector<Direction> directions = actor->room->getAvailableDirections();
             // Check if there are some directions.
             if (!directions.empty())
             {
                 // Pick a random direction, from the poll of the available ones.
-                Direction randomDirection = directions.at(
-                    TRandInteger<size_t>(0, directions.size() - 1));
+                size_t randomDirValue = TRandInteger<size_t>(0, directions.size() - 1);
+                Direction randomDirection = directions.at(randomDirValue);
                 // Get the selected exit.
                 std::shared_ptr<Exit> selected = actor->room->findExit(randomDirection);
                 // Check that the picked exit is not a null pointer.
@@ -373,6 +373,8 @@ bool CombatAction::performCombatAction(const CombatActionType & move)
                 }
                 else
                 {
+                    // Consume the stamina.
+                    actor->remStamina(consumedStamina, true);
                     // Stop the current action.
                     actor->sendMsg(this->stop());
                     // Move the actor to the random direction.
@@ -381,8 +383,12 @@ bool CombatAction::performCombatAction(const CombatActionType & move)
                         nam + " flees from the battlefield.\n\n",
                         nam + " arives fleeing.\n\n",
                         "You flee from the battlefield.\n");
-                    return true;
+                    return ActionStatus::Finished;
                 }
+            }
+            else
+            {
+                actor->sendMsg("You have no way out.\n");
             }
         }
     }
@@ -390,7 +396,7 @@ bool CombatAction::performCombatAction(const CombatActionType & move)
     if (!this->setNextCombatAction(CombatActionType::BasicAttack))
     {
         actor->sendMsg(this->stop() + "\n\n");
-        return true;
+        return ActionStatus::Finished;
     }
-    return false;
+    return ActionStatus::Running;
 }

@@ -70,38 +70,38 @@ std::string MoveAction::stop()
     return "You stop moving.";
 }
 
-bool MoveAction::perform()
+ActionStatus MoveAction::perform()
 {
     // Check if the cooldown is ended.
-    if (this->checkElapsed())
+    if (!this->checkElapsed())
     {
-        // Create a variable which will contain the ammount of consumed stamina.
-        unsigned int consumedStamina;
-        // Check if the actor has enough stamina to execute the action.
-        if (actor->hasStaminaFor(consumedStamina, ActionType::Move))
-        {
-            // Consume the stamina.
-            actor->remStamina(consumedStamina);
-            // Move character.
-            actor->moveTo(
-                destination,
-                actor->getNameCapital() + " goes " + GetDirectionName(direction) + ".\n",
-                actor->getNameCapital() + " arives from "
-                    + GetDirectionName(InverDirection(direction)) + ".\n");
-        }
-        else
-        {
-            // Notify that the actor can't move because too tired.
-            actor->sendMsg("You are too tired right now.\n");
-            // Debugging log.
-            Logger::log(
-                LogLevel::Debug,
-                "[%s] Has %s stamina and needs %s.",
-                actor->getName(),
-                ToString(actor->getStamina()),
-                ToString(consumedStamina));
-        }
-        return true;
+        return ActionStatus::Running;
     }
-    return false;
+    // Create a variable which will contain the ammount of consumed stamina.
+    unsigned int consumedStamina;
+    // Check if the actor has enough stamina to execute the action.
+    if (actor->hasStaminaFor(consumedStamina, ActionType::Move))
+    {
+        // Consume the stamina.
+        actor->remStamina(consumedStamina);
+        // Move character.
+        actor->moveTo(
+            destination,
+            actor->getNameCapital() + " goes " + GetDirectionName(direction) + ".\n",
+            actor->getNameCapital() + " arives from " + GetDirectionName(InverDirection(direction))
+                + ".\n");
+    }
+    else
+    {
+        // Notify that the actor can't move because too tired.
+        actor->sendMsg("You are too tired right now.\n");
+        // Debugging log.
+        Logger::log(
+            LogLevel::Debug,
+            "[%s] Has %s stamina and needs %s.",
+            actor->getName(),
+            ToString(actor->getStamina()),
+            ToString(consumedStamina));
+    }
+    return ActionStatus::Finished;
 }

@@ -71,28 +71,25 @@ std::string CraftAction::stop()
     return this->production->profession->interruptMessage + ".";
 }
 
-bool CraftAction::perform()
+ActionStatus CraftAction::perform()
 {
     // Check if the cooldown is ended.
     if (!this->checkElapsed())
     {
-        return false;
+        return ActionStatus::Running;
     }
+
     // Check the character stamina.
     unsigned int consumedStamina;
     if (!this->checkHasStamina(consumedStamina))
     {
         actor->sendMsg("\nYou are too tired right now.\n");
-        // Set the status to Error.
-        this->actionStatus = ActionStatus::Error;
-        return false;
+        return ActionStatus::Error;
     }
     if (!checkProduction() || !checkMaterial() || !checkTools() || !checkIngredients())
     {
         actor->sendMsg("\nYou have failed your action.\n");
-        // Set the status to Error.
-        this->actionStatus = ActionStatus::Error;
-        return false;
+        return ActionStatus::Error;
     }
     // Consume the stamina.
     actor->remStamina(consumedStamina, true);
@@ -119,9 +116,7 @@ bool CraftAction::perform()
             }
             // Notify the character.
             actor->sendMsg("\nYou have failed your action.\n");
-            // Set the status to Error.
-            this->actionStatus = ActionStatus::Error;
-            return false;
+            return ActionStatus::Error;
         }
         createdItems.push_back(newItem);
     }
@@ -174,7 +169,7 @@ bool CraftAction::perform()
         actor->sendMsg(
             "Since you can't carry them, some of the items have been placed on the ground.\n\n");
     }
-    return true;
+    return ActionStatus::Finished;
 }
 
 bool CraftAction::checkHasStamina(unsigned int & consumed) const

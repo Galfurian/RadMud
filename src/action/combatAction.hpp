@@ -63,9 +63,8 @@ class CombatAction: public GeneralAction
         virtual std::string stop();
 
         /// @brief Performs the current action.
-        /// @return <b>True</b> if the action is finished,<br>
-        ///         <b>False</b> otherwise.
-        virtual bool perform();
+        /// @return the status after performing the action.
+        virtual ActionStatus perform();
 
         /// @brief Provides the type of combat action.
         /// @return The type of combat action.
@@ -80,7 +79,6 @@ class CombatAction: public GeneralAction
     private:
 
         /// @brief Performs the combat action.
-        /// @return <b>True</b> if the action is finished,<br>
-        ///         <b>False</b> otherwise.
-        bool performCombatAction(const CombatActionType & move);
+        /// @return the status after performing the combat action.
+        ActionStatus performCombatAction(const CombatActionType & move);
 };

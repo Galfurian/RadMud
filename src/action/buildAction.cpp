@@ -71,28 +71,24 @@ std::string BuildAction::stop()
     return "You stop building.";
 }
 
-bool BuildAction::perform()
+ActionStatus BuildAction::perform()
 {
     // Check if the cooldown is ended.
     if (!this->checkElapsed())
     {
-        return false;
+        return ActionStatus::Running;
     }
     // Check the character stamina.
     unsigned int consumedStamina;
     if (!checkHasStamina(consumedStamina))
     {
         actor->sendMsg("\nYou are too tired right now.\n");
-        // Set the status to Error.
-        this->actionStatus = ActionStatus::Error;
-        return false;
+        return ActionStatus::Error;
     }
     if (!checkBuilding() || !checkSchematics() || !checkTools() || !checkIngredients())
     {
         actor->sendMsg("\nYou have failed your action.\n");
-        // Set the status to Error.
-        this->actionStatus = ActionStatus::Error;
-        return false;
+        return ActionStatus::Error;
     }
 
     // Consume the stamina.
@@ -126,7 +122,7 @@ bool BuildAction::perform()
     actor->sendMsg(
         "You have finished building %s.\n\n",
         Formatter::yellow() + schematics->buildingModel->getName() + Formatter::reset());
-    return true;
+    return ActionStatus::Finished;
 }
 
 bool BuildAction::checkHasStamina(unsigned int & consumed) const

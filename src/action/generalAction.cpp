@@ -23,16 +23,14 @@ using namespace std::chrono;
 
 GeneralAction::GeneralAction(Character * _actor) :
         actor(_actor),
-        actionCooldown(),
-        actionStatus(ActionStatus::Running)
+        actionCooldown()
 {
     Logger::log(LogLevel::Debug, "Created general action.");
 }
 
 GeneralAction::GeneralAction(Character * _actor, TimeClock _actionCooldown) :
         actor(_actor),
-        actionCooldown(_actionCooldown),
-        actionStatus(ActionStatus::Running)
+        actionCooldown(_actionCooldown)
 {
     Logger::log(LogLevel::Debug, "Created general action.");
 }
@@ -73,14 +71,9 @@ std::string GeneralAction::stop()
     return "Excuse me sir, but you are doing nothing.";
 }
 
-bool GeneralAction::perform()
+ActionStatus GeneralAction::perform()
 {
-    return true;
-}
-
-ActionStatus GeneralAction::getActionStatus() const
-{
-    return actionStatus;
+    return ActionStatus::Finished;
 }
 
 std::string GetActionTypeName(ActionType type)

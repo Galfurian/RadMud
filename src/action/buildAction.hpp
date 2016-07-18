@@ -68,9 +68,8 @@ class BuildAction: public GeneralAction
         virtual std::string stop();
 
         /// @brief Performs the current action.
-        /// @return <b>True</b> if the action is finished,<br>
-        ///         <b>False</b> otherwise.
-        virtual bool perform();
+        /// @return the status after performing the action.
+        virtual ActionStatus perform();
 
     private:
         /// @brief Checks if the character as the required amount of stamina.

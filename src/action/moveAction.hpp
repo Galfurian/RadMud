@@ -60,7 +60,6 @@ class MoveAction: public GeneralAction
         virtual std::string stop();
 
         /// @brief Performs the current action.
-        /// @return <b>True</b> if the action is finished,<br>
-        ///         <b>False</b> otherwise.
-        virtual bool perform();
+        /// @return the status after performing the action.
+        virtual ActionStatus perform();
 };

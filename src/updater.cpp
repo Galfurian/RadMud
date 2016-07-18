@@ -305,11 +305,8 @@ void MudUpdater::performActions()
         {
             continue;
         }
-        if (iterator->getAction()->perform())
-        {
-            iterator->setAction(std::make_shared<GeneralAction>(iterator));
-        }
-        else if (iterator->getAction()->getActionStatus() == ActionStatus::Error)
+        ActionStatus actionStatus = iterator->getAction()->perform();
+        if ((actionStatus == ActionStatus::Finished) || (actionStatus == ActionStatus::Error))
         {
             iterator->setAction(std::make_shared<GeneralAction>(iterator));
         }
@@ -332,11 +329,8 @@ void MudUpdater::performActions()
         {
             continue;
         }
-        if (mobile->getAction()->perform())
-        {
-            mobile->setAction(std::make_shared<GeneralAction>(mobile));
-        }
-        else if (mobile->getAction()->getActionStatus() == ActionStatus::Error)
+        ActionStatus actionStatus = mobile->getAction()->perform();
+        if ((actionStatus == ActionStatus::Finished) || (actionStatus == ActionStatus::Error))
         {
             mobile->setAction(std::make_shared<GeneralAction>(mobile));
         }
