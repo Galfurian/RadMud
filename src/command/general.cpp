@@ -37,8 +37,7 @@ void DoDirection(Character * character, Direction direction)
     StopAction(character);
 
     std::string error;
-    Room * destination = character->canMoveTo(direction, error);
-    if (destination == nullptr)
+    if (!character->canMoveTo(direction, error))
     {
         character->sendMsg(error + "\n");
         return;
@@ -70,7 +69,7 @@ void DoDirection(Character * character, Direction direction)
 
     std::shared_ptr<MoveAction> moveAction = std::make_shared<MoveAction>(
         character,
-        destination,
+        character->room->findExit(direction)->destination,
         direction,
         speed);
     // Check the new action.

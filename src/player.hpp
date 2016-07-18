@@ -87,9 +87,9 @@ class Player: public Character
         /// Disable assign operator.
         Player& operator=(const Player&) = delete;
 
-        virtual bool check();
+        virtual bool check() const;
 
-        virtual bool isPlayer();
+        virtual bool isPlayer() const;
 
         /// @brief Return player socket.
         /// @return Player sockec.

@@ -89,24 +89,24 @@ class EffectList
 
         /// @brief Provides the overall health modifier.
         /// @return The total modifier.
-        int getHealthMod();
+        int getHealthMod() const;
 
         /// @brief Provides the overall stamina modifier.
         /// @return The total modifier.
-        int getStaminaMod();
+        int getStaminaMod() const;
 
         /// @brief Provides the overall hit modifier.
         /// @return The total modifier.
-        int getHitMod();
+        int getHitMod() const;
 
         /// @brief Provides the overall damage modifier.
         /// @return The total modifier.
-        int getDamMod();
+        int getDamMod() const;
 
         /// @brief Provides the overall ability.
         /// @param ability The ability.
         /// @return The total modifier.
-        int getAbilityModifier(const Ability & ability);
+        int getAbilityModifier(const Ability & ability) const;
 
         /// @brief Allows to add an effect to the buffer of pending effects.
         /// @param effect The one which has to be added to the buffer.
@@ -128,6 +128,12 @@ class EffectList
         /// @brief Provides an iterator to the begin of the list of active effects.
         iterator begin();
 
+        /// @brief Provides a const_iterator to the begin of the list of active effects.
+        const_iterator begin() const;
+
         /// @brief Provides an iterator to the end of the list of active effects.
         iterator end();
+
+        /// @brief Provides a const_iterator to the end of the list of active effects.
+        const_iterator end() const;
 };
