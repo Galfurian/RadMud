@@ -20,6 +20,7 @@
 
 #include "itemModel.hpp"
 
+/// @brief Model of a projectile.
 class ProjectileModel: public ItemModel
 {
     public:

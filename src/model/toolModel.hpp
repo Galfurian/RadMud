@@ -54,6 +54,7 @@ typedef enum class ToolTypes
 /// Set of tool types.
 typedef std::set<ToolType> ToolSet;
 
+/// @brief Model of a tool.
 class ToolModel: public ItemModel
 {
     public:

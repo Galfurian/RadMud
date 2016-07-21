@@ -52,6 +52,7 @@ typedef enum class WeaponTypes
     Unarmed,
 } WeaponType;
 
+/// @brief Model of a weapon.
 class WeaponModel: public ItemModel
 {
     public:

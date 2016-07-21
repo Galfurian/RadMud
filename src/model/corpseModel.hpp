@@ -20,6 +20,7 @@
 
 #include "itemModel.hpp"
 
+/// @brief Model of a corpse.
 class CorpseModel: public ItemModel
 {
     public:

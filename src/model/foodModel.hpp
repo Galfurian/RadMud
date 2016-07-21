@@ -31,6 +31,7 @@ typedef enum class FoodFlags
     Raw = 2,
 } FoodFlag;
 
+/// @brief Model of food.
 class FoodModel: public ItemModel
 {
     public:

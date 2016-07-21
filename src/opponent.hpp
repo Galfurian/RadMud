@@ -132,6 +132,11 @@ class OpponentsList
         /// @brief Check and clear the list from possible disconnected players.
         void checkList();
 
+        /// @brief Reset this list and all the ones linked to it.
+        /// @details
+        /// Traverses the internal list of opponents and for each element
+        ///  removes from its list of opponents the actor which owns this list.
+        /// Then the element is removed from the list.
         void resetList();
 
         /// @brief Provides an iterator to the begin of the list of aggressors.

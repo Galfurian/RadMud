@@ -190,6 +190,8 @@ class Character
         /// @return The maximum radius of view.
         int getViewDistance() const;
 
+        /// @brief Allows to set an action.
+        /// @param _action The action that has to be set.
         void setAction(std::shared_ptr<GeneralAction> _action);
 
         /// @brief Provides a pointer to the action object associated to this character.

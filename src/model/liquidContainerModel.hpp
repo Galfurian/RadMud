@@ -33,6 +33,7 @@ typedef enum class LiqContainerFlags
     Destroy = 4,
 } LiqContainerFlag;
 
+/// @brief Model of a container of liquids.
 class LiquidContainerModel: public ItemModel
 {
     public:
