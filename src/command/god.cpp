@@ -675,9 +675,14 @@ void DoItemGet(Character * character, std::istream & sArgs)
     else if (item->owner != nullptr)
     {
         character->sendMsg("The item was possessed by '%s'\n", item->owner->getName());
-        FindErase(item->owner->inventory, item);
-        FindErase(item->owner->equipment, item);
-        item->owner = nullptr;
+        if (!character->remEquipmentItem(item))
+        {
+            if (!character->remInventoryItem(item))
+            {
+                character->sendMsg("Cannot take the item from the owner!");
+                return;
+            }
+        }
         item->updateOnDB();
     }
     else if (item->container != nullptr)
@@ -710,8 +715,14 @@ void DoItemDestroy(Character * character, std::istream & sArgs)
         character->sendMsg("Invalid vnum.\n");
         return;
     }
-    item->destroy();
-    character->sendMsg("You have tryed to destroy the desired object.\n");
+    if (item->destroy())
+    {
+        character->sendMsg("You have destroyed the desired object.\n");
+    }
+    else
+    {
+        character->sendMsg("You have NOT destroyed the desired object.\n");
+    }
 }
 
 void DoItemInfo(Character * character, std::istream & sArgs)
@@ -1604,8 +1615,9 @@ void DoItemList(Character * character, std::istream & sArgs)
     table.addColumn("NAME", StringAlign::Left);
     table.addColumn("TYPE", StringAlign::Left);
     table.addColumn("LOCATION", StringAlign::Left);
-    for (auto item : Mud::instance().mudItems)
+    for (auto iterator : Mud::instance().mudItems)
     {
+        Item * item = iterator.second;
         // Prepare the row.
         TableRow row;
         row.push_back(ToString(item->vnum));
@@ -1851,23 +1863,24 @@ void DoCorpseList(Character * character, std::istream & sArgs)
     table.addColumn("VNUM", StringAlign::Right);
     table.addColumn("NAME", StringAlign::Left);
     table.addColumn("LOCATION", StringAlign::Left);
-    for (auto item : Mud::instance().mudCorpses)
+    for (auto iterator : Mud::instance().mudCorpses)
     {
+        Item * corpse = iterator.second;
         // Prepare the row.
         TableRow row;
-        row.push_back(ToString(item->vnum));
-        row.push_back(item->getNameCapital());
-        if (item->owner != nullptr)
+        row.push_back(ToString(corpse->vnum));
+        row.push_back(corpse->getNameCapital());
+        if (corpse->owner != nullptr)
         {
-            row.push_back(" Owner  : " + item->owner->getName());
+            row.push_back(" Owner  : " + corpse->owner->getName());
         }
-        else if (item->room != nullptr)
+        else if (corpse->room != nullptr)
         {
-            row.push_back(" Room   : " + ToString(item->room->vnum));
+            row.push_back(" Room   : " + ToString(corpse->room->vnum));
         }
-        else if (item->container != nullptr)
+        else if (corpse->container != nullptr)
         {
-            row.push_back(" Inside : " + ToString(item->container->vnum));
+            row.push_back(" Inside : " + ToString(corpse->container->vnum));
         }
         else
         {

@@ -240,7 +240,9 @@ void DoTake(Character * character, std::istream & sArgs)
                 character->sendMsg("You've taken nothing from %s.\n", container->getName());
                 return; // Skip the rest of the function.
             }
-            character->sendMsg("You've taken nothing from %s.\n", container->getName());
+            character->sendMsg(
+                "You've taken everything you could from %s.\n",
+                container->getName());
             // Set the list of exceptions.
             CharacterVector exceptions;
             exceptions.push_back(character);
@@ -1180,7 +1182,14 @@ void DoPut(Character * character, std::istream & sArgs)
     }
     if (container->model->getType() != ModelType::Container)
     {
-        character->sendMsg("'%s' is not a container.\n", container->getName());
+        if (container->model->getType() == ModelType::Corpse)
+        {
+            character->sendMsg("You don't really want to put something inside that body...\n");
+        }
+        else
+        {
+            character->sendMsg("'%s' is not a container.\n", container->getName());
+        }
         return;
     }
 

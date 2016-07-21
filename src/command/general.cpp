@@ -307,7 +307,8 @@ void DoLook(Character * character, std::istream & sArgs)
         Item * container = character->findNearbyItem(arguments[1].first, arguments[1].second);
         if (container)
         {
-            if (container->model->getType() == ModelType::Container)
+            ModelType modelType = container->model->getType();
+            if ((modelType == ModelType::Container) || (modelType == ModelType::Corpse))
             {
                 Item * item = container->findContent(arguments[0].first, arguments[0].second);
                 if (item)

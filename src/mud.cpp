@@ -42,14 +42,14 @@ void Bailout(int signal)
 }
 
 Mud::Mud() :
-    mudPort(4000),
-    _servSocket(-1),
-    _maxDesc(-1),
-    _shutdownSignal(),
-    _bootTime(time(NULL)),
-    _maxVnumRoom(),
-    _maxVnumItem(),
-    _minVnumCorpses()
+        mudPort(4000),
+        _servSocket(-1),
+        _maxDesc(-1),
+        _shutdownSignal(),
+        _bootTime(time(NULL)),
+        _maxVnumRoom(),
+        _maxVnumItem(),
+        _minVnumCorpses()
 {
     // Nothing to do.
 }
@@ -69,7 +69,7 @@ Mud::~Mud()
     Logger::log(LogLevel::Global, "Freeing memory occupied by items...");
     for (auto iterator : Mud::instance().mudItems)
     {
-        delete (iterator);
+        delete (iterator.second);
     }
     Logger::log(LogLevel::Global, "Freeing memory occupied by rooms...");
     for (auto iterator : Mud::instance().mudRooms)
@@ -89,7 +89,7 @@ Mud::~Mud()
     Logger::log(LogLevel::Global, "Freeing memory occupied by corpses...");
     for (auto iterator : Mud::instance().mudCorpses)
     {
-        delete (iterator);
+        delete (iterator.second);
     }
     Logger::log(LogLevel::Global, "Freeing memory occupied by item models...");
     for (auto iterator : Mud::instance().mudItemModels)
@@ -169,11 +169,11 @@ bool Mud::savePlayers()
 bool Mud::saveItems()
 {
     bool result = true;
-    for (auto item : mudItems)
+    for (auto iterator : mudItems)
     {
-        if (!item->updateOnDB())
+        if (!iterator.second->updateOnDB())
         {
-            Logger::log(LogLevel::Error, "Error saving item :" + ToString(item->vnum));
+            Logger::log(LogLevel::Error, "Error saving item :" + ToString(iterator.second->vnum));
             result = false;
             break;
         }
@@ -229,13 +229,19 @@ bool Mud::remMobile(Mobile * mobile)
 }
 bool Mud::addItem(Item * item)
 {
-    mudItems.insert(mudItems.end(), item);
-    _maxVnumItem = std::max(_maxVnumItem, item->vnum);
-    return true;
+    if (mudItems.insert(std::make_pair(item->vnum, item)).second)
+    {
+        _maxVnumItem = std::max(_maxVnumItem, item->vnum);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 bool Mud::remItem(Item * item)
 {
-    return (FindErase(mudItems, item) != mudItems.end());
+    return (FindErase(mudItems, item->vnum) != mudItems.end());
 }
 bool Mud::addRoom(Room * room)
 {
@@ -250,14 +256,21 @@ bool Mud::remRoom(Room * room)
 {
     return (FindErase(mudRooms, room->vnum) != mudRooms.end());
 }
-void Mud::addCorpse(Item * corpse)
+bool Mud::addCorpse(Item * corpse)
 {
-    mudCorpses.push_back(corpse);
-    _minVnumCorpses = std::min(_minVnumCorpses, corpse->vnum);
+    if (mudCorpses.insert(std::make_pair(corpse->vnum, corpse)).second)
+    {
+        _minVnumCorpses = std::min(_minVnumCorpses, corpse->vnum);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 bool Mud::remCorpse(Item * corpse)
 {
-    return (FindErase(mudCorpses, corpse) != mudCorpses.end());
+    return (FindErase(mudCorpses, corpse->vnum) != mudCorpses.end());
 }
 bool Mud::addItemModel(ItemModel * model)
 {
@@ -398,12 +411,10 @@ ItemModel * Mud::findItemModel(int vnum)
 
 Item * Mud::findItem(int vnum)
 {
-    for (auto iterator : mudItems)
+    ItemMap::iterator iterator = mudItems.find(vnum);
+    if (iterator != mudItems.end())
     {
-        if (iterator->vnum == vnum)
-        {
-            return iterator;
-        }
+        return iterator->second;
     }
     return nullptr;
 }
@@ -462,7 +473,8 @@ Faction * Mud::findFaction(int vnum)
 
 Faction * Mud::findFaction(std::string name)
 {
-    for (FactionMap::iterator iterator = mudFactions.begin(); iterator != mudFactions.end(); ++iterator)
+    for (FactionMap::iterator iterator = mudFactions.begin(); iterator != mudFactions.end();
+        ++iterator)
     {
         if (ToLower(iterator->second->name) == ToLower(name))
         {
@@ -494,13 +506,10 @@ Writing * Mud::findWriting(int vnum)
 
 Item * Mud::findCorpse(int vnum)
 {
-    for (ItemList::iterator it = mudCorpses.begin(); it != mudCorpses.end(); ++it)
+    ItemMap::iterator iterator = mudCorpses.find(vnum);
+    if (iterator != mudCorpses.end())
     {
-        Item * corpse = (*it);
-        if (corpse->vnum == vnum)
-        {
-            return corpse;
-        }
+        return iterator->second;
     }
     return nullptr;
 }
@@ -537,7 +546,8 @@ Profession * Mud::findProfession(unsigned int vnum)
 
 Profession * Mud::findProfession(std::string command)
 {
-    for (ProfessionMap::iterator iterator = mudProfessions.begin(); iterator != mudProfessions.end(); ++iterator)
+    for (ProfessionMap::iterator iterator = mudProfessions.begin();
+        iterator != mudProfessions.end(); ++iterator)
     {
         if (ToLower(iterator->second->command) == ToLower(command))
         {
@@ -559,7 +569,8 @@ Production * Mud::findProduction(int vnum)
 
 Production * Mud::findProduction(std::string name)
 {
-    for (ProductionMap::iterator iterator = mudProductions.begin(); iterator != mudProductions.end(); ++iterator)
+    for (ProductionMap::iterator iterator = mudProductions.begin();
+        iterator != mudProductions.end(); ++iterator)
     {
         if (ToLower(iterator->second->name) == ToLower(name))
         {
@@ -596,7 +607,8 @@ ActionHandler & Mud::findStateAction(ConnectionState state)
 
 Building * Mud::findBuilding(std::string name)
 {
-    for (BuildingMap::iterator iterator = mudBuildings.begin(); iterator != mudBuildings.end(); ++iterator)
+    for (BuildingMap::iterator iterator = mudBuildings.begin(); iterator != mudBuildings.end();
+        ++iterator)
     {
         if (ToLower(iterator->second.name) == ToLower(name))
         {
@@ -608,7 +620,8 @@ Building * Mud::findBuilding(std::string name)
 
 Building * Mud::findBuilding(int vnum)
 {
-    for (BuildingMap::iterator iterator = mudBuildings.begin(); iterator != mudBuildings.end(); ++iterator)
+    for (BuildingMap::iterator iterator = mudBuildings.begin(); iterator != mudBuildings.end();
+        ++iterator)
     {
         if (iterator->second.buildingModel->vnum == vnum)
         {
@@ -844,7 +857,10 @@ void Mud::processNewConnection()
     {
         try
         {
-            socketFileDescriptor = accept(_servSocket, (struct sockaddr *) &socketAddress, &socketAddressSize);
+            socketFileDescriptor = accept(
+                _servSocket,
+                (struct sockaddr *) &socketAddress,
+                &socketAddressSize);
 
             // A bad socket probably means no more connections are outstanding.
             if (socketFileDescriptor == kNoSocketIndicator)

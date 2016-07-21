@@ -88,28 +88,39 @@ bool Item::check(bool complete)
     return safe;
 }
 
-void Item::destroy()
+bool Item::destroy()
 {
-    Logger::log(LogLevel::Error, "Destroying item '" + this->getName() + "'");
     // Remove the item from the game, this means: Room, Player, Container.
     if (room != nullptr)
     {
-        room->removeItem(this);
+        Logger::log(LogLevel::Debug, "Removing item from room.");
+        if (!room->removeItem(this))
+        {
+            return false;
+        }
     }
     else if (owner != nullptr)
     {
-        if (owner->hasInventoryItem(this))
+        Logger::log(LogLevel::Debug, "Removing item from owner.");
+        if (!owner->remInventoryItem(this))
         {
-            owner->remInventoryItem(this);
-        }
-        else if (owner->hasEquipmentItem(this))
-        {
-            owner->remEquipmentItem(this);
+            if (!owner->remEquipmentItem(this))
+            {
+                return false;
+            }
         }
     }
     else if (container != nullptr)
     {
-        container->takeOut(this);
+        Logger::log(LogLevel::Debug, "Removing item from container.");
+        if (!container->takeOut(this))
+        {
+            return false;
+        }
+    }
+    else
+    {
+        return false;
     }
 
     if (this->model->getType() == ModelType::Corpse)
@@ -119,9 +130,8 @@ void Item::destroy()
         if (!Mud::instance().remCorpse(this))
         {
             Logger::log(LogLevel::Error, "Something gone wrong during corpse removal from mud.");
+            return false;
         }
-        // Delete the auto-generated model for this corpse.
-        delete (this->model);
     }
     else
     {
@@ -130,16 +140,46 @@ void Item::destroy()
         if (!Mud::instance().remItem(this))
         {
             Logger::log(LogLevel::Error, "Something gone wrong during item removal from mud.");
+            return false;
         }
         Logger::log(LogLevel::Error, "Removing item '" + this->getName() + "' from DB;");
         // Remove the item from the database.
         if (!this->removeOnDB())
         {
             Logger::log(LogLevel::Error, "Something gone wrong during item removal from DB.");
+            return false;
         }
     }
     // Delete the item.
     delete (this);
+    return true;
+}
+
+bool Item::createOnDB()
+{
+    // Check if the Item can be saved on the database.
+    if (model->getType() == ModelType::Corpse)
+    {
+        return true;
+    }
+    // Prepare the vector used to insert into the database.
+    std::vector<std::string> arguments;
+    arguments.push_back(ToString(this->vnum));
+    arguments.push_back(ToString(model->vnum));
+    arguments.push_back(this->maker);
+    arguments.push_back(ToString(this->condition));
+    arguments.push_back(ToString(this->composition->vnum));
+    arguments.push_back(EnumToString(this->quality));
+    arguments.push_back(ToString(this->flags));
+    if (SQLiteDbms::instance().insertInto("Item", arguments))
+    {
+        return true;
+    }
+    else
+    {
+        SQLiteDbms::instance().rollbackTransection();
+        return false;
+    }
 }
 
 bool Item::updateOnDB()
@@ -411,7 +451,7 @@ bool Item::hasNodeType(NodeType nodeType)
 
 bool Item::isEmpty()
 {
-    if (model->getType() == ModelType::Container)
+    if ((model->getType() == ModelType::Container) || (model->getType() == ModelType::Corpse))
     {
         return (content.size() == 0);
     }
@@ -496,19 +536,24 @@ bool Item::putInside(Item * item)
     return true;
 }
 
-void Item::takeOut(Item * item)
+bool Item::takeOut(Item * item)
 {
-    if (FindErase(content, item))
+    bool removed = false;
+    for (auto it = content.begin(); it != content.end(); ++it)
     {
-        Logger::log(
-            LogLevel::Debug,
-            "Item '" + item->getName() + "' taken out from '" + this->getName() + "';");
-        item->container = nullptr;
+        Item * containedItem = (*it);
+        if (containedItem->vnum == item->vnum)
+        {
+            Logger::log(
+                LogLevel::Debug,
+                "Item '" + item->getName() + "' taken out from '" + this->getName() + "';");
+            item->container = nullptr;
+            content.erase(it);
+            removed = true;
+            break;
+        }
     }
-    else
-    {
-        Logger::log(LogLevel::Error, "Error during item removal from container.");
-    }
+    return removed;
 }
 
 bool Item::pourIn(Liquid * liquid, const unsigned int & quantity)
@@ -620,7 +665,7 @@ Item * Item::findContent(std::string search_parameter, int & number)
 string Item::lookContent()
 {
     string output;
-    if (model->getType() == ModelType::Container)
+    if ((model->getType() == ModelType::Container) || (model->getType() == ModelType::Corpse))
     {
         if (content.empty())
         {

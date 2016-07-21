@@ -97,11 +97,15 @@ class Room
 
         /// @brief Remove the passed item from room's item list.
         /// @param item The item to remove from the list.
-        void removeItem(Item * item);
+        /// @return <b>True</b> if the operation goes well,<br>
+        ///         <b>False</b> otherwise.
+        bool removeItem(Item * item);
 
         /// @brief Remove the passed item from room's building list.
         /// @param item The building to remove from the list.
-        void removeBuilding(Item * item);
+        /// @return <b>True</b> if the operation goes well,<br>
+        ///         <b>False</b> otherwise.
+        bool removeBuilding(Item * item);
 
         /// @brief Remove the passed character from room's character list.
         /// @param character The character to remove from the list.

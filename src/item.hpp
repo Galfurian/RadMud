@@ -87,7 +87,14 @@ class Item
         bool check(bool complete = false);
 
         /// @brief This function is used to destroy the item.
-        void destroy();
+        /// @return <b>True</b> if the item has been destroyed,<br>
+        ///         <b>False</b> otherwise.
+        bool destroy();
+
+        /// @brief Create the item entry on database.
+        /// @return <b>True</b> if the execution goes well,<br>
+        ///         <b>False</b> otherwise.
+        bool createOnDB();
 
         /// @brief Save the item on database.
         /// @return <b>True</b> if the execution goes well,<br><b>False</b> otherwise.
@@ -163,7 +170,9 @@ class Item
 
         /// @brief Extract an item from the container.
         /// @param item The item to load in.
-        void takeOut(Item * item);
+        /// @return <b>True</b> if the item has been taken out,<br>
+        ///         <b>False</b> otherwise.
+        bool takeOut(Item * item);
 
         /// @brief Load some liquid inside the container and update the database.
         /// @param liquid   The liquid to load in.
@@ -205,6 +214,7 @@ class Item
         /// @brief Operator used to order the items based on their name.
         inline bool operator<(Item & rhs)
         {
+            Logger::log(LogLevel::Debug, "%s < %s", ToString(this->vnum), ToString(rhs.vnum));
             return getName() < rhs.getName();
         }
 };
@@ -217,6 +227,9 @@ typedef std::vector<std::pair<Item *, int>> ItemVectorNumbered;
 
 /// List of items.
 typedef std::list<Item *> ItemList;
+
+/// Map of items.
+typedef std::map<int, Item *> ItemMap;
 
 /// @brief Return the list of items grouped.
 /// @param items The item list to group.

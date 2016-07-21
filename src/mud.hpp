@@ -119,7 +119,7 @@ class Mud
         /// List all the mobile.
         MobileMap mudMobiles;
         /// List of all items.
-        ItemList mudItems;
+        ItemMap mudItems;
         /// List of all the rooms.
         RoomMap mudRooms;
         /// List all the items model.
@@ -135,7 +135,7 @@ class Mud
         /// List of all the writings.
         WritingMap mudWritings;
         /// List of all the corpses.
-        ItemList mudCorpses;
+        ItemMap mudCorpses;
         /// List of all the continents.
         ContinentMap mudContinents;
         /// List of all the materials.
@@ -204,7 +204,7 @@ class Mud
         /// Remove the given room from the mud.
         bool remRoom(Room * room);
         /// Add the given corpse to the mud.
-        void addCorpse(Item * corpse);
+        bool addCorpse(Item * corpse);
         /// Remove the given corpse from the mud.
         bool remCorpse(Item * corpse);
         /// Add the given item model to the mud.

@@ -105,35 +105,33 @@ void Room::addCharacter(Character * character)
     character->room = this;
 }
 
-void Room::removeItem(Item * item)
+bool Room::removeItem(Item * item)
 {
-    if (FindErase(items, item))
+    bool removed = false;
+    for (auto it = items.begin(); it != items.end(); ++it)
     {
-        Logger::log(
-            LogLevel::Debug,
-            "Item '" + item->getName() + "' removed from '" + this->name + "';");
-        item->room = nullptr;
+        if ((*it)->vnum == item->vnum)
+        {
+            Logger::log(
+                LogLevel::Debug,
+                "Item '" + item->getName() + "' removed from '" + this->name + "';");
+            item->room = nullptr;
+            items.erase(it);
+            removed = true;
+            break;
+        }
     }
-    else
-    {
-        Logger::log(LogLevel::Error, "Error during item removal from room.");
-    }
+    return removed;
 }
 
-void Room::removeBuilding(Item * item)
+bool Room::removeBuilding(Item * item)
 {
-    if (FindErase(items, item))
+    if (this->removeItem(item))
     {
-        Logger::log(
-            LogLevel::Debug,
-            "Building '" + item->getName() + "' removed from '" + this->name + "';");
-        item->room = nullptr;
         ClearFlag(item->flags, ItemFlag::Built);
+        return true;
     }
-    else
-    {
-        Logger::log(LogLevel::Error, "Error during item removal from room.");
-    }
+    return false;
 }
 
 void Room::removeCharacter(Character * character)

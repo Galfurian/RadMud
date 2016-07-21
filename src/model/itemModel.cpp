@@ -199,26 +199,11 @@ Item * ItemModel::createItem(std::string maker, Material * composition, ItemQual
         return nullptr;
     }
 
-    // Prepare the vector used to insert into the database.
-    std::vector<std::string> arguments;
-    arguments.push_back(ToString(newItem->vnum));
-    arguments.push_back(ToString(vnum));
-    arguments.push_back(maker);
-    arguments.push_back(ToString(condition));
-    arguments.push_back(ToString(composition->vnum));
-    arguments.push_back(EnumToString(itemQuality));
-    arguments.push_back(ToString(modelFlags));
-
-    if (SQLiteDbms::instance().insertInto("Item", arguments))
+    if (newItem->createOnDB())
     {
         // Insert into the item_list the new item.
         Mud::instance().addItem(newItem);
     }
-    else
-    {
-        SQLiteDbms::instance().rollbackTransection();
-    }
-
     return newItem;
 }
 

@@ -254,10 +254,9 @@ void MudUpdater::updateItems()
 {
     ItemList itemToDestroy;
     Logger::log(LogLevel::Debug, "Updating corpses...");
-    for (ItemList::iterator it = Mud::instance().mudCorpses.begin();
-        it != Mud::instance().mudCorpses.end(); ++it)
+    for (auto it : Mud::instance().mudCorpses)
     {
-        Item * corpse = *it;
+        Item * corpse = it.second;
         if (HasFlag(corpse->model->modelFlags, ModelFlag::Unbreakable))
         {
             continue;
@@ -269,10 +268,9 @@ void MudUpdater::updateItems()
         }
     }
     Logger::log(LogLevel::Debug, "Updating items...");
-    for (ItemList::iterator it = Mud::instance().mudItems.begin();
-        it != Mud::instance().mudItems.end(); ++it)
+    for (auto it : Mud::instance().mudItems)
     {
-        Item * item = *it;
+        Item * item = it.second;
         Logger::log(LogLevel::Debug, "Updating '" + item->getName() + "'...");
         if (HasFlag(item->model->modelFlags, ModelFlag::Unbreakable))
         {
@@ -286,7 +284,7 @@ void MudUpdater::updateItems()
     }
     for (auto it : itemToDestroy)
     {
-        FindErase(Mud::instance().mudItems, it);
+        Mud::instance().remItem(it);
         it->destroy();
     }
     Logger::log(LogLevel::Debug, "Done!");

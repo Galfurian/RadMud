@@ -151,6 +151,38 @@ bool Mobile::hasAction(const string & _action) const
 
 void Mobile::kill()
 {
+    // Before calling the character kill function, set the vnum for the new
+    //  items, and set the item condition to a random value from 10% to 50%.
+    for (auto it = this->inventory.begin(); it != this->inventory.end(); ++it)
+    {
+        Item * item = (*it);
+        // Set the item vnum.
+        item->vnum = Mud::instance().getMaxVnumItem() + 1;
+        // Add the item to the mud.
+        Mud::instance().addItem(item);
+        // Evaluate the minimum and maximum condition.
+        int min = (item->model->condition / 100) * 10;
+        int max = (item->model->condition / 100) * 50;
+        // Set a random condition for the new item.
+        item->condition = TRandInteger<int>(min, max);
+        // Create the entry for the item on the database.
+        item->createOnDB();
+    }
+    for (auto it = this->equipment.begin(); it != this->equipment.end(); ++it)
+    {
+        Item * item = (*it);
+        // Set the item vnum.
+        item->vnum = Mud::instance().getMaxVnumItem() + 1;
+        // Add the item to the mud.
+        Mud::instance().addItem(item);
+        // Evaluate the minimum and maximum condition.
+        int min = (item->model->condition / 100) * 10;
+        int max = (item->model->condition / 100) * 50;
+        // Set a random condition for the new item.
+        item->condition = TRandInteger<int>(min, max);
+        // Create the entry for the item on the database.
+        item->createOnDB();
+    }
     // Call the method of the father class.
     Character::kill();
     // Set the mobile as dead.

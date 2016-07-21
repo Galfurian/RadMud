@@ -676,12 +676,26 @@ bool Character::findNearbyResouces(IngredientMap ingredients, ItemVector & found
 
 bool Character::hasInventoryItem(Item * item)
 {
-    return (std::find(inventory.begin(), inventory.end(), item) != inventory.end());
+    for (auto it : inventory)
+    {
+        if (it->vnum == item->vnum)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool Character::hasEquipmentItem(Item * item)
 {
-    return (std::find(equipment.begin(), equipment.end(), item) != equipment.end());
+    for (auto it : equipment)
+    {
+        if (it->vnum == item->vnum)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool Character::addInventoryItem(Item * item)
@@ -703,26 +717,22 @@ bool Character::addInventoryItem(Item * item)
 
 bool Character::remInventoryItem(Item *item)
 {
-    if (item == nullptr)
+    bool removed = false;
+    for (ItemVector::iterator it = inventory.begin(); it != inventory.end(); ++it)
     {
-        Logger::log(LogLevel::Error, "[remInventoryItem] Item is a nullptr.");
-        return false;
+        Item * invItem = (*it);
+        if (invItem->vnum == item->vnum)
+        {
+            Logger::log(
+                LogLevel::Debug,
+                "Item '" + item->getName() + "' removed from '" + this->getName() + "';");
+            item->owner = nullptr;
+            inventory.erase(it);
+            removed = true;
+            break;
+        }
     }
-    else if (!FindErase(inventory, item))
-    {
-        Logger::log(
-            LogLevel::Error,
-            "[remInventoryItem] Error during item removal from inventory.");
-        return false;
-    }
-    else
-    {
-        Logger::log(
-            LogLevel::Debug,
-            "Item '" + item->getName() + "' removed from '" + this->getName() + "';");
-        item->owner = nullptr;
-        return true;
-    }
+    return removed;
 }
 
 bool Character::canCarry(Item * item) const
@@ -772,28 +782,22 @@ bool Character::addEquipmentItem(Item * item)
 
 bool Character::remEquipmentItem(Item * item)
 {
-    // Check if the item exist.
-    if (item == nullptr)
+    bool removed = false;
+    for (auto it = equipment.begin(); it != equipment.end(); ++it)
     {
-        Logger::log(LogLevel::Error, "[remEquipmentItem] Item is a nullptr.");
-        return false;
+        Item * eqpItem = (*it);
+        if (eqpItem->vnum == item->vnum)
+        {
+            Logger::log(
+                LogLevel::Debug,
+                "Item '" + item->getName() + "' removed from '" + this->getName() + "';");
+            item->owner = nullptr;
+            equipment.erase(it);
+            removed = true;
+            break;
+        }
     }
-    // Try to remove the item from the equipment.
-    else if (!FindErase(equipment, item))
-    {
-        Logger::log(
-            LogLevel::Error,
-            "[remEquipmentItem] Error during item removal from equipment.");
-        return false;
-    }
-    else
-    {
-        Logger::log(
-            LogLevel::Debug,
-            "Item '" + item->getName() + "' removed from '" + this->getName() + "';");
-        item->owner = nullptr;
-        return true;
-    }
+    return removed;
 }
 
 bool Character::canWield(Item * item, std::string & error, EquipmentSlot & where) const
@@ -1450,17 +1454,30 @@ void Character::kill()
     Item * corpse = this->createCorpse();
     // Transfer all the items from the character to the corpse.
     auto tempInventory = this->inventory;
-    for (auto it = tempInventory.begin(); it != tempInventory.begin(); ++it)
+    for (auto it = tempInventory.begin(); it != tempInventory.end(); ++it)
     {
-        this->remInventoryItem(*it);
-        corpse->content.push_back(*it);
-        (*it)->updateOnDB();
+        Item * item = (*it);
+        // Remove the item from the inventory.
+        this->remInventoryItem(item);
+        // Add the item to the corpse.
+        corpse->content.push_back(item);
+        // Set the corpse as container of the item.
+        item->container = corpse;
+        // Update the item on the database.
+        item->updateOnDB();
     }
     auto tempEquipment = this->equipment;
-    for (auto it = tempEquipment.begin(); it != tempEquipment.begin(); ++it)
+    for (auto it = tempEquipment.begin(); it != tempEquipment.end(); ++it)
     {
-        this->remEquipmentItem(*it);
-        corpse->content.push_back(*it);
+        Item * item = (*it);
+        // Remove the item from the inventory.
+        this->remEquipmentItem(item);
+        // Add the item to the corpse.
+        corpse->content.push_back(item);
+        // Set the corpse as container of the item.
+        item->container = corpse;
+        // Update the item on the database.
+        item->updateOnDB();
     }
     // Reset the action of the character.
     this->setAction(std::make_shared<GeneralAction>(this));
