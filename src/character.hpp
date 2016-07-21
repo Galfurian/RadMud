@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "actions.hpp"
+#include "action/combatAction.hpp"
 #include "defines.hpp"
 #include "effect.hpp"
 #include "exit.hpp"
@@ -78,12 +78,12 @@ class Character
         CharacterPosture posture;
         /// Active effects on player.
         EffectList effects;
-        /// Character current action.
-        Action action;
         /// The lua_State associated with this character.
         lua_State * L;
         /// List of opponents.
         OpponentsList opponents;
+        /// Character current action.
+        std::shared_ptr<GeneralAction> action;
 
         /// @brief Constructor.
         Character();
@@ -98,39 +98,40 @@ class Character
         Character& operator=(const Character&) = delete;
 
         /// @brief Check the correctness of the character information.
-        /// @return <b>True</b> if the information are correct,<br><b>False</b> otherwise.
-        virtual bool check();
+        /// @return <b>True</b> if the information are correct,<br>
+        ///         <b>False</b> otherwise.
+        virtual bool check() const;
 
         /// @brief Used to identify if this character is an npc.
         /// @return <b>True</b> if is an NPC,<br>
         ///         <b>False</b> otherwise.
-        virtual bool isMobile();
+        virtual bool isMobile() const;
 
         /// @brief Used to identify if this character is a player.
         /// @return <b>True</b> if is an NPC,<br>
         ///         <b>False</b> otherwise.
-        virtual bool isPlayer();
+        virtual bool isPlayer() const;
 
         /// @brief Return the name of the character with all lowercase characters.
         /// @return The name of the character.
-        std::string getName();
+        std::string getName() const;
 
         /// @brief Return the name of the character.
         /// @return The name of the character.
-        std::string getNameCapital();
+        std::string getNameCapital() const;
 
         /// @brief Return the static description of this character.
         /// @return The static description.
-        std::string getStaticDesc();
+        std::string getStaticDesc() const;
 
         /// @brief Return the subject pronoun for the character.
-        std::string getSubjectPronoun();
+        std::string getSubjectPronoun() const;
 
         /// @brief Return the possessive pronoun for the character.
-        std::string getPossessivePronoun();
+        std::string getPossessivePronoun() const;
 
         /// @brief Return the object pronoun for the character.
-        std::string getObjectPronoun();
+        std::string getObjectPronoun() const;
 
         /// @brief Allows to set the value of a given ability.
         /// @param ability The ability to set.
@@ -145,7 +146,7 @@ class Character
         ///                     ability value without the contribution due to
         ///                     the active effects.
         /// @return The overall ability value.
-        unsigned int getAbility(const Ability & ability, bool withEffects = true);
+        unsigned int getAbility(const Ability & ability, bool withEffects = true) const;
 
         /// @brief Provides the modifier of the given ability.
         /// @param ability The ability of which the modifier has to be
@@ -154,7 +155,7 @@ class Character
         ///                     ability modifier without the contribution due
         ///                     to the active effects.
         /// @return The overall ability modifer.
-        unsigned int getAbilityModifier(const Ability & ability, bool withEffects = true);
+        unsigned int getAbilityModifier(const Ability & ability, bool withEffects = true) const;
 
         /// @brief Provides the base ten logarithm of the desired ability
         ///         modifier, multiplied by an optional multiplier. Also,
@@ -172,32 +173,37 @@ class Character
             const Ability & ability,
             const double & base,
             const double & multiplier,
-            const bool & withEffects = true);
+            const bool & withEffects = true) const;
 
         /// @brief Return the max health value.
         /// @return The maximum health for this character.
-        unsigned int getMaxHealth(bool withEffects = true);
+        unsigned int getMaxHealth(bool withEffects = true) const;
 
         /// @brief Return the max stamina value.
         /// @return The maximum stamina for this character.
-        unsigned int getMaxStamina(bool withEffects = true);
+        unsigned int getMaxStamina(bool withEffects = true) const;
 
         /// @brief Manage the recovering of both health and stamina.
         void updateResources();
 
         /// @brief Evaluate the maximum distance at which the character can still see.
         /// @return The maximum radius of view.
-        int getViewDistance();
+        int getViewDistance() const;
 
-        /// @brief Provides a pointer to the Action object associated to this character.
-        /// @return A pointer to Action.
-        Action * getAction();
+        /// @brief Allows to set an action.
+        /// @param _action The action that has to be set.
+        void setAction(std::shared_ptr<GeneralAction> _action);
 
-        /// @brief Check if the character can move in the given direction, if it's so, returns the room in that direction.
+        /// @brief Provides a pointer to the action object associated to this character.
+        /// @return A pointer to action.
+        std::shared_ptr<GeneralAction> getAction();
+
+        /// @brief Check if the character can move in the given direction.
         /// @param direction The direction where to search the room.
-        /// @param error     A pointer to a string which will contain the error message if the character cannot go in the given direction.
-        /// @return The point to the room in the given direction.
-        Room * canMoveTo(Direction direction, std::string & error);
+        /// @param error     A reference to a string which will contain error message in case of failure.
+        /// @return <b>True</b> if the operation goes well,<br>
+        ///         <b>False</b> otherwise.
+        bool canMoveTo(Direction direction, std::string & error) const;
 
         /// @brief Move the character to another room.
         /// @param destination Destination room.
@@ -225,7 +231,7 @@ class Character
         /// @brief Search the item at given position and return it.
         /// @param slot The slot where the method need to search the item.
         /// @return The item, if it's in the character's equipment.
-        Item * findEquipmentSlotItem(EquipmentSlot slot);
+        Item * findEquipmentSlotItem(EquipmentSlot slot) const;
 
         /// @brief Search the tool in the given equipment slot.
         /// @param slot The slot where the tool can be found.
@@ -297,15 +303,15 @@ class Character
         /// @brief Check if the player can carry the item.
         /// @param item The item we want to check.
         /// @return <b>True</b> if the character can lift the item,<br><b>False</b> otherwise.
-        bool canCarry(Item * item);
+        bool canCarry(Item * item) const;
 
         /// @brief The total carrying weight for this character.
         /// @return The total carrying weight.
-        unsigned int getCarryingWeight();
+        unsigned int getCarryingWeight() const;
 
         /// @brief The maximum carrying weight for this character.
         /// @return The maximum carrying weight.
-        unsigned int getMaxCarryingWeight();
+        unsigned int getMaxCarryingWeight() const;
 
         /// @brief Equip the passed item.
         /// @param item The item to equip.
@@ -314,23 +320,24 @@ class Character
 
         /// @brief Remove from current equipment the item.
         /// @param item The item to remove.
-        /// @return <b>True</b> if the operation goes well,<br><b>False</b> otherwise.
+        /// @return <b>True</b> if the operation goes well,<br>
+        ///         <b>False</b> otherwise.
         virtual bool remEquipmentItem(Item * item);
 
         /// @brief Check if the character can wield a given item.
-        /// @param item    The item to wield.
-        /// @param message The error message.
-        /// @param where   Where the item has been wielded.
+        /// @param item  The item to wield.
+        /// @param error The error message.
+        /// @param where Where the item has been wielded.
         /// @return <b>True</b> if the operation goes well,<br>
         ///         <b>False</b> otherwise.
-        bool canWield(Item * item, std::string & message, EquipmentSlot & where);
+        bool canWield(Item * item, std::string & error, EquipmentSlot & where) const;
 
         /// @brief Check if the character can wear a given item.
-        /// @param item    The item to wear.
-        /// @param message The error message.
+        /// @param item  The item to wear.
+        /// @param error The error message.
         /// @return <b>True</b> if the operation goes well,<br>
         ///         <b>False</b> otherwise.
-        bool canWear(Item * item, std::string & message);
+        bool canWear(Item * item, std::string & error) const;
 
         /// @brief Get character condition.
         /// @param character The target character.
@@ -351,19 +358,19 @@ class Character
 
         /// @brief Provides the current level of thirst.
         /// @return The current value.
-        unsigned int getThirst();
+        unsigned int getThirst() const;
 
         /// @brief Provides the current level of hunger.
         /// @return The current value.
-        unsigned int getHunger();
+        unsigned int getHunger() const;
 
         /// @brief Get character level of thirst.
         /// @return Thirst of this character.
-        std::string getThirstDesc();
+        std::string getThirstDesc() const;
 
         /// @brief Get character level of hunger.
         /// @return Hunger of this character.
-        std::string getHungerDesc();
+        std::string getHungerDesc() const;
 
         /// @brief Provide a detailed description of the character.
         /// @param character The target character.
@@ -374,30 +381,30 @@ class Character
         /// @param target The target character.
         /// @return <b>True</b> if the can see the other character,<br>
         ///         <b>False</b> otherwise.
-        bool canSee(Character * target);
+        bool canSee(Character * target) const;
 
         // Combat functions.
         /// @brief Provides the overall armor class.
         /// @return The armor class.
-        unsigned int getArmorClass();
+        unsigned int getArmorClass() const;
 
         /// @brief Function which checks if the character can attack with a weapon equipped
         ///         in the given slot.
         /// @param slot The slot in which the weapon should be.
         /// @return <b>True</b> if the item is there,<br>
         ///         <b>False</b> otherwise.
-        bool canAttackWith(const EquipmentSlot & slot);
+        bool canAttackWith(const EquipmentSlot & slot) const;
 
         /// @brief Checks if the given target is both In Sight and within the Range of Sight.
         /// @param target The target character.
         /// @param range The maximum range.
         /// @return <b>True</b> if the target is in sight,<br>
         ///         <b>False</b> otherwise.
-        bool isAtRange(Character * target, const unsigned int & range);
+        bool isAtRange(Character * target, const unsigned int & range) const;
 
         /// @brief Provides a pointer to the opponent on the top of the aggro list.
         /// @return A pointer to the next opponent.
-        Character * getNextOpponentAtRange(const unsigned int & range);
+        Character * getNextOpponentAtRange(const unsigned int & range) const;
 
         /// @brief Provides the list of active weapons (Left and Right hands).
         /// @return Vector of items.
@@ -405,20 +412,17 @@ class Character
 
         /// @brief Given an action, it returns the necessary cooldown.
         /// @return The non-decreasing value of the cooldown.
-        unsigned int getCooldown(CombatAction combatAction);
+        unsigned int getCooldown(CombatActionType combatAction);
 
         /// @brief Given an action, it returns the stamina required to execute it.
-        /// @param consumed     The ammount of consumed stamina.
         /// @param actionType   The type of action.
         /// @param combatAction The type of combat action.
         /// @param slot         The slot of the weapon used in the combat action.
-        /// @return <b>True</b> if the character has enough stamina,<br>
-        ///         <b>False</b> otherwise.
-        bool hasStaminaFor(
-            unsigned int & consumed,
+        /// @return The ammount of consumed stamina.
+        unsigned int getConsumedStaminaFor(
             const ActionType & actionType,
-            const CombatAction & combatAction = CombatAction::NoAction,
-            const EquipmentSlot & slot = EquipmentSlot::None);
+            const CombatActionType & combatAction = CombatActionType::NoAction,
+            const EquipmentSlot & slot = EquipmentSlot::None) const;
 
         /// @brief Allows to SET the health value.
         /// @param value The value to set.
@@ -452,7 +456,7 @@ class Character
 
         /// @brief Get character level of health.
         /// @return Health of this character.
-        unsigned int getHealth();
+        unsigned int getHealth() const;
 
         /// @brief Allows to SET the stamina value.
         /// @param value The value to set.
@@ -486,7 +490,7 @@ class Character
 
         /// @brief Get character level of stamina.
         /// @return Stamina of this character.
-        unsigned int getStamina();
+        unsigned int getStamina() const;
 
         /// @brief Handle what happend when this character die.
         virtual void kill();

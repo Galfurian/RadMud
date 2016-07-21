@@ -32,19 +32,19 @@
 using namespace std;
 
 Mobile::Mobile() :
-    id(),
-    respawnRoom(),
-    keys(),
-    shortdesc(),
-    staticdesc(),
-    actions(),
-    message_buffer(),
-    alive(),
-    nextRespawn(),
-    controller(),
-    lua_script(),
-    lua_mutex(),
-    nextActionCooldown()
+        id(),
+        respawnRoom(),
+        keys(),
+        shortdesc(),
+        staticdesc(),
+        actions(),
+        message_buffer(),
+        alive(),
+        nextRespawn(),
+        controller(),
+        lua_script(),
+        lua_mutex(),
+        nextActionCooldown()
 {
     // Nothing to do.
 }
@@ -105,7 +105,7 @@ void Mobile::respawn()
     Logger::log(LogLevel::Debug, "Respawning " + this->id);
 }
 
-bool Mobile::check()
+bool Mobile::check() const
 {
     bool safe = Character::check();
     safe &= CorrectAssert(!id.empty());
@@ -118,12 +118,12 @@ bool Mobile::check()
     return safe;
 }
 
-bool Mobile::isMobile()
+bool Mobile::isMobile() const
 {
     return true;
 }
 
-bool Mobile::hasKey(const string & key)
+bool Mobile::hasKey(const string & key) const
 {
     bool found = false;
     for (auto iterator : keys)
@@ -164,7 +164,8 @@ void Mobile::kill()
 int64_t Mobile::getRespawnTime()
 {
     // Return the check if the mobile can be respawned.
-    return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - nextRespawn).count();
+    return std::chrono::duration_cast<std::chrono::seconds>(
+        std::chrono::system_clock::now() - nextRespawn).count();
 }
 
 bool Mobile::canRespawn()

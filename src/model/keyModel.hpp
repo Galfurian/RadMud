@@ -20,6 +20,7 @@
 
 #include "itemModel.hpp"
 
+/// @brief Model of a key.
 class KeyModel: public ItemModel
 {
     public:

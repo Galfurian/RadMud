@@ -37,6 +37,7 @@ Production::Production() :
         time(),
         assisted(),
         outcome(),
+        quantity(),
         tools(),
         ingredients(),
         workbench(ToolType::NoType),
@@ -72,8 +73,8 @@ bool Production::setOutcome(const std::string & source)
             correct = false;
         }
 
-        outcome.first = Mud::instance().findItemModel(ToInt(outcomeInfo[0]));
-        if (outcome.first == nullptr)
+        outcome = Mud::instance().findItemModel(ToInt(outcomeInfo[0]));
+        if (outcome == nullptr)
         {
             Logger::log(LogLevel::Error, "Can't find the Outcome :" + outcomeInfo[0]);
             correct = false;
@@ -88,7 +89,7 @@ bool Production::setOutcome(const std::string & source)
             correct = false;
             break;
         }
-        outcome.second = static_cast<unsigned int>(outcomeQuantity);
+        quantity = static_cast<unsigned int>(outcomeQuantity);
     }
     return correct;
 }
@@ -145,8 +146,8 @@ bool Production::setIngredient(const std::string & source)
             break;
         }
 
-        int quantity = ToInt(ingredientInfo[1]);
-        if (quantity == 0)
+        int ingredientQuantity = ToInt(ingredientInfo[1]);
+        if (ingredientQuantity == 0)
         {
             Logger::log(
                 LogLevel::Error,
@@ -154,7 +155,7 @@ bool Production::setIngredient(const std::string & source)
             correct = false;
             break;
         }
-        if (!this->ingredients.insert(std::make_pair(ingredient, quantity)).second)
+        if (!this->ingredients.insert(std::make_pair(ingredient, ingredientQuantity)).second)
         {
             Logger::log(LogLevel::Error, "Cannot insert the ingredient");
             correct = false;
@@ -171,8 +172,8 @@ bool Production::check()
     assert(profession != nullptr);
     assert(difficulty > 0);
     assert(time > 0);
-    assert(outcome.first != nullptr);
-    assert(outcome.second > 0);
+    assert(outcome != nullptr);
+    assert(quantity > 0);
     assert(!tools.empty());
     for (auto it : tools)
     {

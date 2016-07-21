@@ -44,8 +44,10 @@ class Production
         unsigned int time;
         /// A flag which indicates if the maker can be assisted by someone.
         bool assisted;
-        /// The outcome and its quantity.
-        std::pair<ItemModel *, unsigned int> outcome;
+        /// A pointer to the outcome model.
+        ItemModel * outcome;
+        /// The quantity of the outcome.
+        unsigned int quantity;
         /// The list of needed type of tools.
         ToolSet tools;
         /// The list of needed type of ingredients and their quantity.

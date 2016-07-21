@@ -33,6 +33,7 @@ typedef enum class ContainerFlags
     CanSee = 4,
 } ContainerFlag;
 
+/// @brief Model of a container of objects.
 class ContainerModel: public ItemModel
 {
     public:

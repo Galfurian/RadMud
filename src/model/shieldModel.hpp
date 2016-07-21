@@ -33,6 +33,7 @@ typedef enum class ShieldSizes
     Heavy
 } ShieldSize;
 
+/// @brief Model of a shield.
 class ShieldModel: public ItemModel
 {
     public:

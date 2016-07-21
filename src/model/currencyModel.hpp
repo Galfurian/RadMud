@@ -20,6 +20,7 @@
 
 #include "itemModel.hpp"
 
+/// @brief Model of a currency.
 class CurrencyModel: public ItemModel
 {
     public:

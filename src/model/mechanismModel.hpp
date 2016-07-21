@@ -35,6 +35,7 @@ typedef enum class MechanismTypes
     Lever
 } MechanismType;
 
+/// @brief Model of a general mechanism.
 class MechanismModel: public ItemModel
 {
     public:

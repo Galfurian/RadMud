@@ -101,7 +101,7 @@ Player::~Player()
     Logger::log(LogLevel::Debug, "Deleted player\t\t\t\t(%s)", this->getNameCapital());
 }
 
-bool Player::check()
+bool Player::check() const
 {
     bool safe = Character::check();
     safe &= CorrectAssert(psocket > 0);
@@ -118,10 +118,11 @@ bool Player::check()
     //safe &= CorrectAssert(skills.size() == Mud::instance().mudSkills.size());
     for (auto iterator : Mud::instance().mudSkills)
     {
-        std::map<int, unsigned int>::iterator iterator2 = skills.find(iterator.first);
+        std::map<int, unsigned int>::const_iterator iterator2 = skills.find(iterator.first);
         if (iterator2 == skills.end())
         {
-            skills.insert(std::make_pair(iterator.first, 1));
+            Logger::log(LogLevel::Error, "The skill %s has been set.", iterator.second->name);
+            safe &= false;
         }
     }
     safe &= CorrectAssert(password_attempts >= 0);
@@ -130,7 +131,7 @@ bool Player::check()
     return safe;
 }
 
-bool Player::isPlayer()
+bool Player::isPlayer() const
 {
     return true;
 }
@@ -308,17 +309,20 @@ bool Player::updateOnDB()
 
 void Player::sendPrompt()
 {
-    string readyPrompt = prompt + "\n";
-    FindAndReplace(readyPrompt, "&n", ToLower(name));
-    FindAndReplace(readyPrompt, "&N", name);
-    FindAndReplace(readyPrompt, "&h", ToString(this->getHealth()));
-    FindAndReplace(readyPrompt, "&H", ToString(this->getMaxHealth()));
-    FindAndReplace(readyPrompt, "&s", ToString(this->getStamina()));
-    FindAndReplace(readyPrompt, "&S", ToString(this->getMaxStamina()));
-    // Send to the player his prompt.
-    if (!closing)
+    if (this->isPlaying())
     {
-        this->sendMsg(readyPrompt);
+        string readyPrompt = prompt + "\n";
+        FindAndReplace(readyPrompt, "&n", ToLower(name));
+        FindAndReplace(readyPrompt, "&N", name);
+        FindAndReplace(readyPrompt, "&h", ToString(this->getHealth()));
+        FindAndReplace(readyPrompt, "&H", ToString(this->getMaxHealth()));
+        FindAndReplace(readyPrompt, "&s", ToString(this->getStamina()));
+        FindAndReplace(readyPrompt, "&S", ToString(this->getMaxStamina()));
+        // Send to the player his prompt.
+        if (!closing)
+        {
+            this->sendMsg(readyPrompt);
+        }
     }
 }
 

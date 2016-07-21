@@ -29,6 +29,7 @@ typedef enum class SeedTypes
     Tree,
 } SeedType;
 
+/// @brief Model of a seed.
 class SeedModel: public ItemModel
 {
     public:

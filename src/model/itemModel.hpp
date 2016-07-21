@@ -109,12 +109,19 @@ class ItemModel
         /// @return Provides the type of model.
         virtual ModelType getType() const;
 
+        /// @return Provides a string representing the type of model.
         virtual std::string getTypeName() const = 0;
 
+        /// @return Extracts from the source string the information
+        ///          about the model and set them.
+        /// @param source The source string.
+        /// @return <b>True</b> if the information are correct,<br>
+        ///         <b>False</b> otherwise.
         virtual bool setModel(const std::string & source) = 0;
 
         /// @brief Check the correctness of the model.
-        /// @return <b>True</b> if the model has correct values,<br><b>False</b> otherwise.
+        /// @return <b>True</b> if the model has correct values,<br>
+        ///         <b>False</b> otherwise.
         bool check();
 
         /// @brief Given the argumtens the function replace the symbols inside the source string

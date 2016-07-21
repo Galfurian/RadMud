@@ -18,16 +18,20 @@
 
 #include "effect.hpp"
 
-Effect::Effect(std::string _name, int _expires, std::string _messageActivate, std::string _messageFade) :
-    name(_name),
-    expires(_expires),
-    messageActivate(_messageActivate),
-    messageExpire(_messageFade),
-    health(),
-    stamina(),
-    abilities(),
-    hit(),
-    damage()
+Effect::Effect(
+    std::string _name,
+    int _expires,
+    std::string _messageActivate,
+    std::string _messageFade) :
+        name(_name),
+        expires(_expires),
+        messageActivate(_messageActivate),
+        messageExpire(_messageFade),
+        health(),
+        stamina(),
+        abilities(),
+        hit(),
+        damage()
 {
     // Nothing to do.
 }
@@ -49,8 +53,8 @@ bool Effect::operator<(const Effect & right) const
 }
 
 EffectList::EffectList() :
-    activeEffects(),
-    pendingEffects()
+        activeEffects(),
+        pendingEffects()
 {
 }
 EffectList::~EffectList()
@@ -58,52 +62,52 @@ EffectList::~EffectList()
 
 }
 
-int EffectList::getHealthMod()
+int EffectList::getHealthMod() const
 {
     int result = 0;
-    for (iterator it = activeEffects.begin(); it != activeEffects.end(); ++it)
+    for (const_iterator it = activeEffects.begin(); it != activeEffects.end(); ++it)
     {
         result += it->health;
     }
     return result;
 }
 
-int EffectList::getStaminaMod()
+int EffectList::getStaminaMod() const
 {
     int result = 0;
-    for (iterator it = activeEffects.begin(); it != activeEffects.end(); ++it)
+    for (const_iterator it = activeEffects.begin(); it != activeEffects.end(); ++it)
     {
         result += it->stamina;
     }
     return result;
 }
 
-int EffectList::getHitMod()
+int EffectList::getHitMod() const
 {
     int result = 0;
-    for (iterator it = activeEffects.begin(); it != activeEffects.end(); ++it)
+    for (const_iterator it = activeEffects.begin(); it != activeEffects.end(); ++it)
     {
         result += it->hit;
     }
     return result;
 }
 
-int EffectList::getDamMod()
+int EffectList::getDamMod() const
 {
     int result = 0;
-    for (iterator it = activeEffects.begin(); it != activeEffects.end(); ++it)
+    for (const_iterator it = activeEffects.begin(); it != activeEffects.end(); ++it)
     {
         result += it->damage;
     }
     return result;
 }
 
-int EffectList::getAbilityModifier(const Ability & ability)
+int EffectList::getAbilityModifier(const Ability & ability) const
 {
     int result = 0;
-    for (iterator it = activeEffects.begin(); it != activeEffects.end(); ++it)
+    for (const_iterator it = activeEffects.begin(); it != activeEffects.end(); ++it)
     {
-        result += it->abilities[ability];
+        result += it->abilities.at(ability);
     }
     return result;
 }
@@ -183,7 +187,17 @@ EffectList::iterator EffectList::begin()
     return activeEffects.begin();
 }
 
+EffectList::const_iterator EffectList::begin() const
+{
+    return activeEffects.begin();
+}
+
 EffectList::iterator EffectList::end()
+{
+    return activeEffects.end();
+}
+
+EffectList::const_iterator EffectList::end() const
 {
     return activeEffects.end();
 }

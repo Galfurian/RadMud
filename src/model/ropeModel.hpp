@@ -20,6 +20,7 @@
 
 #include "itemModel.hpp"
 
+/// @brief Model of a rope.
 class RopeModel: public ItemModel
 {
     public:

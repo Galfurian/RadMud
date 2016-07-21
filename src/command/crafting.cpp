@@ -19,6 +19,8 @@
 #include "command.hpp"
 #include "../mud.hpp"
 #include "../model/resourceModel.hpp"
+#include "../action/buildAction.hpp"
+#include "../action/craftAction.hpp"
 
 using namespace std;
 
@@ -44,16 +46,9 @@ void DoProfession(Character * character, Profession * profession, std::istream &
         return;
     }
     // Check if the actor has enough stamina to execute the action.
-    unsigned int consumedStamina;
-    if (!character->hasStaminaFor(consumedStamina, ActionType::Crafting))
+    if (character->getConsumedStaminaFor(ActionType::Crafting) > character->getStamina())
     {
         character->sendMsg("You are too tired right now.\n");
-        Logger::log(
-            LogLevel::Debug,
-            "[%s] Has %s stamina and needs %s.",
-            character->getName(),
-            ToString(character->getStamina()),
-            ToString(consumedStamina));
         return;
     }
     // Search the needed tools.
@@ -105,22 +100,27 @@ void DoProfession(Character * character, Profession * profession, std::istream &
 
     // //////////////////////////////////////////
     // Prepare the action.
-    if (!character->getAction()->setCraft(
+    std::shared_ptr<CraftAction> craftAction = std::make_shared<CraftAction>(
+        character,
         production,
+        craftMaterial,
         usedTools,
         usedIngredients,
-        craftMaterial,
-        production->time))
+        production->time);
+    // Check the new action.
+    if (!craftAction->check())
     {
         character->sendMsg("You can't start the process of production.\n");
         return;
     }
+    // Set the new action.
+    character->setAction(craftAction);
 
     // //////////////////////////////////////////
     character->sendMsg(
         "%s %s.\n",
         profession->startMessage,
-        Formatter::yellow() + production->outcome.first->getName() + Formatter::reset());
+        Formatter::yellow() + production->outcome->getName() + Formatter::reset());
 
     // Set the list of exceptions.
     CharacterVector exceptions;
@@ -149,16 +149,9 @@ void DoBuild(Character * character, std::istream & sArgs)
         return;
     }
     // Check if the actor has enough stamina to execute the action.
-    unsigned int consumedStamina;
-    if (!character->hasStaminaFor(consumedStamina, ActionType::Building))
+    if (character->getConsumedStaminaFor(ActionType::Building) > character->getStamina())
     {
         character->sendMsg("You are too tired right now.\n");
-        Logger::log(
-            LogLevel::Debug,
-            "[%s] Has %s stamina and needs %s.",
-            character->getName(),
-            ToString(character->getStamina()),
-            ToString(consumedStamina));
         return;
     }
     // Search the needed tools.
@@ -227,16 +220,21 @@ void DoBuild(Character * character, std::istream & sArgs)
 
     // //////////////////////////////////////////
     // Prepare the action.
-    if (!character->getAction()->setBuild(
+    std::shared_ptr<BuildAction> buildAction = std::make_shared<BuildAction>(
+        character,
         schematics,
         building,
         usedTools,
         usedIngredients,
-        schematics->time))
+        schematics->time);
+    // Check the new action.
+    if (!buildAction->check())
     {
         character->sendMsg("You can't start the building.\n");
         return;
     }
+    // Set the new action.
+    character->setAction(buildAction);
 
     // //////////////////////////////////////////
     character->sendMsg(
@@ -269,16 +267,9 @@ void DoDeconstruct(Character * character, std::istream & sArgs)
         return;
     }
     // Check if the actor has enough stamina to execute the action.
-    unsigned int consumedStamina;
-    if (!character->hasStaminaFor(consumedStamina, ActionType::Building))
+    if (character->getConsumedStaminaFor(ActionType::Building) > character->getStamina())
     {
         character->sendMsg("You are too tired right now.\n");
-        Logger::log(
-            LogLevel::Debug,
-            "[%s] Has %s stamina and needs %s.",
-            character->getName(),
-            ToString(character->getStamina()),
-            ToString(consumedStamina));
         return;
     }
     if (HasFlag(item->flags, ItemFlag::Built))

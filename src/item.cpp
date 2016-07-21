@@ -283,23 +283,14 @@ bool Item::hasKey(string key)
     return false;
 }
 
-bool Item::editCondition(int degradation)
+bool Item::triggerDecay()
 {
-    condition += degradation;
+    condition -= model->decay;
     if (condition <= 0)
     {
         return true;
     }
-    else if (condition > model->condition)
-    {
-        condition = model->condition;
-    }
     return false;
-}
-
-void Item::decayCondition()
-{
-    condition -= model->decay;
 }
 
 string Item::getCondition()

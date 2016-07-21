@@ -59,11 +59,15 @@ Character::Character() :
         equipment(),
         posture(CharacterPosture::Stand),
         effects(),
-        action(this),
         L(luaL_newstate()),
-        opponents(this)
+        opponents(this),
+        action(std::make_shared<GeneralAction>(this))
 {
-    // Nothing to do.
+    abilities[Ability::Strength] = 0;
+    abilities[Ability::Agility] = 0;
+    abilities[Ability::Perception] = 0;
+    abilities[Ability::Constitution] = 0;
+    abilities[Ability::Intelligence] = 0;
 }
 
 Character::~Character()
@@ -71,7 +75,7 @@ Character::~Character()
     // Nothing to do.
 }
 
-bool Character::check()
+bool Character::check() const
 {
     bool safe = true;
     safe &= CorrectAssert(!name.empty());
@@ -79,33 +83,33 @@ bool Character::check()
     safe &= CorrectAssert(weight > 0);
     safe &= CorrectAssert(race != nullptr);
     safe &= CorrectAssert(faction != nullptr);
-    safe &= CorrectAssert(abilities[Ability::Strength] > 0);
-    safe &= CorrectAssert(abilities[Ability::Strength] <= 60);
-    safe &= CorrectAssert(abilities[Ability::Agility] > 0);
-    safe &= CorrectAssert(abilities[Ability::Agility] <= 60);
-    safe &= CorrectAssert(abilities[Ability::Perception] > 0);
-    safe &= CorrectAssert(abilities[Ability::Perception] <= 60);
-    safe &= CorrectAssert(abilities[Ability::Constitution] > 0);
-    safe &= CorrectAssert(abilities[Ability::Constitution] <= 60);
-    safe &= CorrectAssert(abilities[Ability::Intelligence] > 0);
-    safe &= CorrectAssert(abilities[Ability::Intelligence] <= 60);
+    safe &= CorrectAssert(abilities.at(Ability::Strength) > 0);
+    safe &= CorrectAssert(abilities.at(Ability::Strength) <= 60);
+    safe &= CorrectAssert(abilities.at(Ability::Agility) > 0);
+    safe &= CorrectAssert(abilities.at(Ability::Agility) <= 60);
+    safe &= CorrectAssert(abilities.at(Ability::Perception) > 0);
+    safe &= CorrectAssert(abilities.at(Ability::Perception) <= 60);
+    safe &= CorrectAssert(abilities.at(Ability::Constitution) > 0);
+    safe &= CorrectAssert(abilities.at(Ability::Constitution) <= 60);
+    safe &= CorrectAssert(abilities.at(Ability::Intelligence) > 0);
+    safe &= CorrectAssert(abilities.at(Ability::Intelligence) <= 60);
     safe &= CorrectAssert(thirst > 0);
     safe &= CorrectAssert(room != nullptr);
     safe &= CorrectAssert(L != nullptr);
     return safe;
 }
 
-bool Character::isMobile()
+bool Character::isMobile() const
 {
     return false;
 }
 
-bool Character::isPlayer()
+bool Character::isPlayer() const
 {
     return false;
 }
 
-std::string Character::getName()
+std::string Character::getName() const
 {
     if (this->isPlayer())
     {
@@ -113,7 +117,7 @@ std::string Character::getName()
     }
     else if (this->isMobile())
     {
-        Mobile * mobile = this->toMobile();
+        const Mobile * mobile = dynamic_cast<const Mobile *>(this);
         return ToLower(mobile->staticdesc);
     }
     else
@@ -122,24 +126,12 @@ std::string Character::getName()
     }
 }
 
-std::string Character::getNameCapital()
+std::string Character::getNameCapital() const
 {
-    if (this->isPlayer())
-    {
-        return ToCapitals(this->name);
-    }
-    else if (this->isMobile())
-    {
-        Mobile * mobile = this->toMobile();
-        return mobile->staticdesc;
-    }
-    else
-    {
-        return "No name";
-    }
+    return ToCapitals(this->getName());
 }
 
-std::string Character::getStaticDesc()
+std::string Character::getStaticDesc() const
 {
     // Name
     std::string desc(this->getNameCapital());
@@ -150,31 +142,30 @@ std::string Character::getStaticDesc()
         desc += " " + GetPostureName(posture);
     }
     desc += " here";
-    // Action
-    if ((action.getType() != ActionType::NoAction) && (action.getType() != ActionType::Wait))
+    if (this->action->getType() != ActionType::Wait)
     {
         desc += ", " + this->getSubjectPronoun() + " is ";
-        desc += action.getDescription();
+        desc += this->action->getDescription();
     }
     desc += ".";
     return desc;
 }
 
-string Character::getSubjectPronoun()
+string Character::getSubjectPronoun() const
 {
     if (gender == GenderType::Male) return "he";
     if (gender == GenderType::Female) return "she";
     return "it";
 }
 
-string Character::getPossessivePronoun()
+string Character::getPossessivePronoun() const
 {
     if (gender == GenderType::Male) return "his";
     if (gender == GenderType::Female) return "her";
     return "its";
 }
 
-std::string Character::getObjectPronoun()
+std::string Character::getObjectPronoun() const
 {
     if (gender == GenderType::Male) return "him";
     if (gender == GenderType::Female) return "her";
@@ -194,15 +185,15 @@ bool Character::setAbility(const Ability & ability, const unsigned int & value)
     }
 }
 
-unsigned int Character::getAbility(const Ability & ability, bool withEffects)
+unsigned int Character::getAbility(const Ability & ability, bool withEffects) const
 {
     if (AbilityTest::is_value(ability))
     {
         if (!withEffects)
         {
-            return abilities[ability];
+            return abilities.at(ability);
         }
-        int overall = static_cast<int>(this->abilities[ability])
+        int overall = static_cast<int>(this->abilities.at(ability))
             + effects.getAbilityModifier(ability);
         if (overall <= 0)
         {
@@ -223,7 +214,7 @@ unsigned int Character::getAbility(const Ability & ability, bool withEffects)
     }
 }
 
-unsigned int Character::getAbilityModifier(const Ability & ability, bool withEffects)
+unsigned int Character::getAbilityModifier(const Ability & ability, bool withEffects) const
 {
     return GetAbilityModifier(this->getAbility(ability, withEffects));
 }
@@ -232,7 +223,7 @@ unsigned int Character::getAbilityLog(
     const Ability & ability,
     const double & base,
     const double & multiplier,
-    const bool & withEffects)
+    const bool & withEffects) const
 {
     double result = base;
     double modifier = static_cast<double>(this->getAbilityModifier(ability, withEffects));
@@ -247,7 +238,7 @@ unsigned int Character::getAbilityLog(
     return static_cast<unsigned int>(result);
 }
 
-unsigned int Character::getMaxHealth(bool withEffects)
+unsigned int Character::getMaxHealth(bool withEffects) const
 {
     // Value = 40 + (10 * AbilityModifier(Constitution))
     unsigned int BASE = 40 + (10 * this->getAbilityModifier(Ability::Constitution));
@@ -266,7 +257,7 @@ unsigned int Character::getMaxHealth(bool withEffects)
     }
 }
 
-unsigned int Character::getMaxStamina(bool withEffects)
+unsigned int Character::getMaxStamina(bool withEffects) const
 {
     // Value = 50 + (15 * AbilityModifier(Constitution))
     unsigned int BASE = 50 + (15 * this->getAbilityModifier(Ability::Constitution));
@@ -307,7 +298,7 @@ void Character::updateResources()
     }
 }
 
-int Character::getViewDistance()
+int Character::getViewDistance() const
 {
     // Value = 3 + LogMod(PER)
     // MIN   = 3.0
@@ -315,42 +306,37 @@ int Character::getViewDistance()
     return 3 + static_cast<int>(this->getAbilityLog(Ability::Perception, 0.0, 1.0));
 }
 
-Action * Character::getAction()
+void Character::setAction(std::shared_ptr<GeneralAction> _action)
 {
-    return &this->action;
+    this->action = _action;
 }
 
-Room * Character::canMoveTo(Direction direction, std::string & error)
+std::shared_ptr<GeneralAction> Character::getAction()
 {
-    // Check if the player it's in a non-walking position.
+    return this->action;
+}
+
+bool Character::canMoveTo(Direction direction, std::string & error) const
+{
+    // Check if the character is in a no-walk position.
     if (posture == CharacterPosture::Rest || posture == CharacterPosture::Sit)
     {
         error = "You first need to stand up.";
-        return nullptr;
+        return false;
     }
-
     // Find the exit to the destination.
     std::shared_ptr<Exit> destExit = room->findExit(direction);
     if (destExit == nullptr)
     {
         error = "You cannot go that way.";
-        return nullptr;
+        return false;
     }
-
-    unsigned int consumedStamina;
     // Check if the actor has enough stamina to execute the action.
-    if (!this->hasStaminaFor(consumedStamina, ActionType::Move))
+    if (this->getConsumedStaminaFor(ActionType::Move) > this->getStamina())
     {
         error = "You are too tired to move.\n";
-        Logger::log(
-            LogLevel::Debug,
-            "[%s] Has %s stamina and needs %s.",
-            this->getName(),
-            ToString(this->stamina),
-            ToString(consumedStamina));
-        return nullptr;
+        return false;
     }
-
     // If the direction is upstairs, check if there is a stair.
     if (direction == Direction::Up)
     {
@@ -358,17 +344,15 @@ Room * Character::canMoveTo(Direction direction, std::string & error)
         if (!HasFlag(destExit->flags, ExitFlag::Stairs))
         {
             error = "You can't go upstairs, there are no stairs.";
-            return nullptr;
+            return false;
         }
     }
-
     // Check if the destination is correct.
     if (destExit->destination == nullptr)
     {
         error = "That direction can't take you anywhere.";
-        return nullptr;
+        return false;
     }
-
     // Check if the destination is bocked by a door.
     Item * door = destExit->destination->findDoor();
     if (door != nullptr)
@@ -376,10 +360,9 @@ Room * Character::canMoveTo(Direction direction, std::string & error)
         if (HasFlag(door->flags, ItemFlag::Closed))
         {
             error = "Maybe you have to open that door first.";
-            return nullptr;
+            return false;
         }
     }
-
     // Check if the destination has a floor.
     std::shared_ptr<Exit> destDown = destExit->destination->findExit(Direction::Down);
     if (destDown != nullptr)
@@ -387,19 +370,18 @@ Room * Character::canMoveTo(Direction direction, std::string & error)
         if (!HasFlag(destDown->flags, ExitFlag::Stairs))
         {
             error = "Do you really want to fall in that pit?";
-            return nullptr;
+            return false;
         }
     }
-
-    if (isMobile())
+    // Check if the destination is forbidden for mobiles.
+    if (this->isMobile())
     {
         if (HasFlag(destExit->flags, ExitFlag::NoMob))
         {
-            return nullptr;
+            return false;
         }
     }
-
-    return destExit->destination;
+    return true;
 }
 
 void Character::moveTo(
@@ -504,7 +486,7 @@ Item* Character::findEquipmentItem(string search_parameter, int & number)
     return nullptr;
 }
 
-Item * Character::findEquipmentSlotItem(EquipmentSlot slot)
+Item * Character::findEquipmentSlotItem(EquipmentSlot slot) const
 {
     for (auto iterator : equipment)
     {
@@ -549,12 +531,10 @@ Item * Character::findNearbyItem(std::string itemName, int & number)
     return item;
 }
 
-Item * Character::findNearbyTool(
-    const ToolType & toolType,
-    const ItemVector & exceptions,
-    bool searchRoom,
-    bool searchInventory,
-    bool searchEquipment)
+Item * Character::findNearbyTool(const ToolType & toolType, const ItemVector & exceptions,
+bool searchRoom,
+bool searchInventory,
+bool searchEquipment)
 {
     if (searchRoom)
     {
@@ -613,12 +593,10 @@ Item * Character::findNearbyTool(
     return nullptr;
 }
 
-bool Character::findNearbyTools(
-    ToolSet tools,
-    ItemVector & foundOnes,
-    bool searchRoom,
-    bool searchInventory,
-    bool searchEquipment)
+bool Character::findNearbyTools(ToolSet tools, ItemVector & foundOnes,
+bool searchRoom,
+bool searchInventory,
+bool searchEquipment)
 {
     // TODO: Prepare a map with key the tool type and as value:
     //  Option A: A bool which determine if the tool has been found.
@@ -747,12 +725,12 @@ bool Character::remInventoryItem(Item *item)
     }
 }
 
-bool Character::canCarry(Item * item)
+bool Character::canCarry(Item * item) const
 {
     return ((this->getCarryingWeight() + item->getTotalWeight()) < this->getMaxCarryingWeight());
 }
 
-unsigned int Character::getCarryingWeight()
+unsigned int Character::getCarryingWeight() const
 {
     unsigned int carrying = 0;
     for (auto iterator : inventory)
@@ -766,7 +744,7 @@ unsigned int Character::getCarryingWeight()
     return carrying;
 }
 
-unsigned int Character::getMaxCarryingWeight()
+unsigned int Character::getMaxCarryingWeight() const
 {
     // Value = 50 + (AbilMod(STR) * 10)
     // MIN   =  50
@@ -818,7 +796,7 @@ bool Character::remEquipmentItem(Item * item)
     }
 }
 
-bool Character::canWield(Item * item, std::string & message, EquipmentSlot & where)
+bool Character::canWield(Item * item, std::string & error, EquipmentSlot & where) const
 {
     // Gather the item in the right hand, if there is one.
     Item * rightHand = findEquipmentSlotItem(EquipmentSlot::RightHand);
@@ -828,7 +806,7 @@ bool Character::canWield(Item * item, std::string & message, EquipmentSlot & whe
     {
         if ((rightHand != nullptr) || (leftHand != nullptr))
         {
-            message = "You must have both your hand free to wield it.\n";
+            error = "You must have both your hand free to wield it.\n";
             return false;
         }
         where = EquipmentSlot::RightHand;
@@ -837,14 +815,14 @@ bool Character::canWield(Item * item, std::string & message, EquipmentSlot & whe
     {
         if ((rightHand != nullptr) && (leftHand != nullptr))
         {
-            message = "You have both your hand occupied.\n";
+            error = "You have both your hand occupied.\n";
             return false;
         }
         else if ((rightHand == nullptr) && (leftHand != nullptr))
         {
             if (HasFlag(leftHand->model->modelFlags, ModelFlag::TwoHand))
             {
-                message = "You have both your hand occupied.\n";
+                error = "You have both your hand occupied.\n";
                 return false;
             }
             where = EquipmentSlot::RightHand;
@@ -853,7 +831,7 @@ bool Character::canWield(Item * item, std::string & message, EquipmentSlot & whe
         {
             if (HasFlag(rightHand->model->modelFlags, ModelFlag::TwoHand))
             {
-                message = "You have both your hand occupied.\n";
+                error = "You have both your hand occupied.\n";
                 return false;
             }
             where = EquipmentSlot::LeftHand;
@@ -866,7 +844,7 @@ bool Character::canWield(Item * item, std::string & message, EquipmentSlot & whe
     return true;
 }
 
-bool Character::canWear(Item * item, std::string & message)
+bool Character::canWear(Item * item, std::string & error) const
 {
     bool result = false;
     if (item->model->getType() == ModelType::Armor)
@@ -882,12 +860,12 @@ bool Character::canWear(Item * item, std::string & message)
     }
     if (!result)
     {
-        message = "The item is not meant to be weared.\n";
+        error = "The item is not meant to be weared.\n";
         return false;
     }
     if (findEquipmentSlotItem(item->getCurrentSlot()) != nullptr)
     {
-        message = "There is already something in that location.\n";
+        error = "There is already something in that location.\n";
         return false;
     }
     return true;
@@ -974,17 +952,17 @@ bool Character::setHunger(int value)
     return true;
 }
 
-unsigned int Character::getThirst()
+unsigned int Character::getThirst() const
 {
     return this->thirst;
 }
 
-unsigned int Character::getHunger()
+unsigned int Character::getHunger() const
 {
     return this->hunger;
 }
 
-std::string Character::getThirstDesc()
+std::string Character::getThirstDesc() const
 {
     std::string output;
     int percent = static_cast<int>((100.0 * static_cast<double>(this->thirst)) / (100.0));
@@ -996,7 +974,7 @@ std::string Character::getThirstDesc()
     return output;
 }
 
-std::string Character::getHungerDesc()
+std::string Character::getHungerDesc() const
 {
     std::string output;
     int percent = static_cast<int>((100.0 * static_cast<double>(this->hunger)) / (100.0));
@@ -1102,7 +1080,7 @@ string Character::getLook(Character * character)
     return output;
 }
 
-bool Character::canSee(Character * target)
+bool Character::canSee(Character * target) const
 {
     if (HasFlag(target->flags, CharacterFlag::Invisible))
     {
@@ -1111,7 +1089,7 @@ bool Character::canSee(Character * target)
     return true;
 }
 
-unsigned int Character::getArmorClass()
+unsigned int Character::getArmorClass() const
 {
     // 10
     unsigned int result = 10;
@@ -1145,7 +1123,7 @@ unsigned int Character::getArmorClass()
     return result;
 }
 
-bool Character::canAttackWith(const EquipmentSlot & slot)
+bool Character::canAttackWith(const EquipmentSlot & slot) const
 {
     if ((slot == EquipmentSlot::RightHand) || (slot == EquipmentSlot::LeftHand))
     {
@@ -1162,7 +1140,7 @@ bool Character::canAttackWith(const EquipmentSlot & slot)
     return false;
 }
 
-bool Character::isAtRange(Character * target, const unsigned int & range)
+bool Character::isAtRange(Character * target, const unsigned int & range) const
 {
     if (WrongAssert(target == nullptr)) return false;
     if (WrongAssert(this->room == nullptr)) return false;
@@ -1172,7 +1150,7 @@ bool Character::isAtRange(Character * target, const unsigned int & range)
     return this->room->area->fastInSight(this->room->coord, target->room->coord, range);
 }
 
-Character * Character::getNextOpponentAtRange(const unsigned int & range)
+Character * Character::getNextOpponentAtRange(const unsigned int & range) const
 {
     if (opponents.hasOpponents())
     {
@@ -1209,7 +1187,7 @@ ItemVector Character::getActiveWeapons()
     return ret;
 }
 
-unsigned int Character::getCooldown(CombatAction combatAction)
+unsigned int Character::getCooldown(CombatActionType combatAction)
 {
     double BASE = 5.0;
     // The strength modifier.
@@ -1246,7 +1224,7 @@ unsigned int Character::getCooldown(CombatAction combatAction)
         }
         CAR = log10(CARmod);
     }
-    if (combatAction == CombatAction::BasicAttack)
+    if (combatAction == CombatActionType::BasicAttack)
     {
         double RHD = 0;
         double LHD = 0;
@@ -1284,18 +1262,17 @@ unsigned int Character::getCooldown(CombatAction combatAction)
         }
         BASE += -STR - AGI + WGT + CAR + max(RHD, LHD);
     }
-    else if (combatAction == CombatAction::Flee)
+    else if (combatAction == CombatActionType::Flee)
     {
         BASE += -STR - AGI + WGT + CAR;
     }
     return static_cast<unsigned int>(BASE);
 }
 
-bool Character::hasStaminaFor(
-    unsigned int & consumed,
+unsigned int Character::getConsumedStaminaFor(
     const ActionType & actionType,
-    const CombatAction & combatAction,
-    const EquipmentSlot & slot)
+    const CombatActionType & combatAction,
+    const EquipmentSlot & slot) const
 {
     // BASE     [+1.0]
     // STRENGTH [-0.0 to -2.80]
@@ -1313,36 +1290,21 @@ bool Character::hasStaminaFor(
     double CAR = (carried == 0) ? 0 : log10(carried);
     // Partial result;
     double RSLT = BASE - STR + WGT + CAR;
-    if ((actionType == ActionType::Move) || (actionType == ActionType::Building)
-        || (actionType == ActionType::Crafting))
+    if (actionType == ActionType::Move)
     {
-        Logger::log(
-            LogLevel::Debug,
-            "Required Stamina : %s - %s + %s + %s = %s",
-            ToString(BASE),
-            ToString(STR),
-            ToString(WGT),
-            ToString(CAR),
-            ToString(RSLT));
-        if (RSLT > 0)
-        {
-            consumed = static_cast<unsigned int>(RSLT);
-            if (this->stamina >= consumed)
-            {
-                return true;
-            }
-        }
-        else
-        {
-            Logger::log(
-                LogLevel::Warning,
-                "Evaluated cosumed stamina is below zero(%s).",
-                ToString(RSLT));
-        }
+        // Do something.
+    }
+    else if (actionType == ActionType::Building)
+    {
+        // Do something.
+    }
+    else if (actionType == ActionType::Crafting)
+    {
+        // Do something.
     }
     else if (actionType == ActionType::Combat)
     {
-        if (combatAction == CombatAction::BasicAttack)
+        if (combatAction == CombatActionType::BasicAttack)
         {
             if (this->canAttackWith(slot))
             {
@@ -1350,59 +1312,14 @@ bool Character::hasStaminaFor(
                 unsigned int wpnWeight = weapon->getTotalWeight();
                 double WPN = (wpnWeight == 0) ? 0 : log10(wpnWeight);
                 RSLT += WPN;
-                Logger::log(
-                    LogLevel::Debug,
-                    "Required Stamina : %s - %s + %s + %s = %s",
-                    ToString(BASE),
-                    ToString(STR),
-                    ToString(WGT),
-                    ToString(CAR),
-                    ToString(RSLT));
-                if (RSLT > 0)
-                {
-                    consumed = static_cast<unsigned int>(RSLT);
-                    if (this->stamina >= consumed)
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    Logger::log(
-                        LogLevel::Warning,
-                        "Evaluated cosumed stamina is below zero(%s).",
-                        ToString(RSLT));
-                }
             }
         }
-        else if (combatAction == CombatAction::Flee)
+        else if (combatAction == CombatActionType::Flee)
         {
-            Logger::log(
-                LogLevel::Debug,
-                "Required Stamina : %s - %s + %s + %s = %s",
-                ToString(BASE),
-                ToString(STR),
-                ToString(WGT),
-                ToString(CAR),
-                ToString(RSLT));
-            if (RSLT > 0)
-            {
-                consumed = static_cast<unsigned int>(RSLT);
-                if (this->stamina >= consumed)
-                {
-                    return true;
-                }
-            }
-            else
-            {
-                Logger::log(
-                    LogLevel::Warning,
-                    "Evaluated cosumed stamina is below zero(%s).",
-                    ToString(RSLT));
-            }
+            // Do something.
         }
     }
-    return false;
+    return static_cast<unsigned int>(RSLT);
 }
 
 bool Character::setHealth(const unsigned int & value, const bool & force)
@@ -1461,7 +1378,7 @@ bool Character::remHealth(const unsigned int & value, const bool & force)
     return true;
 }
 
-unsigned int Character::getHealth()
+unsigned int Character::getHealth() const
 {
     return this->health;
 }
@@ -1522,7 +1439,7 @@ bool Character::remStamina(const unsigned int & value, const bool & force)
     return true;
 }
 
-unsigned int Character::getStamina()
+unsigned int Character::getStamina() const
 {
     return this->stamina;
 }
@@ -1546,7 +1463,7 @@ void Character::kill()
         corpse->content.push_back(*it);
     }
     // Reset the action of the character.
-    this->getAction()->reset();
+    this->setAction(std::make_shared<GeneralAction>(this));
     // Reset the list of opponents.
     this->opponents.resetList();
     // Remove the character from the current room.

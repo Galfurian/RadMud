@@ -32,6 +32,7 @@ typedef enum class NodeTypes
     Stone
 } NodeType;
 
+/// @brief Model of a node of resources.
 class NodeModel: public ItemModel
 {
     public:

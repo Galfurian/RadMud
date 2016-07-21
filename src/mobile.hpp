@@ -64,9 +64,9 @@ class Mobile: public Character
         /// @brief Destructor.
         ~Mobile();
 
-        virtual bool check();
+        virtual bool check() const;
 
-        virtual bool isMobile();
+        virtual bool isMobile() const;
 
         /// @brief Allows to pass a string which contains the abilities.
         /// @param source The string which containts the values
@@ -79,8 +79,9 @@ class Mobile: public Character
 
         /// @brief Check if the mobile has the desired key.
         /// @param key The key to find.
-        /// @return <b>True</b> if the operations succeeded,<br><b>False</b> Otherwise.
-        bool hasKey(const std::string & key);
+        /// @return <b>True</b> if the operations succeeded,<br>
+        ///         <b>False</b> Otherwise.
+        bool hasKey(const std::string & key) const;
 
         /// @brief Check if the mobile has the desired action set.
         /// @param _action The action to check.

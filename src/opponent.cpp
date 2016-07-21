@@ -1,4 +1,4 @@
-/// @file   combat.cpp
+/// @file   opponent.cpp
 /// @brief  Contains implementation of combat classes.
 /// @author Enrico Fraccaroli
 /// @date   May 8 2016

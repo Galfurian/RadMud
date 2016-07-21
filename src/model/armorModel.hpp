@@ -33,6 +33,7 @@ typedef enum class ArmorSizes
     Heavy
 } ArmorSize;
 
+/// @brief Model of an armor.
 class ArmorModel: public ItemModel
 {
     public:
