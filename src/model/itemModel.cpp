@@ -249,7 +249,7 @@ std::string ItemModel::getTile(int offset)
     }
 }
 
-void ItemModel::getSheet(Table & sheet)
+void ItemModel::getSheet(Table & sheet) const
 {
     // Add the columns.
     sheet.addColumn("Attribute", StringAlign::Left);

@@ -61,7 +61,7 @@ bool LightModel::setModel(const std::string & source)
     return true;
 }
 
-void LightModel::getSheet(Table & sheet)
+void LightModel::getSheet(Table & sheet) const
 {
     // Call the function of the father class.
     ItemModel::getSheet(sheet);

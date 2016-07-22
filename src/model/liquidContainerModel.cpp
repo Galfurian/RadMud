@@ -61,7 +61,7 @@ bool LiquidContainerModel::setModel(const std::string & source)
     return true;
 }
 
-void LiquidContainerModel::getSheet(Table & sheet)
+void LiquidContainerModel::getSheet(Table & sheet) const
 {
     // Call the function of the father class.
     ItemModel::getSheet(sheet);

@@ -52,7 +52,7 @@ bool CurrencyModel::setModel(const std::string & source)
     return true;
 }
 
-void CurrencyModel::getSheet(Table & sheet)
+void CurrencyModel::getSheet(Table & sheet) const
 {
     // Call the function of the father class.
     ItemModel::getSheet(sheet);

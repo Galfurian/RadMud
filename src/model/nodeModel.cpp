@@ -58,7 +58,7 @@ bool NodeModel::setModel(const std::string & source)
     return true;
 }
 
-void NodeModel::getSheet(Table & sheet)
+void NodeModel::getSheet(Table & sheet) const
 {
     // Call the function of the father class.
     ItemModel::getSheet(sheet);

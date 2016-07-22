@@ -170,7 +170,7 @@ class ItemModel
         /// @return The string which contains the code of the tile.
         std::string getTile(int offset = 0);
 
-        virtual void getSheet(Table & sheet);
+        virtual void getSheet(Table & sheet) const;
 
     public:
         /// @brief Returns the model <b>statically</b> casted to Armor.

@@ -61,7 +61,7 @@ bool ShieldModel::setModel(const std::string & source)
     return true;
 }
 
-void ShieldModel::getSheet(Table & sheet)
+void ShieldModel::getSheet(Table & sheet) const
 {
     // Call the function of the father class.
     ItemModel::getSheet(sheet);

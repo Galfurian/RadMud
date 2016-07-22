@@ -56,7 +56,7 @@ bool BookModel::setModel(const std::string & source)
     return true;
 }
 
-void BookModel::getSheet(Table & sheet)
+void BookModel::getSheet(Table & sheet) const
 {
     // Call the function of the father class.
     ItemModel::getSheet(sheet);

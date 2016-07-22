@@ -75,7 +75,7 @@ class WeaponModel: public ItemModel
 
         virtual bool setModel(const std::string & source);
 
-        virtual void getSheet(Table & sheet);
+        virtual void getSheet(Table & sheet) const;
 };
 
 /// @addtogroup EnumToString

@@ -38,7 +38,7 @@ std::string VehicleModel::getTypeName() const
     return "Vehicle";
 }
 
-void VehicleModel::getSheet(Table & sheet)
+void VehicleModel::getSheet(Table & sheet) const
 {
     // Call the function of the father class.
     ItemModel::getSheet(sheet);
