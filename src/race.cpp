@@ -132,16 +132,21 @@ bool Race::setAvailableFactions(const std::string & source)
     return true;
 }
 
-unsigned int Race::getAbility(const Ability & ability)
+unsigned int Race::getAbility(const Ability & ability) const
 {
-    return abilities[ability];
+    auto it = abilities.find(ability);
+    if (it != abilities.end())
+    {
+        return it->second;
+    }
+    return 0;
 }
 
 unsigned int Race::getAbilityLua(const unsigned int & abilityNumber)
 {
     if (AbilityTest::is_value(abilityNumber))
     {
-        return abilities[static_cast<Ability>(abilityNumber)];
+        return this->getAbility(AbilityTest::convert(abilityNumber));
     }
     else
     {

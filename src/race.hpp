@@ -106,7 +106,7 @@ class Race
         /// @brief Provides the value of the given ability.
         /// @param ability The ability to retrieve.
         /// @return The overall ability value.
-        unsigned int getAbility(const Ability & ability);
+        unsigned int getAbility(const Ability & ability) const;
 
         /// @brief Provides the value of the given ability IF the ability number is correct.
         /// @param abilityNumber The ability to retrieve.

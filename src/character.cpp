@@ -63,11 +63,7 @@ Character::Character() :
         opponents(this),
         action(std::make_shared<GeneralAction>(this))
 {
-    abilities[Ability::Strength] = 0;
-    abilities[Ability::Agility] = 0;
-    abilities[Ability::Perception] = 0;
-    abilities[Ability::Constitution] = 0;
-    abilities[Ability::Intelligence] = 0;
+    // Nothing to do.
 }
 
 Character::~Character()
@@ -83,16 +79,16 @@ bool Character::check() const
     safe &= CorrectAssert(weight > 0);
     safe &= CorrectAssert(race != nullptr);
     safe &= CorrectAssert(faction != nullptr);
-    safe &= CorrectAssert(abilities.at(Ability::Strength) > 0);
-    safe &= CorrectAssert(abilities.at(Ability::Strength) <= 60);
-    safe &= CorrectAssert(abilities.at(Ability::Agility) > 0);
-    safe &= CorrectAssert(abilities.at(Ability::Agility) <= 60);
-    safe &= CorrectAssert(abilities.at(Ability::Perception) > 0);
-    safe &= CorrectAssert(abilities.at(Ability::Perception) <= 60);
-    safe &= CorrectAssert(abilities.at(Ability::Constitution) > 0);
-    safe &= CorrectAssert(abilities.at(Ability::Constitution) <= 60);
-    safe &= CorrectAssert(abilities.at(Ability::Intelligence) > 0);
-    safe &= CorrectAssert(abilities.at(Ability::Intelligence) <= 60);
+    safe &= CorrectAssert(this->getAbility(Ability::Strength, false) > 0);
+    safe &= CorrectAssert(this->getAbility(Ability::Strength, false) <= 60);
+    safe &= CorrectAssert(this->getAbility(Ability::Agility, false) > 0);
+    safe &= CorrectAssert(this->getAbility(Ability::Agility, false) <= 60);
+    safe &= CorrectAssert(this->getAbility(Ability::Perception, false) > 0);
+    safe &= CorrectAssert(this->getAbility(Ability::Perception, false) <= 60);
+    safe &= CorrectAssert(this->getAbility(Ability::Constitution, false) > 0);
+    safe &= CorrectAssert(this->getAbility(Ability::Constitution, false) <= 60);
+    safe &= CorrectAssert(this->getAbility(Ability::Intelligence, false) > 0);
+    safe &= CorrectAssert(this->getAbility(Ability::Intelligence, false) <= 60);
     safe &= CorrectAssert(thirst > 0);
     safe &= CorrectAssert(room != nullptr);
     safe &= CorrectAssert(L != nullptr);
@@ -187,31 +183,28 @@ bool Character::setAbility(const Ability & ability, const unsigned int & value)
 
 unsigned int Character::getAbility(const Ability & ability, bool withEffects) const
 {
-    if (AbilityTest::is_value(ability))
+    auto overall = 0;
+    // Try to find the ability value.
+    auto it = abilities.find(ability);
+    if (it != abilities.end())
     {
-        if (!withEffects)
-        {
-            return abilities.at(ability);
-        }
-        int overall = static_cast<int>(this->abilities.at(ability))
-            + effects.getAbilityModifier(ability);
+        overall = static_cast<int>(it->second);
+    }
+    // Add the effects if needed.
+    if (withEffects)
+    {
+        overall += effects.getAbilityModifier(ability);
+        // Prune the value if exceed the boundaries.
         if (overall <= 0)
         {
-            return 0;
+            overall = 0;
         }
         else if (overall > 60)
         {
-            return 60;
-        }
-        else
-        {
-            return static_cast<unsigned int>(overall);
+            overall = 60;
         }
     }
-    else
-    {
-        return 0;
-    }
+    return static_cast<unsigned int>(overall);
 }
 
 unsigned int Character::getAbilityModifier(const Ability & ability, bool withEffects) const

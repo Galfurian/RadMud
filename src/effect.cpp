@@ -107,7 +107,11 @@ int EffectList::getAbilityModifier(const Ability & ability) const
     int result = 0;
     for (const_iterator it = activeEffects.begin(); it != activeEffects.end(); ++it)
     {
-        result += it->abilities.at(ability);
+        auto abilityIt = it->abilities.find(ability);
+        if (abilityIt != it->abilities.end())
+        {
+            result += abilityIt->second;
+        }
     }
     return result;
 }

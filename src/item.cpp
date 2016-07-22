@@ -546,7 +546,9 @@ bool Item::takeOut(Item * item)
         {
             Logger::log(
                 LogLevel::Debug,
-                "Item '" + item->getName() + "' taken out from '" + this->getName() + "';");
+                "Item '%s' taken out from '%s';",
+                item->getName(),
+                this->getName());
             item->container = nullptr;
             content.erase(it);
             removed = true;
