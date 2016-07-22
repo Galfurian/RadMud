@@ -56,6 +56,16 @@ bool SeedModel::setModel(const std::string & source)
     return true;
 }
 
+void SeedModel::getSheet(Table & sheet)
+{
+    // Call the function of the father class.
+    ItemModel::getSheet(sheet);
+    // Add a divider.
+    sheet.addDivider();
+    // Set the values.
+    sheet.addRow( { "Seed Type", GetSeedTypeName(this->seedType) });
+}
+
 std::string GetSeedTypeName(SeedType type)
 {
     if (type == SeedType::Plant) return "Plant Seed";

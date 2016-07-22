@@ -404,192 +404,12 @@ void DoModelInfo(Character * character, std::istream & sArgs)
         character->sendMsg("Item model not found.\n");
         return;
     }
-
-    std::string msg;
-    msg += Formatter::yellow() + "Vnum          " + Formatter::reset();
-    msg += ": " + ToString(itemModel->vnum) + "\n";
-    msg += Formatter::yellow() + "Name          " + Formatter::reset();
-    msg += ": " + itemModel->name + "\n";
-    msg += Formatter::yellow() + "Article       " + Formatter::reset();
-    msg += ": " + itemModel->article + "\n";
-    msg += Formatter::yellow() + "Short Descr.  " + Formatter::reset();
-    msg += ": " + itemModel->shortdesc + "\n";
-    msg += Formatter::yellow() + "Keys          " + Formatter::reset();
-    msg += ": {";
-    for (auto it : itemModel->keys)
-    {
-        msg += " " + it;
-    }
-    msg += "}\n";
-    msg += Formatter::yellow() + "Description   " + Formatter::reset();
-    msg += ": " + itemModel->description + "\n";
-    msg += Formatter::yellow() + "Type          " + Formatter::reset();
-    msg += ": " + GetModelTypeName(itemModel->getType()) + "\n";
-    msg += Formatter::yellow() + "Slot          " + Formatter::reset();
-    msg += ": " + GetEquipmentSlotName(itemModel->slot) + "\n";
-    msg += Formatter::yellow() + "Flags         " + Formatter::reset();
-    msg += ": " + GetModelFlagString(itemModel->modelFlags) + "\n";
-    msg += Formatter::yellow() + "Weight        " + Formatter::reset();
-    msg += ": " + ToString(itemModel->weight) + " " + mud_measure + ".\n";
-    msg += Formatter::yellow() + "Price         " + Formatter::reset();
-    msg += ": " + ToString(itemModel->price) + ".\n";
-    msg += Formatter::yellow() + "Condition     " + Formatter::reset();
-    msg += ": " + ToString(itemModel->condition) + "\n";
-    msg += Formatter::yellow() + "Decay         " + Formatter::reset();
-    msg += ": " + ToString(itemModel->decay) + "\n";
-    msg += Formatter::yellow() + "Material      " + Formatter::reset();
-    msg += ": " + GetMaterialTypeName(itemModel->material) + "\n";
-    msg += Formatter::yellow() + "Tile Set      " + Formatter::reset();
-    msg += ": " + ToString(itemModel->tileSet) + "\n";
-    msg += Formatter::yellow() + "Tile Id       " + Formatter::reset();
-    msg += ": " + ToString(itemModel->tileId) + "\n";
-    if (itemModel->getType() == ModelType::Weapon)
-    {
-        WeaponModel * subModel = itemModel->toWeapon();
-        msg += Formatter::brown() + "Type          " + Formatter::reset();
-        msg += ": " + GetWeaponTypeName(subModel->weaponType) + "\n";
-        msg += Formatter::brown() + "Minimum Damage  " + Formatter::reset();
-        msg += ": " + ToString(subModel->minDamage) + "\n";
-        msg += Formatter::brown() + "Maximum Damage  " + Formatter::reset();
-        msg += ": " + ToString(subModel->maxDamage) + "\n";
-        msg += Formatter::brown() + "Range           " + Formatter::reset();
-        msg += ": " + ToString(subModel->range) + "\n";
-    }
-    else if (itemModel->getType() == ModelType::Armor)
-    {
-        ArmorModel * subModel = itemModel->toArmor();
-        msg += Formatter::brown() + "Size          " + Formatter::reset();
-        msg += ": " + GetArmorSizeName(subModel->size) + "\n";
-        msg += Formatter::brown() + "Damage Abs.   " + Formatter::reset();
-        msg += ": " + ToString(subModel->damageAbs) + "\n";
-        msg += Formatter::brown() + "Allowed Anatom. " + Formatter::reset();
-        msg += ": " + ToString(subModel->allowedAnatomy) + "\n";
-    }
-    else if (itemModel->getType() == ModelType::Shield)
-    {
-        ShieldModel * subModel = itemModel->toShield();
-        msg += Formatter::brown() + "Size            " + Formatter::reset();
-        msg += ": " + GetShieldSizeName(subModel->size) + "\n";
-        msg += Formatter::brown() + "Parry Chance    " + Formatter::reset();
-        msg += ": " + ToString(subModel->parryChance) + "\n";
-    }
-    else if (itemModel->getType() == ModelType::Projectile)
-    {
-        ProjectileModel * subModel = itemModel->toProjectile();
-        msg += Formatter::brown() + "Damage Bonus    " + Formatter::reset();
-        msg += ": " + ToString(subModel->damageBonus) + "\n";
-        msg += Formatter::brown() + "Range Bonus     " + Formatter::reset();
-        msg += ": " + ToString(subModel->rangeBonus) + "\n";
-    }
-    else if (itemModel->getType() == ModelType::Container)
-    {
-        ContainerModel * subModel = itemModel->toContainer();
-        msg += Formatter::brown() + "Max Weight      " + Formatter::reset();
-        msg += ": " + ToString(subModel->maxWeight) + "\n";
-        msg += Formatter::brown() + "Flags           " + Formatter::reset();
-        msg += ": {" + GetContainerFlagString(subModel->containerFlags) + "}\n";
-        msg += Formatter::brown() + "Key Vnum        " + Formatter::reset();
-        msg += ": " + ToString(subModel->keyVnum) + "\n";
-        msg += Formatter::brown() + "Lockpicking Lv. " + Formatter::reset();
-        msg += ": " + ToString(subModel->difficulty) + "\n";
-    }
-    else if (itemModel->getType() == ModelType::LiquidContainer)
-    {
-        LiquidContainerModel * subModel = itemModel->toLiquidContainer();
-        msg += Formatter::brown() + "Max Weight      " + Formatter::reset();
-        msg += ": " + ToString(subModel->maxWeight) + "\n";
-        msg += Formatter::brown() + "Flags           " + Formatter::reset();
-        msg += ": {" + GetLiqContainerFlagString(subModel->liquidFlags) + "}\n";
-    }
-    else if (itemModel->getType() == ModelType::Tool)
-    {
-        ToolModel * subModel = itemModel->toTool();
-        msg += Formatter::brown() + "Type            " + Formatter::reset();
-        msg += ": " + GetToolTypeName(subModel->toolType) + "\n";
-    }
-    else if (itemModel->getType() == ModelType::Node)
-    {
-        NodeModel * subModel = itemModel->toNode();
-        msg += Formatter::brown() + "Type            " + Formatter::reset();
-        msg += ": " + GetNodeTypeName(subModel->nodeType) + "\n";
-    }
-    else if (itemModel->getType() == ModelType::Resource)
-    {
-        ResourceModel * subModel = itemModel->toResource();
-        msg += Formatter::brown() + "Type            " + Formatter::reset();
-        msg += ": " + GetResourceTypeName(subModel->resourceType) + "\n";
-    }
-    else if (itemModel->getType() == ModelType::Seed)
-    {
-        SeedModel * subModel = itemModel->toSeed();
-        msg += Formatter::brown() + "Type            " + Formatter::reset();
-        msg += ": " + GetSeedTypeName(subModel->seedType) + "\n";
-    }
-    else if (itemModel->getType() == ModelType::Food)
-    {
-        FoodModel * subModel = itemModel->toFood();
-        msg += Formatter::brown() + "Feeding         " + Formatter::reset();
-        msg += ": " + ToString(subModel->hours) + "\n";
-        msg += Formatter::brown() + "Flags           " + Formatter::reset();
-        msg += ": {" + GetFoodFlagString(subModel->foodFlags) + "}\n";
-    }
-    else if (itemModel->getType() == ModelType::Light)
-    {
-        LightModel * subModel = itemModel->toLight();
-        msg += Formatter::brown() + "Autonomy        " + Formatter::reset();
-        msg += ": " + ToString(subModel->maxHours) + "\n";
-        msg += Formatter::brown() + "Rechargeable    " + Formatter::reset();
-        msg += ": " + ToString(subModel->policy) + "\n";
-    }
-    else if (itemModel->getType() == ModelType::Book)
-    {
-        BookModel * subModel = itemModel->toBook();
-        msg += Formatter::brown() + "Capacity        " + Formatter::reset();
-        msg += ": " + ToString(subModel->maxParchments) + "\n";
-    }
-    else if (itemModel->getType() == ModelType::Rope)
-    {
-        RopeModel * subModel = itemModel->toRope();
-        msg += Formatter::brown() + "Difficulty      " + Formatter::reset();
-        msg += ": " + ToString(subModel->difficulty) + "\n";
-        msg += Formatter::brown() + "Type            " + Formatter::reset();
-        msg += ": " + ToString(subModel->ropeType) + "\n";
-    }
-    else if (itemModel->getType() == ModelType::Mechanism)
-    {
-        MechanismModel * subModel = itemModel->toMechanism();
-        msg += Formatter::brown() + "Type            " + Formatter::reset();
-        msg += ": " + GetMechanismTypeName(subModel->mechanismType) + "\n";
-        if ((subModel->mechanismType == MechanismType::Door)
-            || (subModel->mechanismType == MechanismType::Lock))
-        {
-            msg += Formatter::brown() + "Key             " + Formatter::reset();
-            msg += ": " + ToString(subModel->key) + "\n";
-            msg += Formatter::brown() + "Difficulty      " + Formatter::reset();
-            msg += ": " + ToString(subModel->difficulty) + "\n";
-        }
-        else if (subModel->mechanismType == MechanismType::Picklock)
-        {
-            msg += Formatter::brown() + "Efficency       " + Formatter::reset();
-            msg += ": " + ToString(subModel->efficency) + "\n";
-        }
-        else if (subModel->mechanismType == MechanismType::Lever)
-        {
-            msg += Formatter::brown() + "Command         " + Formatter::reset();
-            msg += ": " + ToString(subModel->command) + "\n";
-            msg += Formatter::brown() + "Target          " + Formatter::reset();
-            msg += ": " + ToString(subModel->target) + "\n";
-        }
-        else
-        {
-            msg += Formatter::brown() + "None" + Formatter::reset() + "\n";
-        }
-    }
-    else
-    {
-        msg += Formatter::brown() + "No Type" + Formatter::reset() + "\n";
-    }
-    character->sendMsg(msg);
+    // Create a table.
+    Table sheet;
+    // Get the sheet of the mode.
+    itemModel->getSheet(sheet);
+    // Show the seet to character.
+    character->sendMsg(sheet.getTable());
 }
 
 void DoItemCreate(Character * character, std::istream & sArgs)
@@ -997,10 +817,8 @@ void DoRoomEdit(Character * character, std::istream & sArgs)
             return;
         }
 
-        QueryList value =
-        { std::make_pair("description", input) };
-        QueryList where =
-        { std::make_pair("vnum", ToString(room->vnum)) };
+        QueryList value = { std::make_pair("description", input) };
+        QueryList where = { std::make_pair("vnum", ToString(room->vnum)) };
 
         if (!SQLiteDbms::instance().updateInto("Room", value, where))
         {
@@ -1019,10 +837,8 @@ void DoRoomEdit(Character * character, std::istream & sArgs)
             player->sendMsg("You can't set an empty terrain.\n");
             return;
         }
-        QueryList value =
-        { std::make_pair("terrain", input) };
-        QueryList where =
-        { std::make_pair("vnum", ToString(room->vnum)) };
+        QueryList value = { std::make_pair("terrain", input) };
+        QueryList where = { std::make_pair("vnum", ToString(room->vnum)) };
 
         if (!SQLiteDbms::instance().updateInto("Room", value, where))
         {
@@ -1042,10 +858,8 @@ void DoRoomEdit(Character * character, std::istream & sArgs)
             return;
         }
 
-        QueryList value =
-        { std::make_pair("name", input) };
-        QueryList where =
-        { std::make_pair("vnum", ToString(room->vnum)) };
+        QueryList value = { std::make_pair("name", input) };
+        QueryList where = { std::make_pair("vnum", ToString(room->vnum)) };
         if (!SQLiteDbms::instance().updateInto("Room", value, where))
         {
             player->sendMsg("Command gone wrong.\n");

@@ -50,10 +50,24 @@ bool LightModel::setModel(const std::string & source)
     std::vector<std::string> functionList = SplitString(source, " ");
     if (functionList.size() != 2)
     {
-        Logger::log(LogLevel::Error, "Wrong number of parameters for Light Model (%s).", this->name);
+        Logger::log(
+            LogLevel::Error,
+            "Wrong number of parameters for Light Model (%s).",
+            this->name);
         return false;
     }
     this->maxHours = ToNumber<unsigned int>(functionList[0]);
     this->policy = ToNumber<unsigned int>(functionList[1]);
     return true;
+}
+
+void LightModel::getSheet(Table & sheet)
+{
+    // Call the function of the father class.
+    ItemModel::getSheet(sheet);
+    // Add a divider.
+    sheet.addDivider();
+    // Set the values.
+    sheet.addRow( { "Max Hours", ToString(this->maxHours) });
+    sheet.addRow( { "Policy", ToString(this->policy) });
 }

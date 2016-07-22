@@ -57,3 +57,14 @@ bool RopeModel::setModel(const std::string & source)
     this->ropeType = ToNumber<unsigned int>(functionList[1]);
     return true;
 }
+
+void RopeModel::getSheet(Table & sheet)
+{
+    // Call the function of the father class.
+    ItemModel::getSheet(sheet);
+    // Add a divider.
+    sheet.addDivider();
+    // Set the values.
+    sheet.addRow( { "Untie Difficulty", ToString(this->difficulty) });
+    sheet.addRow( { "Rope Type", ToString(this->ropeType) });
+}

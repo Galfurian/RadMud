@@ -63,6 +63,18 @@ bool ArmorModel::setModel(const std::string & source)
     return true;
 }
 
+void ArmorModel::getSheet(Table & sheet)
+{
+    // Call the function of the father class.
+    ItemModel::getSheet(sheet);
+    // Add a divider.
+    sheet.addDivider();
+    // Set the values.
+    sheet.addRow( { "Size", GetArmorSizeName(this->size) });
+    sheet.addRow( { "Damage Absorption", ToString(this->damageAbs) });
+    sheet.addRow( { "Allowed Anatomies", ToString(this->allowedAnatomy) });
+}
+
 std::string GetArmorSizeName(ArmorSize armorSize)
 {
     if (armorSize == ArmorSize::All) return "Universal Armor";

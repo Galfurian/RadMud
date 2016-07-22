@@ -25,6 +25,7 @@
 
 #include "../defines.hpp"
 #include "../lua/lua_script.hpp"
+#include "../utilities/table.hpp"
 
 class Item;
 class Player;
@@ -168,6 +169,8 @@ class ItemModel
         /// @brief Returns the tile of the model.
         /// @return The string which contains the code of the tile.
         std::string getTile(int offset = 0);
+
+        virtual void getSheet(Table & sheet);
 
     public:
         /// @brief Returns the model <b>statically</b> casted to Armor.

@@ -61,6 +61,17 @@ bool LiquidContainerModel::setModel(const std::string & source)
     return true;
 }
 
+void LiquidContainerModel::getSheet(Table & sheet)
+{
+    // Call the function of the father class.
+    ItemModel::getSheet(sheet);
+    // Add a divider.
+    sheet.addDivider();
+    // Set the values.
+    sheet.addRow( { "Max Weight", ToString(this->maxWeight) });
+    sheet.addRow( { "Flags", GetLiqContainerFlagString(this->liquidFlags) });
+}
+
 std::string GetLiqContainerFlagString(unsigned int flags)
 {
     std::string flagList;

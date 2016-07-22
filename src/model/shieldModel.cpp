@@ -61,6 +61,17 @@ bool ShieldModel::setModel(const std::string & source)
     return true;
 }
 
+void ShieldModel::getSheet(Table & sheet)
+{
+    // Call the function of the father class.
+    ItemModel::getSheet(sheet);
+    // Add a divider.
+    sheet.addDivider();
+    // Set the values.
+    sheet.addRow( { "Size", GetShieldSizeName(this->size) });
+    sheet.addRow( { "Parry Change", ToString(this->parryChance) });
+}
+
 std::string GetShieldSizeName(ShieldSize shieldSize)
 {
     if (shieldSize == ShieldSize::All) return "Universal Shield";

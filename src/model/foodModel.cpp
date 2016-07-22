@@ -58,6 +58,17 @@ bool FoodModel::setModel(const std::string & source)
     return true;
 }
 
+void FoodModel::getSheet(Table & sheet)
+{
+    // Call the function of the father class.
+    ItemModel::getSheet(sheet);
+    // Add a divider.
+    sheet.addDivider();
+    // Set the values.
+    sheet.addRow( { "Hours", ToString(this->hours) });
+    sheet.addRow( { "Flags", GetFoodFlagString(this->foodFlags) });
+}
+
 std::string GetFoodFlagString(unsigned int flags)
 {
     std::string flagList;

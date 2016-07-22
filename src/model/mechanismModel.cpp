@@ -80,6 +80,21 @@ bool MechanismModel::setModel(const std::string & source)
     return true;
 }
 
+void MechanismModel::getSheet(Table & sheet)
+{
+    // Call the function of the father class.
+    ItemModel::getSheet(sheet);
+    // Add a divider.
+    sheet.addDivider();
+    // Set the values.
+    sheet.addRow( { "Mechanism Type", GetMechanismTypeName(this->mechanismType) });
+    sheet.addRow( { "Key", ToString(this->key) });
+    sheet.addRow( { "Picklock Difficulty", ToString(this->difficulty) });
+    sheet.addRow( { "Picklock Efficency", ToString(this->efficency) });
+    sheet.addRow( { "Lever command", ToString(this->command) });
+    sheet.addRow( { "Target Vnum", ToString(this->target) });
+}
+
 std::string GetMechanismTypeName(MechanismType type)
 {
     if (type == MechanismType::Door) return "Door";

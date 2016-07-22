@@ -58,6 +58,17 @@ bool NodeModel::setModel(const std::string & source)
     return true;
 }
 
+void NodeModel::getSheet(Table & sheet)
+{
+    // Call the function of the father class.
+    ItemModel::getSheet(sheet);
+    // Add a divider.
+    sheet.addDivider();
+    // Set the values.
+    sheet.addRow( { "Node Type", GetNodeTypeName(this->nodeType) });
+    sheet.addRow( { "Provides", ToString(this->provides) });
+}
+
 std::string GetNodeTypeName(NodeType type)
 {
     if (type == NodeType::Metal) return "Metal Node";

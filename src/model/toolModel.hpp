@@ -70,6 +70,8 @@ class ToolModel: public ItemModel
         virtual std::string getTypeName() const;
 
         virtual bool setModel(const std::string & source);
+
+        virtual void getSheet(Table & sheet);
 };
 
 /// @addtogroup EnumToString

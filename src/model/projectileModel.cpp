@@ -50,10 +50,24 @@ bool ProjectileModel::setModel(const std::string & source)
     std::vector<std::string> functionList = SplitString(source, " ");
     if (functionList.size() != 2)
     {
-        Logger::log(LogLevel::Error, "Wrong number of parameters for Projectile Model (%s).", this->name);
+        Logger::log(
+            LogLevel::Error,
+            "Wrong number of parameters for Projectile Model (%s).",
+            this->name);
         return false;
     }
     this->damageBonus = ToNumber<unsigned int>(functionList[0]);
     this->rangeBonus = ToNumber<unsigned int>(functionList[1]);
     return true;
+}
+
+void ProjectileModel::getSheet(Table & sheet)
+{
+    // Call the function of the father class.
+    ItemModel::getSheet(sheet);
+    // Add a divider.
+    sheet.addDivider();
+    // Set the values.
+    sheet.addRow( { "Damage Bonus", ToString(this->damageBonus) });
+    sheet.addRow( { "Range  Bonus", ToString(this->rangeBonus) });
 }

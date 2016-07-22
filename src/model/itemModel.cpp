@@ -249,6 +249,35 @@ std::string ItemModel::getTile(int offset)
     }
 }
 
+void ItemModel::getSheet(Table & sheet)
+{
+    // Add the columns.
+    sheet.addColumn("Attribute", StringAlign::Left);
+    sheet.addColumn("Value", StringAlign::Left);
+    // Set the values.
+    sheet.addRow( { "Vnum", ToString(this->vnum) });
+    sheet.addRow( { "Name", this->name });
+    sheet.addRow( { "Article", this->article });
+    sheet.addRow( { "Short Description", this->shortdesc });
+    std::string keyGroup;
+    for (auto it : this->keys)
+    {
+        keyGroup += " " + it;
+    }
+    sheet.addRow( { "Keys", keyGroup });
+    sheet.addRow( { "Description", this->description });
+    sheet.addRow( { "Type", this->getTypeName() });
+    sheet.addRow( { "Slot", GetEquipmentSlotName(this->slot) });
+    sheet.addRow( { "Flags", GetModelFlagString(this->modelFlags) });
+    sheet.addRow( { "Weight", ToString(this->weight) });
+    sheet.addRow( { "Price", ToString(this->price) });
+    sheet.addRow( { "Condition", ToString(this->condition) });
+    sheet.addRow( { "Decay", ToString(this->decay) });
+    sheet.addRow( { "Material", GetMaterialTypeName(this->material) });
+    sheet.addRow( { "Tile", ToString(this->condition) });
+    sheet.addRow( { "Condition", ToString(this->tileSet) + ":" + ToString(this->tileId) });
+}
+
 ArmorModel * ItemModel::toArmor()
 {
     return static_cast<ArmorModel *>(this);

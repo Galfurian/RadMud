@@ -43,8 +43,19 @@ bool FurnitureModel::setModel(const std::string & source)
     std::vector<std::string> functionList = SplitString(source, " ");
     if (functionList.size() != 0)
     {
-        Logger::log(LogLevel::Error, "Wrong number of parameters for Furniture Model (%s).", this->name);
+        Logger::log(
+            LogLevel::Error,
+            "Wrong number of parameters for Furniture Model (%s).",
+            this->name);
         return false;
     }
     return true;
+}
+
+void FurnitureModel::getSheet(Table & sheet)
+{
+    // Call the function of the father class.
+    ItemModel::getSheet(sheet);
+    // Add a divider.
+    //sheet.addDivider();
 }

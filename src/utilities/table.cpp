@@ -24,9 +24,9 @@
 #include "../logger.hpp"
 
 TableColumn::TableColumn(std::string _title, StringAlign _alignment, size_t _width) :
-    title(_title),
-    alignment(_alignment),
-    width(_width)
+        title(_title),
+        alignment(_alignment),
+        width(_width)
 {
     if (width == 0)
     {
@@ -58,17 +58,17 @@ void TableColumn::setWidth(size_t _width)
 }
 
 Table::Table() :
-    title(),
-    columns(),
-    rows()
+        title(),
+        columns(),
+        rows()
 {
     // Nothing to do.
 }
 
 Table::Table(std::string _title) :
-    title(_title),
-    columns(),
-    rows()
+        title(_title),
+        columns(),
+        rows()
 {
     // Nothing to do.
 }
@@ -83,7 +83,7 @@ void Table::addColumn(std::string columnTitle, StringAlign columnAlignment, size
     columns.push_back(TableColumn(columnTitle, columnAlignment, columnWidth));
 }
 
-void Table::addRow(std::vector<std::string> row)
+void Table::addRow(TableRow row)
 {
     if (row.size() != columns.size())
     {
@@ -116,7 +116,8 @@ std::string Table::getTable(bool withoutHeaders)
         unsigned int column = 0;
         for (auto cell : row)
         {
-            output += "#" + AlignString(cell, columns[column].getAlignment(), columns[column].getWidth());
+            output += "#"
+                + AlignString(cell, columns[column].getAlignment(), columns[column].getWidth());
             column++;
         }
         output += "#\n";
@@ -128,6 +129,26 @@ std::string Table::getTable(bool withoutHeaders)
 size_t Table::getNumRows()
 {
     return rows.size();
+}
+
+void Table::addDivider()
+{
+    std::vector<std::string> divider;
+    for (auto column : columns)
+    {
+        std::string cell;
+        for (size_t w = 0; w < column.getWidth(); ++w)
+        {
+            cell += '-';
+        }
+        divider.push_back(cell);
+    }
+    this->addRow(divider);
+}
+
+void Table::popRow()
+{
+    this->rows.pop_back();
 }
 
 std::string Table::getDivider()
@@ -146,7 +167,8 @@ std::string Table::getDivider()
 
 std::string Table::getTitle()
 {
-    return "#" + AlignString(title, StringAlign::Center, getTotalWidth() + (columns.size() - 1)) + "#\n";
+    return "#" + AlignString(title, StringAlign::Center, getTotalWidth() + (columns.size() - 1))
+        + "#\n";
 }
 
 std::string Table::getHeaders()

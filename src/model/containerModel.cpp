@@ -65,6 +65,19 @@ bool ContainerModel::setModel(const std::string & source)
     return true;
 }
 
+void ContainerModel::getSheet(Table & sheet)
+{
+    // Call the function of the father class.
+    ItemModel::getSheet(sheet);
+    // Add a divider.
+    sheet.addDivider();
+    // Set the values.
+    sheet.addRow( { "Max Weight", ToString(this->maxWeight) });
+    sheet.addRow( { "Flags", GetContainerFlagString(this->containerFlags) });
+    sheet.addRow( { "Key Vnum", ToString(this->keyVnum) });
+    sheet.addRow( { "Picklock Difficulty", ToString(this->difficulty) });
+}
+
 std::string GetContainerFlagString(unsigned int flags)
 {
     std::string flagList;

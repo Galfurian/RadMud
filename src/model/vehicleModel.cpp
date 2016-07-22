@@ -38,6 +38,14 @@ std::string VehicleModel::getTypeName() const
     return "Vehicle";
 }
 
+void VehicleModel::getSheet(Table & sheet)
+{
+    // Call the function of the father class.
+    ItemModel::getSheet(sheet);
+    // Add a divider.
+    //sheet.addDivider();
+}
+
 bool VehicleModel::setModel(const std::string & source)
 {
     if (source.empty())

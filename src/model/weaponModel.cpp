@@ -65,6 +65,19 @@ bool WeaponModel::setModel(const std::string & source)
     return true;
 }
 
+void WeaponModel::getSheet(Table & sheet)
+{
+    // Call the function of the father class.
+    ItemModel::getSheet(sheet);
+    // Add a divider.
+    sheet.addDivider();
+    // Set the values.
+    sheet.addRow( { "Weapon Type", GetWeaponTypeName(this->weaponType) });
+    sheet.addRow( { "Minimum Damage", ToString(this->minDamage) });
+    sheet.addRow( { "Maximum Damage", ToString(this->maxDamage) });
+    sheet.addRow( { "Range", ToString(this->range) });
+}
+
 std::string GetWeaponTypeName(WeaponType type)
 {
     if (type == WeaponType::Pistol) return "Pistol";

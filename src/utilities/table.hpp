@@ -71,7 +71,7 @@ class Table
         /// List of columns of the table.
         std::vector<TableColumn> columns;
         /// List of rows of the table.
-        std::vector<std::vector<std::string> > rows;
+        std::vector<TableRow> rows;
 
     public:
         /// @brief Constructor.
@@ -88,11 +88,14 @@ class Table
         /// @param columnTitle     The column title.
         /// @param columnAlignment The column alignment.
         /// @param columnWidth     The column width.
-        void addColumn(std::string columnTitle, StringAlign columnAlignment, size_t columnWidth = 0);
+        void addColumn(
+            std::string columnTitle,
+            StringAlign columnAlignment,
+            size_t columnWidth = 0);
 
         /// @brief Allows to add a row of values.
         /// @param row The vector which containts the row values.
-        void addRow(std::vector<std::string> row);
+        void addRow(TableRow row);
 
         /// @brief Provides the table.
         /// @param withoutHeaders Allows to hide the header of the columns.
@@ -102,6 +105,10 @@ class Table
         /// @brief Provides the number of rows inside the table.
         /// @return The number of rows.
         size_t getNumRows();
+
+        void addDivider();
+
+        void popRow();
 
     private:
         /// @brief Provides a divided of the same width of the table.

@@ -59,6 +59,16 @@ bool ResourceModel::setModel(const std::string & source)
     return true;
 }
 
+void ResourceModel::getSheet(Table & sheet)
+{
+    // Call the function of the father class.
+    ItemModel::getSheet(sheet);
+    // Add a divider.
+    sheet.addDivider();
+    // Set the values.
+    sheet.addRow( { "Resource Type", GetResourceTypeName(this->resourceType) });
+}
+
 std::string GetResourceTypeName(ResourceType type)
 {
     if (type == ResourceType::Coal) return "Natural Coal";

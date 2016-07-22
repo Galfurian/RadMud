@@ -53,3 +53,11 @@ bool KeyModel::setModel(const std::string & source)
     }
     return true;
 }
+
+void KeyModel::getSheet(Table & sheet)
+{
+    // Call the function of the father class.
+    ItemModel::getSheet(sheet);
+    // Add a divider.
+    //sheet.addDivider();
+}

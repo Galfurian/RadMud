@@ -56,3 +56,11 @@ bool CorpseModel::setModel(const std::string & source)
     }
     return true;
 }
+
+void CorpseModel::getSheet(Table & sheet)
+{
+    // Call the function of the father class.
+    ItemModel::getSheet(sheet);
+    // Add a divider.
+    //sheet.addDivider();
+}
