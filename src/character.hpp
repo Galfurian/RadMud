@@ -112,6 +112,8 @@ class Character
         ///         <b>False</b> otherwise.
         virtual bool isPlayer() const;
 
+        virtual void getSheet(Table & sheet) const;
+
         /// @brief Return the name of the character with all lowercase characters.
         /// @return The name of the character.
         std::string getName() const;

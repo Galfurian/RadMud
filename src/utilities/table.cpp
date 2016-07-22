@@ -136,12 +136,7 @@ void Table::addDivider()
     std::vector<std::string> divider;
     for (auto column : columns)
     {
-        std::string cell;
-        for (size_t w = 0; w < column.getWidth(); ++w)
-        {
-            cell += '-';
-        }
-        divider.push_back(cell);
+        divider.push_back("#");
     }
     this->addRow(divider);
 }

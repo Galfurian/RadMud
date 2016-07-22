@@ -91,6 +91,8 @@ class Player: public Character
 
         virtual bool isPlayer() const;
 
+        virtual void getSheet(Table & sheet) const;
+
         /// @brief Return player socket.
         /// @return Player sockec.
         int getSocket() const;

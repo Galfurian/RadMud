@@ -193,128 +193,12 @@ void DoGodInfo(Character * character, std::istream & sArgs)
             return;
         }
     }
-    std::string msg;
-    msg += Formatter::green() + "# Chracter:\n" + Formatter::reset();
-    msg += Formatter::yellow() + " Proper Noun  " + Formatter::reset() + ":";
-    msg += target->name + "\n";
-    msg += Formatter::yellow() + "    Desc    " + Formatter::reset() + ":";
-    msg += target->description + "\n";
-    msg += Formatter::yellow() + "    Gender  " + Formatter::reset() + ":";
-    msg += GetGenderTypeName(target->gender) + "\n";
-    msg += Formatter::yellow() + "    Weight  " + Formatter::reset() + ":";
-    msg += ToString(target->weight) + "\n";
-    msg += Formatter::yellow() + "    Level   " + Formatter::reset() + ":";
-    msg += ToString(target->level) + "\n";
-    msg += Formatter::yellow() + "    Flags   " + Formatter::reset() + ":";
-    msg += ToString(target->flags) + "\n";
-    msg += Formatter::yellow() + "    Race    " + Formatter::reset() + ":";
-    if (CorrectAssert(target->race != nullptr)) msg += target->race->name + "\n";
-    else msg += "NONE\n";
-    msg += Formatter::yellow() + "    Faction " + Formatter::reset() + ":";
-    if (CorrectAssert(target->faction != nullptr)) msg += target->faction->name + "\n";
-    else msg += "NONE\n";
-    msg += Formatter::yellow() + "    Health  " + Formatter::reset() + ":";
-    msg += ToString(target->getHealth()) + "\n";
-    msg += Formatter::yellow() + "    Stamina " + Formatter::reset() + ":";
-    msg += ToString(target->getStamina()) + "\n";
-    msg += Formatter::yellow() + "    Hunger  " + Formatter::reset() + ":";
-    msg += ToString(target->getHunger()) + "\n";
-    msg += Formatter::yellow() + "    Thirst  " + Formatter::reset() + ":";
-    msg += ToString(target->getThirst()) + "\n";
-    msg += Formatter::yellow() + "    STR     " + Formatter::reset() + ":";
-    msg += ToString(target->getAbility(Ability::Strength, false));
-    msg += "[" + ToString(target->effects.getAbilityModifier(Ability::Strength)) + "]\n";
-    msg += Formatter::yellow() + "    AGI     " + Formatter::reset() + ":";
-    msg += ToString(target->getAbility(Ability::Agility, false));
-    msg += "[" + ToString(target->effects.getAbilityModifier(Ability::Agility)) + "]\n";
-    msg += Formatter::yellow() + "    PER     " + Formatter::reset() + ":";
-    msg += ToString(target->getAbility(Ability::Perception, false));
-    msg += "[" + ToString(target->effects.getAbilityModifier(Ability::Perception)) + "]\n";
-    msg += Formatter::yellow() + "    CON     " + Formatter::reset() + ":";
-    msg += ToString(target->getAbility(Ability::Constitution, false));
-    msg += "[" + ToString(target->effects.getAbilityModifier(Ability::Constitution)) + "]\n";
-    msg += Formatter::yellow() + "    INT     " + Formatter::reset() + ":";
-    msg += ToString(target->getAbility(Ability::Intelligence, false));
-    msg += "[" + ToString(target->effects.getAbilityModifier(Ability::Intelligence)) + "]\n";
-    msg += Formatter::yellow() + "    Room    " + Formatter::reset() + ":";
-    if (CorrectAssert(target->room != nullptr)) msg += ToString(target->room->vnum) + "\n";
-    else msg += "NONE\n";
-    msg += Formatter::yellow() + "    Posture " + Formatter::reset() + ":";
-    msg += GetPostureName(target->posture) + "\n";
-    msg += Formatter::yellow() + "    Inv     " + Formatter::reset() + ":\n";
-    for (auto it : target->inventory)
-    {
-        msg += "        " + it->getName() + "\n";
-    }
-    msg += Formatter::yellow() + "    Equip   " + Formatter::reset() + ":\n";
-    for (auto it : target->equipment)
-    {
-        msg += "        " + it->getName() + "\n";
-    }
-    msg += Formatter::yellow() + "    Effects " + Formatter::reset() + ":\n";
-    for (EffectList::iterator it = target->effects.begin(); it != target->effects.end(); ++it)
-    {
-        msg += "                [" + ToString(it->expires) + "] " + it->name + "\n";
-    }
-    msg += Formatter::yellow() + "    Action  " + Formatter::reset() + ":";
-    msg += GetActionTypeName(target->getAction()->getType()) + "\n";
-    if (target->isPlayer())
-    {
-        Player * player = target->toPlayer();
-        msg += Formatter::yellow() + "    Age     " + Formatter::reset() + ":";
-        msg += ToString(player->age) + "\n";
-        msg += Formatter::yellow() + "    Exp     " + Formatter::reset() + ":";
-        msg += ToString(player->experience) + "\n";
-        msg += Formatter::yellow() + "    Prompt  " + Formatter::reset() + ":";
-        msg += player->prompt + "\n";
-        msg += Formatter::yellow() + "    Rent    " + Formatter::reset() + ":";
-        msg += ToString(player->rent_room) + "\n";
-        msg += Formatter::yellow() + "    Skills  " + Formatter::reset() + ":\n";
-        for (auto iterator : Mud::instance().mudSkills)
-        {
-            msg += "        " + iterator.second->name + "[";
-            msg += ToString(player->skills[iterator.first]) + "]\n";
-        }
-    }
-    else if (target->isMobile())
-    {
-        Mobile * m = target->toMobile();
-        msg += Formatter::yellow() + "    Id      " + Formatter::reset() + ":";
-        msg += m->id + "\n";
-        msg += Formatter::yellow() + "    Spawn   " + Formatter::reset() + ":";
-        msg += ToString(m->respawnRoom->vnum) + "\n";
-        msg += Formatter::yellow() + "    Keys    " + Formatter::reset() + ": {";
-        for (auto it : m->keys)
-        {
-            msg += " " + it;
-        }
-        msg += "}\n";
-        msg += Formatter::yellow() + "    Short   " + Formatter::reset() + ":";
-        msg += m->shortdesc + "\n";
-        msg += Formatter::yellow() + "    Static  " + Formatter::reset() + ":";
-        msg += m->staticdesc + "\n";
-        msg += Formatter::yellow() + "    Actions " + Formatter::reset() + ": {";
-        for (auto it : m->actions)
-        {
-            msg += " " + it;
-        }
-        msg += "}\n";
-        msg += Formatter::yellow() + "    Alive   " + Formatter::reset() + ":";
-        msg += ToString(m->alive) + "\n";
-        if (!m->alive)
-        {
-            msg += Formatter::yellow() + "    Respawn " + Formatter::reset() + ":";
-            msg += ToString(m->getRespawnTime()) + "\n";
-        }
-        if (m->controller != nullptr)
-        {
-            msg += Formatter::red() + "    Controller " + Formatter::reset() + ":";
-            msg += m->controller->getName() + "\n";
-        }
-        msg += Formatter::red() + "    Lua Script   " + Formatter::reset() + ":";
-        msg += m->lua_script + "\n";
-    }
-    character->sendMsg(msg);
+    // Create a table.
+    Table sheet;
+    // Get the sheet.
+    target->getSheet(sheet);
+    // Show the seet to character.
+    character->sendMsg(sheet.getTable());
 }
 
 void DoSetFlag(Character * character, std::istream & sArgs)
@@ -406,7 +290,7 @@ void DoModelInfo(Character * character, std::istream & sArgs)
     }
     // Create a table.
     Table sheet;
-    // Get the sheet of the mode.
+    // Get the sheet.
     itemModel->getSheet(sheet);
     // Show the seet to character.
     character->sendMsg(sheet.getTable());

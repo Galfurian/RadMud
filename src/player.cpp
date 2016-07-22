@@ -136,6 +136,32 @@ bool Player::isPlayer() const
     return true;
 }
 
+void Player::getSheet(Table & sheet) const
+{
+    // Call the function of the father class.
+    Character::getSheet(sheet);
+    // Add a divider.
+    sheet.addDivider();
+    // Set the values.
+    sheet.addRow( { "Age", ToString(this->age) });
+    sheet.addRow( { "Experience", ToString(this->experience) });
+    sheet.addRow( { "Prompt", this->prompt });
+    sheet.addRow( { "Rent Room", ToString(this->rent_room) });
+    sheet.addDivider();
+    sheet.addRow( { "## Skill", "## Points" });
+    for (auto it : Mud::instance().mudSkills)
+    {
+        if (this->skills.find(it.first) != this->skills.end())
+        {
+            sheet.addRow( { it.second->name, ToString(this->skills.at(it.first)) });
+        }
+        else
+        {
+            sheet.addRow( { it.second->name, "0" });
+        }
+    }
+}
+
 ///////////////////////////////////////////////////////////
 // CONNECTIONI ////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
@@ -334,8 +360,8 @@ bool Player::remInventoryItem(Item * item)
 {
     if (Character::remInventoryItem(item))
     {
-        SQLiteDbms::instance().deleteFrom("ItemPlayer",
-        { std::make_pair("owner", name), std::make_pair("item", ToString(item->vnum)) });
+        SQLiteDbms::instance().deleteFrom("ItemPlayer", { std::make_pair("owner", name),
+            std::make_pair("item", ToString(item->vnum)) });
         return true;
     }
     return false;
@@ -349,8 +375,8 @@ bool Player::remEquipmentItem(Item * item)
 {
     if (Character::remEquipmentItem(item))
     {
-        SQLiteDbms::instance().deleteFrom("ItemPlayer",
-        { std::make_pair("owner", name), std::make_pair("item", ToString(item->vnum)) });
+        SQLiteDbms::instance().deleteFrom("ItemPlayer", { std::make_pair("owner", name),
+            std::make_pair("item", ToString(item->vnum)) });
         return true;
     }
     return false;

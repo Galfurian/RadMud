@@ -105,6 +105,86 @@ bool Character::isPlayer() const
     return false;
 }
 
+void Character::getSheet(Table & sheet) const
+{
+    // Add the columns.
+    sheet.addColumn("Attribute", StringAlign::Left);
+    sheet.addColumn("Value", StringAlign::Left);
+    // Set the values.
+    sheet.addRow( { "Proper Noun", this->name });
+    sheet.addRow( { "Description", this->description });
+    sheet.addRow( { "Gender", GetGenderTypeName(this->gender) });
+    sheet.addRow( { "Weight", ToString(this->weight) });
+    sheet.addRow( { "Level", ToString(this->level) });
+    sheet.addRow( { "Flags", GetCharacterFlagString(this->flags) });
+    if (CorrectAssert(this->race != nullptr))
+    {
+        sheet.addRow( { "Race", this->race->name });
+    }
+    else
+    {
+        sheet.addRow( { "Race", "NONE" });
+    }
+    if (CorrectAssert(this->faction != nullptr))
+    {
+        sheet.addRow( { "Faction", this->faction->name });
+    }
+    else
+    {
+        sheet.addRow( { "Faction", "NONE" });
+    }
+    sheet.addRow( { "Health", ToString(this->getHealth()) });
+    sheet.addRow( { "Stamina", ToString(this->getStamina()) });
+    sheet.addRow( { "Hunger", ToString(this->getHunger()) });
+    sheet.addRow( { "Thirst", ToString(this->getThirst()) });
+    sheet.addRow(
+        { "Strength", ToString(this->getAbility(Ability::Strength, false)) + " ["
+            + ToString(this->effects.getAbilityModifier(Ability::Strength)) + "]" });
+    sheet.addRow(
+        { "Agility", ToString(this->getAbility(Ability::Agility, false)) + " ["
+            + ToString(this->effects.getAbilityModifier(Ability::Agility)) + "]" });
+    sheet.addRow(
+        { "Perception", ToString(this->getAbility(Ability::Perception, false)) + " ["
+            + ToString(this->effects.getAbilityModifier(Ability::Perception)) + "]" });
+    sheet.addRow(
+        { "Constitution", ToString(this->getAbility(Ability::Constitution, false)) + " ["
+            + ToString(this->effects.getAbilityModifier(Ability::Constitution)) + "]" });
+    sheet.addRow(
+        { "Intelligence", ToString(this->getAbility(Ability::Intelligence, false)) + " ["
+            + ToString(this->effects.getAbilityModifier(Ability::Intelligence)) + "]" });
+    if (CorrectAssert(this->room != nullptr))
+    {
+        sheet.addRow( { "Room", this->room->name + " [" + ToString(this->room->vnum) + "]" });
+    }
+    else
+    {
+        sheet.addRow( { "Room", "NONE" });
+    }
+    sheet.addRow( { "Posture", GetPostureName(this->posture) });
+    sheet.addRow( { "Action", action->getDescription() });
+    sheet.addDivider();
+    sheet.addRow( { "## Equipment", "## Inventory" });
+    for (size_t it = 0; it < std::max(this->inventory.size(), this->equipment.size()); ++it)
+    {
+        std::string equipmentItem, inventoryItem;
+        if (it < this->equipment.size())
+        {
+            equipmentItem = this->equipment.at(it)->getName();
+        }
+        if (it < this->inventory.size())
+        {
+            inventoryItem = this->inventory.at(it)->getName();
+        }
+        sheet.addRow( { equipmentItem, inventoryItem });
+    }
+    sheet.addDivider();
+    sheet.addRow( { "## Effect Name", "## Expires In" });
+    for (EffectList::const_iterator it = this->effects.begin(); it != this->effects.end(); ++it)
+    {
+        sheet.addRow( { it->name, ToString(it->expires) });
+    }
+}
+
 std::string Character::getName() const
 {
     if (this->isPlayer())
@@ -524,10 +604,12 @@ Item * Character::findNearbyItem(std::string itemName, int & number)
     return item;
 }
 
-Item * Character::findNearbyTool(const ToolType & toolType, const ItemVector & exceptions,
-bool searchRoom,
-bool searchInventory,
-bool searchEquipment)
+Item * Character::findNearbyTool(
+    const ToolType & toolType,
+    const ItemVector & exceptions,
+    bool searchRoom,
+    bool searchInventory,
+    bool searchEquipment)
 {
     if (searchRoom)
     {
@@ -586,10 +668,12 @@ bool searchEquipment)
     return nullptr;
 }
 
-bool Character::findNearbyTools(ToolSet tools, ItemVector & foundOnes,
-bool searchRoom,
-bool searchInventory,
-bool searchEquipment)
+bool Character::findNearbyTools(
+    ToolSet tools,
+    ItemVector & foundOnes,
+    bool searchRoom,
+    bool searchInventory,
+    bool searchEquipment)
 {
     // TODO: Prepare a map with key the tool type and as value:
     //  Option A: A bool which determine if the tool has been found.

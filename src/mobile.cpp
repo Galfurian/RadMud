@@ -30,6 +30,7 @@
 #include "luabridge/LuaBridge.h"
 
 using namespace std;
+using namespace std::chrono;
 
 Mobile::Mobile() :
         id(),
@@ -123,6 +124,42 @@ bool Mobile::isMobile() const
     return true;
 }
 
+void Mobile::getSheet(Table & sheet) const
+{
+    // Call the function of the father class.
+    Character::getSheet(sheet);
+    // Add a divider.
+    sheet.addDivider();
+    // Set the values.
+    sheet.addRow( { "Id", this->id });
+    sheet.addRow( { "Respawn Room", ToString(this->respawnRoom->vnum) });
+    std::string keyGroup;
+    for (auto it : this->keys)
+    {
+        keyGroup += " " + it;
+    }
+    sheet.addRow( { "Keys", keyGroup });
+    sheet.addRow( { "Short Desc.", this->shortdesc });
+    sheet.addRow( { "Static Desc.", this->staticdesc });
+    std::string actionGroup;
+    for (auto it : this->actions)
+    {
+        actionGroup += " " + it;
+    }
+    sheet.addRow( { "Actions", actionGroup });
+    sheet.addRow( { "Is Alive", ToString(this->alive) });
+    if (!this->alive)
+    {
+        sheet.addRow( { "Respawn Time", ToString(this->getRespawnTime()) });
+
+    }
+    if (this->controller != nullptr)
+    {
+        sheet.addRow( { "Controller", this->controller->getName() });
+    }
+    sheet.addRow( { "Lua Script", this->lua_script });
+}
+
 bool Mobile::hasKey(const string & key) const
 {
     bool found = false;
@@ -188,16 +225,15 @@ void Mobile::kill()
     // Set the mobile as dead.
     alive = false;
     // Set to 0 the cycle that this mobile has passed dead.
-    nextRespawn = std::chrono::system_clock::now() + std::chrono::seconds(10 * this->level);
+    nextRespawn = system_clock::now() + seconds(10 * this->level);
     // Call the LUA function: Event_Death.
     this->triggerEventDeath();
 }
 
-int64_t Mobile::getRespawnTime()
+int64_t Mobile::getRespawnTime() const
 {
     // Return the check if the mobile can be respawned.
-    return std::chrono::duration_cast<std::chrono::seconds>(
-        std::chrono::system_clock::now() - nextRespawn).count();
+    return duration_cast<seconds>(system_clock::now() - nextRespawn).count();
 }
 
 bool Mobile::canRespawn()

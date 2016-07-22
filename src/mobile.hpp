@@ -68,6 +68,8 @@ class Mobile: public Character
 
         virtual bool isMobile() const;
 
+        virtual void getSheet(Table & sheet) const;
+
         /// @brief Allows to pass a string which contains the abilities.
         /// @param source The string which containts the values
         /// @return <b>True</b> if the string is correct,<br>
@@ -94,7 +96,7 @@ class Mobile: public Character
 
         /// @brief Return the number of second until next respawn.
         /// @return Seconds until respawn.
-        int64_t getRespawnTime();
+        int64_t getRespawnTime() const;
 
         /// @brief Check if the mobile can be respawned.
         /// @return <b>True</b> if it can be respawned,<br>
