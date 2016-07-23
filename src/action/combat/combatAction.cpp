@@ -17,10 +17,10 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "combatAction.hpp"
-#include "../logger.hpp"
-#include "../room.hpp"
-#include "../character.hpp"
-#include "../model/weaponModel.hpp"
+#include "../../room.hpp"
+#include "../../logger.hpp"
+#include "../../character.hpp"
+#include "../../model/weaponModel.hpp"
 
 using namespace std::chrono;
 
@@ -28,12 +28,12 @@ CombatAction::CombatAction(Character * _actor) :
         GeneralAction(_actor),
         combatAction(CombatActionType::NoAction)
 {
-    Logger::log(LogLevel::Debug, "Created combat action.");
+    Logger::log(LogLevel::Debug, "Created CombatAction.");
 }
 
 CombatAction::~CombatAction()
 {
-    Logger::log(LogLevel::Debug, "Deleted combat action.");
+    Logger::log(LogLevel::Debug, "Deleted CombatAction.");
 }
 
 bool CombatAction::check() const

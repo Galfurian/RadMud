@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include "action/combatAction.hpp"
 #include "defines.hpp"
 #include "effect.hpp"
 #include "exit.hpp"
@@ -29,6 +28,7 @@
 #include "item.hpp"
 #include "race.hpp"
 #include "utils.hpp"
+#include "action/combat/combatAction.hpp"
 
 class Room;
 class Player;

@@ -18,32 +18,17 @@
 
 #pragma once
 
-#include "generalAction.hpp"
+#include "combatAction.hpp"
 
-/// The list of possible combat actions.
-typedef enum class CombatActionTypes
+class BasicAttack: public CombatAction
 {
-    /// The combat move is to do nothing.
-    NoAction,
-    /// The action is a basic attack.
-    BasicAttack,
-    /// The character tries to flee.
-    Flee
-} CombatActionType;
-
-class CombatAction: public GeneralAction
-{
-    private:
-        /// The current combat action.
-        CombatActionType combatAction;
-
     public:
         /// @brief Constructor.
         /// @param _cooldown    How many seconds are required to complete the movement.
-        CombatAction(Character * _actor);
+        BasicAttack(Character * _actor);
 
         /// @brief Destructor.
-        virtual ~CombatAction();
+        virtual ~BasicAttack();
 
         /// @brief Checks the correctness of the action's values.
         /// @return <b>True</b> if it has correct values,<br>
@@ -69,16 +54,4 @@ class CombatAction: public GeneralAction
         /// @brief Provides the type of combat action.
         /// @return The type of combat action.
         CombatActionType getCombatActionType() const;
-
-        /// @brief Allows to set a combat action.
-        /// @param nextAction The next action to execute in combat.
-        /// @return <b>True</b> if correct values have been provided,<br>
-        ///         <b>False</b> otherwise.
-        bool setNextCombatAction(const CombatActionType & nextAction);
-
-    private:
-
-        /// @brief Performs the combat action.
-        /// @return the status after performing the combat action.
-        ActionStatus performCombatAction(const CombatActionType & move);
 };

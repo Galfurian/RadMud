@@ -1,7 +1,11 @@
 #############################################
+add_subdirectory(combat)
+
+#############################################
 # Action Include Directories
 set(RADMUD_ACTION_INC
 	./src/action
+	${RADMUD_COMBAT_ACTION_INC}
     PARENT_SCOPE
 )
 
@@ -12,6 +16,6 @@ set(RADMUD_ACTION_SRC
 	./src/action/buildAction.cpp
 	./src/action/craftAction.cpp
 	./src/action/moveAction.cpp
-	./src/action/combatAction.cpp
+	${RADMUD_COMBAT_ACTION_SRC}
     PARENT_SCOPE
 )
