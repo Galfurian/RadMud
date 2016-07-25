@@ -22,6 +22,7 @@
 #include "../constants.hpp"
 #include "../action/combat/combatAction.hpp"
 #include "../action/combat/basicAttack.hpp"
+#include "../action/combat/flee.hpp"
 
 using namespace std;
 
@@ -74,7 +75,6 @@ void DoKill(Character * character, std::istream & sArgs)
     else if ((character->getAction()->getType() != ActionType::Combat)
         && (target->getAction()->getType() == ActionType::Combat))
     {
-        auto basicAttack = std::make_shared<BasicAttack>(character);
         // Set the opponents.
         if (!character->opponents.addOpponent(target))
         {
@@ -100,14 +100,17 @@ void DoKill(Character * character, std::istream & sArgs)
             exceptions,
             character->getNameCapital(),
             target->getName());
-
         // Let the characters enter the combat.
-        character->setAction(basicAttack);
+        if (!character->setNextCombatAction(CombatActionType::BasicAttack))
+        {
+            character->sendMsg("You were not ablet to attack %s.\n", target->getName());
+            character->opponents.remOpponent(target);
+            target->opponents.remOpponent(character);
+            return;
+        }
     }
     else
     {
-        auto characBasicAttack = std::make_shared<BasicAttack>(character);
-        auto targetBasicAttack = std::make_shared<BasicAttack>(target);
         // Set the opponents.
         if (!character->opponents.addOpponent(target))
         {
@@ -135,8 +138,20 @@ void DoKill(Character * character, std::istream & sArgs)
             target->getName());
 
         // Let the characters enter the combat.
-        character->setAction(characBasicAttack);
-        target->setAction(targetBasicAttack);
+        if (!character->setNextCombatAction(CombatActionType::BasicAttack))
+        {
+            character->sendMsg("You were not ablet to attack %s.\n", target->getName());
+            character->opponents.remOpponent(target);
+            target->opponents.remOpponent(character);
+            return;
+        }
+        if (!target->setNextCombatAction(CombatActionType::BasicAttack))
+        {
+            character->sendMsg("You were not ablet to attack %s.\n", target->getName());
+            character->opponents.remOpponent(target);
+            target->opponents.remOpponent(character);
+            return;
+        }
     }
 }
 
@@ -150,8 +165,7 @@ void DoFlee(Character * character, std::istream & sArgs)
         character->sendMsg("You are not fighting.\n");
         return;
     }
-    auto combatAction = dynamic_pointer_cast<CombatAction>(character->getAction());
-
+    auto combatAction = character->getAction()->toCombatAction();
     // Check if the character is already trying to flee.
     if (combatAction->getCombatActionType() == CombatActionType::Flee)
     {
@@ -159,5 +173,5 @@ void DoFlee(Character * character, std::istream & sArgs)
         return;
     }
     character->sendMsg("You prepare to flee...\n");
-    combatAction->setNextCombatAction(CombatActionType::Flee);
+    character->setNextCombatAction(CombatActionType::Flee);
 }

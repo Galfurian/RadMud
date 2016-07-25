@@ -33,10 +33,6 @@ typedef enum class CombatActionTypes
 
 class CombatAction: public GeneralAction
 {
-    protected:
-        /// The current combat action.
-        CombatActionType combatAction;
-
     public:
         /// @brief Constructor.
         /// @param _cooldown    How many seconds are required to complete the movement.
@@ -64,21 +60,9 @@ class CombatAction: public GeneralAction
 
         /// @brief Performs the current action.
         /// @return the status after performing the action.
-        virtual ActionStatus perform();
+        virtual ActionStatus perform() = 0;
 
         /// @brief Provides the type of combat action.
         /// @return The type of combat action.
-        CombatActionType getCombatActionType() const;
-
-        /// @brief Allows to set a combat action.
-        /// @param nextAction The next action to execute in combat.
-        /// @return <b>True</b> if correct values have been provided,<br>
-        ///         <b>False</b> otherwise.
-        bool setNextCombatAction(const CombatActionType & nextAction);
-
-    private:
-
-        /// @brief Performs the combat action.
-        /// @return the status after performing the combat action.
-        ActionStatus performCombatAction(const CombatActionType & move);
+        virtual CombatActionType getCombatActionType() const = 0;
 };

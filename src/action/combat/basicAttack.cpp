@@ -35,7 +35,7 @@ BasicAttack::~BasicAttack()
 
 bool BasicAttack::check() const
 {
-    bool correct = GeneralAction::check();
+    bool correct = CombatAction::check();
     return correct;
 }
 
@@ -98,8 +98,6 @@ ActionStatus BasicAttack::perform()
                     ToString(consumedStamina));
                 continue;
             }
-            // Consume the stamina.
-            actor->remStamina(consumedStamina, true);
             // Natural roll for the attack.
             unsigned int ATK = TRandInteger<unsigned int>(1, 20);
             // Log the rolled value.
@@ -171,9 +169,13 @@ ActionStatus BasicAttack::perform()
                     actor->getName(),
                     enemy->getName(),
                     iterator->getName());
+                // Consume half the stamina.
+                actor->remStamina(consumedStamina / 2, true);
             }
             else
             {
+                // Consume the stamina.
+                actor->remStamina(consumedStamina, true);
                 // Store the type of attack.
                 bool isCritical;
                 // Natural roll for the damage.
@@ -278,7 +280,7 @@ ActionStatus BasicAttack::perform()
         }
     }
     // By default set the next combat action to basic attack.
-    if (!this->setNextCombatAction(CombatActionType::BasicAttack))
+    if (!actor->setNextCombatAction(CombatActionType::BasicAttack))
     {
         actor->sendMsg(this->stop() + "\n\n");
         return ActionStatus::Finished;

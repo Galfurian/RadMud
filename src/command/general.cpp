@@ -191,8 +191,7 @@ void DoWho(Character * character, std::istream & sArgs)
         {
             location = iterator->room->name;
         }
-        table.addRow(
-        { iterator->getName(), location });
+        table.addRow( { iterator->getName(), location });
     }
     output += table.getTable();
     output += "# Total " + Formatter::yellow() + "Players" + Formatter::reset() + " :"

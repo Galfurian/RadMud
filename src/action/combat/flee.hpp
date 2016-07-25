@@ -20,15 +20,15 @@
 
 #include "combatAction.hpp"
 
-class BasicAttack: public CombatAction
+class Flee: public CombatAction
 {
     public:
         /// @brief Constructor.
         /// @param _cooldown    How many seconds are required to complete the movement.
-        BasicAttack(Character * _actor);
+        Flee(Character * _actor);
 
         /// @brief Destructor.
-        virtual ~BasicAttack();
+        virtual ~Flee();
 
         /// @brief Checks the correctness of the action's values.
         /// @return <b>True</b> if it has correct values,<br>

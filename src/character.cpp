@@ -39,7 +39,11 @@
 #include "model/shieldModel.hpp"
 #include "model/resourceModel.hpp"
 
+#include "action/combat/basicAttack.hpp"
+#include "action/combat/flee.hpp"
+
 using namespace std;
+using namespace std::chrono;
 
 Character::Character() :
         name(),
@@ -313,8 +317,8 @@ unsigned int Character::getAbilityLog(
 
 unsigned int Character::getMaxHealth(bool withEffects) const
 {
-    // Value = 40 + (10 * AbilityModifier(Constitution))
-    unsigned int BASE = 40 + (10 * this->getAbilityModifier(Ability::Constitution));
+    // Value = 5 + (5 * AbilityModifier(Constitution))
+    unsigned int BASE = 5 + (5 * this->getAbility(Ability::Constitution));
     if (!withEffects)
     {
         return BASE;
@@ -332,8 +336,8 @@ unsigned int Character::getMaxHealth(bool withEffects) const
 
 unsigned int Character::getMaxStamina(bool withEffects) const
 {
-    // Value = 50 + (15 * AbilityModifier(Constitution))
-    unsigned int BASE = 50 + (15 * this->getAbilityModifier(Ability::Constitution));
+    // Value = 10 + (10 * Ability(Constitution))
+    unsigned int BASE = 10 + (10 * this->getAbility(Ability::Constitution));
     if (!withEffects)
     {
         return BASE;
@@ -382,6 +386,32 @@ int Character::getViewDistance() const
 void Character::setAction(std::shared_ptr<GeneralAction> _action)
 {
     this->action = _action;
+}
+
+bool Character::setNextCombatAction(CombatActionType nextAction)
+{
+    if (!opponents.hasOpponents())
+    {
+        Logger::log(LogLevel::Error, "The list of opponents is empty.");
+        return false;
+    }
+    bool sameAction = false;
+    if (this->action->getType() == ActionType::Combat)
+    {
+        auto combatAction = this->action->toCombatAction();
+        sameAction = (combatAction->getCombatActionType() == nextAction);
+    }
+    if ((nextAction == CombatActionType::BasicAttack) && !sameAction)
+    {
+        this->action = std::make_shared<BasicAttack>(this);
+    }
+    else if ((nextAction == CombatActionType::Flee) && !sameAction)
+    {
+        this->action = std::make_shared<Flee>(this);
+    }
+    // Set the action cooldown.
+    this->action->setCooldown(this->getCooldown(nextAction));
+    return true;
 }
 
 std::shared_ptr<GeneralAction> Character::getAction()
@@ -1504,6 +1534,7 @@ bool Character::addStamina(const unsigned int & value, const bool & force)
 
 bool Character::remStamina(const unsigned int & value, const bool & force)
 {
+    Logger::log(LogLevel::Debug, "Consuming stamina: %s", ToString(value));
     int result = static_cast<int>(this->stamina) - static_cast<int>(value);
     if (result < 0)
     {
