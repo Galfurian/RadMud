@@ -25,6 +25,13 @@
 #include "../item.hpp"
 #include "../opponent.hpp"
 
+#include <memory>
+
+class BuildAction;
+class CraftAction;
+class MoveAction;
+class CombatAction;
+
 /// The list of possible actions.
 typedef enum class ActionTypes
 {
@@ -51,7 +58,7 @@ typedef enum class ActionStatus_t
     Error
 } ActionStatus;
 
-class GeneralAction
+class GeneralAction: public std::enable_shared_from_this<GeneralAction>
 {
     protected:
         /// Actor of the action.
@@ -94,6 +101,10 @@ class GeneralAction
         /// @brief Performs the current action.
         /// @return the status after performing the action.
         virtual ActionStatus perform();
+
+        void setCooldown(const unsigned int & _actionCooldown);
+
+        std::shared_ptr<CombatAction> toCombatAction();
 };
 
 /// @addtogroup EnumToString

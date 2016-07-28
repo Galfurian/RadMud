@@ -159,7 +159,7 @@ void DoFeast(Character * character, std::istream & sArgs)
     target->setStamina(target->getMaxStamina(), true);
     target->setThirst(100);
     target->setHunger(100);
-    target->sendMsg("A banquet with any kind of delicacy appears from nowhere!");
+    target->sendMsg("A banquet with any kind of delicacy appears from nowhere!\n");
 }
 
 void DoGodInfo(Character * character, std::istream & sArgs)

@@ -18,6 +18,7 @@
 
 #include "generalAction.hpp"
 #include "../logger.hpp"
+#include "combat/combatAction.hpp"
 
 using namespace std::chrono;
 
@@ -25,19 +26,19 @@ GeneralAction::GeneralAction(Character * _actor) :
         actor(_actor),
         actionCooldown()
 {
-    Logger::log(LogLevel::Debug, "Created general action.");
+    Logger::log(LogLevel::Debug, "Created GeneralAction.");
 }
 
 GeneralAction::GeneralAction(Character * _actor, TimeClock _actionCooldown) :
         actor(_actor),
         actionCooldown(_actionCooldown)
 {
-    Logger::log(LogLevel::Debug, "Created general action.");
+    Logger::log(LogLevel::Debug, "Created GeneralAction.");
 }
 
 GeneralAction::~GeneralAction()
 {
-    Logger::log(LogLevel::Debug, "Deleted general action.");
+    Logger::log(LogLevel::Debug, "Deleted GeneralAction.");
 }
 
 bool GeneralAction::checkElapsed() const
@@ -74,6 +75,17 @@ std::string GeneralAction::stop()
 ActionStatus GeneralAction::perform()
 {
     return ActionStatus::Finished;
+}
+
+void GeneralAction::setCooldown(const unsigned int & _actionCooldown)
+{
+    this->actionCooldown = system_clock::now() + seconds(_actionCooldown);
+    Logger::log(LogLevel::Debug, "Next combat action in %s.", ToString(_actionCooldown));
+}
+
+std::shared_ptr<CombatAction> GeneralAction::toCombatAction()
+{
+    return std::static_pointer_cast<CombatAction>(this->shared_from_this());
 }
 
 std::string GetActionTypeName(ActionType type)
