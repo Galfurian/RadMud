@@ -154,28 +154,13 @@ void MudUpdater::updatePlayers()
         {
             continue;
         }
-        // Update the modifiers.
-        std::vector<std::string> expirationMessages;
-        if (iterator->effects.effectUpdate(expirationMessages))
-        {
-            for (auto message : expirationMessages)
-            {
-                iterator->sendMsg(message + "\n");
-            }
-        }
-
-        // Activate the modifiers.
-        std::vector<std::string> activationMessages;
-        if (iterator->effects.effectActivate(activationMessages))
-        {
-            for (auto message : activationMessages)
-            {
-                iterator->sendMsg(message + "\n");
-            }
-        }
-
-        // Update the player resources (health, stamina).
-        iterator->updateResources();
+        // Update the player conditions.
+        iterator->updateHealth();
+        iterator->updateStamina();
+        iterator->updateHunger();
+        iterator->updateThirst();
+        iterator->updateExpiredEffects();
+        iterator->updateActivatedEffects();
     }
 }
 
@@ -194,28 +179,13 @@ void MudUpdater::updateMobiles()
         }
         else
         {
-            // Update the modifiers.
-            std::vector<std::string> expirationMessages;
-            if (mobile->effects.effectUpdate(expirationMessages))
-            {
-                for (auto message : expirationMessages)
-                {
-                    mobile->sendMsg(message + "\n");
-                }
-            }
-
-            // Activate the modifiers.
-            std::vector<std::string> activationMessages;
-            if (mobile->effects.effectActivate(activationMessages))
-            {
-                for (auto message : activationMessages)
-                {
-                    mobile->sendMsg(message + "\n");
-                }
-            }
-
-            // Update the resources (health, stamina).
-            mobile->updateResources();
+            // Update the condition.
+            mobile->updateHealth();
+            mobile->updateStamina();
+            mobile->updateHunger();
+            mobile->updateThirst();
+            mobile->updateExpiredEffects();
+            mobile->updateActivatedEffects();
         }
     }
 }

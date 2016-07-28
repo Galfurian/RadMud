@@ -264,9 +264,6 @@ class Character
         /// @return Stamina condition of the character.
         std::string getStaminaCondition();
 
-        /// @brief Manage the recovering of both health and stamina.
-        void updateResources();
-
         /// @brief Evaluate the maximum distance at which the character can still see.
         /// @return The maximum radius of view.
         int getViewDistance() const;
@@ -447,6 +444,24 @@ class Character
         /// @brief Get character level of hunger.
         /// @return Hunger of this character.
         std::string getHungerCondition() const;
+
+        /// @brief Update the health.
+        void updateHealth();
+
+        /// @brief Update the stamina.
+        void updateStamina();
+
+        /// @brief Update the hunger.
+        void updateHunger();
+
+        /// @brief Update the thirst.
+        void updateThirst();
+
+        /// @brief Update the list of expired effects.
+        void updateExpiredEffects();
+
+        /// @brief Update the list of activated effects.
+        void updateActivatedEffects();
 
         /// @brief Provide a detailed description of the character.
         /// @param character The target character.

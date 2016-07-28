@@ -515,28 +515,6 @@ std::string Character::getStaminaCondition()
     else return "are too tired, you can't even blink your eyes";
 }
 
-void Character::updateResources()
-{
-    unsigned int PosMod = 0;
-    unsigned int LogMod = this->getAbilityLog(Ability::Constitution, 0.0, 1.0);
-    if (posture == CharacterPosture::Sit)
-    {
-        PosMod = 2;
-    }
-    else if (posture == CharacterPosture::Rest)
-    {
-        PosMod = 4;
-    }
-    if (this->health < this->getMaxHealth())
-    {
-        this->addHealth((1 + 3 * LogMod) * (1 + 2 * PosMod), true);
-    }
-    if (this->stamina < this->getMaxStamina())
-    {
-        this->addStamina((1 + 4 * LogMod) * (1 + 3 * PosMod), true);
-    }
-}
-
 int Character::getViewDistance() const
 {
     // Value = 3 + LogMod(PER)
@@ -1176,6 +1154,92 @@ std::string Character::getHungerCondition() const
     else if (this->hunger >= 60) return "are quite hungry";
     else if (this->hunger >= 30) return "are hungry";
     else return "are dying of hunger";
+}
+
+void Character::updateHealth()
+{
+    unsigned int posModifier = 0;
+    unsigned int logModifier = this->getAbilityLog(Ability::Constitution, 0.0, 1.0);
+    if (posture == CharacterPosture::Sit)
+    {
+        posModifier = 2;
+    }
+    else if (posture == CharacterPosture::Rest)
+    {
+        posModifier = 4;
+    }
+    if (this->health < this->getMaxHealth())
+    {
+        this->addHealth((1 + 3 * logModifier) * (1 + 2 * posModifier), true);
+    }
+}
+
+void Character::updateStamina()
+{
+    unsigned int posModifier = 0;
+    unsigned int logModifier = this->getAbilityLog(Ability::Constitution, 0.0, 1.0);
+    if (posture == CharacterPosture::Sit)
+    {
+        posModifier = 3;
+    }
+    else if (posture == CharacterPosture::Rest)
+    {
+        posModifier = 5;
+    }
+    if (this->stamina < this->getMaxStamina())
+    {
+        this->addStamina((1 + 4 * logModifier) * (1 + 3 * posModifier), true);
+    }
+}
+
+void Character::updateHunger()
+{
+    unsigned int reduction = 10;
+    if (this->hunger < reduction)
+    {
+        this->hunger = 0;
+    }
+    else
+    {
+        this->hunger -= reduction;
+    }
+}
+
+void Character::updateThirst()
+{
+    unsigned int reduction = 10;
+    if (this->thirst < reduction)
+    {
+        this->thirst = 0;
+    }
+    else
+    {
+        this->thirst -= reduction;
+    }
+}
+
+void Character::updateExpiredEffects()
+{
+    std::vector<std::string> messages;
+    if (this->effects.effectUpdate(messages))
+    {
+        for (auto message : messages)
+        {
+            this->sendMsg(message + "\n");
+        }
+    }
+}
+
+void Character::updateActivatedEffects()
+{
+    std::vector<std::string> messages;
+    if (this->effects.effectActivate(messages))
+    {
+        for (auto message : messages)
+        {
+            this->sendMsg(message + "\n");
+        }
+    }
 }
 
 string Character::getLook(Character * character)
