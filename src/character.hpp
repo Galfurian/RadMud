@@ -112,6 +112,8 @@ class Character
         ///         <b>False</b> otherwise.
         virtual bool isPlayer() const;
 
+        /// @brief Fills the provided table with the information concerning the character.
+        /// @param sheet The table that has to be filled.
         virtual void getSheet(Table & sheet) const;
 
         /// @brief Return the name of the character with all lowercase characters.
@@ -177,13 +179,90 @@ class Character
             const double & multiplier,
             const bool & withEffects = true) const;
 
+        /// @brief Allows to SET the health value.
+        /// @param value The value to set.
+        /// @param force <b>True</b> if the value is greather than the maximum
+        ///               the function set the health to it and
+        ///               returns true,<br>
+        ///              <b>False</b> return false.
+        /// @return <b>True</b> if the function has set the value,<br>
+        ///         <b>False</b> otherwise.
+        bool setHealth(const unsigned int & value, const bool & force = false);
+
+        /// @brief Allows to ADD a value to the current health value.
+        /// @param value The value to add.
+        /// @param force <b>True</b> if the resulting value is greather than
+        ///               the maximum the function set the health to it and
+        ///               returns true,<br>
+        ///              <b>False</b> return false.
+        /// @return <b>True</b> if the function has added the value,<br>
+        ///         <b>False</b> otherwise.
+        bool addHealth(const unsigned int & value, const bool & force = false);
+
+        /// @brief Allows to REMOVE a value to the current health value.
+        /// @param value The value to remove.
+        /// @param force <b>True</b> if the resulting value is lesser than
+        ///               zero the function set the health to it and
+        ///               returns true,<br>
+        ///              <b>False</b> return false.
+        /// @return <b>True</b> if the function has removed the value,<br>
+        ///         <b>False</b> otherwise.
+        bool remHealth(const unsigned int & value, const bool & force = false);
+
+        /// @brief Get character level of health.
+        /// @return Health of this character.
+        unsigned int getHealth() const;
+
         /// @brief Return the max health value.
         /// @return The maximum health for this character.
         unsigned int getMaxHealth(bool withEffects = true) const;
 
+        /// @brief Get character condition.
+        /// @param character The target character.
+        /// @return Condition of this character.
+        std::string getHealthCondition(Character * character = nullptr);
+
+        /// @brief Allows to SET the stamina value.
+        /// @param value The value to set.
+        /// @param force <b>True</b> if the value is greather than the maximum
+        ///               the function set the stamina to it and
+        ///               returns true,<br>
+        ///              <b>False</b> return false.
+        /// @return <b>True</b> if the function has set the value,<br>
+        ///         <b>False</b> otherwise.
+        bool setStamina(const unsigned int & value, const bool & force = false);
+
+        /// @brief Allows to ADD a value to the current stamina value.
+        /// @param value The value to add.
+        /// @param force <b>True</b> if the resulting value is greather than
+        ///               the maximum the function set the stamina to it and
+        ///               returns true,<br>
+        ///              <b>False</b> return false.
+        /// @return <b>True</b> if the function has added the value,<br>
+        ///         <b>False</b> otherwise.
+        bool addStamina(const unsigned int & value, const bool & force = false);
+
+        /// @brief Allows to REMOVE a value to the current stamina value.
+        /// @param value The value to remove.
+        /// @param force <b>True</b> if the resulting value is lesser than
+        ///               zero the function set the stamina to it and
+        ///               returns true,<br>
+        ///              <b>False</b> return false.
+        /// @return <b>True</b> if the function has removed the value,<br>
+        ///         <b>False</b> otherwise.
+        bool remStamina(const unsigned int & value, const bool & force = false);
+
+        /// @brief Get character level of stamina.
+        /// @return Stamina of this character.
+        unsigned int getStamina() const;
+
         /// @brief Return the max stamina value.
         /// @return The maximum stamina for this character.
         unsigned int getMaxStamina(bool withEffects = true) const;
+
+        /// @brief Get the character stamina condition.
+        /// @return Stamina condition of the character.
+        std::string getStaminaCondition();
 
         /// @brief Manage the recovering of both health and stamina.
         void updateResources();
@@ -341,16 +420,19 @@ class Character
         ///         <b>False</b> otherwise.
         bool canWear(Item * item, std::string & error) const;
 
-        /// @brief Get character condition.
-        /// @param character The target character.
-        /// @return Condition of this character.
-        std::string getHealthCondition(Character * character = nullptr);
-
         /// @brief Sums the given value to the current thirst.
         /// @param value The value to sum.
         /// @return <b>True</b> if the new value is geq 0,<br>
         ///         <b>False</b> otherwise.
         bool setThirst(int value);
+
+        /// @brief Provides the current level of thirst.
+        /// @return The current value.
+        unsigned int getThirst() const;
+
+        /// @brief Get character level of thirst.
+        /// @return Thirst of this character.
+        std::string getThirstCondition() const;
 
         /// @brief Sums the given value to the current hunger.
         /// @param value The value to sum.
@@ -358,21 +440,13 @@ class Character
         ///         <b>False</b> otherwise.
         bool setHunger(int value);
 
-        /// @brief Provides the current level of thirst.
-        /// @return The current value.
-        unsigned int getThirst() const;
-
         /// @brief Provides the current level of hunger.
         /// @return The current value.
         unsigned int getHunger() const;
 
-        /// @brief Get character level of thirst.
-        /// @return Thirst of this character.
-        std::string getThirstDesc() const;
-
         /// @brief Get character level of hunger.
         /// @return Hunger of this character.
-        std::string getHungerDesc() const;
+        std::string getHungerCondition() const;
 
         /// @brief Provide a detailed description of the character.
         /// @param character The target character.
@@ -425,74 +499,6 @@ class Character
             const ActionType & actionType,
             const CombatActionType & combatAction = CombatActionType::NoAction,
             const EquipmentSlot & slot = EquipmentSlot::None) const;
-
-        /// @brief Allows to SET the health value.
-        /// @param value The value to set.
-        /// @param force <b>True</b> if the value is greather than the maximum
-        ///               the function set the health to it and
-        ///               returns true,<br>
-        ///              <b>False</b> return false.
-        /// @return <b>True</b> if the function has set the value,<br>
-        ///         <b>False</b> otherwise.
-        bool setHealth(const unsigned int & value, const bool & force = false);
-
-        /// @brief Allows to ADD a value to the current health value.
-        /// @param value The value to add.
-        /// @param force <b>True</b> if the resulting value is greather than
-        ///               the maximum the function set the health to it and
-        ///               returns true,<br>
-        ///              <b>False</b> return false.
-        /// @return <b>True</b> if the function has added the value,<br>
-        ///         <b>False</b> otherwise.
-        bool addHealth(const unsigned int & value, const bool & force = false);
-
-        /// @brief Allows to REMOVE a value to the current health value.
-        /// @param value The value to remove.
-        /// @param force <b>True</b> if the resulting value is lesser than
-        ///               zero the function set the health to it and
-        ///               returns true,<br>
-        ///              <b>False</b> return false.
-        /// @return <b>True</b> if the function has removed the value,<br>
-        ///         <b>False</b> otherwise.
-        bool remHealth(const unsigned int & value, const bool & force = false);
-
-        /// @brief Get character level of health.
-        /// @return Health of this character.
-        unsigned int getHealth() const;
-
-        /// @brief Allows to SET the stamina value.
-        /// @param value The value to set.
-        /// @param force <b>True</b> if the value is greather than the maximum
-        ///               the function set the stamina to it and
-        ///               returns true,<br>
-        ///              <b>False</b> return false.
-        /// @return <b>True</b> if the function has set the value,<br>
-        ///         <b>False</b> otherwise.
-        bool setStamina(const unsigned int & value, const bool & force = false);
-
-        /// @brief Allows to ADD a value to the current stamina value.
-        /// @param value The value to add.
-        /// @param force <b>True</b> if the resulting value is greather than
-        ///               the maximum the function set the stamina to it and
-        ///               returns true,<br>
-        ///              <b>False</b> return false.
-        /// @return <b>True</b> if the function has added the value,<br>
-        ///         <b>False</b> otherwise.
-        bool addStamina(const unsigned int & value, const bool & force = false);
-
-        /// @brief Allows to REMOVE a value to the current stamina value.
-        /// @param value The value to remove.
-        /// @param force <b>True</b> if the resulting value is lesser than
-        ///               zero the function set the stamina to it and
-        ///               returns true,<br>
-        ///              <b>False</b> return false.
-        /// @return <b>True</b> if the function has removed the value,<br>
-        ///         <b>False</b> otherwise.
-        bool remStamina(const unsigned int & value, const bool & force = false);
-
-        /// @brief Get character level of stamina.
-        /// @return Stamina of this character.
-        unsigned int getStamina() const;
 
         /// @brief Handle what happend when this character die.
         virtual void kill();

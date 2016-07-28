@@ -311,6 +311,67 @@ unsigned int Character::getAbilityLog(
     return static_cast<unsigned int>(result);
 }
 
+bool Character::setHealth(const unsigned int & value, const bool & force)
+{
+    unsigned int maximum = this->getMaxHealth();
+    if (value > maximum)
+    {
+        if (force)
+        {
+            this->health = maximum;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    this->health = value;
+    return true;
+}
+
+bool Character::addHealth(const unsigned int & value, const bool & force)
+{
+    unsigned int maximum = this->getMaxHealth();
+    unsigned int result = this->health + value;
+    if (result > maximum)
+    {
+        if (force)
+        {
+            result = maximum;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    this->health = result;
+    return true;
+}
+
+bool Character::remHealth(const unsigned int & value, const bool & force)
+{
+    int result = static_cast<int>(this->health) - static_cast<int>(value);
+    if (result < 0)
+    {
+        if (force)
+        {
+            result = 0;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    this->health = static_cast<unsigned int>(result);
+    return true;
+}
+
+unsigned int Character::getHealth() const
+{
+    return this->health;
+}
+
 unsigned int Character::getMaxHealth(bool withEffects) const
 {
     // Value = 40 + (10 * AbilityModifier(Constitution))
@@ -330,6 +391,98 @@ unsigned int Character::getMaxHealth(bool withEffects) const
     }
 }
 
+string Character::getHealthCondition(Character * character)
+{
+    string sent_be, sent_have;
+    // Determine who is the examined character.
+    if (character != nullptr && character != this)
+    {
+        sent_be = "is";
+        sent_have = "has";
+    }
+    else
+    {
+        character = this;
+        sent_be = "are";
+        sent_have = "have";
+    }
+    // Determine the percentage of current health.
+    auto percent = (100 * character->health) / character->getMaxHealth();
+    // Determine the correct description.
+    if (percent >= 100) return sent_be + " in perfect health";
+    else if (percent >= 90) return sent_be + " slightly scratched";
+    else if (percent >= 80) return sent_have + " a few bruises";
+    else if (percent >= 70) return sent_have + " some cuts";
+    else if (percent >= 60) return sent_have + " several wounds";
+    else if (percent >= 50) return sent_have + " many nasty wounds";
+    else if (percent >= 40) return sent_be + " bleeding freely";
+    else if (percent >= 30) return sent_be + " covered in blood";
+    else if (percent >= 20) return sent_be + " leaking guts";
+    else if (percent >= 10) return sent_be + " almost dead";
+    else return sent_be + " DYING";
+}
+
+bool Character::setStamina(const unsigned int & value, const bool & force)
+{
+    unsigned int maximum = this->getMaxStamina();
+    if (value > maximum)
+    {
+        if (force)
+        {
+            this->stamina = maximum;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    this->stamina = value;
+    return true;
+}
+
+bool Character::addStamina(const unsigned int & value, const bool & force)
+{
+    unsigned int maximum = this->getMaxStamina();
+    unsigned int result = this->stamina + value;
+    if (result > maximum)
+    {
+        if (force)
+        {
+            result = maximum;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    this->stamina = result;
+    return true;
+}
+
+bool Character::remStamina(const unsigned int & value, const bool & force)
+{
+    int result = static_cast<int>(this->stamina) - static_cast<int>(value);
+    if (result < 0)
+    {
+        if (force)
+        {
+            result = 0;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    this->stamina = static_cast<unsigned int>(result);
+    return true;
+}
+
+unsigned int Character::getStamina() const
+{
+    return this->stamina;
+}
+
 unsigned int Character::getMaxStamina(bool withEffects) const
 {
     // Value = 50 + (15 * AbilityModifier(Constitution))
@@ -347,6 +500,19 @@ unsigned int Character::getMaxStamina(bool withEffects) const
     {
         return static_cast<unsigned int>(overall);
     }
+}
+
+std::string Character::getStaminaCondition()
+{
+    // Determine the percentage of current health.
+    auto percent = (100 * this->stamina) / this->getMaxStamina(true);
+    // Determine the correct description.
+    if (percent >= 100) return "look fresh as a daisy";
+    else if (percent >= 80) return "are slightly weary";
+    else if (percent >= 60) return "are quite tired";
+    else if (percent >= 40) return "need to rest";
+    else if (percent >= 20) return "need a good night of sleep";
+    else return "are too tired, you can't even blink your eyes";
 }
 
 void Character::updateResources()
@@ -604,12 +770,10 @@ Item * Character::findNearbyItem(std::string itemName, int & number)
     return item;
 }
 
-Item * Character::findNearbyTool(
-    const ToolType & toolType,
-    const ItemVector & exceptions,
-    bool searchRoom,
-    bool searchInventory,
-    bool searchEquipment)
+Item * Character::findNearbyTool(const ToolType & toolType, const ItemVector & exceptions,
+bool searchRoom,
+bool searchInventory,
+bool searchEquipment)
 {
     if (searchRoom)
     {
@@ -668,12 +832,10 @@ Item * Character::findNearbyTool(
     return nullptr;
 }
 
-bool Character::findNearbyTools(
-    ToolSet tools,
-    ItemVector & foundOnes,
-    bool searchRoom,
-    bool searchInventory,
-    bool searchEquipment)
+bool Character::findNearbyTools(ToolSet tools, ItemVector & foundOnes,
+bool searchRoom,
+bool searchInventory,
+bool searchEquipment)
 {
     // TODO: Prepare a map with key the tool type and as value:
     //  Option A: A bool which determine if the tool has been found.
@@ -952,51 +1114,6 @@ bool Character::canWear(Item * item, std::string & error) const
     return true;
 }
 
-string Character::getHealthCondition(Character * character)
-{
-    string condition;
-    string sent_be, sent_have;
-    int percent;
-
-    // Determine who is the examined character.
-    if (character != nullptr && character != this)
-    {
-        sent_be = "is";
-        sent_have = "has";
-    }
-    else
-    {
-        character = this;
-        sent_be = "are";
-        sent_have = "have";
-    }
-
-    // Determine the percentage of current health.
-    if (character->health > 0)
-    {
-        percent = static_cast<int>((100.0 * static_cast<double>(character->health))
-            / static_cast<double>(character->getMaxHealth()));
-    }
-    else
-    {
-        percent = -1;
-    }
-
-    // Determine the correct description.
-    if (percent >= 100) condition = " " + sent_be + " in perfect health.\n";
-    else if (percent >= 90) condition = " " + sent_be + " slightly scratched.\n";
-    else if (percent >= 80) condition = " " + sent_have + " a few bruises.\n";
-    else if (percent >= 70) condition = " " + sent_have + " some cuts.\n";
-    else if (percent >= 60) condition = " " + sent_have + " several wounds.\n";
-    else if (percent >= 50) condition = " " + sent_have + " many nasty wounds.\n";
-    else if (percent >= 40) condition = " " + sent_be + " bleeding freely.\n";
-    else if (percent >= 30) condition = " " + sent_be + " covered in blood.\n";
-    else if (percent >= 20) condition = " " + sent_be + " leaking guts.\n";
-    else if (percent >= 10) condition = " " + sent_be + " almost dead.\n";
-    else condition = " " + sent_be + " DYING.\n";
-    return condition;
-}
-
 bool Character::setThirst(int value)
 {
     int result = static_cast<int>(this->thirst) + value;
@@ -1013,6 +1130,20 @@ bool Character::setThirst(int value)
         this->thirst = static_cast<unsigned int>(result);
     }
     return true;
+}
+
+unsigned int Character::getThirst() const
+{
+    return this->thirst;
+}
+
+std::string Character::getThirstCondition() const
+{
+    // Determine the correct description.
+    if (this->thirst >= 90) return "are not thirsty";
+    else if (this->thirst >= 60) return "are quite thirsty";
+    else if (this->thirst >= 30) return "are thirsty";
+    else return "are dying of thirst";
 }
 
 bool Character::setHunger(int value)
@@ -1033,38 +1164,18 @@ bool Character::setHunger(int value)
     return true;
 }
 
-unsigned int Character::getThirst() const
-{
-    return this->thirst;
-}
-
 unsigned int Character::getHunger() const
 {
     return this->hunger;
 }
 
-std::string Character::getThirstDesc() const
+std::string Character::getHungerCondition() const
 {
-    std::string output;
-    int percent = static_cast<int>((100.0 * static_cast<double>(this->thirst)) / (100.0));
     // Determine the correct description.
-    if (percent >= 90) output = "are not thirsty.\n";
-    else if (percent >= 60) output = "are quite thirsty.\n";
-    else if (percent >= 30) output = "are thirsty.\n";
-    else output = "are dying of thirst.\n";
-    return output;
-}
-
-std::string Character::getHungerDesc() const
-{
-    std::string output;
-    int percent = static_cast<int>((100.0 * static_cast<double>(this->hunger)) / (100.0));
-    // Determine the correct description.
-    if (percent >= 90) output = "are not hungry.\n";
-    else if (percent >= 60) output = "are quite hungry.\n";
-    else if (percent >= 30) output = "are hungry.\n";
-    else output = "are dying of hunger.\n";
-    return output;
+    if (this->hunger >= 90) return "are not hungry";
+    else if (this->hunger >= 60) return "are quite hungry";
+    else if (this->hunger >= 30) return "are hungry";
+    else return "are dying of hunger";
 }
 
 string Character::getLook(Character * character)
@@ -1401,128 +1512,6 @@ unsigned int Character::getConsumedStaminaFor(
         }
     }
     return static_cast<unsigned int>(RSLT);
-}
-
-bool Character::setHealth(const unsigned int & value, const bool & force)
-{
-    unsigned int maximum = this->getMaxHealth();
-    if (value > maximum)
-    {
-        if (force)
-        {
-            this->health = maximum;
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-    this->health = value;
-    return true;
-}
-
-bool Character::addHealth(const unsigned int & value, const bool & force)
-{
-    unsigned int maximum = this->getMaxHealth();
-    unsigned int result = this->health + value;
-    if (result > maximum)
-    {
-        if (force)
-        {
-            result = maximum;
-        }
-        else
-        {
-            return false;
-        }
-    }
-    this->health = result;
-    return true;
-}
-
-bool Character::remHealth(const unsigned int & value, const bool & force)
-{
-    int result = static_cast<int>(this->health) - static_cast<int>(value);
-    if (result < 0)
-    {
-        if (force)
-        {
-            result = 0;
-        }
-        else
-        {
-            return false;
-        }
-    }
-    this->health = static_cast<unsigned int>(result);
-    return true;
-}
-
-unsigned int Character::getHealth() const
-{
-    return this->health;
-}
-
-bool Character::setStamina(const unsigned int & value, const bool & force)
-{
-    unsigned int maximum = this->getMaxStamina();
-    if (value > maximum)
-    {
-        if (force)
-        {
-            this->stamina = maximum;
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-    this->stamina = value;
-    return true;
-}
-
-bool Character::addStamina(const unsigned int & value, const bool & force)
-{
-    unsigned int maximum = this->getMaxStamina();
-    unsigned int result = this->stamina + value;
-    if (result > maximum)
-    {
-        if (force)
-        {
-            result = maximum;
-        }
-        else
-        {
-            return false;
-        }
-    }
-    this->stamina = result;
-    return true;
-}
-
-bool Character::remStamina(const unsigned int & value, const bool & force)
-{
-    int result = static_cast<int>(this->stamina) - static_cast<int>(value);
-    if (result < 0)
-    {
-        if (force)
-        {
-            result = 0;
-        }
-        else
-        {
-            return false;
-        }
-    }
-    this->stamina = static_cast<unsigned int>(result);
-    return true;
-}
-
-unsigned int Character::getStamina() const
-{
-    return this->stamina;
 }
 
 void Character::kill()

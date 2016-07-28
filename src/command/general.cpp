@@ -191,8 +191,7 @@ void DoWho(Character * character, std::istream & sArgs)
         {
             location = iterator->room->name;
         }
-        table.addRow(
-        { iterator->getName(), location });
+        table.addRow( { iterator->getName(), location });
     }
     output += table.getTable();
     output += "# Total " + Formatter::yellow() + "Players" + Formatter::reset() + " :"
@@ -615,8 +614,10 @@ void DoStatistics(Character * character, std::istream & sArgs)
     msg += Formatter::magenta() + "    Armor Class " + Formatter::reset();
     msg += ToString(player->getArmorClass()) + "\n";
 
-    msg += "You " + player->getHungerDesc();
-    msg += "You " + player->getThirstDesc();
+    msg += "You " + player->getHealthCondition() + ".\n";
+    msg += "You " + player->getStaminaCondition() + ".\n";
+    msg += "You " + player->getHungerCondition() + ".\n";
+    msg += "You " + player->getThirstCondition() + ".\n";
 
     msg += "You are " + GetPostureName(player->posture) + ".\n";
 
