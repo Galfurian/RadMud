@@ -83,6 +83,11 @@ void GeneralAction::setCooldown(const unsigned int & _actionCooldown)
     Logger::log(LogLevel::Debug, "Next combat action in %s.", ToString(_actionCooldown));
 }
 
+unsigned int GeneralAction::getCooldown()
+{
+    return static_cast<unsigned int>(duration_cast<seconds>(actionCooldown - system_clock::now()).count());
+}
+
 std::shared_ptr<CombatAction> GeneralAction::toCombatAction()
 {
     return std::static_pointer_cast<CombatAction>(this->shared_from_this());

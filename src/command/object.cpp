@@ -873,7 +873,7 @@ void DoInventory(Character * character, std::istream & sArgs)
     for (auto it : GroupItems(character->inventory))
     {
         table.addRow(
-        { it.first->getNameCapital(), ToString(it.second), ToString(it.first->getTotalWeight()) });
+            { it.first->getNameCapital(), ToString(it.second), ToString(it.first->getTotalWeight()) });
     }
     character->sendMsg(table.getTable());
     std::string carried = ToString(character->getCarryingWeight());

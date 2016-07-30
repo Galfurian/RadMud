@@ -35,17 +35,17 @@
 using namespace std;
 
 Area::Area() :
-    vnum(),
-    name(),
-    builder(),
-    continent(),
-    areaMap(),
-    width(),
-    height(),
-    elevation(),
-    tileSet(),
-    type(),
-    status()
+        vnum(),
+        name(),
+        builder(),
+        continent(),
+        areaMap(),
+        width(),
+        height(),
+        elevation(),
+        tileSet(),
+        type(),
+        status()
 {
 }
 
@@ -94,12 +94,18 @@ bool Area::addRoom(Room * room)
         }
         else
         {
-            Logger::log(LogLevel::Error, "Room's insertion could not be completed %s.", room->coord.toString());
+            Logger::log(
+                LogLevel::Error,
+                "Room's insertion could not be completed %s.",
+                room->coord.toString());
         }
     }
     else
     {
-        Logger::log(LogLevel::Error, "Room's coordiantes are not inside the boundaries %s.", room->coord.toString());
+        Logger::log(
+            LogLevel::Error,
+            "Room's coordiantes are not inside the boundaries %s.",
+            room->coord.toString());
     }
     return false;
 }
@@ -172,7 +178,8 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, int radius)
 
                 if ((up != nullptr) && (down != nullptr))
                 {
-                    if (HasFlag(up->flags, ExitFlag::Stairs) && HasFlag(down->flags, ExitFlag::Stairs))
+                    if (HasFlag(up->flags, ExitFlag::Stairs)
+                        && HasFlag(down->flags, ExitFlag::Stairs))
                     {
                         tileCode = ToString(18) + ":" + ToString(this->tileSet + 1);
                     }
@@ -302,10 +309,17 @@ std::string Area::drawASCIIFov(Room * centerRoom, int radius)
     {
         for (int x = min_x; x < max_x; ++x)
         {
-            // The tile which has to be placed.
             std::string tile = " ";
             Room * room = this->getRoom(x, y, origin_z);
-            if ((map.get(x, y) != MapTile::Void) && (room != nullptr))
+            if (map.get(x, y) == MapTile::Void)
+            {
+                tile = " ";
+            }
+            else if (room == nullptr)
+            {
+                tile = " ";
+            }
+            else
             {
                 std::shared_ptr<Exit> up = room->findExit(Direction::Up);
                 std::shared_ptr<Exit> down = room->findExit(Direction::Down);
@@ -327,7 +341,8 @@ std::string Area::drawASCIIFov(Room * centerRoom, int radius)
                 // IV  - STAIRS
                 if ((up != nullptr) && (down != nullptr))
                 {
-                    if (HasFlag(up->flags, ExitFlag::Stairs) && HasFlag(down->flags, ExitFlag::Stairs))
+                    if (HasFlag(up->flags, ExitFlag::Stairs)
+                        && HasFlag(down->flags, ExitFlag::Stairs))
                     {
                         tile = "X";
                     }

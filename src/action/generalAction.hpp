@@ -104,6 +104,8 @@ class GeneralAction: public std::enable_shared_from_this<GeneralAction>
 
         void setCooldown(const unsigned int & _actionCooldown);
 
+        unsigned int getCooldown();
+
         std::shared_ptr<CombatAction> toCombatAction();
 };
 

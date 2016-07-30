@@ -35,7 +35,6 @@ class Area
         /// The list of integer used to identify different obstacles inside the map.
         typedef enum class MapTiles
         {
-            None,
             /// It's an empty tile.
             Void,
             /// It's a walkable tile.
