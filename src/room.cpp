@@ -95,8 +95,15 @@ void Room::addItem(Item * item)
 
 void Room::addBuilding(Item * item)
 {
-    this->addItem(item);
     SetFlag(item->flags, ItemFlag::Built);
+    for (auto iterator : this->items)
+    {
+        if (iterator->vnum == item->vnum)
+        {
+            return;
+        }
+    }
+    this->addItem(item);
 }
 
 void Room::addCharacter(Character * character)
@@ -226,8 +233,7 @@ bool Room::removeOnDB()
     }
 
     //----------Remove from Room-----------
-    SQLiteDbms::instance().deleteFrom("Room",
-    { std::make_pair("vnum", ToString(vnum)) });
+    SQLiteDbms::instance().deleteFrom("Room", { std::make_pair("vnum", ToString(vnum)) });
     return true;
 }
 
