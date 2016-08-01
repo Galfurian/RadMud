@@ -310,8 +310,7 @@ void DoLook(Character * character, std::istream & sArgs)
         Item * container = character->findNearbyItem(arguments[1].first, arguments[1].second);
         if (container)
         {
-            ModelType modelType = container->model->getType();
-            if ((modelType == ModelType::Container) || (modelType == ModelType::Corpse))
+            if (container->isAContainer())
             {
                 Item * item = container->findContent(arguments[0].first, arguments[0].second);
                 if (item)
@@ -323,6 +322,7 @@ void DoLook(Character * character, std::istream & sArgs)
                     character->sendMsg("It's not insiede %s.\n", container->getName());
                     return;
                 }
+
             }
             else
             {

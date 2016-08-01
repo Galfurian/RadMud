@@ -26,6 +26,7 @@ set(RADMUD_MODEL_SRC
 	./src/model/ropeModel.cpp
 	./src/model/seedModel.cpp
 	./src/model/shieldModel.cpp
+	./src/model/shopModel.cpp
 	./src/model/toolModel.cpp
 	./src/model/vehicleModel.cpp
 	./src/model/weaponModel.cpp

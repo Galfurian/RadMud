@@ -288,8 +288,7 @@ class Character
 
         /// @brief Provides a pointer to the action at the front position and
         ///         then remove it from the queue.
-        /// @return A pointer to action.
-        std::shared_ptr<GeneralAction> popAction();
+        void popAction();
 
         /// @brief Check if the character can move in the given direction.
         /// @param direction The direction where to search the room.

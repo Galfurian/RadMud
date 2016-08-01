@@ -387,53 +387,6 @@ typedef enum class ItemQualities
 // MODEL ////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////
 
-/// Used to determine the type of the model.
-typedef enum class ModelTypes
-{
-    /// [0] No type.
-    NoType,
-    /// [1] A corpse, it's a knowledge for internal use.
-    Corpse,
-    /// [2] Any weapon.
-    Weapon, //
-    /// [3] Any armor.
-    Armor, //
-    /// [4] A shield.
-    Shield, //
-    /// [5] Projectiles.
-    Projectile, //
-    /// [6] A container for items.
-    Container, //
-    /// [7] A container for liquids.
-    LiquidContainer, //
-    /// [8] Any tool.
-    Tool, //
-    /// [9] Any node of resources.
-    Node, //
-    /// [10] A resource.
-    Resource, //
-    /// [11] Any kind of seed.
-    Seed, //
-    /// [12] A key.
-    Key, //
-    /// [13] A forniture (eg. chair, bed, painting, table and so on).
-    Furniture, //
-    /// [14] A food.
-    Food, //
-    /// [15] A source of light ((eg. torch, lamp, candle and so on).
-    Light, //
-    /// [16] Any kind of vehicle.
-    Vehicle, //
-    /// [17] Container of parchements.
-    Book, //
-    /// [18] A generic rope.
-    Rope, //
-    /// [19] Any kind of mechanism.
-    Mechanism, //
-    /// [20] Any kind of currency.
-    Currency
-} ModelType;
-
 /// All the possible equipment slots.
 typedef enum class EquipmentSlots
 {
@@ -454,23 +407,6 @@ typedef enum class EquipmentSlots
     /// Can be wielded on the lefty hand.
     LeftHand = 64,
 } EquipmentSlot;
-
-/// Used to determine the flag of the model.
-typedef enum class ModelFlags
-{
-    /// No flag.
-    None = 0,
-    /// The item can't be collected, put down or moved.
-    Static = 1,
-    /// The item can't be seen.
-    Invisible = 2,
-    /// The item can't be damaged.
-    Unbreakable = 4,
-    /// The item cannot be sold.
-    NoSaleable = 8,
-    /// Must be wielded with two hands.
-    TwoHand = 16
-} ModelFlag;
 
 /// @brief Given the source direction, it returns the opposite direction.
 /// @param direction The source direction.
@@ -508,8 +444,6 @@ std::string GetCharacterFlagName(CharacterFlag flag);
 std::string GetMaterialTypeName(MaterialType type);
 /// Return the string describing the quality of an item.
 std::string GetItemQualityName(ItemQuality quality);
-/// Return the string describing the type of a Model.
-std::string GetModelTypeName(ModelType type);
 /// Return the string describing the equipment slot.
 std::string GetEquipmentSlotName(EquipmentSlot slot);
 /// Return the string describing the type of Gender.

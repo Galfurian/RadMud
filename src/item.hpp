@@ -147,6 +147,11 @@ class Item
         /// @return <b>True</b> if the node has the right node type,<br><b>False</b> otherwise.
         bool hasNodeType(NodeType nodeType);
 
+        /// @brief Check if the item is a valid container.
+        /// @return <b>True</b> if it is a valid container,<br>
+        ///         <b>False</b> otherwise.
+        bool isAContainer();
+
         /// @brief Check if the container is empty.
         /// @return <b>True</b> if the item is empty,<br><b>False</b> otherwise.
         bool isEmpty();

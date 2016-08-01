@@ -27,6 +27,72 @@
 #include "../lua/lua_script.hpp"
 #include "../utilities/table.hpp"
 
+/// Used to determine the type of the model.
+typedef enum class ModelTypes
+{
+    /// [0] No type.
+    NoType,
+    /// [1] A corpse, it's a knowledge for internal use.
+    Corpse,
+    /// [2] Any weapon.
+    Weapon,
+    /// [3] Any armor.
+    Armor,
+    /// [4] A shield.
+    Shield,
+    /// [5] Projectiles.
+    Projectile,
+    /// [6] A container for items.
+    Container,
+    /// [7] A container for liquids.
+    LiquidContainer,
+    /// [8] Any tool.
+    Tool,
+    /// [9] Any node of resources.
+    Node,
+    /// [10] A resource.
+    Resource,
+    /// [11] Any kind of seed.
+    Seed,
+    /// [12] A key.
+    Key,
+    /// [13] A forniture (eg. chair, bed, painting, table and so on).
+    Furniture,
+    /// [14] A food.
+    Food,
+    /// [15] A source of light ((eg. torch, lamp, candle and so on).
+    Light,
+    /// [16] Any kind of vehicle.
+    Vehicle,
+    /// [17] Container of parchements.
+    Book,
+    /// [18] A generic rope.
+    Rope,
+    /// [19] Any kind of mechanism.
+    Mechanism,
+    /// [20] Any kind of currency.
+    Currency,
+    /// [21] A shop.
+    Shop
+} ModelType;
+
+/// Used to determine the flag of the model.
+typedef enum class ModelFlags
+{
+    /// No flag.
+    None = 0,
+    /// The item can't be collected, put down or moved.
+    Static = 1,
+    /// The item can't be seen.
+    Invisible = 2,
+    /// The item can't be damaged.
+    Unbreakable = 4,
+    /// The item cannot be sold.
+    NoSaleable = 8,
+    /// Must be wielded with two hands.
+    TwoHand = 16
+} ModelFlag;
+
 class Item;
 class Player;
 class Material;
@@ -48,6 +114,7 @@ class ResourceModel;
 class RopeModel;
 class SeedModel;
 class ShieldModel;
+class ShopModel;
 class ToolModel;
 class VehicleModel;
 class WeaponModel;
@@ -207,6 +274,8 @@ class ItemModel
         SeedModel * toSeed();
         /// @brief Returns the model <b>statically</b> casted to Shield.
         ShieldModel * toShield();
+        /// @brief Returns the model <b>statically</b> casted to shop.
+        ShopModel * toShop();
         /// @brief Returns the model <b>statically</b> casted to Tool.
         ToolModel * toTool();
         /// @brief Returns the model <b>statically</b> casted to Vehicle.
@@ -227,5 +296,8 @@ typedef std::map<int, ItemModel *> ItemModelMap;
 
 /// Return a list of string containg the Model flags contained inside the value.
 std::string GetModelFlagString(unsigned int flags);
+
+/// Return the string describing the type of a Model.
+std::string GetModelTypeName(ModelType type);
 
 /// @}

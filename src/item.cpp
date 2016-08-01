@@ -34,6 +34,7 @@
 #include "model/nodeModel.hpp"
 #include "model/containerModel.hpp"
 #include "model/liquidContainerModel.hpp"
+#include "model/shopModel.hpp"
 
 using namespace std;
 
@@ -381,15 +382,11 @@ unsigned int Item::getTotalWeight()
 {
     // Add the default weight of the model.
     unsigned int totalWeight = this->getWeight(true);
-
-    if (model->getType() == ModelType::Container)
+    if (!this->isEmpty())
     {
-        if (!this->isEmpty())
+        for (auto iterator : content)
         {
-            for (auto iterator : content)
-            {
-                totalWeight += iterator->getTotalWeight();
-            }
+            totalWeight += iterator->getTotalWeight();
         }
     }
     else if (model->getType() == ModelType::LiquidContainer)
@@ -453,9 +450,29 @@ bool Item::hasNodeType(NodeType nodeType)
     return true;
 }
 
+bool Item::isAContainer()
+{
+    if (model->getType() == ModelType::Container)
+    {
+        return true;
+    }
+    else if (model->getType() == ModelType::Corpse)
+    {
+        return true;
+    }
+    else if (model->getType() == ModelType::Shop)
+    {
+        if (HasFlag(this->flags, ItemFlag::Built))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool Item::isEmpty()
 {
-    if ((model->getType() == ModelType::Container) || (model->getType() == ModelType::Corpse))
+    if (this->isAContainer())
     {
         return (content.size() == 0);
     }
@@ -479,6 +496,10 @@ unsigned int Item::getTotalSpace()
     {
         return model->toLiquidContainer()->maxWeight;
     }
+    else if (model->getType() == ModelType::Shop)
+    {
+        return model->toShop()->maxWeight;
+    }
     else
     {
         return 0;
@@ -488,7 +509,7 @@ unsigned int Item::getTotalSpace()
 unsigned int Item::getUsedSpace()
 {
     unsigned int used = 0;
-    if (model->getType() == ModelType::Container)
+    if (this->isAContainer())
     {
         for (auto iterator : content)
         {
@@ -671,7 +692,7 @@ Item * Item::findContent(std::string search_parameter, int & number)
 string Item::lookContent()
 {
     string output;
-    if ((model->getType() == ModelType::Container) || (model->getType() == ModelType::Corpse))
+    if (this->isAContainer())
     {
         if (content.empty())
         {

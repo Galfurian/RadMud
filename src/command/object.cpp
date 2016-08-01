@@ -1176,20 +1176,17 @@ void DoPut(Character * character, std::istream & sArgs)
     Item * container = character->findNearbyItem(arguments[1].first, arguments[1].second);
     if (container == nullptr)
     {
-        character->sendMsg(
-            "You don't see any container named '" + arguments[1].first + "' here.\n");
+        character->sendMsg("You don't see any container named '%s' here.\n", arguments[1].first);
         return;
     }
-    if (container->model->getType() != ModelType::Container)
+    if (!container->isAContainer())
     {
-        if (container->model->getType() == ModelType::Corpse)
-        {
-            character->sendMsg("You don't really want to put something inside that body...\n");
-        }
-        else
-        {
-            character->sendMsg("'%s' is not a container.\n", container->getName());
-        }
+        character->sendMsg("%s is not a valid container.\n", container->getNameCapital());
+        return;
+    }
+    if (container->model->getType() == ModelType::Corpse)
+    {
+        character->sendMsg("You don't really want to put something inside that body...\n");
         return;
     }
 

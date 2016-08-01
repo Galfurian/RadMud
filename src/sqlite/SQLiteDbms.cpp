@@ -45,6 +45,7 @@
 #include "../model/toolModel.hpp"
 #include "../model/vehicleModel.hpp"
 #include "../model/weaponModel.hpp"
+#include "../model/shopModel.hpp"
 
 using namespace std;
 
@@ -629,25 +630,26 @@ bool LoadModel(ResultSet * result)
         // Create a pointer to the new item model.
         ItemModel * itemModel;
         // Call the contructor for the right type of model.
-        if (type == ModelType::Weapon) itemModel = new WeaponModel();
-        else if (type == ModelType::Armor) itemModel = new ArmorModel();
-        else if (type == ModelType::Shield) itemModel = new ShieldModel();
-        else if (type == ModelType::Projectile) itemModel = new ProjectileModel();
+        if (type == ModelType::Armor) itemModel = new ArmorModel();
+        else if (type == ModelType::Book) itemModel = new BookModel();
         else if (type == ModelType::Container) itemModel = new ContainerModel();
         else if (type == ModelType::Currency) itemModel = new CurrencyModel();
-        else if (type == ModelType::LiquidContainer) itemModel = new LiquidContainerModel();
-        else if (type == ModelType::Tool) itemModel = new ToolModel();
-        else if (type == ModelType::Node) itemModel = new NodeModel();
-        else if (type == ModelType::Resource) itemModel = new ResourceModel();
-        else if (type == ModelType::Seed) itemModel = new SeedModel();
-        else if (type == ModelType::Key) itemModel = new KeyModel();
-        else if (type == ModelType::Furniture) itemModel = new FurnitureModel();
         else if (type == ModelType::Food) itemModel = new FoodModel();
+        else if (type == ModelType::Furniture) itemModel = new FurnitureModel();
+        else if (type == ModelType::Key) itemModel = new KeyModel();
         else if (type == ModelType::Light) itemModel = new LightModel();
-        else if (type == ModelType::Vehicle) itemModel = new VehicleModel();
-        else if (type == ModelType::Book) itemModel = new BookModel();
-        else if (type == ModelType::Rope) itemModel = new RopeModel();
+        else if (type == ModelType::LiquidContainer) itemModel = new LiquidContainerModel();
         else if (type == ModelType::Mechanism) itemModel = new MechanismModel();
+        else if (type == ModelType::Node) itemModel = new NodeModel();
+        else if (type == ModelType::Projectile) itemModel = new ProjectileModel();
+        else if (type == ModelType::Resource) itemModel = new ResourceModel();
+        else if (type == ModelType::Rope) itemModel = new RopeModel();
+        else if (type == ModelType::Seed) itemModel = new SeedModel();
+        else if (type == ModelType::Shield) itemModel = new ShieldModel();
+        else if (type == ModelType::Shop) itemModel = new ShopModel();
+        else if (type == ModelType::Tool) itemModel = new ToolModel();
+        else if (type == ModelType::Vehicle) itemModel = new VehicleModel();
+        else if (type == ModelType::Weapon) itemModel = new WeaponModel();
         else
         {
             Logger::log(LogLevel::Error, "Wrong type of model %s.", ToString(vnum));
