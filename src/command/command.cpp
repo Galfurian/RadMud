@@ -1632,6 +1632,13 @@ void LoadCommands()
         command.hndl = DoFlee;
         Mud::instance().addCommand(command);
     }
+    {
+        command.name = "aim";
+        command.help = "Provides the list of targets nearby.";
+        command.args = "";
+        command.hndl = DoAim;
+        Mud::instance().addCommand(command);
+    }
 
     // ////////////////////////////////////////////////////////////////////////////////////////////
     // GODS COMMANDS

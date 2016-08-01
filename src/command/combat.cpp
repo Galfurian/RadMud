@@ -175,3 +175,20 @@ void DoFlee(Character * character, std::istream & sArgs)
     character->sendMsg("You prepare to flee...\n");
     character->setNextCombatAction(CombatActionType::Flee);
 }
+
+void DoAim(Character * character, std::istream & sArgs)
+{
+    // Get the arguments of the command.
+    ArgumentList arguments = ParseArgs(sArgs);
+    CharacterVector targets;
+    if (!character->getCharactersInSight(targets))
+    {
+        character->sendMsg("There are no targets nearby!\n");
+        return;
+    }
+    character->sendMsg("You see:\n");
+    for (auto it : targets)
+    {
+        character->sendMsg("    %s\n", it->getName());
+    }
+}
