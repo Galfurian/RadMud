@@ -240,6 +240,8 @@ void DoRead(Character * character, std::istream & sArgs);
 void DoKill(Character * character, std::istream &sArgs);
 /// Try to flee from combat.
 void DoFlee(Character * character, std::istream &sArgs);
+/// Provides the list of targets nearby.
+void DoAim(Character * character, std::istream & sArgs);
 /// Shutdown the Mud.
 void DoShutdown(Character * character, std::istream & sArgs);
 /// Go to the desired room.
