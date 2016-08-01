@@ -57,6 +57,22 @@ void DoShutdown(Character * character, std::istream & sArgs)
     Mud::instance().shutDownSignal();
 }
 
+void DoMudSave(Character * character, std::istream & sArgs)
+{
+    // Check no more input.
+    NoMore(character, sArgs);
+    if (!Mud::instance().saveMud())
+    {
+        character->sendMsg("Something gone wrong during the saving process.\n");
+    }
+    else
+    {
+        // Send message to all the players.
+        Mud::instance().broadcastMsg(0, character->getNameCapital() + " is writing the history...");
+        character->sendMsg("Ok.\n");
+    }
+}
+
 void DoGoTo(Character * character, std::istream & sArgs)
 {
     std::string msgDepart, msgArrive, msgChar;
@@ -453,7 +469,7 @@ void DoItemInfo(Character * character, std::istream & sArgs)
     std::string msg;
     msg += "Vnum         : " + ToString(item->vnum) + "\n";
     msg += "Model        : [" + ToString(item->model->vnum) + "] " + item->getName() + ".\n";
-    msg += "Type         : " + GetModelTypeName(item->model->getType()) + "\n";
+    msg += "Type         : " + item->model->getTypeName() + "\n";
     msg += "Maker        : " + item->maker + "\n";
     msg += "Condition    : " + ToString(item->condition) + " of " + ToString(item->model->condition)
         + "\n";

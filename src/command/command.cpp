@@ -1653,6 +1653,14 @@ void LoadCommands()
         Mud::instance().addCommand(command);
     }
     {
+        command.name = "mudsave";
+        command.help = "Save the MUD.";
+        command.args = "";
+        command.hndl = DoMudSave;
+        command.level = 1;
+        Mud::instance().addCommand(command);
+    }
+    {
         command.name = "goto";
         command.help = "Go to another room.";
         command.args = "(Room.vnum)";

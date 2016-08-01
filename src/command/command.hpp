@@ -256,6 +256,8 @@ void DoFlee(Character * character, std::istream &sArgs);
 void DoAim(Character * character, std::istream & sArgs);
 /// Shutdown the Mud.
 void DoShutdown(Character * character, std::istream & sArgs);
+/// Save the Mud.
+void DoMudSave(Character * character, std::istream & sArgs);
 /// Go to the desired room.
 void DoGoTo(Character * character, std::istream & sArgs);
 /// Transfer a character from room to room.
