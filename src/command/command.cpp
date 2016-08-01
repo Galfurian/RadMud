@@ -1649,6 +1649,7 @@ void LoadCommands()
         command.help = "Shut the MUD down.";
         command.args = "";
         command.hndl = DoShutdown;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1656,6 +1657,7 @@ void LoadCommands()
         command.help = "Go to another room.";
         command.args = "(Room.vnum)";
         command.hndl = DoGoTo;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1663,6 +1665,7 @@ void LoadCommands()
         command.help = "Hurt the desired target.";
         command.args = "(Target)";
         command.hndl = DoHurt;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1670,6 +1673,7 @@ void LoadCommands()
         command.help = "Became invisible.";
         command.args = "";
         command.hndl = DoInvisibility;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1677,6 +1681,7 @@ void LoadCommands()
         command.help = "Return visible.";
         command.args = "";
         command.hndl = DoVisible;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1684,6 +1689,7 @@ void LoadCommands()
         command.help = "Get information about a character.";
         command.args = "(target)";
         command.hndl = DoGodInfo;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
 
@@ -1693,6 +1699,7 @@ void LoadCommands()
         command.help = "Provides the list of opponents of the given target.";
         command.args = "(Target)";
         command.hndl = DoAggroList;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1700,6 +1707,7 @@ void LoadCommands()
         command.help = "Transfer another character here, or to another room.";
         command.args = "(Target) [Where]";
         command.hndl = DoTransfer;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1707,6 +1715,7 @@ void LoadCommands()
         command.help = "Restores completely the health and the stamina of the target.";
         command.args = "(Target)";
         command.hndl = DoFeast;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1714,6 +1723,7 @@ void LoadCommands()
         command.help = "Sets a flag for a character.";
         command.args = "(Target) (Flag)";
         command.hndl = DoSetFlag;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1721,6 +1731,7 @@ void LoadCommands()
         command.help = "Remove a flag from a character.";
         command.args = "(Target) (Flag)";
         command.hndl = DoClearFlag;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1728,6 +1739,7 @@ void LoadCommands()
         command.help = "Modify the value of the player skill.";
         command.args = "(Target) (Skill) (Value)";
         command.hndl = DoModSkill;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1735,6 +1747,7 @@ void LoadCommands()
         command.help = "Modify the value of the player attribute.";
         command.args = "(Target) (Attribute) (Value)";
         command.hndl = DoModAttr;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
 
@@ -1744,6 +1757,7 @@ void LoadCommands()
         command.help = "List all the information about a model.";
         command.args = "(Model.vnum)";
         command.hndl = DoModelInfo;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
 
@@ -1753,6 +1767,7 @@ void LoadCommands()
         command.help = "Show information about an item.";
         command.args = "(Item.vnum)";
         command.hndl = DoItemInfo;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1760,6 +1775,7 @@ void LoadCommands()
         command.help = "Create a new item, if not set the quality will be Normal.";
         command.args = "(Model.vnum)(Material.vnum)[Quality]";
         command.hndl = DoItemCreate;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1767,6 +1783,7 @@ void LoadCommands()
         command.help = "Destroy the desired object.";
         command.args = "(Item.vnum)";
         command.hndl = DoItemDestroy;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1774,6 +1791,7 @@ void LoadCommands()
         command.help = "Materialize the desired object.";
         command.args = "(Item.vnum)";
         command.hndl = DoItemGet;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
 
@@ -1783,6 +1801,7 @@ void LoadCommands()
         command.help = "Show the informations about a specific area.";
         command.args = "(Area.vnum)";
         command.hndl = DoAreaInfo;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
 
@@ -1792,6 +1811,7 @@ void LoadCommands()
         command.help = "Show the informations about a specific room.";
         command.args = "(Room.vnum)";
         command.hndl = DoRoomInfo;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1799,6 +1819,7 @@ void LoadCommands()
         command.help = "Create a room in the given direction.";
         command.args = "(Direction)";
         command.hndl = DoRoomCreate;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1806,6 +1827,7 @@ void LoadCommands()
         command.help = "Delete the room in the given direction.";
         command.args = "(Direction)";
         command.hndl = DoRoomDelete;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1813,6 +1835,7 @@ void LoadCommands()
         command.help = "Change room values.";
         command.args = "(Option) (Value)";
         command.hndl = DoRoomEdit;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
 
@@ -1822,6 +1845,7 @@ void LoadCommands()
         command.help = "Kill the desired mobile, in the same room.";
         command.args = "(Mobile.name)";
         command.hndl = DoMobileKill;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1829,6 +1853,7 @@ void LoadCommands()
         command.help = "Reload the lua script for the target mobile, in the same room.";
         command.args = "(Mobile.name)";
         command.hndl = DoMobileReload;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1836,6 +1861,7 @@ void LoadCommands()
         command.help = "Given a mobile id, it returns the curresponding mobile log.";
         command.args = "(Mobile.id)";
         command.hndl = DoMobileLog;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
 
@@ -1845,6 +1871,7 @@ void LoadCommands()
         command.help = "Show the informations about a specific material.";
         command.args = "(Material.vnum)";
         command.hndl = DoMaterialInfo;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
 
@@ -1854,6 +1881,7 @@ void LoadCommands()
         command.help = "Show the informations about a specific liquid.";
         command.args = "(Liquid.vnum)";
         command.hndl = DoLiquidInfo;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1861,6 +1889,7 @@ void LoadCommands()
         command.help = "Materialize some liquid sinde a container.";
         command.args = "(Container.name)(Liquid.vnum)(Quantity)";
         command.hndl = DoLiquidCreate;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
 
@@ -1870,6 +1899,7 @@ void LoadCommands()
         command.help = "Provide all the information regarding the given production.";
         command.args = "(Production.vnum)";
         command.hndl = DoProductionInfo;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
 
@@ -1879,6 +1909,7 @@ void LoadCommands()
         command.help = "Provide all the information regarding the given profession.";
         command.args = "(Profession.command)";
         command.hndl = DoProfessionInfo;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
 
@@ -1890,6 +1921,7 @@ void LoadCommands()
         command.help = "List all the models for the items.";
         command.args = "";
         command.hndl = DoModelList;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1897,6 +1929,7 @@ void LoadCommands()
         command.help = "List all the items.";
         command.args = "";
         command.hndl = DoItemList;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1904,6 +1937,7 @@ void LoadCommands()
         command.help = "List all the mobiles.";
         command.args = "";
         command.hndl = DoMobileList;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1911,6 +1945,7 @@ void LoadCommands()
         command.help = "List all the players.";
         command.args = "";
         command.hndl = DoPlayerList;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1918,6 +1953,7 @@ void LoadCommands()
         command.help = "List all the areas.";
         command.args = "";
         command.hndl = DoAreaList;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1925,6 +1961,7 @@ void LoadCommands()
         command.help = "List all the rooms.";
         command.args = "";
         command.hndl = DoRoomList;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1932,6 +1969,7 @@ void LoadCommands()
         command.help = "List all the races.";
         command.args = "";
         command.hndl = DoRaceList;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1939,6 +1977,7 @@ void LoadCommands()
         command.help = "List all the factions.";
         command.args = "";
         command.hndl = DoFactionList;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1946,6 +1985,7 @@ void LoadCommands()
         command.help = "List all the skills.";
         command.args = "";
         command.hndl = DoSkillList;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1953,6 +1993,7 @@ void LoadCommands()
         command.help = "List all the writings.";
         command.args = "";
         command.hndl = DoWritingList;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1960,6 +2001,7 @@ void LoadCommands()
         command.help = "List all the corpses.";
         command.args = "";
         command.hndl = DoCorpseList;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1967,6 +2009,7 @@ void LoadCommands()
         command.help = "List all the continents.";
         command.args = "";
         command.hndl = DoContinentList;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1974,6 +2017,7 @@ void LoadCommands()
         command.help = "List all the materials.";
         command.args = "";
         command.hndl = DoMaterialList;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1981,6 +2025,7 @@ void LoadCommands()
         command.help = "Get the list of all the professions.";
         command.args = "";
         command.hndl = DoProfessionList;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1988,6 +2033,7 @@ void LoadCommands()
         command.help = "Get the list of all the productions.";
         command.args = "";
         command.hndl = DoProductionList;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -1995,6 +2041,7 @@ void LoadCommands()
         command.help = "List all the liquids.";
         command.args = "";
         command.hndl = DoLiquidList;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
     {
@@ -2002,6 +2049,7 @@ void LoadCommands()
         command.help = "List all the buildings.";
         command.args = "";
         command.hndl = DoBuildingList;
+        command.level = 1;
         Mud::instance().addCommand(command);
     }
 }

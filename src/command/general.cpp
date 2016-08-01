@@ -344,40 +344,42 @@ void DoHelp(Character * character, std::istream & sArgs)
 
     if (command.empty())
     {
-        size_t totalCommands = 0, numColumns = 0;
-        // Count the total number of command which can be displayed.
-        for (auto it : Mud::instance().mudCommands)
-        {
-            if ((it.level == 1) && !HasFlag(character->flags, CharacterFlag::IsGod))
-            {
-                continue;
-            }
-            totalCommands++;
-        }
-        // Find the number of columns.
-        for (numColumns = 3; numColumns < totalCommands; ++numColumns)
-        {
-            if ((totalCommands % numColumns) == 0)
-            {
-                break;
-            }
-        }
+        size_t numColumns = 4;
         Table commandTable = Table("Commands");
         for (size_t it = 0; it < numColumns; ++it)
         {
             commandTable.addColumn("", StringAlign::Left);
         }
+
         TableRow row;
         for (auto it : Mud::instance().mudCommands)
         {
-            if ((it.level == 0) || !HasFlag(character->flags, CharacterFlag::IsGod))
+            if (it.level == 0)
             {
-                row.push_back(it.name);
+                if (it.canUse(character))
+                {
+                    row.push_back(it.name);
+                }
+                if (row.size() == numColumns)
+                {
+                    commandTable.addRow(row);
+                    row.clear();
+                }
             }
-            if (row.size() == numColumns)
+        }
+        for (auto it : Mud::instance().mudCommands)
+        {
+            if (it.level > 0)
             {
-                commandTable.addRow(row);
-                row.clear();
+                if (it.canUse(character))
+                {
+                    row.push_back(it.name);
+                }
+                if (row.size() == numColumns)
+                {
+                    commandTable.addRow(row);
+                    row.clear();
+                }
             }
         }
         character->sendMsg(commandTable.getTable(true));
@@ -386,24 +388,23 @@ void DoHelp(Character * character, std::istream & sArgs)
     {
         for (auto iterator : Mud::instance().mudCommands)
         {
-            if (iterator.level == 1 && !HasFlag(character->flags, CharacterFlag::IsGod))
+            if (iterator.canUse(character))
             {
-                continue;
-            }
-            if (BeginWith(ToLower(iterator.name), command))
-            {
-                std::string msg;
-                msg += "Showing help for command :" + iterator.name + "\n";
-                msg += Formatter::yellow() + " Command   : " + Formatter::reset() + iterator.name
-                    + "\n";
-                msg += Formatter::yellow() + " Level     : " + Formatter::reset()
-                    + ToString(iterator.level) + "\n";
-                msg += Formatter::yellow() + " Arguments : " + Formatter::reset() + iterator.args
-                    + "\n";
-                msg += Formatter::yellow() + " Help      : " + Formatter::reset() + iterator.help
-                    + "\n";
-                character->sendMsg(msg);
-                return;
+                if (BeginWith(ToLower(iterator.name), command))
+                {
+                    std::string msg;
+                    msg += "Showing help for command :" + iterator.name + "\n";
+                    msg += Formatter::yellow() + " Command   : " + Formatter::reset()
+                        + iterator.name + "\n";
+                    msg += Formatter::yellow() + " Level     : " + Formatter::reset()
+                        + ToString(iterator.level) + "\n";
+                    msg += Formatter::yellow() + " Arguments : " + Formatter::reset()
+                        + iterator.args + "\n";
+                    msg += Formatter::yellow() + " Help      : " + Formatter::reset()
+                        + iterator.help + "\n";
+                    character->sendMsg(msg);
+                    return;
+                }
             }
         }
         character->sendMsg("There is no help for '" + command + ".\n");

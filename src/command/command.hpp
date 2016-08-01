@@ -60,6 +60,18 @@ class Command
         {
         }
 
+        bool canUse(Character * character) const
+        {
+            if (this->level == 1)
+            {
+                if (!HasFlag(character->flags, CharacterFlag::IsGod))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         /// The level of the command.
         int level;
         /// The name of the command.
