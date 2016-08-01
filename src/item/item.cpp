@@ -23,28 +23,28 @@
 #include <sstream>
 
 // Other Include.
-#include "mud.hpp"
-#include "utils.hpp"
-#include "logger.hpp"
-#include "defines.hpp"
-#include "material.hpp"
-#include "constants.hpp"
-#include "luabridge/LuaBridge.h"
+#include "../mud.hpp"
+#include "../utils.hpp"
+#include "../logger.hpp"
+#include "../defines.hpp"
+#include "../material.hpp"
+#include "../constants.hpp"
+#include "../luabridge/LuaBridge.h"
+#include "../model/nodeModel.hpp"
+#include "../model/containerModel.hpp"
+#include "../model/liquidContainerModel.hpp"
+#include "../model/shopModel.hpp"
 
-#include "model/nodeModel.hpp"
-#include "model/containerModel.hpp"
-#include "model/liquidContainerModel.hpp"
-#include "model/shopModel.hpp"
-
-using namespace std;
+#include "shopItem.hpp"
 
 Item::Item() :
         vnum(),
+        type(),
         model(),
         maker(),
         condition(),
         composition(),
-        quality(ItemQuality::None),
+        quality(ItemQuality::Normal),
         flags(),
         room(),
         owner(),
@@ -65,6 +65,16 @@ Item::~Item()
         this->getNameCapital());
 }
 
+ItemType Item::getType() const
+{
+    return ItemType::Generic;
+}
+
+std::string Item::getTypeName() const
+{
+    return "generic";
+}
+
 bool Item::check(bool complete)
 {
     bool safe = true;
@@ -73,7 +83,6 @@ bool Item::check(bool complete)
     safe &= CorrectAssert(!maker.empty());
     safe &= CorrectAssert(condition > 0);
     safe &= CorrectAssert(composition != nullptr);
-    safe &= CorrectAssert(quality != ItemQuality::None);
     if (complete)
     {
         safe &= CorrectAssert(!((room != nullptr) && (owner != nullptr)));
@@ -178,7 +187,6 @@ bool Item::createOnDB()
     }
     else
     {
-        SQLiteDbms::instance().rollbackTransection();
         return false;
     }
 }
@@ -222,7 +230,7 @@ bool Item::updateOnDB()
     // Save the item's position.
     if (room != nullptr)
     {
-        vector<string> arguments;
+        std::vector<std::string> arguments;
         arguments.push_back(ToString(room->vnum));
         arguments.push_back(ToString(vnum));
         if (!SQLiteDbms::instance().insertInto("ItemRoom", arguments))
@@ -235,7 +243,7 @@ bool Item::updateOnDB()
     {
         if (owner->isPlayer())
         {
-            vector<string> arguments;
+            std::vector<std::string> arguments;
             arguments.push_back(owner->name);
             arguments.push_back(ToString(vnum));
             if (owner->hasEquipmentItem(this))
@@ -257,7 +265,7 @@ bool Item::updateOnDB()
     {
         if (container->model->getType() != ModelType::Corpse)
         {
-            vector<string> arguments;
+            std::vector<std::string> arguments;
             arguments.push_back(ToString(container->vnum));
             arguments.push_back(ToString(vnum));
             if (!SQLiteDbms::instance().insertInto("ItemContent", arguments))
@@ -272,7 +280,7 @@ bool Item::updateOnDB()
     {
         for (auto iterator : content)
         {
-            vector<string> arguments;
+            std::vector<std::string> arguments;
             // Prepare the query arguments.
             arguments.push_back(ToString(vnum));
             arguments.push_back(ToString(iterator->vnum));
@@ -286,7 +294,7 @@ bool Item::updateOnDB()
 
     if (contentLiq.first != nullptr)
     {
-        vector<string> arguments;
+        std::vector<std::string> arguments;
         // Prepare the query arguments.
         arguments.push_back(ToString(vnum));
         arguments.push_back(ToString(contentLiq.first->vnum));
@@ -312,7 +320,12 @@ bool Item::removeOnDB()
     return result;
 }
 
-bool Item::hasKey(string key)
+bool Item::loadFromDB()
+{
+    return true;
+}
+
+bool Item::hasKey(std::string key)
 {
     for (auto iterator : model->keys)
     {
@@ -338,28 +351,15 @@ bool Item::triggerDecay()
     return false;
 }
 
-string Item::getCondition()
+std::string Item::getCondition()
 {
-    string output;
-    int percent;
-
-    if (condition > 0)
-    {
-        percent = (int) ((100.0 * (double) (condition)) / (double) (model->condition));
-    }
-    else
-    {
-        percent = -1;
-    }
-
-    if (percent >= 100) output = " is in perfect condition.\n";
-    else if (percent >= 75) output = " is scratched.\n";
-    else if (percent >= 50) output = " is ruined.\n";
-    else if (percent >= 25) output = " is cracked.\n";
-    else if (percent >= 0) output = " is almost broken.\n";
-    else output = " is broken.\n";
-
-    return output;
+    auto percent = (100 * this->condition) / model->condition;
+    if (percent >= 100) return "is in perfect condition";
+    else if (percent >= 75) return "is scratched";
+    else if (percent >= 50) return "is ruined";
+    else if (percent >= 25) return "is cracked";
+    else if (percent >= 0) return "is almost broken";
+    else return "is broken";
 }
 
 unsigned int Item::getWeight(bool withMaterial)
@@ -404,32 +404,33 @@ std::string Item::getName()
     return model->getName(composition, quality);
 }
 
-string Item::getNameCapital()
+std::string Item::getNameCapital()
 {
     std::string itemName = getName();
     itemName[0] = static_cast<char>(toupper(itemName[0]));
     return itemName;
 }
 
-string Item::getDescription()
+std::string Item::getDescription()
 {
     return model->getDescription(composition, quality);
 }
 
-string Item::getLook()
+std::string Item::getLook()
 {
-    string output;
+    std::string output;
 
     // Prepare : Name, Condition.
     //           Description.
-    output = "You look at " + Formatter::cyan() + getName() + Formatter::reset() + ", it"
-        + getCondition();
-    output += Formatter::gray() + getDescription() + Formatter::reset() + "\n";
+    output = "You look at " + Formatter::cyan() + this->getName() + Formatter::reset();
+    output += ", it " + this->getCondition() + ".\n";
+    output += Formatter::gray() + this->getDescription() + Formatter::reset() + "\n";
+    output += "\n";
     // Print the content.
-    output += lookContent();
-    output += "It weights about " + Formatter::yellow() + ToString(this->getTotalWeight())
-        + Formatter::reset() + " " + mud_measure + ".\n";
-
+    output += this->lookContent();
+    output += "It weights about ";
+    output += Formatter::yellow() + ToString(this->getTotalWeight()) + Formatter::reset();
+    output += " " + mud_measure + ".\n";
     return output;
 }
 
@@ -689,9 +690,9 @@ Item * Item::findContent(std::string search_parameter, int & number)
     return nullptr;
 }
 
-string Item::lookContent()
+std::string Item::lookContent()
 {
-    string output;
+    std::string output;
     if (this->isAContainer())
     {
         if (content.empty())
@@ -748,6 +749,7 @@ string Item::lookContent()
             output += Formatter::cyan() + contentLiq.first->getName() + Formatter::reset() + ".\n";
         }
     }
+    output += "\n";
     return output;
 }
 
@@ -771,6 +773,11 @@ EquipmentSlot Item::getCurrentSlot()
 std::string Item::getCurrentSlotName()
 {
     return GetEquipmentSlotName(getCurrentSlot());
+}
+
+ShopItem * Item::toShopItem()
+{
+    return static_cast<ShopItem *>(this);
 }
 
 void Item::luaRegister(lua_State * L)
@@ -835,4 +842,15 @@ bool OrderItemByName(Item * first, Item * second)
 bool OrderItemByWeight(Item * first, Item * second)
 {
     return first->getTotalWeight() < second->getTotalWeight();
+}
+
+std::string GetItemQualityName(ItemQuality quality)
+{
+    if (quality == ItemQuality::Disastrous) return "Disastrous";
+    if (quality == ItemQuality::Poor) return "Poor";
+    if (quality == ItemQuality::Normal) return "Normal";
+    if (quality == ItemQuality::Fine) return "Fine";
+    if (quality == ItemQuality::Masterful) return "Masterful";
+    if (quality == ItemQuality::Fine) return "Fine";
+    return "No Quality";
 }

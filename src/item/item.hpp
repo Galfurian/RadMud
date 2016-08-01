@@ -22,14 +22,25 @@
 #include <list>
 #include <map>
 
-#include "liquid.hpp"
-#include "lua/lua_script.hpp"
-#include "model/itemModel.hpp"
-#include "model/nodeModel.hpp"
+#include "../liquid.hpp"
+#include "../lua/lua_script.hpp"
+#include "../model/itemModel.hpp"
+#include "../model/nodeModel.hpp"
+#include "../sqlite/SQLiteWrapper.hpp"
 
 class Room;
 class Character;
 class Material;
+
+class ShopItem;
+
+/// Used to determine the type of item.
+typedef enum class ItemTypes
+{
+    Generic,
+    /// A shop.
+    Shop
+} ItemType;
 
 /// @brief Holds details about items.
 class Item
@@ -37,6 +48,8 @@ class Item
     public:
         /// Item vnum.
         int vnum;
+        /// The type of item.
+        ItemType type;
         /// Item model.
         ItemModel * model;
         /// The player that created the item.
@@ -80,29 +93,36 @@ class Item
         Item & operator=(Item &&) = delete;
 
         /// @brief Destructor - Is a method which is automatically invoked when the object is destroyed.
-        ~Item();
+        virtual ~Item();
+
+        virtual ItemType getType() const;
+
+        virtual std::string getTypeName() const;
 
         /// @brief Check the correctness of the item.
-        /// @return <b>True</b> if the item has correct values,<br><b>False</b> otherwise.
-        bool check(bool complete = false);
+        /// @return <b>True</b> if the item has correct values,<br>
+        ///         <b>False</b> otherwise.
+        virtual bool check(bool complete = false);
 
         /// @brief This function is used to destroy the item.
         /// @return <b>True</b> if the item has been destroyed,<br>
         ///         <b>False</b> otherwise.
-        bool destroy();
+        virtual bool destroy();
 
         /// @brief Create the item entry on database.
         /// @return <b>True</b> if the execution goes well,<br>
         ///         <b>False</b> otherwise.
-        bool createOnDB();
+        virtual bool createOnDB();
 
         /// @brief Save the item on database.
         /// @return <b>True</b> if the execution goes well,<br><b>False</b> otherwise.
-        bool updateOnDB();
+        virtual bool updateOnDB();
 
         /// @brief Remove the item on database.
         /// @return <b>True</b> if the execution goes well,<br><b>False</b> otherwise.
-        bool removeOnDB();
+        virtual bool removeOnDB();
+
+        virtual bool loadFromDB();
 
         /// @brief Check if the item has the desired key.
         /// @param key The key to search.
@@ -198,7 +218,7 @@ class Item
 
         /// @brief Return the description of the content.
         /// @return The string describing the content.
-        std::string lookContent();
+        virtual std::string lookContent();
 
         /// @brief Set the equipment slot where this item must be weared.
         /// @param _currentSlot The new equipment slot.
@@ -211,6 +231,8 @@ class Item
         /// @brief Return the current equipment slot name.
         /// @return The equipment slot name.
         std::string getCurrentSlotName();
+
+        ShopItem * toShopItem();
 
         /// @brief Function used to register inside the lua environment the class.
         /// @param L The lua environment.
@@ -255,3 +277,11 @@ bool OrderItemByName(Item * first, Item * second);
 /// @param second The second item.
 /// @return <b>True</b> if the first item is lighter then the second.<br><b>False</b> otherwise.
 bool OrderItemByWeight(Item * first, Item * second);
+
+/// @addtogroup EnumToString
+/// @{
+
+/// Return the string describing the quality of an item.
+std::string GetItemQualityName(ItemQuality quality);
+
+///@}

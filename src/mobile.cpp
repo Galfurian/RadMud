@@ -45,7 +45,8 @@ Mobile::Mobile() :
         controller(),
         lua_script(),
         lua_mutex(),
-        nextActionCooldown()
+        nextActionCooldown(),
+        managedItem()
 {
     // Nothing to do.
 }
@@ -203,7 +204,18 @@ void Mobile::kill()
         // Set a random condition for the new item.
         item->condition = TRandInteger<int>(min, max);
         // Create the entry for the item on the database.
-        item->createOnDB();
+        SQLiteDbms::instance().beginTransaction();
+        if (item->createOnDB())
+        {
+            // Insert into the item_list the new item.
+            Mud::instance().addItem(item);
+        }
+        else
+        {
+            Logger::log(LogLevel::Error, "Cannot save the item (%s) on DB.", ToString(item->vnum));
+            // Rollback the transation.
+            SQLiteDbms::instance().rollbackTransection();
+        }
     }
     for (auto it = this->equipment.begin(); it != this->equipment.end(); ++it)
     {
@@ -218,7 +230,18 @@ void Mobile::kill()
         // Set a random condition for the new item.
         item->condition = TRandInteger<int>(min, max);
         // Create the entry for the item on the database.
-        item->createOnDB();
+        SQLiteDbms::instance().beginTransaction();
+        if (item->createOnDB())
+        {
+            // Insert into the item_list the new item.
+            Mud::instance().addItem(item);
+        }
+        else
+        {
+            Logger::log(LogLevel::Error, "Cannot save the item (%s) on DB.", ToString(item->vnum));
+            // Rollback the transation.
+            SQLiteDbms::instance().rollbackTransection();
+        }
     }
     // Call the method of the father class.
     Character::kill();

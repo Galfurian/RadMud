@@ -257,10 +257,11 @@ void DoLook(Character * character, std::istream & sArgs)
     }
     else if (arguments.size() == 1)
     {
+        CharacterVector excpetions = { character };
         Character * target = character->room->findCharacter(
             arguments[0].first,
             arguments[0].second,
-            character);
+            excpetions);
         if (target)
         {
             if (character->canSee(target))
@@ -284,10 +285,11 @@ void DoLook(Character * character, std::istream & sArgs)
     }
     else if (arguments.size() == 2)
     {
+        CharacterVector excpetions = { character };
         Character * target = character->room->findCharacter(
             arguments[1].first,
             arguments[1].second,
-            character);
+            excpetions);
         if (target)
         {
             if (character->canSee(target))

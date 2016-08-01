@@ -1578,21 +1578,14 @@ void LoadCommands()
         Mud::instance().addCommand(command);
     }
 
-    // Gathering.
-    //{
-    //command.name = "mine";
-    //command.help = "Gather some metal from a node.";
-    //command.args = "(node)";
-    //command.hndl = DoMine;
-    //Mud::instance().addCommand(command);
-    //}
-    //{
-    //command.name = "chop";
-    //command.help = "Gather some wood branches.";
-    //command.args = "(node)";
-    //command.hndl = DoChop;
-    //Mud::instance().addCommand(command);
-    //}
+    // Manager.
+    {
+        command.name = "assign";
+        command.help = "Allows to assign a mobile to a task/building.";
+        command.args = "(mobile)(building)";
+        command.hndl = DoAssign;
+        Mud::instance().addCommand(command);
+    }
 
     // Crafting.
     {

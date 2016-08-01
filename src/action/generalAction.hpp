@@ -22,8 +22,8 @@
 #include "../building.hpp"
 #include "../defines.hpp"
 #include "../utils.hpp"
-#include "../item.hpp"
 #include "../opponent.hpp"
+#include "../item/item.hpp"
 
 #include <memory>
 

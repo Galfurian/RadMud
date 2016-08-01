@@ -38,4 +38,9 @@ class ShopModel: public ItemModel
         virtual bool setModel(const std::string & source);
 
         virtual void getSheet(Table & sheet) const;
+
+        virtual Item * createItem(
+            std::string maker,
+            Material * composition,
+            ItemQuality itemQuality);
 };

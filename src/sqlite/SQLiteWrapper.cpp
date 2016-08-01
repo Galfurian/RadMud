@@ -184,8 +184,10 @@ bool SQLiteWrapper::next()
 
 bool SQLiteWrapper::release()
 {
-    if (sqlite3_finalize(dbDetails.dbStatement) != SQLITE_OK)
+    errorCode = sqlite3_finalize(dbDetails.dbStatement);
+    if (errorCode != SQLITE_OK)
     {
+        errorMessage = sqlite3_errmsg(dbDetails.dbConnection);
         Logger::log(LogLevel::Error, "Error code :" + ToString(errorCode));
         Logger::log(LogLevel::Error, "Last error :" + errorMessage);
         return false;

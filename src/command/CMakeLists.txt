@@ -12,7 +12,7 @@ set(RADMUD_COMMAND_SRC
 	./src/command/combat.cpp
 	./src/command/communication.cpp
 	./src/command/crafting.cpp
-	./src/command/gathering.cpp
+	./src/command/manager.cpp
 	./src/command/general.cpp
 	./src/command/god.cpp
 	./src/command/object.cpp

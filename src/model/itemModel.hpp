@@ -144,7 +144,7 @@ class ItemModel
         /// The model weight.
         unsigned int weight;
         /// The model price.
-        int price;
+        unsigned int price;
         /// The model maximum condition.
         int condition;
         /// The model maximum condition.
@@ -223,7 +223,10 @@ class ItemModel
         /// @param composition The composition of the item.
         /// @param itemQuality The quality of the item.
         /// @return The newly created item.
-        Item * createItem(std::string maker, Material * composition, ItemQuality itemQuality);
+        virtual Item * createItem(
+            std::string maker,
+            Material * composition,
+            ItemQuality itemQuality);
 
         /// @brief Check if the item must be wielded.
         /// @return <b>True</b> if the item must be wielded,<br><b>False</b> Otherwise.
@@ -298,6 +301,6 @@ typedef std::map<int, ItemModel *> ItemModelMap;
 std::string GetModelFlagString(unsigned int flags);
 
 /// Return the string describing the type of a Model.
-std::string GetModelTypeName(ModelType type);
+//std::string GetModelTypeName(ModelType type);
 
 /// @}

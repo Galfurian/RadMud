@@ -358,4 +358,6 @@ void DoProfession(Character * character, Profession * profession, std::istream &
 void DoBuild(Character * character, std::istream &sArgs);
 /// Deconstruct something.
 void DoDeconstruct(Character * character, std::istream &sArgs);
+/// Allows to assign a mobile to a task/building.
+void DoAssign(Character * character, std::istream & sArgs);
 ///@}

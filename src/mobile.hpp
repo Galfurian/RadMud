@@ -57,6 +57,8 @@ class Mobile: public Character
         std::mutex lua_mutex;
         /// Seconds until next action.
         TimeClock nextActionCooldown;
+        /// The item of which this mobile is the manager.
+        Item * managedItem;
 
         /// @brief Constructor.
         Mobile();

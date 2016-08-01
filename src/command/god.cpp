@@ -165,7 +165,10 @@ void DoFeast(Character * character, std::istream & sArgs)
         character->sendMsg("You must insert a valide target.\n");
         return;
     }
-    Character * target = character->room->findCharacter(arguments[0].first, arguments[0].second);
+    Character * target = character->room->findCharacter(
+        arguments[0].first,
+        arguments[0].second,
+        { });
     if (target == nullptr)
     {
         character->sendMsg("You must provide a valide target.\n");
@@ -341,12 +344,13 @@ void DoItemCreate(Character * character, std::istream & sArgs)
     }
     if (arguments.size() == 3)
     {
-        quality = static_cast<ItemQuality>(ToNumber<unsigned int>(arguments[2].first));
-        if (quality == ItemQuality::None)
+        unsigned int itemQualityValue = ToNumber<unsigned int>(arguments[2].first);
+        if (!ItemQualityTest::is_value(itemQualityValue))
         {
             character->sendMsg("Not a valid quality.\n");
             return;
         }
+        quality = ItemQualityTest::convert(itemQualityValue);
     }
     // Create the item.
     Item * item = itemModel->createItem(character->getName(), material, quality);
@@ -839,7 +843,7 @@ void DoMobileKill(Character * character, std::istream & sArgs)
         character->sendMsg("You must provide a target mobile.\n");
         return;
     }
-    Mobile * mobile = character->room->findMobile(arguments[0].first, arguments[0].second);
+    Mobile * mobile = character->room->findMobile(arguments[0].first, arguments[0].second, { });
     if (mobile == nullptr)
     {
         character->sendMsg("Mobile not found.\n");
@@ -864,7 +868,7 @@ void DoMobileReload(Character * character, std::istream & sArgs)
         character->sendMsg("You must provide a target mobile.\n");
         return;
     }
-    Mobile * mobile = character->room->findMobile(arguments[0].first, arguments[0].second);
+    Mobile * mobile = character->room->findMobile(arguments[0].first, arguments[0].second, { });
     if (mobile == nullptr)
     {
         character->sendMsg("Mobile not found.\n");
@@ -904,7 +908,10 @@ void DoHurt(Character * character, std::istream & sArgs)
         character->sendMsg("Who do you want to hurt?\n");
         return;
     }
-    Character * target = character->room->findCharacter(arguments[0].first, arguments[0].second);
+    Character * target = character->room->findCharacter(
+        arguments[0].first,
+        arguments[0].second,
+        { });
     if (target == nullptr)
     {
         character->sendMsg("Target not found.\n");
@@ -969,7 +976,7 @@ void DoModSkill(Character * character, std::istream & sArgs)
         character->sendMsg("Usage: [target] [#skill] [+/-VALUE]\n");
         return;
     }
-    Player * target = character->room->findPlayer(arguments[0].first, arguments[0].second);
+    Player * target = character->room->findPlayer(arguments[0].first, arguments[0].second, { });
     if (target == nullptr)
     {
         character->sendMsg("Target not found.\n");
@@ -1022,7 +1029,10 @@ void DoModAttr(Character * character, std::istream & sArgs)
         character->sendMsg("Usage: [target] [attribute] [+/-VALUE]\n");
         return; // Skip the rest of the function.
     }
-    Character * target = character->room->findCharacter(arguments[0].first, arguments[0].second);
+    Character * target = character->room->findCharacter(
+        arguments[0].first,
+        arguments[0].second,
+        { });
     if (target == nullptr)
     {
         character->sendMsg("Target not found.\n");
@@ -1325,10 +1335,11 @@ void DoItemList(Character * character, std::istream & sArgs)
     // Check no more input.
     NoMore(character, sArgs);
     Table table;
-    table.addColumn("VNUM", StringAlign::Right);
-    table.addColumn("NAME", StringAlign::Left);
-    table.addColumn("TYPE", StringAlign::Left);
-    table.addColumn("LOCATION", StringAlign::Left);
+    table.addColumn("Vnum", StringAlign::Right);
+    table.addColumn("Name", StringAlign::Left);
+    table.addColumn("Type", StringAlign::Left);
+    table.addColumn("Model", StringAlign::Left);
+    table.addColumn("Location", StringAlign::Left);
     for (auto iterator : Mud::instance().mudItems)
     {
         Item * item = iterator.second;
@@ -1336,7 +1347,8 @@ void DoItemList(Character * character, std::istream & sArgs)
         TableRow row;
         row.push_back(ToString(item->vnum));
         row.push_back(item->getNameCapital());
-        row.push_back(GetModelTypeName(item->model->getType()));
+        row.push_back(item->getTypeName());
+        row.push_back(ToString(item->model->vnum));
         if (item->owner != nullptr)
         {
             row.push_back(" Owner  : " + item->owner->getName());

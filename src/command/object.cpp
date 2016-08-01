@@ -409,10 +409,11 @@ void DoGive(Character * character, std::istream & sArgs)
         return; // Skip the rest of the function.
     }
     // Get the target.
+    CharacterVector excpetions = { character };
     Character * target = character->room->findCharacter(
         arguments[1].first,
         arguments[1].second,
-        character);
+        excpetions);
     if (target == nullptr)
     {
         character->sendMsg("You don't see that person.\n");

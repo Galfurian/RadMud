@@ -96,7 +96,7 @@ bool ItemModel::check()
         assert(slot != EquipmentSlot::None);
     }
     assert(weight > 0);
-    assert(price >= 0);
+    assert(price > 0);
     assert(condition > 0);
     assert(decay > 0);
     assert(this->material != MaterialType::NoType);
@@ -200,11 +200,23 @@ Item * ItemModel::createItem(std::string maker, Material * composition, ItemQual
         return nullptr;
     }
 
+    SQLiteDbms::instance().beginTransaction();
     if (newItem->createOnDB())
     {
         // Insert into the item_list the new item.
         Mud::instance().addItem(newItem);
     }
+    else
+    {
+        Logger::log(LogLevel::Error, "Cannot save the new item on DB.");
+        // Rollback the transation.
+        SQLiteDbms::instance().rollbackTransection();
+        // Delete the item.
+        delete (newItem);
+        // Return pointer to nothing.
+        return nullptr;
+    }
+    SQLiteDbms::instance().endTransaction();
     return newItem;
 }
 
@@ -396,27 +408,29 @@ std::string GetModelFlagString(unsigned int flags)
     return flagList;
 }
 
-std::string GetModelTypeName(ModelType type)
-{
-    if (type == ModelType::Corpse) return "Corpse";
-    if (type == ModelType::Weapon) return "Weapon";
-    if (type == ModelType::Armor) return "Armor";
-    if (type == ModelType::Shield) return "Shield";
-    if (type == ModelType::Projectile) return "Projectile";
-    if (type == ModelType::Container) return "Container";
-    if (type == ModelType::LiquidContainer) return "LiquidContainer";
-    if (type == ModelType::Tool) return "Tool";
-    if (type == ModelType::Node) return "Node";
-    if (type == ModelType::Resource) return "Resource";
-    if (type == ModelType::Seed) return "Seed";
-    if (type == ModelType::Key) return "Key";
-    if (type == ModelType::Furniture) return "Furniture";
-    if (type == ModelType::Food) return "Food";
-    if (type == ModelType::Light) return "Light";
-    if (type == ModelType::Vehicle) return "Vehicle";
-    if (type == ModelType::Book) return "Book";
-    if (type == ModelType::Rope) return "Rope";
-    if (type == ModelType::Mechanism) return "Mechanism";
-    if (type == ModelType::Currency) return "Currency";
-    return "No Model Type";
-}
+/*
+ std::string GetModelTypeName(ModelType type)
+ {
+ if (type == ModelType::Corpse) return "Corpse";
+ if (type == ModelType::Weapon) return "Weapon";
+ if (type == ModelType::Armor) return "Armor";
+ if (type == ModelType::Shield) return "Shield";
+ if (type == ModelType::Projectile) return "Projectile";
+ if (type == ModelType::Container) return "Container";
+ if (type == ModelType::LiquidContainer) return "LiquidContainer";
+ if (type == ModelType::Tool) return "Tool";
+ if (type == ModelType::Node) return "Node";
+ if (type == ModelType::Resource) return "Resource";
+ if (type == ModelType::Seed) return "Seed";
+ if (type == ModelType::Key) return "Key";
+ if (type == ModelType::Furniture) return "Furniture";
+ if (type == ModelType::Food) return "Food";
+ if (type == ModelType::Light) return "Light";
+ if (type == ModelType::Vehicle) return "Vehicle";
+ if (type == ModelType::Book) return "Book";
+ if (type == ModelType::Rope) return "Rope";
+ if (type == ModelType::Mechanism) return "Mechanism";
+ if (type == ModelType::Currency) return "Currency";
+ return "No Model Type";
+ }
+ */

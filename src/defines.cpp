@@ -106,17 +106,6 @@ std::string GetMaterialTypeName(MaterialType type)
     return "No Material Type";
 }
 
-std::string GetItemQualityName(ItemQuality quality)
-{
-    if (quality == ItemQuality::Disastrous) return "Disastrous";
-    if (quality == ItemQuality::Poor) return "Poor";
-    if (quality == ItemQuality::Normal) return "Normal";
-    if (quality == ItemQuality::Fine) return "Fine";
-    if (quality == ItemQuality::Masterful) return "Masterful";
-    if (quality == ItemQuality::Fine) return "Fine";
-    return "No Quality";
-}
-
 std::string GetEquipmentSlotName(EquipmentSlot slot)
 {
     if (slot == EquipmentSlot::Head) return "Head";

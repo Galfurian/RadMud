@@ -165,6 +165,12 @@ class SQLiteDbms
         /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
         bool updateInto(std::string table, QueryList value, QueryList where);
 
+        /// @brief Execute a select.
+        /// @param table The name of the table.
+        /// @param where Vector of where clause.
+        /// @return The result of the operation.
+        ResultSet * executeSelect(std::string table, QueryList where);
+
         /// @brief Begin a transaction.
         void beginTransaction();
 

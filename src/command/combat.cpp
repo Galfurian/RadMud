@@ -35,11 +35,12 @@ void DoKill(Character * character, std::istream & sArgs)
     {
         character->sendMsg("You have to specify whom to kill.\n");
     }
+    CharacterVector excpetions = { character };
     // Retrieve the target.
     Character * target = character->room->findCharacter(
         arguments[0].first,
         arguments[0].second,
-        character);
+        excpetions);
     if (!target)
     {
         character->sendMsg("You don't see '%s' anywhere.\n", arguments[0].first);

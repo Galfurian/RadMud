@@ -47,6 +47,8 @@
 #include "../model/weaponModel.hpp"
 #include "../model/shopModel.hpp"
 
+#include "../item/shopItem.hpp"
+
 using namespace std;
 
 SQLiteDbms::SQLiteDbms()
@@ -139,6 +141,15 @@ bool SQLiteDbms::loadTables()
         }
         // release the resource.
         result->release();
+    }
+    // TODO: I cannot put this chunk of code inside the LoadItem function.
+    for (auto iterator : Mud::instance().mudItems)
+    {
+        if (!iterator.second->loadFromDB())
+        {
+            Logger::log(LogLevel::Error, "Error during item loading from DB.");
+            return false;
+        }
     }
     return true;
 }
@@ -329,6 +340,26 @@ bool SQLiteDbms::updateInto(std::string table, QueryList value, QueryList where)
         }
     }
     return (dbConnection.executeQuery(stream.str().c_str()) != 0);
+}
+
+ResultSet * SQLiteDbms::executeSelect(std::string table, QueryList where)
+{
+    stringstream stream;
+    stream << "SELECT * FROM " << table << std::endl;
+    stream << "WHERE" << std::endl;
+    for (unsigned int it = 0; it < where.size(); ++it)
+    {
+        std::pair<std::string, std::string> clause = where.at(it);
+        if (it == (where.size() - 1))
+        {
+            stream << "    " << clause.first << " = \"" << clause.second << "\";" << std::endl;
+        }
+        else
+        {
+            stream << "    " << clause.first << " = \"" << clause.second << "\" AND" << std::endl;
+        }
+    }
+    return dbConnection.executeSelect(stream.str().c_str());
 }
 
 void SQLiteDbms::beginTransaction()
@@ -541,24 +572,65 @@ bool LoadItem(ResultSet * result)
 {
     while (result->next())
     {
-        // Create a new item.
-        Item * item = new Item();
-        // Initialize the item.
-        item->vnum = result->getNextInteger();
-        item->model = Mud::instance().findItemModel(result->getNextInteger());
-        item->maker = result->getNextString();
-        item->condition = result->getNextInteger();
-        item->composition = Mud::instance().findMaterial(result->getNextInteger());
-        item->quality = (ItemQuality) result->getNextInteger();
-        item->flags = result->getNextUnsignedInteger();
+        // Retrieve the model vnum.
+        ItemModel * model = Mud::instance().findItemModel(result->getDataInteger(1));
+        Item * item;
+        if (model->getType() == ModelType::Shop)
+        {
+            item = new ShopItem();
+        }
+        else
+        {
+            item = new Item();
+        }
+        // Retrieve the values.
+        int itemVnum = result->getNextInteger();
+        int itemModelVnum = result->getNextInteger();
+        std::string itemMaker = result->getNextString();
+        int itemCondition = result->getNextInteger();
+        int itemCompositionVnum = result->getNextInteger();
+        int itemQualityValue = result->getNextInteger();
+        unsigned int itemFlags = result->getNextUnsignedInteger();
 
+        Logger::log(LogLevel::Debug, "Loading item (%s)", ToString(itemVnum));
+
+        // Check the dynamic attributes.
+        ItemModel * itemModel = Mud::instance().findItemModel(itemModelVnum);
+        if (itemModel == nullptr)
+        {
+            Logger::log(LogLevel::Error, "Item has wrong model (%s)", ToString(itemModelVnum));
+            return false;
+        }
+        Material * itemComposition = Mud::instance().findMaterial(itemCompositionVnum);
+        if (itemComposition == nullptr)
+        {
+            Logger::log(
+                LogLevel::Error,
+                "Item has wrong material (%s)",
+                ToString(itemCompositionVnum));
+            return false;
+        }
+        if (!ItemQualityTest::is_value(itemQualityValue))
+        {
+            Logger::log(LogLevel::Error, "Item has wrong quality (%s)", ToString(itemQualityValue));
+            return false;
+        }
+        ItemQuality itemQuality = ItemQualityTest::convert(itemQualityValue);
+        // Set the item values.
+        item->vnum = itemVnum;
+        item->model = itemModel;
+        item->condition = itemCondition;
+        item->maker = itemMaker;
+        item->composition = itemComposition;
+        item->quality = itemQuality;
+        item->flags = itemFlags;
+        // Check correctness of attributes.
         if (!item->check())
         {
             Logger::log(LogLevel::Error, "Error during error checking.");
             delete (item);
             return false;
         }
-
         // Add the item to the map of items.
         if (!Mud::instance().addItem(item))
         {
@@ -666,7 +738,7 @@ bool LoadModel(ResultSet * result)
         itemModel->slot = static_cast<EquipmentSlot>(result->getNextInteger());
         itemModel->modelFlags = result->getNextUnsignedInteger();
         itemModel->weight = result->getNextUnsignedInteger();
-        itemModel->price = result->getNextInteger();
+        itemModel->price = result->getNextUnsignedInteger();
         itemModel->condition = result->getNextInteger();
         itemModel->decay = result->getNextInteger();
         itemModel->material = static_cast<MaterialType>(result->getNextInteger());

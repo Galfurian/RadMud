@@ -231,8 +231,6 @@ bool Room::removeOnDB()
         Logger::log(LogLevel::Error, "[Room::RemoveOnDB] There are still characters in the room!");
         return false;
     }
-
-    //----------Remove from Room-----------
     SQLiteDbms::instance().deleteFrom("Room", { std::make_pair("vnum", ToString(vnum)) });
     return true;
 }
@@ -293,24 +291,22 @@ ItemVector Room::findBuildings(ModelType type)
     return buildingsList;
 }
 
-Character * Room::findCharacter(string target, int & number, Character * exception)
+Character * Room::findCharacter(string target, int & number, const CharacterVector & exceptions)
 {
-    Player * player;
-    Mobile * mobile;
-
     for (auto iterator : characters)
     {
-        // Exclude the exception.
-        if (iterator == exception)
+        // Check exceptions.
+        if (!exceptions.empty())
         {
-            continue;
+            if (std::find(exceptions.begin(), exceptions.end(), iterator) != exceptions.end())
+            {
+                continue;
+            }
         }
-
         // Check if the character is a mobile or a player.
         if (iterator->isMobile())
         {
-            mobile = iterator->toMobile();
-            if (mobile->hasKey(ToLower(target)))
+            if (iterator->toMobile()->hasKey(ToLower(target)))
             {
                 if (number > 1)
                 {
@@ -318,26 +314,24 @@ Character * Room::findCharacter(string target, int & number, Character * excepti
                 }
                 else
                 {
-                    return mobile;
+                    return iterator->toMobile();
                 }
             }
         }
         else
         {
-            player = iterator->toPlayer();
-            if (!player->isPlaying())
+            if (iterator->toPlayer()->isPlaying())
             {
-                continue;
-            }
-            if (BeginWith(player->getName(), ToLower(target)))
-            {
-                if (number > 1)
+                if (BeginWith(iterator->toPlayer()->getName(), ToLower(target)))
                 {
-                    number -= 1;
-                }
-                else
-                {
-                    return player;
+                    if (number > 1)
+                    {
+                        number -= 1;
+                    }
+                    else
+                    {
+                        return iterator->toPlayer();
+                    }
                 }
             }
         }
@@ -345,63 +339,62 @@ Character * Room::findCharacter(string target, int & number, Character * excepti
     return nullptr;
 }
 
-Player * Room::findPlayer(string target, int & number, Player * exception)
+Player * Room::findPlayer(string target, int & number, const CharacterVector & exceptions)
 {
-    Player * player;
-
     for (auto iterator : characters)
     {
-        // Exclude the exception.
-        if (iterator == exception)
-        {
-            continue;
-        }
         // Check if the character is a mobile.
         if (iterator->isMobile())
         {
             continue;
         }
-
-        player = iterator->toPlayer();
-        if (!player->isPlaying())
+        // Check exceptions.
+        if (!exceptions.empty())
         {
-            continue;
-        }
-        if (BeginWith(player->getName(), ToLower(target)))
-        {
-            if (number == 1)
+            if (std::find(exceptions.begin(), exceptions.end(), iterator) != exceptions.end())
             {
-                return player;
+                continue;
             }
-            number -= 1;
+        }
+        // Check if it is the desired target.
+        if (iterator->toPlayer()->isPlaying())
+        {
+            if (BeginWith(iterator->toPlayer()->getName(), ToLower(target)))
+            {
+                if (number == 1)
+                {
+                    return iterator->toPlayer();
+                }
+                number -= 1;
+            }
         }
     }
     return nullptr;
 }
 
-Mobile * Room::findMobile(string target, int & number, Mobile * exception)
+Mobile * Room::findMobile(string target, int & number, const CharacterVector & exceptions)
 {
-    Mobile * mobile;
-
     for (auto iterator : characters)
     {
-        // Exclude the exception.
-        if (iterator == exception)
-        {
-            continue;
-        }
         // Check if the character is a player.
         if (!iterator->isMobile())
         {
             continue;
         }
-
-        mobile = iterator->toMobile();
-        if (mobile->hasKey(ToLower(target)))
+        // Check exceptions.
+        if (!exceptions.empty())
+        {
+            if (std::find(exceptions.begin(), exceptions.end(), iterator) != exceptions.end())
+            {
+                continue;
+            }
+        }
+        // Check if it is the desired target.
+        if (iterator->toMobile()->hasKey(ToLower(target)))
         {
             if (number == 1)
             {
-                return mobile;
+                return iterator->toMobile();
             }
             number -= 1;
         }

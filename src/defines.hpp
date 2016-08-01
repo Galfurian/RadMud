@@ -353,6 +353,28 @@ typedef enum class MaterialTypes
 // ITEM /////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////
 
+/// The quality of an item.
+typedef enum class ItemQualities
+{
+    /// Disastrous
+    Disastrous,
+    /// Poor
+    Poor,
+    /// Normal
+    Normal,
+    /// Fine
+    Fine,
+    /// Masterful
+    Masterful
+} ItemQuality;
+/// Tester for ability enums.
+using ItemQualityTest = EnumCheck<ItemQuality,
+ItemQuality::Disastrous,
+ItemQuality::Poor,
+ItemQuality::Normal,
+ItemQuality::Fine,
+ItemQuality::Masterful>;
+
 /// Used to determine the flag of the item.
 typedef enum class ItemFlags
 {
@@ -365,23 +387,6 @@ typedef enum class ItemFlags
     /// Built
     Built = 4
 } ItemFlag;
-
-/// The quality of an item.
-typedef enum class ItemQualities
-{
-    /// No quality set.
-    None,
-    /// Disastrous
-    Disastrous,
-    /// Poor
-    Poor,
-    /// Normal
-    Normal,
-    /// Fine
-    Fine,
-    /// Masterful
-    Masterful
-} ItemQuality;
 
 // //////////////////////////////////////////////////////////////////
 // MODEL ////////////////////////////////////////////////////////////
@@ -442,8 +447,6 @@ std::string GetPostureName(CharacterPosture posture);
 std::string GetCharacterFlagName(CharacterFlag flag);
 /// Return the string describing the type of a Material.
 std::string GetMaterialTypeName(MaterialType type);
-/// Return the string describing the quality of an item.
-std::string GetItemQualityName(ItemQuality quality);
 /// Return the string describing the equipment slot.
 std::string GetEquipmentSlotName(EquipmentSlot slot);
 /// Return the string describing the type of Gender.

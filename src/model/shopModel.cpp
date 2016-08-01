@@ -18,7 +18,11 @@
 
 #include "shopModel.hpp"
 
-ShopModel::ShopModel()
+#include "../mud.hpp"
+#include "../item/shopItem.hpp"
+
+ShopModel::ShopModel() :
+        maxWeight()
 {
     // Nothing to do.
 }
@@ -63,4 +67,51 @@ void ShopModel::getSheet(Table & sheet) const
     sheet.addDivider();
     // Set the values.
     sheet.addRow( { "Max Weight", ToString(this->maxWeight) });
+}
+
+Item * ShopModel::createItem(std::string maker, Material * composition, ItemQuality itemQuality)
+{
+    // Instantiate the new item.
+    ShopItem * newItem = new ShopItem();
+    newItem->vnum = Mud::instance().getMaxVnumItem() + 1;
+    newItem->model = this;
+    newItem->maker = maker;
+    newItem->condition = condition;
+    newItem->composition = composition;
+    newItem->quality = itemQuality;
+    newItem->flags = 0;
+    newItem->room = nullptr;
+    newItem->owner = nullptr;
+    newItem->container = nullptr;
+    newItem->currentSlot = slot;
+    newItem->content = std::vector<Item *>();
+    newItem->contentLiq = LiquidContent();
+
+    if (!newItem->check())
+    {
+        Logger::log(LogLevel::Error, "Cannot create the shop.");
+        // Delete the item.
+        delete (newItem);
+        // Return pointer to nothing.
+        return nullptr;
+    }
+    SQLiteDbms::instance().beginTransaction();
+    if (newItem->createOnDB())
+    {
+        // Insert into the item_list the new item.
+        Mud::instance().addItem(newItem);
+    }
+    else
+    {
+        Logger::log(LogLevel::Error, "Cannot save the shop on DB.");
+        // Rollback the transation.
+        SQLiteDbms::instance().rollbackTransection();
+        // Delete the item.
+        delete (newItem);
+        // Return pointer to nothing.
+        return nullptr;
+    }
+    SQLiteDbms::instance().endTransaction();
+    Logger::log(LogLevel::Debug, "A new shop has been created.");
+    return newItem;
 }
