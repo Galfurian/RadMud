@@ -276,7 +276,8 @@ void MudUpdater::performActions()
         ActionStatus actionStatus = iterator->getAction()->perform();
         if ((actionStatus == ActionStatus::Finished) || (actionStatus == ActionStatus::Error))
         {
-            iterator->setAction(std::make_shared<GeneralAction>(iterator));
+            // Remove the from action.
+            iterator->popAction();
         }
     }
     for (auto iterator : Mud::instance().mudMobiles)
@@ -300,7 +301,8 @@ void MudUpdater::performActions()
         ActionStatus actionStatus = mobile->getAction()->perform();
         if ((actionStatus == ActionStatus::Finished) || (actionStatus == ActionStatus::Error))
         {
-            mobile->setAction(std::make_shared<GeneralAction>(mobile));
+            // Remove the from action.
+            mobile->popAction();
         }
     }
 }

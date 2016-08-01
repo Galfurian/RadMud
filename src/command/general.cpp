@@ -239,7 +239,11 @@ void DoStop(Character * character, std::istream & sArgs)
 {
     // Check no more input.
     NoMore(character, sArgs);
-    character->sendMsg(character->getAction()->stop() + "\n");
+    if (character->getAction()->getType() != ActionType::Combat)
+    {
+        character->sendMsg(character->getAction()->stop() + "\n");
+        character->popAction();
+    }
 }
 
 void DoLook(Character * character, std::istream & sArgs)

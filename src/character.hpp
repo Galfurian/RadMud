@@ -30,6 +30,8 @@
 #include "utils.hpp"
 #include "action/combat/combatAction.hpp"
 
+#include <deque>
+
 class Room;
 class Player;
 class Mobile;
@@ -83,7 +85,7 @@ class Character
         /// List of opponents.
         OpponentsList opponents;
         /// Character current action.
-        std::shared_ptr<GeneralAction> action;
+        std::deque<std::shared_ptr<GeneralAction> > actionQueue;
 
         /// @brief Constructor.
         Character();
@@ -281,6 +283,13 @@ class Character
         /// @brief Provides a pointer to the action object associated to this character.
         /// @return A pointer to action.
         std::shared_ptr<GeneralAction> getAction();
+
+        std::shared_ptr<GeneralAction> getAction() const;
+
+        /// @brief Provides a pointer to the action at the front position and
+        ///         then remove it from the queue.
+        /// @return A pointer to action.
+        std::shared_ptr<GeneralAction> popAction();
 
         /// @brief Check if the character can move in the given direction.
         /// @param direction The direction where to search the room.
@@ -506,6 +515,8 @@ class Character
         /// @brief Provides the list of active weapons (Left and Right hands).
         /// @return Vector of items.
         ItemVector getActiveWeapons();
+
+        bool getCharactersInSight(std::vector<Character *> & targets);
 
         /// @brief Given an action, it returns the necessary cooldown.
         /// @return The non-decreasing value of the cooldown.

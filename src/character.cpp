@@ -65,8 +65,9 @@ Character::Character() :
         effects(),
         L(luaL_newstate()),
         opponents(this),
-        action(std::make_shared<GeneralAction>(this))
+        actionQueue()
 {
+    actionQueue.push_back(std::make_shared<GeneralAction>(this));
     // Nothing to do.
 }
 
@@ -165,7 +166,7 @@ void Character::getSheet(Table & sheet) const
         sheet.addRow( { "Room", "NONE" });
     }
     sheet.addRow( { "Posture", GetPostureName(this->posture) });
-    sheet.addRow( { "Action", action->getDescription() });
+    sheet.addRow( { "Action", this->getAction()->getDescription() });
     sheet.addDivider();
     sheet.addRow( { "## Equipment", "## Inventory" });
     for (size_t it = 0; it < std::max(this->inventory.size(), this->equipment.size()); ++it)
@@ -222,10 +223,10 @@ std::string Character::getStaticDesc() const
         desc += " " + GetPostureName(posture);
     }
     desc += " here";
-    if (this->action->getType() != ActionType::Wait)
+    if (this->getAction()->getType() != ActionType::Wait)
     {
         desc += ", " + this->getSubjectPronoun() + " is ";
-        desc += this->action->getDescription();
+        desc += this->getAction()->getDescription();
     }
     desc += ".";
     return desc;
@@ -529,7 +530,7 @@ int Character::getViewDistance() const
 
 void Character::setAction(std::shared_ptr<GeneralAction> _action)
 {
-    this->action = _action;
+    this->actionQueue.push_front(_action);
 }
 
 bool Character::setNextCombatAction(CombatActionType nextAction)
@@ -540,31 +541,48 @@ bool Character::setNextCombatAction(CombatActionType nextAction)
         return false;
     }
     bool sameAction = false;
-    if (this->action->getType() == ActionType::Combat)
+    if (this->getAction()->getType() == ActionType::Combat)
     {
-        auto combatAction = this->action->toCombatAction();
+        auto combatAction = this->getAction()->toCombatAction();
         sameAction = (combatAction->getCombatActionType() == nextAction);
     }
     if ((nextAction == CombatActionType::BasicAttack) && !sameAction)
     {
-        this->action = std::make_shared<BasicAttack>(this);
+        this->actionQueue.push_front(std::make_shared<BasicAttack>(this));
     }
     else if ((nextAction == CombatActionType::Flee) && !sameAction)
     {
-        this->action = std::make_shared<Flee>(this);
+        this->actionQueue.push_front(std::make_shared<Flee>(this));
     }
     // Set the action cooldown.
-    this->action->setCooldown(this->getCooldown(nextAction));
+    this->getAction()->setCooldown(this->getCooldown(nextAction));
     return true;
 }
 
 std::shared_ptr<GeneralAction> Character::getAction()
 {
-    return this->action;
+    return this->actionQueue.front();
+}
+
+std::shared_ptr<GeneralAction> Character::getAction() const
+{
+    return this->actionQueue.front();
+}
+
+std::shared_ptr<GeneralAction> Character::popAction()
+{
+    std::shared_ptr<GeneralAction> frontAction = this->getAction();
+    this->actionQueue.pop_front();
+    return frontAction;
 }
 
 bool Character::canMoveTo(Direction direction, std::string & error) const
 {
+    if (this->getAction()->getType() == ActionType::Combat)
+    {
+        error = "You cannot move while fighting.";
+        return false;
+    }
     // Check if the character is in a no-walk position.
     if (posture == CharacterPosture::Rest || posture == CharacterPosture::Sit)
     {
@@ -778,10 +796,12 @@ Item * Character::findNearbyItem(std::string itemName, int & number)
     return item;
 }
 
-Item * Character::findNearbyTool(const ToolType & toolType, const ItemVector & exceptions,
-bool searchRoom,
-bool searchInventory,
-bool searchEquipment)
+Item * Character::findNearbyTool(
+    const ToolType & toolType,
+    const ItemVector & exceptions,
+    bool searchRoom,
+    bool searchInventory,
+    bool searchEquipment)
 {
     if (searchRoom)
     {
@@ -840,10 +860,12 @@ bool searchEquipment)
     return nullptr;
 }
 
-bool Character::findNearbyTools(ToolSet tools, ItemVector & foundOnes,
-bool searchRoom,
-bool searchInventory,
-bool searchEquipment)
+bool Character::findNearbyTools(
+    ToolSet tools,
+    ItemVector & foundOnes,
+    bool searchRoom,
+    bool searchInventory,
+    bool searchEquipment)
 {
     // TODO: Prepare a map with key the tool type and as value:
     //  Option A: A bool which determine if the tool has been found.
@@ -1473,6 +1495,20 @@ ItemVector Character::getActiveWeapons()
     return ret;
 }
 
+bool Character::getCharactersInSight(CharacterVector & targets)
+{
+    CharacterVector exceptions;
+    exceptions.push_back(this);
+    Coordinates<int> coord = this->room->coord;
+    return this->room->area->getCharactersInSight(
+        targets,
+        exceptions,
+        coord.x,
+        coord.y,
+        coord.z,
+        this->getViewDistance());
+}
+
 unsigned int Character::getCooldown(CombatActionType combatAction)
 {
     double BASE = 5.0;
@@ -1640,6 +1676,7 @@ void Character::kill()
         item->updateOnDB();
     }
     // Reset the action of the character.
+    this->actionQueue.clear();
     this->setAction(std::make_shared<GeneralAction>(this));
     // Reset the list of opponents.
     this->opponents.resetList();
