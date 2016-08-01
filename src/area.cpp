@@ -129,16 +129,16 @@ Room * Area::getRoom(int room_vnum)
 
 Room * Area::getRoom(int x, int y, int z)
 {
-    return areaMap.get(x, y, z);
+    if (this->inBoundaries(x, y, z))
+    {
+        return areaMap.get(x, y, z);
+    }
+    return nullptr;
 }
 
 Room * Area::getRoom(Coordinates<int> coord)
 {
-    if (this->inBoundaries(coord))
-    {
-        return this->getRoom(coord.x, coord.y, coord.z);
-    }
-    return nullptr;
+    return this->getRoom(coord.x, coord.y, coord.z);
 }
 
 std::vector<std::string> Area::drawFov(Room * centerRoom, int radius)
@@ -560,6 +560,81 @@ bool Area::fastInSight(
 bool Area::fastInSight(Coordinates<int> origin, Coordinates<int> target, unsigned int radius)
 {
     return this->fastInSight(origin.x, origin.y, origin.z, target.x, target.y, target.z, radius);
+}
+
+bool Area::getCharactersInSight(
+    CharacterVector & targets,
+    CharacterVector & exceptions,
+    int origin_x,
+    int origin_y,
+    int origin_z,
+    int radius)
+{
+    double increment_x = 0.0, increment_y = 0.0, increment_z = 0.0;
+    for (float i = 0.0; i < 360; ++i)
+    {
+        // The x and y coordinates used by LOS Algorithm.
+        increment_x = cos(static_cast<double>(i * 0.0174533f));
+        increment_y = sin(static_cast<double>(i * 0.0174533f));
+        double ox = origin_x + static_cast<double>(0.5f);
+        double oy = origin_y + static_cast<double>(0.5f);
+        double oz = origin_z + static_cast<double>(0.5f);
+        for (int distance = 0; distance < radius; ++distance)
+        {
+            // Transform into integer the coordinates.
+            int curr_x = static_cast<int>(ox);
+            int curr_y = static_cast<int>(oy);
+            int curr_z = static_cast<int>(oz);
+            // Get the room at the current coordinates.
+            Room * room = this->getRoom(curr_x, curr_y, curr_z);
+            if (room != nullptr)
+            {
+                // Check if there is a door.
+                Item * door = room->findDoor();
+                if (door != nullptr)
+                {
+                    if (HasFlag(door->flags, ItemFlag::Closed))
+                    {
+                        break;
+                    }
+                }
+                // Check if there is a character inside the room.
+                for (auto it : room->characters)
+                {
+                    bool skip = false;
+                    for (auto it2 : exceptions)
+                    {
+                        if (it->name == it2->name)
+                        {
+                            skip = true;
+                            break;
+                        }
+                    }
+                    if (!skip)
+                    {
+                        skip = false;
+                        for (auto it2 : targets)
+                        {
+                            if (it->name == it2->name)
+                            {
+                                skip = true;
+                                break;
+                            }
+                        }
+                        if (!skip)
+                        {
+                            targets.push_back(it);
+                        }
+                    }
+                }
+                // Updated current coordinates.
+                ox += increment_x;
+                oy += increment_y;
+                oz += increment_z;
+            }
+        }
+    }
+    return (!targets.empty());
 }
 
 void Area::luaRegister(lua_State * L)

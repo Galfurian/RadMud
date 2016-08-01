@@ -24,6 +24,7 @@
 #include "utilities/coordinates.hpp"
 #include "utilities/map3D.hpp"
 #include "utilities/map2D.hpp"
+#include "character.hpp"
 #include "defines.hpp"
 
 class Room;
@@ -185,6 +186,14 @@ class Area
         /// @return <b>True</b> if the target room is in sight,<br>
         ///         <b>False</b> otherwise.
         bool fastInSight(Coordinates<int> origin, Coordinates<int> target, unsigned int radius);
+
+        bool getCharactersInSight(
+            CharacterVector & targets,
+            CharacterVector & exceptions,
+            int origin_x,
+            int origin_y,
+            int origin_z,
+            int radius);
 
         /// @brief Function used to register inside the lua environment the class.
         /// @param L The lua environment.
