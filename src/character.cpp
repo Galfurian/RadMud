@@ -569,11 +569,12 @@ std::shared_ptr<GeneralAction> Character::getAction() const
     return this->actionQueue.front();
 }
 
-std::shared_ptr<GeneralAction> Character::popAction()
+void Character::popAction()
 {
-    std::shared_ptr<GeneralAction> frontAction = this->getAction();
-    this->actionQueue.pop_front();
-    return frontAction;
+    if (this->actionQueue.front()->getType() != ActionType::Wait)
+    {
+        this->actionQueue.pop_front();
+    }
 }
 
 bool Character::canMoveTo(Direction direction, std::string & error) const
