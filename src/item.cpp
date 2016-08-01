@@ -208,12 +208,15 @@ bool Item::updateOnDB()
         }
     }
 
-    // Remove the item from any auxiliary table.
-    QueryList where;
-    where.push_back(std::make_pair("item", ToString(vnum)));
-    SQLiteDbms::instance().deleteFrom("ItemPlayer", where);
-    SQLiteDbms::instance().deleteFrom("ItemRoom", where);
-    SQLiteDbms::instance().deleteFrom("ItemContent", where);
+    if ((room != nullptr) || (owner != nullptr) || (container != nullptr))
+    {
+        // Remove the item from any auxiliary table.
+        QueryList where;
+        where.push_back(std::make_pair("item", ToString(vnum)));
+        SQLiteDbms::instance().deleteFrom("ItemPlayer", where);
+        SQLiteDbms::instance().deleteFrom("ItemRoom", where);
+        SQLiteDbms::instance().deleteFrom("ItemContent", where);
+    }
 
     // Save the item's position.
     if (room != nullptr)
@@ -298,8 +301,9 @@ bool Item::updateOnDB()
 
 bool Item::removeOnDB()
 {
-    bool result = SQLiteDbms::instance().deleteFrom("Item",
-    { std::make_pair("vnum", ToString(vnum)) });
+    bool result = SQLiteDbms::instance().deleteFrom(
+        "Item",
+        { std::make_pair("vnum", ToString(vnum)) });
     if (!result)
     {
         Logger::log(LogLevel::Error, "Error during item removal from table Item.");
