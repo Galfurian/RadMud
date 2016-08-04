@@ -26,19 +26,23 @@
 #include "../lua/lua_script.hpp"
 #include "../model/itemModel.hpp"
 #include "../model/nodeModel.hpp"
+#include "../utilities/table.hpp"
 
 class Room;
 class Character;
 class Material;
 
 class ShopItem;
+class ArmorItem;
 
 /// Used to determine the type of item.
 typedef enum class ItemTypes
 {
     Generic,
     /// A shop.
-    Shop
+    Shop,
+    /// An armor.
+    Armor
 } ItemType;
 
 /// @brief Holds details about items.
@@ -120,6 +124,8 @@ class Item
         /// @brief Remove the item on database.
         /// @return <b>True</b> if the execution goes well,<br><b>False</b> otherwise.
         virtual bool removeOnDB();
+
+        virtual void getSheet(Table & sheet) const;
 
         /// @brief Check if the item has the desired key.
         /// @param key The key to search.
@@ -230,6 +236,8 @@ class Item
         std::string getCurrentSlotName();
 
         ShopItem * toShopItem();
+
+        ArmorItem * toArmorItem();
 
         unsigned int getPrice() const;
 

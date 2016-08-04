@@ -134,6 +134,26 @@ bool ShopItem::removeOnDB()
     return false;
 }
 
+void ShopItem::getSheet(Table & sheet) const
+{
+    // Call the function of the father class.
+    Item::getSheet(sheet);
+    // Add a divider.
+    sheet.addDivider();
+    // Set the values.
+    sheet.addRow( { "Shop Name", shopName });
+    sheet.addRow( { "Buy Tax", ToString(shopBuyTax) });
+    sheet.addRow( { "Sell Tax", ToString(shopSellTax) });
+    if (shopKeeper)
+    {
+        sheet.addRow( { "ShopKeeper", shopKeeper->getNameCapital() });
+    }
+    else
+    {
+        sheet.addRow( { "ShopKeeper", "Nobody" });
+    }
+}
+
 std::string ShopItem::lookContent()
 {
     std::string output;

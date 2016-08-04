@@ -36,6 +36,7 @@
 #include "../model/shopModel.hpp"
 
 #include "shopItem.hpp"
+#include "armorItem.hpp"
 
 Item::Item() :
         vnum(),
@@ -318,6 +319,45 @@ bool Item::removeOnDB()
         Logger::log(LogLevel::Error, "Error during item removal from table Item.");
     }
     return result;
+}
+
+void Item::getSheet(Table & sheet) const
+{
+    // Add the columns.
+    sheet.addColumn("Attribute", StringAlign::Left);
+    sheet.addColumn("Value", StringAlign::Left);
+    // Set the values.
+    sheet.addRow( { "vnum", ToString(vnum) });
+    sheet.addRow( { "type", this->getTypeName() });
+    sheet.addRow( { "model", model->name });
+    sheet.addRow( { "maker", maker });
+    sheet.addRow( { "condition", ToString(condition) });
+    sheet.addRow( { "Material", composition->name });
+    sheet.addRow( { "Quality", GetItemQualityName(quality) });
+    sheet.addRow( { "Flags", ToString(flags) });
+    if (room) sheet.addRow( { "Location", room->name });
+    if (owner) sheet.addRow( { "Location", owner->getNameCapital() });
+    if (container) sheet.addRow(
+        { "Location", container->getNameCapital() + " " + ToString(container->vnum) });
+    sheet.addRow( { "Equipment Slot", GetEquipmentSlotName(currentSlot) });
+    sheet.addDivider();
+    if (!content.empty())
+    {
+        sheet.addRow( { "Content", "Vnum" });
+        for (auto iterator : content)
+        {
+            sheet.addRow( { iterator->getNameCapital(), ToString(iterator->vnum) });
+        }
+    }
+    if (model->getType() == ModelType::LiquidContainer)
+    {
+        sheet.addRow( { "Liquid", "Quantity" });
+        sheet.addRow( { contentLiq.first->getNameCapital(), ToString(contentLiq.second) });
+    }
+    if (customWeight != 0)
+    {
+        sheet.addRow( { "Custom Weight", ToString(customWeight) });
+    }
 }
 
 bool Item::hasKey(std::string key)
@@ -788,6 +828,11 @@ std::string Item::getCurrentSlotName()
 ShopItem * Item::toShopItem()
 {
     return static_cast<ShopItem *>(this);
+}
+
+ArmorItem * Item::toArmorItem()
+{
+    return static_cast<ArmorItem *>(this);
 }
 
 unsigned int Item::getPrice() const

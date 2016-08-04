@@ -367,6 +367,7 @@ typedef enum class ItemQualities
     /// Masterful
     Masterful
 } ItemQuality;
+
 /// Tester for ability enums.
 using ItemQualityTest = EnumCheck<ItemQuality,
 ItemQuality::Disastrous,

@@ -18,6 +18,9 @@
 
 #include "armorModel.hpp"
 
+#include "../mud.hpp"
+#include "../item/armorItem.hpp"
+
 ArmorModel::ArmorModel() :
         size(),
         damageAbs(),
@@ -73,6 +76,53 @@ void ArmorModel::getSheet(Table & sheet) const
     sheet.addRow( { "Size", GetArmorSizeName(this->size) });
     sheet.addRow( { "Damage Absorption", ToString(this->damageAbs) });
     sheet.addRow( { "Allowed Anatomies", ToString(this->allowedAnatomy) });
+}
+
+Item * ArmorModel::createItem(std::string maker, Material * composition, ItemQuality itemQuality)
+{
+    // Instantiate the new item.
+    ArmorItem * newItem = new ArmorItem();
+    newItem->vnum = Mud::instance().getMaxVnumItem() + 1;
+    newItem->model = this;
+    newItem->maker = maker;
+    newItem->condition = condition;
+    newItem->composition = composition;
+    newItem->quality = itemQuality;
+    newItem->flags = 0;
+    newItem->room = nullptr;
+    newItem->owner = nullptr;
+    newItem->container = nullptr;
+    newItem->currentSlot = slot;
+    newItem->content = std::vector<Item *>();
+    newItem->contentLiq = LiquidContent();
+
+    if (!newItem->check())
+    {
+        Logger::log(LogLevel::Error, "Cannot create the armor.");
+        // Delete the item.
+        delete (newItem);
+        // Return pointer to nothing.
+        return nullptr;
+    }
+    SQLiteDbms::instance().beginTransaction();
+    if (newItem->createOnDB())
+    {
+        // Insert into the item_list the new item.
+        Mud::instance().addItem(newItem);
+    }
+    else
+    {
+        Logger::log(LogLevel::Error, "Cannot save the armor on DB.");
+        // Rollback the transation.
+        SQLiteDbms::instance().rollbackTransection();
+        // Delete the item.
+        delete (newItem);
+        // Return pointer to nothing.
+        return nullptr;
+    }
+    SQLiteDbms::instance().endTransaction();
+    Logger::log(LogLevel::Debug, "A new armor has been created.");
+    return newItem;
 }
 
 std::string GetArmorSizeName(ArmorSize armorSize)

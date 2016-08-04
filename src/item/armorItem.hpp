@@ -1,6 +1,6 @@
-/// @file   shopItem.hpp
+/// @file   armorItem.hpp
 /// @author Enrico Fraccaroli
-/// @date   Aug 01 2016
+/// @date   Aug 04 2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission to use, copy, modify, and distribute this software for any
@@ -18,46 +18,19 @@
 #pragma once
 
 #include "item.hpp"
-#include "../mobile.hpp"
 
-class ShopItem: public Item
+class ArmorItem: public Item
 {
     public:
-        /// The name of the shop.
-        std::string shopName;
-        /// The tax applied to each good which is bought.
-        unsigned int shopBuyTax;
-        /// The tax applied to each good which is sold.
-        unsigned int shopSellTax;
-        /// The mobile which is managing the shop.
-        Mobile * shopKeeper;
+        ArmorItem();
 
-        ShopItem();
-
-        virtual ~ShopItem();
+        virtual ~ArmorItem();
 
         virtual ItemType getType() const;
 
         virtual std::string getTypeName() const;
 
-        virtual bool check(bool complete = false);
-
-        virtual bool destroy();
-
-        virtual bool createOnDB();
-
-        virtual bool updateOnDB();
-
-        virtual bool removeOnDB();
-
         virtual void getSheet(Table & sheet) const;
 
-        virtual std::string lookContent();
-
-        void setNewShopKeeper(Mobile * _shopKeeper);
-
-    private:
-        unsigned int evaluateBuyPrice(const unsigned int & price);
-
-        unsigned int evaluateSellPrice(const unsigned int & price);
+        unsigned int getArmorClass() const;
 };

@@ -45,6 +45,7 @@
 #include "../model/shopModel.hpp"
 
 #include "../item/shopItem.hpp"
+#include "../item/armorItem.hpp"
 
 bool LoadBadName(ResultSet * result)
 {
@@ -123,6 +124,10 @@ bool LoadItem(ResultSet * result)
         if (model->getType() == ModelType::Shop)
         {
             item = new ShopItem();
+        }
+        else if (model->getType() == ModelType::Armor)
+        {
+            item = new ArmorItem();
         }
         else
         {

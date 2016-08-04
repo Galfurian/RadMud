@@ -470,47 +470,12 @@ void DoItemInfo(Character * character, std::istream & sArgs)
             return;
         }
     }
-    std::string msg;
-    msg += "Vnum         : " + ToString(item->vnum) + "\n";
-    msg += "Model        : [" + ToString(item->model->vnum) + "] " + item->getName() + ".\n";
-    msg += "Type         : " + item->model->getTypeName() + "\n";
-    msg += "Maker        : " + item->maker + "\n";
-    msg += "Condition    : " + ToString(item->condition) + " of " + ToString(item->model->condition)
-        + "\n";
-    msg += "Composition  : " + item->composition->name + " [" + ToString(item->composition->vnum)
-        + "]\n";
-    msg += "Quality      : " + GetItemQualityName(item->quality) + "\n";
-    if (item->room != nullptr)
-    {
-        msg += "Room         : " + item->room->name + " [" + ToString(item->room->vnum) + "]\n";
-    }
-    else if (item->owner != nullptr)
-    {
-        msg += "Owner        : " + item->owner->getName() + "\n";
-    }
-    else if (item->container != nullptr)
-    {
-        msg += "Inside       : " + item->container->getName() + " ["
-            + ToString(item->container->vnum) + "]\n";
-    }
-    if (!item->content.empty())
-    {
-        msg += "Content      :\n";
-        for (auto iterator : item->content)
-        {
-            msg += "             * " + iterator->getName() + " [" + ToString(iterator->vnum)
-                + "]\n";
-        }
-    }
-    if (item->contentLiq.first != nullptr)
-    {
-        msg += "Content Liq. : ";
-        msg += item->contentLiq.first->getNameCapital() + " [" + ToString(item->contentLiq.second)
-            + "]\n";
-    }
-    msg += "Current Slot : " + item->getCurrentSlotName() + "\n";
-    // Send the formatted message.
-    character->sendMsg(msg);
+    // Create a table.
+    Table sheet;
+    // Get the sheet.
+    item->getSheet(sheet);
+    // Show the seet to character.
+    character->sendMsg(sheet.getTable());
 }
 
 void DoAreaInfo(Character * character, std::istream & sArgs)
