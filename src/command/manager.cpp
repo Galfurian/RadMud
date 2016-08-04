@@ -21,7 +21,7 @@
 #include "../room.hpp"
 #include "../mobile.hpp"
 #include "../item/shopItem.hpp"
-#include "../sqlite/SQLiteDbms.hpp"
+#include "../sqlite/sqliteDbms.hpp"
 
 void DoAssign(Character * character, std::istream & sArgs)
 {

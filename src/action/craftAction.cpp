@@ -19,9 +19,9 @@
 #include "craftAction.hpp"
 #include "../logger.hpp"
 #include "../character.hpp"
-#include "../sqlite/SQLiteDbms.hpp"
 #include "../formatter.hpp"
 #include "../room.hpp"
+#include "../sqlite/sqliteDbms.hpp"
 
 using namespace std::chrono;
 

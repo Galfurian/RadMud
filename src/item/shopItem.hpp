@@ -50,8 +50,6 @@ class ShopItem: public Item
 
         virtual bool removeOnDB();
 
-        virtual bool loadFromDB();
-
         virtual std::string lookContent();
 
         void setNewShopKeeper(Mobile * _shopKeeper);

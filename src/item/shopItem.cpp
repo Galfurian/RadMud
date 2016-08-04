@@ -21,7 +21,6 @@
 #include "../logger.hpp"
 #include "../formatter.hpp"
 #include "../constants.hpp"
-#include "../sqlite/SQLiteDbms.hpp"
 
 ShopItem::ShopItem() :
         shopName(),
@@ -133,49 +132,6 @@ bool ShopItem::removeOnDB()
         }
     }
     return false;
-}
-
-bool ShopItem::loadFromDB()
-{
-    Logger::log(LogLevel::Debug, "Loading shop (%s)", ToString(this->vnum));
-
-    ResultSet * shopResult = SQLiteDbms::instance().executeSelect(
-        "ItemShop",
-        { { "vnum", ToString(this->vnum) } });
-    if (shopResult == nullptr)
-    {
-        Logger::log(
-            LogLevel::Error,
-            "Shop &s has no entry inside the shop table.",
-            ToString(this->vnum));
-        return false;
-    }
-    if (!shopResult->next())
-    {
-        Logger::log(LogLevel::Error, "Error when retrieving the next result of the query.");
-        // Release the result.
-        shopResult->release();
-        return false;
-    }
-    if (shopResult->getColumnCount() != 5)
-    {
-        Logger::log(
-            LogLevel::Error,
-            "The result has the wrong number of column.",
-            ToString(this->vnum));
-        // Release the result.
-        shopResult->release();
-        return false;
-    }
-    // Skip the vnum.
-    shopResult->getNextInteger();
-    this->shopName = shopResult->getNextString();
-    this->shopBuyTax = shopResult->getNextUnsignedInteger();
-    this->shopSellTax = shopResult->getNextUnsignedInteger();
-    this->shopKeeper = Mud::instance().findMobile(shopResult->getNextString());
-    // Release the result.
-    shopResult->release();
-    return true;
 }
 
 std::string ShopItem::lookContent()

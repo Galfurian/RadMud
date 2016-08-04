@@ -116,7 +116,6 @@ bool Building::setIngredient(const std::string & source)
 {
     if (source.empty())
     {
-        Logger::log(LogLevel::Error, "No outcome set.");
         return false;
     }
     // Split the string of ingredients.

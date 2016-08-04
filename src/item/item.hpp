@@ -26,7 +26,6 @@
 #include "../lua/lua_script.hpp"
 #include "../model/itemModel.hpp"
 #include "../model/nodeModel.hpp"
-#include "../sqlite/SQLiteWrapper.hpp"
 
 class Room;
 class Character;
@@ -121,8 +120,6 @@ class Item
         /// @brief Remove the item on database.
         /// @return <b>True</b> if the execution goes well,<br><b>False</b> otherwise.
         virtual bool removeOnDB();
-
-        virtual bool loadFromDB();
 
         /// @brief Check if the item has the desired key.
         /// @param key The key to search.

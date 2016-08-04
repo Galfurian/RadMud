@@ -33,7 +33,7 @@
 #include "writing.hpp"
 
 #include "command/command.hpp"
-#include "sqlite/SQLiteDbms.hpp"
+#include "sqlite/sqliteDbms.hpp"
 #include "utilities/table.hpp"
 
 #ifdef __linux__

@@ -320,11 +320,6 @@ bool Item::removeOnDB()
     return result;
 }
 
-bool Item::loadFromDB()
-{
-    return true;
-}
-
 bool Item::hasKey(std::string key)
 {
     for (auto iterator : model->keys)

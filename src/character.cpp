@@ -30,7 +30,6 @@
 #include "logger.hpp"
 #include "constants.hpp"
 #include "lua/lua_script.hpp"
-#include "sqlite/SQLiteDbms.hpp"
 #include "luabridge/LuaBridge.h"
 #include "command/command.hpp"
 
@@ -41,6 +40,7 @@
 
 #include "action/combat/basicAttack.hpp"
 #include "action/combat/flee.hpp"
+#include "sqlite/sqliteDbms.hpp"
 
 using namespace std;
 using namespace std::chrono;
