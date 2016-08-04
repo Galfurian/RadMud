@@ -90,7 +90,11 @@ typedef enum class ModelFlags
     /// The item cannot be sold.
     NoSaleable = 8,
     /// Must be wielded with two hands.
-    TwoHand = 16
+    TwoHand = 16,
+    /// It can be closed.
+    CanClose = 32,
+    /// Even if it is closed, a character can see through it.
+    CanSeeThrough = 64
 } ModelFlag;
 
 class Item;

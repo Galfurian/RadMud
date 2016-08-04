@@ -690,6 +690,14 @@ std::string Item::lookContent()
     std::string output;
     if (this->isAContainer())
     {
+        if (HasFlag(this->flags, ItemFlag::Closed))
+        {
+            output += Formatter::italic() + "It is closed.\n" + Formatter::reset();
+            if (!HasFlag(this->model->modelFlags, ModelFlag::CanSeeThrough))
+            {
+                return output + "\n";
+            }
+        }
         if (content.empty())
         {
             output += Formatter::italic() + "It's empty.\n" + Formatter::reset();
@@ -718,6 +726,14 @@ std::string Item::lookContent()
     }
     else if (model->getType() == ModelType::LiquidContainer)
     {
+        if (HasFlag(this->flags, ItemFlag::Closed))
+        {
+            output += Formatter::italic() + "It is closed.\n" + Formatter::reset();
+            if (!HasFlag(this->model->modelFlags, ModelFlag::CanSeeThrough))
+            {
+                return output + "\n";
+            }
+        }
         if (contentLiq.first == nullptr)
         {
             output += Formatter::italic() + "It does not contain any liquid.\n"

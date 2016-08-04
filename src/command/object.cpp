@@ -32,12 +32,6 @@ void DoTake(Character * character, std::istream & sArgs)
     StopAction(character);
     // Get the arguments of the command.
     ArgumentList arguments = ParseArgs(sArgs);
-    // Check the number of arguments.
-    if ((arguments.size() != 1) && (arguments.size() != 2))
-    {
-        character->sendMsg("Wrong number of arguments.\n");
-        return; // Skip the rest of the function.
-    }
     // Try to take the item inside the room.
     if (arguments.size() == 1)
     {
@@ -181,12 +175,22 @@ void DoTake(Character * character, std::istream & sArgs)
             Formatter::cyan() + ToLower(item->getName()) + Formatter::reset());
         return; // Skip the rest of the function.
     }
-    if (arguments.size() == 2)
+    else if (arguments.size() == 2)
     {
         Item * container = character->findNearbyItem(arguments[1].first, arguments[1].second);
         if (container == nullptr)
         {
             character->sendMsg("You don't see that container.\n");
+            return; // Skip the rest of the function.
+        }
+        if (HasFlag(container->flags, ItemFlag::Locked))
+        {
+            character->sendMsg("You have first to unlock %s.\n", container->getName());
+            return; // Skip the rest of the function.
+        }
+        if (HasFlag(container->flags, ItemFlag::Closed))
+        {
+            character->sendMsg("You have first to open %s.\n", container->getName());
             return; // Skip the rest of the function.
         }
         if (ToLower(arguments[0].first) == "all")
@@ -303,6 +307,10 @@ void DoTake(Character * character, std::istream & sArgs)
             character->getNameCapital(),
             Formatter::cyan() + ToLower(item->getName()) + Formatter::reset(),
             Formatter::cyan() + ToLower(container->getName()) + Formatter::reset());
+    }
+    else
+    {
+        character->sendMsg("What do you want to pick up?\n");
     }
 }
 
@@ -1015,7 +1023,7 @@ void DoOpen(Character * character, std::istream & sArgs)
             exceptions.push_back(character);
             // Send the message inside the room.
             character->room->sendToAll(
-                "%s closes a door.\n",
+                "%s opens a door.\n",
                 exceptions,
                 character->getNameCapital());
         }
@@ -1046,9 +1054,32 @@ void DoOpen(Character * character, std::istream & sArgs)
     }
     else
     {
-        //Item * container = character->findNearbyItem(arguments[0].first, arguments[0].second);
+        Item * container = character->findNearbyItem(arguments[0].first, arguments[0].second);
+        if (container == nullptr)
+        {
+            character->sendMsg("What do you want to open?\n");
+            return; // Skip the rest of the function.
+        }
+        if (HasFlag(container->flags, ItemFlag::Locked))
+        {
+            character->sendMsg("You have first to unlock it.\n");
+            return; // Skip the rest of the function.
+        }
+        if (!HasFlag(container->flags, ItemFlag::Closed))
+        {
+            character->sendMsg("It is already opened.\n");
+            return; // Skip the rest of the function.
+        }
+        ClearFlag(container->flags, ItemFlag::Closed);
+        // Send the message to the character.
+        character->sendMsg("You open %s.\n", container->getName());
+        // Send the message inside the room.
+        character->room->sendToAll(
+            "%s opens %s.\n",
+            { character },
+            character->getNameCapital(),
+            container->getName());
     }
-    return;
 }
 
 void DoClose(Character * character, std::istream & sArgs)
@@ -1158,7 +1189,31 @@ void DoClose(Character * character, std::istream & sArgs)
     }
     else
     {
-        //Item * container = character->findNearbyItem(arguments[0].first, arguments[0].second);
+        Item * container = character->findNearbyItem(arguments[0].first, arguments[0].second);
+        if (container == nullptr)
+        {
+            character->sendMsg("What do you want to close?\n");
+            return; // Skip the rest of the function.
+        }
+        if (HasFlag(container->flags, ItemFlag::Closed))
+        {
+            character->sendMsg("It is already closed.\n");
+            return; // Skip the rest of the function.
+        }
+        if (!HasFlag(container->model->modelFlags, ModelFlag::CanClose))
+        {
+            character->sendMsg("It cannot be closed.\n");
+            return; // Skip the rest of the function.
+        }
+        SetFlag(container->flags, ItemFlag::Closed);
+        // Send the message to the character.
+        character->sendMsg("You close %s.\n", container->getName());
+        // Send the message inside the room.
+        character->room->sendToAll(
+            "%s closes %s.\n",
+            { character },
+            character->getNameCapital(),
+            container->getName());
     }
     return;
 }
@@ -1189,6 +1244,16 @@ void DoPut(Character * character, std::istream & sArgs)
     {
         character->sendMsg("You don't really want to put something inside that body...\n");
         return;
+    }
+    if (HasFlag(container->flags, ItemFlag::Locked))
+    {
+        character->sendMsg("You have first to unlock %s.\n", container->getName());
+        return; // Skip the rest of the function.
+    }
+    if (HasFlag(container->flags, ItemFlag::Closed))
+    {
+        character->sendMsg("You have first to open %s.\n", container->getName());
+        return; // Skip the rest of the function.
     }
 
     // Check if the player wants to put all in the container.
@@ -1310,6 +1375,16 @@ void DoDrink(Character * character, std::istream & sArgs)
 
     ///////////////////////////////////////////////////////////////////////////
     // Execute every necessary checks.
+    if (HasFlag(container->flags, ItemFlag::Locked))
+    {
+        character->sendMsg("You have first to unlock %s.\n", container->getName());
+        return; // Skip the rest of the function.
+    }
+    if (HasFlag(container->flags, ItemFlag::Closed))
+    {
+        character->sendMsg("You have first to open %s.\n", container->getName());
+        return; // Skip the rest of the function.
+    }
     if (container->model->getType() != ModelType::LiquidContainer)
     {
         character->sendMsg("%s is not a container for liquids.\n", container->getNameCapital());
@@ -1390,6 +1465,27 @@ void DoFill(Character * character, std::istream & sArgs)
                 return; // Skip the rest of the function.
             }
         }
+    }
+
+    if (HasFlag(source->flags, ItemFlag::Locked))
+    {
+        character->sendMsg("You have first to unlock %s.\n", source->getName());
+        return; // Skip the rest of the function.
+    }
+    if (HasFlag(source->flags, ItemFlag::Closed))
+    {
+        character->sendMsg("You have first to open %s.\n", source->getName());
+        return; // Skip the rest of the function.
+    }
+    if (HasFlag(container->flags, ItemFlag::Locked))
+    {
+        character->sendMsg("You have first to unlock %s.\n", container->getName());
+        return; // Skip the rest of the function.
+    }
+    if (HasFlag(container->flags, ItemFlag::Closed))
+    {
+        character->sendMsg("You have first to open %s.\n", container->getName());
+        return; // Skip the rest of the function.
     }
 
     // Check if the items are suitable source and container of liquids.
@@ -1513,6 +1609,28 @@ void DoPour(Character * character, std::istream & sArgs)
                 return; // Skip the rest of the function.
             }
         }
+    }
+
+    if (HasFlag(source->flags, ItemFlag::Locked))
+    {
+        character->sendMsg("You have first to unlock %s.\n", source->getName());
+        return; // Skip the rest of the function.
+    }
+    if (HasFlag(source->flags, ItemFlag::Closed))
+    {
+        character->sendMsg("You have first to open %s.\n", source->getName());
+        return; // Skip the rest of the function.
+    }
+
+    if (HasFlag(container->flags, ItemFlag::Locked))
+    {
+        character->sendMsg("You have first to unlock %s.\n", container->getName());
+        return; // Skip the rest of the function.
+    }
+    if (HasFlag(container->flags, ItemFlag::Closed))
+    {
+        character->sendMsg("You have first to open %s.\n", container->getName());
+        return; // Skip the rest of the function.
     }
 
     // Check if the items are suitable source and container of liquids.

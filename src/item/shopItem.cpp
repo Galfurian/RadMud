@@ -152,13 +152,13 @@ std::string ShopItem::lookContent()
         return output;
     }
 
+    output += this->shopKeeper->getNameCapital() + " is currently managing the shop.\n";
     if (content.empty())
     {
         return Formatter::italic() + "There is nothing on sale.\n" + Formatter::reset();
     }
     else
     {
-        output += "Here's what's for sale:\n";
         Table saleTable(shopName);
         saleTable.addColumn("Good", StringAlign::Left);
         saleTable.addColumn("Quantity", StringAlign::Center);
@@ -166,11 +166,14 @@ std::string ShopItem::lookContent()
         saleTable.addColumn("Sell Price", StringAlign::Left);
         for (auto iterator : GroupItems(content))
         {
+            // Retrieve the item.
+            Item * item = iterator.first;
+            // Prepare the row.
             TableRow row;
-            row.push_back(iterator.first->getName());
+            row.push_back(item->getNameCapital());
             row.push_back(ToString(iterator.second));
-            row.push_back(ToString(this->evaluateBuyPrice(iterator.first->model->price)));
-            row.push_back(ToString(this->evaluateSellPrice(iterator.first->model->price)));
+            row.push_back(ToString(this->evaluateBuyPrice(item->model->price)));
+            row.push_back(ToString(this->evaluateSellPrice(item->model->price)));
             // Add the row to the table.
             saleTable.addRow(row);
         }
