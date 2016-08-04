@@ -266,7 +266,7 @@ void DoLook(Character * character, std::istream & sArgs)
         {
             if (character->canSee(target))
             {
-                character->sendMsg(character->getLook(target));
+                character->sendMsg(target->getLook());
                 if (target->canSee(character))
                 {
                     // Notify to other character, that this one are looking at him.
@@ -621,7 +621,7 @@ void DoStatistics(Character * character, std::istream & sArgs)
     msg += Formatter::magenta() + "    Armor Class " + Formatter::reset();
     msg += ToString(player->getArmorClass()) + "\n";
 
-    msg += "You " + player->getHealthCondition() + ".\n";
+    msg += "You " + player->getHealthCondition(true) + ".\n";
     msg += "You " + player->getStaminaCondition() + ".\n";
     msg += "You " + player->getHungerCondition() + ".\n";
     msg += "You " + player->getThirstCondition() + ".\n";

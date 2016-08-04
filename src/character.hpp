@@ -220,9 +220,9 @@ class Character
         unsigned int getMaxHealth(bool withEffects = true) const;
 
         /// @brief Get character condition.
-        /// @param character The target character.
+        /// @param self If the sentence has to be for another character or not.
         /// @return Condition of this character.
-        std::string getHealthCondition(Character * character = nullptr);
+        std::string getHealthCondition(const bool & self = false);
 
         /// @brief Allows to SET the stamina value.
         /// @param value The value to set.
@@ -478,9 +478,8 @@ class Character
         void updateActivatedEffects();
 
         /// @brief Provide a detailed description of the character.
-        /// @param character The target character.
         /// @return A detailed description of the character.
-        std::string getLook(Character * character = nullptr);
+        std::string getLook();
 
         /// @brief Check if the current character can see the target character.
         /// @param target The target character.

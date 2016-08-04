@@ -396,23 +396,22 @@ unsigned int Character::getMaxHealth(bool withEffects) const
     }
 }
 
-string Character::getHealthCondition(Character * character)
+string Character::getHealthCondition(const bool & self)
 {
     string sent_be, sent_have;
     // Determine who is the examined character.
-    if (character != nullptr && character != this)
+    if (self)
+    {
+        sent_be = "are";
+        sent_have = "have";
+    }
+    else
     {
         sent_be = "is";
         sent_have = "has";
     }
-    else
-    {
-        character = this;
-        sent_be = "are";
-        sent_have = "have";
-    }
     // Determine the percentage of current health.
-    auto percent = (100 * character->health) / character->getMaxHealth();
+    auto percent = (100 * this->health) / this->getMaxHealth();
     // Determine the correct description.
     if (percent >= 100) return sent_be + " in perfect health";
     else if (percent >= 90) return sent_be + " slightly scratched";
@@ -797,12 +796,10 @@ Item * Character::findNearbyItem(std::string itemName, int & number)
     return item;
 }
 
-Item * Character::findNearbyTool(
-    const ToolType & toolType,
-    const ItemVector & exceptions,
-    bool searchRoom,
-    bool searchInventory,
-    bool searchEquipment)
+Item * Character::findNearbyTool(const ToolType & toolType, const ItemVector & exceptions,
+bool searchRoom,
+bool searchInventory,
+bool searchEquipment)
 {
     if (searchRoom)
     {
@@ -1295,95 +1292,76 @@ void Character::updateActivatedEffects()
     }
 }
 
-string Character::getLook(Character * character)
+string Character::getLook()
 {
-    string sent_be, sent_pronoun;
-    string output;
-
-    // Determine who is the examined character.
-    if (character != nullptr && character != this)
-    {
-        output = "You look at " + character->getName() + ".\n";
-        sent_be = "is";
-        sent_pronoun = character->getSubjectPronoun();
-    }
-    else
-    {
-        character = this;
-        output = "You give a look at yourself.\n";
-        sent_be = "are";
-        sent_pronoun = "you";
-    }
-
-    Item * head = character->findEquipmentSlotItem(EquipmentSlot::Head);
-    Item * back = character->findEquipmentSlotItem(EquipmentSlot::Back);
-    Item * torso = character->findEquipmentSlotItem(EquipmentSlot::Torso);
-    Item * legs = character->findEquipmentSlotItem(EquipmentSlot::Legs);
-    Item * feet = character->findEquipmentSlotItem(EquipmentSlot::Feet);
-    Item * right = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
-    Item * left = character->findEquipmentSlotItem(EquipmentSlot::LeftHand);
-
+    std::string output = "You look at " + this->getName() + ".\n";
     // Add the condition.
-    output += ToCapitals(sent_pronoun) + getHealthCondition(character);
+    output += ToCapitals(this->getSubjectPronoun()) + " " + this->getHealthCondition() + ".\n";
     // Add the description.
-    output += character->description + "\n";
+    output += this->description + "\n";
     // Add what the target is wearing.
-    output += ToCapitals(sent_pronoun) + " " + sent_be + " wearing:\n";
+    if (equipment.empty())
+    {
+        output += Formatter::italic();
+        output += ToCapitals(this->getSubjectPronoun()) + " is wearing nothing.\n";
+        output += Formatter::reset();
+        return output;
+    }
+    output += ToCapitals(this->getSubjectPronoun()) + " is wearing:\n";
 
     // Equipment Slot : HEAD
-    output += "    " + Formatter::yellow() + "Head" + Formatter::reset() + "       : ";
-    output +=
-        (head != nullptr) ?
-            Formatter::cyan() + head->getNameCapital() : Formatter::gray() + "Nothing";
-    output += Formatter::reset() + ".\n";
+    Item * head = this->findEquipmentSlotItem(EquipmentSlot::Head);
+    if (head)
+    {
+        output += "  " + Formatter::yellow() + "Head" + Formatter::reset() + "       : ";
+        output += Formatter::cyan() + head->getNameCapital() + Formatter::reset() + ".\n";
+    }
     // Equipment Slot : BACK
-    output += "    " + Formatter::yellow() + "Back" + Formatter::reset() + "       : ";
-    output +=
-        (back != nullptr) ?
-            Formatter::cyan() + back->getNameCapital() : Formatter::gray() + "Nothing";
-    output += Formatter::reset() + ".\n";
+    Item * back = this->findEquipmentSlotItem(EquipmentSlot::Back);
+    if (back)
+    {
+        output += "  " + Formatter::yellow() + "Back" + Formatter::reset() + "       : ";
+        output += Formatter::cyan() + back->getNameCapital() + Formatter::reset() + ".\n";
+    }
     // Equipment Slot : TORSO
-    output += "    " + Formatter::yellow() + "Torso" + Formatter::reset() + "      : ";
-    output +=
-        (torso != nullptr) ?
-            Formatter::cyan() + torso->getNameCapital() : Formatter::gray() + "Nothing";
-    output += Formatter::reset() + ".\n";
+    Item * torso = this->findEquipmentSlotItem(EquipmentSlot::Torso);
+    if (torso)
+    {
+        output += "  " + Formatter::yellow() + "Torso" + Formatter::reset() + "      : ";
+        output += Formatter::cyan() + torso->getNameCapital() + Formatter::reset() + ".\n";
+    }
     // Equipment Slot : LEGS
-    output += "    " + Formatter::yellow() + "Legs" + Formatter::reset() + "       : ";
-    output +=
-        (legs != nullptr) ?
-            Formatter::cyan() + legs->getNameCapital() : Formatter::gray() + "Nothing";
-    output += Formatter::reset() + ".\n";
+    Item * legs = this->findEquipmentSlotItem(EquipmentSlot::Legs);
+    if (legs)
+    {
+        output += "  " + Formatter::yellow() + "Legs" + Formatter::reset() + "       : ";
+        output += Formatter::cyan() + legs->getNameCapital() + Formatter::reset() + ".\n";
+    }
     // Equipment Slot : FEET
-    output += "    " + Formatter::yellow() + "Feet" + Formatter::reset() + "       : ";
-    output +=
-        (feet != nullptr) ?
-            Formatter::cyan() + feet->getNameCapital() : Formatter::gray() + "Nothing";
-    output += Formatter::reset() + ".\n";
-
+    Item * feet = this->findEquipmentSlotItem(EquipmentSlot::Feet);
+    if (feet)
+    {
+        output += "  " + Formatter::yellow() + "Feet" + Formatter::reset() + "       : ";
+        output += Formatter::cyan() + feet->getNameCapital() + Formatter::reset() + ".\n";
+    }
     // Print what is wielding.
-    if (right != nullptr)
+    Item * right = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
+    if (right)
     {
         if (HasFlag(right->model->modelFlags, ModelFlag::TwoHand))
         {
-            output += "    " + Formatter::yellow() + "Both Hands" + Formatter::reset() + " : ";
+            output += "  " + Formatter::yellow() + "Both Hands" + Formatter::reset() + " : ";
         }
         else
         {
-            output += "    " + Formatter::yellow() + "Right Hand" + Formatter::reset() + " : ";
+            output += "  " + Formatter::yellow() + "Right Hand" + Formatter::reset() + " : ";
         }
         output += Formatter::cyan() + right->getNameCapital() + Formatter::reset() + ".\n";
     }
-    else
+    Item * left = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
+    if (left)
     {
-        output += "    " + Formatter::yellow() + "Right Hand" + Formatter::reset() + " : "
-            + "Nothing";
-        output += ".\n";
-    }
-
-    if (left != nullptr)
-    {
-        output += "    " + Formatter::yellow() + "Left Hand" + Formatter::reset() + "  : ";
+        output += "  " + Formatter::yellow() + "Left Hand" + Formatter::reset() + "  : ";
         output += Formatter::cyan() + left->getNameCapital() + Formatter::reset() + ".\n";
     }
     return output;
