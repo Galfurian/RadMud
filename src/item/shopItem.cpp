@@ -162,8 +162,9 @@ std::string ShopItem::lookContent()
         Table saleTable(shopName);
         saleTable.addColumn("Good", StringAlign::Left);
         saleTable.addColumn("Quantity", StringAlign::Center);
-        saleTable.addColumn("Buy Price", StringAlign::Left);
-        saleTable.addColumn("Sell Price", StringAlign::Left);
+        saleTable.addColumn("Weight", StringAlign::Center);
+        saleTable.addColumn("Buy", StringAlign::Left);
+        saleTable.addColumn("Sell", StringAlign::Left);
         for (auto iterator : GroupItems(content))
         {
             // Retrieve the item.
@@ -172,8 +173,9 @@ std::string ShopItem::lookContent()
             TableRow row;
             row.push_back(item->getNameCapital());
             row.push_back(ToString(iterator.second));
-            row.push_back(ToString(this->evaluateBuyPrice(item->model->price)));
-            row.push_back(ToString(this->evaluateSellPrice(item->model->price)));
+            row.push_back(ToString(item->getWeight(true)));
+            row.push_back(ToString(this->evaluateBuyPrice(item->getPrice())));
+            row.push_back(ToString(this->evaluateSellPrice(item->getPrice())));
             // Add the row to the table.
             saleTable.addRow(row);
         }

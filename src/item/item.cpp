@@ -367,8 +367,7 @@ unsigned int Item::getWeight(bool withMaterial)
     if (withMaterial)
     {
         // Add the addition weight due to the material.
-        result += static_cast<unsigned int>(static_cast<double>(result / 100)
-            * composition->lightness);
+        result += ((result / 100) * composition->lightness);
     }
     return result;
 }
@@ -789,6 +788,14 @@ std::string Item::getCurrentSlotName()
 ShopItem * Item::toShopItem()
 {
     return static_cast<ShopItem *>(this);
+}
+
+unsigned int Item::getPrice() const
+{
+    unsigned int result = this->model->price;
+    // Add the addition weight due to the material.
+    result += ((result / 100) * composition->worth);
+    return result;
 }
 
 void Item::luaRegister(lua_State * L)

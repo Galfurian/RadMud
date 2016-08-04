@@ -644,9 +644,9 @@ bool LoadMaterial(ResultSet * result)
         material->type = (MaterialType) result->getNextInteger();
         material->name = result->getNextString();
         material->article = result->getNextString();
-        material->worth = result->getNextInteger();
-        material->hardness = result->getNextInteger();
-        material->lightness = result->getNextInteger();
+        material->worth = result->getNextUnsignedInteger();
+        material->hardness = result->getNextUnsignedInteger();
+        material->lightness = result->getNextUnsignedInteger();
         // Check the correctness.
         if (!material->check())
         {

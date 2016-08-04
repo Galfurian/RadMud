@@ -36,11 +36,11 @@ class Material
         /// Material's article.
         std::string article;
         /// Material's value on market.
-        int worth;
+        unsigned int worth;
         /// Material's hardness.
-        int hardness;
+        unsigned int hardness;
         /// Material's lightness.
-        int lightness;
+        unsigned int lightness;
 
         /// @brief Constructor.
         Material();

@@ -1381,11 +1381,13 @@ unsigned int Character::getArmorClass() const
     // 10
     unsigned int result = 10;
     // + ARMOR BONUS
-    for (auto it : equipment)
+    for (auto item : equipment)
     {
-        if (it->model->getType() == ModelType::Armor)
+        if (item->model->getType() == ModelType::Armor)
         {
-            result += it->model->toArmor()->damageAbs;
+            unsigned int damageAbs = item->model->toArmor()->damageAbs;
+            damageAbs += ((damageAbs / 100) * item->composition->hardness);
+            result += damageAbs;
         }
     }
     // + SHIELD BONUS
