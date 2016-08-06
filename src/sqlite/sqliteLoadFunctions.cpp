@@ -137,9 +137,9 @@ bool LoadItem(ResultSet * result)
         int itemVnum = result->getNextInteger();
         int itemModelVnum = result->getNextInteger();
         std::string itemMaker = result->getNextString();
-        int itemCondition = result->getNextInteger();
+        unsigned int itemCondition = result->getNextUnsignedInteger();
         int itemCompositionVnum = result->getNextInteger();
-        int itemQualityValue = result->getNextInteger();
+        unsigned int itemQualityValue = result->getNextUnsignedInteger();
         unsigned int itemFlags = result->getNextUnsignedInteger();
 
         // Check the dynamic attributes.
@@ -158,19 +158,18 @@ bool LoadItem(ResultSet * result)
                 ToString(itemCompositionVnum));
             return false;
         }
-        if (!ItemQualityTest::is_value(itemQualityValue))
+        if (!ItemQuality::isValid(itemQualityValue))
         {
             Logger::log(LogLevel::Error, "Item has wrong quality (%s)", ToString(itemQualityValue));
             return false;
         }
-        ItemQuality itemQuality = ItemQualityTest::convert(itemQualityValue);
         // Set the item values.
         item->vnum = itemVnum;
         item->model = itemModel;
         item->condition = itemCondition;
         item->maker = itemMaker;
         item->composition = itemComposition;
-        item->quality = itemQuality;
+        item->quality = ItemQuality(itemQualityValue);
         item->flags = itemFlags;
         // Check correctness of attributes.
         if (!item->check())
@@ -287,7 +286,7 @@ bool LoadModel(ResultSet * result)
         itemModel->modelFlags = result->getNextUnsignedInteger();
         itemModel->weight = result->getNextUnsignedInteger();
         itemModel->price = result->getNextUnsignedInteger();
-        itemModel->condition = result->getNextInteger();
+        itemModel->condition = result->getNextUnsignedInteger();
         itemModel->decay = result->getNextInteger();
         itemModel->material = static_cast<MaterialType>(result->getNextInteger());
         itemModel->tileSet = result->getNextInteger();

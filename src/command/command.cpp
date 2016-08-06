@@ -60,7 +60,7 @@ void ProcessCommand(Character * character, std::istream & sArgs)
             {
                 continue;
             }
-            if (iterator.level == 1 && !HasFlag(character->flags, CharacterFlag::IsGod))
+            if (!iterator.canUse(character))
             {
                 continue;
             }

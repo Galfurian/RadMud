@@ -354,27 +354,81 @@ typedef enum class MaterialTypes
 // //////////////////////////////////////////////////////////////////
 
 /// The quality of an item.
-typedef enum class ItemQualities
+class ItemQuality
 {
-    /// Disastrous
-    Disastrous,
-    /// Poor
-    Poor,
-    /// Normal
-    Normal,
-    /// Fine
-    Fine,
-    /// Masterful
-    Masterful
-} ItemQuality;
+    public:
+        enum Enum
+        {
+            /// Disastrous
+            Disastrous,
+            /// Poor
+            Poor,
+            /// Normal
+            Normal,
+            /// Fine
+            Fine,
+            /// Masterful
+            Masterful
+        };
 
-/// Tester for ability enums.
-using ItemQualityTest = EnumCheck<ItemQuality,
-ItemQuality::Disastrous,
-ItemQuality::Poor,
-ItemQuality::Normal,
-ItemQuality::Fine,
-ItemQuality::Masterful>;
+        ItemQuality(unsigned int & _quality) :
+                quality()
+        {
+            if (_quality == 0) quality = Disastrous;
+            else if (_quality == 1) quality = Poor;
+            else if (_quality == 2) quality = Normal;
+            else if (_quality == 3) quality = Fine;
+            else if (_quality == 4) quality = Masterful;
+            else quality = Normal;
+        }
+
+        ItemQuality(Enum _quality) :
+                quality(_quality)
+        {
+            // Nothing to do.
+        }
+
+        static bool isValid(const unsigned int & _quality)
+        {
+            return (_quality <= 4);
+        }
+
+        std::string toString() const
+        {
+            if (quality == ItemQuality::Disastrous) return "Disastrous";
+            if (quality == ItemQuality::Poor) return "Poor";
+            if (quality == ItemQuality::Normal) return "Normal";
+            if (quality == ItemQuality::Fine) return "Fine";
+            else return "Masterful";
+        }
+
+        unsigned int toUInt() const
+        {
+            return static_cast<unsigned int>(quality);
+        }
+
+        double getModifier() const
+        {
+            if (quality == ItemQuality::Disastrous) return 0.5;
+            else if (quality == ItemQuality::Poor) return 0.75;
+            else if (quality == ItemQuality::Normal) return 1.0;
+            else if (quality == ItemQuality::Fine) return 1.50;
+            else return 2.00;
+        }
+
+        bool operator==(const ItemQuality::Enum & rhs) const
+        {
+            return quality == rhs;
+        }
+
+        bool operator!=(const ItemQuality::Enum & rhs) const
+        {
+            return quality != rhs;
+        }
+
+    private:
+        Enum quality;
+};
 
 /// Used to determine the flag of the item.
 typedef enum class ItemFlags

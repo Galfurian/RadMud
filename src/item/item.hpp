@@ -58,7 +58,7 @@ class Item
         /// The player that created the item.
         std::string maker;
         /// In which condition is the item.
-        int condition;
+        unsigned int condition;
         /// The composing material of the item.
         Material * composition;
         /// The quality of the item.
@@ -98,8 +98,10 @@ class Item
         /// @brief Destructor - Is a method which is automatically invoked when the object is destroyed.
         virtual ~Item();
 
+        /// @return Provides the type of item.
         virtual ItemType getType() const;
 
+        /// @return Provides a string representing the type of item.
         virtual std::string getTypeName() const;
 
         /// @brief Check the correctness of the item.
@@ -125,6 +127,8 @@ class Item
         /// @return <b>True</b> if the execution goes well,<br><b>False</b> otherwise.
         virtual bool removeOnDB();
 
+        /// @brief Fills the provided table with the information concerning the item.
+        /// @param sheet The table that has to be filled.
         virtual void getSheet(Table & sheet) const;
 
         /// @brief Check if the item has the desired key.
@@ -137,9 +141,11 @@ class Item
         ///         <b>False</b> otherwise.
         bool triggerDecay();
 
+        double getConditionModifier() const;
+
         /// @brief Get the item current condition in text.
         /// @return The condition of the item.
-        std::string getCondition();
+        std::string getConditionDescription();
 
         /// @brief Get the item weight.
         /// @return The weight of just the item.
@@ -235,10 +241,13 @@ class Item
         /// @return The equipment slot name.
         std::string getCurrentSlotName();
 
+        /// @brief Returns the model <b>statically</b> casted to Shop.
         ShopItem * toShopItem();
 
+        /// @brief Returns the model <b>statically</b> casted to Armor.
         ArmorItem * toArmorItem();
 
+        /// Provides the price of the item based on its quality, material and condition.
         unsigned int getPrice() const;
 
         /// @brief Function used to register inside the lua environment the class.
@@ -284,11 +293,3 @@ bool OrderItemByName(Item * first, Item * second);
 /// @param second The second item.
 /// @return <b>True</b> if the first item is lighter then the second.<br><b>False</b> otherwise.
 bool OrderItemByWeight(Item * first, Item * second);
-
-/// @addtogroup EnumToString
-/// @{
-
-/// Return the string describing the quality of an item.
-std::string GetItemQualityName(ItemQuality quality);
-
-///@}

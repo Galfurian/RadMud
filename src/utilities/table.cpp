@@ -136,7 +136,7 @@ void Table::addDivider()
     std::vector<std::string> divider;
     for (auto column : columns)
     {
-        divider.push_back("#");
+        divider.push_back("");
     }
     this->addRow(divider);
 }

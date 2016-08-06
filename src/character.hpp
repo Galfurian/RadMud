@@ -282,8 +282,6 @@ class Character
 
         /// @brief Provides a pointer to the action object associated to this character.
         /// @return A pointer to action.
-        std::shared_ptr<GeneralAction> getAction();
-
         std::shared_ptr<GeneralAction> getAction() const;
 
         /// @brief Provides a pointer to the action at the front position and
@@ -514,6 +512,10 @@ class Character
         /// @return Vector of items.
         ItemVector getActiveWeapons();
 
+        /// @brief Provides a list of characters which are in sight.
+        /// @param targets    The list which will contain the targets.
+        /// @return <b>True</b> if there are targets in sight,<br>
+        ///         <b>False</b> otherwise.
         bool getCharactersInSight(std::vector<Character *> & targets);
 
         /// @brief Given an action, it returns the necessary cooldown.

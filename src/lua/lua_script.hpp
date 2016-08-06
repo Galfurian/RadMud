@@ -43,14 +43,14 @@ class VectorHelper
     public:
         /// @brief Constructor.
         VectorHelper() :
-            vector()
+                vector()
         {
         }
 
         /// @brief Constructor.
         /// @param _vector The vector which has to be wrapped.
         VectorHelper(const std::vector<T> & _vector) :
-            vector(_vector)
+                vector(_vector)
         {
         }
 
@@ -120,7 +120,7 @@ int LuaRandom(int min, int max);
 /// @param vnumMaterial The vnum of the material.
 /// @param intQuality   The initial quality of the item.
 /// @return The newly created item.
-Item * LuaLoadItem(Character * maker, int vnumModel, int vnumMaterial, int intQuality);
+Item * LuaLoadItem(Character * maker, int vnumModel, int vnumMaterial, unsigned int qualityValue);
 
 /// @brief Register in Lua all the functions.
 /// @param L The lua state.

@@ -106,8 +106,10 @@ class Table
         /// @return The number of rows.
         size_t getNumRows();
 
+        /// @brief Adds an empty row as divider.
         void addDivider();
 
+        /// @brief Removes the last row.
         void popRow();
 
     private:

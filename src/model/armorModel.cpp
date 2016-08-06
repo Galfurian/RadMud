@@ -23,7 +23,7 @@
 
 ArmorModel::ArmorModel() :
         size(),
-        damageAbs(),
+        armorClass(),
         allowedAnatomy()
 {
     // Nothing to do.
@@ -61,7 +61,7 @@ bool ArmorModel::setModel(const std::string & source)
         return false;
     }
     this->size = static_cast<ArmorSize>(ToNumber<unsigned int>(functionList[0]));
-    this->damageAbs = ToNumber<unsigned int>(functionList[1]);
+    this->armorClass = ToNumber<unsigned int>(functionList[1]);
     this->allowedAnatomy = ToNumber<unsigned int>(functionList[2]);
     return true;
 }
@@ -74,7 +74,7 @@ void ArmorModel::getSheet(Table & sheet) const
     sheet.addDivider();
     // Set the values.
     sheet.addRow( { "Size", GetArmorSizeName(this->size) });
-    sheet.addRow( { "Damage Absorption", ToString(this->damageAbs) });
+    sheet.addRow( { "Armor Class", ToString(this->armorClass) });
     sheet.addRow( { "Allowed Anatomies", ToString(this->allowedAnatomy) });
 }
 

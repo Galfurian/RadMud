@@ -20,6 +20,7 @@
 #include "item.hpp"
 #include "../mobile.hpp"
 
+/// @brief Holds details about shops.
 class ShopItem: public Item
 {
     public:
@@ -32,6 +33,7 @@ class ShopItem: public Item
         /// The mobile which is managing the shop.
         Mobile * shopKeeper;
 
+        /// @brief Constructor.
         ShopItem();
 
         virtual ~ShopItem();
@@ -54,10 +56,18 @@ class ShopItem: public Item
 
         virtual std::string lookContent();
 
+        /// @brief Allows to set the new shop keeper.
+        /// @param _shopKeeper The new shop keeper.
         void setNewShopKeeper(Mobile * _shopKeeper);
 
     private:
+        /// @brief Applies the buy tax to the given price.
+        /// @param price The original buy price.
+        /// @return The buy price with applied the taxes.
         unsigned int evaluateBuyPrice(const unsigned int & price);
 
+        /// @brief Applies the sell tax to the given price.
+        /// @param price The original sell price.
+        /// @return The sell price with applied the taxes.
         unsigned int evaluateSellPrice(const unsigned int & price);
 };

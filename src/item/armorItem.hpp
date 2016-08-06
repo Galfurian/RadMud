@@ -19,6 +19,7 @@
 
 #include "item.hpp"
 
+/// @brief Holds details about armors.
 class ArmorItem: public Item
 {
     public:
@@ -32,5 +33,7 @@ class ArmorItem: public Item
 
         virtual void getSheet(Table & sheet) const;
 
+        /// Provides the AC of the armor based on its quality, material and condition.
+        /// @return the armor class.
         unsigned int getArmorClass() const;
 };

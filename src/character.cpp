@@ -42,6 +42,8 @@
 #include "action/combat/flee.hpp"
 #include "sqlite/sqliteDbms.hpp"
 
+#include "item/armorItem.hpp"
+
 using namespace std;
 using namespace std::chrono;
 
@@ -558,11 +560,6 @@ bool Character::setNextCombatAction(CombatActionType nextAction)
     return true;
 }
 
-std::shared_ptr<GeneralAction> Character::getAction()
-{
-    return this->actionQueue.front();
-}
-
 std::shared_ptr<GeneralAction> Character::getAction() const
 {
     return this->actionQueue.front();
@@ -858,12 +855,10 @@ bool searchEquipment)
     return nullptr;
 }
 
-bool Character::findNearbyTools(
-    ToolSet tools,
-    ItemVector & foundOnes,
-    bool searchRoom,
-    bool searchInventory,
-    bool searchEquipment)
+bool Character::findNearbyTools(ToolSet tools, ItemVector & foundOnes,
+bool searchRoom,
+bool searchInventory,
+bool searchEquipment)
 {
     // TODO: Prepare a map with key the tool type and as value:
     //  Option A: A bool which determine if the tool has been found.
@@ -1380,35 +1375,16 @@ unsigned int Character::getArmorClass() const
 {
     // 10
     unsigned int result = 10;
+    // + AGILITY MODIFIER
+    result += this->getAbilityModifier(Ability::Agility);
     // + ARMOR BONUS
     for (auto item : equipment)
     {
         if (item->model->getType() == ModelType::Armor)
         {
-            unsigned int damageAbs = item->model->toArmor()->damageAbs;
-            damageAbs += ((damageAbs / 100) * item->composition->hardness);
-            result += damageAbs;
+            result += item->toArmorItem()->getArmorClass();
         }
     }
-    // + SHIELD BONUS
-    Item * rh = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
-    if (rh != nullptr)
-    {
-        if (rh->model->getType() == ModelType::Shield)
-        {
-            result += rh->model->toShield()->parryChance;
-        }
-    }
-    Item * lh = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
-    if (lh != nullptr)
-    {
-        if (lh->model->getType() == ModelType::Shield)
-        {
-            result += lh->model->toShield()->parryChance;
-        }
-    }
-    // + AGILITY MODIFIER
-    result += this->getAbilityModifier(Ability::Agility);
     return result;
 }
 

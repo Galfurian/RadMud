@@ -1,4 +1,4 @@
-/// @file   gods.cpp
+/// @file   god.cpp
 /// @brief  Implements the methods used by <b>gods</b>.
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2014
@@ -345,12 +345,12 @@ void DoItemCreate(Character * character, std::istream & sArgs)
     if (arguments.size() == 3)
     {
         unsigned int itemQualityValue = ToNumber<unsigned int>(arguments[2].first);
-        if (!ItemQualityTest::is_value(itemQualityValue))
+        if (!ItemQuality::isValid(itemQualityValue))
         {
             character->sendMsg("Not a valid quality.\n");
             return;
         }
-        quality = ItemQualityTest::convert(itemQualityValue);
+        quality = ItemQuality(itemQualityValue);
     }
     // Create the item.
     Item * item = itemModel->createItem(character->getName(), material, quality);
@@ -471,7 +471,7 @@ void DoItemInfo(Character * character, std::istream & sArgs)
         }
     }
     // Create a table.
-    Table sheet;
+    Table sheet(item->getNameCapital());
     // Get the sheet.
     item->getSheet(sheet);
     // Show the seet to character.

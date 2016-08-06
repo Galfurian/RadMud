@@ -22,6 +22,7 @@
 #include "../profession.hpp"
 #include "../production.hpp"
 
+/// @brief An action executed by characters when crafting new objects.
 class CraftAction: public GeneralAction
 {
     private:
@@ -36,6 +37,7 @@ class CraftAction: public GeneralAction
 
     public:
         /// @brief Constructor.
+        /// @param _actor       The actor who is doing the action.
         /// @param _production  A pointer to the production to craft.
         /// @param _material    The material of the outcome.
         /// @param _tools       The list of used tools.

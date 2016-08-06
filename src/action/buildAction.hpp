@@ -20,6 +20,7 @@
 
 #include "generalAction.hpp"
 
+/// @brief An action executed by characters during building.
 class BuildAction: public GeneralAction
 {
     private:
@@ -34,6 +35,7 @@ class BuildAction: public GeneralAction
 
     public:
         /// @brief Constructor.
+        /// @param _actor       The actor who is doing the action.
         /// @param _schematics  A pointer to the schematic of the building.
         /// @param _building    A pointer to the item which has to be built.
         /// @param _tools       The list of used tools.

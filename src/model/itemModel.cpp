@@ -79,84 +79,34 @@ ModelType ItemModel::getType() const
     return ModelType::NoType;
 }
 
-///////////////////////////////////////////////////////////
-// CHECKER ////////////////////////////////////////////////
-///////////////////////////////////////////////////////////
-bool ItemModel::check()
+void ItemModel::getSheet(Table & sheet) const
 {
-    assert(vnum > 0);
-    assert(!name.empty());
-    assert(!article.empty());
-    assert(!shortdesc.empty());
-    assert(!keys.empty());
-    assert(!description.empty());
-    assert(modelType != ModelType::NoType);
-    if ((modelType == ModelType::Armor) || (modelType == ModelType::Weapon))
+    // Add the columns.
+    sheet.addColumn("Attribute", StringAlign::Left);
+    sheet.addColumn("Value", StringAlign::Left);
+    // Set the values.
+    sheet.addRow( { "Vnum", ToString(this->vnum) });
+    sheet.addRow( { "Name", this->name });
+    sheet.addRow( { "Article", this->article });
+    sheet.addRow( { "Short Description", this->shortdesc });
+    std::string keyGroup;
+    for (auto it : this->keys)
     {
-        assert(slot != EquipmentSlot::None);
+        keyGroup += " " + it;
     }
-    assert(weight > 0);
-    assert(price > 0);
-    assert(condition > 0);
-    assert(decay > 0);
-    assert(this->material != MaterialType::NoType);
-    assert(tileSet >= 0);
-    assert(tileId >= 0);
-    return true;
+    sheet.addRow( { "Keys", keyGroup });
+    sheet.addRow( { "Description", this->description });
+    sheet.addRow( { "Type", this->getTypeName() });
+    sheet.addRow( { "Slot", GetEquipmentSlotName(this->slot) });
+    sheet.addRow( { "Flags", GetModelFlagString(this->modelFlags) });
+    sheet.addRow( { "Weight", ToString(this->weight) });
+    sheet.addRow( { "Price", ToString(this->price) });
+    sheet.addRow( { "Condition", ToString(this->condition) });
+    sheet.addRow( { "Decay", ToString(this->decay) });
+    sheet.addRow( { "Material", GetMaterialTypeName(this->material) });
+    sheet.addRow( { "Tile", ToString(this->condition) });
+    sheet.addRow( { "Condition", ToString(this->tileSet) + ":" + ToString(this->tileId) });
 }
-
-bool ItemModel::replaceSymbols(
-    std::string & source,
-    Material * itemMaterial,
-    ItemQuality itemQuality)
-{
-    bool modified = false;
-    if (itemMaterial)
-    {
-        modified = true;
-        FindAndReplace(source, "&m", ToLower(itemMaterial->name));
-        FindAndReplace(source, "&M", ToLower(itemMaterial->article + ' ' + itemMaterial->name));
-    }
-    else
-    {
-        FindAndReplace(source, "&m", "");
-        FindAndReplace(source, "&M", "");
-    }
-    if (itemQuality != ItemQuality::Normal)
-    {
-        modified = true;
-        FindAndReplace(source, "&q", " " + ToLower(GetItemQualityName(itemQuality)));
-    }
-    else
-    {
-        FindAndReplace(source, "&q", "");
-    }
-    return modified;
-}
-
-std::string ItemModel::getName(Material * itemMaterial, ItemQuality itemQuality)
-{
-    // Make a copy of the short description.
-    std::string output = shortdesc;
-    // Try to replace the symbols inside the short description.
-    if (!replaceSymbols(output, itemMaterial, itemQuality))
-    {
-        output = article + " " + name;
-    }
-    return output;
-}
-
-std::string ItemModel::getDescription(Material * itemMaterial, ItemQuality itemQuality)
-{
-    // Make a copy of the description.
-    std::string output = description;
-    replaceSymbols(output, itemMaterial, itemQuality);
-    return output;
-}
-
-///////////////////////////////////////////////////////////
-// ITEM CREATION //////////////////////////////////////////
-///////////////////////////////////////////////////////////
 
 Item * ItemModel::createItem(std::string maker, Material * composition, ItemQuality itemQuality)
 {
@@ -220,6 +170,78 @@ Item * ItemModel::createItem(std::string maker, Material * composition, ItemQual
     return newItem;
 }
 
+bool ItemModel::check()
+{
+    assert(vnum > 0);
+    assert(!name.empty());
+    assert(!article.empty());
+    assert(!shortdesc.empty());
+    assert(!keys.empty());
+    assert(!description.empty());
+    assert(modelType != ModelType::NoType);
+    if ((modelType == ModelType::Armor) || (modelType == ModelType::Weapon))
+    {
+        assert(slot != EquipmentSlot::None);
+    }
+    assert(weight > 0);
+    assert(price > 0);
+    assert(condition > 0);
+    assert(decay > 0);
+    assert(this->material != MaterialType::NoType);
+    assert(tileSet >= 0);
+    assert(tileId >= 0);
+    return true;
+}
+
+bool ItemModel::replaceSymbols(
+    std::string & source,
+    Material * itemMaterial,
+    const ItemQuality & itemQuality)
+{
+    bool modified = false;
+    if (itemMaterial)
+    {
+        modified = true;
+        FindAndReplace(source, "&m", ToLower(itemMaterial->name));
+        FindAndReplace(source, "&M", ToLower(itemMaterial->article + ' ' + itemMaterial->name));
+    }
+    else
+    {
+        FindAndReplace(source, "&m", "");
+        FindAndReplace(source, "&M", "");
+    }
+    if (itemQuality != ItemQuality::Normal)
+    {
+        modified = true;
+        FindAndReplace(source, "&q", " " + ToLower(itemQuality.toString()));
+    }
+    else
+    {
+        FindAndReplace(source, "&q", "");
+    }
+    return modified;
+}
+
+std::string ItemModel::getName(Material * itemMaterial, const ItemQuality & itemQuality)
+{
+    // Make a copy of the short description.
+    std::string output = shortdesc;
+    // Try to replace the symbols inside the short description.
+    if (!replaceSymbols(output, itemMaterial, itemQuality))
+    {
+        output = article + " " + name;
+    }
+    return output;
+}
+
+std::string ItemModel::getDescription(Material * itemMaterial, const ItemQuality & itemQuality)
+{
+    // Make a copy of the description.
+    std::string output = description;
+    replaceSymbols(output, itemMaterial, itemQuality);
+    return output;
+}
+
 bool ItemModel::mustBeWielded()
 {
     return ((slot == EquipmentSlot::RightHand) || (slot == EquipmentSlot::LeftHand));
@@ -260,35 +282,6 @@ std::string ItemModel::getTile(int offset)
             return "i";
         }
     }
-}
-
-void ItemModel::getSheet(Table & sheet) const
-{
-    // Add the columns.
-    sheet.addColumn("Attribute", StringAlign::Left);
-    sheet.addColumn("Value", StringAlign::Left);
-    // Set the values.
-    sheet.addRow( { "Vnum", ToString(this->vnum) });
-    sheet.addRow( { "Name", this->name });
-    sheet.addRow( { "Article", this->article });
-    sheet.addRow( { "Short Description", this->shortdesc });
-    std::string keyGroup;
-    for (auto it : this->keys)
-    {
-        keyGroup += " " + it;
-    }
-    sheet.addRow( { "Keys", keyGroup });
-    sheet.addRow( { "Description", this->description });
-    sheet.addRow( { "Type", this->getTypeName() });
-    sheet.addRow( { "Slot", GetEquipmentSlotName(this->slot) });
-    sheet.addRow( { "Flags", GetModelFlagString(this->modelFlags) });
-    sheet.addRow( { "Weight", ToString(this->weight) });
-    sheet.addRow( { "Price", ToString(this->price) });
-    sheet.addRow( { "Condition", ToString(this->condition) });
-    sheet.addRow( { "Decay", ToString(this->decay) });
-    sheet.addRow( { "Material", GetMaterialTypeName(this->material) });
-    sheet.addRow( { "Tile", ToString(this->condition) });
-    sheet.addRow( { "Condition", ToString(this->tileSet) + ":" + ToString(this->tileId) });
 }
 
 ArmorModel * ItemModel::toArmor()

@@ -180,7 +180,7 @@ bool Item::createOnDB()
     arguments.push_back(this->maker);
     arguments.push_back(ToString(this->condition));
     arguments.push_back(ToString(this->composition->vnum));
-    arguments.push_back(EnumToString(this->quality));
+    arguments.push_back(ToString(this->quality.toUInt()));
     arguments.push_back(ToString(this->flags));
     if (SQLiteDbms::instance().insertInto("Item", arguments))
     {
@@ -207,7 +207,7 @@ bool Item::updateOnDB()
         value.push_back(std::make_pair("maker", maker));
         value.push_back(std::make_pair("condition", ToString(condition)));
         value.push_back(std::make_pair("composition", ToString(composition->vnum)));
-        value.push_back(std::make_pair("quality", EnumToString(quality)));
+        value.push_back(std::make_pair("quality", ToString(quality.toUInt())));
         value.push_back(std::make_pair("flag", ToString(flags)));
         QueryList where;
         where.push_back(std::make_pair("vnum", ToString(vnum)));
@@ -333,7 +333,7 @@ void Item::getSheet(Table & sheet) const
     sheet.addRow( { "maker", maker });
     sheet.addRow( { "condition", ToString(condition) });
     sheet.addRow( { "Material", composition->name });
-    sheet.addRow( { "Quality", GetItemQualityName(quality) });
+    sheet.addRow( { "Quality", quality.toString() });
     sheet.addRow( { "Flags", ToString(flags) });
     if (room) sheet.addRow( { "Location", room->name });
     if (owner) sheet.addRow( { "Location", owner->getNameCapital() });
@@ -386,14 +386,23 @@ bool Item::triggerDecay()
     return false;
 }
 
-std::string Item::getCondition()
+double Item::getConditionModifier() const
 {
-    auto percent = (100 * this->condition) / model->condition;
+    auto percent = ((100 * this->condition) / model->condition);
+    if (percent >= 75) return 1.00;
+    else if (percent >= 50) return 0.75;
+    else if (percent >= 25) return 0.50;
+    else return 0.25;
+}
+
+std::string Item::getConditionDescription()
+{
+    auto percent = ((100 * this->condition) / model->condition);
     if (percent >= 100) return "is in perfect condition";
     else if (percent >= 75) return "is scratched";
     else if (percent >= 50) return "is ruined";
     else if (percent >= 25) return "is cracked";
-    else if (percent >= 0) return "is almost broken";
+    else if (percent > 0) return "is almost broken";
     else return "is broken";
 }
 
@@ -457,7 +466,7 @@ std::string Item::getLook()
     // Prepare : Name, Condition.
     //           Description.
     output = "You look at " + Formatter::cyan() + this->getName() + Formatter::reset();
-    output += ", it " + this->getCondition() + ".\n";
+    output += ", it " + this->getConditionDescription() + ".\n";
     output += Formatter::gray() + this->getDescription() + Formatter::reset() + "\n";
     output += "\n";
     // Print the content.
@@ -837,8 +846,11 @@ ArmorItem * Item::toArmorItem()
 
 unsigned int Item::getPrice() const
 {
-    unsigned int result = this->model->price;
-    // Add the addition weight due to the material.
+    // The resulting price.
+    unsigned int result = 0;
+    // Add the base item price.
+    result += this->model->price;
+    // Increase the price based on the material.
     result += ((result / 100) * composition->worth);
     return result;
 }
@@ -853,7 +865,6 @@ void Item::luaRegister(lua_State * L)
     .addData("maker", &Item::maker) //
     .addData("condition", &Item::condition) //
     .addData("composition", &Item::composition) //
-    .addData("quality", &Item::quality) //
     .addData("room", &Item::room) //
     .addData("owner", &Item::owner) //
     .addData("container", &Item::container) //
@@ -905,15 +916,4 @@ bool OrderItemByName(Item * first, Item * second)
 bool OrderItemByWeight(Item * first, Item * second)
 {
     return first->getTotalWeight() < second->getTotalWeight();
-}
-
-std::string GetItemQualityName(ItemQuality quality)
-{
-    if (quality == ItemQuality::Disastrous) return "Disastrous";
-    if (quality == ItemQuality::Poor) return "Poor";
-    if (quality == ItemQuality::Normal) return "Normal";
-    if (quality == ItemQuality::Fine) return "Fine";
-    if (quality == ItemQuality::Masterful) return "Masterful";
-    if (quality == ItemQuality::Fine) return "Fine";
-    return "No Quality";
 }

@@ -20,6 +20,7 @@
 
 #include "generalAction.hpp"
 
+/// @brief An action which allows to move characters.
 class MoveAction: public GeneralAction
 {
     private:
@@ -30,6 +31,7 @@ class MoveAction: public GeneralAction
 
     public:
         /// @brief Constructor.
+        /// @param _actor       The actor who is doing the action.
         /// @param _destination The destionation of the movement.
         /// @param _direction   The direction of the movement.
         /// @param _cooldown    How many seconds are required to complete the movement.

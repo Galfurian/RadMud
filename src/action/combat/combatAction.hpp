@@ -31,11 +31,12 @@ typedef enum class CombatActionTypes
     Flee
 } CombatActionType;
 
+/// @brief An action executed by characters when fighting.
 class CombatAction: public GeneralAction
 {
     public:
         /// @brief Constructor.
-        /// @param _cooldown    How many seconds are required to complete the movement.
+        /// @param _actor The actor who is doing the action.
         CombatAction(Character * _actor);
 
         /// @brief Destructor.

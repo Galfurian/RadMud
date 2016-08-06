@@ -60,6 +60,9 @@ class Command
         {
         }
 
+        /// @brief Checks if the provided character can use the command.
+        /// @return <b>True</b> if the character can use the command,<br>
+        ///         <b>False</b> otherwise.
         bool canUse(Character * character) const
         {
             if (this->level == 1)

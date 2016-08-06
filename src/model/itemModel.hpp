@@ -150,7 +150,7 @@ class ItemModel
         /// The model price.
         unsigned int price;
         /// The model maximum condition.
-        int condition;
+        unsigned int condition;
         /// The model maximum condition.
         int decay;
         /// The model's material.
@@ -191,6 +191,20 @@ class ItemModel
         ///         <b>False</b> otherwise.
         virtual bool setModel(const std::string & source) = 0;
 
+        /// @brief Fills the provided table with the information concerning the model.
+        /// @param sheet The table that has to be filled.
+        virtual void getSheet(Table & sheet) const;
+
+        /// @brief Create a new item starting from this model.
+        /// @param maker       The player that create the item.
+        /// @param composition The composition of the item.
+        /// @param itemQuality The quality of the item.
+        /// @return The newly created item.
+        virtual Item * createItem(
+            std::string maker,
+            Material * composition,
+            ItemQuality itemQuality);
+
         /// @brief Check the correctness of the model.
         /// @return <b>True</b> if the model has correct values,<br>
         ///         <b>False</b> otherwise.
@@ -206,31 +220,22 @@ class ItemModel
         bool replaceSymbols(
             std::string & source,
             Material * itemMaterial = nullptr,
-            ItemQuality itemQuality = ItemQuality::Normal);
+            const ItemQuality & itemQuality = ItemQuality::Normal);
 
         /// @brief Returns the name of the model depending on the passed arguments.
         /// @param itemMaterial The material of which the model is made.
         /// @param itemQuality  The quality of the model.
         /// @return The specific name of the model.
-        std::string getName(Material * itemMaterial = nullptr, ItemQuality itemQuality =
+        std::string getName(Material * itemMaterial = nullptr, const ItemQuality & itemQuality =
             ItemQuality::Normal);
 
         /// @brief Returns the description of the model depending on the passed arguments.
         /// @param itemMaterial The material of which the model is made.
         /// @param itemQuality  The quality of the model.
         /// @return The specific description of the model.
-        std::string getDescription(Material * itemMaterial = nullptr, ItemQuality itemQuality =
-            ItemQuality::Normal);
-
-        /// @brief Create a new item starting from this model.
-        /// @param maker       The player that create the item.
-        /// @param composition The composition of the item.
-        /// @param itemQuality The quality of the item.
-        /// @return The newly created item.
-        virtual Item * createItem(
-            std::string maker,
-            Material * composition,
-            ItemQuality itemQuality);
+        std::string getDescription(
+            Material * itemMaterial = nullptr,
+            const ItemQuality & itemQuality = ItemQuality::Normal);
 
         /// @brief Check if the item must be wielded.
         /// @return <b>True</b> if the item must be wielded,<br><b>False</b> Otherwise.
@@ -243,8 +248,6 @@ class ItemModel
         /// @brief Returns the tile of the model.
         /// @return The string which contains the code of the tile.
         std::string getTile(int offset = 0);
-
-        virtual void getSheet(Table & sheet) const;
 
     public:
         /// @brief Returns the model <b>statically</b> casted to Armor.

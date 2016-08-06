@@ -42,32 +42,20 @@ void ArmorItem::getSheet(Table & sheet) const
 
 unsigned int ArmorItem::getArmorClass() const
 {
-    // The armor model.
-    ArmorModel * armorModel = this->model->toArmor();
+    // Add the base armor class.
+    auto acBase = this->model->toArmor()->armorClass;
+    // Evaluate the modifier due to item's quality.
+    auto acQuality = static_cast<unsigned int>(acBase * quality.getModifier());
+    // Evaluate the modifier due to item's condition.
+    auto acCondition = static_cast<unsigned int>(acBase * this->getConditionModifier());
+    // Evaluate the modifier due to item's material.
+    auto acMaterial = static_cast<unsigned int>(acBase * this->composition->getHardnessModifier());
+    Logger::log(LogLevel::Debug, "acBase      : %s", ToString(acBase));
+    Logger::log(LogLevel::Debug, "acQuality   : %s", ToString(acQuality));
+    Logger::log(LogLevel::Debug, "acCondition : %s", ToString(acCondition));
+    Logger::log(LogLevel::Debug, "Material    : %s", ToString(acMaterial));
     // The resulting armor class.
-    unsigned int result = 0;
-    // Add the damage absorption.
-    result += armorModel->damageAbs;
-    // Add the material's hardness.
-    // TODO: Need to be fixed, base value of damage abs is too low.
-    result += static_cast<unsigned int>(static_cast<double>(armorModel->damageAbs / 100)
-        * this->composition->hardness);
-    // Modify based on the item's quality.
-    if (this->quality == ItemQuality::Disastrous)
-    {
-        result = static_cast<unsigned int>(result * 0.5);
-    }
-    else if (this->quality == ItemQuality::Poor)
-    {
-        result = static_cast<unsigned int>(result * 0.75);
-    }
-    else if (this->quality == ItemQuality::Fine)
-    {
-        result = static_cast<unsigned int>(result * 1.25);
-    }
-    else if (this->quality == ItemQuality::Masterful)
-    {
-        result = static_cast<unsigned int>(result * 1.50);
-    }
+    unsigned int result = ((acBase + acQuality + acCondition + acMaterial) / 4);
+    Logger::log(LogLevel::Debug, "Result      : %s", ToString(result));
     return result;
 }

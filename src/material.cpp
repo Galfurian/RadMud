@@ -55,6 +55,11 @@ bool Material::check()
     return true;
 }
 
+double Material::getHardnessModifier() const
+{
+    return 1 + (0.25 * (this->hardness / 5));
+}
+
 void Material::luaRegister(lua_State * L)
 {
     luabridge::getGlobalNamespace(L) //

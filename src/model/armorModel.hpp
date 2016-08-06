@@ -39,8 +39,8 @@ class ArmorModel: public ItemModel
     public:
         /// The size of the armor.
         ArmorSize size;
-        /// The damage absorption of the armor.
-        unsigned int damageAbs;
+        /// The Armor Class (AC).
+        unsigned int armorClass;
         /// The anatomy which a character must have in order to wear this armor.
         unsigned int allowedAnatomy;
 
