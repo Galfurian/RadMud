@@ -47,6 +47,10 @@
 #include "vehicleModel.hpp"
 #include "weaponModel.hpp"
 
+#include "../item/armorItem.hpp"
+#include "../item/shopItem.hpp"
+#include "../item/weaponItem.hpp"
+
 using namespace std;
 
 ItemModel::ItemModel() :
@@ -56,7 +60,6 @@ ItemModel::ItemModel() :
         shortdesc(),
         keys(),
         description(),
-        modelType(),
         slot(),
         modelFlags(),
         weight(),
@@ -112,9 +115,16 @@ void ItemModel::getSheet(Table & sheet) const
 Item * ItemModel::createItem(std::string maker, Material * composition, ItemQuality itemQuality)
 {
     // Instantiate the new item.
-    Item * newItem = new Item();
+    Item * newItem = GenerateItem(this->getType());
+    if (newItem == nullptr)
+    {
+        Logger::log(LogLevel::Error, "Cannot create the new item.");
+        // Return pointer to nothing.
+        return nullptr;
+    }
+
     // If the new item is a corpse, don't use the normal item's vnum.
-    if (this->modelType == ModelType::Corpse)
+    if (this->getType() == ModelType::Corpse)
     {
         newItem->vnum = Mud::instance().getMinVnumCorpse() - 1;
     }
@@ -122,11 +132,15 @@ Item * ItemModel::createItem(std::string maker, Material * composition, ItemQual
     {
         newItem->vnum = Mud::instance().getMaxVnumItem() + 1;
     }
+
+    // First set: Model, Maker, Composition, Quality.
     newItem->model = this;
     newItem->maker = maker;
-    newItem->condition = condition;
     newItem->composition = composition;
     newItem->quality = itemQuality;
+
+    // Then set the rest.
+    newItem->condition = newItem->getMaxCondition();
     newItem->flags = 0;
     newItem->room = nullptr;
     newItem->owner = nullptr;
@@ -136,7 +150,7 @@ Item * ItemModel::createItem(std::string maker, Material * composition, ItemQual
     newItem->contentLiq = LiquidContent();
 
     // If the newly created item is a corpse, return it and don't save it on DB.
-    if (this->modelType == ModelType::Corpse)
+    if (this->getType() == ModelType::Corpse)
     {
         Mud::instance().addCorpse(newItem);
         return newItem;
@@ -179,8 +193,7 @@ bool ItemModel::check()
     assert(!shortdesc.empty());
     assert(!keys.empty());
     assert(!description.empty());
-    assert(modelType != ModelType::NoType);
-    if ((modelType == ModelType::Armor) || (modelType == ModelType::Weapon))
+    if ((this->getType() == ModelType::Armor) || (this->getType() == ModelType::Weapon))
     {
         assert(slot != EquipmentSlot::None);
     }
@@ -253,11 +266,11 @@ void ItemModel::luaRegister(lua_State * L)
     luabridge::getGlobalNamespace(L) //
     .beginClass<ItemModel>("ItemModel") //
     .addData("vnum", &ItemModel::vnum) //
-    .addData("type", &ItemModel::modelType) //
     .addData("weight", &ItemModel::weight) //
     .addData("price", &ItemModel::price) //
     .addData("condition", &ItemModel::condition) //
     .addData("decay", &ItemModel::decay) //
+    .addFunction("getType", &ItemModel::getType) //
     .endClass();
 }
 
@@ -270,11 +283,11 @@ std::string ItemModel::getTile(int offset)
     else
     {
         // TODO: Too easy this way.
-        if (modelType == ModelType::Armor)
+        if (this->getType() == ModelType::Armor)
         {
             return "a";
         }
-        else if (modelType == ModelType::Weapon)
+        else if (this->getType() == ModelType::Weapon)
         {
             return "w";
         }
@@ -388,6 +401,59 @@ VehicleModel * ItemModel::toVehicle()
 WeaponModel * ItemModel::toWeapon()
 {
     return static_cast<WeaponModel *>(this);
+}
+
+ItemModel * GenerateModel(const ModelType & type)
+{
+    switch (type)
+    {
+        case ModelType::Corpse:
+            return new CorpseModel();
+        case ModelType::Armor:
+            return new ArmorModel();
+        case ModelType::Book:
+            return new BookModel();
+        case ModelType::Container:
+            return new ContainerModel();
+        case ModelType::Currency:
+            return new CurrencyModel();
+        case ModelType::Food:
+            return new FoodModel();
+        case ModelType::Furniture:
+            return new FurnitureModel();
+        case ModelType::Key:
+            return new KeyModel();
+        case ModelType::Light:
+            return new LightModel();
+        case ModelType::LiquidContainer:
+            return new LiquidContainerModel();
+        case ModelType::Mechanism:
+            return new MechanismModel();
+        case ModelType::Node:
+            return new NodeModel();
+        case ModelType::Projectile:
+            return new ProjectileModel();
+        case ModelType::Resource:
+            return new ResourceModel();
+        case ModelType::Rope:
+            return new RopeModel();
+        case ModelType::Seed:
+            return new SeedModel();
+        case ModelType::Shield:
+            return new ShieldModel();
+        case ModelType::Shop:
+            return new ShopModel();
+        case ModelType::Tool:
+            return new ToolModel();
+        case ModelType::Vehicle:
+            return new VehicleModel();
+        case ModelType::Weapon:
+            return new WeaponModel();
+        case ModelType::NoType:
+            return nullptr;
+        default:
+            return nullptr;
+    }
 }
 
 std::string GetModelFlagString(unsigned int flags)

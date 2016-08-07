@@ -140,8 +140,6 @@ class ItemModel
         std::vector<std::string> keys;
         /// The model description.
         std::string description;
-        /// The model type.
-        ModelType modelType;
         /// Store here the position where the model can be equipped.
         EquipmentSlot slot;
         /// The model flags.
@@ -201,7 +199,7 @@ class ItemModel
         /// @param composition The composition of the item.
         /// @param itemQuality The quality of the item.
         /// @return The newly created item.
-        virtual Item * createItem(
+        Item * createItem(
             std::string maker,
             Material * composition,
             ItemQuality itemQuality);
@@ -294,6 +292,8 @@ class ItemModel
         /// @brief Returns the model <b>statically</b> casted to Weapon.
         WeaponModel * toWeapon();
 };
+
+ItemModel * GenerateModel(const ModelType & type);
 
 /// ItemModel vector handler.
 typedef std::vector<ItemModel *> ItemModelList;

@@ -36,6 +36,7 @@
 
 #include "shopItem.hpp"
 #include "armorItem.hpp"
+#include "weaponItem.hpp"
 
 Item::Item() :
         vnum(),
@@ -913,6 +914,11 @@ ArmorItem * Item::toArmorItem()
     return static_cast<ArmorItem *>(this);
 }
 
+WeaponItem * Item::toWeaponItem()
+{
+    return static_cast<WeaponItem *>(this);
+}
+
 void Item::luaRegister(lua_State * L)
 {
     luabridge::getGlobalNamespace(L) //
@@ -935,6 +941,42 @@ bool Item::operator<(Item & rhs) const
 {
     Logger::log(LogLevel::Debug, "%s < %s", ToString(this->vnum), ToString(rhs.vnum));
     return getName() < rhs.getName();
+}
+
+Item * GenerateItem(const ModelType & type)
+{
+    switch (type)
+    {
+        case ModelType::Armor:
+            return new ArmorItem();
+        case ModelType::Shop:
+            return new ShopItem();
+        case ModelType::Weapon:
+            return new WeaponItem();
+        case ModelType::Corpse:
+        case ModelType::Book:
+        case ModelType::Container:
+        case ModelType::Currency:
+        case ModelType::Food:
+        case ModelType::Furniture:
+        case ModelType::Key:
+        case ModelType::Light:
+        case ModelType::LiquidContainer:
+        case ModelType::Mechanism:
+        case ModelType::Node:
+        case ModelType::Projectile:
+        case ModelType::Resource:
+        case ModelType::Rope:
+        case ModelType::Seed:
+        case ModelType::Shield:
+        case ModelType::Tool:
+        case ModelType::Vehicle:
+            return new Item();
+        case ModelType::NoType:
+            return nullptr;
+        default:
+            return nullptr;
+    }
 }
 
 ItemVectorNumbered GroupItems(const ItemVector & items)

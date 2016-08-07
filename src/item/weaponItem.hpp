@@ -1,7 +1,6 @@
-/// @file   weaponModel.hpp
-/// @brief  Define variables and methods of Weapon.
+/// @file   weaponItem.hpp
 /// @author Enrico Fraccaroli
-/// @date   Jul 6 2016
+/// @date   Aug 04 2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission to use, copy, modify, and distribute this software for any
@@ -18,24 +17,27 @@
 
 #pragma once
 
-#include "itemModel.hpp"
+#include "item.hpp"
 
-/// @brief Model of a weapon.
-class ShopModel: public ItemModel
+/// @brief Holds details about armors.
+class WeaponItem: public Item
 {
     public:
-        /// The maximum weight which this shop can carry.
-        unsigned int maxWeight;
+        WeaponItem();
 
-        ShopModel();
+        virtual ~WeaponItem();
 
-        virtual ~ShopModel();
-
-        virtual ModelType getType() const;
+        virtual ItemType getType() const;
 
         virtual std::string getTypeName() const;
 
-        virtual bool setModel(const std::string & source);
-
         virtual void getSheet(Table & sheet) const;
+
+        unsigned int rollDamage() const;
+
+        unsigned int getMinDamage() const;
+
+        unsigned int getMaxDamage() const;
+
+        unsigned int getRange() const;
 };

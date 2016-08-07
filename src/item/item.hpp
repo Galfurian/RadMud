@@ -34,6 +34,7 @@ class Material;
 
 class ShopItem;
 class ArmorItem;
+class WeaponItem;
 
 /// Used to determine the type of item.
 typedef enum class ItemTypes
@@ -42,7 +43,9 @@ typedef enum class ItemTypes
     /// A shop.
     Shop,
     /// An armor.
-    Armor
+    Armor,
+    /// A weapon.
+    Weapon
 } ItemType;
 
 /// @brief Holds details about items.
@@ -255,6 +258,9 @@ class Item
         /// @brief Returns the model <b>statically</b> casted to Armor.
         ArmorItem * toArmorItem();
 
+        /// @brief Returns the model <b>statically</b> casted to Weapon.
+        WeaponItem * toWeaponItem();
+
         /// @brief Function used to register inside the lua environment the class.
         /// @param L The lua environment.
         static void luaRegister(lua_State * L);
@@ -262,6 +268,8 @@ class Item
         /// @brief Operator used to order the items based on their name.
         bool operator<(Item & rhs) const;
 };
+
+Item * GenerateItem(const ModelType & type);
 
 /// Vector of items.
 typedef std::vector<Item *> ItemVector;

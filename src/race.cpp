@@ -57,7 +57,6 @@ void Race::initializeCorpse(const std::string & corpseDescription)
     corpse.keys.push_back("corpse");
     corpse.keys.push_back(name);
     corpse.description = corpseDescription;
-    corpse.modelType = ModelType::Corpse;
     corpse.slot = EquipmentSlot::None;
     corpse.modelFlags = 0;
     corpse.weight = 50;

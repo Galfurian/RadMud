@@ -509,7 +509,7 @@ class Character
 
         /// @brief Provides the list of active weapons (Left and Right hands).
         /// @return Vector of items.
-        ItemVector getActiveWeapons();
+        std::vector<WeaponItem *> getActiveWeapons();
 
         /// @brief Provides a list of characters which are in sight.
         /// @param targets    The list which will contain the targets.

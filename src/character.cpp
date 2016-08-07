@@ -1431,15 +1431,15 @@ Character * Character::getNextOpponentAtRange(const unsigned int & range) const
     return nullptr;
 }
 
-ItemVector Character::getActiveWeapons()
+std::vector<WeaponItem *> Character::getActiveWeapons()
 {
-    ItemVector ret;
+    std::vector<WeaponItem *> ret;
     if (this->canAttackWith(EquipmentSlot::RightHand))
     {
         Item * weapon = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
         if (weapon != nullptr)
         {
-            ret.push_back(weapon);
+            ret.push_back(weapon->toWeaponItem());
         }
     }
     if (this->canAttackWith(EquipmentSlot::LeftHand))
@@ -1447,7 +1447,7 @@ ItemVector Character::getActiveWeapons()
         Item * weapon = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
         if (weapon != nullptr)
         {
-            ret.push_back(weapon);
+            ret.push_back(weapon->toWeaponItem());
         }
     }
     return ret;

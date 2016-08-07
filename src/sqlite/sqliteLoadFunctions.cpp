@@ -45,6 +45,7 @@
 
 #include "../item/shopItem.hpp"
 #include "../item/armorItem.hpp"
+#include "../item/weaponItem.hpp"
 
 bool LoadBadName(ResultSet * result)
 {
@@ -117,21 +118,6 @@ bool LoadItem(ResultSet * result)
 {
     while (result->next())
     {
-        // Retrieve the model vnum.
-        ItemModel * model = Mud::instance().findItemModel(result->getDataInteger(1));
-        Item * item;
-        if (model->getType() == ModelType::Shop)
-        {
-            item = new ShopItem();
-        }
-        else if (model->getType() == ModelType::Armor)
-        {
-            item = new ArmorItem();
-        }
-        else
-        {
-            item = new Item();
-        }
         // Retrieve the values.
         int itemVnum = result->getNextInteger();
         int itemModelVnum = result->getNextInteger();
@@ -141,13 +127,14 @@ bool LoadItem(ResultSet * result)
         unsigned int itemQualityValue = result->getNextUnsignedInteger();
         unsigned int itemFlags = result->getNextUnsignedInteger();
 
-        // Check the dynamic attributes.
+        // Retrieve the model vnum.
         ItemModel * itemModel = Mud::instance().findItemModel(itemModelVnum);
         if (itemModel == nullptr)
         {
             Logger::log(LogLevel::Error, "Item has wrong model (%s)", ToString(itemModelVnum));
             return false;
         }
+        // Check the dynamic attributes.
         Material * itemComposition = Mud::instance().findMaterial(itemCompositionVnum);
         if (itemComposition == nullptr)
         {
@@ -163,6 +150,7 @@ bool LoadItem(ResultSet * result)
             return false;
         }
         // Set the item values.
+        Item * item = GenerateItem(itemModel->getType());
         item->vnum = itemVnum;
         item->model = itemModel;
         item->condition = itemCondition;
@@ -246,36 +234,15 @@ bool LoadModel(ResultSet * result)
         int vnum = result->getNextInteger();
         ModelType type = static_cast<ModelType>(result->getNextInteger());
         // Create a pointer to the new item model.
-        ItemModel * itemModel;
-        // Call the contructor for the right type of model.
-        if (type == ModelType::Armor) itemModel = new ArmorModel();
-        else if (type == ModelType::Book) itemModel = new BookModel();
-        else if (type == ModelType::Container) itemModel = new ContainerModel();
-        else if (type == ModelType::Currency) itemModel = new CurrencyModel();
-        else if (type == ModelType::Food) itemModel = new FoodModel();
-        else if (type == ModelType::Furniture) itemModel = new FurnitureModel();
-        else if (type == ModelType::Key) itemModel = new KeyModel();
-        else if (type == ModelType::Light) itemModel = new LightModel();
-        else if (type == ModelType::LiquidContainer) itemModel = new LiquidContainerModel();
-        else if (type == ModelType::Mechanism) itemModel = new MechanismModel();
-        else if (type == ModelType::Node) itemModel = new NodeModel();
-        else if (type == ModelType::Projectile) itemModel = new ProjectileModel();
-        else if (type == ModelType::Resource) itemModel = new ResourceModel();
-        else if (type == ModelType::Rope) itemModel = new RopeModel();
-        else if (type == ModelType::Seed) itemModel = new SeedModel();
-        else if (type == ModelType::Shield) itemModel = new ShieldModel();
-        else if (type == ModelType::Shop) itemModel = new ShopModel();
-        else if (type == ModelType::Tool) itemModel = new ToolModel();
-        else if (type == ModelType::Vehicle) itemModel = new VehicleModel();
-        else if (type == ModelType::Weapon) itemModel = new WeaponModel();
-        else
+        ItemModel * itemModel = GenerateModel(type);
+        if (itemModel == nullptr)
         {
             Logger::log(LogLevel::Error, "Wrong type of model %s.", ToString(vnum));
             return false;
         }
+
         // Set the values of the new model.
         itemModel->vnum = vnum;
-        itemModel->modelType = type;
         itemModel->name = result->getNextString();
         itemModel->article = result->getNextString();
         itemModel->shortdesc = result->getNextString();
