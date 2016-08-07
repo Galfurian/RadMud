@@ -415,7 +415,7 @@ unsigned int Item::getWeight()
         wgBase = this->customWeight;
     }
     // Evaluate the modifier due to item's quality.
-    auto wgQuality = static_cast<unsigned int>(wgBase * quality.getModifier());
+    auto wgQuality = static_cast<unsigned int>(wgBase * (1 / quality.getModifier()));
     // Evaluate the modifier due to item's material.
     auto wgMaterial = static_cast<unsigned int>(wgBase * this->composition->getLightnessModifier());
     // Evaluate the result.

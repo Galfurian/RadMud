@@ -61,19 +61,16 @@ bool Material::check()
 
 double Material::getWorthModifier() const
 {
-    Logger::log(LogLevel::Debug, "Worth     : %s", ToString(1 + (0.1 * this->worth)));
     return 1 + (0.1 * this->worth);
 }
 
 double Material::getHardnessModifier() const
 {
-    Logger::log(LogLevel::Debug, "Hardness  : %s", ToString(1 + (0.1 * this->hardness)));
     return 1 + (0.1 * this->hardness);
 }
 
 double Material::getLightnessModifier() const
 {
-    Logger::log(LogLevel::Debug, "Lightness : %s", ToString(1 + (0.1 * this->lightness)));
     return 1 + (0.1 * this->lightness);
 }
 
