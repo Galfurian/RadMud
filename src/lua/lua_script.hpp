@@ -118,7 +118,7 @@ int LuaRandom(int min, int max);
 /// @param maker        The maker of the new item.
 /// @param vnumModel    The vnum of the model.
 /// @param vnumMaterial The vnum of the material.
-/// @param intQuality   The initial quality of the item.
+/// @param qualityValue The initial quality of the item.
 /// @return The newly created item.
 Item * LuaLoadItem(Character * maker, int vnumModel, int vnumMaterial, unsigned int qualityValue);
 

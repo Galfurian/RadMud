@@ -330,28 +330,53 @@ void Item::getSheet(Table & sheet) const
     sheet.addRow( { "type", this->getTypeName() });
     sheet.addRow( { "model", model->name });
     sheet.addRow( { "maker", maker });
-    sheet.addRow( { "condition", ToString(condition) });
+    sheet.addRow( { "condition", ToString(condition) + "/" + ToString(this->getMaxCondition()) });
     sheet.addRow( { "Material", composition->name });
     sheet.addRow( { "Quality", quality.toString() });
     sheet.addRow( { "Flags", ToString(flags) });
-    if (room) sheet.addRow( { "Location", room->name });
-    if (owner) sheet.addRow( { "Location", owner->getNameCapital() });
-    if (container) sheet.addRow(
-        { "Location", container->getNameCapital() + " " + ToString(container->vnum) });
+    TableRow locationRow = { "Location" };
+    if (room != nullptr)
+    {
+        locationRow.push_back(room->name);
+    }
+    else if (owner != nullptr)
+    {
+        locationRow.push_back(owner->getNameCapital());
+    }
+    else if (container != nullptr)
+    {
+        locationRow.push_back(container->getNameCapital() + " " + ToString(container->vnum));
+    }
+    else
+    {
+        locationRow.push_back("Nowhere");
+    }
+    sheet.addRow(locationRow);
     sheet.addRow( { "Equipment Slot", GetEquipmentSlotName(currentSlot) });
-    sheet.addDivider();
     if (!content.empty())
     {
+        sheet.addDivider();
         sheet.addRow( { "Content", "Vnum" });
         for (auto iterator : content)
         {
             sheet.addRow( { iterator->getNameCapital(), ToString(iterator->vnum) });
         }
+        sheet.addDivider();
     }
     if (model->getType() == ModelType::LiquidContainer)
     {
+        sheet.addDivider();
         sheet.addRow( { "Liquid", "Quantity" });
         sheet.addRow( { contentLiq.first->getNameCapital(), ToString(contentLiq.second) });
+        sheet.addDivider();
+    }
+    sheet.addRow( { "Weight", ToString(this->getWeight()) });
+    if (this->isAContainer() || (model->getType() == ModelType::LiquidContainer))
+    {
+        sheet.addRow( { "Total Weight", ToString(this->getTotalWeight()) });
+        sheet.addRow( { "Free  Space", ToString(this->getFreeSpace()) });
+        sheet.addRow( { "Used  Space", ToString(this->getUsedSpace()) });
+        sheet.addRow( { "Total Space", ToString(this->getTotalSpace()) });
     }
     if (customWeight != 0)
     {
@@ -375,6 +400,18 @@ bool Item::hasKey(std::string key)
     return false;
 }
 
+unsigned int Item::getMaxCondition() const
+{
+    // Evaluate the base condition.
+    auto cndBase = this->model->condition;
+    // Evaluate the modifier due to item's quality.
+    auto cndQuality = static_cast<unsigned int>(cndBase * quality.getModifier());
+    // Evaluate the modifier due to item's material.
+    auto cndMaterial = static_cast<unsigned int>(cndBase * this->composition->getHardnessModifier());
+    // The resulting price.
+    return ((cndBase + cndQuality + cndMaterial) / 3);
+}
+
 bool Item::triggerDecay()
 {
     condition -= model->decay;
@@ -387,7 +424,7 @@ bool Item::triggerDecay()
 
 double Item::getConditionModifier() const
 {
-    auto percent = ((100 * this->condition) / model->condition);
+    auto percent = ((100 * this->condition) / this->getMaxCondition());
     if (percent >= 75) return 1.00;
     else if (percent >= 50) return 0.75;
     else if (percent >= 25) return 0.50;
@@ -396,7 +433,7 @@ double Item::getConditionModifier() const
 
 std::string Item::getConditionDescription()
 {
-    auto percent = ((100 * this->condition) / model->condition);
+    auto percent = ((100 * this->condition) / this->getMaxCondition());
     if (percent >= 100) return "is in perfect condition";
     else if (percent >= 75) return "is scratched";
     else if (percent >= 50) return "is ruined";
@@ -405,7 +442,21 @@ std::string Item::getConditionDescription()
     else return "is broken";
 }
 
-unsigned int Item::getWeight()
+unsigned int Item::getPrice() const
+{
+    // Add the base price.
+    auto pcBase = this->model->price;
+    // Evaluate the modifier due to item's quality.
+    auto pcQuality = static_cast<unsigned int>(pcBase * quality.getModifier());
+    // Evaluate the modifier due to item's condition.
+    auto pcCondition = static_cast<unsigned int>(pcBase * this->getConditionModifier());
+    // Evaluate the modifier due to item's material.
+    auto pcMaterial = static_cast<unsigned int>(pcBase * this->composition->getWorthModifier());
+    // The resulting price.
+    return ((pcBase + pcQuality + pcCondition + pcMaterial) / 4);
+}
+
+unsigned int Item::getWeight() const
 {
     // Add the base weight.
     auto wgBase = this->model->weight;
@@ -421,7 +472,7 @@ unsigned int Item::getWeight()
     return ((wgBase + wgQuality + wgMaterial) / 3);
 }
 
-unsigned int Item::getTotalWeight()
+unsigned int Item::getTotalWeight() const
 {
     // Add the default weight of the model.
     unsigned int totalWeight = this->getWeight();
@@ -494,7 +545,7 @@ bool Item::hasNodeType(NodeType nodeType)
     return true;
 }
 
-bool Item::isAContainer()
+bool Item::isAContainer() const
 {
     if (model->getType() == ModelType::Container)
     {
@@ -514,7 +565,7 @@ bool Item::isAContainer()
     return false;
 }
 
-bool Item::isEmpty()
+bool Item::isEmpty() const
 {
     if (this->isAContainer())
     {
@@ -530,19 +581,34 @@ bool Item::isEmpty()
     }
 }
 
-unsigned int Item::getTotalSpace()
+unsigned int Item::getTotalSpace() const
 {
     if (model->getType() == ModelType::Container)
     {
-        return model->toContainer()->maxWeight;
+        // Evaluate the base space.
+        auto spBase = model->toContainer()->maxWeight;
+        // Evaluate the modifier due to item's quality.
+        auto spQuality = static_cast<unsigned int>(spBase * quality.getModifier());
+        // Evaluate the result.
+        return ((spBase + spQuality) / 2);
     }
     else if (model->getType() == ModelType::LiquidContainer)
     {
-        return model->toLiquidContainer()->maxWeight;
+        // Evaluate the base space.
+        auto spBase = model->toLiquidContainer()->maxWeight;
+        // Evaluate the modifier due to item's quality.
+        auto spQuality = static_cast<unsigned int>(spBase * quality.getModifier());
+        // Evaluate the result.
+        return ((spBase + spQuality) / 2);
     }
     else if (model->getType() == ModelType::Shop)
     {
-        return model->toShop()->maxWeight;
+        // Evaluate the base space.
+        auto spBase = model->toShop()->maxWeight;
+        // Evaluate the modifier due to item's quality.
+        auto spQuality = static_cast<unsigned int>(spBase * quality.getModifier());
+        // Evaluate the result.
+        return ((spBase + spQuality) / 2);
     }
     else
     {
@@ -550,7 +616,7 @@ unsigned int Item::getTotalSpace()
     }
 }
 
-unsigned int Item::getUsedSpace()
+unsigned int Item::getUsedSpace() const
 {
     unsigned int used = 0;
     if (this->isAContainer())
@@ -570,7 +636,7 @@ unsigned int Item::getUsedSpace()
     return used;
 }
 
-unsigned int Item::getFreeSpace()
+unsigned int Item::getFreeSpace() const
 {
     unsigned int totalSpace = this->getTotalSpace();
     unsigned int usedSpace = this->getUsedSpace();
@@ -842,20 +908,6 @@ ShopItem * Item::toShopItem()
 ArmorItem * Item::toArmorItem()
 {
     return static_cast<ArmorItem *>(this);
-}
-
-unsigned int Item::getPrice() const
-{
-    // Add the base price.
-    auto pcBase = this->model->price;
-    // Evaluate the modifier due to item's quality.
-    auto pcQuality = static_cast<unsigned int>(pcBase * quality.getModifier());
-    // Evaluate the modifier due to item's condition.
-    auto pcCondition = static_cast<unsigned int>(pcBase * this->getConditionModifier());
-    // Evaluate the modifier due to item's material.
-    auto pcMaterial = static_cast<unsigned int>(pcBase * this->composition->getWorthModifier());
-    // The resulting price.
-    return ((pcBase + pcQuality + pcCondition + pcMaterial) / 4);
 }
 
 void Item::luaRegister(lua_State * L)

@@ -205,11 +205,13 @@ class Direction
             else direction = None;
         }
 
+        /// @brief Check is the given number is a valid direction.
         static bool isValid(const unsigned int & _direction)
         {
             return (_direction >= 1) && (_direction <= 6);
         }
 
+        /// @brief Check is the given string is a valid direction.
         static bool isValid(const std::string & _direction)
         {
             if (_direction == "north") return true;
@@ -221,6 +223,7 @@ class Direction
             return false;
         }
 
+        /// @brief Returns the direction as string.
         std::string toString() const
         {
             if (direction == Direction::North) return "north";
@@ -232,6 +235,7 @@ class Direction
             else return "none";
         }
 
+        /// @brief Returns the direction as number.
         unsigned int toUInt() const
         {
             return static_cast<unsigned int>(direction);
@@ -261,22 +265,26 @@ class Direction
             return Coordinates<int>(0, 0, 0);
         }
 
+        /// @brief Equality operator w.r.t. a direction object.
         bool operator==(const Direction & rhs) const
         {
             return direction == rhs.direction;
         }
 
+        /// @brief Equality operator w.r.t. a direction enum.
         bool operator==(const Direction::Enum & rhs) const
         {
             return direction == rhs;
         }
 
+        /// @brief Inequality operator w.r.t. a direction enum.
         bool operator!=(const Direction::Enum & rhs) const
         {
             return direction != rhs;
         }
 
     private:
+        /// Internal direction value.
         Enum direction;
 };
 
@@ -469,6 +477,7 @@ typedef enum class MaterialTypes
 class ItemQuality
 {
     public:
+        /// List of possible quality values.
         enum Enum
         {
             /// Disastrous
@@ -483,6 +492,7 @@ class ItemQuality
             Masterful
         };
 
+        /// @brief Constructor from number.
         ItemQuality(unsigned int & _quality) :
                 quality()
         {
@@ -494,17 +504,20 @@ class ItemQuality
             else quality = Normal;
         }
 
+        /// @brief Constructor from enum.
         ItemQuality(Enum _quality) :
                 quality(_quality)
         {
             // Nothing to do.
         }
 
+        /// @brief Check is the given number is a valid quality.
         static bool isValid(const unsigned int & _quality)
         {
             return (_quality <= 4);
         }
 
+        /// @brief Returns the quality as string.
         std::string toString() const
         {
             if (quality == ItemQuality::Disastrous) return "Disastrous";
@@ -514,11 +527,13 @@ class ItemQuality
             else return "Masterful";
         }
 
+        /// @brief Returns the quality as number.
         unsigned int toUInt() const
         {
             return static_cast<unsigned int>(quality);
         }
 
+        /// @brief Returns the quality modifier.
         double getModifier() const
         {
             if (quality == ItemQuality::Disastrous) return 0.5;
@@ -528,17 +543,20 @@ class ItemQuality
             else return 2.00;
         }
 
+        /// @brief Equality operator w.r.t. a quality enum.
         bool operator==(const ItemQuality::Enum & rhs) const
         {
             return quality == rhs;
         }
 
+        /// @brief Inequality operator w.r.t. a quality enum.
         bool operator!=(const ItemQuality::Enum & rhs) const
         {
             return quality != rhs;
         }
 
     private:
+        /// Internal quality value.
         Enum quality;
 };
 

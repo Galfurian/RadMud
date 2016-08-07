@@ -136,24 +136,32 @@ class Item
         /// @return <b>True</b> if the operations succeeded,<br><b>False</b> Otherwise.
         bool hasKey(std::string key);
 
+        /// @brief Provides the maximum condition of the item, given
+        ///         quality and material.
+        unsigned int getMaxCondition() const;
+
         /// @brief Trigger a decay cycle.
         /// @return <b>True</b> if the item is destroyed,<br>
         ///         <b>False</b> otherwise.
         bool triggerDecay();
 
+        /// @brief Provides the modifier due to the item's condition.
         double getConditionModifier() const;
 
         /// @brief Get the item current condition in text.
         /// @return The condition of the item.
         std::string getConditionDescription();
 
+        /// Provides the price of the item based on its quality, material and condition.
+        unsigned int getPrice() const;
+
         /// @brief Get the item weight.
         /// @return The weight of just the item.
-        unsigned int getWeight();
+        unsigned int getWeight() const;
 
         /// @brief Get the item weight, plus eventually contained item weight.
         /// @return The total weight of the item.
-        unsigned int getTotalWeight();
+        unsigned int getTotalWeight() const;
 
         /// @brief Return the name of the item.
         /// @return The name of the item.
@@ -179,23 +187,23 @@ class Item
         /// @brief Check if the item is a valid container.
         /// @return <b>True</b> if it is a valid container,<br>
         ///         <b>False</b> otherwise.
-        bool isAContainer();
+        bool isAContainer() const;
 
         /// @brief Check if the container is empty.
         /// @return <b>True</b> if the item is empty,<br><b>False</b> otherwise.
-        bool isEmpty();
+        bool isEmpty() const;
 
         /// @brief Return the total space of the container.
         /// @return The total space as an integer.
-        unsigned int getTotalSpace();
+        unsigned int getTotalSpace() const;
 
         /// @brief Return the used space of the container.
         /// @return The used space as an integer.
-        unsigned int getUsedSpace();
+        unsigned int getUsedSpace() const;
 
         /// @brief Return the free space inside the container.
         /// @return The free unit of space as an integer.
-        unsigned int getFreeSpace();
+        unsigned int getFreeSpace() const;
 
         /// @brief Load an item inside the container and update the database.
         /// @param item The item to load in.
@@ -246,9 +254,6 @@ class Item
 
         /// @brief Returns the model <b>statically</b> casted to Armor.
         ArmorItem * toArmorItem();
-
-        /// Provides the price of the item based on its quality, material and condition.
-        unsigned int getPrice() const;
 
         /// @brief Function used to register inside the lua environment the class.
         /// @param L The lua environment.

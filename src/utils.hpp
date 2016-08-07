@@ -67,7 +67,7 @@ struct CommandHelp
 /// @param flag  The flag to search.
 /// @return <b>True</b> if the value contain the flag, <br> <b>False</b> otherwise.
 template<typename Enum>
-bool HasFlag(unsigned int & flags, Enum flag)
+bool HasFlag(const unsigned int & flags, Enum flag)
 {
     static_assert(std::is_enum<Enum>::value, "template parameter is not an enum type");
     return (flags & static_cast<unsigned int>(flag)) != 0;

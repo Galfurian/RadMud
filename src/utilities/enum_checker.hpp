@@ -43,6 +43,7 @@ template<typename EnumType, EnumType V, EnumType ... Next>
 class EnumCheck<EnumType, V, Next...> : private EnumCheck<EnumType, Next...>
 {
     private:
+        /// The previous EnumCheck occurence.
         using super = EnumCheck<EnumType, Next...>;
 
     public:

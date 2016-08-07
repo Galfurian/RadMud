@@ -199,8 +199,8 @@ void Mobile::kill()
         // Add the item to the mud.
         Mud::instance().addItem(item);
         // Evaluate the minimum and maximum condition.
-        int min = (item->model->condition / 100) * 10;
-        int max = (item->model->condition / 100) * 50;
+        int min = (item->getMaxCondition() / 100) * 10;
+        int max = (item->getMaxCondition() / 100) * 50;
         // Set a random condition for the new item.
         item->condition = TRandInteger<int>(min, max);
         // Create the entry for the item on the database.
@@ -225,8 +225,8 @@ void Mobile::kill()
         // Add the item to the mud.
         Mud::instance().addItem(item);
         // Evaluate the minimum and maximum condition.
-        int min = (item->model->condition / 100) * 10;
-        int max = (item->model->condition / 100) * 50;
+        int min = (item->getMaxCondition() / 100) * 10;
+        int max = (item->getMaxCondition() / 100) * 50;
         // Set a random condition for the new item.
         item->condition = TRandInteger<int>(min, max);
         // Create the entry for the item on the database.
