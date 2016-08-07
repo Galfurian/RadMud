@@ -1457,7 +1457,7 @@ bool Character::getCharactersInSight(CharacterVector & targets)
 {
     CharacterVector exceptions;
     exceptions.push_back(this);
-    Coordinates<int> coord = this->room->coord;
+    Coordinates coord = this->room->coord;
     return this->room->area->getCharactersInSight(
         targets,
         exceptions,
@@ -1700,7 +1700,7 @@ void Character::loadScript(const std::string & scriptFilename)
     Item::luaRegister(L);
     Material::luaRegister(L);
     Race::luaRegister(L);
-    Coordinates<int>::luaRegister(L);
+    Coordinates::luaRegister(L);
     Exit::luaRegister(L);
     Room::luaRegister(L);
 

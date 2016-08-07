@@ -254,15 +254,15 @@ class Direction
         }
 
         /// @brief Returns the direction in terms of coordinates.
-        Coordinates<int> getCoordinates() const
+        Coordinates getCoordinates() const
         {
-            if (direction == Direction::North) return Coordinates<int>(0, +1, 0);
-            if (direction == Direction::South) return Coordinates<int>(0, -1, 0);
-            if (direction == Direction::West) return Coordinates<int>(-1, 0, 0);
-            if (direction == Direction::East) return Coordinates<int>(+1, 0, 0);
-            if (direction == Direction::Up) return Coordinates<int>(0, 0, +1);
-            if (direction == Direction::Down) return Coordinates<int>(0, 0, -1);
-            return Coordinates<int>(0, 0, 0);
+            if (direction == Direction::North) return Coordinates(0, +1, 0);
+            if (direction == Direction::South) return Coordinates(0, -1, 0);
+            if (direction == Direction::West) return Coordinates(-1, 0, 0);
+            if (direction == Direction::East) return Coordinates(+1, 0, 0);
+            if (direction == Direction::Up) return Coordinates(0, 0, +1);
+            if (direction == Direction::Down) return Coordinates(0, 0, -1);
+            return Coordinates(0, 0, 0);
         }
 
         /// @brief Equality operator w.r.t. a direction object.

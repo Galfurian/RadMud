@@ -113,7 +113,7 @@ class Continent
         /// @param coord The coordinates to check.
         /// @return <b>True</b> if the coordinates are valid,<br>
         ///         <b>False</b> otherwise.
-        bool inBoundaries(Coordinates<int> coord);
+        bool inBoundaries(Coordinates coord);
 
         /// @brief Get the room at the given coordinates.
         /// @param x Coordinate on width axis.
@@ -125,7 +125,7 @@ class Continent
         /// @brief Get the room at the given coordinates.
         /// @param coord The coordiantes where search the room.
         /// @return The room at the selected spot.
-        Room * getRoom(Coordinates<int> coord);
+        Room * getRoom(Coordinates coord);
 
         /// @brief Draw the Filed of View for a character.
         /// @param room   The room from where the algorithm has to compute the Field of View.

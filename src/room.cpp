@@ -629,7 +629,7 @@ bool Room::operator==(const Room & right) const
     return vnum == right.vnum;
 }
 
-bool CreateRoom(Coordinates<int> coord, Room * source_room)
+bool CreateRoom(Coordinates coord, Room * source_room)
 {
     Room * new_room = new Room();
 
@@ -722,7 +722,7 @@ bool ConnectRoom(Room * room)
     for (auto iterator : Mud::instance().mudDirections)
     {
         // Get the coordinate modifier.
-        Coordinates<int> coordinates = room->coord + iterator.second.getCoordinates();
+        Coordinates coordinates = room->coord + iterator.second.getCoordinates();
         // Get the room at the given coordinates.
         Room * near = room->area->getRoom(coordinates);
         if (near != nullptr)

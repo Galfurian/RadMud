@@ -582,7 +582,7 @@ void DoRoomCreate(Character * character, std::istream & sArgs)
         return; // Skip the rest of the function.
     }
     // Get the coordinate modifier.
-    Coordinates<int> targetCoord = currentRoom->coord + direction.getCoordinates();
+    Coordinates targetCoord = currentRoom->coord + direction.getCoordinates();
     if (!currentArea->inBoundaries(targetCoord))
     {
         character->sendMsg("Sorry but in that direction you will go outside the boundaries.\n");
@@ -629,7 +629,7 @@ void DoRoomDelete(Character * character, std::istream & sArgs)
         return; // Skip the rest of the function.
     }
     // Get the coordinate modifier.
-    Coordinates<int> targetCoord = character->room->coord + direction.getCoordinates();
+    Coordinates targetCoord = character->room->coord + direction.getCoordinates();
     if (!currentArea->inBoundaries(targetCoord))
     {
         character->sendMsg("Sorry but in that direction you will go outside the boundaries.\n");

@@ -84,7 +84,7 @@ bool Continent::inBoundaries(int x, int y, int z)
     return result;
 }
 
-bool Continent::inBoundaries(Coordinates<int> coord)
+bool Continent::inBoundaries(Coordinates coord)
 {
     return this->inBoundaries(coord.x, coord.y, coord.z);
 }
@@ -94,7 +94,7 @@ Room * Continent::getRoom(int x, int y, int z)
     return &continentMap.get(x, y, z);
 }
 
-Room * Continent::getRoom(Coordinates<int> coord)
+Room * Continent::getRoom(Coordinates coord)
 {
     return &continentMap.get(coord.x, coord.y, coord.z);
 }

@@ -90,7 +90,7 @@ class Area
         /// @param coord The coordinates to check.
         /// @return <b>True</b> if the coordinates are valid,<br>
         ///         <b>False</b> otherwise.
-        bool inBoundaries(const Coordinates<int> & coord);
+        bool inBoundaries(const Coordinates & coord);
 
         /// @brief Add the passed room to its coordinates inside the area.
         /// @param room The room that has to be added.
@@ -119,7 +119,7 @@ class Area
         /// @brief Find a room in a precise spot.
         /// @param coord The coordiantes where search the room.
         /// @return The room at the selected spot.
-        Room * getRoom(Coordinates<int> coord);
+        Room * getRoom(Coordinates coord);
 
         /// @brief Draw the Filed of View for a character.
         /// @param centerRoom The room from where the algorithm has to compute the Field of View.
@@ -185,7 +185,7 @@ class Area
         /// @param radius The radius of visibility.
         /// @return <b>True</b> if the target room is in sight,<br>
         ///         <b>False</b> otherwise.
-        bool fastInSight(Coordinates<int> origin, Coordinates<int> target, unsigned int radius);
+        bool fastInSight(Coordinates origin, Coordinates target, unsigned int radius);
 
         /// @brief Provides a list of characters which are in sight.
         /// @param targets    The list which will contain the targets.
