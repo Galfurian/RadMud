@@ -199,10 +199,10 @@ void Mobile::kill()
         // Add the item to the mud.
         Mud::instance().addItem(item);
         // Evaluate the minimum and maximum condition.
-        int min = (item->getMaxCondition() / 100) * 10;
-        int max = (item->getMaxCondition() / 100) * 50;
+        unsigned int min = (item->getMaxCondition() / 100) * 10;
+        unsigned int max = (item->getMaxCondition() / 100) * 50;
         // Set a random condition for the new item.
-        item->condition = TRandInteger<int>(min, max);
+        item->condition = TRandInteger<unsigned int>(min, max);
         // Create the entry for the item on the database.
         SQLiteDbms::instance().beginTransaction();
         if (item->createOnDB())
@@ -225,10 +225,10 @@ void Mobile::kill()
         // Add the item to the mud.
         Mud::instance().addItem(item);
         // Evaluate the minimum and maximum condition.
-        int min = (item->getMaxCondition() / 100) * 10;
-        int max = (item->getMaxCondition() / 100) * 50;
+        unsigned int min = (item->getMaxCondition() / 100) * 10;
+        unsigned int max = (item->getMaxCondition() / 100) * 50;
         // Set a random condition for the new item.
-        item->condition = TRandInteger<int>(min, max);
+        item->condition = TRandInteger<unsigned int>(min, max);
         // Create the entry for the item on the database.
         SQLiteDbms::instance().beginTransaction();
         if (item->createOnDB())

@@ -286,7 +286,7 @@ bool LoadModel(ResultSet * result)
         itemModel->weight = result->getNextUnsignedInteger();
         itemModel->price = result->getNextUnsignedInteger();
         itemModel->condition = result->getNextUnsignedInteger();
-        itemModel->decay = result->getNextInteger();
+        itemModel->decay = result->getNextUnsignedInteger();
         itemModel->material = static_cast<MaterialType>(result->getNextInteger());
         itemModel->tileSet = result->getNextInteger();
         itemModel->tileId = result->getNextInteger();

@@ -24,7 +24,6 @@
 // Other Include.
 #include "mud.hpp"
 #include "room.hpp"
-#include "utils.hpp"
 #include "constants.hpp"
 #include "utilities/logger.hpp"
 

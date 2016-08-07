@@ -23,6 +23,7 @@
 #include <set>
 #include <map>
 
+#include "../utils.hpp"
 #include "../defines.hpp"
 #include "../lua/lua_script.hpp"
 #include "../utilities/table.hpp"
@@ -152,7 +153,7 @@ class ItemModel
         /// The model maximum condition.
         unsigned int condition;
         /// The model maximum condition.
-        int decay;
+        unsigned int decay;
         /// The model's material.
         MaterialType material;
         /// TileSet of the icon.
@@ -220,14 +221,14 @@ class ItemModel
         bool replaceSymbols(
             std::string & source,
             Material * itemMaterial = nullptr,
-            const ItemQuality & itemQuality = ItemQuality::Normal);
+            const ItemQuality & itemQuality = ItemQuality::Normal) const;
 
         /// @brief Returns the name of the model depending on the passed arguments.
         /// @param itemMaterial The material of which the model is made.
         /// @param itemQuality  The quality of the model.
         /// @return The specific name of the model.
         std::string getName(Material * itemMaterial = nullptr, const ItemQuality & itemQuality =
-            ItemQuality::Normal);
+            ItemQuality::Normal) const;
 
         /// @brief Returns the description of the model depending on the passed arguments.
         /// @param itemMaterial The material of which the model is made.

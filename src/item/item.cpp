@@ -414,12 +414,15 @@ unsigned int Item::getMaxCondition() const
 
 bool Item::triggerDecay()
 {
-    condition -= model->decay;
-    if (condition <= 0)
+    if (condition < model->decay)
     {
         return true;
     }
-    return false;
+    else
+    {
+        condition -= model->decay;
+        return false;
+    }
 }
 
 double Item::getConditionModifier() const
@@ -493,14 +496,14 @@ unsigned int Item::getTotalWeight() const
     return totalWeight;
 }
 
-std::string Item::getName()
+std::string Item::getName() const
 {
     return model->getName(composition, quality);
 }
 
-std::string Item::getNameCapital()
+std::string Item::getNameCapital() const
 {
-    std::string itemName = getName();
+    std::string itemName = this->getName();
     itemName[0] = static_cast<char>(toupper(itemName[0]));
     return itemName;
 }
@@ -926,6 +929,12 @@ void Item::luaRegister(lua_State * L)
     .addData("container", &Item::container) //
     .addData("content", &Item::content) //
     .endClass();
+}
+
+bool Item::operator<(Item & rhs) const
+{
+    Logger::log(LogLevel::Debug, "%s < %s", ToString(this->vnum), ToString(rhs.vnum));
+    return getName() < rhs.getName();
 }
 
 ItemVectorNumbered GroupItems(const ItemVector & items)

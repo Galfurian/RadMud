@@ -197,7 +197,7 @@ bool ItemModel::check()
 bool ItemModel::replaceSymbols(
     std::string & source,
     Material * itemMaterial,
-    const ItemQuality & itemQuality)
+    const ItemQuality & itemQuality) const
 {
     bool modified = false;
     if (itemMaterial)
@@ -223,12 +223,12 @@ bool ItemModel::replaceSymbols(
     return modified;
 }
 
-std::string ItemModel::getName(Material * itemMaterial, const ItemQuality & itemQuality)
+std::string ItemModel::getName(Material * itemMaterial, const ItemQuality & itemQuality) const
 {
     // Make a copy of the short description.
     std::string output = shortdesc;
     // Try to replace the symbols inside the short description.
-    if (!replaceSymbols(output, itemMaterial, itemQuality))
+    if (!this->replaceSymbols(output, itemMaterial, itemQuality))
     {
         output = article + " " + name;
     }

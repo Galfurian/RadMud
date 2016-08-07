@@ -16,15 +16,12 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-// Basic Include.
 #include "skill.hpp"
 
-#include "constants.hpp"
-// Local Includes.
-
-// Other Include.
-#include "utils.hpp"
 #include "utilities/logger.hpp"
+#include "utils.hpp"
+
+#include <cassert>
 
 Skill::Skill() :
     vnum(),

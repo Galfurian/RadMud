@@ -165,11 +165,11 @@ class Item
 
         /// @brief Return the name of the item.
         /// @return The name of the item.
-        std::string getName();
+        std::string getName() const;
 
         /// @brief Return the name of the item with the first letter capitalized.
         /// @return The name of the item.
-        std::string getNameCapital();
+        std::string getNameCapital() const;
 
         /// @brief Return the description of the item.
         /// @return The description of the item.
@@ -260,11 +260,7 @@ class Item
         static void luaRegister(lua_State * L);
 
         /// @brief Operator used to order the items based on their name.
-        inline bool operator<(Item & rhs)
-        {
-            Logger::log(LogLevel::Debug, "%s < %s", ToString(this->vnum), ToString(rhs.vnum));
-            return getName() < rhs.getName();
-        }
+        bool operator<(Item & rhs) const;
 };
 
 /// Vector of items.

@@ -18,22 +18,17 @@
 
 #pragma once
 
-#include <stdint.h>
 #include <algorithm>
-#include <string>
-#include <vector>
-#include <set>
-#include <map>
+#include <stdint.h>
+#include <cstdlib>
 #include <list>
-#include <zlib.h>
-#include <type_traits>
-#include <iostream>
-#include <chrono>
-#include <functional>
-#include <cassert>
-#include <sstream>
-#include <type_traits>
+#include <map>
 #include <random>
+#include <set>
+#include <sstream>
+#include <string>
+#include <type_traits>
+#include <vector>
 
 /// Allows to define a non-aborting assertion for correct guards.
 #define CorrectAssert(e) ( (e) ? true : (\
@@ -232,24 +227,6 @@ std::string EnumToString(const Enum & value)
     stm << static_cast<unsigned int>(value);
     return stm.str();
 }
-
-/// Kinds of string alignment.
-typedef enum class StringAlignments
-{
-    /// Left alignment.
-    Left,
-    /// Center alignment.
-    Center,
-    /// Right alignment.
-    Right,
-} StringAlign;
-
-/// @brief Align the given string.
-/// @param source    The source string.
-/// @param alignment The kind of alignment.
-/// @param width     The total width of the string.
-/// @return The aligned string.
-std::string AlignString(const std::string & source, const StringAlign & alignment, const size_t & width);
 
 /// @brief Check if all the character in the string it's ASCII.
 /// @param string_to_check The string to check.

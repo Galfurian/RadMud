@@ -31,6 +31,7 @@
 #include "skill.hpp"
 #include "updater.hpp"
 #include "writing.hpp"
+#include "material.hpp"
 
 #include "command/command.hpp"
 #include "sqlite/sqliteDbms.hpp"

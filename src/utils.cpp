@@ -17,23 +17,20 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 // Basic Include.
+
 #include "utils.hpp"
 
-#include <ctime>
-#include <iostream>
-#include <sstream>
 #include <dirent.h>
-#include <fstream>
-#include <random>
-#include <iomanip>
-#include <iterator>
-#include <cstring>
-#include <errno.h>
-#include <string>
 #include <limits.h>
+#include <stddef.h>
+#include <zconf.h>
+#include <zlib.h>
+#include <cctype>
+#include <ctime>
+#include <fstream>
+#include <iostream>
+#include <iterator>
 
-// Other Include.
-#include "constants.hpp"
 #include "utilities/logger.hpp"
 
 bool BeginWith(const std::string & source, const std::string & target)
@@ -50,7 +47,10 @@ bool EndWith(const std::string & source, const std::string & target)
     return false;
 }
 
-std::string FindAndReplace(std::string & source, const std::string & target, const std::string & replacement)
+std::string FindAndReplace(
+    std::string & source,
+    const std::string & target,
+    const std::string & replacement)
 {
     if (target.empty())
     {
@@ -161,7 +161,9 @@ std::string GetDate()
     return buffer;
 }
 
-std::vector<std::string> GetAllFilesInFolder(const std::string & folder, const std::string & extension)
+std::vector<std::string> GetAllFilesInFolder(
+    const std::string & folder,
+    const std::string & extension)
 {
     DIR *directory;
     std::vector<std::string> files_name;
@@ -192,53 +194,6 @@ int ToInt(const std::string & source)
 {
     char * pEnd;
     return static_cast<int>(strtol(source.c_str(), &pEnd, 10));
-}
-
-std::string AlignString(const std::string & source, const StringAlign & alignment, const size_t & width)
-{
-    unsigned int padding;
-    // Create a string stream.
-    std::ostringstream oss;
-    // Align the string.
-    if (alignment == StringAlign::Left)
-    {
-        oss << ' ';
-        // Set the width.
-        oss << std::setw(static_cast<int>(width) - 1);
-        // Set the alignment.
-        oss << std::left;
-        // Set the string.
-        oss << source;
-    }
-    else if (alignment == StringAlign::Center)
-    {
-        padding = static_cast<unsigned int>(width - source.size());
-        for (unsigned int i = 0; i < (padding / 2); i++)
-        {
-            oss << ' ';
-        }
-        oss << source;
-        for (unsigned int i = 0; i < (padding / 2); i++)
-        {
-            oss << ' ';
-        }
-        // if odd #, add 1 space
-        if (padding > 0 && padding % 2 != 0)
-        {
-            oss << ' ';
-        }
-    }
-    else if (alignment == StringAlign::Right)
-    {
-        // Set the width.
-        oss << std::setw(static_cast<int>(width) - 1);
-        // Set the alignment.
-        oss << std::right;
-        // Set the string.
-        oss << source;
-        oss << ' ';
-    }
-    return oss.str();
 }
 
 bool IsAllASCII(const char * string_to_check)
@@ -381,8 +336,7 @@ void DeflateStream(std::vector<uint8_t> & uncompressed, std::vector<uint8_t> & c
 
     while (true)
     {
-        uint8_t c_buffer[10] =
-        { };
+        uint8_t c_buffer[10] = { };
         c_stream.next_out = &c_buffer[0];
         c_stream.avail_out = 10;
 
@@ -431,8 +385,7 @@ void InflateStream(std::vector<uint8_t> & compressed, std::vector<uint8_t> & unc
 
     do
     {
-        uint8_t d_buffer[10] =
-        { };
+        uint8_t d_buffer[10] = { };
         d_stream.next_out = &d_buffer[0];
         d_stream.avail_out = 10;
 

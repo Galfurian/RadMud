@@ -18,15 +18,15 @@
 
 #pragma once
 
-#include <vector>
-#include <string>
-#include <list>
 #include <map>
+#include <string>
+#include <vector>
 
-#include "lua/lua_script.hpp"
-#include "material.hpp"
-#include "faction.hpp"
 #include "model/corpseModel.hpp"
+#include "defines.hpp"
+#include "faction.hpp"
+
+class Material;
 
 /// @brief Holds details about a race.
 class Race

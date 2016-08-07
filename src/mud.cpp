@@ -18,10 +18,11 @@
 
 #include "mud.hpp"
 
-#include <algorithm>
-#include <signal.h>
 #include <chrono>
 #include <errno.h>
+#include <unistd.h>
+#include <signal.h>
+#include <algorithm>
 
 #include "protocol.hpp"
 #include "utilities/logger.hpp"

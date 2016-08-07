@@ -21,9 +21,10 @@
 #include <string>
 #include <map>
 
-#include "model/itemModel.hpp"
 #include "model/toolModel.hpp"
 #include "model/resourceModel.hpp"
+
+class ItemModel;
 
 /// @brief Holds details about a building.
 class Building

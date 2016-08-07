@@ -186,3 +186,53 @@ size_t Table::getTotalWidth()
     }
     return totalWidth;
 }
+
+std::string AlignString(
+    const std::string & source,
+    const StringAlign & alignment,
+    const size_t & width)
+{
+    unsigned int padding;
+    // Create a string stream.
+    std::ostringstream oss;
+    // Align the string.
+    if (alignment == StringAlign::Left)
+    {
+        oss << ' ';
+        // Set the width.
+        oss << std::setw(static_cast<int>(width) - 1);
+        // Set the alignment.
+        oss << std::left;
+        // Set the string.
+        oss << source;
+    }
+    else if (alignment == StringAlign::Center)
+    {
+        padding = static_cast<unsigned int>(width - source.size());
+        for (unsigned int i = 0; i < (padding / 2); i++)
+        {
+            oss << ' ';
+        }
+        oss << source;
+        for (unsigned int i = 0; i < (padding / 2); i++)
+        {
+            oss << ' ';
+        }
+        // if odd #, add 1 space
+        if (padding > 0 && padding % 2 != 0)
+        {
+            oss << ' ';
+        }
+    }
+    else if (alignment == StringAlign::Right)
+    {
+        // Set the width.
+        oss << std::setw(static_cast<int>(width) - 1);
+        // Set the alignment.
+        oss << std::right;
+        // Set the string.
+        oss << source;
+        oss << ' ';
+    }
+    return oss.str();
+}
