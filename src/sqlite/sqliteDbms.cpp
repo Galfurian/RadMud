@@ -30,31 +30,31 @@ using namespace std;
 
 SQLiteDbms::SQLiteDbms()
 {
-    tableLoaders.push_back(std::make_pair("BadName", LoadBadName));
-    tableLoaders.push_back(std::make_pair("BlockedIp", LoadBlockedIp));
-    tableLoaders.push_back(std::make_pair("News", LoadNews));
-    tableLoaders.push_back(std::make_pair("Material", LoadMaterial));
-    tableLoaders.push_back(std::make_pair("Skill", LoadSkill));
-    tableLoaders.push_back(std::make_pair("Faction", LoadFaction));
-    tableLoaders.push_back(std::make_pair("Race", LoadRace));
-    tableLoaders.push_back(std::make_pair("Continent", LoadContinent));
-    tableLoaders.push_back(std::make_pair("Area", LoadArea));
-    tableLoaders.push_back(std::make_pair("Room", LoadRoom));
-    tableLoaders.push_back(std::make_pair("Exit", LoadExit));
-    tableLoaders.push_back(std::make_pair("AreaList", LoadAreaList));
-    tableLoaders.push_back(std::make_pair("TravelPoint", LoadTravelPoint));
-    tableLoaders.push_back(std::make_pair("Model", LoadModel));
-    tableLoaders.push_back(std::make_pair("Liquid", LoadLiquid));
-    tableLoaders.push_back(std::make_pair("Item", LoadItem));
-    tableLoaders.push_back(std::make_pair("ItemContent", LoadContent));
-    tableLoaders.push_back(std::make_pair("ItemContentLiq", LoadContentLiq));
-    tableLoaders.push_back(std::make_pair("ItemRoom", LoadItemRoom));
-    tableLoaders.push_back(std::make_pair("Writings", LoadWriting));
-    tableLoaders.push_back(std::make_pair("Profession", LoadProfession));
-    tableLoaders.push_back(std::make_pair("Production", LoadProduction));
-    tableLoaders.push_back(std::make_pair("Mobile", LoadMobile));
-    tableLoaders.push_back(std::make_pair("Building", LoadBuilding));
-    tableLoaders.push_back(std::make_pair("ItemShop", LoadItemShop));
+    loaders.push_back(TableLoader("BadName", LoadBadName));
+    loaders.push_back(TableLoader("BlockedIp", LoadBlockedIp));
+    loaders.push_back(TableLoader("News", LoadNews));
+    loaders.push_back(TableLoader("Material", LoadMaterial));
+    loaders.push_back(TableLoader("Skill", LoadSkill));
+    loaders.push_back(TableLoader("Faction", LoadFaction));
+    loaders.push_back(TableLoader("Race", LoadRace));
+    loaders.push_back(TableLoader("Continent", LoadContinent));
+    loaders.push_back(TableLoader("Area", LoadArea));
+    loaders.push_back(TableLoader("Room", LoadRoom));
+    loaders.push_back(TableLoader("Exit", LoadExit));
+    loaders.push_back(TableLoader("AreaList", LoadAreaList));
+    loaders.push_back(TableLoader("TravelPoint", LoadTravelPoint));
+    loaders.push_back(TableLoader("Model", LoadModel));
+    loaders.push_back(TableLoader("Liquid", LoadLiquid));
+    loaders.push_back(TableLoader("Item", LoadItem));
+    loaders.push_back(TableLoader("ItemContent", LoadContent));
+    loaders.push_back(TableLoader("ItemContentLiq", LoadContentLiq));
+    loaders.push_back(TableLoader("ItemRoom", LoadItemRoom));
+    loaders.push_back(TableLoader("Writings", LoadWriting));
+    loaders.push_back(TableLoader("Profession", LoadProfession));
+    loaders.push_back(TableLoader("Production", LoadProduction));
+    loaders.push_back(TableLoader("Mobile", LoadMobile));
+    loaders.push_back(TableLoader("Building", LoadBuilding));
+    loaders.push_back(TableLoader("ItemShop", LoadItemShop));
 }
 
 SQLiteDbms::~SQLiteDbms()
@@ -97,25 +97,21 @@ bool SQLiteDbms::loadTables()
 {
     // Status variable for loading operation.
     bool status = true;
-    for (auto iterator : tableLoaders)
+    for (auto iterator : loaders)
     {
-        Logger::log(LogLevel::Debug, "    Loading Table: " + iterator.first + ".");
-        // Prepare the query.
-        std::string query = "SELECT * FROM " + iterator.first + ";";
+        Logger::log(LogLevel::Debug, "    Loading Table: " + iterator.table + ".");
         // Execute the query.
-        ResultSet * result = dbConnection.executeSelect(query.c_str());
+        ResultSet * result = dbConnection.executeSelect(iterator.getQuery().c_str());
         // Check the result.
         if (result == nullptr)
         {
             return false;
         }
         // Call the rows parsing function.
-        if (!iterator.second(result))
+        if (!iterator.loadFunction(result))
         {
             // Log an error.
-            Logger::log(
-                LogLevel::Error,
-                "Encountered an error during loading table: " + iterator.first);
+            Logger::log(LogLevel::Error, "Error when loading table: " + iterator.table);
             status = false;
         }
         // release the resource.

@@ -99,7 +99,7 @@ bool Item::check(bool complete)
     return safe;
 }
 
-bool Item::destroy()
+bool Item::removeFromMud()
 {
     // Remove the item from the game, this means: Room, Player, Container.
     if (room != nullptr)
@@ -153,16 +153,26 @@ bool Item::destroy()
             Logger::log(LogLevel::Error, "Something gone wrong during item removal from mud.");
             return false;
         }
-        Logger::log(LogLevel::Error, "Removing item '" + this->getName() + "' from DB;");
-        // Remove the item from the database.
-        if (!this->removeOnDB())
+    }
+    return true;
+}
+
+bool Item::destroy()
+{
+    if (this->removeFromMud())
+    {
+        if (this->model->getType() != ModelType::Corpse)
         {
-            Logger::log(LogLevel::Error, "Something gone wrong during item removal from DB.");
-            return false;
+
+            Logger::log(LogLevel::Error, "Removing item '" + this->getName() + "' from DB;");
+            // Remove the item from the database.
+            if (!this->removeOnDB())
+            {
+                Logger::log(LogLevel::Error, "Something gone wrong during item removal from DB.");
+                return false;
+            }
         }
     }
-    // Delete the item.
-    delete (this);
     return true;
 }
 

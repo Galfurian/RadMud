@@ -112,6 +112,11 @@ class Item
         ///         <b>False</b> otherwise.
         virtual bool check(bool complete = false);
 
+        /// @brief This function is used to remove the item from everywhere.
+        /// @return <b>True</b> if the item has been removed,<br>
+        ///         <b>False</b> otherwise.
+        virtual bool removeFromMud();
+
         /// @brief This function is used to destroy the item.
         /// @return <b>True</b> if the item has been destroyed,<br>
         ///         <b>False</b> otherwise.

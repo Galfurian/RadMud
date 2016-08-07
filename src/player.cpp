@@ -85,13 +85,20 @@ Player::~Player()
             Logger::log(LogLevel::Error, "Something has gone wrong during player socket closure.");
         }
     }
-    for (auto iterator : inventory)
+    // Make a temporary copy of the lists.
+    auto inventoryClone = inventory;
+    auto equipmentClone = equipment;
+    // Delete the inventory items.
+    for (auto iterator : inventoryClone)
     {
-        iterator->owner = nullptr;
+        iterator->removeFromMud();
+        delete (iterator);
     }
-    for (auto iterator : equipment)
+    // Delete the equipment items.
+    for (auto iterator : equipmentClone)
     {
-        iterator->owner = nullptr;
+        iterator->removeFromMud();
+        delete (iterator);
     }
     // Remove the player from the room.
     if (room != nullptr)

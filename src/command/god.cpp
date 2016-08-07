@@ -442,6 +442,7 @@ void DoItemDestroy(Character * character, std::istream & sArgs)
     if (item->destroy())
     {
         character->sendMsg("You have destroyed the desired object.\n");
+        delete (item);
     }
     else
     {

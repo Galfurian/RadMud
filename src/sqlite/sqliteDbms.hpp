@@ -88,6 +88,40 @@ bool LoadBuilding(ResultSet * result);
 bool LoadItemShop(ResultSet * result);
 ///@}
 
+class TableLoader
+{
+    public:
+        /// Loading function for sqlite3 tables.
+        typedef std::function<bool(ResultSet * result)> LoadingFunction;
+
+        std::string table;
+
+        LoadingFunction loadFunction;
+
+        std::string loadQuery;
+
+        TableLoader(std::string _table, LoadingFunction _loadFunction, std::string _loadQuery = "") :
+                table(_table),
+                loadFunction(_loadFunction),
+                loadQuery(_loadQuery)
+        {
+            // Nothing to do.
+        }
+
+        std::string getQuery() const
+        {
+            if (loadQuery.empty())
+            {
+                return "SELECT * FROM " + table + ";";
+            }
+            else
+            {
+                return loadQuery;
+            }
+        }
+
+};
+
 /// @brief It's used to connect to a database and retrieve information as well as update them.
 class SQLiteDbms
 {
@@ -191,8 +225,6 @@ class SQLiteDbms
         /// The connection, used to communicate with the database.
         SQLiteWrapper dbConnection;
 
-        /// Loading function for sqlite3 tables.
-        typedef std::function<bool(ResultSet * result)> LoadingFunction;
         /// List of the tables with their loader.
-        std::vector<std::pair<std::string, LoadingFunction> > tableLoaders;
+        std::vector<TableLoader> loaders;
 };

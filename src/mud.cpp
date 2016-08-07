@@ -204,11 +204,11 @@ bool Mud::saveMud()
     bool result = true;
     SQLiteDbms::instance().beginTransaction();
     Logger::log(LogLevel::Global, "Saving information on Database for : Players...");
-    result |= Mud::instance().savePlayers();
+    result &= Mud::instance().savePlayers();
     Logger::log(LogLevel::Global, "Saving information on Database for : Items...");
-    result |= Mud::instance().saveItems();
+    result &= Mud::instance().saveItems();
     Logger::log(LogLevel::Global, "Saving information on Database for : Rooms...");
-    result |= Mud::instance().saveRooms();
+    result &= Mud::instance().saveRooms();
     SQLiteDbms::instance().endTransaction();
     return result;
 }

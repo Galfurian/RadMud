@@ -157,6 +157,7 @@ ActionStatus CraftAction::perform()
     for (auto it : toDestroy)
     {
         it->destroy();
+        delete (it);
     }
     SQLiteDbms::instance().endTransaction();
 
