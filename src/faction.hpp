@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 #include <map>
+
 #include "lua/lua_script.hpp"
 
 /// @brief Holds details about a faction.

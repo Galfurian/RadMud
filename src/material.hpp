@@ -36,11 +36,11 @@ class Material
         /// Material's article.
         std::string article;
         /// Material's value on market.
-        int worth;
+        unsigned int worth;
         /// Material's hardness.
-        int hardness;
+        unsigned int hardness;
         /// Material's lightness.
-        int lightness;
+        unsigned int lightness;
 
         /// @brief Constructor.
         Material();
@@ -63,6 +63,15 @@ class Material
         /// @brief Check the correctness of the material.
         /// @return <b>True</b> if the material has correct values,<br><b>False</b> otherwise.
         bool check();
+
+        /// @brief Provides the modifier w.r.t. the material worth value.
+        double getWorthModifier() const;
+
+        /// @brief Provides the modifier w.r.t. the material hardness value.
+        double getHardnessModifier() const;
+
+        /// @brief Provides the modifier w.r.t. the material lightness value.
+        double getLightnessModifier() const;
 
         /// @brief Function used to register inside the lua environment the class.
         /// @param L The lua environment.

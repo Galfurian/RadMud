@@ -149,24 +149,144 @@ TelnetChar::DRAW_MAP,
 TelnetChar::CLR_MAP,
 TelnetChar::FORMAT>;
 
-/// The possible directions.
-typedef enum class Directions
+/// Provides a complete controll on directions.
+class Direction
 {
-    /// No direction.
-    None,
-    /// North.
-    North,
-    /// South.
-    South,
-    /// West.
-    West,
-    /// East.
-    East,
-    /// Up.
-    Up,
-    /// Down.
-    Down
-} Direction;
+    public:
+        /// The possible directions.
+        enum Enum
+        {
+            /// No direction.
+            None,
+            /// North.
+            North,
+            /// South.
+            South,
+            /// West.
+            West,
+            /// East.
+            East,
+            /// Up.
+            Up,
+            /// Down.
+            Down
+        };
+
+        /// @brief Constructor from uint.
+        Direction(unsigned int & _direction) :
+                direction()
+        {
+            if (_direction == 1) direction = North;
+            else if (_direction == 2) direction = South;
+            else if (_direction == 3) direction = West;
+            else if (_direction == 4) direction = East;
+            else if (_direction == 5) direction = Up;
+            else if (_direction == 6) direction = Down;
+            else direction = None;
+        }
+
+        /// @brief Constructor from enum.
+        Direction(Enum _direction) :
+                direction(_direction)
+        {
+            // Nothing to do.
+        }
+
+        /// @brief Constructor from string.
+        Direction(const std::string & _direction) :
+                direction()
+        {
+            if (_direction == "north") direction = North;
+            else if (_direction == "south") direction = South;
+            else if (_direction == "west") direction = West;
+            else if (_direction == "east") direction = East;
+            else if (_direction == "up") direction = Up;
+            else if (_direction == "down") direction = Down;
+            else direction = None;
+        }
+
+        /// @brief Check is the given number is a valid direction.
+        static bool isValid(const unsigned int & _direction)
+        {
+            return (_direction >= 1) && (_direction <= 6);
+        }
+
+        /// @brief Check is the given string is a valid direction.
+        static bool isValid(const std::string & _direction)
+        {
+            if (_direction == "north") return true;
+            if (_direction == "south") return true;
+            if (_direction == "west") return true;
+            if (_direction == "east") return true;
+            if (_direction == "up") return true;
+            if (_direction == "down") return true;
+            return false;
+        }
+
+        /// @brief Returns the direction as string.
+        std::string toString() const
+        {
+            if (direction == Direction::North) return "north";
+            else if (direction == Direction::South) return "south";
+            else if (direction == Direction::West) return "west";
+            else if (direction == Direction::East) return "east";
+            else if (direction == Direction::Up) return "up";
+            else if (direction == Direction::Down) return "down";
+            else return "none";
+        }
+
+        /// @brief Returns the direction as number.
+        unsigned int toUInt() const
+        {
+            return static_cast<unsigned int>(direction);
+        }
+
+        /// @brief Returns the opposite direction.
+        Direction getOpposite() const
+        {
+            if (direction == Direction::North) return Direction::South;
+            else if (direction == Direction::South) return Direction::North;
+            else if (direction == Direction::West) return Direction::East;
+            else if (direction == Direction::East) return Direction::West;
+            else if (direction == Direction::Up) return Direction::Down;
+            else if (direction == Direction::Down) return Direction::Up;
+            else return Direction::None;
+        }
+
+        /// @brief Returns the direction in terms of coordinates.
+        Coordinates getCoordinates() const
+        {
+            if (direction == Direction::North) return Coordinates(0, +1, 0);
+            if (direction == Direction::South) return Coordinates(0, -1, 0);
+            if (direction == Direction::West) return Coordinates(-1, 0, 0);
+            if (direction == Direction::East) return Coordinates(+1, 0, 0);
+            if (direction == Direction::Up) return Coordinates(0, 0, +1);
+            if (direction == Direction::Down) return Coordinates(0, 0, -1);
+            return Coordinates(0, 0, 0);
+        }
+
+        /// @brief Equality operator w.r.t. a direction object.
+        bool operator==(const Direction & rhs) const
+        {
+            return direction == rhs.direction;
+        }
+
+        /// @brief Equality operator w.r.t. a direction enum.
+        bool operator==(const Direction::Enum & rhs) const
+        {
+            return direction == rhs;
+        }
+
+        /// @brief Inequality operator w.r.t. a direction enum.
+        bool operator!=(const Direction::Enum & rhs) const
+        {
+            return direction != rhs;
+        }
+
+    private:
+        /// Internal direction value.
+        Enum direction;
+};
 
 /// Map which associate a string to a direction.
 typedef std::map<std::string, Direction> DirectionMap;
@@ -353,6 +473,93 @@ typedef enum class MaterialTypes
 // ITEM /////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////
 
+/// The quality of an item.
+class ItemQuality
+{
+    public:
+        /// List of possible quality values.
+        enum Enum
+        {
+            /// Disastrous
+            Disastrous,
+            /// Poor
+            Poor,
+            /// Normal
+            Normal,
+            /// Fine
+            Fine,
+            /// Masterful
+            Masterful
+        };
+
+        /// @brief Constructor from number.
+        ItemQuality(unsigned int & _quality) :
+                quality()
+        {
+            if (_quality == 0) quality = Disastrous;
+            else if (_quality == 1) quality = Poor;
+            else if (_quality == 2) quality = Normal;
+            else if (_quality == 3) quality = Fine;
+            else if (_quality == 4) quality = Masterful;
+            else quality = Normal;
+        }
+
+        /// @brief Constructor from enum.
+        ItemQuality(Enum _quality) :
+                quality(_quality)
+        {
+            // Nothing to do.
+        }
+
+        /// @brief Check is the given number is a valid quality.
+        static bool isValid(const unsigned int & _quality)
+        {
+            return (_quality <= 4);
+        }
+
+        /// @brief Returns the quality as string.
+        std::string toString() const
+        {
+            if (quality == ItemQuality::Disastrous) return "Disastrous";
+            if (quality == ItemQuality::Poor) return "Poor";
+            if (quality == ItemQuality::Normal) return "Normal";
+            if (quality == ItemQuality::Fine) return "Fine";
+            else return "Masterful";
+        }
+
+        /// @brief Returns the quality as number.
+        unsigned int toUInt() const
+        {
+            return static_cast<unsigned int>(quality);
+        }
+
+        /// @brief Returns the quality modifier.
+        double getModifier() const
+        {
+            if (quality == ItemQuality::Disastrous) return 0.5;
+            else if (quality == ItemQuality::Poor) return 0.75;
+            else if (quality == ItemQuality::Normal) return 1.0;
+            else if (quality == ItemQuality::Fine) return 1.50;
+            else return 2.00;
+        }
+
+        /// @brief Equality operator w.r.t. a quality enum.
+        bool operator==(const ItemQuality::Enum & rhs) const
+        {
+            return quality == rhs;
+        }
+
+        /// @brief Inequality operator w.r.t. a quality enum.
+        bool operator!=(const ItemQuality::Enum & rhs) const
+        {
+            return quality != rhs;
+        }
+
+    private:
+        /// Internal quality value.
+        Enum quality;
+};
+
 /// Used to determine the flag of the item.
 typedef enum class ItemFlags
 {
@@ -365,23 +572,6 @@ typedef enum class ItemFlags
     /// Built
     Built = 4
 } ItemFlag;
-
-/// The quality of an item.
-typedef enum class ItemQualities
-{
-    /// No quality set.
-    None,
-    /// Disastrous
-    Disastrous,
-    /// Poor
-    Poor,
-    /// Normal
-    Normal,
-    /// Fine
-    Fine,
-    /// Masterful
-    Masterful
-} ItemQuality;
 
 // //////////////////////////////////////////////////////////////////
 // MODEL ////////////////////////////////////////////////////////////
@@ -408,21 +598,6 @@ typedef enum class EquipmentSlots
     LeftHand = 64,
 } EquipmentSlot;
 
-/// @brief Given the source direction, it returns the opposite direction.
-/// @param direction The source direction.
-/// @return The opposite direction.
-Direction InverDirection(Direction direction);
-
-/// @brief Given a string containing a direction, it returns the enum.
-/// @param direction The string of the direction.
-/// @return The enum of the direction.
-Direction GetDirection(std::string direction);
-
-/// @brief Given an enum of a possible direction, the function return the changing in terms of coordinates.
-/// @param direction The enum of the direction.
-/// @return The coordinates to that direction.
-Coordinates<int> GetCoordinates(Direction direction);
-
 /// @brief Check if the passed flag is valid.
 /// @param flag The flag to check.
 /// @return <b>True</b> if the flag is valid,<br><b>False</b> otherwise.
@@ -434,16 +609,12 @@ bool ValidCharacterFlag(int flag);
 
 /// Return the string describing the given ability.
 std::string GetAbilityName(Ability ability);
-/// Return the string describing the given direction.
-std::string GetDirectionName(Direction direction);
 /// Return the string describing the given posture.
 std::string GetPostureName(CharacterPosture posture);
 /// Return the string describing the given character flag.
 std::string GetCharacterFlagName(CharacterFlag flag);
 /// Return the string describing the type of a Material.
 std::string GetMaterialTypeName(MaterialType type);
-/// Return the string describing the quality of an item.
-std::string GetItemQualityName(ItemQuality quality);
 /// Return the string describing the equipment slot.
 std::string GetEquipmentSlotName(EquipmentSlot slot);
 /// Return the string describing the type of Gender.

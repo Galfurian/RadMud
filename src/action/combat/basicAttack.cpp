@@ -18,9 +18,9 @@
 
 #include "basicAttack.hpp"
 #include "../../room.hpp"
-#include "../../logger.hpp"
 #include "../../character.hpp"
-#include "../../model/weaponModel.hpp"
+#include "../../item/weaponItem.hpp"
+#include "../../utilities/logger.hpp"
 
 BasicAttack::BasicAttack(Character * _actor) :
         CombatAction(_actor)
@@ -62,7 +62,7 @@ ActionStatus BasicAttack::perform()
         return ActionStatus::Running;
     }
     Logger::log(LogLevel::Debug, "[%s] Perform a BasicAttack.", actor->getName());
-    ItemVector activeWeapons = actor->getActiveWeapons();
+    auto activeWeapons = actor->getActiveWeapons();
     if (activeWeapons.empty())
     {
         actor->sendMsg("You do not have a valid weapon equipped.\n");
@@ -71,9 +71,8 @@ ActionStatus BasicAttack::perform()
     {
         for (auto iterator : activeWeapons)
         {
-            WeaponModel * weapon = iterator->model->toWeapon();
             // Get the top aggro enemy at range.
-            Character * enemy = actor->getNextOpponentAtRange(weapon->range);
+            Character * enemy = actor->getNextOpponentAtRange(iterator->getRange());
             if (enemy == nullptr)
             {
                 actor->sendMsg(
@@ -179,7 +178,7 @@ ActionStatus BasicAttack::perform()
                 // Store the type of attack.
                 bool isCritical;
                 // Natural roll for the damage.
-                unsigned int DMG = TRandInteger<unsigned int>(weapon->minDamage, weapon->maxDamage);
+                unsigned int DMG = iterator->rollDamage();
                 // Log the damage roll.
                 Logger::log(
                     LogLevel::Debug,

@@ -31,9 +31,10 @@
 #include "skill.hpp"
 #include "updater.hpp"
 #include "writing.hpp"
+#include "material.hpp"
 
 #include "command/command.hpp"
-#include "sqlite/SQLiteDbms.hpp"
+#include "sqlite/sqliteDbms.hpp"
 #include "utilities/table.hpp"
 
 #ifdef __linux__
@@ -294,7 +295,7 @@ class Mud
         /// Find a building given the vnum of the model to build.
         Building * findBuilding(int vnum);
         /// Find the direction.
-        Direction findDirection(std::string direction, bool exact);
+        Direction findDirection(const std::string & direction, bool exact);
         ///@}
 
         /// @brief Main processing loop.

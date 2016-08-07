@@ -17,8 +17,8 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "generalAction.hpp"
-#include "../logger.hpp"
 #include "combat/combatAction.hpp"
+#include "../utilities/logger.hpp"
 
 using namespace std::chrono;
 
@@ -26,19 +26,19 @@ GeneralAction::GeneralAction(Character * _actor) :
         actor(_actor),
         actionCooldown()
 {
-    Logger::log(LogLevel::Debug, "Created GeneralAction.");
+    // Nothing to do.
 }
 
 GeneralAction::GeneralAction(Character * _actor, TimeClock _actionCooldown) :
         actor(_actor),
         actionCooldown(_actionCooldown)
 {
-    Logger::log(LogLevel::Debug, "Created GeneralAction.");
+    // Nothing to do.
 }
 
 GeneralAction::~GeneralAction()
 {
-    Logger::log(LogLevel::Debug, "Deleted GeneralAction.");
+    // Nothing to do.
 }
 
 bool GeneralAction::checkElapsed() const

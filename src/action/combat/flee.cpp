@@ -18,9 +18,9 @@
 
 #include "flee.hpp"
 #include "../../room.hpp"
-#include "../../logger.hpp"
 #include "../../character.hpp"
 #include "../../model/weaponModel.hpp"
+#include "../../utilities/logger.hpp"
 
 Flee::Flee(Character * _actor) :
         CombatAction(_actor)

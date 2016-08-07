@@ -18,10 +18,11 @@
 
 // Basic Include.
 #include "../mud.hpp"
-#include "../logger.hpp"
 #include "../material.hpp"
 #include "../constants.hpp"
 #include "../luabridge/LuaBridge.h"
+#include "../utilities/logger.hpp"
+
 #include "itemModel.hpp"
 
 #include "armorModel.hpp"
@@ -46,6 +47,10 @@
 #include "vehicleModel.hpp"
 #include "weaponModel.hpp"
 
+#include "../item/armorItem.hpp"
+#include "../item/shopItem.hpp"
+#include "../item/weaponItem.hpp"
+
 using namespace std;
 
 ItemModel::ItemModel() :
@@ -55,7 +60,6 @@ ItemModel::ItemModel() :
         shortdesc(),
         keys(),
         description(),
-        modelType(),
         slot(),
         modelFlags(),
         weight(),
@@ -77,177 +81,6 @@ ItemModel::~ItemModel()
 ModelType ItemModel::getType() const
 {
     return ModelType::NoType;
-}
-
-///////////////////////////////////////////////////////////
-// CHECKER ////////////////////////////////////////////////
-///////////////////////////////////////////////////////////
-bool ItemModel::check()
-{
-    assert(vnum > 0);
-    assert(!name.empty());
-    assert(!article.empty());
-    assert(!shortdesc.empty());
-    assert(!keys.empty());
-    assert(!description.empty());
-    assert(modelType != ModelType::NoType);
-    if ((modelType == ModelType::Armor) || (modelType == ModelType::Weapon))
-    {
-        assert(slot != EquipmentSlot::None);
-    }
-    assert(weight > 0);
-    assert(price >= 0);
-    assert(condition > 0);
-    assert(decay > 0);
-    assert(this->material != MaterialType::NoType);
-    assert(tileSet >= 0);
-    assert(tileId >= 0);
-    return true;
-}
-
-bool ItemModel::replaceSymbols(
-    std::string & source,
-    Material * itemMaterial,
-    ItemQuality itemQuality)
-{
-    bool modified = false;
-    if (itemMaterial)
-    {
-        modified = true;
-        FindAndReplace(source, "&m", ToLower(itemMaterial->name));
-        FindAndReplace(source, "&M", ToLower(itemMaterial->article + ' ' + itemMaterial->name));
-    }
-    else
-    {
-        FindAndReplace(source, "&m", "");
-        FindAndReplace(source, "&M", "");
-    }
-    if (itemQuality != ItemQuality::Normal)
-    {
-        modified = true;
-        FindAndReplace(source, "&q", " " + ToLower(GetItemQualityName(itemQuality)));
-    }
-    else
-    {
-        FindAndReplace(source, "&q", "");
-    }
-    return modified;
-}
-
-std::string ItemModel::getName(Material * itemMaterial, ItemQuality itemQuality)
-{
-    // Make a copy of the short description.
-    std::string output = shortdesc;
-    // Try to replace the symbols inside the short description.
-    if (!replaceSymbols(output, itemMaterial, itemQuality))
-    {
-        output = article + " " + name;
-    }
-    return output;
-}
-
-std::string ItemModel::getDescription(Material * itemMaterial, ItemQuality itemQuality)
-{
-    // Make a copy of the description.
-    std::string output = description;
-    replaceSymbols(output, itemMaterial, itemQuality);
-    return output;
-}
-
-///////////////////////////////////////////////////////////
-// ITEM CREATION //////////////////////////////////////////
-///////////////////////////////////////////////////////////
-
-Item * ItemModel::createItem(std::string maker, Material * composition, ItemQuality itemQuality)
-{
-    // Instantiate the new item.
-    Item * newItem = new Item();
-    // If the new item is a corpse, don't use the normal item's vnum.
-    if (this->modelType == ModelType::Corpse)
-    {
-        newItem->vnum = Mud::instance().getMinVnumCorpse() - 1;
-    }
-    else
-    {
-        newItem->vnum = Mud::instance().getMaxVnumItem() + 1;
-    }
-    newItem->model = this;
-    newItem->maker = maker;
-    newItem->condition = condition;
-    newItem->composition = composition;
-    newItem->quality = itemQuality;
-    newItem->flags = 0;
-    newItem->room = nullptr;
-    newItem->owner = nullptr;
-    newItem->container = nullptr;
-    newItem->currentSlot = slot;
-    newItem->content = std::vector<Item *>();
-    newItem->contentLiq = LiquidContent();
-
-    // If the newly created item is a corpse, return it and don't save it on DB.
-    if (this->modelType == ModelType::Corpse)
-    {
-        Mud::instance().addCorpse(newItem);
-        return newItem;
-    }
-
-    if (!newItem->check())
-    {
-        Logger::log(LogLevel::Error, "Cannot create the new item.");
-        // Delete the item.
-        delete (newItem);
-        // Return pointer to nothing.
-        return nullptr;
-    }
-
-    if (newItem->createOnDB())
-    {
-        // Insert into the item_list the new item.
-        Mud::instance().addItem(newItem);
-    }
-    return newItem;
-}
-
-bool ItemModel::mustBeWielded()
-{
-    return ((slot == EquipmentSlot::RightHand) || (slot == EquipmentSlot::LeftHand));
-}
-
-void ItemModel::luaRegister(lua_State * L)
-{
-    luabridge::getGlobalNamespace(L) //
-    .beginClass<ItemModel>("ItemModel") //
-    .addData("vnum", &ItemModel::vnum) //
-    .addData("type", &ItemModel::modelType) //
-    .addData("weight", &ItemModel::weight) //
-    .addData("price", &ItemModel::price) //
-    .addData("condition", &ItemModel::condition) //
-    .addData("decay", &ItemModel::decay) //
-    .endClass();
-}
-
-std::string ItemModel::getTile(int offset)
-{
-    if (Formatter::getFormat() == Formatter::TELNET)
-    {
-        return ToString(tileSet) + ":" + ToString(tileId + offset);
-    }
-    else
-    {
-        // TODO: Too easy this way.
-        if (modelType == ModelType::Armor)
-        {
-            return "a";
-        }
-        else if (modelType == ModelType::Weapon)
-        {
-            return "w";
-        }
-        else
-        {
-            return "i";
-        }
-    }
 }
 
 void ItemModel::getSheet(Table & sheet) const
@@ -277,6 +110,192 @@ void ItemModel::getSheet(Table & sheet) const
     sheet.addRow( { "Material", GetMaterialTypeName(this->material) });
     sheet.addRow( { "Tile", ToString(this->condition) });
     sheet.addRow( { "Condition", ToString(this->tileSet) + ":" + ToString(this->tileId) });
+}
+
+Item * ItemModel::createItem(std::string maker, Material * composition, ItemQuality itemQuality)
+{
+    // Instantiate the new item.
+    Item * newItem = GenerateItem(this->getType());
+    if (newItem == nullptr)
+    {
+        Logger::log(LogLevel::Error, "Cannot create the new item.");
+        // Return pointer to nothing.
+        return nullptr;
+    }
+
+    // If the new item is a corpse, don't use the normal item's vnum.
+    if (this->getType() == ModelType::Corpse)
+    {
+        newItem->vnum = Mud::instance().getMinVnumCorpse() - 1;
+    }
+    else
+    {
+        newItem->vnum = Mud::instance().getMaxVnumItem() + 1;
+    }
+
+    // First set: Model, Maker, Composition, Quality.
+    newItem->model = this;
+    newItem->maker = maker;
+    newItem->composition = composition;
+    newItem->quality = itemQuality;
+
+    // Then set the rest.
+    newItem->condition = newItem->getMaxCondition();
+    newItem->flags = 0;
+    newItem->room = nullptr;
+    newItem->owner = nullptr;
+    newItem->container = nullptr;
+    newItem->currentSlot = slot;
+    newItem->content = std::vector<Item *>();
+    newItem->contentLiq = LiquidContent();
+
+    // If the newly created item is a corpse, return it and don't save it on DB.
+    if (this->getType() == ModelType::Corpse)
+    {
+        Mud::instance().addCorpse(newItem);
+        return newItem;
+    }
+
+    if (!newItem->check())
+    {
+        Logger::log(LogLevel::Error, "Cannot create the new item.");
+        // Delete the item.
+        delete (newItem);
+        // Return pointer to nothing.
+        return nullptr;
+    }
+
+    SQLiteDbms::instance().beginTransaction();
+    if (newItem->createOnDB())
+    {
+        // Insert into the item_list the new item.
+        Mud::instance().addItem(newItem);
+    }
+    else
+    {
+        Logger::log(LogLevel::Error, "Cannot save the new item on DB.");
+        // Rollback the transation.
+        SQLiteDbms::instance().rollbackTransection();
+        // Delete the item.
+        delete (newItem);
+        // Return pointer to nothing.
+        return nullptr;
+    }
+    SQLiteDbms::instance().endTransaction();
+    return newItem;
+}
+
+bool ItemModel::check()
+{
+    assert(vnum > 0);
+    assert(!name.empty());
+    assert(!article.empty());
+    assert(!shortdesc.empty());
+    assert(!keys.empty());
+    assert(!description.empty());
+    if ((this->getType() == ModelType::Armor) || (this->getType() == ModelType::Weapon))
+    {
+        assert(slot != EquipmentSlot::None);
+    }
+    assert(weight > 0);
+    assert(price > 0);
+    assert(condition > 0);
+    assert(decay > 0);
+    assert(this->material != MaterialType::NoType);
+    assert(tileSet >= 0);
+    assert(tileId >= 0);
+    return true;
+}
+
+bool ItemModel::replaceSymbols(
+    std::string & source,
+    Material * itemMaterial,
+    const ItemQuality & itemQuality) const
+{
+    bool modified = false;
+    if (itemMaterial)
+    {
+        modified = true;
+        FindAndReplace(source, "&m", ToLower(itemMaterial->name));
+        FindAndReplace(source, "&M", ToLower(itemMaterial->article + ' ' + itemMaterial->name));
+    }
+    else
+    {
+        FindAndReplace(source, "&m", "");
+        FindAndReplace(source, "&M", "");
+    }
+    if (itemQuality != ItemQuality::Normal)
+    {
+        modified = true;
+        FindAndReplace(source, "&q", " " + ToLower(itemQuality.toString()));
+    }
+    else
+    {
+        FindAndReplace(source, "&q", "");
+    }
+    return modified;
+}
+
+std::string ItemModel::getName(Material * itemMaterial, const ItemQuality & itemQuality) const
+{
+    // Make a copy of the short description.
+    std::string output = shortdesc;
+    // Try to replace the symbols inside the short description.
+    if (!this->replaceSymbols(output, itemMaterial, itemQuality))
+    {
+        output = article + " " + name;
+    }
+    return output;
+}
+
+std::string ItemModel::getDescription(Material * itemMaterial, const ItemQuality & itemQuality)
+{
+    // Make a copy of the description.
+    std::string output = description;
+    replaceSymbols(output, itemMaterial, itemQuality);
+    return output;
+}
+
+bool ItemModel::mustBeWielded()
+{
+    return ((slot == EquipmentSlot::RightHand) || (slot == EquipmentSlot::LeftHand));
+}
+
+void ItemModel::luaRegister(lua_State * L)
+{
+    luabridge::getGlobalNamespace(L) //
+    .beginClass<ItemModel>("ItemModel") //
+    .addData("vnum", &ItemModel::vnum) //
+    .addData("weight", &ItemModel::weight) //
+    .addData("price", &ItemModel::price) //
+    .addData("condition", &ItemModel::condition) //
+    .addData("decay", &ItemModel::decay) //
+    .addFunction("getType", &ItemModel::getType) //
+    .endClass();
+}
+
+std::string ItemModel::getTile(int offset)
+{
+    if (Formatter::getFormat() == Formatter::TELNET)
+    {
+        return ToString(tileSet) + ":" + ToString(tileId + offset);
+    }
+    else
+    {
+        // TODO: Too easy this way.
+        if (this->getType() == ModelType::Armor)
+        {
+            return "a";
+        }
+        else if (this->getType() == ModelType::Weapon)
+        {
+            return "w";
+        }
+        else
+        {
+            return "i";
+        }
+    }
 }
 
 ArmorModel * ItemModel::toArmor()
@@ -384,6 +403,59 @@ WeaponModel * ItemModel::toWeapon()
     return static_cast<WeaponModel *>(this);
 }
 
+ItemModel * GenerateModel(const ModelType & type)
+{
+    switch (type)
+    {
+        case ModelType::Corpse:
+            return new CorpseModel();
+        case ModelType::Armor:
+            return new ArmorModel();
+        case ModelType::Book:
+            return new BookModel();
+        case ModelType::Container:
+            return new ContainerModel();
+        case ModelType::Currency:
+            return new CurrencyModel();
+        case ModelType::Food:
+            return new FoodModel();
+        case ModelType::Furniture:
+            return new FurnitureModel();
+        case ModelType::Key:
+            return new KeyModel();
+        case ModelType::Light:
+            return new LightModel();
+        case ModelType::LiquidContainer:
+            return new LiquidContainerModel();
+        case ModelType::Mechanism:
+            return new MechanismModel();
+        case ModelType::Node:
+            return new NodeModel();
+        case ModelType::Projectile:
+            return new ProjectileModel();
+        case ModelType::Resource:
+            return new ResourceModel();
+        case ModelType::Rope:
+            return new RopeModel();
+        case ModelType::Seed:
+            return new SeedModel();
+        case ModelType::Shield:
+            return new ShieldModel();
+        case ModelType::Shop:
+            return new ShopModel();
+        case ModelType::Tool:
+            return new ToolModel();
+        case ModelType::Vehicle:
+            return new VehicleModel();
+        case ModelType::Weapon:
+            return new WeaponModel();
+        case ModelType::NoType:
+            return nullptr;
+        default:
+            return nullptr;
+    }
+}
+
 std::string GetModelFlagString(unsigned int flags)
 {
     std::string flagList;
@@ -396,27 +468,29 @@ std::string GetModelFlagString(unsigned int flags)
     return flagList;
 }
 
-std::string GetModelTypeName(ModelType type)
-{
-    if (type == ModelType::Corpse) return "Corpse";
-    if (type == ModelType::Weapon) return "Weapon";
-    if (type == ModelType::Armor) return "Armor";
-    if (type == ModelType::Shield) return "Shield";
-    if (type == ModelType::Projectile) return "Projectile";
-    if (type == ModelType::Container) return "Container";
-    if (type == ModelType::LiquidContainer) return "LiquidContainer";
-    if (type == ModelType::Tool) return "Tool";
-    if (type == ModelType::Node) return "Node";
-    if (type == ModelType::Resource) return "Resource";
-    if (type == ModelType::Seed) return "Seed";
-    if (type == ModelType::Key) return "Key";
-    if (type == ModelType::Furniture) return "Furniture";
-    if (type == ModelType::Food) return "Food";
-    if (type == ModelType::Light) return "Light";
-    if (type == ModelType::Vehicle) return "Vehicle";
-    if (type == ModelType::Book) return "Book";
-    if (type == ModelType::Rope) return "Rope";
-    if (type == ModelType::Mechanism) return "Mechanism";
-    if (type == ModelType::Currency) return "Currency";
-    return "No Model Type";
-}
+/*
+ std::string GetModelTypeName(ModelType type)
+ {
+ if (type == ModelType::Corpse) return "Corpse";
+ if (type == ModelType::Weapon) return "Weapon";
+ if (type == ModelType::Armor) return "Armor";
+ if (type == ModelType::Shield) return "Shield";
+ if (type == ModelType::Projectile) return "Projectile";
+ if (type == ModelType::Container) return "Container";
+ if (type == ModelType::LiquidContainer) return "LiquidContainer";
+ if (type == ModelType::Tool) return "Tool";
+ if (type == ModelType::Node) return "Node";
+ if (type == ModelType::Resource) return "Resource";
+ if (type == ModelType::Seed) return "Seed";
+ if (type == ModelType::Key) return "Key";
+ if (type == ModelType::Furniture) return "Furniture";
+ if (type == ModelType::Food) return "Food";
+ if (type == ModelType::Light) return "Light";
+ if (type == ModelType::Vehicle) return "Vehicle";
+ if (type == ModelType::Book) return "Book";
+ if (type == ModelType::Rope) return "Rope";
+ if (type == ModelType::Mechanism) return "Mechanism";
+ if (type == ModelType::Currency) return "Currency";
+ return "No Model Type";
+ }
+ */

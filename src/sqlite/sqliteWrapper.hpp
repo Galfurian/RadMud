@@ -1,7 +1,7 @@
-/// @file   SQLiteWrapper.hpp
+/// @file   sqliteWrapper.hpp
 /// @brief  Define a wrapper for interacting with a sqlite3 database.
 /// @author Enrico Fraccaroli
-/// @date   23 Agosto 2014
+/// @date   Aug 23 2014
 /// @copyright
 /// Copyright (c) 2014, 2015, 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission to use, copy, modify, and distribute this software for any

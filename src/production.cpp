@@ -25,9 +25,9 @@
 #include "mud.hpp"
 #include "room.hpp"
 #include "utils.hpp"
-#include "logger.hpp"
 #include "character.hpp"
 #include "constants.hpp"
+#include "utilities/logger.hpp"
 
 Production::Production() :
         vnum(-1),

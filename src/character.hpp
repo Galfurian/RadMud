@@ -25,9 +25,8 @@
 #include "effect.hpp"
 #include "exit.hpp"
 #include "faction.hpp"
-#include "item.hpp"
 #include "race.hpp"
-#include "utils.hpp"
+#include "item/item.hpp"
 #include "action/combat/combatAction.hpp"
 
 #include <deque>
@@ -220,9 +219,9 @@ class Character
         unsigned int getMaxHealth(bool withEffects = true) const;
 
         /// @brief Get character condition.
-        /// @param character The target character.
+        /// @param self If the sentence has to be for another character or not.
         /// @return Condition of this character.
-        std::string getHealthCondition(Character * character = nullptr);
+        std::string getHealthCondition(const bool & self = false);
 
         /// @brief Allows to SET the stamina value.
         /// @param value The value to set.
@@ -282,8 +281,6 @@ class Character
 
         /// @brief Provides a pointer to the action object associated to this character.
         /// @return A pointer to action.
-        std::shared_ptr<GeneralAction> getAction();
-
         std::shared_ptr<GeneralAction> getAction() const;
 
         /// @brief Provides a pointer to the action at the front position and
@@ -295,7 +292,7 @@ class Character
         /// @param error     A reference to a string which will contain error message in case of failure.
         /// @return <b>True</b> if the operation goes well,<br>
         ///         <b>False</b> otherwise.
-        bool canMoveTo(Direction direction, std::string & error) const;
+        bool canMoveTo(const Direction & direction, std::string & error) const;
 
         /// @brief Move the character to another room.
         /// @param destination Destination room.
@@ -478,9 +475,8 @@ class Character
         void updateActivatedEffects();
 
         /// @brief Provide a detailed description of the character.
-        /// @param character The target character.
         /// @return A detailed description of the character.
-        std::string getLook(Character * character = nullptr);
+        std::string getLook();
 
         /// @brief Check if the current character can see the target character.
         /// @param target The target character.
@@ -513,8 +509,12 @@ class Character
 
         /// @brief Provides the list of active weapons (Left and Right hands).
         /// @return Vector of items.
-        ItemVector getActiveWeapons();
+        std::vector<WeaponItem *> getActiveWeapons();
 
+        /// @brief Provides a list of characters which are in sight.
+        /// @param targets    The list which will contain the targets.
+        /// @return <b>True</b> if there are targets in sight,<br>
+        ///         <b>False</b> otherwise.
         bool getCharactersInSight(std::vector<Character *> & targets);
 
         /// @brief Given an action, it returns the necessary cooldown.

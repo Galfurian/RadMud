@@ -23,12 +23,12 @@
 #include "character.hpp"
 #include "defines.hpp"
 #include "exit.hpp"
-#include "item.hpp"
-#include "lua/lua_script.hpp"
 #include "mobile.hpp"
 #include "player.hpp"
-#include "utilities/coordinates.hpp"
 #include "utils.hpp"
+#include "item/item.hpp"
+#include "lua/lua_script.hpp"
+#include "utilities/coordinates.hpp"
 
 class Item;
 class Area;
@@ -58,7 +58,7 @@ class Room
         /// The continent where is located the room.
         Continent * continent;
         /// The current room coordinates.
-        Coordinates<int> coord;
+        Coordinates coord;
         /// The terrain where the room is situated.
         std::string terrain;
         /// The name of the room.
@@ -153,27 +153,27 @@ class Room
 
         /// @brief Search for the character in the room.
         /// @param target    The character to search.
-        /// @param number    Number of the character we are looking for.
-        /// @param exception The character to skip in the search.
+        /// @param number    Number of the player we are looking for.
+        /// @param exceptions The list of exceptions.
         /// @return The character, if it's in the room.
         Character * findCharacter(
             std::string target,
             int & number,
-            Character * exception = nullptr);
+            const CharacterVector & exceptions);
 
         /// @brief Search for the player in the room.
         /// @param target    The player to search.
-        /// @param exception The player to skip in the search.
         /// @param number    Number of the player we are looking for.
+        /// @param exceptions The list of exceptions.
         /// @return The player, if it's in the room.
-        Player * findPlayer(std::string target, int & number, Player * exception = nullptr);
+        Player * findPlayer(std::string target, int & number, const CharacterVector & exceptions);
 
         /// @brief Search for the mobile in the room.
         /// @param target    The mobile to search.
-        /// @param exception The mobile to skip in the search.
         /// @param number    Number of the mobile we are looking for.
+        /// @param exceptions The list of exceptions.
         /// @return The mobile, if it's in the room.
-        Mobile * findMobile(std::string target, int & number, Mobile * exception = nullptr);
+        Mobile * findMobile(std::string target, int & number, const CharacterVector & exceptions);
 
         /// @brief Add the provided exit to the room list of exits.
         /// @param exit The exit to add to the list.
@@ -183,8 +183,9 @@ class Room
 
         /// @brief Remove from the list of exits the one on the given direction.
         /// @param direction The direction to removed.
-        /// @return <b>True</b> if the execution goes well,<br><b>False</b> otherwise.
-        bool removeExit(Direction direction);
+        /// @return <b>True</b> if the execution goes well,<br>
+        ///         <b>False</b> otherwise.
+        bool removeExit(const Direction & direction);
 
         /// @brief Search for the desired exit in a direction, provided as an enumerator.
         /// @param direction The direction to search.
@@ -194,7 +195,7 @@ class Room
         /// @brief Search for the desired exit in a direction, provided as a string.
         /// @param direction The direction to search.
         /// @return The desired exit.
-        std::shared_ptr<Exit> findExit(std::string direction);
+        std::shared_ptr<Exit> findExit(const std::string & direction);
 
         /// @brief Search for the desired exit of this room.
         /// @param destination The destination room.
@@ -270,7 +271,7 @@ class Room
 /// @param coord       The coordinates where create the room.
 /// @param source_room During mining, the emthod uses source_room to connect rooms.
 /// @return <b>True</b> if the execution goes well,<br><b>False</b> otherwise.
-bool CreateRoom(Coordinates<int> coord, Room * source_room = NULL);
+bool CreateRoom(Coordinates coord, Room * source_room = NULL);
 
 /// @brief Connect the room with the near rooms.
 /// @param room The room to be connected.

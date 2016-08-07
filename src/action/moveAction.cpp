@@ -17,8 +17,8 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "moveAction.hpp"
-#include "../logger.hpp"
 #include "../character.hpp"
+#include "../utilities/logger.hpp"
 
 using namespace std::chrono;
 
@@ -87,9 +87,8 @@ ActionStatus MoveAction::perform()
         // Move character.
         actor->moveTo(
             destination,
-            actor->getNameCapital() + " goes " + GetDirectionName(direction) + ".\n",
-            actor->getNameCapital() + " arives from " + GetDirectionName(InverDirection(direction))
-                + ".\n");
+            actor->getNameCapital() + " goes " + direction.toString() + ".\n",
+            actor->getNameCapital() + " arives from " + direction.getOpposite().toString() + ".\n");
     }
     return ActionStatus::Finished;
 }

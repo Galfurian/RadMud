@@ -24,9 +24,9 @@
 // Other Include.
 #include "mud.hpp"
 #include "room.hpp"
-#include "logger.hpp"
 #include "constants.hpp"
 #include "lua/lua_script.hpp"
+#include "utilities/logger.hpp"
 #include "luabridge/LuaBridge.h"
 
 using namespace std;
@@ -45,7 +45,8 @@ Mobile::Mobile() :
         controller(),
         lua_script(),
         lua_mutex(),
-        nextActionCooldown()
+        nextActionCooldown(),
+        managedItem()
 {
     // Nothing to do.
 }
@@ -198,12 +199,23 @@ void Mobile::kill()
         // Add the item to the mud.
         Mud::instance().addItem(item);
         // Evaluate the minimum and maximum condition.
-        int min = (item->model->condition / 100) * 10;
-        int max = (item->model->condition / 100) * 50;
+        unsigned int min = (item->getMaxCondition() / 100) * 10;
+        unsigned int max = (item->getMaxCondition() / 100) * 50;
         // Set a random condition for the new item.
-        item->condition = TRandInteger<int>(min, max);
+        item->condition = TRandInteger<unsigned int>(min, max);
         // Create the entry for the item on the database.
-        item->createOnDB();
+        SQLiteDbms::instance().beginTransaction();
+        if (item->createOnDB())
+        {
+            // Insert into the item_list the new item.
+            Mud::instance().addItem(item);
+        }
+        else
+        {
+            Logger::log(LogLevel::Error, "Cannot save the item (%s) on DB.", ToString(item->vnum));
+            // Rollback the transation.
+            SQLiteDbms::instance().rollbackTransection();
+        }
     }
     for (auto it = this->equipment.begin(); it != this->equipment.end(); ++it)
     {
@@ -213,12 +225,23 @@ void Mobile::kill()
         // Add the item to the mud.
         Mud::instance().addItem(item);
         // Evaluate the minimum and maximum condition.
-        int min = (item->model->condition / 100) * 10;
-        int max = (item->model->condition / 100) * 50;
+        unsigned int min = (item->getMaxCondition() / 100) * 10;
+        unsigned int max = (item->getMaxCondition() / 100) * 50;
         // Set a random condition for the new item.
-        item->condition = TRandInteger<int>(min, max);
+        item->condition = TRandInteger<unsigned int>(min, max);
         // Create the entry for the item on the database.
-        item->createOnDB();
+        SQLiteDbms::instance().beginTransaction();
+        if (item->createOnDB())
+        {
+            // Insert into the item_list the new item.
+            Mud::instance().addItem(item);
+        }
+        else
+        {
+            Logger::log(LogLevel::Error, "Cannot save the item (%s) on DB.", ToString(item->vnum));
+            // Rollback the transation.
+            SQLiteDbms::instance().rollbackTransection();
+        }
     }
     // Call the method of the father class.
     Character::kill();

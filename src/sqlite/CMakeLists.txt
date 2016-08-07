@@ -8,7 +8,8 @@ set(RADMUD_SQLITE_INC
 #############################################
 # SQLite Source Files
 set(RADMUD_SQLITE_SRC
-	./src/sqlite/SQLiteDbms.cpp
-	./src/sqlite/SQLiteWrapper.cpp
+	./src/sqlite/sqliteDbms.cpp
+	./src/sqlite/sqliteWrapper.cpp
+	./src/sqlite/sqliteLoadFunctions.cpp
     PARENT_SCOPE
 )

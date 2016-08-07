@@ -18,13 +18,15 @@
 
 #include "mud.hpp"
 
-#include <algorithm>
-#include <signal.h>
 #include <chrono>
 #include <errno.h>
+#include <unistd.h>
+#include <signal.h>
+#include <algorithm>
 
-#include "logger.hpp"
 #include "protocol.hpp"
+#include "utilities/logger.hpp"
+#include "utilities/stopwatch.hpp"
 #include "utilities/CMacroWrapper.hpp"
 
 /// Input file descriptor.
@@ -631,7 +633,7 @@ Building * Mud::findBuilding(int vnum)
     return nullptr;
 }
 
-Direction Mud::findDirection(std::string direction, bool exact)
+Direction Mud::findDirection(const std::string & direction, bool exact)
 {
     for (auto iterator : mudDirections)
     {

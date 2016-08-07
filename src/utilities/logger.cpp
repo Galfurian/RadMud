@@ -17,7 +17,7 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "logger.hpp"
-#include "utils.hpp"
+#include "../utils.hpp"
 
 Logger::Logger()
 {

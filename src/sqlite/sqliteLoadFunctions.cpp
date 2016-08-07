@@ -1,9 +1,8 @@
-/// @file   SQLiteDbms.cpp
-/// @brief  It's manage action to Database.
+/// @file   sqliteLoadFunctions.cpp
 /// @author Enrico Fraccaroli
-/// @date   23 Agosto 2014
+/// @date   Aug 4 2016
 /// @copyright
-/// Copyright (c) 2014, 2015, 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
+/// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission to use, copy, modify, and distribute this software for any
 /// purpose with or without fee is hereby granted, provided that the above
 /// copyright notice and this permission notice appear in all copies.
@@ -16,14 +15,11 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#include "SQLiteDbms.hpp"
+#include "sqliteDbms.hpp"
 
-#include <sstream>
-#include <chrono>
-#include "../constants.hpp"
 #include "../mud.hpp"
-#include "../utils.hpp"
-#include "../logger.hpp"
+#include "../constants.hpp"
+#include "../utilities/logger.hpp"
 
 #include "../model/armorModel.hpp"
 #include "../model/bookModel.hpp"
@@ -47,428 +43,9 @@
 #include "../model/weaponModel.hpp"
 #include "../model/shopModel.hpp"
 
-using namespace std;
-
-SQLiteDbms::SQLiteDbms()
-{
-    tableLoaders.push_back(std::make_pair("BadName", LoadBadName));
-    tableLoaders.push_back(std::make_pair("BlockedIp", LoadBlockedIp));
-    tableLoaders.push_back(std::make_pair("News", LoadNews));
-    tableLoaders.push_back(std::make_pair("Material", LoadMaterial));
-    tableLoaders.push_back(std::make_pair("Skill", LoadSkill));
-    tableLoaders.push_back(std::make_pair("Faction", LoadFaction));
-    tableLoaders.push_back(std::make_pair("Race", LoadRace));
-    tableLoaders.push_back(std::make_pair("Continent", LoadContinent));
-    tableLoaders.push_back(std::make_pair("Area", LoadArea));
-    tableLoaders.push_back(std::make_pair("Room", LoadRoom));
-    tableLoaders.push_back(std::make_pair("Exit", LoadExit));
-    tableLoaders.push_back(std::make_pair("AreaList", LoadAreaList));
-    tableLoaders.push_back(std::make_pair("TravelPoint", LoadTravelPoint));
-    tableLoaders.push_back(std::make_pair("Model", LoadModel));
-    tableLoaders.push_back(std::make_pair("Liquid", LoadLiquid));
-    tableLoaders.push_back(std::make_pair("Item", LoadItem));
-    tableLoaders.push_back(std::make_pair("ItemContent", LoadContent));
-    tableLoaders.push_back(std::make_pair("ItemContentLiq", LoadContentLiq));
-    tableLoaders.push_back(std::make_pair("ItemRoom", LoadItemRoom));
-    tableLoaders.push_back(std::make_pair("Writings", LoadWriting));
-    tableLoaders.push_back(std::make_pair("Profession", LoadProfession));
-    tableLoaders.push_back(std::make_pair("Production", LoadProduction));
-    tableLoaders.push_back(std::make_pair("Mobile", LoadMobile));
-    tableLoaders.push_back(std::make_pair("Building", LoadBuilding));
-}
-
-SQLiteDbms::~SQLiteDbms()
-{
-    // Nothing to do.
-}
-
-SQLiteDbms & SQLiteDbms::instance()
-{
-    // Since it's a static variable, if the class has already been created,
-    // It won't be created again. And it **is** thread-safe in C++11.
-    static SQLiteDbms instance;
-    // Return a reference to our instance.
-    return instance;
-}
-
-bool SQLiteDbms::openDatabase()
-{
-    if (!dbConnection.openConnection(kDatabaseName, kSystemDir))
-    {
-        Logger::log(LogLevel::Error, "Error code :" + ToString(dbConnection.getLastErrorCode()));
-        Logger::log(LogLevel::Error, "Last error :" + dbConnection.getLastErrorMsg());
-        return false;
-    }
-    return true;
-}
-
-bool SQLiteDbms::closeDatabase()
-{
-    if (!dbConnection.closeConnection())
-    {
-        Logger::log(LogLevel::Error, "Error code :" + ToString(dbConnection.getLastErrorCode()));
-        Logger::log(LogLevel::Error, "Last error :" + dbConnection.getLastErrorMsg());
-        return false;
-    }
-    return true;
-}
-
-bool SQLiteDbms::loadTables()
-{
-    for (auto iterator : tableLoaders)
-    {
-        Logger::log(LogLevel::Debug, "    Loading Table: " + iterator.first + ".");
-        // Execute the query.
-        ResultSet * result = dbConnection.executeSelect(
-            ("SELECT * FROM " + iterator.first + ";").c_str());
-        // Check the result.
-        if (result == nullptr)
-        {
-            return false;
-        }
-        // Call the rows parsing function.
-        if (!iterator.second(result))
-        {
-            // Log an error.
-            Logger::log(
-                LogLevel::Error,
-                "Encountered an error during loading table: " + iterator.first);
-            // release the resource.
-            result->release();
-            return false;
-        }
-        // release the resource.
-        result->release();
-    }
-    return true;
-}
-
-bool SQLiteDbms::loadPlayer(Player * player)
-{
-    Stopwatch<std::chrono::milliseconds> stopwatch("LoadPlayer");
-    std::string query;
-    ResultSet * result;
-    Logger::log(LogLevel::Debug, "Loading player " + player->getName() + ".");
-    stopwatch.start();
-
-    ///////////////////////////////////////////////////////////////////////////////
-    query = "SELECT * FROM Player WHERE name = \"" + player->name + "\";";
-    // Execute the query.
-    result = dbConnection.executeSelect(query.c_str());
-    // Check the result.
-    if (result == nullptr)
-    {
-        Logger::log(LogLevel::Error, "Result of query is empty.");
-        return false;
-    }
-    // Call the rows parsing function.
-    if (!LoadPlayerInformation(result, player))
-    {
-        Logger::log(LogLevel::Error, "Encountered an error during loading Player Information.");
-        result->release();
-        return false;
-    }
-    // release the resource.
-    result->release();
-
-    ///////////////////////////////////////////////////////////////////////////////
-    query = "SELECT item, position FROM ItemPlayer WHERE owner = \"" + player->name + "\";";
-    // Execute the query.
-    result = dbConnection.executeSelect(query.c_str());
-    // Check the result.
-    if (result == nullptr)
-    {
-        Logger::log(LogLevel::Error, "Result of query is empty.");
-        return false;
-    }
-    // Call the rows parsing function.
-    if (!LoadPlayerItems(result, player))
-    {
-        Logger::log(LogLevel::Error, "Encountered an error during loading Player Items.");
-        result->release();
-        return false;
-    }
-    // release the resource.
-    result->release();
-
-    ///////////////////////////////////////////////////////////////////////////////
-    query = "SELECT skill,value FROM Advancement WHERE player=\"" + player->name + "\";";
-    // Execute the query.
-    result = dbConnection.executeSelect(query.c_str());
-    // Check the result.
-    if (result == nullptr)
-    {
-        Logger::log(LogLevel::Error, "Result of query is empty.");
-        return false;
-    }
-    // Call the rows parsing function.
-    if (!LoadPlayerSkill(result, player))
-    {
-        Logger::log(LogLevel::Error, "Encountered an error during loading Player Skills.");
-        result->release();
-        return false;
-    }
-    // release the resource.
-    result->release();
-
-    ///////////////////////////////////////////////////////////////////////////////
-    // Check the loaded player.
-    if (!player->check())
-    {
-        Logger::log(LogLevel::Error, "Error during error checking.");
-        return false;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////
-    // Log the elapsed time.
-    Logger::log(LogLevel::Debug, "Elapsed Time (" + ToString(stopwatch.elapsed()) + " ms).");
-
-    return true;
-}
-
-bool SQLiteDbms::searchPlayer(string name)
-{
-    bool outcome = false;
-    ResultSet * result = dbConnection.executeSelect(
-        ("SELECT count(*) FROM Player WHERE name=\"" + name + "\";").c_str());
-    if (result)
-    {
-        if (result->next())
-        {
-            if (result->getNextInteger() == 1)
-            {
-                outcome = true;
-            }
-        }
-    }
-    result->release();
-    return outcome;
-}
-
-bool SQLiteDbms::insertInto(
-    std::string table,
-    std::vector<std::string> args,
-    bool orIgnore,
-    bool orReplace)
-{
-    stringstream stream;
-    stream << "INSERT";
-    if (orIgnore)
-    {
-        stream << " OR IGNORE";
-    }
-    else if (orReplace)
-    {
-        stream << " OR REPLACE";
-    }
-    stream << " INTO " << table << std::endl;
-    stream << "VALUES(" << std::endl;
-    for (unsigned int it = 0; it < args.size(); it++)
-    {
-        std::string value = args.at(it);
-        if (it == (args.size() - 1))
-        {
-            stream << "\"" << value << "\");";
-        }
-        else
-        {
-            stream << "\"" << value << "\", ";
-        }
-    }
-    return (dbConnection.executeQuery(stream.str().c_str()) != 0);
-}
-
-bool SQLiteDbms::deleteFrom(string table, QueryList where)
-{
-    stringstream stream;
-    stream << "DELETE FROM " << table << std::endl;
-    stream << "WHERE" << std::endl;
-    for (unsigned int it = 0; it < where.size(); ++it)
-    {
-        std::pair<std::string, std::string> clause = where.at(it);
-        if (it == (where.size() - 1))
-        {
-            stream << "    " << clause.first << " = \"" << clause.second << "\";" << std::endl;
-        }
-        else
-        {
-            stream << "    " << clause.first << " = \"" << clause.second << "\" AND" << std::endl;
-        }
-    }
-    return (dbConnection.executeQuery(stream.str().c_str()) != 0);
-}
-
-bool SQLiteDbms::updateInto(std::string table, QueryList value, QueryList where)
-{
-    stringstream stream;
-    stream << "UPDATE " << table << std::endl;
-    stream << "SET" << std::endl;
-    for (unsigned int it = 0; it < value.size(); ++it)
-    {
-        std::pair<std::string, std::string> clause = value.at(it);
-        if (it == (value.size() - 1))
-        {
-            stream << "    " << clause.first << " = \"" << clause.second << "\"" << std::endl;
-        }
-        else
-        {
-            stream << "    " << clause.first << " = \"" << clause.second << "\"," << std::endl;
-        }
-    }
-    stream << "WHERE" << std::endl;
-    for (unsigned int it = 0; it < where.size(); ++it)
-    {
-        std::pair<std::string, std::string> clause = where.at(it);
-        if (it == (where.size() - 1))
-        {
-            stream << "    " << clause.first << " = \"" << clause.second << "\";" << std::endl;
-        }
-        else
-        {
-            stream << "    " << clause.first << " = \"" << clause.second << "\" AND" << std::endl;
-        }
-    }
-    return (dbConnection.executeQuery(stream.str().c_str()) != 0);
-}
-
-void SQLiteDbms::beginTransaction()
-{
-    dbConnection.beginTransaction();
-}
-
-void SQLiteDbms::rollbackTransection()
-{
-    dbConnection.rollbackTransection();
-}
-
-void SQLiteDbms::endTransaction()
-{
-    dbConnection.endTransaction();
-}
-
-bool LoadPlayerInformation(ResultSet * result, Player * player)
-{
-    if (!result->next())
-    {
-        Logger::log(LogLevel::Error, "No result from the query.");
-        return false;
-    }
-
-    player->name = result->getNextString();
-    player->password = result->getNextString();
-    player->race = Mud::instance().findRace(result->getNextInteger());
-    player->setAbility(Ability::Strength, result->getNextUnsignedInteger());
-    player->setAbility(Ability::Agility, result->getNextUnsignedInteger());
-    player->setAbility(Ability::Perception, result->getNextUnsignedInteger());
-    player->setAbility(Ability::Constitution, result->getNextUnsignedInteger());
-    player->setAbility(Ability::Intelligence, result->getNextUnsignedInteger());
-    player->gender = static_cast<GenderType>(result->getNextInteger());
-    player->age = result->getNextInteger();
-    player->description = result->getNextString();
-    player->weight = result->getNextUnsignedInteger();
-    player->faction = Mud::instance().findFaction(result->getNextInteger());
-    player->level = result->getNextUnsignedInteger();
-    player->experience = result->getNextInteger();
-    player->room = Mud::instance().findRoom(result->getNextInteger());
-    player->prompt = player->prompt_save = result->getNextString();
-    player->flags = result->getNextUnsignedInteger();
-    player->setHealth(result->getNextUnsignedInteger(), true);
-    player->setStamina(result->getNextUnsignedInteger(), true);
-    player->setHunger(result->getNextInteger());
-    player->setThirst(result->getNextInteger());
-    player->rent_room = result->getNextInteger();
-
-    if (player->room == nullptr)
-    {
-        player->room = Mud::instance().findRoom(player->rent_room);
-        if (player->room == nullptr)
-        {
-            Logger::log(LogLevel::Error, "No room has been set.");
-            return false;
-        }
-    }
-
-    return true;
-}
-
-bool LoadPlayerItems(ResultSet * result, Character * character)
-{
-    while (result->next())
-    {
-        // The pointer to the object.
-        Item * item = Mud::instance().findItem(result->getNextInteger());
-        EquipmentSlot slot = static_cast<EquipmentSlot>(result->getNextInteger());
-
-        if (item == nullptr)
-        {
-            Logger::log(LogLevel::Error, "Item not found!");
-            return false;
-        }
-
-        if (item->room != nullptr)
-        {
-            Logger::log(LogLevel::Error, "The item is no more available.");
-            return false;
-        }
-        if (item->owner != nullptr)
-        {
-            if (item->owner != character)
-            {
-                Logger::log(LogLevel::Error, "The item is no more available.");
-                return false;
-            }
-        }
-        if (slot == EquipmentSlot::None)
-        {
-            // Add the item to the inventory.
-            character->addInventoryItem(item);
-        }
-        else
-        {
-            // Change the slot of the item.
-            item->setCurrentSlot(slot);
-            // Add the item to the equipment.
-            character->addEquipmentItem(item);
-        }
-    }
-    return true;
-}
-
-bool LoadPlayerSkill(ResultSet * result, Player * player)
-{
-    try
-    {
-        while (result->next())
-        {
-            Skill * skill = Mud::instance().findSkill(result->getNextInteger());
-            unsigned int value = result->getNextUnsignedInteger();
-
-            if (skill == nullptr)
-            {
-                throw runtime_error("Wrong skill id.");
-            }
-            // Prevent saved values below 0.
-            if (value <= 0)
-            {
-                value = 1;
-            }
-
-            player->skills[skill->vnum] = value;
-        }
-    }
-    catch (std::runtime_error & e)
-    {
-        Logger::log(LogLevel::Error, "    " + std::string(e.what()));
-        return false;
-    }
-    catch (std::bad_alloc & e)
-    {
-        Logger::log(LogLevel::Error, "    " + std::string(e.what()));
-        return false;
-    }
-
-    return true;
-}
+#include "../item/shopItem.hpp"
+#include "../item/armorItem.hpp"
+#include "../item/weaponItem.hpp"
 
 bool LoadBadName(ResultSet * result)
 {
@@ -541,24 +118,53 @@ bool LoadItem(ResultSet * result)
 {
     while (result->next())
     {
-        // Create a new item.
-        Item * item = new Item();
-        // Initialize the item.
-        item->vnum = result->getNextInteger();
-        item->model = Mud::instance().findItemModel(result->getNextInteger());
-        item->maker = result->getNextString();
-        item->condition = result->getNextInteger();
-        item->composition = Mud::instance().findMaterial(result->getNextInteger());
-        item->quality = (ItemQuality) result->getNextInteger();
-        item->flags = result->getNextUnsignedInteger();
+        // Retrieve the values.
+        int itemVnum = result->getNextInteger();
+        int itemModelVnum = result->getNextInteger();
+        std::string itemMaker = result->getNextString();
+        unsigned int itemCondition = result->getNextUnsignedInteger();
+        int itemCompositionVnum = result->getNextInteger();
+        unsigned int itemQualityValue = result->getNextUnsignedInteger();
+        unsigned int itemFlags = result->getNextUnsignedInteger();
 
+        // Retrieve the model vnum.
+        ItemModel * itemModel = Mud::instance().findItemModel(itemModelVnum);
+        if (itemModel == nullptr)
+        {
+            Logger::log(LogLevel::Error, "Item has wrong model (%s)", ToString(itemModelVnum));
+            return false;
+        }
+        // Check the dynamic attributes.
+        Material * itemComposition = Mud::instance().findMaterial(itemCompositionVnum);
+        if (itemComposition == nullptr)
+        {
+            Logger::log(
+                LogLevel::Error,
+                "Item has wrong material (%s)",
+                ToString(itemCompositionVnum));
+            return false;
+        }
+        if (!ItemQuality::isValid(itemQualityValue))
+        {
+            Logger::log(LogLevel::Error, "Item has wrong quality (%s)", ToString(itemQualityValue));
+            return false;
+        }
+        // Set the item values.
+        Item * item = GenerateItem(itemModel->getType());
+        item->vnum = itemVnum;
+        item->model = itemModel;
+        item->condition = itemCondition;
+        item->maker = itemMaker;
+        item->composition = itemComposition;
+        item->quality = ItemQuality(itemQualityValue);
+        item->flags = itemFlags;
+        // Check correctness of attributes.
         if (!item->check())
         {
             Logger::log(LogLevel::Error, "Error during error checking.");
             delete (item);
             return false;
         }
-
         // Add the item to the map of items.
         if (!Mud::instance().addItem(item))
         {
@@ -628,36 +234,15 @@ bool LoadModel(ResultSet * result)
         int vnum = result->getNextInteger();
         ModelType type = static_cast<ModelType>(result->getNextInteger());
         // Create a pointer to the new item model.
-        ItemModel * itemModel;
-        // Call the contructor for the right type of model.
-        if (type == ModelType::Armor) itemModel = new ArmorModel();
-        else if (type == ModelType::Book) itemModel = new BookModel();
-        else if (type == ModelType::Container) itemModel = new ContainerModel();
-        else if (type == ModelType::Currency) itemModel = new CurrencyModel();
-        else if (type == ModelType::Food) itemModel = new FoodModel();
-        else if (type == ModelType::Furniture) itemModel = new FurnitureModel();
-        else if (type == ModelType::Key) itemModel = new KeyModel();
-        else if (type == ModelType::Light) itemModel = new LightModel();
-        else if (type == ModelType::LiquidContainer) itemModel = new LiquidContainerModel();
-        else if (type == ModelType::Mechanism) itemModel = new MechanismModel();
-        else if (type == ModelType::Node) itemModel = new NodeModel();
-        else if (type == ModelType::Projectile) itemModel = new ProjectileModel();
-        else if (type == ModelType::Resource) itemModel = new ResourceModel();
-        else if (type == ModelType::Rope) itemModel = new RopeModel();
-        else if (type == ModelType::Seed) itemModel = new SeedModel();
-        else if (type == ModelType::Shield) itemModel = new ShieldModel();
-        else if (type == ModelType::Shop) itemModel = new ShopModel();
-        else if (type == ModelType::Tool) itemModel = new ToolModel();
-        else if (type == ModelType::Vehicle) itemModel = new VehicleModel();
-        else if (type == ModelType::Weapon) itemModel = new WeaponModel();
-        else
+        ItemModel * itemModel = GenerateModel(type);
+        if (itemModel == nullptr)
         {
             Logger::log(LogLevel::Error, "Wrong type of model %s.", ToString(vnum));
             return false;
         }
+
         // Set the values of the new model.
         itemModel->vnum = vnum;
-        itemModel->modelType = type;
         itemModel->name = result->getNextString();
         itemModel->article = result->getNextString();
         itemModel->shortdesc = result->getNextString();
@@ -666,9 +251,9 @@ bool LoadModel(ResultSet * result)
         itemModel->slot = static_cast<EquipmentSlot>(result->getNextInteger());
         itemModel->modelFlags = result->getNextUnsignedInteger();
         itemModel->weight = result->getNextUnsignedInteger();
-        itemModel->price = result->getNextInteger();
-        itemModel->condition = result->getNextInteger();
-        itemModel->decay = result->getNextInteger();
+        itemModel->price = result->getNextUnsignedInteger();
+        itemModel->condition = result->getNextUnsignedInteger();
+        itemModel->decay = result->getNextUnsignedInteger();
         itemModel->material = static_cast<MaterialType>(result->getNextInteger());
         itemModel->tileSet = result->getNextInteger();
         itemModel->tileId = result->getNextInteger();
@@ -836,23 +421,31 @@ bool LoadExit(ResultSet * result)
     {
         // Create an empty exit.
         std::shared_ptr<Exit> newExit = std::make_shared<Exit>();
-        // Retrieve the rooms vnum.
-        newExit->source = Mud::instance().findRoom(result->getNextInteger());
-        newExit->destination = Mud::instance().findRoom(result->getNextInteger());
-        newExit->direction = static_cast<Direction>(result->getNextInteger());
-        newExit->flags = result->getNextUnsignedInteger();
-
+        // retrive the values.
+        int sourceVnum = result->getNextInteger();
+        int destinationVnum = result->getNextInteger();
+        unsigned int directionValue = result->getNextUnsignedInteger();
+        unsigned int flagValue = result->getNextUnsignedInteger();
         // Check the correctness.
+        newExit->source = Mud::instance().findRoom(sourceVnum);
         if (newExit->source == nullptr)
         {
-            Logger::log(LogLevel::Error, "Can't find the source room.");
+            Logger::log(LogLevel::Error, "Can't find source (%s).", ToString(sourceVnum));
             return false;
         }
+        newExit->destination = Mud::instance().findRoom(destinationVnum);
         if (newExit->destination == nullptr)
         {
-            Logger::log(LogLevel::Error, "Can't find the destination room.");
+            Logger::log(LogLevel::Error, "Can't find destination (%s).", ToString(destinationVnum));
             return false;
         }
+        if (!Direction::isValid(directionValue))
+        {
+            Logger::log(LogLevel::Error, "Direction si not valid (%s).", ToString(directionValue));
+            return false;
+        }
+        newExit->direction = Direction(directionValue);
+        newExit->flags = flagValue;
         if (!newExit->check())
         {
             Logger::log(LogLevel::Error, "Error during error checking.");
@@ -1029,9 +622,9 @@ bool LoadMaterial(ResultSet * result)
         material->type = (MaterialType) result->getNextInteger();
         material->name = result->getNextString();
         material->article = result->getNextString();
-        material->worth = result->getNextInteger();
-        material->hardness = result->getNextInteger();
-        material->lightness = result->getNextInteger();
+        material->worth = result->getNextUnsignedInteger();
+        material->hardness = result->getNextUnsignedInteger();
+        material->lightness = result->getNextUnsignedInteger();
         // Check the correctness.
         if (!material->check())
         {
@@ -1266,6 +859,32 @@ bool LoadBuilding(ResultSet * result)
             Logger::log(LogLevel::Error, "Error during building insertion.");
             return false;
         }
+    }
+    return true;
+}
+
+bool LoadItemShop(ResultSet * result)
+{
+    while (result->next())
+    {
+        // Retrieve the item vnum.
+        int vnum = result->getNextInteger();
+        Item * genericItem = Mud::instance().findItem(vnum);
+        if (genericItem == nullptr)
+        {
+            Logger::log(LogLevel::Error, "Can't find the item (%s).", ToString(vnum));
+            return false;
+        }
+        if (genericItem->getType() != ItemType::Shop)
+        {
+            Logger::log(LogLevel::Error, "Wrong type of item (%s).", ToString(vnum));
+            return false;
+        }
+        ShopItem * shop = genericItem->toShopItem();
+        shop->shopName = result->getNextString();
+        shop->shopBuyTax = result->getNextUnsignedInteger();
+        shop->shopSellTax = result->getNextUnsignedInteger();
+        shop->shopKeeper = Mud::instance().findMobile(result->getNextString());
     }
     return true;
 }

@@ -27,10 +27,8 @@
 
 // Other Include.
 #include "mud.hpp"
-#include "logger.hpp"
 #include "constants.hpp"
 #include "lua/lua_script.hpp"
-#include "sqlite/SQLiteDbms.hpp"
 #include "luabridge/LuaBridge.h"
 #include "command/command.hpp"
 
@@ -41,6 +39,11 @@
 
 #include "action/combat/basicAttack.hpp"
 #include "action/combat/flee.hpp"
+#include "sqlite/sqliteDbms.hpp"
+
+#include "utilities/logger.hpp"
+
+#include "item/armorItem.hpp"
 
 using namespace std;
 using namespace std::chrono;
@@ -396,23 +399,22 @@ unsigned int Character::getMaxHealth(bool withEffects) const
     }
 }
 
-string Character::getHealthCondition(Character * character)
+string Character::getHealthCondition(const bool & self)
 {
     string sent_be, sent_have;
     // Determine who is the examined character.
-    if (character != nullptr && character != this)
+    if (self)
+    {
+        sent_be = "are";
+        sent_have = "have";
+    }
+    else
     {
         sent_be = "is";
         sent_have = "has";
     }
-    else
-    {
-        character = this;
-        sent_be = "are";
-        sent_have = "have";
-    }
     // Determine the percentage of current health.
-    auto percent = (100 * character->health) / character->getMaxHealth();
+    auto percent = (100 * this->health) / this->getMaxHealth();
     // Determine the correct description.
     if (percent >= 100) return sent_be + " in perfect health";
     else if (percent >= 90) return sent_be + " slightly scratched";
@@ -559,11 +561,6 @@ bool Character::setNextCombatAction(CombatActionType nextAction)
     return true;
 }
 
-std::shared_ptr<GeneralAction> Character::getAction()
-{
-    return this->actionQueue.front();
-}
-
 std::shared_ptr<GeneralAction> Character::getAction() const
 {
     return this->actionQueue.front();
@@ -577,7 +574,7 @@ void Character::popAction()
     }
 }
 
-bool Character::canMoveTo(Direction direction, std::string & error) const
+bool Character::canMoveTo(const Direction & direction, std::string & error) const
 {
     if (this->getAction()->getType() == ActionType::Combat)
     {
@@ -797,12 +794,10 @@ Item * Character::findNearbyItem(std::string itemName, int & number)
     return item;
 }
 
-Item * Character::findNearbyTool(
-    const ToolType & toolType,
-    const ItemVector & exceptions,
-    bool searchRoom,
-    bool searchInventory,
-    bool searchEquipment)
+Item * Character::findNearbyTool(const ToolType & toolType, const ItemVector & exceptions,
+bool searchRoom,
+bool searchInventory,
+bool searchEquipment)
 {
     if (searchRoom)
     {
@@ -861,12 +856,10 @@ Item * Character::findNearbyTool(
     return nullptr;
 }
 
-bool Character::findNearbyTools(
-    ToolSet tools,
-    ItemVector & foundOnes,
-    bool searchRoom,
-    bool searchInventory,
-    bool searchEquipment)
+bool Character::findNearbyTools(ToolSet tools, ItemVector & foundOnes,
+bool searchRoom,
+bool searchInventory,
+bool searchEquipment)
 {
     // TODO: Prepare a map with key the tool type and as value:
     //  Option A: A bool which determine if the tool has been found.
@@ -1295,95 +1288,76 @@ void Character::updateActivatedEffects()
     }
 }
 
-string Character::getLook(Character * character)
+string Character::getLook()
 {
-    string sent_be, sent_pronoun;
-    string output;
-
-    // Determine who is the examined character.
-    if (character != nullptr && character != this)
-    {
-        output = "You look at " + character->getName() + ".\n";
-        sent_be = "is";
-        sent_pronoun = character->getSubjectPronoun();
-    }
-    else
-    {
-        character = this;
-        output = "You give a look at yourself.\n";
-        sent_be = "are";
-        sent_pronoun = "you";
-    }
-
-    Item * head = character->findEquipmentSlotItem(EquipmentSlot::Head);
-    Item * back = character->findEquipmentSlotItem(EquipmentSlot::Back);
-    Item * torso = character->findEquipmentSlotItem(EquipmentSlot::Torso);
-    Item * legs = character->findEquipmentSlotItem(EquipmentSlot::Legs);
-    Item * feet = character->findEquipmentSlotItem(EquipmentSlot::Feet);
-    Item * right = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
-    Item * left = character->findEquipmentSlotItem(EquipmentSlot::LeftHand);
-
+    std::string output = "You look at " + this->getName() + ".\n";
     // Add the condition.
-    output += ToCapitals(sent_pronoun) + getHealthCondition(character);
+    output += ToCapitals(this->getSubjectPronoun()) + " " + this->getHealthCondition() + ".\n";
     // Add the description.
-    output += character->description + "\n";
+    output += this->description + "\n";
     // Add what the target is wearing.
-    output += ToCapitals(sent_pronoun) + " " + sent_be + " wearing:\n";
+    if (equipment.empty())
+    {
+        output += Formatter::italic();
+        output += ToCapitals(this->getSubjectPronoun()) + " is wearing nothing.\n";
+        output += Formatter::reset();
+        return output;
+    }
+    output += ToCapitals(this->getSubjectPronoun()) + " is wearing:\n";
 
     // Equipment Slot : HEAD
-    output += "    " + Formatter::yellow() + "Head" + Formatter::reset() + "       : ";
-    output +=
-        (head != nullptr) ?
-            Formatter::cyan() + head->getNameCapital() : Formatter::gray() + "Nothing";
-    output += Formatter::reset() + ".\n";
+    Item * head = this->findEquipmentSlotItem(EquipmentSlot::Head);
+    if (head)
+    {
+        output += "  " + Formatter::yellow() + "Head" + Formatter::reset() + "       : ";
+        output += Formatter::cyan() + head->getNameCapital() + Formatter::reset() + ".\n";
+    }
     // Equipment Slot : BACK
-    output += "    " + Formatter::yellow() + "Back" + Formatter::reset() + "       : ";
-    output +=
-        (back != nullptr) ?
-            Formatter::cyan() + back->getNameCapital() : Formatter::gray() + "Nothing";
-    output += Formatter::reset() + ".\n";
+    Item * back = this->findEquipmentSlotItem(EquipmentSlot::Back);
+    if (back)
+    {
+        output += "  " + Formatter::yellow() + "Back" + Formatter::reset() + "       : ";
+        output += Formatter::cyan() + back->getNameCapital() + Formatter::reset() + ".\n";
+    }
     // Equipment Slot : TORSO
-    output += "    " + Formatter::yellow() + "Torso" + Formatter::reset() + "      : ";
-    output +=
-        (torso != nullptr) ?
-            Formatter::cyan() + torso->getNameCapital() : Formatter::gray() + "Nothing";
-    output += Formatter::reset() + ".\n";
+    Item * torso = this->findEquipmentSlotItem(EquipmentSlot::Torso);
+    if (torso)
+    {
+        output += "  " + Formatter::yellow() + "Torso" + Formatter::reset() + "      : ";
+        output += Formatter::cyan() + torso->getNameCapital() + Formatter::reset() + ".\n";
+    }
     // Equipment Slot : LEGS
-    output += "    " + Formatter::yellow() + "Legs" + Formatter::reset() + "       : ";
-    output +=
-        (legs != nullptr) ?
-            Formatter::cyan() + legs->getNameCapital() : Formatter::gray() + "Nothing";
-    output += Formatter::reset() + ".\n";
+    Item * legs = this->findEquipmentSlotItem(EquipmentSlot::Legs);
+    if (legs)
+    {
+        output += "  " + Formatter::yellow() + "Legs" + Formatter::reset() + "       : ";
+        output += Formatter::cyan() + legs->getNameCapital() + Formatter::reset() + ".\n";
+    }
     // Equipment Slot : FEET
-    output += "    " + Formatter::yellow() + "Feet" + Formatter::reset() + "       : ";
-    output +=
-        (feet != nullptr) ?
-            Formatter::cyan() + feet->getNameCapital() : Formatter::gray() + "Nothing";
-    output += Formatter::reset() + ".\n";
-
+    Item * feet = this->findEquipmentSlotItem(EquipmentSlot::Feet);
+    if (feet)
+    {
+        output += "  " + Formatter::yellow() + "Feet" + Formatter::reset() + "       : ";
+        output += Formatter::cyan() + feet->getNameCapital() + Formatter::reset() + ".\n";
+    }
     // Print what is wielding.
-    if (right != nullptr)
+    Item * right = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
+    if (right)
     {
         if (HasFlag(right->model->modelFlags, ModelFlag::TwoHand))
         {
-            output += "    " + Formatter::yellow() + "Both Hands" + Formatter::reset() + " : ";
+            output += "  " + Formatter::yellow() + "Both Hands" + Formatter::reset() + " : ";
         }
         else
         {
-            output += "    " + Formatter::yellow() + "Right Hand" + Formatter::reset() + " : ";
+            output += "  " + Formatter::yellow() + "Right Hand" + Formatter::reset() + " : ";
         }
         output += Formatter::cyan() + right->getNameCapital() + Formatter::reset() + ".\n";
     }
-    else
+    Item * left = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
+    if (left)
     {
-        output += "    " + Formatter::yellow() + "Right Hand" + Formatter::reset() + " : "
-            + "Nothing";
-        output += ".\n";
-    }
-
-    if (left != nullptr)
-    {
-        output += "    " + Formatter::yellow() + "Left Hand" + Formatter::reset() + "  : ";
+        output += "  " + Formatter::yellow() + "Left Hand" + Formatter::reset() + "  : ";
         output += Formatter::cyan() + left->getNameCapital() + Formatter::reset() + ".\n";
     }
     return output;
@@ -1402,33 +1376,16 @@ unsigned int Character::getArmorClass() const
 {
     // 10
     unsigned int result = 10;
-    // + ARMOR BONUS
-    for (auto it : equipment)
-    {
-        if (it->model->getType() == ModelType::Armor)
-        {
-            result += it->model->toArmor()->damageAbs;
-        }
-    }
-    // + SHIELD BONUS
-    Item * rh = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
-    if (rh != nullptr)
-    {
-        if (rh->model->getType() == ModelType::Shield)
-        {
-            result += rh->model->toShield()->parryChance;
-        }
-    }
-    Item * lh = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
-    if (lh != nullptr)
-    {
-        if (lh->model->getType() == ModelType::Shield)
-        {
-            result += lh->model->toShield()->parryChance;
-        }
-    }
     // + AGILITY MODIFIER
     result += this->getAbilityModifier(Ability::Agility);
+    // + ARMOR BONUS
+    for (auto item : equipment)
+    {
+        if (item->model->getType() == ModelType::Armor)
+        {
+            result += item->toArmorItem()->getArmorClass();
+        }
+    }
     return result;
 }
 
@@ -1474,15 +1431,15 @@ Character * Character::getNextOpponentAtRange(const unsigned int & range) const
     return nullptr;
 }
 
-ItemVector Character::getActiveWeapons()
+std::vector<WeaponItem *> Character::getActiveWeapons()
 {
-    ItemVector ret;
+    std::vector<WeaponItem *> ret;
     if (this->canAttackWith(EquipmentSlot::RightHand))
     {
         Item * weapon = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
         if (weapon != nullptr)
         {
-            ret.push_back(weapon);
+            ret.push_back(weapon->toWeaponItem());
         }
     }
     if (this->canAttackWith(EquipmentSlot::LeftHand))
@@ -1490,7 +1447,7 @@ ItemVector Character::getActiveWeapons()
         Item * weapon = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
         if (weapon != nullptr)
         {
-            ret.push_back(weapon);
+            ret.push_back(weapon->toWeaponItem());
         }
     }
     return ret;
@@ -1500,7 +1457,7 @@ bool Character::getCharactersInSight(CharacterVector & targets)
 {
     CharacterVector exceptions;
     exceptions.push_back(this);
-    Coordinates<int> coord = this->room->coord;
+    Coordinates coord = this->room->coord;
     return this->room->area->getCharactersInSight(
         targets,
         exceptions,
@@ -1743,7 +1700,7 @@ void Character::loadScript(const std::string & scriptFilename)
     Item::luaRegister(L);
     Material::luaRegister(L);
     Race::luaRegister(L);
-    Coordinates<int>::luaRegister(L);
+    Coordinates::luaRegister(L);
     Exit::luaRegister(L);
     Room::luaRegister(L);
 

@@ -1,7 +1,6 @@
-/// @file   armorModel.hpp
-/// @brief  Define variables and methods of Armor.
+/// @file   armorItem.hpp
 /// @author Enrico Fraccaroli
-/// @date   Jul 6 2016
+/// @date   Aug 04 2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission to use, copy, modify, and distribute this software for any
@@ -18,49 +17,23 @@
 
 #pragma once
 
-#include "itemModel.hpp"
+#include "item.hpp"
 
-/// Sizes of armor.
-typedef enum class ArmorSizes
-{
-    /// [0] All kind of size.
-    All,
-    /// [1] Light Armor
-    Light,
-    /// [2] Medium Armor
-    Medium,
-    /// [3] Heavy Armor
-    Heavy
-} ArmorSize;
-
-/// @brief Model of an armor.
-class ArmorModel: public ItemModel
+/// @brief Holds details about armors.
+class ArmorItem: public Item
 {
     public:
-        /// The size of the armor.
-        ArmorSize size;
-        /// The Armor Class (AC).
-        unsigned int armorClass;
-        /// The anatomy which a character must have in order to wear this armor.
-        unsigned int allowedAnatomy;
+        ArmorItem();
 
-        ArmorModel();
+        virtual ~ArmorItem();
 
-        virtual ~ArmorModel();
-
-        virtual ModelType getType() const;
+        virtual ItemType getType() const;
 
         virtual std::string getTypeName() const;
 
-        virtual bool setModel(const std::string & source);
-
         virtual void getSheet(Table & sheet) const;
+
+        /// Provides the AC of the armor based on its quality, material and condition.
+        /// @return the armor class.
+        unsigned int getArmorClass() const;
 };
-
-/// @addtogroup EnumToString
-/// @{
-
-/// Return the string describing the size of an Armor.
-std::string GetArmorSizeName(ArmorSize armorSize);
-
-///@}

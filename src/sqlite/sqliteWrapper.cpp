@@ -1,7 +1,7 @@
-/// @file   SQLiteWrapper.cpp
+/// @file   sqliteWrapper.cpp
 /// @brief  Implement a wrapper for interacting with a sqlite3 dbDetails.
 /// @author Enrico Fraccaroli
-/// @date   23 Agosto 2014
+/// @date   Aug 23 2014
 /// @copyright
 /// Copyright (c) 2014, 2015, 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission to use, copy, modify, and distribute this software for any
@@ -16,11 +16,11 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#include "SQLiteWrapper.hpp"
+#include "sqliteWrapper.hpp"
 
-#include "../constants.hpp"
-#include "../logger.hpp"
 #include "../utils.hpp"
+#include "../constants.hpp"
+#include "../utilities/logger.hpp"
 
 ResultSet::~ResultSet()
 {
@@ -184,8 +184,10 @@ bool SQLiteWrapper::next()
 
 bool SQLiteWrapper::release()
 {
-    if (sqlite3_finalize(dbDetails.dbStatement) != SQLITE_OK)
+    errorCode = sqlite3_finalize(dbDetails.dbStatement);
+    if (errorCode != SQLITE_OK)
     {
+        errorMessage = sqlite3_errmsg(dbDetails.dbConnection);
         Logger::log(LogLevel::Error, "Error code :" + ToString(errorCode));
         Logger::log(LogLevel::Error, "Last error :" + errorMessage);
         return false;

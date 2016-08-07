@@ -1,4 +1,4 @@
-/// @file   gods.cpp
+/// @file   god.cpp
 /// @brief  Implements the methods used by <b>gods</b>.
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2014
@@ -165,7 +165,10 @@ void DoFeast(Character * character, std::istream & sArgs)
         character->sendMsg("You must insert a valide target.\n");
         return;
     }
-    Character * target = character->room->findCharacter(arguments[0].first, arguments[0].second);
+    Character * target = character->room->findCharacter(
+        arguments[0].first,
+        arguments[0].second,
+        { });
     if (target == nullptr)
     {
         character->sendMsg("You must provide a valide target.\n");
@@ -341,12 +344,13 @@ void DoItemCreate(Character * character, std::istream & sArgs)
     }
     if (arguments.size() == 3)
     {
-        quality = static_cast<ItemQuality>(ToNumber<unsigned int>(arguments[2].first));
-        if (quality == ItemQuality::None)
+        unsigned int itemQualityValue = ToNumber<unsigned int>(arguments[2].first);
+        if (!ItemQuality::isValid(itemQualityValue))
         {
             character->sendMsg("Not a valid quality.\n");
             return;
         }
+        quality = ItemQuality(itemQualityValue);
     }
     // Create the item.
     Item * item = itemModel->createItem(character->getName(), material, quality);
@@ -466,47 +470,12 @@ void DoItemInfo(Character * character, std::istream & sArgs)
             return;
         }
     }
-    std::string msg;
-    msg += "Vnum         : " + ToString(item->vnum) + "\n";
-    msg += "Model        : [" + ToString(item->model->vnum) + "] " + item->getName() + ".\n";
-    msg += "Type         : " + item->model->getTypeName() + "\n";
-    msg += "Maker        : " + item->maker + "\n";
-    msg += "Condition    : " + ToString(item->condition) + " of " + ToString(item->model->condition)
-        + "\n";
-    msg += "Composition  : " + item->composition->name + " [" + ToString(item->composition->vnum)
-        + "]\n";
-    msg += "Quality      : " + GetItemQualityName(item->quality) + "\n";
-    if (item->room != nullptr)
-    {
-        msg += "Room         : " + item->room->name + " [" + ToString(item->room->vnum) + "]\n";
-    }
-    else if (item->owner != nullptr)
-    {
-        msg += "Owner        : " + item->owner->getName() + "\n";
-    }
-    else if (item->container != nullptr)
-    {
-        msg += "Inside       : " + item->container->getName() + " ["
-            + ToString(item->container->vnum) + "]\n";
-    }
-    if (!item->content.empty())
-    {
-        msg += "Content      :\n";
-        for (auto iterator : item->content)
-        {
-            msg += "             * " + iterator->getName() + " [" + ToString(iterator->vnum)
-                + "]\n";
-        }
-    }
-    if (item->contentLiq.first != nullptr)
-    {
-        msg += "Content Liq. : ";
-        msg += item->contentLiq.first->getNameCapital() + " [" + ToString(item->contentLiq.second)
-            + "]\n";
-    }
-    msg += "Current Slot : " + item->getCurrentSlotName() + "\n";
-    // Send the formatted message.
-    character->sendMsg(msg);
+    // Create a table.
+    Table sheet(item->getNameCapital());
+    // Get the sheet.
+    item->getSheet(sheet);
+    // Show the seet to character.
+    character->sendMsg(sheet.getTable());
 }
 
 void DoAreaInfo(Character * character, std::istream & sArgs)
@@ -613,7 +582,7 @@ void DoRoomCreate(Character * character, std::istream & sArgs)
         return; // Skip the rest of the function.
     }
     // Get the coordinate modifier.
-    Coordinates<int> targetCoord = currentRoom->coord + GetCoordinates(direction);
+    Coordinates targetCoord = currentRoom->coord + direction.getCoordinates();
     if (!currentArea->inBoundaries(targetCoord))
     {
         character->sendMsg("Sorry but in that direction you will go outside the boundaries.\n");
@@ -660,7 +629,7 @@ void DoRoomDelete(Character * character, std::istream & sArgs)
         return; // Skip the rest of the function.
     }
     // Get the coordinate modifier.
-    Coordinates<int> targetCoord = character->room->coord + GetCoordinates(direction);
+    Coordinates targetCoord = character->room->coord + direction.getCoordinates();
     if (!currentArea->inBoundaries(targetCoord))
     {
         character->sendMsg("Sorry but in that direction you will go outside the boundaries.\n");
@@ -839,7 +808,7 @@ void DoMobileKill(Character * character, std::istream & sArgs)
         character->sendMsg("You must provide a target mobile.\n");
         return;
     }
-    Mobile * mobile = character->room->findMobile(arguments[0].first, arguments[0].second);
+    Mobile * mobile = character->room->findMobile(arguments[0].first, arguments[0].second, { });
     if (mobile == nullptr)
     {
         character->sendMsg("Mobile not found.\n");
@@ -864,7 +833,7 @@ void DoMobileReload(Character * character, std::istream & sArgs)
         character->sendMsg("You must provide a target mobile.\n");
         return;
     }
-    Mobile * mobile = character->room->findMobile(arguments[0].first, arguments[0].second);
+    Mobile * mobile = character->room->findMobile(arguments[0].first, arguments[0].second, { });
     if (mobile == nullptr)
     {
         character->sendMsg("Mobile not found.\n");
@@ -904,7 +873,10 @@ void DoHurt(Character * character, std::istream & sArgs)
         character->sendMsg("Who do you want to hurt?\n");
         return;
     }
-    Character * target = character->room->findCharacter(arguments[0].first, arguments[0].second);
+    Character * target = character->room->findCharacter(
+        arguments[0].first,
+        arguments[0].second,
+        { });
     if (target == nullptr)
     {
         character->sendMsg("Target not found.\n");
@@ -969,7 +941,7 @@ void DoModSkill(Character * character, std::istream & sArgs)
         character->sendMsg("Usage: [target] [#skill] [+/-VALUE]\n");
         return;
     }
-    Player * target = character->room->findPlayer(arguments[0].first, arguments[0].second);
+    Player * target = character->room->findPlayer(arguments[0].first, arguments[0].second, { });
     if (target == nullptr)
     {
         character->sendMsg("Target not found.\n");
@@ -1022,7 +994,10 @@ void DoModAttr(Character * character, std::istream & sArgs)
         character->sendMsg("Usage: [target] [attribute] [+/-VALUE]\n");
         return; // Skip the rest of the function.
     }
-    Character * target = character->room->findCharacter(arguments[0].first, arguments[0].second);
+    Character * target = character->room->findCharacter(
+        arguments[0].first,
+        arguments[0].second,
+        { });
     if (target == nullptr)
     {
         character->sendMsg("Target not found.\n");
@@ -1325,10 +1300,11 @@ void DoItemList(Character * character, std::istream & sArgs)
     // Check no more input.
     NoMore(character, sArgs);
     Table table;
-    table.addColumn("VNUM", StringAlign::Right);
-    table.addColumn("NAME", StringAlign::Left);
-    table.addColumn("TYPE", StringAlign::Left);
-    table.addColumn("LOCATION", StringAlign::Left);
+    table.addColumn("Vnum", StringAlign::Right);
+    table.addColumn("Name", StringAlign::Left);
+    table.addColumn("Type", StringAlign::Left);
+    table.addColumn("Model", StringAlign::Left);
+    table.addColumn("Location", StringAlign::Left);
     for (auto iterator : Mud::instance().mudItems)
     {
         Item * item = iterator.second;
@@ -1336,7 +1312,8 @@ void DoItemList(Character * character, std::istream & sArgs)
         TableRow row;
         row.push_back(ToString(item->vnum));
         row.push_back(item->getNameCapital());
-        row.push_back(GetModelTypeName(item->model->getType()));
+        row.push_back(item->getTypeName());
+        row.push_back(ToString(item->model->vnum));
         if (item->owner != nullptr)
         {
             row.push_back(" Owner  : " + item->owner->getName());

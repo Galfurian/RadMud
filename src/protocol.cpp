@@ -16,9 +16,9 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#include "protocol.hpp"
-#include "logger.hpp"
 #include "mud.hpp"
+#include "protocol.hpp"
+#include "utilities/logger.hpp"
 
 void LoadProtocolStates()
 {

@@ -1,7 +1,7 @@
-/// @file   SQLiteDbms.hpp
+/// @file   sqliteDbms.hpp
 /// @brief  Definition of the class SQLiteDbms, that allows to interact whit a SQLITE3 Database.
 /// @author Enrico Fraccaroli
-/// @date   23 Agosto 2014
+/// @date   Aug 23 2014
 /// @copyright
 /// Copyright (c) 2014, 2015, 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission to use, copy, modify, and distribute this software for any
@@ -20,7 +20,8 @@
 
 #include <functional>
 #include <vector>
-#include "SQLiteWrapper.hpp"
+
+#include "sqliteWrapper.hpp"
 
 class Character;
 class Player;
@@ -35,12 +36,6 @@ typedef std::vector<std::pair<std::string, std::string> > QueryList;
 /// @brief All the functions necessary to load information from a SQLITE3 database.
 
 /// @{
-/// @brief Function used to retrieve information about Player.
-bool LoadPlayerInformation(ResultSet * result, Player * player);
-/// @brief Function used to retrieve information about the item posessed by the player.
-bool LoadPlayerItems(ResultSet * result, Character * player);
-/// @brief Function used to retrieve information about the skills of the player.
-bool LoadPlayerSkill(ResultSet * result, Player * player);
 /// @brief Function used to retrieve information about bad names.
 bool LoadBadName(ResultSet * result);
 /// @brief Function used to retrieve information about blocked ips.
@@ -89,6 +84,8 @@ bool LoadContentLiq(ResultSet * result);
 bool LoadTravelPoint(ResultSet * result);
 /// @brief Function used to retrieve information about all the buildings.
 bool LoadBuilding(ResultSet * result);
+/// @brief Function used to load shops.
+bool LoadItemShop(ResultSet * result);
 ///@}
 
 /// @brief It's used to connect to a database and retrieve information as well as update them.
@@ -165,6 +162,12 @@ class SQLiteDbms
         /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
         bool updateInto(std::string table, QueryList value, QueryList where);
 
+        /// @brief Execute a select.
+        /// @param table The name of the table.
+        /// @param where Vector of where clause.
+        /// @return The result of the operation.
+        ResultSet * executeSelect(std::string table, QueryList where);
+
         /// @brief Begin a transaction.
         void beginTransaction();
 
@@ -175,6 +178,16 @@ class SQLiteDbms
         void endTransaction();
 
     private:
+        /// @brief Function used to retrieve information about Player.
+        bool loadPlayerInformation(Player * player);
+        /// @brief Function used to retrieve information about the item posessed by the player.
+        bool loadPlayerItems(Player * player);
+        /// @brief Function used to retrieve information about the skills of the player.
+        bool loadPlayerSkill(Player * player);
+
+        /// Loading function for sqlite3 tables.
+        typedef std::function<bool(ResultSet * result)> ClassLoadingFunction;
+
         /// The connection, used to communicate with the database.
         SQLiteWrapper dbConnection;
 

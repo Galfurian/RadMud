@@ -25,10 +25,10 @@
 
 // Other Include.
 #include "mud.hpp"
-#include "logger.hpp"
 #include "constants.hpp"
 #include "formatter.hpp"
 #include "generator.hpp"
+#include "utilities/logger.hpp"
 #include "luabridge/LuaBridge.h"
 #include "model/mechanismModel.hpp"
 
@@ -231,8 +231,6 @@ bool Room::removeOnDB()
         Logger::log(LogLevel::Error, "[Room::RemoveOnDB] There are still characters in the room!");
         return false;
     }
-
-    //----------Remove from Room-----------
     SQLiteDbms::instance().deleteFrom("Room", { std::make_pair("vnum", ToString(vnum)) });
     return true;
 }
@@ -293,24 +291,22 @@ ItemVector Room::findBuildings(ModelType type)
     return buildingsList;
 }
 
-Character * Room::findCharacter(string target, int & number, Character * exception)
+Character * Room::findCharacter(string target, int & number, const CharacterVector & exceptions)
 {
-    Player * player;
-    Mobile * mobile;
-
     for (auto iterator : characters)
     {
-        // Exclude the exception.
-        if (iterator == exception)
+        // Check exceptions.
+        if (!exceptions.empty())
         {
-            continue;
+            if (std::find(exceptions.begin(), exceptions.end(), iterator) != exceptions.end())
+            {
+                continue;
+            }
         }
-
         // Check if the character is a mobile or a player.
         if (iterator->isMobile())
         {
-            mobile = iterator->toMobile();
-            if (mobile->hasKey(ToLower(target)))
+            if (iterator->toMobile()->hasKey(ToLower(target)))
             {
                 if (number > 1)
                 {
@@ -318,26 +314,24 @@ Character * Room::findCharacter(string target, int & number, Character * excepti
                 }
                 else
                 {
-                    return mobile;
+                    return iterator->toMobile();
                 }
             }
         }
         else
         {
-            player = iterator->toPlayer();
-            if (!player->isPlaying())
+            if (iterator->toPlayer()->isPlaying())
             {
-                continue;
-            }
-            if (BeginWith(player->getName(), ToLower(target)))
-            {
-                if (number > 1)
+                if (BeginWith(iterator->toPlayer()->getName(), ToLower(target)))
                 {
-                    number -= 1;
-                }
-                else
-                {
-                    return player;
+                    if (number > 1)
+                    {
+                        number -= 1;
+                    }
+                    else
+                    {
+                        return iterator->toPlayer();
+                    }
                 }
             }
         }
@@ -345,63 +339,62 @@ Character * Room::findCharacter(string target, int & number, Character * excepti
     return nullptr;
 }
 
-Player * Room::findPlayer(string target, int & number, Player * exception)
+Player * Room::findPlayer(string target, int & number, const CharacterVector & exceptions)
 {
-    Player * player;
-
     for (auto iterator : characters)
     {
-        // Exclude the exception.
-        if (iterator == exception)
-        {
-            continue;
-        }
         // Check if the character is a mobile.
         if (iterator->isMobile())
         {
             continue;
         }
-
-        player = iterator->toPlayer();
-        if (!player->isPlaying())
+        // Check exceptions.
+        if (!exceptions.empty())
         {
-            continue;
-        }
-        if (BeginWith(player->getName(), ToLower(target)))
-        {
-            if (number == 1)
+            if (std::find(exceptions.begin(), exceptions.end(), iterator) != exceptions.end())
             {
-                return player;
+                continue;
             }
-            number -= 1;
+        }
+        // Check if it is the desired target.
+        if (iterator->toPlayer()->isPlaying())
+        {
+            if (BeginWith(iterator->toPlayer()->getName(), ToLower(target)))
+            {
+                if (number == 1)
+                {
+                    return iterator->toPlayer();
+                }
+                number -= 1;
+            }
         }
     }
     return nullptr;
 }
 
-Mobile * Room::findMobile(string target, int & number, Mobile * exception)
+Mobile * Room::findMobile(string target, int & number, const CharacterVector & exceptions)
 {
-    Mobile * mobile;
-
     for (auto iterator : characters)
     {
-        // Exclude the exception.
-        if (iterator == exception)
-        {
-            continue;
-        }
         // Check if the character is a player.
         if (!iterator->isMobile())
         {
             continue;
         }
-
-        mobile = iterator->toMobile();
-        if (mobile->hasKey(ToLower(target)))
+        // Check exceptions.
+        if (!exceptions.empty())
+        {
+            if (std::find(exceptions.begin(), exceptions.end(), iterator) != exceptions.end())
+            {
+                continue;
+            }
+        }
+        // Check if it is the desired target.
+        if (iterator->toMobile()->hasKey(ToLower(target)))
         {
             if (number == 1)
             {
-                return mobile;
+                return iterator->toMobile();
             }
             number -= 1;
         }
@@ -421,9 +414,13 @@ std::shared_ptr<Exit> Room::findExit(Direction direction)
     return nullptr;
 }
 
-std::shared_ptr<Exit> Room::findExit(std::string direction)
+std::shared_ptr<Exit> Room::findExit(const std::string & direction)
 {
-    return this->findExit(GetDirection(direction));
+    if (Direction::isValid(direction))
+    {
+        return this->findExit(Direction(direction));
+    }
+    return nullptr;
 }
 
 std::shared_ptr<Exit> Room::findExit(Room * destination)
@@ -472,7 +469,7 @@ bool Room::addExit(std::shared_ptr<Exit> exit)
     this->exits.push_back(std::move(exit));
     return true;
 }
-bool Room::removeExit(Direction direction)
+bool Room::removeExit(const Direction & direction)
 {
     for (auto it : exits)
     {
@@ -632,7 +629,7 @@ bool Room::operator==(const Room & right) const
     return vnum == right.vnum;
 }
 
-bool CreateRoom(Coordinates<int> coord, Room * source_room)
+bool CreateRoom(Coordinates coord, Room * source_room)
 {
     Room * new_room = new Room();
 
@@ -725,7 +722,7 @@ bool ConnectRoom(Room * room)
     for (auto iterator : Mud::instance().mudDirections)
     {
         // Get the coordinate modifier.
-        Coordinates<int> coordinates = room->coord + GetCoordinates(iterator.second);
+        Coordinates coordinates = room->coord + iterator.second.getCoordinates();
         // Get the room at the given coordinates.
         Room * near = room->area->getRoom(coordinates);
         if (near != nullptr)
@@ -755,7 +752,7 @@ bool ConnectRoom(Room * room)
             vector<string> arguments;
             arguments.push_back(ToString(forward->source->vnum));
             arguments.push_back(ToString(forward->destination->vnum));
-            arguments.push_back(EnumToString(forward->direction));
+            arguments.push_back(ToString(forward->direction.toUInt()));
             arguments.push_back(ToString(forward->flags));
             if (!SQLiteDbms::instance().insertInto("Exit", arguments))
             {
@@ -767,7 +764,7 @@ bool ConnectRoom(Room * room)
             vector<string> arguments2;
             arguments2.push_back(ToString(backward->source->vnum));
             arguments2.push_back(ToString(backward->destination->vnum));
-            arguments2.push_back(EnumToString(backward->direction));
+            arguments2.push_back(ToString(backward->direction.toUInt()));
             arguments2.push_back(ToString(backward->flags));
             if (!SQLiteDbms::instance().insertInto("Exit", arguments2))
             {

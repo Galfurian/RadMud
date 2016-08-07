@@ -19,10 +19,10 @@
 #include "lua_script.hpp"
 
 #include "../mud.hpp"
-#include "../logger.hpp"
 #include "../constants.hpp"
 #include "../command/command.hpp"
 #include "../luabridge/LuaBridge.h"
+#include "../utilities/logger.hpp"
 
 void LuaLog(std::string message)
 {
@@ -45,7 +45,7 @@ int LuaRandom(int min, int max)
     return TRandInteger<int>(min, max);
 }
 
-Item * LuaLoadItem(Character * maker, int vnumModel, int vnumMaterial, int intQuality)
+Item * LuaLoadItem(Character * maker, int vnumModel, int vnumMaterial, unsigned int qualityValue)
 {
     if (maker == nullptr)
     {
@@ -55,8 +55,11 @@ Item * LuaLoadItem(Character * maker, int vnumModel, int vnumMaterial, int intQu
 
     ItemModel * itemModel = Mud::instance().findItemModel(vnumModel);
     Material * material = Mud::instance().findMaterial(vnumMaterial);
-    ItemQuality quality = static_cast<ItemQuality>(intQuality);
-
+    ItemQuality quality = ItemQuality::Normal;
+    if (ItemQuality::isValid(qualityValue))
+    {
+        quality = ItemQuality(qualityValue);
+    }
     if (itemModel == nullptr)
     {
         Logger::log(LogLevel::Error, "Can't find model :" + ToString(vnumModel));

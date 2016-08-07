@@ -23,9 +23,9 @@
 // Local Includes.
 
 // Other Include.
-#include "luabridge/LuaBridge.h"
 #include "utils.hpp"
-#include "logger.hpp"
+#include "utilities/logger.hpp"
+#include "luabridge/LuaBridge.h"
 
 Faction::Faction() :
     vnum(),

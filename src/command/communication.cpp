@@ -54,11 +54,13 @@ void DoSay(Character * character, std::istream & sArgs)
     // //////////////////////////////////////////
     // Check if the speaker is invisible.
     std::string chName =
-        (HasFlag(character->flags, CharacterFlag::Invisible)) ? "Someone" : character->getNameCapital();
+        (HasFlag(character->flags, CharacterFlag::Invisible)) ?
+            "Someone" : character->getNameCapital();
 
     // //////////////////////////////////////////
     // Check if the character are talking to another character.
-    Character * receiver = character->room->findCharacter(target, number, character);
+    CharacterVector excpetions = { character };
+    Character * receiver = character->room->findCharacter(target, number, excpetions);
     if (receiver != nullptr)
     {
         // Get the rest of the message, minus the first word.
@@ -71,11 +73,15 @@ void DoSay(Character * character, std::istream & sArgs)
         // Eat the space between the name and the message.
         message = Trim(message, " ");
         // Player send.
-        character->sendMsg("You say to %s, \"%s\"\n", receiver->getName(),
+        character->sendMsg(
+            "You say to %s, \"%s\"\n",
+            receiver->getName(),
             Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
 
         // Target receive.
-        receiver->sendMsg("%s say to you, \"%s\"\n\n", chName,
+        receiver->sendMsg(
+            "%s say to you, \"%s\"\n\n",
+            chName,
             Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
 
         // Set the list of exceptions.
@@ -83,7 +89,11 @@ void DoSay(Character * character, std::istream & sArgs)
         exceptions.push_back(character);
         exceptions.push_back(receiver);
         // Send the message inside the room.
-        character->room->sendToAll("%s says to %s, \"%s\".\n", exceptions, chName, receiver->getName(),
+        character->room->sendToAll(
+            "%s says to %s, \"%s\".\n",
+            exceptions,
+            chName,
+            receiver->getName(),
             Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
         // If it's a mobile, activate the trigger.
         if (receiver->isMobile())
@@ -93,12 +103,17 @@ void DoSay(Character * character, std::istream & sArgs)
     }
     else
     {
-        character->sendMsg("You say \"%s\".\n", Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
+        character->sendMsg(
+            "You say \"%s\".\n",
+            Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
         // Set the list of exceptions.
         CharacterVector exceptions;
         exceptions.push_back(character);
         // Send the message inside the room.
-        character->room->sendToAll("%s says \"%s\".\n", exceptions, chName,
+        character->room->sendToAll(
+            "%s says \"%s\".\n",
+            exceptions,
+            chName,
             Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
     }
 }
@@ -122,11 +137,13 @@ void DoWhisper(Character * character, std::istream & sArgs)
     // //////////////////////////////////////////
     // Check if the speaker is invisible.
     std::string chName =
-        (HasFlag(character->flags, CharacterFlag::Invisible)) ? "Someone" : character->getNameCapital();
+        (HasFlag(character->flags, CharacterFlag::Invisible)) ?
+            "Someone" : character->getNameCapital();
 
     // //////////////////////////////////////////
     // Check the existance of the target character.
-    Character * receiver = character->room->findCharacter(target, number, character);
+    CharacterVector excpetions = { character };
+    Character * receiver = character->room->findCharacter(target, number, excpetions);
     if (receiver == nullptr)
     {
         throw std::runtime_error("You don't see " + target + " here.\n");
@@ -143,9 +160,17 @@ void DoWhisper(Character * character, std::istream & sArgs)
 
     // //////////////////////////////////////////
     // Send the message.
-    character->sendMsg("%sYou whisper to %s, %s\"%s\".\n", Formatter::magenta(), receiver->getName(),
-        Formatter::reset(), message);
-    receiver->sendMsg("%s whisper to you, %s\"%s\"\n\n", Formatter::magenta() + chName, Formatter::reset(), message);
+    character->sendMsg(
+        "%sYou whisper to %s, %s\"%s\".\n",
+        Formatter::magenta(),
+        receiver->getName(),
+        Formatter::reset(),
+        message);
+    receiver->sendMsg(
+        "%s whisper to you, %s\"%s\"\n\n",
+        Formatter::magenta() + chName,
+        Formatter::reset(),
+        message);
 }
 
 void DoEmote(Character * character, std::istream & sArgs)
@@ -163,7 +188,8 @@ void DoEmote(Character * character, std::istream & sArgs)
     // //////////////////////////////////////////
     // Check if the character is invisible.
     std::string chName =
-        (HasFlag(character->flags, CharacterFlag::Invisible)) ? "Someone" : character->getNameCapital();
+        (HasFlag(character->flags, CharacterFlag::Invisible)) ?
+            "Someone" : character->getNameCapital();
 
     // //////////////////////////////////////////
     // Send the emote.
@@ -172,7 +198,11 @@ void DoEmote(Character * character, std::istream & sArgs)
     CharacterVector exceptions;
     exceptions.push_back(character);
     // Send the message inside the room.
-    character->room->sendToAll("%s %s\n", exceptions, Formatter::yellow() + chName, emote + Formatter::reset());
+    character->room->sendToAll(
+        "%s %s\n",
+        exceptions,
+        Formatter::yellow() + chName,
+        emote + Formatter::reset());
 }
 
 void DoBug(Character * character, std::istream & sArgs)

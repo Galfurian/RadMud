@@ -20,11 +20,12 @@
 
 #include "combatAction.hpp"
 
+/// @brief An action executed by characters when fighting. This is the basic attack.
 class BasicAttack: public CombatAction
 {
     public:
         /// @brief Constructor.
-        /// @param _cooldown    How many seconds are required to complete the movement.
+        /// @param _actor The actor who is doing the action.
         BasicAttack(Character * _actor);
 
         /// @brief Destructor.

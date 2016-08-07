@@ -23,7 +23,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wconversion")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmessage-length=0")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
 
 if(FLAG_EVERYTHING)
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -106,6 +106,7 @@ endif()
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 add_subdirectory(src/lua)
+add_subdirectory(src/item)
 add_subdirectory(src/model)
 add_subdirectory(src/sqlite)
 add_subdirectory(src/action)
@@ -122,7 +123,6 @@ set(PROJECT_SRC
     ./src/exit.cpp
     ./src/faction.cpp
     ./src/generator.cpp
-    ./src/item.cpp
     ./src/liquid.cpp
     ./src/main.cpp
     ./src/material.cpp
@@ -138,10 +138,10 @@ set(PROJECT_SRC
     ./src/utils.cpp
     ./src/formatter.cpp
     ./src/opponent.cpp
-    ./src/logger.cpp
     ./src/protocol.cpp
     ./src/luabridge/detail/LuaHelpers.cpp
     ${RADMUD_LUA_SRC}
+    ${RADMUD_ITEM_SRC}
     ${RADMUD_MODEL_SRC}
     ${RADMUD_ACTION_SRC}
     ${RADMUD_SQLITE_SRC}
@@ -162,6 +162,7 @@ include_directories(
 	${RADMUD_SQLITE_INC}
     ${RADMUD_ACTION_INC}
 	${RADMUD_MODEL_INC}
+    ${RADMUD_ITEM_INC}
 	${RADMUD_LUA_INC}
 	./src/luabridge/detail
 	./src/luabridge

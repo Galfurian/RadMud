@@ -23,11 +23,10 @@
 #include "command.hpp"
 // Other Include.
 #include "../mud.hpp"
-#include "../utils.hpp"
-#include "../logger.hpp"
 #include "../constants.hpp"
-#include "../utilities/table.hpp"
 #include "../action/moveAction.hpp"
+#include "../utilities/table.hpp"
+#include "../utilities/logger.hpp"
 
 using namespace std;
 
@@ -48,17 +47,17 @@ void DoDirection(Character * character, Direction direction)
     // Calculate the time needed to move.
     if (character->posture == CharacterPosture::Stand)
     {
-        character->sendMsg("You start to go %s...\n", GetDirectionName(direction));
+        character->sendMsg("You start to go %s...\n", direction.toString());
         speed = 2;
     }
     else if (character->posture == CharacterPosture::Crouch)
     {
-        character->sendMsg("You move crouching towards %s...\n", GetDirectionName(direction));
+        character->sendMsg("You move crouching towards %s...\n", direction.toString());
         speed = 4;
     }
     else if (character->posture == CharacterPosture::Prone)
     {
-        character->sendMsg("You begin to crawl to %s...\n", GetDirectionName(direction));
+        character->sendMsg("You begin to crawl to %s...\n", direction.toString());
         speed = 6;
     }
     else
@@ -257,15 +256,16 @@ void DoLook(Character * character, std::istream & sArgs)
     }
     else if (arguments.size() == 1)
     {
+        CharacterVector excpetions = { character };
         Character * target = character->room->findCharacter(
             arguments[0].first,
             arguments[0].second,
-            character);
+            excpetions);
         if (target)
         {
             if (character->canSee(target))
             {
-                character->sendMsg(character->getLook(target));
+                character->sendMsg(target->getLook());
                 if (target->canSee(character))
                 {
                     // Notify to other character, that this one are looking at him.
@@ -284,10 +284,11 @@ void DoLook(Character * character, std::istream & sArgs)
     }
     else if (arguments.size() == 2)
     {
+        CharacterVector excpetions = { character };
         Character * target = character->room->findCharacter(
             arguments[1].first,
             arguments[1].second,
-            character);
+            excpetions);
         if (target)
         {
             if (character->canSee(target))
@@ -619,7 +620,7 @@ void DoStatistics(Character * character, std::istream & sArgs)
     msg += Formatter::magenta() + "    Armor Class " + Formatter::reset();
     msg += ToString(player->getArmorClass()) + "\n";
 
-    msg += "You " + player->getHealthCondition() + ".\n";
+    msg += "You " + player->getHealthCondition(true) + ".\n";
     msg += "You " + player->getStaminaCondition() + ".\n";
     msg += "You " + player->getHungerCondition() + ".\n";
     msg += "You " + player->getThirstCondition() + ".\n";

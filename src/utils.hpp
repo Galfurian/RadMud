@@ -18,35 +18,17 @@
 
 #pragma once
 
-#include <stdint.h>
 #include <algorithm>
-#include <string>
-#include <vector>
-#include <set>
-#include <map>
+#include <stdint.h>
+#include <cstdlib>
 #include <list>
-#include <zlib.h>
-#include <type_traits>
-#include <iostream>
-#include <chrono>
-#include <functional>
-#include <cassert>
-#include <sstream>
-#include <type_traits>
+#include <map>
 #include <random>
-
-/// 8 bits
-typedef unsigned char Byte;
-/// Type used by the mud to store time.
-typedef std::chrono::nanoseconds TimeNS;
-/// Time point in microseconds.
-typedef std::chrono::time_point<std::chrono::microseconds> TimeUS;
-/// Time point in milliseconds.
-typedef std::chrono::time_point<std::chrono::milliseconds> TimeMS;
-/// Time point in seconds.
-typedef std::chrono::time_point<std::chrono::seconds> TimeSEC;
-/// Clock type of time.
-typedef std::chrono::time_point<std::chrono::system_clock> TimeClock;
+#include <set>
+#include <sstream>
+#include <string>
+#include <type_traits>
+#include <vector>
 
 /// Allows to define a non-aborting assertion for correct guards.
 #define CorrectAssert(e) ( (e) ? true : (\
@@ -80,7 +62,7 @@ struct CommandHelp
 /// @param flag  The flag to search.
 /// @return <b>True</b> if the value contain the flag, <br> <b>False</b> otherwise.
 template<typename Enum>
-bool HasFlag(unsigned int & flags, Enum flag)
+bool HasFlag(const unsigned int & flags, Enum flag)
 {
     static_assert(std::is_enum<Enum>::value, "template parameter is not an enum type");
     return (flags & static_cast<unsigned int>(flag)) != 0;
@@ -246,24 +228,6 @@ std::string EnumToString(const Enum & value)
     return stm.str();
 }
 
-/// Kinds of string alignment.
-typedef enum class StringAlignments
-{
-    /// Left alignment.
-    Left,
-    /// Center alignment.
-    Center,
-    /// Right alignment.
-    Right,
-} StringAlign;
-
-/// @brief Align the given string.
-/// @param source    The source string.
-/// @param alignment The kind of alignment.
-/// @param width     The total width of the string.
-/// @return The aligned string.
-std::string AlignString(const std::string & source, const StringAlign & alignment, const size_t & width);
-
 /// @brief Check if all the character in the string it's ASCII.
 /// @param string_to_check The string to check.
 /// @return <b>True</b> if the string it's made of all ASCII characters.<br><b>False</b> otherwise.
@@ -399,60 +363,3 @@ inline typename std::map<K, T>::iterator FindErase(std::map<K, T> & map, const K
     }
     return it;
 }
-
-/// @brief Class which allows to gather timings.
-template<typename TimeT, typename ClockT = std::chrono::high_resolution_clock, typename DurationT = double>
-class Stopwatch
-{
-    private:
-        /// The header used during the printing of the elapsed time.
-        std::string header;
-        /// The starting time.
-        std::chrono::time_point<ClockT> timeStart;
-        /// The ending time.
-        std::chrono::time_point<ClockT> timeEnd;
-    public:
-        /// @brief Constructor.
-        /// @param _header The header of the stopwatch.
-        Stopwatch(std::string _header) :
-            header(_header),
-            timeStart(ClockT::now()),
-            timeEnd(ClockT::now())
-        {
-            // Nothing to do.
-        }
-        /// @brief Starts the stopwatch.
-        void start()
-        {
-            timeStart = timeEnd = ClockT::now();
-        }
-        /// @brief Stops the stopwatch.
-        /// @return The elapsed time.
-        DurationT stop()
-        {
-            timeEnd = ClockT::now();
-            return elapsed();
-        }
-        /// @brief Restarts the stopwatch and provides the elapsed time.
-        /// @return The elapsed time.
-        DurationT restart()
-        {
-            DurationT ret = stop();
-            start();
-            return ret;
-        }
-
-        /// @brief Provides the current elapsed time.
-        /// @return The elapsed time.
-        DurationT elapsed() const
-        {
-            auto delta = std::chrono::duration_cast<TimeT>(timeEnd - timeStart);
-            return static_cast<DurationT>(delta.count());
-        }
-
-        /// @brief Print the current elapsed time.
-        void print() const
-        {
-            std::cout << header << " : " << elapsed() << std::endl;
-        }
-};

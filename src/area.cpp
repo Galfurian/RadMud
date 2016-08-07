@@ -27,10 +27,10 @@
 // Other Include.
 #include "character.hpp"
 #include "constants.hpp"
-#include "item.hpp"
-#include "luabridge/LuaBridge.h"
-#include "logger.hpp"
 #include "room.hpp"
+#include "item/item.hpp"
+#include "luabridge/LuaBridge.h"
+#include "utilities/logger.hpp"
 
 using namespace std;
 
@@ -77,7 +77,7 @@ bool Area::inBoundaries(const int & x, const int & y, const int & z)
     return result;
 }
 
-bool Area::inBoundaries(const Coordinates<int> & coord)
+bool Area::inBoundaries(const Coordinates & coord)
 {
     return this->inBoundaries(coord.x, coord.y, coord.z);
 }
@@ -136,7 +136,7 @@ Room * Area::getRoom(int x, int y, int z)
     return nullptr;
 }
 
-Room * Area::getRoom(Coordinates<int> coord)
+Room * Area::getRoom(Coordinates coord)
 {
     return this->getRoom(coord.x, coord.y, coord.z);
 }
@@ -557,7 +557,7 @@ bool Area::fastInSight(
     return true;
 }
 
-bool Area::fastInSight(Coordinates<int> origin, Coordinates<int> target, unsigned int radius)
+bool Area::fastInSight(Coordinates origin, Coordinates target, unsigned int radius)
 {
     return this->fastInSight(origin.x, origin.y, origin.z, target.x, target.y, target.z, radius);
 }

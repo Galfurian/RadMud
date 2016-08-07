@@ -21,38 +21,6 @@
 
 #include "utils.hpp"
 
-Direction InverDirection(Direction direction)
-{
-    if (direction == Direction::North) return Direction::South;
-    if (direction == Direction::South) return Direction::North;
-    if (direction == Direction::West) return Direction::East;
-    if (direction == Direction::East) return Direction::West;
-    if (direction == Direction::Up) return Direction::Down;
-    if (direction == Direction::Down) return Direction::Up;
-    return Direction::None;
-}
-
-Direction GetDirection(std::string direction)
-{
-    if (direction == "north") return Direction::North;
-    if (direction == "south") return Direction::South;
-    if (direction == "west") return Direction::West;
-    if (direction == "east") return Direction::East;
-    if (direction == "up") return Direction::Up;
-    if (direction == "down") return Direction::Down;
-    return Direction::None;
-}
-Coordinates<int> GetCoordinates(Direction direction)
-{
-    if (direction == Direction::North) return Coordinates<int>(0, +1, 0);
-    if (direction == Direction::South) return Coordinates<int>(0, -1, 0);
-    if (direction == Direction::West) return Coordinates<int>(-1, 0, 0);
-    if (direction == Direction::East) return Coordinates<int>(+1, 0, 0);
-    if (direction == Direction::Up) return Coordinates<int>(0, 0, +1);
-    if (direction == Direction::Down) return Coordinates<int>(0, 0, -1);
-    return Coordinates<int>(0, 0, 0);
-}
-
 std::string GetAbilityName(Ability ability)
 {
     if (ability == Ability::Strength) return "strength";
@@ -60,17 +28,6 @@ std::string GetAbilityName(Ability ability)
     if (ability == Ability::Perception) return "perception";
     if (ability == Ability::Constitution) return "constitution";
     if (ability == Ability::Intelligence) return "intelligence";
-    return "none";
-}
-
-std::string GetDirectionName(Direction direction)
-{
-    if (direction == Direction::North) return "north";
-    if (direction == Direction::South) return "south";
-    if (direction == Direction::West) return "west";
-    if (direction == Direction::East) return "east";
-    if (direction == Direction::Up) return "up";
-    if (direction == Direction::Down) return "down";
     return "none";
 }
 
@@ -104,17 +61,6 @@ std::string GetMaterialTypeName(MaterialType type)
     if (type == MaterialType::Paper) return "Paper";
     if (type == MaterialType::Coal) return "Coal";
     return "No Material Type";
-}
-
-std::string GetItemQualityName(ItemQuality quality)
-{
-    if (quality == ItemQuality::Disastrous) return "Disastrous";
-    if (quality == ItemQuality::Poor) return "Poor";
-    if (quality == ItemQuality::Normal) return "Normal";
-    if (quality == ItemQuality::Fine) return "Fine";
-    if (quality == ItemQuality::Masterful) return "Masterful";
-    if (quality == ItemQuality::Fine) return "Fine";
-    return "No Quality";
 }
 
 std::string GetEquipmentSlotName(EquipmentSlot slot)

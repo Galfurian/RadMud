@@ -21,9 +21,9 @@
 #include "../production.hpp"
 #include "../building.hpp"
 #include "../defines.hpp"
-#include "../utils.hpp"
-#include "../item.hpp"
 #include "../opponent.hpp"
+#include "../item/item.hpp"
+#include "../constants.hpp"
 
 #include <memory>
 
@@ -58,6 +58,7 @@ typedef enum class ActionStatus_t
     Error
 } ActionStatus;
 
+/// @brief A general action. Performing this action will result in doing nothing.
 class GeneralAction: public std::enable_shared_from_this<GeneralAction>
 {
     protected:
@@ -102,10 +103,14 @@ class GeneralAction: public std::enable_shared_from_this<GeneralAction>
         /// @return the status after performing the action.
         virtual ActionStatus perform();
 
+        /// @brief Allows to set the remaining time before the action can be triggered.
+        /// @param _actionCooldown The cooldown that has to be set.
         void setCooldown(const unsigned int & _actionCooldown);
 
+        /// @brief Provides the remaining time before the action can be triggered.
         unsigned int getCooldown();
 
+        /// @brief Returns the action <b>statically</b> casted to CombatAction.
         std::shared_ptr<CombatAction> toCombatAction();
 };
 

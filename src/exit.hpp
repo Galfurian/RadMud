@@ -55,19 +55,19 @@ class Exit
         /// @brief Check the correctness of the exit.
         /// @return <b>True</b> if it has correct values,<br>
         ///         <b>False</b> otherwise.
-        bool check();
+        bool check() const;
 
         /// @brief Get the opposite direction.
         /// @return The opposite direction.
-        Direction getOppositeDirection();
+        Direction getOppositeDirection() const;
 
         /// @brief Get the exit on the opposite side.
         /// @return The opposite exit.
-        std::shared_ptr<Exit> getOppositeExit();
+        std::shared_ptr<Exit> getOppositeExit() const;
 
         /// @brief Get the direction.
         /// @return The direction.
-        std::string getDirection();
+        std::string getDirection() const;
 
         /// @brief Unlink the current exit from its source.
         /// @return <b>True</b> if the operation succeeded,<br>

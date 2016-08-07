@@ -19,35 +19,35 @@
 // Basic Include.
 #include "building.hpp"
 
+#include "room.hpp"
 #include "character.hpp"
 #include "constants.hpp"
+#include "model/itemModel.hpp"
 #include "luabridge/LuaBridge.h"
-#include "room.hpp"
-#include "utils.hpp"
 
 Building::Building() :
-    vnum(),
-    name(),
-    difficulty(),
-    time(),
-    assisted(),
-    tools(),
-    buildingModel(),
-    ingredients(),
-    unique()
+        vnum(),
+        name(),
+        difficulty(),
+        time(),
+        assisted(),
+        tools(),
+        buildingModel(),
+        ingredients(),
+        unique()
 {
 }
 
 Building::Building(const Building & source) :
-    vnum(source.vnum),
-    name(source.name),
-    difficulty(source.difficulty),
-    time(source.time),
-    assisted(source.assisted),
-    tools(source.tools),
-    buildingModel(source.buildingModel),
-    ingredients(source.ingredients),
-    unique(source.unique)
+        vnum(source.vnum),
+        name(source.name),
+        difficulty(source.difficulty),
+        time(source.time),
+        assisted(source.assisted),
+        tools(source.tools),
+        buildingModel(source.buildingModel),
+        ingredients(source.ingredients),
+        unique(source.unique)
 {
 }
 
@@ -116,7 +116,6 @@ bool Building::setIngredient(const std::string & source)
 {
     if (source.empty())
     {
-        Logger::log(LogLevel::Error, "No outcome set.");
         return false;
     }
     // Split the string of ingredients.
@@ -139,7 +138,9 @@ bool Building::setIngredient(const std::string & source)
         int quantity = ToInt(ingredientInfo[1]);
         if (quantity <= 0)
         {
-            Logger::log(LogLevel::Error, "Can't find the quantity of the Outcome :" + ingredientInfo[0]);
+            Logger::log(
+                LogLevel::Error,
+                "Can't find the quantity of the Outcome :" + ingredientInfo[0]);
             return false;
         }
         this->ingredients[ingredient] = static_cast<unsigned int>(quantity);
