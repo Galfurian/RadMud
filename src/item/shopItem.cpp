@@ -18,9 +18,9 @@
 #include "shopItem.hpp"
 
 #include "../mud.hpp"
-#include "../logger.hpp"
 #include "../formatter.hpp"
 #include "../constants.hpp"
+#include "../utilities/logger.hpp"
 
 ShopItem::ShopItem() :
         shopName(),

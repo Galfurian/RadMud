@@ -24,9 +24,9 @@
 // Other Include.
 #include "mud.hpp"
 #include "room.hpp"
-#include "logger.hpp"
 #include "constants.hpp"
 #include "lua/lua_script.hpp"
+#include "utilities/logger.hpp"
 #include "luabridge/LuaBridge.h"
 
 using namespace std;

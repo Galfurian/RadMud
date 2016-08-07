@@ -25,10 +25,10 @@
 
 // Other Include.
 #include "mud.hpp"
-#include "logger.hpp"
 #include "constants.hpp"
 #include "formatter.hpp"
 #include "generator.hpp"
+#include "utilities/logger.hpp"
 #include "luabridge/LuaBridge.h"
 #include "model/mechanismModel.hpp"
 

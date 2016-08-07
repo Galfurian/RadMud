@@ -18,9 +18,9 @@
 
 #include "sqliteWrapper.hpp"
 
-#include "../constants.hpp"
-#include "../logger.hpp"
 #include "../utils.hpp"
+#include "../constants.hpp"
+#include "../utilities/logger.hpp"
 
 ResultSet::~ResultSet()
 {

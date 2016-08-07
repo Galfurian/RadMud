@@ -21,7 +21,7 @@
 #include <sstream>
 #include <iomanip>
 
-#include "../logger.hpp"
+#include "logger.hpp"
 
 TableColumn::TableColumn(std::string _title, StringAlign _alignment, size_t _width) :
         title(_title),

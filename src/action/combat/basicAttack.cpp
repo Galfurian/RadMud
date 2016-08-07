@@ -18,9 +18,9 @@
 
 #include "basicAttack.hpp"
 #include "../../room.hpp"
-#include "../../logger.hpp"
 #include "../../character.hpp"
 #include "../../model/weaponModel.hpp"
+#include "../../utilities/logger.hpp"
 
 BasicAttack::BasicAttack(Character * _actor) :
         CombatAction(_actor)

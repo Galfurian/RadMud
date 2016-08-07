@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "../logger.hpp"
+#include "logger.hpp"
 
 /// @brief Class used to check whether a given enum is valid or not.
 template<typename EnumType, EnumType ... Values> class EnumCheck;

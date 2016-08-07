@@ -24,10 +24,10 @@
 // Other Include.
 #include "../mud.hpp"
 #include "../utils.hpp"
-#include "../logger.hpp"
 #include "../constants.hpp"
-#include "../utilities/table.hpp"
 #include "../action/moveAction.hpp"
+#include "../utilities/table.hpp"
+#include "../utilities/logger.hpp"
 
 using namespace std;
 

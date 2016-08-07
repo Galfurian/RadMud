@@ -18,10 +18,11 @@
 
 // Basic Include.
 #include "../mud.hpp"
-#include "../logger.hpp"
 #include "../material.hpp"
 #include "../constants.hpp"
 #include "../luabridge/LuaBridge.h"
+#include "../utilities/logger.hpp"
+
 #include "itemModel.hpp"
 
 #include "armorModel.hpp"

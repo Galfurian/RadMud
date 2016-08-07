@@ -25,7 +25,6 @@
 // Other Include.
 #include "../mud.hpp"
 #include "../utils.hpp"
-#include "../logger.hpp"
 #include "../defines.hpp"
 #include "../material.hpp"
 #include "../constants.hpp"
@@ -34,6 +33,7 @@
 #include "../model/containerModel.hpp"
 #include "../model/liquidContainerModel.hpp"
 #include "../model/shopModel.hpp"
+#include "../utilities/logger.hpp"
 
 #include "shopItem.hpp"
 #include "armorItem.hpp"

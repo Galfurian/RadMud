@@ -19,10 +19,10 @@
 #include "lua_script.hpp"
 
 #include "../mud.hpp"
-#include "../logger.hpp"
 #include "../constants.hpp"
 #include "../command/command.hpp"
 #include "../luabridge/LuaBridge.h"
+#include "../utilities/logger.hpp"
 
 void LuaLog(std::string message)
 {

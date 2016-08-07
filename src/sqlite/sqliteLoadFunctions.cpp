@@ -17,10 +17,10 @@
 
 #include "sqliteDbms.hpp"
 
-#include "../constants.hpp"
 #include "../mud.hpp"
 #include "../utils.hpp"
-#include "../logger.hpp"
+#include "../constants.hpp"
+#include "../utilities/logger.hpp"
 
 #include "../model/armorModel.hpp"
 #include "../model/bookModel.hpp"

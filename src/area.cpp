@@ -27,10 +27,10 @@
 // Other Include.
 #include "character.hpp"
 #include "constants.hpp"
-#include "logger.hpp"
 #include "room.hpp"
 #include "item/item.hpp"
 #include "luabridge/LuaBridge.h"
+#include "utilities/logger.hpp"
 
 using namespace std;
 

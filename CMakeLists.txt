@@ -138,7 +138,6 @@ set(PROJECT_SRC
     ./src/utils.cpp
     ./src/formatter.cpp
     ./src/opponent.cpp
-    ./src/logger.cpp
     ./src/protocol.cpp
     ./src/luabridge/detail/LuaHelpers.cpp
     ${RADMUD_LUA_SRC}

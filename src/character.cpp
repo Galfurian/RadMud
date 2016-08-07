@@ -27,7 +27,6 @@
 
 // Other Include.
 #include "mud.hpp"
-#include "logger.hpp"
 #include "constants.hpp"
 #include "lua/lua_script.hpp"
 #include "luabridge/LuaBridge.h"
@@ -41,6 +40,8 @@
 #include "action/combat/basicAttack.hpp"
 #include "action/combat/flee.hpp"
 #include "sqlite/sqliteDbms.hpp"
+
+#include "utilities/logger.hpp"
 
 #include "item/armorItem.hpp"
 

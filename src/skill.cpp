@@ -24,7 +24,7 @@
 
 // Other Include.
 #include "utils.hpp"
-#include "logger.hpp"
+#include "utilities/logger.hpp"
 
 Skill::Skill() :
     vnum(),
