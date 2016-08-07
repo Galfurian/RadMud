@@ -52,7 +52,7 @@ Exit::~Exit()
     //Logger::log(LogLevel::Debug, "Deleted: Exit.");
 }
 
-bool Exit::check()
+bool Exit::check() const
 {
     assert(source != nullptr);
     assert(destination != nullptr);
@@ -60,12 +60,12 @@ bool Exit::check()
     return true;
 }
 
-Direction Exit::getOppositeDirection()
+Direction Exit::getOppositeDirection() const
 {
-    return InverDirection(direction);
+    return direction.getOpposite();
 }
 
-std::shared_ptr<Exit> Exit::getOppositeExit()
+std::shared_ptr<Exit> Exit::getOppositeExit() const
 {
     if (destination != nullptr)
     {
@@ -80,9 +80,9 @@ std::shared_ptr<Exit> Exit::getOppositeExit()
     return nullptr;
 }
 
-std::string Exit::getDirection()
+std::string Exit::getDirection() const
 {
-    return GetDirectionName(direction);
+    return direction.toString();
 }
 
 bool Exit::unlink() const

@@ -414,9 +414,13 @@ std::shared_ptr<Exit> Room::findExit(Direction direction)
     return nullptr;
 }
 
-std::shared_ptr<Exit> Room::findExit(std::string direction)
+std::shared_ptr<Exit> Room::findExit(const std::string & direction)
 {
-    return this->findExit(GetDirection(direction));
+    if (Direction::isValid(direction))
+    {
+        return this->findExit(Direction(direction));
+    }
+    return nullptr;
 }
 
 std::shared_ptr<Exit> Room::findExit(Room * destination)
@@ -465,7 +469,7 @@ bool Room::addExit(std::shared_ptr<Exit> exit)
     this->exits.push_back(std::move(exit));
     return true;
 }
-bool Room::removeExit(Direction direction)
+bool Room::removeExit(const Direction & direction)
 {
     for (auto it : exits)
     {
@@ -718,7 +722,7 @@ bool ConnectRoom(Room * room)
     for (auto iterator : Mud::instance().mudDirections)
     {
         // Get the coordinate modifier.
-        Coordinates<int> coordinates = room->coord + GetCoordinates(iterator.second);
+        Coordinates<int> coordinates = room->coord + iterator.second.getCoordinates();
         // Get the room at the given coordinates.
         Room * near = room->area->getRoom(coordinates);
         if (near != nullptr)
@@ -748,7 +752,7 @@ bool ConnectRoom(Room * room)
             vector<string> arguments;
             arguments.push_back(ToString(forward->source->vnum));
             arguments.push_back(ToString(forward->destination->vnum));
-            arguments.push_back(EnumToString(forward->direction));
+            arguments.push_back(ToString(forward->direction.toUInt()));
             arguments.push_back(ToString(forward->flags));
             if (!SQLiteDbms::instance().insertInto("Exit", arguments))
             {
@@ -760,7 +764,7 @@ bool ConnectRoom(Room * room)
             vector<string> arguments2;
             arguments2.push_back(ToString(backward->source->vnum));
             arguments2.push_back(ToString(backward->destination->vnum));
-            arguments2.push_back(EnumToString(backward->direction));
+            arguments2.push_back(ToString(backward->direction.toUInt()));
             arguments2.push_back(ToString(backward->flags));
             if (!SQLiteDbms::instance().insertInto("Exit", arguments2))
             {

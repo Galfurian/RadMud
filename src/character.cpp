@@ -573,7 +573,7 @@ void Character::popAction()
     }
 }
 
-bool Character::canMoveTo(Direction direction, std::string & error) const
+bool Character::canMoveTo(const Direction & direction, std::string & error) const
 {
     if (this->getAction()->getType() == ActionType::Combat)
     {

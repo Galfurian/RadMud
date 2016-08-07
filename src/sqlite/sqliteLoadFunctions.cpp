@@ -455,23 +455,31 @@ bool LoadExit(ResultSet * result)
     {
         // Create an empty exit.
         std::shared_ptr<Exit> newExit = std::make_shared<Exit>();
-        // Retrieve the rooms vnum.
-        newExit->source = Mud::instance().findRoom(result->getNextInteger());
-        newExit->destination = Mud::instance().findRoom(result->getNextInteger());
-        newExit->direction = static_cast<Direction>(result->getNextInteger());
-        newExit->flags = result->getNextUnsignedInteger();
-
+        // retrive the values.
+        int sourceVnum = result->getNextInteger();
+        int destinationVnum = result->getNextInteger();
+        unsigned int directionValue = result->getNextUnsignedInteger();
+        unsigned int flagValue = result->getNextUnsignedInteger();
         // Check the correctness.
+        newExit->source = Mud::instance().findRoom(sourceVnum);
         if (newExit->source == nullptr)
         {
-            Logger::log(LogLevel::Error, "Can't find the source room.");
+            Logger::log(LogLevel::Error, "Can't find source (%s).", ToString(sourceVnum));
             return false;
         }
+        newExit->destination = Mud::instance().findRoom(destinationVnum);
         if (newExit->destination == nullptr)
         {
-            Logger::log(LogLevel::Error, "Can't find the destination room.");
+            Logger::log(LogLevel::Error, "Can't find destination (%s).", ToString(destinationVnum));
             return false;
         }
+        if (!Direction::isValid(directionValue))
+        {
+            Logger::log(LogLevel::Error, "Direction si not valid (%s).", ToString(directionValue));
+            return false;
+        }
+        newExit->direction = Direction(directionValue);
+        newExit->flags = flagValue;
         if (!newExit->check())
         {
             Logger::log(LogLevel::Error, "Error during error checking.");

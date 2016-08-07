@@ -183,8 +183,9 @@ class Room
 
         /// @brief Remove from the list of exits the one on the given direction.
         /// @param direction The direction to removed.
-        /// @return <b>True</b> if the execution goes well,<br><b>False</b> otherwise.
-        bool removeExit(Direction direction);
+        /// @return <b>True</b> if the execution goes well,<br>
+        ///         <b>False</b> otherwise.
+        bool removeExit(const Direction & direction);
 
         /// @brief Search for the desired exit in a direction, provided as an enumerator.
         /// @param direction The direction to search.
@@ -194,7 +195,7 @@ class Room
         /// @brief Search for the desired exit in a direction, provided as a string.
         /// @param direction The direction to search.
         /// @return The desired exit.
-        std::shared_ptr<Exit> findExit(std::string direction);
+        std::shared_ptr<Exit> findExit(const std::string & direction);
 
         /// @brief Search for the desired exit of this room.
         /// @param destination The destination room.

@@ -293,7 +293,7 @@ class Character
         /// @param error     A reference to a string which will contain error message in case of failure.
         /// @return <b>True</b> if the operation goes well,<br>
         ///         <b>False</b> otherwise.
-        bool canMoveTo(Direction direction, std::string & error) const;
+        bool canMoveTo(const Direction & direction, std::string & error) const;
 
         /// @brief Move the character to another room.
         /// @param destination Destination room.

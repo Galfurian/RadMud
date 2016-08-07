@@ -48,17 +48,17 @@ void DoDirection(Character * character, Direction direction)
     // Calculate the time needed to move.
     if (character->posture == CharacterPosture::Stand)
     {
-        character->sendMsg("You start to go %s...\n", GetDirectionName(direction));
+        character->sendMsg("You start to go %s...\n", direction.toString());
         speed = 2;
     }
     else if (character->posture == CharacterPosture::Crouch)
     {
-        character->sendMsg("You move crouching towards %s...\n", GetDirectionName(direction));
+        character->sendMsg("You move crouching towards %s...\n", direction.toString());
         speed = 4;
     }
     else if (character->posture == CharacterPosture::Prone)
     {
-        character->sendMsg("You begin to crawl to %s...\n", GetDirectionName(direction));
+        character->sendMsg("You begin to crawl to %s...\n", direction.toString());
         speed = 6;
     }
     else
