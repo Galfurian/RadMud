@@ -406,25 +406,26 @@ std::string Item::getConditionDescription()
     else return "is broken";
 }
 
-unsigned int Item::getWeight(bool withMaterial)
+unsigned int Item::getWeight()
 {
-    unsigned int result = this->model->weight;
+    // Add the base weight.
+    auto wgBase = this->model->weight;
     if (this->customWeight != 0)
     {
-        result = this->customWeight;
+        wgBase = this->customWeight;
     }
-    if (withMaterial)
-    {
-        // Add the addition weight due to the material.
-        result += ((result / 100) * composition->lightness);
-    }
-    return result;
+    // Evaluate the modifier due to item's quality.
+    auto wgQuality = static_cast<unsigned int>(wgBase * quality.getModifier());
+    // Evaluate the modifier due to item's material.
+    auto wgMaterial = static_cast<unsigned int>(wgBase * this->composition->getLightnessModifier());
+    // Evaluate the result.
+    return ((wgBase + wgQuality + wgMaterial) / 3);
 }
 
 unsigned int Item::getTotalWeight()
 {
     // Add the default weight of the model.
-    unsigned int totalWeight = this->getWeight(true);
+    unsigned int totalWeight = this->getWeight();
     if (!this->isEmpty())
     {
         for (auto iterator : content)
@@ -846,13 +847,16 @@ ArmorItem * Item::toArmorItem()
 
 unsigned int Item::getPrice() const
 {
+    // Add the base price.
+    auto pcBase = this->model->price;
+    // Evaluate the modifier due to item's quality.
+    auto pcQuality = static_cast<unsigned int>(pcBase * quality.getModifier());
+    // Evaluate the modifier due to item's condition.
+    auto pcCondition = static_cast<unsigned int>(pcBase * this->getConditionModifier());
+    // Evaluate the modifier due to item's material.
+    auto pcMaterial = static_cast<unsigned int>(pcBase * this->composition->getWorthModifier());
     // The resulting price.
-    unsigned int result = 0;
-    // Add the base item price.
-    result += this->model->price;
-    // Increase the price based on the material.
-    result += ((result / 100) * composition->worth);
-    return result;
+    return ((pcBase + pcQuality + pcCondition + pcMaterial) / 4);
 }
 
 void Item::luaRegister(lua_State * L)

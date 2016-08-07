@@ -64,7 +64,11 @@ class Material
         /// @return <b>True</b> if the material has correct values,<br><b>False</b> otherwise.
         bool check();
 
+        double getWorthModifier() const;
+
         double getHardnessModifier() const;
+
+        double getLightnessModifier() const;
 
         /// @brief Function used to register inside the lua environment the class.
         /// @param L The lua environment.

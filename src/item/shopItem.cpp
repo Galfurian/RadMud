@@ -193,9 +193,9 @@ std::string ShopItem::lookContent()
             TableRow row;
             row.push_back(item->getNameCapital());
             row.push_back(ToString(iterator.second));
-            row.push_back(ToString(item->getWeight(true)));
-            row.push_back(ToString(this->evaluateBuyPrice(item->getPrice())));
-            row.push_back(ToString(this->evaluateSellPrice(item->getPrice())));
+            row.push_back(ToString(item->getWeight()));
+            row.push_back(ToString(this->evaluateBuyPrice(item)));
+            row.push_back(ToString(this->evaluateSellPrice(item)));
             // Add the row to the table.
             saleTable.addRow(row);
         }
@@ -227,12 +227,12 @@ void ShopItem::setNewShopKeeper(Mobile * _shopKeeper)
     this->shopKeeper = _shopKeeper;
 }
 
-unsigned int ShopItem::evaluateBuyPrice(const unsigned int & price)
+unsigned int ShopItem::evaluateBuyPrice(Item * item)
 {
-    return this->shopBuyTax * price;
+    return this->shopBuyTax * item->getPrice();
 }
 
-unsigned int ShopItem::evaluateSellPrice(const unsigned int & price)
+unsigned int ShopItem::evaluateSellPrice(Item * item)
 {
-    return this->shopSellTax * price;
+    return this->shopSellTax * item->getPrice();
 }

@@ -27,20 +27,24 @@
 #include "utils.hpp"
 
 Material::Material() :
-    vnum(),
-    type(MaterialType::NoType),
-    name(),
-    article(),
-    worth(),
-    hardness(),
-    lightness()
+        vnum(),
+        type(MaterialType::NoType),
+        name(),
+        article(),
+        worth(),
+        hardness(),
+        lightness()
 {
     // Nothing to do.
 }
 
 Material::~Material()
 {
-    Logger::log(LogLevel::Debug, "Deleted material\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
+    Logger::log(
+        LogLevel::Debug,
+        "Deleted material\t[%s]\t\t(%s)",
+        ToString(this->vnum),
+        this->name);
 }
 
 bool Material::check()
@@ -55,9 +59,22 @@ bool Material::check()
     return true;
 }
 
+double Material::getWorthModifier() const
+{
+    Logger::log(LogLevel::Debug, "Worth     : %s", ToString(1 + (0.1 * this->worth)));
+    return 1 + (0.1 * this->worth);
+}
+
 double Material::getHardnessModifier() const
 {
-    return 1 + (0.25 * (this->hardness / 5));
+    Logger::log(LogLevel::Debug, "Hardness  : %s", ToString(1 + (0.1 * this->hardness)));
+    return 1 + (0.1 * this->hardness);
+}
+
+double Material::getLightnessModifier() const
+{
+    Logger::log(LogLevel::Debug, "Lightness : %s", ToString(1 + (0.1 * this->lightness)));
+    return 1 + (0.1 * this->lightness);
 }
 
 void Material::luaRegister(lua_State * L)

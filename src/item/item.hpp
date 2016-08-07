@@ -149,7 +149,7 @@ class Item
 
         /// @brief Get the item weight.
         /// @return The weight of just the item.
-        unsigned int getWeight(bool withMaterial);
+        unsigned int getWeight();
 
         /// @brief Get the item weight, plus eventually contained item weight.
         /// @return The total weight of the item.

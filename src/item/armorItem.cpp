@@ -50,12 +50,6 @@ unsigned int ArmorItem::getArmorClass() const
     auto acCondition = static_cast<unsigned int>(acBase * this->getConditionModifier());
     // Evaluate the modifier due to item's material.
     auto acMaterial = static_cast<unsigned int>(acBase * this->composition->getHardnessModifier());
-    Logger::log(LogLevel::Debug, "acBase      : %s", ToString(acBase));
-    Logger::log(LogLevel::Debug, "acQuality   : %s", ToString(acQuality));
-    Logger::log(LogLevel::Debug, "acCondition : %s", ToString(acCondition));
-    Logger::log(LogLevel::Debug, "Material    : %s", ToString(acMaterial));
     // The resulting armor class.
-    unsigned int result = ((acBase + acQuality + acCondition + acMaterial) / 4);
-    Logger::log(LogLevel::Debug, "Result      : %s", ToString(result));
-    return result;
+    return ((acBase + acQuality + acCondition + acMaterial) / 4);
 }
