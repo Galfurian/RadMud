@@ -19,7 +19,6 @@
 #pragma once
 
 #include "constants.hpp"
-#include "utils.hpp"
 
 /// @brief Enumerator which identifies the day phase.
 typedef enum class DayPhases

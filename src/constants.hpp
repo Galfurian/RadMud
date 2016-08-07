@@ -18,9 +18,8 @@
 
 #pragma once
 
-#include <ctime>
+#include <chrono>
 #include <string>
-#include <vector>
 
 // ////////////////////////////////////////////////////////////////////////////
 // Global constants.
@@ -41,4 +40,17 @@ static const int kNoSocketIndicator = -1;
 static const std::string kDatabaseName = "radmud.db";
 /// Location of system files.
 static const std::string kSystemDir = "../system/";
+
+/// 8 bits
+typedef unsigned char Byte;
+/// Type used by the mud to store time.
+typedef std::chrono::nanoseconds TimeNS;
+/// Time point in microseconds.
+typedef std::chrono::time_point<std::chrono::microseconds> TimeUS;
+/// Time point in milliseconds.
+typedef std::chrono::time_point<std::chrono::milliseconds> TimeMS;
+/// Time point in seconds.
+typedef std::chrono::time_point<std::chrono::seconds> TimeSEC;
+/// Clock type of time.
+typedef std::chrono::time_point<std::chrono::system_clock> TimeClock;
 

@@ -23,7 +23,6 @@
 #include "command.hpp"
 // Other Include.
 #include "../mud.hpp"
-#include "../utils.hpp"
 #include "../constants.hpp"
 #include "../action/moveAction.hpp"
 #include "../utilities/table.hpp"

@@ -21,9 +21,9 @@
 #include "../production.hpp"
 #include "../building.hpp"
 #include "../defines.hpp"
-#include "../utils.hpp"
 #include "../opponent.hpp"
 #include "../item/item.hpp"
+#include "../constants.hpp"
 
 #include <memory>
 

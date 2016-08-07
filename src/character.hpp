@@ -26,7 +26,6 @@
 #include "exit.hpp"
 #include "faction.hpp"
 #include "race.hpp"
-#include "utils.hpp"
 #include "item/item.hpp"
 #include "action/combat/combatAction.hpp"
 

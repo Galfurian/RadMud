@@ -23,7 +23,6 @@
 #include "constants.hpp"
 #include "luabridge/LuaBridge.h"
 #include "room.hpp"
-#include "utils.hpp"
 
 Building::Building() :
     vnum(),
