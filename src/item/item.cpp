@@ -393,7 +393,6 @@ void Item::getSheet(Table & sheet) const
     }
     if (this->isAContainer() || (model->getType() == ModelType::LiquidContainer))
     {
-        sheet.addRow( { "Total Weight", ToString(this->getTotalWeight()) });
         sheet.addRow( { "Free  Space", ToString(this->getFreeSpace()) });
         sheet.addRow( { "Used  Space", ToString(this->getUsedSpace()) });
         sheet.addRow( { "Total Space", ToString(this->getTotalSpace()) });
@@ -466,18 +465,13 @@ unsigned int Item::getPrice() const
 
 unsigned int Item::getWeight() const
 {
-    return this->weight;
-}
-
-unsigned int Item::getTotalWeight() const
-{
     // Add the default weight of the model.
-    unsigned int totalWeight = this->getWeight();
+    unsigned int totalWeight = this->weight;
     if (!this->isEmpty())
     {
         for (auto iterator : content)
         {
-            totalWeight += iterator->getTotalWeight();
+            totalWeight += iterator->getWeight();
         }
     }
     else if (model->getType() == ModelType::LiquidContainer)
@@ -520,7 +514,7 @@ std::string Item::getLook()
     // Print the content.
     output += this->lookContent();
     output += "It weights about ";
-    output += Formatter::yellow() + ToString(this->getTotalWeight()) + Formatter::reset();
+    output += Formatter::yellow() + ToString(this->getWeight()) + Formatter::reset();
     output += " " + mud_measure + ".\n";
     return output;
 }
@@ -620,7 +614,7 @@ unsigned int Item::getUsedSpace() const
     {
         for (auto iterator : content)
         {
-            used += iterator->getTotalWeight();
+            used += iterator->getWeight();
         }
     }
     else if (model->getType() == ModelType::LiquidContainer)
@@ -649,7 +643,7 @@ unsigned int Item::getFreeSpace() const
 
 bool Item::putInside(Item * item)
 {
-    if (item->getTotalWeight() > this->getFreeSpace())
+    if (item->getWeight() > this->getFreeSpace())
     {
         return false;
     }
@@ -1019,5 +1013,5 @@ bool OrderItemByName(Item * first, Item * second)
 
 bool OrderItemByWeight(Item * first, Item * second)
 {
-    return first->getTotalWeight() < second->getTotalWeight();
+    return first->getWeight() < second->getWeight();
 }

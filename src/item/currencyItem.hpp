@@ -34,4 +34,6 @@ class CurrencyItem: public Item
         virtual void getSheet(Table & sheet) const;
 
         virtual unsigned int getPrice() const;
+
+        virtual unsigned int getWeight() const;
 };

@@ -59,3 +59,19 @@ void CurrencyModel::getSheet(Table & sheet) const
     // Add a divider.
     //sheet.addDivider();
 }
+
+bool CurrencyModel::addPrice(const int & materialVnum, const unsigned int & price)
+{
+    return prices.insert(std::make_pair(materialVnum, price)).second;
+}
+
+bool CurrencyModel::findPrice(const int & materialVnum, unsigned int & price) const
+{
+    auto it = prices.find(materialVnum);
+    if (it != prices.end())
+    {
+        price = it->second;
+        return true;
+    }
+    return false;
+}

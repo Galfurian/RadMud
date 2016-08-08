@@ -85,7 +85,9 @@ bool LoadTravelPoint(ResultSet * result);
 /// @brief Function used to retrieve information about all the buildings.
 bool LoadBuilding(ResultSet * result);
 /// @brief Function used to load shops.
-bool LoadItemShop(ResultSet * result);
+bool LoadShop(ResultSet * result);
+/// @brief Function used to load currencies.
+bool LoadCurrency(ResultSet * result);
 ///@}
 
 class TableLoader

@@ -52,5 +52,20 @@ void CurrencyItem::getSheet(Table & sheet) const
 
 unsigned int CurrencyItem::getPrice() const
 {
-    return this->composition->worth;
+    unsigned int customPrice = Item::getPrice();
+    CurrencyModel * currency = this->model->toCurrency();
+    if (!currency->findPrice(this->composition->vnum, customPrice))
+    {
+        Logger::log(
+            LogLevel::Warning,
+            "The item (%s) has a wrong composition w.r.t the currency (%s).",
+            this->getName(),
+            currency->getName());
+    }
+    return customPrice;
+}
+
+unsigned int CurrencyItem::getWeight() const
+{
+    return 0;
 }

@@ -54,7 +54,8 @@ SQLiteDbms::SQLiteDbms()
     loaders.push_back(TableLoader("Production", LoadProduction));
     loaders.push_back(TableLoader("Mobile", LoadMobile));
     loaders.push_back(TableLoader("Building", LoadBuilding));
-    loaders.push_back(TableLoader("ItemShop", LoadItemShop));
+    loaders.push_back(TableLoader("Shop", LoadShop));
+    loaders.push_back(TableLoader("Currency", LoadCurrency));
 }
 
 SQLiteDbms::~SQLiteDbms()

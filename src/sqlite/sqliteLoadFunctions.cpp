@@ -869,7 +869,7 @@ bool LoadBuilding(ResultSet * result)
     return true;
 }
 
-bool LoadItemShop(ResultSet * result)
+bool LoadShop(ResultSet * result)
 {
     while (result->next())
     {
@@ -891,6 +891,42 @@ bool LoadItemShop(ResultSet * result)
         shop->shopBuyTax = result->getNextUnsignedInteger();
         shop->shopSellTax = result->getNextUnsignedInteger();
         shop->shopKeeper = Mud::instance().findMobile(result->getNextString());
+    }
+    return true;
+}
+
+bool LoadCurrency(ResultSet * result)
+{
+    while (result->next())
+    {
+        // Retrieve the item vnum.
+        auto modelVnum = result->getNextInteger();
+        auto materialVnum = result->getNextInteger();
+        auto worth = result->getNextUnsignedInteger();
+
+        auto model = Mud::instance().findItemModel(modelVnum);
+        if (model == nullptr)
+        {
+            Logger::log(LogLevel::Error, "Can't find the model (%s).", ToString(modelVnum));
+            return false;
+        }
+        if (model->getType() != ModelType::Currency)
+        {
+            Logger::log(LogLevel::Error, "Wrong type of model (%s).", ToString(modelVnum));
+            return false;
+        }
+        auto material = Mud::instance().findMaterial(materialVnum);
+        if (material == nullptr)
+        {
+            Logger::log(LogLevel::Error, "Can't find the material (%s).", ToString(materialVnum));
+            return false;
+        }
+        CurrencyModel * currency = model->toCurrency();
+        if (!currency->addPrice(materialVnum, worth))
+        {
+            Logger::log(LogLevel::Error, "Can't add the price for (%s).", ToString(modelVnum));
+            return false;
+        }
     }
     return true;
 }

@@ -135,11 +135,13 @@ class Item
         virtual bool createOnDB();
 
         /// @brief Save the item on database.
-        /// @return <b>True</b> if the execution goes well,<br><b>False</b> otherwise.
+        /// @return <b>True</b> if the execution goes well,<br>
+        ///         <b>False</b> otherwise.
         virtual bool updateOnDB();
 
         /// @brief Remove the item on database.
-        /// @return <b>True</b> if the execution goes well,<br><b>False</b> otherwise.
+        /// @return <b>True</b> if the execution goes well,<br>
+        ///         <b>False</b> otherwise.
         virtual bool removeOnDB();
 
         /// @brief Fills the provided table with the information concerning the item.
@@ -148,7 +150,8 @@ class Item
 
         /// @brief Check if the item has the desired key.
         /// @param key The key to search.
-        /// @return <b>True</b> if the operations succeeded,<br><b>False</b> Otherwise.
+        /// @return <b>True</b> if the operations succeeded,<br>
+        ///         <b>False</b> Otherwise.
         bool hasKey(std::string key);
 
         /// @brief Provides the maximum condition of the item, given
@@ -170,13 +173,9 @@ class Item
         /// Provides the price of the item based on its quality, material and condition.
         virtual unsigned int getPrice() const;
 
-        /// @brief Get the item weight.
-        /// @return The weight of just the item.
-        unsigned int getWeight() const;
-
         /// @brief Get the item weight, plus eventually contained item weight.
         /// @return The total weight of the item.
-        unsigned int getTotalWeight() const;
+        virtual unsigned int getWeight() const;
 
         /// @brief Return the name of the item.
         /// @return The name of the item.

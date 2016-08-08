@@ -1000,7 +1000,7 @@ bool Character::remInventoryItem(Item *item)
 
 bool Character::canCarry(Item * item) const
 {
-    return ((this->getCarryingWeight() + item->getTotalWeight()) < this->getMaxCarryingWeight());
+    return ((this->getCarryingWeight() + item->getWeight()) < this->getMaxCarryingWeight());
 }
 
 unsigned int Character::getCarryingWeight() const
@@ -1008,11 +1008,11 @@ unsigned int Character::getCarryingWeight() const
     unsigned int carrying = 0;
     for (auto iterator : inventory)
     {
-        carrying += iterator->getTotalWeight();
+        carrying += iterator->getWeight();
     }
     for (auto iterator : equipment)
     {
-        carrying += iterator->getTotalWeight();
+        carrying += iterator->getWeight();
     }
     return carrying;
 }
@@ -1514,7 +1514,7 @@ unsigned int Character::getCooldown(CombatActionType combatAction)
             // MIN =  0.00
             // MAX =  1.60
             Item * weapon = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
-            double RHDmod = weapon->getTotalWeight();
+            double RHDmod = weapon->getWeight();
             if (RHDmod > 0)
             {
                 if (RHDmod > 40)
@@ -1530,7 +1530,7 @@ unsigned int Character::getCooldown(CombatActionType combatAction)
             // MIN =  0.00
             // MAX =  1.60
             Item * weapon = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
-            double LHDmod = weapon->getTotalWeight();
+            double LHDmod = weapon->getWeight();
             if (LHDmod > 0)
             {
                 if (LHDmod > 40)
@@ -1589,7 +1589,7 @@ unsigned int Character::getConsumedStaminaFor(
             if (this->canAttackWith(slot))
             {
                 Item * weapon = this->findEquipmentSlotItem(slot);
-                unsigned int wpnWeight = weapon->getTotalWeight();
+                unsigned int wpnWeight = weapon->getWeight();
                 double WPN = (wpnWeight == 0) ? 0 : log10(wpnWeight);
                 RSLT += WPN;
             }

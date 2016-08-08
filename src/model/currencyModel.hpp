@@ -24,6 +24,8 @@
 class CurrencyModel: public ItemModel
 {
     public:
+        std::map<int, unsigned int> prices;
+
         CurrencyModel();
 
         virtual ~CurrencyModel();
@@ -35,4 +37,8 @@ class CurrencyModel: public ItemModel
         virtual bool setModel(const std::string & source);
 
         virtual void getSheet(Table & sheet) const;
+
+        bool addPrice(const int & materialVnum, const unsigned int & price);
+
+        bool findPrice(const int & materialVnum, unsigned int & price) const;
 };
