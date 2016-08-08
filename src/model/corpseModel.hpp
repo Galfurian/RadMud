@@ -39,7 +39,7 @@ class CorpseModel: public ItemModel
         virtual Item * createItem(
             std::string maker,
             Material * composition,
-            ItemQuality itemQuality);
+            const ItemQuality & itemQuality);
 
         Item * createCorpse(std::string maker, Material * composition, const unsigned int & weight);
 };

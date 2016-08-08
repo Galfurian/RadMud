@@ -963,18 +963,15 @@ bool Character::hasEquipmentItem(Item * item)
 
 bool Character::addInventoryItem(Item * item)
 {
-    if (item == nullptr)
-    {
-        Logger::log(LogLevel::Error, "[addInventoryItem] Item is a nullptr.");
-        return false;
-    }
     // Set the owner of the item.
     item->owner = this;
     // Add the item to the inventory.
     inventory.push_back(item);
     Logger::log(
         LogLevel::Debug,
-        "Item '" + item->getName() + "' added to '" + this->getName() + "' inventory;");
+        "Item '%s' added to '%s' inventory;",
+        item->getName(),
+        this->getName());
     return true;
 }
 

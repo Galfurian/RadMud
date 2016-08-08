@@ -68,7 +68,7 @@ void CorpseModel::getSheet(Table & sheet) const
     //sheet.addDivider();
 }
 
-Item * CorpseModel::createItem(std::string, Material *, ItemQuality)
+Item * CorpseModel::createItem(std::string, Material *, const ItemQuality &)
 {
     Logger::log(LogLevel::Error, "Use the proper createCorpse function.");
     return nullptr;

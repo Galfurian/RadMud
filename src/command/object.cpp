@@ -20,8 +20,10 @@
 
 #include "../mud.hpp"
 #include "../utilities/table.hpp"
-#include "../model/liquidContainerModel.hpp"
 #include "../item/shopItem.hpp"
+
+#include "../model/liquidContainerModel.hpp"
+#include "../model/currencyModel.hpp"
 
 #include <algorithm>
 
@@ -1840,10 +1842,63 @@ void DoSell(Character * character, std::istream & sArgs)
         shopKeeper->doCommand("say " + character->getName() + " " + phrase);
         return;
     }
-    if (shop->balance < item->getPrice())
+    auto price = item->getPrice();
+    if (shop->balance < price)
     {
         std::string phrase = "I can't afford to buy your goods.";
         shopKeeper->doCommand("say " + character->getName() + " " + phrase);
         return;
     }
+    auto currency = shopKeeper->faction->currency;
+    // Give the coins to the character.
+    SQLiteDbms::instance().beginTransaction();
+    auto status = true;
+    std::vector<Item *> coins;
+    if (!currency->generateCurrency(shopKeeper->getName(), price, coins))
+    {
+        character->sendMsg("You failed to sell %s.\n", item->getName());
+        SQLiteDbms::instance().rollbackTransection();
+        return;
+    }
+    // Remove the item from the inventory.
+    if (status)
+    {
+        status &= character->remInventoryItem(item);
+    }
+    // Put the item inside the shop.
+    if (status)
+    {
+        status &= shop->putInside(item);
+    }
+    if (status)
+    {
+        for (auto coin : coins)
+        {
+            character->addInventoryItem(coin);
+            if (!coin->updateOnDB())
+            {
+                status = false;
+                break;
+            }
+        }
+    }
+    if (status)
+    {
+        shop->balance -= price;
+        status &= shop->updateOnDB();
+    }
+    // Handle error.
+    if (!status)
+    {
+        character->sendMsg("You failed to sell %s.\n", item->getName());
+        SQLiteDbms::instance().rollbackTransection();
+        for (auto coin : coins)
+        {
+            character->remInventoryItem(coin);
+            delete (coin);
+        }
+        return;
+    }
+    SQLiteDbms::instance().endTransaction();
+    character->sendMsg("You sell %s to %s.\n", item->getName(), shopKeeper->getName());
 }

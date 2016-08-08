@@ -77,8 +77,6 @@ bool Item::check(bool complete)
     safe &= CorrectAssert(!maker.empty());
     safe &= CorrectAssert(condition > 0);
     safe &= CorrectAssert(composition != nullptr);
-    safe &= CorrectAssert(weight > 0);
-    safe &= CorrectAssert(price > 0);
     if (complete)
     {
         safe &= CorrectAssert(!((room != nullptr) && (owner != nullptr)));

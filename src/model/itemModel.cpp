@@ -110,7 +110,10 @@ void ItemModel::getSheet(Table & sheet) const
     sheet.addRow( { "Condition", ToString(this->tileSet) + ":" + ToString(this->tileId) });
 }
 
-Item * ItemModel::createItem(std::string maker, Material * composition, ItemQuality itemQuality)
+Item * ItemModel::createItem(
+    std::string maker,
+    Material * composition,
+    const ItemQuality & itemQuality)
 {
     if (composition->type != this->material)
     {
@@ -183,8 +186,6 @@ Item * ItemModel::createItem(std::string maker, Material * composition, ItemQual
         // Return pointer to nothing.
         return nullptr;
     }
-
-    SQLiteDbms::instance().beginTransaction();
     if (newItem->createOnDB())
     {
         // Insert into the item_list the new item.
@@ -193,14 +194,11 @@ Item * ItemModel::createItem(std::string maker, Material * composition, ItemQual
     else
     {
         Logger::log(LogLevel::Error, "Cannot save the new item on DB.");
-        // Rollback the transation.
-        SQLiteDbms::instance().rollbackTransection();
         // Delete the item.
         delete (newItem);
         // Return pointer to nothing.
         return nullptr;
     }
-    SQLiteDbms::instance().endTransaction();
     return newItem;
 }
 
