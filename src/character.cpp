@@ -1648,9 +1648,7 @@ void Character::kill()
 Item * Character::createCorpse()
 {
     // Create the corpse.
-    Item * corpse = race->corpse.createItem(this->name, race->material, ItemQuality::Normal);
-    // Set the weight of the new corpse.
-    corpse->customWeight = this->weight;
+    Item * corpse = race->corpse.createCorpse(this->name, race->material, this->weight);
     // Add the corpse to the room.
     room->addItem(corpse);
     // Return the corpse.

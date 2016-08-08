@@ -18,6 +18,9 @@
 
 #include "corpseModel.hpp"
 
+#include "../mud.hpp"
+#include "../item/item.hpp"
+
 CorpseModel::CorpseModel()
 {
     // Nothing to do.
@@ -63,4 +66,41 @@ void CorpseModel::getSheet(Table & sheet) const
     ItemModel::getSheet(sheet);
     // Add a divider.
     //sheet.addDivider();
+}
+
+Item * CorpseModel::createCorpse(
+    std::string maker,
+    Material * composition,
+    const unsigned int & weight)
+{
+    // Instantiate the new item.
+    Item * newItem = GenerateItem(this->getType());
+    if (newItem == nullptr)
+    {
+        Logger::log(LogLevel::Error, "Cannot create the new item.");
+        // Return pointer to nothing.
+        return nullptr;
+    }
+
+    // First set: Vnum, Model, Maker, Composition, Quality.
+    newItem->vnum = Mud::instance().getMinVnumCorpse() - 1;
+    newItem->model = this;
+    newItem->maker = maker;
+    newItem->composition = composition;
+    newItem->quality = ItemQuality::Normal;
+    // Then set the rest.
+    newItem->price = 0;
+    newItem->weight = weight;
+    newItem->condition = weight;
+    newItem->maxCondition = weight;
+    newItem->flags = 0;
+    newItem->room = nullptr;
+    newItem->owner = nullptr;
+    newItem->container = nullptr;
+    newItem->currentSlot = slot;
+    newItem->content = std::vector<Item *>();
+    newItem->contentLiq = LiquidContent();
+
+    Mud::instance().addCorpse(newItem);
+    return newItem;
 }

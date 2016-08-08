@@ -256,20 +256,21 @@ void DoLook(Character * character, std::istream & sArgs)
     }
     else if (arguments.size() == 1)
     {
-        CharacterVector excpetions = { character };
         Character * target = character->room->findCharacter(
             arguments[0].first,
             arguments[0].second,
-            excpetions);
+            { character });
         if (target)
         {
             if (character->canSee(target))
             {
+                // Show the target.
                 character->sendMsg(target->getLook());
+                // Notify the target.
                 if (target->canSee(character))
                 {
                     // Notify to other character, that this one are looking at him.
-                    target->sendMsg("%s look at you.\n\n", character->getNameCapital());
+                    target->sendMsg("%s looks at you.\n\n", character->getNameCapital());
                 }
                 return;
             }
@@ -278,17 +279,19 @@ void DoLook(Character * character, std::istream & sArgs)
         if (item)
         {
             character->sendMsg(item->getLook());
-            return;
         }
-        character->sendMsg("You don't see '%s' anywhere.\n", arguments[0].first);
+        else
+        {
+            character->sendMsg("You don't see '%s' anywhere.\n", arguments[0].first);
+        }
     }
     else if (arguments.size() == 2)
     {
-        CharacterVector excpetions = { character };
         Character * target = character->room->findCharacter(
             arguments[1].first,
             arguments[1].second,
-            excpetions);
+            { character });
+        Item * container = character->findNearbyItem(arguments[1].first, arguments[1].second);
         if (target)
         {
             if (character->canSee(target))
@@ -305,11 +308,15 @@ void DoLook(Character * character, std::istream & sArgs)
                         arguments[0].first,
                         target->getName());
                 }
-                return;
+            }
+            else
+            {
+                character->sendMsg(
+                    "You don't see the container '%s' anywhere.\n",
+                    arguments[1].first);
             }
         }
-        Item * container = character->findNearbyItem(arguments[1].first, arguments[1].second);
-        if (container)
+        else if (container)
         {
             if (container->isAContainer())
             {
@@ -321,17 +328,17 @@ void DoLook(Character * character, std::istream & sArgs)
                 else
                 {
                     character->sendMsg("It's not insiede %s.\n", container->getName());
-                    return;
                 }
-
             }
             else
             {
                 character->sendMsg("%s is not a container.\n", container->getNameCapital());
-                return;
             }
         }
-        character->sendMsg("You don't see the container '%s' anywhere.\n", arguments[1].first);
+        else
+        {
+            character->sendMsg("You don't see the container '%s' anywhere.\n", arguments[1].first);
+        }
     }
     else
     {

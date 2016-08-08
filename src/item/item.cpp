@@ -37,13 +37,17 @@
 #include "shopItem.hpp"
 #include "armorItem.hpp"
 #include "weaponItem.hpp"
+#include "currencyItem.hpp"
 
 Item::Item() :
         vnum(),
         type(),
         model(),
         maker(),
+        price(),
+        weight(),
         condition(),
+        maxCondition(),
         composition(),
         quality(ItemQuality::Normal),
         flags(),
@@ -52,8 +56,7 @@ Item::Item() :
         container(),
         currentSlot(EquipmentSlot::None),
         content(),
-        contentLiq(),
-        customWeight()
+        contentLiq()
 {
 }
 
@@ -84,6 +87,8 @@ bool Item::check(bool complete)
     safe &= CorrectAssert(!maker.empty());
     safe &= CorrectAssert(condition > 0);
     safe &= CorrectAssert(composition != nullptr);
+    safe &= CorrectAssert(weight > 0);
+    safe &= CorrectAssert(price > 0);
     if (complete)
     {
         safe &= CorrectAssert(!((room != nullptr) && (owner != nullptr)));
@@ -188,7 +193,10 @@ bool Item::createOnDB()
     arguments.push_back(ToString(this->vnum));
     arguments.push_back(ToString(model->vnum));
     arguments.push_back(this->maker);
+    arguments.push_back(ToString(this->getPrice()));
+    arguments.push_back(ToString(this->getWeight()));
     arguments.push_back(ToString(this->condition));
+    arguments.push_back(ToString(this->maxCondition));
     arguments.push_back(ToString(this->composition->vnum));
     arguments.push_back(ToString(this->quality.toUInt()));
     arguments.push_back(ToString(this->flags));
@@ -344,6 +352,8 @@ void Item::getSheet(Table & sheet) const
     sheet.addRow( { "condition", ToString(condition) + "/" + ToString(this->getMaxCondition()) });
     sheet.addRow( { "Material", composition->name });
     sheet.addRow( { "Quality", quality.toString() });
+    sheet.addRow( { "Weight", ToString(this->getWeight()) });
+    sheet.addRow( { "Price", ToString(this->getPrice()) });
     sheet.addRow( { "Flags", ToString(flags) });
     TableRow locationRow = { "Location" };
     if (room != nullptr)
@@ -381,17 +391,12 @@ void Item::getSheet(Table & sheet) const
         sheet.addRow( { contentLiq.first->getNameCapital(), ToString(contentLiq.second) });
         sheet.addDivider();
     }
-    sheet.addRow( { "Weight", ToString(this->getWeight()) });
     if (this->isAContainer() || (model->getType() == ModelType::LiquidContainer))
     {
         sheet.addRow( { "Total Weight", ToString(this->getTotalWeight()) });
         sheet.addRow( { "Free  Space", ToString(this->getFreeSpace()) });
         sheet.addRow( { "Used  Space", ToString(this->getUsedSpace()) });
         sheet.addRow( { "Total Space", ToString(this->getTotalSpace()) });
-    }
-    if (customWeight != 0)
-    {
-        sheet.addRow( { "Custom Weight", ToString(customWeight) });
     }
 }
 
@@ -413,14 +418,7 @@ bool Item::hasKey(std::string key)
 
 unsigned int Item::getMaxCondition() const
 {
-    // Evaluate the base condition.
-    auto cndBase = this->model->condition;
-    // Evaluate the modifier due to item's quality.
-    auto cndQuality = static_cast<unsigned int>(cndBase * quality.getModifier());
-    // Evaluate the modifier due to item's material.
-    auto cndMaterial = static_cast<unsigned int>(cndBase * this->composition->getHardnessModifier());
-    // The resulting price.
-    return ((cndBase + cndQuality + cndMaterial) / 3);
+    return this->maxCondition;
 }
 
 bool Item::triggerDecay()
@@ -459,31 +457,16 @@ std::string Item::getConditionDescription()
 unsigned int Item::getPrice() const
 {
     // Add the base price.
-    auto pcBase = this->model->price;
-    // Evaluate the modifier due to item's quality.
-    auto pcQuality = static_cast<unsigned int>(pcBase * quality.getModifier());
+    auto pcBase = this->price;
     // Evaluate the modifier due to item's condition.
     auto pcCondition = static_cast<unsigned int>(pcBase * this->getConditionModifier());
-    // Evaluate the modifier due to item's material.
-    auto pcMaterial = static_cast<unsigned int>(pcBase * this->composition->getWorthModifier());
     // The resulting price.
-    return ((pcBase + pcQuality + pcCondition + pcMaterial) / 4);
+    return ((pcBase + pcCondition) / 2);
 }
 
 unsigned int Item::getWeight() const
 {
-    // Add the base weight.
-    auto wgBase = this->model->weight;
-    if (this->customWeight != 0)
-    {
-        wgBase = this->customWeight;
-    }
-    // Evaluate the modifier due to item's quality.
-    auto wgQuality = static_cast<unsigned int>(wgBase * (1 / quality.getModifier()));
-    // Evaluate the modifier due to item's material.
-    auto wgMaterial = static_cast<unsigned int>(wgBase * this->composition->getLightnessModifier());
-    // Evaluate the result.
-    return ((wgBase + wgQuality + wgMaterial) / 3);
+    return this->weight;
 }
 
 unsigned int Item::getTotalWeight() const
@@ -637,7 +620,7 @@ unsigned int Item::getUsedSpace() const
     {
         for (auto iterator : content)
         {
-            used += iterator->model->weight;
+            used += iterator->getTotalWeight();
         }
     }
     else if (model->getType() == ModelType::LiquidContainer)
@@ -666,7 +649,7 @@ unsigned int Item::getFreeSpace() const
 
 bool Item::putInside(Item * item)
 {
-    if (item->model->weight > this->getFreeSpace())
+    if (item->getTotalWeight() > this->getFreeSpace())
     {
         return false;
     }
@@ -918,15 +901,17 @@ ShopItem * Item::toShopItem()
 {
     return static_cast<ShopItem *>(this);
 }
-
 ArmorItem * Item::toArmorItem()
 {
     return static_cast<ArmorItem *>(this);
 }
-
 WeaponItem * Item::toWeaponItem()
 {
     return static_cast<WeaponItem *>(this);
+}
+CurrencyItem * Item::toCurrencyItem()
+{
+    return static_cast<CurrencyItem *>(this);
 }
 
 void Item::luaRegister(lua_State * L)
@@ -938,6 +923,8 @@ void Item::luaRegister(lua_State * L)
     .addFunction("getName", &Item::getName) //
     .addData("maker", &Item::maker) //
     .addData("condition", &Item::condition) //
+    .addData("weight", &Item::weight) //
+    .addData("price", &Item::price) //
     .addData("composition", &Item::composition) //
     .addData("room", &Item::room) //
     .addData("owner", &Item::owner) //
@@ -967,6 +954,7 @@ Item * GenerateItem(const ModelType & type)
         case ModelType::Book:
         case ModelType::Container:
         case ModelType::Currency:
+            return new CurrencyItem();
         case ModelType::Food:
         case ModelType::Furniture:
         case ModelType::Key:

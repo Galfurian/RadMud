@@ -1,7 +1,6 @@
-/// @file   corpseModel.hpp
-/// @brief  Define variables and methods of Corpse.
+/// @file   currencyItem.hpp
 /// @author Enrico Fraccaroli
-/// @date   Jul 6 2016
+/// @date   Aug 04 2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission to use, copy, modify, and distribute this software for any
@@ -18,23 +17,21 @@
 
 #pragma once
 
-#include "itemModel.hpp"
+#include "item.hpp"
 
-/// @brief Model of a corpse.
-class CorpseModel: public ItemModel
+/// @brief Holds details about currency.
+class CurrencyItem: public Item
 {
     public:
-        CorpseModel();
+        CurrencyItem();
 
-        virtual ~CorpseModel();
+        virtual ~CurrencyItem();
 
-        virtual ModelType getType() const;
+        virtual ItemType getType() const;
 
         virtual std::string getTypeName() const;
 
-        virtual bool setModel(const std::string & source);
-
         virtual void getSheet(Table & sheet) const;
 
-        Item * createCorpse(std::string maker, Material * composition, const unsigned int & weight);
+        virtual unsigned int getPrice() const;
 };

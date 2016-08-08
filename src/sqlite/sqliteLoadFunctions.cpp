@@ -119,13 +119,16 @@ bool LoadItem(ResultSet * result)
     while (result->next())
     {
         // Retrieve the values.
-        int itemVnum = result->getNextInteger();
-        int itemModelVnum = result->getNextInteger();
-        std::string itemMaker = result->getNextString();
-        unsigned int itemCondition = result->getNextUnsignedInteger();
-        int itemCompositionVnum = result->getNextInteger();
-        unsigned int itemQualityValue = result->getNextUnsignedInteger();
-        unsigned int itemFlags = result->getNextUnsignedInteger();
+        auto itemVnum = result->getNextInteger();
+        auto itemModelVnum = result->getNextInteger();
+        auto itemMaker = result->getNextString();
+        auto itemPrice = result->getNextUnsignedInteger();
+        auto itemWeight = result->getNextUnsignedInteger();
+        auto itemCondition = result->getNextUnsignedInteger();
+        auto itemMaxCondition = result->getNextUnsignedInteger();
+        auto itemCompositionVnum = result->getNextInteger();
+        auto itemQualityValue = result->getNextUnsignedInteger();
+        auto itemFlags = result->getNextUnsignedInteger();
 
         // Retrieve the model vnum.
         ItemModel * itemModel = Mud::instance().findItemModel(itemModelVnum);
@@ -153,7 +156,10 @@ bool LoadItem(ResultSet * result)
         Item * item = GenerateItem(itemModel->getType());
         item->vnum = itemVnum;
         item->model = itemModel;
+        item->price = itemPrice;
+        item->weight = itemWeight;
         item->condition = itemCondition;
+        item->maxCondition = itemMaxCondition;
         item->maker = itemMaker;
         item->composition = itemComposition;
         item->quality = ItemQuality(itemQualityValue);
@@ -250,8 +256,8 @@ bool LoadModel(ResultSet * result)
         itemModel->description = result->getNextString();
         itemModel->slot = static_cast<EquipmentSlot>(result->getNextInteger());
         itemModel->modelFlags = result->getNextUnsignedInteger();
-        itemModel->weight = result->getNextUnsignedInteger();
-        itemModel->price = result->getNextUnsignedInteger();
+        itemModel->baseWeight = result->getNextUnsignedInteger();
+        itemModel->basePrice = result->getNextUnsignedInteger();
         itemModel->condition = result->getNextUnsignedInteger();
         itemModel->decay = result->getNextUnsignedInteger();
         itemModel->material = static_cast<MaterialType>(result->getNextInteger());
@@ -420,12 +426,12 @@ bool LoadExit(ResultSet * result)
     while (result->next())
     {
         // Create an empty exit.
-        std::shared_ptr<Exit> newExit = std::make_shared<Exit>();
+        auto newExit = std::make_shared<Exit>();
         // retrive the values.
-        int sourceVnum = result->getNextInteger();
-        int destinationVnum = result->getNextInteger();
-        unsigned int directionValue = result->getNextUnsignedInteger();
-        unsigned int flagValue = result->getNextUnsignedInteger();
+        auto sourceVnum = result->getNextInteger();
+        auto destinationVnum = result->getNextInteger();
+        auto directionValue = result->getNextUnsignedInteger();
+        auto flagValue = result->getNextUnsignedInteger();
         // Check the correctness.
         newExit->source = Mud::instance().findRoom(sourceVnum);
         if (newExit->source == nullptr)

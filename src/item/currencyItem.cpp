@@ -1,7 +1,6 @@
-/// @file   corpseModel.hpp
-/// @brief  Define variables and methods of Corpse.
+/// @file   currencyItem.cpp
 /// @author Enrico Fraccaroli
-/// @date   Jul 6 2016
+/// @date   Aug 04 2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission to use, copy, modify, and distribute this software for any
@@ -16,25 +15,42 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#pragma once
+#include "currencyItem.hpp"
 
-#include "itemModel.hpp"
+#include "../model/currencyModel.hpp"
+#include "../material.hpp"
+#include "../utils.hpp"
 
-/// @brief Model of a corpse.
-class CorpseModel: public ItemModel
+CurrencyItem::CurrencyItem()
 {
-    public:
-        CorpseModel();
+    // Nothing to do.
+}
 
-        virtual ~CorpseModel();
+CurrencyItem::~CurrencyItem()
+{
+    // Nothing to do.
+}
 
-        virtual ModelType getType() const;
+ItemType CurrencyItem::getType() const
+{
+    return ItemType::Currency;
+}
 
-        virtual std::string getTypeName() const;
+std::string CurrencyItem::getTypeName() const
+{
+    return "currency";
+}
 
-        virtual bool setModel(const std::string & source);
+void CurrencyItem::getSheet(Table & sheet) const
+{
+    // Call the function of the father class.
+    Item::getSheet(sheet);
+    // Add a divider.
+    sheet.addDivider();
+    // Set the values.
+}
 
-        virtual void getSheet(Table & sheet) const;
-
-        Item * createCorpse(std::string maker, Material * composition, const unsigned int & weight);
-};
+unsigned int CurrencyItem::getPrice() const
+{
+    return this->composition->worth;
+}

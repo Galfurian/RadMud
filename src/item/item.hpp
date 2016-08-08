@@ -35,6 +35,7 @@ class Material;
 class ShopItem;
 class ArmorItem;
 class WeaponItem;
+class CurrencyItem;
 
 /// Used to determine the type of item.
 typedef enum class ItemTypes
@@ -45,7 +46,9 @@ typedef enum class ItemTypes
     /// An armor.
     Armor,
     /// A weapon.
-    Weapon
+    Weapon,
+    /// Currency.
+    Currency
 } ItemType;
 
 /// @brief Holds details about items.
@@ -60,8 +63,14 @@ class Item
         ItemModel * model;
         /// The player that created the item.
         std::string maker;
-        /// In which condition is the item.
+        /// The item's price.
+        unsigned int price;
+        /// The item's weight.
+        unsigned int weight;
+        /// The item's condition.
         unsigned int condition;
+        /// The maximum condition.
+        unsigned int maxCondition;
         /// The composing material of the item.
         Material * composition;
         /// The quality of the item.
@@ -80,8 +89,6 @@ class Item
         std::vector<Item *> content;
         /// The liquid inside the container.
         LiquidContent contentLiq;
-        /// Customized weight.
-        unsigned int customWeight;
 
         /// @brief Constructor - Create a new empty item.
         Item();
@@ -161,7 +168,7 @@ class Item
         std::string getConditionDescription();
 
         /// Provides the price of the item based on its quality, material and condition.
-        unsigned int getPrice() const;
+        virtual unsigned int getPrice() const;
 
         /// @brief Get the item weight.
         /// @return The weight of just the item.
@@ -259,12 +266,12 @@ class Item
 
         /// @brief Returns the model <b>statically</b> casted to Shop.
         ShopItem * toShopItem();
-
         /// @brief Returns the model <b>statically</b> casted to Armor.
         ArmorItem * toArmorItem();
-
         /// @brief Returns the model <b>statically</b> casted to Weapon.
         WeaponItem * toWeaponItem();
+        /// @brief Returns the model <b>statically</b> casted to Currency.
+        CurrencyItem * toCurrencyItem();
 
         /// @brief Function used to register inside the lua environment the class.
         /// @param L The lua environment.

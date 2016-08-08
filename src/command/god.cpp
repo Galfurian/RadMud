@@ -1276,8 +1276,6 @@ void DoModelList(Character * character, std::istream & sArgs)
     table.addColumn("TYPE", StringAlign::Left);
     table.addColumn("SLOT", StringAlign::Left);
     table.addColumn("FLAGS", StringAlign::Right);
-    table.addColumn("WEIGHT", StringAlign::Right);
-    table.addColumn("PRICE", StringAlign::Right);
     for (auto iterator : Mud::instance().mudItemModels)
     {
         ItemModel * itemModel = iterator.second;
@@ -1288,8 +1286,6 @@ void DoModelList(Character * character, std::istream & sArgs)
         row.push_back(itemModel->getTypeName());
         row.push_back(GetEquipmentSlotName(itemModel->slot));
         row.push_back(ToString(itemModel->modelFlags));
-        row.push_back(ToString(itemModel->weight));
-        row.push_back(ToString(itemModel->price));
         // Add the row to the table.
         table.addRow(row);
     }

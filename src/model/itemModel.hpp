@@ -144,10 +144,10 @@ class ItemModel
         EquipmentSlot slot;
         /// The model flags.
         unsigned int modelFlags;
-        /// The model weight.
-        unsigned int weight;
-        /// The model price.
-        unsigned int price;
+        /// The model base weight.
+        unsigned int baseWeight;
+        /// The model base price.
+        unsigned int basePrice;
         /// The model maximum condition.
         unsigned int condition;
         /// The model maximum condition.
@@ -199,10 +199,7 @@ class ItemModel
         /// @param composition The composition of the item.
         /// @param itemQuality The quality of the item.
         /// @return The newly created item.
-        Item * createItem(
-            std::string maker,
-            Material * composition,
-            ItemQuality itemQuality);
+        Item * createItem(std::string maker, Material * composition, ItemQuality itemQuality);
 
         /// @brief Check the correctness of the model.
         /// @return <b>True</b> if the model has correct values,<br>
