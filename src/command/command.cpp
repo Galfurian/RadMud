@@ -1294,13 +1294,6 @@ void LoadCommands()
     Command command;
     command.level = 0;
     {
-        command.name = "save";
-        command.help = "Save character into the database.";
-        command.args = "";
-        command.hndl = DoSave;
-        Mud::instance().addCommand(command);
-    }
-    {
         command.name = "quit";
         command.help = "Leave the game.";
         command.args = "";

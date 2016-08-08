@@ -108,30 +108,6 @@ void DoTravel(Character * character, std::istream & sArgs)
     character->moveTo(destination, msgDepart, msgArrive, msgChar);
 }
 
-void DoSave(Character * character, std::istream & sArgs)
-{
-    // Prevent mobiles to execute this command.
-    NoMobile(character);
-    // Check no more input.
-    NoMore(character, sArgs);
-    // Stop any ongoing action.
-    StopAction(character);
-
-    Player * player = character->toPlayer();
-
-    SQLiteDbms::instance().beginTransaction();
-    if (!player->updateOnDB())
-    {
-        SQLiteDbms::instance().rollbackTransection();
-        player->sendMsg("Something goes wrong during save, re-try later...\n");
-    }
-    else
-    {
-        SQLiteDbms::instance().endTransaction();
-        player->sendMsg("Saved.\n");
-    }
-}
-
 void DoQuit(Character * character, std::istream & sArgs)
 {
     // Prevent mobiles to execute this command.

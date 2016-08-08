@@ -97,7 +97,6 @@ bool Item::removeFromMud()
     // Remove the item from the game, this means: Room, Player, Container.
     if (room != nullptr)
     {
-        Logger::log(LogLevel::Debug, "Removing item from room.");
         if (!room->removeItem(this))
         {
             return false;
@@ -105,7 +104,6 @@ bool Item::removeFromMud()
     }
     else if (owner != nullptr)
     {
-        Logger::log(LogLevel::Debug, "Removing item from owner.");
         if (!owner->remInventoryItem(this))
         {
             if (!owner->remEquipmentItem(this))
@@ -116,7 +114,6 @@ bool Item::removeFromMud()
     }
     else if (container != nullptr)
     {
-        Logger::log(LogLevel::Debug, "Removing item from container.");
         if (!container->takeOut(this))
         {
             return false;
@@ -129,7 +126,6 @@ bool Item::removeFromMud()
 
     if (this->model->getType() == ModelType::Corpse)
     {
-        Logger::log(LogLevel::Error, "Removing corpse '" + this->getName() + "' from MUD;");
         // Remove the item from the list of corpses.
         if (!Mud::instance().remCorpse(this))
         {
@@ -139,7 +135,6 @@ bool Item::removeFromMud()
     }
     else
     {
-        Logger::log(LogLevel::Error, "Removing item '" + this->getName() + "' from MUD;");
         // Remove the item from the mud.
         if (!Mud::instance().remItem(this))
         {

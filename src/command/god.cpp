@@ -418,6 +418,9 @@ void DoItemGet(Character * character, std::istream & sArgs)
     }
     character->sendMsg("You materialize the desired object in your hands.\n");
     character->addInventoryItem(item);
+    SQLiteDbms::instance().beginTransaction();
+    item->updateOnDB();
+    SQLiteDbms::instance().endTransaction();
 }
 
 void DoItemDestroy(Character * character, std::istream & sArgs)

@@ -171,8 +171,6 @@ void LoadCommands();
 void DoDirection(Character * character, Direction direction);
 /// Allow the character to mote the continental map.
 void DoTravel(Character * character, std::istream & sArgs);
-/// Save all the information about the player.
-void DoSave(Character * character, std::istream & sArgs);
 /// Disconnect the player from the Mud.
 void DoQuit(Character * character, std::istream & sArgs);
 /// Shows a list of all the online players.
