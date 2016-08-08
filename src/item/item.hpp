@@ -128,6 +128,8 @@ class Item
         /// @param sheet The table that has to be filled.
         virtual void getSheet(Table & sheet) const;
 
+        virtual bool canDeconstruct(std::string & error) const;
+
         /// @return Provides the type of item.
         ModelType getType() const;
 
@@ -205,9 +207,12 @@ class Item
         /// @return The free unit of space as an integer.
         unsigned int getFreeSpace() const;
 
+        bool canContain(Item * item) const;
+
         /// @brief Load an item inside the container and update the database.
         /// @param item The item to load in.
-        /// @return <b>True</b> if the item is a container,<br><b>False</b> otherwise.
+        /// @return <b>True</b> if the item is a container,<br>
+        ///         <b>False</b> otherwise.
         bool putInside(Item * item);
 
         /// @brief Extract an item from the container.
@@ -216,10 +221,13 @@ class Item
         ///         <b>False</b> otherwise.
         bool takeOut(Item * item);
 
+        bool canContain(Liquid * liquid, const unsigned int & quantity) const;
+
         /// @brief Load some liquid inside the container and update the database.
         /// @param liquid   The liquid to load in.
         /// @param quantity The quantity of liquid.
-        /// @return <b>True</b> if the operation is a success,<br><b>False</b> otherwise.
+        /// @return <b>True</b> if the operation is a success,<br>
+        ///         <b>False</b> otherwise.
         bool pourIn(Liquid * liquid, const unsigned int & quantity);
 
         /// @brief Extract some liquid from the container and update the database.

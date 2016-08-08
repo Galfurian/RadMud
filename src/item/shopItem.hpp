@@ -30,6 +30,8 @@ class ShopItem: public Item
         unsigned int shopBuyTax;
         /// The tax applied to each good which is sold.
         unsigned int shopSellTax;
+        /// The shop balance.
+        unsigned int balance;
         /// The mobile which is managing the shop.
         Mobile * shopKeeper;
 
@@ -50,11 +52,15 @@ class ShopItem: public Item
 
         virtual void getSheet(Table & sheet) const;
 
+        virtual bool canDeconstruct(std::string & error) const;
+
         virtual std::string lookContent();
 
         /// @brief Allows to set the new shop keeper.
         /// @param _shopKeeper The new shop keeper.
         void setNewShopKeeper(Mobile * _shopKeeper);
+
+        unsigned int getBalance() const;
 
     private:
         /// @brief Applies the buy tax to the item's price.

@@ -1533,6 +1533,20 @@ void LoadCommands()
         command.hndl = DoPour;
         Mud::instance().addCommand(command);
     }
+    {
+        command.name = "deposit";
+        command.help = "Deposit a coin inside a shop.";
+        command.args = "(item) (shop)";
+        command.hndl = DoDeposit;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "sell";
+        command.help = "Sell an item to a shop keeper.";
+        command.args = "(item) (shopkeeper)";
+        command.hndl = DoSell;
+        Mud::instance().addCommand(command);
+    }
 
     // Comunication.
     {

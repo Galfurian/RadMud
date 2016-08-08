@@ -91,8 +91,8 @@ bool LoadContent(ResultSet * result)
 {
     while (result->next())
     {
-        Item * container = Mud::instance().findItem(result->getNextInteger());
-        Item * contained = Mud::instance().findItem(result->getNextInteger());
+        auto container = Mud::instance().findItem(result->getNextInteger());
+        auto contained = Mud::instance().findItem(result->getNextInteger());
         if (container == nullptr)
         {
             Logger::log(LogLevel::Error, "Can't find container item.");
@@ -876,6 +876,11 @@ bool LoadShop(ResultSet * result)
         // Retrieve the item vnum.
         auto vnum = result->getNextInteger();
         auto item = Mud::instance().findItem(vnum);
+        auto name = result->getNextString();
+        auto buy = result->getNextUnsignedInteger();
+        auto sell = result->getNextUnsignedInteger();
+        auto balance = result->getNextUnsignedInteger();
+        auto shopKeeper = Mud::instance().findMobile(result->getNextString());
         if (item == nullptr)
         {
             Logger::log(LogLevel::Error, "Can't find the item (%s).", ToString(vnum));
@@ -887,10 +892,15 @@ bool LoadShop(ResultSet * result)
             return false;
         }
         ShopItem * shop = item->toShopItem();
-        shop->shopName = result->getNextString();
-        shop->shopBuyTax = result->getNextUnsignedInteger();
-        shop->shopSellTax = result->getNextUnsignedInteger();
-        shop->shopKeeper = Mud::instance().findMobile(result->getNextString());
+        shop->shopName = name;
+        shop->shopBuyTax = buy;
+        shop->shopSellTax = sell;
+        shop->balance = balance;
+        shop->shopKeeper = shopKeeper;
+        if (shopKeeper != nullptr)
+        {
+            shopKeeper->managedItem = shop;
+        }
     }
     return true;
 }

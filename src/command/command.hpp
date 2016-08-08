@@ -237,6 +237,10 @@ void DoDrink(Character * character, std::istream & sArgs);
 void DoFill(Character * character, std::istream & sArgs);
 /// Pour the container of liquids into another one or on the ground.
 void DoPour(Character * character, std::istream & sArgs);
+/// Deposit a currency inside a shop.
+void DoDeposit(Character * character, std::istream & sArgs);
+/// Sell an item.
+void DoSell(Character * character, std::istream & sArgs);
 /// The character say something.
 void DoSay(Character * character, std::istream & sArgs);
 /// The character whisper something to someone, even in distance.

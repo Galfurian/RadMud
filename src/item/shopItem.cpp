@@ -22,10 +22,13 @@
 #include "../constants.hpp"
 #include "../utilities/logger.hpp"
 
+#include "currencyItem.hpp"
+
 ShopItem::ShopItem() :
         shopName(),
         shopBuyTax(1),
         shopSellTax(1),
+        balance(),
         shopKeeper()
 {
     // Nothing to do.
@@ -56,6 +59,7 @@ bool ShopItem::createOnDB()
         arguments.push_back(this->shopName);
         arguments.push_back(ToString(this->shopBuyTax));
         arguments.push_back(ToString(this->shopSellTax));
+        arguments.push_back(ToString(this->balance));
         if (this->shopKeeper != nullptr)
         {
             arguments.push_back(this->shopKeeper->id);
@@ -64,7 +68,7 @@ bool ShopItem::createOnDB()
         {
             arguments.push_back("");
         }
-        if (SQLiteDbms::instance().insertInto("ItemShop", arguments))
+        if (SQLiteDbms::instance().insertInto("Shop", arguments))
         {
             return true;
         }
@@ -79,10 +83,11 @@ bool ShopItem::updateOnDB()
         // Save the item's Information.
         {
             QueryList value;
-            value.push_back(std::make_pair("vnum", ToString(this->vnum)));
+            value.push_back(std::make_pair("item", ToString(this->vnum)));
             value.push_back(std::make_pair("name", this->shopName));
             value.push_back(std::make_pair("buyTax", ToString(this->shopBuyTax)));
             value.push_back(std::make_pair("sellTax", ToString(this->shopSellTax)));
+            value.push_back(std::make_pair("balance", ToString(this->balance)));
             if (this->shopKeeper != nullptr)
             {
                 value.push_back(std::make_pair("keeper", this->shopKeeper->id));
@@ -92,8 +97,8 @@ bool ShopItem::updateOnDB()
                 value.push_back(std::make_pair("keeper", ""));
             }
             QueryList where;
-            where.push_back(std::make_pair("vnum", ToString(vnum)));
-            if (SQLiteDbms::instance().updateInto("ItemShop", value, where))
+            where.push_back(std::make_pair("item", ToString(vnum)));
+            if (SQLiteDbms::instance().updateInto("Shop", value, where))
             {
                 return true;
             }
@@ -112,7 +117,7 @@ bool ShopItem::removeOnDB()
     {
         QueryList where;
         where.push_back(std::make_pair("vnum", ToString(vnum)));
-        if (SQLiteDbms::instance().deleteFrom("ItemShop", where))
+        if (SQLiteDbms::instance().deleteFrom("Shop", where))
         {
             return true;
         }
@@ -134,6 +139,7 @@ void ShopItem::getSheet(Table & sheet) const
     sheet.addRow( { "Shop Name", shopName });
     sheet.addRow( { "Buy Tax", ToString(shopBuyTax) });
     sheet.addRow( { "Sell Tax", ToString(shopSellTax) });
+    sheet.addRow( { "Balance", ToString(this->getBalance()) });
     if (shopKeeper)
     {
         sheet.addRow( { "ShopKeeper", shopKeeper->getNameCapital() });
@@ -142,6 +148,20 @@ void ShopItem::getSheet(Table & sheet) const
     {
         sheet.addRow( { "ShopKeeper", "Nobody" });
     }
+}
+
+bool ShopItem::canDeconstruct(std::string & error) const
+{
+    if (!Item::canDeconstruct(error))
+    {
+        return false;
+    }
+    if (this->getBalance() != 0)
+    {
+        error = "You must withdraw all the coin first.";
+        return false;
+    }
+    return true;
 }
 
 std::string ShopItem::lookContent()
@@ -215,6 +235,11 @@ void ShopItem::setNewShopKeeper(Mobile * _shopKeeper)
         }
     }
     this->shopKeeper = _shopKeeper;
+}
+
+unsigned int ShopItem::getBalance() const
+{
+    return this->balance;
 }
 
 unsigned int ShopItem::evaluateBuyPrice(Item * item)

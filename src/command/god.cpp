@@ -327,7 +327,7 @@ void DoItemCreate(Character * character, std::istream & sArgs)
     if ((arguments.size() != 2) && (arguments.size() != 3))
     {
         character->sendMsg("What do you want to create?\n");
-        return; // Skip the rest of the function.
+        return;
     }
     ItemModel * itemModel = Mud::instance().findItemModel(ToInt(arguments[0].first));
     Material * material = Mud::instance().findMaterial(ToInt(arguments[1].first));
@@ -566,40 +566,40 @@ void DoRoomCreate(Character * character, std::istream & sArgs)
     if (arguments.size() != 1)
     {
         character->sendMsg("Usage: [direction]\n");
-        return; // Skip the rest of the function.
+        return;
     }
     Room * currentRoom = character->room;
     Area * currentArea = currentRoom->area;
     if (currentArea == nullptr)
     {
         character->sendMsg("Your room's area has not been defined!\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Check if it's a direction.
     Direction direction = Mud::instance().findDirection(arguments[0].first, false);
     if (direction == Direction::None)
     {
         character->sendMsg("You must insert a valid direction!\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Get the coordinate modifier.
     Coordinates targetCoord = currentRoom->coord + direction.getCoordinates();
     if (!currentArea->inBoundaries(targetCoord))
     {
         character->sendMsg("Sorry but in that direction you will go outside the boundaries.\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Find the room.
     Room * targetRoom = currentArea->getRoom(targetCoord);
     if (targetRoom)
     {
         character->sendMsg("Sorry but in that direction there is already a room.\n");
-        return; // Skip the rest of the function.
+        return;
     }
     if (!CreateRoom(targetCoord, currentRoom))
     {
         character->sendMsg("Sorry but you couldn't create the room.\n");
-        return; // Skip the rest of the function.
+        return;
     }
     character->sendMsg("You have created a room at: %s\n", targetCoord.toString());
 }
@@ -614,47 +614,47 @@ void DoRoomDelete(Character * character, std::istream & sArgs)
     if (arguments.size() != 1)
     {
         character->sendMsg("Usage: [direction]\n");
-        return; // Skip the rest of the function.
+        return;
     }
     Area * currentArea = character->room->area;
     if (currentArea == nullptr)
     {
         character->sendMsg("Your room's area has not been defined!\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Check if it's a direction.
     Direction direction = Mud::instance().findDirection(arguments[0].first, false);
     if (direction == Direction::None)
     {
         character->sendMsg("You must insert a valid direction!\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Get the coordinate modifier.
     Coordinates targetCoord = character->room->coord + direction.getCoordinates();
     if (!currentArea->inBoundaries(targetCoord))
     {
         character->sendMsg("Sorry but in that direction you will go outside the boundaries.\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Find the room.
     Room * targetRoom = currentArea->getRoom(targetCoord);
     if (targetRoom == nullptr)
     {
         character->sendMsg("Sorry but in that direction there is no room.\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Remove the room from the Database.
     if (!targetRoom->removeOnDB())
     {
         character->sendMsg("Sorry but you couldn't delete the selected room.\n");
         character->sendMsg("Probably there are items or characters in that room.\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Remove the room from the list of rooms.
     if (!Mud::instance().remRoom(targetRoom))
     {
         character->sendMsg("You cannot remove the room.\n");
-        return; // Skip the rest of the function.
+        return;
     }
 
     // Delete completely the room.
@@ -993,7 +993,7 @@ void DoModAttr(Character * character, std::istream & sArgs)
     if (arguments.size() != 3)
     {
         character->sendMsg("Usage: [target] [attribute] [+/-VALUE]\n");
-        return; // Skip the rest of the function.
+        return;
     }
     Character * target = character->room->findCharacter(
         arguments[0].first,
@@ -1002,13 +1002,13 @@ void DoModAttr(Character * character, std::istream & sArgs)
     if (target == nullptr)
     {
         character->sendMsg("Target not found.\n");
-        return; // Skip the rest of the function.
+        return;
     }
     int modifier = ToInt(arguments[2].first);
     if (modifier == 0)
     {
         character->sendMsg("You must insert a valid value.\n");
-        return; // Skip the rest of the function.
+        return;
     }
     Ability ability;
     if (arguments[1].first == "str")
@@ -1041,12 +1041,12 @@ void DoModAttr(Character * character, std::istream & sArgs)
     if (result < 0)
     {
         character->sendMsg("Attribute cannot go below 0.");
-        return; // Skip the rest of the function.
+        return;
     }
     else if (!target->setAbility(ability, static_cast<unsigned int>(result)))
     {
         character->sendMsg("Attribute cannot go above 60.");
-        return; // Skip the rest of the function.
+        return;
     }
     character->sendMsg(
         "You have successfully %s by %s the %s of the target.",

@@ -389,6 +389,21 @@ void Item::getSheet(Table & sheet) const
     }
 }
 
+bool Item::canDeconstruct(std::string & error) const
+{
+    if (!HasFlag(this->flags, ItemFlag::Built))
+    {
+        error = "It is not built.";
+        return false;
+    }
+    if (!this->isEmpty())
+    {
+        error = "You must remove all the content first.";
+        return false;
+    }
+    return true;
+}
+
 ModelType Item::getType() const
 {
     return this->model->getType();
@@ -641,25 +656,30 @@ unsigned int Item::getFreeSpace() const
     }
 }
 
+bool Item::canContain(Item * item) const
+{
+    return (item->getWeight() <= this->getFreeSpace());
+}
+
 bool Item::putInside(Item * item)
 {
-    if (item->getWeight() > this->getFreeSpace())
+    if (this->canContain(item))
     {
-        return false;
+        // Insert in the container table.
+        std::vector<std::string> arguments;
+        arguments.push_back(ToString(vnum));       // Container
+        arguments.push_back(ToString(item->vnum)); // Content
+        if (!SQLiteDbms::instance().insertInto("ItemContent", arguments))
+        {
+            return false;
+        }
+        // Put the item into the container.
+        content.push_back(item);
+        // Set the container value to the content item.
+        item->container = this;
+        return true;
     }
-    // Insert in the container table.
-    std::vector<std::string> arguments;
-    arguments.push_back(ToString(vnum));       // Container
-    arguments.push_back(ToString(item->vnum)); // Content
-    if (!SQLiteDbms::instance().insertInto("ItemContent", arguments))
-    {
-        return false;
-    }
-    // Put the item into the container.
-    content.push_back(item);
-    // Set the container value to the content item.
-    item->container = this;
-    return true;
+    return false;
 }
 
 bool Item::takeOut(Item * item)
@@ -684,48 +704,57 @@ bool Item::takeOut(Item * item)
     return removed;
 }
 
-bool Item::pourIn(Liquid * liquid, const unsigned int & quantity)
+bool Item::canContain(Liquid * liquid, const unsigned int & quantity) const
 {
     if (quantity > this->getFreeSpace())
     {
         return false;
     }
-    if (contentLiq.first == nullptr)
-    {
-        // Insert in the liquid table the value.
-        std::vector<std::string> arguments;
-        arguments.push_back(ToString(vnum));         // Container
-        arguments.push_back(ToString(liquid->vnum)); // Content
-        arguments.push_back(ToString(quantity));     // Quantity
-        // Execute the insert.
-        if (!SQLiteDbms::instance().insertInto("ItemContentLiq", arguments))
-        {
-            return false;
-        }
-        // Set the liquid quantity.
-        contentLiq.first = liquid;
-        contentLiq.second = quantity;
-    }
-    else if (contentLiq.first == liquid)
-    {
-        QueryList value;
-        value.push_back(std::make_pair("quantity", ToString(contentLiq.second)));
-        QueryList where;
-        where.push_back(std::make_pair("container", ToString(vnum)));
-        where.push_back(std::make_pair("content", ToString(liquid->vnum)));
-        // Update value inside the database.
-        if (!SQLiteDbms::instance().updateInto("ItemContentLiq", value, where))
-        {
-            return false;
-        }
-        // Increment the liquid quantity.
-        contentLiq.second += quantity;
-    }
-    else
+    else if (contentLiq.first != liquid)
     {
         return false;
     }
     return true;
+}
+
+bool Item::pourIn(Liquid * liquid, const unsigned int & quantity)
+{
+    if (this->canContain(liquid, quantity))
+    {
+        if (contentLiq.first == nullptr)
+        {
+            // Insert in the liquid table the value.
+            std::vector<std::string> arguments;
+            arguments.push_back(ToString(vnum));         // Container
+            arguments.push_back(ToString(liquid->vnum)); // Content
+            arguments.push_back(ToString(quantity));     // Quantity
+            // Execute the insert.
+            if (!SQLiteDbms::instance().insertInto("ItemContentLiq", arguments))
+            {
+                return false;
+            }
+            // Set the liquid quantity.
+            contentLiq.first = liquid;
+            contentLiq.second = quantity;
+        }
+        else if (contentLiq.first == liquid)
+        {
+            QueryList value;
+            value.push_back(std::make_pair("quantity", ToString(contentLiq.second)));
+            QueryList where;
+            where.push_back(std::make_pair("container", ToString(vnum)));
+            where.push_back(std::make_pair("content", ToString(liquid->vnum)));
+            // Update value inside the database.
+            if (!SQLiteDbms::instance().updateInto("ItemContentLiq", value, where))
+            {
+                return false;
+            }
+            // Increment the liquid quantity.
+            contentLiq.second += quantity;
+        }
+        return true;
+    }
+    return false;
 }
 
 bool Item::pourOut(const unsigned int & quantity)
