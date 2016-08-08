@@ -112,6 +112,13 @@ void ItemModel::getSheet(Table & sheet) const
 
 Item * ItemModel::createItem(std::string maker, Material * composition, ItemQuality itemQuality)
 {
+    if (composition->type != this->material)
+    {
+        Logger::log(LogLevel::Error, "Wrong type of material.");
+        // Return pointer to nothing.
+        return nullptr;
+    }
+
     // Instantiate the new item.
     Item * newItem = GenerateItem(this->getType());
     if (newItem == nullptr)
@@ -167,13 +174,6 @@ Item * ItemModel::createItem(std::string maker, Material * composition, ItemQual
     newItem->currentSlot = slot;
     newItem->content = std::vector<Item *>();
     newItem->contentLiq = LiquidContent();
-
-    // If the newly created item is a corpse, return it and don't save it on DB.
-    if (this->getType() == ModelType::Corpse)
-    {
-        Mud::instance().addCorpse(newItem);
-        return newItem;
-    }
 
     if (!newItem->check())
     {

@@ -38,6 +38,11 @@ class CurrencyModel: public ItemModel
 
         virtual void getSheet(Table & sheet) const;
 
+        virtual Item * createItem(
+            std::string maker,
+            Material * composition,
+            ItemQuality itemQuality);
+
         bool addPrice(const int & materialVnum, const unsigned int & price);
 
         bool findPrice(const int & materialVnum, unsigned int & price) const;

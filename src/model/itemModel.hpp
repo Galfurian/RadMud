@@ -199,7 +199,10 @@ class ItemModel
         /// @param composition The composition of the item.
         /// @param itemQuality The quality of the item.
         /// @return The newly created item.
-        Item * createItem(std::string maker, Material * composition, ItemQuality itemQuality);
+        virtual Item * createItem(
+            std::string maker,
+            Material * composition,
+            ItemQuality itemQuality);
 
         /// @brief Check the correctness of the model.
         /// @return <b>True</b> if the model has correct values,<br>

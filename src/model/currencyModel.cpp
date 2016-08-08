@@ -18,6 +18,8 @@
 
 #include "currencyModel.hpp"
 
+#include "../material.hpp"
+
 CurrencyModel::CurrencyModel()
 {
     // Nothing to do.
@@ -58,6 +60,20 @@ void CurrencyModel::getSheet(Table & sheet) const
     ItemModel::getSheet(sheet);
     // Add a divider.
     //sheet.addDivider();
+}
+
+Item * CurrencyModel::createItem(std::string maker, Material * composition, ItemQuality itemQuality)
+{
+    auto it = prices.find(composition->vnum);
+    if (it != prices.end())
+    {
+        return ItemModel::createItem(maker, composition, itemQuality);
+    }
+    else
+    {
+        Logger::log(LogLevel::Error, "Material is not allowed.");
+        return nullptr;
+    }
 }
 
 bool CurrencyModel::addPrice(const int & materialVnum, const unsigned int & price)
