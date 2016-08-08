@@ -1658,6 +1658,9 @@ void Character::kill()
     Item * corpse = this->createCorpse();
     // Transfer all the items from the character to the corpse.
     auto tempInventory = this->inventory;
+
+    SQLiteDbms::instance().beginTransaction();
+
     for (auto it = tempInventory.begin(); it != tempInventory.end(); ++it)
     {
         Item * item = (*it);
@@ -1683,6 +1686,9 @@ void Character::kill()
         // Update the item on the database.
         item->updateOnDB();
     }
+
+    SQLiteDbms::instance().endTransaction();
+
     // Reset the action of the character.
     this->actionQueue.clear();
     this->setAction(std::make_shared<GeneralAction>(this));

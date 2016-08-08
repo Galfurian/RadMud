@@ -282,9 +282,6 @@ void DoDeconstruct(Character * character, std::istream & sArgs)
         character->sendMsg("You deconstruct %s.\n", item->getName());
         // Reset item flags.
         ClearFlag(item->flags, ItemFlag::Built);
-        SQLiteDbms::instance().beginTransaction();
-        item->updateOnDB();
-        SQLiteDbms::instance().endTransaction();
     }
 }
 

@@ -120,15 +120,15 @@ void DoSave(Character * character, std::istream & sArgs)
     Player * player = character->toPlayer();
 
     SQLiteDbms::instance().beginTransaction();
-    if (player->updateOnDB())
-    {
-        SQLiteDbms::instance().endTransaction();
-        player->sendMsg("Saved.\n");
-    }
-    else
+    if (!player->updateOnDB())
     {
         SQLiteDbms::instance().rollbackTransection();
         player->sendMsg("Something goes wrong during save, re-try later...\n");
+    }
+    else
+    {
+        SQLiteDbms::instance().endTransaction();
+        player->sendMsg("Saved.\n");
     }
 }
 

@@ -95,7 +95,6 @@ ActionStatus CraftAction::perform()
     // Consume the stamina.
     actor->remStamina(consumedStamina, true);
 
-    SQLiteDbms::instance().beginTransaction();
     ItemVector createdItems;
     for (unsigned int it = 0; it < production->quantity; ++it)
     {
@@ -109,7 +108,6 @@ ActionStatus CraftAction::perform()
                 LogLevel::Warning,
                 actor->getName() + ":craft = New item is a null pointer.");
             // Rollback the database.
-            SQLiteDbms::instance().rollbackTransection();
             // Delete all the items created so far.
             for (auto createdItem : createdItems)
             {
@@ -121,11 +119,9 @@ ActionStatus CraftAction::perform()
         }
         createdItems.push_back(newItem);
     }
-    SQLiteDbms::instance().endTransaction();
 
     // Add the created items into the character inventory.
     bool dropped = false;
-    SQLiteDbms::instance().beginTransaction();
     for (auto createdItem : createdItems)
     {
         if (!actor->canCarry(createdItem))
@@ -137,7 +133,6 @@ ActionStatus CraftAction::perform()
         {
             actor->addInventoryItem(createdItem);
         }
-        createdItem->updateOnDB();
     }
     // Update the tools.
     ItemVector toDestroy;
@@ -159,7 +154,6 @@ ActionStatus CraftAction::perform()
         it->destroy();
         delete (it);
     }
-    SQLiteDbms::instance().endTransaction();
 
     // Send conclusion message.
     actor->sendMsg(

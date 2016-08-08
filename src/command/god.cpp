@@ -353,22 +353,13 @@ void DoItemCreate(Character * character, std::istream & sArgs)
         quality = ItemQuality(itemQualityValue);
     }
     // Create the item.
-    SQLiteDbms::instance().beginTransaction();
     Item * item = itemModel->createItem(character->getName(), material, quality);
     if (item == nullptr)
     {
-        SQLiteDbms::instance().rollbackTransection();
         character->sendMsg("Creation failed.\n");
         return;
     }
     character->addInventoryItem(item);
-    if (!item->updateOnDB())
-    {
-        SQLiteDbms::instance().rollbackTransection();
-        character->sendMsg("Creation failed.\n");
-        return;
-    }
-    SQLiteDbms::instance().endTransaction();
     character->sendMsg(
         "You produce '%s' out of your apparently empty top hat.\n",
         Formatter::yellow() + item->getName() + Formatter::reset());
@@ -403,7 +394,6 @@ void DoItemGet(Character * character, std::istream & sArgs)
             item->room->name,
             ToString(item->room->vnum));
         item->room->removeItem(item);
-        item->updateOnDB();
     }
     else if (item->owner != nullptr)
     {
@@ -416,13 +406,11 @@ void DoItemGet(Character * character, std::istream & sArgs)
                 return;
             }
         }
-        item->updateOnDB();
     }
     else if (item->container != nullptr)
     {
         character->sendMsg("The item was inside the container '%s'\n", item->container->getName());
         item->container->takeOut(item);
-        item->updateOnDB();
     }
     else
     {
@@ -430,7 +418,6 @@ void DoItemGet(Character * character, std::istream & sArgs)
     }
     character->sendMsg("You materialize the desired object in your hands.\n");
     character->addInventoryItem(item);
-    item->updateOnDB();
 }
 
 void DoItemDestroy(Character * character, std::istream & sArgs)

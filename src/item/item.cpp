@@ -668,14 +668,6 @@ bool Item::putInside(Item * item)
 {
     if (this->canContain(item))
     {
-        // Insert in the container table.
-        std::vector<std::string> arguments;
-        arguments.push_back(ToString(vnum));       // Container
-        arguments.push_back(ToString(item->vnum)); // Content
-        if (!SQLiteDbms::instance().insertInto("ItemContent", arguments))
-        {
-            return false;
-        }
         // Put the item into the container.
         content.push_back(item);
         // Set the container value to the content item.
@@ -726,16 +718,6 @@ bool Item::pourIn(Liquid * liquid, const unsigned int & quantity)
     {
         if (contentLiq.first == nullptr)
         {
-            // Insert in the liquid table the value.
-            std::vector<std::string> arguments;
-            arguments.push_back(ToString(vnum));         // Container
-            arguments.push_back(ToString(liquid->vnum)); // Content
-            arguments.push_back(ToString(quantity));     // Quantity
-            // Execute the insert.
-            if (!SQLiteDbms::instance().insertInto("ItemContentLiq", arguments))
-            {
-                return false;
-            }
             // Set the liquid quantity.
             contentLiq.first = liquid;
             contentLiq.second = quantity;
@@ -976,11 +958,11 @@ Item * GenerateItem(const ModelType & type)
             return new ShopItem();
         case ModelType::Weapon:
             return new WeaponItem();
+        case ModelType::Currency:
+            return new CurrencyItem();
         case ModelType::Corpse:
         case ModelType::Book:
         case ModelType::Container:
-        case ModelType::Currency:
-            return new CurrencyItem();
         case ModelType::Food:
         case ModelType::Furniture:
         case ModelType::Key:

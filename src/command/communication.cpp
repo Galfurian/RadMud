@@ -225,11 +225,13 @@ void DoBug(Character * character, std::istream & sArgs)
     arguments.push_back(ToString(character->room->vnum)); // Location
     arguments.push_back(message);
 
+    SQLiteDbms::instance().beginTransaction();
     if (!SQLiteDbms::instance().insertInto("Board", arguments))
     {
         character->sendMsg("Something gone wrong during the storing of your bug.\n");
         return;
     }
+    SQLiteDbms::instance().endTransaction();
     character->sendMsg("Bug posted on Board correctly.\n");
     character->sendMsg("# Author   :%s\n", character->getName());
     character->sendMsg("# Date     :%s\n", GetDate());
@@ -257,11 +259,14 @@ void DoIdea(Character * character, std::istream & sArgs)
     arguments.push_back(ToString(character->room->vnum)); // Location
     arguments.push_back(message);
 
+    SQLiteDbms::instance().beginTransaction();
     if (!SQLiteDbms::instance().insertInto("Board", arguments))
     {
         character->sendMsg("Something gone wrong during the storing of your idea.\n");
         return;
     }
+    SQLiteDbms::instance().endTransaction();
+
     character->sendMsg("Idea posted on Board correctly.\n");
     character->sendMsg("# Author   :%s\n", character->getName());
     character->sendMsg("# Message  :%s\n", message);
@@ -287,11 +292,14 @@ void DoTypo(Character * character, std::istream & sArgs)
     arguments.push_back(ToString(character->room->vnum)); // Location
     arguments.push_back(message);
 
+    SQLiteDbms::instance().beginTransaction();
     if (!SQLiteDbms::instance().insertInto("Board", arguments))
     {
         character->sendMsg("Something gone wrong during the storing of the Typo.\n");
         return;
     }
+    SQLiteDbms::instance().endTransaction();
+
     character->sendMsg("Typo posted on Board correctly.\n");
     character->sendMsg("# Author   :%s\n", character->getName());
     character->sendMsg("# Date     :%s\n", GetDate());

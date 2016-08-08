@@ -95,10 +95,8 @@ ActionStatus BuildAction::perform()
     // Consume the stamina.
     actor->remStamina(consumedStamina, true);
 
-    SQLiteDbms::instance().beginTransaction();
     actor->remInventoryItem(building);
     actor->room->addBuilding(building);
-    building->updateOnDB();
     ItemVector toDestroy;
     for (auto iterator : tools)
     {
@@ -118,7 +116,6 @@ ActionStatus BuildAction::perform()
         it->destroy();
         delete (it);
     }
-    SQLiteDbms::instance().endTransaction();
 
     // Send conclusion message.
     actor->sendMsg(

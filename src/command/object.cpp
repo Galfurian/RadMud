@@ -66,28 +66,6 @@ void DoTake(Character * character, std::istream & sArgs)
                 // Add the item to the list of actually taken items.
                 actuallyTaken.push_back(iterator);
             }
-            // Update on database only the items which were taken.
-            SQLiteDbms::instance().beginTransaction();
-            bool commitStatus = true;
-            for (auto iterator : actuallyTaken)
-            {
-                if (!iterator->updateOnDB())
-                {
-                    commitStatus = false;
-                    break;
-                }
-            }
-            if (commitStatus)
-            {
-                SQLiteDbms::instance().endTransaction();
-            }
-            else
-            {
-                Logger::log(LogLevel::Error, "%s:DoTake", character->getName());
-                character->sendMsg("You've picked up nothing.\n");
-                SQLiteDbms::instance().rollbackTransection();
-                return;
-            }
             // Handle output only if the player has really taken something.
             if (actuallyTaken.empty())
             {
@@ -95,13 +73,10 @@ void DoTake(Character * character, std::istream & sArgs)
                 return;
             }
             character->sendMsg("You've picked up everything you could.\n");
-            // Set the list of exceptions.
-            CharacterVector exceptions;
-            exceptions.push_back(character);
             // Send the message inside the room.
             character->room->sendToAll(
                 "%s has picked up everything %s could.\n",
-                exceptions,
+                { character },
                 character->getNameCapital(),
                 character->getSubjectPronoun());
             return;
@@ -150,30 +125,14 @@ void DoTake(Character * character, std::istream & sArgs)
         character->room->removeItem(item);
         // Add the item to the player's inventory.
         character->addInventoryItem(item);
-        // Update the item on database.
-        SQLiteDbms::instance().beginTransaction();
-        if (item->updateOnDB())
-        {
-            SQLiteDbms::instance().endTransaction();
-        }
-        else
-        {
-            Logger::log(LogLevel::Error, "%s:DoTake", character->getName());
-            character->sendMsg("You've picked up nothing.\n");
-            SQLiteDbms::instance().rollbackTransection();
-            return;
-        }
         // Notify to player.
         character->sendMsg(
             "You take %s.\n",
             Formatter::cyan() + ToLower(item->getName()) + Formatter::reset());
-        // Set the list of exceptions.
-        CharacterVector exceptions;
-        exceptions.push_back(character);
         // Send the message inside the room.
         character->room->sendToAll(
             "%s has picked up %s.\n",
-            exceptions,
+            { character },
             character->getNameCapital(),
             Formatter::cyan() + ToLower(item->getName()) + Formatter::reset());
         return;
@@ -219,28 +178,6 @@ void DoTake(Character * character, std::istream & sArgs)
                 // Add the item to the list of actually taken items.
                 actuallyTaken.push_back(iterator);
             }
-            // Update on database only the items which were taken.
-            SQLiteDbms::instance().beginTransaction();
-            bool commitStatus = true;
-            for (auto iterator : actuallyTaken)
-            {
-                if (!iterator->updateOnDB())
-                {
-                    commitStatus = false;
-                    break;
-                }
-            }
-            if (commitStatus)
-            {
-                SQLiteDbms::instance().endTransaction();
-            }
-            else
-            {
-                Logger::log(LogLevel::Error, "%s:DoTake", character->getName());
-                character->sendMsg("You've taken nothing from %s.\n", container->getName());
-                SQLiteDbms::instance().rollbackTransection();
-                return;
-            }
             // Handle output only if the player has really taken something.
             if (actuallyTaken.empty())
             {
@@ -250,13 +187,10 @@ void DoTake(Character * character, std::istream & sArgs)
             character->sendMsg(
                 "You've taken everything you could from %s.\n",
                 container->getName());
-            // Set the list of exceptions.
-            CharacterVector exceptions;
-            exceptions.push_back(character);
             // Send the message inside the room.
             character->room->sendToAll(
                 "%s has taken everything %s could from %s.\n",
-                exceptions,
+                { character },
                 character->getNameCapital(),
                 character->getSubjectPronoun(),
                 Formatter::cyan() + ToLower(container->getName()) + Formatter::reset());
@@ -284,29 +218,14 @@ void DoTake(Character * character, std::istream & sArgs)
         container->takeOut(item);
         // Add the item to the player's inventory.
         character->addInventoryItem(item);
-        // Update the item on database.
-        SQLiteDbms::instance().beginTransaction();
-        if (item->updateOnDB())
-        {
-            SQLiteDbms::instance().endTransaction();
-        }
-        else
-        {
-            SQLiteDbms::instance().rollbackTransection();
-        }
-
         character->sendMsg(
             "You take out %s from %s.\n",
             Formatter::cyan() + ToLower(item->getName()) + Formatter::reset(),
             Formatter::cyan() + ToLower(container->getName()) + Formatter::reset());
-
-        // Set the list of exceptions.
-        CharacterVector exceptions;
-        exceptions.push_back(character);
         // Send the message inside the room.
         character->room->sendToAll(
             "%s takes out %s from %s.\n",
-            exceptions,
+            { character },
             character->getNameCapital(),
             Formatter::cyan() + ToLower(item->getName()) + Formatter::reset(),
             Formatter::cyan() + ToLower(container->getName()) + Formatter::reset());
@@ -343,25 +262,18 @@ void DoDrop(Character * character, std::istream & sArgs)
             return;
         }
         auto untouchedList = character->inventory;
-        SQLiteDbms::instance().beginTransaction();
         for (auto iterator : untouchedList)
         {
             // Remove the item from the player's inventory.
             character->remInventoryItem(iterator);
             // Add the item to the room.
             character->room->addItem(iterator);
-            // Update the item on database.
-            iterator->updateOnDB();
         }
-        SQLiteDbms::instance().endTransaction();
         character->sendMsg("You dropped all.\n");
-        // Set the list of exceptions.
-        CharacterVector exceptions;
-        exceptions.push_back(character);
         // Send the message inside the room.
         character->room->sendToAll(
             "%s has dropped all %s items.\n",
-            exceptions,
+            { character },
             character->getNameCapital(),
             character->getPossessivePronoun());
         return;
@@ -377,25 +289,13 @@ void DoDrop(Character * character, std::istream & sArgs)
     // Update the item iside the Database.
     character->remInventoryItem(item);
     character->room->addItem(item);
-    SQLiteDbms::instance().beginTransaction();
-    if (item->updateOnDB())
-    {
-        SQLiteDbms::instance().endTransaction();
-    }
-    else
-    {
-        SQLiteDbms::instance().rollbackTransection();
-    }
     // Active message.
     character->sendMsg(
         "You drop " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n");
-    // Set the list of exceptions.
-    CharacterVector exceptions;
-    exceptions.push_back(character);
     // Send the message inside the room.
     character->room->sendToAll(
         "%s has dropped %s.\n",
-        exceptions,
+        { character },
         character->getNameCapital(),
         Formatter::cyan() + ToLower(item->getName()) + Formatter::reset());
 }
@@ -419,12 +319,8 @@ void DoGive(Character * character, std::istream & sArgs)
         character->sendMsg("You don't have that item.\n");
         return;
     }
-    // Get the target.
-    CharacterVector excpetions = { character };
-    Character * target = character->room->findCharacter(
-        arguments[1].first,
-        arguments[1].second,
-        excpetions);
+    Character * target = character->room->findCharacter(arguments[1].first, arguments[1].second, {
+        character });
     if (target == nullptr)
     {
         character->sendMsg("You don't see that person.\n");
@@ -454,16 +350,6 @@ void DoGive(Character * character, std::istream & sArgs)
     std::string viewdName =
         (HasFlag(character->flags, CharacterFlag::Invisible)) ?
             "Someone" : character->getNameCapital();
-    // Update the item iside the Database.
-    SQLiteDbms::instance().beginTransaction();
-    if (item->updateOnDB())
-    {
-        SQLiteDbms::instance().endTransaction();
-    }
-    else
-    {
-        SQLiteDbms::instance().rollbackTransection();
-    }
     // GIVE Message.
     character->sendMsg(
         "You give %s to %s.\n",
@@ -479,12 +365,8 @@ void DoGive(Character * character, std::istream & sArgs)
     broadcast += character->getNameCapital() + " gives ";
     broadcast += Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + " to ";
     broadcast += target->getName() + ".\n";
-    // Set the list of exceptions.
-    CharacterVector exceptions;
-    exceptions.push_back(character);
-    exceptions.push_back(target);
     // Send the message inside the room.
-    character->room->sendToAll(broadcast, exceptions);
+    character->room->sendToAll(broadcast, { character, target });
 }
 
 void DoEquipments(Character * character, std::istream & sArgs)
@@ -632,16 +514,6 @@ void DoWield(Character * character, std::istream & sArgs)
     character->remInventoryItem(item);
     // Equip the item.
     character->addEquipmentItem(item);
-    // Save the item on the Database.
-    SQLiteDbms::instance().beginTransaction();
-    if (item->updateOnDB())
-    {
-        SQLiteDbms::instance().endTransaction();
-    }
-    else
-    {
-        SQLiteDbms::instance().rollbackTransection();
-    }
     // Show the proper message.
     std::string message = "You wield " + Formatter::cyan() + ToLower(item->getName())
         + Formatter::reset() + " ";
@@ -654,13 +526,10 @@ void DoWield(Character * character, std::istream & sArgs)
         message += "with your " + item->getCurrentSlotName() + ".\n";
     }
     character->sendMsg(message);
-    // Set the list of exceptions.
-    CharacterVector exceptions;
-    exceptions.push_back(character);
     // Send the message inside the room.
     character->room->sendToAll(
         "%s wields %s in %s %s.\n",
-        exceptions,
+        { character },
         character->getNameCapital(),
         Formatter::cyan() + ToLower(item->getName()) + Formatter::reset(),
         character->getPossessivePronoun(),
@@ -688,7 +557,6 @@ void DoWear(Character * character, std::istream & sArgs)
     {
         bool wearedSomething = false;
         auto untouchedList = character->inventory;
-        SQLiteDbms::instance().beginTransaction();
         for (auto iterator : untouchedList)
         {
             std::string errMessage;
@@ -700,12 +568,9 @@ void DoWear(Character * character, std::istream & sArgs)
             character->remInventoryItem(iterator);
             // Add the item to the equipment.
             character->addEquipmentItem(iterator);
-            // Update the item on database.
-            iterator->updateOnDB();
             // Notify that something has been weared.
             wearedSomething = true;
         }
-        SQLiteDbms::instance().endTransaction();
         // Handle output only if the player has really weared something.
         if (!wearedSomething)
         {
@@ -713,13 +578,10 @@ void DoWear(Character * character, std::istream & sArgs)
             return;
         }
         character->sendMsg("You have weared everything you could.\n");
-        // Set the list of exceptions.
-        CharacterVector exceptions;
-        exceptions.push_back(character);
         // Send the message inside the room.
         character->room->sendToAll(
             "%s has weared all %s could.\n",
-            exceptions,
+            { character },
             character->getNameCapital(),
             character->getSubjectPronoun());
         return;
@@ -757,26 +619,13 @@ void DoWear(Character * character, std::istream & sArgs)
     character->remInventoryItem(item);
     // Add the item to the equipment.
     character->addEquipmentItem(item);
-    // Update the item on database.
-    SQLiteDbms::instance().beginTransaction();
-    if (item->updateOnDB())
-    {
-        SQLiteDbms::instance().endTransaction();
-    }
-    else
-    {
-        SQLiteDbms::instance().rollbackTransection();
-    }
     // Notify to character.
     character->sendMsg(
         "You wear " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n");
-    // Set the list of exceptions.
-    CharacterVector exceptions;
-    exceptions.push_back(character);
     // Send the message inside the room.
     character->room->sendToAll(
         "%s wears %s on %s %s.\n",
-        exceptions,
+        { character },
         character->getNameCapital(),
         Formatter::cyan() + ToLower(item->getName()) + Formatter::reset(),
         character->getPossessivePronoun(),
@@ -809,25 +658,18 @@ void DoRemove(Character * character, std::istream & sArgs)
             return;
         }
         auto untouchedList = character->equipment;
-        SQLiteDbms::instance().beginTransaction();
         for (auto iterator : untouchedList)
         {
             // Remove the item from the player's equipment.
             character->remEquipmentItem(iterator);
             // Add the item to the inventory.
             character->addInventoryItem(iterator);
-            // Update the item on database.
-            iterator->updateOnDB();
         }
-        SQLiteDbms::instance().endTransaction();
         character->sendMsg("You have removed everything.\n");
-        // Set the list of exceptions.
-        CharacterVector exceptions;
-        exceptions.push_back(character);
         // Send the message inside the room.
         character->room->sendToAll(
             "%s has undressed all he could.\n",
-            exceptions,
+            { character },
             character->getNameCapital());
         return;
     }
@@ -843,26 +685,14 @@ void DoRemove(Character * character, std::istream & sArgs)
     character->remEquipmentItem(item);
     // Add the item to the inventory.
     character->addInventoryItem(item);
-    // Update the item on database.
-    SQLiteDbms::instance().beginTransaction();
-    if (item->updateOnDB())
-    {
-        SQLiteDbms::instance().endTransaction();
-    }
-    else
-    {
-        SQLiteDbms::instance().rollbackTransection();
-    }
     // Notify the character.
     character->sendMsg(
-        "You remove " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n");
-    // Set the list of exceptions.
-    CharacterVector exceptions;
-    exceptions.push_back(character);
+        "You remove %s.\n",
+        Formatter::cyan() + ToLower(item->getName()) + Formatter::reset());
     // Send the message inside the room.
     character->room->sendToAll(
         "%s removes %s from %s %s.\n",
-        exceptions,
+        { character },
         character->getNameCapital(),
         Formatter::cyan() + ToLower(item->getName()) + Formatter::reset(),
         character->getPossessivePronoun(),
@@ -1009,25 +839,19 @@ void DoOpen(Character * character, std::istream & sArgs)
         if (HasFlag(roomExit->flags, ExitFlag::Hidden))
         {
             character->sendMsg("You have opened a hidden door!\n");
-            // Set the list of exceptions.
-            CharacterVector exceptions;
-            exceptions.push_back(character);
             // Send the message inside the room.
             character->room->sendToAll(
                 "%s opens a hidden door!\n",
-                exceptions,
+                { character },
                 character->getNameCapital());
         }
         else
         {
             character->sendMsg("You have opened the door.\n");
-            // Set the list of exceptions.
-            CharacterVector exceptions;
-            exceptions.push_back(character);
             // Send the message inside the room.
             character->room->sendToAll(
                 "%s opens a door.\n",
-                exceptions,
+                { character },
                 character->getNameCapital());
         }
         for (auto it : destination->exits)
@@ -1142,25 +966,19 @@ void DoClose(Character * character, std::istream & sArgs)
         if (HasFlag(roomExit->flags, ExitFlag::Hidden))
         {
             character->sendMsg("You have closed a hidden door!\n");
-            // Set the list of exceptions.
-            CharacterVector exceptions;
-            exceptions.push_back(character);
             // Send the message inside the room.
             character->room->sendToAll(
                 "%s closes a hidden door!\n",
-                exceptions,
+                { character },
                 character->getNameCapital());
         }
         else
         {
             character->sendMsg("You have closed the door.\n");
-            // Set the list of exceptions.
-            CharacterVector exceptions;
-            exceptions.push_back(character);
             // Send the message inside the room.
             character->room->sendToAll(
                 "%s closes a door.\n",
-                exceptions,
+                { character },
                 character->getNameCapital());
         }
         for (auto it : destination->exits)
@@ -1268,7 +1086,6 @@ void DoPut(Character * character, std::istream & sArgs)
             return;
         }
         auto originalList = character->inventory;
-        SQLiteDbms::instance().beginTransaction();
         for (auto iterator : originalList)
         {
             if (iterator == container)
@@ -1282,15 +1099,11 @@ void DoPut(Character * character, std::istream & sArgs)
             // Remove the item from the player's inventory.
             character->remInventoryItem(iterator);
         }
-        SQLiteDbms::instance().endTransaction();
         character->sendMsg("You put everything you could in %s.\n", container->getName());
-        // Set the list of exceptions.
-        CharacterVector exceptions;
-        exceptions.push_back(character);
         // Send the message inside the room.
         character->room->sendToAll(
             "%s puts everything %s could inside %s.\n",
-            exceptions,
+            { character },
             character->getNameCapital(),
             character->getSubjectPronoun(),
             Formatter::cyan() + ToLower(container->getName()) + Formatter::reset());
@@ -1304,34 +1117,26 @@ void DoPut(Character * character, std::istream & sArgs)
         return;
     }
     // Try to put the item inside the container.
-    SQLiteDbms::instance().beginTransaction();
     if (!container->putInside(item))
     {
-        SQLiteDbms::instance().rollbackTransection();
         character->sendMsg("%s can't contain any more items.\n", container->getNameCapital());
         return;
     }
     if (!character->remInventoryItem(item))
     {
         container->putInside(item);
-        SQLiteDbms::instance().endTransaction();
         character->sendMsg("You can't let go %s.\n", item->getName());
         return;
     }
-    SQLiteDbms::instance().endTransaction();
     // Notify to player.
     character->sendMsg(
         "You put %s inside %s.\n",
         Formatter::cyan() + ToLower(item->getName()) + Formatter::reset(),
         Formatter::cyan() + ToLower(container->getName()) + Formatter::reset());
-
-    // Set the list of exceptions.
-    CharacterVector exceptions;
-    exceptions.push_back(character);
     // Send the message inside the room.
     character->room->sendToAll(
         "%s puts %s inside %s.\n",
-        exceptions,
+        { character },
         character->getNameCapital(),
         Formatter::cyan() + ToLower(item->getName()) + Formatter::reset(),
         Formatter::cyan() + ToLower(container->getName()) + Formatter::reset());
@@ -1403,11 +1208,7 @@ void DoDrink(Character * character, std::istream & sArgs)
     // Take out the liquid.
     Liquid * liquid = container->contentLiq.first;
 
-    SQLiteDbms::instance().beginTransaction();
-    bool result = container->pourOut(1);
-    SQLiteDbms::instance().endTransaction();
-
-    if (!result)
+    if (!container->pourOut(1))
     {
         character->sendMsg(
             "You were not able to drink some %s from %s.\n",
@@ -1417,13 +1218,10 @@ void DoDrink(Character * character, std::istream & sArgs)
     }
 
     character->sendMsg("You drink some %s from %s.\n", liquid->getName(), container->getName());
-    // Set the list of exceptions.
-    CharacterVector exceptions;
-    exceptions.push_back(character);
     // Send the message inside the room.
     character->room->sendToAll(
         "%s drinks some %s from %s.\n",
-        exceptions,
+        { character },
         character->getNameCapital(),
         liquid->getName(),
         container->getName());
@@ -1537,36 +1335,28 @@ void DoFill(Character * character, std::istream & sArgs)
         }
     }
 
-    SQLiteDbms::instance().beginTransaction();
     if (!source->pourOut(quantity))
     {
         character->sendMsg(
             "You failed to take out the liquid from a %s.\n",
             source->getNameCapital());
-        SQLiteDbms::instance().endTransaction();
         return;
     }
     if (!container->pourIn(sourLiquid, quantity))
     {
         character->sendMsg("You failed to fill the container with the liquid.\n");
-        SQLiteDbms::instance().endTransaction();
         return;
     }
-    SQLiteDbms::instance().endTransaction();
 
     character->sendMsg(
         "You fill %s with %s from %s.\n",
         container->getName(),
         sourLiquid->getName(),
         source->getName());
-
-    // Set the list of exceptions.
-    CharacterVector exceptions;
-    exceptions.push_back(character);
     // Send the message inside the room.
     character->room->sendToAll(
         "%s fills %s with %s from %s.\n",
-        exceptions,
+        { character },
         character->getNameCapital(),
         container->getName(),
         sourLiquid->getName(),
@@ -1681,37 +1471,25 @@ void DoPour(Character * character, std::istream & sArgs)
             quantity = atDisposal;
         }
     }
-
-    SQLiteDbms::instance().beginTransaction();
     if (!source->pourOut(quantity))
     {
-        character->sendMsg(
-            "You failed to pour out the liquid from " + source->getNameCapital() + ".\n");
-        SQLiteDbms::instance().endTransaction();
+        character->sendMsg("You failed to pour out the liquid from %s.\n", source->getName());
         return;
     }
     if (!container->pourIn(sourLiquid, quantity))
     {
-        character->sendMsg(
-            "You failed to pour the liquid into " + source->getNameCapital() + ".\n");
-        SQLiteDbms::instance().endTransaction();
+        character->sendMsg("You failed to pour the liquid into %s.\n", source->getName());
         return;
     }
-    SQLiteDbms::instance().endTransaction();
-
     character->sendMsg(
         "You pour %s of %s into %s.\n",
         sourLiquid->getName(),
         source->getName(),
         container->getName());
-
-    // Set the list of exceptions.
-    CharacterVector exceptions;
-    exceptions.push_back(character);
     // Send the message inside the room.
     character->room->sendToAll(
         "%s pour %s of %s into %s.\n",
-        exceptions,
+        { character },
         character->getNameCapital(),
         sourLiquid->getName(),
         source->getName(),
@@ -1757,14 +1535,15 @@ void DoDeposit(Character * character, std::istream & sArgs)
     auto shop = building->toShopItem();
     auto deposit = item->getPrice();
     auto status = false;
-    SQLiteDbms::instance().beginTransaction();
     if (item->destroy())
     {
         shop->balance += deposit;
-        if (shop->updateOnDB())
+        SQLiteDbms::instance().beginTransaction();
+        if (item->removeOnDB())
         {
             status = true;
         }
+        SQLiteDbms::instance().endTransaction();
     }
     if (!status)
     {
@@ -1773,14 +1552,12 @@ void DoDeposit(Character * character, std::istream & sArgs)
             "You failed to deposit %s in %s.\n",
             item->getName(),
             building->getName());
-        SQLiteDbms::instance().rollbackTransection();
         return;
     }
     else
     {
         delete (item);
     }
-    SQLiteDbms::instance().endTransaction();
     character->sendMsg("You deposit %s in %s.\n", item->getName(), building->getName());
 }
 
@@ -1851,56 +1628,44 @@ void DoSell(Character * character, std::istream & sArgs)
     }
     auto currency = shopKeeper->faction->currency;
     // Give the coins to the character.
-    SQLiteDbms::instance().beginTransaction();
-    auto status = true;
     std::vector<Item *> coins;
     if (!currency->generateCurrency(shopKeeper->getName(), price, coins))
     {
         character->sendMsg("You failed to sell %s.\n", item->getName());
-        SQLiteDbms::instance().rollbackTransection();
         return;
     }
     // Remove the item from the inventory.
-    if (status)
+    auto status = false;
+    if (character->remInventoryItem(item))
     {
-        status &= character->remInventoryItem(item);
-    }
-    // Put the item inside the shop.
-    if (status)
-    {
-        status &= shop->putInside(item);
-    }
-    if (status)
-    {
-        for (auto coin : coins)
+        // Put the item inside the shop.
+        if (shop->putInside(item))
         {
-            character->addInventoryItem(coin);
-            if (!coin->updateOnDB())
+            for (auto coin : coins)
             {
-                status = false;
-                break;
+                character->addInventoryItem(coin);
             }
+            shop->balance -= price;
+            status = true;
         }
-    }
-    if (status)
-    {
-        shop->balance -= price;
-        status &= shop->updateOnDB();
+        else
+        {
+            character->addInventoryItem(item);
+        }
     }
     // Handle error.
     if (!status)
     {
         character->sendMsg("You failed to sell %s.\n", item->getName());
-        SQLiteDbms::instance().rollbackTransection();
         for (auto coin : coins)
         {
-            character->remInventoryItem(coin);
             delete (coin);
         }
-        return;
     }
-    SQLiteDbms::instance().endTransaction();
-    character->sendMsg("You sell %s to %s.\n", item->getName(), shopKeeper->getName());
+    else
+    {
+        character->sendMsg("You sell %s to %s.\n", item->getName(), shopKeeper->getName());
+    }
 }
 
 void DoBuy(Character * character, std::istream & sArgs)
@@ -1965,56 +1730,32 @@ void DoBuy(Character * character, std::istream & sArgs)
         auto change = providedValue - requiredValue;
         auto currency = shopKeeper->faction->currency;
         std::vector<Item *> returnedCoins;
-        SQLiteDbms::instance().beginTransaction();
         if (!currency->generateCurrency(shopKeeper->getName(), change, returnedCoins))
         {
             auto phrase = "Sorry but I cannot sell " + item->getName() + " to you.\n";
             shopKeeper->doCommand("say " + character->getName() + " " + phrase);
-            SQLiteDbms::instance().rollbackTransection();
             return;
         }
         for (auto coin : returnedCoins)
         {
             character->addInventoryItem(coin);
-            if (!coin->updateOnDB())
-            {
-                auto phrase = "Sorry but I cannot sell " + item->getName() + " to you.\n";
-                shopKeeper->doCommand("say " + character->getName() + " " + phrase);
-                SQLiteDbms::instance().rollbackTransection();
-                return;
-            }
         }
-        SQLiteDbms::instance().endTransaction();
     }
+
     SQLiteDbms::instance().beginTransaction();
     for (auto coin : givenCoins)
     {
-        if (!coin->destroy())
+        if (coin->destroy())
         {
-            auto phrase = "Sorry but I cannot sell " + item->getName() + " to you.\n";
-            shopKeeper->doCommand("say " + character->getName() + " " + phrase);
-            SQLiteDbms::instance().rollbackTransection();
-            return;
+            if (coin->removeOnDB())
+            {
+                delete (coin);
+            }
         }
     }
+    SQLiteDbms::instance().endTransaction();
     shop->takeOut(item);
     character->addInventoryItem(item);
-    if (!item->updateOnDB())
-    {
-        auto phrase = "Sorry but I cannot sell " + item->getName() + " to you.\n";
-        shopKeeper->doCommand("say " + character->getName() + " " + phrase);
-        SQLiteDbms::instance().rollbackTransection();
-        return;
-    }
     shop->balance += requiredValue;
-    if (!shop->updateOnDB())
-    {
-        auto phrase = "Sorry but I cannot sell " + item->getName() + " to you.\n";
-        shopKeeper->doCommand("say " + character->getName() + " " + phrase);
-        SQLiteDbms::instance().rollbackTransection();
-        return;
-    }
-    SQLiteDbms::instance().endTransaction();
-
     character->sendMsg("You buy %s from %s.\n", item->getName(), shop->getName());
 }

@@ -49,33 +49,26 @@ void DoAssign(Character * character, std::istream & sArgs)
     if (building->getType() == ModelType::Shop)
     {
         ShopItem * shop = building->toShopItem();
-        if (shop->shopKeeper == mobile)
+        if (mobile->managedItem != nullptr)
         {
-            character->sendMsg(
-                "%s is already assigned to %s.\n",
-                mobile->getNameCapital(),
-                building->getName());
-        }
-        else
-        {
-            shop->setNewShopKeeper(mobile);
-            SQLiteDbms::instance().beginTransaction();
-            if (shop->updateOnDB())
+            if (mobile->managedItem == shop)
             {
-                SQLiteDbms::instance().endTransaction();
                 character->sendMsg(
-                    "You assign %s to %s.\n",
-                    mobile->getName(),
+                    "%s is already assigned to %s.\n",
+                    mobile->getNameCapital(),
                     building->getName());
             }
             else
             {
-                SQLiteDbms::instance().rollbackTransection();
                 character->sendMsg(
-                    "You failded to assign %s to %s.\n",
-                    mobile->getName(),
-                    building->getName());
+                    "%s is already assigned to another shop.\n",
+                    mobile->getNameCapital());
             }
+        }
+        else
+        {
+            shop->setNewShopKeeper(mobile);
+            character->sendMsg("You assign %s to %s.\n", mobile->getName(), building->getName());
         }
     }
     else
