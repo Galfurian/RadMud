@@ -1928,6 +1928,15 @@ void LoadCommands()
         Mud::instance().addCommand(command);
     }
 
+    {
+        command.name = "ifaction";
+        command.help = "Shows the infos about a faction.";
+        command.args = "(vnum)";
+        command.hndl = DoFactionInfo;
+        command.level = 1;
+        Mud::instance().addCommand(command);
+    }
+
     //
     // LISTS
     //

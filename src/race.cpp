@@ -108,7 +108,7 @@ bool Race::setAvailableFactions(const std::string & source)
 {
     if (source.empty())
     {
-        return false;
+        return true;
     }
     std::vector<std::string> factionList = SplitString(source, ";");
     if (factionList.empty())

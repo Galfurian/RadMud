@@ -15,6 +15,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+#include "model/currencyModel.hpp"
 #include "sqliteDbms.hpp"
 
 #include "../mud.hpp"
@@ -211,11 +212,30 @@ bool LoadFaction(ResultSet * result)
 {
     while (result->next())
     {
+        auto vnum = result->getNextInteger();
+        auto name = result->getNextString();
+        auto description = result->getNextString();
+        auto currencyVnum = result->getNextInteger();
+
+        auto currencyModel = Mud::instance().findItemModel(currencyVnum);
+        if (currencyModel == nullptr)
+        {
+            Logger::log(LogLevel::Error, "Can't find the currency %s", ToString(currencyVnum));
+            return false;
+        }
+        if (currencyModel->getType() != ModelType::Currency)
+        {
+            Logger::log(LogLevel::Error, "Model is not currency %s", ToString(currencyVnum));
+            return false;
+        }
+        auto currency = currencyModel->toCurrency();
+
         // Create an empty Faction.
         Faction * faction = new Faction();
-        faction->vnum = result->getNextInteger();
-        faction->name = result->getNextString();
-        faction->description = result->getNextString();
+        faction->vnum = vnum;
+        faction->name = name;
+        faction->description = description;
+        faction->currency = currency;
         // Translate new_line.
         FindAndReplace(faction->description, "%r", "\n");
         // Check the correctness.
@@ -302,7 +322,11 @@ bool LoadRace(ResultSet * result)
         race->description = result->getNextString();
         race->material = Mud::instance().findMaterial(result->getNextInteger());
         race->setAbilities(result->getNextString());
-        race->setAvailableFactions(result->getNextString());
+        if (!race->setAvailableFactions(result->getNextString()))
+        {
+            Logger::log(LogLevel::Error, "Error when setting race factions.");
+            return false;
+        }
         race->player_allow = result->getNextInteger();
         race->tileSet = result->getNextInteger();
         race->tileId = result->getNextInteger();

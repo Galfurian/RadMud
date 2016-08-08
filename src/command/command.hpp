@@ -325,6 +325,8 @@ void DoLiquidInfo(Character * character, std::istream & sArgs);
 void DoProductionInfo(Character * character, std::istream & sArgs);
 /// Provide all the information regarding the given profession.
 void DoProfessionInfo(Character * character, std::istream & sArgs);
+/// Shows the infos about a faction.
+void DoFactionInfo(Character * character, std::istream & sArgs);
 /// List all the model used to define items.
 void DoModelList(Character * character, std::istream & sArgs);
 /// List all the items in the Mud.

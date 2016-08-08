@@ -24,6 +24,9 @@
 #include <map>
 
 #include "lua/lua_script.hpp"
+#include "utilities/table.hpp"
+
+class CurrencyModel;
 
 /// @brief Holds details about a faction.
 class Faction
@@ -35,6 +38,8 @@ class Faction
         std::string name;
         /// The description of the faction.
         std::string description;
+        /// The currency used by this faction.
+        CurrencyModel * currency;
 
         /// @brief Contructor.
         Faction();
@@ -57,6 +62,10 @@ class Faction
         /// @brief Check the correctness of the faction.
         /// @return <b>True</b> if the faction has correct values,<br><b>False</b> otherwise.
         bool check();
+
+        /// @brief Fills the provided table with the information concerning the faction.
+        /// @param sheet The table that has to be filled.
+        void getSheet(Table & sheet) const;
 
         /// @brief Return the name of the faction.
         /// @return The name of the faction.

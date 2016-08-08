@@ -1266,6 +1266,29 @@ void DoProfessionInfo(Character * character, std::istream & sArgs)
     character->sendMsg(msg);
 }
 
+void DoFactionInfo(Character * character, std::istream & sArgs)
+{
+    // Get the arguments of the command.
+    ArgumentList args = ParseArgs(sArgs);
+    if (args.size() != 1)
+    {
+        character->sendMsg("You must insert a valide faction vnum.\n");
+        return;
+    }
+    auto * faction = Mud::instance().findFaction(ToNumber<int>(args[0].first));
+    if (faction == nullptr)
+    {
+        character->sendMsg("Faction not found.\n");
+        return;
+    }
+    // Create a table.
+    Table sheet;
+    // Get the sheet.
+    faction->getSheet(sheet);
+    // Show the seet to character.
+    character->sendMsg(sheet.getTable());
+}
+
 void DoModelList(Character * character, std::istream & sArgs)
 {
     // Check no more input.

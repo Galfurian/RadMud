@@ -16,21 +16,18 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-// Basic Include.
 #include "faction.hpp"
 
-#include "constants.hpp"
-// Local Includes.
-
-// Other Include.
-#include "utils.hpp"
-#include "utilities/logger.hpp"
+#include "model/currencyModel.hpp"
 #include "luabridge/LuaBridge.h"
+#include "utilities/logger.hpp"
+#include "utils.hpp"
 
 Faction::Faction() :
-    vnum(),
-    name(),
-    description()
+        vnum(),
+        name(),
+        description(),
+        currency()
 {
     // Nothing to do.
 }
@@ -45,7 +42,20 @@ bool Faction::check()
     assert(vnum > 0);
     assert(!name.empty());
     assert(!description.empty());
+    assert(currency != nullptr);
     return true;
+}
+
+void Faction::getSheet(Table & sheet) const
+{
+    // Add the columns.
+    sheet.addColumn("Attribute", StringAlign::Left);
+    sheet.addColumn("Value", StringAlign::Left);
+    // Set the values.
+    sheet.addRow( { "Vnum", ToString(this->vnum) });
+    sheet.addRow( { "Name", this->name });
+    sheet.addRow( { "Description", this->description });
+    sheet.addRow( { "Currency", currency->getName() + " (" + ToString(currency->vnum) + ")" });
 }
 
 std::string Faction::getName()
