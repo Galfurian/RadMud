@@ -168,8 +168,8 @@ void MudUpdater::updateMobiles()
 {
     for (auto iterator : Mud::instance().mudMobiles)
     {
-        Mobile * mobile = iterator.second;
-        if (!mobile->alive)
+        auto mobile = iterator.second;
+        if (!mobile->isAlive())
         {
             if (mobile->canRespawn())
             {
@@ -194,27 +194,28 @@ void MudUpdater::updateMobilesHour()
 {
     for (auto iterator : Mud::instance().mudMobiles)
     {
-        if (iterator.second->alive)
+        auto mobile = iterator.second;
+        if (mobile->isAlive())
         {
             if (mudHour == 6)
             {
-                iterator.second->triggerEventMorning();
+                mobile->triggerEventMorning();
             }
             else if (mudHour == 12)
             {
-                iterator.second->triggerEventDay();
+                mobile->triggerEventDay();
             }
             else if (mudHour == 18)
             {
-                iterator.second->triggerEventDusk();
+                mobile->triggerEventDusk();
             }
             else if (mudHour == 24)
             {
-                iterator.second->triggerEventNight();
+                mobile->triggerEventNight();
             }
             else
             {
-                iterator.second->triggerEventRandom();
+                mobile->triggerEventRandom();
             }
         }
     }
@@ -283,7 +284,7 @@ void MudUpdater::performActions()
     for (auto iterator : Mud::instance().mudMobiles)
     {
         Mobile * mobile = iterator.second;
-        if (!mobile->alive)
+        if (!mobile->isAlive())
         {
             continue;
         }
@@ -301,7 +302,7 @@ void MudUpdater::performActions()
         ActionStatus actionStatus = mobile->getAction()->perform();
         if ((actionStatus == ActionStatus::Finished) || (actionStatus == ActionStatus::Error))
         {
-            // Remove the from action.
+            // Remove the last action.
             mobile->popAction();
         }
     }

@@ -166,22 +166,13 @@ bool ShopItem::canDeconstruct(std::string & error) const
 
 std::string ShopItem::lookContent()
 {
-    std::string output;
-    if (this->shopKeeper == nullptr)
+    std::string output, error;
+    if (!this->canUse(error))
     {
-        output += Formatter::italic() + "Nobody is managing the shop.\n\n" + Formatter::reset();
+        output += Formatter::italic() + error + "\n\n" + Formatter::reset();
         output += Item::lookContent();
         return output;
     }
-    else if (!this->shopKeeper->alive)
-    {
-
-        output += Formatter::italic() + "The shopkeeper's probably taking a nap.\n\n"
-            + Formatter::reset();
-        output += Item::lookContent();
-        return output;
-    }
-
     output += this->shopKeeper->getNameCapital() + " is currently managing the shop.\n";
     if (content.empty())
     {
@@ -240,6 +231,26 @@ void ShopItem::setNewShopKeeper(Mobile * _shopKeeper)
 unsigned int ShopItem::getBalance() const
 {
     return this->balance;
+}
+
+bool ShopItem::canUse(std::string & error)
+{
+    if (this->shopKeeper == nullptr)
+    {
+        error = "Nobody is managing the shop.";
+        return false;
+    }
+    if (!this->shopKeeper->isAlive())
+    {
+        error = "The shopkeeper's probably taking a nap.";
+        return false;
+    }
+    if (this->room->vnum != this->shopKeeper->room->vnum)
+    {
+        error = "The shopkeeper's is elsewhere.";
+        return false;
+    }
+    return true;
 }
 
 unsigned int ShopItem::evaluateBuyPrice(Item * item)

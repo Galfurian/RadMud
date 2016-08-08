@@ -128,7 +128,7 @@ void DoTransfer(Character * character, std::istream & sArgs)
     }
     if (target->isMobile())
     {
-        if (!target->toMobile()->alive)
+        if (!target->toMobile()->isAlive())
         {
             character->sendMsg("You cannot transfer a dead mobile.\n");
             return;
@@ -1379,7 +1379,7 @@ void DoMobileList(Character * character, std::istream & sArgs)
         Mobile * mobile = iterator.second;
         // Prepare the row.
         TableRow row;
-        row.push_back((mobile->alive) ? "Yes" : "No");
+        row.push_back((mobile->isAlive()) ? "Yes" : "No");
         row.push_back(mobile->id);
         row.push_back(mobile->getName());
         if (mobile->room != nullptr)

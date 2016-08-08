@@ -1838,14 +1838,14 @@ void DoSell(Character * character, std::istream & sArgs)
     auto shop = shopKeeper->managedItem->toShopItem();
     if (!shop->canContain(item))
     {
-        std::string phrase = "The shop is full, come back another day.";
+        auto phrase = "The shop is full, come back another day.";
         shopKeeper->doCommand("say " + character->getName() + " " + phrase);
         return;
     }
-    auto price = item->getPrice();
+    auto price = shop->evaluateSellPrice(item);
     if (shop->balance < price)
     {
-        std::string phrase = "I can't afford to buy your goods.";
+        auto phrase = "I can't afford to buy your goods.";
         shopKeeper->doCommand("say " + character->getName() + " " + phrase);
         return;
     }
@@ -1901,4 +1901,120 @@ void DoSell(Character * character, std::istream & sArgs)
     }
     SQLiteDbms::instance().endTransaction();
     character->sendMsg("You sell %s to %s.\n", item->getName(), shopKeeper->getName());
+}
+
+void DoBuy(Character * character, std::istream & sArgs)
+{
+    // Stop any action the character is executing.
+    StopAction(character);
+    // Get the arguments of the command.
+    ArgumentList args = ParseArgs(sArgs);
+    // Check the number of arguments.
+    if (args.size() != 2)
+    {
+        character->sendMsg("Buy what from which shop?\n");
+        return;
+    }
+    // Get the target.
+    auto target = character->room->findItem(args[1].first, args[1].second);
+    if (target == nullptr)
+    {
+        character->sendMsg("You don't see '%s' here.\n", args[1].first);
+        return;
+    }
+    if (target->getType() != ModelType::Shop)
+    {
+        character->sendMsg("%s is not a shop.\n", target->getNameCapital());
+        return;
+    }
+    auto shop = target->toShopItem();
+    std::string error;
+    if (!shop->canUse(error))
+    {
+        character->sendMsg(error + "\n");
+        return;
+    }
+    auto shopKeeper = shop->shopKeeper;
+    // Get the item.
+    auto item = shop->findContent(args[0].first, args[0].second);
+    // Check the item.
+    if (item == nullptr)
+    {
+        auto phrase = "There is no " + args[0].first + " on sale.\n";
+        shopKeeper->doCommand("say " + character->getName() + " " + phrase);
+        return;
+    }
+    std::vector<Item *> givenCoins;
+    auto requiredValue = shop->evaluateBuyPrice(item);
+    unsigned int providedValue = 0;
+    if (!character->findCoins(givenCoins, requiredValue, providedValue))
+    {
+        auto phrase = "You can't afford to buy " + item->getName() + ".\n";
+        shopKeeper->doCommand("say " + character->getName() + " " + phrase);
+        return;
+    }
+    if (!character->canCarry(item))
+    {
+        auto phrase = "It seems that you can't carry " + item->getName() + ".\n";
+        shopKeeper->doCommand("say " + character->getName() + " " + phrase);
+        return;
+    }
+
+    if (providedValue > requiredValue)
+    {
+        auto change = providedValue - requiredValue;
+        auto currency = shopKeeper->faction->currency;
+        std::vector<Item *> returnedCoins;
+        SQLiteDbms::instance().beginTransaction();
+        if (!currency->generateCurrency(shopKeeper->getName(), change, returnedCoins))
+        {
+            auto phrase = "Sorry but I cannot sell " + item->getName() + " to you.\n";
+            shopKeeper->doCommand("say " + character->getName() + " " + phrase);
+            SQLiteDbms::instance().rollbackTransection();
+            return;
+        }
+        for (auto coin : returnedCoins)
+        {
+            character->addInventoryItem(coin);
+            if (!coin->updateOnDB())
+            {
+                auto phrase = "Sorry but I cannot sell " + item->getName() + " to you.\n";
+                shopKeeper->doCommand("say " + character->getName() + " " + phrase);
+                SQLiteDbms::instance().rollbackTransection();
+                return;
+            }
+        }
+        SQLiteDbms::instance().endTransaction();
+    }
+    SQLiteDbms::instance().beginTransaction();
+    for (auto coin : givenCoins)
+    {
+        if (!coin->destroy())
+        {
+            auto phrase = "Sorry but I cannot sell " + item->getName() + " to you.\n";
+            shopKeeper->doCommand("say " + character->getName() + " " + phrase);
+            SQLiteDbms::instance().rollbackTransection();
+            return;
+        }
+    }
+    shop->takeOut(item);
+    character->addInventoryItem(item);
+    if (!item->updateOnDB())
+    {
+        auto phrase = "Sorry but I cannot sell " + item->getName() + " to you.\n";
+        shopKeeper->doCommand("say " + character->getName() + " " + phrase);
+        SQLiteDbms::instance().rollbackTransection();
+        return;
+    }
+    shop->balance += requiredValue;
+    if (!shop->updateOnDB())
+    {
+        auto phrase = "Sorry but I cannot sell " + item->getName() + " to you.\n";
+        shopKeeper->doCommand("say " + character->getName() + " " + phrase);
+        SQLiteDbms::instance().rollbackTransection();
+        return;
+    }
+    SQLiteDbms::instance().endTransaction();
+
+    character->sendMsg("You buy %s from %s.\n", item->getName(), shop->getName());
 }

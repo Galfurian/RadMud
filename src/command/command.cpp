@@ -1547,6 +1547,13 @@ void LoadCommands()
         command.hndl = DoSell;
         Mud::instance().addCommand(command);
     }
+    {
+        command.name = "buy";
+        command.help = "Allows to buy an item from a shop.";
+        command.args = "(item) (shop)";
+        command.hndl = DoBuy;
+        Mud::instance().addCommand(command);
+    }
 
     // Comunication.
     {

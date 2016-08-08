@@ -398,15 +398,10 @@ bool LoadMobile(ResultSet * result)
             delete (mobile);
             return false;
         }
-
-        // Set the respawn time.
-        mobile->nextRespawn = std::chrono::system_clock::now()
-            + std::chrono::seconds(5 * mobile->level);
-        // Set the next action time.
-        mobile->nextActionCooldown = std::chrono::system_clock::now()
-            + std::chrono::seconds(10 * mobile->level);
-        // Load its script.
+        // Load the script.
         mobile->loadScript(kSystemDir + "lua/" + mobile->lua_script);
+        // Respawn it.
+        mobile->respawn();
     }
     return true;
 }

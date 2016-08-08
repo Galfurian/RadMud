@@ -156,7 +156,6 @@ bool Item::destroy()
     {
         if (this->model->getType() != ModelType::Corpse)
         {
-
             Logger::log(LogLevel::Error, "Removing item '" + this->getName() + "' from DB;");
             // Remove the item from the database.
             if (!this->removeOnDB())
@@ -317,9 +316,15 @@ bool Item::updateOnDB()
 
 bool Item::removeOnDB()
 {
-    bool result = SQLiteDbms::instance().deleteFrom(
-        "Item",
-        { std::make_pair("vnum", ToString(vnum)) });
+    // Prepare the where clause.
+    QueryList main = { std::make_pair("vnum", ToString(vnum)) };
+    auto result = SQLiteDbms::instance().deleteFrom("Item", main);
+    // Remove the item from everywhere.
+    QueryList other = { std::make_pair("item", ToString(vnum)) };
+    SQLiteDbms::instance().deleteFrom("ItemPlayer", other);
+    SQLiteDbms::instance().deleteFrom("ItemRoom", other);
+    SQLiteDbms::instance().deleteFrom("ItemContent", other);
+    SQLiteDbms::instance().deleteFrom("Shop", other);
     if (!result)
     {
         Logger::log(LogLevel::Error, "Error during item removal from table Item.");

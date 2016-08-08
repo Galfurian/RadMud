@@ -937,6 +937,59 @@ bool Character::findNearbyResouces(IngredientMap ingredients, ItemVector & found
     return true;
 }
 
+bool Character::findCoins(
+    std::vector<Item *> & coins,
+    const unsigned int & requiredValue,
+    unsigned int & providedValue)
+{
+    for (auto it : equipment)
+    {
+        if (it->isAContainer() && !it->isEmpty())
+        {
+            for (auto content : it->content)
+            {
+                if (content->getType() == ModelType::Currency)
+                {
+                    providedValue += content->getPrice();
+                    coins.push_back(content);
+                    if (providedValue >= requiredValue)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    for (auto it : inventory)
+    {
+        if (it->getType() == ModelType::Currency)
+        {
+            providedValue += it->getPrice();
+            coins.push_back(it);
+            if (providedValue >= requiredValue)
+            {
+                return true;
+            }
+        }
+        if (it->isAContainer() && !it->isEmpty())
+        {
+            for (auto content : it->content)
+            {
+                if (content->getType() == ModelType::Currency)
+                {
+                    providedValue += content->getPrice();
+                    coins.push_back(it);
+                    if (providedValue >= requiredValue)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+
 bool Character::hasInventoryItem(Item * item)
 {
     for (auto it : inventory)
@@ -1728,9 +1781,9 @@ void Character::luaRegister(lua_State * L)
     .addData("shortdesc", &Mobile::shortdesc) //
     .addData("staticdesc", &Mobile::staticdesc) //
     .addData("message_buffer", &Mobile::message_buffer) //
-    .addData("alive", &Mobile::alive) //
     .addData("controller", &Mobile::controller) //
     .addFunction("isMobile", &Mobile::isMobile) //
+    .addFunction("isAlive", &Mobile::isAlive) //
     .endClass() //
     .deriveClass<Player, Character>("Player") //
     .addData("age", &Player::age, false) //

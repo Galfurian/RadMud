@@ -62,7 +62,8 @@ class ShopItem: public Item
 
         unsigned int getBalance() const;
 
-    private:
+        bool canUse(std::string & error);
+
         /// @brief Applies the buy tax to the item's price.
         /// @param item The item that has to be priced.
         /// @return The buy price with applied the taxes.
