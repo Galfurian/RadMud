@@ -31,9 +31,9 @@ CurrencyItem::~CurrencyItem()
     // Nothing to do.
 }
 
-ItemType CurrencyItem::getType() const
+ModelType CurrencyItem::getType() const
 {
-    return ItemType::Currency;
+    return ModelType::Currency;
 }
 
 std::string CurrencyItem::getTypeName() const

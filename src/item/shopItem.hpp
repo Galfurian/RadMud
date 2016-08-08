@@ -38,10 +38,6 @@ class ShopItem: public Item
 
         virtual ~ShopItem();
 
-        virtual ItemType getType() const;
-
-        virtual std::string getTypeName() const;
-
         virtual bool check(bool complete = false);
 
         virtual bool destroy();

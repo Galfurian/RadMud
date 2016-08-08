@@ -874,19 +874,19 @@ bool LoadShop(ResultSet * result)
     while (result->next())
     {
         // Retrieve the item vnum.
-        int vnum = result->getNextInteger();
-        Item * genericItem = Mud::instance().findItem(vnum);
-        if (genericItem == nullptr)
+        auto vnum = result->getNextInteger();
+        auto item = Mud::instance().findItem(vnum);
+        if (item == nullptr)
         {
             Logger::log(LogLevel::Error, "Can't find the item (%s).", ToString(vnum));
             return false;
         }
-        if (genericItem->getType() != ItemType::Shop)
+        if (item->getType() != ModelType::Shop)
         {
             Logger::log(LogLevel::Error, "Wrong type of item (%s).", ToString(vnum));
             return false;
         }
-        ShopItem * shop = genericItem->toShopItem();
+        ShopItem * shop = item->toShopItem();
         shop->shopName = result->getNextString();
         shop->shopBuyTax = result->getNextUnsignedInteger();
         shop->shopSellTax = result->getNextUnsignedInteger();

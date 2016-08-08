@@ -27,10 +27,6 @@ class ArmorItem: public Item
 
         virtual ~ArmorItem();
 
-        virtual ItemType getType() const;
-
-        virtual std::string getTypeName() const;
-
         virtual void getSheet(Table & sheet) const;
 
         /// Provides the AC of the armor based on its quality, material and condition.

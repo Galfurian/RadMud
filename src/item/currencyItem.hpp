@@ -27,7 +27,7 @@ class CurrencyItem: public Item
 
         virtual ~CurrencyItem();
 
-        virtual ItemType getType() const;
+        virtual ModelType getType() const;
 
         virtual std::string getTypeName() const;
 

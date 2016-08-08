@@ -69,16 +69,6 @@ Item::~Item()
         this->getNameCapital());
 }
 
-ItemType Item::getType() const
-{
-    return ItemType::Generic;
-}
-
-std::string Item::getTypeName() const
-{
-    return "generic";
-}
-
 bool Item::check(bool complete)
 {
     bool safe = true;
@@ -397,6 +387,16 @@ void Item::getSheet(Table & sheet) const
         sheet.addRow( { "Used  Space", ToString(this->getUsedSpace()) });
         sheet.addRow( { "Total Space", ToString(this->getTotalSpace()) });
     }
+}
+
+ModelType Item::getType() const
+{
+    return this->model->getType();
+}
+
+std::string Item::getTypeName() const
+{
+    return this->model->getTypeName();
 }
 
 bool Item::hasKey(std::string key)

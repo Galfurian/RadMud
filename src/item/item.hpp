@@ -37,20 +37,6 @@ class ArmorItem;
 class WeaponItem;
 class CurrencyItem;
 
-/// Used to determine the type of item.
-typedef enum class ItemTypes
-{
-    Generic,
-    /// A shop.
-    Shop,
-    /// An armor.
-    Armor,
-    /// A weapon.
-    Weapon,
-    /// Currency.
-    Currency
-} ItemType;
-
 /// @brief Holds details about items.
 class Item
 {
@@ -58,7 +44,7 @@ class Item
         /// Item vnum.
         int vnum;
         /// The type of item.
-        ItemType type;
+        ModelType type;
         /// Item model.
         ItemModel * model;
         /// The player that created the item.
@@ -108,12 +94,6 @@ class Item
         /// @brief Destructor - Is a method which is automatically invoked when the object is destroyed.
         virtual ~Item();
 
-        /// @return Provides the type of item.
-        virtual ItemType getType() const;
-
-        /// @return Provides a string representing the type of item.
-        virtual std::string getTypeName() const;
-
         /// @brief Check the correctness of the item.
         /// @return <b>True</b> if the item has correct values,<br>
         ///         <b>False</b> otherwise.
@@ -147,6 +127,12 @@ class Item
         /// @brief Fills the provided table with the information concerning the item.
         /// @param sheet The table that has to be filled.
         virtual void getSheet(Table & sheet) const;
+
+        /// @return Provides the type of item.
+        ModelType getType() const;
+
+        /// @return Provides a string representing the type of item.
+        std::string getTypeName() const;
 
         /// @brief Check if the item has the desired key.
         /// @param key The key to search.

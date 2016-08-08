@@ -36,16 +36,6 @@ ShopItem::~ShopItem()
     // Nothing to do.
 }
 
-ItemType ShopItem::getType() const
-{
-    return ItemType::Shop;
-}
-
-std::string ShopItem::getTypeName() const
-{
-    return "shop";
-}
-
 bool ShopItem::check(bool complete)
 {
     return Item::check(complete);

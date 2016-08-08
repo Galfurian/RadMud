@@ -27,10 +27,6 @@ class WeaponItem: public Item
 
         virtual ~WeaponItem();
 
-        virtual ItemType getType() const;
-
-        virtual std::string getTypeName() const;
-
         virtual void getSheet(Table & sheet) const;
 
         unsigned int rollDamage() const;

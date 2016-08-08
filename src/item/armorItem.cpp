@@ -31,16 +31,6 @@ ArmorItem::~ArmorItem()
     // Nothing to do.
 }
 
-ItemType ArmorItem::getType() const
-{
-    return ItemType::Armor;
-}
-
-std::string ArmorItem::getTypeName() const
-{
-    return "armor";
-}
-
 void ArmorItem::getSheet(Table & sheet) const
 {
     // Call the function of the father class.

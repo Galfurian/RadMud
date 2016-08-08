@@ -46,7 +46,7 @@ void DoAssign(Character * character, std::istream & sArgs)
         character->sendMsg("You don't see the desired building here.\n");
         return;
     }
-    if (building->getType() == ItemType::Shop)
+    if (building->getType() == ModelType::Shop)
     {
         ShopItem * shop = building->toShopItem();
         if (shop->shopKeeper == mobile)
