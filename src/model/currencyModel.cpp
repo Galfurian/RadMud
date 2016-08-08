@@ -18,6 +18,9 @@
 
 #include "currencyModel.hpp"
 
+#include "../material.hpp"
+#include "../mud.hpp"
+
 CurrencyModel::CurrencyModel()
 {
     // Nothing to do.
@@ -58,4 +61,89 @@ void CurrencyModel::getSheet(Table & sheet) const
     ItemModel::getSheet(sheet);
     // Add a divider.
     //sheet.addDivider();
+}
+
+Item * CurrencyModel::createItem(
+    std::string maker,
+    Material * composition,
+    const ItemQuality & itemQuality)
+{
+    auto it = std::find(prices.begin(), prices.end(), composition->vnum);
+    if (it != prices.end())
+    {
+        return ItemModel::createItem(maker, composition, itemQuality);
+    }
+    else
+    {
+        Logger::log(LogLevel::Error, "Material is not allowed.");
+        return nullptr;
+    }
+}
+
+bool CurrencyModel::addPrice(const int & materialVnum, const unsigned int & price)
+{
+    auto it = std::find(prices.begin(), prices.end(), materialVnum);
+    if (it == prices.end())
+    {
+        prices.push_back(Price(materialVnum, price));
+        this->sortList();
+        return true;
+    }
+    return false;
+}
+
+bool CurrencyModel::findPrice(const int & materialVnum, unsigned int & price) const
+{
+    auto it = std::find(prices.begin(), prices.end(), materialVnum);
+    if (it != prices.end())
+    {
+        price = it->price;
+        return true;
+    }
+    return false;
+}
+
+bool CurrencyModel::generateCurrency(
+    const std::string & maker,
+    const unsigned int & value,
+    std::vector<Item *> & coins)
+{
+    auto status = true;
+    auto currentValue = value;
+    for (auto it : prices)
+    {
+        auto coinMaterial = Mud::instance().findMaterial(it.material);
+        unsigned int coinQuantity = (currentValue / it.price);
+        for (unsigned int it2 = 0; it2 < coinQuantity; ++it2)
+        {
+            auto generated = this->createItem(maker, coinMaterial, ItemQuality::Normal);
+            if (generated == nullptr)
+            {
+                status = false;
+                break;
+            }
+            else
+            {
+                coins.push_back(generated);
+            }
+        }
+        if (!status)
+        {
+            break;
+        }
+        currentValue -= it.price * coinQuantity;
+    }
+    if (!status)
+    {
+        for (auto generated : coins)
+        {
+            delete (generated);
+        }
+    }
+    return status;
+}
+
+void CurrencyModel::sortList()
+{
+    std::sort(prices.begin(), prices.end(), std::greater<Price>());
 }

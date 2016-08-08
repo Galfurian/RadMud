@@ -45,8 +45,6 @@ class Mobile: public Character
         std::vector<std::string> actions;
         /// Mobile buffer of received message.
         std::string message_buffer;
-        /// Mobile most important variable, deterine if the mobile it's alive or not.
-        bool alive;
         /// How many seconds before respawn.
         TimeClock nextRespawn;
         /// The character that is controlling this one.
@@ -80,6 +78,11 @@ class Mobile: public Character
 
         /// @brief Initialize mobile.
         void respawn();
+
+        /// @brief Checks if the mobile is alive.
+        /// @return <b>True</b> if is alive,<br>
+        ///         <b>False</b> otherwise.
+        bool isAlive() const;
 
         /// @brief Check if the mobile has the desired key.
         /// @param key The key to find.

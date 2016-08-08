@@ -35,8 +35,6 @@ SQLiteDbms::SQLiteDbms()
     loaders.push_back(TableLoader("News", LoadNews));
     loaders.push_back(TableLoader("Material", LoadMaterial));
     loaders.push_back(TableLoader("Skill", LoadSkill));
-    loaders.push_back(TableLoader("Faction", LoadFaction));
-    loaders.push_back(TableLoader("Race", LoadRace));
     loaders.push_back(TableLoader("Continent", LoadContinent));
     loaders.push_back(TableLoader("Area", LoadArea));
     loaders.push_back(TableLoader("Room", LoadRoom));
@@ -44,6 +42,8 @@ SQLiteDbms::SQLiteDbms()
     loaders.push_back(TableLoader("AreaList", LoadAreaList));
     loaders.push_back(TableLoader("TravelPoint", LoadTravelPoint));
     loaders.push_back(TableLoader("Model", LoadModel));
+    loaders.push_back(TableLoader("Faction", LoadFaction));
+    loaders.push_back(TableLoader("Race", LoadRace));
     loaders.push_back(TableLoader("Liquid", LoadLiquid));
     loaders.push_back(TableLoader("Item", LoadItem));
     loaders.push_back(TableLoader("ItemContent", LoadContent));
@@ -54,7 +54,8 @@ SQLiteDbms::SQLiteDbms()
     loaders.push_back(TableLoader("Production", LoadProduction));
     loaders.push_back(TableLoader("Mobile", LoadMobile));
     loaders.push_back(TableLoader("Building", LoadBuilding));
-    loaders.push_back(TableLoader("ItemShop", LoadItemShop));
+    loaders.push_back(TableLoader("Shop", LoadShop));
+    loaders.push_back(TableLoader("Currency", LoadCurrency));
 }
 
 SQLiteDbms::~SQLiteDbms()

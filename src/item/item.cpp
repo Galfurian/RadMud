@@ -37,13 +37,17 @@
 #include "shopItem.hpp"
 #include "armorItem.hpp"
 #include "weaponItem.hpp"
+#include "currencyItem.hpp"
 
 Item::Item() :
         vnum(),
         type(),
         model(),
         maker(),
+        price(),
+        weight(),
         condition(),
+        maxCondition(),
         composition(),
         quality(ItemQuality::Normal),
         flags(),
@@ -52,8 +56,7 @@ Item::Item() :
         container(),
         currentSlot(EquipmentSlot::None),
         content(),
-        contentLiq(),
-        customWeight()
+        contentLiq()
 {
 }
 
@@ -64,16 +67,6 @@ Item::~Item()
         "Deleted item\t\t[%s]\t\t(%s)",
         ToString(this->vnum),
         this->getNameCapital());
-}
-
-ItemType Item::getType() const
-{
-    return ItemType::Generic;
-}
-
-std::string Item::getTypeName() const
-{
-    return "generic";
 }
 
 bool Item::check(bool complete)
@@ -163,7 +156,6 @@ bool Item::destroy()
     {
         if (this->model->getType() != ModelType::Corpse)
         {
-
             Logger::log(LogLevel::Error, "Removing item '" + this->getName() + "' from DB;");
             // Remove the item from the database.
             if (!this->removeOnDB())
@@ -188,7 +180,10 @@ bool Item::createOnDB()
     arguments.push_back(ToString(this->vnum));
     arguments.push_back(ToString(model->vnum));
     arguments.push_back(this->maker);
+    arguments.push_back(ToString(this->getPrice()));
+    arguments.push_back(ToString(this->getWeight()));
     arguments.push_back(ToString(this->condition));
+    arguments.push_back(ToString(this->maxCondition));
     arguments.push_back(ToString(this->composition->vnum));
     arguments.push_back(ToString(this->quality.toUInt()));
     arguments.push_back(ToString(this->flags));
@@ -321,9 +316,15 @@ bool Item::updateOnDB()
 
 bool Item::removeOnDB()
 {
-    bool result = SQLiteDbms::instance().deleteFrom(
-        "Item",
-        { std::make_pair("vnum", ToString(vnum)) });
+    // Prepare the where clause.
+    QueryList main = { std::make_pair("vnum", ToString(vnum)) };
+    auto result = SQLiteDbms::instance().deleteFrom("Item", main);
+    // Remove the item from everywhere.
+    QueryList other = { std::make_pair("item", ToString(vnum)) };
+    SQLiteDbms::instance().deleteFrom("ItemPlayer", other);
+    SQLiteDbms::instance().deleteFrom("ItemRoom", other);
+    SQLiteDbms::instance().deleteFrom("ItemContent", other);
+    SQLiteDbms::instance().deleteFrom("Shop", other);
     if (!result)
     {
         Logger::log(LogLevel::Error, "Error during item removal from table Item.");
@@ -344,6 +345,8 @@ void Item::getSheet(Table & sheet) const
     sheet.addRow( { "condition", ToString(condition) + "/" + ToString(this->getMaxCondition()) });
     sheet.addRow( { "Material", composition->name });
     sheet.addRow( { "Quality", quality.toString() });
+    sheet.addRow( { "Weight", ToString(this->getWeight()) });
+    sheet.addRow( { "Price", ToString(this->getPrice()) });
     sheet.addRow( { "Flags", ToString(flags) });
     TableRow locationRow = { "Location" };
     if (room != nullptr)
@@ -381,18 +384,37 @@ void Item::getSheet(Table & sheet) const
         sheet.addRow( { contentLiq.first->getNameCapital(), ToString(contentLiq.second) });
         sheet.addDivider();
     }
-    sheet.addRow( { "Weight", ToString(this->getWeight()) });
     if (this->isAContainer() || (model->getType() == ModelType::LiquidContainer))
     {
-        sheet.addRow( { "Total Weight", ToString(this->getTotalWeight()) });
         sheet.addRow( { "Free  Space", ToString(this->getFreeSpace()) });
         sheet.addRow( { "Used  Space", ToString(this->getUsedSpace()) });
         sheet.addRow( { "Total Space", ToString(this->getTotalSpace()) });
     }
-    if (customWeight != 0)
+}
+
+bool Item::canDeconstruct(std::string & error) const
+{
+    if (!HasFlag(this->flags, ItemFlag::Built))
     {
-        sheet.addRow( { "Custom Weight", ToString(customWeight) });
+        error = "It is not built.";
+        return false;
     }
+    if (!this->isEmpty())
+    {
+        error = "You must remove all the content first.";
+        return false;
+    }
+    return true;
+}
+
+ModelType Item::getType() const
+{
+    return this->model->getType();
+}
+
+std::string Item::getTypeName() const
+{
+    return this->model->getTypeName();
 }
 
 bool Item::hasKey(std::string key)
@@ -413,14 +435,7 @@ bool Item::hasKey(std::string key)
 
 unsigned int Item::getMaxCondition() const
 {
-    // Evaluate the base condition.
-    auto cndBase = this->model->condition;
-    // Evaluate the modifier due to item's quality.
-    auto cndQuality = static_cast<unsigned int>(cndBase * quality.getModifier());
-    // Evaluate the modifier due to item's material.
-    auto cndMaterial = static_cast<unsigned int>(cndBase * this->composition->getHardnessModifier());
-    // The resulting price.
-    return ((cndBase + cndQuality + cndMaterial) / 3);
+    return this->maxCondition;
 }
 
 bool Item::triggerDecay()
@@ -459,42 +474,22 @@ std::string Item::getConditionDescription()
 unsigned int Item::getPrice() const
 {
     // Add the base price.
-    auto pcBase = this->model->price;
-    // Evaluate the modifier due to item's quality.
-    auto pcQuality = static_cast<unsigned int>(pcBase * quality.getModifier());
+    auto pcBase = this->price;
     // Evaluate the modifier due to item's condition.
     auto pcCondition = static_cast<unsigned int>(pcBase * this->getConditionModifier());
-    // Evaluate the modifier due to item's material.
-    auto pcMaterial = static_cast<unsigned int>(pcBase * this->composition->getWorthModifier());
     // The resulting price.
-    return ((pcBase + pcQuality + pcCondition + pcMaterial) / 4);
+    return ((pcBase + pcCondition) / 2);
 }
 
 unsigned int Item::getWeight() const
 {
-    // Add the base weight.
-    auto wgBase = this->model->weight;
-    if (this->customWeight != 0)
-    {
-        wgBase = this->customWeight;
-    }
-    // Evaluate the modifier due to item's quality.
-    auto wgQuality = static_cast<unsigned int>(wgBase * (1 / quality.getModifier()));
-    // Evaluate the modifier due to item's material.
-    auto wgMaterial = static_cast<unsigned int>(wgBase * this->composition->getLightnessModifier());
-    // Evaluate the result.
-    return ((wgBase + wgQuality + wgMaterial) / 3);
-}
-
-unsigned int Item::getTotalWeight() const
-{
     // Add the default weight of the model.
-    unsigned int totalWeight = this->getWeight();
+    unsigned int totalWeight = this->weight;
     if (!this->isEmpty())
     {
         for (auto iterator : content)
         {
-            totalWeight += iterator->getTotalWeight();
+            totalWeight += iterator->getWeight();
         }
     }
     else if (model->getType() == ModelType::LiquidContainer)
@@ -537,7 +532,7 @@ std::string Item::getLook()
     // Print the content.
     output += this->lookContent();
     output += "It weights about ";
-    output += Formatter::yellow() + ToString(this->getTotalWeight()) + Formatter::reset();
+    output += Formatter::yellow() + ToString(this->getWeight()) + Formatter::reset();
     output += " " + mud_measure + ".\n";
     return output;
 }
@@ -637,7 +632,7 @@ unsigned int Item::getUsedSpace() const
     {
         for (auto iterator : content)
         {
-            used += iterator->model->weight;
+            used += iterator->getWeight();
         }
     }
     else if (model->getType() == ModelType::LiquidContainer)
@@ -664,25 +659,30 @@ unsigned int Item::getFreeSpace() const
     }
 }
 
+bool Item::canContain(Item * item) const
+{
+    return (item->getWeight() <= this->getFreeSpace());
+}
+
 bool Item::putInside(Item * item)
 {
-    if (item->model->weight > this->getFreeSpace())
+    if (this->canContain(item))
     {
-        return false;
+        // Insert in the container table.
+        std::vector<std::string> arguments;
+        arguments.push_back(ToString(vnum));       // Container
+        arguments.push_back(ToString(item->vnum)); // Content
+        if (!SQLiteDbms::instance().insertInto("ItemContent", arguments))
+        {
+            return false;
+        }
+        // Put the item into the container.
+        content.push_back(item);
+        // Set the container value to the content item.
+        item->container = this;
+        return true;
     }
-    // Insert in the container table.
-    std::vector<std::string> arguments;
-    arguments.push_back(ToString(vnum));       // Container
-    arguments.push_back(ToString(item->vnum)); // Content
-    if (!SQLiteDbms::instance().insertInto("ItemContent", arguments))
-    {
-        return false;
-    }
-    // Put the item into the container.
-    content.push_back(item);
-    // Set the container value to the content item.
-    item->container = this;
-    return true;
+    return false;
 }
 
 bool Item::takeOut(Item * item)
@@ -707,48 +707,57 @@ bool Item::takeOut(Item * item)
     return removed;
 }
 
-bool Item::pourIn(Liquid * liquid, const unsigned int & quantity)
+bool Item::canContain(Liquid * liquid, const unsigned int & quantity) const
 {
     if (quantity > this->getFreeSpace())
     {
         return false;
     }
-    if (contentLiq.first == nullptr)
-    {
-        // Insert in the liquid table the value.
-        std::vector<std::string> arguments;
-        arguments.push_back(ToString(vnum));         // Container
-        arguments.push_back(ToString(liquid->vnum)); // Content
-        arguments.push_back(ToString(quantity));     // Quantity
-        // Execute the insert.
-        if (!SQLiteDbms::instance().insertInto("ItemContentLiq", arguments))
-        {
-            return false;
-        }
-        // Set the liquid quantity.
-        contentLiq.first = liquid;
-        contentLiq.second = quantity;
-    }
-    else if (contentLiq.first == liquid)
-    {
-        QueryList value;
-        value.push_back(std::make_pair("quantity", ToString(contentLiq.second)));
-        QueryList where;
-        where.push_back(std::make_pair("container", ToString(vnum)));
-        where.push_back(std::make_pair("content", ToString(liquid->vnum)));
-        // Update value inside the database.
-        if (!SQLiteDbms::instance().updateInto("ItemContentLiq", value, where))
-        {
-            return false;
-        }
-        // Increment the liquid quantity.
-        contentLiq.second += quantity;
-    }
-    else
+    else if (contentLiq.first != liquid)
     {
         return false;
     }
     return true;
+}
+
+bool Item::pourIn(Liquid * liquid, const unsigned int & quantity)
+{
+    if (this->canContain(liquid, quantity))
+    {
+        if (contentLiq.first == nullptr)
+        {
+            // Insert in the liquid table the value.
+            std::vector<std::string> arguments;
+            arguments.push_back(ToString(vnum));         // Container
+            arguments.push_back(ToString(liquid->vnum)); // Content
+            arguments.push_back(ToString(quantity));     // Quantity
+            // Execute the insert.
+            if (!SQLiteDbms::instance().insertInto("ItemContentLiq", arguments))
+            {
+                return false;
+            }
+            // Set the liquid quantity.
+            contentLiq.first = liquid;
+            contentLiq.second = quantity;
+        }
+        else if (contentLiq.first == liquid)
+        {
+            QueryList value;
+            value.push_back(std::make_pair("quantity", ToString(contentLiq.second)));
+            QueryList where;
+            where.push_back(std::make_pair("container", ToString(vnum)));
+            where.push_back(std::make_pair("content", ToString(liquid->vnum)));
+            // Update value inside the database.
+            if (!SQLiteDbms::instance().updateInto("ItemContentLiq", value, where))
+            {
+                return false;
+            }
+            // Increment the liquid quantity.
+            contentLiq.second += quantity;
+        }
+        return true;
+    }
+    return false;
 }
 
 bool Item::pourOut(const unsigned int & quantity)
@@ -918,15 +927,17 @@ ShopItem * Item::toShopItem()
 {
     return static_cast<ShopItem *>(this);
 }
-
 ArmorItem * Item::toArmorItem()
 {
     return static_cast<ArmorItem *>(this);
 }
-
 WeaponItem * Item::toWeaponItem()
 {
     return static_cast<WeaponItem *>(this);
+}
+CurrencyItem * Item::toCurrencyItem()
+{
+    return static_cast<CurrencyItem *>(this);
 }
 
 void Item::luaRegister(lua_State * L)
@@ -938,6 +949,8 @@ void Item::luaRegister(lua_State * L)
     .addFunction("getName", &Item::getName) //
     .addData("maker", &Item::maker) //
     .addData("condition", &Item::condition) //
+    .addData("weight", &Item::weight) //
+    .addData("price", &Item::price) //
     .addData("composition", &Item::composition) //
     .addData("room", &Item::room) //
     .addData("owner", &Item::owner) //
@@ -967,6 +980,7 @@ Item * GenerateItem(const ModelType & type)
         case ModelType::Book:
         case ModelType::Container:
         case ModelType::Currency:
+            return new CurrencyItem();
         case ModelType::Food:
         case ModelType::Furniture:
         case ModelType::Key:
@@ -1031,5 +1045,5 @@ bool OrderItemByName(Item * first, Item * second)
 
 bool OrderItemByWeight(Item * first, Item * second)
 {
-    return first->getTotalWeight() < second->getTotalWeight();
+    return first->getWeight() < second->getWeight();
 }

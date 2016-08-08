@@ -35,18 +35,7 @@ class Material;
 class ShopItem;
 class ArmorItem;
 class WeaponItem;
-
-/// Used to determine the type of item.
-typedef enum class ItemTypes
-{
-    Generic,
-    /// A shop.
-    Shop,
-    /// An armor.
-    Armor,
-    /// A weapon.
-    Weapon
-} ItemType;
+class CurrencyItem;
 
 /// @brief Holds details about items.
 class Item
@@ -55,13 +44,19 @@ class Item
         /// Item vnum.
         int vnum;
         /// The type of item.
-        ItemType type;
+        ModelType type;
         /// Item model.
         ItemModel * model;
         /// The player that created the item.
         std::string maker;
-        /// In which condition is the item.
+        /// The item's price.
+        unsigned int price;
+        /// The item's weight.
+        unsigned int weight;
+        /// The item's condition.
         unsigned int condition;
+        /// The maximum condition.
+        unsigned int maxCondition;
         /// The composing material of the item.
         Material * composition;
         /// The quality of the item.
@@ -80,8 +75,6 @@ class Item
         std::vector<Item *> content;
         /// The liquid inside the container.
         LiquidContent contentLiq;
-        /// Customized weight.
-        unsigned int customWeight;
 
         /// @brief Constructor - Create a new empty item.
         Item();
@@ -100,12 +93,6 @@ class Item
 
         /// @brief Destructor - Is a method which is automatically invoked when the object is destroyed.
         virtual ~Item();
-
-        /// @return Provides the type of item.
-        virtual ItemType getType() const;
-
-        /// @return Provides a string representing the type of item.
-        virtual std::string getTypeName() const;
 
         /// @brief Check the correctness of the item.
         /// @return <b>True</b> if the item has correct values,<br>
@@ -128,20 +115,31 @@ class Item
         virtual bool createOnDB();
 
         /// @brief Save the item on database.
-        /// @return <b>True</b> if the execution goes well,<br><b>False</b> otherwise.
+        /// @return <b>True</b> if the execution goes well,<br>
+        ///         <b>False</b> otherwise.
         virtual bool updateOnDB();
 
         /// @brief Remove the item on database.
-        /// @return <b>True</b> if the execution goes well,<br><b>False</b> otherwise.
+        /// @return <b>True</b> if the execution goes well,<br>
+        ///         <b>False</b> otherwise.
         virtual bool removeOnDB();
 
         /// @brief Fills the provided table with the information concerning the item.
         /// @param sheet The table that has to be filled.
         virtual void getSheet(Table & sheet) const;
 
+        virtual bool canDeconstruct(std::string & error) const;
+
+        /// @return Provides the type of item.
+        ModelType getType() const;
+
+        /// @return Provides a string representing the type of item.
+        std::string getTypeName() const;
+
         /// @brief Check if the item has the desired key.
         /// @param key The key to search.
-        /// @return <b>True</b> if the operations succeeded,<br><b>False</b> Otherwise.
+        /// @return <b>True</b> if the operations succeeded,<br>
+        ///         <b>False</b> Otherwise.
         bool hasKey(std::string key);
 
         /// @brief Provides the maximum condition of the item, given
@@ -161,15 +159,11 @@ class Item
         std::string getConditionDescription();
 
         /// Provides the price of the item based on its quality, material and condition.
-        unsigned int getPrice() const;
-
-        /// @brief Get the item weight.
-        /// @return The weight of just the item.
-        unsigned int getWeight() const;
+        virtual unsigned int getPrice() const;
 
         /// @brief Get the item weight, plus eventually contained item weight.
         /// @return The total weight of the item.
-        unsigned int getTotalWeight() const;
+        virtual unsigned int getWeight() const;
 
         /// @brief Return the name of the item.
         /// @return The name of the item.
@@ -213,9 +207,12 @@ class Item
         /// @return The free unit of space as an integer.
         unsigned int getFreeSpace() const;
 
+        bool canContain(Item * item) const;
+
         /// @brief Load an item inside the container and update the database.
         /// @param item The item to load in.
-        /// @return <b>True</b> if the item is a container,<br><b>False</b> otherwise.
+        /// @return <b>True</b> if the item is a container,<br>
+        ///         <b>False</b> otherwise.
         bool putInside(Item * item);
 
         /// @brief Extract an item from the container.
@@ -224,10 +221,13 @@ class Item
         ///         <b>False</b> otherwise.
         bool takeOut(Item * item);
 
+        bool canContain(Liquid * liquid, const unsigned int & quantity) const;
+
         /// @brief Load some liquid inside the container and update the database.
         /// @param liquid   The liquid to load in.
         /// @param quantity The quantity of liquid.
-        /// @return <b>True</b> if the operation is a success,<br><b>False</b> otherwise.
+        /// @return <b>True</b> if the operation is a success,<br>
+        ///         <b>False</b> otherwise.
         bool pourIn(Liquid * liquid, const unsigned int & quantity);
 
         /// @brief Extract some liquid from the container and update the database.
@@ -259,12 +259,12 @@ class Item
 
         /// @brief Returns the model <b>statically</b> casted to Shop.
         ShopItem * toShopItem();
-
         /// @brief Returns the model <b>statically</b> casted to Armor.
         ArmorItem * toArmorItem();
-
         /// @brief Returns the model <b>statically</b> casted to Weapon.
         WeaponItem * toWeaponItem();
+        /// @brief Returns the model <b>statically</b> casted to Currency.
+        CurrencyItem * toCurrencyItem();
 
         /// @brief Function used to register inside the lua environment the class.
         /// @param L The lua environment.

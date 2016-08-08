@@ -62,8 +62,8 @@ ItemModel::ItemModel() :
         description(),
         slot(),
         modelFlags(),
-        weight(),
-        price(),
+        baseWeight(),
+        basePrice(),
         condition(),
         decay(),
         material(),
@@ -103,8 +103,6 @@ void ItemModel::getSheet(Table & sheet) const
     sheet.addRow( { "Type", this->getTypeName() });
     sheet.addRow( { "Slot", GetEquipmentSlotName(this->slot) });
     sheet.addRow( { "Flags", GetModelFlagString(this->modelFlags) });
-    sheet.addRow( { "Weight", ToString(this->weight) });
-    sheet.addRow( { "Price", ToString(this->price) });
     sheet.addRow( { "Condition", ToString(this->condition) });
     sheet.addRow( { "Decay", ToString(this->decay) });
     sheet.addRow( { "Material", GetMaterialTypeName(this->material) });
@@ -112,8 +110,18 @@ void ItemModel::getSheet(Table & sheet) const
     sheet.addRow( { "Condition", ToString(this->tileSet) + ":" + ToString(this->tileId) });
 }
 
-Item * ItemModel::createItem(std::string maker, Material * composition, ItemQuality itemQuality)
+Item * ItemModel::createItem(
+    std::string maker,
+    Material * composition,
+    const ItemQuality & itemQuality)
 {
+    if (composition->type != this->material)
+    {
+        Logger::log(LogLevel::Error, "Wrong type of material.");
+        // Return pointer to nothing.
+        return nullptr;
+    }
+
     // Instantiate the new item.
     Item * newItem = GenerateItem(this->getType());
     if (newItem == nullptr)
@@ -123,24 +131,45 @@ Item * ItemModel::createItem(std::string maker, Material * composition, ItemQual
         return nullptr;
     }
 
-    // If the new item is a corpse, don't use the normal item's vnum.
-    if (this->getType() == ModelType::Corpse)
-    {
-        newItem->vnum = Mud::instance().getMinVnumCorpse() - 1;
-    }
-    else
-    {
-        newItem->vnum = Mud::instance().getMaxVnumItem() + 1;
-    }
-
-    // First set: Model, Maker, Composition, Quality.
+    // First set: Vnum, Model, Maker, Composition, Quality.
+    newItem->vnum = Mud::instance().getMaxVnumItem() + 1;
     newItem->model = this;
     newItem->maker = maker;
     newItem->composition = composition;
     newItem->quality = itemQuality;
 
     // Then set the rest.
-    newItem->condition = newItem->getMaxCondition();
+    {
+        // Evaluate the base value.
+        auto valBase = this->basePrice;
+        // Evaluate the modifier due to item's quality.
+        auto valQuality = static_cast<unsigned int>(valBase * itemQuality.getModifier());
+        // Evaluate the modifier due to item's material.
+        auto valMaterial = static_cast<unsigned int>(valBase * composition->getWorthModifier());
+        // Evaluate the result.
+        newItem->price = ((valBase + valQuality + valMaterial) / 3);
+    }
+    {
+        // Evaluate the base value.
+        auto valBase = this->baseWeight;
+        // Evaluate the modifier due to item's quality.
+        auto valQuality = static_cast<unsigned int>(valBase * (1 / itemQuality.getModifier()));
+        // Evaluate the modifier due to item's material.
+        auto valMaterial = static_cast<unsigned int>(valBase * composition->getLightnessModifier());
+        // Evaluate the result.
+        newItem->weight = ((valBase + valQuality + valMaterial) / 3);
+    }
+    {
+        // Evaluate the base value.
+        auto valBase = this->condition;
+        // Evaluate the modifier due to item's quality.
+        auto valQuality = static_cast<unsigned int>(valBase * itemQuality.getModifier());
+        // Evaluate the modifier due to item's material.
+        auto valMaterial = static_cast<unsigned int>(valBase * composition->getHardnessModifier());
+        // Evaluate the result.
+        newItem->maxCondition = ((valBase + valQuality + valMaterial) / 3);
+        newItem->condition = newItem->maxCondition;
+    }
     newItem->flags = 0;
     newItem->room = nullptr;
     newItem->owner = nullptr;
@@ -148,13 +177,6 @@ Item * ItemModel::createItem(std::string maker, Material * composition, ItemQual
     newItem->currentSlot = slot;
     newItem->content = std::vector<Item *>();
     newItem->contentLiq = LiquidContent();
-
-    // If the newly created item is a corpse, return it and don't save it on DB.
-    if (this->getType() == ModelType::Corpse)
-    {
-        Mud::instance().addCorpse(newItem);
-        return newItem;
-    }
 
     if (!newItem->check())
     {
@@ -164,8 +186,6 @@ Item * ItemModel::createItem(std::string maker, Material * composition, ItemQual
         // Return pointer to nothing.
         return nullptr;
     }
-
-    SQLiteDbms::instance().beginTransaction();
     if (newItem->createOnDB())
     {
         // Insert into the item_list the new item.
@@ -174,14 +194,11 @@ Item * ItemModel::createItem(std::string maker, Material * composition, ItemQual
     else
     {
         Logger::log(LogLevel::Error, "Cannot save the new item on DB.");
-        // Rollback the transation.
-        SQLiteDbms::instance().rollbackTransection();
         // Delete the item.
         delete (newItem);
         // Return pointer to nothing.
         return nullptr;
     }
-    SQLiteDbms::instance().endTransaction();
     return newItem;
 }
 
@@ -197,8 +214,6 @@ bool ItemModel::check()
     {
         assert(slot != EquipmentSlot::None);
     }
-    assert(weight > 0);
-    assert(price > 0);
     assert(condition > 0);
     assert(decay > 0);
     assert(this->material != MaterialType::NoType);
@@ -266,8 +281,6 @@ void ItemModel::luaRegister(lua_State * L)
     luabridge::getGlobalNamespace(L) //
     .beginClass<ItemModel>("ItemModel") //
     .addData("vnum", &ItemModel::vnum) //
-    .addData("weight", &ItemModel::weight) //
-    .addData("price", &ItemModel::price) //
     .addData("condition", &ItemModel::condition) //
     .addData("decay", &ItemModel::decay) //
     .addFunction("getType", &ItemModel::getType) //

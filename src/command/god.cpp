@@ -128,7 +128,7 @@ void DoTransfer(Character * character, std::istream & sArgs)
     }
     if (target->isMobile())
     {
-        if (!target->toMobile()->alive)
+        if (!target->toMobile()->isAlive())
         {
             character->sendMsg("You cannot transfer a dead mobile.\n");
             return;
@@ -327,7 +327,7 @@ void DoItemCreate(Character * character, std::istream & sArgs)
     if ((arguments.size() != 2) && (arguments.size() != 3))
     {
         character->sendMsg("What do you want to create?\n");
-        return; // Skip the rest of the function.
+        return;
     }
     ItemModel * itemModel = Mud::instance().findItemModel(ToInt(arguments[0].first));
     Material * material = Mud::instance().findMaterial(ToInt(arguments[1].first));
@@ -353,13 +353,22 @@ void DoItemCreate(Character * character, std::istream & sArgs)
         quality = ItemQuality(itemQualityValue);
     }
     // Create the item.
+    SQLiteDbms::instance().beginTransaction();
     Item * item = itemModel->createItem(character->getName(), material, quality);
     if (item == nullptr)
     {
+        SQLiteDbms::instance().rollbackTransection();
         character->sendMsg("Creation failed.\n");
         return;
     }
     character->addInventoryItem(item);
+    if (!item->updateOnDB())
+    {
+        SQLiteDbms::instance().rollbackTransection();
+        character->sendMsg("Creation failed.\n");
+        return;
+    }
+    SQLiteDbms::instance().endTransaction();
     character->sendMsg(
         "You produce '%s' out of your apparently empty top hat.\n",
         Formatter::yellow() + item->getName() + Formatter::reset());
@@ -566,40 +575,40 @@ void DoRoomCreate(Character * character, std::istream & sArgs)
     if (arguments.size() != 1)
     {
         character->sendMsg("Usage: [direction]\n");
-        return; // Skip the rest of the function.
+        return;
     }
     Room * currentRoom = character->room;
     Area * currentArea = currentRoom->area;
     if (currentArea == nullptr)
     {
         character->sendMsg("Your room's area has not been defined!\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Check if it's a direction.
     Direction direction = Mud::instance().findDirection(arguments[0].first, false);
     if (direction == Direction::None)
     {
         character->sendMsg("You must insert a valid direction!\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Get the coordinate modifier.
     Coordinates targetCoord = currentRoom->coord + direction.getCoordinates();
     if (!currentArea->inBoundaries(targetCoord))
     {
         character->sendMsg("Sorry but in that direction you will go outside the boundaries.\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Find the room.
     Room * targetRoom = currentArea->getRoom(targetCoord);
     if (targetRoom)
     {
         character->sendMsg("Sorry but in that direction there is already a room.\n");
-        return; // Skip the rest of the function.
+        return;
     }
     if (!CreateRoom(targetCoord, currentRoom))
     {
         character->sendMsg("Sorry but you couldn't create the room.\n");
-        return; // Skip the rest of the function.
+        return;
     }
     character->sendMsg("You have created a room at: %s\n", targetCoord.toString());
 }
@@ -614,47 +623,47 @@ void DoRoomDelete(Character * character, std::istream & sArgs)
     if (arguments.size() != 1)
     {
         character->sendMsg("Usage: [direction]\n");
-        return; // Skip the rest of the function.
+        return;
     }
     Area * currentArea = character->room->area;
     if (currentArea == nullptr)
     {
         character->sendMsg("Your room's area has not been defined!\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Check if it's a direction.
     Direction direction = Mud::instance().findDirection(arguments[0].first, false);
     if (direction == Direction::None)
     {
         character->sendMsg("You must insert a valid direction!\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Get the coordinate modifier.
     Coordinates targetCoord = character->room->coord + direction.getCoordinates();
     if (!currentArea->inBoundaries(targetCoord))
     {
         character->sendMsg("Sorry but in that direction you will go outside the boundaries.\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Find the room.
     Room * targetRoom = currentArea->getRoom(targetCoord);
     if (targetRoom == nullptr)
     {
         character->sendMsg("Sorry but in that direction there is no room.\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Remove the room from the Database.
     if (!targetRoom->removeOnDB())
     {
         character->sendMsg("Sorry but you couldn't delete the selected room.\n");
         character->sendMsg("Probably there are items or characters in that room.\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Remove the room from the list of rooms.
     if (!Mud::instance().remRoom(targetRoom))
     {
         character->sendMsg("You cannot remove the room.\n");
-        return; // Skip the rest of the function.
+        return;
     }
 
     // Delete completely the room.
@@ -993,7 +1002,7 @@ void DoModAttr(Character * character, std::istream & sArgs)
     if (arguments.size() != 3)
     {
         character->sendMsg("Usage: [target] [attribute] [+/-VALUE]\n");
-        return; // Skip the rest of the function.
+        return;
     }
     Character * target = character->room->findCharacter(
         arguments[0].first,
@@ -1002,13 +1011,13 @@ void DoModAttr(Character * character, std::istream & sArgs)
     if (target == nullptr)
     {
         character->sendMsg("Target not found.\n");
-        return; // Skip the rest of the function.
+        return;
     }
     int modifier = ToInt(arguments[2].first);
     if (modifier == 0)
     {
         character->sendMsg("You must insert a valid value.\n");
-        return; // Skip the rest of the function.
+        return;
     }
     Ability ability;
     if (arguments[1].first == "str")
@@ -1041,12 +1050,12 @@ void DoModAttr(Character * character, std::istream & sArgs)
     if (result < 0)
     {
         character->sendMsg("Attribute cannot go below 0.");
-        return; // Skip the rest of the function.
+        return;
     }
     else if (!target->setAbility(ability, static_cast<unsigned int>(result)))
     {
         character->sendMsg("Attribute cannot go above 60.");
-        return; // Skip the rest of the function.
+        return;
     }
     character->sendMsg(
         "You have successfully %s by %s the %s of the target.",
@@ -1266,6 +1275,29 @@ void DoProfessionInfo(Character * character, std::istream & sArgs)
     character->sendMsg(msg);
 }
 
+void DoFactionInfo(Character * character, std::istream & sArgs)
+{
+    // Get the arguments of the command.
+    ArgumentList args = ParseArgs(sArgs);
+    if (args.size() != 1)
+    {
+        character->sendMsg("You must insert a valide faction vnum.\n");
+        return;
+    }
+    auto * faction = Mud::instance().findFaction(ToNumber<int>(args[0].first));
+    if (faction == nullptr)
+    {
+        character->sendMsg("Faction not found.\n");
+        return;
+    }
+    // Create a table.
+    Table sheet;
+    // Get the sheet.
+    faction->getSheet(sheet);
+    // Show the seet to character.
+    character->sendMsg(sheet.getTable());
+}
+
 void DoModelList(Character * character, std::istream & sArgs)
 {
     // Check no more input.
@@ -1276,8 +1308,6 @@ void DoModelList(Character * character, std::istream & sArgs)
     table.addColumn("TYPE", StringAlign::Left);
     table.addColumn("SLOT", StringAlign::Left);
     table.addColumn("FLAGS", StringAlign::Right);
-    table.addColumn("WEIGHT", StringAlign::Right);
-    table.addColumn("PRICE", StringAlign::Right);
     for (auto iterator : Mud::instance().mudItemModels)
     {
         ItemModel * itemModel = iterator.second;
@@ -1288,8 +1318,6 @@ void DoModelList(Character * character, std::istream & sArgs)
         row.push_back(itemModel->getTypeName());
         row.push_back(GetEquipmentSlotName(itemModel->slot));
         row.push_back(ToString(itemModel->modelFlags));
-        row.push_back(ToString(itemModel->weight));
-        row.push_back(ToString(itemModel->price));
         // Add the row to the table.
         table.addRow(row);
     }
@@ -1351,7 +1379,7 @@ void DoMobileList(Character * character, std::istream & sArgs)
         Mobile * mobile = iterator.second;
         // Prepare the row.
         TableRow row;
-        row.push_back((mobile->alive) ? "Yes" : "No");
+        row.push_back((mobile->isAlive()) ? "Yes" : "No");
         row.push_back(mobile->id);
         row.push_back(mobile->getName());
         if (mobile->room != nullptr)

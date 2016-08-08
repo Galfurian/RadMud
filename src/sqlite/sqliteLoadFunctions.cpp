@@ -15,6 +15,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+#include "model/currencyModel.hpp"
 #include "sqliteDbms.hpp"
 
 #include "../mud.hpp"
@@ -91,8 +92,8 @@ bool LoadContent(ResultSet * result)
 {
     while (result->next())
     {
-        Item * container = Mud::instance().findItem(result->getNextInteger());
-        Item * contained = Mud::instance().findItem(result->getNextInteger());
+        auto container = Mud::instance().findItem(result->getNextInteger());
+        auto contained = Mud::instance().findItem(result->getNextInteger());
         if (container == nullptr)
         {
             Logger::log(LogLevel::Error, "Can't find container item.");
@@ -119,13 +120,16 @@ bool LoadItem(ResultSet * result)
     while (result->next())
     {
         // Retrieve the values.
-        int itemVnum = result->getNextInteger();
-        int itemModelVnum = result->getNextInteger();
-        std::string itemMaker = result->getNextString();
-        unsigned int itemCondition = result->getNextUnsignedInteger();
-        int itemCompositionVnum = result->getNextInteger();
-        unsigned int itemQualityValue = result->getNextUnsignedInteger();
-        unsigned int itemFlags = result->getNextUnsignedInteger();
+        auto itemVnum = result->getNextInteger();
+        auto itemModelVnum = result->getNextInteger();
+        auto itemMaker = result->getNextString();
+        auto itemPrice = result->getNextUnsignedInteger();
+        auto itemWeight = result->getNextUnsignedInteger();
+        auto itemCondition = result->getNextUnsignedInteger();
+        auto itemMaxCondition = result->getNextUnsignedInteger();
+        auto itemCompositionVnum = result->getNextInteger();
+        auto itemQualityValue = result->getNextUnsignedInteger();
+        auto itemFlags = result->getNextUnsignedInteger();
 
         // Retrieve the model vnum.
         ItemModel * itemModel = Mud::instance().findItemModel(itemModelVnum);
@@ -153,7 +157,10 @@ bool LoadItem(ResultSet * result)
         Item * item = GenerateItem(itemModel->getType());
         item->vnum = itemVnum;
         item->model = itemModel;
+        item->price = itemPrice;
+        item->weight = itemWeight;
         item->condition = itemCondition;
+        item->maxCondition = itemMaxCondition;
         item->maker = itemMaker;
         item->composition = itemComposition;
         item->quality = ItemQuality(itemQualityValue);
@@ -205,11 +212,30 @@ bool LoadFaction(ResultSet * result)
 {
     while (result->next())
     {
+        auto vnum = result->getNextInteger();
+        auto name = result->getNextString();
+        auto description = result->getNextString();
+        auto currencyVnum = result->getNextInteger();
+
+        auto currencyModel = Mud::instance().findItemModel(currencyVnum);
+        if (currencyModel == nullptr)
+        {
+            Logger::log(LogLevel::Error, "Can't find the currency %s", ToString(currencyVnum));
+            return false;
+        }
+        if (currencyModel->getType() != ModelType::Currency)
+        {
+            Logger::log(LogLevel::Error, "Model is not currency %s", ToString(currencyVnum));
+            return false;
+        }
+        auto currency = currencyModel->toCurrency();
+
         // Create an empty Faction.
         Faction * faction = new Faction();
-        faction->vnum = result->getNextInteger();
-        faction->name = result->getNextString();
-        faction->description = result->getNextString();
+        faction->vnum = vnum;
+        faction->name = name;
+        faction->description = description;
+        faction->currency = currency;
         // Translate new_line.
         FindAndReplace(faction->description, "%r", "\n");
         // Check the correctness.
@@ -250,8 +276,8 @@ bool LoadModel(ResultSet * result)
         itemModel->description = result->getNextString();
         itemModel->slot = static_cast<EquipmentSlot>(result->getNextInteger());
         itemModel->modelFlags = result->getNextUnsignedInteger();
-        itemModel->weight = result->getNextUnsignedInteger();
-        itemModel->price = result->getNextUnsignedInteger();
+        itemModel->baseWeight = result->getNextUnsignedInteger();
+        itemModel->basePrice = result->getNextUnsignedInteger();
         itemModel->condition = result->getNextUnsignedInteger();
         itemModel->decay = result->getNextUnsignedInteger();
         itemModel->material = static_cast<MaterialType>(result->getNextInteger());
@@ -296,7 +322,11 @@ bool LoadRace(ResultSet * result)
         race->description = result->getNextString();
         race->material = Mud::instance().findMaterial(result->getNextInteger());
         race->setAbilities(result->getNextString());
-        race->setAvailableFactions(result->getNextString());
+        if (!race->setAvailableFactions(result->getNextString()))
+        {
+            Logger::log(LogLevel::Error, "Error when setting race factions.");
+            return false;
+        }
         race->player_allow = result->getNextInteger();
         race->tileSet = result->getNextInteger();
         race->tileId = result->getNextInteger();
@@ -368,15 +398,10 @@ bool LoadMobile(ResultSet * result)
             delete (mobile);
             return false;
         }
-
-        // Set the respawn time.
-        mobile->nextRespawn = std::chrono::system_clock::now()
-            + std::chrono::seconds(5 * mobile->level);
-        // Set the next action time.
-        mobile->nextActionCooldown = std::chrono::system_clock::now()
-            + std::chrono::seconds(10 * mobile->level);
-        // Load its script.
+        // Load the script.
         mobile->loadScript(kSystemDir + "lua/" + mobile->lua_script);
+        // Respawn it.
+        mobile->respawn();
     }
     return true;
 }
@@ -420,12 +445,12 @@ bool LoadExit(ResultSet * result)
     while (result->next())
     {
         // Create an empty exit.
-        std::shared_ptr<Exit> newExit = std::make_shared<Exit>();
+        auto newExit = std::make_shared<Exit>();
         // retrive the values.
-        int sourceVnum = result->getNextInteger();
-        int destinationVnum = result->getNextInteger();
-        unsigned int directionValue = result->getNextUnsignedInteger();
-        unsigned int flagValue = result->getNextUnsignedInteger();
+        auto sourceVnum = result->getNextInteger();
+        auto destinationVnum = result->getNextInteger();
+        auto directionValue = result->getNextUnsignedInteger();
+        auto flagValue = result->getNextUnsignedInteger();
         // Check the correctness.
         newExit->source = Mud::instance().findRoom(sourceVnum);
         if (newExit->source == nullptr)
@@ -863,28 +888,74 @@ bool LoadBuilding(ResultSet * result)
     return true;
 }
 
-bool LoadItemShop(ResultSet * result)
+bool LoadShop(ResultSet * result)
 {
     while (result->next())
     {
         // Retrieve the item vnum.
-        int vnum = result->getNextInteger();
-        Item * genericItem = Mud::instance().findItem(vnum);
-        if (genericItem == nullptr)
+        auto vnum = result->getNextInteger();
+        auto item = Mud::instance().findItem(vnum);
+        auto name = result->getNextString();
+        auto buy = result->getNextUnsignedInteger();
+        auto sell = result->getNextUnsignedInteger();
+        auto balance = result->getNextUnsignedInteger();
+        auto shopKeeper = Mud::instance().findMobile(result->getNextString());
+        if (item == nullptr)
         {
             Logger::log(LogLevel::Error, "Can't find the item (%s).", ToString(vnum));
             return false;
         }
-        if (genericItem->getType() != ItemType::Shop)
+        if (item->getType() != ModelType::Shop)
         {
             Logger::log(LogLevel::Error, "Wrong type of item (%s).", ToString(vnum));
             return false;
         }
-        ShopItem * shop = genericItem->toShopItem();
-        shop->shopName = result->getNextString();
-        shop->shopBuyTax = result->getNextUnsignedInteger();
-        shop->shopSellTax = result->getNextUnsignedInteger();
-        shop->shopKeeper = Mud::instance().findMobile(result->getNextString());
+        ShopItem * shop = item->toShopItem();
+        shop->shopName = name;
+        shop->shopBuyTax = buy;
+        shop->shopSellTax = sell;
+        shop->balance = balance;
+        shop->shopKeeper = shopKeeper;
+        if (shopKeeper != nullptr)
+        {
+            shopKeeper->managedItem = shop;
+        }
+    }
+    return true;
+}
+
+bool LoadCurrency(ResultSet * result)
+{
+    while (result->next())
+    {
+        // Retrieve the item vnum.
+        auto modelVnum = result->getNextInteger();
+        auto materialVnum = result->getNextInteger();
+        auto worth = result->getNextUnsignedInteger();
+
+        auto model = Mud::instance().findItemModel(modelVnum);
+        if (model == nullptr)
+        {
+            Logger::log(LogLevel::Error, "Can't find the model (%s).", ToString(modelVnum));
+            return false;
+        }
+        if (model->getType() != ModelType::Currency)
+        {
+            Logger::log(LogLevel::Error, "Wrong type of model (%s).", ToString(modelVnum));
+            return false;
+        }
+        auto material = Mud::instance().findMaterial(materialVnum);
+        if (material == nullptr)
+        {
+            Logger::log(LogLevel::Error, "Can't find the material (%s).", ToString(materialVnum));
+            return false;
+        }
+        CurrencyModel * currency = model->toCurrency();
+        if (!currency->addPrice(materialVnum, worth))
+        {
+            Logger::log(LogLevel::Error, "Can't add the price for (%s).", ToString(modelVnum));
+            return false;
+        }
     }
     return true;
 }

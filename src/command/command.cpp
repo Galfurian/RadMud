@@ -1533,6 +1533,27 @@ void LoadCommands()
         command.hndl = DoPour;
         Mud::instance().addCommand(command);
     }
+    {
+        command.name = "deposit";
+        command.help = "Deposit a coin inside a shop.";
+        command.args = "(item) (shop)";
+        command.hndl = DoDeposit;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "sell";
+        command.help = "Sell an item to a shop keeper.";
+        command.args = "(item) (shopkeeper)";
+        command.hndl = DoSell;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "buy";
+        command.help = "Allows to buy an item from a shop.";
+        command.args = "(item) (shop)";
+        command.hndl = DoBuy;
+        Mud::instance().addCommand(command);
+    }
 
     // Comunication.
     {
@@ -1910,6 +1931,15 @@ void LoadCommands()
         command.help = "Provide all the information regarding the given profession.";
         command.args = "(Profession.command)";
         command.hndl = DoProfessionInfo;
+        command.level = 1;
+        Mud::instance().addCommand(command);
+    }
+
+    {
+        command.name = "ifaction";
+        command.help = "Shows the infos about a faction.";
+        command.args = "(vnum)";
+        command.hndl = DoFactionInfo;
         command.level = 1;
         Mud::instance().addCommand(command);
     }

@@ -40,12 +40,11 @@ Mobile::Mobile() :
         staticdesc(),
         actions(),
         message_buffer(),
-        alive(),
         nextRespawn(),
         controller(),
         lua_script(),
         lua_mutex(),
-        nextActionCooldown(),
+        nextActionCooldown(std::chrono::system_clock::now()),
         managedItem()
 {
     // Nothing to do.
@@ -61,7 +60,7 @@ Mobile::~Mobile()
     {
         delete (item);
     }
-    if ((room != nullptr) && this->alive)
+    if (this->isAlive())
     {
         room->removeCharacter(this);
     }
@@ -91,7 +90,6 @@ bool Mobile::setAbilities(const std::string & source)
 void Mobile::respawn()
 {
     // Set the mobile to Alive.
-    this->alive = true;
     this->setHealth(this->getMaxHealth(), true);
     this->setStamina(this->getMaxStamina(), true);
     // Trigger the init lua function.
@@ -103,8 +101,15 @@ void Mobile::respawn()
     exceptions.push_back(this);
     // Send the message inside the room.
     this->room->sendToAll("%s apear from somewhere.\n", exceptions, this->getNameCapital());
+    // Set the next action time.
+    nextActionCooldown = std::chrono::system_clock::now() + std::chrono::seconds(10 * level);
     // Log to the mud.
     Logger::log(LogLevel::Debug, "Respawning " + this->id);
+}
+
+bool Mobile::isAlive() const
+{
+    return (this->room != nullptr);
 }
 
 bool Mobile::check() const
@@ -148,8 +153,8 @@ void Mobile::getSheet(Table & sheet) const
         actionGroup += " " + it;
     }
     sheet.addRow( { "Actions", actionGroup });
-    sheet.addRow( { "Is Alive", ToString(this->alive) });
-    if (!this->alive)
+    sheet.addRow( { "Is Alive", ToString(this->isAlive()) });
+    if (!this->isAlive())
     {
         sheet.addRow( { "Respawn Time", ToString(this->getRespawnTime()) });
 
@@ -245,8 +250,6 @@ void Mobile::kill()
     }
     // Call the method of the father class.
     Character::kill();
-    // Set the mobile as dead.
-    alive = false;
     // Set to 0 the cycle that this mobile has passed dead.
     nextRespawn = system_clock::now() + seconds(10 * this->level);
     // Call the LUA function: Event_Death.

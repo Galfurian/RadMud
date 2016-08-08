@@ -20,7 +20,10 @@
 
 #include "../mud.hpp"
 #include "../utilities/table.hpp"
+#include "../item/shopItem.hpp"
+
 #include "../model/liquidContainerModel.hpp"
+#include "../model/currencyModel.hpp"
 
 #include <algorithm>
 
@@ -83,13 +86,13 @@ void DoTake(Character * character, std::istream & sArgs)
                 Logger::log(LogLevel::Error, "%s:DoTake", character->getName());
                 character->sendMsg("You've picked up nothing.\n");
                 SQLiteDbms::instance().rollbackTransection();
-                return; // Skip the rest of the function.
+                return;
             }
             // Handle output only if the player has really taken something.
             if (actuallyTaken.empty())
             {
                 character->sendMsg("You've picked up nothing.\n");
-                return; // Skip the rest of the function.
+                return;
             }
             character->sendMsg("You've picked up everything you could.\n");
             // Set the list of exceptions.
@@ -101,7 +104,7 @@ void DoTake(Character * character, std::istream & sArgs)
                 exceptions,
                 character->getNameCapital(),
                 character->getSubjectPronoun());
-            return; // Skip the rest of the function.
+            return;
         }
         Item * item = character->room->findItem(arguments[0].first, arguments[0].second);
         // If the item is null.
@@ -124,24 +127,24 @@ void DoTake(Character * character, std::istream & sArgs)
         if (item == nullptr)
         {
             character->sendMsg("You don't see that item inside the room.\n");
-            return; // Skip the rest of the function.
+            return;
         }
         // Check if the item has the flag Static.
         if (HasFlag(item->model->modelFlags, ModelFlag::Static))
         {
             character->sendMsg("You can't pick up %s!\n", item->getName());
-            return; // Skip the rest of the function.
+            return;
         }
         if (HasFlag(item->flags, ItemFlag::Built))
         {
             character->sendMsg("You can't pick up something which is built!\n");
-            return; // Skip the rest of the function.
+            return;
         }
         // Check if the player can carry the item.
         if (!character->canCarry(item))
         {
             character->sendMsg("You can't carry %s!\n", item->getName());
-            return; // Skip the rest of the function.
+            return;
         }
         // Remove the item from the room.
         character->room->removeItem(item);
@@ -158,7 +161,7 @@ void DoTake(Character * character, std::istream & sArgs)
             Logger::log(LogLevel::Error, "%s:DoTake", character->getName());
             character->sendMsg("You've picked up nothing.\n");
             SQLiteDbms::instance().rollbackTransection();
-            return; // Skip the rest of the function.
+            return;
         }
         // Notify to player.
         character->sendMsg(
@@ -173,7 +176,7 @@ void DoTake(Character * character, std::istream & sArgs)
             exceptions,
             character->getNameCapital(),
             Formatter::cyan() + ToLower(item->getName()) + Formatter::reset());
-        return; // Skip the rest of the function.
+        return;
     }
     else if (arguments.size() == 2)
     {
@@ -181,17 +184,17 @@ void DoTake(Character * character, std::istream & sArgs)
         if (container == nullptr)
         {
             character->sendMsg("You don't see that container.\n");
-            return; // Skip the rest of the function.
+            return;
         }
         if (HasFlag(container->flags, ItemFlag::Locked))
         {
             character->sendMsg("You have first to unlock %s.\n", container->getName());
-            return; // Skip the rest of the function.
+            return;
         }
         if (HasFlag(container->flags, ItemFlag::Closed))
         {
             character->sendMsg("You have first to open %s.\n", container->getName());
-            return; // Skip the rest of the function.
+            return;
         }
         if (ToLower(arguments[0].first) == "all")
         {
@@ -236,13 +239,13 @@ void DoTake(Character * character, std::istream & sArgs)
                 Logger::log(LogLevel::Error, "%s:DoTake", character->getName());
                 character->sendMsg("You've taken nothing from %s.\n", container->getName());
                 SQLiteDbms::instance().rollbackTransection();
-                return; // Skip the rest of the function.
+                return;
             }
             // Handle output only if the player has really taken something.
             if (actuallyTaken.empty())
             {
                 character->sendMsg("You've taken nothing from %s.\n", container->getName());
-                return; // Skip the rest of the function.
+                return;
             }
             character->sendMsg(
                 "You've taken everything you could from %s.\n",
@@ -257,25 +260,25 @@ void DoTake(Character * character, std::istream & sArgs)
                 character->getNameCapital(),
                 character->getSubjectPronoun(),
                 Formatter::cyan() + ToLower(container->getName()) + Formatter::reset());
-            return; // Skip the rest of the function.
+            return;
         }
         Item * item = container->findContent(arguments[0].first, arguments[0].second);
         if (item == nullptr)
         {
             character->sendMsg("You don't see that item inside the container.\n");
-            return; // Skip the rest of the function.
+            return;
         }
         // Check if the item has the flag kNoPick.
         if (HasFlag(item->model->modelFlags, ModelFlag::Static))
         {
             character->sendMsg("You can't pick up this kind of items!\n");
-            return; // Skip the rest of the function.
+            return;
         }
         // Check if the player can carry the item.
         if (!character->canCarry(item))
         {
             character->sendMsg("You are not strong enough to carry that object.\n");
-            return; // Skip the rest of the function.
+            return;
         }
         // Remove the item from the container.
         container->takeOut(item);
@@ -324,12 +327,12 @@ void DoDrop(Character * character, std::istream & sArgs)
     if (arguments.size() == 0)
     {
         character->sendMsg("Drop what?\n");
-        return; // Skip the rest of the function.
+        return;
     }
     if (arguments.size() > 1)
     {
         character->sendMsg("Too many arguments!\n");
-        return; // Skip the rest of the function.
+        return;
     }
     if (ToLower(arguments[0].first) == "all")
     {
@@ -337,7 +340,7 @@ void DoDrop(Character * character, std::istream & sArgs)
         if (character->inventory.empty())
         {
             character->sendMsg("You have nothing to drop.\n");
-            return; // Skip the rest of the function.
+            return;
         }
         auto untouchedList = character->inventory;
         SQLiteDbms::instance().beginTransaction();
@@ -361,7 +364,7 @@ void DoDrop(Character * character, std::istream & sArgs)
             exceptions,
             character->getNameCapital(),
             character->getPossessivePronoun());
-        return; // Skip the rest of the function.
+        return;
     }
     // Get the item.
     Item * item = character->findInventoryItem(arguments[0].first, arguments[0].second);
@@ -369,7 +372,7 @@ void DoDrop(Character * character, std::istream & sArgs)
     if (item == nullptr)
     {
         character->sendMsg("You don't have that item.\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Update the item iside the Database.
     character->remInventoryItem(item);
@@ -407,14 +410,14 @@ void DoGive(Character * character, std::istream & sArgs)
     if (arguments.size() != 2)
     {
         character->sendMsg("Give what to whom?\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Get the item.
     Item * item = character->findInventoryItem(arguments[0].first, arguments[0].second);
     if (item == nullptr)
     {
         character->sendMsg("You don't have that item.\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Get the target.
     CharacterVector excpetions = { character };
@@ -425,27 +428,27 @@ void DoGive(Character * character, std::istream & sArgs)
     if (target == nullptr)
     {
         character->sendMsg("You don't see that person.\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Check if the target player can carry the item.
     if (!target->canCarry(item))
     {
         character->sendMsg(target->getNameCapital() + " can't carry anymore items.\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Remove the item from the character inventory.
     if (!character->remInventoryItem(item))
     {
         character->sendMsg(
             "You cannot give " + item->getName() + " to " + target->getName() + ".\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Add the item to the target inventory.
     if (!target->addInventoryItem(item))
     {
         character->sendMsg(
             "You cannot give " + item->getName() + " to " + target->getName() + ".\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Check if the character is invisible.
     std::string viewdName =
@@ -571,12 +574,12 @@ void DoWield(Character * character, std::istream & sArgs)
     if (arguments.size() == 0)
     {
         character->sendMsg("Wield what?\n");
-        return; // Skip the rest of the function.
+        return;
     }
     if (arguments.size() > 1)
     {
         character->sendMsg("Too many arguments.\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Get the item.
     Item * item = character->findInventoryItem(arguments[0].first, arguments[0].second);
@@ -600,7 +603,7 @@ void DoWield(Character * character, std::istream & sArgs)
     if (item == nullptr)
     {
         character->sendMsg("You don't have that item.\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Check if can be wielded.
     if (!item->model->mustBeWielded())
@@ -611,7 +614,7 @@ void DoWield(Character * character, std::istream & sArgs)
         {
             character->sendMsg("Try to wear it instead.\n");
         }
-        return; // Skip the rest of the function.
+        return;
     }
     // String where the error message will be put.
     std::string errMessage;
@@ -621,7 +624,7 @@ void DoWield(Character * character, std::istream & sArgs)
     if (!character->canWield(item, errMessage, destinationSlot))
     {
         character->sendMsg(errMessage);
-        return; // Skip the rest of the function.
+        return;
     }
     // Set the item slot.
     item->setCurrentSlot(destinationSlot);
@@ -674,12 +677,12 @@ void DoWear(Character * character, std::istream & sArgs)
     if (arguments.size() == 0)
     {
         character->sendMsg("Wear what?\n");
-        return; // Skip the rest of the function.
+        return;
     }
     if (arguments.size() > 1)
     {
         character->sendMsg("Too many arguments.\n");
-        return; // Skip the rest of the function.
+        return;
     }
     if (arguments[0].first == "all")
     {
@@ -707,7 +710,7 @@ void DoWear(Character * character, std::istream & sArgs)
         if (!wearedSomething)
         {
             character->sendMsg("You had nothing to wear.\n");
-            return; // Skip the rest of the function.
+            return;
         }
         character->sendMsg("You have weared everything you could.\n");
         // Set the list of exceptions.
@@ -719,7 +722,7 @@ void DoWear(Character * character, std::istream & sArgs)
             exceptions,
             character->getNameCapital(),
             character->getSubjectPronoun());
-        return; // Skip the rest of the function.
+        return;
     }
 
     Item * item = character->findInventoryItem(arguments[0].first, arguments[0].second);
@@ -742,13 +745,13 @@ void DoWear(Character * character, std::istream & sArgs)
     if (item == nullptr)
     {
         character->sendMsg("You don't have that item.\n");
-        return; // Skip the rest of the function.
+        return;
     }
     std::string errMessage;
     if (!character->canWear(item, errMessage))
     {
         character->sendMsg(errMessage);
-        return; // Skip the rest of the function.
+        return;
     }
     // Remove the item from the player's inventory.
     character->remInventoryItem(item);
@@ -790,12 +793,12 @@ void DoRemove(Character * character, std::istream & sArgs)
     if (arguments.size() == 0)
     {
         character->sendMsg("Remove what?\n");
-        return; // Skip the rest of the function.
+        return;
     }
     if (arguments.size() > 1)
     {
         character->sendMsg("Too many arguments.\n");
-        return; // Skip the rest of the function.
+        return;
     }
     if (arguments[0].first == "all")
     {
@@ -803,7 +806,7 @@ void DoRemove(Character * character, std::istream & sArgs)
         if (character->equipment.empty())
         {
             character->sendMsg("You have nothing to remove.\n");
-            return; // Skip the rest of the function.
+            return;
         }
         auto untouchedList = character->equipment;
         SQLiteDbms::instance().beginTransaction();
@@ -826,7 +829,7 @@ void DoRemove(Character * character, std::istream & sArgs)
             "%s has undressed all he could.\n",
             exceptions,
             character->getNameCapital());
-        return; // Skip the rest of the function.
+        return;
     }
     // Get the item.
     Item * item = character->findEquipmentItem(arguments[0].first, arguments[0].second);
@@ -834,7 +837,7 @@ void DoRemove(Character * character, std::istream & sArgs)
     if (item == nullptr)
     {
         character->sendMsg("You don't have that item equipped.\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Remove the item from the player's equipment.
     character->remEquipmentItem(item);
@@ -882,7 +885,7 @@ void DoInventory(Character * character, std::istream & sArgs)
     for (auto it : GroupItems(character->inventory))
     {
         table.addRow(
-            { it.first->getNameCapital(), ToString(it.second), ToString(it.first->getTotalWeight()) });
+            { it.first->getNameCapital(), ToString(it.second), ToString(it.first->getWeight()) });
     }
     character->sendMsg(table.getTable());
     std::string carried = ToString(character->getCarryingWeight());
@@ -902,7 +905,7 @@ void DoOrganize(Character * character, std::istream & sArgs)
     if (arguments.empty())
     {
         character->sendMsg("Organize what?\n");
-        return; // Skip the rest of the function.
+        return;
     }
     ItemSorter sorter = OrderItemByName;
     std::string sorterTag = "name";
@@ -919,14 +922,14 @@ void DoOrganize(Character * character, std::istream & sArgs)
     else
     {
         character->sendMsg("You can organize by: name, weight,...\n");
-        return; // Skip the rest of the function.
+        return;
     }
     if (arguments.size() == 1)
     {
         ItemVector * list = &character->room->items;
         sort(list->begin(), list->end(), sorter);
         character->sendMsg("You have organized the room by " + sorterTag + ".\n");
-        return; // Skip the rest of the function.
+        return;
     }
     else if (arguments.size() == 2)
     {
@@ -934,12 +937,12 @@ void DoOrganize(Character * character, std::istream & sArgs)
         if (container == nullptr)
         {
             character->sendMsg("What do you want to organize?\n");
-            return; // Skip the rest of the function.
+            return;
         }
         if (container->content.empty())
         {
             character->sendMsg("You can't organize " + container->getName() + "\n");
-            return; // Skip the rest of the function.
+            return;
         }
         // Organize the target container.
         ItemVector * list = &container->content;
@@ -950,7 +953,7 @@ void DoOrganize(Character * character, std::istream & sArgs)
     else
     {
         character->sendMsg("Too much arguments.\n");
-        return; // Skip the rest of the function.
+        return;
     }
 }
 
@@ -964,7 +967,7 @@ void DoOpen(Character * character, std::istream & sArgs)
     if (arguments.size() != 1)
     {
         character->sendMsg("What do you want to open?\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Check if the character want to open something in onother direction.
     Direction direction = Mud::instance().findDirection(arguments[0].first, false);
@@ -975,29 +978,29 @@ void DoOpen(Character * character, std::istream & sArgs)
         if (roomExit == nullptr)
         {
             character->sendMsg("There is nothing in that direction.\n");
-            return; // Skip the rest of the function.
+            return;
         }
         Room * destination = roomExit->destination;
         if (destination == nullptr)
         {
             character->sendMsg("There is nothing in that direction.\n");
-            return; // Skip the rest of the function.
+            return;
         }
         Item * door = destination->findDoor();
         if (door == nullptr)
         {
             character->sendMsg("There is no door in that direction.\n");
-            return; // Skip the rest of the function.
+            return;
         }
         if (HasFlag(door->flags, ItemFlag::Locked))
         {
             character->sendMsg("You have first to unlock it.\n");
-            return; // Skip the rest of the function.
+            return;
         }
         if (!HasFlag(door->flags, ItemFlag::Closed))
         {
             character->sendMsg("There door it's already opened.\n");
-            return; // Skip the rest of the function.
+            return;
         }
 
         ClearFlag(door->flags, ItemFlag::Closed);
@@ -1058,17 +1061,17 @@ void DoOpen(Character * character, std::istream & sArgs)
         if (container == nullptr)
         {
             character->sendMsg("What do you want to open?\n");
-            return; // Skip the rest of the function.
+            return;
         }
         if (HasFlag(container->flags, ItemFlag::Locked))
         {
             character->sendMsg("You have first to unlock it.\n");
-            return; // Skip the rest of the function.
+            return;
         }
         if (!HasFlag(container->flags, ItemFlag::Closed))
         {
             character->sendMsg("It is already opened.\n");
-            return; // Skip the rest of the function.
+            return;
         }
         ClearFlag(container->flags, ItemFlag::Closed);
         // Send the message to the character.
@@ -1092,7 +1095,7 @@ void DoClose(Character * character, std::istream & sArgs)
     if (arguments.size() != 1)
     {
         character->sendMsg("What do you want to close?\n");
-        return; // Skip the rest of the function.
+        return;
     }
     // Check if the character want to open something in onother direction.
     Direction direction = Mud::instance().findDirection(arguments[0].first, false);
@@ -1103,34 +1106,34 @@ void DoClose(Character * character, std::istream & sArgs)
         if (roomExit == nullptr)
         {
             character->sendMsg("There is nothing in that direction.\n");
-            return; // Skip the rest of the function.
+            return;
         }
         Room * destination = roomExit->destination;
         if (destination == nullptr)
         {
             character->sendMsg("There is nothing in that direction.\n");
-            return; // Skip the rest of the function.
+            return;
         }
         Item * door = destination->findDoor();
         if (door == nullptr)
         {
             character->sendMsg("There is no door in that direction.\n");
-            return; // Skip the rest of the function.
+            return;
         }
         if (HasFlag(door->flags, ItemFlag::Closed))
         {
             character->sendMsg("There door it's already closed.\n");
-            return; // Skip the rest of the function.
+            return;
         }
         if (destination->items.size() > 1)
         {
             character->sendMsg("There are items on the way, you can't close the door.\n");
-            return; // Skip the rest of the function.
+            return;
         }
         if (destination->characters.size() >= 1)
         {
             character->sendMsg("There are someone on the way, you can't close the door.\n");
-            return; // Skip the rest of the function.
+            return;
         }
 
         SetFlag(door->flags, ItemFlag::Closed);
@@ -1185,7 +1188,7 @@ void DoClose(Character * character, std::istream & sArgs)
                     CharacterVector());
             }
         }
-        return; // Skip the rest of the function.
+        return;
     }
     else
     {
@@ -1193,17 +1196,17 @@ void DoClose(Character * character, std::istream & sArgs)
         if (container == nullptr)
         {
             character->sendMsg("What do you want to close?\n");
-            return; // Skip the rest of the function.
+            return;
         }
         if (HasFlag(container->flags, ItemFlag::Closed))
         {
             character->sendMsg("It is already closed.\n");
-            return; // Skip the rest of the function.
+            return;
         }
         if (!HasFlag(container->model->modelFlags, ModelFlag::CanClose))
         {
             character->sendMsg("It cannot be closed.\n");
-            return; // Skip the rest of the function.
+            return;
         }
         SetFlag(container->flags, ItemFlag::Closed);
         // Send the message to the character.
@@ -1248,12 +1251,12 @@ void DoPut(Character * character, std::istream & sArgs)
     if (HasFlag(container->flags, ItemFlag::Locked))
     {
         character->sendMsg("You have first to unlock %s.\n", container->getName());
-        return; // Skip the rest of the function.
+        return;
     }
     if (HasFlag(container->flags, ItemFlag::Closed))
     {
         character->sendMsg("You have first to open %s.\n", container->getName());
-        return; // Skip the rest of the function.
+        return;
     }
 
     // Check if the player wants to put all in the container.
@@ -1378,12 +1381,12 @@ void DoDrink(Character * character, std::istream & sArgs)
     if (HasFlag(container->flags, ItemFlag::Locked))
     {
         character->sendMsg("You have first to unlock %s.\n", container->getName());
-        return; // Skip the rest of the function.
+        return;
     }
     if (HasFlag(container->flags, ItemFlag::Closed))
     {
         character->sendMsg("You have first to open %s.\n", container->getName());
-        return; // Skip the rest of the function.
+        return;
     }
     if (container->model->getType() != ModelType::LiquidContainer)
     {
@@ -1436,7 +1439,7 @@ void DoFill(Character * character, std::istream & sArgs)
     if (arguments.size() != 2)
     {
         character->sendMsg("You have to fill something from a source.\n");
-        return; // Skip the rest of the function.
+        return;
     }
 
     // Search the container.
@@ -1447,7 +1450,7 @@ void DoFill(Character * character, std::istream & sArgs)
         if (container == nullptr)
         {
             character->sendMsg("You don't have any '%s' with you.\n", arguments[0].first);
-            return; // Skip the rest of the function.
+            return;
         }
     }
 
@@ -1462,7 +1465,7 @@ void DoFill(Character * character, std::istream & sArgs)
             if (source == nullptr)
             {
                 character->sendMsg("You don't see any '%s'.\n", arguments[1].first);
-                return; // Skip the rest of the function.
+                return;
             }
         }
     }
@@ -1470,34 +1473,34 @@ void DoFill(Character * character, std::istream & sArgs)
     if (HasFlag(source->flags, ItemFlag::Locked))
     {
         character->sendMsg("You have first to unlock %s.\n", source->getName());
-        return; // Skip the rest of the function.
+        return;
     }
     if (HasFlag(source->flags, ItemFlag::Closed))
     {
         character->sendMsg("You have first to open %s.\n", source->getName());
-        return; // Skip the rest of the function.
+        return;
     }
     if (HasFlag(container->flags, ItemFlag::Locked))
     {
         character->sendMsg("You have first to unlock %s.\n", container->getName());
-        return; // Skip the rest of the function.
+        return;
     }
     if (HasFlag(container->flags, ItemFlag::Closed))
     {
         character->sendMsg("You have first to open %s.\n", container->getName());
-        return; // Skip the rest of the function.
+        return;
     }
 
     // Check if the items are suitable source and container of liquids.
     if (container->model->getType() != ModelType::LiquidContainer)
     {
         character->sendMsg("%s is not a suitable container.\n", container->getNameCapital());
-        return; // Skip the rest of the function.
+        return;
     }
     if (source->model->getType() != ModelType::LiquidContainer)
     {
         character->sendMsg("%s is not a suitable source of liquids.\n", source->getNameCapital());
-        return; // Skip the rest of the function.
+        return;
     }
 
     LiquidContainerModel * liquidModelSource = source->model->toLiquidContainer();
@@ -1506,7 +1509,7 @@ void DoFill(Character * character, std::istream & sArgs)
     if (source->isEmpty())
     {
         character->sendMsg("%s is empty.\n", source->getNameCapital());
-        return; // Skip the rest of the function.
+        return;
     }
 
     // Get the liquid from the source and eventually from the container.
@@ -1519,7 +1522,7 @@ void DoFill(Character * character, std::istream & sArgs)
         if (sourLiquid != contLiquid)
         {
             character->sendMsg("You can't mix those two liquids.\n");
-            return; // Skip the rest of the function.
+            return;
         }
     }
 
@@ -1541,13 +1544,13 @@ void DoFill(Character * character, std::istream & sArgs)
             "You failed to take out the liquid from a %s.\n",
             source->getNameCapital());
         SQLiteDbms::instance().endTransaction();
-        return; // Skip the rest of the function.
+        return;
     }
     if (!container->pourIn(sourLiquid, quantity))
     {
         character->sendMsg("You failed to fill the container with the liquid.\n");
         SQLiteDbms::instance().endTransaction();
-        return; // Skip the rest of the function.
+        return;
     }
     SQLiteDbms::instance().endTransaction();
 
@@ -1580,7 +1583,7 @@ void DoPour(Character * character, std::istream & sArgs)
     if (arguments.size() != 2)
     {
         character->sendMsg("You have to pour something into something else.\n");
-        return; // Skip the rest of the function.
+        return;
     }
 
     // Search the container.
@@ -1591,7 +1594,7 @@ void DoPour(Character * character, std::istream & sArgs)
         if (source == nullptr)
         {
             character->sendMsg("You don't have any '%s' with you.\n", arguments[0].first);
-            return; // Skip the rest of the function.
+            return;
         }
     }
 
@@ -1606,7 +1609,7 @@ void DoPour(Character * character, std::istream & sArgs)
             if (container == nullptr)
             {
                 character->sendMsg("You don't see any '%s'.\n", arguments[1].first);
-                return; // Skip the rest of the function.
+                return;
             }
         }
     }
@@ -1614,35 +1617,35 @@ void DoPour(Character * character, std::istream & sArgs)
     if (HasFlag(source->flags, ItemFlag::Locked))
     {
         character->sendMsg("You have first to unlock %s.\n", source->getName());
-        return; // Skip the rest of the function.
+        return;
     }
     if (HasFlag(source->flags, ItemFlag::Closed))
     {
         character->sendMsg("You have first to open %s.\n", source->getName());
-        return; // Skip the rest of the function.
+        return;
     }
 
     if (HasFlag(container->flags, ItemFlag::Locked))
     {
         character->sendMsg("You have first to unlock %s.\n", container->getName());
-        return; // Skip the rest of the function.
+        return;
     }
     if (HasFlag(container->flags, ItemFlag::Closed))
     {
         character->sendMsg("You have first to open %s.\n", container->getName());
-        return; // Skip the rest of the function.
+        return;
     }
 
     // Check if the items are suitable source and container of liquids.
     if (container->model->getType() != ModelType::LiquidContainer)
     {
         character->sendMsg("%s is not a suitable container.\n", container->getNameCapital());
-        return; // Skip the rest of the function.
+        return;
     }
     if (source->model->getType() != ModelType::LiquidContainer)
     {
         character->sendMsg("%s is not a suitable source of liquids.\n", source->getNameCapital());
-        return; // Skip the rest of the function.
+        return;
     }
     LiquidContainerModel * liquidModelSource = source->model->toLiquidContainer();
 
@@ -1650,7 +1653,7 @@ void DoPour(Character * character, std::istream & sArgs)
     if (source->isEmpty())
     {
         character->sendMsg("%s is empty.\n", source->getNameCapital());
-        return; // Skip the rest of the function.
+        return;
     }
 
     // Get the liquid from the source and eventually from the container.
@@ -1663,7 +1666,7 @@ void DoPour(Character * character, std::istream & sArgs)
         if (sourLiquid != contLiquid)
         {
             character->sendMsg("You can't mix those two liquids.\n");
-            return; // Skip the rest of the function.
+            return;
         }
     }
 
@@ -1685,14 +1688,14 @@ void DoPour(Character * character, std::istream & sArgs)
         character->sendMsg(
             "You failed to pour out the liquid from " + source->getNameCapital() + ".\n");
         SQLiteDbms::instance().endTransaction();
-        return; // Skip the rest of the function.
+        return;
     }
     if (!container->pourIn(sourLiquid, quantity))
     {
         character->sendMsg(
             "You failed to pour the liquid into " + source->getNameCapital() + ".\n");
         SQLiteDbms::instance().endTransaction();
-        return; // Skip the rest of the function.
+        return;
     }
     SQLiteDbms::instance().endTransaction();
 
@@ -1713,4 +1716,305 @@ void DoPour(Character * character, std::istream & sArgs)
         sourLiquid->getName(),
         source->getName(),
         container->getName());
+}
+
+void DoDeposit(Character * character, std::istream & sArgs)
+{
+    // Stop any action the character is executing.
+    StopAction(character);
+    // Get the arguments of the command.
+    ArgumentList args = ParseArgs(sArgs);
+    // Check the number of arguments.
+    if (args.size() != 2)
+    {
+        character->sendMsg("What do you want to deposit?\n");
+        return;
+    }
+    auto item = character->findInventoryItem(args[0].first, args[0].second);
+    auto building = character->room->findBuilding(args[1].first, args[1].second);
+    // Check the item.
+    if (item == nullptr)
+    {
+        character->sendMsg("You don't have that item.\n");
+        return;
+    }
+    if (item->getType() != ModelType::Currency)
+    {
+        character->sendMsg("You can't deposit %s.\n", item->getName());
+        return;
+    }
+    // Check the building.
+    if (building == nullptr)
+    {
+        character->sendMsg("You don't see that building.\n");
+        return;
+    }
+    if (building->getType() != ModelType::Shop)
+    {
+        character->sendMsg("You can't deposit %s in %s.\n", item->getName(), building->getName());
+        return;
+    }
+    auto shop = building->toShopItem();
+    auto deposit = item->getPrice();
+    auto status = false;
+    SQLiteDbms::instance().beginTransaction();
+    if (item->destroy())
+    {
+        shop->balance += deposit;
+        if (shop->updateOnDB())
+        {
+            status = true;
+        }
+    }
+    if (!status)
+    {
+        shop->balance -= deposit;
+        character->sendMsg(
+            "You failed to deposit %s in %s.\n",
+            item->getName(),
+            building->getName());
+        SQLiteDbms::instance().rollbackTransection();
+        return;
+    }
+    else
+    {
+        delete (item);
+    }
+    SQLiteDbms::instance().endTransaction();
+    character->sendMsg("You deposit %s in %s.\n", item->getName(), building->getName());
+}
+
+void DoSell(Character * character, std::istream & sArgs)
+{
+    // Stop any action the character is executing.
+    StopAction(character);
+    // Get the arguments of the command.
+    ArgumentList args = ParseArgs(sArgs);
+    // Check the number of arguments.
+    if (args.size() != 2)
+    {
+        character->sendMsg("Sell what to whom?\n");
+        return;
+    }
+    // Get the item and the target.
+    auto item = character->findInventoryItem(args[0].first, args[0].second);
+    auto target = character->room->findCharacter(args[1].first, args[1].second, { character });
+    // Check the item.
+    if (item == nullptr)
+    {
+        character->sendMsg("You don't have that item.\n");
+        return;
+    }
+    if (item->getType() == ModelType::Currency)
+    {
+        character->sendMsg("You can't sell %s.\n", item->getName());
+        return;
+    }
+    // Check the target.
+    if (target == nullptr)
+    {
+        character->sendMsg("You don't see that person.\n");
+        return;
+    }
+    if (target->isPlayer())
+    {
+        character->sendMsg("%s is not a shop keeper.\n", target->getNameCapital());
+        return;
+    }
+    bool isAShopKeeper = false;
+    auto shopKeeper = target->toMobile();
+    if (shopKeeper->managedItem != nullptr)
+    {
+        if (shopKeeper->managedItem->getType() == ModelType::Shop)
+        {
+            isAShopKeeper = true;
+        }
+    }
+    if (!isAShopKeeper)
+    {
+        character->sendMsg("You cant't sell anything to %s.\n", target->getName());
+        return;
+    }
+    auto shop = shopKeeper->managedItem->toShopItem();
+    if (!shop->canContain(item))
+    {
+        auto phrase = "The shop is full, come back another day.";
+        shopKeeper->doCommand("say " + character->getName() + " " + phrase);
+        return;
+    }
+    auto price = shop->evaluateSellPrice(item);
+    if (shop->balance < price)
+    {
+        auto phrase = "I can't afford to buy your goods.";
+        shopKeeper->doCommand("say " + character->getName() + " " + phrase);
+        return;
+    }
+    auto currency = shopKeeper->faction->currency;
+    // Give the coins to the character.
+    SQLiteDbms::instance().beginTransaction();
+    auto status = true;
+    std::vector<Item *> coins;
+    if (!currency->generateCurrency(shopKeeper->getName(), price, coins))
+    {
+        character->sendMsg("You failed to sell %s.\n", item->getName());
+        SQLiteDbms::instance().rollbackTransection();
+        return;
+    }
+    // Remove the item from the inventory.
+    if (status)
+    {
+        status &= character->remInventoryItem(item);
+    }
+    // Put the item inside the shop.
+    if (status)
+    {
+        status &= shop->putInside(item);
+    }
+    if (status)
+    {
+        for (auto coin : coins)
+        {
+            character->addInventoryItem(coin);
+            if (!coin->updateOnDB())
+            {
+                status = false;
+                break;
+            }
+        }
+    }
+    if (status)
+    {
+        shop->balance -= price;
+        status &= shop->updateOnDB();
+    }
+    // Handle error.
+    if (!status)
+    {
+        character->sendMsg("You failed to sell %s.\n", item->getName());
+        SQLiteDbms::instance().rollbackTransection();
+        for (auto coin : coins)
+        {
+            character->remInventoryItem(coin);
+            delete (coin);
+        }
+        return;
+    }
+    SQLiteDbms::instance().endTransaction();
+    character->sendMsg("You sell %s to %s.\n", item->getName(), shopKeeper->getName());
+}
+
+void DoBuy(Character * character, std::istream & sArgs)
+{
+    // Stop any action the character is executing.
+    StopAction(character);
+    // Get the arguments of the command.
+    ArgumentList args = ParseArgs(sArgs);
+    // Check the number of arguments.
+    if (args.size() != 2)
+    {
+        character->sendMsg("Buy what from which shop?\n");
+        return;
+    }
+    // Get the target.
+    auto target = character->room->findItem(args[1].first, args[1].second);
+    if (target == nullptr)
+    {
+        character->sendMsg("You don't see '%s' here.\n", args[1].first);
+        return;
+    }
+    if (target->getType() != ModelType::Shop)
+    {
+        character->sendMsg("%s is not a shop.\n", target->getNameCapital());
+        return;
+    }
+    auto shop = target->toShopItem();
+    std::string error;
+    if (!shop->canUse(error))
+    {
+        character->sendMsg(error + "\n");
+        return;
+    }
+    auto shopKeeper = shop->shopKeeper;
+    // Get the item.
+    auto item = shop->findContent(args[0].first, args[0].second);
+    // Check the item.
+    if (item == nullptr)
+    {
+        auto phrase = "There is no " + args[0].first + " on sale.\n";
+        shopKeeper->doCommand("say " + character->getName() + " " + phrase);
+        return;
+    }
+    std::vector<Item *> givenCoins;
+    auto requiredValue = shop->evaluateBuyPrice(item);
+    unsigned int providedValue = 0;
+    if (!character->findCoins(givenCoins, requiredValue, providedValue))
+    {
+        auto phrase = "You can't afford to buy " + item->getName() + ".\n";
+        shopKeeper->doCommand("say " + character->getName() + " " + phrase);
+        return;
+    }
+    if (!character->canCarry(item))
+    {
+        auto phrase = "It seems that you can't carry " + item->getName() + ".\n";
+        shopKeeper->doCommand("say " + character->getName() + " " + phrase);
+        return;
+    }
+
+    if (providedValue > requiredValue)
+    {
+        auto change = providedValue - requiredValue;
+        auto currency = shopKeeper->faction->currency;
+        std::vector<Item *> returnedCoins;
+        SQLiteDbms::instance().beginTransaction();
+        if (!currency->generateCurrency(shopKeeper->getName(), change, returnedCoins))
+        {
+            auto phrase = "Sorry but I cannot sell " + item->getName() + " to you.\n";
+            shopKeeper->doCommand("say " + character->getName() + " " + phrase);
+            SQLiteDbms::instance().rollbackTransection();
+            return;
+        }
+        for (auto coin : returnedCoins)
+        {
+            character->addInventoryItem(coin);
+            if (!coin->updateOnDB())
+            {
+                auto phrase = "Sorry but I cannot sell " + item->getName() + " to you.\n";
+                shopKeeper->doCommand("say " + character->getName() + " " + phrase);
+                SQLiteDbms::instance().rollbackTransection();
+                return;
+            }
+        }
+        SQLiteDbms::instance().endTransaction();
+    }
+    SQLiteDbms::instance().beginTransaction();
+    for (auto coin : givenCoins)
+    {
+        if (!coin->destroy())
+        {
+            auto phrase = "Sorry but I cannot sell " + item->getName() + " to you.\n";
+            shopKeeper->doCommand("say " + character->getName() + " " + phrase);
+            SQLiteDbms::instance().rollbackTransection();
+            return;
+        }
+    }
+    shop->takeOut(item);
+    character->addInventoryItem(item);
+    if (!item->updateOnDB())
+    {
+        auto phrase = "Sorry but I cannot sell " + item->getName() + " to you.\n";
+        shopKeeper->doCommand("say " + character->getName() + " " + phrase);
+        SQLiteDbms::instance().rollbackTransection();
+        return;
+    }
+    shop->balance += requiredValue;
+    if (!shop->updateOnDB())
+    {
+        auto phrase = "Sorry but I cannot sell " + item->getName() + " to you.\n";
+        shopKeeper->doCommand("say " + character->getName() + " " + phrase);
+        SQLiteDbms::instance().rollbackTransection();
+        return;
+    }
+    SQLiteDbms::instance().endTransaction();
+
+    character->sendMsg("You buy %s from %s.\n", item->getName(), shop->getName());
 }

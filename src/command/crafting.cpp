@@ -68,12 +68,10 @@ void DoProfession(Character * character, Profession * profession, std::istream &
     // Search the needed workbench.
     if (production->workbench != ToolType::NoType)
     {
-        Item * workbench = character->findNearbyTool(
-            production->workbench,
-            ItemVector(),
-            true,
-            false,
-            false);
+        Item * workbench = character->findNearbyTool(production->workbench, ItemVector(),
+        true,
+        false,
+        false);
         if (workbench == nullptr)
         {
             character->sendMsg("The proper workbench is not present.\n");
@@ -274,25 +272,19 @@ void DoDeconstruct(Character * character, std::istream & sArgs)
         character->sendMsg("You are too tired right now.\n");
         return;
     }
-    if (HasFlag(item->flags, ItemFlag::Built))
+    std::string error;
+    if (!item->canDeconstruct(error))
     {
-        if (!item->isEmpty())
-        {
-            character->sendMsg("You must remove all the content first.\n");
-        }
-        else
-        {
-            character->sendMsg("You deconstruct %s.\n", item->getName());
-            // Reset item flags.
-            ClearFlag(item->flags, ItemFlag::Built);
-            SQLiteDbms::instance().beginTransaction();
-            item->updateOnDB();
-            SQLiteDbms::instance().endTransaction();
-        }
+        character->sendMsg(error + "\n");
     }
     else
     {
-        character->sendMsg("%s is not built.\n", item->getNameCapital());
+        character->sendMsg("You deconstruct %s.\n", item->getName());
+        // Reset item flags.
+        ClearFlag(item->flags, ItemFlag::Built);
+        SQLiteDbms::instance().beginTransaction();
+        item->updateOnDB();
+        SQLiteDbms::instance().endTransaction();
     }
 }
 

@@ -35,4 +35,11 @@ class CorpseModel: public ItemModel
         virtual bool setModel(const std::string & source);
 
         virtual void getSheet(Table & sheet) const;
+
+        virtual Item * createItem(
+            std::string maker,
+            Material * composition,
+            const ItemQuality & itemQuality);
+
+        Item * createCorpse(std::string maker, Material * composition, const unsigned int & weight);
 };

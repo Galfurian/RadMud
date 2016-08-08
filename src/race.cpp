@@ -59,8 +59,6 @@ void Race::initializeCorpse(const std::string & corpseDescription)
     corpse.description = corpseDescription;
     corpse.slot = EquipmentSlot::None;
     corpse.modelFlags = 0;
-    corpse.weight = 50;
-    corpse.price = 0;
     corpse.condition = 10;
     corpse.decay = 1;
     corpse.material = this->material->type;
@@ -110,7 +108,7 @@ bool Race::setAvailableFactions(const std::string & source)
 {
     if (source.empty())
     {
-        return false;
+        return true;
     }
     std::vector<std::string> factionList = SplitString(source, ";");
     if (factionList.empty())

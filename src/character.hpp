@@ -366,8 +366,19 @@ class Character
         /// @brief Search the list of ingredients nearby the character.
         /// @param ingredients The list of ingredients and their quantities.
         /// @param foundOnes   The list of found ingredients.
-        /// @return <b>True</b> if the operation goes well,<br><b>False</b> otherwise.
+        /// @return <b>True</b> if the operation goes well,<br>
+        ///         <b>False</b> otherwise.
         bool findNearbyResouces(IngredientMap ingredients, ItemVector & foundOnes);
+
+        /// @brief Search the coins on the character.
+        /// @param coins List of found coins.
+        /// @param value Total value that has to be found.
+        /// @return <b>True</b> if the character has the right ammount of coins,<br>
+        ///         <b>False</b> otherwise.
+        bool findCoins(
+            std::vector<Item *> & coins,
+            const unsigned int & requiredValue,
+            unsigned int & providedValue);
 
         /// @brief Allows to check if an item is inside the inventory.
         /// @param item The item to search.

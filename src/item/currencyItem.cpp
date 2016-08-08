@@ -1,4 +1,4 @@
-/// @file   armorItem.cpp
+/// @file   currencyItem.cpp
 /// @author Enrico Fraccaroli
 /// @date   Aug 04 2016
 /// @copyright
@@ -15,42 +15,57 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#include "armorItem.hpp"
+#include "currencyItem.hpp"
 
-#include "../model/armorModel.hpp"
+#include "../model/currencyModel.hpp"
 #include "../material.hpp"
 #include "../utils.hpp"
 
-ArmorItem::ArmorItem()
+CurrencyItem::CurrencyItem()
 {
     // Nothing to do.
 }
 
-ArmorItem::~ArmorItem()
+CurrencyItem::~CurrencyItem()
 {
     // Nothing to do.
 }
 
-void ArmorItem::getSheet(Table & sheet) const
+ModelType CurrencyItem::getType() const
+{
+    return ModelType::Currency;
+}
+
+std::string CurrencyItem::getTypeName() const
+{
+    return "currency";
+}
+
+void CurrencyItem::getSheet(Table & sheet) const
 {
     // Call the function of the father class.
     Item::getSheet(sheet);
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow( { "Armor Class", ToString(this->getArmorClass()) });
 }
 
-unsigned int ArmorItem::getArmorClass() const
+unsigned int CurrencyItem::getPrice() const
 {
-    // Add the base armor class.
-    auto acBase = this->model->toArmor()->armorClass;
-    // Evaluate the modifier due to item's quality.
-    auto acQuality = static_cast<unsigned int>(acBase * quality.getModifier());
-    // Evaluate the modifier due to item's condition.
-    auto acCondition = static_cast<unsigned int>(acBase * this->getConditionModifier());
-    // Evaluate the modifier due to item's material.
-    auto acMaterial = static_cast<unsigned int>(acBase * this->composition->getHardnessModifier());
-    // The resulting armor class.
-    return ((acBase + acQuality + acCondition + acMaterial) / 4);
+    unsigned int customPrice = Item::getPrice();
+    CurrencyModel * currency = this->model->toCurrency();
+    if (!currency->findPrice(this->composition->vnum, customPrice))
+    {
+        Logger::log(
+            LogLevel::Warning,
+            "The item (%s) has a wrong composition w.r.t the currency (%s).",
+            this->getName(),
+            currency->getName());
+    }
+    return customPrice;
+}
+
+unsigned int CurrencyItem::getWeight() const
+{
+    return 0;
 }

@@ -1,4 +1,4 @@
-/// @file   armorItem.hpp
+/// @file   currencyItem.hpp
 /// @author Enrico Fraccaroli
 /// @date   Aug 04 2016
 /// @copyright
@@ -19,17 +19,21 @@
 
 #include "item.hpp"
 
-/// @brief Holds details about armors.
-class ArmorItem: public Item
+/// @brief Holds details about currency.
+class CurrencyItem: public Item
 {
     public:
-        ArmorItem();
+        CurrencyItem();
 
-        virtual ~ArmorItem();
+        virtual ~CurrencyItem();
+
+        virtual ModelType getType() const;
+
+        virtual std::string getTypeName() const;
 
         virtual void getSheet(Table & sheet) const;
 
-        /// Provides the AC of the armor based on its quality, material and condition.
-        /// @return the armor class.
-        unsigned int getArmorClass() const;
+        virtual unsigned int getPrice() const;
+
+        virtual unsigned int getWeight() const;
 };

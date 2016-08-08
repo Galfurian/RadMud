@@ -23,7 +23,38 @@
 /// @brief Model of a currency.
 class CurrencyModel: public ItemModel
 {
+    private:
+        struct Price
+        {
+            public:
+                int material;
+                unsigned int price;
+                Price(const int & _material, const unsigned int & _price) :
+                        material(_material),
+                        price(_price)
+                {
+                    // Nothing to do.
+                }
+                /// @brief Operator used to order the prices.
+                bool operator>(const Price & rhs) const
+                {
+                    return price > rhs.price;
+                }
+                /// @brief Operator used to order the prices.
+                bool operator==(const Price & rhs) const
+                {
+                    return price == rhs.price;
+                }
+                /// @brief Operator used to order the prices.
+                bool operator==(const int & _rhs) const
+                {
+                    return material == _rhs;
+                }
+        };
+
     public:
+        std::vector<Price> prices;
+
         CurrencyModel();
 
         virtual ~CurrencyModel();
@@ -35,4 +66,22 @@ class CurrencyModel: public ItemModel
         virtual bool setModel(const std::string & source);
 
         virtual void getSheet(Table & sheet) const;
+
+        virtual Item * createItem(
+            std::string maker,
+            Material * composition,
+            const ItemQuality & itemQuality);
+
+        bool addPrice(const int & materialVnum, const unsigned int & price);
+
+        bool findPrice(const int & materialVnum, unsigned int & price) const;
+
+        bool generateCurrency(
+            const std::string & maker,
+            const unsigned int & value,
+            std::vector<Item *> & coins);
+
+    private:
+        /// @brief Sort the list of prices.
+        void sortList();
 };

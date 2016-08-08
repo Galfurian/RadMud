@@ -937,6 +937,59 @@ bool Character::findNearbyResouces(IngredientMap ingredients, ItemVector & found
     return true;
 }
 
+bool Character::findCoins(
+    std::vector<Item *> & coins,
+    const unsigned int & requiredValue,
+    unsigned int & providedValue)
+{
+    for (auto it : equipment)
+    {
+        if (it->isAContainer() && !it->isEmpty())
+        {
+            for (auto content : it->content)
+            {
+                if (content->getType() == ModelType::Currency)
+                {
+                    providedValue += content->getPrice();
+                    coins.push_back(content);
+                    if (providedValue >= requiredValue)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    for (auto it : inventory)
+    {
+        if (it->getType() == ModelType::Currency)
+        {
+            providedValue += it->getPrice();
+            coins.push_back(it);
+            if (providedValue >= requiredValue)
+            {
+                return true;
+            }
+        }
+        if (it->isAContainer() && !it->isEmpty())
+        {
+            for (auto content : it->content)
+            {
+                if (content->getType() == ModelType::Currency)
+                {
+                    providedValue += content->getPrice();
+                    coins.push_back(it);
+                    if (providedValue >= requiredValue)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+
 bool Character::hasInventoryItem(Item * item)
 {
     for (auto it : inventory)
@@ -963,18 +1016,15 @@ bool Character::hasEquipmentItem(Item * item)
 
 bool Character::addInventoryItem(Item * item)
 {
-    if (item == nullptr)
-    {
-        Logger::log(LogLevel::Error, "[addInventoryItem] Item is a nullptr.");
-        return false;
-    }
     // Set the owner of the item.
     item->owner = this;
     // Add the item to the inventory.
     inventory.push_back(item);
     Logger::log(
         LogLevel::Debug,
-        "Item '" + item->getName() + "' added to '" + this->getName() + "' inventory;");
+        "Item '%s' added to '%s' inventory;",
+        item->getName(),
+        this->getName());
     return true;
 }
 
@@ -1000,7 +1050,7 @@ bool Character::remInventoryItem(Item *item)
 
 bool Character::canCarry(Item * item) const
 {
-    return ((this->getCarryingWeight() + item->getTotalWeight()) < this->getMaxCarryingWeight());
+    return ((this->getCarryingWeight() + item->getWeight()) < this->getMaxCarryingWeight());
 }
 
 unsigned int Character::getCarryingWeight() const
@@ -1008,11 +1058,11 @@ unsigned int Character::getCarryingWeight() const
     unsigned int carrying = 0;
     for (auto iterator : inventory)
     {
-        carrying += iterator->getTotalWeight();
+        carrying += iterator->getWeight();
     }
     for (auto iterator : equipment)
     {
-        carrying += iterator->getTotalWeight();
+        carrying += iterator->getWeight();
     }
     return carrying;
 }
@@ -1514,7 +1564,7 @@ unsigned int Character::getCooldown(CombatActionType combatAction)
             // MIN =  0.00
             // MAX =  1.60
             Item * weapon = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
-            double RHDmod = weapon->getTotalWeight();
+            double RHDmod = weapon->getWeight();
             if (RHDmod > 0)
             {
                 if (RHDmod > 40)
@@ -1530,7 +1580,7 @@ unsigned int Character::getCooldown(CombatActionType combatAction)
             // MIN =  0.00
             // MAX =  1.60
             Item * weapon = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
-            double LHDmod = weapon->getTotalWeight();
+            double LHDmod = weapon->getWeight();
             if (LHDmod > 0)
             {
                 if (LHDmod > 40)
@@ -1589,7 +1639,7 @@ unsigned int Character::getConsumedStaminaFor(
             if (this->canAttackWith(slot))
             {
                 Item * weapon = this->findEquipmentSlotItem(slot);
-                unsigned int wpnWeight = weapon->getTotalWeight();
+                unsigned int wpnWeight = weapon->getWeight();
                 double WPN = (wpnWeight == 0) ? 0 : log10(wpnWeight);
                 RSLT += WPN;
             }
@@ -1648,9 +1698,7 @@ void Character::kill()
 Item * Character::createCorpse()
 {
     // Create the corpse.
-    Item * corpse = race->corpse.createItem(this->name, race->material, ItemQuality::Normal);
-    // Set the weight of the new corpse.
-    corpse->customWeight = this->weight;
+    Item * corpse = race->corpse.createCorpse(this->name, race->material, this->weight);
     // Add the corpse to the room.
     room->addItem(corpse);
     // Return the corpse.
@@ -1733,9 +1781,9 @@ void Character::luaRegister(lua_State * L)
     .addData("shortdesc", &Mobile::shortdesc) //
     .addData("staticdesc", &Mobile::staticdesc) //
     .addData("message_buffer", &Mobile::message_buffer) //
-    .addData("alive", &Mobile::alive) //
     .addData("controller", &Mobile::controller) //
     .addFunction("isMobile", &Mobile::isMobile) //
+    .addFunction("isAlive", &Mobile::isAlive) //
     .endClass() //
     .deriveClass<Player, Character>("Player") //
     .addData("age", &Player::age, false) //

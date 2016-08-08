@@ -237,6 +237,12 @@ void DoDrink(Character * character, std::istream & sArgs);
 void DoFill(Character * character, std::istream & sArgs);
 /// Pour the container of liquids into another one or on the ground.
 void DoPour(Character * character, std::istream & sArgs);
+/// Deposit a currency inside a shop.
+void DoDeposit(Character * character, std::istream & sArgs);
+/// Sell an item.
+void DoSell(Character * character, std::istream & sArgs);
+/// Buy an item.
+void DoBuy(Character * character, std::istream & sArgs);
 /// The character say something.
 void DoSay(Character * character, std::istream & sArgs);
 /// The character whisper something to someone, even in distance.
@@ -321,6 +327,8 @@ void DoLiquidInfo(Character * character, std::istream & sArgs);
 void DoProductionInfo(Character * character, std::istream & sArgs);
 /// Provide all the information regarding the given profession.
 void DoProfessionInfo(Character * character, std::istream & sArgs);
+/// Shows the infos about a faction.
+void DoFactionInfo(Character * character, std::istream & sArgs);
 /// List all the model used to define items.
 void DoModelList(Character * character, std::istream & sArgs);
 /// List all the items in the Mud.
