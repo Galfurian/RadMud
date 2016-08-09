@@ -186,14 +186,10 @@ Item * ItemModel::createItem(
         // Return pointer to nothing.
         return nullptr;
     }
-    if (newItem->createOnDB())
+    // Insert into the item_list the new item.
+    if (!Mud::instance().addItem(newItem))
     {
-        // Insert into the item_list the new item.
-        Mud::instance().addItem(newItem);
-    }
-    else
-    {
-        Logger::log(LogLevel::Error, "Cannot save the new item on DB.");
+        Logger::log(LogLevel::Error, "Cannot save the new item on MUD.");
         // Delete the item.
         delete (newItem);
         // Return pointer to nothing.
