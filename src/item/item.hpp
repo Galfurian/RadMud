@@ -47,6 +47,8 @@ class Item
         ModelType type;
         /// Item model.
         ItemModel * model;
+        /// The number of stacked items.
+        unsigned int quantity;
         /// The player that created the item.
         std::string maker;
         /// The item's price.
@@ -221,19 +223,19 @@ class Item
         ///         <b>False</b> otherwise.
         bool takeOut(Item * item);
 
-        bool canContain(Liquid * liquid, const unsigned int & quantity) const;
+        bool canContain(Liquid * liquid, const unsigned int & ammount) const;
 
         /// @brief Load some liquid inside the container and update the database.
         /// @param liquid   The liquid to load in.
-        /// @param quantity The quantity of liquid.
+        /// @param ammount The ammount of liquid.
         /// @return <b>True</b> if the operation is a success,<br>
         ///         <b>False</b> otherwise.
-        bool pourIn(Liquid * liquid, const unsigned int & quantity);
+        bool pourIn(Liquid * liquid, const unsigned int & ammount);
 
         /// @brief Extract some liquid from the container and update the database.
-        /// @param quantity The quantity of liquid.
+        /// @param ammount The ammount of liquid.
         /// @return <b>True</b> if the operation is a success,<br><b>False</b> otherwise.
-        bool pourOut(const unsigned int & quantity);
+        bool pourOut(const unsigned int & ammount);
 
         /// @brief Search for the item inside the container.
         /// @param search_parameter The item to search.

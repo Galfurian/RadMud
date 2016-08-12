@@ -43,6 +43,7 @@ Item::Item() :
         vnum(),
         type(),
         model(),
+        quantity(),
         maker(),
         price(),
         weight(),
@@ -74,6 +75,7 @@ bool Item::check(bool complete)
     bool safe = true;
     safe &= CorrectAssert(vnum > 0);
     safe &= CorrectAssert(model != nullptr);
+    safe &= CorrectAssert(quantity > 0);
     safe &= CorrectAssert(!maker.empty());
     safe &= CorrectAssert(condition > 0);
     safe &= CorrectAssert(composition != nullptr);
@@ -694,9 +696,9 @@ bool Item::takeOut(Item * item)
     return removed;
 }
 
-bool Item::canContain(Liquid * liquid, const unsigned int & quantity) const
+bool Item::canContain(Liquid * liquid, const unsigned int & ammount) const
 {
-    if (quantity > this->getFreeSpace())
+    if (ammount > this->getFreeSpace())
     {
         return false;
     }
@@ -707,20 +709,20 @@ bool Item::canContain(Liquid * liquid, const unsigned int & quantity) const
     return true;
 }
 
-bool Item::pourIn(Liquid * liquid, const unsigned int & quantity)
+bool Item::pourIn(Liquid * liquid, const unsigned int & ammount)
 {
-    if (this->canContain(liquid, quantity))
+    if (this->canContain(liquid, ammount))
     {
         if (contentLiq.first == nullptr)
         {
-            // Set the liquid quantity.
+            // Set the liquid ammount.
             contentLiq.first = liquid;
-            contentLiq.second = quantity;
+            contentLiq.second = ammount;
         }
         else if (contentLiq.first == liquid)
         {
             QueryList value;
-            value.push_back(std::make_pair("quantity", ToString(contentLiq.second)));
+            value.push_back(std::make_pair("ammount", ToString(contentLiq.second)));
             QueryList where;
             where.push_back(std::make_pair("container", ToString(vnum)));
             where.push_back(std::make_pair("content", ToString(liquid->vnum)));
@@ -729,15 +731,15 @@ bool Item::pourIn(Liquid * liquid, const unsigned int & quantity)
             {
                 return false;
             }
-            // Increment the liquid quantity.
-            contentLiq.second += quantity;
+            // Increment the liquid ammount.
+            contentLiq.second += ammount;
         }
         return true;
     }
     return false;
 }
 
-bool Item::pourOut(const unsigned int & quantity)
+bool Item::pourOut(const unsigned int & ammount)
 {
     if (model->getType() != ModelType::LiquidContainer)
     {
@@ -748,11 +750,11 @@ bool Item::pourOut(const unsigned int & quantity)
     {
         return true;
     }
-    // Check if the container has the necessary quantity of liquid.
-    if (contentLiq.second >= quantity)
+    // Check if the container has the necessary ammount of liquid.
+    if (contentLiq.second >= ammount)
     {
-        // Decrement the liquid quantity.
-        contentLiq.second -= quantity;
+        // Decrement the liquid ammount.
+        contentLiq.second -= ammount;
         if (contentLiq.second == 0)
         {
             QueryList where;
@@ -766,7 +768,7 @@ bool Item::pourOut(const unsigned int & quantity)
         else
         {
             QueryList value;
-            value.push_back(std::make_pair("quantity", ToString(contentLiq.second)));
+            value.push_back(std::make_pair("ammount", ToString(contentLiq.second)));
             QueryList where;
             where.push_back(std::make_pair("container", ToString(vnum)));
             where.push_back(std::make_pair("content", ToString(contentLiq.first->vnum)));
@@ -867,7 +869,7 @@ std::string Item::lookContent()
 
             if (percent >= 100) output += "It's full of ";
             else if (percent >= 75) output += "It's half full of ";
-            else if (percent >= 50) output += "Contains a discrete quantity of ";
+            else if (percent >= 50) output += "Contains a discrete ammount of ";
             else if (percent >= 25) output += "It contains a little bit of ";
             else if (percent >= 0) output += "It contains some drops of ";
             else output += "It's empty, but you can see some ";

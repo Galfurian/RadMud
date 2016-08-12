@@ -95,7 +95,9 @@ typedef enum class ModelFlags
     /// It can be closed.
     CanClose = 32,
     /// Even if it is closed, a character can see through it.
-    CanSeeThrough = 64
+    CanSeeThrough = 64,
+    /// The items with this flag can be stacked.
+    CanBeStacked = 128
 } ModelFlag;
 
 class Item;

@@ -15,7 +15,6 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#include "model/currencyModel.hpp"
 #include "sqliteDbms.hpp"
 
 #include "../mud.hpp"
@@ -43,6 +42,7 @@
 #include "../model/vehicleModel.hpp"
 #include "../model/weaponModel.hpp"
 #include "../model/shopModel.hpp"
+#include "../model/currencyModel.hpp"
 
 #include "../item/shopItem.hpp"
 #include "../item/armorItem.hpp"
@@ -122,6 +122,7 @@ bool LoadItem(ResultSet * result)
         // Retrieve the values.
         auto itemVnum = result->getNextInteger();
         auto itemModelVnum = result->getNextInteger();
+        auto itemQuantity = result->getNextUnsignedInteger();
         auto itemMaker = result->getNextString();
         auto itemPrice = result->getNextUnsignedInteger();
         auto itemWeight = result->getNextUnsignedInteger();
@@ -157,6 +158,7 @@ bool LoadItem(ResultSet * result)
         Item * item = GenerateItem(itemModel->getType());
         item->vnum = itemVnum;
         item->model = itemModel;
+        item->quantity = itemQuantity;
         item->price = itemPrice;
         item->weight = itemWeight;
         item->condition = itemCondition;
