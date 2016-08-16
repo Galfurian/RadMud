@@ -62,9 +62,3 @@ class Liquid
         /// @return The name of the liquid.
         std::string getNameCapital();
 };
-
-/// Liquid list for containers.
-typedef std::pair<Liquid *, unsigned int> LiquidContent;
-
-/// Liquid map handler.
-typedef std::map<int, Liquid *> LiquidMap;

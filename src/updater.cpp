@@ -223,7 +223,7 @@ void MudUpdater::updateMobilesHour()
 
 void MudUpdater::updateItems()
 {
-    ItemList itemToDestroy;
+    std::list<Item *> itemToDestroy;
     Logger::log(LogLevel::Debug, "Updating corpses...");
     for (auto it : Mud::instance().mudCorpses)
     {

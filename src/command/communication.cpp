@@ -59,8 +59,7 @@ void DoSay(Character * character, std::istream & sArgs)
 
     // //////////////////////////////////////////
     // Check if the character are talking to another character.
-    CharacterVector excpetions = { character };
-    Character * receiver = character->room->findCharacter(target, number, excpetions);
+    Character * receiver = character->room->findCharacter(target, number, { character });
     if (receiver != nullptr)
     {
         // Get the rest of the message, minus the first word.
@@ -84,14 +83,10 @@ void DoSay(Character * character, std::istream & sArgs)
             chName,
             Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
 
-        // Set the list of exceptions.
-        CharacterVector exceptions;
-        exceptions.push_back(character);
-        exceptions.push_back(receiver);
         // Send the message inside the room.
         character->room->sendToAll(
             "%s says to %s, \"%s\".\n",
-            exceptions,
+            { character, receiver },
             chName,
             receiver->getName(),
             Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
@@ -106,13 +101,10 @@ void DoSay(Character * character, std::istream & sArgs)
         character->sendMsg(
             "You say \"%s\".\n",
             Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
-        // Set the list of exceptions.
-        CharacterVector exceptions;
-        exceptions.push_back(character);
         // Send the message inside the room.
         character->room->sendToAll(
             "%s says \"%s\".\n",
-            exceptions,
+            { character },
             chName,
             Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
     }
@@ -142,8 +134,7 @@ void DoWhisper(Character * character, std::istream & sArgs)
 
     // //////////////////////////////////////////
     // Check the existance of the target character.
-    CharacterVector excpetions = { character };
-    Character * receiver = character->room->findCharacter(target, number, excpetions);
+    Character * receiver = character->room->findCharacter(target, number, { character });
     if (receiver == nullptr)
     {
         throw std::runtime_error("You don't see " + target + " here.\n");
@@ -194,13 +185,10 @@ void DoEmote(Character * character, std::istream & sArgs)
     // //////////////////////////////////////////
     // Send the emote.
     character->sendMsg("%sYou %s\n", Formatter::yellow(), emote + Formatter::reset());
-    // Set the list of exceptions.
-    CharacterVector exceptions;
-    exceptions.push_back(character);
     // Send the message inside the room.
     character->room->sendToAll(
         "%s %s\n",
-        exceptions,
+        { character },
         Formatter::yellow() + chName,
         emote + Formatter::reset());
 }

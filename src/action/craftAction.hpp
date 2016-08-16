@@ -47,8 +47,8 @@ class CraftAction: public GeneralAction
             Character * _actor,
             Production * _production,
             Material * _material,
-            ItemVector & _tools,
-            ItemVector & _ingredients,
+            std::vector<Item *> & _tools,
+            std::vector<Item *> & _ingredients,
             unsigned int & _cooldown);
 
         /// @brief Destructor.

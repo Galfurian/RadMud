@@ -416,7 +416,7 @@ void Player::enterGame()
     {
         room->addCharacter(this);
         // Set the list of exceptions.
-        CharacterVector exceptions;
+        std::vector<Character *> exceptions;
         exceptions.push_back(this);
         // Send the message inside the room.
         room->sendToAll("%s appears.\n", exceptions, name);

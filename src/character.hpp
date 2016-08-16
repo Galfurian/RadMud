@@ -343,7 +343,7 @@ class Character
         /// @return The searched tool.
         Item * findNearbyTool(
             const ToolType & toolType,
-            const ItemVector & exceptions,
+            const std::vector<Item *> & exceptions,
             bool searchRoom,
             bool searchInventory,
             bool searchEquipment);
@@ -357,8 +357,8 @@ class Character
         /// @return <b>True</b> if the operation goes well,<br>
         ///         <b>False</b> otherwise.
         bool findNearbyTools(
-            ToolSet tools,
-            ItemVector & foundOnes,
+            std::set<ToolType> tools,
+            std::vector<Item *> & foundOnes,
             bool searchRoom,
             bool searchInventory,
             bool searchEquipment);
@@ -368,7 +368,9 @@ class Character
         /// @param foundOnes   The list of found ingredients.
         /// @return <b>True</b> if the operation goes well,<br>
         ///         <b>False</b> otherwise.
-        bool findNearbyResouces(IngredientMap ingredients, ItemVector & foundOnes);
+        bool findNearbyResouces(
+            std::map<ResourceType, unsigned int> ingredients,
+            std::vector<Item *> & foundOnes);
 
         /// @brief Search the coins on the character.
         /// @param coins List of found coins.
@@ -605,14 +607,8 @@ class Character
         }
 };
 
-/// @brief Character list handler.
-typedef std::vector<Character *> CharacterVector;
-
 /// @brief An action handler for the character.
 typedef std::function<void(Character * character, std::istream & args)> ActionHandler;
-
-/// @brief Map of things to do for various connection states.
-typedef std::map<ConnectionState, ActionHandler> StateActionMap;
 
 /// @addtogroup FlagsToList
 /// @{

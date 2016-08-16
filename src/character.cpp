@@ -686,7 +686,7 @@ void Character::moveTo(
     }
 
     // Set the list of exceptions.
-    CharacterVector exceptions;
+    std::vector<Character *> exceptions;
     exceptions.push_back(this);
     // Tell others where the character went and remove s/he from the old room.
     room->sendToAll(msgDepart, exceptions);
@@ -794,7 +794,7 @@ Item * Character::findNearbyItem(std::string itemName, int & number)
     return item;
 }
 
-Item * Character::findNearbyTool(const ToolType & toolType, const ItemVector & exceptions,
+Item * Character::findNearbyTool(const ToolType & toolType, const std::vector<Item *> & exceptions,
 bool searchRoom,
 bool searchInventory,
 bool searchEquipment)
@@ -856,7 +856,7 @@ bool searchEquipment)
     return nullptr;
 }
 
-bool Character::findNearbyTools(ToolSet tools, ItemVector & foundOnes,
+bool Character::findNearbyTools(std::set<ToolType> tools, std::vector<Item *> & foundOnes,
 bool searchRoom,
 bool searchInventory,
 bool searchEquipment)
@@ -886,7 +886,7 @@ bool searchEquipment)
     return true;
 }
 
-bool Character::findNearbyResouces(IngredientMap ingredients, ItemVector & foundOnes)
+bool Character::findNearbyResouces(std::map<ResourceType, unsigned int> ingredients, std::vector<Item *> & foundOnes)
 {
     for (auto ingredient : ingredients)
     {
@@ -1031,7 +1031,7 @@ bool Character::addInventoryItem(Item * item)
 bool Character::remInventoryItem(Item *item)
 {
     bool removed = false;
-    for (ItemVector::iterator it = inventory.begin(); it != inventory.end(); ++it)
+    for (std::vector<Item *>::iterator it = inventory.begin(); it != inventory.end(); ++it)
     {
         Item * invItem = (*it);
         if (invItem->vnum == item->vnum)
@@ -1503,9 +1503,9 @@ std::vector<WeaponItem *> Character::getActiveWeapons()
     return ret;
 }
 
-bool Character::getCharactersInSight(CharacterVector & targets)
+bool Character::getCharactersInSight(std::vector<Character *> & targets)
 {
-    CharacterVector exceptions;
+    std::vector<Character *> exceptions;
     exceptions.push_back(this);
     Coordinates coord = this->room->coord;
     return this->room->area->getCharactersInSight(

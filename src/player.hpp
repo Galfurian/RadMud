@@ -165,6 +165,3 @@ class Player: public Character
         /// @param msg String to sent.
         void sendMsg(const std::string & msg);
 };
-
-/// Player map.
-typedef std::set<Player *> PlayerList;

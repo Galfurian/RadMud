@@ -97,7 +97,7 @@ void Mobile::respawn()
     // Add the mobile to the respawn room.
     this->respawnRoom->addCharacter(this);
     // Set the list of exceptions.
-    CharacterVector exceptions;
+    std::vector<Character *> exceptions;
     exceptions.push_back(this);
     // Send the message inside the room.
     this->room->sendToAll("%s apear from somewhere.\n", exceptions, this->getNameCapital());

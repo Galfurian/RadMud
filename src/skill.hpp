@@ -57,6 +57,3 @@ class Skill
         /// @return <b>True</b> if it has correct values,<br><b>False</b> otherwise.
         bool check();
 };
-
-/// Map of skills with values.
-typedef std::map<int, Skill *> SkillMap;

@@ -153,9 +153,9 @@ void Room::removeCharacter(Character * character)
     }
 }
 
-PlayerList Room::getAllPlayer(Character * exception)
+std::set<Player *> Room::getAllPlayer(Character * exception)
 {
-    PlayerList plvec;
+    std::set<Player *> plvec;
     for (auto iterator : characters)
     {
         if (exception)
@@ -178,9 +178,9 @@ PlayerList Room::getAllPlayer(Character * exception)
     return plvec;
 }
 
-MobileList Room::getAllMobile(Character * exception)
+std::vector<Mobile *> Room::getAllMobile(Character * exception)
 {
-    MobileList movec;
+    std::vector<Mobile *> movec;
     for (auto iterator : characters)
     {
         if (exception)
@@ -281,9 +281,9 @@ Item * Room::findBuilding(int buildingVnum)
     return nullptr;
 }
 
-ItemVector Room::findBuildings(ModelType type)
+std::vector<Item *> Room::findBuildings(ModelType type)
 {
-    ItemVector buildingsList;
+    std::vector<Item *> buildingsList;
     for (auto iterator : items)
     {
         if ((iterator->model->getType() == type) && HasFlag(iterator->flags, ItemFlag::Built))
@@ -294,7 +294,7 @@ ItemVector Room::findBuildings(ModelType type)
     return buildingsList;
 }
 
-Character * Room::findCharacter(string target, int & number, const CharacterVector & exceptions)
+Character * Room::findCharacter(string target, int & number, const std::vector<Character *> & exceptions)
 {
     for (auto iterator : characters)
     {
@@ -342,7 +342,7 @@ Character * Room::findCharacter(string target, int & number, const CharacterVect
     return nullptr;
 }
 
-Player * Room::findPlayer(string target, int & number, const CharacterVector & exceptions)
+Player * Room::findPlayer(string target, int & number, const std::vector<Character *> & exceptions)
 {
     for (auto iterator : characters)
     {
@@ -375,7 +375,7 @@ Player * Room::findPlayer(string target, int & number, const CharacterVector & e
     return nullptr;
 }
 
-Mobile * Room::findMobile(string target, int & number, const CharacterVector & exceptions)
+Mobile * Room::findMobile(string target, int & number, const std::vector<Character *> & exceptions)
 {
     for (auto iterator : characters)
     {
@@ -583,7 +583,7 @@ string Room::getLook(Character * exception)
     return output;
 }
 
-void Room::sendToAll(const std::string & message, const CharacterVector & exceptions)
+void Room::sendToAll(const std::string & message, const std::vector<Character *> & exceptions)
 {
     for (auto iterator : characters)
     {

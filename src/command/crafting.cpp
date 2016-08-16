@@ -52,14 +52,14 @@ void DoProfession(Character * character, Profession * profession, std::istream &
         return;
     }
     // Search the needed tools.
-    ItemVector usedTools;
+    std::vector<Item *> usedTools;
     if (!character->findNearbyTools(production->tools, usedTools, false, true, true))
     {
         character->sendMsg("You don't have the right tools.\n");
         return;
     }
     // Search the needed ingredients.
-    ItemVector usedIngredients;
+    std::vector<Item *> usedIngredients;
     if (!character->findNearbyResouces(production->ingredients, usedIngredients))
     {
         character->sendMsg("You don't have enough material.\n");
@@ -68,7 +68,7 @@ void DoProfession(Character * character, Profession * profession, std::istream &
     // Search the needed workbench.
     if (production->workbench != ToolType::NoType)
     {
-        Item * workbench = character->findNearbyTool(production->workbench, ItemVector(),
+        Item * workbench = character->findNearbyTool(production->workbench, std::vector<Item *>(),
         true,
         false,
         false);
@@ -122,13 +122,10 @@ void DoProfession(Character * character, Profession * profession, std::istream &
         profession->startMessage,
         Formatter::yellow() + production->outcome->getName() + Formatter::reset());
 
-    // Set the list of exceptions.
-    CharacterVector exceptions;
-    exceptions.push_back(character);
     // Send the message inside the room.
     character->room->sendToAll(
         "%s has started %s something...\n",
-        exceptions,
+        { character },
         character->getNameCapital(),
         production->profession->action);
 }
@@ -155,14 +152,14 @@ void DoBuild(Character * character, std::istream & sArgs)
         return;
     }
     // Search the needed tools.
-    ItemVector usedTools;
+    std::vector<Item *> usedTools;
     if (!character->findNearbyTools(schematics->tools, usedTools, true, true, true))
     {
         character->sendMsg("You don't have the right tools.\n");
         return;
     }
     // Search the needed ingredients.
-    ItemVector usedIngredients;
+    std::vector<Item *> usedIngredients;
     if (!character->findNearbyResouces(schematics->ingredients, usedIngredients))
     {
         character->sendMsg("You don't have enough material.\n");
@@ -244,11 +241,8 @@ void DoBuild(Character * character, std::istream & sArgs)
     // //////////////////////////////////////////
     std::string roomMsg;
     roomMsg += character->name + " has started building something...\n";
-    // Set the list of exceptions.
-    CharacterVector exceptions;
-    exceptions.push_back(character);
     // Send the message inside the room.
-    character->room->sendToAll(roomMsg, exceptions);
+    character->room->sendToAll(roomMsg, { character });
 }
 
 void DoDeconstruct(Character * character, std::istream & sArgs)

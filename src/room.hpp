@@ -72,7 +72,7 @@ class Room
         /// List of items in the room.
         ItemContainer items;
         /// List of characters in the room.
-        CharacterVector characters;
+        std::vector<Character *> characters;
         /// Integer that describe the flags of the room.
         unsigned int flags;
 
@@ -116,12 +116,12 @@ class Room
         /// @brief Select from the room all the players and return them.
         /// @param exception The exception from the list.
         /// @return The list of all the players in the room.
-        PlayerList getAllPlayer(Character * exception);
+        std::set<Player *> getAllPlayer(Character * exception);
 
         /// @brief Select from the room all the mobiles and return them.
         /// @param exception The exception from the list.
         /// @return The list of all the mobiles in the room.
-        MobileList getAllMobile(Character * exception);
+        std::vector<Mobile *> getAllMobile(Character * exception);
 
         /// @brief Save the room on database.
         /// @return <b>True</b> if the execution goes well,<br><b>False</b> otherwise.
@@ -151,7 +151,7 @@ class Room
         /// @brief Search for the buildings of the given type inside the room.
         /// @param type The type of the buildings.
         /// @return The buildings list.
-        ItemVector findBuildings(ModelType type);
+        std::vector<Item *> findBuildings(ModelType type);
 
         /// @brief Search for the character in the room.
         /// @param target    The character to search.
@@ -161,21 +161,27 @@ class Room
         Character * findCharacter(
             std::string target,
             int & number,
-            const CharacterVector & exceptions);
+            const std::vector<Character *> & exceptions);
 
         /// @brief Search for the player in the room.
         /// @param target    The player to search.
         /// @param number    Number of the player we are looking for.
         /// @param exceptions The list of exceptions.
         /// @return The player, if it's in the room.
-        Player * findPlayer(std::string target, int & number, const CharacterVector & exceptions);
+        Player * findPlayer(
+            std::string target,
+            int & number,
+            const std::vector<Character *> & exceptions);
 
         /// @brief Search for the mobile in the room.
         /// @param target    The mobile to search.
         /// @param number    Number of the mobile we are looking for.
         /// @param exceptions The list of exceptions.
         /// @return The mobile, if it's in the room.
-        Mobile * findMobile(std::string target, int & number, const CharacterVector & exceptions);
+        Mobile * findMobile(
+            std::string target,
+            int & number,
+            const std::vector<Character *> & exceptions);
 
         /// @brief Add the provided exit to the room list of exits.
         /// @param exit The exit to add to the list.
@@ -220,7 +226,7 @@ class Room
         /// @brief Send a message to all the player in the room, can specify exceptions.
         /// @param message    The message to send.
         /// @param exceptions The list of exceptions.
-        void sendToAll(const std::string & message, const CharacterVector & exceptions);
+        void sendToAll(const std::string & message, const std::vector<Character *> & exceptions);
 
         /// @brief Print to consol and to logging file the gievn string.
         /// @param message    The message to send.
@@ -230,7 +236,7 @@ class Room
         template<typename ... Args>
         void sendToAll(
             const std::string & message,
-            const CharacterVector & exceptions,
+            const std::vector<Character *> & exceptions,
             const std::string & first,
             const Args & ... args)
         {
@@ -288,18 +294,3 @@ bool ConnectRoom(Room * room);
 std::string GetRoomFlagString(unsigned int flags);
 
 /// @}
-
-/// Room list handler.
-typedef std::vector<Room *> RoomList;
-
-/// RoomList iterator.
-typedef RoomList::iterator RoomListIterator;
-
-/// Room map handler.
-typedef std::map<int, Room *> RoomMap;
-
-/// RoomMap iterator.
-typedef RoomMap::iterator RoomMapIterator;
-
-/// Map of travelling points.
-typedef std::map<Room *, Room *> TravelPointMap;

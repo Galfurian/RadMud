@@ -81,6 +81,3 @@ class Profession
         /// @return The name of the profession.
         std::string getNameCapital();
 };
-
-/// Profession map handler.
-typedef std::map<unsigned int, Profession *> ProfessionMap;

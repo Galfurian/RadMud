@@ -78,7 +78,7 @@ class Item
         /// List of items contained in this one.
         ItemContainer content;
         /// The liquid inside the container.
-        LiquidContent contentLiq;
+        std::pair<Liquid *, unsigned int> contentLiq;
 
         /// @brief Constructor - Create a new empty item.
         Item();
@@ -281,12 +281,3 @@ class Item
 };
 
 Item * GenerateItem(const ModelType & type);
-
-/// Vector of items.
-typedef std::vector<Item *> ItemVector;
-
-/// List of items.
-typedef std::list<Item *> ItemList;
-
-/// Map of items.
-typedef std::map<int, Item *> ItemMap;

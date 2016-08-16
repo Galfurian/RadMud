@@ -40,8 +40,8 @@ void DoTake(Character * character, std::istream & sArgs)
     {
         if (ToLower(arguments[0].first) == "all")
         {
-            ItemVector untouchedList = character->room->items;
-            ItemVector actuallyTaken;
+            std::vector<Item *> untouchedList = character->room->items;
+            std::vector<Item *> actuallyTaken;
             for (auto iterator : untouchedList)
             {
                 // Check if the item is static.
@@ -877,13 +877,11 @@ void DoOpen(Character * character, std::istream & sArgs)
                 // Show the action in the next room.
                 it->destination->sendToAll(
                     "Someone opens a secret passage from the other side.\n",
-                    CharacterVector());
+                    { });
             }
             else
             {
-                it->destination->sendToAll(
-                    "Someone opens a door from the other side.\n",
-                    CharacterVector());
+                it->destination->sendToAll("Someone opens a door from the other side.\n", { });
             }
         }
     }
@@ -1004,14 +1002,12 @@ void DoClose(Character * character, std::istream & sArgs)
                 // Send the message inside the room.
                 it->destination->sendToAll(
                     "Someone closes a secret passage from the other side.\n",
-                    CharacterVector());
+                    { });
             }
             else
             {
                 // Send the message inside the room.
-                it->destination->sendToAll(
-                    "Someone closes a door from the other side.\n",
-                    CharacterVector());
+                it->destination->sendToAll("Someone closes a door from the other side.\n", { });
             }
         }
         return;

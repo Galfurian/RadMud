@@ -29,8 +29,8 @@ CraftAction::CraftAction(
     Character * _actor,
     Production * _production,
     Material * _material,
-    ItemVector & _tools,
-    ItemVector & _ingredients,
+    std::vector<Item *> & _tools,
+    std::vector<Item *> & _ingredients,
     unsigned int & _cooldown) :
         GeneralAction(_actor, system_clock::now() + seconds(_cooldown)),
         production(_production),
@@ -95,7 +95,7 @@ ActionStatus CraftAction::perform()
     // Consume the stamina.
     actor->remStamina(consumedStamina, true);
 
-    ItemVector createdItems;
+    std::vector<Item *> createdItems;
     for (unsigned int it = 0; it < production->quantity; ++it)
     {
         ItemModel * outcomeModel = production->outcome;
@@ -135,7 +135,7 @@ ActionStatus CraftAction::perform()
         }
     }
     // Update the tools.
-    ItemVector toDestroy;
+    std::vector<Item *> toDestroy;
     for (auto iterator : tools)
     {
         // Update the condition of the involved objects.

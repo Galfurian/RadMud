@@ -29,8 +29,8 @@ BuildAction::BuildAction(
     Character * _actor,
     Building * _schematics,
     Item * _building,
-    ItemVector & _tools,
-    ItemVector & _ingredients,
+    std::vector<Item *> & _tools,
+    std::vector<Item *> & _ingredients,
     unsigned int _cooldown) :
         GeneralAction(_actor, system_clock::now() + seconds(_cooldown)),
         schematics(_schematics),
@@ -97,7 +97,7 @@ ActionStatus BuildAction::perform()
 
     actor->remInventoryItem(building);
     actor->room->addBuilding(building);
-    ItemVector toDestroy;
+    std::vector<Item *> toDestroy;
     for (auto iterator : tools)
     {
         // Update the condition of the involved objects.

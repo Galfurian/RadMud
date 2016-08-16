@@ -30,9 +30,3 @@ struct Writing
         /// The content of the writing.
         std::string content;
 };
-
-/// Writing map handler.
-typedef std::map<int, Writing *> WritingMap;
-
-/// WritingMap iterator.
-typedef WritingMap::iterator WritingMapIterator;

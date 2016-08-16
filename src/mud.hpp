@@ -116,39 +116,39 @@ class Mud
         static Mud & instance();
 
         /// List of all connected players.
-        PlayerList mudPlayers;
+        std::set<Player *> mudPlayers;
         /// List all the mobile.
-        MobileMap mudMobiles;
+        std::map<std::string, Mobile *> mudMobiles;
         /// List of all items.
-        ItemMap mudItems;
+        std::map<int, Item *> mudItems;
         /// List of all the rooms.
-        RoomMap mudRooms;
+        std::map<int, Room *> mudRooms;
         /// List all the items model.
-        ItemModelMap mudItemModels;
+        std::map<int, ItemModel *> mudItemModels;
         /// List of all the areas.
-        AreaMap mudAreas;
+        std::map<int, Area *> mudAreas;
         /// List of all the races.
-        RaceMap mudRaces;
+        std::map<int, Race *> mudRaces;
         /// List of all the factions.
-        FactionMap mudFactions;
+        std::map<int, Faction *> mudFactions;
         /// List of all the skills.
-        SkillMap mudSkills;
+        std::map<int, Skill *> mudSkills;
         /// List of all the writings.
-        WritingMap mudWritings;
+        std::map<int, Writing *> mudWritings;
         /// List of all the corpses.
-        ItemMap mudCorpses;
+        std::map<int, Item *> mudCorpses;
         /// List of all the continents.
-        ContinentMap mudContinents;
+        std::map<int, Continent *> mudContinents;
         /// List of all the materials.
-        MaterialMap mudMaterials;
+        std::map<int, Material *> mudMaterials;
         /// List of all the professions.
-        ProfessionMap mudProfessions;
+        std::map<unsigned int, Profession *> mudProfessions;
         /// List of all the productions.
-        ProductionMap mudProductions;
+        std::map<int, Production *> mudProductions;
         /// List of all the liquids.
-        LiquidMap mudLiquids;
+        std::map<int, Liquid *> mudLiquids;
         /// List of all the travelling points.
-        TravelPointMap mudTravelPoints;
+        std::map<Room *, Room *> mudTravelPoints;
         /// Blocked IP addresses.
         std::set<std::string> blockedIPs;
         /// Bad player names.
@@ -158,11 +158,11 @@ class Mud
         /// List of commands (eg. look, quit, north etc.).
         std::vector<Command> mudCommands;
         /// Mud possible directions.
-        DirectionMap mudDirections;
+        std::map<std::string, Direction> mudDirections;
         /// Map of things to do for various connection states.
-        StateActionMap mudStateActions;
+        std::map<ConnectionState, ActionHandler> mudStateActions;
         /// Map of buildings schematic.
-        BuildingMap mudBuildings;
+        std::map<int, Building> mudBuildings;
 
         /// @brief Update all the player on the database.
         /// @return <b>True</b> if the operations succeeded,<br>

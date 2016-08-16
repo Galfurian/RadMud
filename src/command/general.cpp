@@ -127,13 +127,10 @@ void DoQuit(Character * character, std::istream & sArgs)
 
         if (player->room != nullptr)
         {
-            // Set the list of exceptions.
-            CharacterVector exceptions;
-            exceptions.push_back(character);
             // Send the message inside the room.
             player->room->sendToAll(
                 "Player %s disappear in a puff of smoke.\n",
-                exceptions,
+                { character },
                 player->getName());
         }
 

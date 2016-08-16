@@ -815,10 +815,7 @@ void DoMobileKill(Character * character, std::istream & sArgs)
     mobile->kill();
     // Notify the death.
     character->sendMsg("You snap your fingers.\n");
-    character->room->sendToAll(
-        "%s fall to the ground dead.",
-        CharacterVector(),
-        mobile->getNameCapital());
+    character->room->sendToAll("%s fall to the ground dead.", { }, mobile->getNameCapital());
 }
 
 void DoMobileReload(Character * character, std::istream & sArgs)
@@ -886,17 +883,9 @@ void DoHurt(Character * character, std::istream & sArgs)
     target->sendMsg(
         "%s points the finger towards you, you cry in pain.\n",
         character->getNameCapital());
-    // Set the list of exceptions.
-    CharacterVector exceptions;
-    exceptions.push_back(character);
-    exceptions.push_back(target);
     // Send the message inside the room.
-    target->room->sendToAll(
-        "%s points the finger towards %s, %s cries in pain.\n",
-        exceptions,
-        character->getNameCapital(),
-        target->getName(),
-        target->getSubjectPronoun());
+    target->room->sendToAll("%s points the finger towards %s, %s cries in pain.\n", { character,
+        target }, character->getNameCapital(), target->getName(), target->getSubjectPronoun());
 }
 
 void DoInvisibility(Character * character, std::istream & sArgs)

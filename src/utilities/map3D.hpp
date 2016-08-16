@@ -26,10 +26,6 @@ template<typename T>
 class Map3D
 {
     private:
-        /// Structure used as key for the map.
-        typedef std::tuple<int, int, int> key_t;
-        /// The structure of the 3d map.
-        typedef typename std::map<key_t, T> DataMatrix3D;
         /// Width of th map.
         int width;
         /// Height of th map.
@@ -37,20 +33,20 @@ class Map3D
         /// Elevation of th map.
         int elevation;
         /// Data contained inside the map.
-        DataMatrix3D data;
+        std::map<std::tuple<int, int, int>, T> data;
 
     public:
         /// Iterator for the 3D structure.
-        typedef typename DataMatrix3D::iterator iterator;
+        typedef typename std::map<std::tuple<int, int, int>, T>::iterator iterator;
         /// Const iterator for the 3D structure.
-        typedef typename DataMatrix3D::const_iterator const_iterator;
+        typedef typename std::map<std::tuple<int, int, int>, T>::const_iterator const_iterator;
 
         /// @brief Constructor.
         Map3D() :
-            width(),
-            height(),
-            elevation(),
-            data()
+                width(),
+                height(),
+                elevation(),
+                data()
         {
             // Nothing to do.
         }
@@ -60,10 +56,10 @@ class Map3D
         /// @param _height    The height of the 3D map.
         /// @param _elevation The elevation of the 3D map.
         Map3D(int _width, int _height, int _elevation) :
-            width(_width),
-            height(_height),
-            elevation(_elevation),
-            data()
+                width(_width),
+                height(_height),
+                elevation(_elevation),
+                data()
         {
             // Nothing to do.
         }
@@ -74,10 +70,10 @@ class Map3D
         /// @param _elevation The elevation of the 3D map.
         /// @param value     The initial value of the cells.
         Map3D(int _width, int _height, int _elevation, T value) :
-            width(_width),
-            height(_height),
-            elevation(_elevation),
-            data()
+                width(_width),
+                height(_height),
+                elevation(_elevation),
+                data()
         {
             for (int z = 0; z < width; z++)
             {

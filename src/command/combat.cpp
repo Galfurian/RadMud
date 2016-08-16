@@ -35,12 +35,9 @@ void DoKill(Character * character, std::istream & sArgs)
     {
         character->sendMsg("You have to specify whom to kill.\n");
     }
-    CharacterVector excpetions = { character };
     // Retrieve the target.
-    Character * target = character->room->findCharacter(
-        arguments[0].first,
-        arguments[0].second,
-        excpetions);
+    Character * target = character->room->findCharacter(arguments[0].first, arguments[0].second, {
+        character });
     if (!target)
     {
         character->sendMsg("You don't see '%s' anywhere.\n", arguments[0].first);
@@ -93,12 +90,9 @@ void DoKill(Character * character, std::istream & sArgs)
         // Notify the target.
         target->sendMsg("%s attacks you.\n\n", character->getNameCapital());
         // Notify the others.
-        CharacterVector exceptions;
-        exceptions.push_back(character);
-        exceptions.push_back(target);
         character->room->sendToAll(
             "%s attacks %s.\n",
-            exceptions,
+            { character, target },
             character->getNameCapital(),
             target->getName());
         // Let the characters enter the combat.
@@ -129,12 +123,9 @@ void DoKill(Character * character, std::istream & sArgs)
         // Notify the target.
         target->sendMsg("%s attacks you.\n\n", character->getNameCapital());
         // Notify the others.
-        CharacterVector exceptions;
-        exceptions.push_back(character);
-        exceptions.push_back(target);
         character->room->sendToAll(
             "%s attacks %s.\n",
-            exceptions,
+            { character, target },
             character->getNameCapital(),
             target->getName());
 
@@ -181,7 +172,7 @@ void DoAim(Character * character, std::istream & sArgs)
 {
     // Get the arguments of the command.
     ArgumentList arguments = ParseArgs(sArgs);
-    CharacterVector targets;
+    std::vector<Character *> targets;
     if (!character->getCharactersInSight(targets))
     {
         character->sendMsg("There are no targets nearby!\n");

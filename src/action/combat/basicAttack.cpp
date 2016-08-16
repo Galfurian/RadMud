@@ -159,12 +159,9 @@ ActionStatus BasicAttack::perform()
                 // Notify the enemy.
                 enemy->sendMsg("%s misses you with %s.\n\n", actor->getName(), iterator->getName());
                 // Notify the others.
-                CharacterVector exceptions;
-                exceptions.push_back(actor);
-                exceptions.push_back(enemy);
                 enemy->room->sendToAll(
                     "%s miss %s with %s.\n",
-                    exceptions,
+                    { actor, enemy },
                     actor->getName(),
                     enemy->getName(),
                     iterator->getName());
@@ -231,12 +228,9 @@ ActionStatus BasicAttack::perform()
                         (isCritical ? "critically" : ""),
                         iterator->getName());
                     // Notify the others.
-                    CharacterVector exceptions;
-                    exceptions.push_back(actor);
-                    exceptions.push_back(enemy);
                     enemy->room->sendToAll(
                         "%s %s hits %s with %s and kill %s.\n",
-                        exceptions,
+                        { actor, enemy },
                         actor->getName(),
                         (isCritical ? "critically" : ""),
                         enemy->getName(),
@@ -263,12 +257,9 @@ ActionStatus BasicAttack::perform()
                         iterator->getName(),
                         ToString(DMG));
                     // Notify the others.
-                    CharacterVector exceptions;
-                    exceptions.push_back(actor);
-                    exceptions.push_back(enemy);
                     enemy->room->sendToAll(
                         "%s %s hits %s with %s for %s.\n",
-                        exceptions,
+                        { actor, enemy },
                         actor->getName(),
                         (isCritical ? "critically" : ""),
                         enemy->getName(),

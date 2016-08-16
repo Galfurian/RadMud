@@ -384,7 +384,7 @@ Player * Mud::findPlayer(std::string name)
 
 Mobile * Mud::findMobile(std::string id)
 {
-    MobileMap::iterator iterator = mudMobiles.find(id);
+    std::map<std::string, Mobile *>::iterator iterator = mudMobiles.find(id);
     if (iterator != mudMobiles.end())
     {
         return iterator->second;
@@ -394,7 +394,7 @@ Mobile * Mud::findMobile(std::string id)
 
 ItemModel * Mud::findItemModel(int vnum)
 {
-    ItemModelMap::iterator iterator = mudItemModels.find(vnum);
+    auto iterator = mudItemModels.find(vnum);
     if (iterator != mudItemModels.end())
     {
         return iterator->second;
@@ -407,7 +407,7 @@ ItemModel * Mud::findItemModel(int vnum)
 
 Item * Mud::findItem(int vnum)
 {
-    ItemMap::iterator iterator = mudItems.find(vnum);
+    std::map<int, Item *>::iterator iterator = mudItems.find(vnum);
     if (iterator != mudItems.end())
     {
         return iterator->second;
@@ -417,7 +417,7 @@ Item * Mud::findItem(int vnum)
 
 Area * Mud::findArea(int vnum)
 {
-    AreaMap::iterator iterator = mudAreas.find(vnum);
+    auto iterator = mudAreas.find(vnum);
     if (iterator != mudAreas.end())
     {
         return iterator->second;
@@ -427,7 +427,7 @@ Area * Mud::findArea(int vnum)
 
 Room * Mud::findRoom(int vnum)
 {
-    RoomMap::iterator iterator = mudRooms.find(vnum);
+    std::map<int, Room *>::iterator iterator = mudRooms.find(vnum);
     if (iterator != mudRooms.end())
     {
         return iterator->second;
@@ -437,7 +437,7 @@ Room * Mud::findRoom(int vnum)
 
 Race * Mud::findRace(int vnum)
 {
-    RaceMap::iterator iterator = mudRaces.find(vnum);
+    std::map<int, Race *>::iterator iterator = mudRaces.find(vnum);
     if (iterator != mudRaces.end())
     {
         return iterator->second;
@@ -447,7 +447,7 @@ Race * Mud::findRace(int vnum)
 
 Race * Mud::findRace(std::string name)
 {
-    for (RaceMap::iterator iterator = mudRaces.begin(); iterator != mudRaces.end(); ++iterator)
+    for (std::map<int, Race *>::iterator iterator = mudRaces.begin(); iterator != mudRaces.end(); ++iterator)
     {
         if (ToLower(iterator->second->name) == ToLower(name))
         {
@@ -459,7 +459,7 @@ Race * Mud::findRace(std::string name)
 
 Faction * Mud::findFaction(int vnum)
 {
-    FactionMap::iterator iterator = mudFactions.find(vnum);
+    std::map<int, Faction *>::iterator iterator = mudFactions.find(vnum);
     if (iterator != mudFactions.end())
     {
         return iterator->second;
@@ -469,7 +469,7 @@ Faction * Mud::findFaction(int vnum)
 
 Faction * Mud::findFaction(std::string name)
 {
-    for (FactionMap::iterator iterator = mudFactions.begin(); iterator != mudFactions.end();
+    for (std::map<int, Faction *>::iterator iterator = mudFactions.begin(); iterator != mudFactions.end();
         ++iterator)
     {
         if (ToLower(iterator->second->name) == ToLower(name))
@@ -482,7 +482,7 @@ Faction * Mud::findFaction(std::string name)
 
 Skill * Mud::findSkill(int vnum)
 {
-    SkillMap::iterator iterator = mudSkills.find(vnum);
+    std::map<int, Skill *>::iterator iterator = mudSkills.find(vnum);
     if (iterator != mudSkills.end())
     {
         return iterator->second;
@@ -492,7 +492,7 @@ Skill * Mud::findSkill(int vnum)
 
 Writing * Mud::findWriting(int vnum)
 {
-    WritingMap::iterator iterator = mudWritings.find(vnum);
+    std::map<int, Writing *>::iterator iterator = mudWritings.find(vnum);
     if (iterator != mudWritings.end())
     {
         return iterator->second;
@@ -502,7 +502,7 @@ Writing * Mud::findWriting(int vnum)
 
 Item * Mud::findCorpse(int vnum)
 {
-    ItemMap::iterator iterator = mudCorpses.find(vnum);
+    std::map<int, Item *>::iterator iterator = mudCorpses.find(vnum);
     if (iterator != mudCorpses.end())
     {
         return iterator->second;
@@ -512,7 +512,7 @@ Item * Mud::findCorpse(int vnum)
 
 Continent * Mud::findContinent(int vnum)
 {
-    ContinentMap::iterator iterator = mudContinents.find(vnum);
+    std::map<int, Continent *>::iterator iterator = mudContinents.find(vnum);
     if (iterator != mudContinents.end())
     {
         return iterator->second;
@@ -522,7 +522,7 @@ Continent * Mud::findContinent(int vnum)
 
 Material * Mud::findMaterial(int vnum)
 {
-    MaterialMap::iterator iterator = mudMaterials.find(vnum);
+    std::map<int, Material *>::iterator iterator = mudMaterials.find(vnum);
     if (iterator != mudMaterials.end())
     {
         return iterator->second;
@@ -532,7 +532,7 @@ Material * Mud::findMaterial(int vnum)
 
 Profession * Mud::findProfession(unsigned int vnum)
 {
-    ProfessionMap::iterator iterator = mudProfessions.find(vnum);
+    std::map<unsigned int, Profession *>::iterator iterator = mudProfessions.find(vnum);
     if (iterator != mudProfessions.end())
     {
         return iterator->second;
@@ -542,7 +542,7 @@ Profession * Mud::findProfession(unsigned int vnum)
 
 Profession * Mud::findProfession(std::string command)
 {
-    for (ProfessionMap::iterator iterator = mudProfessions.begin();
+    for (std::map<unsigned int, Profession *>::iterator iterator = mudProfessions.begin();
         iterator != mudProfessions.end(); ++iterator)
     {
         if (ToLower(iterator->second->command) == ToLower(command))
@@ -555,7 +555,7 @@ Profession * Mud::findProfession(std::string command)
 
 Production * Mud::findProduction(int vnum)
 {
-    ProductionMap::iterator iterator = mudProductions.find(vnum);
+    std::map<int, Production *>::iterator iterator = mudProductions.find(vnum);
     if (iterator != mudProductions.end())
     {
         return iterator->second;
@@ -565,7 +565,7 @@ Production * Mud::findProduction(int vnum)
 
 Production * Mud::findProduction(std::string name)
 {
-    for (ProductionMap::iterator iterator = mudProductions.begin();
+    for (std::map<int, Production *>::iterator iterator = mudProductions.begin();
         iterator != mudProductions.end(); ++iterator)
     {
         if (ToLower(iterator->second->name) == ToLower(name))
@@ -578,7 +578,7 @@ Production * Mud::findProduction(std::string name)
 
 Liquid * Mud::findLiquid(int vnum)
 {
-    LiquidMap::iterator iterator = mudLiquids.find(vnum);
+    std::map<int, Liquid *>::iterator iterator = mudLiquids.find(vnum);
     if (iterator != mudLiquids.end())
     {
         return iterator->second;
@@ -588,7 +588,7 @@ Liquid * Mud::findLiquid(int vnum)
 
 Room * Mud::findTravelPoint(Room * room)
 {
-    TravelPointMap::iterator iterator = mudTravelPoints.find(room);
+    std::map<Room *, Room *>::iterator iterator = mudTravelPoints.find(room);
     if (iterator != mudTravelPoints.end())
     {
         return iterator->second;
@@ -603,7 +603,7 @@ ActionHandler & Mud::findStateAction(ConnectionState state)
 
 Building * Mud::findBuilding(std::string name)
 {
-    for (BuildingMap::iterator iterator = mudBuildings.begin(); iterator != mudBuildings.end();
+    for (std::map<int, Building>::iterator iterator = mudBuildings.begin(); iterator != mudBuildings.end();
         ++iterator)
     {
         if (ToLower(iterator->second.name) == ToLower(name))
@@ -616,7 +616,7 @@ Building * Mud::findBuilding(std::string name)
 
 Building * Mud::findBuilding(int vnum)
 {
-    for (BuildingMap::iterator iterator = mudBuildings.begin(); iterator != mudBuildings.end();
+    for (std::map<int, Building>::iterator iterator = mudBuildings.begin(); iterator != mudBuildings.end();
         ++iterator)
     {
         if (iterator->second.buildingModel->vnum == vnum)
@@ -811,7 +811,7 @@ void Mud::broadcastMsg(const int & level, const std::string & message) const
 
 void Mud::removeInactivePlayers()
 {
-    PlayerList toRemove = PlayerList();
+    std::set<Player *> toRemove;
     for (auto iterator : mudPlayers)
     {
         // Proceed only if the player is not connected and is closing.
