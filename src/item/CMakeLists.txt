@@ -13,5 +13,6 @@ set(RADMUD_ITEM_SRC
 	./src/item/armorItem.cpp
 	./src/item/weaponItem.cpp
 	./src/item/currencyItem.cpp
+	./src/item/itemContainer.cpp
     PARENT_SCOPE
 )

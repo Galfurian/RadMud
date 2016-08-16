@@ -88,7 +88,7 @@ bool Room::check(bool complete)
 
 void Room::addItem(Item * item)
 {
-    items.push_back(item);
+    item = items.addItem(item);
     item->room = this;
     Logger::log(LogLevel::Debug, "Item '" + item->getName() + "' added to '" + this->name + "';");
 }
@@ -201,22 +201,25 @@ MobileList Room::getAllMobile(Character * exception)
 
 bool Room::updateOnDB()
 {
-    QueryList value;
-    value.push_back(std::make_pair("x", ToString(coord.x)));
-    value.push_back(std::make_pair("y", ToString(coord.y)));
-    value.push_back(std::make_pair("z", ToString(coord.z)));
-    value.push_back(std::make_pair("terrain", terrain));
-    value.push_back(std::make_pair("name", name));
-    value.push_back(std::make_pair("description", description));
-    value.push_back(std::make_pair("flag", ToString(flags)));
-    QueryList where;
-    where.push_back(std::make_pair("vnum", ToString(vnum)));
-    if (!SQLiteDbms::instance().updateInto("Room", value, where))
-    {
-        Logger::log(LogLevel::Error, "Can't save the room!");
-        return false;
-    }
-    return true;
+    /*
+     QueryList value;
+     value.push_back(std::make_pair("x", ToString(coord.x)));
+     value.push_back(std::make_pair("y", ToString(coord.y)));
+     value.push_back(std::make_pair("z", ToString(coord.z)));
+     value.push_back(std::make_pair("terrain", terrain));
+     value.push_back(std::make_pair("name", name));
+     value.push_back(std::make_pair("description", description));
+     value.push_back(std::make_pair("flag", ToString(flags)));
+     QueryList where;
+     where.push_back(std::make_pair("vnum", ToString(vnum)));
+     if (!SQLiteDbms::instance().updateInto("Room", value, where))
+     {
+     Logger::log(LogLevel::Error, "Can't save the room!");
+     return false;
+     }
+     return true;
+     */
+    return false;
 }
 
 bool Room::removeOnDB()
@@ -485,7 +488,6 @@ bool Room::removeExit(const Direction & direction)
 string Room::getLook(Character * exception)
 {
     string output = "";
-
     // The player want to look at the entire room.
     output += Formatter::bold() + name + Formatter::reset() + "\n";
     output += description + "\n";
@@ -531,29 +533,28 @@ string Room::getLook(Character * exception)
 
     ///////////////////////////////////////////////////////////////////////////
     // List all the items placed in the same room.
-    for (auto it : GroupItems(items))
+    for (auto it : items)
     {
         // If the item is invisible, don't show it.
-        if (HasFlag(it.first->model->modelFlags, ModelFlag::Invisible))
+        if (HasFlag(it->model->modelFlags, ModelFlag::Invisible))
         {
             continue;
         }
 
-        if (HasFlag(it.first->flags, ItemFlag::Built))
+        if (HasFlag(it->flags, ItemFlag::Built))
         {
             output += "[B]";
         }
 
         // If there are more of this item, show the counter.
-        if (it.second > 1)
+        if (it->quantity > 1)
         {
-            output += Formatter::cyan() + it.first->getNameCapital() + Formatter::reset()
-                + " are here.[" + ToString(it.second) + "]\n";
+            output += Formatter::cyan() + it->getNameCapital() + Formatter::reset() + " are here.["
+                + ToString(it->quantity) + "]\n";
         }
         else
         {
-            output += Formatter::cyan() + it.first->getNameCapital() + Formatter::reset()
-                + " is here.\n";
+            output += Formatter::cyan() + it->getNameCapital() + Formatter::reset() + " is here.\n";
         }
     }
 

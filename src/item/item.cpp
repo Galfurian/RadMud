@@ -414,6 +414,21 @@ std::string Item::getTypeName() const
     return this->model->getTypeName();
 }
 
+bool Item::canStackWith(Item * item) const
+{
+    if (HasFlag(this->model->modelFlags, ModelFlag::CanBeStacked))
+    {
+        if (this->model->vnum == item->model->vnum)
+        {
+            if (this->composition->vnum == item->composition->vnum)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 bool Item::hasKey(std::string key)
 {
     for (auto iterator : model->keys)
@@ -666,7 +681,7 @@ bool Item::putInside(Item * item)
     if (this->canContain(item))
     {
         // Put the item into the container.
-        content.push_back(item);
+        content.addItem(item);
         // Set the container value to the content item.
         item->container = this;
         return true;
@@ -821,7 +836,7 @@ std::string Item::lookContent()
         else
         {
             output += "Looking inside you see:\n";
-            for (auto it : GroupItems(content))
+            for (auto it : content.toStack())
             {
                 std::string contentName = it.first->getNameCapital();
                 if (it.second > 1)
@@ -935,7 +950,7 @@ void Item::luaRegister(lua_State * L)
     .addData("owner", &Item::owner) //
     .addData("container", &Item::container) //
     .addData("container", &Item::container) //
-    .addData("content", &Item::content) //
+    //.addData("content", &Item::content) //
     .endClass();
 }
 
@@ -980,49 +995,4 @@ Item * GenerateItem(const ModelType & type)
         default:
             return nullptr;
     }
-}
-
-ItemVectorNumbered GroupItems(const ItemVector & items)
-{
-    ItemVectorNumbered numberedItems;
-    for (auto it : items)
-    {
-        bool missing = true;
-        for (auto it2 = numberedItems.begin(); it2 != numberedItems.end(); ++it2)
-        {
-            if (it2->first->getName() == it->getName())
-            {
-                if (HasFlag(it2->first->flags, ItemFlag::Built))
-                {
-                    if (HasFlag(it->flags, ItemFlag::Built))
-                    {
-                        missing = false;
-                        it2->second++;
-                        break;
-                    }
-                }
-                else
-                {
-                    missing = false;
-                    it2->second++;
-                    break;
-                }
-            }
-        }
-        if (missing)
-        {
-            numberedItems.push_back(std::make_pair(it, 1));
-        }
-    }
-    return numberedItems;
-}
-
-bool OrderItemByName(Item * first, Item * second)
-{
-    return first->getName() < second->getName();
-}
-
-bool OrderItemByWeight(Item * first, Item * second)
-{
-    return first->getWeight() < second->getWeight();
 }

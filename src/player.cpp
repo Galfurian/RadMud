@@ -261,73 +261,60 @@ bool Player::loadFromDB()
 
 bool Player::updateOnDB()
 {
-    if (connection_state == ConnectionState::Playing)
-    {
-        QueryList value, where;
-        value.push_back(std::make_pair("name", name));
-        value.push_back(std::make_pair("password", password));
-        value.push_back(std::make_pair("race", ToString(race->vnum)));
-        value.push_back(
-            std::make_pair("str", ToString(this->getAbility(Ability::Strength, false))));
-        value.push_back(std::make_pair("agi", ToString(this->getAbility(Ability::Agility, false))));
-        value.push_back(
-            std::make_pair("per", ToString(this->getAbility(Ability::Perception, false))));
-        value.push_back(
-            std::make_pair("con", ToString(this->getAbility(Ability::Constitution, false))));
-        value.push_back(
-            std::make_pair("int", ToString(this->getAbility(Ability::Intelligence, false))));
-        value.push_back(std::make_pair("gender", ToString(static_cast<int>(gender))));
-        value.push_back(std::make_pair("age", ToString(age)));
-        value.push_back(std::make_pair("description", description));
-        value.push_back(std::make_pair("weight", ToString(weight)));
-        value.push_back(std::make_pair("faction", ToString(faction->vnum)));
-        value.push_back(std::make_pair("level", ToString(level)));
-        value.push_back(std::make_pair("experience", ToString(experience)));
-        value.push_back(std::make_pair("position", ToString(room->vnum)));
-        value.push_back(std::make_pair("prompt", prompt));
-        value.push_back(std::make_pair("flag", ToString(flags)));
-        value.push_back(std::make_pair("health", ToString(this->getHealth())));
-        value.push_back(std::make_pair("stamina", ToString(this->getStamina())));
-        value.push_back(std::make_pair("rent_room", ToString(rent_room)));
-        value.push_back(std::make_pair("hunger", ToString(this->getHunger())));
-        value.push_back(std::make_pair("thirst", ToString(this->getThirst())));
-        where.push_back(std::make_pair("name", name));
+    /*
+     if (connection_state == ConnectionState::Playing)
+     {
+     QueryList value, where;
+     value.push_back(std::make_pair("name", name));
+     value.push_back(std::make_pair("password", password));
+     value.push_back(std::make_pair("race", ToString(race->vnum)));
+     value.push_back(
+     std::make_pair("str", ToString(this->getAbility(Ability::Strength, false))));
+     value.push_back(std::make_pair("agi", ToString(this->getAbility(Ability::Agility, false))));
+     value.push_back(
+     std::make_pair("per", ToString(this->getAbility(Ability::Perception, false))));
+     value.push_back(
+     std::make_pair("con", ToString(this->getAbility(Ability::Constitution, false))));
+     value.push_back(
+     std::make_pair("int", ToString(this->getAbility(Ability::Intelligence, false))));
+     value.push_back(std::make_pair("gender", ToString(static_cast<int>(gender))));
+     value.push_back(std::make_pair("age", ToString(age)));
+     value.push_back(std::make_pair("description", description));
+     value.push_back(std::make_pair("weight", ToString(weight)));
+     value.push_back(std::make_pair("faction", ToString(faction->vnum)));
+     value.push_back(std::make_pair("level", ToString(level)));
+     value.push_back(std::make_pair("experience", ToString(experience)));
+     value.push_back(std::make_pair("position", ToString(room->vnum)));
+     value.push_back(std::make_pair("prompt", prompt));
+     value.push_back(std::make_pair("flag", ToString(flags)));
+     value.push_back(std::make_pair("health", ToString(this->getHealth())));
+     value.push_back(std::make_pair("stamina", ToString(this->getStamina())));
+     value.push_back(std::make_pair("rent_room", ToString(rent_room)));
+     value.push_back(std::make_pair("hunger", ToString(this->getHunger())));
+     value.push_back(std::make_pair("thirst", ToString(this->getThirst())));
+     where.push_back(std::make_pair("name", name));
 
-        if (!SQLiteDbms::instance().updateInto("Player", value, where))
-        {
-            Logger::log(LogLevel::Error, "Error during Player's Information save.");
-            return false;
-        }
-        for (auto iterator : inventory)
-        {
-            if (!iterator->updateOnDB())
-            {
-                Logger::log(LogLevel::Error, "Error during Player's Inventory save.");
-                return false;
-            }
-        }
-        for (auto iterator : equipment)
-        {
-            if (!iterator->updateOnDB())
-            {
-                Logger::log(LogLevel::Error, "Error during Player's Equipment save.");
-                return false;
-            }
-        }
-        for (auto iterator : skills)
-        {
-            vector<string> arguments;
-            arguments.push_back(name);
-            arguments.push_back(ToString(iterator.first));
-            arguments.push_back(ToString(iterator.second));
+     if (!SQLiteDbms::instance().updateInto("Player", value, where))
+     {
+     Logger::log(LogLevel::Error, "Error during Player's Information save.");
+     return false;
+     }
+     for (auto iterator : skills)
+     {
+     vector<string> arguments;
+     arguments.push_back(name);
+     arguments.push_back(ToString(iterator.first));
+     arguments.push_back(ToString(iterator.second));
 
-            if (!SQLiteDbms::instance().insertInto("Advancement", arguments, false, true))
-            {
-                Logger::log(LogLevel::Error, "Error during Player's Skills save.");
-                return false;
-            }
-        }
-    }
+     if (!SQLiteDbms::instance().insertInto("Advancement", arguments, false, true))
+     {
+     Logger::log(LogLevel::Error, "Error during Player's Skills save.");
+     return false;
+     }
+     }
+     }
+     return true;
+     */
     return true;
 }
 

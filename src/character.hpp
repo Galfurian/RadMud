@@ -72,9 +72,9 @@ class Character
         /// The current room the character is in.
         Room * room;
         /// Character's inventory.
-        ItemVector inventory;
+        ItemContainer inventory;
         /// Character's equipment.
-        ItemVector equipment;
+        ItemContainer equipment;
         /// Character's posture.
         CharacterPosture posture;
         /// Active effects on player.

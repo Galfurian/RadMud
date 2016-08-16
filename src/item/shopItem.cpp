@@ -186,7 +186,7 @@ std::string ShopItem::lookContent()
         saleTable.addColumn("Weight", StringAlign::Center);
         saleTable.addColumn("Buy", StringAlign::Left);
         saleTable.addColumn("Sell", StringAlign::Left);
-        for (auto iterator : GroupItems(content))
+        for (auto iterator : content.toStack())
         {
             // Retrieve the item.
             Item * item = iterator.first;

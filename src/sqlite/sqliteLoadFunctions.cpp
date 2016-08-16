@@ -104,7 +104,7 @@ bool LoadContent(ResultSet * result)
             Logger::log(LogLevel::Error, "Can't find contained item.");
             return false;
         }
-        container->content.push_back(contained);
+        container->content.addItem(contained);
         contained->container = container;
         if (!contained->check(true))
         {

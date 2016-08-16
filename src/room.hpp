@@ -30,6 +30,8 @@
 #include "lua/lua_script.hpp"
 #include "utilities/coordinates.hpp"
 
+#include "item/itemContainer.hpp"
+
 class Item;
 class Area;
 class Continent;
@@ -68,7 +70,7 @@ class Room
         /// List of exits.
         ExitVector exits;
         /// List of items in the room.
-        ItemVector items;
+        ItemContainer items;
         /// List of characters in the room.
         CharacterVector characters;
         /// Integer that describe the flags of the room.

@@ -198,6 +198,12 @@ class SQLiteDbms
         /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
         bool updateInto(std::string table, QueryList value, QueryList where);
 
+        bool updatePlayers();
+
+        bool updateItems();
+
+        bool updateRooms();
+
         /// @brief Execute a select.
         /// @param table The name of the table.
         /// @param where Vector of where clause.
@@ -212,6 +218,8 @@ class SQLiteDbms
 
         /// @brief End a Transaction.
         void endTransaction();
+
+        void showLastError() const;
 
     private:
         /// @brief Function used to retrieve information about Player.

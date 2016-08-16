@@ -28,6 +28,8 @@
 #include "../model/nodeModel.hpp"
 #include "../utilities/table.hpp"
 
+#include "itemContainer.hpp"
+
 class Room;
 class Character;
 class Material;
@@ -74,7 +76,7 @@ class Item
         /// Current equipment slot.
         EquipmentSlot currentSlot;
         /// List of items contained in this one.
-        std::vector<Item *> content;
+        ItemContainer content;
         /// The liquid inside the container.
         LiquidContent contentLiq;
 
@@ -137,6 +139,8 @@ class Item
 
         /// @return Provides a string representing the type of item.
         std::string getTypeName() const;
+
+        bool canStackWith(Item * item) const;
 
         /// @brief Check if the item has the desired key.
         /// @param key The key to search.
@@ -281,31 +285,8 @@ Item * GenerateItem(const ModelType & type);
 /// Vector of items.
 typedef std::vector<Item *> ItemVector;
 
-/// Vector of items with counter.
-typedef std::vector<std::pair<Item *, int>> ItemVectorNumbered;
-
 /// List of items.
 typedef std::list<Item *> ItemList;
 
 /// Map of items.
 typedef std::map<int, Item *> ItemMap;
-
-/// @brief Return the list of items grouped.
-/// @param items The item list to group.
-/// @return A vector which has for each item listed the number of occurence of that item.
-ItemVectorNumbered GroupItems(const ItemVector & items);
-
-/// It's a pointer to an ordering function for items.
-typedef bool (*ItemSorter)(Item * first, Item * second);
-
-/// @brief Compare the names of the two item.
-/// @param first  The first item.
-/// @param second The second item.
-/// @return <b>True</b> if the first name is beefore the second.<br><b>False</b> otherwise.
-bool OrderItemByName(Item * first, Item * second);
-
-/// @brief Compare the weight of the two item.
-/// @param first  The first item.
-/// @param second The second item.
-/// @return <b>True</b> if the first item is lighter then the second.<br><b>False</b> otherwise.
-bool OrderItemByWeight(Item * first, Item * second);

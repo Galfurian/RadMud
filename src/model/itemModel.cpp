@@ -134,6 +134,7 @@ Item * ItemModel::createItem(
     // First set: Vnum, Model, Maker, Composition, Quality.
     newItem->vnum = Mud::instance().getMaxVnumItem() + 1;
     newItem->model = this;
+    newItem->quantity = 1;
     newItem->maker = maker;
     newItem->composition = composition;
     newItem->quality = itemQuality;
@@ -170,13 +171,7 @@ Item * ItemModel::createItem(
         newItem->maxCondition = ((valBase + valQuality + valMaterial) / 3);
         newItem->condition = newItem->maxCondition;
     }
-    newItem->flags = 0;
-    newItem->room = nullptr;
-    newItem->owner = nullptr;
-    newItem->container = nullptr;
     newItem->currentSlot = slot;
-    newItem->content = std::vector<Item *>();
-    newItem->contentLiq = LiquidContent();
 
     if (!newItem->check())
     {
@@ -473,7 +468,13 @@ std::string GetModelFlagString(unsigned int flags)
     if (HasFlag(flags, ModelFlag::Unbreakable)) flagList += "|Unbreakable";
     if (HasFlag(flags, ModelFlag::NoSaleable)) flagList += "|NoSaleable";
     if (HasFlag(flags, ModelFlag::TwoHand)) flagList += "|TwoHand";
-    flagList += "|";
+    if (HasFlag(flags, ModelFlag::CanClose)) flagList += "|CanClose";
+    if (HasFlag(flags, ModelFlag::CanSeeThrough)) flagList += "|CanSeeThrough";
+    if (HasFlag(flags, ModelFlag::CanBeStacked)) flagList += "|CanBeStacked";
+    if (!flagList.empty())
+    {
+        flagList += "|";
+    }
     return flagList;
 }
 

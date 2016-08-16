@@ -95,17 +95,10 @@ Item * CorpseModel::createCorpse(
     newItem->composition = composition;
     newItem->quality = ItemQuality::Normal;
     // Then set the rest.
-    newItem->price = 0;
     newItem->weight = weight;
     newItem->condition = weight;
     newItem->maxCondition = weight;
-    newItem->flags = 0;
-    newItem->room = nullptr;
-    newItem->owner = nullptr;
-    newItem->container = nullptr;
     newItem->currentSlot = slot;
-    newItem->content = std::vector<Item *>();
-    newItem->contentLiq = LiquidContent();
 
     Mud::instance().addCorpse(newItem);
     return newItem;

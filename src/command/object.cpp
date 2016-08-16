@@ -157,8 +157,8 @@ void DoTake(Character * character, std::istream & sArgs)
         }
         if (ToLower(arguments[0].first) == "all")
         {
-            ItemVector untouchedList = container->content;
-            ItemVector actuallyTaken;
+            auto takenSomething = false;
+            auto untouchedList = container->content;
             for (auto iterator : untouchedList)
             {
                 // Check if the item is static.
@@ -175,11 +175,10 @@ void DoTake(Character * character, std::istream & sArgs)
                 container->takeOut(iterator);
                 // Add the item to the player's inventory.
                 character->addInventoryItem(iterator);
-                // Add the item to the list of actually taken items.
-                actuallyTaken.push_back(iterator);
+                takenSomething = true;
             }
             // Handle output only if the player has really taken something.
-            if (actuallyTaken.empty())
+            if (!takenSomething)
             {
                 character->sendMsg("You've taken nothing from %s.\n", container->getName());
                 return;
@@ -712,10 +711,9 @@ void DoInventory(Character * character, std::istream & sArgs)
     table.addColumn("Quantity", StringAlign::Right);
     table.addColumn("Weight", StringAlign::Right);
     // List all the items in inventory
-    for (auto it : GroupItems(character->inventory))
+    for (auto it : character->inventory)
     {
-        table.addRow(
-            { it.first->getNameCapital(), ToString(it.second), ToString(it.first->getWeight()) });
+        table.addRow( { it->getNameCapital(), ToString(it->quantity), ToString(it->getWeight()) });
     }
     character->sendMsg(table.getTable());
     std::string carried = ToString(character->getCarryingWeight());
@@ -737,53 +735,63 @@ void DoOrganize(Character * character, std::istream & sArgs)
         character->sendMsg("Organize what?\n");
         return;
     }
-    ItemSorter sorter = OrderItemByName;
-    std::string sorterTag = "name";
+    ItemContainer::Order order;
     if (BeginWith("name", ToLower(arguments[0].first)))
     {
-        sorter = OrderItemByName;
-        sorterTag = "name";
+        order = ItemContainer::Order::ByName;
     }
     else if (BeginWith("weight", ToLower(arguments[0].first)))
     {
-        sorter = OrderItemByWeight;
-        sorterTag = "weight";
+        order = ItemContainer::Order::ByWeight;
     }
     else
     {
         character->sendMsg("You can organize by: name, weight,...\n");
         return;
     }
+
     if (arguments.size() == 1)
     {
-        ItemVector * list = &character->room->items;
-        sort(list->begin(), list->end(), sorter);
-        character->sendMsg("You have organized the room by " + sorterTag + ".\n");
-        return;
+        character->room->items.orderBy(order);
+        character->sendMsg(
+            "You have organized the room by %s.\n",
+            ItemContainer::orderToString(order));
     }
     else if (arguments.size() == 2)
     {
         Item * container = character->findNearbyItem(arguments[1].first, arguments[1].second);
-        if (container == nullptr)
+        if (container != nullptr)
+        {
+            if (container->content.empty())
+            {
+                character->sendMsg("You can't organize " + container->getName() + "\n");
+            }
+            else
+            {
+                container->content.orderBy(order);
+                // Organize the target container.
+                character->sendMsg(
+                    "You have organized %s, by %s.\n",
+                    container->getName(),
+                    ItemContainer::orderToString(order));
+            }
+        }
+        else if (BeginWith("inventory", arguments[1].first))
+        {
+            character->inventory.orderBy(order);
+            // Organize the target container.
+            character->sendMsg(
+                "You have organized your inventory, by %s.\n",
+                ItemContainer::orderToString(order));
+        }
+        else
         {
             character->sendMsg("What do you want to organize?\n");
-            return;
         }
-        if (container->content.empty())
-        {
-            character->sendMsg("You can't organize " + container->getName() + "\n");
-            return;
-        }
-        // Organize the target container.
-        ItemVector * list = &container->content;
-        sort(list->begin(), list->end(), sorter);
-        character->sendMsg(
-            "You have organized " + container->getName() + ", by " + sorterTag + ".\n");
     }
     else
     {
         character->sendMsg("Too much arguments.\n");
-        return;
     }
 }
 
@@ -1538,12 +1546,6 @@ void DoDeposit(Character * character, std::istream & sArgs)
     if (item->destroy())
     {
         shop->balance += deposit;
-        SQLiteDbms::instance().beginTransaction();
-        if (item->removeOnDB())
-        {
-            status = true;
-        }
-        SQLiteDbms::instance().endTransaction();
     }
     if (!status)
     {
@@ -1742,18 +1744,13 @@ void DoBuy(Character * character, std::istream & sArgs)
         }
     }
 
-    SQLiteDbms::instance().beginTransaction();
     for (auto coin : givenCoins)
     {
         if (coin->destroy())
         {
-            if (coin->removeOnDB())
-            {
-                delete (coin);
-            }
+            delete (coin);
         }
     }
-    SQLiteDbms::instance().endTransaction();
     shop->takeOut(item);
     character->addInventoryItem(item);
     shop->balance += requiredValue;

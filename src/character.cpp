@@ -1656,22 +1656,18 @@ void Character::kill()
 {
     // Create a corpse at the current position.
     Item * corpse = this->createCorpse();
+
     // Transfer all the items from the character to the corpse.
     auto tempInventory = this->inventory;
-
-    SQLiteDbms::instance().beginTransaction();
-
     for (auto it = tempInventory.begin(); it != tempInventory.end(); ++it)
     {
         Item * item = (*it);
         // Remove the item from the inventory.
         this->remInventoryItem(item);
         // Add the item to the corpse.
-        corpse->content.push_back(item);
+        corpse->content.addItem(item);
         // Set the corpse as container of the item.
         item->container = corpse;
-        // Update the item on the database.
-        item->updateOnDB();
     }
     auto tempEquipment = this->equipment;
     for (auto it = tempEquipment.begin(); it != tempEquipment.end(); ++it)
@@ -1680,14 +1676,10 @@ void Character::kill()
         // Remove the item from the inventory.
         this->remEquipmentItem(item);
         // Add the item to the corpse.
-        corpse->content.push_back(item);
+        corpse->content.addItem(item);
         // Set the corpse as container of the item.
         item->container = corpse;
-        // Update the item on the database.
-        item->updateOnDB();
     }
-
-    SQLiteDbms::instance().endTransaction();
 
     // Reset the action of the character.
     this->actionQueue.clear();

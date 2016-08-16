@@ -76,8 +76,7 @@ bool SQLiteDbms::openDatabase()
 {
     if (!dbConnection.openConnection(kDatabaseName, kSystemDir))
     {
-        Logger::log(LogLevel::Error, "Error code :" + ToString(dbConnection.getLastErrorCode()));
-        Logger::log(LogLevel::Error, "Last error :" + dbConnection.getLastErrorMsg());
+        this->showLastError();
         return false;
     }
     return true;
@@ -87,8 +86,7 @@ bool SQLiteDbms::closeDatabase()
 {
     if (!dbConnection.closeConnection())
     {
-        Logger::log(LogLevel::Error, "Error code :" + ToString(dbConnection.getLastErrorCode()));
-        Logger::log(LogLevel::Error, "Last error :" + dbConnection.getLastErrorMsg());
+        this->showLastError();
         return false;
     }
     return true;
@@ -113,6 +111,7 @@ bool SQLiteDbms::loadTables()
         {
             // Log an error.
             Logger::log(LogLevel::Error, "Error when loading table: " + iterator.table);
+            this->showLastError();
             status = false;
         }
         // release the resource.
@@ -259,6 +258,257 @@ bool SQLiteDbms::updateInto(std::string table, QueryList value, QueryList where)
     return (dbConnection.executeQuery(stream.str().c_str()) != 0);
 }
 
+bool SQLiteDbms::updatePlayers()
+{
+    // Start a new transaction.
+    dbConnection.beginTransaction();
+    // Then update all the items.
+    bool result = true;
+    for (auto player : Mud::instance().mudPlayers)
+    {
+        if (player->isPlaying())
+        {
+            QueryList value, where;
+            value.push_back(std::make_pair("name", player->name));
+            value.push_back(std::make_pair("password", player->password));
+            value.push_back(std::make_pair("race", ToString(player->race->vnum)));
+            value.push_back(
+                std::make_pair("str", ToString(player->getAbility(Ability::Strength, false))));
+            value.push_back(
+                std::make_pair("agi", ToString(player->getAbility(Ability::Agility, false))));
+            value.push_back(
+                std::make_pair("per", ToString(player->getAbility(Ability::Perception, false))));
+            value.push_back(
+                std::make_pair("con", ToString(player->getAbility(Ability::Constitution, false))));
+            value.push_back(
+                std::make_pair("int", ToString(player->getAbility(Ability::Intelligence, false))));
+            value.push_back(std::make_pair("gender", ToString(static_cast<int>(player->gender))));
+            value.push_back(std::make_pair("age", ToString(player->age)));
+            value.push_back(std::make_pair("description", player->description));
+            value.push_back(std::make_pair("weight", ToString(player->weight)));
+            value.push_back(std::make_pair("faction", ToString(player->faction->vnum)));
+            value.push_back(std::make_pair("level", ToString(player->level)));
+            value.push_back(std::make_pair("experience", ToString(player->experience)));
+            value.push_back(std::make_pair("position", ToString(player->room->vnum)));
+            value.push_back(std::make_pair("prompt", player->prompt));
+            value.push_back(std::make_pair("flag", ToString(player->flags)));
+            value.push_back(std::make_pair("health", ToString(player->getHealth())));
+            value.push_back(std::make_pair("stamina", ToString(player->getStamina())));
+            value.push_back(std::make_pair("rent_room", ToString(player->rent_room)));
+            value.push_back(std::make_pair("hunger", ToString(player->getHunger())));
+            value.push_back(std::make_pair("thirst", ToString(player->getThirst())));
+            // Where clause.
+            where.push_back(std::make_pair("name", player->name));
+            if (!SQLiteDbms::instance().updateInto("Player", value, where))
+            {
+                Logger::log(LogLevel::Error, "Error during Player's Information save.");
+                this->showLastError();
+                result = false;
+            }
+            for (auto iterator : player->skills)
+            {
+                vector<string> arguments;
+                arguments.push_back(player->name);
+                arguments.push_back(ToString(iterator.first));
+                arguments.push_back(ToString(iterator.second));
+
+                if (!SQLiteDbms::instance().insertInto("Advancement", arguments, false, true))
+                {
+                    Logger::log(LogLevel::Error, "Error during Player's Skills save.");
+                    this->showLastError();
+                    result = false;
+                }
+            }
+        }
+    }
+    // Complete the transaction.
+    dbConnection.endTransaction();
+    return result;
+}
+
+bool SQLiteDbms::updateItems()
+{
+    // Start a transaction.
+    dbConnection.beginTransaction();
+    // First delete all from table.
+    if (!dbConnection.executeQuery("DELETE FROM Item;"))
+    {
+        Logger::log(LogLevel::Error, "Can't truncate the Item table!");
+        dbConnection.rollbackTransection();
+        return false;
+    }
+    // Complete the transaction.
+    dbConnection.endTransaction();
+
+    // Start a new transaction.
+    dbConnection.beginTransaction();
+    // Then update all the items.
+    bool result = true;
+    for (auto it : Mud::instance().mudItems)
+    {
+        Item * item = it.second;
+        // Prepare the vector used to insert into the database.
+        std::vector<std::string> arguments;
+        arguments.push_back(ToString(item->vnum));
+        arguments.push_back(ToString(item->model->vnum));
+        arguments.push_back(ToString(item->quantity));
+        arguments.push_back(item->maker);
+        arguments.push_back(ToString(item->getPrice()));
+        arguments.push_back(ToString(item->getWeight()));
+        arguments.push_back(ToString(item->condition));
+        arguments.push_back(ToString(item->maxCondition));
+        arguments.push_back(ToString(item->composition->vnum));
+        arguments.push_back(ToString(item->quality.toUInt()));
+        arguments.push_back(ToString(item->flags));
+        // Execute the insert.
+        if (!SQLiteDbms::instance().insertInto("Item", arguments))
+        {
+            Logger::log(LogLevel::Error, "Can't save the item %s!", item->getName());
+            this->showLastError();
+            result = false;
+        }
+    }
+    if (!result)
+    {
+        dbConnection.rollbackTransection();
+        return false;
+    }
+    // Complete the transaction.
+    dbConnection.endTransaction();
+
+    // Start a new transaction.
+    dbConnection.beginTransaction();
+    for (auto it : Mud::instance().mudItems)
+    {
+        Item * item = it.second;
+        // Save the item's position.
+        if (item->room != nullptr)
+        {
+            std::vector<std::string> arguments;
+            arguments.push_back(ToString(item->room->vnum));
+            arguments.push_back(ToString(item->vnum));
+            if (!SQLiteDbms::instance().insertInto("ItemRoom", arguments))
+            {
+                Logger::log(LogLevel::Error, "Can't save the item inside the room!");
+                this->showLastError();
+                result = false;
+                break;
+            }
+        }
+        else if (item->owner != nullptr)
+        {
+            if (item->owner->isPlayer())
+            {
+                std::vector<std::string> arguments;
+                arguments.push_back(item->owner->name);
+                arguments.push_back(ToString(item->vnum));
+                if (item->owner->hasEquipmentItem(item))
+                {
+                    arguments.push_back(EnumToString(item->getCurrentSlot()));
+                }
+                else
+                {
+                    arguments.push_back("0");
+                }
+                if (!SQLiteDbms::instance().insertInto("ItemPlayer", arguments, false, true))
+                {
+                    Logger::log(LogLevel::Error, "Can't save the item possesed by the Player!");
+                    this->showLastError();
+                    result = false;
+                    break;
+                }
+            }
+        }
+        else if (item->container != nullptr)
+        {
+            if (item->container->model->getType() != ModelType::Corpse)
+            {
+                std::vector<std::string> arguments;
+                arguments.push_back(ToString(item->container->vnum));
+                arguments.push_back(ToString(item->vnum));
+                if (!SQLiteDbms::instance().insertInto("ItemContent", arguments))
+                {
+                    Logger::log(LogLevel::Error, "Can't save the item inside the container!");
+                    this->showLastError();
+                    result = false;
+                    break;
+                }
+            }
+        }
+        if (!item->content.empty())
+        {
+            for (auto iterator2 : item->content)
+            {
+                std::vector<std::string> arguments;
+                // Prepare the query arguments.
+                arguments.push_back(ToString(item->vnum));
+                arguments.push_back(ToString(iterator2->vnum));
+                if (!SQLiteDbms::instance().insertInto("ItemContent", arguments))
+                {
+                    Logger::log(LogLevel::Error, "Can't save the contained item!");
+                    this->showLastError();
+                    result = false;
+                    break;
+                }
+            }
+        }
+        if (item->contentLiq.first != nullptr)
+        {
+            std::vector<std::string> arguments;
+            // Prepare the query arguments.
+            arguments.push_back(ToString(item->vnum));
+            arguments.push_back(ToString(item->contentLiq.first->vnum));
+            arguments.push_back(ToString(item->contentLiq.second));
+            if (!SQLiteDbms::instance().insertInto("ItemContentLiq", arguments, false, true))
+            {
+                Logger::log(LogLevel::Error, "Can't save the contained liquid!");
+                this->showLastError();
+                result = false;
+                break;
+            }
+        }
+    }
+    if (!result)
+    {
+        dbConnection.rollbackTransection();
+        return false;
+    }
+    // Complete the transaction.
+    dbConnection.endTransaction();
+    return result;
+}
+
+bool SQLiteDbms::updateRooms()
+{
+    // Start a new transaction.
+    dbConnection.beginTransaction();
+    // Then update all the items.
+    bool result = true;
+    for (auto it : Mud::instance().mudRooms)
+    {
+        Room * room = it.second;
+        QueryList value;
+        value.push_back(std::make_pair("x", ToString(room->coord.x)));
+        value.push_back(std::make_pair("y", ToString(room->coord.y)));
+        value.push_back(std::make_pair("z", ToString(room->coord.z)));
+        value.push_back(std::make_pair("terrain", room->terrain));
+        value.push_back(std::make_pair("name", room->name));
+        value.push_back(std::make_pair("description", room->description));
+        value.push_back(std::make_pair("flag", ToString(room->flags)));
+        QueryList where;
+        where.push_back(std::make_pair("vnum", ToString(room->vnum)));
+        if (!SQLiteDbms::instance().updateInto("Room", value, where))
+        {
+            Logger::log(LogLevel::Error, "Can't save the room!");
+            this->showLastError();
+            result = false;
+        }
+    }
+    // Complete the transaction.
+    dbConnection.endTransaction();
+    return result;
+}
+
 ResultSet * SQLiteDbms::executeSelect(std::string table, QueryList where)
 {
     stringstream stream;
@@ -292,6 +542,12 @@ void SQLiteDbms::rollbackTransection()
 void SQLiteDbms::endTransaction()
 {
     dbConnection.endTransaction();
+}
+
+void SQLiteDbms::showLastError() const
+{
+    Logger::log(LogLevel::Error, "Error code :" + ToString(dbConnection.getLastErrorCode()));
+    Logger::log(LogLevel::Error, "Last error :" + dbConnection.getLastErrorMsg());
 }
 
 bool SQLiteDbms::loadPlayerInformation(Player * player)

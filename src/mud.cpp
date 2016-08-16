@@ -151,65 +151,59 @@ Mud & Mud::instance()
 
 bool Mud::savePlayers()
 {
-    bool result = true;
-    for (auto iterator : mudPlayers)
-    {
-        // If the player is not playing, continue.
-        if (!iterator->isPlaying())
-        {
-            continue;
-        }
-        if (!iterator->updateOnDB())
-        {
-            Logger::log(LogLevel::Error, "Error saving player :" + iterator->getName());
-            result = false;
-        }
-    }
-    return result;
+    return SQLiteDbms::instance().updatePlayers();
+    /*
+     bool result = true;
+     for (auto iterator : mudPlayers)
+     {
+     // If the player is not playing, continue.
+     if (!iterator->isPlaying())
+     {
+     continue;
+     }
+     if (!iterator->updateOnDB())
+     {
+     Logger::log(LogLevel::Error, "Error saving player :" + iterator->getName());
+     result = false;
+     }
+     }
+     return result;
+     */
 }
 
 bool Mud::saveItems()
 {
-    bool result = true;
-    for (auto iterator : mudItems)
-    {
-        if (!iterator.second->updateOnDB())
-        {
-            Logger::log(LogLevel::Error, "Error saving item :" + ToString(iterator.second->vnum));
-            result = false;
-            break;
-        }
-    }
-    return result;
+    return SQLiteDbms::instance().updateItems();
 }
 
 bool Mud::saveRooms()
 {
-    bool result = true;
-    for (auto iterator : mudRooms)
-    {
-        Room * room = iterator.second;
-        if (!room->updateOnDB())
-        {
-            Logger::log(LogLevel::Error, "Error saving room :" + ToString(room->vnum));
-            result = false;
-            break;
-        }
-    }
-    return result;
+    return SQLiteDbms::instance().updateRooms();
+    /*
+     bool result = true;
+     for (auto iterator : mudRooms)
+     {
+     Room * room = iterator.second;
+     if (!room->updateOnDB())
+     {
+     Logger::log(LogLevel::Error, "Error saving room :" + ToString(room->vnum));
+     result = false;
+     break;
+     }
+     }
+     return result;
+     */
 }
 
 bool Mud::saveMud()
 {
     bool result = true;
-    SQLiteDbms::instance().beginTransaction();
     Logger::log(LogLevel::Global, "Saving information on Database for : Players...");
     result &= Mud::instance().savePlayers();
     Logger::log(LogLevel::Global, "Saving information on Database for : Items...");
     result &= Mud::instance().saveItems();
     Logger::log(LogLevel::Global, "Saving information on Database for : Rooms...");
     result &= Mud::instance().saveRooms();
-    SQLiteDbms::instance().endTransaction();
     return result;
 }
 

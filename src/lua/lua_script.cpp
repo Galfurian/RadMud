@@ -80,13 +80,7 @@ Item * LuaLoadItem(Character * maker, int vnumModel, int vnumMaterial, unsigned 
     newItem->condition = itemModel->condition;
     newItem->composition = material;
     newItem->quality = quality;
-    newItem->room = nullptr;
-    newItem->owner = nullptr;
-    newItem->container = nullptr;
     newItem->currentSlot = itemModel->slot;
-    newItem->content = std::vector<Item *>();
-    newItem->contentLiq = LiquidContent();
-
     return newItem;
 }
 
