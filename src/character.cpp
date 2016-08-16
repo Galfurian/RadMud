@@ -794,10 +794,12 @@ Item * Character::findNearbyItem(std::string itemName, int & number)
     return item;
 }
 
-Item * Character::findNearbyTool(const ToolType & toolType, const std::vector<Item *> & exceptions,
-bool searchRoom,
-bool searchInventory,
-bool searchEquipment)
+Item * Character::findNearbyTool(
+    const ToolType & toolType,
+    const std::vector<Item *> & exceptions,
+    bool searchRoom,
+    bool searchInventory,
+    bool searchEquipment)
 {
     if (searchRoom)
     {
@@ -856,10 +858,12 @@ bool searchEquipment)
     return nullptr;
 }
 
-bool Character::findNearbyTools(std::set<ToolType> tools, std::vector<Item *> & foundOnes,
-bool searchRoom,
-bool searchInventory,
-bool searchEquipment)
+bool Character::findNearbyTools(
+    std::set<ToolType> tools,
+    std::vector<Item *> & foundOnes,
+    bool searchRoom,
+    bool searchInventory,
+    bool searchEquipment)
 {
     // TODO: Prepare a map with key the tool type and as value:
     //  Option A: A bool which determine if the tool has been found.
@@ -886,7 +890,9 @@ bool searchEquipment)
     return true;
 }
 
-bool Character::findNearbyResouces(std::map<ResourceType, unsigned int> ingredients, std::vector<Item *> & foundOnes)
+bool Character::findNearbyResouces(
+    std::map<ResourceType, unsigned int> ingredients,
+    std::vector<Item *> & foundOnes)
 {
     for (auto ingredient : ingredients)
     {
@@ -1014,12 +1020,12 @@ bool Character::hasEquipmentItem(Item * item)
     return false;
 }
 
-bool Character::addInventoryItem(Item * item)
+bool Character::addInventoryItem(Item * & item)
 {
+    // Add the item to the inventory.
+    inventory.push_back_item(item);
     // Set the owner of the item.
     item->owner = this;
-    // Add the item to the inventory.
-    inventory.push_back(item);
     Logger::log(
         LogLevel::Debug,
         "Item '%s' added to '%s' inventory;",
@@ -1030,22 +1036,17 @@ bool Character::addInventoryItem(Item * item)
 
 bool Character::remInventoryItem(Item *item)
 {
-    bool removed = false;
-    for (std::vector<Item *>::iterator it = inventory.begin(); it != inventory.end(); ++it)
+    if (inventory.removeItem(item))
     {
-        Item * invItem = (*it);
-        if (invItem->vnum == item->vnum)
-        {
-            Logger::log(
-                LogLevel::Debug,
-                "Item '" + item->getName() + "' removed from '" + this->getName() + "';");
-            item->owner = nullptr;
-            inventory.erase(it);
-            removed = true;
-            break;
-        }
+        Logger::log(
+            LogLevel::Debug,
+            "Item '%s' removed from '%s';",
+            item->getName(),
+            this->getName());
+        item->owner = nullptr;
+        return true;
     }
-    return removed;
+    return false;
 }
 
 bool Character::canCarry(Item * item) const
@@ -1077,16 +1078,10 @@ unsigned int Character::getMaxCarryingWeight() const
 
 bool Character::addEquipmentItem(Item * item)
 {
-    // Check if the item exist.
-    if (item == nullptr)
-    {
-        Logger::log(LogLevel::Error, "[addEquipmentItem] Item is a nullptr.");
-        return false;
-    }
-    // Set the owner of the item.
-    item->owner = this;
     // Add the item to the equipment.
     equipment.push_back(item);
+    // Set the owner of the item.
+    item->owner = this;
     Logger::log(
         LogLevel::Debug,
         "Item '" + item->getName() + "' added to '" + this->getName() + "' equipment;");
@@ -1095,22 +1090,17 @@ bool Character::addEquipmentItem(Item * item)
 
 bool Character::remEquipmentItem(Item * item)
 {
-    bool removed = false;
-    for (auto it = equipment.begin(); it != equipment.end(); ++it)
+    if (equipment.removeItem(item))
     {
-        Item * eqpItem = (*it);
-        if (eqpItem->vnum == item->vnum)
-        {
-            Logger::log(
-                LogLevel::Debug,
-                "Item '" + item->getName() + "' removed from '" + this->getName() + "';");
-            item->owner = nullptr;
-            equipment.erase(it);
-            removed = true;
-            break;
-        }
+        Logger::log(
+            LogLevel::Debug,
+            "Item '%s' removed from '%s';",
+            item->getName(),
+            this->getName());
+        item->owner = nullptr;
+        return true;
     }
-    return removed;
+    return false;
 }
 
 bool Character::canWield(Item * item, std::string & error, EquipmentSlot & where) const
@@ -1665,7 +1655,7 @@ void Character::kill()
         // Remove the item from the inventory.
         this->remInventoryItem(item);
         // Add the item to the corpse.
-        corpse->content.addItem(item);
+        corpse->content.push_back_item(item);
         // Set the corpse as container of the item.
         item->container = corpse;
     }
@@ -1676,7 +1666,7 @@ void Character::kill()
         // Remove the item from the inventory.
         this->remEquipmentItem(item);
         // Add the item to the corpse.
-        corpse->content.addItem(item);
+        corpse->content.push_back_item(item);
         // Set the corpse as container of the item.
         item->container = corpse;
     }

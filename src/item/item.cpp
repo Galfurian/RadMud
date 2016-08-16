@@ -99,6 +99,11 @@ bool Item::removeFromMud()
     // Remove the item from the game, this means: Room, Player, Container.
     if (room != nullptr)
     {
+        Logger::log(
+            LogLevel::Debug,
+            "Removing item '%s' from room '%s'.",
+            this->getName(),
+            room->name);
         if (!room->removeItem(this))
         {
             return false;
@@ -106,6 +111,11 @@ bool Item::removeFromMud()
     }
     else if (owner != nullptr)
     {
+        Logger::log(
+            LogLevel::Debug,
+            "Removing item '%s' from owner '%s'.",
+            this->getName(),
+            owner->getName());
         if (!owner->remInventoryItem(this))
         {
             if (!owner->remEquipmentItem(this))
@@ -116,14 +126,15 @@ bool Item::removeFromMud()
     }
     else if (container != nullptr)
     {
+        Logger::log(
+            LogLevel::Debug,
+            "Removing item '%s' from container '%s'.",
+            this->getName(),
+            container->getName());
         if (!container->takeOut(this))
         {
             return false;
         }
-    }
-    else
-    {
-        return false;
     }
 
     if (this->model->getType() == ModelType::Corpse)
@@ -149,18 +160,10 @@ bool Item::removeFromMud()
 
 bool Item::destroy()
 {
-    if (this->removeFromMud())
+    if (!this->removeFromMud())
     {
-        if (this->model->getType() != ModelType::Corpse)
-        {
-            Logger::log(LogLevel::Error, "Removing item '" + this->getName() + "' from DB;");
-            // Remove the item from the database.
-            if (!this->removeOnDB())
-            {
-                Logger::log(LogLevel::Error, "Something gone wrong during item removal from DB.");
-                return false;
-            }
-        }
+        Logger::log(LogLevel::Error, "Error while destroying item '" + this->getName() + "';");
+        return false;
     }
     return true;
 }
@@ -676,12 +679,12 @@ bool Item::canContain(Item * item) const
     return (item->getWeight() <= this->getFreeSpace());
 }
 
-bool Item::putInside(Item * item)
+bool Item::putInside(Item * & item)
 {
     if (this->canContain(item))
     {
         // Put the item into the container.
-        content.addItem(item);
+        content.push_back_item(item);
         // Set the container value to the content item.
         item->container = this;
         return true;
@@ -691,24 +694,17 @@ bool Item::putInside(Item * item)
 
 bool Item::takeOut(Item * item)
 {
-    bool removed = false;
-    for (auto it = content.begin(); it != content.end(); ++it)
+    if (content.removeItem(item))
     {
-        Item * containedItem = (*it);
-        if (containedItem->vnum == item->vnum)
-        {
-            Logger::log(
-                LogLevel::Debug,
-                "Item '%s' taken out from '%s';",
-                item->getName(),
-                this->getName());
-            item->container = nullptr;
-            content.erase(it);
-            removed = true;
-            break;
-        }
+        Logger::log(
+            LogLevel::Debug,
+            "Item '%s' taken out from '%s';",
+            item->getName(),
+            this->getName());
+        item->container = nullptr;
+        return true;
     }
-    return removed;
+    return false;
 }
 
 bool Item::canContain(Liquid * liquid, const unsigned int & ammount) const

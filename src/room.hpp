@@ -87,7 +87,7 @@ class Room
 
         /// @brief In addition to adding the the passed item to room's items list.
         /// @param item The item to add to the list.
-        void addItem(Item * item);
+        void addItem(Item * & item);
 
         /// @brief Add the passed item to room's buildings list.
         /// @param item The item to add to the list.

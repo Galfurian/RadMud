@@ -219,7 +219,7 @@ class Item
         /// @param item The item to load in.
         /// @return <b>True</b> if the item is a container,<br>
         ///         <b>False</b> otherwise.
-        bool putInside(Item * item);
+        bool putInside(Item * & item);
 
         /// @brief Extract an item from the container.
         /// @param item The item to load in.

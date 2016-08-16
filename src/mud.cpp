@@ -237,7 +237,15 @@ bool Mud::addItem(Item * item)
 }
 bool Mud::remItem(Item * item)
 {
-    return (FindErase(mudItems, item->vnum) != mudItems.end());
+    for (auto it = mudItems.begin(); it != mudItems.end(); ++it)
+    {
+        if (it->second->vnum == item->vnum)
+        {
+            mudItems.erase(it);
+            return true;
+        }
+    }
+    return false;
 }
 bool Mud::addRoom(Room * room)
 {
@@ -266,7 +274,15 @@ bool Mud::addCorpse(Item * corpse)
 }
 bool Mud::remCorpse(Item * corpse)
 {
-    return (FindErase(mudCorpses, corpse->vnum) != mudCorpses.end());
+    for (auto it = mudCorpses.begin(); it != mudCorpses.end(); ++it)
+    {
+        if (it->second->vnum == corpse->vnum)
+        {
+            mudCorpses.erase(it);
+            return true;
+        }
+    }
+    return false;
 }
 bool Mud::addItemModel(ItemModel * model)
 {
@@ -447,7 +463,8 @@ Race * Mud::findRace(int vnum)
 
 Race * Mud::findRace(std::string name)
 {
-    for (std::map<int, Race *>::iterator iterator = mudRaces.begin(); iterator != mudRaces.end(); ++iterator)
+    for (std::map<int, Race *>::iterator iterator = mudRaces.begin(); iterator != mudRaces.end();
+        ++iterator)
     {
         if (ToLower(iterator->second->name) == ToLower(name))
         {
@@ -469,8 +486,8 @@ Faction * Mud::findFaction(int vnum)
 
 Faction * Mud::findFaction(std::string name)
 {
-    for (std::map<int, Faction *>::iterator iterator = mudFactions.begin(); iterator != mudFactions.end();
-        ++iterator)
+    for (std::map<int, Faction *>::iterator iterator = mudFactions.begin();
+        iterator != mudFactions.end(); ++iterator)
     {
         if (ToLower(iterator->second->name) == ToLower(name))
         {
@@ -603,8 +620,8 @@ ActionHandler & Mud::findStateAction(ConnectionState state)
 
 Building * Mud::findBuilding(std::string name)
 {
-    for (std::map<int, Building>::iterator iterator = mudBuildings.begin(); iterator != mudBuildings.end();
-        ++iterator)
+    for (std::map<int, Building>::iterator iterator = mudBuildings.begin();
+        iterator != mudBuildings.end(); ++iterator)
     {
         if (ToLower(iterator->second.name) == ToLower(name))
         {
@@ -616,8 +633,8 @@ Building * Mud::findBuilding(std::string name)
 
 Building * Mud::findBuilding(int vnum)
 {
-    for (std::map<int, Building>::iterator iterator = mudBuildings.begin(); iterator != mudBuildings.end();
-        ++iterator)
+    for (std::map<int, Building>::iterator iterator = mudBuildings.begin();
+        iterator != mudBuildings.end(); ++iterator)
     {
         if (iterator->second.buildingModel->vnum == vnum)
         {

@@ -174,9 +174,11 @@ bool SQLiteDbms::searchPlayer(string name)
     return outcome;
 }
 
-bool SQLiteDbms::insertInto(std::string table, std::vector<std::string> args,
-bool orIgnore,
-bool orReplace)
+bool SQLiteDbms::insertInto(
+    std::string table,
+    std::vector<std::string> args,
+    bool orIgnore,
+    bool orReplace)
 {
     stringstream stream;
     stream << "INSERT";

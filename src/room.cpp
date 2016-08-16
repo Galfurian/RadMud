@@ -86,9 +86,9 @@ bool Room::check(bool complete)
     return true;
 }
 
-void Room::addItem(Item * item)
+void Room::addItem(Item * & item)
 {
-    item = items.addItem(item);
+    items.push_back_item(item);
     item->room = this;
     Logger::log(LogLevel::Debug, "Item '" + item->getName() + "' added to '" + this->name + "';");
 }
@@ -114,21 +114,15 @@ void Room::addCharacter(Character * character)
 
 bool Room::removeItem(Item * item)
 {
-    bool removed = false;
-    for (auto it = items.begin(); it != items.end(); ++it)
+    if (items.removeItem(item))
     {
-        if ((*it)->vnum == item->vnum)
-        {
-            Logger::log(
-                LogLevel::Debug,
-                "Item '" + item->getName() + "' removed from '" + this->name + "';");
-            item->room = nullptr;
-            items.erase(it);
-            removed = true;
-            break;
-        }
+        Logger::log(
+            LogLevel::Debug,
+            "Item '" + item->getName() + "' removed from '" + this->name + "';");
+        item->room = nullptr;
+        return true;
     }
-    return removed;
+    return false;
 }
 
 bool Room::removeBuilding(Item * item)
@@ -294,7 +288,10 @@ std::vector<Item *> Room::findBuildings(ModelType type)
     return buildingsList;
 }
 
-Character * Room::findCharacter(string target, int & number, const std::vector<Character *> & exceptions)
+Character * Room::findCharacter(
+    string target,
+    int & number,
+    const std::vector<Character *> & exceptions)
 {
     for (auto iterator : characters)
     {

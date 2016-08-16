@@ -35,13 +35,11 @@ class ItemContainer: public std::vector<Item *>
 
         virtual ~ItemContainer();
 
-        Item * addItem(Item * item);
+        void push_back_item(Item * & item);
 
-        bool removeItem(const int & vnum);
+        bool removeItem(Item * item);
 
         Item * findItem(const int & vnum) const;
-
-        void stackItems();
 
         std::vector<std::pair<Item *, int>> toStack() const;
 

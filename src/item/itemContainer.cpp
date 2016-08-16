@@ -30,8 +30,9 @@ ItemContainer::~ItemContainer()
     // TODO Auto-generated destructor stub
 }
 
-Item * ItemContainer::addItem(Item * item)
+void ItemContainer::push_back_item(Item * & item)
 {
+    auto stacked = false;
     for (auto it = this->begin(); it != this->end(); ++it)
     {
         Item * content = (*it);
@@ -41,19 +42,24 @@ Item * ItemContainer::addItem(Item * item)
             {
                 content->quantity += item->quantity;
                 delete (item);
-                return content;
+                item = content;
+                stacked = true;
+                break;
             }
         }
     }
-    this->push_back(item);
-    return item;
+    if (!stacked)
+    {
+        this->push_back(item);
+    }
 }
 
-bool ItemContainer::removeItem(const int & vnum)
+bool ItemContainer::removeItem(Item * item)
 {
-    for (iterator it = this->begin(); it != this->end(); ++it)
+    for (auto it = this->begin(); it != this->end(); ++it)
     {
-        if ((*it)->vnum == vnum)
+        Item * contained = (*it);
+        if (contained->vnum == item->vnum)
         {
             this->erase(it);
             return true;

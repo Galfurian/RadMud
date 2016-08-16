@@ -395,7 +395,7 @@ class Character
         /// @brief Add the passed item to character's inventory.
         /// @param item The item to add to inventory.
         /// @return <b>True</b> if the operation goes well,<br><b>False</b> otherwise.
-        bool addInventoryItem(Item * item);
+        bool addInventoryItem(Item * & item);
 
         /// @brief Remove the passed item from the character's inventory.
         /// @param item The item to remove from inventory.
