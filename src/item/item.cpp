@@ -36,6 +36,7 @@
 
 #include "shopItem.hpp"
 #include "armorItem.hpp"
+#include "corpseItem.hpp"
 #include "weaponItem.hpp"
 #include "currencyItem.hpp"
 
@@ -94,87 +95,61 @@ bool Item::check(bool complete)
     return safe;
 }
 
-bool Item::removeFromMud()
+void Item::removeFromMud()
 {
     // Remove the item from the game, this means: Room, Player, Container.
     if (room != nullptr)
     {
-        Logger::log(
-            LogLevel::Debug,
-            "Removing item '%s' from room '%s'.",
-            this->getName(),
-            room->name);
-        if (!room->removeItem(this))
+        if (room->removeItem(this))
         {
-            return false;
+            Logger::log(
+                LogLevel::Debug,
+                "Removing item '%s' from room '%s'.",
+                this->getName(),
+                room->name);
         }
     }
-    else if (owner != nullptr)
+    if (owner != nullptr)
     {
-        Logger::log(
-            LogLevel::Debug,
-            "Removing item '%s' from owner '%s'.",
-            this->getName(),
-            owner->getName());
-        if (!owner->remInventoryItem(this))
+        if (owner->equipment.removeItem(this))
         {
-            if (!owner->remEquipmentItem(this))
-            {
-                return false;
-            }
+            Logger::log(
+                LogLevel::Debug,
+                "Removing item '%s' from '%s' equipment.",
+                this->getName(),
+                owner->getName());
+        }
+        if (owner->inventory.removeItem(this))
+        {
+            Logger::log(
+                LogLevel::Debug,
+                "Removing item '%s' from '%s' inventory.",
+                this->getName(),
+                owner->getName());
         }
     }
-    else if (container != nullptr)
+    if (container != nullptr)
     {
-        Logger::log(
-            LogLevel::Debug,
-            "Removing item '%s' from container '%s'.",
-            this->getName(),
-            container->getName());
-        if (!container->takeOut(this))
+        if (container->content.removeItem(this))
         {
-            return false;
+            Logger::log(
+                LogLevel::Debug,
+                "Removing item '%s' from container '%s'.",
+                this->getName(),
+                container->getName());
         }
     }
-
-    if (this->model->getType() == ModelType::Corpse)
+    if (this->model->getType() != ModelType::Corpse)
     {
-        // Remove the item from the list of corpses.
-        if (!Mud::instance().remCorpse(this))
+        if (Mud::instance().remItem(this))
         {
-            Logger::log(LogLevel::Error, "Something gone wrong during corpse removal from mud.");
-            return false;
+            Logger::log(LogLevel::Debug, "Removing item '%s' from MUD items.", this->getName());
         }
     }
-    else
-    {
-        // Remove the item from the mud.
-        if (!Mud::instance().remItem(this))
-        {
-            Logger::log(LogLevel::Error, "Something gone wrong during item removal from mud.");
-            return false;
-        }
-    }
-    return true;
-}
-
-bool Item::destroy()
-{
-    if (!this->removeFromMud())
-    {
-        Logger::log(LogLevel::Error, "Error while destroying item '" + this->getName() + "';");
-        return false;
-    }
-    return true;
 }
 
 bool Item::createOnDB()
 {
-    // Check if the Item can be saved on the database.
-    if (model->getType() == ModelType::Corpse)
-    {
-        return true;
-    }
     // Prepare the vector used to insert into the database.
     std::vector<std::string> arguments;
     arguments.push_back(ToString(this->vnum));
@@ -187,52 +162,32 @@ bool Item::createOnDB()
     arguments.push_back(ToString(this->composition->vnum));
     arguments.push_back(ToString(this->quality.toUInt()));
     arguments.push_back(ToString(this->flags));
-    if (SQLiteDbms::instance().insertInto("Item", arguments))
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return SQLiteDbms::instance().insertInto("Item", arguments);
 }
 
 bool Item::updateOnDB()
 {
-    // Check if the Item can be saved on the database.
-    if (model->getType() == ModelType::Corpse)
-    {
-        return true;
-    }
-
     // Save the item's Information.
+    QueryList value, where;
+    value.push_back(std::make_pair("model", ToString(model->vnum)));
+    value.push_back(std::make_pair("maker", maker));
+    value.push_back(std::make_pair("condition", ToString(condition)));
+    value.push_back(std::make_pair("composition", ToString(composition->vnum)));
+    value.push_back(std::make_pair("quality", ToString(quality.toUInt())));
+    value.push_back(std::make_pair("flag", ToString(flags)));
+    where.push_back(std::make_pair("vnum", ToString(vnum)));
+    if (!SQLiteDbms::instance().updateInto("Item", value, where))
     {
-        QueryList value;
-        value.push_back(std::make_pair("model", ToString(model->vnum)));
-        value.push_back(std::make_pair("maker", maker));
-        value.push_back(std::make_pair("condition", ToString(condition)));
-        value.push_back(std::make_pair("composition", ToString(composition->vnum)));
-        value.push_back(std::make_pair("quality", ToString(quality.toUInt())));
-        value.push_back(std::make_pair("flag", ToString(flags)));
-        QueryList where;
-        where.push_back(std::make_pair("vnum", ToString(vnum)));
-        if (!SQLiteDbms::instance().updateInto("Item", value, where))
-        {
-            Logger::log(LogLevel::Error, "Can't save the item!");
-            return false;
-        }
+        Logger::log(LogLevel::Error, "Can't save the item!");
+        return false;
     }
-
     if ((room != nullptr) || (owner != nullptr) || (container != nullptr))
     {
         // Remove the item from any auxiliary table.
-        QueryList where;
-        where.push_back(std::make_pair("item", ToString(vnum)));
         SQLiteDbms::instance().deleteFrom("ItemPlayer", where);
         SQLiteDbms::instance().deleteFrom("ItemRoom", where);
         SQLiteDbms::instance().deleteFrom("ItemContent", where);
     }
-
     // Save the item's position.
     if (room != nullptr)
     {
@@ -281,23 +236,6 @@ bool Item::updateOnDB()
             }
         }
     }
-
-    if (!content.empty())
-    {
-        for (auto iterator : content)
-        {
-            std::vector<std::string> arguments;
-            // Prepare the query arguments.
-            arguments.push_back(ToString(vnum));
-            arguments.push_back(ToString(iterator->vnum));
-            if (!SQLiteDbms::instance().insertInto("ItemContent", arguments))
-            {
-                Logger::log(LogLevel::Error, "Can't save the contained item!");
-                return false;
-            }
-        }
-    }
-
     if (contentLiq.first != nullptr)
     {
         std::vector<std::string> arguments;
@@ -316,20 +254,19 @@ bool Item::updateOnDB()
 
 bool Item::removeOnDB()
 {
+    auto strVnum = ToString(vnum);
     // Prepare the where clause.
-    QueryList main = { std::make_pair("vnum", ToString(vnum)) };
-    auto result = SQLiteDbms::instance().deleteFrom("Item", main);
-    // Remove the item from everywhere.
-    QueryList other = { std::make_pair("item", ToString(vnum)) };
-    SQLiteDbms::instance().deleteFrom("ItemPlayer", other);
-    SQLiteDbms::instance().deleteFrom("ItemRoom", other);
-    SQLiteDbms::instance().deleteFrom("ItemContent", other);
-    SQLiteDbms::instance().deleteFrom("Shop", other);
-    if (!result)
+    if (SQLiteDbms::instance().deleteFrom("Item", { std::make_pair("vnum", strVnum) }))
     {
-        Logger::log(LogLevel::Error, "Error during item removal from table Item.");
+        // Remove the item from everywhere.
+        SQLiteDbms::instance().deleteFrom("ItemPlayer", { std::make_pair("item", strVnum) });
+        SQLiteDbms::instance().deleteFrom("ItemRoom", { std::make_pair("item", strVnum) });
+        SQLiteDbms::instance().deleteFrom("ItemContent", { std::make_pair("item", strVnum) });
+        return true;
     }
-    return result;
+    Logger::log(LogLevel::Error, "Can't delete the item from the database!");
+    SQLiteDbms::instance().showLastError();
+    return false;
 }
 
 void Item::getSheet(Table & sheet) const
@@ -929,6 +866,10 @@ CurrencyItem * Item::toCurrencyItem()
 {
     return static_cast<CurrencyItem *>(this);
 }
+CorpseItem * Item::toCorpseItem()
+{
+    return static_cast<CorpseItem *>(this);
+}
 
 void Item::luaRegister(lua_State * L)
 {
@@ -969,6 +910,7 @@ Item * GenerateItem(const ModelType & type)
         case ModelType::Currency:
             return new CurrencyItem();
         case ModelType::Corpse:
+            return new CorpseItem();
         case ModelType::Book:
         case ModelType::Container:
         case ModelType::Food:

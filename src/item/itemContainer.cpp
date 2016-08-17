@@ -38,14 +38,12 @@ void ItemContainer::push_back_item(Item * & item)
         Item * content = (*it);
         if (item->canStackWith(content))
         {
-            if (item->destroy())
-            {
-                content->quantity += item->quantity;
-                delete (item);
-                item = content;
-                stacked = true;
-                break;
-            }
+            content->quantity += item->quantity;
+            item->removeFromMud();
+            delete (item);
+            item = content;
+            stacked = true;
+            break;
         }
     }
     if (!stacked)

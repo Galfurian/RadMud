@@ -44,11 +44,6 @@ bool ShopItem::check(bool complete)
     return Item::check(complete);
 }
 
-bool ShopItem::destroy()
-{
-    return Item::destroy();
-}
-
 bool ShopItem::createOnDB()
 {
     if (Item::createOnDB())
@@ -115,17 +110,12 @@ bool ShopItem::removeOnDB()
 {
     if (Item::removeOnDB())
     {
-        QueryList where;
-        where.push_back(std::make_pair("vnum", ToString(vnum)));
-        if (SQLiteDbms::instance().deleteFrom("Shop", where))
+        if (SQLiteDbms::instance().deleteFrom("Shop", { std::make_pair("vnum", ToString(vnum)) }))
         {
             return true;
         }
-        else
-        {
-            Logger::log(LogLevel::Error, "Error during item removal from table Item.");
-        }
     }
+    Logger::log(LogLevel::Error, "Error during item removal from table Shop.");
     return false;
 }
 

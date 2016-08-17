@@ -255,7 +255,7 @@ void MudUpdater::updateItems()
     }
     for (auto it : itemToDestroy)
     {
-        it->destroy();
+        it->removeFromMud();
         delete (it);
     }
     Logger::log(LogLevel::Debug, "Done!");

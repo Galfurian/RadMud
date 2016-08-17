@@ -1536,26 +1536,9 @@ void DoDeposit(Character * character, std::istream & sArgs)
         character->sendMsg("You can't deposit %s in %s.\n", item->getName(), building->getName());
         return;
     }
-    auto shop = building->toShopItem();
-    auto deposit = item->getPrice();
-    auto status = false;
-    if (item->destroy())
-    {
-        shop->balance += deposit;
-    }
-    if (!status)
-    {
-        shop->balance -= deposit;
-        character->sendMsg(
-            "You failed to deposit %s in %s.\n",
-            item->getName(),
-            building->getName());
-        return;
-    }
-    else
-    {
-        delete (item);
-    }
+    building->toShopItem()->balance += item->getPrice();
+    item->removeFromMud();
+    delete (item);
     character->sendMsg("You deposit %s in %s.\n", item->getName(), building->getName());
 }
 
@@ -1742,10 +1725,8 @@ void DoBuy(Character * character, std::istream & sArgs)
 
     for (auto coin : givenCoins)
     {
-        if (coin->destroy())
-        {
-            delete (coin);
-        }
+        coin->removeFromMud();
+        delete (coin);
     }
     shop->takeOut(item);
     character->addInventoryItem(item);

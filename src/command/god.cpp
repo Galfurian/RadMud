@@ -435,15 +435,9 @@ void DoItemDestroy(Character * character, std::istream & sArgs)
         character->sendMsg("Invalid vnum.\n");
         return;
     }
-    if (item->destroy())
-    {
-        character->sendMsg("You have destroyed the desired object.\n");
-        delete (item);
-    }
-    else
-    {
-        character->sendMsg("You have NOT destroyed the desired object.\n");
-    }
+    item->removeFromMud();
+    delete (item);
+    character->sendMsg("You have destroyed the desired object.\n");
 }
 
 void DoItemInfo(Character * character, std::istream & sArgs)

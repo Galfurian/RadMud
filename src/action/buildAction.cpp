@@ -113,7 +113,7 @@ ActionStatus BuildAction::perform()
     }
     for (auto it : toDestroy)
     {
-        it->destroy();
+        it->removeFromMud();
         delete (it);
     }
 

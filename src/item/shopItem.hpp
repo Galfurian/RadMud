@@ -42,8 +42,6 @@ class ShopItem: public Item
 
         virtual bool check(bool complete = false);
 
-        virtual bool destroy();
-
         virtual bool createOnDB();
 
         virtual bool updateOnDB();
