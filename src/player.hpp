@@ -129,14 +129,6 @@ class Player: public Character
         /// @brief Send the prompt to player.
         void sendPrompt();
 
-        /// @brief Remove the passed item from the player's inventory and update the information on database.
-        /// @param item The item to remove from inventory.
-        bool remInventoryItem(Item * item);
-
-        /// @brief Remove from current equipment the item, and update the information on database.
-        /// @param item The item to remove.
-        bool remEquipmentItem(Item * item);
-
         /// @brief Handle what happend when this player die.
         void kill();
 

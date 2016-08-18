@@ -211,9 +211,7 @@ class Item
 
         /// @brief Load an item inside the container and update the database.
         /// @param item The item to load in.
-        /// @return <b>True</b> if the item is a container,<br>
-        ///         <b>False</b> otherwise.
-        bool putInside(Item * & item);
+        void putInside(Item * & item);
 
         /// @brief Extract an item from the container.
         /// @param item The item to load in.

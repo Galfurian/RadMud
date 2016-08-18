@@ -1020,7 +1020,7 @@ bool Character::hasEquipmentItem(Item * item)
     return false;
 }
 
-bool Character::addInventoryItem(Item * & item)
+void Character::addInventoryItem(Item * & item)
 {
     // Add the item to the inventory.
     inventory.push_back_item(item);
@@ -1031,19 +1031,46 @@ bool Character::addInventoryItem(Item * & item)
         "Item '%s' added to '%s' inventory;",
         item->getName(),
         this->getName());
-    return true;
 }
 
-bool Character::remInventoryItem(Item *item)
+void Character::addEquipmentItem(Item * & item)
+{
+    // Add the item to the equipment.
+    equipment.push_back(item);
+    // Set the owner of the item.
+    item->owner = this;
+    Logger::log(
+        LogLevel::Debug,
+        "Item '%s' added to '%s' equipment;",
+        item->getName(),
+        this->getName());
+}
+
+bool Character::remInventoryItem(Item * item)
 {
     if (inventory.removeItem(item))
     {
+        item->owner = nullptr;
         Logger::log(
             LogLevel::Debug,
             "Item '%s' removed from '%s';",
             item->getName(),
             this->getName());
+        return true;
+    }
+    return false;
+}
+
+bool Character::remEquipmentItem(Item * item)
+{
+    if (equipment.removeItem(item))
+    {
         item->owner = nullptr;
+        Logger::log(
+            LogLevel::Debug,
+            "Item '%s' removed from '%s';",
+            item->getName(),
+            this->getName());
         return true;
     }
     return false;
@@ -1074,33 +1101,6 @@ unsigned int Character::getMaxCarryingWeight() const
     // MIN   =  50
     // MAX   = 300
     return 50 + (this->getAbilityModifier(Ability::Strength) * 10);
-}
-
-bool Character::addEquipmentItem(Item * item)
-{
-    // Add the item to the equipment.
-    equipment.push_back(item);
-    // Set the owner of the item.
-    item->owner = this;
-    Logger::log(
-        LogLevel::Debug,
-        "Item '" + item->getName() + "' added to '" + this->getName() + "' equipment;");
-    return true;
-}
-
-bool Character::remEquipmentItem(Item * item)
-{
-    if (equipment.removeItem(item))
-    {
-        Logger::log(
-            LogLevel::Debug,
-            "Item '%s' removed from '%s';",
-            item->getName(),
-            this->getName());
-        item->owner = nullptr;
-        return true;
-    }
-    return false;
 }
 
 bool Character::canWield(Item * item, std::string & error, EquipmentSlot & where) const

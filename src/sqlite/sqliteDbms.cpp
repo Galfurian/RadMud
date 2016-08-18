@@ -18,6 +18,8 @@
 
 #include "sqliteDbms.hpp"
 
+#include "sqliteLoadFunctions.hpp"
+
 #include "../mud.hpp"
 #include "../constants.hpp"
 #include "../utilities/logger.hpp"

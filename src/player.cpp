@@ -164,10 +164,6 @@ void Player::getSheet(Table & sheet) const
     }
 }
 
-///////////////////////////////////////////////////////////
-// CONNECTIONI ////////////////////////////////////////////
-///////////////////////////////////////////////////////////
-
 int Player::getSocket() const
 {
     return psocket;
@@ -199,10 +195,6 @@ bool Player::hasPendingOutput() const
     return !outbuf.empty();
 }
 
-///////////////////////////////////////////////////////////
-// DATABASE ///////////////////////////////////////////////
-///////////////////////////////////////////////////////////
-
 bool Player::createOnDB()
 {
     vector<string> arguments;
@@ -230,12 +222,11 @@ bool Player::createOnDB()
     arguments.push_back(ToString(this->getHunger()));
     arguments.push_back(ToString(this->getThirst()));
     arguments.push_back(ToString(rent_room));
-    if (!SQLiteDbms::instance().insertInto("Player", arguments))
+    if (!SQLiteDbms::instance().insertInto("Player", arguments, false, true))
     {
-        Logger::log(LogLevel::Error, "Something gone wrong during player creation on database.");
+        Logger::log(LogLevel::Error, "Error during player creation on database.");
         return false;
     }
-
     // Prepare the arguments of the query for skill table.
     for (auto iterator : skills)
     {
@@ -243,11 +234,9 @@ bool Player::createOnDB()
         arguments.push_back(name);
         arguments.push_back(ToString(iterator.first));
         arguments.push_back(ToString(iterator.second));
-        if (!SQLiteDbms::instance().insertInto("Advancement", arguments))
+        if (!SQLiteDbms::instance().insertInto("Advancement", arguments, false, true))
         {
-            Logger::log(
-                LogLevel::Error,
-                "Something gone wrong during player Skill creation on database.");
+            Logger::log(LogLevel::Error, "Error during player Skill creation on database.");
             return false;
         }
     }
@@ -318,10 +307,6 @@ bool Player::updateOnDB()
     return true;
 }
 
-///////////////////////////////////////////////////////////
-// INTERFACE //////////////////////////////////////////////
-///////////////////////////////////////////////////////////
-
 void Player::sendPrompt()
 {
     if (this->isPlaying())
@@ -341,40 +326,6 @@ void Player::sendPrompt()
     }
 }
 
-///////////////////////////////////////////////////////////
-// INVENTORY //////////////////////////////////////////////
-///////////////////////////////////////////////////////////
-
-bool Player::remInventoryItem(Item * item)
-{
-    if (Character::remInventoryItem(item))
-    {
-        SQLiteDbms::instance().deleteFrom("ItemPlayer", { std::make_pair("owner", name),
-            std::make_pair("item", ToString(item->vnum)) });
-        return true;
-    }
-    return false;
-}
-
-///////////////////////////////////////////////////////////
-// EQUIPMENT //////////////////////////////////////////////
-///////////////////////////////////////////////////////////
-
-bool Player::remEquipmentItem(Item * item)
-{
-    if (Character::remEquipmentItem(item))
-    {
-        SQLiteDbms::instance().deleteFrom("ItemPlayer", { std::make_pair("owner", name),
-            std::make_pair("item", ToString(item->vnum)) });
-        return true;
-    }
-    return false;
-}
-
-///////////////////////////////////////////////////////////
-// DEATH //////////////////////////////////////////////////
-///////////////////////////////////////////////////////////
-
 void Player::kill()
 {
     // Call the method of the father class.
@@ -388,10 +339,6 @@ void Player::kill()
     this->setHealth(1, true);
     this->setStamina(1, true);
 }
-
-///////////////////////////////////////////////////////////
-// COMMUNICATION //////////////////////////////////////////
-///////////////////////////////////////////////////////////
 
 void Player::enterGame()
 {

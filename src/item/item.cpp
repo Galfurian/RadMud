@@ -616,17 +616,13 @@ bool Item::canContain(Item * item) const
     return (item->getWeight() <= this->getFreeSpace());
 }
 
-bool Item::putInside(Item * & item)
+void Item::putInside(Item * & item)
 {
-    if (this->canContain(item))
-    {
-        // Put the item into the container.
-        content.push_back_item(item);
-        // Set the container value to the content item.
-        item->container = this;
-        return true;
-    }
-    return false;
+    // Put the item into the container.
+    content.push_back_item(item);
+    // Set the container value to the content item.
+    item->container = this;
+    Logger::log(LogLevel::Debug, "Item '%s' added to '%s';", item->getName(), this->getName());
 }
 
 bool Item::takeOut(Item * item)

@@ -332,23 +332,11 @@ void DoGive(Character * character, std::istream & sArgs)
         return;
     }
     // Remove the item from the character inventory.
-    if (!character->remInventoryItem(item))
-    {
-        character->sendMsg(
-            "You cannot give " + item->getName() + " to " + target->getName() + ".\n");
-        return;
-    }
+    character->remInventoryItem(item);
     // Add the item to the target inventory.
-    if (!target->addInventoryItem(item))
-    {
-        character->sendMsg(
-            "You cannot give " + item->getName() + " to " + target->getName() + ".\n");
-        return;
-    }
+    target->addInventoryItem(item);
     // Check if the character is invisible.
-    std::string viewdName =
-        (HasFlag(character->flags, CharacterFlag::Invisible)) ?
-            "Someone" : character->getNameCapital();
+    auto customName = (target->canSee(character)) ? "Someone" : character->getNameCapital();
     // GIVE Message.
     character->sendMsg(
         "You give %s to %s.\n",
@@ -357,7 +345,7 @@ void DoGive(Character * character, std::istream & sArgs)
     // RECEIVE Message.
     target->sendMsg(
         "%s gives you %s.\n\n",
-        viewdName,
+        customName,
         Formatter::cyan() + ToLower(item->getName()) + Formatter::reset());
     // Check if the character is invisible.
     std::string broadcast;
@@ -1092,16 +1080,13 @@ void DoPut(Character * character, std::istream & sArgs)
         auto originalList = character->inventory;
         for (auto iterator : originalList)
         {
-            if (iterator == container)
+            if ((iterator != container) && container->canContain(iterator))
             {
-                continue;
+                // Remove the item from the player's inventory.
+                character->remInventoryItem(iterator);
+                // Put the item inside the container.
+                container->putInside(iterator);
             }
-            if (!container->putInside(iterator))
-            {
-                continue;
-            }
-            // Remove the item from the player's inventory.
-            character->remInventoryItem(iterator);
         }
         character->sendMsg("You put everything you could in %s.\n", container->getName());
         // Send the message inside the room.
@@ -1121,17 +1106,15 @@ void DoPut(Character * character, std::istream & sArgs)
         return;
     }
     // Try to put the item inside the container.
-    if (!container->putInside(item))
+    if (!container->canContain(item))
     {
         character->sendMsg("%s can't contain any more items.\n", container->getNameCapital());
         return;
     }
-    if (!character->remInventoryItem(item))
-    {
-        container->putInside(item);
-        character->sendMsg("You can't let go %s.\n", item->getName());
-        return;
-    }
+    // Remove the item from the player's inventory.
+    character->remInventoryItem(item);
+    // Put the item inside the container.
+    container->putInside(item);
     // Notify to player.
     character->sendMsg(
         "You put %s inside %s.\n",
@@ -1615,38 +1598,16 @@ void DoSell(Character * character, std::istream & sArgs)
         character->sendMsg("You failed to sell %s.\n", item->getName());
         return;
     }
-    // Remove the item from the inventory.
-    auto status = false;
-    if (character->remInventoryItem(item))
+    // Remove the item from the player's inventory.
+    character->remInventoryItem(item);
+    // Put the item inside the container.
+    shop->putInside(item);
+    for (auto coin : coins)
     {
-        // Put the item inside the shop.
-        if (shop->putInside(item))
-        {
-            for (auto coin : coins)
-            {
-                character->addInventoryItem(coin);
-            }
-            shop->balance -= price;
-            status = true;
-        }
-        else
-        {
-            character->addInventoryItem(item);
-        }
+        character->addInventoryItem(coin);
     }
-    // Handle error.
-    if (!status)
-    {
-        character->sendMsg("You failed to sell %s.\n", item->getName());
-        for (auto coin : coins)
-        {
-            delete (coin);
-        }
-    }
-    else
-    {
-        character->sendMsg("You sell %s to %s.\n", item->getName(), shopKeeper->getName());
-    }
+    shop->balance -= price;
+    character->sendMsg("You sell %s to %s.\n", item->getName(), shopKeeper->getName());
 }
 
 void DoBuy(Character * character, std::istream & sArgs)
@@ -1705,7 +1666,6 @@ void DoBuy(Character * character, std::istream & sArgs)
         shopKeeper->doCommand("say " + character->getName() + " " + phrase);
         return;
     }
-
     if (providedValue > requiredValue)
     {
         auto change = providedValue - requiredValue;
