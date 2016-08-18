@@ -943,11 +943,11 @@ bool Character::findNearbyResouces(
     return true;
 }
 
-bool Character::findCoins(
-    std::vector<Item *> & coins,
+std::vector<Item *> Character::findCoins(
     const unsigned int & requiredValue,
     unsigned int & providedValue)
 {
+    std::vector<Item *> coins;
     for (auto it : equipment)
     {
         if (it->isAContainer() && !it->isEmpty())
@@ -960,7 +960,7 @@ bool Character::findCoins(
                     coins.push_back(content);
                     if (providedValue >= requiredValue)
                     {
-                        return true;
+                        return coins;
                     }
                 }
             }
@@ -974,7 +974,7 @@ bool Character::findCoins(
             coins.push_back(it);
             if (providedValue >= requiredValue)
             {
-                return true;
+                return coins;
             }
         }
         if (it->isAContainer() && !it->isEmpty())
@@ -987,13 +987,17 @@ bool Character::findCoins(
                     coins.push_back(it);
                     if (providedValue >= requiredValue)
                     {
-                        return true;
+                        return coins;
                     }
                 }
             }
         }
     }
-    return false;
+    if (providedValue < requiredValue)
+    {
+        coins.clear();
+    }
+    return coins;
 }
 
 bool Character::hasInventoryItem(Item * item)

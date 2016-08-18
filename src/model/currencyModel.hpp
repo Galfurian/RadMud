@@ -76,10 +76,7 @@ class CurrencyModel: public ItemModel
 
         bool findPrice(const int & materialVnum, unsigned int & price) const;
 
-        bool generateCurrency(
-            const std::string & maker,
-            const unsigned int & value,
-            std::vector<Item *> & coins);
+        std::vector<Item *> generateCurrency(const std::string & maker, const unsigned int & value);
 
     private:
         /// @brief Sort the list of prices.

@@ -250,7 +250,6 @@ bool SQLiteDbms::insertInto(
             stream << "\"" << value << "\", ";
         }
     }
-    std::cout << stream.str() << "\n";
     return (dbConnection.executeQuery(stream.str().c_str()) != 0);
 }
 

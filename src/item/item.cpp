@@ -541,7 +541,7 @@ void Item::putInside(Item * & item, bool updateDB)
     {
         SQLiteDbms::instance().insertInto(
             "ItemContent",
-            { ToString(container->vnum), ToString(vnum) },
+            { ToString(this->vnum), ToString(item->vnum) },
             false,
             true);
     }
@@ -696,19 +696,17 @@ std::string Item::lookContent()
         else
         {
             output += "Looking inside you see:\n";
-            for (auto it : content.toStack())
+            Table table = Table();
+            table.addColumn("Item", StringAlign::Left);
+            table.addColumn("Quantity", StringAlign::Right);
+            table.addColumn("Weight", StringAlign::Right);
+            // List all the items in inventory
+            for (auto it : content)
             {
-                std::string contentName = it.first->getNameCapital();
-                if (it.second > 1)
-                {
-                    output += " - " + Formatter::cyan() + contentName + Formatter::reset() + " ["
-                        + ToString(it.second) + "].\n";
-                }
-                else
-                {
-                    output += " - " + Formatter::cyan() + contentName + Formatter::reset() + ".\n";
-                }
+                table.addRow(
+                    { it->getNameCapital(), ToString(it->quantity), ToString(it->getWeight()) });
             }
+            output += table.getTable();
             output += "Has been used " + Formatter::yellow() + ToString(getUsedSpace())
                 + Formatter::reset();
             output += " out of " + Formatter::yellow() + ToString(getTotalSpace())

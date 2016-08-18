@@ -103,32 +103,26 @@ bool CurrencyModel::findPrice(const int & materialVnum, unsigned int & price) co
     return false;
 }
 
-bool CurrencyModel::generateCurrency(
+std::vector<Item *> CurrencyModel::generateCurrency(
     const std::string & maker,
-    const unsigned int & value,
-    std::vector<Item *> & coins)
+    const unsigned int & value)
 {
     auto status = true;
     auto currentValue = value;
+    std::vector<Item *> coins;
     for (auto it : prices)
     {
         auto coinMaterial = Mud::instance().findMaterial(it.material);
-        unsigned int coinQuantity = (currentValue / it.price);
-        for (unsigned int it2 = 0; it2 < coinQuantity; ++it2)
+        auto coinQuantity = (currentValue / it.price);
+        auto coin = this->createItem(maker, coinMaterial, ItemQuality::Normal);
+        if (coin != nullptr)
         {
-            auto generated = this->createItem(maker, coinMaterial, ItemQuality::Normal);
-            if (generated == nullptr)
-            {
-                status = false;
-                break;
-            }
-            else
-            {
-                coins.push_back(generated);
-            }
+            coin->quantity = coinQuantity;
+            coins.push_back(coin);
         }
-        if (!status)
+        else
         {
+            status = false;
             break;
         }
         currentValue -= it.price * coinQuantity;
@@ -139,8 +133,9 @@ bool CurrencyModel::generateCurrency(
         {
             delete (generated);
         }
+        coins.clear();
     }
-    return status;
+    return coins;
 }
 
 void CurrencyModel::sortList()

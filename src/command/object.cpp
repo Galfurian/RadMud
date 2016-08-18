@@ -1592,8 +1592,8 @@ void DoSell(Character * character, std::istream & sArgs)
     }
     auto currency = shopKeeper->faction->currency;
     // Give the coins to the character.
-    std::vector<Item *> coins;
-    if (!currency->generateCurrency(shopKeeper->getName(), price, coins))
+    auto coins = currency->generateCurrency(shopKeeper->getName(), price);
+    if (coins.empty())
     {
         character->sendMsg("You failed to sell %s.\n", item->getName());
         return;
@@ -1651,10 +1651,10 @@ void DoBuy(Character * character, std::istream & sArgs)
         shopKeeper->doCommand("say " + character->getName() + " " + phrase);
         return;
     }
-    std::vector<Item *> givenCoins;
     auto requiredValue = shop->evaluateBuyPrice(item);
     unsigned int providedValue = 0;
-    if (!character->findCoins(givenCoins, requiredValue, providedValue))
+    auto givenCoins = character->findCoins(requiredValue, providedValue);
+    if (givenCoins.empty())
     {
         auto phrase = "You can't afford to buy " + item->getName() + ".\n";
         shopKeeper->doCommand("say " + character->getName() + " " + phrase);
@@ -1670,19 +1670,18 @@ void DoBuy(Character * character, std::istream & sArgs)
     {
         auto change = providedValue - requiredValue;
         auto currency = shopKeeper->faction->currency;
-        std::vector<Item *> returnedCoins;
-        if (!currency->generateCurrency(shopKeeper->getName(), change, returnedCoins))
+        auto coins = currency->generateCurrency(shopKeeper->getName(), change);
+        if (coins.empty())
         {
             auto phrase = "Sorry but I cannot sell " + item->getName() + " to you.\n";
             shopKeeper->doCommand("say " + character->getName() + " " + phrase);
             return;
         }
-        for (auto coin : returnedCoins)
+        for (auto coin : coins)
         {
             character->addInventoryItem(coin);
         }
     }
-
     for (auto coin : givenCoins)
     {
         coin->removeFromMud();
