@@ -164,6 +164,54 @@ void Player::getSheet(Table & sheet) const
     }
 }
 
+void Player::addInventoryItem(Item * & item)
+{
+    Character::addInventoryItem(item);
+    // Update on database.
+    SQLiteDbms::instance().insertInto(
+        "ItemPlayer",
+        { name, ToString(item->vnum), EnumToString(EquipmentSlot::None) },
+        false,
+        true);
+}
+
+void Player::addEquipmentItem(Item * & item)
+{
+    Character::addEquipmentItem(item);
+    // Update on database.
+    SQLiteDbms::instance().insertInto(
+        "ItemPlayer",
+        { name, ToString(item->vnum), EnumToString(item->getCurrentSlot()) },
+        false,
+        true);
+}
+
+bool Player::remInventoryItem(Item * item)
+{
+    if (Character::remInventoryItem(item))
+    {
+        // Update on database.
+        SQLiteDbms::instance().deleteFrom(
+            "ItemPlayer",
+            { std::make_pair("item", ToString(item->vnum)) });
+        return true;
+    }
+    return false;
+}
+
+bool Player::remEquipmentItem(Item * item)
+{
+    if (Character::remEquipmentItem(item))
+    {
+        // Update on database.
+        SQLiteDbms::instance().deleteFrom(
+            "ItemPlayer",
+            { std::make_pair("item", ToString(item->vnum)) });
+        return true;
+    }
+    return false;
+}
+
 int Player::getSocket() const
 {
     return psocket;
@@ -195,7 +243,7 @@ bool Player::hasPendingOutput() const
     return !outbuf.empty();
 }
 
-bool Player::createOnDB()
+bool Player::updateOnDB()
 {
     vector<string> arguments;
     // Prepare the arguments of the query.

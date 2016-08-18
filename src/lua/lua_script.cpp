@@ -77,7 +77,6 @@ Item * LuaLoadItem(Character * maker, int vnumModel, int vnumMaterial, unsigned 
     item->composition = mater;
     item->quality = qualt;
     item->condition = item->getMaxCondition();
-    Logger::log(LogLevel::Debug, "Item created '%s'.", item->getName());
     return item;
 }
 

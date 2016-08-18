@@ -190,6 +190,14 @@ Item * ItemModel::createItem(
         // Return pointer to nothing.
         return nullptr;
     }
+    if (!newItem->updateOnDB())
+    {
+        Logger::log(LogLevel::Error, "Cannot save the new item on DB.");
+        // Delete the item.
+        delete (newItem);
+        // Return pointer to nothing.
+        return nullptr;
+    }
     return newItem;
 }
 

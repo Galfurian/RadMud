@@ -93,6 +93,14 @@ class Player: public Character
 
         virtual void getSheet(Table & sheet) const;
 
+        virtual void addInventoryItem(Item * & item);
+
+        virtual void addEquipmentItem(Item * & item);
+
+        virtual bool remInventoryItem(Item * item);
+
+        virtual bool remEquipmentItem(Item * item);
+
         /// @brief Return player socket.
         /// @return Player sockec.
         int getSocket() const;
@@ -117,7 +125,7 @@ class Player: public Character
         bool hasPendingOutput() const;
 
         /// @brief Create an entry for the player in the database.
-        bool createOnDB();
+        bool updateOnDB();
 
         /// @brief Send the prompt to player.
         void sendPrompt();

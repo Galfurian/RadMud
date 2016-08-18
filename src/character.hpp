@@ -394,23 +394,23 @@ class Character
 
         /// @brief Add the passed item to character's inventory.
         /// @param item The item to add to inventory.
-        void addInventoryItem(Item * & item);
+        virtual void addInventoryItem(Item * & item);
 
         /// @brief Equip the passed item.
         /// @param item The item to equip.
-        void addEquipmentItem(Item * & item);
+        virtual void addEquipmentItem(Item * & item);
 
         /// @brief Remove the passed item from the character's inventory.
         /// @param item The item to remove from inventory.
         /// @return <b>True</b> if the operation goes well,<br>
         ///         <b>False</b> otherwise.
-        bool remInventoryItem(Item * item);
+        virtual bool remInventoryItem(Item * item);
 
         /// @brief Remove from current equipment the item.
         /// @param item The item to remove.
         /// @return <b>True</b> if the operation goes well,<br>
         ///         <b>False</b> otherwise.
-        bool remEquipmentItem(Item * item);
+        virtual bool remEquipmentItem(Item * item);
 
         /// @brief Check if the player can carry the item.
         /// @param item The item we want to check.

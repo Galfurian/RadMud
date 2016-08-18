@@ -106,8 +106,7 @@ bool LoadContent(ResultSet * result)
             Logger::log(LogLevel::Error, "Can't find contained item.");
             return false;
         }
-        container->content.push_back_item(contained);
-        contained->container = container;
+        container->putInside(contained, false);
         if (!contained->check(true))
         {
             Logger::log(LogLevel::Error, "Error during error checking.");
@@ -507,11 +506,11 @@ bool LoadItemRoom(ResultSet * result)
         // Load the item inside the room.
         if (HasFlag(item->flags, ItemFlag::Built))
         {
-            room->addBuilding(item);
+            room->addBuilding(item, false);
         }
         else
         {
-            room->addItem(item);
+            room->addItem(item, false);
         }
         if (!item->check(true))
         {
@@ -799,8 +798,7 @@ bool LoadContentLiq(ResultSet * result)
             Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
-        container->contentLiq.first = liquid;
-        container->contentLiq.second = quantity;
+        container->pourIn(liquid, quantity, false);
     }
     return true;
 }

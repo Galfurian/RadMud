@@ -148,12 +148,13 @@ void Item::removeFromMud()
     }
 }
 
-bool Item::createOnDB()
+bool Item::updateOnDB()
 {
     // Prepare the vector used to insert into the database.
     std::vector<std::string> arguments;
     arguments.push_back(ToString(this->vnum));
     arguments.push_back(ToString(model->vnum));
+    arguments.push_back(ToString(this->quantity));
     arguments.push_back(this->maker);
     arguments.push_back(ToString(this->getPrice()));
     arguments.push_back(ToString(this->getWeight()));
@@ -163,87 +164,6 @@ bool Item::createOnDB()
     arguments.push_back(ToString(this->quality.toUInt()));
     arguments.push_back(ToString(this->flags));
     return SQLiteDbms::instance().insertInto("Item", arguments, false, true);
-}
-
-bool Item::updateOnDB()
-{
-    // Just create the item inside the databse.
-    if (!this->createOnDB())
-    {
-        Logger::log(LogLevel::Error, "Failed to save the item inside the databse.");
-        return false;
-    }
-    // Save the item's Information.
-    QueryList value, where;
-    if ((room != nullptr) || (owner != nullptr) || (container != nullptr))
-    {
-        // Remove the item from any auxiliary table.
-        SQLiteDbms::instance().deleteFrom("ItemPlayer", where);
-        SQLiteDbms::instance().deleteFrom("ItemRoom", where);
-        SQLiteDbms::instance().deleteFrom("ItemContent", where);
-    }
-    // Save the item's position.
-    if (room != nullptr)
-    {
-        std::vector<std::string> arguments;
-        arguments.push_back(ToString(room->vnum));
-        arguments.push_back(ToString(vnum));
-        if (!SQLiteDbms::instance().insertInto("ItemRoom", arguments))
-        {
-            Logger::log(LogLevel::Error, "Can't save the item inside the room!");
-            return false;
-        }
-    }
-    else if (owner != nullptr)
-    {
-        if (owner->isPlayer())
-        {
-            std::vector<std::string> arguments;
-            arguments.push_back(owner->name);
-            arguments.push_back(ToString(vnum));
-            if (owner->hasEquipmentItem(this))
-            {
-                arguments.push_back(EnumToString(this->getCurrentSlot()));
-            }
-            else
-            {
-                arguments.push_back("0");
-            }
-            if (!SQLiteDbms::instance().insertInto("ItemPlayer", arguments, false, true))
-            {
-                Logger::log(LogLevel::Error, "Can't save the item possesed by the Player!");
-                return false;
-            }
-        }
-    }
-    else if (container != nullptr)
-    {
-        if (container->model->getType() != ModelType::Corpse)
-        {
-            std::vector<std::string> arguments;
-            arguments.push_back(ToString(container->vnum));
-            arguments.push_back(ToString(vnum));
-            if (!SQLiteDbms::instance().insertInto("ItemContent", arguments))
-            {
-                Logger::log(LogLevel::Error, "Can't save the item inside the container!");
-                return false;
-            }
-        }
-    }
-    if (contentLiq.first != nullptr)
-    {
-        std::vector<std::string> arguments;
-        // Prepare the query arguments.
-        arguments.push_back(ToString(vnum));
-        arguments.push_back(ToString(contentLiq.first->vnum));
-        arguments.push_back(ToString(contentLiq.second));
-        if (!SQLiteDbms::instance().insertInto("ItemContentLiq", arguments, false, true))
-        {
-            Logger::log(LogLevel::Error, "Can't save the contained liquid!");
-            return false;
-        }
-    }
-    return true;
 }
 
 bool Item::removeOnDB()
@@ -610,25 +530,43 @@ bool Item::canContain(Item * item) const
     return (item->getWeight() <= this->getFreeSpace());
 }
 
-void Item::putInside(Item * & item)
+void Item::putInside(Item * & item, bool updateDB)
 {
-    // Put the item into the container.
+    // Put the item inside the container.
     content.push_back_item(item);
     // Set the container value to the content item.
     item->container = this;
+    // Update the database.
+    if (updateDB)
+    {
+        SQLiteDbms::instance().insertInto(
+            "ItemContent",
+            { ToString(container->vnum), ToString(vnum) },
+            false,
+            true);
+    }
+    // Log it.
     Logger::log(LogLevel::Debug, "Item '%s' added to '%s';", item->getName(), this->getName());
 }
 
-bool Item::takeOut(Item * item)
+bool Item::takeOut(Item * item, bool updateDB)
 {
     if (content.removeItem(item))
     {
+        item->container = nullptr;
+        // Update the database.
+        if (updateDB)
+        {
+            SQLiteDbms::instance().deleteFrom(
+                "ItemContent",
+                { std::make_pair("item", ToString(item->vnum)) });
+        }
+        // Log it.
         Logger::log(
             LogLevel::Debug,
             "Item '%s' taken out from '%s';",
             item->getName(),
             this->getName());
-        item->container = nullptr;
         return true;
     }
     return false;
@@ -647,7 +585,7 @@ bool Item::canContain(Liquid * liquid, const unsigned int & ammount) const
     return true;
 }
 
-bool Item::pourIn(Liquid * liquid, const unsigned int & ammount)
+bool Item::pourIn(Liquid * liquid, const unsigned int & ammount, bool updateDB)
 {
     if (this->canContain(liquid, ammount))
     {
@@ -659,25 +597,24 @@ bool Item::pourIn(Liquid * liquid, const unsigned int & ammount)
         }
         else if (contentLiq.first == liquid)
         {
-            QueryList value;
-            value.push_back(std::make_pair("ammount", ToString(contentLiq.second)));
-            QueryList where;
-            where.push_back(std::make_pair("container", ToString(vnum)));
-            where.push_back(std::make_pair("content", ToString(liquid->vnum)));
-            // Update value inside the database.
-            if (!SQLiteDbms::instance().updateInto("ItemContentLiq", value, where))
-            {
-                return false;
-            }
             // Increment the liquid ammount.
             contentLiq.second += ammount;
+        }
+        // Prepare the query arguments.
+        if (updateDB)
+        {
+            SQLiteDbms::instance().insertInto(
+                "ItemContentLiq",
+                { ToString(vnum), ToString(contentLiq.first->vnum), ToString(contentLiq.second) },
+                false,
+                true);
         }
         return true;
     }
     return false;
 }
 
-bool Item::pourOut(const unsigned int & ammount)
+bool Item::pourOut(const unsigned int & ammount, bool updateDB)
 {
     if (model->getType() != ModelType::LiquidContainer)
     {
@@ -693,26 +630,26 @@ bool Item::pourOut(const unsigned int & ammount)
     {
         // Decrement the liquid ammount.
         contentLiq.second -= ammount;
-        if (contentLiq.second == 0)
+        if (updateDB)
         {
-            QueryList where;
-            where.push_back(std::make_pair("container", ToString(vnum)));
-            where.push_back(std::make_pair("content", ToString(contentLiq.first->vnum)));
-            // If the container is empty, remove the entry from the liquid contained table.
-            SQLiteDbms::instance().deleteFrom("ItemContentLiq", where);
-            // Erase the key of the liquid.
-            contentLiq.first = nullptr;
-        }
-        else
-        {
-            QueryList value;
-            value.push_back(std::make_pair("ammount", ToString(contentLiq.second)));
-            QueryList where;
-            where.push_back(std::make_pair("container", ToString(vnum)));
-            where.push_back(std::make_pair("content", ToString(contentLiq.first->vnum)));
-            // Update value inside the database.
-            // TODO: Check.
-            SQLiteDbms::instance().updateInto("ItemContentLiq", value, where);
+            if (contentLiq.second == 0)
+            {
+                QueryList where;
+                where.push_back(std::make_pair("container", ToString(vnum)));
+                where.push_back(std::make_pair("content", ToString(contentLiq.first->vnum)));
+                // If the container is empty, remove the entry from the liquid contained table.
+                SQLiteDbms::instance().deleteFrom("ItemContentLiq", where);
+                // Erase the key of the liquid.
+                contentLiq.first = nullptr;
+            }
+            else
+            {
+                SQLiteDbms::instance().insertInto(
+                    "ItemContentLiq",
+                    { ToString(vnum), ToString(contentLiq.first->vnum), ToString(contentLiq.second) },
+                    false,
+                    true);
+            }
         }
         return true;
     }

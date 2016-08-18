@@ -839,7 +839,7 @@ void ProcessNewConfirm(Character * character, std::istream & sArgs)
         player->experience = 0;
         player->flags = 0;
         player->rent_room = 1000;
-        if (player->createOnDB())
+        if (player->updateOnDB())
         {
             AdvanceCharacterCreation(player, ConnectionState::Playing);
         }

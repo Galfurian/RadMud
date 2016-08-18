@@ -87,11 +87,11 @@ class Room
 
         /// @brief In addition to adding the the passed item to room's items list.
         /// @param item The item to add to the list.
-        void addItem(Item * & item);
+        void addItem(Item * & item, bool updateDB = true);
 
         /// @brief Add the passed item to room's buildings list.
         /// @param item The item to add to the list.
-        void addBuilding(Item * item);
+        void addBuilding(Item * item, bool updateDB = true);
 
         /// @brief Add the passed character to room's character list.
         /// @param character The character to add to the list.
@@ -101,13 +101,13 @@ class Room
         /// @param item The item to remove from the list.
         /// @return <b>True</b> if the operation goes well,<br>
         ///         <b>False</b> otherwise.
-        bool removeItem(Item * item);
+        bool removeItem(Item * item, bool updateDB = true);
 
         /// @brief Remove the passed item from room's building list.
         /// @param item The building to remove from the list.
         /// @return <b>True</b> if the operation goes well,<br>
         ///         <b>False</b> otherwise.
-        bool removeBuilding(Item * item);
+        bool removeBuilding(Item * item, bool updateDB = true);
 
         /// @brief Remove the passed character from room's character list.
         /// @param character The character to remove from the list.

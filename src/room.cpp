@@ -86,16 +86,29 @@ bool Room::check(bool complete)
     return true;
 }
 
-void Room::addItem(Item * & item)
+void Room::addItem(Item * & item, bool updateDB)
 {
+    // Add the item.
     items.push_back_item(item);
+    // Set the room attribute of the item.
     item->room = this;
+    // Update the database.
+    if (updateDB)
+    {
+        SQLiteDbms::instance().insertInto(
+            "ItemRoom",
+            { ToString(this->vnum), ToString(item->vnum) },
+            false,
+            true);
+    }
     Logger::log(LogLevel::Debug, "Item '" + item->getName() + "' added to '" + this->name + "';");
 }
 
-void Room::addBuilding(Item * item)
+void Room::addBuilding(Item * item, bool updateDB)
 {
+    // Set the item as built.
     SetFlag(item->flags, ItemFlag::Built);
+    // Check if the item is already inside the room.
     for (auto iterator : this->items)
     {
         if (iterator->vnum == item->vnum)
@@ -103,7 +116,8 @@ void Room::addBuilding(Item * item)
             return;
         }
     }
-    this->addItem(item);
+    // Otherwise, add the item.
+    this->addItem(item, updateDB);
 }
 
 void Room::addCharacter(Character * character)
@@ -112,23 +126,32 @@ void Room::addCharacter(Character * character)
     character->room = this;
 }
 
-bool Room::removeItem(Item * item)
+bool Room::removeItem(Item * item, bool updateDB)
 {
     if (items.removeItem(item))
     {
+        item->room = nullptr;
+        // Update the database.
+        if (updateDB)
+        {
+            SQLiteDbms::instance().deleteFrom(
+                "ItemRoom",
+                { std::make_pair("item", ToString(item->vnum)) });
+        }
+        // Log it.
         Logger::log(
             LogLevel::Debug,
             "Item '" + item->getName() + "' removed from '" + this->name + "';");
-        item->room = nullptr;
         return true;
     }
     return false;
 }
 
-bool Room::removeBuilding(Item * item)
+bool Room::removeBuilding(Item * item, bool updateDB)
 {
-    if (this->removeItem(item))
+    if (this->removeItem(item, updateDB))
     {
+        // Clear the built flag from the item.
         ClearFlag(item->flags, ItemFlag::Built);
         return true;
     }
@@ -195,25 +218,16 @@ std::vector<Mobile *> Room::getAllMobile(Character * exception)
 
 bool Room::updateOnDB()
 {
-    /*
-     QueryList value;
-     value.push_back(std::make_pair("x", ToString(coord.x)));
-     value.push_back(std::make_pair("y", ToString(coord.y)));
-     value.push_back(std::make_pair("z", ToString(coord.z)));
-     value.push_back(std::make_pair("terrain", terrain));
-     value.push_back(std::make_pair("name", name));
-     value.push_back(std::make_pair("description", description));
-     value.push_back(std::make_pair("flag", ToString(flags)));
-     QueryList where;
-     where.push_back(std::make_pair("vnum", ToString(vnum)));
-     if (!SQLiteDbms::instance().updateInto("Room", value, where))
-     {
-     Logger::log(LogLevel::Error, "Can't save the room!");
-     return false;
-     }
-     return true;
-     */
-    return false;
+    vector<string> arguments;
+    arguments.push_back(ToString(this->vnum));
+    arguments.push_back(ToString(this->coord.x));
+    arguments.push_back(ToString(this->coord.y));
+    arguments.push_back(ToString(this->coord.z));
+    arguments.push_back(this->terrain);
+    arguments.push_back(this->name);
+    arguments.push_back(this->description);
+    arguments.push_back(ToString(this->flags));
+    return SQLiteDbms::instance().insertInto("Room", arguments, false, true);
 }
 
 bool Room::removeOnDB()

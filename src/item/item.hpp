@@ -107,12 +107,7 @@ class Item
         /// @brief This function is used to remove the item from everywhere.
         virtual void removeFromMud();
 
-        /// @brief Create the item entry on database.
-        /// @return <b>True</b> if the execution goes well,<br>
-        ///         <b>False</b> otherwise.
-        virtual bool createOnDB();
-
-        /// @brief Save the item on database.
+        /// @brief Create or Update the item entry on database.
         /// @return <b>True</b> if the execution goes well,<br>
         ///         <b>False</b> otherwise.
         virtual bool updateOnDB();
@@ -211,13 +206,13 @@ class Item
 
         /// @brief Load an item inside the container and update the database.
         /// @param item The item to load in.
-        void putInside(Item * & item);
+        void putInside(Item * & item, bool updateDB = true);
 
         /// @brief Extract an item from the container.
         /// @param item The item to load in.
         /// @return <b>True</b> if the item has been taken out,<br>
         ///         <b>False</b> otherwise.
-        bool takeOut(Item * item);
+        bool takeOut(Item * item, bool updateDB = true);
 
         bool canContain(Liquid * liquid, const unsigned int & ammount) const;
 
@@ -226,12 +221,12 @@ class Item
         /// @param ammount The ammount of liquid.
         /// @return <b>True</b> if the operation is a success,<br>
         ///         <b>False</b> otherwise.
-        bool pourIn(Liquid * liquid, const unsigned int & ammount);
+        bool pourIn(Liquid * liquid, const unsigned int & ammount, bool updateDB = true);
 
         /// @brief Extract some liquid from the container and update the database.
         /// @param ammount The ammount of liquid.
         /// @return <b>True</b> if the operation is a success,<br><b>False</b> otherwise.
-        bool pourOut(const unsigned int & ammount);
+        bool pourOut(const unsigned int & ammount, bool updateDB = true);
 
         /// @brief Search for the item inside the container.
         /// @param search_parameter The item to search.

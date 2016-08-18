@@ -152,23 +152,6 @@ Mud & Mud::instance()
 bool Mud::savePlayers()
 {
     return SQLiteDbms::instance().updatePlayers();
-    /*
-     bool result = true;
-     for (auto iterator : mudPlayers)
-     {
-     // If the player is not playing, continue.
-     if (!iterator->isPlaying())
-     {
-     continue;
-     }
-     if (!iterator->updateOnDB())
-     {
-     Logger::log(LogLevel::Error, "Error saving player :" + iterator->getName());
-     result = false;
-     }
-     }
-     return result;
-     */
 }
 
 bool Mud::saveItems()
@@ -179,20 +162,6 @@ bool Mud::saveItems()
 bool Mud::saveRooms()
 {
     return SQLiteDbms::instance().updateRooms();
-    /*
-     bool result = true;
-     for (auto iterator : mudRooms)
-     {
-     Room * room = iterator.second;
-     if (!room->updateOnDB())
-     {
-     Logger::log(LogLevel::Error, "Error saving room :" + ToString(room->vnum));
-     result = false;
-     break;
-     }
-     }
-     return result;
-     */
 }
 
 bool Mud::saveMud()

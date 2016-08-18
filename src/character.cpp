@@ -1026,6 +1026,7 @@ void Character::addInventoryItem(Item * & item)
     inventory.push_back_item(item);
     // Set the owner of the item.
     item->owner = this;
+    // Log it.
     Logger::log(
         LogLevel::Debug,
         "Item '%s' added to '%s' inventory;",
@@ -1039,6 +1040,7 @@ void Character::addEquipmentItem(Item * & item)
     equipment.push_back(item);
     // Set the owner of the item.
     item->owner = this;
+    // Log it.
     Logger::log(
         LogLevel::Debug,
         "Item '%s' added to '%s' equipment;",
@@ -1051,6 +1053,7 @@ bool Character::remInventoryItem(Item * item)
     if (inventory.removeItem(item))
     {
         item->owner = nullptr;
+        // Log it.
         Logger::log(
             LogLevel::Debug,
             "Item '%s' removed from '%s';",
@@ -1066,6 +1069,7 @@ bool Character::remEquipmentItem(Item * item)
     if (equipment.removeItem(item))
     {
         item->owner = nullptr;
+        // Log it.
         Logger::log(
             LogLevel::Debug,
             "Item '%s' removed from '%s';",
