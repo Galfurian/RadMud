@@ -52,36 +52,33 @@ Item * LuaLoadItem(Character * maker, int vnumModel, int vnumMaterial, unsigned 
         Logger::log(LogLevel::Error, "Received null maker.");
         return nullptr;
     }
-
-    ItemModel * itemModel = Mud::instance().findItemModel(vnumModel);
-    Material * material = Mud::instance().findMaterial(vnumMaterial);
-    ItemQuality quality = ItemQuality::Normal;
-    if (ItemQuality::isValid(qualityValue))
-    {
-        quality = ItemQuality(qualityValue);
-    }
-    if (itemModel == nullptr)
+    auto model = Mud::instance().findItemModel(vnumModel);
+    if (model == nullptr)
     {
         Logger::log(LogLevel::Error, "Can't find model :" + ToString(vnumModel));
         return nullptr;
     }
-    if (material == nullptr)
+    auto mater = Mud::instance().findMaterial(vnumMaterial);
+    if (mater == nullptr)
     {
         Logger::log(LogLevel::Error, "Can't find material :" + ToString(vnumMaterial));
         return nullptr;
     }
-
-    // Instantiate the new item.
-    Item * newItem = new Item();
+    ItemQuality qualt = ItemQuality::Normal;
+    if (ItemQuality::isValid(qualityValue))
+    {
+        qualt = ItemQuality(qualityValue);
+    }
+    auto item = GenerateItem(model->getType());
     // Set the values of the new item.
-    newItem->vnum = -1;
-    newItem->model = itemModel;
-    newItem->maker = maker->getName();
-    newItem->condition = itemModel->condition;
-    newItem->composition = material;
-    newItem->quality = quality;
-    newItem->currentSlot = itemModel->slot;
-    return newItem;
+    item->vnum = -1;
+    item->model = model;
+    item->maker = maker->getName();
+    item->composition = mater;
+    item->quality = qualt;
+    item->condition = item->getMaxCondition();
+    Logger::log(LogLevel::Debug, "Item created '%s'.", item->getName());
+    return item;
 }
 
 void LuaRegisterUtils(lua_State * L)

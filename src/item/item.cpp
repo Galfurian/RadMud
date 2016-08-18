@@ -883,7 +883,17 @@ void Item::luaRegister(lua_State * L)
     .addData("owner", &Item::owner) //
     .addData("container", &Item::container) //
     .addData("container", &Item::container) //
-    //.addData("content", &Item::content) //
+    .endClass() //
+    .deriveClass<ArmorItem, Item>("ArmorItem") //
+    .addFunction("getAC", &ArmorItem::getArmorClass) //
+    .endClass() //
+    .deriveClass<CorpseItem, Item>("CorpseItem") //
+    .endClass() //
+    .deriveClass<CurrencyItem, Item>("CurrencyItem") //
+    .endClass() //
+    .deriveClass<ShopItem, Item>("ShopItem") //
+    .endClass() //
+    .deriveClass<WeaponItem, Item>("WeaponItem") //
     .endClass();
 }
 

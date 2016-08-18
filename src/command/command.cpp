@@ -146,7 +146,7 @@ void ProcessPlayerName(Character * character, std::istream & sArgs)
         // Save the name of the player.
         player->name = ToCapitals(input);
         // Load player so we know the player_password etc.
-        if (player->loadFromDB())
+        if (SQLiteDbms::instance().loadPlayer(player))
         {
             // Delete the loaded prompt, otherwise it will be shown.
             player->prompt = "";

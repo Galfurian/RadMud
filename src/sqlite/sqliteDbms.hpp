@@ -72,21 +72,30 @@ class SQLiteDbms
         bool loadTables();
 
         /// @brief Load all the vital information about the player.
-        /// @param player The address of the player, where to load information.
-        /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
+        /// @param player The player.
+        /// @return <b>True</b> if the operations succeeded,<br>
+        ///         <b>False</b> Otherwise.
         bool loadPlayer(Player * player);
+
+        /// @brief Save the player on the database.
+        /// @param player The player.
+        /// @return <b>True</b> if the update goes well,<br>
+        ///         <b>False</b> otherwise.
+        bool updatePlayer(Player * player);
 
         /// @brief Search for the player in the table.
         /// @param name The name of the player.
-        /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
-        bool searchPlayer(std::string name);
+        /// @return <b>True</b> if the operations succeeded,<br>
+        ///         <b>False</b> Otherwise.
+        bool searchPlayer(const std::string & name);
 
         /// @brief Execute an Insert Into query.
         /// @param table     Name of the table.
         /// @param args      Vector of arguments.
         /// @param orIgnore  Flag used to enable the OR IGNORE option.
         /// @param orReplace Flag used to enable the OR REPLACE option.
-        /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
+        /// @return <b>True</b> if the operations succeeded,<br>
+        ///         <b>False</b> Otherwise.
         bool insertInto(
             std::string table,
             std::vector<std::string> args,
@@ -96,14 +105,16 @@ class SQLiteDbms
         /// @brief Execute a Delete From query.
         /// @param table The name of the table.
         /// @param where Vector of where clause.
-        /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
+        /// @return <b>True</b> if the operations succeeded,<br>
+        ///         <b>False</b> Otherwise.
         bool deleteFrom(std::string table, QueryList where);
 
         /// @brief Execute an Update query.
         /// @param table The name of the table.
         /// @param value Vector of values.
         /// @param where Vector of where clause.
-        /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
+        /// @return <b>True</b> if the operations succeeded,<br>
+        ///         <b>False</b> Otherwise.
         bool updateInto(std::string table, QueryList value, QueryList where);
 
         bool updatePlayers();

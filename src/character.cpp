@@ -1709,15 +1709,6 @@ Mobile * Character::toMobile()
     return static_cast<Mobile *>(this);
 }
 
-VectorHelper<Character *> Character::luaGetTargets()
-{
-    if (room != nullptr)
-    {
-        return VectorHelper<Character *>(room->characters);
-    }
-    return VectorHelper<Character *>();
-}
-
 void Character::loadScript(const std::string & scriptFilename)
 {
     Logger::log(LogLevel::Debug, "Loading script '%s'...", scriptFilename);
@@ -1747,6 +1738,45 @@ void Character::loadScript(const std::string & scriptFilename)
     }
 }
 
+VectorHelper<Character *> Character::luaGetTargets()
+{
+    if (room != nullptr)
+    {
+        return VectorHelper<Character *>(room->characters);
+    }
+    return VectorHelper<Character *>();
+}
+
+void Character::luaAddEquipment(Item * item)
+{
+    this->equipment.push_back(item);
+}
+
+bool Character::luaRemEquipment(Item * item)
+{
+    if (equipment.removeItem(item))
+    {
+        item->owner = nullptr;
+        return true;
+    }
+    return false;
+}
+
+void Character::luaAddInventory(Item * item)
+{
+    this->equipment.push_back(item);
+}
+
+bool Character::luaRemInventory(Item * item)
+{
+    if (inventory.removeItem(item))
+    {
+        item->owner = nullptr;
+        return true;
+    }
+    return false;
+}
+
 void Character::luaRegister(lua_State * L)
 {
     luabridge::getGlobalNamespace(L) //
@@ -1755,13 +1785,13 @@ void Character::luaRegister(lua_State * L)
     .addData("race", &Character::race) //
     .addData("faction", &Character::faction) //
     .addData("room", &Character::room) //
-    .addFunction("inventoryAdd", &Character::addInventoryItem) //
-    .addFunction("inventoryRemove", &Character::remInventoryItem) //
-    .addFunction("equipmentAdd", &Character::addEquipmentItem) //
-    .addFunction("equipmentRemove", &Character::remEquipmentItem) //
-    .addFunction("doCommand", &Character::doCommand) //
-    .addFunction("getTargets", &Character::luaGetTargets) //
-    .addFunction("isMobile", &Character::isMobile) //
+    .addFunction("inventoryAdd", Character::luaAddInventory) //
+    .addFunction("inventoryRem", Character::luaRemInventory) //
+    .addFunction("equipmentAdd", Character::luaAddEquipment) //
+    .addFunction("equipmentRem", Character::luaRemEquipment) //
+    .addFunction("doCommand", Character::doCommand) //
+    .addFunction("getTargets", Character::luaGetTargets) //
+    .addFunction("isMobile", Character::isMobile) //
     .endClass() //
     .deriveClass<Mobile, Character>("Mobile") //
     .addData("id", &Mobile::id) //

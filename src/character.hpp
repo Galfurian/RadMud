@@ -562,14 +562,22 @@ class Character
         /// @return The mobile version of the character.
         Mobile * toMobile();
 
+        /// @brief Starts a lua environment and loads the given script.
+        /// @param scriptFilename The name of the script that has to be loaded.
+        void loadScript(const std::string & scriptFilename);
+
         /// @brief Returns the list of available targets using the vector
         ///         structure made for lua environment.
         /// @return The vector of targets.
         VectorHelper<Character *> luaGetTargets();
 
-        /// @brief Starts a lua environment and loads the given script.
-        /// @param scriptFilename The name of the script that has to be loaded.
-        void loadScript(const std::string & scriptFilename);
+        void luaAddEquipment(Item * item);
+
+        bool luaRemEquipment(Item * item);
+
+        void luaAddInventory(Item * item);
+
+        bool luaRemInventory(Item * item);
 
         /// @brief Function used to register inside the lua environment the class.
         /// @param L The lua environment.

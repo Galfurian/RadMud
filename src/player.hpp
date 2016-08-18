@@ -119,13 +119,6 @@ class Player: public Character
         /// @brief Create an entry for the player in the database.
         bool createOnDB();
 
-        /// @brief Load player from database.
-        bool loadFromDB();
-
-        /// @brief Save player to database.
-        /// @return <b>True</b> if the update goes well,<br><b>False</b> otherwise.
-        bool updateOnDB();
-
         /// @brief Send the prompt to player.
         void sendPrompt();
 
