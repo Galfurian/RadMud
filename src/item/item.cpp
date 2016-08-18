@@ -162,25 +162,19 @@ bool Item::createOnDB()
     arguments.push_back(ToString(this->composition->vnum));
     arguments.push_back(ToString(this->quality.toUInt()));
     arguments.push_back(ToString(this->flags));
-    return SQLiteDbms::instance().insertInto("Item", arguments);
+    return SQLiteDbms::instance().insertInto("Item", arguments, false, true);
 }
 
 bool Item::updateOnDB()
 {
-    // Save the item's Information.
-    QueryList value, where;
-    value.push_back(std::make_pair("model", ToString(model->vnum)));
-    value.push_back(std::make_pair("maker", maker));
-    value.push_back(std::make_pair("condition", ToString(condition)));
-    value.push_back(std::make_pair("composition", ToString(composition->vnum)));
-    value.push_back(std::make_pair("quality", ToString(quality.toUInt())));
-    value.push_back(std::make_pair("flag", ToString(flags)));
-    where.push_back(std::make_pair("vnum", ToString(vnum)));
-    if (!SQLiteDbms::instance().updateInto("Item", value, where))
+    // Just create the item inside the databse.
+    if (!this->createOnDB())
     {
-        Logger::log(LogLevel::Error, "Can't save the item!");
+        Logger::log(LogLevel::Error, "Failed to save the item inside the databse.");
         return false;
     }
+    // Save the item's Information.
+    QueryList value, where;
     if ((room != nullptr) || (owner != nullptr) || (container != nullptr))
     {
         // Remove the item from any auxiliary table.

@@ -1785,13 +1785,13 @@ void Character::luaRegister(lua_State * L)
     .addData("race", &Character::race) //
     .addData("faction", &Character::faction) //
     .addData("room", &Character::room) //
-    .addFunction("inventoryAdd", Character::luaAddInventory) //
-    .addFunction("inventoryRem", Character::luaRemInventory) //
-    .addFunction("equipmentAdd", Character::luaAddEquipment) //
-    .addFunction("equipmentRem", Character::luaRemEquipment) //
-    .addFunction("doCommand", Character::doCommand) //
-    .addFunction("getTargets", Character::luaGetTargets) //
-    .addFunction("isMobile", Character::isMobile) //
+    .addFunction("inventoryAdd", &Character::luaAddInventory) //
+    .addFunction("inventoryRem", &Character::luaRemInventory) //
+    .addFunction("equipmentAdd", &Character::luaAddEquipment) //
+    .addFunction("equipmentRem", &Character::luaRemEquipment) //
+    .addFunction("doCommand", &Character::doCommand) //
+    .addFunction("getTargets", &Character::luaGetTargets) //
+    .addFunction("isMobile", &Character::isMobile) //
     .endClass() //
     .deriveClass<Mobile, Character>("Mobile") //
     .addData("id", &Mobile::id) //
