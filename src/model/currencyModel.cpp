@@ -135,6 +135,7 @@ std::vector<Item *> CurrencyModel::generateCurrency(
     {
         for (auto generated : coins)
         {
+            generated->removeOnDB();
             delete (generated);
         }
         coins.clear();

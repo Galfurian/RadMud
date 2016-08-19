@@ -40,9 +40,11 @@ void ItemContainer::push_back_item(Item * & item)
         {
             content->quantity += item->quantity;
             item->removeFromMud();
+            item->removeOnDB();
             delete (item);
             item = content;
             stacked = true;
+            content->updateOnDB();
             break;
         }
     }

@@ -1687,6 +1687,7 @@ void DoBuy(Character * character, std::istream & sArgs)
         if (coin.second == coin.first->quantity)
         {
             coin.first->removeFromMud();
+            coin.first->removeOnDB();
             delete (coin.first);
         }
         else

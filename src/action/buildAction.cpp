@@ -114,6 +114,7 @@ ActionStatus BuildAction::perform()
     for (auto it : toDestroy)
     {
         it->removeFromMud();
+        it->removeOnDB();
         delete (it);
     }
 
