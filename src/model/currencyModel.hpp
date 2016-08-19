@@ -70,7 +70,8 @@ class CurrencyModel: public ItemModel
         virtual Item * createItem(
             std::string maker,
             Material * composition,
-            const ItemQuality & itemQuality);
+            const ItemQuality & itemQuality,
+            const unsigned int & quantity);
 
         bool addPrice(const int & materialVnum, const unsigned int & price);
 

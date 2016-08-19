@@ -100,7 +100,11 @@ ActionStatus CraftAction::perform()
     {
         ItemModel * outcomeModel = production->outcome;
         // Create the item.
-        Item * newItem = outcomeModel->createItem(actor->getName(), material, ItemQuality::Normal);
+        Item * newItem = outcomeModel->createItem(
+            actor->getName(),
+            material,
+            ItemQuality::Normal,
+            1);
         if (newItem == nullptr)
         {
             // Log a warning.

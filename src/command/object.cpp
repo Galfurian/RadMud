@@ -1651,8 +1651,14 @@ void DoBuy(Character * character, std::istream & sArgs)
         shopKeeper->doCommand("say " + character->getName() + " " + phrase);
         return;
     }
-    auto requiredValue = shop->evaluateBuyPrice(item);
-    unsigned int providedValue = 0;
+    if (!character->canCarry(item))
+    {
+        auto phrase = "It seems that you can't carry " + item->getName() + ".\n";
+        shopKeeper->doCommand("say " + character->getName() + " " + phrase);
+        return;
+    }
+
+    unsigned int providedValue = 0, requiredValue = shop->evaluateBuyPrice(item);
     auto givenCoins = character->findCoins(requiredValue, providedValue);
     if (givenCoins.empty())
     {
@@ -1660,32 +1666,34 @@ void DoBuy(Character * character, std::istream & sArgs)
         shopKeeper->doCommand("say " + character->getName() + " " + phrase);
         return;
     }
-    if (!character->canCarry(item))
-    {
-        auto phrase = "It seems that you can't carry " + item->getName() + ".\n";
-        shopKeeper->doCommand("say " + character->getName() + " " + phrase);
-        return;
-    }
     if (providedValue > requiredValue)
     {
         auto change = providedValue - requiredValue;
         auto currency = shopKeeper->faction->currency;
-        auto coins = currency->generateCurrency(shopKeeper->getName(), change);
-        if (coins.empty())
+        auto changeCoins = currency->generateCurrency(shopKeeper->getName(), change);
+        if (changeCoins.empty())
         {
             auto phrase = "Sorry but I cannot sell " + item->getName() + " to you.\n";
             shopKeeper->doCommand("say " + character->getName() + " " + phrase);
             return;
         }
-        for (auto coin : coins)
+        for (auto coin : changeCoins)
         {
             character->addInventoryItem(coin);
         }
     }
     for (auto coin : givenCoins)
     {
-        coin->removeFromMud();
-        delete (coin);
+        if (coin.second == coin.first->quantity)
+        {
+            coin.first->removeFromMud();
+            delete (coin.first);
+        }
+        else
+        {
+            coin.first->quantity -= coin.second;
+            coin.first->updateOnDB();
+        }
     }
     shop->takeOut(item);
     character->addInventoryItem(item);

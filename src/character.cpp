@@ -943,11 +943,11 @@ bool Character::findNearbyResouces(
     return true;
 }
 
-std::vector<Item *> Character::findCoins(
+std::vector<std::pair<Item *, unsigned int>> Character::findCoins(
     const unsigned int & requiredValue,
     unsigned int & providedValue)
 {
-    std::vector<Item *> coins;
+    std::vector<std::pair<Item *, unsigned int>> coins;
     for (auto it : equipment)
     {
         if (it->isAContainer() && !it->isEmpty())
@@ -956,8 +956,12 @@ std::vector<Item *> Character::findCoins(
             {
                 if (content->getType() == ModelType::Currency)
                 {
-                    providedValue += content->getPrice();
-                    coins.push_back(content);
+                    unsigned int qnt = 0, price = content->getPrice();
+                    for (; (qnt < content->quantity) && (providedValue < requiredValue); ++qnt)
+                    {
+                        providedValue += price;
+                    }
+                    coins.push_back(std::make_pair(content, qnt));
                     if (providedValue >= requiredValue)
                     {
                         return coins;
@@ -970,8 +974,12 @@ std::vector<Item *> Character::findCoins(
     {
         if (it->getType() == ModelType::Currency)
         {
-            providedValue += it->getPrice();
-            coins.push_back(it);
+            unsigned int qnt = 0, price = it->getPrice();
+            for (; (qnt < it->quantity) && (providedValue < requiredValue); ++qnt)
+            {
+                providedValue += price;
+            }
+            coins.push_back(std::make_pair(it, qnt));
             if (providedValue >= requiredValue)
             {
                 return coins;
@@ -983,8 +991,12 @@ std::vector<Item *> Character::findCoins(
             {
                 if (content->getType() == ModelType::Currency)
                 {
-                    providedValue += content->getPrice();
-                    coins.push_back(it);
+                    unsigned int qnt = 0, price = content->getPrice();
+                    for (; (qnt < content->quantity) && (providedValue < requiredValue); ++qnt)
+                    {
+                        providedValue += price;
+                    }
+                    coins.push_back(std::make_pair(content, qnt));
                     if (providedValue >= requiredValue)
                     {
                         return coins;

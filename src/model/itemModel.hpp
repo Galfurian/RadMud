@@ -204,7 +204,8 @@ class ItemModel
         virtual Item * createItem(
             std::string maker,
             Material * composition,
-            const ItemQuality & itemQuality);
+            const ItemQuality & itemQuality,
+            const unsigned int & quantity);
 
         /// @brief Check the correctness of the model.
         /// @return <b>True</b> if the model has correct values,<br>

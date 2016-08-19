@@ -66,12 +66,13 @@ void CurrencyModel::getSheet(Table & sheet) const
 Item * CurrencyModel::createItem(
     std::string maker,
     Material * composition,
-    const ItemQuality & itemQuality)
+    const ItemQuality & itemQuality,
+    const unsigned int & quantity)
 {
     auto it = std::find(prices.begin(), prices.end(), composition->vnum);
     if (it != prices.end())
     {
-        return ItemModel::createItem(maker, composition, itemQuality);
+        return ItemModel::createItem(maker, composition, itemQuality, quantity);
     }
     else
     {
@@ -114,10 +115,13 @@ std::vector<Item *> CurrencyModel::generateCurrency(
     {
         auto coinMaterial = Mud::instance().findMaterial(it.material);
         auto coinQuantity = (currentValue / it.price);
-        auto coin = this->createItem(maker, coinMaterial, ItemQuality::Normal);
+        if (coinQuantity == 0)
+        {
+            continue;
+        }
+        auto coin = this->createItem(maker, coinMaterial, ItemQuality::Normal, coinQuantity);
         if (coin != nullptr)
         {
-            coin->quantity = coinQuantity;
             coins.push_back(coin);
         }
         else

@@ -60,7 +60,6 @@ unsigned int CurrencyItem::getPrice() const
             "The item (%s) has a wrong composition w.r.t its currency.",
             this->getName());
     }
-    customPrice *= this->quantity;
     return customPrice;
 }
 

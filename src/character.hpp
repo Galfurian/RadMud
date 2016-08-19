@@ -377,7 +377,7 @@ class Character
         /// @param value Total value that has to be found.
         /// @return <b>True</b> if the character has the right ammount of coins,<br>
         ///         <b>False</b> otherwise.
-        std::vector<Item *> findCoins(
+        std::vector<std::pair<Item *, unsigned int>> findCoins(
             const unsigned int & requiredValue,
             unsigned int & providedValue);
 

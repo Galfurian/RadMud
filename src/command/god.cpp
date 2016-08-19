@@ -353,7 +353,7 @@ void DoItemCreate(Character * character, std::istream & sArgs)
         quality = ItemQuality(itemQualityValue);
     }
     // Create the item.
-    Item * item = itemModel->createItem(character->getName(), material, quality);
+    Item * item = itemModel->createItem(character->getName(), material, quality, 1);
     if (item == nullptr)
     {
         character->sendMsg("Creation failed.\n");
@@ -436,6 +436,7 @@ void DoItemDestroy(Character * character, std::istream & sArgs)
         return;
     }
     item->removeFromMud();
+    item->removeOnDB();
     delete (item);
     character->sendMsg("You have destroyed the desired object.\n");
 }

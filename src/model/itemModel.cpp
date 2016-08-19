@@ -113,7 +113,8 @@ void ItemModel::getSheet(Table & sheet) const
 Item * ItemModel::createItem(
     std::string maker,
     Material * composition,
-    const ItemQuality & itemQuality)
+    const ItemQuality & itemQuality,
+    const unsigned int & quantity)
 {
     if (composition->type != this->material)
     {
@@ -134,7 +135,7 @@ Item * ItemModel::createItem(
     // First set: Vnum, Model, Maker, Composition, Quality.
     newItem->vnum = Mud::instance().getMaxVnumItem() + 1;
     newItem->model = this;
-    newItem->quantity = 1;
+    newItem->quantity = quantity;
     newItem->maker = maker;
     newItem->composition = composition;
     newItem->quality = itemQuality;
