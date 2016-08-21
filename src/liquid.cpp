@@ -54,5 +54,5 @@ std::string Liquid::getName()
 
 std::string Liquid::getNameCapital()
 {
-    return name;
+    return ToCapitals(name);
 }

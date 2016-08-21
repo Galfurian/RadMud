@@ -126,6 +126,10 @@ void ItemContainer::orderBy(const ItemContainer::Order & order)
     {
         std::sort(this->begin(), this->end(), ItemContainer::orderItemByWeight);
     }
+    else if (order == Order::ByPrice)
+    {
+        std::sort(this->begin(), this->end(), ItemContainer::orderItemByPrice);
+    }
 }
 
 std::string ItemContainer::orderToString(const Order & order)
@@ -134,9 +138,13 @@ std::string ItemContainer::orderToString(const Order & order)
     {
         return "name";
     }
-    else
+    else if (order == Order::ByWeight)
     {
         return "weight";
+    }
+    else
+    {
+        return "price";
     }
 }
 
@@ -149,3 +157,9 @@ bool ItemContainer::orderItemByWeight(Item * first, Item * second)
 {
     return first->getWeight() < second->getWeight();
 }
+
+bool ItemContainer::orderItemByPrice(Item * first, Item * second)
+{
+    return first->getPrice() < second->getPrice();
+}
+

@@ -839,6 +839,7 @@ void ProcessNewConfirm(Character * character, std::istream & sArgs)
         player->experience = 0;
         player->flags = 0;
         player->rent_room = 1000;
+        SQLiteDbms::instance().beginTransaction();
         if (player->updateOnDB())
         {
             AdvanceCharacterCreation(player, ConnectionState::Playing);
@@ -847,6 +848,7 @@ void ProcessNewConfirm(Character * character, std::istream & sArgs)
         {
             player->closeConnection();
         }
+        SQLiteDbms::instance().endTransaction();
     }
     else
     {
@@ -1536,7 +1538,7 @@ void LoadCommands()
     {
         command.name = "sell";
         command.help = "Sell an item to a shop keeper.";
-        command.args = "(item) (shopkeeper)";
+        command.args = "(item) (shop)";
         command.hndl = DoSell;
         Mud::instance().addCommand(command);
     }
@@ -1545,6 +1547,13 @@ void LoadCommands()
         command.help = "Allows to buy an item from a shop.";
         command.args = "(item) (shop)";
         command.hndl = DoBuy;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "balance";
+        command.help = "Shows the character's balance.";
+        command.args = "";
+        command.hndl = DoBalance;
         Mud::instance().addCommand(command);
     }
 

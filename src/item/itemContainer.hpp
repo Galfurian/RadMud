@@ -28,7 +28,8 @@ class ItemContainer: public std::vector<Item *>
         enum Order
         {
             ByName,
-            ByWeight
+            ByWeight,
+            ByPrice
         };
 
         ItemContainer();
@@ -51,4 +52,6 @@ class ItemContainer: public std::vector<Item *>
         static bool orderItemByName(Item * first, Item * second);
 
         static bool orderItemByWeight(Item * first, Item * second);
+
+        static bool orderItemByPrice(Item * first, Item * second);
 };

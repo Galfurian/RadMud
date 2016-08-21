@@ -77,12 +77,6 @@ class SQLiteDbms
         ///         <b>False</b> Otherwise.
         bool loadPlayer(Player * player);
 
-        /// @brief Save the player on the database.
-        /// @param player The player.
-        /// @return <b>True</b> if the update goes well,<br>
-        ///         <b>False</b> otherwise.
-        bool updatePlayer(Player * player);
-
         /// @brief Search for the player in the table.
         /// @param name The name of the player.
         /// @return <b>True</b> if the operations succeeded,<br>
@@ -123,12 +117,6 @@ class SQLiteDbms
 
         bool updateRooms();
 
-        /// @brief Execute a select.
-        /// @param table The name of the table.
-        /// @param where Vector of where clause.
-        /// @return The result of the operation.
-        ResultSet * executeSelect(std::string table, QueryList where);
-
         /// @brief Begin a transaction.
         void beginTransaction();
 
@@ -138,6 +126,7 @@ class SQLiteDbms
         /// @brief End a Transaction.
         void endTransaction();
 
+        /// @brief Prints last error message and code.
         void showLastError() const;
 
     private:

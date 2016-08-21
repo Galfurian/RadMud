@@ -943,11 +943,9 @@ bool Character::findNearbyResouces(
     return true;
 }
 
-std::vector<std::pair<Item *, unsigned int>> Character::findCoins(
-    const unsigned int & requiredValue,
-    unsigned int & providedValue)
+std::vector<Item *> Character::findCoins()
 {
-    std::vector<std::pair<Item *, unsigned int>> coins;
+    ItemContainer foundCoins;
     for (auto it : equipment)
     {
         if (it->isAContainer() && !it->isEmpty())
@@ -956,16 +954,7 @@ std::vector<std::pair<Item *, unsigned int>> Character::findCoins(
             {
                 if (content->getType() == ModelType::Currency)
                 {
-                    unsigned int qnt = 0, price = content->getPrice();
-                    for (; (qnt < content->quantity) && (providedValue < requiredValue); ++qnt)
-                    {
-                        providedValue += price;
-                    }
-                    coins.push_back(std::make_pair(content, qnt));
-                    if (providedValue >= requiredValue)
-                    {
-                        return coins;
-                    }
+                    foundCoins.push_back(content);
                 }
             }
         }
@@ -974,16 +963,7 @@ std::vector<std::pair<Item *, unsigned int>> Character::findCoins(
     {
         if (it->getType() == ModelType::Currency)
         {
-            unsigned int qnt = 0, price = it->getPrice();
-            for (; (qnt < it->quantity) && (providedValue < requiredValue); ++qnt)
-            {
-                providedValue += price;
-            }
-            coins.push_back(std::make_pair(it, qnt));
-            if (providedValue >= requiredValue)
-            {
-                return coins;
-            }
+            foundCoins.push_back(it);
         }
         if (it->isAContainer() && !it->isEmpty())
         {
@@ -991,25 +971,13 @@ std::vector<std::pair<Item *, unsigned int>> Character::findCoins(
             {
                 if (content->getType() == ModelType::Currency)
                 {
-                    unsigned int qnt = 0, price = content->getPrice();
-                    for (; (qnt < content->quantity) && (providedValue < requiredValue); ++qnt)
-                    {
-                        providedValue += price;
-                    }
-                    coins.push_back(std::make_pair(content, qnt));
-                    if (providedValue >= requiredValue)
-                    {
-                        return coins;
-                    }
+                    foundCoins.push_back(content);
                 }
             }
         }
     }
-    if (providedValue < requiredValue)
-    {
-        coins.clear();
-    }
-    return coins;
+    foundCoins.orderBy(ItemContainer::ByPrice);
+    return foundCoins;
 }
 
 bool Character::hasInventoryItem(Item * item)

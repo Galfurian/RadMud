@@ -373,13 +373,8 @@ class Character
             std::vector<Item *> & foundOnes);
 
         /// @brief Search the coins on the character.
-        /// @param coins List of found coins.
-        /// @param value Total value that has to be found.
-        /// @return <b>True</b> if the character has the right ammount of coins,<br>
-        ///         <b>False</b> otherwise.
-        std::vector<std::pair<Item *, unsigned int>> findCoins(
-            const unsigned int & requiredValue,
-            unsigned int & providedValue);
+        /// @return List of found coins.
+        std::vector<Item *> findCoins();
 
         /// @brief Allows to check if an item is inside the inventory.
         /// @param item The item to search.

@@ -241,6 +241,8 @@ void DoDeposit(Character * character, std::istream & sArgs);
 void DoSell(Character * character, std::istream & sArgs);
 /// Buy an item.
 void DoBuy(Character * character, std::istream & sArgs);
+/// Shows the total ammount of monney.
+void DoBalance(Character * character, std::istream & sArgs);
 /// The character say something.
 void DoSay(Character * character, std::istream & sArgs);
 /// The character whisper something to someone, even in distance.

@@ -1522,7 +1522,6 @@ void DoDeposit(Character * character, std::istream & sArgs)
     building->toShopItem()->balance += item->getPrice();
     item->removeFromMud();
     delete (item);
-    character->sendMsg("You deposit %s in %s.\n", item->getName(), building->getName());
 }
 
 void DoSell(Character * character, std::istream & sArgs)
@@ -1539,7 +1538,6 @@ void DoSell(Character * character, std::istream & sArgs)
     }
     // Get the item and the target.
     auto item = character->findInventoryItem(args[0].first, args[0].second);
-    auto target = character->room->findCharacter(args[1].first, args[1].second, { character });
     // Check the item.
     if (item == nullptr)
     {
@@ -1551,32 +1549,26 @@ void DoSell(Character * character, std::istream & sArgs)
         character->sendMsg("You can't sell %s.\n", item->getName());
         return;
     }
-    // Check the target.
+    // Get the target.
+    auto target = character->room->findItem(args[1].first, args[1].second);
     if (target == nullptr)
     {
-        character->sendMsg("You don't see that person.\n");
+        character->sendMsg("You don't see '%s' here.\n", args[1].first);
         return;
     }
-    if (target->isPlayer())
+    if (target->getType() != ModelType::Shop)
     {
-        character->sendMsg("%s is not a shop keeper.\n", target->getNameCapital());
+        character->sendMsg("%s is not a shop.\n", target->getNameCapital());
         return;
     }
-    bool isAShopKeeper = false;
-    auto shopKeeper = target->toMobile();
-    if (shopKeeper->managedItem != nullptr)
+    auto shop = target->toShopItem();
+    std::string error;
+    if (!shop->canUse(error))
     {
-        if (shopKeeper->managedItem->getType() == ModelType::Shop)
-        {
-            isAShopKeeper = true;
-        }
-    }
-    if (!isAShopKeeper)
-    {
-        character->sendMsg("You cant't sell anything to %s.\n", target->getName());
+        character->sendMsg(error + "\n");
         return;
     }
-    auto shop = shopKeeper->managedItem->toShopItem();
+    auto shopKeeper = shop->shopKeeper;
     if (!shop->canContain(item))
     {
         auto phrase = "The shop is full, come back another day.";
@@ -1598,6 +1590,7 @@ void DoSell(Character * character, std::istream & sArgs)
         character->sendMsg("You failed to sell %s.\n", item->getName());
         return;
     }
+    SQLiteDbms::instance().beginTransaction();
     // Remove the item from the player's inventory.
     character->remInventoryItem(item);
     // Put the item inside the container.
@@ -1606,8 +1599,9 @@ void DoSell(Character * character, std::istream & sArgs)
     {
         character->addInventoryItem(coin);
     }
+    SQLiteDbms::instance().endTransaction();
     shop->balance -= price;
-    character->sendMsg("You sell %s to %s.\n", item->getName(), shopKeeper->getName());
+    character->sendMsg("You sell %s to %s.\n", item->getName(), shop->getName());
 }
 
 void DoBuy(Character * character, std::istream & sArgs)
@@ -1657,9 +1651,24 @@ void DoBuy(Character * character, std::istream & sArgs)
         shopKeeper->doCommand("say " + character->getName() + " " + phrase);
         return;
     }
-
+    std::vector<Item *> availableCoins = character->findCoins();
+    std::vector<Item *> changedCoins;
+    std::vector<std::pair<Item *, unsigned int>> givenCoins;
     unsigned int providedValue = 0, requiredValue = shop->evaluateBuyPrice(item);
-    auto givenCoins = character->findCoins(requiredValue, providedValue);
+    for (auto coin : availableCoins)
+    {
+        unsigned int coinValue = coin->getPrice();
+        unsigned int quantity = 0;
+        for (; (quantity < coin->quantity) && (providedValue < requiredValue); ++quantity)
+        {
+            providedValue += coinValue;
+        }
+        givenCoins.push_back(std::make_pair(coin, quantity));
+        if (providedValue >= requiredValue)
+        {
+            break;
+        }
+    }
     if (givenCoins.empty())
     {
         auto phrase = "You can't afford to buy " + item->getName() + ".\n";
@@ -1670,17 +1679,18 @@ void DoBuy(Character * character, std::istream & sArgs)
     {
         auto change = providedValue - requiredValue;
         auto currency = shopKeeper->faction->currency;
-        auto changeCoins = currency->generateCurrency(shopKeeper->getName(), change);
-        if (changeCoins.empty())
+        changedCoins = currency->generateCurrency(shopKeeper->getName(), change);
+        if (changedCoins.empty())
         {
             auto phrase = "Sorry but I cannot sell " + item->getName() + " to you.\n";
             shopKeeper->doCommand("say " + character->getName() + " " + phrase);
             return;
         }
-        for (auto coin : changeCoins)
-        {
-            character->addInventoryItem(coin);
-        }
+    }
+    SQLiteDbms::instance().beginTransaction();
+    for (auto coin : changedCoins)
+    {
+        character->addInventoryItem(coin);
     }
     for (auto coin : givenCoins)
     {
@@ -1698,6 +1708,25 @@ void DoBuy(Character * character, std::istream & sArgs)
     }
     shop->takeOut(item);
     character->addInventoryItem(item);
+    SQLiteDbms::instance().endTransaction();
     shop->balance += requiredValue;
     character->sendMsg("You buy %s from %s.\n", item->getName(), shop->getName());
+}
+
+void DoBalance(Character * character, std::istream & sArgs)
+{
+    // Get the arguments of the command.
+    ArgumentList args = ParseArgs(sArgs);
+    // Check the number of arguments.
+    if (!args.empty())
+    {
+        character->sendMsg("You have provided unecessary arguments.\n");
+        return;
+    }
+    unsigned int balance = 0;
+    for (auto coin : character->findCoins())
+    {
+        balance += coin->quantity * coin->getPrice();
+    }
+    character->sendMsg("Your balance is: %s.\n", ToString(balance));
 }

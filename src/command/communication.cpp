@@ -217,6 +217,7 @@ void DoBug(Character * character, std::istream & sArgs)
     if (!SQLiteDbms::instance().insertInto("Board", arguments))
     {
         character->sendMsg("Something gone wrong during the storing of your bug.\n");
+        SQLiteDbms::instance().rollbackTransection();
         return;
     }
     SQLiteDbms::instance().endTransaction();
@@ -251,6 +252,7 @@ void DoIdea(Character * character, std::istream & sArgs)
     if (!SQLiteDbms::instance().insertInto("Board", arguments))
     {
         character->sendMsg("Something gone wrong during the storing of your idea.\n");
+        SQLiteDbms::instance().rollbackTransection();
         return;
     }
     SQLiteDbms::instance().endTransaction();
@@ -284,6 +286,7 @@ void DoTypo(Character * character, std::istream & sArgs)
     if (!SQLiteDbms::instance().insertInto("Board", arguments))
     {
         character->sendMsg("Something gone wrong during the storing of the Typo.\n");
+        SQLiteDbms::instance().rollbackTransection();
         return;
     }
     SQLiteDbms::instance().endTransaction();

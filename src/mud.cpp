@@ -817,7 +817,7 @@ void Mud::removeInactivePlayers()
         if (player->logged_in)
         {
             SQLiteDbms::instance().beginTransaction();
-            SQLiteDbms::instance().updatePlayer(player);
+            player->updateOnDB();
             SQLiteDbms::instance().endTransaction();
         }
         // Remove the player from the list of players.

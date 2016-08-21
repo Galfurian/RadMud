@@ -157,50 +157,6 @@ bool SQLiteDbms::loadPlayer(Player * player)
     return true;
 }
 
-bool SQLiteDbms::updatePlayer(Player * player)
-{
-    QueryList value, where;
-    value.push_back( { "name", player->name });
-    value.push_back( { "password", player->password });
-    value.push_back( { "race", ToString(player->race->vnum) });
-    value.push_back( { "str", ToString(player->getAbility(Ability::Strength, false)) });
-    value.push_back( { "agi", ToString(player->getAbility(Ability::Agility, false)) });
-    value.push_back( { "per", ToString(player->getAbility(Ability::Perception, false)) });
-    value.push_back( { "con", ToString(player->getAbility(Ability::Constitution, false)) });
-    value.push_back( { "int", ToString(player->getAbility(Ability::Intelligence, false)) });
-    value.push_back( { "gender", ToString(static_cast<int>(player->gender)) });
-    value.push_back( { "age", ToString(player->age) });
-    value.push_back( { "description", player->description });
-    value.push_back( { "weight", ToString(player->weight) });
-    value.push_back( { "faction", ToString(player->faction->vnum) });
-    value.push_back( { "level", ToString(player->level) });
-    value.push_back( { "experience", ToString(player->experience) });
-    value.push_back( { "position", ToString(player->room->vnum) });
-    value.push_back( { "prompt", player->prompt });
-    value.push_back( { "flag", ToString(player->flags) });
-    value.push_back( { "health", ToString(player->getHealth()) });
-    value.push_back( { "stamina", ToString(player->getStamina()) });
-    value.push_back( { "rent_room", ToString(player->rent_room) });
-    value.push_back( { "hunger", ToString(player->getHunger()) });
-    value.push_back( { "thirst", ToString(player->getThirst()) });
-    where.push_back( { "name", player->name });
-    if (!SQLiteDbms::instance().updateInto("Player", value, where))
-    {
-        Logger::log(LogLevel::Error, "Error during Player's Information save.");
-        return false;
-    }
-    for (auto iterator : player->skills)
-    {
-        auto arguments = { player->name, ToString(iterator.first), ToString(iterator.second) };
-        if (!SQLiteDbms::instance().insertInto("Advancement", arguments, false, true))
-        {
-            Logger::log(LogLevel::Error, "Error during Player's Skills save.");
-            return false;
-        }
-    }
-    return true;
-}
-
 bool SQLiteDbms::searchPlayer(const std::string & name)
 {
     bool outcome = false;
@@ -358,26 +314,6 @@ bool SQLiteDbms::updateRooms()
     // Complete the transaction.
     dbConnection.endTransaction();
     return true;
-}
-
-ResultSet * SQLiteDbms::executeSelect(std::string table, QueryList where)
-{
-    stringstream stream;
-    stream << "SELECT * FROM " << table << std::endl;
-    stream << "WHERE" << std::endl;
-    for (unsigned int it = 0; it < where.size(); ++it)
-    {
-        std::pair<std::string, std::string> clause = where.at(it);
-        if (it == (where.size() - 1))
-        {
-            stream << "    " << clause.first << " = \"" << clause.second << "\";" << std::endl;
-        }
-        else
-        {
-            stream << "    " << clause.first << " = \"" << clause.second << "\" AND" << std::endl;
-        }
-    }
-    return dbConnection.executeSelect(stream.str().c_str());
 }
 
 void SQLiteDbms::beginTransaction()

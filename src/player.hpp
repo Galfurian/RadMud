@@ -124,7 +124,9 @@ class Player: public Character
         /// @return <b>True</b> if we have something to send them,<br><b>False</b> otherwise.
         bool hasPendingOutput() const;
 
-        /// @brief Create an entry for the player in the database.
+        /// @brief Create an updated entry for the player inside the database.
+        /// @return <b>True</b> if the update goes well,<br>
+        ///         <b>False</b> otherwise.
         bool updateOnDB();
 
         /// @brief Send the prompt to player.

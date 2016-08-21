@@ -111,6 +111,7 @@ std::vector<Item *> CurrencyModel::generateCurrency(
     auto status = true;
     auto currentValue = value;
     std::vector<Item *> coins;
+    SQLiteDbms::instance().beginTransaction();
     for (auto it : prices)
     {
         auto coinMaterial = Mud::instance().findMaterial(it.material);
@@ -139,7 +140,9 @@ std::vector<Item *> CurrencyModel::generateCurrency(
             delete (generated);
         }
         coins.clear();
+        SQLiteDbms::instance().rollbackTransection();
     }
+    SQLiteDbms::instance().endTransaction();
     return coins;
 }
 
