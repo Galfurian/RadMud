@@ -27,21 +27,15 @@ const std::string kValidPlayerName =
 const std::string kValidDescription =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ,.\n";
 
-void ProcessCommand(Character * character, std::istream & sArgs)
+void ProcessCommand(Character * character, ArgumentHandler & args)
 {
-    std::string command;
-    if (!sArgs.good())
+    if (args.empty())
     {
-        Logger::log(LogLevel::Fatal, "Possible fatal error in input.");
-        throw std::runtime_error("Huh?\n");
+        character->sendMsg("Huh?\n");
+        return;
     }
-    // Get command, eat whitespace after it.
-    sArgs >> command;
-    if (command.empty())
-    {
-        throw std::runtime_error("Huh?\n");
-    }
-    sArgs >> std::ws;
+    auto command = args[0].getContent();
+    args.erase(0);
 
     // Check if it's a direction.
     Direction direction = Mud::instance().findDirection(command, false);
@@ -74,7 +68,7 @@ void ProcessCommand(Character * character, std::istream & sArgs)
             }
             else
             {
-                iterator.hndl(character, sArgs);
+                iterator.hndl(character, args);
                 found = true;
                 break;
             }
@@ -85,7 +79,7 @@ void ProcessCommand(Character * character, std::istream & sArgs)
 
             if (profession != nullptr)
             {
-                DoProfession(character, profession, sArgs);
+                DoProfession(character, profession, args);
             }
             else
             {
@@ -96,12 +90,10 @@ void ProcessCommand(Character * character, std::istream & sArgs)
     character->sendMsg("\n");
 }
 
-void ProcessPlayerName(Character * character, std::istream & sArgs)
+void ProcessPlayerName(Character * character, ArgumentHandler & args)
 {
     Player * player = character->toPlayer();
-    std::string input;
-    getline(sArgs, input);
-
+    auto input = args.getOriginal();
     // Name can't be blank.
     if (input.empty())
     {
@@ -162,12 +154,10 @@ void ProcessPlayerName(Character * character, std::istream & sArgs)
     }
 }
 
-void ProcessPlayerPassword(Character * character, std::istream & sArgs)
+void ProcessPlayerPassword(Character * character, ArgumentHandler & args)
 {
     Player * player = character->toPlayer();
-    std::string input;
-    getline(sArgs, input);
-
+    auto input = args.getOriginal();
     // Check the correctness of the password.
     if (input != player->password)
     {
@@ -192,12 +182,10 @@ void ProcessPlayerPassword(Character * character, std::istream & sArgs)
     }
 }
 
-void ProcessNewName(Character * character, std::istream & sArgs)
+void ProcessNewName(Character * character, ArgumentHandler & args)
 {
     Player * player = character->toPlayer();
-    std::string input;
-    getline(sArgs, input);
-
+    auto input = args.getOriginal();
     // Player_password can't be blank.
     if (input.empty())
     {
@@ -248,12 +236,10 @@ void ProcessNewName(Character * character, std::istream & sArgs)
     }
 }
 
-void ProcessNewPwd(Character * character, std::istream & sArgs)
+void ProcessNewPwd(Character * character, ArgumentHandler & args)
 {
     Player * player = character->toPlayer();
-    std::string input;
-    getline(sArgs, input);
-
+    auto input = args.getOriginal();
     // Player_password can't be blank.
     if (input.empty())
     {
@@ -279,12 +265,10 @@ void ProcessNewPwd(Character * character, std::istream & sArgs)
     }
 }
 
-void ProcessNewPwdCon(Character * character, std::istream & sArgs)
+void ProcessNewPwdCon(Character * character, ArgumentHandler & args)
 {
     Player * player = character->toPlayer();
-    std::string input;
-    getline(sArgs, input);
-
+    auto input = args.getOriginal();
     // Check if the player has typed BACK.
     if (ToLower(input) == "back")
     {
@@ -304,12 +288,10 @@ void ProcessNewPwdCon(Character * character, std::istream & sArgs)
     }
 }
 
-void ProcessNewStory(Character * character, std::istream & sArgs)
+void ProcessNewStory(Character * character, ArgumentHandler & args)
 {
     Player * player = character->toPlayer();
-    std::string input;
-    getline(sArgs, input);
-
+    auto input = args.getOriginal();
     // Player_password can't be blank.
     if (input.empty())
     {
@@ -334,30 +316,26 @@ void ProcessNewStory(Character * character, std::istream & sArgs)
     }
 }
 
-void ProcessNewRace(Character * character, std::istream & sArgs)
+void ProcessNewRace(Character * character, ArgumentHandler & args)
 {
     Player * player = character->toPlayer();
-
-    // Get the arguments of the command.
-    ArgumentList arguments = ParseArgs(sArgs);
-
     // Player_password can't be blank.
-    if ((arguments.size() != 1) && (arguments.size() != 2))
+    if ((args.size() != 1) && (args.size() != 2))
     {
         AdvanceCharacterCreation(character, ConnectionState::AwaitingNewRace, "Invalid input.");
     }
     // Check if the player has typed BACK.
-    else if (ToLower(arguments[0].first) == "back")
+    else if (ToLower(args[0].getContent()) == "back")
     {
         RollbackCharacterCreation(player, ConnectionState::AwaitingNewStory);
     }
     // If the player has insert help (race_number), show its help.
-    else if (BeginWith(ToLower(arguments[0].first), "help"))
+    else if (BeginWith(ToLower(args[0].getContent()), "help"))
     {
-        if (arguments.size() == 2)
+        if (args.size() == 2)
         {
             // Get the race.
-            Race * race = Mud::instance().findRace(ToInt(arguments[1].first));
+            Race * race = Mud::instance().findRace(ToInt(args[1].getContent()));
             if (race == nullptr)
             {
                 AdvanceCharacterCreation(
@@ -399,10 +377,10 @@ void ProcessNewRace(Character * character, std::istream & sArgs)
                 "You have to specify the race number.");
         }
     }
-    else if (IsNumber(arguments[0].first))
+    else if (IsNumber(args[0].getContent()))
     {
         // Get the race.
-        Race * race = Mud::instance().findRace(ToInt(arguments[0].first));
+        Race * race = Mud::instance().findRace(ToInt(args[0].getContent()));
         if (race == nullptr)
         {
             AdvanceCharacterCreation(
@@ -432,24 +410,21 @@ void ProcessNewRace(Character * character, std::istream & sArgs)
     }
 }
 
-void ProcessNewAttr(Character * character, std::istream & sArgs)
+void ProcessNewAttr(Character * character, ArgumentHandler & args)
 {
     Player * player = character->toPlayer();
-
-    // Get the arguments of the command.
-    ArgumentList arguments = ParseArgs(sArgs);
     // Player_password can't be blank.
-    if ((arguments.size() != 1) && (arguments.size() != 2))
+    if ((args.size() != 1) && (args.size() != 2))
     {
         AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAttr, "Invalid input.");
     }
     // Check if the player has typed BACK.
-    else if (ToLower(arguments[0].first) == "back")
+    else if (ToLower(args[0].getContent()) == "back")
     {
         RollbackCharacterCreation(player, ConnectionState::AwaitingNewRace);
     }
     // Check if the player has not yet typed RESET.
-    else if (ToLower(arguments[0].first) == "reset")
+    else if (ToLower(args[0].getContent()) == "reset")
     {
         player->remaining_points = 0;
         player->setAbility(Ability::Strength, player->race->getAbility(Ability::Strength));
@@ -463,17 +438,17 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
             Formatter::cyan() + "Attribute has been set by default." + Formatter::reset() + "\n");
     }
     // If the player has insert help (attribute number), show its help.
-    else if (BeginWith(ToLower(arguments[0].first), "continue"))
+    else if (BeginWith(ToLower(args[0].getContent()), "continue"))
     {
         AdvanceCharacterCreation(player, ConnectionState::AwaitingNewGender);
     }
     // If the player has insert help (attribute number), show its help.
-    else if (BeginWith(ToLower(arguments[0].first), "help"))
+    else if (BeginWith(ToLower(args[0].getContent()), "help"))
     {
-        if (arguments.size() == 2)
+        if (args.size() == 2)
         {
             std::string helpMessage;
-            if (arguments[1].first == "1")
+            if (args[1].getContent() == "1")
             {
                 helpMessage = "Help about Strength.\n" + Formatter::italic();
                 helpMessage += "Strength is important for increasing the Carrying Weight and ";
@@ -481,7 +456,7 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
                     "satisfying the minimum Strength requirements for some weapons and armors.";
                 helpMessage += Formatter::reset() + "\n";
             }
-            else if (arguments[1].first == "2")
+            else if (args[1].getContent() == "2")
             {
                 helpMessage = "Help about Agility.\n" + Formatter::italic();
                 helpMessage += "Besides increasing mobility in combat, it increases the recharge ";
@@ -489,21 +464,21 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
                     "speed of all the weapons, as well as the ability to use light armor.";
                 helpMessage += Formatter::reset() + "\n";
             }
-            else if (arguments[1].first == "3")
+            else if (args[1].getContent() == "3")
             {
                 helpMessage = "Help about Perception.\n" + Formatter::italic();
                 helpMessage += "The ability to see, hear, taste and notice unusual things. ";
                 helpMessage += "A high Perception is important for a sharpshooter.";
                 helpMessage += Formatter::reset() + "\n";
             }
-            else if (arguments[1].first == "4")
+            else if (args[1].getContent() == "4")
             {
                 helpMessage = "Help about Constitution.\n" + Formatter::italic();
                 helpMessage += "Stamina and physical toughness. A character with a high Endurance ";
                 helpMessage += "will survive where others may not.";
                 helpMessage += Formatter::reset() + "\n";
             }
-            else if (arguments[1].first == "5")
+            else if (args[1].getContent() == "5")
             {
                 helpMessage = "Help about Intelligence.\n" + Formatter::italic();
                 helpMessage += "Knowledge, wisdom and the ability to think quickly, ";
@@ -526,16 +501,16 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
     }
     else
     {
-        if (arguments.size() == 2)
+        if (args.size() == 2)
         {
             std::string helpMessage;
-            int modifier = ToInt(arguments[1].first);
+            int modifier = ToInt(args[1].getContent());
             // Check for errors.
             if (player->remaining_points < modifier)
             {
                 helpMessage = "You don't have enough points left.";
             }
-            else if (arguments[0].first == "1")
+            else if (args[0].getContent() == "1")
             {
                 int result = static_cast<int>(player->getAbility(Ability::Strength, false))
                     + modifier;
@@ -559,7 +534,7 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
                     player->setAbility(Ability::Strength, static_cast<unsigned int>(result));
                 }
             }
-            else if (arguments[0].first == "2")
+            else if (args[0].getContent() == "2")
             {
                 int result = static_cast<int>(player->getAbility(Ability::Agility, false))
                     + modifier;
@@ -583,7 +558,7 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
                     player->setAbility(Ability::Agility, static_cast<unsigned int>(result));
                 }
             }
-            else if (arguments[0].first == "3")
+            else if (args[0].getContent() == "3")
             {
                 int result = static_cast<int>(player->getAbility(Ability::Perception, false))
                     + modifier;
@@ -609,7 +584,7 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
                     player->setAbility(Ability::Perception, static_cast<unsigned int>(result));
                 }
             }
-            else if (arguments[0].first == "4")
+            else if (args[0].getContent() == "4")
             {
                 int result = static_cast<int>(player->getAbility(Ability::Constitution, false))
                     + modifier;
@@ -635,7 +610,7 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
                     player->setAbility(Ability::Constitution, static_cast<unsigned int>(result));
                 }
             }
-            else if (arguments[0].first == "5")
+            else if (args[0].getContent() == "5")
             {
                 int result = static_cast<int>(player->getAbility(Ability::Intelligence, false))
                     + modifier;
@@ -677,11 +652,10 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
     }
 }
 
-void ProcessNewGender(Character * character, std::istream & sArgs)
+void ProcessNewGender(Character * character, ArgumentHandler & args)
 {
     Player * player = character->toPlayer();
-    std::string input;
-    getline(sArgs, input);
+    auto input = args.getOriginal();
     // Check if the player has typed BACK.
     if (ToLower(input) == "back")
     {
@@ -706,11 +680,10 @@ void ProcessNewGender(Character * character, std::istream & sArgs)
     }
 }
 
-void ProcessNewAge(Character * character, std::istream & sArgs)
+void ProcessNewAge(Character * character, ArgumentHandler & args)
 {
     Player * player = character->toPlayer();
-    std::string input;
-    getline(sArgs, input);
+    auto input = args.getOriginal();
     // Check if the player has typed BACK.
     if (ToLower(input) == "back")
     {
@@ -745,11 +718,10 @@ void ProcessNewAge(Character * character, std::istream & sArgs)
     }
 }
 
-void ProcessNewDesc(Character * character, std::istream & sArgs)
+void ProcessNewDesc(Character * character, ArgumentHandler & args)
 {
     Player * player = character->toPlayer();
-    std::string input;
-    getline(sArgs, input);
+    auto input = args.getOriginal();
     // Player_password can't be blank.
     if (input.empty())
     {
@@ -781,11 +753,10 @@ void ProcessNewDesc(Character * character, std::istream & sArgs)
     }
 }
 
-void ProcessNewWeight(Character * character, std::istream & sArgs)
+void ProcessNewWeight(Character * character, ArgumentHandler & args)
 {
     Player * player = character->toPlayer();
-    std::string input;
-    getline(sArgs, input);
+    auto input = args.getOriginal();
     // Check if the player has typed BACK.
     if (ToLower(input) == "back")
     {
@@ -820,12 +791,10 @@ void ProcessNewWeight(Character * character, std::istream & sArgs)
     }
 }
 
-void ProcessNewConfirm(Character * character, std::istream & sArgs)
+void ProcessNewConfirm(Character * character, ArgumentHandler & args)
 {
     Player * player = character->toPlayer();
-    std::string input;
-    getline(sArgs, input);
-
+    auto input = args.getOriginal();
     // Check if the player has typed BACK.
     if (ToLower(input) == "back")
     {
@@ -867,17 +836,6 @@ void NoMobile(Character * character)
     }
 }
 
-void NoMore(Character * character, std::istream & sArgs)
-{
-    std::string sLine;
-    getline(sArgs, sLine);
-    if (!sLine.empty())
-    {
-        character->sendMsg("Unexpected input :'" + sLine + "'.\n");
-        throw std::runtime_error("");
-    }
-}
-
 void StopAction(Character * character)
 {
     if ((character->getAction()->getType() != ActionType::Wait))
@@ -887,27 +845,6 @@ void StopAction(Character * character)
             character->doCommand("stop");
         }
     }
-}
-
-ArgumentList ParseArgs(std::istream & sArgs)
-{
-    ArgumentList arguments;
-    std::vector<std::string> words;
-
-    // Get the words from the input line.
-    std::string argumentsLine;
-    std::getline(sArgs, argumentsLine);
-    words = GetWords(argumentsLine);
-    for (auto it : words)
-    {
-        // Set one by default.
-        int number = 1;
-        // Extract the number.
-        ExtractNumber(it, number);
-        // Add the argument.
-        arguments.push_back(std::make_pair(it, number));
-    }
-    return arguments;
 }
 
 void LoadStates()

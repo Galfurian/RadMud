@@ -22,27 +22,27 @@
 #include "../action/buildAction.hpp"
 #include "../action/craftAction.hpp"
 
+#include "argumentHandler.hpp"
+
 using namespace std;
 
-void DoProfession(Character * character, Profession * profession, std::istream & sArgs)
+void DoProfession(Character * character, Profession * profession, ArgumentHandler & args)
 {
-    // Get the arguments of the command.
-    ArgumentList arguments = ParseArgs(sArgs);
-    if (arguments.size() != 1)
+    if (args.size() != 1)
     {
         character->sendMsg("What do you want to produce?\n");
         return;
     }
     // Search the production.
-    Production * production = Mud::instance().findProduction(arguments[0].first);
+    Production * production = Mud::instance().findProduction(args[0].getContent());
     if (production == nullptr)
     {
-        character->sendMsg("%s '%s'.\n", profession->notFoundMessage, arguments[0].first);
+        character->sendMsg("%s '%s'.\n", profession->notFoundMessage, args[0].getContent());
         return;
     }
     if (production->profession != profession)
     {
-        character->sendMsg("%s '%s'.\n", profession->notFoundMessage, arguments[0].first);
+        character->sendMsg("%s '%s'.\n", profession->notFoundMessage, args[0].getContent());
         return;
     }
     // Check if the actor has enough stamina to execute the action.
@@ -130,19 +130,17 @@ void DoProfession(Character * character, Profession * profession, std::istream &
         production->profession->action);
 }
 
-void DoBuild(Character * character, std::istream & sArgs)
+void DoBuild(Character * character, ArgumentHandler & args)
 {
-    // Get the arguments of the command.
-    ArgumentList arguments = ParseArgs(sArgs);
-    if (arguments.size() != 1)
+    if (args.size() != 1)
     {
         character->sendMsg("What do you want to build?\n");
         return;
     }
-    Building * schematics = Mud::instance().findBuilding(arguments[0].first);
+    Building * schematics = Mud::instance().findBuilding(args[0].getContent());
     if (schematics == nullptr)
     {
-        character->sendMsg("You don't know how to build '%s'.\n", arguments[0].first);
+        character->sendMsg("You don't know how to build '%s'.\n", args[0].getContent());
         return;
     }
     // Check if the actor has enough stamina to execute the action.
@@ -245,16 +243,14 @@ void DoBuild(Character * character, std::istream & sArgs)
     character->room->sendToAll(roomMsg, { character });
 }
 
-void DoDeconstruct(Character * character, std::istream & sArgs)
+void DoDeconstruct(Character * character, ArgumentHandler & args)
 {
-    // Get the arguments of the command.
-    ArgumentList arguments = ParseArgs(sArgs);
-    if (arguments.size() != 1)
+    if (args.size() != 1)
     {
         character->sendMsg("What do you want to deconstruct, sai?\n");
         return;
     }
-    Item * item = character->findNearbyItem(arguments[0].first, arguments[0].second);
+    Item * item = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
     if (item == nullptr)
     {
         character->sendMsg("You can't find want you to deconstruct.\n");
@@ -279,16 +275,14 @@ void DoDeconstruct(Character * character, std::istream & sArgs)
     }
 }
 
-void DoRead(Character * character, std::istream & sArgs)
+void DoRead(Character * character, ArgumentHandler & args)
 {
-    // Get the arguments of the command.
-    ArgumentList arguments = ParseArgs(sArgs);
-    if (arguments.size() != 1)
+    if (args.size() != 1)
     {
         character->sendMsg("What do you want to read today, sai?\n");
         return;
     }
-    Item * item = character->findNearbyItem(arguments[0].first, arguments[0].second);
+    Item * item = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
     if (item == nullptr)
     {
         character->sendMsg("You can't find want you to read.\n");

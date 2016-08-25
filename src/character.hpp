@@ -28,6 +28,7 @@
 #include "race.hpp"
 #include "item/item.hpp"
 #include "action/combat/combatAction.hpp"
+#include "command/argumentHandler.hpp"
 
 #include <deque>
 
@@ -607,9 +608,6 @@ class Character
             }
         }
 };
-
-/// @brief An action handler for the character.
-typedef std::function<void(Character * character, std::istream & args)> ActionHandler;
 
 /// @addtogroup FlagsToList
 /// @{

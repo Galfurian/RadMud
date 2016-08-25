@@ -24,29 +24,29 @@
 #include "../action/combat/basicAttack.hpp"
 #include "../action/combat/flee.hpp"
 
+#include "argumentHandler.hpp"
+
 using namespace std;
 
-void DoKill(Character * character, std::istream & sArgs)
+void DoKill(Character * character, ArgumentHandler & args)
 {
-    // Get the arguments of the command.
-    ArgumentList arguments = ParseArgs(sArgs);
     // If there are no arguments, show the room.
-    if (arguments.size() != 1)
+    if (args.size() != 1)
     {
         character->sendMsg("You have to specify whom to kill.\n");
     }
     // Retrieve the target.
-    Character * target = character->room->findCharacter(arguments[0].first, arguments[0].second, {
+    Character * target = character->room->findCharacter(args[0].getContent(), args[0].getIndex(), {
         character });
     if (!target)
     {
-        character->sendMsg("You don't see '%s' anywhere.\n", arguments[0].first);
+        character->sendMsg("You don't see '%s' anywhere.\n", args[0].getContent());
         return;
     }
     // Check if the attacker can see the target.
     if (!character->canSee(target))
     {
-        character->sendMsg("You don't see '%s' anywhere.\n", arguments[0].first);
+        character->sendMsg("You don't see '%s' anywhere.\n", args[0].getContent());
         return;
     }
 
@@ -147,10 +147,8 @@ void DoKill(Character * character, std::istream & sArgs)
     }
 }
 
-void DoFlee(Character * character, std::istream & sArgs)
+void DoFlee(Character * character, ArgumentHandler & /*args*/)
 {
-    // Check that there are no more arguments.
-    NoMore(character, sArgs);
     // Check if the character is in combat.
     if (character->getAction()->getType() != ActionType::Combat)
     {
@@ -168,10 +166,8 @@ void DoFlee(Character * character, std::istream & sArgs)
     character->setNextCombatAction(CombatActionType::Flee);
 }
 
-void DoAim(Character * character, std::istream & sArgs)
+void DoAim(Character * character, ArgumentHandler & /*args*/)
 {
-    // Get the arguments of the command.
-    ArgumentList arguments = ParseArgs(sArgs);
     std::vector<Character *> targets;
     if (!character->getCharactersInSight(targets))
     {

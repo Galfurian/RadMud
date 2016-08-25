@@ -23,24 +23,24 @@
 #include "../item/shopItem.hpp"
 #include "../sqlite/sqliteDbms.hpp"
 
-void DoAssign(Character * character, std::istream & sArgs)
+#include "argumentHandler.hpp"
+
+void DoAssign(Character * character, ArgumentHandler & args)
 {
     // Check if the player it's already doing something.
     StopAction(character);
-    // Get the arguments of the command.
-    ArgumentList arguments = ParseArgs(sArgs);
-    if (arguments.size() != 2)
+    if (args.size() != 2)
     {
         character->sendMsg("You need to specify who you want assign to which building.\n");
         return;
     }
-    Mobile * mobile = character->room->findMobile(arguments[0].first, arguments[0].second, { });
+    Mobile * mobile = character->room->findMobile(args[0].getContent(), args[0].getIndex(), { });
     if (mobile == nullptr)
     {
         character->sendMsg("You don't see that person.\n");
         return;
     }
-    Item * building = character->room->findBuilding(arguments[1].first, arguments[1].second);
+    Item * building = character->room->findBuilding(args[1].getContent(), args[1].getIndex());
     if (building == nullptr)
     {
         character->sendMsg("You don't see the desired building here.\n");

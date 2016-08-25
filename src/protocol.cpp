@@ -26,7 +26,11 @@ void LoadProtocolStates()
     Mud::instance().addStateAction(ConnectionState::NegotiatingMCCP, ProcessTelnetCommand);
 }
 
-bool ExtractCommand(const std::string & source, size_t & index, TelnetChar & command, std::string & buffer)
+bool ExtractCommand(
+    const std::string & source,
+    size_t & index,
+    TelnetChar & command,
+    std::string & buffer)
 {
     // Check if the source string is empty.
     if (source.empty())
@@ -83,14 +87,12 @@ void NegotiateProtocol(Character * character, const ConnectionState & nextState)
     }
 }
 
-void ProcessTelnetCommand(Character * character, std::istream & sArgs)
+void ProcessTelnetCommand(Character * character, ArgumentHandler & args)
 {
     // Cast the character to player.
     Player * player = character->toPlayer();
     // Line which will contain the answer to IAC+WILL+MSDP
-    std::string source;
-    // Retrieve the answer.
-    std::getline(sArgs, source);
+    std::string source = args.getOriginal();
     // Get the size of the command.
     size_t sourceSize = source.size();
     // Prepare an index.
@@ -116,7 +118,10 @@ void ProcessTelnetCommand(Character * character, std::istream & sArgs)
             {
                 result.clear();
                 content += source[index];
-                Logger::log(LogLevel::Debug, "Content '%s'.", ToString(static_cast<int>(source[index])));
+                Logger::log(
+                    LogLevel::Debug,
+                    "Content '%s'.",
+                    ToString(static_cast<int>(source[index])));
             }
             index++;
         }

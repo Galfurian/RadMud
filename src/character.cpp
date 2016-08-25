@@ -30,7 +30,6 @@
 #include "constants.hpp"
 #include "lua/lua_script.hpp"
 #include "luabridge/LuaBridge.h"
-#include "command/command.hpp"
 
 #include "model/toolModel.hpp"
 #include "model/armorModel.hpp"
@@ -44,6 +43,8 @@
 #include "utilities/logger.hpp"
 
 #include "item/armorItem.hpp"
+
+#include "command/command.hpp"
 
 using namespace std;
 using namespace std::chrono;
@@ -794,12 +795,10 @@ Item * Character::findNearbyItem(std::string itemName, int & number)
     return item;
 }
 
-Item * Character::findNearbyTool(
-    const ToolType & toolType,
-    const std::vector<Item *> & exceptions,
-    bool searchRoom,
-    bool searchInventory,
-    bool searchEquipment)
+Item * Character::findNearbyTool(const ToolType & toolType, const std::vector<Item *> & exceptions,
+bool searchRoom,
+bool searchInventory,
+bool searchEquipment)
 {
     if (searchRoom)
     {
@@ -858,12 +857,10 @@ Item * Character::findNearbyTool(
     return nullptr;
 }
 
-bool Character::findNearbyTools(
-    std::set<ToolType> tools,
-    std::vector<Item *> & foundOnes,
-    bool searchRoom,
-    bool searchInventory,
-    bool searchEquipment)
+bool Character::findNearbyTools(std::set<ToolType> tools, std::vector<Item *> & foundOnes,
+bool searchRoom,
+bool searchInventory,
+bool searchEquipment)
 {
     // TODO: Prepare a map with key the tool type and as value:
     //  Option A: A bool which determine if the tool has been found.
@@ -1683,8 +1680,8 @@ Item * Character::createCorpse()
 
 void Character::doCommand(const string & command)
 {
-    std::istringstream is(command);
-    ProcessCommand(this, is);
+    ArgumentHandler argumentHandler(command);
+    ProcessCommand(this, argumentHandler);
 }
 
 Player * Character::toPlayer()

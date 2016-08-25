@@ -23,6 +23,11 @@
 #include "../profession.hpp"
 #include <iosfwd>
 
+#include "argumentHandler.hpp"
+
+/// @brief An action handler for the character.
+typedef std::function<void(Character * character, ArgumentHandler & args)> ActionHandler;
+
 /// @brief Contains all the informations concerning a command, including its handler.
 class Command
 {
@@ -87,9 +92,6 @@ class Command
         ActionHandler hndl;
 };
 
-/// @brief List of command arguments.
-typedef std::vector<std::pair<std::string, int> > ArgumentList;
-
 /// @defgroup ProcessStates Player state processing.
 /// @brief All the functions necessary to process players commands, from creation to gameplay.
 /// @{
@@ -97,46 +99,40 @@ typedef std::vector<std::pair<std::string, int> > ArgumentList;
 /// @brief Process commands when character is connected.
 /// @param character The character that execute the command.
 /// @param sArgs  Command arguments.
-void ProcessCommand(Character * character, std::istream &sArgs);
+void ProcessCommand(Character * character, ArgumentHandler & args);
 /// Check player name.
-void ProcessPlayerName(Character * character, std::istream & sArgs);
+void ProcessPlayerName(Character * character, ArgumentHandler & args);
 /// Check if the player password is correct.
-void ProcessPlayerPassword(Character * character, std::istream & sArgs);
+void ProcessPlayerPassword(Character * character, ArgumentHandler & args);
 /// Step 1  - Choose the Name.
-void ProcessNewName(Character * character, std::istream & sArgs);
+void ProcessNewName(Character * character, ArgumentHandler & args);
 /// Step 2  - Choose the Password.
-void ProcessNewPwd(Character * character, std::istream & sArgs);
+void ProcessNewPwd(Character * character, ArgumentHandler & args);
 /// Step 3  - Confirm the Password.
-void ProcessNewPwdCon(Character * character, std::istream & sArgs);
+void ProcessNewPwdCon(Character * character, ArgumentHandler & args);
 /// Step 4  - Short story of the mud world.
-void ProcessNewStory(Character * character, std::istream & sArgs);
+void ProcessNewStory(Character * character, ArgumentHandler & args);
 /// Step 5  - Choose the Race.
-void ProcessNewRace(Character * character, std::istream & sArgs);
+void ProcessNewRace(Character * character, ArgumentHandler & args);
 /// Step 6  - Choose the Attributes.
-void ProcessNewAttr(Character * character, std::istream & sArgs);
+void ProcessNewAttr(Character * character, ArgumentHandler & args);
 /// Step 7  - Choose the Gender.
-void ProcessNewGender(Character * character, std::istream & sArgs);
+void ProcessNewGender(Character * character, ArgumentHandler & args);
 /// Step 8  - Choose the Age.
-void ProcessNewAge(Character * character, std::istream & sArgs);
+void ProcessNewAge(Character * character, ArgumentHandler & args);
 /// Step 9  - Choose the description (optional).
-void ProcessNewDesc(Character * character, std::istream & sArgs);
+void ProcessNewDesc(Character * character, ArgumentHandler & args);
 /// Step 10 - Choose the Weight.
-void ProcessNewWeight(Character * character, std::istream & sArgs);
+void ProcessNewWeight(Character * character, ArgumentHandler & args);
 /// Step 11 - Confirm the character.
-void ProcessNewConfirm(Character * character, std::istream & sArgs);
+void ProcessNewConfirm(Character * character, ArgumentHandler & args);
 ///@}
 
 /// @brief Check if the executer of this command is a player.
 void NoMobile(Character * character);
 
-/// @brief Check if there is more input.
-void NoMore(Character * character, std::istream & sArgs);
-
 /// @brief Stop any action the character is executing.
 void StopAction(Character * character);
-
-/// @brief Parse the arguments inside the given stream.
-ArgumentList ParseArgs(std::istream & sArgs);
 
 /// @brief Load all the possible player states.
 void LoadStates();
@@ -170,205 +166,205 @@ void LoadCommands();
 /// Execute character movement.
 void DoDirection(Character * character, Direction direction);
 /// Allow the character to mote the continental map.
-void DoTravel(Character * character, std::istream & sArgs);
+void DoTravel(Character * character, ArgumentHandler & args);
 /// Disconnect the player from the Mud.
-void DoQuit(Character * character, std::istream & sArgs);
+void DoQuit(Character * character, ArgumentHandler & args);
 /// Shows a list of all the online players.
-void DoWho(Character * character, std::istream & sArgs);
+void DoWho(Character * character, ArgumentHandler & args);
 /// Allow to modify the character informations.
-void DoSet(Character * character, std::istream & sArgs);
+void DoSet(Character * character, ArgumentHandler & args);
 /// Stop the current action of the character.
-void DoStop(Character * character, std::istream & sArgs);
+void DoStop(Character * character, ArgumentHandler & args);
 /// The character look at: the current room, the near rooms, an object, a player, a character, and so on.
-void DoLook(Character * character, std::istream & sArgs);
+void DoLook(Character * character, ArgumentHandler & args);
 /// Provide a complete help on the mud.
-void DoHelp(Character * character, std::istream & sArgs);
+void DoHelp(Character * character, ArgumentHandler & args);
 /// Allow character to modify his prompt.
-void DoPrompt(Character * character, std::istream & sArgs);
+void DoPrompt(Character * character, ArgumentHandler & args);
 /// Report the current day phase.
-void DoTime(Character * character, std::istream & sArgs);
+void DoTime(Character * character, ArgumentHandler & args);
 /// Make the player stand up.
-void DoStand(Character * character, std::istream & sArgs);
+void DoStand(Character * character, ArgumentHandler & args);
 /// Make the player crouch.
-void DoCrouch(Character * character, std::istream & sArgs);
+void DoCrouch(Character * character, ArgumentHandler & args);
 /// Make the player sit.
-void DoSit(Character * character, std::istream & sArgs);
+void DoSit(Character * character, ArgumentHandler & args);
 /// Make the player prone.
-void DoProne(Character * character, std::istream & sArgs);
+void DoProne(Character * character, ArgumentHandler & args);
 /// Make the player lie down and rest.
-void DoRest(Character * character, std::istream & sArgs);
+void DoRest(Character * character, ArgumentHandler & args);
 /// Show player statistics.
-void DoStatistics(Character * character, std::istream & sArgs);
+void DoStatistics(Character * character, ArgumentHandler & args);
 /// Allow player to rent and disconnect.
-void DoRent(Character * character, std::istream & sArgs);
+void DoRent(Character * character, ArgumentHandler & args);
 /// Show player skills.
-void DoSkills(Character * character, std::istream & sArgs);
+void DoSkills(Character * character, ArgumentHandler & args);
 /// Show server informations and statistics.
-void DoServer(Character * character, std::istream & sArgs);
+void DoServer(Character * character, ArgumentHandler & args);
 /// Allow the character to pick up an object, or take an object from another one.
-void DoTake(Character * character, std::istream & sArgs);
+void DoTake(Character * character, ArgumentHandler & args);
 /// Allow the character to drop an object.
-void DoDrop(Character * character, std::istream & sArgs);
+void DoDrop(Character * character, ArgumentHandler & args);
 /// Allow the character to give an object to another character.
-void DoGive(Character * character, std::istream & sArgs);
+void DoGive(Character * character, ArgumentHandler & args);
 /// List all the item equipped by the character.
-void DoEquipments(Character * character, std::istream & sArgs);
+void DoEquipments(Character * character, ArgumentHandler & args);
 /// Wield a object, if it can be wielded.
-void DoWield(Character * character, std::istream & sArgs);
+void DoWield(Character * character, ArgumentHandler & args);
 /// Wear a object, if it can be weared.
-void DoWear(Character * character, std::istream & sArgs);
+void DoWear(Character * character, ArgumentHandler & args);
 /// Remove an equipped or wielded item.
-void DoRemove(Character * character, std::istream & sArgs);
+void DoRemove(Character * character, ArgumentHandler & args);
 /// List the character's inventory.
-void DoInventory(Character * character, std::istream & sArgs);
+void DoInventory(Character * character, ArgumentHandler & args);
 /// Organize the items in the room.
-void DoOrganize(Character * character, std::istream & sArgs);
+void DoOrganize(Character * character, ArgumentHandler & args);
 /// Open a door if not unlocked.
-void DoOpen(Character * character, std::istream & sArgs);
+void DoOpen(Character * character, ArgumentHandler & args);
 /// Close a door.
-void DoClose(Character * character, std::istream & sArgs);
+void DoClose(Character * character, ArgumentHandler & args);
 /// Put an object inside a container.
-void DoPut(Character * character, std::istream & sArgs);
+void DoPut(Character * character, ArgumentHandler & args);
 /// Drink from a container of liquids.
-void DoDrink(Character * character, std::istream & sArgs);
+void DoDrink(Character * character, ArgumentHandler & args);
 /// Fill a container of liquids from a source of liquid.
-void DoFill(Character * character, std::istream & sArgs);
+void DoFill(Character * character, ArgumentHandler & args);
 /// Pour the container of liquids into another one or on the ground.
-void DoPour(Character * character, std::istream & sArgs);
+void DoPour(Character * character, ArgumentHandler & args);
 /// Deposit a currency inside a shop.
-void DoDeposit(Character * character, std::istream & sArgs);
+void DoDeposit(Character * character, ArgumentHandler & args);
 /// Sell an item.
-void DoSell(Character * character, std::istream & sArgs);
+void DoSell(Character * character, ArgumentHandler & args);
 /// Buy an item.
-void DoBuy(Character * character, std::istream & sArgs);
+void DoBuy(Character * character, ArgumentHandler & args);
 /// Shows the total ammount of monney.
-void DoBalance(Character * character, std::istream & sArgs);
+void DoBalance(Character * character, ArgumentHandler & args);
 /// The character say something.
-void DoSay(Character * character, std::istream & sArgs);
+void DoSay(Character * character, ArgumentHandler & args);
 /// The character whisper something to someone, even in distance.
-void DoWhisper(Character * character, std::istream & sArgs);
+void DoWhisper(Character * character, ArgumentHandler & args);
 /// The character emote something.
-void DoEmote(Character * character, std::istream & sArgs);
+void DoEmote(Character * character, ArgumentHandler & args);
 /// The character report a bug.
-void DoBug(Character * character, std::istream & sArgs);
+void DoBug(Character * character, ArgumentHandler & args);
 /// The character send an idea.
-void DoIdea(Character * character, std::istream & sArgs);
+void DoIdea(Character * character, ArgumentHandler & args);
 /// The character report a typo.
-void DoTypo(Character * character, std::istream & sArgs);
+void DoTypo(Character * character, ArgumentHandler & args);
 /// The character read a book.
-void DoRead(Character * character, std::istream & sArgs);
+void DoRead(Character * character, ArgumentHandler & args);
 /// Engage in combat the desired target.
-void DoKill(Character * character, std::istream &sArgs);
+void DoKill(Character * character, ArgumentHandler & args);
 /// Try to flee from combat.
-void DoFlee(Character * character, std::istream &sArgs);
+void DoFlee(Character * character, ArgumentHandler & args);
 /// Provides the list of targets nearby.
-void DoAim(Character * character, std::istream & sArgs);
+void DoAim(Character * character, ArgumentHandler & args);
 /// Shutdown the Mud.
-void DoShutdown(Character * character, std::istream & sArgs);
+void DoShutdown(Character * character, ArgumentHandler & args);
 /// Save the Mud.
-void DoMudSave(Character * character, std::istream & sArgs);
+void DoMudSave(Character * character, ArgumentHandler & args);
 /// Go to the desired room.
-void DoGoTo(Character * character, std::istream & sArgs);
+void DoGoTo(Character * character, ArgumentHandler & args);
 /// Transfer a character from room to room.
-void DoTransfer(Character * character, std::istream & sArgs);
+void DoTransfer(Character * character, ArgumentHandler & args);
 /// Regain completely health and stamina.
-void DoFeast(Character * character, std::istream & sArgs);
+void DoFeast(Character * character, ArgumentHandler & args);
 /// Get information about a character.
-void DoGodInfo(Character * character, std::istream &sArgs);
+void DoGodInfo(Character * character, ArgumentHandler & args);
 /// Set a flag to a character.
-void DoSetFlag(Character * character, std::istream & sArgs);
+void DoSetFlag(Character * character, ArgumentHandler & args);
 /// Remove a flag from the character.
-void DoClearFlag(Character * character, std::istream & sArgs);
+void DoClearFlag(Character * character, ArgumentHandler & args);
 /// Show all the information fo the desired model.
-void DoModelInfo(Character * character, std::istream & sArgs);
+void DoModelInfo(Character * character, ArgumentHandler & args);
 /// Generate a new item from the vnum of a model.
-void DoItemCreate(Character * character, std::istream & sArgs);
+void DoItemCreate(Character * character, ArgumentHandler & args);
 /// Materialize an item from everywere.
-void DoItemGet(Character * character, std::istream & sArgs);
+void DoItemGet(Character * character, ArgumentHandler & args);
 /// Destroy an item.
-void DoItemDestroy(Character * character, std::istream & sArgs);
+void DoItemDestroy(Character * character, ArgumentHandler & args);
 /// Get information about an item.
-void DoItemInfo(Character * character, std::istream & sArgs);
+void DoItemInfo(Character * character, ArgumentHandler & args);
 /// Show the informations about an area.
-void DoAreaInfo(Character * character, std::istream & sArgs);
+void DoAreaInfo(Character * character, ArgumentHandler & args);
 /// Show the informations about a room.
-void DoRoomInfo(Character * character, std::istream & sArgs);
+void DoRoomInfo(Character * character, ArgumentHandler & args);
 /// Create a room in the given direction.
-void DoRoomCreate(Character * character, std::istream & sArgs);
+void DoRoomCreate(Character * character, ArgumentHandler & args);
 /// Delete a room in the given direction.
-void DoRoomDelete(Character * character, std::istream & sArgs);
+void DoRoomDelete(Character * character, ArgumentHandler & args);
 /// Edit a room name or description.
-void DoRoomEdit(Character * character, std::istream & sArgs);
+void DoRoomEdit(Character * character, ArgumentHandler & args);
 /// Kill the desired mobile, in the same room.
-void DoMobileKill(Character * character, std::istream &sArgs);
+void DoMobileKill(Character * character, ArgumentHandler & args);
 /// Reload the lua script for the target mobile, in the same room.
-void DoMobileReload(Character * character, std::istream &sArgs);
+void DoMobileReload(Character * character, ArgumentHandler & args);
 /// Show the mobile's log.
-void DoMobileLog(Character * character, std::istream &sArgs);
+void DoMobileLog(Character * character, ArgumentHandler & args);
 /// Hurt the desired target.
-void DoHurt(Character * character, std::istream &sArgs);
+void DoHurt(Character * character, ArgumentHandler & args);
 /// Became invisible.
-void DoInvisibility(Character * character, std::istream &sArgs);
+void DoInvisibility(Character * character, ArgumentHandler & args);
 /// Return visible.
-void DoVisible(Character * character, std::istream &sArgs);
+void DoVisible(Character * character, ArgumentHandler & args);
 /// Modify the value of the player skill.
-void DoModSkill(Character * character, std::istream &sArgs);
+void DoModSkill(Character * character, ArgumentHandler & args);
 /// Modify the value of the player attribute.
-void DoModAttr(Character * character, std::istream &sArgs);
+void DoModAttr(Character * character, ArgumentHandler & args);
 /// Provides the list of opponents of the given target.
-void DoAggroList(Character * character, std::istream &sArgs);
+void DoAggroList(Character * character, ArgumentHandler & args);
 /// Provide all the information regarding the given material.
-void DoMaterialInfo(Character * character, std::istream & sArgs);
+void DoMaterialInfo(Character * character, ArgumentHandler & args);
 /// Create the item with the given liquid inside a container.
-void DoLiquidCreate(Character * character, std::istream & sArgs);
+void DoLiquidCreate(Character * character, ArgumentHandler & args);
 /// Provide all the information regarding the given liquid.
-void DoLiquidInfo(Character * character, std::istream & sArgs);
+void DoLiquidInfo(Character * character, ArgumentHandler & args);
 /// Provide all the information regarding the given production.
-void DoProductionInfo(Character * character, std::istream & sArgs);
+void DoProductionInfo(Character * character, ArgumentHandler & args);
 /// Provide all the information regarding the given profession.
-void DoProfessionInfo(Character * character, std::istream & sArgs);
+void DoProfessionInfo(Character * character, ArgumentHandler & args);
 /// Shows the infos about a faction.
-void DoFactionInfo(Character * character, std::istream & sArgs);
+void DoFactionInfo(Character * character, ArgumentHandler & args);
 /// List all the model used to define items.
-void DoModelList(Character * character, std::istream & sArgs);
+void DoModelList(Character * character, ArgumentHandler & args);
 /// List all the items in the Mud.
-void DoItemList(Character * character, std::istream & sArgs);
+void DoItemList(Character * character, ArgumentHandler & args);
 /// List all the mobiles.
-void DoMobileList(Character * character, std::istream & sArgs);
+void DoMobileList(Character * character, ArgumentHandler & args);
 /// List all the players.
-void DoPlayerList(Character * character, std::istream & sArgs);
+void DoPlayerList(Character * character, ArgumentHandler & args);
 /// List all the areas.
-void DoAreaList(Character * character, std::istream & sArgs);
+void DoAreaList(Character * character, ArgumentHandler & args);
 /// List all the rooms.
-void DoRoomList(Character * character, std::istream & sArgs);
+void DoRoomList(Character * character, ArgumentHandler & args);
 /// List all the races.
-void DoRaceList(Character * character, std::istream & sArgs);
+void DoRaceList(Character * character, ArgumentHandler & args);
 /// List all the factions.
-void DoFactionList(Character * character, std::istream & sArgs);
+void DoFactionList(Character * character, ArgumentHandler & args);
 /// List all the skills.
-void DoSkillList(Character * character, std::istream & sArgs);
+void DoSkillList(Character * character, ArgumentHandler & args);
 /// List all the writings.
-void DoWritingList(Character * character, std::istream & sArgs);
+void DoWritingList(Character * character, ArgumentHandler & args);
 /// List all the corpses
-void DoCorpseList(Character * character, std::istream & sArgs);
+void DoCorpseList(Character * character, ArgumentHandler & args);
 /// List all the continents.
-void DoContinentList(Character * character, std::istream & sArgs);
+void DoContinentList(Character * character, ArgumentHandler & args);
 /// Get the list of materials.
-void DoMaterialList(Character * character, std::istream &sArgs);
+void DoMaterialList(Character * character, ArgumentHandler & args);
 /// Get the list of all the professions.
-void DoProfessionList(Character * character, std::istream & sArgs);
+void DoProfessionList(Character * character, ArgumentHandler & args);
 /// Get the list of all the productions.
-void DoProductionList(Character * character, std::istream & sArgs);
+void DoProductionList(Character * character, ArgumentHandler & args);
 /// Get the list of liquids.
-void DoLiquidList(Character * character, std::istream & sArgs);
+void DoLiquidList(Character * character, ArgumentHandler & args);
 /// Get the list of buildings.
-void DoBuildingList(Character * character, std::istream & sArgs);
+void DoBuildingList(Character * character, ArgumentHandler & args);
 /// Execute a profession.
-void DoProfession(Character * character, Profession * profession, std::istream &sArgs);
+void DoProfession(Character * character, Profession * profession, ArgumentHandler & args);
 /// Build something.
-void DoBuild(Character * character, std::istream &sArgs);
+void DoBuild(Character * character, ArgumentHandler & args);
 /// Deconstruct something.
-void DoDeconstruct(Character * character, std::istream &sArgs);
+void DoDeconstruct(Character * character, ArgumentHandler & args);
 /// Allows to assign a mobile to a task/building.
-void DoAssign(Character * character, std::istream & sArgs);
+void DoAssign(Character * character, ArgumentHandler & args);
 ///@}

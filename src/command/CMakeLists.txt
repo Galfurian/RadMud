@@ -8,6 +8,7 @@ set(RADMUD_COMMAND_INC
 #############################################
 # Command Source Files
 set(RADMUD_COMMAND_SRC
+	./src/command/argumentHandler.cpp
 	./src/command/command.cpp
 	./src/command/combat.cpp
 	./src/command/communication.cpp

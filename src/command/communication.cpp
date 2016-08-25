@@ -19,51 +19,26 @@
 #include "command.hpp"
 #include "../mud.hpp"
 
+#include "argumentHandler.hpp"
+
 using namespace std;
 
-void DoSay(Character * character, std::istream & sArgs)
+void DoSay(Character * character, ArgumentHandler & args)
 {
-    // //////////////////////////////////////////
-    // Retrieve the message.
-    std::string message;
-    getline(sArgs, message);
-    if (message.empty())
+    if (args.empty())
     {
         character->sendMsg("My dear friend, say what?\n");
         return;
     }
-
-    // //////////////////////////////////////////
-    // Retrieve the target, if the first word is one.
-    std::string target = "";
-    {
-        std::vector<std::string> arguments = GetWords(message);
-        if (arguments.size() <= 0)
-        {
-            character->sendMsg("My dear friend, say what?\n");
-            return;
-        }
-        target = arguments[0];
-    }
-
-    // //////////////////////////////////////////
-    // Extract the number, if the character has provided one.
-    int number = 1;
-    ExtractNumber(target, number);
-
-    // //////////////////////////////////////////
-    // Check if the speaker is invisible.
-    std::string chName =
-        (HasFlag(character->flags, CharacterFlag::Invisible)) ?
-            "Someone" : character->getNameCapital();
-
-    // //////////////////////////////////////////
     // Check if the character are talking to another character.
-    Character * receiver = character->room->findCharacter(target, number, { character });
+    Character * receiver = character->room->findCharacter(
+        args.get(0).getContent(),
+        args.get(0).getIndex(),
+        { character });
     if (receiver != nullptr)
     {
         // Get the rest of the message, minus the first word.
-        message = message.substr(target.size(), message.size());
+        auto message = args.substr(1);
         if (message.empty())
         {
             character->sendMsg("My dear friend, say what to %s?\n", receiver->getName());
@@ -80,14 +55,14 @@ void DoSay(Character * character, std::istream & sArgs)
         // Target receive.
         receiver->sendMsg(
             "%s say to you, \"%s\"\n\n",
-            chName,
+            character->getName(),
             Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
 
         // Send the message inside the room.
         character->room->sendToAll(
             "%s says to %s, \"%s\".\n",
             { character, receiver },
-            chName,
+            character->getName(),
             receiver->getName(),
             Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
         // If it's a mobile, activate the trigger.
@@ -100,56 +75,42 @@ void DoSay(Character * character, std::istream & sArgs)
     {
         character->sendMsg(
             "You say \"%s\".\n",
-            Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
+            Formatter::cyan() + Formatter::italic() + args.getOriginal() + Formatter::reset());
         // Send the message inside the room.
         character->room->sendToAll(
             "%s says \"%s\".\n",
             { character },
-            chName,
-            Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
+            character->getName(),
+            Formatter::cyan() + Formatter::italic() + args.getOriginal() + Formatter::reset());
     }
 }
 
-void DoWhisper(Character * character, std::istream & sArgs)
+void DoWhisper(Character * character, ArgumentHandler & args)
 {
-    // //////////////////////////////////////////
-    // Retrieve the target.
-    std::string target = "";
-    sArgs >> target >> std::ws;
-    if (target.empty())
+    if (args.empty())
     {
-        throw std::runtime_error("Whisper to whom?\n");
+        character->sendMsg("Whisper to whom?\n");
+        return;
     }
-
-    // //////////////////////////////////////////
-    // Extract the number, if the character has provided one.
-    int number = 1;
-    ExtractNumber(target, number);
-
-    // //////////////////////////////////////////
-    // Check if the speaker is invisible.
-    std::string chName =
-        (HasFlag(character->flags, CharacterFlag::Invisible)) ?
-            "Someone" : character->getNameCapital();
-
-    // //////////////////////////////////////////
     // Check the existance of the target character.
-    Character * receiver = character->room->findCharacter(target, number, { character });
+    Character * receiver = character->room->findCharacter(
+        args[0].getContent(),
+        args[0].getIndex(),
+        { character });
     if (receiver == nullptr)
     {
-        throw std::runtime_error("You don't see " + target + " here.\n");
+        character->sendMsg("You don't see %s here.\n", args[0].getContent());
+        return;
     }
-
-    // //////////////////////////////////////////
     // Retrieve the message.
-    std::string message;
-    getline(sArgs, message);
+    auto message = args.substr(1);
     if (message.empty())
     {
-        throw std::runtime_error("Whisper to " + target + " what?\n");
+        character->sendMsg("What do you want to whisper to %s?\n", receiver->getName());
+        return;
     }
-
-    // //////////////////////////////////////////
+    // Check if the sender is invisible.
+    auto sender = (receiver->canSee(character)) ? "Someone" : character->getNameCapital();
     // Send the message.
     character->sendMsg(
         "%sYou whisper to %s, %s\"%s\".\n",
@@ -159,60 +120,40 @@ void DoWhisper(Character * character, std::istream & sArgs)
         message);
     receiver->sendMsg(
         "%s whisper to you, %s\"%s\"\n\n",
-        Formatter::magenta() + chName,
+        Formatter::magenta() + sender,
         Formatter::reset(),
         message);
 }
 
-void DoEmote(Character * character, std::istream & sArgs)
+void DoEmote(Character * character, ArgumentHandler & args)
 {
-    // //////////////////////////////////////////
-    // Retrieve the emote.
-    std::string emote;
-    getline(sArgs, emote);
-    if (emote.empty())
+    if (args.empty())
     {
-        character->sendMsg("Emote what?\n");
+        character->sendMsg("My dear friend, emote what?\n");
         return;
     }
-
-    // //////////////////////////////////////////
-    // Check if the character is invisible.
-    std::string chName =
-        (HasFlag(character->flags, CharacterFlag::Invisible)) ?
-            "Someone" : character->getNameCapital();
-
-    // //////////////////////////////////////////
-    // Send the emote.
-    character->sendMsg("%sYou %s\n", Formatter::yellow(), emote + Formatter::reset());
-    // Send the message inside the room.
+    // Send the messages.
+    character->sendMsg("%sYou %s\n", Formatter::yellow(), args.getOriginal() + Formatter::reset());
     character->room->sendToAll(
         "%s %s\n",
         { character },
-        Formatter::yellow() + chName,
-        emote + Formatter::reset());
+        Formatter::yellow() + character->getName(),
+        args.getOriginal() + Formatter::reset());
 }
 
-void DoBug(Character * character, std::istream & sArgs)
+void DoBug(Character * character, ArgumentHandler & args)
 {
-    NoMobile(character);
-    vector<string> arguments;
-    string message;
-
-    getline(sArgs, message);
-
-    if (message.empty())
+    if (args.empty())
     {
         character->sendMsg("Writing nothing won't help us!\n");
         return;
     }
-
+    std::vector<std::string> arguments;
     arguments.push_back(character->getName()); // Author
     arguments.push_back(GetDate()); // Date.
     arguments.push_back("0"); // Type
     arguments.push_back(ToString(character->room->vnum)); // Location
-    arguments.push_back(message);
-
+    arguments.push_back(args.getOriginal());
     SQLiteDbms::instance().beginTransaction();
     if (!SQLiteDbms::instance().insertInto("Board", arguments))
     {
@@ -225,29 +166,22 @@ void DoBug(Character * character, std::istream & sArgs)
     character->sendMsg("# Author   :%s\n", character->getName());
     character->sendMsg("# Date     :%s\n", GetDate());
     character->sendMsg("# Location :%s\n", character->room->name);
-    character->sendMsg("# Message  :%s\n", message);
+    character->sendMsg("# Message  :%s\n", args.getOriginal());
 }
 
-void DoIdea(Character * character, std::istream & sArgs)
+void DoIdea(Character * character, ArgumentHandler & args)
 {
-    NoMobile(character);
-    vector<string> arguments;
-    string message;
-
-    getline(sArgs, message);
-
-    if (message.empty())
+    if (args.empty())
     {
-        character->sendMsg("Give us some ideas!\n");
+        character->sendMsg("Writing nothing won't help us!\n");
         return;
     }
-
+    std::vector<std::string> arguments;
     arguments.push_back(character->getName()); // Author
     arguments.push_back(GetDate()); // Date.
     arguments.push_back("1"); // Type
     arguments.push_back(ToString(character->room->vnum)); // Location
-    arguments.push_back(message);
-
+    arguments.push_back(args.getOriginal());
     SQLiteDbms::instance().beginTransaction();
     if (!SQLiteDbms::instance().insertInto("Board", arguments))
     {
@@ -256,31 +190,24 @@ void DoIdea(Character * character, std::istream & sArgs)
         return;
     }
     SQLiteDbms::instance().endTransaction();
-
     character->sendMsg("Idea posted on Board correctly.\n");
     character->sendMsg("# Author   :%s\n", character->getName());
-    character->sendMsg("# Message  :%s\n", message);
+    character->sendMsg("# Message  :%s\n", args.getOriginal());
 }
 
-void DoTypo(Character * character, std::istream & sArgs)
+void DoTypo(Character * character, ArgumentHandler & args)
 {
-    NoMobile(character);
-    vector<string> arguments;
-    string message;
-
-    getline(sArgs, message);
-
-    if (message.empty())
+    if (args.empty())
     {
         character->sendMsg("Writing nothing won't help us!\n");
         return;
     }
-
+    std::vector<std::string> arguments;
     arguments.push_back(character->getName()); // Author
     arguments.push_back(GetDate()); // Date.
     arguments.push_back("2"); // Type
     arguments.push_back(ToString(character->room->vnum)); // Location
-    arguments.push_back(message);
+    arguments.push_back(args.getOriginal());
 
     SQLiteDbms::instance().beginTransaction();
     if (!SQLiteDbms::instance().insertInto("Board", arguments))
@@ -295,5 +222,5 @@ void DoTypo(Character * character, std::istream & sArgs)
     character->sendMsg("# Author   :%s\n", character->getName());
     character->sendMsg("# Date     :%s\n", GetDate());
     character->sendMsg("# Location :%s\n", character->room->name);
-    character->sendMsg("# Message  :%s\n", message);
+    character->sendMsg("# Message  :%s\n", args.getOriginal());
 }
