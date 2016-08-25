@@ -121,6 +121,10 @@ class Item
         /// @param sheet The table that has to be filled.
         virtual void getSheet(Table & sheet) const;
 
+        /// @brief Check if the item can be deconstructed.
+        /// @brief error In case the item cannot be deconstructed, error contains the reason.
+        /// @return <b>True</b> if it can be deconstructed,<br>
+        ///         <b>False</b> otherwise.
         virtual bool canDeconstruct(std::string & error) const;
 
         /// @return Provides the type of item.
@@ -129,6 +133,10 @@ class Item
         /// @return Provides a string representing the type of item.
         std::string getTypeName() const;
 
+        /// @brief Check if the provided item can be stacked with this one.
+        /// @brief item The item to check.
+        /// @return <b>True</b> if it can be stacked,<br>
+        ///         <b>False</b> otherwise.
         bool canStackWith(Item * item) const;
 
         /// @brief Check if the item has the desired key.
@@ -187,7 +195,8 @@ class Item
         bool isAContainer() const;
 
         /// @brief Check if the container is empty.
-        /// @return <b>True</b> if the item is empty,<br><b>False</b> otherwise.
+        /// @return <b>True</b> if the item is empty,<br>
+        ///         <b>False</b> otherwise.
         bool isEmpty() const;
 
         /// @brief Return the total space of the container.
@@ -202,29 +211,42 @@ class Item
         /// @return The free unit of space as an integer.
         unsigned int getFreeSpace() const;
 
+        /// @brief Check if this item can contain the passed one.
+        /// @param item The item to check.
+        /// @return <b>True</b> if it can be contained,<br>
+        ///         <b>False</b> otherwise.
         bool canContain(Item * item) const;
 
         /// @brief Load an item inside the container and update the database.
-        /// @param item The item to load in.
+        /// @param item     The item to load in.
+        /// @param updateDB If the action has to be updated on the database.
         void putInside(Item * & item, bool updateDB = true);
 
         /// @brief Extract an item from the container.
         /// @param item The item to load in.
+        /// @param updateDB If the action has to be updated on the database.
         /// @return <b>True</b> if the item has been taken out,<br>
         ///         <b>False</b> otherwise.
         bool takeOut(Item * item, bool updateDB = true);
 
+        /// @brief Check if this item can contain the passed one.
+        /// @param liquid  The liquid to pour in.
+        /// @param ammount The ammount of liquid.
+        /// @return <b>True</b> if it can be contained,<br>
+        ///         <b>False</b> otherwise.
         bool canContain(Liquid * liquid, const unsigned int & ammount) const;
 
         /// @brief Load some liquid inside the container and update the database.
         /// @param liquid   The liquid to load in.
-        /// @param ammount The ammount of liquid.
+        /// @param ammount  The ammount of liquid.
+        /// @param updateDB If the action has to be updated on the database.
         /// @return <b>True</b> if the operation is a success,<br>
         ///         <b>False</b> otherwise.
         bool pourIn(Liquid * liquid, const unsigned int & ammount, bool updateDB = true);
 
         /// @brief Extract some liquid from the container and update the database.
-        /// @param ammount The ammount of liquid.
+        /// @param ammount  The ammount of liquid.
+        /// @param updateDB If the action has to be updated on the database.
         /// @return <b>True</b> if the operation is a success,<br><b>False</b> otherwise.
         bool pourOut(const unsigned int & ammount, bool updateDB = true);
 
@@ -269,4 +291,7 @@ class Item
         bool operator<(Item & rhs) const;
 };
 
+/// @brief Function which instantiate the item of the same type of the passed model.
+/// @param type The type of item.
+/// @return the generated item.
 Item * GenerateItem(const ModelType & type);
