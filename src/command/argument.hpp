@@ -1,4 +1,4 @@
-/// @file   argumentHandler.hpp
+/// @file   argument.hpp
 /// @author Enrico Fraccaroli
 /// @date   Aug 25, 2016
 /// @copyright
@@ -17,42 +17,37 @@
 
 #pragma once
 
-#include "argument.hpp"
+#include <string>
 
-#include <vector>
-
-class ArgumentHandler
+class Argument
 {
-    private:
-        /// The original string.
+    public:
+        /// The original argument string.
         std::string original;
-        /// List of arguments.
-        std::vector<Argument> arguments;
+        /// The string with both the index and the multiplier removed.
+        std::string content;
+        /// The provided index.
+        int index;
+        /// The provided multiplier.
+        unsigned int multiplier;
 
     public:
         /// @brief Constructor.
-        ArgumentHandler(const std::string & _original);
-
-        /// @brief Constructor.
-        ArgumentHandler(std::istream & _original);
+        Argument(const std::string & _original);
 
         /// @brief Destructor.
-        virtual ~ArgumentHandler();
+        virtual ~Argument();
 
-        std::string getOriginal();
+        std::string getOriginal() const;
 
-        size_t size() const;
+        std::string getContent() const;
 
-        bool empty() const;
+        int & getIndex();
 
-        Argument & get(const size_t & position);
-
-        Argument & operator[](const size_t & position);
-
-        std::string substr(const size_t & startingArgument);
-
-        void erase(const size_t & position);
+        unsigned int getMultiplier() const;
 
     private:
-        void evaluateArguments();
+        void evaluateIndex();
+
+        void evaluateMultiplier();
 };

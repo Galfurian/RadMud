@@ -16,15 +16,39 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#include "command.hpp"
+#include "crafting.hpp"
+
 #include "../mud.hpp"
 #include "../model/resourceModel.hpp"
 #include "../action/buildAction.hpp"
 #include "../action/craftAction.hpp"
 
-#include "argumentHandler.hpp"
-
-using namespace std;
+void LoadCraftingCommands()
+{
+    Command command;
+    command.level = 0;
+    {
+        command.name = "build";
+        command.help = "Build something.";
+        command.args = "(item)";
+        command.hndl = DoBuild;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "deconstruct";
+        command.help = "Deconstruct a building.";
+        command.args = "(building)";
+        command.hndl = DoDeconstruct;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "read";
+        command.help = "Read an inscription from an item.";
+        command.args = "(item)";
+        command.hndl = DoRead;
+        Mud::instance().addCommand(command);
+    }
+}
 
 void DoProfession(Character * character, Profession * profession, ArgumentHandler & args)
 {

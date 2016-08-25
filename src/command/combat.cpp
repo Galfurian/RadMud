@@ -1,5 +1,4 @@
 /// @file   combat.cpp
-/// @brief  Implements the methods used by the character in order to <b>fight</b>.
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2014
 /// @copyright
@@ -16,17 +15,35 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-// Basic Include.
-#include "command.hpp"
-#include "../room.hpp"
-#include "../constants.hpp"
-#include "../action/combat/combatAction.hpp"
-#include "../action/combat/basicAttack.hpp"
-#include "../action/combat/flee.hpp"
+#include "combat.hpp"
+#include "../mud.hpp"
 
-#include "argumentHandler.hpp"
-
-using namespace std;
+void LoadCombatCommands()
+{
+    Command command;
+    command.level = 0;
+    {
+        command.name = "kill";
+        command.help = "Engage in combat the desired target.";
+        command.args = "(target)";
+        command.hndl = DoKill;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "flee";
+        command.help = "Try to flee from combat.";
+        command.args = "";
+        command.hndl = DoFlee;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "aim";
+        command.help = "Provides the list of targets nearby.";
+        command.args = "";
+        command.hndl = DoAim;
+        Mud::instance().addCommand(command);
+    }
+}
 
 void DoKill(Character * character, ArgumentHandler & args)
 {

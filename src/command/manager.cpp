@@ -16,14 +16,23 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#include "command.hpp"
+#include "manager.hpp"
 
-#include "../room.hpp"
-#include "../mobile.hpp"
+#include "../mud.hpp"
 #include "../item/shopItem.hpp"
-#include "../sqlite/sqliteDbms.hpp"
 
-#include "argumentHandler.hpp"
+void LoadManagerCommands()
+{
+    Command command;
+    command.level = 0;
+    {
+        command.name = "assign";
+        command.help = "Allows to assign a mobile to a task/building.";
+        command.args = "(mobile)(building)";
+        command.hndl = DoAssign;
+        Mud::instance().addCommand(command);
+    }
+}
 
 void DoAssign(Character * character, ArgumentHandler & args)
 {

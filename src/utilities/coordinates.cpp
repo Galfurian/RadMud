@@ -16,10 +16,6 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-/// @brief Define operator <, less than.
-/// @param right The right parameter.
-/// @return True if left Coordinates are less than right Coordinates.
-
 #include "coordinates.hpp"
 
 #include "../utils.hpp"

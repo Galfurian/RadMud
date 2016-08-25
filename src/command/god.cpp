@@ -16,37 +16,390 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-// Basic Include.
-#include <istream>
-
-#include "command.hpp"
+#include "god.hpp"
 
 #include "../mud.hpp"
-#include "../defines.hpp"
-#include "../constants.hpp"
-#include "../utilities/table.hpp"
-#include "../model/armorModel.hpp"
-#include "../model/bookModel.hpp"
-#include "../model/containerModel.hpp"
-#include "../model/currencyModel.hpp"
-#include "../model/foodModel.hpp"
-#include "../model/furnitureModel.hpp"
-#include "../model/itemModel.hpp"
-#include "../model/keyModel.hpp"
-#include "../model/lightModel.hpp"
-#include "../model/liquidContainerModel.hpp"
-#include "../model/mechanismModel.hpp"
-#include "../model/nodeModel.hpp"
-#include "../model/projectileModel.hpp"
-#include "../model/resourceModel.hpp"
-#include "../model/ropeModel.hpp"
-#include "../model/seedModel.hpp"
-#include "../model/shieldModel.hpp"
-#include "../model/toolModel.hpp"
-#include "../model/vehicleModel.hpp"
-#include "../model/weaponModel.hpp"
 
-using namespace std;
+void LoadGodCommands()
+{
+    Command command;
+    command.level = 1;
+    {
+        command.name = "shutdown";
+        command.help = "Shut the MUD down.";
+        command.args = "";
+        command.hndl = DoShutdown;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "mudsave";
+        command.help = "Save the MUD.";
+        command.args = "";
+        command.hndl = DoMudSave;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "goto";
+        command.help = "Go to another room.";
+        command.args = "(Room.vnum)";
+        command.hndl = DoGoTo;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "hurt";
+        command.help = "Hurt the desired target.";
+        command.args = "(Target)";
+        command.hndl = DoHurt;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "invisibility";
+        command.help = "Became invisible.";
+        command.args = "";
+        command.hndl = DoInvisibility;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "visible";
+        command.help = "Return visible.";
+        command.args = "";
+        command.hndl = DoVisible;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "ginfo";
+        command.help = "Get information about a character.";
+        command.args = "(target)";
+        command.hndl = DoGodInfo;
+        Mud::instance().addCommand(command);
+    }
+
+    // Interaction with Players.
+    {
+        command.name = "aggrolist";
+        command.help = "Provides the list of opponents of the given target.";
+        command.args = "(Target)";
+        command.hndl = DoAggroList;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "transfer";
+        command.help = "Transfer another character here, or to another room.";
+        command.args = "(Target) [Where]";
+        command.hndl = DoTransfer;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "feast";
+        command.help = "Restores completely the health and the stamina of the target.";
+        command.args = "(Target)";
+        command.hndl = DoFeast;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "sflag";
+        command.help = "Sets a flag for a character.";
+        command.args = "(Target) (Flag)";
+        command.hndl = DoSetFlag;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "cflag";
+        command.help = "Remove a flag from a character.";
+        command.args = "(Target) (Flag)";
+        command.hndl = DoClearFlag;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "modskill";
+        command.help = "Modify the value of the player skill.";
+        command.args = "(Target) (Skill) (Value)";
+        command.hndl = DoModSkill;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "modattribute";
+        command.help = "Modify the value of the player attribute.";
+        command.args = "(Target) (Attribute) (Value)";
+        command.hndl = DoModAttr;
+        Mud::instance().addCommand(command);
+    }
+
+    // Item's Model.
+    {
+        command.name = "imodel";
+        command.help = "List all the information about a model.";
+        command.args = "(Model.vnum)";
+        command.hndl = DoModelInfo;
+        Mud::instance().addCommand(command);
+    }
+
+    // Items.
+    {
+        command.name = "iitem";
+        command.help = "Show information about an item.";
+        command.args = "(Item.vnum)";
+        command.hndl = DoItemInfo;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "citem";
+        command.help = "Create a new item, if not set the quality will be Normal.";
+        command.args = "(Model.vnum)(Material.vnum)[Quality]";
+        command.hndl = DoItemCreate;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "ditem";
+        command.help = "Destroy the desired object.";
+        command.args = "(Item.vnum)";
+        command.hndl = DoItemDestroy;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "gitem";
+        command.help = "Materialize the desired object.";
+        command.args = "(Item.vnum)";
+        command.hndl = DoItemGet;
+        Mud::instance().addCommand(command);
+    }
+
+    // Areas.
+    {
+        command.name = "iarea";
+        command.help = "Show the informations about a specific area.";
+        command.args = "(Area.vnum)";
+        command.hndl = DoAreaInfo;
+        Mud::instance().addCommand(command);
+    }
+
+    // Rooms.
+    {
+        command.name = "iroom";
+        command.help = "Show the informations about a specific room.";
+        command.args = "(Room.vnum)";
+        command.hndl = DoRoomInfo;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "croom";
+        command.help = "Create a room in the given direction.";
+        command.args = "(Direction)";
+        command.hndl = DoRoomCreate;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "droom";
+        command.help = "Delete the room in the given direction.";
+        command.args = "(Direction)";
+        command.hndl = DoRoomDelete;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "eroom";
+        command.help = "Change room values.";
+        command.args = "(Option) (Value)";
+        command.hndl = DoRoomEdit;
+        Mud::instance().addCommand(command);
+    }
+
+    // Mobiles.
+    {
+        command.name = "kmobile";
+        command.help = "Kill the desired mobile, in the same room.";
+        command.args = "(Mobile.name)";
+        command.hndl = DoMobileKill;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "rmobile";
+        command.help = "Reload the lua script for the target mobile, in the same room.";
+        command.args = "(Mobile.name)";
+        command.hndl = DoMobileReload;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "mobilelog";
+        command.help = "Given a mobile id, it returns the curresponding mobile log.";
+        command.args = "(Mobile.id)";
+        command.hndl = DoMobileLog;
+        Mud::instance().addCommand(command);
+    }
+
+    // Materials.
+    {
+        command.name = "imaterial";
+        command.help = "Show the informations about a specific material.";
+        command.args = "(Material.vnum)";
+        command.hndl = DoMaterialInfo;
+        Mud::instance().addCommand(command);
+    }
+
+    // Liquids.
+    {
+        command.name = "iliquid";
+        command.help = "Show the informations about a specific liquid.";
+        command.args = "(Liquid.vnum)";
+        command.hndl = DoLiquidInfo;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "cliquid";
+        command.help = "Materialize some liquid sinde a container.";
+        command.args = "(Container.name)(Liquid.vnum)(Quantity)";
+        command.hndl = DoLiquidCreate;
+        Mud::instance().addCommand(command);
+    }
+
+    // Productions.
+    {
+        command.name = "iproduction";
+        command.help = "Provide all the information regarding the given production.";
+        command.args = "(Production.vnum)";
+        command.hndl = DoProductionInfo;
+        Mud::instance().addCommand(command);
+    }
+
+    // Profession.
+    {
+        command.name = "iprofession";
+        command.help = "Provide all the information regarding the given profession.";
+        command.args = "(Profession.command)";
+        command.hndl = DoProfessionInfo;
+        Mud::instance().addCommand(command);
+    }
+
+    {
+        command.name = "ifaction";
+        command.help = "Shows the infos about a faction.";
+        command.args = "(vnum)";
+        command.hndl = DoFactionInfo;
+        Mud::instance().addCommand(command);
+    }
+
+    //
+    // LISTS
+    //
+    {
+        command.name = "lmodel";
+        command.help = "List all the models for the items.";
+        command.args = "";
+        command.hndl = DoModelList;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "litem";
+        command.help = "List all the items.";
+        command.args = "";
+        command.hndl = DoItemList;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "lmobile";
+        command.help = "List all the mobiles.";
+        command.args = "";
+        command.hndl = DoMobileList;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "lplayer";
+        command.help = "List all the players.";
+        command.args = "";
+        command.hndl = DoPlayerList;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "larea";
+        command.help = "List all the areas.";
+        command.args = "";
+        command.hndl = DoAreaList;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "lroom";
+        command.help = "List all the rooms.";
+        command.args = "";
+        command.hndl = DoRoomList;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "lrace";
+        command.help = "List all the races.";
+        command.args = "";
+        command.hndl = DoRaceList;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "lfaction";
+        command.help = "List all the factions.";
+        command.args = "";
+        command.hndl = DoFactionList;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "lskill";
+        command.help = "List all the skills.";
+        command.args = "";
+        command.hndl = DoSkillList;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "lwriting";
+        command.help = "List all the writings.";
+        command.args = "";
+        command.hndl = DoWritingList;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "lcorpse";
+        command.help = "List all the corpses.";
+        command.args = "";
+        command.hndl = DoCorpseList;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "lcontinent";
+        command.help = "List all the continents.";
+        command.args = "";
+        command.hndl = DoContinentList;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "lmaterial";
+        command.help = "List all the materials.";
+        command.args = "";
+        command.hndl = DoMaterialList;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "lprofession";
+        command.help = "Get the list of all the professions.";
+        command.args = "";
+        command.hndl = DoProfessionList;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "lproduction";
+        command.help = "Get the list of all the productions.";
+        command.args = "";
+        command.hndl = DoProductionList;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "lliquid";
+        command.help = "List all the liquids.";
+        command.args = "";
+        command.hndl = DoLiquidList;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "lbuild";
+        command.help = "List all the buildings.";
+        command.args = "";
+        command.hndl = DoBuildingList;
+        Mud::instance().addCommand(command);
+    }
+}
 
 void DoShutdown(Character * character, ArgumentHandler & /*args*/)
 {

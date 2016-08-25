@@ -16,12 +16,58 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+#include "communication.hpp"
+
 #include "command.hpp"
 #include "../mud.hpp"
 
-#include "argumentHandler.hpp"
-
-using namespace std;
+void LoadCommunicationCommands()
+{
+    Command command;
+    command.level = 0;
+    {
+        command.name = "say";
+        command.help = "Talk to people in the current room.";
+        command.args = "[someone] (something)";
+        command.hndl = DoSay;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "whisper";
+        command.help = "Whisper secretly to a single character.";
+        command.args = "(someone) (something)";
+        command.hndl = DoWhisper;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "emote";
+        command.help = "Execute and emote.";
+        command.args = "(emotion)";
+        command.hndl = DoEmote;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "bug";
+        command.help = "Report a bug, your character's name, location and date will be saved.";
+        command.args = "(message)";
+        command.hndl = DoBug;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "idea";
+        command.help = "Send an idea, try to be as clear as possible.";
+        command.args = "(message)";
+        command.hndl = DoIdea;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "typo";
+        command.help = "Report a typo.";
+        command.args = "(message)";
+        command.hndl = DoTypo;
+        Mud::instance().addCommand(command);
+    }
+}
 
 void DoSay(Character * character, ArgumentHandler & args)
 {

@@ -16,21 +16,143 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-// Basic Include.
-#include <istream>
-#include <time.h>
+#include "general.hpp"
 
-#include "command.hpp"
-// Other Include.
 #include "../mud.hpp"
-#include "../constants.hpp"
 #include "../action/moveAction.hpp"
-#include "../utilities/table.hpp"
-#include "../utilities/logger.hpp"
 
-#include "argumentHandler.hpp"
+void LoadGeneralCommands()
+{
+    Command command;
+    command.level = 0;
+    {
+        command.name = "quit";
+        command.help = "Leave the game.";
+        command.args = "";
+        command.hndl = DoQuit;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "who";
+        command.help = "List all the character online.";
+        command.args = "";
+        command.hndl = DoWho;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "set";
+        command.help = "Set some character texts(eg. descr).";
+        command.args = "(setting) (value)";
+        command.hndl = DoSet;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "stop";
+        command.help = "Stop the current character action.";
+        command.args = "";
+        command.hndl = DoStop;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "look";
+        command.help = "Look at something or someone.";
+        command.args = "[(something) or (someone)]";
+        command.hndl = DoLook;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "help";
+        command.help = "Show the list of commands or show help for a given command.";
+        command.args = "(command)";
+        command.hndl = DoHelp;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "prompt";
+        command.help = "Modify your prompt.";
+        command.args = "(help)|(prompt definition)";
+        command.hndl = DoPrompt;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "time";
+        command.help = "Give the current day phase.";
+        command.args = "";
+        command.hndl = DoTime;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "stand";
+        command.help = "Make the player stand.";
+        command.args = "";
+        command.hndl = DoStand;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "crouch";
+        command.help = "The player crouches down himself, it's a good stance for hiding.";
+        command.args = "";
+        command.hndl = DoCrouch;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "sit";
+        command.help = "The player sits down, ideal for a quick break.";
+        command.args = "";
+        command.hndl = DoSit;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "prone";
+        command.help = "The player starts prone, a perfect position to shoot long distance.";
+        command.args = "";
+        command.hndl = DoProne;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "rest";
+        command.help = "The player lies down and begin to rest.";
+        command.args = "";
+        command.hndl = DoRest;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "statistics";
+        command.help = "Show player statistics.";
+        command.args = "";
+        command.hndl = DoStatistics;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "rent";
+        command.help = "Allow player to rent and disconnect.";
+        command.args = "";
+        command.hndl = DoRent;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "skills";
+        command.help = "Shows the playes skills and their level.";
+        command.args = "";
+        command.hndl = DoSkills;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "server";
+        command.help = "Shows the server statistics.";
+        command.args = "";
+        command.hndl = DoServer;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "travel";
+        command.help = "Allow the character to travel between areas.";
+        command.args = "";
+        command.hndl = DoTravel;
+        Mud::instance().addCommand(command);
+    }
 
-using namespace std;
+}
 
 void DoDirection(Character * character, Direction direction)
 {
@@ -153,7 +275,7 @@ void DoWho(Character * character, ArgumentHandler & /*args*/)
         {
             continue;
         }
-        string location("Nowhere");
+        std::string location = "Nowhere";
         if (iterator->room != nullptr)
         {
             location = iterator->room->name;

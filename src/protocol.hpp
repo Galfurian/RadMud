@@ -42,5 +42,5 @@ void NegotiateProtocol(Character * character, const ConnectionState & nextState)
 
 /// @brief Input process function for handling telnet commands.
 /// @param character The character with which the protocol is negotiated.
-/// @param sArgs     The input stream containing from the character.
+/// @param args      The input stream containing from the character.
 void ProcessTelnetCommand(Character * character, ArgumentHandler & args);

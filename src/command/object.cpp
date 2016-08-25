@@ -16,20 +16,151 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#include "command.hpp"
+#include "object.hpp"
 
 #include "../mud.hpp"
-#include "../utilities/table.hpp"
 #include "../item/shopItem.hpp"
-
-#include "../model/liquidContainerModel.hpp"
 #include "../model/currencyModel.hpp"
+#include "../model/liquidContainerModel.hpp"
 
-#include "argumentHandler.hpp"
-
-#include <algorithm>
-
-using namespace std;
+void LoadObjectCommands()
+{
+    Command command;
+    command.level = 0;
+    {
+        command.name = "take";
+        command.help = "Take something from the ground or from a container.";
+        command.args = "(item) [(container)]";
+        command.hndl = DoTake;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "drop";
+        command.help = "Drop an object.";
+        command.args = "(item)";
+        command.hndl = DoDrop;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "give";
+        command.help = "Give an object to someone.";
+        command.args = "(item) (someone)";
+        command.hndl = DoGive;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "equipments";
+        command.help = "List all the items you are wearing.";
+        command.args = "";
+        command.hndl = DoEquipments;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "wield";
+        command.help = "Wield a weapon, a shield or maybe a tool.";
+        command.args = "(item)";
+        command.hndl = DoWield;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "wear";
+        command.help = "Puts on a piece of equipment.";
+        command.args = "(item)";
+        command.hndl = DoWear;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "remove";
+        command.help = "Remove a weared or wielded item.";
+        command.args = "(item)";
+        command.hndl = DoRemove;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "inventory";
+        command.help = "Show character's inventory.";
+        command.args = "";
+        command.hndl = DoInventory;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "organize";
+        command.help = "Order the desired container or if no target is passed, the room.";
+        command.args = "(name|weight) [(target)]";
+        command.hndl = DoOrganize;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "open";
+        command.help = "Open a door in a given direction.";
+        command.args = "(item)|(direction)";
+        command.hndl = DoOpen;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "close";
+        command.help = "Close a door in a given direction.";
+        command.args = "(item)|(direction)";
+        command.hndl = DoClose;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "put";
+        command.help = "Put something inside a container.";
+        command.args = "(something) (container)";
+        command.hndl = DoPut;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "drink";
+        command.help = "Drink from a container of liquids.";
+        command.args = "(container)";
+        command.hndl = DoDrink;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "fill";
+        command.help = "Fill a container of liquids from a source of liquid.";
+        command.args = "(container) (source)";
+        command.hndl = DoFill;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "pour";
+        command.help = "Pour the content of the container into another one or on the ground.";
+        command.args = "(container) [container]";
+        command.hndl = DoPour;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "deposit";
+        command.help = "Deposit a coin inside a shop.";
+        command.args = "(item) (shop)";
+        command.hndl = DoDeposit;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "sell";
+        command.help = "Sell an item to a shop keeper.";
+        command.args = "(item) (shop)";
+        command.hndl = DoSell;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "buy";
+        command.help = "Allows to buy an item from a shop.";
+        command.args = "(item) (shop)";
+        command.hndl = DoBuy;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "balance";
+        command.help = "Shows the character's balance.";
+        command.args = "";
+        command.hndl = DoBalance;
+        Mud::instance().addCommand(command);
+    }
+}
 
 void DoTake(Character * character, ArgumentHandler & args)
 {
@@ -411,7 +542,7 @@ void DoEquipments(Character * character, ArgumentHandler & /*args*/)
     auto right = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
     auto left = character->findEquipmentSlotItem(EquipmentSlot::LeftHand);
 
-    string output;
+    std::string output;
     // Print what is wearing.
     output += Formatter::yellow() + "#------------ Equipment -----------#\n" + Formatter::reset();
     // Equipment Slot : HEAD
