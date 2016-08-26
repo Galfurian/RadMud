@@ -31,16 +31,6 @@ CurrencyItem::~CurrencyItem()
     // Nothing to do.
 }
 
-ModelType CurrencyItem::getType() const
-{
-    return ModelType::Currency;
-}
-
-std::string CurrencyItem::getTypeName() const
-{
-    return "currency";
-}
-
 void CurrencyItem::getSheet(Table & sheet) const
 {
     // Call the function of the father class.

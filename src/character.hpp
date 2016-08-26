@@ -566,12 +566,16 @@ class Character
         /// @return The vector of targets.
         VectorHelper<Character *> luaGetTargets();
 
+        /// @brief Specific function used by lua to add an equipment item.
         void luaAddEquipment(Item * item);
 
+        /// @brief Specific function used by lua to remove an equipment item.
         bool luaRemEquipment(Item * item);
 
+        /// @brief Specific function used by lua to add an inventory item.
         void luaAddInventory(Item * item);
 
+        /// @brief Specific function used by lua to remove an inventory item.
         bool luaRemInventory(Item * item);
 
         /// @brief Function used to register inside the lua environment the class.

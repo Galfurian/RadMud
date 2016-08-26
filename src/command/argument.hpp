@@ -19,6 +19,7 @@
 
 #include <string>
 
+/// @brief Allows to easely manage input arguments from players.
 class Argument
 {
     public:
@@ -38,16 +39,22 @@ class Argument
         /// @brief Destructor.
         virtual ~Argument();
 
+        /// Provides the original argument.
         std::string getOriginal() const;
 
+        /// Provides the content with both index and multiplier removed.
         std::string getContent() const;
 
+        /// Provides the index.
         int & getIndex();
 
+        /// Provides the multiplier.
         unsigned int getMultiplier() const;
 
     private:
+        /// Evaluates the index.
         void evaluateIndex();
 
+        /// Evaluates the multiplier.
         void evaluateMultiplier();
 };

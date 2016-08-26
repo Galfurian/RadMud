@@ -41,11 +41,6 @@ void CorpseItem::removeFromMud()
     }
 }
 
-bool CorpseItem::createOnDB()
-{
-    return true;
-}
-
 bool CorpseItem::updateOnDB()
 {
     return true;

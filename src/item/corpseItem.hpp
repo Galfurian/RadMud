@@ -29,8 +29,6 @@ class CorpseItem: public Item
 
         virtual void removeFromMud();
 
-        virtual bool createOnDB();
-
         virtual bool updateOnDB();
 
         virtual bool removeOnDB();

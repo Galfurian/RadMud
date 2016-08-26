@@ -79,18 +79,24 @@ class Room
         /// @brief Constructor.
         Room();
 
-        /// @brief Copy Constructor.
+        /// @brief Destructor.
         ~Room();
 
-        /// @brief Destructor.
+        /// @brief Function used to check the correctness of the room.
+        /// @param complete If set to true, the function check if the room has
+        ///                  been placed inside an area or a continent.
+        /// @return <b>True</b> if the room values are correct,<br>
+        ///         <b>False</b> otherwise.
         bool check(bool complete = false);
 
         /// @brief In addition to adding the the passed item to room's items list.
-        /// @param item The item to add to the list.
+        /// @param item     The item to add to the list.
+        /// @param updateDB If <b>True</b> all the changes are also updated on DB.
         void addItem(Item * & item, bool updateDB = true);
 
         /// @brief Add the passed item to room's buildings list.
-        /// @param item The item to add to the list.
+        /// @param item     The building to add to the list.
+        /// @param updateDB If <b>True</b> all the changes are also updated on DB.
         void addBuilding(Item * item, bool updateDB = true);
 
         /// @brief Add the passed character to room's character list.
@@ -98,13 +104,15 @@ class Room
         void addCharacter(Character * character);
 
         /// @brief Remove the passed item from room's item list.
-        /// @param item The item to remove from the list.
+        /// @param item     The item to remove from the list.
+        /// @param updateDB If <b>True</b> all the changes are also updated on DB.
         /// @return <b>True</b> if the operation goes well,<br>
         ///         <b>False</b> otherwise.
         bool removeItem(Item * item, bool updateDB = true);
 
         /// @brief Remove the passed item from room's building list.
-        /// @param item The building to remove from the list.
+        /// @param item     The building to remove from the list.
+        /// @param updateDB If <b>True</b> all the changes are also updated on DB.
         /// @return <b>True</b> if the operation goes well,<br>
         ///         <b>False</b> otherwise.
         bool removeBuilding(Item * item, bool updateDB = true);
@@ -124,11 +132,13 @@ class Room
         std::vector<Mobile *> getAllMobile(Character * exception);
 
         /// @brief Save the room on database.
-        /// @return <b>True</b> if the execution goes well,<br><b>False</b> otherwise.
+        /// @return <b>True</b> if the execution goes well,<br>
+        ///         <b>False</b> otherwise.
         bool updateOnDB();
 
         /// @brief Remove the room from the database.
-        /// @return <b>True</b> if the execution goes well,<br><b>False</b> otherwise.
+        /// @return <b>True</b> if the execution goes well,<br>
+        ///         <b>False</b> otherwise.
         bool removeOnDB();
 
         /// @brief Search for the item in the room.

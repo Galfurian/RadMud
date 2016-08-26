@@ -20,6 +20,7 @@
 #include "argumentHandler.hpp"
 #include "../character.hpp"
 
+/// Loads all the combat commands.
 void LoadCombatCommands();
 
 /// @defgroup ComInterfaces Commands List Interface.

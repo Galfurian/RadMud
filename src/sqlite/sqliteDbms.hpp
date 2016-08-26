@@ -111,10 +111,13 @@ class SQLiteDbms
         ///         <b>False</b> Otherwise.
         bool updateInto(std::string table, QueryList value, QueryList where);
 
+        /// Updates all the connected players.
         bool updatePlayers();
 
+        /// Updates all the items.
         bool updateItems();
 
+        /// Update all the rooms.
         bool updateRooms();
 
         /// @brief Begin a transaction.

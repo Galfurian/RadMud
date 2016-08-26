@@ -20,6 +20,7 @@
 #include "argumentHandler.hpp"
 #include "../character.hpp"
 
+/// Loads all the crafring commands.
 void LoadCraftingCommands();
 
 /// @defgroup ComInterfaces Commands List Interface.

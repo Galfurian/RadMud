@@ -200,6 +200,7 @@ class ItemModel
         /// @param maker       The player that create the item.
         /// @param composition The composition of the item.
         /// @param itemQuality The quality of the item.
+        /// @param quantity    The quantity.
         /// @return The newly created item.
         virtual Item * createItem(
             std::string maker,
@@ -296,6 +297,7 @@ class ItemModel
         WeaponModel * toWeapon();
 };
 
+/// Generates a new model based on the provided type.
 ItemModel * GenerateModel(const ModelType & type);
 
 /// @defgroup FlagsToList Flags to List of Strings.
@@ -304,8 +306,5 @@ ItemModel * GenerateModel(const ModelType & type);
 
 /// Return a list of string containg the Model flags contained inside the value.
 std::string GetModelFlagString(unsigned int flags);
-
-/// Return the string describing the type of a Model.
-//std::string GetModelTypeName(ModelType type);
 
 /// @}

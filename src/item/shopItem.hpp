@@ -56,8 +56,13 @@ class ShopItem: public Item
         /// @param _shopKeeper The new shop keeper.
         void setNewShopKeeper(Mobile * _shopKeeper);
 
+        /// @brief Provides the balance of the shop.
         unsigned int getBalance() const;
 
+        /// Check if the shop can be used.
+        /// @param error In case it cannot be used, the reason is stored in this variable.
+        /// @return <b>True</b> if it can be used,<br>
+        ///         <b>False</b> otherwise.
         bool canUse(std::string & error);
 
         /// @brief Applies the buy tax to the item's price.

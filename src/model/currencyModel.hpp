@@ -24,35 +24,33 @@
 class CurrencyModel: public ItemModel
 {
     private:
-        struct Price
+        /// @brief Give a currency, this class is used to determine the value of the currency
+        ///         based on material and a pre-defined price.
+        class Price
         {
             public:
+                /// Material vnum.
                 int material;
+                /// The associated price.
                 unsigned int price;
-                Price(const int & _material, const unsigned int & _price) :
-                        material(_material),
-                        price(_price)
-                {
-                    // Nothing to do.
-                }
+
+                /// @brief Constructor.
+                /// @param _material The material.
+                /// @param _price    The price associated to the material.
+                Price(const int & _material, const unsigned int & _price);
+
                 /// @brief Operator used to order the prices.
-                bool operator>(const Price & rhs) const
-                {
-                    return price > rhs.price;
-                }
+                bool operator>(const Price & rhs) const;
+
                 /// @brief Operator used to order the prices.
-                bool operator==(const Price & rhs) const
-                {
-                    return price == rhs.price;
-                }
+                bool operator==(const Price & rhs) const;
+
                 /// @brief Operator used to order the prices.
-                bool operator==(const int & _rhs) const
-                {
-                    return material == _rhs;
-                }
+                bool operator==(const int & _rhs) const;
         };
 
     public:
+        /// All the prices defined for this currency.
         std::vector<Price> prices;
 
         CurrencyModel();
@@ -73,10 +71,24 @@ class CurrencyModel: public ItemModel
             const ItemQuality & itemQuality,
             const unsigned int & quantity);
 
+        /// @brief Add an entry to the prices.
+        /// @param materialVnum The vnum of the material.
+        /// @param price        The price associated to the material.
+        /// @return <b>True</b> if the price has been added,<br>
+        ///         <b>False</b> otherwise.
         bool addPrice(const int & materialVnum, const unsigned int & price);
 
+        /// @brief Given a specific material, this function returns the associated price.
+        /// @param materialVnum The vnum of the material.
+        /// @param price        Variable where the found price is saved.
+        /// @return <b>True</b> if the price has been found,<br>
+        ///         <b>False</b> otherwise.
         bool findPrice(const int & materialVnum, unsigned int & price) const;
 
+        /// @brief Generates an ammount of currency with a worth equal to the variable value.
+        /// @param maker Who has generated the currency.
+        /// @param value The total worth that has to be generate.
+        /// @return The list of generated currencies.
         std::vector<Item *> generateCurrency(const std::string & maker, const unsigned int & value);
 
     private:

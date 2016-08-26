@@ -20,6 +20,7 @@
 #include "argumentHandler.hpp"
 #include "../character.hpp"
 
+/// Loads all the commands concerning objects.
 void LoadObjectCommands();
 
 /// @defgroup ComInterfaces Commands List Interface.

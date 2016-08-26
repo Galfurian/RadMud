@@ -127,10 +127,10 @@ class Item
         ///         <b>False</b> otherwise.
         virtual bool canDeconstruct(std::string & error) const;
 
-        /// @return Provides the type of item.
+        /// Provides the type of item.
         ModelType getType() const;
 
-        /// @return Provides a string representing the type of item.
+        /// Provides a string representing the type of item.
         std::string getTypeName() const;
 
         /// @brief Check if the provided item can be stacked with this one.

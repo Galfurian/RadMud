@@ -20,6 +20,7 @@
 #include "argumentHandler.hpp"
 #include "../character.hpp"
 
+/// Loads all the commands used by gods.
 void LoadGodCommands();
 
 /// @defgroup ComInterfaces Commands List Interface.

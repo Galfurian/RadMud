@@ -20,6 +20,7 @@
 #include "argumentHandler.hpp"
 #include "../character.hpp"
 
+/// Loads all the commands used to communicate.
 void LoadCommunicationCommands();
 
 /// @defgroup ComInterfaces Commands List Interface.

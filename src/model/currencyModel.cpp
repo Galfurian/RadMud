@@ -21,14 +21,36 @@
 #include "../material.hpp"
 #include "../mud.hpp"
 
-CurrencyModel::CurrencyModel()
+CurrencyModel::Price::Price(const int & _material, const unsigned int & _price) :
+        material(_material),
+        price(_price)
 {
     // Nothing to do.
 }
 
+bool CurrencyModel::Price::operator>(const Price & rhs) const
+{
+    return price > rhs.price;
+}
+
+bool CurrencyModel::Price::operator==(const Price & rhs) const
+{
+    return price == rhs.price;
+}
+
+bool CurrencyModel::Price::operator==(const int & _rhs) const
+{
+    return material == _rhs;
+}
+
+CurrencyModel::CurrencyModel()
+{
+// Nothing to do.
+}
+
 CurrencyModel::~CurrencyModel()
 {
-    // Nothing to do.
+// Nothing to do.
 }
 
 ModelType CurrencyModel::getType() const
@@ -57,10 +79,10 @@ bool CurrencyModel::setModel(const std::string & source)
 
 void CurrencyModel::getSheet(Table & sheet) const
 {
-    // Call the function of the father class.
+// Call the function of the father class.
     ItemModel::getSheet(sheet);
-    // Add a divider.
-    //sheet.addDivider();
+// Add a divider.
+//sheet.addDivider();
 }
 
 Item * CurrencyModel::createItem(

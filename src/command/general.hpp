@@ -20,6 +20,7 @@
 #include "argumentHandler.hpp"
 #include "../character.hpp"
 
+/// Loads all the general commands.
 void LoadGeneralCommands();
 
 /// @defgroup ComInterfaces Commands List Interface.
