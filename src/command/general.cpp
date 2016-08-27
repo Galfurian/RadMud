@@ -158,14 +158,12 @@ void DoDirection(Character * character, Direction direction)
 {
     // Check if the player it's already doing something.
     StopAction(character);
-
     std::string error;
     if (!character->canMoveTo(direction, error))
     {
         character->sendMsg(error + "\n");
         return;
     }
-
     // ////////////////////////////////////////////////////////////////////////
     unsigned int speed;
     // Calculate the time needed to move.
@@ -190,7 +188,7 @@ void DoDirection(Character * character, Direction direction)
         return;
     }
 
-    std::shared_ptr<MoveAction> moveAction = std::make_shared<MoveAction>(
+    auto moveAction = std::make_shared<MoveAction>(
         character,
         character->room->findExit(direction)->destination,
         direction,
@@ -209,23 +207,19 @@ void DoTravel(Character * character, ArgumentHandler & /*args*/)
 {
     // Stop any ongoing action.
     StopAction(character);
-
     // Check if the room is a travel point.
     if (!HasFlag(character->room->flags, RoomFlag::TravelPoint))
     {
         throw std::runtime_error("You can't travel from here.\n");
     }
-
-    Room * destination = Mud::instance().findTravelPoint(character->room);
+    auto destination = Mud::instance().findTravelPoint(character->room);
     if (destination == nullptr)
     {
         throw std::runtime_error("You can't find an exit from here.\n");
     }
-
-    std::string msgDepart = character->getNameCapital() + " goes outside.\n";
-    std::string msgArrive = character->getNameCapital() + " enter the room.\n";
-    std::string msgChar = "You begin to travel...";
-
+    auto msgDepart = character->getNameCapital() + " goes outside.\n";
+    auto msgArrive = character->getNameCapital() + " enter the room.\n";
+    auto msgChar = "You begin to travel...";
     // Move character.
     character->moveTo(destination, msgDepart, msgArrive, msgChar);
 }
@@ -236,15 +230,12 @@ void DoQuit(Character * character, ArgumentHandler & /*args*/)
     NoMobile(character);
     // Stop any ongoing action.
     StopAction(character);
-
-    Player * player = character->toPlayer();
-
+    auto player = character->toPlayer();
     // If s/he finished connecting, tell others s/he has left.
     if (player->connection_state == ConnectionState::Playing)
     {
         // Say goodbye to player.
         player->sendMsg("See you next time!\n");
-
         if (player->room != nullptr)
         {
             // Send the message inside the room.
@@ -253,9 +244,7 @@ void DoQuit(Character * character, ArgumentHandler & /*args*/)
                 { character },
                 player->getName());
         }
-
         Logger::log(LogLevel::Global, "Player %s has left the game.", player->getName());
-
         // End of properly connected.
         player->closeConnection();
     }
@@ -266,7 +255,6 @@ void DoWho(Character * character, ArgumentHandler & /*args*/)
     Table table = Table();
     table.addColumn("Player", StringAlign::Left);
     table.addColumn("Location", StringAlign::Left);
-
     std::string output;
     for (auto iterator : Mud::instance().mudPlayers)
     {
@@ -282,10 +270,12 @@ void DoWho(Character * character, ArgumentHandler & /*args*/)
         }
         table.addRow( { iterator->getName(), location });
     }
-    output += table.getTable();
-    output += "# Total " + Formatter::yellow() + "Players" + Formatter::reset() + " :"
-        + ToString(table.getNumRows()) + "\n";
-    character->sendMsg(output);
+    character->sendMsg(table.getTable());
+    character->sendMsg(
+        "# Total %sPlayers%s: %s\n",
+        Formatter::yellow(),
+        Formatter::reset(),
+        ToString(table.getNumRows()));
 }
 
 void DoSet(Character * character, ArgumentHandler & args)
@@ -334,10 +324,8 @@ void DoLook(Character * character, ArgumentHandler & args)
     }
     else if (args.size() == 1)
     {
-        Character * target = character->room->findCharacter(
-            args[0].getContent(),
-            args[0].getIndex(),
-            { character });
+        auto target = character->room->findCharacter(args[0].getContent(), args[0].getIndex(), {
+            character });
         if (target)
         {
             if (character->canSee(target))
@@ -353,7 +341,7 @@ void DoLook(Character * character, ArgumentHandler & args)
                 return;
             }
         }
-        Item * item = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
+        auto item = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
         if (item)
         {
             character->sendMsg(item->getLook());
@@ -365,11 +353,9 @@ void DoLook(Character * character, ArgumentHandler & args)
     }
     else if (args.size() == 2)
     {
-        Character * target = character->room->findCharacter(
-            args[1].getContent(),
-            args[1].getIndex(),
-            { character });
-        Item * container = character->findNearbyItem(args[1].getContent(), args[1].getIndex());
+        auto target = character->room->findCharacter(args[1].getContent(), args[1].getIndex(), {
+            character });
+        auto container = character->findNearbyItem(args[1].getContent(), args[1].getIndex());
         if (target)
         {
             if (character->canSee(target))
@@ -398,7 +384,7 @@ void DoLook(Character * character, ArgumentHandler & args)
         {
             if (container->isAContainer())
             {
-                Item * item = container->findContent(args[0].getContent(), args[0].getIndex());
+                auto item = container->findContent(args[0].getContent(), args[0].getIndex());
                 if (item)
                 {
                     character->sendMsg(item->getLook());
@@ -436,7 +422,6 @@ void DoHelp(Character * character, ArgumentHandler & args)
         {
             commandTable.addColumn("", StringAlign::Left);
         }
-
         TableRow row;
         for (auto it : Mud::instance().mudCommands)
         {
@@ -501,7 +486,7 @@ void DoHelp(Character * character, ArgumentHandler & args)
 void DoPrompt(Character * character, ArgumentHandler & args)
 {
     NoMobile(character);
-    Player * player = character->toPlayer();
+    auto player = character->toPlayer();
     if (args.empty())
     {
         character->sendMsg("Current prompt:\n");
@@ -697,9 +682,9 @@ void DoStatistics(Character * character, ArgumentHandler & /*args*/)
 void DoRent(Character * character, ArgumentHandler & /*args*/)
 {
     NoMobile(character);
-    Player * player = character->toPlayer();
+    auto player = character->toPlayer();
     // Get the current room.
-    Room * room = player->room;
+    auto room = player->room;
     // Check if the room allow to rent.
     if (!HasFlag(room->flags, RoomFlag::Rent))
     {
@@ -716,7 +701,7 @@ void DoRent(Character * character, ArgumentHandler & /*args*/)
 void DoSkills(Character * character, ArgumentHandler & /*args*/)
 {
     NoMobile(character);
-    Player * player = character->toPlayer();
+    auto player = character->toPlayer();
     Table table = Table();
     table.addColumn("LvL", StringAlign::Left);
     table.addColumn("Skill", StringAlign::Left);
@@ -733,36 +718,27 @@ void DoSkills(Character * character, ArgumentHandler & /*args*/)
 
 void DoServer(Character * character, ArgumentHandler & /*args*/)
 {
-    character->sendMsg("    Mud         : RadMud.\n");
-    character->sendMsg("    Version     : " + kVersion + "\n");
-    character->sendMsg("    Uptime      : " + ToString(Mud::instance().getUpTime()) + " s\n");
-    character->sendMsg("\n");
-    character->sendMsg("    Players     : " + ToString(Mud::instance().mudPlayers.size()) + "\n");
-    character->sendMsg("    Mobiles     : " + ToString(Mud::instance().mudMobiles.size()) + "\n");
-    character->sendMsg("\n");
-    character->sendMsg(
-        "    Models      : " + ToString(Mud::instance().mudItemModels.size()) + "\n");
-    character->sendMsg("    Items       : " + ToString(Mud::instance().mudItems.size()) + "\n");
-    character->sendMsg("    Corpses     : " + ToString(Mud::instance().mudCorpses.size()) + "\n");
-    character->sendMsg("\n");
-    character->sendMsg(
-        "    Continents  : " + ToString(Mud::instance().mudContinents.size()) + "\n");
-    character->sendMsg("    Areas       : " + ToString(Mud::instance().mudAreas.size()) + "\n");
-    character->sendMsg("    Rooms       : " + ToString(Mud::instance().mudRooms.size()) + "\n");
-    character->sendMsg("\n");
-    character->sendMsg("    Races       : " + ToString(Mud::instance().mudRaces.size()) + "\n");
-    character->sendMsg("    Factions    : " + ToString(Mud::instance().mudFactions.size()) + "\n");
-    character->sendMsg("    Skills      : " + ToString(Mud::instance().mudSkills.size()) + "\n");
-    character->sendMsg("    Writings    : " + ToString(Mud::instance().mudWritings.size()) + "\n");
-    character->sendMsg("    Materials   : " + ToString(Mud::instance().mudMaterials.size()) + "\n");
-    character->sendMsg(
-        "    Professions : " + ToString(Mud::instance().mudProfessions.size()) + "\n");
-    character->sendMsg(
-        "    Productions : " + ToString(Mud::instance().mudProductions.size()) + "\n");
-    character->sendMsg("    Schematics  : " + ToString(Mud::instance().mudBuildings.size()) + "\n");
-    character->sendMsg("    Liquids     : " + ToString(Mud::instance().mudLiquids.size()) + "\n");
-    character->sendMsg("    News        : " + ToString(Mud::instance().mudNews.size()) + "\n");
-    character->sendMsg("\n");
-    character->sendMsg("    Commands    : " + ToString(Mud::instance().mudCommands.size()) + "\n");
-
+    std::string msg = "    Mud         : RadMud.\n";
+    msg += "    Version     : " + kVersion + "\n";
+    msg += "    Uptime      : " + ToString(Mud::instance().getUpTime()) + " s\n";
+    msg += "    Players     : " + ToString(Mud::instance().mudPlayers.size()) + "\n";
+    msg += "    Mobiles     : " + ToString(Mud::instance().mudMobiles.size()) + "\n";
+    msg += "    Models      : " + ToString(Mud::instance().mudItemModels.size()) + "\n";
+    msg += "    Items       : " + ToString(Mud::instance().mudItems.size()) + "\n";
+    msg += "    Corpses     : " + ToString(Mud::instance().mudCorpses.size()) + "\n";
+    msg += "    Continents  : " + ToString(Mud::instance().mudContinents.size()) + "\n";
+    msg += "    Areas       : " + ToString(Mud::instance().mudAreas.size()) + "\n";
+    msg += "    Rooms       : " + ToString(Mud::instance().mudRooms.size()) + "\n";
+    msg += "    Races       : " + ToString(Mud::instance().mudRaces.size()) + "\n";
+    msg += "    Factions    : " + ToString(Mud::instance().mudFactions.size()) + "\n";
+    msg += "    Skills      : " + ToString(Mud::instance().mudSkills.size()) + "\n";
+    msg += "    Writings    : " + ToString(Mud::instance().mudWritings.size()) + "\n";
+    msg += "    Materials   : " + ToString(Mud::instance().mudMaterials.size()) + "\n";
+    msg += "    Professions : " + ToString(Mud::instance().mudProfessions.size()) + "\n";
+    msg += "    Productions : " + ToString(Mud::instance().mudProductions.size()) + "\n";
+    msg += "    Schematics  : " + ToString(Mud::instance().mudBuildings.size()) + "\n";
+    msg += "    Liquids     : " + ToString(Mud::instance().mudLiquids.size()) + "\n";
+    msg += "    News        : " + ToString(Mud::instance().mudNews.size()) + "\n";
+    msg += "    Commands    : " + ToString(Mud::instance().mudCommands.size()) + "\n";
+    character->sendMsg(msg);
 }

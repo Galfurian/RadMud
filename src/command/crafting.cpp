@@ -58,7 +58,7 @@ void DoProfession(Character * character, Profession * profession, ArgumentHandle
         return;
     }
     // Search the production.
-    Production * production = Mud::instance().findProduction(args[0].getContent());
+    auto production = Mud::instance().findProduction(args[0].getContent());
     if (production == nullptr)
     {
         character->sendMsg("%s '%s'.\n", profession->notFoundMessage, args[0].getContent());
@@ -92,10 +92,12 @@ void DoProfession(Character * character, Profession * profession, ArgumentHandle
     // Search the needed workbench.
     if (production->workbench != ToolType::NoType)
     {
-        Item * workbench = character->findNearbyTool(production->workbench, std::vector<Item *>(),
-        true,
-        false,
-        false);
+        Item * workbench = character->findNearbyTool(
+            production->workbench,
+            std::vector<Item *>(),
+            true,
+            false,
+            false);
         if (workbench == nullptr)
         {
             character->sendMsg("The proper workbench is not present.\n");
@@ -124,7 +126,7 @@ void DoProfession(Character * character, Profession * profession, ArgumentHandle
 
     // //////////////////////////////////////////
     // Prepare the action.
-    std::shared_ptr<CraftAction> craftAction = std::make_shared<CraftAction>(
+    auto craftAction = std::make_shared<CraftAction>(
         character,
         production,
         craftMaterial,
@@ -139,14 +141,12 @@ void DoProfession(Character * character, Profession * profession, ArgumentHandle
     }
     // Set the new action.
     character->setAction(craftAction);
-
     // //////////////////////////////////////////
+    // Send the messages.
     character->sendMsg(
         "%s %s.\n",
         profession->startMessage,
         Formatter::yellow() + production->outcome->getName() + Formatter::reset());
-
-    // Send the message inside the room.
     character->room->sendToAll(
         "%s has started %s something...\n",
         { character },
@@ -161,7 +161,7 @@ void DoBuild(Character * character, ArgumentHandler & args)
         character->sendMsg("What do you want to build?\n");
         return;
     }
-    Building * schematics = Mud::instance().findBuilding(args[0].getContent());
+    auto schematics = Mud::instance().findBuilding(args[0].getContent());
     if (schematics == nullptr)
     {
         character->sendMsg("You don't know how to build '%s'.\n", args[0].getContent());
@@ -239,7 +239,7 @@ void DoBuild(Character * character, ArgumentHandler & args)
 
     // //////////////////////////////////////////
     // Prepare the action.
-    std::shared_ptr<BuildAction> buildAction = std::make_shared<BuildAction>(
+    auto buildAction = std::make_shared<BuildAction>(
         character,
         schematics,
         building,
@@ -254,17 +254,17 @@ void DoBuild(Character * character, ArgumentHandler & args)
     }
     // Set the new action.
     character->setAction(buildAction);
-
     // //////////////////////////////////////////
     character->sendMsg(
         "You start building %s.\n",
         Formatter::yellow() + schematics->buildingModel->getName() + Formatter::reset());
 
     // //////////////////////////////////////////
-    std::string roomMsg;
-    roomMsg += character->name + " has started building something...\n";
     // Send the message inside the room.
-    character->room->sendToAll(roomMsg, { character });
+    character->room->sendToAll(
+        "%s has started building something...\n",
+        { character },
+        character->getNameCapital());
 }
 
 void DoDeconstruct(Character * character, ArgumentHandler & args)
@@ -274,7 +274,7 @@ void DoDeconstruct(Character * character, ArgumentHandler & args)
         character->sendMsg("What do you want to deconstruct, sai?\n");
         return;
     }
-    Item * item = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
+    auto item = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
     if (item == nullptr)
     {
         character->sendMsg("You can't find want you to deconstruct.\n");
@@ -306,13 +306,13 @@ void DoRead(Character * character, ArgumentHandler & args)
         character->sendMsg("What do you want to read today, sai?\n");
         return;
     }
-    Item * item = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
+    auto item = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
     if (item == nullptr)
     {
         character->sendMsg("You can't find want you to read.\n");
         return;
     }
-    Writing * writing = Mud::instance().findWriting(item->vnum);
+    auto writing = Mud::instance().findWriting(item->vnum);
     if (writing == nullptr)
     {
         character->sendMsg("There is nothing written on %s.\n", item->getName());

@@ -43,13 +43,13 @@ void DoAssign(Character * character, ArgumentHandler & args)
         character->sendMsg("You need to specify who you want assign to which building.\n");
         return;
     }
-    Mobile * mobile = character->room->findMobile(args[0].getContent(), args[0].getIndex(), { });
+    auto mobile = character->room->findMobile(args[0].getContent(), args[0].getIndex(), { });
     if (mobile == nullptr)
     {
         character->sendMsg("You don't see that person.\n");
         return;
     }
-    Item * building = character->room->findBuilding(args[1].getContent(), args[1].getIndex());
+    auto building = character->room->findBuilding(args[1].getContent(), args[1].getIndex());
     if (building == nullptr)
     {
         character->sendMsg("You don't see the desired building here.\n");
@@ -57,7 +57,7 @@ void DoAssign(Character * character, ArgumentHandler & args)
     }
     if (building->getType() == ModelType::Shop)
     {
-        ShopItem * shop = building->toShopItem();
+        auto shop = building->toShopItem();
         if (mobile->managedItem != nullptr)
         {
             if (mobile->managedItem == shop)

@@ -900,35 +900,34 @@ void DoRoomDelete(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
-
     // Check the number of arguments.
     if (args.size() != 1)
     {
         character->sendMsg("Usage: [direction]\n");
         return;
     }
-    Area * currentArea = character->room->area;
+    auto currentArea = character->room->area;
     if (currentArea == nullptr)
     {
         character->sendMsg("Your room's area has not been defined!\n");
         return;
     }
     // Check if it's a direction.
-    Direction direction = Mud::instance().findDirection(args[0].getContent(), false);
+    auto direction = Mud::instance().findDirection(args[0].getContent(), false);
     if (direction == Direction::None)
     {
         character->sendMsg("You must insert a valid direction!\n");
         return;
     }
     // Get the coordinate modifier.
-    Coordinates targetCoord = character->room->coord + direction.getCoordinates();
-    if (!currentArea->inBoundaries(targetCoord))
+    auto coord = character->room->coord + direction.getCoordinates();
+    if (!currentArea->inBoundaries(coord))
     {
         character->sendMsg("Sorry but in that direction you will go outside the boundaries.\n");
         return;
     }
     // Find the room.
-    Room * targetRoom = currentArea->getRoom(targetCoord);
+    auto targetRoom = currentArea->getRoom(coord);
     if (targetRoom == nullptr)
     {
         character->sendMsg("Sorry but in that direction there is no room.\n");
@@ -947,25 +946,17 @@ void DoRoomDelete(Character * character, ArgumentHandler & args)
         character->sendMsg("You cannot remove the room.\n");
         return;
     }
-
     // Delete completely the room.
     delete (targetRoom);
-
     character->sendMsg("You have destroyed the room at coordinates :\n");
-    std::string msg = "    [";
-    msg += ToString(targetCoord.x) + ";";
-    msg += ToString(targetCoord.y) + ";";
-    msg += ToString(targetCoord.z) + "]\n";
-    character->sendMsg(msg);
+    character->sendMsg("[%s;%s;%s]\n", ToString(coord.x), ToString(coord.y), ToString(coord.z));
 }
 
 void DoRoomEdit(Character * character, ArgumentHandler & args)
 {
-    NoMobile(character);
-    Player * player = character->toPlayer();
     if (args.empty())
     {
-        player->sendMsg("What do you want to edit?\n");
+        character->sendMsg("What do you want to edit?\n");
         return;
     }
     if (args[0].getContent() == "des")
@@ -973,74 +964,74 @@ void DoRoomEdit(Character * character, ArgumentHandler & args)
         auto input = args.substr(1);
         if (input.empty())
         {
-            player->sendMsg("You can't set an empty description.\n");
+            character->sendMsg("You can't set an empty description.\n");
             return;
         }
         QueryList value = { std::make_pair("description", input) };
-        QueryList where = { std::make_pair("vnum", ToString(player->room->vnum)) };
+        QueryList where = { std::make_pair("vnum", ToString(character->room->vnum)) };
         if (!SQLiteDbms::instance().updateInto("Room", value, where))
         {
-            player->sendMsg("Command gone wrong.\n");
+            character->sendMsg("Command gone wrong.\n");
             return;
         }
-        player->room->description = input;
-        player->sendMsg("Room description modified.\n");
+        character->room->description = input;
+        character->sendMsg("Room description modified.\n");
     }
     else if (args[0].getContent() == "ter")
     {
         auto input = args.substr(1);
         if (input.empty())
         {
-            player->sendMsg("You can't set an empty terrain.\n");
+            character->sendMsg("You can't set an empty terrain.\n");
             return;
         }
         QueryList value = { std::make_pair("terrain", input) };
-        QueryList where = { std::make_pair("vnum", ToString(player->room->vnum)) };
+        QueryList where = { std::make_pair("vnum", ToString(character->room->vnum)) };
         if (!SQLiteDbms::instance().updateInto("Room", value, where))
         {
-            player->sendMsg("Command gone wrong.\n");
+            character->sendMsg("Command gone wrong.\n");
             return;
         }
-        player->room->terrain = input;
-        player->sendMsg("Room terrain modified.\n");
+        character->room->terrain = input;
+        character->sendMsg("Room terrain modified.\n");
     }
     else if (args[0].getContent() == "nam")
     {
         auto input = args.substr(1);
         if (input.empty())
         {
-            player->sendMsg("You can't set an empty name.\n");
+            character->sendMsg("You can't set an empty name.\n");
             return;
         }
         QueryList value = { std::make_pair("name", input) };
-        QueryList where = { std::make_pair("vnum", ToString(player->room->vnum)) };
+        QueryList where = { std::make_pair("vnum", ToString(character->room->vnum)) };
         if (!SQLiteDbms::instance().updateInto("Room", value, where))
         {
-            player->sendMsg("Command gone wrong.\n");
+            character->sendMsg("Command gone wrong.\n");
             return;
         }
-        player->room->name = input;
-        player->sendMsg("Room name modified.\n");
+        character->room->name = input;
+        character->sendMsg("Room name modified.\n");
     }
     else if (args[0].getContent() == "sflag")
     {
         auto input = args.substr(1);
         if (input.empty())
         {
-            player->sendMsg("Wrong flag.\n");
+            character->sendMsg("Wrong flag.\n");
             return;
         }
         if (input == "R")
         {
-            SetFlag(player->room->flags, RoomFlag::Rent);
+            SetFlag(character->room->flags, RoomFlag::Rent);
         }
         else if (input == "P")
         {
-            SetFlag(player->room->flags, RoomFlag::Peaceful);
+            SetFlag(character->room->flags, RoomFlag::Peaceful);
         }
         else
         {
-            player->sendMsg("Not a valid flag.\n");
+            character->sendMsg("Not a valid flag.\n");
         }
     }
     else if (args[0].getContent() == "cflag")
@@ -1048,38 +1039,39 @@ void DoRoomEdit(Character * character, ArgumentHandler & args)
         auto input = args.substr(1);
         if (input.empty())
         {
-            player->sendMsg("Wrong flag.\n");
+            character->sendMsg("Wrong flag.\n");
             return;
         }
         if (input == "R")
         {
-            ClearFlag(player->room->flags, RoomFlag::Rent);
+            ClearFlag(character->room->flags, RoomFlag::Rent);
         }
         else if (input == "P")
         {
-            ClearFlag(player->room->flags, RoomFlag::Peaceful);
+            ClearFlag(character->room->flags, RoomFlag::Peaceful);
         }
         else
         {
-            player->sendMsg("Not a valid flag.\n");
+            character->sendMsg("Not a valid flag.\n");
         }
     }
     else
     {
-        player->sendMsg("Usage:                           \n");
-        player->sendMsg("|  Argument  |  Text            |\n");
-        player->sendMsg("| ---------- | ---------------- |\n");
-        player->sendMsg("|  nam       |  [name]          |\n");
-        player->sendMsg("|  ter       |  [terrain]       |\n");
-        player->sendMsg("|  des       |  [description]   |\n");
-        player->sendMsg("|  sflag     |  [Set Flag]      |\n");
-        player->sendMsg("|            |   R -> kRent     |\n");
-        player->sendMsg("|            |   P -> kPeaceful |\n");
-        player->sendMsg("|  cflag     |  [Clear Flag]    |\n");
-        player->sendMsg("|            |   R -> kRent     |\n");
-        player->sendMsg("|            |   P -> kPeaceful |\n");
-        player->sendMsg("| ---------- | ---------------- |\n");
-        return;
+        std::string msg;
+        msg += "Usage:                           \n";
+        msg += "|  Argument  |  Text            |\n";
+        msg += "| ---------- | ---------------- |\n";
+        msg += "|  nam       |  [name]          |\n";
+        msg += "|  ter       |  [terrain]       |\n";
+        msg += "|  des       |  [description]   |\n";
+        msg += "|  sflag     |  [Set Flag]      |\n";
+        msg += "|            |   R -> kRent     |\n";
+        msg += "|            |   P -> kPeaceful |\n";
+        msg += "|  cflag     |  [Clear Flag]    |\n";
+        msg += "|            |   R -> kRent     |\n";
+        msg += "|            |   P -> kPeaceful |\n";
+        msg += "| ---------- | ---------------- |\n";
+        character->sendMsg(msg);
     }
 }
 
@@ -1090,7 +1082,7 @@ void DoMobileKill(Character * character, ArgumentHandler & args)
         character->sendMsg("You must provide a target mobile.\n");
         return;
     }
-    Mobile * mobile = character->room->findMobile(args[0].getContent(), args[0].getIndex(), { });
+    auto mobile = character->room->findMobile(args[0].getContent(), args[0].getIndex(), { });
     if (mobile == nullptr)
     {
         character->sendMsg("Mobile not found.\n");
@@ -1110,7 +1102,7 @@ void DoMobileReload(Character * character, ArgumentHandler & args)
         character->sendMsg("You must provide a target mobile.\n");
         return;
     }
-    Mobile * mobile = character->room->findMobile(args[0].getContent(), args[0].getIndex(), { });
+    auto mobile = character->room->findMobile(args[0].getContent(), args[0].getIndex(), { });
     if (mobile == nullptr)
     {
         character->sendMsg("Mobile not found.\n");
@@ -1128,7 +1120,7 @@ void DoMobileLog(Character * character, ArgumentHandler & args)
         character->sendMsg("You must provide a mobile id.\n");
         return;
     }
-    Mobile * mobile = Mud::instance().findMobile(args[0].getContent());
+    auto mobile = Mud::instance().findMobile(args[0].getContent());
     if (mobile == nullptr)
     {
         character->sendMsg("Mobile not found.\n");
@@ -1141,16 +1133,12 @@ void DoMobileLog(Character * character, ArgumentHandler & args)
 
 void DoHurt(Character * character, ArgumentHandler & args)
 {
-
     if (args.size() != 1)
     {
         character->sendMsg("Who do you want to hurt?\n");
         return;
     }
-    Character * target = character->room->findCharacter(
-        args[0].getContent(),
-        args[0].getIndex(),
-        { });
+    auto target = character->room->findCharacter(args[0].getContent(), args[0].getIndex(), { });
     if (target == nullptr)
     {
         character->sendMsg("Target not found.\n");
@@ -1201,13 +1189,13 @@ void DoModSkill(Character * character, ArgumentHandler & args)
         character->sendMsg("Usage: [target] [#skill] [+/-VALUE]\n");
         return;
     }
-    Player * target = character->room->findPlayer(args[0].getContent(), args[0].getIndex(), { });
+    auto target = character->room->findPlayer(args[0].getContent(), args[0].getIndex(), { });
     if (target == nullptr)
     {
         character->sendMsg("Target not found.\n");
         return;
     }
-    Skill * skill = Mud::instance().findSkill(ToNumber<int>(args[1].getContent()));
+    auto skill = Mud::instance().findSkill(ToNumber<int>(args[1].getContent()));
     if (skill == nullptr)
     {
         character->sendMsg("Cannot find the desired skill.\n");
@@ -1219,7 +1207,7 @@ void DoModSkill(Character * character, ArgumentHandler & args)
         character->sendMsg("You must insert a valid modifier.\n");
         return;
     }
-    int modified = static_cast<int>(target->skills[skill->vnum]) + modifier;
+    auto modified = static_cast<int>(target->skills[skill->vnum]) + modifier;
     if (modified <= 0)
     {
         character->sendMsg("You cannot reduce the skill level to 0 or below.\n");
@@ -1233,7 +1221,6 @@ void DoModSkill(Character * character, ArgumentHandler & args)
     // Change the skill value.
     target->skills[skill->vnum] = static_cast<unsigned int>(modified);
     // Notify.
-    std::string msg;
     character->sendMsg(
         "You have successfully %s by %s the \"%s\" skill, the new level is %s.\n",
         ((modifier > 0) ? "increased " : "decreased"),
@@ -1246,7 +1233,6 @@ void DoModAttr(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
-
     // Check the number of arguments.
     if (args.size() != 3)
     {
@@ -1369,7 +1355,7 @@ void DoLiquidCreate(Character * character, ArgumentHandler & args)
         character->sendMsg("Usage: [Item] [Liquid] [Quantity].\n");
         return;
     }
-    Item * item = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
+    auto item = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
     if (item == nullptr)
     {
         character->sendMsg("Can't find the desire item.\n");
@@ -1380,13 +1366,13 @@ void DoLiquidCreate(Character * character, ArgumentHandler & args)
         character->sendMsg("The item is not a container of liquids.\n");
         return;
     }
-    Liquid * liquid = Mud::instance().findLiquid(ToNumber<int>(args[1].getContent()));
+    auto liquid = Mud::instance().findLiquid(ToNumber<int>(args[1].getContent()));
     if (liquid == nullptr)
     {
         character->sendMsg("Can't find the desire liquid.\n");
         return;
     }
-    int quantity = ToNumber<int>(args[2].getContent());
+    auto quantity = ToNumber<int>(args[2].getContent());
     if ((quantity <= 0) || (quantity >= 100))
     {
         character->sendMsg("You must insert a valid quantity of liquids between 1 and 99.\n");
@@ -1406,25 +1392,21 @@ void DoLiquidCreate(Character * character, ArgumentHandler & args)
 
 void DoLiquidInfo(Character * character, ArgumentHandler & args)
 {
-
     if (args.size() != 1)
     {
         character->sendMsg("You must provide a liquid vnum.\n");
         return;
     }
-    Liquid * liquid = Mud::instance().findLiquid(ToNumber<int>(args[0].getContent()));
+    auto liquid = Mud::instance().findLiquid(ToNumber<int>(args[0].getContent()));
     if (liquid == nullptr)
     {
         character->sendMsg("Can't find the desire liquid.\n");
         return;
     }
     std::string msg;
-    msg += Formatter::yellow() + "Vnum            " + Formatter::reset() + ": "
-        + ToString(liquid->vnum) + "\n";
-    msg += Formatter::yellow() + "Name            " + Formatter::reset() + ": "
-        + liquid->getNameCapital() + "\n";
-    msg += Formatter::yellow() + "Worth           " + Formatter::reset() + ": "
-        + ToString(liquid->worth) + "\n";
+    msg += "Vnum  : " + ToString(liquid->vnum) + "\n";
+    msg += "Name  : " + liquid->getNameCapital() + "\n";
+    msg += "Worth : " + ToString(liquid->worth) + "\n";
     character->sendMsg(msg);
 }
 
@@ -1468,7 +1450,6 @@ void DoProductionInfo(Character * character, ArgumentHandler & args)
 
 void DoProfessionInfo(Character * character, ArgumentHandler & args)
 {
-
     if (args.size() != 1)
     {
         character->sendMsg("You must provide a profession name.\n");
@@ -1481,34 +1462,22 @@ void DoProfessionInfo(Character * character, ArgumentHandler & args)
         return;
     }
     std::string msg;
-    msg += Formatter::yellow() + "Name          " + Formatter::reset() + ": " + profession->name
-        + "\n";
-    msg += Formatter::yellow() + "Description   " + Formatter::reset() + ": "
-        + profession->description + "\n";
-    msg += Formatter::yellow() + "Command       " + Formatter::reset() + ": " + profession->command
-        + "\n";
-    msg += Formatter::yellow() + "Posture       " + Formatter::reset() + ": "
-        + GetPostureName(profession->posture) + "\n";
-    msg += Formatter::yellow() + "Action        " + Formatter::reset() + ": " + profession->action
-        + "\n";
-    msg += Formatter::yellow() + "    Start     " + Formatter::reset() + ": "
-        + profession->startMessage + "\n";
-    msg += Formatter::yellow() + "    Finish    " + Formatter::reset() + ": "
-        + profession->finishMessage + "\n";
-    msg += Formatter::yellow() + "    Success   " + Formatter::reset() + ": "
-        + profession->successMessage + "\n";
-    msg += Formatter::yellow() + "    Failure   " + Formatter::reset() + ": "
-        + profession->failureMessage + "\n";
-    msg += Formatter::yellow() + "    Interrupt " + Formatter::reset() + ": "
-        + profession->interruptMessage + "\n";
-    msg += Formatter::yellow() + "    Not Found " + Formatter::reset() + ": "
-        + profession->notFoundMessage + "\n";
+    msg += "Name          : " + profession->name + "\n";
+    msg += "Description   : " + profession->description + "\n";
+    msg += "Command       : " + profession->command + "\n";
+    msg += "Posture       : " + GetPostureName(profession->posture) + "\n";
+    msg += "Action        : " + profession->action + "\n";
+    msg += "    Start     : " + profession->startMessage + "\n";
+    msg += "    Finish    : " + profession->finishMessage + "\n";
+    msg += "    Success   : " + profession->successMessage + "\n";
+    msg += "    Failure   : " + profession->failureMessage + "\n";
+    msg += "    Interrupt : " + profession->interruptMessage + "\n";
+    msg += "    Not Found : " + profession->notFoundMessage + "\n";
     character->sendMsg(msg);
 }
 
 void DoFactionInfo(Character * character, ArgumentHandler & args)
 {
-
     if (args.size() != 1)
     {
         character->sendMsg("You must insert a valide faction vnum.\n");
@@ -1530,7 +1499,6 @@ void DoFactionInfo(Character * character, ArgumentHandler & args)
 
 void DoModelList(Character * character, ArgumentHandler & /*args*/)
 {
-
     Table table;
     table.addColumn("VNUM", StringAlign::Right);
     table.addColumn("NAME", StringAlign::Left);
@@ -1555,7 +1523,6 @@ void DoModelList(Character * character, ArgumentHandler & /*args*/)
 
 void DoItemList(Character * character, ArgumentHandler & /*args*/)
 {
-
     Table table;
     table.addColumn("Vnum", StringAlign::Right);
     table.addColumn("Name", StringAlign::Left);
@@ -1595,7 +1562,6 @@ void DoItemList(Character * character, ArgumentHandler & /*args*/)
 
 void DoMobileList(Character * character, ArgumentHandler & /*args*/)
 {
-
     Table table;
     table.addColumn("ALIVE", StringAlign::Center);
     table.addColumn("ID", StringAlign::Left);
@@ -1625,7 +1591,6 @@ void DoMobileList(Character * character, ArgumentHandler & /*args*/)
 
 void DoPlayerList(Character * character, ArgumentHandler & /*args*/)
 {
-
     Table table;
     table.addColumn("NAME", StringAlign::Left);
     table.addColumn("ROOM", StringAlign::Left);
@@ -1648,7 +1613,6 @@ void DoPlayerList(Character * character, ArgumentHandler & /*args*/)
 
 void DoAreaList(Character * character, ArgumentHandler & /*args*/)
 {
-
     Table table;
     table.addColumn("VNUM", StringAlign::Center);
     table.addColumn("NAME", StringAlign::Left);
@@ -1673,7 +1637,6 @@ void DoAreaList(Character * character, ArgumentHandler & /*args*/)
 
 void DoRoomList(Character * character, ArgumentHandler & /*args*/)
 {
-
     Table table;
     table.addColumn("VNUM", StringAlign::Center);
     table.addColumn("AREA", StringAlign::Left);
@@ -1707,7 +1670,6 @@ void DoRoomList(Character * character, ArgumentHandler & /*args*/)
 
 void DoRaceList(Character * character, ArgumentHandler & /*args*/)
 {
-
     Table table;
     table.addColumn("VNUM", StringAlign::Center);
     table.addColumn("NAME", StringAlign::Left);
@@ -1738,7 +1700,6 @@ void DoRaceList(Character * character, ArgumentHandler & /*args*/)
 
 void DoFactionList(Character * character, ArgumentHandler & /*args*/)
 {
-
     Table table;
     table.addColumn("VNUM", StringAlign::Center);
     table.addColumn("NAME", StringAlign::Left);
@@ -1756,7 +1717,6 @@ void DoFactionList(Character * character, ArgumentHandler & /*args*/)
 
 void DoSkillList(Character * character, ArgumentHandler & /*args*/)
 {
-
     Table table;
     table.addColumn("VNUM", StringAlign::Center);
     table.addColumn("NAME", StringAlign::Left);
@@ -1776,7 +1736,6 @@ void DoSkillList(Character * character, ArgumentHandler & /*args*/)
 
 void DoWritingList(Character * character, ArgumentHandler & /*args*/)
 {
-
     Table table;
     table.addColumn("VNUM", StringAlign::Center);
     table.addColumn("AUTHOR", StringAlign::Left);
@@ -1797,7 +1756,6 @@ void DoWritingList(Character * character, ArgumentHandler & /*args*/)
 
 void DoCorpseList(Character * character, ArgumentHandler & /*args*/)
 {
-
     Table table;
     table.addColumn("VNUM", StringAlign::Right);
     table.addColumn("NAME", StringAlign::Left);
@@ -1838,7 +1796,6 @@ void DoContinentList(Character * /*character*/, ArgumentHandler & /*args*/)
 
 void DoMaterialList(Character * character, ArgumentHandler & /*args*/)
 {
-
     Table table;
     table.addColumn("VNUM", StringAlign::Right);
     table.addColumn("TYPE", StringAlign::Center);
@@ -1864,7 +1821,6 @@ void DoMaterialList(Character * character, ArgumentHandler & /*args*/)
 
 void DoProfessionList(Character * character, ArgumentHandler & /*args*/)
 {
-
     Table table;
     table.addColumn("NAME", StringAlign::Center);
     table.addColumn("COMMAND", StringAlign::Center);
@@ -1886,7 +1842,6 @@ void DoProfessionList(Character * character, ArgumentHandler & /*args*/)
 
 void DoProductionList(Character * character, ArgumentHandler & /*args*/)
 {
-
     Table table;
     table.addColumn("VNUM", StringAlign::Center);
     table.addColumn("NAME", StringAlign::Center);
@@ -1908,7 +1863,6 @@ void DoProductionList(Character * character, ArgumentHandler & /*args*/)
 
 void DoLiquidList(Character * character, ArgumentHandler & /*args*/)
 {
-
     Table table;
     table.addColumn("VNUM", StringAlign::Center);
     table.addColumn("NAME", StringAlign::Right);

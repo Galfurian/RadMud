@@ -77,7 +77,7 @@ void DoSay(Character * character, ArgumentHandler & args)
         return;
     }
     // Check if the character are talking to another character.
-    Character * receiver = character->room->findCharacter(
+    auto receiver = character->room->findCharacter(
         args.get(0).getContent(),
         args.get(0).getIndex(),
         { character });
@@ -139,10 +139,8 @@ void DoWhisper(Character * character, ArgumentHandler & args)
         return;
     }
     // Check the existance of the target character.
-    Character * receiver = character->room->findCharacter(
-        args[0].getContent(),
-        args[0].getIndex(),
-        { character });
+    auto receiver = character->room->findCharacter(args[0].getContent(), args[0].getIndex(), {
+        character });
     if (receiver == nullptr)
     {
         character->sendMsg("You don't see %s here.\n", args[0].getContent());

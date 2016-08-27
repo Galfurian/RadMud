@@ -407,7 +407,6 @@ void DoDrop(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
-
     // Check the number of arguments.
     if (args.size() == 0)
     {
@@ -494,7 +493,7 @@ void DoGive(Character * character, ArgumentHandler & args)
         character->sendMsg("You don't have that item.\n");
         return;
     }
-    Character * target = character->room->findCharacter(args[1].getContent(), args[1].getIndex(), {
+    auto target = character->room->findCharacter(args[1].getContent(), args[1].getIndex(), {
         character });
     if (target == nullptr)
     {
@@ -541,7 +540,6 @@ void DoEquipments(Character * character, ArgumentHandler & /*args*/)
     auto feet = character->findEquipmentSlotItem(EquipmentSlot::Feet);
     auto right = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
     auto left = character->findEquipmentSlotItem(EquipmentSlot::LeftHand);
-
     std::string output;
     // Print what is wearing.
     output += Formatter::yellow() + "#------------ Equipment -----------#\n" + Formatter::reset();
@@ -673,25 +671,22 @@ void DoWield(Character * character, ArgumentHandler & args)
     // Equip the item.
     character->addEquipmentItem(item);
     // Show the proper message.
-    std::string message = "You wield " + Formatter::cyan() + ToLower(item->getName())
-        + Formatter::reset() + " ";
+    auto object = Formatter::cyan() + ToLower(item->getName()) + Formatter::reset();
+    auto where = "with your " + item->getCurrentSlotName();
+    auto whereOthers = character->getPossessivePronoun() + " " + item->getCurrentSlotName();
     if (HasFlag(item->model->modelFlags, ModelFlag::TwoHand))
     {
-        message += "with both your hands.\n";
+        where = "both your hands";
+        whereOthers = "both " + character->getPossessivePronoun() + " hands";
     }
-    else
-    {
-        message += "with your " + item->getCurrentSlotName() + ".\n";
-    }
-    character->sendMsg(message);
+    character->sendMsg("You wield %s with %s.\n", object, where);
     // Send the message inside the room.
     character->room->sendToAll(
-        "%s wields %s in %s %s.\n",
+        "%s wields %s with %s.\n",
         { character },
         character->getNameCapital(),
         Formatter::cyan() + ToLower(item->getName()) + Formatter::reset(),
-        character->getPossessivePronoun(),
-        ToLower(item->getCurrentSlotName()));
+        whereOthers);
 }
 
 void DoWear(Character * character, ArgumentHandler & args)
@@ -711,7 +706,7 @@ void DoWear(Character * character, ArgumentHandler & args)
     }
     if (args[0].getContent() == "all")
     {
-        bool wearedSomething = false;
+        auto wearedSomething = false;
         auto untouchedList = character->inventory;
         for (auto iterator : untouchedList)
         {
@@ -742,7 +737,6 @@ void DoWear(Character * character, ArgumentHandler & args)
             character->getSubjectPronoun());
         return;
     }
-
     auto item = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
     // Check if the item is null.
     if (item == nullptr)
@@ -777,7 +771,9 @@ void DoWear(Character * character, ArgumentHandler & args)
     character->addEquipmentItem(item);
     // Notify to character.
     character->sendMsg(
-        "You wear " + Formatter::cyan() + ToLower(item->getName()) + Formatter::reset() + ".\n");
+        "You wear %s on your %s.\n",
+        Formatter::cyan() + ToLower(item->getName()) + Formatter::reset(),
+        ToLower(item->getCurrentSlotName()));
     // Send the message inside the room.
     character->room->sendToAll(
         "%s wears %s on %s %s.\n",
@@ -841,8 +837,9 @@ void DoRemove(Character * character, ArgumentHandler & args)
     character->addInventoryItem(item);
     // Notify the character.
     character->sendMsg(
-        "You remove %s.\n",
-        Formatter::cyan() + ToLower(item->getName()) + Formatter::reset());
+        "You remove %s from your %s.\n",
+        Formatter::cyan() + ToLower(item->getName()) + Formatter::reset(),
+        ToLower(item->getCurrentSlotName()));
     // Send the message inside the room.
     character->room->sendToAll(
         "%s removes %s from %s %s.\n",
@@ -870,11 +867,13 @@ void DoInventory(Character * character, ArgumentHandler & /*args*/)
         table.addRow( { it->getNameCapital(), ToString(it->quantity), ToString(it->getWeight()) });
     }
     character->sendMsg(table.getTable());
-    std::string carried = ToString(character->getCarryingWeight());
-    std::string maximum = ToString(character->getMaxCarryingWeight());
     character->sendMsg(
-        Formatter::yellow() + "\nTotal carrying weight: " + Formatter::reset() + carried + " of "
-            + maximum + Formatter::reset() + " " + mud_measure + ".\n");
+        "\n%sTotal carrying weight%s: %s of %s %s.\n",
+        Formatter::yellow(),
+        Formatter::reset(),
+        ToString(character->getCarryingWeight()),
+        ToString(character->getMaxCarryingWeight()),
+        mud_measure);
 }
 
 void DoOrganize(Character * character, ArgumentHandler & args)
@@ -887,7 +886,7 @@ void DoOrganize(Character * character, ArgumentHandler & args)
         character->sendMsg("Organize what?\n");
         return;
     }
-    ItemContainer::Order order;
+    auto order = ItemContainer::Order::ByName;
     if (BeginWith("name", ToLower(args[0].getContent())))
     {
         order = ItemContainer::Order::ByName;
@@ -896,18 +895,15 @@ void DoOrganize(Character * character, ArgumentHandler & args)
     {
         order = ItemContainer::Order::ByWeight;
     }
-    else
+    else if (BeginWith("price", ToLower(args[0].getContent())))
     {
-        character->sendMsg("You can organize by: name, weight,...\n");
-        return;
+        order = ItemContainer::Order::ByPrice;
     }
-
+    auto name = ItemContainer::orderToString(order);
     if (args.size() == 1)
     {
         character->room->items.orderBy(order);
-        character->sendMsg(
-            "You have organized the room by %s.\n",
-            ItemContainer::orderToString(order));
+        character->sendMsg("You have organized the room by %s.\n", name);
     }
     else if (args.size() == 2)
     {
@@ -922,19 +918,14 @@ void DoOrganize(Character * character, ArgumentHandler & args)
             {
                 container->content.orderBy(order);
                 // Organize the target container.
-                character->sendMsg(
-                    "You have organized %s, by %s.\n",
-                    container->getName(),
-                    ItemContainer::orderToString(order));
+                character->sendMsg("You have organized %s, by %s.\n", container->getName(), name);
             }
         }
         else if (BeginWith("inventory", args[1].getContent()))
         {
             character->inventory.orderBy(order);
             // Organize the target container.
-            character->sendMsg(
-                "You have organized your inventory, by %s.\n",
-                ItemContainer::orderToString(order));
+            character->sendMsg("You have organized your inventory, by %s.\n", name);
         }
         else
         {
@@ -958,17 +949,17 @@ void DoOpen(Character * character, ArgumentHandler & args)
         return;
     }
     // Check if the character want to open something in onother direction.
-    Direction direction = Mud::instance().findDirection(args[0].getContent(), false);
+    auto direction = Mud::instance().findDirection(args[0].getContent(), false);
     if (direction != Direction::None)
     {
         // Check if the direction exists.
-        std::shared_ptr<Exit> roomExit = character->room->findExit(direction);
+        auto roomExit = character->room->findExit(direction);
         if (roomExit == nullptr)
         {
             character->sendMsg("There is nothing in that direction.\n");
             return;
         }
-        Room * destination = roomExit->destination;
+        auto destination = roomExit->destination;
         if (destination == nullptr)
         {
             character->sendMsg("There is nothing in that direction.\n");
@@ -1076,17 +1067,17 @@ void DoClose(Character * character, ArgumentHandler & args)
         return;
     }
     // Check if the character want to open something in onother direction.
-    Direction direction = Mud::instance().findDirection(args[0].getContent(), false);
+    auto direction = Mud::instance().findDirection(args[0].getContent(), false);
     if (direction != Direction::None)
     {
         // Check if the direction exists.
-        std::shared_ptr<Exit> roomExit = character->room->findExit(direction);
+        auto roomExit = character->room->findExit(direction);
         if (roomExit == nullptr)
         {
             character->sendMsg("There is nothing in that direction.\n");
             return;
         }
-        Room * destination = roomExit->destination;
+        auto destination = roomExit->destination;
         if (destination == nullptr)
         {
             character->sendMsg("There is nothing in that direction.\n");
@@ -1113,9 +1104,7 @@ void DoClose(Character * character, ArgumentHandler & args)
             character->sendMsg("There are someone on the way, you can't close the door.\n");
             return;
         }
-
         SetFlag(door->flags, ItemFlag::Closed);
-
         // Display message.
         if (HasFlag(roomExit->flags, ExitFlag::Hidden))
         {
@@ -1231,7 +1220,6 @@ void DoPut(Character * character, ArgumentHandler & args)
         character->sendMsg("You don't have anything to put in a container.");
         return;
     }
-
     // Check if the player wants to put all in the container.
     if (args[0].getContent() == "all")
     {
@@ -1343,7 +1331,7 @@ void DoDrink(Character * character, ArgumentHandler & args)
         return;
     }
     // Take out the liquid.
-    Liquid * liquid = container->contentLiq.first;
+    auto liquid = container->contentLiq.first;
     if (!container->pourOut(1))
     {
         character->sendMsg(
@@ -1418,7 +1406,6 @@ void DoFill(Character * character, ArgumentHandler & args)
         character->sendMsg("You have first to open %s.\n", container->getName());
         return;
     }
-
     // Check if the items are suitable source and container of liquids.
     if (container->model->getType() != ModelType::LiquidContainer)
     {
@@ -1441,7 +1428,6 @@ void DoFill(Character * character, ArgumentHandler & args)
     // Get the liquid from the source and eventually from the container.
     auto sourLiquid = source->contentLiq.first;
     auto contLiquid = container->contentLiq.first;
-
     // Check compatibility between liquids.
     if (contLiquid != nullptr)
     {
@@ -1451,10 +1437,9 @@ void DoFill(Character * character, ArgumentHandler & args)
             return;
         }
     }
-
     // Fill the container from the source.
-    unsigned int atDisposal = source->contentLiq.second;
-    unsigned int quantity = container->getFreeSpace();
+    auto atDisposal = source->contentLiq.second;
+    auto quantity = container->getFreeSpace();
     if (!HasFlag(liquidModelSource->liquidFlags, LiqContainerFlag::Endless))
     {
         if (atDisposal < quantity)
@@ -1462,7 +1447,6 @@ void DoFill(Character * character, ArgumentHandler & args)
             quantity = atDisposal;
         }
     }
-
     if (!source->pourOut(quantity))
     {
         character->sendMsg(
@@ -1475,13 +1459,12 @@ void DoFill(Character * character, ArgumentHandler & args)
         character->sendMsg("You failed to fill the container with the liquid.\n");
         return;
     }
-
+    // Send the messages.
     character->sendMsg(
         "You fill %s with %s from %s.\n",
         container->getName(),
         sourLiquid->getName(),
         source->getName());
-    // Send the message inside the room.
     character->room->sendToAll(
         "%s fills %s with %s from %s.\n",
         { character },
@@ -1501,7 +1484,6 @@ void DoPour(Character * character, ArgumentHandler & args)
         character->sendMsg("You have to pour something into something else.\n");
         return;
     }
-
     // Search the container.
     auto source = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
     if (source == nullptr)
@@ -1513,7 +1495,6 @@ void DoPour(Character * character, ArgumentHandler & args)
             return;
         }
     }
-
     // Search the source.
     auto container = character->findInventoryItem(args[1].getContent(), args[1].getIndex());
     if ((container == nullptr) || (container == source))
@@ -1529,7 +1510,6 @@ void DoPour(Character * character, ArgumentHandler & args)
             }
         }
     }
-
     if (HasFlag(source->flags, ItemFlag::Locked))
     {
         character->sendMsg("You have first to unlock %s.\n", source->getName());
@@ -1551,7 +1531,6 @@ void DoPour(Character * character, ArgumentHandler & args)
         character->sendMsg("You have first to open %s.\n", container->getName());
         return;
     }
-
     // Check if the items are suitable source and container of liquids.
     if (container->model->getType() != ModelType::LiquidContainer)
     {
@@ -1564,18 +1543,15 @@ void DoPour(Character * character, ArgumentHandler & args)
         return;
     }
     auto liquidModelSource = source->model->toLiquidContainer();
-
     // Check if source is empty.
     if (source->isEmpty())
     {
         character->sendMsg("%s is empty.\n", source->getNameCapital());
         return;
     }
-
     // Get the liquid from the source and eventually from the container.
     auto sourLiquid = source->contentLiq.first;
     auto contLiquid = container->contentLiq.first;
-
     // Check compatibility between liquids.
     if (contLiquid != nullptr)
     {
@@ -1585,11 +1561,9 @@ void DoPour(Character * character, ArgumentHandler & args)
             return;
         }
     }
-
     // Fill the container from the source.
-    unsigned int atDisposal = source->contentLiq.second;
-    unsigned int quantity = container->getFreeSpace();
-
+    auto atDisposal = source->contentLiq.second;
+    auto quantity = container->getFreeSpace();
     if (!HasFlag(liquidModelSource->liquidFlags, LiqContainerFlag::Endless))
     {
         if (atDisposal < quantity)
@@ -1607,12 +1581,12 @@ void DoPour(Character * character, ArgumentHandler & args)
         character->sendMsg("You failed to pour the liquid into %s.\n", source->getName());
         return;
     }
+    // Send the messages.
     character->sendMsg(
         "You pour %s of %s into %s.\n",
         sourLiquid->getName(),
         source->getName(),
         container->getName());
-    // Send the message inside the room.
     character->room->sendToAll(
         "%s pour %s of %s into %s.\n",
         { character },
@@ -1784,7 +1758,7 @@ void DoBuy(Character * character, ArgumentHandler & args)
         shopKeeper->doCommand("say " + character->getName() + " " + phrase);
         return;
     }
-    std::vector<Item *> availableCoins = character->findCoins();
+    auto availableCoins = character->findCoins();
     std::vector<Item *> changedCoins;
     std::vector<std::pair<Item *, unsigned int>> givenCoins;
     unsigned int providedValue = 0, requiredValue = shop->evaluateBuyPrice(item);

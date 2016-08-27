@@ -53,7 +53,7 @@ void DoKill(Character * character, ArgumentHandler & args)
         character->sendMsg("You have to specify whom to kill.\n");
     }
     // Retrieve the target.
-    Character * target = character->room->findCharacter(args[0].getContent(), args[0].getIndex(), {
+    auto target = character->room->findCharacter(args[0].getContent(), args[0].getIndex(), {
         character });
     if (!target)
     {
