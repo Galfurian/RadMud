@@ -424,52 +424,42 @@ void DoMudSave(Character * character, ArgumentHandler & /*args*/)
 
 void DoGoTo(Character * character, ArgumentHandler & args)
 {
-    std::string msgDepart, msgArrive, msgChar;
     if (args.size() != 1)
     {
         character->sendMsg("You have to provide a room vnum.");
         return;
     }
-    Room * destination = Mud::instance().findRoom(ToInt(args[0].getContent()));
+    auto destination = Mud::instance().findRoom(ToNumber<int>(args[0].getContent()));
     if (destination == nullptr)
     {
         character->sendMsg("That room doesen't exists.\n");
         return;
     }
-
     // Check if the player it's already doing something.
     StopAction(character);
     // Prepare messages.
-    msgDepart = character->getNameCapital();
-    msgDepart += " disappears in a puff of smoke!\n";
-    msgArrive = character->getNameCapital();
-    msgArrive += " appears in a puff of smoke!\n";
-    msgChar = "You go to room " + destination->name + ".\n";
+    auto msgDepart = character->getNameCapital() + " disappears in a puff of smoke!\n";
+    auto msgArrive = character->getNameCapital() + " appears in a puff of smoke!\n";
+    auto msgChar = "You go to room " + destination->name + ".\n";
     // Move player.
     character->moveTo(destination, msgDepart, msgArrive, msgChar);
 }
 
 void DoTransfer(Character * character, ArgumentHandler & args)
 {
-    std::string msgDepart, msgArrive, msgChar;
-
     if ((args.size() != 1) && (args.size() != 2))
     {
         character->sendMsg("You have to select at least a target and optionally a destination.\n");
         return;
     }
-    Character * target = nullptr;
-    if (args.size() >= 1)
+    Character * target = Mud::instance().findPlayer(args[0].getContent());
+    if (target == nullptr)
     {
-        target = Mud::instance().findPlayer(args[0].getContent());
+        target = Mud::instance().findMobile(args[0].getContent());
         if (target == nullptr)
         {
-            target = Mud::instance().findMobile(args[0].getContent());
-            if (target == nullptr)
-            {
-                character->sendMsg("Can't find the target character.\n");
-                return;
-            }
+            character->sendMsg("Can't find the target character.\n");
+            return;
         }
     }
     if (target->isMobile())
@@ -480,10 +470,10 @@ void DoTransfer(Character * character, ArgumentHandler & args)
             return;
         }
     }
-    Room * destination = character->room;
+    auto destination = character->room;
     if (args.size() == 2)
     {
-        destination = character->room->area->getRoom(ToInt(args[1].getContent()));
+        destination = character->room->area->getRoom(ToNumber<int>(args[1].getContent()));
         if (destination == nullptr)
         {
             character->sendMsg("Can't find the target room, setting the current room.\n");
@@ -493,10 +483,9 @@ void DoTransfer(Character * character, ArgumentHandler & args)
     // Check if the player it's already doing something.
     StopAction(target);
     // Prepare messages.
-    msgDepart = target->getNameCapital() + " is yanked away by unseen forces!";
-    msgArrive = target->getNameCapital() + " appears breathlessly!";
-    msgChar = "\n" + character->getNameCapital();
-    msgChar += " transfers you to another room!\n";
+    auto msgDepart = target->getNameCapital() + " is yanked away by unseen forces!";
+    auto msgArrive = target->getNameCapital() + " appears breathlessly!";
+    auto msgChar = "\n" + character->getNameCapital() + " transfers you to another room!\n";
     // Move player.
     target->moveTo(destination, msgDepart, msgArrive, msgChar);
     character->sendMsg("You transfer %s to room %s.\n", target->getName(), destination->name);
@@ -504,16 +493,12 @@ void DoTransfer(Character * character, ArgumentHandler & args)
 
 void DoFeast(Character * character, ArgumentHandler & args)
 {
-
     if (args.size() != 1)
     {
         character->sendMsg("You must insert a valide target.\n");
         return;
     }
-    Character * target = character->room->findCharacter(
-        args[0].getContent(),
-        args[0].getIndex(),
-        { });
+    auto target = character->room->findCharacter(args[0].getContent(), args[0].getIndex(), { });
     if (target == nullptr)
     {
         character->sendMsg("You must provide a valide target.\n");
@@ -528,7 +513,6 @@ void DoFeast(Character * character, ArgumentHandler & args)
 
 void DoGodInfo(Character * character, ArgumentHandler & args)
 {
-
     if (args.size() != 1)
     {
         character->sendMsg("You must insert a valide player name.\n");
@@ -566,19 +550,18 @@ void DoGodInfo(Character * character, ArgumentHandler & args)
 
 void DoSetFlag(Character * character, ArgumentHandler & args)
 {
-
     if (args.size() != 2)
     {
         character->sendMsg("You must provide a target and a flag.");
         return;
     }
-    Player * target = Mud::instance().findPlayer(args[0].getContent());
+    auto target = Mud::instance().findPlayer(args[0].getContent());
     if (target == nullptr)
     {
         character->sendMsg("You can't find the player '" + args[0].getContent() + "'.\n");
         return;
     }
-    CharacterFlag flag = static_cast<CharacterFlag>(ToInt(args[1].getContent()));
+    auto flag = static_cast<CharacterFlag>(ToNumber<int>(args[1].getContent()));
     if (flag == CharacterFlag::None)
     {
         character->sendMsg("You must insert a valid flag.\n");
@@ -601,19 +584,18 @@ void DoSetFlag(Character * character, ArgumentHandler & args)
 
 void DoClearFlag(Character * character, ArgumentHandler & args)
 {
-
     if (args.size() != 2)
     {
         character->sendMsg("You must provide a target and a flag.");
         return;
     }
-    Player * target = Mud::instance().findPlayer(args[0].getContent());
+    auto target = Mud::instance().findPlayer(args[0].getContent());
     if (target == nullptr)
     {
         character->sendMsg("You can't find the player '" + args[0].getContent() + "'.\n");
         return;
     }
-    CharacterFlag flag = static_cast<CharacterFlag>(ToInt(args[1].getContent()));
+    auto flag = static_cast<CharacterFlag>(ToNumber<int>(args[1].getContent()));
     if (flag == CharacterFlag::None)
     {
         character->sendMsg("You must insert a valid flag.\n");
@@ -636,13 +618,12 @@ void DoClearFlag(Character * character, ArgumentHandler & args)
 
 void DoModelInfo(Character * character, ArgumentHandler & args)
 {
-
     if (args.size() != 1)
     {
         character->sendMsg("You must insert a model vnum.\n");
         return;
     }
-    ItemModel * itemModel = Mud::instance().findItemModel(ToInt(args[0].getContent()));
+    auto itemModel = Mud::instance().findItemModel(ToNumber<int>(args[0].getContent()));
     if (itemModel == nullptr)
     {
         character->sendMsg("Item model not found.\n");
@@ -662,16 +643,15 @@ void DoItemCreate(Character * character, ArgumentHandler & args)
     NoMobile(character);
     // Stop any ongoing action.
     StopAction(character);
-
     // Check the number of arguments.
     if ((args.size() != 2) && (args.size() != 3))
     {
         character->sendMsg("What do you want to create?\n");
         return;
     }
-    ItemModel * itemModel = Mud::instance().findItemModel(ToInt(args[0].getContent()));
-    Material * material = Mud::instance().findMaterial(ToInt(args[1].getContent()));
-    ItemQuality quality = ItemQuality::Normal;
+    auto itemModel = Mud::instance().findItemModel(ToNumber<int>(args[0].getContent()));
+    auto material = Mud::instance().findMaterial(ToNumber<int>(args[1].getContent()));
+    auto quality = ItemQuality(ItemQuality::Normal);
     if (itemModel == nullptr)
     {
         character->sendMsg("Cannot find model '%s'.\n", args[0].getContent());
@@ -684,7 +664,7 @@ void DoItemCreate(Character * character, ArgumentHandler & args)
     }
     if (args.size() == 3)
     {
-        unsigned int itemQualityValue = ToNumber<unsigned int>(args[2].getContent());
+        auto itemQualityValue = ToNumber<unsigned int>(args[2].getContent());
         if (!ItemQuality::isValid(itemQualityValue))
         {
             character->sendMsg("Not a valid quality.\n");
@@ -693,7 +673,7 @@ void DoItemCreate(Character * character, ArgumentHandler & args)
         quality = ItemQuality(itemQualityValue);
     }
     // Create the item.
-    Item * item = itemModel->createItem(character->getName(), material, quality, 1);
+    auto item = itemModel->createItem(character->getName(), material, quality, 1);
     if (item == nullptr)
     {
         character->sendMsg("Creation failed.\n");
@@ -707,14 +687,13 @@ void DoItemCreate(Character * character, ArgumentHandler & args)
 
 void DoItemGet(Character * character, ArgumentHandler & args)
 {
-
     if (args.size() != 1)
     {
         character->sendMsg("You must instert an item vnum.\n");
         return;
     }
-    int itemVnum = ToNumber<int>(args[0].getContent());
-    Item * item = Mud::instance().findItem(itemVnum);
+    auto itemVnum = ToNumber<int>(args[0].getContent());
+    auto item = Mud::instance().findItem(itemVnum);
     if (item == nullptr)
     {
         character->sendMsg("Invalid vnum (%s).\n", ToString(itemVnum));
@@ -761,16 +740,20 @@ void DoItemGet(Character * character, ArgumentHandler & args)
 
 void DoItemDestroy(Character * character, ArgumentHandler & args)
 {
-
     if (args.size() != 1)
     {
         character->sendMsg("You must instert an item vnum.\n");
         return;
     }
-    Item * item = Mud::instance().findItem(ToInt(args[0].getContent()));
+    auto item = Mud::instance().findItem(ToNumber<int>(args[0].getContent()));
     if (item == nullptr)
     {
         character->sendMsg("Invalid vnum.\n");
+        return;
+    }
+    if (!item->isEmpty())
+    {
+        character->sendMsg("You cannot destroy an item which has item inside.\n");
         return;
     }
     item->removeFromMud();
@@ -781,14 +764,13 @@ void DoItemDestroy(Character * character, ArgumentHandler & args)
 
 void DoItemInfo(Character * character, ArgumentHandler & args)
 {
-
     if (args.size() != 1)
     {
         character->sendMsg(
             "You must instert the item vnum or the name of the item inside the room.\n");
         return;
     }
-    Item * item = Mud::instance().findItem(ToInt(args[0].getContent()));
+    auto item = Mud::instance().findItem(ToNumber<int>(args[0].getContent()));
     if (item == nullptr)
     {
         item = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
@@ -809,35 +791,27 @@ void DoItemInfo(Character * character, ArgumentHandler & args)
 
 void DoAreaInfo(Character * character, ArgumentHandler & args)
 {
-
     if (args.size() != 1)
     {
         character->sendMsg("You must instert an area vnum.\n");
         return;
     }
-    Area * area = Mud::instance().findArea(ToInt(args[0].getContent()));
+    auto area = Mud::instance().findArea(ToNumber<int>(args[0].getContent()));
     if (area == nullptr)
     {
         character->sendMsg("The selected area does not exist.");
         return;
     }
     std::string msg;
-    msg += Formatter::green() + "# Area Informations:\n" + Formatter::reset();
-    msg += Formatter::yellow() + " Vnum            " + Formatter::reset() + ":"
-        + ToString(area->vnum) + "\n";
-    msg += Formatter::yellow() + " Name            " + Formatter::reset() + ":" + area->name + "\n";
-    msg += Formatter::yellow() + " Builder         " + Formatter::reset() + ":" + area->builder
-        + "\n";
-    msg += Formatter::yellow() + " Continent       " + Formatter::reset() + ":" + area->continent
-        + "\n";
-    msg += Formatter::yellow() + " Width           " + Formatter::reset() + ":"
-        + ToString(area->width) + "\n";
-    msg += Formatter::yellow() + " Height          " + Formatter::reset() + ":"
-        + ToString(area->height) + "\n";
-    msg += Formatter::yellow() + " Elevation       " + Formatter::reset() + ":"
-        + ToString(area->elevation) + "\n";
-    msg += Formatter::yellow() + " Number of Rooms " + Formatter::reset() + ":"
-        + ToString(area->areaMap.size()) + "\n";
+    msg += "Area Informations:\n";
+    msg += " Vnum      :" + ToString(area->vnum) + "\n";
+    msg += " Name      :" + area->name + "\n";
+    msg += " Builder   :" + area->builder + "\n";
+    msg += " Continent :" + area->continent + "\n";
+    msg += " Width     :" + ToString(area->width) + "\n";
+    msg += " Height    :" + ToString(area->height) + "\n";
+    msg += " Elevation :" + ToString(area->elevation) + "\n";
+    msg += " N. Rooms  :" + ToString(area->areaMap.size()) + "\n";
     character->sendMsg(msg);
 }
 
@@ -850,7 +824,7 @@ void DoRoomInfo(Character * character, ArgumentHandler & args)
     }
     else if (args.size() == 1)
     {
-        room = Mud::instance().findRoom(ToInt(args[0].getContent()));
+        room = Mud::instance().findRoom(ToNumber<int>(args[0].getContent()));
         if (room == nullptr)
         {
             character->sendMsg("Can't find the desired room.\n");
@@ -863,21 +837,15 @@ void DoRoomInfo(Character * character, ArgumentHandler & args)
         return;
     }
     std::string msg;
-    msg += Formatter::green() + "# Room Informations:\n" + Formatter::reset();
-    msg += Formatter::yellow() + " Vnum        " + Formatter::reset() + ":" + ToString(room->vnum)
-        + "\n";
-    msg += Formatter::yellow() + " X           " + Formatter::reset() + ":"
-        + ToString(room->coord.x) + "\n";
-    msg += Formatter::yellow() + " Y           " + Formatter::reset() + ":"
-        + ToString(room->coord.y) + "\n";
-    msg += Formatter::yellow() + " Z           " + Formatter::reset() + ":"
-        + ToString(room->coord.z) + "\n";
-    msg += Formatter::yellow() + " Name        " + Formatter::reset() + ":" + room->name + "\n";
-    msg += Formatter::yellow() + " Description " + Formatter::reset() + ":" + room->description
-        + "\n";
-    msg += Formatter::yellow() + " Terrain     " + Formatter::reset() + ":" + room->terrain + "\n";
-    msg += Formatter::yellow() + " Flags       " + Formatter::reset() + ":"
-        + GetRoomFlagString(room->flags) + "\n";
+    msg += "Room Informations:\n";
+    msg += " Vnum        :" + ToString(room->vnum) + "\n";
+    msg += " X           :" + ToString(room->coord.x) + "\n";
+    msg += " Y           :" + ToString(room->coord.y) + "\n";
+    msg += " Z           :" + ToString(room->coord.z) + "\n";
+    msg += " Name        :" + room->name + "\n";
+    msg += " Description :" + room->description + "\n";
+    msg += " Terrain     :" + room->terrain + "\n";
+    msg += " Flags       :" + GetRoomFlagString(room->flags) + "\n";
     character->sendMsg(msg);
 }
 
@@ -892,29 +860,29 @@ void DoRoomCreate(Character * character, ArgumentHandler & args)
         character->sendMsg("Usage: [direction]\n");
         return;
     }
-    Room * currentRoom = character->room;
-    Area * currentArea = currentRoom->area;
+    auto currentRoom = character->room;
+    auto currentArea = currentRoom->area;
     if (currentArea == nullptr)
     {
         character->sendMsg("Your room's area has not been defined!\n");
         return;
     }
     // Check if it's a direction.
-    Direction direction = Mud::instance().findDirection(args[0].getContent(), false);
+    auto direction = Mud::instance().findDirection(args[0].getContent(), false);
     if (direction == Direction::None)
     {
         character->sendMsg("You must insert a valid direction!\n");
         return;
     }
     // Get the coordinate modifier.
-    Coordinates targetCoord = currentRoom->coord + direction.getCoordinates();
+    auto targetCoord = currentRoom->coord + direction.getCoordinates();
     if (!currentArea->inBoundaries(targetCoord))
     {
         character->sendMsg("Sorry but in that direction you will go outside the boundaries.\n");
         return;
     }
     // Find the room.
-    Room * targetRoom = currentArea->getRoom(targetCoord);
+    auto targetRoom = currentArea->getRoom(targetCoord);
     if (targetRoom)
     {
         character->sendMsg("Sorry but in that direction there is already a room.\n");
@@ -1239,7 +1207,7 @@ void DoModSkill(Character * character, ArgumentHandler & args)
         character->sendMsg("Target not found.\n");
         return;
     }
-    Skill * skill = Mud::instance().findSkill(ToInt(args[1].getContent()));
+    Skill * skill = Mud::instance().findSkill(ToNumber<int>(args[1].getContent()));
     if (skill == nullptr)
     {
         character->sendMsg("Cannot find the desired skill.\n");
@@ -1285,16 +1253,13 @@ void DoModAttr(Character * character, ArgumentHandler & args)
         character->sendMsg("Usage: [target] [attribute] [+/-VALUE]\n");
         return;
     }
-    Character * target = character->room->findCharacter(
-        args[0].getContent(),
-        args[0].getIndex(),
-        { });
+    auto target = character->room->findCharacter(args[0].getContent(), args[0].getIndex());
     if (target == nullptr)
     {
         character->sendMsg("Target not found.\n");
         return;
     }
-    int modifier = ToInt(args[2].getContent());
+    auto modifier = ToNumber<int>(args[2].getContent());
     if (modifier == 0)
     {
         character->sendMsg("You must insert a valid value.\n");
@@ -1327,7 +1292,7 @@ void DoModAttr(Character * character, ArgumentHandler & args)
         return;
     }
     // Get the resulting ability value.
-    int result = static_cast<int>(target->getAbility(ability)) + modifier;
+    auto result = static_cast<int>(target->getAbility(ability)) + modifier;
     if (result < 0)
     {
         character->sendMsg("Attribute cannot go below 0.");
@@ -1381,31 +1346,24 @@ void DoMaterialInfo(Character * character, ArgumentHandler & args)
         character->sendMsg("You must insert a valide material vnum.\n");
         return;
     }
-    Material * material = Mud::instance().findMaterial(ToInt(args[0].getContent()));
+    auto material = Mud::instance().findMaterial(ToNumber<int>(args[0].getContent()));
     if (material == nullptr)
     {
         character->sendMsg("Can't find the desire material.\n");
         return;
     }
     std::string msg;
-    msg += Formatter::yellow() + "Vnum            " + Formatter::reset() + ": "
-        + ToString(material->vnum) + "\n";
-    msg += Formatter::yellow() + "Type            " + Formatter::reset() + ": "
-        + GetMaterialTypeName(material->type) + "\n";
-    msg += Formatter::yellow() + "Name            " + Formatter::reset() + ": " + material->name
-        + "\n";
-    msg += Formatter::yellow() + "Worth           " + Formatter::reset() + ": "
-        + ToString(material->worth) + "\n";
-    msg += Formatter::yellow() + "Hardness        " + Formatter::reset() + ": "
-        + ToString(material->hardness) + "\n";
-    msg += Formatter::yellow() + "Lightness       " + Formatter::reset() + ": "
-        + ToString(material->lightness) + "\n";
+    msg += "Vnum      : " + ToString(material->vnum) + "\n";
+    msg += "Type      : " + GetMaterialTypeName(material->type) + "\n";
+    msg += "Name      : " + material->name + "\n";
+    msg += "Worth     : " + ToString(material->worth) + "\n";
+    msg += "Hardness  : " + ToString(material->hardness) + "\n";
+    msg += "Lightness : " + ToString(material->lightness) + "\n";
     character->sendMsg(msg);
 }
 
 void DoLiquidCreate(Character * character, ArgumentHandler & args)
 {
-
     if (args.size() != 3)
     {
         character->sendMsg("Usage: [Item] [Liquid] [Quantity].\n");
@@ -1422,13 +1380,13 @@ void DoLiquidCreate(Character * character, ArgumentHandler & args)
         character->sendMsg("The item is not a container of liquids.\n");
         return;
     }
-    Liquid * liquid = Mud::instance().findLiquid(ToInt(args[1].getContent()));
+    Liquid * liquid = Mud::instance().findLiquid(ToNumber<int>(args[1].getContent()));
     if (liquid == nullptr)
     {
         character->sendMsg("Can't find the desire liquid.\n");
         return;
     }
-    int quantity = ToInt(args[2].getContent());
+    int quantity = ToNumber<int>(args[2].getContent());
     if ((quantity <= 0) || (quantity >= 100))
     {
         character->sendMsg("You must insert a valid quantity of liquids between 1 and 99.\n");
@@ -1454,7 +1412,7 @@ void DoLiquidInfo(Character * character, ArgumentHandler & args)
         character->sendMsg("You must provide a liquid vnum.\n");
         return;
     }
-    Liquid * liquid = Mud::instance().findLiquid(ToInt(args[0].getContent()));
+    Liquid * liquid = Mud::instance().findLiquid(ToNumber<int>(args[0].getContent()));
     if (liquid == nullptr)
     {
         character->sendMsg("Can't find the desire liquid.\n");
@@ -1478,7 +1436,7 @@ void DoProductionInfo(Character * character, ArgumentHandler & args)
         character->sendMsg("You must provide a production vnum.\n");
         return;
     }
-    Production * production = Mud::instance().findProduction(ToInt(args[0].getContent()));
+    Production * production = Mud::instance().findProduction(ToNumber<int>(args[0].getContent()));
     if (production == nullptr)
     {
         character->sendMsg("Can't find the desire production.\n");

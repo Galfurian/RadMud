@@ -342,7 +342,7 @@ void ProcessNewRace(Character * character, ArgumentHandler & args)
         if (args.size() == 2)
         {
             // Get the race.
-            Race * race = Mud::instance().findRace(ToInt(args[1].getContent()));
+            Race * race = Mud::instance().findRace(ToNumber<int>(args[1].getContent()));
             if (race == nullptr)
             {
                 AdvanceCharacterCreation(
@@ -387,7 +387,7 @@ void ProcessNewRace(Character * character, ArgumentHandler & args)
     else if (IsNumber(args[0].getContent()))
     {
         // Get the race.
-        Race * race = Mud::instance().findRace(ToInt(args[0].getContent()));
+        Race * race = Mud::instance().findRace(ToNumber<int>(args[0].getContent()));
         if (race == nullptr)
         {
             AdvanceCharacterCreation(
@@ -511,7 +511,7 @@ void ProcessNewAttr(Character * character, ArgumentHandler & args)
         if (args.size() == 2)
         {
             std::string helpMessage;
-            int modifier = ToInt(args[1].getContent());
+            int modifier = ToNumber<int>(args[1].getContent());
             // Check for errors.
             if (player->remaining_points < modifier)
             {
@@ -702,7 +702,7 @@ void ProcessNewAge(Character * character, ArgumentHandler & args)
     }
     else
     {
-        int age = ToInt(input);
+        int age = ToNumber<int>(input);
         if (age < 18)
         {
             AdvanceCharacterCreation(
@@ -778,7 +778,7 @@ void ProcessNewWeight(Character * character, ArgumentHandler & args)
     }
     else
     {
-        int weight = ToInt(input);
+        int weight = ToNumber<int>(input);
         if (weight < 40)
         {
             AdvanceCharacterCreation(
@@ -1241,7 +1241,7 @@ void LoadCommands()
     LoadCommunicationCommands();
     LoadCraftingCommands();
     LoadGeneralCommands();
-    LoadGodCommands();
     LoadManagerCommands();
     LoadObjectCommands();
+    LoadGodCommands();
 }

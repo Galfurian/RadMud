@@ -129,13 +129,13 @@ bool Building::setIngredient(const std::string & source)
             Logger::log(LogLevel::Error, "Ingredient is not composed by [Ingredient*Quantity]");
             return false;
         }
-        ResourceType ingredient = static_cast<ResourceType>(ToInt(ingredientInfo[0]));
+        ResourceType ingredient = static_cast<ResourceType>(ToNumber<int>(ingredientInfo[0]));
         if (ingredient == ResourceType::NoType)
         {
             Logger::log(LogLevel::Error, "Can't find the Ingredient :" + ingredientInfo[0]);
             return false;
         }
-        int quantity = ToInt(ingredientInfo[1]);
+        int quantity = ToNumber<int>(ingredientInfo[1]);
         if (quantity <= 0)
         {
             Logger::log(

@@ -73,14 +73,14 @@ bool Production::setOutcome(const std::string & source)
             correct = false;
         }
 
-        outcome = Mud::instance().findItemModel(ToInt(outcomeInfo[0]));
+        outcome = Mud::instance().findItemModel(ToNumber<int>(outcomeInfo[0]));
         if (outcome == nullptr)
         {
             Logger::log(LogLevel::Error, "Can't find the Outcome :" + outcomeInfo[0]);
             correct = false;
             break;
         }
-        int outcomeQuantity = ToInt(outcomeInfo[1]);
+        int outcomeQuantity = ToNumber<int>(outcomeInfo[1]);
         if (outcomeQuantity <= 0)
         {
             Logger::log(
@@ -106,7 +106,7 @@ bool Production::setTool(const std::string & source)
     bool correct = true;
     for (auto iterator : toolList)
     {
-        ToolType toolType = static_cast<ToolType>(ToInt(iterator));
+        ToolType toolType = static_cast<ToolType>(ToNumber<int>(iterator));
         if (toolType == ToolType::NoType)
         {
             Logger::log(LogLevel::Error, "Can't find the Tool Type:" + iterator);
@@ -138,7 +138,7 @@ bool Production::setIngredient(const std::string & source)
             correct = false;
             break;
         }
-        ResourceType ingredient = static_cast<ResourceType>(ToInt(ingredientInfo[0]));
+        ResourceType ingredient = static_cast<ResourceType>(ToNumber<int>(ingredientInfo[0]));
         if (ingredient == ResourceType::NoType)
         {
             Logger::log(LogLevel::Error, "Can't find the Ingredient :" + ingredientInfo[0]);
@@ -146,7 +146,7 @@ bool Production::setIngredient(const std::string & source)
             break;
         }
 
-        int ingredientQuantity = ToInt(ingredientInfo[1]);
+        int ingredientQuantity = ToNumber<int>(ingredientInfo[1]);
         if (ingredientQuantity == 0)
         {
             Logger::log(

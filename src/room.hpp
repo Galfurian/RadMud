@@ -171,7 +171,7 @@ class Room
         Character * findCharacter(
             std::string target,
             int & number,
-            const std::vector<Character *> & exceptions);
+            const std::vector<Character *> & exceptions = std::vector<Character *>());
 
         /// @brief Search for the player in the room.
         /// @param target    The player to search.
@@ -181,7 +181,7 @@ class Room
         Player * findPlayer(
             std::string target,
             int & number,
-            const std::vector<Character *> & exceptions);
+            const std::vector<Character *> & exceptions = std::vector<Character *>());
 
         /// @brief Search for the mobile in the room.
         /// @param target    The mobile to search.
@@ -191,7 +191,7 @@ class Room
         Mobile * findMobile(
             std::string target,
             int & number,
-            const std::vector<Character *> & exceptions);
+            const std::vector<Character *> & exceptions = std::vector<Character *>());
 
         /// @brief Add the provided exit to the room list of exits.
         /// @param exit The exit to add to the list.

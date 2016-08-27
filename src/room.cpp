@@ -312,9 +312,12 @@ Character * Room::findCharacter(
         // Check exceptions.
         if (!exceptions.empty())
         {
-            if (std::find(exceptions.begin(), exceptions.end(), iterator) != exceptions.end())
+            for (auto exception : exceptions)
             {
-                continue;
+                if (exception->getName() == iterator->getName())
+                {
+                    continue;
+                }
             }
         }
         // Check if the character is a mobile or a player.
@@ -365,9 +368,12 @@ Player * Room::findPlayer(string target, int & number, const std::vector<Charact
         // Check exceptions.
         if (!exceptions.empty())
         {
-            if (std::find(exceptions.begin(), exceptions.end(), iterator) != exceptions.end())
+            for (auto exception : exceptions)
             {
-                continue;
+                if (exception->getName() == iterator->getName())
+                {
+                    continue;
+                }
             }
         }
         // Check if it is the desired target.
@@ -398,9 +404,12 @@ Mobile * Room::findMobile(string target, int & number, const std::vector<Charact
         // Check exceptions.
         if (!exceptions.empty())
         {
-            if (std::find(exceptions.begin(), exceptions.end(), iterator) != exceptions.end())
+            for (auto exception : exceptions)
             {
-                continue;
+                if (exception->getName() == iterator->getName())
+                {
+                    continue;
+                }
             }
         }
         // Check if it is the desired target.

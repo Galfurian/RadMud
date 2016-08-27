@@ -236,7 +236,7 @@ void DoTake(Character * character, ArgumentHandler & args)
                 {
                     for (auto it : character->room->items)
                     {
-                        if (it->vnum == ToInt(args[0].getContent()))
+                        if (it->vnum == ToNumber<int>(args[0].getContent()))
                         {
                             item = it;
                         }
@@ -632,7 +632,7 @@ void DoWield(Character * character, ArgumentHandler & args)
         {
             for (auto it : character->inventory)
             {
-                if (it->vnum == ToInt(args[0].getContent()))
+                if (it->vnum == ToNumber<int>(args[0].getContent()))
                 {
                     item = it;
                 }
@@ -753,7 +753,7 @@ void DoWear(Character * character, ArgumentHandler & args)
         {
             for (auto it : character->inventory)
             {
-                if (it->vnum == ToInt(args[0].getContent()))
+                if (it->vnum == ToNumber<int>(args[0].getContent()))
                 {
                     item = it;
                 }
