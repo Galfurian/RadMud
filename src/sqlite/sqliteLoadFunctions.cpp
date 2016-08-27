@@ -15,7 +15,8 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#include "model/currencyModel.hpp"
+#include "sqliteLoadFunctions.hpp"
+
 #include "sqliteDbms.hpp"
 
 #include "../mud.hpp"
@@ -43,6 +44,7 @@
 #include "../model/vehicleModel.hpp"
 #include "../model/weaponModel.hpp"
 #include "../model/shopModel.hpp"
+#include "../model/currencyModel.hpp"
 
 #include "../item/shopItem.hpp"
 #include "../item/armorItem.hpp"
@@ -104,8 +106,7 @@ bool LoadContent(ResultSet * result)
             Logger::log(LogLevel::Error, "Can't find contained item.");
             return false;
         }
-        container->content.push_back(contained);
-        contained->container = container;
+        container->putInside(contained, false);
         if (!contained->check(true))
         {
             Logger::log(LogLevel::Error, "Error during error checking.");
@@ -122,6 +123,7 @@ bool LoadItem(ResultSet * result)
         // Retrieve the values.
         auto itemVnum = result->getNextInteger();
         auto itemModelVnum = result->getNextInteger();
+        auto itemQuantity = result->getNextUnsignedInteger();
         auto itemMaker = result->getNextString();
         auto itemPrice = result->getNextUnsignedInteger();
         auto itemWeight = result->getNextUnsignedInteger();
@@ -157,6 +159,7 @@ bool LoadItem(ResultSet * result)
         Item * item = GenerateItem(itemModel->getType());
         item->vnum = itemVnum;
         item->model = itemModel;
+        item->quantity = itemQuantity;
         item->price = itemPrice;
         item->weight = itemWeight;
         item->condition = itemCondition;
@@ -503,11 +506,11 @@ bool LoadItemRoom(ResultSet * result)
         // Load the item inside the room.
         if (HasFlag(item->flags, ItemFlag::Built))
         {
-            room->addBuilding(item);
+            room->addBuilding(item, false);
         }
         else
         {
-            room->addItem(item);
+            room->addItem(item, false);
         }
         if (!item->check(true))
         {
@@ -795,8 +798,7 @@ bool LoadContentLiq(ResultSet * result)
             Logger::log(LogLevel::Error, "Error during error checking.");
             return false;
         }
-        container->contentLiq.first = liquid;
-        container->contentLiq.second = quantity;
+        container->pourIn(liquid, quantity, false);
     }
     return true;
 }

@@ -36,6 +36,7 @@
 
 #include "shopItem.hpp"
 #include "armorItem.hpp"
+#include "corpseItem.hpp"
 #include "weaponItem.hpp"
 #include "currencyItem.hpp"
 
@@ -43,6 +44,7 @@ Item::Item() :
         vnum(),
         type(),
         model(),
+        quantity(),
         maker(),
         price(),
         weight(),
@@ -74,6 +76,7 @@ bool Item::check(bool complete)
     bool safe = true;
     safe &= CorrectAssert(vnum > 0);
     safe &= CorrectAssert(model != nullptr);
+    safe &= CorrectAssert(quantity > 0);
     safe &= CorrectAssert(!maker.empty());
     safe &= CorrectAssert(condition > 0);
     safe &= CorrectAssert(composition != nullptr);
@@ -92,93 +95,66 @@ bool Item::check(bool complete)
     return safe;
 }
 
-bool Item::removeFromMud()
+void Item::removeFromMud()
 {
     // Remove the item from the game, this means: Room, Player, Container.
     if (room != nullptr)
     {
-        Logger::log(LogLevel::Debug, "Removing item from room.");
-        if (!room->removeItem(this))
+        if (room->removeItem(this))
         {
-            return false;
+            Logger::log(
+                LogLevel::Debug,
+                "Removing item '%s' from room '%s'.",
+                this->getName(),
+                room->name);
         }
     }
-    else if (owner != nullptr)
+    if (owner != nullptr)
     {
-        Logger::log(LogLevel::Debug, "Removing item from owner.");
-        if (!owner->remInventoryItem(this))
+        if (owner->equipment.removeItem(this))
         {
-            if (!owner->remEquipmentItem(this))
-            {
-                return false;
-            }
+            Logger::log(
+                LogLevel::Debug,
+                "Removing item '%s' from '%s' equipment.",
+                this->getName(),
+                owner->getName());
+        }
+        if (owner->inventory.removeItem(this))
+        {
+            Logger::log(
+                LogLevel::Debug,
+                "Removing item '%s' from '%s' inventory.",
+                this->getName(),
+                owner->getName());
         }
     }
-    else if (container != nullptr)
+    if (container != nullptr)
     {
-        Logger::log(LogLevel::Debug, "Removing item from container.");
-        if (!container->takeOut(this))
+        if (container->content.removeItem(this))
         {
-            return false;
+            Logger::log(
+                LogLevel::Debug,
+                "Removing item '%s' from container '%s'.",
+                this->getName(),
+                container->getName());
         }
     }
-    else
+    if (this->model->getType() != ModelType::Corpse)
     {
-        return false;
-    }
-
-    if (this->model->getType() == ModelType::Corpse)
-    {
-        Logger::log(LogLevel::Error, "Removing corpse '" + this->getName() + "' from MUD;");
-        // Remove the item from the list of corpses.
-        if (!Mud::instance().remCorpse(this))
+        if (Mud::instance().remItem(this))
         {
-            Logger::log(LogLevel::Error, "Something gone wrong during corpse removal from mud.");
-            return false;
+            Logger::log(LogLevel::Debug, "Removing item '%s' from MUD items.", this->getName());
         }
     }
-    else
-    {
-        Logger::log(LogLevel::Error, "Removing item '" + this->getName() + "' from MUD;");
-        // Remove the item from the mud.
-        if (!Mud::instance().remItem(this))
-        {
-            Logger::log(LogLevel::Error, "Something gone wrong during item removal from mud.");
-            return false;
-        }
-    }
-    return true;
 }
 
-bool Item::destroy()
+bool Item::updateOnDB()
 {
-    if (this->removeFromMud())
-    {
-        if (this->model->getType() != ModelType::Corpse)
-        {
-            Logger::log(LogLevel::Error, "Removing item '" + this->getName() + "' from DB;");
-            // Remove the item from the database.
-            if (!this->removeOnDB())
-            {
-                Logger::log(LogLevel::Error, "Something gone wrong during item removal from DB.");
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
-bool Item::createOnDB()
-{
-    // Check if the Item can be saved on the database.
-    if (model->getType() == ModelType::Corpse)
-    {
-        return true;
-    }
     // Prepare the vector used to insert into the database.
     std::vector<std::string> arguments;
     arguments.push_back(ToString(this->vnum));
     arguments.push_back(ToString(model->vnum));
+    arguments.push_back(ToString(this->quantity));
     arguments.push_back(this->maker);
     arguments.push_back(ToString(this->getPrice()));
     arguments.push_back(ToString(this->getWeight()));
@@ -187,149 +163,24 @@ bool Item::createOnDB()
     arguments.push_back(ToString(this->composition->vnum));
     arguments.push_back(ToString(this->quality.toUInt()));
     arguments.push_back(ToString(this->flags));
-    if (SQLiteDbms::instance().insertInto("Item", arguments))
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-bool Item::updateOnDB()
-{
-    // Check if the Item can be saved on the database.
-    if (model->getType() == ModelType::Corpse)
-    {
-        return true;
-    }
-
-    // Save the item's Information.
-    {
-        QueryList value;
-        value.push_back(std::make_pair("model", ToString(model->vnum)));
-        value.push_back(std::make_pair("maker", maker));
-        value.push_back(std::make_pair("condition", ToString(condition)));
-        value.push_back(std::make_pair("composition", ToString(composition->vnum)));
-        value.push_back(std::make_pair("quality", ToString(quality.toUInt())));
-        value.push_back(std::make_pair("flag", ToString(flags)));
-        QueryList where;
-        where.push_back(std::make_pair("vnum", ToString(vnum)));
-        if (!SQLiteDbms::instance().updateInto("Item", value, where))
-        {
-            Logger::log(LogLevel::Error, "Can't save the item!");
-            return false;
-        }
-    }
-
-    if ((room != nullptr) || (owner != nullptr) || (container != nullptr))
-    {
-        // Remove the item from any auxiliary table.
-        QueryList where;
-        where.push_back(std::make_pair("item", ToString(vnum)));
-        SQLiteDbms::instance().deleteFrom("ItemPlayer", where);
-        SQLiteDbms::instance().deleteFrom("ItemRoom", where);
-        SQLiteDbms::instance().deleteFrom("ItemContent", where);
-    }
-
-    // Save the item's position.
-    if (room != nullptr)
-    {
-        std::vector<std::string> arguments;
-        arguments.push_back(ToString(room->vnum));
-        arguments.push_back(ToString(vnum));
-        if (!SQLiteDbms::instance().insertInto("ItemRoom", arguments))
-        {
-            Logger::log(LogLevel::Error, "Can't save the item inside the room!");
-            return false;
-        }
-    }
-    else if (owner != nullptr)
-    {
-        if (owner->isPlayer())
-        {
-            std::vector<std::string> arguments;
-            arguments.push_back(owner->name);
-            arguments.push_back(ToString(vnum));
-            if (owner->hasEquipmentItem(this))
-            {
-                arguments.push_back(EnumToString(this->getCurrentSlot()));
-            }
-            else
-            {
-                arguments.push_back("0");
-            }
-            if (!SQLiteDbms::instance().insertInto("ItemPlayer", arguments, false, true))
-            {
-                Logger::log(LogLevel::Error, "Can't save the item possesed by the Player!");
-                return false;
-            }
-        }
-    }
-    else if (container != nullptr)
-    {
-        if (container->model->getType() != ModelType::Corpse)
-        {
-            std::vector<std::string> arguments;
-            arguments.push_back(ToString(container->vnum));
-            arguments.push_back(ToString(vnum));
-            if (!SQLiteDbms::instance().insertInto("ItemContent", arguments))
-            {
-                Logger::log(LogLevel::Error, "Can't save the item inside the container!");
-                return false;
-            }
-        }
-    }
-
-    if (!content.empty())
-    {
-        for (auto iterator : content)
-        {
-            std::vector<std::string> arguments;
-            // Prepare the query arguments.
-            arguments.push_back(ToString(vnum));
-            arguments.push_back(ToString(iterator->vnum));
-            if (!SQLiteDbms::instance().insertInto("ItemContent", arguments))
-            {
-                Logger::log(LogLevel::Error, "Can't save the contained item!");
-                return false;
-            }
-        }
-    }
-
-    if (contentLiq.first != nullptr)
-    {
-        std::vector<std::string> arguments;
-        // Prepare the query arguments.
-        arguments.push_back(ToString(vnum));
-        arguments.push_back(ToString(contentLiq.first->vnum));
-        arguments.push_back(ToString(contentLiq.second));
-        if (!SQLiteDbms::instance().insertInto("ItemContentLiq", arguments, false, true))
-        {
-            Logger::log(LogLevel::Error, "Can't save the contained liquid!");
-            return false;
-        }
-    }
-    return true;
+    return SQLiteDbms::instance().insertInto("Item", arguments, false, true);
 }
 
 bool Item::removeOnDB()
 {
+    auto strVnum = ToString(vnum);
     // Prepare the where clause.
-    QueryList main = { std::make_pair("vnum", ToString(vnum)) };
-    auto result = SQLiteDbms::instance().deleteFrom("Item", main);
-    // Remove the item from everywhere.
-    QueryList other = { std::make_pair("item", ToString(vnum)) };
-    SQLiteDbms::instance().deleteFrom("ItemPlayer", other);
-    SQLiteDbms::instance().deleteFrom("ItemRoom", other);
-    SQLiteDbms::instance().deleteFrom("ItemContent", other);
-    SQLiteDbms::instance().deleteFrom("Shop", other);
-    if (!result)
+    if (SQLiteDbms::instance().deleteFrom("Item", { std::make_pair("vnum", strVnum) }))
     {
-        Logger::log(LogLevel::Error, "Error during item removal from table Item.");
+        // Remove the item from everywhere.
+        SQLiteDbms::instance().deleteFrom("ItemPlayer", { std::make_pair("item", strVnum) });
+        SQLiteDbms::instance().deleteFrom("ItemRoom", { std::make_pair("item", strVnum) });
+        SQLiteDbms::instance().deleteFrom("ItemContent", { std::make_pair("item", strVnum) });
+        return true;
     }
-    return result;
+    Logger::log(LogLevel::Error, "Can't delete the item from the database!");
+    SQLiteDbms::instance().showLastError();
+    return false;
 }
 
 void Item::getSheet(Table & sheet) const
@@ -415,6 +266,21 @@ ModelType Item::getType() const
 std::string Item::getTypeName() const
 {
     return this->model->getTypeName();
+}
+
+bool Item::canStackWith(Item * item) const
+{
+    if (HasFlag(this->model->modelFlags, ModelFlag::CanBeStacked))
+    {
+        if (this->model->vnum == item->model->vnum)
+        {
+            if (this->composition->vnum == item->composition->vnum)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 bool Item::hasKey(std::string key)
@@ -664,52 +530,51 @@ bool Item::canContain(Item * item) const
     return (item->getWeight() <= this->getFreeSpace());
 }
 
-bool Item::putInside(Item * item)
+void Item::putInside(Item * & item, bool updateDB)
 {
-    if (this->canContain(item))
+    // Put the item inside the container.
+    content.push_back_item(item);
+    // Set the container value to the content item.
+    item->container = this;
+    // Update the database.
+    if (updateDB)
     {
-        // Insert in the container table.
-        std::vector<std::string> arguments;
-        arguments.push_back(ToString(vnum));       // Container
-        arguments.push_back(ToString(item->vnum)); // Content
-        if (!SQLiteDbms::instance().insertInto("ItemContent", arguments))
+        SQLiteDbms::instance().insertInto(
+            "ItemContent",
+            { ToString(this->vnum), ToString(item->vnum) },
+            false,
+            true);
+    }
+    // Log it.
+    Logger::log(LogLevel::Debug, "Item '%s' added to '%s';", item->getName(), this->getName());
+}
+
+bool Item::takeOut(Item * item, bool updateDB)
+{
+    if (content.removeItem(item))
+    {
+        item->container = nullptr;
+        // Update the database.
+        if (updateDB)
         {
-            return false;
+            SQLiteDbms::instance().deleteFrom(
+                "ItemContent",
+                { std::make_pair("item", ToString(item->vnum)) });
         }
-        // Put the item into the container.
-        content.push_back(item);
-        // Set the container value to the content item.
-        item->container = this;
+        // Log it.
+        Logger::log(
+            LogLevel::Debug,
+            "Item '%s' taken out from '%s';",
+            item->getName(),
+            this->getName());
         return true;
     }
     return false;
 }
 
-bool Item::takeOut(Item * item)
+bool Item::canContain(Liquid * liquid, const unsigned int & ammount) const
 {
-    bool removed = false;
-    for (auto it = content.begin(); it != content.end(); ++it)
-    {
-        Item * containedItem = (*it);
-        if (containedItem->vnum == item->vnum)
-        {
-            Logger::log(
-                LogLevel::Debug,
-                "Item '%s' taken out from '%s';",
-                item->getName(),
-                this->getName());
-            item->container = nullptr;
-            content.erase(it);
-            removed = true;
-            break;
-        }
-    }
-    return removed;
-}
-
-bool Item::canContain(Liquid * liquid, const unsigned int & quantity) const
-{
-    if (quantity > this->getFreeSpace())
+    if (ammount > this->getFreeSpace())
     {
         return false;
     }
@@ -720,47 +585,36 @@ bool Item::canContain(Liquid * liquid, const unsigned int & quantity) const
     return true;
 }
 
-bool Item::pourIn(Liquid * liquid, const unsigned int & quantity)
+bool Item::pourIn(Liquid * liquid, const unsigned int & ammount, bool updateDB)
 {
-    if (this->canContain(liquid, quantity))
+    if (this->canContain(liquid, ammount))
     {
         if (contentLiq.first == nullptr)
         {
-            // Insert in the liquid table the value.
-            std::vector<std::string> arguments;
-            arguments.push_back(ToString(vnum));         // Container
-            arguments.push_back(ToString(liquid->vnum)); // Content
-            arguments.push_back(ToString(quantity));     // Quantity
-            // Execute the insert.
-            if (!SQLiteDbms::instance().insertInto("ItemContentLiq", arguments))
-            {
-                return false;
-            }
-            // Set the liquid quantity.
+            // Set the liquid ammount.
             contentLiq.first = liquid;
-            contentLiq.second = quantity;
+            contentLiq.second = ammount;
         }
         else if (contentLiq.first == liquid)
         {
-            QueryList value;
-            value.push_back(std::make_pair("quantity", ToString(contentLiq.second)));
-            QueryList where;
-            where.push_back(std::make_pair("container", ToString(vnum)));
-            where.push_back(std::make_pair("content", ToString(liquid->vnum)));
-            // Update value inside the database.
-            if (!SQLiteDbms::instance().updateInto("ItemContentLiq", value, where))
-            {
-                return false;
-            }
-            // Increment the liquid quantity.
-            contentLiq.second += quantity;
+            // Increment the liquid ammount.
+            contentLiq.second += ammount;
+        }
+        // Prepare the query arguments.
+        if (updateDB)
+        {
+            SQLiteDbms::instance().insertInto(
+                "ItemContentLiq",
+                { ToString(vnum), ToString(contentLiq.first->vnum), ToString(contentLiq.second) },
+                false,
+                true);
         }
         return true;
     }
     return false;
 }
 
-bool Item::pourOut(const unsigned int & quantity)
+bool Item::pourOut(const unsigned int & ammount, bool updateDB)
 {
     if (model->getType() != ModelType::LiquidContainer)
     {
@@ -771,31 +625,31 @@ bool Item::pourOut(const unsigned int & quantity)
     {
         return true;
     }
-    // Check if the container has the necessary quantity of liquid.
-    if (contentLiq.second >= quantity)
+    // Check if the container has the necessary ammount of liquid.
+    if (contentLiq.second >= ammount)
     {
-        // Decrement the liquid quantity.
-        contentLiq.second -= quantity;
-        if (contentLiq.second == 0)
+        // Decrement the liquid ammount.
+        contentLiq.second -= ammount;
+        if (updateDB)
         {
-            QueryList where;
-            where.push_back(std::make_pair("container", ToString(vnum)));
-            where.push_back(std::make_pair("content", ToString(contentLiq.first->vnum)));
-            // If the container is empty, remove the entry from the liquid contained table.
-            SQLiteDbms::instance().deleteFrom("ItemContentLiq", where);
-            // Erase the key of the liquid.
-            contentLiq.first = nullptr;
-        }
-        else
-        {
-            QueryList value;
-            value.push_back(std::make_pair("quantity", ToString(contentLiq.second)));
-            QueryList where;
-            where.push_back(std::make_pair("container", ToString(vnum)));
-            where.push_back(std::make_pair("content", ToString(contentLiq.first->vnum)));
-            // Update value inside the database.
-            // TODO: Check.
-            SQLiteDbms::instance().updateInto("ItemContentLiq", value, where);
+            if (contentLiq.second == 0)
+            {
+                QueryList where;
+                where.push_back(std::make_pair("container", ToString(vnum)));
+                where.push_back(std::make_pair("content", ToString(contentLiq.first->vnum)));
+                // If the container is empty, remove the entry from the liquid contained table.
+                SQLiteDbms::instance().deleteFrom("ItemContentLiq", where);
+                // Erase the key of the liquid.
+                contentLiq.first = nullptr;
+            }
+            else
+            {
+                SQLiteDbms::instance().insertInto(
+                    "ItemContentLiq",
+                    { ToString(vnum), ToString(contentLiq.first->vnum), ToString(contentLiq.second) },
+                    false,
+                    true);
+            }
         }
         return true;
     }
@@ -842,19 +696,17 @@ std::string Item::lookContent()
         else
         {
             output += "Looking inside you see:\n";
-            for (auto it : GroupItems(content))
+            Table table = Table();
+            table.addColumn("Item", StringAlign::Left);
+            table.addColumn("Quantity", StringAlign::Right);
+            table.addColumn("Weight", StringAlign::Right);
+            // List all the items in inventory
+            for (auto it : content)
             {
-                std::string contentName = it.first->getNameCapital();
-                if (it.second > 1)
-                {
-                    output += " - " + Formatter::cyan() + contentName + Formatter::reset() + " ["
-                        + ToString(it.second) + "].\n";
-                }
-                else
-                {
-                    output += " - " + Formatter::cyan() + contentName + Formatter::reset() + ".\n";
-                }
+                table.addRow(
+                    { it->getNameCapital(), ToString(it->quantity), ToString(it->getWeight()) });
             }
+            output += table.getTable();
             output += "Has been used " + Formatter::yellow() + ToString(getUsedSpace())
                 + Formatter::reset();
             output += " out of " + Formatter::yellow() + ToString(getTotalSpace())
@@ -890,7 +742,7 @@ std::string Item::lookContent()
 
             if (percent >= 100) output += "It's full of ";
             else if (percent >= 75) output += "It's half full of ";
-            else if (percent >= 50) output += "Contains a discrete quantity of ";
+            else if (percent >= 50) output += "Contains a discrete ammount of ";
             else if (percent >= 25) output += "It contains a little bit of ";
             else if (percent >= 0) output += "It contains some drops of ";
             else output += "It's empty, but you can see some ";
@@ -939,6 +791,10 @@ CurrencyItem * Item::toCurrencyItem()
 {
     return static_cast<CurrencyItem *>(this);
 }
+CorpseItem * Item::toCorpseItem()
+{
+    return static_cast<CorpseItem *>(this);
+}
 
 void Item::luaRegister(lua_State * L)
 {
@@ -956,7 +812,17 @@ void Item::luaRegister(lua_State * L)
     .addData("owner", &Item::owner) //
     .addData("container", &Item::container) //
     .addData("container", &Item::container) //
-    .addData("content", &Item::content) //
+    .endClass() //
+    .deriveClass<ArmorItem, Item>("ArmorItem") //
+    .addFunction("getAC", &ArmorItem::getArmorClass) //
+    .endClass() //
+    .deriveClass<CorpseItem, Item>("CorpseItem") //
+    .endClass() //
+    .deriveClass<CurrencyItem, Item>("CurrencyItem") //
+    .endClass() //
+    .deriveClass<ShopItem, Item>("ShopItem") //
+    .endClass() //
+    .deriveClass<WeaponItem, Item>("WeaponItem") //
     .endClass();
 }
 
@@ -976,11 +842,12 @@ Item * GenerateItem(const ModelType & type)
             return new ShopItem();
         case ModelType::Weapon:
             return new WeaponItem();
-        case ModelType::Corpse:
-        case ModelType::Book:
-        case ModelType::Container:
         case ModelType::Currency:
             return new CurrencyItem();
+        case ModelType::Corpse:
+            return new CorpseItem();
+        case ModelType::Book:
+        case ModelType::Container:
         case ModelType::Food:
         case ModelType::Furniture:
         case ModelType::Key:
@@ -1001,49 +868,4 @@ Item * GenerateItem(const ModelType & type)
         default:
             return nullptr;
     }
-}
-
-ItemVectorNumbered GroupItems(const ItemVector & items)
-{
-    ItemVectorNumbered numberedItems;
-    for (auto it : items)
-    {
-        bool missing = true;
-        for (auto it2 = numberedItems.begin(); it2 != numberedItems.end(); ++it2)
-        {
-            if (it2->first->getName() == it->getName())
-            {
-                if (HasFlag(it2->first->flags, ItemFlag::Built))
-                {
-                    if (HasFlag(it->flags, ItemFlag::Built))
-                    {
-                        missing = false;
-                        it2->second++;
-                        break;
-                    }
-                }
-                else
-                {
-                    missing = false;
-                    it2->second++;
-                    break;
-                }
-            }
-        }
-        if (missing)
-        {
-            numberedItems.push_back(std::make_pair(it, 1));
-        }
-    }
-    return numberedItems;
-}
-
-bool OrderItemByName(Item * first, Item * second)
-{
-    return first->getName() < second->getName();
-}
-
-bool OrderItemByWeight(Item * first, Item * second)
-{
-    return first->getWeight() < second->getWeight();
 }

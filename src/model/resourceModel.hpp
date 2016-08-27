@@ -54,9 +54,6 @@ typedef enum class ResourceTypes
     Trash
 } ResourceType;
 
-/// Map which stores a type of resource and a quantity.
-typedef std::map<ResourceType, unsigned int> IngredientMap;
-
 /// @brief Model of resources.
 class ResourceModel: public ItemModel
 {

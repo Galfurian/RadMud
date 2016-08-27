@@ -86,16 +86,29 @@ bool Room::check(bool complete)
     return true;
 }
 
-void Room::addItem(Item * item)
+void Room::addItem(Item * & item, bool updateDB)
 {
-    items.push_back(item);
+    // Add the item.
+    items.push_back_item(item);
+    // Set the room attribute of the item.
     item->room = this;
+    // Update the database.
+    if (updateDB)
+    {
+        SQLiteDbms::instance().insertInto(
+            "ItemRoom",
+            { ToString(this->vnum), ToString(item->vnum) },
+            false,
+            true);
+    }
     Logger::log(LogLevel::Debug, "Item '" + item->getName() + "' added to '" + this->name + "';");
 }
 
-void Room::addBuilding(Item * item)
+void Room::addBuilding(Item * item, bool updateDB)
 {
+    // Set the item as built.
     SetFlag(item->flags, ItemFlag::Built);
+    // Check if the item is already inside the room.
     for (auto iterator : this->items)
     {
         if (iterator->vnum == item->vnum)
@@ -103,7 +116,8 @@ void Room::addBuilding(Item * item)
             return;
         }
     }
-    this->addItem(item);
+    // Otherwise, add the item.
+    this->addItem(item, updateDB);
 }
 
 void Room::addCharacter(Character * character)
@@ -112,29 +126,32 @@ void Room::addCharacter(Character * character)
     character->room = this;
 }
 
-bool Room::removeItem(Item * item)
+bool Room::removeItem(Item * item, bool updateDB)
 {
-    bool removed = false;
-    for (auto it = items.begin(); it != items.end(); ++it)
+    if (items.removeItem(item))
     {
-        if ((*it)->vnum == item->vnum)
+        item->room = nullptr;
+        // Update the database.
+        if (updateDB)
         {
-            Logger::log(
-                LogLevel::Debug,
-                "Item '" + item->getName() + "' removed from '" + this->name + "';");
-            item->room = nullptr;
-            items.erase(it);
-            removed = true;
-            break;
+            SQLiteDbms::instance().deleteFrom(
+                "ItemRoom",
+                { std::make_pair("item", ToString(item->vnum)) });
         }
+        // Log it.
+        Logger::log(
+            LogLevel::Debug,
+            "Item '" + item->getName() + "' removed from '" + this->name + "';");
+        return true;
     }
-    return removed;
+    return false;
 }
 
-bool Room::removeBuilding(Item * item)
+bool Room::removeBuilding(Item * item, bool updateDB)
 {
-    if (this->removeItem(item))
+    if (this->removeItem(item, updateDB))
     {
+        // Clear the built flag from the item.
         ClearFlag(item->flags, ItemFlag::Built);
         return true;
     }
@@ -153,9 +170,9 @@ void Room::removeCharacter(Character * character)
     }
 }
 
-PlayerList Room::getAllPlayer(Character * exception)
+std::set<Player *> Room::getAllPlayer(Character * exception)
 {
-    PlayerList plvec;
+    std::set<Player *> plvec;
     for (auto iterator : characters)
     {
         if (exception)
@@ -178,9 +195,9 @@ PlayerList Room::getAllPlayer(Character * exception)
     return plvec;
 }
 
-MobileList Room::getAllMobile(Character * exception)
+std::vector<Mobile *> Room::getAllMobile(Character * exception)
 {
-    MobileList movec;
+    std::vector<Mobile *> movec;
     for (auto iterator : characters)
     {
         if (exception)
@@ -201,22 +218,16 @@ MobileList Room::getAllMobile(Character * exception)
 
 bool Room::updateOnDB()
 {
-    QueryList value;
-    value.push_back(std::make_pair("x", ToString(coord.x)));
-    value.push_back(std::make_pair("y", ToString(coord.y)));
-    value.push_back(std::make_pair("z", ToString(coord.z)));
-    value.push_back(std::make_pair("terrain", terrain));
-    value.push_back(std::make_pair("name", name));
-    value.push_back(std::make_pair("description", description));
-    value.push_back(std::make_pair("flag", ToString(flags)));
-    QueryList where;
-    where.push_back(std::make_pair("vnum", ToString(vnum)));
-    if (!SQLiteDbms::instance().updateInto("Room", value, where))
-    {
-        Logger::log(LogLevel::Error, "Can't save the room!");
-        return false;
-    }
-    return true;
+    vector<string> arguments;
+    arguments.push_back(ToString(this->vnum));
+    arguments.push_back(ToString(this->coord.x));
+    arguments.push_back(ToString(this->coord.y));
+    arguments.push_back(ToString(this->coord.z));
+    arguments.push_back(this->terrain);
+    arguments.push_back(this->name);
+    arguments.push_back(this->description);
+    arguments.push_back(ToString(this->flags));
+    return SQLiteDbms::instance().insertInto("Room", arguments, false, true);
 }
 
 bool Room::removeOnDB()
@@ -278,9 +289,9 @@ Item * Room::findBuilding(int buildingVnum)
     return nullptr;
 }
 
-ItemVector Room::findBuildings(ModelType type)
+std::vector<Item *> Room::findBuildings(ModelType type)
 {
-    ItemVector buildingsList;
+    std::vector<Item *> buildingsList;
     for (auto iterator : items)
     {
         if ((iterator->model->getType() == type) && HasFlag(iterator->flags, ItemFlag::Built))
@@ -291,16 +302,22 @@ ItemVector Room::findBuildings(ModelType type)
     return buildingsList;
 }
 
-Character * Room::findCharacter(string target, int & number, const CharacterVector & exceptions)
+Character * Room::findCharacter(
+    string target,
+    int & number,
+    const std::vector<Character *> & exceptions)
 {
     for (auto iterator : characters)
     {
         // Check exceptions.
         if (!exceptions.empty())
         {
-            if (std::find(exceptions.begin(), exceptions.end(), iterator) != exceptions.end())
+            for (auto exception : exceptions)
             {
-                continue;
+                if (exception->getName() == iterator->getName())
+                {
+                    continue;
+                }
             }
         }
         // Check if the character is a mobile or a player.
@@ -339,7 +356,7 @@ Character * Room::findCharacter(string target, int & number, const CharacterVect
     return nullptr;
 }
 
-Player * Room::findPlayer(string target, int & number, const CharacterVector & exceptions)
+Player * Room::findPlayer(string target, int & number, const std::vector<Character *> & exceptions)
 {
     for (auto iterator : characters)
     {
@@ -351,9 +368,12 @@ Player * Room::findPlayer(string target, int & number, const CharacterVector & e
         // Check exceptions.
         if (!exceptions.empty())
         {
-            if (std::find(exceptions.begin(), exceptions.end(), iterator) != exceptions.end())
+            for (auto exception : exceptions)
             {
-                continue;
+                if (exception->getName() == iterator->getName())
+                {
+                    continue;
+                }
             }
         }
         // Check if it is the desired target.
@@ -372,7 +392,7 @@ Player * Room::findPlayer(string target, int & number, const CharacterVector & e
     return nullptr;
 }
 
-Mobile * Room::findMobile(string target, int & number, const CharacterVector & exceptions)
+Mobile * Room::findMobile(string target, int & number, const std::vector<Character *> & exceptions)
 {
     for (auto iterator : characters)
     {
@@ -384,9 +404,12 @@ Mobile * Room::findMobile(string target, int & number, const CharacterVector & e
         // Check exceptions.
         if (!exceptions.empty())
         {
-            if (std::find(exceptions.begin(), exceptions.end(), iterator) != exceptions.end())
+            for (auto exception : exceptions)
             {
-                continue;
+                if (exception->getName() == iterator->getName())
+                {
+                    continue;
+                }
             }
         }
         // Check if it is the desired target.
@@ -485,7 +508,6 @@ bool Room::removeExit(const Direction & direction)
 string Room::getLook(Character * exception)
 {
     string output = "";
-
     // The player want to look at the entire room.
     output += Formatter::bold() + name + Formatter::reset() + "\n";
     output += description + "\n";
@@ -531,29 +553,28 @@ string Room::getLook(Character * exception)
 
     ///////////////////////////////////////////////////////////////////////////
     // List all the items placed in the same room.
-    for (auto it : GroupItems(items))
+    for (auto it : items)
     {
         // If the item is invisible, don't show it.
-        if (HasFlag(it.first->model->modelFlags, ModelFlag::Invisible))
+        if (HasFlag(it->model->modelFlags, ModelFlag::Invisible))
         {
             continue;
         }
 
-        if (HasFlag(it.first->flags, ItemFlag::Built))
+        if (HasFlag(it->flags, ItemFlag::Built))
         {
             output += "[B]";
         }
 
         // If there are more of this item, show the counter.
-        if (it.second > 1)
+        if (it->quantity > 1)
         {
-            output += Formatter::cyan() + it.first->getNameCapital() + Formatter::reset()
-                + " are here.[" + ToString(it.second) + "]\n";
+            output += Formatter::cyan() + it->getNameCapital() + Formatter::reset() + " are here.["
+                + ToString(it->quantity) + "]\n";
         }
         else
         {
-            output += Formatter::cyan() + it.first->getNameCapital() + Formatter::reset()
-                + " is here.\n";
+            output += Formatter::cyan() + it->getNameCapital() + Formatter::reset() + " is here.\n";
         }
     }
 
@@ -582,7 +603,7 @@ string Room::getLook(Character * exception)
     return output;
 }
 
-void Room::sendToAll(const std::string & message, const CharacterVector & exceptions)
+void Room::sendToAll(const std::string & message, const std::vector<Character *> & exceptions)
 {
     for (auto iterator : characters)
     {

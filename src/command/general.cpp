@@ -16,19 +16,143 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-// Basic Include.
-#include <istream>
-#include <time.h>
+#include "general.hpp"
 
-#include "command.hpp"
-// Other Include.
 #include "../mud.hpp"
-#include "../constants.hpp"
 #include "../action/moveAction.hpp"
-#include "../utilities/table.hpp"
-#include "../utilities/logger.hpp"
 
-using namespace std;
+void LoadGeneralCommands()
+{
+    Command command;
+    command.level = 0;
+    {
+        command.name = "quit";
+        command.help = "Leave the game.";
+        command.args = "";
+        command.hndl = DoQuit;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "who";
+        command.help = "List all the character online.";
+        command.args = "";
+        command.hndl = DoWho;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "set";
+        command.help = "Set some character texts(eg. descr).";
+        command.args = "(setting) (value)";
+        command.hndl = DoSet;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "stop";
+        command.help = "Stop the current character action.";
+        command.args = "";
+        command.hndl = DoStop;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "look";
+        command.help = "Look at something or someone.";
+        command.args = "[(something) or (someone)]";
+        command.hndl = DoLook;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "help";
+        command.help = "Show the list of commands or show help for a given command.";
+        command.args = "(command)";
+        command.hndl = DoHelp;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "prompt";
+        command.help = "Modify your prompt.";
+        command.args = "(help)|(prompt definition)";
+        command.hndl = DoPrompt;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "time";
+        command.help = "Give the current day phase.";
+        command.args = "";
+        command.hndl = DoTime;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "stand";
+        command.help = "Make the player stand.";
+        command.args = "";
+        command.hndl = DoStand;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "crouch";
+        command.help = "The player crouches down himself, it's a good stance for hiding.";
+        command.args = "";
+        command.hndl = DoCrouch;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "sit";
+        command.help = "The player sits down, ideal for a quick break.";
+        command.args = "";
+        command.hndl = DoSit;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "prone";
+        command.help = "The player starts prone, a perfect position to shoot long distance.";
+        command.args = "";
+        command.hndl = DoProne;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "rest";
+        command.help = "The player lies down and begin to rest.";
+        command.args = "";
+        command.hndl = DoRest;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "statistics";
+        command.help = "Show player statistics.";
+        command.args = "";
+        command.hndl = DoStatistics;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "rent";
+        command.help = "Allow player to rent and disconnect.";
+        command.args = "";
+        command.hndl = DoRent;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "skills";
+        command.help = "Shows the playes skills and their level.";
+        command.args = "";
+        command.hndl = DoSkills;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "server";
+        command.help = "Shows the server statistics.";
+        command.args = "";
+        command.hndl = DoServer;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "travel";
+        command.help = "Allow the character to travel between areas.";
+        command.args = "";
+        command.hndl = DoTravel;
+        Mud::instance().addCommand(command);
+    }
+
+}
 
 void DoDirection(Character * character, Direction direction)
 {
@@ -81,10 +205,8 @@ void DoDirection(Character * character, Direction direction)
     character->setAction(moveAction);
 }
 
-void DoTravel(Character * character, std::istream & sArgs)
+void DoTravel(Character * character, ArgumentHandler & /*args*/)
 {
-    // Check no more input.
-    NoMore(character, sArgs);
     // Stop any ongoing action.
     StopAction(character);
 
@@ -108,36 +230,10 @@ void DoTravel(Character * character, std::istream & sArgs)
     character->moveTo(destination, msgDepart, msgArrive, msgChar);
 }
 
-void DoSave(Character * character, std::istream & sArgs)
+void DoQuit(Character * character, ArgumentHandler & /*args*/)
 {
     // Prevent mobiles to execute this command.
     NoMobile(character);
-    // Check no more input.
-    NoMore(character, sArgs);
-    // Stop any ongoing action.
-    StopAction(character);
-
-    Player * player = character->toPlayer();
-
-    SQLiteDbms::instance().beginTransaction();
-    if (player->updateOnDB())
-    {
-        SQLiteDbms::instance().endTransaction();
-        player->sendMsg("Saved.\n");
-    }
-    else
-    {
-        SQLiteDbms::instance().rollbackTransection();
-        player->sendMsg("Something goes wrong during save, re-try later...\n");
-    }
-}
-
-void DoQuit(Character * character, std::istream & sArgs)
-{
-    // Prevent mobiles to execute this command.
-    NoMobile(character);
-    // Check no more input.
-    NoMore(character, sArgs);
     // Stop any ongoing action.
     StopAction(character);
 
@@ -151,13 +247,10 @@ void DoQuit(Character * character, std::istream & sArgs)
 
         if (player->room != nullptr)
         {
-            // Set the list of exceptions.
-            CharacterVector exceptions;
-            exceptions.push_back(character);
             // Send the message inside the room.
             player->room->sendToAll(
                 "Player %s disappear in a puff of smoke.\n",
-                exceptions,
+                { character },
                 player->getName());
         }
 
@@ -168,11 +261,8 @@ void DoQuit(Character * character, std::istream & sArgs)
     }
 }
 
-void DoWho(Character * character, std::istream & sArgs)
+void DoWho(Character * character, ArgumentHandler & /*args*/)
 {
-    // Check no more input.
-    NoMore(character, sArgs);
-
     Table table = Table();
     table.addColumn("Player", StringAlign::Left);
     table.addColumn("Location", StringAlign::Left);
@@ -185,7 +275,7 @@ void DoWho(Character * character, std::istream & sArgs)
         {
             continue;
         }
-        string location("Nowhere");
+        std::string location = "Nowhere";
         if (iterator->room != nullptr)
         {
             location = iterator->room->name;
@@ -198,46 +288,36 @@ void DoWho(Character * character, std::istream & sArgs)
     character->sendMsg(output);
 }
 
-void DoSet(Character * character, std::istream & sArgs)
+void DoSet(Character * character, ArgumentHandler & args)
 {
-    string input;
-    // Get the setting that the player want to set.
-    sArgs >> input >> std::ws;
-    if (sArgs.fail())
+    if (args.empty())
     {
-        character->sendMsg("Usage: set <opt> <arguments>  \n");
-        character->sendMsg("       ---------------------  \n");
-        character->sendMsg("            des  [description]\n");
-        return;
-    }
-    if (input == "des")
-    {
-        // Get the description.
-        getline(sArgs, input);
-        if (sArgs.fail())
-        {
-            character->sendMsg("You can't set an empty description.\n");
-        }
-        else
-        {
-            character->description = input;
-
-            character->sendMsg("You had set your description:\n");
-            character->sendMsg(character->description + "\n");
-        }
+        character->sendMsg("What do you want to set?");
     }
     else
     {
-        character->sendMsg("Usage: set <opt> <arguments>  \n");
-        character->sendMsg("       ---------------------  \n");
-        character->sendMsg("            des  [description]\n");
+        if (args[0].getContent() == "des")
+        {
+            auto newDescription = args.substr(1);
+            if (newDescription.empty())
+            {
+                character->sendMsg("You can't set an empty description.\n");
+            }
+            else
+            {
+                character->description = newDescription;
+                character->sendMsg("You had set your description:\n");
+                character->sendMsg(character->description + "\n");
+            }
+        }
     }
+    character->sendMsg("Usage: set <opt> <arguments>  \n");
+    character->sendMsg("       ---------------------  \n");
+    character->sendMsg("            des  [description]\n");
 }
 
-void DoStop(Character * character, std::istream & sArgs)
+void DoStop(Character * character, ArgumentHandler & /*args*/)
 {
-    // Check no more input.
-    NoMore(character, sArgs);
     if (character->getAction()->getType() != ActionType::Combat)
     {
         character->sendMsg(character->getAction()->stop() + "\n");
@@ -245,20 +325,18 @@ void DoStop(Character * character, std::istream & sArgs)
     }
 }
 
-void DoLook(Character * character, std::istream & sArgs)
+void DoLook(Character * character, ArgumentHandler & args)
 {
-    // Get the arguments of the command.
-    ArgumentList arguments = ParseArgs(sArgs);
     // If there are no arguments, show the room.
-    if (arguments.empty())
+    if (args.empty())
     {
         character->sendMsg(character->room->getLook(character));
     }
-    else if (arguments.size() == 1)
+    else if (args.size() == 1)
     {
         Character * target = character->room->findCharacter(
-            arguments[0].first,
-            arguments[0].second,
+            args[0].getContent(),
+            args[0].getIndex(),
             { character });
         if (target)
         {
@@ -275,28 +353,28 @@ void DoLook(Character * character, std::istream & sArgs)
                 return;
             }
         }
-        Item * item = character->findNearbyItem(arguments[0].first, arguments[0].second);
+        Item * item = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
         if (item)
         {
             character->sendMsg(item->getLook());
         }
         else
         {
-            character->sendMsg("You don't see '%s' anywhere.\n", arguments[0].first);
+            character->sendMsg("You don't see '%s' anywhere.\n", args[0].getContent());
         }
     }
-    else if (arguments.size() == 2)
+    else if (args.size() == 2)
     {
         Character * target = character->room->findCharacter(
-            arguments[1].first,
-            arguments[1].second,
+            args[1].getContent(),
+            args[1].getIndex(),
             { character });
-        Item * container = character->findNearbyItem(arguments[1].first, arguments[1].second);
+        Item * container = character->findNearbyItem(args[1].getContent(), args[1].getIndex());
         if (target)
         {
             if (character->canSee(target))
             {
-                Item * item = target->findEquipmentItem(arguments[0].first, arguments[0].second);
+                Item * item = target->findEquipmentItem(args[0].getContent(), args[0].getIndex());
                 if (item)
                 {
                     character->sendMsg(item->getLook());
@@ -305,7 +383,7 @@ void DoLook(Character * character, std::istream & sArgs)
                 {
                     character->sendMsg(
                         "You don't see %s on %s.\n",
-                        arguments[0].first,
+                        args[0].getContent(),
                         target->getName());
                 }
             }
@@ -313,14 +391,14 @@ void DoLook(Character * character, std::istream & sArgs)
             {
                 character->sendMsg(
                     "You don't see the container '%s' anywhere.\n",
-                    arguments[1].first);
+                    args[1].getContent());
             }
         }
         else if (container)
         {
             if (container->isAContainer())
             {
-                Item * item = container->findContent(arguments[0].first, arguments[0].second);
+                Item * item = container->findContent(args[0].getContent(), args[0].getIndex());
                 if (item)
                 {
                     character->sendMsg(item->getLook());
@@ -337,7 +415,9 @@ void DoLook(Character * character, std::istream & sArgs)
         }
         else
         {
-            character->sendMsg("You don't see the container '%s' anywhere.\n", arguments[1].first);
+            character->sendMsg(
+                "You don't see the container '%s' anywhere.\n",
+                args[1].getContent());
         }
     }
     else
@@ -346,15 +426,9 @@ void DoLook(Character * character, std::istream & sArgs)
     }
 }
 
-void DoHelp(Character * character, std::istream & sArgs)
+void DoHelp(Character * character, ArgumentHandler & args)
 {
-    // Get the command.
-    string command;
-    sArgs >> command;
-    // Check no more input.
-    NoMore(character, sArgs);
-
-    if (command.empty())
+    if (args.empty())
     {
         size_t numColumns = 4;
         Table commandTable = Table("Commands");
@@ -396,8 +470,9 @@ void DoHelp(Character * character, std::istream & sArgs)
         }
         character->sendMsg(commandTable.getTable(true));
     }
-    else
+    else if (args.size() == 1)
     {
+        auto command = args[0].getContent();
         for (auto iterator : Mud::instance().mudCommands)
         {
             if (iterator.canUse(character))
@@ -419,19 +494,15 @@ void DoHelp(Character * character, std::istream & sArgs)
                 }
             }
         }
-        character->sendMsg("There is no help for '" + command + ".\n");
     }
+    character->sendMsg("There is no help for '%s'.\n", args.getOriginal());
 }
 
-void DoPrompt(Character * character, std::istream & sArgs)
+void DoPrompt(Character * character, ArgumentHandler & args)
 {
     NoMobile(character);
     Player * player = character->toPlayer();
-    string prompt;
-
-    getline(sArgs, prompt);
-
-    if (prompt.empty())
+    if (args.empty())
     {
         character->sendMsg("Current prompt:\n");
         character->sendMsg("    %s\n", player->prompt);
@@ -441,7 +512,7 @@ void DoPrompt(Character * character, std::istream & sArgs)
             Formatter::reset());
         return;
     }
-    if (GetWords(prompt)[0] == "help")
+    else if (args[0].getContent() == "help")
     {
         character->sendMsg(Formatter::yellow() + "Prompt Help" + Formatter::reset() + "\n");
         character->sendMsg(
@@ -472,14 +543,11 @@ void DoPrompt(Character * character, std::istream & sArgs)
             Formatter::reset());
         return;
     }
-    player->prompt = prompt;
+    player->prompt = args.getOriginal();
 }
 
-void DoTime(Character * character, std::istream & sArgs)
+void DoTime(Character * character, ArgumentHandler & /*args*/)
 {
-    // Check no more input.
-    NoMore(character, sArgs);
-
     if (MudUpdater::instance().getDayPhase() == DayPhase::Morning)
     {
         character->sendMsg(
@@ -510,10 +578,8 @@ void DoTime(Character * character, std::istream & sArgs)
     }
 }
 
-void DoStand(Character * character, std::istream & sArgs)
+void DoStand(Character * character, ArgumentHandler & /*args*/)
 {
-    // Check no more input.
-    NoMore(character, sArgs);
     if (character->posture == CharacterPosture::Stand)
     {
         character->sendMsg("You are already standing.\n");
@@ -523,10 +589,8 @@ void DoStand(Character * character, std::istream & sArgs)
     character->sendMsg("You stand up.\n");
 }
 
-void DoCrouch(Character * character, std::istream & sArgs)
+void DoCrouch(Character * character, ArgumentHandler & /*args*/)
 {
-    // Check no more input.
-    NoMore(character, sArgs);
     if (character->posture == CharacterPosture::Crouch)
     {
         character->sendMsg("You are already crouched.\n");
@@ -536,10 +600,8 @@ void DoCrouch(Character * character, std::istream & sArgs)
     character->sendMsg("You put yourself crouched.\n");
 }
 
-void DoSit(Character * character, std::istream & sArgs)
+void DoSit(Character * character, ArgumentHandler & /*args*/)
 {
-    // Check no more input.
-    NoMore(character, sArgs);
     if (character->posture == CharacterPosture::Sit)
     {
         character->sendMsg("You are already seated.\n");
@@ -549,10 +611,8 @@ void DoSit(Character * character, std::istream & sArgs)
     character->sendMsg("You sit down.\n");
 }
 
-void DoProne(Character * character, std::istream & sArgs)
+void DoProne(Character * character, ArgumentHandler & /*args*/)
 {
-    // Check no more input.
-    NoMore(character, sArgs);
     if (character->posture == CharacterPosture::Prone)
     {
         character->sendMsg("You are already prone.\n");
@@ -562,10 +622,8 @@ void DoProne(Character * character, std::istream & sArgs)
     character->sendMsg("You put yourself prone.\n");
 }
 
-void DoRest(Character * character, std::istream & sArgs)
+void DoRest(Character * character, ArgumentHandler & /*args*/)
 {
-    // Check no more input.
-    NoMore(character, sArgs);
     if (character->posture == CharacterPosture::Rest)
     {
         character->sendMsg("You are already resting.\n");
@@ -575,10 +633,9 @@ void DoRest(Character * character, std::istream & sArgs)
     character->sendMsg("You lie down.\n");
 }
 
-void DoStatistics(Character * character, std::istream & sArgs)
+void DoStatistics(Character * character, ArgumentHandler & /*args*/)
 {
     NoMobile(character);
-    NoMore(character, sArgs);
     Player * player = character->toPlayer();
 
     std::string msg;
@@ -637,17 +694,12 @@ void DoStatistics(Character * character, std::istream & sArgs)
     player->sendMsg(msg);
 }
 
-void DoRent(Character * character, std::istream & sArgs)
+void DoRent(Character * character, ArgumentHandler & /*args*/)
 {
     NoMobile(character);
     Player * player = character->toPlayer();
-
     // Get the current room.
     Room * room = player->room;
-
-    // Check no more input.
-    NoMore(character, sArgs);
-
     // Check if the room allow to rent.
     if (!HasFlag(room->flags, RoomFlag::Rent))
     {
@@ -661,41 +713,26 @@ void DoRent(Character * character, std::istream & sArgs)
     }
 }
 
-void DoSkills(Character * character, std::istream & sArgs)
+void DoSkills(Character * character, ArgumentHandler & /*args*/)
 {
     NoMobile(character);
     Player * player = character->toPlayer();
-
-    string output;
-
-    // Check no more input.
-    NoMore(character, sArgs);
-
-    player->sendMsg(
-        "     ##    " + Formatter::yellow() + "LvL" + Formatter::green() + "    Skill"
-            + Formatter::reset() + "\n");
+    Table table = Table();
+    table.addColumn("LvL", StringAlign::Left);
+    table.addColumn("Skill", StringAlign::Left);
     for (auto iterator : player->skills)
     {
         Skill * skill = Mud::instance().findSkill(iterator.first);
-        if (skill != nullptr)
+        if (skill)
         {
-            output = "     ";
-            if (skill->vnum < 10) output += " ";
-            output += ToString(skill->vnum);
-            output += "    ";
-            if (iterator.second < 10) output += "  ";
-            else if (iterator.second < 100) output += " ";
-            output += ToString(iterator.second);
-            output += "    " + skill->name + "\n";
-            player->sendMsg(output);
+            table.addRow( { skill->name, ToString(iterator.second) });
         }
     }
+    character->sendMsg(table.getTable());
 }
 
-void DoServer(Character * character, std::istream & sArgs)
+void DoServer(Character * character, ArgumentHandler & /*args*/)
 {
-    // Check no more input.
-    NoMore(character, sArgs);
     character->sendMsg("    Mud         : RadMud.\n");
     character->sendMsg("    Version     : " + kVersion + "\n");
     character->sendMsg("    Uptime      : " + ToString(Mud::instance().getUpTime()) + " s\n");

@@ -28,6 +28,8 @@
 #include "../model/nodeModel.hpp"
 #include "../utilities/table.hpp"
 
+#include "itemContainer.hpp"
+
 class Room;
 class Character;
 class Material;
@@ -36,6 +38,7 @@ class ShopItem;
 class ArmorItem;
 class WeaponItem;
 class CurrencyItem;
+class CorpseItem;
 
 /// @brief Holds details about items.
 class Item
@@ -47,6 +50,8 @@ class Item
         ModelType type;
         /// Item model.
         ItemModel * model;
+        /// The number of stacked items.
+        unsigned int quantity;
         /// The player that created the item.
         std::string maker;
         /// The item's price.
@@ -72,9 +77,9 @@ class Item
         /// Current equipment slot.
         EquipmentSlot currentSlot;
         /// List of items contained in this one.
-        std::vector<Item *> content;
+        ItemContainer content;
         /// The liquid inside the container.
-        LiquidContent contentLiq;
+        std::pair<Liquid *, unsigned int> contentLiq;
 
         /// @brief Constructor - Create a new empty item.
         Item();
@@ -100,21 +105,9 @@ class Item
         virtual bool check(bool complete = false);
 
         /// @brief This function is used to remove the item from everywhere.
-        /// @return <b>True</b> if the item has been removed,<br>
-        ///         <b>False</b> otherwise.
-        virtual bool removeFromMud();
+        virtual void removeFromMud();
 
-        /// @brief This function is used to destroy the item.
-        /// @return <b>True</b> if the item has been destroyed,<br>
-        ///         <b>False</b> otherwise.
-        virtual bool destroy();
-
-        /// @brief Create the item entry on database.
-        /// @return <b>True</b> if the execution goes well,<br>
-        ///         <b>False</b> otherwise.
-        virtual bool createOnDB();
-
-        /// @brief Save the item on database.
+        /// @brief Create or Update the item entry on database.
         /// @return <b>True</b> if the execution goes well,<br>
         ///         <b>False</b> otherwise.
         virtual bool updateOnDB();
@@ -128,13 +121,23 @@ class Item
         /// @param sheet The table that has to be filled.
         virtual void getSheet(Table & sheet) const;
 
+        /// @brief Check if the item can be deconstructed.
+        /// @brief error In case the item cannot be deconstructed, error contains the reason.
+        /// @return <b>True</b> if it can be deconstructed,<br>
+        ///         <b>False</b> otherwise.
         virtual bool canDeconstruct(std::string & error) const;
 
-        /// @return Provides the type of item.
+        /// Provides the type of item.
         ModelType getType() const;
 
-        /// @return Provides a string representing the type of item.
+        /// Provides a string representing the type of item.
         std::string getTypeName() const;
+
+        /// @brief Check if the provided item can be stacked with this one.
+        /// @brief item The item to check.
+        /// @return <b>True</b> if it can be stacked,<br>
+        ///         <b>False</b> otherwise.
+        bool canStackWith(Item * item) const;
 
         /// @brief Check if the item has the desired key.
         /// @param key The key to search.
@@ -192,7 +195,8 @@ class Item
         bool isAContainer() const;
 
         /// @brief Check if the container is empty.
-        /// @return <b>True</b> if the item is empty,<br><b>False</b> otherwise.
+        /// @return <b>True</b> if the item is empty,<br>
+        ///         <b>False</b> otherwise.
         bool isEmpty() const;
 
         /// @brief Return the total space of the container.
@@ -207,33 +211,44 @@ class Item
         /// @return The free unit of space as an integer.
         unsigned int getFreeSpace() const;
 
+        /// @brief Check if this item can contain the passed one.
+        /// @param item The item to check.
+        /// @return <b>True</b> if it can be contained,<br>
+        ///         <b>False</b> otherwise.
         bool canContain(Item * item) const;
 
         /// @brief Load an item inside the container and update the database.
-        /// @param item The item to load in.
-        /// @return <b>True</b> if the item is a container,<br>
-        ///         <b>False</b> otherwise.
-        bool putInside(Item * item);
+        /// @param item     The item to load in.
+        /// @param updateDB If the action has to be updated on the database.
+        void putInside(Item * & item, bool updateDB = true);
 
         /// @brief Extract an item from the container.
         /// @param item The item to load in.
+        /// @param updateDB If the action has to be updated on the database.
         /// @return <b>True</b> if the item has been taken out,<br>
         ///         <b>False</b> otherwise.
-        bool takeOut(Item * item);
+        bool takeOut(Item * item, bool updateDB = true);
 
-        bool canContain(Liquid * liquid, const unsigned int & quantity) const;
+        /// @brief Check if this item can contain the passed one.
+        /// @param liquid  The liquid to pour in.
+        /// @param ammount The ammount of liquid.
+        /// @return <b>True</b> if it can be contained,<br>
+        ///         <b>False</b> otherwise.
+        bool canContain(Liquid * liquid, const unsigned int & ammount) const;
 
         /// @brief Load some liquid inside the container and update the database.
         /// @param liquid   The liquid to load in.
-        /// @param quantity The quantity of liquid.
+        /// @param ammount  The ammount of liquid.
+        /// @param updateDB If the action has to be updated on the database.
         /// @return <b>True</b> if the operation is a success,<br>
         ///         <b>False</b> otherwise.
-        bool pourIn(Liquid * liquid, const unsigned int & quantity);
+        bool pourIn(Liquid * liquid, const unsigned int & ammount, bool updateDB = true);
 
         /// @brief Extract some liquid from the container and update the database.
-        /// @param quantity The quantity of liquid.
+        /// @param ammount  The ammount of liquid.
+        /// @param updateDB If the action has to be updated on the database.
         /// @return <b>True</b> if the operation is a success,<br><b>False</b> otherwise.
-        bool pourOut(const unsigned int & quantity);
+        bool pourOut(const unsigned int & ammount, bool updateDB = true);
 
         /// @brief Search for the item inside the container.
         /// @param search_parameter The item to search.
@@ -265,6 +280,8 @@ class Item
         WeaponItem * toWeaponItem();
         /// @brief Returns the model <b>statically</b> casted to Currency.
         CurrencyItem * toCurrencyItem();
+        /// @brief Returns the model <b>statically</b> casted to Currency.
+        CorpseItem * toCorpseItem();
 
         /// @brief Function used to register inside the lua environment the class.
         /// @param L The lua environment.
@@ -274,36 +291,7 @@ class Item
         bool operator<(Item & rhs) const;
 };
 
+/// @brief Function which instantiate the item of the same type of the passed model.
+/// @param type The type of item.
+/// @return the generated item.
 Item * GenerateItem(const ModelType & type);
-
-/// Vector of items.
-typedef std::vector<Item *> ItemVector;
-
-/// Vector of items with counter.
-typedef std::vector<std::pair<Item *, int>> ItemVectorNumbered;
-
-/// List of items.
-typedef std::list<Item *> ItemList;
-
-/// Map of items.
-typedef std::map<int, Item *> ItemMap;
-
-/// @brief Return the list of items grouped.
-/// @param items The item list to group.
-/// @return A vector which has for each item listed the number of occurence of that item.
-ItemVectorNumbered GroupItems(const ItemVector & items);
-
-/// It's a pointer to an ordering function for items.
-typedef bool (*ItemSorter)(Item * first, Item * second);
-
-/// @brief Compare the names of the two item.
-/// @param first  The first item.
-/// @param second The second item.
-/// @return <b>True</b> if the first name is beefore the second.<br><b>False</b> otherwise.
-bool OrderItemByName(Item * first, Item * second);
-
-/// @brief Compare the weight of the two item.
-/// @param first  The first item.
-/// @param second The second item.
-/// @return <b>True</b> if the first item is lighter then the second.<br><b>False</b> otherwise.
-bool OrderItemByWeight(Item * first, Item * second);

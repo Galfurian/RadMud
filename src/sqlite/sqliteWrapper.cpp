@@ -160,12 +160,12 @@ void SQLiteWrapper::rollbackTransection()
     executeQuery("ROLLBACK TRANSACTION");
 }
 
-std::string SQLiteWrapper::getLastErrorMsg()
+std::string SQLiteWrapper::getLastErrorMsg() const
 {
     return errorMessage;
 }
 
-int SQLiteWrapper::getLastErrorCode()
+int SQLiteWrapper::getLastErrorCode() const
 {
     return errorCode;
 }

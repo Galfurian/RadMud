@@ -30,7 +30,6 @@
 #include "constants.hpp"
 #include "lua/lua_script.hpp"
 #include "luabridge/LuaBridge.h"
-#include "command/command.hpp"
 
 #include "model/toolModel.hpp"
 #include "model/armorModel.hpp"
@@ -44,6 +43,8 @@
 #include "utilities/logger.hpp"
 
 #include "item/armorItem.hpp"
+
+#include "command/command.hpp"
 
 using namespace std;
 using namespace std::chrono;
@@ -686,7 +687,7 @@ void Character::moveTo(
     }
 
     // Set the list of exceptions.
-    CharacterVector exceptions;
+    std::vector<Character *> exceptions;
     exceptions.push_back(this);
     // Tell others where the character went and remove s/he from the old room.
     room->sendToAll(msgDepart, exceptions);
@@ -794,7 +795,7 @@ Item * Character::findNearbyItem(std::string itemName, int & number)
     return item;
 }
 
-Item * Character::findNearbyTool(const ToolType & toolType, const ItemVector & exceptions,
+Item * Character::findNearbyTool(const ToolType & toolType, const std::vector<Item *> & exceptions,
 bool searchRoom,
 bool searchInventory,
 bool searchEquipment)
@@ -856,7 +857,7 @@ bool searchEquipment)
     return nullptr;
 }
 
-bool Character::findNearbyTools(ToolSet tools, ItemVector & foundOnes,
+bool Character::findNearbyTools(std::set<ToolType> tools, std::vector<Item *> & foundOnes,
 bool searchRoom,
 bool searchInventory,
 bool searchEquipment)
@@ -886,7 +887,9 @@ bool searchEquipment)
     return true;
 }
 
-bool Character::findNearbyResouces(IngredientMap ingredients, ItemVector & foundOnes)
+bool Character::findNearbyResouces(
+    std::map<ResourceType, unsigned int> ingredients,
+    std::vector<Item *> & foundOnes)
 {
     for (auto ingredient : ingredients)
     {
@@ -937,11 +940,9 @@ bool Character::findNearbyResouces(IngredientMap ingredients, ItemVector & found
     return true;
 }
 
-bool Character::findCoins(
-    std::vector<Item *> & coins,
-    const unsigned int & requiredValue,
-    unsigned int & providedValue)
+std::vector<Item *> Character::findCoins()
 {
+    ItemContainer foundCoins;
     for (auto it : equipment)
     {
         if (it->isAContainer() && !it->isEmpty())
@@ -950,12 +951,7 @@ bool Character::findCoins(
             {
                 if (content->getType() == ModelType::Currency)
                 {
-                    providedValue += content->getPrice();
-                    coins.push_back(content);
-                    if (providedValue >= requiredValue)
-                    {
-                        return true;
-                    }
+                    foundCoins.push_back(content);
                 }
             }
         }
@@ -964,12 +960,7 @@ bool Character::findCoins(
     {
         if (it->getType() == ModelType::Currency)
         {
-            providedValue += it->getPrice();
-            coins.push_back(it);
-            if (providedValue >= requiredValue)
-            {
-                return true;
-            }
+            foundCoins.push_back(it);
         }
         if (it->isAContainer() && !it->isEmpty())
         {
@@ -977,17 +968,13 @@ bool Character::findCoins(
             {
                 if (content->getType() == ModelType::Currency)
                 {
-                    providedValue += content->getPrice();
-                    coins.push_back(it);
-                    if (providedValue >= requiredValue)
-                    {
-                        return true;
-                    }
+                    foundCoins.push_back(content);
                 }
             }
         }
     }
-    return false;
+    foundCoins.orderBy(ItemContainer::ByPrice);
+    return foundCoins;
 }
 
 bool Character::hasInventoryItem(Item * item)
@@ -1014,38 +1001,64 @@ bool Character::hasEquipmentItem(Item * item)
     return false;
 }
 
-bool Character::addInventoryItem(Item * item)
+void Character::addInventoryItem(Item * & item)
 {
+    // Add the item to the inventory.
+    inventory.push_back_item(item);
     // Set the owner of the item.
     item->owner = this;
-    // Add the item to the inventory.
-    inventory.push_back(item);
+    // Log it.
     Logger::log(
         LogLevel::Debug,
         "Item '%s' added to '%s' inventory;",
         item->getName(),
         this->getName());
-    return true;
 }
 
-bool Character::remInventoryItem(Item *item)
+void Character::addEquipmentItem(Item * & item)
 {
-    bool removed = false;
-    for (ItemVector::iterator it = inventory.begin(); it != inventory.end(); ++it)
+    // Add the item to the equipment.
+    equipment.push_back(item);
+    // Set the owner of the item.
+    item->owner = this;
+    // Log it.
+    Logger::log(
+        LogLevel::Debug,
+        "Item '%s' added to '%s' equipment;",
+        item->getName(),
+        this->getName());
+}
+
+bool Character::remInventoryItem(Item * item)
+{
+    if (inventory.removeItem(item))
     {
-        Item * invItem = (*it);
-        if (invItem->vnum == item->vnum)
-        {
-            Logger::log(
-                LogLevel::Debug,
-                "Item '" + item->getName() + "' removed from '" + this->getName() + "';");
-            item->owner = nullptr;
-            inventory.erase(it);
-            removed = true;
-            break;
-        }
+        item->owner = nullptr;
+        // Log it.
+        Logger::log(
+            LogLevel::Debug,
+            "Item '%s' removed from '%s';",
+            item->getName(),
+            this->getName());
+        return true;
     }
-    return removed;
+    return false;
+}
+
+bool Character::remEquipmentItem(Item * item)
+{
+    if (equipment.removeItem(item))
+    {
+        item->owner = nullptr;
+        // Log it.
+        Logger::log(
+            LogLevel::Debug,
+            "Item '%s' removed from '%s';",
+            item->getName(),
+            this->getName());
+        return true;
+    }
+    return false;
 }
 
 bool Character::canCarry(Item * item) const
@@ -1073,44 +1086,6 @@ unsigned int Character::getMaxCarryingWeight() const
     // MIN   =  50
     // MAX   = 300
     return 50 + (this->getAbilityModifier(Ability::Strength) * 10);
-}
-
-bool Character::addEquipmentItem(Item * item)
-{
-    // Check if the item exist.
-    if (item == nullptr)
-    {
-        Logger::log(LogLevel::Error, "[addEquipmentItem] Item is a nullptr.");
-        return false;
-    }
-    // Set the owner of the item.
-    item->owner = this;
-    // Add the item to the equipment.
-    equipment.push_back(item);
-    Logger::log(
-        LogLevel::Debug,
-        "Item '" + item->getName() + "' added to '" + this->getName() + "' equipment;");
-    return true;
-}
-
-bool Character::remEquipmentItem(Item * item)
-{
-    bool removed = false;
-    for (auto it = equipment.begin(); it != equipment.end(); ++it)
-    {
-        Item * eqpItem = (*it);
-        if (eqpItem->vnum == item->vnum)
-        {
-            Logger::log(
-                LogLevel::Debug,
-                "Item '" + item->getName() + "' removed from '" + this->getName() + "';");
-            item->owner = nullptr;
-            equipment.erase(it);
-            removed = true;
-            break;
-        }
-    }
-    return removed;
 }
 
 bool Character::canWield(Item * item, std::string & error, EquipmentSlot & where) const
@@ -1503,9 +1478,9 @@ std::vector<WeaponItem *> Character::getActiveWeapons()
     return ret;
 }
 
-bool Character::getCharactersInSight(CharacterVector & targets)
+bool Character::getCharactersInSight(std::vector<Character *> & targets)
 {
-    CharacterVector exceptions;
+    std::vector<Character *> exceptions;
     exceptions.push_back(this);
     Coordinates coord = this->room->coord;
     return this->room->area->getCharactersInSight(
@@ -1656,6 +1631,7 @@ void Character::kill()
 {
     // Create a corpse at the current position.
     Item * corpse = this->createCorpse();
+
     // Transfer all the items from the character to the corpse.
     auto tempInventory = this->inventory;
     for (auto it = tempInventory.begin(); it != tempInventory.end(); ++it)
@@ -1664,11 +1640,9 @@ void Character::kill()
         // Remove the item from the inventory.
         this->remInventoryItem(item);
         // Add the item to the corpse.
-        corpse->content.push_back(item);
+        corpse->content.push_back_item(item);
         // Set the corpse as container of the item.
         item->container = corpse;
-        // Update the item on the database.
-        item->updateOnDB();
     }
     auto tempEquipment = this->equipment;
     for (auto it = tempEquipment.begin(); it != tempEquipment.end(); ++it)
@@ -1677,12 +1651,11 @@ void Character::kill()
         // Remove the item from the inventory.
         this->remEquipmentItem(item);
         // Add the item to the corpse.
-        corpse->content.push_back(item);
+        corpse->content.push_back_item(item);
         // Set the corpse as container of the item.
         item->container = corpse;
-        // Update the item on the database.
-        item->updateOnDB();
     }
+
     // Reset the action of the character.
     this->actionQueue.clear();
     this->setAction(std::make_shared<GeneralAction>(this));
@@ -1707,8 +1680,8 @@ Item * Character::createCorpse()
 
 void Character::doCommand(const string & command)
 {
-    std::istringstream is(command);
-    ProcessCommand(this, is);
+    ArgumentHandler argumentHandler(command);
+    ProcessCommand(this, argumentHandler);
 }
 
 Player * Character::toPlayer()
@@ -1719,15 +1692,6 @@ Player * Character::toPlayer()
 Mobile * Character::toMobile()
 {
     return static_cast<Mobile *>(this);
-}
-
-VectorHelper<Character *> Character::luaGetTargets()
-{
-    if (room != nullptr)
-    {
-        return VectorHelper<Character *>(room->characters);
-    }
-    return VectorHelper<Character *>();
 }
 
 void Character::loadScript(const std::string & scriptFilename)
@@ -1759,6 +1723,45 @@ void Character::loadScript(const std::string & scriptFilename)
     }
 }
 
+VectorHelper<Character *> Character::luaGetTargets()
+{
+    if (room != nullptr)
+    {
+        return VectorHelper<Character *>(room->characters);
+    }
+    return VectorHelper<Character *>();
+}
+
+void Character::luaAddEquipment(Item * item)
+{
+    this->equipment.push_back(item);
+}
+
+bool Character::luaRemEquipment(Item * item)
+{
+    if (equipment.removeItem(item))
+    {
+        item->owner = nullptr;
+        return true;
+    }
+    return false;
+}
+
+void Character::luaAddInventory(Item * item)
+{
+    this->equipment.push_back(item);
+}
+
+bool Character::luaRemInventory(Item * item)
+{
+    if (inventory.removeItem(item))
+    {
+        item->owner = nullptr;
+        return true;
+    }
+    return false;
+}
+
 void Character::luaRegister(lua_State * L)
 {
     luabridge::getGlobalNamespace(L) //
@@ -1767,10 +1770,10 @@ void Character::luaRegister(lua_State * L)
     .addData("race", &Character::race) //
     .addData("faction", &Character::faction) //
     .addData("room", &Character::room) //
-    .addFunction("inventoryAdd", &Character::addInventoryItem) //
-    .addFunction("inventoryRemove", &Character::remInventoryItem) //
-    .addFunction("equipmentAdd", &Character::addEquipmentItem) //
-    .addFunction("equipmentRemove", &Character::remEquipmentItem) //
+    .addFunction("inventoryAdd", &Character::luaAddInventory) //
+    .addFunction("inventoryRem", &Character::luaRemInventory) //
+    .addFunction("equipmentAdd", &Character::luaAddEquipment) //
+    .addFunction("equipmentRem", &Character::luaRemEquipment) //
     .addFunction("doCommand", &Character::doCommand) //
     .addFunction("getTargets", &Character::luaGetTargets) //
     .addFunction("isMobile", &Character::isMobile) //

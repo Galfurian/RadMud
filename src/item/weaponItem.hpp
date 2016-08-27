@@ -29,11 +29,15 @@ class WeaponItem: public Item
 
         virtual void getSheet(Table & sheet) const;
 
+        /// Randomly roll the weapon damage.
         unsigned int rollDamage() const;
 
+        /// Provides the minimum damage.
         unsigned int getMinDamage() const;
 
+        /// Provides the maximum damage.
         unsigned int getMaxDamage() const;
 
+        /// Provides the range of this weapon.
         unsigned int getRange() const;
 };

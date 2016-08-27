@@ -21,14 +21,36 @@
 #include "../material.hpp"
 #include "../mud.hpp"
 
-CurrencyModel::CurrencyModel()
+CurrencyModel::Price::Price(const int & _material, const unsigned int & _price) :
+        material(_material),
+        price(_price)
 {
     // Nothing to do.
 }
 
+bool CurrencyModel::Price::operator>(const Price & rhs) const
+{
+    return price > rhs.price;
+}
+
+bool CurrencyModel::Price::operator==(const Price & rhs) const
+{
+    return price == rhs.price;
+}
+
+bool CurrencyModel::Price::operator==(const int & _rhs) const
+{
+    return material == _rhs;
+}
+
+CurrencyModel::CurrencyModel()
+{
+// Nothing to do.
+}
+
 CurrencyModel::~CurrencyModel()
 {
-    // Nothing to do.
+// Nothing to do.
 }
 
 ModelType CurrencyModel::getType() const
@@ -57,21 +79,22 @@ bool CurrencyModel::setModel(const std::string & source)
 
 void CurrencyModel::getSheet(Table & sheet) const
 {
-    // Call the function of the father class.
+// Call the function of the father class.
     ItemModel::getSheet(sheet);
-    // Add a divider.
-    //sheet.addDivider();
+// Add a divider.
+//sheet.addDivider();
 }
 
 Item * CurrencyModel::createItem(
     std::string maker,
     Material * composition,
-    const ItemQuality & itemQuality)
+    const ItemQuality & itemQuality,
+    const unsigned int & quantity)
 {
     auto it = std::find(prices.begin(), prices.end(), composition->vnum);
     if (it != prices.end())
     {
-        return ItemModel::createItem(maker, composition, itemQuality);
+        return ItemModel::createItem(maker, composition, itemQuality, quantity);
     }
     else
     {
@@ -103,32 +126,30 @@ bool CurrencyModel::findPrice(const int & materialVnum, unsigned int & price) co
     return false;
 }
 
-bool CurrencyModel::generateCurrency(
+std::vector<Item *> CurrencyModel::generateCurrency(
     const std::string & maker,
-    const unsigned int & value,
-    std::vector<Item *> & coins)
+    const unsigned int & value)
 {
     auto status = true;
     auto currentValue = value;
+    std::vector<Item *> coins;
+    SQLiteDbms::instance().beginTransaction();
     for (auto it : prices)
     {
         auto coinMaterial = Mud::instance().findMaterial(it.material);
-        unsigned int coinQuantity = (currentValue / it.price);
-        for (unsigned int it2 = 0; it2 < coinQuantity; ++it2)
+        auto coinQuantity = (currentValue / it.price);
+        if (coinQuantity == 0)
         {
-            auto generated = this->createItem(maker, coinMaterial, ItemQuality::Normal);
-            if (generated == nullptr)
-            {
-                status = false;
-                break;
-            }
-            else
-            {
-                coins.push_back(generated);
-            }
+            continue;
         }
-        if (!status)
+        auto coin = this->createItem(maker, coinMaterial, ItemQuality::Normal, coinQuantity);
+        if (coin != nullptr)
         {
+            coins.push_back(coin);
+        }
+        else
+        {
+            status = false;
             break;
         }
         currentValue -= it.price * coinQuantity;
@@ -137,10 +158,14 @@ bool CurrencyModel::generateCurrency(
     {
         for (auto generated : coins)
         {
+            generated->removeOnDB();
             delete (generated);
         }
+        coins.clear();
+        SQLiteDbms::instance().rollbackTransection();
     }
-    return status;
+    SQLiteDbms::instance().endTransaction();
+    return coins;
 }
 
 void CurrencyModel::sortList()

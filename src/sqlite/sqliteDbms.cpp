@@ -18,6 +18,8 @@
 
 #include "sqliteDbms.hpp"
 
+#include "sqliteLoadFunctions.hpp"
+
 #include "../mud.hpp"
 #include "../constants.hpp"
 #include "../utilities/logger.hpp"
@@ -76,8 +78,7 @@ bool SQLiteDbms::openDatabase()
 {
     if (!dbConnection.openConnection(kDatabaseName, kSystemDir))
     {
-        Logger::log(LogLevel::Error, "Error code :" + ToString(dbConnection.getLastErrorCode()));
-        Logger::log(LogLevel::Error, "Last error :" + dbConnection.getLastErrorMsg());
+        this->showLastError();
         return false;
     }
     return true;
@@ -87,8 +88,7 @@ bool SQLiteDbms::closeDatabase()
 {
     if (!dbConnection.closeConnection())
     {
-        Logger::log(LogLevel::Error, "Error code :" + ToString(dbConnection.getLastErrorCode()));
-        Logger::log(LogLevel::Error, "Last error :" + dbConnection.getLastErrorMsg());
+        this->showLastError();
         return false;
     }
     return true;
@@ -113,6 +113,7 @@ bool SQLiteDbms::loadTables()
         {
             // Log an error.
             Logger::log(LogLevel::Error, "Error when loading table: " + iterator.table);
+            this->showLastError();
             status = false;
         }
         // release the resource.
@@ -156,7 +157,7 @@ bool SQLiteDbms::loadPlayer(Player * player)
     return true;
 }
 
-bool SQLiteDbms::searchPlayer(string name)
+bool SQLiteDbms::searchPlayer(const std::string & name)
 {
     bool outcome = false;
     ResultSet * result = dbConnection.executeSelect(
@@ -175,9 +176,11 @@ bool SQLiteDbms::searchPlayer(string name)
     return outcome;
 }
 
-bool SQLiteDbms::insertInto(std::string table, std::vector<std::string> args,
-bool orIgnore,
-bool orReplace)
+bool SQLiteDbms::insertInto(
+    std::string table,
+    std::vector<std::string> args,
+    bool orIgnore,
+    bool orReplace)
 {
     stringstream stream;
     stream << "INSERT";
@@ -189,7 +192,7 @@ bool orReplace)
     {
         stream << " OR REPLACE";
     }
-    stream << " INTO " << table << std::endl;
+    stream << " INTO `" << table << "`" << std::endl;
     stream << "VALUES(" << std::endl;
     for (unsigned int it = 0; it < args.size(); it++)
     {
@@ -259,24 +262,58 @@ bool SQLiteDbms::updateInto(std::string table, QueryList value, QueryList where)
     return (dbConnection.executeQuery(stream.str().c_str()) != 0);
 }
 
-ResultSet * SQLiteDbms::executeSelect(std::string table, QueryList where)
+bool SQLiteDbms::updatePlayers()
 {
-    stringstream stream;
-    stream << "SELECT * FROM " << table << std::endl;
-    stream << "WHERE" << std::endl;
-    for (unsigned int it = 0; it < where.size(); ++it)
+    // Start a new transaction.
+    dbConnection.beginTransaction();
+    for (auto player : Mud::instance().mudPlayers)
     {
-        std::pair<std::string, std::string> clause = where.at(it);
-        if (it == (where.size() - 1))
+        if (player->isPlaying())
         {
-            stream << "    " << clause.first << " = \"" << clause.second << "\";" << std::endl;
-        }
-        else
-        {
-            stream << "    " << clause.first << " = \"" << clause.second << "\" AND" << std::endl;
+            if (!player->updateOnDB())
+            {
+                Logger::log(LogLevel::Error, "Can't save the player '%s'.", player->getName());
+                this->showLastError();
+            }
         }
     }
-    return dbConnection.executeSelect(stream.str().c_str());
+    // Complete the transaction.
+    dbConnection.endTransaction();
+    return true;
+}
+
+bool SQLiteDbms::updateItems()
+{
+    // Start a transaction.
+    dbConnection.beginTransaction();
+    for (auto it : Mud::instance().mudItems)
+    {
+        if (!it.second->updateOnDB())
+        {
+            Logger::log(LogLevel::Error, "Can't save the item '%s'.", it.second->getName());
+            this->showLastError();
+        }
+    }
+    // Complete the transaction.
+    dbConnection.endTransaction();
+    return true;
+}
+
+bool SQLiteDbms::updateRooms()
+{
+    // Start a new transaction.
+    dbConnection.beginTransaction();
+    for (auto it : Mud::instance().mudRooms)
+    {
+        if (!it.second->updateOnDB())
+        {
+            Logger::log(LogLevel::Error, "Can't save the room '%s'.", it.second->name);
+            this->showLastError();
+        }
+    }
+    // Complete the transaction.
+    dbConnection.endTransaction();
+    return true;
 }
 
 void SQLiteDbms::beginTransaction()
@@ -292,6 +329,12 @@ void SQLiteDbms::rollbackTransection()
 void SQLiteDbms::endTransaction()
 {
     dbConnection.endTransaction();
+}
+
+void SQLiteDbms::showLastError() const
+{
+    Logger::log(LogLevel::Error, "Error code :" + ToString(dbConnection.getLastErrorCode()));
+    Logger::log(LogLevel::Error, "Last error :" + dbConnection.getLastErrorMsg());
 }
 
 bool SQLiteDbms::loadPlayerInformation(Player * player)
@@ -393,14 +436,18 @@ bool SQLiteDbms::loadPlayerItems(Player * player)
         if (slot == EquipmentSlot::None)
         {
             // Add the item to the inventory.
-            player->addInventoryItem(item);
+            player->inventory.push_back_item(item);
+            // Set the owner of the item.
+            item->owner = player;
         }
         else
         {
             // Change the slot of the item.
             item->setCurrentSlot(slot);
-            // Add the item to the equipment.
-            player->addEquipmentItem(item);
+            // Add the item to the inventory.
+            player->equipment.push_back_item(item);
+            // Set the owner of the item.
+            item->owner = player;
         }
     }
     // release the resource.

@@ -563,8 +563,8 @@ bool Area::fastInSight(Coordinates origin, Coordinates target, unsigned int radi
 }
 
 bool Area::getCharactersInSight(
-    CharacterVector & targets,
-    CharacterVector & exceptions,
+    std::vector<Character *> & targets,
+    std::vector<Character *> & exceptions,
     int origin_x,
     int origin_y,
     int origin_z,

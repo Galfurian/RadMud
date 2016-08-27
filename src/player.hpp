@@ -93,6 +93,14 @@ class Player: public Character
 
         virtual void getSheet(Table & sheet) const;
 
+        virtual void addInventoryItem(Item * & item);
+
+        virtual void addEquipmentItem(Item * & item);
+
+        virtual bool remInventoryItem(Item * item);
+
+        virtual bool remEquipmentItem(Item * item);
+
         /// @brief Return player socket.
         /// @return Player sockec.
         int getSocket() const;
@@ -116,26 +124,13 @@ class Player: public Character
         /// @return <b>True</b> if we have something to send them,<br><b>False</b> otherwise.
         bool hasPendingOutput() const;
 
-        /// @brief Create an entry for the player in the database.
-        bool createOnDB();
-
-        /// @brief Load player from database.
-        bool loadFromDB();
-
-        /// @brief Save player to database.
-        /// @return <b>True</b> if the update goes well,<br><b>False</b> otherwise.
+        /// @brief Create an updated entry for the player inside the database.
+        /// @return <b>True</b> if the update goes well,<br>
+        ///         <b>False</b> otherwise.
         bool updateOnDB();
 
         /// @brief Send the prompt to player.
         void sendPrompt();
-
-        /// @brief Remove the passed item from the player's inventory and update the information on database.
-        /// @param item The item to remove from inventory.
-        bool remInventoryItem(Item * item);
-
-        /// @brief Remove from current equipment the item, and update the information on database.
-        /// @param item The item to remove.
-        bool remEquipmentItem(Item * item);
 
         /// @brief Handle what happend when this player die.
         void kill();
@@ -165,6 +160,3 @@ class Player: public Character
         /// @param msg String to sent.
         void sendMsg(const std::string & msg);
 };
-
-/// Player map.
-typedef std::set<Player *> PlayerList;

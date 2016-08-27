@@ -28,6 +28,7 @@
 #include "race.hpp"
 #include "item/item.hpp"
 #include "action/combat/combatAction.hpp"
+#include "command/argumentHandler.hpp"
 
 #include <deque>
 
@@ -72,9 +73,9 @@ class Character
         /// The current room the character is in.
         Room * room;
         /// Character's inventory.
-        ItemVector inventory;
+        ItemContainer inventory;
         /// Character's equipment.
-        ItemVector equipment;
+        ItemContainer equipment;
         /// Character's posture.
         CharacterPosture posture;
         /// Active effects on player.
@@ -343,7 +344,7 @@ class Character
         /// @return The searched tool.
         Item * findNearbyTool(
             const ToolType & toolType,
-            const ItemVector & exceptions,
+            const std::vector<Item *> & exceptions,
             bool searchRoom,
             bool searchInventory,
             bool searchEquipment);
@@ -357,8 +358,8 @@ class Character
         /// @return <b>True</b> if the operation goes well,<br>
         ///         <b>False</b> otherwise.
         bool findNearbyTools(
-            ToolSet tools,
-            ItemVector & foundOnes,
+            std::set<ToolType> tools,
+            std::vector<Item *> & foundOnes,
             bool searchRoom,
             bool searchInventory,
             bool searchEquipment);
@@ -368,17 +369,13 @@ class Character
         /// @param foundOnes   The list of found ingredients.
         /// @return <b>True</b> if the operation goes well,<br>
         ///         <b>False</b> otherwise.
-        bool findNearbyResouces(IngredientMap ingredients, ItemVector & foundOnes);
+        bool findNearbyResouces(
+            std::map<ResourceType, unsigned int> ingredients,
+            std::vector<Item *> & foundOnes);
 
         /// @brief Search the coins on the character.
-        /// @param coins List of found coins.
-        /// @param value Total value that has to be found.
-        /// @return <b>True</b> if the character has the right ammount of coins,<br>
-        ///         <b>False</b> otherwise.
-        bool findCoins(
-            std::vector<Item *> & coins,
-            const unsigned int & requiredValue,
-            unsigned int & providedValue);
+        /// @return List of found coins.
+        std::vector<Item *> findCoins();
 
         /// @brief Allows to check if an item is inside the inventory.
         /// @param item The item to search.
@@ -392,13 +389,23 @@ class Character
 
         /// @brief Add the passed item to character's inventory.
         /// @param item The item to add to inventory.
-        /// @return <b>True</b> if the operation goes well,<br><b>False</b> otherwise.
-        bool addInventoryItem(Item * item);
+        virtual void addInventoryItem(Item * & item);
+
+        /// @brief Equip the passed item.
+        /// @param item The item to equip.
+        virtual void addEquipmentItem(Item * & item);
 
         /// @brief Remove the passed item from the character's inventory.
         /// @param item The item to remove from inventory.
-        /// @return <b>True</b> if the operation goes well,<br><b>False</b> otherwise.
-        bool remInventoryItem(Item * item);
+        /// @return <b>True</b> if the operation goes well,<br>
+        ///         <b>False</b> otherwise.
+        virtual bool remInventoryItem(Item * item);
+
+        /// @brief Remove from current equipment the item.
+        /// @param item The item to remove.
+        /// @return <b>True</b> if the operation goes well,<br>
+        ///         <b>False</b> otherwise.
+        virtual bool remEquipmentItem(Item * item);
 
         /// @brief Check if the player can carry the item.
         /// @param item The item we want to check.
@@ -412,17 +419,6 @@ class Character
         /// @brief The maximum carrying weight for this character.
         /// @return The maximum carrying weight.
         unsigned int getMaxCarryingWeight() const;
-
-        /// @brief Equip the passed item.
-        /// @param item The item to equip.
-        /// @return <b>True</b> if the operation goes well,<br><b>False</b> otherwise.
-        bool addEquipmentItem(Item * item);
-
-        /// @brief Remove from current equipment the item.
-        /// @param item The item to remove.
-        /// @return <b>True</b> if the operation goes well,<br>
-        ///         <b>False</b> otherwise.
-        virtual bool remEquipmentItem(Item * item);
 
         /// @brief Check if the character can wield a given item.
         /// @param item  The item to wield.
@@ -561,14 +557,26 @@ class Character
         /// @return The mobile version of the character.
         Mobile * toMobile();
 
+        /// @brief Starts a lua environment and loads the given script.
+        /// @param scriptFilename The name of the script that has to be loaded.
+        void loadScript(const std::string & scriptFilename);
+
         /// @brief Returns the list of available targets using the vector
         ///         structure made for lua environment.
         /// @return The vector of targets.
         VectorHelper<Character *> luaGetTargets();
 
-        /// @brief Starts a lua environment and loads the given script.
-        /// @param scriptFilename The name of the script that has to be loaded.
-        void loadScript(const std::string & scriptFilename);
+        /// @brief Specific function used by lua to add an equipment item.
+        void luaAddEquipment(Item * item);
+
+        /// @brief Specific function used by lua to remove an equipment item.
+        bool luaRemEquipment(Item * item);
+
+        /// @brief Specific function used by lua to add an inventory item.
+        void luaAddInventory(Item * item);
+
+        /// @brief Specific function used by lua to remove an inventory item.
+        bool luaRemInventory(Item * item);
 
         /// @brief Function used to register inside the lua environment the class.
         /// @param L The lua environment.
@@ -604,15 +612,6 @@ class Character
             }
         }
 };
-
-/// @brief Character list handler.
-typedef std::vector<Character *> CharacterVector;
-
-/// @brief An action handler for the character.
-typedef std::function<void(Character * character, std::istream & args)> ActionHandler;
-
-/// @brief Map of things to do for various connection states.
-typedef std::map<ConnectionState, ActionHandler> StateActionMap;
 
 /// @addtogroup FlagsToList
 /// @{

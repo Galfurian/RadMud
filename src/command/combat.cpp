@@ -1,5 +1,4 @@
 /// @file   combat.cpp
-/// @brief  Implements the methods used by the character in order to <b>fight</b>.
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2014
 /// @copyright
@@ -16,40 +15,55 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-// Basic Include.
-#include "command.hpp"
-#include "../room.hpp"
-#include "../constants.hpp"
-#include "../action/combat/combatAction.hpp"
-#include "../action/combat/basicAttack.hpp"
-#include "../action/combat/flee.hpp"
+#include "combat.hpp"
+#include "../mud.hpp"
 
-using namespace std;
-
-void DoKill(Character * character, std::istream & sArgs)
+void LoadCombatCommands()
 {
-    // Get the arguments of the command.
-    ArgumentList arguments = ParseArgs(sArgs);
+    Command command;
+    command.level = 0;
+    {
+        command.name = "kill";
+        command.help = "Engage in combat the desired target.";
+        command.args = "(target)";
+        command.hndl = DoKill;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "flee";
+        command.help = "Try to flee from combat.";
+        command.args = "";
+        command.hndl = DoFlee;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "aim";
+        command.help = "Provides the list of targets nearby.";
+        command.args = "";
+        command.hndl = DoAim;
+        Mud::instance().addCommand(command);
+    }
+}
+
+void DoKill(Character * character, ArgumentHandler & args)
+{
     // If there are no arguments, show the room.
-    if (arguments.size() != 1)
+    if (args.size() != 1)
     {
         character->sendMsg("You have to specify whom to kill.\n");
     }
-    CharacterVector excpetions = { character };
     // Retrieve the target.
-    Character * target = character->room->findCharacter(
-        arguments[0].first,
-        arguments[0].second,
-        excpetions);
+    Character * target = character->room->findCharacter(args[0].getContent(), args[0].getIndex(), {
+        character });
     if (!target)
     {
-        character->sendMsg("You don't see '%s' anywhere.\n", arguments[0].first);
+        character->sendMsg("You don't see '%s' anywhere.\n", args[0].getContent());
         return;
     }
     // Check if the attacker can see the target.
     if (!character->canSee(target))
     {
-        character->sendMsg("You don't see '%s' anywhere.\n", arguments[0].first);
+        character->sendMsg("You don't see '%s' anywhere.\n", args[0].getContent());
         return;
     }
 
@@ -93,12 +107,9 @@ void DoKill(Character * character, std::istream & sArgs)
         // Notify the target.
         target->sendMsg("%s attacks you.\n\n", character->getNameCapital());
         // Notify the others.
-        CharacterVector exceptions;
-        exceptions.push_back(character);
-        exceptions.push_back(target);
         character->room->sendToAll(
             "%s attacks %s.\n",
-            exceptions,
+            { character, target },
             character->getNameCapital(),
             target->getName());
         // Let the characters enter the combat.
@@ -129,12 +140,9 @@ void DoKill(Character * character, std::istream & sArgs)
         // Notify the target.
         target->sendMsg("%s attacks you.\n\n", character->getNameCapital());
         // Notify the others.
-        CharacterVector exceptions;
-        exceptions.push_back(character);
-        exceptions.push_back(target);
         character->room->sendToAll(
             "%s attacks %s.\n",
-            exceptions,
+            { character, target },
             character->getNameCapital(),
             target->getName());
 
@@ -156,10 +164,8 @@ void DoKill(Character * character, std::istream & sArgs)
     }
 }
 
-void DoFlee(Character * character, std::istream & sArgs)
+void DoFlee(Character * character, ArgumentHandler & /*args*/)
 {
-    // Check that there are no more arguments.
-    NoMore(character, sArgs);
     // Check if the character is in combat.
     if (character->getAction()->getType() != ActionType::Combat)
     {
@@ -177,11 +183,9 @@ void DoFlee(Character * character, std::istream & sArgs)
     character->setNextCombatAction(CombatActionType::Flee);
 }
 
-void DoAim(Character * character, std::istream & sArgs)
+void DoAim(Character * character, ArgumentHandler & /*args*/)
 {
-    // Get the arguments of the command.
-    ArgumentList arguments = ParseArgs(sArgs);
-    CharacterVector targets;
+    std::vector<Character *> targets;
     if (!character->getCharactersInSight(targets))
     {
         character->sendMsg("There are no targets nearby!\n");

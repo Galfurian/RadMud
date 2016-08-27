@@ -16,33 +16,57 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#include "command.hpp"
+#include "crafting.hpp"
+
 #include "../mud.hpp"
 #include "../model/resourceModel.hpp"
 #include "../action/buildAction.hpp"
 #include "../action/craftAction.hpp"
 
-using namespace std;
-
-void DoProfession(Character * character, Profession * profession, std::istream & sArgs)
+void LoadCraftingCommands()
 {
-    // Get the arguments of the command.
-    ArgumentList arguments = ParseArgs(sArgs);
-    if (arguments.size() != 1)
+    Command command;
+    command.level = 0;
+    {
+        command.name = "build";
+        command.help = "Build something.";
+        command.args = "(item)";
+        command.hndl = DoBuild;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "deconstruct";
+        command.help = "Deconstruct a building.";
+        command.args = "(building)";
+        command.hndl = DoDeconstruct;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "read";
+        command.help = "Read an inscription from an item.";
+        command.args = "(item)";
+        command.hndl = DoRead;
+        Mud::instance().addCommand(command);
+    }
+}
+
+void DoProfession(Character * character, Profession * profession, ArgumentHandler & args)
+{
+    if (args.size() != 1)
     {
         character->sendMsg("What do you want to produce?\n");
         return;
     }
     // Search the production.
-    Production * production = Mud::instance().findProduction(arguments[0].first);
+    Production * production = Mud::instance().findProduction(args[0].getContent());
     if (production == nullptr)
     {
-        character->sendMsg("%s '%s'.\n", profession->notFoundMessage, arguments[0].first);
+        character->sendMsg("%s '%s'.\n", profession->notFoundMessage, args[0].getContent());
         return;
     }
     if (production->profession != profession)
     {
-        character->sendMsg("%s '%s'.\n", profession->notFoundMessage, arguments[0].first);
+        character->sendMsg("%s '%s'.\n", profession->notFoundMessage, args[0].getContent());
         return;
     }
     // Check if the actor has enough stamina to execute the action.
@@ -52,14 +76,14 @@ void DoProfession(Character * character, Profession * profession, std::istream &
         return;
     }
     // Search the needed tools.
-    ItemVector usedTools;
+    std::vector<Item *> usedTools;
     if (!character->findNearbyTools(production->tools, usedTools, false, true, true))
     {
         character->sendMsg("You don't have the right tools.\n");
         return;
     }
     // Search the needed ingredients.
-    ItemVector usedIngredients;
+    std::vector<Item *> usedIngredients;
     if (!character->findNearbyResouces(production->ingredients, usedIngredients))
     {
         character->sendMsg("You don't have enough material.\n");
@@ -68,7 +92,7 @@ void DoProfession(Character * character, Profession * profession, std::istream &
     // Search the needed workbench.
     if (production->workbench != ToolType::NoType)
     {
-        Item * workbench = character->findNearbyTool(production->workbench, ItemVector(),
+        Item * workbench = character->findNearbyTool(production->workbench, std::vector<Item *>(),
         true,
         false,
         false);
@@ -122,30 +146,25 @@ void DoProfession(Character * character, Profession * profession, std::istream &
         profession->startMessage,
         Formatter::yellow() + production->outcome->getName() + Formatter::reset());
 
-    // Set the list of exceptions.
-    CharacterVector exceptions;
-    exceptions.push_back(character);
     // Send the message inside the room.
     character->room->sendToAll(
         "%s has started %s something...\n",
-        exceptions,
+        { character },
         character->getNameCapital(),
         production->profession->action);
 }
 
-void DoBuild(Character * character, std::istream & sArgs)
+void DoBuild(Character * character, ArgumentHandler & args)
 {
-    // Get the arguments of the command.
-    ArgumentList arguments = ParseArgs(sArgs);
-    if (arguments.size() != 1)
+    if (args.size() != 1)
     {
         character->sendMsg("What do you want to build?\n");
         return;
     }
-    Building * schematics = Mud::instance().findBuilding(arguments[0].first);
+    Building * schematics = Mud::instance().findBuilding(args[0].getContent());
     if (schematics == nullptr)
     {
-        character->sendMsg("You don't know how to build '%s'.\n", arguments[0].first);
+        character->sendMsg("You don't know how to build '%s'.\n", args[0].getContent());
         return;
     }
     // Check if the actor has enough stamina to execute the action.
@@ -155,14 +174,14 @@ void DoBuild(Character * character, std::istream & sArgs)
         return;
     }
     // Search the needed tools.
-    ItemVector usedTools;
+    std::vector<Item *> usedTools;
     if (!character->findNearbyTools(schematics->tools, usedTools, true, true, true))
     {
         character->sendMsg("You don't have the right tools.\n");
         return;
     }
     // Search the needed ingredients.
-    ItemVector usedIngredients;
+    std::vector<Item *> usedIngredients;
     if (!character->findNearbyResouces(schematics->ingredients, usedIngredients))
     {
         character->sendMsg("You don't have enough material.\n");
@@ -244,23 +263,18 @@ void DoBuild(Character * character, std::istream & sArgs)
     // //////////////////////////////////////////
     std::string roomMsg;
     roomMsg += character->name + " has started building something...\n";
-    // Set the list of exceptions.
-    CharacterVector exceptions;
-    exceptions.push_back(character);
     // Send the message inside the room.
-    character->room->sendToAll(roomMsg, exceptions);
+    character->room->sendToAll(roomMsg, { character });
 }
 
-void DoDeconstruct(Character * character, std::istream & sArgs)
+void DoDeconstruct(Character * character, ArgumentHandler & args)
 {
-    // Get the arguments of the command.
-    ArgumentList arguments = ParseArgs(sArgs);
-    if (arguments.size() != 1)
+    if (args.size() != 1)
     {
         character->sendMsg("What do you want to deconstruct, sai?\n");
         return;
     }
-    Item * item = character->findNearbyItem(arguments[0].first, arguments[0].second);
+    Item * item = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
     if (item == nullptr)
     {
         character->sendMsg("You can't find want you to deconstruct.\n");
@@ -282,22 +296,17 @@ void DoDeconstruct(Character * character, std::istream & sArgs)
         character->sendMsg("You deconstruct %s.\n", item->getName());
         // Reset item flags.
         ClearFlag(item->flags, ItemFlag::Built);
-        SQLiteDbms::instance().beginTransaction();
-        item->updateOnDB();
-        SQLiteDbms::instance().endTransaction();
     }
 }
 
-void DoRead(Character * character, std::istream & sArgs)
+void DoRead(Character * character, ArgumentHandler & args)
 {
-    // Get the arguments of the command.
-    ArgumentList arguments = ParseArgs(sArgs);
-    if (arguments.size() != 1)
+    if (args.size() != 1)
     {
         character->sendMsg("What do you want to read today, sai?\n");
         return;
     }
-    Item * item = character->findNearbyItem(arguments[0].first, arguments[0].second);
+    Item * item = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
     if (item == nullptr)
     {
         character->sendMsg("You can't find want you to read.\n");

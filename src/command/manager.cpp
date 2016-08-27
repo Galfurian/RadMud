@@ -16,31 +16,40 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#include "command.hpp"
+#include "manager.hpp"
 
-#include "../room.hpp"
-#include "../mobile.hpp"
+#include "../mud.hpp"
 #include "../item/shopItem.hpp"
-#include "../sqlite/sqliteDbms.hpp"
 
-void DoAssign(Character * character, std::istream & sArgs)
+void LoadManagerCommands()
+{
+    Command command;
+    command.level = 0;
+    {
+        command.name = "assign";
+        command.help = "Allows to assign a mobile to a task/building.";
+        command.args = "(mobile)(building)";
+        command.hndl = DoAssign;
+        Mud::instance().addCommand(command);
+    }
+}
+
+void DoAssign(Character * character, ArgumentHandler & args)
 {
     // Check if the player it's already doing something.
     StopAction(character);
-    // Get the arguments of the command.
-    ArgumentList arguments = ParseArgs(sArgs);
-    if (arguments.size() != 2)
+    if (args.size() != 2)
     {
         character->sendMsg("You need to specify who you want assign to which building.\n");
         return;
     }
-    Mobile * mobile = character->room->findMobile(arguments[0].first, arguments[0].second, { });
+    Mobile * mobile = character->room->findMobile(args[0].getContent(), args[0].getIndex(), { });
     if (mobile == nullptr)
     {
         character->sendMsg("You don't see that person.\n");
         return;
     }
-    Item * building = character->room->findBuilding(arguments[1].first, arguments[1].second);
+    Item * building = character->room->findBuilding(args[1].getContent(), args[1].getIndex());
     if (building == nullptr)
     {
         character->sendMsg("You don't see the desired building here.\n");
@@ -49,33 +58,26 @@ void DoAssign(Character * character, std::istream & sArgs)
     if (building->getType() == ModelType::Shop)
     {
         ShopItem * shop = building->toShopItem();
-        if (shop->shopKeeper == mobile)
+        if (mobile->managedItem != nullptr)
         {
-            character->sendMsg(
-                "%s is already assigned to %s.\n",
-                mobile->getNameCapital(),
-                building->getName());
-        }
-        else
-        {
-            shop->setNewShopKeeper(mobile);
-            SQLiteDbms::instance().beginTransaction();
-            if (shop->updateOnDB())
+            if (mobile->managedItem == shop)
             {
-                SQLiteDbms::instance().endTransaction();
                 character->sendMsg(
-                    "You assign %s to %s.\n",
-                    mobile->getName(),
+                    "%s is already assigned to %s.\n",
+                    mobile->getNameCapital(),
                     building->getName());
             }
             else
             {
-                SQLiteDbms::instance().rollbackTransection();
                 character->sendMsg(
-                    "You failded to assign %s to %s.\n",
-                    mobile->getName(),
-                    building->getName());
+                    "%s is already assigned to another shop.\n",
+                    mobile->getNameCapital());
             }
+        }
+        else
+        {
+            shop->setNewShopKeeper(mobile);
+            character->sendMsg("You assign %s to %s.\n", mobile->getName(), building->getName());
         }
     }
     else

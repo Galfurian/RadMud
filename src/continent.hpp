@@ -139,7 +139,12 @@ class Continent
         /// @param origin_y The y coordinate of the central room.
         /// @param origin_z The z coordinate of the central room.
         /// @param radius   The radius of visibility of the character.
-        void fieldOfView(Map2D<ContinentTile> & map, int origin_x, int origin_y, int origin_z, int radius);
+        void fieldOfView(
+            Map2D<ContinentTile> & map,
+            int origin_x,
+            int origin_y,
+            int origin_z,
+            int radius);
 
         /// @brief A fast line of sight algorithm between two points.
         /// @param map      The map where the LOS algorithm has to write the line.
@@ -160,10 +165,3 @@ class Continent
             double incr_z,
             int radius);
 };
-
-/// Continent list handler.
-typedef std::vector<Continent *> ContinentList;
-
-/// Continent map handler.
-typedef std::map<int, Continent *> ContinentMap;
-

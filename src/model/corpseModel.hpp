@@ -39,7 +39,13 @@ class CorpseModel: public ItemModel
         virtual Item * createItem(
             std::string maker,
             Material * composition,
-            const ItemQuality & itemQuality);
+            const ItemQuality & itemQuality,
+            const unsigned int & quantity);
 
+        /// Creates a new corpse.
+        /// @param maker       The player that create the corpse.
+        /// @param composition The composition of the corpse.
+        /// @param weight      The custom weight of the corpse.
+        /// @return The created corpse.
         Item * createCorpse(std::string maker, Material * composition, const unsigned int & weight);
 };

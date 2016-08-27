@@ -85,20 +85,15 @@ Player::~Player()
             Logger::log(LogLevel::Error, "Something has gone wrong during player socket closure.");
         }
     }
-    // Make a temporary copy of the lists.
-    auto inventoryClone = inventory;
-    auto equipmentClone = equipment;
-    // Delete the inventory items.
-    for (auto iterator : inventoryClone)
+    // Unlink the inventory items.
+    for (auto iterator : inventory)
     {
-        iterator->removeFromMud();
-        delete (iterator);
+        iterator->owner = nullptr;
     }
-    // Delete the equipment items.
-    for (auto iterator : equipmentClone)
+    // Unlink the equipment items.
+    for (auto iterator : equipment)
     {
-        iterator->removeFromMud();
-        delete (iterator);
+        iterator->owner = nullptr;
     }
     // Remove the player from the room.
     if (room != nullptr)
@@ -169,9 +164,53 @@ void Player::getSheet(Table & sheet) const
     }
 }
 
-///////////////////////////////////////////////////////////
-// CONNECTIONI ////////////////////////////////////////////
-///////////////////////////////////////////////////////////
+void Player::addInventoryItem(Item * & item)
+{
+    Character::addInventoryItem(item);
+    // Update on database.
+    SQLiteDbms::instance().insertInto(
+        "ItemPlayer",
+        { name, ToString(item->vnum), EnumToString(EquipmentSlot::None) },
+        false,
+        true);
+}
+
+void Player::addEquipmentItem(Item * & item)
+{
+    Character::addEquipmentItem(item);
+    // Update on database.
+    SQLiteDbms::instance().insertInto(
+        "ItemPlayer",
+        { name, ToString(item->vnum), EnumToString(item->getCurrentSlot()) },
+        false,
+        true);
+}
+
+bool Player::remInventoryItem(Item * item)
+{
+    if (Character::remInventoryItem(item))
+    {
+        // Update on database.
+        SQLiteDbms::instance().deleteFrom(
+            "ItemPlayer",
+            { std::make_pair("item", ToString(item->vnum)) });
+        return true;
+    }
+    return false;
+}
+
+bool Player::remEquipmentItem(Item * item)
+{
+    if (Character::remEquipmentItem(item))
+    {
+        // Update on database.
+        SQLiteDbms::instance().deleteFrom(
+            "ItemPlayer",
+            { std::make_pair("item", ToString(item->vnum)) });
+        return true;
+    }
+    return false;
+}
 
 int Player::getSocket() const
 {
@@ -204,11 +243,7 @@ bool Player::hasPendingOutput() const
     return !outbuf.empty();
 }
 
-///////////////////////////////////////////////////////////
-// DATABASE ///////////////////////////////////////////////
-///////////////////////////////////////////////////////////
-
-bool Player::createOnDB()
+bool Player::updateOnDB()
 {
     vector<string> arguments;
     // Prepare the arguments of the query.
@@ -235,12 +270,11 @@ bool Player::createOnDB()
     arguments.push_back(ToString(this->getHunger()));
     arguments.push_back(ToString(this->getThirst()));
     arguments.push_back(ToString(rent_room));
-    if (!SQLiteDbms::instance().insertInto("Player", arguments))
+    if (!SQLiteDbms::instance().insertInto("Player", arguments, false, true))
     {
-        Logger::log(LogLevel::Error, "Something gone wrong during player creation on database.");
+        Logger::log(LogLevel::Error, "Error during player creation on database.");
         return false;
     }
-
     // Prepare the arguments of the query for skill table.
     for (auto iterator : skills)
     {
@@ -248,150 +282,37 @@ bool Player::createOnDB()
         arguments.push_back(name);
         arguments.push_back(ToString(iterator.first));
         arguments.push_back(ToString(iterator.second));
-        if (!SQLiteDbms::instance().insertInto("Advancement", arguments))
+        if (!SQLiteDbms::instance().insertInto("Advancement", arguments, false, true))
         {
-            Logger::log(
-                LogLevel::Error,
-                "Something gone wrong during player Skill creation on database.");
+            Logger::log(LogLevel::Error, "Error during player Skill creation on database.");
             return false;
         }
     }
     return true;
 }
-
-bool Player::loadFromDB()
-{
-    return SQLiteDbms::instance().loadPlayer(this);
-}
-
-bool Player::updateOnDB()
-{
-    if (connection_state == ConnectionState::Playing)
-    {
-        QueryList value, where;
-        value.push_back(std::make_pair("name", name));
-        value.push_back(std::make_pair("password", password));
-        value.push_back(std::make_pair("race", ToString(race->vnum)));
-        value.push_back(
-            std::make_pair("str", ToString(this->getAbility(Ability::Strength, false))));
-        value.push_back(std::make_pair("agi", ToString(this->getAbility(Ability::Agility, false))));
-        value.push_back(
-            std::make_pair("per", ToString(this->getAbility(Ability::Perception, false))));
-        value.push_back(
-            std::make_pair("con", ToString(this->getAbility(Ability::Constitution, false))));
-        value.push_back(
-            std::make_pair("int", ToString(this->getAbility(Ability::Intelligence, false))));
-        value.push_back(std::make_pair("gender", ToString(static_cast<int>(gender))));
-        value.push_back(std::make_pair("age", ToString(age)));
-        value.push_back(std::make_pair("description", description));
-        value.push_back(std::make_pair("weight", ToString(weight)));
-        value.push_back(std::make_pair("faction", ToString(faction->vnum)));
-        value.push_back(std::make_pair("level", ToString(level)));
-        value.push_back(std::make_pair("experience", ToString(experience)));
-        value.push_back(std::make_pair("position", ToString(room->vnum)));
-        value.push_back(std::make_pair("prompt", prompt));
-        value.push_back(std::make_pair("flag", ToString(flags)));
-        value.push_back(std::make_pair("health", ToString(this->getHealth())));
-        value.push_back(std::make_pair("stamina", ToString(this->getStamina())));
-        value.push_back(std::make_pair("rent_room", ToString(rent_room)));
-        value.push_back(std::make_pair("hunger", ToString(this->getHunger())));
-        value.push_back(std::make_pair("thirst", ToString(this->getThirst())));
-        where.push_back(std::make_pair("name", name));
-
-        if (!SQLiteDbms::instance().updateInto("Player", value, where))
-        {
-            Logger::log(LogLevel::Error, "Error during Player's Information save.");
-            return false;
-        }
-        for (auto iterator : inventory)
-        {
-            if (!iterator->updateOnDB())
-            {
-                Logger::log(LogLevel::Error, "Error during Player's Inventory save.");
-                return false;
-            }
-        }
-        for (auto iterator : equipment)
-        {
-            if (!iterator->updateOnDB())
-            {
-                Logger::log(LogLevel::Error, "Error during Player's Equipment save.");
-                return false;
-            }
-        }
-        for (auto iterator : skills)
-        {
-            vector<string> arguments;
-            arguments.push_back(name);
-            arguments.push_back(ToString(iterator.first));
-            arguments.push_back(ToString(iterator.second));
-
-            if (!SQLiteDbms::instance().insertInto("Advancement", arguments, false, true))
-            {
-                Logger::log(LogLevel::Error, "Error during Player's Skills save.");
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
-///////////////////////////////////////////////////////////
-// INTERFACE //////////////////////////////////////////////
-///////////////////////////////////////////////////////////
 
 void Player::sendPrompt()
 {
     if (this->isPlaying())
     {
-        string readyPrompt = prompt + "\n";
-        FindAndReplace(readyPrompt, "&n", ToLower(name));
-        FindAndReplace(readyPrompt, "&N", name);
-        FindAndReplace(readyPrompt, "&h", ToString(this->getHealth()));
-        FindAndReplace(readyPrompt, "&H", ToString(this->getMaxHealth()));
-        FindAndReplace(readyPrompt, "&s", ToString(this->getStamina()));
-        FindAndReplace(readyPrompt, "&S", ToString(this->getMaxStamina()));
         // Send to the player his prompt.
-        if (!closing)
+        if (this->logged_in)
         {
+            string readyPrompt = prompt + "\n";
+            FindAndReplace(readyPrompt, "&n", ToLower(name));
+            FindAndReplace(readyPrompt, "&N", name);
+            FindAndReplace(readyPrompt, "&h", ToString(this->getHealth()));
+            FindAndReplace(readyPrompt, "&H", ToString(this->getMaxHealth()));
+            FindAndReplace(readyPrompt, "&s", ToString(this->getStamina()));
+            FindAndReplace(readyPrompt, "&S", ToString(this->getMaxStamina()));
             this->sendMsg(readyPrompt);
+        }
+        else
+        {
+            this->sendMsg("\n");
         }
     }
 }
-
-///////////////////////////////////////////////////////////
-// INVENTORY //////////////////////////////////////////////
-///////////////////////////////////////////////////////////
-
-bool Player::remInventoryItem(Item * item)
-{
-    if (Character::remInventoryItem(item))
-    {
-        SQLiteDbms::instance().deleteFrom("ItemPlayer", { std::make_pair("owner", name),
-            std::make_pair("item", ToString(item->vnum)) });
-        return true;
-    }
-    return false;
-}
-
-///////////////////////////////////////////////////////////
-// EQUIPMENT //////////////////////////////////////////////
-///////////////////////////////////////////////////////////
-
-bool Player::remEquipmentItem(Item * item)
-{
-    if (Character::remEquipmentItem(item))
-    {
-        SQLiteDbms::instance().deleteFrom("ItemPlayer", { std::make_pair("owner", name),
-            std::make_pair("item", ToString(item->vnum)) });
-        return true;
-    }
-    return false;
-}
-
-///////////////////////////////////////////////////////////
-// DEATH //////////////////////////////////////////////////
-///////////////////////////////////////////////////////////
 
 void Player::kill()
 {
@@ -406,10 +327,6 @@ void Player::kill()
     this->setHealth(1, true);
     this->setStamina(1, true);
 }
-
-///////////////////////////////////////////////////////////
-// COMMUNICATION //////////////////////////////////////////
-///////////////////////////////////////////////////////////
 
 void Player::enterGame()
 {
@@ -434,7 +351,7 @@ void Player::enterGame()
     {
         room->addCharacter(this);
         // Set the list of exceptions.
-        CharacterVector exceptions;
+        std::vector<Character *> exceptions;
         exceptions.push_back(this);
         // Send the message inside the room.
         room->sendToAll("%s appears.\n", exceptions, name);
@@ -454,10 +371,10 @@ void Player::enterGame()
 void Player::processInput(Player * player, const string & command)
 {
     ActionHandler _action = Mud::instance().findStateAction(player->connection_state);
-    std::istringstream is(command);
     try
     {
-        _action(player, is);
+        ArgumentHandler argumentHandler(command);
+        _action(player, argumentHandler);
     }
     catch (std::runtime_error & e)
     {

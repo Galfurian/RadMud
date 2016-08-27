@@ -31,16 +31,6 @@ CurrencyItem::~CurrencyItem()
     // Nothing to do.
 }
 
-ModelType CurrencyItem::getType() const
-{
-    return ModelType::Currency;
-}
-
-std::string CurrencyItem::getTypeName() const
-{
-    return "currency";
-}
-
 void CurrencyItem::getSheet(Table & sheet) const
 {
     // Call the function of the father class.
@@ -52,15 +42,13 @@ void CurrencyItem::getSheet(Table & sheet) const
 
 unsigned int CurrencyItem::getPrice() const
 {
-    unsigned int customPrice = Item::getPrice();
-    CurrencyModel * currency = this->model->toCurrency();
-    if (!currency->findPrice(this->composition->vnum, customPrice))
+    auto customPrice = Item::getPrice();
+    if (!model->toCurrency()->findPrice(this->composition->vnum, customPrice))
     {
         Logger::log(
-            LogLevel::Warning,
-            "The item (%s) has a wrong composition w.r.t the currency (%s).",
-            this->getName(),
-            currency->getName());
+            LogLevel::Error,
+            "The item (%s) has a wrong composition w.r.t its currency.",
+            this->getName());
     }
     return customPrice;
 }

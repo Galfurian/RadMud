@@ -288,9 +288,6 @@ class Direction
         Enum direction;
 };
 
-/// Map which associate a string to a direction.
-typedef std::map<std::string, Direction> DirectionMap;
-
 // //////////////////////////////////////////////////////////////////
 // AREA /////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////
@@ -505,7 +502,7 @@ class ItemQuality
         }
 
         /// @brief Constructor from enum.
-        ItemQuality(Enum _quality) :
+        ItemQuality(const Enum & _quality) :
                 quality(_quality)
         {
             // Nothing to do.

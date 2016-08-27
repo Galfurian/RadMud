@@ -44,14 +44,9 @@ bool ShopItem::check(bool complete)
     return Item::check(complete);
 }
 
-bool ShopItem::destroy()
+bool ShopItem::updateOnDB()
 {
-    return Item::destroy();
-}
-
-bool ShopItem::createOnDB()
-{
-    if (Item::createOnDB())
+    if (Item::updateOnDB())
     {
         // Prepare the vector used to insert into the database.
         std::vector<std::string> arguments;
@@ -68,45 +63,7 @@ bool ShopItem::createOnDB()
         {
             arguments.push_back("");
         }
-        if (SQLiteDbms::instance().insertInto("Shop", arguments))
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool ShopItem::updateOnDB()
-{
-    if (Item::updateOnDB())
-    {
-        // Save the item's Information.
-        {
-            QueryList value;
-            value.push_back(std::make_pair("item", ToString(this->vnum)));
-            value.push_back(std::make_pair("name", this->shopName));
-            value.push_back(std::make_pair("buyTax", ToString(this->shopBuyTax)));
-            value.push_back(std::make_pair("sellTax", ToString(this->shopSellTax)));
-            value.push_back(std::make_pair("balance", ToString(this->balance)));
-            if (this->shopKeeper != nullptr)
-            {
-                value.push_back(std::make_pair("keeper", this->shopKeeper->id));
-            }
-            else
-            {
-                value.push_back(std::make_pair("keeper", ""));
-            }
-            QueryList where;
-            where.push_back(std::make_pair("item", ToString(vnum)));
-            if (SQLiteDbms::instance().updateInto("Shop", value, where))
-            {
-                return true;
-            }
-            else
-            {
-                Logger::log(LogLevel::Error, "Can't save the shop!");
-            }
-        }
+        return SQLiteDbms::instance().insertInto("Shop", arguments, false, true);
     }
     return false;
 }
@@ -115,17 +72,12 @@ bool ShopItem::removeOnDB()
 {
     if (Item::removeOnDB())
     {
-        QueryList where;
-        where.push_back(std::make_pair("vnum", ToString(vnum)));
-        if (SQLiteDbms::instance().deleteFrom("Shop", where))
+        if (SQLiteDbms::instance().deleteFrom("Shop", { std::make_pair("vnum", ToString(vnum)) }))
         {
             return true;
         }
-        else
-        {
-            Logger::log(LogLevel::Error, "Error during item removal from table Item.");
-        }
     }
+    Logger::log(LogLevel::Error, "Error during item removal from table Shop.");
     return false;
 }
 
@@ -186,7 +138,7 @@ std::string ShopItem::lookContent()
         saleTable.addColumn("Weight", StringAlign::Center);
         saleTable.addColumn("Buy", StringAlign::Left);
         saleTable.addColumn("Sell", StringAlign::Left);
-        for (auto iterator : GroupItems(content))
+        for (auto iterator : content.toStack())
         {
             // Retrieve the item.
             Item * item = iterator.first;

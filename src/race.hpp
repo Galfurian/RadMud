@@ -45,7 +45,7 @@ class Race
         /// Base race abilities.
         std::map<Ability, unsigned int> abilities;
         /// The factions that a player of this race can choose.
-        FactionList availableFaction;
+        std::vector<Faction *> availableFaction;
         /// The flag that indicates if the race is selectable by the player during
         ///  character creation.
         bool player_allow;
@@ -126,9 +126,3 @@ class Race
         /// @return The string which contains the code of the race's tile.
         std::string getTile();
 };
-
-/// Race list handler.
-typedef std::vector<Race *> RaceList;
-
-/// Race map handler.
-typedef std::map<int, Race *> RaceMap;

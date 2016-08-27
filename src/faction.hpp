@@ -79,9 +79,3 @@ class Faction
         /// @param L The lua environment.
         static void luaRegister(lua_State * L);
 };
-
-/// Faction list handler.
-typedef std::vector<Faction *> FactionList;
-
-/// Faction map handler.
-typedef std::map<int, Faction *> FactionMap;

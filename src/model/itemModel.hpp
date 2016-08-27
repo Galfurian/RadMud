@@ -95,7 +95,9 @@ typedef enum class ModelFlags
     /// It can be closed.
     CanClose = 32,
     /// Even if it is closed, a character can see through it.
-    CanSeeThrough = 64
+    CanSeeThrough = 64,
+    /// The items with this flag can be stacked.
+    CanBeStacked = 128
 } ModelFlag;
 
 class Item;
@@ -198,11 +200,13 @@ class ItemModel
         /// @param maker       The player that create the item.
         /// @param composition The composition of the item.
         /// @param itemQuality The quality of the item.
+        /// @param quantity    The quantity.
         /// @return The newly created item.
         virtual Item * createItem(
             std::string maker,
             Material * composition,
-            const ItemQuality & itemQuality);
+            const ItemQuality & itemQuality,
+            const unsigned int & quantity);
 
         /// @brief Check the correctness of the model.
         /// @return <b>True</b> if the model has correct values,<br>
@@ -293,13 +297,8 @@ class ItemModel
         WeaponModel * toWeapon();
 };
 
+/// Generates a new model based on the provided type.
 ItemModel * GenerateModel(const ModelType & type);
-
-/// ItemModel vector handler.
-typedef std::vector<ItemModel *> ItemModelList;
-
-/// ItemModel map handler.
-typedef std::map<int, ItemModel *> ItemModelMap;
 
 /// @defgroup FlagsToList Flags to List of Strings.
 /// @brief All the functions necessary to transform into a list of string a pool of flags.
@@ -307,8 +306,5 @@ typedef std::map<int, ItemModel *> ItemModelMap;
 
 /// Return a list of string containg the Model flags contained inside the value.
 std::string GetModelFlagString(unsigned int flags);
-
-/// Return the string describing the type of a Model.
-//std::string GetModelTypeName(ModelType type);
 
 /// @}

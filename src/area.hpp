@@ -197,8 +197,8 @@ class Area
         /// @return <b>True</b> if there are targets in sight,<br>
         ///         <b>False</b> otherwise.
         bool getCharactersInSight(
-            CharacterVector & targets,
-            CharacterVector & exceptions,
+            std::vector<Character *> & targets,
+            std::vector<Character *> & exceptions,
             int origin_x,
             int origin_y,
             int origin_z,
@@ -208,16 +208,3 @@ class Area
         /// @param L The lua environment.
         static void luaRegister(lua_State * L);
 };
-
-/// Area list handler.
-typedef std::vector<Area *> AreaList;
-
-/// AreaList iterator.
-typedef AreaList::iterator AreaListIterator;
-
-/// Area map handler.
-typedef std::map<int, Area *> AreaMap;
-
-/// AreaMap iterator.
-typedef AreaMap::iterator AreaMapIterator;
-

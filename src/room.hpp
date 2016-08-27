@@ -30,6 +30,8 @@
 #include "lua/lua_script.hpp"
 #include "utilities/coordinates.hpp"
 
+#include "item/itemContainer.hpp"
+
 class Item;
 class Area;
 class Continent;
@@ -68,44 +70,52 @@ class Room
         /// List of exits.
         ExitVector exits;
         /// List of items in the room.
-        ItemVector items;
+        ItemContainer items;
         /// List of characters in the room.
-        CharacterVector characters;
+        std::vector<Character *> characters;
         /// Integer that describe the flags of the room.
         unsigned int flags;
 
         /// @brief Constructor.
         Room();
 
-        /// @brief Copy Constructor.
+        /// @brief Destructor.
         ~Room();
 
-        /// @brief Destructor.
+        /// @brief Function used to check the correctness of the room.
+        /// @param complete If set to true, the function check if the room has
+        ///                  been placed inside an area or a continent.
+        /// @return <b>True</b> if the room values are correct,<br>
+        ///         <b>False</b> otherwise.
         bool check(bool complete = false);
 
         /// @brief In addition to adding the the passed item to room's items list.
-        /// @param item The item to add to the list.
-        void addItem(Item * item);
+        /// @param item     The item to add to the list.
+        /// @param updateDB If <b>True</b> all the changes are also updated on DB.
+        void addItem(Item * & item, bool updateDB = true);
 
         /// @brief Add the passed item to room's buildings list.
-        /// @param item The item to add to the list.
-        void addBuilding(Item * item);
+        /// @param item     The building to add to the list.
+        /// @param updateDB If <b>True</b> all the changes are also updated on DB.
+        void addBuilding(Item * item, bool updateDB = true);
 
         /// @brief Add the passed character to room's character list.
         /// @param character The character to add to the list.
         void addCharacter(Character * character);
 
         /// @brief Remove the passed item from room's item list.
-        /// @param item The item to remove from the list.
+        /// @param item     The item to remove from the list.
+        /// @param updateDB If <b>True</b> all the changes are also updated on DB.
         /// @return <b>True</b> if the operation goes well,<br>
         ///         <b>False</b> otherwise.
-        bool removeItem(Item * item);
+        bool removeItem(Item * item, bool updateDB = true);
 
         /// @brief Remove the passed item from room's building list.
-        /// @param item The building to remove from the list.
+        /// @param item     The building to remove from the list.
+        /// @param updateDB If <b>True</b> all the changes are also updated on DB.
         /// @return <b>True</b> if the operation goes well,<br>
         ///         <b>False</b> otherwise.
-        bool removeBuilding(Item * item);
+        bool removeBuilding(Item * item, bool updateDB = true);
 
         /// @brief Remove the passed character from room's character list.
         /// @param character The character to remove from the list.
@@ -114,19 +124,21 @@ class Room
         /// @brief Select from the room all the players and return them.
         /// @param exception The exception from the list.
         /// @return The list of all the players in the room.
-        PlayerList getAllPlayer(Character * exception);
+        std::set<Player *> getAllPlayer(Character * exception);
 
         /// @brief Select from the room all the mobiles and return them.
         /// @param exception The exception from the list.
         /// @return The list of all the mobiles in the room.
-        MobileList getAllMobile(Character * exception);
+        std::vector<Mobile *> getAllMobile(Character * exception);
 
         /// @brief Save the room on database.
-        /// @return <b>True</b> if the execution goes well,<br><b>False</b> otherwise.
+        /// @return <b>True</b> if the execution goes well,<br>
+        ///         <b>False</b> otherwise.
         bool updateOnDB();
 
         /// @brief Remove the room from the database.
-        /// @return <b>True</b> if the execution goes well,<br><b>False</b> otherwise.
+        /// @return <b>True</b> if the execution goes well,<br>
+        ///         <b>False</b> otherwise.
         bool removeOnDB();
 
         /// @brief Search for the item in the room.
@@ -149,7 +161,7 @@ class Room
         /// @brief Search for the buildings of the given type inside the room.
         /// @param type The type of the buildings.
         /// @return The buildings list.
-        ItemVector findBuildings(ModelType type);
+        std::vector<Item *> findBuildings(ModelType type);
 
         /// @brief Search for the character in the room.
         /// @param target    The character to search.
@@ -159,21 +171,27 @@ class Room
         Character * findCharacter(
             std::string target,
             int & number,
-            const CharacterVector & exceptions);
+            const std::vector<Character *> & exceptions = std::vector<Character *>());
 
         /// @brief Search for the player in the room.
         /// @param target    The player to search.
         /// @param number    Number of the player we are looking for.
         /// @param exceptions The list of exceptions.
         /// @return The player, if it's in the room.
-        Player * findPlayer(std::string target, int & number, const CharacterVector & exceptions);
+        Player * findPlayer(
+            std::string target,
+            int & number,
+            const std::vector<Character *> & exceptions = std::vector<Character *>());
 
         /// @brief Search for the mobile in the room.
         /// @param target    The mobile to search.
         /// @param number    Number of the mobile we are looking for.
         /// @param exceptions The list of exceptions.
         /// @return The mobile, if it's in the room.
-        Mobile * findMobile(std::string target, int & number, const CharacterVector & exceptions);
+        Mobile * findMobile(
+            std::string target,
+            int & number,
+            const std::vector<Character *> & exceptions = std::vector<Character *>());
 
         /// @brief Add the provided exit to the room list of exits.
         /// @param exit The exit to add to the list.
@@ -218,7 +236,7 @@ class Room
         /// @brief Send a message to all the player in the room, can specify exceptions.
         /// @param message    The message to send.
         /// @param exceptions The list of exceptions.
-        void sendToAll(const std::string & message, const CharacterVector & exceptions);
+        void sendToAll(const std::string & message, const std::vector<Character *> & exceptions);
 
         /// @brief Print to consol and to logging file the gievn string.
         /// @param message    The message to send.
@@ -228,7 +246,7 @@ class Room
         template<typename ... Args>
         void sendToAll(
             const std::string & message,
-            const CharacterVector & exceptions,
+            const std::vector<Character *> & exceptions,
             const std::string & first,
             const Args & ... args)
         {
@@ -286,18 +304,3 @@ bool ConnectRoom(Room * room);
 std::string GetRoomFlagString(unsigned int flags);
 
 /// @}
-
-/// Room list handler.
-typedef std::vector<Room *> RoomList;
-
-/// RoomList iterator.
-typedef RoomList::iterator RoomListIterator;
-
-/// Room map handler.
-typedef std::map<int, Room *> RoomMap;
-
-/// RoomMap iterator.
-typedef RoomMap::iterator RoomMapIterator;
-
-/// Map of travelling points.
-typedef std::map<Room *, Room *> TravelPointMap;

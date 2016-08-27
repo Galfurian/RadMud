@@ -41,11 +41,11 @@ class Building
         /// A flag which indicates if the maker can be assisted by someone.
         bool assisted;
         /// The list of needed type of tools.
-        ToolSet tools;
+        std::set<ToolType> tools;
         /// The model that has to be built.
         ItemModel * buildingModel;
         /// The list of needed type of ingredients and their quantity.
-        IngredientMap ingredients;
+        std::map<ResourceType, unsigned int> ingredients;
         /// Flag which determine if in the same room only one of this building can be present.
         bool unique;
 
@@ -84,9 +84,3 @@ class Building
         ///         <b>False</b> otherwise.
         bool setIngredient(const std::string & source);
 };
-
-/// Building map handler.
-typedef std::map<int, Building> BuildingMap;
-
-/// BuildingMap iterator.
-typedef BuildingMap::iterator BuildingMapIterator;

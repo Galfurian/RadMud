@@ -20,6 +20,14 @@
 #include "command.hpp"
 #include "../mud.hpp"
 
+#include "combat.hpp"
+#include "communication.hpp"
+#include "crafting.hpp"
+#include "general.hpp"
+#include "god.hpp"
+#include "manager.hpp"
+#include "object.hpp"
+
 /// Player names must consist of characters from this list.
 const std::string kValidPlayerName =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
@@ -27,21 +35,15 @@ const std::string kValidPlayerName =
 const std::string kValidDescription =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ,.\n";
 
-void ProcessCommand(Character * character, std::istream & sArgs)
+void ProcessCommand(Character * character, ArgumentHandler & args)
 {
-    std::string command;
-    if (!sArgs.good())
+    if (args.empty())
     {
-        Logger::log(LogLevel::Fatal, "Possible fatal error in input.");
-        throw std::runtime_error("Huh?\n");
+        character->sendMsg("Huh?\n");
+        return;
     }
-    // Get command, eat whitespace after it.
-    sArgs >> command;
-    if (command.empty())
-    {
-        throw std::runtime_error("Huh?\n");
-    }
-    sArgs >> std::ws;
+    auto command = args[0].getContent();
+    args.erase(0);
 
     // Check if it's a direction.
     Direction direction = Mud::instance().findDirection(command, false);
@@ -74,7 +76,7 @@ void ProcessCommand(Character * character, std::istream & sArgs)
             }
             else
             {
-                iterator.hndl(character, sArgs);
+                iterator.hndl(character, args);
                 found = true;
                 break;
             }
@@ -82,10 +84,9 @@ void ProcessCommand(Character * character, std::istream & sArgs)
         if (!found)
         {
             Profession * profession = Mud::instance().findProfession(command);
-
             if (profession != nullptr)
             {
-                DoProfession(character, profession, sArgs);
+                DoProfession(character, profession, args);
             }
             else
             {
@@ -96,12 +97,10 @@ void ProcessCommand(Character * character, std::istream & sArgs)
     character->sendMsg("\n");
 }
 
-void ProcessPlayerName(Character * character, std::istream & sArgs)
+void ProcessPlayerName(Character * character, ArgumentHandler & args)
 {
     Player * player = character->toPlayer();
-    std::string input;
-    getline(sArgs, input);
-
+    auto input = args.getOriginal();
     // Name can't be blank.
     if (input.empty())
     {
@@ -146,7 +145,7 @@ void ProcessPlayerName(Character * character, std::istream & sArgs)
         // Save the name of the player.
         player->name = ToCapitals(input);
         // Load player so we know the player_password etc.
-        if (player->loadFromDB())
+        if (SQLiteDbms::instance().loadPlayer(player))
         {
             // Delete the loaded prompt, otherwise it will be shown.
             player->prompt = "";
@@ -162,12 +161,10 @@ void ProcessPlayerName(Character * character, std::istream & sArgs)
     }
 }
 
-void ProcessPlayerPassword(Character * character, std::istream & sArgs)
+void ProcessPlayerPassword(Character * character, ArgumentHandler & args)
 {
     Player * player = character->toPlayer();
-    std::string input;
-    getline(sArgs, input);
-
+    auto input = args.getOriginal();
     // Check the correctness of the password.
     if (input != player->password)
     {
@@ -192,12 +189,10 @@ void ProcessPlayerPassword(Character * character, std::istream & sArgs)
     }
 }
 
-void ProcessNewName(Character * character, std::istream & sArgs)
+void ProcessNewName(Character * character, ArgumentHandler & args)
 {
     Player * player = character->toPlayer();
-    std::string input;
-    getline(sArgs, input);
-
+    auto input = args.getOriginal();
     // Player_password can't be blank.
     if (input.empty())
     {
@@ -248,12 +243,10 @@ void ProcessNewName(Character * character, std::istream & sArgs)
     }
 }
 
-void ProcessNewPwd(Character * character, std::istream & sArgs)
+void ProcessNewPwd(Character * character, ArgumentHandler & args)
 {
     Player * player = character->toPlayer();
-    std::string input;
-    getline(sArgs, input);
-
+    auto input = args.getOriginal();
     // Player_password can't be blank.
     if (input.empty())
     {
@@ -279,12 +272,10 @@ void ProcessNewPwd(Character * character, std::istream & sArgs)
     }
 }
 
-void ProcessNewPwdCon(Character * character, std::istream & sArgs)
+void ProcessNewPwdCon(Character * character, ArgumentHandler & args)
 {
     Player * player = character->toPlayer();
-    std::string input;
-    getline(sArgs, input);
-
+    auto input = args.getOriginal();
     // Check if the player has typed BACK.
     if (ToLower(input) == "back")
     {
@@ -304,12 +295,10 @@ void ProcessNewPwdCon(Character * character, std::istream & sArgs)
     }
 }
 
-void ProcessNewStory(Character * character, std::istream & sArgs)
+void ProcessNewStory(Character * character, ArgumentHandler & args)
 {
     Player * player = character->toPlayer();
-    std::string input;
-    getline(sArgs, input);
-
+    auto input = args.getOriginal();
     // Player_password can't be blank.
     if (input.empty())
     {
@@ -334,30 +323,26 @@ void ProcessNewStory(Character * character, std::istream & sArgs)
     }
 }
 
-void ProcessNewRace(Character * character, std::istream & sArgs)
+void ProcessNewRace(Character * character, ArgumentHandler & args)
 {
     Player * player = character->toPlayer();
-
-    // Get the arguments of the command.
-    ArgumentList arguments = ParseArgs(sArgs);
-
     // Player_password can't be blank.
-    if ((arguments.size() != 1) && (arguments.size() != 2))
+    if ((args.size() != 1) && (args.size() != 2))
     {
         AdvanceCharacterCreation(character, ConnectionState::AwaitingNewRace, "Invalid input.");
     }
     // Check if the player has typed BACK.
-    else if (ToLower(arguments[0].first) == "back")
+    else if (ToLower(args[0].getContent()) == "back")
     {
         RollbackCharacterCreation(player, ConnectionState::AwaitingNewStory);
     }
     // If the player has insert help (race_number), show its help.
-    else if (BeginWith(ToLower(arguments[0].first), "help"))
+    else if (BeginWith(ToLower(args[0].getContent()), "help"))
     {
-        if (arguments.size() == 2)
+        if (args.size() == 2)
         {
             // Get the race.
-            Race * race = Mud::instance().findRace(ToInt(arguments[1].first));
+            Race * race = Mud::instance().findRace(ToNumber<int>(args[1].getContent()));
             if (race == nullptr)
             {
                 AdvanceCharacterCreation(
@@ -399,10 +384,10 @@ void ProcessNewRace(Character * character, std::istream & sArgs)
                 "You have to specify the race number.");
         }
     }
-    else if (IsNumber(arguments[0].first))
+    else if (IsNumber(args[0].getContent()))
     {
         // Get the race.
-        Race * race = Mud::instance().findRace(ToInt(arguments[0].first));
+        Race * race = Mud::instance().findRace(ToNumber<int>(args[0].getContent()));
         if (race == nullptr)
         {
             AdvanceCharacterCreation(
@@ -432,24 +417,21 @@ void ProcessNewRace(Character * character, std::istream & sArgs)
     }
 }
 
-void ProcessNewAttr(Character * character, std::istream & sArgs)
+void ProcessNewAttr(Character * character, ArgumentHandler & args)
 {
     Player * player = character->toPlayer();
-
-    // Get the arguments of the command.
-    ArgumentList arguments = ParseArgs(sArgs);
     // Player_password can't be blank.
-    if ((arguments.size() != 1) && (arguments.size() != 2))
+    if ((args.size() != 1) && (args.size() != 2))
     {
         AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAttr, "Invalid input.");
     }
     // Check if the player has typed BACK.
-    else if (ToLower(arguments[0].first) == "back")
+    else if (ToLower(args[0].getContent()) == "back")
     {
         RollbackCharacterCreation(player, ConnectionState::AwaitingNewRace);
     }
     // Check if the player has not yet typed RESET.
-    else if (ToLower(arguments[0].first) == "reset")
+    else if (ToLower(args[0].getContent()) == "reset")
     {
         player->remaining_points = 0;
         player->setAbility(Ability::Strength, player->race->getAbility(Ability::Strength));
@@ -463,17 +445,17 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
             Formatter::cyan() + "Attribute has been set by default." + Formatter::reset() + "\n");
     }
     // If the player has insert help (attribute number), show its help.
-    else if (BeginWith(ToLower(arguments[0].first), "continue"))
+    else if (BeginWith(ToLower(args[0].getContent()), "continue"))
     {
         AdvanceCharacterCreation(player, ConnectionState::AwaitingNewGender);
     }
     // If the player has insert help (attribute number), show its help.
-    else if (BeginWith(ToLower(arguments[0].first), "help"))
+    else if (BeginWith(ToLower(args[0].getContent()), "help"))
     {
-        if (arguments.size() == 2)
+        if (args.size() == 2)
         {
             std::string helpMessage;
-            if (arguments[1].first == "1")
+            if (args[1].getContent() == "1")
             {
                 helpMessage = "Help about Strength.\n" + Formatter::italic();
                 helpMessage += "Strength is important for increasing the Carrying Weight and ";
@@ -481,7 +463,7 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
                     "satisfying the minimum Strength requirements for some weapons and armors.";
                 helpMessage += Formatter::reset() + "\n";
             }
-            else if (arguments[1].first == "2")
+            else if (args[1].getContent() == "2")
             {
                 helpMessage = "Help about Agility.\n" + Formatter::italic();
                 helpMessage += "Besides increasing mobility in combat, it increases the recharge ";
@@ -489,21 +471,21 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
                     "speed of all the weapons, as well as the ability to use light armor.";
                 helpMessage += Formatter::reset() + "\n";
             }
-            else if (arguments[1].first == "3")
+            else if (args[1].getContent() == "3")
             {
                 helpMessage = "Help about Perception.\n" + Formatter::italic();
                 helpMessage += "The ability to see, hear, taste and notice unusual things. ";
                 helpMessage += "A high Perception is important for a sharpshooter.";
                 helpMessage += Formatter::reset() + "\n";
             }
-            else if (arguments[1].first == "4")
+            else if (args[1].getContent() == "4")
             {
                 helpMessage = "Help about Constitution.\n" + Formatter::italic();
                 helpMessage += "Stamina and physical toughness. A character with a high Endurance ";
                 helpMessage += "will survive where others may not.";
                 helpMessage += Formatter::reset() + "\n";
             }
-            else if (arguments[1].first == "5")
+            else if (args[1].getContent() == "5")
             {
                 helpMessage = "Help about Intelligence.\n" + Formatter::italic();
                 helpMessage += "Knowledge, wisdom and the ability to think quickly, ";
@@ -526,16 +508,16 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
     }
     else
     {
-        if (arguments.size() == 2)
+        if (args.size() == 2)
         {
             std::string helpMessage;
-            int modifier = ToInt(arguments[1].first);
+            int modifier = ToNumber<int>(args[1].getContent());
             // Check for errors.
             if (player->remaining_points < modifier)
             {
                 helpMessage = "You don't have enough points left.";
             }
-            else if (arguments[0].first == "1")
+            else if (args[0].getContent() == "1")
             {
                 int result = static_cast<int>(player->getAbility(Ability::Strength, false))
                     + modifier;
@@ -559,7 +541,7 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
                     player->setAbility(Ability::Strength, static_cast<unsigned int>(result));
                 }
             }
-            else if (arguments[0].first == "2")
+            else if (args[0].getContent() == "2")
             {
                 int result = static_cast<int>(player->getAbility(Ability::Agility, false))
                     + modifier;
@@ -583,7 +565,7 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
                     player->setAbility(Ability::Agility, static_cast<unsigned int>(result));
                 }
             }
-            else if (arguments[0].first == "3")
+            else if (args[0].getContent() == "3")
             {
                 int result = static_cast<int>(player->getAbility(Ability::Perception, false))
                     + modifier;
@@ -609,7 +591,7 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
                     player->setAbility(Ability::Perception, static_cast<unsigned int>(result));
                 }
             }
-            else if (arguments[0].first == "4")
+            else if (args[0].getContent() == "4")
             {
                 int result = static_cast<int>(player->getAbility(Ability::Constitution, false))
                     + modifier;
@@ -635,7 +617,7 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
                     player->setAbility(Ability::Constitution, static_cast<unsigned int>(result));
                 }
             }
-            else if (arguments[0].first == "5")
+            else if (args[0].getContent() == "5")
             {
                 int result = static_cast<int>(player->getAbility(Ability::Intelligence, false))
                     + modifier;
@@ -677,11 +659,10 @@ void ProcessNewAttr(Character * character, std::istream & sArgs)
     }
 }
 
-void ProcessNewGender(Character * character, std::istream & sArgs)
+void ProcessNewGender(Character * character, ArgumentHandler & args)
 {
     Player * player = character->toPlayer();
-    std::string input;
-    getline(sArgs, input);
+    auto input = args.getOriginal();
     // Check if the player has typed BACK.
     if (ToLower(input) == "back")
     {
@@ -706,11 +687,10 @@ void ProcessNewGender(Character * character, std::istream & sArgs)
     }
 }
 
-void ProcessNewAge(Character * character, std::istream & sArgs)
+void ProcessNewAge(Character * character, ArgumentHandler & args)
 {
     Player * player = character->toPlayer();
-    std::string input;
-    getline(sArgs, input);
+    auto input = args.getOriginal();
     // Check if the player has typed BACK.
     if (ToLower(input) == "back")
     {
@@ -722,7 +702,7 @@ void ProcessNewAge(Character * character, std::istream & sArgs)
     }
     else
     {
-        int age = ToInt(input);
+        int age = ToNumber<int>(input);
         if (age < 18)
         {
             AdvanceCharacterCreation(
@@ -745,11 +725,10 @@ void ProcessNewAge(Character * character, std::istream & sArgs)
     }
 }
 
-void ProcessNewDesc(Character * character, std::istream & sArgs)
+void ProcessNewDesc(Character * character, ArgumentHandler & args)
 {
     Player * player = character->toPlayer();
-    std::string input;
-    getline(sArgs, input);
+    auto input = args.getOriginal();
     // Player_password can't be blank.
     if (input.empty())
     {
@@ -781,11 +760,10 @@ void ProcessNewDesc(Character * character, std::istream & sArgs)
     }
 }
 
-void ProcessNewWeight(Character * character, std::istream & sArgs)
+void ProcessNewWeight(Character * character, ArgumentHandler & args)
 {
     Player * player = character->toPlayer();
-    std::string input;
-    getline(sArgs, input);
+    auto input = args.getOriginal();
     // Check if the player has typed BACK.
     if (ToLower(input) == "back")
     {
@@ -800,7 +778,7 @@ void ProcessNewWeight(Character * character, std::istream & sArgs)
     }
     else
     {
-        int weight = ToInt(input);
+        int weight = ToNumber<int>(input);
         if (weight < 40)
         {
             AdvanceCharacterCreation(
@@ -820,12 +798,10 @@ void ProcessNewWeight(Character * character, std::istream & sArgs)
     }
 }
 
-void ProcessNewConfirm(Character * character, std::istream & sArgs)
+void ProcessNewConfirm(Character * character, ArgumentHandler & args)
 {
     Player * player = character->toPlayer();
-    std::string input;
-    getline(sArgs, input);
-
+    auto input = args.getOriginal();
     // Check if the player has typed BACK.
     if (ToLower(input) == "back")
     {
@@ -839,7 +815,8 @@ void ProcessNewConfirm(Character * character, std::istream & sArgs)
         player->experience = 0;
         player->flags = 0;
         player->rent_room = 1000;
-        if (player->createOnDB())
+        SQLiteDbms::instance().beginTransaction();
+        if (player->updateOnDB())
         {
             AdvanceCharacterCreation(player, ConnectionState::Playing);
         }
@@ -847,6 +824,7 @@ void ProcessNewConfirm(Character * character, std::istream & sArgs)
         {
             player->closeConnection();
         }
+        SQLiteDbms::instance().endTransaction();
     }
     else
     {
@@ -865,17 +843,6 @@ void NoMobile(Character * character)
     }
 }
 
-void NoMore(Character * character, std::istream & sArgs)
-{
-    std::string sLine;
-    getline(sArgs, sLine);
-    if (!sLine.empty())
-    {
-        character->sendMsg("Unexpected input :'" + sLine + "'.\n");
-        throw std::runtime_error("");
-    }
-}
-
 void StopAction(Character * character)
 {
     if ((character->getAction()->getType() != ActionType::Wait))
@@ -885,27 +852,6 @@ void StopAction(Character * character)
             character->doCommand("stop");
         }
     }
-}
-
-ArgumentList ParseArgs(std::istream & sArgs)
-{
-    ArgumentList arguments;
-    std::vector<std::string> words;
-
-    // Get the words from the input line.
-    std::string argumentsLine;
-    std::getline(sArgs, argumentsLine);
-    words = GetWords(argumentsLine);
-    for (auto it : words)
-    {
-        // Set one by default.
-        int number = 1;
-        // Extract the number.
-        ExtractNumber(it, number);
-        // Add the argument.
-        arguments.push_back(std::make_pair(it, number));
-    }
-    return arguments;
 }
 
 void LoadStates()
@@ -1291,796 +1237,11 @@ void AdvanceCharacterCreation(Character * character, ConnectionState new_state, 
 
 void LoadCommands()
 {
-    Command command;
-    command.level = 0;
-    {
-        command.name = "save";
-        command.help = "Save character into the database.";
-        command.args = "";
-        command.hndl = DoSave;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "quit";
-        command.help = "Leave the game.";
-        command.args = "";
-        command.hndl = DoQuit;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "who";
-        command.help = "List all the character online.";
-        command.args = "";
-        command.hndl = DoWho;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "set";
-        command.help = "Set some character texts(eg. descr).";
-        command.args = "(setting) (value)";
-        command.hndl = DoSet;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "stop";
-        command.help = "Stop the current character action.";
-        command.args = "";
-        command.hndl = DoStop;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "look";
-        command.help = "Look at something or someone.";
-        command.args = "[(something) or (someone)]";
-        command.hndl = DoLook;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "help";
-        command.help = "Show the list of commands or show help for a given command.";
-        command.args = "(command)";
-        command.hndl = DoHelp;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "prompt";
-        command.help = "Modify your prompt.";
-        command.args = "(help)|(prompt definition)";
-        command.hndl = DoPrompt;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "time";
-        command.help = "Give the current day phase.";
-        command.args = "";
-        command.hndl = DoTime;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "stand";
-        command.help = "Make the player stand.";
-        command.args = "";
-        command.hndl = DoStand;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "crouch";
-        command.help = "The player crouches down himself, it's a good stance for hiding.";
-        command.args = "";
-        command.hndl = DoCrouch;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "sit";
-        command.help = "The player sits down, ideal for a quick break.";
-        command.args = "";
-        command.hndl = DoSit;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "prone";
-        command.help = "The player starts prone, a perfect position to shoot long distance.";
-        command.args = "";
-        command.hndl = DoProne;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "rest";
-        command.help = "The player lies down and begin to rest.";
-        command.args = "";
-        command.hndl = DoRest;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "statistics";
-        command.help = "Show player statistics.";
-        command.args = "";
-        command.hndl = DoStatistics;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "rent";
-        command.help = "Allow player to rent and disconnect.";
-        command.args = "";
-        command.hndl = DoRent;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "skills";
-        command.help = "Shows the playes skills and their level.";
-        command.args = "";
-        command.hndl = DoSkills;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "server";
-        command.help = "Shows the server statistics.";
-        command.args = "";
-        command.hndl = DoServer;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "travel";
-        command.help = "Allow the character to travel between areas.";
-        command.args = "";
-        command.hndl = DoTravel;
-        Mud::instance().addCommand(command);
-    }
-
-    // Inventory and Equipment.
-    {
-        command.name = "take";
-        command.help = "Take something from the ground or from a container.";
-        command.args = "(item) [(container)]";
-        command.hndl = DoTake;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "drop";
-        command.help = "Drop an object.";
-        command.args = "(item)";
-        command.hndl = DoDrop;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "give";
-        command.help = "Give an object to someone.";
-        command.args = "(item) (someone)";
-        command.hndl = DoGive;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "equipments";
-        command.help = "List all the items you are wearing.";
-        command.args = "";
-        command.hndl = DoEquipments;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "wield";
-        command.help = "Wield a weapon, a shield or maybe a tool.";
-        command.args = "(item)";
-        command.hndl = DoWield;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "wear";
-        command.help = "Puts on a piece of equipment.";
-        command.args = "(item)";
-        command.hndl = DoWear;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "remove";
-        command.help = "Remove a weared or wielded item.";
-        command.args = "(item)";
-        command.hndl = DoRemove;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "inventory";
-        command.help = "Show character's inventory.";
-        command.args = "";
-        command.hndl = DoInventory;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "organize";
-        command.help = "Order the desired container or if no target is passed, the room.";
-        command.args = "(name|weight) [(target)]";
-        command.hndl = DoOrganize;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "open";
-        command.help = "Open a door in a given direction.";
-        command.args = "(item)|(direction)";
-        command.hndl = DoOpen;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "close";
-        command.help = "Close a door in a given direction.";
-        command.args = "(item)|(direction)";
-        command.hndl = DoClose;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "put";
-        command.help = "Put something inside a container.";
-        command.args = "(something) (container)";
-        command.hndl = DoPut;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "drink";
-        command.help = "Drink from a container of liquids.";
-        command.args = "(container)";
-        command.hndl = DoDrink;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "fill";
-        command.help = "Fill a container of liquids from a source of liquid.";
-        command.args = "(container) (source)";
-        command.hndl = DoFill;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "pour";
-        command.help = "Pour the content of the container into another one or on the ground.";
-        command.args = "(container) [container]";
-        command.hndl = DoPour;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "deposit";
-        command.help = "Deposit a coin inside a shop.";
-        command.args = "(item) (shop)";
-        command.hndl = DoDeposit;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "sell";
-        command.help = "Sell an item to a shop keeper.";
-        command.args = "(item) (shopkeeper)";
-        command.hndl = DoSell;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "buy";
-        command.help = "Allows to buy an item from a shop.";
-        command.args = "(item) (shop)";
-        command.hndl = DoBuy;
-        Mud::instance().addCommand(command);
-    }
-
-    // Comunication.
-    {
-        command.name = "say";
-        command.help = "Talk to people in the current room.";
-        command.args = "[someone] (something)";
-        command.hndl = DoSay;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "whisper";
-        command.help = "Whisper secretly to a single character.";
-        command.args = "(someone) (something)";
-        command.hndl = DoWhisper;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "emote";
-        command.help = "Execute and emote.";
-        command.args = "(emotion)";
-        command.hndl = DoEmote;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "bug";
-        command.help = "Report a bug, your character's name, location and date will be saved.";
-        command.args = "(message)";
-        command.hndl = DoBug;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "idea";
-        command.help = "Send an idea, try to be as clear as possible.";
-        command.args = "(message)";
-        command.hndl = DoIdea;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "typo";
-        command.help = "Report a typo.";
-        command.args = "(message)";
-        command.hndl = DoTypo;
-        Mud::instance().addCommand(command);
-    }
-
-    // Manager.
-    {
-        command.name = "assign";
-        command.help = "Allows to assign a mobile to a task/building.";
-        command.args = "(mobile)(building)";
-        command.hndl = DoAssign;
-        Mud::instance().addCommand(command);
-    }
-
-    // Crafting.
-    {
-        command.name = "build";
-        command.help = "Build something.";
-        command.args = "(item)";
-        command.hndl = DoBuild;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "deconstruct";
-        command.help = "Deconstruct a building.";
-        command.args = "(building)";
-        command.hndl = DoDeconstruct;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "read";
-        command.help = "Read an inscription from an item.";
-        command.args = "(item)";
-        command.hndl = DoRead;
-        Mud::instance().addCommand(command);
-    }
-
-    // Combat.
-    {
-        command.name = "kill";
-        command.help = "Engage in combat the desired target.";
-        command.args = "(target)";
-        command.hndl = DoKill;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "flee";
-        command.help = "Try to flee from combat.";
-        command.args = "";
-        command.hndl = DoFlee;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "aim";
-        command.help = "Provides the list of targets nearby.";
-        command.args = "";
-        command.hndl = DoAim;
-        Mud::instance().addCommand(command);
-    }
-
-    // ////////////////////////////////////////////////////////////////////////////////////////////
-    // GODS COMMANDS
-    // ////////////////////////////////////////////////////////////////////////////////////////////
-
-    {
-        command.name = "shutdown";
-        command.help = "Shut the MUD down.";
-        command.args = "";
-        command.hndl = DoShutdown;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "mudsave";
-        command.help = "Save the MUD.";
-        command.args = "";
-        command.hndl = DoMudSave;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "goto";
-        command.help = "Go to another room.";
-        command.args = "(Room.vnum)";
-        command.hndl = DoGoTo;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "hurt";
-        command.help = "Hurt the desired target.";
-        command.args = "(Target)";
-        command.hndl = DoHurt;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "invisibility";
-        command.help = "Became invisible.";
-        command.args = "";
-        command.hndl = DoInvisibility;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "visible";
-        command.help = "Return visible.";
-        command.args = "";
-        command.hndl = DoVisible;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "ginfo";
-        command.help = "Get information about a character.";
-        command.args = "(target)";
-        command.hndl = DoGodInfo;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-
-    // Interaction with Players.
-    {
-        command.name = "aggrolist";
-        command.help = "Provides the list of opponents of the given target.";
-        command.args = "(Target)";
-        command.hndl = DoAggroList;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "transfer";
-        command.help = "Transfer another character here, or to another room.";
-        command.args = "(Target) [Where]";
-        command.hndl = DoTransfer;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "feast";
-        command.help = "Restores completely the health and the stamina of the target.";
-        command.args = "(Target)";
-        command.hndl = DoFeast;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "sflag";
-        command.help = "Sets a flag for a character.";
-        command.args = "(Target) (Flag)";
-        command.hndl = DoSetFlag;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "cflag";
-        command.help = "Remove a flag from a character.";
-        command.args = "(Target) (Flag)";
-        command.hndl = DoClearFlag;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "modskill";
-        command.help = "Modify the value of the player skill.";
-        command.args = "(Target) (Skill) (Value)";
-        command.hndl = DoModSkill;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "modattribute";
-        command.help = "Modify the value of the player attribute.";
-        command.args = "(Target) (Attribute) (Value)";
-        command.hndl = DoModAttr;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-
-    // Item's Model.
-    {
-        command.name = "imodel";
-        command.help = "List all the information about a model.";
-        command.args = "(Model.vnum)";
-        command.hndl = DoModelInfo;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-
-    // Items.
-    {
-        command.name = "iitem";
-        command.help = "Show information about an item.";
-        command.args = "(Item.vnum)";
-        command.hndl = DoItemInfo;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "citem";
-        command.help = "Create a new item, if not set the quality will be Normal.";
-        command.args = "(Model.vnum)(Material.vnum)[Quality]";
-        command.hndl = DoItemCreate;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "ditem";
-        command.help = "Destroy the desired object.";
-        command.args = "(Item.vnum)";
-        command.hndl = DoItemDestroy;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "gitem";
-        command.help = "Materialize the desired object.";
-        command.args = "(Item.vnum)";
-        command.hndl = DoItemGet;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-
-    // Areas.
-    {
-        command.name = "iarea";
-        command.help = "Show the informations about a specific area.";
-        command.args = "(Area.vnum)";
-        command.hndl = DoAreaInfo;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-
-    // Rooms.
-    {
-        command.name = "iroom";
-        command.help = "Show the informations about a specific room.";
-        command.args = "(Room.vnum)";
-        command.hndl = DoRoomInfo;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "croom";
-        command.help = "Create a room in the given direction.";
-        command.args = "(Direction)";
-        command.hndl = DoRoomCreate;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "droom";
-        command.help = "Delete the room in the given direction.";
-        command.args = "(Direction)";
-        command.hndl = DoRoomDelete;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "eroom";
-        command.help = "Change room values.";
-        command.args = "(Option) (Value)";
-        command.hndl = DoRoomEdit;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-
-    // Mobiles.
-    {
-        command.name = "kmobile";
-        command.help = "Kill the desired mobile, in the same room.";
-        command.args = "(Mobile.name)";
-        command.hndl = DoMobileKill;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "rmobile";
-        command.help = "Reload the lua script for the target mobile, in the same room.";
-        command.args = "(Mobile.name)";
-        command.hndl = DoMobileReload;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "mobilelog";
-        command.help = "Given a mobile id, it returns the curresponding mobile log.";
-        command.args = "(Mobile.id)";
-        command.hndl = DoMobileLog;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-
-    // Materials.
-    {
-        command.name = "imaterial";
-        command.help = "Show the informations about a specific material.";
-        command.args = "(Material.vnum)";
-        command.hndl = DoMaterialInfo;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-
-    // Liquids.
-    {
-        command.name = "iliquid";
-        command.help = "Show the informations about a specific liquid.";
-        command.args = "(Liquid.vnum)";
-        command.hndl = DoLiquidInfo;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "cliquid";
-        command.help = "Materialize some liquid sinde a container.";
-        command.args = "(Container.name)(Liquid.vnum)(Quantity)";
-        command.hndl = DoLiquidCreate;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-
-    // Productions.
-    {
-        command.name = "iproduction";
-        command.help = "Provide all the information regarding the given production.";
-        command.args = "(Production.vnum)";
-        command.hndl = DoProductionInfo;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-
-    // Profession.
-    {
-        command.name = "iprofession";
-        command.help = "Provide all the information regarding the given profession.";
-        command.args = "(Profession.command)";
-        command.hndl = DoProfessionInfo;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-
-    {
-        command.name = "ifaction";
-        command.help = "Shows the infos about a faction.";
-        command.args = "(vnum)";
-        command.hndl = DoFactionInfo;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-
-    //
-    // LISTS
-    //
-    {
-        command.name = "lmodel";
-        command.help = "List all the models for the items.";
-        command.args = "";
-        command.hndl = DoModelList;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "litem";
-        command.help = "List all the items.";
-        command.args = "";
-        command.hndl = DoItemList;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "lmobile";
-        command.help = "List all the mobiles.";
-        command.args = "";
-        command.hndl = DoMobileList;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "lplayer";
-        command.help = "List all the players.";
-        command.args = "";
-        command.hndl = DoPlayerList;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "larea";
-        command.help = "List all the areas.";
-        command.args = "";
-        command.hndl = DoAreaList;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "lroom";
-        command.help = "List all the rooms.";
-        command.args = "";
-        command.hndl = DoRoomList;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "lrace";
-        command.help = "List all the races.";
-        command.args = "";
-        command.hndl = DoRaceList;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "lfaction";
-        command.help = "List all the factions.";
-        command.args = "";
-        command.hndl = DoFactionList;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "lskill";
-        command.help = "List all the skills.";
-        command.args = "";
-        command.hndl = DoSkillList;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "lwriting";
-        command.help = "List all the writings.";
-        command.args = "";
-        command.hndl = DoWritingList;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "lcorpse";
-        command.help = "List all the corpses.";
-        command.args = "";
-        command.hndl = DoCorpseList;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "lcontinent";
-        command.help = "List all the continents.";
-        command.args = "";
-        command.hndl = DoContinentList;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "lmaterial";
-        command.help = "List all the materials.";
-        command.args = "";
-        command.hndl = DoMaterialList;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "lprofession";
-        command.help = "Get the list of all the professions.";
-        command.args = "";
-        command.hndl = DoProfessionList;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "lproduction";
-        command.help = "Get the list of all the productions.";
-        command.args = "";
-        command.hndl = DoProductionList;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "lliquid";
-        command.help = "List all the liquids.";
-        command.args = "";
-        command.hndl = DoLiquidList;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "lbuild";
-        command.help = "List all the buildings.";
-        command.args = "";
-        command.hndl = DoBuildingList;
-        command.level = 1;
-        Mud::instance().addCommand(command);
-    }
+    LoadCombatCommands();
+    LoadCommunicationCommands();
+    LoadCraftingCommands();
+    LoadGeneralCommands();
+    LoadManagerCommands();
+    LoadObjectCommands();
+    LoadGodCommands();
 }

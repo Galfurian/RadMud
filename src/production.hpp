@@ -49,9 +49,9 @@ class Production
         /// The quantity of the outcome.
         unsigned int quantity;
         /// The list of needed type of tools.
-        ToolSet tools;
+        std::set<ToolType> tools;
         /// The list of needed type of ingredients and their quantity.
-        IngredientMap ingredients;
+        std::map<ResourceType, unsigned int> ingredients;
         /// The type of the workbench.
         ToolType workbench;
         /// The ingredient from which the material of the production is choosen.
@@ -106,6 +106,3 @@ class Production
         std::string getNameCapital();
 
 };
-
-/// Production map handler.
-typedef std::map<int, Production *> ProductionMap;

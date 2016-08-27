@@ -29,8 +29,8 @@ CraftAction::CraftAction(
     Character * _actor,
     Production * _production,
     Material * _material,
-    ItemVector & _tools,
-    ItemVector & _ingredients,
+    std::vector<Item *> & _tools,
+    std::vector<Item *> & _ingredients,
     unsigned int & _cooldown) :
         GeneralAction(_actor, system_clock::now() + seconds(_cooldown)),
         production(_production),
@@ -95,13 +95,16 @@ ActionStatus CraftAction::perform()
     // Consume the stamina.
     actor->remStamina(consumedStamina, true);
 
-    SQLiteDbms::instance().beginTransaction();
-    ItemVector createdItems;
+    std::vector<Item *> createdItems;
     for (unsigned int it = 0; it < production->quantity; ++it)
     {
         ItemModel * outcomeModel = production->outcome;
         // Create the item.
-        Item * newItem = outcomeModel->createItem(actor->getName(), material, ItemQuality::Normal);
+        Item * newItem = outcomeModel->createItem(
+            actor->getName(),
+            material,
+            ItemQuality::Normal,
+            1);
         if (newItem == nullptr)
         {
             // Log a warning.
@@ -109,7 +112,6 @@ ActionStatus CraftAction::perform()
                 LogLevel::Warning,
                 actor->getName() + ":craft = New item is a null pointer.");
             // Rollback the database.
-            SQLiteDbms::instance().rollbackTransection();
             // Delete all the items created so far.
             for (auto createdItem : createdItems)
             {
@@ -121,11 +123,9 @@ ActionStatus CraftAction::perform()
         }
         createdItems.push_back(newItem);
     }
-    SQLiteDbms::instance().endTransaction();
 
     // Add the created items into the character inventory.
     bool dropped = false;
-    SQLiteDbms::instance().beginTransaction();
     for (auto createdItem : createdItems)
     {
         if (!actor->canCarry(createdItem))
@@ -137,10 +137,9 @@ ActionStatus CraftAction::perform()
         {
             actor->addInventoryItem(createdItem);
         }
-        createdItem->updateOnDB();
     }
     // Update the tools.
-    ItemVector toDestroy;
+    std::vector<Item *> toDestroy;
     for (auto iterator : tools)
     {
         // Update the condition of the involved objects.
@@ -156,10 +155,10 @@ ActionStatus CraftAction::perform()
     }
     for (auto it : toDestroy)
     {
-        it->destroy();
+        it->removeFromMud();
+        it->removeOnDB();
         delete (it);
     }
-    SQLiteDbms::instance().endTransaction();
 
     // Send conclusion message.
     actor->sendMsg(

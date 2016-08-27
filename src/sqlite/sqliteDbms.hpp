@@ -18,10 +18,10 @@
 
 #pragma once
 
-#include <functional>
 #include <vector>
 
 #include "sqliteWrapper.hpp"
+#include "tableLoader.hpp"
 
 class Character;
 class Player;
@@ -31,98 +31,6 @@ class Room;
 
 /// @brief A query list of FIELD+VALUE.
 typedef std::vector<std::pair<std::string, std::string> > QueryList;
-
-/// @defgroup SQLLoadFun Sqlite3 Loading Functions
-/// @brief All the functions necessary to load information from a SQLITE3 database.
-
-/// @{
-/// @brief Function used to retrieve information about bad names.
-bool LoadBadName(ResultSet * result);
-/// @brief Function used to retrieve information about blocked ips.
-bool LoadBlockedIp(ResultSet * result);
-/// @brief Function used to retrieve information about the news from the developers.
-bool LoadNews(ResultSet * result);
-/// @brief Function used to retrieve information about items inside containers.
-bool LoadContent(ResultSet * result);
-/// @brief Function used to retrieve information about all the items.
-bool LoadItem(ResultSet * result);
-/// @brief Function used to retrieve information about skills.
-bool LoadSkill(ResultSet * result);
-/// @brief Function used to retrieve information about factions.
-bool LoadFaction(ResultSet * result);
-/// @brief Function used to retrieve information about models of items.
-bool LoadModel(ResultSet * result);
-/// @brief Function used to retrieve information about races.
-bool LoadRace(ResultSet * result);
-/// @brief Function used to retrieve information about all the mobiles.
-bool LoadMobile(ResultSet * result);
-/// @brief Function used to retrieve information about all the rooms.
-bool LoadRoom(ResultSet * result);
-/// @brief Function used to retrieve information about exits of rooms.
-bool LoadExit(ResultSet * result);
-/// @brief Function used to retrieve information about the item placed inside the rooms.
-bool LoadItemRoom(ResultSet * result);
-/// @brief Function used to retrieve information about all the areas of the mud.
-bool LoadArea(ResultSet * result);
-/// @brief Function used to retrieve information about the rooms associated with every area.
-bool LoadAreaList(ResultSet * result);
-/// @brief Function used to retrieve the writings
-bool LoadWriting(ResultSet * result);
-/// @brief Function used to retrieve information about all the continents of the mud.
-bool LoadContinent(ResultSet * result);
-/// @brief Function used to retrieve information about all the materials.
-bool LoadMaterial(ResultSet * result);
-/// @brief Function used to retrieve information about all the professions.
-bool LoadProfession(ResultSet * result);
-/// @brief Function used to retrieve information about all the productions.
-bool LoadProduction(ResultSet * result);
-/// @brief Function used to retrieve information about all the liquids.
-bool LoadLiquid(ResultSet * result);
-/// @brief Function used to retrieve information about liquids inside containers.
-bool LoadContentLiq(ResultSet * result);
-/// @brief Function used to retrieve information about all the travelling point.
-bool LoadTravelPoint(ResultSet * result);
-/// @brief Function used to retrieve information about all the buildings.
-bool LoadBuilding(ResultSet * result);
-/// @brief Function used to load shops.
-bool LoadShop(ResultSet * result);
-/// @brief Function used to load currencies.
-bool LoadCurrency(ResultSet * result);
-///@}
-
-class TableLoader
-{
-    public:
-        /// Loading function for sqlite3 tables.
-        typedef std::function<bool(ResultSet * result)> LoadingFunction;
-
-        std::string table;
-
-        LoadingFunction loadFunction;
-
-        std::string loadQuery;
-
-        TableLoader(std::string _table, LoadingFunction _loadFunction, std::string _loadQuery = "") :
-                table(_table),
-                loadFunction(_loadFunction),
-                loadQuery(_loadQuery)
-        {
-            // Nothing to do.
-        }
-
-        std::string getQuery() const
-        {
-            if (loadQuery.empty())
-            {
-                return "SELECT * FROM " + table + ";";
-            }
-            else
-            {
-                return loadQuery;
-            }
-        }
-
-};
 
 /// @brief It's used to connect to a database and retrieve information as well as update them.
 class SQLiteDbms
@@ -164,21 +72,24 @@ class SQLiteDbms
         bool loadTables();
 
         /// @brief Load all the vital information about the player.
-        /// @param player The address of the player, where to load information.
-        /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
+        /// @param player The player.
+        /// @return <b>True</b> if the operations succeeded,<br>
+        ///         <b>False</b> Otherwise.
         bool loadPlayer(Player * player);
 
         /// @brief Search for the player in the table.
         /// @param name The name of the player.
-        /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
-        bool searchPlayer(std::string name);
+        /// @return <b>True</b> if the operations succeeded,<br>
+        ///         <b>False</b> Otherwise.
+        bool searchPlayer(const std::string & name);
 
         /// @brief Execute an Insert Into query.
         /// @param table     Name of the table.
         /// @param args      Vector of arguments.
         /// @param orIgnore  Flag used to enable the OR IGNORE option.
         /// @param orReplace Flag used to enable the OR REPLACE option.
-        /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
+        /// @return <b>True</b> if the operations succeeded,<br>
+        ///         <b>False</b> Otherwise.
         bool insertInto(
             std::string table,
             std::vector<std::string> args,
@@ -188,21 +99,26 @@ class SQLiteDbms
         /// @brief Execute a Delete From query.
         /// @param table The name of the table.
         /// @param where Vector of where clause.
-        /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
+        /// @return <b>True</b> if the operations succeeded,<br>
+        ///         <b>False</b> Otherwise.
         bool deleteFrom(std::string table, QueryList where);
 
         /// @brief Execute an Update query.
         /// @param table The name of the table.
         /// @param value Vector of values.
         /// @param where Vector of where clause.
-        /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
+        /// @return <b>True</b> if the operations succeeded,<br>
+        ///         <b>False</b> Otherwise.
         bool updateInto(std::string table, QueryList value, QueryList where);
 
-        /// @brief Execute a select.
-        /// @param table The name of the table.
-        /// @param where Vector of where clause.
-        /// @return The result of the operation.
-        ResultSet * executeSelect(std::string table, QueryList where);
+        /// Updates all the connected players.
+        bool updatePlayers();
+
+        /// Updates all the items.
+        bool updateItems();
+
+        /// Update all the rooms.
+        bool updateRooms();
 
         /// @brief Begin a transaction.
         void beginTransaction();
@@ -212,6 +128,9 @@ class SQLiteDbms
 
         /// @brief End a Transaction.
         void endTransaction();
+
+        /// @brief Prints last error message and code.
+        void showLastError() const;
 
     private:
         /// @brief Function used to retrieve information about Player.

@@ -27,10 +27,6 @@ class CurrencyItem: public Item
 
         virtual ~CurrencyItem();
 
-        virtual ModelType getType() const;
-
-        virtual std::string getTypeName() const;
-
         virtual void getSheet(Table & sheet) const;
 
         virtual unsigned int getPrice() const;

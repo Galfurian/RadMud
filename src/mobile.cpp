@@ -97,7 +97,7 @@ void Mobile::respawn()
     // Add the mobile to the respawn room.
     this->respawnRoom->addCharacter(this);
     // Set the list of exceptions.
-    CharacterVector exceptions;
+    std::vector<Character *> exceptions;
     exceptions.push_back(this);
     // Send the message inside the room.
     this->room->sendToAll("%s apear from somewhere.\n", exceptions, this->getNameCapital());
@@ -208,19 +208,6 @@ void Mobile::kill()
         unsigned int max = (item->getMaxCondition() / 100) * 50;
         // Set a random condition for the new item.
         item->condition = TRandInteger<unsigned int>(min, max);
-        // Create the entry for the item on the database.
-        SQLiteDbms::instance().beginTransaction();
-        if (item->createOnDB())
-        {
-            // Insert into the item_list the new item.
-            Mud::instance().addItem(item);
-        }
-        else
-        {
-            Logger::log(LogLevel::Error, "Cannot save the item (%s) on DB.", ToString(item->vnum));
-            // Rollback the transation.
-            SQLiteDbms::instance().rollbackTransection();
-        }
     }
     for (auto it = this->equipment.begin(); it != this->equipment.end(); ++it)
     {
@@ -235,18 +222,6 @@ void Mobile::kill()
         // Set a random condition for the new item.
         item->condition = TRandInteger<unsigned int>(min, max);
         // Create the entry for the item on the database.
-        SQLiteDbms::instance().beginTransaction();
-        if (item->createOnDB())
-        {
-            // Insert into the item_list the new item.
-            Mud::instance().addItem(item);
-        }
-        else
-        {
-            Logger::log(LogLevel::Error, "Cannot save the item (%s) on DB.", ToString(item->vnum));
-            // Rollback the transation.
-            SQLiteDbms::instance().rollbackTransection();
-        }
     }
     // Call the method of the father class.
     Character::kill();

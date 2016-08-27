@@ -111,11 +111,11 @@ class SQLiteWrapper: public ResultSet
 
         /// @brief Get the last error message.
         /// @return The string of the last error message.
-        std::string getLastErrorMsg();
+        std::string getLastErrorMsg() const;
 
         /// @brief Get the last error code.
         /// @return The last error code.
-        int getLastErrorCode();
+        int getLastErrorCode() const;
 
         /// @brief Check if the databse is connected
         /// @return <b>True</b> if databse is connected,<br> <b>False</b> Otherwise.

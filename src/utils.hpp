@@ -176,11 +176,6 @@ std::vector<std::string> GetAllFilesInFolder(const std::string & folder, const s
 /// @return The value turned into string.
 std::string BoolToString(const bool & value);
 
-/// @brief Transform a string into an integer.
-/// @param source The string to turn into an integer.
-/// @return The resulting integer.
-int ToInt(const std::string & source);
-
 /// @brief Transform a string into a numeric value.
 /// @param source The string to turn into a number.
 /// @return The number.

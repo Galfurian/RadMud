@@ -77,6 +77,3 @@ class Material
         /// @param L The lua environment.
         static void luaRegister(lua_State * L);
 };
-
-/// Material map handler.
-typedef std::map<int, Material *> MaterialMap;

@@ -160,15 +160,3 @@ class Mobile: public Character
         /// @brief Disable assign operator.
         Mobile& operator=(const Mobile&);
 };
-
-/// Mobile list handler.
-typedef std::vector<Mobile *> MobileList;
-
-/// MobileList iterator.
-typedef MobileList::iterator MobileListIterator;
-
-/// Mobile map handler.
-typedef std::map<std::string, Mobile *> MobileMap;
-
-/// MobileMap iterator.
-typedef MobileMap::iterator MobileMapIterator;

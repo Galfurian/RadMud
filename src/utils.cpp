@@ -190,12 +190,6 @@ std::string BoolToString(const bool & value)
     return ((value) ? "Yes" : "No");
 }
 
-int ToInt(const std::string & source)
-{
-    char * pEnd;
-    return static_cast<int>(strtol(source.c_str(), &pEnd, 10));
-}
-
 bool IsAllASCII(const char * string_to_check)
 {
     for (; *string_to_check != 0; string_to_check++)

@@ -45,8 +45,8 @@ class BuildAction: public GeneralAction
             Character * _actor,
             Building * _schematics,
             Item * _building,
-            ItemVector & _tools,
-            ItemVector & _ingredients,
+            std::vector<Item *> & _tools,
+            std::vector<Item *> & _ingredients,
             unsigned int _cooldown);
 
         /// @brief Destructor.
