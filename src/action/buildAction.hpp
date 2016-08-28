@@ -31,7 +31,7 @@ class BuildAction: public GeneralAction
         /// The tool used by the actor for the action.
         std::vector<Item *> tools;
         /// The ingredients used by the actor for the action.
-        std::vector<Item *> ingredients;
+        std::vector<std::pair<Item *, unsigned int>> ingredients;
 
     public:
         /// @brief Constructor.
@@ -46,7 +46,7 @@ class BuildAction: public GeneralAction
             Building * _schematics,
             Item * _building,
             std::vector<Item *> & _tools,
-            std::vector<Item *> & _ingredients,
+            std::vector<std::pair<Item *, unsigned int>> & _ingredients,
             unsigned int _cooldown);
 
         /// @brief Destructor.

@@ -371,7 +371,7 @@ class Character
         ///         <b>False</b> otherwise.
         bool findNearbyResouces(
             std::map<ResourceType, unsigned int> ingredients,
-            std::vector<Item *> & foundOnes);
+            std::vector<std::pair<Item *, unsigned int>> & foundOnes);
 
         /// @brief Search the coins on the character.
         /// @return List of found coins.

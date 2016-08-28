@@ -30,7 +30,7 @@ CraftAction::CraftAction(
     Production * _production,
     Material * _material,
     std::vector<Item *> & _tools,
-    std::vector<Item *> & _ingredients,
+    std::vector<std::pair<Item *, unsigned int>> & _ingredients,
     unsigned int & _cooldown) :
         GeneralAction(_actor, system_clock::now() + seconds(_cooldown)),
         production(_production),
@@ -85,7 +85,7 @@ ActionStatus CraftAction::perform()
         return ActionStatus::Error;
     }
     // Get the amount of required stamina.
-    unsigned int consumedStamina = actor->getConsumedStaminaFor(ActionType::Crafting);
+    auto consumedStamina = actor->getConsumedStaminaFor(ActionType::Crafting);
     // Check if the actor has enough stamina to execute the action.
     if (consumedStamina > actor->getStamina())
     {
@@ -94,38 +94,70 @@ ActionStatus CraftAction::perform()
     }
     // Consume the stamina.
     actor->remStamina(consumedStamina, true);
-
+    // Vector which will contain the list of created items.
     std::vector<Item *> createdItems;
-    for (unsigned int it = 0; it < production->quantity; ++it)
+    // Vector which will contain the list of items to destroy.
+    std::vector<Item *> destroyItems;
+    // Add the ingredients to the list of items to destroy.
+    for (auto it : ingredients)
     {
-        ItemModel * outcomeModel = production->outcome;
+        auto ingredient = it.first;
+        if (ingredient->quantity == it.second)
+        {
+            destroyItems.push_back(ingredient);
+        }
+        else if (ingredient->quantity > it.second)
+        {
+            ingredient->quantity -= it.second;
+        }
+        else
+        {
+            actor->sendMsg("\nYou don't have enough of %s.\n", ingredient->getName());
+            return ActionStatus::Error;
+        }
+    }
+    // Get the outcome model.
+    auto outcomeModel = production->outcome;
+    if (HasFlag(outcomeModel->modelFlags, ModelFlag::CanBeStacked))
+    {
         // Create the item.
-        Item * newItem = outcomeModel->createItem(
+        auto newItem = outcomeModel->createItem(
             actor->getName(),
             material,
             ItemQuality::Normal,
-            1);
+            production->quantity);
         if (newItem == nullptr)
         {
-            // Log a warning.
-            Logger::log(
-                LogLevel::Warning,
-                actor->getName() + ":craft = New item is a null pointer.");
-            // Rollback the database.
-            // Delete all the items created so far.
-            for (auto createdItem : createdItems)
-            {
-                delete (createdItem);
-            }
-            // Notify the character.
+            Logger::log(LogLevel::Error, actor->getName() + "Crafted item is a null pointer.");
             actor->sendMsg("\nYou have failed your action.\n");
             return ActionStatus::Error;
         }
         createdItems.push_back(newItem);
     }
-
-    // Add the created items into the character inventory.
+    else
+    {
+        for (unsigned int it = 0; it < production->quantity; ++it)
+        {
+            // Create the item.
+            auto newItem = outcomeModel->createItem(actor->getName(), material);
+            if (newItem == nullptr)
+            {
+                Logger::log(LogLevel::Error, actor->getName() + "Crafted item is a null pointer.");
+                // Delete all the items created so far.
+                for (auto createdItem : createdItems)
+                {
+                    delete (createdItem);
+                }
+                // Notify the character.
+                actor->sendMsg("\nYou have failed your action.\n");
+                return ActionStatus::Error;
+            }
+            createdItems.push_back(newItem);
+        }
+    }
+    // Flag which will become true if some items are dropped to the ground.
     bool dropped = false;
+    // Add the created items to the character's inventory.
     for (auto createdItem : createdItems)
     {
         if (!actor->canCarry(createdItem))
@@ -138,28 +170,27 @@ ActionStatus CraftAction::perform()
             actor->addInventoryItem(createdItem);
         }
     }
-    // Update the tools.
-    std::vector<Item *> toDestroy;
     for (auto iterator : tools)
     {
         // Update the condition of the involved objects.
         if (iterator->triggerDecay())
         {
-            actor->sendMsg(iterator->getName() + " falls into pieces.");
-            toDestroy.push_back(iterator);
+            actor->sendMsg("%s falls into pieces.", iterator->getNameCapital());
+            destroyItems.push_back(iterator);
         }
     }
-    for (auto it : ingredients)
+    // Consume the items.
+    Logger::log(LogLevel::Error, "Consuming the items.");
+    for (auto it : destroyItems)
     {
-        toDestroy.push_back(it);
-    }
-    for (auto it : toDestroy)
-    {
+        // First, remove the item from the mud.
         it->removeFromMud();
+        // Then, remove it from the database.
         it->removeOnDB();
+        // Finally, delete it.
         delete (it);
     }
-
+    Logger::log(LogLevel::Error, "Done.");
     // Send conclusion message.
     actor->sendMsg(
         "%s %s.\n\n",
@@ -167,8 +198,7 @@ ActionStatus CraftAction::perform()
         Formatter::yellow() + createdItems.back()->getName() + Formatter::reset());
     if (dropped)
     {
-        actor->sendMsg(
-            "Since you can't carry them, some of the items have been placed on the ground.\n\n");
+        actor->sendMsg("some of the items have been placed on the ground.\n\n");
     }
     return ActionStatus::Finished;
 }
@@ -217,7 +247,7 @@ bool CraftAction::checkIngredients() const
     for (auto iterator : ingredients)
     {
         // Check if the ingredient has been deleted.
-        if (iterator == nullptr)
+        if (iterator.first == nullptr)
         {
             Logger::log(LogLevel::Error, "One of the ingredients is a null pointer.");
             return false;

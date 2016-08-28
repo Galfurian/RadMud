@@ -795,10 +795,12 @@ Item * Character::findNearbyItem(std::string itemName, int & number)
     return item;
 }
 
-Item * Character::findNearbyTool(const ToolType & toolType, const std::vector<Item *> & exceptions,
-bool searchRoom,
-bool searchInventory,
-bool searchEquipment)
+Item * Character::findNearbyTool(
+    const ToolType & toolType,
+    const std::vector<Item *> & exceptions,
+    bool searchRoom,
+    bool searchInventory,
+    bool searchEquipment)
 {
     if (searchRoom)
     {
@@ -857,10 +859,12 @@ bool searchEquipment)
     return nullptr;
 }
 
-bool Character::findNearbyTools(std::set<ToolType> tools, std::vector<Item *> & foundOnes,
-bool searchRoom,
-bool searchInventory,
-bool searchEquipment)
+bool Character::findNearbyTools(
+    std::set<ToolType> tools,
+    std::vector<Item *> & foundOnes,
+    bool searchRoom,
+    bool searchInventory,
+    bool searchEquipment)
 {
     // TODO: Prepare a map with key the tool type and as value:
     //  Option A: A bool which determine if the tool has been found.
@@ -889,21 +893,28 @@ bool searchEquipment)
 
 bool Character::findNearbyResouces(
     std::map<ResourceType, unsigned int> ingredients,
-    std::vector<Item *> & foundOnes)
+    std::vector<std::pair<Item *, unsigned int>> & foundOnes)
 {
     for (auto ingredient : ingredients)
     {
         // Quantity of ingredients that has to be found.
-        unsigned int quantityNeeded = ingredient.second;
-        for (auto iterator : inventory)
+        auto quantityNeeded = ingredient.second;
+        for (auto item : inventory)
         {
-            if (iterator->model->getType() == ModelType::Resource)
+            auto model = item->model;
+            if (model->getType() == ModelType::Resource)
             {
-                ResourceModel * resourceModel = iterator->model->toResource();
+                auto resourceModel = model->toResource();
                 if (resourceModel->resourceType == ingredient.first)
                 {
-                    foundOnes.push_back(iterator);
-                    quantityNeeded--;
+                    auto quantityAvailable = item->quantity;
+                    auto quantityUsed = quantityAvailable;
+                    if (quantityAvailable > quantityNeeded)
+                    {
+                        quantityUsed = (quantityAvailable - quantityNeeded);
+                    }
+                    foundOnes.push_back(std::make_pair(item, quantityUsed));
+                    quantityNeeded -= quantityUsed;
                     if (quantityNeeded == 0)
                     {
                         break;
@@ -914,15 +925,22 @@ bool Character::findNearbyResouces(
         // If the ingredients are not enough, search even in the room.
         if (quantityNeeded > 0)
         {
-            for (auto iterator : room->items)
+            for (auto item : room->items)
             {
-                if (iterator->model->getType() == ModelType::Resource)
+                auto model = item->model;
+                if (model->getType() == ModelType::Resource)
                 {
-                    ResourceModel * resourceModel = iterator->model->toResource();
+                    auto resourceModel = model->toResource();
                     if (resourceModel->resourceType == ingredient.first)
                     {
-                        foundOnes.push_back(iterator);
-                        quantityNeeded--;
+                        auto quantityAvailable = item->quantity;
+                        auto quantityUsed = quantityAvailable;
+                        if (quantityAvailable > quantityNeeded)
+                        {
+                            quantityUsed = (quantityAvailable - quantityNeeded);
+                        }
+                        foundOnes.push_back(std::make_pair(item, quantityUsed));
+                        quantityNeeded -= quantityUsed;
                         if (quantityNeeded == 0)
                         {
                             break;

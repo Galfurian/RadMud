@@ -33,7 +33,7 @@ class CraftAction: public GeneralAction
         /// The tool used by the actor for the action.
         std::vector<Item *> tools;
         /// The ingredients used by the actor for the action.
-        std::vector<Item *> ingredients;
+        std::vector<std::pair<Item *, unsigned int>> ingredients;
 
     public:
         /// @brief Constructor.
@@ -48,7 +48,7 @@ class CraftAction: public GeneralAction
             Production * _production,
             Material * _material,
             std::vector<Item *> & _tools,
-            std::vector<Item *> & _ingredients,
+            std::vector<std::pair<Item *, unsigned int>> & _ingredients,
             unsigned int & _cooldown);
 
         /// @brief Destructor.

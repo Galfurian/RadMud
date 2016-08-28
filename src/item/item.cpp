@@ -97,27 +97,30 @@ bool Item::check(bool complete)
 
 void Item::removeFromMud()
 {
+    Logger::log(LogLevel::Debug, "Removing %s from MUD...", this->getName());
     // Remove the item from the game, this means: Room, Player, Container.
     if (room != nullptr)
     {
+        auto itemRoom = room;
         if (room->removeItem(this))
         {
             Logger::log(
                 LogLevel::Debug,
                 "Removing item '%s' from room '%s'.",
                 this->getName(),
-                room->name);
+                itemRoom->name);
         }
     }
     if (owner != nullptr)
     {
+        auto itemOwner = owner;
         if (owner->equipment.removeItem(this))
         {
             Logger::log(
                 LogLevel::Debug,
                 "Removing item '%s' from '%s' equipment.",
                 this->getName(),
-                owner->getName());
+                itemOwner->getName());
         }
         if (owner->inventory.removeItem(this))
         {
@@ -125,18 +128,19 @@ void Item::removeFromMud()
                 LogLevel::Debug,
                 "Removing item '%s' from '%s' inventory.",
                 this->getName(),
-                owner->getName());
+                itemOwner->getName());
         }
     }
     if (container != nullptr)
     {
+        auto itemContainer = owner;
         if (container->content.removeItem(this))
         {
             Logger::log(
                 LogLevel::Debug,
                 "Removing item '%s' from container '%s'.",
                 this->getName(),
-                container->getName());
+                itemContainer->getName());
         }
     }
     if (this->model->getType() != ModelType::Corpse)
@@ -168,6 +172,7 @@ bool Item::updateOnDB()
 
 bool Item::removeOnDB()
 {
+    Logger::log(LogLevel::Debug, "Removing %s from DB...", this->getName());
     auto strVnum = ToString(vnum);
     // Prepare the where clause.
     if (SQLiteDbms::instance().deleteFrom("Item", { std::make_pair("vnum", strVnum) }))

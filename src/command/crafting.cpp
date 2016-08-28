@@ -83,7 +83,7 @@ void DoProfession(Character * character, Profession * profession, ArgumentHandle
         return;
     }
     // Search the needed ingredients.
-    std::vector<Item *> usedIngredients;
+    std::vector<std::pair<Item *, unsigned int>> usedIngredients;
     if (!character->findNearbyResouces(production->ingredients, usedIngredients))
     {
         character->sendMsg("You don't have enough material.\n");
@@ -108,12 +108,13 @@ void DoProfession(Character * character, Profession * profession, ArgumentHandle
     Material * craftMaterial = nullptr;
     for (auto iterator : usedIngredients)
     {
-        if (iterator->model->getType() == ModelType::Resource)
+        auto item = iterator.first;
+        if (item->model->getType() == ModelType::Resource)
         {
-            ResourceModel * resourceModel = iterator->model->toResource();
+            ResourceModel * resourceModel = item->model->toResource();
             if (resourceModel->resourceType == production->material)
             {
-                craftMaterial = iterator->composition;
+                craftMaterial = item->composition;
                 break;
             }
         }
@@ -181,7 +182,7 @@ void DoBuild(Character * character, ArgumentHandler & args)
         return;
     }
     // Search the needed ingredients.
-    std::vector<Item *> usedIngredients;
+    std::vector<std::pair<Item *, unsigned int>> usedIngredients;
     if (!character->findNearbyResouces(schematics->ingredients, usedIngredients))
     {
         character->sendMsg("You don't have enough material.\n");

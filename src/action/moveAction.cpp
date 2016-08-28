@@ -81,7 +81,7 @@ ActionStatus MoveAction::perform()
     else
     {
         // Get the amount of required stamina.
-        unsigned int consumedStamina = actor->getConsumedStaminaFor(ActionType::Building);
+        auto consumedStamina = actor->getConsumedStaminaFor(ActionType::Building);
         // Consume the stamina.
         actor->remStamina(consumedStamina, true);
         // Move character.

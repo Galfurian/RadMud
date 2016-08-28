@@ -30,7 +30,7 @@ BuildAction::BuildAction(
     Building * _schematics,
     Item * _building,
     std::vector<Item *> & _tools,
-    std::vector<Item *> & _ingredients,
+    std::vector<std::pair<Item *, unsigned int>> & _ingredients,
     unsigned int _cooldown) :
         GeneralAction(_actor, system_clock::now() + seconds(_cooldown)),
         schematics(_schematics),
@@ -94,30 +94,46 @@ ActionStatus BuildAction::perform()
     }
     // Consume the stamina.
     actor->remStamina(consumedStamina, true);
-
     actor->remInventoryItem(building);
     actor->room->addBuilding(building);
-    std::vector<Item *> toDestroy;
+    // Vector which will contain the list of items to destroy.
+    std::vector<Item *> destroyItems;
+    // Add the ingredients to the list of items to destroy.
+    for (auto it : ingredients)
+    {
+        auto ingredient = it.first;
+        if (ingredient->quantity == it.second)
+        {
+            destroyItems.push_back(ingredient);
+        }
+        else if (ingredient->quantity > it.second)
+        {
+            ingredient->quantity -= it.second;
+        }
+        else
+        {
+            actor->sendMsg("\nYou don't have enough of %s.\n", ingredient->getName());
+            return ActionStatus::Error;
+        }
+    }
     for (auto iterator : tools)
     {
         // Update the condition of the involved objects.
         if (iterator->triggerDecay())
         {
             actor->sendMsg(iterator->getName() + " falls into pieces.");
-            toDestroy.push_back(iterator);
+            destroyItems.push_back(iterator);
         }
     }
-    for (auto it : ingredients)
-    {
-        toDestroy.push_back(it);
-    }
-    for (auto it : toDestroy)
+    // Consume the items.
+    Logger::log(LogLevel::Error, "Consuming the items.");
+    for (auto it : destroyItems)
     {
         it->removeFromMud();
         it->removeOnDB();
         delete (it);
     }
-
+    Logger::log(LogLevel::Error, "Done.");
     // Send conclusion message.
     actor->sendMsg(
         "You have finished building %s.\n\n",
@@ -150,7 +166,7 @@ bool BuildAction::checkIngredients() const
     for (auto iterator : ingredients)
     {
         // Check if the ingredient has been deleted.
-        if (iterator == nullptr)
+        if (iterator.first == nullptr)
         {
             Logger::log(LogLevel::Error, "One of the ingredients is a null pointer.");
             return false;
