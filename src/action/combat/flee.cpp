@@ -18,7 +18,7 @@
 
 #include "flee.hpp"
 #include "../../room.hpp"
-#include "../../character.hpp"
+#include "../../character/character.hpp"
 #include "../../model/weaponModel.hpp"
 #include "../../utilities/logger.hpp"
 

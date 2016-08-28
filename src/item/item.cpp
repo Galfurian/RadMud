@@ -27,12 +27,12 @@
 #include "../defines.hpp"
 #include "../material.hpp"
 #include "../constants.hpp"
-#include "../luabridge/LuaBridge.h"
 #include "../model/nodeModel.hpp"
 #include "../model/containerModel.hpp"
 #include "../model/liquidContainerModel.hpp"
 #include "../model/shopModel.hpp"
 #include "../utilities/logger.hpp"
+#include "../lua/luabridge/LuaBridge.h"
 
 #include "shopItem.hpp"
 #include "armorItem.hpp"

@@ -26,27 +26,26 @@
 #include <sstream>
 
 // Other Include.
-#include "mud.hpp"
-#include "constants.hpp"
-#include "lua/lua_script.hpp"
-#include "luabridge/LuaBridge.h"
+#include "../mud.hpp"
+#include "../constants.hpp"
+#include "../lua/lua_script.hpp"
+#include "../lua/luabridge/LuaBridge.h"
 
-#include "model/toolModel.hpp"
-#include "model/armorModel.hpp"
-#include "model/shieldModel.hpp"
-#include "model/resourceModel.hpp"
+#include "../model/toolModel.hpp"
+#include "../model/armorModel.hpp"
+#include "../model/shieldModel.hpp"
+#include "../model/resourceModel.hpp"
 
-#include "action/combat/basicAttack.hpp"
-#include "action/combat/flee.hpp"
-#include "sqlite/sqliteDbms.hpp"
+#include "../action/combat/basicAttack.hpp"
+#include "../action/combat/flee.hpp"
+#include "../sqlite/sqliteDbms.hpp"
 
-#include "utilities/logger.hpp"
+#include "../utilities/logger.hpp"
 
-#include "item/armorItem.hpp"
+#include "../item/armorItem.hpp"
 
-#include "command/command.hpp"
+#include "../command/command.hpp"
 
-using namespace std;
 using namespace std::chrono;
 
 Character::Character() :
@@ -236,14 +235,14 @@ std::string Character::getStaticDesc() const
     return desc;
 }
 
-string Character::getSubjectPronoun() const
+std::string Character::getSubjectPronoun() const
 {
     if (gender == GenderType::Male) return "he";
     if (gender == GenderType::Female) return "she";
     return "it";
 }
 
-string Character::getPossessivePronoun() const
+std::string Character::getPossessivePronoun() const
 {
     if (gender == GenderType::Male) return "his";
     if (gender == GenderType::Female) return "her";
@@ -400,9 +399,9 @@ unsigned int Character::getMaxHealth(bool withEffects) const
     }
 }
 
-string Character::getHealthCondition(const bool & self)
+std::string Character::getHealthCondition(const bool & self)
 {
-    string sent_be, sent_have;
+    std::string sent_be, sent_have;
     // Determine who is the examined character.
     if (self)
     {
@@ -718,7 +717,7 @@ void Character::moveTo(
     }
 }
 
-Item* Character::findInventoryItem(string search_parameter, int & number)
+Item* Character::findInventoryItem(std::string search_parameter, int & number)
 {
     for (auto iterator : inventory)
     {
@@ -734,7 +733,7 @@ Item* Character::findInventoryItem(string search_parameter, int & number)
     return nullptr;
 }
 
-Item* Character::findEquipmentItem(string search_parameter, int & number)
+Item* Character::findEquipmentItem(std::string search_parameter, int & number)
 {
     for (auto * iterator : equipment)
     {
@@ -1331,7 +1330,7 @@ void Character::updateActivatedEffects()
     }
 }
 
-string Character::getLook()
+std::string Character::getLook()
 {
     std::string output = "You look at " + this->getName() + ".\n";
     // Add the condition.
@@ -1583,7 +1582,7 @@ unsigned int Character::getCooldown(CombatActionType combatAction)
                 LHD = log10(LHDmod);
             }
         }
-        BASE += -STR - AGI + WGT + CAR + max(RHD, LHD);
+        BASE += -STR - AGI + WGT + CAR + std::max(RHD, LHD);
     }
     else if (combatAction == CombatActionType::Flee)
     {
@@ -1696,7 +1695,7 @@ Item * Character::createCorpse()
     return corpse;
 }
 
-void Character::doCommand(const string & command)
+void Character::doCommand(const std::string & command)
 {
     ArgumentHandler argumentHandler(command);
     ProcessCommand(this, argumentHandler);

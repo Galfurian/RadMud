@@ -25,12 +25,12 @@
 #include <ostream>
 
 // Other Include.
-#include "character.hpp"
 #include "constants.hpp"
 #include "room.hpp"
 #include "item/item.hpp"
-#include "luabridge/LuaBridge.h"
 #include "utilities/logger.hpp"
+#include "character/character.hpp"
+#include "lua/luabridge/LuaBridge.h"
 
 using namespace std;
 

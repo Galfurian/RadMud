@@ -16,16 +16,12 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-// Basic Include.
 #include "exit.hpp"
 
 #include "constants.hpp"
-// Local Includes.
-
-// Other Include.
-#include "luabridge/LuaBridge.h"
 #include "room.hpp"
 #include "utils.hpp"
+#include "lua/luabridge/LuaBridge.h"
 
 using namespace std;
 

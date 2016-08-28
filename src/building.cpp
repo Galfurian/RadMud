@@ -20,10 +20,10 @@
 #include "building.hpp"
 
 #include "room.hpp"
-#include "character.hpp"
 #include "constants.hpp"
 #include "model/itemModel.hpp"
-#include "luabridge/LuaBridge.h"
+#include "character/character.hpp"
+#include "lua/luabridge/LuaBridge.h"
 
 Building::Building() :
         vnum(),

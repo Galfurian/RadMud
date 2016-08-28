@@ -16,17 +16,13 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-// Basic Include.
 #include "race.hpp"
 
-#include "constants.hpp"
-// Local Includes.
-
-// Other Include.
-#include "luabridge/LuaBridge.h"
-#include "formatter.hpp"
-#include "utils.hpp"
 #include "mud.hpp"
+#include "utils.hpp"
+#include "formatter.hpp"
+#include "constants.hpp"
+#include "lua/luabridge/LuaBridge.h"
 
 Race::Race() :
         vnum(),

@@ -18,8 +18,7 @@
 
 #pragma once
 
-#include "character.hpp"
-
+#include "character/character.hpp"
 #include "command/argumentHandler.hpp"
 
 /// @brief Map all the connection states which are necessary for the
@@ -33,7 +32,11 @@ void LoadProtocolStates();
 /// @param buffer  The buffer where the string version of the command will be store.
 /// @return <b>True</b> if the function extracts a valid command,<br>
 ///         <b>False</b> otherwise.
-bool ExtractCommand(const std::string & source, size_t & index, TelnetChar & command, std::string & buffer);
+bool ExtractCommand(
+    const std::string & source,
+    size_t & index,
+    TelnetChar & command,
+    std::string & buffer);
 
 /// @brief Function for the protocol negotiation with the client.
 /// @param character The character with which the protocol is negotiated.

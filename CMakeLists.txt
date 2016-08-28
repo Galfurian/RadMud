@@ -111,12 +111,12 @@ add_subdirectory(src/model)
 add_subdirectory(src/sqlite)
 add_subdirectory(src/action)
 add_subdirectory(src/command)
+add_subdirectory(src/character)
 add_subdirectory(src/utilities)
 
 set(PROJECT_SRC
     ./src/area.cpp
     ./src/building.cpp
-    ./src/character.cpp
     ./src/continent.cpp
     ./src/defines.cpp
     ./src/effect.cpp
@@ -126,9 +126,7 @@ set(PROJECT_SRC
     ./src/liquid.cpp
     ./src/main.cpp
     ./src/material.cpp
-    ./src/mobile.cpp
     ./src/mud.cpp
-    ./src/player.cpp
     ./src/production.cpp
     ./src/profession.cpp
     ./src/race.cpp
@@ -139,13 +137,13 @@ set(PROJECT_SRC
     ./src/formatter.cpp
     ./src/opponent.cpp
     ./src/protocol.cpp
-    ./src/luabridge/detail/LuaHelpers.cpp
     ${RADMUD_LUA_SRC}
     ${RADMUD_ITEM_SRC}
     ${RADMUD_MODEL_SRC}
     ${RADMUD_ACTION_SRC}
     ${RADMUD_SQLITE_SRC}
     ${RADMUD_COMMAND_SRC}
+    ${RADMUD_CHARACTER_SRC}
     ${RADMUD_UTILITIES_SRC}
 )
 
@@ -158,14 +156,13 @@ include_directories(
 	${ZLIB_INCLUDE_DIR}
 	${SQLITE3_INCLUDE_DIR}
 	${RADMUD_UTILITIES_INC}
+    ${RADMUD_CHARACTER_INC}
     ${RADMUD_COMMAND_INC}
 	${RADMUD_SQLITE_INC}
     ${RADMUD_ACTION_INC}
 	${RADMUD_MODEL_INC}
     ${RADMUD_ITEM_INC}
 	${RADMUD_LUA_INC}
-	./src/luabridge/detail
-	./src/luabridge
 	./src
 )
 

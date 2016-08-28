@@ -23,8 +23,6 @@
 #include "constants.hpp"
 #include "continent.hpp"
 #include "formatter.hpp"
-#include "mobile.hpp"
-#include "player.hpp"
 #include "production.hpp"
 #include "profession.hpp"
 #include "room.hpp"
@@ -33,6 +31,8 @@
 #include "writing.hpp"
 #include "material.hpp"
 
+#include "character/mobile.hpp"
+#include "character/player.hpp"
 #include "command/command.hpp"
 #include "sqlite/sqliteDbms.hpp"
 #include "utilities/table.hpp"

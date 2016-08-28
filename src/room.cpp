@@ -16,23 +16,19 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-// Basic Include.
 #include "room.hpp"
 
 #include <algorithm>
 #include <cmath>
 #include <utility> // std::move
 
-// Other Include.
 #include "mud.hpp"
 #include "constants.hpp"
 #include "formatter.hpp"
 #include "generator.hpp"
 #include "utilities/logger.hpp"
-#include "luabridge/LuaBridge.h"
 #include "model/mechanismModel.hpp"
-
-using namespace std;
+#include "lua/luabridge/LuaBridge.h"
 
 Room::Room() :
         vnum(),
@@ -218,7 +214,7 @@ std::vector<Mobile *> Room::getAllMobile(Character * exception)
 
 bool Room::updateOnDB()
 {
-    vector<string> arguments;
+    std::vector<std::string> arguments;
     arguments.push_back(ToString(this->vnum));
     arguments.push_back(ToString(this->coord.x));
     arguments.push_back(ToString(this->coord.y));
@@ -246,7 +242,7 @@ bool Room::removeOnDB()
     return true;
 }
 
-Item * Room::findItem(string search_parameter, int & number)
+Item * Room::findItem(std::string search_parameter, int & number)
 {
     for (auto iterator : items)
     {
@@ -303,7 +299,7 @@ std::vector<Item *> Room::findBuildings(ModelType type)
 }
 
 Character * Room::findCharacter(
-    string target,
+    std::string target,
     int & number,
     const std::vector<Character *> & exceptions)
 {
@@ -356,7 +352,10 @@ Character * Room::findCharacter(
     return nullptr;
 }
 
-Player * Room::findPlayer(string target, int & number, const std::vector<Character *> & exceptions)
+Player * Room::findPlayer(
+    std::string target,
+    int & number,
+    const std::vector<Character *> & exceptions)
 {
     for (auto iterator : characters)
     {
@@ -392,7 +391,10 @@ Player * Room::findPlayer(string target, int & number, const std::vector<Charact
     return nullptr;
 }
 
-Mobile * Room::findMobile(string target, int & number, const std::vector<Character *> & exceptions)
+Mobile * Room::findMobile(
+    std::string target,
+    int & number,
+    const std::vector<Character *> & exceptions)
 {
     for (auto iterator : characters)
     {
@@ -505,9 +507,9 @@ bool Room::removeExit(const Direction & direction)
     return false;
 }
 
-string Room::getLook(Character * exception)
+std::string Room::getLook(Character * exception)
 {
-    string output = "";
+    std::string output = "";
     // The player want to look at the entire room.
     output += Formatter::bold() + name + Formatter::reset() + "\n";
     output += description + "\n";
@@ -671,7 +673,7 @@ bool CreateRoom(Coordinates coord, Room * source_room)
 
     // Insert into table Room the newly created room.
     Logger::log(LogLevel::Info, "[CreateRoom] Saving room details on the database...");
-    vector<string> arguments;
+    std::vector<std::string> arguments;
     arguments.push_back(ToString(new_room->vnum));
     arguments.push_back(ToString(new_room->coord.x));
     arguments.push_back(ToString(new_room->coord.y));
@@ -690,7 +692,7 @@ bool CreateRoom(Coordinates coord, Room * source_room)
     }
 
     // Insert Room in AreaList.
-    vector<string> arguments2;
+    std::vector<std::string> arguments2;
     arguments2.push_back(ToString(new_room->area->vnum));
     arguments2.push_back(ToString(new_room->vnum));
     if (!SQLiteDbms::instance().insertInto("AreaList", arguments2))
@@ -770,7 +772,7 @@ bool ConnectRoom(Room * room)
             near->addExit(backward);
 
             // Update the values on Database.
-            vector<string> arguments;
+            std::vector<std::string> arguments;
             arguments.push_back(ToString(forward->source->vnum));
             arguments.push_back(ToString(forward->destination->vnum));
             arguments.push_back(ToString(forward->direction.toUInt()));
@@ -782,7 +784,7 @@ bool ConnectRoom(Room * room)
                 break;
             }
 
-            vector<string> arguments2;
+            std::vector<std::string> arguments2;
             arguments2.push_back(ToString(backward->source->vnum));
             arguments2.push_back(ToString(backward->destination->vnum));
             arguments2.push_back(ToString(backward->direction.toUInt()));

@@ -17,8 +17,8 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "moveAction.hpp"
-#include "../character.hpp"
 #include "../utilities/logger.hpp"
+#include "../character/character.hpp"
 
 using namespace std::chrono;
 

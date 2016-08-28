@@ -18,7 +18,7 @@
 
 #include "basicAttack.hpp"
 #include "../../room.hpp"
-#include "../../character.hpp"
+#include "../../character/character.hpp"
 #include "../../item/weaponItem.hpp"
 #include "../../utilities/logger.hpp"
 

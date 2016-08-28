@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "../character.hpp"
+#include "../character/character.hpp"
 #include "argumentHandler.hpp"
 
 /// @brief An action handler for the character.

@@ -17,9 +17,9 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "buildAction.hpp"
-#include "../character.hpp"
 #include "../formatter.hpp"
 #include "../room.hpp"
+#include "../character/character.hpp"
 #include "../sqlite/sqliteDbms.hpp"
 #include "../utilities/logger.hpp"
 

@@ -37,14 +37,14 @@
 #include <errno.h>
 
 // Other Include.
-#include "mud.hpp"
-#include "race.hpp"
-#include "utils.hpp"
-#include "updater.hpp"
-#include "faction.hpp"
-#include "constants.hpp"
-#include "formatter.hpp"
-#include "utilities/logger.hpp"
+#include "../mud.hpp"
+#include "../race.hpp"
+#include "../utils.hpp"
+#include "../updater.hpp"
+#include "../faction.hpp"
+#include "../constants.hpp"
+#include "../formatter.hpp"
+#include "../utilities/logger.hpp"
 
 using namespace std;
 

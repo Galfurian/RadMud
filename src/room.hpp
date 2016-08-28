@@ -20,16 +20,15 @@
 
 #include <map>
 
-#include "character.hpp"
 #include "defines.hpp"
 #include "exit.hpp"
-#include "mobile.hpp"
-#include "player.hpp"
 #include "utils.hpp"
 #include "item/item.hpp"
 #include "lua/lua_script.hpp"
 #include "utilities/coordinates.hpp"
-
+#include "character/character.hpp"
+#include "character/mobile.hpp"
+#include "character/player.hpp"
 #include "item/itemContainer.hpp"
 
 class Item;

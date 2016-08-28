@@ -25,7 +25,7 @@
 #include <string>
 
 #include "character.hpp"
-#include "skill.hpp"
+#include "../skill.hpp"
 
 /// @brief Holds details about each connected player.
 class Player: public Character

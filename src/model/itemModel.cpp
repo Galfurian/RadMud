@@ -16,14 +16,16 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-// Basic Include.
+#include "itemModel.hpp"
+
 #include "../mud.hpp"
 #include "../material.hpp"
 #include "../constants.hpp"
-#include "../luabridge/LuaBridge.h"
 #include "../utilities/logger.hpp"
-
-#include "itemModel.hpp"
+#include "../lua/luabridge/LuaBridge.h"
+#include "../item/armorItem.hpp"
+#include "../item/shopItem.hpp"
+#include "../item/weaponItem.hpp"
 
 #include "armorModel.hpp"
 #include "bookModel.hpp"
@@ -46,10 +48,6 @@
 #include "toolModel.hpp"
 #include "vehicleModel.hpp"
 #include "weaponModel.hpp"
-
-#include "../item/armorItem.hpp"
-#include "../item/shopItem.hpp"
-#include "../item/weaponItem.hpp"
 
 using namespace std;
 

@@ -1,17 +1,15 @@
 #############################################
 # Include Directories
-
-set(RADMUD_LUA_INC
-	./src/luabridge/detail
-	./src/luabridge
-	./src/lua
+set(RADMUD_CHARACTER_INC
+	./src/character
     PARENT_SCOPE
 )
 
 #############################################
 # Source Files
-set(RADMUD_LUA_SRC
-	./src/lua/lua_script.cpp
-	./src/lua/luabridge/detail/LuaHelpers.cpp
+set(RADMUD_CHARACTER_SRC
+	./src/character/character.cpp
+	./src/character/mobile.cpp
+	./src/character/player.cpp
     PARENT_SCOPE
 )

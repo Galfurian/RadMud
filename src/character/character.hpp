@@ -21,14 +21,14 @@
 
 #pragma once
 
-#include "defines.hpp"
-#include "effect.hpp"
-#include "exit.hpp"
-#include "faction.hpp"
-#include "race.hpp"
-#include "item/item.hpp"
-#include "action/combat/combatAction.hpp"
-#include "command/argumentHandler.hpp"
+#include "../defines.hpp"
+#include "../effect.hpp"
+#include "../exit.hpp"
+#include "../faction.hpp"
+#include "../race.hpp"
+#include "../item/item.hpp"
+#include "../action/combat/combatAction.hpp"
+#include "../command/argumentHandler.hpp"
 
 #include <deque>
 

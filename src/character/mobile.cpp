@@ -22,14 +22,13 @@
 // Local Includes.
 
 // Other Include.
-#include "mud.hpp"
-#include "room.hpp"
-#include "constants.hpp"
-#include "lua/lua_script.hpp"
-#include "utilities/logger.hpp"
-#include "luabridge/LuaBridge.h"
+#include "../mud.hpp"
+#include "../room.hpp"
+#include "../constants.hpp"
+#include "../utilities/logger.hpp"
+#include "../lua/lua_script.hpp"
+#include "../lua/luabridge/LuaBridge.h"
 
-using namespace std;
 using namespace std::chrono;
 
 Mobile::Mobile() :
@@ -166,7 +165,7 @@ void Mobile::getSheet(Table & sheet) const
     sheet.addRow( { "Lua Script", this->lua_script });
 }
 
-bool Mobile::hasKey(const string & key) const
+bool Mobile::hasKey(const std::string & key) const
 {
     bool found = false;
     for (auto iterator : keys)
@@ -179,7 +178,7 @@ bool Mobile::hasKey(const string & key) const
     return found;
 }
 
-bool Mobile::hasAction(const string & _action) const
+bool Mobile::hasAction(const std::string & _action) const
 {
     bool found = false;
     for (auto iterator : actions)
@@ -347,7 +346,7 @@ void Mobile::triggerEventExit(Character * character)
     t.detach();
 }
 
-void Mobile::triggerEventMessage(Character * character, string message)
+void Mobile::triggerEventMessage(Character * character, std::string message)
 {
     std::thread t(&Mobile::mobileThread, this, "EventMessage", character, message);
     t.detach();

@@ -17,9 +17,9 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "utils.hpp"
-#include "character.hpp"
 #include "opponent.hpp"
 #include "utilities/logger.hpp"
+#include "character/character.hpp"
 
 Aggression::Aggression(Character * _aggressor, unsigned int _aggression) :
         aggressor(_aggressor),
