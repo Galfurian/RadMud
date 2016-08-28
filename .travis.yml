@@ -3,7 +3,7 @@ sudo: required
 dist: precise
 language: cpp
 matrix:
-#  include:
+  include:
 #    - compiler: gcc
 #      addons:
 #        apt:
