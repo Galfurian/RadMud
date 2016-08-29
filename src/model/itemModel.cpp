@@ -49,8 +49,6 @@
 #include "vehicleModel.hpp"
 #include "weaponModel.hpp"
 
-using namespace std;
-
 ItemModel::ItemModel() :
         vnum(),
         name(),

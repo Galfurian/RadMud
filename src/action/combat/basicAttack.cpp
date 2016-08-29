@@ -1,5 +1,5 @@
-/// @file   combatAction.cpp
-/// @brief  Implementation of the class for a move action.
+/// @file   basicAttack.cpp
+/// /// @brief  Contais the implementation of the class for the basic attack.
 /// @author Enrico Fraccaroli
 /// @date   Jul 14 2016
 /// @copyright

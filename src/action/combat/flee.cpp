@@ -1,5 +1,5 @@
-/// @file   combatAction.cpp
-/// @brief  Implementation of the class for a move action.
+/// @file   flee.cpp
+/// @brief  Contais the implementation of the class for the action of fleeing from combat.
 /// @author Enrico Fraccaroli
 /// @date   Jul 14 2016
 /// @copyright

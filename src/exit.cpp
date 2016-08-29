@@ -23,8 +23,6 @@
 #include "utils.hpp"
 #include "lua/luabridge/LuaBridge.h"
 
-using namespace std;
-
 Exit::Exit() :
         source(),
         destination(),

@@ -28,8 +28,6 @@
 #include <sstream>
 #include <chrono>
 
-using namespace std;
-
 SQLiteDbms::SQLiteDbms()
 {
     loaders.push_back(TableLoader("BadName", LoadBadName));
@@ -182,7 +180,7 @@ bool SQLiteDbms::insertInto(
     bool orIgnore,
     bool orReplace)
 {
-    stringstream stream;
+    std::stringstream stream;
     stream << "INSERT";
     if (orIgnore)
     {
@@ -209,9 +207,9 @@ bool SQLiteDbms::insertInto(
     return (dbConnection.executeQuery(stream.str().c_str()) != 0);
 }
 
-bool SQLiteDbms::deleteFrom(string table, QueryList where)
+bool SQLiteDbms::deleteFrom(std::string table, QueryList where)
 {
-    stringstream stream;
+    std::stringstream stream;
     stream << "DELETE FROM " << table << std::endl;
     stream << "WHERE" << std::endl;
     for (unsigned int it = 0; it < where.size(); ++it)
@@ -231,7 +229,7 @@ bool SQLiteDbms::deleteFrom(string table, QueryList where)
 
 bool SQLiteDbms::updateInto(std::string table, QueryList value, QueryList where)
 {
-    stringstream stream;
+    std::stringstream stream;
     stream << "UPDATE " << table << std::endl;
     stream << "SET" << std::endl;
     for (unsigned int it = 0; it < value.size(); ++it)

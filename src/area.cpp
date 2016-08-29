@@ -32,8 +32,6 @@
 #include "character/character.hpp"
 #include "lua/luabridge/LuaBridge.h"
 
-using namespace std;
-
 Area::Area() :
         vnum(),
         name(),

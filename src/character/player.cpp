@@ -46,8 +46,6 @@
 #include "../formatter.hpp"
 #include "../utilities/logger.hpp"
 
-using namespace std;
-
 Player::Player(const int & _socket, const int & _port, const std::string & _address) :
         psocket(_socket),
         port(_port),
@@ -217,7 +215,7 @@ int Player::getSocket() const
     return psocket;
 }
 
-string Player::getAddress() const
+std::string Player::getAddress() const
 {
     return address;
 }
@@ -245,7 +243,7 @@ bool Player::hasPendingOutput() const
 
 bool Player::updateOnDB()
 {
-    vector<string> arguments;
+    std::vector<std::string> arguments;
     // Prepare the arguments of the query.
     arguments.push_back(name);
     arguments.push_back(password);
@@ -298,7 +296,7 @@ void Player::sendPrompt()
         // Send to the player his prompt.
         if (this->logged_in)
         {
-            string readyPrompt = prompt + "\n";
+            std::string readyPrompt = prompt + "\n";
             FindAndReplace(readyPrompt, "&n", ToLower(name));
             FindAndReplace(readyPrompt, "&N", name);
             FindAndReplace(readyPrompt, "&h", ToString(this->getHealth()));
@@ -331,21 +329,17 @@ void Player::kill()
 void Player::enterGame()
 {
     this->sendMsg(Formatter::clearScreen());
-    map<string, string>::reverse_iterator it;
-
     // Greet them.
     this->sendMsg(Formatter::bold() + "Welcome, " + name + "!\n" + Formatter::reset());
-
     // Load the news.
     this->sendMsg("#---------------- Global News ----------------#\n");
-    for (it = Mud::instance().mudNews.rbegin(); it != Mud::instance().mudNews.rend(); ++it)
+    for (auto it = Mud::instance().mudNews.rbegin(); it != Mud::instance().mudNews.rend(); ++it)
     {
         this->sendMsg("Date :" + it->first + "\n");
         this->sendMsg(it->second + "\n");
     }
     this->sendMsg("#---------------------------------------------#\n\n");
     this->sendMsg("You walked through the mist and came into the world...\n\n");
-
     // Notice all the players in the same room.
     if (room != nullptr)
     {
@@ -368,7 +362,7 @@ void Player::enterGame()
     doCommand("look");
 }
 
-void Player::processInput(Player * player, const string & command)
+void Player::processInput(Player * player, const std::string & command)
 {
     ActionHandler _action = Mud::instance().findStateAction(player->connection_state);
     try

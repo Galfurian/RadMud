@@ -26,8 +26,6 @@
 #include "constants.hpp"
 #include "utilities/logger.hpp"
 
-using namespace std;
-
 Generator::Generator()
 {
     // NAMES

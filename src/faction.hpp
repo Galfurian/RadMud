@@ -60,7 +60,8 @@ class Faction
         ~Faction();
 
         /// @brief Check the correctness of the faction.
-        /// @return <b>True</b> if the faction has correct values,<br><b>False</b> otherwise.
+        /// @return <b>True</b> if the faction has correct values,<br>
+        ///         <b>False</b> otherwise.
         bool check();
 
         /// @brief Fills the provided table with the information concerning the faction.
