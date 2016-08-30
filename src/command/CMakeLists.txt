@@ -1,12 +1,12 @@
 #############################################
-# Command Include Directories
+# Include Directories
 set(RADMUD_COMMAND_INC
 	./src/command
     PARENT_SCOPE
 )
 
 #############################################
-# Command Source Files
+# Source Files
 set(RADMUD_COMMAND_SRC
 	./src/command/argumentHandler.cpp
 	./src/command/argument.cpp

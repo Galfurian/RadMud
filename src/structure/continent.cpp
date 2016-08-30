@@ -16,16 +16,14 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-// Basic Include.
 #include "continent.hpp"
 
 #include <cmath>
 
-// Other Include.
-#include "mud.hpp"
 #include "room.hpp"
-#include "constants.hpp"
-#include "utilities/logger.hpp"
+#include "../mud.hpp"
+#include "../constants.hpp"
+#include "../utilities/logger.hpp"
 
 Continent::Continent() :
     vnum(),

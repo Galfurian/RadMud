@@ -2,7 +2,7 @@
 add_subdirectory(combat)
 
 #############################################
-# Action Include Directories
+# Include Directories
 set(RADMUD_ACTION_INC
 	./src/action
 	${RADMUD_COMBAT_ACTION_INC}
@@ -10,7 +10,7 @@ set(RADMUD_ACTION_INC
 )
 
 #############################################
-# Action Source Files
+# Source Files
 set(RADMUD_ACTION_SRC
 	./src/action/generalAction.cpp
 	./src/action/buildAction.cpp

@@ -1,12 +1,12 @@
 #############################################
-# Model Include Directories
+# Include Directories
 set(RADMUD_MODEL_INC
 	src/model
     PARENT_SCOPE
 )
 
 #############################################
-# Model Source Files
+# Source Files
 set(RADMUD_MODEL_SRC
 	./src/model/armorModel.cpp
 	./src/model/bookModel.cpp

@@ -23,7 +23,7 @@
 
 #include "../defines.hpp"
 #include "../effect.hpp"
-#include "../exit.hpp"
+#include "../structure/exit.hpp"
 #include "../faction.hpp"
 #include "../race.hpp"
 #include "../item/item.hpp"

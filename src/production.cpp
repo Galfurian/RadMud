@@ -16,16 +16,14 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-// Basic Include.
 #include "production.hpp"
 
 #include <algorithm>
 
-// Other Include.
 #include "mud.hpp"
-#include "room.hpp"
 #include "utils.hpp"
 #include "constants.hpp"
+#include "structure/room.hpp"
 #include "utilities/logger.hpp"
 #include "character/character.hpp"
 

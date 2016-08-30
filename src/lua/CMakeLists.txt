@@ -1,6 +1,5 @@
 #############################################
-# Include Directories
-
+# Directories
 set(RADMUD_LUA_INC
 	./src/luabridge/detail
 	./src/luabridge
@@ -9,7 +8,7 @@ set(RADMUD_LUA_INC
 )
 
 #############################################
-# Source Files
+# Files
 set(RADMUD_LUA_SRC
 	./src/lua/lua_script.cpp
 	./src/lua/luabridge/detail/LuaHelpers.cpp

@@ -18,23 +18,28 @@
 
 #pragma once
 
-#include "area.hpp"
+
 #include "building.hpp"
 #include "constants.hpp"
-#include "continent.hpp"
 #include "formatter.hpp"
 #include "production.hpp"
 #include "profession.hpp"
-#include "room.hpp"
 #include "skill.hpp"
 #include "updater.hpp"
 #include "writing.hpp"
 #include "material.hpp"
 
+#include "structure/area.hpp"
+#include "structure/room.hpp"
+#include "structure/continent.hpp"
+
 #include "character/mobile.hpp"
 #include "character/player.hpp"
+
 #include "command/command.hpp"
+
 #include "sqlite/sqliteDbms.hpp"
+
 #include "utilities/table.hpp"
 
 #ifdef __linux__

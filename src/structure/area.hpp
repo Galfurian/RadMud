@@ -21,11 +21,11 @@
 #include <string>
 #include <vector>
 
-#include "utilities/coordinates.hpp"
-#include "utilities/map3D.hpp"
-#include "utilities/map2D.hpp"
-#include "character/character.hpp"
-#include "defines.hpp"
+#include "../utilities/coordinates.hpp"
+#include "../utilities/map3D.hpp"
+#include "../utilities/map2D.hpp"
+#include "../character/character.hpp"
+#include "../defines.hpp"
 
 class Room;
 

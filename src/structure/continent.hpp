@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include "utilities/coordinates.hpp"
-#include "utilities/map2D.hpp"
-#include "utilities/map3D.hpp"
+#include "../utilities/coordinates.hpp"
+#include "../utilities/map2D.hpp"
+#include "../utilities/map3D.hpp"
 
 class Room;
 

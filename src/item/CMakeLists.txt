@@ -1,12 +1,12 @@
 #############################################
-# Item Include Directories
+# Include Directories
 set(RADMUD_ITEM_INC
 	./src/item
     PARENT_SCOPE
 )
 
 #############################################
-# Item Source Files
+# Source Files
 set(RADMUD_ITEM_SRC
 	./src/item/item.cpp
 	./src/item/shopItem.cpp

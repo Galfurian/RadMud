@@ -23,7 +23,7 @@
 
 // Other Include.
 #include "../mud.hpp"
-#include "../room.hpp"
+#include "../structure/room.hpp"
 #include "../constants.hpp"
 #include "../utilities/logger.hpp"
 #include "../lua/lua_script.hpp"

@@ -122,7 +122,7 @@ class Item
         virtual void getSheet(Table & sheet) const;
 
         /// @brief Check if the item can be deconstructed.
-        /// @brief error In case the item cannot be deconstructed, error contains the reason.
+        /// @param error In case the item cannot be deconstructed, error contains the reason.
         /// @return <b>True</b> if it can be deconstructed,<br>
         ///         <b>False</b> otherwise.
         virtual bool canDeconstruct(std::string & error) const;
@@ -134,7 +134,7 @@ class Item
         std::string getTypeName() const;
 
         /// @brief Check if the provided item can be stacked with this one.
-        /// @brief item The item to check.
+        /// @param item The item to check.
         /// @return <b>True</b> if it can be stacked,<br>
         ///         <b>False</b> otherwise.
         bool canStackWith(Item * item) const;

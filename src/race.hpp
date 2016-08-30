@@ -75,8 +75,6 @@ class Race
         ~Race();
 
         /// @brief Initialize the corpse specific of this race.
-        /// @return <b>True</b> if the generated corpse has correct values,<br>
-        ///         <b>False</b> otherwise.
         void initializeCorpse(const std::string & corpseDescription);
 
         /// @brief Check the correctness of the race.

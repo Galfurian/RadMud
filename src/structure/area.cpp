@@ -16,7 +16,6 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-// Basic Include.
 #include "area.hpp"
 
 #include <algorithm>
@@ -24,13 +23,12 @@
 #include <iosfwd>
 #include <ostream>
 
-// Other Include.
-#include "constants.hpp"
 #include "room.hpp"
-#include "item/item.hpp"
-#include "utilities/logger.hpp"
-#include "character/character.hpp"
-#include "lua/luabridge/LuaBridge.h"
+#include "../constants.hpp"
+#include "../item/item.hpp"
+#include "../utilities/logger.hpp"
+#include "../character/character.hpp"
+#include "../lua/luabridge/LuaBridge.h"
 
 Area::Area() :
         vnum(),

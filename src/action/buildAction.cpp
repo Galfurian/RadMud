@@ -18,7 +18,7 @@
 
 #include "buildAction.hpp"
 #include "../formatter.hpp"
-#include "../room.hpp"
+#include "../structure/room.hpp"
 #include "../character/character.hpp"
 #include "../sqlite/sqliteDbms.hpp"
 #include "../utilities/logger.hpp"

@@ -17,7 +17,7 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "basicAttack.hpp"
-#include "../../room.hpp"
+#include "../../structure/room.hpp"
 #include "../../character/character.hpp"
 #include "../../item/weaponItem.hpp"
 #include "../../utilities/logger.hpp"

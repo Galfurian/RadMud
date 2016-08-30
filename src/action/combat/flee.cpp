@@ -17,7 +17,7 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "flee.hpp"
-#include "../../room.hpp"
+#include "../../structure/room.hpp"
 #include "../../character/character.hpp"
 #include "../../model/weaponModel.hpp"
 #include "../../utilities/logger.hpp"
