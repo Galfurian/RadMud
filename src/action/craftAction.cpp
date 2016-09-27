@@ -160,7 +160,7 @@ ActionStatus CraftAction::perform()
     // Add the created items to the character's inventory.
     for (auto createdItem : createdItems)
     {
-        if (!actor->canCarry(createdItem))
+        if (!actor->canCarry(createdItem, createdItem->quantity))
         {
             actor->room->addItem(createdItem);
             dropped = true;

@@ -700,7 +700,7 @@ void DoItemGet(Character * character, ArgumentHandler & args)
         return;
     }
     // Check if the God player can carry the item.
-    if (!character->canCarry(item))
+    if (!character->canCarry(item, item->quantity))
     {
         character->sendMsg("You can't carry anymore items.\n");
         return;

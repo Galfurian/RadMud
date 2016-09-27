@@ -1078,9 +1078,9 @@ bool Character::remEquipmentItem(Item * item)
     return false;
 }
 
-bool Character::canCarry(Item * item) const
+bool Character::canCarry(Item * item, unsigned int quantity) const
 {
-    return ((this->getCarryingWeight() + item->getWeight()) < this->getMaxCarryingWeight());
+    return ((this->getCarryingWeight() + (item->getWeight() * quantity)) < this->getMaxCarryingWeight());
 }
 
 unsigned int Character::getCarryingWeight() const

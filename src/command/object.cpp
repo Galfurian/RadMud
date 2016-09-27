@@ -195,7 +195,7 @@ void DoTake(Character * character, ArgumentHandler & args)
                     continue;
                 }
                 // Check if the player can carry the item.
-                if (!character->canCarry(iterator))
+                if (!character->canCarry(iterator, iterator->quantity))
                 {
                     continue;
                 }
@@ -260,29 +260,61 @@ void DoTake(Character * character, ArgumentHandler & args)
                 character->sendMsg("You can't pick up something which is built!\n");
                 return;
             }
+            // Set the quantity.
+            auto quantity = args[0].getMultiplier();
+            if(item->quantity < quantity)
+            {
+                quantity = item->quantity;
+            }
             // Check if the player can carry the item.
-            if (!character->canCarry(item))
+            if (!character->canCarry(item, quantity))
             {
                 character->sendMsg("You can't carry %s!\n", item->getName());
                 return;
             }
-            // Start a transaction.
-            SQLiteDbms::instance().beginTransaction();
-            // Remove the item from the room.
-            character->room->removeItem(item);
-            // Add the item to the player's inventory.
-            character->addInventoryItem(item);
-            // Conclude the transaction.
-            SQLiteDbms::instance().endTransaction();
-            // Send the messages.
-            character->sendMsg(
-                "You take %s.\n",
-                Formatter::cyan() + ToLower(item->getName()) + Formatter::reset());
-            character->room->sendToAll(
-                "%s has picked up %s.\n",
-                { character },
-                character->getNameCapital(),
-                Formatter::cyan() + ToLower(item->getName()) + Formatter::reset());
+            if(quantity == item->quantity)
+            {
+                // Start a transaction.
+                SQLiteDbms::instance().beginTransaction();
+                // Remove the item from the room.
+                character->room->removeItem(item);
+                // Add the item to the player's inventory.
+                character->addInventoryItem(item);
+                // Conclude the transaction.
+                SQLiteDbms::instance().endTransaction();
+                // Send the messages.
+                character->sendMsg(
+                    "You take %s.\n",
+                    Formatter::cyan() + ToLower(item->getName()) + Formatter::reset());
+                character->room->sendToAll(
+                    "%s has picked up %s.\n",
+                    { character },
+                    character->getNameCapital(),
+                    Formatter::cyan() + ToLower(item->getName()) + Formatter::reset());
+            }
+            else
+            {
+                // Start a transaction.
+                SQLiteDbms::instance().beginTransaction();
+                // Update the quantity.
+                item->quantity -= quantity;
+                item->updateOnDB();
+                // Create the new stack of items.
+                auto newItemStack = item->model->createItem(character->getName(), item->composition, item->quality, quantity);
+                // Add the new stack to the player's inventory.
+                character->addInventoryItem(newItemStack);
+                // Conclude the transaction.
+                SQLiteDbms::instance().endTransaction();
+                // Send the messages.
+                character->sendMsg(
+                    "You take a part of %s.\n",
+                    Formatter::cyan() + ToLower(item->getName()) + Formatter::reset());
+                character->room->sendToAll(
+                    "%s has picked up part of %s.\n",
+                    { character },
+                    character->getNameCapital(),
+                    Formatter::cyan() + ToLower(item->getName()) + Formatter::reset());
+            }
         }
     }
     else if (args.size() == 2)
@@ -324,7 +356,7 @@ void DoTake(Character * character, ArgumentHandler & args)
                     continue;
                 }
                 // Check if the player can carry the item.
-                if (!character->canCarry(iterator))
+                if (!character->canCarry(iterator, iterator->quantity))
                 {
                     continue;
                 }
@@ -371,7 +403,7 @@ void DoTake(Character * character, ArgumentHandler & args)
                 return;
             }
             // Check if the player can carry the item.
-            if (!character->canCarry(item))
+            if (!character->canCarry(item, item->quantity))
             {
                 character->sendMsg("You are not strong enough to carry that object.\n");
                 return;
@@ -501,7 +533,7 @@ void DoGive(Character * character, ArgumentHandler & args)
         return;
     }
     // Check if the target player can carry the item.
-    if (!target->canCarry(item))
+    if (!target->canCarry(item, item->quantity))
     {
         character->sendMsg(target->getNameCapital() + " can't carry anymore items.\n");
         return;
@@ -1752,7 +1784,7 @@ void DoBuy(Character * character, ArgumentHandler & args)
         shopKeeper->doCommand("say " + character->getName() + " " + phrase);
         return;
     }
-    if (!character->canCarry(item))
+    if (!character->canCarry(item, item->quantity))
     {
         auto phrase = "It seems that you can't carry " + item->getName() + ".\n";
         shopKeeper->doCommand("say " + character->getName() + " " + phrase);
