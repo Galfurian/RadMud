@@ -146,7 +146,7 @@ std::string ShopItem::lookContent()
             TableRow row;
             row.push_back(item->getNameCapital());
             row.push_back(ToString(iterator.second));
-            row.push_back(ToString(item->getWeight()));
+            row.push_back(ToString(item->getWeight(true)));
             row.push_back(ToString(this->evaluateBuyPrice(item)));
             row.push_back(ToString(this->evaluateSellPrice(item)));
             // Add the row to the table.

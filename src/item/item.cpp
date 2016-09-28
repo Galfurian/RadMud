@@ -161,7 +161,7 @@ bool Item::updateOnDB()
     arguments.push_back(ToString(this->quantity));
     arguments.push_back(this->maker);
     arguments.push_back(ToString(this->getPrice()));
-    arguments.push_back(ToString(this->getWeight()));
+    arguments.push_back(ToString(this->getWeight(false))); // Save the weight of one item.
     arguments.push_back(ToString(this->condition));
     arguments.push_back(ToString(this->maxCondition));
     arguments.push_back(ToString(this->composition->vnum));
@@ -201,7 +201,7 @@ void Item::getSheet(Table & sheet) const
     sheet.addRow( { "condition", ToString(condition) + "/" + ToString(this->getMaxCondition()) });
     sheet.addRow( { "Material", composition->name });
     sheet.addRow( { "Quality", quality.toString() });
-    sheet.addRow( { "Weight", ToString(this->getWeight()) });
+    sheet.addRow( { "Weight", ToString(this->getWeight(true)) });
     sheet.addRow( { "Price", ToString(this->getPrice()) });
     sheet.addRow( { "Flags", ToString(flags) });
     TableRow locationRow = { "Location" };
@@ -288,6 +288,25 @@ bool Item::canStackWith(Item * item) const
     return false;
 }
 
+Item * Item::removeFromStack(Character * actor, unsigned int & _quantity)
+{
+    if(this->quantity > _quantity)
+    {
+        // Generate a copty of this item with the given quantity.
+        auto newStack = this->model->createItem(actor->getName(), this->composition, this->quality, _quantity);
+        if(newStack != nullptr)
+        {
+            // Actually reduce the quantity.
+            this->quantity -= _quantity;
+            // Update this item, since its quantity has changed.
+            this->updateOnDB();
+            // Return the new stack.
+            return newStack;
+        }
+    }
+    return nullptr;
+}
+
 bool Item::hasKey(std::string key)
 {
     for (auto iterator : model->keys)
@@ -352,15 +371,20 @@ unsigned int Item::getPrice() const
     return ((pcBase + pcCondition) / 2);
 }
 
-unsigned int Item::getWeight() const
+unsigned int Item::getWeight(bool entireStack) const
 {
     // Add the default weight of the model.
     unsigned int totalWeight = this->weight;
+    // If not single, multiply for the quantity.
+    if(entireStack)
+    {
+        totalWeight *= this->quantity;
+    }
     if (!this->isEmpty())
     {
         for (auto iterator : content)
         {
-            totalWeight += iterator->getWeight();
+            totalWeight += iterator->getWeight(true);
         }
     }
     else if (model->getType() == ModelType::LiquidContainer)
@@ -403,7 +427,7 @@ std::string Item::getLook()
     // Print the content.
     output += this->lookContent();
     output += "It weights about ";
-    output += Formatter::yellow() + ToString(this->getWeight()) + Formatter::reset();
+    output += Formatter::yellow() + ToString(this->getWeight(true)) + Formatter::reset();
     output += " " + mud_measure + ".\n";
     return output;
 }
@@ -503,7 +527,7 @@ unsigned int Item::getUsedSpace() const
     {
         for (auto iterator : content)
         {
-            used += iterator->getWeight();
+            used += iterator->getWeight(true);
         }
     }
     else if (model->getType() == ModelType::LiquidContainer)
@@ -532,7 +556,7 @@ unsigned int Item::getFreeSpace() const
 
 bool Item::canContain(Item * item) const
 {
-    return (item->getWeight() <= this->getFreeSpace());
+    return (item->getWeight(true) <= this->getFreeSpace());
 }
 
 void Item::putInside(Item * & item, bool updateDB)
@@ -709,7 +733,7 @@ std::string Item::lookContent()
             for (auto it : content)
             {
                 table.addRow(
-                    { it->getNameCapital(), ToString(it->quantity), ToString(it->getWeight()) });
+                    { it->getNameCapital(), ToString(it->quantity), ToString(it->getWeight(true)) });
             }
             output += table.getTable();
             output += "Has been used " + Formatter::yellow() + ToString(getUsedSpace())

@@ -296,24 +296,33 @@ void DoTake(Character * character, ArgumentHandler & args)
             {
                 // Start a transaction.
                 SQLiteDbms::instance().beginTransaction();
-                // Update the quantity.
-                item->quantity -= quantity;
-                item->updateOnDB();
                 // Create the new stack of items.
-                auto newItemStack = item->model->createItem(character->getName(), item->composition, item->quality, quantity);
-                // Add the new stack to the player's inventory.
-                character->addInventoryItem(newItemStack);
-                // Conclude the transaction.
-                SQLiteDbms::instance().endTransaction();
-                // Send the messages.
-                character->sendMsg(
-                    "You take a part of %s.\n",
-                    Formatter::cyan() + ToLower(item->getName()) + Formatter::reset());
-                character->room->sendToAll(
-                    "%s has picked up part of %s.\n",
-                    { character },
-                    character->getNameCapital(),
-                    Formatter::cyan() + ToLower(item->getName()) + Formatter::reset());
+                auto newStack = item->removeFromStack(character,quantity);
+                if(newStack == nullptr)
+                {
+                    // Rollback the transaction.
+                    SQLiteDbms::instance().rollbackTransection();
+                    // Send the messages.
+                    character->sendMsg(
+                        "You failed to take a part of %s.\n",
+                        Formatter::cyan() + ToLower(item->getName()) + Formatter::reset());
+                }
+                else
+                {
+                    // Add the new stack to the player's inventory.
+                    character->addInventoryItem(newStack);
+                    // Conclude the transaction.
+                    SQLiteDbms::instance().endTransaction();
+                    // Send the messages.
+                    character->sendMsg(
+                        "You take a part of %s.\n",
+                        Formatter::cyan() + ToLower(item->getName()) + Formatter::reset());
+                    character->room->sendToAll(
+                        "%s has picked up part of %s.\n",
+                        { character },
+                        character->getNameCapital(),
+                        Formatter::cyan() + ToLower(item->getName()) + Formatter::reset());
+                }
             }
         }
     }
@@ -896,7 +905,7 @@ void DoInventory(Character * character, ArgumentHandler & /*args*/)
     // List all the items in inventory
     for (auto it : character->inventory)
     {
-        table.addRow( { it->getNameCapital(), ToString(it->quantity), ToString(it->getWeight()) });
+        table.addRow( { it->getNameCapital(), ToString(it->quantity), ToString(it->getWeight(true)) });
     }
     character->sendMsg(table.getTable());
     character->sendMsg(

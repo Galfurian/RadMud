@@ -1080,7 +1080,7 @@ bool Character::remEquipmentItem(Item * item)
 
 bool Character::canCarry(Item * item, unsigned int quantity) const
 {
-    return ((this->getCarryingWeight() + (item->getWeight() * quantity)) < this->getMaxCarryingWeight());
+    return ((this->getCarryingWeight() + (item->getWeight(false) * quantity)) < this->getMaxCarryingWeight());
 }
 
 unsigned int Character::getCarryingWeight() const
@@ -1088,11 +1088,11 @@ unsigned int Character::getCarryingWeight() const
     unsigned int carrying = 0;
     for (auto iterator : inventory)
     {
-        carrying += iterator->getWeight();
+        carrying += iterator->getWeight(true);
     }
     for (auto iterator : equipment)
     {
-        carrying += iterator->getWeight();
+        carrying += iterator->getWeight(true);
     }
     return carrying;
 }
@@ -1556,7 +1556,7 @@ unsigned int Character::getCooldown(CombatActionType combatAction)
             // MIN =  0.00
             // MAX =  1.60
             Item * weapon = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
-            double RHDmod = weapon->getWeight();
+            double RHDmod = weapon->getWeight(true);
             if (RHDmod > 0)
             {
                 if (RHDmod > 40)
@@ -1572,7 +1572,7 @@ unsigned int Character::getCooldown(CombatActionType combatAction)
             // MIN =  0.00
             // MAX =  1.60
             Item * weapon = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
-            double LHDmod = weapon->getWeight();
+            double LHDmod = weapon->getWeight(true);
             if (LHDmod > 0)
             {
                 if (LHDmod > 40)
@@ -1631,7 +1631,7 @@ unsigned int Character::getConsumedStaminaFor(
             if (this->canAttackWith(slot))
             {
                 Item * weapon = this->findEquipmentSlotItem(slot);
-                unsigned int wpnWeight = weapon->getWeight();
+                unsigned int wpnWeight = weapon->getWeight(true);
                 double WPN = (wpnWeight == 0) ? 0 : log10(wpnWeight);
                 RSLT += WPN;
             }

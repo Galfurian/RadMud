@@ -139,6 +139,8 @@ class Item
         ///         <b>False</b> otherwise.
         bool canStackWith(Item * item) const;
 
+        Item * removeFromStack(Character * actor, unsigned int & _quantity);
+
         /// @brief Check if the item has the desired key.
         /// @param key The key to search.
         /// @return <b>True</b> if the operations succeeded,<br>
@@ -165,8 +167,9 @@ class Item
         virtual unsigned int getPrice() const;
 
         /// @brief Get the item weight, plus eventually contained item weight.
+        /// @param entireStack If <b>true</b> this function returns the weight of the entire stack.
         /// @return The total weight of the item.
-        virtual unsigned int getWeight() const;
+        virtual unsigned int getWeight(bool entireStack) const;
 
         /// @brief Return the name of the item.
         /// @return The name of the item.
