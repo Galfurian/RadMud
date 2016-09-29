@@ -41,7 +41,7 @@ void CurrencyItem::getSheet(Table & sheet) const
 
 unsigned int CurrencyItem::getPrice() const
 {
-    auto customPrice = Item::getPrice();
+    auto customPrice = Item::getPrice(true);
     if (!model->toCurrency()->findPrice(this->composition->vnum, customPrice))
     {
         Logger::log(

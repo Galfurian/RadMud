@@ -160,6 +160,6 @@ bool ItemContainer::orderItemByWeight(Item * first, Item * second)
 
 bool ItemContainer::orderItemByPrice(Item * first, Item * second)
 {
-    return first->getPrice() < second->getPrice();
+    return first->getPrice(true) < second->getPrice(true);
 }
 

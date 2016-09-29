@@ -132,20 +132,36 @@ std::string ShopItem::lookContent()
         Table saleTable(shopName);
         saleTable.addColumn("Good", StringAlign::Left);
         saleTable.addColumn("Quantity", StringAlign::Center);
-        saleTable.addColumn("Weight", StringAlign::Center);
-        saleTable.addColumn("Buy", StringAlign::Left);
-        saleTable.addColumn("Sell", StringAlign::Left);
-        for (auto iterator : content.toStack())
+        saleTable.addColumn("Weight (Single)", StringAlign::Right);
+        saleTable.addColumn("Weight (Stack)", StringAlign::Right);
+        saleTable.addColumn("Buy", StringAlign::Right);
+        saleTable.addColumn("Sell (Single)", StringAlign::Right);
+        saleTable.addColumn("Sell (Stack)", StringAlign::Right);
+        for (auto iterator : content)
         {
-            // Retrieve the item.
-            Item * item = iterator.first;
             // Prepare the row.
             TableRow row;
-            row.push_back(item->getNameCapital());
-            row.push_back(ToString(iterator.second));
-            row.push_back(ToString(item->getWeight(true)));
-            row.push_back(ToString(this->evaluateBuyPrice(item)));
-            row.push_back(ToString(this->evaluateSellPrice(item)));
+            row.push_back(iterator->getNameCapital());
+            row.push_back(ToString(iterator->quantity));
+            row.push_back(ToString(iterator->getWeight(false)));
+            if (iterator->quantity > 1)
+            {
+                row.push_back(ToString(iterator->getWeight(true)));
+            }
+            else
+            {
+                row.push_back("");
+            }
+            row.push_back(ToString(this->evaluateBuyPrice(iterator)));
+            row.push_back(ToString(this->evaluateSellPrice(iterator)));
+            if (iterator->quantity > 1)
+            {
+                row.push_back(ToString(this->evaluateSellPrice(iterator) * iterator->quantity));
+            }
+            else
+            {
+                row.push_back("");
+            }
             // Add the row to the table.
             saleTable.addRow(row);
         }
@@ -204,10 +220,10 @@ bool ShopItem::canUse(std::string & error)
 
 unsigned int ShopItem::evaluateBuyPrice(Item * item)
 {
-    return this->shopBuyTax * item->getPrice();
+    return this->shopBuyTax * item->getPrice(false);
 }
 
 unsigned int ShopItem::evaluateSellPrice(Item * item)
 {
-    return this->shopSellTax * item->getPrice();
+    return this->shopSellTax * item->getPrice(false);
 }

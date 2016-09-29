@@ -297,7 +297,7 @@ void DoTake(Character * character, ArgumentHandler & args)
                 if (newStack == nullptr)
                 {
                     character->sendMsg("You failed to drop %s.\n", item->getName(true));
-                    // Conclude the transaction.
+                    // Rollback the transaction.
                     SQLiteDbms::instance().rollbackTransection();
                     return;
                 }
@@ -441,7 +441,7 @@ void DoTake(Character * character, ArgumentHandler & args)
                 if (newStack == nullptr)
                 {
                     character->sendMsg("You failed to take part of %s.\n", item->getName(true));
-                    // Conclude the transaction.
+                    // Rollback the transaction.
                     SQLiteDbms::instance().rollbackTransection();
                     return;
                 }
@@ -449,11 +449,11 @@ void DoTake(Character * character, ArgumentHandler & args)
                 character->addInventoryItem(newStack);
                 // Send the messages.
                 character->sendMsg(
-                    "You take a part of %s from %s.\n",
+                    "You take out part of %s from %s.\n",
                     item->getName(true),
                     container->getName(true));
                 character->room->sendToAll(
-                    "%s has picked up part of %s from %s.\n",
+                    "%s takes out %s from %s.\n",
                     {character},
                     character->getNameCapital(),
                     item->getName(true),
@@ -553,7 +553,7 @@ void DoDrop(Character * character, ArgumentHandler & args)
             if (newStack == nullptr)
             {
                 character->sendMsg("You failed to drop %s.\n", item->getName(true));
-                // Conclude the transaction.
+                // Rollback the transaction.
                 SQLiteDbms::instance().rollbackTransection();
                 return;
             }
@@ -564,7 +564,7 @@ void DoDrop(Character * character, ArgumentHandler & args)
                 "You drop part of %s.\n",
                 item->getName(true));
             character->room->sendToAll(
-                "%s has dropped part of %s.\n",
+                "%s has dropped %s.\n",
                 {character},
                 character->getNameCapital(),
                 item->getName(true));
@@ -644,7 +644,7 @@ void DoGive(Character * character, ArgumentHandler & args)
                 "You failed to give part of %s to %s.\n",
                 item->getName(true),
                 target->getName());
-            // Conclude the transaction.
+            // Rollback the transaction.
             SQLiteDbms::instance().rollbackTransection();
             return;
         }
@@ -1346,7 +1346,7 @@ void DoPut(Character * character, ArgumentHandler & args)
         for (auto iterator : originalList)
         {
             // Skip the item if it cannot be contained inside the destination.
-            if (!container->canContain(iterator)) continue;
+            if (!container->canContain(iterator, true)) continue;
             // Skip the item if it is the destination.
             if (iterator->vnum == container->vnum) continue;
             // Remove the item from the player's inventory.
@@ -1375,31 +1375,68 @@ void DoPut(Character * character, ArgumentHandler & args)
             character->sendMsg("You don't have any '%s'.\n", args[0].getContent());
             return;
         }
+        // Set the quantity.
+        auto quantity = args[0].getMultiplier();
+        if (item->quantity < quantity)
+        {
+            quantity = item->quantity;
+        }
         // Check if the item can be contained inside the destination.
-        if (!container->canContain(item))
+        if (!container->canContain(item, quantity))
         {
             character->sendMsg("%s can't contain any more items.\n", container->getNameCapital());
             return;
         }
         // Start a transaction.
         SQLiteDbms::instance().beginTransaction();
-        // Remove the item from the player's inventory.
-        character->remInventoryItem(item);
-        // Put the item inside the container.
-        container->putInside(item);
+        if (item->quantity <= quantity)
+        {
+            // Remove the item from the player's inventory.
+            character->remInventoryItem(item);
+            // Put the item inside the container.
+            container->putInside(item);
+            // Send the messages.
+            character->sendMsg(
+                "You put %s inside %s.\n",
+                item->getName(true),
+                container->getName(true));
+            character->room->sendToAll(
+                "%s puts %s inside %s.\n",
+                {character},
+                character->getNameCapital(),
+                item->getName(true),
+                container->getName(true));
+        }
+        else
+        {
+            // Remove from the stack.
+            auto newStack = item->removeFromStack(character, quantity);
+            if (newStack == nullptr)
+            {
+                character->sendMsg(
+                    "You failed to put part of %s inside %s.\n",
+                    item->getName(true),
+                    container->getName(true));
+                // Rollback the transaction.
+                SQLiteDbms::instance().rollbackTransection();
+                return;
+            }
+            // Put the stack inside the container.
+            container->putInside(newStack);
+            // Send the messages.
+            character->sendMsg(
+                "You put part of %s inside %s.\n",
+                item->getName(true),
+                container->getName(true));
+            character->room->sendToAll(
+                "%s puts %s inside %s.\n",
+                {character},
+                character->getNameCapital(),
+                item->getName(true),
+                container->getName(true));
+        }
         // Conclude the transaction.
         SQLiteDbms::instance().endTransaction();
-        // Send the messages.
-        character->sendMsg(
-            "You put %s inside %s.\n",
-            item->getName(true),
-            container->getName(true));
-        character->room->sendToAll(
-            "%s puts %s inside %s.\n",
-            {character},
-            character->getNameCapital(),
-            item->getName(true),
-            container->getName(true));
     }
 }
 
@@ -1745,9 +1782,19 @@ void DoDeposit(Character * character, ArgumentHandler & args)
         character->sendMsg("You can't deposit %s in %s.\n", item->getName(true), building->getName(true));
         return;
     }
-    building->toShopItem()->balance += item->getPrice();
-    item->removeFromMud();
-    delete (item);
+    // Set the quantity.
+    auto quantity = args[0].getMultiplier();
+    if (item->quantity <= quantity)
+    {
+        building->toShopItem()->balance += item->getPrice(true);
+        item->removeFromMud();
+        delete (item);
+    }
+    else
+    {
+        item->quantity -= quantity;
+        building->toShopItem()->balance += item->getPrice(false) * quantity;
+    }
 }
 
 void DoSell(Character * character, ArgumentHandler & args)
@@ -1760,6 +1807,7 @@ void DoSell(Character * character, ArgumentHandler & args)
         character->sendMsg("Sell what to whom?\n");
         return;
     }
+
     // Get the item and the target.
     auto item = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
     // Check the item.
@@ -1773,6 +1821,7 @@ void DoSell(Character * character, ArgumentHandler & args)
         character->sendMsg("You can't sell %s.\n", item->getName(true));
         return;
     }
+
     // Get the target.
     auto target = character->room->findItem(args[1].getContent(), args[1].getIndex());
     if (target == nullptr)
@@ -1785,6 +1834,14 @@ void DoSell(Character * character, ArgumentHandler & args)
         character->sendMsg("%s is not a shop.\n", target->getNameCapital());
         return;
     }
+
+    // Set the quantity.
+    auto quantity = args[0].getMultiplier();
+    if (item->quantity < quantity)
+    {
+        quantity = item->quantity;
+    }
+
     auto shop = target->toShopItem();
     std::string error;
     if (!shop->canUse(error))
@@ -1792,21 +1849,25 @@ void DoSell(Character * character, ArgumentHandler & args)
         character->sendMsg(error + "\n");
         return;
     }
+
     auto shopKeeper = shop->shopKeeper;
-    if (!shop->canContain(item))
+    if (!shop->canContain(item, quantity))
     {
         auto phrase = "The shop is full, come back another day.";
         shopKeeper->doCommand("say " + character->getName() + " " + phrase);
         return;
     }
-    auto price = shop->evaluateSellPrice(item);
+
+    auto price = shop->evaluateSellPrice(item) * quantity;
     if (shop->balance < price)
     {
         auto phrase = "I can't afford to buy your goods.";
         shopKeeper->doCommand("say " + character->getName() + " " + phrase);
         return;
     }
+
     auto currency = shopKeeper->faction->currency;
+
     // Give the coins to the character.
     auto coins = currency->generateCurrency(shopKeeper->getName(), price);
     if (coins.empty())
@@ -1814,18 +1875,46 @@ void DoSell(Character * character, ArgumentHandler & args)
         character->sendMsg("You failed to sell %s.\n", item->getName(true));
         return;
     }
+
     SQLiteDbms::instance().beginTransaction();
-    // Remove the item from the player's inventory.
-    character->remInventoryItem(item);
-    // Put the item inside the container.
-    shop->putInside(item);
+    if (item->quantity <= quantity)
+    {
+        // Remove the item from the player's inventory.
+        character->remInventoryItem(item);
+        // Put the item inside the container.
+        shop->putInside(item);
+        // Decrese the shop balance.
+        shop->balance -= price;
+        // Send a message.
+        character->sendMsg("You sell %s to %s.\n", item->getName(true), shop->getName(true));
+    }
+    else
+    {
+        // Remove from the stack.
+        auto newStack = item->removeFromStack(character, quantity);
+        if (newStack == nullptr)
+        {
+            character->sendMsg("You failed sell part of %s to %s.\n", item->getName(true), shop->getName(true));
+            for (auto coin : coins)
+            {
+                delete (coin);
+            }
+            // Rollback the transaction.
+            SQLiteDbms::instance().rollbackTransection();
+            return;
+        }
+        // Put the item inside the container.
+        shop->putInside(newStack);
+        // Decrese the shop balance.
+        shop->balance -= price;
+        // Send a message.
+        character->sendMsg("You sell part of %s to %s.\n", item->getName(true), shop->getName(true));
+    }
     for (auto coin : coins)
     {
         character->addInventoryItem(coin);
     }
     SQLiteDbms::instance().endTransaction();
-    shop->balance -= price;
-    character->sendMsg("You sell %s to %s.\n", item->getName(true), shop->getName(true));
 }
 
 void DoBuy(Character * character, ArgumentHandler & args)
@@ -1838,6 +1927,7 @@ void DoBuy(Character * character, ArgumentHandler & args)
         character->sendMsg("Buy what from which shop?\n");
         return;
     }
+
     // Get the target.
     auto target = character->room->findItem(args[1].getContent(), args[1].getIndex());
     if (target == nullptr)
@@ -1850,6 +1940,8 @@ void DoBuy(Character * character, ArgumentHandler & args)
         character->sendMsg("%s is not a shop.\n", target->getNameCapital(true));
         return;
     }
+
+    // Get the shop.
     auto shop = target->toShopItem();
     std::string error;
     if (!shop->canUse(error))
@@ -1858,6 +1950,7 @@ void DoBuy(Character * character, ArgumentHandler & args)
         return;
     }
     auto shopKeeper = shop->shopKeeper;
+
     // Get the item.
     auto item = shop->findContent(args[0].getContent(), args[0].getIndex());
     // Check the item.
@@ -1867,25 +1960,34 @@ void DoBuy(Character * character, ArgumentHandler & args)
         shopKeeper->doCommand("say " + character->getName() + " " + phrase);
         return;
     }
-    if (!character->canCarry(item, item->quantity))
+    // Set the quantity.
+    auto quantity = args[0].getMultiplier();
+    if (item->quantity < quantity)
+    {
+        quantity = item->quantity;
+    }
+    if (!character->canCarry(item, quantity))
     {
         auto phrase = "It seems that you can't carry " + item->getName(true) + ".\n";
         shopKeeper->doCommand("say " + character->getName() + " " + phrase);
         return;
     }
+
+    // Check if the character has enough coins.
     auto availableCoins = character->findCoins();
     std::vector<Item *> changedCoins;
     std::vector<std::pair<Item *, unsigned int>> givenCoins;
-    unsigned int providedValue = 0, requiredValue = shop->evaluateBuyPrice(item);
+    unsigned int requiredValue = shop->evaluateBuyPrice(item) * quantity;
+    unsigned int providedValue = 0;
     for (auto coin : availableCoins)
     {
-        unsigned int coinValue = coin->getPrice();
-        unsigned int quantity = 0;
-        for (; (quantity < coin->quantity) && (providedValue < requiredValue); ++quantity)
+        unsigned int coinValue = coin->getPrice(false);
+        unsigned int coinQuantity = 0;
+        for (; (coinQuantity < coin->quantity) && (providedValue < requiredValue); ++coinQuantity)
         {
             providedValue += coinValue;
         }
-        givenCoins.push_back(std::make_pair(coin, quantity));
+        givenCoins.push_back(std::make_pair(coin, coinQuantity));
         if (providedValue >= requiredValue)
         {
             break;
@@ -1910,6 +2012,27 @@ void DoBuy(Character * character, ArgumentHandler & args)
         }
     }
     SQLiteDbms::instance().beginTransaction();
+    if (item->quantity <= quantity)
+    {
+        shop->balance += requiredValue;
+
+        shop->takeOut(item);
+        character->addInventoryItem(item);
+        character->sendMsg("You buy %s from %s.\n", item->getName(true), shop->getName(true));
+    }
+    else
+    {
+        // Remove from the stack.
+        auto newStack = item->removeFromStack(character, quantity);
+        if (newStack == nullptr)
+        {
+            // Rollback the transaction.
+            SQLiteDbms::instance().rollbackTransection();
+            return;
+        }
+        character->addInventoryItem(newStack);
+        character->sendMsg("You buy part of %s from %s.\n", item->getName(true), shop->getName(true));
+    }
     for (auto coin : changedCoins)
     {
         character->addInventoryItem(coin);
@@ -1928,11 +2051,7 @@ void DoBuy(Character * character, ArgumentHandler & args)
             coin.first->updateOnDB();
         }
     }
-    shop->takeOut(item);
-    character->addInventoryItem(item);
     SQLiteDbms::instance().endTransaction();
-    shop->balance += requiredValue;
-    character->sendMsg("You buy %s from %s.\n", item->getName(true), shop->getName(true));
 }
 
 void DoBalance(Character * character, ArgumentHandler & args)
@@ -1946,7 +2065,7 @@ void DoBalance(Character * character, ArgumentHandler & args)
     unsigned int balance = 0;
     for (auto coin : character->findCoins())
     {
-        balance += coin->quantity * coin->getPrice();
+        balance += coin->getPrice(true);
     }
     character->sendMsg("Your balance is: %s.\n", ToString(balance));
 }

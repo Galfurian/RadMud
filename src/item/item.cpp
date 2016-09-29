@@ -151,7 +151,7 @@ bool Item::updateOnDB()
     arguments.push_back(ToString(model->vnum));
     arguments.push_back(ToString(this->quantity));
     arguments.push_back(this->maker);
-    arguments.push_back(ToString(this->getPrice()));
+    arguments.push_back(ToString(this->getPrice(false))); // Save the weight of one item.
     arguments.push_back(ToString(this->getWeight(false))); // Save the weight of one item.
     arguments.push_back(ToString(this->condition));
     arguments.push_back(ToString(this->maxCondition));
@@ -193,7 +193,7 @@ void Item::getSheet(Table & sheet) const
     sheet.addRow({"Material", composition->name});
     sheet.addRow({"Quality", quality.toString()});
     sheet.addRow({"Weight", ToString(this->getWeight(true))});
-    sheet.addRow({"Price", ToString(this->getPrice())});
+    sheet.addRow({"Price", ToString(this->getPrice(true))});
     sheet.addRow({"Flags", ToString(flags)});
     TableRow locationRow = {"Location"};
     if (room != nullptr)
@@ -359,14 +359,20 @@ std::string Item::getConditionDescription()
     else return "is broken";
 }
 
-unsigned int Item::getPrice() const
+unsigned int Item::getPrice(bool entireStack) const
 {
     // Add the base price.
     auto pcBase = this->price;
     // Evaluate the modifier due to item's condition.
     auto pcCondition = static_cast<unsigned int>(pcBase * this->getConditionModifier());
     // The resulting price.
-    return ((pcBase + pcCondition) / 2);
+    auto itemPrice = ((pcBase + pcCondition) / 2);
+    // Evaluate for the entire stack.
+    if (entireStack)
+    {
+        itemPrice *= this->quantity;
+    }
+    return itemPrice;
 }
 
 unsigned int Item::getWeight(bool entireStack) const
@@ -561,9 +567,9 @@ unsigned int Item::getFreeSpace() const
     }
 }
 
-bool Item::canContain(Item * item) const
+bool Item::canContain(Item * item, bool entireStack) const
 {
-    return (item->getWeight(true) <= this->getFreeSpace());
+    return (item->getWeight(entireStack) <= this->getFreeSpace());
 }
 
 void Item::putInside(Item *& item, bool updateDB)

@@ -169,8 +169,9 @@ public:
     /// @return The condition of the item.
     std::string getConditionDescription();
 
-    /// Provides the price of the item based on its quality, material and condition.
-    virtual unsigned int getPrice() const;
+    /// @brief Provides the price of the item based on its quality, material and condition.
+    /// @param entireStack If <b>true</b> this function returns the price of the entire stack.
+    virtual unsigned int getPrice(bool entireStack) const;
 
     /// @brief Get the item weight, plus eventually contained item weight.
     /// @param entireStack If <b>true</b> this function returns the weight of the entire stack.
@@ -223,10 +224,11 @@ public:
     unsigned int getFreeSpace() const;
 
     /// @brief Check if this item can contain the passed one.
-    /// @param item The item to check.
+    /// @param item        The item to check.
+    /// @param entireStack If <b>true</b> this function perform the check for the entire stack.
     /// @return <b>True</b> if it can be contained,<br>
     ///         <b>False</b> otherwise.
-    bool canContain(Item * item) const;
+    bool canContain(Item * item, bool entireStack) const;
 
     /// @brief Load an item inside the container and update the database.
     /// @param item     The item to load in.
