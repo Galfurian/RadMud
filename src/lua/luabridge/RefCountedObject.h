@@ -330,19 +330,19 @@ namespace luabridge
 {
 
 // forward declaration
-    template<class T>
-    struct ContainerTraits;
+template<class T>
+struct ContainerTraits;
 
-    template<class T>
-    struct ContainerTraits<RefCountedObjectPtr<T> >
+template<class T>
+struct ContainerTraits<RefCountedObjectPtr<T> >
+{
+    typedef T Type;
+
+    static T * get(RefCountedObjectPtr<T> const & c)
     {
-        typedef T Type;
-
-        static T * get(RefCountedObjectPtr<T> const & c)
-        {
-            return c.getObject();
-        }
-    };
+        return c.getObject();
+    }
+};
 
 }
 
