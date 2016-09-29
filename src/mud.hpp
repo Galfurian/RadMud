@@ -21,7 +21,6 @@
 
 #include "building.hpp"
 #include "constants.hpp"
-#include "formatter.hpp"
 #include "production.hpp"
 #include "profession.hpp"
 #include "skill.hpp"
@@ -41,6 +40,7 @@
 #include "sqlite/sqliteDbms.hpp"
 
 #include "utilities/table.hpp"
+#include "utilities/formatter.hpp"
 
 #ifdef __linux__
 

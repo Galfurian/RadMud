@@ -87,7 +87,6 @@ set(PROJECT_SRC
         ./src/skill.cpp
         ./src/updater.cpp
         ./src/utils.cpp
-        ./src/formatter.cpp
         ./src/opponent.cpp
         ./src/protocol.cpp
         ${RADMUD_LUA_SRC}
