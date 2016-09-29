@@ -19,12 +19,12 @@
 #include "mechanismModel.hpp"
 
 MechanismModel::MechanismModel() :
-        mechanismType(),
-        key(),
-        difficulty(),
-        efficency(),
-        command(),
-        target()
+    mechanismType(),
+    key(),
+    difficulty(),
+    efficency(),
+    command(),
+    target()
 {
     // Nothing to do.
 }
@@ -87,12 +87,12 @@ void MechanismModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow( { "Mechanism Type", GetMechanismTypeName(this->mechanismType) });
-    sheet.addRow( { "Key", ToString(this->key) });
-    sheet.addRow( { "Picklock Difficulty", ToString(this->difficulty) });
-    sheet.addRow( { "Picklock Efficency", ToString(this->efficency) });
-    sheet.addRow( { "Lever command", ToString(this->command) });
-    sheet.addRow( { "Target Vnum", ToString(this->target) });
+    sheet.addRow({"Mechanism Type", GetMechanismTypeName(this->mechanismType)});
+    sheet.addRow({"Key", ToString(this->key)});
+    sheet.addRow({"Picklock Difficulty", ToString(this->difficulty)});
+    sheet.addRow({"Picklock Efficency", ToString(this->efficency)});
+    sheet.addRow({"Lever command", ToString(this->command)});
+    sheet.addRow({"Target Vnum", ToString(this->target)});
 }
 
 std::string GetMechanismTypeName(MechanismType type)

@@ -21,18 +21,19 @@
 #include "itemModel.hpp"
 
 /// @brief Model of a furniture.
-class FurnitureModel: public ItemModel
+class FurnitureModel :
+    public ItemModel
 {
-    public:
-        FurnitureModel();
+public:
+    FurnitureModel();
 
-        virtual ~FurnitureModel();
+    virtual ~FurnitureModel();
 
-        virtual ModelType getType() const;
+    virtual ModelType getType() const;
 
-        virtual std::string getTypeName() const;
+    virtual std::string getTypeName() const;
 
-        virtual bool setModel(const std::string & source);
+    virtual bool setModel(const std::string & source);
 
-        virtual void getSheet(Table & sheet) const;
+    virtual void getSheet(Table & sheet) const;
 };

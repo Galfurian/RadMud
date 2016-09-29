@@ -22,15 +22,15 @@
 using namespace std::chrono;
 
 GeneralAction::GeneralAction(Character * _actor) :
-        actor(_actor),
-        actionCooldown()
+    actor(_actor),
+    actionCooldown()
 {
     // Nothing to do.
 }
 
 GeneralAction::GeneralAction(Character * _actor, TimeClock _actionCooldown) :
-        actor(_actor),
-        actionCooldown(_actionCooldown)
+    actor(_actor),
+    actionCooldown(_actionCooldown)
 {
     // Nothing to do.
 }

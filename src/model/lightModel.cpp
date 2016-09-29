@@ -19,8 +19,8 @@
 #include "lightModel.hpp"
 
 LightModel::LightModel() :
-        maxHours(),
-        policy()
+    maxHours(),
+    policy()
 {
     // Nothing to do.
 }
@@ -68,6 +68,6 @@ void LightModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow( { "Max Hours", ToString(this->maxHours) });
-    sheet.addRow( { "Policy", ToString(this->policy) });
+    sheet.addRow({"Max Hours", ToString(this->maxHours)});
+    sheet.addRow({"Policy", ToString(this->policy)});
 }

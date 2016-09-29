@@ -22,7 +22,7 @@
 using namespace std::chrono;
 
 CombatAction::CombatAction(Character * _actor) :
-        GeneralAction(_actor)
+    GeneralAction(_actor)
 {
     Logger::log(LogLevel::Debug, "Created CombatAction.");
 }

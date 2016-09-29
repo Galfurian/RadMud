@@ -27,19 +27,19 @@
 using namespace std::chrono;
 
 Mobile::Mobile() :
-        id(),
-        respawnRoom(),
-        keys(),
-        shortdesc(),
-        staticdesc(),
-        actions(),
-        message_buffer(),
-        nextRespawn(),
-        controller(),
-        lua_script(),
-        lua_mutex(),
-        nextActionCooldown(std::chrono::system_clock::now()),
-        managedItem()
+    id(),
+    respawnRoom(),
+    keys(),
+    shortdesc(),
+    staticdesc(),
+    actions(),
+    message_buffer(),
+    nextRespawn(),
+    controller(),
+    lua_script(),
+    lua_mutex(),
+    nextActionCooldown(std::chrono::system_clock::now()),
+    managedItem()
 {
     // Nothing to do.
 }
@@ -131,33 +131,33 @@ void Mobile::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow( { "Id", this->id });
-    sheet.addRow( { "Respawn Room", ToString(this->respawnRoom->vnum) });
+    sheet.addRow({"Id", this->id});
+    sheet.addRow({"Respawn Room", ToString(this->respawnRoom->vnum)});
     std::string keyGroup;
     for (auto it : this->keys)
     {
         keyGroup += " " + it;
     }
-    sheet.addRow( { "Keys", keyGroup });
-    sheet.addRow( { "Short Desc.", this->shortdesc });
-    sheet.addRow( { "Static Desc.", this->staticdesc });
+    sheet.addRow({"Keys", keyGroup});
+    sheet.addRow({"Short Desc.", this->shortdesc});
+    sheet.addRow({"Static Desc.", this->staticdesc});
     std::string actionGroup;
     for (auto it : this->actions)
     {
         actionGroup += " " + it;
     }
-    sheet.addRow( { "Actions", actionGroup });
-    sheet.addRow( { "Is Alive", ToString(this->isAlive()) });
+    sheet.addRow({"Actions", actionGroup});
+    sheet.addRow({"Is Alive", ToString(this->isAlive())});
     if (!this->isAlive())
     {
-        sheet.addRow( { "Respawn Time", ToString(this->getRespawnTime()) });
+        sheet.addRow({"Respawn Time", ToString(this->getRespawnTime())});
 
     }
     if (this->controller != nullptr)
     {
-        sheet.addRow( { "Controller", this->controller->getName() });
+        sheet.addRow({"Controller", this->controller->getName()});
     }
-    sheet.addRow( { "Lua Script", this->lua_script });
+    sheet.addRow({"Lua Script", this->lua_script});
 }
 
 bool Mobile::hasKey(const std::string & key) const
@@ -302,7 +302,7 @@ bool Mobile::mobileThread(std::string event, Character * character, std::string 
                 f(this);
             }
         }
-        catch (luabridge::LuaException const& e)
+        catch (luabridge::LuaException const & e)
         {
             Logger::log(LogLevel::Error, e.what());
         }

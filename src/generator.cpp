@@ -41,7 +41,8 @@ Generator::Generator()
     mapBase[AreaType::Cavern].names.push_back("A cavern");
     mapBase[AreaType::Cavern].descriptions.push_back(
         "You have just entered @ROOM_NAME when you hear the distant noise of some animal, maybe his sleep is over. ");
-    mapBase[AreaType::Cavern].descriptions.push_back("You are in @ROOM_NAME in some places the walls have metal veins.");
+    mapBase[AreaType::Cavern].descriptions.push_back(
+        "You are in @ROOM_NAME in some places the walls have metal veins.");
     mapBase[AreaType::Cavern].descriptions.push_back(
         "The sound of your footsteps is magnified as you advance in the dark, in addition to the sound of your breath, they are the only sounds that you can perceive.");
     mapBase[AreaType::Cavern].descriptions.push_back(
@@ -129,7 +130,8 @@ std::string Generator::generateName(const AreaType & type, const AreaStatus & st
     return mapBase[type].names[nameSelector] + mapStatus[status].namesStatus[nameStatus];
 }
 
-std::string Generator::generateDescription(const AreaType & type, const AreaStatus & status, const std::string & roomName)
+std::string
+Generator::generateDescription(const AreaType & type, const AreaStatus & status, const std::string & roomName)
 {
     size_t nameSelector = TRandInteger<size_t>(0, mapBase[type].descriptions.size() - 1);
     size_t nameStatus = TRandInteger<size_t>(0, mapStatus[status].descriptionStatus.size() - 1);

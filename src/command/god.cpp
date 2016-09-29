@@ -422,7 +422,7 @@ void DoMudSave(Character * character, ArgumentHandler & /*args*/)
     }
 }
 
-void DoGoTo(Character * character, ArgumentHandler &args)
+void DoGoTo(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 1)
     {
@@ -445,7 +445,7 @@ void DoGoTo(Character * character, ArgumentHandler &args)
     character->moveTo(destination, msgDepart, msgArrive, msgChar);
 }
 
-void DoTransfer(Character * character, ArgumentHandler &args)
+void DoTransfer(Character * character, ArgumentHandler & args)
 {
     if ((args.size() != 1) && (args.size() != 2))
     {
@@ -491,7 +491,7 @@ void DoTransfer(Character * character, ArgumentHandler &args)
     character->sendMsg("You transfer %s to room %s.\n", target->getName(), destination->name);
 }
 
-void DoFeast(Character * character, ArgumentHandler &args)
+void DoFeast(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 1)
     {
@@ -511,7 +511,7 @@ void DoFeast(Character * character, ArgumentHandler &args)
     target->sendMsg("A banquet with any kind of delicacy appears from nowhere!\n");
 }
 
-void DoGodInfo(Character * character, ArgumentHandler &args)
+void DoGodInfo(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 1)
     {
@@ -548,7 +548,7 @@ void DoGodInfo(Character * character, ArgumentHandler &args)
     character->sendMsg(sheet.getTable());
 }
 
-void DoSetFlag(Character * character, ArgumentHandler &args)
+void DoSetFlag(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 2)
     {
@@ -582,7 +582,7 @@ void DoSetFlag(Character * character, ArgumentHandler &args)
         target->getName());
 }
 
-void DoClearFlag(Character * character, ArgumentHandler &args)
+void DoClearFlag(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 2)
     {
@@ -616,7 +616,7 @@ void DoClearFlag(Character * character, ArgumentHandler &args)
         target->getName());
 }
 
-void DoModelInfo(Character * character, ArgumentHandler &args)
+void DoModelInfo(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 1)
     {
@@ -637,7 +637,7 @@ void DoModelInfo(Character * character, ArgumentHandler &args)
     character->sendMsg(sheet.getTable());
 }
 
-void DoItemCreate(Character * character, ArgumentHandler &args)
+void DoItemCreate(Character * character, ArgumentHandler & args)
 {
     // Prevent mobiles to execute this command.
     NoMobile(character);
@@ -683,7 +683,7 @@ void DoItemCreate(Character * character, ArgumentHandler &args)
     character->sendMsg("You produce '%s' out of your apparently empty top hat.\n", item->getName(true));
 }
 
-void DoItemGet(Character * character, ArgumentHandler &args)
+void DoItemGet(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 1)
     {
@@ -736,7 +736,7 @@ void DoItemGet(Character * character, ArgumentHandler &args)
     character->addInventoryItem(item);
 }
 
-void DoItemDestroy(Character * character, ArgumentHandler &args)
+void DoItemDestroy(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 1)
     {
@@ -760,7 +760,7 @@ void DoItemDestroy(Character * character, ArgumentHandler &args)
     character->sendMsg("You have destroyed the desired object.\n");
 }
 
-void DoItemInfo(Character * character, ArgumentHandler &args)
+void DoItemInfo(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 1)
     {
@@ -787,7 +787,7 @@ void DoItemInfo(Character * character, ArgumentHandler &args)
     character->sendMsg(sheet.getTable());
 }
 
-void DoAreaInfo(Character * character, ArgumentHandler &args)
+void DoAreaInfo(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 1)
     {
@@ -813,7 +813,7 @@ void DoAreaInfo(Character * character, ArgumentHandler &args)
     character->sendMsg(msg);
 }
 
-void DoRoomInfo(Character * character, ArgumentHandler &args)
+void DoRoomInfo(Character * character, ArgumentHandler & args)
 {
     Room * room;
     if (args.empty())
@@ -847,7 +847,7 @@ void DoRoomInfo(Character * character, ArgumentHandler &args)
     character->sendMsg(msg);
 }
 
-void DoRoomCreate(Character * character, ArgumentHandler &args)
+void DoRoomCreate(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -894,7 +894,7 @@ void DoRoomCreate(Character * character, ArgumentHandler &args)
     character->sendMsg("You have created a room at: %s\n", targetCoord.toString());
 }
 
-void DoRoomDelete(Character * character, ArgumentHandler &args)
+void DoRoomDelete(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -950,7 +950,7 @@ void DoRoomDelete(Character * character, ArgumentHandler &args)
     character->sendMsg("[%s;%s;%s]\n", ToString(coord.x), ToString(coord.y), ToString(coord.z));
 }
 
-void DoRoomEdit(Character * character, ArgumentHandler &args)
+void DoRoomEdit(Character * character, ArgumentHandler & args)
 {
     if (args.empty())
     {
@@ -1073,7 +1073,7 @@ void DoRoomEdit(Character * character, ArgumentHandler &args)
     }
 }
 
-void DoMobileKill(Character * character, ArgumentHandler &args)
+void DoMobileKill(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 1)
     {
@@ -1093,7 +1093,7 @@ void DoMobileKill(Character * character, ArgumentHandler &args)
     character->room->sendToAll("%s fall to the ground dead.", {}, mobile->getNameCapital());
 }
 
-void DoMobileReload(Character * character, ArgumentHandler &args)
+void DoMobileReload(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 1)
     {
@@ -1112,7 +1112,7 @@ void DoMobileReload(Character * character, ArgumentHandler &args)
     character->sendMsg("Target(%s) Script(%s)\n", mobile->getName(), mobile->lua_script);
 }
 
-void DoMobileLog(Character * character, ArgumentHandler &args)
+void DoMobileLog(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 1)
     {
@@ -1130,7 +1130,7 @@ void DoMobileLog(Character * character, ArgumentHandler &args)
     character->sendMsg("Log:\n%s\n", mobile->message_buffer);
 }
 
-void DoHurt(Character * character, ArgumentHandler &args)
+void DoHurt(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 1)
     {
@@ -1182,7 +1182,7 @@ void DoVisible(Character * character, ArgumentHandler & /*args*/)
     character->sendMsg("You are no more invisible.\n");
 }
 
-void DoModSkill(Character * character, ArgumentHandler &args)
+void DoModSkill(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 3)
     {
@@ -1229,7 +1229,7 @@ void DoModSkill(Character * character, ArgumentHandler &args)
         ToString(target->skills[skill->vnum]));
 }
 
-void DoModAttr(Character * character, ArgumentHandler &args)
+void DoModAttr(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -1296,7 +1296,7 @@ void DoModAttr(Character * character, ArgumentHandler &args)
         GetAbilityName(ability));
 }
 
-void DoAggroList(Character * character, ArgumentHandler &args)
+void DoAggroList(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 1)
     {
@@ -1325,7 +1325,7 @@ void DoAggroList(Character * character, ArgumentHandler &args)
     }
 }
 
-void DoMaterialInfo(Character * character, ArgumentHandler &args)
+void DoMaterialInfo(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 1)
     {
@@ -1348,7 +1348,7 @@ void DoMaterialInfo(Character * character, ArgumentHandler &args)
     character->sendMsg(msg);
 }
 
-void DoLiquidCreate(Character * character, ArgumentHandler &args)
+void DoLiquidCreate(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 3)
     {
@@ -1390,7 +1390,7 @@ void DoLiquidCreate(Character * character, ArgumentHandler &args)
         item->getName(true));
 }
 
-void DoLiquidInfo(Character * character, ArgumentHandler &args)
+void DoLiquidInfo(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 1)
     {
@@ -1410,7 +1410,7 @@ void DoLiquidInfo(Character * character, ArgumentHandler &args)
     character->sendMsg(msg);
 }
 
-void DoProductionInfo(Character * character, ArgumentHandler &args)
+void DoProductionInfo(Character * character, ArgumentHandler & args)
 {
 
     if (args.size() != 1)
@@ -1448,7 +1448,7 @@ void DoProductionInfo(Character * character, ArgumentHandler &args)
     character->sendMsg(msg);
 }
 
-void DoProfessionInfo(Character * character, ArgumentHandler &args)
+void DoProfessionInfo(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 1)
     {
@@ -1476,7 +1476,7 @@ void DoProfessionInfo(Character * character, ArgumentHandler &args)
     character->sendMsg(msg);
 }
 
-void DoFactionInfo(Character * character, ArgumentHandler &args)
+void DoFactionInfo(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 1)
     {

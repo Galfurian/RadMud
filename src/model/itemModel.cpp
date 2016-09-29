@@ -39,21 +39,21 @@
 #include "weaponModel.hpp"
 
 ItemModel::ItemModel() :
-        vnum(),
-        name(),
-        article(),
-        shortdesc(),
-        keys(),
-        description(),
-        slot(),
-        modelFlags(),
-        baseWeight(),
-        basePrice(),
-        condition(),
-        decay(),
-        material(),
-        tileSet(),
-        tileId()
+    vnum(),
+    name(),
+    article(),
+    shortdesc(),
+    keys(),
+    description(),
+    slot(),
+    modelFlags(),
+    baseWeight(),
+    basePrice(),
+    condition(),
+    decay(),
+    material(),
+    tileSet(),
+    tileId()
 {
     // Nothing to do.
 }
@@ -74,25 +74,25 @@ void ItemModel::getSheet(Table & sheet) const
     sheet.addColumn("Attribute", StringAlign::Left);
     sheet.addColumn("Value", StringAlign::Left);
     // Set the values.
-    sheet.addRow( { "Vnum", ToString(this->vnum) });
-    sheet.addRow( { "Name", this->name });
-    sheet.addRow( { "Article", this->article });
-    sheet.addRow( { "Short Description", this->shortdesc });
+    sheet.addRow({"Vnum", ToString(this->vnum)});
+    sheet.addRow({"Name", this->name});
+    sheet.addRow({"Article", this->article});
+    sheet.addRow({"Short Description", this->shortdesc});
     std::string keyGroup;
     for (auto it : this->keys)
     {
         keyGroup += " " + it;
     }
-    sheet.addRow( { "Keys", keyGroup });
-    sheet.addRow( { "Description", this->description });
-    sheet.addRow( { "Type", this->getTypeName() });
-    sheet.addRow( { "Slot", GetEquipmentSlotName(this->slot) });
-    sheet.addRow( { "Flags", GetModelFlagString(this->modelFlags) });
-    sheet.addRow( { "Condition", ToString(this->condition) });
-    sheet.addRow( { "Decay", ToString(this->decay) });
-    sheet.addRow( { "Material", GetMaterialTypeName(this->material) });
-    sheet.addRow( { "Tile", ToString(this->condition) });
-    sheet.addRow( { "Condition", ToString(this->tileSet) + ":" + ToString(this->tileId) });
+    sheet.addRow({"Keys", keyGroup});
+    sheet.addRow({"Description", this->description});
+    sheet.addRow({"Type", this->getTypeName()});
+    sheet.addRow({"Slot", GetEquipmentSlotName(this->slot)});
+    sheet.addRow({"Flags", GetModelFlagString(this->modelFlags)});
+    sheet.addRow({"Condition", ToString(this->condition)});
+    sheet.addRow({"Decay", ToString(this->decay)});
+    sheet.addRow({"Material", GetMaterialTypeName(this->material)});
+    sheet.addRow({"Tile", ToString(this->condition)});
+    sheet.addRow({"Condition", ToString(this->tileSet) + ":" + ToString(this->tileId)});
 }
 
 Item * ItemModel::createItem(
@@ -264,12 +264,12 @@ bool ItemModel::mustBeWielded()
 void ItemModel::luaRegister(lua_State * L)
 {
     luabridge::getGlobalNamespace(L) //
-    .beginClass<ItemModel>("ItemModel") //
-    .addData("vnum", &ItemModel::vnum) //
-    .addData("condition", &ItemModel::condition) //
-    .addData("decay", &ItemModel::decay) //
-    .addFunction("getType", &ItemModel::getType) //
-    .endClass();
+        .beginClass<ItemModel>("ItemModel") //
+        .addData("vnum", &ItemModel::vnum) //
+        .addData("condition", &ItemModel::condition) //
+        .addData("decay", &ItemModel::decay) //
+        .addFunction("getType", &ItemModel::getType) //
+        .endClass();
 }
 
 std::string ItemModel::getTile(int offset)

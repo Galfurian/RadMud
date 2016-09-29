@@ -112,6 +112,7 @@ std::string ToCapitals(const std::string & source)
     }
     return working;
 }
+
 std::vector<std::string> SplitString(const std::string & source, const std::string & delimiter)
 {
     std::vector<std::string> result;
@@ -163,13 +164,13 @@ std::vector<std::string> GetAllFilesInFolder(
     const std::string & folder,
     const std::string & extension)
 {
-    DIR *directory;
+    DIR * directory;
     std::vector<std::string> files_name;
     directory = opendir(folder.c_str());
     if (directory)
     {
         int i = 0;
-        struct dirent *dir;
+        struct dirent * dir;
         while ((dir = readdir(directory)) != NULL)
         {
             i++;
@@ -305,6 +306,7 @@ if (err != Z_OK) {\
     exit(1);\
 }\
 
+
 /// Creates compressed strem of data.
 void DeflateStream(std::vector<uint8_t> & uncompressed, std::vector<uint8_t> & compressed)
 {
@@ -328,7 +330,7 @@ void DeflateStream(std::vector<uint8_t> & uncompressed, std::vector<uint8_t> & c
 
     while (true)
     {
-        uint8_t c_buffer[10] = { };
+        uint8_t c_buffer[10] = {};
         c_stream.next_out = &c_buffer[0];
         c_stream.avail_out = 10;
 
@@ -377,7 +379,7 @@ void InflateStream(std::vector<uint8_t> & compressed, std::vector<uint8_t> & unc
 
     do
     {
-        uint8_t d_buffer[10] = { };
+        uint8_t d_buffer[10] = {};
         d_stream.next_out = &d_buffer[0];
         d_stream.avail_out = 10;
 
@@ -402,8 +404,7 @@ void InflateStream(std::vector<uint8_t> & compressed, std::vector<uint8_t> & unc
         {
             uncompressed.push_back(d_buffer[i]);
         }
-    }
-    while (d_stream.avail_out == 0);
+    } while (d_stream.avail_out == 0);
 
     errmsg = inflateEnd(&d_stream);
     ZCHECK_ERROR(errmsg, "inflateEnd");

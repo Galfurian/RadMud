@@ -21,16 +21,16 @@
 #include "mud.hpp"
 
 Race::Race() :
-        vnum(),
-        name(),
-        description(),
-        material(),
-        abilities(),
-        availableFaction(),
-        player_allow(),
-        tileSet(),
-        tileId(),
-        corpse()
+    vnum(),
+    name(),
+    description(),
+    material(),
+    abilities(),
+    availableFaction(),
+    player_allow(),
+    tileSet(),
+    tileId(),
+    corpse()
 {
     // Nothing to do.
 }
@@ -158,13 +158,13 @@ bool Race::factionAllowed(int factionVnum)
 void Race::luaRegister(lua_State * L)
 {
     luabridge::getGlobalNamespace(L) //
-    .beginClass<Race>("Race") //
-    .addData("vnum", &Race::vnum) //
-    .addData("name", &Race::name) //
-    .addData("material", &Race::material) //
-    .addFunction("getAbility", &Race::getAbilityLua) //
-    .addData("available_faction", &Race::availableFaction) //
-    .endClass();
+        .beginClass<Race>("Race") //
+        .addData("vnum", &Race::vnum) //
+        .addData("name", &Race::name) //
+        .addData("material", &Race::material) //
+        .addFunction("getAbility", &Race::getAbilityLua) //
+        .addData("available_faction", &Race::availableFaction) //
+        .endClass();
 }
 
 std::string Race::getTile()

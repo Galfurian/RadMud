@@ -30,7 +30,7 @@ ItemContainer::~ItemContainer()
     // TODO Auto-generated destructor stub
 }
 
-void ItemContainer::push_back_item(Item * & item)
+void ItemContainer::push_back_item(Item *& item)
 {
     auto stacked = false;
     for (auto it = this->begin(); it != this->end(); ++it)

@@ -19,10 +19,10 @@
 #include "containerModel.hpp"
 
 ContainerModel::ContainerModel() :
-        maxWeight(),
-        containerFlags(),
-        keyVnum(),
-        difficulty()
+    maxWeight(),
+    containerFlags(),
+    keyVnum(),
+    difficulty()
 {
     // Nothing to do.
 }
@@ -72,10 +72,10 @@ void ContainerModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow( { "Max Weight", ToString(this->maxWeight) });
-    sheet.addRow( { "Flags", GetContainerFlagString(this->containerFlags) });
-    sheet.addRow( { "Key Vnum", ToString(this->keyVnum) });
-    sheet.addRow( { "Picklock Difficulty", ToString(this->difficulty) });
+    sheet.addRow({"Max Weight", ToString(this->maxWeight)});
+    sheet.addRow({"Flags", GetContainerFlagString(this->containerFlags)});
+    sheet.addRow({"Key Vnum", ToString(this->keyVnum)});
+    sheet.addRow({"Picklock Difficulty", ToString(this->difficulty)});
 }
 
 std::string GetContainerFlagString(unsigned int flags)

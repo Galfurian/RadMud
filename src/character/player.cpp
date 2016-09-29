@@ -23,25 +23,25 @@
 #include "../mud.hpp"
 
 Player::Player(const int & _socket, const int & _port, const std::string & _address) :
-        psocket(_socket),
-        port(_port),
-        address(_address),
-        outbuf(),
-        inbuf(),
-        password(),
-        age(),
-        experience(),
-        prompt(),
-        prompt_save(),
-        rent_room(),
-        skills(),
-        remaining_points(),
-        connection_state(ConnectionState::NoState),
-        password_attempts(),
-        closing(),
-        logged_in(),
-        connectionFlags(),
-        msdpVariables()
+    psocket(_socket),
+    port(_port),
+    address(_address),
+    outbuf(),
+    inbuf(),
+    password(),
+    age(),
+    experience(),
+    prompt(),
+    prompt_save(),
+    rent_room(),
+    skills(),
+    remaining_points(),
+    connection_state(ConnectionState::NoState),
+    password_attempts(),
+    closing(),
+    logged_in(),
+    connectionFlags(),
+    msdpVariables()
 {
     // Nothing to do.
 }
@@ -119,43 +119,43 @@ void Player::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow( { "Age", ToString(this->age) });
-    sheet.addRow( { "Experience", ToString(this->experience) });
-    sheet.addRow( { "Prompt", this->prompt });
-    sheet.addRow( { "Rent Room", ToString(this->rent_room) });
+    sheet.addRow({"Age", ToString(this->age)});
+    sheet.addRow({"Experience", ToString(this->experience)});
+    sheet.addRow({"Prompt", this->prompt});
+    sheet.addRow({"Rent Room", ToString(this->rent_room)});
     sheet.addDivider();
-    sheet.addRow( { "## Skill", "## Points" });
+    sheet.addRow({"## Skill", "## Points"});
     for (auto it : Mud::instance().mudSkills)
     {
         if (this->skills.find(it.first) != this->skills.end())
         {
-            sheet.addRow( { it.second->name, ToString(this->skills.at(it.first)) });
+            sheet.addRow({it.second->name, ToString(this->skills.at(it.first))});
         }
         else
         {
-            sheet.addRow( { it.second->name, "0" });
+            sheet.addRow({it.second->name, "0"});
         }
     }
 }
 
-void Player::addInventoryItem(Item * & item)
+void Player::addInventoryItem(Item *& item)
 {
     Character::addInventoryItem(item);
     // Update on database.
     SQLiteDbms::instance().insertInto(
         "ItemPlayer",
-        { name, ToString(item->vnum), EnumToString(EquipmentSlot::None) },
+        {name, ToString(item->vnum), EnumToString(EquipmentSlot::None)},
         false,
         true);
 }
 
-void Player::addEquipmentItem(Item * & item)
+void Player::addEquipmentItem(Item *& item)
 {
     Character::addEquipmentItem(item);
     // Update on database.
     SQLiteDbms::instance().insertInto(
         "ItemPlayer",
-        { name, ToString(item->vnum), EnumToString(item->getCurrentSlot()) },
+        {name, ToString(item->vnum), EnumToString(item->getCurrentSlot())},
         false,
         true);
 }
@@ -167,7 +167,7 @@ bool Player::remInventoryItem(Item * item)
         // Update on database.
         SQLiteDbms::instance().deleteFrom(
             "ItemPlayer",
-            { std::make_pair("item", ToString(item->vnum)) });
+            {std::make_pair("item", ToString(item->vnum))});
         return true;
     }
     return false;
@@ -180,7 +180,7 @@ bool Player::remEquipmentItem(Item * item)
         // Update on database.
         SQLiteDbms::instance().deleteFrom(
             "ItemPlayer",
-            { std::make_pair("item", ToString(item->vnum)) });
+            {std::make_pair("item", ToString(item->vnum))});
         return true;
     }
     return false;
@@ -209,7 +209,7 @@ void Player::closeConnection()
 bool Player::isPlaying() const
 {
     return checkConnection() && (connection_state == ConnectionState::Playing) && (!closing)
-        && logged_in;
+           && logged_in;
 }
 
 bool Player::hasPendingOutput() const

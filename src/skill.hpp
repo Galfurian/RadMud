@@ -25,35 +25,35 @@
 /// @brief Holds details about a skill.
 class Skill
 {
-    public:
-        /// The skill virtual number.
-        int vnum;
-        /// The name of the skill.
-        std::string name;
-        /// The description of the skill.
-        std::string description;
-        /// The main attribute of the skill.
-        int attribute;
+public:
+    /// The skill virtual number.
+    int vnum;
+    /// The name of the skill.
+    std::string name;
+    /// The description of the skill.
+    std::string description;
+    /// The main attribute of the skill.
+    int attribute;
 
-        /// @brief Constructor.
-        Skill();
+    /// @brief Constructor.
+    Skill();
 
-        /// @brief Disable Copy Construct.
-        Skill(Skill const &) = delete;
+    /// @brief Disable Copy Construct.
+    Skill(Skill const &) = delete;
 
-        /// @brief Disable Move construct.
-        Skill(Skill &&) = delete;
+    /// @brief Disable Move construct.
+    Skill(Skill &&) = delete;
 
-        /// @brief Disable Copy assign.
-        Skill & operator=(Skill const &) = delete;
+    /// @brief Disable Copy assign.
+    Skill & operator=(Skill const &) = delete;
 
-        /// @brief Disable Move assign.
-        Skill & operator=(Skill &&) = delete;
+    /// @brief Disable Move assign.
+    Skill & operator=(Skill &&) = delete;
 
-        /// @brief Destructor.
-        ~Skill();
+    /// @brief Destructor.
+    ~Skill();
 
-        /// @brief Check the correctness of the continent.
-        /// @return <b>True</b> if it has correct values,<br><b>False</b> otherwise.
-        bool check();
+    /// @brief Check the correctness of the continent.
+    /// @return <b>True</b> if it has correct values,<br><b>False</b> otherwise.
+    bool check();
 };

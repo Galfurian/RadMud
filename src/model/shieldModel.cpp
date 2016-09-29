@@ -19,8 +19,8 @@
 #include "shieldModel.hpp"
 
 ShieldModel::ShieldModel() :
-        size(),
-        parryChance()
+    size(),
+    parryChance()
 {
     // Nothing to do.
 }
@@ -68,8 +68,8 @@ void ShieldModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow( { "Size", GetShieldSizeName(this->size) });
-    sheet.addRow( { "Parry Change", ToString(this->parryChance) });
+    sheet.addRow({"Size", GetShieldSizeName(this->size)});
+    sheet.addRow({"Parry Change", ToString(this->parryChance)});
 }
 
 std::string GetShieldSizeName(ShieldSize shieldSize)

@@ -32,24 +32,24 @@
 #include "currencyItem.hpp"
 
 Item::Item() :
-        vnum(),
-        type(),
-        model(),
-        quantity(),
-        maker(),
-        price(),
-        weight(),
-        condition(),
-        maxCondition(),
-        composition(),
-        quality(ItemQuality::Normal),
-        flags(),
-        room(),
-        owner(),
-        container(),
-        currentSlot(EquipmentSlot::None),
-        content(),
-        contentLiq()
+    vnum(),
+    type(),
+    model(),
+    quantity(),
+    maker(),
+    price(),
+    weight(),
+    condition(),
+    maxCondition(),
+    composition(),
+    quality(ItemQuality::Normal),
+    flags(),
+    room(),
+    owner(),
+    container(),
+    currentSlot(EquipmentSlot::None),
+    content(),
+    contentLiq()
 {
 }
 
@@ -166,12 +166,12 @@ bool Item::removeOnDB()
     Logger::log(LogLevel::Debug, "Removing %s from DB...", this->getName());
     auto strVnum = ToString(vnum);
     // Prepare the where clause.
-    if (SQLiteDbms::instance().deleteFrom("Item", { std::make_pair("vnum", strVnum) }))
+    if (SQLiteDbms::instance().deleteFrom("Item", {std::make_pair("vnum", strVnum)}))
     {
         // Remove the item from everywhere.
-        SQLiteDbms::instance().deleteFrom("ItemPlayer", { std::make_pair("item", strVnum) });
-        SQLiteDbms::instance().deleteFrom("ItemRoom", { std::make_pair("item", strVnum) });
-        SQLiteDbms::instance().deleteFrom("ItemContent", { std::make_pair("item", strVnum) });
+        SQLiteDbms::instance().deleteFrom("ItemPlayer", {std::make_pair("item", strVnum)});
+        SQLiteDbms::instance().deleteFrom("ItemRoom", {std::make_pair("item", strVnum)});
+        SQLiteDbms::instance().deleteFrom("ItemContent", {std::make_pair("item", strVnum)});
         return true;
     }
     Logger::log(LogLevel::Error, "Can't delete the item from the database!");
@@ -185,17 +185,17 @@ void Item::getSheet(Table & sheet) const
     sheet.addColumn("Attribute", StringAlign::Left);
     sheet.addColumn("Value", StringAlign::Left);
     // Set the values.
-    sheet.addRow( { "vnum", ToString(vnum) });
-    sheet.addRow( { "type", this->getTypeName() });
-    sheet.addRow( { "model", model->name });
-    sheet.addRow( { "maker", maker });
-    sheet.addRow( { "condition", ToString(condition) + "/" + ToString(this->getMaxCondition()) });
-    sheet.addRow( { "Material", composition->name });
-    sheet.addRow( { "Quality", quality.toString() });
-    sheet.addRow( { "Weight", ToString(this->getWeight(true)) });
-    sheet.addRow( { "Price", ToString(this->getPrice()) });
-    sheet.addRow( { "Flags", ToString(flags) });
-    TableRow locationRow = { "Location" };
+    sheet.addRow({"vnum", ToString(vnum)});
+    sheet.addRow({"type", this->getTypeName()});
+    sheet.addRow({"model", model->name});
+    sheet.addRow({"maker", maker});
+    sheet.addRow({"condition", ToString(condition) + "/" + ToString(this->getMaxCondition())});
+    sheet.addRow({"Material", composition->name});
+    sheet.addRow({"Quality", quality.toString()});
+    sheet.addRow({"Weight", ToString(this->getWeight(true))});
+    sheet.addRow({"Price", ToString(this->getPrice())});
+    sheet.addRow({"Flags", ToString(flags)});
+    TableRow locationRow = {"Location"};
     if (room != nullptr)
     {
         locationRow.push_back(room->name);
@@ -213,29 +213,29 @@ void Item::getSheet(Table & sheet) const
         locationRow.push_back("Nowhere");
     }
     sheet.addRow(locationRow);
-    sheet.addRow( { "Equipment Slot", GetEquipmentSlotName(currentSlot) });
+    sheet.addRow({"Equipment Slot", GetEquipmentSlotName(currentSlot)});
     if (!content.empty())
     {
         sheet.addDivider();
-        sheet.addRow( { "Content", "Vnum" });
+        sheet.addRow({"Content", "Vnum"});
         for (auto iterator : content)
         {
-            sheet.addRow( { iterator->getNameCapital(), ToString(iterator->vnum) });
+            sheet.addRow({iterator->getNameCapital(), ToString(iterator->vnum)});
         }
         sheet.addDivider();
     }
     if (model->getType() == ModelType::LiquidContainer)
     {
         sheet.addDivider();
-        sheet.addRow( { "Liquid", "Quantity" });
-        sheet.addRow( { contentLiq.first->getNameCapital(), ToString(contentLiq.second) });
+        sheet.addRow({"Liquid", "Quantity"});
+        sheet.addRow({contentLiq.first->getNameCapital(), ToString(contentLiq.second)});
         sheet.addDivider();
     }
     if (this->isAContainer() || (model->getType() == ModelType::LiquidContainer))
     {
-        sheet.addRow( { "Free  Space", ToString(this->getFreeSpace()) });
-        sheet.addRow( { "Used  Space", ToString(this->getUsedSpace()) });
-        sheet.addRow( { "Total Space", ToString(this->getTotalSpace()) });
+        sheet.addRow({"Free  Space", ToString(this->getFreeSpace())});
+        sheet.addRow({"Used  Space", ToString(this->getUsedSpace())});
+        sheet.addRow({"Total Space", ToString(this->getTotalSpace())});
     }
 }
 
@@ -281,11 +281,11 @@ bool Item::canStackWith(Item * item) const
 
 Item * Item::removeFromStack(Character * actor, unsigned int & _quantity)
 {
-    if(this->quantity > _quantity)
+    if (this->quantity > _quantity)
     {
         // Generate a copty of this item with the given quantity.
         auto newStack = this->model->createItem(actor->getName(), this->composition, this->quality, _quantity);
-        if(newStack != nullptr)
+        if (newStack != nullptr)
         {
             // Actually reduce the quantity.
             this->quantity -= _quantity;
@@ -374,7 +374,7 @@ unsigned int Item::getWeight(bool entireStack) const
     // Add the default weight of the model.
     unsigned int totalWeight = this->weight;
     // If not single, multiply for the quantity.
-    if(entireStack)
+    if (entireStack)
     {
         totalWeight *= this->quantity;
     }
@@ -398,7 +398,7 @@ unsigned int Item::getWeight(bool entireStack) const
 std::string Item::getName(bool colored) const
 {
     std::string itemName = model->getName(composition, quality);
-    if(colored)
+    if (colored)
     {
         itemName = Formatter::cyan() + itemName + Formatter::reset();
     }
@@ -409,7 +409,7 @@ std::string Item::getNameCapital(bool colored) const
 {
     std::string itemName = model->getName(composition, quality);
     itemName[0] = static_cast<char>(toupper(itemName[0]));
-    if(colored)
+    if (colored)
     {
         itemName = Formatter::cyan() + itemName + Formatter::reset();
     }
@@ -566,7 +566,7 @@ bool Item::canContain(Item * item) const
     return (item->getWeight(true) <= this->getFreeSpace());
 }
 
-void Item::putInside(Item * & item, bool updateDB)
+void Item::putInside(Item *& item, bool updateDB)
 {
     // Put the item inside the container.
     content.push_back_item(item);
@@ -577,7 +577,7 @@ void Item::putInside(Item * & item, bool updateDB)
     {
         SQLiteDbms::instance().insertInto(
             "ItemContent",
-            { ToString(this->vnum), ToString(item->vnum) },
+            {ToString(this->vnum), ToString(item->vnum)},
             false,
             true);
     }
@@ -595,7 +595,7 @@ bool Item::takeOut(Item * item, bool updateDB)
         {
             SQLiteDbms::instance().deleteFrom(
                 "ItemContent",
-                { std::make_pair("item", ToString(item->vnum)) });
+                {std::make_pair("item", ToString(item->vnum))});
         }
         // Log it.
         Logger::log(
@@ -641,7 +641,7 @@ bool Item::pourIn(Liquid * liquid, const unsigned int & ammount, bool updateDB)
         {
             SQLiteDbms::instance().insertInto(
                 "ItemContentLiq",
-                { ToString(vnum), ToString(contentLiq.first->vnum), ToString(contentLiq.second) },
+                {ToString(vnum), ToString(contentLiq.first->vnum), ToString(contentLiq.second)},
                 false,
                 true);
         }
@@ -682,7 +682,7 @@ bool Item::pourOut(const unsigned int & ammount, bool updateDB)
             {
                 SQLiteDbms::instance().insertInto(
                     "ItemContentLiq",
-                    { ToString(vnum), ToString(contentLiq.first->vnum), ToString(contentLiq.second) },
+                    {ToString(vnum), ToString(contentLiq.first->vnum), ToString(contentLiq.second)},
                     false,
                     true);
             }
@@ -740,13 +740,13 @@ std::string Item::lookContent()
             for (auto it : content)
             {
                 table.addRow(
-                    { it->getNameCapital(), ToString(it->quantity), ToString(it->getWeight(true)) });
+                    {it->getNameCapital(), ToString(it->quantity), ToString(it->getWeight(true))});
             }
             output += table.getTable();
             output += "Has been used " + Formatter::yellow() + ToString(getUsedSpace())
-                + Formatter::reset();
+                      + Formatter::reset();
             output += " out of " + Formatter::yellow() + ToString(getTotalSpace())
-                + Formatter::reset() + " " + mud_measure + ".\n";
+                      + Formatter::reset() + " " + mud_measure + ".\n";
         }
     }
     else if (model->getType() == ModelType::LiquidContainer)
@@ -762,7 +762,7 @@ std::string Item::lookContent()
         if (contentLiq.first == nullptr)
         {
             output += Formatter::italic() + "It does not contain any liquid.\n"
-                + Formatter::reset();
+                      + Formatter::reset();
         }
         else
         {
@@ -815,18 +815,22 @@ ShopItem * Item::toShopItem()
 {
     return static_cast<ShopItem *>(this);
 }
+
 ArmorItem * Item::toArmorItem()
 {
     return static_cast<ArmorItem *>(this);
 }
+
 WeaponItem * Item::toWeaponItem()
 {
     return static_cast<WeaponItem *>(this);
 }
+
 CurrencyItem * Item::toCurrencyItem()
 {
     return static_cast<CurrencyItem *>(this);
 }
+
 CorpseItem * Item::toCorpseItem()
 {
     return static_cast<CorpseItem *>(this);
@@ -835,31 +839,31 @@ CorpseItem * Item::toCorpseItem()
 void Item::luaRegister(lua_State * L)
 {
     luabridge::getGlobalNamespace(L) //
-    .beginClass<Item>("Item") //
-    .addData("vnum", &Item::vnum) //
-    .addData("model", &Item::model) //
-    .addFunction("getName", &Item::getName) //
-    .addData("maker", &Item::maker) //
-    .addData("condition", &Item::condition) //
-    .addData("weight", &Item::weight) //
-    .addData("price", &Item::price) //
-    .addData("composition", &Item::composition) //
-    .addData("room", &Item::room) //
-    .addData("owner", &Item::owner) //
-    .addData("container", &Item::container) //
-    .addData("container", &Item::container) //
-    .endClass() //
-    .deriveClass<ArmorItem, Item>("ArmorItem") //
-    .addFunction("getAC", &ArmorItem::getArmorClass) //
-    .endClass() //
-    .deriveClass<CorpseItem, Item>("CorpseItem") //
-    .endClass() //
-    .deriveClass<CurrencyItem, Item>("CurrencyItem") //
-    .endClass() //
-    .deriveClass<ShopItem, Item>("ShopItem") //
-    .endClass() //
-    .deriveClass<WeaponItem, Item>("WeaponItem") //
-    .endClass();
+        .beginClass<Item>("Item") //
+        .addData("vnum", &Item::vnum) //
+        .addData("model", &Item::model) //
+        .addFunction("getName", &Item::getName) //
+        .addData("maker", &Item::maker) //
+        .addData("condition", &Item::condition) //
+        .addData("weight", &Item::weight) //
+        .addData("price", &Item::price) //
+        .addData("composition", &Item::composition) //
+        .addData("room", &Item::room) //
+        .addData("owner", &Item::owner) //
+        .addData("container", &Item::container) //
+        .addData("container", &Item::container) //
+        .endClass() //
+        .deriveClass<ArmorItem, Item>("ArmorItem") //
+        .addFunction("getAC", &ArmorItem::getArmorClass) //
+        .endClass() //
+        .deriveClass<CorpseItem, Item>("CorpseItem") //
+        .endClass() //
+        .deriveClass<CurrencyItem, Item>("CurrencyItem") //
+        .endClass() //
+        .deriveClass<ShopItem, Item>("ShopItem") //
+        .endClass() //
+        .deriveClass<WeaponItem, Item>("WeaponItem") //
+        .endClass();
 }
 
 bool Item::operator<(Item & rhs) const

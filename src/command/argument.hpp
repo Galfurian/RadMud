@@ -22,39 +22,39 @@
 /// @brief Allows to easely manage input arguments from players.
 class Argument
 {
-    public:
-        /// The original argument string.
-        std::string original;
-        /// The string with both the index and the multiplier removed.
-        std::string content;
-        /// The provided index.
-        int index;
-        /// The provided multiplier.
-        unsigned int multiplier;
+public:
+    /// The original argument string.
+    std::string original;
+    /// The string with both the index and the multiplier removed.
+    std::string content;
+    /// The provided index.
+    int index;
+    /// The provided multiplier.
+    unsigned int multiplier;
 
-    public:
-        /// @brief Constructor.
-        Argument(const std::string & _original);
+public:
+    /// @brief Constructor.
+    Argument(const std::string & _original);
 
-        /// @brief Destructor.
-        virtual ~Argument();
+    /// @brief Destructor.
+    virtual ~Argument();
 
-        /// Provides the original argument.
-        std::string getOriginal() const;
+    /// Provides the original argument.
+    std::string getOriginal() const;
 
-        /// Provides the content with both index and multiplier removed.
-        std::string getContent() const;
+    /// Provides the content with both index and multiplier removed.
+    std::string getContent() const;
 
-        /// Provides the index.
-        int & getIndex();
+    /// Provides the index.
+    int & getIndex();
 
-        /// Provides the multiplier.
-        unsigned int getMultiplier() const;
+    /// Provides the multiplier.
+    unsigned int getMultiplier() const;
 
-    private:
-        /// Evaluates the index.
-        void evaluateIndex();
+private:
+    /// Evaluates the index.
+    void evaluateIndex();
 
-        /// Evaluates the multiplier.
-        void evaluateMultiplier();
+    /// Evaluates the multiplier.
+    void evaluateMultiplier();
 };

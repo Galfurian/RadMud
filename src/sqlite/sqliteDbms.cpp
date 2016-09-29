@@ -388,7 +388,7 @@ bool SQLiteDbms::loadPlayerItems(Player * player)
 {
     // Prepare the query.
     std::string query = "SELECT item, position FROM ItemPlayer WHERE owner = \"" + player->name
-        + "\";";
+                        + "\";";
     // Execute the query.
     ResultSet * result = dbConnection.executeSelect(query.c_str());
     // Check the result.
@@ -452,7 +452,7 @@ bool SQLiteDbms::loadPlayerSkill(Player * player)
 {
     // Prepare the query.
     std::string query = "SELECT skill, value FROM Advancement WHERE player=\"" + player->name
-        + "\";";
+                        + "\";";
     // Execute the query.
     ResultSet * result = dbConnection.executeSelect(query.c_str());
     // Check the result.

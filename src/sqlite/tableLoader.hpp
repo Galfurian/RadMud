@@ -24,23 +24,23 @@
 /// @brief A customizable table loader.
 class TableLoader
 {
-    public:
-        /// The name of the table.
-        std::string table;
-        /// The loading function.
-        std::function<bool(ResultSet * result)> loadFunction;
-        /// The custom loading query.
-        std::string loadQuery;
+public:
+    /// The name of the table.
+    std::string table;
+    /// The loading function.
+    std::function<bool(ResultSet * result)> loadFunction;
+    /// The custom loading query.
+    std::string loadQuery;
 
-        /// @brief Constructor.
-        TableLoader(
-            std::string _table,
-            std::function<bool(ResultSet * result)> _loadFunction,
-            std::string _loadQuery = "");
+    /// @brief Constructor.
+    TableLoader(
+        std::string _table,
+        std::function<bool(ResultSet * result)> _loadFunction,
+        std::string _loadQuery = "");
 
-        /// @brief Destructor.
-        ~TableLoader();
+    /// @brief Destructor.
+    ~TableLoader();
 
-        /// Provide the query required to load the table.
-        std::string getQuery() const;
+    /// Provide the query required to load the table.
+    std::string getQuery() const;
 };

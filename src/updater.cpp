@@ -32,17 +32,17 @@ using namespace std::chrono;
 //    4320000 MS -> 1 DAY in real world.
 
 MudUpdater::MudUpdater() :
-        bandwidth_in(),
-        bandwidth_out(),
-        bandwidth_uncompressed(),
-        ticTime(system_clock::now()),
-        mudTime(system_clock::now()),
-        ticSize(30),
-        secondSize(50),
-        hourSize(secondSize * 3600),
-        daySize(secondSize * 86400),
-        mudHour(),
-        mudDayPhase(DayPhase::Morning)
+    bandwidth_in(),
+    bandwidth_out(),
+    bandwidth_uncompressed(),
+    ticTime(system_clock::now()),
+    mudTime(system_clock::now()),
+    ticSize(30),
+    secondSize(50),
+    hourSize(secondSize * 3600),
+    daySize(secondSize * 86400),
+    mudHour(),
+    mudDayPhase(DayPhase::Morning)
 {
     // Nothing to do.
 }

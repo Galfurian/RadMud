@@ -49,8 +49,8 @@ typedef void None;
 template<typename H, typename T = None>
 struct TypeList
 {
-        typedef H Head;
-        typedef T Tail;
+    typedef H Head;
+    typedef T Tail;
 };
 
 /**
@@ -59,10 +59,10 @@ struct TypeList
 template<typename List>
 struct TypeListValues
 {
-        static std::string const tostring(bool)
-        {
-            return "";
-        }
+    static std::string const tostring(bool)
+    {
+        return "";
+    }
 };
 
 /**
@@ -71,25 +71,25 @@ struct TypeListValues
 template<typename Head, typename Tail>
 struct TypeListValues<TypeList<Head, Tail> >
 {
-        Head hd;
-        TypeListValues<Tail> tl;
+    Head hd;
+    TypeListValues<Tail> tl;
 
-        TypeListValues(Head hd_, TypeListValues<Tail> const& tl_) :
-                hd(hd_),
-                tl(tl_)
-        {
-        }
+    TypeListValues(Head hd_, TypeListValues<Tail> const & tl_) :
+        hd(hd_),
+        tl(tl_)
+    {
+    }
 
-        static std::string const tostring(bool comma = false)
-        {
-            std::string s;
+    static std::string const tostring(bool comma = false)
+    {
+        std::string s;
 
-            if (comma) s = ", ";
+        if (comma) s = ", ";
 
-            s = s + typeid(Head).name();
+        s = s + typeid(Head).name();
 
-            return s + TypeListValues<Tail>::tostring(true);
-        }
+        return s + TypeListValues<Tail>::tostring(true);
+    }
 };
 
 // Specializations of type/value list for head types that are references and
@@ -97,51 +97,51 @@ struct TypeListValues<TypeList<Head, Tail> >
 // on the referenced object hanging around for the lifetime of the list.
 
 template<typename Head, typename Tail>
-struct TypeListValues<TypeList<Head&, Tail> >
+struct TypeListValues<TypeList<Head &, Tail> >
 {
-        Head hd;
-        TypeListValues<Tail> tl;
+    Head hd;
+    TypeListValues<Tail> tl;
 
-        TypeListValues(Head& hd_, TypeListValues<Tail> const& tl_) :
-                hd(hd_),
-                tl(tl_)
-        {
-        }
+    TypeListValues(Head & hd_, TypeListValues<Tail> const & tl_) :
+        hd(hd_),
+        tl(tl_)
+    {
+    }
 
-        static std::string const tostring(bool comma = false)
-        {
-            std::string s;
+    static std::string const tostring(bool comma = false)
+    {
+        std::string s;
 
-            if (comma) s = ", ";
+        if (comma) s = ", ";
 
-            s = s + typeid(Head).name() + "&";
+        s = s + typeid(Head).name() + "&";
 
-            return s + TypeListValues<Tail>::tostring(true);
-        }
+        return s + TypeListValues<Tail>::tostring(true);
+    }
 };
 
 template<typename Head, typename Tail>
-struct TypeListValues<TypeList<Head const&, Tail> >
+struct TypeListValues<TypeList<Head const &, Tail> >
 {
-        Head hd;
-        TypeListValues<Tail> tl;
+    Head hd;
+    TypeListValues<Tail> tl;
 
-        TypeListValues(Head const& hd_, const TypeListValues<Tail>& tl_) :
-                hd(hd_),
-                tl(tl_)
-        {
-        }
+    TypeListValues(Head const & hd_, const TypeListValues<Tail> & tl_) :
+        hd(hd_),
+        tl(tl_)
+    {
+    }
 
-        static std::string const tostring(bool comma = false)
-        {
-            std::string s;
+    static std::string const tostring(bool comma = false)
+    {
+        std::string s;
 
-            if (comma) s = ", ";
+        if (comma) s = ", ";
 
-            s = s + typeid(Head).name() + " const&";
+        s = s + typeid(Head).name() + " const&";
 
-            return s + TypeListValues<Tail>::tostring(true);
-        }
+        return s + TypeListValues<Tail>::tostring(true);
+    }
 };
 
 //==============================================================================
@@ -155,18 +155,20 @@ struct ArgList
 };
 
 template<int Start>
-struct ArgList<None, Start> : public TypeListValues<None>
+struct ArgList<None, Start> :
+    public TypeListValues<None>
 {
-        ArgList(lua_State*)
-        {
-        }
+    ArgList(lua_State *)
+    {
+    }
 };
 
 template<typename Head, typename Tail, int Start>
-struct ArgList<TypeList<Head, Tail>, Start> : public TypeListValues<TypeList<Head, Tail> >
+struct ArgList<TypeList<Head, Tail>, Start> :
+    public TypeListValues<TypeList<Head, Tail> >
 {
-        ArgList(lua_State* L) :
-                TypeListValues<TypeList<Head, Tail> >(Stack < Head > ::get(L, Start), ArgList<Tail, Start + 1>(L))
-        {
-        }
+    ArgList(lua_State * L) :
+        TypeListValues<TypeList<Head, Tail> >(Stack<Head>::get(L, Start), ArgList<Tail, Start + 1>(L))
+    {
+    }
 };

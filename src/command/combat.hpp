@@ -29,8 +29,10 @@ void LoadCombatCommands();
 
 /// Engage in combat the desired target.
 void DoKill(Character * character, ArgumentHandler & args);
+
 /// Try to flee from combat.
 void DoFlee(Character * character, ArgumentHandler & args);
+
 /// Provides the list of targets nearby.
 void DoAim(Character * character, ArgumentHandler & args);
 

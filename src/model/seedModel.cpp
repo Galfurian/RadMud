@@ -19,7 +19,7 @@
 #include "seedModel.hpp"
 
 SeedModel::SeedModel() :
-        seedType()
+    seedType()
 {
     // Nothing to do.
 }
@@ -63,7 +63,7 @@ void SeedModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow( { "Seed Type", GetSeedTypeName(this->seedType) });
+    sheet.addRow({"Seed Type", GetSeedTypeName(this->seedType)});
 }
 
 std::string GetSeedTypeName(SeedType type)

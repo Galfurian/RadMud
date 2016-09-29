@@ -43,7 +43,7 @@ void DoAssign(Character * character, ArgumentHandler & args)
         character->sendMsg("You need to specify who you want assign to which building.\n");
         return;
     }
-    auto mobile = character->room->findMobile(args[0].getContent(), args[0].getIndex(), { });
+    auto mobile = character->room->findMobile(args[0].getContent(), args[0].getIndex(), {});
     if (mobile == nullptr)
     {
         character->sendMsg("You don't see that person.\n");

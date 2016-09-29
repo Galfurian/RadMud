@@ -19,8 +19,8 @@
 #include "liquidContainerModel.hpp"
 
 LiquidContainerModel::LiquidContainerModel() :
-        maxWeight(),
-        liquidFlags()
+    maxWeight(),
+    liquidFlags()
 {
     // Nothing to do.
 }
@@ -68,8 +68,8 @@ void LiquidContainerModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow( { "Max Weight", ToString(this->maxWeight) });
-    sheet.addRow( { "Flags", GetLiqContainerFlagString(this->liquidFlags) });
+    sheet.addRow({"Max Weight", ToString(this->maxWeight)});
+    sheet.addRow({"Flags", GetLiqContainerFlagString(this->liquidFlags)});
 }
 
 std::string GetLiqContainerFlagString(unsigned int flags)

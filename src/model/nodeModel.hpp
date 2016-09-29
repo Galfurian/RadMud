@@ -21,37 +21,35 @@
 #include "itemModel.hpp"
 
 /// Used to determine the type of the node.
-typedef enum class NodeTypes
+typedef enum class NodeType_t
 {
     NoType,
-    /// [1] The node is a METAL node.
     Metal,
-    /// [2] The node is a WOOD node.
     Wood,
-    /// [3] The node is a STONE node.
     Stone
 } NodeType;
 
 /// @brief Model of a node of resources.
-class NodeModel: public ItemModel
+class NodeModel :
+    public ItemModel
 {
-    public:
-        /// Type of node.
-        NodeType nodeType;
-        /// The vnum of the item provided during the extraction.
-        unsigned int provides;
+public:
+    /// Type of node.
+    NodeType nodeType;
+    /// The vnum of the item provided during the extraction.
+    unsigned int provides;
 
-        NodeModel();
+    NodeModel();
 
-        virtual ~NodeModel();
+    virtual ~NodeModel();
 
-        virtual ModelType getType() const;
+    virtual ModelType getType() const;
 
-        virtual std::string getTypeName() const;
+    virtual std::string getTypeName() const;
 
-        virtual bool setModel(const std::string & source);
+    virtual bool setModel(const std::string & source);
 
-        virtual void getSheet(Table & sheet) const;
+    virtual void getSheet(Table & sheet) const;
 };
 
 /// @addtogroup EnumToString

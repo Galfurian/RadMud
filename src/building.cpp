@@ -22,28 +22,28 @@
 #include "structure/room.hpp"
 
 Building::Building() :
-        vnum(),
-        name(),
-        difficulty(),
-        time(),
-        assisted(),
-        tools(),
-        buildingModel(),
-        ingredients(),
-        unique()
+    vnum(),
+    name(),
+    difficulty(),
+    time(),
+    assisted(),
+    tools(),
+    buildingModel(),
+    ingredients(),
+    unique()
 {
 }
 
 Building::Building(const Building & source) :
-        vnum(source.vnum),
-        name(source.name),
-        difficulty(source.difficulty),
-        time(source.time),
-        assisted(source.assisted),
-        tools(source.tools),
-        buildingModel(source.buildingModel),
-        ingredients(source.ingredients),
-        unique(source.unique)
+    vnum(source.vnum),
+    name(source.name),
+    difficulty(source.difficulty),
+    time(source.time),
+    assisted(source.assisted),
+    tools(source.tools),
+    buildingModel(source.buildingModel),
+    ingredients(source.ingredients),
+    unique(source.unique)
 {
 }
 

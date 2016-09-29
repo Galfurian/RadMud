@@ -48,13 +48,13 @@
 /// @brief  Contains the string for showing a command help.
 struct CommandHelp
 {
-    public:
-        /// The name of the command.
-        std::string command;
-        /// The arguemtns of the command.
-        std::string arguments;
-        /// The help message of the command.
-        std::string help;
+public:
+    /// The name of the command.
+    std::string command;
+    /// The arguemtns of the command.
+    std::string arguments;
+    /// The help message of the command.
+    std::string help;
 };
 
 /// @brief Check if the passed value has the given flag set.
@@ -141,12 +141,12 @@ template<typename ValueType>
 std::vector<ValueType> GetNumberVect(const std::string & source)
 {
     static_assert((
-            std::is_same<ValueType, bool>::value ||
-            std::is_same<ValueType, int>::value ||
-            std::is_same<ValueType, long int>::value ||
-            std::is_same<ValueType, unsigned int>::value ||
-            std::is_same<ValueType, long unsigned int>::value ||
-            std::is_same<ValueType,double>::value), "template parameter is of the wrong type");
+                      std::is_same<ValueType, bool>::value ||
+                      std::is_same<ValueType, int>::value ||
+                      std::is_same<ValueType, long int>::value ||
+                      std::is_same<ValueType, unsigned int>::value ||
+                      std::is_same<ValueType, long unsigned int>::value ||
+                      std::is_same<ValueType, double>::value), "template parameter is of the wrong type");
     std::stringstream line(source);
     std::vector<ValueType> output_vector;
     ValueType buffer;
@@ -183,12 +183,12 @@ template<typename ValueType>
 ValueType ToNumber(const std::string & source)
 {
     static_assert((
-            std::is_same<ValueType, bool>::value ||
-            std::is_same<ValueType, int>::value ||
-            std::is_same<ValueType, long int>::value ||
-            std::is_same<ValueType, unsigned int>::value ||
-            std::is_same<ValueType, long unsigned int>::value ||
-            std::is_same<ValueType,double>::value), "template parameter is of the wrong type");
+                      std::is_same<ValueType, bool>::value ||
+                      std::is_same<ValueType, int>::value ||
+                      std::is_same<ValueType, long int>::value ||
+                      std::is_same<ValueType, unsigned int>::value ||
+                      std::is_same<ValueType, long unsigned int>::value ||
+                      std::is_same<ValueType, double>::value), "template parameter is of the wrong type");
     char * pEnd;
     return static_cast<ValueType>(strtol(source.c_str(), &pEnd, 10));
 }
@@ -200,12 +200,12 @@ template<typename ValueType>
 std::string ToString(const ValueType & value)
 {
     static_assert((
-            std::is_same<ValueType, bool>::value ||
-            std::is_same<ValueType, int>::value ||
-            std::is_same<ValueType, long int>::value ||
-            std::is_same<ValueType, unsigned int>::value ||
-            std::is_same<ValueType, long unsigned int>::value ||
-            std::is_same<ValueType,double>::value), "template parameter is of the wrong type");
+                      std::is_same<ValueType, bool>::value ||
+                      std::is_same<ValueType, int>::value ||
+                      std::is_same<ValueType, long int>::value ||
+                      std::is_same<ValueType, unsigned int>::value ||
+                      std::is_same<ValueType, long unsigned int>::value ||
+                      std::is_same<ValueType, double>::value), "template parameter is of the wrong type");
     std::ostringstream stm;
     stm << value;
     return stm.str();
@@ -217,7 +217,7 @@ std::string ToString(const ValueType & value)
 template<typename Enum>
 std::string EnumToString(const Enum & value)
 {
-    static_assert(( std::is_enum<Enum>::value), "template parameter is not an enum type");
+    static_assert((std::is_enum<Enum>::value), "template parameter is not an enum type");
     std::ostringstream stm;
     stm << static_cast<unsigned int>(value);
     return stm.str();
@@ -226,7 +226,7 @@ std::string EnumToString(const Enum & value)
 /// @brief Check if all the character in the string it's ASCII.
 /// @param string_to_check The string to check.
 /// @return <b>True</b> if the string it's made of all ASCII characters.<br><b>False</b> otherwise.
-bool IsAllASCII(const char *string_to_check);
+bool IsAllASCII(const char * string_to_check);
 
 /// @brief Generate a random integral value between the defined range.
 /// @param lowerBound The lower bound for the random value.
@@ -236,12 +236,12 @@ template<typename ValueType>
 ValueType TRandInteger(const ValueType & lowerBound, const ValueType & upperBound)
 {
     static_assert((
-            std::is_same<ValueType, bool>::value ||
-            std::is_same<ValueType, int>::value ||
-            std::is_same<ValueType, long int>::value ||
-            std::is_same<ValueType, unsigned int>::value ||
-            std::is_same<ValueType, long unsigned int>::value ||
-            std::is_same<ValueType,double>::value), "template parameter is of the wrong type");
+                      std::is_same<ValueType, bool>::value ||
+                      std::is_same<ValueType, int>::value ||
+                      std::is_same<ValueType, long int>::value ||
+                      std::is_same<ValueType, unsigned int>::value ||
+                      std::is_same<ValueType, long unsigned int>::value ||
+                      std::is_same<ValueType, double>::value), "template parameter is of the wrong type");
 
     std::random_device rng;
     std::uniform_int_distribution<ValueType> uid(lowerBound, upperBound);

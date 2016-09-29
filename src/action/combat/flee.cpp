@@ -20,7 +20,7 @@
 #include "../../structure/room.hpp"
 
 Flee::Flee(Character * _actor) :
-        CombatAction(_actor)
+    CombatAction(_actor)
 {
     Logger::log(LogLevel::Debug, "Created Flee.");
 }
@@ -61,7 +61,7 @@ ActionStatus Flee::perform()
     Logger::log(LogLevel::Debug, "[%s] Perform a Flee.", actor->getName());
     // Get the character chance of fleeing (D20).
     auto fleeChance = TRandInteger<unsigned int>(0, 20)
-        + actor->getAbilityModifier(Ability::Agility);
+                      + actor->getAbilityModifier(Ability::Agility);
     // Get the required stamina.
     auto consumedStamina = actor->getConsumedStaminaFor(ActionType::Combat, CombatActionType::Flee);
     // Base the escape level on how many enemies are surrounding the character.
@@ -71,7 +71,7 @@ ActionStatus Flee::perform()
         // Consume half the stamina.
         actor->remStamina(consumedStamina / 2, true);
     }
-    // Check if the actor has enough stamina to execute the action.
+        // Check if the actor has enough stamina to execute the action.
     else if (consumedStamina > actor->getStamina())
     {
         actor->sendMsg("You are too tired to flee.\n");

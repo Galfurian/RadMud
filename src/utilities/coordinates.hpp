@@ -33,42 +33,42 @@ extern "C"
 /// Used to create and manage a tridimensional coordinates.
 class Coordinates
 {
-    public:
-        /// Coordinate on the x axis.
-        int x;
-        /// Coordinate on the y axis.
-        int y;
-        /// Coordinate on the z axis.
-        int z;
+public:
+    /// Coordinate on the x axis.
+    int x;
+    /// Coordinate on the y axis.
+    int y;
+    /// Coordinate on the z axis.
+    int z;
 
-        Coordinates();
+    Coordinates();
 
-        /// @brief It the constructor, needed to create a set of Coordinates.
-        /// @param _x Coordinate on width axis.
-        /// @param _y Coordinate on heigth axis.
-        /// @param _z Coordinate on altitude axis.
-        Coordinates(const int & _x, const int & _y, const int & _z);
+    /// @brief It the constructor, needed to create a set of Coordinates.
+    /// @param _x Coordinate on width axis.
+    /// @param _y Coordinate on heigth axis.
+    /// @param _z Coordinate on altitude axis.
+    Coordinates(const int & _x, const int & _y, const int & _z);
 
-        /// @brief Define operator ==, equal.
-        /// @param right The right parameter.
-        /// @return True if left Coordinates are equal to the right Coordinates.
-        bool operator==(const Coordinates & right) const;
+    /// @brief Define operator ==, equal.
+    /// @param right The right parameter.
+    /// @return True if left Coordinates are equal to the right Coordinates.
+    bool operator==(const Coordinates & right) const;
 
-        /// @brief Define operator <, less than.
-        /// @param right The right parameter.
-        /// @return True if left Coordinates are less than right Coordinates.
-        bool operator<(const Coordinates & right);
+    /// @brief Define operator <, less than.
+    /// @param right The right parameter.
+    /// @return True if left Coordinates are less than right Coordinates.
+    bool operator<(const Coordinates & right);
 
-        /// @brief Add to the current Coordinates the right operand.
-        /// @param right The right parameter.
-        /// @return The new Coordinates.
-        Coordinates operator+(const Coordinates & right);
+    /// @brief Add to the current Coordinates the right operand.
+    /// @param right The right parameter.
+    /// @return The new Coordinates.
+    Coordinates operator+(const Coordinates & right);
 
-        /// @brief Provides the string version of the coordinates.
-        /// @return A string representing the coordinates.
-        std::string toString() const;
+    /// @brief Provides the string version of the coordinates.
+    /// @return A string representing the coordinates.
+    std::string toString() const;
 
-        /// @brief Function used to register inside the lua environment the class.
-        /// @param L The lua environment.
-        static void luaRegister(lua_State * L);
+    /// @brief Function used to register inside the lua environment the class.
+    /// @param L The lua environment.
+    static void luaRegister(lua_State * L);
 };

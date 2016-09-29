@@ -74,6 +74,7 @@ std::string GetEquipmentSlotName(EquipmentSlot slot)
     if (slot == EquipmentSlot::LeftHand) return "Left Hand";
     return "No Equipment Slot";
 }
+
 std::string GetGenderTypeName(GenderType type)
 {
     if (type == GenderType::Male) return "Male";

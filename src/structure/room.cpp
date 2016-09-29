@@ -23,17 +23,17 @@
 #include "../model/mechanismModel.hpp"
 
 Room::Room() :
-        vnum(),
-        area(),
-        continent(),
-        coord(),
-        terrain(),
-        name(),
-        description(),
-        exits(),
-        items(),
-        characters(),
-        flags()
+    vnum(),
+    area(),
+    continent(),
+    coord(),
+    terrain(),
+    name(),
+    description(),
+    exits(),
+    items(),
+    characters(),
+    flags()
 {
     // Nothing to do.
 }
@@ -74,7 +74,7 @@ bool Room::check(bool complete)
     return true;
 }
 
-void Room::addItem(Item * & item, bool updateDB)
+void Room::addItem(Item *& item, bool updateDB)
 {
     // Add the item.
     items.push_back_item(item);
@@ -85,7 +85,7 @@ void Room::addItem(Item * & item, bool updateDB)
     {
         SQLiteDbms::instance().insertInto(
             "ItemRoom",
-            { ToString(this->vnum), ToString(item->vnum) },
+            {ToString(this->vnum), ToString(item->vnum)},
             false,
             true);
     }
@@ -124,7 +124,7 @@ bool Room::removeItem(Item * item, bool updateDB)
         {
             SQLiteDbms::instance().deleteFrom(
                 "ItemRoom",
-                { std::make_pair("item", ToString(item->vnum)) });
+                {std::make_pair("item", ToString(item->vnum))});
         }
         // Log it.
         Logger::log(
@@ -230,7 +230,7 @@ bool Room::removeOnDB()
         Logger::log(LogLevel::Error, "[Room::RemoveOnDB] There are still characters in the room!");
         return false;
     }
-    SQLiteDbms::instance().deleteFrom("Room", { std::make_pair("vnum", ToString(vnum)) });
+    SQLiteDbms::instance().deleteFrom("Room", {std::make_pair("vnum", ToString(vnum))});
     return true;
 }
 
@@ -265,6 +265,7 @@ Item * Room::findBuilding(std::string target, int & number)
     }
     return nullptr;
 }
+
 Item * Room::findBuilding(int buildingVnum)
 {
     for (auto iterator : items)
@@ -451,6 +452,7 @@ std::shared_ptr<Exit> Room::findExit(Room * destination)
     }
     return nullptr;
 }
+
 Item * Room::findDoor()
 {
     for (auto iterator : items)
@@ -468,6 +470,7 @@ Item * Room::findDoor()
     }
     return nullptr;
 }
+
 std::vector<Direction> Room::getAvailableDirections()
 {
     std::vector<Direction> directions;
@@ -477,6 +480,7 @@ std::vector<Direction> Room::getAvailableDirections()
     }
     return directions;
 }
+
 bool Room::addExit(std::shared_ptr<Exit> exit)
 {
     if (this->findExit(exit->direction))
@@ -486,6 +490,7 @@ bool Room::addExit(std::shared_ptr<Exit> exit)
     this->exits.push_back(std::move(exit));
     return true;
 }
+
 bool Room::removeExit(const Direction & direction)
 {
     for (auto it : exits)
@@ -564,7 +569,7 @@ std::string Room::getLook(Character * exception)
         if (it->quantity > 1)
         {
             output += Formatter::cyan() + it->getNameCapital() + Formatter::reset() + " are here.["
-                + ToString(it->quantity) + "]\n";
+                      + ToString(it->quantity) + "]\n";
         }
         else
         {
@@ -625,13 +630,13 @@ VectorHelper<Exit *> Room::luaGetExits()
 void Room::luaRegister(lua_State * L)
 {
     luabridge::getGlobalNamespace(L) //
-    .beginClass<Room>("Room") //
-    .addData("vnum", &Room::vnum, false) //
-    .addData("name", &Room::name, false) //
-    .addData("coord", &Room::coord, false) //
-    .addData("terrain", &Room::terrain, false) //
-    .addFunction("getExits", &Room::luaGetExits) //
-    .endClass();
+        .beginClass<Room>("Room") //
+        .addData("vnum", &Room::vnum, false) //
+        .addData("name", &Room::name, false) //
+        .addData("coord", &Room::coord, false) //
+        .addData("terrain", &Room::terrain, false) //
+        .addFunction("getExits", &Room::luaGetExits) //
+        .endClass();
 }
 
 bool Room::operator<(const Room & right) const

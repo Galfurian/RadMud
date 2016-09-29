@@ -19,8 +19,8 @@
 #include "foodModel.hpp"
 
 FoodModel::FoodModel() :
-        hours(),
-        foodFlags()
+    hours(),
+    foodFlags()
 {
     // Nothing to do.
 }
@@ -65,8 +65,8 @@ void FoodModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow( { "Hours", ToString(this->hours) });
-    sheet.addRow( { "Flags", GetFoodFlagString(this->foodFlags) });
+    sheet.addRow({"Hours", ToString(this->hours)});
+    sheet.addRow({"Flags", GetFoodFlagString(this->foodFlags)});
 }
 
 std::string GetFoodFlagString(unsigned int flags)

@@ -19,7 +19,7 @@
 #include "resourceModel.hpp"
 
 ResourceModel::ResourceModel() :
-        resourceType()
+    resourceType()
 {
     // Nothing to do.
 }
@@ -66,7 +66,7 @@ void ResourceModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow( { "Resource Type", GetResourceTypeName(this->resourceType) });
+    sheet.addRow({"Resource Type", GetResourceTypeName(this->resourceType)});
 }
 
 std::string GetResourceTypeName(ResourceType type)

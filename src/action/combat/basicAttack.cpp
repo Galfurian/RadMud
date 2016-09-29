@@ -21,7 +21,7 @@
 #include "../../item/weaponItem.hpp"
 
 BasicAttack::BasicAttack(Character * _actor) :
-        CombatAction(_actor)
+    CombatAction(_actor)
 {
     Logger::log(LogLevel::Debug, "Created BasicAttack.");
 }
@@ -116,7 +116,7 @@ ActionStatus BasicAttack::perform()
                 {
                     penality = 6;
                 }
-                // On the off hand the penality is 10.
+                    // On the off hand the penality is 10.
                 else if (iterator->currentSlot == EquipmentSlot::LeftHand)
                 {
                     penality = 10;
@@ -159,7 +159,7 @@ ActionStatus BasicAttack::perform()
                 // Notify the others.
                 enemy->room->sendToAll(
                     "%s miss %s with %s.\n",
-                    { actor, enemy },
+                    {actor, enemy},
                     actor->getName(),
                     enemy->getName(),
                     iterator->getName(true));
@@ -228,7 +228,7 @@ ActionStatus BasicAttack::perform()
                     // Notify the others.
                     enemy->room->sendToAll(
                         "%s %s hits %s with %s and kill %s.\n",
-                        { actor, enemy },
+                        {actor, enemy},
                         actor->getName(),
                         (isCritical ? "critically" : ""),
                         enemy->getName(),
@@ -257,7 +257,7 @@ ActionStatus BasicAttack::perform()
                     // Notify the others.
                     enemy->room->sendToAll(
                         "%s %s hits %s with %s for %s.\n",
-                        { actor, enemy },
+                        {actor, enemy},
                         actor->getName(),
                         (isCritical ? "critically" : ""),
                         enemy->getName(),

@@ -21,61 +21,49 @@
 #include "itemModel.hpp"
 
 /// Types of weapons.
-typedef enum class WeaponTypes
+typedef enum class WeaponType_t
 {
     None,
-    /// [1]  Pistols that uses bullets
-    Pistol,
-    /// [2]  Rifles that uses bullets
-    Rifle,
-    /// [3]  Shotguns
-    Shotgun,
-    /// [4]  Big guns, heavy weapons that uses bullets
-    HeavyWeapon,
-    /// [5]  Pistols that uses energy
-    EnergyPistol,
-    /// [6]  Rifles that uses energy.
-    EnergyRifle,
-    /// [7]  Big guns, heavy weapons that uses energy.
-    EnergyHeavyWeapon,
-    /// [8]  Granades
-    Granade,
-    /// [9]  Placeble explosives
-    Placed,
-    /// [10] All sort of blades
-    Bladed,
-    /// [11] All sort of blunt weapons
-    Blunt,
-    /// [12] Throwable weapons
-    Thrown,
-    /// [13] Weapon to enanche unarmed fight
-    Unarmed,
+    Pistol,             ///< [1]  Pistols that uses bullets
+    Rifle,              ///< [2]  Rifles that uses bullets
+    Shotgun,            ///< [3]  Shotguns
+    HeavyWeapon,        ///< [4]  Big guns, heavy weapons that uses bullets
+    EnergyPistol,       ///< [5]  Pistols that uses energy
+    EnergyRifle,        ///< [6]  Rifles that uses energy.
+    EnergyHeavyWeapon,  ///< [7]  Big guns, heavy weapons that uses energy.
+    Granade,            ///< [8]  Granades
+    Placed,             ///< [9]  Placeble explosives
+    Bladed,             ///< [10] All sort of blades
+    Blunt,              ///< [11] All sort of blunt weapons
+    Thrown,             ///< [12] Throwable weapons
+    Unarmed,            ///< [13] Weapon to enanche unarmed fight
 } WeaponType;
 
 /// @brief Model of a weapon.
-class WeaponModel: public ItemModel
+class WeaponModel :
+    public ItemModel
 {
-    public:
-        /// The type of the weapon.
-        WeaponType weaponType;
-        /// The minimum damage of the weapon.
-        unsigned int minDamage;
-        /// The maximum damage of the weapon.
-        unsigned int maxDamage;
-        /// The range of the weapon.
-        unsigned int range;
+public:
+    /// The type of the weapon.
+    WeaponType weaponType;
+    /// The minimum damage of the weapon.
+    unsigned int minDamage;
+    /// The maximum damage of the weapon.
+    unsigned int maxDamage;
+    /// The range of the weapon.
+    unsigned int range;
 
-        WeaponModel();
+    WeaponModel();
 
-        virtual ~WeaponModel();
+    virtual ~WeaponModel();
 
-        virtual ModelType getType() const;
+    virtual ModelType getType() const;
 
-        virtual std::string getTypeName() const;
+    virtual std::string getTypeName() const;
 
-        virtual bool setModel(const std::string & source);
+    virtual bool setModel(const std::string & source);
 
-        virtual void getSheet(Table & sheet) const;
+    virtual void getSheet(Table & sheet) const;
 };
 
 /// @addtogroup EnumToString

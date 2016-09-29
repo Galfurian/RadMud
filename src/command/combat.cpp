@@ -54,7 +54,7 @@ void DoKill(Character * character, ArgumentHandler & args)
     }
     // Retrieve the target.
     auto target = character->room->findCharacter(args[0].getContent(), args[0].getIndex(), {
-        character });
+        character});
     if (!target)
     {
         character->sendMsg("You don't see '%s' anywhere.\n", args[0].getContent());
@@ -86,9 +86,9 @@ void DoKill(Character * character, ArgumentHandler & args)
             character->sendMsg("You are already doing your best to kill %s!\n", target->getName());
         }
     }
-    // Check if the character is attacking a target which is already in combat.
+        // Check if the character is attacking a target which is already in combat.
     else if ((character->getAction()->getType() != ActionType::Combat)
-        && (target->getAction()->getType() == ActionType::Combat))
+             && (target->getAction()->getType() == ActionType::Combat))
     {
         // Set the opponents.
         if (!character->opponents.addOpponent(target))
@@ -109,7 +109,7 @@ void DoKill(Character * character, ArgumentHandler & args)
         // Notify the others.
         character->room->sendToAll(
             "%s attacks %s.\n",
-            { character, target },
+            {character, target},
             character->getNameCapital(),
             target->getName());
         // Let the characters enter the combat.
@@ -142,7 +142,7 @@ void DoKill(Character * character, ArgumentHandler & args)
         // Notify the others.
         character->room->sendToAll(
             "%s attacks %s.\n",
-            { character, target },
+            {character, target},
             character->getNameCapital(),
             target->getName());
 

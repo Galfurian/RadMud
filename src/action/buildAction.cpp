@@ -30,11 +30,11 @@ BuildAction::BuildAction(
     std::vector<Item *> & _tools,
     std::vector<std::pair<Item *, unsigned int>> & _ingredients,
     unsigned int _cooldown) :
-        GeneralAction(_actor, system_clock::now() + seconds(_cooldown)),
-        schematics(_schematics),
-        building(_building),
-        tools(_tools),
-        ingredients(_ingredients)
+    GeneralAction(_actor, system_clock::now() + seconds(_cooldown)),
+    schematics(_schematics),
+    building(_building),
+    tools(_tools),
+    ingredients(_ingredients)
 {
     Logger::log(LogLevel::Debug, "Created building action.");
 }

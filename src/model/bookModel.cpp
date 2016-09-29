@@ -19,7 +19,7 @@
 #include "bookModel.hpp"
 
 BookModel::BookModel() :
-        maxParchments()
+    maxParchments()
 {
     // Nothing to do.
 }
@@ -63,6 +63,6 @@ void BookModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow( { "Max Parchments", ToString(this->maxParchments) });
+    sheet.addRow({"Max Parchments", ToString(this->maxParchments)});
 }
 

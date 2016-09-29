@@ -21,23 +21,24 @@
 #include "itemModel.hpp"
 
 /// @brief Model of a light.
-class LightModel: public ItemModel
+class LightModel :
+    public ItemModel
 {
-    public:
-        /// Maximum number of hours autonomy.
-        unsigned int maxHours;
-        /// Recharging polocy
-        unsigned int policy;
+public:
+    /// Maximum number of hours autonomy.
+    unsigned int maxHours;
+    /// Recharging polocy
+    unsigned int policy;
 
-        LightModel();
+    LightModel();
 
-        virtual ~LightModel();
+    virtual ~LightModel();
 
-        virtual ModelType getType() const;
+    virtual ModelType getType() const;
 
-        virtual std::string getTypeName() const;
+    virtual std::string getTypeName() const;
 
-        virtual bool setModel(const std::string & source);
+    virtual bool setModel(const std::string & source);
 
-        virtual void getSheet(Table & sheet) const;
+    virtual void getSheet(Table & sheet) const;
 };

@@ -21,17 +21,17 @@
 #include "../utils.hpp"
 
 Coordinates::Coordinates() :
-        x(),
-        y(),
-        z()
+    x(),
+    y(),
+    z()
 {
     // Nothing to do.
 }
 
 Coordinates::Coordinates(const int & _x, const int & _y, const int & _z) :
-        x(_x),
-        y(_y),
-        z(_z)
+    x(_x),
+    y(_y),
+    z(_z)
 {
     // Nothing to do.
 }
@@ -87,9 +87,9 @@ std::string Coordinates::toString() const
 void Coordinates::luaRegister(lua_State * L)
 {
     luabridge::getGlobalNamespace(L) //
-    .beginClass<Coordinates>("Coordinates") //
-    .addData("x", &Coordinates::x, false) //
-    .addData("y", &Coordinates::y, false) //
-    .addData("z", &Coordinates::z, false) //
-    .endClass();
+        .beginClass<Coordinates>("Coordinates") //
+        .addData("x", &Coordinates::x, false) //
+        .addData("y", &Coordinates::y, false) //
+        .addData("z", &Coordinates::z, false) //
+        .endClass();
 }

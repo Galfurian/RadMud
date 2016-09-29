@@ -65,33 +65,33 @@ namespace luabridge
     /// @brief Class needed for secuirity options.
     class Security
     {
-        public:
-            static bool hideMetatables()
+    public:
+        static bool hideMetatables()
+        {
+            return getSettings().hideMetatables;
+        }
+
+        static void setHideMetatables(bool shouldHide)
+        {
+            getSettings().hideMetatables = shouldHide;
+        }
+
+    private:
+        struct Settings
+        {
+            Settings() :
+                hideMetatables(true)
             {
-                return getSettings().hideMetatables;
             }
 
-            static void setHideMetatables(bool shouldHide)
-            {
-                getSettings().hideMetatables = shouldHide;
-            }
+            bool hideMetatables;
+        };
 
-        private:
-            struct Settings
-            {
-                    Settings() :
-                            hideMetatables(true)
-                    {
-                    }
-
-                    bool hideMetatables;
-            };
-
-            static Settings& getSettings()
-            {
-                static Settings settings;
-                return settings;
-            }
+        static Settings & getSettings()
+        {
+            static Settings settings;
+            return settings;
+        }
     };
 
 #include "detail/Userdata.h"
@@ -100,7 +100,7 @@ namespace luabridge
 
     /// @brief Push an object onto the Lua stack.
     template<class T>
-    inline void push(lua_State* L, T t)
+    inline void push(lua_State * L, T t)
     {
         Stack<T>::push(L, t);
     }
@@ -109,7 +109,7 @@ namespace luabridge
     /// @note This works on any type specialized by `Stack`,
     ///        including `LuaRef` and its table proxies.
     template<class T>
-    inline void setGlobal(lua_State* L, T t, char const* name)
+    inline void setGlobal(lua_State * L, T t, char const * name)
     {
         push(L, t);
         lua_setglobal(L, name);

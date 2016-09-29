@@ -21,17 +21,17 @@
 #include "room.hpp"
 
 Area::Area() :
-        vnum(),
-        name(),
-        builder(),
-        continent(),
-        areaMap(),
-        width(),
-        height(),
-        elevation(),
-        tileSet(),
-        type(),
-        status()
+    vnum(),
+    name(),
+    builder(),
+    continent(),
+    areaMap(),
+    width(),
+    height(),
+    elevation(),
+    tileSet(),
+    type(),
+    status()
 {
 }
 
@@ -50,7 +50,6 @@ bool Area::check()
     assert(height > 0);
     assert(elevation > 0);
     assert(type != AreaType::NoType);
-    assert(status != AreaStatus::NoStatus);
     return true;
 }
 
@@ -626,13 +625,13 @@ bool Area::getCharactersInSight(
 void Area::luaRegister(lua_State * L)
 {
     luabridge::getGlobalNamespace(L) //
-    .beginClass<Area>("Area") //
-    .addData("vnum", &Area::vnum, false) //
-    .addData("name", &Area::name, false) //
-    .addData("builder", &Area::builder, false) //
-    .addData("continent", &Area::continent, false) //
-    .addData("width", &Area::width, false) //
-    .addData("height", &Area::height, false) //
-    .addData("elevation", &Area::elevation, false) //
-    .endClass();
+        .beginClass<Area>("Area") //
+        .addData("vnum", &Area::vnum, false) //
+        .addData("name", &Area::name, false) //
+        .addData("builder", &Area::builder, false) //
+        .addData("continent", &Area::continent, false) //
+        .addData("width", &Area::width, false) //
+        .addData("height", &Area::height, false) //
+        .addData("elevation", &Area::elevation, false) //
+        .endClass();
 }

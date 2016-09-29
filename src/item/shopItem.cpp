@@ -22,11 +22,11 @@
 #include "currencyItem.hpp"
 
 ShopItem::ShopItem() :
-        shopName(),
-        shopBuyTax(1),
-        shopSellTax(1),
-        balance(),
-        shopKeeper()
+    shopName(),
+    shopBuyTax(1),
+    shopSellTax(1),
+    balance(),
+    shopKeeper()
 {
     // Nothing to do.
 }
@@ -69,7 +69,7 @@ bool ShopItem::removeOnDB()
 {
     if (Item::removeOnDB())
     {
-        if (SQLiteDbms::instance().deleteFrom("Shop", { std::make_pair("vnum", ToString(vnum)) }))
+        if (SQLiteDbms::instance().deleteFrom("Shop", {std::make_pair("vnum", ToString(vnum))}))
         {
             return true;
         }
@@ -85,17 +85,17 @@ void ShopItem::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow( { "Shop Name", shopName });
-    sheet.addRow( { "Buy Tax", ToString(shopBuyTax) });
-    sheet.addRow( { "Sell Tax", ToString(shopSellTax) });
-    sheet.addRow( { "Balance", ToString(this->getBalance()) });
+    sheet.addRow({"Shop Name", shopName});
+    sheet.addRow({"Buy Tax", ToString(shopBuyTax)});
+    sheet.addRow({"Sell Tax", ToString(shopSellTax)});
+    sheet.addRow({"Balance", ToString(this->getBalance())});
     if (shopKeeper)
     {
-        sheet.addRow( { "ShopKeeper", shopKeeper->getNameCapital() });
+        sheet.addRow({"ShopKeeper", shopKeeper->getNameCapital()});
     }
     else
     {
-        sheet.addRow( { "ShopKeeper", "Nobody" });
+        sheet.addRow({"ShopKeeper", "Nobody"});
     }
 }
 

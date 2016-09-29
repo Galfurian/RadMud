@@ -28,135 +28,147 @@
 #include "character.hpp"
 
 /// @brief Holds details about mobile: mob, vendor, quest npcs.
-class Mobile: public Character
+class Mobile :
+    public Character
 {
-    public:
-        /// An identifier of the mobile.
-        std::string id;
-        /// The room where the mobile must respawn.
-        Room * respawnRoom;
-        /// List of keys used to target this mobile.
-        std::vector<std::string> keys;
-        /// Short description.
-        std::string shortdesc;
-        /// Static description.
-        std::string staticdesc;
-        /// Default actions that the mobile execute.
-        std::vector<std::string> actions;
-        /// Mobile buffer of received message.
-        std::string message_buffer;
-        /// How many seconds before respawn.
-        TimeClock nextRespawn;
-        /// The character that is controlling this one.
-        Character * controller;
-        /// The file that contains the behaviour of this mobile.
-        std::string lua_script;
-        /// The mutex for this mobile.
-        std::mutex lua_mutex;
-        /// Seconds until next action.
-        TimeClock nextActionCooldown;
-        /// The item of which this mobile is the manager.
-        Item * managedItem;
+public:
+    /// An identifier of the mobile.
+    std::string id;
+    /// The room where the mobile must respawn.
+    Room * respawnRoom;
+    /// List of keys used to target this mobile.
+    std::vector<std::string> keys;
+    /// Short description.
+    std::string shortdesc;
+    /// Static description.
+    std::string staticdesc;
+    /// Default actions that the mobile execute.
+    std::vector<std::string> actions;
+    /// Mobile buffer of received message.
+    std::string message_buffer;
+    /// How many seconds before respawn.
+    TimeClock nextRespawn;
+    /// The character that is controlling this one.
+    Character * controller;
+    /// The file that contains the behaviour of this mobile.
+    std::string lua_script;
+    /// The mutex for this mobile.
+    std::mutex lua_mutex;
+    /// Seconds until next action.
+    TimeClock nextActionCooldown;
+    /// The item of which this mobile is the manager.
+    Item * managedItem;
 
-        /// @brief Constructor.
-        Mobile();
+    /// @brief Constructor.
+    Mobile();
 
-        /// @brief Destructor.
-        ~Mobile();
+    /// @brief Destructor.
+    ~Mobile();
 
-        virtual bool check() const;
+    virtual bool check() const;
 
-        virtual bool isMobile() const;
+    virtual bool isMobile() const;
 
-        virtual void getSheet(Table & sheet) const;
+    virtual void getSheet(Table & sheet) const;
 
-        /// @brief Allows to pass a string which contains the abilities.
-        /// @param source The string which containts the values
-        /// @return <b>True</b> if the string is correct,<br>
-        ///         <b>False</b> otherwise.
-        bool setAbilities(const std::string & source);
+    /// @brief Allows to pass a string which contains the abilities.
+    /// @param source The string which containts the values
+    /// @return <b>True</b> if the string is correct,<br>
+    ///         <b>False</b> otherwise.
+    bool setAbilities(const std::string & source);
 
-        /// @brief Initialize mobile.
-        void respawn();
+    /// @brief Initialize mobile.
+    void respawn();
 
-        /// @brief Checks if the mobile is alive.
-        /// @return <b>True</b> if is alive,<br>
-        ///         <b>False</b> otherwise.
-        bool isAlive() const;
+    /// @brief Checks if the mobile is alive.
+    /// @return <b>True</b> if is alive,<br>
+    ///         <b>False</b> otherwise.
+    bool isAlive() const;
 
-        /// @brief Check if the mobile has the desired key.
-        /// @param key The key to find.
-        /// @return <b>True</b> if the operations succeeded,<br>
-        ///         <b>False</b> Otherwise.
-        bool hasKey(const std::string & key) const;
+    /// @brief Check if the mobile has the desired key.
+    /// @param key The key to find.
+    /// @return <b>True</b> if the operations succeeded,<br>
+    ///         <b>False</b> Otherwise.
+    bool hasKey(const std::string & key) const;
 
-        /// @brief Check if the mobile has the desired action set.
-        /// @param _action The action to check.
-        /// @return <b>True</b> if the operations succeeded,<br>
-        ///         <b>False</b> Otherwise.
-        bool hasAction(const std::string & _action) const;
+    /// @brief Check if the mobile has the desired action set.
+    /// @param _action The action to check.
+    /// @return <b>True</b> if the operations succeeded,<br>
+    ///         <b>False</b> Otherwise.
+    bool hasAction(const std::string & _action) const;
 
-        /// @brief Handle what happend when this mob die.
-        void kill();
+    /// @brief Handle what happend when this mob die.
+    void kill();
 
-        /// @brief Return the number of second until next respawn.
-        /// @return Seconds until respawn.
-        int64_t getRespawnTime() const;
+    /// @brief Return the number of second until next respawn.
+    /// @return Seconds until respawn.
+    int64_t getRespawnTime() const;
 
-        /// @brief Check if the mobile can be respawned.
-        /// @return <b>True</b> if it can be respawned,<br>
-        ///         <b>False</b> Otherwise.
-        bool canRespawn();
+    /// @brief Check if the mobile can be respawned.
+    /// @return <b>True</b> if it can be respawned,<br>
+    ///         <b>False</b> Otherwise.
+    bool canRespawn();
 
-        /// @brief Reload the LUA enviroment of the mobile.
-        void reloadLua();
+    /// @brief Reload the LUA enviroment of the mobile.
+    void reloadLua();
 
-        /// @brief Output to player (any type).
-        /// @param msg The string to sent.
-        void sendMsg(const std::string & msg);
+    /// @brief Output to player (any type).
+    /// @param msg The string to sent.
+    void sendMsg(const std::string & msg);
 
-        /// @brief A thread used to handle mobile actions.
-        /// @param event     The event name.
-        /// @param character The target character.
-        /// @param message   The received message.
-        /// @return <b>True</b> if the operations succeeded,<br><b>False</b> Otherwise.
-        bool mobileThread(std::string event, Character * character, std::string message);
+    /// @brief A thread used to handle mobile actions.
+    /// @param event     The event name.
+    /// @param character The target character.
+    /// @param message   The received message.
+    /// @return <b>True</b> if the operations succeeded,<br><b>False</b> Otherwise.
+    bool mobileThread(std::string event, Character * character, std::string message);
 
-        /// @defgroup MobileLuaEvent Mobile Lua Events Function
-        /// @brief All the functions necessary to call the correspondent Function on Lua file,
-        /// in order to react to a particular event.
-        /// @{
+    /// @defgroup MobileLuaEvent Mobile Lua Events Function
+    /// @brief All the functions necessary to call the correspondent Function on Lua file,
+    /// in order to react to a particular event.
+    /// @{
 
-        /// This event is triggered when the mobile it's created, usually it's used to load the mobile equipment.
-        void triggerEventInit();
-        /// This event is triggered at the beginning of every fight turn.
-        void triggerEventFight(Character * character);
-        /// This event is triggered when the passed character enters the room.
-        void triggerEventEnter(Character * character);
-        /// This event is triggered when the passed character exits the room.
-        void triggerEventExit(Character * character);
-        /// This event is triggered when the passed character send a message to this mobile.
-        void triggerEventMessage(Character * character, std::string message);
-        /// This event is triggered at random every 10 seconds.
-        void triggerEventRandom();
-        /// This event is triggered at the beginning of Morning.
-        void triggerEventMorning();
-        /// This event is triggered at the beginning of the Day.
-        void triggerEventDay();
-        /// This event is triggered at the beginning of Dusk.
-        void triggerEventDusk();
-        /// This event is triggered at the beginning of Night.
-        void triggerEventNight();
-        /// This event is triggered when the mobile dies.
-        void triggerEventDeath();
-        /// This event is triggered at every time tick.
-        void triggerEventMain();
-        ///@}
+    /// This event is triggered when the mobile it's created, usually it's used to load the mobile equipment.
+    void triggerEventInit();
 
-    private:
-        /// @brief Disable copy constructor.
-        Mobile(const Mobile& source);
+    /// This event is triggered at the beginning of every fight turn.
+    void triggerEventFight(Character * character);
 
-        /// @brief Disable assign operator.
-        Mobile& operator=(const Mobile&);
+    /// This event is triggered when the passed character enters the room.
+    void triggerEventEnter(Character * character);
+
+    /// This event is triggered when the passed character exits the room.
+    void triggerEventExit(Character * character);
+
+    /// This event is triggered when the passed character send a message to this mobile.
+    void triggerEventMessage(Character * character, std::string message);
+
+    /// This event is triggered at random every 10 seconds.
+    void triggerEventRandom();
+
+    /// This event is triggered at the beginning of Morning.
+    void triggerEventMorning();
+
+    /// This event is triggered at the beginning of the Day.
+    void triggerEventDay();
+
+    /// This event is triggered at the beginning of Dusk.
+    void triggerEventDusk();
+
+    /// This event is triggered at the beginning of Night.
+    void triggerEventNight();
+
+    /// This event is triggered when the mobile dies.
+    void triggerEventDeath();
+
+    /// This event is triggered at every time tick.
+    void triggerEventMain();
+    ///@}
+
+private:
+    /// @brief Disable copy constructor.
+    Mobile(const Mobile & source);
+
+    /// @brief Disable assign operator.
+    Mobile & operator=(const Mobile &);
 };

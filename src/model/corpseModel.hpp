@@ -21,31 +21,32 @@
 #include "itemModel.hpp"
 
 /// @brief Model of a corpse.
-class CorpseModel: public ItemModel
+class CorpseModel :
+    public ItemModel
 {
-    public:
-        CorpseModel();
+public:
+    CorpseModel();
 
-        virtual ~CorpseModel();
+    virtual ~CorpseModel();
 
-        virtual ModelType getType() const;
+    virtual ModelType getType() const;
 
-        virtual std::string getTypeName() const;
+    virtual std::string getTypeName() const;
 
-        virtual bool setModel(const std::string & source);
+    virtual bool setModel(const std::string & source);
 
-        virtual void getSheet(Table & sheet) const;
+    virtual void getSheet(Table & sheet) const;
 
-        virtual Item * createItem(
-            std::string maker,
-            Material * composition,
-            const ItemQuality & itemQuality,
-            const unsigned int & quantity);
+    virtual Item * createItem(
+        std::string maker,
+        Material * composition,
+        const ItemQuality & itemQuality,
+        const unsigned int & quantity);
 
-        /// Creates a new corpse.
-        /// @param maker       The player that create the corpse.
-        /// @param composition The composition of the corpse.
-        /// @param weight      The custom weight of the corpse.
-        /// @return The created corpse.
-        Item * createCorpse(std::string maker, Material * composition, const unsigned int & weight);
+    /// Creates a new corpse.
+    /// @param maker       The player that create the corpse.
+    /// @param composition The composition of the corpse.
+    /// @param weight      The custom weight of the corpse.
+    /// @return The created corpse.
+    Item * createCorpse(std::string maker, Material * composition, const unsigned int & weight);
 };

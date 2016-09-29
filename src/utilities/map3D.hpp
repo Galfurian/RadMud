@@ -25,143 +25,143 @@
 template<typename T>
 class Map3D
 {
-    private:
-        /// Width of th map.
-        int width;
-        /// Height of th map.
-        int height;
-        /// Elevation of th map.
-        int elevation;
-        /// Data contained inside the map.
-        std::map<std::tuple<int, int, int>, T> data;
+private:
+    /// Width of th map.
+    int width;
+    /// Height of th map.
+    int height;
+    /// Elevation of th map.
+    int elevation;
+    /// Data contained inside the map.
+    std::map<std::tuple<int, int, int>, T> data;
 
-    public:
-        /// Iterator for the 3D structure.
-        typedef typename std::map<std::tuple<int, int, int>, T>::iterator iterator;
-        /// Const iterator for the 3D structure.
-        typedef typename std::map<std::tuple<int, int, int>, T>::const_iterator const_iterator;
+public:
+    /// Iterator for the 3D structure.
+    typedef typename std::map<std::tuple<int, int, int>, T>::iterator iterator;
+    /// Const iterator for the 3D structure.
+    typedef typename std::map<std::tuple<int, int, int>, T>::const_iterator const_iterator;
 
-        /// @brief Constructor.
-        Map3D() :
-                width(),
-                height(),
-                elevation(),
-                data()
+    /// @brief Constructor.
+    Map3D() :
+        width(),
+        height(),
+        elevation(),
+        data()
+    {
+        // Nothing to do.
+    }
+
+    /// @brief Constructor.
+    /// @param _width     The width of the 3D map.
+    /// @param _height    The height of the 3D map.
+    /// @param _elevation The elevation of the 3D map.
+    Map3D(int _width, int _height, int _elevation) :
+        width(_width),
+        height(_height),
+        elevation(_elevation),
+        data()
+    {
+        // Nothing to do.
+    }
+
+    /// @brief Constructor.
+    /// @param _width     The width of the 3D map.
+    /// @param _height    The height of the 3D map.
+    /// @param _elevation The elevation of the 3D map.
+    /// @param value     The initial value of the cells.
+    Map3D(int _width, int _height, int _elevation, T value) :
+        width(_width),
+        height(_height),
+        elevation(_elevation),
+        data()
+    {
+        for (int z = 0; z < width; z++)
         {
-            // Nothing to do.
-        }
-
-        /// @brief Constructor.
-        /// @param _width     The width of the 3D map.
-        /// @param _height    The height of the 3D map.
-        /// @param _elevation The elevation of the 3D map.
-        Map3D(int _width, int _height, int _elevation) :
-                width(_width),
-                height(_height),
-                elevation(_elevation),
-                data()
-        {
-            // Nothing to do.
-        }
-
-        /// @brief Constructor.
-        /// @param _width     The width of the 3D map.
-        /// @param _height    The height of the 3D map.
-        /// @param _elevation The elevation of the 3D map.
-        /// @param value     The initial value of the cells.
-        Map3D(int _width, int _height, int _elevation, T value) :
-                width(_width),
-                height(_height),
-                elevation(_elevation),
-                data()
-        {
-            for (int z = 0; z < width; z++)
+            for (int y = 0; y < height; y++)
             {
-                for (int y = 0; y < height; y++)
+                for (int x = 0; x < height; x++)
                 {
-                    for (int x = 0; x < height; x++)
-                    {
-                        data[std::make_tuple(z, y, x)] = value;
-                    }
+                    data[std::make_tuple(z, y, x)] = value;
                 }
             }
         }
+    }
 
-        /// @brief Destructor.
-        ~Map3D()
-        {
-            // Nothing to do.
-        }
+    /// @brief Destructor.
+    ~Map3D()
+    {
+        // Nothing to do.
+    }
 
-        /// @brief Set the object at the given Coordinates3D.
-        /// @param x     Coordinate on width.
-        /// @param y     Coordinate on heigth.
-        /// @param z     Coordinate on altitude.
-        /// @param value The value that has to be set.
-        bool set(int x, int y, int z, T value)
-        {
+    /// @brief Set the object at the given Coordinates3D.
+    /// @param x     Coordinate on width.
+    /// @param y     Coordinate on heigth.
+    /// @param z     Coordinate on altitude.
+    /// @param value The value that has to be set.
+    bool set(int x, int y, int z, T value)
+    {
 #if 0
-            const key_t key = std::make_tuple(x, y, z);
-            auto ret = data.insert(std::make_pair(key, value));
-            if (!ret.second)
-            {
-                std::cout << "Not unique at " << ToString(x) << " " << ToString(y) << " " << ToString(z) << "\n";
-            }
-            else
-            {
-                std::cout << "Set at " << ToString(x) << " " << ToString(y) << " " << ToString(z) << "\n";
-            }
-            return ret.second;
+        const key_t key = std::make_tuple(x, y, z);
+        auto ret = data.insert(std::make_pair(key, value));
+        if (!ret.second)
+        {
+            std::cout << "Not unique at " << ToString(x) << " " << ToString(y) << " " << ToString(z) << "\n";
+        }
+        else
+        {
+            std::cout << "Set at " << ToString(x) << " " << ToString(y) << " " << ToString(z) << "\n";
+        }
+        return ret.second;
 #else
-            data[std::make_tuple(x, y, z)] = value;
-            return true;
+        data[std::make_tuple(x, y, z)] = value;
+        return true;
 #endif
-        }
+    }
 
-        /// @brief Retrieve the object at the given Coordinates3D.
-        /// @param x Coordinate on width.
-        /// @param y Coordinate on heigth.
-        /// @param z Coordinate on altitude.
-        /// @return The object at the given Coordinates3D.
-        T & get(int x, int y, int z)
-        {
-            return data[std::make_tuple(x, y, z)];
-        }
+    /// @brief Retrieve the object at the given Coordinates3D.
+    /// @param x Coordinate on width.
+    /// @param y Coordinate on heigth.
+    /// @param z Coordinate on altitude.
+    /// @return The object at the given Coordinates3D.
+    T & get(int x, int y, int z)
+    {
+        return data[std::make_tuple(x, y, z)];
+    }
 
-        /// @brief Erase the object at the given Coordinates3D and returns an iterator to the.
-        /// @param x Coordinate on width axis.
-        /// @param y Coordinate on heigth axis.
-        /// @param z Coordinate on altitude axis.
-        /// @return The object at the given Coordinates3D.
-        iterator erase(int x, int y, int z)
-        {
-            return FindErase(data, std::make_tuple(x, y, z));
-        }
+    /// @brief Erase the object at the given Coordinates3D and returns an iterator to the.
+    /// @param x Coordinate on width axis.
+    /// @param y Coordinate on heigth axis.
+    /// @param z Coordinate on altitude axis.
+    /// @return The object at the given Coordinates3D.
+    iterator erase(int x, int y, int z)
+    {
+        return FindErase(data, std::make_tuple(x, y, z));
+    }
 
-        /// @brief Provides an iterator to the begin of the list of data.
-        /// @return An iterator to the begin of the 3D map.
-        iterator begin()
-        {
-            return data.begin();
-        }
+    /// @brief Provides an iterator to the begin of the list of data.
+    /// @return An iterator to the begin of the 3D map.
+    iterator begin()
+    {
+        return data.begin();
+    }
 
-        /// @brief Provides an iterator to the end of the list of data.
-        /// @return An iterator to the end of the 3D map.
-        iterator end()
-        {
-            return data.end();
-        }
+    /// @brief Provides an iterator to the end of the list of data.
+    /// @return An iterator to the end of the 3D map.
+    iterator end()
+    {
+        return data.end();
+    }
 
-        /// @brief Provides the size of the data.
-        /// @return The size of the 3D map.
-        size_t size()
-        {
-            return data.size();
-        }
+    /// @brief Provides the size of the data.
+    /// @return The size of the 3D map.
+    size_t size()
+    {
+        return data.size();
+    }
 
-        /// Disable copy constructor.
-        Map3D(const Map3D<T> &) = delete;
+    /// Disable copy constructor.
+    Map3D(const Map3D<T> &) = delete;
 
-        /// Disable assignment.
-        Map3D & operator=(const Map3D<T> &) = delete;
+    /// Disable assignment.
+    Map3D & operator=(const Map3D<T> &) = delete;
 };

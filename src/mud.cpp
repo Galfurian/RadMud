@@ -40,14 +40,14 @@ void Bailout(int signal)
 }
 
 Mud::Mud() :
-        mudPort(4000),
-        _servSocket(-1),
-        _maxDesc(-1),
-        _shutdownSignal(),
-        _bootTime(time(NULL)),
-        _maxVnumRoom(),
-        _maxVnumItem(),
-        _minVnumCorpses()
+    mudPort(4000),
+    _servSocket(-1),
+    _maxDesc(-1),
+    _shutdownSignal(),
+    _bootTime(time(NULL)),
+    _maxVnumRoom(),
+    _maxVnumItem(),
+    _minVnumCorpses()
 {
     // Nothing to do.
 }
@@ -176,18 +176,22 @@ bool Mud::addPlayer(Player * player)
 {
     return mudPlayers.insert(player).second;
 }
+
 bool Mud::remPlayer(Player * player)
 {
     return (FindErase(mudPlayers, player) != mudPlayers.end());
 }
+
 bool Mud::addMobile(Mobile * mobile)
 {
     return mudMobiles.insert(std::make_pair(mobile->id, mobile)).second;
 }
+
 bool Mud::remMobile(Mobile * mobile)
 {
     return (FindErase(mudMobiles, mobile->id) != mudMobiles.end());
 }
+
 bool Mud::addItem(Item * item)
 {
     if (mudItems.insert(std::make_pair(item->vnum, item)).second)
@@ -200,6 +204,7 @@ bool Mud::addItem(Item * item)
         return false;
     }
 }
+
 bool Mud::remItem(Item * item)
 {
     for (auto it = mudItems.begin(); it != mudItems.end(); ++it)
@@ -212,6 +217,7 @@ bool Mud::remItem(Item * item)
     }
     return false;
 }
+
 bool Mud::addRoom(Room * room)
 {
     bool result = mudRooms.insert(std::make_pair(room->vnum, room)).second;
@@ -221,10 +227,12 @@ bool Mud::addRoom(Room * room)
     }
     return result;
 }
+
 bool Mud::remRoom(Room * room)
 {
     return (FindErase(mudRooms, room->vnum) != mudRooms.end());
 }
+
 bool Mud::addCorpse(Item * corpse)
 {
     if (mudCorpses.insert(std::make_pair(corpse->vnum, corpse)).second)
@@ -237,6 +245,7 @@ bool Mud::addCorpse(Item * corpse)
         return false;
     }
 }
+
 bool Mud::remCorpse(Item * corpse)
 {
     for (auto it = mudCorpses.begin(); it != mudCorpses.end(); ++it)
@@ -249,6 +258,7 @@ bool Mud::remCorpse(Item * corpse)
     }
     return false;
 }
+
 bool Mud::addItemModel(ItemModel * model)
 {
     if (model == nullptr)
@@ -257,10 +267,12 @@ bool Mud::addItemModel(ItemModel * model)
     }
     return mudItemModels.insert(std::make_pair(model->vnum, model)).second;
 }
+
 bool Mud::addArea(Area * area)
 {
     return mudAreas.insert(std::make_pair(area->vnum, area)).second;
 }
+
 bool Mud::addRace(Race * race)
 {
     if (race == nullptr)
@@ -269,6 +281,7 @@ bool Mud::addRace(Race * race)
     }
     return mudRaces.insert(std::make_pair(race->vnum, race)).second;
 }
+
 bool Mud::addFaction(Faction * faction)
 {
     if (faction == nullptr)
@@ -277,6 +290,7 @@ bool Mud::addFaction(Faction * faction)
     }
     return mudFactions.insert(std::make_pair(faction->vnum, faction)).second;
 }
+
 bool Mud::addSkill(Skill * skill)
 {
     if (skill == nullptr)
@@ -285,14 +299,17 @@ bool Mud::addSkill(Skill * skill)
     }
     return mudSkills.insert(std::make_pair(skill->vnum, skill)).second;
 }
+
 bool Mud::addWriting(Writing * writing)
 {
     return mudWritings.insert(std::make_pair(writing->vnum, writing)).second;
 }
+
 bool Mud::addContinent(Continent * continent)
 {
     return mudContinents.insert(std::make_pair(continent->vnum, continent)).second;
 }
+
 bool Mud::addMaterial(Material * material)
 {
     if (material == nullptr)
@@ -301,6 +318,7 @@ bool Mud::addMaterial(Material * material)
     }
     return mudMaterials.insert(std::make_pair(material->vnum, material)).second;
 }
+
 bool Mud::addProfession(Profession * profession)
 {
     if (profession == nullptr)
@@ -309,6 +327,7 @@ bool Mud::addProfession(Profession * profession)
     }
     return mudProfessions.insert(std::make_pair(profession->vnum, profession)).second;
 }
+
 bool Mud::addProduction(Production * production)
 {
     if (production == nullptr)
@@ -317,6 +336,7 @@ bool Mud::addProduction(Production * production)
     }
     return mudProductions.insert(std::make_pair(production->vnum, production)).second;
 }
+
 bool Mud::addLiquid(Liquid * liquid)
 {
     if (liquid == nullptr)
@@ -325,22 +345,27 @@ bool Mud::addLiquid(Liquid * liquid)
     }
     return mudLiquids.insert(std::make_pair(liquid->vnum, liquid)).second;
 }
+
 bool Mud::addTravelPoint(Room * source, Room * target)
 {
     return mudTravelPoints.insert(std::make_pair(source, target)).second;
 }
+
 void Mud::addCommand(Command & command)
 {
     mudCommands.push_back(command);
 }
+
 bool Mud::addDirection(std::string name, Direction direction)
 {
     return mudDirections.insert(std::make_pair(name, direction)).second;
 }
+
 bool Mud::addStateAction(ConnectionState state, ActionHandler action)
 {
     return mudStateActions.insert(std::make_pair(state, action)).second;
 }
+
 bool Mud::addBuilding(Building & building)
 {
     return mudBuildings.insert(std::make_pair(building.vnum, building)).second;
@@ -429,7 +454,7 @@ Race * Mud::findRace(int vnum)
 Race * Mud::findRace(std::string name)
 {
     for (std::map<int, Race *>::iterator iterator = mudRaces.begin(); iterator != mudRaces.end();
-        ++iterator)
+         ++iterator)
     {
         if (ToLower(iterator->second->name) == ToLower(name))
         {
@@ -452,7 +477,7 @@ Faction * Mud::findFaction(int vnum)
 Faction * Mud::findFaction(std::string name)
 {
     for (std::map<int, Faction *>::iterator iterator = mudFactions.begin();
-        iterator != mudFactions.end(); ++iterator)
+         iterator != mudFactions.end(); ++iterator)
     {
         if (ToLower(iterator->second->name) == ToLower(name))
         {
@@ -525,7 +550,7 @@ Profession * Mud::findProfession(unsigned int vnum)
 Profession * Mud::findProfession(std::string command)
 {
     for (std::map<unsigned int, Profession *>::iterator iterator = mudProfessions.begin();
-        iterator != mudProfessions.end(); ++iterator)
+         iterator != mudProfessions.end(); ++iterator)
     {
         if (ToLower(iterator->second->command) == ToLower(command))
         {
@@ -548,7 +573,7 @@ Production * Mud::findProduction(int vnum)
 Production * Mud::findProduction(std::string name)
 {
     for (std::map<int, Production *>::iterator iterator = mudProductions.begin();
-        iterator != mudProductions.end(); ++iterator)
+         iterator != mudProductions.end(); ++iterator)
     {
         if (ToLower(iterator->second->name) == ToLower(name))
         {
@@ -586,7 +611,7 @@ ActionHandler & Mud::findStateAction(ConnectionState state)
 Building * Mud::findBuilding(std::string name)
 {
     for (std::map<int, Building>::iterator iterator = mudBuildings.begin();
-        iterator != mudBuildings.end(); ++iterator)
+         iterator != mudBuildings.end(); ++iterator)
     {
         if (ToLower(iterator->second.name) == ToLower(name))
         {
@@ -599,7 +624,7 @@ Building * Mud::findBuilding(std::string name)
 Building * Mud::findBuilding(int vnum)
 {
     for (std::map<int, Building>::iterator iterator = mudBuildings.begin();
-        iterator != mudBuildings.end(); ++iterator)
+         iterator != mudBuildings.end(); ++iterator)
     {
         if (iterator->second.buildingModel->vnum == vnum)
         {
@@ -713,8 +738,7 @@ bool Mud::runMud()
         {
             this->processDescriptor(iterator);
         }
-    }
-    while (!_shutdownSignal);
+    } while (!_shutdownSignal);
 
     if (!this->stopMud())
     {

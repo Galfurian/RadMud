@@ -19,10 +19,10 @@
 #include "weaponModel.hpp"
 
 WeaponModel::WeaponModel() :
-        weaponType(),
-        minDamage(),
-        maxDamage(),
-        range()
+    weaponType(),
+    minDamage(),
+    maxDamage(),
+    range()
 {
     // Nothing to do.
 }
@@ -72,10 +72,10 @@ void WeaponModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow( { "Weapon Type", GetWeaponTypeName(this->weaponType) });
-    sheet.addRow( { "Minimum Damage", ToString(this->minDamage) });
-    sheet.addRow( { "Maximum Damage", ToString(this->maxDamage) });
-    sheet.addRow( { "Range", ToString(this->range) });
+    sheet.addRow({"Weapon Type", GetWeaponTypeName(this->weaponType)});
+    sheet.addRow({"Minimum Damage", ToString(this->minDamage)});
+    sheet.addRow({"Maximum Damage", ToString(this->maxDamage)});
+    sheet.addRow({"Range", ToString(this->range)});
 }
 
 std::string GetWeaponTypeName(WeaponType type)

@@ -32,179 +32,176 @@ class Room;
 /// @brief This class contains all the information regarding an entire area.
 class Area
 {
-    private:
-        /// The list of integer used to identify different obstacles inside the map.
-        typedef enum class MapTiles
-        {
-            /// It's an empty tile.
-            Void,
-            /// It's a walkable tile.
-            Walkable,
-            /// It's a closed door.
-            ClosedDoor,
-        } MapTile;
+private:
+    /// The list of integer used to identify different obstacles inside the map.
+    typedef enum class MapTile_t
+    {
+        Void,       ///< It's an empty tile.
+        Walkable,   ///< It's a walkable tile.
+        ClosedDoor, ///< It's a closed door.
+    } MapTile;
 
-    public:
-        /// The virtual number of the area.
-        int vnum;
-        /// The name of the area.
-        std::string name;
-        /// The name of the original builder of this area.
-        std::string builder;
-        /// The continent where the area is placed.
-        std::string continent;
-        /// The 3D grid of the map.
-        Map3D<Room *> areaMap;
-        /// The width of the area.
-        int width;
-        /// The height of the area.
-        int height;
-        /// The elevation of the area.
-        int elevation;
-        /// The tileset of the entire area.
-        int tileSet;
-        /// The type of area.
-        AreaType type;
-        /// The status of the area.
-        AreaStatus status;
+public:
+    /// The virtual number of the area.
+    int vnum;
+    /// The name of the area.
+    std::string name;
+    /// The name of the original builder of this area.
+    std::string builder;
+    /// The continent where the area is placed.
+    std::string continent;
+    /// The 3D grid of the map.
+    Map3D<Room *> areaMap;
+    /// The width of the area.
+    int width;
+    /// The height of the area.
+    int height;
+    /// The elevation of the area.
+    int elevation;
+    /// The tileset of the entire area.
+    int tileSet;
+    /// The type of area.
+    AreaType type;
+    /// The status of the area.
+    AreaStatus status;
 
-        /// Constructor.
-        Area();
+    /// Constructor.
+    Area();
 
-        /// Destructor.
-        virtual ~Area();
+    /// Destructor.
+    virtual ~Area();
 
-        /// @brief Check the correctness of the area.
-        /// @return <b>True</b> if the area has correct values,<br><b>False</b> otherwise.
-        bool check();
+    /// @brief Check the correctness of the area.
+    /// @return <b>True</b> if the area has correct values,<br><b>False</b> otherwise.
+    bool check();
 
-        /// @brief Check if the given coordinates is inside the boundaries.
-        /// @param x Coordinate on width axis.
-        /// @param y Coordinate on height axis.
-        /// @param z Coordinate on altitude axis.
-        /// @return <b>True</b> if the coordinates are valid,<br>
-        ///         <b>False</b> otherwise..
-        bool inBoundaries(const int & x, const int & y, const int & z);
+    /// @brief Check if the given coordinates is inside the boundaries.
+    /// @param x Coordinate on width axis.
+    /// @param y Coordinate on height axis.
+    /// @param z Coordinate on altitude axis.
+    /// @return <b>True</b> if the coordinates are valid,<br>
+    ///         <b>False</b> otherwise..
+    bool inBoundaries(const int & x, const int & y, const int & z);
 
-        /// @brief Check if the given coordinates is inside the boundaries.
-        /// @param coord The coordinates to check.
-        /// @return <b>True</b> if the coordinates are valid,<br>
-        ///         <b>False</b> otherwise.
-        bool inBoundaries(const Coordinates & coord);
+    /// @brief Check if the given coordinates is inside the boundaries.
+    /// @param coord The coordinates to check.
+    /// @return <b>True</b> if the coordinates are valid,<br>
+    ///         <b>False</b> otherwise.
+    bool inBoundaries(const Coordinates & coord);
 
-        /// @brief Add the passed room to its coordinates inside the area.
-        /// @param room The room that has to be added.
-        /// @return <b>True</b> if the room has been added,<br>
-        ///         <b>False</b> otherwise.
-        bool addRoom(Room * room);
+    /// @brief Add the passed room to its coordinates inside the area.
+    /// @param room The room that has to be added.
+    /// @return <b>True</b> if the room has been added,<br>
+    ///         <b>False</b> otherwise.
+    bool addRoom(Room * room);
 
-        /// @brief Remove the passed room.
-        /// @param room The room that has to be removed.
-        /// @return <b>True</b> if the room has been removed,<br>
-        ///         <b>False</b> otherwise.
-        bool remRoom(Room * room);
+    /// @brief Remove the passed room.
+    /// @param room The room that has to be removed.
+    /// @return <b>True</b> if the room has been removed,<br>
+    ///         <b>False</b> otherwise.
+    bool remRoom(Room * room);
 
-        /// @brief Find a room  given its vnum.
-        /// @param room_vnum The vnum of the room.
-        /// @return The desired room.
-        Room * getRoom(int room_vnum);
+    /// @brief Find a room  given its vnum.
+    /// @param room_vnum The vnum of the room.
+    /// @return The desired room.
+    Room * getRoom(int room_vnum);
 
-        /// @brief Find a room in a precise spot.
-        /// @param x Coordinate on width axis.
-        /// @param y Coordinate on height axis.
-        /// @param z Coordinate on altitude axis.
-        /// @return The room at the selected spot.
-        Room * getRoom(int x, int y, int z);
+    /// @brief Find a room in a precise spot.
+    /// @param x Coordinate on width axis.
+    /// @param y Coordinate on height axis.
+    /// @param z Coordinate on altitude axis.
+    /// @return The room at the selected spot.
+    Room * getRoom(int x, int y, int z);
 
-        /// @brief Find a room in a precise spot.
-        /// @param coord The coordiantes where search the room.
-        /// @return The room at the selected spot.
-        Room * getRoom(Coordinates coord);
+    /// @brief Find a room in a precise spot.
+    /// @param coord The coordiantes where search the room.
+    /// @return The room at the selected spot.
+    Room * getRoom(Coordinates coord);
 
-        /// @brief Draw the Filed of View for a character.
-        /// @param centerRoom The room from where the algorithm has to compute the Field of View.
-        /// @param radius     The radius of visibility of the character.
-        /// @return The map containing all the Information about the Field of View of a character.
-        std::vector<std::string> drawFov(Room * centerRoom, int radius);
+    /// @brief Draw the Filed of View for a character.
+    /// @param centerRoom The room from where the algorithm has to compute the Field of View.
+    /// @param radius     The radius of visibility of the character.
+    /// @return The map containing all the Information about the Field of View of a character.
+    std::vector<std::string> drawFov(Room * centerRoom, int radius);
 
-        /// @brief Draw the Filed of View for a character (ASCII).
-        /// @param centerRoom The room from where the algorithm has to compute the Field of View.
-        /// @param radius     The radius of visibility of the character.
-        /// @return The map containing all the Information about the Field of View of a character.
-        std::string drawASCIIFov(Room * centerRoom, int radius);
+    /// @brief Draw the Filed of View for a character (ASCII).
+    /// @param centerRoom The room from where the algorithm has to compute the Field of View.
+    /// @param radius     The radius of visibility of the character.
+    /// @return The map containing all the Information about the Field of View of a character.
+    std::string drawASCIIFov(Room * centerRoom, int radius);
 
-        /// @brief Default version of a FOV alforithm.
-        /// @param map      A 2D map, where the the Field of View will be drawn.
-        /// @param origin_x The x coordinate of the central room.
-        /// @param origin_y The y coordinate of the central room.
-        /// @param origin_z The z coordinate of the central room.
-        /// @param radius   The radius of visibility of the character.
-        void fov(Map2D<MapTile> & map, int origin_x, int origin_y, int origin_z, int radius);
+    /// @brief Default version of a FOV alforithm.
+    /// @param map      A 2D map, where the the Field of View will be drawn.
+    /// @param origin_x The x coordinate of the central room.
+    /// @param origin_y The y coordinate of the central room.
+    /// @param origin_z The z coordinate of the central room.
+    /// @param radius   The radius of visibility of the character.
+    void fov(Map2D<MapTile> & map, int origin_x, int origin_y, int origin_z, int radius);
 
-        /// @brief A simple line of sight algorithm.
-        /// @param map      The map where the LOS algorithm has to write the line.
-        /// @param origin_x The x coordinate of the central room.
-        /// @param origin_y The y coordinate of the central room.
-        /// @param origin_z The z coordinate of the central room.
-        /// @param incr_x   The value of which the x coordiante must be incremented at each step.
-        /// @param incr_y   The value of which the y coordiante must be incremented at each step.
-        /// @param incr_z   The value of which the z coordiante must be incremented at each step.
-        /// @param radius   The radius of visibility.
-        void los(
-            Map2D<MapTile> & map,
-            int origin_x,
-            int origin_y,
-            int origin_z,
-            double incr_x,
-            double incr_y,
-            double incr_z,
-            int radius);
+    /// @brief A simple line of sight algorithm.
+    /// @param map      The map where the LOS algorithm has to write the line.
+    /// @param origin_x The x coordinate of the central room.
+    /// @param origin_y The y coordinate of the central room.
+    /// @param origin_z The z coordinate of the central room.
+    /// @param incr_x   The value of which the x coordiante must be incremented at each step.
+    /// @param incr_y   The value of which the y coordiante must be incremented at each step.
+    /// @param incr_z   The value of which the z coordiante must be incremented at each step.
+    /// @param radius   The radius of visibility.
+    void los(
+        Map2D<MapTile> & map,
+        int origin_x,
+        int origin_y,
+        int origin_z,
+        double incr_x,
+        double incr_y,
+        double incr_z,
+        int radius);
 
-        /// @brief Determine if a coordinate is in sight from a starting one.
-        /// @param origin_x The x coordinate of the central room.
-        /// @param origin_y The y coordinate of the central room.
-        /// @param origin_z The z coordinate of the central room.
-        /// @param target_x The target x coordinate.
-        /// @param target_y The target y coordinate.
-        /// @param target_z The target z coordinate.
-        /// @param radius   The radius of visibility.
-        /// @return <b>True</b> if the target room is in sight,<br>
-        ///         <b>False</b> otherwise.
-        bool fastInSight(
-            int origin_x,
-            int origin_y,
-            int origin_z,
-            int target_x,
-            int target_y,
-            int target_z,
-            unsigned int radius);
+    /// @brief Determine if a coordinate is in sight from a starting one.
+    /// @param origin_x The x coordinate of the central room.
+    /// @param origin_y The y coordinate of the central room.
+    /// @param origin_z The z coordinate of the central room.
+    /// @param target_x The target x coordinate.
+    /// @param target_y The target y coordinate.
+    /// @param target_z The target z coordinate.
+    /// @param radius   The radius of visibility.
+    /// @return <b>True</b> if the target room is in sight,<br>
+    ///         <b>False</b> otherwise.
+    bool fastInSight(
+        int origin_x,
+        int origin_y,
+        int origin_z,
+        int target_x,
+        int target_y,
+        int target_z,
+        unsigned int radius);
 
-        /// @brief Determine if a coordinate is in sight from a starting one.
-        /// @param origin The coordinates of the origin.
-        /// @param target The coordinates of the target room.
-        /// @param radius The radius of visibility.
-        /// @return <b>True</b> if the target room is in sight,<br>
-        ///         <b>False</b> otherwise.
-        bool fastInSight(Coordinates origin, Coordinates target, unsigned int radius);
+    /// @brief Determine if a coordinate is in sight from a starting one.
+    /// @param origin The coordinates of the origin.
+    /// @param target The coordinates of the target room.
+    /// @param radius The radius of visibility.
+    /// @return <b>True</b> if the target room is in sight,<br>
+    ///         <b>False</b> otherwise.
+    bool fastInSight(Coordinates origin, Coordinates target, unsigned int radius);
 
-        /// @brief Provides a list of characters which are in sight.
-        /// @param targets    The list which will contain the targets.
-        /// @param exceptions A list of excections.
-        /// @param origin_x   The x coordinate of the central room.
-        /// @param origin_y   The y coordinate of the central room.
-        /// @param origin_z   The z coordinate of the central room.
-        /// @param radius     The radius of visibility.
-        /// @return <b>True</b> if there are targets in sight,<br>
-        ///         <b>False</b> otherwise.
-        bool getCharactersInSight(
-            std::vector<Character *> & targets,
-            std::vector<Character *> & exceptions,
-            int origin_x,
-            int origin_y,
-            int origin_z,
-            int radius);
+    /// @brief Provides a list of characters which are in sight.
+    /// @param targets    The list which will contain the targets.
+    /// @param exceptions A list of excections.
+    /// @param origin_x   The x coordinate of the central room.
+    /// @param origin_y   The y coordinate of the central room.
+    /// @param origin_z   The z coordinate of the central room.
+    /// @param radius     The radius of visibility.
+    /// @return <b>True</b> if there are targets in sight,<br>
+    ///         <b>False</b> otherwise.
+    bool getCharactersInSight(
+        std::vector<Character *> & targets,
+        std::vector<Character *> & exceptions,
+        int origin_x,
+        int origin_y,
+        int origin_z,
+        int radius);
 
-        /// @brief Function used to register inside the lua environment the class.
-        /// @param L The lua environment.
-        static void luaRegister(lua_State * L);
+    /// @brief Function used to register inside the lua environment the class.
+    /// @param L The lua environment.
+    static void luaRegister(lua_State * L);
 };

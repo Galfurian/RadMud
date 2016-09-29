@@ -21,7 +21,7 @@
 #include "../mud.hpp"
 
 ShopModel::ShopModel() :
-        maxWeight()
+    maxWeight()
 {
     // Nothing to do.
 }
@@ -65,5 +65,5 @@ void ShopModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow( { "Max Weight", ToString(this->maxWeight) });
+    sheet.addRow({"Max Weight", ToString(this->maxWeight)});
 }

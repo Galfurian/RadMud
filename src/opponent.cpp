@@ -22,35 +22,40 @@
 #include "character/character.hpp"
 
 Aggression::Aggression(Character * _aggressor, unsigned int _aggression) :
-        aggressor(_aggressor),
-        aggression(_aggression)
+    aggressor(_aggressor),
+    aggression(_aggression)
 {
     // Nothing to do.
 }
+
 Aggression::~Aggression()
 {
     // Nothing to do.
 }
+
 bool Aggression::operator>(const Aggression & source) const
 {
     return (this->aggression > source.aggression);
 }
+
 bool Aggression::operator<(const Aggression & source) const
 {
     return (this->aggression < source.aggression);
 }
+
 bool Aggression::operator==(const Aggression & source) const
 {
     return (this->aggressor->name == source.aggressor->name);
 }
+
 bool Aggression::operator==(const Character * source) const
 {
     return (this->aggressor->name == source->name);
 }
 
 OpponentsList::OpponentsList(Character * _owner) :
-        owner(_owner),
-        aggressionList()
+    owner(_owner),
+    aggressionList()
 {
     // Nothing to do.
 }
@@ -222,7 +227,7 @@ void OpponentsList::checkList()
         {
             this->remOpponent(it->aggressor);
         }
-        // Check if the aggressor is nowhere.
+            // Check if the aggressor is nowhere.
         else if (it->aggressor->room == nullptr)
         {
             this->remOpponent(it->aggressor);

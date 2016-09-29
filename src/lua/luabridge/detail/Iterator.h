@@ -28,59 +28,59 @@
  */
 class Iterator
 {
-    private:
-        lua_State* m_L;
-        LuaRef m_table;
-        LuaRef m_key;
-        LuaRef m_value;
+private:
+    lua_State * m_L;
+    LuaRef m_table;
+    LuaRef m_key;
+    LuaRef m_value;
 
-    public:
-        explicit Iterator(LuaRef table) :
-                m_L(table.state()),
-                m_table(table),
-                m_key(table.state()),
-                m_value(table.state())
-        {
-            //m_table.push (
-        }
+public:
+    explicit Iterator(LuaRef table) :
+        m_L(table.state()),
+        m_table(table),
+        m_key(table.state()),
+        m_value(table.state())
+    {
+        //m_table.push (
+    }
 
-        lua_State* state() const
-        {
-            return m_L;
-        }
+    lua_State * state() const
+    {
+        return m_L;
+    }
 
-        LuaRef operator*() const
-        {
-            return m_value;
-        }
+    LuaRef operator*() const
+    {
+        return m_value;
+    }
 
-        LuaRef operator->() const
-        {
-            return m_value;
-        }
+    LuaRef operator->() const
+    {
+        return m_value;
+    }
 
-        Iterator& operator++()
-        {
-            return *this;
-        }
+    Iterator & operator++()
+    {
+        return *this;
+    }
 
-        inline bool isNil() const
-        {
-            return m_key.isNil();
-        }
+    inline bool isNil() const
+    {
+        return m_key.isNil();
+    }
 
-        inline LuaRef key() const
-        {
-            return m_key;
-        }
+    inline LuaRef key() const
+    {
+        return m_key;
+    }
 
-        inline LuaRef value() const
-        {
-            return m_value;
-        }
+    inline LuaRef value() const
+    {
+        return m_value;
+    }
 
-    private:
-        // Don't use postfix increment, it is less efficient
-        Iterator operator++(int);
+private:
+    // Don't use postfix increment, it is less efficient
+    Iterator operator++(int);
 };
 

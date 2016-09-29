@@ -21,12 +21,12 @@
 /// @brief Holds details about a writing.
 struct Writing
 {
-        /// The virtual number of the writing.
-        int vnum;
-        /// The title of the writing.
-        std::string title;
-        /// The author of the writing.
-        std::string author;
-        /// The content of the writing.
-        std::string content;
+    /// The virtual number of the writing.
+    int vnum;
+    /// The title of the writing.
+    std::string title;
+    /// The author of the writing.
+    std::string author;
+    /// The content of the writing.
+    std::string content;
 };

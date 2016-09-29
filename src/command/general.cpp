@@ -241,7 +241,7 @@ void DoQuit(Character * character, ArgumentHandler & /*args*/)
             // Send the message inside the room.
             player->room->sendToAll(
                 "Player %s disappear in a puff of smoke.\n",
-                { character },
+                {character},
                 player->getName());
         }
         Logger::log(LogLevel::Global, "Player %s has left the game.", player->getName());
@@ -268,7 +268,7 @@ void DoWho(Character * character, ArgumentHandler & /*args*/)
         {
             location = iterator->room->name;
         }
-        table.addRow( { iterator->getName(), location });
+        table.addRow({iterator->getName(), location});
     }
     character->sendMsg(table.getTable());
     character->sendMsg(
@@ -325,7 +325,7 @@ void DoLook(Character * character, ArgumentHandler & args)
     else if (args.size() == 1)
     {
         auto target = character->room->findCharacter(args[0].getContent(), args[0].getIndex(), {
-            character });
+            character});
         if (target)
         {
             if (character->canSee(target))
@@ -354,7 +354,7 @@ void DoLook(Character * character, ArgumentHandler & args)
     else if (args.size() == 2)
     {
         auto target = character->room->findCharacter(args[1].getContent(), args[1].getIndex(), {
-            character });
+            character});
         auto container = character->findNearbyItem(args[1].getContent(), args[1].getIndex());
         if (target)
         {
@@ -467,13 +467,13 @@ void DoHelp(Character * character, ArgumentHandler & args)
                     std::string msg;
                     msg += "Showing help for command :" + iterator.name + "\n";
                     msg += Formatter::yellow() + " Command   : " + Formatter::reset()
-                        + iterator.name + "\n";
+                           + iterator.name + "\n";
                     msg += Formatter::yellow() + " Level     : " + Formatter::reset()
-                        + ToString(iterator.level) + "\n";
+                           + ToString(iterator.level) + "\n";
                     msg += Formatter::yellow() + " Arguments : " + Formatter::reset()
-                        + iterator.args + "\n";
+                           + iterator.args + "\n";
                     msg += Formatter::yellow() + " Help      : " + Formatter::reset()
-                        + iterator.help + "\n";
+                           + iterator.help + "\n";
                     character->sendMsg(msg);
                     return;
                 }
@@ -627,11 +627,11 @@ void DoStatistics(Character * character, ArgumentHandler & /*args*/)
     msg += Formatter::magenta() + "Name: " + Formatter::reset() + player->getName() + " ";
     msg += Formatter::magenta() + "Race: " + Formatter::reset() + player->race->name + "\n";
     msg += Formatter::magenta() + "Gender: " + Formatter::reset()
-        + GetGenderTypeName(player->gender) + "\n";
+           + GetGenderTypeName(player->gender) + "\n";
     msg += Formatter::magenta() + "Affiliation: " + Formatter::reset() + player->faction->name
-        + "\n";
+           + "\n";
     msg += Formatter::magenta() + "Experience: " + Formatter::reset() + ToString(player->experience)
-        + " px\n";
+           + " px\n";
 
     msg += Formatter::magenta() + "    Str " + Formatter::reset();
     msg += ToString(player->getAbility(Ability::Strength, false));
@@ -710,7 +710,7 @@ void DoSkills(Character * character, ArgumentHandler & /*args*/)
         Skill * skill = Mud::instance().findSkill(iterator.first);
         if (skill)
         {
-            table.addRow( { skill->name, ToString(iterator.second) });
+            table.addRow({skill->name, ToString(iterator.second)});
         }
     }
     character->sendMsg(table.getTable());

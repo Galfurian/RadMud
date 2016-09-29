@@ -21,32 +21,31 @@
 #include "itemModel.hpp"
 
 /// Used to determine the type of the resource.
-typedef enum class SeedTypes
+typedef enum class SeedType_t
 {
-    /// A generic seed.
-    Plant,
-    /// A seed used to plant a tree.
-    Tree,
+    Plant,  ///< A generic seed.
+    Tree,   ///< A seed used to plant a tree.
 } SeedType;
 
 /// @brief Model of a seed.
-class SeedModel: public ItemModel
+class SeedModel :
+    public ItemModel
 {
-    public:
-        /// Type of seed.
-        SeedType seedType;
+public:
+    /// Type of seed.
+    SeedType seedType;
 
-        SeedModel();
+    SeedModel();
 
-        virtual ~SeedModel();
+    virtual ~SeedModel();
 
-        virtual ModelType getType() const;
+    virtual ModelType getType() const;
 
-        virtual std::string getTypeName() const;
+    virtual std::string getTypeName() const;
 
-        virtual bool setModel(const std::string & source);
+    virtual bool setModel(const std::string & source);
 
-        virtual void getSheet(Table & sheet) const;
+    virtual void getSheet(Table & sheet) const;
 };
 
 /// @addtogroup EnumToString

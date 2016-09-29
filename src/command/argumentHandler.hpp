@@ -24,44 +24,44 @@
 /// @brief Allows to simply handle players inputs.
 class ArgumentHandler
 {
-    private:
-        /// The original string.
-        std::string original;
-        /// List of arguments.
-        std::vector<Argument> arguments;
+private:
+    /// The original string.
+    std::string original;
+    /// List of arguments.
+    std::vector<Argument> arguments;
 
-    public:
-        /// @brief Constructor.
-        ArgumentHandler(const std::string & _original);
+public:
+    /// @brief Constructor.
+    ArgumentHandler(const std::string & _original);
 
-        /// @brief Constructor.
-        ArgumentHandler(std::istream & _original);
+    /// @brief Constructor.
+    ArgumentHandler(std::istream & _original);
 
-        /// @brief Destructor.
-        virtual ~ArgumentHandler();
+    /// @brief Destructor.
+    virtual ~ArgumentHandler();
 
-        /// Provides the original input string.
-        std::string getOriginal();
+    /// Provides the original input string.
+    std::string getOriginal();
 
-        /// Returns the number of arguments.
-        size_t size() const;
+    /// Returns the number of arguments.
+    size_t size() const;
 
-        /// Checks if the vector of arguments is empty.
-        bool empty() const;
+    /// Checks if the vector of arguments is empty.
+    bool empty() const;
 
-        /// Allows to retrieve the argument at the given position.
-        Argument & get(const size_t & position);
+    /// Allows to retrieve the argument at the given position.
+    Argument & get(const size_t & position);
 
-        /// Allows to retrieve the argument at the given position.
-        Argument & operator[](const size_t & position);
+    /// Allows to retrieve the argument at the given position.
+    Argument & operator[](const size_t & position);
 
-        /// Returns the string from the given argument to the end.
-        std::string substr(const size_t & startingArgument);
+    /// Returns the string from the given argument to the end.
+    std::string substr(const size_t & startingArgument);
 
-        /// Erase the argument at the given position.
-        void erase(const size_t & position);
+    /// Erase the argument at the given position.
+    void erase(const size_t & position);
 
-    private:
-        /// Given that original string has been set, it fills the vector of arguments.
-        void evaluateArguments();
+private:
+    /// Given that original string has been set, it fills the vector of arguments.
+    void evaluateArguments();
 };

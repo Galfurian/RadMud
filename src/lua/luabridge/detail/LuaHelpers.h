@@ -94,11 +94,11 @@ inline int get_length(lua_State* L, int idx)
 
 #else
 
-int get_length(lua_State* L, int idx);
+int get_length(lua_State * L, int idx);
 
 #endif
 
-lua_State * get_main_thread(lua_State* thread);
+lua_State * get_main_thread(lua_State * thread);
 
 #ifndef LUA_OK
 #define LUABRIDGE_LUA_OK 0
@@ -107,18 +107,18 @@ lua_State * get_main_thread(lua_State* thread);
 #endif
 
 /// @brief Get a table value, bypassing metamethods.
-void rawgetfield(lua_State* L, int index, char const* key);
+void rawgetfield(lua_State * L, int index, char const * key);
 
 /// @brief Set a table value, bypassing metamethods.
-void rawsetfield(lua_State* L, int index, char const* key);
+void rawsetfield(lua_State * L, int index, char const * key);
 
 /// @brief Returns true if the value is a full userdata (not light).
-bool isfulluserdata(lua_State* L, int index);
+bool isfulluserdata(lua_State * L, int index);
 
 /// @brief Test lua_State objects for global equality.
 /// @details This can determine if two different lua_State objects really point
 ///           to the same global state, such as when using coroutines.
 /// @note This is used for assertions.
-bool equalstates(lua_State* L1, lua_State* L2);
+bool equalstates(lua_State * L1, lua_State * L2);
 
 #endif

@@ -24,41 +24,41 @@
 /// @brief Holds details about a liquid.
 class Liquid
 {
-    public:
-        /// Virtual number.
-        int vnum;
-        /// Liquid's name.
-        std::string name;
-        /// Liquid's value on market.
-        int worth;
+public:
+    /// Virtual number.
+    int vnum;
+    /// Liquid's name.
+    std::string name;
+    /// Liquid's value on market.
+    int worth;
 
-        /// @brief Constructor.
-        Liquid();
+    /// @brief Constructor.
+    Liquid();
 
-        /// @brief Disable Copy Construct.
-        Liquid(Liquid const &) = delete;
+    /// @brief Disable Copy Construct.
+    Liquid(Liquid const &) = delete;
 
-        /// @brief Disable Move construct.
-        Liquid(Liquid &&) = delete;
+    /// @brief Disable Move construct.
+    Liquid(Liquid &&) = delete;
 
-        /// @brief Disable Copy assign.
-        Liquid & operator=(Liquid const &) = delete;
+    /// @brief Disable Copy assign.
+    Liquid & operator=(Liquid const &) = delete;
 
-        /// @brief Disable Move assign.
-        Liquid & operator=(Liquid &&) = delete;
+    /// @brief Disable Move assign.
+    Liquid & operator=(Liquid &&) = delete;
 
-        /// @brief Destructor.
-        ~Liquid();
+    /// @brief Destructor.
+    ~Liquid();
 
-        /// @brief Check the correctness of the liquid.
-        /// @return <b>True</b> if the liquid has correct values,<br><b>False</b> otherwise.
-        bool check();
+    /// @brief Check the correctness of the liquid.
+    /// @return <b>True</b> if the liquid has correct values,<br><b>False</b> otherwise.
+    bool check();
 
-        /// @brief Return the name of the liquid.
-        /// @return The name of the liquid.
-        std::string getName();
+    /// @brief Return the name of the liquid.
+    /// @return The name of the liquid.
+    std::string getName();
 
-        /// @brief Return the name of the liquid with the first letter capitalized.
-        /// @return The name of the liquid.
-        std::string getNameCapital();
+    /// @brief Return the name of the liquid with the first letter capitalized.
+    /// @return The name of the liquid.
+    std::string getNameCapital();
 };

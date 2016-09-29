@@ -22,8 +22,8 @@
 #include "../mud.hpp"
 
 CurrencyModel::Price::Price(const int & _material, const unsigned int & _price) :
-        material(_material),
-        price(_price)
+    material(_material),
+    price(_price)
 {
     // Nothing to do.
 }

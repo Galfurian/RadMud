@@ -91,8 +91,7 @@ bool SQLiteWrapper::closeConnection()
                             sqlite3_finalize(dbDetails.dbStatement);
                         }
                     }
-                }
-                while (retry);
+                } while (retry);
             }
         }
         else
@@ -110,7 +109,7 @@ ResultSet * SQLiteWrapper::executeSelect(const char * query)
         return NULL;
     }
     if (sqlite3_prepare_v2(dbDetails.dbConnection, query, -1, &dbDetails.dbStatement,
-    NULL) != SQLITE_OK)
+                           NULL) != SQLITE_OK)
     {
         errorMessage = sqlite3_errmsg(dbDetails.dbConnection);
         errorCode = sqlite3_finalize(dbDetails.dbStatement);
@@ -121,7 +120,7 @@ ResultSet * SQLiteWrapper::executeSelect(const char * query)
     else
     {
         num_col = sqlite3_column_count(dbDetails.dbStatement);
-        ResultSet *ires = this;
+        ResultSet * ires = this;
         return ires;
     }
 }

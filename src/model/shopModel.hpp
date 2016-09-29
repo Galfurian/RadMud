@@ -21,21 +21,22 @@
 #include "itemModel.hpp"
 
 /// @brief Model of a weapon.
-class ShopModel: public ItemModel
+class ShopModel :
+    public ItemModel
 {
-    public:
-        /// The maximum weight which this shop can carry.
-        unsigned int maxWeight;
+public:
+    /// The maximum weight which this shop can carry.
+    unsigned int maxWeight;
 
-        ShopModel();
+    ShopModel();
 
-        virtual ~ShopModel();
+    virtual ~ShopModel();
 
-        virtual ModelType getType() const;
+    virtual ModelType getType() const;
 
-        virtual std::string getTypeName() const;
+    virtual std::string getTypeName() const;
 
-        virtual bool setModel(const std::string & source);
+    virtual bool setModel(const std::string & source);
 
-        virtual void getSheet(Table & sheet) const;
+    virtual void getSheet(Table & sheet) const;
 };

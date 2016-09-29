@@ -37,7 +37,7 @@ void ArmorItem::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow( { "Armor Class", ToString(this->getArmorClass()) });
+    sheet.addRow({"Armor Class", ToString(this->getArmorClass())});
 }
 
 unsigned int ArmorItem::getArmorClass() const

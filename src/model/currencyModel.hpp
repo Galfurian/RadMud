@@ -21,79 +21,80 @@
 #include "itemModel.hpp"
 
 /// @brief Model of a currency.
-class CurrencyModel: public ItemModel
+class CurrencyModel :
+    public ItemModel
 {
-    private:
-        /// @brief Give a currency, this class is used to determine the value of the currency
-        ///         based on material and a pre-defined price.
-        class Price
-        {
-            public:
-                /// Material vnum.
-                int material;
-                /// The associated price.
-                unsigned int price;
-
-                /// @brief Constructor.
-                /// @param _material The material.
-                /// @param _price    The price associated to the material.
-                Price(const int & _material, const unsigned int & _price);
-
-                /// @brief Operator used to order the prices.
-                bool operator>(const Price & rhs) const;
-
-                /// @brief Operator used to order the prices.
-                bool operator==(const Price & rhs) const;
-
-                /// @brief Operator used to order the prices.
-                bool operator==(const int & _rhs) const;
-        };
-
+private:
+    /// @brief Give a currency, this class is used to determine the value of the currency
+    ///         based on material and a pre-defined price.
+    class Price
+    {
     public:
-        /// All the prices defined for this currency.
-        std::vector<Price> prices;
+        /// Material vnum.
+        int material;
+        /// The associated price.
+        unsigned int price;
 
-        CurrencyModel();
+        /// @brief Constructor.
+        /// @param _material The material.
+        /// @param _price    The price associated to the material.
+        Price(const int & _material, const unsigned int & _price);
 
-        virtual ~CurrencyModel();
+        /// @brief Operator used to order the prices.
+        bool operator>(const Price & rhs) const;
 
-        virtual ModelType getType() const;
+        /// @brief Operator used to order the prices.
+        bool operator==(const Price & rhs) const;
 
-        virtual std::string getTypeName() const;
+        /// @brief Operator used to order the prices.
+        bool operator==(const int & _rhs) const;
+    };
 
-        virtual bool setModel(const std::string & source);
+public:
+    /// All the prices defined for this currency.
+    std::vector<Price> prices;
 
-        virtual void getSheet(Table & sheet) const;
+    CurrencyModel();
 
-        virtual Item * createItem(
-            std::string maker,
-            Material * composition,
-            const ItemQuality & itemQuality,
-            const unsigned int & quantity);
+    virtual ~CurrencyModel();
 
-        /// @brief Add an entry to the prices.
-        /// @param materialVnum The vnum of the material.
-        /// @param price        The price associated to the material.
-        /// @return <b>True</b> if the price has been added,<br>
-        ///         <b>False</b> otherwise.
-        bool addPrice(const int & materialVnum, const unsigned int & price);
+    virtual ModelType getType() const;
 
-        /// @brief Given a specific material, this function returns the associated price.
-        /// @param materialVnum The vnum of the material.
-        /// @param price        Variable where the found price is saved.
-        /// @return <b>True</b> if the price has been found,<br>
-        ///         <b>False</b> otherwise.
-        bool findPrice(const int & materialVnum, unsigned int & price) const;
+    virtual std::string getTypeName() const;
 
-        /// @brief Generates an ammount of currency with a worth equal to the variable value.
-        /// @details
-        ///     <b>This function starts and ends a SQLITE3 Transaction.</b>
-        /// @param maker Who has generated the currency.
-        /// @param value The total worth that has to be generate.
-        /// @return The list of generated currencies.
-        std::vector<Item *> generateCurrency(const std::string & maker, const unsigned int & value);
+    virtual bool setModel(const std::string & source);
 
-    private:
-        /// @brief Sort the list of prices.
-        void sortList();
+    virtual void getSheet(Table & sheet) const;
+
+    virtual Item * createItem(
+        std::string maker,
+        Material * composition,
+        const ItemQuality & itemQuality,
+        const unsigned int & quantity);
+
+    /// @brief Add an entry to the prices.
+    /// @param materialVnum The vnum of the material.
+    /// @param price        The price associated to the material.
+    /// @return <b>True</b> if the price has been added,<br>
+    ///         <b>False</b> otherwise.
+    bool addPrice(const int & materialVnum, const unsigned int & price);
+
+    /// @brief Given a specific material, this function returns the associated price.
+    /// @param materialVnum The vnum of the material.
+    /// @param price        Variable where the found price is saved.
+    /// @return <b>True</b> if the price has been found,<br>
+    ///         <b>False</b> otherwise.
+    bool findPrice(const int & materialVnum, unsigned int & price) const;
+
+    /// @brief Generates an ammount of currency with a worth equal to the variable value.
+    /// @details
+    ///     <b>This function starts and ends a SQLITE3 Transaction.</b>
+    /// @param maker Who has generated the currency.
+    /// @param value The total worth that has to be generate.
+    /// @return The list of generated currencies.
+    std::vector<Item *> generateCurrency(const std::string & maker, const unsigned int & value);
+
+private:
+    /// @brief Sort the list of prices.
+    void sortList();
 };

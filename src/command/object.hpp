@@ -29,40 +29,58 @@ void LoadObjectCommands();
 
 /// Allow the character to pick up an object, or take an object from another one.
 void DoTake(Character * character, ArgumentHandler & args);
+
 /// Allow the character to drop an object.
 void DoDrop(Character * character, ArgumentHandler & args);
+
 /// Allow the character to give an object to another character.
 void DoGive(Character * character, ArgumentHandler & args);
+
 /// List all the item equipped by the character.
 void DoEquipments(Character * character, ArgumentHandler & args);
+
 /// Wield a object, if it can be wielded.
 void DoWield(Character * character, ArgumentHandler & args);
+
 /// Wear a object, if it can be weared.
 void DoWear(Character * character, ArgumentHandler & args);
+
 /// Remove an equipped or wielded item.
 void DoRemove(Character * character, ArgumentHandler & args);
+
 /// List the character's inventory.
 void DoInventory(Character * character, ArgumentHandler & args);
+
 /// Organize the items in the room.
 void DoOrganize(Character * character, ArgumentHandler & args);
+
 /// Open a door if not unlocked.
 void DoOpen(Character * character, ArgumentHandler & args);
+
 /// Close a door.
 void DoClose(Character * character, ArgumentHandler & args);
+
 /// Put an object inside a container.
 void DoPut(Character * character, ArgumentHandler & args);
+
 /// Drink from a container of liquids.
 void DoDrink(Character * character, ArgumentHandler & args);
+
 /// Fill a container of liquids from a source of liquid.
 void DoFill(Character * character, ArgumentHandler & args);
+
 /// Pour the container of liquids into another one or on the ground.
 void DoPour(Character * character, ArgumentHandler & args);
+
 /// Deposit a currency inside a shop.
 void DoDeposit(Character * character, ArgumentHandler & args);
+
 /// Sell an item.
 void DoSell(Character * character, ArgumentHandler & args);
+
 /// Buy an item.
 void DoBuy(Character * character, ArgumentHandler & args);
+
 /// Shows the total ammount of monney.
 void DoBalance(Character * character, ArgumentHandler & args);
 

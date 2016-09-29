@@ -23,10 +23,10 @@
 #include <limits.h>
 
 Argument::Argument(const std::string & _original) :
-        original(_original),
-        content(_original),
-        index(1),
-        multiplier(1)
+    original(_original),
+    content(_original),
+    index(1),
+    multiplier(1)
 {
     // First, evaluate the multiplier.
     this->evaluateMultiplier();

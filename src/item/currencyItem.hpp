@@ -20,16 +20,17 @@
 #include "item.hpp"
 
 /// @brief Holds details about currency.
-class CurrencyItem: public Item
+class CurrencyItem :
+    public Item
 {
-    public:
-        CurrencyItem();
+public:
+    CurrencyItem();
 
-        virtual ~CurrencyItem();
+    virtual ~CurrencyItem();
 
-        virtual void getSheet(Table & sheet) const;
+    virtual void getSheet(Table & sheet) const;
 
-        virtual unsigned int getPrice() const;
+    virtual unsigned int getPrice() const;
 
-        virtual unsigned int getWeight() const;
+    virtual unsigned int getWeight() const;
 };

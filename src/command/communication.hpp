@@ -29,14 +29,19 @@ void LoadCommunicationCommands();
 
 /// The character say something.
 void DoSay(Character * character, ArgumentHandler & args);
+
 /// The character whisper something to someone, even in distance.
 void DoWhisper(Character * character, ArgumentHandler & args);
+
 /// The character emote something.
 void DoEmote(Character * character, ArgumentHandler & args);
+
 /// The character report a bug.
 void DoBug(Character * character, ArgumentHandler & args);
+
 /// The character send an idea.
 void DoIdea(Character * character, ArgumentHandler & args);
+
 /// The character report a typo.
 void DoTypo(Character * character, ArgumentHandler & args);
 

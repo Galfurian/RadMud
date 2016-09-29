@@ -26,54 +26,54 @@
 /// @brief Holds details about a material.
 class Material
 {
-    public:
-        /// Virtual number.
-        int vnum;
-        /// Type of material.
-        MaterialType type;
-        /// Material's name.
-        std::string name;
-        /// Material's article.
-        std::string article;
-        /// Material's value on market.
-        unsigned int worth;
-        /// Material's hardness.
-        unsigned int hardness;
-        /// Material's lightness.
-        unsigned int lightness;
+public:
+    /// Virtual number.
+    int vnum;
+    /// Type of material.
+    MaterialType type;
+    /// Material's name.
+    std::string name;
+    /// Material's article.
+    std::string article;
+    /// Material's value on market.
+    unsigned int worth;
+    /// Material's hardness.
+    unsigned int hardness;
+    /// Material's lightness.
+    unsigned int lightness;
 
-        /// @brief Constructor.
-        Material();
+    /// @brief Constructor.
+    Material();
 
-        /// @brief Disable Copy Construct.
-        Material(Material const &) = delete;
+    /// @brief Disable Copy Construct.
+    Material(Material const &) = delete;
 
-        /// @brief Disable Move construct.
-        Material(Material &&) = delete;
+    /// @brief Disable Move construct.
+    Material(Material &&) = delete;
 
-        /// @brief Disable Copy assign.
-        Material & operator=(Material const &) = delete;
+    /// @brief Disable Copy assign.
+    Material & operator=(Material const &) = delete;
 
-        /// @brief Disable Move assign.
-        Material & operator=(Material &&) = delete;
+    /// @brief Disable Move assign.
+    Material & operator=(Material &&) = delete;
 
-        /// @brief Destructor.
-        ~Material();
+    /// @brief Destructor.
+    ~Material();
 
-        /// @brief Check the correctness of the material.
-        /// @return <b>True</b> if the material has correct values,<br><b>False</b> otherwise.
-        bool check();
+    /// @brief Check the correctness of the material.
+    /// @return <b>True</b> if the material has correct values,<br><b>False</b> otherwise.
+    bool check();
 
-        /// @brief Provides the modifier w.r.t. the material worth value.
-        double getWorthModifier() const;
+    /// @brief Provides the modifier w.r.t. the material worth value.
+    double getWorthModifier() const;
 
-        /// @brief Provides the modifier w.r.t. the material hardness value.
-        double getHardnessModifier() const;
+    /// @brief Provides the modifier w.r.t. the material hardness value.
+    double getHardnessModifier() const;
 
-        /// @brief Provides the modifier w.r.t. the material lightness value.
-        double getLightnessModifier() const;
+    /// @brief Provides the modifier w.r.t. the material lightness value.
+    double getLightnessModifier() const;
 
-        /// @brief Function used to register inside the lua environment the class.
-        /// @param L The lua environment.
-        static void luaRegister(lua_State * L);
+    /// @brief Function used to register inside the lua environment the class.
+    /// @param L The lua environment.
+    static void luaRegister(lua_State * L);
 };

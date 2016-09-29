@@ -31,269 +31,279 @@
 #include "itemContainer.hpp"
 
 class Room;
+
 class Character;
+
 class Material;
 
 class ShopItem;
+
 class ArmorItem;
+
 class WeaponItem;
+
 class CurrencyItem;
+
 class CorpseItem;
 
 /// @brief Holds details about items.
 class Item
 {
-    public:
-        /// Item vnum.
-        int vnum;
-        /// The type of item.
-        ModelType type;
-        /// Item model.
-        ItemModel * model;
-        /// The number of stacked items.
-        unsigned int quantity;
-        /// The player that created the item.
-        std::string maker;
-        /// The item's price.
-        unsigned int price;
-        /// The item's weight.
-        unsigned int weight;
-        /// The item's condition.
-        unsigned int condition;
-        /// The maximum condition.
-        unsigned int maxCondition;
-        /// The composing material of the item.
-        Material * composition;
-        /// The quality of the item.
-        ItemQuality quality;
-        /// The item flags.
-        unsigned int flags;
-        /// Pointer to the room, where the item resides.
-        Room * room;
-        /// Pointer to the character who owns this item.
-        Character * owner;
-        /// Pointer to the item which contains this item.
-        Item * container;
-        /// Current equipment slot.
-        EquipmentSlot currentSlot;
-        /// List of items contained in this one.
-        ItemContainer content;
-        /// The liquid inside the container.
-        std::pair<Liquid *, unsigned int> contentLiq;
+public:
+    /// Item vnum.
+    int vnum;
+    /// The type of item.
+    ModelType type;
+    /// Item model.
+    ItemModel * model;
+    /// The number of stacked items.
+    unsigned int quantity;
+    /// The player that created the item.
+    std::string maker;
+    /// The item's price.
+    unsigned int price;
+    /// The item's weight.
+    unsigned int weight;
+    /// The item's condition.
+    unsigned int condition;
+    /// The maximum condition.
+    unsigned int maxCondition;
+    /// The composing material of the item.
+    Material * composition;
+    /// The quality of the item.
+    ItemQuality quality;
+    /// The item flags.
+    unsigned int flags;
+    /// Pointer to the room, where the item resides.
+    Room * room;
+    /// Pointer to the character who owns this item.
+    Character * owner;
+    /// Pointer to the item which contains this item.
+    Item * container;
+    /// Current equipment slot.
+    EquipmentSlot currentSlot;
+    /// List of items contained in this one.
+    ItemContainer content;
+    /// The liquid inside the container.
+    std::pair<Liquid *, unsigned int> contentLiq;
 
-        /// @brief Constructor - Create a new empty item.
-        Item();
+    /// @brief Constructor - Create a new empty item.
+    Item();
 
-        /// @brief Disable Copy Construct.
-        Item(Item const &) = delete;
+    /// @brief Disable Copy Construct.
+    Item(Item const &) = delete;
 
-        /// @brief Disable Move construct.
-        Item(Item &&) = delete;
+    /// @brief Disable Move construct.
+    Item(Item &&) = delete;
 
-        /// @brief Disable Copy assign.
-        Item & operator=(Item const &) = delete;
+    /// @brief Disable Copy assign.
+    Item & operator=(Item const &) = delete;
 
-        /// @brief Disable Move assign.
-        Item & operator=(Item &&) = delete;
+    /// @brief Disable Move assign.
+    Item & operator=(Item &&) = delete;
 
-        /// @brief Destructor - Is a method which is automatically invoked when the object is destroyed.
-        virtual ~Item();
+    /// @brief Destructor - Is a method which is automatically invoked when the object is destroyed.
+    virtual ~Item();
 
-        /// @brief Check the correctness of the item.
-        /// @return <b>True</b> if the item has correct values,<br>
-        ///         <b>False</b> otherwise.
-        virtual bool check(bool complete = false);
+    /// @brief Check the correctness of the item.
+    /// @return <b>True</b> if the item has correct values,<br>
+    ///         <b>False</b> otherwise.
+    virtual bool check(bool complete = false);
 
-        /// @brief This function is used to remove the item from everywhere.
-        virtual void removeFromMud();
+    /// @brief This function is used to remove the item from everywhere.
+    virtual void removeFromMud();
 
-        /// @brief Create or Update the item entry on database.
-        /// @return <b>True</b> if the execution goes well,<br>
-        ///         <b>False</b> otherwise.
-        virtual bool updateOnDB();
+    /// @brief Create or Update the item entry on database.
+    /// @return <b>True</b> if the execution goes well,<br>
+    ///         <b>False</b> otherwise.
+    virtual bool updateOnDB();
 
-        /// @brief Remove the item on database.
-        /// @return <b>True</b> if the execution goes well,<br>
-        ///         <b>False</b> otherwise.
-        virtual bool removeOnDB();
+    /// @brief Remove the item on database.
+    /// @return <b>True</b> if the execution goes well,<br>
+    ///         <b>False</b> otherwise.
+    virtual bool removeOnDB();
 
-        /// @brief Fills the provided table with the information concerning the item.
-        /// @param sheet The table that has to be filled.
-        virtual void getSheet(Table & sheet) const;
+    /// @brief Fills the provided table with the information concerning the item.
+    /// @param sheet The table that has to be filled.
+    virtual void getSheet(Table & sheet) const;
 
-        /// @brief Check if the item can be deconstructed.
-        /// @param error In case the item cannot be deconstructed, error contains the reason.
-        /// @return <b>True</b> if it can be deconstructed,<br>
-        ///         <b>False</b> otherwise.
-        virtual bool canDeconstruct(std::string & error) const;
+    /// @brief Check if the item can be deconstructed.
+    /// @param error In case the item cannot be deconstructed, error contains the reason.
+    /// @return <b>True</b> if it can be deconstructed,<br>
+    ///         <b>False</b> otherwise.
+    virtual bool canDeconstruct(std::string & error) const;
 
-        /// Provides the type of item.
-        ModelType getType() const;
+    /// Provides the type of item.
+    ModelType getType() const;
 
-        /// Provides a string representing the type of item.
-        std::string getTypeName() const;
+    /// Provides a string representing the type of item.
+    std::string getTypeName() const;
 
-        /// @brief Check if the provided item can be stacked with this one.
-        /// @param item The item to check.
-        /// @return <b>True</b> if it can be stacked,<br>
-        ///         <b>False</b> otherwise.
-        bool canStackWith(Item * item) const;
+    /// @brief Check if the provided item can be stacked with this one.
+    /// @param item The item to check.
+    /// @return <b>True</b> if it can be stacked,<br>
+    ///         <b>False</b> otherwise.
+    bool canStackWith(Item * item) const;
 
-        Item * removeFromStack(Character * actor, unsigned int & _quantity);
+    Item * removeFromStack(Character * actor, unsigned int & _quantity);
 
-        /// @brief Check if the item has the desired key.
-        /// @param key The key to search.
-        /// @return <b>True</b> if the operations succeeded,<br>
-        ///         <b>False</b> Otherwise.
-        bool hasKey(std::string key);
+    /// @brief Check if the item has the desired key.
+    /// @param key The key to search.
+    /// @return <b>True</b> if the operations succeeded,<br>
+    ///         <b>False</b> Otherwise.
+    bool hasKey(std::string key);
 
-        /// @brief Provides the maximum condition of the item, given
-        ///         quality and material.
-        unsigned int getMaxCondition() const;
+    /// @brief Provides the maximum condition of the item, given
+    ///         quality and material.
+    unsigned int getMaxCondition() const;
 
-        /// @brief Trigger a decay cycle.
-        /// @return <b>True</b> if the item is destroyed,<br>
-        ///         <b>False</b> otherwise.
-        bool triggerDecay();
+    /// @brief Trigger a decay cycle.
+    /// @return <b>True</b> if the item is destroyed,<br>
+    ///         <b>False</b> otherwise.
+    bool triggerDecay();
 
-        /// @brief Provides the modifier due to the item's condition.
-        double getConditionModifier() const;
+    /// @brief Provides the modifier due to the item's condition.
+    double getConditionModifier() const;
 
-        /// @brief Get the item current condition in text.
-        /// @return The condition of the item.
-        std::string getConditionDescription();
+    /// @brief Get the item current condition in text.
+    /// @return The condition of the item.
+    std::string getConditionDescription();
 
-        /// Provides the price of the item based on its quality, material and condition.
-        virtual unsigned int getPrice() const;
+    /// Provides the price of the item based on its quality, material and condition.
+    virtual unsigned int getPrice() const;
 
-        /// @brief Get the item weight, plus eventually contained item weight.
-        /// @param entireStack If <b>true</b> this function returns the weight of the entire stack.
-        /// @return The total weight of the item.
-        virtual unsigned int getWeight(bool entireStack) const;
+    /// @brief Get the item weight, plus eventually contained item weight.
+    /// @param entireStack If <b>true</b> this function returns the weight of the entire stack.
+    /// @return The total weight of the item.
+    virtual unsigned int getWeight(bool entireStack) const;
 
-        /// @brief Return the name of the item.
-        /// @param colored If <b>true</b> the name also include formatting color.
-        /// @return The name of the item.
-        std::string getName(bool colored = false) const;
+    /// @brief Return the name of the item.
+    /// @param colored If <b>true</b> the name also include formatting color.
+    /// @return The name of the item.
+    std::string getName(bool colored = false) const;
 
-        /// @brief Return the name of the item with the first letter capitalized.
-        /// @param colored If <b>true</b> the name also include formatting color.
-        /// @return The name of the item.
-        std::string getNameCapital(bool colored = false) const;
+    /// @brief Return the name of the item with the first letter capitalized.
+    /// @param colored If <b>true</b> the name also include formatting color.
+    /// @return The name of the item.
+    std::string getNameCapital(bool colored = false) const;
 
-        /// @brief Return the description of the item.
-        /// @return The description of the item.
-        std::string getDescription();
+    /// @brief Return the description of the item.
+    /// @return The description of the item.
+    std::string getDescription();
 
-        /// @brief Provide a detailed description of the item, including it's condition.
-        /// @return A detailed description of the item.
-        std::string getLook();
+    /// @brief Provide a detailed description of the item, including it's condition.
+    /// @return A detailed description of the item.
+    std::string getLook();
 
-        /// @brief Check if the item is a node of the given type.
-        /// @param nodeType The type of node to check.
-        /// @return <b>True</b> if the node has the right node type,<br><b>False</b> otherwise.
-        bool hasNodeType(NodeType nodeType);
+    /// @brief Check if the item is a node of the given type.
+    /// @param nodeType The type of node to check.
+    /// @return <b>True</b> if the node has the right node type,<br><b>False</b> otherwise.
+    bool hasNodeType(NodeType nodeType);
 
-        /// @brief Check if the item is a valid container.
-        /// @return <b>True</b> if it is a valid container,<br>
-        ///         <b>False</b> otherwise.
-        bool isAContainer() const;
+    /// @brief Check if the item is a valid container.
+    /// @return <b>True</b> if it is a valid container,<br>
+    ///         <b>False</b> otherwise.
+    bool isAContainer() const;
 
-        /// @brief Check if the container is empty.
-        /// @return <b>True</b> if the item is empty,<br>
-        ///         <b>False</b> otherwise.
-        bool isEmpty() const;
+    /// @brief Check if the container is empty.
+    /// @return <b>True</b> if the item is empty,<br>
+    ///         <b>False</b> otherwise.
+    bool isEmpty() const;
 
-        /// @brief Return the total space of the container.
-        /// @return The total space as an integer.
-        unsigned int getTotalSpace() const;
+    /// @brief Return the total space of the container.
+    /// @return The total space as an integer.
+    unsigned int getTotalSpace() const;
 
-        /// @brief Return the used space of the container.
-        /// @return The used space as an integer.
-        unsigned int getUsedSpace() const;
+    /// @brief Return the used space of the container.
+    /// @return The used space as an integer.
+    unsigned int getUsedSpace() const;
 
-        /// @brief Return the free space inside the container.
-        /// @return The free unit of space as an integer.
-        unsigned int getFreeSpace() const;
+    /// @brief Return the free space inside the container.
+    /// @return The free unit of space as an integer.
+    unsigned int getFreeSpace() const;
 
-        /// @brief Check if this item can contain the passed one.
-        /// @param item The item to check.
-        /// @return <b>True</b> if it can be contained,<br>
-        ///         <b>False</b> otherwise.
-        bool canContain(Item * item) const;
+    /// @brief Check if this item can contain the passed one.
+    /// @param item The item to check.
+    /// @return <b>True</b> if it can be contained,<br>
+    ///         <b>False</b> otherwise.
+    bool canContain(Item * item) const;
 
-        /// @brief Load an item inside the container and update the database.
-        /// @param item     The item to load in.
-        /// @param updateDB If the action has to be updated on the database.
-        void putInside(Item * & item, bool updateDB = true);
+    /// @brief Load an item inside the container and update the database.
+    /// @param item     The item to load in.
+    /// @param updateDB If the action has to be updated on the database.
+    void putInside(Item *& item, bool updateDB = true);
 
-        /// @brief Extract an item from the container.
-        /// @param item The item to load in.
-        /// @param updateDB If the action has to be updated on the database.
-        /// @return <b>True</b> if the item has been taken out,<br>
-        ///         <b>False</b> otherwise.
-        bool takeOut(Item * item, bool updateDB = true);
+    /// @brief Extract an item from the container.
+    /// @param item The item to load in.
+    /// @param updateDB If the action has to be updated on the database.
+    /// @return <b>True</b> if the item has been taken out,<br>
+    ///         <b>False</b> otherwise.
+    bool takeOut(Item * item, bool updateDB = true);
 
-        /// @brief Check if this item can contain the passed one.
-        /// @param liquid  The liquid to pour in.
-        /// @param ammount The ammount of liquid.
-        /// @return <b>True</b> if it can be contained,<br>
-        ///         <b>False</b> otherwise.
-        bool canContain(Liquid * liquid, const unsigned int & ammount) const;
+    /// @brief Check if this item can contain the passed one.
+    /// @param liquid  The liquid to pour in.
+    /// @param ammount The ammount of liquid.
+    /// @return <b>True</b> if it can be contained,<br>
+    ///         <b>False</b> otherwise.
+    bool canContain(Liquid * liquid, const unsigned int & ammount) const;
 
-        /// @brief Load some liquid inside the container and update the database.
-        /// @param liquid   The liquid to load in.
-        /// @param ammount  The ammount of liquid.
-        /// @param updateDB If the action has to be updated on the database.
-        /// @return <b>True</b> if the operation is a success,<br>
-        ///         <b>False</b> otherwise.
-        bool pourIn(Liquid * liquid, const unsigned int & ammount, bool updateDB = true);
+    /// @brief Load some liquid inside the container and update the database.
+    /// @param liquid   The liquid to load in.
+    /// @param ammount  The ammount of liquid.
+    /// @param updateDB If the action has to be updated on the database.
+    /// @return <b>True</b> if the operation is a success,<br>
+    ///         <b>False</b> otherwise.
+    bool pourIn(Liquid * liquid, const unsigned int & ammount, bool updateDB = true);
 
-        /// @brief Extract some liquid from the container and update the database.
-        /// @param ammount  The ammount of liquid.
-        /// @param updateDB If the action has to be updated on the database.
-        /// @return <b>True</b> if the operation is a success,<br><b>False</b> otherwise.
-        bool pourOut(const unsigned int & ammount, bool updateDB = true);
+    /// @brief Extract some liquid from the container and update the database.
+    /// @param ammount  The ammount of liquid.
+    /// @param updateDB If the action has to be updated on the database.
+    /// @return <b>True</b> if the operation is a success,<br><b>False</b> otherwise.
+    bool pourOut(const unsigned int & ammount, bool updateDB = true);
 
-        /// @brief Search for the item inside the container.
-        /// @param search_parameter The item to search.
-        /// @param number           Position of the item we want to look for.
-        /// @return The item, if it's in the container.
-        Item * findContent(std::string search_parameter, int & number);
+    /// @brief Search for the item inside the container.
+    /// @param search_parameter The item to search.
+    /// @param number           Position of the item we want to look for.
+    /// @return The item, if it's in the container.
+    Item * findContent(std::string search_parameter, int & number);
 
-        /// @brief Return the description of the content.
-        /// @return The string describing the content.
-        virtual std::string lookContent();
+    /// @brief Return the description of the content.
+    /// @return The string describing the content.
+    virtual std::string lookContent();
 
-        /// @brief Set the equipment slot where this item must be weared.
-        /// @param _currentSlot The new equipment slot.
-        void setCurrentSlot(EquipmentSlot _currentSlot);
+    /// @brief Set the equipment slot where this item must be weared.
+    /// @param _currentSlot The new equipment slot.
+    void setCurrentSlot(EquipmentSlot _currentSlot);
 
-        /// @brief Return the current equipment slot.
-        /// @return The equipment slot.
-        EquipmentSlot getCurrentSlot();
+    /// @brief Return the current equipment slot.
+    /// @return The equipment slot.
+    EquipmentSlot getCurrentSlot();
 
-        /// @brief Return the current equipment slot name.
-        /// @return The equipment slot name.
-        std::string getCurrentSlotName();
+    /// @brief Return the current equipment slot name.
+    /// @return The equipment slot name.
+    std::string getCurrentSlotName();
 
-        /// @brief Returns the model <b>statically</b> casted to Shop.
-        ShopItem * toShopItem();
-        /// @brief Returns the model <b>statically</b> casted to Armor.
-        ArmorItem * toArmorItem();
-        /// @brief Returns the model <b>statically</b> casted to Weapon.
-        WeaponItem * toWeaponItem();
-        /// @brief Returns the model <b>statically</b> casted to Currency.
-        CurrencyItem * toCurrencyItem();
-        /// @brief Returns the model <b>statically</b> casted to Currency.
-        CorpseItem * toCorpseItem();
+    /// @brief Returns the model <b>statically</b> casted to Shop.
+    ShopItem * toShopItem();
 
-        /// @brief Function used to register inside the lua environment the class.
-        /// @param L The lua environment.
-        static void luaRegister(lua_State * L);
+    /// @brief Returns the model <b>statically</b> casted to Armor.
+    ArmorItem * toArmorItem();
 
-        /// @brief Operator used to order the items based on their name.
-        bool operator<(Item & rhs) const;
+    /// @brief Returns the model <b>statically</b> casted to Weapon.
+    WeaponItem * toWeaponItem();
+
+    /// @brief Returns the model <b>statically</b> casted to Currency.
+    CurrencyItem * toCurrencyItem();
+
+    /// @brief Returns the model <b>statically</b> casted to Currency.
+    CorpseItem * toCorpseItem();
+
+    /// @brief Function used to register inside the lua environment the class.
+    /// @param L The lua environment.
+    static void luaRegister(lua_State * L);
+
+    /// @brief Operator used to order the items based on their name.
+    bool operator<(Item & rhs) const;
 };
 
 /// @brief Function which instantiate the item of the same type of the passed model.

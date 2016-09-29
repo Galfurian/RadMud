@@ -36,9 +36,9 @@ void WeaponItem::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow( { "Min Damage", ToString(this->getMinDamage()) });
-    sheet.addRow( { "Max Damage", ToString(this->getMaxDamage()) });
-    sheet.addRow( { "Range     ", ToString(this->getRange()) });
+    sheet.addRow({"Min Damage", ToString(this->getMinDamage())});
+    sheet.addRow({"Max Damage", ToString(this->getMaxDamage())});
+    sheet.addRow({"Range     ", ToString(this->getRange())});
 }
 
 unsigned int WeaponItem::rollDamage() const

@@ -23,10 +23,10 @@
 #include "model/currencyModel.hpp"
 
 Faction::Faction() :
-        vnum(),
-        name(),
-        description(),
-        currency()
+    vnum(),
+    name(),
+    description(),
+    currency()
 {
     // Nothing to do.
 }
@@ -51,10 +51,10 @@ void Faction::getSheet(Table & sheet) const
     sheet.addColumn("Attribute", StringAlign::Left);
     sheet.addColumn("Value", StringAlign::Left);
     // Set the values.
-    sheet.addRow( { "Vnum", ToString(this->vnum) });
-    sheet.addRow( { "Name", this->name });
-    sheet.addRow( { "Description", this->description });
-    sheet.addRow( { "Currency", currency->getName() + " (" + ToString(currency->vnum) + ")" });
+    sheet.addRow({"Vnum", ToString(this->vnum)});
+    sheet.addRow({"Name", this->name});
+    sheet.addRow({"Description", this->description});
+    sheet.addRow({"Currency", currency->getName() + " (" + ToString(currency->vnum) + ")"});
 }
 
 std::string Faction::getName()
@@ -70,8 +70,8 @@ std::string Faction::getNameCapital()
 void Faction::luaRegister(lua_State * L)
 {
     luabridge::getGlobalNamespace(L) //
-    .beginClass<Faction>("Faction") //
-    .addData("vnum", &Faction::vnum) //
-    .addData("name", &Faction::name) //
-    .endClass();
+        .beginClass<Faction>("Faction") //
+        .addData("vnum", &Faction::vnum) //
+        .addData("name", &Faction::name) //
+        .endClass();
 }

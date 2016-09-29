@@ -21,18 +21,18 @@
 #include "mud.hpp"
 
 Production::Production() :
-        vnum(-1),
-        name(),
-        profession(),
-        difficulty(),
-        time(),
-        assisted(),
-        outcome(),
-        quantity(),
-        tools(),
-        ingredients(),
-        workbench(ToolType::NoType),
-        material(ResourceType::NoType)
+    vnum(-1),
+    name(),
+    profession(),
+    difficulty(),
+    time(),
+    assisted(),
+    outcome(),
+    quantity(),
+    tools(),
+    ingredients(),
+    workbench(ToolType::NoType),
+    material(ResourceType::NoType)
 {
     // Nothing to do.
 }

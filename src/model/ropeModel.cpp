@@ -19,8 +19,8 @@
 #include "ropeModel.hpp"
 
 RopeModel::RopeModel() :
-        difficulty(),
-        ropeType()
+    difficulty(),
+    ropeType()
 {
     // Nothing to do.
 }
@@ -65,6 +65,6 @@ void RopeModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow( { "Untie Difficulty", ToString(this->difficulty) });
-    sheet.addRow( { "Rope Type", ToString(this->ropeType) });
+    sheet.addRow({"Untie Difficulty", ToString(this->difficulty)});
+    sheet.addRow({"Rope Type", ToString(this->ropeType)});
 }

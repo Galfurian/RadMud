@@ -41,13 +41,13 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmessage-length=0")
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-if(COMPILER_SUPPORTS_CXX11)
+if (COMPILER_SUPPORTS_CXX11)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-elseif(COMPILER_SUPPORTS_CXX0X)
+elseif (COMPILER_SUPPORTS_CXX0X)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-else()
+else ()
     message(FATAL_ERROR "Compiler ${CMAKE_CXX_COMPILER} has no C++11 support.")
-endif()
+endif ()
 
 #################################################
 # Add cmake modules folder...
@@ -72,67 +72,67 @@ add_subdirectory(src/structure)
 #################################################
 # Add project sources...
 set(PROJECT_SRC
-    ./src/building.cpp
-    ./src/defines.cpp
-    ./src/effect.cpp
-    ./src/faction.cpp
-    ./src/generator.cpp
-    ./src/liquid.cpp
-    ./src/main.cpp
-    ./src/material.cpp
-    ./src/mud.cpp
-    ./src/production.cpp
-    ./src/profession.cpp
-    ./src/race.cpp
-    ./src/skill.cpp
-    ./src/updater.cpp
-    ./src/utils.cpp
-    ./src/formatter.cpp
-    ./src/opponent.cpp
-    ./src/protocol.cpp
-    ${RADMUD_LUA_SRC}
-    ${RADMUD_ITEM_SRC}
-    ${RADMUD_MODEL_SRC}
-    ${RADMUD_ACTION_SRC}
-    ${RADMUD_SQLITE_SRC}
-    ${RADMUD_COMMAND_SRC}
-    ${RADMUD_CHARACTER_SRC}
-    ${RADMUD_UTILITIES_SRC}
-    ${RADMUD_STRUCTURE_SRC}
-)
+        ./src/building.cpp
+        ./src/defines.cpp
+        ./src/effect.cpp
+        ./src/faction.cpp
+        ./src/generator.cpp
+        ./src/liquid.cpp
+        ./src/main.cpp
+        ./src/material.cpp
+        ./src/mud.cpp
+        ./src/production.cpp
+        ./src/profession.cpp
+        ./src/race.cpp
+        ./src/skill.cpp
+        ./src/updater.cpp
+        ./src/utils.cpp
+        ./src/formatter.cpp
+        ./src/opponent.cpp
+        ./src/protocol.cpp
+        ${RADMUD_LUA_SRC}
+        ${RADMUD_ITEM_SRC}
+        ${RADMUD_MODEL_SRC}
+        ${RADMUD_ACTION_SRC}
+        ${RADMUD_SQLITE_SRC}
+        ${RADMUD_COMMAND_SRC}
+        ${RADMUD_CHARACTER_SRC}
+        ${RADMUD_UTILITIES_SRC}
+        ${RADMUD_STRUCTURE_SRC}
+        )
 
 #################################################
 # Add project includes...
 include_directories(
-	${LUA_INCLUDE_DIR}
-	${ZLIB_INCLUDE_DIR}
-	${SQLITE3_INCLUDE_DIR}
-	${RADMUD_STRUCTURE_INC}
-	${RADMUD_UTILITIES_INC}
-    ${RADMUD_CHARACTER_INC}
-    ${RADMUD_COMMAND_INC}
-	${RADMUD_SQLITE_INC}
-    ${RADMUD_ACTION_INC}
-	${RADMUD_MODEL_INC}
-    ${RADMUD_ITEM_INC}
-	${RADMUD_LUA_INC}
-	./src
+        ${LUA_INCLUDE_DIR}
+        ${ZLIB_INCLUDE_DIR}
+        ${SQLITE3_INCLUDE_DIR}
+        ${RADMUD_STRUCTURE_INC}
+        ${RADMUD_UTILITIES_INC}
+        ${RADMUD_CHARACTER_INC}
+        ${RADMUD_COMMAND_INC}
+        ${RADMUD_SQLITE_INC}
+        ${RADMUD_ACTION_INC}
+        ${RADMUD_MODEL_INC}
+        ${RADMUD_ITEM_INC}
+        ${RADMUD_LUA_INC}
+        ./src
 )
 
 #################################################
 # Add the executable...
 add_executable(
-	${PROJECT_NAME}
-	${PROJECT_SRC}
+        ${PROJECT_NAME}
+        ${PROJECT_SRC}
 )
 
 #################################################
 # Link the libraries...
 target_link_libraries(
-	${PROJECT_NAME}
-	${LUA_LIBRARIES}
-	${SQLITE3_LIBRARY}
-	pthread
-	dl
-	z
+        ${PROJECT_NAME}
+        ${LUA_LIBRARIES}
+        ${SQLITE3_LIBRARY}
+        pthread
+        dl
+        z
 )

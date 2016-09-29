@@ -21,42 +21,39 @@
 #include "itemModel.hpp"
 
 /// Used to determine the flag of the container.
-typedef enum class ContainerFlags
+typedef enum class ContainerFlag_t
 {
-    /// No flag.
-    None = 0,
-    /// Can be closed.
-    CanClose = 1,
-    /// Can be burgled.
-    CanBurgle = 2,
-    /// Can see inside even if closed.
-    CanSee = 4,
+    None = 0,       ///< No flag.
+    CanClose = 1,   ///< Can be closed.
+    CanBurgle = 2,  ///< Can be burgled.
+    CanSee = 4,     ///< Can see inside even if closed.
 } ContainerFlag;
 
 /// @brief Model of a container of objects.
-class ContainerModel: public ItemModel
+class ContainerModel :
+    public ItemModel
 {
-    public:
-        /// The maximum weight which this container can carry.
-        unsigned int maxWeight;
-        /// The flags of the container.
-        unsigned int containerFlags;
-        /// The vnum of the key which opens this container.
-        unsigned int keyVnum;
-        /// The lockpicking difficulty.
-        unsigned int difficulty;
+public:
+    /// The maximum weight which this container can carry.
+    unsigned int maxWeight;
+    /// The flags of the container.
+    unsigned int containerFlags;
+    /// The vnum of the key which opens this container.
+    unsigned int keyVnum;
+    /// The lockpicking difficulty.
+    unsigned int difficulty;
 
-        ContainerModel();
+    ContainerModel();
 
-        virtual ~ContainerModel();
+    virtual ~ContainerModel();
 
-        virtual ModelType getType() const;
+    virtual ModelType getType() const;
 
-        virtual std::string getTypeName() const;
+    virtual std::string getTypeName() const;
 
-        virtual bool setModel(const std::string & source);
+    virtual bool setModel(const std::string & source);
 
-        virtual void getSheet(Table & sheet) const;
+    virtual void getSheet(Table & sheet) const;
 };
 
 /// @addtogroup FlagsToList

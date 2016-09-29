@@ -19,8 +19,8 @@
 #include "projectileModel.hpp"
 
 ProjectileModel::ProjectileModel() :
-        damageBonus(),
-        rangeBonus()
+    damageBonus(),
+    rangeBonus()
 {
     // Nothing to do.
 }
@@ -68,6 +68,6 @@ void ProjectileModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow( { "Damage Bonus", ToString(this->damageBonus) });
-    sheet.addRow( { "Range  Bonus", ToString(this->rangeBonus) });
+    sheet.addRow({"Damage Bonus", ToString(this->damageBonus)});
+    sheet.addRow({"Range  Bonus", ToString(this->rangeBonus)});
 }

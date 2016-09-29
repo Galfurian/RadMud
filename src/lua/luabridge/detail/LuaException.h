@@ -23,72 +23,73 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 /// SOFTWARE.
 
-class LuaException: public std::exception
+class LuaException :
+    public std::exception
 {
-    private:
-        lua_State* m_L;
-        std::string m_what;
+private:
+    lua_State * m_L;
+    std::string m_what;
 
-    public:
-        /// @brief Construct a LuaException after a lua_pcall().
-        LuaException(lua_State * L, int) :
-                m_L(L)
+public:
+    /// @brief Construct a LuaException after a lua_pcall().
+    LuaException(lua_State * L, int) :
+        m_L(L)
+    {
+        this->whatFromStack();
+    }
+
+    /// @brief Constructor.
+    LuaException(lua_State * L, char const *, char const *, long) :
+        m_L(L)
+    {
+        this->whatFromStack();
+    }
+
+    virtual ~LuaException() noexcept
+    {
+        // Nothing to do.
+    }
+
+    virtual char const * what() const noexcept
+    {
+        return m_what.c_str();
+    }
+
+    /// @brief Throw an exception.
+    /// @details
+    /// This centralizes all the exceptions thrown, so that we can set
+    ///  breakpoints before the stack is unwound, or otherwise customize the
+    ///  behavior.
+    template<class Exception>
+    static void Throw(Exception e)
+    {
+        throw e;
+    }
+
+    /// @brief Wrapper for lua_pcall that throws.
+    static void pcall(lua_State * L, int nargs = 0, int nresults = 0, int msgh = 0)
+    {
+        int code = lua_pcall(L, nargs, nresults, msgh);
+        if (code != LUABRIDGE_LUA_OK)
         {
-            this->whatFromStack();
+            Throw(LuaException(L, code));
         }
+    }
 
-        /// @brief Constructor.
-        LuaException(lua_State * L, char const *, char const *, long) :
-                m_L(L)
+protected:
+
+    /// @brief Retrieves the error from the stack.
+    void whatFromStack()
+    {
+        if (lua_gettop(m_L) > 0)
         {
-            this->whatFromStack();
+            char const * s = lua_tostring(m_L, -1);
+            m_what = s ? s : "";
         }
-
-        virtual ~LuaException() noexcept
+        else
         {
-            // Nothing to do.
+            // stack is empty
+            m_what = "missing error";
         }
-
-        virtual char const * what() const noexcept
-        {
-            return m_what.c_str();
-        }
-
-        /// @brief Throw an exception.
-        /// @details
-        /// This centralizes all the exceptions thrown, so that we can set
-        ///  breakpoints before the stack is unwound, or otherwise customize the
-        ///  behavior.
-        template<class Exception>
-        static void Throw(Exception e)
-        {
-            throw e;
-        }
-
-        /// @brief Wrapper for lua_pcall that throws.
-        static void pcall(lua_State * L, int nargs = 0, int nresults = 0, int msgh = 0)
-        {
-            int code = lua_pcall(L, nargs, nresults, msgh);
-            if (code != LUABRIDGE_LUA_OK)
-            {
-                Throw(LuaException(L, code));
-            }
-        }
-
-    protected:
-
-        /// @brief Retrieves the error from the stack.
-        void whatFromStack()
-        {
-            if (lua_gettop(m_L) > 0)
-            {
-                char const* s = lua_tostring(m_L, -1);
-                m_what = s ? s : "";
-            }
-            else
-            {
-                // stack is empty
-                m_what = "missing error";
-            }
-        }
+    }
 };

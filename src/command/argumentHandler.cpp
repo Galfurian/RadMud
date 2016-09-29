@@ -19,16 +19,16 @@
 #include "../utils.hpp"
 
 ArgumentHandler::ArgumentHandler(const std::string & _original) :
-        original(_original),
-        arguments()
+    original(_original),
+    arguments()
 {
     // First, evaluate the arguments.
     this->evaluateArguments();
 }
 
 ArgumentHandler::ArgumentHandler(std::istream & _original) :
-        original(),
-        arguments()
+    original(),
+    arguments()
 {
     // First, get the content.
     std::getline(_original, original);

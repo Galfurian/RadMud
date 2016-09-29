@@ -80,7 +80,7 @@ void DoSay(Character * character, ArgumentHandler & args)
     auto receiver = character->room->findCharacter(
         args.get(0).getContent(),
         args.get(0).getIndex(),
-        { character });
+        {character});
     if (receiver != nullptr)
     {
         // Get the rest of the message, minus the first word.
@@ -107,7 +107,7 @@ void DoSay(Character * character, ArgumentHandler & args)
         // Send the message inside the room.
         character->room->sendToAll(
             "%s says to %s, \"%s\".\n",
-            { character, receiver },
+            {character, receiver},
             character->getName(),
             receiver->getName(),
             Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
@@ -125,7 +125,7 @@ void DoSay(Character * character, ArgumentHandler & args)
         // Send the message inside the room.
         character->room->sendToAll(
             "%s says \"%s\".\n",
-            { character },
+            {character},
             character->getName(),
             Formatter::cyan() + Formatter::italic() + args.getOriginal() + Formatter::reset());
     }
@@ -140,7 +140,7 @@ void DoWhisper(Character * character, ArgumentHandler & args)
     }
     // Check the existance of the target character.
     auto receiver = character->room->findCharacter(args[0].getContent(), args[0].getIndex(), {
-        character });
+        character});
     if (receiver == nullptr)
     {
         character->sendMsg("You don't see %s here.\n", args[0].getContent());
@@ -180,7 +180,7 @@ void DoEmote(Character * character, ArgumentHandler & args)
     character->sendMsg("%sYou %s\n", Formatter::yellow(), args.getOriginal() + Formatter::reset());
     character->room->sendToAll(
         "%s %s\n",
-        { character },
+        {character},
         Formatter::yellow() + character->getName(),
         args.getOriginal() + Formatter::reset());
 }

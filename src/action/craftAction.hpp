@@ -23,76 +23,77 @@
 #include "../production.hpp"
 
 /// @brief An action executed by characters when crafting new objects.
-class CraftAction: public GeneralAction
+class CraftAction :
+    public GeneralAction
 {
-    private:
-        /// The production associated with the action.
-        Production * production;
-        /// The material of which the production will be made of.
-        Material * material;
-        /// The tool used by the actor for the action.
-        std::vector<Item *> tools;
-        /// The ingredients used by the actor for the action.
-        std::vector<std::pair<Item *, unsigned int>> ingredients;
+private:
+    /// The production associated with the action.
+    Production * production;
+    /// The material of which the production will be made of.
+    Material * material;
+    /// The tool used by the actor for the action.
+    std::vector<Item *> tools;
+    /// The ingredients used by the actor for the action.
+    std::vector<std::pair<Item *, unsigned int>> ingredients;
 
-    public:
-        /// @brief Constructor.
-        /// @param _actor       The actor who is doing the action.
-        /// @param _production  A pointer to the production to craft.
-        /// @param _material    The material of the outcome.
-        /// @param _tools       The list of used tools.
-        /// @param _ingredients The list of used ingredients.
-        /// @param _cooldown    How many seconds are required to complete the action.
-        CraftAction(
-            Character * _actor,
-            Production * _production,
-            Material * _material,
-            std::vector<Item *> & _tools,
-            std::vector<std::pair<Item *, unsigned int>> & _ingredients,
-            unsigned int & _cooldown);
+public:
+    /// @brief Constructor.
+    /// @param _actor       The actor who is doing the action.
+    /// @param _production  A pointer to the production to craft.
+    /// @param _material    The material of the outcome.
+    /// @param _tools       The list of used tools.
+    /// @param _ingredients The list of used ingredients.
+    /// @param _cooldown    How many seconds are required to complete the action.
+    CraftAction(
+        Character * _actor,
+        Production * _production,
+        Material * _material,
+        std::vector<Item *> & _tools,
+        std::vector<std::pair<Item *, unsigned int>> & _ingredients,
+        unsigned int & _cooldown);
 
-        /// @brief Destructor.
-        virtual ~CraftAction();
+    /// @brief Destructor.
+    virtual ~CraftAction();
 
-        /// @brief Checks the correctness of the action's values.
-        /// @return <b>True</b> if it has correct values,<br>
-        ///         <b>False</b> otherwise.
-        virtual bool check() const;
+    /// @brief Checks the correctness of the action's values.
+    /// @return <b>True</b> if it has correct values,<br>
+    ///         <b>False</b> otherwise.
+    virtual bool check() const;
 
-        /// @brief Provides the type of the action.
-        /// @return The type of action.
-        virtual ActionType getType() const;
+    /// @brief Provides the type of the action.
+    /// @return The type of action.
+    virtual ActionType getType() const;
 
-        /// @brief Provides the description of the action.
-        /// @return The string which describe the current action.
-        virtual std::string getDescription() const;
+    /// @brief Provides the description of the action.
+    /// @return The string which describe the current action.
+    virtual std::string getDescription() const;
 
-        /// @brief Stops the current action and returns a string which describe the intterruption.
-        /// @return The stopping description.
-        virtual std::string stop();
+    /// @brief Stops the current action and returns a string which describe the intterruption.
+    /// @return The stopping description.
+    virtual std::string stop();
 
-        /// @brief Performs the current action.
-        /// @return the status after performing the action.
-        virtual ActionStatus perform();
+    /// @brief Performs the current action.
+    /// @return the status after performing the action.
+    virtual ActionStatus perform();
 
-    private:
-        /// @brief Checks the production.
-        /// @return <b>True</b> if the production is available,<br>
-        ///         <b>False</b> otherwise.
-        bool checkProduction() const;
+private:
+    /// @brief Checks the production.
+    /// @return <b>True</b> if the production is available,<br>
+    ///         <b>False</b> otherwise.
+    bool checkProduction() const;
 
-        /// @brief Checks the material.
-        /// @return <b>True</b> if the material is available,<br>
-        ///         <b>False</b> otherwise.
-        bool checkMaterial() const;
+    /// @brief Checks the material.
+    /// @return <b>True</b> if the material is available,<br>
+    ///         <b>False</b> otherwise.
+    bool checkMaterial() const;
 
-        /// @brief Checks the ingredients.
-        /// @return <b>True</b> if the ingredients are available,<br>
-        ///         <b>False</b> otherwise.
-        bool checkIngredients() const;
+    /// @brief Checks the ingredients.
+    /// @return <b>True</b> if the ingredients are available,<br>
+    ///         <b>False</b> otherwise.
+    bool checkIngredients() const;
 
-        /// @brief Checks the used tools.
-        /// @return <b>True</b> if the tools are available,<br>
-        ///         <b>False</b> otherwise.
-        bool checkTools() const;
+    /// @brief Checks the used tools.
+    /// @return <b>True</b> if the tools are available,<br>
+    ///         <b>False</b> otherwise.
+    bool checkTools() const;
 };

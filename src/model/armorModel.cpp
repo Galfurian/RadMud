@@ -21,9 +21,9 @@
 #include "../mud.hpp"
 
 ArmorModel::ArmorModel() :
-        size(),
-        armorClass(),
-        allowedAnatomy()
+    size(),
+    armorClass(),
+    allowedAnatomy()
 {
     // Nothing to do.
 }
@@ -72,9 +72,9 @@ void ArmorModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow( { "Size", GetArmorSizeName(this->size) });
-    sheet.addRow( { "Armor Class", ToString(this->armorClass) });
-    sheet.addRow( { "Allowed Anatomies", ToString(this->allowedAnatomy) });
+    sheet.addRow({"Size", GetArmorSizeName(this->size)});
+    sheet.addRow({"Armor Class", ToString(this->armorClass)});
+    sheet.addRow({"Allowed Anatomies", ToString(this->allowedAnatomy)});
 }
 
 std::string GetArmorSizeName(ArmorSize armorSize)

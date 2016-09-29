@@ -20,18 +20,19 @@
 #include "item.hpp"
 
 /// @brief Holds details about a corpse.
-class CorpseItem: public Item
+class CorpseItem :
+    public Item
 {
-    public:
-        CorpseItem();
+public:
+    CorpseItem();
 
-        virtual ~CorpseItem();
+    virtual ~CorpseItem();
 
-        virtual void removeFromMud();
+    virtual void removeFromMud();
 
-        virtual bool updateOnDB();
+    virtual bool updateOnDB();
 
-        virtual bool removeOnDB();
+    virtual bool removeOnDB();
 
-        virtual void getSheet(Table & sheet) const;
+    virtual void getSheet(Table & sheet) const;
 };

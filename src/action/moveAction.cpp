@@ -26,9 +26,9 @@ MoveAction::MoveAction(
     Room * _destination,
     Direction _direction,
     unsigned int _cooldown) :
-        GeneralAction(_actor, system_clock::now() + seconds(_cooldown)),
-        destination(_destination),
-        direction(_direction)
+    GeneralAction(_actor, system_clock::now() + seconds(_cooldown)),
+    destination(_destination),
+    direction(_direction)
 {
     Logger::log(LogLevel::Debug, "Created move action.");
 }

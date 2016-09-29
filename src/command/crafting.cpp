@@ -149,7 +149,7 @@ void DoProfession(Character * character, Profession * profession, ArgumentHandle
         Formatter::yellow() + production->outcome->getName() + Formatter::reset());
     character->room->sendToAll(
         "%s has started %s something...\n",
-        { character },
+        {character},
         character->getNameCapital(),
         production->profession->action);
 }
@@ -263,7 +263,7 @@ void DoBuild(Character * character, ArgumentHandler & args)
     // Send the message inside the room.
     character->room->sendToAll(
         "%s has started building something...\n",
-        { character },
+        {character},
         character->getNameCapital());
 }
 

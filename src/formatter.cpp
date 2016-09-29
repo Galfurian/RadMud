@@ -61,6 +61,7 @@ std::string Formatter::doDrawMap()
     }
     return output;
 }
+
 std::string Formatter::dontDrawMap()
 {
     std::string output;
@@ -98,6 +99,7 @@ std::string Formatter::cursorHome()
         return "\u001b[H";
     }
 }
+
 std::string Formatter::clearScreen()
 {
     if (getFormat() == Format::TELNET)
@@ -121,6 +123,7 @@ std::string Formatter::bold()
         return "\u001B[1m";
     }
 }
+
 std::string Formatter::italic()
 {
     if (getFormat() == Format::TELNET)
@@ -144,6 +147,7 @@ std::string Formatter::black()
         return "\u001B[0;30m";
     }
 }
+
 std::string Formatter::red()
 {
     if (getFormat() == Format::TELNET)
@@ -155,6 +159,7 @@ std::string Formatter::red()
         return "\u001B[0;31m";
     }
 }
+
 std::string Formatter::green()
 {
     if (getFormat() == Format::TELNET)
@@ -166,6 +171,7 @@ std::string Formatter::green()
         return "\u001B[0;32m";
     }
 }
+
 std::string Formatter::brown()
 {
     if (getFormat() == Format::TELNET)
@@ -177,6 +183,7 @@ std::string Formatter::brown()
         return "\u001B[0;33m";
     }
 }
+
 std::string Formatter::yellow()
 {
     if (getFormat() == Format::TELNET)
@@ -188,6 +195,7 @@ std::string Formatter::yellow()
         return "\u001B[1;33m";
     }
 }
+
 std::string Formatter::blue()
 {
     if (getFormat() == Format::TELNET)
@@ -199,6 +207,7 @@ std::string Formatter::blue()
         return "\u001B[0;34m";
     }
 }
+
 std::string Formatter::magenta()
 {
     if (getFormat() == Format::TELNET)
@@ -210,6 +219,7 @@ std::string Formatter::magenta()
         return "\u001B[0;35m";
     }
 }
+
 std::string Formatter::cyan()
 {
     if (getFormat() == Format::TELNET)
@@ -221,6 +231,7 @@ std::string Formatter::cyan()
         return "\u001B[0;36m";
     }
 }
+
 std::string Formatter::gray()
 {
     if (getFormat() == Format::TELNET)
@@ -232,6 +243,7 @@ std::string Formatter::gray()
         return "\u001B[0;37m";
     }
 }
+
 std::string Formatter::darkGray()
 {
     if (getFormat() == Format::TELNET)

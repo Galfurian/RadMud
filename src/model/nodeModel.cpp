@@ -19,8 +19,8 @@
 #include "nodeModel.hpp"
 
 NodeModel::NodeModel() :
-        nodeType(),
-        provides()
+    nodeType(),
+    provides()
 {
     // Nothing to do.
 }
@@ -65,8 +65,8 @@ void NodeModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow( { "Node Type", GetNodeTypeName(this->nodeType) });
-    sheet.addRow( { "Provides", ToString(this->provides) });
+    sheet.addRow({"Node Type", GetNodeTypeName(this->nodeType)});
+    sheet.addRow({"Provides", ToString(this->provides)});
 }
 
 std::string GetNodeTypeName(NodeType type)

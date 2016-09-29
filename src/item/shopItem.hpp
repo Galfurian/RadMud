@@ -21,57 +21,58 @@
 #include "../character/mobile.hpp"
 
 /// @brief Holds details about shops.
-class ShopItem: public Item
+class ShopItem :
+    public Item
 {
-    public:
-        /// The name of the shop.
-        std::string shopName;
-        /// The tax applied to each good which is bought.
-        unsigned int shopBuyTax;
-        /// The tax applied to each good which is sold.
-        unsigned int shopSellTax;
-        /// The shop balance.
-        unsigned int balance;
-        /// The mobile which is managing the shop.
-        Mobile * shopKeeper;
+public:
+    /// The name of the shop.
+    std::string shopName;
+    /// The tax applied to each good which is bought.
+    unsigned int shopBuyTax;
+    /// The tax applied to each good which is sold.
+    unsigned int shopSellTax;
+    /// The shop balance.
+    unsigned int balance;
+    /// The mobile which is managing the shop.
+    Mobile * shopKeeper;
 
-        /// @brief Constructor.
-        ShopItem();
+    /// @brief Constructor.
+    ShopItem();
 
-        virtual ~ShopItem();
+    virtual ~ShopItem();
 
-        virtual bool check(bool complete = false);
+    virtual bool check(bool complete = false);
 
-        virtual bool updateOnDB();
+    virtual bool updateOnDB();
 
-        virtual bool removeOnDB();
+    virtual bool removeOnDB();
 
-        virtual void getSheet(Table & sheet) const;
+    virtual void getSheet(Table & sheet) const;
 
-        virtual bool canDeconstruct(std::string & error) const;
+    virtual bool canDeconstruct(std::string & error) const;
 
-        virtual std::string lookContent();
+    virtual std::string lookContent();
 
-        /// @brief Allows to set the new shop keeper.
-        /// @param _shopKeeper The new shop keeper.
-        void setNewShopKeeper(Mobile * _shopKeeper);
+    /// @brief Allows to set the new shop keeper.
+    /// @param _shopKeeper The new shop keeper.
+    void setNewShopKeeper(Mobile * _shopKeeper);
 
-        /// @brief Provides the balance of the shop.
-        unsigned int getBalance() const;
+    /// @brief Provides the balance of the shop.
+    unsigned int getBalance() const;
 
-        /// Check if the shop can be used.
-        /// @param error In case it cannot be used, the reason is stored in this variable.
-        /// @return <b>True</b> if it can be used,<br>
-        ///         <b>False</b> otherwise.
-        bool canUse(std::string & error);
+    /// Check if the shop can be used.
+    /// @param error In case it cannot be used, the reason is stored in this variable.
+    /// @return <b>True</b> if it can be used,<br>
+    ///         <b>False</b> otherwise.
+    bool canUse(std::string & error);
 
-        /// @brief Applies the buy tax to the item's price.
-        /// @param item The item that has to be priced.
-        /// @return The buy price with applied the taxes.
-        unsigned int evaluateBuyPrice(Item * item);
+    /// @brief Applies the buy tax to the item's price.
+    /// @param item The item that has to be priced.
+    /// @return The buy price with applied the taxes.
+    unsigned int evaluateBuyPrice(Item * item);
 
-        /// @brief Applies the sell tax to the item's price.
-        /// @param item The item that has to be priced.
-        /// @return The sell price with applied the taxes.
-        unsigned int evaluateSellPrice(Item * item);
+    /// @brief Applies the sell tax to the item's price.
+    /// @param item The item that has to be priced.
+    /// @return The sell price with applied the taxes.
+    unsigned int evaluateSellPrice(Item * item);
 };

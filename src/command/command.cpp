@@ -106,17 +106,17 @@ void ProcessPlayerName(Character * character, ArgumentHandler & args)
     {
         AdvanceCharacterCreation(character, ConnectionState::AwaitingName, "Name cannot be blank.");
     }
-    // Check if the player has typed new.
+        // Check if the player has typed new.
     else if (ToLower(input) == "new")
     {
         AdvanceCharacterCreation(player, ConnectionState::AwaitingNewName);
     }
-    // Check if the user want to quit.
+        // Check if the user want to quit.
     else if (input == "quit")
     {
         player->closeConnection();
     }
-    // Check if the give name contains valid characters.
+        // Check if the give name contains valid characters.
     else if (input.find_first_not_of(kValidPlayerName) != std::string::npos)
     {
         AdvanceCharacterCreation(
@@ -124,7 +124,7 @@ void ProcessPlayerName(Character * character, ArgumentHandler & args)
             ConnectionState::AwaitingName,
             "That player name contains disallowed characters.");
     }
-    // Check if the player is already connected.
+        // Check if the player is already connected.
     else if (Mud::instance().findPlayer(input))
     {
         AdvanceCharacterCreation(
@@ -132,7 +132,7 @@ void ProcessPlayerName(Character * character, ArgumentHandler & args)
             ConnectionState::AwaitingName,
             input + " is already connected.");
     }
-    // Check if the player exists in the Database.
+        // Check if the player exists in the Database.
     else if (!SQLiteDbms::instance().searchPlayer(ToCapitals(input)))
     {
         AdvanceCharacterCreation(
@@ -198,12 +198,12 @@ void ProcessNewName(Character * character, ArgumentHandler & args)
     {
         AdvanceCharacterCreation(character, ConnectionState::AwaitingNewName, "Invalid input.");
     }
-    // Check if the player has typed BACK.
+        // Check if the player has typed BACK.
     else if (ToLower(input) == "back")
     {
         RollbackCharacterCreation(player, ConnectionState::AwaitingName);
     }
-    // Check if the player has given bad characters.
+        // Check if the player has given bad characters.
     else if (input.find_first_not_of(kValidPlayerName) != std::string::npos)
     {
         AdvanceCharacterCreation(
@@ -211,7 +211,7 @@ void ProcessNewName(Character * character, ArgumentHandler & args)
             ConnectionState::AwaitingNewName,
             "That player name contains disallowed characters.");
     }
-    // Check for bad names here.
+        // Check for bad names here.
     else if (Mud::instance().badNames.find(input) != Mud::instance().badNames.end())
     {
         AdvanceCharacterCreation(
@@ -219,7 +219,7 @@ void ProcessNewName(Character * character, ArgumentHandler & args)
             ConnectionState::AwaitingNewName,
             "That name is not permitted.");
     }
-    // Check if the player name has already been used.
+        // Check if the player name has already been used.
     else if (SQLiteDbms::instance().searchPlayer(ToCapitals(input)))
     {
         AdvanceCharacterCreation(
@@ -252,12 +252,12 @@ void ProcessNewPwd(Character * character, ArgumentHandler & args)
     {
         AdvanceCharacterCreation(character, ConnectionState::AwaitingNewPwd, "Invalid input.");
     }
-    // Check if the player has typed BACK.
+        // Check if the player has typed BACK.
     else if (ToLower(input) == "back")
     {
         RollbackCharacterCreation(player, ConnectionState::AwaitingNewName);
     }
-    // Check if the player has given bad characters.
+        // Check if the player has given bad characters.
     else if (input.find_first_not_of(kValidPlayerName) != std::string::npos)
     {
         AdvanceCharacterCreation(
@@ -281,7 +281,7 @@ void ProcessNewPwdCon(Character * character, ArgumentHandler & args)
     {
         RollbackCharacterCreation(player, ConnectionState::AwaitingNewPwd);
     }
-    // Player_password must agree.
+        // Player_password must agree.
     else if (input != player->password)
     {
         AdvanceCharacterCreation(
@@ -304,12 +304,12 @@ void ProcessNewStory(Character * character, ArgumentHandler & args)
     {
         AdvanceCharacterCreation(character, ConnectionState::AwaitingNewStory, "Invalid input.");
     }
-    // Check if the player has typed BACK.
+        // Check if the player has typed BACK.
     else if (ToLower(input) == "back")
     {
         RollbackCharacterCreation(player, ConnectionState::AwaitingNewPwd);
     }
-    // Check if the player has written 'continue' or NOT.
+        // Check if the player has written 'continue' or NOT.
     else if (input != "continue")
     {
         AdvanceCharacterCreation(
@@ -331,12 +331,12 @@ void ProcessNewRace(Character * character, ArgumentHandler & args)
     {
         AdvanceCharacterCreation(character, ConnectionState::AwaitingNewRace, "Invalid input.");
     }
-    // Check if the player has typed BACK.
+        // Check if the player has typed BACK.
     else if (ToLower(args[0].getContent()) == "back")
     {
         RollbackCharacterCreation(player, ConnectionState::AwaitingNewStory);
     }
-    // If the player has insert help (race_number), show its help.
+        // If the player has insert help (race_number), show its help.
     else if (BeginWith(ToLower(args[0].getContent()), "help"))
     {
         if (args.size() == 2)
@@ -362,15 +362,15 @@ void ProcessNewRace(Character * character, ArgumentHandler & args)
                 std::string helpMessage;
                 helpMessage += "Help about " + race->name + ".\n";
                 helpMessage += "Strength     " + ToString(race->getAbility(Ability::Strength))
-                    + ".\n";
+                               + ".\n";
                 helpMessage += "Agility      " + ToString(race->getAbility(Ability::Agility))
-                    + ".\n";
+                               + ".\n";
                 helpMessage += "Perception   " + ToString(race->getAbility(Ability::Perception))
-                    + ".\n";
+                               + ".\n";
                 helpMessage += "Constitution " + ToString(race->getAbility(Ability::Constitution))
-                    + ".\n";
+                               + ".\n";
                 helpMessage += "Intelligence " + ToString(race->getAbility(Ability::Intelligence))
-                    + ".\n";
+                               + ".\n";
                 helpMessage += Formatter::italic() + race->description + Formatter::reset() + "\n";
                 AdvanceCharacterCreation(character, ConnectionState::AwaitingNewRace, helpMessage);
             }
@@ -425,12 +425,12 @@ void ProcessNewAttr(Character * character, ArgumentHandler & args)
     {
         AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAttr, "Invalid input.");
     }
-    // Check if the player has typed BACK.
+        // Check if the player has typed BACK.
     else if (ToLower(args[0].getContent()) == "back")
     {
         RollbackCharacterCreation(player, ConnectionState::AwaitingNewRace);
     }
-    // Check if the player has not yet typed RESET.
+        // Check if the player has not yet typed RESET.
     else if (ToLower(args[0].getContent()) == "reset")
     {
         player->remaining_points = 0;
@@ -444,12 +444,12 @@ void ProcessNewAttr(Character * character, ArgumentHandler & args)
             ConnectionState::AwaitingNewAttr,
             Formatter::cyan() + "Attribute has been set by default." + Formatter::reset() + "\n");
     }
-    // If the player has insert help (attribute number), show its help.
+        // If the player has insert help (attribute number), show its help.
     else if (BeginWith(ToLower(args[0].getContent()), "continue"))
     {
         AdvanceCharacterCreation(player, ConnectionState::AwaitingNewGender);
     }
-    // If the player has insert help (attribute number), show its help.
+        // If the player has insert help (attribute number), show its help.
     else if (BeginWith(ToLower(args[0].getContent()), "help"))
     {
         if (args.size() == 2)
@@ -520,7 +520,7 @@ void ProcessNewAttr(Character * character, ArgumentHandler & args)
             else if (args[0].getContent() == "1")
             {
                 int result = static_cast<int>(player->getAbility(Ability::Strength, false))
-                    + modifier;
+                             + modifier;
                 int upperBound = static_cast<int>(player->race->getAbility(Ability::Strength)) + 5;
                 int lowerBound = static_cast<int>(player->race->getAbility(Ability::Strength)) - 5;
                 if (lowerBound < 0)
@@ -544,7 +544,7 @@ void ProcessNewAttr(Character * character, ArgumentHandler & args)
             else if (args[0].getContent() == "2")
             {
                 int result = static_cast<int>(player->getAbility(Ability::Agility, false))
-                    + modifier;
+                             + modifier;
                 int upperBound = static_cast<int>(player->race->getAbility(Ability::Agility)) + 5;
                 int lowerBound = static_cast<int>(player->race->getAbility(Ability::Agility)) - 5;
                 if (lowerBound < 0)
@@ -568,11 +568,11 @@ void ProcessNewAttr(Character * character, ArgumentHandler & args)
             else if (args[0].getContent() == "3")
             {
                 int result = static_cast<int>(player->getAbility(Ability::Perception, false))
-                    + modifier;
+                             + modifier;
                 int upperBound = static_cast<int>(player->race->getAbility(Ability::Perception))
-                    + 5;
+                                 + 5;
                 int lowerBound = static_cast<int>(player->race->getAbility(Ability::Perception))
-                    - 5;
+                                 - 5;
                 if (lowerBound < 0)
                 {
                     lowerBound = 0;
@@ -594,11 +594,11 @@ void ProcessNewAttr(Character * character, ArgumentHandler & args)
             else if (args[0].getContent() == "4")
             {
                 int result = static_cast<int>(player->getAbility(Ability::Constitution, false))
-                    + modifier;
+                             + modifier;
                 int upperBound = static_cast<int>(player->race->getAbility(Ability::Constitution))
-                    + 5;
+                                 + 5;
                 int lowerBound = static_cast<int>(player->race->getAbility(Ability::Constitution))
-                    - 5;
+                                 - 5;
                 if (lowerBound < 0)
                 {
                     lowerBound = 0;
@@ -620,11 +620,11 @@ void ProcessNewAttr(Character * character, ArgumentHandler & args)
             else if (args[0].getContent() == "5")
             {
                 int result = static_cast<int>(player->getAbility(Ability::Intelligence, false))
-                    + modifier;
+                             + modifier;
                 int upperBound = static_cast<int>(player->race->getAbility(Ability::Intelligence))
-                    + 5;
+                                 + 5;
                 int lowerBound = static_cast<int>(player->race->getAbility(Ability::Intelligence))
-                    - 5;
+                                 - 5;
                 if (lowerBound < 0)
                 {
                     lowerBound = 0;
@@ -734,18 +734,18 @@ void ProcessNewDesc(Character * character, ArgumentHandler & args)
     {
         AdvanceCharacterCreation(character, ConnectionState::AwaitingNewDesc, "Invalid input.");
     }
-    // Check if the player has typed BACK.
+        // Check if the player has typed BACK.
     else if (ToLower(input) == "back")
     {
         RollbackCharacterCreation(player, ConnectionState::AwaitingNewAge);
     }
-    // Check if the player has typed BACK.
+        // Check if the player has typed BACK.
     else if (ToLower(input) == "skip")
     {
         player->description = "You see " + ToLower(player->name) + " here.";
         AdvanceCharacterCreation(player, ConnectionState::AwaitingNewWeight);
     }
-    // Check if the description contains bad characters.
+        // Check if the description contains bad characters.
     else if (input.find_first_not_of(kValidDescription) != std::string::npos)
     {
         AdvanceCharacterCreation(
@@ -807,7 +807,7 @@ void ProcessNewConfirm(Character * character, ArgumentHandler & args)
     {
         RollbackCharacterCreation(player, ConnectionState::AwaitingNewWeight);
     }
-    // Check if the player has typed CONFIRM.
+        // Check if the player has typed CONFIRM.
     else if (ToLower(input) == "confirm")
     {
         // Set the last variables.
@@ -1063,7 +1063,7 @@ void AdvanceCharacterCreation(Character * character, ConnectionState new_state, 
     {
         msg += Formatter::clearScreen();
         msg += "\nWelcome to RadMud. Version " + Formatter::green() + kVersion + Formatter::reset()
-            + "!\n";
+               + "!\n";
         msg += Formatter::red();
         msg += "#--------------------------------------------#\n";
         msg += "                 XXXXXXXXXXXXX                \n";
@@ -1102,7 +1102,7 @@ void AdvanceCharacterCreation(Character * character, ConnectionState new_state, 
         msg +=
             " to pick a legendary name, maybe one day it will be whispered all over the lands.\n";
         msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset()
-            + "] to return to the login.\n";
+               + "] to return to the login.\n";
     }
     else if (new_state == ConnectionState::AwaitingNewPwd)
     {
@@ -1110,7 +1110,7 @@ void AdvanceCharacterCreation(Character * character, ConnectionState new_state, 
         msg += "# " + Formatter::bold() + "Character's Password." + Formatter::reset() + "\n";
         msg += "# Choose a proper password, in order to protect the acces to your character.\n";
         msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset()
-            + "] to return to the previus step.\n";
+               + "] to return to the previus step.\n";
     }
     else if (new_state == ConnectionState::AwaitingNewPwdCon)
     {
@@ -1124,9 +1124,9 @@ void AdvanceCharacterCreation(Character * character, ConnectionState new_state, 
         msg += "Year 374\n";
         msg += "#\n";
         msg += "# Type [" + Formatter::magenta() + "continue" + Formatter::reset()
-            + "] to continue character creation.\n";
+               + "] to continue character creation.\n";
         msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset()
-            + "] to return to the previus step.\n";
+               + "] to return to the previus step.\n";
     }
     else if (new_state == ConnectionState::AwaitingNewRace)
     {
@@ -1153,21 +1153,21 @@ void AdvanceCharacterCreation(Character * character, ConnectionState new_state, 
         PrintChoices(player);
         msg += "# " + Formatter::bold() + "Character's Attributes." + Formatter::reset() + "\n";
         msg += "#    [1] Strength     :" + ToString(player->getAbility(Ability::Strength, false))
-            + "\n";
+               + "\n";
         msg += "#    [2] Agility      :" + ToString(player->getAbility(Ability::Agility, false))
-            + "\n";
+               + "\n";
         msg += "#    [3] Perception   :" + ToString(player->getAbility(Ability::Perception, false))
-            + "\n";
+               + "\n";
         msg += "#    [4] Constitution :"
-            + ToString(player->getAbility(Ability::Constitution, false)) + "\n";
+               + ToString(player->getAbility(Ability::Constitution, false)) + "\n";
         msg += "#    [5] Intelligence :"
-            + ToString(player->getAbility(Ability::Intelligence, false)) + "\n";
+               + ToString(player->getAbility(Ability::Intelligence, false)) + "\n";
         msg += "#\n";
         msg += "# Remaining Points: " + Formatter::green() + ToString(player->remaining_points)
-            + Formatter::reset() + "\n";
+               + Formatter::reset() + "\n";
         msg += "#\n";
         msg += "# Type [" + Formatter::magenta() + "(number) +/-modifier" + Formatter::reset()
-            + "]";
+               + "]";
         msg += " to decrease or increase the value of an attribute.\n";
         msg += "# Type [" + Formatter::magenta() + "help (number)" + Formatter::reset() + "]";
         msg += " to read a brief description of the attribute.\n";
@@ -1188,7 +1188,7 @@ void AdvanceCharacterCreation(Character * character, ConnectionState new_state, 
         msg += "# Choose one of the above gender by typing the correspondent number.\n";
         msg += "#\n";
         msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset()
-            + "] to return to the previus step.\n";
+               + "] to return to the previus step.\n";
     }
     else if (new_state == ConnectionState::AwaitingNewAge)
     {
@@ -1197,7 +1197,7 @@ void AdvanceCharacterCreation(Character * character, ConnectionState new_state, 
         msg +=
             "# Choose the starting age of your character, be aware that during the game the time will pass.\n";
         msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset()
-            + "] to return to the previus step.\n";
+               + "] to return to the previus step.\n";
     }
     else if (new_state == ConnectionState::AwaitingNewDesc)
     {
@@ -1205,9 +1205,9 @@ void AdvanceCharacterCreation(Character * character, ConnectionState new_state, 
         msg += "# " + Formatter::bold() + "Character's Description." + Formatter::reset() + "\n";
         msg += "# Insert a brief description of your character, its optional.\n";
         msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset()
-            + "] to return to the previus step.\n";
+               + "] to return to the previus step.\n";
         msg += "# Type [" + Formatter::magenta() + "skip" + Formatter::reset()
-            + "] to just pass to the next step.\n";
+               + "] to just pass to the next step.\n";
     }
     else if (new_state == ConnectionState::AwaitingNewWeight)
     {
@@ -1215,7 +1215,7 @@ void AdvanceCharacterCreation(Character * character, ConnectionState new_state, 
         msg += "# " + Formatter::bold() + "Character's Weight." + Formatter::reset() + "\n";
         msg += "# Choose the wheight of your character.\n";
         msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset()
-            + "] to return to the previus step.\n";
+               + "] to return to the previus step.\n";
     }
     else if (new_state == ConnectionState::AwaitingNewConfirm)
     {
@@ -1223,9 +1223,9 @@ void AdvanceCharacterCreation(Character * character, ConnectionState new_state, 
         msg += "# Give a look to the information you have provided, now it's the right time";
         msg += " to decide if you want to change something.\n";
         msg += "# Type [" + Formatter::magenta() + "confirm" + Formatter::reset()
-            + "] to conclude the character creation.\n";
+               + "] to conclude the character creation.\n";
         msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset()
-            + "]    to return to the previus step.\n";
+               + "]    to return to the previus step.\n";
         msg += Formatter::green() + "Do you confirm? " + Formatter::reset() + "\n";
     }
     if (!message.empty())

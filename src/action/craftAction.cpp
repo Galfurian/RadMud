@@ -29,11 +29,11 @@ CraftAction::CraftAction(
     std::vector<Item *> & _tools,
     std::vector<std::pair<Item *, unsigned int>> & _ingredients,
     unsigned int & _cooldown) :
-        GeneralAction(_actor, system_clock::now() + seconds(_cooldown)),
-        production(_production),
-        material(_material),
-        tools(_tools),
-        ingredients(_ingredients)
+    GeneralAction(_actor, system_clock::now() + seconds(_cooldown)),
+    production(_production),
+    material(_material),
+    tools(_tools),
+    ingredients(_ingredients)
 {
     Logger::log(LogLevel::Debug, "Created crafting action.");
 }

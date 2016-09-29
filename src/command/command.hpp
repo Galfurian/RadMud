@@ -27,65 +27,65 @@ typedef std::function<void(Character * character, ArgumentHandler & args)> Actio
 /// @brief Contains all the informations concerning a command, including its handler.
 class Command
 {
-    public:
-        Command() :
-                level(),
-                name(),
-                help(),
-                args(),
-                hndl()
-        {
-        }
+public:
+    Command() :
+        level(),
+        name(),
+        help(),
+        args(),
+        hndl()
+    {
+    }
 
-        /// @brief Create a complete structure for a command.
-        /// @param _level The level necessary to execute the command.
-        /// @param _name  The name of the command.
-        /// @param _help  The help message of the command.
-        /// @param _args  The arguments of the command.
-        /// @param _hndl  The handler of the command.
-        Command(
-            int _level,
-            std::string _name,
-            std::string _help,
-            std::string _args,
-            ActionHandler _hndl) :
-                level(_level),
-                name(_name),
-                help(_help),
-                args(_args),
-                hndl(_hndl)
-        {
-        }
+    /// @brief Create a complete structure for a command.
+    /// @param _level The level necessary to execute the command.
+    /// @param _name  The name of the command.
+    /// @param _help  The help message of the command.
+    /// @param _args  The arguments of the command.
+    /// @param _hndl  The handler of the command.
+    Command(
+        int _level,
+        std::string _name,
+        std::string _help,
+        std::string _args,
+        ActionHandler _hndl) :
+        level(_level),
+        name(_name),
+        help(_help),
+        args(_args),
+        hndl(_hndl)
+    {
+    }
 
-        ~Command()
-        {
-        }
+    ~Command()
+    {
+    }
 
-        /// @brief Checks if the provided character can use the command.
-        /// @return <b>True</b> if the character can use the command,<br>
-        ///         <b>False</b> otherwise.
-        bool canUse(Character * character) const
+    /// @brief Checks if the provided character can use the command.
+    /// @return <b>True</b> if the character can use the command,<br>
+    ///         <b>False</b> otherwise.
+    bool canUse(Character * character) const
+    {
+        if (this->level == 1)
         {
-            if (this->level == 1)
+            if (!HasFlag(character->flags, CharacterFlag::IsGod))
             {
-                if (!HasFlag(character->flags, CharacterFlag::IsGod))
-                {
-                    return false;
-                }
+                return false;
             }
-            return true;
         }
+        return true;
+    }
 
-        /// The level of the command.
-        int level;
-        /// The name of the command.
-        std::string name;
-        /// The help message of the command.
-        std::string help;
-        /// The arguemtns of the command.
-        std::string args;
-        /// The handler of the command.
-        ActionHandler hndl;
+    /// The level of the command.
+    int level;
+    /// The name of the command.
+    std::string name;
+    /// The help message of the command.
+    std::string help;
+    /// The arguemtns of the command.
+    std::string args;
+    /// The handler of the command.
+    ActionHandler hndl;
 };
 
 /// @defgroup ProcessStates Player state processing.
@@ -96,30 +96,43 @@ class Command
 /// @param character The character that execute the command.
 /// @param args  Command arguments.
 void ProcessCommand(Character * character, ArgumentHandler & args);
+
 /// Check player name.
 void ProcessPlayerName(Character * character, ArgumentHandler & args);
+
 /// Check if the player password is correct.
 void ProcessPlayerPassword(Character * character, ArgumentHandler & args);
+
 /// Step 1  - Choose the Name.
 void ProcessNewName(Character * character, ArgumentHandler & args);
+
 /// Step 2  - Choose the Password.
 void ProcessNewPwd(Character * character, ArgumentHandler & args);
+
 /// Step 3  - Confirm the Password.
 void ProcessNewPwdCon(Character * character, ArgumentHandler & args);
+
 /// Step 4  - Short story of the mud world.
 void ProcessNewStory(Character * character, ArgumentHandler & args);
+
 /// Step 5  - Choose the Race.
 void ProcessNewRace(Character * character, ArgumentHandler & args);
+
 /// Step 6  - Choose the Attributes.
 void ProcessNewAttr(Character * character, ArgumentHandler & args);
+
 /// Step 7  - Choose the Gender.
 void ProcessNewGender(Character * character, ArgumentHandler & args);
+
 /// Step 8  - Choose the Age.
 void ProcessNewAge(Character * character, ArgumentHandler & args);
+
 /// Step 9  - Choose the description (optional).
 void ProcessNewDesc(Character * character, ArgumentHandler & args);
+
 /// Step 10 - Choose the Weight.
 void ProcessNewWeight(Character * character, ArgumentHandler & args);
+
 /// Step 11 - Confirm the character.
 void ProcessNewConfirm(Character * character, ArgumentHandler & args);
 ///@}

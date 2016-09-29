@@ -23,15 +23,15 @@ Effect::Effect(
     int _expires,
     std::string _messageActivate,
     std::string _messageFade) :
-        name(_name),
-        expires(_expires),
-        messageActivate(_messageActivate),
-        messageExpire(_messageFade),
-        health(),
-        stamina(),
-        abilities(),
-        hit(),
-        damage()
+    name(_name),
+    expires(_expires),
+    messageActivate(_messageActivate),
+    messageExpire(_messageFade),
+    health(),
+    stamina(),
+    abilities(),
+    hit(),
+    damage()
 {
     // Nothing to do.
 }
@@ -53,10 +53,11 @@ bool Effect::operator<(const Effect & right) const
 }
 
 EffectList::EffectList() :
-        activeEffects(),
-        pendingEffects()
+    activeEffects(),
+    pendingEffects()
 {
 }
+
 EffectList::~EffectList()
 {
 

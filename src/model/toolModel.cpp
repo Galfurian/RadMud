@@ -19,7 +19,7 @@
 #include "toolModel.hpp"
 
 ToolModel::ToolModel() :
-        toolType()
+    toolType()
 {
     // Nothing to do.
 }
@@ -63,7 +63,7 @@ void ToolModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow( { "Tool Type", GetToolTypeName(this->toolType) });
+    sheet.addRow({"Tool Type", GetToolTypeName(this->toolType)});
 }
 
 std::string GetToolTypeName(ToolType type)

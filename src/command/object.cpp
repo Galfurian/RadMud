@@ -162,7 +162,7 @@ void LoadObjectCommands()
     }
 }
 
-void DoTake(Character * character, ArgumentHandler &args)
+void DoTake(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -469,7 +469,7 @@ void DoTake(Character * character, ArgumentHandler &args)
     }
 }
 
-void DoDrop(Character * character, ArgumentHandler &args)
+void DoDrop(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -574,7 +574,7 @@ void DoDrop(Character * character, ArgumentHandler &args)
     }
 }
 
-void DoGive(Character * character, ArgumentHandler &args)
+void DoGive(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -678,7 +678,7 @@ void DoEquipments(Character * character, ArgumentHandler & /*args*/)
     character->sendMsg(output);
 }
 
-void DoWield(Character * character, ArgumentHandler &args)
+void DoWield(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -763,7 +763,7 @@ void DoWield(Character * character, ArgumentHandler &args)
         whereOthers);
 }
 
-void DoWear(Character * character, ArgumentHandler &args)
+void DoWear(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -858,7 +858,7 @@ void DoWear(Character * character, ArgumentHandler &args)
         ToLower(item->getCurrentSlotName()));
 }
 
-void DoRemove(Character * character, ArgumentHandler &args)
+void DoRemove(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -950,7 +950,7 @@ void DoInventory(Character * character, ArgumentHandler & /*args*/)
         mud_measure);
 }
 
-void DoOrganize(Character * character, ArgumentHandler &args)
+void DoOrganize(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -1012,7 +1012,7 @@ void DoOrganize(Character * character, ArgumentHandler &args)
     }
 }
 
-void DoOpen(Character * character, ArgumentHandler &args)
+void DoOpen(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -1130,7 +1130,7 @@ void DoOpen(Character * character, ArgumentHandler &args)
     }
 }
 
-void DoClose(Character * character, ArgumentHandler &args)
+void DoClose(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -1254,7 +1254,7 @@ void DoClose(Character * character, ArgumentHandler &args)
     return;
 }
 
-void DoPut(Character * character, ArgumentHandler &args)
+void DoPut(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -1362,7 +1362,7 @@ void DoPut(Character * character, ArgumentHandler &args)
     }
 }
 
-void DoDrink(Character * character, ArgumentHandler &args)
+void DoDrink(Character * character, ArgumentHandler & args)
 {
     if (args.empty())
     {
@@ -1424,7 +1424,7 @@ void DoDrink(Character * character, ArgumentHandler &args)
         container->getName(true));
 }
 
-void DoFill(Character * character, ArgumentHandler &args)
+void DoFill(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -1548,7 +1548,7 @@ void DoFill(Character * character, ArgumentHandler &args)
         source->getName(true));
 }
 
-void DoPour(Character * character, ArgumentHandler &args)
+void DoPour(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -1670,7 +1670,7 @@ void DoPour(Character * character, ArgumentHandler &args)
         container->getName(true));
 }
 
-void DoDeposit(Character * character, ArgumentHandler &args)
+void DoDeposit(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -1709,7 +1709,7 @@ void DoDeposit(Character * character, ArgumentHandler &args)
     delete (item);
 }
 
-void DoSell(Character * character, ArgumentHandler &args)
+void DoSell(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -1787,7 +1787,7 @@ void DoSell(Character * character, ArgumentHandler &args)
     character->sendMsg("You sell %s to %s.\n", item->getName(true), shop->getName(true));
 }
 
-void DoBuy(Character * character, ArgumentHandler &args)
+void DoBuy(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -1894,7 +1894,7 @@ void DoBuy(Character * character, ArgumentHandler &args)
     character->sendMsg("You buy %s from %s.\n", item->getName(true), shop->getName(true));
 }
 
-void DoBalance(Character * character, ArgumentHandler &args)
+void DoBalance(Character * character, ArgumentHandler & args)
 {
     // Check the number of arguments.
     if (!args.empty())

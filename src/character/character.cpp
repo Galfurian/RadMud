@@ -30,26 +30,26 @@
 using namespace std::chrono;
 
 Character::Character() :
-        name(),
-        description(),
-        gender(),
-        weight(),
-        level(),
-        flags(),
-        race(),
-        faction(),
-        health(),
-        stamina(),
-        hunger(100),
-        thirst(100),
-        room(),
-        inventory(),
-        equipment(),
-        posture(CharacterPosture::Stand),
-        effects(),
-        L(luaL_newstate()),
-        opponents(this),
-        actionQueue()
+    name(),
+    description(),
+    gender(),
+    weight(),
+    level(),
+    flags(),
+    race(),
+    faction(),
+    health(),
+    stamina(),
+    hunger(100),
+    thirst(100),
+    room(),
+    inventory(),
+    equipment(),
+    posture(CharacterPosture::Stand),
+    effects(),
+    L(luaL_newstate()),
+    opponents(this),
+    actionQueue()
 {
     actionQueue.push_back(std::make_shared<GeneralAction>(this));
     // Nothing to do.
@@ -100,59 +100,59 @@ void Character::getSheet(Table & sheet) const
     sheet.addColumn("Attribute", StringAlign::Left);
     sheet.addColumn("Value", StringAlign::Left);
     // Set the values.
-    sheet.addRow( { "Proper Noun", this->name });
-    sheet.addRow( { "Description", this->description });
-    sheet.addRow( { "Gender", GetGenderTypeName(this->gender) });
-    sheet.addRow( { "Weight", ToString(this->weight) });
-    sheet.addRow( { "Level", ToString(this->level) });
-    sheet.addRow( { "Flags", GetCharacterFlagString(this->flags) });
+    sheet.addRow({"Proper Noun", this->name});
+    sheet.addRow({"Description", this->description});
+    sheet.addRow({"Gender", GetGenderTypeName(this->gender)});
+    sheet.addRow({"Weight", ToString(this->weight)});
+    sheet.addRow({"Level", ToString(this->level)});
+    sheet.addRow({"Flags", GetCharacterFlagString(this->flags)});
     if (CorrectAssert(this->race != nullptr))
     {
-        sheet.addRow( { "Race", this->race->name });
+        sheet.addRow({"Race", this->race->name});
     }
     else
     {
-        sheet.addRow( { "Race", "NONE" });
+        sheet.addRow({"Race", "NONE"});
     }
     if (CorrectAssert(this->faction != nullptr))
     {
-        sheet.addRow( { "Faction", this->faction->name });
+        sheet.addRow({"Faction", this->faction->name});
     }
     else
     {
-        sheet.addRow( { "Faction", "NONE" });
+        sheet.addRow({"Faction", "NONE"});
     }
-    sheet.addRow( { "Health", ToString(this->getHealth()) });
-    sheet.addRow( { "Stamina", ToString(this->getStamina()) });
-    sheet.addRow( { "Hunger", ToString(this->getHunger()) });
-    sheet.addRow( { "Thirst", ToString(this->getThirst()) });
+    sheet.addRow({"Health", ToString(this->getHealth())});
+    sheet.addRow({"Stamina", ToString(this->getStamina())});
+    sheet.addRow({"Hunger", ToString(this->getHunger())});
+    sheet.addRow({"Thirst", ToString(this->getThirst())});
     sheet.addRow(
-        { "Strength", ToString(this->getAbility(Ability::Strength, false)) + " ["
-            + ToString(this->effects.getAbilityModifier(Ability::Strength)) + "]" });
+        {"Strength", ToString(this->getAbility(Ability::Strength, false)) + " ["
+                     + ToString(this->effects.getAbilityModifier(Ability::Strength)) + "]"});
     sheet.addRow(
-        { "Agility", ToString(this->getAbility(Ability::Agility, false)) + " ["
-            + ToString(this->effects.getAbilityModifier(Ability::Agility)) + "]" });
+        {"Agility", ToString(this->getAbility(Ability::Agility, false)) + " ["
+                    + ToString(this->effects.getAbilityModifier(Ability::Agility)) + "]"});
     sheet.addRow(
-        { "Perception", ToString(this->getAbility(Ability::Perception, false)) + " ["
-            + ToString(this->effects.getAbilityModifier(Ability::Perception)) + "]" });
+        {"Perception", ToString(this->getAbility(Ability::Perception, false)) + " ["
+                       + ToString(this->effects.getAbilityModifier(Ability::Perception)) + "]"});
     sheet.addRow(
-        { "Constitution", ToString(this->getAbility(Ability::Constitution, false)) + " ["
-            + ToString(this->effects.getAbilityModifier(Ability::Constitution)) + "]" });
+        {"Constitution", ToString(this->getAbility(Ability::Constitution, false)) + " ["
+                         + ToString(this->effects.getAbilityModifier(Ability::Constitution)) + "]"});
     sheet.addRow(
-        { "Intelligence", ToString(this->getAbility(Ability::Intelligence, false)) + " ["
-            + ToString(this->effects.getAbilityModifier(Ability::Intelligence)) + "]" });
+        {"Intelligence", ToString(this->getAbility(Ability::Intelligence, false)) + " ["
+                         + ToString(this->effects.getAbilityModifier(Ability::Intelligence)) + "]"});
     if (CorrectAssert(this->room != nullptr))
     {
-        sheet.addRow( { "Room", this->room->name + " [" + ToString(this->room->vnum) + "]" });
+        sheet.addRow({"Room", this->room->name + " [" + ToString(this->room->vnum) + "]"});
     }
     else
     {
-        sheet.addRow( { "Room", "NONE" });
+        sheet.addRow({"Room", "NONE"});
     }
-    sheet.addRow( { "Posture", GetPostureName(this->posture) });
-    sheet.addRow( { "Action", this->getAction()->getDescription() });
+    sheet.addRow({"Posture", GetPostureName(this->posture)});
+    sheet.addRow({"Action", this->getAction()->getDescription()});
     sheet.addDivider();
-    sheet.addRow( { "## Equipment", "## Inventory" });
+    sheet.addRow({"## Equipment", "## Inventory"});
     for (size_t it = 0; it < std::max(this->inventory.size(), this->equipment.size()); ++it)
     {
         std::string equipmentItem, inventoryItem;
@@ -164,13 +164,13 @@ void Character::getSheet(Table & sheet) const
         {
             inventoryItem = this->inventory.at(it)->getName();
         }
-        sheet.addRow( { equipmentItem, inventoryItem });
+        sheet.addRow({equipmentItem, inventoryItem});
     }
     sheet.addDivider();
-    sheet.addRow( { "## Effect Name", "## Expires In" });
+    sheet.addRow({"## Effect Name", "## Expires In"});
     for (EffectList::const_iterator it = this->effects.begin(); it != this->effects.end(); ++it)
     {
-        sheet.addRow( { it->name, ToString(it->expires) });
+        sheet.addRow({it->name, ToString(it->expires)});
     }
 }
 
@@ -698,7 +698,7 @@ void Character::moveTo(
     }
 }
 
-Item* Character::findInventoryItem(std::string search_parameter, int & number)
+Item * Character::findInventoryItem(std::string search_parameter, int & number)
 {
     for (auto iterator : inventory)
     {
@@ -714,7 +714,7 @@ Item* Character::findInventoryItem(std::string search_parameter, int & number)
     return nullptr;
 }
 
-Item* Character::findEquipmentItem(std::string search_parameter, int & number)
+Item * Character::findEquipmentItem(std::string search_parameter, int & number)
 {
     for (auto * iterator : equipment)
     {
@@ -999,7 +999,7 @@ bool Character::hasEquipmentItem(Item * item)
     return false;
 }
 
-void Character::addInventoryItem(Item * & item)
+void Character::addInventoryItem(Item *& item)
 {
     // Add the item to the inventory.
     inventory.push_back_item(item);
@@ -1013,7 +1013,7 @@ void Character::addInventoryItem(Item * & item)
         this->getName());
 }
 
-void Character::addEquipmentItem(Item * & item)
+void Character::addEquipmentItem(Item *& item)
 {
     // Add the item to the equipment.
     equipment.push_back(item);
@@ -1763,38 +1763,38 @@ bool Character::luaRemInventory(Item * item)
 void Character::luaRegister(lua_State * L)
 {
     luabridge::getGlobalNamespace(L) //
-    .beginClass<Character>("Character") //
-    .addData("name", &Character::name) //
-    .addData("race", &Character::race) //
-    .addData("faction", &Character::faction) //
-    .addData("room", &Character::room) //
-    .addFunction("inventoryAdd", &Character::luaAddInventory) //
-    .addFunction("inventoryRem", &Character::luaRemInventory) //
-    .addFunction("equipmentAdd", &Character::luaAddEquipment) //
-    .addFunction("equipmentRem", &Character::luaRemEquipment) //
-    .addFunction("doCommand", &Character::doCommand) //
-    .addFunction("getTargets", &Character::luaGetTargets) //
-    .addFunction("isMobile", &Character::isMobile) //
-    .endClass() //
-    .deriveClass<Mobile, Character>("Mobile") //
-    .addData("id", &Mobile::id) //
-    .addData("spawnRoom", &Mobile::respawnRoom) //
-    .addData("shortdesc", &Mobile::shortdesc) //
-    .addData("staticdesc", &Mobile::staticdesc) //
-    .addData("message_buffer", &Mobile::message_buffer) //
-    .addData("controller", &Mobile::controller) //
-    .addFunction("isMobile", &Mobile::isMobile) //
-    .addFunction("isAlive", &Mobile::isAlive) //
-    .endClass() //
-    .deriveClass<Player, Character>("Player") //
-    .addData("age", &Player::age, false) //
-    .addData("experience", &Player::experience, false) //
-    .addData("prompt", &Player::prompt, false) //
-    .addData("rent_room", &Player::rent_room, false) //
-    .addData("remaining_points", &Player::remaining_points, false) //
-    .addData("rent_room", &Player::rent_room, false) //
-    //std::map<int, unsigned int> skills;
-    .endClass();
+        .beginClass<Character>("Character") //
+        .addData("name", &Character::name) //
+        .addData("race", &Character::race) //
+        .addData("faction", &Character::faction) //
+        .addData("room", &Character::room) //
+        .addFunction("inventoryAdd", &Character::luaAddInventory) //
+        .addFunction("inventoryRem", &Character::luaRemInventory) //
+        .addFunction("equipmentAdd", &Character::luaAddEquipment) //
+        .addFunction("equipmentRem", &Character::luaRemEquipment) //
+        .addFunction("doCommand", &Character::doCommand) //
+        .addFunction("getTargets", &Character::luaGetTargets) //
+        .addFunction("isMobile", &Character::isMobile) //
+        .endClass() //
+        .deriveClass<Mobile, Character>("Mobile") //
+        .addData("id", &Mobile::id) //
+        .addData("spawnRoom", &Mobile::respawnRoom) //
+        .addData("shortdesc", &Mobile::shortdesc) //
+        .addData("staticdesc", &Mobile::staticdesc) //
+        .addData("message_buffer", &Mobile::message_buffer) //
+        .addData("controller", &Mobile::controller) //
+        .addFunction("isMobile", &Mobile::isMobile) //
+        .addFunction("isAlive", &Mobile::isAlive) //
+        .endClass() //
+        .deriveClass<Player, Character>("Player") //
+        .addData("age", &Player::age, false) //
+        .addData("experience", &Player::experience, false) //
+        .addData("prompt", &Player::prompt, false) //
+        .addData("rent_room", &Player::rent_room, false) //
+        .addData("remaining_points", &Player::remaining_points, false) //
+        .addData("rent_room", &Player::rent_room, false) //
+            //std::map<int, unsigned int> skills;
+        .endClass();
 }
 
 bool Character::operator<(const class Character & source) const

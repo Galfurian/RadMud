@@ -21,49 +21,47 @@
 #include "../generalAction.hpp"
 
 /// The list of possible combat actions.
-typedef enum class CombatActionTypes
+typedef enum class CombatActionType_t
 {
-    /// The combat move is to do nothing.
-    NoAction,
-    /// The action is a basic attack.
-    BasicAttack,
-    /// The character tries to flee.
-    Flee
+    NoAction,       ///< The combat move is to do nothing.
+    BasicAttack,    ///< The action is a basic attack.
+    Flee            ///< The character tries to flee.
 } CombatActionType;
 
 /// @brief An action executed by characters when fighting.
-class CombatAction: public GeneralAction
+class CombatAction :
+    public GeneralAction
 {
-    public:
-        /// @brief Constructor.
-        /// @param _actor The actor who is doing the action.
-        CombatAction(Character * _actor);
+public:
+    /// @brief Constructor.
+    /// @param _actor The actor who is doing the action.
+    CombatAction(Character * _actor);
 
-        /// @brief Destructor.
-        virtual ~CombatAction();
+    /// @brief Destructor.
+    virtual ~CombatAction();
 
-        /// @brief Checks the correctness of the action's values.
-        /// @return <b>True</b> if it has correct values,<br>
-        ///         <b>False</b> otherwise.
-        virtual bool check() const;
+    /// @brief Checks the correctness of the action's values.
+    /// @return <b>True</b> if it has correct values,<br>
+    ///         <b>False</b> otherwise.
+    virtual bool check() const;
 
-        /// @brief Provides the type of the action.
-        /// @return The type of action.
-        virtual ActionType getType() const;
+    /// @brief Provides the type of the action.
+    /// @return The type of action.
+    virtual ActionType getType() const;
 
-        /// @brief Provides the description of the action.
-        /// @return The string which describe the current action.
-        virtual std::string getDescription() const;
+    /// @brief Provides the description of the action.
+    /// @return The string which describe the current action.
+    virtual std::string getDescription() const;
 
-        /// @brief Stops the current action and returns a string which describe the intterruption.
-        /// @return The stopping description.
-        virtual std::string stop();
+    /// @brief Stops the current action and returns a string which describe the intterruption.
+    /// @return The stopping description.
+    virtual std::string stop();
 
-        /// @brief Performs the current action.
-        /// @return the status after performing the action.
-        virtual ActionStatus perform() = 0;
+    /// @brief Performs the current action.
+    /// @return the status after performing the action.
+    virtual ActionStatus perform() = 0;
 
-        /// @brief Provides the type of combat action.
-        /// @return The type of combat action.
-        virtual CombatActionType getCombatActionType() const = 0;
+    /// @brief Provides the type of combat action.
+    /// @return The type of combat action.
+    virtual CombatActionType getCombatActionType() const = 0;
 };

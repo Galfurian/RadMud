@@ -28,90 +28,86 @@
 #include <memory>
 
 class BuildAction;
+
 class CraftAction;
+
 class MoveAction;
+
 class CombatAction;
 
 /// The list of possible actions.
-typedef enum class ActionTypes
+typedef enum class ActionType_t
 {
-    /// The character is doing common action.
-    Wait,
-    /// The character is moving to another location.
-    Move,
-    /// The character is crafting something.
-    Crafting,
-    /// The character is crafting something.
-    Building,
-    /// The character is fighting.
-    Combat
+    Wait,       ///< The character is doing common action.
+    Move,       ///< The character is moving to another location.
+    Crafting,   ///< The character is crafting something.
+    Building,   ///< The character is crafting something.
+    Combat      ///< The character is fighting.
 } ActionType;
 
 /// The list of possible actions.
 typedef enum class ActionStatus_t
 {
-    /// The action is finished.
-    Finished,
-    /// The action is still running.
-    Running,
-    /// The action has encountered an error.
-    Error
+    Finished,   ///< The action is finished.
+    Running,    ///< The action is still running.
+    Error       ///< The action has encountered an error.
 } ActionStatus;
 
 /// @brief A general action. Performing this action will result in doing nothing.
-class GeneralAction: public std::enable_shared_from_this<GeneralAction>
+class GeneralAction :
+    public std::enable_shared_from_this<GeneralAction>
 {
-    protected:
-        /// Actor of the action.
-        Character * actor;
-        /// The time point in the future needed by the action to complete.
-        TimeClock actionCooldown;
+protected:
+    /// Actor of the action.
+    Character * actor;
+    /// The time point in the future needed by the action to complete.
+    TimeClock actionCooldown;
 
-    public:
-        /// @brief Constructor.
-        GeneralAction(Character * _actor);
+public:
+    /// @brief Constructor.
+    GeneralAction(Character * _actor);
 
-        /// @brief Constructor.
-        GeneralAction(Character * _actor, TimeClock _actionCooldown);
+    /// @brief Constructor.
+    GeneralAction(Character * _actor, TimeClock _actionCooldown);
 
-        /// @brief Destructor.
-        virtual ~GeneralAction();
+    /// @brief Destructor.
+    virtual ~GeneralAction();
 
-        /// @brief Check if the cooldown of the action is elapsed.
-        /// @return <b>True</b> if the time has passed,<br>
-        ///         <b>False</b> otherwise.
-        bool checkElapsed() const;
+    /// @brief Check if the cooldown of the action is elapsed.
+    /// @return <b>True</b> if the time has passed,<br>
+    ///         <b>False</b> otherwise.
+    bool checkElapsed() const;
 
-        /// @brief Checks the correctness of the action's values.
-        /// @return <b>True</b> if it has correct values,<br>
-        ///         <b>False</b> otherwise.
-        virtual bool check() const;
+    /// @brief Checks the correctness of the action's values.
+    /// @return <b>True</b> if it has correct values,<br>
+    ///         <b>False</b> otherwise.
+    virtual bool check() const;
 
-        /// @brief Provides the type of the action.
-        /// @return The type of action.
-        virtual ActionType getType() const;
+    /// @brief Provides the type of the action.
+    /// @return The type of action.
+    virtual ActionType getType() const;
 
-        /// @brief Provides the description of the action.
-        /// @return The string which describe the current action.
-        virtual std::string getDescription() const;
+    /// @brief Provides the description of the action.
+    /// @return The string which describe the current action.
+    virtual std::string getDescription() const;
 
-        /// @brief Stops the current action and returns a string which describe the intterruption.
-        /// @return The stopping description.
-        virtual std::string stop();
+    /// @brief Stops the current action and returns a string which describe the intterruption.
+    /// @return The stopping description.
+    virtual std::string stop();
 
-        /// @brief Performs the current action.
-        /// @return the status after performing the action.
-        virtual ActionStatus perform();
+    /// @brief Performs the current action.
+    /// @return the status after performing the action.
+    virtual ActionStatus perform();
 
-        /// @brief Allows to set the remaining time before the action can be triggered.
-        /// @param _actionCooldown The cooldown that has to be set.
-        void setCooldown(const unsigned int & _actionCooldown);
+    /// @brief Allows to set the remaining time before the action can be triggered.
+    /// @param _actionCooldown The cooldown that has to be set.
+    void setCooldown(const unsigned int & _actionCooldown);
 
-        /// @brief Provides the remaining time before the action can be triggered.
-        unsigned int getCooldown();
+    /// @brief Provides the remaining time before the action can be triggered.
+    unsigned int getCooldown();
 
-        /// @brief Returns the action <b>statically</b> casted to CombatAction.
-        std::shared_ptr<CombatAction> toCombatAction();
+    /// @brief Returns the action <b>statically</b> casted to CombatAction.
+    std::shared_ptr<CombatAction> toCombatAction();
 };
 
 /// @addtogroup EnumToString

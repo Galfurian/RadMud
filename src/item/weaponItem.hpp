@@ -20,24 +20,25 @@
 #include "item.hpp"
 
 /// @brief Holds details about armors.
-class WeaponItem: public Item
+class WeaponItem :
+    public Item
 {
-    public:
-        WeaponItem();
+public:
+    WeaponItem();
 
-        virtual ~WeaponItem();
+    virtual ~WeaponItem();
 
-        virtual void getSheet(Table & sheet) const;
+    virtual void getSheet(Table & sheet) const;
 
-        /// Randomly roll the weapon damage.
-        unsigned int rollDamage() const;
+    /// Randomly roll the weapon damage.
+    unsigned int rollDamage() const;
 
-        /// Provides the minimum damage.
-        unsigned int getMinDamage() const;
+    /// Provides the minimum damage.
+    unsigned int getMinDamage() const;
 
-        /// Provides the maximum damage.
-        unsigned int getMaxDamage() const;
+    /// Provides the maximum damage.
+    unsigned int getMaxDamage() const;
 
-        /// Provides the range of this weapon.
-        unsigned int getRange() const;
+    /// Provides the range of this weapon.
+    unsigned int getRange() const;
 };
