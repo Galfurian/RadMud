@@ -604,29 +604,70 @@ void DoGive(Character * character, ArgumentHandler & args)
         character->sendMsg(target->getNameCapital() + " can't carry anymore items.\n");
         return;
     }
+    // Set the quantity.
+    auto quantity = args[0].getMultiplier();
+    if (item->quantity < quantity)
+    {
+        quantity = item->quantity;
+    }
     // Start a transaction.
     SQLiteDbms::instance().beginTransaction();
-    // Remove the item from the character inventory.
-    character->remInventoryItem(item);
-    // Add the item to the target inventory.
-    target->addInventoryItem(item);
+    if (item->quantity <= quantity)
+    {
+        // Remove the item from the character inventory.
+        character->remInventoryItem(item);
+        // Add the item to the target inventory.
+        target->addInventoryItem(item);
+        // Send all the messages.
+        character->sendMsg(
+            "You give %s to %s.\n",
+            item->getName(true),
+            target->getName());
+        target->sendMsg(
+            "%s gives you %s.\n\n",
+            character->getNameCapital(),
+            item->getName(true));
+        character->room->sendToAll(
+            "%s gives %s to %s.\n",
+            {character, target},
+            character->getNameCapital(),
+            item->getName(true),
+            target->getName());
+    }
+    else
+    {
+        // Remove from the stack.
+        auto newStack = item->removeFromStack(character, quantity);
+        if (newStack == nullptr)
+        {
+            character->sendMsg(
+                "You failed to give part of %s to %s.\n",
+                item->getName(true),
+                target->getName());
+            // Conclude the transaction.
+            SQLiteDbms::instance().rollbackTransection();
+            return;
+        }
+        // Add the stack to the target inventory.
+        target->addInventoryItem(newStack);
+        // Send all the messages.
+        character->sendMsg(
+            "You give part of %s to %s.\n",
+            item->getName(true),
+            target->getName());
+        target->sendMsg(
+            "%s gives you %s.\n\n",
+            character->getNameCapital(),
+            item->getName(true));
+        character->room->sendToAll(
+            "%s gives %s to %s.\n",
+            {character, target},
+            character->getNameCapital(),
+            item->getName(true),
+            target->getName());
+    }
     // Conclude the transaction.
     SQLiteDbms::instance().endTransaction();
-    // Send all the messages.
-    character->sendMsg(
-        "You give %s to %s.\n",
-        item->getName(true),
-        target->getName());
-    target->sendMsg(
-        "%s gives you %s.\n\n",
-        character->getNameCapital(),
-        item->getName(true));
-    character->room->sendToAll(
-        "%s gives %s to %s.\n",
-        {character, target},
-        character->getNameCapital(),
-        item->getName(true),
-        target->getName());
 }
 
 void DoEquipments(Character * character, ArgumentHandler & /*args*/)
