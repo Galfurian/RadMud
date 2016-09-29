@@ -19,32 +19,13 @@
 // Basic Include.
 #include "character.hpp"
 
-#include <cstdlib>
-#include <typeinfo>
-#include <algorithm>
-#include <list>
-#include <sstream>
-
 // Other Include.
 #include "../mud.hpp"
-#include "../constants.hpp"
-#include "../lua/lua_script.hpp"
-#include "../lua/luabridge/LuaBridge.h"
-
-#include "../model/toolModel.hpp"
-#include "../model/armorModel.hpp"
-#include "../model/shieldModel.hpp"
-#include "../model/resourceModel.hpp"
 
 #include "../action/combat/basicAttack.hpp"
 #include "../action/combat/flee.hpp"
-#include "../sqlite/sqliteDbms.hpp"
-
-#include "../utilities/logger.hpp"
 
 #include "../item/armorItem.hpp"
-
-#include "../command/command.hpp"
 
 using namespace std::chrono;
 

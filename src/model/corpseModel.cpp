@@ -19,7 +19,6 @@
 #include "corpseModel.hpp"
 
 #include "../mud.hpp"
-#include "../item/item.hpp"
 
 CorpseModel::CorpseModel()
 {

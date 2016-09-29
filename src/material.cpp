@@ -18,9 +18,7 @@
 
 #include "material.hpp"
 
-#include "constants.hpp"
 #include "utils.hpp"
-#include "lua/luabridge/LuaBridge.h"
 
 Material::Material() :
         vnum(),

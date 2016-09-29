@@ -18,11 +18,6 @@
 
 #include "combatAction.hpp"
 #include "../../structure/room.hpp"
-#include "../../character/character.hpp"
-#include "../../model/weaponModel.hpp"
-#include "../../utilities/logger.hpp"
-#include "basicAttack.hpp"
-#include "flee.hpp"
 
 using namespace std::chrono;
 

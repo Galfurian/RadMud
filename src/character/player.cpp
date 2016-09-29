@@ -19,32 +19,8 @@
 // Basic Include.
 #include "player.hpp"
 
-#include <stddef.h>
-
-#include <algorithm>
-#include <cerrno>
-#include <cstdio>
-#include <ctime>
-#include <list>
-#include <map>
-#include <set>
-#include <stdexcept>
-#include <string>
-#include <utility>
-#include <vector>
-#include <sstream>
-#include <iostream>
-#include <errno.h>
-
 // Other Include.
 #include "../mud.hpp"
-#include "../race.hpp"
-#include "../utils.hpp"
-#include "../updater.hpp"
-#include "../faction.hpp"
-#include "../constants.hpp"
-#include "../formatter.hpp"
-#include "../utilities/logger.hpp"
 
 Player::Player(const int & _socket, const int & _port, const std::string & _address) :
         psocket(_socket),

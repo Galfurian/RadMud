@@ -18,7 +18,6 @@
 
 #include "generalAction.hpp"
 #include "combat/combatAction.hpp"
-#include "../utilities/logger.hpp"
 
 using namespace std::chrono;
 

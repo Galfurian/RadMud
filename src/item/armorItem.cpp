@@ -19,7 +19,6 @@
 
 #include "../model/armorModel.hpp"
 #include "../material.hpp"
-#include "../utils.hpp"
 
 ArmorItem::ArmorItem()
 {

@@ -20,35 +20,10 @@
 #include "sqliteDbms.hpp"
 
 #include "../mud.hpp"
-#include "../constants.hpp"
-#include "../utilities/logger.hpp"
 
-#include "../model/armorModel.hpp"
-#include "../model/bookModel.hpp"
-#include "../model/containerModel.hpp"
-#include "../model/currencyModel.hpp"
-#include "../model/foodModel.hpp"
-#include "../model/furnitureModel.hpp"
-#include "../model/itemModel.hpp"
-#include "../model/keyModel.hpp"
-#include "../model/lightModel.hpp"
-#include "../model/liquidContainerModel.hpp"
-#include "../model/mechanismModel.hpp"
-#include "../model/nodeModel.hpp"
-#include "../model/projectileModel.hpp"
-#include "../model/resourceModel.hpp"
-#include "../model/ropeModel.hpp"
-#include "../model/seedModel.hpp"
-#include "../model/shieldModel.hpp"
-#include "../model/toolModel.hpp"
-#include "../model/vehicleModel.hpp"
-#include "../model/weaponModel.hpp"
-#include "../model/shopModel.hpp"
 #include "../model/currencyModel.hpp"
 
 #include "../item/shopItem.hpp"
-#include "../item/armorItem.hpp"
-#include "../item/weaponItem.hpp"
 
 bool LoadBadName(ResultSet * result)
 {

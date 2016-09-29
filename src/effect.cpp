@@ -18,8 +18,6 @@
 
 #include "effect.hpp"
 
-#include <algorithm>
-
 Effect::Effect(
     std::string _name,
     int _expires,

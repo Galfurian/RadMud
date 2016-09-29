@@ -21,7 +21,6 @@
 #include "utils.hpp"
 #include "utilities/logger.hpp"
 #include "model/currencyModel.hpp"
-#include "lua/luabridge/LuaBridge.h"
 
 Faction::Faction() :
         vnum(),

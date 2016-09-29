@@ -19,20 +19,11 @@
 // Basic Include.
 #include "item.hpp"
 
-#include <algorithm>
-#include <sstream>
-
 // Other Include.
 #include "../mud.hpp"
-#include "../defines.hpp"
-#include "../material.hpp"
-#include "../constants.hpp"
-#include "../model/nodeModel.hpp"
 #include "../model/containerModel.hpp"
 #include "../model/liquidContainerModel.hpp"
 #include "../model/shopModel.hpp"
-#include "../utilities/logger.hpp"
-#include "../lua/luabridge/LuaBridge.h"
 
 #include "shopItem.hpp"
 #include "armorItem.hpp"

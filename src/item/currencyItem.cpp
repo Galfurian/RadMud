@@ -19,7 +19,6 @@
 
 #include "../model/currencyModel.hpp"
 #include "../material.hpp"
-#include "../utils.hpp"
 
 CurrencyItem::CurrencyItem()
 {

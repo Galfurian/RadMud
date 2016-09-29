@@ -22,10 +22,8 @@
 
 #include <dirent.h>
 #include <limits.h>
-#include <stddef.h>
 #include <zconf.h>
 #include <zlib.h>
-#include <cctype>
 #include <ctime>
 #include <fstream>
 #include <iostream>

@@ -18,8 +18,6 @@
 #include "weaponItem.hpp"
 
 #include "../model/weaponModel.hpp"
-#include "../material.hpp"
-#include "../utils.hpp"
 
 WeaponItem::WeaponItem()
 {

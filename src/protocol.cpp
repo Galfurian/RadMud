@@ -18,7 +18,6 @@
 
 #include "mud.hpp"
 #include "protocol.hpp"
-#include "utilities/logger.hpp"
 
 void LoadProtocolStates()
 {

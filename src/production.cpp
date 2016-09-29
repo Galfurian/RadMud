@@ -18,14 +18,7 @@
 
 #include "production.hpp"
 
-#include <algorithm>
-
 #include "mud.hpp"
-#include "utils.hpp"
-#include "constants.hpp"
-#include "structure/room.hpp"
-#include "utilities/logger.hpp"
-#include "character/character.hpp"
 
 Production::Production() :
         vnum(-1),

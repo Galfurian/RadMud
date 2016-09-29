@@ -19,7 +19,6 @@
 #include "crafting.hpp"
 
 #include "../mud.hpp"
-#include "../model/resourceModel.hpp"
 #include "../action/buildAction.hpp"
 #include "../action/craftAction.hpp"
 

@@ -18,17 +18,9 @@
 
 #include "room.hpp"
 
-#include <algorithm>
-#include <cmath>
-#include <utility> // std::move
-
 #include "../mud.hpp"
-#include "../constants.hpp"
-#include "../formatter.hpp"
 #include "../generator.hpp"
-#include "../utilities/logger.hpp"
 #include "../model/mechanismModel.hpp"
-#include "../lua/luabridge/LuaBridge.h"
 
 Room::Room() :
         vnum(),

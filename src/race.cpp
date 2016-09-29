@@ -19,10 +19,6 @@
 #include "race.hpp"
 
 #include "mud.hpp"
-#include "utils.hpp"
-#include "formatter.hpp"
-#include "constants.hpp"
-#include "lua/luabridge/LuaBridge.h"
 
 Race::Race() :
         vnum(),

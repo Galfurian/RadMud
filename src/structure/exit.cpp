@@ -19,9 +19,6 @@
 #include "exit.hpp"
 
 #include "room.hpp"
-#include "../utils.hpp"
-#include "../constants.hpp"
-#include "../lua/luabridge/LuaBridge.h"
 
 Exit::Exit() :
         source(),

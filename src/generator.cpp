@@ -24,7 +24,6 @@
 // Other Include.
 #include "utils.hpp"
 #include "constants.hpp"
-#include "utilities/logger.hpp"
 
 Generator::Generator()
 {

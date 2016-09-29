@@ -18,17 +18,7 @@
 
 #include "area.hpp"
 
-#include <algorithm>
-#include <cmath>
-#include <iosfwd>
-#include <ostream>
-
 #include "room.hpp"
-#include "../constants.hpp"
-#include "../item/item.hpp"
-#include "../utilities/logger.hpp"
-#include "../character/character.hpp"
-#include "../lua/luabridge/LuaBridge.h"
 
 Area::Area() :
         vnum(),

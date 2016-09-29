@@ -19,11 +19,7 @@
 // Basic Include.
 #include "building.hpp"
 
-#include "constants.hpp"
 #include "structure/room.hpp"
-#include "model/itemModel.hpp"
-#include "character/character.hpp"
-#include "lua/luabridge/LuaBridge.h"
 
 Building::Building() :
         vnum(),

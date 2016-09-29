@@ -17,9 +17,6 @@
 
 #include "corpseItem.hpp"
 
-#include "../model/corpseModel.hpp"
-#include "../material.hpp"
-#include "../utils.hpp"
 #include "../mud.hpp"
 
 CorpseItem::CorpseItem()

@@ -22,8 +22,6 @@
 
 #include "room.hpp"
 #include "../mud.hpp"
-#include "../constants.hpp"
-#include "../utilities/logger.hpp"
 
 Continent::Continent() :
     vnum(),

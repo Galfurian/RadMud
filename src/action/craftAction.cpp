@@ -17,11 +17,8 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "craftAction.hpp"
-#include "../formatter.hpp"
 #include "../structure/room.hpp"
 #include "../sqlite/sqliteDbms.hpp"
-#include "../utilities/logger.hpp"
-#include "../character/character.hpp"
 
 using namespace std::chrono;
 

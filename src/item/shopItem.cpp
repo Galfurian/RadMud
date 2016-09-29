@@ -18,9 +18,6 @@
 #include "shopItem.hpp"
 
 #include "../mud.hpp"
-#include "../formatter.hpp"
-#include "../constants.hpp"
-#include "../utilities/logger.hpp"
 
 #include "currencyItem.hpp"
 

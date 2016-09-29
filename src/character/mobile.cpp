@@ -23,11 +23,6 @@
 
 // Other Include.
 #include "../mud.hpp"
-#include "../structure/room.hpp"
-#include "../constants.hpp"
-#include "../utilities/logger.hpp"
-#include "../lua/lua_script.hpp"
-#include "../lua/luabridge/LuaBridge.h"
 
 using namespace std::chrono;
 
