@@ -112,7 +112,7 @@ ActionStatus BuildAction::perform()
         }
         else
         {
-            actor->sendMsg("\nYou don't have enough of %s.\n", ingredient->getName());
+            actor->sendMsg("\nYou don't have enough of %s.\n", ingredient->getName(true));
             return ActionStatus::Error;
         }
     }
@@ -121,7 +121,7 @@ ActionStatus BuildAction::perform()
         // Update the condition of the involved objects.
         if (iterator->triggerDecay())
         {
-            actor->sendMsg(iterator->getName() + " falls into pieces.");
+            actor->sendMsg(iterator->getName(true) + " falls into pieces.");
             destroyItems.push_back(iterator);
         }
     }

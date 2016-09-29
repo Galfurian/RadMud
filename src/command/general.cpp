@@ -391,12 +391,12 @@ void DoLook(Character * character, ArgumentHandler & args)
                 }
                 else
                 {
-                    character->sendMsg("It's not insiede %s.\n", container->getName());
+                    character->sendMsg("It's not insiede %s.\n", container->getName(true));
                 }
             }
             else
             {
-                character->sendMsg("%s is not a container.\n", container->getNameCapital());
+                character->sendMsg("%s is not a container.\n", container->getNameCapital(true));
             }
         }
         else

@@ -65,7 +65,7 @@ void DoAssign(Character * character, ArgumentHandler & args)
                 character->sendMsg(
                     "%s is already assigned to %s.\n",
                     mobile->getNameCapital(),
-                    building->getName());
+                    building->getName(true));
             }
             else
             {
@@ -77,11 +77,11 @@ void DoAssign(Character * character, ArgumentHandler & args)
         else
         {
             shop->setNewShopKeeper(mobile);
-            character->sendMsg("You assign %s to %s.\n", mobile->getName(), building->getName());
+            character->sendMsg("You assign %s to %s.\n", mobile->getName(), building->getName(true));
         }
     }
     else
     {
-        character->sendMsg("You cannot assign %s to %s.\n", mobile->getName(), building->getName());
+        character->sendMsg("You cannot assign %s to %s.\n", mobile->getName(), building->getName(true));
     }
 }

@@ -422,7 +422,7 @@ void DoMudSave(Character * character, ArgumentHandler & /*args*/)
     }
 }
 
-void DoGoTo(Character * character, ArgumentHandler & args)
+void DoGoTo(Character * character, ArgumentHandler &args)
 {
     if (args.size() != 1)
     {
@@ -445,7 +445,7 @@ void DoGoTo(Character * character, ArgumentHandler & args)
     character->moveTo(destination, msgDepart, msgArrive, msgChar);
 }
 
-void DoTransfer(Character * character, ArgumentHandler & args)
+void DoTransfer(Character * character, ArgumentHandler &args)
 {
     if ((args.size() != 1) && (args.size() != 2))
     {
@@ -491,14 +491,14 @@ void DoTransfer(Character * character, ArgumentHandler & args)
     character->sendMsg("You transfer %s to room %s.\n", target->getName(), destination->name);
 }
 
-void DoFeast(Character * character, ArgumentHandler & args)
+void DoFeast(Character * character, ArgumentHandler &args)
 {
     if (args.size() != 1)
     {
         character->sendMsg("You must insert a valide target.\n");
         return;
     }
-    auto target = character->room->findCharacter(args[0].getContent(), args[0].getIndex(), { });
+    auto target = character->room->findCharacter(args[0].getContent(), args[0].getIndex(), {});
     if (target == nullptr)
     {
         character->sendMsg("You must provide a valide target.\n");
@@ -511,7 +511,7 @@ void DoFeast(Character * character, ArgumentHandler & args)
     target->sendMsg("A banquet with any kind of delicacy appears from nowhere!\n");
 }
 
-void DoGodInfo(Character * character, ArgumentHandler & args)
+void DoGodInfo(Character * character, ArgumentHandler &args)
 {
     if (args.size() != 1)
     {
@@ -548,7 +548,7 @@ void DoGodInfo(Character * character, ArgumentHandler & args)
     character->sendMsg(sheet.getTable());
 }
 
-void DoSetFlag(Character * character, ArgumentHandler & args)
+void DoSetFlag(Character * character, ArgumentHandler &args)
 {
     if (args.size() != 2)
     {
@@ -582,7 +582,7 @@ void DoSetFlag(Character * character, ArgumentHandler & args)
         target->getName());
 }
 
-void DoClearFlag(Character * character, ArgumentHandler & args)
+void DoClearFlag(Character * character, ArgumentHandler &args)
 {
     if (args.size() != 2)
     {
@@ -616,7 +616,7 @@ void DoClearFlag(Character * character, ArgumentHandler & args)
         target->getName());
 }
 
-void DoModelInfo(Character * character, ArgumentHandler & args)
+void DoModelInfo(Character * character, ArgumentHandler &args)
 {
     if (args.size() != 1)
     {
@@ -637,7 +637,7 @@ void DoModelInfo(Character * character, ArgumentHandler & args)
     character->sendMsg(sheet.getTable());
 }
 
-void DoItemCreate(Character * character, ArgumentHandler & args)
+void DoItemCreate(Character * character, ArgumentHandler &args)
 {
     // Prevent mobiles to execute this command.
     NoMobile(character);
@@ -680,12 +680,10 @@ void DoItemCreate(Character * character, ArgumentHandler & args)
         return;
     }
     character->addInventoryItem(item);
-    character->sendMsg(
-        "You produce '%s' out of your apparently empty top hat.\n",
-        Formatter::yellow() + item->getName() + Formatter::reset());
+    character->sendMsg("You produce '%s' out of your apparently empty top hat.\n", item->getName(true));
 }
 
-void DoItemGet(Character * character, ArgumentHandler & args)
+void DoItemGet(Character * character, ArgumentHandler &args)
 {
     if (args.size() != 1)
     {
@@ -727,7 +725,7 @@ void DoItemGet(Character * character, ArgumentHandler & args)
     }
     else if (item->container != nullptr)
     {
-        character->sendMsg("The item was inside the container '%s'\n", item->container->getName());
+        character->sendMsg("The item was inside the container '%s'\n", item->container->getName(true));
         item->container->takeOut(item);
     }
     else
@@ -738,7 +736,7 @@ void DoItemGet(Character * character, ArgumentHandler & args)
     character->addInventoryItem(item);
 }
 
-void DoItemDestroy(Character * character, ArgumentHandler & args)
+void DoItemDestroy(Character * character, ArgumentHandler &args)
 {
     if (args.size() != 1)
     {
@@ -762,7 +760,7 @@ void DoItemDestroy(Character * character, ArgumentHandler & args)
     character->sendMsg("You have destroyed the desired object.\n");
 }
 
-void DoItemInfo(Character * character, ArgumentHandler & args)
+void DoItemInfo(Character * character, ArgumentHandler &args)
 {
     if (args.size() != 1)
     {
@@ -789,7 +787,7 @@ void DoItemInfo(Character * character, ArgumentHandler & args)
     character->sendMsg(sheet.getTable());
 }
 
-void DoAreaInfo(Character * character, ArgumentHandler & args)
+void DoAreaInfo(Character * character, ArgumentHandler &args)
 {
     if (args.size() != 1)
     {
@@ -815,7 +813,7 @@ void DoAreaInfo(Character * character, ArgumentHandler & args)
     character->sendMsg(msg);
 }
 
-void DoRoomInfo(Character * character, ArgumentHandler & args)
+void DoRoomInfo(Character * character, ArgumentHandler &args)
 {
     Room * room;
     if (args.empty())
@@ -849,7 +847,7 @@ void DoRoomInfo(Character * character, ArgumentHandler & args)
     character->sendMsg(msg);
 }
 
-void DoRoomCreate(Character * character, ArgumentHandler & args)
+void DoRoomCreate(Character * character, ArgumentHandler &args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -896,7 +894,7 @@ void DoRoomCreate(Character * character, ArgumentHandler & args)
     character->sendMsg("You have created a room at: %s\n", targetCoord.toString());
 }
 
-void DoRoomDelete(Character * character, ArgumentHandler & args)
+void DoRoomDelete(Character * character, ArgumentHandler &args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -952,7 +950,7 @@ void DoRoomDelete(Character * character, ArgumentHandler & args)
     character->sendMsg("[%s;%s;%s]\n", ToString(coord.x), ToString(coord.y), ToString(coord.z));
 }
 
-void DoRoomEdit(Character * character, ArgumentHandler & args)
+void DoRoomEdit(Character * character, ArgumentHandler &args)
 {
     if (args.empty())
     {
@@ -967,8 +965,8 @@ void DoRoomEdit(Character * character, ArgumentHandler & args)
             character->sendMsg("You can't set an empty description.\n");
             return;
         }
-        QueryList value = { std::make_pair("description", input) };
-        QueryList where = { std::make_pair("vnum", ToString(character->room->vnum)) };
+        QueryList value = {std::make_pair("description", input)};
+        QueryList where = {std::make_pair("vnum", ToString(character->room->vnum))};
         if (!SQLiteDbms::instance().updateInto("Room", value, where))
         {
             character->sendMsg("Command gone wrong.\n");
@@ -985,8 +983,8 @@ void DoRoomEdit(Character * character, ArgumentHandler & args)
             character->sendMsg("You can't set an empty terrain.\n");
             return;
         }
-        QueryList value = { std::make_pair("terrain", input) };
-        QueryList where = { std::make_pair("vnum", ToString(character->room->vnum)) };
+        QueryList value = {std::make_pair("terrain", input)};
+        QueryList where = {std::make_pair("vnum", ToString(character->room->vnum))};
         if (!SQLiteDbms::instance().updateInto("Room", value, where))
         {
             character->sendMsg("Command gone wrong.\n");
@@ -1003,8 +1001,8 @@ void DoRoomEdit(Character * character, ArgumentHandler & args)
             character->sendMsg("You can't set an empty name.\n");
             return;
         }
-        QueryList value = { std::make_pair("name", input) };
-        QueryList where = { std::make_pair("vnum", ToString(character->room->vnum)) };
+        QueryList value = {std::make_pair("name", input)};
+        QueryList where = {std::make_pair("vnum", ToString(character->room->vnum))};
         if (!SQLiteDbms::instance().updateInto("Room", value, where))
         {
             character->sendMsg("Command gone wrong.\n");
@@ -1075,14 +1073,14 @@ void DoRoomEdit(Character * character, ArgumentHandler & args)
     }
 }
 
-void DoMobileKill(Character * character, ArgumentHandler & args)
+void DoMobileKill(Character * character, ArgumentHandler &args)
 {
     if (args.size() != 1)
     {
         character->sendMsg("You must provide a target mobile.\n");
         return;
     }
-    auto mobile = character->room->findMobile(args[0].getContent(), args[0].getIndex(), { });
+    auto mobile = character->room->findMobile(args[0].getContent(), args[0].getIndex(), {});
     if (mobile == nullptr)
     {
         character->sendMsg("Mobile not found.\n");
@@ -1092,17 +1090,17 @@ void DoMobileKill(Character * character, ArgumentHandler & args)
     mobile->kill();
     // Notify the death.
     character->sendMsg("You snap your fingers.\n");
-    character->room->sendToAll("%s fall to the ground dead.", { }, mobile->getNameCapital());
+    character->room->sendToAll("%s fall to the ground dead.", {}, mobile->getNameCapital());
 }
 
-void DoMobileReload(Character * character, ArgumentHandler & args)
+void DoMobileReload(Character * character, ArgumentHandler &args)
 {
     if (args.size() != 1)
     {
         character->sendMsg("You must provide a target mobile.\n");
         return;
     }
-    auto mobile = character->room->findMobile(args[0].getContent(), args[0].getIndex(), { });
+    auto mobile = character->room->findMobile(args[0].getContent(), args[0].getIndex(), {});
     if (mobile == nullptr)
     {
         character->sendMsg("Mobile not found.\n");
@@ -1113,7 +1111,8 @@ void DoMobileReload(Character * character, ArgumentHandler & args)
     // Notify.
     character->sendMsg("Target(%s) Script(%s)\n", mobile->getName(), mobile->lua_script);
 }
-void DoMobileLog(Character * character, ArgumentHandler & args)
+
+void DoMobileLog(Character * character, ArgumentHandler &args)
 {
     if (args.size() != 1)
     {
@@ -1131,14 +1130,14 @@ void DoMobileLog(Character * character, ArgumentHandler & args)
     character->sendMsg("Log:\n%s\n", mobile->message_buffer);
 }
 
-void DoHurt(Character * character, ArgumentHandler & args)
+void DoHurt(Character * character, ArgumentHandler &args)
 {
     if (args.size() != 1)
     {
         character->sendMsg("Who do you want to hurt?\n");
         return;
     }
-    auto target = character->room->findCharacter(args[0].getContent(), args[0].getIndex(), { });
+    auto target = character->room->findCharacter(args[0].getContent(), args[0].getIndex(), {});
     if (target == nullptr)
     {
         character->sendMsg("Target not found.\n");
@@ -1152,8 +1151,9 @@ void DoHurt(Character * character, ArgumentHandler & args)
         "%s points the finger towards you, you cry in pain.\n",
         character->getNameCapital());
     // Send the message inside the room.
-    target->room->sendToAll("%s points the finger towards %s, %s cries in pain.\n", { character,
-        target }, character->getNameCapital(), target->getName(), target->getSubjectPronoun());
+    target->room->sendToAll("%s points the finger towards %s, %s cries in pain.\n", {character,
+                                                                                     target},
+                            character->getNameCapital(), target->getName(), target->getSubjectPronoun());
 }
 
 void DoInvisibility(Character * character, ArgumentHandler & /*args*/)
@@ -1182,14 +1182,14 @@ void DoVisible(Character * character, ArgumentHandler & /*args*/)
     character->sendMsg("You are no more invisible.\n");
 }
 
-void DoModSkill(Character * character, ArgumentHandler & args)
+void DoModSkill(Character * character, ArgumentHandler &args)
 {
     if (args.size() != 3)
     {
         character->sendMsg("Usage: [target] [#skill] [+/-VALUE]\n");
         return;
     }
-    auto target = character->room->findPlayer(args[0].getContent(), args[0].getIndex(), { });
+    auto target = character->room->findPlayer(args[0].getContent(), args[0].getIndex(), {});
     if (target == nullptr)
     {
         character->sendMsg("Target not found.\n");
@@ -1229,7 +1229,7 @@ void DoModSkill(Character * character, ArgumentHandler & args)
         ToString(target->skills[skill->vnum]));
 }
 
-void DoModAttr(Character * character, ArgumentHandler & args)
+void DoModAttr(Character * character, ArgumentHandler &args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -1296,7 +1296,7 @@ void DoModAttr(Character * character, ArgumentHandler & args)
         GetAbilityName(ability));
 }
 
-void DoAggroList(Character * character, ArgumentHandler & args)
+void DoAggroList(Character * character, ArgumentHandler &args)
 {
     if (args.size() != 1)
     {
@@ -1325,7 +1325,7 @@ void DoAggroList(Character * character, ArgumentHandler & args)
     }
 }
 
-void DoMaterialInfo(Character * character, ArgumentHandler & args)
+void DoMaterialInfo(Character * character, ArgumentHandler &args)
 {
     if (args.size() != 1)
     {
@@ -1348,7 +1348,7 @@ void DoMaterialInfo(Character * character, ArgumentHandler & args)
     character->sendMsg(msg);
 }
 
-void DoLiquidCreate(Character * character, ArgumentHandler & args)
+void DoLiquidCreate(Character * character, ArgumentHandler &args)
 {
     if (args.size() != 3)
     {
@@ -1387,10 +1387,10 @@ void DoLiquidCreate(Character * character, ArgumentHandler & args)
         "You materialise %s units of %s inside %s.\n",
         ToString(quantity),
         liquid->getName(),
-        item->getName());
+        item->getName(true));
 }
 
-void DoLiquidInfo(Character * character, ArgumentHandler & args)
+void DoLiquidInfo(Character * character, ArgumentHandler &args)
 {
     if (args.size() != 1)
     {
@@ -1410,7 +1410,7 @@ void DoLiquidInfo(Character * character, ArgumentHandler & args)
     character->sendMsg(msg);
 }
 
-void DoProductionInfo(Character * character, ArgumentHandler & args)
+void DoProductionInfo(Character * character, ArgumentHandler &args)
 {
 
     if (args.size() != 1)
@@ -1432,7 +1432,7 @@ void DoProductionInfo(Character * character, ArgumentHandler & args)
     msg += "Time        : " + ToString(production->time) + "\n";
     msg += "Assisted    : " + ToString(production->assisted) + "\n";
     msg += "Outcome     : " + production->outcome->name + "*" + ToString(production->quantity)
-        + "\n";
+           + "\n";
     msg += "Tools       :\n";
     for (auto iterator : production->tools)
     {
@@ -1442,13 +1442,13 @@ void DoProductionInfo(Character * character, ArgumentHandler & args)
     for (auto iterator : production->ingredients)
     {
         msg += "                  " + GetResourceTypeName(iterator.first) + "("
-            + ToString(iterator.second) + ")\n";
+               + ToString(iterator.second) + ")\n";
     }
     msg += "Workbench   :" + GetToolTypeName(production->workbench) + "\n";
     character->sendMsg(msg);
 }
 
-void DoProfessionInfo(Character * character, ArgumentHandler & args)
+void DoProfessionInfo(Character * character, ArgumentHandler &args)
 {
     if (args.size() != 1)
     {
@@ -1476,7 +1476,7 @@ void DoProfessionInfo(Character * character, ArgumentHandler & args)
     character->sendMsg(msg);
 }
 
-void DoFactionInfo(Character * character, ArgumentHandler & args)
+void DoFactionInfo(Character * character, ArgumentHandler &args)
 {
     if (args.size() != 1)
     {
@@ -1659,7 +1659,7 @@ void DoRoomList(Character * character, ArgumentHandler & /*args*/)
         }
         row.push_back(
             ToString(room->coord.x) + ' ' + ToString(room->coord.y) + ' '
-                + ToString(room->coord.z));
+            + ToString(room->coord.z));
         row.push_back(room->terrain);
         row.push_back(room->name);
         // Add the row to the table.

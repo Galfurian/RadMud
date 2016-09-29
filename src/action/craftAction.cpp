@@ -112,7 +112,7 @@ ActionStatus CraftAction::perform()
         }
         else
         {
-            actor->sendMsg("\nYou don't have enough of %s.\n", ingredient->getName());
+            actor->sendMsg("\nYou don't have enough of %s.\n", ingredient->getName(true));
             return ActionStatus::Error;
         }
     }
@@ -175,7 +175,7 @@ ActionStatus CraftAction::perform()
         // Update the condition of the involved objects.
         if (iterator->triggerDecay())
         {
-            actor->sendMsg("%s falls into pieces.", iterator->getNameCapital());
+            actor->sendMsg("%s falls into pieces.", iterator->getNameCapital(true));
             destroyItems.push_back(iterator);
         }
     }
@@ -195,7 +195,7 @@ ActionStatus CraftAction::perform()
     actor->sendMsg(
         "%s %s.\n\n",
         production->profession->finishMessage,
-        Formatter::yellow() + createdItems.back()->getName() + Formatter::reset());
+        createdItems.back()->getName(true));
     if (dropped)
     {
         actor->sendMsg("some of the items have been placed on the ground.\n\n");

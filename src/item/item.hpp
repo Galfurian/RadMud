@@ -172,12 +172,14 @@ class Item
         virtual unsigned int getWeight(bool entireStack) const;
 
         /// @brief Return the name of the item.
+        /// @param colored If <b>true</b> the name also include formatting color.
         /// @return The name of the item.
-        std::string getName() const;
+        std::string getName(bool colored = false) const;
 
         /// @brief Return the name of the item with the first letter capitalized.
+        /// @param colored If <b>true</b> the name also include formatting color.
         /// @return The name of the item.
-        std::string getNameCapital() const;
+        std::string getNameCapital(bool colored = false) const;
 
         /// @brief Return the description of the item.
         /// @return The description of the item.

@@ -303,8 +303,15 @@ Item * Item::removeFromStack(Character * actor, unsigned int & _quantity)
             // Return the new stack.
             return newStack;
         }
+        else
+        {
+            return nullptr;
+        }
     }
-    return nullptr;
+    else
+    {
+        return this;
+    }
 }
 
 bool Item::hasKey(std::string key)
@@ -397,15 +404,24 @@ unsigned int Item::getWeight(bool entireStack) const
     return totalWeight;
 }
 
-std::string Item::getName() const
+std::string Item::getName(bool colored) const
 {
-    return model->getName(composition, quality);
+    std::string itemName = model->getName(composition, quality);
+    if(colored)
+    {
+        itemName = Formatter::cyan() + itemName + Formatter::reset();
+    }
+    return itemName;
 }
 
-std::string Item::getNameCapital() const
+std::string Item::getNameCapital(bool colored) const
 {
-    std::string itemName = this->getName();
+    std::string itemName = model->getName(composition, quality);
     itemName[0] = static_cast<char>(toupper(itemName[0]));
+    if(colored)
+    {
+        itemName = Formatter::cyan() + itemName + Formatter::reset();
+    }
     return itemName;
 }
 
@@ -420,7 +436,7 @@ std::string Item::getLook()
 
     // Prepare : Name, Condition.
     //           Description.
-    output = "You look at " + Formatter::cyan() + this->getName() + Formatter::reset();
+    output = "You look at " + this->getName(true);
     output += ", it " + this->getConditionDescription() + ".\n";
     output += Formatter::gray() + this->getDescription() + Formatter::reset() + "\n";
     output += "\n";

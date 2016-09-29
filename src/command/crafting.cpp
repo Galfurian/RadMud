@@ -294,7 +294,7 @@ void DoDeconstruct(Character * character, ArgumentHandler & args)
     }
     else
     {
-        character->sendMsg("You deconstruct %s.\n", item->getName());
+        character->sendMsg("You deconstruct %s.\n", item->getName(true));
         // Reset item flags.
         ClearFlag(item->flags, ItemFlag::Built);
     }
@@ -316,10 +316,10 @@ void DoRead(Character * character, ArgumentHandler & args)
     auto writing = Mud::instance().findWriting(item->vnum);
     if (writing == nullptr)
     {
-        character->sendMsg("There is nothing written on %s.\n", item->getName());
+        character->sendMsg("There is nothing written on %s.\n", item->getName(true));
         return;
     }
-    character->sendMsg("You start reading %s...\n", item->getName());
+    character->sendMsg("You start reading %s...\n", item->getName(true));
     if (!writing->title.empty())
     {
         character->sendMsg("The title is '%s'.\n", writing->title);

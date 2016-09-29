@@ -77,7 +77,7 @@ ActionStatus BasicAttack::perform()
             {
                 actor->sendMsg(
                     "You do not have opponents at reange for %s.\n",
-                    iterator->getName());
+                    iterator->getName(true));
                 continue;
             }
             // Get the required stamina.
@@ -88,7 +88,7 @@ ActionStatus BasicAttack::perform()
             // Check if the actor has enough stamina to execute the action.
             if (consumedStamina > actor->getStamina())
             {
-                actor->sendMsg("You are too tired to attack with %s.\n", iterator->getName());
+                actor->sendMsg("You are too tired to attack with %s.\n", iterator->getName(true));
                 Logger::log(
                     LogLevel::Debug,
                     "[%s] Has %s stamina and needs %s.",
@@ -155,16 +155,16 @@ ActionStatus BasicAttack::perform()
             if ((ATK < AC) && (ATK != 20))
             {
                 // Notify the actor.
-                actor->sendMsg("You miss %s with %s.\n\n", enemy->getName(), iterator->getName());
+                actor->sendMsg("You miss %s with %s.\n\n", enemy->getName(), iterator->getName(true));
                 // Notify the enemy.
-                enemy->sendMsg("%s misses you with %s.\n\n", actor->getName(), iterator->getName());
+                enemy->sendMsg("%s misses you with %s.\n\n", actor->getName(), iterator->getName(true));
                 // Notify the others.
                 enemy->room->sendToAll(
                     "%s miss %s with %s.\n",
                     { actor, enemy },
                     actor->getName(),
                     enemy->getName(),
-                    iterator->getName());
+                    iterator->getName(true));
                 // Consume half the stamina.
                 actor->remStamina(consumedStamina / 2, true);
             }
@@ -211,7 +211,7 @@ ActionStatus BasicAttack::perform()
                     actor->getName(),
                     enemy->getName(),
                     ToString(DMG),
-                    iterator->getName());
+                    iterator->getName(true));
                 // Procede and remove the damage from the health of the target.
                 if (!enemy->remHealth(DMG))
                 {
@@ -219,14 +219,14 @@ ActionStatus BasicAttack::perform()
                         "You %s hit %s with %s and kill %s.\n\n",
                         (isCritical ? "critically" : ""),
                         enemy->getName(),
-                        iterator->getName(),
+                        iterator->getName(true),
                         enemy->getObjectPronoun());
                     // Notify the enemy.
                     enemy->sendMsg(
                         "%s %s hits you with %s and kill you.\n\n",
                         actor->getName(),
                         (isCritical ? "critically" : ""),
-                        iterator->getName());
+                        iterator->getName(true));
                     // Notify the others.
                     enemy->room->sendToAll(
                         "%s %s hits %s with %s and kill %s.\n",
@@ -234,7 +234,7 @@ ActionStatus BasicAttack::perform()
                         actor->getName(),
                         (isCritical ? "critically" : ""),
                         enemy->getName(),
-                        iterator->getName(),
+                        iterator->getName(true),
                         enemy->getObjectPronoun());
                     // The enemy has received the damage and now it is dead.
                     enemy->kill();
@@ -247,14 +247,14 @@ ActionStatus BasicAttack::perform()
                         "You %s hit %s with %s for %s.\n\n",
                         (isCritical ? "critically" : ""),
                         enemy->getName(),
-                        iterator->getName(),
+                        iterator->getName(true),
                         ToString(DMG));
                     // Notify the enemy.
                     enemy->sendMsg(
                         "%s %s hits you with %s for %s.\n\n",
                         actor->getName(),
                         (isCritical ? "critically" : ""),
-                        iterator->getName(),
+                        iterator->getName(true),
                         ToString(DMG));
                     // Notify the others.
                     enemy->room->sendToAll(
@@ -263,7 +263,7 @@ ActionStatus BasicAttack::perform()
                         actor->getName(),
                         (isCritical ? "critically" : ""),
                         enemy->getName(),
-                        iterator->getName(),
+                        iterator->getName(true),
                         ToString(DMG));
                 }
             }
