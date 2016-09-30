@@ -1097,7 +1097,7 @@ void DoOpen(Character * character, ArgumentHandler & args)
             return;
         }
 
-        ClearFlag(door->flags, ItemFlag::Closed);
+        ClearFlag(&door->flags, ItemFlag::Closed);
 
         // Display message.
         if (HasFlag(roomExit->flags, ExitFlag::Hidden))
@@ -1159,7 +1159,7 @@ void DoOpen(Character * character, ArgumentHandler & args)
             character->sendMsg("It is already opened.\n");
             return;
         }
-        ClearFlag(container->flags, ItemFlag::Closed);
+        ClearFlag(&container->flags, ItemFlag::Closed);
         // Send the message to the character.
         character->sendMsg("You open %s.\n", container->getName(true));
         // Send the message inside the room.
@@ -1219,7 +1219,7 @@ void DoClose(Character * character, ArgumentHandler & args)
             character->sendMsg("There are someone on the way, you can't close the door.\n");
             return;
         }
-        SetFlag(door->flags, ItemFlag::Closed);
+        SetFlag(&door->flags, ItemFlag::Closed);
         // Display message.
         if (HasFlag(roomExit->flags, ExitFlag::Hidden))
         {
@@ -1282,7 +1282,7 @@ void DoClose(Character * character, ArgumentHandler & args)
             character->sendMsg("It cannot be closed.\n");
             return;
         }
-        SetFlag(container->flags, ItemFlag::Closed);
+        SetFlag(&container->flags, ItemFlag::Closed);
         // Send the message to the character.
         character->sendMsg("You close %s.\n", container->getName(true));
         // Send the message inside the room.

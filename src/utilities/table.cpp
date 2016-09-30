@@ -24,9 +24,9 @@
 #include "logger.hpp"
 
 TableColumn::TableColumn(std::string _title, StringAlign _alignment, size_t _width) :
-    title(_title),
-    alignment(_alignment),
-    width(_width)
+    title(std::move(_title)),
+    alignment(std::move(_alignment)),
+    width(std::move(_width))
 {
     if (width == 0)
     {
@@ -34,12 +34,12 @@ TableColumn::TableColumn(std::string _title, StringAlign _alignment, size_t _wid
     }
 }
 
-std::string TableColumn::getTitle()
+std::string TableColumn::getTitle() const
 {
     return title;
 }
 
-size_t TableColumn::getWidth()
+size_t TableColumn::getWidth() const
 {
     return width;
 }
@@ -66,7 +66,7 @@ Table::Table() :
 }
 
 Table::Table(std::string _title) :
-    title(_title),
+    title(std::move(_title)),
     columns(),
     rows()
 {
@@ -80,7 +80,7 @@ Table::~Table()
 
 void Table::addColumn(std::string columnTitle, StringAlign columnAlignment, size_t columnWidth)
 {
-    columns.push_back(TableColumn(columnTitle, columnAlignment, columnWidth));
+    columns.emplace_back(TableColumn(columnTitle, columnAlignment, columnWidth));
 }
 
 void Table::addRow(TableRow row)
@@ -114,7 +114,7 @@ std::string Table::getTable(bool withoutHeaders)
     for (auto row : rows)
     {
         unsigned int column = 0;
-        for (auto cell : row)
+        for (const auto & cell : row)
         {
             output += "#"
                       + AlignString(cell, columns[column].getAlignment(), columns[column].getWidth());
@@ -134,9 +134,9 @@ size_t Table::getNumRows()
 void Table::addDivider()
 {
     std::vector<std::string> divider;
-    for (auto column : columns)
+    for (const auto & column : columns)
     {
-        divider.push_back("");
+        divider.emplace_back("");
     }
     this->addRow(divider);
 }
@@ -149,7 +149,7 @@ void Table::popRow()
 std::string Table::getDivider()
 {
     std::string output;
-    for (auto column : columns)
+    for (const auto & column : columns)
     {
         output += "#";
         for (size_t w = 0; w < column.getWidth(); ++w)

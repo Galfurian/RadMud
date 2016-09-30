@@ -47,29 +47,29 @@ bool Logger::openLog(const std::string & filename)
     return Logger::getStream().is_open();
 }
 
-bool Logger::getLog(const LogLevel & level, std::string & result)
+bool Logger::getLog(const LogLevel & level, std::string * result)
 {
     if (Logger::getStream().is_open())
     {
         // Clear the output string.
-        result.clear();
+        result->clear();
         std::streamoff totalSize = Logger::getStream().tellg();
         if (totalSize > 0)
         {
             // Resize the log string.
-            result.resize(static_cast<std::size_t>(totalSize));
+            result->resize(static_cast<std::size_t>(totalSize));
             // Move the input position to the beginning of the string.
             Logger::getStream().seekg(0, std::ios::beg);
             // Create a string for storing the line.
             std::string line;
             // Create a string which contains the given level.
             std::string logLevel = "[" + Logger::levelToString(level) + "]";
-            while (std::getline(Logger::getStream(), line))
+            while (std::getline(Logger::getStream(), line) != nullptr)
             {
                 // If the line starts with the sa
                 if (BeginWith(line, logLevel))
                 {
-                    result.append(line + "\n");
+                    result->append(line + "\n");
                 }
             }
             return true;
@@ -102,7 +102,7 @@ std::fstream & Logger::getStream()
 
 std::string Logger::getDateTime()
 {
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     char buffer[32];
     // Format: H:M
     strftime(buffer, 32, "%H:%M", localtime(&now));

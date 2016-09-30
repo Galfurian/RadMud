@@ -273,12 +273,12 @@ void Player::sendPrompt()
         if (this->logged_in)
         {
             std::string readyPrompt = prompt + "\n";
-            FindAndReplace(readyPrompt, "&n", ToLower(name));
-            FindAndReplace(readyPrompt, "&N", name);
-            FindAndReplace(readyPrompt, "&h", ToString(this->getHealth()));
-            FindAndReplace(readyPrompt, "&H", ToString(this->getMaxHealth()));
-            FindAndReplace(readyPrompt, "&s", ToString(this->getStamina()));
-            FindAndReplace(readyPrompt, "&S", ToString(this->getMaxStamina()));
+            FindAndReplace(&readyPrompt, "&n", ToLower(name));
+            FindAndReplace(&readyPrompt, "&N", name);
+            FindAndReplace(&readyPrompt, "&h", ToString(this->getHealth()));
+            FindAndReplace(&readyPrompt, "&H", ToString(this->getMaxHealth()));
+            FindAndReplace(&readyPrompt, "&s", ToString(this->getStamina()));
+            FindAndReplace(&readyPrompt, "&S", ToString(this->getMaxStamina()));
             this->sendMsg(readyPrompt);
         }
         else
@@ -404,7 +404,7 @@ void Player::processWrite()
         this->sendPrompt();
 
         // For portability I replace \n with \r\n.
-        FindAndReplace(outbuf, "\n", "\r\n");
+        FindAndReplace(&outbuf, "\n", "\r\n");
 
         // Send a maximum of 4096 at a time.
         size_t iLength = std::min<size_t>(outbuf.size(), kMaxStream);

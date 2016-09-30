@@ -136,25 +136,25 @@ void ProcessTelnetCommand(Character * character, ArgumentHandler & args)
             {
                 if (player->connection_state == ConnectionState::NegotiatingMSDP)
                 {
-                    SetFlag(player->connectionFlags, ConnectionFlag::UseMSDP);
+                    SetFlag(&player->connectionFlags, ConnectionFlag::UseMSDP);
                     Logger::log(LogLevel::Debug, "Positive acknowledgments for MSDP (%s).", result);
                 }
                 else if (player->connection_state == ConnectionState::NegotiatingMCCP)
                 {
-                    SetFlag(player->connectionFlags, ConnectionFlag::UseMCCP);
+                    SetFlag(&player->connectionFlags, ConnectionFlag::UseMCCP);
                     Logger::log(LogLevel::Debug, "Positive acknowledgments for MCCP (%s).", result);
                 }
                 break;
             }
             if (command == TelnetChar::MSDP)
             {
-                SetFlag(player->connectionFlags, ConnectionFlag::UseMSDP);
+                SetFlag(&player->connectionFlags, ConnectionFlag::UseMSDP);
                 Logger::log(LogLevel::Debug, "Positive acknowledgments for MSDP (%s).", result);
                 continue;
             }
             else if (command == TelnetChar::MCCP)
             {
-                SetFlag(player->connectionFlags, ConnectionFlag::UseMCCP);
+                SetFlag(&player->connectionFlags, ConnectionFlag::UseMCCP);
                 Logger::log(LogLevel::Debug, "Positive acknowledgments for MCCP (%s).", result);
                 continue;
             }

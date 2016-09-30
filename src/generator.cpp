@@ -136,6 +136,6 @@ Generator::generateDescription(const AreaType & type, const AreaStatus & status,
     size_t nameSelector = TRandInteger<size_t>(0, mapBase[type].descriptions.size() - 1);
     size_t nameStatus = TRandInteger<size_t>(0, mapStatus[status].descriptionStatus.size() - 1);
     std::string result = mapBase[type].descriptions[nameSelector] + mapStatus[status].descriptionStatus[nameStatus];
-    FindAndReplace(result, "@ROOM_NAME", ToLower(roomName));
+    FindAndReplace(&result, "@ROOM_NAME", ToLower(roomName));
     return result;
 }

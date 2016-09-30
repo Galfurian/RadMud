@@ -215,7 +215,7 @@ bool LoadFaction(ResultSet * result)
         faction->description = description;
         faction->currency = currency;
         // Translate new_line.
-        FindAndReplace(faction->description, "%r", "\n");
+        FindAndReplace(&faction->description, "%r", "\n");
         // Check the correctness.
         if (!faction->check())
         {
@@ -272,7 +272,7 @@ bool LoadModel(ResultSet * result)
         //    return false;
         //}
         // Translate new_line.
-        FindAndReplace(itemModel->description, "%r", "\n");
+        FindAndReplace(&itemModel->description, "%r", "\n");
         // Check the correctness.
         if (!itemModel->check())
         {
@@ -310,7 +310,7 @@ bool LoadRace(ResultSet * result)
         race->tileId = result->getNextInteger();
         std::string corpseDescription = result->getNextString();
         // Translate new_line.
-        FindAndReplace(race->description, "%r", "\n");
+        FindAndReplace(&race->description, "%r", "\n");
         // Intialize the corpse.
         race->initializeCorpse(corpseDescription);
         // Check the correctness.
@@ -362,7 +362,7 @@ bool LoadMobile(ResultSet * result)
         mobile->setStamina(mobile->getMaxStamina(), true);
 
         // Translate new_line.
-        FindAndReplace(mobile->description, "%r", "\n");
+        FindAndReplace(&mobile->description, "%r", "\n");
         // Check the correctness.
         if (!mobile->check())
         {
@@ -400,7 +400,7 @@ bool LoadRoom(ResultSet * result)
         room->description = result->getNextString();
         room->flags = result->getNextUnsignedInteger();
         // Translate new_line.
-        FindAndReplace(room->description, "%r", "\n");
+        FindAndReplace(&room->description, "%r", "\n");
         // Check the correctness.
         if (!room->check())
         {
@@ -822,8 +822,8 @@ bool LoadTravelPoint(ResultSet * result)
             Logger::log(LogLevel::Error, "Error during TravelPoint insertion.");
             return false;
         }
-        SetFlag(sourceRoom->flags, RoomFlag::TravelPoint);
-        SetFlag(targetRoom->flags, RoomFlag::TravelPoint);
+        SetFlag(&sourceRoom->flags, RoomFlag::TravelPoint);
+        SetFlag(&targetRoom->flags, RoomFlag::TravelPoint);
     }
     return true;
 }

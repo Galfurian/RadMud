@@ -22,7 +22,7 @@
 #include <fstream>
 
 /// @brief Enumerator which identifies the severity of the log entry.
-typedef enum class LoggingLevels
+using LogLevel = enum class LogLevel_t
 {
     Global = 1,     ///< General logging level.
     Trace = 2,      ///< Log events useful for back-tracing.
@@ -31,7 +31,7 @@ typedef enum class LoggingLevels
     Error = 16,     ///< Log events which concerns errors.
     Warning = 32,   ///< Log events which can harm the stability of the mud.
     Info = 64       ///< Log of events which involves the action of characters.
-} LogLevel;
+};
 
 /// @brief Class used to handle mud logging.
 class Logger
@@ -71,7 +71,7 @@ public:
     /// @param result For efficiency, receive a reference to the result.
     /// @return <b>True</b> if the log has been retrieved,<br>
     ///         <b>False</b> otherwise.
-    static bool getLog(const LogLevel & level, std::string & result);
+    static bool getLog(const LogLevel & level, std::string * result);
 
     /// @brief Casts an unsigned int to a possible logging level.
     /// @param level  The logging level.

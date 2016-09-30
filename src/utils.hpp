@@ -19,7 +19,7 @@
 #pragma once
 
 #include <algorithm>
-#include <stdint.h>
+#include <cstdint>
 #include <cstdlib>
 #include <list>
 #include <map>
@@ -72,40 +72,39 @@ bool HasFlag(const unsigned int & flags, Enum flag)
 /// @param flags The destination value.
 /// @param flag  The flag to set.
 template<typename Enum>
-void SetFlag(unsigned int & flags, Enum flag)
+void SetFlag(unsigned int * flags, Enum flag)
 {
     static_assert(std::is_enum<Enum>::value, "template parameter is not an enum type");
-    flags |= static_cast<unsigned int>(flag);
+    (*flags) |= static_cast<unsigned int>(flag);
 }
 
 /// @brief Clear the passed flag to the value.
 /// @param flags The destination value.
 /// @param flag  The flag to clear.
 template<typename Enum>
-void ClearFlag(unsigned int & flags, Enum flag)
+void ClearFlag(unsigned int * flags, Enum flag)
 {
     static_assert(std::is_enum<Enum>::value, "template parameter is not an enum type");
-    flags &= ~static_cast<unsigned int>(flag);
+    (*flags) &= ~static_cast<unsigned int>(flag);
 }
 
 /// @brief Check if the source string begin with a given prefix.
 /// @param source Source string.
-/// @param target Prefix string.
+/// @param prefix Prefix string.
 /// @return <b>True</b> if the source begin with the given prefix, <br> <b>False</b> otherwise.
-bool BeginWith(const std::string & source, const std::string & target);
+bool BeginWith(const std::string & source, const std::string & prefix);
 
 /// @brief Check if the source string end with a given string.
 /// @param source Source string.
-/// @param target Final string.
+/// @param suffix Final string.
 /// @return <b>True</b> if the source end with the given postfix, <b>False</b> otherwise.
-bool EndWith(const std::string & source, const std::string & target);
+bool EndWith(const std::string & source, const std::string & suffix);
 
 /// @brief Find and replace in a string.
 /// @param source      Source string.
 /// @param target      Target sub-string.
 /// @param replacement Replacement for the sub-string.
-/// @return String with sub-string replaced.
-std::string FindAndReplace(std::string & source, const std::string & target, const std::string & replacement);
+void FindAndReplace(std::string * source, const std::string & target, const std::string & replacement);
 
 /// @brief Get rid of leading and trailing spaces from a string
 /// @param source Source string.
@@ -185,9 +184,9 @@ ValueType ToNumber(const std::string & source)
     static_assert((
                       std::is_same<ValueType, bool>::value ||
                       std::is_same<ValueType, int>::value ||
-                      std::is_same<ValueType, long int>::value ||
+                      std::is_same<ValueType, int64_t>::value ||
                       std::is_same<ValueType, unsigned int>::value ||
-                      std::is_same<ValueType, long unsigned int>::value ||
+                      std::is_same<ValueType, uint64_t>::value ||
                       std::is_same<ValueType, double>::value), "template parameter is of the wrong type");
     char * pEnd;
     return static_cast<ValueType>(strtol(source.c_str(), &pEnd, 10));
@@ -202,9 +201,9 @@ std::string ToString(const ValueType & value)
     static_assert((
                       std::is_same<ValueType, bool>::value ||
                       std::is_same<ValueType, int>::value ||
-                      std::is_same<ValueType, long int>::value ||
+                      std::is_same<ValueType, int64_t>::value ||
                       std::is_same<ValueType, unsigned int>::value ||
-                      std::is_same<ValueType, long unsigned int>::value ||
+                      std::is_same<ValueType, uint64_t>::value ||
                       std::is_same<ValueType, double>::value), "template parameter is of the wrong type");
     std::ostringstream stm;
     stm << value;
@@ -223,11 +222,6 @@ std::string EnumToString(const Enum & value)
     return stm.str();
 }
 
-/// @brief Check if all the character in the string it's ASCII.
-/// @param string_to_check The string to check.
-/// @return <b>True</b> if the string it's made of all ASCII characters.<br><b>False</b> otherwise.
-bool IsAllASCII(const char * string_to_check);
-
 /// @brief Generate a random integral value between the defined range.
 /// @param lowerBound The lower bound for the random value.
 /// @param upperBound The upper bound for the random value.
@@ -238,9 +232,9 @@ ValueType TRandInteger(const ValueType & lowerBound, const ValueType & upperBoun
     static_assert((
                       std::is_same<ValueType, bool>::value ||
                       std::is_same<ValueType, int>::value ||
-                      std::is_same<ValueType, long int>::value ||
+                      std::is_same<ValueType, int64_t>::value ||
                       std::is_same<ValueType, unsigned int>::value ||
-                      std::is_same<ValueType, long unsigned int>::value ||
+                      std::is_same<ValueType, uint64_t>::value ||
                       std::is_same<ValueType, double>::value), "template parameter is of the wrong type");
 
     std::random_device rng;
@@ -258,11 +252,6 @@ bool IsNumber(const std::string & source);
 /// @return The ability modifier.
 unsigned int GetAbilityModifier(const unsigned int & value);
 
-/// @brief Given a player target, eg.: 2.rat.<br>Extract the number <b>2</b>.
-/// @param source The source string.
-/// @param number Pointer where must put the number once retrieved.
-void ExtractNumber(std::string & source, int & number);
-
 /// @brief  Retrieve the content of a file.
 /// @param  filename The path and name of the file to read.
 /// @return The content of the file.
@@ -276,13 +265,13 @@ std::string GetAttributeName(const int & id, const bool & abbreviated = false);
 
 /// @brief It creates a compressed strem of data.
 /// @param uncompressed The input non-compressed stream of data.
-/// @param compressed   The resulting compressed stream of data.
-void DeflateStream(std::vector<uint8_t> & uncompressed, std::vector<uint8_t> & compressed);
+/// @return The resulting compressed stream of data.
+std::vector<uint8_t> DeflateStream(std::vector<uint8_t> & uncompressed);
 
 /// @brief It decompress a compressed strem of data.
 /// @param compressed   The input compressed stream of data.
-/// @param uncompressed The resulting non-compressed stream of data.
-void InflateStream(std::vector<uint8_t> & compressed, std::vector<uint8_t> & uncompressed);
+/// @return The resulting non-compressed stream of data.
+std::vector<uint8_t> InflateStream(std::vector<uint8_t> & compressed);
 
 /// @brief Remove an element from a vector.
 /// @param v    The vector.
@@ -301,11 +290,9 @@ bool FindErase(std::vector<T> & v, const T & item)
         v.shrink_to_fit();
         return true;
     }
-    else
-    {
-        return false;
-    }
+    return false;
 }
+
 
 /// @brief Remove an element from a list.
 /// @param l    The list.

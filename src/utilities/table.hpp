@@ -19,20 +19,20 @@
 
 #pragma once
 
-#include <stddef.h>
+#include <cstddef>
 #include <string>
 #include <vector>
 
 /// The structure used to provide a row.
-typedef std::vector<std::string> TableRow;
+using TableRow = std::vector<std::string>;
 
 /// Kinds of string alignment.
-typedef enum class StringAlign_t
+using StringAlign = enum class StringAlign_t
 {
     Left,
     Center,
     Right,
-} StringAlign;
+};
 
 /// @brief A class which provide access and means to manage a table column.
 class TableColumn
@@ -54,11 +54,11 @@ public:
 
     /// @brief Provide access to the title of the column.
     /// @return The title of the column
-    std::string getTitle();
+    std::string getTitle() const;
 
     /// @brief Provides the width of the column.
     /// @return The width of the column.
-    size_t getWidth();
+    size_t getWidth() const;
 
     /// @brief Provides access to the allignment of the column.
     /// @return The allignment of the column.
@@ -86,7 +86,7 @@ public:
 
     /// @brief Constructor.
     /// @param _title The title of the table.
-    Table(std::string _title);
+    explicit Table(std::string _title);
 
     /// @brief Destructor.
     ~Table();

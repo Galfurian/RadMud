@@ -21,7 +21,6 @@
 #include "utils.hpp"
 
 #include <dirent.h>
-#include <limits.h>
 #include <zconf.h>
 #include <zlib.h>
 #include <ctime>
@@ -31,36 +30,24 @@
 
 #include "utilities/logger.hpp"
 
-bool BeginWith(const std::string & source, const std::string & target)
+bool BeginWith(const std::string & source, const std::string & prefix)
 {
-    return !source.compare(0, target.size(), target);
+    return source.compare(0, prefix.size(), prefix) == 0;
 }
 
-bool EndWith(const std::string & source, const std::string & target)
+bool EndWith(const std::string & source, const std::string & suffix)
 {
-    if (source.size() > target.size())
-    {
-        return !source.compare(source.size() - target.size(), source.size(), target);
-    }
-    return false;
+    return source.size() >= suffix.size() && source.compare(source.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
 
-std::string FindAndReplace(
-    std::string & source,
-    const std::string & target,
-    const std::string & replacement)
+void FindAndReplace(std::string * source, const std::string & target, const std::string & replacement)
 {
-    if (target.empty())
-    {
-        return target;
-    }
     size_t start_pos = 0;
-    while ((start_pos = source.find(target, start_pos)) != std::string::npos)
+    while ((start_pos = source->find(target, start_pos)) != std::string::npos)
     {
-        source.replace(start_pos, target.length(), replacement);
+        source->replace(start_pos, target.length(), replacement);
         start_pos += replacement.length();
     }
-    return source;
 }
 
 std::string Trim(const std::string & source, const std::string & trim)
@@ -71,10 +58,7 @@ std::string Trim(const std::string & source, const std::string & trim)
     {
         return "";
     }
-    else
-    {
-        return working.erase(i + 1).erase(0, source.find_first_not_of(trim));
-    }
+    return working.erase(i + 1).erase(0, source.find_first_not_of(trim));
 }
 
 std::string ToLower(const std::string & source)
@@ -92,22 +76,28 @@ std::string ToCapitals(const std::string & source)
 {
     std::string working = source;
     // First of all put all the letter to lower case.
-    for (unsigned int i = 0; i < working.length(); i++)
+    for (auto & c : working)
     {
-        working[i] = static_cast<char>(tolower(working[i]));
+        c = static_cast<char>(tolower(c));
     }
     // Capitalize the first letter.
     working[0] = static_cast<char>(toupper(working[0]));
+    bool previousWasSpace = false;
     // Capitalize the rest of the std::string.
-    for (unsigned int i = 1; i < working.length(); i++)
+    for (auto & c : working)
     {
         //prints next char providing not a space
-        if (working[i] == ' ')
+        if (c == ' ')
         {
-            // Move to the next letter.
-            i++;
+            previousWasSpace = true;
+            continue;
+        }
+        else if (previousWasSpace)
+        {
             // Capitalize letter after space.
-            working[i] = static_cast<char>(toupper(working[i]));
+            c = static_cast<char>(toupper(c));
+            // Reset the flag.
+            previousWasSpace = false;
         }
     }
     return working;
@@ -142,7 +132,7 @@ std::vector<std::string> GetWords(const std::string & source)
 
 std::string GetFormattedTime()
 {
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     char buffer[32];
     // Format: H:M
     strftime(buffer, 32, "%H:%M", localtime(&now));
@@ -151,7 +141,7 @@ std::string GetFormattedTime()
 
 std::string GetDate()
 {
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     tm * ptm = localtime(&now);
     char buffer[32];
 
@@ -167,16 +157,16 @@ std::vector<std::string> GetAllFilesInFolder(
     DIR * directory;
     std::vector<std::string> files_name;
     directory = opendir(folder.c_str());
-    if (directory)
+    if (directory != nullptr)
     {
         int i = 0;
         struct dirent * dir;
-        while ((dir = readdir(directory)) != NULL)
+        while ((dir = readdir(directory)) != nullptr)
         {
             i++;
             if (EndWith(dir->d_name, extension))
             {
-                files_name.push_back(dir->d_name);
+                files_name.emplace_back(dir->d_name);
             }
         }
         closedir(directory);
@@ -189,23 +179,11 @@ std::string BoolToString(const bool & value)
     return ((value) ? "Yes" : "No");
 }
 
-bool IsAllASCII(const char * string_to_check)
-{
-    for (; *string_to_check != 0; string_to_check++)
-    {
-        if (*string_to_check & 0x80)
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
 bool IsNumber(const std::string & source)
 {
     for (auto c : source)
     {
-        if (!isdigit(c))
+        if (isdigit(c) == 0)
         {
             return false;
         }
@@ -222,39 +200,11 @@ unsigned int GetAbilityModifier(const unsigned int & value)
     return static_cast<unsigned int>((value - 10) / 2);
 }
 
-void ExtractNumber(std::string & source, int & number)
-{
-    // If the entire string is a number, set it.
-    if (!IsNumber(source))
-    {
-        // Otherwise try to find a number if there is one.
-        size_t pos = source.find('.');
-        if (pos != std::string::npos)
-        {
-            // Extract the digits.
-            std::string digits = source.substr(0, pos);
-            // Check the digits.
-            if (IsNumber(digits))
-            {
-                // Get the number.
-                long int value = atol(digits.c_str());
-                if (value < INT_MAX)
-                {
-                    // Set the number.
-                    number = static_cast<int>(value);
-                }
-                // Remove the digits.
-                source = source.substr(pos + 1, source.size());
-            }
-        }
-    }
-}
-
 std::string GetFileContents(const char * filename)
 {
     std::string contents;
     std::ifstream in(filename, std::ios::in | std::ios::binary);
-    if (in)
+    if (in.good())
     {
         in.seekg(0, std::ios::end);
         std::streamoff totalSize = in.tellg();
@@ -280,19 +230,19 @@ std::string GetAttributeName(const int & id, const bool & abbreviated)
     {
         return (abbreviated) ? "Str" : "Strength";
     }
-    else if (id == 2)
+    if (id == 2)
     {
         return (abbreviated) ? "Agi" : "Agility";
     }
-    else if (id == 3)
+    if (id == 3)
     {
         return (abbreviated) ? "Per" : "Perception";
     }
-    else if (id == 4)
+    if (id == 4)
     {
         return (abbreviated) ? "Con" : "Constitution";
     }
-    else if (id == 5)
+    if (id == 5)
     {
         return (abbreviated) ? "Int" : "Intelligence";
     }
@@ -301,26 +251,26 @@ std::string GetAttributeName(const int & id, const bool & abbreviated)
 
 /// Check if the return code from Zlib is an error.
 #define ZCHECK_ERROR(err, msg)\
-if (err != Z_OK) {\
+if ((err) != Z_OK) {\
     std::cerr << #msg" error: "#err"\n";\
     exit(1);\
 }\
 
 
 /// Creates compressed strem of data.
-void DeflateStream(std::vector<uint8_t> & uncompressed, std::vector<uint8_t> & compressed)
+std::vector<uint8_t> DeflateStream(std::vector<uint8_t> & uncompressed)
 {
     // ZLib compression stream.
     z_stream c_stream;
     // The error code returned from every call to zlib
     int errmsg;
 
-    // Clear the input std::vector.
-    compressed.clear();
+    // Prepare a vector for the compressed data.
+    std::vector<uint8_t> compressed;
 
-    c_stream.zalloc = (alloc_func) 0;
-    c_stream.zfree = (free_func) 0;
-    c_stream.opaque = (voidpf) 0;
+    c_stream.zalloc = nullptr;
+    c_stream.zfree = nullptr;
+    c_stream.opaque = nullptr;
 
     errmsg = deflateInit(&c_stream, Z_BEST_COMPRESSION);
     ZCHECK_ERROR(errmsg, "deflateInit");
@@ -352,18 +302,19 @@ void DeflateStream(std::vector<uint8_t> & uncompressed, std::vector<uint8_t> & c
 
     errmsg = deflateEnd(&c_stream);
     ZCHECK_ERROR(errmsg, "deflateReset");
+    return compressed;
 }
 
 /// Creates decompressed strem of data.
-void InflateStream(std::vector<uint8_t> & compressed, std::vector<uint8_t> & uncompressed)
+std::vector<uint8_t> InflateStream(std::vector<uint8_t> & compressed)
 {
     // ZLib decompression stream.
     z_stream d_stream;
     // The error code returned from every call to zlib
     int errmsg;
 
-    // Clear the input std::vector.
-    uncompressed.clear();
+    // Prepare a vector for the uncompressed data.
+    std::vector<uint8_t> uncompressed;
 
     d_stream.zalloc = Z_NULL;
     d_stream.zfree = Z_NULL;
@@ -408,4 +359,5 @@ void InflateStream(std::vector<uint8_t> & compressed, std::vector<uint8_t> & unc
 
     errmsg = inflateEnd(&d_stream);
     ZCHECK_ERROR(errmsg, "inflateEnd");
+    return uncompressed;
 }

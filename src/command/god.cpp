@@ -574,7 +574,7 @@ void DoSetFlag(Character * character, ArgumentHandler & args)
         return;
     }
     // Set the flag.
-    SetFlag(target->flags, flag);
+    SetFlag(&target->flags, flag);
     // Send confirmation to the player.
     character->sendMsg(
         "You set the flag '%s' for %s\n",
@@ -608,7 +608,7 @@ void DoClearFlag(Character * character, ArgumentHandler & args)
         return;
     }
     // Set the flag.
-    ClearFlag(target->flags, flag);
+    ClearFlag(&target->flags, flag);
     // Send confirmation to the player.
     character->sendMsg(
         "You clear the flag '%s' for %s\n",
@@ -1021,11 +1021,11 @@ void DoRoomEdit(Character * character, ArgumentHandler & args)
         }
         if (input == "R")
         {
-            SetFlag(character->room->flags, RoomFlag::Rent);
+            SetFlag(&character->room->flags, RoomFlag::Rent);
         }
         else if (input == "P")
         {
-            SetFlag(character->room->flags, RoomFlag::Peaceful);
+            SetFlag(&character->room->flags, RoomFlag::Peaceful);
         }
         else
         {
@@ -1042,11 +1042,11 @@ void DoRoomEdit(Character * character, ArgumentHandler & args)
         }
         if (input == "R")
         {
-            ClearFlag(character->room->flags, RoomFlag::Rent);
+            ClearFlag(&character->room->flags, RoomFlag::Rent);
         }
         else if (input == "P")
         {
-            ClearFlag(character->room->flags, RoomFlag::Peaceful);
+            ClearFlag(&character->room->flags, RoomFlag::Peaceful);
         }
         else
         {
@@ -1165,7 +1165,7 @@ void DoInvisibility(Character * character, ArgumentHandler & /*args*/)
         return;
     }
     // Set the character invisible.
-    SetFlag(character->flags, CharacterFlag::Invisible);
+    SetFlag(&character->flags, CharacterFlag::Invisible);
     character->sendMsg("You are invisible now.\n");
 }
 
@@ -1178,7 +1178,7 @@ void DoVisible(Character * character, ArgumentHandler & /*args*/)
         return;
     }
     // Set the character visible.
-    ClearFlag(character->flags, CharacterFlag::Invisible);
+    ClearFlag(&character->flags, CharacterFlag::Invisible);
     character->sendMsg("You are no more invisible.\n");
 }
 

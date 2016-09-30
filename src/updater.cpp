@@ -22,8 +22,6 @@
 // Other Include.
 #include "mud.hpp"
 
-using namespace std::chrono;
-
 // //////////////////////////////////////////////////////////
 // Timings Values
 //    50      MS -> 1 SECOND in real world.
@@ -35,8 +33,8 @@ MudUpdater::MudUpdater() :
     bandwidth_in(),
     bandwidth_out(),
     bandwidth_uncompressed(),
-    ticTime(system_clock::now()),
-    mudTime(system_clock::now()),
+    ticTime(std::chrono::system_clock::now()),
+    mudTime(std::chrono::system_clock::now()),
     ticSize(30),
     secondSize(50),
     hourSize(secondSize * 3600),
@@ -63,42 +61,36 @@ MudUpdater & MudUpdater::instance()
 
 void MudUpdater::initTimers()
 {
-    ticTime = system_clock::now();
-    mudTime = system_clock::now();
+    ticTime = std::chrono::system_clock::now();
+    mudTime = std::chrono::system_clock::now();
 }
 
 bool MudUpdater::hasTicPassed()
 {
     // Get the current time.
-    TimeClock currentTime = system_clock::now();
+    TimeClock currentTime = std::chrono::system_clock::now();
     // Return the check if a tic has passed.
-    if (duration_cast<seconds>(currentTime - ticTime).count() >= ticSize)
+    if (duration_cast<std::chrono::seconds>(currentTime - ticTime).count() >= ticSize)
     {
         // Reset Tic Time.
-        ticTime = system_clock::now();
+        ticTime = std::chrono::system_clock::now();
         return true;
     }
-    else
-    {
-        return false;
-    }
+    return false;
 }
 
 bool MudUpdater::hasHourPassed()
 {
     // Get the current time.
-    TimeClock currentTime = system_clock::now();
+    TimeClock currentTime = std::chrono::system_clock::now();
     // Return the check if a hour is passed.
-    if (duration_cast<milliseconds>(currentTime - mudTime).count() >= hourSize)
+    if (duration_cast<std::chrono::milliseconds>(currentTime - mudTime).count() >= hourSize)
     {
         // Reset Mud Time.
-        mudTime = system_clock::now();
+        mudTime = std::chrono::system_clock::now();
         return true;
     }
-    else
-    {
-        return false;
-    }
+    return false;
 }
 
 void MudUpdater::updateTime()

@@ -216,22 +216,22 @@ bool ItemModel::replaceSymbols(
     if (itemMaterial)
     {
         modified = true;
-        FindAndReplace(source, "&m", ToLower(itemMaterial->name));
-        FindAndReplace(source, "&M", ToLower(itemMaterial->article + ' ' + itemMaterial->name));
+        FindAndReplace(&source, "&m", ToLower(itemMaterial->name));
+        FindAndReplace(&source, "&M", ToLower(itemMaterial->article + ' ' + itemMaterial->name));
     }
     else
     {
-        FindAndReplace(source, "&m", "");
-        FindAndReplace(source, "&M", "");
+        FindAndReplace(&source, "&m", "");
+        FindAndReplace(&source, "&M", "");
     }
     if (itemQuality != ItemQuality::Normal)
     {
         modified = true;
-        FindAndReplace(source, "&q", " " + ToLower(itemQuality.toString()));
+        FindAndReplace(&source, "&q", " " + ToLower(itemQuality.toString()));
     }
     else
     {
-        FindAndReplace(source, "&q", "");
+        FindAndReplace(&source, "&q", "");
     }
     return modified;
 }
