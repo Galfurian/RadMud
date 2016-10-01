@@ -60,13 +60,10 @@ bool Logger::getLog(const LogLevel & level, std::string * result)
             result->resize(static_cast<std::size_t>(totalSize));
             // Move the input position to the beginning of the string.
             Logger::getStream().seekg(0, std::ios::beg);
-            // Create a string for storing the line.
-            std::string line;
             // Create a string which contains the given level.
             std::string logLevel = "[" + Logger::levelToString(level) + "]";
-            while (std::getline(Logger::getStream(), line) != nullptr)
+            for (std::string line; std::getline(Logger::getStream(), line);)
             {
-                // If the line starts with the sa
                 if (BeginWith(line, logLevel))
                 {
                     result->append(line + "\n");

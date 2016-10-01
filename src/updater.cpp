@@ -70,7 +70,7 @@ bool MudUpdater::hasTicPassed()
     // Get the current time.
     TimeClock currentTime = std::chrono::system_clock::now();
     // Return the check if a tic has passed.
-    if (duration_cast<std::chrono::seconds>(currentTime - ticTime).count() >= ticSize)
+    if (std::chrono::duration_cast<std::chrono::seconds>(currentTime - ticTime).count() >= ticSize)
     {
         // Reset Tic Time.
         ticTime = std::chrono::system_clock::now();
@@ -84,7 +84,7 @@ bool MudUpdater::hasHourPassed()
     // Get the current time.
     TimeClock currentTime = std::chrono::system_clock::now();
     // Return the check if a hour is passed.
-    if (duration_cast<std::chrono::milliseconds>(currentTime - mudTime).count() >= hourSize)
+    if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - mudTime).count() >= hourSize)
     {
         // Reset Mud Time.
         mudTime = std::chrono::system_clock::now();
@@ -278,12 +278,12 @@ void MudUpdater::performActions()
         {
             continue;
         }
-        auto end = system_clock::now();
-        auto elapsed = duration_cast<seconds>(mobile->nextActionCooldown - end).count();
+        auto end = std::chrono::system_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(mobile->nextActionCooldown - end).count();
         if (elapsed < 0)
         {
             mobile->triggerEventRandom();
-            mobile->nextActionCooldown = end + seconds(TRandInteger<int>(30, 60));
+            mobile->nextActionCooldown = end + std::chrono::seconds(TRandInteger<int>(30, 60));
         }
         if (mobile->getAction()->getType() == ActionType::Wait)
         {

@@ -134,7 +134,7 @@ size_t Table::getNumRows()
 void Table::addDivider()
 {
     std::vector<std::string> divider;
-    for (const auto & column : columns)
+    for (size_t w = 0; w < columns.size(); ++w)
     {
         divider.emplace_back("");
     }
