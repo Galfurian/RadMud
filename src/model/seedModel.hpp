@@ -21,11 +21,11 @@
 #include "itemModel.hpp"
 
 /// Used to determine the type of the resource.
-typedef enum class SeedType_t
+using SeedType = enum class SeedType_t
 {
     Plant,  ///< A generic seed.
     Tree,   ///< A seed used to plant a tree.
-} SeedType;
+} ;
 
 /// @brief Model of a seed.
 class SeedModel :

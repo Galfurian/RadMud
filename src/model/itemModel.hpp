@@ -29,7 +29,7 @@
 #include "../utilities/table.hpp"
 
 /// Used to determine the type of the model.
-typedef enum class ModelType_t
+using ModelType = enum class ModelType_t
 {
     NoType,             ///< [0] No type.
     Corpse,             ///< [1] A corpse, it's a knowledge for internal use.
@@ -53,10 +53,10 @@ typedef enum class ModelType_t
     Mechanism,          ///< [19] Any kind of mechanism.
     Currency,           ///< [20] Any kind of currency.
     Shop                ///< [21] A shop.
-} ModelType;
+};
 
 /// Used to determine the flag of the model.
-typedef enum class ModelFlag_t
+using ModelFlag = enum class ModelFlag_t
 {
     None = 0,           ///< [0]    No flag.
     Static = 1,         ///< [1]    The item can't be collected, put down or moved.
@@ -67,7 +67,7 @@ typedef enum class ModelFlag_t
     CanClose = 32,      ///< [32]   It can be closed.
     CanSeeThrough = 64, ///< [64]   Even if it is closed, a character can see through it.
     CanBeStacked = 128  ///< [128]  The items with this flag can be stacked.
-} ModelFlag;
+};
 
 class Item;
 

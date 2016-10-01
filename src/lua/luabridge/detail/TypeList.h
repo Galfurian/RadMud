@@ -44,13 +44,13 @@
 /**
  None type means void parameters or return value.
  */
-typedef void None;
+using None = void;
 
 template<typename H, typename T = None>
 struct TypeList
 {
-    typedef H Head;
-    typedef T Tail;
+    using Head = H;
+    using Tail = T;
 };
 
 /**

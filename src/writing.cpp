@@ -1,7 +1,6 @@
-/// @file   writing.hpp
-/// @brief  Contains information about a writing.
+/// @file   writing.cpp
 /// @author Enrico Fraccaroli
-/// @date   Jul 25 2015
+/// @date   Oct 01 2016
 /// @copyright
 /// Copyright (c) 2015, 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission to use, copy, modify, and distribute this software for any
@@ -16,27 +15,18 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#pragma once
+#include "writing.hpp"
 
-#include <string>
-
-/// @brief Holds details about a writing.
-
-class Writing
+Writing::Writing() :
+    vnum(),
+    title(),
+    author(),
+    content()
 {
-public:
-    /// The virtual number of the writing.
-    int vnum;
-    /// The title of the writing.
-    std::string title;
-    /// The author of the writing.
-    std::string author;
-    /// The content of the writing.
-    std::string content;
 
-    /// @brief Constructor
-    Writing();
+}
 
-    /// @brief Destructor.
-    ~Writing();
-};
+Writing::~Writing()
+{
+
+}

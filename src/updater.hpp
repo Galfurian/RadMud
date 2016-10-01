@@ -21,13 +21,13 @@
 #include "constants.hpp"
 
 /// @brief Enumerator which identifies the day phase.
-typedef enum class DayPhase_t
+using DayPhase = enum class DayPhase_t
 {
     Morning,    ///< General logging level.
     Day,        ///< Log events useful for back-tracing.
     Dusk,       ///< Log events useful for developers.
     Night,      ///< Log events which may lead to errors.
-} DayPhase;
+};
 
 /// @brief Handle everything that it's considered dynamic inside the mud, like player or mobile.
 /// @details

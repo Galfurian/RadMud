@@ -34,12 +34,12 @@ class Area
 {
 private:
     /// The list of integer used to identify different obstacles inside the map.
-    typedef enum class MapTile_t
+    using MapTile = enum class MapTile_t
     {
         Void,       ///< It's an empty tile.
         Walkable,   ///< It's a walkable tile.
         ClosedDoor, ///< It's a closed door.
-    } MapTile;
+    } ;
 
 public:
     /// The virtual number of the area.

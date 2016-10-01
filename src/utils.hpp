@@ -213,10 +213,10 @@ std::string ToString(const ValueType & value)
 /// @brief Transform a numeric value into a string.
 /// @param value The value to turn into a string.
 /// @return The resulting string.
-template<typename Enum>
-std::string EnumToString(const Enum & value)
+template<typename ValueType>
+std::string EnumToString(const ValueType & value)
 {
-    static_assert((std::is_enum<Enum>::value), "template parameter is not an enum type");
+    static_assert((std::is_enum<ValueType>::value), "template parameter is not an enum type");
     std::ostringstream stm;
     stm << static_cast<unsigned int>(value);
     return stm.str();

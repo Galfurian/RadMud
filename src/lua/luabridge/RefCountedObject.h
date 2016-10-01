@@ -118,7 +118,7 @@ private:
  This creates a RefCountedObjectType that uses a non-atomic integer
  as the counter.
  */
-typedef RefCountedObjectType<int> RefCountedObject;
+using RefCountedObject = RefCountedObjectType<int>;
 
 //==============================================================================
 /**
@@ -144,7 +144,7 @@ class RefCountedObjectPtr
 {
 public:
     /** The class being referenced by this pointer. */
-    typedef ReferenceCountedObjectClass ReferencedType;
+    using ReferencedType = ReferenceCountedObjectClass;
 
     //==============================================================================
     /** Creates a pointer to a null object. */
@@ -336,7 +336,7 @@ struct ContainerTraits;
 template<class T>
 struct ContainerTraits<RefCountedObjectPtr<T> >
 {
-    typedef T Type;
+    using Type = T;
 
     static T * get(RefCountedObjectPtr<T> const & c)
     {

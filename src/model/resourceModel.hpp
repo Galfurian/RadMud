@@ -21,7 +21,7 @@
 #include "itemModel.hpp"
 
 /// Used to determine the type of the resource.
-typedef enum class ResourceType_t
+using ResourceType = enum class ResourceType_t
 {
     NoType,
     Coal,           ///< [1] COAL
@@ -38,7 +38,7 @@ typedef enum class ResourceType_t
     StoneMonolith,  ///< [12] STONE_MONOLITH
     Pen,            ///< [13] Pen
     Trash           ///< [14] Trash (Anything which has no specific use)
-} ResourceType;
+} ;
 
 /// @brief Model of resources.
 class ResourceModel :

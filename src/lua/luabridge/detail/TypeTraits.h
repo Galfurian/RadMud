@@ -54,7 +54,7 @@
 template<class T>
 struct ContainerTraits
 {
-    typedef bool isNotContainer;
+    using isNotContainer = bool;
 };
 
 /**
@@ -103,7 +103,7 @@ struct ContainerTraits
 template<class C>
 struct ContainerConstructionTraits
 {
-    typedef typename ContainerTraits<C>::Type T;
+    using T = typename ContainerTraits<C>::Type;
 
     static C constructContainer(T * t)
     {
@@ -163,13 +163,13 @@ struct TypeTraits
     template<class T>
     struct removeConst
     {
-        typedef T Type;
+        using Type = T;
     };
 
     template<class T>
     struct removeConst<T const>
     {
-        typedef T Type;
+        using Type = T;
     };
     /**@}*/
 };

@@ -21,13 +21,13 @@
 #include "itemModel.hpp"
 
 /// Shield sizes.
-typedef enum class ShieldSize_t
+using ShieldSize = enum class ShieldSize_t
 {
     All,    ///< [0] All kind of size.
     Light,  ///< [1] Light Shield
     Medium, ///< [2] Medium Shield
     Heavy   ///< [3] Heavy Shield
-} ShieldSize;
+} ;
 
 /// @brief Model of a shield.
 class ShieldModel :

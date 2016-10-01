@@ -28,7 +28,7 @@ class Room;
 #include <string>
 
 /// The list of tiles used in the continental map.
-typedef enum class ContinentTile_t
+using ContinentTile = enum class ContinentTile_t
 {
     Void = 0,           ///< It's an empty tile.
     Wall = '#',         ///< It's a wall tile.
@@ -44,7 +44,7 @@ typedef enum class ContinentTile_t
     Item = 'i',         ///< It's a generic item.
     Door = 'D',         ///< It's a door tile.
     DoorOpen = 'd',     ///< It's a door tile.
-} ContinentTile;
+} ;
 
 /// @brief Holds details about a continent.
 class Continent

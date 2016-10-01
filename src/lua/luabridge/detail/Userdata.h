@@ -566,7 +566,7 @@ private:
 
     UserdataShared<C> & operator=(UserdataShared<C> const &);
 
-    typedef typename TypeTraits::removeConst<typename ContainerTraits<C>::Type>::Type T;
+    using T = typename TypeTraits::removeConst<typename ContainerTraits<C>::Type>::Type;
 
     C m_c;
 
@@ -612,7 +612,7 @@ public:
 template<class C, bool makeObjectConst>
 struct UserdataSharedHelper
 {
-    typedef typename TypeTraits::removeConst<typename ContainerTraits<C>::Type>::Type T;
+    using T = typename TypeTraits::removeConst<typename ContainerTraits<C>::Type>::Type;
 
     static void push(lua_State * L, C const & c)
     {
@@ -651,7 +651,7 @@ struct UserdataSharedHelper
 template<class C>
 struct UserdataSharedHelper<C, true>
 {
-    typedef typename TypeTraits::removeConst<typename ContainerTraits<C>::Type>::Type T;
+    using T = typename TypeTraits::removeConst<typename ContainerTraits<C>::Type>::Type;
 
     static void push(lua_State * L, C const & c)
     {
@@ -703,7 +703,7 @@ struct StackHelper
         UserdataSharedHelper<C, TypeTraits::isConst<typename ContainerTraits<C>::Type>::value>::push(L, c);
     }
 
-    typedef typename TypeTraits::removeConst<typename ContainerTraits<C>::Type>::Type T;
+    using T = typename TypeTraits::removeConst<typename ContainerTraits<C>::Type>::Type;
 
     static inline C get(lua_State * L, int index)
     {
@@ -883,14 +883,14 @@ struct Stack<T &>
 template<class C, bool byContainer>
 struct RefStackHelper
 {
-    typedef C return_type;
+    using return_type = C;
 
     static inline void push(lua_State * L, C const & t)
     {
         UserdataSharedHelper<C, TypeTraits::isConst<typename ContainerTraits<C>::Type>::value>::push(L, t);
     }
 
-    typedef typename TypeTraits::removeConst<typename ContainerTraits<C>::Type>::Type T;
+    using T = typename TypeTraits::removeConst<typename ContainerTraits<C>::Type>::Type;
 
     static return_type get(lua_State * L, int index)
     {
@@ -906,7 +906,7 @@ struct RefStackHelper
 template<class T>
 struct RefStackHelper<T, false>
 {
-    typedef T const & return_type;
+    using return_type = T const &;
 
     static inline void push(lua_State * L, T const & t)
     {
@@ -931,7 +931,7 @@ struct RefStackHelper<T, false>
 template<class T>
 struct Stack<T const &>
 {
-    typedef RefStackHelper<T, TypeTraits::isContainer<T>::value> helper_t;
+    using helper_t = RefStackHelper<T, TypeTraits::isContainer<T>::value>;
 
     static inline void push(lua_State * L, T const & t)
     {

@@ -86,7 +86,7 @@ public:
 };
 
 /// Exit list handler.
-typedef std::vector<std::shared_ptr<Exit> > ExitVector;
+using ExitVector = std::vector<std::shared_ptr<Exit> >;
 
 /// @addtogroup FlagsToList
 /// @{

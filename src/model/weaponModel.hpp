@@ -21,7 +21,7 @@
 #include "itemModel.hpp"
 
 /// Types of weapons.
-typedef enum class WeaponType_t
+using WeaponType = enum class WeaponType_t
 {
     None,
     Pistol,             ///< [1]  Pistols that uses bullets
@@ -37,7 +37,7 @@ typedef enum class WeaponType_t
     Blunt,              ///< [11] All sort of blunt weapons
     Thrown,             ///< [12] Throwable weapons
     Unarmed,            ///< [13] Weapon to enanche unarmed fight
-} WeaponType;
+} ;
 
 /// @brief Model of a weapon.
 class WeaponModel :

@@ -21,12 +21,12 @@
 #include "../generalAction.hpp"
 
 /// The list of possible combat actions.
-typedef enum class CombatActionType_t
+using CombatActionType = enum class CombatActionType_t
 {
     NoAction,       ///< The combat move is to do nothing.
     BasicAttack,    ///< The action is a basic attack.
     Flee            ///< The character tries to flee.
-} CombatActionType;
+};
 
 /// @brief An action executed by characters when fighting.
 class CombatAction :

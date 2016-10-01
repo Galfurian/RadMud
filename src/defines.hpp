@@ -27,14 +27,15 @@
 #include "utilities/enum_checker.hpp"
 
 /// The list of character's abilities.
-typedef enum class Ability_t
+using Ability = enum class Ability_t
 {
     Strength,
     Agility,
     Perception,
     Constitution,
     Intelligence
-} Ability;
+};
+
 /// Tester for ability enums.
 using AbilityTest = EnumCheck<Ability,
     Ability::Strength,
@@ -44,7 +45,7 @@ using AbilityTest = EnumCheck<Ability,
     Ability::Intelligence>;
 
 /// List of telnet commands.
-typedef enum class TelnetChar_t
+using TelnetChar = enum class TelnetChar_t
 {
     None = 0,
     // OPTIONS
@@ -92,7 +93,7 @@ typedef enum class TelnetChar_t
     DRAW_MAP = 91,  ///< I will send the map.
     CLR_MAP = 92,   ///< Please, clear the already drawn map.
     FORMAT = 100    ///< I will send a format string.
-} TelnetChar;
+};
 /// Tester for telnet enums.
 using TelnetCharTest = EnumCheck<TelnetChar,
 //TelnetChar::Echo,
@@ -269,24 +270,24 @@ private:
 };
 
 /// Used to determine the type of Zone.
-typedef enum class AreaType_t
+using AreaType = enum class AreaType_t
 {
     NoType,     ///< No type.
     Cavern,     ///< Identifies a cavern.
     Underdark   ///< Identifies a region of the underdark.
-} AreaType;
+};
 
 /// Used to determine the status of a Zone.
-typedef enum class AreaStatus_t
+using AreaStatus = enum class AreaStatus_t
 {
     Normal,     ///< The area has no environmentals status.
     Iced,       ///< The area is freezing.
     Magmatic,   ///< The area have vulcanic activities.
     Vegetal     ///< The area is overrun by the vegetation.
-} AreaStatus;
+};
 
 /// Handle all the player's phases during login.
-typedef enum class ConnectionState_t
+using ConnectionState = enum class ConnectionState_t
 {
     NoState,            ///< The player has no state.
     NegotiatingMSDP,    ///< The player is negotiating for MSDP.
@@ -305,18 +306,18 @@ typedef enum class ConnectionState_t
     AwaitingNewWeight,  ///< Step 10  - Choose the Weight.
     AwaitingNewConfirm, ///< Step 11 - Confirm the character.
     Playing             ///< This is the normal 'connected' mode.
-} ConnectionState;
+};
 
 /// Handle all the player's phases during login.
-typedef enum class ConnectionFlag_t
+using ConnectionFlag = enum class ConnectionFlag_t
 {
     None,
     UseMSDP = 1,
     UseMCCP = 2
-} ConnectionFlag;
+};
 
 /// Used to determine the posture of the player.
-typedef enum class CharacterPosture_t
+using CharacterPosture = enum class CharacterPosture_t
 {
     NoPosure,   ///< The character has no posture.
     Stand,      ///< The character it's standing.
@@ -324,42 +325,42 @@ typedef enum class CharacterPosture_t
     Sit,        ///< The character it's sitting.
     Prone,      ///< The character it's prone.
     Rest,       ///< The character it's lying down.
-} CharacterPosture;
+};
 
 /// Used to determine the flag of the character.
-typedef enum class CharacterFlag_t
+using CharacterFlag = enum class CharacterFlag_t
 {
     None = 0,       ///< No flag.
     IsGod = 1,      ///< The character is a GOD.
     Invisible = 2   ///< The character is invisible.
-} CharacterFlag;
+};
 
 /// The list of possible actions.
-typedef enum class GenderType_t
+using GenderType = enum class GenderType_t
 {
     None,   ///< The character has no gender (robot).
     Female, ///< The character is a female.
     Male    ///< The character is a male.
-} GenderType;
+};
 
 /// Used to determine the flag of the character.
-typedef enum class MobileFlag_t
+using MobileFlag = enum class MobileFlag_t
 {
     None = 0,       ///< No flag.
     NoViolent = 1   ///< The mobile is not violent.
-} MobileFlag;
+};
 
 /// Used to determine the flag of the exit.
-typedef enum class ExitFlag_t
+using ExitFlag = enum class ExitFlag_t
 {
     None = 0,   ///< No flag.
     NoMob = 1,  ///< A mob can't move through this exit.
     Hidden = 2, ///< The exit it's hidden.
     Stairs = 4, ///< The exit has stairs.
-} ExitFlag;
+};
 
 /// The list of materials.
-typedef enum class MaterialType_t
+using MaterialType = enum class MaterialType_t
 {
     NoType,     ///< [0] No type.
     Metal,      ///< [1] Metal
@@ -372,7 +373,7 @@ typedef enum class MaterialType_t
     Glass,      ///< [8] Glass
     Paper,      ///< [9] Paper
     Coal        ///< [10] Coal
-} MaterialType;
+};
 
 /// The quality of an item.
 class ItemQuality
@@ -457,20 +458,20 @@ private:
 };
 
 /// Used to determine the flag of the item.
-typedef enum class ItemFlag_t
+using ItemFlag = enum class ItemFlag_t
 {
     None = 0,
     Closed = 1,
     Locked = 2,
     Built = 4
-} ItemFlag;
+};
 
 // //////////////////////////////////////////////////////////////////
 // MODEL ////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////
 
 /// All the possible equipment slots.
-typedef enum class EquipmentSlot_t
+using EquipmentSlot = enum class EquipmentSlot_t
 {
     None,
     Head = 1,
@@ -480,7 +481,7 @@ typedef enum class EquipmentSlot_t
     Feet = 16,
     RightHand = 32,
     LeftHand = 64,
-} EquipmentSlot;
+};
 
 /// @brief Check if the passed flag is valid.
 /// @param flag The flag to check.

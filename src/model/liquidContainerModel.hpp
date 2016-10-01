@@ -21,13 +21,13 @@
 #include "itemModel.hpp"
 
 /// Used to determine the flag of the container of liquid.
-typedef enum class LiqContainerFlag_t
+using LiqContainerFlag = enum class LiqContainerFlag_t
 {
     None = 0,       ///< No flag.
     Poisoned = 1,   ///< Liquid is poisoned.
     Endless = 2,    ///< Content never ends.
     Destroy = 4,    ///< Container is destroyed once emptied.
-} LiqContainerFlag;
+};
 
 /// @brief Model of a container of liquids.
 class LiquidContainerModel :

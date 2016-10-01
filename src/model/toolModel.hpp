@@ -21,7 +21,7 @@
 #include "itemModel.hpp"
 
 /// Used to determine the type of the tool.
-typedef enum class ToolType_t
+using ToolType = enum class ToolType_t
 {
     NoType = 0,
     Pickaxe = 1,
@@ -36,7 +36,7 @@ typedef enum class ToolType_t
     Bellows = 33,
     Crucible = 34,
     Tinderbox = 40
-} ToolType;
+} ;
 
 /// @brief Model of a tool.
 class ToolModel :

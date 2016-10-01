@@ -13,6 +13,7 @@ SET(PROJECT_SOURCE_DIR src)
 
 #################################################
 # Initialize CXXFLAGS...
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpedantic")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
@@ -31,6 +32,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wuninitialized")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch-default")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch-enum")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-pragma-once-outside-header")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic-errors")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmessage-length=0")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1")
@@ -89,6 +91,7 @@ set(PROJECT_SRC
         ./src/utils.cpp
         ./src/opponent.cpp
         ./src/protocol.cpp
+        ./src/writing.cpp
         ${RADMUD_LUA_SRC}
         ${RADMUD_ITEM_SRC}
         ${RADMUD_MODEL_SRC}
@@ -98,7 +101,7 @@ set(PROJECT_SRC
         ${RADMUD_CHARACTER_SRC}
         ${RADMUD_UTILITIES_SRC}
         ${RADMUD_STRUCTURE_SRC}
-        )
+        src/writing.cpp)
 
 #################################################
 # Add project includes...

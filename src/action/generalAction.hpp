@@ -36,22 +36,22 @@ class MoveAction;
 class CombatAction;
 
 /// The list of possible actions.
-typedef enum class ActionType_t
+using ActionType = enum class ActionType_t
 {
     Wait,       ///< The character is doing common action.
     Move,       ///< The character is moving to another location.
     Crafting,   ///< The character is crafting something.
     Building,   ///< The character is crafting something.
     Combat      ///< The character is fighting.
-} ActionType;
+};
 
 /// The list of possible actions.
-typedef enum class ActionStatus_t
+using ActionStatus = enum class ActionStatus_t
 {
     Finished,   ///< The action is finished.
     Running,    ///< The action is still running.
     Error       ///< The action has encountered an error.
-} ActionStatus;
+};
 
 /// @brief A general action. Performing this action will result in doing nothing.
 class GeneralAction :

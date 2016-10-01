@@ -124,7 +124,7 @@ public:
 
 private:
     /// @brief SQLite Connection Object.
-    typedef struct
+    using DBDetails = struct
     {
     public:
         /// SQLite connection object.
@@ -135,7 +135,7 @@ private:
         std::string dbDirectory;
         /// SQLite statement object.
         sqlite3_stmt * dbStatement;
-    } DBDetails;
+    };
 
     /// Connection status to the database.
     bool connected;

@@ -68,11 +68,11 @@ class EffectList
 {
 public:
     /// Type of structure which contains effects.
-    typedef typename std::vector<Effect> EffectVector;
+    using EffectVector = typename std::vector<Effect>;
     /// Iterator for an effects vector.
-    typedef typename std::vector<Effect>::iterator iterator;
+    using iterator = typename std::vector<Effect>::iterator;
     /// Constant iterator for an effects vector.
-    typedef typename std::vector<Effect>::const_iterator const_iterator;
+    using const_iterator = typename std::vector<Effect>::const_iterator;
 
 private:
     /// The list of active effects.

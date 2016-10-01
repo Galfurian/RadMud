@@ -34,7 +34,7 @@ class Item;
 class Room;
 
 /// @brief A query list of FIELD+VALUE.
-typedef std::vector<std::pair<std::string, std::string> > QueryList;
+using QueryList = std::vector<std::pair<std::string, std::string> >;
 
 /// @brief It's used to connect to a database and retrieve information as well as update them.
 class SQLiteDbms
@@ -147,7 +147,7 @@ private:
     bool loadPlayerSkill(Player * player);
 
     /// Loading function for sqlite3 tables.
-    typedef std::function<bool(ResultSet * result)> ClassLoadingFunction;
+    using ClassLoadingFunction = std::function<bool(ResultSet * result)>;
 
     /// The connection, used to communicate with the database.
     SQLiteWrapper dbConnection;

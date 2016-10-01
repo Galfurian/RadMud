@@ -21,12 +21,12 @@
 #include "itemModel.hpp"
 
 /// Used to determine the flag of the food.
-typedef enum class FoodFlag_t
+using FoodFlag = enum class FoodFlag_t
 {
     None = 0,       ///< No flag.
     Poisoned = 1,   ///< Food is poisoned.
     Raw = 2,        ///< Food is not cocked.
-} FoodFlag;
+};
 
 /// @brief Model of food.
 class FoodModel :

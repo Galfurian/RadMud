@@ -37,9 +37,9 @@ private:
 
 public:
     /// Iterator for the 3D structure.
-    typedef typename std::map<std::tuple<int, int, int>, T>::iterator iterator;
+    using iterator = typename std::map<std::tuple<int, int, int>, T>::iterator;
     /// Const iterator for the 3D structure.
-    typedef typename std::map<std::tuple<int, int, int>, T>::const_iterator const_iterator;
+    using const_iterator = typename std::map<std::tuple<int, int, int>, T>::const_iterator;
 
     /// @brief Constructor.
     Map3D() :

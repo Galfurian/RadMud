@@ -58,11 +58,11 @@ class OpponentsList
 
 public:
     /// Type of structure which contains aggressors.
-    typedef typename std::vector<Aggression> AggressorVector;
+    using AggressorVector = typename std::vector<Aggression>;
     /// Iterator for an aggressor vector.
-    typedef typename std::vector<Aggression>::iterator iterator;
+    using iterator  = typename std::vector<Aggression>::iterator;
     /// Constant iterator for an aggressor vector.
-    typedef typename std::vector<Aggression>::const_iterator const_iterator;
+    using const_iterator = typename std::vector<Aggression>::const_iterator;
 private:
     /// Owner of the list.
     Character * owner;

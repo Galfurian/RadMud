@@ -21,13 +21,13 @@
 #include "itemModel.hpp"
 
 /// Used to determine the flag of the container.
-typedef enum class ContainerFlag_t
+using ContainerFlag = enum class ContainerFlag_t
 {
     None = 0,       ///< No flag.
     CanClose = 1,   ///< Can be closed.
     CanBurgle = 2,  ///< Can be burgled.
     CanSee = 4,     ///< Can see inside even if closed.
-} ContainerFlag;
+};
 
 /// @brief Model of a container of objects.
 class ContainerModel :

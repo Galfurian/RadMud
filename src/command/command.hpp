@@ -22,7 +22,7 @@
 #include "argumentHandler.hpp"
 
 /// @brief An action handler for the character.
-typedef std::function<void(Character * character, ArgumentHandler & args)> ActionHandler;
+using ActionHandler = std::function<void(Character * character, ArgumentHandler & args)>;
 
 /// @brief Contains all the informations concerning a command, including its handler.
 class Command

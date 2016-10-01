@@ -206,7 +206,7 @@ struct CFunc
     template<class FnPtr, class ReturnType = typename FuncTraits<FnPtr>::ReturnType>
     struct Call
     {
-        typedef typename FuncTraits<FnPtr>::Params Params;
+        using Params = typename FuncTraits<FnPtr>::Params;
 
         static int f(lua_State * L)
         {
@@ -241,7 +241,7 @@ struct CFunc
     template<class FnPtr>
     struct Call<FnPtr, void>
     {
-        typedef typename FuncTraits<FnPtr>::Params Params;
+        using Params = typename FuncTraits<FnPtr>::Params;
 
         static int f(lua_State * L)
         {
@@ -274,8 +274,8 @@ struct CFunc
     template<class MemFnPtr, class ReturnType = typename FuncTraits<MemFnPtr>::ReturnType>
     struct CallMember
     {
-        typedef typename FuncTraits<MemFnPtr>::ClassType T;
-        typedef typename FuncTraits<MemFnPtr>::Params Params;
+        using T = typename FuncTraits<MemFnPtr>::ClassType;
+        using Params = typename FuncTraits<MemFnPtr>::Params;
 
         static int f(lua_State * L)
         {
@@ -301,8 +301,8 @@ struct CFunc
     template<class MemFnPtr, class ReturnType = typename FuncTraits<MemFnPtr>::ReturnType>
     struct CallConstMember
     {
-        typedef typename FuncTraits<MemFnPtr>::ClassType T;
-        typedef typename FuncTraits<MemFnPtr>::Params Params;
+        using T = typename FuncTraits<MemFnPtr>::ClassType;
+        using Params = typename FuncTraits<MemFnPtr>::Params;
 
         static int f(lua_State * L)
         {
@@ -335,8 +335,8 @@ struct CFunc
     template<class MemFnPtr>
     struct CallMember<MemFnPtr, void>
     {
-        typedef typename FuncTraits<MemFnPtr>::ClassType T;
-        typedef typename FuncTraits<MemFnPtr>::Params Params;
+        using T = typename FuncTraits<MemFnPtr>::ClassType;
+        using Params = typename FuncTraits<MemFnPtr>::Params;
 
         static int f(lua_State * L)
         {
@@ -362,8 +362,8 @@ struct CFunc
     template<class MemFnPtr>
     struct CallConstMember<MemFnPtr, void>
     {
-        typedef typename FuncTraits<MemFnPtr>::ClassType T;
-        typedef typename FuncTraits<MemFnPtr>::Params Params;
+        using T = typename FuncTraits<MemFnPtr>::ClassType;
+        using Params = typename FuncTraits<MemFnPtr>::Params;
 
         static int f(lua_State * L)
         {

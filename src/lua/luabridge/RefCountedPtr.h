@@ -45,7 +45,7 @@ struct RefCountedPtrBase
 {
     // Declaration of container for the refcounts
 #ifdef _MSC_VER
-    typedef stdext::hash_map <const void *, int> RefCountsType;
+    using RefCountsType = stdext::hash_map <const void *, int>;
 #else
 
     struct ptr_hash
@@ -57,7 +57,7 @@ struct RefCountedPtrBase
         }
     };
 
-    typedef __gnu_cxx::hash_map<const void *, int, ptr_hash> RefCountsType;
+    using RefCountsType = __gnu_cxx::hash_map<const void *, int, ptr_hash>;
 #endif
 
 protected:
@@ -95,7 +95,7 @@ public:
     template<typename Other>
     struct rebind
     {
-        typedef RefCountedPtr<Other> other;
+        using other = RefCountedPtr<Other>;
     };
 
     /** Construct as nullptr or from existing pointer to T.
@@ -243,7 +243,7 @@ struct ContainerTraits;
 template<class T>
 struct ContainerTraits<RefCountedPtr<T> >
 {
-    typedef T Type;
+    using Type = T;
 
     static T * get(RefCountedPtr<T> const & c)
     {

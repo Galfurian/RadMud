@@ -363,7 +363,7 @@ private:
         template<class Params, class C>
         static int ctorContainerProxy(lua_State * L)
         {
-            typedef typename ContainerTraits<C>::Type T;
+            using T = typename ContainerTraits<C>::Type;
             ArgList<Params, 2> args(L);
             T * const p = Constructor<T, Params>::call(args);
             UserdataSharedHelper<C, false>::push(L, p);

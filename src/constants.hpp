@@ -42,15 +42,15 @@ static const std::string kDatabaseName = "radmud.db";
 static const std::string kSystemDir = "../system/";
 
 /// 8 bits
-typedef unsigned char Byte;
+using Byte = unsigned char;
 /// Type used by the mud to store time.
-typedef std::chrono::nanoseconds TimeNS;
+using TimeNS = std::chrono::nanoseconds;
 /// Time point in microseconds.
-typedef std::chrono::time_point<std::chrono::microseconds> TimeUS;
+using TimeUS = std::chrono::time_point<std::chrono::microseconds>;
 /// Time point in milliseconds.
-typedef std::chrono::time_point<std::chrono::milliseconds> TimeMS;
+using TimeMS = std::chrono::time_point<std::chrono::milliseconds>;
 /// Time point in seconds.
-typedef std::chrono::time_point<std::chrono::seconds> TimeSEC;
+using TimeSEC = std::chrono::time_point<std::chrono::seconds>;
 /// Clock type of time.
-typedef std::chrono::time_point<std::chrono::system_clock> TimeClock;
+using TimeClock = std::chrono::time_point<std::chrono::system_clock>;
 

@@ -38,13 +38,13 @@ class Area;
 class Continent;
 
 /// Used to determine the flag of the room.
-typedef enum class RoomFlags
+using RoomFlag = enum class RoomFlags
 {
     Rent = 1,           ///< A player can rent and disconnect.
     Peaceful = 2,       ///< Everyone here can't be harmful.
     TravelPoint = 4,    ///< From here a player can travel to another location.
     SpawnPoint = 8      ///< It is a spawn room for players.
-} RoomFlag;
+};
 
 /// @brief Holds details about room.
 class Room

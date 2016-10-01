@@ -21,13 +21,13 @@
 #include "itemModel.hpp"
 
 /// Sizes of armor.
-typedef enum class ArmorSize_t
+using ArmorSize = enum class ArmorSize_t
 {
     All,    ///< [0] All kind of size.
     Light,  ///< [1] Light Armor
     Medium, ///< [2] Medium Armor
     Heavy   ///< [3] Heavy Armor
-} ArmorSize;
+};
 
 /// @brief Model of an armor.
 class ArmorModel :

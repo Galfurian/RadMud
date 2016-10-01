@@ -21,14 +21,14 @@
 #include "itemModel.hpp"
 
 /// Used to determine the type of the resource.
-typedef enum class MechanismType_t
+using MechanismType = enum class MechanismType_t
 {
     None,
     Door,
     Lock,
     Picklock,
     Lever
-} MechanismType;
+};
 
 /// @brief Model of a general mechanism.
 class MechanismModel :

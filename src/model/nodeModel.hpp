@@ -21,13 +21,13 @@
 #include "itemModel.hpp"
 
 /// Used to determine the type of the node.
-typedef enum class NodeType_t
+using NodeType = enum class NodeType_t
 {
     NoType,
     Metal,
     Wood,
     Stone
-} NodeType;
+};
 
 /// @brief Model of a node of resources.
 class NodeModel :
