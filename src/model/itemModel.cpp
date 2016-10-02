@@ -98,6 +98,7 @@ void ItemModel::getSheet(Table & sheet) const
 Item * ItemModel::createItem(
     std::string maker,
     Material * composition,
+    bool isForMobile,
     const ItemQuality & itemQuality,
     const unsigned int & quantity)
 {
@@ -118,7 +119,15 @@ Item * ItemModel::createItem(
     }
 
     // First set: Vnum, Model, Maker, Composition, Quality.
-    newItem->vnum = Mud::instance().getMaxVnumItem() + 1;
+    // If the item is for a mobile, set the vnum to -1.
+    if (isForMobile)
+    {
+        newItem->vnum = -1;
+    }
+    else
+    {
+        newItem->vnum = Mud::instance().getMaxVnumItem() + 1;
+    }
     newItem->model = this;
     newItem->quantity = quantity;
     newItem->maker = maker;
@@ -158,6 +167,12 @@ Item * ItemModel::createItem(
         newItem->condition = newItem->maxCondition;
     }
     newItem->currentSlot = slot;
+
+    // If the item is for a mobile, do not add the item to the MUD nor to the DB and do not check its correctness.
+    if(isForMobile)
+    {
+        return newItem;
+    }
 
     if (!newItem->check())
     {

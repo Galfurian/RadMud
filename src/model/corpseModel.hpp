@@ -29,19 +29,20 @@ public:
 
     virtual ~CorpseModel();
 
-    virtual ModelType getType() const;
+    ModelType getType() const override;
 
-    virtual std::string getTypeName() const;
+    std::string getTypeName() const override;
 
-    virtual bool setModel(const std::string & source);
+    bool setModel(const std::string & source) override;
 
-    virtual void getSheet(Table & sheet) const;
+    void getSheet(Table & sheet) const override;
 
-    virtual Item * createItem(
+    Item * createItem(
         std::string maker,
         Material * composition,
-        const ItemQuality & itemQuality,
-        const unsigned int & quantity);
+        bool isForMobile = false,
+        const ItemQuality & itemQuality = ItemQuality::Normal,
+        const unsigned int & quantity = 1) override;
 
     /// Creates a new corpse.
     /// @param maker       The player that create the corpse.

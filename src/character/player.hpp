@@ -88,19 +88,19 @@ public:
     /// Disable assign operator.
     Player & operator=(const Player &) = delete;
 
-    virtual bool check() const;
+    bool check() const override;
 
-    virtual bool isPlayer() const;
+    bool isPlayer() const override;
 
-    virtual void getSheet(Table & sheet) const;
+    void getSheet(Table & sheet) const override;
 
-    virtual void addInventoryItem(Item *& item);
+    void addInventoryItem(Item *& item) override;
 
-    virtual void addEquipmentItem(Item *& item);
+    void addEquipmentItem(Item *& item) override;
 
-    virtual bool remInventoryItem(Item * item);
+    bool remInventoryItem(Item * item) override;
 
-    virtual bool remEquipmentItem(Item * item);
+    bool remEquipmentItem(Item * item) override;
 
     /// @brief Return player socket.
     /// @return Player sockec.
@@ -134,7 +134,7 @@ public:
     void sendPrompt();
 
     /// @brief Handle what happend when this player die.
-    void kill();
+    void kill() override;
 
     /// @brief Handle player has entered the game.
     void enterGame();
@@ -159,5 +159,5 @@ public:
 
     /// @brief Output to player (any type).
     /// @param msg String to sent.
-    void sendMsg(const std::string & msg);
+    void sendMsg(const std::string & msg) override;
 };

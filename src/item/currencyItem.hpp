@@ -28,9 +28,9 @@ public:
 
     virtual ~CurrencyItem();
 
-    virtual void getSheet(Table & sheet) const;
+    void getSheet(Table & sheet) const override;
 
-    virtual unsigned int getPrice(bool entireStack) const;
+    unsigned int getPrice(bool entireStack) const override;
 
-    virtual unsigned int getWeight(bool entireStack) const;
+    unsigned int getWeight(bool entireStack) const override;
 };

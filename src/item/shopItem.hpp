@@ -41,17 +41,17 @@ public:
 
     virtual ~ShopItem();
 
-    virtual bool check(bool complete = false);
+    bool check(bool complete = false) override;
 
-    virtual bool updateOnDB();
+    bool updateOnDB() override;
 
-    virtual bool removeOnDB();
+    bool removeOnDB() override;
 
-    virtual void getSheet(Table & sheet) const;
+    void getSheet(Table & sheet) const override;
 
-    virtual bool canDeconstruct(std::string & error) const;
+    bool canDeconstruct(std::string & error) const override;
 
-    virtual std::string lookContent();
+    std::string lookContent() override;
 
     /// @brief Allows to set the new shop keeper.
     /// @param _shopKeeper The new shop keeper.

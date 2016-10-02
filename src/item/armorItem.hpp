@@ -28,7 +28,7 @@ public:
 
     virtual ~ArmorItem();
 
-    virtual void getSheet(Table & sheet) const;
+    void getSheet(Table & sheet) const override;
 
     /// Provides the AC of the armor based on its quality, material and condition.
     /// @return the armor class.

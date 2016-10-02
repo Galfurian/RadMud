@@ -45,13 +45,13 @@ public:
 
     virtual ~ArmorModel();
 
-    virtual ModelType getType() const;
+    ModelType getType() const override;
 
-    virtual std::string getTypeName() const;
+    std::string getTypeName() const override;
 
-    virtual bool setModel(const std::string & source);
+    bool setModel(const std::string & source) override;
 
-    virtual void getSheet(Table & sheet) const;
+    void getSheet(Table & sheet) const override;
 };
 
 /// @addtogroup EnumToString

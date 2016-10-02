@@ -190,12 +190,14 @@ public:
     /// @brief Create a new item starting from this model.
     /// @param maker       The player that create the item.
     /// @param composition The composition of the item.
+    /// @param isForMobile Defines if the item is for a mobile, thus it is not save on the DB nor on the MUD.
     /// @param itemQuality The quality of the item.
     /// @param quantity    The quantity.
     /// @return The newly created item.
     virtual Item * createItem(
         std::string maker,
         Material * composition,
+        bool isForMobile = false,
         const ItemQuality & itemQuality = ItemQuality::Normal,
         const unsigned int & quantity = 1);
 

@@ -284,7 +284,7 @@ Item * Item::removeFromStack(Character * actor, unsigned int & _quantity)
     if (this->quantity > _quantity)
     {
         // Generate a copty of this item with the given quantity.
-        auto newStack = this->model->createItem(actor->getName(), this->composition, this->quality, _quantity);
+        auto newStack = this->model->createItem(actor->getName(), this->composition, false, this->quality, _quantity);
         if (newStack != nullptr)
         {
             // Actually reduce the quantity.

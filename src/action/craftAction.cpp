@@ -121,6 +121,7 @@ ActionStatus CraftAction::perform()
         auto newItem = outcomeModel->createItem(
             actor->getName(),
             material,
+            false,
             ItemQuality::Normal,
             production->quantity);
         if (newItem == nullptr)

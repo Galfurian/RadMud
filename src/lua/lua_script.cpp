@@ -54,25 +54,20 @@ Item * LuaLoadItem(Character * maker, int vnumModel, int vnumMaterial, unsigned 
         Logger::log(LogLevel::Error, "Can't find model :" + ToString(vnumModel));
         return nullptr;
     }
-    auto mater = Mud::instance().findMaterial(vnumMaterial);
-    if (mater == nullptr)
+    auto composition = Mud::instance().findMaterial(vnumMaterial);
+    if (composition == nullptr)
     {
         Logger::log(LogLevel::Error, "Can't find material :" + ToString(vnumMaterial));
         return nullptr;
     }
-    ItemQuality qualt = ItemQuality::Normal;
+    ItemQuality quality = ItemQuality::Normal;
     if (ItemQuality::isValid(qualityValue))
     {
-        qualt = ItemQuality(qualityValue);
+        quality = ItemQuality(qualityValue);
     }
-    auto item = GenerateItem(model->getType());
-    // Set the values of the new item.
-    item->vnum = -1;
-    item->model = model;
-    item->maker = maker->getName();
-    item->composition = mater;
-    item->quality = qualt;
-    item->condition = item->getMaxCondition();
+
+    auto item = model->createItem(maker->getName(), composition, true, quality);
+
     return item;
 }
 

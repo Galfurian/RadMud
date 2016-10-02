@@ -65,11 +65,11 @@ public:
     /// @brief Destructor.
     ~Mobile();
 
-    virtual bool check() const;
+    bool check() const override;
 
-    virtual bool isMobile() const;
+    bool isMobile() const override;
 
-    virtual void getSheet(Table & sheet) const;
+    void getSheet(Table & sheet) const override;
 
     /// @brief Allows to pass a string which contains the abilities.
     /// @param source The string which containts the values
@@ -98,7 +98,7 @@ public:
     bool hasAction(const std::string & _action) const;
 
     /// @brief Handle what happend when this mob die.
-    void kill();
+    void kill() override;
 
     /// @brief Return the number of second until next respawn.
     /// @return Seconds until respawn.
@@ -114,7 +114,7 @@ public:
 
     /// @brief Output to player (any type).
     /// @param msg The string to sent.
-    void sendMsg(const std::string & msg);
+    void sendMsg(const std::string & msg) override;
 
     /// @brief A thread used to handle mobile actions.
     /// @param event     The event name.

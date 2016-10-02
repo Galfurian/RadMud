@@ -32,28 +32,15 @@ public:
     /// @brief Destructor.
     virtual ~BasicAttack();
 
-    /// @brief Checks the correctness of the action's values.
-    /// @return <b>True</b> if it has correct values,<br>
-    ///         <b>False</b> otherwise.
-    virtual bool check() const;
+    bool check() const override;
 
-    /// @brief Provides the type of the action.
-    /// @return The type of action.
-    virtual ActionType getType() const;
+    ActionType getType() const override;
 
-    /// @brief Provides the description of the action.
-    /// @return The string which describe the current action.
-    virtual std::string getDescription() const;
+    std::string getDescription() const override;
 
-    /// @brief Stops the current action and returns a string which describe the intterruption.
-    /// @return The stopping description.
-    virtual std::string stop();
+    std::string stop() override;
 
-    /// @brief Performs the current action.
-    /// @return the status after performing the action.
-    virtual ActionStatus perform();
+    ActionStatus perform() override;
 
-    /// @brief Provides the type of combat action.
-    /// @return The type of combat action.
-    virtual CombatActionType getCombatActionType() const;
+    CombatActionType getCombatActionType() const override;
 };

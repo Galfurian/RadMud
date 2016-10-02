@@ -51,11 +51,13 @@
 #include <fcntl.h>
 
 #elif __APPLE__
+
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <fcntl.h>
+
 #elif __CYGWIN__
 
 #include <sys/select.h>
@@ -65,9 +67,11 @@
 #include <fcntl.h>
 
 #elif _WIN32
+
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <WS2tcpip.h>
 #include <windows.h>
+
 #endif
 
 extern "C"

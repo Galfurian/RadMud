@@ -30,9 +30,9 @@ public:
 
     virtual void removeFromMud();
 
-    virtual bool updateOnDB();
+    bool updateOnDB() override;
 
-    virtual bool removeOnDB();
+    bool removeOnDB() override;
 
-    virtual void getSheet(Table & sheet) const;
+    void getSheet(Table & sheet) const override;
 };

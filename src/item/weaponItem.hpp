@@ -28,7 +28,7 @@ public:
 
     virtual ~WeaponItem();
 
-    virtual void getSheet(Table & sheet) const;
+    void getSheet(Table & sheet) const override;
 
     /// Randomly roll the weapon damage.
     unsigned int rollDamage() const;

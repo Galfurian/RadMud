@@ -28,7 +28,7 @@ extern "C"
 #include "lualib.h"
 }
 
-#include "luabridge/LuaBridge.hpp"
+#include "../lua/luabridge/LuaBridge.hpp"
 
 /// Used to create and manage a tridimensional coordinates.
 class Coordinates

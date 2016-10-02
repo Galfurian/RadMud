@@ -615,7 +615,7 @@ void DoItemCreate(Character * character, ArgumentHandler & args)
         quality = ItemQuality(itemQualityValue);
     }
     // Create the item.
-    auto item = itemModel->createItem(character->getName(), material, quality, 1);
+    auto item = itemModel->createItem(character->getName(), material, false, quality, 1);
     if (item == nullptr)
     {
         character->sendMsg("Creation failed.\n");
