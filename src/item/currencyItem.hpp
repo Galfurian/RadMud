@@ -30,7 +30,7 @@ public:
 
     virtual void getSheet(Table & sheet) const;
 
-    virtual unsigned int getPrice() const;
+    virtual unsigned int getPrice(bool entireStack) const;
 
-    virtual unsigned int getWeight() const;
+    virtual unsigned int getWeight(bool entireStack) const;
 };

@@ -47,20 +47,20 @@ namespace luabridge
 template<class T>
 struct Stack;
 
-#include "detail/LuaHelpers.h"
+#include "detail/LuaHelpers.hpp"
 
-#include "detail/TypeTraits.h"
-#include "detail/TypeList.h"
-#include "detail/FuncTraits.h"
-#include "detail/Constructor.h"
-#include "detail/Stack.h"
-#include "detail/ClassInfo.h"
+#include "detail/TypeTraits.hpp"
+#include "detail/TypeList.hpp"
+#include "detail/FuncTraits.hpp"
+#include "detail/Constructor.hpp"
+#include "detail/Stack.hpp"
+#include "detail/ClassInfo.hpp"
 
 class LuaRef;
 
-#include "detail/LuaException.h"
-#include "detail/LuaRef.h"
-#include "detail/Iterator.h"
+#include "detail/LuaException.hpp"
+#include "detail/LuaRef.hpp"
+#include "detail/Iterator.hpp"
 
 /// @brief Class needed for secuirity options.
 class Security
@@ -94,9 +94,9 @@ private:
     }
 };
 
-#include "detail/Userdata.h"
-#include "detail/CFunctions.h"
-#include "detail/Namespace.h"
+#include "detail/Userdata.hpp"
+#include "detail/CFunctions.hpp"
+#include "detail/Namespace.hpp"
 
 /// @brief Push an object onto the Lua stack.
 template<class T>

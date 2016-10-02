@@ -39,9 +39,9 @@ void CurrencyItem::getSheet(Table & sheet) const
     // Set the values.
 }
 
-unsigned int CurrencyItem::getPrice() const
+unsigned int CurrencyItem::getPrice(bool entireStack) const
 {
-    auto customPrice = Item::getPrice(true);
+    auto customPrice = Item::getPrice(entireStack);
     if (!model->toCurrency()->findPrice(this->composition->vnum, customPrice))
     {
         Logger::log(
@@ -52,7 +52,7 @@ unsigned int CurrencyItem::getPrice() const
     return customPrice;
 }
 
-unsigned int CurrencyItem::getWeight() const
+unsigned int CurrencyItem::getWeight(bool) const
 {
     return 0;
 }
