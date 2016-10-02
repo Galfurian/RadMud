@@ -57,11 +57,13 @@
 #include <netinet/in.h>
 #include <fcntl.h>
 #elif __CYGWIN__
+
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <fcntl.h>
+
 #elif _WIN32
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <WS2tcpip.h>
@@ -197,55 +199,79 @@ public:
 
     /// Add a player to the list of connected players.
     bool addPlayer(Player * player);
+
     /// Remove a player from the list of connected players.
     bool remPlayer(Player * player);
+
     /// Add the given mobile to the mud.
     bool addMobile(Mobile * mobile);
+
     /// Remove the given mobile from the mud.
     bool remMobile(Mobile * mobile);
+
     /// Add the given item to the mud.
     bool addItem(Item * item);
+
     /// Remove the given item from the mud.
     bool remItem(Item * item);
+
     /// Add the given room to the mud.
     bool addRoom(Room * room);
+
     /// Remove the given room from the mud.
     bool remRoom(Room * room);
+
     /// Add the given corpse to the mud.
     bool addCorpse(Item * corpse);
+
     /// Remove the given corpse from the mud.
     bool remCorpse(Item * corpse);
+
     /// Add the given item model to the mud.
     bool addItemModel(ItemModel * model);
+
     /// Add the given area to the mud.
     bool addArea(Area * area);
+
     /// Add the given race to the mud.
     bool addRace(Race * race);
+
     /// Add the given faction to the mud.
     bool addFaction(Faction * faction);
+
     /// Add the given skill to the mud.
     bool addSkill(Skill * skill);
+
     /// Add the given writing to the mud.
     bool addWriting(Writing * writing);
+
     /// Add the given continent to the mud.
     bool addContinent(Continent * continent);
+
     /// Add the given material to the mud.
     bool addMaterial(Material * material);
+
     /// Add the given profession to the mud.
     bool addProfession(Profession * profession);
+
     /// Add the given production to the mud.
     bool addProduction(Production * production);
+
     /// Add the given liquid to the mud.
     bool addLiquid(Liquid * liquid);
+
     /// Add the given travel point to the mud.
     bool addTravelPoint(Room * source, Room * target);
 
     /// Add a command to the mud.
     void addCommand(Command & command);
+
     /// Add a direction to the mud.
     bool addDirection(std::string name, Direction direction);
+
     /// Add a state action to the mud.
     bool addStateAction(ConnectionState state, ActionHandler action);
+
     /// Add a building to the mud.
     bool addBuilding(Building & building);
     ///@}

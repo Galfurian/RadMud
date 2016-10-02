@@ -44,7 +44,7 @@ using ContinentTile = enum class ContinentTile_t
     Item = 'i',         ///< It's a generic item.
     Door = 'D',         ///< It's a door tile.
     DoorOpen = 'd',     ///< It's a door tile.
-} ;
+};
 
 /// @brief Holds details about a continent.
 class Continent

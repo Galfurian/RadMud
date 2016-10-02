@@ -36,7 +36,7 @@ using ToolType = enum class ToolType_t
     Bellows = 33,
     Crucible = 34,
     Tinderbox = 40
-} ;
+};
 
 /// @brief Model of a tool.
 class ToolModel :

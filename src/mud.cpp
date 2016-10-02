@@ -19,7 +19,6 @@
 #include "mud.hpp"
 
 #include <unistd.h>
-#include <signal.h>
 
 #include "protocol.hpp"
 #include "utilities/stopwatch.hpp"

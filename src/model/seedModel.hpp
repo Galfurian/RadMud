@@ -25,7 +25,7 @@ using SeedType = enum class SeedType_t
 {
     Plant,  ///< A generic seed.
     Tree,   ///< A seed used to plant a tree.
-} ;
+};
 
 /// @brief Model of a seed.
 class SeedModel :

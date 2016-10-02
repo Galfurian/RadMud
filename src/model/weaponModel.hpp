@@ -37,7 +37,7 @@ using WeaponType = enum class WeaponType_t
     Blunt,              ///< [11] All sort of blunt weapons
     Thrown,             ///< [12] Throwable weapons
     Unarmed,            ///< [13] Weapon to enanche unarmed fight
-} ;
+};
 
 /// @brief Model of a weapon.
 class WeaponModel :

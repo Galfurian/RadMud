@@ -1,4 +1,4 @@
-#include "LuaHelpers.h"
+#include "LuaHelpers.hpp"
 
 namespace luabridge
 {

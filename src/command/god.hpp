@@ -42,17 +42,11 @@ void DoTransfer(Character * character, ArgumentHandler & args);
 /// Regain completely health and stamina.
 void DoFeast(Character * character, ArgumentHandler & args);
 
-/// Get information about a character.
-void DoGodInfo(Character * character, ArgumentHandler & args);
-
 /// Set a flag to a character.
 void DoSetFlag(Character * character, ArgumentHandler & args);
 
 /// Remove a flag from the character.
 void DoClearFlag(Character * character, ArgumentHandler & args);
-
-/// Show all the information fo the desired model.
-void DoModelInfo(Character * character, ArgumentHandler & args);
 
 /// Generate a new item from the vnum of a model.
 void DoItemCreate(Character * character, ArgumentHandler & args);
@@ -62,15 +56,6 @@ void DoItemGet(Character * character, ArgumentHandler & args);
 
 /// Destroy an item.
 void DoItemDestroy(Character * character, ArgumentHandler & args);
-
-/// Get information about an item.
-void DoItemInfo(Character * character, ArgumentHandler & args);
-
-/// Show the informations about an area.
-void DoAreaInfo(Character * character, ArgumentHandler & args);
-
-/// Show the informations about a room.
-void DoRoomInfo(Character * character, ArgumentHandler & args);
 
 /// Create a room in the given direction.
 void DoRoomCreate(Character * character, ArgumentHandler & args);
@@ -105,14 +90,26 @@ void DoModSkill(Character * character, ArgumentHandler & args);
 /// Modify the value of the player attribute.
 void DoModAttr(Character * character, ArgumentHandler & args);
 
-/// Provides the list of opponents of the given target.
-void DoAggroList(Character * character, ArgumentHandler & args);
+/// Create the item with the given liquid inside a container.
+void DoLiquidCreate(Character * character, ArgumentHandler & args);
+
+/// Get information about a character.
+void DoGodInfo(Character * character, ArgumentHandler & args);
+
+/// Show all the information fo the desired model.
+void DoModelInfo(Character * character, ArgumentHandler & args);
+
+/// Get information about an item.
+void DoItemInfo(Character * character, ArgumentHandler & args);
+
+/// Show the informations about an area.
+void DoAreaInfo(Character * character, ArgumentHandler & args);
+
+/// Show the informations about a room.
+void DoRoomInfo(Character * character, ArgumentHandler & args);
 
 /// Provide all the information regarding the given material.
 void DoMaterialInfo(Character * character, ArgumentHandler & args);
-
-/// Create the item with the given liquid inside a container.
-void DoLiquidCreate(Character * character, ArgumentHandler & args);
 
 /// Provide all the information regarding the given liquid.
 void DoLiquidInfo(Character * character, ArgumentHandler & args);
@@ -125,6 +122,9 @@ void DoProfessionInfo(Character * character, ArgumentHandler & args);
 
 /// Shows the infos about a faction.
 void DoFactionInfo(Character * character, ArgumentHandler & args);
+
+/// Provides the list of opponents of the given target.
+void DoAggroList(Character * character, ArgumentHandler & args);
 
 /// List all the model used to define items.
 void DoModelList(Character * character, ArgumentHandler & args);

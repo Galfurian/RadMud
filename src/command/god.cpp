@@ -511,43 +511,6 @@ void DoFeast(Character * character, ArgumentHandler & args)
     target->sendMsg("A banquet with any kind of delicacy appears from nowhere!\n");
 }
 
-void DoGodInfo(Character * character, ArgumentHandler & args)
-{
-    if (args.size() != 1)
-    {
-        character->sendMsg("You must insert a valide player name.\n");
-        return;
-    }
-    Character * target = Mud::instance().findPlayer(args[0].getContent());
-    if (target == nullptr)
-    {
-        target = Mud::instance().findMobile(args[0].getContent());
-        if (target == nullptr)
-        {
-            std::string msgFound;
-            for (auto it : Mud::instance().mudMobiles)
-            {
-                if (BeginWith(it.first, args[0].getContent()))
-                {
-                    if (msgFound.empty())
-                    {
-                        msgFound += "Maybe you mean:\n";
-                    }
-                    msgFound += "    " + it.first + "\n";
-                }
-            }
-            character->sendMsg("Mobile not found.\n" + msgFound);
-            return;
-        }
-    }
-    // Create a table.
-    Table sheet;
-    // Get the sheet.
-    target->getSheet(sheet);
-    // Show the seet to character.
-    character->sendMsg(sheet.getTable());
-}
-
 void DoSetFlag(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 2)
@@ -614,27 +577,6 @@ void DoClearFlag(Character * character, ArgumentHandler & args)
         "You clear the flag '%s' for %s\n",
         GetCharacterFlagName(flag),
         target->getName());
-}
-
-void DoModelInfo(Character * character, ArgumentHandler & args)
-{
-    if (args.size() != 1)
-    {
-        character->sendMsg("You must insert a model vnum.\n");
-        return;
-    }
-    auto itemModel = Mud::instance().findItemModel(ToNumber<int>(args[0].getContent()));
-    if (itemModel == nullptr)
-    {
-        character->sendMsg("Item model not found.\n");
-        return;
-    }
-    // Create a table.
-    Table sheet;
-    // Get the sheet.
-    itemModel->getSheet(sheet);
-    // Show the seet to character.
-    character->sendMsg(sheet.getTable());
 }
 
 void DoItemCreate(Character * character, ArgumentHandler & args)
@@ -758,93 +700,6 @@ void DoItemDestroy(Character * character, ArgumentHandler & args)
     item->removeOnDB();
     delete (item);
     character->sendMsg("You have destroyed the desired object.\n");
-}
-
-void DoItemInfo(Character * character, ArgumentHandler & args)
-{
-    if (args.size() != 1)
-    {
-        character->sendMsg(
-            "You must instert the item vnum or the name of the item inside the room.\n");
-        return;
-    }
-    auto item = Mud::instance().findItem(ToNumber<int>(args[0].getContent()));
-    if (item == nullptr)
-    {
-        item = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
-        if (item == nullptr)
-        {
-
-            character->sendMsg("Cannot find the target item (provide vnum or item name).\n");
-            return;
-        }
-    }
-    // Create a table.
-    Table sheet(item->getNameCapital());
-    // Get the sheet.
-    item->getSheet(sheet);
-    // Show the seet to character.
-    character->sendMsg(sheet.getTable());
-}
-
-void DoAreaInfo(Character * character, ArgumentHandler & args)
-{
-    if (args.size() != 1)
-    {
-        character->sendMsg("You must instert an area vnum.\n");
-        return;
-    }
-    auto area = Mud::instance().findArea(ToNumber<int>(args[0].getContent()));
-    if (area == nullptr)
-    {
-        character->sendMsg("The selected area does not exist.");
-        return;
-    }
-    std::string msg;
-    msg += "Area Informations:\n";
-    msg += " Vnum      :" + ToString(area->vnum) + "\n";
-    msg += " Name      :" + area->name + "\n";
-    msg += " Builder   :" + area->builder + "\n";
-    msg += " Continent :" + area->continent + "\n";
-    msg += " Width     :" + ToString(area->width) + "\n";
-    msg += " Height    :" + ToString(area->height) + "\n";
-    msg += " Elevation :" + ToString(area->elevation) + "\n";
-    msg += " N. Rooms  :" + ToString(area->areaMap.size()) + "\n";
-    character->sendMsg(msg);
-}
-
-void DoRoomInfo(Character * character, ArgumentHandler & args)
-{
-    Room * room;
-    if (args.empty())
-    {
-        room = character->room;
-    }
-    else if (args.size() == 1)
-    {
-        room = Mud::instance().findRoom(ToNumber<int>(args[0].getContent()));
-        if (room == nullptr)
-        {
-            character->sendMsg("Can't find the desired room.\n");
-            return;
-        }
-    }
-    else
-    {
-        character->sendMsg("CanYu can only provide nothing or a room vnum.\n");
-        return;
-    }
-    std::string msg;
-    msg += "Room Informations:\n";
-    msg += " Vnum        :" + ToString(room->vnum) + "\n";
-    msg += " X           :" + ToString(room->coord.x) + "\n";
-    msg += " Y           :" + ToString(room->coord.y) + "\n";
-    msg += " Z           :" + ToString(room->coord.z) + "\n";
-    msg += " Name        :" + room->name + "\n";
-    msg += " Description :" + room->description + "\n";
-    msg += " Terrain     :" + room->terrain + "\n";
-    msg += " Flags       :" + GetRoomFlagString(room->flags) + "\n";
-    character->sendMsg(msg);
 }
 
 void DoRoomCreate(Character * character, ArgumentHandler & args)
@@ -1296,58 +1151,6 @@ void DoModAttr(Character * character, ArgumentHandler & args)
         GetAbilityName(ability));
 }
 
-void DoAggroList(Character * character, ArgumentHandler & args)
-{
-    if (args.size() != 1)
-    {
-        character->sendMsg("You must insert a valide character name.\n");
-        return;
-    }
-    Character * targer = Mud::instance().findPlayer(args[0].getContent());
-    if (targer == nullptr)
-    {
-        targer = Mud::instance().findMobile(args[0].getContent());
-        if (targer == nullptr)
-        {
-            character->sendMsg("Character not found.\n");
-            return;
-        }
-    }
-    for (auto aggressor : targer->opponents)
-    {
-        if (aggressor.aggressor != nullptr)
-        {
-            character->sendMsg(
-                "%s\t%s",
-                ToString(aggressor.aggression),
-                aggressor.aggressor->getNameCapital());
-        }
-    }
-}
-
-void DoMaterialInfo(Character * character, ArgumentHandler & args)
-{
-    if (args.size() != 1)
-    {
-        character->sendMsg("You must insert a valide material vnum.\n");
-        return;
-    }
-    auto material = Mud::instance().findMaterial(ToNumber<int>(args[0].getContent()));
-    if (material == nullptr)
-    {
-        character->sendMsg("Can't find the desire material.\n");
-        return;
-    }
-    std::string msg;
-    msg += "Vnum      : " + ToString(material->vnum) + "\n";
-    msg += "Type      : " + GetMaterialTypeName(material->type) + "\n";
-    msg += "Name      : " + material->name + "\n";
-    msg += "Worth     : " + ToString(material->worth) + "\n";
-    msg += "Hardness  : " + ToString(material->hardness) + "\n";
-    msg += "Lightness : " + ToString(material->lightness) + "\n";
-    character->sendMsg(msg);
-}
-
 void DoLiquidCreate(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 3)
@@ -1388,6 +1191,178 @@ void DoLiquidCreate(Character * character, ArgumentHandler & args)
         ToString(quantity),
         liquid->getName(),
         item->getName(true));
+}
+
+// ////////////////////////////////////////////////////////////////////////////
+// INFORMATION
+// ////////////////////////////////////////////////////////////////////////////
+
+void DoGodInfo(Character * character, ArgumentHandler & args)
+{
+    if (args.size() != 1)
+    {
+        character->sendMsg("You must insert a valide player name.\n");
+        return;
+    }
+    Character * target = Mud::instance().findPlayer(args[0].getContent());
+    if (target == nullptr)
+    {
+        target = Mud::instance().findMobile(args[0].getContent());
+        if (target == nullptr)
+        {
+            std::string msgFound;
+            for (auto it : Mud::instance().mudMobiles)
+            {
+                if (BeginWith(it.first, args[0].getContent()))
+                {
+                    if (msgFound.empty())
+                    {
+                        msgFound += "Maybe you mean:\n";
+                    }
+                    msgFound += "    " + it.first + "\n";
+                }
+            }
+            character->sendMsg("Mobile not found.\n" + msgFound);
+            return;
+        }
+    }
+    // Create a table.
+    Table sheet;
+    // Get the sheet.
+    target->getSheet(sheet);
+    // Show the seet to character.
+    character->sendMsg(sheet.getTable());
+}
+
+void DoModelInfo(Character * character, ArgumentHandler & args)
+{
+    if (args.size() != 1)
+    {
+        character->sendMsg("You must insert a model vnum.\n");
+        return;
+    }
+    auto itemModel = Mud::instance().findItemModel(ToNumber<int>(args[0].getContent()));
+    if (itemModel == nullptr)
+    {
+        character->sendMsg("Item model not found.\n");
+        return;
+    }
+    // Create a table.
+    Table sheet;
+    // Get the sheet.
+    itemModel->getSheet(sheet);
+    // Show the seet to character.
+    character->sendMsg(sheet.getTable());
+}
+
+void DoItemInfo(Character * character, ArgumentHandler & args)
+{
+    if (args.size() != 1)
+    {
+        character->sendMsg(
+            "You must instert the item vnum or the name of the item inside the room.\n");
+        return;
+    }
+    auto item = Mud::instance().findItem(ToNumber<int>(args[0].getContent()));
+    if (item == nullptr)
+    {
+        item = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
+        if (item == nullptr)
+        {
+
+            character->sendMsg("Cannot find the target item (provide vnum or item name).\n");
+            return;
+        }
+    }
+    // Create a table.
+    Table sheet(item->getNameCapital());
+    // Get the sheet.
+    item->getSheet(sheet);
+    // Show the seet to character.
+    character->sendMsg(sheet.getTable());
+}
+
+void DoAreaInfo(Character * character, ArgumentHandler & args)
+{
+    if (args.size() != 1)
+    {
+        character->sendMsg("You must instert an area vnum.\n");
+        return;
+    }
+    auto area = Mud::instance().findArea(ToNumber<int>(args[0].getContent()));
+    if (area == nullptr)
+    {
+        character->sendMsg("The selected area does not exist.");
+        return;
+    }
+    std::string msg;
+    msg += "Area Informations:\n";
+    msg += " Vnum      :" + ToString(area->vnum) + "\n";
+    msg += " Name      :" + area->name + "\n";
+    msg += " Builder   :" + area->builder + "\n";
+    msg += " Continent :" + area->continent + "\n";
+    msg += " Width     :" + ToString(area->width) + "\n";
+    msg += " Height    :" + ToString(area->height) + "\n";
+    msg += " Elevation :" + ToString(area->elevation) + "\n";
+    msg += " N. Rooms  :" + ToString(area->areaMap.size()) + "\n";
+    character->sendMsg(msg);
+}
+
+void DoRoomInfo(Character * character, ArgumentHandler & args)
+{
+    Room * room;
+    if (args.empty())
+    {
+        room = character->room;
+    }
+    else if (args.size() == 1)
+    {
+        room = Mud::instance().findRoom(ToNumber<int>(args[0].getContent()));
+        if (room == nullptr)
+        {
+            character->sendMsg("Can't find the desired room.\n");
+            return;
+        }
+    }
+    else
+    {
+        character->sendMsg("CanYu can only provide nothing or a room vnum.\n");
+        return;
+    }
+    std::string msg;
+    msg += "Room Informations:\n";
+    msg += " Vnum        :" + ToString(room->vnum) + "\n";
+    msg += " X           :" + ToString(room->coord.x) + "\n";
+    msg += " Y           :" + ToString(room->coord.y) + "\n";
+    msg += " Z           :" + ToString(room->coord.z) + "\n";
+    msg += " Name        :" + room->name + "\n";
+    msg += " Description :" + room->description + "\n";
+    msg += " Terrain     :" + room->terrain + "\n";
+    msg += " Flags       :" + GetRoomFlagString(room->flags) + "\n";
+    character->sendMsg(msg);
+}
+
+void DoMaterialInfo(Character * character, ArgumentHandler & args)
+{
+    if (args.size() != 1)
+    {
+        character->sendMsg("You must insert a valide material vnum.\n");
+        return;
+    }
+    auto material = Mud::instance().findMaterial(ToNumber<int>(args[0].getContent()));
+    if (material == nullptr)
+    {
+        character->sendMsg("Can't find the desire material.\n");
+        return;
+    }
+    std::string msg;
+    msg += "Vnum      : " + ToString(material->vnum) + "\n";
+    msg += "Type      : " + GetMaterialTypeName(material->type) + "\n";
+    msg += "Name      : " + material->name + "\n";
+    msg += "Worth     : " + ToString(material->worth) + "\n";
+    msg += "Hardness  : " + ToString(material->hardness) + "\n";
+    msg += "Lightness : " + ToString(material->lightness) + "\n";
+    character->sendMsg(msg);
 }
 
 void DoLiquidInfo(Character * character, ArgumentHandler & args)
@@ -1495,6 +1470,39 @@ void DoFactionInfo(Character * character, ArgumentHandler & args)
     faction->getSheet(sheet);
     // Show the seet to character.
     character->sendMsg(sheet.getTable());
+}
+
+// ////////////////////////////////////////////////////////////////////////////
+// LIST
+// ////////////////////////////////////////////////////////////////////////////
+
+void DoAggroList(Character * character, ArgumentHandler & args)
+{
+    if (args.size() != 1)
+    {
+        character->sendMsg("You must insert a valide character name.\n");
+        return;
+    }
+    Character * targer = Mud::instance().findPlayer(args[0].getContent());
+    if (targer == nullptr)
+    {
+        targer = Mud::instance().findMobile(args[0].getContent());
+        if (targer == nullptr)
+        {
+            character->sendMsg("Character not found.\n");
+            return;
+        }
+    }
+    for (auto aggressor : targer->opponents)
+    {
+        if (aggressor.aggressor != nullptr)
+        {
+            character->sendMsg(
+                "%s\t%s",
+                ToString(aggressor.aggression),
+                aggressor.aggressor->getNameCapital());
+        }
+    }
 }
 
 void DoModelList(Character * character, ArgumentHandler & /*args*/)

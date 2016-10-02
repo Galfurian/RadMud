@@ -39,7 +39,7 @@ private:
         Void,       ///< It's an empty tile.
         Walkable,   ///< It's a walkable tile.
         ClosedDoor, ///< It's a closed door.
-    } ;
+    };
 
 public:
     /// The virtual number of the area.

@@ -27,7 +27,7 @@ using ShieldSize = enum class ShieldSize_t
     Light,  ///< [1] Light Shield
     Medium, ///< [2] Medium Shield
     Heavy   ///< [3] Heavy Shield
-} ;
+};
 
 /// @brief Model of a shield.
 class ShieldModel :

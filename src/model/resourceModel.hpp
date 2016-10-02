@@ -38,7 +38,7 @@ using ResourceType = enum class ResourceType_t
     StoneMonolith,  ///< [12] STONE_MONOLITH
     Pen,            ///< [13] Pen
     Trash           ///< [14] Trash (Anything which has no specific use)
-} ;
+};
 
 /// @brief Model of resources.
 class ResourceModel :
