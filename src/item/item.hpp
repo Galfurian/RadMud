@@ -224,11 +224,11 @@ public:
     unsigned int getFreeSpace() const;
 
     /// @brief Check if this item can contain the passed one.
-    /// @param item        The item to check.
-    /// @param entireStack If <b>true</b> this function perform the check for the entire stack.
+    /// @param item    The item to check.
+    /// @param ammount The ammount to check.
     /// @return <b>True</b> if it can be contained,<br>
     ///         <b>False</b> otherwise.
-    bool canContain(Item * item, bool entireStack) const;
+    bool canContain(Item * item, const unsigned int & ammount) const;
 
     /// @brief Load an item inside the container and update the database.
     /// @param item     The item to load in.
@@ -247,7 +247,7 @@ public:
     /// @param ammount The ammount of liquid.
     /// @return <b>True</b> if it can be contained,<br>
     ///         <b>False</b> otherwise.
-    bool canContain(Liquid * liquid, const unsigned int & ammount) const;
+    bool canContainLiquid(Liquid * liquid, const unsigned int & ammount) const;
 
     /// @brief Load some liquid inside the container and update the database.
     /// @param liquid   The liquid to load in.

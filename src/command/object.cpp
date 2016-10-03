@@ -1346,7 +1346,7 @@ void DoPut(Character * character, ArgumentHandler & args)
         for (auto iterator : originalList)
         {
             // Skip the item if it cannot be contained inside the destination.
-            if (!container->canContain(iterator, true)) continue;
+            if (!container->canContain(iterator, iterator->quantity)) continue;
             // Skip the item if it is the destination.
             if (iterator->vnum == container->vnum) continue;
             // Remove the item from the player's inventory.

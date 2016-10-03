@@ -567,9 +567,9 @@ unsigned int Item::getFreeSpace() const
     }
 }
 
-bool Item::canContain(Item * item, bool entireStack) const
+bool Item::canContain(Item * item, const unsigned int & ammount) const
 {
-    return (item->getWeight(entireStack) <= this->getFreeSpace());
+    return ((item->getWeight(false) * ammount) <= this->getFreeSpace());
 }
 
 void Item::putInside(Item *& item, bool updateDB)
@@ -614,7 +614,7 @@ bool Item::takeOut(Item * item, bool updateDB)
     return false;
 }
 
-bool Item::canContain(Liquid * liquid, const unsigned int & ammount) const
+bool Item::canContainLiquid(Liquid * liquid, const unsigned int & ammount) const
 {
     if (ammount > this->getFreeSpace())
     {
@@ -629,7 +629,7 @@ bool Item::canContain(Liquid * liquid, const unsigned int & ammount) const
 
 bool Item::pourIn(Liquid * liquid, const unsigned int & ammount, bool updateDB)
 {
-    if (this->canContain(liquid, ammount))
+    if (this->canContainLiquid(liquid, ammount))
     {
         if (contentLiq.first == nullptr)
         {
