@@ -61,6 +61,8 @@ public:
     /// Erase the argument at the given position.
     void erase(const size_t & position);
 
+    void dump() const;
+
 private:
     /// Given that original string has been set, it fills the vector of arguments.
     void evaluateArguments();

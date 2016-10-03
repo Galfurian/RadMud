@@ -17,6 +17,7 @@
 
 #include "argumentHandler.hpp"
 #include "../utils.hpp"
+#include "../utilities/logger.hpp"
 
 ArgumentHandler::ArgumentHandler(const std::string & _original) :
     original(_original),
@@ -77,18 +78,23 @@ Argument & ArgumentHandler::operator[](const size_t & position)
 
 std::string ArgumentHandler::substr(const size_t & startingArgument)
 {
-    if (startingArgument >= this->size())
+    if (startingArgument < this->size())
     {
-        return original;
+        std::string result;
+        for (size_t it = startingArgument; it < arguments.size(); ++it)
+        {
+            result += arguments[it].getContent();
+            if (it != (arguments.size() - 1))
+            {
+                result += " ";
+            }
+        }
+        return result;
     }
     else
     {
-        size_t pos = 0;
-        for (size_t it = 0; it < startingArgument; ++it)
-        {
-            pos += arguments[it].getOriginal().size() + 1;
-        }
-        return original.substr(pos);
+        Logger::log(LogLevel::Error, "[ArgumentHandler::substr] Starting argument out of bound!");
+        return original;
     }
 }
 
@@ -99,5 +105,17 @@ void ArgumentHandler::erase(const size_t & position)
         auto it = arguments.begin();
         std::advance(it, position);
         arguments.erase(it);
+    }
+    else
+    {
+        Logger::log(LogLevel::Error, "[ArgumentHandler::erase] Position out of bound!");
+    }
+}
+
+void ArgumentHandler::dump() const
+{
+    for (size_t it = 0; it < arguments.size(); ++it)
+    {
+        Logger::log(LogLevel::Debug, "[%s] %s", ToString(it), arguments.at(it).getOriginal());
     }
 }
