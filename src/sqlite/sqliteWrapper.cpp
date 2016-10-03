@@ -49,7 +49,7 @@ bool SQLiteWrapper::openConnection(std::string dbName, std::string dbDirectory)
     errorCode = sqlite3_open(
         (dbDetails.dbDirectory + dbDetails.dbName).c_str(),
         &(dbDetails.dbConnection));
-    errorMessage = reinterpret_cast<const char *>(sqlite3_errmsg(dbDetails.dbConnection));
+    errorMessage = sqlite3_errmsg(dbDetails.dbConnection);
 
     if (errorCode != SQLITE_OK)
     {
