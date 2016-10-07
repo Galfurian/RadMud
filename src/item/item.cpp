@@ -436,12 +436,23 @@ std::string Item::getLook()
     output = "You look at " + this->getName(true);
     output += ", it " + this->getConditionDescription() + ".\n";
     output += Formatter::gray() + this->getDescription() + Formatter::reset() + "\n";
-    output += "\n";
     // Print the content.
     output += this->lookContent();
-    output += "It weights about ";
-    output += Formatter::yellow() + ToString(this->getWeight(true)) + Formatter::reset();
-    output += " " + mud_measure + ".\n";
+    if (this->quantity != 1)
+    {
+        output += this->getNameCapital(true) + " weights about ";
+        output += Formatter::yellow() + ToString(this->getWeight(false)) + Formatter::reset();
+        output += " " + mud_measure + ".\n";
+        output += "The stack weights about ";
+        output += Formatter::yellow() + ToString(this->getWeight(true)) + Formatter::reset();
+        output += " " + mud_measure + ".\n";
+    }
+    else
+    {
+        output += "It weights about ";
+        output += Formatter::yellow() + ToString(this->getWeight(true)) + Formatter::reset();
+        output += " " + mud_measure + ".\n";
+    }
     return output;
 }
 
@@ -791,7 +802,6 @@ std::string Item::lookContent()
             output += Formatter::cyan() + contentLiq.first->getName() + Formatter::reset() + ".\n";
         }
     }
-    output += "\n";
     return output;
 }
 
