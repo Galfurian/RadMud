@@ -39,7 +39,7 @@ public:
     ItemContainer();
 
     /// @brief Destructor.
-    virtual ~ItemContainer();
+    ~ItemContainer();
 
     /// @brief Special function used to add an item to the container.
     /// @details

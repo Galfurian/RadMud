@@ -71,7 +71,7 @@ public:
     GeneralAction(Character * _actor, TimeClock _actionCooldown);
 
     /// @brief Destructor.
-    virtual ~GeneralAction();
+    ~GeneralAction();
 
     /// @brief Check if the cooldown of the action is elapsed.
     /// @return <b>True</b> if the time has passed,<br>

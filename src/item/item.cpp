@@ -466,11 +466,7 @@ bool Item::hasNodeType(NodeType nodeType)
     {
         return false;
     }
-    if (model->toNode()->nodeType != nodeType)
-    {
-        return false;
-    }
-    return true;
+    return (model->toNode()->nodeType == nodeType);
 }
 
 bool Item::isAContainer() const
@@ -499,14 +495,11 @@ bool Item::isEmpty() const
     {
         return (content.size() == 0);
     }
-    else if (model->getType() == ModelType::LiquidContainer)
+    if (model->getType() == ModelType::LiquidContainer)
     {
         return (contentLiq.first == nullptr);
     }
-    else
-    {
-        return true;
-    }
+    return true;
 }
 
 unsigned int Item::getTotalSpace() const

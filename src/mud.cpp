@@ -261,11 +261,7 @@ bool Mud::remCorpse(Item * corpse)
 
 bool Mud::addItemModel(ItemModel * model)
 {
-    if (model == nullptr)
-    {
-        return false;
-    }
-    return mudItemModels.insert(std::make_pair(model->vnum, model)).second;
+    return (model == nullptr) ? false : mudItemModels.insert(std::make_pair(model->vnum, model)).second;
 }
 
 bool Mud::addArea(Area * area)
@@ -275,29 +271,17 @@ bool Mud::addArea(Area * area)
 
 bool Mud::addRace(Race * race)
 {
-    if (race == nullptr)
-    {
-        return false;
-    }
-    return mudRaces.insert(std::make_pair(race->vnum, race)).second;
+    return (race == nullptr) ? false : mudRaces.insert(std::make_pair(race->vnum, race)).second;
 }
 
 bool Mud::addFaction(Faction * faction)
 {
-    if (faction == nullptr)
-    {
-        return false;
-    }
-    return mudFactions.insert(std::make_pair(faction->vnum, faction)).second;
+    return (faction == nullptr) ? false : mudFactions.insert(std::make_pair(faction->vnum, faction)).second;
 }
 
 bool Mud::addSkill(Skill * skill)
 {
-    if (skill == nullptr)
-    {
-        return false;
-    }
-    return mudSkills.insert(std::make_pair(skill->vnum, skill)).second;
+    return (skill == nullptr) ? false : mudSkills.insert(std::make_pair(skill->vnum, skill)).second;
 }
 
 bool Mud::addWriting(Writing * writing)
@@ -312,38 +296,22 @@ bool Mud::addContinent(Continent * continent)
 
 bool Mud::addMaterial(Material * material)
 {
-    if (material == nullptr)
-    {
-        return false;
-    }
-    return mudMaterials.insert(std::make_pair(material->vnum, material)).second;
+    return (material == nullptr) ? false : mudMaterials.insert(std::make_pair(material->vnum, material)).second;
 }
 
 bool Mud::addProfession(Profession * profession)
 {
-    if (profession == nullptr)
-    {
-        return false;
-    }
-    return mudProfessions.insert(std::make_pair(profession->vnum, profession)).second;
+    return (profession == nullptr) ? false : mudProfessions.insert(std::make_pair(profession->vnum, profession)).second;
 }
 
 bool Mud::addProduction(Production * production)
 {
-    if (production == nullptr)
-    {
-        return false;
-    }
-    return mudProductions.insert(std::make_pair(production->vnum, production)).second;
+    return (production == nullptr) ? false : mudProductions.insert(std::make_pair(production->vnum, production)).second;
 }
 
 bool Mud::addLiquid(Liquid * liquid)
 {
-    if (liquid == nullptr)
-    {
-        return false;
-    }
-    return mudLiquids.insert(std::make_pair(liquid->vnum, liquid)).second;
+    return (liquid == nullptr) ? false : mudLiquids.insert(std::make_pair(liquid->vnum, liquid)).second;
 }
 
 bool Mud::addTravelPoint(Room * source, Room * target)
@@ -1116,11 +1084,7 @@ bool Mud::initComunications()
 
 bool Mud::closeComunications()
 {
-    if (_servSocket != kNoSocketIndicator)
-    {
-        return this->closeSocket(_servSocket);
-    }
-    return false;
+    return (_servSocket == kNoSocketIndicator) ? false : this->closeSocket(_servSocket);
 }
 
 bool Mud::startMud()

@@ -178,7 +178,7 @@ bool SQLiteWrapper::next()
 {
     // Reset the column number.
     currentColumn = 0;
-    return (sqlite3_step(dbDetails.dbStatement) == SQLITE_ROW) ? true : false;
+    return (sqlite3_step(dbDetails.dbStatement) == SQLITE_ROW);
 }
 
 bool SQLiteWrapper::release()

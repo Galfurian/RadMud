@@ -44,8 +44,8 @@ Material::~Material()
 bool Material::check()
 {
     assert(vnum > 0);
-    assert(name.empty() == false);
-    assert(article.empty() == false);
+    assert(!name.empty());
+    assert(!article.empty());
     assert(type != MaterialType::NoType);
     assert(worth > 0);
     assert(hardness > 0);

@@ -103,7 +103,7 @@ std::string Logger::getDateTime()
     char buffer[32];
     // Format: H:M
     strftime(buffer, 32, "%H:%M", localtime(&now));
-    return buffer;
+    return std::string(buffer);
 }
 
 std::ostream & Logger::getOutputStream(const LogLevel & level)

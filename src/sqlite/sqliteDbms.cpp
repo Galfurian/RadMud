@@ -111,10 +111,7 @@ bool SQLiteDbms::loadTables()
         }
         // release the resource.
         result->release();
-        if (status == false)
-        {
-            break;
-        }
+        if (!status) break;
     }
     return status;
 }
@@ -155,7 +152,7 @@ bool SQLiteDbms::searchPlayer(const std::string & name)
     bool outcome = false;
     ResultSet * result = dbConnection.executeSelect(
         ("SELECT count(*) FROM Player WHERE name=\"" + name + "\";").c_str());
-    if (result)
+    if (result != nullptr)
     {
         if (result->next())
         {
@@ -164,8 +161,8 @@ bool SQLiteDbms::searchPlayer(const std::string & name)
                 outcome = true;
             }
         }
+        result->release();
     }
-    result->release();
     return outcome;
 }
 

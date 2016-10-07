@@ -256,14 +256,6 @@ void ProcessTelnetCommand(Character * character, ArgumentHandler & args)
         // Activate the procedure of negotiation.
         NegotiateProtocol(character, ConnectionState::NegotiatingMCCP);
     }
-    else if (player->connection_state == ConnectionState::NegotiatingMCCP)
-    {
-        // Activate the procedure of login
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingName);
-    }
-    else
-    {
-        // Activate the procedure of login
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingName);
-    }
+    // Activate the procedure of login
+    AdvanceCharacterCreation(character, ConnectionState::AwaitingName);
 }

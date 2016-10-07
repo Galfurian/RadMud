@@ -136,7 +136,7 @@ std::string GetFormattedTime()
     char buffer[32];
     // Format: H:M
     strftime(buffer, 32, "%H:%M", localtime(&now));
-    return buffer;
+    return std::string(buffer);
 }
 
 std::string GetDate()
@@ -147,7 +147,7 @@ std::string GetDate()
 
     // Format: %Y_%m_%d_%H-%M
     strftime(buffer, 32, "%Y_%m_%d", ptm);
-    return buffer;
+    return std::string(buffer);
 }
 
 std::vector<std::string> GetAllFilesInFolder(

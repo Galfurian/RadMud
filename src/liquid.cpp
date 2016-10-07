@@ -41,7 +41,7 @@ Liquid::~Liquid()
 bool Liquid::check()
 {
     assert(vnum > 0);
-    assert(name.empty() == false);
+    assert(!name.empty());
     assert(worth > 0);
     return true;
 }

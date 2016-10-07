@@ -1388,11 +1388,7 @@ std::string Character::getLook()
 
 bool Character::canSee(Character * target) const
 {
-    if (HasFlag(target->flags, CharacterFlag::Invisible))
-    {
-        return false;
-    }
-    return true;
+    return !HasFlag(target->flags, CharacterFlag::Invisible) || HasFlag(this->flags, CharacterFlag::IsGod);
 }
 
 unsigned int Character::getArmorClass() const

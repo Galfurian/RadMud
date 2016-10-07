@@ -89,7 +89,7 @@ bool Area::addRoom(Room * room)
     {
         Logger::log(
             LogLevel::Error,
-            "Room's coordiantes are not inside the boundaries %s.",
+            "Room's coordinates are not inside the boundaries %s.",
             room->coord.toString());
     }
     return false;
@@ -142,11 +142,11 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, int radius)
     int max_x = ((origin_x + radius) > this->width) ? this->width : (origin_x + radius);
     int min_y = (origin_y < radius) ? 0 : (origin_y - radius);
     int max_y = ((origin_y + radius - 1) > this->height) ? this->height : (origin_y + radius - 1);
-    // Create a 2D map of chararacters.
+    // Create a 2D map of characters.
     Map2D<MapTile> map(radius * 2, radius * 2);
     // Evaluate the field of view.
     this->fov(map, origin_x, origin_y, origin_z, radius);
-    // Prepare Enviroment layer.
+    // Prepare Environment layer.
     for (int y = max_y; y >= min_y; --y)
     {
         for (int x = min_x; x < max_x; ++x)
@@ -285,7 +285,7 @@ std::string Area::drawASCIIFov(Room * centerRoom, int radius)
     int max_x = ((origin_x + radius) > this->width) ? this->width : (origin_x + radius);
     int min_y = (origin_y < radius) ? 0 : (origin_y - radius);
     int max_y = ((origin_y + radius - 1) > this->height) ? this->height : (origin_y + radius - 1);
-    // Create a 2D map of chararacters.
+    // Create a 2D map of characters.
     Map2D<MapTile> map(radius * 2, radius * 2, MapTile::Void);
     // Evaluate the field of view.
     this->fov(map, origin_x, origin_y, origin_z, radius);

@@ -55,12 +55,6 @@ private:
     /// Map between the status of an area and the corresponding status naming struct.
     std::map<AreaStatus, ZoneStatusNaming> mapStatus;
 
-    /// @brief Generate the room name and description.
-    /// @param phase  Phase of the generation process.
-    /// @param zone   Zone of the desired room.
-    /// @param status Status of the desired room.
-    void generate(int phase, std::string zone, std::string status);
-
 public:
     /// @brief Disable Copy Construct.
     Generator(Generator const &) = delete;
