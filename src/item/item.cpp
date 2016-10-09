@@ -375,10 +375,10 @@ unsigned int Item::getPrice(bool entireStack) const
     return itemPrice;
 }
 
-unsigned int Item::getWeight(bool entireStack) const
+double Item::getWeight(bool entireStack) const
 {
     // Add the default weight of the model.
-    unsigned int totalWeight = this->weight;
+    auto totalWeight = this->weight;
     // If not single, multiply for the quantity.
     if (entireStack)
     {
@@ -502,14 +502,14 @@ bool Item::isEmpty() const
     return true;
 }
 
-unsigned int Item::getTotalSpace() const
+double Item::getTotalSpace() const
 {
     if (model->getType() == ModelType::Container)
     {
         // Evaluate the base space.
         auto spBase = model->toContainer()->maxWeight;
         // Evaluate the modifier due to item's quality.
-        auto spQuality = static_cast<unsigned int>(spBase * quality.getModifier());
+        auto spQuality = spBase * quality.getModifier();
         // Evaluate the result.
         return ((spBase + spQuality) / 2);
     }
@@ -518,7 +518,7 @@ unsigned int Item::getTotalSpace() const
         // Evaluate the base space.
         auto spBase = model->toLiquidContainer()->maxWeight;
         // Evaluate the modifier due to item's quality.
-        auto spQuality = static_cast<unsigned int>(spBase * quality.getModifier());
+        auto spQuality = spBase * quality.getModifier();
         // Evaluate the result.
         return ((spBase + spQuality) / 2);
     }
@@ -527,19 +527,19 @@ unsigned int Item::getTotalSpace() const
         // Evaluate the base space.
         auto spBase = model->toShop()->maxWeight;
         // Evaluate the modifier due to item's quality.
-        auto spQuality = static_cast<unsigned int>(spBase * quality.getModifier());
+        auto spQuality = spBase * quality.getModifier();
         // Evaluate the result.
         return ((spBase + spQuality) / 2);
     }
     else
     {
-        return 0;
+        return 0.0;
     }
 }
 
-unsigned int Item::getUsedSpace() const
+double Item::getUsedSpace() const
 {
-    unsigned int used = 0;
+    auto used = 0.0;
     if (this->isAContainer())
     {
         for (auto iterator : content)
@@ -557,13 +557,13 @@ unsigned int Item::getUsedSpace() const
     return used;
 }
 
-unsigned int Item::getFreeSpace() const
+double Item::getFreeSpace() const
 {
-    unsigned int totalSpace = this->getTotalSpace();
-    unsigned int usedSpace = this->getUsedSpace();
+    auto totalSpace = this->getTotalSpace();
+    auto usedSpace = this->getUsedSpace();
     if (totalSpace < usedSpace)
     {
-        return 0;
+        return 0.0;
     }
     else
     {
@@ -618,7 +618,7 @@ bool Item::takeOut(Item * item, bool updateDB)
     return false;
 }
 
-bool Item::canContainLiquid(Liquid * liquid, const unsigned int & ammount) const
+bool Item::canContainLiquid(Liquid * liquid, const double & ammount) const
 {
     if (ammount > this->getFreeSpace())
     {
@@ -631,7 +631,7 @@ bool Item::canContainLiquid(Liquid * liquid, const unsigned int & ammount) const
     return true;
 }
 
-bool Item::pourIn(Liquid * liquid, const unsigned int & ammount, bool updateDB)
+bool Item::pourIn(Liquid * liquid, const double & ammount, bool updateDB)
 {
     if (this->canContainLiquid(liquid, ammount))
     {
@@ -660,7 +660,7 @@ bool Item::pourIn(Liquid * liquid, const unsigned int & ammount, bool updateDB)
     return false;
 }
 
-bool Item::pourOut(const unsigned int & ammount, bool updateDB)
+bool Item::pourOut(const double & ammount, bool updateDB)
 {
     if (model->getType() != ModelType::LiquidContainer)
     {

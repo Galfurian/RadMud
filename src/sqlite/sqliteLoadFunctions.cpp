@@ -101,7 +101,7 @@ bool LoadItem(ResultSet * result)
         auto itemQuantity = result->getNextUnsignedInteger();
         auto itemMaker = result->getNextString();
         auto itemPrice = result->getNextUnsignedInteger();
-        auto itemWeight = result->getNextUnsignedInteger();
+        auto itemWeight = result->getNextDouble();
         auto itemCondition = result->getNextUnsignedInteger();
         auto itemMaxCondition = result->getNextUnsignedInteger();
         auto itemCompositionVnum = result->getNextInteger();
@@ -254,7 +254,7 @@ bool LoadModel(ResultSet * result)
         itemModel->description = result->getNextString();
         itemModel->slot = static_cast<EquipmentSlot>(result->getNextInteger());
         itemModel->modelFlags = result->getNextUnsignedInteger();
-        itemModel->baseWeight = result->getNextUnsignedInteger();
+        itemModel->baseWeight = result->getNextDouble();
         itemModel->basePrice = result->getNextUnsignedInteger();
         itemModel->condition = result->getNextUnsignedInteger();
         itemModel->decay = result->getNextUnsignedInteger();

@@ -1064,9 +1064,9 @@ bool Character::canCarry(Item * item, unsigned int quantity) const
     return ((this->getCarryingWeight() + (item->getWeight(false) * quantity)) < this->getMaxCarryingWeight());
 }
 
-unsigned int Character::getCarryingWeight() const
+double Character::getCarryingWeight() const
 {
-    unsigned int carrying = 0;
+    auto carrying = 0.0;
     for (auto iterator : inventory)
     {
         carrying += iterator->getWeight(true);
@@ -1078,7 +1078,7 @@ unsigned int Character::getCarryingWeight() const
     return carrying;
 }
 
-unsigned int Character::getMaxCarryingWeight() const
+double Character::getMaxCarryingWeight() const
 {
     // Value = 50 + (AbilMod(STR) * 10)
     // MIN   =  50
@@ -1579,16 +1579,16 @@ unsigned int Character::getConsumedStaminaFor(
     // CARRIED  [+0.0 to +2.48]
     // WEAPON   [+0.0 to +1.60]
     // The base value.
-    double BASE = 1.0;
+    auto BASE = 1.0;
     // The strength modifier.
-    double STR = this->getAbilityLog(Ability::Strength, 0.0, 1.0);
+    auto STR = this->getAbilityLog(Ability::Strength, 0.0, 1.0);
     // The weight modifier.
-    double WGT = (this->weight == 0) ? 0 : log10(this->weight);
+    auto WGT = (this->weight > 0) ? log10(this->weight) : 0.0;
     // The carried weight.
-    unsigned int carried = this->getCarryingWeight();
-    double CAR = (carried == 0) ? 0 : log10(carried);
+    auto carried = this->getCarryingWeight();
+    auto CAR = (carried > 0) ? log10(carried) : 0.0;
     // Partial result;
-    double RSLT = BASE - STR + WGT + CAR;
+    auto RSLT = BASE - STR + WGT + CAR;
     if (actionType == ActionType::Move)
     {
         // Do something.
@@ -1608,8 +1608,8 @@ unsigned int Character::getConsumedStaminaFor(
             if (this->canAttackWith(slot))
             {
                 Item * weapon = this->findEquipmentSlotItem(slot);
-                unsigned int wpnWeight = weapon->getWeight(true);
-                double WPN = (wpnWeight == 0) ? 0 : log10(wpnWeight);
+                auto wpnWeight = weapon->getWeight(true);
+                auto WPN = (wpnWeight == 0) ? 0 : log10(wpnWeight);
                 RSLT += WPN;
             }
         }

@@ -302,3 +302,18 @@ unsigned int SQLiteWrapper::getNextUnsignedInteger()
         return static_cast<unsigned int>(value);
     }
 }
+
+double SQLiteWrapper::getNextDouble()
+{
+    // Check if the column is beyond the limit.
+    if (currentColumn >= num_col)
+    {
+        release();
+        throw std::runtime_error(
+            "Number column exceded (" + ToString(currentColumn) + ">=" + ToString(num_col) + ").");
+    }
+    auto value = sqlite3_column_double(dbDetails.dbStatement, currentColumn);
+    // Increase the column index.
+    currentColumn += 1;
+    return value;
+}

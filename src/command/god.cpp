@@ -591,6 +591,8 @@ void DoItemCreate(Character * character, ArgumentHandler & args)
         character->sendMsg("What do you want to create?\n");
         return;
     }
+    // Get the quantity.
+    auto quantity = args[0].getMultiplier();
     auto itemModel = Mud::instance().findItemModel(ToNumber<int>(args[0].getContent()));
     auto material = Mud::instance().findMaterial(ToNumber<int>(args[1].getContent()));
     auto quality = ItemQuality(ItemQuality::Normal);
@@ -615,7 +617,7 @@ void DoItemCreate(Character * character, ArgumentHandler & args)
         quality = ItemQuality(itemQualityValue);
     }
     // Create the item.
-    auto item = itemModel->createItem(character->getName(), material, false, quality, 1);
+    auto item = itemModel->createItem(character->getName(), material, false, quality, quantity);
     if (item == nullptr)
     {
         character->sendMsg("Creation failed.\n");

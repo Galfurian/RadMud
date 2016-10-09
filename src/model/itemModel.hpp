@@ -138,7 +138,7 @@ public:
     /// The model flags.
     unsigned int modelFlags;
     /// The model base weight.
-    unsigned int baseWeight;
+    double baseWeight;
     /// The model base price.
     unsigned int basePrice;
     /// The model maximum condition.

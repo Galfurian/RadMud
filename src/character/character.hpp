@@ -417,11 +417,11 @@ public:
 
     /// @brief The total carrying weight for this character.
     /// @return The total carrying weight.
-    unsigned int getCarryingWeight() const;
+    double getCarryingWeight() const;
 
     /// @brief The maximum carrying weight for this character.
     /// @return The maximum carrying weight.
-    unsigned int getMaxCarryingWeight() const;
+    double getMaxCarryingWeight() const;
 
     /// @brief Check if the character can wield a given item.
     /// @param item  The item to wield.

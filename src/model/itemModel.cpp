@@ -149,11 +149,11 @@ Item * ItemModel::createItem(
         // Evaluate the base value.
         auto valBase = this->baseWeight;
         // Evaluate the modifier due to item's quality.
-        auto valQuality = static_cast<unsigned int>(valBase * (1 / itemQuality.getModifier()));
+        auto valQuality = valBase * (1.0 / itemQuality.getModifier());
         // Evaluate the modifier due to item's material.
-        auto valMaterial = static_cast<unsigned int>(valBase * composition->getLightnessModifier());
+        auto valMaterial = valBase * composition->getLightnessModifier();
         // Evaluate the result.
-        newItem->weight = ((valBase + valQuality + valMaterial) / 3);
+        newItem->weight = ((valBase + valQuality + valMaterial) / 3.0);
     }
     {
         // Evaluate the base value.

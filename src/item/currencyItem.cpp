@@ -52,7 +52,7 @@ unsigned int CurrencyItem::getPrice(bool entireStack) const
     return customPrice;
 }
 
-unsigned int CurrencyItem::getWeight(bool) const
+double CurrencyItem::getWeight(bool) const
 {
-    return 0;
+    return 0.0;
 }

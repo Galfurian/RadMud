@@ -97,7 +97,7 @@ public:
     /// @param columnWidth     The column width.
     void addColumn(
         std::string columnTitle,
-        StringAlign columnAlignment,
+        const StringAlign & columnAlignment,
         size_t columnWidth = 0);
 
     /// @brief Allows to add a row of values.

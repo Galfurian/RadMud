@@ -68,6 +68,10 @@ public:
     /// @brief Get the next coloumn data as an unsigned integer.
     /// @return The unsigned integer retrieved from the cell.
     virtual unsigned int getNextUnsignedInteger() = 0;
+
+    /// @brief Get the next coloumn data as a double.
+    /// @return The double retrieved from the cell.
+    virtual double getNextDouble() = 0;
 };
 
 /// @brief Class necessary to execute query on the Database.
@@ -79,7 +83,7 @@ public:
     SQLiteWrapper();
 
     /// Deconstructor for the class SQLiteWrapper.
-    ~SQLiteWrapper();
+    virtual ~SQLiteWrapper();
 
     /// @brief Open database connection.
     /// @param dbName      The name of the database.
@@ -155,21 +159,23 @@ private:
     /// SQLite Connection Details.
     DBDetails dbDetails;
 
-    bool next();
+    bool next() override;
 
-    bool release();
+    bool release() override;
 
-    int getColumnCount();
+    int getColumnCount() override;
 
-    std::string getColumnName(const int & column);
+    std::string getColumnName(const int & column) override;
 
-    std::string getDataString(const int & column);
+    std::string getDataString(const int & column) override;
 
-    int getDataInteger(const int & column);
+    int getDataInteger(const int & column) override;
 
-    std::string getNextString();
+    std::string getNextString() override;
 
-    int getNextInteger();
+    int getNextInteger() override;
 
-    unsigned int getNextUnsignedInteger();
+    unsigned int getNextUnsignedInteger() override;
+
+    double getNextDouble() override;
 };

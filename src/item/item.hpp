@@ -63,7 +63,7 @@ public:
     /// The item's price.
     unsigned int price;
     /// The item's weight.
-    unsigned int weight;
+    double weight;
     /// The item's condition.
     unsigned int condition;
     /// The maximum condition.
@@ -85,7 +85,7 @@ public:
     /// List of items contained in this one.
     ItemContainer content;
     /// The liquid inside the container.
-    std::pair<Liquid *, unsigned int> contentLiq;
+    std::pair<Liquid *, double> contentLiq;
 
     /// @brief Constructor - Create a new empty item.
     Item();
@@ -176,7 +176,7 @@ public:
     /// @brief Get the item weight, plus eventually contained item weight.
     /// @param entireStack If <b>true</b> this function returns the weight of the entire stack.
     /// @return The total weight of the item.
-    virtual unsigned int getWeight(bool entireStack) const;
+    virtual double getWeight(bool entireStack) const;
 
     /// @brief Return the name of the item.
     /// @param colored If <b>true</b> the name also include formatting color.
@@ -213,15 +213,15 @@ public:
 
     /// @brief Return the total space of the container.
     /// @return The total space as an integer.
-    unsigned int getTotalSpace() const;
+    double getTotalSpace() const;
 
     /// @brief Return the used space of the container.
     /// @return The used space as an integer.
-    unsigned int getUsedSpace() const;
+    double getUsedSpace() const;
 
     /// @brief Return the free space inside the container.
     /// @return The free unit of space as an integer.
-    unsigned int getFreeSpace() const;
+    double getFreeSpace() const;
 
     /// @brief Check if this item can contain the passed one.
     /// @param item    The item to check.
@@ -247,7 +247,7 @@ public:
     /// @param ammount The ammount of liquid.
     /// @return <b>True</b> if it can be contained,<br>
     ///         <b>False</b> otherwise.
-    bool canContainLiquid(Liquid * liquid, const unsigned int & ammount) const;
+    bool canContainLiquid(Liquid * liquid, const double & ammount) const;
 
     /// @brief Load some liquid inside the container and update the database.
     /// @param liquid   The liquid to load in.
@@ -255,13 +255,13 @@ public:
     /// @param updateDB If the action has to be updated on the database.
     /// @return <b>True</b> if the operation is a success,<br>
     ///         <b>False</b> otherwise.
-    bool pourIn(Liquid * liquid, const unsigned int & ammount, bool updateDB = true);
+    bool pourIn(Liquid * liquid, const double & ammount, bool updateDB = true);
 
     /// @brief Extract some liquid from the container and update the database.
     /// @param ammount  The ammount of liquid.
     /// @param updateDB If the action has to be updated on the database.
     /// @return <b>True</b> if the operation is a success,<br><b>False</b> otherwise.
-    bool pourOut(const unsigned int & ammount, bool updateDB = true);
+    bool pourOut(const double & ammount, bool updateDB = true);
 
     /// @brief Search for the item inside the container.
     /// @param search_parameter The item to search.

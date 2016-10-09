@@ -76,7 +76,7 @@ Item * CorpseModel::createItem(std::string, Material *, bool, const ItemQuality 
 Item * CorpseModel::createCorpse(
     std::string maker,
     Material * composition,
-    const unsigned int & weight)
+    const double & weight)
 {
     // Instantiate the new item.
     Item * newItem = GenerateItem(this->getType());
@@ -95,8 +95,8 @@ Item * CorpseModel::createCorpse(
     newItem->quality = ItemQuality::Normal;
     // Then set the rest.
     newItem->weight = weight;
-    newItem->condition = weight;
-    newItem->maxCondition = weight;
+    newItem->condition = static_cast<unsigned int>(weight);
+    newItem->maxCondition = static_cast<unsigned int>(weight);
     newItem->currentSlot = slot;
 
     Mud::instance().addCorpse(newItem);

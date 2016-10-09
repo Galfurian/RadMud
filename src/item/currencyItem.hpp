@@ -32,5 +32,5 @@ public:
 
     unsigned int getPrice(bool entireStack) const override;
 
-    unsigned int getWeight(bool entireStack) const override;
+    double getWeight(bool entireStack) const override;
 };

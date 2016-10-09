@@ -49,5 +49,5 @@ public:
     /// @param composition The composition of the corpse.
     /// @param weight      The custom weight of the corpse.
     /// @return The created corpse.
-    Item * createCorpse(std::string maker, Material * composition, const unsigned int & weight);
+    Item * createCorpse(std::string maker, Material * composition, const double & weight);
 };

@@ -35,7 +35,7 @@ class ContainerModel :
 {
 public:
     /// The maximum weight which this container can carry.
-    unsigned int maxWeight;
+    double maxWeight;
     /// The flags of the container.
     unsigned int containerFlags;
     /// The vnum of the key which opens this container.
