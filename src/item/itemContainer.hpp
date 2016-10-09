@@ -38,9 +38,6 @@ public:
     /// @brief Constructor.
     ItemContainer();
 
-    /// @brief Destructor.
-    ~ItemContainer();
-
     /// @brief Special function used to add an item to the container.
     /// @details
     /// Before adding the item to this container a check is performed.

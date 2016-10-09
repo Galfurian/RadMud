@@ -23,10 +23,10 @@ Writing::Writing() :
     author(),
     content()
 {
-
+    // Nothing to do.
 }
 
 Writing::~Writing()
 {
-
+    // Nothing to do.
 }

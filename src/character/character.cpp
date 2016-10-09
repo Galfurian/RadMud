@@ -1583,10 +1583,10 @@ unsigned int Character::getConsumedStaminaFor(
     // The strength modifier.
     auto STR = this->getAbilityLog(Ability::Strength, 0.0, 1.0);
     // The weight modifier.
-    auto WGT = (this->weight > 0) ? log10(this->weight) : 0.0;
+    auto WGT = (this->weight < 0.1) ? 0.0 : log10(this->weight);
     // The carried weight.
     auto carried = this->getCarryingWeight();
-    auto CAR = (carried > 0) ? log10(carried) : 0.0;
+    auto CAR = (carried < 0.1) ? 0.0 : log10(carried);
     // Partial result;
     auto RSLT = BASE - STR + WGT + CAR;
     if (actionType == ActionType::Move)
@@ -1613,7 +1613,7 @@ unsigned int Character::getConsumedStaminaFor(
             {
                 Item * weapon = this->findEquipmentSlotItem(slot);
                 auto wpnWeight = weapon->getWeight(true);
-                auto WPN = (wpnWeight == 0) ? 0 : log10(wpnWeight);
+                auto WPN = (wpnWeight < 0.1) ? 0.0 : log10(wpnWeight);
                 RSLT += WPN;
             }
         }

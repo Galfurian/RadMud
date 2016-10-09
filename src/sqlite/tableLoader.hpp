@@ -38,9 +38,6 @@ public:
         std::function<bool(ResultSet * result)> _loadFunction,
         std::string _loadQuery = "");
 
-    /// @brief Destructor.
-    ~TableLoader();
-
     /// Provide the query required to load the table.
     std::string getQuery() const;
 };

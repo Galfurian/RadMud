@@ -91,11 +91,13 @@ bool SQLiteDbms::loadTables()
 {
     // Status variable for loading operation.
     bool status = true;
+    // Create a result variable.
+    ResultSet * result = nullptr;
     for (auto iterator : loaders)
     {
         Logger::log(LogLevel::Debug, "    Loading Table: " + iterator.table + ".");
         // Execute the query.
-        ResultSet * result = dbConnection.executeSelect(iterator.getQuery().c_str());
+        result = dbConnection.executeSelect(iterator.getQuery().c_str());
         // Check the result.
         if (result == nullptr)
         {

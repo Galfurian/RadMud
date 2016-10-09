@@ -678,7 +678,8 @@ bool Item::pourOut(const double & ammount, bool updateDB)
         contentLiq.second -= ammount;
         if (updateDB)
         {
-            if (contentLiq.second == 0)
+            // Check if the quantity has dropped to zero.
+            if (contentLiq.second < 0.1)
             {
                 QueryList where;
                 where.push_back(std::make_pair("container", ToString(vnum)));
@@ -783,7 +784,7 @@ std::string Item::lookContent()
             }
             else if (getUsedSpace() > 0)
             {
-                percent = (int) ((100.0 * (double) (getUsedSpace())) / (double) (getTotalSpace()));
+                percent = static_cast<int>((100.0 * this->getUsedSpace()) / this->getTotalSpace());
             }
 
             if (percent >= 100) output += "It's full of ";
@@ -913,8 +914,6 @@ Item * GenerateItem(const ModelType & type)
         case ModelType::Vehicle:
             return new Item();
         case ModelType::NoType:
-            return nullptr;
-        default:
             return nullptr;
     }
 }

@@ -28,11 +28,6 @@ TableLoader::TableLoader(
     // Nothing to do.
 }
 
-TableLoader::~TableLoader()
-{
-    // Nothing to do.
-}
-
 std::string TableLoader::getQuery() const
 {
     if (loadQuery.empty())

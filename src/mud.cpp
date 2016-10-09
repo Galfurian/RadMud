@@ -847,7 +847,7 @@ void Mud::processNewConnection()
         {
             socketFileDescriptor = accept(
                 _servSocket,
-                (struct sockaddr *) &socketAddress,
+                reinterpret_cast<struct sockaddr *>(&socketAddress),
                 &socketAddressSize);
 
             // A bad socket probably means no more connections are outstanding.
@@ -1058,7 +1058,7 @@ bool Mud::initComunications()
     struct linger ld = linger();
 
     // Don't allow closed sockets to linger.
-    if (setsockopt(_servSocket, SOL_SOCKET, SO_LINGER, (char *) &ld, sizeof ld) < 0)
+    if (setsockopt(_servSocket, SOL_SOCKET, SO_LINGER, reinterpret_cast<char *>(&ld), sizeof ld) < 0)
     {
         perror("Setsockopt (SO_LINGER)");
         return false;
@@ -1067,7 +1067,7 @@ bool Mud::initComunications()
     int x = 1;
 
     // Allow address reuse.
-    if (setsockopt(_servSocket, SOL_SOCKET, SO_REUSEADDR, (char *) &x, sizeof x) == -1)
+    if (setsockopt(_servSocket, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char *>(&x), sizeof x) == -1)
     {
         perror("Setsockopt (SO_REUSEADDR)");
         return false;
@@ -1078,7 +1078,7 @@ bool Mud::initComunications()
     socketAddress.sin_addr.s_addr = INADDR_ANY; // Change to listen on a specific adapter.
 
     // Bind the socket to our connection port.
-    if (::bind(_servSocket, (struct sockaddr *) &socketAddress, sizeof(socketAddress)) < 0)
+    if (::bind(_servSocket, reinterpret_cast<struct sockaddr *>(&socketAddress), sizeof(socketAddress)) < 0)
     {
         perror("BIND");
         return false;

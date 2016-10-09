@@ -21,13 +21,7 @@
 
 ItemContainer::ItemContainer()
 {
-    // TODO Auto-generated constructor stub
-
-}
-
-ItemContainer::~ItemContainer()
-{
-    // TODO Auto-generated destructor stub
+    // Nothing to do.
 }
 
 void ItemContainer::push_back_item(Item *& item)

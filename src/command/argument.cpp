@@ -37,11 +37,6 @@ Argument::Argument(const std::string & _original) :
     //Logger::log(LogLevel::Debug, "Multiplier : '" + ToString(multiplier) + "';");
 }
 
-Argument::~Argument()
-{
-    // Nothing to do.
-}
-
 std::string Argument::getOriginal() const
 {
     return original;

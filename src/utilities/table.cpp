@@ -73,11 +73,6 @@ Table::Table(std::string _title) :
     // Nothing to do.
 }
 
-Table::~Table()
-{
-    // Nothing to do.
-}
-
 void Table::addColumn(std::string columnTitle, const StringAlign & columnAlignment, size_t columnWidth)
 {
     columns.emplace_back(TableColumn(columnTitle, columnAlignment, columnWidth));

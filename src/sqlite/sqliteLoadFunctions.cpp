@@ -622,7 +622,7 @@ bool LoadMaterial(ResultSet * result)
         Material * material = new Material();
         // Intialize the material.
         material->vnum = result->getNextInteger();
-        material->type = (MaterialType) result->getNextInteger();
+        material->type = static_cast<MaterialType>(result->getNextInteger());
         material->name = result->getNextString();
         material->article = result->getNextString();
         material->worth = result->getNextUnsignedInteger();
@@ -654,7 +654,7 @@ bool LoadProfession(ResultSet * result)
         professions->name = result->getNextString();
         professions->description = result->getNextString();
         professions->command = result->getNextString();
-        professions->posture = (CharacterPosture) result->getNextInteger();
+        professions->posture = static_cast<CharacterPosture>(result->getNextInteger());
         professions->action = result->getNextString();
         professions->startMessage = result->getNextString();
         professions->finishMessage = result->getNextString();

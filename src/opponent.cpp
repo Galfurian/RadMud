@@ -28,11 +28,6 @@ Aggression::Aggression(Character * _aggressor, unsigned int _aggression) :
     // Nothing to do.
 }
 
-Aggression::~Aggression()
-{
-    // Nothing to do.
-}
-
 bool Aggression::operator>(const Aggression & source) const
 {
     return (this->aggression > source.aggression);

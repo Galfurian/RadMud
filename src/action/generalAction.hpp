@@ -72,7 +72,7 @@ public:
     GeneralAction(Character * _actor, std::chrono::time_point<std::chrono::system_clock> _actionCooldown);
 
     /// @brief Destructor.
-    ~GeneralAction();
+    virtual ~GeneralAction();
 
     /// @brief Check if the cooldown of the action is elapsed.
     /// @return <b>True</b> if the time has passed,<br>

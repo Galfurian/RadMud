@@ -88,9 +88,6 @@ public:
     /// @param _title The title of the table.
     explicit Table(std::string _title);
 
-    /// @brief Destructor.
-    ~Table();
-
     /// @brief Allows to add a column.
     /// @param columnTitle     The column title.
     /// @param columnAlignment The column alignment.

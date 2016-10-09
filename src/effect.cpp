@@ -36,11 +36,6 @@ Effect::Effect(
     // Nothing to do.
 }
 
-Effect::~Effect()
-{
-    // Nothing to do.
-}
-
 bool Effect::update()
 {
     expires--;

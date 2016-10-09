@@ -464,8 +464,6 @@ ItemModel * GenerateModel(const ModelType & type)
             return new WeaponModel();
         case ModelType::NoType:
             return nullptr;
-        default:
-            return nullptr;
     }
 }
 

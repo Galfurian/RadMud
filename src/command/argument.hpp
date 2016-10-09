@@ -36,9 +36,6 @@ public:
     /// @brief Constructor.
     Argument(const std::string & _original);
 
-    /// @brief Destructor.
-    virtual ~Argument();
-
     /// Provides the original argument.
     std::string getOriginal() const;
 

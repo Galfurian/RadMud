@@ -28,14 +28,8 @@ using ActionHandler = std::function<void(Character * character, ArgumentHandler 
 class Command
 {
 public:
-    Command() :
-        level(),
-        name(),
-        help(),
-        args(),
-        hndl()
-    {
-    }
+    /// @brief Constructor.
+    Command();
 
     /// @brief Create a complete structure for a command.
     /// @param _level The level necessary to execute the command.
@@ -48,33 +42,12 @@ public:
         std::string _name,
         std::string _help,
         std::string _args,
-        ActionHandler _hndl) :
-        level(_level),
-        name(_name),
-        help(_help),
-        args(_args),
-        hndl(_hndl)
-    {
-    }
-
-    ~Command()
-    {
-    }
+        ActionHandler _hndl);
 
     /// @brief Checks if the provided character can use the command.
     /// @return <b>True</b> if the character can use the command,<br>
     ///         <b>False</b> otherwise.
-    bool canUse(Character * character) const
-    {
-        if (this->level == 1)
-        {
-            if (!HasFlag(character->flags, CharacterFlag::IsGod))
-            {
-                return false;
-            }
-        }
-        return true;
-    }
+    bool canUse(Character * character) const;
 
     /// The level of the command.
     int level;

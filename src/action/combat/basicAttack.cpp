@@ -171,7 +171,7 @@ ActionStatus BasicAttack::perform()
                 // Consume the stamina.
                 actor->remStamina(consumedStamina, true);
                 // Store the type of attack.
-                bool isCritical;
+                bool isCritical = false;
                 // Natural roll for the damage.
                 unsigned int DMG = iterator->rollDamage();
                 // Log the damage roll.

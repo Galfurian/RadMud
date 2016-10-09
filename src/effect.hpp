@@ -51,9 +51,6 @@ public:
         std::string _messageActivate,
         std::string _messageFade);
 
-    /// @brief Destructor.
-    ~Effect();
-
     /// @brief Update the cooldown of the effect.
     /// @return <b>True</b> if the effect is expired,<br>
     ///         <b>False</b> otherwise.

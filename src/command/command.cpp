@@ -29,11 +29,46 @@
 #include "object.hpp"
 
 /// Player names must consist of characters from this list.
-const std::string kValidPlayerName =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
+#define  VALID_CHARACTERS_NAME "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-"
 /// Player descriptions must consist of characters from this list.
-const std::string kValidDescription =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ,.\n";
+#define  VALID_CHARACTERS_DESC "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ,.\n"
+
+Command::Command() :
+    level(),
+    name(),
+    help(),
+    args(),
+    hndl()
+{
+    // Nothing to do.
+}
+
+Command::Command(
+    int _level,
+    std::string _name,
+    std::string _help,
+    std::string _args,
+    ActionHandler _hndl) :
+    level(_level),
+    name(_name),
+    help(_help),
+    args(_args),
+    hndl(_hndl)
+{
+    // Nothing to do.
+}
+
+bool Command::canUse(Character * character) const
+{
+    if (this->level == 1)
+    {
+        if (!HasFlag(character->flags, CharacterFlag::IsGod))
+        {
+            return false;
+        }
+    }
+    return true;
+}
 
 void ProcessCommand(Character * character, ArgumentHandler & args)
 {
@@ -117,7 +152,7 @@ void ProcessPlayerName(Character * character, ArgumentHandler & args)
         player->closeConnection();
     }
         // Check if the give name contains valid characters.
-    else if (input.find_first_not_of(kValidPlayerName) != std::string::npos)
+    else if (input.find_first_not_of(VALID_CHARACTERS_NAME) != std::string::npos)
     {
         AdvanceCharacterCreation(
             character,
@@ -204,7 +239,7 @@ void ProcessNewName(Character * character, ArgumentHandler & args)
         RollbackCharacterCreation(player, ConnectionState::AwaitingName);
     }
         // Check if the player has given bad characters.
-    else if (input.find_first_not_of(kValidPlayerName) != std::string::npos)
+    else if (input.find_first_not_of(VALID_CHARACTERS_NAME) != std::string::npos)
     {
         AdvanceCharacterCreation(
             character,
@@ -258,7 +293,7 @@ void ProcessNewPwd(Character * character, ArgumentHandler & args)
         RollbackCharacterCreation(player, ConnectionState::AwaitingNewName);
     }
         // Check if the player has given bad characters.
-    else if (input.find_first_not_of(kValidPlayerName) != std::string::npos)
+    else if (input.find_first_not_of(VALID_CHARACTERS_NAME) != std::string::npos)
     {
         AdvanceCharacterCreation(
             character,
@@ -746,7 +781,7 @@ void ProcessNewDesc(Character * character, ArgumentHandler & args)
         AdvanceCharacterCreation(player, ConnectionState::AwaitingNewWeight);
     }
         // Check if the description contains bad characters.
-    else if (input.find_first_not_of(kValidDescription) != std::string::npos)
+    else if (input.find_first_not_of(VALID_CHARACTERS_DESC) != std::string::npos)
     {
         AdvanceCharacterCreation(
             character,
