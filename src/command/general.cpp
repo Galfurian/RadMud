@@ -479,8 +479,8 @@ void DoHelp(Character * character, ArgumentHandler & args)
                 }
             }
         }
+        character->sendMsg("There is no help for '%s'.\n", args.getOriginal());
     }
-    character->sendMsg("There is no help for '%s'.\n", args.getOriginal());
 }
 
 void DoPrompt(Character * character, ArgumentHandler & args)
@@ -528,7 +528,7 @@ void DoPrompt(Character * character, ArgumentHandler & args)
             Formatter::reset());
         return;
     }
-    player->prompt = args.getOriginal();
+    player->prompt = args.substr(0);
 }
 
 void DoTime(Character * character, ArgumentHandler & /*args*/)
