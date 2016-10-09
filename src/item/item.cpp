@@ -442,16 +442,16 @@ std::string Item::getLook()
     {
         output += this->getNameCapital(true) + " weights about ";
         output += Formatter::yellow() + ToString(this->getWeight(false)) + Formatter::reset();
-        output += " " + mud_measure + ".\n";
+        output += " " + Mud::instance().getWeightMeasure() + ".\n";
         output += "The stack weights about ";
         output += Formatter::yellow() + ToString(this->getWeight(true)) + Formatter::reset();
-        output += " " + mud_measure + ".\n";
+        output += " " + Mud::instance().getWeightMeasure() + ".\n";
     }
     else
     {
         output += "It weights about ";
         output += Formatter::yellow() + ToString(this->getWeight(true)) + Formatter::reset();
-        output += " " + mud_measure + ".\n";
+        output += " " + Mud::instance().getWeightMeasure() + ".\n";
     }
     return output;
 }
@@ -756,7 +756,7 @@ std::string Item::lookContent()
             output += "Has been used " + Formatter::yellow() + ToString(getUsedSpace())
                       + Formatter::reset();
             output += " out of " + Formatter::yellow() + ToString(getTotalSpace())
-                      + Formatter::reset() + " " + mud_measure + ".\n";
+                      + Formatter::reset() + " " + Mud::instance().getWeightMeasure() + ".\n";
         }
     }
     else if (model->getType() == ModelType::LiquidContainer)

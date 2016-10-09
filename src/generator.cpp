@@ -23,7 +23,6 @@
 
 // Other Include.
 #include "utils.hpp"
-#include "constants.hpp"
 
 Generator::Generator()
 {

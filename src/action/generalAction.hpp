@@ -23,9 +23,9 @@
 #include "../defines.hpp"
 #include "../opponent.hpp"
 #include "../item/item.hpp"
-#include "../constants.hpp"
 
 #include <memory>
+#include <chrono>
 
 class BuildAction;
 
@@ -62,14 +62,14 @@ protected:
     /// Actor of the action.
     Character * actor;
     /// The time point in the future needed by the action to complete.
-    TimeClock actionCooldown;
+    std::chrono::time_point<std::chrono::system_clock> actionCooldown;
 
 public:
     /// @brief Constructor.
     GeneralAction(Character * _actor);
 
     /// @brief Constructor.
-    GeneralAction(Character * _actor, TimeClock _actionCooldown);
+    GeneralAction(Character * _actor, std::chrono::time_point<std::chrono::system_clock> _actionCooldown);
 
     /// @brief Destructor.
     ~GeneralAction();

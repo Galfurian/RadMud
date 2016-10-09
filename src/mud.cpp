@@ -47,7 +47,10 @@ Mud::Mud() :
     _bootTime(time(NULL)),
     _maxVnumRoom(),
     _maxVnumItem(),
-    _minVnumCorpses()
+    _minVnumCorpses(),
+    _mudMeasure("stones"),
+    _mudDatabaseName("radmud.db"),
+    _mudSystemDirectory("../system/")
 {
     // Nothing to do.
 }
@@ -627,7 +630,7 @@ Direction Mud::findDirection(const std::string & direction, bool exact)
 bool Mud::runMud()
 {
     // Open logging file.
-    if (!Logger::instance().openLog(kSystemDir + GetDate() + ".log"))
+    if (!Logger::instance().openLog(Mud::instance().getMudSystemDirectory() + GetDate() + ".log"))
     {
         std::cerr << "Can't create the logging file." << std::endl;
         return false;
@@ -783,6 +786,21 @@ void Mud::broadcastMsg(const int & level, const std::string & message) const
     }
 }
 
+std::string Mud::getWeightMeasure() const
+{
+    return _mudMeasure;
+}
+
+std::string Mud::getMudDatabaseName() const
+{
+    return _mudDatabaseName;
+}
+
+std::string Mud::getMudSystemDirectory() const
+{
+    return _mudSystemDirectory;
+}
+
 void Mud::removeInactivePlayers()
 {
     std::set<Player *> toRemove;
@@ -833,7 +851,7 @@ void Mud::processNewConnection()
                 &socketAddressSize);
 
             // A bad socket probably means no more connections are outstanding.
-            if (socketFileDescriptor == kNoSocketIndicator)
+            if (socketFileDescriptor == NO_SOCKET_COMMUNICATION)
             {
                 // blocking is OK - we have accepted all outstanding connections.
                 if (errno == EWOULDBLOCK)
@@ -1084,7 +1102,7 @@ bool Mud::initComunications()
 
 bool Mud::closeComunications()
 {
-    return (_servSocket == kNoSocketIndicator) ? false : this->closeSocket(_servSocket);
+    return (_servSocket == NO_SOCKET_COMMUNICATION) ? false : this->closeSocket(_servSocket);
 }
 
 bool Mud::startMud()

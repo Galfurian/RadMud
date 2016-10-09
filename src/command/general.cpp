@@ -719,7 +719,8 @@ void DoSkills(Character * character, ArgumentHandler & /*args*/)
 void DoServer(Character * character, ArgumentHandler & /*args*/)
 {
     std::string msg = "    Mud         : RadMud.\n";
-    msg += "    Version     : " + kVersion + "\n";
+    msg += "    Version     : ";
+    msg += ToString(RADMUD_MAJOR_VERSION) + ToString(RADMUD_MINOR_VERSION) + ToString(RADMUD_VERSION) + "\n";
     msg += "    Uptime      : " + ToString(Mud::instance().getUpTime()) + " s\n";
     msg += "    Players     : " + ToString(Mud::instance().mudPlayers.size()) + "\n";
     msg += "    Mobiles     : " + ToString(Mud::instance().mudMobiles.size()) + "\n";

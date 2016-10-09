@@ -352,7 +352,7 @@ void Player::processInput(Player * player, const std::string & command)
     }
 }
 
-/// Buffer used for the reading process.
+/// Size of buffers used for communications.
 #define BUFSIZE 512
 
 void Player::processRead()
@@ -375,7 +375,7 @@ void Player::processRead()
         // Log the error.
         Logger::log(LogLevel::Error, "Connection " + ToString(psocket) + " closed.");
         // Clear the socket.
-        this->psocket = kNoSocketIndicator;
+        this->psocket = NO_SOCKET_COMMUNICATION;
         // Close the connection.
         this->closeConnection();
         // Skip the rest of the function.
@@ -398,7 +398,7 @@ void Player::processWrite()
     std::vector<unsigned char> compressed;
     //std::vector<unsigned char> check;
     // We will loop attempting to write all in buffer, until write blocks.
-    while (psocket != kNoSocketIndicator && !outbuf.empty())
+    while ((psocket != NO_SOCKET_COMMUNICATION) && !outbuf.empty())
     {
         // We attach to the message the player prompt.
         this->sendPrompt();
@@ -407,7 +407,7 @@ void Player::processWrite()
         FindAndReplace(&outbuf, "\n", "\r\n");
 
         // Send a maximum of 4096 at a time.
-        size_t iLength = std::min<size_t>(outbuf.size(), kMaxStream);
+        size_t iLength = std::min<size_t>(outbuf.size(), BUFSIZE);
 
 #if 0
         // Compress the data.

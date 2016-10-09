@@ -1,5 +1,5 @@
 ///----------------------------------------------------------------------------
-/// @file   RefCountedObject.h
+/// @file   RefCountedObject.hpp
 /// @copyright
 /// Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
 /// Copyright 2004-11 by Raw Material Software Ltd.

@@ -255,7 +255,7 @@ void Mobile::reloadLua()
 
     L = luaL_newstate();
 
-    this->loadScript(kSystemDir + "lua/" + lua_script);
+    this->loadScript(Mud::instance().getMudSystemDirectory() + "lua/" + lua_script);
 
     // Call the LUA function: Event_Init in order to prepare the mobile.
     this->triggerEventInit();

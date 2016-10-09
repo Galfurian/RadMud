@@ -68,7 +68,7 @@ void MudUpdater::initTimers()
 bool MudUpdater::hasTicPassed()
 {
     // Get the current time.
-    TimeClock currentTime = std::chrono::system_clock::now();
+    std::chrono::time_point<std::chrono::system_clock> currentTime = std::chrono::system_clock::now();
     // Return the check if a tic has passed.
     if (std::chrono::duration_cast<std::chrono::seconds>(currentTime - ticTime).count() >= ticSize)
     {
@@ -82,7 +82,7 @@ bool MudUpdater::hasTicPassed()
 bool MudUpdater::hasHourPassed()
 {
     // Get the current time.
-    TimeClock currentTime = std::chrono::system_clock::now();
+    std::chrono::time_point<std::chrono::system_clock> currentTime = std::chrono::system_clock::now();
     // Return the check if a hour is passed.
     if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - mudTime).count() >= hourSize)
     {

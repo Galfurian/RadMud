@@ -988,7 +988,7 @@ void DoInventory(Character * character, ArgumentHandler & /*args*/)
         Formatter::reset(),
         ToString(character->getCarryingWeight()),
         ToString(character->getMaxCarryingWeight()),
-        mud_measure);
+        Mud::instance().getWeightMeasure());
 }
 
 void DoOrganize(Character * character, ArgumentHandler & args)

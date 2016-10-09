@@ -18,9 +18,14 @@
 
 #pragma once
 
+#define RADMUD_MAJOR_VERSION 1
+#define RADMUD_MINOR_VERSION 0
+#define RADMUD_VERSION       0
+
+/// Indicator for no socket connected.
+#define NO_SOCKET_COMMUNICATION -1
 
 #include "building.hpp"
-#include "constants.hpp"
 #include "production.hpp"
 #include "profession.hpp"
 #include "skill.hpp"
@@ -104,6 +109,29 @@ class Mud
 private:
     /// The port at which the mud is listening.
     uint16_t mudPort;
+    /// Socket for accepting new connections.
+    int _servSocket;
+    /// The max descriptor, in other terms, the max socket value.
+    int _maxDesc;
+    /// When set, the MUD shuts down.
+    bool _shutdownSignal;
+    /// Contains the time when the mud has been booted.
+    time_t _bootTime;
+    /// Highest value of vnum for rooms.
+    int _maxVnumRoom;
+    /// Highest value of vnum for items.
+    int _maxVnumItem;
+    /// Lowest value of vnum for corpses.
+    int _minVnumCorpses;
+
+    /// Mud weight measure.
+    const std::string _mudMeasure;
+
+    /// Mud database filename.
+    const std::string _mudDatabaseName;
+
+    /// Location of system files.
+    const std::string _mudSystemDirectory;
 
     /// @brief Constructor.
     Mud();
@@ -401,6 +429,12 @@ public:
     /// @param message Message to send.
     void broadcastMsg(const int & level, const std::string & message) const;
 
+    std::string getWeightMeasure() const;
+
+    std::string getMudDatabaseName() const;
+
+    std::string getMudSystemDirectory() const;
+
 private:
     /// @brief Remove players that are disconnected or about to leave the MUD.
     void removeInactivePlayers();
@@ -443,21 +477,6 @@ private:
     /// @return <b>True</b> if there are no errors,<br>
     ///         <b>False</b> otherwise.
     bool stopMud();
-
-    /// Socket for accepting new connections.
-    int _servSocket;
-    /// The max descriptor, in other terms, the max socket value.
-    int _maxDesc;
-    /// When set, the MUD shuts down.
-    bool _shutdownSignal;
-    /// Contains the time when the mud has been booted.
-    time_t _bootTime;
-    /// Highest value of vnum for rooms.
-    int _maxVnumRoom;
-    /// Highest value of vnum for items.
-    int _maxVnumItem;
-    /// Lowest value of vnum for corpses.
-    int _minVnumCorpses;
 };
 
 /// @brief Here when a signal is raised.

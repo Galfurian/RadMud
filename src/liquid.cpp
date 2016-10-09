@@ -16,13 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-// Basic Include.
 #include "liquid.hpp"
-
-#include "constants.hpp"
-// Local Includes.
-
-// Other Include.
 #include "utils.hpp"
 
 Liquid::Liquid() :

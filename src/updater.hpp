@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include "constants.hpp"
-
 /// @brief Enumerator which identifies the day phase.
+#include <chrono>
+
 using DayPhase = enum class DayPhase_t
 {
     Morning,    ///< General logging level.
@@ -43,9 +43,9 @@ private:
     size_t bandwidth_uncompressed;
 
     /// Mud current time.
-    TimeClock ticTime;
+    std::chrono::time_point<std::chrono::system_clock> ticTime;
     /// Mud current time.
-    TimeClock mudTime;
+    std::chrono::time_point<std::chrono::system_clock> mudTime;
 
     /// Mud tic length.
     unsigned int ticSize;

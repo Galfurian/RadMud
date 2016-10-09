@@ -49,7 +49,7 @@ bool ExtractCommand(
     else
     {
         // Retrieve the command.
-        command = static_cast<TelnetChar>(static_cast<Byte>(source.at(index)));
+        command = static_cast<TelnetChar>(static_cast<unsigned char>(source.at(index)));
         // Add the command to the buffer.
         buffer += GetTelnetCharName(command) + " ";
         // Increment the index.

@@ -170,7 +170,7 @@ std::string ShopItem::lookContent()
         output += Formatter::yellow() + ToString(this->getUsedSpace()) + Formatter::reset();
         output += " out of ";
         output += Formatter::yellow() + ToString(this->getTotalSpace()) + Formatter::reset();
-        output += " " + mud_measure + ".\n";
+        output += " " + Mud::instance().getWeightMeasure() + ".\n";
     }
     output += "\n";
     return output;

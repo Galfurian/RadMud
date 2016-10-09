@@ -377,7 +377,7 @@ bool LoadMobile(ResultSet * result)
             return false;
         }
         // Load the script.
-        mobile->loadScript(kSystemDir + "lua/" + mobile->lua_script);
+        mobile->loadScript(Mud::instance().getMudSystemDirectory() + "lua/" + mobile->lua_script);
         // Respawn it.
         mobile->respawn();
     }

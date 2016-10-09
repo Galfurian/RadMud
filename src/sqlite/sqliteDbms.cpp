@@ -69,7 +69,7 @@ SQLiteDbms & SQLiteDbms::instance()
 
 bool SQLiteDbms::openDatabase()
 {
-    if (!dbConnection.openConnection(kDatabaseName, kSystemDir))
+    if (!dbConnection.openConnection(Mud::instance().getMudDatabaseName(), Mud::instance().getMudSystemDirectory()))
     {
         this->showLastError();
         return false;

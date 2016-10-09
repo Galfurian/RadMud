@@ -28,7 +28,7 @@ GeneralAction::GeneralAction(Character * _actor) :
     // Nothing to do.
 }
 
-GeneralAction::GeneralAction(Character * _actor, TimeClock _actionCooldown) :
+GeneralAction::GeneralAction(Character * _actor, std::chrono::time_point<std::chrono::system_clock> _actionCooldown) :
     actor(_actor),
     actionCooldown(_actionCooldown)
 {

@@ -1,5 +1,5 @@
 ///----------------------------------------------------------------------------
-/// @file   RefCountedPtr.h
+/// @file   RefCountedPtr.hpp
 /// @copyright
 /// Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
 /// Copyright 2007, Nathan Reed

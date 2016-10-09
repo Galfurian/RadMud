@@ -1,5 +1,5 @@
 ///----------------------------------------------------------------------------
-/// @file   TypeList.h
+/// @file   TypeList.hpp
 /// @copyright
 /// Copyright 2007, Nathan Reed
 /// Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>

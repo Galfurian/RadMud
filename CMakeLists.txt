@@ -36,6 +36,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmessage-length=0")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
 
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++98-compat")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++98-compat-pedantic")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-documentation-unknown-command")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-noreturn")
+
 #################################################
 # Activate compiler-specific C++11...
 include(CheckCXXCompilerFlag)

@@ -1,4 +1,4 @@
-/// @file   LuaException.h
+/// @file   LuaException.hpp
 /// @copyright
 /// Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
 /// Copyright 2008, Nigel Atkinson <suprapilot+LuaCode@gmail.com>
@@ -33,14 +33,23 @@ private:
 public:
     /// @brief Construct a LuaException after a lua_pcall().
     LuaException(lua_State * L, int) :
-        m_L(L)
+        m_L(L),
+        m_what()
     {
         this->whatFromStack();
     }
 
     /// @brief Constructor.
     LuaException(lua_State * L, char const *, char const *, long) :
-        m_L(L)
+        m_L(L),
+        m_what()
+    {
+        this->whatFromStack();
+    }
+
+    LuaException(const LuaException & source) :
+        m_L(source.m_L),
+        m_what()
     {
         this->whatFromStack();
     }

@@ -1,5 +1,5 @@
 ///----------------------------------------------------------------------------
-/// @file   Iterator.h
+/// @file   Iterator.hpp
 /// @copyright
 /// Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
 ///

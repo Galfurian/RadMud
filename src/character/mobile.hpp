@@ -47,7 +47,7 @@ public:
     /// Mobile buffer of received message.
     std::string message_buffer;
     /// How many seconds before respawn.
-    TimeClock nextRespawn;
+    std::chrono::time_point<std::chrono::system_clock> nextRespawn;
     /// The character that is controlling this one.
     Character * controller;
     /// The file that contains the behaviour of this mobile.
@@ -55,7 +55,7 @@ public:
     /// The mutex for this mobile.
     std::mutex lua_mutex;
     /// Seconds until next action.
-    TimeClock nextActionCooldown;
+    std::chrono::time_point<std::chrono::system_clock> nextActionCooldown;
     /// The item of which this mobile is the manager.
     Item * managedItem;
 

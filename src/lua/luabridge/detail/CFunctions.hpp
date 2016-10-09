@@ -1,5 +1,5 @@
 ///----------------------------------------------------------------------------
-/// @file   CFunctions.h
+/// @file   CFunctions.hpp
 /// @copyright
 /// Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
 ///

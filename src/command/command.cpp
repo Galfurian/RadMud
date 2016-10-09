@@ -169,7 +169,7 @@ void ProcessPlayerPassword(Character * character, ArgumentHandler & args)
     if (input != player->password)
     {
         // Detect too many password attempts.
-        if (++player->password_attempts >= kMaxPasswordAttempts)
+        if (++player->password_attempts >= 3)
         {
             player->closeConnection();
             player->sendMsg("Goodbye!\n");
@@ -1062,8 +1062,7 @@ void AdvanceCharacterCreation(Character * character, ConnectionState new_state, 
     else if (new_state == ConnectionState::AwaitingName)
     {
         msg += Formatter::clearScreen();
-        msg += "\nWelcome to RadMud. Version " + Formatter::green() + kVersion + Formatter::reset()
-               + "!\n";
+        msg += "\nWelcome to RadMud!\n";
         msg += Formatter::red();
         msg += "#--------------------------------------------#\n";
         msg += "                 XXXXXXXXXXXXX                \n";
