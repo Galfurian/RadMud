@@ -465,6 +465,7 @@ ItemModel * GenerateModel(const ModelType & type)
         case ModelType::NoType:
             return nullptr;
     }
+    return nullptr;
 }
 
 std::string GetModelFlagString(unsigned int flags)

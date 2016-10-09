@@ -916,4 +916,5 @@ Item * GenerateItem(const ModelType & type)
         case ModelType::NoType:
             return nullptr;
     }
+    return nullptr;
 }
