@@ -52,3 +52,8 @@ std::string CombatAction::stop()
 {
     return "You stop fighting.";
 }
+
+ActionStatus CombatAction::perform()
+{
+    return ActionStatus::Running;
+}

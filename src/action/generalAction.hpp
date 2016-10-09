@@ -42,7 +42,8 @@ using ActionType = enum class ActionType_t
     Move,       ///< The character is moving to another location.
     Crafting,   ///< The character is crafting something.
     Building,   ///< The character is crafting something.
-    Combat      ///< The character is fighting.
+    Combat,     ///< The character is fighting.
+    Scout       ///< The character is scouting the area.
 };
 
 /// The list of possible actions.

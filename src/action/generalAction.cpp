@@ -99,5 +99,6 @@ std::string GetActionTypeName(ActionType type)
     if (type == ActionType::Crafting) return "Crafting";
     if (type == ActionType::Building) return "Building";
     if (type == ActionType::Combat) return "Fighting";
+    if (type == ActionType::Scout) return "Scouting";
     return "No Action";
 }

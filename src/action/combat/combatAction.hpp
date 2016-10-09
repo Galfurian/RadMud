@@ -48,7 +48,7 @@ public:
 
     std::string stop() override;
 
-    virtual ActionStatus perform() = 0;
+    ActionStatus perform() override;
 
     /// @brief Provides the type of combat action.
     /// @return The type of combat action.

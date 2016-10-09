@@ -1601,6 +1601,10 @@ unsigned int Character::getConsumedStaminaFor(
     {
         // Do something.
     }
+    else if (actionType == ActionType::Scout)
+    {
+        // Do something.
+    }
     else if (actionType == ActionType::Combat)
     {
         if (combatAction == CombatActionType::BasicAttack)

@@ -17,6 +17,7 @@
 
 #include "combat.hpp"
 #include "../mud.hpp"
+#include "../action/scoutAction.hpp"
 
 void LoadCombatCommands()
 {
@@ -37,10 +38,10 @@ void LoadCombatCommands()
         Mud::instance().addCommand(command);
     }
     {
-        command.name = "aim";
-        command.help = "Provides the list of targets nearby.";
+        command.name = "scout";
+        command.help = "Provides information about the surrounding area.";
         command.args = "";
-        command.hndl = DoAim;
+        command.hndl = DoScout;
         Mud::instance().addCommand(command);
     }
 }
@@ -183,17 +184,18 @@ void DoFlee(Character * character, ArgumentHandler & /*args*/)
     character->setNextCombatAction(CombatActionType::Flee);
 }
 
-void DoAim(Character * character, ArgumentHandler & /*args*/)
+void DoScout(Character * character, ArgumentHandler & /*args*/)
 {
-    std::vector<Character *> targets;
-    if (!character->getCharactersInSight(targets))
+    auto requiredTime = 3;
+    auto newAction = std::make_shared<ScoutAction>(character, requiredTime);
+    // Check the new action.
+    if (!newAction->check())
     {
-        character->sendMsg("There are no targets nearby!\n");
+        character->sendMsg("You can't scout the area.\n");
         return;
     }
-    character->sendMsg("You see:\n");
-    for (auto it : targets)
-    {
-        character->sendMsg("    %s\n", it->getName());
-    }
+    // Send the starting message.
+    character->sendMsg("You start scouting the area...\n");
+    // Set the new action.
+    character->setAction(newAction);
 }
