@@ -68,11 +68,11 @@ ActionStatus ScoutAction::perform()
     std::vector<Character *> targets;
     if (!actor->getCharactersInSight(targets))
     {
-        actor->sendMsg("There are no targets nearby!\n");
+        actor->sendMsg("You have found nothing...\n");
     }
     else
     {
-        actor->sendMsg("You see:\n");
+        actor->sendMsg("Nearby you see...\n");
         for (auto it : targets)
         {
             actor->sendMsg("    %s\n", it->getName());

@@ -538,7 +538,7 @@ bool Character::setNextCombatAction(CombatActionType nextAction)
         this->actionQueue.push_front(std::make_shared<Flee>(this));
     }
     // Set the action cooldown.
-    this->getAction()->setCooldown(this->getCooldown(nextAction));
+    this->getAction()->resetCooldown(this->getCooldown(nextAction));
     return true;
 }
 

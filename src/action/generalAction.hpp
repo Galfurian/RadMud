@@ -79,6 +79,9 @@ public:
     ///         <b>False</b> otherwise.
     bool checkElapsed() const;
 
+    /// @brief Get the elapsed time.
+    long int getElapsed() const;
+
     /// @brief Checks the correctness of the action's values.
     /// @return <b>True</b> if it has correct values,<br>
     ///         <b>False</b> otherwise.
@@ -102,7 +105,7 @@ public:
 
     /// @brief Allows to set the remaining time before the action can be triggered.
     /// @param _actionCooldown The cooldown that has to be set.
-    void setCooldown(const unsigned int & _actionCooldown);
+    void resetCooldown(const unsigned int & _actionCooldown);
 
     /// @brief Provides the remaining time before the action can be triggered.
     unsigned int getCooldown();

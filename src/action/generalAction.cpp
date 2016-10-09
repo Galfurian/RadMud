@@ -45,6 +45,11 @@ bool GeneralAction::checkElapsed() const
     return (duration_cast<seconds>(actionCooldown - system_clock::now()).count() <= 0);
 }
 
+long int GeneralAction::getElapsed() const
+{
+    return duration_cast<seconds>(actionCooldown - system_clock::now()).count();
+}
+
 bool GeneralAction::check() const
 {
     bool correct = true;
@@ -76,7 +81,7 @@ ActionStatus GeneralAction::perform()
     return ActionStatus::Finished;
 }
 
-void GeneralAction::setCooldown(const unsigned int & _actionCooldown)
+void GeneralAction::resetCooldown(const unsigned int & _actionCooldown)
 {
     this->actionCooldown = system_clock::now() + seconds(_actionCooldown);
     Logger::log(LogLevel::Debug, "Next action in %s.", ToString(_actionCooldown));
