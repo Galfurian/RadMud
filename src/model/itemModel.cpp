@@ -36,7 +36,9 @@
 #include "shieldModel.hpp"
 #include "shopModel.hpp"
 #include "vehicleModel.hpp"
-#include "weaponModel.hpp"
+#include "magazineModel.hpp"
+#include "meleeWeaponModel.hpp"
+#include "rangedWeaponModel.hpp"
 
 ItemModel::ItemModel() :
     vnum(),
@@ -169,7 +171,7 @@ Item * ItemModel::createItem(
     newItem->currentSlot = slot;
 
     // If the item is for a mobile, do not add the item to the MUD nor to the DB and do not check its correctness.
-    if(isForMobile)
+    if (isForMobile)
     {
         return newItem;
     }
@@ -210,7 +212,9 @@ bool ItemModel::check()
     assert(!shortdesc.empty());
     assert(!keys.empty());
     assert(!description.empty());
-    if ((this->getType() == ModelType::Armor) || (this->getType() == ModelType::Weapon))
+    if ((this->getType() == ModelType::Armor) ||
+        (this->getType() == ModelType::MeleeWeapon) ||
+        (this->getType() == ModelType::RangedWeapon))
     {
         assert(slot != EquipmentSlot::None);
     }
@@ -300,7 +304,7 @@ std::string ItemModel::getTile(int offset)
         {
             return "a";
         }
-        else if (this->getType() == ModelType::Weapon)
+        else if ((this->getType() == ModelType::MeleeWeapon) || (this->getType() == ModelType::RangedWeapon))
         {
             return "w";
         }
@@ -411,9 +415,19 @@ VehicleModel * ItemModel::toVehicle()
     return static_cast<VehicleModel *>(this);
 }
 
-WeaponModel * ItemModel::toWeapon()
+MeleeWeaponModel * ItemModel::toMeleeWeapon()
 {
-    return static_cast<WeaponModel *>(this);
+    return static_cast<MeleeWeaponModel *>(this);
+}
+
+RangedWeaponModel * ItemModel::toRangedWeapon()
+{
+    return static_cast<RangedWeaponModel *>(this);
+}
+
+MagazineModel * ItemModel::toMagazine()
+{
+    return static_cast<MagazineModel *>(this);
 }
 
 ItemModel * GenerateModel(const ModelType & type)
@@ -460,8 +474,12 @@ ItemModel * GenerateModel(const ModelType & type)
             return new ToolModel();
         case ModelType::Vehicle:
             return new VehicleModel();
-        case ModelType::Weapon:
-            return new WeaponModel();
+        case ModelType::MeleeWeapon:
+            return new MeleeWeaponModel();
+        case ModelType::RangedWeapon:
+            return new RangedWeaponModel();
+        case ModelType::Magazine:
+            return new MagazineModel();
         case ModelType::NoType:
             return nullptr;
     }
@@ -471,14 +489,22 @@ ItemModel * GenerateModel(const ModelType & type)
 std::string GetModelFlagString(unsigned int flags)
 {
     std::string flagList;
-    if (HasFlag(flags, ModelFlag::Static)) flagList += "|Static";
-    if (HasFlag(flags, ModelFlag::Invisible)) flagList += "|Invisible";
-    if (HasFlag(flags, ModelFlag::Unbreakable)) flagList += "|Unbreakable";
-    if (HasFlag(flags, ModelFlag::NoSaleable)) flagList += "|NoSaleable";
-    if (HasFlag(flags, ModelFlag::TwoHand)) flagList += "|TwoHand";
-    if (HasFlag(flags, ModelFlag::CanClose)) flagList += "|CanClose";
-    if (HasFlag(flags, ModelFlag::CanSeeThrough)) flagList += "|CanSeeThrough";
-    if (HasFlag(flags, ModelFlag::CanBeStacked)) flagList += "|CanBeStacked";
+    if (HasFlag(flags, ModelFlag::Static))
+    { flagList += "|Static"; }
+    if (HasFlag(flags, ModelFlag::Invisible))
+    { flagList += "|Invisible"; }
+    if (HasFlag(flags, ModelFlag::Unbreakable))
+    { flagList += "|Unbreakable"; }
+    if (HasFlag(flags, ModelFlag::NoSaleable))
+    { flagList += "|NoSaleable"; }
+    if (HasFlag(flags, ModelFlag::TwoHand))
+    { flagList += "|TwoHand"; }
+    if (HasFlag(flags, ModelFlag::CanClose))
+    { flagList += "|CanClose"; }
+    if (HasFlag(flags, ModelFlag::CanSeeThrough))
+    { flagList += "|CanSeeThrough"; }
+    if (HasFlag(flags, ModelFlag::CanBeStacked))
+    { flagList += "|CanBeStacked"; }
     if (!flagList.empty())
     {
         flagList += "|";

@@ -19,8 +19,8 @@
 #include "nodeModel.hpp"
 
 NodeModel::NodeModel() :
-    nodeType(),
-    provides()
+    nodeType()
+    //,provides()
 {
     // Nothing to do.
 }
@@ -48,13 +48,13 @@ bool NodeModel::setModel(const std::string & source)
         return false;
     }
     std::vector<std::string> functionList = SplitString(source, " ");
-    if (functionList.size() != 2)
+    if (functionList.size() != 1)
     {
         Logger::log(LogLevel::Error, "Wrong number of parameters for Node Model (%s).", this->name);
         return false;
     }
     this->nodeType = static_cast<NodeType>(ToNumber<unsigned int>(functionList[0]));
-    this->provides = ToNumber<unsigned int>(functionList[1]);
+    //this->provides = ToNumber<unsigned int>(functionList[1]);
     return true;
 }
 
@@ -66,7 +66,7 @@ void NodeModel::getSheet(Table & sheet) const
     sheet.addDivider();
     // Set the values.
     sheet.addRow({"Node Type", GetNodeTypeName(this->nodeType)});
-    sheet.addRow({"Provides", ToString(this->provides)});
+    //sheet.addRow({"Provides", ToString(this->provides)});
 }
 
 std::string GetNodeTypeName(NodeType type)

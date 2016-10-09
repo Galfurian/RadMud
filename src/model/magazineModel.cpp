@@ -1,7 +1,7 @@
-/// @file   projectileModel.cpp
-/// @brief  Iplement the methods for Projectile.
+/// @file   magazineModel.cpp
+/// @brief  Iplement the methods for a magazine model.
 /// @author Enrico Fraccaroli
-/// @date   Jul 6 2016
+/// @date   Oct 9 2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission to use, copy, modify, and distribute this software for any
@@ -16,32 +16,31 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#include "projectileModel.hpp"
+#include "magazineModel.hpp"
 
-ProjectileModel::ProjectileModel() :
+MagazineModel::MagazineModel() :
     projectileType(),
-    damageBonus(),
-    rangeBonus()
+    maxAmmount()
 {
     // Nothing to do.
 }
 
-ProjectileModel::~ProjectileModel()
+MagazineModel::~MagazineModel()
 {
     // Nothing to do.
 }
 
-ModelType ProjectileModel::getType() const
+ModelType MagazineModel::getType() const
 {
-    return ModelType::Projectile;
+    return ModelType::Magazine;
 }
 
-std::string ProjectileModel::getTypeName() const
+std::string MagazineModel::getTypeName() const
 {
-    return "Projectile";
+    return "Magazine";
 }
 
-bool ProjectileModel::setModel(const std::string &source)
+bool MagazineModel::setModel(const std::string & source)
 {
     if (source.empty())
     {
@@ -49,28 +48,26 @@ bool ProjectileModel::setModel(const std::string &source)
         return false;
     }
     std::vector<std::string> functionList = SplitString(source, " ");
-    if (functionList.size() != 3)
+    if (functionList.size() != 2)
     {
         Logger::log(
             LogLevel::Error,
-            "Wrong number of parameters for Projectile Model (%s).",
+            "Wrong number of parameters for Magazine Model (%s).",
             this->name);
         return false;
     }
     this->projectileType = static_cast<RangedWeaponType>(ToNumber<unsigned int>(functionList[0]));
-    this->damageBonus = ToNumber<unsigned int>(functionList[1]);
-    this->rangeBonus = ToNumber<unsigned int>(functionList[2]);
+    this->maxAmmount = ToNumber<unsigned int>(functionList[1]);
     return true;
 }
 
-void ProjectileModel::getSheet(Table &sheet) const
+void MagazineModel::getSheet(Table & sheet) const
 {
     // Call the function of the father class.
     ItemModel::getSheet(sheet);
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow({"Projectile Type", GetRangedWeaponTypeName(this->projectileType)});
-    sheet.addRow({"Damage Bonus", ToString(this->damageBonus)});
-    sheet.addRow({"Range  Bonus", ToString(this->rangeBonus)});
+    sheet.addRow({"Contained Type", GetRangedWeaponTypeName(this->projectileType)});
+    sheet.addRow({"Maximum Ammount", ToString(this->maxAmmount)});
 }

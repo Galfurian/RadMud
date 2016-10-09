@@ -1,5 +1,5 @@
-/// @file   nodeModel.hpp
-/// @brief  Define variables and methods of Node.
+/// @file   meleeWeaponModel.hpp
+/// @brief  Define variables and methods of Weapon.
 /// @author Enrico Fraccaroli
 /// @date   Jul 6 2016
 /// @copyright
@@ -20,28 +20,31 @@
 
 #include "itemModel.hpp"
 
-/// Used to determine the type of the node.
-using NodeType = enum class NodeType_t
+/// Types of weapons.
+using MeleeWeaponType = enum class MeleeWeaponType_t
 {
-    NoType, ///< [0] No type.
-    Metal,  ///< [1] Metal vein.
-    Wood,   ///< [2] A tree.
-    Stone   ///< [3] A monolith of stone.
+    None,
+    Unarmed, ///< [1] Weapon to enanche unarmed fight
+    Bladed,  ///< [2] All sort of blades
+    Blunt,   ///< [3] All sort of blunt weapons
+    Placed,  ///< [4]  Placeble explosives
 };
 
-/// @brief Model of a node of resources.
-class NodeModel :
+/// @brief Model of a weapon.
+class MeleeWeaponModel :
     public ItemModel
 {
 public:
-    /// Type of node.
-    NodeType nodeType;
-    /// The vnum of the item provided during the extraction.
-    //unsigned int provides;
+    /// The type of the melee weapon.
+    MeleeWeaponType meleeWeaponType;
+    /// The minimum damage of the weapon.
+    unsigned int minDamage;
+    /// The maximum damage of the weapon.
+    unsigned int maxDamage;
 
-    NodeModel();
+    MeleeWeaponModel();
 
-    virtual ~NodeModel();
+    virtual ~MeleeWeaponModel();
 
     ModelType getType() const override;
 
@@ -55,8 +58,7 @@ public:
 /// @addtogroup EnumToString
 /// @{
 
-/// Return the string describing the type of a Node.
-std::string GetNodeTypeName(NodeType type);
+/// Return the string describing the type of a Melee Weapon.
+std::string GetMeleeWeaponTypeName(MeleeWeaponType type);
 
 ///@}
-

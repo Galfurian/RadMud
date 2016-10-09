@@ -1,5 +1,5 @@
-/// @file   weaponModel.cpp
-/// @brief  Iplement the methods for Weapon.
+/// @file   rangedWeaponModel.cpp
+/// @brief  Iplement the methods for Ranged Weapons.
 /// @author Enrico Fraccaroli
 /// @date   Jul 6 2016
 /// @copyright
@@ -16,10 +16,10 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#include "weaponModel.hpp"
+#include "rangedWeaponModel.hpp"
 
-WeaponModel::WeaponModel() :
-    weaponType(),
+RangedWeaponModel::RangedWeaponModel() :
+    rangedWeaponType(),
     minDamage(),
     maxDamage(),
     range()
@@ -27,22 +27,22 @@ WeaponModel::WeaponModel() :
     // Nothing to do.
 }
 
-WeaponModel::~WeaponModel()
+RangedWeaponModel::~RangedWeaponModel()
 {
     // Nothing to do.
 }
 
-ModelType WeaponModel::getType() const
+ModelType RangedWeaponModel::getType() const
 {
-    return ModelType::Weapon;
+    return ModelType::RangedWeapon;
 }
 
-std::string WeaponModel::getTypeName() const
+std::string RangedWeaponModel::getTypeName() const
 {
-    return "Weapon";
+    return "Ranged Weapon";
 }
 
-bool WeaponModel::setModel(const std::string & source)
+bool RangedWeaponModel::setModel(const std::string & source)
 {
     if (source.empty())
     {
@@ -54,44 +54,40 @@ bool WeaponModel::setModel(const std::string & source)
     {
         Logger::log(
             LogLevel::Error,
-            "Wrong number of parameters for Weapon Model (%s).",
+            "Wrong number of parameters for Ranged Weapon Model (%s).",
             this->name);
         return false;
     }
-    this->weaponType = static_cast<WeaponType>(ToNumber<unsigned int>(functionList[0]));
+    this->rangedWeaponType = static_cast<RangedWeaponType>(ToNumber<unsigned int>(functionList[0]));
     this->minDamage = ToNumber<unsigned int>(functionList[1]);
     this->maxDamage = ToNumber<unsigned int>(functionList[2]);
     this->range = ToNumber<unsigned int>(functionList[3]);
     return true;
 }
 
-void WeaponModel::getSheet(Table & sheet) const
+void RangedWeaponModel::getSheet(Table & sheet) const
 {
     // Call the function of the father class.
     ItemModel::getSheet(sheet);
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow({"Weapon Type", GetWeaponTypeName(this->weaponType)});
+    sheet.addRow({"Ranged Weapon Type", GetRangedWeaponTypeName(this->rangedWeaponType)});
     sheet.addRow({"Minimum Damage", ToString(this->minDamage)});
     sheet.addRow({"Maximum Damage", ToString(this->maxDamage)});
     sheet.addRow({"Range", ToString(this->range)});
 }
 
-std::string GetWeaponTypeName(WeaponType type)
+std::string GetRangedWeaponTypeName(RangedWeaponType type)
 {
-    if (type == WeaponType::Pistol) return "Pistol";
-    if (type == WeaponType::Rifle) return "Rifle";
-    if (type == WeaponType::Shotgun) return "Shotgun";
-    if (type == WeaponType::HeavyWeapon) return "Heavy Weapon";
-    if (type == WeaponType::EnergyPistol) return "Energy Pistol";
-    if (type == WeaponType::EnergyRifle) return "Energy Rifle";
-    if (type == WeaponType::EnergyHeavyWeapon) return "Energy Heavy Weapon";
-    if (type == WeaponType::Granade) return "Granade";
-    if (type == WeaponType::Placed) return "Placed";
-    if (type == WeaponType::Bladed) return "Bladed";
-    if (type == WeaponType::Blunt) return "Blunt";
-    if (type == WeaponType::Thrown) return "Thrown";
-    if (type == WeaponType::Unarmed) return "Unarmed";
+    if (type == RangedWeaponType::Pistol) return "Pistol";
+    if (type == RangedWeaponType::Rifle) return "Rifle";
+    if (type == RangedWeaponType::Shotgun) return "Shotgun";
+    if (type == RangedWeaponType::HeavyWeapon) return "Heavy Weapon";
+    if (type == RangedWeaponType::EnergyPistol) return "Energy Pistol";
+    if (type == RangedWeaponType::EnergyRifle) return "Energy Rifle";
+    if (type == RangedWeaponType::EnergyHeavyWeapon) return "Energy Heavy Weapon";
+    if (type == RangedWeaponType::Granade) return "Granade";
+    if (type == RangedWeaponType::Thrown) return "Thrown";
     return "No Weapon Type";
 }

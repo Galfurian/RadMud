@@ -18,7 +18,7 @@
 
 #include "basicAttack.hpp"
 #include "../../structure/room.hpp"
-#include "../../item/weaponItem.hpp"
+#include "meleeWeaponItem.hpp"
 
 BasicAttack::BasicAttack(Character * _actor) :
     CombatAction(_actor)
@@ -60,7 +60,7 @@ ActionStatus BasicAttack::perform()
         return ActionStatus::Running;
     }
     Logger::log(LogLevel::Debug, "[%s] Perform a BasicAttack.", actor->getName());
-    auto activeWeapons = actor->getActiveWeapons();
+    auto activeWeapons = actor->getActiveMeleeWeapons();
     if (activeWeapons.empty())
     {
         actor->sendMsg("You do not have a valid weapon equipped.\n");
@@ -70,7 +70,7 @@ ActionStatus BasicAttack::perform()
         for (auto iterator : activeWeapons)
         {
             // Get the top aggro enemy at range.
-            Character * enemy = actor->getNextOpponentAtRange(iterator->getRange());
+            Character * enemy = actor->getNextOpponentAtRange(1);
             if (enemy == nullptr)
             {
                 actor->sendMsg(

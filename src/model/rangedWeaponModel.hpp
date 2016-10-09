@@ -1,7 +1,7 @@
-/// @file   weaponModel.hpp
-/// @brief  Define variables and methods of Weapon.
+/// @file   rangedWeaponModel.hpp
+/// @brief  Define variables and methods of Ranged Weapons.
 /// @author Enrico Fraccaroli
-/// @date   Jul 6 2016
+/// @date   Oct 9 2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission to use, copy, modify, and distribute this software for any
@@ -20,32 +20,28 @@
 
 #include "itemModel.hpp"
 
-/// Types of weapons.
-using WeaponType = enum class WeaponType_t
+/// Types of ranged weapons.
+using RangedWeaponType = enum class RangedWeaponType_t
 {
     None,
-    Pistol,             ///< [1]  Pistols that uses bullets
-    Rifle,              ///< [2]  Rifles that uses bullets
-    Shotgun,            ///< [3]  Shotguns
-    HeavyWeapon,        ///< [4]  Big guns, heavy weapons that uses bullets
-    EnergyPistol,       ///< [5]  Pistols that uses energy
-    EnergyRifle,        ///< [6]  Rifles that uses energy.
-    EnergyHeavyWeapon,  ///< [7]  Big guns, heavy weapons that uses energy.
-    Granade,            ///< [8]  Granades
-    Placed,             ///< [9]  Placeble explosives
-    Bladed,             ///< [10] All sort of blades
-    Blunt,              ///< [11] All sort of blunt weapons
-    Thrown,             ///< [12] Throwable weapons
-    Unarmed,            ///< [13] Weapon to enanche unarmed fight
+    Pistol,             ///< [1] Normal Pistols
+    Rifle,              ///< [2] Normal Rifles
+    Shotgun,            ///< [3] Normal Shotguns
+    HeavyWeapon,        ///< [4] Normal Heavy Weapons
+    EnergyPistol,       ///< [5] Pistols that uses energy
+    EnergyRifle,        ///< [6] Rifles that uses energy
+    EnergyHeavyWeapon,  ///< [7] Heavy Weapons that uses energy
+    Granade,            ///< [8] Normal Granades
+    Thrown,             ///< [9] Throwable weapons
 };
 
 /// @brief Model of a weapon.
-class WeaponModel :
+class RangedWeaponModel :
     public ItemModel
 {
 public:
-    /// The type of the weapon.
-    WeaponType weaponType;
+    /// The type of the ranged weapon.
+    RangedWeaponType rangedWeaponType;
     /// The minimum damage of the weapon.
     unsigned int minDamage;
     /// The maximum damage of the weapon.
@@ -53,9 +49,9 @@ public:
     /// The range of the weapon.
     unsigned int range;
 
-    WeaponModel();
+    RangedWeaponModel();
 
-    virtual ~WeaponModel();
+    virtual ~RangedWeaponModel();
 
     ModelType getType() const override;
 
@@ -69,7 +65,7 @@ public:
 /// @addtogroup EnumToString
 /// @{
 
-/// Return the string describing the type of a Weapon.
-std::string GetWeaponTypeName(WeaponType type);
+/// Return the string describing the type of a Ranged Weapon.
+std::string GetRangedWeaponTypeName(RangedWeaponType type);
 
 ///@}

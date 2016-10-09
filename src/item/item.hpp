@@ -40,7 +40,9 @@ class ShopItem;
 
 class ArmorItem;
 
-class WeaponItem;
+class MeleeWeaponItem;
+
+class RangedWeaponItem;
 
 class CurrencyItem;
 
@@ -291,8 +293,11 @@ public:
     /// @brief Returns the model <b>statically</b> casted to Armor.
     ArmorItem * toArmorItem();
 
-    /// @brief Returns the model <b>statically</b> casted to Weapon.
-    WeaponItem * toWeaponItem();
+    /// @brief Returns the model <b>statically</b> casted to Melee Weapon.
+    MeleeWeaponItem * toMeleeWeaponItem();
+
+    /// @brief Returns the model <b>statically</b> casted to Ranged Weapon.
+    RangedWeaponItem * toRangedWeaponItem();
 
     /// @brief Returns the model <b>statically</b> casted to Currency.
     CurrencyItem * toCurrencyItem();

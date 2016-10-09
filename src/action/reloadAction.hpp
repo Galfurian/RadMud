@@ -1,6 +1,7 @@
-/// @file   weaponItem.hpp
+/// @file   reloadAction.hpp
+/// @brief  Class which manage reloading activities.
 /// @author Enrico Fraccaroli
-/// @date   Aug 04 2016
+/// @date   Oct 9 2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission to use, copy, modify, and distribute this software for any
@@ -17,28 +18,37 @@
 
 #pragma once
 
-#include "item.hpp"
+#include "generalAction.hpp"
+#include "rangedWeaponItem.hpp"
 
-/// @brief Holds details about armors.
-class WeaponItem :
-    public Item
+/// @brief Allows to scout the surrounding area.
+class ReloadAction :
+    public GeneralAction
 {
+private:
+    /// The weapon which has to be reloaded.
+    RangedWeaponItem * weapon;
+
 public:
-    WeaponItem();
+    /// @brief Constructor.
+    ReloadAction(RangedWeaponItem * _weapon, Character * _actor, unsigned int _cooldown);
 
-    virtual ~WeaponItem();
+    /// @brief Destructor.
+    virtual ~ReloadAction();
 
-    void getSheet(Table & sheet) const override;
+    bool check() const override;
 
-    /// Randomly roll the weapon damage.
-    unsigned int rollDamage() const;
+    ActionType getType() const override;
 
-    /// Provides the minimum damage.
-    unsigned int getMinDamage() const;
+    std::string getDescription() const override;
 
-    /// Provides the maximum damage.
-    unsigned int getMaxDamage() const;
+    std::string stop() override;
 
-    /// Provides the range of this weapon.
-    unsigned int getRange() const;
+    ActionStatus perform() override;
+
+private:
+    /// @brief Checks the weapon.
+    /// @return <b>True</b> if the weapon is available,<br>
+    ///         <b>False</b> otherwise.
+    bool checkWeapon() const;
 };

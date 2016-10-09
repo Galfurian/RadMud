@@ -29,6 +29,8 @@ set(RADMUD_MODEL_SRC
         ./src/model/shopModel.cpp
         ./src/model/toolModel.cpp
         ./src/model/vehicleModel.cpp
-        ./src/model/weaponModel.cpp
+        ./src/model/magazineModel.cpp
+        ./src/model/meleeWeaponModel.cpp
+        ./src/model/rangedWeaponModel.cpp
         PARENT_SCOPE
         )

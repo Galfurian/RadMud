@@ -18,6 +18,7 @@
 #include "combat.hpp"
 #include "../mud.hpp"
 #include "../action/scoutAction.hpp"
+#include "../action/reloadAction.hpp"
 
 void LoadCombatCommands()
 {
@@ -42,6 +43,13 @@ void LoadCombatCommands()
         command.help = "Provides information about the surrounding area.";
         command.args = "";
         command.hndl = DoScout;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "reload";
+        command.help = "Allows to reload a firearm.";
+        command.args = "";
+        command.hndl = DoReload;
         Mud::instance().addCommand(command);
     }
 }
@@ -198,4 +206,55 @@ void DoScout(Character * character, ArgumentHandler & /*args*/)
     character->sendMsg("You start scouting the area...\n");
     // Set the new action.
     character->setAction(newAction);
+}
+
+void DoReload(Character * character, ArgumentHandler & args)
+{
+    if (args.size() != 2)
+    {
+        character->sendMsg("What do you want to reload with what?\n");
+    }
+    else
+    {
+        auto nearbyItem = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
+        if (nearbyItem == nullptr)
+        {
+            character->sendMsg("You don't have %s.\n", args[0].getContent());
+        }
+        else
+        {
+            if (nearbyItem->getType() != ModelType::RangedWeapon)
+            {
+                character->sendMsg("You can't reload %s.\n", args[0].getContent());
+            }
+            else
+            {
+                auto weapon = nearbyItem->toRangedWeaponItem();
+                auto magazine = character->findNearbyItem(args[1].getContent(), args[1].getIndex());
+                if (magazine == nullptr)
+                {
+                    character->sendMsg("You don't have %s.\n", args[1].getContent());
+                }
+                else
+                {
+                    auto requiredTime = 2;
+                    auto newAction = std::make_shared<ReloadAction>(weapon, character, requiredTime);
+                    // Check the new action.
+                    if (!newAction->check())
+                    {
+                        character->sendMsg("You can't reload %s.\n", weapon->getName(true));
+                    }
+                    else
+                    {
+                        // Send the starting message.
+                        character->sendMsg("You start reloading %s with %s.",
+                                           weapon->getName(true),
+                                           magazine->getName(true));
+                        // Set the new action.
+                        character->setAction(newAction);
+                    }
+                }
+            }
+        }
+    }
 }

@@ -26,6 +26,8 @@
 #include "../action/combat/flee.hpp"
 
 #include "../item/armorItem.hpp"
+#include "../item/meleeWeaponItem.hpp"
+#include "../item/rangedWeaponItem.hpp"
 
 using namespace std::chrono;
 
@@ -1416,7 +1418,8 @@ bool Character::canAttackWith(const EquipmentSlot & slot) const
         if (weapon != nullptr)
         {
             // Check if there is actually a weapon equiped.
-            if (weapon->model->getType() == ModelType::Weapon)
+            if ((weapon->model->getType() == ModelType::MeleeWeapon) ||
+                (weapon->model->getType() == ModelType::RangedWeapon))
             {
                 return true;
             }
@@ -1450,15 +1453,18 @@ Character * Character::getNextOpponentAtRange(const unsigned int & range) const
     return nullptr;
 }
 
-std::vector<WeaponItem *> Character::getActiveWeapons()
+std::vector<MeleeWeaponItem *> Character::getActiveMeleeWeapons()
 {
-    std::vector<WeaponItem *> ret;
+    std::vector<MeleeWeaponItem *> ret;
     if (this->canAttackWith(EquipmentSlot::RightHand))
     {
         Item * weapon = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
         if (weapon != nullptr)
         {
-            ret.push_back(weapon->toWeaponItem());
+            if (weapon->getType() == ModelType::MeleeWeapon)
+            {
+                ret.push_back(weapon->toMeleeWeaponItem());
+            }
         }
     }
     if (this->canAttackWith(EquipmentSlot::LeftHand))
@@ -1466,7 +1472,38 @@ std::vector<WeaponItem *> Character::getActiveWeapons()
         Item * weapon = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
         if (weapon != nullptr)
         {
-            ret.push_back(weapon->toWeaponItem());
+            if (weapon->getType() == ModelType::MeleeWeapon)
+            {
+                ret.push_back(weapon->toMeleeWeaponItem());
+            }
+        }
+    }
+    return ret;
+}
+
+std::vector<RangedWeaponItem *> Character::getActiveRangedWeapons()
+{
+    std::vector<RangedWeaponItem *> ret;
+    if (this->canAttackWith(EquipmentSlot::RightHand))
+    {
+        Item * weapon = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
+        if (weapon != nullptr)
+        {
+            if (weapon->getType() == ModelType::RangedWeapon)
+            {
+                ret.push_back(weapon->toRangedWeaponItem());
+            }
+        }
+    }
+    if (this->canAttackWith(EquipmentSlot::LeftHand))
+    {
+        Item * weapon = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
+        if (weapon != nullptr)
+        {
+            if (weapon->getType() == ModelType::RangedWeapon)
+            {
+                ret.push_back(weapon->toRangedWeaponItem());
+            }
         }
     }
     return ret;
@@ -1815,8 +1852,10 @@ void Character::sendMsg(const std::string & msg)
 std::string GetCharacterFlagString(unsigned int flags)
 {
     std::string flagList;
-    if (HasFlag(flags, CharacterFlag::IsGod)) flagList += "|IsGod";
-    if (HasFlag(flags, CharacterFlag::Invisible)) flagList += "|Invisible";
+    if (HasFlag(flags, CharacterFlag::IsGod))
+    { flagList += "|IsGod"; }
+    if (HasFlag(flags, CharacterFlag::Invisible))
+    { flagList += "|Invisible"; }
     flagList += "|";
     return flagList;
 }

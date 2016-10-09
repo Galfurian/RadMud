@@ -32,27 +32,29 @@
 using ModelType = enum class ModelType_t
 {
     NoType,             ///< [0] No type.
-    Corpse,             ///< [1] A corpse, it's a knowledge for internal use.
-    Weapon,             ///< [2] Any weapon.
-    Armor,              ///< [3] Any armor.
-    Shield,             ///< [4] A shield.
-    Projectile,         ///< [5] Projectiles.
-    Container,          ///< [6] A container for items.
-    LiquidContainer,    ///< [7] A container for liquids.
-    Tool,               ///< [8] Any tool.
-    Node,               ///< [9] Any node of resources.
-    Resource,           ///< [10] A resource.
-    Seed,               ///< [11] Any kind of seed.
-    Key,                ///< [12] A key.
-    Furniture,          ///< [13] A forniture (eg. chair, bed, painting, table and so on).
-    Food,               ///< [14] A food.
-    Light,              ///< [15] A source of light ((eg. torch, lamp, candle and so on).
-    Vehicle,            ///< [16] Any kind of vehicle.
-    Book,               ///< [17] Container of parchements.
-    Rope,               ///< [18] A generic rope.
-    Mechanism,          ///< [19] Any kind of mechanism.
-    Currency,           ///< [20] Any kind of currency.
-    Shop                ///< [21] A shop.
+    Corpse,             ///< [1] A corpse.
+    MeleeWeapon,        ///< [2] Any melee weapon.
+    RangedWeapon,       ///< [3] Any ranged weapon.
+    Armor,              ///< [4] Any armor.
+    Shield,             ///< [5] A shield.
+    Projectile,         ///< [6] Projectiles.
+    Container,          ///< [7] A container for items.
+    LiquidContainer,    ///< [8] A container for liquids.
+    Tool,               ///< [9] Any tool.
+    Node,               ///< [10] Any node of resources.
+    Resource,           ///< [11] A resource.
+    Seed,               ///< [12] Any kind of seed.
+    Key,                ///< [13] A key.
+    Furniture,          ///< [14] A forniture (eg. chair, bed, painting, table and so on).
+    Food,               ///< [15] A food.
+    Light,              ///< [16] A source of light ((eg. torch, lamp, candle and so on).
+    Vehicle,            ///< [17] Any kind of vehicle.
+    Book,               ///< [18] Container of parchements.
+    Rope,               ///< [19] A generic rope.
+    Mechanism,          ///< [20] Any kind of mechanism.
+    Currency,           ///< [21] Any kind of currency.
+    Shop,               ///< [22] A shop.
+    Magazine            ///< [23] A magazine for ammunitions.
 };
 
 /// Used to determine the flag of the model.
@@ -115,7 +117,11 @@ class ToolModel;
 
 class VehicleModel;
 
-class WeaponModel;
+class MeleeWeaponModel;
+
+class RangedWeaponModel;
+
+class MagazineModel;
 
 /// @brief Holds details about a model of item.
 class ItemModel
@@ -306,8 +312,14 @@ public:
     /// @brief Returns the model <b>statically</b> casted to Vehicle.
     VehicleModel * toVehicle();
 
-    /// @brief Returns the model <b>statically</b> casted to Weapon.
-    WeaponModel * toWeapon();
+    /// @brief Returns the model <b>statically</b> casted to Melee Weapon.
+    MeleeWeaponModel * toMeleeWeapon();
+
+    /// @brief Returns the model <b>statically</b> casted to Ranged Weapon.
+    RangedWeaponModel * toRangedWeapon();
+
+    /// @brief Returns the model <b>statically</b> casted to Magazine.
+    MagazineModel * toMagazine();
 };
 
 /// Generates a new model based on the provided type.

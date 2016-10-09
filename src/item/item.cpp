@@ -28,8 +28,9 @@
 #include "shopItem.hpp"
 #include "armorItem.hpp"
 #include "corpseItem.hpp"
-#include "weaponItem.hpp"
 #include "currencyItem.hpp"
+#include "meleeWeaponItem.hpp"
+#include "rangedWeaponItem.hpp"
 
 Item::Item() :
     vnum(),
@@ -831,9 +832,14 @@ ArmorItem * Item::toArmorItem()
     return static_cast<ArmorItem *>(this);
 }
 
-WeaponItem * Item::toWeaponItem()
+MeleeWeaponItem * Item::toMeleeWeaponItem()
 {
-    return static_cast<WeaponItem *>(this);
+    return static_cast<MeleeWeaponItem *>(this);
+}
+
+RangedWeaponItem * Item::toRangedWeaponItem()
+{
+    return static_cast<RangedWeaponItem *>(this);
 }
 
 CurrencyItem * Item::toCurrencyItem()
@@ -846,34 +852,36 @@ CorpseItem * Item::toCorpseItem()
     return static_cast<CorpseItem *>(this);
 }
 
-void Item::luaRegister(lua_State * L)
+void Item::luaRegister(lua_State *L)
 {
-    luabridge::getGlobalNamespace(L) //
-        .beginClass<Item>("Item") //
-        .addData("vnum", &Item::vnum) //
-        .addData("model", &Item::model) //
-        .addFunction("getName", &Item::getName) //
-        .addData("maker", &Item::maker) //
-        .addData("condition", &Item::condition) //
-        .addData("weight", &Item::weight) //
-        .addData("price", &Item::price) //
-        .addData("composition", &Item::composition) //
-        .addData("room", &Item::room) //
-        .addData("owner", &Item::owner) //
-        .addData("container", &Item::container) //
-        .addData("container", &Item::container) //
-        .endClass() //
-        .deriveClass<ArmorItem, Item>("ArmorItem") //
-        .addFunction("getAC", &ArmorItem::getArmorClass) //
-        .endClass() //
-        .deriveClass<CorpseItem, Item>("CorpseItem") //
-        .endClass() //
-        .deriveClass<CurrencyItem, Item>("CurrencyItem") //
-        .endClass() //
-        .deriveClass<ShopItem, Item>("ShopItem") //
-        .endClass() //
-        .deriveClass<WeaponItem, Item>("WeaponItem") //
-        .endClass();
+    luabridge::getGlobalNamespace(L)
+            .beginClass<Item>("Item")
+            .addData("vnum", &Item::vnum)
+            .addData("model", &Item::model)
+            .addFunction("getName", &Item::getName)
+            .addData("maker", &Item::maker)
+            .addData("condition", &Item::condition)
+            .addData("weight", &Item::weight)
+            .addData("price", &Item::price)
+            .addData("composition", &Item::composition)
+            .addData("room", &Item::room)
+            .addData("owner", &Item::owner)
+            .addData("container", &Item::container)
+            .addData("container", &Item::container)
+            .endClass()
+            .deriveClass<ArmorItem, Item>("ArmorItem")
+            .addFunction("getAC", &ArmorItem::getArmorClass)
+            .endClass()
+            .deriveClass<CorpseItem, Item>("CorpseItem")
+            .endClass()
+            .deriveClass<CurrencyItem, Item>("CurrencyItem")
+            .endClass()
+            .deriveClass<ShopItem, Item>("ShopItem")
+            .endClass()
+            .deriveClass<MeleeWeaponItem, Item>("MeleeWeaponItem")
+            .endClass()
+            .deriveClass<RangedWeaponItem, Item>("RangedWeaponItem")
+            .endClass();
 }
 
 bool Item::operator<(Item & rhs) const
@@ -890,8 +898,10 @@ Item * GenerateItem(const ModelType & type)
             return new ArmorItem();
         case ModelType::Shop:
             return new ShopItem();
-        case ModelType::Weapon:
-            return new WeaponItem();
+        case ModelType::MeleeWeapon:
+            return new MeleeWeaponItem();
+        case ModelType::RangedWeapon:
+            return new RangedWeaponItem();
         case ModelType::Currency:
             return new CurrencyItem();
         case ModelType::Corpse:
@@ -911,6 +921,7 @@ Item * GenerateItem(const ModelType & type)
         case ModelType::Seed:
         case ModelType::Shield:
         case ModelType::Tool:
+        case ModelType::Magazine:
         case ModelType::Vehicle:
             return new Item();
         case ModelType::NoType:

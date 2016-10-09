@@ -1,5 +1,5 @@
-/// @file   projectileModel.cpp
-/// @brief  Iplement the methods for Projectile.
+/// @file   meleeWeaponModel.cpp
+/// @brief  Iplement the methods for Weapon.
 /// @author Enrico Fraccaroli
 /// @date   Jul 6 2016
 /// @copyright
@@ -16,32 +16,32 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#include "projectileModel.hpp"
+#include "meleeWeaponModel.hpp"
 
-ProjectileModel::ProjectileModel() :
-    projectileType(),
-    damageBonus(),
-    rangeBonus()
+MeleeWeaponModel::MeleeWeaponModel() :
+    meleeWeaponType(),
+    minDamage(),
+    maxDamage()
 {
     // Nothing to do.
 }
 
-ProjectileModel::~ProjectileModel()
+MeleeWeaponModel::~MeleeWeaponModel()
 {
     // Nothing to do.
 }
 
-ModelType ProjectileModel::getType() const
+ModelType MeleeWeaponModel::getType() const
 {
-    return ModelType::Projectile;
+    return ModelType::MeleeWeapon;
 }
 
-std::string ProjectileModel::getTypeName() const
+std::string MeleeWeaponModel::getTypeName() const
 {
-    return "Projectile";
+    return "Melee Weapon";
 }
 
-bool ProjectileModel::setModel(const std::string &source)
+bool MeleeWeaponModel::setModel(const std::string & source)
 {
     if (source.empty())
     {
@@ -53,24 +53,33 @@ bool ProjectileModel::setModel(const std::string &source)
     {
         Logger::log(
             LogLevel::Error,
-            "Wrong number of parameters for Projectile Model (%s).",
+            "Wrong number of parameters for Weapon Model (%s).",
             this->name);
         return false;
     }
-    this->projectileType = static_cast<RangedWeaponType>(ToNumber<unsigned int>(functionList[0]));
-    this->damageBonus = ToNumber<unsigned int>(functionList[1]);
-    this->rangeBonus = ToNumber<unsigned int>(functionList[2]);
+    this->meleeWeaponType = static_cast<MeleeWeaponType>(ToNumber<unsigned int>(functionList[0]));
+    this->minDamage = ToNumber<unsigned int>(functionList[1]);
+    this->maxDamage = ToNumber<unsigned int>(functionList[2]);
     return true;
 }
 
-void ProjectileModel::getSheet(Table &sheet) const
+void MeleeWeaponModel::getSheet(Table & sheet) const
 {
     // Call the function of the father class.
     ItemModel::getSheet(sheet);
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow({"Projectile Type", GetRangedWeaponTypeName(this->projectileType)});
-    sheet.addRow({"Damage Bonus", ToString(this->damageBonus)});
-    sheet.addRow({"Range  Bonus", ToString(this->rangeBonus)});
+    sheet.addRow({"Melee Weapon Type", GetMeleeWeaponTypeName(this->meleeWeaponType)});
+    sheet.addRow({"Minimum Damage", ToString(this->minDamage)});
+    sheet.addRow({"Maximum Damage", ToString(this->maxDamage)});
+}
+
+std::string GetMeleeWeaponTypeName(MeleeWeaponType type)
+{
+    if (type == MeleeWeaponType::Unarmed) return "Unarmed";
+    if (type == MeleeWeaponType::Bladed) return "Bladed";
+    if (type == MeleeWeaponType::Blunt) return "Blunt";
+    if (type == MeleeWeaponType::Placed) return "Placed";
+    return "No Weapon Type";
 }

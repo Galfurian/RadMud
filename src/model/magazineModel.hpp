@@ -1,7 +1,7 @@
-/// @file   nodeModel.hpp
-/// @brief  Define variables and methods of Node.
+/// @file   magazineModel.hpp
+/// @brief  Define variables and methods of a magazine model.
 /// @author Enrico Fraccaroli
-/// @date   Jul 6 2016
+/// @date   Oct 9 2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission to use, copy, modify, and distribute this software for any
@@ -18,30 +18,21 @@
 
 #pragma once
 
-#include "itemModel.hpp"
+#include "rangedWeaponModel.hpp"
 
-/// Used to determine the type of the node.
-using NodeType = enum class NodeType_t
-{
-    NoType, ///< [0] No type.
-    Metal,  ///< [1] Metal vein.
-    Wood,   ///< [2] A tree.
-    Stone   ///< [3] A monolith of stone.
-};
-
-/// @brief Model of a node of resources.
-class NodeModel :
+/// @brief Model of a container of projectiles.
+class MagazineModel :
     public ItemModel
 {
 public:
-    /// Type of node.
-    NodeType nodeType;
-    /// The vnum of the item provided during the extraction.
-    //unsigned int provides;
+    /// The type of projectiles which can be contained.
+    RangedWeaponType projectileType;
+    /// The maximum ammount.
+    unsigned int maxAmmount;
 
-    NodeModel();
+    MagazineModel();
 
-    virtual ~NodeModel();
+    virtual ~MagazineModel();
 
     ModelType getType() const override;
 
@@ -51,12 +42,4 @@ public:
 
     void getSheet(Table & sheet) const override;
 };
-
-/// @addtogroup EnumToString
-/// @{
-
-/// Return the string describing the type of a Node.
-std::string GetNodeTypeName(NodeType type);
-
-///@}
 

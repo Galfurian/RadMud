@@ -18,13 +18,15 @@
 
 #pragma once
 
-#include "itemModel.hpp"
+#include "rangedWeaponModel.hpp"
 
 /// @brief Model of a projectile.
 class ProjectileModel :
     public ItemModel
 {
 public:
+    /// The type of projectile.
+    RangedWeaponType projectileType;
     /// The increment to the damage dealt.
     unsigned int damageBonus;
     /// The increment to the range of the weapon.

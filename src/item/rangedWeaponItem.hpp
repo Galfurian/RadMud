@@ -1,7 +1,6 @@
-/// @file   nodeModel.hpp
-/// @brief  Define variables and methods of Node.
+/// @file   rangedWeaponItem.hpp
 /// @author Enrico Fraccaroli
-/// @date   Jul 6 2016
+/// @date   Oct 09 2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission to use, copy, modify, and distribute this software for any
@@ -18,45 +17,31 @@
 
 #pragma once
 
-#include "itemModel.hpp"
+#include "item.hpp"
 
-/// Used to determine the type of the node.
-using NodeType = enum class NodeType_t
-{
-    NoType, ///< [0] No type.
-    Metal,  ///< [1] Metal vein.
-    Wood,   ///< [2] A tree.
-    Stone   ///< [3] A monolith of stone.
-};
-
-/// @brief Model of a node of resources.
-class NodeModel :
-    public ItemModel
+/// @brief Holds details about a ranged weapon.
+class RangedWeaponItem :
+    public Item
 {
 public:
-    /// Type of node.
-    NodeType nodeType;
-    /// The vnum of the item provided during the extraction.
-    //unsigned int provides;
+    RangedWeaponItem();
 
-    NodeModel();
-
-    virtual ~NodeModel();
-
-    ModelType getType() const override;
-
-    std::string getTypeName() const override;
-
-    bool setModel(const std::string & source) override;
+    virtual ~RangedWeaponItem();
 
     void getSheet(Table & sheet) const override;
+
+    /// Randomly roll the weapon damage.
+    unsigned int rollDamage() const;
+
+    /// Provides the minimum damage.
+    unsigned int getMinDamage() const;
+
+    /// Provides the maximum damage.
+    unsigned int getMaxDamage() const;
+
+    /// Provides the range of this weapon.
+    unsigned int getRange() const;
+
+    /// Checks if the current weapon can be reloaded with the given item.
+    bool canBeReloadedWith(Item * magazine) const;
 };
-
-/// @addtogroup EnumToString
-/// @{
-
-/// Return the string describing the type of a Node.
-std::string GetNodeTypeName(NodeType type);
-
-///@}
-

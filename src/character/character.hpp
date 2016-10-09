@@ -517,9 +517,13 @@ public:
     /// @return A pointer to the next opponent.
     Character * getNextOpponentAtRange(const unsigned int & range) const;
 
-    /// @brief Provides the list of active weapons (Left and Right hands).
-    /// @return Vector of items.
-    std::vector<WeaponItem *> getActiveWeapons();
+    /// @brief Provides the list of active melee weapons (Left and Right hands).
+    /// @return Vector of melee weapons.
+    std::vector<MeleeWeaponItem *> getActiveMeleeWeapons();
+
+    /// @brief Provides the list of active ranged weapons (Left and Right hands).
+    /// @return Vector of ranged weapons.
+    std::vector<RangedWeaponItem *> getActiveRangedWeapons();
 
     /// @brief Provides a list of characters which are in sight.
     /// @param targets    The list which will contain the targets.

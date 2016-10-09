@@ -1,6 +1,6 @@
-/// @file   weaponItem.cpp
+/// @file   RangedWeaponItem.cpp
 /// @author Enrico Fraccaroli
-/// @date   Aug 04 2016
+/// @date   Oct 09 2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission to use, copy, modify, and distribute this software for any
@@ -15,21 +15,21 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#include "weaponItem.hpp"
+#include <magazineModel.hpp>
+#include "rangedWeaponItem.hpp"
+#include "../model/rangedWeaponModel.hpp"
 
-#include "../model/weaponModel.hpp"
-
-WeaponItem::WeaponItem()
+RangedWeaponItem::RangedWeaponItem()
 {
     // Nothing to do.
 }
 
-WeaponItem::~WeaponItem()
+RangedWeaponItem::~RangedWeaponItem()
 {
     // Nothing to do.
 }
 
-void WeaponItem::getSheet(Table & sheet) const
+void RangedWeaponItem::getSheet(Table & sheet) const
 {
     // Call the function of the father class.
     Item::getSheet(sheet);
@@ -41,15 +41,15 @@ void WeaponItem::getSheet(Table & sheet) const
     sheet.addRow({"Range     ", ToString(this->getRange())});
 }
 
-unsigned int WeaponItem::rollDamage() const
+unsigned int RangedWeaponItem::rollDamage() const
 {
     return TRandInteger<unsigned int>(this->getMinDamage(), this->getMaxDamage());
 }
 
-unsigned int WeaponItem::getMinDamage() const
+unsigned int RangedWeaponItem::getMinDamage() const
 {
     // Add the base value.
-    auto valBase = this->model->toWeapon()->minDamage;
+    auto valBase = this->model->toRangedWeapon()->minDamage;
     // Evaluate the modifier due to item's quality.
     auto valQuality = static_cast<unsigned int>(valBase * quality.getModifier());
     // Evaluate the modifier due to item's condition.
@@ -58,10 +58,10 @@ unsigned int WeaponItem::getMinDamage() const
     return ((valBase + valQuality + valCondition) / 3);
 }
 
-unsigned int WeaponItem::getMaxDamage() const
+unsigned int RangedWeaponItem::getMaxDamage() const
 {
     // Add the base value.
-    auto valBase = this->model->toWeapon()->maxDamage;
+    auto valBase = this->model->toRangedWeapon()->maxDamage;
     // Evaluate the modifier due to item's quality.
     auto valQuality = static_cast<unsigned int>(valBase * quality.getModifier());
     // Evaluate the modifier due to item's condition.
@@ -70,14 +70,28 @@ unsigned int WeaponItem::getMaxDamage() const
     return ((valBase + valQuality + valCondition) / 3);
 }
 
-unsigned int WeaponItem::getRange() const
+unsigned int RangedWeaponItem::getRange() const
 {
     // Add the base value.
-    auto valBase = this->model->toWeapon()->range;
+    auto valBase = this->model->toRangedWeapon()->range;
     // Evaluate the modifier due to item's quality.
     auto valQuality = static_cast<unsigned int>(valBase * quality.getModifier());
     // Evaluate the modifier due to item's condition.
     auto valCondition = static_cast<unsigned int>(valBase * this->getConditionModifier());
     // The resulting value.
     return ((valBase + valQuality + valCondition) / 3);
+}
+
+bool RangedWeaponItem::canBeReloadedWith(Item * magazine) const
+{
+    RangedWeaponModel * rangedWeaponModel = this->model->toRangedWeapon();
+    if (magazine->getType() == ModelType::Magazine)
+    {
+        MagazineModel * magazineModel = magazine->model->toMagazine();
+        if (magazineModel->projectileType == rangedWeaponModel->rangedWeaponType)
+        {
+            return true;
+        }
+    }
+    return false;
 }
