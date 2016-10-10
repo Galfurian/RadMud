@@ -28,10 +28,12 @@ class LoadAction :
 private:
     /// The item which has to be loaded.
     Item * itemToBeLoaded;
+    /// The projectile used to load the item.
+    Item * projectile;
 
 public:
     /// @brief Constructor.
-    LoadAction(Item * _itemToBeLoaded, Character * _actor, unsigned int _cooldown);
+    LoadAction(Item * _itemToBeLoaded, Item * _projectile, Character * _actor, unsigned int _cooldown);
 
     /// @brief Destructor.
     virtual ~LoadAction();
@@ -51,4 +53,9 @@ private:
     /// @return <b>True</b> if the item is available,<br>
     ///         <b>False</b> otherwise.
     bool checkItem() const;
+
+    /// @brief Checks the projectile.
+    /// @return <b>True</b> if the projectile is available,<br>
+    ///         <b>False</b> otherwise.
+    bool checkProjectile() const;
 };

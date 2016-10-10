@@ -472,34 +472,17 @@ bool Item::hasNodeType(NodeType nodeType)
 
 bool Item::isAContainer() const
 {
-    if (model->getType() == ModelType::Container)
-    {
-        return true;
-    }
-    else if (model->getType() == ModelType::Corpse)
-    {
-        return true;
-    }
-    else if (model->getType() == ModelType::Shop)
-    {
-        if (HasFlag(this->flags, ItemFlag::Built))
-        {
-            return true;
-        }
-    }
+    if (model->getType() == ModelType::Container) return true;
+    if (model->getType() == ModelType::Corpse) return true;
+    if ((model->getType() == ModelType::Shop) && HasFlag(this->flags, ItemFlag::Built)) return true;
     return false;
 }
 
 bool Item::isEmpty() const
 {
-    if (this->isAContainer())
-    {
-        return (content.size() == 0);
-    }
-    if (model->getType() == ModelType::LiquidContainer)
-    {
-        return (contentLiq.first == nullptr);
-    }
+    if (this->isAContainer()) return content.empty();
+    if (model->getType() == ModelType::Magazine) return content.empty();
+    if (model->getType() == ModelType::LiquidContainer) return (contentLiq.first == nullptr);
     return true;
 }
 
@@ -761,6 +744,24 @@ std::string Item::lookContent()
                       + Formatter::reset() + " " + Mud::instance().getWeightMeasure() + ".\n";
         }
     }
+    else if (model->getType() == ModelType::Magazine)
+    {
+        if (content.empty())
+        {
+            output += Formatter::italic() + "It does not contain any projectiles.\n" + Formatter::reset();
+        }
+        else
+        {
+            Item * loadedProjectiles = content.front();
+            if (loadedProjectiles != nullptr)
+            {
+                output += Formatter::italic();
+                output += "It contains " + loadedProjectiles->getName(true) + "[";
+                output += ToString(loadedProjectiles->quantity) + "].\n";
+                output += Formatter::reset();
+            }
+        }
+    }
     else if (model->getType() == ModelType::LiquidContainer)
     {
         if (HasFlag(this->flags, ItemFlag::Closed))
@@ -852,36 +853,36 @@ CorpseItem * Item::toCorpseItem()
     return static_cast<CorpseItem *>(this);
 }
 
-void Item::luaRegister(lua_State *L)
+void Item::luaRegister(lua_State * L)
 {
     luabridge::getGlobalNamespace(L)
-            .beginClass<Item>("Item")
-            .addData("vnum", &Item::vnum)
-            .addData("model", &Item::model)
-            .addFunction("getName", &Item::getName)
-            .addData("maker", &Item::maker)
-            .addData("condition", &Item::condition)
-            .addData("weight", &Item::weight)
-            .addData("price", &Item::price)
-            .addData("composition", &Item::composition)
-            .addData("room", &Item::room)
-            .addData("owner", &Item::owner)
-            .addData("container", &Item::container)
-            .addData("container", &Item::container)
-            .endClass()
-            .deriveClass<ArmorItem, Item>("ArmorItem")
-            .addFunction("getAC", &ArmorItem::getArmorClass)
-            .endClass()
-            .deriveClass<CorpseItem, Item>("CorpseItem")
-            .endClass()
-            .deriveClass<CurrencyItem, Item>("CurrencyItem")
-            .endClass()
-            .deriveClass<ShopItem, Item>("ShopItem")
-            .endClass()
-            .deriveClass<MeleeWeaponItem, Item>("MeleeWeaponItem")
-            .endClass()
-            .deriveClass<RangedWeaponItem, Item>("RangedWeaponItem")
-            .endClass();
+        .beginClass<Item>("Item")
+        .addData("vnum", &Item::vnum)
+        .addData("model", &Item::model)
+        .addFunction("getName", &Item::getName)
+        .addData("maker", &Item::maker)
+        .addData("condition", &Item::condition)
+        .addData("weight", &Item::weight)
+        .addData("price", &Item::price)
+        .addData("composition", &Item::composition)
+        .addData("room", &Item::room)
+        .addData("owner", &Item::owner)
+        .addData("container", &Item::container)
+        .addData("container", &Item::container)
+        .endClass()
+        .deriveClass<ArmorItem, Item>("ArmorItem")
+        .addFunction("getAC", &ArmorItem::getArmorClass)
+        .endClass()
+        .deriveClass<CorpseItem, Item>("CorpseItem")
+        .endClass()
+        .deriveClass<CurrencyItem, Item>("CurrencyItem")
+        .endClass()
+        .deriveClass<ShopItem, Item>("ShopItem")
+        .endClass()
+        .deriveClass<MeleeWeaponItem, Item>("MeleeWeaponItem")
+        .endClass()
+        .deriveClass<RangedWeaponItem, Item>("RangedWeaponItem")
+        .endClass();
 }
 
 bool Item::operator<(Item & rhs) const

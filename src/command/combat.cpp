@@ -20,6 +20,7 @@
 #include "../action/scoutAction.hpp"
 #include "../action/reloadAction.hpp"
 #include "../action/loadAction.hpp"
+#include "../item/item.hpp"
 
 void LoadCombatCommands()
 {
@@ -237,23 +238,23 @@ void DoLoad(Character * character, ArgumentHandler & args)
             }
             else
             {
-                auto projectiles = character->findNearbyItem(args[1].getContent(), args[1].getIndex());
-                if (projectiles == nullptr)
+                auto projectile = character->findNearbyItem(args[1].getContent(), args[1].getIndex());
+                if (projectile == nullptr)
                 {
                     character->sendMsg("You don't have %s.\n", args[1].getContent());
                 }
                 else
                 {
-                    if (projectiles->getType() != ModelType::Projectile)
+                    if (projectile->getType() != ModelType::Projectile)
                     {
                         character->sendMsg("You can't load %s with %s.\n",
                                            magazine->getName(true),
-                                           projectiles->getName(true));
+                                           projectile->getName(true));
                     }
                     else
                     {
                         auto requiredTime = 2;
-                        auto newAction = std::make_shared<LoadAction>(magazine, character, requiredTime);
+                        auto newAction = std::make_shared<LoadAction>(magazine, projectile, character, requiredTime);
                         // Check the new action.
                         if (!newAction->check())
                         {

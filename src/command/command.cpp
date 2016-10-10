@@ -1271,11 +1271,14 @@ void AdvanceCharacterCreation(Character * character, ConnectionState new_state, 
 
 void LoadCommands()
 {
-    LoadCombatCommands();
+    // Beware the order is important.
+    // Changing the order will not compromise the correct execution of the Mud, but...
+    // If a player just types 'l' or 'lo' in order to 'look' the first commant which get hit is the 'load' command.
+    LoadGeneralCommands();
+    LoadObjectCommands();
     LoadCommunicationCommands();
     LoadCraftingCommands();
-    LoadGeneralCommands();
+    LoadCombatCommands();
     LoadManagerCommands();
-    LoadObjectCommands();
     LoadGodCommands();
 }
