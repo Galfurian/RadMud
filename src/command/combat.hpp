@@ -39,6 +39,9 @@ void DoScout(Character * character, ArgumentHandler & args);
 /// Allows to load a magazine with projectiles.
 void DoLoad(Character * character, ArgumentHandler & args);
 
+/// Allows to unload a magazine with projectiles.
+void DoUnload(Character * character, ArgumentHandler & args);
+
 /// Allows to reload a firearm.
 void DoReload(Character * character, ArgumentHandler & args);
 

@@ -1,7 +1,7 @@
-/// @file   projectileModel.hpp
-/// @brief  Define variables and methods of Projectile.
+/// @file   unloadAction.hpp
+/// @brief  Class which manage unloading activities.
 /// @author Enrico Fraccaroli
-/// @date   Jul 6 2016
+/// @date   Oct 10 2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission to use, copy, modify, and distribute this software for any
@@ -18,29 +18,37 @@
 
 #pragma once
 
-#include "rangedWeaponModel.hpp"
+#include "generalAction.hpp"
+#include "rangedWeaponItem.hpp"
 
-/// @brief Model of a projectile.
-class ProjectileModel :
-    public ItemModel
+/// @brief Allows to load something.
+class UnloadAction :
+    public GeneralAction
 {
+private:
+    /// The item which has to be unloaded.
+    Item * itemToBeUnloaded;
+
 public:
-    /// The type of projectile.
-    RangedWeaponType projectileType;
-    /// The increment to the damage dealt.
-    unsigned int damageBonus;
-    /// The increment to the range of the weapon.
-    unsigned int rangeBonus;
+    /// @brief Constructor.
+    UnloadAction(Item * _itemToBeUnloaded, Character * _actor, unsigned int _cooldown);
 
-    ProjectileModel();
+    /// @brief Destructor.
+    virtual ~UnloadAction();
 
-    virtual ~ProjectileModel();
+    bool check() const override;
 
-    ModelType getType() const override;
+    ActionType getType() const override;
 
-    std::string getTypeName() const override;
+    std::string getDescription() const override;
 
-    bool setModel(const std::string & source) override;
+    std::string stop() override;
 
-    void getSheet(Table & sheet) const override;
+    ActionStatus perform() override;
+
+private:
+    /// @brief Checks the item tha has to be loaded.
+    /// @return <b>True</b> if the item is available,<br>
+    ///         <b>False</b> otherwise.
+    bool checkItem() const;
 };

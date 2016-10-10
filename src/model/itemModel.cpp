@@ -432,83 +432,44 @@ MagazineModel * ItemModel::toMagazine()
 
 ItemModel * GenerateModel(const ModelType & type)
 {
-    switch (type)
-    {
-        case ModelType::Corpse:
-            return new CorpseModel();
-        case ModelType::Armor:
-            return new ArmorModel();
-        case ModelType::Book:
-            return new BookModel();
-        case ModelType::Container:
-            return new ContainerModel();
-        case ModelType::Currency:
-            return new CurrencyModel();
-        case ModelType::Food:
-            return new FoodModel();
-        case ModelType::Furniture:
-            return new FurnitureModel();
-        case ModelType::Key:
-            return new KeyModel();
-        case ModelType::Light:
-            return new LightModel();
-        case ModelType::LiquidContainer:
-            return new LiquidContainerModel();
-        case ModelType::Mechanism:
-            return new MechanismModel();
-        case ModelType::Node:
-            return new NodeModel();
-        case ModelType::Projectile:
-            return new ProjectileModel();
-        case ModelType::Resource:
-            return new ResourceModel();
-        case ModelType::Rope:
-            return new RopeModel();
-        case ModelType::Seed:
-            return new SeedModel();
-        case ModelType::Shield:
-            return new ShieldModel();
-        case ModelType::Shop:
-            return new ShopModel();
-        case ModelType::Tool:
-            return new ToolModel();
-        case ModelType::Vehicle:
-            return new VehicleModel();
-        case ModelType::MeleeWeapon:
-            return new MeleeWeaponModel();
-        case ModelType::RangedWeapon:
-            return new RangedWeaponModel();
-        case ModelType::Magazine:
-            return new MagazineModel();
-        case ModelType::NoType:
-            return nullptr;
-    }
+    if (type == ModelType::Corpse) return new CorpseModel();
+    if (type == ModelType::MeleeWeapon) return new MeleeWeaponModel();
+    if (type == ModelType::RangedWeapon) return new RangedWeaponModel();
+    if (type == ModelType::Armor) return new ArmorModel();
+    if (type == ModelType::Book) return new BookModel();
+    if (type == ModelType::Container) return new ContainerModel();
+    if (type == ModelType::Currency) return new CurrencyModel();
+    if (type == ModelType::Food) return new FoodModel();
+    if (type == ModelType::Furniture) return new FurnitureModel();
+    if (type == ModelType::Key) return new KeyModel();
+    if (type == ModelType::Light) return new LightModel();
+    if (type == ModelType::LiquidContainer) return new LiquidContainerModel();
+    if (type == ModelType::Mechanism) return new MechanismModel();
+    if (type == ModelType::Node) return new NodeModel();
+    if (type == ModelType::Projectile) return new ProjectileModel();
+    if (type == ModelType::Resource) return new ResourceModel();
+    if (type == ModelType::Rope) return new RopeModel();
+    if (type == ModelType::Seed) return new SeedModel();
+    if (type == ModelType::Shield) return new ShieldModel();
+    if (type == ModelType::Shop) return new ShopModel();
+    if (type == ModelType::Tool) return new ToolModel();
+    if (type == ModelType::Vehicle) return new VehicleModel();
+    if (type == ModelType::Magazine) return new MagazineModel();
     return nullptr;
 }
 
 std::string GetModelFlagString(unsigned int flags)
 {
     std::string flagList;
-    if (HasFlag(flags, ModelFlag::Static))
-    { flagList += "|Static"; }
-    if (HasFlag(flags, ModelFlag::Invisible))
-    { flagList += "|Invisible"; }
-    if (HasFlag(flags, ModelFlag::Unbreakable))
-    { flagList += "|Unbreakable"; }
-    if (HasFlag(flags, ModelFlag::NoSaleable))
-    { flagList += "|NoSaleable"; }
-    if (HasFlag(flags, ModelFlag::TwoHand))
-    { flagList += "|TwoHand"; }
-    if (HasFlag(flags, ModelFlag::CanClose))
-    { flagList += "|CanClose"; }
-    if (HasFlag(flags, ModelFlag::CanSeeThrough))
-    { flagList += "|CanSeeThrough"; }
-    if (HasFlag(flags, ModelFlag::CanBeStacked))
-    { flagList += "|CanBeStacked"; }
-    if (!flagList.empty())
-    {
-        flagList += "|";
-    }
+    if (HasFlag(flags, ModelFlag::Static)) flagList += "|Static";
+    if (HasFlag(flags, ModelFlag::Invisible)) flagList += "|Invisible";
+    if (HasFlag(flags, ModelFlag::Unbreakable)) flagList += "|Unbreakable";
+    if (HasFlag(flags, ModelFlag::NoSaleable)) flagList += "|NoSaleable";
+    if (HasFlag(flags, ModelFlag::TwoHand)) flagList += "|TwoHand";
+    if (HasFlag(flags, ModelFlag::CanClose)) flagList += "|CanClose";
+    if (HasFlag(flags, ModelFlag::CanSeeThrough)) flagList += "|CanSeeThrough";
+    if (HasFlag(flags, ModelFlag::CanBeStacked)) flagList += "|CanBeStacked";
+    if (!flagList.empty()) flagList += "|";
     return flagList;
 }
 

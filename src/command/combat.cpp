@@ -20,7 +20,8 @@
 #include "../action/scoutAction.hpp"
 #include "../action/reloadAction.hpp"
 #include "../action/loadAction.hpp"
-#include "../item/item.hpp"
+#include "../action/unloadAction.hpp"
+#include "../model/magazineModel.hpp"
 
 void LoadCombatCommands()
 {
@@ -52,6 +53,13 @@ void LoadCombatCommands()
         command.help = "Allows to load a magazine with projectiles.";
         command.args = "";
         command.hndl = DoLoad;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "unload";
+        command.help = "Allows to unload a magazine.";
+        command.args = "";
+        command.hndl = DoUnload;
         Mud::instance().addCommand(command);
     }
     {
@@ -253,7 +261,34 @@ void DoLoad(Character * character, ArgumentHandler & args)
                     }
                     else
                     {
-                        auto requiredTime = 2;
+                        auto ammountToLoad = magazine->model->toMagazine()->maxAmmount;
+                        if (!magazine->isEmpty())
+                        {
+                            auto alreadyLoadedProjectile = magazine->content.front();
+                            unsigned int ammountAlreadyLoaded = 0;
+                            if (alreadyLoadedProjectile == nullptr)
+                            {
+                                character->sendMsg("Something is gone wrong while you were loading %s...\n\n",
+                                                   magazine->getName(true));
+                                return;
+                            }
+                            // If there are projectiles inside, check if the two types of projectiles are compatible.
+                            if (!projectile->canStackWith(alreadyLoadedProjectile))
+                            {
+                                character->sendMsg(
+                                    "The magazine already contains a different type of projectiles...\n\n");
+                                return;
+                            }
+                            // Set the ammount of already loaded projectiles.
+                            ammountAlreadyLoaded = alreadyLoadedProjectile->quantity;
+                            if (ammountToLoad <= ammountAlreadyLoaded)
+                            {
+                                character->sendMsg("The magazine is already at full capacity...\n\n");
+                                return;
+                            }
+                            ammountToLoad -= ammountAlreadyLoaded;
+                        }
+                        double requiredTime = 0.5 * ammountToLoad;
                         auto newAction = std::make_shared<LoadAction>(magazine, projectile, character, requiredTime);
                         // Check the new action.
                         if (!newAction->check())
@@ -265,11 +300,65 @@ void DoLoad(Character * character, ArgumentHandler & args)
                             // Send the starting message.
                             character->sendMsg("You start loading %s with %s.\n",
                                                magazine->getName(true),
-                                               magazine->getName(true));
+                                               projectile->getName(true));
                             // Set the new action.
                             character->setAction(newAction);
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+void DoUnload(Character * character, ArgumentHandler & args)
+{
+    if (args.size() != 1)
+    {
+        character->sendMsg("What do you want to unload?\n");
+    }
+    else
+    {
+        auto magazine = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
+        if (magazine == nullptr)
+        {
+            character->sendMsg("You don't have %s.\n", args[0].getContent());
+        }
+        else
+        {
+            if (magazine->getType() != ModelType::Magazine)
+            {
+                character->sendMsg("You can't unload %s.\n", magazine->getName(true));
+            }
+            else
+            {
+                if (magazine->isEmpty())
+                {
+                    character->sendMsg("%s is already empty...\n", magazine->getNameCapital(true));
+                    return;
+                }
+                auto loadedProjectile = magazine->content.front();
+                if (loadedProjectile == nullptr)
+                {
+                    character->sendMsg("Something is gone wrong while you were unloading %s...\n\n",
+                                       magazine->getName(true));
+                    return;
+                }
+                // Set the required time to unloaded the magazine.
+                double requiredTime = 0.25 * loadedProjectile->quantity;
+                // Create the unload action.
+                auto newAction = std::make_shared<UnloadAction>(magazine, character, requiredTime);
+                // Check the new action.
+                if (!newAction->check())
+                {
+                    character->sendMsg("You can't unload %s.\n", magazine->getName(true));
+                }
+                else
+                {
+                    // Send the starting message.
+                    character->sendMsg("You start unloading %s.\n", magazine->getName(true));
+                    // Set the new action.
+                    character->setAction(newAction);
                 }
             }
         }

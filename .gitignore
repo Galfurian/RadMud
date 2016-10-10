@@ -2,4 +2,5 @@
 .project
 .idea
 build
+build-clang
 Default

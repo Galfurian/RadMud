@@ -152,8 +152,8 @@ bool Item::updateOnDB()
     arguments.push_back(ToString(model->vnum));
     arguments.push_back(ToString(this->quantity));
     arguments.push_back(this->maker);
-    arguments.push_back(ToString(this->getPrice(false))); // Save the weight of one item.
-    arguments.push_back(ToString(this->getWeight(false))); // Save the weight of one item.
+    arguments.push_back(ToString(this->price));  // Save the basic value of price.
+    arguments.push_back(ToString(this->weight)); // Save the weight of just the item.
     arguments.push_back(ToString(this->condition));
     arguments.push_back(ToString(this->maxCondition));
     arguments.push_back(ToString(this->composition->vnum));
@@ -893,40 +893,12 @@ bool Item::operator<(Item & rhs) const
 
 Item * GenerateItem(const ModelType & type)
 {
-    switch (type)
-    {
-        case ModelType::Armor:
-            return new ArmorItem();
-        case ModelType::Shop:
-            return new ShopItem();
-        case ModelType::MeleeWeapon:
-            return new MeleeWeaponItem();
-        case ModelType::RangedWeapon:
-            return new RangedWeaponItem();
-        case ModelType::Currency:
-            return new CurrencyItem();
-        case ModelType::Corpse:
-            return new CorpseItem();
-        case ModelType::Book:
-        case ModelType::Container:
-        case ModelType::Food:
-        case ModelType::Furniture:
-        case ModelType::Key:
-        case ModelType::Light:
-        case ModelType::LiquidContainer:
-        case ModelType::Mechanism:
-        case ModelType::Node:
-        case ModelType::Projectile:
-        case ModelType::Resource:
-        case ModelType::Rope:
-        case ModelType::Seed:
-        case ModelType::Shield:
-        case ModelType::Tool:
-        case ModelType::Magazine:
-        case ModelType::Vehicle:
-            return new Item();
-        case ModelType::NoType:
-            return nullptr;
-    }
-    return nullptr;
+    if (type == ModelType::NoType) return nullptr;
+    if (type == ModelType::Armor) return new ArmorItem();
+    if (type == ModelType::Shop) return new ShopItem();
+    if (type == ModelType::MeleeWeapon) return new MeleeWeaponItem();
+    if (type == ModelType::RangedWeapon) return new RangedWeaponItem();
+    if (type == ModelType::Currency) return new CurrencyItem();
+    if (type == ModelType::Corpse) return new CorpseItem();
+    return new Item();
 }

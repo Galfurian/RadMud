@@ -69,30 +69,26 @@ ActionStatus LoadAction::perform()
     // First check if there are already some projectiles inside the magazine.
     if (!itemToBeLoaded->isEmpty())
     {
-        Logger::log(LogLevel::Debug, "The magazine is NOT empty...");
-        Item * alreadyLoadedProjectiles = itemToBeLoaded->content.front();
-        if (alreadyLoadedProjectiles == nullptr)
+        Item * alreadyLoadedProjectile = itemToBeLoaded->content.front();
+        if (alreadyLoadedProjectile == nullptr)
         {
             actor->sendMsg("Something is gone wrong while you were loading %s...\n\n", itemToBeLoaded->getName(true));
             return ActionStatus::Error;
         }
         // If there are projectiles inside, check if the two types of projectiles are compatible.
-        if (!projectile->canStackWith(alreadyLoadedProjectiles))
+        if (!projectile->canStackWith(alreadyLoadedProjectile))
         {
             actor->sendMsg("The magazine already contains a different type of projectiles...\n\n");
             return ActionStatus::Error;
         }
         // Set the ammount of already loaded projectiles.
-        ammountAlreadyLoaded = alreadyLoadedProjectiles->quantity;
+        ammountAlreadyLoaded = alreadyLoadedProjectile->quantity;
         if (ammountToLoad <= ammountAlreadyLoaded)
         {
             actor->sendMsg("The magazine is already at full capacity...\n\n");
             return ActionStatus::Finished;
         }
         ammountToLoad -= ammountAlreadyLoaded;
-        Logger::log(LogLevel::Debug, "To Load   : %s", ToString(ammountToLoad));
-        Logger::log(LogLevel::Debug, "Loaded    : %s", ToString(ammountAlreadyLoaded));
-        Logger::log(LogLevel::Debug, "Available : %s", ToString(projectile->quantity));
         SQLiteDbms::instance().beginTransaction();
         if (projectile->quantity < ammountToLoad)
         {
@@ -100,9 +96,9 @@ ActionStatus LoadAction::perform()
         }
         else
         {
-            alreadyLoadedProjectiles->quantity += ammountToLoad;
+            alreadyLoadedProjectile->quantity += ammountToLoad;
             projectile->quantity -= ammountToLoad;
-            alreadyLoadedProjectiles->updateOnDB();
+            alreadyLoadedProjectile->updateOnDB();
             projectile->updateOnDB();
         }
         SQLiteDbms::instance().endTransaction();
