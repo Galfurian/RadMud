@@ -44,7 +44,8 @@ using ActionType = enum class ActionType_t
     Building,   ///< The character is crafting something.
     Combat,     ///< The character is fighting.
     Scout,      ///< The character is scouting the area.
-    Reload      ///< The character is reloading a firearm.
+    Reload,     ///< The character is reloading a firearm.
+    Load        ///< The character is loading something.
 };
 
 /// The list of possible actions.

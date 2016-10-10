@@ -106,5 +106,6 @@ std::string GetActionTypeName(ActionType type)
     if (type == ActionType::Combat) return "Fighting";
     if (type == ActionType::Scout) return "Scouting";
     if (type == ActionType::Reload) return "Reloading";
+    if (type == ActionType::Load) return "Loading";
     return "No Action";
 }

@@ -19,6 +19,7 @@
 #include "../mud.hpp"
 #include "../action/scoutAction.hpp"
 #include "../action/reloadAction.hpp"
+#include "../action/loadAction.hpp"
 
 void LoadCombatCommands()
 {
@@ -43,6 +44,13 @@ void LoadCombatCommands()
         command.help = "Provides information about the surrounding area.";
         command.args = "";
         command.hndl = DoScout;
+        Mud::instance().addCommand(command);
+    }
+    {
+        command.name = "load";
+        command.help = "Allows to load a magazine with projectiles.";
+        command.args = "";
+        command.hndl = DoLoad;
         Mud::instance().addCommand(command);
     }
     {
@@ -208,6 +216,65 @@ void DoScout(Character * character, ArgumentHandler & /*args*/)
     character->setAction(newAction);
 }
 
+void DoLoad(Character * character, ArgumentHandler & args)
+{
+    if (args.size() != 2)
+    {
+        character->sendMsg("What do you want to load with what?\n");
+    }
+    else
+    {
+        auto magazine = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
+        if (magazine == nullptr)
+        {
+            character->sendMsg("You don't have %s.\n", args[0].getContent());
+        }
+        else
+        {
+            if (magazine->getType() != ModelType::Magazine)
+            {
+                character->sendMsg("You can't load %s.\n", magazine->getName(true));
+            }
+            else
+            {
+                auto projectiles = character->findNearbyItem(args[1].getContent(), args[1].getIndex());
+                if (projectiles == nullptr)
+                {
+                    character->sendMsg("You don't have %s.\n", args[1].getContent());
+                }
+                else
+                {
+                    if (projectiles->getType() != ModelType::Projectile)
+                    {
+                        character->sendMsg("You can't load %s with %s.\n",
+                                           magazine->getName(true),
+                                           projectiles->getName(true));
+                    }
+                    else
+                    {
+                        auto requiredTime = 2;
+                        auto newAction = std::make_shared<LoadAction>(magazine, character, requiredTime);
+                        // Check the new action.
+                        if (!newAction->check())
+                        {
+                            character->sendMsg("You can't load %s.\n", magazine->getName(true));
+                        }
+                        else
+                        {
+                            // Send the starting message.
+                            character->sendMsg("You start loading %s with %s.\n",
+                                               magazine->getName(true),
+                                               magazine->getName(true));
+                            // Set the new action.
+                            character->setAction(newAction);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 void DoReload(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 2)
@@ -225,7 +292,7 @@ void DoReload(Character * character, ArgumentHandler & args)
         {
             if (nearbyItem->getType() != ModelType::RangedWeapon)
             {
-                character->sendMsg("You can't reload %s.\n", args[0].getContent());
+                character->sendMsg("You can't reload %s.\n", nearbyItem->getName(true));
             }
             else
             {
@@ -237,21 +304,30 @@ void DoReload(Character * character, ArgumentHandler & args)
                 }
                 else
                 {
-                    auto requiredTime = 2;
-                    auto newAction = std::make_shared<ReloadAction>(weapon, character, requiredTime);
-                    // Check the new action.
-                    if (!newAction->check())
+                    if (magazine->getType() != ModelType::Magazine)
                     {
-                        character->sendMsg("You can't reload %s.\n", weapon->getName(true));
+                        character->sendMsg("You can't reload %s with %s.\n",
+                                           weapon->getName(true),
+                                           magazine->getName(true));
                     }
                     else
                     {
-                        // Send the starting message.
-                        character->sendMsg("You start reloading %s with %s.",
-                                           weapon->getName(true),
-                                           magazine->getName(true));
-                        // Set the new action.
-                        character->setAction(newAction);
+                        auto requiredTime = 2;
+                        auto newAction = std::make_shared<ReloadAction>(weapon, character, requiredTime);
+                        // Check the new action.
+                        if (!newAction->check())
+                        {
+                            character->sendMsg("You can't reload %s.\n", weapon->getName(true));
+                        }
+                        else
+                        {
+                            // Send the starting message.
+                            character->sendMsg("You start reloading %s with %s.\n",
+                                               weapon->getName(true),
+                                               magazine->getName(true));
+                            // Set the new action.
+                            character->setAction(newAction);
+                        }
                     }
                 }
             }

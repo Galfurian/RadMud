@@ -36,7 +36,10 @@ void DoFlee(Character * character, ArgumentHandler & args);
 /// Provides information about the surrounding area.
 void DoScout(Character * character, ArgumentHandler & args);
 
-/// Allows to reload a firearm
+/// Allows to load a magazine with projectiles.
+void DoLoad(Character * character, ArgumentHandler & args);
+
+/// Allows to reload a firearm.
 void DoReload(Character * character, ArgumentHandler & args);
 
 ///@}

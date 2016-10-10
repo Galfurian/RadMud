@@ -1,7 +1,7 @@
-/// @file   ReloadAction.cpp
-/// @brief  Implementation of the class for reloading activities.
+/// @file   loadAction.cpp
+/// @brief  Implementation of the class for loading activities.
 /// @author Enrico Fraccaroli
-/// @date   Oct 9 2016
+/// @date   Oct 10 2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission to use, copy, modify, and distribute this software for any
@@ -16,59 +16,59 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#include "reloadAction.hpp"
+#include "loadAction.hpp"
 #include "../character/character.hpp"
 
-ReloadAction::ReloadAction(RangedWeaponItem * _weapon, Character * _actor, unsigned int _cooldown) :
+LoadAction::LoadAction(Item * _itemToBeLoaded, Character * _actor, unsigned int _cooldown) :
     GeneralAction(_actor, std::chrono::system_clock::now() + std::chrono::seconds(_cooldown)),
-    weapon(_weapon)
+    itemToBeLoaded(_itemToBeLoaded)
 {
     Logger::log(LogLevel::Debug, "Created reload action.");
 }
 
-ReloadAction::~ReloadAction()
+LoadAction::~LoadAction()
 {
     Logger::log(LogLevel::Debug, "Deleted reload action.");
 }
 
-bool ReloadAction::check() const
+bool LoadAction::check() const
 {
     bool correct = GeneralAction::check();
-    correct &= this->checkWeapon();
+    correct &= this->checkItem();
     return correct;
 }
 
-ActionType ReloadAction::getType() const
+ActionType LoadAction::getType() const
 {
-    return ActionType::Reload;
+    return ActionType::Load;
 }
 
-std::string ReloadAction::getDescription() const
+std::string LoadAction::getDescription() const
 {
-    return "reloading";
+    return "loading";
 }
 
-std::string ReloadAction::stop()
+std::string LoadAction::stop()
 {
-    return "You stop reloading " + weapon->getName(true) + ".";
+    return "You stop loading " + itemToBeLoaded->getName(true) + ".";
 }
 
-ActionStatus ReloadAction::perform()
+ActionStatus LoadAction::perform()
 {
     // Check if the cooldown is ended.
     if (!this->checkElapsed())
     {
         return ActionStatus::Running;
     }
-    actor->sendMsg("You have finished reloading %s...\n\n", this->weapon->getName(true));
+    actor->sendMsg("You have finished loading %s...\n\n", this->itemToBeLoaded->getName(true));
     return ActionStatus::Finished;
 }
 
-bool ReloadAction::checkWeapon() const
+bool LoadAction::checkItem() const
 {
-    if (weapon == nullptr)
+    if (itemToBeLoaded == nullptr)
     {
-        Logger::log(LogLevel::Error, "The weapon is a null pointer.");
+        Logger::log(LogLevel::Error, "The item is a null pointer.");
         return false;
     }
     return true;
