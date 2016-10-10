@@ -18,10 +18,12 @@
 
 #include "reloadAction.hpp"
 #include "../character/character.hpp"
+#include "../sqlite/sqliteDbms.hpp"
 
-ReloadAction::ReloadAction(RangedWeaponItem * _weapon, Character * _actor, unsigned int _cooldown) :
+ReloadAction::ReloadAction(RangedWeaponItem * _weapon, Item * _magazine, Character * _actor, unsigned int _cooldown) :
     GeneralAction(_actor, std::chrono::system_clock::now() + std::chrono::seconds(_cooldown)),
-    weapon(_weapon)
+    weapon(_weapon),
+    magazine(_magazine)
 {
     Logger::log(LogLevel::Debug, "Created reload action.");
 }
@@ -35,6 +37,7 @@ bool ReloadAction::check() const
 {
     bool correct = GeneralAction::check();
     correct &= this->checkWeapon();
+    correct &= this->checkMagazine();
     return correct;
 }
 
@@ -50,7 +53,7 @@ std::string ReloadAction::getDescription() const
 
 std::string ReloadAction::stop()
 {
-    return "You stop reloading " + weapon->getName(true) + ".";
+    return "You stop reloading " + weapon->getName(true) + " with " + magazine->getName(true) + ".";
 }
 
 ActionStatus ReloadAction::perform()
@@ -60,6 +63,25 @@ ActionStatus ReloadAction::perform()
     {
         return ActionStatus::Running;
     }
+    // First check if there is already a magazine inside the weapon.
+    if (!weapon->isEmpty())
+    {
+        actor->sendMsg("%s already contains a magazine...\n\n", weapon->getName(true));
+        return ActionStatus::Error;
+    }
+    SQLiteDbms::instance().beginTransaction();
+    if (!actor->remEquipmentItem(magazine))
+    {
+        if (!actor->remInventoryItem(magazine))
+        {
+            // Rollback the transaction.
+            SQLiteDbms::instance().rollbackTransection();
+            actor->sendMsg("Something is gone wrong while you were reloading %s...\n\n", weapon->getName(true));
+            return ActionStatus::Error;
+        }
+    }
+    weapon->putInside(magazine);
+    SQLiteDbms::instance().endTransaction();
     actor->sendMsg("You have finished reloading %s...\n\n", this->weapon->getName(true));
     return ActionStatus::Finished;
 }
@@ -69,6 +91,16 @@ bool ReloadAction::checkWeapon() const
     if (weapon == nullptr)
     {
         Logger::log(LogLevel::Error, "The weapon is a null pointer.");
+        return false;
+    }
+    return true;
+}
+
+bool ReloadAction::checkMagazine() const
+{
+    if (magazine == nullptr)
+    {
+        Logger::log(LogLevel::Error, "The magazine is a null pointer.");
         return false;
     }
     return true;

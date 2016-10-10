@@ -482,6 +482,7 @@ bool Item::isEmpty() const
 {
     if (this->isAContainer()) return content.empty();
     if (model->getType() == ModelType::Magazine) return content.empty();
+    if (model->getType() == ModelType::RangedWeapon) return content.empty();
     if (model->getType() == ModelType::LiquidContainer) return (contentLiq.first == nullptr);
     return true;
 }
@@ -752,12 +753,29 @@ std::string Item::lookContent()
         }
         else
         {
-            Item * loadedProjectiles = content.front();
+            auto loadedProjectiles = content.front();
             if (loadedProjectiles != nullptr)
             {
                 output += Formatter::italic();
                 output += "It contains " + loadedProjectiles->getName(true) + "[";
                 output += ToString(loadedProjectiles->quantity) + "].\n";
+                output += Formatter::reset();
+            }
+        }
+    }
+    else if (model->getType() == ModelType::RangedWeapon)
+    {
+        if (content.empty())
+        {
+            output += Formatter::italic() + "It does not contain any magazine.\n" + Formatter::reset();
+        }
+        else
+        {
+            auto containedMagazine = content.front();
+            if (containedMagazine != nullptr)
+            {
+                output += Formatter::italic();
+                output += "It is loaded with " + containedMagazine->getName(true) + "\n";
                 output += Formatter::reset();
             }
         }

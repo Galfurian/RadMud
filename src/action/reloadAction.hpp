@@ -28,10 +28,12 @@ class ReloadAction :
 private:
     /// The weapon which has to be reloaded.
     RangedWeaponItem * weapon;
+    /// The magazine used to load the weapon.
+    Item * magazine;
 
 public:
     /// @brief Constructor.
-    ReloadAction(RangedWeaponItem * _weapon, Character * _actor, unsigned int _cooldown);
+    ReloadAction(RangedWeaponItem * _weapon, Item * _magazine, Character * _actor, unsigned int _cooldown);
 
     /// @brief Destructor.
     virtual ~ReloadAction();
@@ -51,4 +53,9 @@ private:
     /// @return <b>True</b> if the weapon is available,<br>
     ///         <b>False</b> otherwise.
     bool checkWeapon() const;
+
+    /// @brief Checks the magazine.
+    /// @return <b>True</b> if the magazine is available,<br>
+    ///         <b>False</b> otherwise.
+    bool checkMagazine() const;
 };

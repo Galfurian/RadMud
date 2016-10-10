@@ -62,23 +62,23 @@ ActionStatus UnloadAction::perform()
     {
         return ActionStatus::Running;
     }
-    // First check if there are some projectiles inside the magazine.
+    // First check if there is the item inside the magazine.
     if (itemToBeUnloaded->isEmpty())
     {
         actor->sendMsg("%s is already empty...\n\n", itemToBeUnloaded->getNameCapital(true));
     }
     else
     {
-        Item * loadedProjectile = itemToBeUnloaded->content.front();
-        if (loadedProjectile == nullptr)
+        auto loadedItem = itemToBeUnloaded->content.front();
+        if (loadedItem == nullptr)
         {
             actor->sendMsg("Something is gone wrong while you were unloading %s...\n\n",
                            itemToBeUnloaded->getName(true));
             return ActionStatus::Error;
         }
         SQLiteDbms::instance().beginTransaction();
-        itemToBeUnloaded->takeOut(loadedProjectile);
-        actor->addInventoryItem(loadedProjectile);
+        itemToBeUnloaded->takeOut(loadedItem);
+        actor->addInventoryItem(loadedItem);
         SQLiteDbms::instance().endTransaction();
         actor->sendMsg("You have finished unloading %s...\n\n", itemToBeUnloaded->getName(true));
     }
