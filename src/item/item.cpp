@@ -31,6 +31,7 @@
 #include "currencyItem.hpp"
 #include "meleeWeaponItem.hpp"
 #include "rangedWeaponItem.hpp"
+#include "magazineItem.hpp"
 
 Item::Item() :
     vnum(),
@@ -871,6 +872,11 @@ CorpseItem * Item::toCorpseItem()
     return static_cast<CorpseItem *>(this);
 }
 
+MagazineItem * Item::toMagazineItem()
+{
+    return static_cast<MagazineItem *>(this);
+}
+
 void Item::luaRegister(lua_State * L)
 {
     luabridge::getGlobalNamespace(L)
@@ -918,5 +924,6 @@ Item * GenerateItem(const ModelType & type)
     if (type == ModelType::RangedWeapon) return new RangedWeaponItem();
     if (type == ModelType::Currency) return new CurrencyItem();
     if (type == ModelType::Corpse) return new CorpseItem();
+    if (type == ModelType::Magazine) return new MagazineItem();
     return new Item();
 }

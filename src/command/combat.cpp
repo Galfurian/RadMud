@@ -21,7 +21,7 @@
 #include "../action/reloadAction.hpp"
 #include "../action/loadAction.hpp"
 #include "../action/unloadAction.hpp"
-#include "../model/magazineModel.hpp"
+#include "../item/magazineItem.hpp"
 
 void LoadCombatCommands()
 {
@@ -230,84 +230,51 @@ void DoLoad(Character * character, ArgumentHandler & args)
     if (args.size() != 2)
     {
         character->sendMsg("What do you want to load with what?\n");
+        return;
+    }
+
+    auto foundItem = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
+    if (foundItem == nullptr)
+    {
+        character->sendMsg("You don't have %s.\n", args[0].getContent());
+        return;
+    }
+
+    if (foundItem->getType() != ModelType::Magazine)
+    {
+        character->sendMsg("You can't load %s.\n", foundItem->getName(true));
+        return;
+    }
+    auto magazine = foundItem->toMagazineItem();
+
+    auto projectile = character->findNearbyItem(args[1].getContent(), args[1].getIndex());
+    if (projectile == nullptr)
+    {
+        character->sendMsg("You don't have %s.\n", args[1].getContent());
+        return;
+    }
+    std::string error;
+    unsigned int ammountToLoad = 0;
+    if (!magazine->getAmountToLoad(projectile, ammountToLoad, error))
+    {
+        character->sendMsg(error + ".\n");
+        return;
+    }
+    double requiredTime = 0.5 * ammountToLoad;
+    auto newAction = std::make_shared<LoadAction>(magazine, projectile, character, requiredTime);
+    // Check the new action.
+    if (!newAction->check())
+    {
+        character->sendMsg("You can't load %s.\n", magazine->getName(true));
     }
     else
     {
-        auto magazine = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
-        if (magazine == nullptr)
-        {
-            character->sendMsg("You don't have %s.\n", args[0].getContent());
-        }
-        else
-        {
-            if (magazine->getType() != ModelType::Magazine)
-            {
-                character->sendMsg("You can't load %s.\n", magazine->getName(true));
-            }
-            else
-            {
-                auto projectile = character->findNearbyItem(args[1].getContent(), args[1].getIndex());
-                if (projectile == nullptr)
-                {
-                    character->sendMsg("You don't have %s.\n", args[1].getContent());
-                }
-                else
-                {
-                    if (projectile->getType() != ModelType::Projectile)
-                    {
-                        character->sendMsg("You can't load %s with %s.\n",
-                                           magazine->getName(true),
-                                           projectile->getName(true));
-                    }
-                    else
-                    {
-                        auto ammountToLoad = magazine->model->toMagazine()->maxAmmount;
-                        if (!magazine->isEmpty())
-                        {
-                            auto alreadyLoadedProjectile = magazine->content.front();
-                            unsigned int ammountAlreadyLoaded = 0;
-                            if (alreadyLoadedProjectile == nullptr)
-                            {
-                                character->sendMsg("Something is gone wrong while you were loading %s...\n\n",
-                                                   magazine->getName(true));
-                                return;
-                            }
-                            // If there are projectiles inside, check if the two types of projectiles are compatible.
-                            if (!projectile->canStackWith(alreadyLoadedProjectile))
-                            {
-                                character->sendMsg(
-                                    "The magazine already contains a different type of projectiles...\n\n");
-                                return;
-                            }
-                            // Set the ammount of already loaded projectiles.
-                            ammountAlreadyLoaded = alreadyLoadedProjectile->quantity;
-                            if (ammountToLoad <= ammountAlreadyLoaded)
-                            {
-                                character->sendMsg("The magazine is already at full capacity...\n\n");
-                                return;
-                            }
-                            ammountToLoad -= ammountAlreadyLoaded;
-                        }
-                        double requiredTime = 0.5 * ammountToLoad;
-                        auto newAction = std::make_shared<LoadAction>(magazine, projectile, character, requiredTime);
-                        // Check the new action.
-                        if (!newAction->check())
-                        {
-                            character->sendMsg("You can't load %s.\n", magazine->getName(true));
-                        }
-                        else
-                        {
-                            // Send the starting message.
-                            character->sendMsg("You start loading %s with %s.\n",
-                                               magazine->getName(true),
-                                               projectile->getName(true));
-                            // Set the new action.
-                            character->setAction(newAction);
-                        }
-                    }
-                }
-            }
-        }
+        // Send the starting message.
+        character->sendMsg("You start loading %s with %s.\n",
+                           magazine->getName(true),
+                           projectile->getName(true));
+        // Set the new action.
+        character->setAction(newAction);
     }
 }
 
@@ -356,7 +323,7 @@ void DoUnload(Character * character, ArgumentHandler & args)
         requiredTime = 1.0;
     }
     // Create the unload action.
-    auto newAction = std::make_shared<UnloadAction>(loadedItem, character, requiredTime);
+    auto newAction = std::make_shared<UnloadAction>(itemToUnload, character, requiredTime);
     // Check the new action.
     if (!newAction->check())
     {

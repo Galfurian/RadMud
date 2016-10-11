@@ -48,6 +48,8 @@ class CurrencyItem;
 
 class CorpseItem;
 
+class MagazineItem;
+
 /// @brief Holds details about items.
 class Item
 {
@@ -302,8 +304,11 @@ public:
     /// @brief Returns the model <b>statically</b> casted to Currency.
     CurrencyItem * toCurrencyItem();
 
-    /// @brief Returns the model <b>statically</b> casted to Currency.
+    /// @brief Returns the model <b>statically</b> casted to Corpse.
     CorpseItem * toCorpseItem();
+
+    /// @brief Returns the model <b>statically</b> casted to Magazine.
+    MagazineItem * toMagazineItem();
 
     /// @brief Function used to register inside the lua environment the class.
     /// @param L The lua environment.

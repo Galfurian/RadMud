@@ -15,9 +15,9 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#include <magazineModel.hpp>
 #include "rangedWeaponItem.hpp"
 #include "../model/rangedWeaponModel.hpp"
+#include "../model/magazineModel.hpp"
 
 RangedWeaponItem::RangedWeaponItem()
 {
