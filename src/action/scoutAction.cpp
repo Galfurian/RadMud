@@ -65,15 +65,14 @@ ActionStatus ScoutAction::perform()
     // Consume the stamina.
     actor->remStamina(consumedStamina, true);
     // Show the surrounding.
-    std::vector<Character *> targets;
-    if (!actor->getCharactersInSight(targets))
+    if (!actor->getCharactersInSight(actor->charactersInSight))
     {
         actor->sendMsg("You have found nothing...\n");
     }
     else
     {
         actor->sendMsg("Nearby you see...\n");
-        for (auto it : targets)
+        for (auto it : actor->charactersInSight)
         {
             actor->sendMsg("    %s\n", it->getName());
         }

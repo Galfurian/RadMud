@@ -69,6 +69,13 @@ void LoadCombatCommands()
         command.hndl = DoReload;
         Mud::instance().addCommand(command);
     }
+    {
+        command.name = "aim";
+        command.help = "Allows to aim a target.";
+        command.args = "";
+        command.hndl = DoAim;
+        Mud::instance().addCommand(command);
+    }
 }
 
 void DoKill(Character * character, ArgumentHandler & args)
@@ -407,4 +414,80 @@ void DoReload(Character * character, ArgumentHandler & args)
         // Set the new action.
         character->setAction(newAction);
     }
+}
+
+void DoAim(Character * character, ArgumentHandler & args)
+{
+    if (args.size() != 1)
+    {
+        character->sendMsg("Who or what do you want to aim?\n");
+        return;
+    }
+    auto target = args[0].getContent();
+    auto number = args[0].getIndex();
+    Character * aimedCharacter = nullptr;
+    for (auto characterInSight: character->charactersInSight)
+    {
+        // Check the target.
+        if (characterInSight == nullptr) continue;
+        // Check if the target is the one choosen by the character.
+        // Get the coordinates.
+        auto originCoord = character->room->coord;
+        // Check if the character is a mobile or a player.
+        bool found = false;
+        if (characterInSight->isMobile())
+        {
+            if (characterInSight->toMobile()->hasKey(ToLower(args[0].getContent())))
+            {
+                if (number > 1)
+                {
+                    number -= 1;
+                    continue;
+                }
+                found = true;
+            }
+        }
+        else
+        {
+            if (characterInSight->toPlayer()->isPlaying())
+            {
+                if (BeginWith(characterInSight->toPlayer()->getName(), ToLower(target)))
+                {
+                    if (number > 1)
+                    {
+                        number -= 1;
+                        continue;
+                    }
+                    found = true;
+                }
+            }
+        }
+        // Check if the target is still in sight.
+        if (found)
+        {
+            // Check the room of the target.
+            if (characterInSight->room == nullptr)
+            {
+                continue;
+            }
+            // Get the coordinates of the target.
+            auto targetCoord = characterInSight->room->coord;
+            if (character->room->area->fastInSight(originCoord, targetCoord, character->getViewDistance()))
+            {
+                aimedCharacter = characterInSight;
+                break;
+            }
+            else
+            {
+                character->sendMsg("%s is out of your line of sight...\n", characterInSight->getNameCapital());
+                return;
+            }
+        }
+    }
+    if (aimedCharacter == nullptr)
+    {
+        character->sendMsg("You don't see '%s' anywhere...\n", target);
+        return;
+    }
+    character->sendMsg("You aim at %s...\n", aimedCharacter->getName());
 }

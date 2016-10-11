@@ -51,7 +51,8 @@ Character::Character() :
     effects(),
     L(luaL_newstate()),
     opponents(this),
-    actionQueue()
+    actionQueue(),
+    charactersInSight()
 {
     actionQueue.push_back(std::make_shared<GeneralAction>(this));
     // Nothing to do.
@@ -505,12 +506,12 @@ std::string Character::getStaminaCondition()
     else return "are too tired, you can't even blink your eyes";
 }
 
-int Character::getViewDistance() const
+unsigned int Character::getViewDistance() const
 {
     // Value = 3 + LogMod(PER)
     // MIN   = 3.0
     // MAX   = 7.2
-    return 3 + static_cast<int>(this->getAbilityLog(Ability::Perception, 0.0, 1.0));
+    return 3 + this->getAbilityLog(Ability::Perception, 0.0, 1.0);
 }
 
 void Character::setAction(std::shared_ptr<GeneralAction> _action)
@@ -1514,6 +1515,7 @@ bool Character::getCharactersInSight(std::vector<Character *> & targets)
     std::vector<Character *> exceptions;
     exceptions.push_back(this);
     Coordinates coord = this->room->coord;
+    targets.clear();
     return this->room->area->getCharactersInSight(
         targets,
         exceptions,

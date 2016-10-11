@@ -45,4 +45,7 @@ void DoUnload(Character * character, ArgumentHandler & args);
 /// Allows to reload a firearm.
 void DoReload(Character * character, ArgumentHandler & args);
 
+/// Allows to aim at a target.
+void DoAim(Character * character, ArgumentHandler & args);
+
 ///@}

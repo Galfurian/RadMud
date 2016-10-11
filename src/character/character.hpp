@@ -88,6 +88,8 @@ public:
     OpponentsList opponents;
     /// Character current action.
     std::deque<std::shared_ptr<GeneralAction> > actionQueue;
+    /// List of characters in sight.
+    std::vector<Character *> charactersInSight;
 
     /// @brief Constructor.
     Character();
@@ -270,7 +272,7 @@ public:
 
     /// @brief Evaluate the maximum distance at which the character can still see.
     /// @return The maximum radius of view.
-    int getViewDistance() const;
+    unsigned int getViewDistance() const;
 
     /// @brief Allows to set an action.
     /// @param _action The action that has to be set.

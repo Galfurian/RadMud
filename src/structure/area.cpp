@@ -126,24 +126,25 @@ Room * Area::getRoom(Coordinates coord)
     return this->getRoom(coord.x, coord.y, coord.z);
 }
 
-std::vector<std::string> Area::drawFov(Room * centerRoom, int radius)
+std::vector<std::string> Area::drawFov(Room * centerRoom, const unsigned int & radius)
 {
     std::vector<std::string> layers(3);
     if (!this->inBoundaries(centerRoom->coord))
     {
         return layers;
     }
+    int signedRadius = static_cast<int>(radius);
     // Retrieve the coordinates of the room.
     int origin_x = centerRoom->coord.x;
     int origin_y = centerRoom->coord.y;
     int origin_z = centerRoom->coord.z;
     // Evaluate the minimum and maximum value for x and y.
-    int min_x = (origin_x < radius) ? 0 : (origin_x - radius);
-    int max_x = ((origin_x + radius) > this->width) ? this->width : (origin_x + radius);
-    int min_y = (origin_y < radius) ? 0 : (origin_y - radius);
-    int max_y = ((origin_y + radius - 1) > this->height) ? this->height : (origin_y + radius - 1);
+    int min_x = (origin_x < signedRadius) ? 0 : (origin_x - signedRadius);
+    int max_x = ((origin_x + signedRadius) > this->width) ? this->width : (origin_x + signedRadius);
+    int min_y = (origin_y < signedRadius) ? 0 : (origin_y - signedRadius);
+    int max_y = ((origin_y + signedRadius - 1) > this->height) ? this->height : (origin_y + signedRadius - 1);
     // Create a 2D map of characters.
-    Map2D<MapTile> map(radius * 2, radius * 2);
+    Map2D<MapTile> map(signedRadius * 2, signedRadius * 2);
     // Evaluate the field of view.
     this->fov(map, origin_x, origin_y, origin_z, radius);
     // Prepare Environment layer.
@@ -189,7 +190,7 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, int radius)
                 }
             }
             layers[0] += tileCode;
-            if (x != (origin_x + radius - 1))
+            if (x != (origin_x + signedRadius - 1))
             {
                 layers[0] += ",";
             }
@@ -224,7 +225,7 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, int radius)
                 }
             }
             layers[1] += tileCode;
-            if (x != (origin_x + radius - 1))
+            if (x != (origin_x + signedRadius - 1))
             {
                 layers[1] += ",";
             }
@@ -259,7 +260,7 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, int radius)
                 }
             }
             layers[2] += tileCode;
-            if (x != (origin_x + radius - 1))
+            if (x != (origin_x + signedRadius - 1))
             {
                 layers[2] += ",";
             }
@@ -269,24 +270,25 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, int radius)
     return layers;
 }
 
-std::string Area::drawASCIIFov(Room * centerRoom, int radius)
+std::string Area::drawASCIIFov(Room * centerRoom, const unsigned int & radius)
 {
     std::string result;
     if (!this->inBoundaries(centerRoom->coord))
     {
         return result;
     }
+    int signedRadius = static_cast<int>(radius);
     // Retrieve the coordinates of the room.
     int origin_x = centerRoom->coord.x;
     int origin_y = centerRoom->coord.y;
     int origin_z = centerRoom->coord.z;
     // Evaluate the minimum and maximum value for x and y.
-    int min_x = (origin_x < radius) ? 0 : (origin_x - radius);
-    int max_x = ((origin_x + radius) > this->width) ? this->width : (origin_x + radius);
-    int min_y = (origin_y < radius) ? 0 : (origin_y - radius);
-    int max_y = ((origin_y + radius - 1) > this->height) ? this->height : (origin_y + radius - 1);
+    int min_x = (origin_x < signedRadius) ? 0 : (origin_x - signedRadius);
+    int max_x = ((origin_x + signedRadius) > this->width) ? this->width : (origin_x + signedRadius);
+    int min_y = (origin_y < signedRadius) ? 0 : (origin_y - signedRadius);
+    int max_y = ((origin_y + signedRadius - 1) > this->height) ? this->height : (origin_y + signedRadius - 1);
     // Create a 2D map of characters.
-    Map2D<MapTile> map(radius * 2, radius * 2, MapTile::Void);
+    Map2D<MapTile> map(signedRadius * 2, signedRadius * 2, MapTile::Void);
     // Evaluate the field of view.
     this->fov(map, origin_x, origin_y, origin_z, radius);
     // Prepare Living Creatures layer.
@@ -379,7 +381,7 @@ std::string Area::drawASCIIFov(Room * centerRoom, int radius)
     return result;
 }
 
-void Area::fov(Map2D<MapTile> & map, int origin_x, int origin_y, int origin_z, int radius)
+void Area::fov(Map2D<MapTile> & map, int origin_x, int origin_y, int origin_z, const unsigned int & radius)
 {
     double incr_x = 0.0;
     double incr_y = 0.0;
@@ -401,12 +403,12 @@ void Area::los(
     double incr_x,
     double incr_y,
     double incr_z,
-    int radius)
+    const unsigned int & radius)
 {
     double ox = origin_x + static_cast<double>(0.5f);
     double oy = origin_y + static_cast<double>(0.5f);
     double oz = origin_z + static_cast<double>(0.5f);
-    for (int i = 0; i < radius; ++i)
+    for (unsigned int i = 0; i <= radius; ++i)
     {
         // Transform into integer the coordinates.
         int curr_x = static_cast<int>(ox);
@@ -450,99 +452,39 @@ bool Area::fastInSight(
     int origin_z,
     int target_x,
     int target_y,
-    int target_z,
-    unsigned int radius)
+    int /*target_z*/,
+    const unsigned int & radius)
 {
-    int dx = target_x - origin_x;
-    int dy = target_y - origin_y;
-    int dz = target_z - origin_z;
-    double nx = dx;
-    double ny = dy;
-    double nz = dz;
-    int sign_x = dx > 0 ? 1 : -1;
-    int sign_y = dy > 0 ? 1 : -1;
-    int sign_z = dz > 0 ? 1 : -1;
-    double ix = 0;
-    double iy = 0;
-    double iz = 0;
-    int current_x = 0;
-    int current_y = 0;
-    int current_z = 0;
-    unsigned int step = 0;
-    while (((ix < nx) || (iy < ny) || (iz < nz)) && (step < radius))
+    double deltax = target_x - origin_x;
+    double deltay = target_y - origin_y;
+    double error = -1.0;
+    // Assume deltax != 0 (line is not vertical)
+    double deltaerr = std::abs(deltay / deltax);
+    // note that this division needs to be done in a way that preserves the fractional part
+    int y = origin_y;
+    for (int x = origin_x; x < target_x - 1; ++x)
     {
-        double change_x = (0.5 + ix) / nx;
-        double change_y = (0.5 + iy) / ny;
-        double change_z = (0.5 + iz) / nz;
-
-        if (change_x < change_y)
-        {
-            if (change_x < change_z)
-            {
-                // Next step is on X axis.
-                if ((current_x + sign_x) < 0)
-                {
-                    return false;
-                }
-                else
-                {
-                    current_x += sign_x;
-                    ix++;
-                }
-            }
-            else
-            {
-                // Next step is on Z axis.
-                if ((current_z + sign_z) < 0)
-                {
-                    return false;
-                }
-                else
-                {
-                    current_z += sign_z;
-                    iz++;
-                }
-            }
-        }
-        else
-        {
-            if (change_y < change_z)
-            {
-                // Next step is on Y axis.
-                if ((current_y + sign_y) < 0)
-                {
-                    return false;
-                }
-                else
-                {
-                    current_y += sign_y;
-                    iy++;
-                }
-            }
-            else
-            {
-                // Next step is on Z axis.
-                if ((current_z + sign_z) < 0)
-                {
-                    return false;
-                }
-                else
-                {
-                    current_z += sign_z;
-                    iz++;
-                }
-            }
-        }
-        if (this->getRoom(current_x, current_y, current_z) == nullptr)
+        if (this->getRoom(x, y, origin_z) == nullptr)
         {
             return false;
         }
-        step++;
+        error += deltaerr;
+        if (error >= 0.0)
+        {
+            y += 1;
+        }
+        error -= 1;
+        unsigned int distance = static_cast<unsigned int>(
+            std::sqrt(std::pow(target_x - x, 2) + std::pow(target_y - y, 2)));
+        if (distance > radius)
+        {
+            return false;
+        }
     }
     return true;
 }
 
-bool Area::fastInSight(Coordinates origin, Coordinates target, unsigned int radius)
+bool Area::fastInSight(Coordinates origin, Coordinates target, const unsigned int & radius)
 {
     return this->fastInSight(origin.x, origin.y, origin.z, target.x, target.y, target.z, radius);
 }
@@ -553,8 +495,10 @@ bool Area::getCharactersInSight(
     int origin_x,
     int origin_y,
     int origin_z,
-    int radius)
+    const unsigned int & radius)
 {
+    Logger::log(LogLevel::Debug, "Radius : %s", ToString(radius));
+
     double increment_x = 0.0, increment_y = 0.0, increment_z = 0.0;
     for (float i = 0.0; i < 360; ++i)
     {
@@ -564,7 +508,7 @@ bool Area::getCharactersInSight(
         double ox = origin_x + static_cast<double>(0.5f);
         double oy = origin_y + static_cast<double>(0.5f);
         double oz = origin_z + static_cast<double>(0.5f);
-        for (int distance = 0; distance < radius; ++distance)
+        for (unsigned int distance = 0; distance <= radius; ++distance)
         {
             // Transform into integer the coordinates.
             int curr_x = static_cast<int>(ox);

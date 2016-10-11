@@ -122,13 +122,13 @@ public:
     /// @param centerRoom The room from where the algorithm has to compute the Field of View.
     /// @param radius     The radius of visibility of the character.
     /// @return The map containing all the Information about the Field of View of a character.
-    std::vector<std::string> drawFov(Room * centerRoom, int radius);
+    std::vector<std::string> drawFov(Room * centerRoom, const unsigned int & radius);
 
     /// @brief Draw the Filed of View for a character (ASCII).
     /// @param centerRoom The room from where the algorithm has to compute the Field of View.
     /// @param radius     The radius of visibility of the character.
     /// @return The map containing all the Information about the Field of View of a character.
-    std::string drawASCIIFov(Room * centerRoom, int radius);
+    std::string drawASCIIFov(Room * centerRoom, const unsigned int & radius);
 
     /// @brief Default version of a FOV alforithm.
     /// @param map      A 2D map, where the the Field of View will be drawn.
@@ -136,7 +136,7 @@ public:
     /// @param origin_y The y coordinate of the central room.
     /// @param origin_z The z coordinate of the central room.
     /// @param radius   The radius of visibility of the character.
-    void fov(Map2D<MapTile> & map, int origin_x, int origin_y, int origin_z, int radius);
+    void fov(Map2D<MapTile> & map, int origin_x, int origin_y, int origin_z, const unsigned int & radius);
 
     /// @brief A simple line of sight algorithm.
     /// @param map      The map where the LOS algorithm has to write the line.
@@ -155,7 +155,7 @@ public:
         double incr_x,
         double incr_y,
         double incr_z,
-        int radius);
+        const unsigned int & radius);
 
     /// @brief Determine if a coordinate is in sight from a starting one.
     /// @param origin_x The x coordinate of the central room.
@@ -174,7 +174,7 @@ public:
         int target_x,
         int target_y,
         int target_z,
-        unsigned int radius);
+        const unsigned int & radius);
 
     /// @brief Determine if a coordinate is in sight from a starting one.
     /// @param origin The coordinates of the origin.
@@ -182,7 +182,7 @@ public:
     /// @param radius The radius of visibility.
     /// @return <b>True</b> if the target room is in sight,<br>
     ///         <b>False</b> otherwise.
-    bool fastInSight(Coordinates origin, Coordinates target, unsigned int radius);
+    bool fastInSight(Coordinates origin, Coordinates target, const unsigned int & radius);
 
     /// @brief Provides a list of characters which are in sight.
     /// @param targets    The list which will contain the targets.
@@ -199,7 +199,7 @@ public:
         int origin_x,
         int origin_y,
         int origin_z,
-        int radius);
+        const unsigned int & radius);
 
     /// @brief Function used to register inside the lua environment the class.
     /// @param L The lua environment.

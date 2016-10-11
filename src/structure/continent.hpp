@@ -117,7 +117,7 @@ public:
     /// @param room   The room from where the algorithm has to compute the Field of View.
     /// @param radius The radius of visibility of the character.
     /// @return The map containing all the Information about the Field of View of a character.
-    std::vector<std::string> drawFov(Room * room, int radius);
+    std::vector<std::string> drawFov(Room * room, const unsigned int & radius);
 
     /// @brief A faster but a little inacurate version of a FOV alforithm.
     /// @param map      A 2D map, where the the Field of View will be drawn.
@@ -130,7 +130,7 @@ public:
         int origin_x,
         int origin_y,
         int origin_z,
-        int radius);
+        const unsigned int & radius);
 
     /// @brief A fast line of sight algorithm between two points.
     /// @param map      The map where the LOS algorithm has to write the line.
@@ -149,5 +149,5 @@ public:
         double incr_x,
         double incr_y,
         double incr_z,
-        int radius);
+        const unsigned int & radius);
 };

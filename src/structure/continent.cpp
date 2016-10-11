@@ -94,24 +94,25 @@ Room * Continent::getRoom(Coordinates coord)
     return &continentMap.get(coord.x, coord.y, coord.z);
 }
 
-std::vector<std::string> Continent::drawFov(Room * centerRoom, int radius)
+std::vector<std::string> Continent::drawFov(Room * centerRoom, const unsigned int & radius)
 {
     std::vector<std::string> layers(3);
     if (!this->inBoundaries(centerRoom->coord))
     {
         return layers;
     }
+    int signedRadius = static_cast<int>(radius);
     // Retrieve the coordinates of the room.
     int origin_x = centerRoom->coord.x;
     int origin_y = centerRoom->coord.y;
     int origin_z = centerRoom->coord.z;
     // Evaluate the minimum and maximum value for x and y.
-    int min_x = (origin_x < radius) ? 0 : (origin_x - radius);
-    int max_x = ((origin_x + radius) > this->width) ? this->width : (origin_x + radius);
-    int min_y = (origin_y < radius) ? 0 : (origin_y - radius);
-    int max_y = ((origin_y + radius) > this->height) ? this->height : (origin_y + radius);
+    int min_x = (origin_x < signedRadius) ? 0 : (origin_x - signedRadius);
+    int max_x = ((origin_x + signedRadius) > this->width) ? this->width : (origin_x + signedRadius);
+    int min_y = (origin_y < signedRadius) ? 0 : (origin_y - signedRadius);
+    int max_y = ((origin_y + signedRadius) > this->height) ? this->height : (origin_y + signedRadius);
     // Create a 2D map of chararacters.
-    Map2D<ContinentTile> map(radius * 2, radius * 2);
+    Map2D<ContinentTile> map(signedRadius * 2, signedRadius * 2);
     // Evaluate the field of view.
     this->fieldOfView(map, origin_x, origin_y, origin_z, radius);
     // Prepare Enviroment layer.
@@ -161,7 +162,7 @@ std::vector<std::string> Continent::drawFov(Room * centerRoom, int radius)
 
             layers[0] += tileCode;
 
-            if (x != (origin_x + radius - 1))
+            if (x != (origin_x + signedRadius - 1))
             {
                 layers[0] += ",";
             }
@@ -207,7 +208,7 @@ std::vector<std::string> Continent::drawFov(Room * centerRoom, int radius)
 
             layers[1] += tileCode;
 
-            if (x != (origin_x + radius - 1))
+            if (x != (origin_x + signedRadius - 1))
             {
                 layers[1] += ",";
             }
@@ -248,7 +249,7 @@ std::vector<std::string> Continent::drawFov(Room * centerRoom, int radius)
 
             layers[2] += tileCode;
 
-            if (x != (origin_x + radius - 1))
+            if (x != (origin_x + signedRadius - 1))
             {
                 layers[2] += ",";
             }
@@ -259,7 +260,7 @@ std::vector<std::string> Continent::drawFov(Room * centerRoom, int radius)
     return layers;
 }
 
-void Continent::fieldOfView(Map2D<ContinentTile> & map, int origin_x, int origin_y, int origin_z, int radius)
+void Continent::fieldOfView(Map2D<ContinentTile> & map, int origin_x, int origin_y, int origin_z, const unsigned int & radius)
 {
     double incr_x = 0.0;
     double incr_y = 0.0;
@@ -281,13 +282,13 @@ void Continent::lineOfSight(
     double incr_x,
     double incr_y,
     double incr_z,
-    int radius)
+    const unsigned int & radius)
 {
     double ox = origin_x + static_cast<double>(0.5f);
     double oy = origin_y + static_cast<double>(0.5f);
     double oz = origin_z;
 
-    for (int i = 0; i < radius; ++i)
+    for (unsigned int i = 0; i <= radius; ++i)
     {
         // Transform into integer the coordinates.
         int curr_x = static_cast<int>(ox);
