@@ -39,7 +39,7 @@ Effect::Effect(
 bool Effect::update()
 {
     expires--;
-    return (expires <= 0);
+    return expires <= 0;
 }
 
 bool Effect::operator<(const Effect & right) const
@@ -156,7 +156,7 @@ bool EffectList::effectActivate(std::vector<std::string> & messages)
         }
     }
     pendingEffects.clear();
-    return (!messages.empty());
+    return !messages.empty();
 }
 
 bool EffectList::effectUpdate(std::vector<std::string> & messages)
@@ -174,7 +174,7 @@ bool EffectList::effectUpdate(std::vector<std::string> & messages)
             ++iterator;
         }
     }
-    return (!messages.empty());
+    return !messages.empty();
 }
 
 void EffectList::sortList()

@@ -202,10 +202,7 @@ bool Mud::addItem(Item * item)
         _maxVnumItem = std::max(_maxVnumItem, item->vnum);
         return true;
     }
-    else
-    {
-        return false;
-    }
+    return false;
 }
 
 bool Mud::remItem(Item * item)
@@ -243,10 +240,7 @@ bool Mud::addCorpse(Item * corpse)
         _minVnumCorpses = std::min(_minVnumCorpses, corpse->vnum);
         return true;
     }
-    else
-    {
-        return false;
-    }
+    return false;
 }
 
 bool Mud::remCorpse(Item * corpse)
@@ -376,10 +370,7 @@ ItemModel * Mud::findItemModel(int vnum)
     {
         return iterator->second;
     }
-    else
-    {
-        return nullptr;
-    }
+    return nullptr;
 }
 
 Item * Mud::findItem(int vnum)

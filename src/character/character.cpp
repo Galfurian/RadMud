@@ -1799,38 +1799,37 @@ bool Character::luaRemInventory(Item * item)
 
 void Character::luaRegister(lua_State * L)
 {
-    luabridge::getGlobalNamespace(L) //
-        .beginClass<Character>("Character") //
-        .addData("name", &Character::name) //
-        .addData("race", &Character::race) //
-        .addData("faction", &Character::faction) //
-        .addData("room", &Character::room) //
-        .addFunction("inventoryAdd", &Character::luaAddInventory) //
-        .addFunction("inventoryRem", &Character::luaRemInventory) //
-        .addFunction("equipmentAdd", &Character::luaAddEquipment) //
-        .addFunction("equipmentRem", &Character::luaRemEquipment) //
-        .addFunction("doCommand", &Character::doCommand) //
-        .addFunction("getTargets", &Character::luaGetTargets) //
-        .addFunction("isMobile", &Character::isMobile) //
-        .endClass() //
-        .deriveClass<Mobile, Character>("Mobile") //
-        .addData("id", &Mobile::id) //
-        .addData("spawnRoom", &Mobile::respawnRoom) //
-        .addData("shortdesc", &Mobile::shortdesc) //
-        .addData("staticdesc", &Mobile::staticdesc) //
-        .addData("message_buffer", &Mobile::message_buffer) //
-        .addData("controller", &Mobile::controller) //
-        .addFunction("isMobile", &Mobile::isMobile) //
-        .addFunction("isAlive", &Mobile::isAlive) //
-        .endClass() //
-        .deriveClass<Player, Character>("Player") //
-        .addData("age", &Player::age, false) //
-        .addData("experience", &Player::experience, false) //
-        .addData("prompt", &Player::prompt, false) //
-        .addData("rent_room", &Player::rent_room, false) //
-        .addData("remaining_points", &Player::remaining_points, false) //
-        .addData("rent_room", &Player::rent_room, false) //
-            //std::map<int, unsigned int> skills;
+    luabridge::getGlobalNamespace(L)
+        .beginClass<Character>("Character")
+        .addData("name", &Character::name)
+        .addData("race", &Character::race)
+        .addData("faction", &Character::faction)
+        .addData("room", &Character::room)
+        .addFunction("inventoryAdd", &Character::luaAddInventory)
+        .addFunction("inventoryRem", &Character::luaRemInventory)
+        .addFunction("equipmentAdd", &Character::luaAddEquipment)
+        .addFunction("equipmentRem", &Character::luaRemEquipment)
+        .addFunction("doCommand", &Character::doCommand)
+        .addFunction("getTargets", &Character::luaGetTargets)
+        .addFunction("isMobile", &Character::isMobile)
+        .endClass()
+        .deriveClass<Mobile, Character>("Mobile")
+        .addData("id", &Mobile::id)
+        .addData("spawnRoom", &Mobile::respawnRoom)
+        .addData("shortdesc", &Mobile::shortdesc)
+        .addData("staticdesc", &Mobile::staticdesc)
+        .addData("message_buffer", &Mobile::message_buffer)
+        .addData("controller", &Mobile::controller)
+        .addFunction("isMobile", &Mobile::isMobile)
+        .addFunction("isAlive", &Mobile::isAlive)
+        .endClass()
+        .deriveClass<Player, Character>("Player")
+        .addData("age", &Player::age, false)
+        .addData("experience", &Player::experience, false)
+        .addData("prompt", &Player::prompt, false)
+        .addData("rent_room", &Player::rent_room, false)
+        .addData("remaining_points", &Player::remaining_points, false)
+        .addData("rent_room", &Player::rent_room, false)
         .endClass();
 }
 

@@ -137,10 +137,7 @@ unsigned int Race::getAbilityLua(const unsigned int & abilityNumber)
     {
         return this->getAbility(AbilityTest::convert(abilityNumber));
     }
-    else
-    {
-        return 0;
-    }
+    return 0;
 }
 
 bool Race::factionAllowed(int factionVnum)
@@ -157,13 +154,13 @@ bool Race::factionAllowed(int factionVnum)
 
 void Race::luaRegister(lua_State * L)
 {
-    luabridge::getGlobalNamespace(L) //
-        .beginClass<Race>("Race") //
-        .addData("vnum", &Race::vnum) //
-        .addData("name", &Race::name) //
-        .addData("material", &Race::material) //
-        .addFunction("getAbility", &Race::getAbilityLua) //
-        .addData("available_faction", &Race::availableFaction) //
+    luabridge::getGlobalNamespace(L)
+        .beginClass<Race>("Race")
+        .addData("vnum", &Race::vnum)
+        .addData("name", &Race::name)
+        .addData("material", &Race::material)
+        .addFunction("getAbility", &Race::getAbilityLua)
+        .addData("available_faction", &Race::availableFaction)
         .endClass();
 }
 
@@ -173,8 +170,5 @@ std::string Race::getTile()
     {
         return ToString(tileSet) + ":" + ToString(tileId);
     }
-    else
-    {
-        return "c";
-    }
+    return "c";
 }

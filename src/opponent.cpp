@@ -30,22 +30,22 @@ Aggression::Aggression(Character * _aggressor, unsigned int _aggression) :
 
 bool Aggression::operator>(const Aggression & source) const
 {
-    return (this->aggression > source.aggression);
+    return this->aggression > source.aggression;
 }
 
 bool Aggression::operator<(const Aggression & source) const
 {
-    return (this->aggression < source.aggression);
+    return this->aggression < source.aggression;
 }
 
 bool Aggression::operator==(const Aggression & source) const
 {
-    return (this->aggressor->name == source.aggressor->name);
+    return this->aggressor->name == source.aggressor->name;
 }
 
 bool Aggression::operator==(const Character * source) const
 {
-    return (this->aggressor->name == source->name);
+    return this->aggressor->name == source->name;
 }
 
 OpponentsList::OpponentsList(Character * _owner) :
@@ -118,7 +118,7 @@ bool OpponentsList::hasOpponent(Character * character)
 
 bool OpponentsList::hasOpponents() const
 {
-    return (!aggressionList.empty());
+    return !aggressionList.empty();
 }
 
 bool OpponentsList::setAggro(Character * character, unsigned int newAggression)
@@ -139,14 +139,11 @@ bool OpponentsList::setAggro(Character * character, unsigned int newAggression)
 
 Aggression * OpponentsList::getTopAggro()
 {
-    if (!aggressionList.empty())
-    {
-        return &(*aggressionList.begin());
-    }
-    else
+    if (aggressionList.empty())
     {
         return nullptr;
     }
+    return &(*aggressionList.begin());
 }
 
 bool OpponentsList::moveToTopAggro(Character * character)
@@ -187,10 +184,7 @@ unsigned int OpponentsList::getInitialAggro(Character * character)
     {
         return (owner->level - character->level);
     }
-    else
-    {
-        return (character->level - owner->level);
-    }
+    return (character->level - owner->level);
 }
 
 unsigned int OpponentsList::getAggro(Character * character)

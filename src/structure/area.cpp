@@ -624,14 +624,14 @@ bool Area::getCharactersInSight(
 
 void Area::luaRegister(lua_State * L)
 {
-    luabridge::getGlobalNamespace(L) //
-        .beginClass<Area>("Area") //
-        .addData("vnum", &Area::vnum, false) //
-        .addData("name", &Area::name, false) //
-        .addData("builder", &Area::builder, false) //
-        .addData("continent", &Area::continent, false) //
-        .addData("width", &Area::width, false) //
-        .addData("height", &Area::height, false) //
-        .addData("elevation", &Area::elevation, false) //
+    luabridge::getGlobalNamespace(L)
+        .beginClass<Area>("Area")
+        .addData("vnum", &Area::vnum, false)
+        .addData("name", &Area::name, false)
+        .addData("builder", &Area::builder, false)
+        .addData("continent", &Area::continent, false)
+        .addData("width", &Area::width, false)
+        .addData("height", &Area::height, false)
+        .addData("elevation", &Area::elevation, false)
         .endClass();
 }

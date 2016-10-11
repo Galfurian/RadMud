@@ -268,17 +268,9 @@ std::string Item::getTypeName() const
 
 bool Item::canStackWith(Item * item) const
 {
-    if (HasFlag(this->model->modelFlags, ModelFlag::CanBeStacked))
-    {
-        if (this->model->vnum == item->model->vnum)
-        {
-            if (this->composition->vnum == item->composition->vnum)
-            {
-                return true;
-            }
-        }
-    }
-    return false;
+    return HasFlag(this->model->modelFlags, ModelFlag::CanBeStacked)
+           && (this->model->vnum == item->model->vnum)
+           && (this->composition->vnum == item->composition->vnum);
 }
 
 Item * Item::removeFromStack(Character * actor, unsigned int & _quantity)
@@ -296,15 +288,9 @@ Item * Item::removeFromStack(Character * actor, unsigned int & _quantity)
             // Return the new stack.
             return newStack;
         }
-        else
-        {
-            return nullptr;
-        }
+        return nullptr;
     }
-    else
-    {
-        return this;
-    }
+    return this;
 }
 
 bool Item::hasKey(std::string key)
@@ -334,31 +320,28 @@ bool Item::triggerDecay()
     {
         return true;
     }
-    else
-    {
-        condition -= model->decay;
-        return false;
-    }
+    condition -= model->decay;
+    return false;
 }
 
 double Item::getConditionModifier() const
 {
     auto percent = ((100 * this->condition) / this->getMaxCondition());
     if (percent >= 75) return 1.00;
-    else if (percent >= 50) return 0.75;
-    else if (percent >= 25) return 0.50;
-    else return 0.25;
+    if (percent >= 50) return 0.75;
+    if (percent >= 25) return 0.50;
+    return 0.25;
 }
 
 std::string Item::getConditionDescription()
 {
     auto percent = ((100 * this->condition) / this->getMaxCondition());
     if (percent >= 100) return "is in perfect condition";
-    else if (percent >= 75) return "is scratched";
-    else if (percent >= 50) return "is ruined";
-    else if (percent >= 25) return "is cracked";
-    else if (percent > 0) return "is almost broken";
-    else return "is broken";
+    if (percent >= 75) return "is scratched";
+    if (percent >= 50) return "is ruined";
+    if (percent >= 25) return "is cracked";
+    if (percent > 0) return "is almost broken";
+    return "is broken";
 }
 
 unsigned int Item::getPrice(bool entireStack) const
@@ -432,7 +415,6 @@ std::string Item::getDescription()
 std::string Item::getLook()
 {
     std::string output;
-
     // Prepare : Name, Condition.
     //           Description.
     output = "You look at " + this->getName(true);
@@ -473,18 +455,33 @@ bool Item::hasNodeType(NodeType nodeType)
 
 bool Item::isAContainer() const
 {
-    if (model->getType() == ModelType::Container) return true;
-    if (model->getType() == ModelType::Corpse) return true;
-    if ((model->getType() == ModelType::Shop) && HasFlag(this->flags, ItemFlag::Built)) return true;
+    if (model->getType() == ModelType::Container)
+    {
+        return true;
+    }
+    if (model->getType() == ModelType::Corpse)
+    {
+        return true;
+    }
+    if ((model->getType() == ModelType::Shop) && HasFlag(this->flags, ItemFlag::Built))
+    {
+        return true;
+    }
     return false;
 }
 
 bool Item::isEmpty() const
 {
-    if (this->isAContainer()) return content.empty();
-    if (model->getType() == ModelType::Magazine) return content.empty();
-    if (model->getType() == ModelType::RangedWeapon) return content.empty();
-    if (model->getType() == ModelType::LiquidContainer) return (contentLiq.first == nullptr);
+    if (this->isAContainer() ||
+        (model->getType() == ModelType::Magazine) ||
+        (model->getType() == ModelType::RangedWeapon))
+    {
+        return content.empty();
+    }
+    if (model->getType() == ModelType::LiquidContainer)
+    {
+        return contentLiq.first == nullptr;
+    }
     return true;
 }
 
@@ -499,7 +496,7 @@ double Item::getTotalSpace() const
         // Evaluate the result.
         return ((spBase + spQuality) / 2);
     }
-    else if (model->getType() == ModelType::LiquidContainer)
+    if (model->getType() == ModelType::LiquidContainer)
     {
         // Evaluate the base space.
         auto spBase = model->toLiquidContainer()->maxWeight;
@@ -508,7 +505,7 @@ double Item::getTotalSpace() const
         // Evaluate the result.
         return ((spBase + spQuality) / 2);
     }
-    else if (model->getType() == ModelType::Shop)
+    if (model->getType() == ModelType::Shop)
     {
         // Evaluate the base space.
         auto spBase = model->toShop()->maxWeight;
@@ -517,10 +514,7 @@ double Item::getTotalSpace() const
         // Evaluate the result.
         return ((spBase + spQuality) / 2);
     }
-    else
-    {
-        return 0.0;
-    }
+    return 0.0;
 }
 
 double Item::getUsedSpace() const
@@ -551,15 +545,12 @@ double Item::getFreeSpace() const
     {
         return 0.0;
     }
-    else
-    {
-        return totalSpace - usedSpace;
-    }
+    return totalSpace - usedSpace;
 }
 
 bool Item::canContain(Item * item, const unsigned int & ammount) const
 {
-    return ((item->getWeight(false) * ammount) <= this->getFreeSpace());
+    return (item->getWeight(false) * ammount) <= this->getFreeSpace();
 }
 
 void Item::putInside(Item *& item, bool updateDB)
@@ -571,11 +562,10 @@ void Item::putInside(Item *& item, bool updateDB)
     // Update the database.
     if (updateDB)
     {
-        SQLiteDbms::instance().insertInto(
-            "ItemContent",
-            {ToString(this->vnum), ToString(item->vnum)},
-            false,
-            true);
+        SQLiteDbms::instance().insertInto("ItemContent",
+                                          {ToString(this->vnum), ToString(item->vnum)},
+                                          false,
+                                          true);
     }
     // Log it.
     Logger::log(LogLevel::Debug, "Item '%s' added to '%s';", item->getName(), this->getName());
@@ -583,25 +573,23 @@ void Item::putInside(Item *& item, bool updateDB)
 
 bool Item::takeOut(Item * item, bool updateDB)
 {
-    if (content.removeItem(item))
+    if (!content.removeItem(item))
     {
-        item->container = nullptr;
-        // Update the database.
-        if (updateDB)
-        {
-            SQLiteDbms::instance().deleteFrom(
-                "ItemContent",
-                {std::make_pair("item", ToString(item->vnum))});
-        }
-        // Log it.
-        Logger::log(
-            LogLevel::Debug,
-            "Item '%s' taken out from '%s';",
-            item->getName(),
-            this->getName());
-        return true;
+        return false;
     }
-    return false;
+    // Set the container reference of the item to nullptr.
+    item->container = nullptr;
+    // Update the database.
+    if (updateDB)
+    {
+        SQLiteDbms::instance().deleteFrom("ItemContent", {std::make_pair("item", ToString(item->vnum))});
+    }
+    // Log it.
+    Logger::log(LogLevel::Debug,
+                "Item '%s' taken out from '%s';",
+                item->getName(),
+                this->getName());
+    return true;
 }
 
 bool Item::canContainLiquid(Liquid * liquid, const double & ammount) const
@@ -610,7 +598,7 @@ bool Item::canContainLiquid(Liquid * liquid, const double & ammount) const
     {
         return false;
     }
-    else if (contentLiq.first != liquid)
+    if (contentLiq.first != liquid)
     {
         return false;
     }
@@ -635,11 +623,11 @@ bool Item::pourIn(Liquid * liquid, const double & ammount, bool updateDB)
         // Prepare the query arguments.
         if (updateDB)
         {
-            SQLiteDbms::instance().insertInto(
-                "ItemContentLiq",
-                {ToString(vnum), ToString(contentLiq.first->vnum), ToString(contentLiq.second)},
-                false,
-                true);
+            SQLiteDbms::instance().insertInto("ItemContentLiq",
+                                              {ToString(vnum), ToString(contentLiq.first->vnum),
+                                               ToString(contentLiq.second)},
+                                              false,
+                                              true);
         }
         return true;
     }
@@ -831,10 +819,7 @@ EquipmentSlot Item::getCurrentSlot()
     {
         return model->slot;
     }
-    else
-    {
-        return currentSlot;
-    }
+    return currentSlot;
 }
 
 std::string Item::getCurrentSlotName()

@@ -65,59 +65,56 @@ Item * LuaLoadItem(Character * maker, int vnumModel, int vnumMaterial, unsigned 
     {
         quality = ItemQuality(qualityValue);
     }
-
-    auto item = model->createItem(maker->getName(), composition, true, quality);
-
-    return item;
+    return model->createItem(maker->getName(), composition, true, quality);
 }
 
 void LuaRegisterUtils(lua_State * L)
 {
-    luabridge::getGlobalNamespace(L) //
-        .beginNamespace("Mud") //
-        .addFunction("Log", LuaLog) //
-        .addFunction("Sleep", LuaSleep) //
-        .addFunction("Random", LuaRandom) //
-        .addFunction("LoadItem", LuaLoadItem) //
+    luabridge::getGlobalNamespace(L)
+        .beginNamespace("Mud")
+        .addFunction("Log", LuaLog)
+        .addFunction("Sleep", LuaSleep)
+        .addFunction("Random", LuaRandom)
+        .addFunction("LoadItem", LuaLoadItem)
         .endNamespace();
 
-    luabridge::getGlobalNamespace(L) //
-        .beginClass<VectorHelper<std::string>>("StringVector") //
-        .addFunction("size", &VectorHelper<std::string>::size) //
-        .addFunction("back", &VectorHelper<std::string>::back) //
-        .addFunction("front", &VectorHelper<std::string>::front) //
-        .addFunction("at", &VectorHelper<std::string>::at) //
-        .addFunction("push_back", &VectorHelper<Character *>::push_back) //
-        .addFunction("pop_back", &VectorHelper<Character *>::pop_back) //
+    luabridge::getGlobalNamespace(L)
+        .beginClass<VectorHelper<std::string>>("StringVector")
+        .addFunction("size", &VectorHelper<std::string>::size)
+        .addFunction("back", &VectorHelper<std::string>::back)
+        .addFunction("front", &VectorHelper<std::string>::front)
+        .addFunction("at", &VectorHelper<std::string>::at)
+        .addFunction("push_back", &VectorHelper<Character *>::push_back)
+        .addFunction("pop_back", &VectorHelper<Character *>::pop_back)
         .endClass();
 
-    luabridge::getGlobalNamespace(L) //
-        .beginClass<VectorHelper<Character *>>("CharacterVector") //
-        .addFunction("size", &VectorHelper<Character *>::size) //
-        .addFunction("back", &VectorHelper<Character *>::back) //
-        .addFunction("front", &VectorHelper<Character *>::front) //
-        .addFunction("at", &VectorHelper<Character *>::at) //
-        .addFunction("push_back", &VectorHelper<Character *>::push_back) //
-        .addFunction("pop_back", &VectorHelper<Character *>::pop_back) //
+    luabridge::getGlobalNamespace(L)
+        .beginClass<VectorHelper<Character *>>("CharacterVector")
+        .addFunction("size", &VectorHelper<Character *>::size)
+        .addFunction("back", &VectorHelper<Character *>::back)
+        .addFunction("front", &VectorHelper<Character *>::front)
+        .addFunction("at", &VectorHelper<Character *>::at)
+        .addFunction("push_back", &VectorHelper<Character *>::push_back)
+        .addFunction("pop_back", &VectorHelper<Character *>::pop_back)
         .endClass();
 
-    luabridge::getGlobalNamespace(L) //
-        .beginClass<VectorHelper<Item *>>("ItemVector") //
-        .addFunction("size", &VectorHelper<Item *>::size) //
-        .addFunction("back", &VectorHelper<Item *>::back) //
-        .addFunction("front", &VectorHelper<Item *>::front) //
-        .addFunction("at", &VectorHelper<Item *>::at) //
-        .addFunction("push_back", &VectorHelper<Item *>::push_back) //
-        .addFunction("pop_back", &VectorHelper<Item *>::pop_back) //
+    luabridge::getGlobalNamespace(L)
+        .beginClass<VectorHelper<Item *>>("ItemVector")
+        .addFunction("size", &VectorHelper<Item *>::size)
+        .addFunction("back", &VectorHelper<Item *>::back)
+        .addFunction("front", &VectorHelper<Item *>::front)
+        .addFunction("at", &VectorHelper<Item *>::at)
+        .addFunction("push_back", &VectorHelper<Item *>::push_back)
+        .addFunction("pop_back", &VectorHelper<Item *>::pop_back)
         .endClass();
 
-    luabridge::getGlobalNamespace(L) //
-        .beginClass<VectorHelper<Exit *> >("ExitVector") //
-        .addFunction("size", &VectorHelper<Exit *>::size) //
-        .addFunction("back", &VectorHelper<Exit *>::back) //
-        .addFunction("front", &VectorHelper<Exit *>::front) //
-        .addFunction("at", &VectorHelper<Exit *>::at) //
-        .addFunction("push_back", &VectorHelper<Exit *>::push_back) //
-        .addFunction("pop_back", &VectorHelper<Exit *>::pop_back) //
+    luabridge::getGlobalNamespace(L)
+        .beginClass<VectorHelper<Exit *> >("ExitVector")
+        .addFunction("size", &VectorHelper<Exit *>::size)
+        .addFunction("back", &VectorHelper<Exit *>::back)
+        .addFunction("front", &VectorHelper<Exit *>::front)
+        .addFunction("at", &VectorHelper<Exit *>::at)
+        .addFunction("push_back", &VectorHelper<Exit *>::push_back)
+        .addFunction("pop_back", &VectorHelper<Exit *>::pop_back)
         .endClass();
 }

@@ -42,11 +42,7 @@ bool ExtractCommand(
         return false;
     }
     // Check if the character is a valid Telnet Character.
-    if (!TelnetCharTest::is_value(source.at(index)))
-    {
-        command = TelnetChar::None;
-    }
-    else
+    if (TelnetCharTest::is_value(source.at(index)))
     {
         // Retrieve the command.
         command = static_cast<TelnetChar>(static_cast<unsigned char>(source.at(index)));
@@ -55,13 +51,17 @@ bool ExtractCommand(
         // Increment the index.
         index++;
     }
+    else
+    {
+        command = TelnetChar::None;
+    }
     return true;
 }
 
 void NegotiateProtocol(Character * character, const ConnectionState & nextState)
 {
     // Cast the character to player.
-    Player * player = character->toPlayer();
+    auto player = character->toPlayer();
     // Set its next state.
     player->connection_state = nextState;
     if (nextState == ConnectionState::NegotiatingMSDP)
@@ -89,7 +89,7 @@ void NegotiateProtocol(Character * character, const ConnectionState & nextState)
 void ProcessTelnetCommand(Character * character, ArgumentHandler & args)
 {
     // Cast the character to player.
-    Player * player = character->toPlayer();
+    auto player = character->toPlayer();
     // Line which will contain the answer to IAC+WILL+MSDP
     std::string source = args.getOriginal();
     // Get the size of the command.
@@ -207,14 +207,11 @@ void ProcessTelnetCommand(Character * character, ArgumentHandler & args)
                     std::string variableName;
                     for (size_t indexVal = index; indexVal < source.size(); ++indexVal)
                     {
-                        if (source[indexVal] != static_cast<char>(TelnetChar::MSDP_VAL))
-                        {
-                            variableName += source[indexVal];
-                        }
-                        else
+                        if (source[indexVal] == static_cast<char>(TelnetChar::MSDP_VAL))
                         {
                             break;
                         }
+                        variableName += source[indexVal];
                     }
                     result += "\"" + variableName + "\" ";
                     result += "MSDP_VAL ";
@@ -223,14 +220,11 @@ void ProcessTelnetCommand(Character * character, ArgumentHandler & args)
                     std::string variableValue;
                     for (size_t indexVal = index; indexVal < source.size(); ++indexVal)
                     {
-                        if (source[indexVal] != static_cast<char>(TelnetChar::IAC))
-                        {
-                            variableValue += source[indexVal];
-                        }
-                        else
+                        if (source[indexVal] == static_cast<char>(TelnetChar::IAC))
                         {
                             break;
                         }
+                        variableValue += source[indexVal];
                     }
                     result += "\"" + variableValue + "\" ";
                     result += "IAC";

@@ -629,13 +629,13 @@ VectorHelper<Exit *> Room::luaGetExits()
 
 void Room::luaRegister(lua_State * L)
 {
-    luabridge::getGlobalNamespace(L) //
-        .beginClass<Room>("Room") //
-        .addData("vnum", &Room::vnum, false) //
-        .addData("name", &Room::name, false) //
-        .addData("coord", &Room::coord, false) //
-        .addData("terrain", &Room::terrain, false) //
-        .addFunction("getExits", &Room::luaGetExits) //
+    luabridge::getGlobalNamespace(L)
+        .beginClass<Room>("Room")
+        .addData("vnum", &Room::vnum, false)
+        .addData("name", &Room::name, false)
+        .addData("coord", &Room::coord, false)
+        .addData("terrain", &Room::terrain, false)
+        .addFunction("getExits", &Room::luaGetExits)
         .endClass();
 }
 

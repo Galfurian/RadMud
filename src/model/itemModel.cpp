@@ -38,7 +38,6 @@
 #include "vehicleModel.hpp"
 #include "magazineModel.hpp"
 #include "meleeWeaponModel.hpp"
-#include "rangedWeaponModel.hpp"
 
 ItemModel::ItemModel() :
     vnum(),
@@ -282,12 +281,12 @@ bool ItemModel::mustBeWielded()
 
 void ItemModel::luaRegister(lua_State * L)
 {
-    luabridge::getGlobalNamespace(L) //
-        .beginClass<ItemModel>("ItemModel") //
-        .addData("vnum", &ItemModel::vnum) //
-        .addData("condition", &ItemModel::condition) //
-        .addData("decay", &ItemModel::decay) //
-        .addFunction("getType", &ItemModel::getType) //
+    luabridge::getGlobalNamespace(L)
+        .beginClass<ItemModel>("ItemModel")
+        .addData("vnum", &ItemModel::vnum)
+        .addData("condition", &ItemModel::condition)
+        .addData("decay", &ItemModel::decay)
+        .addFunction("getType", &ItemModel::getType)
         .endClass();
 }
 
@@ -297,22 +296,17 @@ std::string ItemModel::getTile(int offset)
     {
         return ToString(tileSet) + ":" + ToString(tileId + offset);
     }
-    else
+    // TODO: Too easy this way.
+    if (this->getType() == ModelType::Armor)
     {
-        // TODO: Too easy this way.
-        if (this->getType() == ModelType::Armor)
-        {
-            return "a";
-        }
-        else if ((this->getType() == ModelType::MeleeWeapon) || (this->getType() == ModelType::RangedWeapon))
-        {
-            return "w";
-        }
-        else
-        {
-            return "i";
-        }
+        return "a";
     }
+    if ((this->getType() == ModelType::MeleeWeapon) || (this->getType() == ModelType::RangedWeapon))
+    {
+        return "w";
+    }
+    return "i";
+
 }
 
 ArmorModel * ItemModel::toArmor()

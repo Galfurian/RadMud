@@ -78,10 +78,10 @@ std::string Coordinates::toString() const
 
 void Coordinates::luaRegister(lua_State * L)
 {
-    luabridge::getGlobalNamespace(L) //
-        .beginClass<Coordinates>("Coordinates") //
-        .addData("x", &Coordinates::x, false) //
-        .addData("y", &Coordinates::y, false) //
-        .addData("z", &Coordinates::z, false) //
+    luabridge::getGlobalNamespace(L)
+        .beginClass<Coordinates>("Coordinates")
+        .addData("x", &Coordinates::x, false)
+        .addData("y", &Coordinates::y, false)
+        .addData("z", &Coordinates::z, false)
         .endClass();
 }

@@ -95,11 +95,11 @@ bool Exit::operator==(const Exit & right) const
 
 void Exit::luaRegister(lua_State * L)
 {
-    luabridge::getGlobalNamespace(L) //
-        .beginClass<Exit>("Exit") //
-        .addData("source", &Exit::source) //
-        .addData("destination", &Exit::destination) //
-        .addFunction("getDirection", &Exit::getDirection) //
+    luabridge::getGlobalNamespace(L)
+        .beginClass<Exit>("Exit")
+        .addData("source", &Exit::source)
+        .addData("destination", &Exit::destination)
+        .addFunction("getDirection", &Exit::getDirection)
         .endClass();
 }
 
