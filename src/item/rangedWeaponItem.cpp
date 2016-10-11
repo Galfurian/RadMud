@@ -95,3 +95,20 @@ bool RangedWeaponItem::canBeReloadedWith(Item * magazine) const
     }
     return false;
 }
+
+
+Item * RangedWeaponItem::getAlreadyLoadedMagazine() const
+{
+    if (!this->isEmpty())
+    {
+        Item * magazine = this->content.front();
+        if (magazine != nullptr)
+        {
+            if (magazine->getType() == ModelType::Magazine)
+            {
+                return magazine;
+            }
+        }
+    }
+    return nullptr;
+}

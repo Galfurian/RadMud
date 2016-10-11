@@ -44,4 +44,6 @@ public:
 
     /// Checks if the current weapon can be reloaded with the given item.
     bool canBeReloadedWith(Item * magazine) const;
+
+    Item * getAlreadyLoadedMagazine() const;
 };

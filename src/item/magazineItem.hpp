@@ -36,6 +36,5 @@ public:
     /// Evaluates the ammount of projectiles which can be loaded.
     bool getAmountToLoad(Item * projectileToLoad, unsigned int & ammountToLoad, std::string & error) const;
 
-private:
     Item * getAlreadyLoadedProjectile() const;
 };

@@ -53,11 +53,13 @@ long int GeneralAction::getElapsed() const
 bool GeneralAction::check() const
 {
     bool correct = true;
+    /*
     if (this->checkElapsed())
     {
         Logger::log(LogLevel::Error, "Cooldown is already expired.");
         correct = false;
     }
+     */
     return correct;
 }
 
