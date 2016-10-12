@@ -53,7 +53,7 @@ bool Area::check()
     return true;
 }
 
-bool Area::inBoundaries(const int & x, const int & y, const int & z)
+bool Area::inBoundaries(const int & x, const int & y, const int & z) const
 {
     bool result = true;
     result &= (x >= 0) && (x <= width);
@@ -62,7 +62,7 @@ bool Area::inBoundaries(const int & x, const int & y, const int & z)
     return result;
 }
 
-bool Area::inBoundaries(const Coordinates & coord)
+bool Area::inBoundaries(const Coordinates & coord) const
 {
     return this->inBoundaries(coord.x, coord.y, coord.z);
 }
@@ -453,7 +453,7 @@ bool Area::fastInSight(
     int target_x,
     int target_y,
     int /*target_z*/,
-    const unsigned int & radius)
+    const unsigned int & radius) const
 {
     double deltax = target_x - origin_x;
     double deltay = target_y - origin_y;
@@ -464,7 +464,11 @@ bool Area::fastInSight(
     int y = origin_y;
     for (int x = origin_x; x < target_x - 1; ++x)
     {
-        if (this->getRoom(x, y, origin_z) == nullptr)
+        if (!this->inBoundaries(x, y, origin_z))
+        {
+            return false;
+        }
+        if (!areaMap.has(x, y, origin_z))
         {
             return false;
         }
@@ -484,9 +488,23 @@ bool Area::fastInSight(
     return true;
 }
 
-bool Area::fastInSight(Coordinates origin, Coordinates target, const unsigned int & radius)
+bool Area::fastInSight(const Coordinates & origin, const Coordinates & target, const unsigned int & radius) const
 {
     return this->fastInSight(origin.x, origin.y, origin.z, target.x, target.y, target.z, radius);
+}
+
+bool Area::fastInSight(Character * source, Character * target) const
+{
+    if ((source == nullptr) || (target == nullptr))
+    {
+        return false;
+    }
+    if ((source->room == nullptr) || (target->room == nullptr))
+    {
+        return false;
+    }
+    // Check if the target is in sight.
+    return this->fastInSight(source->room->coord, target->room->coord, source->getViewDistance());
 }
 
 bool Area::getCharactersInSight(
@@ -497,8 +515,6 @@ bool Area::getCharactersInSight(
     int origin_z,
     const unsigned int & radius)
 {
-    Logger::log(LogLevel::Debug, "Radius : %s", ToString(radius));
-
     double increment_x = 0.0, increment_y = 0.0, increment_z = 0.0;
     for (float i = 0.0; i < 360; ++i)
     {

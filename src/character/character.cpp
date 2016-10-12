@@ -52,7 +52,8 @@ Character::Character() :
     L(luaL_newstate()),
     opponents(this),
     actionQueue(),
-    charactersInSight()
+    charactersInSight(),
+    aimedCharacter()
 {
     actionQueue.push_back(std::make_shared<GeneralAction>(this));
     // Nothing to do.

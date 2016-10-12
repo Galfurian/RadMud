@@ -80,14 +80,14 @@ public:
     /// @param y Coordinate on height axis.
     /// @param z Coordinate on altitude axis.
     /// @return <b>True</b> if the coordinates are valid,<br>
-    ///         <b>False</b> otherwise..
-    bool inBoundaries(const int & x, const int & y, const int & z);
+    ///         <b>False</b> otherwise.
+    bool inBoundaries(const int & x, const int & y, const int & z) const;
 
     /// @brief Check if the given coordinates is inside the boundaries.
     /// @param coord The coordinates to check.
     /// @return <b>True</b> if the coordinates are valid,<br>
     ///         <b>False</b> otherwise.
-    bool inBoundaries(const Coordinates & coord);
+    bool inBoundaries(const Coordinates & coord) const;
 
     /// @brief Add the passed room to its coordinates inside the area.
     /// @param room The room that has to be added.
@@ -174,7 +174,7 @@ public:
         int target_x,
         int target_y,
         int target_z,
-        const unsigned int & radius);
+        const unsigned int & radius) const;
 
     /// @brief Determine if a coordinate is in sight from a starting one.
     /// @param origin The coordinates of the origin.
@@ -182,7 +182,14 @@ public:
     /// @param radius The radius of visibility.
     /// @return <b>True</b> if the target room is in sight,<br>
     ///         <b>False</b> otherwise.
-    bool fastInSight(Coordinates origin, Coordinates target, const unsigned int & radius);
+    bool fastInSight(const Coordinates & origin, const Coordinates & target, const unsigned int & radius) const;
+
+    /// @brief Determine if a target character is in sight from a source one.
+    /// @param source The character placed on the origin.
+    /// @param target The target character.
+    /// @return <b>True</b> if the target is in sight,<br>
+    ///         <b>False</b> otherwise.
+    bool fastInSight(Character * source, Character * target) const;
 
     /// @brief Provides a list of characters which are in sight.
     /// @param targets    The list which will contain the targets.

@@ -125,7 +125,18 @@ public:
     /// @return The object at the given Coordinates3D.
     T & get(int x, int y, int z)
     {
-        return data[std::make_tuple(x, y, z)];
+        return data.at(std::make_tuple(x, y, z));
+    }
+
+    /// @brief Checks if there is an object at the given Coordinates3D.
+    /// @param x Coordinate on width.
+    /// @param y Coordinate on heigth.
+    /// @param z Coordinate on altitude.
+    /// @return <b>True</b> if if there is an object at the given coordinates,<br>
+    ///         <b>False</b> otherwise.
+    bool has(int x, int y, int z) const
+    {
+        return data.find(std::make_tuple(x, y, z)) != data.end();
     }
 
     /// @brief Erase the object at the given Coordinates3D and returns an iterator to the.
@@ -154,7 +165,7 @@ public:
 
     /// @brief Provides the size of the data.
     /// @return The size of the 3D map.
-    size_t size()
+    size_t size() const
     {
         return data.size();
     }

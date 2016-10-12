@@ -90,6 +90,8 @@ public:
     std::deque<std::shared_ptr<GeneralAction> > actionQueue;
     /// List of characters in sight.
     std::vector<Character *> charactersInSight;
+    /// A pointer to the currently aimed character.
+    Character * aimedCharacter;
 
     /// @brief Constructor.
     Character();
