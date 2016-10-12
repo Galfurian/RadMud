@@ -125,7 +125,7 @@ public:
     /// @return The object at the given Coordinates3D.
     T & get(int x, int y, int z)
     {
-        return data.at(std::make_tuple(x, y, z));
+        return data[std::make_tuple(x, y, z)];
     }
 
     /// @brief Checks if there is an object at the given Coordinates3D.
