@@ -88,3 +88,27 @@ Character * CharacterContainer::findCharacter(const std::string & target,
     }
     return nullptr;
 }
+
+void CharacterContainer::emplace_back_character(Character * character)
+{
+    for (const_iterator it = this->begin(); it != this->end(); ++it)
+    {
+        Character * contained = (*it);
+        if (contained != nullptr)
+        {
+            if (contained->getName() == character->getName())
+            {
+                return;
+            }
+        }
+    }
+    this->emplace_back(character);
+}
+
+void CharacterContainer::addUnique(CharacterContainer & others)
+{
+    for (auto other : others)
+    {
+        this->emplace_back_character(other);
+    }
+}

@@ -40,4 +40,8 @@ public:
                               const std::vector<Character *> & exceptions = std::vector<Character *>(),
                               bool skipMobile = false,
                               bool skipPlayer = false) const;
+
+    void emplace_back_character(Character * character);
+
+    void addUnique(CharacterContainer & others);
 };

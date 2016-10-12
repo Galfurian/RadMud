@@ -423,22 +423,18 @@ void DoAim(Character * character, ArgumentHandler & args)
         character->sendMsg("Who or what do you want to aim?\n");
         return;
     }
-    // Get the target and the number.
-    auto target = args[0].getContent();
-    auto number = args[0].getIndex();
     // Prepare a pointer to the aimed character.
     Character * aimedCharacter = nullptr;
+    // Create a single CharacterContainer which contains a unique list of all the targets.
+    CharacterContainer targets = character->charactersInSight;
+    targets.addUnique(character->room->characters);
     // First try to search the target inside the same room.
-    aimedCharacter = character->room->findCharacter(target, number);
+    aimedCharacter = targets.findCharacter(args[0].getContent(), args[0].getIndex());
     // Otherwise try to find the target inside the list of characters in sight.
     if (aimedCharacter == nullptr)
     {
-        aimedCharacter = character->charactersInSight.findCharacter(args[0].getContent(), args[0].getIndex());
-        if (aimedCharacter == nullptr)
-        {
-            character->sendMsg("You don't see '%s' anywhere...\n", target);
-            return;
-        }
+        character->sendMsg("You don't see '%s' anywhere...\n", args[0].getContent());
+        return;
     }
     // Check the room of the target.
     if (aimedCharacter->room == nullptr)
