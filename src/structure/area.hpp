@@ -157,6 +157,8 @@ public:
         double incr_z,
         const unsigned int & radius);
 
+    void simpleFov(Map2D<MapTile> & map, int origin_x, int origin_y, int origin_z, const unsigned int & radius);
+
     /// @brief Determine if a coordinate is in sight from a starting one.
     /// @details
     /// Thanks to Eugen Dedu for the implementation, which can be found at

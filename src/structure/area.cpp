@@ -146,7 +146,8 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, const unsigned int & r
     // Create a 2D map of characters.
     Map2D<MapTile> map(signedRadius * 2, signedRadius * 2);
     // Evaluate the field of view.
-    this->fov(map, origin_x, origin_y, origin_z, radius);
+    //this->fov(map, origin_x, origin_y, origin_z, radius);
+    this->simpleFov(map, origin_x, origin_y, origin_z, radius);
     // Prepare Environment layer.
     for (int y = max_y; y >= min_y; --y)
     {
@@ -290,11 +291,12 @@ std::string Area::drawASCIIFov(Room * centerRoom, const unsigned int & radius)
     // Create a 2D map of characters.
     Map2D<MapTile> map(signedRadius * 2, signedRadius * 2, MapTile::Void);
     // Evaluate the field of view.
-    this->fov(map, origin_x, origin_y, origin_z, radius);
+    //this->fov(map, origin_x, origin_y, origin_z, radius);
+    this->simpleFov(map, origin_x, origin_y, origin_z, radius);
     // Prepare Living Creatures layer.
     for (int y = max_y; y >= min_y; --y)
     {
-        for (int x = min_x; x < max_x; ++x)
+        for (int x = min_x; x <= max_x; ++x)
         {
             std::string tile = " ";
             Room * room = this->getRoom(x, y, origin_z);
@@ -446,6 +448,41 @@ void Area::los(
     }
 }
 
+void Area::simpleFov(Map2D<MapTile> & map, int origin_x, int origin_y, int origin_z, const unsigned int & radius)
+{
+    int r = static_cast<int>(radius);
+    for (int x = (origin_x - r); x <= origin_x; ++x)
+    {
+        for (int y = (origin_y - r); y <= origin_y; ++y)
+        {
+            if ((x - origin_x) * (x - origin_x) + (y - origin_y) * (y - origin_y) <= (r * r))
+            {
+                int symmetric_x = origin_x - (x - origin_x);
+                int symmetric_y = origin_y - (y - origin_y);
+                if (this->fastInSight(origin_x, origin_y, origin_z, x, y, origin_z, radius))
+                {
+                    map.set(x, y, MapTile::Walkable);
+                }
+                if (this->fastInSight(origin_x, origin_y, origin_z, x, symmetric_y, origin_z, radius))
+                {
+                    map.set(x, symmetric_y, MapTile::Walkable);
+                }
+                if (this->fastInSight(origin_x, origin_y, origin_z, symmetric_x, y, origin_z, radius))
+                {
+                    map.set(symmetric_x, y, MapTile::Walkable);
+                }
+                if (this->fastInSight(origin_x, origin_y, origin_z, symmetric_x, symmetric_y, origin_z, radius))
+                {
+                    map.set(symmetric_x, symmetric_y, MapTile::Walkable);
+                }
+                // (x, y), (x, ySym), (xSym , y), (xSym, ySym) are in the circle
+            }
+        }
+    }
+}
+
+#define USE_CUSTOM 0
+
 bool Area::fastInSight(
     int origin_x,
     int origin_y,
@@ -459,8 +496,10 @@ bool Area::fastInSight(
     int ystep, xstep;
     // The error accumulated during the increment.
     int error;
+#if USE_CUSTOM
     // *vision the previous value of the error variable.
     int errorprev;
+#endif
     // The points of the line.
     int x = origin_x;
     int y = origin_y;
@@ -494,7 +533,11 @@ bool Area::fastInSight(
     {
         // first octant (0 <= slope <= 1)
         // compulsory initialization (even for errorprev, needed when dx==dy)
+#if USE_CUSTOM
         errorprev = error = dx;  // start in the middle of the square
+#else
+        error = dx;  // start in the middle of the square
+#endif
         for (int i = 0; i < dx; ++i)
         {
             // do not use the first point (already done)
@@ -505,6 +548,7 @@ bool Area::fastInSight(
                 // increment y if AFTER the middle ( > )
                 y += ystep;
                 error -= ddx;
+#if USE_CUSTOM
                 // three cases (octant == right->right-top for directions below):
                 if (error + errorprev < ddx)
                 {
@@ -522,21 +566,22 @@ bool Area::fastInSight(
                 //    if (!this->isValid(x - xstep, y, z)) return false;
                 //    if (!this->isValid(x, y - ystep, z)) return false;
                 //}
+#endif
             }
             if (!this->isValid(x, y, z)) return false;
+#if USE_CUSTOM
             errorprev = error;
-            // Check the distance.
-            auto distance = static_cast<unsigned int>(std::sqrt(std::pow(target_x - x, 2) + std::pow(target_y - y, 2)));
-            if (distance > radius)
-            {
-                return false;
-            }
+#endif
         }
     }
     else
     {
         // The same as above.
+#if USE_CUSTOM
         errorprev = error = dy;
+#else
+        error = dy;
+#endif
         for (int i = 0; i < dy; ++i)
         {
             y += ystep;
@@ -545,6 +590,7 @@ bool Area::fastInSight(
             {
                 x += xstep;
                 error -= ddy;
+#if USE_CUSTOM
                 if (error + errorprev < ddy)
                 {
                     if (!this->isValid(x - xstep, y, z)) return false;
@@ -559,15 +605,12 @@ bool Area::fastInSight(
                 //    if (!this->isValid(x - xstep, y, z)) return false;
                 //    if (!this->isValid(x, y - ystep, z)) return false;
                 //}
+#endif
             }
             if (!this->isValid(x, y, z)) return false;
+#if USE_CUSTOM
             errorprev = error;
-            // Check the distance.
-            auto distance = static_cast<unsigned int>(std::sqrt(std::pow(target_x - x, 2) + std::pow(target_y - y, 2)));
-            if (distance > radius)
-            {
-                return false;
-            }
+#endif
         }
     }
     return true;
