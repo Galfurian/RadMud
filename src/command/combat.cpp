@@ -76,6 +76,13 @@ void LoadCombatCommands()
         command.hndl = DoAim;
         Mud::instance().addCommand(command);
     }
+    {
+        command.name = "fire";
+        command.help = "Allows to fire with an equipped ranged weapon to an aimed target.";
+        command.args = "";
+        command.hndl = DoFire;
+        Mud::instance().addCommand(command);
+    }
 }
 
 void DoKill(Character * character, ArgumentHandler & args)
@@ -444,7 +451,7 @@ void DoAim(Character * character, ArgumentHandler & args)
     else
     {
         // Check if the target is still in sight.
-        if (character->room->area->fastInSight(character, aimedCharacter))
+        if (character->isAtRange(aimedCharacter, character->getViewDistance()))
         {
             character->sendMsg("You aim at %s...\n", aimedCharacter->getName());
             // Set the aimed character.
@@ -453,6 +460,49 @@ void DoAim(Character * character, ArgumentHandler & args)
         else
         {
             character->sendMsg("%s is out of your line of sight...\n", aimedCharacter->getNameCapital());
+        }
+    }
+}
+
+void DoFire(Character * character, ArgumentHandler & /*args*/)
+{
+    // Check if the pointer to the aimed target is still valid.
+    if (character->aimedCharacter == nullptr)
+    {
+        character->sendMsg("You first need to aim at someone or something.\n");
+        return;
+    }
+    // Check if the target is still in sight.
+    if (!character->isAtRange(character->aimedCharacter, character->getViewDistance()))
+    {
+        character->sendMsg("%s is out of your line of sight...\n", character->aimedCharacter->getNameCapital());
+        return;
+    }
+    // Retrive the active ranged weapons.
+    auto rangedWeapons = character->getActiveRangedWeapons();
+    // Check if the character has some ranged weapons equipped.
+    if (rangedWeapons.empty())
+    {
+        character->sendMsg("You don't have any ranged weapon equipped.\n");
+        return;
+    }
+    // For each ranged weapon check if it is able to reach the target.
+    for (auto weapon : rangedWeapons)
+    {
+        auto weaponRange = weapon->getRange();
+        Logger::log(LogLevel::Debug, "Weapon Range : %s", ToString(weaponRange));
+        if (character->isAtRange(character->aimedCharacter, weaponRange))
+        {
+            character->sendMsg("You fire at %s with %s...\n",
+                               character->aimedCharacter->getName(),
+                               weapon->getName(true));
+        }
+        else
+        {
+            character->sendMsg("You fire at %s with %s but %s is out of your reach...\n",
+                               character->aimedCharacter->getName(),
+                               weapon->getName(true),
+                               character->aimedCharacter->getSubjectPronoun());
         }
     }
 }

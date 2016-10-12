@@ -516,11 +516,11 @@ public:
     /// @param range The maximum range.
     /// @return <b>True</b> if the target is in sight,<br>
     ///         <b>False</b> otherwise.
-    bool isAtRange(Character * target, const unsigned int & range) const;
+    bool isAtRange(Character * target, const unsigned int & range);
 
     /// @brief Provides a pointer to the opponent on the top of the aggro list.
     /// @return A pointer to the next opponent.
-    Character * getNextOpponentAtRange(const unsigned int & range) const;
+    Character * getNextOpponentAtRange(const unsigned int & range);
 
     /// @brief Provides the list of active melee weapons (Left and Right hands).
     /// @return Vector of melee weapons.

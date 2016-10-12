@@ -48,4 +48,7 @@ void DoReload(Character * character, ArgumentHandler & args);
 /// Allows to aim at a target.
 void DoAim(Character * character, ArgumentHandler & args);
 
+/// Allows to shot with an equipped ranged weapon to an aimed target.
+void DoFire(Character * character, ArgumentHandler & args);
+
 ///@}

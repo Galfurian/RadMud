@@ -1430,7 +1430,7 @@ bool Character::canAttackWith(const EquipmentSlot & slot) const
     return false;
 }
 
-bool Character::isAtRange(Character * target, const unsigned int & range) const
+bool Character::isAtRange(Character * target, const unsigned int & range)
 {
     if (WrongAssert(target == nullptr)) return false;
     if (WrongAssert(this->room == nullptr)) return false;
@@ -1440,7 +1440,7 @@ bool Character::isAtRange(Character * target, const unsigned int & range) const
     return this->room->area->fastInSight(this->room->coord, target->room->coord, range);
 }
 
-Character * Character::getNextOpponentAtRange(const unsigned int & range) const
+Character * Character::getNextOpponentAtRange(const unsigned int & range)
 {
     if (opponents.hasOpponents())
     {

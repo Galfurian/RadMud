@@ -158,6 +158,12 @@ public:
         const unsigned int & radius);
 
     /// @brief Determine if a coordinate is in sight from a starting one.
+    /// @details
+    /// Thanks to Eugen Dedu for the implementation, which can be found at
+    /// http://lifc.univ-fcomte.fr/home/~ededu/projects/bresenham/
+    /// Cite: The difference with Bresenham is that ALL the points of the
+    /// line are printed, not only one per x coordinate.
+    ///
     /// @param origin_x The x coordinate of the central room.
     /// @param origin_y The y coordinate of the central room.
     /// @param origin_z The z coordinate of the central room.
@@ -174,7 +180,7 @@ public:
         int target_x,
         int target_y,
         int target_z,
-        const unsigned int & radius) const;
+        const unsigned int & radius);
 
     /// @brief Determine if a coordinate is in sight from a starting one.
     /// @param origin The coordinates of the origin.
@@ -182,14 +188,7 @@ public:
     /// @param radius The radius of visibility.
     /// @return <b>True</b> if the target room is in sight,<br>
     ///         <b>False</b> otherwise.
-    bool fastInSight(const Coordinates & origin, const Coordinates & target, const unsigned int & radius) const;
-
-    /// @brief Determine if a target character is in sight from a source one.
-    /// @param source The character placed on the origin.
-    /// @param target The target character.
-    /// @return <b>True</b> if the target is in sight,<br>
-    ///         <b>False</b> otherwise.
-    bool fastInSight(Character * source, Character * target) const;
+    bool fastInSight(const Coordinates & origin, const Coordinates & target, const unsigned int & radius);
 
     /// @brief Provides a list of characters which are in sight.
     /// @param targets    The list which will contain the targets.
@@ -211,4 +210,6 @@ public:
     /// @brief Function used to register inside the lua environment the class.
     /// @param L The lua environment.
     static void luaRegister(lua_State * L);
+
+    bool isValid(int x, int y, int z);
 };

@@ -453,58 +453,129 @@ bool Area::fastInSight(
     int target_x,
     int target_y,
     int /*target_z*/,
-    const unsigned int & radius) const
+    const unsigned int & radius)
 {
-    double deltax = target_x - origin_x;
-    double deltay = target_y - origin_y;
-    double error = -1.0;
-    // Assume deltax != 0 (line is not vertical)
-    double deltaerr = std::abs(deltay / deltax);
-    // note that this division needs to be done in a way that preserves the fractional part
+    // The steps on y and x axis.
+    int ystep, xstep;
+    // The error accumulated during the increment.
+    int error;
+    // *vision the previous value of the error variable.
+    int errorprev;
+    // The points of the line.
+    int x = origin_x;
     int y = origin_y;
-    for (int x = origin_x; x < target_x - 1; ++x)
+    int z = origin_z;
+    int dx = target_x - origin_x;
+    int dy = target_y - origin_y;
+    // Compulsory variables: the double values of dy and dx.
+    // Work with double values for full precision.
+    int ddy = 2 * dy;
+    int ddx = 2 * dx;
+    // NB the last point can't be here, because of its previous point (which has to be verified)
+    if (dy < 0)
     {
-        if (!this->inBoundaries(x, y, origin_z))
+        ystep = -1;
+        dy = -dy;
+    }
+    else
+    {
+        ystep = 1;
+    }
+    if (dx < 0)
+    {
+        xstep = -1;
+        dx = -dx;
+    }
+    else
+    {
+        xstep = 1;
+    }
+    if (ddx >= ddy)
+    {
+        // first octant (0 <= slope <= 1)
+        // compulsory initialization (even for errorprev, needed when dx==dy)
+        errorprev = error = dx;  // start in the middle of the square
+        for (int i = 0; i < dx; ++i)
         {
-            return false;
+            // do not use the first point (already done)
+            x += xstep;
+            error += ddy;
+            if (error > ddx)
+            {
+                // increment y if AFTER the middle ( > )
+                y += ystep;
+                error -= ddx;
+                // three cases (octant == right->right-top for directions below):
+                if (error + errorprev < ddx)
+                {
+                    // bottom square also
+                    if (!this->isValid(x, y - ystep, z)) return false;
+                }
+                else if (error + errorprev > ddx)
+                {
+                    // left square also
+                    if (!this->isValid(x - xstep, y, z)) return false;
+                }
+                // This branch covers the case in which the line passes through a corner.
+                //else
+                //{
+                //    if (!this->isValid(x - xstep, y, z)) return false;
+                //    if (!this->isValid(x, y - ystep, z)) return false;
+                //}
+            }
+            if (!this->isValid(x, y, z)) return false;
+            errorprev = error;
+            // Check the distance.
+            auto distance = static_cast<unsigned int>(std::sqrt(std::pow(target_x - x, 2) + std::pow(target_y - y, 2)));
+            if (distance > radius)
+            {
+                return false;
+            }
         }
-        if (!areaMap.has(x, y, origin_z))
+    }
+    else
+    {
+        // The same as above.
+        errorprev = error = dy;
+        for (int i = 0; i < dy; ++i)
         {
-            return false;
-        }
-        error += deltaerr;
-        if (error >= 0.0)
-        {
-            y += 1;
-        }
-        error -= 1;
-        unsigned int distance = static_cast<unsigned int>(
-            std::sqrt(std::pow(target_x - x, 2) + std::pow(target_y - y, 2)));
-        if (distance > radius)
-        {
-            return false;
+            y += ystep;
+            error += ddx;
+            if (error > ddy)
+            {
+                x += xstep;
+                error -= ddy;
+                if (error + errorprev < ddy)
+                {
+                    if (!this->isValid(x - xstep, y, z)) return false;
+                }
+                else if (error + errorprev > ddy)
+                {
+                    if (!this->isValid(x, y - ystep, z)) return false;
+                }
+                // This branch covers the case in which the line passes through a corner.
+                //else
+                //{
+                //    if (!this->isValid(x - xstep, y, z)) return false;
+                //    if (!this->isValid(x, y - ystep, z)) return false;
+                //}
+            }
+            if (!this->isValid(x, y, z)) return false;
+            errorprev = error;
+            // Check the distance.
+            auto distance = static_cast<unsigned int>(std::sqrt(std::pow(target_x - x, 2) + std::pow(target_y - y, 2)));
+            if (distance > radius)
+            {
+                return false;
+            }
         }
     }
     return true;
 }
 
-bool Area::fastInSight(const Coordinates & origin, const Coordinates & target, const unsigned int & radius) const
+bool Area::fastInSight(const Coordinates & origin, const Coordinates & target, const unsigned int & radius)
 {
     return this->fastInSight(origin.x, origin.y, origin.z, target.x, target.y, target.z, radius);
-}
-
-bool Area::fastInSight(Character * source, Character * target) const
-{
-    if ((source == nullptr) || (target == nullptr))
-    {
-        return false;
-    }
-    if ((source->room == nullptr) || (target->room == nullptr))
-    {
-        return false;
-    }
-    // Check if the target is in sight.
-    return this->fastInSight(source->room->coord, target->room->coord, source->getViewDistance());
 }
 
 bool Area::getCharactersInSight(
@@ -595,3 +666,29 @@ void Area::luaRegister(lua_State * L)
         .addData("elevation", &Area::elevation, false)
         .endClass();
 }
+
+bool Area::isValid(int x, int y, int z)
+{
+    // Check if out of boundaries.
+    if (!this->inBoundaries(x, y, z))
+    {
+        return false;
+    }
+    // Get the room at the coordinates.
+    Room * currentRoom = this->getRoom(x, y, z);
+    if (currentRoom == nullptr)
+    {
+        return false;
+    }
+    // Check if there is a door.
+    Item * door = currentRoom->findDoor();
+    if (door != nullptr)
+    {
+        if (HasFlag(door->flags, ItemFlag::Closed))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
