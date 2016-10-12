@@ -29,6 +29,7 @@
 #include "../item/item.hpp"
 #include "../action/combat/combatAction.hpp"
 #include "../command/argumentHandler.hpp"
+#include "characterContainer.hpp"
 
 #include <deque>
 
@@ -89,7 +90,7 @@ public:
     /// Character current action.
     std::deque<std::shared_ptr<GeneralAction> > actionQueue;
     /// List of characters in sight.
-    std::vector<Character *> charactersInSight;
+    CharacterContainer charactersInSight;
     /// A pointer to the currently aimed character.
     Character * aimedCharacter;
 

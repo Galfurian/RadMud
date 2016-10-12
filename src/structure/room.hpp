@@ -26,9 +26,8 @@
 #include "../item/item.hpp"
 #include "../lua/lua_script.hpp"
 #include "../utilities/coordinates.hpp"
-#include "../character/character.hpp"
 #include "../character/mobile.hpp"
-#include "../character/player.hpp"
+#include "../character/characterContainer.hpp"
 #include "../item/itemContainer.hpp"
 
 class Item;
@@ -69,7 +68,7 @@ public:
     /// List of items in the room.
     ItemContainer items;
     /// List of characters in the room.
-    std::vector<Character *> characters;
+    CharacterContainer characters;
     /// Integer that describe the flags of the room.
     unsigned int flags;
 
@@ -168,7 +167,7 @@ public:
     Character * findCharacter(
         std::string target,
         int & number,
-        const std::vector<Character *> & exceptions = std::vector<Character *>());
+        const std::vector<Character *> & exceptions = std::vector<Character *>()) const;
 
     /// @brief Search for the player in the room.
     /// @param target    The player to search.
@@ -178,7 +177,7 @@ public:
     Player * findPlayer(
         std::string target,
         int & number,
-        const std::vector<Character *> & exceptions = std::vector<Character *>());
+        const std::vector<Character *> & exceptions = std::vector<Character *>()) const;
 
     /// @brief Search for the mobile in the room.
     /// @param target    The mobile to search.
@@ -188,7 +187,7 @@ public:
     Mobile * findMobile(
         std::string target,
         int & number,
-        const std::vector<Character *> & exceptions = std::vector<Character *>());
+        const std::vector<Character *> & exceptions = std::vector<Character *>()) const;
 
     /// @brief Add the provided exit to the room list of exits.
     /// @param exit The exit to add to the list.

@@ -294,92 +294,20 @@ std::vector<Item *> Room::findBuildings(ModelType type)
 Character * Room::findCharacter(
     std::string target,
     int & number,
-    const std::vector<Character *> & exceptions)
+    const std::vector<Character *> & exceptions) const
 {
-    for (auto iterator : characters)
-    {
-        // Check exceptions.
-        if (!exceptions.empty())
-        {
-            for (auto exception : exceptions)
-            {
-                if (exception->getName() == iterator->getName())
-                {
-                    continue;
-                }
-            }
-        }
-        // Check if the character is a mobile or a player.
-        if (iterator->isMobile())
-        {
-            if (iterator->toMobile()->hasKey(ToLower(target)))
-            {
-                if (number > 1)
-                {
-                    number -= 1;
-                }
-                else
-                {
-                    return iterator->toMobile();
-                }
-            }
-        }
-        else
-        {
-            if (iterator->toPlayer()->isPlaying())
-            {
-                if (BeginWith(iterator->toPlayer()->getName(), ToLower(target)))
-                {
-                    if (number > 1)
-                    {
-                        number -= 1;
-                    }
-                    else
-                    {
-                        return iterator->toPlayer();
-                    }
-                }
-            }
-        }
-    }
-    return nullptr;
+    return characters.findCharacter(target, number, exceptions);
 }
 
 Player * Room::findPlayer(
     std::string target,
     int & number,
-    const std::vector<Character *> & exceptions)
+    const std::vector<Character *> & exceptions) const
 {
-    for (auto iterator : characters)
+    Character * foundCharacter = characters.findCharacter(target, number, exceptions, true);
+    if (foundCharacter != nullptr)
     {
-        // Check if the character is a mobile.
-        if (iterator->isMobile())
-        {
-            continue;
-        }
-        // Check exceptions.
-        if (!exceptions.empty())
-        {
-            for (auto exception : exceptions)
-            {
-                if (exception->getName() == iterator->getName())
-                {
-                    continue;
-                }
-            }
-        }
-        // Check if it is the desired target.
-        if (iterator->toPlayer()->isPlaying())
-        {
-            if (BeginWith(iterator->toPlayer()->getName(), ToLower(target)))
-            {
-                if (number == 1)
-                {
-                    return iterator->toPlayer();
-                }
-                number -= 1;
-            }
-        }
+        return foundCharacter->toPlayer();
     }
     return nullptr;
 }
@@ -387,35 +315,12 @@ Player * Room::findPlayer(
 Mobile * Room::findMobile(
     std::string target,
     int & number,
-    const std::vector<Character *> & exceptions)
+    const std::vector<Character *> & exceptions) const
 {
-    for (auto iterator : characters)
+    Character * foundCharacter = characters.findCharacter(target, number, exceptions, false, true);
+    if (foundCharacter != nullptr)
     {
-        // Check if the character is a player.
-        if (!iterator->isMobile())
-        {
-            continue;
-        }
-        // Check exceptions.
-        if (!exceptions.empty())
-        {
-            for (auto exception : exceptions)
-            {
-                if (exception->getName() == iterator->getName())
-                {
-                    continue;
-                }
-            }
-        }
-        // Check if it is the desired target.
-        if (iterator->toMobile()->hasKey(ToLower(target)))
-        {
-            if (number == 1)
-            {
-                return iterator->toMobile();
-            }
-            number -= 1;
-        }
+        return foundCharacter->toMobile();
     }
     return nullptr;
 }

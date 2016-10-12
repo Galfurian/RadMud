@@ -433,69 +433,30 @@ void DoAim(Character * character, ArgumentHandler & args)
     // Otherwise try to find the target inside the list of characters in sight.
     if (aimedCharacter == nullptr)
     {
-        // Create a list which contains the characters in sight, BUT without the characters inside the room.
-
-        for (auto characterInSight: character->charactersInSight)
+        aimedCharacter = character->charactersInSight.findCharacter(args[0].getContent(), args[0].getIndex());
+        if (aimedCharacter == nullptr)
         {
-            // Check if the target is still available.
-            if (characterInSight == nullptr) continue;
-            // Check the type of the character.
-            if (characterInSight->isMobile())
-            {
-                if (characterInSight->toMobile()->hasKey(ToLower(args[0].getContent())))
-                {
-                    if (number > 1)
-                    {
-                        number -= 1;
-                        continue;
-                    }
-                    aimedCharacter = characterInSight;
-                    break;
-                }
-            }
-            else if (characterInSight->isPlayer())
-            {
-                if (characterInSight->toPlayer()->isPlaying())
-                {
-                    if (BeginWith(characterInSight->toPlayer()->getName(), ToLower(target)))
-                    {
-                        if (number > 1)
-                        {
-                            number -= 1;
-                            continue;
-                        }
-                        aimedCharacter = characterInSight;
-                        break;
-                    }
-                }
-            }
+            character->sendMsg("You don't see '%s' anywhere...\n", target);
+            return;
         }
     }
-    // Check if the target is still in sight.
-    if (aimedCharacter == nullptr)
+    // Check the room of the target.
+    if (aimedCharacter->room == nullptr)
     {
-        character->sendMsg("You don't see '%s' anywhere...\n", target);
+        character->sendMsg("%s is out of your line of sight...\n", aimedCharacter->getNameCapital());
     }
     else
     {
-        // Check the room of the target.
-        if (aimedCharacter->room == nullptr)
+        // Check if the target is still in sight.
+        if (character->room->area->fastInSight(character, aimedCharacter))
         {
-            character->sendMsg("%s is out of your line of sight...\n", aimedCharacter->getNameCapital());
+            character->sendMsg("You aim at %s...\n", aimedCharacter->getName());
+            // Set the aimed character.
+            character->aimedCharacter = aimedCharacter;
         }
         else
         {
-            // Check if the target is in sight.
-            if (character->room->area->fastInSight(character, aimedCharacter))
-            {
-                character->sendMsg("You aim at %s...\n", aimedCharacter->getName());
-                // Set the aimed character.
-                character->aimedCharacter = aimedCharacter;
-            }
-            else
-            {
-                character->sendMsg("%s is out of your line of sight...\n", aimedCharacter->getNameCapital());
-            }
+            character->sendMsg("%s is out of your line of sight...\n", aimedCharacter->getNameCapital());
         }
     }
 }
