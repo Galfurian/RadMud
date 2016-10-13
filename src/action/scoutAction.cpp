@@ -65,7 +65,8 @@ ActionStatus ScoutAction::perform()
     // Consume the stamina.
     actor->remStamina(consumedStamina, true);
     // Show the surrounding.
-    if (!actor->getCharactersInSight(actor->charactersInSight))
+    actor->charactersInSight = actor->getCharactersInSight();
+    if (actor->charactersInSight.empty())
     {
         actor->sendMsg("You have found nothing...\n");
     }

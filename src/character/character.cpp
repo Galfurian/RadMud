@@ -509,10 +509,10 @@ std::string Character::getStaminaCondition()
 
 unsigned int Character::getViewDistance() const
 {
-    // Value = 3 + LogMod(PER)
-    // MIN   = 3.0
+    // Value = 4 + LogMod(PER)
+    // MIN   = 4.0
     // MAX   = 7.2
-    return 3 + this->getAbilityLog(Ability::Perception, 0.0, 1.0);
+    return 4 + this->getAbilityLog(Ability::Perception, 0.0, 1.0);
 }
 
 void Character::setAction(std::shared_ptr<GeneralAction> _action)
@@ -1511,14 +1511,12 @@ std::vector<RangedWeaponItem *> Character::getActiveRangedWeapons()
     return ret;
 }
 
-bool Character::getCharactersInSight(std::vector<Character *> & targets)
+CharacterContainer Character::getCharactersInSight()
 {
-    std::vector<Character *> exceptions;
+    CharacterContainer characterContainer, exceptions;
     exceptions.push_back(this);
     Coordinates coord = this->room->coord;
-    targets.clear();
     return this->room->area->getCharactersInSight(
-        targets,
         exceptions,
         coord.x,
         coord.y,

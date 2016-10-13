@@ -455,22 +455,31 @@ void Area::simpleFov(Map2D<MapTile> & map, int origin_x, int origin_y, int origi
     {
         for (int y = (origin_y - r); y <= origin_y; ++y)
         {
+            if ((x == origin_x) && (y == origin_y))
+            {
+                map.set(x, y, MapTile::Walkable);
+                continue;
+            }
             if ((x - origin_x) * (x - origin_x) + (y - origin_y) * (y - origin_y) <= (r * r))
             {
                 int symmetric_x = origin_x - (x - origin_x);
                 int symmetric_y = origin_y - (y - origin_y);
+                // [X, Y]
                 if (this->fastInSight(origin_x, origin_y, origin_z, x, y, origin_z, radius))
                 {
                     map.set(x, y, MapTile::Walkable);
                 }
+                // [X, sY]
                 if (this->fastInSight(origin_x, origin_y, origin_z, x, symmetric_y, origin_z, radius))
                 {
                     map.set(x, symmetric_y, MapTile::Walkable);
                 }
+                // [sX, Y]
                 if (this->fastInSight(origin_x, origin_y, origin_z, symmetric_x, y, origin_z, radius))
                 {
                     map.set(symmetric_x, y, MapTile::Walkable);
                 }
+                // [sX, sY]
                 if (this->fastInSight(origin_x, origin_y, origin_z, symmetric_x, symmetric_y, origin_z, radius))
                 {
                     map.set(symmetric_x, symmetric_y, MapTile::Walkable);
@@ -481,7 +490,7 @@ void Area::simpleFov(Map2D<MapTile> & map, int origin_x, int origin_y, int origi
     }
 }
 
-#define USE_CUSTOM 0
+//#define USE_CUSTOM 0
 
 bool Area::fastInSight(
     int origin_x,
@@ -490,130 +499,51 @@ bool Area::fastInSight(
     int target_x,
     int target_y,
     int /*target_z*/,
-    const unsigned int & radius)
+    const unsigned int & /*radius*/)
 {
-    // The steps on y and x axis.
-    int ystep, xstep;
-    // The error accumulated during the increment.
-    int error;
-#if USE_CUSTOM
-    // *vision the previous value of the error variable.
-    int errorprev;
-#endif
-    // The points of the line.
-    int x = origin_x;
-    int y = origin_y;
-    int z = origin_z;
-    int dx = target_x - origin_x;
-    int dy = target_y - origin_y;
-    // Compulsory variables: the double values of dy and dx.
-    // Work with double values for full precision.
-    int ddy = 2 * dy;
-    int ddx = 2 * dx;
-    // NB the last point can't be here, because of its previous point (which has to be verified)
-    if (dy < 0)
+    int w = target_x - origin_x;
+    int h = target_y - origin_y;
+    int dx1 = (w < 0) ? -1 : (w > 0) ? 1 : 0;
+    int dy1 = (h < 0) ? -1 : (h > 0) ? 1 : 0;
+    int dx2 = (w < 0) ? -1 : (w > 0) ? 1 : 0;
+    int dy2 = (h < 0) ? -1 : (h > 0) ? 1 : 0;
+    int longest = std::abs(w);
+    int shortest = std::abs(h);
+    int cx = origin_x;
+    int cy = origin_y;
+    int cz = origin_z;
+    if (!(longest > shortest))
     {
-        ystep = -1;
-        dy = -dy;
+        longest = std::abs(h);
+        shortest = std::abs(w);
+        if (h < 0) dy2 = -1; else if (h > 0) dy2 = 1;
+        dx2 = 0;
     }
-    else
+    int numerator = longest >> 1;
+    for (int i = 0; i <= longest; i++)
     {
-        ystep = 1;
-    }
-    if (dx < 0)
-    {
-        xstep = -1;
-        dx = -dx;
-    }
-    else
-    {
-        xstep = 1;
-    }
-    if (ddx >= ddy)
-    {
-        // first octant (0 <= slope <= 1)
-        // compulsory initialization (even for errorprev, needed when dx==dy)
-#if USE_CUSTOM
-        errorprev = error = dx;  // start in the middle of the square
-#else
-        error = dx;  // start in the middle of the square
-#endif
-        for (int i = 0; i < dx; ++i)
+        if (!this->isValid(cx, cy, cz))
         {
-            // do not use the first point (already done)
-            x += xstep;
-            error += ddy;
-            if (error > ddx)
-            {
-                // increment y if AFTER the middle ( > )
-                y += ystep;
-                error -= ddx;
-#if USE_CUSTOM
-                // three cases (octant == right->right-top for directions below):
-                if (error + errorprev < ddx)
-                {
-                    // bottom square also
-                    if (!this->isValid(x, y - ystep, z)) return false;
-                }
-                else if (error + errorprev > ddx)
-                {
-                    // left square also
-                    if (!this->isValid(x - xstep, y, z)) return false;
-                }
-                // This branch covers the case in which the line passes through a corner.
-                //else
-                //{
-                //    if (!this->isValid(x - xstep, y, z)) return false;
-                //    if (!this->isValid(x, y - ystep, z)) return false;
-                //}
-#endif
-            }
-            if (!this->isValid(x, y, z)) return false;
-#if USE_CUSTOM
-            errorprev = error;
-#endif
+            break;
+        }
+        if ((cx == target_x) && (cy == target_y))
+        {
+            return true;
+        }
+        numerator += shortest;
+        if (!(numerator < longest))
+        {
+            numerator -= longest;
+            cx += dx1;
+            cy += dy1;
+        }
+        else
+        {
+            cx += dx2;
+            cy += dy2;
         }
     }
-    else
-    {
-        // The same as above.
-#if USE_CUSTOM
-        errorprev = error = dy;
-#else
-        error = dy;
-#endif
-        for (int i = 0; i < dy; ++i)
-        {
-            y += ystep;
-            error += ddx;
-            if (error > ddy)
-            {
-                x += xstep;
-                error -= ddy;
-#if USE_CUSTOM
-                if (error + errorprev < ddy)
-                {
-                    if (!this->isValid(x - xstep, y, z)) return false;
-                }
-                else if (error + errorprev > ddy)
-                {
-                    if (!this->isValid(x, y - ystep, z)) return false;
-                }
-                // This branch covers the case in which the line passes through a corner.
-                //else
-                //{
-                //    if (!this->isValid(x - xstep, y, z)) return false;
-                //    if (!this->isValid(x, y - ystep, z)) return false;
-                //}
-#endif
-            }
-            if (!this->isValid(x, y, z)) return false;
-#if USE_CUSTOM
-            errorprev = error;
-#endif
-        }
-    }
-    return true;
+    return false;
 }
 
 bool Area::fastInSight(const Coordinates & origin, const Coordinates & target, const unsigned int & radius)
@@ -621,79 +551,71 @@ bool Area::fastInSight(const Coordinates & origin, const Coordinates & target, c
     return this->fastInSight(origin.x, origin.y, origin.z, target.x, target.y, target.z, radius);
 }
 
-bool Area::getCharactersInSight(
-    std::vector<Character *> & targets,
-    std::vector<Character *> & exceptions,
+CharacterContainer Area::getCharactersInSight(
+    CharacterContainer & exceptions,
     int origin_x,
     int origin_y,
     int origin_z,
     const unsigned int & radius)
 {
-    double increment_x = 0.0, increment_y = 0.0, increment_z = 0.0;
-    for (float i = 0.0; i < 360; ++i)
+    CharacterContainer characterContainer;
+    int r = static_cast<int>(radius);
+    for (int x = (origin_x - r); x <= origin_x; ++x)
     {
-        // The x and y coordinates used by LOS Algorithm.
-        increment_x = cos(static_cast<double>(i * 0.0174533f));
-        increment_y = sin(static_cast<double>(i * 0.0174533f));
-        double ox = origin_x + static_cast<double>(0.5f);
-        double oy = origin_y + static_cast<double>(0.5f);
-        double oz = origin_z + static_cast<double>(0.5f);
-        for (unsigned int distance = 0; distance <= radius; ++distance)
+        for (int y = (origin_y - r); y <= origin_y; ++y)
         {
-            // Transform into integer the coordinates.
-            int curr_x = static_cast<int>(ox);
-            int curr_y = static_cast<int>(oy);
-            int curr_z = static_cast<int>(oz);
-            // Get the room at the current coordinates.
-            Room * room = this->getRoom(curr_x, curr_y, curr_z);
-            if (room != nullptr)
+            if ((x == origin_x) && (y == origin_y))
             {
-                // Check if there is a door.
-                Item * door = room->findDoor();
-                if (door != nullptr)
+                characterContainer.addUnique(this->getCharactersAt(x, y, origin_z, exceptions));
+            }
+            else
+            {
+                if ((x - origin_x) * (x - origin_x) + (y - origin_y) * (y - origin_y) <= (r * r))
                 {
-                    if (HasFlag(door->flags, ItemFlag::Closed))
+                    int symmetric_x = origin_x - (x - origin_x);
+                    int symmetric_y = origin_y - (y - origin_y);
+                    // [X, Y]
+                    if (this->fastInSight(origin_x, origin_y, origin_z, x, y, origin_z, radius))
                     {
-                        break;
+                        characterContainer.addUnique(
+                            this->getCharactersAt(x,
+                                                  y,
+                                                  origin_z,
+                                                  exceptions));
                     }
+                    // [X, sY]
+                    if (this->fastInSight(origin_x, origin_y, origin_z, x, symmetric_y, origin_z, radius))
+                    {
+                        characterContainer.addUnique(
+                            this->getCharactersAt(x,
+                                                  symmetric_y,
+                                                  origin_z,
+                                                  exceptions));
+                    }
+                    // [sX, Y]
+                    if (this->fastInSight(origin_x, origin_y, origin_z, symmetric_x, y, origin_z, radius))
+                    {
+                        characterContainer.addUnique(
+                            this->getCharactersAt(symmetric_x,
+                                                  y,
+                                                  origin_z,
+                                                  exceptions));
+                    }
+                    // [sX, sY]
+                    if (this->fastInSight(origin_x, origin_y, origin_z, symmetric_x, symmetric_y, origin_z, radius))
+                    {
+                        characterContainer.addUnique(
+                            this->getCharactersAt(symmetric_x,
+                                                  symmetric_y,
+                                                  origin_z,
+                                                  exceptions));
+                    }
+                    // (x, y), (x, ySym), (xSym , y), (xSym, ySym) are in the circle
                 }
-                // Check if there is a character inside the room.
-                for (auto it : room->characters)
-                {
-                    bool skip = false;
-                    for (auto it2 : exceptions)
-                    {
-                        if (it->name == it2->name)
-                        {
-                            skip = true;
-                            break;
-                        }
-                    }
-                    if (!skip)
-                    {
-                        skip = false;
-                        for (auto it2 : targets)
-                        {
-                            if (it->name == it2->name)
-                            {
-                                skip = true;
-                                break;
-                            }
-                        }
-                        if (!skip)
-                        {
-                            targets.push_back(it);
-                        }
-                    }
-                }
-                // Updated current coordinates.
-                ox += increment_x;
-                oy += increment_y;
-                oz += increment_z;
             }
         }
     }
-    return (!targets.empty());
+    return characterContainer;
 }
 
 void Area::luaRegister(lua_State * L)
@@ -735,3 +657,20 @@ bool Area::isValid(int x, int y, int z)
     return true;
 }
 
+CharacterContainer Area::getCharactersAt(const int x, const int y, const int z, const CharacterContainer & exceptions)
+{
+    CharacterContainer characterContainer;
+    if (this->isValid(x, y, z))
+    {
+        Room * room = this->getRoom(x, y, z);
+        // Check if there is a character inside the room.
+        for (auto it : room->characters)
+        {
+            if (!exceptions.containsCharacter(it))
+            {
+                characterContainer.emplace_back_character(it);
+            }
+        }
+    }
+    return characterContainer;
+}

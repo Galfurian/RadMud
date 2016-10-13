@@ -531,10 +531,8 @@ public:
     std::vector<RangedWeaponItem *> getActiveRangedWeapons();
 
     /// @brief Provides a list of characters which are in sight.
-    /// @param targets    The list which will contain the targets.
-    /// @return <b>True</b> if there are targets in sight,<br>
-    ///         <b>False</b> otherwise.
-    bool getCharactersInSight(std::vector<Character *> & targets);
+    /// @return The list containing the targets.
+    CharacterContainer getCharactersInSight();
 
     /// @brief Given an action, it returns the necessary cooldown.
     /// @return The non-decreasing value of the cooldown.

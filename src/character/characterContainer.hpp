@@ -35,13 +35,16 @@ public:
     CharacterContainer();
 
     /// Search the character.
-    Character * findCharacter(const std::string & target,
-                              int & number,
-                              const std::vector<Character *> & exceptions = std::vector<Character *>(),
-                              bool skipMobile = false,
-                              bool skipPlayer = false) const;
+    Character * findCharacter(
+        const std::string & target,
+        int & number,
+        const std::vector<Character *> & exceptions = std::vector<Character *>(),
+        bool skipMobile = false,
+        bool skipPlayer = false) const;
+
+    bool containsCharacter(Character * character) const;
 
     void emplace_back_character(Character * character);
 
-    void addUnique(CharacterContainer & others);
+    void addUnique(const CharacterContainer & others);
 };

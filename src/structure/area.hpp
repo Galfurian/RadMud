@@ -193,17 +193,14 @@ public:
     bool fastInSight(const Coordinates & origin, const Coordinates & target, const unsigned int & radius);
 
     /// @brief Provides a list of characters which are in sight.
-    /// @param targets    The list which will contain the targets.
     /// @param exceptions A list of excections.
     /// @param origin_x   The x coordinate of the central room.
     /// @param origin_y   The y coordinate of the central room.
     /// @param origin_z   The z coordinate of the central room.
     /// @param radius     The radius of visibility.
-    /// @return <b>True</b> if there are targets in sight,<br>
-    ///         <b>False</b> otherwise.
-    bool getCharactersInSight(
-        std::vector<Character *> & targets,
-        std::vector<Character *> & exceptions,
+    /// @return The list containing the targets.
+    CharacterContainer getCharactersInSight(
+        CharacterContainer & exceptions,
         int origin_x,
         int origin_y,
         int origin_z,
@@ -214,4 +211,6 @@ public:
     static void luaRegister(lua_State * L);
 
     bool isValid(int x, int y, int z);
+
+    CharacterContainer getCharactersAt(const int x, const int y, const int z, const CharacterContainer & exceptions);
 };
