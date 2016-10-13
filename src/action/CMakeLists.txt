@@ -20,6 +20,7 @@ set(RADMUD_ACTION_SRC
         ./src/action/reloadAction.cpp
         ./src/action/loadAction.cpp
         ./src/action/unloadAction.cpp
+        ./src/action/aimAction.cpp
         ${RADMUD_COMBAT_ACTION_SRC}
         PARENT_SCOPE
         )

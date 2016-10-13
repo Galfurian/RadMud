@@ -21,6 +21,7 @@
 #include "../action/reloadAction.hpp"
 #include "../action/loadAction.hpp"
 #include "../action/unloadAction.hpp"
+#include "../action/aimAction.hpp"
 #include "../item/magazineItem.hpp"
 
 void LoadCombatCommands()
@@ -228,15 +229,17 @@ void DoScout(Character * character, ArgumentHandler & /*args*/)
     auto requiredTime = 3;
     auto newAction = std::make_shared<ScoutAction>(character, requiredTime);
     // Check the new action.
-    if (!newAction->check())
+    if (newAction->check())
     {
-        character->sendMsg("You can't scout the area.\n");
-        return;
+        // Send the starting message.
+        character->sendMsg("You start scouting the area...\n");
+        // Set the new action.
+        character->setAction(newAction);
     }
-    // Send the starting message.
-    character->sendMsg("You start scouting the area...\n");
-    // Set the new action.
-    character->setAction(newAction);
+    else
+    {
+        character->sendMsg("You failed your action.\n");
+    }
 }
 
 void DoLoad(Character * character, ArgumentHandler & args)
@@ -289,11 +292,7 @@ void DoLoad(Character * character, ArgumentHandler & args)
     // Create the load action.
     auto newAction = std::make_shared<LoadAction>(magazine, projectile, character, requiredTime);
     // Check the new action.
-    if (!newAction->check())
-    {
-        character->sendMsg("You can't load %s.\n", magazine->getName(true));
-    }
-    else
+    if (newAction->check())
     {
         // Send the starting message.
         character->sendMsg("You start loading %s with %s.\n",
@@ -301,6 +300,10 @@ void DoLoad(Character * character, ArgumentHandler & args)
                            projectile->getName(true));
         // Set the new action.
         character->setAction(newAction);
+    }
+    else
+    {
+        character->sendMsg("You failed your action.\n");
     }
 }
 
@@ -350,16 +353,16 @@ void DoUnload(Character * character, ArgumentHandler & args)
     // Create the unload action.
     auto newAction = std::make_shared<UnloadAction>(itemToUnload, character, requiredTime);
     // Check the new action.
-    if (!newAction->check())
-    {
-        character->sendMsg("You can't unload %s.\n", itemToUnload->getName(true));
-    }
-    else
+    if (newAction->check())
     {
         // Send the starting message.
         character->sendMsg("You start unloading %s.\n", itemToUnload->getName(true));
         // Set the new action.
         character->setAction(newAction);
+    }
+    else
+    {
+        character->sendMsg("You failed your action.\n");
     }
 }
 
@@ -408,11 +411,7 @@ void DoReload(Character * character, ArgumentHandler & args)
     auto requiredTime = 2;
     auto newAction = std::make_shared<ReloadAction>(rangedWeapon, magazine, character, requiredTime);
     // Check the new action.
-    if (!newAction->check())
-    {
-        character->sendMsg("You can't reload %s.\n", rangedWeapon->getName(true));
-    }
-    else
+    if (newAction->check())
     {
         // Send the starting message.
         character->sendMsg("You start reloading %s with %s.\n",
@@ -420,6 +419,10 @@ void DoReload(Character * character, ArgumentHandler & args)
                            magazine->getName(true));
         // Set the new action.
         character->setAction(newAction);
+    }
+    else
+    {
+        character->sendMsg("You failed your action.\n");
     }
 }
 
@@ -453,9 +456,22 @@ void DoAim(Character * character, ArgumentHandler & args)
         // Check if the target is still in sight.
         if (character->isAtRange(aimedCharacter, character->getViewDistance()))
         {
-            character->sendMsg("You aim at %s...\n", aimedCharacter->getName());
-            // Set the aimed character.
-            character->aimedCharacter = aimedCharacter;
+            Logger::log(LogLevel::Debug, "Distance : %s", ToString(Area::getDistance(character, aimedCharacter)));
+            auto requiredTime = 1.5 * Area::getDistance(character, aimedCharacter);
+            Logger::log(LogLevel::Debug, "Time     : %s", ToString(requiredTime));
+            auto newAction = std::make_shared<AimAction>(character, aimedCharacter, requiredTime);
+            // Check the new action.
+            if (newAction->check())
+            {
+                // Send the starting message.
+                character->sendMsg("You start aiming at %s...\n", aimedCharacter->getName());
+                // Set the new action.
+                character->setAction(newAction);
+            }
+            else
+            {
+                character->sendMsg("You failed your action.\n");
+            }
         }
         else
         {

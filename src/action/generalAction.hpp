@@ -45,7 +45,9 @@ using ActionType = enum class ActionType_t
     Combat,     ///< The character is fighting.
     Scout,      ///< The character is scouting the area.
     Reload,     ///< The character is reloading a firearm.
-    Load        ///< The character is loading something.
+    Load,       ///< The character is loading something.
+    Unload,     ///< The character is unloading something.
+    Aim         ///< The character is aiming a target.
 };
 
 /// The list of possible actions.

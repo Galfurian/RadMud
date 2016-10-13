@@ -213,4 +213,10 @@ public:
     bool isValid(int x, int y, int z);
 
     CharacterContainer getCharactersAt(const int x, const int y, const int z, const CharacterContainer & exceptions);
+
+    static int getDistance(const int x0, const int y0, const int z0, const int x1, const int y1, const int z1);
+
+    static int getDistance(const Coordinates & source, const Coordinates & target);
+
+    static int getDistance(Character * source, Character * target);
 };

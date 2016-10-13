@@ -42,7 +42,7 @@ bool UnloadAction::check() const
 
 ActionType UnloadAction::getType() const
 {
-    return ActionType::Load;
+    return ActionType::Unload;
 }
 
 std::string UnloadAction::getDescription() const

@@ -674,3 +674,18 @@ CharacterContainer Area::getCharactersAt(const int x, const int y, const int z, 
     }
     return characterContainer;
 }
+
+int Area::getDistance(const int x0, const int y0, const int z0, const int x1, const int y1, const int z1)
+{
+    return static_cast<int>(std::pow((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1) + (z0 - z1) * (z0 - z1), 0.5));
+}
+
+int Area::getDistance(const Coordinates & source, const Coordinates & target)
+{
+    return Area::getDistance(source.x, source.y, source.z, target.x, target.y, target.z);
+}
+
+int Area::getDistance(Character * source, Character * target)
+{
+    return Area::getDistance(source->room->coord, target->room->coord);
+}
