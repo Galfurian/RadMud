@@ -26,7 +26,7 @@
 void LoadObjectCommands()
 {
     Command command;
-    command.level = 0;
+    command.gods = false;
     {
         command.name = "take";
         command.help = "Take something from the ground or from a container.";

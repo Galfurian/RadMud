@@ -27,7 +27,7 @@
 void LoadCombatCommands()
 {
     Command command;
-    command.level = 0;
+    command.gods = false;
     {
         command.name = "kill";
         command.help = "Engage in combat the desired target.";

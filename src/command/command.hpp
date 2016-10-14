@@ -32,13 +32,13 @@ public:
     Command();
 
     /// @brief Create a complete structure for a command.
-    /// @param _level The level necessary to execute the command.
-    /// @param _name  The name of the command.
-    /// @param _help  The help message of the command.
-    /// @param _args  The arguments of the command.
-    /// @param _hndl  The handler of the command.
+    /// @param _gods The level necessary to execute the command.
+    /// @param _name The name of the command.
+    /// @param _help The help message of the command.
+    /// @param _args The arguments of the command.
+    /// @param _hndl The handler of the command.
     Command(
-        int _level,
+        bool _gods,
         std::string _name,
         std::string _help,
         std::string _args,
@@ -49,8 +49,8 @@ public:
     ///         <b>False</b> otherwise.
     bool canUse(Character * character) const;
 
-    /// The level of the command.
-    int level;
+    /// Flag which identifies if the command is for gods.
+    bool gods;
     /// The name of the command.
     std::string name;
     /// The help message of the command.

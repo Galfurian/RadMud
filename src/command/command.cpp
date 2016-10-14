@@ -34,7 +34,7 @@
 #define  VALID_CHARACTERS_DESC "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ,.\n"
 
 Command::Command() :
-    level(),
+    gods(),
     name(),
     help(),
     args(),
@@ -44,12 +44,12 @@ Command::Command() :
 }
 
 Command::Command(
-    int _level,
+    bool _gods,
     std::string _name,
     std::string _help,
     std::string _args,
     ActionHandler _hndl) :
-    level(_level),
+    gods(_gods),
     name(_name),
     help(_help),
     args(_args),
@@ -60,14 +60,7 @@ Command::Command(
 
 bool Command::canUse(Character * character) const
 {
-    if (this->level == 1)
-    {
-        if (!HasFlag(character->flags, CharacterFlag::IsGod))
-        {
-            return false;
-        }
-    }
-    return true;
+    return (gods && HasFlag(character->flags, CharacterFlag::IsGod)) || (!gods);
 }
 
 void ProcessCommand(Character * character, ArgumentHandler & args)

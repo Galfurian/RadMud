@@ -23,7 +23,7 @@
 void LoadGodCommands()
 {
     Command command;
-    command.level = 1;
+    command.gods = true;
     {
         command.name = "shutdown";
         command.help = "Shut the MUD down.";

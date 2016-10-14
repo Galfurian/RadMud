@@ -25,7 +25,7 @@
 void LoadCraftingCommands()
 {
     Command command;
-    command.level = 0;
+    command.gods = false;
     {
         command.name = "build";
         command.help = "Build something.";

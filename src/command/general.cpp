@@ -24,7 +24,7 @@
 void LoadGeneralCommands()
 {
     Command command;
-    command.level = 0;
+    command.gods = false;
     {
         command.name = "quit";
         command.help = "Leave the game.";
@@ -417,43 +417,55 @@ void DoHelp(Character * character, ArgumentHandler & args)
     if (args.empty())
     {
         size_t numColumns = 4;
-        Table commandTable = Table("Commands");
+        TableRow baseRow, godsRow;
+        Table baseCommands("Commands"), godsCommands("Management");
         for (size_t it = 0; it < numColumns; ++it)
         {
-            commandTable.addColumn("", StringAlign::Left);
-        }
-        TableRow row;
-        for (auto it : Mud::instance().mudCommands)
-        {
-            if (it.level == 0)
-            {
-                if (it.canUse(character))
-                {
-                    row.push_back(it.name);
-                }
-                if (row.size() == numColumns)
-                {
-                    commandTable.addRow(row);
-                    row.clear();
-                }
-            }
+            baseCommands.addColumn("", StringAlign::Left, 15);
+            godsCommands.addColumn("", StringAlign::Left, 15);
         }
         for (auto it : Mud::instance().mudCommands)
         {
-            if (it.level > 0)
+            if (it.canUse(character))
             {
-                if (it.canUse(character))
+                if (it.gods)
                 {
-                    row.push_back(it.name);
+                    godsRow.push_back(it.name);
+                    if (godsRow.size() == numColumns)
+                    {
+                        godsCommands.addRow(godsRow);
+                        godsRow.clear();
+                    }
                 }
-                if (row.size() == numColumns)
+                else
                 {
-                    commandTable.addRow(row);
-                    row.clear();
+                    baseRow.push_back(it.name);
+                    if (baseRow.size() == numColumns)
+                    {
+                        baseCommands.addRow(baseRow);
+                        baseRow.clear();
+                    }
                 }
             }
         }
-        character->sendMsg(commandTable.getTable(true));
+        if (!godsRow.empty())
+        {
+            for (auto it = godsRow.size(); it < 4; ++it)
+            {
+                godsRow.emplace_back("");
+            }
+            godsCommands.addRow(godsRow);
+        }
+        if (!baseRow.empty())
+        {
+            for (auto it = baseRow.size(); it < 4; ++it)
+            {
+                baseRow.emplace_back("");
+            }
+            baseCommands.addRow(baseRow);
+        }
+        character->sendMsg(baseCommands.getTable(true));
+        character->sendMsg(godsCommands.getTable(true));
     }
     else if (args.size() == 1)
     {
@@ -469,7 +481,7 @@ void DoHelp(Character * character, ArgumentHandler & args)
                     msg += Formatter::yellow() + " Command   : " + Formatter::reset()
                            + iterator.name + "\n";
                     msg += Formatter::yellow() + " Level     : " + Formatter::reset()
-                           + ToString(iterator.level) + "\n";
+                           + ToString(iterator.gods) + "\n";
                     msg += Formatter::yellow() + " Arguments : " + Formatter::reset()
                            + iterator.args + "\n";
                     msg += Formatter::yellow() + " Help      : " + Formatter::reset()

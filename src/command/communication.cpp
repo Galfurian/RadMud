@@ -24,7 +24,7 @@
 void LoadCommunicationCommands()
 {
     Command command;
-    command.level = 0;
+    command.gods = false;
     {
         command.name = "say";
         command.help = "Talk to people in the current room.";
