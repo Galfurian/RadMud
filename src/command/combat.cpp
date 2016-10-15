@@ -436,8 +436,8 @@ void DoAim(Character * character, ArgumentHandler & args)
     // Prepare a pointer to the aimed character.
     Character * aimedCharacter = nullptr;
     // Create a single CharacterContainer which contains a unique list of all the targets.
-    CharacterContainer targets = character->charactersInSight;
-    targets.addUnique(character->room->characters);
+    CharacterContainer targets = character->room->characters;
+    targets.addUnique(character->charactersInSight);
     // First try to search the target inside the same room.
     aimedCharacter = targets.findCharacter(args[0].getContent(), args[0].getIndex());
     // Otherwise try to find the target inside the list of characters in sight.
