@@ -64,16 +64,6 @@ std::string Coordinates::toString() const
     return "[X:" + ToString(x) + "; Y:" + ToString(y) + "; Z:" + ToString(z) + "]";
 }
 
-void Coordinates::luaRegister(lua_State * L)
-{
-    luabridge::getGlobalNamespace(L)
-        .beginClass<Coordinates>("Coordinates")
-        .addData("x", &Coordinates::x, false)
-        .addData("y", &Coordinates::y, false)
-        .addData("z", &Coordinates::z, false)
-        .endClass();
-}
-
 Coordinates Coordinates::round(double x, double y, double z)
 {
     float rx = static_cast<float>(std::round(x));
@@ -113,3 +103,12 @@ Coordinates Coordinates::round(double x, double y, double z)
     return Coordinates(static_cast<int>(rx), static_cast<int>(ry), static_cast<int>(rz));
 }
 
+void Coordinates::luaRegister(lua_State * L)
+{
+    luabridge::getGlobalNamespace(L)
+        .beginClass<Coordinates>("Coordinates")
+        .addData("x", &Coordinates::x, false)
+        .addData("y", &Coordinates::y, false)
+        .addData("z", &Coordinates::z, false)
+        .endClass();
+}

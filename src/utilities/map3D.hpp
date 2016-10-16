@@ -98,6 +98,8 @@ public:
     /// @param y     Coordinate on heigth.
     /// @param z     Coordinate on altitude.
     /// @param value The value that has to be set.
+    /// @return <b>True</b> if the value has been set,<br>
+    ///         <b>False</b> otherwise.
     bool set(int x, int y, int z, T value)
     {
 #if 0

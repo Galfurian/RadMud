@@ -61,6 +61,7 @@ public:
     /// Erase the argument at the given position.
     void erase(const size_t & position);
 
+    /// @brief Prints a log of all the contained arguments.
     void dump() const;
 
 private:

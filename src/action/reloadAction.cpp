@@ -1,4 +1,4 @@
-/// @file   ReloadAction.cpp
+/// @file   reloadAction.cpp
 /// @brief  Implementation of the class for reloading activities.
 /// @author Enrico Fraccaroli
 /// @date   Oct 9 2016

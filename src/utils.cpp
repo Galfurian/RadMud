@@ -262,7 +262,6 @@ if ((err) != Z_OK) {\
 }\
 
 
-/// Creates compressed strem of data.
 std::vector<uint8_t> DeflateStream(std::vector<uint8_t> & uncompressed)
 {
     // ZLib compression stream.
@@ -310,7 +309,7 @@ std::vector<uint8_t> DeflateStream(std::vector<uint8_t> & uncompressed)
     return compressed;
 }
 
-/// Creates decompressed strem of data.
+// Creates decompressed strem of data.
 std::vector<uint8_t> InflateStream(std::vector<uint8_t> & compressed)
 {
     // ZLib decompression stream.

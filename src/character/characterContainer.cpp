@@ -122,10 +122,10 @@ void CharacterContainer::emplace_back_character(Character * character)
     this->emplace_back(character);
 }
 
-void CharacterContainer::addUnique(const CharacterContainer & others)
+void CharacterContainer::addUnique(const CharacterContainer & other)
 {
-    for (auto other : others)
+    for (auto character : other)
     {
-        this->emplace_back_character(other);
+        this->emplace_back_character(character);
     }
 }

@@ -42,8 +42,13 @@ public:
     /// Provides the range of this weapon.
     unsigned int getRange() const;
 
-    /// Checks if the current weapon can be reloaded with the given item.
+    /// @brief Checks if the current weapon can be reloaded with the given item.
+    /// @param magazine The magazine to check.
+    /// @return <b>True</b> if the ranged weapon can be reloaded with the given magazine,<br>
+    ///         <b>False</b> otherwise.
     bool canBeReloadedWith(Item * magazine) const;
 
+    /// @brief Search for an already loaded magazine.
+    /// @return A magazine already loaded if there is one.
     Item * getAlreadyLoadedMagazine() const;
 };

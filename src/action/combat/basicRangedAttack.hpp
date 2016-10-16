@@ -1,4 +1,4 @@
-/// @file   BasicRangedAttack.hpp
+/// @file   basicRangedAttack.hpp
 /// @brief  Contais the definition of the class for the basic ranged attacks.
 /// @author Enrico Fraccaroli
 /// @date   Oct 15 2016

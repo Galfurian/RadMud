@@ -1,5 +1,5 @@
-/// @file   BasicRangedAttack.cpp
-/// /// @brief  Contais the implementation of the class for the basic ranged attacks.
+/// @file   basicRangedAttack.cpp
+/// @brief  Contais the implementation of the class for the basic ranged attacks.
 /// @author Enrico Fraccaroli
 /// @date   Jul 14 2016
 /// @copyright

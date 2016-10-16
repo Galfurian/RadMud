@@ -45,6 +45,7 @@ public:
         ActionHandler _hndl);
 
     /// @brief Checks if the provided character can use the command.
+    /// @param character The character to check.
     /// @return <b>True</b> if the character can use the command,<br>
     ///         <b>False</b> otherwise.
     bool canUse(Character * character) const;

@@ -1,5 +1,5 @@
-/// @file   BasicMeleeAttack.cpp
-/// /// @brief  Contais the implementation of the class for the basic melee attacks.
+/// @file   basicMeleeAttack.cpp
+/// @brief  Contais the implementation of the class for the basic melee attacks.
 /// @author Enrico Fraccaroli
 /// @date   Jul 14 2016
 /// @copyright

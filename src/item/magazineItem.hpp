@@ -30,11 +30,22 @@ public:
 
     void getSheet(Table & sheet) const override;
 
-    /// Checks if the current magazine can be loaded with the given item.
-    bool canLoadWith(Item * projectileToLoad, std::string & error) const;
+    /// @brief Checks if the current magazine can be loaded with the given item.
+    /// @param projectile The projectile to load.
+    /// @param error      An error string, set when the projectile cannot be loaded.
+    /// @return <b>True</b> if the projectile can be loaded,<br>
+    ///         <b>False</b> otherwise.
+    bool canLoadWith(Item * projectile, std::string & error) const;
 
-    /// Evaluates the ammount of projectiles which can be loaded.
-    bool getAmountToLoad(Item * projectileToLoad, unsigned int & ammountToLoad, std::string & error) const;
+    /// @brief Evaluates the ammount of projectiles which can be loaded.
+    /// @param projectile The projectile to load.
+    /// @param ammount    The ammount to load.
+    /// @param error      An error string, set when the projectile cannot be loaded.
+    /// @return <b>True</b> if the projectile can be loaded,<br>
+    ///         <b>False</b> otherwise.
+    bool getAmountToLoad(Item * projectile, unsigned int & ammount, std::string & error) const;
 
+    /// @brief Provides the list of already loaded projectiles.
+    /// @return The contained projectiles.
     Item * getAlreadyLoadedProjectile() const;
 };

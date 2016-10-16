@@ -18,8 +18,11 @@
 
 #pragma once
 
+/// MUD Major Version.
 #define RADMUD_MAJOR_VERSION 1
+/// MUD Minor Version.
 #define RADMUD_MINOR_VERSION 0
+/// MUD Version.
 #define RADMUD_VERSION       0
 
 /// Indicator for no socket connected.
@@ -429,10 +432,13 @@ public:
     /// @param message Message to send.
     void broadcastMsg(const int & level, const std::string & message) const;
 
+    /// @brief Provides the name of the measure for weight.
     std::string getWeightMeasure() const;
 
+    /// @brief Provides the name of the database.
     std::string getMudDatabaseName() const;
 
+    /// @brief Provides the path to the system directory.
     std::string getMudSystemDirectory() const;
 
 private:

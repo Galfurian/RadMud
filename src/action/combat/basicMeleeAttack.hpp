@@ -1,4 +1,4 @@
-/// @file   BasicMeleeAttack.hpp
+/// @file   basicMeleeAttack.hpp
 /// @brief  Contais the definition of the class for the basic melee attacks.
 /// @author Enrico Fraccaroli
 /// @date   Jul 16 2016

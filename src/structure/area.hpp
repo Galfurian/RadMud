@@ -81,10 +81,22 @@ public:
     ///         <b>False</b> otherwise.
     bool inBoundaries(const Coordinates & coordinates) const;
 
+    /// @brief Checks if At the given coordinates there is a valid room through which a player Can See.
+    /// @param coordinates The provided coordinates.
+    /// @return <b>True</b> if there is a valid room at the given coordinates,<br>
+    ///         <b>False</b> otherwise.
     bool isValid(const Coordinates & coordinates);
 
+    /// @brief Provides the distance between the source and the target.
+    /// @param source The source coordinates.
+    /// @param target The target coordinates.
+    /// @return The distance between the two coordinates.
     static int getDistance(const Coordinates & source, const Coordinates & target);
 
+    /// @brief Provides all the charactes inside the room at the given coordinates.
+    /// @param exceptions  The exceptions.
+    /// @param coordinates The desired coordinates.
+    /// @return The list of characters at the given coordinates.
     CharacterContainer getCharactersAt(const CharacterContainer & exceptions, const Coordinates & coordinates);
 
     /// @brief Add the passed room to its coordinates inside the area.

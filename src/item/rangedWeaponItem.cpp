@@ -1,4 +1,4 @@
-/// @file   RangedWeaponItem.cpp
+/// @file   rangedWeaponItem.cpp
 /// @author Enrico Fraccaroli
 /// @date   Oct 09 2016
 /// @copyright

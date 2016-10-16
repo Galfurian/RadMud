@@ -1,5 +1,5 @@
-/// @file   weaponModel.hpp
-/// @brief  Define variables and methods of Weapon.
+/// @file   shopModel.hpp
+/// @brief  Define variables and methods of Shop.
 /// @author Enrico Fraccaroli
 /// @date   Jul 6 2016
 /// @copyright

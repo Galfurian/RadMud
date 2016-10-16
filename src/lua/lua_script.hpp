@@ -114,6 +114,7 @@ void LuaSleep(int sleepTime);
 /// @brief Allow from lua coden to generate a random integer.
 /// @param min Lower bound.
 /// @param max Upper bound.
+/// @return The generated random value.
 int LuaRandom(int min, int max);
 
 /// @brief Allow from lua to load an item.

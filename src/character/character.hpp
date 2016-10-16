@@ -223,6 +223,8 @@ public:
     unsigned int getHealth() const;
 
     /// @brief Return the max health value.
+    /// @param withEffects <b>True</b> also add the health due to effects,<br>
+    ///                    <b>False</b> otherwise.
     /// @return The maximum health for this character.
     unsigned int getMaxHealth(bool withEffects = true) const;
 
@@ -266,6 +268,8 @@ public:
     unsigned int getStamina() const;
 
     /// @brief Return the max stamina value.
+    /// @param withEffects  <b>True</b> also add the stamina due to effects,<br>
+    ///                     <b>False</b> otherwise.
     /// @return The maximum stamina for this character.
     unsigned int getMaxStamina(bool withEffects = true) const;
 
@@ -519,6 +523,7 @@ public:
     bool isAtRange(Character * target, const unsigned int & range);
 
     /// @brief Provides a pointer to the opponent on the top of the aggro list.
+    /// @param range Specifies the maximum range.
     /// @return A pointer to the next opponent.
     Character * getNextOpponentAtRange(const unsigned int & range);
 
@@ -535,6 +540,7 @@ public:
     CharacterContainer getCharactersInSight();
 
     /// @brief Given an action, it returns the necessary cooldown.
+    /// @param combatAction The desired combat action.
     /// @return The non-decreasing value of the cooldown.
     unsigned int getCooldown(CombatActionType combatAction);
 

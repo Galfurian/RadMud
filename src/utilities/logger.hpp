@@ -145,6 +145,7 @@ private:
     static std::string getDateTime();
 
     /// @brief Given a logging level returns the associated output stream.
+    /// @param level The level of the output stream.
     /// @return The output stream.
     static std::ostream & getOutputStream(const LogLevel & level);
 

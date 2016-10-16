@@ -57,12 +57,18 @@ public:
     std::string help;
 };
 
+/// @brief Checks the equality between two doubles.
+/// @param a The first value.
+/// @param b The second value.
+/// @return <b>True</b> if they are the same value, <br>
+///         <b>False</b> otherwise.
 bool DoubleEquality(double a, double b);
 
 /// @brief Check if the passed value has the given flag set.
 /// @param flags The value to check.
 /// @param flag  The flag to search.
-/// @return <b>True</b> if the value contain the flag, <br> <b>False</b> otherwise.
+/// @return <b>True</b> if the value contain the flag, <br>
+///         <b>False</b> otherwise.
 template<typename Enum>
 bool HasFlag(const unsigned int & flags, Enum flag)
 {
@@ -112,7 +118,7 @@ void FindAndReplace(std::string * source, const std::string & target, const std:
 /// @param source Source string.
 /// @param trim   Trim condition.
 /// @return String modified.
-std::string Trim(const std::string & source, const std::string & trim = " \t\r\n");
+std::string Trim(const std::string & source, const std::string & trim = std::string(" \t\r\n"));
 
 /// @brief Convert all the stirng to lowercase.
 /// @param source Source string.

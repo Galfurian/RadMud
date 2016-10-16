@@ -1,5 +1,5 @@
-/// @file   weaponModel.cpp
-/// @brief  Iplement the methods for Weapon.
+/// @file   shopModel.cpp
+/// @brief  Iplement the methods for Shop.
 /// @author Enrico Fraccaroli
 /// @date   Jul 6 2016
 /// @copyright

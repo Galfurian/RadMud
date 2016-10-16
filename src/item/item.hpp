@@ -110,6 +110,8 @@ public:
     virtual ~Item();
 
     /// @brief Check the correctness of the item.
+    /// @param complete <b>True</b> also the variables which are set after the placement are checked,<br>
+    ///                 <b>False</b> only the basic variables are checked.
     /// @return <b>True</b> if the item has correct values,<br>
     ///         <b>False</b> otherwise.
     virtual bool check(bool complete = false);
@@ -149,6 +151,10 @@ public:
     ///         <b>False</b> otherwise.
     bool canStackWith(Item * item) const;
 
+    /// @brief Allows to separate a new stack of this item.
+    /// @param actor      The character which is separating the items.
+    /// @param _quantity  The dimension of the new stack.
+    /// @return The new stack of items.
     Item * removeFromStack(Character * actor, unsigned int & _quantity);
 
     /// @brief Check if the item has the desired key.
@@ -175,6 +181,7 @@ public:
 
     /// @brief Provides the price of the item based on its quality, material and condition.
     /// @param entireStack If <b>true</b> this function returns the price of the entire stack.
+    /// @return The price of the item.
     virtual unsigned int getPrice(bool entireStack) const;
 
     /// @brief Get the item weight, plus eventually contained item weight.
