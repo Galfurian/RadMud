@@ -446,56 +446,10 @@ CharacterContainer Area::getCharactersInSight(CharacterContainer & exceptions,
                                               const unsigned int & radius)
 {
     CharacterContainer characterContainer;
-    int signedRadius = static_cast<int>(radius);
-    Coordinates target, point;
-    while (point.x <= signedRadius)
+    auto validCoordinates = this->fov(origin, radius);
+    for (auto coordinates : validCoordinates)
     {
-        while ((point.y <= point.x) && (point.square() <= signedRadius))
-        {
-            target = Coordinates(origin.x + point.x, origin.y + point.y, origin.z);
-            if (this->los(origin, target, radius))
-            {
-                characterContainer.addUnique(this->getCharactersAt(exceptions, target));
-            }
-            target = Coordinates(origin.x - point.x, origin.y + point.y, origin.z);
-            if (this->los(origin, target, radius))
-            {
-                characterContainer.addUnique(this->getCharactersAt(exceptions, target));
-            }
-            target = Coordinates(origin.x + point.x, origin.y - point.y, origin.z);
-            if (this->los(origin, target, radius))
-            {
-                characterContainer.addUnique(this->getCharactersAt(exceptions, target));
-            }
-            target = Coordinates(origin.x - point.x, origin.y - point.y, origin.z);
-            if (this->los(origin, target, radius))
-            {
-                characterContainer.addUnique(this->getCharactersAt(exceptions, target));
-            }
-            target = Coordinates(origin.x + point.y, origin.y + point.x, origin.z);
-            if (this->los(origin, target, radius))
-            {
-                characterContainer.addUnique(this->getCharactersAt(exceptions, target));
-            }
-            target = Coordinates(origin.x - point.y, origin.y + point.x, origin.z);
-            if (this->los(origin, target, radius))
-            {
-                characterContainer.addUnique(this->getCharactersAt(exceptions, target));
-            }
-            target = Coordinates(origin.x + point.y, origin.y - point.x, origin.z);
-            if (this->los(origin, target, radius))
-            {
-                characterContainer.addUnique(this->getCharactersAt(exceptions, target));
-            }
-            target = Coordinates(origin.x - point.y, origin.y - point.x, origin.z);
-            if (this->los(origin, target, radius))
-            {
-                characterContainer.addUnique(this->getCharactersAt(exceptions, target));
-            }
-            point.y++;
-        }
-        point.y = 0;
-        point.x++;
+        characterContainer.addUnique(this->getCharactersAt(exceptions, coordinates));
     }
     return characterContainer;
 }
@@ -599,10 +553,6 @@ bool Area::los(const Coordinates & source, const Coordinates & target, const uns
         Coordinates nw(floor_x, ceil_y, source.z);
         Coordinates se(ceil_x, floor_y, source.z);
         Coordinates ne(ceil_x, ceil_y, source.z);
-        if ((source == Coordinates(54, 51, 50)) && (target == Coordinates(57, 53, 50)))
-        {
-            Logger::log(LogLevel::Debug, "SW:%s, NW:%s, SE:%s, NE:%s", sw, nw, se, ne);
-        }
         // Check if we have reached the target room.
         if ((sw == target) || (nw == target) || (se == target) || (ne == target))
         {
