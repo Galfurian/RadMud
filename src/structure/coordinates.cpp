@@ -18,7 +18,6 @@
 
 #include "coordinates.hpp"
 #include "../utilities/logger.hpp"
-#include "../utils.hpp"
 
 Coordinates::Coordinates() :
     x(),
@@ -80,8 +79,8 @@ Coordinates Coordinates::round(double x, double y, double z)
     float rx = static_cast<float>(std::round(x));
     float ry = static_cast<float>(std::round(y));
     float rz = static_cast<float>(std::round(z));
-    int s = static_cast<int>(rx + ry + rz);
-    if (s != 0)
+    float s = rx + ry + rz;
+    if (!DoubleEquality(s, 0.0))
     {
         float x_err = static_cast<float>(std::abs(rx - x));
         float y_err = static_cast<float>(std::abs(ry - y));

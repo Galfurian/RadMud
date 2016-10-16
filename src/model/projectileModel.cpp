@@ -41,7 +41,7 @@ std::string ProjectileModel::getTypeName() const
     return "Projectile";
 }
 
-bool ProjectileModel::setModel(const std::string &source)
+bool ProjectileModel::setModel(const std::string & source)
 {
     if (source.empty())
     {
@@ -63,7 +63,7 @@ bool ProjectileModel::setModel(const std::string &source)
     return true;
 }
 
-void ProjectileModel::getSheet(Table &sheet) const
+void ProjectileModel::getSheet(Table & sheet) const
 {
     // Call the function of the father class.
     ItemModel::getSheet(sheet);

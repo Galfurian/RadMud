@@ -18,8 +18,6 @@
 
 #include "material.hpp"
 
-#include "utils.hpp"
-
 Material::Material() :
     vnum(),
     type(MaterialType::NoType),

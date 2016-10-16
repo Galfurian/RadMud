@@ -19,8 +19,6 @@
 // Basic Include.
 #include "defines.hpp"
 
-#include "utils.hpp"
-
 std::string GetAbilityName(Ability ability)
 {
     if (ability == Ability::Strength) return "strength";

@@ -260,7 +260,8 @@ std::vector<std::string> Continent::drawFov(Room * centerRoom, const unsigned in
     return layers;
 }
 
-void Continent::fieldOfView(Map2D<ContinentTile> & map, int origin_x, int origin_y, int origin_z, const unsigned int & radius)
+void Continent::fieldOfView(Map2D<ContinentTile> & map, int origin_x, int origin_y, int origin_z,
+                            const unsigned int & radius)
 {
     double incr_x = 0.0;
     double incr_y = 0.0;

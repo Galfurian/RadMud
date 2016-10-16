@@ -23,7 +23,7 @@
 #include <map>
 #include <set>
 
-#include "utilities/coordinates.hpp"
+#include "structure/coordinates.hpp"
 #include "utilities/enum_checker.hpp"
 
 /// The list of character's abilities.

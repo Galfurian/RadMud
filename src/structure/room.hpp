@@ -21,11 +21,11 @@
 #include <map>
 
 #include "exit.hpp"
+#include "coordinates.hpp"
 #include "../defines.hpp"
 #include "../utils.hpp"
 #include "../item/item.hpp"
 #include "../lua/lua_script.hpp"
-#include "../utilities/coordinates.hpp"
 #include "../character/mobile.hpp"
 #include "../character/characterContainer.hpp"
 #include "../item/itemContainer.hpp"

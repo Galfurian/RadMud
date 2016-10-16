@@ -8,9 +8,10 @@ set(RADMUD_STRUCTURE_INC
 #############################################
 # Source Files
 set(RADMUD_STRUCTURE_SRC
-        ./src/structure/area.cpp
-        ./src/structure/continent.cpp
         ./src/structure/exit.cpp
         ./src/structure/room.cpp
+        ./src/structure/area.cpp
+        ./src/structure/continent.cpp
+        ./src/structure/coordinates.cpp
         PARENT_SCOPE
         )

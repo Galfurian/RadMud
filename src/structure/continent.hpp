@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "../utilities/coordinates.hpp"
+#include "coordinates.hpp"
 #include "../utilities/map2D.hpp"
 #include "../utilities/map3D.hpp"
 

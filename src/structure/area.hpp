@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include "../utilities/coordinates.hpp"
+#include "coordinates.hpp"
 #include "../utilities/map3D.hpp"
 #include "../utilities/map2D.hpp"
 #include "../character/character.hpp"

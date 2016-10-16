@@ -19,7 +19,6 @@
 #include "skill.hpp"
 
 #include "utilities/logger.hpp"
-#include "utils.hpp"
 
 #include <cassert>
 

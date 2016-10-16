@@ -18,7 +18,6 @@
 
 #include "unloadAction.hpp"
 #include "../character/character.hpp"
-#include "../model/magazineModel.hpp"
 #include "../sqlite/sqliteDbms.hpp"
 
 UnloadAction::UnloadAction(Item * _itemToBeUnloaded, Character * _actor, unsigned int _cooldown) :

@@ -9,7 +9,6 @@ set(RADMUD_UTILITIES_INC
 # Source Files
 set(RADMUD_UTILITIES_SRC
         ./src/utilities/CMacroWrapper.cpp
-        ./src/utilities/coordinates.cpp
         ./src/utilities/formatter.cpp
         ./src/utilities/table.cpp
         ./src/utilities/logger.cpp
