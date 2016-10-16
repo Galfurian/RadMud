@@ -22,7 +22,8 @@
 // Other Include.
 #include "../mud.hpp"
 
-#include "../action/combat/basicAttack.hpp"
+#include "combat/basicMeleeAttack.hpp"
+#include "combat/basicRangedAttack.hpp"
 #include "../action/combat/flee.hpp"
 
 #include "../item/armorItem.hpp"
@@ -533,9 +534,13 @@ bool Character::setNextCombatAction(CombatActionType nextAction)
         auto combatAction = this->getAction()->toCombatAction();
         sameAction = (combatAction->getCombatActionType() == nextAction);
     }
-    if ((nextAction == CombatActionType::BasicAttack) && !sameAction)
+    if ((nextAction == CombatActionType::BasicMeleeAttack) && !sameAction)
     {
-        this->actionQueue.push_front(std::make_shared<BasicAttack>(this));
+        this->actionQueue.push_front(std::make_shared<BasicMeleeAttack>(this));
+    }
+    else if ((nextAction == CombatActionType::BasicRangedAttack) && !sameAction)
+    {
+        this->actionQueue.push_front(std::make_shared<BasicRangedAttack>(this));
     }
     else if ((nextAction == CombatActionType::Flee) && !sameAction)
     {
@@ -1437,7 +1442,7 @@ bool Character::isAtRange(Character * target, const unsigned int & range)
     if (WrongAssert(this->room->area == nullptr)) return false;
     if (WrongAssert(target->room == nullptr)) return false;
     if (WrongAssert(target->room->area == nullptr)) return false;
-    return this->room->area->fastInSight(this->room->coord, target->room->coord, range);
+    return this->room->area->los(this->room->coord, target->room->coord, range);
 }
 
 Character * Character::getNextOpponentAtRange(const unsigned int & range)
@@ -1513,15 +1518,9 @@ std::vector<RangedWeaponItem *> Character::getActiveRangedWeapons()
 
 CharacterContainer Character::getCharactersInSight()
 {
-    CharacterContainer characterContainer, exceptions;
-    exceptions.push_back(this);
-    Coordinates coord = this->room->coord;
-    return this->room->area->getCharactersInSight(
-        exceptions,
-        coord.x,
-        coord.y,
-        coord.z,
-        this->getViewDistance());
+    CharacterContainer exceptions;
+    exceptions.emplace_back(this);
+    return this->room->area->getCharactersInSight(exceptions, this->room->coord, this->getViewDistance());
 }
 
 unsigned int Character::getCooldown(CombatActionType combatAction)
@@ -1561,7 +1560,7 @@ unsigned int Character::getCooldown(CombatActionType combatAction)
         }
         CAR = log10(CARmod);
     }
-    if (combatAction == CombatActionType::BasicAttack)
+    if (combatAction == CombatActionType::BasicMeleeAttack)
     {
         double RHD = 0;
         double LHD = 0;
@@ -1598,6 +1597,10 @@ unsigned int Character::getCooldown(CombatActionType combatAction)
             }
         }
         BASE += -STR - AGI + WGT + CAR + std::max(RHD, LHD);
+    }
+    else if (combatAction == CombatActionType::BasicRangedAttack)
+    {
+        BASE += -STR - AGI + WGT + CAR;
     }
     else if (combatAction == CombatActionType::Flee)
     {
@@ -1645,15 +1648,19 @@ unsigned int Character::getConsumedStaminaFor(
     }
     else if (actionType == ActionType::Combat)
     {
-        if (combatAction == CombatActionType::BasicAttack)
+        if (combatAction == CombatActionType::BasicMeleeAttack)
         {
             if (this->canAttackWith(slot))
             {
-                Item * weapon = this->findEquipmentSlotItem(slot);
+                auto weapon = this->findEquipmentSlotItem(slot);
                 auto wpnWeight = weapon->getWeight(true);
                 auto WPN = (wpnWeight < 0.1) ? 0.0 : log10(wpnWeight);
                 RSLT += WPN;
             }
+        }
+        else if (combatAction == CombatActionType::BasicRangedAttack)
+        {
+            // Do something.
         }
         else if (combatAction == CombatActionType::Flee)
         {

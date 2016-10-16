@@ -76,18 +76,16 @@ public:
     bool check();
 
     /// @brief Check if the given coordinates is inside the boundaries.
-    /// @param x Coordinate on width axis.
-    /// @param y Coordinate on height axis.
-    /// @param z Coordinate on altitude axis.
+    /// @param coordinates The coordinates to check.
     /// @return <b>True</b> if the coordinates are valid,<br>
     ///         <b>False</b> otherwise.
-    bool inBoundaries(const int & x, const int & y, const int & z) const;
+    bool inBoundaries(const Coordinates & coordinates) const;
 
-    /// @brief Check if the given coordinates is inside the boundaries.
-    /// @param coord The coordinates to check.
-    /// @return <b>True</b> if the coordinates are valid,<br>
-    ///         <b>False</b> otherwise.
-    bool inBoundaries(const Coordinates & coord) const;
+    bool isValid(const Coordinates & coordinates);
+
+    static int getDistance(const Coordinates & source, const Coordinates & target);
+
+    CharacterContainer getCharactersAt(const CharacterContainer & exceptions, const Coordinates & coordinates);
 
     /// @brief Add the passed room to its coordinates inside the area.
     /// @param room The room that has to be added.
@@ -107,16 +105,9 @@ public:
     Room * getRoom(int room_vnum);
 
     /// @brief Find a room in a precise spot.
-    /// @param x Coordinate on width axis.
-    /// @param y Coordinate on height axis.
-    /// @param z Coordinate on altitude axis.
+    /// @param coordinates The coordiantes where search the room.
     /// @return The room at the selected spot.
-    Room * getRoom(int x, int y, int z);
-
-    /// @brief Find a room in a precise spot.
-    /// @param coord The coordiantes where search the room.
-    /// @return The room at the selected spot.
-    Room * getRoom(Coordinates coord);
+    Room * getRoom(const Coordinates & coordinates);
 
     /// @brief Draw the Filed of View for a character.
     /// @param centerRoom The room from where the algorithm has to compute the Field of View.
@@ -130,93 +121,31 @@ public:
     /// @return The map containing all the Information about the Field of View of a character.
     std::string drawASCIIFov(Room * centerRoom, const unsigned int & radius);
 
-    /// @brief Default version of a FOV alforithm.
-    /// @param map      A 2D map, where the the Field of View will be drawn.
-    /// @param origin_x The x coordinate of the central room.
-    /// @param origin_y The y coordinate of the central room.
-    /// @param origin_z The z coordinate of the central room.
-    /// @param radius   The radius of visibility of the character.
-    void fov(Map2D<MapTile> & map, int origin_x, int origin_y, int origin_z, const unsigned int & radius);
-
-    /// @brief A simple line of sight algorithm.
-    /// @param map      The map where the LOS algorithm has to write the line.
-    /// @param origin_x The x coordinate of the central room.
-    /// @param origin_y The y coordinate of the central room.
-    /// @param origin_z The z coordinate of the central room.
-    /// @param incr_x   The value of which the x coordiante must be incremented at each step.
-    /// @param incr_y   The value of which the y coordiante must be incremented at each step.
-    /// @param incr_z   The value of which the z coordiante must be incremented at each step.
-    /// @param radius   The radius of visibility.
-    void los(
-        Map2D<MapTile> & map,
-        int origin_x,
-        int origin_y,
-        int origin_z,
-        double incr_x,
-        double incr_y,
-        double incr_z,
-        const unsigned int & radius);
-
-    void simpleFov(Map2D<MapTile> & map, int origin_x, int origin_y, int origin_z, const unsigned int & radius);
-
-    /// @brief Determine if a coordinate is in sight from a starting one.
-    /// @details
-    /// Thanks to Eugen Dedu for the implementation, which can be found at
-    /// http://lifc.univ-fcomte.fr/home/~ededu/projects/bresenham/
-    /// Cite: The difference with Bresenham is that ALL the points of the
-    /// line are printed, not only one per x coordinate.
-    ///
-    /// @param origin_x The x coordinate of the central room.
-    /// @param origin_y The y coordinate of the central room.
-    /// @param origin_z The z coordinate of the central room.
-    /// @param target_x The target x coordinate.
-    /// @param target_y The target y coordinate.
-    /// @param target_z The target z coordinate.
-    /// @param radius   The radius of visibility.
-    /// @return <b>True</b> if the target room is in sight,<br>
-    ///         <b>False</b> otherwise.
-    bool fastInSight(
-        int origin_x,
-        int origin_y,
-        int origin_z,
-        int target_x,
-        int target_y,
-        int target_z,
-        const unsigned int & radius);
-
-    /// @brief Determine if a coordinate is in sight from a starting one.
-    /// @param origin The coordinates of the origin.
-    /// @param target The coordinates of the target room.
-    /// @param radius The radius of visibility.
-    /// @return <b>True</b> if the target room is in sight,<br>
-    ///         <b>False</b> otherwise.
-    bool fastInSight(const Coordinates & origin, const Coordinates & target, const unsigned int & radius);
-
     /// @brief Provides a list of characters which are in sight.
     /// @param exceptions A list of excections.
-    /// @param origin_x   The x coordinate of the central room.
-    /// @param origin_y   The y coordinate of the central room.
-    /// @param origin_z   The z coordinate of the central room.
+    /// @param origin The coordinate of the central room.
     /// @param radius     The radius of visibility.
     /// @return The list containing the targets.
-    CharacterContainer getCharactersInSight(
-        CharacterContainer & exceptions,
-        int origin_x,
-        int origin_y,
-        int origin_z,
-        const unsigned int & radius);
+    CharacterContainer getCharactersInSight(CharacterContainer & exceptions,
+                                            Coordinates & origin,
+                                            const unsigned int & radius);
+
+    /// @brief A Field of View algorithm which provides all the rooms which are inside the
+    ///         radius of the field of view.
+    /// @param origin The coordinate of the central room.
+    /// @param radius The radius of visibility of the character.
+    /// @return A vector containing all the coordinates of valid rooms.
+    std::vector<Coordinates> fov(Coordinates & origin, const unsigned int & radius);
+
+    /// @brief Determine if a coordinate is in sight from a starting one.
+    /// @param source The coordinates of the origin.
+    /// @param target The coordinates of the target room.
+    /// @param radius   The radius of visibility.
+    /// @return <b>True</b> if the target room is in sight,<br>
+    ///         <b>False</b> otherwise.
+    bool los(const Coordinates & source, const Coordinates & target, const unsigned int & radius);
 
     /// @brief Function used to register inside the lua environment the class.
     /// @param L The lua environment.
     static void luaRegister(lua_State * L);
-
-    bool isValid(int x, int y, int z);
-
-    CharacterContainer getCharactersAt(const int x, const int y, const int z, const CharacterContainer & exceptions);
-
-    static int getDistance(const int x0, const int y0, const int z0, const int x1, const int y1, const int z1);
-
-    static int getDistance(const Coordinates & source, const Coordinates & target);
-
-    static int getDistance(Character * source, Character * target);
 };

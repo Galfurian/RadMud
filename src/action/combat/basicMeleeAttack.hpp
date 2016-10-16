@@ -1,5 +1,5 @@
-/// @file   combatAction.hpp
-/// @brief  Contais the definition of the virtual class for general combat actions.
+/// @file   BasicMeleeAttack.hpp
+/// @brief  Contais the definition of the class for the basic melee attacks.
 /// @author Enrico Fraccaroli
 /// @date   Jul 16 2016
 /// @copyright
@@ -18,28 +18,19 @@
 
 #pragma once
 
-#include "../generalAction.hpp"
+#include "combatAction.hpp"
 
-/// The list of possible combat actions.
-using CombatActionType = enum class CombatActionType_t
-{
-    NoAction,          ///< The combat move is to do nothing.
-    BasicMeleeAttack,  ///< The action is a basic melee attack.
-    BasicRangedAttack, ///< The action is a basic ranged attack.
-    Flee               ///< The character tries to flee.
-};
-
-/// @brief An action executed by characters when fighting.
-class CombatAction :
-    public GeneralAction
+/// @brief An action executed by characters when fighting at close range.
+class BasicMeleeAttack :
+    public CombatAction
 {
 public:
     /// @brief Constructor.
     /// @param _actor The actor who is doing the action.
-    CombatAction(Character * _actor);
+    BasicMeleeAttack(Character * _actor);
 
     /// @brief Destructor.
-    virtual ~CombatAction();
+    virtual ~BasicMeleeAttack();
 
     bool check() const override;
 
@@ -51,7 +42,5 @@ public:
 
     ActionStatus perform() override;
 
-    /// @brief Provides the type of combat action.
-    /// @return The type of combat action.
-    virtual CombatActionType getCombatActionType() const = 0;
+    CombatActionType getCombatActionType() const override;
 };

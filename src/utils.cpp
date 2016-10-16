@@ -30,6 +30,11 @@
 
 #include "utilities/logger.hpp"
 
+bool DoubleEquality(double a, double b)
+{
+    return std::fabs(a - b) < std::numeric_limits<double>::epsilon();
+}
+
 bool BeginWith(const std::string & source, const std::string & prefix)
 {
     return source.compare(0, prefix.size(), prefix) == 0;

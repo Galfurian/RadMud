@@ -1,7 +1,7 @@
-/// @file   basicAttack.hpp
-/// @brief  Contais the definition of the class for the basic attack.
+/// @file   BasicRangedAttack.hpp
+/// @brief  Contais the definition of the class for the basic ranged attacks.
 /// @author Enrico Fraccaroli
-/// @date   Jul 16 2016
+/// @date   Oct 15 2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission to use, copy, modify, and distribute this software for any
@@ -20,17 +20,17 @@
 
 #include "combatAction.hpp"
 
-/// @brief An action executed by characters when fighting. This is the basic attack.
-class BasicAttack :
+/// @brief An action executed by characters when fighting at distant range.
+class BasicRangedAttack :
     public CombatAction
 {
 public:
     /// @brief Constructor.
     /// @param _actor The actor who is doing the action.
-    BasicAttack(Character * _actor);
+    BasicRangedAttack(Character * _actor);
 
     /// @brief Destructor.
-    virtual ~BasicAttack();
+    virtual ~BasicRangedAttack();
 
     bool check() const override;
 

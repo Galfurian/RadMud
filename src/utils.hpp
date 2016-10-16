@@ -57,6 +57,8 @@ public:
     std::string help;
 };
 
+bool DoubleEquality(double a, double b);
+
 /// @brief Check if the passed value has the given flag set.
 /// @param flags The value to check.
 /// @param flag  The flag to search.

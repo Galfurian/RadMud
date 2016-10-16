@@ -57,18 +57,27 @@ public:
     /// @brief Define operator <, less than.
     /// @param right The right parameter.
     /// @return True if left Coordinates are less than right Coordinates.
-    bool operator<(const Coordinates & right);
+    bool operator<(const Coordinates & right) const;
 
     /// @brief Add to the current Coordinates the right operand.
     /// @param right The right parameter.
     /// @return The new Coordinates.
-    Coordinates operator+(const Coordinates & right);
+    Coordinates operator+(const Coordinates & right) const;
+
+    int square() const;
 
     /// @brief Provides the string version of the coordinates.
     /// @return A string representing the coordinates.
     std::string toString() const;
 
+    friend std::ostream & operator<<(std::ostream & os, const Coordinates & coordinates)
+    {
+        return os << "(" << coordinates.x << ", " << coordinates.y << ", " << coordinates.z << ")";
+    }
+
     /// @brief Function used to register inside the lua environment the class.
     /// @param L The lua environment.
     static void luaRegister(lua_State * L);
+
+    static Coordinates round(double x, double y, double z);
 };

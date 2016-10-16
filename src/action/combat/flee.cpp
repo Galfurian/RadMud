@@ -115,7 +115,7 @@ ActionStatus Flee::perform()
         }
     }
     // By default set the next combat action to basic attack.
-    if (!actor->setNextCombatAction(CombatActionType::BasicAttack))
+    if (!actor->setNextCombatAction(CombatActionType::BasicMeleeAttack))
     {
         actor->sendMsg(this->stop() + "\n\n");
         return ActionStatus::Finished;

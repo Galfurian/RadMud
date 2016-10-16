@@ -97,6 +97,14 @@ public:
         data[std::make_tuple(x, y)] = value;
     }
 
+    /// @brief Set the object at the given Coordinates2D.
+    /// @param coordinates The coordinate.
+    /// @param value The value that has to be set.
+    void set(const Coordinates & coordinates, T value)
+    {
+        data[std::make_tuple(coordinates.x, coordinates.y)] = value;
+    }
+
     /// @brief Retrieve the object at the given Coordinates2D.
     /// @param x Coordinate on width axis.
     /// @param y Coordinate on heigth axis.

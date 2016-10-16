@@ -1,5 +1,5 @@
-/// @file   basicAttack.cpp
-/// /// @brief  Contais the implementation of the class for the basic attack.
+/// @file   BasicMeleeAttack.cpp
+/// /// @brief  Contais the implementation of the class for the basic melee attacks.
 /// @author Enrico Fraccaroli
 /// @date   Jul 14 2016
 /// @copyright
@@ -16,50 +16,50 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#include "basicAttack.hpp"
+#include "basicMeleeAttack.hpp"
 #include "../../structure/room.hpp"
 #include "meleeWeaponItem.hpp"
 
-BasicAttack::BasicAttack(Character * _actor) :
+BasicMeleeAttack::BasicMeleeAttack(Character * _actor) :
     CombatAction(_actor)
 {
-    Logger::log(LogLevel::Debug, "Created BasicAttack.");
+    Logger::log(LogLevel::Debug, "Created BasicMeleeAttack.");
 }
 
-BasicAttack::~BasicAttack()
+BasicMeleeAttack::~BasicMeleeAttack()
 {
-    Logger::log(LogLevel::Debug, "Deleted BasicAttack.");
+    Logger::log(LogLevel::Debug, "Deleted BasicMeleeAttack.");
 }
 
-bool BasicAttack::check() const
+bool BasicMeleeAttack::check() const
 {
     bool correct = CombatAction::check();
     return correct;
 }
 
-ActionType BasicAttack::getType() const
+ActionType BasicMeleeAttack::getType() const
 {
     return ActionType::Combat;
 }
 
-std::string BasicAttack::getDescription() const
+std::string BasicMeleeAttack::getDescription() const
 {
     return "fighting";
 }
 
-std::string BasicAttack::stop()
+std::string BasicMeleeAttack::stop()
 {
     return "You stop fighting.";
 }
 
-ActionStatus BasicAttack::perform()
+ActionStatus BasicMeleeAttack::perform()
 {
     // Check if the cooldown is ended.
     if (!this->checkElapsed())
     {
         return ActionStatus::Running;
     }
-    Logger::log(LogLevel::Debug, "[%s] Perform a BasicAttack.", actor->getName());
+    Logger::log(LogLevel::Debug, "[%s] Perform a BasicMeleeAttack.", actor->getName());
     auto activeWeapons = actor->getActiveMeleeWeapons();
     if (activeWeapons.empty())
     {
@@ -81,7 +81,7 @@ ActionStatus BasicAttack::perform()
             // Get the required stamina.
             unsigned int consumedStamina = actor->getConsumedStaminaFor(
                 ActionType::Combat,
-                CombatActionType::BasicAttack,
+                CombatActionType::BasicMeleeAttack,
                 iterator->getCurrentSlot());
             // Check if the actor has enough stamina to execute the action.
             if (consumedStamina > actor->getStamina())
@@ -268,7 +268,7 @@ ActionStatus BasicAttack::perform()
         }
     }
     // By default set the next combat action to basic attack.
-    if (!actor->setNextCombatAction(CombatActionType::BasicAttack))
+    if (!actor->setNextCombatAction(CombatActionType::BasicMeleeAttack))
     {
         actor->sendMsg(this->stop() + "\n\n");
         return ActionStatus::Finished;
@@ -276,7 +276,7 @@ ActionStatus BasicAttack::perform()
     return ActionStatus::Running;
 }
 
-CombatActionType BasicAttack::getCombatActionType() const
+CombatActionType BasicMeleeAttack::getCombatActionType() const
 {
-    return CombatActionType::BasicAttack;
+    return CombatActionType::BasicMeleeAttack;
 }

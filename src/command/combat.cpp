@@ -154,7 +154,7 @@ void DoKill(Character * character, ArgumentHandler & args)
             character->getNameCapital(),
             target->getName());
         // Let the characters enter the combat.
-        if (!character->setNextCombatAction(CombatActionType::BasicAttack))
+        if (!character->setNextCombatAction(CombatActionType::BasicMeleeAttack))
         {
             character->sendMsg("You were not ablet to attack %s.\n", target->getName());
             character->opponents.remOpponent(target);
@@ -188,14 +188,14 @@ void DoKill(Character * character, ArgumentHandler & args)
             target->getName());
 
         // Let the characters enter the combat.
-        if (!character->setNextCombatAction(CombatActionType::BasicAttack))
+        if (!character->setNextCombatAction(CombatActionType::BasicMeleeAttack))
         {
             character->sendMsg("You were not ablet to attack %s.\n", target->getName());
             character->opponents.remOpponent(target);
             target->opponents.remOpponent(character);
             return;
         }
-        if (!target->setNextCombatAction(CombatActionType::BasicAttack))
+        if (!target->setNextCombatAction(CombatActionType::BasicMeleeAttack))
         {
             character->sendMsg("You were not ablet to attack %s.\n", target->getName());
             character->opponents.remOpponent(target);
@@ -456,9 +456,10 @@ void DoAim(Character * character, ArgumentHandler & args)
         // Check if the target is still in sight.
         if (character->isAtRange(aimedCharacter, character->getViewDistance()))
         {
-            Logger::log(LogLevel::Debug, "Distance : %s", ToString(Area::getDistance(character, aimedCharacter)));
-            auto requiredTime = 1.5 * Area::getDistance(character, aimedCharacter);
-            Logger::log(LogLevel::Debug, "Time     : %s", ToString(requiredTime));
+            int distance = Area::getDistance(character->room->coord, aimedCharacter->room->coord);
+            Logger::log(LogLevel::Debug, "Distance : %s", distance);
+            auto requiredTime = 1.5 * distance;
+            Logger::log(LogLevel::Debug, "Time     : %s", requiredTime);
             auto newAction = std::make_shared<AimAction>(character, aimedCharacter, requiredTime);
             // Check the new action.
             if (newAction->check())

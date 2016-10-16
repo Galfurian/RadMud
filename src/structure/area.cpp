@@ -17,7 +17,6 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "area.hpp"
-
 #include "room.hpp"
 
 Area::Area() :
@@ -53,18 +52,62 @@ bool Area::check()
     return true;
 }
 
-bool Area::inBoundaries(const int & x, const int & y, const int & z) const
+bool Area::inBoundaries(const Coordinates & coordinates) const
 {
-    bool result = true;
-    result &= (x >= 0) && (x <= width);
-    result &= (y >= 0) && (y <= height);
-    result &= (z >= 0) && (z <= elevation);
-    return result;
+    if ((coordinates.x < 0) || (coordinates.x > width)) return false;
+    if ((coordinates.y < 0) || (coordinates.y > height)) return false;
+    if ((coordinates.z < 0) || (coordinates.z > elevation)) return false;
+    return true;
 }
 
-bool Area::inBoundaries(const Coordinates & coord) const
+bool Area::isValid(const Coordinates & coordinates)
 {
-    return this->inBoundaries(coord.x, coord.y, coord.z);
+    // Check if out of boundaries.
+    if (!this->inBoundaries(coordinates))
+    {
+        return false;
+    }
+    // Get the room at the coordinates.
+    Room * currentRoom = this->getRoom(coordinates);
+    if (currentRoom == nullptr)
+    {
+        return false;
+    }
+    // Check if there is a door.
+    Item * door = currentRoom->findDoor();
+    if (door != nullptr)
+    {
+        if (HasFlag(door->flags, ItemFlag::Closed))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+int Area::getDistance(const Coordinates & source, const Coordinates & target)
+{
+    return static_cast<int>(std::sqrt((source.x - target.x) * (source.x - target.x) +
+                                      (source.y - target.y) * (source.y - target.y) +
+                                      (source.z - target.z) * (source.z - target.z)));
+}
+
+CharacterContainer Area::getCharactersAt(const CharacterContainer & exceptions, const Coordinates & coordinates)
+{
+    CharacterContainer characterContainer;
+    if (this->isValid(coordinates))
+    {
+        Room * room = this->getRoom(coordinates);
+        // Check if there is a character inside the room.
+        for (auto it : room->characters)
+        {
+            if (!exceptions.containsCharacter(it))
+            {
+                characterContainer.emplace_back_character(it);
+            }
+        }
+    }
+    return characterContainer;
 }
 
 bool Area::addRoom(Room * room)
@@ -79,18 +122,12 @@ bool Area::addRoom(Room * room)
         }
         else
         {
-            Logger::log(
-                LogLevel::Error,
-                "Room's insertion could not be completed %s.",
-                room->coord.toString());
+            Logger::log(LogLevel::Error, "Room's insertion could not be completed %s.", room->coord);
         }
     }
     else
     {
-        Logger::log(
-            LogLevel::Error,
-            "Room's coordinates are not inside the boundaries %s.",
-            room->coord.toString());
+        Logger::log(LogLevel::Error, "Room's coordinates are not inside the boundaries %s.", room->coord);
     }
     return false;
 }
@@ -112,18 +149,13 @@ Room * Area::getRoom(int room_vnum)
     return nullptr;
 }
 
-Room * Area::getRoom(int x, int y, int z)
+Room * Area::getRoom(const Coordinates & coordinates)
 {
-    if (this->inBoundaries(x, y, z))
+    if (this->inBoundaries(coordinates))
     {
-        return areaMap.get(x, y, z);
+        return areaMap.get(coordinates.x, coordinates.y, coordinates.z);
     }
     return nullptr;
-}
-
-Room * Area::getRoom(Coordinates coord)
-{
-    return this->getRoom(coord.x, coord.y, coord.z);
 }
 
 std::vector<std::string> Area::drawFov(Room * centerRoom, const unsigned int & radius)
@@ -147,16 +179,26 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, const unsigned int & r
     Map2D<MapTile> map(signedRadius * 2, signedRadius * 2);
     // Evaluate the field of view.
     //this->fov(map, origin_x, origin_y, origin_z, radius);
-    this->simpleFov(map, origin_x, origin_y, origin_z, radius);
+    auto coordinatesInFov = this->fov(centerRoom->coord, radius);
     // Prepare Environment layer.
     for (int y = max_y; y >= min_y; --y)
     {
         for (int x = min_x; x < max_x; ++x)
         {
             std::string tileCode = " : ";
-            if (map.get(x, y) == MapTile::Walkable)
+            Coordinates coordinates(x, y, origin_z);
+            bool found = false;
+            for (auto it : coordinatesInFov)
             {
-                Room * room = this->getRoom(x, y, origin_z);
+                if (coordinates == it)
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (found)
+            {
+                Room * room = this->getRoom(Coordinates(x, y, origin_z));
                 std::shared_ptr<Exit> up = room->findExit(Direction::Up);
                 std::shared_ptr<Exit> down = room->findExit(Direction::Down);
 
@@ -205,23 +247,36 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, const unsigned int & r
         for (int x = min_x; x < max_x; ++x)
         {
             std::string tileCode = " : ";
-            Room * room = this->getRoom(x, y, origin_z);
-            if ((map.get(x, y) != MapTile::Void) && (room != nullptr))
+            Coordinates coordinates(x, y, origin_z);
+            bool found = false;
+            for (auto it : coordinatesInFov)
             {
-                Item * door = room->findDoor();
-                if (!room->items.empty())
+                if (coordinates == it)
                 {
-                    tileCode = room->items.back()->model->getTile();
+                    found = true;
+                    break;
                 }
-                else if (door != nullptr)
+            }
+            if (found)
+            {
+                Room * room = this->getRoom(coordinates);
+                if (room != nullptr)
                 {
-                    if (HasFlag(door->flags, ItemFlag::Closed))
+                    Item * door = room->findDoor();
+                    if (!room->items.empty())
                     {
-                        tileCode = door->model->getTile(+1);
+                        tileCode = room->items.back()->model->getTile();
                     }
-                    else
+                    else if (door != nullptr)
                     {
-                        tileCode = door->model->getTile(+3);
+                        if (HasFlag(door->flags, ItemFlag::Closed))
+                        {
+                            tileCode = door->model->getTile(+1);
+                        }
+                        else
+                        {
+                            tileCode = door->model->getTile(+3);
+                        }
                     }
                 }
             }
@@ -240,13 +295,23 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, const unsigned int & r
         for (int x = min_x; x < max_x; ++x)
         {
             std::string tileCode = " : ";
+            Coordinates coordinates(x, y, origin_z);
+            bool found = false;
+            for (auto it : coordinatesInFov)
+            {
+                if (coordinates == it)
+                {
+                    found = true;
+                    break;
+                }
+            }
             if ((origin_x == x) && (origin_y == y))
             {
                 tileCode = ToString(1) + ":" + ToString(480);
             }
-            else if (map.get(x, y) == MapTile::Walkable)
+            else if (found)
             {
-                Room * room = this->getRoom(x, y, origin_z);
+                Room * room = this->getRoom(Coordinates(x, y, origin_z));
                 // Check if there are creatures in the tile.
                 if (!room->characters.empty())
                 {
@@ -283,97 +348,90 @@ std::string Area::drawASCIIFov(Room * centerRoom, const unsigned int & radius)
     int origin_x = centerRoom->coord.x;
     int origin_y = centerRoom->coord.y;
     int origin_z = centerRoom->coord.z;
+    (void) origin_z;
     // Evaluate the minimum and maximum value for x and y.
-    int min_x = (origin_x < signedRadius) ? 0 : (origin_x - signedRadius);
-    int max_x = ((origin_x + signedRadius) > this->width) ? this->width : (origin_x + signedRadius);
-    int min_y = (origin_y < signedRadius) ? 0 : (origin_y - signedRadius);
-    int max_y = ((origin_y + signedRadius - 1) > this->height) ? this->height : (origin_y + signedRadius - 1);
-    // Create a 2D map of characters.
-    Map2D<MapTile> map(signedRadius * 2, signedRadius * 2, MapTile::Void);
+    int min_x = (origin_x - signedRadius);
+    int min_y = (origin_y - signedRadius);
+    int max_x = (origin_x + signedRadius);
+    int max_y = (origin_y + signedRadius);
     // Evaluate the field of view.
-    //this->fov(map, origin_x, origin_y, origin_z, radius);
-    this->simpleFov(map, origin_x, origin_y, origin_z, radius);
-    // Prepare Living Creatures layer.
+    auto validFov = this->fov(centerRoom->coord, radius);
     for (int y = max_y; y >= min_y; --y)
     {
         for (int x = min_x; x <= max_x; ++x)
         {
             std::string tile = " ";
-            Room * room = this->getRoom(x, y, origin_z);
-            if (map.get(x, y) == MapTile::Void)
+            Coordinates coordinates(x, y, origin_z);
+            if (std::find(validFov.begin(), validFov.end(), coordinates) != validFov.end())
             {
-                tile = " ";
-            }
-            else if (room == nullptr)
-            {
-                tile = " ";
-            }
-            else
-            {
-                std::shared_ptr<Exit> up = room->findExit(Direction::Up);
-                std::shared_ptr<Exit> down = room->findExit(Direction::Down);
-                // VI  - WALKABLE
-                tile = '.';
-                // V   - OPEN DOOR
-                Item * door = room->findDoor();
-                if (door != nullptr)
+                Room * room = this->getRoom(Coordinates(x, y, origin_z));
+                if (room != nullptr)
                 {
-                    if (HasFlag(door->flags, ItemFlag::Closed))
+                    std::shared_ptr<Exit> up = room->findExit(Direction::Up);
+                    std::shared_ptr<Exit> down = room->findExit(Direction::Down);
+                    // VI  - WALKABLE
+                    tile = ".";
+                    // V   - OPEN DOOR
+                    Item * door = room->findDoor();
+                    if (door != nullptr)
                     {
-                        tile = 'D';
-                    }
-                    else
-                    {
-                        tile = 'O';
-                    }
-                }
-                // IV  - STAIRS
-                if ((up != nullptr) && (down != nullptr))
-                {
-                    if (HasFlag(up->flags, ExitFlag::Stairs)
-                        && HasFlag(down->flags, ExitFlag::Stairs))
-                    {
-                        tile = "X";
-                    }
-                }
-                else if (up != nullptr)
-                {
-                    if (HasFlag(up->flags, ExitFlag::Stairs))
-                    {
-                        tile = ">";
-                    }
-                }
-                else if (down != nullptr)
-                {
-                    if (HasFlag(down->flags, ExitFlag::Stairs))
-                    {
-                        tile = "<";
-                    }
-                    else
-                    {
-                        tile = ' ';
-                    }
-                }
-                // III - ITEMS
-                if (room->items.size() > 0)
-                {
-                    tile = room->items.back()->model->getTile();
-                }
-                // II  - CHARACTERS
-                if (room->characters.size() > 0)
-                {
-                    for (auto iterator : room->characters)
-                    {
-                        if (!HasFlag(iterator->flags, CharacterFlag::Invisible))
+                        if (HasFlag(door->flags, ItemFlag::Closed))
                         {
-                            tile = iterator->race->getTile();
+                            tile = 'D';
+                        }
+                        else
+                        {
+                            tile = 'O';
                         }
                     }
-                }
-                // I   - PLAYER
-                if ((origin_x == x) && (origin_y == y))
-                {
-                    tile = "@";
+                    // IV  - STAIRS
+                    if ((up != nullptr) && (down != nullptr))
+                    {
+                        if (HasFlag(up->flags, ExitFlag::Stairs)
+                            && HasFlag(down->flags, ExitFlag::Stairs))
+                        {
+                            tile = "X";
+                        }
+                    }
+                    else if (up != nullptr)
+                    {
+                        if (HasFlag(up->flags, ExitFlag::Stairs))
+                        {
+                            tile = ">";
+                        }
+                    }
+                    else if (down != nullptr)
+                    {
+                        if (HasFlag(down->flags, ExitFlag::Stairs))
+                        {
+                            tile = "<";
+                        }
+                        else
+                        {
+                            tile = " ";
+                        }
+                    }
+                    // III - ITEMS
+                    if (room->items.size() > 0)
+                    {
+                        tile = room->items.back()->model->getTile();
+                    }
+                    // II  - CHARACTERS
+                    if (room->characters.size() > 0)
+                    {
+                        for (auto iterator : room->characters)
+                        {
+                            if (!HasFlag(iterator->flags, CharacterFlag::Invisible))
+                            {
+                                tile = iterator->race->getTile();
+                            }
+                        }
+                    }
+                    // I   - PLAYER
+                    if ((origin_x == x) && (origin_y == y))
+                    {
+                        tile = "@";
+                    }
                 }
             }
             result += tile;
@@ -383,239 +441,187 @@ std::string Area::drawASCIIFov(Room * centerRoom, const unsigned int & radius)
     return result;
 }
 
-void Area::fov(Map2D<MapTile> & map, int origin_x, int origin_y, int origin_z, const unsigned int & radius)
-{
-    double incr_x = 0.0;
-    double incr_y = 0.0;
-    double incr_z = 0.0;
-    for (float i = 0.0; i < 360; ++i)
-    {
-        // The x and y coordinates used by LOS Algorithm.
-        incr_x = cos(static_cast<double>(i * 0.0174533f));
-        incr_y = sin(static_cast<double>(i * 0.0174533f));
-        this->los(map, origin_x, origin_y, origin_z, incr_x, incr_y, incr_z, radius);
-    }
-}
-
-void Area::los(
-    Map2D<MapTile> & map,
-    int origin_x,
-    int origin_y,
-    int origin_z,
-    double incr_x,
-    double incr_y,
-    double incr_z,
-    const unsigned int & radius)
-{
-    double ox = origin_x + static_cast<double>(0.5f);
-    double oy = origin_y + static_cast<double>(0.5f);
-    double oz = origin_z + static_cast<double>(0.5f);
-    for (unsigned int i = 0; i <= radius; ++i)
-    {
-        // Transform into integer the coordinates.
-        int curr_x = static_cast<int>(ox);
-        int curr_y = static_cast<int>(oy);
-        int curr_z = static_cast<int>(oz);
-        // Check if out of boundaries.
-        if (!this->inBoundaries(curr_x, curr_y, curr_z))
-        {
-            map.set(curr_x, curr_y, MapTile::Void);
-            break;
-        }
-        // Get the room at the current coordinates.
-        Room * currentRoom = this->getRoom(curr_x, curr_y, curr_z);
-        if (currentRoom == nullptr)
-        {
-            map.set(curr_x, curr_y, MapTile::Void);
-            break;
-        }
-        // Check if there is a door.
-        Item * door = currentRoom->findDoor();
-        if (door != nullptr)
-        {
-            if (HasFlag(door->flags, ItemFlag::Closed))
-            {
-                map.set(curr_x, curr_y, MapTile::ClosedDoor);
-                break;
-            }
-        }
-        // Set the tile to visible.
-        map.set(curr_x, curr_y, MapTile::Walkable);
-        // Updated current coordinates.
-        ox += incr_x;
-        oy += incr_y;
-        oz += incr_z;
-    }
-}
-
-void Area::simpleFov(Map2D<MapTile> & map, int origin_x, int origin_y, int origin_z, const unsigned int & radius)
-{
-    int r = static_cast<int>(radius);
-    for (int x = (origin_x - r); x <= origin_x; ++x)
-    {
-        for (int y = (origin_y - r); y <= origin_y; ++y)
-        {
-            if ((x == origin_x) && (y == origin_y))
-            {
-                map.set(x, y, MapTile::Walkable);
-                continue;
-            }
-            if ((x - origin_x) * (x - origin_x) + (y - origin_y) * (y - origin_y) <= (r * r))
-            {
-                int symmetric_x = origin_x - (x - origin_x);
-                int symmetric_y = origin_y - (y - origin_y);
-                // [X, Y]
-                if (this->fastInSight(origin_x, origin_y, origin_z, x, y, origin_z, radius))
-                {
-                    map.set(x, y, MapTile::Walkable);
-                }
-                // [X, sY]
-                if (this->fastInSight(origin_x, origin_y, origin_z, x, symmetric_y, origin_z, radius))
-                {
-                    map.set(x, symmetric_y, MapTile::Walkable);
-                }
-                // [sX, Y]
-                if (this->fastInSight(origin_x, origin_y, origin_z, symmetric_x, y, origin_z, radius))
-                {
-                    map.set(symmetric_x, y, MapTile::Walkable);
-                }
-                // [sX, sY]
-                if (this->fastInSight(origin_x, origin_y, origin_z, symmetric_x, symmetric_y, origin_z, radius))
-                {
-                    map.set(symmetric_x, symmetric_y, MapTile::Walkable);
-                }
-                // (x, y), (x, ySym), (xSym , y), (xSym, ySym) are in the circle
-            }
-        }
-    }
-}
-
-//#define USE_CUSTOM 0
-
-bool Area::fastInSight(
-    int origin_x,
-    int origin_y,
-    int origin_z,
-    int target_x,
-    int target_y,
-    int /*target_z*/,
-    const unsigned int & /*radius*/)
-{
-    int w = target_x - origin_x;
-    int h = target_y - origin_y;
-    int dx1 = (w < 0) ? -1 : (w > 0) ? 1 : 0;
-    int dy1 = (h < 0) ? -1 : (h > 0) ? 1 : 0;
-    int dx2 = (w < 0) ? -1 : (w > 0) ? 1 : 0;
-    int dy2 = (h < 0) ? -1 : (h > 0) ? 1 : 0;
-    int longest = std::abs(w);
-    int shortest = std::abs(h);
-    int cx = origin_x;
-    int cy = origin_y;
-    int cz = origin_z;
-    if (!(longest > shortest))
-    {
-        longest = std::abs(h);
-        shortest = std::abs(w);
-        if (h < 0) dy2 = -1; else if (h > 0) dy2 = 1;
-        dx2 = 0;
-    }
-    int numerator = longest >> 1;
-    for (int i = 0; i <= longest; i++)
-    {
-        if (!this->isValid(cx, cy, cz))
-        {
-            break;
-        }
-        if ((cx == target_x) && (cy == target_y))
-        {
-            return true;
-        }
-        numerator += shortest;
-        if (!(numerator < longest))
-        {
-            numerator -= longest;
-            cx += dx1;
-            cy += dy1;
-        }
-        else
-        {
-            cx += dx2;
-            cy += dy2;
-        }
-    }
-    return false;
-}
-
-bool Area::fastInSight(const Coordinates & origin, const Coordinates & target, const unsigned int & radius)
-{
-    return this->fastInSight(origin.x, origin.y, origin.z, target.x, target.y, target.z, radius);
-}
-
-CharacterContainer Area::getCharactersInSight(
-    CharacterContainer & exceptions,
-    int origin_x,
-    int origin_y,
-    int origin_z,
-    const unsigned int & radius)
+CharacterContainer Area::getCharactersInSight(CharacterContainer & exceptions,
+                                              Coordinates & origin,
+                                              const unsigned int & radius)
 {
     CharacterContainer characterContainer;
-    int r = static_cast<int>(radius);
-    for (int x = (origin_x - r); x <= origin_x; ++x)
+    int signedRadius = static_cast<int>(radius);
+    Coordinates target, point;
+    while (point.x <= signedRadius)
     {
-        for (int y = (origin_y - r); y <= origin_y; ++y)
+        while ((point.y <= point.x) && (point.square() <= signedRadius))
         {
-            if ((x == origin_x) && (y == origin_y))
+            target = Coordinates(origin.x + point.x, origin.y + point.y, origin.z);
+            if (this->los(origin, target, radius))
             {
-                characterContainer.addUnique(this->getCharactersAt(x, y, origin_z, exceptions));
+                characterContainer.addUnique(this->getCharactersAt(exceptions, target));
+            }
+            target = Coordinates(origin.x - point.x, origin.y + point.y, origin.z);
+            if (this->los(origin, target, radius))
+            {
+                characterContainer.addUnique(this->getCharactersAt(exceptions, target));
+            }
+            target = Coordinates(origin.x + point.x, origin.y - point.y, origin.z);
+            if (this->los(origin, target, radius))
+            {
+                characterContainer.addUnique(this->getCharactersAt(exceptions, target));
+            }
+            target = Coordinates(origin.x - point.x, origin.y - point.y, origin.z);
+            if (this->los(origin, target, radius))
+            {
+                characterContainer.addUnique(this->getCharactersAt(exceptions, target));
+            }
+            target = Coordinates(origin.x + point.y, origin.y + point.x, origin.z);
+            if (this->los(origin, target, radius))
+            {
+                characterContainer.addUnique(this->getCharactersAt(exceptions, target));
+            }
+            target = Coordinates(origin.x - point.y, origin.y + point.x, origin.z);
+            if (this->los(origin, target, radius))
+            {
+                characterContainer.addUnique(this->getCharactersAt(exceptions, target));
+            }
+            target = Coordinates(origin.x + point.y, origin.y - point.x, origin.z);
+            if (this->los(origin, target, radius))
+            {
+                characterContainer.addUnique(this->getCharactersAt(exceptions, target));
+            }
+            target = Coordinates(origin.x - point.y, origin.y - point.x, origin.z);
+            if (this->los(origin, target, radius))
+            {
+                characterContainer.addUnique(this->getCharactersAt(exceptions, target));
+            }
+            point.y++;
+        }
+        point.y = 0;
+        point.x++;
+    }
+    return characterContainer;
+}
+
+std::vector<Coordinates> Area::fov(Coordinates & origin, const unsigned int & radius)
+{
+    std::vector<Coordinates> fovCoordinates;
+    int signedRadius = static_cast<int>(radius);
+    Coordinates target, point;
+    while (point.x <= signedRadius)
+    {
+        while ((point.y <= point.x) && (point.square() <= (signedRadius * signedRadius)))
+        {
+            target = Coordinates(origin.x + point.x, origin.y + point.y, origin.z);
+            if ((target.x == origin.x) && (target.y == origin.y))
+            {
+                fovCoordinates.emplace_back(target);
             }
             else
             {
-                if ((x - origin_x) * (x - origin_x) + (y - origin_y) * (y - origin_y) <= (r * r))
-                {
-                    int symmetric_x = origin_x - (x - origin_x);
-                    int symmetric_y = origin_y - (y - origin_y);
-                    // [X, Y]
-                    if (this->fastInSight(origin_x, origin_y, origin_z, x, y, origin_z, radius))
-                    {
-                        characterContainer.addUnique(
-                            this->getCharactersAt(x,
-                                                  y,
-                                                  origin_z,
-                                                  exceptions));
-                    }
-                    // [X, sY]
-                    if (this->fastInSight(origin_x, origin_y, origin_z, x, symmetric_y, origin_z, radius))
-                    {
-                        characterContainer.addUnique(
-                            this->getCharactersAt(x,
-                                                  symmetric_y,
-                                                  origin_z,
-                                                  exceptions));
-                    }
-                    // [sX, Y]
-                    if (this->fastInSight(origin_x, origin_y, origin_z, symmetric_x, y, origin_z, radius))
-                    {
-                        characterContainer.addUnique(
-                            this->getCharactersAt(symmetric_x,
-                                                  y,
-                                                  origin_z,
-                                                  exceptions));
-                    }
-                    // [sX, sY]
-                    if (this->fastInSight(origin_x, origin_y, origin_z, symmetric_x, symmetric_y, origin_z, radius))
-                    {
-                        characterContainer.addUnique(
-                            this->getCharactersAt(symmetric_x,
-                                                  symmetric_y,
-                                                  origin_z,
-                                                  exceptions));
-                    }
-                    // (x, y), (x, ySym), (xSym , y), (xSym, ySym) are in the circle
-                }
+                if (this->los(origin, target, radius)) fovCoordinates.emplace_back(target);
+
+                target = Coordinates(origin.x - point.x, origin.y + point.y, origin.z);
+                if (this->los(origin, target, radius)) fovCoordinates.emplace_back(target);
+
+                target = Coordinates(origin.x + point.x, origin.y - point.y, origin.z);
+                if (this->los(origin, target, radius)) fovCoordinates.emplace_back(target);
+
+                target = Coordinates(origin.x - point.x, origin.y - point.y, origin.z);
+                if (this->los(origin, target, radius)) fovCoordinates.emplace_back(target);
+
+                target = Coordinates(origin.x + point.y, origin.y + point.x, origin.z);
+                if (this->los(origin, target, radius)) fovCoordinates.emplace_back(target);
+
+                target = Coordinates(origin.x - point.y, origin.y + point.x, origin.z);
+                if (this->los(origin, target, radius)) fovCoordinates.emplace_back(target);
+
+                target = Coordinates(origin.x + point.y, origin.y - point.x, origin.z);
+                if (this->los(origin, target, radius)) fovCoordinates.emplace_back(target);
+
+                target = Coordinates(origin.x - point.y, origin.y - point.x, origin.z);
+                if (this->los(origin, target, radius)) fovCoordinates.emplace_back(target);
             }
+            ++point.y;
         }
+        point.y = 0;
+        ++point.x;
     }
-    return characterContainer;
+    return fovCoordinates;
+}
+
+bool Area::los(const Coordinates & source, const Coordinates & target, const unsigned int & radius)
+{
+    // Deal with the easiest case.
+    if (source == target)
+    {
+        return true;
+    }
+    // Check if there is a room at the given coordinates.
+    if (this->getRoom(target) == nullptr)
+    {
+        return false;
+    }
+    // Ensure that the line will not extend too long.
+    if (Area::getDistance(source, target) > static_cast<int>(radius))
+    {
+        return false;
+    }
+    // There is an automatic line of sight, of course, between a
+    //  location and the same location or directly adjacent
+    //  locations.
+    if (std::abs(target.x - source.x) < 2 && std::abs(target.y - source.y) < 2)
+    {
+        return this->isValid(source);
+    }
+    // Evaluates the difference.
+    double dx = target.x - source.x;
+    double dy = target.y - source.y;
+    // Evaluate the distance between the
+    double distance = std::sqrt((dx * dx) + (dy * dy));
+    // Evaluate the unit increment for both X and Y.
+    // Decrease the value of precision for a faster execution with a worsening in terms of accuracy (default 6).
+    double precision = 6;
+    double unitx = dx / (distance * precision);
+    double unity = dy / (distance * precision);
+    // Evaluate the minimum value of increment.
+    double min = std::min(unitx, unity);
+    // Set the initial values for X and Y.
+    double x = source.x;
+    double y = source.y;
+    for (double i = 0; i < distance; i += min)
+    {
+        // Evaluate the integer version of the coordinates using the floor value.
+        int floor_x = static_cast<int>(std::floor(x));
+        int floor_y = static_cast<int>(std::floor(y));
+        // Evaluate the integer version of the coordinates using the ceiling value.
+        int ceil_x = static_cast<int>(std::ceil(x));
+        int ceil_y = static_cast<int>(std::ceil(y));
+        // Prepare all the possible combinations.
+        Coordinates sw(floor_x, floor_y, source.z);
+        Coordinates nw(floor_x, ceil_y, source.z);
+        Coordinates se(ceil_x, floor_y, source.z);
+        Coordinates ne(ceil_x, ceil_y, source.z);
+        if ((source == Coordinates(54, 51, 50)) && (target == Coordinates(57, 53, 50)))
+        {
+            Logger::log(LogLevel::Debug, "SW:%s, NW:%s, SE:%s, NE:%s", sw, nw, se, ne);
+        }
+        // Check if we have reached the target room.
+        if ((sw == target) || (nw == target) || (se == target) || (ne == target))
+        {
+            return true;
+        }
+        // Check if non of the adjacent rooms are unavailable.
+        auto numberNotValid = ((!this->isValid(sw)) ? 1 : 0) +
+                              ((!this->isValid(nw)) ? 1 : 0) +
+                              ((!this->isValid(se)) ? 1 : 0) +
+                              ((!this->isValid(ne)) ? 1 : 0);
+        if (numberNotValid >= 3)
+        {
+            return false;
+        }
+        // Increment both x and y.
+        x += unitx;
+        y += unity;
+    }
+    return false;
 }
 
 void Area::luaRegister(lua_State * L)
@@ -630,62 +636,4 @@ void Area::luaRegister(lua_State * L)
         .addData("height", &Area::height, false)
         .addData("elevation", &Area::elevation, false)
         .endClass();
-}
-
-bool Area::isValid(int x, int y, int z)
-{
-    // Check if out of boundaries.
-    if (!this->inBoundaries(x, y, z))
-    {
-        return false;
-    }
-    // Get the room at the coordinates.
-    Room * currentRoom = this->getRoom(x, y, z);
-    if (currentRoom == nullptr)
-    {
-        return false;
-    }
-    // Check if there is a door.
-    Item * door = currentRoom->findDoor();
-    if (door != nullptr)
-    {
-        if (HasFlag(door->flags, ItemFlag::Closed))
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-CharacterContainer Area::getCharactersAt(const int x, const int y, const int z, const CharacterContainer & exceptions)
-{
-    CharacterContainer characterContainer;
-    if (this->isValid(x, y, z))
-    {
-        Room * room = this->getRoom(x, y, z);
-        // Check if there is a character inside the room.
-        for (auto it : room->characters)
-        {
-            if (!exceptions.containsCharacter(it))
-            {
-                characterContainer.emplace_back_character(it);
-            }
-        }
-    }
-    return characterContainer;
-}
-
-int Area::getDistance(const int x0, const int y0, const int z0, const int x1, const int y1, const int z1)
-{
-    return static_cast<int>(std::pow((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1) + (z0 - z1) * (z0 - z1), 0.5));
-}
-
-int Area::getDistance(const Coordinates & source, const Coordinates & target)
-{
-    return Area::getDistance(source.x, source.y, source.z, target.x, target.y, target.z);
-}
-
-int Area::getDistance(Character * source, Character * target)
-{
-    return Area::getDistance(source->room->coord, target->room->coord);
 }

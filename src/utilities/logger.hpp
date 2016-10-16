@@ -21,6 +21,9 @@
 #include <iostream>
 #include <fstream>
 
+#include "../utils.hpp"
+#include "coordinates.hpp"
+
 /// @brief Enumerator which identifies the severity of the log entry.
 using LogLevel = enum class LogLevel_t
 {
@@ -78,12 +81,12 @@ public:
     /// @return The enum which identifies the given logging level.
     static LogLevel castFromInt(const unsigned int & level);
 
-    /// @brief Print to consol and to logging file the gievn string.
+    /// @brief Print to consol and to logging file the given string.
     /// @param level  The category of the message.
     /// @param msg    The message to log.
     static void log(const LogLevel & level, const std::string & msg);
 
-    /// @brief Print to consol and to logging file the gievn string.
+    /// @brief Print to consol and to logging file the given string.
     /// @param level The category of the message.
     /// @param msg   The message to log.
     /// @param first The first unpacked argument.
@@ -102,6 +105,34 @@ public:
             working.replace(pos, 2, first);
             log(level, working, args ...);
         }
+    }
+
+    /// @brief Print to consol and to logging file the given integer.
+    template<typename ... Args>
+    static void log(const LogLevel & level, const std::string & msg, const int first, const Args & ... args)
+    {
+        Logger::log(level, msg, ToString(first), args ...);
+    }
+
+    /// @brief Print to consol and to logging file the given unsign integer.
+    template<typename ... Args>
+    static void log(const LogLevel & level, const std::string & msg, const unsigned int first, const Args & ... args)
+    {
+        Logger::log(level, msg, ToString(first), args ...);
+    }
+
+    /// @brief Print to consol and to logging file the given double.
+    template<typename ... Args>
+    static void log(const LogLevel & level, const std::string & msg, const double first, const Args & ... args)
+    {
+        Logger::log(level, msg, ToString(first), args ...);
+    }
+
+    /// @brief Print to consol and to logging file the given coordiantes.
+    template<typename ... Args>
+    static void log(const LogLevel & level, const std::string & msg, const Coordinates & first, const Args & ... args)
+    {
+        Logger::log(level, msg, first.toString(), args ...);
     }
 
 private:
