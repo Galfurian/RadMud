@@ -157,6 +157,8 @@ public:
     ///         <b>False</b> otherwise.
     bool los(const Coordinates & source, const Coordinates & target, const unsigned int & radius);
 
+    bool isDiagonal(const Coordinates & source, const Coordinates & target);
+
     /// @brief Function used to register inside the lua environment the class.
     /// @param L The lua environment.
     static void luaRegister(lua_State * L);

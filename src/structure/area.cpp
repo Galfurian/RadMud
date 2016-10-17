@@ -518,13 +518,6 @@ bool Area::los(const Coordinates & source, const Coordinates & target, const uns
     {
         return false;
     }
-    // There is an automatic line of sight, of course, between a
-    //  location and the same location or directly adjacent
-    //  locations.
-    if (std::abs(target.x - source.x) < 2 && std::abs(target.y - source.y) < 2)
-    {
-        return this->isValid(source);
-    }
     // Evaluates the difference.
     double dx = target.x - source.x;
     double dy = target.y - source.y;
@@ -532,7 +525,7 @@ bool Area::los(const Coordinates & source, const Coordinates & target, const uns
     double distance = std::sqrt((dx * dx) + (dy * dy));
     // Evaluate the unit increment for both X and Y.
     // Decrease the value of precision for a faster execution with a worsening in terms of accuracy (default 6).
-    double precision = 6;
+    double precision = 10;
     double unitx = dx / (distance * precision);
     double unity = dy / (distance * precision);
     // Evaluate the minimum value of increment.
@@ -540,7 +533,8 @@ bool Area::los(const Coordinates & source, const Coordinates & target, const uns
     // Set the initial values for X and Y.
     double x = source.x;
     double y = source.y;
-    for (double i = 0; i < distance; i += min)
+    Coordinates sw, nw, se, ne;
+    for (double i = 0; i <= distance; i += min)
     {
         // Evaluate the integer version of the coordinates using the floor value.
         int floor_x = static_cast<int>(std::floor(x));
@@ -549,13 +543,14 @@ bool Area::los(const Coordinates & source, const Coordinates & target, const uns
         int ceil_x = static_cast<int>(std::ceil(x));
         int ceil_y = static_cast<int>(std::ceil(y));
         // Prepare all the possible combinations.
-        Coordinates sw(floor_x, floor_y, source.z);
-        Coordinates nw(floor_x, ceil_y, source.z);
-        Coordinates se(ceil_x, floor_y, source.z);
-        Coordinates ne(ceil_x, ceil_y, source.z);
+        nw = Coordinates(floor_x, ceil_y, source.z);
+        ne = Coordinates(ceil_x, ceil_y, source.z);
+        se = Coordinates(ceil_x, floor_y, source.z);
+        sw = Coordinates(floor_x, floor_y, source.z);
         // Check if we have reached the target room.
         if ((sw == target) || (nw == target) || (se == target) || (ne == target))
         {
+            Logger::log(LogLevel::Debug, "%s->%s : Reached  (%s,%s)", source, target, x, y);
             return true;
         }
         // Evaluate only once the validity of the four cells.
@@ -572,11 +567,38 @@ bool Area::los(const Coordinates & source, const Coordinates & target, const uns
         if (!((swIsValid && nwIsValid && neIsValid) || (nwIsValid && neIsValid && seIsValid) ||
               (neIsValid && seIsValid && swIsValid) || (seIsValid && swIsValid && nwIsValid)))
         {
+            Logger::log(LogLevel::Debug, "%s->%s : !Valid   (%s,%s)", source, target, x, y);
             return false;
         }
         // Increment both x and y.
         x += unitx;
         y += unity;
+    }
+    Logger::log(LogLevel::Debug, "%s->%s : !Valid   (%s,%s)", source, target, x, y);
+    return false;
+}
+
+bool Area::isDiagonal(const Coordinates & source, const Coordinates & target)
+{
+    Coordinates north(source.x, source.y + 1, source.z);
+    Coordinates south(source.x, source.y - 1, source.z);
+    Coordinates west(source.x - 1, source.y, source.z);
+    Coordinates east(source.x + 1, source.y, source.z);
+    if ((source.x == (target.x - 1)) && (source.y == (target.y - 1)))
+    {
+        return (!this->isValid(north) && !this->isValid(east));
+    }
+    if ((source.x == (target.x - 1)) && (source.y == (target.y + 1)))
+    {
+        return (!this->isValid(south) && !this->isValid(east));
+    }
+    if ((source.x == (target.x + 1)) && (source.y == (target.y - 1)))
+    {
+        return (!this->isValid(west) && !this->isValid(south));
+    }
+    if ((source.x == (target.x + 1)) && (source.y == (target.y + 1)))
+    {
+        return (!this->isValid(west) && !this->isValid(north));
     }
     return false;
 }
