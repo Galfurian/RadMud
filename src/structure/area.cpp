@@ -558,12 +558,19 @@ bool Area::los(const Coordinates & source, const Coordinates & target, const uns
         {
             return true;
         }
-        // Check if non of the adjacent rooms are unavailable.
-        auto numberNotValid = ((!this->isValid(sw)) ? 1 : 0) +
-                              ((!this->isValid(nw)) ? 1 : 0) +
-                              ((!this->isValid(se)) ? 1 : 0) +
-                              ((!this->isValid(ne)) ? 1 : 0);
-        if (numberNotValid >= 3)
+        // Evaluate only once the validity of the four cells.
+        bool swIsValid = this->isValid(sw);
+        bool nwIsValid = this->isValid(nw);
+        bool seIsValid = this->isValid(se);
+        bool neIsValid = this->isValid(ne);
+        // If NONE of the following patter is valid, then there is no line of sight.
+        //
+        // | nw..ne | nw..ne |     ne | nw     |
+        // | ..     |     .. |     .. | ..     |
+        // | sw     |     se | sw..se | sw..se |
+        //
+        if (!((swIsValid && nwIsValid && neIsValid) || (nwIsValid && neIsValid && seIsValid) ||
+              (neIsValid && seIsValid && swIsValid) || (seIsValid && swIsValid && nwIsValid)))
         {
             return false;
         }
