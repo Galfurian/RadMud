@@ -188,35 +188,22 @@ bool Mobile::hasAction(const std::string & _action) const
 
 void Mobile::kill()
 {
+    auto generateItem = [&](Item * item)
+    {
+        // Set the item vnum.
+        item->vnum = Mud::instance().getMaxVnumItem() + 1;
+        // Add the item to the mud.
+        Mud::instance().addItem(item);
+        // Evaluate the minimum and maximum condition.
+        unsigned int min = (item->getMaxCondition() / 100) * 10;
+        unsigned int max = (item->getMaxCondition() / 100) * 50;
+        // Set a random condition for the new item.
+        item->condition = TRandInteger<unsigned int>(min, max);
+    };
     // Before calling the character kill function, set the vnum for the new
     //  items, and set the item condition to a random value from 10% to 50%.
-    for (auto it = this->inventory.begin(); it != this->inventory.end(); ++it)
-    {
-        Item * item = (*it);
-        // Set the item vnum.
-        item->vnum = Mud::instance().getMaxVnumItem() + 1;
-        // Add the item to the mud.
-        Mud::instance().addItem(item);
-        // Evaluate the minimum and maximum condition.
-        unsigned int min = (item->getMaxCondition() / 100) * 10;
-        unsigned int max = (item->getMaxCondition() / 100) * 50;
-        // Set a random condition for the new item.
-        item->condition = TRandInteger<unsigned int>(min, max);
-    }
-    for (auto it = this->equipment.begin(); it != this->equipment.end(); ++it)
-    {
-        Item * item = (*it);
-        // Set the item vnum.
-        item->vnum = Mud::instance().getMaxVnumItem() + 1;
-        // Add the item to the mud.
-        Mud::instance().addItem(item);
-        // Evaluate the minimum and maximum condition.
-        unsigned int min = (item->getMaxCondition() / 100) * 10;
-        unsigned int max = (item->getMaxCondition() / 100) * 50;
-        // Set a random condition for the new item.
-        item->condition = TRandInteger<unsigned int>(min, max);
-        // Create the entry for the item on the database.
-    }
+    for (auto item : this->inventory) generateItem(item);
+    for (auto item : this->equipment) generateItem(item);
     // Call the method of the father class.
     Character::kill();
     // Set to 0 the cycle that this mobile has passed dead.

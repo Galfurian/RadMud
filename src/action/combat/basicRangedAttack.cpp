@@ -18,6 +18,7 @@
 
 #include "basicRangedAttack.hpp"
 #include "../../structure/room.hpp"
+#include "../../item/rangedWeaponItem.hpp"
 
 BasicRangedAttack::BasicRangedAttack(Character * _actor) :
     CombatAction(_actor)
@@ -59,6 +60,218 @@ ActionStatus BasicRangedAttack::perform()
         return ActionStatus::Running;
     }
     Logger::log(LogLevel::Debug, "[%s] Perform a BasicRangedAttack.", actor->getName());
+    auto activeWeapons = actor->getActiveRangedWeapons();
+    if (activeWeapons.empty())
+    {
+        actor->sendMsg("You do not have a valid weapon equipped.\n");
+    }
+    else
+    {
+        for (auto iterator : activeWeapons)
+        {
+            Character * enemy = actor->aimedCharacter;
+            // Get the top aggro enemy at range.
+            if (enemy == nullptr)
+            {
+                actor->sendMsg(
+                    "You are not aiming to anyone with %s.\n",
+                    iterator->getName(true));
+                continue;
+            }
+            if (!actor->isAtRange(enemy, iterator->getRange()))
+            {
+                actor->sendMsg("%s is not at range for your %s.\n", actor->getNameCapital(), iterator->getName(true));
+                continue;
+            }
+            // Get the required stamina.
+            unsigned int consumedStamina = actor->getConsumedStaminaFor(
+                ActionType::Combat,
+                CombatActionType::BasicRangedAttack,
+                iterator->getCurrentSlot());
+            // Check if the actor has enough stamina to execute the action.
+            if (consumedStamina > actor->getStamina())
+            {
+                actor->sendMsg("You are too tired to fire with %s.\n", iterator->getName(true));
+                Logger::log(
+                    LogLevel::Debug,
+                    "[%s] Has %s stamina and needs %s.",
+                    actor->getName(),
+                    ToString(actor->getStamina()),
+                    ToString(consumedStamina));
+                continue;
+            }
+            // Natural roll for the attack.
+            unsigned int ATK = TRandInteger<unsigned int>(1, 20);
+            // Log the rolled value.
+            Logger::log(
+                LogLevel::Debug,
+                "[%s] Natural roll of %s.",
+                actor->getName(),
+                ToString(ATK));
+            // Check if:
+            //  1. The number of active weapons is more than 1, then we have to apply
+            //      a penality to the attack roll.
+            //  2. The value is NOT a natural 20 (hit).
+            if ((activeWeapons.size() > 1) && (ATK != 20))
+            {
+                // Evaluate the penality to the attack roll.
+                unsigned int penality = 0;
+                // On the main hand the penality is 6.
+                if (iterator->currentSlot == EquipmentSlot::RightHand)
+                {
+                    penality = 6;
+                }
+                    // On the off hand the penality is 10.
+                else if (iterator->currentSlot == EquipmentSlot::LeftHand)
+                {
+                    penality = 10;
+                }
+                // Log that we have applied a penality.
+                Logger::log(
+                    LogLevel::Debug,
+                    "[%s] Suffer a %s penalty with its %s.",
+                    actor->getName(),
+                    ToString(penality),
+                    GetEquipmentSlotName(iterator->currentSlot));
+                // Safely apply the penality.
+                if (ATK < penality)
+                {
+                    ATK = 0;
+                }
+                else
+                {
+                    ATK -= penality;
+                }
+            }
+            // Evaluate the armor class of the enemy.
+            unsigned int AC = enemy->getArmorClass();
+            // Log the overall attack roll.
+            Logger::log(
+                LogLevel::Debug,
+                "[%s] Attack roll %s vs %s.",
+                actor->getName(),
+                ToString(ATK),
+                ToString(AC));
+            // Check if:
+            //  1. The attack roll is lesser than the armor class of the opponent.
+            //  2. The attack roll is not a natural 20.
+            if ((ATK < AC) && (ATK != 20))
+            {
+                // Notify the actor.
+                actor->sendMsg("You miss %s with %s.\n\n", enemy->getName(), iterator->getName(true));
+                // Notify the enemy.
+                enemy->sendMsg("%s misses you with %s.\n\n", actor->getName(), iterator->getName(true));
+                // Notify the others.
+                enemy->room->sendToAll(
+                    "%s miss %s with %s.\n",
+                    {actor, enemy},
+                    actor->getName(),
+                    enemy->getName(),
+                    iterator->getName(true));
+                // Consume half the stamina.
+                actor->remStamina(consumedStamina / 2, true);
+            }
+            else
+            {
+                // Consume the stamina.
+                actor->remStamina(consumedStamina, true);
+                // Store the type of attack.
+                bool isCritical = false;
+                // Natural roll for the damage.
+                unsigned int DMG = iterator->rollDamage();
+                // Log the damage roll.
+                Logger::log(
+                    LogLevel::Debug,
+                    "[%s] Rolls a damage of %s.",
+                    actor->getName(),
+                    ToString(DMG));
+                // Check if the character is wielding a two-handed weapon.
+                if (activeWeapons.size() == 1)
+                {
+                    if (HasFlag(iterator->model->modelFlags, ModelFlag::TwoHand))
+                    {
+                        // Get the strenth modifier.
+                        unsigned int STR = actor->getAbilityModifier(Ability::Strength);
+                        // Add to the damage rool one and half the strenth value.
+                        DMG += STR + (STR / 2);
+                        // Log the additional damage.
+                        Logger::log(
+                            LogLevel::Debug,
+                            "[%s] Add 1-1/2 times its Strength.",
+                            actor->getName());
+                    }
+                }
+                // If the character has rolled a natural 20, then multiply the damage by two.
+                if (ATK == 20)
+                {
+                    DMG *= 2;
+                    isCritical = true;
+                }
+                // Log the damage.
+                Logger::log(
+                    LogLevel::Debug,
+                    "[%s] Hits %s for with %s.",
+                    actor->getName(),
+                    enemy->getName(),
+                    ToString(DMG),
+                    iterator->getName(true));
+                // Procede and remove the damage from the health of the target.
+                if (!enemy->remHealth(DMG))
+                {
+                    actor->sendMsg(
+                        "You %shit %s with %s and kill %s.\n\n",
+                        (isCritical ? "critically " : ""),
+                        enemy->getName(),
+                        iterator->getName(true),
+                        enemy->getObjectPronoun());
+                    // Notify the enemy.
+                    enemy->sendMsg(
+                        "%s %shits you with %s and kill you.\n\n",
+                        actor->getName(),
+                        (isCritical ? "critically " : ""),
+                        iterator->getName(true));
+                    // Notify the others.
+                    enemy->room->sendToAll(
+                        "%s %shits %s with %s and kill %s.\n",
+                        {actor, enemy},
+                        actor->getName(),
+                        (isCritical ? "critically " : ""),
+                        enemy->getName(),
+                        iterator->getName(true),
+                        enemy->getObjectPronoun());
+                    // The enemy has received the damage and now it is dead.
+                    enemy->kill();
+                    continue;
+                }
+                else
+                {
+                    // The enemy has received the damage but it is still alive.
+                    actor->sendMsg(
+                        "You %s hit %s with %s for %s.\n\n",
+                        (isCritical ? "critically" : ""),
+                        enemy->getName(),
+                        iterator->getName(true),
+                        ToString(DMG));
+                    // Notify the enemy.
+                    enemy->sendMsg(
+                        "%s %s hits you with %s for %s.\n\n",
+                        actor->getName(),
+                        (isCritical ? "critically" : ""),
+                        iterator->getName(true),
+                        ToString(DMG));
+                    // Notify the others.
+                    enemy->room->sendToAll(
+                        "%s %s hits %s with %s for %s.\n",
+                        {actor, enemy},
+                        actor->getName(),
+                        (isCritical ? "critically" : ""),
+                        enemy->getName(),
+                        iterator->getName(true),
+                        ToString(DMG));
+                }
+            }
+        }
+    }
     // By default set the next combat action to basic attack.
     if (!actor->setNextCombatAction(CombatActionType::BasicRangedAttack))
     {

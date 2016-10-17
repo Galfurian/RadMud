@@ -131,21 +131,16 @@ void Character::getSheet(Table & sheet) const
     sheet.addRow({"Stamina", ToString(this->getStamina())});
     sheet.addRow({"Hunger", ToString(this->getHunger())});
     sheet.addRow({"Thirst", ToString(this->getThirst())});
-    sheet.addRow(
-        {"Strength", ToString(this->getAbility(Ability::Strength, false)) + " ["
-                     + ToString(this->effects.getAbilityModifier(Ability::Strength)) + "]"});
-    sheet.addRow(
-        {"Agility", ToString(this->getAbility(Ability::Agility, false)) + " ["
-                    + ToString(this->effects.getAbilityModifier(Ability::Agility)) + "]"});
-    sheet.addRow(
-        {"Perception", ToString(this->getAbility(Ability::Perception, false)) + " ["
-                       + ToString(this->effects.getAbilityModifier(Ability::Perception)) + "]"});
-    sheet.addRow(
-        {"Constitution", ToString(this->getAbility(Ability::Constitution, false)) + " ["
-                         + ToString(this->effects.getAbilityModifier(Ability::Constitution)) + "]"});
-    sheet.addRow(
-        {"Intelligence", ToString(this->getAbility(Ability::Intelligence, false)) + " ["
-                         + ToString(this->effects.getAbilityModifier(Ability::Intelligence)) + "]"});
+    sheet.addRow({"Strength", ToString(this->getAbility(Ability::Strength, false)) + " [" +
+                              ToString(this->effects.getAbilityModifier(Ability::Strength)) + "]"});
+    sheet.addRow({"Agility", ToString(this->getAbility(Ability::Agility, false)) + " [" +
+                             ToString(this->effects.getAbilityModifier(Ability::Agility)) + "]"});
+    sheet.addRow({"Perception", ToString(this->getAbility(Ability::Perception, false)) + " [" +
+                                ToString(this->effects.getAbilityModifier(Ability::Perception)) + "]"});
+    sheet.addRow({"Constitution", ToString(this->getAbility(Ability::Constitution, false)) + " [" +
+                                  ToString(this->effects.getAbilityModifier(Ability::Constitution)) + "]"});
+    sheet.addRow({"Intelligence", ToString(this->getAbility(Ability::Intelligence, false)) + " [" +
+                                  ToString(this->effects.getAbilityModifier(Ability::Intelligence)) + "]"});
     if (CorrectAssert(this->room != nullptr))
     {
         sheet.addRow({"Room", this->room->name + " [" + ToString(this->room->vnum) + "]"});
@@ -521,30 +516,38 @@ void Character::setAction(std::shared_ptr<GeneralAction> _action)
     this->actionQueue.push_front(_action);
 }
 
-bool Character::setNextCombatAction(CombatActionType nextAction)
+bool Character::setNextCombatAction(const CombatActionType & nextAction)
 {
-    if (!opponents.hasOpponents())
-    {
-        Logger::log(LogLevel::Error, "The list of opponents is empty.");
-        return false;
-    }
     bool sameAction = false;
     if (this->getAction()->getType() == ActionType::Combat)
     {
         auto combatAction = this->getAction()->toCombatAction();
         sameAction = (combatAction->getCombatActionType() == nextAction);
     }
-    if ((nextAction == CombatActionType::BasicMeleeAttack) && !sameAction)
+    if (!sameAction)
     {
-        this->actionQueue.push_front(std::make_shared<BasicMeleeAttack>(this));
-    }
-    else if ((nextAction == CombatActionType::BasicRangedAttack) && !sameAction)
-    {
-        this->actionQueue.push_front(std::make_shared<BasicRangedAttack>(this));
-    }
-    else if ((nextAction == CombatActionType::Flee) && !sameAction)
-    {
-        this->actionQueue.push_front(std::make_shared<Flee>(this));
+        if (nextAction == CombatActionType::BasicMeleeAttack)
+        {
+            if (!opponents.hasOpponents())
+            {
+                Logger::log(LogLevel::Error, "The list of opponents is empty.");
+                return false;
+            }
+            this->actionQueue.push_front(std::make_shared<BasicMeleeAttack>(this));
+        }
+        else if (nextAction == CombatActionType::BasicRangedAttack)
+        {
+            if (this->aimedCharacter == nullptr)
+            {
+                Logger::log(LogLevel::Error, "Aimed character is a nullptr.");
+                return false;
+            }
+            this->actionQueue.push_front(std::make_shared<BasicRangedAttack>(this));
+        }
+        else if (nextAction == CombatActionType::Flee)
+        {
+            this->actionQueue.push_front(std::make_shared<Flee>(this));
+        }
     }
     // Set the action cooldown.
     this->getAction()->resetCooldown(this->getCooldown(nextAction));
@@ -607,7 +610,7 @@ bool Character::canMoveTo(const Direction & direction, std::string & error) cons
         return false;
     }
     // Check if the destination is bocked by a door.
-    Item * door = destExit->destination->findDoor();
+    auto  door = destExit->destination->findDoor();
     if (door != nullptr)
     {
         if (HasFlag(door->flags, ItemFlag::Closed))
@@ -725,7 +728,7 @@ Item * Character::findInventoryItem(std::string search_parameter, int & number)
 
 Item * Character::findEquipmentItem(std::string search_parameter, int & number)
 {
-    for (auto * iterator : equipment)
+    for (auto iterator : equipment)
     {
         if (iterator->hasKey(ToLower(search_parameter)))
         {
@@ -753,7 +756,7 @@ Item * Character::findEquipmentSlotItem(EquipmentSlot slot) const
 
 Item * Character::findEquipmentSlotTool(EquipmentSlot slot, ToolType type)
 {
-    Item * tool = findEquipmentSlotItem(slot);
+    auto tool = findEquipmentSlotItem(slot);
     if (tool != nullptr)
     {
         if (tool->model != nullptr)
@@ -771,16 +774,11 @@ Item * Character::findEquipmentSlotTool(EquipmentSlot slot, ToolType type)
     return nullptr;
 }
 
-Item * Character::findNearbyItem(std::string itemName, int & number)
+Item * Character::findNearbyItem(const std::string & itemName, int & number)
 {
-    Item * item;
-    if ((item = findInventoryItem(itemName, number)) == nullptr)
-    {
-        if ((item = findEquipmentItem(itemName, number)) == nullptr)
-        {
-            item = room->findItem(itemName, number);
-        }
-    }
+    auto item = this->findInventoryItem(itemName, number);
+    if (item == nullptr) item = this->findEquipmentItem(itemName, number);
+    if (item == nullptr) item = room->findItem(itemName, number);
     return item;
 }
 
@@ -862,7 +860,7 @@ bool Character::findNearbyTools(
     //              the found tools inside this function).
     for (auto toolType : tools)
     {
-        Item * tool = this->findNearbyTool(
+        auto  tool = this->findNearbyTool(
             toolType,
             foundOnes,
             searchRoom,
@@ -950,34 +948,32 @@ bool Character::findNearbyResouces(
 std::vector<Item *> Character::findCoins()
 {
     ItemContainer foundCoins;
-    for (auto it : equipment)
+    auto findCointInContainer = [&](Item * item)
     {
-        if (it->isAContainer() && !it->isEmpty())
+        if (item->isAContainer() && !item->isEmpty())
         {
-            for (auto content : it->content)
+            for (auto content : item->content)
             {
                 if (content->getType() == ModelType::Currency)
                 {
-                    foundCoins.push_back(content);
+                    foundCoins.emplace_back(content);
                 }
             }
         }
+    };
+    for (auto it : equipment)
+    {
+        findCointInContainer(it);
     }
     for (auto it : inventory)
     {
         if (it->getType() == ModelType::Currency)
         {
-            foundCoins.push_back(it);
+            foundCoins.emplace_back(it);
         }
-        if (it->isAContainer() && !it->isEmpty())
+        else
         {
-            for (auto content : it->content)
-            {
-                if (content->getType() == ModelType::Currency)
-                {
-                    foundCoins.push_back(content);
-                }
-            }
+            findCointInContainer(it);
         }
     }
     foundCoins.orderBy(ItemContainer::ByPrice);
@@ -988,10 +984,7 @@ bool Character::hasInventoryItem(Item * item)
 {
     for (auto it : inventory)
     {
-        if (it->vnum == item->vnum)
-        {
-            return true;
-        }
+        if (it->vnum == item->vnum) return true;
     }
     return false;
 }
@@ -1000,10 +993,7 @@ bool Character::hasEquipmentItem(Item * item)
 {
     for (auto it : equipment)
     {
-        if (it->vnum == item->vnum)
-        {
-            return true;
-        }
+        if (it->vnum == item->vnum) return true;
     }
     return false;
 }
@@ -1015,11 +1005,7 @@ void Character::addInventoryItem(Item *& item)
     // Set the owner of the item.
     item->owner = this;
     // Log it.
-    Logger::log(
-        LogLevel::Debug,
-        "Item '%s' added to '%s' inventory;",
-        item->getName(),
-        this->getName());
+    Logger::log(LogLevel::Debug, "Item '%s' added to '%s' inventory;", item->getName(), this->getName());
 }
 
 void Character::addEquipmentItem(Item *& item)
@@ -1029,43 +1015,35 @@ void Character::addEquipmentItem(Item *& item)
     // Set the owner of the item.
     item->owner = this;
     // Log it.
-    Logger::log(
-        LogLevel::Debug,
-        "Item '%s' added to '%s' equipment;",
-        item->getName(),
-        this->getName());
+    Logger::log(LogLevel::Debug, "Item '%s' added to '%s' equipment;", item->getName(), this->getName());
 }
 
 bool Character::remInventoryItem(Item * item)
 {
-    if (inventory.removeItem(item))
+    // Remove the item from the inventory.
+    if (!inventory.removeItem(item))
     {
-        item->owner = nullptr;
-        // Log it.
-        Logger::log(
-            LogLevel::Debug,
-            "Item '%s' removed from '%s';",
-            item->getName(),
-            this->getName());
-        return true;
+        return false;
     }
-    return false;
+    // Clear the owner of the item.
+    item->owner = nullptr;
+    // Log it.
+    Logger::log(LogLevel::Debug, "Item '%s' removed from '%s';", item->getName(), this->getName());
+    return true;
 }
 
 bool Character::remEquipmentItem(Item * item)
 {
-    if (equipment.removeItem(item))
+    // Remove the item from the equipment.
+    if (!equipment.removeItem(item))
     {
-        item->owner = nullptr;
-        // Log it.
-        Logger::log(
-            LogLevel::Debug,
-            "Item '%s' removed from '%s';",
-            item->getName(),
-            this->getName());
-        return true;
+        return false;
     }
-    return false;
+    // Clear the owner of the item.
+    item->owner = nullptr;
+    // Log it.
+    Logger::log(LogLevel::Debug, "Item '%s' removed from '%s';", item->getName(), this->getName());
+    return true;
 }
 
 bool Character::canCarry(Item * item, unsigned int quantity) const
@@ -1098,9 +1076,9 @@ double Character::getMaxCarryingWeight() const
 bool Character::canWield(Item * item, std::string & error, EquipmentSlot & where) const
 {
     // Gather the item in the right hand, if there is one.
-    Item * rightHand = findEquipmentSlotItem(EquipmentSlot::RightHand);
+    auto  rightHand = findEquipmentSlotItem(EquipmentSlot::RightHand);
     // Gather the item in the left hand, if there is one.
-    Item * leftHand = findEquipmentSlotItem(EquipmentSlot::LeftHand);
+    auto  leftHand = findEquipmentSlotItem(EquipmentSlot::LeftHand);
     if (HasFlag(item->model->modelFlags, ModelFlag::TwoHand))
     {
         if ((rightHand != nullptr) || (leftHand != nullptr))
@@ -1338,42 +1316,42 @@ std::string Character::getLook()
     output += ToCapitals(this->getSubjectPronoun()) + " is wearing:\n";
 
     // Equipment Slot : HEAD
-    Item * head = this->findEquipmentSlotItem(EquipmentSlot::Head);
+    auto head = this->findEquipmentSlotItem(EquipmentSlot::Head);
     if (head)
     {
         output += "  " + Formatter::yellow() + "Head" + Formatter::reset() + "       : ";
         output += Formatter::cyan() + head->getNameCapital() + Formatter::reset() + ".\n";
     }
     // Equipment Slot : BACK
-    Item * back = this->findEquipmentSlotItem(EquipmentSlot::Back);
+    auto back = this->findEquipmentSlotItem(EquipmentSlot::Back);
     if (back)
     {
         output += "  " + Formatter::yellow() + "Back" + Formatter::reset() + "       : ";
         output += Formatter::cyan() + back->getNameCapital() + Formatter::reset() + ".\n";
     }
     // Equipment Slot : TORSO
-    Item * torso = this->findEquipmentSlotItem(EquipmentSlot::Torso);
+    auto torso = this->findEquipmentSlotItem(EquipmentSlot::Torso);
     if (torso)
     {
         output += "  " + Formatter::yellow() + "Torso" + Formatter::reset() + "      : ";
         output += Formatter::cyan() + torso->getNameCapital() + Formatter::reset() + ".\n";
     }
     // Equipment Slot : LEGS
-    Item * legs = this->findEquipmentSlotItem(EquipmentSlot::Legs);
+    auto legs = this->findEquipmentSlotItem(EquipmentSlot::Legs);
     if (legs)
     {
         output += "  " + Formatter::yellow() + "Legs" + Formatter::reset() + "       : ";
         output += Formatter::cyan() + legs->getNameCapital() + Formatter::reset() + ".\n";
     }
     // Equipment Slot : FEET
-    Item * feet = this->findEquipmentSlotItem(EquipmentSlot::Feet);
+    auto feet = this->findEquipmentSlotItem(EquipmentSlot::Feet);
     if (feet)
     {
         output += "  " + Formatter::yellow() + "Feet" + Formatter::reset() + "       : ";
         output += Formatter::cyan() + feet->getNameCapital() + Formatter::reset() + ".\n";
     }
     // Print what is wielding.
-    Item * right = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
+    auto right = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
     if (right)
     {
         if (HasFlag(right->model->modelFlags, ModelFlag::TwoHand))
@@ -1386,7 +1364,7 @@ std::string Character::getLook()
         }
         output += Formatter::cyan() + right->getNameCapital() + Formatter::reset() + ".\n";
     }
-    Item * left = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
+    auto left = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
     if (left)
     {
         output += "  " + Formatter::yellow() + "Left Hand" + Formatter::reset() + "  : ";
@@ -1421,7 +1399,7 @@ bool Character::canAttackWith(const EquipmentSlot & slot) const
 {
     if ((slot == EquipmentSlot::RightHand) || (slot == EquipmentSlot::LeftHand))
     {
-        Item * weapon = this->findEquipmentSlotItem(slot);
+        auto weapon = this->findEquipmentSlotItem(slot);
         if (weapon != nullptr)
         {
             // Check if there is actually a weapon equiped.
@@ -1462,58 +1440,42 @@ Character * Character::getNextOpponentAtRange(const unsigned int & range)
 
 std::vector<MeleeWeaponItem *> Character::getActiveMeleeWeapons()
 {
-    std::vector<MeleeWeaponItem *> ret;
-    if (this->canAttackWith(EquipmentSlot::RightHand))
+    std::vector<MeleeWeaponItem *> gatheredWeapons;
+    auto retrieveWeapon = [&](const EquipmentSlot & slot)
     {
-        Item * weapon = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
+        // First get the item at the given position.
+        auto weapon = this->findEquipmentSlotItem(slot);
         if (weapon != nullptr)
         {
             if (weapon->getType() == ModelType::MeleeWeapon)
             {
-                ret.push_back(weapon->toMeleeWeaponItem());
+                gatheredWeapons.emplace_back(weapon->toMeleeWeaponItem());
             }
         }
-    }
-    if (this->canAttackWith(EquipmentSlot::LeftHand))
-    {
-        Item * weapon = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
-        if (weapon != nullptr)
-        {
-            if (weapon->getType() == ModelType::MeleeWeapon)
-            {
-                ret.push_back(weapon->toMeleeWeaponItem());
-            }
-        }
-    }
-    return ret;
+    };
+    retrieveWeapon(EquipmentSlot::RightHand);
+    retrieveWeapon(EquipmentSlot::LeftHand);
+    return gatheredWeapons;
 }
 
 std::vector<RangedWeaponItem *> Character::getActiveRangedWeapons()
 {
-    std::vector<RangedWeaponItem *> ret;
-    if (this->canAttackWith(EquipmentSlot::RightHand))
+    std::vector<RangedWeaponItem *> gatheredWeapons;
+    auto retrieveWeapon = [&](const EquipmentSlot & slot)
     {
-        Item * weapon = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
+        // First get the item at the given position.
+        auto weapon = this->findEquipmentSlotItem(slot);
         if (weapon != nullptr)
         {
             if (weapon->getType() == ModelType::RangedWeapon)
             {
-                ret.push_back(weapon->toRangedWeaponItem());
+                gatheredWeapons.emplace_back(weapon->toRangedWeaponItem());
             }
         }
-    }
-    if (this->canAttackWith(EquipmentSlot::LeftHand))
-    {
-        Item * weapon = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
-        if (weapon != nullptr)
-        {
-            if (weapon->getType() == ModelType::RangedWeapon)
-            {
-                ret.push_back(weapon->toRangedWeaponItem());
-            }
-        }
-    }
-    return ret;
+    };
+    retrieveWeapon(EquipmentSlot::RightHand);
+    retrieveWeapon(EquipmentSlot::LeftHand);
+    return gatheredWeapons;
 }
 
 CharacterContainer Character::getCharactersInSight()
@@ -1560,7 +1522,8 @@ unsigned int Character::getCooldown(CombatActionType combatAction)
         }
         CAR = log10(CARmod);
     }
-    if (combatAction == CombatActionType::BasicMeleeAttack)
+    if ((combatAction == CombatActionType::BasicMeleeAttack) ||
+        (combatAction == CombatActionType::BasicRangedAttack))
     {
         double RHD = 0;
         double LHD = 0;
@@ -1569,7 +1532,7 @@ unsigned int Character::getCooldown(CombatActionType combatAction)
             // Right Hand Weapon
             // MIN =  0.00
             // MAX =  1.60
-            Item * weapon = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
+            auto weapon = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
             double RHDmod = weapon->getWeight(true);
             if (RHDmod > 0)
             {
@@ -1585,7 +1548,7 @@ unsigned int Character::getCooldown(CombatActionType combatAction)
             // Left Hand Weapon
             // MIN =  0.00
             // MAX =  1.60
-            Item * weapon = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
+            auto weapon = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
             double LHDmod = weapon->getWeight(true);
             if (LHDmod > 0)
             {
@@ -1597,10 +1560,6 @@ unsigned int Character::getCooldown(CombatActionType combatAction)
             }
         }
         BASE += -STR - AGI + WGT + CAR + std::max(RHD, LHD);
-    }
-    else if (combatAction == CombatActionType::BasicRangedAttack)
-    {
-        BASE += -STR - AGI + WGT + CAR;
     }
     else if (combatAction == CombatActionType::Flee)
     {
@@ -1673,13 +1632,12 @@ unsigned int Character::getConsumedStaminaFor(
 void Character::kill()
 {
     // Create a corpse at the current position.
-    Item * corpse = this->createCorpse();
-
+    auto  corpse = this->createCorpse();
     // Transfer all the items from the character to the corpse.
     auto tempInventory = this->inventory;
     for (auto it = tempInventory.begin(); it != tempInventory.end(); ++it)
     {
-        Item * item = (*it);
+        auto  item = (*it);
         // Remove the item from the inventory.
         this->remInventoryItem(item);
         // Add the item to the corpse.
@@ -1690,7 +1648,7 @@ void Character::kill()
     auto tempEquipment = this->equipment;
     for (auto it = tempEquipment.begin(); it != tempEquipment.end(); ++it)
     {
-        Item * item = (*it);
+        auto  item = (*it);
         // Remove the item from the inventory.
         this->remEquipmentItem(item);
         // Add the item to the corpse.
@@ -1698,7 +1656,6 @@ void Character::kill()
         // Set the corpse as container of the item.
         item->container = corpse;
     }
-
     // Reset the action of the character.
     this->actionQueue.clear();
     this->setAction(std::make_shared<GeneralAction>(this));
@@ -1714,7 +1671,7 @@ void Character::kill()
 Item * Character::createCorpse()
 {
     // Create the corpse.
-    Item * corpse = race->corpse.createCorpse(this->name, race->material, this->weight);
+    auto  corpse = race->corpse.createCorpse(this->name, race->material, this->weight);
     // Add the corpse to the room.
     room->addItem(corpse);
     // Return the corpse.

@@ -289,7 +289,7 @@ public:
     /// @param nextAction The next combat action to execute.
     /// @return <b>True</b> if correct values have been provided,<br>
     ///         <b>False</b> otherwise.
-    bool setNextCombatAction(CombatActionType nextAction);
+    bool setNextCombatAction(const CombatActionType & nextAction);
 
     /// @brief Provides a pointer to the action object associated to this character.
     /// @return A pointer to action.
@@ -344,7 +344,7 @@ public:
     /// @param itemName The name of the item.
     /// @param number   Position of the item we want to look for.
     /// @return The item, if it's found.
-    Item * findNearbyItem(std::string itemName, int & number);
+    Item * findNearbyItem(const std::string & itemName, int & number);
 
     /// @brief Search the given type of tool in the proximity of the character.
     /// @param toolType        The type of tool that has to be searched.

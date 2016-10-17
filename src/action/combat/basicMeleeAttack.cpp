@@ -214,23 +214,23 @@ ActionStatus BasicMeleeAttack::perform()
                 if (!enemy->remHealth(DMG))
                 {
                     actor->sendMsg(
-                        "You %s hit %s with %s and kill %s.\n\n",
-                        (isCritical ? "critically" : ""),
+                        "You %shit %s with %s and kill %s.\n\n",
+                        (isCritical ? "critically " : ""),
                         enemy->getName(),
                         iterator->getName(true),
                         enemy->getObjectPronoun());
                     // Notify the enemy.
                     enemy->sendMsg(
-                        "%s %s hits you with %s and kill you.\n\n",
+                        "%s %shits you with %s and kill you.\n\n",
                         actor->getName(),
-                        (isCritical ? "critically" : ""),
+                        (isCritical ? "critically " : ""),
                         iterator->getName(true));
                     // Notify the others.
                     enemy->room->sendToAll(
-                        "%s %s hits %s with %s and kill %s.\n",
+                        "%s %shits %s with %s and kill %s.\n",
                         {actor, enemy},
                         actor->getName(),
-                        (isCritical ? "critically" : ""),
+                        (isCritical ? "critically " : ""),
                         enemy->getName(),
                         iterator->getName(true),
                         enemy->getObjectPronoun());
@@ -242,24 +242,24 @@ ActionStatus BasicMeleeAttack::perform()
                 {
                     // The enemy has received the damage but it is still alive.
                     actor->sendMsg(
-                        "You %s hit %s with %s for %s.\n\n",
-                        (isCritical ? "critically" : ""),
+                        "You %shit %s with %s for %s.\n\n",
+                        (isCritical ? "critically " : ""),
                         enemy->getName(),
                         iterator->getName(true),
                         ToString(DMG));
                     // Notify the enemy.
                     enemy->sendMsg(
-                        "%s %s hits you with %s for %s.\n\n",
+                        "%s %shits you with %s for %s.\n\n",
                         actor->getName(),
-                        (isCritical ? "critically" : ""),
+                        (isCritical ? "critically " : ""),
                         iterator->getName(true),
                         ToString(DMG));
                     // Notify the others.
                     enemy->room->sendToAll(
-                        "%s %s hits %s with %s for %s.\n",
+                        "%s %shits %s with %s for %s.\n",
                         {actor, enemy},
                         actor->getName(),
-                        (isCritical ? "critically" : ""),
+                        (isCritical ? "critically " : ""),
                         enemy->getName(),
                         iterator->getName(true),
                         ToString(DMG));

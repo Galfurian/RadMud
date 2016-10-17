@@ -510,9 +510,20 @@ void DoFire(Character * character, ArgumentHandler & /*args*/)
         Logger::log(LogLevel::Debug, "Weapon Range : %s", ToString(weaponRange));
         if (character->isAtRange(character->aimedCharacter, weaponRange))
         {
-            character->sendMsg("You fire at %s with %s...\n",
-                               character->aimedCharacter->getName(),
-                               weapon->getName(true));
+            // Let the characters enter the combat.
+            if (!character->setNextCombatAction(CombatActionType::BasicRangedAttack))
+            {
+                character->sendMsg("You were not able to fire at %s with %s.\n",
+                                   character->aimedCharacter->getName(),
+                                   weapon->getName(true));
+                return;
+            }
+            else
+            {
+                character->sendMsg("You start firing at %s with %s...\n",
+                                   character->aimedCharacter->getName(),
+                                   weapon->getName(true));
+            }
         }
         else
         {

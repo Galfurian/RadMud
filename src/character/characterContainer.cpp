@@ -31,17 +31,8 @@ Character * CharacterContainer::findCharacter(const std::string & target,
                                               bool skipMobile,
                                               bool skipPlayer) const
 {
-    for (const_iterator it = this->begin(); it != this->end(); ++it)
+    auto isAnException = [&](Character * character)
     {
-        Character * character = (*it);
-        if (skipMobile && character->isMobile())
-        {
-            continue;
-        }
-        if (skipPlayer && character->isPlayer())
-        {
-            continue;
-        }
         // Check exceptions.
         if (!exceptions.empty())
         {
@@ -49,9 +40,23 @@ Character * CharacterContainer::findCharacter(const std::string & target,
             {
                 if (exception->getName() == character->getName())
                 {
-                    continue;
+                    return true;
                 }
             }
+        }
+        return false;
+    };
+
+    for (const_iterator it = this->begin(); it != this->end(); ++it)
+    {
+        Character * character = (*it);
+        if ((skipMobile && character->isMobile()) || (skipPlayer && character->isPlayer()))
+        {
+            continue;
+        }
+        if (isAnException(character))
+        {
+            continue;
         }
         // Check if the character is a mobile or a player.
         if (character->isMobile())
