@@ -35,6 +35,15 @@ bool DoubleEquality(double a, double b)
     return std::fabs(a - b) < std::numeric_limits<double>::epsilon();
 }
 
+double SafeLog10(const double & source)
+{
+    if (source > 0)
+    {
+        return log10(source);
+    }
+    return 0;
+}
+
 bool BeginWith(const std::string & source, const std::string & prefix)
 {
     return source.compare(0, prefix.size(), prefix) == 0;

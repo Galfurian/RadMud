@@ -64,6 +64,11 @@ public:
 ///         <b>False</b> otherwise.
 bool DoubleEquality(double a, double b);
 
+/// @brief Transform a string into a numeric value.
+/// @param source The string to turn into a number.
+/// @return The number.
+double SafeLog10(const double & source);
+
 /// @brief Check if the passed value has the given flag set.
 /// @param flags The value to check.
 /// @param flag  The flag to search.

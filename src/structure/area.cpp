@@ -550,7 +550,6 @@ bool Area::los(const Coordinates & source, const Coordinates & target, const uns
         // Check if we have reached the target room.
         if ((sw == target) || (nw == target) || (se == target) || (ne == target))
         {
-            Logger::log(LogLevel::Debug, "%s->%s : Reached  (%s,%s)", source, target, x, y);
             return true;
         }
         // Evaluate only once the validity of the four cells.
@@ -567,14 +566,12 @@ bool Area::los(const Coordinates & source, const Coordinates & target, const uns
         if (!((swIsValid && nwIsValid && neIsValid) || (nwIsValid && neIsValid && seIsValid) ||
               (neIsValid && seIsValid && swIsValid) || (seIsValid && swIsValid && nwIsValid)))
         {
-            Logger::log(LogLevel::Debug, "%s->%s : !Valid   (%s,%s)", source, target, x, y);
             return false;
         }
         // Increment both x and y.
         x += unitx;
         y += unity;
     }
-    Logger::log(LogLevel::Debug, "%s->%s : !Valid   (%s,%s)", source, target, x, y);
     return false;
 }
 
