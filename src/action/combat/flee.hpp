@@ -43,4 +43,6 @@ public:
     ActionStatus perform() override;
 
     CombatActionType getCombatActionType() const override;
+
+    static unsigned int getConsumedStamina(Character * character);
 };

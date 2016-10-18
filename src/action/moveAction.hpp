@@ -55,6 +55,9 @@ public:
 
     ActionStatus perform() override;
 
+    /// @brief Given an action, it returns the stamina required to execute it.
+    static unsigned int getConsumedStamina(const Character * character, const CharacterPosture & posture);
+
 private:
     /// @brief Checks the destination.
     /// @return <b>True</b> if the destination is set,<br>

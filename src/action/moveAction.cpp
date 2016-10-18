@@ -80,7 +80,7 @@ ActionStatus MoveAction::perform()
     else
     {
         // Get the amount of required stamina.
-        auto consumedStamina = actor->getConsumedStaminaFor(ActionType::Building);
+        auto consumedStamina = this->getConsumedStamina(actor, actor->posture);
         // Consume the stamina.
         actor->remStamina(consumedStamina, true);
         // Move character.
@@ -110,4 +110,25 @@ bool MoveAction::checkDirection() const
         return false;
     }
     return true;
+}
+
+unsigned int MoveAction::getConsumedStamina(const Character * character, const CharacterPosture & posture)
+{
+    auto multiplier = 1.0;
+    if (posture == CharacterPosture::Crouch)
+    {
+        multiplier = 0.75;
+    }
+    else if (posture == CharacterPosture::Prone)
+    {
+        multiplier = 0.50;
+    }
+    // BASE     [+1.0]
+    // STRENGTH [-0.0 to -2.80]
+    // WEIGHT   [+1.6 to +2.51]
+    // CARRIED  [+0.0 to +2.48]
+    return static_cast<unsigned int>((1.0
+                                      - character->getAbilityLog(Ability::Strength, 0.0, 1.0)
+                                      + SafeLog10(character->weight)
+                                      + SafeLog10(character->getCarryingWeight())) * multiplier);
 }

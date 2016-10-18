@@ -18,7 +18,8 @@
 
 #include "basicMeleeAttack.hpp"
 #include "../../structure/room.hpp"
-#include "meleeWeaponItem.hpp"
+#include "../../item/meleeWeaponItem.hpp"
+#include "../../model/meleeWeaponModel.hpp"
 
 BasicMeleeAttack::BasicMeleeAttack(Character * _actor) :
     CombatAction(_actor)
@@ -79,10 +80,7 @@ ActionStatus BasicMeleeAttack::perform()
                 continue;
             }
             // Get the required stamina.
-            unsigned int consumedStamina = actor->getConsumedStaminaFor(
-                ActionType::Combat,
-                CombatActionType::BasicMeleeAttack,
-                iterator->getCurrentSlot());
+            unsigned int consumedStamina = this->getConsumedStamina(actor, iterator);
             // Check if the actor has enough stamina to execute the action.
             if (consumedStamina > actor->getStamina())
             {
@@ -279,4 +277,22 @@ ActionStatus BasicMeleeAttack::perform()
 CombatActionType BasicMeleeAttack::getCombatActionType() const
 {
     return CombatActionType::BasicMeleeAttack;
+}
+
+unsigned int BasicMeleeAttack::getConsumedStamina(Character * character, MeleeWeaponItem * weapon)
+{
+    if (weapon->model->toMeleeWeapon()->meleeWeaponType == MeleeWeaponType::Placed)
+    {
+        return 0;
+    }
+    // BASE     [+1.0]
+    // STRENGTH [-0.0 to -2.80]
+    // WEIGHT   [+1.6 to +2.51]
+    // CARRIED  [+0.0 to +2.48]
+    // WEAPON   [+0.0 to +1.60]
+    return static_cast<unsigned int>(1.0
+                                     - character->getAbilityLog(Ability::Strength, 0.0, 1.0)
+                                     + SafeLog10(character->weight)
+                                     + SafeLog10(character->getCarryingWeight())
+                                     + SafeLog10(weapon->getWeight(true)));
 }

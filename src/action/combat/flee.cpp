@@ -63,7 +63,7 @@ ActionStatus Flee::perform()
     auto fleeChance = TRandInteger<unsigned int>(0, 20)
                       + actor->getAbilityModifier(Ability::Agility);
     // Get the required stamina.
-    auto consumedStamina = actor->getConsumedStaminaFor(ActionType::Combat, CombatActionType::Flee);
+    auto consumedStamina = this->getConsumedStamina(actor);
     // Base the escape level on how many enemies are surrounding the character.
     if (fleeChance < static_cast<unsigned int>(actor->opponents.getSize()))
     {
@@ -126,4 +126,16 @@ ActionStatus Flee::perform()
 CombatActionType Flee::getCombatActionType() const
 {
     return CombatActionType::Flee;
+}
+
+unsigned int Flee::getConsumedStamina(Character * character)
+{
+    // BASE     [+1.0]
+    // STRENGTH [-0.0 to -2.80]
+    // WEIGHT   [+1.6 to +2.51]
+    // CARRIED  [+0.0 to +2.48]
+    return static_cast<unsigned int>(1.0
+                                     - character->getAbilityLog(Ability::Strength, 0.0, 1.0)
+                                     + SafeLog10(character->weight)
+                                     + SafeLog10(character->getCarryingWeight()));
 }

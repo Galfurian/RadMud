@@ -63,6 +63,8 @@ public:
 
     ActionStatus perform() override;
 
+    static unsigned int getConsumedStamina(Character * character);
+
 private:
     /// @brief Checks the building.
     /// @return <b>True</b> if the building is available,<br>

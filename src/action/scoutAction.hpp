@@ -42,4 +42,6 @@ public:
 
     ActionStatus perform() override;
 
+    static unsigned int getConsumedStamina(Character * character);
+
 };

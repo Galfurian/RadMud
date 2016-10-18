@@ -61,7 +61,7 @@ ActionStatus ScoutAction::perform()
     // Create a variable which will contain the ammount of consumed stamina.
     std::string error;
     // Get the amount of required stamina.
-    auto consumedStamina = actor->getConsumedStaminaFor(ActionType::Scout);
+    auto consumedStamina = this->getConsumedStamina(actor);
     // Consume the stamina.
     actor->remStamina(consumedStamina, true);
     // Show the surrounding.
@@ -79,4 +79,16 @@ ActionStatus ScoutAction::perform()
         }
     }
     return ActionStatus::Finished;
+}
+
+unsigned int ScoutAction::getConsumedStamina(Character * character)
+{
+    // BASE     [+1.0]
+    // STRENGTH [-0.0 to -2.80]
+    // WEIGHT   [+1.6 to +2.51]
+    // CARRIED  [+0.0 to +2.48]
+    return static_cast<unsigned int>(1.0
+                                     - character->getAbilityLog(Ability::Strength, 0.0, 1.0)
+                                     + SafeLog10(character->weight)
+                                     + SafeLog10(character->getCarryingWeight()));
 }

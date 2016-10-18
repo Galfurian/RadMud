@@ -29,6 +29,7 @@
 #include "../item/armorItem.hpp"
 #include "../item/meleeWeaponItem.hpp"
 #include "../item/rangedWeaponItem.hpp"
+#include "../action/moveAction.hpp"
 
 using namespace std::chrono;
 
@@ -588,7 +589,7 @@ bool Character::canMoveTo(const Direction & direction, std::string & error) cons
         return false;
     }
     // Check if the actor has enough stamina to execute the action.
-    if (this->getConsumedStaminaFor(ActionType::Move) > this->getStamina())
+    if (MoveAction::getConsumedStamina(this, this->posture) > this->getStamina())
     {
         error = "You are too tired to move.\n";
         return false;
@@ -610,7 +611,7 @@ bool Character::canMoveTo(const Direction & direction, std::string & error) cons
         return false;
     }
     // Check if the destination is bocked by a door.
-    auto  door = destExit->destination->findDoor();
+    auto door = destExit->destination->findDoor();
     if (door != nullptr)
     {
         if (HasFlag(door->flags, ItemFlag::Closed))
@@ -860,7 +861,7 @@ bool Character::findNearbyTools(
     //              the found tools inside this function).
     for (auto toolType : tools)
     {
-        auto  tool = this->findNearbyTool(
+        auto tool = this->findNearbyTool(
             toolType,
             foundOnes,
             searchRoom,
@@ -1076,9 +1077,9 @@ double Character::getMaxCarryingWeight() const
 bool Character::canWield(Item * item, std::string & error, EquipmentSlot & where) const
 {
     // Gather the item in the right hand, if there is one.
-    auto  rightHand = findEquipmentSlotItem(EquipmentSlot::RightHand);
+    auto rightHand = findEquipmentSlotItem(EquipmentSlot::RightHand);
     // Gather the item in the left hand, if there is one.
-    auto  leftHand = findEquipmentSlotItem(EquipmentSlot::LeftHand);
+    auto leftHand = findEquipmentSlotItem(EquipmentSlot::LeftHand);
     if (HasFlag(item->model->modelFlags, ModelFlag::TwoHand))
     {
         if ((rightHand != nullptr) || (leftHand != nullptr))
@@ -1568,76 +1569,15 @@ unsigned int Character::getCooldown(CombatActionType combatAction)
     return static_cast<unsigned int>(BASE);
 }
 
-unsigned int Character::getConsumedStaminaFor(
-    const ActionType & actionType,
-    const CombatActionType & combatAction,
-    const EquipmentSlot & slot) const
-{
-    // BASE     [+1.0]
-    // STRENGTH [-0.0 to -2.80]
-    // WEIGHT   [+1.6 to +2.51]
-    // CARRIED  [+0.0 to +2.48]
-    // WEAPON   [+0.0 to +1.60]
-    // The base value.
-    auto BASE = 1.0;
-    // The strength modifier.
-    auto STR = this->getAbilityLog(Ability::Strength, 0.0, 1.0);
-    // The weight modifier.
-    auto WGT = (this->weight < 0.1) ? 0.0 : log10(this->weight);
-    // The carried weight.
-    auto carried = this->getCarryingWeight();
-    auto CAR = (carried < 0.1) ? 0.0 : log10(carried);
-    // Partial result;
-    auto RSLT = BASE - STR + WGT + CAR;
-    if (actionType == ActionType::Move)
-    {
-        // Do something.
-    }
-    else if (actionType == ActionType::Building)
-    {
-        // Do something.
-    }
-    else if (actionType == ActionType::Crafting)
-    {
-        // Do something.
-    }
-    else if (actionType == ActionType::Scout)
-    {
-        // Do something.
-    }
-    else if (actionType == ActionType::Combat)
-    {
-        if (combatAction == CombatActionType::BasicMeleeAttack)
-        {
-            if (this->canAttackWith(slot))
-            {
-                auto weapon = this->findEquipmentSlotItem(slot);
-                auto wpnWeight = weapon->getWeight(true);
-                auto WPN = (wpnWeight < 0.1) ? 0.0 : log10(wpnWeight);
-                RSLT += WPN;
-            }
-        }
-        else if (combatAction == CombatActionType::BasicRangedAttack)
-        {
-            // Do something.
-        }
-        else if (combatAction == CombatActionType::Flee)
-        {
-            // Do something.
-        }
-    }
-    return static_cast<unsigned int>(RSLT);
-}
-
 void Character::kill()
 {
     // Create a corpse at the current position.
-    auto  corpse = this->createCorpse();
+    auto corpse = this->createCorpse();
     // Transfer all the items from the character to the corpse.
     auto tempInventory = this->inventory;
     for (auto it = tempInventory.begin(); it != tempInventory.end(); ++it)
     {
-        auto  item = (*it);
+        auto item = (*it);
         // Remove the item from the inventory.
         this->remInventoryItem(item);
         // Add the item to the corpse.
@@ -1648,7 +1588,7 @@ void Character::kill()
     auto tempEquipment = this->equipment;
     for (auto it = tempEquipment.begin(); it != tempEquipment.end(); ++it)
     {
-        auto  item = (*it);
+        auto item = (*it);
         // Remove the item from the inventory.
         this->remEquipmentItem(item);
         // Add the item to the corpse.
@@ -1671,7 +1611,7 @@ void Character::kill()
 Item * Character::createCorpse()
 {
     // Create the corpse.
-    auto  corpse = race->corpse.createCorpse(this->name, race->material, this->weight);
+    auto corpse = race->corpse.createCorpse(this->name, race->material, this->weight);
     // Add the corpse to the room.
     room->addItem(corpse);
     // Return the corpse.

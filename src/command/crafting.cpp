@@ -69,7 +69,7 @@ void DoProfession(Character * character, Profession * profession, ArgumentHandle
         return;
     }
     // Check if the actor has enough stamina to execute the action.
-    if (character->getConsumedStaminaFor(ActionType::Crafting) > character->getStamina())
+    if (CraftAction::getConsumedStamina(character) > character->getStamina())
     {
         character->sendMsg("You are too tired right now.\n");
         return;
@@ -168,7 +168,7 @@ void DoBuild(Character * character, ArgumentHandler & args)
         return;
     }
     // Check if the actor has enough stamina to execute the action.
-    if (character->getConsumedStaminaFor(ActionType::Building) > character->getStamina())
+    if (BuildAction::getConsumedStamina(character) > character->getStamina())
     {
         character->sendMsg("You are too tired right now.\n");
         return;
@@ -281,7 +281,7 @@ void DoDeconstruct(Character * character, ArgumentHandler & args)
         return;
     }
     // Check if the actor has enough stamina to execute the action.
-    if (character->getConsumedStaminaFor(ActionType::Building) > character->getStamina())
+    if (BuildAction::getConsumedStamina(character) > character->getStamina())
     {
         character->sendMsg("You are too tired right now.\n");
         return;

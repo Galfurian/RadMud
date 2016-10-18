@@ -83,7 +83,7 @@ ActionStatus BuildAction::perform()
         return ActionStatus::Error;
     }
     // Get the amount of required stamina.
-    unsigned int consumedStamina = actor->getConsumedStaminaFor(ActionType::Building);
+    unsigned int consumedStamina = this->getConsumedStamina(actor);
     // Check if the actor has enough stamina to execute the action.
     if (consumedStamina > actor->getStamina())
     {
@@ -190,4 +190,16 @@ bool BuildAction::checkTools() const
         }
     }
     return true;
+}
+
+unsigned int BuildAction::getConsumedStamina(Character * character)
+{
+    // BASE     [+1.0]
+    // STRENGTH [-0.0 to -2.80]
+    // WEIGHT   [+1.6 to +2.51]
+    // CARRIED  [+0.0 to +2.48]
+    return static_cast<unsigned int>(1.0
+                                     - character->getAbilityLog(Ability::Strength, 0.0, 1.0)
+                                     + SafeLog10(character->weight)
+                                     + SafeLog10(character->getCarryingWeight()));
 }

@@ -544,16 +544,6 @@ public:
     /// @return The non-decreasing value of the cooldown.
     unsigned int getCooldown(CombatActionType combatAction);
 
-    /// @brief Given an action, it returns the stamina required to execute it.
-    /// @param actionType   The type of action.
-    /// @param combatAction The type of combat action.
-    /// @param slot         The slot of the weapon used in the combat action.
-    /// @return The ammount of consumed stamina.
-    unsigned int getConsumedStaminaFor(
-        const ActionType & actionType,
-        const CombatActionType & combatAction = CombatActionType::NoAction,
-        const EquipmentSlot & slot = EquipmentSlot::None) const;
-
     /// @brief Handle what happend when this character die.
     virtual void kill();
 

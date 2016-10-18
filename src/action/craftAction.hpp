@@ -65,6 +65,8 @@ public:
 
     ActionStatus perform() override;
 
+    static unsigned int getConsumedStamina(Character * character);
+
 private:
     /// @brief Checks the production.
     /// @return <b>True</b> if the production is available,<br>
