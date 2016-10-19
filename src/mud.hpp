@@ -28,7 +28,7 @@
 /// Indicator for no socket connected.
 #define NO_SOCKET_COMMUNICATION -1
 
-#include "building.hpp"
+#include "creation/building.hpp"
 #include "production.hpp"
 #include "profession.hpp"
 #include "skill.hpp"

@@ -18,7 +18,7 @@
 
 #include "shopModel.hpp"
 
-#include "../mud.hpp"
+#include "mud.hpp"
 
 ShopModel::ShopModel() :
     maxWeight()

@@ -19,7 +19,7 @@
 #include "basicRangedAttack.hpp"
 #include "../../structure/room.hpp"
 #include "../../item/rangedWeaponItem.hpp"
-#include "../../model/rangedWeaponModel.hpp"
+#include "../../model/submodel/rangedWeaponModel.hpp"
 
 BasicRangedAttack::BasicRangedAttack(Character * _actor) :
     CombatAction(_actor)

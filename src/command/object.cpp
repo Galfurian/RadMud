@@ -20,8 +20,8 @@
 
 #include "../mud.hpp"
 #include "../item/shopItem.hpp"
-#include "../model/currencyModel.hpp"
-#include "../model/liquidContainerModel.hpp"
+#include "../model/submodel/currencyModel.hpp"
+#include "../model/submodel/liquidContainerModel.hpp"
 
 void LoadObjectCommands()
 {

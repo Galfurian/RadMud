@@ -13,5 +13,6 @@ set(RADMUD_STRUCTURE_SRC
         ./src/structure/area.cpp
         ./src/structure/continent.cpp
         ./src/structure/coordinates.cpp
+        ./src/structure/generator.cpp
         PARENT_SCOPE
         )

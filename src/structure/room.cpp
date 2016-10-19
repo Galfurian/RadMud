@@ -19,8 +19,8 @@
 #include "room.hpp"
 
 #include "../mud.hpp"
-#include "../generator.hpp"
-#include "../model/mechanismModel.hpp"
+#include "generator.hpp"
+#include "../model/submodel/mechanismModel.hpp"
 
 Room::Room() :
     vnum(),

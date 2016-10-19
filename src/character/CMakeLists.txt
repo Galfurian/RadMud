@@ -12,5 +12,9 @@ set(RADMUD_CHARACTER_SRC
         ./src/character/mobile.cpp
         ./src/character/player.cpp
         ./src/character/characterContainer.cpp
+        ./src/character/effect.cpp
+        ./src/character/faction.cpp
+        ./src/character/race.cpp
+        ./src/character/skill.cpp
         PARENT_SCOPE
         )

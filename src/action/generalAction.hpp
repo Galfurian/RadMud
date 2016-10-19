@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "../production.hpp"
-#include "../building.hpp"
+#include "production.hpp"
+#include "creation/building.hpp"
 #include "../defines.hpp"
 #include "../opponent.hpp"
 #include "../item/item.hpp"

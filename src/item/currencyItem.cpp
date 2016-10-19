@@ -17,8 +17,8 @@
 
 #include "currencyItem.hpp"
 
-#include "../model/currencyModel.hpp"
-#include "../material.hpp"
+#include "material.hpp"
+#include "../model/submodel/currencyModel.hpp"
 
 CurrencyItem::CurrencyItem()
 {

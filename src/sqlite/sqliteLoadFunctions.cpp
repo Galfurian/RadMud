@@ -21,7 +21,7 @@
 
 #include "../mud.hpp"
 
-#include "../model/currencyModel.hpp"
+#include "../model/submodel/currencyModel.hpp"
 
 #include "../item/shopItem.hpp"
 

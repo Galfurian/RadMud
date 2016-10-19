@@ -16,8 +16,8 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "rangedWeaponItem.hpp"
-#include "../model/rangedWeaponModel.hpp"
-#include "../model/magazineModel.hpp"
+#include "../model/submodel/rangedWeaponModel.hpp"
+#include "../model/submodel/magazineModel.hpp"
 
 RangedWeaponItem::RangedWeaponItem()
 {

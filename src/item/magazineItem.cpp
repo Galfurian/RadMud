@@ -16,7 +16,7 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "magazineItem.hpp"
-#include "../model/magazineModel.hpp"
+#include "../model/submodel/magazineModel.hpp"
 
 MagazineItem::MagazineItem()
 {

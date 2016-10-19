@@ -18,7 +18,7 @@
 
 #include "armorModel.hpp"
 
-#include "../mud.hpp"
+#include "mud.hpp"
 
 ArmorModel::ArmorModel() :
     size(),

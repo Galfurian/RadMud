@@ -19,7 +19,7 @@
 #include "basicMeleeAttack.hpp"
 #include "../../structure/room.hpp"
 #include "../../item/meleeWeaponItem.hpp"
-#include "../../model/meleeWeaponModel.hpp"
+#include "../../model/submodel/meleeWeaponModel.hpp"
 
 BasicMeleeAttack::BasicMeleeAttack(Character * _actor) :
     CombatAction(_actor)

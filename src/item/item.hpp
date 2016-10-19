@@ -22,10 +22,10 @@
 #include <list>
 #include <map>
 
-#include "../liquid.hpp"
+#include "liquid.hpp"
 #include "../lua/lua_script.hpp"
 #include "../model/itemModel.hpp"
-#include "../model/nodeModel.hpp"
+#include "../model/submodel/nodeModel.hpp"
 #include "../utilities/table.hpp"
 
 #include "itemContainer.hpp"

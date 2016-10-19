@@ -21,9 +21,9 @@
 
 // Other Include.
 #include "../mud.hpp"
-#include "../model/containerModel.hpp"
-#include "../model/liquidContainerModel.hpp"
-#include "../model/shopModel.hpp"
+#include "../model/submodel/containerModel.hpp"
+#include "../model/submodel/liquidContainerModel.hpp"
+#include "../model/submodel/shopModel.hpp"
 
 #include "shopItem.hpp"
 #include "armorItem.hpp"

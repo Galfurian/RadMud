@@ -2,35 +2,36 @@
 # Include Directories
 set(RADMUD_MODEL_INC
         src/model
+        src/model/submodel
         PARENT_SCOPE
         )
 
 #############################################
 # Source Files
 set(RADMUD_MODEL_SRC
-        ./src/model/armorModel.cpp
-        ./src/model/bookModel.cpp
-        ./src/model/containerModel.cpp
-        ./src/model/corpseModel.cpp
-        ./src/model/currencyModel.cpp
-        ./src/model/foodModel.cpp
-        ./src/model/furnitureModel.cpp
         ./src/model/itemModel.cpp
-        ./src/model/keyModel.cpp
-        ./src/model/lightModel.cpp
-        ./src/model/liquidContainerModel.cpp
-        ./src/model/mechanismModel.cpp
-        ./src/model/nodeModel.cpp
-        ./src/model/projectileModel.cpp
-        ./src/model/resourceModel.cpp
-        ./src/model/ropeModel.cpp
-        ./src/model/seedModel.cpp
-        ./src/model/shieldModel.cpp
-        ./src/model/shopModel.cpp
-        ./src/model/toolModel.cpp
-        ./src/model/vehicleModel.cpp
-        ./src/model/magazineModel.cpp
-        ./src/model/meleeWeaponModel.cpp
-        ./src/model/rangedWeaponModel.cpp
+        ./src/model/submodel/armorModel.cpp
+        ./src/model/submodel/bookModel.cpp
+        ./src/model/submodel/containerModel.cpp
+        ./src/model/submodel/corpseModel.cpp
+        ./src/model/submodel/currencyModel.cpp
+        ./src/model/submodel/foodModel.cpp
+        ./src/model/submodel/furnitureModel.cpp
+        ./src/model/submodel/keyModel.cpp
+        ./src/model/submodel/lightModel.cpp
+        ./src/model/submodel/liquidContainerModel.cpp
+        ./src/model/submodel/mechanismModel.cpp
+        ./src/model/submodel/nodeModel.cpp
+        ./src/model/submodel/projectileModel.cpp
+        ./src/model/submodel/resourceModel.cpp
+        ./src/model/submodel/ropeModel.cpp
+        ./src/model/submodel/seedModel.cpp
+        ./src/model/submodel/shieldModel.cpp
+        ./src/model/submodel/shopModel.cpp
+        ./src/model/submodel/toolModel.cpp
+        ./src/model/submodel/vehicleModel.cpp
+        ./src/model/submodel/magazineModel.cpp
+        ./src/model/submodel/meleeWeaponModel.cpp
+        ./src/model/submodel/rangedWeaponModel.cpp
         PARENT_SCOPE
         )

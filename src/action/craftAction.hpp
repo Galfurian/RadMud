@@ -19,8 +19,8 @@
 #pragma once
 
 #include "generalAction.hpp"
-#include "../profession.hpp"
-#include "../production.hpp"
+#include "profession.hpp"
+#include "production.hpp"
 
 /// @brief An action executed by characters when crafting new objects.
 class CraftAction :

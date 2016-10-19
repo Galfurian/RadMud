@@ -18,7 +18,7 @@
 
 #include "loadAction.hpp"
 #include "../character/character.hpp"
-#include "../model/magazineModel.hpp"
+#include "../model/submodel/magazineModel.hpp"
 #include "../sqlite/sqliteDbms.hpp"
 
 LoadAction::LoadAction(Item * _itemToBeLoaded, Item * _projectile, Character * _actor, unsigned int _cooldown) :

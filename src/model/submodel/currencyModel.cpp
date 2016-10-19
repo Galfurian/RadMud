@@ -18,8 +18,8 @@
 
 #include "currencyModel.hpp"
 
-#include "../material.hpp"
-#include "../mud.hpp"
+#include "material.hpp"
+#include "mud.hpp"
 
 CurrencyModel::Price::Price(const int & _material, const unsigned int & _price) :
     material(_material),

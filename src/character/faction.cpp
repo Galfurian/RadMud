@@ -20,7 +20,7 @@
 
 #include "utils.hpp"
 #include "utilities/logger.hpp"
-#include "model/currencyModel.hpp"
+#include "../model/submodel/currencyModel.hpp"
 
 Faction::Faction() :
     vnum(),

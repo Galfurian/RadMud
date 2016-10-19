@@ -16,9 +16,8 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "armorItem.hpp"
-
-#include "../model/armorModel.hpp"
-#include "../material.hpp"
+#include "material.hpp"
+#include "../model/submodel/armorModel.hpp"
 
 ArmorItem::ArmorItem()
 {

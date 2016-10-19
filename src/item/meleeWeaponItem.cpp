@@ -16,7 +16,7 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "meleeWeaponItem.hpp"
-#include "../model/meleeWeaponModel.hpp"
+#include "../model/submodel/meleeWeaponModel.hpp"
 
 MeleeWeaponItem::MeleeWeaponItem()
 {

@@ -78,6 +78,7 @@ add_subdirectory(src/model)
 add_subdirectory(src/sqlite)
 add_subdirectory(src/action)
 add_subdirectory(src/command)
+add_subdirectory(src/creation)
 add_subdirectory(src/character)
 add_subdirectory(src/utilities)
 add_subdirectory(src/structure)
@@ -85,19 +86,9 @@ add_subdirectory(src/structure)
 #################################################
 # Add project sources...
 set(PROJECT_SRC
-        ./src/building.cpp
         ./src/defines.cpp
-        ./src/effect.cpp
-        ./src/faction.cpp
-        ./src/generator.cpp
-        ./src/liquid.cpp
         ./src/main.cpp
-        ./src/material.cpp
         ./src/mud.cpp
-        ./src/production.cpp
-        ./src/profession.cpp
-        ./src/race.cpp
-        ./src/skill.cpp
         ./src/updater.cpp
         ./src/utils.cpp
         ./src/opponent.cpp
@@ -109,10 +100,10 @@ set(PROJECT_SRC
         ${RADMUD_ACTION_SRC}
         ${RADMUD_SQLITE_SRC}
         ${RADMUD_COMMAND_SRC}
+        ${RADMUD_CREATION_SRC}
         ${RADMUD_CHARACTER_SRC}
         ${RADMUD_UTILITIES_SRC}
-        ${RADMUD_STRUCTURE_SRC}
-        src/writing.cpp)
+        ${RADMUD_STRUCTURE_SRC})
 
 #################################################
 # Add project includes...
@@ -123,6 +114,7 @@ include_directories(
         ${RADMUD_STRUCTURE_INC}
         ${RADMUD_UTILITIES_INC}
         ${RADMUD_CHARACTER_INC}
+        ${RADMUD_CREATION_INC}
         ${RADMUD_COMMAND_INC}
         ${RADMUD_SQLITE_INC}
         ${RADMUD_ACTION_INC}
