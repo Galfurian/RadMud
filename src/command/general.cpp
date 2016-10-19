@@ -194,13 +194,16 @@ void DoDirection(Character * character, Direction direction)
         direction,
         speed);
     // Check the new action.
-    if (!moveAction->check())
+    error = std::string();
+    if (moveAction->check(error))
     {
-        character->sendMsg("You can't move.\n");
-        return;
+        // Set the new action.
+        character->setAction(moveAction);
     }
-    // Set the new action.
-    character->setAction(moveAction);
+    else
+    {
+        character->sendMsg("%s\n", error);
+    }
 }
 
 void DoTravel(Character * character, ArgumentHandler & /*args*/)

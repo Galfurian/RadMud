@@ -38,7 +38,7 @@ public:
     /// @brief Destructor.
     virtual ~ReloadAction();
 
-    bool check() const override;
+    bool check(std::string & error) const override;
 
     ActionType getType() const override;
 
@@ -47,15 +47,4 @@ public:
     std::string stop() override;
 
     ActionStatus perform() override;
-
-private:
-    /// @brief Checks the weapon.
-    /// @return <b>True</b> if the weapon is available,<br>
-    ///         <b>False</b> otherwise.
-    bool checkWeapon() const;
-
-    /// @brief Checks the magazine.
-    /// @return <b>True</b> if the magazine is available,<br>
-    ///         <b>False</b> otherwise.
-    bool checkMagazine() const;
 };

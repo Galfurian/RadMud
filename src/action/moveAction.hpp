@@ -45,7 +45,7 @@ public:
     /// @brief Destructor.
     virtual ~MoveAction();
 
-    bool check() const override;
+    bool check(std::string & error) const override;
 
     ActionType getType() const override;
 
@@ -57,15 +57,4 @@ public:
 
     /// @brief Given an action, it returns the stamina required to execute it.
     static unsigned int getConsumedStamina(const Character * character, const CharacterPosture & posture);
-
-private:
-    /// @brief Checks the destination.
-    /// @return <b>True</b> if the destination is set,<br>
-    ///         <b>False</b> otherwise.
-    bool checkDestination() const;
-
-    /// @brief Checks the direction.
-    /// @return <b>True</b> if the direction is set,<br>
-    ///         <b>False</b> otherwise.
-    bool checkDirection() const;
 };

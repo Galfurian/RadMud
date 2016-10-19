@@ -30,10 +30,24 @@ Flee::~Flee()
     Logger::log(LogLevel::Debug, "Deleted Flee.");
 }
 
-bool Flee::check() const
+bool Flee::check(std::string & error) const
 {
-    bool correct = CombatAction::check();
-    return correct;
+    if (!CombatAction::check(error))
+    {
+        return false;
+    }
+    if (actor->room->exits.empty())
+    {
+        error = "There is no way of escape.";
+        return false;
+    }
+    // Check if the actor has enough stamina to execute the action.
+    if (this->getConsumedStamina(actor) > actor->getStamina())
+    {
+        error = "You are too tired to flee from the battle.";
+        return false;
+    }
+    return true;
 }
 
 ActionType Flee::getType() const
@@ -58,10 +72,15 @@ ActionStatus Flee::perform()
     {
         return ActionStatus::Running;
     }
-    Logger::log(LogLevel::Debug, "[%s] Perform a Flee.", actor->getName());
+    // Check the values of the action.
+    std::string error;
+    if (!this->check(error))
+    {
+        actor->sendMsg(error + "\n\n");
+        return ActionStatus::Error;
+    }
     // Get the character chance of fleeing (D20).
-    auto fleeChance = TRandInteger<unsigned int>(0, 20)
-                      + actor->getAbilityModifier(Ability::Agility);
+    auto fleeChance = TRandInteger<unsigned int>(0, 20) + actor->getAbilityModifier(Ability::Agility);
     // Get the required stamina.
     auto consumedStamina = this->getConsumedStamina(actor);
     // Base the escape level on how many enemies are surrounding the character.
@@ -71,48 +90,32 @@ ActionStatus Flee::perform()
         // Consume half the stamina.
         actor->remStamina(consumedStamina / 2, true);
     }
-        // Check if the actor has enough stamina to execute the action.
-    else if (consumedStamina > actor->getStamina())
+    // Get the list of available directions.
+    auto directions = actor->room->getAvailableDirections();
+    // Pick a random direction, from the poll of the available ones.
+    auto randomDirValue = TRandInteger<size_t>(0, directions.size() - 1);
+    auto randomDirection = directions.at(randomDirValue);
+    // Get the selected exit.
+    auto selected = actor->room->findExit(randomDirection);
+    // Check that the picked exit is not a null pointer.
+    if (selected == nullptr)
     {
-        actor->sendMsg("You are too tired to flee.\n");
+        Logger::log(LogLevel::Error, "Selected null exit during action Flee.");
+        actor->sendMsg("You were not able to escape from your attackers.\n");
     }
     else
     {
-        // Get the list of available directions.
-        std::vector<Direction> directions = actor->room->getAvailableDirections();
-        // Check if there are some directions.
-        if (!directions.empty())
-        {
-            // Pick a random direction, from the poll of the available ones.
-            size_t randomDirValue = TRandInteger<size_t>(0, directions.size() - 1);
-            Direction randomDirection = directions.at(randomDirValue);
-            // Get the selected exit.
-            std::shared_ptr<Exit> selected = actor->room->findExit(randomDirection);
-            // Check that the picked exit is not a null pointer.
-            if (selected == nullptr)
-            {
-                Logger::log(LogLevel::Error, "Selected null exit during action Flee.");
-                actor->sendMsg("You were not able to escape from your attackers.\n");
-            }
-            else
-            {
-                // Consume the stamina.
-                actor->remStamina(consumedStamina, true);
-                // Stop the current action.
-                actor->sendMsg(this->stop() + "\n\n");
-                // Move the actor to the random direction.
-                actor->moveTo(
-                    selected->destination,
-                    actor->getName() + " flees from the battlefield.\n\n",
-                    actor->getName() + " arives fleeing.\n\n",
-                    "You flee from the battlefield.\n");
-                return ActionStatus::Finished;
-            }
-        }
-        else
-        {
-            actor->sendMsg("You have no way out.\n");
-        }
+        // Consume the stamina.
+        actor->remStamina(consumedStamina, true);
+        // Stop the current action.
+        actor->sendMsg(this->stop() + "\n\n");
+        // Move the actor to the random direction.
+        actor->moveTo(
+            selected->destination,
+            actor->getName() + " flees from the battlefield.\n\n",
+            actor->getName() + " arives fleeing.\n\n",
+            "You flee from the battlefield.\n");
+        return ActionStatus::Finished;
     }
     // By default set the next combat action to basic attack.
     if (!actor->setNextCombatAction(CombatActionType::BasicMeleeAttack))

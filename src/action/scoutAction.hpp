@@ -32,7 +32,7 @@ public:
     /// @brief Destructor.
     virtual ~ScoutAction();
 
-    bool check() const override;
+    bool check(std::string & error) const override;
 
     ActionType getType() const override;
 

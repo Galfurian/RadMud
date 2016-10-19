@@ -36,7 +36,7 @@ public:
     /// @brief Destructor.
     virtual ~UnloadAction();
 
-    bool check() const override;
+    bool check(std::string & error) const override;
 
     ActionType getType() const override;
 
@@ -45,10 +45,4 @@ public:
     std::string stop() override;
 
     ActionStatus perform() override;
-
-private:
-    /// @brief Checks the item tha has to be loaded.
-    /// @return <b>True</b> if the item is available,<br>
-    ///         <b>False</b> otherwise.
-    bool checkItem() const;
 };

@@ -32,25 +32,29 @@ BasicRangedAttack::~BasicRangedAttack()
     Logger::log(LogLevel::Debug, "Deleted BasicRangedAttack.");
 }
 
-bool BasicRangedAttack::check() const
+bool BasicRangedAttack::check(std::string & error) const
 {
-    bool correct = CombatAction::check();
+    if (!CombatAction::check(error))
+    {
+        return false;
+    }
     if (actor->getActiveRangedWeapons().empty())
     {
-        actor->sendMsg("You do not have a valid weapon equipped.\n");
+        error = "You do not have a valid weapon equipped.";
         return false;
     }
     if (actor->aimedCharacter == nullptr)
     {
-        actor->sendMsg("You do not have a target.\n");
+
+        error = "You do not have a target.";
         return false;
     }
     if (actor->isAtRange(actor->aimedCharacter, actor->getViewDistance()))
     {
-        actor->sendMsg("Your target is out of your visual.\n");
+        error = "Your target is out of your visual.\n";
         return false;
     }
-    return correct;
+    return true;
 }
 
 ActionType BasicRangedAttack::getType() const
@@ -75,10 +79,10 @@ ActionStatus BasicRangedAttack::perform()
     {
         return ActionStatus::Running;
     }
-    Logger::log(LogLevel::Debug, "%s performs a basic ranged attack.", actor->getNameCapital());
-    if (!this->check())
+    std::string error;
+    if (!this->check(error))
     {
-        actor->sendMsg(this->stop() + "\n\n");
+        actor->sendMsg(error + "\n\n");
         return ActionStatus::Finished;
     }
     // Iterate trough all the ranged weapons.

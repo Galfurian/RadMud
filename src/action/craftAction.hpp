@@ -55,7 +55,7 @@ public:
     /// @brief Destructor.
     virtual ~CraftAction();
 
-    bool check() const override;
+    bool check(std::string & error) const override;
 
     ActionType getType() const override;
 
@@ -66,25 +66,4 @@ public:
     ActionStatus perform() override;
 
     static unsigned int getConsumedStamina(Character * character);
-
-private:
-    /// @brief Checks the production.
-    /// @return <b>True</b> if the production is available,<br>
-    ///         <b>False</b> otherwise.
-    bool checkProduction() const;
-
-    /// @brief Checks the material.
-    /// @return <b>True</b> if the material is available,<br>
-    ///         <b>False</b> otherwise.
-    bool checkMaterial() const;
-
-    /// @brief Checks the ingredients.
-    /// @return <b>True</b> if the ingredients are available,<br>
-    ///         <b>False</b> otherwise.
-    bool checkIngredients() const;
-
-    /// @brief Checks the used tools.
-    /// @return <b>True</b> if the tools are available,<br>
-    ///         <b>False</b> otherwise.
-    bool checkTools() const;
 };

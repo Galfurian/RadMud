@@ -91,7 +91,7 @@ void DoProfession(Character * character, Profession * profession, ArgumentHandle
     // Search the needed workbench.
     if (production->workbench != ToolType::NoType)
     {
-        Item * workbench = character->findNearbyTool(
+        auto workbench = character->findNearbyTool(
             production->workbench,
             std::vector<Item *>(),
             true,
@@ -134,9 +134,10 @@ void DoProfession(Character * character, Profession * profession, ArgumentHandle
         usedIngredients,
         production->time);
     // Check the new action.
-    if (!craftAction->check())
+    std::string error;
+    if (!craftAction->check(error))
     {
-        character->sendMsg("You can't start the process of production.\n");
+        character->sendMsg("%s\n", error);
         return;
     }
     // Set the new action.
@@ -224,7 +225,7 @@ void DoBuild(Character * character, ArgumentHandler & args)
                 character->sendMsg("There are already something built here.\n");
                 return;
             }
-            Building * builtSchematics = Mud::instance().findBuilding(iterator->model->vnum);
+            auto builtSchematics = Mud::instance().findBuilding(iterator->model->vnum);
             if (builtSchematics)
             {
                 if (builtSchematics->unique)
@@ -247,9 +248,10 @@ void DoBuild(Character * character, ArgumentHandler & args)
         usedIngredients,
         schematics->time);
     // Check the new action.
-    if (!buildAction->check())
+    std::string error;
+    if (!buildAction->check(error))
     {
-        character->sendMsg("You can't start the building.\n");
+        character->sendMsg("%s\n", error);
         return;
     }
     // Set the new action.

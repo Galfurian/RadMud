@@ -32,10 +32,17 @@ BasicMeleeAttack::~BasicMeleeAttack()
     Logger::log(LogLevel::Debug, "Deleted BasicMeleeAttack.");
 }
 
-bool BasicMeleeAttack::check() const
+bool BasicMeleeAttack::check(std::string & error) const
 {
-    bool correct = CombatAction::check();
-    return correct;
+    if (!CombatAction::check(error))
+    {
+        return false;
+    }
+    if (actor->getActiveMeleeWeapons().empty())
+    {
+        error = "You do not have a valid weapon equipped.";
+    }
+    return true;
 }
 
 ActionType BasicMeleeAttack::getType() const

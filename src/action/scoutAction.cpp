@@ -16,8 +16,9 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+#include <room.hpp>
 #include "scoutAction.hpp"
-#include "../character/character.hpp"
+#include "../structure/area.hpp"
 
 ScoutAction::ScoutAction(Character * _actor, unsigned int _cooldown) :
     GeneralAction(_actor, std::chrono::system_clock::now() + std::chrono::seconds(_cooldown))
@@ -30,10 +31,28 @@ ScoutAction::~ScoutAction()
     Logger::log(LogLevel::Debug, "Deleted scout action.");
 }
 
-bool ScoutAction::check() const
+bool ScoutAction::check(std::string & error) const
 {
-    bool correct = GeneralAction::check();
-    return correct;
+    if (!GeneralAction::check(error))
+    {
+        return false;
+    }
+    if (actor->room == nullptr)
+    {
+        Logger::log(LogLevel::Error, "The actor's room is a nullptr.");
+        return false;
+    }
+    if (actor->room->area == nullptr)
+    {
+        Logger::log(LogLevel::Error, "The room's area is a nullptr.");
+        return false;
+    }
+    if (this->getConsumedStamina(actor) > actor->getStamina())
+    {
+        error = "You are too tired to scout the area.";
+        return false;
+    }
+    return true;
 }
 
 ActionType ScoutAction::getType() const
@@ -58,25 +77,29 @@ ActionStatus ScoutAction::perform()
     {
         return ActionStatus::Running;
     }
-    // Create a variable which will contain the ammount of consumed stamina.
     std::string error;
-    // Get the amount of required stamina.
-    auto consumedStamina = this->getConsumedStamina(actor);
-    // Consume the stamina.
-    actor->remStamina(consumedStamina, true);
-    // Show the surrounding.
-    actor->charactersInSight = actor->getCharactersInSight();
+    if (!this->check(error))
+    {
+        actor->sendMsg(error + "\n\n");
+        return ActionStatus::Error;
+    }
+    // Get the amount of required stamina and try to consume it.
+    actor->remStamina(this->getConsumedStamina(actor));
+    // Get the characters in sight.
+    CharacterContainer exceptions;
+    exceptions.emplace_back(actor);
+    actor->charactersInSight = actor->room->area->getCharactersInSight(exceptions,
+                                                                       actor->room->coord,
+                                                                       actor->getViewDistance());
     if (actor->charactersInSight.empty())
     {
         actor->sendMsg("You have found nothing...\n");
+        return ActionStatus::Error;
     }
-    else
+    actor->sendMsg("Nearby you can see...\n");
+    for (auto it : actor->charactersInSight)
     {
-        actor->sendMsg("Nearby you see...\n");
-        for (auto it : actor->charactersInSight)
-        {
-            actor->sendMsg("    %s\n", it->getName());
-        }
+        actor->sendMsg("    %s\n", it->getName());
     }
     return ActionStatus::Finished;
 }
@@ -87,8 +110,9 @@ unsigned int ScoutAction::getConsumedStamina(Character * character)
     // STRENGTH [-0.0 to -2.80]
     // WEIGHT   [+1.6 to +2.51]
     // CARRIED  [+0.0 to +2.48]
-    return static_cast<unsigned int>(1.0
-                                     - character->getAbilityLog(Ability::Strength, 0.0, 1.0)
-                                     + SafeLog10(character->weight)
-                                     + SafeLog10(character->getCarryingWeight()));
+    auto consumed = 1.0
+                    - character->getAbilityLog(Ability::Strength, 0.0, 1.0)
+                    + SafeLog10(character->weight)
+                    + SafeLog10(character->getCarryingWeight());
+    return (consumed < 0) ? 0 : static_cast<unsigned int>(consumed);
 }

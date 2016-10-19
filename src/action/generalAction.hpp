@@ -87,9 +87,10 @@ public:
     long int getElapsed() const;
 
     /// @brief Checks the correctness of the action's values.
+    /// @param error A string which contains the error in case of a failed check.
     /// @return <b>True</b> if it has correct values,<br>
     ///         <b>False</b> otherwise.
-    virtual bool check() const;
+    virtual bool check(std::string & error) const;
 
     /// @brief Provides the type of the action.
     /// @return The type of action.

@@ -535,10 +535,6 @@ public:
     /// @return Vector of ranged weapons.
     std::vector<RangedWeaponItem *> getActiveRangedWeapons();
 
-    /// @brief Provides a list of characters which are in sight.
-    /// @return The list containing the targets.
-    CharacterContainer getCharactersInSight();
-
     /// @brief Given an action, it returns the necessary cooldown.
     /// @param combatAction The desired combat action.
     /// @return The non-decreasing value of the cooldown.

@@ -32,11 +32,34 @@ UnloadAction::~UnloadAction()
     Logger::log(LogLevel::Debug, "Deleted unload action.");
 }
 
-bool UnloadAction::check() const
+bool UnloadAction::check(std::string & error) const
 {
-    bool correct = GeneralAction::check();
-    correct &= this->checkItem();
-    return correct;
+    if (!GeneralAction::check(error))
+    {
+        return false;
+    }
+    if (itemToBeUnloaded == nullptr)
+    {
+        Logger::log(LogLevel::Error, "The item is a null pointer.");
+        error = "The item you want to unload is missing.";
+        return false;
+    }
+    if (itemToBeUnloaded->isEmpty())
+    {
+        error = itemToBeUnloaded->getNameCapital(true) + " is already empty.";
+        return false;
+    }
+    if (!itemToBeUnloaded->isEmpty())
+    {
+        auto loadedItem = itemToBeUnloaded->content.front();
+        if (loadedItem == nullptr)
+        {
+            Logger::log(LogLevel::Error, "The item does not contain any loaded item.");
+            error = "Something is gone wrong while you were unloading " + itemToBeUnloaded->getName(true) + ".";
+            return false;
+        }
+    }
+    return true;
 }
 
 ActionType UnloadAction::getType() const
@@ -51,7 +74,11 @@ std::string UnloadAction::getDescription() const
 
 std::string UnloadAction::stop()
 {
-    return "You stop unloading " + itemToBeUnloaded->getName(true) + ".";
+    if (itemToBeUnloaded != nullptr)
+    {
+        return "You stop unloading " + itemToBeUnloaded->getName(true) + ".";
+    }
+    return "You stop unloading.";
 }
 
 ActionStatus UnloadAction::perform()
@@ -61,35 +88,17 @@ ActionStatus UnloadAction::perform()
     {
         return ActionStatus::Running;
     }
-    // First check if there is the item inside the magazine.
-    if (itemToBeUnloaded->isEmpty())
+    std::string error;
+    if (!this->check(error))
     {
-        actor->sendMsg("%s is already empty...\n\n", itemToBeUnloaded->getNameCapital(true));
+        actor->sendMsg(error + "\n\n");
+        return ActionStatus::Error;
     }
-    else
-    {
-        auto loadedItem = itemToBeUnloaded->content.front();
-        if (loadedItem == nullptr)
-        {
-            actor->sendMsg("Something is gone wrong while you were unloading %s...\n\n",
-                           itemToBeUnloaded->getName(true));
-            return ActionStatus::Error;
-        }
-        SQLiteDbms::instance().beginTransaction();
-        itemToBeUnloaded->takeOut(loadedItem);
-        actor->addInventoryItem(loadedItem);
-        SQLiteDbms::instance().endTransaction();
-        actor->sendMsg("You have finished unloading %s...\n\n", itemToBeUnloaded->getName(true));
-    }
+    auto loadedItem = itemToBeUnloaded->content.front();
+    SQLiteDbms::instance().beginTransaction();
+    itemToBeUnloaded->takeOut(loadedItem);
+    actor->addInventoryItem(loadedItem);
+    SQLiteDbms::instance().endTransaction();
+    actor->sendMsg("You have finished unloading %s...\n\n", itemToBeUnloaded->getName(true));
     return ActionStatus::Finished;
-}
-
-bool UnloadAction::checkItem() const
-{
-    if (itemToBeUnloaded == nullptr)
-    {
-        Logger::log(LogLevel::Error, "The item is a null pointer.");
-        return false;
-    }
-    return true;
 }

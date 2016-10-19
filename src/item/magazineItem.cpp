@@ -91,7 +91,7 @@ bool MagazineItem::getAmountToLoad(Item * projectile, unsigned int & ammount, st
         ammountAlreadyLoaded = alreadyLoaded->quantity;
         if (ammount <= ammountAlreadyLoaded)
         {
-            error = this->getNameCapital(true) + " is already at full capacity";
+            error = this->getNameCapital(true) + " is already at full capacity.";
             return false;
         }
         ammount -= ammountAlreadyLoaded;

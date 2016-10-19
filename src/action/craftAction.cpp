@@ -43,14 +43,98 @@ CraftAction::~CraftAction()
     Logger::log(LogLevel::Debug, "Deleted crafting action.");
 }
 
-bool CraftAction::check() const
+bool CraftAction::check(std::string & error) const
 {
-    bool correct = GeneralAction::check();
-    correct &= this->checkProduction();
-    correct &= this->checkMaterial();
-    correct &= this->checkTools();
-    correct &= this->checkIngredients();
-    return correct;
+    if (!GeneralAction::check(error))
+    {
+        return false;
+    }
+    if (production == nullptr)
+    {
+        Logger::log(LogLevel::Error, "The production is a null pointer.");
+        error = "You don't have a production set.";
+        return false;
+    }
+    else
+    {
+        if (production->outcome == nullptr)
+        {
+            Logger::log(LogLevel::Error, "The production outcome is a null pointer.");
+            error = "You don't have a production set.";
+            return false;
+        }
+        if (production->profession == nullptr)
+        {
+            Logger::log(LogLevel::Error, "The production profession is a null pointer.");
+            error = "You don't have a production set.";
+            return false;
+        }
+    }
+    if (material == nullptr)
+    {
+        Logger::log(LogLevel::Error, "The material is a null pointer.");
+        error = "You don't know how to craft the item.";
+        return false;
+    }
+    for (auto iterator : ingredients)
+    {
+        // Check if the ingredient has been deleted.
+        if (iterator.first == nullptr)
+        {
+            Logger::log(LogLevel::Error, "One of the ingredients is a null pointer.");
+            error = "One of your ingredient is missing.";
+            return false;
+        }
+    }
+    if (tools.empty())
+    {
+        Logger::log(LogLevel::Error, "No used tools have been set.");
+        error = "One or more tools are missing.";
+        return false;
+    }
+    for (auto iterator : tools)
+    {
+        // Check if the tool has been deleted.
+        if (iterator == nullptr)
+        {
+            Logger::log(LogLevel::Error, "One of the tools is a null pointer.");
+            error = "One or more tools are missing.";
+            return false;
+        }
+    }
+    // Check if the actor has enough stamina to execute the action.
+    if (this->getConsumedStamina(actor) > actor->getStamina())
+    {
+        error = "You are too tired right now.";
+        return false;
+    }
+    // Add the ingredients to the list of items to destroy.
+    for (auto it : production->ingredients)
+    {
+        auto required = it.second;
+        for (auto it2 : ingredients)
+        {
+            auto item = it2.first;
+            if (item->getType() == ModelType::Resource)
+            {
+                ResourceModel * resourceModel = item->model->toResource();
+                if (resourceModel->resourceType == it.first)
+                {
+                    required -= item->quantity;
+                    if (required <= 0)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+        if (required > 0)
+        {
+            error = "You don't have enough materials.";
+            return false;
+        }
+    }
+    return true;
 }
 
 ActionType CraftAction::getType() const
@@ -76,25 +160,17 @@ ActionStatus CraftAction::perform()
         return ActionStatus::Running;
     }
     // Check the values of the action.
-    if (!checkProduction() || !checkMaterial() || !checkTools() || !checkIngredients())
+    std::string error;
+    if (!this->check(error))
     {
-        actor->sendMsg("\nYou have failed your action.\n");
+        actor->sendMsg(error + "\n\n");
         return ActionStatus::Error;
     }
-    // Get the amount of required stamina.
+    // Get the amount of required stamina and consume it.
     auto consumedStamina = this->getConsumedStamina(actor);
-    // Check if the actor has enough stamina to execute the action.
-    if (consumedStamina > actor->getStamina())
-    {
-        actor->sendMsg("\nYou are too tired right now.\n");
-        return ActionStatus::Error;
-    }
-    // Consume the stamina.
     actor->remStamina(consumedStamina, true);
-    // Vector which will contain the list of created items.
-    std::vector<Item *> createdItems;
-    // Vector which will contain the list of items to destroy.
-    std::vector<Item *> destroyItems;
+    // Vector which will contain the list of created items and items to destroy.
+    std::vector<Item *> createdItems, destroyItems;
     // Add the ingredients to the list of items to destroy.
     for (auto it : ingredients)
     {
@@ -103,14 +179,9 @@ ActionStatus CraftAction::perform()
         {
             destroyItems.push_back(ingredient);
         }
-        else if (ingredient->quantity > it.second)
-        {
-            ingredient->quantity -= it.second;
-        }
         else
         {
-            actor->sendMsg("\nYou don't have enough of %s.\n", ingredient->getName(true));
-            return ActionStatus::Error;
+            ingredient->quantity -= it.second;
         }
     }
     // Get the outcome model.
@@ -178,7 +249,6 @@ ActionStatus CraftAction::perform()
         }
     }
     // Consume the items.
-    Logger::log(LogLevel::Error, "Consuming the items.");
     for (auto it : destroyItems)
     {
         // First, remove the item from the mud.
@@ -188,7 +258,6 @@ ActionStatus CraftAction::perform()
         // Finally, delete it.
         delete (it);
     }
-    Logger::log(LogLevel::Error, "Done.");
     // Send conclusion message.
     actor->sendMsg(
         "%s %s.\n\n",
@@ -199,78 +268,6 @@ ActionStatus CraftAction::perform()
         actor->sendMsg("some of the items have been placed on the ground.\n\n");
     }
     return ActionStatus::Finished;
-}
-
-bool CraftAction::checkProduction() const
-{
-    bool correct = true;
-    if (production == nullptr)
-    {
-        Logger::log(LogLevel::Error, "The production is a null pointer.");
-        correct = false;
-    }
-    else
-    {
-        if (production->outcome == nullptr)
-        {
-            Logger::log(LogLevel::Error, "The production outcome is a null pointer.");
-            correct = false;
-        }
-        if (production->profession == nullptr)
-        {
-            Logger::log(LogLevel::Error, "The production profession is a null pointer.");
-            correct = false;
-        }
-    }
-    return correct;
-}
-
-bool CraftAction::checkMaterial() const
-{
-    if (material == nullptr)
-    {
-        Logger::log(LogLevel::Error, "The material is a null pointer.");
-        return false;
-    }
-    return true;
-}
-
-bool CraftAction::checkIngredients() const
-{
-    if (ingredients.empty())
-    {
-        Logger::log(LogLevel::Error, "No used ingredients have been set.");
-        return false;
-    }
-    for (auto iterator : ingredients)
-    {
-        // Check if the ingredient has been deleted.
-        if (iterator.first == nullptr)
-        {
-            Logger::log(LogLevel::Error, "One of the ingredients is a null pointer.");
-            return false;
-        }
-    }
-    return true;
-}
-
-bool CraftAction::checkTools() const
-{
-    if (tools.empty())
-    {
-        Logger::log(LogLevel::Error, "No used tools have been set.");
-        return false;
-    }
-    for (auto iterator : tools)
-    {
-        // Check if the tool has been deleted.
-        if (iterator == nullptr)
-        {
-            Logger::log(LogLevel::Error, "One of the tools is a null pointer.");
-            return false;
-        }
-    }
-    return true;
 }
 
 unsigned int CraftAction::getConsumedStamina(Character * character)

@@ -1479,13 +1479,6 @@ std::vector<RangedWeaponItem *> Character::getActiveRangedWeapons()
     return gatheredWeapons;
 }
 
-CharacterContainer Character::getCharactersInSight()
-{
-    CharacterContainer exceptions;
-    exceptions.emplace_back(this);
-    return this->room->area->getCharactersInSight(exceptions, this->room->coord, this->getViewDistance());
-}
-
 unsigned int Character::getCooldown(CombatActionType combatAction)
 {
     double BASE = 5.0;

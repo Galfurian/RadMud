@@ -44,14 +44,83 @@ BuildAction::~BuildAction()
     Logger::log(LogLevel::Debug, "Deleted building action.");
 }
 
-bool BuildAction::check() const
+bool BuildAction::check(std::string & error) const
 {
-    bool correct = GeneralAction::check();
-    correct &= this->checkBuilding();
-    correct &= this->checkSchematics();
-    correct &= this->checkTools();
-    correct &= this->checkIngredients();
-    return correct;
+    if (!GeneralAction::check(error))
+    {
+        return false;
+    }
+    if (building == nullptr)
+    {
+        Logger::log(LogLevel::Error, "The building is a null pointer.");
+        error = "You don't have a building set.";
+        return false;
+    }
+    if (schematics == nullptr)
+    {
+        Logger::log(LogLevel::Error, "The schematics for a building are a null pointer.");
+        error = "You don't have a valid schematics set.";
+        return false;
+    }
+    for (auto iterator : ingredients)
+    {
+        // Check if the ingredient has been deleted.
+        if (iterator.first == nullptr)
+        {
+            Logger::log(LogLevel::Error, "One of the ingredients is a null pointer.");
+            error = "One of your ingredient is missing.";
+            return false;
+        }
+    }
+    if (tools.empty())
+    {
+        Logger::log(LogLevel::Error, "No used tools have been set.");
+        error = "One or more tools are missing.";
+        return false;
+    }
+    for (auto iterator : tools)
+    {
+        // Check if the tool has been deleted.
+        if (iterator == nullptr)
+        {
+            Logger::log(LogLevel::Error, "One of the tools is a null pointer.");
+            error = "One or more tools are missing.";
+            return false;
+        }
+    }
+    // Check if the actor has enough stamina to execute the action.
+    if (this->getConsumedStamina(actor) > actor->getStamina())
+    {
+        error = "You are too tired right now.";
+        return false;
+    }
+    // Add the ingredients to the list of items to destroy.
+    for (auto it : schematics->ingredients)
+    {
+        auto required = it.second;
+        for (auto it2 : ingredients)
+        {
+            auto item = it2.first;
+            if (item->getType() == ModelType::Resource)
+            {
+                ResourceModel * resourceModel = item->model->toResource();
+                if (resourceModel->resourceType == it.first)
+                {
+                    required -= item->quantity;
+                    if (required <= 0)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+        if (required > 0)
+        {
+            error = "You don't have enough materials.";
+            return false;
+        }
+    }
+    return true;
 }
 
 ActionType BuildAction::getType() const
@@ -77,20 +146,14 @@ ActionStatus BuildAction::perform()
         return ActionStatus::Running;
     }
     // Check the values of the action.
-    if (!checkBuilding() || !checkSchematics() || !checkTools() || !checkIngredients())
+    std::string error;
+    if (!this->check(error))
     {
-        actor->sendMsg("\nYou have failed your action.\n");
+        actor->sendMsg(error + "\n\n");
         return ActionStatus::Error;
     }
-    // Get the amount of required stamina.
-    unsigned int consumedStamina = this->getConsumedStamina(actor);
-    // Check if the actor has enough stamina to execute the action.
-    if (consumedStamina > actor->getStamina())
-    {
-        actor->sendMsg("\nYou are too tired right now.\n");
-        return ActionStatus::Error;
-    }
-    // Consume the stamina.
+    // Get the amount of required stamina and consume it.
+    auto consumedStamina = this->getConsumedStamina(actor);
     actor->remStamina(consumedStamina, true);
     actor->remInventoryItem(building);
     actor->room->addBuilding(building);
@@ -104,14 +167,9 @@ ActionStatus BuildAction::perform()
         {
             destroyItems.push_back(ingredient);
         }
-        else if (ingredient->quantity > it.second)
-        {
-            ingredient->quantity -= it.second;
-        }
         else
         {
-            actor->sendMsg("\nYou don't have enough of %s.\n", ingredient->getName(true));
-            return ActionStatus::Error;
+            ingredient->quantity -= it.second;
         }
     }
     for (auto iterator : tools)
@@ -124,72 +182,16 @@ ActionStatus BuildAction::perform()
         }
     }
     // Consume the items.
-    Logger::log(LogLevel::Error, "Consuming the items.");
     for (auto it : destroyItems)
     {
         it->removeFromMud();
         it->removeOnDB();
         delete (it);
     }
-    Logger::log(LogLevel::Error, "Done.");
     // Send conclusion message.
-    actor->sendMsg(
-        "You have finished building %s.\n\n",
-        Formatter::yellow() + schematics->buildingModel->getName() + Formatter::reset());
+    actor->sendMsg("You have finished building %s.\n\n",
+                   Formatter::yellow() + schematics->buildingModel->getName() + Formatter::reset());
     return ActionStatus::Finished;
-}
-
-bool BuildAction::checkBuilding() const
-{
-    if (building == nullptr)
-    {
-        Logger::log(LogLevel::Error, "The building is a null pointer.");
-        return false;
-    }
-    return true;
-}
-
-bool BuildAction::checkSchematics() const
-{
-    if (schematics == nullptr)
-    {
-        Logger::log(LogLevel::Error, "The schematics for a building are a null pointer.");
-        return false;
-    }
-    return true;
-}
-
-bool BuildAction::checkIngredients() const
-{
-    for (auto iterator : ingredients)
-    {
-        // Check if the ingredient has been deleted.
-        if (iterator.first == nullptr)
-        {
-            Logger::log(LogLevel::Error, "One of the ingredients is a null pointer.");
-            return false;
-        }
-    }
-    return true;
-}
-
-bool BuildAction::checkTools() const
-{
-    if (tools.empty())
-    {
-        Logger::log(LogLevel::Error, "No used tools have been set.");
-        return false;
-    }
-    for (auto iterator : tools)
-    {
-        // Check if the tool has been deleted.
-        if (iterator == nullptr)
-        {
-            Logger::log(LogLevel::Error, "One of the tools is a null pointer.");
-            return false;
-        }
-    }
-    return true;
 }
 
 unsigned int BuildAction::getConsumedStamina(Character * character)

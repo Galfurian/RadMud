@@ -38,12 +38,25 @@ MoveAction::~MoveAction()
     Logger::log(LogLevel::Debug, "Deleted move action.");
 }
 
-bool MoveAction::check() const
+bool MoveAction::check(std::string & error) const
 {
-    bool correct = GeneralAction::check();
-    correct &= this->checkDestination();
-    correct &= this->checkDirection();
-    return correct;
+    if (!GeneralAction::check(error))
+    {
+        return false;
+    }
+    if (this->destination == nullptr)
+    {
+        Logger::log(LogLevel::Error, "No destination has been set.");
+        error = "You cannot reach the destination.";
+        return false;
+    }
+    if (this->direction == Direction::None)
+    {
+        Logger::log(LogLevel::Error, "No direction has been set.");
+        error = "You have lost your direction.";
+        return false;
+    }
+    return true;
 }
 
 ActionType MoveAction::getType() const
@@ -68,48 +81,28 @@ ActionStatus MoveAction::perform()
     {
         return ActionStatus::Running;
     }
-    // Create a variable which will contain the ammount of consumed stamina.
     std::string error;
-    // Check if the actor has enough stamina to execute the action.
+    if (!this->check(error))
+    {
+        actor->sendMsg(error + "\n\n");
+        return ActionStatus::Error;
+    }
     if (!actor->canMoveTo(direction, error))
     {
         // Notify that the actor can't move because too tired.
         actor->sendMsg(error + "\n");
         return ActionStatus::Error;
     }
-    else
-    {
-        // Get the amount of required stamina.
-        auto consumedStamina = this->getConsumedStamina(actor, actor->posture);
-        // Consume the stamina.
-        actor->remStamina(consumedStamina, true);
-        // Move character.
-        actor->moveTo(
-            destination,
-            actor->getNameCapital() + " goes " + direction.toString() + ".\n",
-            actor->getNameCapital() + " arives from " + direction.getOpposite().toString() + ".\n");
-    }
+    // Get the amount of required stamina.
+    auto consumedStamina = this->getConsumedStamina(actor, actor->posture);
+    // Consume the stamina.
+    actor->remStamina(consumedStamina, true);
+    // Move character.
+    actor->moveTo(
+        destination,
+        actor->getNameCapital() + " goes " + direction.toString() + ".\n",
+        actor->getNameCapital() + " arives from " + direction.getOpposite().toString() + ".\n");
     return ActionStatus::Finished;
-}
-
-bool MoveAction::checkDestination() const
-{
-    if (this->destination == nullptr)
-    {
-        Logger::log(LogLevel::Error, "No destination has been set.");
-        return false;
-    }
-    return true;
-}
-
-bool MoveAction::checkDirection() const
-{
-    if (this->direction == Direction::None)
-    {
-        Logger::log(LogLevel::Error, "No direction has been set.");
-        return false;
-    }
-    return true;
 }
 
 unsigned int MoveAction::getConsumedStamina(const Character * character, const CharacterPosture & posture)

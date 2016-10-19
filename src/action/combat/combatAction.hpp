@@ -41,7 +41,7 @@ public:
     /// @brief Destructor.
     virtual ~CombatAction();
 
-    bool check() const override;
+    bool check(std::string & error) const override;
 
     ActionType getType() const override;
 

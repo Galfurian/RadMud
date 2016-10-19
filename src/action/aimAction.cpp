@@ -31,11 +31,24 @@ AimAction::~AimAction()
     Logger::log(LogLevel::Debug, "Deleted aim action.");
 }
 
-bool AimAction::check() const
+bool AimAction::check(std::string & error) const
 {
-    bool correct = GeneralAction::check();
-    correct &= this->checkTarget();
-    return correct;
+    if (!GeneralAction::check(error))
+    {
+        return false;
+    }
+    if (target == nullptr)
+    {
+        Logger::log(LogLevel::Error, "The target is a null pointer.");
+        error = "You don't have a valid target.";
+        return false;
+    }
+    if (!actor->isAtRange(target, actor->getViewDistance()))
+    {
+        error = target->getNameCapital() + " is out of sight.";
+        return false;
+    }
+    return true;
 }
 
 ActionType AimAction::getType() const
@@ -50,7 +63,7 @@ std::string AimAction::getDescription() const
 
 std::string AimAction::stop()
 {
-    if (this->checkTarget())
+    if (target != nullptr)
     {
         return "You stop aiming at " + target->getName() + ".";
     }
@@ -64,30 +77,15 @@ ActionStatus AimAction::perform()
     {
         return ActionStatus::Running;
     }
-    if (this->checkTarget())
+    std::string error;
+    if (!this->check(error))
     {
-        // Check if the target is still in sight.
-        if (actor->isAtRange(target, actor->getViewDistance()))
-        {
-            actor->sendMsg("You are now aiming at %s...\n\n", target->getName());
-            // Set the aimed character.
-            actor->aimedCharacter = target;
-        }
-        else
-        {
-            actor->sendMsg("%s is out of your line of sight...\n\n", target->getNameCapital());
-            return ActionStatus::Error;
-        }
+        actor->sendMsg(error + "\n\n");
+        return ActionStatus::Error;
     }
+    // Send the message.
+    actor->sendMsg("You are now aiming at %s...\n\n", target->getName());
+    // Set the aimed character.
+    actor->aimedCharacter = target;
     return ActionStatus::Finished;
-}
-
-bool AimAction::checkTarget() const
-{
-    if (target == nullptr)
-    {
-        Logger::log(LogLevel::Error, "The target is a null pointer.");
-        return false;
-    }
-    return true;
 }

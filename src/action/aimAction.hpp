@@ -34,7 +34,7 @@ public:
     /// @brief Destructor.
     virtual ~AimAction();
 
-    bool check() const override;
+    bool check(std::string & error) const override;
 
     ActionType getType() const override;
 
@@ -43,10 +43,4 @@ public:
     std::string stop() override;
 
     ActionStatus perform() override;
-
-private:
-    /// @brief Checks the target.
-    /// @return <b>True</b> if the target is available,<br>
-    ///         <b>False</b> otherwise.
-    bool checkTarget() const;
 };

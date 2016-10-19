@@ -32,7 +32,7 @@ public:
     /// @brief Destructor.
     virtual ~Flee();
 
-    bool check() const override;
+    bool check(std::string & error) const override;
 
     ActionType getType() const override;
 

@@ -32,10 +32,13 @@ CombatAction::~CombatAction()
     Logger::log(LogLevel::Debug, "Deleted CombatAction.");
 }
 
-bool CombatAction::check() const
+bool CombatAction::check(std::string & error) const
 {
-    bool correct = GeneralAction::check();
-    return correct;
+    if (!GeneralAction::check(error))
+    {
+        return false;
+    }
+    return true;
 }
 
 ActionType CombatAction::getType() const

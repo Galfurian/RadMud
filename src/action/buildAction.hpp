@@ -53,7 +53,7 @@ public:
     /// @brief Destructor.
     virtual ~BuildAction();
 
-    bool check() const override;
+    bool check(std::string & error) const override;
 
     ActionType getType() const override;
 
@@ -64,25 +64,4 @@ public:
     ActionStatus perform() override;
 
     static unsigned int getConsumedStamina(Character * character);
-
-private:
-    /// @brief Checks the building.
-    /// @return <b>True</b> if the building is available,<br>
-    ///         <b>False</b> otherwise.
-    bool checkBuilding() const;
-
-    /// @brief Checks the schematics.
-    /// @return <b>True</b> if the schematics are available,<br>
-    ///         <b>False</b> otherwise.
-    bool checkSchematics() const;
-
-    /// @brief Checks the ingredients.
-    /// @return <b>True</b> if the ingredients are available,<br>
-    ///         <b>False</b> otherwise.
-    bool checkIngredients() const;
-
-    /// @brief Checks the used tools.
-    /// @return <b>True</b> if the tools are available,<br>
-    ///         <b>False</b> otherwise.
-    bool checkTools() const;
 };

@@ -800,12 +800,13 @@ div.directory {
 	vertical-align : middle;
 }
 
+/*
 .directory td.entry {
-	/*
+
 	white-space: nowrap;
 	padding-right  : 6px;
 	padding-top    : 3px;
-	*/
+
 	white-space    : nowrap;
 	padding        : 2px;
 }
@@ -817,6 +818,7 @@ div.directory {
 .directory td.entry a img {
 	border : none;
 }
+*/
 
 .directory td.desc {
 	width          : 100%;

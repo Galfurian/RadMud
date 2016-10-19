@@ -50,16 +50,13 @@ long int GeneralAction::getElapsed() const
     return duration_cast<seconds>(actionCooldown - system_clock::now()).count();
 }
 
-bool GeneralAction::check() const
+bool GeneralAction::check(std::string & error) const
 {
     bool correct = true;
-    /*
-    if (this->checkElapsed())
+    if (actor == nullptr)
     {
-        Logger::log(LogLevel::Error, "Cooldown is already expired.");
-        correct = false;
+        error = "You cannot begin the action.";
     }
-     */
     return correct;
 }
 

@@ -229,7 +229,8 @@ void DoScout(Character * character, ArgumentHandler & /*args*/)
     auto requiredTime = 3;
     auto newAction = std::make_shared<ScoutAction>(character, requiredTime);
     // Check the new action.
-    if (newAction->check())
+    std::string error;
+    if (newAction->check(error))
     {
         // Send the starting message.
         character->sendMsg("You start scouting the area...\n");
@@ -238,7 +239,7 @@ void DoScout(Character * character, ArgumentHandler & /*args*/)
     }
     else
     {
-        character->sendMsg("You failed your action.\n");
+        character->sendMsg("%s\n", error);
     }
 }
 
@@ -284,7 +285,7 @@ void DoLoad(Character * character, ArgumentHandler & args)
     unsigned int ammountToLoad = 0;
     if (!magazine->getAmountToLoad(projectile, ammountToLoad, error))
     {
-        character->sendMsg(error + ".\n");
+        character->sendMsg("%s\n", error);
         return;
     }
     // Evaluates the required time for loading the magazine.
@@ -292,7 +293,8 @@ void DoLoad(Character * character, ArgumentHandler & args)
     // Create the load action.
     auto newAction = std::make_shared<LoadAction>(magazine, projectile, character, requiredTime);
     // Check the new action.
-    if (newAction->check())
+    error = std::string();
+    if (newAction->check(error))
     {
         // Send the starting message.
         character->sendMsg("You start loading %s with %s.\n",
@@ -303,7 +305,7 @@ void DoLoad(Character * character, ArgumentHandler & args)
     }
     else
     {
-        character->sendMsg("You failed your action.\n");
+        character->sendMsg("%s\n", error);
     }
 }
 
@@ -352,8 +354,9 @@ void DoUnload(Character * character, ArgumentHandler & args)
     Logger::log(LogLevel::Debug, "Required Time : %s", ToString(requiredTime));
     // Create the unload action.
     auto newAction = std::make_shared<UnloadAction>(itemToUnload, character, requiredTime);
+    std::string error;
     // Check the new action.
-    if (newAction->check())
+    if (newAction->check(error))
     {
         // Send the starting message.
         character->sendMsg("You start unloading %s.\n", itemToUnload->getName(true));
@@ -362,7 +365,7 @@ void DoUnload(Character * character, ArgumentHandler & args)
     }
     else
     {
-        character->sendMsg("You failed your action.\n");
+        character->sendMsg("%s\n", error);
     }
 }
 
@@ -410,8 +413,9 @@ void DoReload(Character * character, ArgumentHandler & args)
     }
     auto requiredTime = 2;
     auto newAction = std::make_shared<ReloadAction>(rangedWeapon, magazine, character, requiredTime);
+    std::string error;
     // Check the new action.
-    if (newAction->check())
+    if (newAction->check(error))
     {
         // Send the starting message.
         character->sendMsg("You start reloading %s with %s.\n",
@@ -422,7 +426,7 @@ void DoReload(Character * character, ArgumentHandler & args)
     }
     else
     {
-        character->sendMsg("You failed your action.\n");
+        character->sendMsg("%s\n", error);
     }
 }
 
@@ -462,7 +466,8 @@ void DoAim(Character * character, ArgumentHandler & args)
             Logger::log(LogLevel::Debug, "Time     : %s", requiredTime);
             auto newAction = std::make_shared<AimAction>(character, aimedCharacter, requiredTime);
             // Check the new action.
-            if (newAction->check())
+            std::string error;
+            if (newAction->check(error))
             {
                 // Send the starting message.
                 character->sendMsg("You start aiming at %s...\n", aimedCharacter->getName());
@@ -471,7 +476,7 @@ void DoAim(Character * character, ArgumentHandler & args)
             }
             else
             {
-                character->sendMsg("You failed your action.\n");
+                character->sendMsg("%s\n", error);
             }
         }
         else
@@ -511,6 +516,7 @@ void DoFire(Character * character, ArgumentHandler & /*args*/)
         if (character->isAtRange(character->aimedCharacter, weaponRange))
         {
             // Let the characters enter the combat.
+
             if (!character->setNextCombatAction(CombatActionType::BasicRangedAttack))
             {
                 character->sendMsg("You were not able to fire at %s with %s.\n",
