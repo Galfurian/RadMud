@@ -27,6 +27,7 @@ Follow the **main features** which are currently implemented
  - A **scripting system** which allows lua scripts to interract with the MUD.
  - A **crafting systems** has already been created, however there is still room for improvement.
  - A **hierarchical structure** for the MUD with four main levels (world, continent, area, room).
+ - An **economy system** with shops and currencies.
 
 ## Requirements
 In order to compile the mud the following libraries need to be installed:
