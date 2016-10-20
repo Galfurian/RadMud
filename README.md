@@ -1,3 +1,4 @@
+<img src="https://github.com/Galfurian/RadMud/blob/master/doc/logo.png" align="left" />
 # RadMud [![Build Status](https://travis-ci.org/Galfurian/RadMud.svg?branch=master)](https://travis-ci.org/Galfurian/RadMud)
 **Author**: Enrico Fraccaroli
 
