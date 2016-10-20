@@ -33,3 +33,12 @@ After compiling the mud, just execute the generated executable
 ```
 ./RadMud
 ```
+
+## Connection
+I've implemented inside the mud a class called Formatter. Such class provides the commands used to format the text shown as output to the players. Depending on the configuration of this class, the output will be compatible with telnet clients or with an ad-hoc client.
+
+### Connection - Telnet
+The mud can be accessed using **localhost** at port **4000**.
+
+### Connection - Graphical client
+An ad-hoc client can be used to connect to the mud. Such client can be found at: https://github.com/Galfurian/RadClient
