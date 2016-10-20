@@ -8,6 +8,12 @@
 
 **Language**: C++
 
+  1. [Introduction](https://github.com/Galfurian/RadMud/blob/master/README.md#introduction)
+  2. [Requirements](https://github.com/Galfurian/RadMud/blob/master/README.md#requirements)
+  3. [Compile](https://github.com/Galfurian/RadMud/blob/master/README.md#compile)
+  4. [Execute](https://github.com/Galfurian/RadMud/blob/master/README.md#execute)
+  5. [Connection](https://github.com/Galfurian/RadMud/blob/master/README.md#connection)
+
 ## Introduction
 The idea is to create a Multi User Dungeon (MUD) set in a post-nuclear world.
 Right now there is a minimal content since all the development effort is used to implement new features.
@@ -18,7 +24,7 @@ In order to compile the mud the following libraries need to be installed:
  - lua (For npc behaviour).
  - zlib (For compressed communication).
 
-## Compiling
+## Compile
 In order to compile the mud just create a build directory and the use the cmake file provided.
 Therefore, the commands are the following:
 ```
@@ -29,7 +35,7 @@ cmake ..
 make
 ```
 
-## Execution
+## Execute
 After compiling the mud, just execute the generated executable
 ```
 ./RadMud
