@@ -19,8 +19,8 @@
 #include "faction.hpp"
 
 #include "utils.hpp"
-#include "utilities/logger.hpp"
-#include "../model/submodel/currencyModel.hpp"
+#include "logger.hpp"
+#include "currencyModel.hpp"
 
 Faction::Faction() :
     vnum(),

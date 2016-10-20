@@ -1,8 +1,8 @@
 #############################################
 # Directories
 set(RADMUD_LUA_INC
-        ./src/luabridge/detail
-        ./src/luabridge
+        ./src/lua/luabridge/detail
+        ./src/lua/luabridge
         ./src/lua
         PARENT_SCOPE
         )

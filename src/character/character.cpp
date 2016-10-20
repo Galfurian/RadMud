@@ -20,16 +20,16 @@
 #include "character.hpp"
 
 // Other Include.
-#include "../mud.hpp"
+#include "mud.hpp"
 
-#include "combat/basicMeleeAttack.hpp"
-#include "combat/basicRangedAttack.hpp"
-#include "../action/combat/flee.hpp"
+#include "basicMeleeAttack.hpp"
+#include "basicRangedAttack.hpp"
+#include "flee.hpp"
 
-#include "../item/armorItem.hpp"
-#include "../item/meleeWeaponItem.hpp"
-#include "../item/rangedWeaponItem.hpp"
-#include "../action/moveAction.hpp"
+#include "armorItem.hpp"
+#include "meleeWeaponItem.hpp"
+#include "rangedWeaponItem.hpp"
+#include "moveAction.hpp"
 
 using namespace std::chrono;
 

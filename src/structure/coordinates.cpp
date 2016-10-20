@@ -17,7 +17,7 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "coordinates.hpp"
-#include "../utilities/logger.hpp"
+#include "logger.hpp"
 
 Coordinates::Coordinates() :
     x(),

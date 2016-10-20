@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "character/character.hpp"
-#include "command/argumentHandler.hpp"
+#include "character.hpp"
+#include "argumentHandler.hpp"
 
 /// @brief Map all the connection states which are necessary for the
 ///         negotiation of protocolls.

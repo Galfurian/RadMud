@@ -19,7 +19,7 @@
 // Basic Include.
 #include "building.hpp"
 
-#include "structure/room.hpp"
+#include "room.hpp"
 
 Building::Building() :
     vnum(),

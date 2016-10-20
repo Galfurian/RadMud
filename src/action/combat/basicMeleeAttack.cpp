@@ -17,9 +17,9 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "basicMeleeAttack.hpp"
-#include "../../structure/room.hpp"
-#include "../../item/meleeWeaponItem.hpp"
-#include "../../model/submodel/meleeWeaponModel.hpp"
+#include "room.hpp"
+#include "meleeWeaponItem.hpp"
+#include "meleeWeaponModel.hpp"
 
 BasicMeleeAttack::BasicMeleeAttack(Character * _actor) :
     CombatAction(_actor)

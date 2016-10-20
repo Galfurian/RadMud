@@ -23,8 +23,8 @@
 #include <vector>
 #include <map>
 
-#include "lua/lua_script.hpp"
-#include "utilities/table.hpp"
+#include "lua_script.hpp"
+#include "table.hpp"
 
 class CurrencyModel;
 

@@ -19,10 +19,10 @@
 #pragma once
 
 #include "production.hpp"
-#include "creation/building.hpp"
-#include "../defines.hpp"
-#include "../opponent.hpp"
-#include "../item/item.hpp"
+#include "building.hpp"
+#include "defines.hpp"
+#include "opponent.hpp"
+#include "item.hpp"
 
 #include <memory>
 #include <chrono>

@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "../generalAction.hpp"
+#include "generalAction.hpp"
 
 /// The list of possible combat actions.
 using CombatActionType = enum class CombatActionType_t

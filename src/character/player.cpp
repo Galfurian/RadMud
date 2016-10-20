@@ -20,7 +20,7 @@
 #include "player.hpp"
 
 // Other Include.
-#include "../mud.hpp"
+#include "mud.hpp"
 
 Player::Player(const int & _socket, const int & _port, const std::string & _address) :
     psocket(_socket),

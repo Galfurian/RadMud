@@ -18,8 +18,8 @@
 
 #include "manager.hpp"
 
-#include "../mud.hpp"
-#include "../item/shopItem.hpp"
+#include "mud.hpp"
+#include "shopItem.hpp"
 
 void LoadManagerCommands()
 {

@@ -17,7 +17,7 @@
 
 #include "argumentHandler.hpp"
 
-#include "../utilities/logger.hpp"
+#include "logger.hpp"
 
 Argument::Argument(const std::string & _original) :
     original(_original),

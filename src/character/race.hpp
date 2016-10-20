@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 
-#include "../model/submodel/corpseModel.hpp"
+#include "corpseModel.hpp"
 #include "defines.hpp"
 #include "faction.hpp"
 

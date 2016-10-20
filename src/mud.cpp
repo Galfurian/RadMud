@@ -22,8 +22,8 @@
 #include <signal.h>
 
 #include "protocol.hpp"
-#include "utilities/stopwatch.hpp"
-#include "utilities/CMacroWrapper.hpp"
+#include "stopwatch.hpp"
+#include "CMacroWrapper.hpp"
 
 /// Input file descriptor.
 static fd_set in_set;

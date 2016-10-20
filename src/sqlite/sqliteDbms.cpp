@@ -20,8 +20,8 @@
 
 #include "sqliteLoadFunctions.hpp"
 
-#include "../mud.hpp"
-#include "../utilities/stopwatch.hpp"
+#include "mud.hpp"
+#include "stopwatch.hpp"
 
 SQLiteDbms::SQLiteDbms()
 {

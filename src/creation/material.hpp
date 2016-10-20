@@ -21,7 +21,7 @@
 #include <map>
 
 #include "defines.hpp"
-#include "lua/lua_script.hpp"
+#include "lua_script.hpp"
 
 /// @brief Holds details about a material.
 class Material

@@ -28,7 +28,7 @@
 /// Indicator for no socket connected.
 #define NO_SOCKET_COMMUNICATION -1
 
-#include "creation/building.hpp"
+#include "building.hpp"
 #include "production.hpp"
 #include "profession.hpp"
 #include "skill.hpp"
@@ -36,19 +36,19 @@
 #include "writing.hpp"
 #include "material.hpp"
 
-#include "structure/area.hpp"
-#include "structure/room.hpp"
-#include "structure/continent.hpp"
+#include "area.hpp"
+#include "room.hpp"
+#include "continent.hpp"
 
-#include "character/mobile.hpp"
-#include "character/player.hpp"
+#include "mobile.hpp"
+#include "player.hpp"
 
-#include "command/command.hpp"
+#include "command.hpp"
 
-#include "sqlite/sqliteDbms.hpp"
+#include "sqliteDbms.hpp"
 
-#include "utilities/table.hpp"
-#include "utilities/formatter.hpp"
+#include "table.hpp"
+#include "formatter.hpp"
 
 #ifdef __linux__
 

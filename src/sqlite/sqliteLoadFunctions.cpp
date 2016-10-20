@@ -16,14 +16,10 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "sqliteLoadFunctions.hpp"
-
 #include "sqliteDbms.hpp"
-
-#include "../mud.hpp"
-
-#include "../model/submodel/currencyModel.hpp"
-
-#include "../item/shopItem.hpp"
+#include "mud.hpp"
+#include "currencyModel.hpp"
+#include "shopItem.hpp"
 
 bool LoadBadName(ResultSet * result)
 {

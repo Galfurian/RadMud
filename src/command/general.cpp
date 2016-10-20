@@ -18,8 +18,8 @@
 
 #include "general.hpp"
 
-#include "../mud.hpp"
-#include "../action/moveAction.hpp"
+#include "mud.hpp"
+#include "moveAction.hpp"
 
 void LoadGeneralCommands()
 {

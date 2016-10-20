@@ -21,8 +21,8 @@
 #include <string>
 #include <map>
 
-#include "model/submodel/toolModel.hpp"
-#include "model/submodel/resourceModel.hpp"
+#include "toolModel.hpp"
+#include "resourceModel.hpp"
 
 class ItemModel;
 

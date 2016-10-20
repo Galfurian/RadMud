@@ -22,13 +22,13 @@
 
 #include "exit.hpp"
 #include "coordinates.hpp"
-#include "../defines.hpp"
-#include "../utils.hpp"
-#include "../item/item.hpp"
-#include "../lua/lua_script.hpp"
-#include "../character/mobile.hpp"
-#include "../character/characterContainer.hpp"
-#include "../item/itemContainer.hpp"
+#include "defines.hpp"
+#include "utils.hpp"
+#include "item.hpp"
+#include "lua_script.hpp"
+#include "mobile.hpp"
+#include "characterContainer.hpp"
+#include "itemContainer.hpp"
 
 class Item;
 

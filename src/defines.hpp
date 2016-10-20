@@ -23,8 +23,8 @@
 #include <map>
 #include <set>
 
-#include "structure/coordinates.hpp"
-#include "utilities/enum_checker.hpp"
+#include "coordinates.hpp"
+#include "enum_checker.hpp"
 
 /// The list of character's abilities.
 using Ability = enum class Ability_t

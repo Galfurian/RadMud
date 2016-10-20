@@ -17,7 +17,7 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "generalAction.hpp"
-#include "combat/combatAction.hpp"
+#include "combatAction.hpp"
 
 using namespace std::chrono;
 

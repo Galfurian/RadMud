@@ -18,7 +18,7 @@
 
 // Basic Include.
 #include "command.hpp"
-#include "../mud.hpp"
+#include "mud.hpp"
 
 #include "combat.hpp"
 #include "communication.hpp"

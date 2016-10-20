@@ -22,7 +22,7 @@
 #include <vector>
 #include <memory>
 
-#include "../defines.hpp"
+#include "defines.hpp"
 
 class Room;
 

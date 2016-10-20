@@ -25,9 +25,9 @@ class Character;
 #include <string>
 #include <map>
 
-#include "model/itemModel.hpp"
-#include "model/submodel/toolModel.hpp"
-#include "model/submodel/resourceModel.hpp"
+#include "itemModel.hpp"
+#include "toolModel.hpp"
+#include "resourceModel.hpp"
 
 /// @brief Holds details about a production.
 class Production

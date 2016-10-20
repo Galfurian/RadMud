@@ -18,10 +18,10 @@
 
 #include "object.hpp"
 
-#include "../mud.hpp"
-#include "../item/shopItem.hpp"
-#include "../model/submodel/currencyModel.hpp"
-#include "../model/submodel/liquidContainerModel.hpp"
+#include "mud.hpp"
+#include "shopItem.hpp"
+#include "currencyModel.hpp"
+#include "liquidContainerModel.hpp"
 
 void LoadObjectCommands()
 {

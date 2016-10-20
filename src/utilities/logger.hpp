@@ -21,8 +21,8 @@
 #include <iostream>
 #include <fstream>
 
-#include "../utils.hpp"
-#include "../structure/coordinates.hpp"
+#include "utils.hpp"
+#include "coordinates.hpp"
 
 /// @brief Enumerator which identifies the severity of the log entry.
 using LogLevel = enum class LogLevel_t

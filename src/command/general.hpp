@@ -18,7 +18,7 @@
 #pragma once
 
 #include "argumentHandler.hpp"
-#include "../character/character.hpp"
+#include "character.hpp"
 
 /// Loads all the general commands.
 void LoadGeneralCommands();

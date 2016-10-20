@@ -28,7 +28,7 @@
 #include <iostream>
 #include <iterator>
 
-#include "utilities/logger.hpp"
+#include "logger.hpp"
 
 bool DoubleEquality(double a, double b)
 {

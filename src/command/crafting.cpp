@@ -18,9 +18,9 @@
 
 #include "crafting.hpp"
 
-#include "../mud.hpp"
-#include "../action/buildAction.hpp"
-#include "../action/craftAction.hpp"
+#include "mud.hpp"
+#include "buildAction.hpp"
+#include "craftAction.hpp"
 
 void LoadCraftingCommands()
 {

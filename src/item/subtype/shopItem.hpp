@@ -18,7 +18,7 @@
 #pragma once
 
 #include "item.hpp"
-#include "../character/mobile.hpp"
+#include "mobile.hpp"
 
 /// @brief Holds details about shops.
 class ShopItem :

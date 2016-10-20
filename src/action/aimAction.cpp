@@ -17,7 +17,7 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "aimAction.hpp"
-#include "../character/character.hpp"
+#include "character.hpp"
 
 AimAction::AimAction(Character * _actor, Character * _target, unsigned int _cooldown) :
     GeneralAction(_actor, std::chrono::system_clock::now() + std::chrono::seconds(_cooldown)),

@@ -1,6 +1,6 @@
-/// @file   armorItem.cpp
+/// @file   corpseItem.cpp
 /// @author Enrico Fraccaroli
-/// @date   Aug 04 2016
+/// @date   Aug 17 2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission to use, copy, modify, and distribute this software for any
@@ -15,40 +15,44 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#include "armorItem.hpp"
-#include "material.hpp"
-#include "../model/submodel/armorModel.hpp"
+#include "corpseItem.hpp"
 
-ArmorItem::ArmorItem()
+#include "mud.hpp"
+
+CorpseItem::CorpseItem()
 {
     // Nothing to do.
 }
 
-ArmorItem::~ArmorItem()
+CorpseItem::~CorpseItem()
 {
     // Nothing to do.
 }
 
-void ArmorItem::getSheet(Table & sheet) const
+void CorpseItem::removeFromMud()
+{
+    Item::removeFromMud();
+    if (Mud::instance().remCorpse(this))
+    {
+        Logger::log(LogLevel::Debug, "Removing item '%s' from MUD corpses.", this->getName());
+    }
+}
+
+bool CorpseItem::updateOnDB()
+{
+    return true;
+}
+
+bool CorpseItem::removeOnDB()
+{
+    return true;
+}
+
+void CorpseItem::getSheet(Table & sheet) const
 {
     // Call the function of the father class.
     Item::getSheet(sheet);
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow({"Armor Class", ToString(this->getArmorClass())});
-}
-
-unsigned int ArmorItem::getArmorClass() const
-{
-    // Add the base armor class.
-    auto acBase = this->model->toArmor()->armorClass;
-    // Evaluate the modifier due to item's quality.
-    auto acQuality = static_cast<unsigned int>(acBase * quality.getModifier());
-    // Evaluate the modifier due to item's condition.
-    auto acCondition = static_cast<unsigned int>(acBase * this->getConditionModifier());
-    // Evaluate the modifier due to item's material.
-    auto acMaterial = static_cast<unsigned int>(acBase * this->composition->getHardnessModifier());
-    // The resulting armor class.
-    return ((acBase + acQuality + acCondition + acMaterial) / 4);
 }

@@ -16,13 +16,13 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "combat.hpp"
-#include "../mud.hpp"
-#include "../action/scoutAction.hpp"
-#include "../action/reloadAction.hpp"
-#include "../action/loadAction.hpp"
-#include "../action/unloadAction.hpp"
-#include "../action/aimAction.hpp"
-#include "../item/magazineItem.hpp"
+#include "mud.hpp"
+#include "scoutAction.hpp"
+#include "reloadAction.hpp"
+#include "loadAction.hpp"
+#include "unloadAction.hpp"
+#include "aimAction.hpp"
+#include "magazineItem.hpp"
 
 void LoadCombatCommands()
 {

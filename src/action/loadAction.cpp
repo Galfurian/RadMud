@@ -17,9 +17,9 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "loadAction.hpp"
-#include "../character/character.hpp"
-#include "../model/submodel/magazineModel.hpp"
-#include "../sqlite/sqliteDbms.hpp"
+#include "character.hpp"
+#include "magazineModel.hpp"
+#include "sqliteDbms.hpp"
 
 LoadAction::LoadAction(Item * _itemToBeLoaded, Item * _projectile, Character * _actor, unsigned int _cooldown) :
     GeneralAction(_actor, std::chrono::system_clock::now() + std::chrono::seconds(_cooldown)),

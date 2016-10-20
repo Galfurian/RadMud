@@ -18,8 +18,8 @@
 
 #include "utils.hpp"
 #include "opponent.hpp"
-#include "utilities/logger.hpp"
-#include "character/character.hpp"
+#include "logger.hpp"
+#include "character.hpp"
 
 Aggression::Aggression(Character * _aggressor, unsigned int _aggression) :
     aggressor(_aggressor),

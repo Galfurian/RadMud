@@ -19,7 +19,7 @@
 #include "communication.hpp"
 
 #include "command.hpp"
-#include "../mud.hpp"
+#include "mud.hpp"
 
 void LoadCommunicationCommands()
 {

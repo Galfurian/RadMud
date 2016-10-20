@@ -22,10 +22,10 @@
 #include <vector>
 
 #include "coordinates.hpp"
-#include "../utilities/map3D.hpp"
-#include "../utilities/map2D.hpp"
-#include "../character/character.hpp"
-#include "../defines.hpp"
+#include "map3D.hpp"
+#include "map2D.hpp"
+#include "character.hpp"
+#include "defines.hpp"
 
 class Room;
 

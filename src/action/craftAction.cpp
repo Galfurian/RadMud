@@ -17,8 +17,8 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "craftAction.hpp"
-#include "../structure/room.hpp"
-#include "../sqlite/sqliteDbms.hpp"
+#include "room.hpp"
+#include "sqliteDbms.hpp"
 
 using namespace std::chrono;
 

@@ -18,7 +18,7 @@
 
 #include "lua_script.hpp"
 
-#include "../mud.hpp"
+#include "mud.hpp"
 
 void LuaLog(std::string message)
 {

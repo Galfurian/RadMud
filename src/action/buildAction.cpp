@@ -17,9 +17,9 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "buildAction.hpp"
-#include "../structure/room.hpp"
-#include "../sqlite/sqliteDbms.hpp"
-#include "../utilities/formatter.hpp"
+#include "room.hpp"
+#include "sqliteDbms.hpp"
+#include "formatter.hpp"
 
 using namespace std::chrono;
 

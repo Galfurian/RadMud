@@ -21,7 +21,7 @@
 #include <cmath>
 
 #include "room.hpp"
-#include "../mud.hpp"
+#include "mud.hpp"
 
 Continent::Continent() :
     vnum(),

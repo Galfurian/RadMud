@@ -18,7 +18,7 @@
 
 #include "god.hpp"
 
-#include "../mud.hpp"
+#include "mud.hpp"
 
 void LoadGodCommands()
 {

@@ -20,10 +20,10 @@
 #include "item.hpp"
 
 // Other Include.
-#include "../mud.hpp"
-#include "../model/submodel/containerModel.hpp"
-#include "../model/submodel/liquidContainerModel.hpp"
-#include "../model/submodel/shopModel.hpp"
+#include "mud.hpp"
+#include "containerModel.hpp"
+#include "liquidContainerModel.hpp"
+#include "shopModel.hpp"
 
 #include "shopItem.hpp"
 #include "armorItem.hpp"

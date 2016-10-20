@@ -17,7 +17,7 @@
 
 #include "shopItem.hpp"
 
-#include "../mud.hpp"
+#include "mud.hpp"
 
 #include "currencyItem.hpp"
 

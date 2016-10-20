@@ -16,8 +16,8 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "argumentHandler.hpp"
-#include "../utils.hpp"
-#include "../utilities/logger.hpp"
+#include "utils.hpp"
+#include "logger.hpp"
 
 ArgumentHandler::ArgumentHandler(const std::string & _original) :
     original(_original),

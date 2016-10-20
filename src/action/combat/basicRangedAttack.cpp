@@ -17,9 +17,9 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "basicRangedAttack.hpp"
-#include "../../structure/room.hpp"
-#include "../../item/rangedWeaponItem.hpp"
-#include "../../model/submodel/rangedWeaponModel.hpp"
+#include "room.hpp"
+#include "rangedWeaponItem.hpp"
+#include "rangedWeaponModel.hpp"
 
 BasicRangedAttack::BasicRangedAttack(Character * _actor) :
     CombatAction(_actor)

@@ -18,8 +18,8 @@
 
 #include "sqliteWrapper.hpp"
 
-#include "../utils.hpp"
-#include "../utilities/logger.hpp"
+#include "utils.hpp"
+#include "logger.hpp"
 
 ResultSet::~ResultSet()
 {

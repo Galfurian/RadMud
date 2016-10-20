@@ -16,9 +16,9 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#include <room.hpp>
 #include "scoutAction.hpp"
-#include "../structure/area.hpp"
+#include "room.hpp"
+#include "area.hpp"
 
 ScoutAction::ScoutAction(Character * _actor, unsigned int _cooldown) :
     GeneralAction(_actor, std::chrono::system_clock::now() + std::chrono::seconds(_cooldown))
