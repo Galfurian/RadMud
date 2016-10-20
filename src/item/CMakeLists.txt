@@ -10,6 +10,7 @@ set(RADMUD_ITEM_INC
 # Source Files
 set(RADMUD_ITEM_SRC
         ./src/item/item.cpp
+        ./src/item/writing.cpp
         ./src/item/itemContainer.cpp
         ./src/item/subtype/shopItem.cpp
         ./src/item/subtype/armorItem.cpp

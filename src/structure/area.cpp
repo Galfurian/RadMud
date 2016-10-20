@@ -531,40 +531,20 @@ bool Area::los(const Coordinates & source, const Coordinates & target, const uns
     // Evaluate the minimum value of increment.
     double min = std::min(unitx, unity);
     // Set the initial values for X and Y.
-    double x = source.x;
-    double y = source.y;
-    Coordinates sw, nw, se, ne;
+    double x = source.x + 0.5;
+    double y = source.y + 0.5;
+    Coordinates coordinates(source.x, source.y, source.z);
     for (double i = 0; i <= distance; i += min)
     {
         // Evaluate the integer version of the coordinates using the floor value.
         int floor_x = static_cast<int>(std::floor(x));
         int floor_y = static_cast<int>(std::floor(y));
-        // Evaluate the integer version of the coordinates using the ceiling value.
-        int ceil_x = static_cast<int>(std::ceil(x));
-        int ceil_y = static_cast<int>(std::ceil(y));
-        // Prepare all the possible combinations.
-        nw = Coordinates(floor_x, ceil_y, source.z);
-        ne = Coordinates(ceil_x, ceil_y, source.z);
-        se = Coordinates(ceil_x, floor_y, source.z);
-        sw = Coordinates(floor_x, floor_y, source.z);
-        // Check if we have reached the target room.
-        if ((sw == target) || (nw == target) || (se == target) || (ne == target))
+        coordinates = Coordinates(floor_x, floor_y, source.z);
+        if (coordinates == target)
         {
             return true;
         }
-        // Evaluate only once the validity of the four cells.
-        bool swIsValid = this->isValid(sw);
-        bool nwIsValid = this->isValid(nw);
-        bool seIsValid = this->isValid(se);
-        bool neIsValid = this->isValid(ne);
-        // If NONE of the following patter is valid, then there is no line of sight.
-        //
-        // | nw..ne | nw..ne |     ne | nw     |
-        // | ..     |     .. |     .. | ..     |
-        // | sw     |     se | sw..se | sw..se |
-        //
-        if (!((swIsValid && nwIsValid && neIsValid) || (nwIsValid && neIsValid && seIsValid) ||
-              (neIsValid && seIsValid && swIsValid) || (seIsValid && swIsValid && nwIsValid)))
+        if (!this->isValid(coordinates))
         {
             return false;
         }

@@ -93,7 +93,6 @@ set(PROJECT_SRC
         ./src/utils.cpp
         ./src/opponent.cpp
         ./src/protocol.cpp
-        ./src/writing.cpp
         ${RADMUD_LUA_SRC}
         ${RADMUD_ITEM_SRC}
         ${RADMUD_MODEL_SRC}
