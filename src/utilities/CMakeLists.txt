@@ -12,5 +12,6 @@ set(RADMUD_UTILITIES_SRC
         ./src/utilities/formatter.cpp
         ./src/utilities/table.cpp
         ./src/utilities/logger.cpp
+        ./src/utilities/utils.cpp
         PARENT_SCOPE
         )

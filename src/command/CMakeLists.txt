@@ -18,5 +18,6 @@ set(RADMUD_COMMAND_SRC
         ./src/command/general.cpp
         ./src/command/god.cpp
         ./src/command/object.cpp
+        ./src/command/protocol.cpp
         PARENT_SCOPE
         )

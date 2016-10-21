@@ -16,5 +16,6 @@ set(RADMUD_CHARACTER_SRC
         ./src/character/faction.cpp
         ./src/character/race.cpp
         ./src/character/skill.cpp
+        ./src/character/opponent.cpp
         PARENT_SCOPE
         )

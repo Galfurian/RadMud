@@ -90,9 +90,6 @@ set(PROJECT_SRC
         ./src/main.cpp
         ./src/mud.cpp
         ./src/updater.cpp
-        ./src/utils.cpp
-        ./src/opponent.cpp
-        ./src/protocol.cpp
         ${RADMUD_LUA_SRC}
         ${RADMUD_ITEM_SRC}
         ${RADMUD_MODEL_SRC}
