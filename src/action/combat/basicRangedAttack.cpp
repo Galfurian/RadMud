@@ -38,22 +38,6 @@ bool BasicRangedAttack::check(std::string & error) const
     {
         return false;
     }
-    if (actor->getActiveRangedWeapons().empty())
-    {
-        error = "You do not have a valid weapon equipped.";
-        return false;
-    }
-    if (actor->aimedCharacter == nullptr)
-    {
-
-        error = "You do not have a target.";
-        return false;
-    }
-    if (actor->isAtRange(actor->aimedCharacter, actor->getViewDistance()))
-    {
-        error = "Your target is out of your visual.\n";
-        return false;
-    }
     return true;
 }
 
@@ -190,9 +174,12 @@ ActionStatus BasicRangedAttack::perform()
                                        actor->getName(), criticalMsg, enemy->getName(),
                                        iterator->getName(true), enemy->getObjectPronoun());
                 // The enemy has received the damage and now it is dead.
-                if (enemy == actor->aimedCharacter)
+                if (actor->aimedCharacter != nullptr)
                 {
-                    actor->aimedCharacter = nullptr;
+                    if (enemy->getName() == actor->aimedCharacter->getName())
+                    {
+                        actor->aimedCharacter = nullptr;
+                    }
                 }
                 enemy->kill();
                 continue;
@@ -211,6 +198,11 @@ ActionStatus BasicRangedAttack::perform()
                                        iterator->getName(true), DMG);
             }
         }
+    }
+    if ((actor->aimedCharacter == nullptr) && (actor->aggressionList.getSize() == 0))
+    {
+        actor->sendMsg(this->stop() + "\n\n");
+        return ActionStatus::Finished;
     }
     if (!canAttackTarget)
     {
