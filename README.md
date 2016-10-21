@@ -36,7 +36,7 @@ In order to compile the mud the following libraries need to be installed:
  - zlib (For compressed communication).
 
 ## Compile
-In order to compile the mud just create a build directory and the use the cmake file provided.
+In order to compile the mud just create a build directory and then use the cmake file provided.
 Therefore, the commands are the following:
 ```
 mkdir build
