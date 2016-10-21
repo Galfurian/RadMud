@@ -105,6 +105,9 @@ public:
     /// @brief Provides the size of the aggessors list.
     std::size_t getSize();
 
+    /// @brief Returns true if the vector is empty.
+    bool empty();
+
     /// @brief Check and clear the list from possible disconnected players.
     void checkList();
 

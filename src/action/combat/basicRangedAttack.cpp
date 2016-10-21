@@ -199,7 +199,7 @@ ActionStatus BasicRangedAttack::perform()
             }
         }
     }
-    if ((actor->aimedCharacter == nullptr) && (actor->aggressionList.getSize() == 0))
+    if ((actor->aimedCharacter == nullptr) && actor->aggressionList.empty())
     {
         actor->sendMsg(this->stop() + "\n\n");
         return ActionStatus::Finished;

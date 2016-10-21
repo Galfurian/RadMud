@@ -189,6 +189,11 @@ std::size_t AggressionList::getSize()
     return this->aggressionList.size();
 }
 
+bool AggressionList::empty()
+{
+    return aggressionList.empty();
+}
+
 void AggressionList::checkList()
 {
     auto temporaryList = aggressionList;
