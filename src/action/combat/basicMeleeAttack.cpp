@@ -67,6 +67,7 @@ ActionStatus BasicMeleeAttack::perform()
     {
         return ActionStatus::Running;
     }
+    bool hasOpponentsAtRange = false;
     Logger::log(LogLevel::Debug, "[%s] Perform a BasicMeleeAttack.", actor->getName());
     auto activeWeapons = actor->getActiveMeleeWeapons();
     if (activeWeapons.empty())
@@ -78,7 +79,7 @@ ActionStatus BasicMeleeAttack::perform()
         for (auto iterator : activeWeapons)
         {
             // Get the top aggro enemy at range.
-            Character * enemy = actor->getNextOpponentAtRange(1);
+            Character * enemy = actor->getNextOpponentAtRange(0);
             if (enemy == nullptr)
             {
                 actor->sendMsg(
@@ -86,6 +87,7 @@ ActionStatus BasicMeleeAttack::perform()
                     iterator->getName(true));
                 continue;
             }
+            hasOpponentsAtRange = true;
             // Get the required stamina.
             unsigned int consumedStamina = this->getConsumedStamina(actor, iterator);
             // Check if the actor has enough stamina to execute the action.
@@ -271,6 +273,11 @@ ActionStatus BasicMeleeAttack::perform()
                 }
             }
         }
+    }
+    if (!hasOpponentsAtRange)
+    {
+        actor->sendMsg(this->stop() + "\n\n");
+        return ActionStatus::Finished;
     }
     // By default set the next combat action to basic attack.
     if (!actor->setNextCombatAction(CombatActionType::BasicMeleeAttack))
