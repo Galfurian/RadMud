@@ -86,7 +86,7 @@ public:
     /// The lua_State associated with this character.
     lua_State * L;
     /// List of opponents.
-    OpponentsList opponents;
+    AggressionList aggressionList;
     /// Character current action.
     std::deque<std::shared_ptr<GeneralAction> > actionQueue;
     /// List of characters in sight.

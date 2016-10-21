@@ -84,7 +84,7 @@ ActionStatus Flee::perform()
     // Get the required stamina.
     auto consumedStamina = this->getConsumedStamina(actor);
     // Base the escape level on how many enemies are surrounding the character.
-    if (fleeChance < static_cast<unsigned int>(actor->opponents.getSize()))
+    if (fleeChance < static_cast<unsigned int>(actor->aggressionList.getSize()))
     {
         actor->sendMsg("You were not able to escape from your attackers.\n");
         // Consume half the stamina.

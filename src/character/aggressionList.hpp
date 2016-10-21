@@ -1,4 +1,4 @@
-/// @file   opponent.hpp
+/// @file   aggressionList.hpp
 /// @brief  Contains definition of combat classes.
 /// @author Enrico Fraccaroli
 /// @date   May 8 2016
@@ -18,39 +18,14 @@
 
 #pragma once
 
-class Character;
+#include "aggression.hpp"
 
 #include <set>
 #include <vector>
 #include <string>
 
-/// @brief Allows to store information about an aggressor.
-class Aggression
-{
-public:
-    /// The aggressor.
-    Character * aggressor;
-    /// The level of aggression.
-    mutable unsigned int aggression;
-
-    /// @brief Constructor.
-    Aggression(Character * _aggressor, unsigned int _aggression);
-
-    /// @brief Operator used to order the aggressors based on the level of aggression.
-    bool operator>(const Aggression & source) const;
-
-    /// @brief Operator used to order the aggressors based on the level of aggression.
-    bool operator<(const Aggression & source) const;
-
-    /// @brief Operator used to order the aggressors based on the level of aggression.
-    bool operator==(const Aggression & source) const;
-
-    /// @brief Operator used to order the aggressors based on the level of aggression.
-    bool operator==(const Character * source) const;
-};
-
 /// @brief Data structure used to store an ordered list of opponents during a combat.
-class OpponentsList
+class AggressionList
 {
     friend class Character;
 
@@ -69,9 +44,10 @@ private:
 
 public:
     /// @brief Constructor.
-    OpponentsList(Character * _owner);
+    AggressionList(Character * _owner);
 
-    ~OpponentsList();
+    /// @brief Destructor.
+    ~AggressionList();
 
     /// @brief Tries to add the given character to the list of opponents.
     /// @param character The opponent to add.

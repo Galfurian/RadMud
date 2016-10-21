@@ -1,4 +1,4 @@
-/// @file   opponent.cpp
+/// @file   aggressionList.cpp
 /// @brief  Contains implementation of combat classes.
 /// @author Enrico Fraccaroli
 /// @date   May 8 2016
@@ -16,51 +16,25 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+#include "aggressionList.hpp"
+
 #include "utils.hpp"
-#include "opponent.hpp"
 #include "logger.hpp"
 #include "character.hpp"
 
-Aggression::Aggression(Character * _aggressor, unsigned int _aggression) :
-    aggressor(_aggressor),
-    aggression(_aggression)
-{
-    // Nothing to do.
-}
-
-bool Aggression::operator>(const Aggression & source) const
-{
-    return this->aggression > source.aggression;
-}
-
-bool Aggression::operator<(const Aggression & source) const
-{
-    return this->aggression < source.aggression;
-}
-
-bool Aggression::operator==(const Aggression & source) const
-{
-    return this->aggressor->name == source.aggressor->name;
-}
-
-bool Aggression::operator==(const Character * source) const
-{
-    return this->aggressor->name == source->name;
-}
-
-OpponentsList::OpponentsList(Character * _owner) :
+AggressionList::AggressionList(Character * _owner) :
     owner(_owner),
     aggressionList()
 {
     // Nothing to do.
 }
 
-OpponentsList::~OpponentsList()
+AggressionList::~AggressionList()
 {
     // Nothing to do.
 }
 
-bool OpponentsList::addOpponent(Character * character, unsigned int initAggro)
+bool AggressionList::addOpponent(Character * character, unsigned int initAggro)
 {
     bool ret = false;
     auto iterator = std::find(aggressionList.begin(), aggressionList.end(), character);
@@ -86,7 +60,7 @@ bool OpponentsList::addOpponent(Character * character, unsigned int initAggro)
     return ret;
 }
 
-bool OpponentsList::remOpponent(Character * character)
+bool AggressionList::remOpponent(Character * character)
 {
     auto iterator = std::find(aggressionList.begin(), aggressionList.end(), character);
     if (iterator != aggressionList.end())
@@ -102,7 +76,7 @@ bool OpponentsList::remOpponent(Character * character)
     return false;
 }
 
-bool OpponentsList::hasOpponent(Character * character)
+bool AggressionList::hasOpponent(Character * character)
 {
     bool ret = false;
     for (auto it : aggressionList)
@@ -116,12 +90,12 @@ bool OpponentsList::hasOpponent(Character * character)
     return ret;
 }
 
-bool OpponentsList::hasOpponents() const
+bool AggressionList::hasOpponents() const
 {
     return !aggressionList.empty();
 }
 
-bool OpponentsList::setAggro(Character * character, unsigned int newAggression)
+bool AggressionList::setAggro(Character * character, unsigned int newAggression)
 {
     bool ret = false;
     auto iterator = std::find(aggressionList.begin(), aggressionList.end(), character);
@@ -137,7 +111,7 @@ bool OpponentsList::setAggro(Character * character, unsigned int newAggression)
     return ret;
 }
 
-Aggression * OpponentsList::getTopAggro()
+Aggression * AggressionList::getTopAggro()
 {
     if (aggressionList.empty())
     {
@@ -146,7 +120,7 @@ Aggression * OpponentsList::getTopAggro()
     return &(*aggressionList.begin());
 }
 
-bool OpponentsList::moveToTopAggro(Character * character)
+bool AggressionList::moveToTopAggro(Character * character)
 {
     // Check if the character is a valid opponent.
     if (!this->hasOpponent(character))
@@ -178,7 +152,7 @@ bool OpponentsList::moveToTopAggro(Character * character)
     return true;
 }
 
-unsigned int OpponentsList::getInitialAggro(Character * character)
+unsigned int AggressionList::getInitialAggro(Character * character)
 {
     if (owner->level > character->level)
     {
@@ -187,7 +161,7 @@ unsigned int OpponentsList::getInitialAggro(Character * character)
     return (character->level - owner->level);
 }
 
-unsigned int OpponentsList::getAggro(Character * character)
+unsigned int AggressionList::getAggro(Character * character)
 {
     unsigned int ret = 0;
     for (auto it : aggressionList)
@@ -201,12 +175,12 @@ unsigned int OpponentsList::getAggro(Character * character)
     return ret;
 }
 
-std::size_t OpponentsList::getSize()
+std::size_t AggressionList::getSize()
 {
     return this->aggressionList.size();
 }
 
-void OpponentsList::checkList()
+void AggressionList::checkList()
 {
     auto temporaryList = aggressionList;
     for (AggressorVector::iterator it = temporaryList.begin(); it != temporaryList.end(); ++it)
@@ -224,7 +198,7 @@ void OpponentsList::checkList()
     }
 }
 
-void OpponentsList::resetList()
+void AggressionList::resetList()
 {
     auto temporaryList = aggressionList;
     for (AggressorVector::iterator it = temporaryList.begin(); it != temporaryList.end(); ++it)
@@ -235,7 +209,7 @@ void OpponentsList::resetList()
             continue;
         }
         // Remove the owner from its list.
-        if (!it->aggressor->opponents.remOpponent(owner))
+        if (!it->aggressor->aggressionList.remOpponent(owner))
         {
             Logger::log(
                 LogLevel::Error,
@@ -255,22 +229,22 @@ void OpponentsList::resetList()
     }
 }
 
-OpponentsList::iterator OpponentsList::begin()
+AggressionList::iterator AggressionList::begin()
 {
     return this->aggressionList.begin();
 }
 
-OpponentsList::iterator OpponentsList::end()
+AggressionList::iterator AggressionList::end()
 {
     return this->aggressionList.end();
 }
 
-void OpponentsList::sortList()
+void AggressionList::sortList()
 {
     std::sort(aggressionList.begin(), aggressionList.end(), std::greater<Aggression>());
 }
 
-void OpponentsList::printList()
+void AggressionList::printList()
 {
     std::cout << "Aggro List:" << std::endl;
     for (auto it : aggressionList)

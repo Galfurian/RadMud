@@ -52,7 +52,7 @@ Character::Character() :
     posture(CharacterPosture::Stand),
     effects(),
     L(luaL_newstate()),
-    opponents(this),
+    aggressionList(this),
     actionQueue(),
     charactersInSight(),
     aimedCharacter()
@@ -529,7 +529,7 @@ bool Character::setNextCombatAction(const CombatActionType & nextAction)
     {
         if (nextAction == CombatActionType::BasicMeleeAttack)
         {
-            if (!opponents.hasOpponents())
+            if (!aggressionList.hasOpponents())
             {
                 Logger::log(LogLevel::Error, "The list of opponents is empty.");
                 return false;
@@ -1426,9 +1426,9 @@ bool Character::isAtRange(Character * target, const unsigned int & range)
 
 Character * Character::getNextOpponentAtRange(const unsigned int & range)
 {
-    if (opponents.hasOpponents())
+    if (aggressionList.hasOpponents())
     {
-        for (auto iterator : opponents.aggressionList)
+        for (auto iterator : aggressionList.aggressionList)
         {
             if (this->isAtRange(iterator.aggressor, range))
             {
@@ -1593,7 +1593,7 @@ void Character::kill()
     this->actionQueue.clear();
     this->setAction(std::make_shared<GeneralAction>(this));
     // Reset the list of opponents.
-    this->opponents.resetList();
+    this->aggressionList.resetList();
     // Remove the character from the current room.
     if (room != nullptr)
     {

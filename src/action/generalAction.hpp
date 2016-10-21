@@ -21,7 +21,7 @@
 #include "production.hpp"
 #include "building.hpp"
 #include "defines.hpp"
-#include "opponent.hpp"
+#include "aggressionList.hpp"
 #include "item.hpp"
 
 #include <memory>

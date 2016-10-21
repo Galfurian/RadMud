@@ -112,13 +112,13 @@ void DoKill(Character * character, ArgumentHandler & args)
     if (character->getAction()->getType() == ActionType::Combat)
     {
         // Check if the character is trying to attack a target with which is not in combat.
-        if (!character->opponents.hasOpponent(target))
+        if (!character->aggressionList.hasOpponent(target))
         {
             character->sendMsg("You have already your share of troubles!\n");
             return;
         }
         // Set the target as a top aggro.
-        if (character->opponents.moveToTopAggro(target))
+        if (character->aggressionList.moveToTopAggro(target))
         {
             character->sendMsg("You focus your attacks on %s!\n", target->getName());
         }
@@ -131,16 +131,16 @@ void DoKill(Character * character, ArgumentHandler & args)
     else if ((character->getAction()->getType() != ActionType::Combat)
              && (target->getAction()->getType() == ActionType::Combat))
     {
-        // Set the opponents.
-        if (!character->opponents.addOpponent(target))
+        // Set the aggressionList.
+        if (!character->aggressionList.addOpponent(target))
         {
             character->sendMsg("You are already fighting againts %s.\n", target->getName());
             return;
         }
-        if (!target->opponents.addOpponent(character))
+        if (!target->aggressionList.addOpponent(character))
         {
             character->sendMsg("You were not ablet to attack %s.\n", target->getName());
-            character->opponents.remOpponent(target);
+            character->aggressionList.remOpponent(target);
             return;
         }
         // Notify the character.
@@ -157,23 +157,23 @@ void DoKill(Character * character, ArgumentHandler & args)
         if (!character->setNextCombatAction(CombatActionType::BasicMeleeAttack))
         {
             character->sendMsg("You were not ablet to attack %s.\n", target->getName());
-            character->opponents.remOpponent(target);
-            target->opponents.remOpponent(character);
+            character->aggressionList.remOpponent(target);
+            target->aggressionList.remOpponent(character);
             return;
         }
     }
     else
     {
-        // Set the opponents.
-        if (!character->opponents.addOpponent(target))
+        // Set the aggressionList.
+        if (!character->aggressionList.addOpponent(target))
         {
             character->sendMsg("You are already fighting againts %s.\n", target->getName());
             return;
         }
-        if (!target->opponents.addOpponent(character))
+        if (!target->aggressionList.addOpponent(character))
         {
             character->sendMsg("You were not ablet to attack %s.\n", target->getName());
-            character->opponents.remOpponent(target);
+            character->aggressionList.remOpponent(target);
             return;
         }
         // Notify the character.
@@ -191,15 +191,15 @@ void DoKill(Character * character, ArgumentHandler & args)
         if (!character->setNextCombatAction(CombatActionType::BasicMeleeAttack))
         {
             character->sendMsg("You were not ablet to attack %s.\n", target->getName());
-            character->opponents.remOpponent(target);
-            target->opponents.remOpponent(character);
+            character->aggressionList.remOpponent(target);
+            target->aggressionList.remOpponent(character);
             return;
         }
         if (!target->setNextCombatAction(CombatActionType::BasicMeleeAttack))
         {
             character->sendMsg("You were not ablet to attack %s.\n", target->getName());
-            character->opponents.remOpponent(target);
-            target->opponents.remOpponent(character);
+            character->aggressionList.remOpponent(target);
+            target->aggressionList.remOpponent(character);
             return;
         }
     }

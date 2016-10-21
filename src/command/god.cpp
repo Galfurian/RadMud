@@ -1495,7 +1495,7 @@ void DoAggroList(Character * character, ArgumentHandler & args)
             return;
         }
     }
-    for (auto aggressor : targer->opponents)
+    for (auto aggressor : targer->aggressionList)
     {
         if (aggressor.aggressor != nullptr)
         {
