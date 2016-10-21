@@ -21,7 +21,6 @@
 #include <string>
 
 /// @brief Holds details about a writing.
-
 class Writing
 {
 public:

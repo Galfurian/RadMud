@@ -47,15 +47,4 @@ public:
     std::string stop() override;
 
     ActionStatus perform() override;
-
-private:
-    /// @brief Checks the item tha has to be loaded.
-    /// @return <b>True</b> if the item is available,<br>
-    ///         <b>False</b> otherwise.
-    bool checkItem() const;
-
-    /// @brief Checks the projectile.
-    /// @return <b>True</b> if the projectile is available,<br>
-    ///         <b>False</b> otherwise.
-    bool checkProjectile() const;
 };

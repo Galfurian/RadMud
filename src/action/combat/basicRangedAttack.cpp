@@ -281,12 +281,6 @@ ActionStatus BasicRangedAttack::perform()
             }
         }
     }
-    return this->performDefault();
-}
-
-
-ActionStatus BasicRangedAttack::performDefault()
-{
     // By default set the next combat action to basic attack.
     if (!actor->setNextCombatAction(CombatActionType::BasicRangedAttack))
     {

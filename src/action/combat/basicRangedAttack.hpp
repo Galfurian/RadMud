@@ -42,9 +42,11 @@ public:
 
     ActionStatus perform() override;
 
-    ActionStatus performDefault();
-
     CombatActionType getCombatActionType() const override;
 
+    /// @brief Returns the stamina required to execute the action.
+    /// @param character The actor.
+    /// @param weapon    The weapon used to performe the action.
+    /// @return The required stamina.
     static unsigned int getConsumedStamina(Character * character, RangedWeaponItem * weapon);
 };

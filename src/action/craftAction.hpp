@@ -65,5 +65,8 @@ public:
 
     ActionStatus perform() override;
 
+    /// @brief Returns the stamina required to execute the action.
+    /// @param character The actor.
+    /// @return The required stamina.
     static unsigned int getConsumedStamina(Character * character);
 };

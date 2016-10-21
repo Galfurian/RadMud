@@ -20,6 +20,7 @@
 
 #include "item.hpp"
 
+/// @brief Factory for items.
 class ItemFactory
 {
 public:

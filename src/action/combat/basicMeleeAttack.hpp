@@ -44,5 +44,9 @@ public:
 
     CombatActionType getCombatActionType() const override;
 
+    /// @brief Returns the stamina required to execute the action.
+    /// @param character The actor.
+    /// @param weapon    The weapon used to performe the action.
+    /// @return The required stamina.
     unsigned int getConsumedStamina(Character * character, MeleeWeaponItem * weapon);
 };

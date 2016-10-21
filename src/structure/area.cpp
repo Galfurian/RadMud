@@ -555,31 +555,6 @@ bool Area::los(const Coordinates & source, const Coordinates & target, const uns
     return false;
 }
 
-bool Area::isDiagonal(const Coordinates & source, const Coordinates & target)
-{
-    Coordinates north(source.x, source.y + 1, source.z);
-    Coordinates south(source.x, source.y - 1, source.z);
-    Coordinates west(source.x - 1, source.y, source.z);
-    Coordinates east(source.x + 1, source.y, source.z);
-    if ((source.x == (target.x - 1)) && (source.y == (target.y - 1)))
-    {
-        return (!this->isValid(north) && !this->isValid(east));
-    }
-    if ((source.x == (target.x - 1)) && (source.y == (target.y + 1)))
-    {
-        return (!this->isValid(south) && !this->isValid(east));
-    }
-    if ((source.x == (target.x + 1)) && (source.y == (target.y - 1)))
-    {
-        return (!this->isValid(west) && !this->isValid(south));
-    }
-    if ((source.x == (target.x + 1)) && (source.y == (target.y + 1)))
-    {
-        return (!this->isValid(west) && !this->isValid(north));
-    }
-    return false;
-}
-
 void Area::luaRegister(lua_State * L)
 {
     luabridge::getGlobalNamespace(L)
