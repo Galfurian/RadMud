@@ -17,7 +17,7 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "corpseModel.hpp"
-
+#include "itemFactory.hpp"
 #include "mud.hpp"
 
 CorpseModel::CorpseModel()
@@ -79,7 +79,7 @@ Item * CorpseModel::createCorpse(
     const double & weight)
 {
     // Instantiate the new item.
-    Item * newItem = GenerateItem(this->getType());
+    auto newItem = ItemFactory::newItem(this->getType());
     if (newItem == nullptr)
     {
         Logger::log(LogLevel::Error, "Cannot create the new item.");

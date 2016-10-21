@@ -39,6 +39,8 @@
 #include "magazineModel.hpp"
 #include "meleeWeaponModel.hpp"
 
+#include "itemFactory.hpp"
+
 ItemModel::ItemModel() :
     vnum(),
     name(),
@@ -111,7 +113,7 @@ Item * ItemModel::createItem(
     }
 
     // Instantiate the new item.
-    Item * newItem = GenerateItem(this->getType());
+    auto newItem = ItemFactory::newItem(this->getType());
     if (newItem == nullptr)
     {
         Logger::log(LogLevel::Error, "Cannot create the new item.");
@@ -422,34 +424,6 @@ RangedWeaponModel * ItemModel::toRangedWeapon()
 MagazineModel * ItemModel::toMagazine()
 {
     return static_cast<MagazineModel *>(this);
-}
-
-ItemModel * GenerateModel(const ModelType & type)
-{
-    if (type == ModelType::Corpse) return new CorpseModel();
-    if (type == ModelType::MeleeWeapon) return new MeleeWeaponModel();
-    if (type == ModelType::RangedWeapon) return new RangedWeaponModel();
-    if (type == ModelType::Armor) return new ArmorModel();
-    if (type == ModelType::Book) return new BookModel();
-    if (type == ModelType::Container) return new ContainerModel();
-    if (type == ModelType::Currency) return new CurrencyModel();
-    if (type == ModelType::Food) return new FoodModel();
-    if (type == ModelType::Furniture) return new FurnitureModel();
-    if (type == ModelType::Key) return new KeyModel();
-    if (type == ModelType::Light) return new LightModel();
-    if (type == ModelType::LiquidContainer) return new LiquidContainerModel();
-    if (type == ModelType::Mechanism) return new MechanismModel();
-    if (type == ModelType::Node) return new NodeModel();
-    if (type == ModelType::Projectile) return new ProjectileModel();
-    if (type == ModelType::Resource) return new ResourceModel();
-    if (type == ModelType::Rope) return new RopeModel();
-    if (type == ModelType::Seed) return new SeedModel();
-    if (type == ModelType::Shield) return new ShieldModel();
-    if (type == ModelType::Shop) return new ShopModel();
-    if (type == ModelType::Tool) return new ToolModel();
-    if (type == ModelType::Vehicle) return new VehicleModel();
-    if (type == ModelType::Magazine) return new MagazineModel();
-    return nullptr;
 }
 
 std::string GetModelFlagString(unsigned int flags)

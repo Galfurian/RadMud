@@ -20,6 +20,8 @@
 #include "mud.hpp"
 #include "currencyModel.hpp"
 #include "shopItem.hpp"
+#include "modelFactory.hpp"
+#include "itemFactory.hpp"
 
 bool LoadBadName(ResultSet * result)
 {
@@ -127,7 +129,7 @@ bool LoadItem(ResultSet * result)
             return false;
         }
         // Set the item values.
-        Item * item = GenerateItem(itemModel->getType());
+        auto item = ItemFactory::newItem(itemModel->getType());
         item->vnum = itemVnum;
         item->model = itemModel;
         item->quantity = itemQuantity;
@@ -234,7 +236,7 @@ bool LoadModel(ResultSet * result)
         int vnum = result->getNextInteger();
         ModelType type = static_cast<ModelType>(result->getNextInteger());
         // Create a pointer to the new item model.
-        ItemModel * itemModel = GenerateModel(type);
+        ItemModel * itemModel = ModelFactory::newModel(type);
         if (itemModel == nullptr)
         {
             Logger::log(LogLevel::Error, "Wrong type of model %s.", ToString(vnum));

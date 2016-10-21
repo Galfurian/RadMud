@@ -899,16 +899,3 @@ bool Item::operator<(Item & rhs) const
     Logger::log(LogLevel::Debug, "%s < %s", ToString(this->vnum), ToString(rhs.vnum));
     return getName() < rhs.getName();
 }
-
-Item * GenerateItem(const ModelType & type)
-{
-    if (type == ModelType::NoType) return nullptr;
-    if (type == ModelType::Armor) return new ArmorItem();
-    if (type == ModelType::Shop) return new ShopItem();
-    if (type == ModelType::MeleeWeapon) return new MeleeWeaponItem();
-    if (type == ModelType::RangedWeapon) return new RangedWeaponItem();
-    if (type == ModelType::Currency) return new CurrencyItem();
-    if (type == ModelType::Corpse) return new CorpseItem();
-    if (type == ModelType::Magazine) return new MagazineItem();
-    return new Item();
-}

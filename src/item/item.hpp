@@ -324,8 +324,3 @@ public:
     /// @brief Operator used to order the items based on their name.
     bool operator<(Item & rhs) const;
 };
-
-/// @brief Function which instantiate the item of the same type of the passed model.
-/// @param type The type of item.
-/// @return the generated item.
-Item * GenerateItem(const ModelType & type);

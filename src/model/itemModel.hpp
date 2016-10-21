@@ -323,9 +323,6 @@ public:
     MagazineModel * toMagazine();
 };
 
-/// Generates a new model based on the provided type.
-ItemModel * GenerateModel(const ModelType & type);
-
 /// @defgroup FlagsToList Flags to List of Strings.
 /// @brief All the functions necessary to transform into a list of string a pool of flags.
 /// @{
