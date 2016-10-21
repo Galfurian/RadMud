@@ -25,23 +25,3 @@ Aggression::Aggression(Character * _aggressor, unsigned int _aggression) :
 {
     // Nothing to do.
 }
-
-bool Aggression::operator>(const Aggression & source) const
-{
-    return this->aggression > source.aggression;
-}
-
-bool Aggression::operator<(const Aggression & source) const
-{
-    return this->aggression < source.aggression;
-}
-
-bool Aggression::operator==(const Aggression & source) const
-{
-    return this->aggressor->name == source.aggressor->name;
-}
-
-bool Aggression::operator==(const Character * source) const
-{
-    return this->aggressor->name == source->name;
-}

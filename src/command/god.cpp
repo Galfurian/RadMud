@@ -1497,12 +1497,12 @@ void DoAggroList(Character * character, ArgumentHandler & args)
     }
     for (auto aggressor : targer->aggressionList)
     {
-        if (aggressor.aggressor != nullptr)
+        if (aggressor->aggressor != nullptr)
         {
             character->sendMsg(
                 "%s\t%s",
-                ToString(aggressor.aggression),
-                aggressor.aggressor->getNameCapital());
+                ToString(aggressor->aggression),
+                aggressor->aggressor->getNameCapital());
         }
     }
 }
@@ -1541,7 +1541,7 @@ void DoItemList(Character * character, ArgumentHandler & /*args*/)
     table.addColumn("Location", StringAlign::Left);
     for (auto iterator : Mud::instance().mudItems)
     {
-        Item * item = iterator.second;
+        auto item = iterator.second;
         // Prepare the row.
         TableRow row;
         row.push_back(ToString(item->vnum));

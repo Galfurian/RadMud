@@ -31,16 +31,4 @@ public:
 
     /// @brief Constructor.
     Aggression(Character * _aggressor, unsigned int _aggression);
-
-    /// @brief Operator used to order the aggressors based on the level of aggression.
-    bool operator>(const Aggression & source) const;
-
-    /// @brief Operator used to order the aggressors based on the level of aggression.
-    bool operator<(const Aggression & source) const;
-
-    /// @brief Operator used to order the aggressors based on the level of aggression.
-    bool operator==(const Aggression & source) const;
-
-    /// @brief Operator used to order the aggressors based on the level of aggression.
-    bool operator==(const Character * source) const;
 };

@@ -1430,9 +1430,9 @@ Character * Character::getNextOpponentAtRange(const unsigned int & range)
     {
         for (auto iterator : aggressionList.aggressionList)
         {
-            if (this->isAtRange(iterator.aggressor, range))
+            if (this->isAtRange(iterator->aggressor, range))
             {
-                return iterator.aggressor;
+                return iterator->aggressor;
             }
         }
     }

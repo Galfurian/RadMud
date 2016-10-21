@@ -37,15 +37,18 @@ AggressionList::~AggressionList()
 bool AggressionList::addOpponent(Character * character, unsigned int initAggro)
 {
     bool ret = false;
-    auto iterator = std::find(aggressionList.begin(), aggressionList.end(), character);
-    if (iterator == aggressionList.end())
+    auto it = std::find_if(aggressionList.begin(), aggressionList.end(), [&](std::shared_ptr<Aggression> const & p)
+    {
+        return p->aggressor->name == character->name;
+    });
+    if (it == aggressionList.end())
     {
         if (initAggro == 0)
         {
             initAggro = this->getInitialAggro(character);
         }
         // Add the aggressor.
-        aggressionList.push_back(Aggression(character, initAggro));
+        aggressionList.push_back(std::make_shared<Aggression>(character, initAggro));
         // Sort the list.
         this->sortList();
         // Set return value to success.
@@ -62,15 +65,18 @@ bool AggressionList::addOpponent(Character * character, unsigned int initAggro)
 
 bool AggressionList::remOpponent(Character * character)
 {
-    auto iterator = std::find(aggressionList.begin(), aggressionList.end(), character);
-    if (iterator != aggressionList.end())
+    auto it = std::find_if(aggressionList.begin(), aggressionList.end(), [&](std::shared_ptr<Aggression> const & p)
+    {
+        return p->aggressor->name == character->name;
+    });
+    if (it != aggressionList.end())
     {
         Logger::log(
             LogLevel::Debug,
             "%s disengage %s",
             owner->getNameCapital(),
             character->getName());
-        iterator = aggressionList.erase(iterator, aggressionList.end());
+        aggressionList.erase(it, aggressionList.end());
         return true;
     }
     return false;
@@ -81,7 +87,7 @@ bool AggressionList::hasOpponent(Character * character)
     bool ret = false;
     for (auto it : aggressionList)
     {
-        if (it == character)
+        if (it->aggressor == character)
         {
             ret = true;
             break;
@@ -98,11 +104,14 @@ bool AggressionList::hasOpponents() const
 bool AggressionList::setAggro(Character * character, unsigned int newAggression)
 {
     bool ret = false;
-    auto iterator = std::find(aggressionList.begin(), aggressionList.end(), character);
-    if (iterator != aggressionList.end())
+    auto it = std::find_if(aggressionList.begin(), aggressionList.end(), [&](std::shared_ptr<Aggression> const & p)
+    {
+        return p->aggressor->name == character->name;
+    });
+    if (it != aggressionList.end())
     {
         // Set the new aggro.
-        iterator->aggression = newAggression;
+        (*it)->aggression = newAggression;
         // Sort the list.
         this->sortList();
         // Set return value to success.
@@ -111,13 +120,13 @@ bool AggressionList::setAggro(Character * character, unsigned int newAggression)
     return ret;
 }
 
-Aggression * AggressionList::getTopAggro()
+std::shared_ptr<Aggression> AggressionList::getTopAggro()
 {
     if (aggressionList.empty())
     {
         return nullptr;
     }
-    return &(*aggressionList.begin());
+    return *(aggressionList.begin());
 }
 
 bool AggressionList::moveToTopAggro(Character * character)
@@ -127,7 +136,7 @@ bool AggressionList::moveToTopAggro(Character * character)
     {
         return false;
     }
-    Aggression * topAggressor = this->getTopAggro();
+    std::shared_ptr<Aggression> topAggressor = this->getTopAggro();
     if (topAggressor == nullptr)
     {
         return false;
@@ -142,9 +151,9 @@ bool AggressionList::moveToTopAggro(Character * character)
     unsigned int topAggro = currentAggro;
     for (auto it : this->aggressionList)
     {
-        if (it.aggression > topAggro)
+        if (it->aggression > topAggro)
         {
-            topAggro = it.aggression;
+            topAggro = it->aggression;
         }
     }
     // Just set the aggro of the character enough to be put on the first place.
@@ -166,9 +175,9 @@ unsigned int AggressionList::getAggro(Character * character)
     unsigned int ret = 0;
     for (auto it : aggressionList)
     {
-        if (it == character)
+        if (it->aggressor == character)
         {
-            ret = it.aggression;
+            ret = it->aggression;
             break;
         }
     }
@@ -183,17 +192,17 @@ std::size_t AggressionList::getSize()
 void AggressionList::checkList()
 {
     auto temporaryList = aggressionList;
-    for (AggressorVector::iterator it = temporaryList.begin(); it != temporaryList.end(); ++it)
+    for (auto it = temporaryList.begin(); it != temporaryList.end(); ++it)
     {
         // Check if the aggressor is null.
-        if (it->aggressor == nullptr)
+        if ((*it)->aggressor == nullptr)
         {
-            this->remOpponent(it->aggressor);
+            this->remOpponent((*it)->aggressor);
         }
             // Check if the aggressor is nowhere.
-        else if (it->aggressor->room == nullptr)
+        else if ((*it)->aggressor->room == nullptr)
         {
-            this->remOpponent(it->aggressor);
+            this->remOpponent((*it)->aggressor);
         }
     }
 }
@@ -201,29 +210,29 @@ void AggressionList::checkList()
 void AggressionList::resetList()
 {
     auto temporaryList = aggressionList;
-    for (AggressorVector::iterator it = temporaryList.begin(); it != temporaryList.end(); ++it)
+    for (auto it = temporaryList.begin(); it != temporaryList.end(); ++it)
     {
         // Check if the aggressor is null.
-        if (it->aggressor == nullptr)
+        if ((*it)->aggressor == nullptr)
         {
             continue;
         }
         // Remove the owner from its list.
-        if (!it->aggressor->aggressionList.remOpponent(owner))
+        if (!(*it)->aggressor->aggressionList.remOpponent(owner))
         {
             Logger::log(
                 LogLevel::Error,
                 "Could not remove %s from opponents of %s.",
                 owner->getName(),
-                it->aggressor->getName());
+                (*it)->aggressor->getName());
         }
         // Remove from this list the opponent.
-        if (!this->remOpponent(it->aggressor))
+        if (!this->remOpponent((*it)->aggressor))
         {
             Logger::log(
                 LogLevel::Error,
                 "Could not remove %s from opponents of %s.",
-                it->aggressor->getName(),
+                (*it)->aggressor->getName(),
                 owner->getName());
         }
     }
@@ -241,7 +250,9 @@ AggressionList::iterator AggressionList::end()
 
 void AggressionList::sortList()
 {
-    std::sort(aggressionList.begin(), aggressionList.end(), std::greater<Aggression>());
+    std::sort(aggressionList.begin(), aggressionList.end(),
+              [](std::shared_ptr<Aggression> a, std::shared_ptr<Aggression> b)
+              { return a->aggression > b->aggression; });
 }
 
 void AggressionList::printList()
@@ -249,6 +260,6 @@ void AggressionList::printList()
     std::cout << "Aggro List:" << std::endl;
     for (auto it : aggressionList)
     {
-        std::cout << "  [" + it.aggressor->name + "] " + ToString(it.aggression) << std::endl;
+        std::cout << "  [" + (*it).aggressor->name + "] " + ToString((*it).aggression) << std::endl;
     }
 }

@@ -23,6 +23,7 @@
 #include <set>
 #include <vector>
 #include <string>
+#include <memory>
 
 /// @brief Data structure used to store an ordered list of opponents during a combat.
 class AggressionList
@@ -31,11 +32,11 @@ class AggressionList
 
 public:
     /// Type of structure which contains aggressors.
-    using AggressorVector = typename std::vector<Aggression>;
+    using AggressorVector = typename std::vector<std::shared_ptr<Aggression> >;
     /// Iterator for an aggressor vector.
-    using iterator  = typename std::vector<Aggression>::iterator;
+    using iterator  = typename std::vector<std::shared_ptr<Aggression> >::iterator;
     /// Constant iterator for an aggressor vector.
-    using const_iterator = typename std::vector<Aggression>::const_iterator;
+    using const_iterator = typename std::vector<std::shared_ptr<Aggression> >::const_iterator;
 private:
     /// Owner of the list.
     Character * owner;
@@ -82,7 +83,7 @@ public:
 
     /// @brief Returns the current top aggressor.
     /// @return The top aggressor.
-    Aggression * getTopAggro();
+    std::shared_ptr<Aggression> getTopAggro();
 
     /// @brief Allows to elect the given character as the opponent with
     ///         the top level of aggro.
