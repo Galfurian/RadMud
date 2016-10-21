@@ -590,11 +590,11 @@ public:
     /// @brief Operator used to order the character based on their name.
     bool operator==(const class Character & source) const;
 
-    /// @brief Send a message to the character.
+    /// @brief Sends a message to the character.
     /// @param msg Message to send.
     virtual void sendMsg(const std::string & msg);
 
-    /// @brief Print to consol and to logging file the gievn string.
+    /// @brief Sends a message to the character.
     /// @param msg   The message to send
     /// @param first The first unpacked argument.
     /// @param args  Packed arguments.
@@ -612,6 +612,13 @@ public:
             working.replace(pos, 2, first);
             sendMsg(working, args ...);
         }
+    }
+
+    /// @brief Sends a message to the character. This one in particular handles unsigned integer.
+    template<typename ... Args>
+    void sendMsg(const std::string & msg, const unsigned int & first, const Args & ... args)
+    {
+        this->sendMsg(msg, ToString(first), args ...);
     }
 };
 

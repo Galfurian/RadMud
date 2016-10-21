@@ -81,7 +81,7 @@ void Room::addItem(Item *& item, bool updateDB)
     // Set the room attribute of the item.
     item->room = this;
     // Update the database.
-    if (updateDB)
+    if (updateDB && (item->getType() != ModelType::Corpse))
     {
         SQLiteDbms::instance().insertInto(
             "ItemRoom",
@@ -120,7 +120,7 @@ bool Room::removeItem(Item * item, bool updateDB)
     {
         item->room = nullptr;
         // Update the database.
-        if (updateDB)
+        if (updateDB && (item->getType() != ModelType::Corpse))
         {
             SQLiteDbms::instance().deleteFrom(
                 "ItemRoom",

@@ -234,17 +234,14 @@ public:
     /// @param exceptions The list of exceptions.
     void sendToAll(const std::string & message, const std::vector<Character *> & exceptions);
 
-    /// @brief Print to consol and to logging file the gievn string.
+    /// @brief Sends a message to all the characters inside the room.
     /// @param message    The message to send.
     /// @param exceptions The list of exceptions.
     /// @param first The first unpacked argument.
     /// @param args  Packed arguments.
     template<typename ... Args>
-    void sendToAll(
-        const std::string & message,
-        const std::vector<Character *> & exceptions,
-        const std::string & first,
-        const Args & ... args)
+    void sendToAll(const std::string & message, const std::vector<Character *> & exceptions,
+                   const std::string & first, const Args & ... args)
     {
         std::string::size_type pos = message.find("%s");
         if (pos == std::string::npos)
@@ -257,6 +254,14 @@ public:
             working.replace(pos, 2, first);
             this->sendToAll(working, exceptions, args ...);
         }
+    }
+
+    /// @brief Sends a message to all the characters inside the room. This one in particular handles integers.
+    template<typename ... Args>
+    void sendToAll(const std::string & message, const std::vector<Character *> & exceptions,
+                   const unsigned int & first, const Args & ... args)
+    {
+        this->sendToAll(message, exceptions, ToString(first), args ...);
     }
 
     /// @brief Returns the list of available exits from the current room
