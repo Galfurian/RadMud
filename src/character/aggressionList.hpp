@@ -69,11 +69,6 @@ public:
     ///         <b>False</b> otherwise.
     bool hasOpponent(Character * character);
 
-    /// @brief Check if the list has some opponents.
-    /// @return <b>True</b> if there are opponents,<br>
-    ///         <b>False</b> otherwise.
-    bool hasOpponents() const;
-
     /// @brief Allows to the a new aggression level to the given opponent.
     /// @param character      The opponent
     /// @param newAggression The new aggression level.

@@ -529,7 +529,7 @@ bool Character::setNextCombatAction(const CombatActionType & nextAction)
     {
         if (nextAction == CombatActionType::BasicMeleeAttack)
         {
-            if (!aggressionList.hasOpponents())
+            if (aggressionList.empty())
             {
                 Logger::log(LogLevel::Error, "The list of opponents is empty.");
                 return false;
@@ -1426,7 +1426,7 @@ bool Character::isAtRange(Character * target, const unsigned int & range)
 
 Character * Character::getNextOpponentAtRange(const unsigned int & range)
 {
-    if (aggressionList.hasOpponents())
+    if (aggressionList.empty())
     {
         for (auto iterator : aggressionList.aggressionList)
         {

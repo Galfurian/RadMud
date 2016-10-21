@@ -36,12 +36,7 @@ AggressionList::~AggressionList()
 
 bool AggressionList::addOpponent(Character * character, unsigned int initAggro)
 {
-    bool ret = false;
-    auto it = std::find_if(aggressionList.begin(), aggressionList.end(), [&](std::shared_ptr<Aggression> const & p)
-    {
-        return p->aggressor->name == character->name;
-    });
-    if (it == aggressionList.end())
+    if (!this->hasOpponent(character))
     {
         if (initAggro == 0)
         {
@@ -51,31 +46,22 @@ bool AggressionList::addOpponent(Character * character, unsigned int initAggro)
         aggressionList.push_back(std::make_shared<Aggression>(character, initAggro));
         // Sort the list.
         this->sortList();
-        // Set return value to success.
-        ret = true;
-        Logger::log(
-            LogLevel::Debug,
-            "%s engage %s with %s.",
-            owner->getNameCapital(),
-            character->getName(),
-            ToString(initAggro));
+        Logger::log(LogLevel::Debug, "%s engage %s with %s.", owner->getNameCapital(), character->getName(), initAggro);
+        return true;
     }
-    return ret;
+    return false;
 }
 
 bool AggressionList::remOpponent(Character * character)
 {
-    auto it = std::find_if(aggressionList.begin(), aggressionList.end(), [&](std::shared_ptr<Aggression> const & p)
-    {
-        return p->aggressor->name == character->name;
-    });
+    auto it = std::find_if(aggressionList.begin(), aggressionList.end(),
+                           [&](std::shared_ptr<Aggression> const & element)
+                           {
+                               return element->aggressor->name == character->name;
+                           });
     if (it != aggressionList.end())
     {
-        Logger::log(
-            LogLevel::Debug,
-            "%s disengage %s",
-            owner->getNameCapital(),
-            character->getName());
+        Logger::log(LogLevel::Debug, "%s disengages %s", owner->getNameCapital(), character->getName());
         aggressionList.erase(it, aggressionList.end());
         return true;
     }
@@ -84,21 +70,11 @@ bool AggressionList::remOpponent(Character * character)
 
 bool AggressionList::hasOpponent(Character * character)
 {
-    bool ret = false;
-    for (auto it : aggressionList)
-    {
-        if (it->aggressor == character)
-        {
-            ret = true;
-            break;
-        }
-    }
-    return ret;
-}
-
-bool AggressionList::hasOpponents() const
-{
-    return !aggressionList.empty();
+    return std::find_if(aggressionList.begin(), aggressionList.end(),
+                        [&](std::shared_ptr<Aggression> const & element)
+                        {
+                            return element->aggressor->name == character->name;
+                        }) != aggressionList.end();
 }
 
 bool AggressionList::setAggro(Character * character, unsigned int newAggression)
@@ -136,7 +112,7 @@ bool AggressionList::moveToTopAggro(Character * character)
     {
         return false;
     }
-    std::shared_ptr<Aggression> topAggressor = this->getTopAggro();
+    auto topAggressor = this->getTopAggro();
     if (topAggressor == nullptr)
     {
         return false;
@@ -147,9 +123,9 @@ bool AggressionList::moveToTopAggro(Character * character)
         return false;
     }
     // Retrieve the top aggro.
-    unsigned int currentAggro = this->getAggro(character);
-    unsigned int topAggro = currentAggro;
-    for (auto it : this->aggressionList)
+    auto currentAggro = this->getAggro(character);
+    auto topAggro = currentAggro;
+    for (auto it : aggressionList)
     {
         if (it->aggression > topAggro)
         {
@@ -172,21 +148,19 @@ unsigned int AggressionList::getInitialAggro(Character * character)
 
 unsigned int AggressionList::getAggro(Character * character)
 {
-    unsigned int ret = 0;
     for (auto it : aggressionList)
     {
         if (it->aggressor == character)
         {
-            ret = it->aggression;
-            break;
+            return it->aggression;
         }
     }
-    return ret;
+    return 0;
 }
 
 std::size_t AggressionList::getSize()
 {
-    return this->aggressionList.size();
+    return aggressionList.size();
 }
 
 bool AggressionList::empty()
@@ -225,32 +199,26 @@ void AggressionList::resetList()
         // Remove the owner from its list.
         if (!(*it)->aggressor->aggressionList.remOpponent(owner))
         {
-            Logger::log(
-                LogLevel::Error,
-                "Could not remove %s from opponents of %s.",
-                owner->getName(),
-                (*it)->aggressor->getName());
+            Logger::log(LogLevel::Error, "Could not remove %s from opponents of %s.",
+                        owner->getName(), (*it)->aggressor->getName());
         }
         // Remove from this list the opponent.
         if (!this->remOpponent((*it)->aggressor))
         {
-            Logger::log(
-                LogLevel::Error,
-                "Could not remove %s from opponents of %s.",
-                (*it)->aggressor->getName(),
-                owner->getName());
+            Logger::log(LogLevel::Error, "Could not remove %s from opponents of %s.",
+                        (*it)->aggressor->getName(), owner->getName());
         }
     }
 }
 
 AggressionList::iterator AggressionList::begin()
 {
-    return this->aggressionList.begin();
+    return aggressionList.begin();
 }
 
 AggressionList::iterator AggressionList::end()
 {
-    return this->aggressionList.end();
+    return aggressionList.end();
 }
 
 void AggressionList::sortList()

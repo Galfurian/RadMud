@@ -207,7 +207,7 @@ ActionStatus BasicMeleeAttack::perform()
         actor->sendMsg(this->stop() + "\n\n");
         return ActionStatus::Finished;
     }
-    if (!actor->aggressionList.hasOpponents())
+    if (actor->aggressionList.empty())
     {
         actor->sendMsg(this->stop() + "\n\n");
         return ActionStatus::Finished;
