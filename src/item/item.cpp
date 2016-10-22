@@ -422,7 +422,7 @@ std::string Item::getLook()
     output += Formatter::gray() + this->getDescription() + Formatter::reset() + "\n";
     // Print the content.
     output += this->lookContent();
-    if (this->quantity != 1)
+    if (this->quantity > 1)
     {
         output += this->getNameCapital(true) + " weights about ";
         output += Formatter::yellow() + ToString(this->getWeight(false)) + Formatter::reset();
