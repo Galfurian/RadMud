@@ -49,4 +49,12 @@ public:
     /// @param weapon    The weapon used to performe the action.
     /// @return The required stamina.
     unsigned int getConsumedStamina(Character * character, MeleeWeaponItem * weapon);
+
+private:
+    void performAttack(Character * target,
+                       const std::string & weaponName,
+                       unsigned int & attack,
+                       unsigned int & damage,
+                       const unsigned int & consumedStamina,
+                       const bool twoHanded) const;
 };
