@@ -57,4 +57,12 @@ public:
 
     /// @brief Given an action, it returns the stamina required to execute it.
     static unsigned int getConsumedStamina(const Character * character, const CharacterPosture & posture);
+
+    /// @brief Check if the character can move in the given direction.
+    /// @param character The character that wants to move.
+    /// @param direction The direction where the character whats to move.
+    /// @param error     A reference to a string which will contain error message in case of failure.
+    /// @return <b>True</b> if the character can move toward the given direction,<br>
+    ///         <b>False</b> otherwise.
+    static bool canMoveTo(Character * character, const Direction & direction, std::string & error);
 };

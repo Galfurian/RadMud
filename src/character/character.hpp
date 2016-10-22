@@ -22,11 +22,11 @@
 #pragma once
 
 #include "defines.hpp"
-#include "effect.hpp"
 #include "exit.hpp"
-#include "faction.hpp"
 #include "race.hpp"
 #include "item.hpp"
+#include "faction.hpp"
+#include "effectList.hpp"
 #include "combatAction.hpp"
 #include "argumentHandler.hpp"
 #include "characterContainer.hpp"
@@ -298,13 +298,6 @@ public:
     /// @brief Provides a pointer to the action at the front position and
     ///         then remove it from the queue.
     void popAction();
-
-    /// @brief Check if the character can move in the given direction.
-    /// @param direction The direction where to search the room.
-    /// @param error     A reference to a string which will contain error message in case of failure.
-    /// @return <b>True</b> if the operation goes well,<br>
-    ///         <b>False</b> otherwise.
-    bool canMoveTo(const Direction & direction, std::string & error) const;
 
     /// @brief Move the character to another room.
     /// @param destination Destination room.

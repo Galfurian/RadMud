@@ -1,7 +1,7 @@
-/// @file   modelFactory.hpp
-/// @brief  Define the factory for item models.
+/// @file   combatEffects.hpp
+/// @brief  Define the functions used for modeling combat effects.
 /// @author Enrico Fraccaroli
-/// @date   Oct 21 2016
+/// @date   Oct 22 2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission to use, copy, modify, and distribute this software for any
@@ -18,14 +18,6 @@
 
 #pragma once
 
-#include "itemModel.hpp"
+class Character;
 
-/// @brief Factory for items models.
-class ModelFactory
-{
-public:
-    /// @brief Generates a new model based on the provided type.
-    /// @param type The type of the new model.
-    /// @return Return an istantiation of a model of the given type.
-    static ItemModel * newModel(const ModelType & type);
-};
+void ClearTargets(Character * character);

@@ -1,7 +1,7 @@
-/// @file   effect.cpp
-/// @brief  Implement the effect class.
+/// @file   effectList.hpp
+/// @brief  Implements a container for effects.
 /// @author Enrico Fraccaroli
-/// @date   May 2 2016
+/// @date   Oct 22 2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission to use, copy, modify, and distribute this software for any
@@ -16,46 +16,19 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#include "effect.hpp"
+#include "effectList.hpp"
 
-Effect::Effect(
-    std::string _name,
-    int _expires,
-    std::string _messageActivate,
-    std::string _messageFade) :
-    name(_name),
-    expires(_expires),
-    messageActivate(_messageActivate),
-    messageExpire(_messageFade),
-    health(),
-    stamina(),
-    abilities(),
-    hit(),
-    damage()
-{
-    // Nothing to do.
-}
-
-bool Effect::update()
-{
-    expires--;
-    return expires <= 0;
-}
-
-bool Effect::operator<(const Effect & right) const
-{
-    return expires < right.expires;
-}
 
 EffectList::EffectList() :
     activeEffects(),
     pendingEffects()
 {
+    // Nothing to do.
 }
 
 EffectList::~EffectList()
 {
-
+    // Nothing to do.
 }
 
 int EffectList::getHealthMod() const
@@ -110,6 +83,11 @@ int EffectList::getAbilityModifier(const Ability & ability) const
         }
     }
     return result;
+}
+
+void EffectList::forceAddEffect(const Effect & effect)
+{
+    activeEffects.push_back(effect);
 }
 
 void EffectList::addPendingEffect(const Effect & effect)

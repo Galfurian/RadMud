@@ -29,7 +29,6 @@
 #include "armorItem.hpp"
 #include "meleeWeaponItem.hpp"
 #include "rangedWeaponItem.hpp"
-#include "moveAction.hpp"
 
 using namespace std::chrono;
 
@@ -288,17 +287,10 @@ unsigned int Character::getAbilityLog(
     const double & multiplier,
     const bool & withEffects) const
 {
-    double result = base;
-    double modifier = static_cast<double>(this->getAbilityModifier(ability, withEffects));
-    if (modifier > 0)
-    {
-        if (modifier > 25)
-        {
-            modifier = 25;
-        }
-        result += multiplier * log10(modifier);
-    }
-    return static_cast<unsigned int>(result);
+    auto mod = this->getAbilityModifier(ability, withEffects);
+    auto logMod = SafeLog10(mod);
+    Logger::log(LogLevel::Debug, "%s -log-> %s", mod, logMod);
+    return static_cast<unsigned int>(base + logMod * multiplier);
 }
 
 bool Character::setHealth(const unsigned int & value, const bool & force)
@@ -566,79 +558,6 @@ void Character::popAction()
     {
         this->actionQueue.pop_front();
     }
-}
-
-bool Character::canMoveTo(const Direction & direction, std::string & error) const
-{
-    if (this->getAction()->getType() == ActionType::Combat)
-    {
-        error = "You cannot move while fighting.";
-        return false;
-    }
-    // Check if the character is in a no-walk position.
-    if (posture == CharacterPosture::Rest || posture == CharacterPosture::Sit)
-    {
-        error = "You first need to stand up.";
-        return false;
-    }
-    // Find the exit to the destination.
-    std::shared_ptr<Exit> destExit = room->findExit(direction);
-    if (destExit == nullptr)
-    {
-        error = "You cannot go that way.";
-        return false;
-    }
-    // Check if the actor has enough stamina to execute the action.
-    if (MoveAction::getConsumedStamina(this, this->posture) > this->getStamina())
-    {
-        error = "You are too tired to move.\n";
-        return false;
-    }
-    // If the direction is upstairs, check if there is a stair.
-    if (direction == Direction::Up)
-    {
-        Logger::log(LogLevel::Debug, "Flags :" + ToString(destExit->flags));
-        if (!HasFlag(destExit->flags, ExitFlag::Stairs))
-        {
-            error = "You can't go upstairs, there are no stairs.";
-            return false;
-        }
-    }
-    // Check if the destination is correct.
-    if (destExit->destination == nullptr)
-    {
-        error = "That direction can't take you anywhere.";
-        return false;
-    }
-    // Check if the destination is bocked by a door.
-    auto door = destExit->destination->findDoor();
-    if (door != nullptr)
-    {
-        if (HasFlag(door->flags, ItemFlag::Closed))
-        {
-            error = "Maybe you have to open that door first.";
-            return false;
-        }
-    }
-    // Check if the destination has a floor.
-    std::shared_ptr<Exit> destDown = destExit->destination->findExit(Direction::Down);
-    if (destDown != nullptr)
-    {
-        if (!HasFlag(destDown->flags, ExitFlag::Stairs))
-        {
-            error = "Do you really want to fall in that pit?";
-            return false;
-        }
-    }
-    // Check if the destination is forbidden for mobiles.
-    if (this->isMobile())
-    {
-        if (HasFlag(destExit->flags, ExitFlag::NoMob))
-        {
-            return false;
-        }
-    }
-    return true;
 }
 
 void Character::moveTo(

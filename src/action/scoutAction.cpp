@@ -19,6 +19,7 @@
 #include "scoutAction.hpp"
 #include "room.hpp"
 #include "area.hpp"
+#include "effectFactory.hpp"
 
 ScoutAction::ScoutAction(Character * _actor, unsigned int _cooldown) :
     GeneralAction(_actor, std::chrono::system_clock::now() + std::chrono::seconds(_cooldown))
@@ -101,6 +102,8 @@ ActionStatus ScoutAction::perform()
     {
         actor->sendMsg("    %s\n", it->getName());
     }
+    // Add the effect.
+    actor->effects.forceAddEffect(EffectFactory::clearTargets(actor, 1));
     return ActionStatus::Finished;
 }
 

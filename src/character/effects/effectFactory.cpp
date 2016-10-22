@@ -1,7 +1,7 @@
-/// @file   modelFactory.hpp
-/// @brief  Define the factory for item models.
+/// @file   effectFactory.cpp
+/// @brief  Implements a factory of effects.
 /// @author Enrico Fraccaroli
-/// @date   Oct 21 2016
+/// @date   Oct 22 2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission to use, copy, modify, and distribute this software for any
@@ -16,16 +16,20 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#pragma once
+#include "effectFactory.hpp"
+#include "combatEffects.hpp"
 
-#include "itemModel.hpp"
-
-/// @brief Factory for items models.
-class ModelFactory
+Effect EffectFactory::clearTargets(Character * actor, const int & lastingTime)
 {
-public:
-    /// @brief Generates a new model based on the provided type.
-    /// @param type The type of the new model.
-    /// @return Return an istantiation of a model of the given type.
-    static ItemModel * newModel(const ModelType & type);
-};
+    return Effect(actor,
+                  "ClearTargets",
+                  lastingTime,
+                  "",
+                  "",
+                  ClearTargets,
+                  0,
+                  0,
+                  std::map<Ability, int>(),
+                  0,
+                  0);
+}

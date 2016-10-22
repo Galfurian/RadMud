@@ -1,7 +1,7 @@
-/// @file   effect.hpp
-/// @brief  Define the effect class.
+/// @file   effectList.hpp
+/// @brief  Define a container for effects.
 /// @author Enrico Fraccaroli
-/// @date   May 2 2016
+/// @date   Oct 22 2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission to use, copy, modify, and distribute this software for any
@@ -18,47 +18,7 @@
 
 #pragma once
 
-#include "defines.hpp"
-#include "utils.hpp"
-
-/// @brief Allows to define an effect which can alter the status of a character.
-class Effect
-{
-public:
-    /// Name of the modifier.
-    std::string name;
-    /// How many tic until it expires.
-    int expires;
-    /// Message to show when the effect begins.
-    std::string messageActivate;
-    /// Message to show when the effect ends.
-    std::string messageExpire;
-    /// Health modifier.
-    int health;
-    /// Stamina modifier.
-    int stamina;
-    /// Abilities modifier.
-    std::map<Ability, int> abilities;
-    /// Hit chance modifier.
-    int hit;
-    /// Damage modifier.
-    int damage;
-
-    /// @brief Constructor.
-    Effect(
-        std::string _name,
-        int _expires,
-        std::string _messageActivate,
-        std::string _messageFade);
-
-    /// @brief Update the cooldown of the effect.
-    /// @return <b>True</b> if the effect is expired,<br>
-    ///         <b>False</b> otherwise.
-    bool update();
-
-    /// @brief Operator used to order the effect based on the remaining time.
-    bool operator<(const Effect & right) const;
-};
+#include "effect.hpp"
 
 /// @brief A class which allows to manage a buffer of Active and Pending effects.
 class EffectList
@@ -104,6 +64,10 @@ public:
     /// @param ability The ability.
     /// @return The total modifier.
     int getAbilityModifier(const Ability & ability) const;
+
+    /// @brief Allows to add an effect.
+    /// @param effect The effect that has to be added.
+    void forceAddEffect(const Effect & effect);
 
     /// @brief Allows to add an effect to the buffer of pending effects.
     /// @param effect The one which has to be added to the buffer.

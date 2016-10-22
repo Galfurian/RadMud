@@ -159,7 +159,7 @@ void DoDirection(Character * character, Direction direction)
     // Check if the player it's already doing something.
     StopAction(character);
     std::string error;
-    if (!character->canMoveTo(direction, error))
+    if (!MoveAction::canMoveTo(character, direction, error))
     {
         character->sendMsg(error + "\n");
         return;
@@ -535,31 +535,20 @@ void DoTime(Character * character, ArgumentHandler & /*args*/)
 {
     if (MudUpdater::instance().getDayPhase() == DayPhase::Morning)
     {
-        character->sendMsg(
-            "%sThe sun has just risen.%s\n",
-            Formatter::yellow(),
-            Formatter::reset());
+        character->sendMsg("%sThe sun has just risen.%s\n", Formatter::yellow(), Formatter::reset());
     }
     else if (MudUpdater::instance().getDayPhase() == DayPhase::Day)
     {
-        character->sendMsg(
-            "%sThe sun is high in the sky.%s\n",
-            Formatter::yellow(),
-            Formatter::reset());
+        character->sendMsg("%sThe sun is high in the sky.%s\n", Formatter::yellow(), Formatter::reset());
     }
     else if (MudUpdater::instance().getDayPhase() == DayPhase::Dusk)
     {
-        character->sendMsg(
-            "%sThe sun is setting, the shadows begin to prevail.%s\n",
-            Formatter::cyan(),
-            Formatter::reset());
+        character->sendMsg("%sThe sun is setting, the shadows begin to prevail.%s\n",
+                           Formatter::cyan(), Formatter::reset());
     }
     else if (MudUpdater::instance().getDayPhase() == DayPhase::Night)
     {
-        character->sendMsg(
-            "%sThe darkness surrounds you.%s\n",
-            Formatter::blue(),
-            Formatter::reset());
+        character->sendMsg("%sThe darkness surrounds you.%s\n", Formatter::blue(), Formatter::reset());
     }
 }
 

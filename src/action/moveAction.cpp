@@ -18,6 +18,7 @@
 
 #include "moveAction.hpp"
 #include "character.hpp"
+#include "room.hpp"
 
 using namespace std::chrono;
 
@@ -87,7 +88,7 @@ ActionStatus MoveAction::perform()
         actor->sendMsg(error + "\n\n");
         return ActionStatus::Error;
     }
-    if (!actor->canMoveTo(direction, error))
+    if (!MoveAction::canMoveTo(actor, direction, error))
     {
         // Notify that the actor can't move because too tired.
         actor->sendMsg(error + "\n");
@@ -101,7 +102,7 @@ ActionStatus MoveAction::perform()
     actor->moveTo(
         destination,
         actor->getNameCapital() + " goes " + direction.toString() + ".\n",
-        actor->getNameCapital() + " arives from " + direction.getOpposite().toString() + ".\n");
+        actor->getNameCapital() + " arrives from " + direction.getOpposite().toString() + ".\n");
     return ActionStatus::Finished;
 }
 
@@ -124,4 +125,73 @@ unsigned int MoveAction::getConsumedStamina(const Character * character, const C
                                       - character->getAbilityLog(Ability::Strength, 0.0, 1.0)
                                       + SafeLog10(character->weight)
                                       + SafeLog10(character->getCarryingWeight())) * multiplier);
+}
+
+bool MoveAction::canMoveTo(Character * character, const Direction & direction, std::string & error)
+{
+    if (character->getAction()->getType() == ActionType::Combat)
+    {
+        error = "You cannot move while fighting.";
+        return false;
+    }
+    // Check if the character is in a no-walk position.
+    if (character->posture == CharacterPosture::Rest || character->posture == CharacterPosture::Sit)
+    {
+        error = "You first need to stand up.";
+        return false;
+    }
+    // Find the exit to the destination.
+    auto destExit = character->room->findExit(direction);
+    if (destExit == nullptr)
+    {
+        error = "You cannot go that way.";
+        return false;
+    }
+    // Check if the actor has enough stamina to execute the action.
+    if (MoveAction::getConsumedStamina(character, character->posture) > character->getStamina())
+    {
+        error = "You are too tired to move.\n";
+        return false;
+    }
+    // If the direction is upstairs, check if there is a stair.
+    if (direction == Direction::Up)
+    {
+        if (!HasFlag(destExit->flags, ExitFlag::Stairs))
+        {
+            error = "You can't go upstairs, there are no stairs.";
+            return false;
+        }
+    }
+    // Check if the destination is correct.
+    if (destExit->destination == nullptr)
+    {
+        error = "That direction can't take you anywhere.";
+        return false;
+    }
+    // Check if the destination is bocked by a door.
+    auto door = destExit->destination->findDoor();
+    if (door != nullptr)
+    {
+        if (HasFlag(door->flags, ItemFlag::Closed))
+        {
+            error = "Maybe you have to open that door first.";
+            return false;
+        }
+    }
+    // Check if the destination has a floor.
+    std::shared_ptr<Exit> destDown = destExit->destination->findExit(Direction::Down);
+    if (destDown != nullptr)
+    {
+        if (!HasFlag(destDown->flags, ExitFlag::Stairs))
+        {
+            error = "Do you really want to fall in that pit?";
+            return false;
+        }
+    }
+    // Check if the destination is forbidden for mobiles.
+    if (character->isMobile() && HasFlag(destExit->flags, ExitFlag::NoMob))
+    {
+        return false;
+    }
+    return true;
 }
