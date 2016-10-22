@@ -93,7 +93,7 @@ void EffectList::forceAddEffect(const Effect & effect)
 void EffectList::addPendingEffect(const Effect & effect)
 {
     bool present = false;
-    for (auto iterator : pendingEffects)
+    for (auto & iterator : pendingEffects)
     {
         if (iterator.name == effect.name)
         {
@@ -114,10 +114,10 @@ void EffectList::addPendingEffect(const Effect & effect)
 
 bool EffectList::effectActivate(std::vector<std::string> & messages)
 {
-    for (auto iterator : pendingEffects)
+    for (auto & iterator : pendingEffects)
     {
         bool present = false;
-        for (auto iterator2 : activeEffects)
+        for (auto & iterator2 : activeEffects)
         {
             if (iterator.name == iterator2.name)
             {
@@ -128,7 +128,10 @@ bool EffectList::effectActivate(std::vector<std::string> & messages)
         }
         if (!present)
         {
-            messages.push_back(iterator.messageActivate);
+            if (!iterator.messageActivate.empty())
+            {
+                messages.push_back(iterator.messageActivate);
+            }
             activeEffects.push_back(iterator);
             this->sortList();
         }
@@ -143,7 +146,10 @@ bool EffectList::effectUpdate(std::vector<std::string> & messages)
     {
         if (iterator->update())
         {
-            messages.push_back(iterator->messageExpire);
+            if (!iterator->messageExpire.empty())
+            {
+                messages.push_back(iterator->messageExpire);
+            }
             iterator = activeEffects.erase(iterator);
             this->sortList();
         }

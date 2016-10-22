@@ -83,6 +83,11 @@ ActionStatus AimAction::perform()
         actor->sendMsg(error + "\n\n");
         return ActionStatus::Error;
     }
+    if (actor->getActiveRangedWeapons().empty())
+    {
+        actor->sendMsg("You don't have a ranged weapon equipped.\n\n");
+        return ActionStatus::Error;
+    }
     // Send the message.
     actor->sendMsg("You are now aiming at %s...\n\n", target->getName());
     // Set the aimed character.

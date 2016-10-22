@@ -437,6 +437,11 @@ void DoAim(Character * character, ArgumentHandler & args)
         character->sendMsg("Who or what do you want to aim?\n");
         return;
     }
+    if (character->getActiveRangedWeapons().empty())
+    {
+        character->sendMsg("You don't have a ranged weapon equipped.\n");
+        return;
+    }
     // Prepare a pointer to the aimed character.
     Character * aimedCharacter = nullptr;
     // Create a single CharacterContainer which contains a unique list of all the targets.

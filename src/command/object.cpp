@@ -914,6 +914,30 @@ void DoRemove(Character * character, ArgumentHandler & args)
         character->sendMsg("Too many arguments.\n");
         return;
     }
+    auto CheckIfRemovedAllRangedWeapons = [&character]()
+    {
+        if (character->aimedCharacter == nullptr)
+        {
+            return false;
+        }
+        auto left = character->findEquipmentSlotItem(EquipmentSlot::LeftHand);
+        if (left != nullptr)
+        {
+            if (left->getType() == ModelType::RangedWeapon)
+            {
+                return false;
+            }
+        }
+        auto right = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
+        if (right != nullptr)
+        {
+            if (right->getType() == ModelType::RangedWeapon)
+            {
+                return false;
+            }
+        }
+        return true;
+    };
     if (args[0].getContent() == "all")
     {
         // Handle output only if the player has really removed something.
@@ -936,6 +960,12 @@ void DoRemove(Character * character, ArgumentHandler & args)
             "%s has undressed all he could.\n",
             {character},
             character->getNameCapital());
+        // Check if we have just removed ALL the USED Ranged Weapons.
+        if (CheckIfRemovedAllRangedWeapons())
+        {
+            character->sendMsg("You stop aiming %s.\n", character->aimedCharacter->getName());
+            character->aimedCharacter = nullptr;
+        }
         return;
     }
     // Get the item.
@@ -963,6 +993,12 @@ void DoRemove(Character * character, ArgumentHandler & args)
         item->getName(true),
         character->getPossessivePronoun(),
         ToLower(item->getCurrentSlotName()));
+    // Check if we have just removed ALL the USED Ranged Weapons.
+    if (CheckIfRemovedAllRangedWeapons())
+    {
+        character->sendMsg("You stop aiming %s.\n", character->aimedCharacter->getName());
+        character->aimedCharacter = nullptr;
+    }
 }
 
 void DoInventory(Character * character, ArgumentHandler & /*args*/)
