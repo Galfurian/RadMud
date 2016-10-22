@@ -17,9 +17,10 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "basicRangedAttack.hpp"
-#include "room.hpp"
-#include "rangedWeaponItem.hpp"
 #include "rangedWeaponModel.hpp"
+#include "rangedWeaponItem.hpp"
+#include "formatter.hpp"
+#include "room.hpp"
 
 BasicRangedAttack::BasicRangedAttack(Character * _actor) :
     CombatAction(_actor)
@@ -71,6 +72,7 @@ ActionStatus BasicRangedAttack::perform()
     }
     // Iterate trough all the ranged weapons.
     auto activeWeapons = actor->getActiveRangedWeapons();
+    bool dualWielding = (activeWeapons.size() > 1);
     bool canAttackTarget = false;
     for (auto iterator : activeWeapons)
     {
@@ -87,117 +89,7 @@ ActionStatus BasicRangedAttack::perform()
             }
         }
         canAttackTarget = true;
-        // Get the required stamina.
-        auto consumedStamina = this->getConsumedStamina(actor, iterator);
-        // Check if the actor has enough stamina to execute the action.
-        if (consumedStamina > actor->getStamina())
-        {
-            actor->sendMsg("You are too tired to fire with %s.\n", iterator->getName(true));
-            Logger::log(LogLevel::Debug, "[%s] Has %s stamina and needs %s.",
-                        actor->getName(), actor->getStamina(), consumedStamina);
-            continue;
-        }
-        // Natural roll for the attack.
-        auto ATK = TRandInteger<unsigned int>(1, 20);
-        Logger::log(LogLevel::Debug, "[%s] Natural roll of %s.", actor->getName(), ATK);
-        // Check if:
-        //  1. The number of active weapons is more than 1, then we have to apply
-        //      a penalty to the attack roll.
-        //  2. The value is NOT a natural 20 (hit).
-        if ((activeWeapons.size() > 1) && (ATK != 20))
-        {
-            // Evaluate the penalty to the attack roll.
-            unsigned int penalty = 0;
-            // On the main hand the penalty is 6.
-            if (iterator->currentSlot == EquipmentSlot::RightHand)
-            {
-                penalty = 6;
-            }
-                // On the off hand the penalty is 10.
-            else if (iterator->currentSlot == EquipmentSlot::LeftHand)
-            {
-                penalty = 10;
-            }
-            // Log that we have applied a penalty.
-            Logger::log(LogLevel::Debug, "[%s] Suffer a %s penalty with its %s.",
-                        actor->getName(), penalty, GetEquipmentSlotName(iterator->currentSlot));
-            // Safely apply the penalty.
-            ATK = (ATK < penalty) ? 0 : (ATK - penalty);
-        }
-        // Evaluate the armor class of the aimed character.
-        auto AC = actor->aimedCharacter->getArmorClass();
-        // Log the overall attack roll.
-        Logger::log(LogLevel::Debug, "[%s] Attack roll %s vs %s.", actor->getName(), ATK, AC);
-        // Check if:
-        //  1. The attack roll is lesser than the armor class of the opponent.
-        //  2. The attack roll is not a natural 20.
-        if ((ATK < AC) && (ATK != 20))
-        {
-            // Notify the actor.
-            actor->sendMsg("You miss %s with %s.\n\n", enemy->getName(), iterator->getName(true));
-            // Notify the enemy.
-            enemy->sendMsg("%s misses you with %s.\n\n", actor->getName(), iterator->getName(true));
-            // Notify the others.
-            enemy->room->sendToAll("%s miss %s with %s.\n", {actor, enemy},
-                                   actor->getName(), enemy->getName(), iterator->getName(true));
-            // Consume half the stamina.
-            actor->remStamina(consumedStamina / 2, true);
-        }
-        else
-        {
-            // Consume the stamina.
-            actor->remStamina(consumedStamina, true);
-            // Natural roll for the damage.
-            auto DMG = iterator->rollDamage();
-            // Log the damage roll.
-            Logger::log(LogLevel::Debug, "[%s] Rolls a damage of %s.", actor->getName(), DMG);
-            // If the character has rolled a natural 20, then multiply the damage by two.
-            std::string criticalMsg;
-            if (ATK == 20)
-            {
-                DMG *= 2;
-                criticalMsg = "critically ";
-            }
-            // Log the damage.
-            Logger::log(LogLevel::Debug, "[%s] Hits %s for with %s.",
-                        actor->getName(), enemy->getName(), DMG, iterator->getName(true));
-            // Procede and remove the damage from the health of the target.
-            if (!enemy->remHealth(DMG))
-            {
-                actor->sendMsg("You %shit %s with %s and kill %s.\n\n",
-                               criticalMsg, enemy->getName(), iterator->getName(true), enemy->getObjectPronoun());
-                // Notify the enemy.
-                enemy->sendMsg("%s %shits you with %s and kill you.\n\n",
-                               actor->getName(), criticalMsg, iterator->getName(true));
-                // Notify the others.
-                enemy->room->sendToAll("%s %shits %s with %s and kill %s.\n", {actor, enemy},
-                                       actor->getName(), criticalMsg, enemy->getName(),
-                                       iterator->getName(true), enemy->getObjectPronoun());
-                // The enemy has received the damage and now it is dead.
-                if (actor->aimedCharacter != nullptr)
-                {
-                    if (enemy->getName() == actor->aimedCharacter->getName())
-                    {
-                        actor->aimedCharacter = nullptr;
-                    }
-                }
-                enemy->kill();
-                continue;
-            }
-            else
-            {
-                // The enemy has received the damage but it is still alive.
-                actor->sendMsg("You %shit %s with %s for %s.\n\n",
-                               criticalMsg, enemy->getName(), iterator->getName(true), DMG);
-                // Notify the enemy.
-                enemy->sendMsg("%s %shits you with %s for %s.\n\n",
-                               actor->getName(), criticalMsg, iterator->getName(true), DMG);
-                // Notify the others.
-                enemy->room->sendToAll("%s %shits %s with %s for %s.\n", {actor, enemy},
-                                       actor->getName(), criticalMsg, enemy->getName(),
-                                       iterator->getName(true), DMG);
-            }
-        }
+        this->performAttack(enemy, iterator, dualWielding);
     }
     if ((actor->aimedCharacter == nullptr) && actor->aggressionList.empty())
     {
@@ -239,4 +131,182 @@ unsigned int BasicRangedAttack::getConsumedStamina(Character * character, Ranged
                                          + SafeLog10(weapon->getWeight(true)));
     }
     return 0;
+}
+
+void BasicRangedAttack::performAttack(Character * target,
+                                      RangedWeaponItem * weapon,
+                                      const bool dualWielding)
+{
+    // Get the required stamina.
+    auto consumedStamina = this->getConsumedStamina(actor, weapon);
+    // Check if the actor has enough stamina to execute the action.
+    if (consumedStamina > actor->getStamina())
+    {
+        actor->sendMsg("You are too tired to attack with %s.\n", weapon->getName(true));
+        return;
+    }
+    // Natural roll for the attack.
+    auto attack = TRandInteger<unsigned int>(1, 20);
+    // Check if:
+    //  1. The number of active weapons is more than 1, then we have to apply a penality to the attack roll.
+    //  2. The value is NOT a natural 20 (hit).
+    if (dualWielding && (attack != 20))
+    {
+        // Evaluate the penalty to the attack roll.
+        unsigned int penalty = 0;
+        // On the RIGHT hand the penality is 6.
+        // On the LEFT  hand the penality is 10.
+        if (weapon->currentSlot == EquipmentSlot::RightHand) penalty = 6;
+        if (weapon->currentSlot == EquipmentSlot::LeftHand) penalty = 10;
+        // Safely apply the penality.
+        attack = (attack < penalty) ? 0 : (attack - penalty);
+    }
+    // Natural roll for the damage.
+    //unsigned int damage = weapon->rollDamage();
+    // Evaluate the armor class of the aimed character.
+    auto armorClass = actor->aimedCharacter->getArmorClass();
+    // Check if:
+    //  1. The attack roll is lesser than the armor class of the opponent.
+    //  2. The attack roll is not a natural 20.
+    if ((attack < armorClass) && (attack != 20))
+    {
+        this->handleMiss(target, weapon);
+        // Consume half the stamina.
+        actor->remStamina(consumedStamina / 2, true);
+    }
+    else
+    {
+        this->handleHit(target, weapon);
+        // Consume the stamina.
+        actor->remStamina(consumedStamina, true);
+        // Natural roll for the damage.
+        auto damage = weapon->rollDamage();
+        // If the character has rolled a natural 20, then multiply the damage by two.
+        if (attack == 20)
+        {
+            damage *= 2;
+        }
+        if (!target->remHealth(damage))
+        {
+            // Notify the others.
+            target->room->sendToAll("%s%s screams in pain and then die!%s\n", {target},
+                                    Formatter::red(), target->getNameCapital(), Formatter::reset());
+            // The target has received the damage and now it is dead.
+            target->kill();
+        }
+    }
+}
+
+void BasicRangedAttack::handleHit(Character * target, RangedWeaponItem * weapon)
+{
+    // The enemy has received the damage but it is still alive.
+    actor->sendMsg("You hit %s with %s.\n\n", target->getName(), weapon->getName(true));
+    // Notify the enemy.
+    if (target->aimedCharacter == actor)
+    {
+        target->sendMsg("%s fires a projectile which hits you.\n\n", actor->getNameCapital());
+    }
+    else
+    {
+        target->sendMsg("Someone fires a projectile that hits you.\n\n");
+    }
+    // Notify the others.
+    actor->room->funcSendToAll("%s fires and hits %s with %s.\n",
+                               [&](Character * character)
+                               {
+                                   if (character == nullptr) return false;
+                                   if (character == actor) return false;
+                                   if (character->aimedCharacter == nullptr) return false;
+                                   return character->aimedCharacter == target;
+                               },
+                               actor->getNameCapital(),
+                               target->getName(),
+                               weapon->getName(true));
+    actor->room->funcSendToAll("%s fires at someone or something with %s.\n",
+                               [&](Character * character)
+                               {
+                                   if (character == nullptr) return false;
+                                   if (character == actor) return false;
+                                   if (character->aimedCharacter == nullptr) return true;
+                                   return character->aimedCharacter != target;
+                               },
+                               actor->getNameCapital(),
+                               weapon->getName(true));
+    target->room->funcSendToAll("%s fires a projectile which hits %s.\n",
+                                [&](Character * character)
+                                {
+                                    if (character == nullptr) return false;
+                                    if (character == target) return false;
+                                    if (character->aimedCharacter == nullptr) return false;
+                                    return character->aimedCharacter == actor;
+                                },
+                                actor->getNameCapital(),
+                                target->getName(),
+                                weapon->getName(true));
+    target->room->funcSendToAll("Someone fires a projectile which hits %s.\n",
+                                [&](Character * character)
+                                {
+                                    if (character == nullptr) return false;
+                                    if (character == target) return false;
+                                    if (character->aimedCharacter == nullptr) return true;
+                                    return character->aimedCharacter != actor;
+                                },
+                                target->getName());
+}
+
+void BasicRangedAttack::handleMiss(Character * target, RangedWeaponItem * weapon)
+{
+    // Notify the actor.
+    actor->sendMsg("You fire and miss %s with %s.\n\n", target->getName(), weapon->getName(true));
+    // Notify the enemy.
+    if (target->aimedCharacter == actor)
+    {
+        target->sendMsg("%s fires an misses you.\n\n", actor->getName());
+    }
+    else
+    {
+        target->sendMsg("Someone fired at you, but missed.\n\n");
+    }
+    // Notify the others.
+    actor->room->funcSendToAll("%s fires and misses %s with %s.\n",
+                               [&](Character * character)
+                               {
+                                   if (character == nullptr) return false;
+                                   if (character == actor) return false;
+                                   if (character->aimedCharacter == nullptr) return false;
+                                   return character->aimedCharacter == target;
+                               },
+                               actor->getNameCapital(),
+                               target->getName(),
+                               weapon->getName(true));
+    actor->room->funcSendToAll("%s fires at someone or something with %s.\n",
+                               [&](Character * character)
+                               {
+                                   if (character == nullptr) return false;
+                                   if (character == actor) return false;
+                                   if (character->aimedCharacter == nullptr) return true;
+                                   return character->aimedCharacter != target;
+                               },
+                               actor->getNameCapital(),
+                               weapon->getName(true));
+    target->room->funcSendToAll("%s fires a projectile which whizzes nearby %s.\n",
+                                [&](Character * character)
+                                {
+                                    if (character == nullptr) return false;
+                                    if (character == target) return false;
+                                    if (character->aimedCharacter == nullptr) return false;
+                                    return character->aimedCharacter == actor;
+                                },
+                                actor->getNameCapital(),
+                                target->getName(),
+                                weapon->getName(true));
+    target->room->funcSendToAll("Something whizzes nearby %s.\n",
+                                [&](Character * character)
+                                {
+                                    if (character == nullptr) return false;
+                                    if (character == target) return false;
+                                    if (character->aimedCharacter == nullptr) return true;
+                                    return character->aimedCharacter != actor;
+                                },
+                                target->getName());
 }

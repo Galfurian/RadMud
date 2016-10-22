@@ -49,4 +49,11 @@ public:
     /// @param weapon    The weapon used to performe the action.
     /// @return The required stamina.
     static unsigned int getConsumedStamina(Character * character, RangedWeaponItem * weapon);
+
+private:
+    void performAttack(Character * target, RangedWeaponItem * weapon, const bool dualWielding);
+
+    void handleHit(Character * target, RangedWeaponItem * weapon);
+
+    void handleMiss(Character * target, RangedWeaponItem * weapon);
 };
