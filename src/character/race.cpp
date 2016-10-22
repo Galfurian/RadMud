@@ -30,7 +30,8 @@ Race::Race() :
     player_allow(),
     tileSet(),
     tileId(),
-    corpse()
+    corpse(),
+    naturalWeapon()
 {
     // Nothing to do.
 }
@@ -64,6 +65,7 @@ bool Race::check()
     assert(!name.empty());
     assert(!description.empty());
     assert(material != nullptr);
+    assert(!naturalWeapon.empty());
     return true;
 }
 

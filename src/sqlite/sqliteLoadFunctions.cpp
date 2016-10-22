@@ -307,6 +307,7 @@ bool LoadRace(ResultSet * result)
         race->tileSet = result->getNextInteger();
         race->tileId = result->getNextInteger();
         std::string corpseDescription = result->getNextString();
+        race->naturalWeapon = result->getNextString();
         // Translate new_line.
         FindAndReplace(&race->description, "%r", "\n");
         // Intialize the corpse.

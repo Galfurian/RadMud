@@ -55,6 +55,8 @@ public:
     int tileId;
     /// Corpse model.
     CorpseModel corpse;
+    /// The text describing the natural weapons used by this race.
+    std::string naturalWeapon;
 
     /// @brief Constructor.
     Race();
