@@ -302,6 +302,8 @@ void Player::kill()
     // Set values of health and stamina to 1.
     this->setHealth(1, true);
     this->setStamina(1, true);
+    Character::sendMsg("%sYou have %sdied%s.. but don't worry your fight is not over...%s\n\n\n",
+                       Formatter::gray(), Formatter::red(), Formatter::gray(), Formatter::reset());
 }
 
 void Player::enterGame()

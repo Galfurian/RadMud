@@ -68,7 +68,6 @@ ActionStatus BasicMeleeAttack::perform()
         return ActionStatus::Running;
     }
     bool hasOpponentsAtRange = false;
-    Logger::log(LogLevel::Debug, "[%s] Perform a BasicMeleeAttack.", actor->getName());
     auto activeWeapons = actor->getActiveMeleeWeapons();
     // If there are no melee weapons available, use the natural weapons.
     if (activeWeapons.empty())

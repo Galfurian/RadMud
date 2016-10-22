@@ -83,7 +83,6 @@ ActionStatus GeneralAction::perform()
 void GeneralAction::resetCooldown(const unsigned int & _actionCooldown)
 {
     this->actionCooldown = system_clock::now() + seconds(_actionCooldown);
-    Logger::log(LogLevel::Debug, "Next action in %s.", ToString(_actionCooldown));
 }
 
 unsigned int GeneralAction::getCooldown()

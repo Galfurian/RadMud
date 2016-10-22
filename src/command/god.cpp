@@ -508,7 +508,9 @@ void DoFeast(Character * character, ArgumentHandler & args)
     target->setStamina(target->getMaxStamina(), true);
     target->setThirst(100);
     target->setHunger(100);
-    target->sendMsg("A banquet with any kind of delicacy appears from nowhere!\n");
+    target->sendMsg("%sA banquet with any kind of delicacy appears from nowhere!%s%s\n",
+                    Formatter::magenta(), Formatter::reset(),
+                    ((target != character) ? "\n" : ""));
 }
 
 void DoSetFlag(Character * character, ArgumentHandler & args)
