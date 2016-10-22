@@ -92,6 +92,22 @@ int Area::getDistance(const Coordinates & source, const Coordinates & target)
                                       (source.z - target.z) * (source.z - target.z)));
 }
 
+Direction Area::getDirection(const Coordinates & source, const Coordinates & target)
+{
+    auto dx = std::abs(source.x - target.x), dy = std::abs(source.y - target.y);
+    if (dx > dy)
+    {
+        if (source.x > target.x) return Direction::West;
+        if (source.x < target.x) return Direction::East;
+    }
+    if (dy < dx)
+    {
+        if (source.y > target.y) return Direction::South;
+        if (source.y < target.y) return Direction::North;
+    }
+    return Direction::None;
+}
+
 CharacterContainer Area::getCharactersAt(const CharacterContainer & exceptions, const Coordinates & coordinates)
 {
     CharacterContainer characterContainer;
