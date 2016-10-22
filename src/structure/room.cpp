@@ -522,6 +522,21 @@ void Room::sendToAll(const std::string & message, const std::vector<Character *>
     }
 }
 
+void Room::funcSendToAll(const std::string & message, std::function<bool(Character * character)> check)
+{
+    for (auto iterator : characters)
+    {
+        if (check)
+        {
+            if (!check(iterator))
+            {
+                continue;
+            }
+        }
+        iterator->sendMsg(message + "\n");
+    }
+}
+
 VectorHelper<Exit *> Room::luaGetExits()
 {
     VectorHelper<Exit *> ret;

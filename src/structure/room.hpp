@@ -240,8 +240,10 @@ public:
     /// @param first The first unpacked argument.
     /// @param args  Packed arguments.
     template<typename ... Args>
-    void sendToAll(const std::string & message, const std::vector<Character *> & exceptions,
-                   const std::string & first, const Args & ... args)
+    void sendToAll(const std::string & message,
+                   const std::vector<Character *> & exceptions,
+                   const std::string & first,
+                   const Args & ... args)
     {
         std::string::size_type pos = message.find("%s");
         if (pos == std::string::npos)
@@ -258,10 +260,34 @@ public:
 
     /// @brief Sends a message to all the characters inside the room. This one in particular handles integers.
     template<typename ... Args>
-    void sendToAll(const std::string & message, const std::vector<Character *> & exceptions,
-                   const unsigned int & first, const Args & ... args)
+    void sendToAll(const std::string & message,
+                   const std::vector<Character *> & exceptions,
+                   const unsigned int & first,
+                   const Args & ... args)
     {
         this->sendToAll(message, exceptions, ToString(first), args ...);
+    }
+
+    /// @brief Send a message to all the player in the room, can specify exceptions.
+    void funcSendToAll(const std::string & message, std::function<bool(Character * character)> check);
+
+    template<typename ... Args>
+    void funcSendToAll(const std::string & message,
+                       std::function<bool(Character * character)> check,
+                       const std::string & first,
+                       const Args & ... args)
+    {
+        std::string::size_type pos = message.find("%s");
+        if (pos == std::string::npos)
+        {
+            this->funcSendToAll(message, check);
+        }
+        else
+        {
+            std::string working(message);
+            working.replace(pos, 2, first);
+            this->funcSendToAll(working, check, args ...);
+        }
     }
 
     /// @brief Returns the list of available exits from the current room
