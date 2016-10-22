@@ -52,9 +52,6 @@ public:
 
 private:
     void performAttack(Character * target,
-                       const std::string & weaponName,
-                       unsigned int & attack,
-                       unsigned int & damage,
-                       const unsigned int & consumedStamina,
-                       const bool twoHanded) const;
+                       MeleeWeaponItem * weapon,
+                       const bool dualWielding);
 };
