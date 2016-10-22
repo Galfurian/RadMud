@@ -272,14 +272,16 @@ void Player::sendPrompt()
         // Send to the player his prompt.
         if (this->logged_in)
         {
-            std::string readyPrompt = prompt + "\n";
-            FindAndReplace(&readyPrompt, "&n", ToLower(name));
-            FindAndReplace(&readyPrompt, "&N", name);
-            FindAndReplace(&readyPrompt, "&h", ToString(this->getHealth()));
-            FindAndReplace(&readyPrompt, "&H", ToString(this->getMaxHealth()));
-            FindAndReplace(&readyPrompt, "&s", ToString(this->getStamina()));
-            FindAndReplace(&readyPrompt, "&S", ToString(this->getMaxStamina()));
-            this->sendMsg(readyPrompt);
+            std::string out(prompt + "\n");
+            FindAndReplace(&out, "&n", ToLower(name));
+            FindAndReplace(&out, "&N", name);
+            FindAndReplace(&out, "&h", ToString(this->getHealth()));
+            FindAndReplace(&out, "&H", ToString(this->getMaxHealth()));
+            FindAndReplace(&out, "&s", ToString(this->getStamina()));
+            FindAndReplace(&out, "&S", ToString(this->getMaxStamina()));
+            FindAndReplace(&out, "&T",
+                           (this->aimedCharacter == nullptr) ? "" : "[" + this->aimedCharacter->getName() + "]");
+            this->sendMsg(out);
         }
         else
         {

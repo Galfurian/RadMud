@@ -506,41 +506,26 @@ void DoPrompt(Character * character, ArgumentHandler & args)
     {
         character->sendMsg("Current prompt:\n");
         character->sendMsg("    %s\n", player->prompt);
-        character->sendMsg(
-            "Type %sprompt help %sto read the guide.\n",
-            Formatter::yellow(),
-            Formatter::reset());
+        character->sendMsg("Type %sprompt help %sto read the guide.\n", Formatter::yellow(), Formatter::reset());
         return;
     }
-    else if (args[0].getContent() == "help")
+    if (args[0].getContent() == "help")
     {
-        character->sendMsg(Formatter::yellow() + "Prompt Help" + Formatter::reset() + "\n");
-        character->sendMsg(
-            "You can set the prompt you prefer, respectfully to this constraints:\n");
-        character->sendMsg(" - Not more than 15 characters.\n");
-        character->sendMsg("\n");
-        character->sendMsg("You can use the following shortcuts in you prompt:\n");
-        character->sendMsg("    %s&n%s - Player name.\n", Formatter::italic(), Formatter::reset());
-        character->sendMsg(
-            "    %s&N%s - Player name capitalized.\n",
-            Formatter::italic(),
-            Formatter::reset());
-        character->sendMsg(
-            "    %s&h%s - Player current health.\n",
-            Formatter::italic(),
-            Formatter::reset());
-        character->sendMsg(
-            "    %s&H%s - Player max health.\n",
-            Formatter::italic(),
-            Formatter::reset());
-        character->sendMsg(
-            "    %s&s%s - Player current stamina.\n",
-            Formatter::italic(),
-            Formatter::reset());
-        character->sendMsg(
-            "    %s&S%s - Player max stamina.\n",
-            Formatter::italic(),
-            Formatter::reset());
+        std::string msg;
+        std::string ITL = Formatter::italic(), RES = Formatter::reset();
+        msg += Formatter::yellow() + "Prompt Help" + Formatter::reset() + "\n";
+        msg += "You can set the prompt you prefer, respectfully to this constraints:\n";
+        msg += " - Not more than 15 characters.\n";
+        msg += "\n";
+        msg += "You can use the following shortcuts in you prompt:\n";
+        msg += "    " + ITL + "&n" + RES + " - Player name.\n";
+        msg += "    " + ITL + "&N" + RES + " - Player name capitalized.\n";
+        msg += "    " + ITL + "&h" + RES + " - Player current health.\n";
+        msg += "    " + ITL + "&H" + RES + " - Player maximum health.\n";
+        msg += "    " + ITL + "&s" + RES + " - Player current stamina.\n";
+        msg += "    " + ITL + "&S" + RES + " - Player maximum stamina.\n";
+        msg += "    " + ITL + "&T" + RES + " - Currently aimed character.\n";
+        player->sendMsg(msg);
         return;
     }
     player->prompt = args.substr(0);
@@ -636,61 +621,55 @@ void DoRest(Character * character, ArgumentHandler & /*args*/)
 void DoStatistics(Character * character, ArgumentHandler & /*args*/)
 {
     NoMobile(character);
-    Player * player = character->toPlayer();
+    auto player = character->toPlayer();
 
     std::string msg;
-    msg += Formatter::magenta() + "Name: " + Formatter::reset() + player->getName() + " ";
-    msg += Formatter::magenta() + "Race: " + Formatter::reset() + player->race->name + "\n";
-    msg += Formatter::magenta() + "Gender: " + Formatter::reset()
-           + GetGenderTypeName(player->gender) + "\n";
-    msg += Formatter::magenta() + "Affiliation: " + Formatter::reset() + player->faction->name
-           + "\n";
-    msg += Formatter::magenta() + "Experience: " + Formatter::reset() + ToString(player->experience)
-           + " px\n";
-
-    msg += Formatter::magenta() + "    Str " + Formatter::reset();
+    std::string MAG = Formatter::magenta();
+    std::string BLD = Formatter::bold();
+    std::string RES = Formatter::reset();
+    msg += MAG + "Name        : " + RES + player->getName() + " ";
+    msg += MAG + "Gender : " + RES + GetGenderTypeName(player->gender) + " ";
+    msg += MAG + "Race : " + RES + player->race->name + "\n";
+    msg += MAG + "Weight      : " + RES + ToString(player->weight) + " " + Mud::instance().getWeightMeasure() + "\n";
+    msg += MAG + "Affiliation : " + RES + player->faction->name + "\n";
+    msg += MAG + "Experience  : " + RES + ToString(player->experience) + " px\n";
+    msg += MAG + "    Str       " + RES;
     msg += ToString(player->getAbility(Ability::Strength, false));
     msg += "(" + ToString(player->effects.getAbilityModifier(Ability::Strength)) + ")";
     msg += "[" + ToString(player->getAbilityModifier(Ability::Strength)) + "]\n";
-
-    msg += Formatter::magenta() + "    Agi " + Formatter::reset();
+    msg += MAG + "    Agi       " + RES;
     msg += ToString(player->getAbility(Ability::Agility, false));
     msg += "(" + ToString(player->effects.getAbilityModifier(Ability::Agility)) + ")";
     msg += "[" + ToString(player->getAbilityModifier(Ability::Agility)) + "]\n";
-
-    msg += Formatter::magenta() + "    Per " + Formatter::reset();
+    msg += MAG + "    Per       " + RES;
     msg += ToString(player->getAbility(Ability::Perception, false));
     msg += "(" + ToString(player->effects.getAbilityModifier(Ability::Perception)) + ")";
     msg += "[" + ToString(player->getAbilityModifier(Ability::Perception)) + "]\n";
-
-    msg += Formatter::magenta() + "    Con " + Formatter::reset();
+    msg += MAG + "    Con       " + RES;
     msg += ToString(player->getAbility(Ability::Constitution, false));
     msg += "(" + ToString(player->effects.getAbilityModifier(Ability::Constitution)) + ")";
     msg += "[" + ToString(player->getAbilityModifier(Ability::Constitution)) + "]\n";
-
-    msg += Formatter::magenta() + "    Int " + Formatter::reset();
+    msg += MAG + "    Int       " + RES;
     msg += ToString(player->getAbility(Ability::Intelligence, false));
     msg += "(" + ToString(player->effects.getAbilityModifier(Ability::Intelligence)) + ")";
     msg += "[" + ToString(player->getAbilityModifier(Ability::Intelligence)) + "]\n";
-
-    msg += Formatter::magenta() + "    Health " + Formatter::reset();
+    msg += MAG + "    Health    " + RES;
     msg += ToString(player->getHealth()) + "/" + ToString(player->getMaxHealth());
     msg += "(" + ToString(player->effects.getHealthMod()) + ")\n";
-
-    msg += Formatter::magenta() + "    Stamina " + Formatter::reset();
+    msg += MAG + "    Stamina   " + RES;
     msg += ToString(player->getStamina()) + "/" + ToString(player->getMaxStamina());
     msg += "(" + ToString(player->effects.getHealthMod()) + ")\n";
-
-    msg += Formatter::magenta() + "    Armor Class " + Formatter::reset();
+    msg += MAG + "Armor Class : " + RES;
     msg += ToString(player->getArmorClass()) + "\n";
-
-    msg += "You " + player->getHealthCondition(true) + ".\n";
-    msg += "You " + player->getStaminaCondition() + ".\n";
-    msg += "You " + player->getHungerCondition() + ".\n";
-    msg += "You " + player->getThirstCondition() + ".\n";
-
-    msg += "You are " + GetPostureName(player->posture) + ".\n";
-
+    msg += "You " + BLD + player->getHealthCondition(true) + RES + ".\n";
+    msg += "You " + BLD + player->getStaminaCondition() + RES + ".\n";
+    msg += "You " + BLD + player->getHungerCondition() + RES + ".\n";
+    msg += "You " + BLD + player->getThirstCondition() + RES + ".\n";
+    msg += "You are " + BLD + GetPostureName(player->posture) + RES + ".\n\n";
+    if (player->aimedCharacter != nullptr)
+    {
+        msg += "You are aiming at " + BLD + player->aimedCharacter->getName() + RES + ".\n";
+    }
     player->sendMsg(msg);
 }
 
