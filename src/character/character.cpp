@@ -289,7 +289,6 @@ unsigned int Character::getAbilityLog(
 {
     auto mod = this->getAbilityModifier(ability, withEffects);
     auto logMod = SafeLog10(mod);
-    Logger::log(LogLevel::Debug, "%s -log-> %s", mod, logMod);
     return static_cast<unsigned int>(base + logMod * multiplier);
 }
 
@@ -1345,7 +1344,7 @@ bool Character::isAtRange(Character * target, const unsigned int & range)
 
 Character * Character::getNextOpponentAtRange(const unsigned int & range)
 {
-    if (aggressionList.empty())
+    if (!aggressionList.empty())
     {
         for (auto iterator : aggressionList.aggressionList)
         {
