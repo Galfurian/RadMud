@@ -55,6 +55,10 @@ private:
                        MeleeWeaponItem * weapon,
                        const bool dualWielding);
 
+    Character * getValidTarget();
+
+    ActionStatus handleStop();
+
     void handleHitMessages(Character * target, MeleeWeaponItem * weapon);
 
     void handleMissMessages(Character * target, MeleeWeaponItem * weapon);

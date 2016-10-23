@@ -67,23 +67,30 @@ ActionStatus BasicMeleeAttack::perform()
     {
         return ActionStatus::Running;
     }
-    bool hasOpponentsAtRange = false;
+    // If there are no enemies, just stop fighting.
+    if (actor->aggressionList.empty())
+    {
+        return this->handleStop();
+    }
+    // Get a valid taret.
+    Character * enemy = this->getValidTarget();
+    if (enemy == nullptr)
+    {
+        actor->sendMsg("You do not have opponents at range.\n");
+        return this->handleStop();
+    }
     auto activeWeapons = actor->getActiveMeleeWeapons();
     // If there are no melee weapons available, use the natural weapons.
     if (activeWeapons.empty())
     {
-        // Get the top aggro enemy at range.
-        Character * enemy = actor->getNextOpponentAtRange(0);
-        if (enemy == nullptr)
+        // Perform the attack.
+        if (actor->isAtRange(enemy, 0))
         {
-            actor->sendMsg("You do not have opponents at range for %s.\n", actor->race->naturalWeapon);
+            this->performAttack(enemy, nullptr, false);
         }
         else
         {
-            // Set that the character has opponents at range.
-            hasOpponentsAtRange = true;
-            // Perform the attack.
-            this->performAttack(enemy, nullptr, false);
+            actor->sendMsg("You are too far away to attack.\n\n");
         }
     }
     else
@@ -91,33 +98,16 @@ ActionStatus BasicMeleeAttack::perform()
         bool dualWielding = (activeWeapons.size() > 1);
         for (auto iterator : activeWeapons)
         {
-            // Get the top aggro enemy at range.
-            Character * enemy = actor->getNextOpponentAtRange(0);
-            if (enemy == nullptr)
+            // Perform the attack.
+            if (actor->isAtRange(enemy, 0))
             {
-                actor->sendMsg("You do not have opponents at range for %s.\n", iterator->getName(true));
-                continue;
+                this->performAttack(enemy, iterator, dualWielding);
             }
             else
             {
-                // Set that the character has opponents at range.
-                hasOpponentsAtRange = true;
-                // Perform the attack.
-                this->performAttack(enemy, iterator, dualWielding);
+                actor->sendMsg("You are too far away to attack.\n\n");
             }
         }
-    }
-    if (!hasOpponentsAtRange)
-    {
-        actor->sendMsg(this->stop() + "\n\n");
-        actor->aggressionList.resetList();
-        return ActionStatus::Finished;
-    }
-    if (actor->aggressionList.empty())
-    {
-        actor->sendMsg(this->stop() + "\n\n");
-        actor->aggressionList.resetList();
-        return ActionStatus::Finished;
     }
     actor->getAction()->resetCooldown(actor->getCooldown(CombatActionType::BasicMeleeAttack));
     return ActionStatus::Running;
@@ -245,6 +235,34 @@ void BasicMeleeAttack::performAttack(Character * target,
             target->kill();
         }
     }
+}
+
+Character * BasicMeleeAttack::getValidTarget()
+{
+    Logger::log(LogLevel::Debug, "[%s] Trying to get a valid target...", actor->getName());
+    // First try to get the next opponent at close combat range.
+    Character * target = actor->getNextOpponentAtRange(0);
+    // Otherwise, check if at least there are enemies in sight.
+    if (target == nullptr)
+    {
+        Logger::log(LogLevel::Debug, "[%s] There is no target at close range.", actor->getName());
+        for (auto iterator : actor->aggressionList)
+        {
+            if (actor->isAtRange(iterator->aggressor, actor->getViewDistance()))
+            {
+                target = iterator->aggressor;
+                break;
+            }
+        }
+    }
+    return target;
+}
+
+ActionStatus BasicMeleeAttack::handleStop()
+{
+    actor->sendMsg(this->stop() + "\n\n");
+    actor->aggressionList.resetList();
+    return ActionStatus::Finished;
 }
 
 void BasicMeleeAttack::handleHitMessages(Character * target, MeleeWeaponItem * weapon)

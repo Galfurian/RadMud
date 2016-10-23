@@ -521,17 +521,33 @@ void DoFire(Character * character, ArgumentHandler & /*args*/)
         if (character->isAtRange(character->aimedCharacter, weaponRange))
         {
             // Let the characters enter the combat.
-
-            if (!character->setNextCombatAction(CombatActionType::BasicRangedAttack))
+            if (character->setNextCombatAction(CombatActionType::BasicRangedAttack))
             {
-                character->sendMsg("You were not able to fire at %s with %s.\n",
+                character->sendMsg("You start firing at %s with %s...\n",
                                    character->aimedCharacter->getName(),
                                    weapon->getName(true));
-                return;
+                if (!character->aggressionList.addOpponent(character->aimedCharacter))
+                {
+                    character->sendMsg("You are already fighting againts %s.\n", character->aimedCharacter->getName());
+                    return;
+                }
+                if (!character->aimedCharacter->aggressionList.addOpponent(character))
+                {
+                    character->sendMsg("You were not able to attack %s.\n", character->aimedCharacter->getName());
+                    character->aggressionList.remOpponent(character->aimedCharacter);
+                    return;
+                }
+                if (!character->aimedCharacter->setNextCombatAction(CombatActionType::BasicMeleeAttack))
+                {
+                    character->sendMsg("You were not able to attack %s.\n", character->aimedCharacter->getName());
+                    character->aggressionList.remOpponent(character->aimedCharacter);
+                    character->aimedCharacter->aggressionList.remOpponent(character);
+                    return;
+                }
             }
             else
             {
-                character->sendMsg("You start firing at %s with %s...\n",
+                character->sendMsg("You were not able to fire at %s with %s.\n",
                                    character->aimedCharacter->getName(),
                                    weapon->getName(true));
             }
