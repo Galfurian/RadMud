@@ -655,6 +655,10 @@ void DoStatistics(Character * character, ArgumentHandler & /*args*/)
     msg += "You " + BLD + player->getHungerCondition() + RES + ".\n";
     msg += "You " + BLD + player->getThirstCondition() + RES + ".\n";
     msg += "You are " + BLD + GetPostureName(player->posture) + RES + ".\n\n";
+    if (player->getAction()->getType() != ActionType::Wait)
+    {
+        msg += "You are " + BLD + player->getAction()->getDescription() + RES + ".\n";
+    }
     if (player->aimedCharacter != nullptr)
     {
         msg += "You are aiming at " + BLD + player->aimedCharacter->getName() + RES + ".\n";
