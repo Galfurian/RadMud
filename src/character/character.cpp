@@ -1339,6 +1339,10 @@ bool Character::isAtRange(Character * target, const unsigned int & range)
     if (WrongAssert(target == nullptr)) return false;
     if (WrongAssert(target->room == nullptr)) return false;
     if (WrongAssert(target->room->area == nullptr)) return false;
+    if (target->isMobile())
+    {
+        if (WrongAssert(!target->toMobile()->isAlive())) return false;
+    }
     return this->room->area->los(this->room->coord, target->room->coord, range);
 }
 
