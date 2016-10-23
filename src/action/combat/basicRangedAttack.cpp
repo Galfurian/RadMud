@@ -84,7 +84,7 @@ ActionStatus BasicRangedAttack::perform()
             enemy = actor->getNextOpponentAtRange(iterator->getRange());
             if (enemy == nullptr)
             {
-                actor->sendMsg("%s is not at range for %s.\n", actor->getNameCapital(), iterator->getName(true));
+                actor->sendMsg("Your enemy is not at range for %s.\n", iterator->getName(true));
                 continue;
             }
         }
