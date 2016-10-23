@@ -131,8 +131,30 @@ bool MoveAction::canMoveTo(Character * character, const Direction & direction, s
 {
     if (character->getAction()->getType() == ActionType::Combat)
     {
-        error = "You cannot move while fighting.";
-        return false;
+        // Check if the character is locked into close combat.
+        bool lockedInCombat = false;
+        // Check if he is in the same room of one of its aggressors.
+        for (auto iterator : character->aggressionList)
+        {
+            if (iterator->aggressor != nullptr)
+            {
+                if (iterator->aggressor->room == character->room)
+                {
+                    lockedInCombat = true;
+                    break;
+                }
+            }
+        }
+        // Check even the aimed character.
+        if (character->aimedCharacter)
+        {
+            if (character->aimedCharacter->room == character->room) lockedInCombat = true;
+        }
+        if (lockedInCombat)
+        {
+            error = "You cannot move while fighting in close combat.";
+        }
+        return !lockedInCombat;
     }
     // Check if the character is in a no-walk position.
     if (character->posture == CharacterPosture::Rest || character->posture == CharacterPosture::Sit)
