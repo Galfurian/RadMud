@@ -214,101 +214,108 @@ void BasicMeleeAttack::performAttack(Character * target,
     //  2. The attack roll is not a natural 20.
     if ((attack < armorClass) && (attack != 20))
     {
-        // Notify the actor, enemy and others.
-        if (weapon != nullptr)
-        {
-            actor->sendMsg("You miss %s with %s.\n\n",
-                           target->getName(),
-                           weapon->getName(true));
-            target->sendMsg("%s misses you with %s.\n\n",
-                            actor->getNameCapital(),
-                            weapon->getName(true));
-            target->room->sendToAll("%s misses %s with %s.\n", {actor, target},
-                                    actor->getNameCapital(),
-                                    target->getName(),
-                                    weapon->getName(true));
-        }
-        else
-        {
-            actor->sendMsg("You miss %s with your %s.\n\n",
-                           target->getName(),
-                           actor->race->naturalWeapon);
-            target->sendMsg("%s misses you with %s %s.\n\n",
-                            actor->getNameCapital(),
-                            actor->getPossessivePronoun(),
-                            actor->race->naturalWeapon);
-            target->room->sendToAll("%s misses %s with %s %s.\n", {actor, target},
-                                    actor->getNameCapital(),
-                                    target->getName(),
-                                    actor->getPossessivePronoun(),
-                                    actor->race->naturalWeapon);
-        }
+        // Show miss messages.
+        this->handleMissMessages(target, weapon);
         // Consume half the stamina.
         actor->remStamina(consumedStamina / 2, true);
         return;
     }
-    // Consume the stamina.
-    actor->remStamina(consumedStamina, true);
-    // If the character has rolled a natural 20, then multiply the damage by two.
-    std::string criticalMsg;
-    if (attack == 20)
+    else
     {
-        damage *= 2;
-        criticalMsg = "critically ";
+        // Show hit messages.
+        this->handleHitMessages(target, weapon);
+        // Consume the stamina.
+        actor->remStamina(consumedStamina, true);
+        // If the character has rolled a natural 20, then multiply the damage by two.
+        if (attack == 20)
+        {
+            damage *= 2;
+        }
+        // Procede and remove the damage from the health of the target.
+        if (!target->remHealth(damage))
+        {
+            // Notify the others.
+            target->room->funcSendToAll("%s%s screams in pain and then die!%s\n",
+                                        [&](Character * character)
+                                        {
+                                            return character != target;
+                                        },
+                                        Formatter::red(), target->getNameCapital(), Formatter::reset());
+            // The target has received the damage and now it is dead.
+            target->kill();
+        }
     }
+}
+
+void BasicMeleeAttack::handleHitMessages(Character * target, MeleeWeaponItem * weapon)
+{
     if (weapon != nullptr)
     {
         // The target has received the damage but it is still alive.
-        actor->sendMsg("You %shit %s with %s for %s.\n\n",
-                       criticalMsg,
-                       target->getName(),
-                       weapon->getName(true),
-                       damage);
+        actor->sendMsg("You hit %s with %s.\n\n", target->getName(), weapon->getName(true));
         // Notify the target.
-        target->sendMsg("%s %shits you with %s for %s.\n\n",
-                        actor->getNameCapital(),
-                        criticalMsg,
-                        weapon->getName(true),
-                        damage);
-        // Notify the others.
-        target->room->sendToAll("%s %shits %s with %s for %s.\n", {actor, target},
-                                actor->getNameCapital(),
-                                criticalMsg,
-                                target->getName(),
-                                weapon->getName(true),
-                                damage);
+        target->sendMsg("%s hits you with %s.\n\n", actor->getNameCapital(), weapon->getName(true));
+        // Notify the other characters.
+        target->room->funcSendToAll("%s hits %s with %s.\n",
+                                    [&](Character * character)
+                                    {
+                                        return !((character == actor) || (character == target));
+                                    },
+                                    actor->getNameCapital(),
+                                    target->getName(),
+                                    weapon->getName(true));
     }
     else
     {
         // The target has received the damage but it is still alive.
-        actor->sendMsg("You %shit %s with your %s for %s.\n\n",
-                       criticalMsg,
-                       target->getName(),
-                       actor->race->naturalWeapon,
-                       damage);
+        actor->sendMsg("You hit %s with your %s.\n\n", target->getName(), actor->race->naturalWeapon);
         // Notify the target.
-        target->sendMsg("%s %shits you with %s %s for %s.\n\n",
+        target->sendMsg("%s hits you with %s %s.\n\n",
                         actor->getNameCapital(),
-                        criticalMsg,
                         actor->getPossessivePronoun(),
-                        actor->race->naturalWeapon,
-                        damage);
-        // Notify the others.
-        target->room->sendToAll("%s %shits %s with %s %s for %s.\n", {actor, target},
+                        actor->race->naturalWeapon);
+        // Notify the other characters.
+        target->room->funcSendToAll("%s hits %s with %s %s.\n",
+                                    [&](Character * character)
+                                    {
+                                        return !((character == actor) || (character == target));
+                                    },
+                                    actor->getNameCapital(),
+                                    target->getName(),
+                                    actor->getPossessivePronoun(),
+                                    actor->race->naturalWeapon);
+    }
+}
+
+void BasicMeleeAttack::handleMissMessages(Character * target, MeleeWeaponItem * weapon)
+{
+    // Notify the actor, enemy and others.
+    if (weapon != nullptr)
+    {
+        actor->sendMsg("You miss %s with %s.\n\n",
+                       target->getName(),
+                       weapon->getName(true));
+        target->sendMsg("%s misses you with %s.\n\n",
+                        actor->getNameCapital(),
+                        weapon->getName(true));
+        target->room->sendToAll("%s misses %s with %s.\n", {actor, target},
                                 actor->getNameCapital(),
-                                criticalMsg,
+                                target->getName(),
+                                weapon->getName(true));
+    }
+    else
+    {
+        actor->sendMsg("You miss %s with your %s.\n\n",
+                       target->getName(),
+                       actor->race->naturalWeapon);
+        target->sendMsg("%s misses you with %s %s.\n\n",
+                        actor->getNameCapital(),
+                        actor->getPossessivePronoun(),
+                        actor->race->naturalWeapon);
+        target->room->sendToAll("%s misses %s with %s %s.\n", {actor, target},
+                                actor->getNameCapital(),
                                 target->getName(),
                                 actor->getPossessivePronoun(),
-                                actor->race->naturalWeapon,
-                                damage);
-    }
-    // Procede and remove the damage from the health of the target.
-    if (!target->remHealth(damage))
-    {
-        // Notify the others.
-        target->room->sendToAll("%s%s screams in pain and then die!%s\n", {target},
-                                Formatter::red(), target->getNameCapital(), Formatter::reset());
-        // The target has received the damage and now it is dead.
-        target->kill();
+                                actor->race->naturalWeapon);
     }
 }

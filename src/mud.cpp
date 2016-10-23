@@ -634,8 +634,8 @@ bool Mud::runMud()
     }
     // Set up timeout interval.
     struct timeval timeoutVal;
-    timeoutVal.tv_sec = 0; // seconds
-    timeoutVal.tv_usec = 5e05;  // microseconds
+    timeoutVal.tv_sec = 0;        // seconds
+    timeoutVal.tv_usec = 500000;  // microseconds
     Logger::log(LogLevel::Global, "Waiting for Connections...");
     // Loop processing input, output, events.
     // We will go through this loop roughly every timeout seconds.

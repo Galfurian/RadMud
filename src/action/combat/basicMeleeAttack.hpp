@@ -54,4 +54,8 @@ private:
     void performAttack(Character * target,
                        MeleeWeaponItem * weapon,
                        const bool dualWielding);
+
+    void handleHitMessages(Character * target, MeleeWeaponItem * weapon);
+
+    void handleMissMessages(Character * target, MeleeWeaponItem * weapon);
 };
