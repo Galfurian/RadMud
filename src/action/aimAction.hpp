@@ -43,4 +43,6 @@ public:
     std::string stop() override;
 
     ActionStatus perform() override;
+
+    static int getAimTime(Character * source, Character * target);
 };

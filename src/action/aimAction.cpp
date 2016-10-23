@@ -18,6 +18,8 @@
 
 #include "aimAction.hpp"
 #include "character.hpp"
+#include "area.hpp"
+#include "room.hpp"
 
 AimAction::AimAction(Character * _actor, Character * _target, unsigned int _cooldown) :
     GeneralAction(_actor, std::chrono::system_clock::now() + std::chrono::seconds(_cooldown)),
@@ -93,4 +95,17 @@ ActionStatus AimAction::perform()
     // Set the aimed character.
     actor->aimedCharacter = target;
     return ActionStatus::Finished;
+}
+
+int AimAction::getAimTime(Character * source, Character * target)
+{
+    int requiredTime = 2;
+    if (source && target)
+    {
+        if (source->room && target->room)
+        {
+            requiredTime = 2 + Area::getDistance(source->room->coord, target->room->coord);
+        }
+    }
+    return requiredTime;
 }

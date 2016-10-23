@@ -465,11 +465,9 @@ void DoAim(Character * character, ArgumentHandler & args)
         // Check if the target is still in sight.
         if (character->isAtRange(aimedCharacter, character->getViewDistance()))
         {
-            int distance = Area::getDistance(character->room->coord, aimedCharacter->room->coord);
-            Logger::log(LogLevel::Debug, "Distance : %s", distance);
-            auto requiredTime = 1.5 * distance;
-            Logger::log(LogLevel::Debug, "Time     : %s", requiredTime);
-            auto newAction = std::make_shared<AimAction>(character, aimedCharacter, requiredTime);
+            auto newAction = std::make_shared<AimAction>(character,
+                                                         aimedCharacter,
+                                                         AimAction::getAimTime(character, aimedCharacter));
             // Check the new action.
             std::string error;
             if (newAction->check(error))
