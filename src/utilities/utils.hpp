@@ -69,6 +69,8 @@ bool DoubleEquality(double a, double b);
 /// @return The number.
 double SafeLog10(const double & source);
 
+unsigned int SafeSum(const unsigned int & first, const int & second);
+
 /// @brief Check if the passed value has the given flag set.
 /// @param flags The value to check.
 /// @param flag  The flag to search.
