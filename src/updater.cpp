@@ -35,7 +35,7 @@ MudUpdater::MudUpdater() :
     bandwidth_uncompressed(),
     ticTime(std::chrono::system_clock::now()),
     mudTime(std::chrono::system_clock::now()),
-    ticSize(30),
+    ticSize(10),
     secondSize(50),
     hourSize(secondSize * 3600),
     daySize(secondSize * 86400),
