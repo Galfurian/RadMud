@@ -269,24 +269,24 @@ public:
     }
 
     /// @brief Send a message to all the player in the room, can specify exceptions.
-    void funcSendToAll(const std::string & message, std::function<bool(Character * character)> check);
+    void funcSendToAll(const std::string & message, std::function<bool(Character * character)> checkException);
 
     template<typename ... Args>
     void funcSendToAll(const std::string & message,
-                       std::function<bool(Character * character)> check,
+                       std::function<bool(Character * character)> checkException,
                        const std::string & first,
                        const Args & ... args)
     {
         std::string::size_type pos = message.find("%s");
         if (pos == std::string::npos)
         {
-            this->funcSendToAll(message, check);
+            this->funcSendToAll(message, checkException);
         }
         else
         {
             std::string working(message);
             working.replace(pos, 2, first);
-            this->funcSendToAll(working, check, args ...);
+            this->funcSendToAll(working, checkException, args ...);
         }
     }
 

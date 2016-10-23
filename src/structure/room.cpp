@@ -522,13 +522,13 @@ void Room::sendToAll(const std::string & message, const std::vector<Character *>
     }
 }
 
-void Room::funcSendToAll(const std::string & message, std::function<bool(Character * character)> check)
+void Room::funcSendToAll(const std::string & message, std::function<bool(Character * character)> checkException)
 {
     for (auto iterator : characters)
     {
-        if (check)
+        if (checkException)
         {
-            if (!check(iterator))
+            if (!checkException(iterator))
             {
                 continue;
             }
