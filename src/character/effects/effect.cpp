@@ -20,7 +20,7 @@
 
 Effect::Effect(Character * _affected,
                std::string _name,
-               int _expires,
+               unsigned int _remainingTic,
                std::string _messageActivate,
                std::string _messageFade,
                std::function<void(Character * character)> _expireFunction,
@@ -31,7 +31,7 @@ Effect::Effect(Character * _affected,
                int _damage) :
     affected(_affected),
     name(_name),
-    expires(_expires),
+    remainingTic(_remainingTic),
     messageActivate(_messageActivate),
     messageExpire(_messageFade),
     expireFunction(_expireFunction),
@@ -47,8 +47,8 @@ Effect::Effect(Character * _affected,
 
 bool Effect::update()
 {
-    expires--;
-    if (expires <= 0)
+    remainingTic--;
+    if (remainingTic == 0)
     {
         if (expireFunction)
         {
@@ -61,5 +61,5 @@ bool Effect::update()
 
 bool Effect::operator<(const Effect & right) const
 {
-    return expires < right.expires;
+    return remainingTic < right.remainingTic;
 }

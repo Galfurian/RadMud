@@ -167,10 +167,10 @@ void Character::getSheet(Table & sheet) const
         sheet.addRow({equipmentItem, inventoryItem});
     }
     sheet.addDivider();
-    sheet.addRow({"## Effect Name", "## Expires In"});
+    sheet.addRow({"## Effect Name", "## Remaining TIC"});
     for (EffectList::const_iterator it = this->effects.begin(); it != this->effects.end(); ++it)
     {
-        sheet.addRow({it->name, ToString(it->expires)});
+        sheet.addRow({it->name, ToString(it->remainingTic)});
     }
 }
 

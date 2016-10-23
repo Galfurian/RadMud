@@ -103,7 +103,8 @@ ActionStatus ScoutAction::perform()
         actor->sendMsg("    %s\n", it->getName());
     }
     // Add the effect.
-    actor->effects.forceAddEffect(EffectFactory::clearTargets(actor, 1));
+    unsigned int modifier = actor->getAbilityModifier(Ability::Perception);
+    actor->effects.forceAddEffect(EffectFactory::clearTargets(actor, 1 + modifier));
     return ActionStatus::Finished;
 }
 

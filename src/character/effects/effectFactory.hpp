@@ -35,5 +35,8 @@ class EffectFactory
 {
 public:
     /// @brief Generates an effect which clears the target of a character.
-    static Effect clearTargets(Character * actor, const int & lastingTime);
+    /// @param actor    The character affected by the effect.
+    /// @param duration THe duration in TIC of the effect.
+    /// @return The created effect.
+    static Effect clearTargets(Character * actor, const unsigned int & duration);
 };

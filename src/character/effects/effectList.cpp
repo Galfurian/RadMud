@@ -97,9 +97,9 @@ void EffectList::addPendingEffect(const Effect & effect)
     {
         if (iterator.name == effect.name)
         {
-            if (iterator.expires < effect.expires)
+            if (iterator.remainingTic < effect.remainingTic)
             {
-                iterator.expires = effect.expires;
+                iterator.remainingTic = effect.remainingTic;
             }
             present = true;
             break;

@@ -34,7 +34,7 @@ public:
     /// Name of the modifier.
     std::string name;
     /// How many tic until it expires.
-    int expires;
+    unsigned int remainingTic;
     /// Message to show when the effect begins.
     std::string messageActivate;
     /// Message to show when the effect ends.
@@ -55,7 +55,7 @@ public:
     /// @brief Constructor.
     Effect(Character * _affected,
            std::string _name,
-           int _expires,
+           unsigned int _remainingTic,
            std::string _messageActivate,
            std::string _messageFade,
            std::function<void(Character * character)> _expireFunction,

@@ -19,11 +19,11 @@
 #include "effectFactory.hpp"
 #include "combatEffects.hpp"
 
-Effect EffectFactory::clearTargets(Character * actor, const int & lastingTime)
+Effect EffectFactory::clearTargets(Character * actor, const unsigned int & duration)
 {
     return Effect(actor,
                   "ClearTargets",
-                  lastingTime,
+                  duration,
                   "",
                   "",
                   ClearTargets,
