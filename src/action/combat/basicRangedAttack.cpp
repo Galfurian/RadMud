@@ -101,12 +101,7 @@ ActionStatus BasicRangedAttack::perform()
         actor->sendMsg(this->stop() + "\n\n");
         return ActionStatus::Finished;
     }
-    // By default set the next combat action to basic attack.
-    if (!actor->setNextCombatAction(CombatActionType::BasicRangedAttack))
-    {
-        actor->sendMsg(this->stop() + "\n\n");
-        return ActionStatus::Finished;
-    }
+    actor->getAction()->resetCooldown(BasicRangedAttack::getCooldown(actor));
     return ActionStatus::Running;
 }
 
@@ -117,20 +112,47 @@ CombatActionType BasicRangedAttack::getCombatActionType() const
 
 unsigned int BasicRangedAttack::getConsumedStamina(Character * character, RangedWeaponItem * weapon)
 {
-    // BASE     [+1.0]
-    // STRENGTH [-0.0 to -2.80]
+    if (weapon->model->toRangedWeapon()->rangedWeaponType == RangedWeaponType::Thrown)
+    {
+        // BASE     [+1.0]
+        // STRENGTH [-0.0 to -1.40]
+        // WEIGHT   [+1.6 to +2.51]
+        // CARRIED  [+0.0 to +2.48]
+        // WEAPON   [+0.0 to +1.60]
+        unsigned int consumedStamina = 1;
+        consumedStamina -= character->getAbilityLog(Ability::Strength, 0.0, 1.0);
+        consumedStamina = SafeSum(consumedStamina, SafeLog10(character->weight));
+        consumedStamina = SafeSum(consumedStamina, SafeLog10(character->getCarryingWeight()));
+        consumedStamina = SafeSum(consumedStamina, SafeLog10(weapon->getWeight(true)));
+        return consumedStamina;
+    }
+    return 0;
+}
+
+unsigned int BasicRangedAttack::getCooldown(Character * character)
+{
+    // BASE     [+5.0]
+    // STRENGTH [-0.0 to -1.40]
+    // AGILITY  [-0.0 to -1.40]
     // WEIGHT   [+1.6 to +2.51]
     // CARRIED  [+0.0 to +2.48]
     // WEAPON   [+0.0 to +1.60]
-    if (weapon->model->toRangedWeapon()->rangedWeaponType == RangedWeaponType::Thrown)
+    unsigned int cooldown = 5;
+    cooldown -= character->getAbilityLog(Ability::Strength, 0.0, 1.0);
+    cooldown -= character->getAbilityLog(Ability::Agility, 0.0, 1.0);
+    cooldown = SafeSum(cooldown, SafeLog10(character->weight));
+    cooldown = SafeSum(cooldown, SafeLog10(character->getCarryingWeight()));
+    if (character->canAttackWith(EquipmentSlot::RightHand))
     {
-        return static_cast<unsigned int>(1.0
-                                         - character->getAbilityLog(Ability::Strength, 0.0, 1.0)
-                                         + SafeLog10(character->weight)
-                                         + SafeLog10(character->getCarryingWeight())
-                                         + SafeLog10(weapon->getWeight(true)));
+        auto weapon = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
+        cooldown = SafeSum(cooldown, SafeLog10(weapon->getWeight(true)));
     }
-    return 0;
+    if (character->canAttackWith(EquipmentSlot::LeftHand))
+    {
+        auto weapon = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
+        cooldown = SafeSum(cooldown, SafeLog10(weapon->getWeight(true)));
+    }
+    return cooldown;
 }
 
 void BasicRangedAttack::performAttack(Character * target,

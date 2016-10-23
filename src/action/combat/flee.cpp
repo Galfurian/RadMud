@@ -18,6 +18,7 @@
 
 #include "flee.hpp"
 #include "room.hpp"
+#include "basicMeleeAttack.hpp"
 
 Flee::Flee(Character * _actor) :
     CombatAction(_actor)
@@ -117,12 +118,7 @@ ActionStatus Flee::perform()
             "You flee from the battlefield.\n");
         return ActionStatus::Finished;
     }
-    // By default set the next combat action to basic attack.
-    if (!actor->setNextCombatAction(CombatActionType::BasicMeleeAttack))
-    {
-        actor->sendMsg(this->stop() + "\n\n");
-        return ActionStatus::Finished;
-    }
+    actor->getAction()->resetCooldown(BasicMeleeAttack::getCooldown(actor));
     return ActionStatus::Running;
 }
 
@@ -134,11 +130,38 @@ CombatActionType Flee::getCombatActionType() const
 unsigned int Flee::getConsumedStamina(Character * character)
 {
     // BASE     [+1.0]
-    // STRENGTH [-0.0 to -2.80]
+    // STRENGTH [-0.0 to -1.40]
     // WEIGHT   [+1.6 to +2.51]
     // CARRIED  [+0.0 to +2.48]
-    return static_cast<unsigned int>(1.0
-                                     - character->getAbilityLog(Ability::Strength, 0.0, 1.0)
-                                     + SafeLog10(character->weight)
-                                     + SafeLog10(character->getCarryingWeight()));
+    unsigned int consumedStamina = 1;
+    consumedStamina -= character->getAbilityLog(Ability::Strength, 0.0, 1.0);
+    consumedStamina = SafeSum(consumedStamina, SafeLog10(character->weight));
+    consumedStamina = SafeSum(consumedStamina, SafeLog10(character->getCarryingWeight()));
+    return consumedStamina;
+}
+
+unsigned int Flee::getCooldown(Character * character)
+{
+    // BASE     [+5.0]
+    // STRENGTH [-0.0 to -1.40]
+    // AGILITY  [-0.0 to -1.40]
+    // WEIGHT   [+1.6 to +2.51]
+    // CARRIED  [+0.0 to +2.48]
+    // WEAPON   [+0.0 to +1.60]
+    unsigned int cooldown = 5;
+    cooldown -= character->getAbilityLog(Ability::Strength, 0.0, 1.0);
+    cooldown -= character->getAbilityLog(Ability::Agility, 0.0, 1.0);
+    cooldown = SafeSum(cooldown, SafeLog10(character->weight));
+    cooldown = SafeSum(cooldown, SafeLog10(character->getCarryingWeight()));
+    if (character->canAttackWith(EquipmentSlot::RightHand))
+    {
+        auto weapon = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
+        cooldown = SafeSum(cooldown, SafeLog10(weapon->getWeight(true)));
+    }
+    if (character->canAttackWith(EquipmentSlot::LeftHand))
+    {
+        auto weapon = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
+        cooldown = SafeSum(cooldown, SafeLog10(weapon->getWeight(true)));
+    }
+    return cooldown;
 }

@@ -197,11 +197,17 @@ ActionStatus BuildAction::perform()
 unsigned int BuildAction::getConsumedStamina(Character * character)
 {
     // BASE     [+1.0]
-    // STRENGTH [-0.0 to -2.80]
+    // STRENGTH [-0.0 to -1.40]
     // WEIGHT   [+1.6 to +2.51]
     // CARRIED  [+0.0 to +2.48]
-    return static_cast<unsigned int>(1.0
-                                     - character->getAbilityLog(Ability::Strength, 0.0, 1.0)
-                                     + SafeLog10(character->weight)
-                                     + SafeLog10(character->getCarryingWeight()));
+    unsigned int consumedStamina = 1;
+    consumedStamina -= character->getAbilityLog(Ability::Strength, 0.0, 1.0);
+    consumedStamina = SafeSum(consumedStamina, SafeLog10(character->weight));
+    consumedStamina = SafeSum(consumedStamina, SafeLog10(character->getCarryingWeight()));
+    return consumedStamina;
+}
+
+unsigned int BuildAction::getCooldown(Character * , Building * _schematics)
+{
+    return _schematics->time;
 }

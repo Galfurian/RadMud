@@ -124,13 +124,28 @@ unsigned int MoveAction::getConsumedStamina(const Character * character, const C
         multiplier = 0.50;
     }
     // BASE     [+1.0]
-    // STRENGTH [-0.0 to -2.80]
+    // STRENGTH [-0.0 to -1.40]
     // WEIGHT   [+1.6 to +2.51]
     // CARRIED  [+0.0 to +2.48]
-    return static_cast<unsigned int>((1.0
-                                      - character->getAbilityLog(Ability::Strength, 0.0, 1.0)
-                                      + SafeLog10(character->weight)
-                                      + SafeLog10(character->getCarryingWeight())) * multiplier);
+    unsigned int consumedStamina = 1;
+    consumedStamina -= character->getAbilityLog(Ability::Strength, 0.0, 1.0);
+    consumedStamina = SafeSum(consumedStamina, SafeLog10(character->weight));
+    consumedStamina = SafeSum(consumedStamina, SafeLog10(character->getCarryingWeight()));
+    return static_cast<unsigned int>(consumedStamina * multiplier);
+}
+
+unsigned int MoveAction::getCooldown(const Character * character)
+{
+    unsigned int cooldown = 2;
+    if (character->posture == CharacterPosture::Crouch)
+    {
+        cooldown = 4;
+    }
+    else if (character->posture == CharacterPosture::Prone)
+    {
+        cooldown = 6;
+    }
+    return cooldown;
 }
 
 bool MoveAction::canMoveTo(Character * character, const Direction & direction, std::string & error)

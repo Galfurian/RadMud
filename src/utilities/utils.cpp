@@ -44,13 +44,6 @@ double SafeLog10(const double & source)
     return 0;
 }
 
-unsigned int SafeSum(const unsigned int & first, const int & second)
-{
-    int signedFirst = static_cast<int>(first);
-    int result = signedFirst + second;
-    return (result < 0) ? 0 : static_cast<unsigned int>(result);
-}
-
 bool BeginWith(const std::string & source, const std::string & prefix)
 {
     return source.compare(0, prefix.size(), prefix) == 0;

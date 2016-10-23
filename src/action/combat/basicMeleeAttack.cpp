@@ -105,11 +105,11 @@ ActionStatus BasicMeleeAttack::perform()
             }
             else
             {
-                actor->sendMsg("You are too far away to attack.\n\n");
+                actor->sendMsg("You are too far away to attack with %s.\n\n", iterator->getName(true));
             }
         }
     }
-    actor->getAction()->resetCooldown(actor->getCooldown(CombatActionType::BasicMeleeAttack));
+    actor->getAction()->resetCooldown(BasicMeleeAttack::getCooldown(actor));
     return ActionStatus::Running;
 }
 
@@ -120,26 +120,46 @@ CombatActionType BasicMeleeAttack::getCombatActionType() const
 
 unsigned int BasicMeleeAttack::getConsumedStamina(Character * character, MeleeWeaponItem * weapon)
 {
-    // If the weapon is not specified.
-    double weaponContribution;
-    if (weapon == nullptr)
-    {
-        weaponContribution = 0.0;
-    }
-    else
-    {
-        weaponContribution = SafeLog10(weapon->getWeight(true));
-    }
     // BASE     [+1.0]
-    // STRENGTH [-0.0 to -2.80]
+    // STRENGTH [-0.0 to -1.40]
     // WEIGHT   [+1.6 to +2.51]
     // CARRIED  [+0.0 to +2.48]
     // WEAPON   [+0.0 to +1.60]
-    return static_cast<unsigned int>(1.0
-                                     - character->getAbilityLog(Ability::Strength, 0.0, 1.0)
-                                     + SafeLog10(character->weight)
-                                     + SafeLog10(character->getCarryingWeight())
-                                     + weaponContribution);
+    unsigned int consumedStamina = 1;
+    consumedStamina -= character->getAbilityLog(Ability::Strength, 0.0, 1.0);
+    consumedStamina = SafeSum(consumedStamina, SafeLog10(character->weight));
+    consumedStamina = SafeSum(consumedStamina, SafeLog10(character->getCarryingWeight()));
+    if (weapon != nullptr)
+    {
+        consumedStamina = SafeSum(consumedStamina, SafeLog10(weapon->getWeight(true)));
+    }
+    return consumedStamina;
+}
+
+unsigned int BasicMeleeAttack::getCooldown(Character * character)
+{
+    // BASE     [+5.0]
+    // STRENGTH [-0.0 to -1.40]
+    // AGILITY  [-0.0 to -1.40]
+    // WEIGHT   [+1.6 to +2.51]
+    // CARRIED  [+0.0 to +2.48]
+    // WEAPON   [+0.0 to +1.60]
+    unsigned int cooldown = 5;
+    cooldown -= character->getAbilityLog(Ability::Strength, 0.0, 1.0);
+    cooldown -= character->getAbilityLog(Ability::Agility, 0.0, 1.0);
+    cooldown = SafeSum(cooldown, SafeLog10(character->weight));
+    cooldown = SafeSum(cooldown, SafeLog10(character->getCarryingWeight()));
+    if (character->canAttackWith(EquipmentSlot::RightHand))
+    {
+        auto weapon = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
+        cooldown = SafeSum(cooldown, SafeLog10(weapon->getWeight(true)));
+    }
+    if (character->canAttackWith(EquipmentSlot::LeftHand))
+    {
+        auto weapon = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
+        cooldown = SafeSum(cooldown, SafeLog10(weapon->getWeight(true)));
+    }
+    return cooldown;
 }
 
 void BasicMeleeAttack::performAttack(Character * target,
@@ -243,13 +263,11 @@ void BasicMeleeAttack::performAttack(Character * target,
 
 Character * BasicMeleeAttack::getValidTarget()
 {
-    Logger::log(LogLevel::Debug, "[%s] Trying to get a valid target...", actor->getName());
     // First try to get the next opponent at close combat range.
     Character * target = actor->getNextOpponentAtRange(0);
     // Otherwise, check if at least there are enemies in sight.
     if (target == nullptr)
     {
-        Logger::log(LogLevel::Debug, "[%s] There is no target at close range.", actor->getName());
         for (auto iterator : actor->aggressionList)
         {
             if (actor->isAtRange(iterator->aggressor, actor->getViewDistance()))

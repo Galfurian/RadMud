@@ -58,6 +58,11 @@ public:
     /// @brief Given an action, it returns the stamina required to execute it.
     static unsigned int getConsumedStamina(const Character * character, const CharacterPosture & posture);
 
+    /// @brief Given an action, it returns the necessary cooldown.
+    /// @param character The actor.
+    /// @return The required time to complete the action.
+    static unsigned int getCooldown(const Character * character);
+
     /// @brief Check if the character can move in the given direction.
     /// @param character The character that wants to move.
     /// @param direction The direction where the character whats to move.

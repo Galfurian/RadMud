@@ -50,6 +50,11 @@ public:
     /// @return The required stamina.
     static unsigned int getConsumedStamina(Character * character, RangedWeaponItem * weapon);
 
+    /// @brief Given an action, it returns the necessary cooldown.
+    /// @param character The actor.
+    /// @return The non-decreasing value of the cooldown.
+    static unsigned int getCooldown(Character * character);
+
 private:
     void performAttack(Character * target, RangedWeaponItem * weapon, const bool dualWielding);
 
