@@ -34,40 +34,42 @@ EffectList::~EffectList()
 int EffectList::getHealthMod() const
 {
     int result = 0;
-    for (const_iterator it = activeEffects.begin(); it != activeEffects.end(); ++it)
-    {
-        result += it->health;
-    }
+    for (auto & it : activeEffects) result += it.health;
     return result;
 }
 
 int EffectList::getStaminaMod() const
 {
     int result = 0;
-    for (const_iterator it = activeEffects.begin(); it != activeEffects.end(); ++it)
-    {
-        result += it->stamina;
-    }
+    for (auto & it : activeEffects) result += it.stamina;
     return result;
 }
 
-int EffectList::getHitMod() const
+int EffectList::getMeleeHitMod() const
 {
     int result = 0;
-    for (const_iterator it = activeEffects.begin(); it != activeEffects.end(); ++it)
-    {
-        result += it->hit;
-    }
+    for (auto & it : activeEffects) result += it.meleeHit;
     return result;
 }
 
-int EffectList::getDamMod() const
+int EffectList::getMeleeDamMod() const
 {
     int result = 0;
-    for (const_iterator it = activeEffects.begin(); it != activeEffects.end(); ++it)
-    {
-        result += it->damage;
-    }
+    for (auto & it : activeEffects) result += it.meleeDamage;
+    return result;
+}
+
+int EffectList::getRangedHitMod() const
+{
+    int result = 0;
+    for (auto & it : activeEffects) result += it.rangedHit;
+    return result;
+}
+
+int EffectList::getRangedDamMod() const
+{
+    int result = 0;
+    for (auto & it : activeEffects) result += it.rangedDamage;
     return result;
 }
 
@@ -87,7 +89,24 @@ int EffectList::getAbilityModifier(const Ability & ability) const
 
 void EffectList::forceAddEffect(const Effect & effect)
 {
-    activeEffects.push_back(effect);
+    bool present = false;
+    for (auto & iterator : pendingEffects)
+    {
+        if (iterator.name == effect.name)
+        {
+            if (iterator.remainingTic < effect.remainingTic)
+            {
+                iterator.remainingTic = effect.remainingTic;
+            }
+            present = true;
+            break;
+        }
+    }
+    if (!present)
+    {
+        activeEffects.push_back(effect);
+        this->sortList();
+    }
 }
 
 void EffectList::addPendingEffect(const Effect & effect)

@@ -162,47 +162,49 @@ void BasicMeleeAttack::performAttack(Character * target,
         return;
     }
     // Natural roll for the attack.
-    auto attack = TRandInteger<unsigned int>(1, 20);
-    // The ammount of damage dealt.
-    unsigned int damage = 0;
+    auto hitRoll = TRandInteger<unsigned int>(1, 20);
+    // The amount of damage dealt.
+    unsigned int damageRoll = 0;
     if (weapon != nullptr)
     {
         // Check if:
-        //  1. The number of active weapons is more than 1, then we have to apply a penality to the attack roll.
+        //  1. The number of active weapons is more than 1, then we have to apply a penality to the hit roll.
         //  2. The value is NOT a natural 20 (hit).
-        if (dualWielding && (attack != 20))
+        if (dualWielding && (hitRoll != 20))
         {
-            // Evaluate the penalty to the attack roll.
+            // Evaluate the penalty to the hit roll.
             unsigned int penalty = 0;
             // On the RIGHT hand the penality is 6.
             // On the LEFT  hand the penality is 10.
             if (weapon->currentSlot == EquipmentSlot::RightHand) penalty = 6;
             if (weapon->currentSlot == EquipmentSlot::LeftHand) penalty = 10;
             // Safely apply the penality.
-            attack = (attack < penalty) ? 0 : (attack - penalty);
+            hitRoll = (hitRoll < penalty) ? 0 : (hitRoll - penalty);
         }
         // Natural roll for the damage.
-        damage = weapon->rollDamage();
+        damageRoll = weapon->rollDamage();
         // Check if the character is wielding a two-handed weapon.
         if (HasFlag(weapon->model->modelFlags, ModelFlag::TwoHand))
         {
             // Get the strenth modifier.
             auto strength = actor->getAbilityModifier(Ability::Strength);
             // Add to the damage rool one and half the strenth value.
-            damage += strength + (strength / 2);
+            damageRoll += strength + (strength / 2);
         }
     }
     else
     {
         // Natural roll for the damage.
-        damage = TRandInteger<unsigned int>(1, 3 + actor->getAbilityModifier(Ability::Strength));
+        damageRoll = TRandInteger<unsigned int>(1, 3 + actor->getAbilityModifier(Ability::Strength));
     }
+    // Add effects modifier.
+    hitRoll = SafeSum(hitRoll, actor->effects.getMeleeHitMod());
     // Evaluate the armor class of the enemy.
     auto armorClass = target->getArmorClass();
     // Check if:
-    //  1. The attack roll is lesser than the armor class of the opponent.
-    //  2. The attack roll is not a natural 20.
-    if ((attack < armorClass) && (attack != 20))
+    //  1. The hit roll is lesser than the armor class of the opponent.
+    //  2. The hit roll is not a natural 20.
+    if ((hitRoll < armorClass) && (hitRoll != 20))
     {
         // Show miss messages.
         this->handleMissMessages(target, weapon);
@@ -217,12 +219,14 @@ void BasicMeleeAttack::performAttack(Character * target,
         // Consume the stamina.
         actor->remStamina(consumedStamina, true);
         // If the character has rolled a natural 20, then multiply the damage by two.
-        if (attack == 20)
+        if (hitRoll == 20)
         {
-            damage *= 2;
+            damageRoll *= 2;
         }
+        // Add effects modifier.
+        hitRoll = SafeSum(hitRoll, actor->effects.getMeleeHitMod());
         // Procede and remove the damage from the health of the target.
-        if (!target->remHealth(damage))
+        if (!target->remHealth(damageRoll))
         {
             // Notify the others.
             target->room->funcSendToAll("%s%s screams in pain and then die!%s\n",

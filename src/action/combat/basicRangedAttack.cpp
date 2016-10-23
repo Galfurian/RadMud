@@ -145,30 +145,30 @@ void BasicRangedAttack::performAttack(Character * target,
         actor->sendMsg("You are too tired to attack with %s.\n", weapon->getName(true));
         return;
     }
-    // Natural roll for the attack.
-    auto attack = TRandInteger<unsigned int>(1, 20);
+    // Natural roll for the hit rool.
+    auto hitRoll = TRandInteger<unsigned int>(1, 20);
     // Check if:
-    //  1. The number of active weapons is more than 1, then we have to apply a penality to the attack roll.
+    //  1. The number of active weapons is more than 1, then we have to apply a penality to the hit roll.
     //  2. The value is NOT a natural 20 (hit).
-    if (dualWielding && (attack != 20))
+    if (dualWielding && (hitRoll != 20))
     {
-        // Evaluate the penalty to the attack roll.
+        // Evaluate the penalty to the hit roll.
         unsigned int penalty = 0;
         // On the RIGHT hand the penality is 6.
         // On the LEFT  hand the penality is 10.
         if (weapon->currentSlot == EquipmentSlot::RightHand) penalty = 6;
         if (weapon->currentSlot == EquipmentSlot::LeftHand) penalty = 10;
         // Safely apply the penality.
-        attack = (attack < penalty) ? 0 : (attack - penalty);
+        hitRoll = (hitRoll < penalty) ? 0 : (hitRoll - penalty);
     }
-    // Natural roll for the damage.
-    //unsigned int damage = weapon->rollDamage();
+    // Add effects modifier.
+    hitRoll = SafeSum(hitRoll, actor->effects.getMeleeHitMod());
     // Evaluate the armor class of the aimed character.
     auto armorClass = actor->aimedCharacter->getArmorClass();
     // Check if:
-    //  1. The attack roll is lesser than the armor class of the opponent.
-    //  2. The attack roll is not a natural 20.
-    if ((attack < armorClass) && (attack != 20))
+    //  1. The hit roll is lesser than the armor class of the opponent.
+    //  2. The hit roll is not a natural 20.
+    if ((hitRoll < armorClass) && (hitRoll != 20))
     {
         this->handleMiss(target, weapon);
         // Consume half the stamina.
@@ -179,14 +179,16 @@ void BasicRangedAttack::performAttack(Character * target,
         this->handleHit(target, weapon);
         // Consume the stamina.
         actor->remStamina(consumedStamina, true);
-        // Natural roll for the damage.
-        auto damage = weapon->rollDamage();
+        // Natural roll for the damage rool.
+        auto damageRoll = weapon->rollDamage();
         // If the character has rolled a natural 20, then multiply the damage by two.
-        if (attack == 20)
+        if (hitRoll == 20)
         {
-            damage *= 2;
+            damageRoll *= 2;
         }
-        if (!target->remHealth(damage))
+        // Add effects modifier.
+        damageRoll = SafeSum(damageRoll, actor->effects.getRangedHitMod());
+        if (!target->remHealth(damageRoll))
         {
             // Notify the others.
             target->room->sendToAll("%s%s screams in pain and then die!%s\n", {target},

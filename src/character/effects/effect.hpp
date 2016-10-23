@@ -47,10 +47,14 @@ public:
     int stamina;
     /// Abilities modifier.
     std::map<Ability, int> abilities;
-    /// Hit chance modifier.
-    int hit;
-    /// Damage modifier.
-    int damage;
+    /// Melee hit chance modifier.
+    int meleeHit;
+    /// Melee damage modifier.
+    int meleeDamage;
+    /// Ranged hit chance modifier.
+    int rangedHit;
+    /// Ranged damage modifier.
+    int rangedDamage;
 
     /// @brief Constructor.
     Effect(Character * _affected,
@@ -62,8 +66,10 @@ public:
            int _health,
            int _stamina,
            std::map<Ability, int> _abilities,
-           int _hit,
-           int _damage);
+           int _meleeHit,
+           int _meleeDamage,
+           int _rangedHit,
+           int _rangedDamage);
 
     /// @brief Update the cooldown of the effect.
     /// @return <b>True</b> if the effect is expired,<br>

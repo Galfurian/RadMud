@@ -19,6 +19,7 @@
 #include "moveAction.hpp"
 #include "character.hpp"
 #include "room.hpp"
+#include "effectFactory.hpp"
 
 using namespace std::chrono;
 
@@ -98,6 +99,11 @@ ActionStatus MoveAction::perform()
     auto consumedStamina = this->getConsumedStamina(actor, actor->posture);
     // Consume the stamina.
     actor->remStamina(consumedStamina, true);
+    // Check if the actor was aiming.
+    if (actor->aimedCharacter)
+    {
+        actor->effects.forceAddEffect(EffectFactory::disturbedAim(actor, 1, -3));
+    }
     // Move character.
     actor->moveTo(
         destination,
@@ -211,9 +217,5 @@ bool MoveAction::canMoveTo(Character * character, const Direction & direction, s
         }
     }
     // Check if the destination is forbidden for mobiles.
-    if (character->isMobile() && HasFlag(destExit->flags, ExitFlag::NoMob))
-    {
-        return false;
-    }
-    return true;
+    return !(character->isMobile() && HasFlag(destExit->flags, ExitFlag::NoMob));
 }

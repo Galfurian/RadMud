@@ -52,13 +52,21 @@ public:
     /// @return The total modifier.
     int getStaminaMod() const;
 
-    /// @brief Provides the overall hit modifier.
+    /// @brief Provides the overall melee hit modifier.
     /// @return The total modifier.
-    int getHitMod() const;
+    int getMeleeHitMod() const;
 
-    /// @brief Provides the overall damage modifier.
+    /// @brief Provides the overall melee damage modifier.
     /// @return The total modifier.
-    int getDamMod() const;
+    int getMeleeDamMod() const;
+
+    /// @brief Provides the overall ranged hit modifier.
+    /// @return The total modifier.
+    int getRangedHitMod() const;
+
+    /// @brief Provides the overall ranged damage modifier.
+    /// @return The total modifier.
+    int getRangedDamMod() const;
 
     /// @brief Provides the overall ability.
     /// @param ability The ability.

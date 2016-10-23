@@ -18,6 +18,7 @@
 
 #include "effectFactory.hpp"
 #include "combatEffects.hpp"
+#include "character.hpp"
 
 Effect EffectFactory::clearTargets(Character * actor, const unsigned int & duration)
 {
@@ -26,10 +27,32 @@ Effect EffectFactory::clearTargets(Character * actor, const unsigned int & durat
                   duration,
                   "",
                   "",
-                  ClearTargets,
+                  [](Character * character)
+                  {
+                      if (character != nullptr) character->charactersInSight.clear();
+                  },
                   0,
                   0,
                   std::map<Ability, int>(),
                   0,
+                  0,
+                  0,
+                  0);
+}
+
+Effect EffectFactory::disturbedAim(Character * actor, const unsigned int & duration, const int & magnitude)
+{
+    return Effect(actor,
+                  "DisturbedAim",
+                  duration,
+                  "",
+                  "",
+                  nullptr,
+                  0,
+                  0,
+                  std::map<Ability, int>(),
+                  0,
+                  0,
+                  magnitude,
                   0);
 }

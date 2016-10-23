@@ -27,8 +27,10 @@ Effect::Effect(Character * _affected,
                int _health,
                int _stamina,
                std::map<Ability, int> _abilities,
-               int _hit,
-               int _damage) :
+               int _meleeHit,
+               int _meleeDamage,
+               int _rangedHit,
+               int _rangedDamage) :
     affected(_affected),
     name(_name),
     remainingTic(_remainingTic),
@@ -38,8 +40,10 @@ Effect::Effect(Character * _affected,
     health(_health),
     stamina(_stamina),
     abilities(_abilities),
-    hit(_hit),
-    damage(_damage)
+    meleeHit(_meleeHit),
+    meleeDamage(_meleeDamage),
+    rangedHit(_rangedHit),
+    rangedDamage(_rangedDamage)
 {
     Logger::log(LogLevel::Debug, "Created effect %s.", name);
     // Nothing to do.
