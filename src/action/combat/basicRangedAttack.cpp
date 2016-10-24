@@ -225,18 +225,10 @@ void BasicRangedAttack::handleHit(Character * target, RangedWeaponItem * weapon)
 {
     // The enemy has received the damage but it is still alive.
     actor->sendMsg("You hit %s with %s.\n\n", target->getName(), weapon->getName(true));
-    // Notify the enemy.
-    if (target->aimedCharacter == actor)
-    {
-        target->sendMsg("%s fires a projectile which hits you.\n\n", actor->getNameCapital());
-    }
-    else
-    {
-        target->sendMsg("Someone fires a projectile that hits you.\n\n");
-    }
     // Notify the other characters.
     if (actor->room == target->room)
     {
+        target->sendMsg("%s fires a projectile which hits you.\n\n", actor->getNameCapital());
         actor->room->funcSendToAll("%s fires and hits %s with %s.\n",
                                    [&](Character * character)
                                    {
@@ -248,6 +240,15 @@ void BasicRangedAttack::handleHit(Character * target, RangedWeaponItem * weapon)
     }
     else
     {
+        // Notify the enemy.
+        if (target->aimedCharacter == actor)
+        {
+            target->sendMsg("%s fires a projectile which hits you.\n\n", actor->getNameCapital());
+        }
+        else
+        {
+            target->sendMsg("Someone fires a projectile that hits you.\n\n");
+        }
         actor->room->funcSendToAll("%s fires and hits %s with %s.\n",
                                    [&](Character * character)
                                    {
@@ -292,18 +293,10 @@ void BasicRangedAttack::handleMiss(Character * target, RangedWeaponItem * weapon
 {
     // Notify the actor.
     actor->sendMsg("You fire and miss %s with %s.\n\n", target->getName(), weapon->getName(true));
-    // Notify the enemy.
-    if (target->aimedCharacter == actor)
-    {
-        target->sendMsg("%s fires an misses you.\n\n", actor->getName());
-    }
-    else
-    {
-        target->sendMsg("Someone fired at you, but missed.\n\n");
-    }
     // Notify the other characters.
     if (actor->room == target->room)
     {
+        target->sendMsg("%s fires an misses you.\n\n", actor->getName());
         actor->room->funcSendToAll("%s fires and misses %s with %s.\n",
                                    [&](Character * character)
                                    {
@@ -315,6 +308,15 @@ void BasicRangedAttack::handleMiss(Character * target, RangedWeaponItem * weapon
     }
     else
     {
+        // Notify the enemy.
+        if (target->aimedCharacter == actor)
+        {
+            target->sendMsg("%s fires an misses you.\n\n", actor->getName());
+        }
+        else
+        {
+            target->sendMsg("Someone fired at you, but missed.\n\n");
+        }
         actor->room->funcSendToAll("%s fires and misses %s with %s.\n",
                                    [&](Character * character)
                                    {
