@@ -149,7 +149,7 @@ unsigned int BasicRangedAttack::getCooldown(Character * character)
     }
     if (character->canAttackWith(EquipmentSlot::LeftHand))
     {
-        auto weapon = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
+        auto weapon = character->findEquipmentSlotItem(EquipmentSlot::LeftHand);
         cooldown = SafeSum(cooldown, SafeLog10(weapon->getWeight(true)));
     }
     return cooldown;
