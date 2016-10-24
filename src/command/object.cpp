@@ -343,7 +343,7 @@ void DoTake(Character * character, ArgumentHandler & args)
                 return;
             }
             // Make a temporary copy of the character's inventory.
-            auto originalList = character->room->items;
+            auto originalList = container->content;
             // Start a transaction.
             SQLiteDbms::instance().beginTransaction();
             // Used to determine if the character has picked up something.
