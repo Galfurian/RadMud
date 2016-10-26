@@ -209,6 +209,7 @@ void AggressionList::resetList()
                         (*it)->aggressor->getName(), owner->getName());
         }
     }
+    aggressionList.clear();
 }
 
 AggressionList::iterator AggressionList::begin()
