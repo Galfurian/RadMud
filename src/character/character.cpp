@@ -63,7 +63,7 @@ Character::Character() :
 
 Character::~Character()
 {
-    // Nothing to do.
+    lua_close(L);
 }
 
 bool Character::check() const
