@@ -512,50 +512,51 @@ void DoFire(Character * character, ArgumentHandler & /*args*/)
         return;
     }
     // For each ranged weapon check if it is able to reach the target.
+    bool canAttack = false;
     for (auto weapon : rangedWeapons)
     {
         auto weaponRange = weapon->getRange();
-        Logger::log(LogLevel::Debug, "Weapon Range : %s", ToString(weaponRange));
         if (character->isAtRange(character->aimedCharacter, weaponRange))
         {
-            // Let the characters enter the combat.
-            if (character->setNextCombatAction(CombatActionType::BasicRangedAttack))
+            canAttack = true;
+            break;
+        }
+    }
+    if (canAttack)
+    {
+        // Let the characters enter the combat.
+        if (character->setNextCombatAction(CombatActionType::BasicRangedAttack))
+        {
+            character->sendMsg("You start firing at %s...\n", character->aimedCharacter->getName());
+            if (!character->aggressionList.addOpponent(character->aimedCharacter))
             {
-                character->sendMsg("You start firing at %s with %s...\n",
-                                   character->aimedCharacter->getName(),
-                                   weapon->getName(true));
-                if (!character->aggressionList.addOpponent(character->aimedCharacter))
-                {
-                    character->sendMsg("You are already fighting againts %s.\n", character->aimedCharacter->getName());
-                    return;
-                }
-                if (!character->aimedCharacter->aggressionList.addOpponent(character))
-                {
-                    character->sendMsg("You were not able to attack %s.\n", character->aimedCharacter->getName());
-                    character->aggressionList.remOpponent(character->aimedCharacter);
-                    return;
-                }
-                if (!character->aimedCharacter->setNextCombatAction(CombatActionType::BasicMeleeAttack))
-                {
-                    character->sendMsg("You were not able to attack %s.\n", character->aimedCharacter->getName());
-                    character->aggressionList.remOpponent(character->aimedCharacter);
-                    character->aimedCharacter->aggressionList.remOpponent(character);
-                    return;
-                }
+                character->sendMsg("You are already fighting againts %s.\n", character->aimedCharacter->getName());
+                return;
             }
-            else
+            if (!character->aimedCharacter->aggressionList.addOpponent(character))
             {
-                character->sendMsg("You were not able to fire at %s with %s.\n",
-                                   character->aimedCharacter->getName(),
-                                   weapon->getName(true));
+                character->sendMsg("You were not able to attack %s.\n", character->aimedCharacter->getName());
+                character->aggressionList.remOpponent(character->aimedCharacter);
+                return;
+            }
+            if (!character->aimedCharacter->setNextCombatAction(CombatActionType::BasicMeleeAttack))
+            {
+                character->sendMsg("You were not able to attack %s.\n", character->aimedCharacter->getName());
+                character->aggressionList.remOpponent(character->aimedCharacter);
+                character->aimedCharacter->aggressionList.remOpponent(character);
+                return;
             }
         }
         else
         {
-            character->sendMsg("You fire at %s with %s but %s is out of your reach...\n",
-                               character->aimedCharacter->getName(),
-                               weapon->getName(true),
-                               character->aimedCharacter->getSubjectPronoun());
+            character->sendMsg("You were not able to fire at %s.\n",
+                               character->aimedCharacter->getName());
         }
+    }
+    else
+    {
+        character->sendMsg("%s is out of your reach...\n",
+                           character->aimedCharacter->getNameCapital(),
+                           character->aimedCharacter->getSubjectPronoun());
     }
 }
