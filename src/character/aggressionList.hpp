@@ -42,6 +42,8 @@ private:
     Character * owner;
     /// List of aggressors.
     AggressorVector aggressionList;
+    /// The predefined target.
+    Character * predefinedTarget;
 
 public:
     /// @brief Constructor.
@@ -68,6 +70,13 @@ public:
     /// @return <b>True</b> if the opponent has been found,<br>
     ///         <b>False</b> otherwise.
     bool hasOpponent(Character * character);
+
+    /// @brief Allows to elect the given character as predefined target.
+    /// @param character The character to set as predefined target.
+    void setPredefinedTarget(Character * character);
+
+    /// @brief Provides the predefined target.
+    Character * getPredefinedTarget();
 
     /// @brief Allows to the a new aggression level to the given opponent.
     /// @param character      The opponent

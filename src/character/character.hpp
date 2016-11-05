@@ -515,11 +515,6 @@ public:
     ///         <b>False</b> otherwise.
     bool isAtRange(Character * target, const unsigned int & range);
 
-    /// @brief Provides a pointer to the opponent on the top of the aggro list.
-    /// @param range Specifies the maximum range.
-    /// @return A pointer to the next opponent.
-    Character * getNextOpponentAtRange(const unsigned int & range);
-
     /// @brief Provides the list of active melee weapons (Left and Right hands).
     /// @return Vector of melee weapons.
     std::vector<MeleeWeaponItem *> getActiveMeleeWeapons();
@@ -527,11 +522,6 @@ public:
     /// @brief Provides the list of active ranged weapons (Left and Right hands).
     /// @return Vector of ranged weapons.
     std::vector<RangedWeaponItem *> getActiveRangedWeapons();
-
-    /// @brief Given an action, it returns the necessary cooldown.
-    /// @param combatAction The desired combat action.
-    /// @return The non-decreasing value of the cooldown.
-    unsigned int getCooldown(CombatActionType combatAction);
 
     /// @brief Handle what happend when this character die.
     virtual void kill();

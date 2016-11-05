@@ -22,9 +22,8 @@
 // Other Include.
 #include "mud.hpp"
 
-#include "basicMeleeAttack.hpp"
-#include "basicRangedAttack.hpp"
 #include "flee.hpp"
+#include "basicAttack.hpp"
 
 #include "armorItem.hpp"
 #include "meleeWeaponItem.hpp"
@@ -518,23 +517,14 @@ bool Character::setNextCombatAction(const CombatActionType & nextAction)
     }
     if (!sameAction)
     {
-        if (nextAction == CombatActionType::BasicMeleeAttack)
+        if (nextAction == CombatActionType::BasicAttack)
         {
             if (aggressionList.empty())
             {
                 Logger::log(LogLevel::Error, "The list of opponents is empty.");
                 return false;
             }
-            this->actionQueue.push_front(std::make_shared<BasicMeleeAttack>(this));
-        }
-        else if (nextAction == CombatActionType::BasicRangedAttack)
-        {
-            if (this->aimedCharacter == nullptr)
-            {
-                Logger::log(LogLevel::Error, "Aimed character is a nullptr.");
-                return false;
-            }
-            this->actionQueue.push_front(std::make_shared<BasicRangedAttack>(this));
+            this->actionQueue.push_front(std::make_shared<BasicAttack>(this));
         }
         else if (nextAction == CombatActionType::Flee)
         {
@@ -542,7 +532,7 @@ bool Character::setNextCombatAction(const CombatActionType & nextAction)
         }
     }
     // Set the action cooldown.
-    this->getAction()->resetCooldown(this->getCooldown(nextAction));
+    this->getAction()->resetCooldown(CombatAction::getCooldown(this));
     return true;
 }
 
@@ -1346,21 +1336,6 @@ bool Character::isAtRange(Character * target, const unsigned int & range)
     return this->room->area->los(this->room->coord, target->room->coord, range);
 }
 
-Character * Character::getNextOpponentAtRange(const unsigned int & range)
-{
-    if (!aggressionList.empty())
-    {
-        for (auto iterator : aggressionList.aggressionList)
-        {
-            if (this->isAtRange(iterator->aggressor, range))
-            {
-                return iterator->aggressor;
-            }
-        }
-    }
-    return nullptr;
-}
-
 std::vector<MeleeWeaponItem *> Character::getActiveMeleeWeapons()
 {
     std::vector<MeleeWeaponItem *> gatheredWeapons;
@@ -1399,89 +1374,6 @@ std::vector<RangedWeaponItem *> Character::getActiveRangedWeapons()
     retrieveWeapon(EquipmentSlot::RightHand);
     retrieveWeapon(EquipmentSlot::LeftHand);
     return gatheredWeapons;
-}
-
-unsigned int Character::getCooldown(CombatActionType combatAction)
-{
-    double BASE = 5.0;
-    // The strength modifier.
-    // MIN = 0.00
-    // MAX = 1.40
-    double AGI = this->getAbilityLog(Ability::Agility, 0.0, 1.0);
-    // The agility modifier.
-    // MIN = 0.00
-    // MAX = 1.40
-    double STR = this->getAbilityLog(Ability::Strength, 0.0, 1.0);
-    // The weight modifier.
-    // MIN =  0.80
-    // MAX =  2.51
-    double WGT = 0.8;
-    double WGTmod = this->weight;
-    if (WGTmod > 0)
-    {
-        if (WGTmod > 320)
-        {
-            WGTmod = 320;
-        }
-        WGT = log10(WGTmod);
-    }
-    // The carried weight.
-    // MIN =  0.00
-    // MAX =  2.48
-    double CAR = 0.0;
-    double CARmod = this->getCarryingWeight();
-    if (CARmod > 0)
-    {
-        if (CARmod > 300)
-        {
-            CARmod = 300;
-        }
-        CAR = log10(CARmod);
-    }
-    if ((combatAction == CombatActionType::BasicMeleeAttack) ||
-        (combatAction == CombatActionType::BasicRangedAttack))
-    {
-        double RHD = 0;
-        double LHD = 0;
-        if (this->canAttackWith(EquipmentSlot::RightHand))
-        {
-            // Right Hand Weapon
-            // MIN =  0.00
-            // MAX =  1.60
-            auto weapon = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
-            double RHDmod = weapon->getWeight(true);
-            if (RHDmod > 0)
-            {
-                if (RHDmod > 40)
-                {
-                    RHDmod = 40;
-                }
-                RHD = log10(RHDmod);
-            }
-        }
-        if (this->canAttackWith(EquipmentSlot::LeftHand))
-        {
-            // Left Hand Weapon
-            // MIN =  0.00
-            // MAX =  1.60
-            auto weapon = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
-            double LHDmod = weapon->getWeight(true);
-            if (LHDmod > 0)
-            {
-                if (LHDmod > 40)
-                {
-                    LHDmod = 40;
-                }
-                LHD = log10(LHDmod);
-            }
-        }
-        BASE += -STR - AGI + WGT + CAR + std::max(RHD, LHD);
-    }
-    else if (combatAction == CombatActionType::Flee)
-    {
-        BASE += -STR - AGI + WGT + CAR;
-    }
-    return static_cast<unsigned int>(BASE);
 }
 
 void Character::kill()

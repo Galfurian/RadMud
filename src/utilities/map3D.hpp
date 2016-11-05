@@ -93,6 +93,22 @@ public:
         // Nothing to do.
     }
 
+    int getWidth() const
+    {
+        return width;
+    }
+
+    int getHeight() const
+    {
+        return height;
+    }
+
+    int getElevation() const
+    {
+        return elevation;
+    }
+
+
     /// @brief Set the object at the given Coordinates3D.
     /// @param x     Coordinate on width.
     /// @param y     Coordinate on heigth.

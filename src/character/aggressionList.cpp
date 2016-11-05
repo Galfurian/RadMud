@@ -24,7 +24,8 @@
 
 AggressionList::AggressionList(Character * _owner) :
     owner(_owner),
-    aggressionList()
+    aggressionList(),
+    predefinedTarget()
 {
     // Nothing to do.
 }
@@ -75,6 +76,16 @@ bool AggressionList::hasOpponent(Character * character)
                         {
                             return element->aggressor->name == character->name;
                         }) != aggressionList.end();
+}
+
+void AggressionList::setPredefinedTarget(Character * character)
+{
+    predefinedTarget = character;
+}
+
+Character * AggressionList::getPredefinedTarget()
+{
+    return predefinedTarget;
 }
 
 bool AggressionList::setAggro(Character * character, unsigned int newAggression)

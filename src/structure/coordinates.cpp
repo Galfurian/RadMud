@@ -40,6 +40,11 @@ bool Coordinates::operator==(const Coordinates & right) const
     return (x == right.x) && (y == right.y) && (z == right.z);
 }
 
+bool Coordinates::operator!=(const Coordinates & right) const
+{
+    return (x != right.x) || (y != right.y) || (z != right.z);
+}
+
 bool Coordinates::operator<(const Coordinates & right) const
 {
     return (x < right.x) && (y < right.y) && (z < right.z);

@@ -54,6 +54,11 @@ public:
     /// @return True if left Coordinates are equal to the right Coordinates.
     bool operator==(const Coordinates & right) const;
 
+    /// @brief Define operator !=, equal.
+    /// @param right The right parameter.
+    /// @return True if left Coordinates are different to the right Coordinates.
+    bool operator!=(const Coordinates & right) const;
+
     /// @brief Define operator <, less than.
     /// @param right The right parameter.
     /// @return True if left Coordinates are less than right Coordinates.

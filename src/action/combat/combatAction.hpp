@@ -23,10 +23,9 @@
 /// The list of possible combat actions.
 using CombatActionType = enum class CombatActionType_t
 {
-    NoAction,          ///< The combat move is to do nothing.
-    BasicMeleeAttack,  ///< The action is a basic melee attack.
-    BasicRangedAttack, ///< The action is a basic ranged attack.
-    Flee               ///< The character tries to flee.
+    NoAction,     ///< The combat move is to do nothing.
+    BasicAttack,  ///< The action is a basic melee attack.
+    Flee          ///< The character tries to flee.
 };
 
 /// @brief An action executed by characters when fighting.
@@ -54,4 +53,9 @@ public:
     /// @brief Provides the type of combat action.
     /// @return The type of combat action.
     virtual CombatActionType getCombatActionType() const = 0;
+
+    /// @brief Given an action, it returns the necessary cooldown.
+    /// @param character The actor.
+    /// @return The non-decreasing value of the cooldown.
+    static unsigned int getCooldown(Character * character);
 };

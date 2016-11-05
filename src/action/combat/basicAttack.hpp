@@ -1,5 +1,5 @@
-/// @file   basicMeleeAttack.hpp
-/// @brief  Contais the definition of the class for the basic melee attacks.
+/// @file   BasicAttack.hpp
+/// @brief  Contais the definition of the class for the basic attacks.
 /// @author Enrico Fraccaroli
 /// @date   Jul 16 2016
 /// @copyright
@@ -21,16 +21,16 @@
 #include "combatAction.hpp"
 
 /// @brief An action executed by characters when fighting at close range.
-class BasicMeleeAttack :
+class BasicAttack :
     public CombatAction
 {
 public:
     /// @brief Constructor.
     /// @param _actor The actor who is doing the action.
-    BasicMeleeAttack(Character * _actor);
+    BasicAttack(Character * _actor);
 
     /// @brief Destructor.
-    virtual ~BasicMeleeAttack();
+    virtual ~BasicAttack();
 
     bool check(std::string & error) const override;
 
@@ -48,23 +48,27 @@ public:
     /// @param character The actor.
     /// @param weapon    The weapon used to performe the action.
     /// @return The required stamina.
-    unsigned int getConsumedStamina(Character * character, MeleeWeaponItem * weapon);
+    static unsigned int getMeleeConsumedStamina(Character * character, MeleeWeaponItem * weapon);
 
-    /// @brief Given an action, it returns the necessary cooldown.
+    /// @brief Returns the stamina required to execute the action.
     /// @param character The actor.
-    /// @return The non-decreasing value of the cooldown.
-    static unsigned int getCooldown(Character * character);
+    /// @param weapon    The weapon used to performe the action.
+    /// @return The required stamina.
+    static unsigned int getRangedConsumedStamina(Character * character, RangedWeaponItem * weapon);
 
 private:
-    void performAttack(Character * target,
-                       MeleeWeaponItem * weapon,
-                       const bool dualWielding);
-
-    Character * getValidTarget();
 
     ActionStatus handleStop();
 
-    void handleHitMessages(Character * target, MeleeWeaponItem * weapon);
+    void performMeleeAttack(Character * target, MeleeWeaponItem * weapon, const bool dualWielding);
 
-    void handleMissMessages(Character * target, MeleeWeaponItem * weapon);
+    void performRangedAttack(Character * target, RangedWeaponItem * weapon, const bool dualWielding);
+
+    void handleMeleeHit(Character * target, MeleeWeaponItem * weapon);
+
+    void handleRangedHit(Character * target, RangedWeaponItem * weapon);
+
+    void handleMeleeMiss(Character * target, MeleeWeaponItem * weapon);
+
+    void handleRangedMiss(Character * target, RangedWeaponItem * weapon);
 };

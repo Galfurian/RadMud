@@ -18,7 +18,7 @@
 
 #include "flee.hpp"
 #include "room.hpp"
-#include "basicMeleeAttack.hpp"
+#include "basicAttack.hpp"
 
 Flee::Flee(Character * _actor) :
     CombatAction(_actor)
@@ -118,7 +118,9 @@ ActionStatus Flee::perform()
             "You flee from the battlefield.\n");
         return ActionStatus::Finished;
     }
-    actor->getAction()->resetCooldown(BasicMeleeAttack::getCooldown(actor));
+    // Reset the cooldown.
+    actor->getAction()->resetCooldown(BasicAttack::getCooldown(actor));
+    // Return that the action is still running.
     return ActionStatus::Running;
 }
 

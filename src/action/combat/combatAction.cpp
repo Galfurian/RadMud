@@ -34,11 +34,7 @@ CombatAction::~CombatAction()
 
 bool CombatAction::check(std::string & error) const
 {
-    if (!GeneralAction::check(error))
-    {
-        return false;
-    }
-    return true;
+    return GeneralAction::check(error);
 }
 
 ActionType CombatAction::getType() const
@@ -59,4 +55,30 @@ std::string CombatAction::stop()
 ActionStatus CombatAction::perform()
 {
     return ActionStatus::Running;
+}
+
+unsigned int CombatAction::getCooldown(Character * character)
+{
+    // BASE     [+5.0]
+    // STRENGTH [-0.0 to -1.40]
+    // AGILITY  [-0.0 to -1.40]
+    // WEIGHT   [+1.6 to +2.51]
+    // CARRIED  [+0.0 to +2.48]
+    // WEAPON   [+0.0 to +1.60]
+    unsigned int cooldown = 5;
+    cooldown -= character->getAbilityLog(Ability::Strength, 0.0, 1.0);
+    cooldown -= character->getAbilityLog(Ability::Agility, 0.0, 1.0);
+    cooldown = SafeSum(cooldown, SafeLog10(character->weight));
+    cooldown = SafeSum(cooldown, SafeLog10(character->getCarryingWeight()));
+    if (character->canAttackWith(EquipmentSlot::RightHand))
+    {
+        auto weapon = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
+        cooldown = SafeSum(cooldown, SafeLog10(weapon->getWeight(true)));
+    }
+    if (character->canAttackWith(EquipmentSlot::LeftHand))
+    {
+        auto weapon = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
+        cooldown = SafeSum(cooldown, SafeLog10(weapon->getWeight(true)));
+    }
+    return cooldown;
 }
