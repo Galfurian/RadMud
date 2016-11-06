@@ -24,9 +24,8 @@
 
 void LoadCraftingCommands()
 {
-    Command command;
-    command.gods = false;
     {
+        Command command;
         command.name = "build";
         command.help = "Build something.";
         command.args = "(item)";
@@ -34,6 +33,7 @@ void LoadCraftingCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "deconstruct";
         command.help = "Deconstruct a building.";
         command.args = "(building)";
@@ -41,6 +41,7 @@ void LoadCraftingCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "read";
         command.help = "Read an inscription from an item.";
         command.args = "(item)";

@@ -23,9 +23,8 @@
 
 void LoadManagerCommands()
 {
-    Command command;
-    command.gods = false;
     {
+        Command command;
         command.name = "assign";
         command.help = "Allows to assign a mobile to a task/building.";
         command.args = "(mobile)(building)";

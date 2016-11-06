@@ -38,24 +38,62 @@ Command::Command() :
     name(),
     help(),
     args(),
-    hndl()
+    hndl(),
+    cuic()
 {
     // Nothing to do.
 }
 
-Command::Command(
-    bool _gods,
-    std::string _name,
-    std::string _help,
-    std::string _args,
-    ActionHandler _hndl) :
+Command::Command(bool _gods,
+                 std::string _name,
+                 std::string _help,
+                 std::string _args,
+                 ActionHandler _hndl,
+                 bool _cuic) :
     gods(_gods),
     name(_name),
     help(_help),
     args(_args),
-    hndl(_hndl)
+    hndl(_hndl),
+    cuic(_cuic)
 {
     // Nothing to do.
+}
+
+Command & Command::setGods(const bool & _gods)
+{
+    gods = _gods;
+    return *this;
+}
+
+Command & Command::setName(const std::string & _name)
+{
+    name = _name;
+    return *this;
+}
+
+Command & Command::setHelp(const std::string & _help)
+{
+    help = _help;
+    return *this;
+}
+
+Command & Command::setArgs(const std::string & _args)
+{
+    args = _args;
+    return *this;
+}
+
+Command & Command::setHndl(const ActionHandler & _hndl)
+{
+    hndl = _hndl;
+    return *this;
+}
+
+Command & Command::setCuic(const bool & _cuic)
+{
+    cuic = _cuic;
+    return *this;
 }
 
 bool Command::canUse(Character * character) const
@@ -94,6 +132,12 @@ void ProcessCommand(Character * character, ArgumentHandler & args)
             {
                 continue;
             }
+            if ((!iterator.cuic) && (character->getAction()->getType() == ActionType::Combat) && !iterator.gods)
+            {
+                character->sendMsg("You cannot do that in combat.\n");
+                found = true;
+                break;
+            }
             if (iterator.name == "shutdown" && command != "shutdown")
             {
                 character->sendMsg("You have to type completly \"shutdown\".\n");
@@ -127,7 +171,7 @@ void ProcessCommand(Character * character, ArgumentHandler & args)
 
 void ProcessPlayerName(Character * character, ArgumentHandler & args)
 {
-    Player * player = character->toPlayer();
+    auto player = character->toPlayer();
     auto input = args.getOriginal();
     // Name can't be blank.
     if (input.empty())

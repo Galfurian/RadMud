@@ -37,12 +37,26 @@ public:
     /// @param _help The help message of the command.
     /// @param _args The arguments of the command.
     /// @param _hndl The handler of the command.
+    /// @param _cuic The handler of the command.
     Command(
         bool _gods,
         std::string _name,
         std::string _help,
         std::string _args,
-        ActionHandler _hndl);
+        ActionHandler _hndl,
+        bool _cuic);
+
+    Command & setGods(const bool & _gods);
+
+    Command & setName(const std::string & _name);
+
+    Command & setHelp(const std::string & _help);
+
+    Command & setArgs(const std::string & _args);
+
+    Command & setHndl(const ActionHandler & _hndl);
+
+    Command & setCuic(const bool & _cuic);
 
     /// @brief Checks if the provided character can use the command.
     /// @param character The character to check.
@@ -60,6 +74,8 @@ public:
     std::string args;
     /// The handler of the command.
     ActionHandler hndl;
+    /// Flag which determines if the command can be used in combat.
+    bool cuic;
 };
 
 /// @defgroup ProcessStates Player state processing.

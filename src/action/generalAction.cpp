@@ -67,7 +67,7 @@ ActionType GeneralAction::getType() const
 
 std::string GeneralAction::getDescription() const
 {
-    return "";
+    return "waiting";
 }
 
 std::string GeneralAction::stop()

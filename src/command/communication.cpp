@@ -30,6 +30,7 @@ void LoadCommunicationCommands()
         command.help = "Talk to people in the current room.";
         command.args = "[someone] (something)";
         command.hndl = DoSay;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
@@ -44,6 +45,7 @@ void LoadCommunicationCommands()
         command.help = "Execute and emote.";
         command.args = "(emotion)";
         command.hndl = DoEmote;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {

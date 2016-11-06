@@ -80,11 +80,11 @@ ActionStatus Flee::perform()
         actor->sendMsg(error + "\n\n");
         return ActionStatus::Error;
     }
-    auto counter = 0;
+    auto counter = actor->actionQueue.size();
     for (auto it : actor->actionQueue)
     {
         Logger::log(LogLevel::Debug, "[%s][%s] %s", actor->getName(), counter, it->getDescription());
-        counter++;
+        counter--;
     }
     // Get the character chance of fleeing (D20).
     auto fleeChance = TRandInteger<unsigned int>(0, 20) + actor->getAbilityModifier(Ability::Agility);

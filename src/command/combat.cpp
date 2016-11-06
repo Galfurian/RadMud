@@ -26,62 +26,76 @@
 
 void LoadCombatCommands()
 {
-    Command command;
-    command.gods = false;
     {
+        Command command;
         command.name = "kill";
         command.help = "Engage in combat the desired target.";
         command.args = "(target)";
         command.hndl = DoKill;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "flee";
         command.help = "Try to flee from combat.";
         command.args = "";
         command.hndl = DoFlee;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "scout";
         command.help = "Provides information about the surrounding area.";
         command.args = "";
         command.hndl = DoScout;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "load";
         command.help = "Allows to load a magazine with projectiles.";
         command.args = "";
         command.hndl = DoLoad;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "unload";
         command.help = "Allows to unload a magazine.";
         command.args = "";
         command.hndl = DoUnload;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "reload";
         command.help = "Allows to reload a firearm.";
         command.args = "";
         command.hndl = DoReload;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "aim";
         command.help = "Allows to aim a target.";
         command.args = "";
         command.hndl = DoAim;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "fire";
         command.help = "Allows to fire with an equipped ranged weapon to an aimed target.";
         command.args = "";
         command.hndl = DoFire;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
 }

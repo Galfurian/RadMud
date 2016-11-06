@@ -23,23 +23,18 @@
 
 void LoadGeneralCommands()
 {
-    Command command;
-    command.gods = false;
     {
-        command.name = "quit";
-        command.help = "Leave the game.";
-        command.args = "";
-        command.hndl = DoQuit;
-        Mud::instance().addCommand(command);
+        Mud::instance().addCommand(Command().setName("quit")
+                                            .setHelp("Leave the game.")
+                                            .setHndl(DoQuit));
     }
     {
-        command.name = "who";
-        command.help = "List all the character online.";
-        command.args = "";
-        command.hndl = DoWho;
-        Mud::instance().addCommand(command);
+        Mud::instance().addCommand(Command().setName("who")
+                                            .setHelp("List all the character online.")
+                                            .setHndl(DoWho));
     }
     {
+        Command command;
         command.name = "set";
         command.help = "Set some character texts(eg. descr).";
         command.args = "(setting) (value)";
@@ -47,20 +42,25 @@ void LoadGeneralCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "stop";
         command.help = "Stop the current character action.";
         command.args = "";
         command.hndl = DoStop;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "look";
         command.help = "Look at something or someone.";
         command.args = "[(something) or (someone)]";
         command.hndl = DoLook;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "help";
         command.help = "Show the list of commands or show help for a given command.";
         command.args = "(command)";
@@ -68,6 +68,7 @@ void LoadGeneralCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "prompt";
         command.help = "Modify your prompt.";
         command.args = "(help)|(prompt definition)";
@@ -75,27 +76,34 @@ void LoadGeneralCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "time";
         command.help = "Give the current day phase.";
         command.args = "";
         command.hndl = DoTime;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "stand";
         command.help = "Make the player stand.";
         command.args = "";
         command.hndl = DoStand;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "crouch";
         command.help = "The player crouches down himself, it's a good stance for hiding.";
         command.args = "";
         command.hndl = DoCrouch;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "sit";
         command.help = "The player sits down, ideal for a quick break.";
         command.args = "";
@@ -103,13 +111,16 @@ void LoadGeneralCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "prone";
         command.help = "The player starts prone, a perfect position to shoot long distance.";
         command.args = "";
         command.hndl = DoProne;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "rest";
         command.help = "The player lies down and begin to rest.";
         command.args = "";
@@ -117,13 +128,16 @@ void LoadGeneralCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "statistics";
         command.help = "Show player statistics.";
         command.args = "";
         command.hndl = DoStatistics;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "rent";
         command.help = "Allow player to rent and disconnect.";
         command.args = "";
@@ -131,24 +145,30 @@ void LoadGeneralCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "skills";
         command.help = "Shows the playes skills and their level.";
         command.args = "";
         command.hndl = DoSkills;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "server";
         command.help = "Shows the server statistics.";
         command.args = "";
         command.hndl = DoServer;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "travel";
         command.help = "Allow the character to travel between areas.";
         command.args = "";
         command.hndl = DoTravel;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
 
