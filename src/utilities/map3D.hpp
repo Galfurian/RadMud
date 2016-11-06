@@ -93,16 +93,19 @@ public:
         // Nothing to do.
     }
 
+    /// @brief Provides the width.
     int getWidth() const
     {
         return width;
     }
 
+    /// @brief Provides the height.
     int getHeight() const
     {
         return height;
     }
 
+    /// @brief Provides the elevation.
     int getElevation() const
     {
         return elevation;

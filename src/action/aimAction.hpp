@@ -44,5 +44,9 @@ public:
 
     ActionStatus perform() override;
 
+    /// @brief Provides the required time for the source to aim the target.
+    /// @param source The source character who is aiming.
+    /// @param target The aimed character.
+    /// @return The seconds required to aim the target.
     static int getAimTime(Character * source, Character * target);
 };

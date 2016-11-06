@@ -268,9 +268,16 @@ public:
         this->sendToAll(message, exceptions, ToString(first), args ...);
     }
 
-    /// @brief Send a message to all the player in the room, can specify exceptions.
+    /// @brief Send a message to all the characters inside the room which pass the checking function.
+    /// @param message        The message to send.
+    /// @param checkException The checking function.
     void funcSendToAll(const std::string & message, std::function<bool(Character * character)> checkException);
 
+    /// @brief Send a message to all the characters inside the room which pass the checking function.
+    /// @param message        The message to send.
+    /// @param checkException The checking function.
+    /// @param first          The first value to unpack.
+    /// @param args           The rest of the arguments.
     template<typename ... Args>
     void funcSendToAll(const std::string & message,
                        std::function<bool(Character * character)> checkException,

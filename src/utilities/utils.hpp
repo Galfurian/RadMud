@@ -69,6 +69,10 @@ bool DoubleEquality(double a, double b);
 /// @return The number.
 double SafeLog10(const double & source);
 
+/// @brief Allows to safely sum an unsigned value with another value.
+/// @param first  The first (unsigned) value.
+/// @param second The second value.
+/// @return The sum of the two values.
 template<typename T>
 unsigned int SafeSum(const unsigned int & first, const T & second)
 {
