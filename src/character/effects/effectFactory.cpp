@@ -17,7 +17,6 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "effectFactory.hpp"
-#include "combatEffects.hpp"
 #include "character.hpp"
 
 Effect EffectFactory::clearTargets(Character * actor, const unsigned int & duration)

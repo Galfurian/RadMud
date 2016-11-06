@@ -11,6 +11,5 @@ set(RADMUD_EFFECTS_SRC
         ./src/character/effects/effect.cpp
         ./src/character/effects/effectList.cpp
         ./src/character/effects/effectFactory.cpp
-        ./src/character/effects/combatEffects.cpp
         PARENT_SCOPE
         )
