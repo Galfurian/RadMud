@@ -53,32 +53,8 @@ ActionStatus BasicAttack::perform()
     {
         return this->handleStop();
     }
-    // Check if the actor has a predefined target.
-    if (actor->aggressionList.getPredefinedTarget() == nullptr)
-    {
-        // First take any valid target at close range.
-        for (auto target : actor->aggressionList)
-        {
-            if (actor->isAtRange(target->aggressor, 0))
-            {
-                actor->aggressionList.setPredefinedTarget(target->aggressor);
-                break;
-            }
-        }
-        // If there is no target at close range, check if there is an aimed character.
-        if (actor->aggressionList.getPredefinedTarget() == nullptr)
-        {
-            if (actor->aimedCharacter == nullptr)
-            {
-                actor->sendMsg("Try aimiming at your enemy.\n");
-                actor->getAction()->resetCooldown(CombatAction::getCooldown(actor));
-            }
-            else
-            {
-                actor->aggressionList.setPredefinedTarget(actor->aimedCharacter);
-            }
-        }
-    }
+    // Find a valid predefined target.
+    this->findPredefinedTarget();
     // Flag used to determine if the actor WAS able to attack the target.
     bool hasAttackedTheTarget = false;
     // Get the predefined target.
@@ -114,27 +90,34 @@ ActionStatus BasicAttack::perform()
         }
         else
         {
-            // Retrieve all the ranged weapons.
-            auto rangedWeapons = actor->getActiveRangedWeapons();
-            // Check if the actor has no ranged weapon equipped.
-            if (rangedWeapons.empty())
+            // Check if the predefined target has been aimed.
+            if (actor->aimedCharacter != nullptr)
             {
-                actor->sendMsg("You don't have a ranged weapon equipped.\n");
-            }
-            else
-            {
-                // Check if the actor is dual-wielding.
-                bool dualWielding = (rangedWeapons.size() > 1);
-                // Perform the attack for each weapon.
-                for (auto weapon : rangedWeapons)
+                if (actor->aimedCharacter == predefinedTarget)
                 {
-                    // Check if the target is at range of the weapon.
-                    if (actor->isAtRange(predefinedTarget, weapon->getRange()))
+                    // Retrieve all the ranged weapons.
+                    auto rangedWeapons = actor->getActiveRangedWeapons();
+                    // Check if the actor has no ranged weapon equipped.
+                    if (rangedWeapons.empty())
                     {
-                        // Set that the actor has actually attacked the target.
-                        hasAttackedTheTarget = true;
-                        // Perform the attack passing the ranged weapon.
-                        this->performRangedAttack(predefinedTarget, weapon, dualWielding);
+                        actor->sendMsg("You don't have a ranged weapon equipped.\n");
+                    }
+                    else
+                    {
+                        // Check if the actor is dual-wielding.
+                        bool dualWielding = (rangedWeapons.size() > 1);
+                        // Perform the attack for each weapon.
+                        for (auto weapon : rangedWeapons)
+                        {
+                            // Check if the target is at range of the weapon.
+                            if (actor->isAtRange(predefinedTarget, weapon->getRange()))
+                            {
+                                // Set that the actor has actually attacked the target.
+                                hasAttackedTheTarget = true;
+                                // Perform the attack passing the ranged weapon.
+                                this->performRangedAttack(predefinedTarget, weapon, dualWielding);
+                            }
+                        }
                     }
                 }
             }
@@ -156,41 +139,122 @@ CombatActionType BasicAttack::getCombatActionType() const
     return CombatActionType::BasicAttack;
 }
 
-unsigned int BasicAttack::getMeleeConsumedStamina(Character * character, MeleeWeaponItem * weapon)
+unsigned int BasicAttack::getConsumedStamina(Character * character, Item * weapon)
 {
     // BASE     [+1.0]
     // STRENGTH [-0.0 to -1.40]
     // WEIGHT   [+1.6 to +2.51]
     // CARRIED  [+0.0 to +2.48]
-    // WEAPON   [+0.0 to +1.60]
     unsigned int consumedStamina = 1;
     consumedStamina -= character->getAbilityLog(Ability::Strength, 0.0, 1.0);
     consumedStamina = SafeSum(consumedStamina, SafeLog10(character->weight));
     consumedStamina = SafeSum(consumedStamina, SafeLog10(character->getCarryingWeight()));
-    if (weapon != nullptr)
+    if (weapon == nullptr)
     {
+        return consumedStamina;
+    }
+    if (weapon->getType() == ModelType::MeleeWeapon)
+    {
+        consumedStamina = SafeSum(consumedStamina, SafeLog10(weapon->getWeight(true)));
+    }
+    else if (weapon->getType() == ModelType::RangedWeapon)
+    {
+        if (weapon->model->toRangedWeapon()->rangedWeaponType != RangedWeaponType::Thrown)
+        {
+            return 0;
+        }
         consumedStamina = SafeSum(consumedStamina, SafeLog10(weapon->getWeight(true)));
     }
     return consumedStamina;
 }
 
-unsigned int BasicAttack::getRangedConsumedStamina(Character * character, RangedWeaponItem * weapon)
+void BasicAttack::findPredefinedTarget()
 {
-    if (weapon->model->toRangedWeapon()->rangedWeaponType == RangedWeaponType::Thrown)
+    // If there is a predefined target, check if it is a valid target.
+    if (actor->aggressionList.getPredefinedTarget() != nullptr)
     {
-        // BASE     [+1.0]
-        // STRENGTH [-0.0 to -1.40]
-        // WEIGHT   [+1.6 to +2.51]
-        // CARRIED  [+0.0 to +2.48]
-        // WEAPON   [+0.0 to +1.60]
-        unsigned int consumedStamina = 1;
-        consumedStamina -= character->getAbilityLog(Ability::Strength, 0.0, 1.0);
-        consumedStamina = SafeSum(consumedStamina, SafeLog10(character->weight));
-        consumedStamina = SafeSum(consumedStamina, SafeLog10(character->getCarryingWeight()));
-        consumedStamina = SafeSum(consumedStamina, SafeLog10(weapon->getWeight(true)));
-        return consumedStamina;
+        Logger::log(LogLevel::Debug, "[%s] Has a predefined target.", actor->getNameCapital());
+        if (this->checkTarget(actor->aggressionList.getPredefinedTarget()))
+        {
+            Logger::log(LogLevel::Debug, "[%s] Predefined target is a valid target.", actor->getNameCapital());
+            return;
+        }
+        Logger::log(LogLevel::Debug, "[%s] Predefined target is NOT a valid target.", actor->getNameCapital());
     }
-    return 0;
+    else
+    {
+        Logger::log(LogLevel::Debug, "[%s] Has no predefined target.", actor->getNameCapital());
+    }
+    // Take a valid target.
+    for (auto it : actor->aggressionList)
+    {
+        if (this->checkTarget(it->aggressor))
+        {
+            Logger::log(LogLevel::Debug, "[%s] Has a new predefined target: %s",
+                        actor->getNameCapital(),
+                        it->aggressor->getNameCapital());
+            actor->aggressionList.setPredefinedTarget(it->aggressor);
+            break;
+        }
+    }
+}
+
+bool BasicAttack::checkTarget(Character * target)
+{
+    // Check characters.
+    if ((actor == nullptr) || (target == nullptr))
+    {
+        Logger::log(LogLevel::Debug, "Either the actor or the target is a nullptr.");
+        return false;
+    }
+    // Check their rooms.
+    if ((actor->room == nullptr) || (target->room == nullptr))
+    {
+        Logger::log(LogLevel::Debug, "[%s] Either the actor or the target are in a nullptr room.",
+                    actor->getNameCapital());
+        return false;
+    }
+    // Check if they are at close range.
+    if (actor->room->coord == target->room->coord)
+    {
+        Logger::log(LogLevel::Debug, "[%s] The actor and the target are in the same room.", actor->getNameCapital());
+        return true;
+    }
+    // Check if there is no aimed character.
+    if (actor->aimedCharacter == nullptr)
+    {
+        Logger::log(LogLevel::Debug, "[%s] The actor has no aimed character, so the target cannot be attacked.",
+                    actor->getNameCapital());
+        return false;
+    }
+    // If at long range, check if the target is the aimed character.
+    if (actor->aimedCharacter->getName() == target->getName())
+    {
+        Logger::log(LogLevel::Debug, "[%s] The aimed character and the target are the same character.",
+                    actor->getNameCapital());
+        // Retrieve all the ranged weapons.
+        auto rangedWeapons = actor->getActiveRangedWeapons();
+        // Check if the actor has no ranged weapon equipped.
+        if (rangedWeapons.empty())
+        {
+            Logger::log(LogLevel::Debug, "[%s] The actor has no ranged weapon equipped.", actor->getNameCapital());
+            return false;
+        }
+        // Just check if AT LEAST one of the equipped ranged weapons can be used
+        //  to attack the target.
+        // TODO: This does not check if the weapon is USABLE!
+        for (auto weapon : rangedWeapons)
+        {
+            if (actor->isAtRange(target, weapon->getRange()))
+            {
+                Logger::log(LogLevel::Debug, "[%s] The target is at range with %s.", actor->getNameCapital(),
+                            weapon->getName(false));
+                return true;
+            }
+        }
+    }
+    Logger::log(LogLevel::Debug, "[%s] No valid target has been found.", actor->getNameCapital());
+    return false;
 }
 
 ActionStatus BasicAttack::handleStop()
@@ -203,7 +267,7 @@ ActionStatus BasicAttack::handleStop()
 void BasicAttack::performMeleeAttack(Character * target, MeleeWeaponItem * weapon, const bool dualWielding)
 {
     // Get the required stamina.
-    auto consumedStamina = this->getMeleeConsumedStamina(actor, weapon);
+    auto consumedStamina = this->getConsumedStamina(actor, weapon);
     // Check if the actor has enough stamina to execute the action.
     if (consumedStamina > actor->getStamina())
     {
@@ -318,7 +382,7 @@ void BasicAttack::performMeleeAttack(Character * target, MeleeWeaponItem * weapo
 void BasicAttack::performRangedAttack(Character * target, RangedWeaponItem * weapon, const bool dualWielding)
 {
     // Get the required stamina.
-    auto consumedStamina = this->getRangedConsumedStamina(actor, weapon);
+    auto consumedStamina = this->getConsumedStamina(actor, weapon);
     // Check if the actor has enough stamina to execute the action.
     if (consumedStamina > actor->getStamina())
     {
@@ -344,7 +408,7 @@ void BasicAttack::performRangedAttack(Character * target, RangedWeaponItem * wea
     // Add effects modifier.
     hitRoll = SafeSum(hitRoll, actor->effects.getMeleeHitMod());
     // Evaluate the armor class of the aimed character.
-    auto armorClass = actor->aimedCharacter->getArmorClass();
+    auto armorClass = target->getArmorClass();
     // Flag used to check if the target is alive.
     bool targetIsAlive = true;
     // Check if:

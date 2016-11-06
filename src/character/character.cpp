@@ -243,10 +243,7 @@ bool Character::setAbility(const Ability & ability, const unsigned int & value)
         abilities[ability] = value;
         return true;
     }
-    else
-    {
-        return false;
-    }
+    return false;
 }
 
 unsigned int Character::getAbility(const Ability & ability, bool withEffects) const
