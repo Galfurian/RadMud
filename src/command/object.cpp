@@ -914,9 +914,10 @@ void DoRemove(Character * character, ArgumentHandler & args)
         character->sendMsg("Too many arguments.\n");
         return;
     }
+    // Define a function which checks if all the ranged weapons have been removed.
     auto CheckIfRemovedAllRangedWeapons = [&character]()
     {
-        if (character->aimedCharacter == nullptr)
+        if (character->combatHandler.getAimedTarget() == nullptr)
         {
             return false;
         }
@@ -938,6 +939,7 @@ void DoRemove(Character * character, ArgumentHandler & args)
         }
         return true;
     };
+
     if (args[0].getContent() == "all")
     {
         // Handle output only if the player has really removed something.
@@ -961,10 +963,13 @@ void DoRemove(Character * character, ArgumentHandler & args)
             {character},
             character->getNameCapital());
         // Check if we have just removed ALL the USED Ranged Weapons.
-        if (CheckIfRemovedAllRangedWeapons())
+        if (character->combatHandler.getAimedTarget() != nullptr)
         {
-            character->sendMsg("You stop aiming %s.\n", character->aimedCharacter->getName());
-            character->aimedCharacter = nullptr;
+            if (CheckIfRemovedAllRangedWeapons())
+            {
+                character->sendMsg("You stop aiming %s.\n", character->combatHandler.getAimedTarget()->getName());
+                character->combatHandler.setAimedTarget(nullptr);
+            }
         }
         return;
     }
@@ -994,10 +999,13 @@ void DoRemove(Character * character, ArgumentHandler & args)
         character->getPossessivePronoun(),
         ToLower(item->getCurrentSlotName()));
     // Check if we have just removed ALL the USED Ranged Weapons.
-    if (CheckIfRemovedAllRangedWeapons())
+    if (character->combatHandler.getAimedTarget() != nullptr)
     {
-        character->sendMsg("You stop aiming %s.\n", character->aimedCharacter->getName());
-        character->aimedCharacter = nullptr;
+        if (CheckIfRemovedAllRangedWeapons())
+        {
+            character->sendMsg("You stop aiming %s.\n", character->combatHandler.getAimedTarget()->getName());
+            character->combatHandler.setAimedTarget(nullptr);
+        }
     }
 }
 

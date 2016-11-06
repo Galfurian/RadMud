@@ -50,10 +50,9 @@ Character::Character() :
     posture(CharacterPosture::Stand),
     effects(),
     L(luaL_newstate()),
-    aggressionList(this),
+    combatHandler(this),
     actionQueue(),
-    charactersInSight(),
-    aimedCharacter()
+    charactersInSight()
 {
     actionQueue.push_back(std::make_shared<GeneralAction>(this));
     // Nothing to do.
@@ -516,7 +515,7 @@ bool Character::setNextCombatAction(const CombatActionType & nextAction)
     {
         if (nextAction == CombatActionType::BasicAttack)
         {
-            if (aggressionList.empty())
+            if (combatHandler.empty())
             {
                 Logger::log(LogLevel::Error, "The list of opponents is empty.");
                 return false;
@@ -1404,7 +1403,7 @@ void Character::kill()
     this->actionQueue.clear();
     this->setAction(std::make_shared<GeneralAction>(this));
     // Reset the list of opponents.
-    this->aggressionList.resetList();
+    this->combatHandler.resetList();
     // Remove the character from the current room.
     if (room != nullptr)
     {

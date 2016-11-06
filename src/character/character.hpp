@@ -86,13 +86,11 @@ public:
     /// The lua_State associated with this character.
     lua_State * L;
     /// List of opponents.
-    AggressionList aggressionList;
+    CombatHandler combatHandler;
     /// Character current action.
     std::deque<std::shared_ptr<GeneralAction> > actionQueue;
     /// List of characters in sight.
     CharacterContainer charactersInSight;
-    /// A pointer to the currently aimed character.
-    Character * aimedCharacter;
 
     /// @brief Constructor.
     Character();

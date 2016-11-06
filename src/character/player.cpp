@@ -279,8 +279,10 @@ void Player::sendPrompt()
             FindAndReplace(&out, "&H", ToString(this->getMaxHealth()));
             FindAndReplace(&out, "&s", ToString(this->getStamina()));
             FindAndReplace(&out, "&S", ToString(this->getMaxStamina()));
-            FindAndReplace(&out, "&T",
-                           (this->aimedCharacter == nullptr) ? "" : "[" + this->aimedCharacter->getName() + "]");
+            FindAndReplace(&out, "&T", (this->combatHandler.getPredefinedTarget() == nullptr) ? "" :
+                                       "[" + this->combatHandler.getPredefinedTarget()->getName() + "]");
+            FindAndReplace(&out, "&A", (this->combatHandler.getAimedTarget() == nullptr) ? "" :
+                                       "[" + this->combatHandler.getAimedTarget()->getName() + "]");
             this->sendMsg(out);
         }
         else

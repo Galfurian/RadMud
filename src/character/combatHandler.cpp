@@ -1,4 +1,4 @@
-/// @file   aggressionList.cpp
+/// @file   combatHandler.cpp
 /// @brief  Contains implementation of combat classes.
 /// @author Enrico Fraccaroli
 /// @date   May 8 2016
@@ -16,26 +16,27 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#include "aggressionList.hpp"
+#include "combatHandler.hpp"
 
 #include "utils.hpp"
 #include "logger.hpp"
 #include "character.hpp"
 
-AggressionList::AggressionList(Character * _owner) :
+CombatHandler::CombatHandler(Character * _owner) :
     owner(_owner),
-    aggressionList(),
-    predefinedTarget()
+    opponents(),
+    predefinedTarget(),
+    aimedCharacter()
 {
     // Nothing to do.
 }
 
-AggressionList::~AggressionList()
+CombatHandler::~CombatHandler()
 {
     // Nothing to do.
 }
 
-bool AggressionList::addOpponent(Character * character, unsigned int initAggro)
+bool CombatHandler::addOpponent(Character * character, unsigned int initAggro)
 {
     if (!this->hasOpponent(character))
     {
@@ -44,7 +45,7 @@ bool AggressionList::addOpponent(Character * character, unsigned int initAggro)
             initAggro = this->getInitialAggro(character);
         }
         // Add the aggressor.
-        aggressionList.push_back(std::make_shared<Aggression>(character, initAggro));
+        opponents.push_back(std::make_shared<Aggression>(character, initAggro));
         // Sort the list.
         this->sortList();
         Logger::log(LogLevel::Debug, "%s engage %s with %s.", owner->getNameCapital(), character->getName(), initAggro);
@@ -53,49 +54,59 @@ bool AggressionList::addOpponent(Character * character, unsigned int initAggro)
     return false;
 }
 
-bool AggressionList::remOpponent(Character * character)
+bool CombatHandler::remOpponent(Character * character)
 {
-    auto it = std::find_if(aggressionList.begin(), aggressionList.end(),
+    auto it = std::find_if(opponents.begin(), opponents.end(),
                            [&](std::shared_ptr<Aggression> const & element)
                            {
                                return element->aggressor->name == character->name;
                            });
-    if (it != aggressionList.end())
+    if (it != opponents.end())
     {
         Logger::log(LogLevel::Debug, "%s disengages %s", owner->getNameCapital(), character->getName());
-        aggressionList.erase(it, aggressionList.end());
+        opponents.erase(it, opponents.end());
         return true;
     }
     return false;
 }
 
-bool AggressionList::hasOpponent(Character * character)
+bool CombatHandler::hasOpponent(Character * character)
 {
-    return std::find_if(aggressionList.begin(), aggressionList.end(),
+    return std::find_if(opponents.begin(), opponents.end(),
                         [&](std::shared_ptr<Aggression> const & element)
                         {
                             return element->aggressor->name == character->name;
-                        }) != aggressionList.end();
+                        }) != opponents.end();
 }
 
-void AggressionList::setPredefinedTarget(Character * character)
+void CombatHandler::setPredefinedTarget(Character * character)
 {
     predefinedTarget = character;
 }
 
-Character * AggressionList::getPredefinedTarget()
+Character * CombatHandler::getPredefinedTarget()
 {
     return predefinedTarget;
 }
 
-bool AggressionList::setAggro(Character * character, unsigned int newAggression)
+void CombatHandler::setAimedTarget(Character * character)
+{
+    aimedCharacter = character;
+}
+
+Character * CombatHandler::getAimedTarget()
+{
+    return aimedCharacter;
+}
+
+bool CombatHandler::setAggro(Character * character, unsigned int newAggression)
 {
     bool ret = false;
-    auto it = std::find_if(aggressionList.begin(), aggressionList.end(), [&](std::shared_ptr<Aggression> const & p)
+    auto it = std::find_if(opponents.begin(), opponents.end(), [&](std::shared_ptr<Aggression> const & p)
     {
         return p->aggressor->name == character->name;
     });
-    if (it != aggressionList.end())
+    if (it != opponents.end())
     {
         // Set the new aggro.
         (*it)->aggression = newAggression;
@@ -107,16 +118,16 @@ bool AggressionList::setAggro(Character * character, unsigned int newAggression)
     return ret;
 }
 
-std::shared_ptr<Aggression> AggressionList::getTopAggro()
+std::shared_ptr<Aggression> CombatHandler::getTopAggro()
 {
-    if (aggressionList.empty())
+    if (opponents.empty())
     {
         return nullptr;
     }
-    return *(aggressionList.begin());
+    return *(opponents.begin());
 }
 
-bool AggressionList::moveToTopAggro(Character * character)
+bool CombatHandler::moveToTopAggro(Character * character)
 {
     // Check if the character is a valid opponent.
     if (!this->hasOpponent(character))
@@ -136,7 +147,7 @@ bool AggressionList::moveToTopAggro(Character * character)
     // Retrieve the top aggro.
     auto currentAggro = this->getAggro(character);
     auto topAggro = currentAggro;
-    for (auto it : aggressionList)
+    for (auto it : opponents)
     {
         if (it->aggression > topAggro)
         {
@@ -148,7 +159,7 @@ bool AggressionList::moveToTopAggro(Character * character)
     return true;
 }
 
-unsigned int AggressionList::getInitialAggro(Character * character)
+unsigned int CombatHandler::getInitialAggro(Character * character)
 {
     if (owner->level > character->level)
     {
@@ -157,9 +168,9 @@ unsigned int AggressionList::getInitialAggro(Character * character)
     return (character->level - owner->level);
 }
 
-unsigned int AggressionList::getAggro(Character * character)
+unsigned int CombatHandler::getAggro(Character * character)
 {
-    for (auto it : aggressionList)
+    for (auto it : opponents)
     {
         if (it->aggressor == character)
         {
@@ -169,19 +180,19 @@ unsigned int AggressionList::getAggro(Character * character)
     return 0;
 }
 
-std::size_t AggressionList::getSize()
+std::size_t CombatHandler::getSize()
 {
-    return aggressionList.size();
+    return opponents.size();
 }
 
-bool AggressionList::empty()
+bool CombatHandler::empty()
 {
-    return aggressionList.empty();
+    return opponents.empty();
 }
 
-void AggressionList::checkList()
+void CombatHandler::checkList()
 {
-    auto temporaryList = aggressionList;
+    auto temporaryList = opponents;
     for (auto it = temporaryList.begin(); it != temporaryList.end(); ++it)
     {
         // Check if the aggressor is null.
@@ -197,9 +208,9 @@ void AggressionList::checkList()
     }
 }
 
-void AggressionList::resetList()
+void CombatHandler::resetList()
 {
-    auto temporaryList = aggressionList;
+    auto temporaryList = opponents;
     for (auto it = temporaryList.begin(); it != temporaryList.end(); ++it)
     {
         // Check if the aggressor is null.
@@ -208,7 +219,7 @@ void AggressionList::resetList()
             continue;
         }
         // Remove the owner from its list.
-        if (!(*it)->aggressor->aggressionList.remOpponent(owner))
+        if (!(*it)->aggressor->combatHandler.remOpponent(owner))
         {
             Logger::log(LogLevel::Error, "Could not remove %s from opponents of %s.",
                         owner->getName(), (*it)->aggressor->getName());
@@ -220,30 +231,30 @@ void AggressionList::resetList()
                         (*it)->aggressor->getName(), owner->getName());
         }
     }
-    aggressionList.clear();
+    opponents.clear();
 }
 
-AggressionList::iterator AggressionList::begin()
+CombatHandler::iterator CombatHandler::begin()
 {
-    return aggressionList.begin();
+    return opponents.begin();
 }
 
-AggressionList::iterator AggressionList::end()
+CombatHandler::iterator CombatHandler::end()
 {
-    return aggressionList.end();
+    return opponents.end();
 }
 
-void AggressionList::sortList()
+void CombatHandler::sortList()
 {
-    std::sort(aggressionList.begin(), aggressionList.end(),
+    std::sort(opponents.begin(), opponents.end(),
               [](std::shared_ptr<Aggression> a, std::shared_ptr<Aggression> b)
               { return a->aggression > b->aggression; });
 }
 
-void AggressionList::printList()
+void CombatHandler::printList()
 {
     std::cout << "Aggro List:" << std::endl;
-    for (auto it : aggressionList)
+    for (auto it : opponents)
     {
         std::cout << "  [" + (*it).aggressor->name + "] " + ToString((*it).aggression) << std::endl;
     }

@@ -659,9 +659,13 @@ void DoStatistics(Character * character, ArgumentHandler & /*args*/)
     {
         msg += "You are " + BLD + player->getAction()->getDescription() + RES + ".\n";
     }
-    if (player->aimedCharacter != nullptr)
+    if (player->combatHandler.getPredefinedTarget() != nullptr)
     {
-        msg += "You are aiming at " + BLD + player->aimedCharacter->getName() + RES + ".\n";
+        msg += "You are fighting with " + BLD + player->combatHandler.getPredefinedTarget()->getName() + RES + ".\n";
+    }
+    if (player->combatHandler.getAimedTarget() != nullptr)
+    {
+        msg += "You are aiming at " + BLD + player->combatHandler.getAimedTarget()->getName() + RES + ".\n";
     }
     player->sendMsg(msg);
 }

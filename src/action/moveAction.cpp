@@ -100,7 +100,7 @@ ActionStatus MoveAction::perform()
     // Consume the stamina.
     actor->remStamina(consumedStamina, true);
     // Check if the actor was aiming.
-    if (actor->aimedCharacter)
+    if (actor->combatHandler.getAimedTarget() != nullptr)
     {
         actor->effects.forceAddEffect(EffectFactory::disturbedAim(actor, 1, -3));
     }
@@ -155,7 +155,7 @@ bool MoveAction::canMoveTo(Character * character, const Direction & direction, s
         // Check if the character is locked into close combat.
         bool lockedInCombat = false;
         // Check if he is in the same room of one of its aggressors.
-        for (auto iterator : character->aggressionList)
+        for (auto iterator : character->combatHandler)
         {
             if (iterator->aggressor != nullptr)
             {
@@ -167,9 +167,12 @@ bool MoveAction::canMoveTo(Character * character, const Direction & direction, s
             }
         }
         // Check even the aimed character.
-        if (character->aimedCharacter)
+        if (character->combatHandler.getAimedTarget() != nullptr)
         {
-            if (character->aimedCharacter->room == character->room) lockedInCombat = true;
+            if (character->combatHandler.getAimedTarget()->room == character->room)
+            {
+                lockedInCombat = true;
+            }
         }
         if (lockedInCombat)
         {

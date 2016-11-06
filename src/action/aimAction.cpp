@@ -93,7 +93,7 @@ ActionStatus AimAction::perform()
     // Send the message.
     actor->sendMsg("You are now aiming at %s...\n\n", target->getName());
     // Set the aimed character.
-    actor->aimedCharacter = target;
+    actor->combatHandler.setAimedTarget(target);
     return ActionStatus::Finished;
 }
 

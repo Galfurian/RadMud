@@ -69,7 +69,7 @@ ActionStatus BasicAttack::perform()
         counter++;
     }
     // If there are no enemies, just stop fighting.
-    if (actor->aggressionList.empty())
+    if (actor->combatHandler.empty())
     {
         // Stop the combat.
         this->handleStop();
@@ -82,7 +82,7 @@ ActionStatus BasicAttack::perform()
     if (this->setPredefinedTarget())
     {
         // Get the predefined target.
-        Character * predefinedTarget = actor->aggressionList.getPredefinedTarget();
+        Character * predefinedTarget = actor->combatHandler.getPredefinedTarget();
         // If the actor and the pred-target are in the same room, then use the melee weapons,
         //  otherwise use the ranged ones.
         if (actor->room->coord == predefinedTarget->room->coord)
@@ -177,10 +177,10 @@ unsigned int BasicAttack::getConsumedStamina(Character * character, Item * weapo
 bool BasicAttack::setPredefinedTarget()
 {
     // If there is a predefined target, check if it is a valid target.
-    if (actor->aggressionList.getPredefinedTarget() != nullptr)
+    if (actor->combatHandler.getPredefinedTarget() != nullptr)
     {
         Logger::log(LogLevel::Debug, "[%s] Has a predefined target.", actor->getNameCapital());
-        if (this->checkTarget(actor->aggressionList.getPredefinedTarget()))
+        if (this->checkTarget(actor->combatHandler.getPredefinedTarget()))
         {
             Logger::log(LogLevel::Debug, "[%s] Predefined target is a valid target.", actor->getNameCapital());
             return true;
@@ -192,14 +192,14 @@ bool BasicAttack::setPredefinedTarget()
         Logger::log(LogLevel::Debug, "[%s] Has no predefined target.", actor->getNameCapital());
     }
     // Take a valid target.
-    for (auto it : actor->aggressionList)
+    for (auto it : actor->combatHandler)
     {
         if (this->checkTarget(it->aggressor))
         {
             Logger::log(LogLevel::Debug, "[%s] Has a new predefined target: %s",
                         actor->getNameCapital(),
                         it->aggressor->getNameCapital());
-            actor->aggressionList.setPredefinedTarget(it->aggressor);
+            actor->combatHandler.setPredefinedTarget(it->aggressor);
             return true;
         }
     }
@@ -228,14 +228,14 @@ bool BasicAttack::checkTarget(Character * target)
         return true;
     }
     // Check if there is no aimed character.
-    if (actor->aimedCharacter == nullptr)
+    if (actor->combatHandler.getAimedTarget() == nullptr)
     {
         Logger::log(LogLevel::Debug, "[%s] The actor has no aimed character, so the target cannot be attacked.",
                     actor->getNameCapital());
         return false;
     }
     // If at long range, check if the target is the aimed character.
-    if (actor->aimedCharacter->getName() == target->getName())
+    if (actor->combatHandler.getAimedTarget() == target)
     {
         Logger::log(LogLevel::Debug, "[%s] The aimed character and the target are the same character.",
                     actor->getNameCapital());
@@ -269,11 +269,11 @@ void BasicAttack::handleStop()
     // Send the stop message.
     actor->sendMsg(this->stop() + "\n\n");
     // Reset the list of aggressors.
-    actor->aggressionList.resetList();
+    actor->combatHandler.resetList();
     // Clear the predefined target.
-    actor->aggressionList.setPredefinedTarget(nullptr);
-    // Remove the aimed character.
-    actor->aimedCharacter = nullptr;
+    actor->combatHandler.setPredefinedTarget(nullptr);
+    // Clear the aimed character.
+    actor->combatHandler.setAimedTarget(nullptr);
 }
 
 void BasicAttack::performMeleeAttack(Character * target, MeleeWeaponItem * weapon, const bool dualWielding)
@@ -376,17 +376,17 @@ void BasicAttack::performMeleeAttack(Character * target, MeleeWeaponItem * weapo
     }
     if (targetIsAlive)
     {
-        if (!target->aggressionList.hasOpponent(actor))
+        if (!target->combatHandler.hasOpponent(actor))
         {
-            target->aggressionList.addOpponent(actor);
+            target->combatHandler.addOpponent(actor);
             if (target->getAction()->getType() != ActionType::Combat)
             {
                 target->actionQueue.push_front(std::make_shared<BasicAttack>(target));
             }
         }
-        if (!actor->aggressionList.hasOpponent(target))
+        if (!actor->combatHandler.hasOpponent(target))
         {
-            actor->aggressionList.addOpponent(target);
+            actor->combatHandler.addOpponent(target);
         }
     }
 }
@@ -459,17 +459,17 @@ void BasicAttack::performRangedAttack(Character * target, RangedWeaponItem * wea
     }
     if (targetIsAlive)
     {
-        if (!target->aggressionList.hasOpponent(actor))
+        if (!target->combatHandler.hasOpponent(actor))
         {
-            target->aggressionList.addOpponent(actor);
+            target->combatHandler.addOpponent(actor);
             if (target->getAction()->getType() != ActionType::Combat)
             {
                 target->actionQueue.push_front(std::make_shared<BasicAttack>(target));
             }
         }
-        if (!actor->aggressionList.hasOpponent(target))
+        if (!actor->combatHandler.hasOpponent(target))
         {
-            actor->aggressionList.addOpponent(target);
+            actor->combatHandler.addOpponent(target);
         }
     }
 }
@@ -534,7 +534,7 @@ void BasicAttack::handleRangedHit(Character * target, RangedWeaponItem * weapon)
     else
     {
         // Notify the enemy.
-        if (target->aimedCharacter == actor)
+        if (target->combatHandler.getAimedTarget() == actor)
         {
             target->sendMsg("%s fires a projectile which hits you.\n\n", actor->getNameCapital());
         }
@@ -547,7 +547,7 @@ void BasicAttack::handleRangedHit(Character * target, RangedWeaponItem * weapon)
                                    {
                                        if ((character == actor) || (character == target)) return false;
                                        if (character->charactersInSight.containsCharacter(target)) return true;
-                                       return character->aimedCharacter == target;
+                                       return character->combatHandler.getAimedTarget() == target;
                                    },
                                    actor->getNameCapital(),
                                    target->getName(),
@@ -557,7 +557,7 @@ void BasicAttack::handleRangedHit(Character * target, RangedWeaponItem * weapon)
                                    {
                                        if ((character == actor) || (character == target)) return false;
                                        if (character->charactersInSight.containsCharacter(target)) return false;
-                                       return character->aimedCharacter != target;
+                                       return character->combatHandler.getAimedTarget() != target;
                                    },
                                    actor->getNameCapital(),
                                    weapon->getName(true));
@@ -566,7 +566,7 @@ void BasicAttack::handleRangedHit(Character * target, RangedWeaponItem * weapon)
                                     {
                                         if ((character == actor) || (character == target)) return false;
                                         if (character->charactersInSight.containsCharacter(actor)) return true;
-                                        return character->aimedCharacter == actor;
+                                        return character->combatHandler.getAimedTarget() == actor;
                                     },
                                     actor->getNameCapital(),
                                     target->getName(),
@@ -576,7 +576,7 @@ void BasicAttack::handleRangedHit(Character * target, RangedWeaponItem * weapon)
                                     {
                                         if ((character == actor) || (character == target)) return false;
                                         if (character->charactersInSight.containsCharacter(actor)) return false;
-                                        return character->aimedCharacter != actor;
+                                        return character->combatHandler.getAimedTarget() != actor;
                                     },
                                     target->getName());
     }
@@ -635,7 +635,7 @@ void BasicAttack::handleRangedMiss(Character * target, RangedWeaponItem * weapon
     else
     {
         // Notify the enemy.
-        if (target->aimedCharacter == actor)
+        if (target->combatHandler.getAimedTarget() == actor)
         {
             target->sendMsg("%s fires an misses you.\n\n", actor->getName());
         }
@@ -648,7 +648,7 @@ void BasicAttack::handleRangedMiss(Character * target, RangedWeaponItem * weapon
                                    {
                                        if ((character == actor) || (character == target)) return false;
                                        if (character->charactersInSight.containsCharacter(target)) return true;
-                                       return character->aimedCharacter == target;
+                                       return character->combatHandler.getAimedTarget() == target;
                                    },
                                    actor->getNameCapital(),
                                    target->getName(),
@@ -658,7 +658,7 @@ void BasicAttack::handleRangedMiss(Character * target, RangedWeaponItem * weapon
                                    {
                                        if ((character == actor) || (character == target)) return false;
                                        if (character->charactersInSight.containsCharacter(target)) return false;
-                                       return character->aimedCharacter != target;
+                                       return character->combatHandler.getAimedTarget() != target;
                                    },
                                    actor->getNameCapital(),
                                    weapon->getName(true));
@@ -667,7 +667,7 @@ void BasicAttack::handleRangedMiss(Character * target, RangedWeaponItem * weapon
                                     {
                                         if ((character == actor) || (character == target)) return false;
                                         if (character->charactersInSight.containsCharacter(actor)) return true;
-                                        return character->aimedCharacter == actor;
+                                        return character->combatHandler.getAimedTarget() == actor;
                                     },
                                     actor->getNameCapital(),
                                     target->getName(),
@@ -677,7 +677,7 @@ void BasicAttack::handleRangedMiss(Character * target, RangedWeaponItem * weapon
                                     {
                                         if ((character == actor) || (character == target)) return false;
                                         if (character->charactersInSight.containsCharacter(actor)) return false;
-                                        return character->aimedCharacter != actor;
+                                        return character->combatHandler.getAimedTarget() != actor;
                                     },
                                     target->getName());
     }

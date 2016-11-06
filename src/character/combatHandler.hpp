@@ -1,4 +1,4 @@
-/// @file   aggressionList.hpp
+/// @file   combatHandler.hpp
 /// @brief  Contains definition of combat classes.
 /// @author Enrico Fraccaroli
 /// @date   May 8 2016
@@ -26,13 +26,11 @@
 #include <memory>
 
 /// @brief Data structure used to store an ordered list of opponents during a combat.
-class AggressionList
+class CombatHandler
 {
     friend class Character;
 
 public:
-    /// Type of structure which contains aggressors.
-    using AggressorVector = typename std::vector<std::shared_ptr<Aggression> >;
     /// Iterator for an aggressor vector.
     using iterator  = typename std::vector<std::shared_ptr<Aggression> >::iterator;
     /// Constant iterator for an aggressor vector.
@@ -40,17 +38,22 @@ public:
 private:
     /// Owner of the list.
     Character * owner;
-    /// List of aggressors.
-    AggressorVector aggressionList;
+
+    /// List of opponents.
+    std::vector<std::shared_ptr<Aggression> > opponents;
+
     /// The predefined target.
     Character * predefinedTarget;
 
+    /// A pointer to the currently aimed character.
+    Character * aimedCharacter;
+
 public:
     /// @brief Constructor.
-    AggressionList(Character * _owner);
+    CombatHandler(Character * _owner);
 
     /// @brief Destructor.
-    ~AggressionList();
+    ~CombatHandler();
 
     /// @brief Tries to add the given character to the list of opponents.
     /// @param character The opponent to add.
@@ -77,6 +80,13 @@ public:
 
     /// @brief Provides the predefined target.
     Character * getPredefinedTarget();
+
+    /// @brief Allows to set the given character as aimed target.
+    /// @param character The character to set as aimed target.
+    void setAimedTarget(Character * character);
+
+    /// @brief Provides the aimed target.
+    Character * getAimedTarget();
 
     /// @brief Allows to the a new aggression level to the given opponent.
     /// @param character      The opponent

@@ -21,7 +21,7 @@ set(RADMUD_CHARACTER_SRC
         ./src/character/race.cpp
         ./src/character/skill.cpp
         ./src/character/aggression.cpp
-        ./src/character/aggressionList.cpp
+        ./src/character/combatHandler.cpp
         ${RADMUD_EFFECTS_SRC}
         PARENT_SCOPE
         )

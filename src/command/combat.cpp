@@ -112,37 +112,37 @@ void DoKill(Character * character, ArgumentHandler & args)
     if (character->getAction()->getType() == ActionType::Combat)
     {
         // Check if the character is trying to attack a target with which is not in combat.
-        if (!character->aggressionList.hasOpponent(target))
+        if (!character->combatHandler.hasOpponent(target))
         {
             character->sendMsg("You have already your share of troubles!\n");
             return;
         }
-        auto predefinedTarget = character->aggressionList.getPredefinedTarget();
+        auto predefinedTarget = character->combatHandler.getPredefinedTarget();
         if (predefinedTarget != nullptr)
         {
-            if(predefinedTarget == target)
+            if (predefinedTarget == target)
             {
                 character->sendMsg("You are already doing your best to kill %s!\n", target->getName());
                 return;
             }
         }
         character->sendMsg("You focus your attacks on %s!\n", target->getName());
-        character->aggressionList.setPredefinedTarget(character->aimedCharacter);
+        character->combatHandler.setPredefinedTarget(character->combatHandler.getAimedTarget());
     }
         // Check if the character is attacking a target which is already in combat.
     else if ((character->getAction()->getType() != ActionType::Combat)
              && (target->getAction()->getType() == ActionType::Combat))
     {
-        // Set the aggressionList.
-        if (!character->aggressionList.addOpponent(target))
+        // Set the combatHandler.
+        if (!character->combatHandler.addOpponent(target))
         {
             character->sendMsg("You are already fighting againts %s.\n", target->getName());
             return;
         }
-        if (!target->aggressionList.addOpponent(character))
+        if (!target->combatHandler.addOpponent(character))
         {
             character->sendMsg("You were not ablet to attack %s.\n", target->getName());
-            character->aggressionList.remOpponent(target);
+            character->combatHandler.remOpponent(target);
             return;
         }
         // Notify the character.
@@ -159,23 +159,23 @@ void DoKill(Character * character, ArgumentHandler & args)
         if (!character->setNextCombatAction(CombatActionType::BasicAttack))
         {
             character->sendMsg("You were not ablet to attack %s.\n", target->getName());
-            character->aggressionList.remOpponent(target);
-            target->aggressionList.remOpponent(character);
+            character->combatHandler.remOpponent(target);
+            target->combatHandler.remOpponent(character);
             return;
         }
     }
     else
     {
-        // Set the aggressionList.
-        if (!character->aggressionList.addOpponent(target))
+        // Set the combatHandler.
+        if (!character->combatHandler.addOpponent(target))
         {
             character->sendMsg("You are already fighting againts %s.\n", target->getName());
             return;
         }
-        if (!target->aggressionList.addOpponent(character))
+        if (!target->combatHandler.addOpponent(character))
         {
             character->sendMsg("You were not ablet to attack %s.\n", target->getName());
-            character->aggressionList.remOpponent(target);
+            character->combatHandler.remOpponent(target);
             return;
         }
         // Notify the character.
@@ -193,15 +193,15 @@ void DoKill(Character * character, ArgumentHandler & args)
         if (!character->setNextCombatAction(CombatActionType::BasicAttack))
         {
             character->sendMsg("You were not ablet to attack %s.\n", target->getName());
-            character->aggressionList.remOpponent(target);
-            target->aggressionList.remOpponent(character);
+            character->combatHandler.remOpponent(target);
+            target->combatHandler.remOpponent(character);
             return;
         }
         if (!target->setNextCombatAction(CombatActionType::BasicAttack))
         {
             character->sendMsg("You were not ablet to attack %s.\n", target->getName());
-            character->aggressionList.remOpponent(target);
-            target->aggressionList.remOpponent(character);
+            character->combatHandler.remOpponent(target);
+            target->combatHandler.remOpponent(character);
             return;
         }
     }
@@ -494,15 +494,16 @@ void DoAim(Character * character, ArgumentHandler & args)
 void DoFire(Character * character, ArgumentHandler & /*args*/)
 {
     // Check if the pointer to the aimed target is still valid.
-    if (character->aimedCharacter == nullptr)
+    if (character->combatHandler.getAimedTarget() == nullptr)
     {
         character->sendMsg("You first need to aim at someone or something.\n");
         return;
     }
+    auto aimedTarget = character->combatHandler.getAimedTarget();
     // Check if the target is still in sight.
-    if (!character->isAtRange(character->aimedCharacter, character->getViewDistance()))
+    if (!character->isAtRange(character->combatHandler.getAimedTarget(), character->getViewDistance()))
     {
-        character->sendMsg("%s is out of your line of sight...\n", character->aimedCharacter->getNameCapital());
+        character->sendMsg("%s is out of your line of sight...\n", aimedTarget->getNameCapital());
         return;
     }
     // Retrive the active ranged weapons.
@@ -518,7 +519,7 @@ void DoFire(Character * character, ArgumentHandler & /*args*/)
     for (auto weapon : rangedWeapons)
     {
         auto weaponRange = weapon->getRange();
-        if (character->isAtRange(character->aimedCharacter, weaponRange))
+        if (character->isAtRange(aimedTarget, weaponRange))
         {
             canAttack = true;
             break;
@@ -530,16 +531,16 @@ void DoFire(Character * character, ArgumentHandler & /*args*/)
         if (character->setNextCombatAction(CombatActionType::BasicAttack))
         {
             // Set the predefined target.
-            character->aggressionList.setPredefinedTarget(character->aimedCharacter);
-            character->sendMsg("You start firing at %s...\n", character->aimedCharacter->getName());
+            character->combatHandler.setPredefinedTarget(aimedTarget);
+            character->sendMsg("You start firing at %s...\n", aimedTarget->getName());
         }
         else
         {
-            character->sendMsg("You were not able to fire at %s.\n", character->aimedCharacter->getName());
+            character->sendMsg("You were not able to fire at %s.\n", aimedTarget->getName());
         }
     }
     else
     {
-        character->sendMsg("%s is out of your reach...\n", character->aimedCharacter->getNameCapital());
+        character->sendMsg("%s is out of your reach...\n", aimedTarget->getNameCapital());
     }
 }
