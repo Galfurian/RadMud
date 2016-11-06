@@ -273,7 +273,7 @@ void MudUpdater::performActions()
     }
     for (auto iterator : Mud::instance().mudMobiles)
     {
-        Mobile * mobile = iterator.second;
+        auto mobile = iterator.second;
         if (!mobile->isAlive())
         {
             continue;

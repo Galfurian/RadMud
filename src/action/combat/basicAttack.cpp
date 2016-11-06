@@ -62,6 +62,12 @@ ActionStatus BasicAttack::perform()
     {
         return ActionStatus::Running;
     }
+    auto counter = 0;
+    for (auto it : actor->actionQueue)
+    {
+        Logger::log(LogLevel::Debug, "[%s][%s] %s", actor->getName(), counter, it->getDescription());
+        counter++;
+    }
     // If there are no enemies, just stop fighting.
     if (actor->aggressionList.empty())
     {

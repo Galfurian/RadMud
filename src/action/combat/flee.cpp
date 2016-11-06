@@ -58,12 +58,12 @@ ActionType Flee::getType() const
 
 std::string Flee::getDescription() const
 {
-    return "fighting";
+    return "fleeing";
 }
 
 std::string Flee::stop()
 {
-    return "You stop fighting.";
+    return "You stop fleeing.";
 }
 
 ActionStatus Flee::perform()
@@ -80,6 +80,12 @@ ActionStatus Flee::perform()
         actor->sendMsg(error + "\n\n");
         return ActionStatus::Error;
     }
+    auto counter = 0;
+    for (auto it : actor->actionQueue)
+    {
+        Logger::log(LogLevel::Debug, "[%s][%s] %s", actor->getName(), counter, it->getDescription());
+        counter++;
+    }
     // Get the character chance of fleeing (D20).
     auto fleeChance = TRandInteger<unsigned int>(0, 20) + actor->getAbilityModifier(Ability::Agility);
     // Get the required stamina.
@@ -91,32 +97,35 @@ ActionStatus Flee::perform()
         // Consume half the stamina.
         actor->remStamina(consumedStamina / 2, true);
     }
-    // Get the list of available directions.
-    auto directions = actor->room->getAvailableDirections();
-    // Pick a random direction, from the poll of the available ones.
-    auto randomDirValue = TRandInteger<size_t>(0, directions.size() - 1);
-    auto randomDirection = directions.at(randomDirValue);
-    // Get the selected exit.
-    auto selected = actor->room->findExit(randomDirection);
-    // Check that the picked exit is not a null pointer.
-    if (selected == nullptr)
-    {
-        Logger::log(LogLevel::Error, "Selected null exit during action Flee.");
-        actor->sendMsg("You were not able to escape from your attackers.\n");
-    }
     else
     {
-        // Consume the stamina.
-        actor->remStamina(consumedStamina, true);
-        // Stop the current action.
-        actor->sendMsg(this->stop() + "\n\n");
-        // Move the actor to the random direction.
-        actor->moveTo(
-            selected->destination,
-            actor->getName() + " flees from the battlefield.\n\n",
-            actor->getName() + " arives fleeing.\n\n",
-            "You flee from the battlefield.\n");
-        return ActionStatus::Finished;
+        // Get the list of available directions.
+        auto directions = actor->room->getAvailableDirections();
+        // Pick a random direction, from the poll of the available ones.
+        auto randomDirValue = TRandInteger<size_t>(0, directions.size() - 1);
+        auto randomDirection = directions.at(randomDirValue);
+        // Get the selected exit.
+        auto selected = actor->room->findExit(randomDirection);
+        // Check that the picked exit is not a null pointer.
+        if (selected == nullptr)
+        {
+            Logger::log(LogLevel::Error, "Selected null exit during action Flee.");
+            actor->sendMsg("You were not able to escape from your attackers.\n");
+        }
+        else
+        {
+            // Consume the stamina.
+            actor->remStamina(consumedStamina, true);
+            // Stop the current action.
+            actor->sendMsg(this->stop() + "\n\n");
+            // Move the actor to the random direction.
+            actor->moveTo(
+                selected->destination,
+                actor->getName() + " flees from the battlefield.\n\n",
+                actor->getName() + " arives fleeing.\n\n",
+                "You flee from the battlefield.\n");
+            return ActionStatus::Finished;
+        }
     }
     // Reset the cooldown.
     actor->getAction()->resetCooldown(BasicAttack::getCooldown(actor));
