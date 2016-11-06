@@ -53,15 +53,13 @@ ActionStatus BasicAttack::perform()
     {
         return this->handleStop();
     }
-    // Find a valid predefined target.
-    this->findPredefinedTarget();
     // Flag used to determine if the actor WAS able to attack the target.
     bool hasAttackedTheTarget = false;
-    // Get the predefined target.
-    Character * predefinedTarget = actor->aggressionList.getPredefinedTarget();
-    // Check if the predefined target is a valid target.
-    if (predefinedTarget != nullptr)
+    // Find a valid predefined target.
+    if (this->setPredefinedTarget())
     {
+        // Get the predefined target.
+        Character * predefinedTarget = actor->aggressionList.getPredefinedTarget();
         // If the actor and the pred-target are in the same room, then use the melee weapons,
         //  otherwise use the ranged ones.
         if (actor->room->coord == predefinedTarget->room->coord)
@@ -90,35 +88,20 @@ ActionStatus BasicAttack::perform()
         }
         else
         {
-            // Check if the predefined target has been aimed.
-            if (actor->aimedCharacter != nullptr)
+            // Retrieve all the ranged weapons.
+            auto rangedWeapons = actor->getActiveRangedWeapons();
+            // Check if the actor is dual-wielding.
+            bool dualWielding = (rangedWeapons.size() > 1);
+            // Perform the attack for each weapon.
+            for (auto weapon : rangedWeapons)
             {
-                if (actor->aimedCharacter == predefinedTarget)
+                // Check if the target is at range of the weapon.
+                if (actor->isAtRange(predefinedTarget, weapon->getRange()))
                 {
-                    // Retrieve all the ranged weapons.
-                    auto rangedWeapons = actor->getActiveRangedWeapons();
-                    // Check if the actor has no ranged weapon equipped.
-                    if (rangedWeapons.empty())
-                    {
-                        actor->sendMsg("You don't have a ranged weapon equipped.\n");
-                    }
-                    else
-                    {
-                        // Check if the actor is dual-wielding.
-                        bool dualWielding = (rangedWeapons.size() > 1);
-                        // Perform the attack for each weapon.
-                        for (auto weapon : rangedWeapons)
-                        {
-                            // Check if the target is at range of the weapon.
-                            if (actor->isAtRange(predefinedTarget, weapon->getRange()))
-                            {
-                                // Set that the actor has actually attacked the target.
-                                hasAttackedTheTarget = true;
-                                // Perform the attack passing the ranged weapon.
-                                this->performRangedAttack(predefinedTarget, weapon, dualWielding);
-                            }
-                        }
-                    }
+                    // Set that the actor has actually attacked the target.
+                    hasAttackedTheTarget = true;
+                    // Perform the attack passing the ranged weapon.
+                    this->performRangedAttack(predefinedTarget, weapon, dualWielding);
                 }
             }
         }
@@ -168,7 +151,7 @@ unsigned int BasicAttack::getConsumedStamina(Character * character, Item * weapo
     return consumedStamina;
 }
 
-void BasicAttack::findPredefinedTarget()
+bool BasicAttack::setPredefinedTarget()
 {
     // If there is a predefined target, check if it is a valid target.
     if (actor->aggressionList.getPredefinedTarget() != nullptr)
@@ -177,7 +160,7 @@ void BasicAttack::findPredefinedTarget()
         if (this->checkTarget(actor->aggressionList.getPredefinedTarget()))
         {
             Logger::log(LogLevel::Debug, "[%s] Predefined target is a valid target.", actor->getNameCapital());
-            return;
+            return true;
         }
         Logger::log(LogLevel::Debug, "[%s] Predefined target is NOT a valid target.", actor->getNameCapital());
     }
@@ -194,9 +177,10 @@ void BasicAttack::findPredefinedTarget()
                         actor->getNameCapital(),
                         it->aggressor->getNameCapital());
             actor->aggressionList.setPredefinedTarget(it->aggressor);
-            break;
+            return true;
         }
     }
+    return false;
 }
 
 bool BasicAttack::checkTarget(Character * target)

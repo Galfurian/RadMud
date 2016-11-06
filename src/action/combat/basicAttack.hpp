@@ -52,7 +52,7 @@ public:
 
 private:
 
-    void findPredefinedTarget();
+    bool setPredefinedTarget();
 
     bool checkTarget(Character * target);
 
