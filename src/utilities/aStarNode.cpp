@@ -7,7 +7,7 @@
 
 AStarNode::AStarNode() :
     room(),
-    state(),
+    nodeState(),
     g(),
     h(),
     parentNode()
@@ -17,12 +17,43 @@ AStarNode::AStarNode() :
 
 AStarNode::AStarNode(Room * _room, Coordinates _target) :
     room(_room),
-    state(),
+    nodeState(),
     g(),
     h(static_cast<float>(Area::getDistance(_room->coord, _target))),
     parentNode()
 {
     // Nothing to do.
+}
+
+void AStarNode::setNodeState(const NodeState & _nodeState)
+{
+    nodeState = _nodeState;
+}
+
+void AStarNode::setParentNode(std::shared_ptr<AStarNode> _parentNode)
+{
+    parentNode = _parentNode;
+    g = _parentNode->getG() + static_cast<float>(Area::getDistance(room->coord, _parentNode->room->coord));
+}
+
+Room * AStarNode::getRoom()
+{
+    return room;
+}
+
+AStarNode::NodeState AStarNode::getNodeState() const
+{
+    return nodeState;
+}
+
+std::shared_ptr<AStarNode> AStarNode::getParentNode()
+{
+    return parentNode;
+}
+
+float AStarNode::getG() const
+{
+    return g;
 }
 
 float AStarNode::getF() const
@@ -32,11 +63,11 @@ float AStarNode::getF() const
 
 std::string AStarNode::toString() const
 {
-    if (state == Open)
+    if (nodeState == Open)
     {
         return "[O] " + room->coord.toString();
     }
-    if (state == Closed)
+    if (nodeState == Closed)
     {
         return "[C] " + room->coord.toString();
     }

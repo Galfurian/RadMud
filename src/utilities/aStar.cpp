@@ -19,10 +19,10 @@ std::vector<Coordinates> PathFinder::findPath(Room * startRoom, Room * endRoom)
         Logger::log(LogLevel::Debug, "Found!");
         // If a path was found, follow the parents from the end node to build a list of locations.
         auto node = nodes[end];
-        while (node->parentNode != nullptr)
+        while (node->getParentNode() != nullptr)
         {
-            path.emplace_back(node->room->coord);
-            node = node->parentNode;
+            path.emplace_back(node->getRoom()->coord);
+            node = node->getParentNode();
         }
         std::reverse(path.begin(), path.end());
     }
@@ -37,7 +37,7 @@ bool PathFinder::search(std::shared_ptr<AStarNode> currentNode)
 {
     Logger::log(LogLevel::Debug, "Current Node : %s", currentNode->toString());
     // Set the current node to Closed since it cannot be traversed more than once
-    currentNode->state = AStarNode::Closed;
+    currentNode->setNodeState(AStarNode::Closed);
     // Get the next nodes.
     auto neighbours = this->getNeighbours(currentNode);
     std::sort(neighbours.begin(), neighbours.end(), [](const std::shared_ptr<AStarNode> & left,
@@ -49,7 +49,7 @@ bool PathFinder::search(std::shared_ptr<AStarNode> currentNode)
     {
         Logger::log(LogLevel::Debug, "    Next Node : %s", nextNode->toString());
         // Check whether the end node has been reached
-        if (nextNode->room->coord == end)
+        if (nextNode->getRoom()->coord == end)
         {
             Logger::log(LogLevel::Debug, "        End!");
             return true;
@@ -71,12 +71,12 @@ bool PathFinder::search(std::shared_ptr<AStarNode> currentNode)
 std::vector<std::shared_ptr<AStarNode>> PathFinder::getNeighbours(std::shared_ptr<AStarNode> fromNode)
 {
     // Retrieve the area.
-    Area * area = fromNode->room->area;
+    Area * area = fromNode->getRoom()->area;
     std::vector<std::shared_ptr<AStarNode>> neighbours;
-    for (auto it : fromNode->room->getAvailableDirections())
+    for (auto it : fromNode->getRoom()->getAvailableDirections())
     {
         // Evaluate the coordinates.
-        Coordinates coordinates = fromNode->room->coord + it.getCoordinates();
+        Coordinates coordinates = fromNode->getRoom()->coord + it.getCoordinates();
         // Ignore non-walkable nodes.
         if (!area->isValid(coordinates))
         {
@@ -96,26 +96,26 @@ std::vector<std::shared_ptr<AStarNode>> PathFinder::getNeighbours(std::shared_pt
             aStarNode = nodes[coordinates] = std::make_shared<AStarNode>(room, end);
         }
         // Ignore already-closed nodes
-        if (aStarNode->state == AStarNode::Closed)
+        if (aStarNode->getNodeState() == AStarNode::Closed)
         {
             continue;
         }
         // Already-open nodes are only added to the list if their G-value is lower going via this route.
-        if (aStarNode->state == AStarNode::Open)
+        if (aStarNode->getNodeState() == AStarNode::Open)
         {
-            auto traversalCost = Area::getDistance(aStarNode->room->coord, coordinates);
-            float gTemp = fromNode->g + static_cast<float>(traversalCost);
-            if (gTemp < aStarNode->g)
+            auto traversalCost = Area::getDistance(aStarNode->getRoom()->coord, coordinates);
+            float gTemp = fromNode->getG() + static_cast<float>(traversalCost);
+            if (gTemp < aStarNode->getG())
             {
-                aStarNode->parentNode = fromNode;
+                aStarNode->setParentNode(fromNode);
                 neighbours.push_back(aStarNode);
             }
         }
         else
         {
             // If it's untested, set the parent and flag it as 'Open' for consideration
-            aStarNode->parentNode = fromNode;
-            aStarNode->state = AStarNode::Open;
+            aStarNode->setParentNode(fromNode);
+            aStarNode->setNodeState(AStarNode::Open);
             neighbours.push_back(aStarNode);
         }
     }
