@@ -40,6 +40,11 @@ bool PathFinder::search(std::shared_ptr<AStarNode> currentNode)
     currentNode->state = AStarNode::Closed;
     // Get the next nodes.
     auto neighbours = this->getNeighbours(currentNode);
+    std::sort(neighbours.begin(), neighbours.end(), [](const std::shared_ptr<AStarNode> & left,
+                                                       const std::shared_ptr<AStarNode> & right)
+    {
+        return left->getF() < right->getF();
+    });
     for (auto nextNode : neighbours)
     {
         Logger::log(LogLevel::Debug, "    Next Node : %s", nextNode->toString());

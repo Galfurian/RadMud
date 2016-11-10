@@ -7,9 +7,9 @@
 
 AStarNode::AStarNode() :
     room(),
+    state(),
     g(),
     h(),
-    state(),
     parentNode()
 {
     // Nothing to do.
@@ -17,9 +17,9 @@ AStarNode::AStarNode() :
 
 AStarNode::AStarNode(Room * _room, Coordinates _target) :
     room(_room),
+    state(),
     g(),
     h(static_cast<float>(Area::getDistance(_room->coord, _target))),
-    state(Untested),
     parentNode()
 {
     // Nothing to do.
