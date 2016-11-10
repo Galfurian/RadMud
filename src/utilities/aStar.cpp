@@ -43,7 +43,9 @@ bool PathFinder::search(std::shared_ptr<AStarNode> currentNode)
     std::sort(neighbours.begin(), neighbours.end(), [](const std::shared_ptr<AStarNode> & left,
                                                        const std::shared_ptr<AStarNode> & right)
     {
-        return left->getF() < right->getF();
+        if (left->getF() < right->getF()) return true;
+        if (left->getF() > right->getF()) return false;
+        return false;
     });
     for (auto nextNode : neighbours)
     {

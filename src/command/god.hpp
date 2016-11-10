@@ -36,6 +36,9 @@ void DoMudSave(Character * character, ArgumentHandler & args);
 /// Go to the desired room.
 void DoGoTo(Character * character, ArgumentHandler & args);
 
+/// Get the path to the given room.
+void DoFindPath(Character * character, ArgumentHandler & args);
+
 /// Transfer a character from room to room.
 void DoTransfer(Character * character, ArgumentHandler & args);
 

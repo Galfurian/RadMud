@@ -19,6 +19,7 @@
 #include "god.hpp"
 
 #include "mud.hpp"
+#include "aStar.hpp"
 
 void LoadGodCommands()
 {
@@ -47,6 +48,15 @@ void LoadGodCommands()
         command.help = "Go to another room.";
         command.args = "(Room.vnum)";
         command.hndl = DoGoTo;
+        Mud::instance().addCommand(command);
+    }
+    {
+        Command command;
+        command.gods = true;
+        command.name = "findpath";
+        command.help = "Finds the path to the given room.";
+        command.args = "(Room.vnum)";
+        command.hndl = DoFindPath;
         Mud::instance().addCommand(command);
     }
     {
@@ -541,6 +551,43 @@ void DoGoTo(Character * character, ArgumentHandler & args)
     auto msgChar = "You go to room " + destination->name + ".\n";
     // Move player.
     character->moveTo(destination, msgDepart, msgArrive, msgChar);
+}
+
+void DoFindPath(Character * character, ArgumentHandler & args)
+{
+    if (args.size() != 1)
+    {
+        character->sendMsg("You have to provide a room vnum.");
+    }
+    else
+    {
+        auto room = character->room->area->getRoom(ToNumber<int>(args[0].getContent()));
+        if (room != nullptr)
+        {
+            PathFinder pathFinder;
+            auto path = pathFinder.findPath(character->room, room);
+            if (path.empty())
+            {
+                character->sendMsg("There is no path to that room.");
+            }
+            else
+            {
+                character->sendMsg("You have to go:\n");
+                Coordinates previous = character->room->coord;
+                for (auto node : path)
+                {
+                    auto direction = Area::getDirection(previous, node);
+                    previous = node;
+                    character->sendMsg("    %s\n", direction.toString());
+                }
+                character->sendMsg("\n");
+            }
+        }
+        else
+        {
+            character->sendMsg("There is no room with that VNUM.");
+        }
+    }
 }
 
 void DoTransfer(Character * character, ArgumentHandler & args)
@@ -1434,6 +1481,7 @@ void DoRoomInfo(Character * character, ArgumentHandler & args)
     std::string msg;
     msg += "Room Informations:\n";
     msg += " Vnum        :" + ToString(room->vnum) + "\n";
+    msg += " Area        :" + ((room->area != nullptr) ? ToString(room->area->vnum) : "NULL") + "\n";
     msg += " X           :" + ToString(room->coord.x) + "\n";
     msg += " Y           :" + ToString(room->coord.y) + "\n";
     msg += " Z           :" + ToString(room->coord.z) + "\n";

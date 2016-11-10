@@ -94,7 +94,7 @@ public:
     static int getDistance(const Coordinates & source, const Coordinates & target);
 
     /// @brief Provides the direction of the target w.r.t. the source.
-    Direction getDirection(const Coordinates & source, const Coordinates & target);
+    static Direction getDirection(const Coordinates & source, const Coordinates & target);
 
     /// @brief Provides all the charactes inside the room at the given coordinates.
     /// @param exceptions  The exceptions.

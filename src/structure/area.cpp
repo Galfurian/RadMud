@@ -94,16 +94,23 @@ int Area::getDistance(const Coordinates & source, const Coordinates & target)
 
 Direction Area::getDirection(const Coordinates & source, const Coordinates & target)
 {
-    auto dx = std::abs(source.x - target.x), dy = std::abs(source.y - target.y);
-    if (dx > dy)
+    auto dx = std::abs(source.x - target.x);
+    auto dy = std::abs(source.y - target.y);
+    auto dz = std::abs(source.z - target.z);
+    if ((dx > dy) && (dx > dz))
     {
         if (source.x > target.x) return Direction::West;
         if (source.x < target.x) return Direction::East;
     }
-    if (dy < dx)
+    if ((dy > dx) && (dy > dz))
     {
         if (source.y > target.y) return Direction::South;
         if (source.y < target.y) return Direction::North;
+    }
+    if ((dz > dx) && (dz > dy))
+    {
+        if (source.z > target.z) return Direction::Down;
+        if (source.z < target.z) return Direction::Up;
     }
     return Direction::None;
 }
@@ -155,12 +162,14 @@ bool Area::remRoom(Room * room)
 
 Room * Area::getRoom(int room_vnum)
 {
-    for (Map3D<Room *>::iterator it = areaMap.begin(); it != areaMap.end(); ++it)
+    auto it = std::find_if(areaMap.begin(), areaMap.end(), [&room_vnum](decltype(*areaMap.begin()) & element)
     {
-        if (it->second->vnum == room_vnum)
-        {
-            return it->second;
-        }
+        if (element.second != nullptr) return (element.second->vnum == room_vnum);
+        return false;
+    });
+    if (it != areaMap.end())
+    {
+        return it->second;
     }
     return nullptr;
 }
