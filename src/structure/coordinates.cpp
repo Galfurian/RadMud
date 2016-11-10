@@ -47,7 +47,13 @@ bool Coordinates::operator!=(const Coordinates & right) const
 
 bool Coordinates::operator<(const Coordinates & right) const
 {
-    return (x < right.x) && (y < right.y) && (z < right.z);
+    if (x < right.x)  return true;
+    if (x > right.x)  return false;
+    if (y < right.y)  return true;
+    if (y > right.y)  return false;
+    if (z < right.z)  return true;
+    if (z > right.z)  return false;
+    return false;
 }
 
 Coordinates Coordinates::operator+(const Coordinates & right) const
