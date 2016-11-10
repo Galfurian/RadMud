@@ -13,5 +13,7 @@ set(RADMUD_UTILITIES_SRC
         ./src/utilities/table.cpp
         ./src/utilities/logger.cpp
         ./src/utilities/utils.cpp
+        ./src/utilities/aStar.cpp
+        ./src/utilities/aStarNode.cpp
         PARENT_SCOPE
         )

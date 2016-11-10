@@ -154,6 +154,13 @@ public:
     };
 
     /// @brief Constructor from uint.
+    Direction() :
+        direction(None)
+    {
+        // Nothing to do.
+    }
+
+    /// @brief Constructor from uint.
     Direction(unsigned int & _direction) :
         direction()
     {

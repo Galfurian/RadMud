@@ -23,6 +23,7 @@
 #include "unloadAction.hpp"
 #include "aimAction.hpp"
 #include "magazineItem.hpp"
+#include "aStar.hpp"
 
 void LoadCombatCommands()
 {
@@ -502,6 +503,12 @@ void DoAim(Character * character, ArgumentHandler & args)
         {
             character->sendMsg("%s is out of your line of sight...\n", aimedCharacter->getNameCapital());
         }
+    }
+    PathFinder pathFinder;
+    auto path = pathFinder.findPath(character->room, aimedCharacter->room);
+    for (auto node : path)
+    {
+        Logger::log(LogLevel::Debug, node.toString());
     }
 }
 
