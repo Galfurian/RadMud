@@ -507,31 +507,6 @@ std::string Room::getLook(Character * exception)
     return output;
 }
 
-bool Room::isEqualTo(Room * other)
-{
-    if (other == nullptr) return false;
-    return (vnum == other->vnum);
-}
-
-std::vector<Room *> Room::getNeighbours(const std::function<bool(Room * from, Room * to)> & checkFunction)
-{
-    std::vector<Room *> neighbours;
-    for (auto it : exits)
-    {
-        if (checkFunction)
-        {
-            if (!checkFunction(this, it->destination)) continue;
-        }
-        neighbours.emplace_back(it->destination);
-    }
-    return neighbours;
-}
-
-int Room::getDistance(Room * other)
-{
-    return area->getDistance(this->coord, other->coord);
-}
-
 void Room::sendToAll(const std::string & message, const std::vector<Character *> & exceptions)
 {
     for (auto iterator : characters)

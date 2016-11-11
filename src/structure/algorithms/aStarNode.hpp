@@ -38,7 +38,7 @@ private:
 
 public:
     /// @brief Constructor.
-    AStarNode();
+    AStarNode(ElementType _element);
 
     void setElement(ElementType _element);
 
@@ -65,6 +65,14 @@ public:
     std::shared_ptr<AStarNode<ElementType>> getParentNode();
 
     bool isEndNode() const;
+
+    bool isEqualTo(std::shared_ptr<AStarNode<ElementType>> other);
+
+    std::vector<std::shared_ptr<AStarNode<ElementType>>> getNeighbours(
+        std::vector<std::shared_ptr<AStarNode<ElementType>>> & nodes,
+        const std::function<bool(ElementType from, ElementType to)> & checkFunction);
+
+    int getDistance(std::shared_ptr<AStarNode<ElementType>> other);
 };
 
 #include "aStarNode.i.hpp"

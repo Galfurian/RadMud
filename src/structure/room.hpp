@@ -47,8 +47,7 @@ using RoomFlag = enum class RoomFlags
 };
 
 /// @brief Holds details about room.
-class Room :
-    public GraphNode<Room *>
+class Room
 {
 public:
     /// The current room vnum.
@@ -230,12 +229,6 @@ public:
     /// @param exception The one who are looking.
     /// @return A detailed description of the room.
     std::string getLook(Character * exception);
-
-    virtual bool isEqualTo(Room * other);
-
-    virtual std::vector<Room *> getNeighbours(const std::function<bool(Room * from, Room * to)> & checkFunction);
-
-    virtual int getDistance(Room * other);
 
     /// @brief Send a message to all the player in the room, can specify exceptions.
     /// @param message    The message to send.
