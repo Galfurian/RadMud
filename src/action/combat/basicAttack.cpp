@@ -27,11 +27,15 @@
 #include "formatter.hpp"
 #include "room.hpp"
 #include "area.hpp"
+#include "chase.hpp"
 
 BasicAttack::BasicAttack(Character * _actor) :
     CombatAction(_actor)
 {
+    // Debugging message.
     Logger::log(LogLevel::Debug, "Created BasicAttack.");
+    // Reset the cooldown of the action.
+    this->resetCooldown(CombatAction::getCooldown(_actor));
 }
 
 BasicAttack::~BasicAttack()
@@ -136,6 +140,32 @@ ActionStatus BasicAttack::perform()
     // Check if the actor has not attacked anyone.
     if (!hasAttackedTheTarget)
     {
+        // Check if the actor is a mobile.
+        if (actor->isMobile())
+        {
+            // Take the enemy with the higher value of aggro.
+            auto topAggro = actor->combatHandler.getTopAggro();
+            if (topAggro->aggressor != nullptr)
+            {
+                std::string error;
+                auto chaseAction = std::make_shared<Chase>(actor, topAggro->aggressor);
+                if (chaseAction->check(error))
+                {
+                    // Add the action.
+                    actor->setAction(chaseAction);
+                    // Return that the action is still running.
+                    return ActionStatus::Running;
+                }
+                else
+                {
+                    actor->sendMsg(error + "\n\n");
+                }
+            }
+            else
+            {
+                Logger::log(LogLevel::Error, "Top aggro is a nullptr!");
+            }
+        }
         actor->sendMsg("Try to get closer to your enemy.\n\n");
     }
     // Reset the cooldown.

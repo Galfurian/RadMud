@@ -16,5 +16,6 @@ set(RADMUD_STRUCTURE_SRC
         ./src/structure/continent.cpp
         ./src/structure/coordinates.cpp
         ./src/structure/generator.cpp
+        ./src/structure/algorithms/AStar/aStarNode.cpp
         PARENT_SCOPE
         )

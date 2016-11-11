@@ -27,6 +27,7 @@
 #include "unloadAction.hpp"
 #include "aimAction.hpp"
 #include "magazineItem.hpp"
+#include "basicAttack.hpp"
 
 void LoadCombatCommands()
 {
@@ -545,9 +546,14 @@ void DoFire(Character * character, ArgumentHandler & /*args*/)
     }
     if (canAttack)
     {
-        // Let the characters enter the combat.
-        if (character->setNextCombatAction(CombatActionType::BasicAttack))
+        auto basicAttack = std::make_shared<BasicAttack>(character);
+        std::string error;
+        if (basicAttack->check(error))
         {
+            // Add the aimedTarget to the list of opponents.
+            character->combatHandler.addOpponent(aimedTarget);
+            // Add the action to the character's combat queue.
+            character->setAction(basicAttack);
             // Set the predefined target.
             character->combatHandler.setPredefinedTarget(aimedTarget);
             character->sendMsg("You start firing at %s...\n", aimedTarget->getName());

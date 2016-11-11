@@ -1,7 +1,7 @@
-/// @file   combatAction.hpp
-/// @brief  Contais the definition of the virtual class for general combat actions.
+/// @file   chase.hpp
+/// @brief  Contais the Chase class.
 /// @author Enrico Fraccaroli
-/// @date   Jul 16 2016
+/// @date   Nov 11 2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -22,28 +22,32 @@
 
 #pragma once
 
-#include "generalAction.hpp"
+#include "combatAction.hpp"
+#include <functional>
 
-/// The list of possible combat actions.
-using CombatActionType = enum class CombatActionType_t
+/// @brief An action executed by characters when fighting at close range.
+class Chase :
+    public CombatAction
 {
-    NoAction,    ///< The combat move is to do nothing.
-    BasicAttack, ///< The action is a basic melee attack.
-    Flee,        ///< The character tries to flee.
-    Chase        ///< The character is chasing someone.
-};
+private:
+    /// The chased target.
+    Character * target;
+    /// The room to which the path leads.
+    Room * lastRoom;
+    /// The path which leads to the target.
+    std::vector<Room *> path;
+    /// Validity flag.
+    bool valid;
+    /// Checking function.
+    std::function<bool (Room *, Room *)> checkFunction;
 
-/// @brief An action executed by characters when fighting.
-class CombatAction :
-    public GeneralAction
-{
 public:
     /// @brief Constructor.
     /// @param _actor The actor who is doing the action.
-    CombatAction(Character * _actor);
+    Chase(Character * _actor, Character * _target);
 
     /// @brief Destructor.
-    virtual ~CombatAction();
+    virtual ~Chase();
 
     bool check(std::string & error) const override;
 
@@ -55,12 +59,13 @@ public:
 
     ActionStatus perform() override;
 
-    /// @brief Provides the type of combat action.
-    /// @return The type of combat action.
-    virtual CombatActionType getCombatActionType() const = 0;
+    CombatActionType getCombatActionType() const override;
 
-    /// @brief Given an action, it returns the necessary cooldown.
-    /// @param character The actor.
-    /// @return The non-decreasing value of the cooldown.
-    static unsigned int getCooldown(Character * character);
+    /// @brief Returns the stamina required to execute the action.
+    /// @param character The character.
+    /// @param posture   The character posture.
+    /// @return The required stamina.
+    static unsigned int getConsumedStamina(Character * character, const CharacterPosture & posture);
+
+    unsigned int getCooldown(Character * character);
 };

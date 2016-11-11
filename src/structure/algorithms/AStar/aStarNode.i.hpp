@@ -108,50 +108,13 @@ bool AStarNode<ElementType>::isEndNode() const
 }
 
 template<>
-bool AStarNode<Room *>::isEqualTo(std::shared_ptr<AStarNode<Room *>> other)
-{
-    if (other == nullptr) return false;
-    return (this->element->vnum == other->getElement()->vnum);
-}
+bool AStarNode<Room *>::isEqualTo(std::shared_ptr<AStarNode<Room *>> other);
 
 template<>
-int AStarNode<Room *>::getDistance(std::shared_ptr<AStarNode<Room *>> other)
-{
-    auto distance = element->area->getDistance(element->coord, other->getElement()->coord);
-    return distance;
-}
+int AStarNode<Room *>::getDistance(std::shared_ptr<AStarNode<Room *>> other);
 
 template<>
 std::vector<std::shared_ptr<AStarNode<Room *>>> AStarNode<Room *>::getNeighbours(
     std::vector<std::shared_ptr<AStarNode<Room *>>> & nodes,
     std::shared_ptr<AStarNode<Room *>> endNode,
-    const std::function<bool(Room * from, Room * to)> & checkFunction)
-{
-    std::vector<std::shared_ptr<AStarNode<Room *>>> neighbours;
-    for (auto it : element->exits)
-    {
-        if (checkFunction)
-        {
-            if (!checkFunction(element, it->destination)) continue;
-        }
-        bool found = false;
-        for (auto it2 : nodes)
-        {
-            if (it->destination->vnum == it2->getElement()->vnum)
-            {
-                neighbours.emplace_back(it2);
-                found = true;
-                break;
-            }
-        }
-        if (!found)
-        {
-            auto node = std::make_shared<AStarNode<Room *>>(it->destination);
-            node->setG(g + this->getDistance(node));
-            node->setH(node->getDistance(endNode));
-            nodes.emplace_back(node);
-            neighbours.emplace_back(node);
-        }
-    }
-    return neighbours;
-}
+    const std::function<bool(Room * from, Room * to)> & checkFunction);
