@@ -564,23 +564,52 @@ void DoFindPath(Character * character, ArgumentHandler & args)
         auto room = character->room->area->getRoom(ToNumber<int>(args[0].getContent()));
         if (room != nullptr)
         {
-            PathFinder pathFinder;
-            auto path = pathFinder.findPath(character->room, room);
-            if (path.empty())
+            AStar<Room *> aStar;
+            std::vector<Room *> path;
+            auto checkFunction = [&character](Room * from, Room * to)
             {
-                character->sendMsg("There is no path to that room.");
-            }
-            else
+                // Get the direction.
+                auto direction = Area::getDirection(from->coord, to->coord);
+                // Get the exit;
+                auto destExit = from->findExit(direction);
+                // If the direction is upstairs, check if there is a stair.
+                if (direction == Direction::Up)
+                {
+                    if (!HasFlag(destExit->flags, ExitFlag::Stairs)) return false;
+                }
+                // Check if the destination is correct.
+                if (destExit->destination == nullptr) return false;
+                // Check if the destination is bocked by a door.
+                auto door = destExit->destination->findDoor();
+                if (door != nullptr)
+                {
+                    if (HasFlag(door->flags, ItemFlag::Closed)) return false;
+                }
+                // Check if the destination has a floor.
+                auto destDown = destExit->destination->findExit(Direction::Down);
+                if (destDown != nullptr)
+                {
+                    if (!HasFlag(destDown->flags, ExitFlag::Stairs)) return false;
+                }
+                // Check if the destination is forbidden for mobiles.
+                return !(character->isMobile() && HasFlag(destExit->flags, ExitFlag::NoMob));
+            };
+            
+            if (aStar.findPath(character->room, room, path, checkFunction))
             {
                 character->sendMsg("You have to go:\n");
                 Coordinates previous = character->room->coord;
                 for (auto node : path)
                 {
-                    auto direction = Area::getDirection(previous, node);
-                    previous = node;
+                    auto direction = Area::getDirection(previous, node->coord);
+                    previous = node->coord;
                     character->sendMsg("    %s\n", direction.toString());
                 }
                 character->sendMsg("\n");
+            }
+            else
+            {
+                character->sendMsg("There is no path to that room.");
             }
         }
         else

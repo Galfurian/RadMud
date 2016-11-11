@@ -29,6 +29,7 @@
 #include "mobile.hpp"
 #include "characterContainer.hpp"
 #include "itemContainer.hpp"
+#include "graphNode.hpp"
 
 class Item;
 
@@ -46,7 +47,8 @@ using RoomFlag = enum class RoomFlags
 };
 
 /// @brief Holds details about room.
-class Room
+class Room :
+    public GraphNode<Room *>
 {
 public:
     /// The current room vnum.
@@ -76,7 +78,7 @@ public:
     Room();
 
     /// @brief Destructor.
-    ~Room();
+    virtual ~Room();
 
     /// @brief Function used to check the correctness of the room.
     /// @param complete If set to true, the function check if the room has
@@ -228,6 +230,12 @@ public:
     /// @param exception The one who are looking.
     /// @return A detailed description of the room.
     std::string getLook(Character * exception);
+
+    virtual bool isEqualTo(Room * other);
+
+    virtual std::vector<Room *> getNeighbours(const std::function<bool(Room * from, Room * to)> & checkFunction);
+
+    virtual int getDistance(Room * other);
 
     /// @brief Send a message to all the player in the room, can specify exceptions.
     /// @param message    The message to send.
