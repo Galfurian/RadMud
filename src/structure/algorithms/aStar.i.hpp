@@ -17,18 +17,19 @@ bool AStar<ElementType>::findPath(ElementType start,
                                   std::vector<ElementType> & path,
                                   const std::function<bool(ElementType from, ElementType to)> & _checkFunction)
 {
+    // Create the starting and end nodes.
     startNode = std::make_shared<AStarNode<ElementType>>(start);
     endNode = std::make_shared<AStarNode<ElementType>>(end);
-
+    // Add the starting and ending nodes to the list of nodes.
     nodes.emplace_back(startNode);
     nodes.emplace_back(endNode);
-
+    // Rise the endNode flag for the end node.
     endNode->setIsEndNode();
-
+    // Set the G-Value for the starting node.
     startNode->setG(startNode->getDistance(endNode));
-
+    // Set the checking function.
     checkFunction = _checkFunction;
-
+    // Start the search.
     if (this->search(startNode))
     {
         // If a path was found, follow the parents from the end node to build a list of locations.
@@ -39,12 +40,9 @@ bool AStar<ElementType>::findPath(ElementType start,
             node = node->getParentNode();
         }
         std::reverse(path.begin(), path.end());
+        return true;
     }
-    else
-    {
-        return false;
-    }
-    return true;
+    return false;
 }
 
 template<typename ElementType>
@@ -53,7 +51,8 @@ bool AStar<ElementType>::search(std::shared_ptr<AStarNode<ElementType>> currentN
     // Set the current node to Closed since it cannot be traversed more than once
     currentNode->setNodeState(AStarNodeState::Closed);
     // Get the next nodes.
-    std::vector<std::shared_ptr<AStarNode<ElementType>>> neighbours = this->getNeighbours(currentNode);
+    auto neighbours = currentNode->getNeighbours(nodes, checkFunction);
+    // Reorder the neighbours so that the one with the lesser G-Value comes first.
     std::sort(neighbours.begin(), neighbours.end(), [](const std::shared_ptr<AStarNode<ElementType>> & left,
                                                        const std::shared_ptr<AStarNode<ElementType>> & right)
     {
@@ -61,61 +60,44 @@ bool AStar<ElementType>::search(std::shared_ptr<AStarNode<ElementType>> currentN
         if (left->getF() > right->getF()) return false;
         return false;
     });
-    for (auto nextNode : neighbours)
+    // Continue the search for each neighbour.
+    for (auto it = neighbours.begin(); it != neighbours.end(); ++it)
     {
-        // Check whether the end node has been reached
-        if (endNode->isEqualTo(nextNode))
+        // Get the neighbour at the given iterator.
+        auto neighbour = (*it);
+        // Ignore already-closed nodes
+        if (neighbour->getNodeState() == AStarNodeState::Closed) continue;
+        // Evaluate the G-value for the neighbour.
+        int gTemp = currentNode->getG() + currentNode->getDistance(neighbour);
+        // Already-open nodes are only added to the list if their G-value is lower going via this route.
+        if (neighbour->getNodeState() == AStarNodeState::Open)
         {
-            return true;
+            if (gTemp < neighbour->getG())
+            {
+                // Change the parent of the neighbour node.
+                neighbour->setParentNode(currentNode);
+                // Set the new G-Value.
+                neighbour->setG(gTemp);
+                // Check whether the end node has been reached.
+                if (endNode->isEqualTo(neighbour)) return true;
+                // If not, check the next set of nodes.
+                if (this->search(neighbour)) return true;
+            }
         }
         else
         {
-            // If not, check the next set of nodes
-            if (this->search(nextNode))
-            {
-                return true;
-            }
+            // Change the state of the node as Open.
+            neighbour->setNodeState(AStarNodeState::Open);
+            // Change the parent of the neighbour node.
+            neighbour->setParentNode(currentNode);
+            // Set the new G-Value.
+            neighbour->setG(gTemp);
+            // Check whether the end node has been reached.
+            if (endNode->isEqualTo(neighbour)) return true;
+            // If not, check the next set of nodes.
+            if (this->search(neighbour)) return true;
         }
     }
     // The method returns false if this path leads to be a dead end.
     return false;
-}
-
-template<typename ElementType>
-std::vector<std::shared_ptr<AStarNode<ElementType>>>
-AStar<ElementType>::getNeighbours(std::shared_ptr<AStarNode<ElementType>> fromNode)
-{
-    std::vector<std::shared_ptr<AStarNode<ElementType>>> neighbours;
-    std::vector<std::shared_ptr<AStarNode<ElementType>>> possibleNeighbours = fromNode->getNeighbours(nodes,
-                                                                                                      checkFunction);
-    for (auto it = possibleNeighbours.begin(); it != possibleNeighbours.end(); ++it)
-    {
-        auto neighbour = (*it);
-        // Ignore already-closed nodes
-        if (neighbour->getNodeState() == AStarNodeState::Closed)
-        {
-            continue;
-        }
-        auto traversalCost = fromNode->getDistance(neighbour);
-        // Already-open nodes are only added to the list if their G-value is lower going via this route.
-        if (neighbour->getNodeState() == AStarNodeState::Open)
-        {
-            int gTemp = fromNode->getG() + traversalCost;
-            if (gTemp < neighbour->getG())
-            {
-                neighbour->setParentNode(fromNode);
-                neighbour->setG(fromNode->getG() + traversalCost);
-                neighbours.push_back(*it);
-            }
-        }
-        else
-        {
-            // If it's untested, set the parent and flag it as 'Open' for consideration
-            neighbour->setNodeState(AStarNodeState::Open);
-            neighbour->setParentNode(fromNode);
-            neighbour->setG(fromNode->getG() + traversalCost);
-            neighbours.push_back(*it);
-        }
-    }
-    return neighbours;
 }

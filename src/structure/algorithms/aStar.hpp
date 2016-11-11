@@ -29,10 +29,6 @@ public:
 private:
     /// Attempts to find a path to the destination node using <paramref name="currentNode"/> as the starting location
     bool search(std::shared_ptr<AStarNode<ElementType>> currentNode);
-
-    /// Returns any nodes that are adjacent to <paramref name="fromNode"/> and may be considered to form the next step in the path
-    std::vector<std::shared_ptr<AStarNode<ElementType>>> getNeighbours(
-        std::shared_ptr<AStarNode<ElementType>> fromNode);
 };
 
 #include "aStar.i.hpp"
