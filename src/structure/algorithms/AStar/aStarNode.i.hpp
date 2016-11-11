@@ -1,6 +1,23 @@
-//
-// Created by enrico on 11/11/16.
-//
+/// @file   aStarNode.i.hpp
+/// @brief  Contains the imlementation of the class of nodes use by the astar pathfinder.
+/// @author Enrico Fraccaroli
+/// @date   Nov 11 2016
+/// @copyright
+/// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
+/// Permission to use, copy, modify, and distribute this software for any
+/// purpose with or without fee is hereby granted, provided that the above
+/// copyright notice and this permission notice appear in all copies.
+///
+/// THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+/// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+/// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+/// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+/// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+/// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+/// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+#include "room.hpp"
+#include "area.hpp"
 
 template<typename ElementType>
 AStarNode<ElementType>::AStarNode(ElementType _element) :
@@ -87,17 +104,17 @@ bool AStarNode<ElementType>::isEndNode() const
 }
 
 template<>
-int AStarNode<Room *>::getDistance(std::shared_ptr<AStarNode<Room *>> other)
-{
-    auto distance = element->area->getDistance(element->coord, other->getElement()->coord);
-    return distance;
-}
-
-template<>
 bool AStarNode<Room *>::isEqualTo(std::shared_ptr<AStarNode<Room *>> other)
 {
     if (other == nullptr) return false;
     return (this->element->vnum == other->getElement()->vnum);
+}
+
+template<>
+int AStarNode<Room *>::getDistance(std::shared_ptr<AStarNode<Room *>> other)
+{
+    auto distance = element->area->getDistance(element->coord, other->getElement()->coord);
+    return distance;
 }
 
 template<>
@@ -106,7 +123,6 @@ std::vector<std::shared_ptr<AStarNode<Room *>>> AStarNode<Room *>::getNeighbours
     std::shared_ptr<AStarNode<Room *>> endNode,
     const std::function<bool(Room * from, Room * to)> & checkFunction)
 {
-    Logger::log(LogLevel::Debug, "Node : %s", element->name);
     std::vector<std::shared_ptr<AStarNode<Room *>>> neighbours;
     for (auto it : element->exits)
     {
@@ -121,7 +137,6 @@ std::vector<std::shared_ptr<AStarNode<Room *>>> AStarNode<Room *>::getNeighbours
             {
                 neighbours.emplace_back(it2);
                 found = true;
-                Logger::log(LogLevel::Debug, "    Taking   [%s]: %s", it2->getF(), it->destination->name);
                 break;
             }
         }
@@ -132,7 +147,6 @@ std::vector<std::shared_ptr<AStarNode<Room *>>> AStarNode<Room *>::getNeighbours
             node->setH(node->getDistance(endNode));
             nodes.emplace_back(node);
             neighbours.emplace_back(node);
-            Logger::log(LogLevel::Debug, "    Taking   [%s]: %s", node->getF(), it->destination->name);
         }
     }
     return neighbours;

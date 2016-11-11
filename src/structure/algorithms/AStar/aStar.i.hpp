@@ -1,6 +1,20 @@
-//
-// Created by enrico on 11/11/16.
-//
+/// @file   aStar.i.hpp
+/// @brief  Contains the imlementation of the class for the astar pathfinder.
+/// @author Enrico Fraccaroli
+/// @date   Nov 11 2016
+/// @copyright
+/// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
+/// Permission to use, copy, modify, and distribute this software for any
+/// purpose with or without fee is hereby granted, provided that the above
+/// copyright notice and this permission notice appear in all copies.
+///
+/// THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+/// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+/// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+/// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+/// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+/// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+/// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 template<typename ElementType>
 AStar<ElementType>::AStar() :
@@ -59,12 +73,6 @@ bool AStar<ElementType>::search(std::shared_ptr<AStarNode<ElementType>> currentN
     {
         return left->getF() < right->getF();
     });
-    for (auto it = neighbours.begin(); it != neighbours.end(); ++it)
-    {
-        // Get the neighbour at the given iterator.
-        auto neighbour = (*it);
-        Logger::log(LogLevel::Debug, "        Neighbour->F:%s", ToString(neighbour->getF()));
-    }
     // Continue the search for each neighbour.
     for (auto it = neighbours.begin(); it != neighbours.end(); ++it)
     {
