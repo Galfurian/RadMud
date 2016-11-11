@@ -38,76 +38,33 @@ private:
 
 public:
     /// @brief Constructor.
-    AStarNode() :
-        nodeState(),
-        g(),
-        h(),
-        parentNode(),
-        endNode()
-    {
-        // Nothing to do.
-    }
+    AStarNode();
 
-    void setElement(ElementType _element)
-    {
-        element = _element;
-    }
+    void setElement(ElementType _element);
 
-    void setNodeState(const AStarNodeState & _nodeState)
-    {
-        nodeState = _nodeState;
-    }
+    void setNodeState(const AStarNodeState & _nodeState);
 
+    void setG(const int & _g);
 
-    void setG(const int & _g)
-    {
-        g = _g;
-    }
+    void setH(const int & _h);
 
-    void setH(const int & _h)
-    {
-        h = _h;
-    }
+    void setParentNode(std::shared_ptr<AStarNode<ElementType>> _parentNode);
 
-    void setParentNode(std::shared_ptr<AStarNode<ElementType>> _parentNode)
-    {
-        parentNode = _parentNode;
-    }
+    void setIsEndNode();
 
-    void setIsEndNode()
-    {
-        endNode = true;
-    }
+    ElementType getElement();
 
-    ElementType getElement()
-    {
-        return element;
-    }
-
-    AStarNodeState getNodeState() const
-    {
-        return nodeState;
-    }
+    AStarNodeState getNodeState() const;
 
     /// Estimated total distance/cost.
-    int getG() const
-    {
-        return g;
-    }
+    int getG() const;
 
     /// Estimated total distance/cost.
-    int getF() const
-    {
-        return g + h;
-    }
+    int getF() const;
 
-    std::shared_ptr<AStarNode<ElementType>> getParentNode()
-    {
-        return parentNode;
-    }
+    std::shared_ptr<AStarNode<ElementType>> getParentNode();
 
-    bool isEndNode() const
-    {
-        return endNode;
-    }
+    bool isEndNode() const;
 };
+
+#include "aStarNode.i.hpp"

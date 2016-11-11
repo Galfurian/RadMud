@@ -15,9 +15,5 @@ set(RADMUD_STRUCTURE_SRC
         ./src/structure/continent.cpp
         ./src/structure/coordinates.cpp
         ./src/structure/generator.cpp
-        ./src/structure/algorithms/aStar.cpp
-        ./src/structure/algorithms/graphNode.cpp
-        ./src/structure/algorithms/aStarNode.cpp
-        ./src/structure/algorithms/pathFinder.cpp
         PARENT_SCOPE
         )
