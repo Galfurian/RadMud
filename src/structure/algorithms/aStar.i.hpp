@@ -56,10 +56,14 @@ bool AStar<ElementType>::search(std::shared_ptr<AStarNode<ElementType>> currentN
     std::sort(neighbours.begin(), neighbours.end(), [](const std::shared_ptr<AStarNode<ElementType>> & left,
                                                        const std::shared_ptr<AStarNode<ElementType>> & right)
     {
-        if (left->getF() < right->getF()) return true;
-        if (left->getF() > right->getF()) return false;
-        return false;
+        return left->getF() < right->getF();
     });
+    for (auto it = neighbours.begin(); it != neighbours.end(); ++it)
+    {
+        // Get the neighbour at the given iterator.
+        auto neighbour = (*it);
+        Logger::log(LogLevel::Debug, "        Neighbour->F:%s", ToString(neighbour->getF()));
+    }
     // Continue the search for each neighbour.
     for (auto it = neighbours.begin(); it != neighbours.end(); ++it)
     {

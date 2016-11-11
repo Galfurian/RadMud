@@ -105,6 +105,7 @@ std::vector<std::shared_ptr<AStarNode<Room *>>> AStarNode<Room *>::getNeighbours
     std::vector<std::shared_ptr<AStarNode<Room *>>> & nodes,
     const std::function<bool(Room * from, Room * to)> & checkFunction)
 {
+    Logger::log(LogLevel::Debug, "Node : %s", element->name);
     std::vector<std::shared_ptr<AStarNode<Room *>>> neighbours;
     for (auto it : element->exits)
     {
@@ -119,6 +120,7 @@ std::vector<std::shared_ptr<AStarNode<Room *>>> AStarNode<Room *>::getNeighbours
             {
                 neighbours.emplace_back(it2);
                 found = true;
+                Logger::log(LogLevel::Debug, "    Taking   [%s]: %s", it2->getF(), it->destination->name);
                 break;
             }
         }
@@ -128,6 +130,7 @@ std::vector<std::shared_ptr<AStarNode<Room *>>> AStarNode<Room *>::getNeighbours
             node->setG(g + this->getDistance(node));
             nodes.emplace_back(node);
             neighbours.emplace_back(node);
+            Logger::log(LogLevel::Debug, "    Taking   [%s]: %s", node->getF(), it->destination->name);
         }
     }
     return neighbours;
