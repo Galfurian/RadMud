@@ -5,9 +5,6 @@
 #pragma once
 
 #include "room.hpp"
-
-#include "graphNode.hpp"
-
 #include <vector>
 
 using AStarNodeState = enum class AStarNodeState_t

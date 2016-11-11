@@ -162,6 +162,7 @@ bool Area::remRoom(Room * room)
 
 Room * Area::getRoom(int room_vnum)
 {
+    // TODO: Apparently there are elements inside the map which has coordinates but a nullptr room.
     auto it = std::find_if(areaMap.begin(), areaMap.end(), [&room_vnum](decltype(*areaMap.begin()) & element)
     {
         if (element.second != nullptr) return (element.second->vnum == room_vnum);

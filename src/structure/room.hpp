@@ -29,7 +29,6 @@
 #include "mobile.hpp"
 #include "characterContainer.hpp"
 #include "itemContainer.hpp"
-#include "graphNode.hpp"
 
 class Item;
 

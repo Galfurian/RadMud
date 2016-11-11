@@ -11,6 +11,11 @@ template<typename ElementType>
 class PathFinder
 {
 public:
+    virtual ~PathFinder()
+    {
+        // Nothing to do.
+    }
+
     virtual bool findPath(ElementType start,
                           ElementType end,
                           std::vector<ElementType> & path,

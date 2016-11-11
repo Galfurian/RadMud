@@ -19,7 +19,7 @@
 #include "god.hpp"
 
 #include "mud.hpp"
-#include "aStar.hpp"
+#include "algorithms/AStar/aStar.hpp"
 
 void LoadGodCommands()
 {

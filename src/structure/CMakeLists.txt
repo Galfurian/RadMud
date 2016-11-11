@@ -3,6 +3,7 @@
 set(RADMUD_STRUCTURE_INC
         ./src/structure/
         ./src/structure/algorithms
+        ./src/structure/algorithms/AStar
         PARENT_SCOPE
         )
 
