@@ -9,7 +9,7 @@ AStarNode<ElementType>::AStarNode(ElementType _element) :
     g(),
     h(),
     parentNode(),
-    endNode()
+    endNodeFlag()
 {
     // Nothing to do.
 }
@@ -47,7 +47,7 @@ void AStarNode<ElementType>::setParentNode(std::shared_ptr<AStarNode<ElementType
 template<typename ElementType>
 void AStarNode<ElementType>::setIsEndNode()
 {
-    endNode = true;
+    endNodeFlag = true;
 }
 
 template<typename ElementType>
@@ -83,7 +83,7 @@ std::shared_ptr<AStarNode<ElementType>> AStarNode<ElementType>::getParentNode()
 template<typename ElementType>
 bool AStarNode<ElementType>::isEndNode() const
 {
-    return endNode;
+    return endNodeFlag;
 }
 
 template<>
@@ -103,6 +103,7 @@ bool AStarNode<Room *>::isEqualTo(std::shared_ptr<AStarNode<Room *>> other)
 template<>
 std::vector<std::shared_ptr<AStarNode<Room *>>> AStarNode<Room *>::getNeighbours(
     std::vector<std::shared_ptr<AStarNode<Room *>>> & nodes,
+    std::shared_ptr<AStarNode<Room *>> endNode,
     const std::function<bool(Room * from, Room * to)> & checkFunction)
 {
     Logger::log(LogLevel::Debug, "Node : %s", element->name);
@@ -128,6 +129,7 @@ std::vector<std::shared_ptr<AStarNode<Room *>>> AStarNode<Room *>::getNeighbours
         {
             auto node = std::make_shared<AStarNode<Room *>>(it->destination);
             node->setG(g + this->getDistance(node));
+            node->setH(node->getDistance(endNode));
             nodes.emplace_back(node);
             neighbours.emplace_back(node);
             Logger::log(LogLevel::Debug, "    Taking   [%s]: %s", node->getF(), it->destination->name);

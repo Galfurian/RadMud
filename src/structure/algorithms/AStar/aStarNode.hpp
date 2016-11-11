@@ -31,7 +31,7 @@ private:
     /// The previous node in path.
     std::shared_ptr<AStarNode<ElementType>> parentNode;
     /// Identifies the end node.
-    bool endNode;
+    bool endNodeFlag;
 
 public:
     /// @brief Constructor.
@@ -67,6 +67,7 @@ public:
 
     std::vector<std::shared_ptr<AStarNode<ElementType>>> getNeighbours(
         std::vector<std::shared_ptr<AStarNode<ElementType>>> & nodes,
+        std::shared_ptr<AStarNode<ElementType>> endNode,
         const std::function<bool(ElementType from, ElementType to)> & checkFunction);
 
     int getDistance(std::shared_ptr<AStarNode<ElementType>> other);

@@ -25,8 +25,9 @@ bool AStar<ElementType>::findPath(ElementType start,
     nodes.emplace_back(endNode);
     // Rise the endNode flag for the end node.
     endNode->setIsEndNode();
-    // Set the G-Value for the starting node.
-    startNode->setG(startNode->getDistance(endNode));
+    // Set the G-Value and H-Value for the starting node.
+    startNode->setG(0);
+    startNode->setH(startNode->getDistance(endNode));
     // Set the checking function.
     checkFunction = _checkFunction;
     // Start the search.
@@ -51,7 +52,7 @@ bool AStar<ElementType>::search(std::shared_ptr<AStarNode<ElementType>> currentN
     // Set the current node to Closed since it cannot be traversed more than once
     currentNode->setNodeState(AStarNodeState::Closed);
     // Get the next nodes.
-    auto neighbours = currentNode->getNeighbours(nodes, checkFunction);
+    auto neighbours = currentNode->getNeighbours(nodes, endNode, checkFunction);
     // Reorder the neighbours so that the one with the lesser G-Value comes first.
     std::sort(neighbours.begin(), neighbours.end(), [](const std::shared_ptr<AStarNode<ElementType>> & left,
                                                        const std::shared_ptr<AStarNode<ElementType>> & right)
