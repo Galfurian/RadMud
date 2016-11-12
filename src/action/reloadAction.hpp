@@ -37,7 +37,7 @@ private:
 
 public:
     /// @brief Constructor.
-    ReloadAction(RangedWeaponItem * _weapon, Item * _magazine, Character * _actor, unsigned int _cooldown);
+    ReloadAction(Character * _actor, RangedWeaponItem * _weapon, Item * _magazine);
 
     /// @brief Destructor.
     virtual ~ReloadAction();
@@ -51,4 +51,7 @@ public:
     std::string stop() override;
 
     ActionStatus perform() override;
+
+    /// @brief Provides the required time for the weapon to be reloaded.
+    static unsigned int getReloadTime(RangedWeaponItem * _weapon, Item * _magazine);
 };

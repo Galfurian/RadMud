@@ -211,8 +211,7 @@ void DoFlee(Character * character, ArgumentHandler & /*args*/)
 
 void DoScout(Character * character, ArgumentHandler & /*args*/)
 {
-    auto requiredTime = 3;
-    auto newAction = std::make_shared<ScoutAction>(character, requiredTime);
+    auto newAction = std::make_shared<ScoutAction>(character);
     // Check the new action.
     std::string error;
     if (newAction->check(error))
@@ -322,7 +321,6 @@ void DoUnload(Character * character, ArgumentHandler & args)
         return;
     }
     // Set the required time to unloaded the item.
-    double requiredTime = 2.0;
     if (itemToUnload->getType() == ModelType::Magazine)
     {
         auto loadedItem = itemToUnload->toMagazineItem()->getAlreadyLoadedProjectile();
@@ -332,11 +330,9 @@ void DoUnload(Character * character, ArgumentHandler & args)
                                itemToUnload->getName(true));
             return;
         }
-        requiredTime = 0.25 * loadedItem->quantity;
     }
-    Logger::log(LogLevel::Debug, "Required Time : %s", ToString(requiredTime));
     // Create the unload action.
-    auto newAction = std::make_shared<UnloadAction>(itemToUnload, character, requiredTime);
+    auto newAction = std::make_shared<UnloadAction>(character, itemToUnload);
     std::string error;
     // Check the new action.
     if (newAction->check(error))
@@ -394,8 +390,7 @@ void DoReload(Character * character, ArgumentHandler & args)
                            magazine->getName(true));
         return;
     }
-    auto requiredTime = 2;
-    auto newAction = std::make_shared<ReloadAction>(rangedWeapon, magazine, character, requiredTime);
+    auto newAction = std::make_shared<ReloadAction>(character, rangedWeapon, magazine);
     std::string error;
     // Check the new action.
     if (newAction->check(error))

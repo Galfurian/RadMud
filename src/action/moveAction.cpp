@@ -27,15 +27,15 @@
 
 using namespace std::chrono;
 
-MoveAction::MoveAction(Character * _actor,
-                       Room * _destination,
-                       Direction _direction,
-                       unsigned int _cooldown) :
-    GeneralAction(_actor, system_clock::now() + seconds(_cooldown)),
+MoveAction::MoveAction(Character * _actor, Room * _destination, Direction _direction) :
+    GeneralAction(_actor),
     destination(_destination),
     direction(_direction)
 {
-    Logger::log(LogLevel::Debug, "Created move action.");
+    // Debugging message.
+    Logger::log(LogLevel::Debug, "Created MoveAction.");
+    // Reset the cooldown of the action.
+    this->resetCooldown(MoveAction::getCooldown(_actor));
 }
 
 MoveAction::~MoveAction()
@@ -59,6 +59,14 @@ bool MoveAction::check(std::string & error) const
     {
         Logger::log(LogLevel::Error, "No direction has been set.");
         error = "You have lost your direction.";
+        return false;
+    }
+    // Calculate the time needed to move.
+    if ((actor->posture != CharacterPosture::Stand) &&
+        (actor->posture != CharacterPosture::Crouch) &&
+        (actor->posture != CharacterPosture::Prone))
+    {
+        error = "You first need to stand up.";
         return false;
     }
     return true;
@@ -184,7 +192,9 @@ bool MoveAction::canMoveTo(Character * character, const Direction & direction, s
         return !lockedInCombat;
     }
     // Check if the character is in a no-walk position.
-    if (character->posture == CharacterPosture::Rest || character->posture == CharacterPosture::Sit)
+    if ((character->posture != CharacterPosture::Stand) &&
+        (character->posture != CharacterPosture::Crouch) &&
+        (character->posture != CharacterPosture::Prone))
     {
         error = "You first need to stand up.";
         return false;

@@ -39,12 +39,7 @@ public:
     /// @param _actor       The actor who is doing the action.
     /// @param _destination The destionation of the movement.
     /// @param _direction   The direction of the movement.
-    /// @param _cooldown    How many seconds are required to complete the movement.
-    MoveAction(
-        Character * _actor,
-        Room * _destination,
-        Direction _direction,
-        unsigned int _cooldown);
+    MoveAction(Character * _actor, Room * _destination, Direction _direction);
 
     /// @brief Destructor.
     virtual ~MoveAction();

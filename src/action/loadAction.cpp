@@ -28,7 +28,8 @@
 LoadAction::LoadAction(Character * _actor, Item * _itemToBeLoaded, Item * _projectile, const unsigned int & _ammount) :
     GeneralAction(_actor),
     itemToBeLoaded(_itemToBeLoaded),
-    projectile(_projectile)
+    projectile(_projectile),
+    ammount(_ammount)
 {
     // Debugging message.
     Logger::log(LogLevel::Debug, "Created LoadAction.");
@@ -120,21 +121,19 @@ ActionStatus LoadAction::perform()
         actor->sendMsg(error + "\n\n");
         return ActionStatus::Error;
     }
-    auto ammountToLoad = itemToBeLoaded->model->toMagazine()->maxAmmount;
     // First check if there are already some projectiles inside the magazine.
     if (!itemToBeLoaded->isEmpty())
     {
         auto loaded = itemToBeLoaded->content.front();
-        ammountToLoad -= loaded->quantity;
         SQLiteDbms::instance().beginTransaction();
-        if (projectile->quantity < ammountToLoad)
+        if (projectile->quantity < ammount)
         {
             itemToBeLoaded->putInside(projectile);
         }
         else
         {
-            loaded->quantity += ammountToLoad;
-            projectile->quantity -= ammountToLoad;
+            loaded->quantity += ammount;
+            projectile->quantity -= ammount;
             loaded->updateOnDB();
             projectile->updateOnDB();
         }
@@ -143,14 +142,14 @@ ActionStatus LoadAction::perform()
     else
     {
         SQLiteDbms::instance().beginTransaction();
-        if (projectile->quantity <= ammountToLoad)
+        if (projectile->quantity <= ammount)
         {
             actor->remInventoryItem(projectile);
             itemToBeLoaded->putInside(projectile);
         }
         else
         {
-            auto newProjectileStack = projectile->removeFromStack(actor, ammountToLoad);
+            auto newProjectileStack = projectile->removeFromStack(actor, ammount);
             if (newProjectileStack == nullptr)
             {
                 // Rollback the transaction.

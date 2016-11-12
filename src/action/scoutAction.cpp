@@ -25,10 +25,13 @@
 #include "area.hpp"
 #include "effectFactory.hpp"
 
-ScoutAction::ScoutAction(Character * _actor, unsigned int _cooldown) :
-    GeneralAction(_actor, std::chrono::system_clock::now() + std::chrono::seconds(_cooldown))
+ScoutAction::ScoutAction(Character * _actor) :
+    GeneralAction(_actor)
 {
-    Logger::log(LogLevel::Debug, "Created scout action.");
+    // Debugging message.
+    Logger::log(LogLevel::Debug, "Created ScoutAction.");
+    // Reset the cooldown of the action.
+    this->resetCooldown(ScoutAction::getScoutTime(_actor));
 }
 
 ScoutAction::~ScoutAction()
@@ -119,9 +122,18 @@ unsigned int ScoutAction::getConsumedStamina(Character * character)
     // STRENGTH [-0.0 to -2.80]
     // WEIGHT   [+1.6 to +2.51]
     // CARRIED  [+0.0 to +2.48]
-    auto consumed = 1.0
-                    - character->getAbilityLog(Ability::Strength, 0.0, 1.0)
-                    + SafeLog10(character->weight)
-                    + SafeLog10(character->getCarryingWeight());
-    return (consumed < 0) ? 0 : static_cast<unsigned int>(consumed);
+    unsigned int consumedStamina = 1;
+    consumedStamina = SafeSum(consumedStamina, -character->getAbilityLog(Ability::Strength, 0.0, 1.0));
+    consumedStamina = SafeSum(consumedStamina, SafeLog10(character->weight));
+    consumedStamina = SafeSum(consumedStamina, SafeLog10(character->getCarryingWeight()));
+    return consumedStamina;
+}
+
+unsigned int ScoutAction::getScoutTime(Character * character)
+{
+    // BASE       [+3.0]
+    // PERCEPTION [-0.0 to -2.80]
+    unsigned int requiredTime = 3;
+    requiredTime = SafeSum(requiredTime, -character->getAbilityLog(Ability::Perception, 0.0, 1.0));
+    return requiredTime;
 }

@@ -188,41 +188,28 @@ void DoDirection(Character * character, Direction direction)
         character->sendMsg(error + "\n");
         return;
     }
-    // ////////////////////////////////////////////////////////////////////////
-    unsigned int speed;
-    // Calculate the time needed to move.
-    if (character->posture == CharacterPosture::Stand)
-    {
-        character->sendMsg("You start to go %s...\n", direction.toString());
-        speed = 2;
-    }
-    else if (character->posture == CharacterPosture::Crouch)
-    {
-        character->sendMsg("You move crouching towards %s...\n", direction.toString());
-        speed = 4;
-    }
-    else if (character->posture == CharacterPosture::Prone)
-    {
-        character->sendMsg("You begin to crawl to %s...\n", direction.toString());
-        speed = 6;
-    }
-    else
-    {
-        character->sendMsg("You can't move!\n");
-        return;
-    }
-
-    auto moveAction = std::make_shared<MoveAction>(
-        character,
-        character->room->findExit(direction)->destination,
-        direction,
-        speed);
+    // Get the destination.
+    auto destination = character->room->findExit(direction)->destination;
+    auto moveAction = std::make_shared<MoveAction>(character, destination, direction);
     // Check the new action.
     error = std::string();
     if (moveAction->check(error))
     {
         // Set the new action.
         character->setAction(moveAction);
+        // Calculate the time needed to move.
+        if (character->posture == CharacterPosture::Stand)
+        {
+            character->sendMsg("You start to go %s...\n", direction.toString());
+        }
+        else if (character->posture == CharacterPosture::Crouch)
+        {
+            character->sendMsg("You move crouching towards %s...\n", direction.toString());
+        }
+        else if (character->posture == CharacterPosture::Prone)
+        {
+            character->sendMsg("You begin to crawl to %s...\n", direction.toString());
+        }
     }
     else
     {

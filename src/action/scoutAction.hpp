@@ -31,7 +31,7 @@ class ScoutAction :
 
 public:
     /// @brief Constructor.
-    ScoutAction(Character * _actor, unsigned int _cooldown);
+    ScoutAction(Character * _actor);
 
     /// @brief Destructor.
     virtual ~ScoutAction();
@@ -51,4 +51,6 @@ public:
     /// @return The required stamina.
     static unsigned int getConsumedStamina(Character * character);
 
+    /// @brief Provides the required time for scouting the area.
+    static unsigned int getScoutTime(Character * character);
 };

@@ -24,11 +24,14 @@
 #include "character.hpp"
 #include "sqliteDbms.hpp"
 
-UnloadAction::UnloadAction(Item * _itemToBeUnloaded, Character * _actor, unsigned int _cooldown) :
-    GeneralAction(_actor, std::chrono::system_clock::now() + std::chrono::seconds(_cooldown)),
+UnloadAction::UnloadAction(Character * _actor, Item * _itemToBeUnloaded) :
+    GeneralAction(_actor),
     itemToBeUnloaded(_itemToBeUnloaded)
 {
-    Logger::log(LogLevel::Debug, "Created unload action.");
+    // Debugging message.
+    Logger::log(LogLevel::Debug, "Created UnloadAction.");
+    // Reset the cooldown of the action.
+    this->resetCooldown(UnloadAction::getUnloadTime(_itemToBeUnloaded));
 }
 
 UnloadAction::~UnloadAction()
@@ -105,4 +108,17 @@ ActionStatus UnloadAction::perform()
     SQLiteDbms::instance().endTransaction();
     actor->sendMsg("You have finished unloading %s...\n\n", itemToBeUnloaded->getName(true));
     return ActionStatus::Finished;
+}
+
+unsigned int UnloadAction::getUnloadTime(Item * _itemToBeUnloaded)
+{
+    if (_itemToBeUnloaded->getType() == ModelType::Magazine)
+    {
+        auto loadedItem = _itemToBeUnloaded->toMagazineItem()->getAlreadyLoadedProjectile();
+        if (loadedItem != nullptr)
+        {
+            return static_cast<unsigned int>(loadedItem->getWeight(false) * loadedItem->quantity);
+        }
+    }
+    return 1;
 }

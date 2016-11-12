@@ -35,7 +35,7 @@ private:
 
 public:
     /// @brief Constructor.
-    UnloadAction(Item * _itemToBeUnloaded, Character * _actor, unsigned int _cooldown);
+    UnloadAction(Character * _actor, Item * _itemToBeUnloaded);
 
     /// @brief Destructor.
     virtual ~UnloadAction();
@@ -49,4 +49,7 @@ public:
     std::string stop() override;
 
     ActionStatus perform() override;
+
+    /// @brief Provides the required time for the item to be unloaded.
+    static unsigned int getUnloadTime(Item * _itemToBeUnloaded);
 };
