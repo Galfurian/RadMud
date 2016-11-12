@@ -211,7 +211,7 @@ unsigned int BuildAction::getConsumedStamina(Character * character)
     return consumedStamina;
 }
 
-unsigned int BuildAction::getCooldown(Character * , Building * _schematics)
+unsigned int BuildAction::getCooldown(Character *, Building * _schematics)
 {
     return _schematics->time;
 }

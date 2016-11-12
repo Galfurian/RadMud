@@ -28,6 +28,7 @@
 #include "aimAction.hpp"
 #include "magazineItem.hpp"
 #include "basicAttack.hpp"
+#include "flee.hpp"
 
 void LoadCombatCommands()
 {
@@ -126,102 +127,52 @@ void DoKill(Character * character, ArgumentHandler & args)
         character->sendMsg("You don't see '%s' anywhere.\n", args[0].getContent());
         return;
     }
-
     // Check if the two characters are both already in combat.
     if (character->getAction()->getType() == ActionType::Combat)
     {
         // Check if the character is trying to attack a target with which is not in combat.
-        if (!character->combatHandler.hasOpponent(target))
+        if (character->combatHandler.hasOpponent(target))
+        {
+            // Check if the current predefined target is the target.
+            auto predefinedTarget = character->combatHandler.getPredefinedTarget();
+            if (predefinedTarget != nullptr)
+            {
+                if (predefinedTarget == target)
+                {
+                    character->sendMsg("You are already doing your best to kill %s!\n", target->getName());
+                    return;
+                }
+            }
+            // Set the target as predefined target.
+            character->combatHandler.setPredefinedTarget(target);
+            // Notify to the character.
+            character->sendMsg("You focus your attacks on %s!\n", target->getName());
+        }
+        else
         {
             character->sendMsg("You have already your share of troubles!\n");
-            return;
-        }
-        auto predefinedTarget = character->combatHandler.getPredefinedTarget();
-        if (predefinedTarget != nullptr)
-        {
-            if (predefinedTarget == target)
-            {
-                character->sendMsg("You are already doing your best to kill %s!\n", target->getName());
-                return;
-            }
-        }
-        character->sendMsg("You focus your attacks on %s!\n", target->getName());
-        character->combatHandler.setPredefinedTarget(character->combatHandler.getAimedTarget());
-    }
-        // Check if the character is attacking a target which is already in combat.
-    else if ((character->getAction()->getType() != ActionType::Combat)
-             && (target->getAction()->getType() == ActionType::Combat))
-    {
-        // Set the combatHandler.
-        if (!character->combatHandler.addOpponent(target))
-        {
-            character->sendMsg("You are already fighting againts %s.\n", target->getName());
-            return;
-        }
-        if (!target->combatHandler.addOpponent(character))
-        {
-            character->sendMsg("You were not ablet to attack %s.\n", target->getName());
-            character->combatHandler.remOpponent(target);
-            return;
-        }
-        // Notify the character.
-        character->sendMsg("You attack %s.\n", target->getName());
-        // Notify the target.
-        target->sendMsg("%s attacks you.\n\n", character->getNameCapital());
-        // Notify the others.
-        character->room->sendToAll(
-            "%s attacks %s.\n",
-            {character, target},
-            character->getNameCapital(),
-            target->getName());
-        // Let the characters enter the combat.
-        if (!character->setNextCombatAction(CombatActionType::BasicAttack))
-        {
-            character->sendMsg("You were not ablet to attack %s.\n", target->getName());
-            character->combatHandler.remOpponent(target);
-            target->combatHandler.remOpponent(character);
-            return;
         }
     }
     else
     {
-        // Set the combatHandler.
-        if (!character->combatHandler.addOpponent(target))
-        {
-            character->sendMsg("You are already fighting againts %s.\n", target->getName());
-            return;
-        }
-        if (!target->combatHandler.addOpponent(character))
-        {
-            character->sendMsg("You were not ablet to attack %s.\n", target->getName());
-            character->combatHandler.remOpponent(target);
-            return;
-        }
-        // Notify the character.
-        character->sendMsg("You attack %s.\n", target->getName());
-        // Notify the target.
-        target->sendMsg("%s attacks you.\n\n", character->getNameCapital());
-        // Notify the others.
-        character->room->sendToAll(
-            "%s attacks %s.\n",
-            {character, target},
-            character->getNameCapital(),
-            target->getName());
-
+        // Check if the character is attacking a target which is already in combat.
         // Let the characters enter the combat.
-        if (!character->setNextCombatAction(CombatActionType::BasicAttack))
+        auto basicAttack = std::make_shared<BasicAttack>(character);
+        std::string error;
+        if (basicAttack->check(error))
         {
-            character->sendMsg("You were not ablet to attack %s.\n", target->getName());
-            character->combatHandler.remOpponent(target);
-            target->combatHandler.remOpponent(character);
-            return;
+            // Add the target to the list of opponents.
+            character->combatHandler.addOpponent(target);
+            // Add the action to the character's combat queue.
+            character->setAction(basicAttack);
+            // Set the predefined target.
+            character->combatHandler.setPredefinedTarget(target);
+            // Notify the character.
+            character->sendMsg("You attack %s.\n", target->getName());
         }
-        if (!target->setNextCombatAction(CombatActionType::BasicAttack))
+        else
         {
-            character->sendMsg("You were not ablet to attack %s.\n", target->getName());
-            character->combatHandler.remOpponent(target);
-            target->combatHandler.remOpponent(character);
-            return;
+            character->sendMsg("You were not able to attack %s.\n", target->getName());
         }
     }
 }
@@ -234,15 +185,29 @@ void DoFlee(Character * character, ArgumentHandler & /*args*/)
         character->sendMsg("You are not fighting.\n");
         return;
     }
-    auto combatAction = character->getAction()->toCombatAction();
-    // Check if the character is already trying to flee.
-    if (combatAction->getCombatActionType() == CombatActionType::Flee)
+    // Check if the actor is already trying to flee.
+    if (character->getAction()->getType() == ActionType::Combat)
     {
-        character->sendMsg("You are already trying to flee.\n");
-        return;
+        // Check if the character is already trying to flee.
+        if (character->getAction()->toCombatAction()->getCombatActionType() == CombatActionType::Flee)
+        {
+            character->sendMsg("You are already trying to flee.\n");
+            return;
+        }
     }
-    character->sendMsg("You prepare to flee...\n");
-    character->setNextCombatAction(CombatActionType::Flee);
+    auto flee = std::make_shared<Flee>(character);
+    std::string error;
+    if (flee->check(error))
+    {
+        // Add the action to the character's combat queue.
+        character->setAction(flee);
+        // Notify the character.
+        character->sendMsg("You prepare to flee...\n");
+    }
+    else
+    {
+        character->sendMsg(error + "\n");
+    }
 }
 
 void DoScout(Character * character, ArgumentHandler & /*args*/)

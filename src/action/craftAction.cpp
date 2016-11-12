@@ -287,7 +287,7 @@ unsigned int CraftAction::getConsumedStamina(Character * character)
     return consumedStamina;
 }
 
-unsigned int CraftAction::getCooldown(Character * , Production * _production)
+unsigned int CraftAction::getCooldown(Character *, Production * _production)
 {
     return _production->time;
 }

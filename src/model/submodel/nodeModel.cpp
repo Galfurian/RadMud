@@ -24,7 +24,7 @@
 
 NodeModel::NodeModel() :
     nodeType()
-    //,provides()
+//,provides()
 {
     // Nothing to do.
 }

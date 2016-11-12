@@ -26,9 +26,6 @@
 // Other Include.
 #include "mud.hpp"
 
-#include "flee.hpp"
-#include "basicAttack.hpp"
-
 #include "armorItem.hpp"
 #include "meleeWeaponItem.hpp"
 #include "rangedWeaponItem.hpp"
@@ -505,35 +502,6 @@ unsigned int Character::getViewDistance() const
 void Character::setAction(std::shared_ptr<GeneralAction> _action)
 {
     this->actionQueue.push_front(_action);
-}
-
-bool Character::setNextCombatAction(const CombatActionType & nextAction)
-{
-    bool sameAction = false;
-    if (this->getAction()->getType() == ActionType::Combat)
-    {
-        auto combatAction = this->getAction()->toCombatAction();
-        sameAction = (combatAction->getCombatActionType() == nextAction);
-    }
-    if (!sameAction)
-    {
-        if (nextAction == CombatActionType::BasicAttack)
-        {
-            if (combatHandler.empty())
-            {
-                Logger::log(LogLevel::Error, "The list of opponents is empty.");
-                return false;
-            }
-            this->actionQueue.push_front(std::make_shared<BasicAttack>(this));
-        }
-        else if (nextAction == CombatActionType::Flee)
-        {
-            this->actionQueue.push_front(std::make_shared<Flee>(this));
-        }
-    }
-    // Set the action cooldown.
-    this->getAction()->resetCooldown(CombatAction::getCooldown(this));
-    return true;
 }
 
 std::shared_ptr<GeneralAction> Character::getAction() const

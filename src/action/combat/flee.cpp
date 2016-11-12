@@ -27,7 +27,10 @@
 Flee::Flee(Character * _actor) :
     CombatAction(_actor)
 {
+    // Debugging message.
     Logger::log(LogLevel::Debug, "Created Flee.");
+    // Reset the cooldown of the action.
+    this->resetCooldown(Flee::getCooldown(_actor));
 }
 
 Flee::~Flee()

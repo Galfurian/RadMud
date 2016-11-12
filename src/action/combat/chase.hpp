@@ -39,7 +39,7 @@ private:
     /// Validity flag.
     bool valid;
     /// Checking function.
-    std::function<bool (Room *, Room *)> checkFunction;
+    std::function<bool(Room *, Room *)> checkFunction;
 
 public:
     /// @brief Constructor.

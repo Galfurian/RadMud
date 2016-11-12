@@ -51,12 +51,12 @@ bool Coordinates::operator!=(const Coordinates & right) const
 
 bool Coordinates::operator<(const Coordinates & right) const
 {
-    if (x < right.x)  return true;
-    if (x > right.x)  return false;
-    if (y < right.y)  return true;
-    if (y > right.y)  return false;
-    if (z < right.z)  return true;
-    if (z > right.z)  return false;
+    if (x < right.x) return true;
+    if (x > right.x) return false;
+    if (y < right.y) return true;
+    if (y > right.y) return false;
+    if (z < right.z) return true;
+    if (z > right.z) return false;
     return false;
 }
 

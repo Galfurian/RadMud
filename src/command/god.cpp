@@ -598,7 +598,7 @@ void DoFindPath(Character * character, ArgumentHandler & args)
                 // Check if the destination is forbidden for mobiles.
                 return !(character->isMobile() && HasFlag(destExit->flags, ExitFlag::NoMob));
             };
-            
+
             if (aStar.findPath(character->room, room, path, checkFunction))
             {
                 character->sendMsg("You have to go:\n");
