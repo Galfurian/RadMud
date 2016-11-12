@@ -76,9 +76,6 @@ public:
     /// @brief Constructor.
     GeneralAction(Character * _actor);
 
-    /// @brief Constructor.
-    GeneralAction(Character * _actor, std::chrono::time_point<std::chrono::system_clock> _actionCooldown);
-
     /// @brief Destructor.
     virtual ~GeneralAction();
 
