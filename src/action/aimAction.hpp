@@ -33,7 +33,7 @@ public:
     Character * target;
 
     /// @brief Constructor.
-    AimAction(Character * _actor, Character * _target, unsigned int _cooldown);
+    AimAction(Character * _actor, Character * _target);
 
     /// @brief Destructor.
     virtual ~AimAction();
@@ -52,5 +52,5 @@ public:
     /// @param source The source character who is aiming.
     /// @param target The aimed character.
     /// @return The seconds required to aim the target.
-    static int getAimTime(Character * source, Character * target);
+    static unsigned int getAimTime(Character * source, Character * target);
 };

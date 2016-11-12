@@ -27,11 +27,10 @@
 
 using namespace std::chrono;
 
-MoveAction::MoveAction(
-    Character * _actor,
-    Room * _destination,
-    Direction _direction,
-    unsigned int _cooldown) :
+MoveAction::MoveAction(Character * _actor,
+                       Room * _destination,
+                       Direction _direction,
+                       unsigned int _cooldown) :
     GeneralAction(_actor, system_clock::now() + seconds(_cooldown)),
     destination(_destination),
     direction(_direction)

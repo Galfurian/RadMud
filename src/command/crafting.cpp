@@ -96,12 +96,7 @@ void DoProfession(Character * character, Profession * profession, ArgumentHandle
     // Search the needed workbench.
     if (production->workbench != ToolType::NoType)
     {
-        auto workbench = character->findNearbyTool(
-            production->workbench,
-            std::vector<Item *>(),
-            true,
-            false,
-            false);
+        auto workbench = character->findNearbyTool(production->workbench, std::vector<Item *>(), true, false, false);
         if (workbench == nullptr)
         {
             character->sendMsg("The proper workbench is not present.\n");
@@ -128,36 +123,29 @@ void DoProfession(Character * character, Profession * profession, ArgumentHandle
         character->sendMsg("You cannot decide which will be the material.\n");
         return;
     }
-
-    // //////////////////////////////////////////
     // Prepare the action.
-    auto craftAction = std::make_shared<CraftAction>(
-        character,
-        production,
-        craftMaterial,
-        usedTools,
-        usedIngredients,
-        production->time);
+    auto craftAction = std::make_shared<CraftAction>(character, production, craftMaterial, usedTools, usedIngredients);
     // Check the new action.
     std::string error;
-    if (!craftAction->check(error))
+    if (craftAction->check(error))
+    {
+        // Set the new action.
+        character->setAction(craftAction);
+        // Send the messages.
+        character->sendMsg(
+            "%s %s.\n",
+            profession->startMessage,
+            Formatter::yellow() + production->outcome->getName() + Formatter::reset());
+        character->room->sendToAll(
+            "%s has started %s something...\n",
+            {character},
+            character->getNameCapital(),
+            production->profession->action);
+    }
+    else
     {
         character->sendMsg("%s\n", error);
-        return;
     }
-    // Set the new action.
-    character->setAction(craftAction);
-    // //////////////////////////////////////////
-    // Send the messages.
-    character->sendMsg(
-        "%s %s.\n",
-        profession->startMessage,
-        Formatter::yellow() + production->outcome->getName() + Formatter::reset());
-    character->room->sendToAll(
-        "%s has started %s something...\n",
-        {character},
-        character->getNameCapital(),
-        production->profession->action);
 }
 
 void DoBuild(Character * character, ArgumentHandler & args)
@@ -194,32 +182,27 @@ void DoBuild(Character * character, ArgumentHandler & args)
         return;
     }
     // Search the model that has to be built.
-    Item * building = nullptr;
-    for (auto iterator : character->inventory)
+    auto it = std::find_if(character->inventory.begin(),
+                           character->inventory.end(), [&schematics](Item * item)
+                           {
+                               return (item->model->vnum == schematics->buildingModel->vnum);
+                           });
+    if (it == character->inventory.end())
     {
-        if (iterator->model->vnum == schematics->buildingModel->vnum)
-        {
-            building = iterator;
-            break;
-        }
-    }
-    if (building == nullptr)
-    {
-        for (auto iterator : character->room->items)
-        {
-            if (iterator->model->vnum == schematics->buildingModel->vnum)
-            {
-                building = iterator;
-                break;
-            }
-        }
-        if (building == nullptr)
+        it = std::find_if(character->room->items.begin(),
+                          character->room->items.end(), [&schematics](Item * item)
+                          {
+                              return (item->model->vnum == schematics->buildingModel->vnum);
+                          });
+        if (it == character->room->items.end())
         {
             // Otherwise notify the missing item.
             character->sendMsg("You don't have the main building item.\n");
             return;
         }
     }
+    auto building = (*it);
+    // Check if there is already something built inside the room with the Unique flag.
     for (auto iterator : character->room->items)
     {
         if (HasFlag(iterator->flags, ItemFlag::Built))
@@ -242,36 +225,27 @@ void DoBuild(Character * character, ArgumentHandler & args)
             }
         }
     }
-
-    // //////////////////////////////////////////
     // Prepare the action.
-    auto buildAction = std::make_shared<BuildAction>(
-        character,
-        schematics,
-        building,
-        usedTools,
-        usedIngredients,
-        schematics->time);
+    auto buildAction = std::make_shared<BuildAction>(character, schematics, building, usedTools, usedIngredients);
     // Check the new action.
     std::string error;
-    if (!buildAction->check(error))
+    if (buildAction->check(error))
+    {
+        // Set the new action.
+        character->setAction(buildAction);
+        character->sendMsg(
+            "You start building %s.\n",
+            Formatter::yellow() + schematics->buildingModel->getName() + Formatter::reset());
+        // Send the message inside the room.
+        character->room->sendToAll(
+            "%s has started building something...\n",
+            {character},
+            character->getNameCapital());
+    }
+    else
     {
         character->sendMsg("%s\n", error);
-        return;
     }
-    // Set the new action.
-    character->setAction(buildAction);
-    // //////////////////////////////////////////
-    character->sendMsg(
-        "You start building %s.\n",
-        Formatter::yellow() + schematics->buildingModel->getName() + Formatter::reset());
-
-    // //////////////////////////////////////////
-    // Send the message inside the room.
-    character->room->sendToAll(
-        "%s has started building something...\n",
-        {character},
-        character->getNameCapital());
 }
 
 void DoDeconstruct(Character * character, ArgumentHandler & args)

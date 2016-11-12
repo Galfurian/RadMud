@@ -34,10 +34,12 @@ private:
     Item * itemToBeLoaded;
     /// The projectile used to load the item.
     Item * projectile;
+    /// The ammount that has to be loaded.
+    unsigned int ammount;
 
 public:
     /// @brief Constructor.
-    LoadAction(Item * _itemToBeLoaded, Item * _projectile, Character * _actor, unsigned int _cooldown);
+    LoadAction(Character * _actor, Item * _itemToBeLoaded, Item * _projectile, const unsigned int & _ammount);
 
     /// @brief Destructor.
     virtual ~LoadAction();
@@ -51,4 +53,7 @@ public:
     std::string stop() override;
 
     ActionStatus perform() override;
+
+    /// @brief Provides the required time for the item to be loaded to aim the target.
+    static unsigned int getLoadTime(Item * projectile, const unsigned int & ammountToLoad);
 };

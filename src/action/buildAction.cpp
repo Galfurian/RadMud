@@ -27,20 +27,21 @@
 
 using namespace std::chrono;
 
-BuildAction::BuildAction(
-    Character * _actor,
-    Building * _schematics,
-    Item * _building,
-    std::vector<Item *> & _tools,
-    std::vector<std::pair<Item *, unsigned int>> & _ingredients,
-    unsigned int _cooldown) :
-    GeneralAction(_actor, system_clock::now() + seconds(_cooldown)),
+BuildAction::BuildAction(Character * _actor,
+                         Building * _schematics,
+                         Item * _building,
+                         std::vector<Item *> & _tools,
+                         std::vector<std::pair<Item *, unsigned int>> & _ingredients) :
+    GeneralAction(_actor),
     schematics(_schematics),
     building(_building),
     tools(_tools),
     ingredients(_ingredients)
 {
-    Logger::log(LogLevel::Debug, "Created building action.");
+    // Debugging message.
+    Logger::log(LogLevel::Debug, "Created BuildAction.");
+    // Reset the cooldown of the action.
+    this->resetCooldown(BuildAction::getCooldown(_actor, _schematics));
 }
 
 BuildAction::~BuildAction()

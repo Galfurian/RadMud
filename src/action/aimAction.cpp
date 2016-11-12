@@ -25,11 +25,14 @@
 #include "area.hpp"
 #include "room.hpp"
 
-AimAction::AimAction(Character * _actor, Character * _target, unsigned int _cooldown) :
-    GeneralAction(_actor, std::chrono::system_clock::now() + std::chrono::seconds(_cooldown)),
+AimAction::AimAction(Character * _actor, Character * _target) :
+    GeneralAction(_actor),
     target(_target)
 {
+    // Debugging message.
     Logger::log(LogLevel::Debug, "Created aim action.");
+    // Reset the cooldown of the action.
+    this->resetCooldown(AimAction::getAimTime(_actor, _target));
 }
 
 AimAction::~AimAction()
@@ -101,14 +104,14 @@ ActionStatus AimAction::perform()
     return ActionStatus::Finished;
 }
 
-int AimAction::getAimTime(Character * source, Character * target)
+unsigned int AimAction::getAimTime(Character * source, Character * target)
 {
-    int requiredTime = 2;
+    unsigned int requiredTime = 2;
     if (source && target)
     {
         if (source->room && target->room)
         {
-            requiredTime = 2 + Area::getDistance(source->room->coord, target->room->coord);
+            requiredTime = SafeSum(requiredTime, Area::getDistance(source->room->coord, target->room->coord));
         }
     }
     return requiredTime;

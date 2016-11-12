@@ -25,12 +25,15 @@
 #include "magazineModel.hpp"
 #include "sqliteDbms.hpp"
 
-LoadAction::LoadAction(Item * _itemToBeLoaded, Item * _projectile, Character * _actor, unsigned int _cooldown) :
-    GeneralAction(_actor, std::chrono::system_clock::now() + std::chrono::seconds(_cooldown)),
+LoadAction::LoadAction(Character * _actor, Item * _itemToBeLoaded, Item * _projectile, const unsigned int & _ammount) :
+    GeneralAction(_actor),
     itemToBeLoaded(_itemToBeLoaded),
     projectile(_projectile)
 {
-    Logger::log(LogLevel::Debug, "Created load action.");
+    // Debugging message.
+    Logger::log(LogLevel::Debug, "Created LoadAction.");
+    // Reset the cooldown of the action.
+    this->resetCooldown(LoadAction::getLoadTime(_projectile, _ammount));
 }
 
 LoadAction::~LoadAction()
@@ -164,4 +167,10 @@ ActionStatus LoadAction::perform()
                    itemToBeLoaded->getName(true),
                    projectile->getName(true));
     return ActionStatus::Finished;
+}
+
+unsigned int LoadAction::getLoadTime(Item * projectile, const unsigned int & ammountToLoad)
+{
+    // Evaluates the required time for loading the magazine.
+    return static_cast<unsigned int>(projectile->getWeight(false) * ammountToLoad);
 }

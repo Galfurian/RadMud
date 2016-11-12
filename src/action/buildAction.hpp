@@ -45,14 +45,12 @@ public:
     /// @param _building    A pointer to the item which has to be built.
     /// @param _tools       The list of used tools.
     /// @param _ingredients The list of used ingredients.
-    /// @param _cooldown    How many seconds are required to complete the action.
     BuildAction(
         Character * _actor,
         Building * _schematics,
         Item * _building,
         std::vector<Item *> & _tools,
-        std::vector<std::pair<Item *, unsigned int>> & _ingredients,
-        unsigned int _cooldown);
+        std::vector<std::pair<Item *, unsigned int>> & _ingredients);
 
     /// @brief Destructor.
     virtual ~BuildAction();

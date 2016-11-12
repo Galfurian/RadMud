@@ -47,14 +47,12 @@ public:
     /// @param _material    The material of the outcome.
     /// @param _tools       The list of used tools.
     /// @param _ingredients The list of used ingredients.
-    /// @param _cooldown    How many seconds are required to complete the action.
     CraftAction(
         Character * _actor,
         Production * _production,
         Material * _material,
         std::vector<Item *> & _tools,
-        std::vector<std::pair<Item *, unsigned int>> & _ingredients,
-        unsigned int & _cooldown);
+        std::vector<std::pair<Item *, unsigned int>> & _ingredients);
 
     /// @brief Destructor.
     virtual ~CraftAction();

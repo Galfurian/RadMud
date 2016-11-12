@@ -26,20 +26,21 @@
 
 using namespace std::chrono;
 
-CraftAction::CraftAction(
-    Character * _actor,
-    Production * _production,
-    Material * _material,
-    std::vector<Item *> & _tools,
-    std::vector<std::pair<Item *, unsigned int>> & _ingredients,
-    unsigned int & _cooldown) :
-    GeneralAction(_actor, system_clock::now() + seconds(_cooldown)),
+CraftAction::CraftAction(Character * _actor,
+                         Production * _production,
+                         Material * _material,
+                         std::vector<Item *> & _tools,
+                         std::vector<std::pair<Item *, unsigned int>> & _ingredients) :
+    GeneralAction(_actor),
     production(_production),
     material(_material),
     tools(_tools),
     ingredients(_ingredients)
 {
-    Logger::log(LogLevel::Debug, "Created crafting action.");
+    // Debugging message.
+    Logger::log(LogLevel::Debug, "Created CraftAction.");
+    // Reset the cooldown of the action.
+    this->resetCooldown(CraftAction::getCooldown(_actor, _production));
 }
 
 CraftAction::~CraftAction()

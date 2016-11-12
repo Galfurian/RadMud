@@ -26,7 +26,6 @@
 #include "loadAction.hpp"
 #include "unloadAction.hpp"
 #include "aimAction.hpp"
-#include "magazineItem.hpp"
 #include "basicAttack.hpp"
 #include "flee.hpp"
 
@@ -274,10 +273,8 @@ void DoLoad(Character * character, ArgumentHandler & args)
         character->sendMsg("%s\n", error);
         return;
     }
-    // Evaluates the required time for loading the magazine.
-    double requiredTime = 0.5 * ammountToLoad;
     // Create the load action.
-    auto newAction = std::make_shared<LoadAction>(magazine, projectile, character, requiredTime);
+    auto newAction = std::make_shared<LoadAction>(character, magazine, projectile, ammountToLoad);
     // Check the new action.
     error = std::string();
     if (newAction->check(error))
@@ -451,9 +448,7 @@ void DoAim(Character * character, ArgumentHandler & args)
         // Check if the target is still in sight.
         if (character->isAtRange(aimedCharacter, character->getViewDistance()))
         {
-            auto newAction = std::make_shared<AimAction>(character,
-                                                         aimedCharacter,
-                                                         AimAction::getAimTime(character, aimedCharacter));
+            auto newAction = std::make_shared<AimAction>(character, aimedCharacter);
             // Check the new action.
             std::string error;
             if (newAction->check(error))

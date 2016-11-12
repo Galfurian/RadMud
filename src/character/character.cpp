@@ -675,7 +675,12 @@ Item * Character::findNearbyTool(
                 ToolModel * toolModel = iterator->model->toTool();
                 if (toolModel->toolType == toolType)
                 {
-                    auto findIt = std::find(exceptions.begin(), exceptions.end(), iterator);
+                    // Check if the item is inside the exception list.
+                    auto findIt = std::find_if(exceptions.begin(), exceptions.end(), [&iterator](Item * item)
+                    {
+                        return (item->vnum == iterator->vnum);
+                    });
+                    // If not, return the item.
                     if (findIt == exceptions.end())
                     {
                         return iterator;
