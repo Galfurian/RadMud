@@ -28,6 +28,7 @@
 #include "room.hpp"
 #include "area.hpp"
 #include "chase.hpp"
+#include "sqliteDbms.hpp"
 
 BasicAttack::BasicAttack(Character * _actor) :
     CombatAction(_actor)
@@ -435,6 +436,13 @@ void BasicAttack::performRangedAttack(Character * target, RangedWeaponItem * wea
         actor->sendMsg("You are too tired to attack with %s.\n", weapon->getName(true));
         return;
     }
+    std::string error;
+    auto projectile = weapon->retrieveProjectile(error);
+    if (projectile == nullptr)
+    {
+        actor->sendMsg(error + ".\n\n");
+        return;
+    }
     // Natural roll for the hit rool.
     auto hitRoll = TRandInteger<unsigned int>(1, 20);
     // Check if:
@@ -505,6 +513,21 @@ void BasicAttack::performRangedAttack(Character * target, RangedWeaponItem * wea
         {
             actor->combatHandler.addOpponent(target);
         }
+    }
+    // Check if it is the last projectile.
+    if (projectile->quantity == 1)
+    {
+        // Start a transaction.
+        SQLiteDbms::instance().beginTransaction();
+        projectile->removeOnDB();
+        projectile->removeFromMud();
+        delete (projectile);
+        // Conclude the transaction.
+        SQLiteDbms::instance().endTransaction();
+    }
+    else
+    {
+        projectile->quantity -= 1;
     }
 }
 

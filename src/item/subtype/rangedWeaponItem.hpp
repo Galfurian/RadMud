@@ -22,6 +22,7 @@
 #pragma once
 
 #include "item.hpp"
+#include "magazineItem.hpp"
 
 /// @brief Holds details about a ranged weapon.
 class RangedWeaponItem :
@@ -54,5 +55,7 @@ public:
 
     /// @brief Search for an already loaded magazine.
     /// @return A magazine already loaded if there is one.
-    Item * getAlreadyLoadedMagazine() const;
+    MagazineItem * getAlreadyLoadedMagazine() const;
+
+    Item * retrieveProjectile(std::string & error) const;
 };

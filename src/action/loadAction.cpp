@@ -140,8 +140,9 @@ ActionStatus LoadAction::perform()
     else
     {
         SQLiteDbms::instance().beginTransaction();
-        if (projectile->quantity < ammountToLoad)
+        if (projectile->quantity <= ammountToLoad)
         {
+            actor->remInventoryItem(projectile);
             itemToBeLoaded->putInside(projectile);
         }
         else

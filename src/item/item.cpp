@@ -130,7 +130,7 @@ void Item::removeFromMud()
     }
     if (container != nullptr)
     {
-        auto itemContainer = owner;
+        auto itemContainer = container;
         if (container->content.removeItem(this))
         {
             Logger::log(
@@ -194,6 +194,7 @@ void Item::getSheet(Table & sheet) const
     sheet.addRow({"vnum", ToString(vnum)});
     sheet.addRow({"type", this->getTypeName()});
     sheet.addRow({"model", model->name});
+    sheet.addRow({"quantity", ToString(quantity)});
     sheet.addRow({"maker", maker});
     sheet.addRow({"condition", ToString(condition) + "/" + ToString(this->getMaxCondition())});
     sheet.addRow({"Material", composition->name});
