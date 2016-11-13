@@ -10,6 +10,7 @@ set(RADMUD_MODEL_INC
 # Source Files
 set(RADMUD_MODEL_SRC
         ./src/model/itemModel.cpp
+        ./src/model/modelFactory.cpp
         ./src/model/submodel/armorModel.cpp
         ./src/model/submodel/bookModel.cpp
         ./src/model/submodel/containerModel.cpp

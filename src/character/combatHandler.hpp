@@ -1,77 +1,63 @@
-/// @file   opponent.hpp
+/// @file   combatHandler.hpp
 /// @brief  Contains definition of combat classes.
 /// @author Enrico Fraccaroli
 /// @date   May 8 2016
 /// @copyright
-/// Copyright (c) 2014, 2015, 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
-/// Permission to use, copy, modify, and distribute this software for any
-/// purpose with or without fee is hereby granted, provided that the above
-/// copyright notice and this permission notice appear in all copies.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-/// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-/// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-/// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-/// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-/// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-/// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+/// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
+/// Permission is hereby granted, free of charge, to any person obtaining a
+/// copy of this software and associated documentation files (the "Software"),
+/// to deal in the Software without restriction, including without limitation
+/// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+/// and/or sell copies of the Software, and to permit persons to whom the
+/// Software is furnished to do so, subject to the following conditions:
+///     The above copyright notice and this permission notice shall be included
+///     in all copies or substantial portions of the Software.
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+/// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+/// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+/// DEALINGS IN THE SOFTWARE.
 
 #pragma once
 
-class Character;
+#include "aggression.hpp"
 
 #include <set>
 #include <vector>
 #include <string>
-
-/// @brief Allows to store information about an aggressor.
-class Aggression
-{
-public:
-    /// The aggressor.
-    Character * aggressor;
-    /// The level of aggression.
-    mutable unsigned int aggression;
-
-    /// @brief Constructor.
-    Aggression(Character * _aggressor, unsigned int _aggression);
-
-    /// @brief Operator used to order the aggressors based on the level of aggression.
-    bool operator>(const Aggression & source) const;
-
-    /// @brief Operator used to order the aggressors based on the level of aggression.
-    bool operator<(const Aggression & source) const;
-
-    /// @brief Operator used to order the aggressors based on the level of aggression.
-    bool operator==(const Aggression & source) const;
-
-    /// @brief Operator used to order the aggressors based on the level of aggression.
-    bool operator==(const Character * source) const;
-};
+#include <memory>
 
 /// @brief Data structure used to store an ordered list of opponents during a combat.
-class OpponentsList
+class CombatHandler
 {
     friend class Character;
 
 public:
-    /// Type of structure which contains aggressors.
-    using AggressorVector = typename std::vector<Aggression>;
     /// Iterator for an aggressor vector.
-    using iterator  = typename std::vector<Aggression>::iterator;
+    using iterator  = typename std::vector<std::shared_ptr<Aggression> >::iterator;
     /// Constant iterator for an aggressor vector.
-    using const_iterator = typename std::vector<Aggression>::const_iterator;
+    using const_iterator = typename std::vector<std::shared_ptr<Aggression> >::const_iterator;
 private:
     /// Owner of the list.
     Character * owner;
-    /// List of aggressors.
-    AggressorVector aggressionList;
+
+    /// List of opponents.
+    std::vector<std::shared_ptr<Aggression> > opponents;
+
+    /// The predefined target.
+    Character * predefinedTarget;
+
+    /// A pointer to the currently aimed character.
+    Character * aimedCharacter;
 
 public:
     /// @brief Constructor.
-    OpponentsList(Character * _owner);
+    CombatHandler(Character * _owner);
 
-    ~OpponentsList();
+    /// @brief Destructor.
+    ~CombatHandler();
 
     /// @brief Tries to add the given character to the list of opponents.
     /// @param character The opponent to add.
@@ -92,10 +78,19 @@ public:
     ///         <b>False</b> otherwise.
     bool hasOpponent(Character * character);
 
-    /// @brief Check if the list has some opponents.
-    /// @return <b>True</b> if there are opponents,<br>
-    ///         <b>False</b> otherwise.
-    bool hasOpponents() const;
+    /// @brief Allows to elect the given character as predefined target.
+    /// @param character The character to set as predefined target.
+    void setPredefinedTarget(Character * character);
+
+    /// @brief Provides the predefined target.
+    Character * getPredefinedTarget();
+
+    /// @brief Allows to set the given character as aimed target.
+    /// @param character The character to set as aimed target.
+    void setAimedTarget(Character * character);
+
+    /// @brief Provides the aimed target.
+    Character * getAimedTarget();
 
     /// @brief Allows to the a new aggression level to the given opponent.
     /// @param character      The opponent
@@ -106,7 +101,7 @@ public:
 
     /// @brief Returns the current top aggressor.
     /// @return The top aggressor.
-    Aggression * getTopAggro();
+    std::shared_ptr<Aggression> getTopAggro();
 
     /// @brief Allows to elect the given character as the opponent with
     ///         the top level of aggro.
@@ -127,6 +122,9 @@ public:
 
     /// @brief Provides the size of the aggessors list.
     std::size_t getSize();
+
+    /// @brief Returns true if the vector is empty.
+    bool empty();
 
     /// @brief Check and clear the list from possible disconnected players.
     void checkList();

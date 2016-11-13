@@ -93,6 +93,25 @@ public:
         // Nothing to do.
     }
 
+    /// @brief Provides the width.
+    int getWidth() const
+    {
+        return width;
+    }
+
+    /// @brief Provides the height.
+    int getHeight() const
+    {
+        return height;
+    }
+
+    /// @brief Provides the elevation.
+    int getElevation() const
+    {
+        return elevation;
+    }
+
+
     /// @brief Set the object at the given Coordinates3D.
     /// @param x     Coordinate on width.
     /// @param y     Coordinate on heigth.

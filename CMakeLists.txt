@@ -34,8 +34,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch-enum")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic-errors")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmessage-length=0")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-switch-default")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything")
@@ -90,9 +90,6 @@ set(PROJECT_SRC
         ./src/main.cpp
         ./src/mud.cpp
         ./src/updater.cpp
-        ./src/utils.cpp
-        ./src/opponent.cpp
-        ./src/protocol.cpp
         ${RADMUD_LUA_SRC}
         ${RADMUD_ITEM_SRC}
         ${RADMUD_MODEL_SRC}

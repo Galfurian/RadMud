@@ -2,6 +2,8 @@
 # Include Directories
 set(RADMUD_STRUCTURE_INC
         ./src/structure/
+        ./src/structure/algorithms
+        ./src/structure/algorithms/AStar
         PARENT_SCOPE
         )
 
@@ -14,5 +16,6 @@ set(RADMUD_STRUCTURE_SRC
         ./src/structure/continent.cpp
         ./src/structure/coordinates.cpp
         ./src/structure/generator.cpp
+        ./src/structure/algorithms/AStar/aStarNode.cpp
         PARENT_SCOPE
         )

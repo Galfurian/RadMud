@@ -3,18 +3,22 @@
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2014
 /// @copyright
-/// Copyright (c) 2014, 2015, 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
-/// Permission to use, copy, modify, and distribute this software for any
-/// purpose with or without fee is hereby granted, provided that the above
-/// copyright notice and this permission notice appear in all copies.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-/// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-/// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-/// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-/// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-/// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-/// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+/// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
+/// Permission is hereby granted, free of charge, to any person obtaining a
+/// copy of this software and associated documentation files (the "Software"),
+/// to deal in the Software without restriction, including without limitation
+/// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+/// and/or sell copies of the Software, and to permit persons to whom the
+/// Software is furnished to do so, subject to the following conditions:
+///     The above copyright notice and this permission notice shall be included
+///     in all copies or substantial portions of the Software.
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+/// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+/// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+/// DEALINGS IN THE SOFTWARE.
 
 #pragma once
 
@@ -76,7 +80,7 @@ public:
     Room();
 
     /// @brief Destructor.
-    ~Room();
+    virtual ~Room();
 
     /// @brief Function used to check the correctness of the room.
     /// @param complete If set to true, the function check if the room has
@@ -234,17 +238,16 @@ public:
     /// @param exceptions The list of exceptions.
     void sendToAll(const std::string & message, const std::vector<Character *> & exceptions);
 
-    /// @brief Print to consol and to logging file the gievn string.
+    /// @brief Sends a message to all the characters inside the room.
     /// @param message    The message to send.
     /// @param exceptions The list of exceptions.
     /// @param first The first unpacked argument.
     /// @param args  Packed arguments.
     template<typename ... Args>
-    void sendToAll(
-        const std::string & message,
-        const std::vector<Character *> & exceptions,
-        const std::string & first,
-        const Args & ... args)
+    void sendToAll(const std::string & message,
+                   const std::vector<Character *> & exceptions,
+                   const std::string & first,
+                   const Args & ... args)
     {
         std::string::size_type pos = message.find("%s");
         if (pos == std::string::npos)
@@ -256,6 +259,45 @@ public:
             std::string working(message);
             working.replace(pos, 2, first);
             this->sendToAll(working, exceptions, args ...);
+        }
+    }
+
+    /// @brief Sends a message to all the characters inside the room. This one in particular handles integers.
+    template<typename ... Args>
+    void sendToAll(const std::string & message,
+                   const std::vector<Character *> & exceptions,
+                   const unsigned int & first,
+                   const Args & ... args)
+    {
+        this->sendToAll(message, exceptions, ToString(first), args ...);
+    }
+
+    /// @brief Send a message to all the characters inside the room which pass the checking function.
+    /// @param message        The message to send.
+    /// @param checkException The checking function.
+    void funcSendToAll(const std::string & message, std::function<bool(Character * character)> checkException);
+
+    /// @brief Send a message to all the characters inside the room which pass the checking function.
+    /// @param message        The message to send.
+    /// @param checkException The checking function.
+    /// @param first          The first value to unpack.
+    /// @param args           The rest of the arguments.
+    template<typename ... Args>
+    void funcSendToAll(const std::string & message,
+                       std::function<bool(Character * character)> checkException,
+                       const std::string & first,
+                       const Args & ... args)
+    {
+        std::string::size_type pos = message.find("%s");
+        if (pos == std::string::npos)
+        {
+            this->funcSendToAll(message, checkException);
+        }
+        else
+        {
+            std::string working(message);
+            working.replace(pos, 2, first);
+            this->funcSendToAll(working, checkException, args ...);
         }
     }
 

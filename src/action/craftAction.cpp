@@ -4,17 +4,21 @@
 /// @date   Jul 14 2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
-/// Permission to use, copy, modify, and distribute this software for any
-/// purpose with or without fee is hereby granted, provided that the above
-/// copyright notice and this permission notice appear in all copies.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-/// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-/// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-/// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-/// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-/// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-/// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+/// Permission is hereby granted, free of charge, to any person obtaining a
+/// copy of this software and associated documentation files (the "Software"),
+/// to deal in the Software without restriction, including without limitation
+/// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+/// and/or sell copies of the Software, and to permit persons to whom the
+/// Software is furnished to do so, subject to the following conditions:
+///     The above copyright notice and this permission notice shall be included
+///     in all copies or substantial portions of the Software.
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+/// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+/// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+/// DEALINGS IN THE SOFTWARE.
 
 #include "craftAction.hpp"
 #include "room.hpp"
@@ -22,20 +26,21 @@
 
 using namespace std::chrono;
 
-CraftAction::CraftAction(
-    Character * _actor,
-    Production * _production,
-    Material * _material,
-    std::vector<Item *> & _tools,
-    std::vector<std::pair<Item *, unsigned int>> & _ingredients,
-    unsigned int & _cooldown) :
-    GeneralAction(_actor, system_clock::now() + seconds(_cooldown)),
+CraftAction::CraftAction(Character * _actor,
+                         Production * _production,
+                         Material * _material,
+                         std::vector<Item *> & _tools,
+                         std::vector<std::pair<Item *, unsigned int>> & _ingredients) :
+    GeneralAction(_actor),
     production(_production),
     material(_material),
     tools(_tools),
     ingredients(_ingredients)
 {
-    Logger::log(LogLevel::Debug, "Created crafting action.");
+    // Debugging message.
+    Logger::log(LogLevel::Debug, "Created CraftAction.");
+    // Reset the cooldown of the action.
+    this->resetCooldown(CraftAction::getCooldown(_actor, _production));
 }
 
 CraftAction::~CraftAction()
@@ -273,11 +278,17 @@ ActionStatus CraftAction::perform()
 unsigned int CraftAction::getConsumedStamina(Character * character)
 {
     // BASE     [+1.0]
-    // STRENGTH [-0.0 to -2.80]
+    // STRENGTH [-0.0 to -1.40]
     // WEIGHT   [+1.6 to +2.51]
     // CARRIED  [+0.0 to +2.48]
-    return static_cast<unsigned int>(1.0
-                                     - character->getAbilityLog(Ability::Strength, 0.0, 1.0)
-                                     + SafeLog10(character->weight)
-                                     + SafeLog10(character->getCarryingWeight()));
+    unsigned int consumedStamina = 1;
+    consumedStamina -= character->getAbilityLog(Ability::Strength, 0.0, 1.0);
+    consumedStamina = SafeSum(consumedStamina, SafeLog10(character->weight));
+    consumedStamina = SafeSum(consumedStamina, SafeLog10(character->getCarryingWeight()));
+    return consumedStamina;
+}
+
+unsigned int CraftAction::getCooldown(Character *, Production * _production)
+{
+    return _production->time;
 }

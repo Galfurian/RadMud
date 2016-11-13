@@ -3,18 +3,22 @@
 /// @author Enrico Fraccaroli
 /// @date   Mar 31 2015
 /// @copyright
-/// Copyright (c) 2015, 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
-/// Permission to use, copy, modify, and distribute this software for any
-/// purpose with or without fee is hereby granted, provided that the above
-/// copyright notice and this permission notice appear in all copies.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-/// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-/// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-/// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-/// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-/// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-/// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+/// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
+/// Permission is hereby granted, free of charge, to any person obtaining a
+/// copy of this software and associated documentation files (the "Software"),
+/// to deal in the Software without restriction, including without limitation
+/// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+/// and/or sell copies of the Software, and to permit persons to whom the
+/// Software is furnished to do so, subject to the following conditions:
+///     The above copyright notice and this permission notice shall be included
+///     in all copies or substantial portions of the Software.
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+/// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+/// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+/// DEALINGS IN THE SOFTWARE.
 
 #include "itemModel.hpp"
 
@@ -38,6 +42,8 @@
 #include "vehicleModel.hpp"
 #include "magazineModel.hpp"
 #include "meleeWeaponModel.hpp"
+
+#include "itemFactory.hpp"
 
 ItemModel::ItemModel() :
     vnum(),
@@ -111,7 +117,7 @@ Item * ItemModel::createItem(
     }
 
     // Instantiate the new item.
-    Item * newItem = GenerateItem(this->getType());
+    auto newItem = ItemFactory::newItem(this->getType());
     if (newItem == nullptr)
     {
         Logger::log(LogLevel::Error, "Cannot create the new item.");
@@ -422,34 +428,6 @@ RangedWeaponModel * ItemModel::toRangedWeapon()
 MagazineModel * ItemModel::toMagazine()
 {
     return static_cast<MagazineModel *>(this);
-}
-
-ItemModel * GenerateModel(const ModelType & type)
-{
-    if (type == ModelType::Corpse) return new CorpseModel();
-    if (type == ModelType::MeleeWeapon) return new MeleeWeaponModel();
-    if (type == ModelType::RangedWeapon) return new RangedWeaponModel();
-    if (type == ModelType::Armor) return new ArmorModel();
-    if (type == ModelType::Book) return new BookModel();
-    if (type == ModelType::Container) return new ContainerModel();
-    if (type == ModelType::Currency) return new CurrencyModel();
-    if (type == ModelType::Food) return new FoodModel();
-    if (type == ModelType::Furniture) return new FurnitureModel();
-    if (type == ModelType::Key) return new KeyModel();
-    if (type == ModelType::Light) return new LightModel();
-    if (type == ModelType::LiquidContainer) return new LiquidContainerModel();
-    if (type == ModelType::Mechanism) return new MechanismModel();
-    if (type == ModelType::Node) return new NodeModel();
-    if (type == ModelType::Projectile) return new ProjectileModel();
-    if (type == ModelType::Resource) return new ResourceModel();
-    if (type == ModelType::Rope) return new RopeModel();
-    if (type == ModelType::Seed) return new SeedModel();
-    if (type == ModelType::Shield) return new ShieldModel();
-    if (type == ModelType::Shop) return new ShopModel();
-    if (type == ModelType::Tool) return new ToolModel();
-    if (type == ModelType::Vehicle) return new VehicleModel();
-    if (type == ModelType::Magazine) return new MagazineModel();
-    return nullptr;
 }
 
 std::string GetModelFlagString(unsigned int flags)

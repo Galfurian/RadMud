@@ -3,18 +3,22 @@
 /// @author Enrico Fraccaroli
 /// @date   Sep 8 2015
 /// @copyright
-/// Copyright (c) 2015, 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
-/// Permission to use, copy, modify, and distribute this software for any
-/// purpose with or without fee is hereby granted, provided that the above
-/// copyright notice and this permission notice appear in all copies.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-/// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-/// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-/// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-/// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-/// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-/// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+/// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
+/// Permission is hereby granted, free of charge, to any person obtaining a
+/// copy of this software and associated documentation files (the "Software"),
+/// to deal in the Software without restriction, including without limitation
+/// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+/// and/or sell copies of the Software, and to permit persons to whom the
+/// Software is furnished to do so, subject to the following conditions:
+///     The above copyright notice and this permission notice shall be included
+///     in all copies or substantial portions of the Software.
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+/// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+/// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+/// DEALINGS IN THE SOFTWARE.
 
 // Basic Include.
 #include "command.hpp"
@@ -38,24 +42,62 @@ Command::Command() :
     name(),
     help(),
     args(),
-    hndl()
+    hndl(),
+    cuic()
 {
     // Nothing to do.
 }
 
-Command::Command(
-    bool _gods,
-    std::string _name,
-    std::string _help,
-    std::string _args,
-    ActionHandler _hndl) :
+Command::Command(bool _gods,
+                 std::string _name,
+                 std::string _help,
+                 std::string _args,
+                 ActionHandler _hndl,
+                 bool _cuic) :
     gods(_gods),
     name(_name),
     help(_help),
     args(_args),
-    hndl(_hndl)
+    hndl(_hndl),
+    cuic(_cuic)
 {
     // Nothing to do.
+}
+
+Command & Command::setGods(const bool & _gods)
+{
+    gods = _gods;
+    return *this;
+}
+
+Command & Command::setName(const std::string & _name)
+{
+    name = _name;
+    return *this;
+}
+
+Command & Command::setHelp(const std::string & _help)
+{
+    help = _help;
+    return *this;
+}
+
+Command & Command::setArgs(const std::string & _args)
+{
+    args = _args;
+    return *this;
+}
+
+Command & Command::setHndl(const ActionHandler & _hndl)
+{
+    hndl = _hndl;
+    return *this;
+}
+
+Command & Command::setCuic(const bool & _cuic)
+{
+    cuic = _cuic;
+    return *this;
 }
 
 bool Command::canUse(Character * character) const
@@ -94,6 +136,12 @@ void ProcessCommand(Character * character, ArgumentHandler & args)
             {
                 continue;
             }
+            if ((!iterator.cuic) && (character->getAction()->getType() == ActionType::Combat) && !iterator.gods)
+            {
+                character->sendMsg("You cannot do that in combat.\n");
+                found = true;
+                break;
+            }
             if (iterator.name == "shutdown" && command != "shutdown")
             {
                 character->sendMsg("You have to type completly \"shutdown\".\n");
@@ -127,7 +175,7 @@ void ProcessCommand(Character * character, ArgumentHandler & args)
 
 void ProcessPlayerName(Character * character, ArgumentHandler & args)
 {
-    Player * player = character->toPlayer();
+    auto player = character->toPlayer();
     auto input = args.getOriginal();
     // Name can't be blank.
     if (input.empty())

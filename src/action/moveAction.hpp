@@ -4,17 +4,21 @@
 /// @date   Jul 14 2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
-/// Permission to use, copy, modify, and distribute this software for any
-/// purpose with or without fee is hereby granted, provided that the above
-/// copyright notice and this permission notice appear in all copies.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-/// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-/// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-/// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-/// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-/// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-/// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+/// Permission is hereby granted, free of charge, to any person obtaining a
+/// copy of this software and associated documentation files (the "Software"),
+/// to deal in the Software without restriction, including without limitation
+/// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+/// and/or sell copies of the Software, and to permit persons to whom the
+/// Software is furnished to do so, subject to the following conditions:
+///     The above copyright notice and this permission notice shall be included
+///     in all copies or substantial portions of the Software.
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+/// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+/// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+/// DEALINGS IN THE SOFTWARE.
 
 #pragma once
 
@@ -35,12 +39,7 @@ public:
     /// @param _actor       The actor who is doing the action.
     /// @param _destination The destionation of the movement.
     /// @param _direction   The direction of the movement.
-    /// @param _cooldown    How many seconds are required to complete the movement.
-    MoveAction(
-        Character * _actor,
-        Room * _destination,
-        Direction _direction,
-        unsigned int _cooldown);
+    MoveAction(Character * _actor, Room * _destination, Direction _direction);
 
     /// @brief Destructor.
     virtual ~MoveAction();
@@ -57,4 +56,17 @@ public:
 
     /// @brief Given an action, it returns the stamina required to execute it.
     static unsigned int getConsumedStamina(const Character * character, const CharacterPosture & posture);
+
+    /// @brief Given an action, it returns the necessary cooldown.
+    /// @param character The actor.
+    /// @return The required time to complete the action.
+    static unsigned int getCooldown(const Character * character);
+
+    /// @brief Check if the character can move in the given direction.
+    /// @param character The character that wants to move.
+    /// @param direction The direction where the character whats to move.
+    /// @param error     A reference to a string which will contain error message in case of failure.
+    /// @return <b>True</b> if the character can move toward the given direction,<br>
+    ///         <b>False</b> otherwise.
+    static bool canMoveTo(Character * character, const Direction & direction, std::string & error);
 };

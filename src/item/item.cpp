@@ -3,18 +3,22 @@
 /// @author Enrico Fraccaroli
 /// @date   Aug 25 2014
 /// @copyright
-/// Copyright (c) 2014, 2015, 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
-/// Permission to use, copy, modify, and distribute this software for any
-/// purpose with or without fee is hereby granted, provided that the above
-/// copyright notice and this permission notice appear in all copies.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-/// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-/// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-/// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-/// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-/// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-/// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+/// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
+/// Permission is hereby granted, free of charge, to any person obtaining a
+/// copy of this software and associated documentation files (the "Software"),
+/// to deal in the Software without restriction, including without limitation
+/// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+/// and/or sell copies of the Software, and to permit persons to whom the
+/// Software is furnished to do so, subject to the following conditions:
+///     The above copyright notice and this permission notice shall be included
+///     in all copies or substantial portions of the Software.
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+/// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+/// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+/// DEALINGS IN THE SOFTWARE.
 
 // Basic Include.
 #include "item.hpp"
@@ -126,7 +130,7 @@ void Item::removeFromMud()
     }
     if (container != nullptr)
     {
-        auto itemContainer = owner;
+        auto itemContainer = container;
         if (container->content.removeItem(this))
         {
             Logger::log(
@@ -190,6 +194,7 @@ void Item::getSheet(Table & sheet) const
     sheet.addRow({"vnum", ToString(vnum)});
     sheet.addRow({"type", this->getTypeName()});
     sheet.addRow({"model", model->name});
+    sheet.addRow({"quantity", ToString(quantity)});
     sheet.addRow({"maker", maker});
     sheet.addRow({"condition", ToString(condition) + "/" + ToString(this->getMaxCondition())});
     sheet.addRow({"Material", composition->name});
@@ -422,7 +427,7 @@ std::string Item::getLook()
     output += Formatter::gray() + this->getDescription() + Formatter::reset() + "\n";
     // Print the content.
     output += this->lookContent();
-    if (this->quantity != 1)
+    if (this->quantity > 1)
     {
         output += this->getNameCapital(true) + " weights about ";
         output += Formatter::yellow() + ToString(this->getWeight(false)) + Formatter::reset();
@@ -898,17 +903,4 @@ bool Item::operator<(Item & rhs) const
 {
     Logger::log(LogLevel::Debug, "%s < %s", ToString(this->vnum), ToString(rhs.vnum));
     return getName() < rhs.getName();
-}
-
-Item * GenerateItem(const ModelType & type)
-{
-    if (type == ModelType::NoType) return nullptr;
-    if (type == ModelType::Armor) return new ArmorItem();
-    if (type == ModelType::Shop) return new ShopItem();
-    if (type == ModelType::MeleeWeapon) return new MeleeWeaponItem();
-    if (type == ModelType::RangedWeapon) return new RangedWeaponItem();
-    if (type == ModelType::Currency) return new CurrencyItem();
-    if (type == ModelType::Corpse) return new CorpseItem();
-    if (type == ModelType::Magazine) return new MagazineItem();
-    return new Item();
 }
