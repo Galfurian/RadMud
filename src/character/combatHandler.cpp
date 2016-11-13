@@ -60,17 +60,36 @@ bool CombatHandler::addOpponent(Character * character, unsigned int initAggro)
 
 bool CombatHandler::remOpponent(Character * character)
 {
-    auto it = std::find_if(opponents.begin(), opponents.end(),
-                           [&](std::shared_ptr<Aggression> const & element)
-                           {
-                               return element->aggressor->name == character->name;
-                           });
-    if (it != opponents.end())
+    for (auto it = opponents.begin(); it != opponents.end(); ++it)
     {
-        Logger::log(LogLevel::Debug, "%s disengages %s", owner->getNameCapital(), character->getName());
-        opponents.erase(it, opponents.end());
-        return true;
+        auto aggression = (*it);
+        if (aggression->aggressor->name == character->name)
+        {
+            // Remove the opponent.
+            opponents.erase(it);
+            // Check if the opponent is currently the aimed character.
+            if (aimedCharacter != nullptr)
+            {
+                if (aimedCharacter->name == aggression->aggressor->name)
+                {
+                    aimedCharacter = nullptr;
+                }
+            }
+            // Check if the opponent is currently the predefined target.
+            if (predefinedTarget != nullptr)
+            {
+                if (predefinedTarget->name == aggression->aggressor->name)
+                {
+                    predefinedTarget = nullptr;
+                }
+            }
+            Logger::log(LogLevel::Debug, "%s disengages %s", owner->getNameCapital(), character->getName());
+            return true;
+        }
     }
+    Logger::log(LogLevel::Debug, "Cannot find %s among the aggressors of %s",
+                character->getName(),
+                owner->getNameCapital());
     return false;
 }
 
@@ -214,25 +233,20 @@ void CombatHandler::checkList()
 
 void CombatHandler::resetList()
 {
-    auto temporaryList = opponents;
-    for (auto it = temporaryList.begin(); it != temporaryList.end(); ++it)
+    for (auto it : opponents)
     {
-        // Check if the aggressor is null.
-        if ((*it)->aggressor == nullptr)
+        if (it->aggressor == nullptr)
         {
-            continue;
+            Logger::log(LogLevel::Error, "Found a nullptr aggressor.");
         }
-        // Remove the owner from its list.
-        if (!(*it)->aggressor->combatHandler.remOpponent(owner))
+        else
         {
-            Logger::log(LogLevel::Error, "Could not remove %s from opponents of %s.",
-                        owner->getName(), (*it)->aggressor->getName());
-        }
-        // Remove from this list the opponent.
-        if (!this->remOpponent((*it)->aggressor))
-        {
-            Logger::log(LogLevel::Error, "Could not remove %s from opponents of %s.",
-                        (*it)->aggressor->getName(), owner->getName());
+            // Remove the owner from its list.
+            if (!it->aggressor->combatHandler.remOpponent(owner))
+            {
+                Logger::log(LogLevel::Error, "Could not remove %s from opponents of %s.",
+                            owner->getName(), it->aggressor->getName());
+            }
         }
     }
     opponents.clear();
