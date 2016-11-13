@@ -180,7 +180,7 @@ void LoadGeneralCommands()
 
 void DoDirection(Character * character, Direction direction)
 {
-    // Check if the player it's already doing something.
+    // Stop any action the character is executing.
     StopAction(character);
     std::string error;
     if (!MoveAction::canMoveTo(character, direction, error))
@@ -565,6 +565,8 @@ void DoTime(Character * character, ArgumentHandler & /*args*/)
 
 void DoStand(Character * character, ArgumentHandler & /*args*/)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     if (character->posture == CharacterPosture::Stand)
     {
         character->sendMsg("You are already standing.\n");
@@ -576,6 +578,8 @@ void DoStand(Character * character, ArgumentHandler & /*args*/)
 
 void DoCrouch(Character * character, ArgumentHandler & /*args*/)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     if (character->posture == CharacterPosture::Crouch)
     {
         character->sendMsg("You are already crouched.\n");
@@ -587,6 +591,8 @@ void DoCrouch(Character * character, ArgumentHandler & /*args*/)
 
 void DoSit(Character * character, ArgumentHandler & /*args*/)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     if (character->posture == CharacterPosture::Sit)
     {
         character->sendMsg("You are already seated.\n");
@@ -598,6 +604,8 @@ void DoSit(Character * character, ArgumentHandler & /*args*/)
 
 void DoProne(Character * character, ArgumentHandler & /*args*/)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     if (character->posture == CharacterPosture::Prone)
     {
         character->sendMsg("You are already prone.\n");
@@ -609,6 +617,8 @@ void DoProne(Character * character, ArgumentHandler & /*args*/)
 
 void DoRest(Character * character, ArgumentHandler & /*args*/)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     if (character->posture == CharacterPosture::Rest)
     {
         character->sendMsg("You are already resting.\n");

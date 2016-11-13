@@ -547,7 +547,7 @@ void DoGoTo(Character * character, ArgumentHandler & args)
         character->sendMsg("That room doesen't exists.\n");
         return;
     }
-    // Check if the player it's already doing something.
+    // Stop any action the character is executing.
     StopAction(character);
     // Prepare messages.
     auto msgDepart = character->getNameCapital() + " disappears in a puff of smoke!\n";
@@ -658,7 +658,7 @@ void DoTransfer(Character * character, ArgumentHandler & args)
             return;
         }
     }
-    // Check if the player it's already doing something.
+    // Stop any action the character is executing.
     StopAction(target);
     // Prepare messages.
     auto msgDepart = target->getNameCapital() + " is yanked away by unseen forces!";

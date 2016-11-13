@@ -56,6 +56,8 @@ void LoadCraftingCommands()
 
 void DoProfession(Character * character, Profession * profession, ArgumentHandler & args)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     if (args.size() != 1)
     {
         character->sendMsg("What do you want to produce?\n");
@@ -150,6 +152,8 @@ void DoProfession(Character * character, Profession * profession, ArgumentHandle
 
 void DoBuild(Character * character, ArgumentHandler & args)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     if (args.size() != 1)
     {
         character->sendMsg("What do you want to build?\n");
@@ -250,6 +254,8 @@ void DoBuild(Character * character, ArgumentHandler & args)
 
 void DoDeconstruct(Character * character, ArgumentHandler & args)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     if (args.size() != 1)
     {
         character->sendMsg("What do you want to deconstruct, sai?\n");
@@ -282,6 +288,8 @@ void DoDeconstruct(Character * character, ArgumentHandler & args)
 
 void DoRead(Character * character, ArgumentHandler & args)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     if (args.size() != 1)
     {
         character->sendMsg("What do you want to read today, sai?\n");

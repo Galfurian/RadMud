@@ -39,7 +39,7 @@ void LoadManagerCommands()
 
 void DoAssign(Character * character, ArgumentHandler & args)
 {
-    // Check if the player it's already doing something.
+    // Stop any action the character is executing.
     StopAction(character);
     if (args.size() != 2)
     {

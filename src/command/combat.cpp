@@ -107,6 +107,8 @@ void LoadCombatCommands()
 
 void DoKill(Character * character, ArgumentHandler & args)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     // If there are no arguments, show the room.
     if (args.size() != 1)
     {
@@ -211,6 +213,8 @@ void DoFlee(Character * character, ArgumentHandler & /*args*/)
 
 void DoScout(Character * character, ArgumentHandler & /*args*/)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     auto newAction = std::make_shared<ScoutAction>(character);
     // Check the new action.
     std::string error;
@@ -229,6 +233,8 @@ void DoScout(Character * character, ArgumentHandler & /*args*/)
 
 void DoLoad(Character * character, ArgumentHandler & args)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     if (args.size() != 2)
     {
         character->sendMsg("What do you want to load with what?\n");
@@ -293,6 +299,8 @@ void DoLoad(Character * character, ArgumentHandler & args)
 
 void DoUnload(Character * character, ArgumentHandler & args)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     if (args.size() != 1)
     {
         character->sendMsg("What do you want to unload?\n");
@@ -350,6 +358,8 @@ void DoUnload(Character * character, ArgumentHandler & args)
 
 void DoReload(Character * character, ArgumentHandler & args)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     if (args.size() != 2)
     {
         character->sendMsg("What do you want to reload with what?\n");
@@ -410,6 +420,8 @@ void DoReload(Character * character, ArgumentHandler & args)
 
 void DoAim(Character * character, ArgumentHandler & args)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     if (args.size() != 1)
     {
         character->sendMsg("Who or what do you want to aim?\n");
@@ -467,6 +479,8 @@ void DoAim(Character * character, ArgumentHandler & args)
 
 void DoFire(Character * character, ArgumentHandler & /*args*/)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     // Check if the pointer to the aimed target is still valid.
     if (character->combatHandler.getAimedTarget() == nullptr)
     {
