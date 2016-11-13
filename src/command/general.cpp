@@ -3,18 +3,22 @@
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2014
 /// @copyright
-/// Copyright (c) 2014, 2015, 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
-/// Permission to use, copy, modify, and distribute this software for any
-/// purpose with or without fee is hereby granted, provided that the above
-/// copyright notice and this permission notice appear in all copies.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-/// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-/// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-/// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-/// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-/// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-/// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+/// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
+/// Permission is hereby granted, free of charge, to any person obtaining a
+/// copy of this software and associated documentation files (the "Software"),
+/// to deal in the Software without restriction, including without limitation
+/// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+/// and/or sell copies of the Software, and to permit persons to whom the
+/// Software is furnished to do so, subject to the following conditions:
+///     The above copyright notice and this permission notice shall be included
+///     in all copies or substantial portions of the Software.
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+/// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+/// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+/// DEALINGS IN THE SOFTWARE.
 
 #include "general.hpp"
 
@@ -23,23 +27,18 @@
 
 void LoadGeneralCommands()
 {
-    Command command;
-    command.gods = false;
     {
-        command.name = "quit";
-        command.help = "Leave the game.";
-        command.args = "";
-        command.hndl = DoQuit;
-        Mud::instance().addCommand(command);
+        Mud::instance().addCommand(Command().setName("quit")
+                                            .setHelp("Leave the game.")
+                                            .setHndl(DoQuit));
     }
     {
-        command.name = "who";
-        command.help = "List all the character online.";
-        command.args = "";
-        command.hndl = DoWho;
-        Mud::instance().addCommand(command);
+        Mud::instance().addCommand(Command().setName("who")
+                                            .setHelp("List all the character online.")
+                                            .setHndl(DoWho));
     }
     {
+        Command command;
         command.name = "set";
         command.help = "Set some character texts(eg. descr).";
         command.args = "(setting) (value)";
@@ -47,20 +46,25 @@ void LoadGeneralCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "stop";
         command.help = "Stop the current character action.";
         command.args = "";
         command.hndl = DoStop;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "look";
         command.help = "Look at something or someone.";
         command.args = "[(something) or (someone)]";
         command.hndl = DoLook;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "help";
         command.help = "Show the list of commands or show help for a given command.";
         command.args = "(command)";
@@ -68,6 +72,7 @@ void LoadGeneralCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "prompt";
         command.help = "Modify your prompt.";
         command.args = "(help)|(prompt definition)";
@@ -75,27 +80,34 @@ void LoadGeneralCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "time";
         command.help = "Give the current day phase.";
         command.args = "";
         command.hndl = DoTime;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "stand";
         command.help = "Make the player stand.";
         command.args = "";
         command.hndl = DoStand;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "crouch";
         command.help = "The player crouches down himself, it's a good stance for hiding.";
         command.args = "";
         command.hndl = DoCrouch;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "sit";
         command.help = "The player sits down, ideal for a quick break.";
         command.args = "";
@@ -103,13 +115,16 @@ void LoadGeneralCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "prone";
         command.help = "The player starts prone, a perfect position to shoot long distance.";
         command.args = "";
         command.hndl = DoProne;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "rest";
         command.help = "The player lies down and begin to rest.";
         command.args = "";
@@ -117,13 +132,16 @@ void LoadGeneralCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "statistics";
         command.help = "Show player statistics.";
         command.args = "";
         command.hndl = DoStatistics;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "rent";
         command.help = "Allow player to rent and disconnect.";
         command.args = "";
@@ -131,24 +149,30 @@ void LoadGeneralCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "skills";
         command.help = "Shows the playes skills and their level.";
         command.args = "";
         command.hndl = DoSkills;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "server";
         command.help = "Shows the server statistics.";
         command.args = "";
         command.hndl = DoServer;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "travel";
         command.help = "Allow the character to travel between areas.";
         command.args = "";
         command.hndl = DoTravel;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
 
@@ -156,49 +180,36 @@ void LoadGeneralCommands()
 
 void DoDirection(Character * character, Direction direction)
 {
-    // Check if the player it's already doing something.
+    // Stop any action the character is executing.
     StopAction(character);
     std::string error;
-    if (!character->canMoveTo(direction, error))
+    if (!MoveAction::canMoveTo(character, direction, error))
     {
         character->sendMsg(error + "\n");
         return;
     }
-    // ////////////////////////////////////////////////////////////////////////
-    unsigned int speed;
-    // Calculate the time needed to move.
-    if (character->posture == CharacterPosture::Stand)
-    {
-        character->sendMsg("You start to go %s...\n", direction.toString());
-        speed = 2;
-    }
-    else if (character->posture == CharacterPosture::Crouch)
-    {
-        character->sendMsg("You move crouching towards %s...\n", direction.toString());
-        speed = 4;
-    }
-    else if (character->posture == CharacterPosture::Prone)
-    {
-        character->sendMsg("You begin to crawl to %s...\n", direction.toString());
-        speed = 6;
-    }
-    else
-    {
-        character->sendMsg("You can't move!\n");
-        return;
-    }
-
-    auto moveAction = std::make_shared<MoveAction>(
-        character,
-        character->room->findExit(direction)->destination,
-        direction,
-        speed);
+    // Get the destination.
+    auto destination = character->room->findExit(direction)->destination;
+    auto moveAction = std::make_shared<MoveAction>(character, destination, direction);
     // Check the new action.
     error = std::string();
     if (moveAction->check(error))
     {
         // Set the new action.
         character->setAction(moveAction);
+        // Calculate the time needed to move.
+        if (character->posture == CharacterPosture::Stand)
+        {
+            character->sendMsg("You start to go %s...\n", direction.toString());
+        }
+        else if (character->posture == CharacterPosture::Crouch)
+        {
+            character->sendMsg("You move crouching towards %s...\n", direction.toString());
+        }
+        else if (character->posture == CharacterPosture::Prone)
+        {
+            character->sendMsg("You begin to crawl to %s...\n", direction.toString());
+        }
     }
     else
     {
@@ -506,41 +517,26 @@ void DoPrompt(Character * character, ArgumentHandler & args)
     {
         character->sendMsg("Current prompt:\n");
         character->sendMsg("    %s\n", player->prompt);
-        character->sendMsg(
-            "Type %sprompt help %sto read the guide.\n",
-            Formatter::yellow(),
-            Formatter::reset());
+        character->sendMsg("Type %sprompt help %sto read the guide.\n", Formatter::yellow(), Formatter::reset());
         return;
     }
-    else if (args[0].getContent() == "help")
+    if (args[0].getContent() == "help")
     {
-        character->sendMsg(Formatter::yellow() + "Prompt Help" + Formatter::reset() + "\n");
-        character->sendMsg(
-            "You can set the prompt you prefer, respectfully to this constraints:\n");
-        character->sendMsg(" - Not more than 15 characters.\n");
-        character->sendMsg("\n");
-        character->sendMsg("You can use the following shortcuts in you prompt:\n");
-        character->sendMsg("    %s&n%s - Player name.\n", Formatter::italic(), Formatter::reset());
-        character->sendMsg(
-            "    %s&N%s - Player name capitalized.\n",
-            Formatter::italic(),
-            Formatter::reset());
-        character->sendMsg(
-            "    %s&h%s - Player current health.\n",
-            Formatter::italic(),
-            Formatter::reset());
-        character->sendMsg(
-            "    %s&H%s - Player max health.\n",
-            Formatter::italic(),
-            Formatter::reset());
-        character->sendMsg(
-            "    %s&s%s - Player current stamina.\n",
-            Formatter::italic(),
-            Formatter::reset());
-        character->sendMsg(
-            "    %s&S%s - Player max stamina.\n",
-            Formatter::italic(),
-            Formatter::reset());
+        std::string msg;
+        std::string ITL = Formatter::italic(), RES = Formatter::reset();
+        msg += Formatter::yellow() + "Prompt Help" + Formatter::reset() + "\n";
+        msg += "You can set the prompt you prefer, respectfully to this constraints:\n";
+        msg += " - Not more than 15 characters.\n";
+        msg += "\n";
+        msg += "You can use the following shortcuts in you prompt:\n";
+        msg += "    " + ITL + "&n" + RES + " - Player name.\n";
+        msg += "    " + ITL + "&N" + RES + " - Player name capitalized.\n";
+        msg += "    " + ITL + "&h" + RES + " - Player current health.\n";
+        msg += "    " + ITL + "&H" + RES + " - Player maximum health.\n";
+        msg += "    " + ITL + "&s" + RES + " - Player current stamina.\n";
+        msg += "    " + ITL + "&S" + RES + " - Player maximum stamina.\n";
+        msg += "    " + ITL + "&T" + RES + " - Currently aimed character.\n";
+        player->sendMsg(msg);
         return;
     }
     player->prompt = args.substr(0);
@@ -550,36 +546,27 @@ void DoTime(Character * character, ArgumentHandler & /*args*/)
 {
     if (MudUpdater::instance().getDayPhase() == DayPhase::Morning)
     {
-        character->sendMsg(
-            "%sThe sun has just risen.%s\n",
-            Formatter::yellow(),
-            Formatter::reset());
+        character->sendMsg("%sThe sun has just risen.%s\n", Formatter::yellow(), Formatter::reset());
     }
     else if (MudUpdater::instance().getDayPhase() == DayPhase::Day)
     {
-        character->sendMsg(
-            "%sThe sun is high in the sky.%s\n",
-            Formatter::yellow(),
-            Formatter::reset());
+        character->sendMsg("%sThe sun is high in the sky.%s\n", Formatter::yellow(), Formatter::reset());
     }
     else if (MudUpdater::instance().getDayPhase() == DayPhase::Dusk)
     {
-        character->sendMsg(
-            "%sThe sun is setting, the shadows begin to prevail.%s\n",
-            Formatter::cyan(),
-            Formatter::reset());
+        character->sendMsg("%sThe sun is setting, the shadows begin to prevail.%s\n",
+                           Formatter::cyan(), Formatter::reset());
     }
     else if (MudUpdater::instance().getDayPhase() == DayPhase::Night)
     {
-        character->sendMsg(
-            "%sThe darkness surrounds you.%s\n",
-            Formatter::blue(),
-            Formatter::reset());
+        character->sendMsg("%sThe darkness surrounds you.%s\n", Formatter::blue(), Formatter::reset());
     }
 }
 
 void DoStand(Character * character, ArgumentHandler & /*args*/)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     if (character->posture == CharacterPosture::Stand)
     {
         character->sendMsg("You are already standing.\n");
@@ -591,6 +578,8 @@ void DoStand(Character * character, ArgumentHandler & /*args*/)
 
 void DoCrouch(Character * character, ArgumentHandler & /*args*/)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     if (character->posture == CharacterPosture::Crouch)
     {
         character->sendMsg("You are already crouched.\n");
@@ -602,6 +591,8 @@ void DoCrouch(Character * character, ArgumentHandler & /*args*/)
 
 void DoSit(Character * character, ArgumentHandler & /*args*/)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     if (character->posture == CharacterPosture::Sit)
     {
         character->sendMsg("You are already seated.\n");
@@ -613,6 +604,8 @@ void DoSit(Character * character, ArgumentHandler & /*args*/)
 
 void DoProne(Character * character, ArgumentHandler & /*args*/)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     if (character->posture == CharacterPosture::Prone)
     {
         character->sendMsg("You are already prone.\n");
@@ -624,6 +617,8 @@ void DoProne(Character * character, ArgumentHandler & /*args*/)
 
 void DoRest(Character * character, ArgumentHandler & /*args*/)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     if (character->posture == CharacterPosture::Rest)
     {
         character->sendMsg("You are already resting.\n");
@@ -636,61 +631,63 @@ void DoRest(Character * character, ArgumentHandler & /*args*/)
 void DoStatistics(Character * character, ArgumentHandler & /*args*/)
 {
     NoMobile(character);
-    Player * player = character->toPlayer();
+    auto player = character->toPlayer();
 
     std::string msg;
-    msg += Formatter::magenta() + "Name: " + Formatter::reset() + player->getName() + " ";
-    msg += Formatter::magenta() + "Race: " + Formatter::reset() + player->race->name + "\n";
-    msg += Formatter::magenta() + "Gender: " + Formatter::reset()
-           + GetGenderTypeName(player->gender) + "\n";
-    msg += Formatter::magenta() + "Affiliation: " + Formatter::reset() + player->faction->name
-           + "\n";
-    msg += Formatter::magenta() + "Experience: " + Formatter::reset() + ToString(player->experience)
-           + " px\n";
-
-    msg += Formatter::magenta() + "    Str " + Formatter::reset();
+    std::string MAG = Formatter::magenta();
+    std::string BLD = Formatter::bold();
+    std::string RES = Formatter::reset();
+    msg += MAG + "Name        : " + RES + player->getName() + " ";
+    msg += MAG + "Gender : " + RES + GetGenderTypeName(player->gender) + " ";
+    msg += MAG + "Race : " + RES + player->race->name + "\n";
+    msg += MAG + "Weight      : " + RES + ToString(player->weight) + " " + Mud::instance().getWeightMeasure() + "\n";
+    msg += MAG + "Affiliation : " + RES + player->faction->name + "\n";
+    msg += MAG + "Experience  : " + RES + ToString(player->experience) + " px\n";
+    msg += MAG + "    Str       " + RES;
     msg += ToString(player->getAbility(Ability::Strength, false));
     msg += "(" + ToString(player->effects.getAbilityModifier(Ability::Strength)) + ")";
     msg += "[" + ToString(player->getAbilityModifier(Ability::Strength)) + "]\n";
-
-    msg += Formatter::magenta() + "    Agi " + Formatter::reset();
+    msg += MAG + "    Agi       " + RES;
     msg += ToString(player->getAbility(Ability::Agility, false));
     msg += "(" + ToString(player->effects.getAbilityModifier(Ability::Agility)) + ")";
     msg += "[" + ToString(player->getAbilityModifier(Ability::Agility)) + "]\n";
-
-    msg += Formatter::magenta() + "    Per " + Formatter::reset();
+    msg += MAG + "    Per       " + RES;
     msg += ToString(player->getAbility(Ability::Perception, false));
     msg += "(" + ToString(player->effects.getAbilityModifier(Ability::Perception)) + ")";
     msg += "[" + ToString(player->getAbilityModifier(Ability::Perception)) + "]\n";
-
-    msg += Formatter::magenta() + "    Con " + Formatter::reset();
+    msg += MAG + "    Con       " + RES;
     msg += ToString(player->getAbility(Ability::Constitution, false));
     msg += "(" + ToString(player->effects.getAbilityModifier(Ability::Constitution)) + ")";
     msg += "[" + ToString(player->getAbilityModifier(Ability::Constitution)) + "]\n";
-
-    msg += Formatter::magenta() + "    Int " + Formatter::reset();
+    msg += MAG + "    Int       " + RES;
     msg += ToString(player->getAbility(Ability::Intelligence, false));
     msg += "(" + ToString(player->effects.getAbilityModifier(Ability::Intelligence)) + ")";
     msg += "[" + ToString(player->getAbilityModifier(Ability::Intelligence)) + "]\n";
-
-    msg += Formatter::magenta() + "    Health " + Formatter::reset();
+    msg += MAG + "    Health    " + RES;
     msg += ToString(player->getHealth()) + "/" + ToString(player->getMaxHealth());
     msg += "(" + ToString(player->effects.getHealthMod()) + ")\n";
-
-    msg += Formatter::magenta() + "    Stamina " + Formatter::reset();
+    msg += MAG + "    Stamina   " + RES;
     msg += ToString(player->getStamina()) + "/" + ToString(player->getMaxStamina());
     msg += "(" + ToString(player->effects.getHealthMod()) + ")\n";
-
-    msg += Formatter::magenta() + "    Armor Class " + Formatter::reset();
+    msg += MAG + "Armor Class : " + RES;
     msg += ToString(player->getArmorClass()) + "\n";
-
-    msg += "You " + player->getHealthCondition(true) + ".\n";
-    msg += "You " + player->getStaminaCondition() + ".\n";
-    msg += "You " + player->getHungerCondition() + ".\n";
-    msg += "You " + player->getThirstCondition() + ".\n";
-
-    msg += "You are " + GetPostureName(player->posture) + ".\n";
-
+    msg += "You " + BLD + player->getHealthCondition(true) + RES + ".\n";
+    msg += "You " + BLD + player->getStaminaCondition() + RES + ".\n";
+    msg += "You " + BLD + player->getHungerCondition() + RES + ".\n";
+    msg += "You " + BLD + player->getThirstCondition() + RES + ".\n";
+    msg += "You are " + BLD + GetPostureName(player->posture) + RES + ".\n\n";
+    if (player->getAction()->getType() != ActionType::Wait)
+    {
+        msg += "You are " + BLD + player->getAction()->getDescription() + RES + ".\n";
+    }
+    if (player->combatHandler.getPredefinedTarget() != nullptr)
+    {
+        msg += "You are fighting with " + BLD + player->combatHandler.getPredefinedTarget()->getName() + RES + ".\n";
+    }
+    if (player->combatHandler.getAimedTarget() != nullptr)
+    {
+        msg += "You are aiming at " + BLD + player->combatHandler.getAimedTarget()->getName() + RES + ".\n";
+    }
     player->sendMsg(msg);
 }
 

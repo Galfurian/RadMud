@@ -2,18 +2,22 @@
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2014
 /// @copyright
-/// Copyright (c) 2014, 2015, 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
-/// Permission to use, copy, modify, and distribute this software for any
-/// purpose with or without fee is hereby granted, provided that the above
-/// copyright notice and this permission notice appear in all copies.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-/// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-/// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-/// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-/// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-/// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-/// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+/// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
+/// Permission is hereby granted, free of charge, to any person obtaining a
+/// copy of this software and associated documentation files (the "Software"),
+/// to deal in the Software without restriction, including without limitation
+/// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+/// and/or sell copies of the Software, and to permit persons to whom the
+/// Software is furnished to do so, subject to the following conditions:
+///     The above copyright notice and this permission notice shall be included
+///     in all copies or substantial portions of the Software.
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+/// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+/// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+/// DEALINGS IN THE SOFTWARE.
 
 #include "combat.hpp"
 #include "mud.hpp"
@@ -22,72 +26,89 @@
 #include "loadAction.hpp"
 #include "unloadAction.hpp"
 #include "aimAction.hpp"
-#include "magazineItem.hpp"
+#include "basicAttack.hpp"
+#include "flee.hpp"
 
 void LoadCombatCommands()
 {
-    Command command;
-    command.gods = false;
     {
+        Command command;
         command.name = "kill";
         command.help = "Engage in combat the desired target.";
         command.args = "(target)";
         command.hndl = DoKill;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "flee";
         command.help = "Try to flee from combat.";
         command.args = "";
         command.hndl = DoFlee;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "scout";
         command.help = "Provides information about the surrounding area.";
         command.args = "";
         command.hndl = DoScout;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "load";
         command.help = "Allows to load a magazine with projectiles.";
         command.args = "";
         command.hndl = DoLoad;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "unload";
         command.help = "Allows to unload a magazine.";
         command.args = "";
         command.hndl = DoUnload;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "reload";
         command.help = "Allows to reload a firearm.";
         command.args = "";
         command.hndl = DoReload;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "aim";
         command.help = "Allows to aim a target.";
         command.args = "";
         command.hndl = DoAim;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "fire";
         command.help = "Allows to fire with an equipped ranged weapon to an aimed target.";
         command.args = "";
         command.hndl = DoFire;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
 }
 
 void DoKill(Character * character, ArgumentHandler & args)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     // If there are no arguments, show the room.
     if (args.size() != 1)
     {
@@ -107,100 +128,52 @@ void DoKill(Character * character, ArgumentHandler & args)
         character->sendMsg("You don't see '%s' anywhere.\n", args[0].getContent());
         return;
     }
-
     // Check if the two characters are both already in combat.
     if (character->getAction()->getType() == ActionType::Combat)
     {
         // Check if the character is trying to attack a target with which is not in combat.
-        if (!character->aggressionList.hasOpponent(target))
+        if (character->combatHandler.hasOpponent(target))
         {
-            character->sendMsg("You have already your share of troubles!\n");
-            return;
-        }
-        // Set the target as a top aggro.
-        if (character->aggressionList.moveToTopAggro(target))
-        {
+            // Check if the current predefined target is the target.
+            auto predefinedTarget = character->combatHandler.getPredefinedTarget();
+            if (predefinedTarget != nullptr)
+            {
+                if (predefinedTarget == target)
+                {
+                    character->sendMsg("You are already doing your best to kill %s!\n", target->getName());
+                    return;
+                }
+            }
+            // Set the target as predefined target.
+            character->combatHandler.setPredefinedTarget(target);
+            // Notify to the character.
             character->sendMsg("You focus your attacks on %s!\n", target->getName());
         }
         else
         {
-            character->sendMsg("You are already doing your best to kill %s!\n", target->getName());
-        }
-    }
-        // Check if the character is attacking a target which is already in combat.
-    else if ((character->getAction()->getType() != ActionType::Combat)
-             && (target->getAction()->getType() == ActionType::Combat))
-    {
-        // Set the aggressionList.
-        if (!character->aggressionList.addOpponent(target))
-        {
-            character->sendMsg("You are already fighting againts %s.\n", target->getName());
-            return;
-        }
-        if (!target->aggressionList.addOpponent(character))
-        {
-            character->sendMsg("You were not ablet to attack %s.\n", target->getName());
-            character->aggressionList.remOpponent(target);
-            return;
-        }
-        // Notify the character.
-        character->sendMsg("You attack %s.\n", target->getName());
-        // Notify the target.
-        target->sendMsg("%s attacks you.\n\n", character->getNameCapital());
-        // Notify the others.
-        character->room->sendToAll(
-            "%s attacks %s.\n",
-            {character, target},
-            character->getNameCapital(),
-            target->getName());
-        // Let the characters enter the combat.
-        if (!character->setNextCombatAction(CombatActionType::BasicMeleeAttack))
-        {
-            character->sendMsg("You were not ablet to attack %s.\n", target->getName());
-            character->aggressionList.remOpponent(target);
-            target->aggressionList.remOpponent(character);
-            return;
+            character->sendMsg("You have already your share of troubles!\n");
         }
     }
     else
     {
-        // Set the aggressionList.
-        if (!character->aggressionList.addOpponent(target))
-        {
-            character->sendMsg("You are already fighting againts %s.\n", target->getName());
-            return;
-        }
-        if (!target->aggressionList.addOpponent(character))
-        {
-            character->sendMsg("You were not ablet to attack %s.\n", target->getName());
-            character->aggressionList.remOpponent(target);
-            return;
-        }
-        // Notify the character.
-        character->sendMsg("You attack %s.\n", target->getName());
-        // Notify the target.
-        target->sendMsg("%s attacks you.\n\n", character->getNameCapital());
-        // Notify the others.
-        character->room->sendToAll(
-            "%s attacks %s.\n",
-            {character, target},
-            character->getNameCapital(),
-            target->getName());
-
+        // Check if the character is attacking a target which is already in combat.
         // Let the characters enter the combat.
-        if (!character->setNextCombatAction(CombatActionType::BasicMeleeAttack))
+        auto basicAttack = std::make_shared<BasicAttack>(character);
+        std::string error;
+        if (basicAttack->check(error))
         {
-            character->sendMsg("You were not ablet to attack %s.\n", target->getName());
-            character->aggressionList.remOpponent(target);
-            target->aggressionList.remOpponent(character);
-            return;
+            // Add the target to the list of opponents.
+            character->combatHandler.addOpponent(target);
+            // Add the action to the character's combat queue.
+            character->setAction(basicAttack);
+            // Set the predefined target.
+            character->combatHandler.setPredefinedTarget(target);
+            // Notify the character.
+            character->sendMsg("You attack %s.\n", target->getName());
         }
-        if (!target->setNextCombatAction(CombatActionType::BasicMeleeAttack))
+        else
         {
-            character->sendMsg("You were not ablet to attack %s.\n", target->getName());
-            character->aggressionList.remOpponent(target);
-            target->aggressionList.remOpponent(character);
-            return;
+            character->sendMsg("You were not able to attack %s.\n", target->getName());
         }
     }
 }
@@ -213,21 +186,36 @@ void DoFlee(Character * character, ArgumentHandler & /*args*/)
         character->sendMsg("You are not fighting.\n");
         return;
     }
-    auto combatAction = character->getAction()->toCombatAction();
-    // Check if the character is already trying to flee.
-    if (combatAction->getCombatActionType() == CombatActionType::Flee)
+    // Check if the actor is already trying to flee.
+    if (character->getAction()->getType() == ActionType::Combat)
     {
-        character->sendMsg("You are already trying to flee.\n");
-        return;
+        // Check if the character is already trying to flee.
+        if (character->getAction()->toCombatAction()->getCombatActionType() == CombatActionType::Flee)
+        {
+            character->sendMsg("You are already trying to flee.\n");
+            return;
+        }
     }
-    character->sendMsg("You prepare to flee...\n");
-    character->setNextCombatAction(CombatActionType::Flee);
+    auto flee = std::make_shared<Flee>(character);
+    std::string error;
+    if (flee->check(error))
+    {
+        // Add the action to the character's combat queue.
+        character->setAction(flee);
+        // Notify the character.
+        character->sendMsg("You prepare to flee...\n");
+    }
+    else
+    {
+        character->sendMsg(error + "\n");
+    }
 }
 
 void DoScout(Character * character, ArgumentHandler & /*args*/)
 {
-    auto requiredTime = 3;
-    auto newAction = std::make_shared<ScoutAction>(character, requiredTime);
+    // Stop any action the character is executing.
+    StopAction(character);
+    auto newAction = std::make_shared<ScoutAction>(character);
     // Check the new action.
     std::string error;
     if (newAction->check(error))
@@ -245,6 +233,8 @@ void DoScout(Character * character, ArgumentHandler & /*args*/)
 
 void DoLoad(Character * character, ArgumentHandler & args)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     if (args.size() != 2)
     {
         character->sendMsg("What do you want to load with what?\n");
@@ -288,10 +278,8 @@ void DoLoad(Character * character, ArgumentHandler & args)
         character->sendMsg("%s\n", error);
         return;
     }
-    // Evaluates the required time for loading the magazine.
-    double requiredTime = 0.5 * ammountToLoad;
     // Create the load action.
-    auto newAction = std::make_shared<LoadAction>(magazine, projectile, character, requiredTime);
+    auto newAction = std::make_shared<LoadAction>(character, magazine, projectile, ammountToLoad);
     // Check the new action.
     error = std::string();
     if (newAction->check(error))
@@ -311,6 +299,8 @@ void DoLoad(Character * character, ArgumentHandler & args)
 
 void DoUnload(Character * character, ArgumentHandler & args)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     if (args.size() != 1)
     {
         character->sendMsg("What do you want to unload?\n");
@@ -339,7 +329,6 @@ void DoUnload(Character * character, ArgumentHandler & args)
         return;
     }
     // Set the required time to unloaded the item.
-    double requiredTime = 2.0;
     if (itemToUnload->getType() == ModelType::Magazine)
     {
         auto loadedItem = itemToUnload->toMagazineItem()->getAlreadyLoadedProjectile();
@@ -349,11 +338,9 @@ void DoUnload(Character * character, ArgumentHandler & args)
                                itemToUnload->getName(true));
             return;
         }
-        requiredTime = 0.25 * loadedItem->quantity;
     }
-    Logger::log(LogLevel::Debug, "Required Time : %s", ToString(requiredTime));
     // Create the unload action.
-    auto newAction = std::make_shared<UnloadAction>(itemToUnload, character, requiredTime);
+    auto newAction = std::make_shared<UnloadAction>(character, itemToUnload);
     std::string error;
     // Check the new action.
     if (newAction->check(error))
@@ -371,6 +358,8 @@ void DoUnload(Character * character, ArgumentHandler & args)
 
 void DoReload(Character * character, ArgumentHandler & args)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     if (args.size() != 2)
     {
         character->sendMsg("What do you want to reload with what?\n");
@@ -411,8 +400,7 @@ void DoReload(Character * character, ArgumentHandler & args)
                            magazine->getName(true));
         return;
     }
-    auto requiredTime = 2;
-    auto newAction = std::make_shared<ReloadAction>(rangedWeapon, magazine, character, requiredTime);
+    auto newAction = std::make_shared<ReloadAction>(character, rangedWeapon, magazine);
     std::string error;
     // Check the new action.
     if (newAction->check(error))
@@ -432,9 +420,16 @@ void DoReload(Character * character, ArgumentHandler & args)
 
 void DoAim(Character * character, ArgumentHandler & args)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     if (args.size() != 1)
     {
         character->sendMsg("Who or what do you want to aim?\n");
+        return;
+    }
+    if (character->getActiveRangedWeapons().empty())
+    {
+        character->sendMsg("You don't have a ranged weapon equipped.\n");
         return;
     }
     // Prepare a pointer to the aimed character.
@@ -460,11 +455,7 @@ void DoAim(Character * character, ArgumentHandler & args)
         // Check if the target is still in sight.
         if (character->isAtRange(aimedCharacter, character->getViewDistance()))
         {
-            int distance = Area::getDistance(character->room->coord, aimedCharacter->room->coord);
-            Logger::log(LogLevel::Debug, "Distance : %s", distance);
-            auto requiredTime = 1.5 * distance;
-            Logger::log(LogLevel::Debug, "Time     : %s", requiredTime);
-            auto newAction = std::make_shared<AimAction>(character, aimedCharacter, requiredTime);
+            auto newAction = std::make_shared<AimAction>(character, aimedCharacter);
             // Check the new action.
             std::string error;
             if (newAction->check(error))
@@ -488,16 +479,19 @@ void DoAim(Character * character, ArgumentHandler & args)
 
 void DoFire(Character * character, ArgumentHandler & /*args*/)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     // Check if the pointer to the aimed target is still valid.
-    if (character->aimedCharacter == nullptr)
+    if (character->combatHandler.getAimedTarget() == nullptr)
     {
         character->sendMsg("You first need to aim at someone or something.\n");
         return;
     }
+    auto aimedTarget = character->combatHandler.getAimedTarget();
     // Check if the target is still in sight.
-    if (!character->isAtRange(character->aimedCharacter, character->getViewDistance()))
+    if (!character->isAtRange(character->combatHandler.getAimedTarget(), character->getViewDistance()))
     {
-        character->sendMsg("%s is out of your line of sight...\n", character->aimedCharacter->getNameCapital());
+        character->sendMsg("%s is out of your line of sight...\n", aimedTarget->getNameCapital());
         return;
     }
     // Retrive the active ranged weapons.
@@ -509,34 +503,37 @@ void DoFire(Character * character, ArgumentHandler & /*args*/)
         return;
     }
     // For each ranged weapon check if it is able to reach the target.
+    bool canAttack = false;
     for (auto weapon : rangedWeapons)
     {
         auto weaponRange = weapon->getRange();
-        Logger::log(LogLevel::Debug, "Weapon Range : %s", ToString(weaponRange));
-        if (character->isAtRange(character->aimedCharacter, weaponRange))
+        if (character->isAtRange(aimedTarget, weaponRange))
         {
-            // Let the characters enter the combat.
-
-            if (!character->setNextCombatAction(CombatActionType::BasicRangedAttack))
-            {
-                character->sendMsg("You were not able to fire at %s with %s.\n",
-                                   character->aimedCharacter->getName(),
-                                   weapon->getName(true));
-                return;
-            }
-            else
-            {
-                character->sendMsg("You start firing at %s with %s...\n",
-                                   character->aimedCharacter->getName(),
-                                   weapon->getName(true));
-            }
+            canAttack = true;
+            break;
+        }
+    }
+    if (canAttack)
+    {
+        auto basicAttack = std::make_shared<BasicAttack>(character);
+        std::string error;
+        if (basicAttack->check(error))
+        {
+            // Add the aimedTarget to the list of opponents.
+            character->combatHandler.addOpponent(aimedTarget);
+            // Add the action to the character's combat queue.
+            character->setAction(basicAttack);
+            // Set the predefined target.
+            character->combatHandler.setPredefinedTarget(aimedTarget);
+            character->sendMsg("You start firing at %s...\n", aimedTarget->getName());
         }
         else
         {
-            character->sendMsg("You fire at %s with %s but %s is out of your reach...\n",
-                               character->aimedCharacter->getName(),
-                               weapon->getName(true),
-                               character->aimedCharacter->getSubjectPronoun());
+            character->sendMsg("You were not able to fire at %s.\n", aimedTarget->getName());
         }
+    }
+    else
+    {
+        character->sendMsg("%s is out of your reach...\n", aimedTarget->getNameCapital());
     }
 }

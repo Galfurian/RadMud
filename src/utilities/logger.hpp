@@ -109,21 +109,28 @@ public:
 
     /// @brief Print to consol and to logging file the given integer.
     template<typename ... Args>
-    static void log(const LogLevel & level, const std::string & msg, const int first, const Args & ... args)
+    static void log(const LogLevel & level, const std::string & msg, const int & first, const Args & ... args)
     {
         Logger::log(level, msg, ToString(first), args ...);
     }
 
     /// @brief Print to consol and to logging file the given unsign integer.
     template<typename ... Args>
-    static void log(const LogLevel & level, const std::string & msg, const unsigned int first, const Args & ... args)
+    static void log(const LogLevel & level, const std::string & msg, const unsigned int & first, const Args & ... args)
     {
         Logger::log(level, msg, ToString(first), args ...);
     }
 
     /// @brief Print to consol and to logging file the given double.
     template<typename ... Args>
-    static void log(const LogLevel & level, const std::string & msg, const double first, const Args & ... args)
+    static void log(const LogLevel & level, const std::string & msg, const unsigned long & first, const Args & ... args)
+    {
+        Logger::log(level, msg, ToString(first), args ...);
+    }
+
+    /// @brief Print to consol and to logging file the given double.
+    template<typename ... Args>
+    static void log(const LogLevel & level, const std::string & msg, const double & first, const Args & ... args)
     {
         Logger::log(level, msg, ToString(first), args ...);
     }

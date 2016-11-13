@@ -69,6 +69,18 @@ bool DoubleEquality(double a, double b);
 /// @return The number.
 double SafeLog10(const double & source);
 
+/// @brief Allows to safely sum an unsigned value with another value.
+/// @param first  The first (unsigned) value.
+/// @param second The second value.
+/// @return The sum of the two values.
+template<typename T>
+unsigned int SafeSum(const unsigned int & first, const T & second)
+{
+    T signedFirst = static_cast<T>(first);
+    T result = signedFirst + second;
+    return (result < 0) ? 0 : static_cast<unsigned int>(result);
+}
+
 /// @brief Check if the passed value has the given flag set.
 /// @param flags The value to check.
 /// @param flag  The flag to search.

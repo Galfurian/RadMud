@@ -6,27 +6,31 @@
 /// @author  Enrico Fraccaroli
 /// @date    Aug 23 2014
 /// @copyright
-/// Copyright (c) 2014, 2015, 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
-/// Permission to use, copy, modify, and distribute this software for any
-/// purpose with or without fee is hereby granted, provided that the above
-/// copyright notice and this permission notice appear in all copies.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-/// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-/// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-/// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-/// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-/// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-/// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+/// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
+/// Permission is hereby granted, free of charge, to any person obtaining a
+/// copy of this software and associated documentation files (the "Software"),
+/// to deal in the Software without restriction, including without limitation
+/// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+/// and/or sell copies of the Software, and to permit persons to whom the
+/// Software is furnished to do so, subject to the following conditions:
+///     The above copyright notice and this permission notice shall be included
+///     in all copies or substantial portions of the Software.
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+/// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+/// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+/// DEALINGS IN THE SOFTWARE.
 
 #pragma once
 
 #include "defines.hpp"
-#include "effect.hpp"
 #include "exit.hpp"
-#include "faction.hpp"
 #include "race.hpp"
 #include "item.hpp"
+#include "faction.hpp"
+#include "effectList.hpp"
 #include "combatAction.hpp"
 #include "argumentHandler.hpp"
 #include "characterContainer.hpp"
@@ -86,13 +90,11 @@ public:
     /// The lua_State associated with this character.
     lua_State * L;
     /// List of opponents.
-    AggressionList aggressionList;
+    CombatHandler combatHandler;
     /// Character current action.
     std::deque<std::shared_ptr<GeneralAction> > actionQueue;
     /// List of characters in sight.
     CharacterContainer charactersInSight;
-    /// A pointer to the currently aimed character.
-    Character * aimedCharacter;
 
     /// @brief Constructor.
     Character();
@@ -285,12 +287,6 @@ public:
     /// @param _action The action that has to be set.
     void setAction(std::shared_ptr<GeneralAction> _action);
 
-    /// @brief Allows to set a combat action.
-    /// @param nextAction The next combat action to execute.
-    /// @return <b>True</b> if correct values have been provided,<br>
-    ///         <b>False</b> otherwise.
-    bool setNextCombatAction(const CombatActionType & nextAction);
-
     /// @brief Provides a pointer to the action object associated to this character.
     /// @return A pointer to action.
     std::shared_ptr<GeneralAction> getAction() const;
@@ -298,13 +294,6 @@ public:
     /// @brief Provides a pointer to the action at the front position and
     ///         then remove it from the queue.
     void popAction();
-
-    /// @brief Check if the character can move in the given direction.
-    /// @param direction The direction where to search the room.
-    /// @param error     A reference to a string which will contain error message in case of failure.
-    /// @return <b>True</b> if the operation goes well,<br>
-    ///         <b>False</b> otherwise.
-    bool canMoveTo(const Direction & direction, std::string & error) const;
 
     /// @brief Move the character to another room.
     /// @param destination Destination room.
@@ -522,11 +511,6 @@ public:
     ///         <b>False</b> otherwise.
     bool isAtRange(Character * target, const unsigned int & range);
 
-    /// @brief Provides a pointer to the opponent on the top of the aggro list.
-    /// @param range Specifies the maximum range.
-    /// @return A pointer to the next opponent.
-    Character * getNextOpponentAtRange(const unsigned int & range);
-
     /// @brief Provides the list of active melee weapons (Left and Right hands).
     /// @return Vector of melee weapons.
     std::vector<MeleeWeaponItem *> getActiveMeleeWeapons();
@@ -534,11 +518,6 @@ public:
     /// @brief Provides the list of active ranged weapons (Left and Right hands).
     /// @return Vector of ranged weapons.
     std::vector<RangedWeaponItem *> getActiveRangedWeapons();
-
-    /// @brief Given an action, it returns the necessary cooldown.
-    /// @param combatAction The desired combat action.
-    /// @return The non-decreasing value of the cooldown.
-    unsigned int getCooldown(CombatActionType combatAction);
 
     /// @brief Handle what happend when this character die.
     virtual void kill();
@@ -590,11 +569,11 @@ public:
     /// @brief Operator used to order the character based on their name.
     bool operator==(const class Character & source) const;
 
-    /// @brief Send a message to the character.
+    /// @brief Sends a message to the character.
     /// @param msg Message to send.
     virtual void sendMsg(const std::string & msg);
 
-    /// @brief Print to consol and to logging file the gievn string.
+    /// @brief Sends a message to the character.
     /// @param msg   The message to send
     /// @param first The first unpacked argument.
     /// @param args  Packed arguments.
@@ -612,6 +591,13 @@ public:
             working.replace(pos, 2, first);
             sendMsg(working, args ...);
         }
+    }
+
+    /// @brief Sends a message to the character. This one in particular handles unsigned integer.
+    template<typename ... Args>
+    void sendMsg(const std::string & msg, const unsigned int & first, const Args & ... args)
+    {
+        this->sendMsg(msg, ToString(first), args ...);
     }
 };
 

@@ -3,28 +3,33 @@
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2014
 /// @copyright
-/// Copyright (c) 2014, 2015, 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
-/// Permission to use, copy, modify, and distribute this software for any
-/// purpose with or without fee is hereby granted, provided that the above
-/// copyright notice and this permission notice appear in all copies.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-/// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-/// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-/// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-/// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-/// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-/// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+/// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
+/// Permission is hereby granted, free of charge, to any person obtaining a
+/// copy of this software and associated documentation files (the "Software"),
+/// to deal in the Software without restriction, including without limitation
+/// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+/// and/or sell copies of the Software, and to permit persons to whom the
+/// Software is furnished to do so, subject to the following conditions:
+///     The above copyright notice and this permission notice shall be included
+///     in all copies or substantial portions of the Software.
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+/// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+/// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+/// DEALINGS IN THE SOFTWARE.
 
 #include "god.hpp"
 
 #include "mud.hpp"
+#include "algorithms/AStar/aStar.hpp"
 
 void LoadGodCommands()
 {
-    Command command;
-    command.gods = true;
     {
+        Command command;
+        command.gods = true;
         command.name = "shutdown";
         command.help = "Shut the MUD down.";
         command.args = "";
@@ -32,6 +37,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "mudsave";
         command.help = "Save the MUD.";
         command.args = "";
@@ -39,6 +46,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "goto";
         command.help = "Go to another room.";
         command.args = "(Room.vnum)";
@@ -46,6 +55,17 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
+        command.name = "findpath";
+        command.help = "Finds the path to the given room.";
+        command.args = "(Room.vnum)";
+        command.hndl = DoFindPath;
+        Mud::instance().addCommand(command);
+    }
+    {
+        Command command;
+        command.gods = true;
         command.name = "hurt";
         command.help = "Hurt the desired target.";
         command.args = "(Target)";
@@ -53,6 +73,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "invisibility";
         command.help = "Became invisible.";
         command.args = "";
@@ -60,6 +82,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "visible";
         command.help = "Return visible.";
         command.args = "";
@@ -67,6 +91,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "ginfo";
         command.help = "Get information about a character.";
         command.args = "(target)";
@@ -76,6 +102,8 @@ void LoadGodCommands()
 
     // Interaction with Players.
     {
+        Command command;
+        command.gods = true;
         command.name = "aggrolist";
         command.help = "Provides the list of opponents of the given target.";
         command.args = "(Target)";
@@ -83,6 +111,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "transfer";
         command.help = "Transfer another character here, or to another room.";
         command.args = "(Target) [Where]";
@@ -90,6 +120,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "feast";
         command.help = "Restores completely the health and the stamina of the target.";
         command.args = "(Target)";
@@ -97,6 +129,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "sflag";
         command.help = "Sets a flag for a character.";
         command.args = "(Target) (Flag)";
@@ -104,6 +138,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "cflag";
         command.help = "Remove a flag from a character.";
         command.args = "(Target) (Flag)";
@@ -111,6 +147,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "modskill";
         command.help = "Modify the value of the player skill.";
         command.args = "(Target) (Skill) (Value)";
@@ -118,6 +156,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "modattribute";
         command.help = "Modify the value of the player attribute.";
         command.args = "(Target) (Attribute) (Value)";
@@ -127,6 +167,8 @@ void LoadGodCommands()
 
     // Item's Model.
     {
+        Command command;
+        command.gods = true;
         command.name = "imodel";
         command.help = "List all the information about a model.";
         command.args = "(Model.vnum)";
@@ -136,6 +178,8 @@ void LoadGodCommands()
 
     // Items.
     {
+        Command command;
+        command.gods = true;
         command.name = "iitem";
         command.help = "Show information about an item.";
         command.args = "(Item.vnum)";
@@ -143,6 +187,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "citem";
         command.help = "Create a new item, if not set the quality will be Normal.";
         command.args = "(Model.vnum)(Material.vnum)[Quality]";
@@ -150,6 +196,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "ditem";
         command.help = "Destroy the desired object.";
         command.args = "(Item.vnum)";
@@ -157,6 +205,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "gitem";
         command.help = "Materialize the desired object.";
         command.args = "(Item.vnum)";
@@ -166,6 +216,8 @@ void LoadGodCommands()
 
     // Areas.
     {
+        Command command;
+        command.gods = true;
         command.name = "iarea";
         command.help = "Show the informations about a specific area.";
         command.args = "(Area.vnum)";
@@ -175,6 +227,8 @@ void LoadGodCommands()
 
     // Rooms.
     {
+        Command command;
+        command.gods = true;
         command.name = "iroom";
         command.help = "Show the informations about a specific room.";
         command.args = "(Room.vnum)";
@@ -182,6 +236,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "croom";
         command.help = "Create a room in the given direction.";
         command.args = "(Direction)";
@@ -189,6 +245,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "droom";
         command.help = "Delete the room in the given direction.";
         command.args = "(Direction)";
@@ -196,6 +254,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "eroom";
         command.help = "Change room values.";
         command.args = "(Option) (Value)";
@@ -205,6 +265,8 @@ void LoadGodCommands()
 
     // Mobiles.
     {
+        Command command;
+        command.gods = true;
         command.name = "kmobile";
         command.help = "Kill the desired mobile, in the same room.";
         command.args = "(Mobile.name)";
@@ -212,6 +274,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "rmobile";
         command.help = "Reload the lua script for the target mobile, in the same room.";
         command.args = "(Mobile.name)";
@@ -219,6 +283,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "mobilelog";
         command.help = "Given a mobile id, it returns the curresponding mobile log.";
         command.args = "(Mobile.id)";
@@ -228,6 +294,8 @@ void LoadGodCommands()
 
     // Materials.
     {
+        Command command;
+        command.gods = true;
         command.name = "imaterial";
         command.help = "Show the informations about a specific material.";
         command.args = "(Material.vnum)";
@@ -237,6 +305,8 @@ void LoadGodCommands()
 
     // Liquids.
     {
+        Command command;
+        command.gods = true;
         command.name = "iliquid";
         command.help = "Show the informations about a specific liquid.";
         command.args = "(Liquid.vnum)";
@@ -244,6 +314,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "cliquid";
         command.help = "Materialize some liquid sinde a container.";
         command.args = "(Container.name)(Liquid.vnum)(Quantity)";
@@ -253,6 +325,8 @@ void LoadGodCommands()
 
     // Productions.
     {
+        Command command;
+        command.gods = true;
         command.name = "iproduction";
         command.help = "Provide all the information regarding the given production.";
         command.args = "(Production.vnum)";
@@ -262,6 +336,8 @@ void LoadGodCommands()
 
     // Profession.
     {
+        Command command;
+        command.gods = true;
         command.name = "iprofession";
         command.help = "Provide all the information regarding the given profession.";
         command.args = "(Profession.command)";
@@ -270,6 +346,8 @@ void LoadGodCommands()
     }
 
     {
+        Command command;
+        command.gods = true;
         command.name = "ifaction";
         command.help = "Shows the infos about a faction.";
         command.args = "(vnum)";
@@ -281,6 +359,8 @@ void LoadGodCommands()
     // LISTS
     //
     {
+        Command command;
+        command.gods = true;
         command.name = "lmodel";
         command.help = "List all the models for the items.";
         command.args = "";
@@ -288,6 +368,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "litem";
         command.help = "List all the items.";
         command.args = "";
@@ -295,6 +377,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "lmobile";
         command.help = "List all the mobiles.";
         command.args = "";
@@ -302,6 +386,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "lplayer";
         command.help = "List all the players.";
         command.args = "";
@@ -309,6 +395,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "larea";
         command.help = "List all the areas.";
         command.args = "";
@@ -316,6 +404,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "lroom";
         command.help = "List all the rooms.";
         command.args = "";
@@ -323,6 +413,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "lrace";
         command.help = "List all the races.";
         command.args = "";
@@ -330,6 +422,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "lfaction";
         command.help = "List all the factions.";
         command.args = "";
@@ -337,6 +431,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "lskill";
         command.help = "List all the skills.";
         command.args = "";
@@ -344,6 +440,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "lwriting";
         command.help = "List all the writings.";
         command.args = "";
@@ -351,6 +449,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "lcorpse";
         command.help = "List all the corpses.";
         command.args = "";
@@ -358,6 +458,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "lcontinent";
         command.help = "List all the continents.";
         command.args = "";
@@ -365,6 +467,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "lmaterial";
         command.help = "List all the materials.";
         command.args = "";
@@ -372,6 +476,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "lprofession";
         command.help = "Get the list of all the professions.";
         command.args = "";
@@ -379,6 +485,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "lproduction";
         command.help = "Get the list of all the productions.";
         command.args = "";
@@ -386,6 +494,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "lliquid";
         command.help = "List all the liquids.";
         command.args = "";
@@ -393,6 +503,8 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
+        command.gods = true;
         command.name = "lbuild";
         command.help = "List all the buildings.";
         command.args = "";
@@ -435,7 +547,7 @@ void DoGoTo(Character * character, ArgumentHandler & args)
         character->sendMsg("That room doesen't exists.\n");
         return;
     }
-    // Check if the player it's already doing something.
+    // Stop any action the character is executing.
     StopAction(character);
     // Prepare messages.
     auto msgDepart = character->getNameCapital() + " disappears in a puff of smoke!\n";
@@ -443,6 +555,72 @@ void DoGoTo(Character * character, ArgumentHandler & args)
     auto msgChar = "You go to room " + destination->name + ".\n";
     // Move player.
     character->moveTo(destination, msgDepart, msgArrive, msgChar);
+}
+
+void DoFindPath(Character * character, ArgumentHandler & args)
+{
+    if (args.size() != 1)
+    {
+        character->sendMsg("You have to provide a room vnum.");
+    }
+    else
+    {
+        auto room = character->room->area->getRoom(ToNumber<int>(args[0].getContent()));
+        if (room != nullptr)
+        {
+            AStar<Room *> aStar;
+            std::vector<Room *> path;
+            auto checkFunction = [&character](Room * from, Room * to)
+            {
+                // Get the direction.
+                auto direction = Area::getDirection(from->coord, to->coord);
+                // Get the exit;
+                auto destExit = from->findExit(direction);
+                // If the direction is upstairs, check if there is a stair.
+                if (direction == Direction::Up)
+                {
+                    if (!HasFlag(destExit->flags, ExitFlag::Stairs)) return false;
+                }
+                // Check if the destination is correct.
+                if (destExit->destination == nullptr) return false;
+                // Check if the destination is bocked by a door.
+                auto door = destExit->destination->findDoor();
+                if (door != nullptr)
+                {
+                    if (HasFlag(door->flags, ItemFlag::Closed)) return false;
+                }
+                // Check if the destination has a floor.
+                auto destDown = destExit->destination->findExit(Direction::Down);
+                if (destDown != nullptr)
+                {
+                    if (!HasFlag(destDown->flags, ExitFlag::Stairs)) return false;
+                }
+                // Check if the destination is forbidden for mobiles.
+                return !(character->isMobile() && HasFlag(destExit->flags, ExitFlag::NoMob));
+            };
+
+            if (aStar.findPath(character->room, room, path, checkFunction))
+            {
+                character->sendMsg("You have to go:\n");
+                Coordinates previous = character->room->coord;
+                for (auto node : path)
+                {
+                    auto direction = Area::getDirection(previous, node->coord);
+                    previous = node->coord;
+                    character->sendMsg("    %s\n", direction.toString());
+                }
+                character->sendMsg("\n");
+            }
+            else
+            {
+                character->sendMsg("There is no path to that room.");
+            }
+        }
+        else
+        {
+            character->sendMsg("There is no room with that VNUM.");
+        }
+    }
 }
 
 void DoTransfer(Character * character, ArgumentHandler & args)
@@ -480,7 +658,7 @@ void DoTransfer(Character * character, ArgumentHandler & args)
             return;
         }
     }
-    // Check if the player it's already doing something.
+    // Stop any action the character is executing.
     StopAction(target);
     // Prepare messages.
     auto msgDepart = target->getNameCapital() + " is yanked away by unseen forces!";
@@ -508,7 +686,9 @@ void DoFeast(Character * character, ArgumentHandler & args)
     target->setStamina(target->getMaxStamina(), true);
     target->setThirst(100);
     target->setHunger(100);
-    target->sendMsg("A banquet with any kind of delicacy appears from nowhere!\n");
+    target->sendMsg("%sA banquet with any kind of delicacy appears from nowhere!%s%s\n",
+                    Formatter::magenta(), Formatter::reset(),
+                    ((target != character) ? "\n" : ""));
 }
 
 void DoSetFlag(Character * character, ArgumentHandler & args)
@@ -1334,6 +1514,7 @@ void DoRoomInfo(Character * character, ArgumentHandler & args)
     std::string msg;
     msg += "Room Informations:\n";
     msg += " Vnum        :" + ToString(room->vnum) + "\n";
+    msg += " Area        :" + ((room->area != nullptr) ? ToString(room->area->vnum) : "NULL") + "\n";
     msg += " X           :" + ToString(room->coord.x) + "\n";
     msg += " Y           :" + ToString(room->coord.y) + "\n";
     msg += " Z           :" + ToString(room->coord.z) + "\n";
@@ -1495,7 +1676,7 @@ void DoAggroList(Character * character, ArgumentHandler & args)
             return;
         }
     }
-    for (auto aggressor : targer->aggressionList)
+    for (auto aggressor : targer->combatHandler)
     {
         if (aggressor->aggressor != nullptr)
         {

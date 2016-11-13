@@ -211,7 +211,7 @@ unsigned int GetAbilityModifier(const unsigned int & value)
     {
         return 0;
     }
-    return static_cast<unsigned int>((value - 10) / 2);
+    return (value - 10) / 2;
 }
 
 std::string GetFileContents(const char * filename)

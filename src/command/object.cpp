@@ -3,18 +3,22 @@
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2014
 /// @copyright
-/// Copyright (c) 2014, 2015, 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
-/// Permission to use, copy, modify, and distribute this software for any
-/// purpose with or without fee is hereby granted, provided that the above
-/// copyright notice and this permission notice appear in all copies.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-/// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-/// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-/// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-/// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-/// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-/// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+/// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
+/// Permission is hereby granted, free of charge, to any person obtaining a
+/// copy of this software and associated documentation files (the "Software"),
+/// to deal in the Software without restriction, including without limitation
+/// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+/// and/or sell copies of the Software, and to permit persons to whom the
+/// Software is furnished to do so, subject to the following conditions:
+///     The above copyright notice and this permission notice shall be included
+///     in all copies or substantial portions of the Software.
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+/// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+/// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+/// DEALINGS IN THE SOFTWARE.
 
 #include "object.hpp"
 
@@ -25,23 +29,26 @@
 
 void LoadObjectCommands()
 {
-    Command command;
-    command.gods = false;
     {
+        Command command;
         command.name = "take";
         command.help = "Take something from the ground or from a container.";
         command.args = "(item) [(container)]";
         command.hndl = DoTake;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "drop";
         command.help = "Drop an object.";
         command.args = "(item)";
         command.hndl = DoDrop;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "give";
         command.help = "Give an object to someone.";
         command.args = "(item) (someone)";
@@ -49,20 +56,25 @@ void LoadObjectCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "equipments";
         command.help = "List all the items you are wearing.";
         command.args = "";
         command.hndl = DoEquipments;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "wield";
         command.help = "Wield a weapon, a shield or maybe a tool.";
         command.args = "(item)";
         command.hndl = DoWield;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "wear";
         command.help = "Puts on a piece of equipment.";
         command.args = "(item)";
@@ -70,20 +82,25 @@ void LoadObjectCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "remove";
         command.help = "Remove a weared or wielded item.";
         command.args = "(item)";
         command.hndl = DoRemove;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "inventory";
         command.help = "Show character's inventory.";
         command.args = "";
         command.hndl = DoInventory;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "organize";
         command.help = "Order the desired container or if no target is passed, the room.";
         command.args = "(name|weight) [(target)]";
@@ -91,20 +108,25 @@ void LoadObjectCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "open";
         command.help = "Open a door in a given direction.";
         command.args = "(item)|(direction)";
         command.hndl = DoOpen;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "close";
         command.help = "Close a door in a given direction.";
         command.args = "(item)|(direction)";
         command.hndl = DoClose;
+        command.cuic = true;
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "put";
         command.help = "Put something inside a container.";
         command.args = "(something) (container)";
@@ -112,6 +134,7 @@ void LoadObjectCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "drink";
         command.help = "Drink from a container of liquids.";
         command.args = "(container)";
@@ -119,6 +142,7 @@ void LoadObjectCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "fill";
         command.help = "Fill a container of liquids from a source of liquid.";
         command.args = "(container) (source)";
@@ -126,6 +150,7 @@ void LoadObjectCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "pour";
         command.help = "Pour the content of the container into another one or on the ground.";
         command.args = "(container) [container]";
@@ -133,6 +158,7 @@ void LoadObjectCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "deposit";
         command.help = "Deposit a coin inside a shop.";
         command.args = "(item) (shop)";
@@ -140,6 +166,7 @@ void LoadObjectCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "sell";
         command.help = "Sell an item to a shop keeper.";
         command.args = "(item) (shop)";
@@ -147,6 +174,7 @@ void LoadObjectCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "buy";
         command.help = "Allows to buy an item from a shop.";
         command.args = "(item) (shop)";
@@ -154,6 +182,7 @@ void LoadObjectCommands()
         Mud::instance().addCommand(command);
     }
     {
+        Command command;
         command.name = "balance";
         command.help = "Shows the character's balance.";
         command.args = "";
@@ -914,6 +943,32 @@ void DoRemove(Character * character, ArgumentHandler & args)
         character->sendMsg("Too many arguments.\n");
         return;
     }
+    // Define a function which checks if all the ranged weapons have been removed.
+    auto CheckIfRemovedAllRangedWeapons = [&character]()
+    {
+        if (character->combatHandler.getAimedTarget() == nullptr)
+        {
+            return false;
+        }
+        auto left = character->findEquipmentSlotItem(EquipmentSlot::LeftHand);
+        if (left != nullptr)
+        {
+            if (left->getType() == ModelType::RangedWeapon)
+            {
+                return false;
+            }
+        }
+        auto right = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
+        if (right != nullptr)
+        {
+            if (right->getType() == ModelType::RangedWeapon)
+            {
+                return false;
+            }
+        }
+        return true;
+    };
+
     if (args[0].getContent() == "all")
     {
         // Handle output only if the player has really removed something.
@@ -936,6 +991,15 @@ void DoRemove(Character * character, ArgumentHandler & args)
             "%s has undressed all he could.\n",
             {character},
             character->getNameCapital());
+        // Check if we have just removed ALL the USED Ranged Weapons.
+        if (character->combatHandler.getAimedTarget() != nullptr)
+        {
+            if (CheckIfRemovedAllRangedWeapons())
+            {
+                character->sendMsg("You stop aiming %s.\n", character->combatHandler.getAimedTarget()->getName());
+                character->combatHandler.setAimedTarget(nullptr);
+            }
+        }
         return;
     }
     // Get the item.
@@ -963,6 +1027,15 @@ void DoRemove(Character * character, ArgumentHandler & args)
         item->getName(true),
         character->getPossessivePronoun(),
         ToLower(item->getCurrentSlotName()));
+    // Check if we have just removed ALL the USED Ranged Weapons.
+    if (character->combatHandler.getAimedTarget() != nullptr)
+    {
+        if (CheckIfRemovedAllRangedWeapons())
+        {
+            character->sendMsg("You stop aiming %s.\n", character->combatHandler.getAimedTarget()->getName());
+            character->combatHandler.setAimedTarget(nullptr);
+        }
+    }
 }
 
 void DoInventory(Character * character, ArgumentHandler & /*args*/)
@@ -1442,6 +1515,8 @@ void DoPut(Character * character, ArgumentHandler & args)
 
 void DoDrink(Character * character, ArgumentHandler & args)
 {
+    // Stop any action the character is executing.
+    StopAction(character);
     if (args.empty())
     {
         character->sendMsg("Drink from what?\n");

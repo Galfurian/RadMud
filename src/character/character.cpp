@@ -3,18 +3,22 @@
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2014
 /// @copyright
-/// Copyright (c) 2014, 2015, 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
-/// Permission to use, copy, modify, and distribute this software for any
-/// purpose with or without fee is hereby granted, provided that the above
-/// copyright notice and this permission notice appear in all copies.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-/// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-/// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-/// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-/// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-/// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-/// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+/// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
+/// Permission is hereby granted, free of charge, to any person obtaining a
+/// copy of this software and associated documentation files (the "Software"),
+/// to deal in the Software without restriction, including without limitation
+/// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+/// and/or sell copies of the Software, and to permit persons to whom the
+/// Software is furnished to do so, subject to the following conditions:
+///     The above copyright notice and this permission notice shall be included
+///     in all copies or substantial portions of the Software.
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+/// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+/// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+/// DEALINGS IN THE SOFTWARE.
 
 // Basic Include.
 #include "character.hpp"
@@ -22,14 +26,9 @@
 // Other Include.
 #include "mud.hpp"
 
-#include "basicMeleeAttack.hpp"
-#include "basicRangedAttack.hpp"
-#include "flee.hpp"
-
 #include "armorItem.hpp"
 #include "meleeWeaponItem.hpp"
 #include "rangedWeaponItem.hpp"
-#include "moveAction.hpp"
 
 using namespace std::chrono;
 
@@ -52,10 +51,9 @@ Character::Character() :
     posture(CharacterPosture::Stand),
     effects(),
     L(luaL_newstate()),
-    aggressionList(this),
+    combatHandler(this),
     actionQueue(),
-    charactersInSight(),
-    aimedCharacter()
+    charactersInSight()
 {
     actionQueue.push_back(std::make_shared<GeneralAction>(this));
     // Nothing to do.
@@ -168,10 +166,10 @@ void Character::getSheet(Table & sheet) const
         sheet.addRow({equipmentItem, inventoryItem});
     }
     sheet.addDivider();
-    sheet.addRow({"## Effect Name", "## Expires In"});
+    sheet.addRow({"## Effect Name", "## Remaining TIC"});
     for (EffectList::const_iterator it = this->effects.begin(); it != this->effects.end(); ++it)
     {
-        sheet.addRow({it->name, ToString(it->expires)});
+        sheet.addRow({it->name, ToString(it->remainingTic)});
     }
 }
 
@@ -245,10 +243,7 @@ bool Character::setAbility(const Ability & ability, const unsigned int & value)
         abilities[ability] = value;
         return true;
     }
-    else
-    {
-        return false;
-    }
+    return false;
 }
 
 unsigned int Character::getAbility(const Ability & ability, bool withEffects) const
@@ -288,17 +283,9 @@ unsigned int Character::getAbilityLog(
     const double & multiplier,
     const bool & withEffects) const
 {
-    double result = base;
-    double modifier = static_cast<double>(this->getAbilityModifier(ability, withEffects));
-    if (modifier > 0)
-    {
-        if (modifier > 25)
-        {
-            modifier = 25;
-        }
-        result += multiplier * log10(modifier);
-    }
-    return static_cast<unsigned int>(result);
+    auto mod = this->getAbilityModifier(ability, withEffects);
+    auto logMod = SafeLog10(mod);
+    return static_cast<unsigned int>(base + logMod * multiplier);
 }
 
 bool Character::setHealth(const unsigned int & value, const bool & force)
@@ -517,44 +504,6 @@ void Character::setAction(std::shared_ptr<GeneralAction> _action)
     this->actionQueue.push_front(_action);
 }
 
-bool Character::setNextCombatAction(const CombatActionType & nextAction)
-{
-    bool sameAction = false;
-    if (this->getAction()->getType() == ActionType::Combat)
-    {
-        auto combatAction = this->getAction()->toCombatAction();
-        sameAction = (combatAction->getCombatActionType() == nextAction);
-    }
-    if (!sameAction)
-    {
-        if (nextAction == CombatActionType::BasicMeleeAttack)
-        {
-            if (!aggressionList.hasOpponents())
-            {
-                Logger::log(LogLevel::Error, "The list of opponents is empty.");
-                return false;
-            }
-            this->actionQueue.push_front(std::make_shared<BasicMeleeAttack>(this));
-        }
-        else if (nextAction == CombatActionType::BasicRangedAttack)
-        {
-            if (this->aimedCharacter == nullptr)
-            {
-                Logger::log(LogLevel::Error, "Aimed character is a nullptr.");
-                return false;
-            }
-            this->actionQueue.push_front(std::make_shared<BasicRangedAttack>(this));
-        }
-        else if (nextAction == CombatActionType::Flee)
-        {
-            this->actionQueue.push_front(std::make_shared<Flee>(this));
-        }
-    }
-    // Set the action cooldown.
-    this->getAction()->resetCooldown(this->getCooldown(nextAction));
-    return true;
-}
-
 std::shared_ptr<GeneralAction> Character::getAction() const
 {
     return this->actionQueue.front();
@@ -566,79 +515,6 @@ void Character::popAction()
     {
         this->actionQueue.pop_front();
     }
-}
-
-bool Character::canMoveTo(const Direction & direction, std::string & error) const
-{
-    if (this->getAction()->getType() == ActionType::Combat)
-    {
-        error = "You cannot move while fighting.";
-        return false;
-    }
-    // Check if the character is in a no-walk position.
-    if (posture == CharacterPosture::Rest || posture == CharacterPosture::Sit)
-    {
-        error = "You first need to stand up.";
-        return false;
-    }
-    // Find the exit to the destination.
-    std::shared_ptr<Exit> destExit = room->findExit(direction);
-    if (destExit == nullptr)
-    {
-        error = "You cannot go that way.";
-        return false;
-    }
-    // Check if the actor has enough stamina to execute the action.
-    if (MoveAction::getConsumedStamina(this, this->posture) > this->getStamina())
-    {
-        error = "You are too tired to move.\n";
-        return false;
-    }
-    // If the direction is upstairs, check if there is a stair.
-    if (direction == Direction::Up)
-    {
-        Logger::log(LogLevel::Debug, "Flags :" + ToString(destExit->flags));
-        if (!HasFlag(destExit->flags, ExitFlag::Stairs))
-        {
-            error = "You can't go upstairs, there are no stairs.";
-            return false;
-        }
-    }
-    // Check if the destination is correct.
-    if (destExit->destination == nullptr)
-    {
-        error = "That direction can't take you anywhere.";
-        return false;
-    }
-    // Check if the destination is bocked by a door.
-    auto door = destExit->destination->findDoor();
-    if (door != nullptr)
-    {
-        if (HasFlag(door->flags, ItemFlag::Closed))
-        {
-            error = "Maybe you have to open that door first.";
-            return false;
-        }
-    }
-    // Check if the destination has a floor.
-    std::shared_ptr<Exit> destDown = destExit->destination->findExit(Direction::Down);
-    if (destDown != nullptr)
-    {
-        if (!HasFlag(destDown->flags, ExitFlag::Stairs))
-        {
-            error = "Do you really want to fall in that pit?";
-            return false;
-        }
-    }
-    // Check if the destination is forbidden for mobiles.
-    if (this->isMobile())
-    {
-        if (HasFlag(destExit->flags, ExitFlag::NoMob))
-        {
-            return false;
-        }
-    }
-    return true;
 }
 
 void Character::moveTo(
@@ -799,7 +675,12 @@ Item * Character::findNearbyTool(
                 ToolModel * toolModel = iterator->model->toTool();
                 if (toolModel->toolType == toolType)
                 {
-                    auto findIt = std::find(exceptions.begin(), exceptions.end(), iterator);
+                    // Check if the item is inside the exception list.
+                    auto findIt = std::find_if(exceptions.begin(), exceptions.end(), [&iterator](Item * item)
+                    {
+                        return (item->vnum == iterator->vnum);
+                    });
+                    // If not, return the item.
                     if (findIt == exceptions.end())
                     {
                         return iterator;
@@ -1416,27 +1297,16 @@ bool Character::canAttackWith(const EquipmentSlot & slot) const
 
 bool Character::isAtRange(Character * target, const unsigned int & range)
 {
-    if (WrongAssert(target == nullptr)) return false;
     if (WrongAssert(this->room == nullptr)) return false;
     if (WrongAssert(this->room->area == nullptr)) return false;
+    if (WrongAssert(target == nullptr)) return false;
     if (WrongAssert(target->room == nullptr)) return false;
     if (WrongAssert(target->room->area == nullptr)) return false;
-    return this->room->area->los(this->room->coord, target->room->coord, range);
-}
-
-Character * Character::getNextOpponentAtRange(const unsigned int & range)
-{
-    if (aggressionList.hasOpponents())
+    if (target->isMobile())
     {
-        for (auto iterator : aggressionList.aggressionList)
-        {
-            if (this->isAtRange(iterator->aggressor, range))
-            {
-                return iterator->aggressor;
-            }
-        }
+        if (WrongAssert(!target->toMobile()->isAlive())) return false;
     }
-    return nullptr;
+    return this->room->area->los(this->room->coord, target->room->coord, range);
 }
 
 std::vector<MeleeWeaponItem *> Character::getActiveMeleeWeapons()
@@ -1479,89 +1349,6 @@ std::vector<RangedWeaponItem *> Character::getActiveRangedWeapons()
     return gatheredWeapons;
 }
 
-unsigned int Character::getCooldown(CombatActionType combatAction)
-{
-    double BASE = 5.0;
-    // The strength modifier.
-    // MIN = 0.00
-    // MAX = 1.40
-    double AGI = this->getAbilityLog(Ability::Agility, 0.0, 1.0);
-    // The agility modifier.
-    // MIN = 0.00
-    // MAX = 1.40
-    double STR = this->getAbilityLog(Ability::Strength, 0.0, 1.0);
-    // The weight modifier.
-    // MIN =  0.80
-    // MAX =  2.51
-    double WGT = 0.8;
-    double WGTmod = this->weight;
-    if (WGTmod > 0)
-    {
-        if (WGTmod > 320)
-        {
-            WGTmod = 320;
-        }
-        WGT = log10(WGTmod);
-    }
-    // The carried weight.
-    // MIN =  0.00
-    // MAX =  2.48
-    double CAR = 0.0;
-    double CARmod = this->getCarryingWeight();
-    if (CARmod > 0)
-    {
-        if (CARmod > 300)
-        {
-            CARmod = 300;
-        }
-        CAR = log10(CARmod);
-    }
-    if ((combatAction == CombatActionType::BasicMeleeAttack) ||
-        (combatAction == CombatActionType::BasicRangedAttack))
-    {
-        double RHD = 0;
-        double LHD = 0;
-        if (this->canAttackWith(EquipmentSlot::RightHand))
-        {
-            // Right Hand Weapon
-            // MIN =  0.00
-            // MAX =  1.60
-            auto weapon = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
-            double RHDmod = weapon->getWeight(true);
-            if (RHDmod > 0)
-            {
-                if (RHDmod > 40)
-                {
-                    RHDmod = 40;
-                }
-                RHD = log10(RHDmod);
-            }
-        }
-        if (this->canAttackWith(EquipmentSlot::LeftHand))
-        {
-            // Left Hand Weapon
-            // MIN =  0.00
-            // MAX =  1.60
-            auto weapon = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
-            double LHDmod = weapon->getWeight(true);
-            if (LHDmod > 0)
-            {
-                if (LHDmod > 40)
-                {
-                    LHDmod = 40;
-                }
-                LHD = log10(LHDmod);
-            }
-        }
-        BASE += -STR - AGI + WGT + CAR + std::max(RHD, LHD);
-    }
-    else if (combatAction == CombatActionType::Flee)
-    {
-        BASE += -STR - AGI + WGT + CAR;
-    }
-    return static_cast<unsigned int>(BASE);
-}
-
 void Character::kill()
 {
     // Create a corpse at the current position.
@@ -1593,7 +1380,7 @@ void Character::kill()
     this->actionQueue.clear();
     this->setAction(std::make_shared<GeneralAction>(this));
     // Reset the list of opponents.
-    this->aggressionList.resetList();
+    this->combatHandler.resetList();
     // Remove the character from the current room.
     if (room != nullptr)
     {
