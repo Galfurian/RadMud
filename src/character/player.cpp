@@ -146,22 +146,28 @@ void Player::addInventoryItem(Item *& item)
 {
     Character::addInventoryItem(item);
     // Update on database.
-    SQLiteDbms::instance().insertInto(
-        "ItemPlayer",
-        {name, ToString(item->vnum), EnumToString(EquipmentSlot::None)},
-        false,
-        true);
+    if (item->getType() != ModelType::Corpse)
+    {
+        SQLiteDbms::instance().insertInto(
+            "ItemPlayer",
+            {name, ToString(item->vnum), EnumToString(EquipmentSlot::None)},
+            false,
+            true);
+    }
 }
 
 void Player::addEquipmentItem(Item *& item)
 {
     Character::addEquipmentItem(item);
     // Update on database.
-    SQLiteDbms::instance().insertInto(
-        "ItemPlayer",
-        {name, ToString(item->vnum), EnumToString(item->getCurrentSlot())},
-        false,
-        true);
+    if (item->getType() != ModelType::Corpse)
+    {
+        SQLiteDbms::instance().insertInto(
+            "ItemPlayer",
+            {name, ToString(item->vnum), EnumToString(item->getCurrentSlot())},
+            false,
+            true);
+    }
 }
 
 bool Player::remInventoryItem(Item * item)
@@ -169,9 +175,12 @@ bool Player::remInventoryItem(Item * item)
     if (Character::remInventoryItem(item))
     {
         // Update on database.
-        SQLiteDbms::instance().deleteFrom(
-            "ItemPlayer",
-            {std::make_pair("item", ToString(item->vnum))});
+        if (item->getType() != ModelType::Corpse)
+        {
+            SQLiteDbms::instance().deleteFrom(
+                "ItemPlayer",
+                {std::make_pair("item", ToString(item->vnum))});
+        }
         return true;
     }
     return false;
@@ -182,9 +191,12 @@ bool Player::remEquipmentItem(Item * item)
     if (Character::remEquipmentItem(item))
     {
         // Update on database.
-        SQLiteDbms::instance().deleteFrom(
-            "ItemPlayer",
-            {std::make_pair("item", ToString(item->vnum))});
+        if (item->getType() != ModelType::Corpse)
+        {
+            SQLiteDbms::instance().deleteFrom(
+                "ItemPlayer",
+                {std::make_pair("item", ToString(item->vnum))});
+        }
         return true;
     }
     return false;
