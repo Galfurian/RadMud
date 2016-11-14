@@ -23,6 +23,7 @@
 #include <queue>
 #include "chase.hpp"
 #include "aStar.hpp"
+#include "moveAction.hpp"
 #include "effectFactory.hpp"
 
 Chase::Chase(Character * _actor, Character * _target) :
@@ -33,30 +34,9 @@ Chase::Chase(Character * _actor, Character * _target) :
     checkFunction([&](Room * from, Room * to)
                   {
                       // Get the direction.
+                      std::string error;
                       auto direction = Area::getDirection(from->coord, to->coord);
-                      // Get the exit;
-                      auto destExit = from->findExit(direction);
-                      // If the direction is upstairs, check if there is a stair.
-                      if (direction == Direction::Up)
-                      {
-                          if (!HasFlag(destExit->flags, ExitFlag::Stairs)) return false;
-                      }
-                      // Check if the destination is correct.
-                      if (destExit->destination == nullptr) return false;
-                      // Check if the destination is bocked by a door.
-                      auto door = destExit->destination->findDoor();
-                      if (door != nullptr)
-                      {
-                          if (HasFlag(door->flags, ItemFlag::Closed)) return false;
-                      }
-                      // Check if the destination has a floor.
-                      auto destDown = destExit->destination->findExit(Direction::Down);
-                      if (destDown != nullptr)
-                      {
-                          if (!HasFlag(destDown->flags, ExitFlag::Stairs)) return false;
-                      }
-                      // Check if the destination is forbidden for mobiles.
-                      return !(actor->isMobile() && HasFlag(destExit->flags, ExitFlag::NoMob));
+                      return MoveAction::canMoveTo(actor, direction, error, true);
                   })
 {
     // Debugging message.

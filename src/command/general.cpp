@@ -183,7 +183,7 @@ void DoDirection(Character * character, Direction direction)
     // Stop any action the character is executing.
     StopAction(character);
     std::string error;
-    if (!MoveAction::canMoveTo(character, direction, error))
+    if (!MoveAction::canMoveTo(character, direction, error, false))
     {
         character->sendMsg(error + "\n");
         return;

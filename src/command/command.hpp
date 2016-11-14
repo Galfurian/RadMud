@@ -91,44 +91,6 @@ public:
 /// @param args  Command arguments.
 void ProcessCommand(Character * character, ArgumentHandler & args);
 
-/// Check player name.
-void ProcessPlayerName(Character * character, ArgumentHandler & args);
-
-/// Check if the player password is correct.
-void ProcessPlayerPassword(Character * character, ArgumentHandler & args);
-
-/// Step 1  - Choose the Name.
-void ProcessNewName(Character * character, ArgumentHandler & args);
-
-/// Step 2  - Choose the Password.
-void ProcessNewPwd(Character * character, ArgumentHandler & args);
-
-/// Step 3  - Confirm the Password.
-void ProcessNewPwdCon(Character * character, ArgumentHandler & args);
-
-/// Step 4  - Short story of the mud world.
-void ProcessNewStory(Character * character, ArgumentHandler & args);
-
-/// Step 5  - Choose the Race.
-void ProcessNewRace(Character * character, ArgumentHandler & args);
-
-/// Step 6  - Choose the Attributes.
-void ProcessNewAttr(Character * character, ArgumentHandler & args);
-
-/// Step 7  - Choose the Gender.
-void ProcessNewGender(Character * character, ArgumentHandler & args);
-
-/// Step 8  - Choose the Age.
-void ProcessNewAge(Character * character, ArgumentHandler & args);
-
-/// Step 9  - Choose the description (optional).
-void ProcessNewDesc(Character * character, ArgumentHandler & args);
-
-/// Step 10 - Choose the Weight.
-void ProcessNewWeight(Character * character, ArgumentHandler & args);
-
-/// Step 11 - Confirm the character.
-void ProcessNewConfirm(Character * character, ArgumentHandler & args);
 ///@}
 
 /// @brief Check if the executer of this command is a player.
