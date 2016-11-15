@@ -19,13 +19,13 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "creationStep.hpp"
+#include "processInitialization.hpp"
 #include "player.hpp"
 #include "mud.hpp"
 
 /// @brief Shows the story of the mud.
 class ProcessNewStory :
-    public CreationStep
+    public ProcessInitialization
 {
 public:
     void process(Character * character, ArgumentHandler & args);

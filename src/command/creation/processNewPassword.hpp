@@ -19,13 +19,11 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "creationStep.hpp"
-#include "player.hpp"
-#include "mud.hpp"
+#include "processInitialization.hpp"
 
 /// @brief Allows to choose the player password.
 class ProcessNewPassword :
-    public CreationStep
+    public ProcessInitialization
 {
 public:
     void process(Character * character, ArgumentHandler & args);

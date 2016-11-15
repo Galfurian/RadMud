@@ -20,8 +20,10 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "processNewPassword.hpp"
-#include "processNewName.hpp"
 #include "processNewPasswordConfirm.hpp"
+#include "processNewName.hpp"
+#include "formatter.hpp"
+#include "player.hpp"
 
 void ProcessNewPassword::process(Character * character, ArgumentHandler & args)
 {
@@ -37,7 +39,7 @@ void ProcessNewPassword::process(Character * character, ArgumentHandler & args)
         // Create a shared pointer to the previous step.
         std::shared_ptr<ProcessNewName> newStep = std::make_shared<ProcessNewName>();
         // Set the handler.
-        player->inputHandler = newStep;
+        player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->rollBack(character);
     }
@@ -51,7 +53,7 @@ void ProcessNewPassword::process(Character * character, ArgumentHandler & args)
         // Create a shared pointer to the next step.
         std::shared_ptr<ProcessNewPasswordConfirm> newStep = std::make_shared<ProcessNewPasswordConfirm>();
         // Set the handler.
-        player->inputHandler = newStep;
+        player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->advance(character);
     }

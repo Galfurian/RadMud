@@ -39,7 +39,7 @@ void ProcessNewDescription::process(Character * character, ArgumentHandler & arg
         // Create a shared pointer to the previous step.
         std::shared_ptr<ProcessNewAge> newStep = std::make_shared<ProcessNewAge>();
         // Set the handler.
-        player->inputHandler = newStep;
+        player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->rollBack(character);
     }
@@ -50,7 +50,7 @@ void ProcessNewDescription::process(Character * character, ArgumentHandler & arg
         // Create a shared pointer to the next step.
         std::shared_ptr<ProcessNewWeight> newStep = std::make_shared<ProcessNewWeight>();
         // Set the handler.
-        player->inputHandler = newStep;
+        player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->advance(character);
     }
@@ -64,7 +64,7 @@ void ProcessNewDescription::process(Character * character, ArgumentHandler & arg
         // Create a shared pointer to the next step.
         std::shared_ptr<ProcessNewWeight> newStep = std::make_shared<ProcessNewWeight>();
         // Set the handler.
-        player->inputHandler = newStep;
+        player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->advance(character);
     }

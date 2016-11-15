@@ -22,8 +22,7 @@
 
 // Basic Include.
 #include "command.hpp"
-#include "creationStep.hpp"
-#include "processNewAge.hpp"
+#include "processInitialization.hpp"
 #include "mud.hpp"
 
 #include "combat.hpp"

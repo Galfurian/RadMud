@@ -33,7 +33,7 @@ void ProcessNewConfirm::process(Character * character, ArgumentHandler & args)
         // Create a shared pointer to the previous step.
         std::shared_ptr<ProcessNewWeight> newStep = std::make_shared<ProcessNewWeight>();
         // Set the handler.
-        player->inputHandler = newStep;
+        player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->rollBack(character);
     }
@@ -48,7 +48,7 @@ void ProcessNewConfirm::process(Character * character, ArgumentHandler & args)
         if (player->updateOnDB())
         {
             // Set the handler.
-            player->inputHandler = std::make_shared<InputHandler>();
+            player->inputProcessor = std::make_shared<ProcessInput>();
             // Retrieve the saved prompt.
             player->prompt = player->prompt_save;
             // Entered the MUD.

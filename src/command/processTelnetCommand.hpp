@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "inputHandler.hpp"
+#include "processInput.hpp"
 #include "defines.hpp"
 
 /// @brief Allows to estract from a string at the given position, a telnet command.
@@ -45,7 +45,7 @@ void NegotiateProtocol(Character * character, const ConnectionState & nextState)
 
 /// @brief Process for handling telnet commands.
 class ProcessTelnetCommand :
-    public InputHandler
+    public ProcessInput
 {
 public:
     void process(Character * character, ArgumentHandler & args);

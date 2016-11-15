@@ -19,23 +19,23 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "creationStep.hpp"
+#include "processInitialization.hpp"
 #include "character.hpp"
 #include "formatter.hpp"
 #include "player.hpp"
 
-CreationStep::CreationStep()
+ProcessInitialization::ProcessInitialization()
 {
     // Nothing to do.
 }
 
-CreationStep::~CreationStep()
+ProcessInitialization::~ProcessInitialization()
 {
     // Nothing to do.
 }
 
 
-void CreationStep::printChices(Character * character)
+void ProcessInitialization::printChices(Character * character)
 {
     auto player = character->toPlayer();
     std::string preview = std::string();

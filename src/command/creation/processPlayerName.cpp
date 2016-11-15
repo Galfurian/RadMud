@@ -39,7 +39,7 @@ void ProcessPlayerName::process(Character * character, ArgumentHandler & args)
         // Create a shared pointer to the next step.
         std::shared_ptr<ProcessNewName> newStep = std::make_shared<ProcessNewName>();
         // Set the handler.
-        player->inputHandler = newStep;
+        player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->advance(character);
     }
@@ -74,7 +74,7 @@ void ProcessPlayerName::process(Character * character, ArgumentHandler & args)
             // Create a shared pointer to the next step.
             std::shared_ptr<ProcessPlayerPassword> newStep = std::make_shared<ProcessPlayerPassword>();
             // Set the handler.
-            player->inputHandler = newStep;
+            player->inputProcessor = newStep;
             // Advance to the next step.
             newStep->advance(character);
         }

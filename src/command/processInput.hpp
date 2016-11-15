@@ -1,4 +1,4 @@
-/// @file   creationStep.hpp
+/// @file   inputHandler.hpp
 /// @author Enrico Fraccaroli
 /// @date   Nov 14, 2016
 /// @copyright
@@ -21,33 +21,19 @@
 
 #pragma once
 
-#include "inputHandler.hpp"
+#include "argumentHandler.hpp"
 
-/// Player names must consist of characters from this list.
-#define  VALID_CHARACTERS_NAME "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-"
-/// Player descriptions must consist of characters from this list.
-#define  VALID_CHARACTERS_DESC "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ,.\n"
+class Character;
 
-class CreationStep :
-    public InputHandler
+class ProcessInput
 {
 public:
     /// @brief Constructor.
-    CreationStep();
+    ProcessInput();
 
     /// @brief Destructor.
-    virtual ~CreationStep();
+    virtual ~ProcessInput();
 
-    /// @brief Print the values inserted until now.
-    /// @param character The player whose creating a new character.
-    void printChices(Character * character);
-
-    /// @brief Print the advancement in the character creation.
-    /// @param character The player whose creating a new character.
-    /// @param error     An optional message used only during error handling.
-    virtual void advance(Character * character, const std::string & error = std::string()) = 0;
-
-    /// @brief Reset the informations inserted in the previous state.
-    /// @param character The player whose creating a new character.
-    virtual void rollBack(Character * character) = 0;
+    /// @brief Process the given command.
+    virtual void process(Character * character, ArgumentHandler & args);
 };

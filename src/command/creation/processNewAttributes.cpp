@@ -37,7 +37,7 @@ void ProcessNewAttributes::process(Character * character, ArgumentHandler & args
         // Create a shared pointer to the previous step.
         std::shared_ptr<ProcessNewRace> newStep = std::make_shared<ProcessNewRace>();
         // Set the handler.
-        player->inputHandler = newStep;
+        player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->rollBack(character);
     }
@@ -56,7 +56,7 @@ void ProcessNewAttributes::process(Character * character, ArgumentHandler & args
         // Create a shared pointer to the next step.
         std::shared_ptr<ProcessNewGender> newStep = std::make_shared<ProcessNewGender>();
         // Set the handler.
-        player->inputHandler = newStep;
+        player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->advance(character);
     }

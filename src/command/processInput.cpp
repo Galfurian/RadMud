@@ -1,4 +1,4 @@
-/// @file   InputHandler.cpp
+/// @file   ProcessInput.cpp
 /// @author Enrico Fraccaroli
 /// @date   Nov 14, 2016
 /// @copyright
@@ -19,23 +19,23 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "inputHandler.hpp"
+#include "processInput.hpp"
 #include "character.hpp"
 #include "crafting.hpp"
 #include "general.hpp"
 #include "mud.hpp"
 
-InputHandler::InputHandler()
+ProcessInput::ProcessInput()
 {
     // Nothing to do.
 }
 
-InputHandler::~InputHandler()
+ProcessInput::~ProcessInput()
 {
     // Nothing to do.
 }
 
-void InputHandler::process(Character * character, ArgumentHandler & args)
+void ProcessInput::process(Character * character, ArgumentHandler & args)
 {
     if (args.empty())
     {

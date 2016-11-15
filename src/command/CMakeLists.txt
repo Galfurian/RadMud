@@ -20,9 +20,9 @@ set(RADMUD_COMMAND_SRC
         ./src/command/general.cpp
         ./src/command/god.cpp
         ./src/command/object.cpp
-        ./src/command/inputHandler.cpp
+        ./src/command/processInput.cpp
         ./src/command/processTelnetCommand.cpp
-        ./src/command/creation/creationStep.cpp
+        ./src/command/creation/processInitialization.cpp
         ./src/command/creation/processNewAge.cpp
         ./src/command/creation/processNewAttributes.cpp
         ./src/command/creation/processNewConfirm.cpp

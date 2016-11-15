@@ -35,7 +35,7 @@ void ProcessNewWeight::process(Character * character, ArgumentHandler & args)
         // Create a shared pointer to the previous step.
         std::shared_ptr<ProcessNewDescription> newStep = std::make_shared<ProcessNewDescription>();
         // Set the handler.
-        player->inputHandler = newStep;
+        player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->rollBack(character);
     }
@@ -60,7 +60,7 @@ void ProcessNewWeight::process(Character * character, ArgumentHandler & args)
             // Create a shared pointer to the next step.
             std::shared_ptr<ProcessNewConfirm> newStep = std::make_shared<ProcessNewConfirm>();
             // Set the handler.
-            player->inputHandler = newStep;
+            player->inputProcessor = newStep;
             // Advance to the next step.
             newStep->advance(character);
         }

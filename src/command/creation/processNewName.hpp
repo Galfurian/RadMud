@@ -19,11 +19,11 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "creationStep.hpp"
+#include "processInitialization.hpp"
 
 /// @brief Allows to choose the player name.
 class ProcessNewName :
-    public CreationStep
+    public ProcessInitialization
 {
 public:
     void process(Character * character, ArgumentHandler & args);

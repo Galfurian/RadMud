@@ -19,11 +19,11 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "creationStep.hpp"
+#include "processInitialization.hpp"
 
 /// @brief Asks to confirm the player creation.
 class ProcessNewConfirm :
-    public CreationStep
+    public ProcessInitialization
 {
 public:
     void process(Character * character, ArgumentHandler & args);

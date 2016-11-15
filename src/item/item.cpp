@@ -35,7 +35,6 @@
 #include "currencyItem.hpp"
 #include "meleeWeaponItem.hpp"
 #include "rangedWeaponItem.hpp"
-#include "magazineItem.hpp"
 
 Item::Item() :
     vnum(),

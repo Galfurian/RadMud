@@ -38,7 +38,7 @@ Player::Player(const int & _socket, const int & _port, const std::string & _addr
     rent_room(),
     skills(),
     remaining_points(),
-    inputHandler(std::make_shared<ProcessTelnetCommand>()),
+    inputProcessor(std::make_shared<ProcessTelnetCommand>()),
     password_attempts(),
     closing(),
     logged_in(),
@@ -363,7 +363,7 @@ void Player::processInput(Player * player, const std::string & command)
     try
     {
         ArgumentHandler argumentHandler(command);
-        inputHandler->process(player, argumentHandler);
+        inputProcessor->process(player, argumentHandler);
     }
     catch (std::runtime_error & e)
     {

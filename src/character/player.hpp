@@ -28,7 +28,7 @@
 #include <set>
 #include <string>
 
-#include "inputHandler.hpp"
+#include "processInput.hpp"
 #include "character.hpp"
 #include "skill.hpp"
 
@@ -68,7 +68,7 @@ public:
     /// Connection state.
     ConnectionState connectionState;
     /// The input handler.
-    std::shared_ptr<InputHandler> inputHandler;
+    std::shared_ptr<ProcessInput> inputProcessor;
     /// Password guessing attempts.
     int password_attempts;
     /// True if they are about to leave us.
