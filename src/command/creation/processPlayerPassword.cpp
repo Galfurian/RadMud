@@ -19,13 +19,13 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "creationStep.hpp"
+#include "processPlayerPassword.hpp"
 #include "player.hpp"
 #include "mud.hpp"
 
-void ProcessPlayerPassword(Character * character, ArgumentHandler & args)
+void ProcessPlayerPassword::process(Character * character, ArgumentHandler & args)
 {
-    Player * player = character->toPlayer();
+    auto player = character->toPlayer();
     auto input = args.getOriginal();
     // Check the correctness of the password.
     if (input != player->password)
@@ -39,14 +39,32 @@ void ProcessPlayerPassword(Character * character, ArgumentHandler & args)
         }
         else
         {
-            AdvanceCharacterCreation(
-                character,
-                ConnectionState::AwaitingPassword,
-                "Incorrect password.");
+            this->advance(character, "Incorrect password.");
         }
     }
     else
     {
-        AdvanceCharacterCreation(character, ConnectionState::Playing);
+        // Set the handler.
+        player->inputHandler = std::make_shared<InputHandler>();
+        // Retrieve the saved prompt.
+        player->prompt = player->prompt_save;
+        // Entered the MUD.
+        player->enterGame();
+        player->connectionState = ConnectionState::Playing;
     }
+}
+
+void ProcessPlayerPassword::advance(Character * character, const std::string & error)
+{
+    // Change the connection state to awaiting age.
+    character->toPlayer()->connectionState = ConnectionState::AwaitingPassword;
+    if (!error.empty())
+    {
+        character->sendMsg("# " + error + "\n");
+    }
+}
+
+void ProcessPlayerPassword::rollBack(Character *)
+{
+
 }

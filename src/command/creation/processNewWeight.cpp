@@ -19,44 +19,75 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "creationStep.hpp"
+#include "processNewWeight.hpp"
 #include "player.hpp"
 #include "mud.hpp"
+#include "processNewDescription.hpp"
+#include "processNewConfirm.hpp"
 
-void ProcessNewWeight(Character * character, ArgumentHandler & args)
+void ProcessNewWeight::process(Character * character, ArgumentHandler & args)
 {
-    Player * player = character->toPlayer();
+    auto player = character->toPlayer();
     auto input = args.getOriginal();
     // Check if the player has typed BACK.
     if (ToLower(input) == "back")
     {
-        RollbackCharacterCreation(player, ConnectionState::AwaitingNewDesc);
+        // Create a shared pointer to the previous step.
+        std::shared_ptr<ProcessNewDescription> newStep = std::make_shared<ProcessNewDescription>();
+        // Set the handler.
+        player->inputHandler = newStep;
+        // Advance to the next step.
+        newStep->rollBack(character);
     }
     else if (!IsNumber(input))
     {
-        AdvanceCharacterCreation(
-            character,
-            ConnectionState::AwaitingNewWeight,
-            "Not a valid weight.");
+        this->advance(character, "Not a valid weight.");
     }
     else
     {
         int weight = ToNumber<int>(input);
         if (weight < 40)
         {
-            AdvanceCharacterCreation(
-                character,
-                ConnectionState::AwaitingNewWeight,
-                "You can't be a feather.");
+            this->advance(character, "You can't be a feather.");
         }
         else if (weight > 120)
         {
-            AdvanceCharacterCreation(character, ConnectionState::AwaitingNewWeight, "Too much.");
+            this->advance(character, "Too much.");
         }
         else
         {
             player->weight = static_cast<unsigned int>(weight);
-            AdvanceCharacterCreation(player, ConnectionState::AwaitingNewConfirm);
+            // Create a shared pointer to the next step.
+            std::shared_ptr<ProcessNewConfirm> newStep = std::make_shared<ProcessNewConfirm>();
+            // Set the handler.
+            player->inputHandler = newStep;
+            // Advance to the next step.
+            newStep->advance(character);
         }
     }
+}
+
+void ProcessNewWeight::advance(Character * character, const std::string & error)
+{
+    // Change the connection state to awaiting age.
+    character->toPlayer()->connectionState = ConnectionState::AwaitingNewWeight;
+    // Print the choices.
+    this->printChices(character);
+    std::string msg;
+    msg += "# " + Formatter::bold() + "Character's Weight." + Formatter::reset() + "\n";
+    msg += "# Choose the wheight of your character.\n";
+    msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset()
+           + "] to return to the previus step.\n";
+    character->sendMsg(msg);
+    if (!error.empty())
+    {
+        character->sendMsg("# " + error + "\n");
+    }
+}
+
+void ProcessNewWeight::rollBack(Character * character)
+{
+    auto player = character->toPlayer();
+    player->weight = 0;
+    this->advance(character);
 }

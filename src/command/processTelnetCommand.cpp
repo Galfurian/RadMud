@@ -1,4 +1,4 @@
-/// @file   protocol.cpp
+/// @file   processTelnetCommand.cpp
 /// @brief  Implement the protocol negotiation functions.
 /// @author Enrico Fraccaroli
 /// @date   Jun 5 2016
@@ -20,14 +20,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
+#include "processTelnetCommand.hpp"
+#include "processPlayerName.hpp"
 #include "mud.hpp"
-#include "protocol.hpp"
-
-void LoadProtocolStates()
-{
-    Mud::instance().addStateAction(ConnectionState::NegotiatingMSDP, ProcessTelnetCommand);
-    Mud::instance().addStateAction(ConnectionState::NegotiatingMCCP, ProcessTelnetCommand);
-}
 
 bool ExtractCommand(
     const std::string & source,
@@ -67,7 +62,7 @@ void NegotiateProtocol(Character * character, const ConnectionState & nextState)
     // Cast the character to player.
     auto player = character->toPlayer();
     // Set its next state.
-    player->connection_state = nextState;
+    player->connectionState = nextState;
     if (nextState == ConnectionState::NegotiatingMSDP)
     {
         Logger::log(LogLevel::Debug, "Sending  : IAC WONT MSDP");
@@ -90,7 +85,7 @@ void NegotiateProtocol(Character * character, const ConnectionState & nextState)
     }
 }
 
-void ProcessTelnetCommand(Character * character, ArgumentHandler & args)
+void ProcessTelnetCommand::process(Character * character, ArgumentHandler & args)
 {
     // Cast the character to player.
     auto player = character->toPlayer();
@@ -138,12 +133,12 @@ void ProcessTelnetCommand(Character * character, ArgumentHandler & args)
         {
             if (!ExtractCommand(source, index, command, result))
             {
-                if (player->connection_state == ConnectionState::NegotiatingMSDP)
+                if (player->connectionState == ConnectionState::NegotiatingMSDP)
                 {
                     SetFlag(&player->connectionFlags, ConnectionFlag::UseMSDP);
                     Logger::log(LogLevel::Debug, "Positive acknowledgments for MSDP (%s).", result);
                 }
-                else if (player->connection_state == ConnectionState::NegotiatingMCCP)
+                else if (player->connectionState == ConnectionState::NegotiatingMCCP)
                 {
                     SetFlag(&player->connectionFlags, ConnectionFlag::UseMCCP);
                     Logger::log(LogLevel::Debug, "Positive acknowledgments for MCCP (%s).", result);
@@ -249,11 +244,15 @@ void ProcessTelnetCommand(Character * character, ArgumentHandler & args)
         }
         index++;
     }
-    if (player->connection_state == ConnectionState::NegotiatingMSDP)
+    if (player->connectionState == ConnectionState::NegotiatingMSDP)
     {
         // Activate the procedure of negotiation.
         NegotiateProtocol(character, ConnectionState::NegotiatingMCCP);
     }
-    // Activate the procedure of login
-    AdvanceCharacterCreation(character, ConnectionState::AwaitingName);
+    // Create a shared pointer to the next step.
+    std::shared_ptr<ProcessPlayerName> newStep = std::make_shared<ProcessPlayerName>();
+    // Set the handler.
+    player->inputHandler = newStep;
+    // Advance to the next step.
+    newStep->advance(character);
 }

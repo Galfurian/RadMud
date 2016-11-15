@@ -19,24 +19,28 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "creationStep.hpp"
+#include "processNewAttributes.hpp"
 #include "player.hpp"
 #include "mud.hpp"
+#include "processNewRace.hpp"
+#include "processNewGender.hpp"
 
-void ProcessNewAttributes(Character * character, ArgumentHandler & args)
+void ProcessNewAttributes::process(Character * character, ArgumentHandler & args)
 {
-    Player * player = character->toPlayer();
-    // Player_password can't be blank.
+    auto player = character->toPlayer();
     if ((args.size() != 1) && (args.size() != 2))
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAttr, "Invalid input.");
+        this->advance(character, "Invalid input.");
     }
-        // Check if the player has typed BACK.
     else if (ToLower(args[0].getContent()) == "back")
     {
-        RollbackCharacterCreation(player, ConnectionState::AwaitingNewRace);
+        // Create a shared pointer to the previous step.
+        std::shared_ptr<ProcessNewRace> newStep = std::make_shared<ProcessNewRace>();
+        // Set the handler.
+        player->inputHandler = newStep;
+        // Advance to the next step.
+        newStep->rollBack(character);
     }
-        // Check if the player has not yet typed RESET.
     else if (ToLower(args[0].getContent()) == "reset")
     {
         player->remaining_points = 0;
@@ -45,17 +49,17 @@ void ProcessNewAttributes(Character * character, ArgumentHandler & args)
         player->setAbility(Ability::Perception, player->race->getAbility(Ability::Perception));
         player->setAbility(Ability::Constitution, player->race->getAbility(Ability::Constitution));
         player->setAbility(Ability::Intelligence, player->race->getAbility(Ability::Intelligence));
-        AdvanceCharacterCreation(
-            character,
-            ConnectionState::AwaitingNewAttr,
-            Formatter::cyan() + "Attribute has been set by default." + Formatter::reset() + "\n");
+        this->advance(character, Formatter::cyan() + "Attribute has been set by default." + Formatter::reset() + "\n");
     }
-        // If the player has insert help (attribute number), show its help.
     else if (BeginWith(ToLower(args[0].getContent()), "continue"))
     {
-        AdvanceCharacterCreation(player, ConnectionState::AwaitingNewGender);
+        // Create a shared pointer to the next step.
+        std::shared_ptr<ProcessNewGender> newStep = std::make_shared<ProcessNewGender>();
+        // Set the handler.
+        player->inputHandler = newStep;
+        // Advance to the next step.
+        newStep->advance(character);
     }
-        // If the player has insert help (attribute number), show its help.
     else if (BeginWith(ToLower(args[0].getContent()), "help"))
     {
         if (args.size() == 2)
@@ -65,16 +69,14 @@ void ProcessNewAttributes(Character * character, ArgumentHandler & args)
             {
                 helpMessage = "Help about Strength.\n" + Formatter::italic();
                 helpMessage += "Strength is important for increasing the Carrying Weight and ";
-                helpMessage +=
-                    "satisfying the minimum Strength requirements for some weapons and armors.";
+                helpMessage += "satisfying the minimum Strength requirements for some weapons and armors.";
                 helpMessage += Formatter::reset() + "\n";
             }
             else if (args[1].getContent() == "2")
             {
                 helpMessage = "Help about Agility.\n" + Formatter::italic();
                 helpMessage += "Besides increasing mobility in combat, it increases the recharge ";
-                helpMessage +=
-                    "speed of all the weapons, as well as the ability to use light armor.";
+                helpMessage += "speed of all the weapons, as well as the ability to use light armor.";
                 helpMessage += Formatter::reset() + "\n";
             }
             else if (args[1].getContent() == "3")
@@ -102,14 +104,11 @@ void ProcessNewAttributes(Character * character, ArgumentHandler & args)
             {
                 helpMessage = "No help for that attribute.";
             }
-            AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAttr, helpMessage);
+            this->advance(character, helpMessage);
         }
         else
         {
-            AdvanceCharacterCreation(
-                character,
-                ConnectionState::AwaitingNewAttr,
-                "You have to specify the attribute number.");
+            this->advance(character, "You have to specify the attribute number.");
         }
     }
     else
@@ -125,8 +124,7 @@ void ProcessNewAttributes(Character * character, ArgumentHandler & args)
             }
             else if (args[0].getContent() == "1")
             {
-                int result = static_cast<int>(player->getAbility(Ability::Strength, false))
-                             + modifier;
+                int result = static_cast<int>(player->getAbility(Ability::Strength, false)) + modifier;
                 int upperBound = static_cast<int>(player->race->getAbility(Ability::Strength)) + 5;
                 int lowerBound = static_cast<int>(player->race->getAbility(Ability::Strength)) - 5;
                 if (lowerBound < 0)
@@ -149,8 +147,7 @@ void ProcessNewAttributes(Character * character, ArgumentHandler & args)
             }
             else if (args[0].getContent() == "2")
             {
-                int result = static_cast<int>(player->getAbility(Ability::Agility, false))
-                             + modifier;
+                int result = static_cast<int>(player->getAbility(Ability::Agility, false)) + modifier;
                 int upperBound = static_cast<int>(player->race->getAbility(Ability::Agility)) + 5;
                 int lowerBound = static_cast<int>(player->race->getAbility(Ability::Agility)) - 5;
                 if (lowerBound < 0)
@@ -173,12 +170,9 @@ void ProcessNewAttributes(Character * character, ArgumentHandler & args)
             }
             else if (args[0].getContent() == "3")
             {
-                int result = static_cast<int>(player->getAbility(Ability::Perception, false))
-                             + modifier;
-                int upperBound = static_cast<int>(player->race->getAbility(Ability::Perception))
-                                 + 5;
-                int lowerBound = static_cast<int>(player->race->getAbility(Ability::Perception))
-                                 - 5;
+                int result = static_cast<int>(player->getAbility(Ability::Perception, false)) + modifier;
+                int upperBound = static_cast<int>(player->race->getAbility(Ability::Perception)) + 5;
+                int lowerBound = static_cast<int>(player->race->getAbility(Ability::Perception)) - 5;
                 if (lowerBound < 0)
                 {
                     lowerBound = 0;
@@ -199,12 +193,9 @@ void ProcessNewAttributes(Character * character, ArgumentHandler & args)
             }
             else if (args[0].getContent() == "4")
             {
-                int result = static_cast<int>(player->getAbility(Ability::Constitution, false))
-                             + modifier;
-                int upperBound = static_cast<int>(player->race->getAbility(Ability::Constitution))
-                                 + 5;
-                int lowerBound = static_cast<int>(player->race->getAbility(Ability::Constitution))
-                                 - 5;
+                int result = static_cast<int>(player->getAbility(Ability::Constitution, false)) + modifier;
+                int upperBound = static_cast<int>(player->race->getAbility(Ability::Constitution)) + 5;
+                int lowerBound = static_cast<int>(player->race->getAbility(Ability::Constitution)) - 5;
                 if (lowerBound < 0)
                 {
                     lowerBound = 0;
@@ -225,12 +216,9 @@ void ProcessNewAttributes(Character * character, ArgumentHandler & args)
             }
             else if (args[0].getContent() == "5")
             {
-                int result = static_cast<int>(player->getAbility(Ability::Intelligence, false))
-                             + modifier;
-                int upperBound = static_cast<int>(player->race->getAbility(Ability::Intelligence))
-                                 + 5;
-                int lowerBound = static_cast<int>(player->race->getAbility(Ability::Intelligence))
-                                 - 5;
+                int result = static_cast<int>(player->getAbility(Ability::Intelligence, false)) + modifier;
+                int upperBound = static_cast<int>(player->race->getAbility(Ability::Intelligence)) + 5;
+                int lowerBound = static_cast<int>(player->race->getAbility(Ability::Intelligence)) - 5;
                 if (lowerBound < 0)
                 {
                     lowerBound = 0;
@@ -253,14 +241,57 @@ void ProcessNewAttributes(Character * character, ArgumentHandler & args)
             {
                 helpMessage = "Must select a valid attribute.";
             }
-            AdvanceCharacterCreation(character, ConnectionState::AwaitingNewAttr, helpMessage);
+            this->advance(character);
         }
         else
         {
-            AdvanceCharacterCreation(
-                character,
-                ConnectionState::AwaitingNewAttr,
-                "Type [#attribute +/-(value)].");
+            this->advance(character, "Type [#attribute +/-(value)].");
         }
     }
+}
+
+void ProcessNewAttributes::advance(Character * character, const std::string & error)
+{
+    // Transform the character into player.
+    auto player = character->toPlayer();
+    // Change the connection state to awaiting age.
+    player->connectionState = ConnectionState::AwaitingNewAttr;
+    // Print the choices.
+    this->printChices(character);
+    std::string msg;
+    msg += "# " + Formatter::bold() + "Character's Attributes." + Formatter::reset() + "\n";
+    msg += "#    [1] Strength     :" + ToString(player->getAbility(Ability::Strength, false)) + "\n";
+    msg += "#    [2] Agility      :" + ToString(player->getAbility(Ability::Agility, false)) + "\n";
+    msg += "#    [3] Perception   :" + ToString(player->getAbility(Ability::Perception, false)) + "\n";
+    msg += "#    [4] Constitution :" + ToString(player->getAbility(Ability::Constitution, false)) + "\n";
+    msg += "#    [5] Intelligence :" + ToString(player->getAbility(Ability::Intelligence, false)) + "\n";
+    msg += "#\n";
+    msg += "# Remaining Points: " + Formatter::green() + ToString(player->remaining_points) + Formatter::reset() + "\n";
+    msg += "#\n";
+    msg += "# Type [" + Formatter::magenta() + "(number) +/-modifier" + Formatter::reset() + "]";
+    msg += " to decrease or increase the value of an attribute.\n";
+    msg += "# Type [" + Formatter::magenta() + "help (number)" + Formatter::reset() + "]";
+    msg += " to read a brief description of the attribute.\n";
+    msg += "# Type [" + Formatter::magenta() + "reset" + Formatter::reset() + "]";
+    msg += " to reset the values as default.\n";
+    msg += "# Type [" + Formatter::magenta() + "continue" + Formatter::reset() + "]";
+    msg += " to continue character creation.\n";
+    msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset() + "]";
+    msg += " to return to the previus step.\n";
+    character->sendMsg(msg);
+    if (!error.empty())
+    {
+        character->sendMsg("# " + error + "\n");
+    }
+}
+
+void ProcessNewAttributes::rollBack(Character * character)
+{
+    auto player = character->toPlayer();
+    player->setAbility(Ability::Strength, player->race->getAbility(Ability::Strength));
+    player->setAbility(Ability::Agility, player->race->getAbility(Ability::Agility));
+    player->setAbility(Ability::Perception, player->race->getAbility(Ability::Perception));
+    player->setAbility(Ability::Constitution, player->race->getAbility(Ability::Constitution));
+    player->setAbility(Ability::Intelligence, player->race->getAbility(Ability::Intelligence));
+    this->advance(character);
 }

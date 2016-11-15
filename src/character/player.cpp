@@ -20,10 +20,8 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-// Basic Include.
 #include "player.hpp"
-
-// Other Include.
+#include "processTelnetCommand.hpp"
 #include "mud.hpp"
 
 Player::Player(const int & _socket, const int & _port, const std::string & _address) :
@@ -40,7 +38,7 @@ Player::Player(const int & _socket, const int & _port, const std::string & _addr
     rent_room(),
     skills(),
     remaining_points(),
-    connection_state(ConnectionState::NoState),
+    inputHandler(std::make_shared<ProcessTelnetCommand>()),
     password_attempts(),
     closing(),
     logged_in(),
@@ -93,7 +91,7 @@ bool Player::check() const
     safe &= CorrectAssert(!prompt.empty());
     safe &= CorrectAssert(!prompt_save.empty());
     safe &= CorrectAssert(rent_room >= 0);
-    safe &= CorrectAssert(connection_state != ConnectionState::NoState);
+    safe &= CorrectAssert(connectionState != ConnectionState::NoState);
     //safe &= CorrectAssert(!skills.empty());
     //safe &= CorrectAssert(skills.size() == Mud::instance().mudSkills.size());
     for (auto iterator : Mud::instance().mudSkills)
@@ -224,7 +222,7 @@ void Player::closeConnection()
 
 bool Player::isPlaying() const
 {
-    return checkConnection() && (connection_state == ConnectionState::Playing) && (!closing)
+    return checkConnection() && (connectionState == ConnectionState::Playing) && (!closing)
            && logged_in;
 }
 
@@ -362,11 +360,10 @@ void Player::enterGame()
 
 void Player::processInput(Player * player, const std::string & command)
 {
-    ActionHandler _action = Mud::instance().findStateAction(player->connection_state);
     try
     {
         ArgumentHandler argumentHandler(command);
-        _action(player, argumentHandler);
+        inputHandler->process(player, argumentHandler);
     }
     catch (std::runtime_error & e)
     {

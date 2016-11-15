@@ -1,4 +1,4 @@
-/// @file   processNewAge.hpp
+/// @file   processNewPassword.hpp
 /// @author Enrico Fraccaroli
 /// @date   Nov 14, 2016
 /// @copyright
@@ -20,9 +20,11 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "creationStep.hpp"
+#include "player.hpp"
+#include "mud.hpp"
 
-/// @brief Allows to choose the age of a player.
-class ProcessNewAge :
+/// @brief Allows to choose the player password.
+class ProcessNewPassword :
     public CreationStep
 {
 public:

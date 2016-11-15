@@ -19,52 +19,45 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "creationStep.hpp"
+#include "processPlayerName.hpp"
 #include "player.hpp"
 #include "mud.hpp"
+#include "processNewName.hpp"
+#include "processPlayerPassword.hpp"
 
-void ProcessPlayerName(Character * character, ArgumentHandler & args)
+void ProcessPlayerName::process(Character * character, ArgumentHandler & args)
 {
     auto player = character->toPlayer();
     auto input = args.getOriginal();
     // Name can't be blank.
     if (input.empty())
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingName, "Name cannot be blank.");
+        this->advance(character, "Name cannot be blank.");
     }
-        // Check if the player has typed new.
     else if (ToLower(input) == "new")
     {
-        AdvanceCharacterCreation(player, ConnectionState::AwaitingNewName);
+        // Create a shared pointer to the next step.
+        std::shared_ptr<ProcessNewName> newStep = std::make_shared<ProcessNewName>();
+        // Set the handler.
+        player->inputHandler = newStep;
+        // Advance to the next step.
+        newStep->advance(character);
     }
-        // Check if the user want to quit.
     else if (input == "quit")
     {
         player->closeConnection();
     }
-        // Check if the give name contains valid characters.
     else if (input.find_first_not_of(VALID_CHARACTERS_NAME) != std::string::npos)
     {
-        AdvanceCharacterCreation(
-            character,
-            ConnectionState::AwaitingName,
-            "That player name contains disallowed characters.");
+        this->advance(character, "That player name contains disallowed characters.");
     }
-        // Check if the player is already connected.
     else if (Mud::instance().findPlayer(input))
     {
-        AdvanceCharacterCreation(
-            character,
-            ConnectionState::AwaitingName,
-            input + " is already connected.");
+        this->advance(character, input + " is already connected.");
     }
-        // Check if the player exists in the Database.
     else if (!SQLiteDbms::instance().searchPlayer(ToCapitals(input)))
     {
-        AdvanceCharacterCreation(
-            character,
-            ConnectionState::AwaitingName,
-            "That player doesen't exist.");
+        this->advance(character, "That player doesen't exist.");
     }
     else
     {
@@ -78,11 +71,60 @@ void ProcessPlayerName(Character * character, ArgumentHandler & args)
             // Set to 0 the current password attempts.
             player->password_attempts = 0;
             player->sendMsg("Username is correct, now insert the password.\n");
-            AdvanceCharacterCreation(character, ConnectionState::AwaitingPassword);
+            // Create a shared pointer to the next step.
+            std::shared_ptr<ProcessPlayerPassword> newStep = std::make_shared<ProcessPlayerPassword>();
+            // Set the handler.
+            player->inputHandler = newStep;
+            // Advance to the next step.
+            newStep->advance(character);
         }
         else
         {
             player->closeConnection();
         }
     }
+}
+
+void ProcessPlayerName::advance(Character * character, const std::string & error)
+{
+    // Change the connection state to awaiting age.
+    character->toPlayer()->connectionState = ConnectionState::AwaitingName;
+    std::string msg;
+    msg += Formatter::clearScreen();
+    msg += "\nWelcome to RadMud!\n";
+    msg += Formatter::red();
+    msg += "#--------------------------------------------#\n";
+    msg += "                 XXXXXXXXXXXXX                \n";
+    msg += "      /'--_###XXXXXXXXXXXXXXXXXXX###_--'\\    \n";
+    msg += "      \\##/#/#XXXXXXXX /O\\ XXXXXXXX#\\'\\##/ \n";
+    msg += "       \\/#/#XXXXXXXXX \\O/ XXXXXXXXX#\\#\\/  \n";
+    msg += "        \\/##XXXXXXXXXX   XXXXXXXXXX##\\/     \n";
+    msg += "         ###XXXX  ''-.XXX.-''  XXXX###        \n";
+    msg += "           \\XXXX               XXXX/         \n";
+    msg += "             XXXXXXXXXXXXXXXXXXXXX            \n";
+    msg += "             XXXX XXXX X XXXX XXXX            \n";
+    msg += "             XXX # XXX X XXX # XXX            \n";
+    msg += "            /XXXX XXX XXX XXX XXXX\\          \n";
+    msg += "           ##XXXXXXX X   X XXXXXXX##          \n";
+    msg += "          ##   XOXXX X   X XXXOX   ##         \n";
+    msg += "          ##    #XXXX XXX XXX #    ##         \n";
+    msg += "           ##..##  XXXXXXXXX  ##..##          \n";
+    msg += "            ###      XXXXX     ####           \n";
+    msg += "#--------------------------------------------#\n";
+    msg += "| Created by : Enrico Fraccaroli.            |\n";
+    msg += "| Date       : 21 Agosto 2014                |\n";
+    msg += "#--------------------------------------------#\n";
+    msg += Formatter::reset();
+    msg += "# Enter your name, or type '" + Formatter::magenta() + "new" + Formatter::reset();
+    msg += "' in order to create a new character!\n";
+    character->sendMsg(msg);
+    if (!error.empty())
+    {
+        character->sendMsg("# " + error + "\n");
+    }
+}
+
+void ProcessPlayerName::rollBack(Character * character)
+{
+    this->advance(character);
 }

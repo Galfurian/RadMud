@@ -246,7 +246,7 @@ void DoQuit(Character * character, ArgumentHandler & /*args*/)
     StopAction(character);
     auto player = character->toPlayer();
     // If s/he finished connecting, tell others s/he has left.
-    if (player->connection_state == ConnectionState::Playing)
+    if (player->connectionState == ConnectionState::Playing)
     {
         // Say goodbye to player.
         player->sendMsg("See you next time!\n");

@@ -207,8 +207,6 @@ public:
     std::vector<Command> mudCommands;
     /// Mud possible directions.
     std::map<std::string, Direction> mudDirections;
-    /// Map of things to do for various connection states.
-    std::map<ConnectionState, ActionHandler> mudStateActions;
     /// Map of buildings schematic.
     std::map<int, Building> mudBuildings;
 
@@ -308,9 +306,6 @@ public:
     /// Add a direction to the mud.
     bool addDirection(std::string name, Direction direction);
 
-    /// Add a state action to the mud.
-    bool addStateAction(ConnectionState state, ActionHandler action);
-
     /// Add a building to the mud.
     bool addBuilding(Building & building);
     ///@}
@@ -381,9 +376,6 @@ public:
 
     /// Find the destination room of a travel point, given its starting room.
     Room * findTravelPoint(Room * room);
-
-    /// Find the action handler given a connection state.
-    ActionHandler & findStateAction(ConnectionState state);
 
     /// Find a building given its name.
     Building * findBuilding(std::string name);

@@ -19,20 +19,24 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "creationStep.hpp"
+#include "processNewConfirm.hpp"
 #include "player.hpp"
 #include "mud.hpp"
+#include "processNewWeight.hpp"
 
-void ProcessNewConfirm(Character * character, ArgumentHandler & args)
+void ProcessNewConfirm::process(Character * character, ArgumentHandler & args)
 {
-    Player * player = character->toPlayer();
+    auto player = character->toPlayer();
     auto input = args.getOriginal();
-    // Check if the player has typed BACK.
     if (ToLower(input) == "back")
     {
-        RollbackCharacterCreation(player, ConnectionState::AwaitingNewWeight);
+        // Create a shared pointer to the previous step.
+        std::shared_ptr<ProcessNewWeight> newStep = std::make_shared<ProcessNewWeight>();
+        // Set the handler.
+        player->inputHandler = newStep;
+        // Advance to the next step.
+        newStep->rollBack(character);
     }
-        // Check if the player has typed CONFIRM.
     else if (ToLower(input) == "confirm")
     {
         // Set the last variables.
@@ -43,7 +47,13 @@ void ProcessNewConfirm(Character * character, ArgumentHandler & args)
         SQLiteDbms::instance().beginTransaction();
         if (player->updateOnDB())
         {
-            AdvanceCharacterCreation(player, ConnectionState::Playing);
+            // Set the handler.
+            player->inputHandler = std::make_shared<InputHandler>();
+            // Retrieve the saved prompt.
+            player->prompt = player->prompt_save;
+            // Entered the MUD.
+            player->enterGame();
+            player->connectionState = ConnectionState::Playing;
         }
         else
         {
@@ -53,9 +63,32 @@ void ProcessNewConfirm(Character * character, ArgumentHandler & args)
     }
     else
     {
-        AdvanceCharacterCreation(
-            character,
-            ConnectionState::AwaitingNewConfirm,
-            "You must write 'confirm' if you agree.");
+        this->advance(character, "You must write 'confirm' if you agree.");
     }
+}
+
+void ProcessNewConfirm::advance(Character * character, const std::string & error)
+{
+    // Change the connection state to awaiting age.
+    character->toPlayer()->connectionState = ConnectionState::AwaitingNewConfirm;
+    // Print the choices.
+    this->printChices(character);
+    std::string msg;
+    msg += "# Give a look to the information you have provided, now it's the right time";
+    msg += " to decide if you want to change something.\n";
+    msg += "# Type [" + Formatter::magenta() + "confirm" + Formatter::reset()
+           + "] to conclude the character creation.\n";
+    msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset()
+           + "]    to return to the previus step.\n";
+    msg += Formatter::green() + "Do you confirm? " + Formatter::reset() + "\n";
+    character->sendMsg(msg);
+    if (!error.empty())
+    {
+        character->sendMsg("# " + error + "\n");
+    }
+}
+
+void ProcessNewConfirm::rollBack(Character *)
+{
+
 }

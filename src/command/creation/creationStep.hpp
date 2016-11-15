@@ -21,63 +21,33 @@
 
 #pragma once
 
-#include "character.hpp"
-#include "command.hpp"
+#include "inputHandler.hpp"
 
 /// Player names must consist of characters from this list.
 #define  VALID_CHARACTERS_NAME "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-"
 /// Player descriptions must consist of characters from this list.
 #define  VALID_CHARACTERS_DESC "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ,.\n"
 
-class CreationStep
+class CreationStep :
+    public InputHandler
 {
 public:
-    static void printChices(Character * character);
+    /// @brief Constructor.
+    CreationStep();
 
-    static void process(Character * character, ArgumentHandler & args) = delete;
+    /// @brief Destructor.
+    virtual ~CreationStep();
 
-    static void advance(Character * character, const std::string & error = std::string()) = delete;
+    /// @brief Print the values inserted until now.
+    /// @param character The player whose creating a new character.
+    void printChices(Character * character);
 
-    static void rollBack(Character * character) = delete;
+    /// @brief Print the advancement in the character creation.
+    /// @param character The player whose creating a new character.
+    /// @param error     An optional message used only during error handling.
+    virtual void advance(Character * character, const std::string & error = std::string()) = 0;
+
+    /// @brief Reset the informations inserted in the previous state.
+    /// @param character The player whose creating a new character.
+    virtual void rollBack(Character * character) = 0;
 };
-
-/// @defgroup ProcessStates Player state processing.
-/// @brief All the functions necessary to process players commands, from creation to gameplay.
-/// @{
-
-/// Check player name.
-void ProcessPlayerName(Character * character, ArgumentHandler & args);
-
-/// Check if the player password is correct.
-void ProcessPlayerPassword(Character * character, ArgumentHandler & args);
-
-/// Step 1  - Choose the Name.
-void ProcessNewName(Character * character, ArgumentHandler & args);
-
-/// Step 2  - Choose the Password.
-void ProcessNewPassword(Character * character, ArgumentHandler & args);
-
-/// Step 3  - Confirm the Password.
-void ProcessNewPasswordConfirm(Character * character, ArgumentHandler & args);
-
-/// Step 4  - Short story of the mud world.
-void ProcessNewStory(Character * character, ArgumentHandler & args);
-
-/// Step 5  - Choose the Race.
-void ProcessNewRace(Character * character, ArgumentHandler & args);
-
-/// Step 6  - Choose the Attributes.
-void ProcessNewAttributes(Character * character, ArgumentHandler & args);
-
-/// Step 7  - Choose the Gender.
-void ProcessNewGender(Character * character, ArgumentHandler & args);
-
-/// Step 9  - Choose the description (optional).
-void ProcessNewDescription(Character * character, ArgumentHandler & args);
-
-/// Step 10 - Choose the Weight.
-void ProcessNewWeight(Character * character, ArgumentHandler & args);
-
-/// Step 11 - Confirm the character.
-void ProcessNewConfirm(Character * character, ArgumentHandler & args);
-///@}

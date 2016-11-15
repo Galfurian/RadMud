@@ -19,43 +19,80 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "creationStep.hpp"
+#include "processNewDescription.hpp"
 #include "player.hpp"
 #include "mud.hpp"
-
 #include "processNewAge.hpp"
+#include "processNewWeight.hpp"
 
-void ProcessNewDescription(Character * character, ArgumentHandler & args)
+void ProcessNewDescription::process(Character * character, ArgumentHandler & args)
 {
     auto player = character->toPlayer();
     auto input = args.getOriginal();
     // Player_password can't be blank.
     if (input.empty())
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewDesc, "Invalid input.");
+        this->advance(character, "Invalid input.");
     }
     else if (ToLower(input) == "back")
     {
-        // Check if the player has typed BACK.
-        ProcessNewAge::rollBack(character);
+        // Create a shared pointer to the previous step.
+        std::shared_ptr<ProcessNewAge> newStep = std::make_shared<ProcessNewAge>();
+        // Set the handler.
+        player->inputHandler = newStep;
+        // Advance to the next step.
+        newStep->rollBack(character);
     }
     else if (ToLower(input) == "skip")
     {
         // Check if the player has typed SKIP.
         player->description = "You see " + ToLower(player->name) + " here.";
-        AdvanceCharacterCreation(player, ConnectionState::AwaitingNewWeight);
+        // Create a shared pointer to the next step.
+        std::shared_ptr<ProcessNewWeight> newStep = std::make_shared<ProcessNewWeight>();
+        // Set the handler.
+        player->inputHandler = newStep;
+        // Advance to the next step.
+        newStep->advance(character);
     }
-        // Check if the description contains bad characters.
     else if (input.find_first_not_of(VALID_CHARACTERS_DESC) != std::string::npos)
     {
-        AdvanceCharacterCreation(
-            character,
-            ConnectionState::AwaitingNewDesc,
-            "Description cannot contain disallowed characters.");
+        this->advance(character, "Description cannot contain disallowed characters.");
     }
     else
     {
         player->description = input;
-        AdvanceCharacterCreation(player, ConnectionState::AwaitingNewWeight);
+        // Create a shared pointer to the next step.
+        std::shared_ptr<ProcessNewWeight> newStep = std::make_shared<ProcessNewWeight>();
+        // Set the handler.
+        player->inputHandler = newStep;
+        // Advance to the next step.
+        newStep->advance(character);
     }
+}
+
+void ProcessNewDescription::advance(Character * character, const std::string & error)
+{
+    // Change the connection state to awaiting age.
+    character->toPlayer()->connectionState = ConnectionState::AwaitingNewDesc;
+    // Print the choices.
+    this->printChices(character);
+    std::string msg;
+    msg += "# " + Formatter::bold() + "Character's Description." + Formatter::reset() + "\n";
+    msg += "# Insert a brief description of your character, its optional.\n";
+    msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset()
+           + "] to return to the previus step.\n";
+    msg += "# Type [" + Formatter::magenta() + "skip" + Formatter::reset()
+           + "] to just pass to the next step.\n";
+    character->sendMsg(msg);
+    if (!error.empty())
+    {
+        character->sendMsg("# " + error + "\n");
+    }
+}
+
+void ProcessNewDescription::rollBack(Character * character)
+{
+    auto player = character->toPlayer();
+    player->description = "";
+    this->advance(character);
 }

@@ -19,35 +19,65 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "creationStep.hpp"
-#include "player.hpp"
-#include "mud.hpp"
+#include "processNewPassword.hpp"
+#include "processNewName.hpp"
+#include "processNewPasswordConfirm.hpp"
 
-void ProcessNewPassword(Character * character, ArgumentHandler & args)
+void ProcessNewPassword::process(Character * character, ArgumentHandler & args)
 {
-    Player * player = character->toPlayer();
+    auto player = character->toPlayer();
     auto input = args.getOriginal();
     // Player_password can't be blank.
     if (input.empty())
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewPwd, "Invalid input.");
+        this->advance(character, "Invalid input.");
     }
-        // Check if the player has typed BACK.
     else if (ToLower(input) == "back")
     {
-        RollbackCharacterCreation(player, ConnectionState::AwaitingNewName);
+        // Create a shared pointer to the previous step.
+        std::shared_ptr<ProcessNewName> newStep = std::make_shared<ProcessNewName>();
+        // Set the handler.
+        player->inputHandler = newStep;
+        // Advance to the next step.
+        newStep->rollBack(character);
     }
-        // Check if the player has given bad characters.
     else if (input.find_first_not_of(VALID_CHARACTERS_NAME) != std::string::npos)
     {
-        AdvanceCharacterCreation(
-            character,
-            ConnectionState::AwaitingNewPwd,
-            "Password cannot contain disallowed characters.");
+        this->advance(character, "Password cannot contain disallowed characters.");
     }
     else
     {
         player->password = input;
-        AdvanceCharacterCreation(player, ConnectionState::AwaitingNewPwdCon);
+        // Create a shared pointer to the next step.
+        std::shared_ptr<ProcessNewPasswordConfirm> newStep = std::make_shared<ProcessNewPasswordConfirm>();
+        // Set the handler.
+        player->inputHandler = newStep;
+        // Advance to the next step.
+        newStep->advance(character);
     }
+}
+
+void ProcessNewPassword::advance(Character * character, const std::string & error)
+{
+    // Change the connection state to awaiting age.
+    character->toPlayer()->connectionState = ConnectionState::AwaitingNewPwd;
+    // Print the choices.
+    this->printChices(character);
+    std::string msg;
+    msg += "# " + Formatter::bold() + "Character's Password." + Formatter::reset() + "\n";
+    msg += "# Choose a proper password, in order to protect the acces to your character.\n";
+    msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset()
+           + "] to return to the previus step.\n";
+    character->sendMsg(msg);
+    if (!error.empty())
+    {
+        character->sendMsg("# " + error + "\n");
+    }
+}
+
+void ProcessNewPassword::rollBack(Character * character)
+{
+    auto player = character->toPlayer();
+    player->password = "";
+    this->advance(character);
 }

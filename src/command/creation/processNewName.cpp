@@ -19,47 +19,43 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "creationStep.hpp"
+#include "processNewName.hpp"
 #include "player.hpp"
 #include "mud.hpp"
+#include "processPlayerName.hpp"
+#include "processNewPassword.hpp"
 
-void ProcessNewName(Character * character, ArgumentHandler & args)
+void ProcessNewName::process(Character * character, ArgumentHandler & args)
 {
-    Player * player = character->toPlayer();
+    auto player = character->toPlayer();
     auto input = args.getOriginal();
     // Player_password can't be blank.
     if (input.empty())
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewName, "Invalid input.");
+        this->advance(character, "Invalid input.");
     }
-        // Check if the player has typed BACK.
     else if (ToLower(input) == "back")
     {
-        RollbackCharacterCreation(player, ConnectionState::AwaitingName);
+        // Create a shared pointer to the previous step.
+        std::shared_ptr<ProcessPlayerName> newStep = std::make_shared<ProcessPlayerName>();
+        // Set the handler.
+        player->inputHandler = newStep;
+        // Advance to the next step.
+        newStep->rollBack(character);
     }
-        // Check if the player has given bad characters.
     else if (input.find_first_not_of(VALID_CHARACTERS_NAME) != std::string::npos)
     {
-        AdvanceCharacterCreation(
-            character,
-            ConnectionState::AwaitingNewName,
-            "That player name contains disallowed characters.");
+        this->advance(character, "That player name contains disallowed characters.");
     }
         // Check for bad names here.
     else if (Mud::instance().badNames.find(input) != Mud::instance().badNames.end())
     {
-        AdvanceCharacterCreation(
-            character,
-            ConnectionState::AwaitingNewName,
-            "That name is not permitted.");
+        this->advance(character, "That name is not permitted.");
     }
         // Check if the player name has already been used.
     else if (SQLiteDbms::instance().searchPlayer(ToCapitals(input)))
     {
-        AdvanceCharacterCreation(
-            character,
-            ConnectionState::AwaitingNewName,
-            "That player already exists, please choose another name.");
+        this->advance(character, "That player already exists, please choose another name.");
     }
     else
     {
@@ -73,6 +69,38 @@ void ProcessNewName(Character * character, ArgumentHandler & args)
         player->faction = Mud::instance().findFaction(1);
         player->prompt_save = "[" + player->name + "]";
         player->password_attempts = 0;
-        AdvanceCharacterCreation(player, ConnectionState::AwaitingNewPwd);
+        // Create a shared pointer to the next step.
+        std::shared_ptr<ProcessNewPassword> newStep = std::make_shared<ProcessNewPassword>();
+        // Set the handler.
+        player->inputHandler = newStep;
+        // Advance to the next step.
+        newStep->advance(character);
     }
+}
+
+void ProcessNewName::advance(Character * character, const std::string & error)
+{
+    // Change the connection state to awaiting age.
+    character->toPlayer()->connectionState = ConnectionState::AwaitingNewName;
+    // Print the choices.
+    this->printChices(character);
+    std::string msg;
+    msg += "# " + Formatter::bold() + "Character's Name." + Formatter::reset() + "\n";
+    msg += "# Choose carefully, because this it's the only chance you have";
+    msg +=
+        " to pick a legendary name, maybe one day it will be whispered all over the lands.\n";
+    msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset()
+           + "] to return to the login.\n";
+    character->sendMsg(msg);
+    if (!error.empty())
+    {
+        character->sendMsg("# " + error + "\n");
+    }
+}
+
+void ProcessNewName::rollBack(Character * character)
+{
+    auto player = character->toPlayer();
+    player->name = "";
+    this->advance(character);
 }

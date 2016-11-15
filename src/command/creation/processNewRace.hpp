@@ -1,4 +1,4 @@
-/// @file   processNewAge.hpp
+/// @file   processNewRace.hpp
 /// @author Enrico Fraccaroli
 /// @date   Nov 14, 2016
 /// @copyright
@@ -21,8 +21,8 @@
 
 #include "creationStep.hpp"
 
-/// @brief Allows to choose the age of a player.
-class ProcessNewAge :
+/// @brief Allows to choose the player race.
+class ProcessNewRace :
     public CreationStep
 {
 public:

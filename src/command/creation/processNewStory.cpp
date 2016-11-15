@@ -19,34 +19,66 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "creationStep.hpp"
-#include "player.hpp"
-#include "mud.hpp"
+#include "processNewStory.hpp"
+#include "processNewPassword.hpp"
+#include "processNewRace.hpp"
 
-void ProcessNewStory(Character * character, ArgumentHandler & args)
+void ProcessNewStory::process(Character * character, ArgumentHandler & args)
 {
-    Player * player = character->toPlayer();
+    auto player = character->toPlayer();
     auto input = args.getOriginal();
     // Player_password can't be blank.
     if (input.empty())
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewStory, "Invalid input.");
+        this->advance(character, "Invalid input.");
     }
-        // Check if the player has typed BACK.
     else if (ToLower(input) == "back")
     {
-        RollbackCharacterCreation(player, ConnectionState::AwaitingNewPwd);
+        // Create a shared pointer to the previous step.
+        std::shared_ptr<ProcessNewPassword> newStep = std::make_shared<ProcessNewPassword>();
+        // Set the handler.
+        player->inputHandler = newStep;
+        // Advance to the next step.
+        newStep->rollBack(character);
     }
-        // Check if the player has written 'continue' or NOT.
     else if (input != "continue")
     {
-        AdvanceCharacterCreation(
-            character,
-            ConnectionState::AwaitingNewStory,
-            "Write 'continue' after you have readed the story.");
+        this->advance(character, "Write 'continue' after you have readed the story.");
     }
     else
     {
-        AdvanceCharacterCreation(player, ConnectionState::AwaitingNewRace);
+        // Create a shared pointer to the next step.
+        std::shared_ptr<ProcessNewRace> newStep = std::make_shared<ProcessNewRace>();
+        // Set the handler.
+        player->inputHandler = newStep;
+        // Advance to the next step.
+        newStep->advance(character);
     }
+}
+
+void ProcessNewStory::advance(Character * character, const std::string & error)
+{
+    // Change the connection state to awaiting age.
+    character->toPlayer()->connectionState = ConnectionState::AwaitingNewStory;
+    // Print the choices.
+    this->printChices(character);
+    std::string msg;
+    msg += "# The story of the Wasteland.\n";
+    msg += "#\n";
+    msg += "Year 374\n";
+    msg += "#\n";
+    msg += "# Type [" + Formatter::magenta() + "continue" + Formatter::reset()
+           + "] to continue character creation.\n";
+    msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset()
+           + "] to return to the previus step.\n";
+    character->sendMsg(msg);
+    if (!error.empty())
+    {
+        character->sendMsg("# " + error + "\n");
+    }
+}
+
+void ProcessNewStory::rollBack(Character * character)
+{
+    this->advance(character);
 }

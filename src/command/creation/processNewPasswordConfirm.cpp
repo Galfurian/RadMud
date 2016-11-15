@@ -19,29 +19,57 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "creationStep.hpp"
-#include "player.hpp"
-#include "mud.hpp"
+#include "processNewPasswordConfirm.hpp"
+#include "processNewPassword.hpp"
+#include "processNewStory.hpp"
 
-void ProcessNewPasswordConfirm(Character * character, ArgumentHandler & args)
+void ProcessNewPasswordConfirm::process(Character * character, ArgumentHandler & args)
 {
-    Player * player = character->toPlayer();
+    auto player = character->toPlayer();
     auto input = args.getOriginal();
     // Check if the player has typed BACK.
     if (ToLower(input) == "back")
     {
-        RollbackCharacterCreation(player, ConnectionState::AwaitingNewPwd);
+        // Create a shared pointer to the previous step.
+        std::shared_ptr<ProcessNewPassword> newStep = std::make_shared<ProcessNewPassword>();
+        // Set the handler.
+        player->inputHandler = newStep;
+        // Advance to the next step.
+        newStep->rollBack(character);
     }
-        // Player_password must agree.
     else if (input != player->password)
     {
-        AdvanceCharacterCreation(
-            character,
-            ConnectionState::AwaitingNewPwdCon,
-            "Password and confirmation do not agree.");
+        this->advance(character, "Password and confirmation do not agree.");
     }
     else
     {
-        AdvanceCharacterCreation(player, ConnectionState::AwaitingNewStory);
+        // Create a shared pointer to the next step.
+        std::shared_ptr<ProcessNewStory> newStep = std::make_shared<ProcessNewStory>();
+        // Set the handler.
+        player->inputHandler = newStep;
+        // Advance to the next step.
+        newStep->advance(character);
     }
+}
+
+void ProcessNewPasswordConfirm::advance(Character * character, const std::string & error)
+{
+    // Change the connection state to awaiting age.
+    character->toPlayer()->connectionState = ConnectionState::AwaitingNewPwdCon;
+    // Print the choices.
+    this->printChices(character);
+    std::string msg;
+    msg += Formatter::green() + "Re-enter the password.." + Formatter::reset() + "\n";
+    character->sendMsg(msg);
+    if (!error.empty())
+    {
+        character->sendMsg("# " + error + "\n");
+    }
+}
+
+void ProcessNewPasswordConfirm::rollBack(Character * character)
+{
+    auto player = character->toPlayer();
+    player->password = "";
+    this->advance(character);
 }

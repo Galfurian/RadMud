@@ -25,7 +25,7 @@
 #include <unistd.h>
 #include <signal.h>
 
-#include "protocol.hpp"
+#include "processTelnetCommand.hpp"
 #include "stopwatch.hpp"
 #include "CMacroWrapper.hpp"
 
@@ -330,11 +330,6 @@ bool Mud::addDirection(std::string name, Direction direction)
     return mudDirections.insert(std::make_pair(name, direction)).second;
 }
 
-bool Mud::addStateAction(ConnectionState state, ActionHandler action)
-{
-    return mudStateActions.insert(std::make_pair(state, action)).second;
-}
-
 bool Mud::addBuilding(Building & building)
 {
     return mudBuildings.insert(std::make_pair(building.vnum, building)).second;
@@ -567,11 +562,6 @@ Room * Mud::findTravelPoint(Room * room)
         return iterator->second;
     }
     return nullptr;
-}
-
-ActionHandler & Mud::findStateAction(ConnectionState state)
-{
-    return mudStateActions.find(state)->second;
 }
 
 Building * Mud::findBuilding(std::string name)
@@ -811,7 +801,7 @@ void Mud::removeInactivePlayers()
     for (auto iterator = toRemove.begin(); iterator != toRemove.end(); ++iterator)
     {
         // Get the player at the given position.
-        Player * player = *iterator;
+        auto player = *iterator;
         // Log the action of removing.
         Logger::log(LogLevel::Global, "Removing inactive player : " + player->getName());
         // Only if the player has successfully logged in, save its state on DB.
@@ -893,18 +883,14 @@ void Mud::processNewConnection()
                 closeSocket(socketFileDescriptor);
                 continue;
             }
-
-            Player * player = new Player(socketFileDescriptor, port, address);
-
+            auto player = new Player(socketFileDescriptor, port, address);
             // Insert the player in the list of players.
-            addPlayer(player);
-
+            this->addPlayer(player);
             Logger::log(LogLevel::Global, "#--------- New Connection ---------#");
             Logger::log(LogLevel::Global, " Socket  : " + ToString(socketFileDescriptor));
             Logger::log(LogLevel::Global, " Address : " + address);
             Logger::log(LogLevel::Global, " Port    : " + ToString(port));
             Logger::log(LogLevel::Global, "#----------------------------------#");
-
             // Activate the procedure of negotiation.
             NegotiateProtocol(player, ConnectionState::NegotiatingMSDP);
         }
@@ -1136,12 +1122,6 @@ bool Mud::startMud()
 
     Logger::log(LogLevel::Global, "Initializing Commands...");
     LoadCommands();
-
-    Logger::log(LogLevel::Global, "Initializing States...");
-    LoadStates();
-
-    Logger::log(LogLevel::Global, "Initializing MSDP States...");
-    LoadProtocolStates();
 
     Logger::log(LogLevel::Global, "Initializing Database...");
     if (!this->initDatabase())

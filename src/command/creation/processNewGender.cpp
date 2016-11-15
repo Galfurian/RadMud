@@ -19,36 +19,77 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "creationStep.hpp"
+#include "processNewGender.hpp"
 #include "player.hpp"
 #include "mud.hpp"
-
+#include "processNewAttributes.hpp"
 #include "processNewAge.hpp"
 
-void ProcessNewGender(Character * character, ArgumentHandler & args)
+void ProcessNewGender::process(Character * character, ArgumentHandler & args)
 {
-    Player * player = character->toPlayer();
+    auto player = character->toPlayer();
     auto input = args.getOriginal();
     // Check if the player has typed BACK.
     if (ToLower(input) == "back")
     {
-        RollbackCharacterCreation(player, ConnectionState::AwaitingNewAttr);
+        // Create a shared pointer to the previous step.
+        std::shared_ptr<ProcessNewAttributes> newStep = std::make_shared<ProcessNewAttributes>();
+        // Set the handler.
+        player->inputHandler = newStep;
+        // Advance to the next step.
+        newStep->rollBack(character);
     }
     else if (input == "1")
     {
         player->gender = GenderType::Male;
-        ProcessNewAge::advance(character);
+        // Create a shared pointer to the next step.
+        std::shared_ptr<ProcessNewAge> newStep = std::make_shared<ProcessNewAge>();
+        // Set the handler.
+        player->inputHandler = newStep;
+        // Advance to the next step.
+        newStep->advance(character);
     }
     else if (input == "2")
     {
         player->gender = GenderType::Female;
-        ProcessNewAge::advance(character);
+        // Create a shared pointer to the next step.
+        std::shared_ptr<ProcessNewAge> newStep = std::make_shared<ProcessNewAge>();
+        // Set the handler.
+        player->inputHandler = newStep;
+        // Advance to the next step.
+        newStep->advance(character);
     }
     else
     {
-        AdvanceCharacterCreation(
-            character,
-            ConnectionState::AwaitingNewGender,
-            "Not a valid gender.");
+        this->advance(character, "Not a valid gender.");
     }
+}
+
+void ProcessNewGender::advance(Character * character, const std::string & error)
+{
+    // Change the connection state to awaiting age.
+    character->toPlayer()->connectionState = ConnectionState::AwaitingNewGender;
+    // Print the choices.
+    this->printChices(character);
+    std::string msg;
+    msg += "# " + Formatter::bold() + "Character's Gender." + Formatter::reset() + "\n";
+    msg += "#    [1] Male.\n";
+    msg += "#    [2] Female.\n";
+    msg += "#\n";
+    msg += "# Choose one of the above gender by typing the correspondent number.\n";
+    msg += "#\n";
+    msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset()
+           + "] to return to the previus step.\n";
+    character->sendMsg(msg);
+    if (!error.empty())
+    {
+        character->sendMsg("# " + error + "\n");
+    }
+}
+
+void ProcessNewGender::rollBack(Character * character)
+{
+    auto player = character->toPlayer();
+    player->gender = GenderType::None;
+    this->advance(character);
 }

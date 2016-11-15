@@ -28,6 +28,7 @@
 #include <set>
 #include <string>
 
+#include "inputHandler.hpp"
 #include "character.hpp"
 #include "skill.hpp"
 
@@ -65,7 +66,9 @@ public:
     /// Points that could be spent during character creation.
     int remaining_points;
     /// Connection state.
-    ConnectionState connection_state;
+    ConnectionState connectionState;
+    /// The input handler.
+    std::shared_ptr<InputHandler> inputHandler;
     /// Password guessing attempts.
     int password_attempts;
     /// True if they are about to leave us.

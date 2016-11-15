@@ -20,8 +20,20 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "creationStep.hpp"
+#include "character.hpp"
 #include "formatter.hpp"
 #include "player.hpp"
+
+CreationStep::CreationStep()
+{
+    // Nothing to do.
+}
+
+CreationStep::~CreationStep()
+{
+    // Nothing to do.
+}
+
 
 void CreationStep::printChices(Character * character)
 {

@@ -1,4 +1,4 @@
-/// @file   processNewAge.hpp
+/// @file   inputHandler.hpp
 /// @author Enrico Fraccaroli
 /// @date   Nov 14, 2016
 /// @copyright
@@ -19,16 +19,21 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "creationStep.hpp"
+#pragma once
 
-/// @brief Allows to choose the age of a player.
-class ProcessNewAge :
-    public CreationStep
+#include "argumentHandler.hpp"
+
+class Character;
+
+class InputHandler
 {
 public:
-    void process(Character * character, ArgumentHandler & args);
+    /// @brief Constructor.
+    InputHandler();
 
-    void advance(Character * character, const std::string & error = std::string());
+    /// @brief Destructor.
+    virtual ~InputHandler();
 
-    void rollBack(Character * character);
+    /// @brief Process the given command.
+    virtual void process(Character * character, ArgumentHandler & args);
 };

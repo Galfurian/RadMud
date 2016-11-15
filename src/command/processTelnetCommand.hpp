@@ -1,4 +1,4 @@
-/// @file   protocol.hpp
+/// @file   processTelnetCommand.hpp
 /// @brief  Define the negotiation functions for MUD.
 /// @author Enrico Fraccaroli
 /// @date   Jun 5 2016
@@ -22,12 +22,8 @@
 
 #pragma once
 
-#include "character.hpp"
-#include "argumentHandler.hpp"
-
-/// @brief Map all the connection states which are necessary for the
-///         negotiation of protocolls.
-void LoadProtocolStates();
+#include "inputHandler.hpp"
+#include "defines.hpp"
 
 /// @brief Allows to estract from a string at the given position, a telnet command.
 /// @param source  The source string.
@@ -47,7 +43,10 @@ bool ExtractCommand(
 /// @param nextState The state which identifies the stage of protocol negotiation.
 void NegotiateProtocol(Character * character, const ConnectionState & nextState);
 
-/// @brief Input process function for handling telnet commands.
-/// @param character The character with which the protocol is negotiated.
-/// @param args      The input stream containing from the character.
-void ProcessTelnetCommand(Character * character, ArgumentHandler & args);
+/// @brief Process for handling telnet commands.
+class ProcessTelnetCommand :
+    public InputHandler
+{
+public:
+    void process(Character * character, ArgumentHandler & args);
+};

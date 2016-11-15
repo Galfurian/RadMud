@@ -19,11 +19,11 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "creationStep.hpp"
+#include "processNewAge.hpp"
 #include "player.hpp"
 #include "mud.hpp"
-
-#include "processNewAge.hpp"
+#include "processNewDescription.hpp"
+#include "processNewGender.hpp"
 
 void ProcessNewAge::process(Character * character, ArgumentHandler & args)
 {
@@ -34,28 +34,38 @@ void ProcessNewAge::process(Character * character, ArgumentHandler & args)
     // Check if the player has typed BACK.
     if (ToLower(input) == "back")
     {
-        RollbackCharacterCreation(player, ConnectionState::AwaitingNewGender);
+        // Create a shared pointer to the previous step.
+        std::shared_ptr<ProcessNewGender> newStep = std::make_shared<ProcessNewGender>();
+        // Set the handler.
+        player->inputHandler = newStep;
+        // Advance to the next step.
+        newStep->rollBack(character);
     }
     else if (!IsNumber(input))
     {
-        ProcessNewAge::advance(character, "Not a valid age.");
+        this->advance(character, "Not a valid age.");
     }
     else
     {
         int age = ToNumber<int>(input);
         if (age < 18)
         {
-            ProcessNewAge::advance(character, "A creature so young is not suitable for a world so wicked.");
+            this->advance(character, "A creature so young is not suitable for a world so wicked.");
         }
         else if (50 < age)
         {
-            ProcessNewAge::advance(character,
-                                   "Life expectancy in this world is 70 years, in order to still be competitive you can choose 50 years at most.");
+            this->advance(character,
+                          "Life expectancy in this world is 70 years, in order to still be competitive you can choose 50 years at most.");
         }
         else
         {
             player->age = age;
-            AdvanceCharacterCreation(player, ConnectionState::AwaitingNewDesc);
+            // Create a shared pointer to the next step.
+            std::shared_ptr<ProcessNewDescription> newStep = std::make_shared<ProcessNewDescription>();
+            // Set the handler.
+            player->inputHandler = newStep;
+            // Advance to the next step.
+            newStep->advance(character);
         }
     }
 }
@@ -63,9 +73,9 @@ void ProcessNewAge::process(Character * character, ArgumentHandler & args)
 void ProcessNewAge::advance(Character * character, const std::string & error)
 {
     // Change the connection state to awaiting age.
-    character->toPlayer()->connection_state = ConnectionState::AwaitingNewAge;
+    character->toPlayer()->connectionState = ConnectionState::AwaitingNewAge;
     // Print the choices.
-    CreationStep::printChices(character);
+    this->printChices(character);
     // The message that has to be sent.
     character->sendMsg("# %sCharacter's Age.%s\n", Formatter::bold(), Formatter::reset());
     character->sendMsg("# Choose the age of your character.\n");
@@ -80,5 +90,5 @@ void ProcessNewAge::rollBack(Character * character)
 {
     auto player = character->toPlayer();
     player->age = 0;
-    ProcessNewAge::advance(character);
+    this->advance(character);
 }

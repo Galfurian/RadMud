@@ -25,9 +25,6 @@
 #include "character.hpp"
 #include "argumentHandler.hpp"
 
-/// @brief An action handler for the character.
-using ActionHandler = std::function<void(Character * character, ArgumentHandler & args)>;
-
 /// @brief Contains all the informations concerning a command, including its handler.
 class Command
 {
@@ -47,7 +44,7 @@ public:
         std::string _name,
         std::string _help,
         std::string _args,
-        ActionHandler _hndl,
+        std::function<void(Character * character, ArgumentHandler & args)> _hndl,
         bool _cuic);
 
     Command & setGods(const bool & _gods);
@@ -58,7 +55,7 @@ public:
 
     Command & setArgs(const std::string & _args);
 
-    Command & setHndl(const ActionHandler & _hndl);
+    Command & setHndl(const std::function<void(Character * character, ArgumentHandler & args)> & _hndl);
 
     Command & setCuic(const bool & _cuic);
 
@@ -77,7 +74,7 @@ public:
     /// The arguemtns of the command.
     std::string args;
     /// The handler of the command.
-    ActionHandler hndl;
+    std::function<void(Character * character, ArgumentHandler & args)> hndl;
     /// Flag which determines if the command can be used in combat.
     bool cuic;
 };
@@ -98,28 +95,6 @@ void NoMobile(Character * character);
 
 /// @brief Stop any action the character is executing.
 void StopAction(Character * character);
-
-/// @brief Load all the possible player states.
-void LoadStates();
-
-/// @brief Print the values inserted until now.
-/// @param character The player whose creating a new character.
-void PrintChoices(Character * character);
-
-/// @brief Reset the informations inserted in the previous state.
-/// @param character The player whose creating a new character.
-/// @param new_state The step reached by this player.
-void RollbackCharacterCreation(Character * character, ConnectionState new_state);
-
-/// @brief Print the advancement in the character creation.
-/// @details If you want to introduce a new step, you have to insert it's text here.
-/// @param character The player whose creating a new character.
-/// @param con_state The step reached by this player.
-/// @param message   An optional message used only during error handling.
-void AdvanceCharacterCreation(
-    Character * character,
-    ConnectionState con_state,
-    std::string message = "");
 
 /// @brief Map all the command to the respective std::string that the character can type.
 void LoadCommands();

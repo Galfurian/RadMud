@@ -19,24 +19,29 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "creationStep.hpp"
+#include "processNewRace.hpp"
 #include "player.hpp"
 #include "mud.hpp"
+#include "processNewStory.hpp"
+#include "processNewAttributes.hpp"
 
-void ProcessNewRace(Character * character, ArgumentHandler & args)
+void ProcessNewRace::process(Character * character, ArgumentHandler & args)
 {
-    Player * player = character->toPlayer();
+    auto player = character->toPlayer();
     // Player_password can't be blank.
     if ((args.size() != 1) && (args.size() != 2))
     {
-        AdvanceCharacterCreation(character, ConnectionState::AwaitingNewRace, "Invalid input.");
+        this->advance(character, "Invalid input.");
     }
-        // Check if the player has typed BACK.
     else if (ToLower(args[0].getContent()) == "back")
     {
-        RollbackCharacterCreation(player, ConnectionState::AwaitingNewStory);
+        // Create a shared pointer to the previous step.
+        std::shared_ptr<ProcessNewStory> newStep = std::make_shared<ProcessNewStory>();
+        // Set the handler.
+        player->inputHandler = newStep;
+        // Advance to the next step.
+        newStep->rollBack(character);
     }
-        // If the player has insert help (race_number), show its help.
     else if (BeginWith(ToLower(args[0].getContent()), "help"))
     {
         if (args.size() == 2)
@@ -45,43 +50,28 @@ void ProcessNewRace(Character * character, ArgumentHandler & args)
             Race * race = Mud::instance().findRace(ToNumber<int>(args[1].getContent()));
             if (race == nullptr)
             {
-                AdvanceCharacterCreation(
-                    character,
-                    ConnectionState::AwaitingNewRace,
-                    "No help for that race.");
+                this->advance(character, "No help for that race.");
             }
             else if (!race->player_allow)
             {
-                AdvanceCharacterCreation(
-                    character,
-                    ConnectionState::AwaitingNewRace,
-                    "No help for that race.");
+                this->advance(character, "No help for that race.");
             }
             else
             {
                 std::string helpMessage;
                 helpMessage += "Help about " + race->name + ".\n";
-                helpMessage += "Strength     " + ToString(race->getAbility(Ability::Strength))
-                               + ".\n";
-                helpMessage += "Agility      " + ToString(race->getAbility(Ability::Agility))
-                               + ".\n";
-                helpMessage += "Perception   " + ToString(race->getAbility(Ability::Perception))
-                               + ".\n";
-                helpMessage += "Constitution " + ToString(race->getAbility(Ability::Constitution))
-                               + ".\n";
-                helpMessage += "Intelligence " + ToString(race->getAbility(Ability::Intelligence))
-                               + ".\n";
+                helpMessage += "Strength     " + ToString(race->getAbility(Ability::Strength)) + ".\n";
+                helpMessage += "Agility      " + ToString(race->getAbility(Ability::Agility)) + ".\n";
+                helpMessage += "Perception   " + ToString(race->getAbility(Ability::Perception)) + ".\n";
+                helpMessage += "Constitution " + ToString(race->getAbility(Ability::Constitution)) + ".\n";
+                helpMessage += "Intelligence " + ToString(race->getAbility(Ability::Intelligence)) + ".\n";
                 helpMessage += Formatter::italic() + race->description + Formatter::reset() + "\n";
-                AdvanceCharacterCreation(character, ConnectionState::AwaitingNewRace, helpMessage);
+                this->advance(character, helpMessage);
             }
-
         }
         else
         {
-            AdvanceCharacterCreation(
-                character,
-                ConnectionState::AwaitingNewRace,
-                "You have to specify the race number.");
+            this->advance(character, "You have to specify the race number.");
         }
     }
     else if (IsNumber(args[0].getContent()))
@@ -90,17 +80,11 @@ void ProcessNewRace(Character * character, ArgumentHandler & args)
         Race * race = Mud::instance().findRace(ToNumber<int>(args[0].getContent()));
         if (race == nullptr)
         {
-            AdvanceCharacterCreation(
-                character,
-                ConnectionState::AwaitingNewRace,
-                "Not a valid race.");
+            this->advance(character, "Not a valid race.");
         }
         else if (!race->player_allow)
         {
-            AdvanceCharacterCreation(
-                character,
-                ConnectionState::AwaitingNewRace,
-                "Not a valid race.");
+            this->advance(character, "Not a valid race.");
         }
         else
         {
@@ -112,7 +96,57 @@ void ProcessNewRace(Character * character, ArgumentHandler & args)
             player->setAbility(Ability::Intelligence, race->getAbility(Ability::Intelligence));
             player->setHealth(player->getMaxHealth(), true);
             player->setStamina(player->getMaxStamina(), true);
-            AdvanceCharacterCreation(player, ConnectionState::AwaitingNewAttr);
+            // Create a shared pointer to the next step.
+            std::shared_ptr<ProcessNewAttributes> newStep = std::make_shared<ProcessNewAttributes>();
+            // Set the handler.
+            player->inputHandler = newStep;
+            // Advance to the next step.
+            newStep->advance(character);
         }
     }
+}
+
+void ProcessNewRace::advance(Character * character, const std::string & error)
+{
+    // Change the connection state to awaiting age.
+    character->toPlayer()->connectionState = ConnectionState::AwaitingNewRace;
+    // Print the choices.
+    this->printChices(character);
+    std::string msg;
+    msg += "# " + Formatter::bold() + "Character's Race." + Formatter::reset() + "\n";
+    for (auto iterator : Mud::instance().mudRaces)
+    {
+        Race * race = iterator.second;
+        if (race->player_allow)
+        {
+            msg += "#    [" + ToString(race->vnum) + "] " + race->name + ".\n";
+        }
+    }
+    msg += "#\n";
+    msg += "# Choose one of the above race by typing the correspondent number.\n";
+    msg += "#\n";
+    msg += "# Type [" + Formatter::magenta() + "help [Number]" + Formatter::reset() + "]";
+    msg += " to read a brief description of the race.\n";
+    msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset() + "]";
+    msg += " to return to the previus step.\n";
+    character->sendMsg(msg);
+    if (!error.empty())
+    {
+        character->sendMsg("# " + error + "\n");
+    }
+}
+
+void ProcessNewRace::rollBack(Character * character)
+{
+    auto player = character->toPlayer();
+    player->race = nullptr;
+    player->setHealth(0);
+    player->setStamina(0);
+    player->setAbility(Ability::Strength, 0);
+    player->setAbility(Ability::Agility, 0);
+    player->setAbility(Ability::Perception, 0);
+    player->setAbility(Ability::Constitution, 0);
+    player->setAbility(Ability::Intelligence, 0);
+    player->remaining_points = 0;
+    this->advance(character);
 }
