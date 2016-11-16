@@ -2,16 +2,12 @@
 # Include Directories
 set(RADMUD_COMMAND_INC
         ./src/command
-        ./src/command/creation
         PARENT_SCOPE
         )
 
 #############################################
 # Source Files
 set(RADMUD_COMMAND_SRC
-        ${RADMUD_CREATION_COMMAND_SRC}
-        ./src/command/argumentHandler.cpp
-        ./src/command/argument.cpp
         ./src/command/command.cpp
         ./src/command/combat.cpp
         ./src/command/communication.cpp
@@ -20,21 +16,5 @@ set(RADMUD_COMMAND_SRC
         ./src/command/general.cpp
         ./src/command/god.cpp
         ./src/command/object.cpp
-        ./src/command/processInput.cpp
-        ./src/command/processTelnetCommand.cpp
-        ./src/command/creation/processInitialization.cpp
-        ./src/command/creation/processNewAge.cpp
-        ./src/command/creation/processNewAttributes.cpp
-        ./src/command/creation/processNewConfirm.cpp
-        ./src/command/creation/processNewDescription.cpp
-        ./src/command/creation/processNewGender.cpp
-        ./src/command/creation/processNewName.cpp
-        ./src/command/creation/processNewPassword.cpp
-        ./src/command/creation/processNewPasswordConfirm.cpp
-        ./src/command/creation/processNewRace.cpp
-        ./src/command/creation/processNewStory.cpp
-        ./src/command/creation/processNewWeight.cpp
-        ./src/command/creation/processPlayerName.cpp
-        ./src/command/creation/processPlayerPassword.cpp
         PARENT_SCOPE
         )

@@ -74,6 +74,7 @@ find_package(Sqlite3 REQUIRED)
 # Add subdirectories...
 add_subdirectory(src/lua)
 add_subdirectory(src/item)
+add_subdirectory(src/input)
 add_subdirectory(src/model)
 add_subdirectory(src/sqlite)
 add_subdirectory(src/action)
@@ -92,6 +93,7 @@ set(PROJECT_SRC
         ./src/updater.cpp
         ${RADMUD_LUA_SRC}
         ${RADMUD_ITEM_SRC}
+        ${RADMUD_INPUT_SRC}
         ${RADMUD_MODEL_SRC}
         ${RADMUD_ACTION_SRC}
         ${RADMUD_SQLITE_SRC}
@@ -115,6 +117,7 @@ include_directories(
         ${RADMUD_SQLITE_INC}
         ${RADMUD_ACTION_INC}
         ${RADMUD_MODEL_INC}
+        ${RADMUD_INPUT_INC}
         ${RADMUD_ITEM_INC}
         ${RADMUD_LUA_INC}
         ./src
