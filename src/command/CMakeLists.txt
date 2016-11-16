@@ -1,13 +1,13 @@
 #############################################
 # Include Directories
-set(RADMUD_COMMAND_INC
+set(PROJECT_INC ${PROJECT_INC}
         ./src/command
         PARENT_SCOPE
         )
 
 #############################################
 # Source Files
-set(RADMUD_COMMAND_SRC
+set(PROJECT_SRC ${PROJECT_SRC}
         ./src/command/command.cpp
         ./src/command/combat.cpp
         ./src/command/communication.cpp

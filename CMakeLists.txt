@@ -65,62 +65,49 @@ endif ()
 #################################################
 # Add cmake modules folder...
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
-
 find_package(Lua52 REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(Sqlite3 REQUIRED)
 
 #################################################
+# Add root project sources...
+set(PROJECT_SRC
+        src/main.cpp
+        src/mud.cpp
+        src/defines.cpp
+        src/updater.cpp
+        )
+
+set(PROJECT_INC
+        src
+        )
+
+#################################################
 # Add subdirectories...
-add_subdirectory(src/lua)
-add_subdirectory(src/item)
-add_subdirectory(src/input)
-add_subdirectory(src/model)
-add_subdirectory(src/sqlite)
-add_subdirectory(src/action)
-add_subdirectory(src/command)
-add_subdirectory(src/creation)
 add_subdirectory(src/character)
 add_subdirectory(src/utilities)
 add_subdirectory(src/structure)
-
-#################################################
-# Add project sources...
-set(PROJECT_SRC
-        ./src/defines.cpp
-        ./src/main.cpp
-        ./src/mud.cpp
-        ./src/updater.cpp
-        ${RADMUD_LUA_SRC}
-        ${RADMUD_ITEM_SRC}
-        ${RADMUD_INPUT_SRC}
-        ${RADMUD_MODEL_SRC}
-        ${RADMUD_ACTION_SRC}
-        ${RADMUD_SQLITE_SRC}
-        ${RADMUD_COMMAND_SRC}
-        ${RADMUD_CREATION_SRC}
-        ${RADMUD_CHARACTER_SRC}
-        ${RADMUD_UTILITIES_SRC}
-        ${RADMUD_STRUCTURE_SRC})
+add_subdirectory(src/structure/algorithms)
+add_subdirectory(src/creation)
+add_subdirectory(src/command)
+add_subdirectory(src/sqlite)
+add_subdirectory(src/action)
+add_subdirectory(src/action/combat)
+add_subdirectory(src/input)
+add_subdirectory(src/input/initialization)
+add_subdirectory(src/model)
+add_subdirectory(src/model/submodel)
+add_subdirectory(src/item)
+add_subdirectory(src/item/subitem)
+add_subdirectory(src/lua)
 
 #################################################
 # Add project includes...
 include_directories(
+        ${PROJECT_INC}
         ${LUA_INCLUDE_DIR}
         ${ZLIB_INCLUDE_DIR}
         ${SQLITE3_INCLUDE_DIR}
-        ${RADMUD_STRUCTURE_INC}
-        ${RADMUD_UTILITIES_INC}
-        ${RADMUD_CHARACTER_INC}
-        ${RADMUD_CREATION_INC}
-        ${RADMUD_COMMAND_INC}
-        ${RADMUD_SQLITE_INC}
-        ${RADMUD_ACTION_INC}
-        ${RADMUD_MODEL_INC}
-        ${RADMUD_INPUT_INC}
-        ${RADMUD_ITEM_INC}
-        ${RADMUD_LUA_INC}
-        ./src
 )
 
 #################################################

@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "aggression.hpp"
+class Character;
 
 #include <set>
 #include <vector>
@@ -35,6 +35,22 @@ class CombatHandler
     friend class Character;
 
 public:
+    /// @brief Allows to store information about an aggressor.
+    struct Aggression
+    {
+        Aggression(Character * _aggressor,
+                   unsigned int _aggression) :
+            aggressor(_aggressor),
+            aggression(_aggression)
+        {
+            /// Nothing to do.
+        }
+
+        /// The aggressor.
+        Character * aggressor;
+        /// The level of aggression.
+        mutable unsigned int aggression;
+    };
     /// Iterator for an aggressor vector.
     using iterator  = typename std::vector<std::shared_ptr<Aggression> >::iterator;
     /// Constant iterator for an aggressor vector.

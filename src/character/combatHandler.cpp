@@ -141,7 +141,7 @@ bool CombatHandler::setAggro(Character * character, unsigned int newAggression)
     return ret;
 }
 
-std::shared_ptr<Aggression> CombatHandler::getTopAggro()
+std::shared_ptr<CombatHandler::Aggression> CombatHandler::getTopAggro()
 {
     if (opponents.empty())
     {
