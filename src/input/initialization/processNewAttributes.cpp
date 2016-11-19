@@ -254,8 +254,6 @@ void ProcessNewAttributes::advance(Character * character, const std::string & er
 {
     // Transform the character into player.
     auto player = character->toPlayer();
-    // Change the connection state to awaiting age.
-    player->connectionState = ConnectionState::AwaitingNewAttr;
     // Print the choices.
     this->printChices(character);
     std::string msg;

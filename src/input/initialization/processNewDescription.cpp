@@ -72,8 +72,6 @@ void ProcessNewDescription::process(Character * character, ArgumentHandler & arg
 
 void ProcessNewDescription::advance(Character * character, const std::string & error)
 {
-    // Change the connection state to awaiting age.
-    character->toPlayer()->connectionState = ConnectionState::AwaitingNewDesc;
     // Print the choices.
     this->printChices(character);
     std::string msg;

@@ -300,23 +300,8 @@ using AreaStatus = enum class AreaStatus_t
 /// Handle all the player's phases during login.
 using ConnectionState = enum class ConnectionState_t
 {
-    NoState,            ///< The player has no state.
-    NegotiatingMSDP,    ///< The player is negotiating for MSDP.
-    NegotiatingMCCP,    ///< The player is negotiating for MCCP.
-    AwaitingName,       ///< We want their player name.
-    AwaitingPassword,   ///< We want their password.
-    AwaitingNewName,    ///< Step 1  - Choose the Name.
-    AwaitingNewPwd,     ///< Step 2  - Choose the Password.
-    AwaitingNewPwdCon,  ///< Step 3  - Confirm the Password.
-    AwaitingNewStory,   ///< Step 4  - Short story of the mud world.
-    AwaitingNewRace,    ///< Step 5  - Choose the Race.
-    AwaitingNewAttr,    ///< Step 6  - Choose the Attributes.
-    AwaitingNewGender,  ///< Step 7  - Choose the Gender.
-    AwaitingNewAge,     ///< Step 8  - Choose the Age.
-    AwaitingNewDesc,    ///< Step 9  - Choose the description (optional).
-    AwaitingNewWeight,  ///< Step 10  - Choose the Weight.
-    AwaitingNewConfirm, ///< Step 11 - Confirm the character.
-    Playing             ///< This is the normal 'connected' mode.
+    LoggingIn, ///< The player is logging in.
+    Playing    ///< The player is playing.
 };
 
 /// Handle all the player's phases during login.

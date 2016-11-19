@@ -88,8 +88,6 @@ void ProcessPlayerName::process(Character * character, ArgumentHandler & args)
 
 void ProcessPlayerName::advance(Character * character, const std::string & error)
 {
-    // Change the connection state to awaiting age.
-    character->toPlayer()->connectionState = ConnectionState::AwaitingName;
     std::string msg;
     msg += Formatter::clearScreen();
     msg += "\nWelcome to RadMud!\n";

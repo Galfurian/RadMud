@@ -61,8 +61,6 @@ void ProcessNewPassword::process(Character * character, ArgumentHandler & args)
 
 void ProcessNewPassword::advance(Character * character, const std::string & error)
 {
-    // Change the connection state to awaiting age.
-    character->toPlayer()->connectionState = ConnectionState::AwaitingNewPwd;
     // Print the choices.
     this->printChices(character);
     std::string msg;

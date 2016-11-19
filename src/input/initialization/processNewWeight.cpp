@@ -69,8 +69,6 @@ void ProcessNewWeight::process(Character * character, ArgumentHandler & args)
 
 void ProcessNewWeight::advance(Character * character, const std::string & error)
 {
-    // Change the connection state to awaiting age.
-    character->toPlayer()->connectionState = ConnectionState::AwaitingNewWeight;
     // Print the choices.
     this->printChices(character);
     std::string msg;

@@ -80,8 +80,6 @@ void ProcessNewName::process(Character * character, ArgumentHandler & args)
 
 void ProcessNewName::advance(Character * character, const std::string & error)
 {
-    // Change the connection state to awaiting age.
-    character->toPlayer()->connectionState = ConnectionState::AwaitingNewName;
     // Print the choices.
     this->printChices(character);
     std::string msg;

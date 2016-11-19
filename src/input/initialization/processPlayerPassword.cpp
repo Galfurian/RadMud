@@ -50,14 +50,13 @@ void ProcessPlayerPassword::process(Character * character, ArgumentHandler & arg
         player->prompt = player->prompt_save;
         // Entered the MUD.
         player->enterGame();
+        // Set the connection state to playing.
         player->connectionState = ConnectionState::Playing;
     }
 }
 
 void ProcessPlayerPassword::advance(Character * character, const std::string & error)
 {
-    // Change the connection state to awaiting age.
-    character->toPlayer()->connectionState = ConnectionState::AwaitingPassword;
     if (!error.empty())
     {
         character->sendMsg("# " + error + "\n");

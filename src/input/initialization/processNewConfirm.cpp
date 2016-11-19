@@ -53,6 +53,7 @@ void ProcessNewConfirm::process(Character * character, ArgumentHandler & args)
             player->prompt = player->prompt_save;
             // Entered the MUD.
             player->enterGame();
+            // Set the connection state to playing.
             player->connectionState = ConnectionState::Playing;
         }
         else
@@ -69,8 +70,6 @@ void ProcessNewConfirm::process(Character * character, ArgumentHandler & args)
 
 void ProcessNewConfirm::advance(Character * character, const std::string & error)
 {
-    // Change the connection state to awaiting age.
-    character->toPlayer()->connectionState = ConnectionState::AwaitingNewConfirm;
     // Print the choices.
     this->printChices(character);
     std::string msg;

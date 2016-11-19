@@ -21,7 +21,6 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "player.hpp"
-#include "processTelnetCommand.hpp"
 #include "mud.hpp"
 
 Player::Player(const int & _socket, const int & _port, const std::string & _address) :
@@ -38,6 +37,7 @@ Player::Player(const int & _socket, const int & _port, const std::string & _addr
     rent_room(),
     skills(),
     remaining_points(),
+    connectionState(ConnectionState::LoggingIn),
     password_attempts(),
     closing(),
     logged_in(),
@@ -90,7 +90,6 @@ bool Player::check() const
     safe &= CorrectAssert(!prompt.empty());
     safe &= CorrectAssert(!prompt_save.empty());
     safe &= CorrectAssert(rent_room >= 0);
-    safe &= CorrectAssert(connectionState != ConnectionState::NoState);
     //safe &= CorrectAssert(!skills.empty());
     //safe &= CorrectAssert(skills.size() == Mud::instance().mudSkills.size());
     for (auto iterator : Mud::instance().mudSkills)
