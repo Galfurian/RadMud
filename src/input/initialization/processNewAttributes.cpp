@@ -49,7 +49,7 @@ void ProcessNewAttributes::process(Character * character, ArgumentHandler & args
         player->setAbility(Ability::Perception, player->race->getAbility(Ability::Perception));
         player->setAbility(Ability::Constitution, player->race->getAbility(Ability::Constitution));
         player->setAbility(Ability::Intelligence, player->race->getAbility(Ability::Intelligence));
-        this->advance(character, Formatter::cyan() + "Attribute has been set by default." + Formatter::reset() + "\n");
+        this->advance(character, Formatter::cyan() + "Attribute has been set by default.%s\n");
     }
     else if (BeginWith(ToLower(args[0].getContent()), "continue"))
     {
@@ -256,27 +256,34 @@ void ProcessNewAttributes::advance(Character * character, const std::string & er
     auto player = character->toPlayer();
     // Print the choices.
     this->printChices(character);
-    std::string msg;
-    msg += "# " + Formatter::bold() + "Character's Attributes." + Formatter::reset() + "\n";
-    msg += "#    [1] Strength     :" + ToString(player->getAbility(Ability::Strength, false)) + "\n";
-    msg += "#    [2] Agility      :" + ToString(player->getAbility(Ability::Agility, false)) + "\n";
-    msg += "#    [3] Perception   :" + ToString(player->getAbility(Ability::Perception, false)) + "\n";
-    msg += "#    [4] Constitution :" + ToString(player->getAbility(Ability::Constitution, false)) + "\n";
-    msg += "#    [5] Intelligence :" + ToString(player->getAbility(Ability::Intelligence, false)) + "\n";
-    msg += "#\n";
-    msg += "# Remaining Points: " + Formatter::green() + ToString(player->remaining_points) + Formatter::reset() + "\n";
-    msg += "#\n";
-    msg += "# Type [" + Formatter::magenta() + "(number) +/-modifier" + Formatter::reset() + "]";
-    msg += " to decrease or increase the value of an attribute.\n";
-    msg += "# Type [" + Formatter::magenta() + "help (number)" + Formatter::reset() + "]";
-    msg += " to read a brief description of the attribute.\n";
-    msg += "# Type [" + Formatter::magenta() + "reset" + Formatter::reset() + "]";
-    msg += " to reset the values as default.\n";
-    msg += "# Type [" + Formatter::magenta() + "continue" + Formatter::reset() + "]";
-    msg += " to continue character creation.\n";
-    msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset() + "]";
-    msg += " to return to the previus step.\n";
-    character->sendMsg(msg);
+    character->sendMsg("# %sCharacter's Attributes.%s\n", Formatter::bold(), Formatter::reset());
+    character->sendMsg("#    [1] Strength     : %s\n", player->getAbility(Ability::Strength, false));
+    character->sendMsg("#    [2] Agility      : %s\n", player->getAbility(Ability::Agility, false));
+    character->sendMsg("#    [3] Perception   : %s\n", player->getAbility(Ability::Perception, false));
+    character->sendMsg("#    [4] Constitution : %s\n", player->getAbility(Ability::Constitution, false));
+    character->sendMsg("#    [5] Intelligence : %s\n", player->getAbility(Ability::Intelligence, false));
+    character->sendMsg("#\n");
+    character->sendMsg("# Remaining Points: %s%s%s\n",
+                       (player->remaining_points > 0) ? Formatter::green() : Formatter::red(),
+                       player->remaining_points,
+                       Formatter::reset());
+    character->sendMsg("#\n");
+    character->sendMsg("# Type [%s(number)%s] [%s+/-modifier%s]",
+                       Formatter::magenta(), Formatter::reset(),
+                       Formatter::magenta(), Formatter::reset());
+    character->sendMsg(" to decrease or increase the value of an attribute.\n");
+    character->sendMsg("# Type [%shelp (number)%s]",
+                       Formatter::magenta(), Formatter::reset());
+    character->sendMsg(" to read a brief description of the attribute.\n");
+    character->sendMsg("# Type [%sreset%s]",
+                       Formatter::magenta(), Formatter::reset());
+    character->sendMsg(" to reset the values as default.\n");
+    character->sendMsg("# Type [%scontinue%s]",
+                       Formatter::magenta(), Formatter::reset());
+    character->sendMsg(" to continue character creation.\n");
+    character->sendMsg("# Type [%sback%s]",
+                       Formatter::magenta(), Formatter::reset());
+    character->sendMsg(" to return to the previus step.\n");
     if (!error.empty())
     {
         character->sendMsg("# " + error + "\n");

@@ -59,13 +59,8 @@ void ProcessNewName::process(Character * character, ArgumentHandler & args)
     }
     else
     {
-        Room * spawnRoom = Mud::instance().findRoom(player->rent_room);
-        if (spawnRoom == nullptr)
-        {
-            spawnRoom = Mud::instance().findRoom(1000);
-        }
         player->name = ToCapitals(input);
-        player->room = spawnRoom;
+        player->room = Mud::instance().findRoom(1000);
         player->faction = Mud::instance().findFaction(1);
         player->password_attempts = 0;
         // Create a shared pointer to the next step.
@@ -81,15 +76,12 @@ void ProcessNewName::advance(Character * character, const std::string & error)
 {
     // Print the choices.
     this->printChices(character);
-    std::string msg;
-    msg += "# " + Formatter::bold() + "Character's Name." + Formatter::reset() + "\n";
-    msg += "# Choose carefully, because this it's the only chance you have";
-    msg +=
-        " to pick a legendary name, maybe one day it will be whispered all over the lands.\n";
-    msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset()
-           + "] to return to the login.\n";
-    character->sendMsg(msg);
-    if (!error.empty())
+    character->sendMsg("# %sCharacter's Name.%s\n", Formatter::bold(), Formatter::reset());
+    character->sendMsg("# Choose carefully, because this it's the only chance you have");
+    character->sendMsg(" to pick a legendary name, maybe one day it will be whispered all over the lands.\n");
+    character->sendMsg("# Type [%sback%s] to return to the previous step.\n",
+                       Formatter::magenta(),
+                       Formatter::reset());    if (!error.empty())
     {
         character->sendMsg("# " + error + "\n");
     }
@@ -97,7 +89,8 @@ void ProcessNewName::advance(Character * character, const std::string & error)
 
 void ProcessNewName::rollBack(Character * character)
 {
-    auto player = character->toPlayer();
-    player->name = "";
+    // Reset the values.
+    character->name = "";
+    // Advance to the current step.
     this->advance(character);
 }

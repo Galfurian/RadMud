@@ -60,16 +60,16 @@ void ProcessNewStory::advance(Character * character, const std::string & error)
 {
     // Print the choices.
     this->printChices(character);
-    std::string msg;
-    msg += "# The story of the Wasteland.\n";
-    msg += "#\n";
-    msg += "Year 374\n";
-    msg += "#\n";
-    msg += "# Type [" + Formatter::magenta() + "continue" + Formatter::reset()
-           + "] to continue character creation.\n";
-    msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset()
-           + "] to return to the previus step.\n";
-    character->sendMsg(msg);
+    character->sendMsg("# The story of the Wasteland.\n");
+    character->sendMsg("#\n");
+    character->sendMsg("Year 374\n");
+    character->sendMsg("#\n");
+    character->sendMsg("# Type [%scontinue%s] to continue to the next step.\n",
+                       Formatter::magenta(),
+                       Formatter::reset());
+    character->sendMsg("# Type [%sback%s] to return to the previous step.\n",
+                       Formatter::magenta(),
+                       Formatter::reset());
     if (!error.empty())
     {
         character->sendMsg("# " + error + "\n");

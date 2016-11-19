@@ -63,13 +63,11 @@ void ProcessNewPassword::advance(Character * character, const std::string & erro
 {
     // Print the choices.
     this->printChices(character);
-    std::string msg;
-    msg += "# " + Formatter::bold() + "Character's Password." + Formatter::reset() + "\n";
-    msg += "# Choose a proper password, in order to protect the acces to your character.\n";
-    msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset()
-           + "] to return to the previus step.\n";
-    character->sendMsg(msg);
-    if (!error.empty())
+    character->sendMsg("# %sCharacter's Password.%s\n", Formatter::bold(), Formatter::reset());
+    character->sendMsg("# Choose a proper password, in order to protect the acces to your character.\n");
+    character->sendMsg("# Type [%sback%s] to return to the previous step.\n",
+                       Formatter::magenta(),
+                       Formatter::reset());    if (!error.empty())
     {
         character->sendMsg("# " + error + "\n");
     }
@@ -78,6 +76,8 @@ void ProcessNewPassword::advance(Character * character, const std::string & erro
 void ProcessNewPassword::rollBack(Character * character)
 {
     auto player = character->toPlayer();
+    // Reset the values.
     player->password = "";
+    // Advance to the current step.
     this->advance(character);
 }

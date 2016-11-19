@@ -602,6 +602,13 @@ public:
     {
         this->sendMsg(msg, ToString(first), args ...);
     }
+
+    /// @brief Sends a message to the character. This one in particular handles unsigned integer.
+    template<typename ... Args>
+    void sendMsg(const std::string & msg, const int & first, const Args & ... args)
+    {
+        this->sendMsg(msg, ToString(first), args ...);
+    }
 };
 
 /// @addtogroup FlagsToList

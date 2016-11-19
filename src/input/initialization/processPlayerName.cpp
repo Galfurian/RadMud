@@ -28,13 +28,13 @@
 void ProcessPlayerName::process(Character * character, ArgumentHandler & args)
 {
     auto player = character->toPlayer();
-    auto input = ToLower(args.getOriginal());
+    auto input = args.getOriginal();
     // Name can't be blank.
     if (input.empty())
     {
         this->advance(character, "Name cannot be blank.");
     }
-    else if (input == "new")
+    else if (ToLower(input) == "new")
     {
         // Create a shared pointer to the next step.
         std::shared_ptr<ProcessNewName> newStep = std::make_shared<ProcessNewName>();
@@ -43,7 +43,7 @@ void ProcessPlayerName::process(Character * character, ArgumentHandler & args)
         // Advance to the next step.
         newStep->advance(character);
     }
-    else if (input == "quit")
+    else if (ToLower(input) == "quit")
     {
         player->closeConnection();
     }
@@ -66,9 +66,9 @@ void ProcessPlayerName::process(Character * character, ArgumentHandler & args)
         // Load player so we know the player_password etc.
         if (SQLiteDbms::instance().loadPlayer(player))
         {
+            player->sendMsg("Username is correct, now insert the password.\n");
             // Set to 0 the current password attempts.
             player->password_attempts = 0;
-            player->sendMsg("Username is correct, now insert the password.\n");
             // Create a shared pointer to the next step.
             std::shared_ptr<ProcessPlayerPassword> newStep = std::make_shared<ProcessPlayerPassword>();
             // Set the handler.

@@ -56,9 +56,7 @@ void ProcessNewPasswordConfirm::advance(Character * character, const std::string
 {
     // Print the choices.
     this->printChices(character);
-    std::string msg;
-    msg += Formatter::green() + "Re-enter the password.." + Formatter::reset() + "\n";
-    character->sendMsg(msg);
+    character->sendMsg("%sRe-enter the password...%s\n", Formatter::green(), Formatter::reset());
     if (!error.empty())
     {
         character->sendMsg("# " + error + "\n");
@@ -67,7 +65,8 @@ void ProcessNewPasswordConfirm::advance(Character * character, const std::string
 
 void ProcessNewPasswordConfirm::rollBack(Character * character)
 {
-    auto player = character->toPlayer();
-    player->password = "";
-    this->advance(character);
+    // Do not stop this step, just go back to ProcessNewPassword.
+    std::shared_ptr<ProcessNewPassword> newStep = std::make_shared<ProcessNewPassword>();
+    character->inputProcessor = newStep;
+    newStep->rollBack(character);
 }
