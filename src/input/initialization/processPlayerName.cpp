@@ -27,15 +27,14 @@
 
 void ProcessPlayerName::process(Character * character, ArgumentHandler & args)
 {
-    Logger::log(LogLevel::Debug, "ProcessPlayerName");
     auto player = character->toPlayer();
-    auto input = args.getOriginal();
+    auto input = ToLower(args.getOriginal());
     // Name can't be blank.
     if (input.empty())
     {
         this->advance(character, "Name cannot be blank.");
     }
-    else if (ToLower(input) == "new")
+    else if (input == "new")
     {
         // Create a shared pointer to the next step.
         std::shared_ptr<ProcessNewName> newStep = std::make_shared<ProcessNewName>();
@@ -67,8 +66,6 @@ void ProcessPlayerName::process(Character * character, ArgumentHandler & args)
         // Load player so we know the player_password etc.
         if (SQLiteDbms::instance().loadPlayer(player))
         {
-            // Delete the loaded prompt, otherwise it will be shown.
-            player->prompt = "";
             // Set to 0 the current password attempts.
             player->password_attempts = 0;
             player->sendMsg("Username is correct, now insert the password.\n");
@@ -111,16 +108,16 @@ void ProcessPlayerName::advance(Character * character, const std::string & error
     msg += "            ###      XXXXX     ####           \n";
     msg += "#--------------------------------------------#\n";
     msg += "| Created by : Enrico Fraccaroli.            |\n";
-    msg += "| Date       : 21 Agosto 2014                |\n";
+    msg += "| In Date    : 21 Agosto 2014                |\n";
     msg += "#--------------------------------------------#\n";
     msg += Formatter::reset();
     msg += "# Enter your name, or type '" + Formatter::magenta() + "new" + Formatter::reset();
     msg += "' in order to create a new character!\n";
-    character->sendMsg(msg);
     if (!error.empty())
     {
-        character->sendMsg("# " + error + "\n");
+        msg += "# " + error + "\n";
     }
+    character->sendMsg(msg);
 }
 
 void ProcessPlayerName::rollBack(Character * character)

@@ -46,8 +46,6 @@ void ProcessPlayerPassword::process(Character * character, ArgumentHandler & arg
     {
         // Set the handler.
         player->inputProcessor = std::make_shared<ProcessInput>();
-        // Retrieve the saved prompt.
-        player->prompt = player->prompt_save;
         // Entered the MUD.
         player->enterGame();
         // Set the connection state to playing.

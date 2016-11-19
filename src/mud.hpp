@@ -324,7 +324,7 @@ public:
     Mobile * findMobile(std::string id);
 
     /// Find a player given his name.
-    Player * findPlayer(std::string name);
+    Player * findPlayer(const std::string & name);
 
     /// Find an area given its vnum.
     Area * findArea(int vnum);

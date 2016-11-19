@@ -67,7 +67,6 @@ void ProcessNewName::process(Character * character, ArgumentHandler & args)
         player->name = ToCapitals(input);
         player->room = spawnRoom;
         player->faction = Mud::instance().findFaction(1);
-        player->prompt_save = "[" + player->name + "]";
         player->password_attempts = 0;
         // Create a shared pointer to the next step.
         std::shared_ptr<ProcessNewPassword> newStep = std::make_shared<ProcessNewPassword>();

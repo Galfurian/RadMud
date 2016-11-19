@@ -33,7 +33,6 @@ Player::Player(const int & _socket, const int & _port, const std::string & _addr
     age(),
     experience(),
     prompt(),
-    prompt_save(),
     rent_room(),
     skills(),
     remaining_points(),
@@ -87,8 +86,6 @@ bool Player::check() const
     safe &= CorrectAssert(!password.empty());
     safe &= CorrectAssert(age > 0);
     safe &= CorrectAssert(experience >= 0);
-    safe &= CorrectAssert(!prompt.empty());
-    safe &= CorrectAssert(!prompt_save.empty());
     safe &= CorrectAssert(rent_room >= 0);
     //safe &= CorrectAssert(!skills.empty());
     //safe &= CorrectAssert(skills.size() == Mud::instance().mudSkills.size());

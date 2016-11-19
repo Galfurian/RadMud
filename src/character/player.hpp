@@ -56,8 +56,6 @@ public:
     int experience;
     /// The current prompt.
     std::string prompt;
-    /// A backup of the player prompt.
-    std::string prompt_save;
     /// The place where the player has slept last time.
     int rent_room;
     /// The player's list of skills.

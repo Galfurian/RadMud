@@ -335,7 +335,7 @@ bool Mud::addBuilding(Building & building)
     return mudBuildings.insert(std::make_pair(building.vnum, building)).second;
 }
 
-Player * Mud::findPlayer(std::string name)
+Player * Mud::findPlayer(const std::string & name)
 {
     for (auto iterator : mudPlayers)
     {
