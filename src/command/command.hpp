@@ -39,12 +39,14 @@ public:
     /// @param _arguments The arguments of the command.
     /// @param _hndl The handler of the command.
     /// @param _canUseInCombat The can_use_in_combat flag.
-    Command(bool _gods,
-            std::string _name,
-            std::string _help,
-            std::string _arguments,
-            std::function<void(Character * character, ArgumentHandler & args)> _hndl,
-            bool _canUseInCombat);
+    /// @param _typedCompletely If the command must be typed completely.
+    Command(const bool & _gods,
+            const std::string & _name,
+            const std::string & _help,
+            const std::string & _arguments,
+            const std::function<void(Character * character, ArgumentHandler & args)> & _hndl,
+            const bool & _canUseInCombat,
+            const bool & _typedCompletely);
 
     Command & setGods(const bool & _gods);
 
@@ -56,7 +58,9 @@ public:
 
     Command & setHndl(const std::function<void(Character * character, ArgumentHandler & args)> & _hndl);
 
-    Command & setCanUseInCombat(const bool & _cuic);
+    Command & setCanUseInCombat(const bool & _canUseInCombat);
+
+    Command & setTypedCompletely(const bool & _typedCompletely);
 
     /// @brief Checks if the provided character can use the command.
     /// @param character The character to check.
@@ -76,6 +80,8 @@ public:
     std::function<void(Character * character, ArgumentHandler & args)> hndl;
     /// Flag which determines if the command can be used in combat.
     bool canUseInCombat;
+    /// Flag which determines if the command must be typed completely.
+    bool typedCompletely;
 };
 
 /// @brief Check if the executer of this command is a player.

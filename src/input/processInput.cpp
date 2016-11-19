@@ -53,27 +53,29 @@ void ProcessInput::process(Character * character, ArgumentHandler & args)
         DoDirection(character, direction);
         return;
     }
-
     // Check if it's a command.
     for (auto iterator : Mud::instance().mudCommands)
     {
         // Skip the commands which do not start with the given command.
-        if (!BeginWith(iterator.name, command)) continue;
+        if (!BeginWith(iterator.name, command))
+        {
+            continue;
+        }
         // If the command is the right one, check if the character can execute the command.
-        if (!iterator.canUse(character)) continue;
+        if (!iterator.canUse(character))
+        {
+            continue;
+        }
         // Check if the command can be used in combat and if the character is actually in combat.
         if ((!iterator.canUseInCombat) && (character->getAction()->getType() == ActionType::Combat))
         {
-            character->sendMsg("You cannot do that in combat.\n");
+            character->sendMsg("You cannot do that in combat.\n\n");
             return;
         }
-        if (iterator.name == "shutdown" && command != "shutdown")
+        else if (iterator.typedCompletely && (command != iterator.name))
         {
-            character->sendMsg("You have to type completly \"shutdown\".\n");
-        }
-        else if (iterator.name == "quit" && command != "quit")
-        {
-            character->sendMsg("You have to type completly \"quit\".\n");
+            character->sendMsg("You have to type completely \"" + iterator.name + "\".\n\n");
+            return;
         }
         else
         {
@@ -81,7 +83,6 @@ void ProcessInput::process(Character * character, ArgumentHandler & args)
             return;
         }
     }
-
     // Check if the command is instead a profession.
     Profession * profession = Mud::instance().findProfession(command);
     if (profession != nullptr)

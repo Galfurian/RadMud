@@ -44,18 +44,20 @@ Command::Command() :
     // Nothing to do.
 }
 
-Command::Command(bool _gods,
-                 std::string _name,
-                 std::string _help,
-                 std::string _arguments,
-                 std::function<void(Character * character, ArgumentHandler & args)> _hndl,
-                 bool _canUseInCombat) :
+Command::Command(const bool & _gods,
+                 const std::string & _name,
+                 const std::string & _help,
+                 const std::string & _arguments,
+                 const std::function<void(Character * character, ArgumentHandler & args)> & _hndl,
+                 const bool & _canUseInCombat,
+                 const bool & _typedCompletely) :
     gods(_gods),
     name(_name),
     help(_help),
     arguments(_arguments),
     hndl(_hndl),
-    canUseInCombat(_canUseInCombat)
+    canUseInCombat(_canUseInCombat),
+    typedCompletely(_typedCompletely)
 {
     // Nothing to do.
 }
@@ -93,6 +95,12 @@ Command & Command::setHndl(const std::function<void(Character * character, Argum
 Command & Command::setCanUseInCombat(const bool & _canUseInCombat)
 {
     canUseInCombat = _canUseInCombat;
+    return *this;
+}
+
+Command & Command::setTypedCompletely(const bool & _typedCompletely)
+{
+    typedCompletely = _typedCompletely;
     return *this;
 }
 

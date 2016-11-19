@@ -30,7 +30,8 @@ void LoadGeneralCommands()
     {
         Mud::instance().addCommand(Command().setName("quit")
                                        .setHelp("Leave the game.")
-                                       .setHndl(DoQuit));
+                                       .setHndl(DoQuit)
+                                       .setTypedCompletely(true));
     }
     {
         Mud::instance().addCommand(Command().setName("who")

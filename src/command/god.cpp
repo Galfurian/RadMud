@@ -34,6 +34,7 @@ void LoadGodCommands()
         command.help = "Shut the MUD down.";
         command.arguments = "NONE";
         command.hndl = DoShutdown;
+        command.typedCompletely = true;
         Mud::instance().addCommand(command);
     }
     {
