@@ -33,25 +33,25 @@ void LoadObjectCommands()
         Command command;
         command.name = "take";
         command.help = "Take something from the ground or from a container.";
-        command.args = "(item) [(container)]";
+        command.arguments = "(item) [(container)]";
         command.hndl = DoTake;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
     {
         Command command;
         command.name = "drop";
         command.help = "Drop an object.";
-        command.args = "(item)";
+        command.arguments = "(item)";
         command.hndl = DoDrop;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
     {
         Command command;
         command.name = "give";
         command.help = "Give an object to someone.";
-        command.args = "(item) (someone)";
+        command.arguments = "(item) (someone)";
         command.hndl = DoGive;
         Mud::instance().addCommand(command);
     }
@@ -59,25 +59,25 @@ void LoadObjectCommands()
         Command command;
         command.name = "equipments";
         command.help = "List all the items you are wearing.";
-        command.args = "";
+        command.arguments = "";
         command.hndl = DoEquipments;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
     {
         Command command;
         command.name = "wield";
         command.help = "Wield a weapon, a shield or maybe a tool.";
-        command.args = "(item)";
+        command.arguments = "(item)";
         command.hndl = DoWield;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
     {
         Command command;
         command.name = "wear";
         command.help = "Puts on a piece of equipment.";
-        command.args = "(item)";
+        command.arguments = "(item)";
         command.hndl = DoWear;
         Mud::instance().addCommand(command);
     }
@@ -85,25 +85,25 @@ void LoadObjectCommands()
         Command command;
         command.name = "remove";
         command.help = "Remove a weared or wielded item.";
-        command.args = "(item)";
+        command.arguments = "(item)";
         command.hndl = DoRemove;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
     {
         Command command;
         command.name = "inventory";
         command.help = "Show character's inventory.";
-        command.args = "";
+        command.arguments = "";
         command.hndl = DoInventory;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
     {
         Command command;
         command.name = "organize";
         command.help = "Order the desired container or if no target is passed, the room.";
-        command.args = "(name|weight) [(target)]";
+        command.arguments = "(name|weight) [(target)]";
         command.hndl = DoOrganize;
         Mud::instance().addCommand(command);
     }
@@ -111,25 +111,25 @@ void LoadObjectCommands()
         Command command;
         command.name = "open";
         command.help = "Open a door in a given direction.";
-        command.args = "(item)|(direction)";
+        command.arguments = "(item)|(direction)";
         command.hndl = DoOpen;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
     {
         Command command;
         command.name = "close";
         command.help = "Close a door in a given direction.";
-        command.args = "(item)|(direction)";
+        command.arguments = "(item)|(direction)";
         command.hndl = DoClose;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
     {
         Command command;
         command.name = "put";
         command.help = "Put something inside a container.";
-        command.args = "(something) (container)";
+        command.arguments = "(something) (container)";
         command.hndl = DoPut;
         Mud::instance().addCommand(command);
     }
@@ -137,7 +137,7 @@ void LoadObjectCommands()
         Command command;
         command.name = "drink";
         command.help = "Drink from a container of liquids.";
-        command.args = "(container)";
+        command.arguments = "(container)";
         command.hndl = DoDrink;
         Mud::instance().addCommand(command);
     }
@@ -145,7 +145,7 @@ void LoadObjectCommands()
         Command command;
         command.name = "fill";
         command.help = "Fill a container of liquids from a source of liquid.";
-        command.args = "(container) (source)";
+        command.arguments = "(container) (source)";
         command.hndl = DoFill;
         Mud::instance().addCommand(command);
     }
@@ -153,7 +153,7 @@ void LoadObjectCommands()
         Command command;
         command.name = "pour";
         command.help = "Pour the content of the container into another one or on the ground.";
-        command.args = "(container) [container]";
+        command.arguments = "(container) [container]";
         command.hndl = DoPour;
         Mud::instance().addCommand(command);
     }
@@ -161,7 +161,7 @@ void LoadObjectCommands()
         Command command;
         command.name = "deposit";
         command.help = "Deposit a coin inside a shop.";
-        command.args = "(item) (shop)";
+        command.arguments = "(item) (shop)";
         command.hndl = DoDeposit;
         Mud::instance().addCommand(command);
     }
@@ -169,7 +169,7 @@ void LoadObjectCommands()
         Command command;
         command.name = "sell";
         command.help = "Sell an item to a shop keeper.";
-        command.args = "(item) (shop)";
+        command.arguments = "(item) (shop)";
         command.hndl = DoSell;
         Mud::instance().addCommand(command);
     }
@@ -177,7 +177,7 @@ void LoadObjectCommands()
         Command command;
         command.name = "buy";
         command.help = "Allows to buy an item from a shop.";
-        command.args = "(item) (shop)";
+        command.arguments = "(item) (shop)";
         command.hndl = DoBuy;
         Mud::instance().addCommand(command);
     }
@@ -185,7 +185,7 @@ void LoadObjectCommands()
         Command command;
         command.name = "balance";
         command.help = "Shows the character's balance.";
-        command.args = "";
+        command.arguments = "";
         command.hndl = DoBalance;
         Mud::instance().addCommand(command);
     }

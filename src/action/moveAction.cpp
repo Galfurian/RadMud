@@ -100,7 +100,7 @@ ActionStatus MoveAction::perform()
         actor->sendMsg(error + "\n\n");
         return ActionStatus::Error;
     }
-    if (!MoveAction::canMoveTo(actor, direction, error))
+    if (!MoveAction::canMoveTo(actor, direction, error, false))
     {
         // Notify that the actor can't move because too tired.
         actor->sendMsg(error + "\n");
@@ -159,9 +159,9 @@ unsigned int MoveAction::getCooldown(const Character * character)
     return cooldown;
 }
 
-bool MoveAction::canMoveTo(Character * character, const Direction & direction, std::string & error)
+bool MoveAction::canMoveTo(Character * character, const Direction & direction, std::string & error, bool allowInCombat)
 {
-    if (character->getAction()->getType() == ActionType::Combat)
+    if ((character->getAction()->getType() == ActionType::Combat) && !allowInCombat)
     {
         // Check if the character is locked into close combat.
         bool lockedInCombat = false;

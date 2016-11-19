@@ -365,7 +365,7 @@ bool SQLiteDbms::loadPlayerInformation(Player * player)
         player->level = result->getNextUnsignedInteger();
         player->experience = result->getNextInteger();
         player->room = Mud::instance().findRoom(result->getNextInteger());
-        player->prompt = player->prompt_save = result->getNextString();
+        player->prompt = result->getNextString();
         player->flags = result->getNextUnsignedInteger();
         player->setHealth(result->getNextUnsignedInteger(), true);
         player->setStamina(result->getNextUnsignedInteger(), true);

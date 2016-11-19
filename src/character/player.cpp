@@ -20,10 +20,7 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-// Basic Include.
 #include "player.hpp"
-
-// Other Include.
 #include "mud.hpp"
 
 Player::Player(const int & _socket, const int & _port, const std::string & _address) :
@@ -36,11 +33,10 @@ Player::Player(const int & _socket, const int & _port, const std::string & _addr
     age(),
     experience(),
     prompt(),
-    prompt_save(),
     rent_room(),
     skills(),
     remaining_points(),
-    connection_state(ConnectionState::NoState),
+    connectionState(ConnectionState::LoggingIn),
     password_attempts(),
     closing(),
     logged_in(),
@@ -90,10 +86,7 @@ bool Player::check() const
     safe &= CorrectAssert(!password.empty());
     safe &= CorrectAssert(age > 0);
     safe &= CorrectAssert(experience >= 0);
-    safe &= CorrectAssert(!prompt.empty());
-    safe &= CorrectAssert(!prompt_save.empty());
     safe &= CorrectAssert(rent_room >= 0);
-    safe &= CorrectAssert(connection_state != ConnectionState::NoState);
     //safe &= CorrectAssert(!skills.empty());
     //safe &= CorrectAssert(skills.size() == Mud::instance().mudSkills.size());
     for (auto iterator : Mud::instance().mudSkills)
@@ -224,7 +217,7 @@ void Player::closeConnection()
 
 bool Player::isPlaying() const
 {
-    return checkConnection() && (connection_state == ConnectionState::Playing) && (!closing)
+    return checkConnection() && (connectionState == ConnectionState::Playing) && (!closing)
            && logged_in;
 }
 
@@ -360,20 +353,6 @@ void Player::enterGame()
     doCommand("look");
 }
 
-void Player::processInput(Player * player, const std::string & command)
-{
-    ActionHandler _action = Mud::instance().findStateAction(player->connection_state);
-    try
-    {
-        ArgumentHandler argumentHandler(command);
-        _action(player, argumentHandler);
-    }
-    catch (std::runtime_error & e)
-    {
-        sendMsg(std::string(e.what()) + "\n");
-    }
-}
-
 /// Size of buffers used for communications.
 #define BUFSIZE 512
 
@@ -408,8 +387,8 @@ void Player::processRead()
     inbuf = std::string(buffer, uRead);
     // Update received data.
     MudUpdater::instance().updateBandIn(uRead);
-    // Process the input.
-    this->processInput(this, Trim(inbuf));
+    // Execute the received command.
+    this->doCommand(Trim(inbuf));
     // Null-terminate the buffer.
     inbuf[uRead] = 0;
 }

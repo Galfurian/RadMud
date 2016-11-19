@@ -29,19 +29,20 @@ void LoadGeneralCommands()
 {
     {
         Mud::instance().addCommand(Command().setName("quit")
-                                            .setHelp("Leave the game.")
-                                            .setHndl(DoQuit));
+                                       .setHelp("Leave the game.")
+                                       .setHndl(DoQuit)
+                                       .setTypedCompletely(true));
     }
     {
         Mud::instance().addCommand(Command().setName("who")
-                                            .setHelp("List all the character online.")
-                                            .setHndl(DoWho));
+                                       .setHelp("List all the character online.")
+                                       .setHndl(DoWho));
     }
     {
         Command command;
         command.name = "set";
         command.help = "Set some character texts(eg. descr).";
-        command.args = "(setting) (value)";
+        command.arguments = "(setting) (value)";
         command.hndl = DoSet;
         Mud::instance().addCommand(command);
     }
@@ -49,25 +50,25 @@ void LoadGeneralCommands()
         Command command;
         command.name = "stop";
         command.help = "Stop the current character action.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoStop;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
     {
         Command command;
         command.name = "look";
         command.help = "Look at something or someone.";
-        command.args = "[(something) or (someone)]";
+        command.arguments = "[(something) or (someone)]";
         command.hndl = DoLook;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
     {
         Command command;
         command.name = "help";
         command.help = "Show the list of commands or show help for a given command.";
-        command.args = "(command)";
+        command.arguments = "(command)";
         command.hndl = DoHelp;
         Mud::instance().addCommand(command);
     }
@@ -75,7 +76,7 @@ void LoadGeneralCommands()
         Command command;
         command.name = "prompt";
         command.help = "Modify your prompt.";
-        command.args = "(help)|(prompt definition)";
+        command.arguments = "(help)|(prompt definition)";
         command.hndl = DoPrompt;
         Mud::instance().addCommand(command);
     }
@@ -83,34 +84,34 @@ void LoadGeneralCommands()
         Command command;
         command.name = "time";
         command.help = "Give the current day phase.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoTime;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
     {
         Command command;
         command.name = "stand";
         command.help = "Make the player stand.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoStand;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
     {
         Command command;
         command.name = "crouch";
         command.help = "The player crouches down himself, it's a good stance for hiding.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoCrouch;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
     {
         Command command;
         command.name = "sit";
         command.help = "The player sits down, ideal for a quick break.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoSit;
         Mud::instance().addCommand(command);
     }
@@ -118,16 +119,16 @@ void LoadGeneralCommands()
         Command command;
         command.name = "prone";
         command.help = "The player starts prone, a perfect position to shoot long distance.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoProne;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
     {
         Command command;
         command.name = "rest";
         command.help = "The player lies down and begin to rest.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoRest;
         Mud::instance().addCommand(command);
     }
@@ -135,16 +136,16 @@ void LoadGeneralCommands()
         Command command;
         command.name = "statistics";
         command.help = "Show player statistics.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoStatistics;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
     {
         Command command;
         command.name = "rent";
         command.help = "Allow player to rent and disconnect.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoRent;
         Mud::instance().addCommand(command);
     }
@@ -152,27 +153,27 @@ void LoadGeneralCommands()
         Command command;
         command.name = "skills";
         command.help = "Shows the playes skills and their level.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoSkills;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
     {
         Command command;
         command.name = "server";
         command.help = "Shows the server statistics.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoServer;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
     {
         Command command;
         command.name = "travel";
         command.help = "Allow the character to travel between areas.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoTravel;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
 
@@ -183,7 +184,7 @@ void DoDirection(Character * character, Direction direction)
     // Stop any action the character is executing.
     StopAction(character);
     std::string error;
-    if (!MoveAction::canMoveTo(character, direction, error))
+    if (!MoveAction::canMoveTo(character, direction, error, false))
     {
         character->sendMsg(error + "\n");
         return;
@@ -224,12 +225,14 @@ void DoTravel(Character * character, ArgumentHandler & /*args*/)
     // Check if the room is a travel point.
     if (!HasFlag(character->room->flags, RoomFlag::TravelPoint))
     {
-        throw std::runtime_error("You can't travel from here.\n");
+        character->sendMsg("You can't travel from here.\n");
+        return;
     }
     auto destination = Mud::instance().findTravelPoint(character->room);
     if (destination == nullptr)
     {
-        throw std::runtime_error("You can't find an exit from here.\n");
+        character->sendMsg("You can't find an exit from here.\n");
+        return;
     }
     auto msgDepart = character->getNameCapital() + " goes outside.\n";
     auto msgArrive = character->getNameCapital() + " enter the room.\n";
@@ -246,7 +249,7 @@ void DoQuit(Character * character, ArgumentHandler & /*args*/)
     StopAction(character);
     auto player = character->toPlayer();
     // If s/he finished connecting, tell others s/he has left.
-    if (player->connection_state == ConnectionState::Playing)
+    if (player->connectionState == ConnectionState::Playing)
     {
         // Say goodbye to player.
         player->sendMsg("See you next time!\n");
@@ -374,8 +377,8 @@ void DoLook(Character * character, ArgumentHandler & args)
         {
             if (character->canSee(target))
             {
-                Item * item = target->findEquipmentItem(args[0].getContent(), args[0].getIndex());
-                if (item)
+                auto item = target->findEquipmentItem(args[0].getContent(), args[0].getIndex());
+                if (item != nullptr)
                 {
                     character->sendMsg(item->getLook());
                 }
@@ -497,7 +500,7 @@ void DoHelp(Character * character, ArgumentHandler & args)
                     msg += Formatter::yellow() + " Level     : " + Formatter::reset()
                            + ToString(iterator.gods) + "\n";
                     msg += Formatter::yellow() + " Arguments : " + Formatter::reset()
-                           + iterator.args + "\n";
+                           + iterator.arguments + "\n";
                     msg += Formatter::yellow() + " Help      : " + Formatter::reset()
                            + iterator.help + "\n";
                     character->sendMsg(msg);

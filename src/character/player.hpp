@@ -56,8 +56,6 @@ public:
     int experience;
     /// The current prompt.
     std::string prompt;
-    /// A backup of the player prompt.
-    std::string prompt_save;
     /// The place where the player has slept last time.
     int rent_room;
     /// The player's list of skills.
@@ -65,7 +63,7 @@ public:
     /// Points that could be spent during character creation.
     int remaining_points;
     /// Connection state.
-    ConnectionState connection_state;
+    ConnectionState connectionState;
     /// Password guessing attempts.
     int password_attempts;
     /// True if they are about to leave us.
@@ -142,11 +140,6 @@ public:
 
     /// @brief Handle player has entered the game.
     void enterGame();
-
-    /// @brief Process player input - check connection state, and act accordingly.
-    /// @param player  Player that submitted input.
-    /// @param command Player's input command.
-    void processInput(Player * player, const std::string & command);
 
     /// @brief Get player input.
     void processRead();

@@ -25,9 +25,6 @@
 #include "character.hpp"
 #include "argumentHandler.hpp"
 
-/// @brief An action handler for the character.
-using ActionHandler = std::function<void(Character * character, ArgumentHandler & args)>;
-
 /// @brief Contains all the informations concerning a command, including its handler.
 class Command
 {
@@ -39,16 +36,17 @@ public:
     /// @param _gods The level necessary to execute the command.
     /// @param _name The name of the command.
     /// @param _help The help message of the command.
-    /// @param _args The arguments of the command.
+    /// @param _arguments The arguments of the command.
     /// @param _hndl The handler of the command.
-    /// @param _cuic The handler of the command.
-    Command(
-        bool _gods,
-        std::string _name,
-        std::string _help,
-        std::string _args,
-        ActionHandler _hndl,
-        bool _cuic);
+    /// @param _canUseInCombat The can_use_in_combat flag.
+    /// @param _typedCompletely If the command must be typed completely.
+    Command(const bool & _gods,
+            const std::string & _name,
+            const std::string & _help,
+            const std::string & _arguments,
+            const std::function<void(Character * character, ArgumentHandler & args)> & _hndl,
+            const bool & _canUseInCombat,
+            const bool & _typedCompletely);
 
     Command & setGods(const bool & _gods);
 
@@ -56,11 +54,13 @@ public:
 
     Command & setHelp(const std::string & _help);
 
-    Command & setArgs(const std::string & _args);
+    Command & setArgs(const std::string & _arguments);
 
-    Command & setHndl(const ActionHandler & _hndl);
+    Command & setHndl(const std::function<void(Character * character, ArgumentHandler & args)> & _hndl);
 
-    Command & setCuic(const bool & _cuic);
+    Command & setCanUseInCombat(const bool & _canUseInCombat);
+
+    Command & setTypedCompletely(const bool & _typedCompletely);
 
     /// @brief Checks if the provided character can use the command.
     /// @param character The character to check.
@@ -75,89 +75,20 @@ public:
     /// The help message of the command.
     std::string help;
     /// The arguemtns of the command.
-    std::string args;
+    std::string arguments;
     /// The handler of the command.
-    ActionHandler hndl;
+    std::function<void(Character * character, ArgumentHandler & args)> hndl;
     /// Flag which determines if the command can be used in combat.
-    bool cuic;
+    bool canUseInCombat;
+    /// Flag which determines if the command must be typed completely.
+    bool typedCompletely;
 };
-
-/// @defgroup ProcessStates Player state processing.
-/// @brief All the functions necessary to process players commands, from creation to gameplay.
-/// @{
-
-/// @brief Process commands when character is connected.
-/// @param character The character that execute the command.
-/// @param args  Command arguments.
-void ProcessCommand(Character * character, ArgumentHandler & args);
-
-/// Check player name.
-void ProcessPlayerName(Character * character, ArgumentHandler & args);
-
-/// Check if the player password is correct.
-void ProcessPlayerPassword(Character * character, ArgumentHandler & args);
-
-/// Step 1  - Choose the Name.
-void ProcessNewName(Character * character, ArgumentHandler & args);
-
-/// Step 2  - Choose the Password.
-void ProcessNewPwd(Character * character, ArgumentHandler & args);
-
-/// Step 3  - Confirm the Password.
-void ProcessNewPwdCon(Character * character, ArgumentHandler & args);
-
-/// Step 4  - Short story of the mud world.
-void ProcessNewStory(Character * character, ArgumentHandler & args);
-
-/// Step 5  - Choose the Race.
-void ProcessNewRace(Character * character, ArgumentHandler & args);
-
-/// Step 6  - Choose the Attributes.
-void ProcessNewAttr(Character * character, ArgumentHandler & args);
-
-/// Step 7  - Choose the Gender.
-void ProcessNewGender(Character * character, ArgumentHandler & args);
-
-/// Step 8  - Choose the Age.
-void ProcessNewAge(Character * character, ArgumentHandler & args);
-
-/// Step 9  - Choose the description (optional).
-void ProcessNewDesc(Character * character, ArgumentHandler & args);
-
-/// Step 10 - Choose the Weight.
-void ProcessNewWeight(Character * character, ArgumentHandler & args);
-
-/// Step 11 - Confirm the character.
-void ProcessNewConfirm(Character * character, ArgumentHandler & args);
-///@}
 
 /// @brief Check if the executer of this command is a player.
 void NoMobile(Character * character);
 
 /// @brief Stop any action the character is executing.
 void StopAction(Character * character);
-
-/// @brief Load all the possible player states.
-void LoadStates();
-
-/// @brief Print the values inserted until now.
-/// @param character The player whose creating a new character.
-void PrintChoices(Character * character);
-
-/// @brief Reset the informations inserted in the previous state.
-/// @param character The player whose creating a new character.
-/// @param new_state The step reached by this player.
-void RollbackCharacterCreation(Character * character, ConnectionState new_state);
-
-/// @brief Print the advancement in the character creation.
-/// @details If you want to introduce a new step, you have to insert it's text here.
-/// @param character The player whose creating a new character.
-/// @param con_state The step reached by this player.
-/// @param message   An optional message used only during error handling.
-void AdvanceCharacterCreation(
-    Character * character,
-    ConnectionState con_state,
-    std::string message = "");
 
 /// @brief Map all the command to the respective std::string that the character can type.
 void LoadCommands();

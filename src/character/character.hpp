@@ -31,6 +31,7 @@
 #include "item.hpp"
 #include "faction.hpp"
 #include "effectList.hpp"
+#include "processInput.hpp"
 #include "combatAction.hpp"
 #include "argumentHandler.hpp"
 #include "characterContainer.hpp"
@@ -95,6 +96,8 @@ public:
     std::deque<std::shared_ptr<GeneralAction> > actionQueue;
     /// List of characters in sight.
     CharacterContainer charactersInSight;
+    /// The input handler.
+    std::shared_ptr<ProcessInput> inputProcessor;
 
     /// @brief Constructor.
     Character();
@@ -596,6 +599,13 @@ public:
     /// @brief Sends a message to the character. This one in particular handles unsigned integer.
     template<typename ... Args>
     void sendMsg(const std::string & msg, const unsigned int & first, const Args & ... args)
+    {
+        this->sendMsg(msg, ToString(first), args ...);
+    }
+
+    /// @brief Sends a message to the character. This one in particular handles unsigned integer.
+    template<typename ... Args>
+    void sendMsg(const std::string & msg, const int & first, const Args & ... args)
     {
         this->sendMsg(msg, ToString(first), args ...);
     }

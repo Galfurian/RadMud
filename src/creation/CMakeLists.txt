@@ -1,13 +1,13 @@
 #############################################
 # Include Directories
-set(RADMUD_CREATION_INC
+set(PROJECT_INC ${PROJECT_INC}
         ./src/creation/
         PARENT_SCOPE
         )
 
 #############################################
 # Source Files
-set(RADMUD_CREATION_SRC
+set(PROJECT_SRC ${PROJECT_SRC}
         ./src/creation/building.cpp
         ./src/creation/production.cpp
         ./src/creation/liquid.cpp

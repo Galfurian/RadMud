@@ -1,13 +1,13 @@
 #############################################
 # SQLite Include Directories
-set(RADMUD_SQLITE_INC
+set(PROJECT_INC ${PROJECT_INC}
         ./src/sqlite
         PARENT_SCOPE
         )
 
 #############################################
 # SQLite Source Files
-set(RADMUD_SQLITE_SRC
+set(PROJECT_SRC ${PROJECT_SRC}
         ./src/sqlite/sqliteDbms.cpp
         ./src/sqlite/tableLoader.cpp
         ./src/sqlite/sqliteWrapper.cpp

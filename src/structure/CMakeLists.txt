@@ -1,21 +1,18 @@
 #############################################
 # Include Directories
-set(RADMUD_STRUCTURE_INC
-        ./src/structure/
-        ./src/structure/algorithms
-        ./src/structure/algorithms/AStar
+set(PROJECT_INC ${PROJECT_INC}
+        ./src/structure
         PARENT_SCOPE
         )
 
 #############################################
 # Source Files
-set(RADMUD_STRUCTURE_SRC
+set(PROJECT_SRC ${PROJECT_SRC}
         ./src/structure/exit.cpp
         ./src/structure/room.cpp
         ./src/structure/area.cpp
         ./src/structure/continent.cpp
         ./src/structure/coordinates.cpp
         ./src/structure/generator.cpp
-        ./src/structure/algorithms/AStar/aStarNode.cpp
         PARENT_SCOPE
         )

@@ -1,7 +1,6 @@
-/// @file   aggression.cpp
-/// @brief  Contains the implementation of the aggression class.
+/// @file   processNewGender.hpp
 /// @author Enrico Fraccaroli
-/// @date   Oct 21 2016
+/// @date   Nov 14, 2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,12 +19,16 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "aggression.hpp"
-#include "character.hpp"
+#include "processInitialization.hpp"
 
-Aggression::Aggression(Character * _aggressor, unsigned int _aggression) :
-    aggressor(_aggressor),
-    aggression(_aggression)
+/// @brief Allows to choose the player gender.
+class ProcessNewGender :
+    public ProcessInitialization
 {
-    // Nothing to do.
-}
+public:
+    void process(Character * character, ArgumentHandler & args);
+
+    void advance(Character * character, const std::string & error = std::string());
+
+    void rollBack(Character * character);
+};

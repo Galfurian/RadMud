@@ -32,7 +32,7 @@ void LoadCraftingCommands()
         Command command;
         command.name = "build";
         command.help = "Build something.";
-        command.args = "(item)";
+        command.arguments = "(item)";
         command.hndl = DoBuild;
         Mud::instance().addCommand(command);
     }
@@ -40,7 +40,7 @@ void LoadCraftingCommands()
         Command command;
         command.name = "deconstruct";
         command.help = "Deconstruct a building.";
-        command.args = "(building)";
+        command.arguments = "(building)";
         command.hndl = DoDeconstruct;
         Mud::instance().addCommand(command);
     }
@@ -48,7 +48,7 @@ void LoadCraftingCommands()
         Command command;
         command.name = "read";
         command.help = "Read an inscription from an item.";
-        command.args = "(item)";
+        command.arguments = "(item)";
         command.hndl = DoRead;
         Mud::instance().addCommand(command);
     }

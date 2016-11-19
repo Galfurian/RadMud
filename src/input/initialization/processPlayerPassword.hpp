@@ -1,7 +1,6 @@
-/// @file   aggression.hpp
-/// @brief  Contains the class used to keep track of an aggression.
+/// @file   processPlayerPassword.hpp
 /// @author Enrico Fraccaroli
-/// @date   Oct 21 2016
+/// @date   Nov 14, 2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,19 +19,16 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#pragma once
+#include "processInitialization.hpp"
 
-class Character;
-
-/// @brief Allows to store information about an aggressor.
-class Aggression
+/// @brief Check if the player password is correct.
+class ProcessPlayerPassword :
+    public ProcessInitialization
 {
 public:
-    /// The aggressor.
-    Character * aggressor;
-    /// The level of aggression.
-    mutable unsigned int aggression;
+    void process(Character * character, ArgumentHandler & args);
 
-    /// @brief Constructor.
-    Aggression(Character * _aggressor, unsigned int _aggression);
+    void advance(Character * character, const std::string & error = std::string());
+
+    void rollBack(Character * character);
 };

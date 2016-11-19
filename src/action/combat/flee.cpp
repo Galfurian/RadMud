@@ -23,6 +23,7 @@
 #include "flee.hpp"
 #include "room.hpp"
 #include "basicAttack.hpp"
+#include "moveAction.hpp"
 
 Flee::Flee(Character * _actor) :
     CombatAction(_actor)
@@ -88,7 +89,7 @@ ActionStatus Flee::perform()
         return ActionStatus::Error;
     }
     // Get the character chance of fleeing (D20).
-    auto fleeChance = TRandInteger<unsigned int>(0, 20) + actor->getAbilityModifier(Ability::Agility);
+    size_t fleeChance = TRandInteger<size_t>(0, 20) + actor->getAbilityModifier(Ability::Agility);
     // Get the required stamina.
     auto consumedStamina = this->getConsumedStamina(actor);
     // Base the escape level on how many enemies are surrounding the character.
@@ -101,7 +102,11 @@ ActionStatus Flee::perform()
     else
     {
         // Get the list of available directions.
-        auto directions = actor->room->getAvailableDirections();
+        std::vector<Direction> directions;
+        for (auto it : actor->room->getAvailableDirections())
+        {
+            if (MoveAction::canMoveTo(actor, it, error, true)) directions.emplace_back(it);
+        }
         // Pick a random direction, from the poll of the available ones.
         auto randomDirValue = TRandInteger<size_t>(0, directions.size() - 1);
         auto randomDirection = directions.at(randomDirValue);

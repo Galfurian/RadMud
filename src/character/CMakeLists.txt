@@ -1,18 +1,13 @@
 #############################################
-# Add Subdirectories
-add_subdirectory(effects)
-
-#############################################
 # Include Directories
-set(RADMUD_CHARACTER_INC
+set(PROJECT_INC ${PROJECT_INC}
         ./src/character
-        ${RADMUD_EFFECTS_INC}
         PARENT_SCOPE
         )
 
 #############################################
 # Source Files
-set(RADMUD_CHARACTER_SRC
+set(PROJECT_SRC ${PROJECT_SRC}
         ./src/character/character.cpp
         ./src/character/mobile.cpp
         ./src/character/player.cpp
@@ -20,8 +15,9 @@ set(RADMUD_CHARACTER_SRC
         ./src/character/faction.cpp
         ./src/character/race.cpp
         ./src/character/skill.cpp
-        ./src/character/aggression.cpp
         ./src/character/combatHandler.cpp
-        ${RADMUD_EFFECTS_SRC}
+        ./src/character/effect.cpp
+        ./src/character/effectList.cpp
+        ./src/character/effectFactory.cpp
         PARENT_SCOPE
         )

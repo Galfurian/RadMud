@@ -207,8 +207,6 @@ public:
     std::vector<Command> mudCommands;
     /// Mud possible directions.
     std::map<std::string, Direction> mudDirections;
-    /// Map of things to do for various connection states.
-    std::map<ConnectionState, ActionHandler> mudStateActions;
     /// Map of buildings schematic.
     std::map<int, Building> mudBuildings;
 
@@ -308,9 +306,6 @@ public:
     /// Add a direction to the mud.
     bool addDirection(std::string name, Direction direction);
 
-    /// Add a state action to the mud.
-    bool addStateAction(ConnectionState state, ActionHandler action);
-
     /// Add a building to the mud.
     bool addBuilding(Building & building);
     ///@}
@@ -329,7 +324,7 @@ public:
     Mobile * findMobile(std::string id);
 
     /// Find a player given his name.
-    Player * findPlayer(std::string name);
+    Player * findPlayer(const std::string & name);
 
     /// Find an area given its vnum.
     Area * findArea(int vnum);
@@ -381,9 +376,6 @@ public:
 
     /// Find the destination room of a travel point, given its starting room.
     Room * findTravelPoint(Room * room);
-
-    /// Find the action handler given a connection state.
-    ActionHandler & findStateAction(ConnectionState state);
 
     /// Find a building given its name.
     Building * findBuilding(std::string name);
@@ -450,7 +442,9 @@ private:
     void removeInactivePlayers();
 
     /// @brief New player has connected.
-    void processNewConnection();
+    /// @return <b>True</b> if there are no errors,<br>
+    ///         <b>False</b> otherwise.
+    bool processNewConnection();
 
     /// @brief Handle all the comunication descriptor, it's the socket value.
     void setupDescriptor(Player * player);

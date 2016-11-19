@@ -32,8 +32,9 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "shutdown";
         command.help = "Shut the MUD down.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoShutdown;
+        command.typedCompletely = true;
         Mud::instance().addCommand(command);
     }
     {
@@ -41,7 +42,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "mudsave";
         command.help = "Save the MUD.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoMudSave;
         Mud::instance().addCommand(command);
     }
@@ -50,7 +51,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "goto";
         command.help = "Go to another room.";
-        command.args = "(Room.vnum)";
+        command.arguments = "(Room.vnum)";
         command.hndl = DoGoTo;
         Mud::instance().addCommand(command);
     }
@@ -59,7 +60,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "findpath";
         command.help = "Finds the path to the given room.";
-        command.args = "(Room.vnum)";
+        command.arguments = "(Room.vnum)";
         command.hndl = DoFindPath;
         Mud::instance().addCommand(command);
     }
@@ -68,7 +69,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "hurt";
         command.help = "Hurt the desired target.";
-        command.args = "(Target)";
+        command.arguments = "(Target)";
         command.hndl = DoHurt;
         Mud::instance().addCommand(command);
     }
@@ -77,7 +78,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "invisibility";
         command.help = "Became invisible.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoInvisibility;
         Mud::instance().addCommand(command);
     }
@@ -86,7 +87,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "visible";
         command.help = "Return visible.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoVisible;
         Mud::instance().addCommand(command);
     }
@@ -95,7 +96,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "ginfo";
         command.help = "Get information about a character.";
-        command.args = "(target)";
+        command.arguments = "(target)";
         command.hndl = DoGodInfo;
         Mud::instance().addCommand(command);
     }
@@ -106,7 +107,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "aggrolist";
         command.help = "Provides the list of opponents of the given target.";
-        command.args = "(Target)";
+        command.arguments = "(Target)";
         command.hndl = DoAggroList;
         Mud::instance().addCommand(command);
     }
@@ -115,7 +116,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "transfer";
         command.help = "Transfer another character here, or to another room.";
-        command.args = "(Target) [Where]";
+        command.arguments = "(Target) [Where]";
         command.hndl = DoTransfer;
         Mud::instance().addCommand(command);
     }
@@ -124,7 +125,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "feast";
         command.help = "Restores completely the health and the stamina of the target.";
-        command.args = "(Target)";
+        command.arguments = "(Target)";
         command.hndl = DoFeast;
         Mud::instance().addCommand(command);
     }
@@ -133,7 +134,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "sflag";
         command.help = "Sets a flag for a character.";
-        command.args = "(Target) (Flag)";
+        command.arguments = "(Target) (Flag)";
         command.hndl = DoSetFlag;
         Mud::instance().addCommand(command);
     }
@@ -142,7 +143,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "cflag";
         command.help = "Remove a flag from a character.";
-        command.args = "(Target) (Flag)";
+        command.arguments = "(Target) (Flag)";
         command.hndl = DoClearFlag;
         Mud::instance().addCommand(command);
     }
@@ -151,7 +152,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "modskill";
         command.help = "Modify the value of the player skill.";
-        command.args = "(Target) (Skill) (Value)";
+        command.arguments = "(Target) (Skill) (Value)";
         command.hndl = DoModSkill;
         Mud::instance().addCommand(command);
     }
@@ -160,7 +161,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "modattribute";
         command.help = "Modify the value of the player attribute.";
-        command.args = "(Target) (Attribute) (Value)";
+        command.arguments = "(Target) (Attribute) (Value)";
         command.hndl = DoModAttr;
         Mud::instance().addCommand(command);
     }
@@ -171,7 +172,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "imodel";
         command.help = "List all the information about a model.";
-        command.args = "(Model.vnum)";
+        command.arguments = "(Model.vnum)";
         command.hndl = DoModelInfo;
         Mud::instance().addCommand(command);
     }
@@ -182,7 +183,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "iitem";
         command.help = "Show information about an item.";
-        command.args = "(Item.vnum)";
+        command.arguments = "(Item.vnum)";
         command.hndl = DoItemInfo;
         Mud::instance().addCommand(command);
     }
@@ -191,7 +192,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "citem";
         command.help = "Create a new item, if not set the quality will be Normal.";
-        command.args = "(Model.vnum)(Material.vnum)[Quality]";
+        command.arguments = "(Model.vnum)(Material.vnum)[Quality]";
         command.hndl = DoItemCreate;
         Mud::instance().addCommand(command);
     }
@@ -200,7 +201,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "ditem";
         command.help = "Destroy the desired object.";
-        command.args = "(Item.vnum)";
+        command.arguments = "(Item.vnum)";
         command.hndl = DoItemDestroy;
         Mud::instance().addCommand(command);
     }
@@ -209,7 +210,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "gitem";
         command.help = "Materialize the desired object.";
-        command.args = "(Item.vnum)";
+        command.arguments = "(Item.vnum)";
         command.hndl = DoItemGet;
         Mud::instance().addCommand(command);
     }
@@ -220,7 +221,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "iarea";
         command.help = "Show the informations about a specific area.";
-        command.args = "(Area.vnum)";
+        command.arguments = "(Area.vnum)";
         command.hndl = DoAreaInfo;
         Mud::instance().addCommand(command);
     }
@@ -231,7 +232,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "iroom";
         command.help = "Show the informations about a specific room.";
-        command.args = "(Room.vnum)";
+        command.arguments = "(Room.vnum)";
         command.hndl = DoRoomInfo;
         Mud::instance().addCommand(command);
     }
@@ -240,7 +241,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "croom";
         command.help = "Create a room in the given direction.";
-        command.args = "(Direction)";
+        command.arguments = "(Direction)";
         command.hndl = DoRoomCreate;
         Mud::instance().addCommand(command);
     }
@@ -249,7 +250,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "droom";
         command.help = "Delete the room in the given direction.";
-        command.args = "(Direction)";
+        command.arguments = "(Direction)";
         command.hndl = DoRoomDelete;
         Mud::instance().addCommand(command);
     }
@@ -258,7 +259,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "eroom";
         command.help = "Change room values.";
-        command.args = "(Option) (Value)";
+        command.arguments = "(Option) (Value)";
         command.hndl = DoRoomEdit;
         Mud::instance().addCommand(command);
     }
@@ -269,7 +270,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "kmobile";
         command.help = "Kill the desired mobile, in the same room.";
-        command.args = "(Mobile.name)";
+        command.arguments = "(Mobile.name)";
         command.hndl = DoMobileKill;
         Mud::instance().addCommand(command);
     }
@@ -278,7 +279,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "rmobile";
         command.help = "Reload the lua script for the target mobile, in the same room.";
-        command.args = "(Mobile.name)";
+        command.arguments = "(Mobile.name)";
         command.hndl = DoMobileReload;
         Mud::instance().addCommand(command);
     }
@@ -287,7 +288,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "mobilelog";
         command.help = "Given a mobile id, it returns the curresponding mobile log.";
-        command.args = "(Mobile.id)";
+        command.arguments = "(Mobile.id)";
         command.hndl = DoMobileLog;
         Mud::instance().addCommand(command);
     }
@@ -298,7 +299,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "imaterial";
         command.help = "Show the informations about a specific material.";
-        command.args = "(Material.vnum)";
+        command.arguments = "(Material.vnum)";
         command.hndl = DoMaterialInfo;
         Mud::instance().addCommand(command);
     }
@@ -309,7 +310,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "iliquid";
         command.help = "Show the informations about a specific liquid.";
-        command.args = "(Liquid.vnum)";
+        command.arguments = "(Liquid.vnum)";
         command.hndl = DoLiquidInfo;
         Mud::instance().addCommand(command);
     }
@@ -318,7 +319,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "cliquid";
         command.help = "Materialize some liquid sinde a container.";
-        command.args = "(Container.name)(Liquid.vnum)(Quantity)";
+        command.arguments = "(Container.name)(Liquid.vnum)(Quantity)";
         command.hndl = DoLiquidCreate;
         Mud::instance().addCommand(command);
     }
@@ -329,7 +330,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "iproduction";
         command.help = "Provide all the information regarding the given production.";
-        command.args = "(Production.vnum)";
+        command.arguments = "(Production.vnum)";
         command.hndl = DoProductionInfo;
         Mud::instance().addCommand(command);
     }
@@ -340,7 +341,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "iprofession";
         command.help = "Provide all the information regarding the given profession.";
-        command.args = "(Profession.command)";
+        command.arguments = "(Profession.command)";
         command.hndl = DoProfessionInfo;
         Mud::instance().addCommand(command);
     }
@@ -350,7 +351,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "ifaction";
         command.help = "Shows the infos about a faction.";
-        command.args = "(vnum)";
+        command.arguments = "(vnum)";
         command.hndl = DoFactionInfo;
         Mud::instance().addCommand(command);
     }
@@ -363,7 +364,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "lmodel";
         command.help = "List all the models for the items.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoModelList;
         Mud::instance().addCommand(command);
     }
@@ -372,7 +373,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "litem";
         command.help = "List all the items.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoItemList;
         Mud::instance().addCommand(command);
     }
@@ -381,7 +382,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "lmobile";
         command.help = "List all the mobiles.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoMobileList;
         Mud::instance().addCommand(command);
     }
@@ -390,7 +391,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "lplayer";
         command.help = "List all the players.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoPlayerList;
         Mud::instance().addCommand(command);
     }
@@ -399,7 +400,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "larea";
         command.help = "List all the areas.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoAreaList;
         Mud::instance().addCommand(command);
     }
@@ -408,7 +409,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "lroom";
         command.help = "List all the rooms.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoRoomList;
         Mud::instance().addCommand(command);
     }
@@ -417,7 +418,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "lrace";
         command.help = "List all the races.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoRaceList;
         Mud::instance().addCommand(command);
     }
@@ -426,7 +427,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "lfaction";
         command.help = "List all the factions.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoFactionList;
         Mud::instance().addCommand(command);
     }
@@ -435,7 +436,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "lskill";
         command.help = "List all the skills.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoSkillList;
         Mud::instance().addCommand(command);
     }
@@ -444,7 +445,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "lwriting";
         command.help = "List all the writings.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoWritingList;
         Mud::instance().addCommand(command);
     }
@@ -453,7 +454,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "lcorpse";
         command.help = "List all the corpses.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoCorpseList;
         Mud::instance().addCommand(command);
     }
@@ -462,7 +463,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "lcontinent";
         command.help = "List all the continents.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoContinentList;
         Mud::instance().addCommand(command);
     }
@@ -471,7 +472,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "lmaterial";
         command.help = "List all the materials.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoMaterialList;
         Mud::instance().addCommand(command);
     }
@@ -480,7 +481,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "lprofession";
         command.help = "Get the list of all the professions.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoProfessionList;
         Mud::instance().addCommand(command);
     }
@@ -489,7 +490,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "lproduction";
         command.help = "Get the list of all the productions.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoProductionList;
         Mud::instance().addCommand(command);
     }
@@ -498,7 +499,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "lliquid";
         command.help = "List all the liquids.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoLiquidList;
         Mud::instance().addCommand(command);
     }
@@ -507,7 +508,7 @@ void LoadGodCommands()
         command.gods = true;
         command.name = "lbuild";
         command.help = "List all the buildings.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoBuildingList;
         Mud::instance().addCommand(command);
     }

@@ -1,6 +1,6 @@
 #############################################
 # Directories
-set(RADMUD_LUA_INC
+set(PROJECT_INC ${PROJECT_INC}
         ./src/lua/luabridge/detail
         ./src/lua/luabridge
         ./src/lua
@@ -9,7 +9,7 @@ set(RADMUD_LUA_INC
 
 #############################################
 # Files
-set(RADMUD_LUA_SRC
+set(PROJECT_SRC ${PROJECT_SRC}
         ./src/lua/lua_script.cpp
         ./src/lua/luabridge/detail/LuaHelpers.cpp
         PARENT_SCOPE

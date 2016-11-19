@@ -53,7 +53,8 @@ Character::Character() :
     L(luaL_newstate()),
     combatHandler(this),
     actionQueue(),
-    charactersInSight()
+    charactersInSight(),
+    inputProcessor(std::make_shared<ProcessInput>())
 {
     actionQueue.push_back(std::make_shared<GeneralAction>(this));
     // Nothing to do.
@@ -1401,7 +1402,7 @@ Item * Character::createCorpse()
 void Character::doCommand(const std::string & command)
 {
     ArgumentHandler argumentHandler(command);
-    ProcessCommand(this, argumentHandler);
+    inputProcessor->process(this, argumentHandler);
 }
 
 Player * Character::toPlayer()

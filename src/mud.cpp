@@ -25,9 +25,9 @@
 #include <unistd.h>
 #include <signal.h>
 
-#include "protocol.hpp"
-#include "stopwatch.hpp"
+#include "processPlayerName.hpp"
 #include "CMacroWrapper.hpp"
+#include "stopwatch.hpp"
 
 /// Input file descriptor.
 static fd_set in_set;
@@ -330,17 +330,12 @@ bool Mud::addDirection(std::string name, Direction direction)
     return mudDirections.insert(std::make_pair(name, direction)).second;
 }
 
-bool Mud::addStateAction(ConnectionState state, ActionHandler action)
-{
-    return mudStateActions.insert(std::make_pair(state, action)).second;
-}
-
 bool Mud::addBuilding(Building & building)
 {
     return mudBuildings.insert(std::make_pair(building.vnum, building)).second;
 }
 
-Player * Mud::findPlayer(std::string name)
+Player * Mud::findPlayer(const std::string & name)
 {
     for (auto iterator : mudPlayers)
     {
@@ -569,11 +564,6 @@ Room * Mud::findTravelPoint(Room * room)
     return nullptr;
 }
 
-ActionHandler & Mud::findStateAction(ConnectionState state)
-{
-    return mudStateActions.find(state)->second;
-}
-
 Building * Mud::findBuilding(std::string name)
 {
     for (std::map<int, Building>::iterator iterator = mudBuildings.begin();
@@ -696,7 +686,10 @@ bool Mud::runMud()
         // Check if there are new connections on control port.
         if (CMacroWrapper::FdIsSet(_servSocket, &in_set))
         {
-            this->processNewConnection();
+            if (!this->processNewConnection())
+            {
+                Logger::log(LogLevel::Error, "Error during processing a new connection.");
+            }
         }
 
         // Handle all player input/output.
@@ -811,7 +804,7 @@ void Mud::removeInactivePlayers()
     for (auto iterator = toRemove.begin(); iterator != toRemove.end(); ++iterator)
     {
         // Get the player at the given position.
-        Player * player = *iterator;
+        auto player = *iterator;
         // Log the action of removing.
         Logger::log(LogLevel::Global, "Removing inactive player : " + player->getName());
         // Only if the player has successfully logged in, save its state on DB.
@@ -828,93 +821,89 @@ void Mud::removeInactivePlayers()
     }
 }
 
-void Mud::processNewConnection()
+bool Mud::processNewConnection()
 {
     // The file descriptor for the new socket.
     int socketFileDescriptor;
     struct sockaddr_in socketAddress;
     socklen_t socketAddressSize = sizeof(socketAddress);
-
     // Loop until all outstanding connections are accepted.
     while (true)
     {
-        try
+        socketFileDescriptor = accept(_servSocket,
+                                      reinterpret_cast<struct sockaddr *>(&socketAddress),
+                                      &socketAddressSize);
+        // A bad socket probably means no more connections are outstanding.
+        if (socketFileDescriptor == NO_SOCKET_COMMUNICATION)
         {
-            socketFileDescriptor = accept(
-                _servSocket,
-                reinterpret_cast<struct sockaddr *>(&socketAddress),
-                &socketAddressSize);
-
-            // A bad socket probably means no more connections are outstanding.
-            if (socketFileDescriptor == NO_SOCKET_COMMUNICATION)
+            // blocking is OK - we have accepted all outstanding connections.
+            if (errno == EWOULDBLOCK)
             {
-                // blocking is OK - we have accepted all outstanding connections.
-                if (errno == EWOULDBLOCK)
-                {
-                    return;
-                }
-                throw std::runtime_error("ACCEPT");
+                break;
             }
-
-            // Here on successful accept - make sure socket doesn't block.
+            perror("ACCEPT");
+            return false;
+        }
+        // Here on successful accept - make sure socket doesn't block.
 #ifdef __linux__
-            if (fcntl(socketFileDescriptor, F_SETFL, FNDELAY) == -1)
-            {
-                throw std::runtime_error("FCNTL on player socket");
-            }
-#elif __APPLE__
-            if (fcntl(socketFileDescriptor, F_SETFL, FNDELAY) == -1)
-            {
-                throw std::runtime_error("FCNTL on player socket");
-            }
-#elif __CYGWIN__
-
-            int flags = fcntl(_servSocket, F_GETFL, 0);
-            //if (fcntl(_servSocket, F_SETFL, flags | O_NONBLOCK | O_RDWR | O_NOCTTY | O_NDELAY) == -1)
-            if (fcntl(_servSocket, F_SETFL, flags | O_NDELAY | O_NONBLOCK) == -1)
-            {
-                throw std::runtime_error("FCNTL on player socket");
-            }
-#elif _WIN32
-            u_long imode = 1;
-            if (ioctlsocket(_servSocket, FIONBIO, &imode) == -1)
-            {
-                throw std::runtime_error("FCNTL on Control Socket");
-            }
-#endif
-
-            std::string address = inet_ntoa(socketAddress.sin_addr);
-            int port = ntohs(socketAddress.sin_port);
-
-            // Immediately close connections from blocked IP addresses.
-            if (blockedIPs.find(address) != blockedIPs.end())
-            {
-                Logger::log(LogLevel::Global, "Rejected connection from " + address + "!");
-                closeSocket(socketFileDescriptor);
-                continue;
-            }
-
-            Player * player = new Player(socketFileDescriptor, port, address);
-
-            // Insert the player in the list of players.
-            addPlayer(player);
-
-            Logger::log(LogLevel::Global, "#--------- New Connection ---------#");
-            Logger::log(LogLevel::Global, " Socket  : " + ToString(socketFileDescriptor));
-            Logger::log(LogLevel::Global, " Address : " + address);
-            Logger::log(LogLevel::Global, " Port    : " + ToString(port));
-            Logger::log(LogLevel::Global, "#----------------------------------#");
-
-            // Activate the procedure of negotiation.
-            NegotiateProtocol(player, ConnectionState::NegotiatingMSDP);
-        }
-        catch (std::exception & e)
+        if (fcntl(socketFileDescriptor, F_SETFL, FNDELAY) == -1)
         {
-            Logger::log(LogLevel::Error, "Error during processing a new connection.");
-            Logger::log(LogLevel::Error, "Error : " + std::string(e.what()));
-            break;
+            perror("FCNTL on player socket");
+            return false;
         }
+#elif __APPLE__
+        if (fcntl(socketFileDescriptor, F_SETFL, FNDELAY) == -1)
+        {
+            perror("FCNTL on player socket");
+            return false;
+        }
+#elif __CYGWIN__
+        int flags = fcntl(_servSocket, F_GETFL, 0);
+        //if (fcntl(_servSocket, F_SETFL, flags | O_NONBLOCK | O_RDWR | O_NOCTTY | O_NDELAY) == -1)
+        if (fcntl(_servSocket, F_SETFL, flags | O_NDELAY | O_NONBLOCK) == -1)
+        {
+            perror("FCNTL on player socket");
+            return false;
+        }
+#elif _WIN32
+        u_long imode = 1;
+        if (ioctlsocket(_servSocket, FIONBIO, &imode) == -1)
+        {
+            perror("FCNTL on player socket");
+            return false;
+        }
+#endif
+        std::string address = inet_ntoa(socketAddress.sin_addr);
+        int port = ntohs(socketAddress.sin_port);
+        // Immediately close connections from blocked IP addresses.
+        if (blockedIPs.find(address) != blockedIPs.end())
+        {
+            Logger::log(LogLevel::Global, "Rejected connection from " + address + "!");
+            closeSocket(socketFileDescriptor);
+            continue;
+        }
+        auto player = new Player(socketFileDescriptor, port, address);
+        // Insert the player in the list of players.
+        this->addPlayer(player);
+        Logger::log(LogLevel::Global, "#--------- New Connection ---------#");
+        Logger::log(LogLevel::Global, " Socket  : " + ToString(socketFileDescriptor));
+        Logger::log(LogLevel::Global, " Address : " + address);
+        Logger::log(LogLevel::Global, " Port    : " + ToString(port));
+        Logger::log(LogLevel::Global, "#----------------------------------#");
+        // Create a shared pointer to the next step.
+        std::shared_ptr<ProcessPlayerName> newStep = std::make_shared<ProcessPlayerName>();
+        // Set the handler.
+        player->inputProcessor = newStep;
+        // Advance to the next step.
+        newStep->advance(player);
+//        // Activate the procedure of negotiation.
+//        NegotiateProtocol(player, ConnectionState::NegotiatingMSDP);
+//        // Create a shared pointer to the next step.
+//        std::shared_ptr<ProcessTelnetCommand> newStep = std::make_shared<ProcessTelnetCommand>();
+//        // Set the handler.
+//        player->inputProcessor = newStep;
     }
+    return true;
 }
 
 void Mud::setupDescriptor(Player * player)
@@ -1010,7 +999,8 @@ bool Mud::initComunications()
     iResult = WSAStartup(0x0202, &wsaData);
     if (iResult != 0)
     {
-        throw std::runtime_error("WSAStartup failed: "+ ToString(iResult));
+        perror("WSAStartup failed: "+ ToString(iResult));
+        return false;
     }
 #endif
 
@@ -1025,12 +1015,14 @@ bool Mud::initComunications()
 #ifdef __linux__
     if (fcntl(_servSocket, F_SETFL, FNDELAY) == -1)
     {
-        throw std::runtime_error("FCNTL on Control Socket");
+        perror("FCNTL on Control Socket");
+        return false;
     }
 #elif __APPLE__
     if (fcntl(_servSocket, F_SETFL, FNDELAY) == -1)
     {
-        throw std::runtime_error("FCNTL on Control Socket");
+        perror("FCNTL on Control Socket");
+        return false;
     }
 #elif __CYGWIN__
 
@@ -1045,7 +1037,8 @@ bool Mud::initComunications()
     u_long imode = 1;
     if (ioctlsocket(_servSocket, FIONBIO, &imode) == -1)
     {
-        throw std::runtime_error("FCNTL on Control Socket");
+        perror("FCNTL on Control Socket");
+        return false;
     }
 #endif
 
@@ -1136,12 +1129,6 @@ bool Mud::startMud()
 
     Logger::log(LogLevel::Global, "Initializing Commands...");
     LoadCommands();
-
-    Logger::log(LogLevel::Global, "Initializing States...");
-    LoadStates();
-
-    Logger::log(LogLevel::Global, "Initializing MSDP States...");
-    LoadProtocolStates();
 
     Logger::log(LogLevel::Global, "Initializing Database...");
     if (!this->initDatabase())

@@ -35,72 +35,73 @@ void LoadCombatCommands()
         Command command;
         command.name = "kill";
         command.help = "Engage in combat the desired target.";
-        command.args = "(target)";
+        command.arguments = "(target)";
         command.hndl = DoKill;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
     {
         Command command;
         command.name = "flee";
         command.help = "Try to flee from combat.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoFlee;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
     {
         Command command;
         command.name = "scout";
         command.help = "Provides information about the surrounding area.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoScout;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
     {
         Command command;
         command.name = "load";
         command.help = "Allows to load a magazine with projectiles.";
-        command.args = "";
+        command.arguments = "(magazine)(projectiles)";
         command.hndl = DoLoad;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
     {
         Command command;
         command.name = "unload";
-        command.help = "Allows to unload a magazine.";
-        command.args = "";
+        command.help = "Allows to unload an magazine.";
+        command.arguments = "(magazine)";
         command.hndl = DoUnload;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
     {
         Command command;
         command.name = "reload";
-        command.help = "Allows to reload a firearm.";
-        command.args = "";
+        command.help = "Allows to reload a firearm with a magazine.";
+        command.arguments = "(firearm)(magazine)";
         command.hndl = DoReload;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
     {
         Command command;
         command.name = "aim";
-        command.help = "Allows to aim a target.";
-        command.args = "";
+        command.help = "Allows to aim a target in sight.\n If the target is not inside the same room";
+        command.help += "If the target is not inside the same room, you have first to scout the area.";
+        command.arguments = "(target)";
         command.hndl = DoAim;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
     {
         Command command;
         command.name = "fire";
         command.help = "Allows to fire with an equipped ranged weapon to an aimed target.";
-        command.args = "";
+        command.arguments = "NONE";
         command.hndl = DoFire;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
 }

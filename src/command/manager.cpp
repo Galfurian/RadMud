@@ -31,7 +31,7 @@ void LoadManagerCommands()
         Command command;
         command.name = "assign";
         command.help = "Allows to assign a mobile to a task/building.";
-        command.args = "(mobile)(building)";
+        command.arguments = "(mobile)(building)";
         command.hndl = DoAssign;
         Mud::instance().addCommand(command);
     }
