@@ -36,16 +36,15 @@ public:
     /// @param _gods The level necessary to execute the command.
     /// @param _name The name of the command.
     /// @param _help The help message of the command.
-    /// @param _args The arguments of the command.
+    /// @param _arguments The arguments of the command.
     /// @param _hndl The handler of the command.
-    /// @param _cuic The handler of the command.
-    Command(
-        bool _gods,
-        std::string _name,
-        std::string _help,
-        std::string _args,
-        std::function<void(Character * character, ArgumentHandler & args)> _hndl,
-        bool _cuic);
+    /// @param _canUseInCombat The can_use_in_combat flag.
+    Command(bool _gods,
+            std::string _name,
+            std::string _help,
+            std::string _arguments,
+            std::function<void(Character * character, ArgumentHandler & args)> _hndl,
+            bool _canUseInCombat);
 
     Command & setGods(const bool & _gods);
 
@@ -53,11 +52,11 @@ public:
 
     Command & setHelp(const std::string & _help);
 
-    Command & setArgs(const std::string & _args);
+    Command & setArgs(const std::string & _arguments);
 
     Command & setHndl(const std::function<void(Character * character, ArgumentHandler & args)> & _hndl);
 
-    Command & setCuic(const bool & _cuic);
+    Command & setCanUseInCombat(const bool & _cuic);
 
     /// @brief Checks if the provided character can use the command.
     /// @param character The character to check.
@@ -72,23 +71,12 @@ public:
     /// The help message of the command.
     std::string help;
     /// The arguemtns of the command.
-    std::string args;
+    std::string arguments;
     /// The handler of the command.
     std::function<void(Character * character, ArgumentHandler & args)> hndl;
     /// Flag which determines if the command can be used in combat.
-    bool cuic;
+    bool canUseInCombat;
 };
-
-/// @defgroup ProcessStates Player state processing.
-/// @brief All the functions necessary to process players commands, from creation to gameplay.
-/// @{
-
-/// @brief Process commands when character is connected.
-/// @param character The character that execute the command.
-/// @param args  Command arguments.
-void ProcessCommand(Character * character, ArgumentHandler & args);
-
-///@}
 
 /// @brief Check if the executer of this command is a player.
 void NoMobile(Character * character);

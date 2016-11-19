@@ -37,9 +37,9 @@ Command::Command() :
     gods(),
     name(),
     help(),
-    args(),
+    arguments(),
     hndl(),
-    cuic()
+    canUseInCombat()
 {
     // Nothing to do.
 }
@@ -47,15 +47,15 @@ Command::Command() :
 Command::Command(bool _gods,
                  std::string _name,
                  std::string _help,
-                 std::string _args,
+                 std::string _arguments,
                  std::function<void(Character * character, ArgumentHandler & args)> _hndl,
-                 bool _cuic) :
+                 bool _canUseInCombat) :
     gods(_gods),
     name(_name),
     help(_help),
-    args(_args),
+    arguments(_arguments),
     hndl(_hndl),
-    cuic(_cuic)
+    canUseInCombat(_canUseInCombat)
 {
     // Nothing to do.
 }
@@ -78,9 +78,9 @@ Command & Command::setHelp(const std::string & _help)
     return *this;
 }
 
-Command & Command::setArgs(const std::string & _args)
+Command & Command::setArgs(const std::string & _arguments)
 {
-    args = _args;
+    arguments = _arguments;
     return *this;
 }
 
@@ -90,83 +90,15 @@ Command & Command::setHndl(const std::function<void(Character * character, Argum
     return *this;
 }
 
-Command & Command::setCuic(const bool & _cuic)
+Command & Command::setCanUseInCombat(const bool & _canUseInCombat)
 {
-    cuic = _cuic;
+    canUseInCombat = _canUseInCombat;
     return *this;
 }
 
 bool Command::canUse(Character * character) const
 {
     return (gods && HasFlag(character->flags, CharacterFlag::IsGod)) || (!gods);
-}
-
-void ProcessCommand(Character * character, ArgumentHandler & args)
-{
-    if (args.empty())
-    {
-        character->sendMsg("Huh?\n");
-        return;
-    }
-    auto command = args[0].getContent();
-    args.erase(0);
-
-    // Check if it's a direction.
-    Direction direction = Mud::instance().findDirection(command, false);
-
-    if (direction != Direction::None)
-    {
-        DoDirection(character, direction);
-    }
-    else
-    {
-        bool found = false;
-        // Check if it's a command.
-        for (auto iterator : Mud::instance().mudCommands)
-        {
-            if (!BeginWith(iterator.name, command))
-            {
-                continue;
-            }
-            if (!iterator.canUse(character))
-            {
-                continue;
-            }
-            if ((!iterator.cuic) && (character->getAction()->getType() == ActionType::Combat) && !iterator.gods)
-            {
-                character->sendMsg("You cannot do that in combat.\n");
-                found = true;
-                break;
-            }
-            if (iterator.name == "shutdown" && command != "shutdown")
-            {
-                character->sendMsg("You have to type completly \"shutdown\".\n");
-            }
-            else if (iterator.name == "quit" && command != "quit")
-            {
-                character->sendMsg("You have to type completly \"quit\".\n");
-            }
-            else
-            {
-                iterator.hndl(character, args);
-                found = true;
-                break;
-            }
-        }
-        if (!found)
-        {
-            Profession * profession = Mud::instance().findProfession(command);
-            if (profession != nullptr)
-            {
-                DoProfession(character, profession, args);
-            }
-            else
-            {
-                throw std::runtime_error("Huh?\n");
-            }
-        }
-    }
-    character->sendMsg("\n");
 }
 
 void NoMobile(Character * character)

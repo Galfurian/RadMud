@@ -28,7 +28,6 @@
 #include <set>
 #include <string>
 
-#include "processInput.hpp"
 #include "character.hpp"
 #include "skill.hpp"
 
@@ -67,8 +66,6 @@ public:
     int remaining_points;
     /// Connection state.
     ConnectionState connectionState;
-    /// The input handler.
-    std::shared_ptr<ProcessInput> inputProcessor;
     /// Password guessing attempts.
     int password_attempts;
     /// True if they are about to leave us.
@@ -145,11 +142,6 @@ public:
 
     /// @brief Handle player has entered the game.
     void enterGame();
-
-    /// @brief Process player input - check connection state, and act accordingly.
-    /// @param player  Player that submitted input.
-    /// @param command Player's input command.
-    void processInput(Player * player, const std::string & command);
 
     /// @brief Get player input.
     void processRead();

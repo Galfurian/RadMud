@@ -32,44 +32,44 @@ void LoadCommunicationCommands()
     {
         command.name = "say";
         command.help = "Talk to people in the current room.";
-        command.args = "[someone] (something)";
+        command.arguments = "[someone] (something)";
         command.hndl = DoSay;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
     {
         command.name = "whisper";
         command.help = "Whisper secretly to a single character.";
-        command.args = "(someone) (something)";
+        command.arguments = "(someone) (something)";
         command.hndl = DoWhisper;
         Mud::instance().addCommand(command);
     }
     {
         command.name = "emote";
         command.help = "Execute and emote.";
-        command.args = "(emotion)";
+        command.arguments = "(emotion)";
         command.hndl = DoEmote;
-        command.cuic = true;
+        command.canUseInCombat = true;
         Mud::instance().addCommand(command);
     }
     {
         command.name = "bug";
         command.help = "Report a bug, your character's name, location and date will be saved.";
-        command.args = "(message)";
+        command.arguments = "(message)";
         command.hndl = DoBug;
         Mud::instance().addCommand(command);
     }
     {
         command.name = "idea";
         command.help = "Send an idea, try to be as clear as possible.";
-        command.args = "(message)";
+        command.arguments = "(message)";
         command.hndl = DoIdea;
         Mud::instance().addCommand(command);
     }
     {
         command.name = "typo";
         command.help = "Report a typo.";
-        command.args = "(message)";
+        command.arguments = "(message)";
         command.hndl = DoTypo;
         Mud::instance().addCommand(command);
     }

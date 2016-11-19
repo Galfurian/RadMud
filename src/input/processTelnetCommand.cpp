@@ -87,6 +87,7 @@ void NegotiateProtocol(Character * character, const ConnectionState & nextState)
 
 void ProcessTelnetCommand::process(Character * character, ArgumentHandler & args)
 {
+    Logger::log(LogLevel::Debug, "ProcessTelnetCommand");
     // Cast the character to player.
     auto player = character->toPlayer();
     // Line which will contain the answer to IAC+WILL+MSDP

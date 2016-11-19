@@ -38,7 +38,6 @@ Player::Player(const int & _socket, const int & _port, const std::string & _addr
     rent_room(),
     skills(),
     remaining_points(),
-    inputProcessor(std::make_shared<ProcessTelnetCommand>()),
     password_attempts(),
     closing(),
     logged_in(),
@@ -358,19 +357,6 @@ void Player::enterGame()
     doCommand("look");
 }
 
-void Player::processInput(Player * player, const std::string & command)
-{
-    try
-    {
-        ArgumentHandler argumentHandler(command);
-        inputProcessor->process(player, argumentHandler);
-    }
-    catch (std::runtime_error & e)
-    {
-        sendMsg(std::string(e.what()) + "\n");
-    }
-}
-
 /// Size of buffers used for communications.
 #define BUFSIZE 512
 
@@ -405,8 +391,8 @@ void Player::processRead()
     inbuf = std::string(buffer, uRead);
     // Update received data.
     MudUpdater::instance().updateBandIn(uRead);
-    // Process the input.
-    this->processInput(this, Trim(inbuf));
+    // Execute the received command.
+    this->doCommand(Trim(inbuf));
     // Null-terminate the buffer.
     inbuf[uRead] = 0;
 }

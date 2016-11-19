@@ -27,6 +27,7 @@
 
 void ProcessPlayerName::process(Character * character, ArgumentHandler & args)
 {
+    Logger::log(LogLevel::Debug, "ProcessPlayerName");
     auto player = character->toPlayer();
     auto input = args.getOriginal();
     // Name can't be blank.

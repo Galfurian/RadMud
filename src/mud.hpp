@@ -442,7 +442,9 @@ private:
     void removeInactivePlayers();
 
     /// @brief New player has connected.
-    void processNewConnection();
+    /// @return <b>True</b> if there are no errors,<br>
+    ///         <b>False</b> otherwise.
+    bool processNewConnection();
 
     /// @brief Handle all the comunication descriptor, it's the socket value.
     void setupDescriptor(Player * player);

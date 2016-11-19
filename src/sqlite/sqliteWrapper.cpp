@@ -250,8 +250,8 @@ std::string SQLiteWrapper::getNextString()
     if (currentColumn >= num_col)
     {
         release();
-        throw std::runtime_error(
-            "Number column exceded (" + ToString(currentColumn) + ">=" + ToString(num_col) + ").");
+        Logger::log(LogLevel::Error, "Number column exceded ( %s >= %s ).", ToString(currentColumn), ToString(num_col));
+        return "";
     }
     // Check the input in case is a valid value.
     const char * ptr = reinterpret_cast<const char *>(sqlite3_column_text(
@@ -275,8 +275,8 @@ int SQLiteWrapper::getNextInteger()
     if (currentColumn >= num_col)
     {
         release();
-        throw std::runtime_error(
-            "Number column exceded (" + ToString(currentColumn) + ">=" + ToString(num_col) + ").");
+        Logger::log(LogLevel::Error, "Number column exceded ( %s >= %s ).", ToString(currentColumn), ToString(num_col));
+        return 0;
     }
     int value = sqlite3_column_int(dbDetails.dbStatement, currentColumn);
     // Increase the column index.
@@ -290,8 +290,8 @@ unsigned int SQLiteWrapper::getNextUnsignedInteger()
     if (currentColumn >= num_col)
     {
         release();
-        throw std::runtime_error(
-            "Number column exceded (" + ToString(currentColumn) + ">=" + ToString(num_col) + ").");
+        Logger::log(LogLevel::Error, "Number column exceded ( %s >= %s ).", ToString(currentColumn), ToString(num_col));
+        return 0;
     }
     int value = sqlite3_column_int(dbDetails.dbStatement, currentColumn);
     // Increase the column index.
@@ -312,8 +312,8 @@ double SQLiteWrapper::getNextDouble()
     if (currentColumn >= num_col)
     {
         release();
-        throw std::runtime_error(
-            "Number column exceded (" + ToString(currentColumn) + ">=" + ToString(num_col) + ").");
+        Logger::log(LogLevel::Error, "Number column exceded ( %s >= %s ).", ToString(currentColumn), ToString(num_col));
+        return 0;
     }
     auto value = sqlite3_column_double(dbDetails.dbStatement, currentColumn);
     // Increase the column index.
