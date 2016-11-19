@@ -39,7 +39,8 @@ Command::Command() :
     help(),
     arguments(),
     hndl(),
-    canUseInCombat()
+    canUseInCombat(),
+    typedCompletely()
 {
     // Nothing to do.
 }
