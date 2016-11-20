@@ -26,13 +26,14 @@
 #include <list>
 #include <map>
 
-#include "liquid.hpp"
+#include "itemContainer.hpp"
+#include "itemQuality.hpp"
 #include "lua_script.hpp"
 #include "itemModel.hpp"
 #include "nodeModel.hpp"
+#include "liquid.hpp"
 #include "table.hpp"
 
-#include "itemContainer.hpp"
 
 class Room;
 
@@ -53,6 +54,7 @@ class CurrencyItem;
 class CorpseItem;
 
 class MagazineItem;
+
 
 /// @brief Holds details about items.
 class Item

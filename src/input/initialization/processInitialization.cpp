@@ -1,4 +1,4 @@
-/// @file   creationStep.cpp
+/// @file   processInitialization.cpp
 /// @author Enrico Fraccaroli
 /// @date   Nov 14, 2016
 /// @copyright

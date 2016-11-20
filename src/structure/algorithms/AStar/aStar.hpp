@@ -25,14 +25,23 @@
 #include "pathFinder.hpp"
 #include "aStarNode.hpp"
 
+/// @brief The AStar algorithm.
 template<typename ElementType>
 class AStar :
     public PathFinder<ElementType>
 {
 private:
+    /// List of AStar nodes.
     std::vector<std::shared_ptr<AStarNode<ElementType>>> nodes;
+
+    /// The starting node.
     std::shared_ptr<AStarNode<ElementType>> startNode;
+
+    /// The ending node.
     std::shared_ptr<AStarNode<ElementType>> endNode;
+
+    /// The function which is used to determine if, during the exploration,
+    ///  the algorithm can move from the element "from" to the "to".
     std::function<bool(ElementType from, ElementType to)> checkFunction;
 
 public:
@@ -45,7 +54,11 @@ public:
                   const std::function<bool(ElementType from, ElementType to)> & _checkFunction) override;
 
 private:
-    /// Attempts to find a path to the destination node using <paramref name="currentNode"/> as the starting location
+    /// @brief Recursive function used to search the path from the
+    ///         current node to the ending node.
+    /// @param currentNode The current node beeing visited.
+    /// @return <b>True</b> if, by visiting the current node, we have reached the end node,<br>
+    ///         <b>False</b> otherwise.
     bool search(std::shared_ptr<AStarNode<ElementType>> currentNode);
 };
 

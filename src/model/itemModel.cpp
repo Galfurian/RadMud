@@ -93,7 +93,7 @@ void ItemModel::getSheet(Table & sheet) const
     sheet.addRow({"Keys", keyGroup});
     sheet.addRow({"Description", this->description});
     sheet.addRow({"Type", this->getTypeName()});
-    sheet.addRow({"Slot", GetEquipmentSlotName(this->slot)});
+    sheet.addRow({"Slot", this->slot.toString()});
     sheet.addRow({"Flags", GetModelFlagString(this->modelFlags)});
     sheet.addRow({"Condition", ToString(this->condition)});
     sheet.addRow({"Decay", ToString(this->decay)});

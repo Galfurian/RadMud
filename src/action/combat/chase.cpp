@@ -20,11 +20,14 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include <queue>
 #include "chase.hpp"
-#include "aStar.hpp"
-#include "moveAction.hpp"
+
 #include "effectFactory.hpp"
+#include "moveAction.hpp"
+#include "aStar.hpp"
+#include "area.hpp"
+#include "room.hpp"
+#include <queue>
 
 Chase::Chase(Character * _actor, Character * _target) :
     CombatAction(_actor),

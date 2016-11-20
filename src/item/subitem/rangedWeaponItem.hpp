@@ -29,8 +29,10 @@ class RangedWeaponItem :
     public Item
 {
 public:
+    /// @brief Constructor.
     RangedWeaponItem();
 
+    /// @brief Destructor.
     virtual ~RangedWeaponItem();
 
     void getSheet(Table & sheet) const override;
@@ -57,5 +59,8 @@ public:
     /// @return A magazine already loaded if there is one.
     MagazineItem * getAlreadyLoadedMagazine() const;
 
+    /// @brief Retrieves the projectiles used by the weapon.
+    /// @param error The error message if the function has not found any projectiles inside.
+    /// @return The projectiles contained inside the weapon.
     Item * retrieveProjectile(std::string & error) const;
 };

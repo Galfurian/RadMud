@@ -205,15 +205,6 @@ bool IsNumber(const std::string & source)
     return true;
 }
 
-unsigned int GetAbilityModifier(const unsigned int & value)
-{
-    if (value <= 10)
-    {
-        return 0;
-    }
-    return (value - 10) / 2;
-}
-
 std::string GetFileContents(const char * filename)
 {
     std::string contents;

@@ -23,16 +23,6 @@
 // Basic Include.
 #include "defines.hpp"
 
-std::string GetAbilityName(Ability ability)
-{
-    if (ability == Ability::Strength) return "strength";
-    if (ability == Ability::Agility) return "agility";
-    if (ability == Ability::Perception) return "perception";
-    if (ability == Ability::Constitution) return "constitution";
-    if (ability == Ability::Intelligence) return "intelligence";
-    return "none";
-}
-
 std::string GetPostureName(CharacterPosture posture)
 {
     if (posture == CharacterPosture::Stand) return "standing";
@@ -63,18 +53,6 @@ std::string GetMaterialTypeName(MaterialType type)
     if (type == MaterialType::Paper) return "Paper";
     if (type == MaterialType::Coal) return "Coal";
     return "No Material Type";
-}
-
-std::string GetEquipmentSlotName(EquipmentSlot slot)
-{
-    if (slot == EquipmentSlot::Head) return "Head";
-    if (slot == EquipmentSlot::Torso) return "Torso";
-    if (slot == EquipmentSlot::Back) return "Back";
-    if (slot == EquipmentSlot::Legs) return "Legs";
-    if (slot == EquipmentSlot::Feet) return "Feet";
-    if (slot == EquipmentSlot::RightHand) return "Right Hand";
-    if (slot == EquipmentSlot::LeftHand) return "Left Hand";
-    return "No Equipment Slot";
 }
 
 std::string GetGenderTypeName(GenderType type)

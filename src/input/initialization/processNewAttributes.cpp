@@ -49,7 +49,7 @@ void ProcessNewAttributes::process(Character * character, ArgumentHandler & args
         player->setAbility(Ability::Perception, player->race->getAbility(Ability::Perception));
         player->setAbility(Ability::Constitution, player->race->getAbility(Ability::Constitution));
         player->setAbility(Ability::Intelligence, player->race->getAbility(Ability::Intelligence));
-        this->advance(character, Formatter::cyan() + "Attribute has been set by default.%s\n");
+        this->advance(character, Formatter::cyan() + "Attribute has been set by default." + Formatter::reset() + "\n");
     }
     else if (BeginWith(ToLower(args[0].getContent()), "continue"))
     {
@@ -62,7 +62,10 @@ void ProcessNewAttributes::process(Character * character, ArgumentHandler & args
     }
     else if (BeginWith(ToLower(args[0].getContent()), "help"))
     {
-        if (args.size() == 2)
+        if (args.size() != 2)
+        {
+            this->advance(character, "You have to specify the attribute number.");
+        }
         {
             std::string helpMessage;
             if (args[1].getContent() == "1")
@@ -105,10 +108,6 @@ void ProcessNewAttributes::process(Character * character, ArgumentHandler & args
                 helpMessage = "No help for that attribute.";
             }
             this->advance(character, helpMessage);
-        }
-        else
-        {
-            this->advance(character, "You have to specify the attribute number.");
         }
     }
     else

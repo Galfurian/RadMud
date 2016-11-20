@@ -48,18 +48,25 @@ public:
             const bool & _canUseInCombat,
             const bool & _typedCompletely);
 
+    /// @brief Set if the command can be used only by gods.
     Command & setGods(const bool & _gods);
 
+    /// @brief Set the name of the command.
     Command & setName(const std::string & _name);
 
+    /// @brief Set the help concerning the nature of the command.
     Command & setHelp(const std::string & _help);
 
+    /// @brief Set the help concerning the arguments of the command.
     Command & setArgs(const std::string & _arguments);
 
+    /// @brief Set the functions used to implement the command.
     Command & setHndl(const std::function<void(Character * character, ArgumentHandler & args)> & _hndl);
 
+    /// @brief Set if the command can be used in combat.
     Command & setCanUseInCombat(const bool & _canUseInCombat);
 
+    /// @brief Set if the command needs to be typed completely.
     Command & setTypedCompletely(const bool & _typedCompletely);
 
     /// @brief Checks if the provided character can use the command.

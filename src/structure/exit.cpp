@@ -21,7 +21,6 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "exit.hpp"
-
 #include "room.hpp"
 
 Exit::Exit() :

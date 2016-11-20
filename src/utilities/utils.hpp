@@ -272,11 +272,6 @@ ValueType TRandInteger(const ValueType & lowerBound, const ValueType & upperBoun
 /// @return <b>True</b> if the string it's a number, <b>False</b> otherwise.
 bool IsNumber(const std::string & source);
 
-/// @brief Return the modifier of the given ability.
-/// @param value The total ability value.
-/// @return The ability modifier.
-unsigned int GetAbilityModifier(const unsigned int & value);
-
 /// @brief  Retrieve the content of a file.
 /// @param  filename The path and name of the file to read.
 /// @return The content of the file.

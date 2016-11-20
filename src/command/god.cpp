@@ -562,7 +562,7 @@ void DoFindPath(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 1)
     {
-        character->sendMsg("You have to provide a room vnum.");
+        character->sendMsg("You have to provide a room vnum.\n\n");
     }
     else
     {
@@ -614,12 +614,12 @@ void DoFindPath(Character * character, ArgumentHandler & args)
             }
             else
             {
-                character->sendMsg("There is no path to that room.");
+                character->sendMsg("There is no path to that room.\n\n");
             }
         }
         else
         {
-            character->sendMsg("There is no room with that VNUM.");
+            character->sendMsg("There is no room with that VNUM.\n\n");
         }
     }
 }
@@ -1331,7 +1331,7 @@ void DoModAttr(Character * character, ArgumentHandler & args)
         "You have successfully %s by %s the %s of the target.",
         std::string((modifier > 0) ? "increased" : "decreased"),
         ToString(modifier),
-        GetAbilityName(ability));
+        ability.toString());
 }
 
 void DoLiquidCreate(Character * character, ArgumentHandler & args)
@@ -1705,7 +1705,7 @@ void DoModelList(Character * character, ArgumentHandler & /*args*/)
         row.push_back(ToString(itemModel->vnum));
         row.push_back(itemModel->name);
         row.push_back(itemModel->getTypeName());
-        row.push_back(GetEquipmentSlotName(itemModel->slot));
+        row.push_back(itemModel->slot.toString());
         row.push_back(ToString(itemModel->modelFlags));
         // Add the row to the table.
         table.addRow(row);

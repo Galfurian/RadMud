@@ -23,6 +23,7 @@
 #pragma once
 
 #include "generalAction.hpp"
+#include "direction.hpp"
 
 /// @brief An action which allows to move characters.
 class MoveAction :

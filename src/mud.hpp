@@ -39,20 +39,17 @@
 #include "updater.hpp"
 #include "writing.hpp"
 #include "material.hpp"
-
 #include "area.hpp"
 #include "room.hpp"
 #include "continent.hpp"
-
 #include "mobile.hpp"
 #include "player.hpp"
-
 #include "command.hpp"
-
 #include "sqliteDbms.hpp"
-
 #include "table.hpp"
 #include "formatter.hpp"
+
+class Direction;
 
 #ifdef __linux__
 
@@ -304,7 +301,7 @@ public:
     void addCommand(Command & command);
 
     /// Add a direction to the mud.
-    bool addDirection(std::string name, Direction direction);
+    bool addDirection(std::string name, const Direction & direction);
 
     /// Add a building to the mud.
     bool addBuilding(Building & building);

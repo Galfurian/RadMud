@@ -25,16 +25,15 @@
 
 // Other Include.
 #include "mud.hpp"
-#include "containerModel.hpp"
-#include "liquidContainerModel.hpp"
-#include "shopModel.hpp"
-
 #include "shopItem.hpp"
+#include "shopModel.hpp"
 #include "armorItem.hpp"
 #include "corpseItem.hpp"
 #include "currencyItem.hpp"
+#include "containerModel.hpp"
 #include "meleeWeaponItem.hpp"
 #include "rangedWeaponItem.hpp"
+#include "liquidContainerModel.hpp"
 
 Item::Item() :
     vnum(),
@@ -219,7 +218,7 @@ void Item::getSheet(Table & sheet) const
         locationRow.push_back("Nowhere");
     }
     sheet.addRow(locationRow);
-    sheet.addRow({"Equipment Slot", GetEquipmentSlotName(currentSlot)});
+    sheet.addRow({"Equipment Slot", currentSlot.toString()});
     if (!content.empty())
     {
         sheet.addDivider();
@@ -828,7 +827,7 @@ EquipmentSlot Item::getCurrentSlot()
 
 std::string Item::getCurrentSlotName()
 {
-    return GetEquipmentSlotName(getCurrentSlot());
+    return getCurrentSlot().toString();
 }
 
 ShopItem * Item::toShopItem()

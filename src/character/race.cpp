@@ -139,9 +139,9 @@ unsigned int Race::getAbility(const Ability & ability) const
 
 unsigned int Race::getAbilityLua(const unsigned int & abilityNumber)
 {
-    if (AbilityTest::is_value(abilityNumber))
+    if (Ability::isValid(abilityNumber))
     {
-        return this->getAbility(AbilityTest::convert(abilityNumber));
+        return this->getAbility(Ability(abilityNumber));
     }
     return 0;
 }

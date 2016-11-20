@@ -405,8 +405,8 @@ bool SQLiteDbms::loadPlayerItems(Player * player)
     while (result->next())
     {
         // The pointer to the object.
-        Item * item = Mud::instance().findItem(result->getNextInteger());
-        EquipmentSlot slot = static_cast<EquipmentSlot>(result->getNextInteger());
+        auto item = Mud::instance().findItem(result->getNextInteger());
+        EquipmentSlot slot(result->getNextUnsignedInteger());
 
         if (item == nullptr)
         {

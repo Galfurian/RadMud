@@ -38,6 +38,9 @@ public:
     /// @brief Allows to store information about an aggressor.
     struct Aggression
     {
+        /// @brief Constructor.
+        /// @param _aggressor  The aggressor.
+        /// @param _aggression The aggro level.
         Aggression(Character * _aggressor,
                    unsigned int _aggression) :
             aggressor(_aggressor),

@@ -157,7 +157,7 @@ void Player::addEquipmentItem(Item *& item)
     {
         SQLiteDbms::instance().insertInto(
             "ItemPlayer",
-            {name, ToString(item->vnum), EnumToString(item->getCurrentSlot())},
+            {name, ToString(item->vnum), ToString(item->getCurrentSlot().toUInt())},
             false,
             true);
     }

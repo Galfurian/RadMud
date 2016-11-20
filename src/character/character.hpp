@@ -26,6 +26,7 @@
 #pragma once
 
 #include "defines.hpp"
+#include "ability.hpp"
 #include "exit.hpp"
 #include "race.hpp"
 #include "item.hpp"

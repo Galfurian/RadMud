@@ -25,15 +25,26 @@
 #include <vector>
 #include <functional>
 
+/// @brief The abstract class used to implement a pathfinding algorithm.
 template<typename ElementType>
 class PathFinder
 {
 public:
+    /// @brief Constructor.
     virtual ~PathFinder()
     {
         // Nothing to do.
     }
 
+    /// @brief Functions which allows to find a path between the "start" and "end" element.
+    /// @param start    The starting position.
+    /// @param end      The ending position.
+    /// @param path     Where the found path is stored.
+    /// @param _checkFunction The function which is used to determine if,
+    ///                        during the exploration, the algorithm can move
+    ///                        from the element "from" and "to".
+    /// @return <b>True</b> if there is a path between the positions,<br>
+    ///         <b>False</b> otherwise.
     virtual bool findPath(ElementType start,
                           ElementType end,
                           std::vector<ElementType> & path,

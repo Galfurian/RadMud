@@ -111,14 +111,14 @@ bool LoadItem(ResultSet * result)
         auto itemFlags = result->getNextUnsignedInteger();
 
         // Retrieve the model vnum.
-        ItemModel * itemModel = Mud::instance().findItemModel(itemModelVnum);
+        auto itemModel = Mud::instance().findItemModel(itemModelVnum);
         if (itemModel == nullptr)
         {
             Logger::log(LogLevel::Error, "Item has wrong model (%s)", ToString(itemModelVnum));
             return false;
         }
         // Check the dynamic attributes.
-        Material * itemComposition = Mud::instance().findMaterial(itemCompositionVnum);
+        auto itemComposition = Mud::instance().findMaterial(itemCompositionVnum);
         if (itemComposition == nullptr)
         {
             Logger::log(
@@ -168,7 +168,7 @@ bool LoadSkill(ResultSet * result)
     while (result->next())
     {
         // Create an empty Skill.
-        Skill * skill = new Skill();
+        auto skill = new Skill();
         skill->vnum = result->getNextInteger();
         skill->name = result->getNextString();
         skill->description = result->getNextString();
@@ -196,7 +196,6 @@ bool LoadFaction(ResultSet * result)
         auto name = result->getNextString();
         auto description = result->getNextString();
         auto currencyVnum = result->getNextInteger();
-
         auto currencyModel = Mud::instance().findItemModel(currencyVnum);
         if (currencyModel == nullptr)
         {
@@ -209,9 +208,8 @@ bool LoadFaction(ResultSet * result)
             return false;
         }
         auto currency = currencyModel->toCurrency();
-
         // Create an empty Faction.
-        Faction * faction = new Faction();
+        auto faction = new Faction();
         faction->vnum = vnum;
         faction->name = name;
         faction->description = description;
@@ -237,16 +235,15 @@ bool LoadModel(ResultSet * result)
     while (result->next())
     {
         // Retrieve the vnum and the type of model.
-        int vnum = result->getNextInteger();
-        ModelType type = static_cast<ModelType>(result->getNextInteger());
+        auto vnum = result->getNextInteger();
+        auto type = static_cast<ModelType>(result->getNextInteger());
         // Create a pointer to the new item model.
-        ItemModel * itemModel = ModelFactory::newModel(type);
+        auto itemModel = ModelFactory::newModel(type);
         if (itemModel == nullptr)
         {
             Logger::log(LogLevel::Error, "Wrong type of model %s.", ToString(vnum));
             return false;
         }
-
         // Set the values of the new model.
         itemModel->vnum = vnum;
         itemModel->name = result->getNextString();
@@ -254,7 +251,7 @@ bool LoadModel(ResultSet * result)
         itemModel->shortdesc = result->getNextString();
         itemModel->keys = SplitString(result->getNextString(), " ");
         itemModel->description = result->getNextString();
-        itemModel->slot = static_cast<EquipmentSlot>(result->getNextInteger());
+        itemModel->slot = EquipmentSlot(result->getNextUnsignedInteger());
         itemModel->modelFlags = result->getNextUnsignedInteger();
         itemModel->baseWeight = result->getNextDouble();
         itemModel->basePrice = result->getNextUnsignedInteger();
@@ -295,7 +292,7 @@ bool LoadRace(ResultSet * result)
     while (result->next())
     {
         // Create an empty Race.
-        Race * race = new Race();
+        auto race = new Race();
         race->vnum = result->getNextInteger();
         race->article = result->getNextString();
         race->name = result->getNextString();
@@ -336,7 +333,7 @@ bool LoadMobile(ResultSet * result)
     while (result->next())
     {
         // Create an empty Mobile.
-        Mobile * mobile = new Mobile();
+        auto mobile = new Mobile();
         // Initialize the mobile.
         mobile->id = result->getNextString();
         mobile->respawnRoom = Mud::instance().findRoom(result->getNextInteger());
@@ -392,7 +389,7 @@ bool LoadRoom(ResultSet * result)
     while (result->next())
     {
         // Create an empty Room.
-        Room * room = new Room();
+        auto room = new Room();
         // Initialize the Room.
         room->vnum = result->getNextInteger();
         room->coord.x = result->getNextInteger();
@@ -467,9 +464,8 @@ bool LoadItemRoom(ResultSet * result)
 {
     while (result->next())
     {
-        Room * room = Mud::instance().findRoom(result->getNextInteger());
-        Item * item = Mud::instance().findItem(result->getNextInteger());
-
+        auto room = Mud::instance().findRoom(result->getNextInteger());
+        auto item = Mud::instance().findItem(result->getNextInteger());
         // Check the correctness.
         if (room == nullptr)
         {
@@ -504,7 +500,7 @@ bool LoadArea(ResultSet * result)
     while (result->next())
     {
         // Create an empty area.
-        Area * area = new Area();
+        auto area = new Area();
         // Initialize the area.
         area->vnum = result->getNextInteger();
         area->name = result->getNextString();
@@ -537,8 +533,8 @@ bool LoadAreaList(ResultSet * result)
     {
         int areaVnum = result->getNextInteger();
         int roomVnum = result->getNextInteger();
-        Area * area = Mud::instance().findArea(areaVnum);
-        Room * room = Mud::instance().findRoom(roomVnum);
+        auto area = Mud::instance().findArea(areaVnum);
+        auto room = Mud::instance().findRoom(roomVnum);
         // Check the correctness.
         if (area == nullptr)
         {
@@ -566,14 +562,14 @@ bool LoadWriting(ResultSet * result)
     while (result->next())
     {
         // Create an empty Writing.
-        Writing * writing = new Writing();
+        auto writing = new Writing();
         // Initialize the Writing.
         writing->vnum = result->getNextInteger();
         writing->title = result->getNextString();
         writing->author = result->getNextString();
         writing->content = result->getNextString();
         // Fid the item on which the writing is attached.
-        Item * item = Mud::instance().findItem(writing->vnum);
+        auto item = Mud::instance().findItem(writing->vnum);
         if (item == nullptr)
         {
             Logger::log(LogLevel::Error, "Can't find the item :" + ToString(writing->vnum));
@@ -592,7 +588,7 @@ bool LoadContinent(ResultSet * result)
 {
     while (result->next())
     {
-        Continent * continent = new Continent();
+        auto continent = new Continent();
         // Initialize the continent.
         continent->vnum = result->getNextInteger();
         continent->name = result->getNextString();
@@ -622,7 +618,7 @@ bool LoadMaterial(ResultSet * result)
     while (result->next())
     {
         // Create an empty Material.
-        Material * material = new Material();
+        auto material = new Material();
         // Intialize the material.
         material->vnum = result->getNextInteger();
         material->type = static_cast<MaterialType>(result->getNextInteger());
@@ -651,7 +647,7 @@ bool LoadProfession(ResultSet * result)
     while (result->next())
     {
         // Create an empty Profession.
-        Profession * professions = new Profession();
+        auto professions = new Profession();
         // Initialize the profession.
         professions->vnum = result->getNextUnsignedInteger();
         professions->name = result->getNextString();
@@ -686,9 +682,8 @@ bool LoadProduction(ResultSet * result)
     {
         // Checker flag.
         bool check = true;
-
         // Create an empty Production.
-        Production * production = new Production();
+        auto production = new Production();
         // Initialize the Production.
         production->vnum = result->getNextInteger();
         production->name = result->getNextString();
@@ -701,7 +696,6 @@ bool LoadProduction(ResultSet * result)
         check &= production->setIngredient(result->getNextString());
         production->material = static_cast<ResourceType>(result->getNextInteger());
         production->workbench = static_cast<ToolType>(result->getNextInteger());
-
         // ////////////////////////////////////////////////////////////////
         // Check the correctness.
         if (!check)
@@ -728,7 +722,7 @@ bool LoadLiquid(ResultSet * result)
     while (result->next())
     {
         // Create an empty Liquid.
-        Liquid * liquid = new Liquid();
+        auto liquid = new Liquid();
         // Load the liquid.
         liquid->vnum = result->getNextInteger();
         liquid->name = result->getNextString();
@@ -752,8 +746,8 @@ bool LoadContentLiq(ResultSet * result)
 {
     while (result->next())
     {
-        Item * container = Mud::instance().findItem(result->getNextInteger());
-        Liquid * liquid = Mud::instance().findLiquid(result->getNextInteger());
+        auto container = Mud::instance().findItem(result->getNextInteger());
+        auto liquid = Mud::instance().findLiquid(result->getNextInteger());
         unsigned int quantity = result->getNextUnsignedInteger();
         bool check = true;
         if (container == nullptr)
@@ -785,10 +779,10 @@ bool LoadTravelPoint(ResultSet * result)
 {
     while (result->next())
     {
-        Area * sourceArea = Mud::instance().findArea(result->getNextInteger());
-        Room * sourceRoom = sourceArea->getRoom(result->getNextInteger());
-        Area * targetArea = Mud::instance().findArea(result->getNextInteger());
-        Room * targetRoom = targetArea->getRoom(result->getNextInteger());
+        auto sourceArea = Mud::instance().findArea(result->getNextInteger());
+        auto sourceRoom = sourceArea->getRoom(result->getNextInteger());
+        auto targetArea = Mud::instance().findArea(result->getNextInteger());
+        auto targetRoom = targetArea->getRoom(result->getNextInteger());
         bool check = true;
         if (sourceArea == nullptr)
         {
@@ -838,7 +832,6 @@ bool LoadBuilding(ResultSet * result)
         // Create an empty Building.
         Building building;
         // Initialize the Production.
-
         building.vnum = result->getNextInteger();
         building.name = result->getNextString();
         building.difficulty = result->getNextUnsignedInteger();
@@ -848,7 +841,6 @@ bool LoadBuilding(ResultSet * result)
         building.buildingModel = Mud::instance().findItemModel(result->getNextInteger());
         building.setIngredient(result->getNextString());
         building.unique = static_cast<bool>(result->getNextInteger());
-
         if (building.buildingModel == nullptr)
         {
             Logger::log(LogLevel::Error, "Can't find the building itemModel.");
@@ -890,7 +882,7 @@ bool LoadShop(ResultSet * result)
             Logger::log(LogLevel::Error, "Wrong type of item (%s).", ToString(vnum));
             return false;
         }
-        ShopItem * shop = item->toShopItem();
+        auto shop = item->toShopItem();
         shop->shopName = name;
         shop->shopBuyTax = buy;
         shop->shopSellTax = sell;
@@ -930,7 +922,7 @@ bool LoadCurrency(ResultSet * result)
             Logger::log(LogLevel::Error, "Can't find the material (%s).", ToString(materialVnum));
             return false;
         }
-        CurrencyModel * currency = model->toCurrency();
+        auto currency = model->toCurrency();
         if (!currency->addPrice(materialVnum, worth))
         {
             Logger::log(LogLevel::Error, "Can't add the price for (%s).", ToString(modelVnum));

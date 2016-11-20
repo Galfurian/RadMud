@@ -1,6 +1,7 @@
-/// @file   processInput.hpp
+/// @file   itemQuality.hpp
+/// @brief  Define the item quality class.
 /// @author Enrico Fraccaroli
-/// @date   Nov 14, 2016
+/// @date   Nov 19 2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -21,25 +22,47 @@
 
 #pragma once
 
-#include "argumentHandler.hpp"
+#include <string>
 
-class Character;
-
-/// @brief The main input processing function.
-/// @details This is the processing function which is used to process
-///           the input of a 'player' which is logged in, as well as the
-///           the commands of a 'mobile'.
-class ProcessInput
+/// The quality of an item.
+class ItemQuality
 {
 public:
-    /// @brief Constructor.
-    ProcessInput();
+    /// List of possible quality values.
+    enum Enum
+    {
+        Disastrous,
+        Poor,
+        Normal,
+        Fine,
+        Masterful
+    };
 
-    /// @brief Destructor.
-    virtual ~ProcessInput();
+    /// @brief Constructor from number.
+    ItemQuality(unsigned int & _quality);
 
-    /// @brief Process the input with the given 'character'.
-    /// @param character    The character which activated the processing function.
-    /// @param args         An argument handler which contains the input.
-    virtual void process(Character * character, ArgumentHandler & args);
+    /// @brief Constructor from enum.
+    ItemQuality(const Enum & _quality);
+
+    /// @brief Check is the given number is a valid quality.
+    static bool isValid(const unsigned int & _quality);
+
+    /// @brief Returns the quality as string.
+    std::string toString() const;
+
+    /// @brief Returns the quality as number.
+    unsigned int toUInt() const;
+
+    /// @brief Returns the quality modifier.
+    double getModifier() const;
+
+    /// @brief Equality operator w.r.t. a quality enum.
+    bool operator==(const ItemQuality::Enum & rhs) const;
+
+    /// @brief Inequality operator w.r.t. a quality enum.
+    bool operator!=(const ItemQuality::Enum & rhs) const;
+
+private:
+    /// Internal quality value.
+    Enum quality;
 };

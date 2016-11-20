@@ -27,10 +27,12 @@
 #include <set>
 #include <map>
 
-#include "utils.hpp"
-#include "defines.hpp"
+#include "equipmentSlot.hpp"
+#include "itemQuality.hpp"
 #include "lua_script.hpp"
+#include "defines.hpp"
 #include "table.hpp"
+#include "utils.hpp"
 
 /// Used to determine the type of the model.
 using ModelType = enum class ModelType_t

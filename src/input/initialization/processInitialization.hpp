@@ -1,4 +1,4 @@
-/// @file   creationStep.hpp
+/// @file   processInitialization.hpp
 /// @author Enrico Fraccaroli
 /// @date   Nov 14, 2016
 /// @copyright
@@ -28,6 +28,16 @@
 /// Player descriptions must consist of characters from this list.
 #define  VALID_CHARACTERS_DESC "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ,.\n"
 
+/// @brief The abstract class used for implementing an initialization step.
+/// @details
+/// The initialization steps comprises all the input processing functions
+///  executed before the player is actually logged inside the game.<br>
+/// For instance, if I want to add a new step inside the character creation phase,
+///  I just need to implement a new class which extends this A.C. and plug it inside
+///  the creation process.
+/// In details, if I want to add a "Choose Skin Color" step, after the "Chose Description"
+///  and "Chose Weight", I just need to go inside those classes and simply change their
+///  "next" and "previous" step.
 class ProcessInitialization :
     public ProcessInput
 {

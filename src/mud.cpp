@@ -28,6 +28,7 @@
 #include "processPlayerName.hpp"
 #include "CMacroWrapper.hpp"
 #include "stopwatch.hpp"
+#include "direction.hpp"
 
 /// Input file descriptor.
 static fd_set in_set;
@@ -325,7 +326,7 @@ void Mud::addCommand(Command & command)
     mudCommands.push_back(command);
 }
 
-bool Mud::addDirection(std::string name, Direction direction)
+bool Mud::addDirection(std::string name, const Direction & direction)
 {
     return mudDirections.insert(std::make_pair(name, direction)).second;
 }
