@@ -22,6 +22,8 @@
 
 #include "projectileModel.hpp"
 
+#include "logger.hpp"
+
 ProjectileModel::ProjectileModel() :
     projectileType(),
     damageBonus(),

@@ -22,6 +22,8 @@
 
 #include "containerModel.hpp"
 
+#include "logger.hpp"
+
 ContainerModel::ContainerModel() :
     maxWeight(),
     containerFlags(),

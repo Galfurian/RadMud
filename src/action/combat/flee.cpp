@@ -21,9 +21,11 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "flee.hpp"
-#include "room.hpp"
+
 #include "basicAttack.hpp"
 #include "moveAction.hpp"
+#include "logger.hpp"
+#include "room.hpp"
 
 Flee::Flee(Character * _actor) :
     CombatAction(_actor)

@@ -21,6 +21,8 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "combatAction.hpp"
+
+#include "logger.hpp"
 #include "room.hpp"
 
 using namespace std::chrono;

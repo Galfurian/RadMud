@@ -1624,7 +1624,7 @@ void DoProfessionInfo(Character * character, ArgumentHandler & args)
     msg += "Name          : " + profession->name + "\n";
     msg += "Description   : " + profession->description + "\n";
     msg += "Command       : " + profession->command + "\n";
-    msg += "Posture       : " + GetPostureName(profession->posture) + "\n";
+    msg += "Posture       : " + profession->posture.toString() + "\n";
     msg += "Action        : " + profession->action + "\n";
     msg += "    Start     : " + profession->startMessage + "\n";
     msg += "    Finish    : " + profession->finishMessage + "\n";
@@ -1761,7 +1761,7 @@ void DoMobileList(Character * character, ArgumentHandler & /*args*/)
     table.addColumn("LOCATION", StringAlign::Right);
     for (auto iterator : Mud::instance().mudMobiles)
     {
-        Mobile * mobile = iterator.second;
+        auto mobile = iterator.second;
         // Prepare the row.
         TableRow row;
         row.push_back((mobile->isAlive()) ? "Yes" : "No");
@@ -2024,7 +2024,7 @@ void DoProfessionList(Character * character, ArgumentHandler & /*args*/)
         TableRow row;
         row.push_back(iterator.second->name);
         row.push_back(iterator.second->command);
-        row.push_back(GetPostureName(iterator.second->posture));
+        row.push_back(iterator.second->posture.toString());
         row.push_back(iterator.second->action);
         // Add the row to the table.
         table.addRow(row);
@@ -2082,7 +2082,7 @@ void DoBuildingList(Character * character, ArgumentHandler & /*args*/)
     table.addColumn("UNIQUE", StringAlign::Center);
     for (auto iterator : Mud::instance().mudBuildings)
     {
-        Building * building = &(iterator.second);
+        auto building = &(iterator.second);
         // Prepare the row.
         TableRow row;
         row.push_back(ToString(building->vnum));

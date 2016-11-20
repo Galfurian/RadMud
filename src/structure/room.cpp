@@ -22,9 +22,10 @@
 
 #include "room.hpp"
 
-#include "mud.hpp"
-#include "generator.hpp"
 #include "mechanismModel.hpp"
+#include "generator.hpp"
+#include "logger.hpp"
+#include "mud.hpp"
 
 Room::Room() :
     vnum(),

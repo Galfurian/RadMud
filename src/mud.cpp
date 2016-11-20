@@ -28,7 +28,7 @@
 #include "processPlayerName.hpp"
 #include "CMacroWrapper.hpp"
 #include "stopwatch.hpp"
-#include "direction.hpp"
+#include "logger.hpp"
 
 /// Input file descriptor.
 static fd_set in_set;

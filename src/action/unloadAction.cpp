@@ -21,8 +21,10 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "unloadAction.hpp"
-#include "character.hpp"
+
 #include "sqliteDbms.hpp"
+#include "character.hpp"
+#include "logger.hpp"
 
 UnloadAction::UnloadAction(Character * _actor, Item * _itemToBeUnloaded) :
     GeneralAction(_actor),

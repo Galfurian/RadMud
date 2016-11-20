@@ -24,6 +24,7 @@
 
 #include <cmath>
 
+#include "logger.hpp"
 #include "room.hpp"
 #include "mud.hpp"
 

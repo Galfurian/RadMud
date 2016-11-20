@@ -22,6 +22,8 @@
 
 #include "shieldModel.hpp"
 
+#include "logger.hpp"
+
 ShieldModel::ShieldModel() :
     size(),
     parryChance()

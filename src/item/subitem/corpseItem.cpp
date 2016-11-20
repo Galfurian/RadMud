@@ -21,6 +21,7 @@
 
 #include "corpseItem.hpp"
 
+#include "logger.hpp"
 #include "mud.hpp"
 
 CorpseItem::CorpseItem()

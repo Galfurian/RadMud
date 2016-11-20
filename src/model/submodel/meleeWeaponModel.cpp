@@ -22,6 +22,8 @@
 
 #include "meleeWeaponModel.hpp"
 
+#include "logger.hpp"
+
 MeleeWeaponModel::MeleeWeaponModel() :
     meleeWeaponType(),
     minDamage(),

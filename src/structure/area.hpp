@@ -29,9 +29,25 @@
 #include "map3D.hpp"
 #include "map2D.hpp"
 #include "character.hpp"
-#include "defines.hpp"
 
 class Room;
+
+/// Used to determine the type of Zone.
+using AreaType = enum class AreaType_t
+{
+    NoType,     ///< No type.
+    Cavern,     ///< Identifies a cavern.
+    Underdark   ///< Identifies a region of the underdark.
+};
+
+/// Used to determine the status of a Zone.
+using AreaStatus = enum class AreaStatus_t
+{
+    Normal,     ///< The area has no environmentals status.
+    Iced,       ///< The area is freezing.
+    Magmatic,   ///< The area have vulcanic activities.
+    Vegetal     ///< The area is overrun by the vegetation.
+};
 
 /// @brief This class contains all the information regarding an entire area.
 class Area

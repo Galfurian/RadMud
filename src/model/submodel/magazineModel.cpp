@@ -22,6 +22,8 @@
 
 #include "magazineModel.hpp"
 
+#include "logger.hpp"
+
 MagazineModel::MagazineModel() :
     projectileType(),
     maxAmmount()

@@ -22,6 +22,8 @@
 
 #include "mechanismModel.hpp"
 
+#include "logger.hpp"
+
 MechanismModel::MechanismModel() :
     mechanismType(),
     key(),

@@ -21,8 +21,8 @@
 
 #include "currencyItem.hpp"
 
-#include "material.hpp"
 #include "currencyModel.hpp"
+#include "logger.hpp"
 
 CurrencyItem::CurrencyItem()
 {

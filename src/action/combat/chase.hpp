@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "characterPosture.hpp"
 #include "combatAction.hpp"
 #include <functional>
 

@@ -30,7 +30,7 @@
 #include "equipmentSlot.hpp"
 #include "itemQuality.hpp"
 #include "lua_script.hpp"
-#include "defines.hpp"
+#include "material.hpp"
 #include "table.hpp"
 #include "utils.hpp"
 
@@ -80,8 +80,6 @@ using ModelFlag = enum class ModelFlag_t
 class Item;
 
 class Player;
-
-class Material;
 
 class ArmorModel;
 

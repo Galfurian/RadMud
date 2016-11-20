@@ -21,6 +21,8 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "player.hpp"
+
+#include "logger.hpp"
 #include "mud.hpp"
 
 Player::Player(const int & _socket, const int & _port, const std::string & _address) :

@@ -25,8 +25,8 @@
 
 #pragma once
 
-#include "defines.hpp"
 #include "ability.hpp"
+#include "characterPosture.hpp"
 #include "exit.hpp"
 #include "race.hpp"
 #include "item.hpp"
@@ -44,6 +44,22 @@ class Room;
 class Player;
 
 class Mobile;
+
+/// The list of possible actions.
+using GenderType = enum class GenderType_t
+{
+    None,   ///< The character has no gender (robot).
+    Female, ///< The character is a female.
+    Male    ///< The character is a male.
+};
+
+/// Used to determine the flag of the character.
+using CharacterFlag = enum class CharacterFlag_t
+{
+    None = 0,       ///< No flag.
+    IsGod = 1,      ///< The character is a GOD.
+    Invisible = 2   ///< The character is invisible.
+};
 
 /// @brief Character class, father of Player and Mobile.
 /// @details
@@ -614,6 +630,12 @@ public:
 
 /// @addtogroup FlagsToList
 /// @{
+
+/// Return the string describing the type of Gender.
+std::string GetGenderTypeName(GenderType type);
+
+/// Return the string describing the given character flag.
+std::string GetCharacterFlagName(CharacterFlag flag);
 
 /// Return a list of string containg the Character flags contained inside the value.
 std::string GetCharacterFlagString(unsigned int flags);

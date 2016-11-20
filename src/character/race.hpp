@@ -28,7 +28,6 @@
 
 #include "corpseModel.hpp"
 #include "ability.hpp"
-#include "defines.hpp"
 #include "faction.hpp"
 
 class Material;

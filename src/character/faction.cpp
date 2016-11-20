@@ -22,9 +22,8 @@
 
 #include "faction.hpp"
 
-#include "utils.hpp"
-#include "logger.hpp"
 #include "currencyModel.hpp"
+#include "logger.hpp"
 
 Faction::Faction() :
     vnum(),

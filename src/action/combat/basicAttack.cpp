@@ -21,14 +21,16 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "basicAttack.hpp"
+
 #include "rangedWeaponModel.hpp"
 #include "rangedWeaponItem.hpp"
 #include "meleeWeaponItem.hpp"
+#include "sqliteDbms.hpp"
 #include "formatter.hpp"
+#include "logger.hpp"
+#include "chase.hpp"
 #include "room.hpp"
 #include "area.hpp"
-#include "chase.hpp"
-#include "sqliteDbms.hpp"
 
 BasicAttack::BasicAttack(Character * _actor) :
     CombatAction(_actor)

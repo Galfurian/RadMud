@@ -22,6 +22,8 @@
 
 #include "nodeModel.hpp"
 
+#include "logger.hpp"
+
 NodeModel::NodeModel() :
     nodeType()
 //,provides()

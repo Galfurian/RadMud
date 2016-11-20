@@ -22,6 +22,8 @@
 
 #include "lightModel.hpp"
 
+#include "logger.hpp"
+
 LightModel::LightModel() :
     maxHours(),
     policy()

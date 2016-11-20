@@ -22,6 +22,8 @@
 
 #include "toolModel.hpp"
 
+#include "logger.hpp"
+
 ToolModel::ToolModel() :
     toolType()
 {

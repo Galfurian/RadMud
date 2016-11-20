@@ -35,6 +35,15 @@ extern "C"
 
 class Room;
 
+/// Used to determine the flag of the exit.
+using ExitFlag = enum class ExitFlag_t
+{
+    None = 0,   ///< No flag.
+    NoMob = 1,  ///< A mob can't move through this exit.
+    Hidden = 2, ///< The exit it's hidden.
+    Stairs = 4, ///< The exit has stairs.
+};
+
 /// @brief Holds details about room.
 class Exit
 {

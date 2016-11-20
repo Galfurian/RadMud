@@ -25,7 +25,6 @@
 #include <zlib.h>
 #include <ctime>
 #include <fstream>
-#include <iostream>
 #include <iterator>
 
 #include "logger.hpp"

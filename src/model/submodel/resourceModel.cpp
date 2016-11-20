@@ -22,6 +22,8 @@
 
 #include "resourceModel.hpp"
 
+#include "logger.hpp"
+
 ResourceModel::ResourceModel() :
     resourceType()
 {

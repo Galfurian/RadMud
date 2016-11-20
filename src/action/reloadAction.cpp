@@ -21,8 +21,10 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "reloadAction.hpp"
-#include "character.hpp"
+
 #include "sqliteDbms.hpp"
+#include "character.hpp"
+#include "logger.hpp"
 
 ReloadAction::ReloadAction(Character * _actor, RangedWeaponItem * _weapon, Item * _magazine) :
     GeneralAction(_actor),

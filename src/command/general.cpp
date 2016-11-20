@@ -22,21 +22,22 @@
 
 #include "general.hpp"
 
-#include "mud.hpp"
 #include "moveAction.hpp"
+#include "logger.hpp"
+#include "mud.hpp"
 
 void LoadGeneralCommands()
 {
     {
         Mud::instance().addCommand(Command().setName("quit")
-                                       .setHelp("Leave the game.")
-                                       .setHndl(DoQuit)
-                                       .setTypedCompletely(true));
+                                            .setHelp("Leave the game.")
+                                            .setHndl(DoQuit)
+                                            .setTypedCompletely(true));
     }
     {
         Mud::instance().addCommand(Command().setName("who")
-                                       .setHelp("List all the character online.")
-                                       .setHndl(DoWho));
+                                            .setHelp("List all the character online.")
+                                            .setHndl(DoWho));
     }
     {
         Command command;
@@ -678,7 +679,7 @@ void DoStatistics(Character * character, ArgumentHandler & /*args*/)
     msg += "You " + BLD + player->getStaminaCondition() + RES + ".\n";
     msg += "You " + BLD + player->getHungerCondition() + RES + ".\n";
     msg += "You " + BLD + player->getThirstCondition() + RES + ".\n";
-    msg += "You are " + BLD + GetPostureName(player->posture) + RES + ".\n\n";
+    msg += "You are " + BLD + player->posture.toString() + RES + ".\n\n";
     if (player->getAction()->getType() != ActionType::Wait)
     {
         msg += "You are " + BLD + player->getAction()->getDescription() + RES + ".\n";

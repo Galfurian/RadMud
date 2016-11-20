@@ -74,7 +74,6 @@ find_package(Sqlite3 REQUIRED)
 set(PROJECT_SRC
         src/main.cpp
         src/mud.cpp
-        src/defines.cpp
         src/updater.cpp
         )
 

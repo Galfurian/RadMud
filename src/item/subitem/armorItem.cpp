@@ -20,7 +20,6 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "armorItem.hpp"
-#include "material.hpp"
 #include "armorModel.hpp"
 
 ArmorItem::ArmorItem()

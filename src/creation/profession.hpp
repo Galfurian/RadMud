@@ -24,7 +24,8 @@
 
 #include <string>
 #include <map>
-#include "defines.hpp"
+
+#include "characterPosture.hpp"
 
 /// @brief Holds details about a profession.
 class Profession

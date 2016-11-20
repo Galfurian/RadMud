@@ -21,7 +21,9 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "corpseModel.hpp"
+
 #include "itemFactory.hpp"
+#include "logger.hpp"
 #include "mud.hpp"
 
 CorpseModel::CorpseModel()

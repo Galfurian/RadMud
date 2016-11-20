@@ -81,7 +81,8 @@ void ProcessNewName::advance(Character * character, const std::string & error)
     character->sendMsg(" to pick a legendary name, maybe one day it will be whispered all over the lands.\n");
     character->sendMsg("# Type [%sback%s] to return to the previous step.\n",
                        Formatter::magenta(),
-                       Formatter::reset());    if (!error.empty())
+                       Formatter::reset());
+    if (!error.empty())
     {
         character->sendMsg("# " + error + "\n");
     }

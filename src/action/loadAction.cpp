@@ -21,9 +21,11 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "loadAction.hpp"
-#include "character.hpp"
+
 #include "magazineModel.hpp"
 #include "sqliteDbms.hpp"
+#include "character.hpp"
+#include "logger.hpp"
 
 LoadAction::LoadAction(Character * _actor, Item * _itemToBeLoaded, Item * _projectile, const unsigned int & _ammount) :
     GeneralAction(_actor),

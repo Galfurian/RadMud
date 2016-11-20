@@ -34,6 +34,14 @@
 #include "liquid.hpp"
 #include "table.hpp"
 
+/// Used to determine the flag of the item.
+using ItemFlag = enum class ItemFlag_t
+{
+    None = 0,
+    Closed = 1,
+    Locked = 2,
+    Built = 4
+};
 
 class Room;
 
@@ -54,7 +62,6 @@ class CurrencyItem;
 class CorpseItem;
 
 class MagazineItem;
-
 
 /// @brief Holds details about items.
 class Item

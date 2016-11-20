@@ -21,9 +21,11 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "scoutAction.hpp"
+
+#include "effectFactory.hpp"
+#include "logger.hpp"
 #include "room.hpp"
 #include "area.hpp"
-#include "effectFactory.hpp"
 
 ScoutAction::ScoutAction(Character * _actor) :
     GeneralAction(_actor)

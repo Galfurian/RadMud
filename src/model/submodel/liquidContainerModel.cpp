@@ -22,6 +22,8 @@
 
 #include "liquidContainerModel.hpp"
 
+#include "logger.hpp"
+
 LiquidContainerModel::LiquidContainerModel() :
     maxWeight(),
     liquidFlags()

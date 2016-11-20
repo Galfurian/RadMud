@@ -20,12 +20,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-// Basic Include.
 #include "mobile.hpp"
 
-// Local Includes.
-
-// Other Include.
+#include "logger.hpp"
 #include "mud.hpp"
 
 using namespace std::chrono;

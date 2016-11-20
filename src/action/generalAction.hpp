@@ -24,7 +24,6 @@
 
 #include "production.hpp"
 #include "building.hpp"
-#include "defines.hpp"
 #include "combatHandler.hpp"
 #include "item.hpp"
 

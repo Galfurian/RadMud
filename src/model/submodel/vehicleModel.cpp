@@ -22,6 +22,8 @@
 
 #include "vehicleModel.hpp"
 
+#include "logger.hpp"
+
 VehicleModel::VehicleModel()
 {
     // Nothing to do.

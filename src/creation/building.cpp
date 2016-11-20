@@ -23,6 +23,7 @@
 // Basic Include.
 #include "building.hpp"
 
+#include "logger.hpp"
 #include "room.hpp"
 
 Building::Building() :

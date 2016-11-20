@@ -24,6 +24,8 @@
 
 #include "mud.hpp"
 
+#include "logger.hpp"
+
 ShopModel::ShopModel() :
     maxWeight()
 {

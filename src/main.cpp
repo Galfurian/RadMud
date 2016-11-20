@@ -20,12 +20,7 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-// Basic Include.
-
-// Local Includes.
 #include "mud.hpp"
-
-// Other Include.
 
 /// @brief  It's the main program.
 /// @return Errore code.

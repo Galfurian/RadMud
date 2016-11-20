@@ -22,6 +22,7 @@
 
 #include "production.hpp"
 
+#include "logger.hpp"
 #include "mud.hpp"
 
 Production::Production() :

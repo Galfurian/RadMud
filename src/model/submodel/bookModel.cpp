@@ -22,6 +22,8 @@
 
 #include "bookModel.hpp"
 
+#include "logger.hpp"
+
 BookModel::BookModel() :
     maxParchments()
 {

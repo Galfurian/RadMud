@@ -23,9 +23,9 @@
 #include "sqliteDbms.hpp"
 
 #include "sqliteLoadFunctions.hpp"
-
-#include "mud.hpp"
 #include "stopwatch.hpp"
+#include "logger.hpp"
+#include "mud.hpp"
 
 SQLiteDbms::SQLiteDbms()
 {

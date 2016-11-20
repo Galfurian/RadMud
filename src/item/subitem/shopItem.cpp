@@ -21,9 +21,9 @@
 
 #include "shopItem.hpp"
 
-#include "mud.hpp"
-
 #include "currencyItem.hpp"
+#include "logger.hpp"
+#include "mud.hpp"
 
 ShopItem::ShopItem() :
     shopName(),

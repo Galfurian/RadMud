@@ -20,11 +20,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-// Basic Include.
 #include "item.hpp"
 
-// Other Include.
 #include "mud.hpp"
+#include "logger.hpp"
 #include "shopItem.hpp"
 #include "shopModel.hpp"
 #include "armorItem.hpp"

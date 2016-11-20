@@ -31,6 +31,13 @@
 #include "character.hpp"
 #include "skill.hpp"
 
+/// Handle all the player's phases during login.
+using ConnectionState = enum class ConnectionState_t
+{
+    LoggingIn, ///< The player is logging in.
+    Playing    ///< The player is playing.
+};
+
 /// @brief Holds details about each connected player.
 class Player :
     public Character

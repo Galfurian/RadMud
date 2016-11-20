@@ -22,7 +22,6 @@
 
 #pragma once
 
-#include "defines.hpp"
 #include "ability.hpp"
 #include "utils.hpp"
 

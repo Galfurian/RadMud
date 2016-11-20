@@ -22,10 +22,28 @@
 
 #pragma once
 
-#include <map>
+#include <string>
 
-#include "defines.hpp"
-#include "lua_script.hpp"
+extern "C"
+{
+#include "lua.h"
+}
+
+/// The list of materials.
+using MaterialType = enum class MaterialType_t
+{
+    NoType,     ///< [0] No type.
+    Metal,      ///< [1] Metal
+    Stone,      ///< [2] Stone
+    Wood,       ///< [3] Wood
+    Skin,       ///< [4] Skin
+    Cloth,      ///< [5] Cloth
+    Vegetable,  ///< [6] Vegetable
+    Meat,       ///< [7] Meat
+    Glass,      ///< [8] Glass
+    Paper,      ///< [9] Paper
+    Coal        ///< [10] Coal
+};
 
 /// @brief Holds details about a material.
 class Material
@@ -81,3 +99,6 @@ public:
     /// @param L The lua environment.
     static void luaRegister(lua_State * L);
 };
+
+/// Return the string describing the type of a Material.
+std::string GetMaterialTypeName(MaterialType type);

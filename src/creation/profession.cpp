@@ -21,6 +21,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "profession.hpp"
+#include "logger.hpp"
 
 Profession::Profession() :
     vnum(),
@@ -50,7 +51,7 @@ bool Profession::check()
     assert(!name.empty());
     assert(!description.empty());
     assert(!command.empty());
-    assert(posture != CharacterPosture::NoPosure);
+    assert(posture != CharacterPosture::None);
     assert(!action.empty());
     assert(!startMessage.empty());
     assert(!finishMessage.empty());

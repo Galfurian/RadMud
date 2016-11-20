@@ -20,12 +20,14 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "sqliteLoadFunctions.hpp"
-#include "sqliteDbms.hpp"
-#include "mud.hpp"
+
 #include "currencyModel.hpp"
-#include "shopItem.hpp"
 #include "modelFactory.hpp"
 #include "itemFactory.hpp"
+#include "sqliteDbms.hpp"
+#include "shopItem.hpp"
+#include "logger.hpp"
+#include "mud.hpp"
 
 bool LoadBadName(ResultSet * result)
 {
@@ -653,7 +655,7 @@ bool LoadProfession(ResultSet * result)
         professions->name = result->getNextString();
         professions->description = result->getNextString();
         professions->command = result->getNextString();
-        professions->posture = static_cast<CharacterPosture>(result->getNextInteger());
+        professions->posture = CharacterPosture(result->getNextUnsignedInteger());
         professions->action = result->getNextString();
         professions->startMessage = result->getNextString();
         professions->finishMessage = result->getNextString();

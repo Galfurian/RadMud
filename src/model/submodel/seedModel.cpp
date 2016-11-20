@@ -22,6 +22,8 @@
 
 #include "seedModel.hpp"
 
+#include "logger.hpp"
+
 SeedModel::SeedModel() :
     seedType()
 {

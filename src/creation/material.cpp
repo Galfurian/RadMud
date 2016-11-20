@@ -22,6 +22,9 @@
 
 #include "material.hpp"
 
+#include "LuaBridge.hpp"
+#include "logger.hpp"
+
 Material::Material() :
     vnum(),
     type(MaterialType::NoType),
@@ -82,4 +85,19 @@ void Material::luaRegister(lua_State * L)
         .addData("hardness", &Material::hardness, false)
         .addData("lightness", &Material::lightness, false)
         .endClass();
+}
+
+std::string GetMaterialTypeName(MaterialType type)
+{
+    if (type == MaterialType::Metal) return "Metal";
+    if (type == MaterialType::Stone) return "Stone";
+    if (type == MaterialType::Wood) return "Wood";
+    if (type == MaterialType::Skin) return "Skin";
+    if (type == MaterialType::Cloth) return "Cloth";
+    if (type == MaterialType::Vegetable) return "Vegetable";
+    if (type == MaterialType::Meat) return "Meat";
+    if (type == MaterialType::Glass) return "Glass";
+    if (type == MaterialType::Paper) return "Paper";
+    if (type == MaterialType::Coal) return "Coal";
+    return "No Material Type";
 }

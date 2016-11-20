@@ -21,7 +21,9 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "aimAction.hpp"
+
 #include "character.hpp"
+#include "logger.hpp"
 #include "area.hpp"
 #include "room.hpp"
 

@@ -23,7 +23,6 @@
 #pragma once
 
 #include <map>
-#include "defines.hpp"
 
 /// @brief Holds details about a liquid.
 class Liquid

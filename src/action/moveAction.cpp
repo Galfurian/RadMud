@@ -21,9 +21,11 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "moveAction.hpp"
-#include "character.hpp"
-#include "room.hpp"
+
 #include "effectFactory.hpp"
+#include "character.hpp"
+#include "logger.hpp"
+#include "room.hpp"
 
 using namespace std::chrono;
 

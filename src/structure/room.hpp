@@ -26,7 +26,6 @@
 
 #include "exit.hpp"
 #include "coordinates.hpp"
-#include "defines.hpp"
 #include "utils.hpp"
 #include "item.hpp"
 #include "lua_script.hpp"

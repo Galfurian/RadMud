@@ -67,7 +67,8 @@ void ProcessNewPassword::advance(Character * character, const std::string & erro
     character->sendMsg("# Choose a proper password, in order to protect the acces to your character.\n");
     character->sendMsg("# Type [%sback%s] to return to the previous step.\n",
                        Formatter::magenta(),
-                       Formatter::reset());    if (!error.empty())
+                       Formatter::reset());
+    if (!error.empty())
     {
         character->sendMsg("# " + error + "\n");
     }

@@ -20,10 +20,8 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-// Basic Include.
 #include "updater.hpp"
-
-// Other Include.
+#include "logger.hpp"
 #include "mud.hpp"
 
 // //////////////////////////////////////////////////////////

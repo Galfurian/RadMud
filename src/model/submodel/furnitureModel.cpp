@@ -22,6 +22,8 @@
 
 #include "furnitureModel.hpp"
 
+#include "logger.hpp"
+
 FurnitureModel::FurnitureModel()
 {
     // Nothing to do.

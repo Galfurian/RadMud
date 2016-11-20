@@ -22,6 +22,8 @@
 
 #include "foodModel.hpp"
 
+#include "logger.hpp"
+
 FoodModel::FoodModel() :
     hours(),
     foodFlags()

@@ -22,6 +22,8 @@
 
 #include "liquid.hpp"
 
+#include "logger.hpp"
+
 Liquid::Liquid() :
     vnum(),
     name(),

@@ -22,6 +22,8 @@
 
 #include "keyModel.hpp"
 
+#include "logger.hpp"
+
 KeyModel::KeyModel()
 {
     // Nothing to do.

@@ -24,6 +24,7 @@
 
 #include "effectFactory.hpp"
 #include "moveAction.hpp"
+#include "logger.hpp"
 #include "aStar.hpp"
 #include "area.hpp"
 #include "room.hpp"

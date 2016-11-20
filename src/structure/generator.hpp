@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "defines.hpp"
+#include "area.hpp"
 
 /// @brief Provides a method which generate a room description and name.
 class Generator

@@ -21,6 +21,8 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "area.hpp"
+
+#include "logger.hpp"
 #include "room.hpp"
 
 Area::Area() :

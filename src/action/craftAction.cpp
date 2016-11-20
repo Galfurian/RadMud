@@ -21,8 +21,10 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "craftAction.hpp"
-#include "room.hpp"
+
 #include "sqliteDbms.hpp"
+#include "logger.hpp"
+#include "room.hpp"
 
 using namespace std::chrono;
 

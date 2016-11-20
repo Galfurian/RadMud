@@ -22,6 +22,8 @@
 
 #include "rangedWeaponModel.hpp"
 
+#include "logger.hpp"
+
 RangedWeaponModel::RangedWeaponModel() :
     rangedWeaponType(),
     minDamage(),

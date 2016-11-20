@@ -22,6 +22,7 @@
 
 #include "armorModel.hpp"
 
+#include "logger.hpp"
 #include "mud.hpp"
 
 ArmorModel::ArmorModel() :

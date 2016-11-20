@@ -29,6 +29,7 @@
 #include <string>
 #include <type_traits>
 #include <vector>
+#include <iostream>
 
 /// Allows to define a non-aborting assertion for correct guards.
 #define CorrectAssert(e) ( (e) ? true : (\

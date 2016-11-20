@@ -20,15 +20,13 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-// Basic Include.
 #include "character.hpp"
 
-// Other Include.
-#include "mud.hpp"
-
-#include "armorItem.hpp"
-#include "meleeWeaponItem.hpp"
 #include "rangedWeaponItem.hpp"
+#include "meleeWeaponItem.hpp"
+#include "armorItem.hpp"
+#include "logger.hpp"
+#include "mud.hpp"
 
 using namespace std::chrono;
 
@@ -149,7 +147,7 @@ void Character::getSheet(Table & sheet) const
     {
         sheet.addRow({"Room", "NONE"});
     }
-    sheet.addRow({"Posture", GetPostureName(this->posture)});
+    sheet.addRow({"Posture", this->posture.toString()});
     sheet.addRow({"Action", this->getAction()->getDescription()});
     sheet.addDivider();
     sheet.addRow({"## Equipment", "## Inventory"});
@@ -204,7 +202,7 @@ std::string Character::getStaticDesc() const
     desc += " is";
     if (posture != CharacterPosture::Stand)
     {
-        desc += " " + GetPostureName(posture);
+        desc += " " + posture.toString();
     }
     desc += " here";
     if (this->getAction()->getType() != ActionType::Wait)
@@ -1532,6 +1530,20 @@ bool Character::operator==(const class Character & source) const
 void Character::sendMsg(const std::string & msg)
 {
     Logger::log(LogLevel::Error, "[SEND_MESSAGE] Msg :" + msg);
+}
+
+std::string GetGenderTypeName(GenderType type)
+{
+    if (type == GenderType::Male) return "Male";
+    if (type == GenderType::Female) return "Female";
+    return "none";
+}
+
+std::string GetCharacterFlagName(CharacterFlag flag)
+{
+    if (flag == CharacterFlag::IsGod) return "IsGod";
+    if (flag == CharacterFlag::IsGod) return "Invisible";
+    return "None";
 }
 
 std::string GetCharacterFlagString(unsigned int flags)

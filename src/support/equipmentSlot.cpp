@@ -70,11 +70,11 @@ bool EquipmentSlot::isValid(const unsigned int & _equipmentSlot)
 bool EquipmentSlot::isValid(const std::string & _equipmentSlot)
 {
     if (_equipmentSlot == "Head") return true;
-    if(_equipmentSlot == "Torso") return true;
-    if(_equipmentSlot == "Back") return true;
-    if(_equipmentSlot == "Legs") return true;
-    if(_equipmentSlot == "Feet") return true;
-    if(_equipmentSlot == "RightHand") return true;
+    if (_equipmentSlot == "Torso") return true;
+    if (_equipmentSlot == "Back") return true;
+    if (_equipmentSlot == "Legs") return true;
+    if (_equipmentSlot == "Feet") return true;
+    if (_equipmentSlot == "RightHand") return true;
     return (_equipmentSlot == "LeftHand");
 }
 

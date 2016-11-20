@@ -22,6 +22,8 @@
 
 #include "ropeModel.hpp"
 
+#include "logger.hpp"
+
 RopeModel::RopeModel() :
     difficulty(),
     ropeType()
