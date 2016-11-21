@@ -29,7 +29,7 @@
 
 #include <cassert>
 #include "LuaHelpers.hpp"
-#include "ClassInfo.hpp"
+#include "classInfo.hpp"
 #include "TypeTraits.hpp"
 
 /**

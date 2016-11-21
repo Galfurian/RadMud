@@ -32,7 +32,7 @@
 #include "LuaHelpers.hpp"
 #include "Userdata.hpp"
 #include "Constructor.hpp"
-#include "ClassInfo.hpp"
+#include "classInfo.hpp"
 #include "CFunctions.hpp"
 #include "TypeTraits.hpp"
 #include "Security.hpp"

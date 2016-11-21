@@ -47,7 +47,7 @@ namespace luabridge
 #include "TypeList.hpp"
 #include "FuncTraits.hpp"
 #include "Constructor.hpp"
-#include "ClassInfo.hpp"
+#include "classInfo.hpp"
 
 class LuaRef;
 
