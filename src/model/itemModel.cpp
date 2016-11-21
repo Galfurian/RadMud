@@ -292,6 +292,7 @@ void ItemModel::luaRegister(lua_State * L)
         .addData("condition", &ItemModel::condition)
         .addData("decay", &ItemModel::decay)
         .addFunction("getType", &ItemModel::getType)
+        .endClass()
         .deriveClass<ArmorModel, ItemModel>("ArmorModel")
         .endClass()
         .deriveClass<BookModel, ItemModel>("BookModel")
@@ -337,7 +338,6 @@ void ItemModel::luaRegister(lua_State * L)
         .deriveClass<ToolModel, ItemModel>("ToolModel")
         .endClass()
         .deriveClass<VehicleModel, ItemModel>("VehicleModel")
-        .endClass()
         .endClass();
 }
 

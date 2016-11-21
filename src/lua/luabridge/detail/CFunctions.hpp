@@ -24,6 +24,16 @@
 /// SOFTWARE.
 ///----------------------------------------------------------------------------
 
+#pragma once
+
+#include "LuaHelpers.hpp"
+#include "FuncTraits.hpp"
+#include "TypeList.hpp"
+#include "Userdata.hpp"
+#include "stack.hpp"
+
+#include <string>
+
 // We use a structure so we can define everything in the header.
 //
 struct CFunc
@@ -215,7 +225,7 @@ struct CFunc
                 assert(isfulluserdata(L, lua_upvalueindex(1)));
                 FnPtr const & fnptr = *static_cast<FnPtr const *>(lua_touserdata(L, lua_upvalueindex(1)));
                 assert(fnptr != 0);
-                ArgList <Params> args(L);
+                ArgList<Params> args(L);
                 Stack<typename FuncTraits<FnPtr>::ReturnType>::push(L,
                                                                     FuncTraits<FnPtr>::call(fnptr, args));
             }
@@ -250,7 +260,7 @@ struct CFunc
                 assert(isfulluserdata(L, lua_upvalueindex(1)));
                 FnPtr const & fnptr = *static_cast<FnPtr const *>(lua_touserdata(L, lua_upvalueindex(1)));
                 assert(fnptr != 0);
-                ArgList <Params> args(L);
+                ArgList<Params> args(L);
                 FuncTraits<FnPtr>::call(fnptr, args);
             }
             catch (std::exception & e)

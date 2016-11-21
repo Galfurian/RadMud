@@ -1,6 +1,7 @@
 ///----------------------------------------------------------------------------
-/// @file   Iterator.hpp
+/// @file   stack.hpp
 /// @copyright
+/// Copyright 2007, Nathan Reed
 /// Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
 ///
 /// License: The MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -26,65 +27,9 @@
 
 #pragma once
 
-#include "LuaRef.hpp"
+// Forward declaration
+//
+template<class T>
+struct Stack;
 
-/** Allows table iteration.
- */
-class Iterator
-{
-private:
-    lua_State * m_L;
-    LuaRef m_table;
-    LuaRef m_key;
-    LuaRef m_value;
-
-public:
-    explicit Iterator(LuaRef table) :
-        m_L(table.state()),
-        m_table(table),
-        m_key(table.state()),
-        m_value(table.state())
-    {
-        //m_table.push (
-    }
-
-    lua_State * state() const
-    {
-        return m_L;
-    }
-
-    LuaRef operator*() const
-    {
-        return m_value;
-    }
-
-    LuaRef operator->() const
-    {
-        return m_value;
-    }
-
-    Iterator & operator++()
-    {
-        return *this;
-    }
-
-    inline bool isNil() const
-    {
-        return m_key.isNil();
-    }
-
-    inline LuaRef key() const
-    {
-        return m_key;
-    }
-
-    inline LuaRef value() const
-    {
-        return m_value;
-    }
-
-private:
-    // Don't use postfix increment, it is less efficient
-    Iterator operator++(int);
-};
-
+#include "stack.i.hpp"

@@ -24,6 +24,8 @@
 /// SOFTWARE.
 ///----------------------------------------------------------------------------
 
+#pragma once
+
 /**
  * Unique Lua registry keys for a class.
 
@@ -69,4 +71,3 @@ public:
         return &value;
     }
 };
-

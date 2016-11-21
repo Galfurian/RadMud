@@ -1,5 +1,5 @@
 ///----------------------------------------------------------------------------
-/// @file   Stack.hpp
+/// @file   TypeTraits.hpp
 /// @copyright
 /// Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
 ///
@@ -24,8 +24,7 @@
 /// SOFTWARE.
 ///----------------------------------------------------------------------------
 
-#ifndef LUABRIDGE_TYPEINFO_HEADER
-#define LUABRIDGE_TYPEINFO_HEADER
+#pragma once
 
 //------------------------------------------------------------------------------
 /**
@@ -173,5 +172,3 @@ struct TypeTraits
     };
     /**@}*/
 };
-
-#endif

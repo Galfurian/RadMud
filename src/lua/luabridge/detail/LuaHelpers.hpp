@@ -25,8 +25,7 @@
 /// SOFTWARE.
 ///----------------------------------------------------------------------------
 
-#ifndef LUA_HELPERS_HPP
-#define LUA_HELPERS_HPP
+#pragma once
 
 extern "C"
 {
@@ -94,7 +93,11 @@ inline int get_length(lua_State* L, int idx)
 
 #else
 
-int get_length(lua_State * L, int idx);
+inline int get_length(lua_State * L, int idx)
+{
+    lua_len(L, idx);
+    return int(luaL_checknumber(L, -1));
+}
 
 #endif
 
@@ -120,5 +123,3 @@ bool isfulluserdata(lua_State * L, int index);
 ///           to the same global state, such as when using coroutines.
 /// @note This is used for assertions.
 bool equalstates(lua_State * L1, lua_State * L2);
-
-#endif

@@ -41,6 +41,12 @@
 ///     without express or implied warranty.
 ///----------------------------------------------------------------------------
 
+#pragma once
+
+#include "stack.hpp"
+
+#include <string>
+
 /**
  None type means void parameters or return value.
  */

@@ -25,6 +25,11 @@
 /// SOFTWARE.
 ///----------------------------------------------------------------------------
 
+#pragma once
+
+#include "LuaHelpers.hpp"
+#include "LuaException.hpp"
+
 /**
  Type tag for representing LUA_TNIL.
 
@@ -38,8 +43,6 @@
 struct Nil
 {
 };
-
-#include "LuaHelpers.hpp"
 
 //------------------------------------------------------------------------------
 /**

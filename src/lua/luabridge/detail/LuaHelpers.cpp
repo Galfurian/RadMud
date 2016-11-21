@@ -2,12 +2,6 @@
 
 namespace luabridge
 {
-int get_length(lua_State * L, int idx)
-{
-    lua_len(L, idx);
-    return int(luaL_checknumber(L, -1));
-}
-
 lua_State * get_main_thread(lua_State * thread)
 {
     lua_rawgeti(thread, LUA_REGISTRYINDEX, LUA_RIDX_MAINTHREAD);
