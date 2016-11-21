@@ -36,7 +36,6 @@
 
 Item::Item() :
     vnum(),
-    type(),
     model(),
     quantity(),
     maker(),

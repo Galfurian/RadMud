@@ -25,6 +25,8 @@
 /// SOFTWARE.
 ///----------------------------------------------------------------------------
 
+#include <type_traits>
+
 /** Provides C++ to Lua registration capabilities.
 
  This class is not instantiated directly, call `getGlobalNamespace` to start
@@ -1023,11 +1025,26 @@ public:
     /// @param name  The name of the value.
     /// @param value The value to add.
     /// @return A reference to the current namespace.
-    template<class T>
-    Namespace & addValue(char const * name, T value)
+    template<class IntType>
+    Namespace & addIntegral(char const * name, IntType value)
     {
+        static_assert(std::is_integral<IntType>::value, "Integer required.");
         assert(lua_istable(L, -1));
         lua_pushnumber(L, value);
+        rawsetfield(L, -2, name);
+        return *this;
+    }
+
+    /// @brief Add an enum value.
+    /// @param name  The name of the value.
+    /// @param value The value to add.
+    /// @return A reference to the current namespace.
+    template<class EnumType>
+    Namespace & addEnum(char const * name, EnumType value)
+    {
+        static_assert(std::is_enum<EnumType>::value, "Enum required.");
+        assert(lua_istable(L, -1));
+        lua_pushnumber(L, static_cast<unsigned int>(value));
         rawsetfield(L, -2, name);
         return *this;
     }

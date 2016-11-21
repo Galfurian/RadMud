@@ -31,7 +31,7 @@
 
 Item * ItemFactory::newItem(const ModelType & type)
 {
-    if (type == ModelType::NoType)
+    if (type == ModelType::None)
     {
         return nullptr;
     }

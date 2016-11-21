@@ -1434,6 +1434,7 @@ void Character::loadScript(const std::string & scriptFilename)
     Coordinates::luaRegister(L);
     Exit::luaRegister(L);
     Room::luaRegister(L);
+    ModelType::luaRegister(L);
 
     if (luaL_dofile(L, scriptFilename.c_str()) != LUABRIDGE_LUA_OK)
     {

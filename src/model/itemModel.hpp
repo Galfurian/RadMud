@@ -30,38 +30,10 @@
 #include "equipmentSlot.hpp"
 #include "itemQuality.hpp"
 #include "lua_script.hpp"
+#include "modelType.hpp"
 #include "material.hpp"
 #include "table.hpp"
 #include "utils.hpp"
-
-/// Used to determine the type of the model.
-using ModelType = enum class ModelType_t
-{
-    NoType,             ///< [0] No type.
-    Corpse,             ///< [1] A corpse.
-    MeleeWeapon,        ///< [2] Any melee weapon.
-    RangedWeapon,       ///< [3] Any ranged weapon.
-    Armor,              ///< [4] Any armor.
-    Shield,             ///< [5] A shield.
-    Projectile,         ///< [6] Projectiles.
-    Container,          ///< [7] A container for items.
-    LiquidContainer,    ///< [8] A container for liquids.
-    Tool,               ///< [9] Any tool.
-    Node,               ///< [10] Any node of resources.
-    Resource,           ///< [11] A resource.
-    Seed,               ///< [12] Any kind of seed.
-    Key,                ///< [13] A key.
-    Furniture,          ///< [14] A forniture (eg. chair, bed, painting, table and so on).
-    Food,               ///< [15] A food.
-    Light,              ///< [16] A source of light ((eg. torch, lamp, candle and so on).
-    Vehicle,            ///< [17] Any kind of vehicle.
-    Book,               ///< [18] Container of parchements.
-    Rope,               ///< [19] A generic rope.
-    Mechanism,          ///< [20] Any kind of mechanism.
-    Currency,           ///< [21] Any kind of currency.
-    Shop,               ///< [22] A shop.
-    Magazine            ///< [23] A magazine for ammunitions.
-};
 
 /// Used to determine the flag of the model.
 using ModelFlag = enum class ModelFlag_t

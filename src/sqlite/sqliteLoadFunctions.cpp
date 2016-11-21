@@ -238,7 +238,7 @@ bool LoadModel(ResultSet * result)
     {
         // Retrieve the vnum and the type of model.
         auto vnum = result->getNextInteger();
-        auto type = static_cast<ModelType>(result->getNextInteger());
+        auto type = ModelType(result->getNextUnsignedInteger());
         // Create a pointer to the new item model.
         auto itemModel = ModelFactory::newModel(type);
         if (itemModel == nullptr)

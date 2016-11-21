@@ -110,12 +110,10 @@ SearchAxeRoom = function(self)
     local itemList = self.room:getItems();
     if (not itemList:empty())
     then
-        for i = 0, (itemList:size() - 1)
-        do
+        for i = 0, (itemList:size() - 1) do
             Mud.Log("Getting index :" .. i);
             local item = itemList:at(i);
-            if (item.model.vnum == 501)
-            then
+            if (item.model:getType() == ModelType.Tool) then
                 Mud.Log("[" .. self.name .. "] I've found an axe!");
                 self:doCommand("take " .. item.vnum);
                 self:doCommand("wield " .. item.vnum);
