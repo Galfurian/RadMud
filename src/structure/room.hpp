@@ -305,6 +305,9 @@ public:
     /// @return The vector of exits.
     VectorHelper<Exit *> luaGetExits();
 
+    /// @brief Returns the list of items inside the room.
+    VectorHelper<Item *> luaGetItems();
+
     /// @brief Function used to register inside the lua environment the class.
     /// @param L The lua environment.
     static void luaRegister(lua_State * L);

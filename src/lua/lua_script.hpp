@@ -105,6 +105,12 @@ public:
     {
         vector.pop_back();
     }
+
+    /// @brief Returns if the vector is empty.
+    bool empty()
+    {
+        return vector.empty();
+    }
 };
 
 /// @brief Allow from lua code, to log a string.

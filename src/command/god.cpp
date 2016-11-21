@@ -268,7 +268,7 @@ void LoadGodCommands()
     {
         Command command;
         command.gods = true;
-        command.name = "kmobile";
+        command.name = "mob_kill";
         command.help = "Kill the desired mobile, in the same room.";
         command.arguments = "(Mobile.name)";
         command.hndl = DoMobileKill;
@@ -277,7 +277,7 @@ void LoadGodCommands()
     {
         Command command;
         command.gods = true;
-        command.name = "rmobile";
+        command.name = "mob_reload";
         command.help = "Reload the lua script for the target mobile, in the same room.";
         command.arguments = "(Mobile.name)";
         command.hndl = DoMobileReload;
@@ -286,7 +286,16 @@ void LoadGodCommands()
     {
         Command command;
         command.gods = true;
-        command.name = "mobilelog";
+        command.name = "mob_trigger";
+        command.help = "Trigger the main behaviour of a mobile.";
+        command.arguments = "(Mobile.name)";
+        command.hndl = DoMobileTrigger;
+        Mud::instance().addCommand(command);
+    }
+    {
+        Command command;
+        command.gods = true;
+        command.name = "mob_log";
         command.help = "Given a mobile id, it returns the curresponding mobile log.";
         command.arguments = "(Mobile.id)";
         command.hndl = DoMobileLog;
@@ -1148,6 +1157,27 @@ void DoMobileReload(Character * character, ArgumentHandler & args)
     mobile->reloadLua();
     // Notify.
     character->sendMsg("Target(%s) Script(%s)\n", mobile->getName(), mobile->lua_script);
+}
+
+void DoMobileTrigger(Character * character, ArgumentHandler & args)
+{
+    if (args.size() != 1)
+    {
+        character->sendMsg("You must provide a target mobile.\n");
+    }
+    else
+    {
+        auto mobile = character->room->findMobile(args[0].getContent(), args[0].getIndex(), {});
+        if (mobile == nullptr)
+        {
+            character->sendMsg("Mobile not found.\n");
+        }
+        else
+        {
+            mobile->triggerEventMain();
+            character->sendMsg("%s::triggerEventMain()\n", mobile->getNameCapital());
+        }
+    }
 }
 
 void DoMobileLog(Character * character, ArgumentHandler & args)

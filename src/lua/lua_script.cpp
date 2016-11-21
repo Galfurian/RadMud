@@ -89,8 +89,9 @@ void LuaRegisterUtils(lua_State * L)
         .addFunction("back", &VectorHelper<std::string>::back)
         .addFunction("front", &VectorHelper<std::string>::front)
         .addFunction("at", &VectorHelper<std::string>::at)
-        .addFunction("push_back", &VectorHelper<Character *>::push_back)
-        .addFunction("pop_back", &VectorHelper<Character *>::pop_back)
+        .addFunction("push_back", &VectorHelper<std::string>::push_back)
+        .addFunction("pop_back", &VectorHelper<std::string>::pop_back)
+        .addFunction("empty", &VectorHelper<std::string>::empty)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
@@ -101,6 +102,7 @@ void LuaRegisterUtils(lua_State * L)
         .addFunction("at", &VectorHelper<Character *>::at)
         .addFunction("push_back", &VectorHelper<Character *>::push_back)
         .addFunction("pop_back", &VectorHelper<Character *>::pop_back)
+        .addFunction("empty", &VectorHelper<Character *>::empty)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
@@ -111,6 +113,7 @@ void LuaRegisterUtils(lua_State * L)
         .addFunction("at", &VectorHelper<Item *>::at)
         .addFunction("push_back", &VectorHelper<Item *>::push_back)
         .addFunction("pop_back", &VectorHelper<Item *>::pop_back)
+        .addFunction("empty", &VectorHelper<Item *>::empty)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
@@ -121,5 +124,6 @@ void LuaRegisterUtils(lua_State * L)
         .addFunction("at", &VectorHelper<Exit *>::at)
         .addFunction("push_back", &VectorHelper<Exit *>::push_back)
         .addFunction("pop_back", &VectorHelper<Exit *>::pop_back)
+        .addFunction("empty", &VectorHelper<Exit *>::empty)
         .endClass();
 }

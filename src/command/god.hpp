@@ -79,6 +79,9 @@ void DoMobileKill(Character * character, ArgumentHandler & args);
 /// Reload the lua script for the target mobile, in the same room.
 void DoMobileReload(Character * character, ArgumentHandler & args);
 
+/// Trigger the main behaviour of a mobile.
+void DoMobileTrigger(Character * character, ArgumentHandler & args);
+
 /// Show the mobile's log.
 void DoMobileLog(Character * character, ArgumentHandler & args);
 

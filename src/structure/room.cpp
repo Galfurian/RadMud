@@ -552,6 +552,16 @@ VectorHelper<Exit *> Room::luaGetExits()
     return ret;
 }
 
+VectorHelper<Item *> Room::luaGetItems()
+{
+    VectorHelper<Item *> ret;
+    for (auto it : this->items)
+    {
+        ret.push_back(it);
+    }
+    return ret;
+}
+
 void Room::luaRegister(lua_State * L)
 {
     luabridge::getGlobalNamespace(L)
@@ -561,6 +571,7 @@ void Room::luaRegister(lua_State * L)
         .addData("coord", &Room::coord, false)
         .addData("terrain", &Room::terrain, false)
         .addFunction("getExits", &Room::luaGetExits)
+        .addFunction("getItems", &Room::luaGetItems)
         .endClass();
 }
 
