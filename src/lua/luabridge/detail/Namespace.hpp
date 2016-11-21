@@ -1019,6 +1019,20 @@ public:
     }
 
     //----------------------------------------------------------------------------
+    /// @brief Add a value.
+    /// @param name  The name of the value.
+    /// @param value The value to add.
+    /// @return A reference to the current namespace.
+    template<class T>
+    Namespace & addValue(char const * name, T value)
+    {
+        assert(lua_istable(L, -1));
+        lua_pushnumber(L, value);
+        rawsetfield(L, -2, name);
+        return *this;
+    }
+
+    //----------------------------------------------------------------------------
     /**
      Add or replace a variable.
      */
