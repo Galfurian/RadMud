@@ -21,7 +21,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "modelType.hpp"
-#include "LuaBridge.hpp"
+#include "luaBridge.hpp"
 
 ModelType::ModelType() :
     modelType(None)
@@ -205,5 +205,6 @@ void ModelType::luaRegister(lua_State * L)
         .addEnum("Currency", ModelType::Currency)
         .addEnum("Shop", ModelType::Shop)
         .addEnum("Magazine", ModelType::Magazine)
-        .addEnum("None", ModelType::None);
+        .addEnum("None", ModelType::None)
+        .endNamespace();
 }

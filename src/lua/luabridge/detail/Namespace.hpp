@@ -650,6 +650,35 @@ private:
             return *this;
         }
 
+        //----------------------------------------------------------------------------
+        /// @brief Add a value.
+        /// @param name  The name of the value.
+        /// @param value The value to add.
+        /// @return A reference to the current namespace.
+        template<class U>
+        Class<T> & addIntegral(char const * name, U value)
+        {
+            static_assert(std::is_integral<U>::value, "Integer required.");
+            assert(lua_istable(L, -1));
+            lua_pushnumber(L, value);
+            rawsetfield(L, -2, name);
+            return *this;
+        }
+
+        /// @brief Add an enum value.
+        /// @param name  The name of the value.
+        /// @param value The value to add.
+        /// @return A reference to the current namespace.
+        template<class U>
+        Class<T> & addEnum(char const * name, U value)
+        {
+            static_assert(std::is_enum<U>::value, "Enum required.");
+            lua_pushnumber(L, static_cast<unsigned int>(value));
+            rawsetfield(L, -2, name);
+            lua_pop(L, 2);
+            return *this;
+        }
+
         //--------------------------------------------------------------------------
         /**
          Add or replace a data member.

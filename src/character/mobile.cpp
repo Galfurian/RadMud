@@ -263,12 +263,9 @@ void Mobile::sendMsg(const std::string & msg)
 
 bool Mobile::mobileThread(std::string event, Character * character, std::string message)
 {
-    (void) character;
-    (void) message;
-
     // Lock to the mutex.
     lua_mutex.lock();
-
+    //Logger::log(LogLevel::Trace, "Starting thread '" + event + "'");
     try
     {
         luabridge::LuaRef f = luabridge::getGlobal(L, event.c_str());
@@ -299,9 +296,9 @@ bool Mobile::mobileThread(std::string event, Character * character, std::string 
     {
         Logger::log(LogLevel::Error, e.what());
     }
-
     // Unlock the mutex.
     lua_mutex.unlock();
+    //Logger::log(LogLevel::Trace, "Ending thread '" + event + "'");
     return true;
 }
 

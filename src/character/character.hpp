@@ -565,7 +565,13 @@ public:
     /// @brief Returns the list of available targets using the vector
     ///         structure made for lua environment.
     /// @return The vector of targets.
-    VectorHelper<Character *> luaGetTargets();
+    VectorHelper<Character *> luaGetCharactersInSight();
+
+    /// @brief Returns the list of items in sight.
+    VectorHelper<Item *> luaGetItemsInSight();
+
+    /// @brief Returns the list of items in sight.
+    VectorHelper<Direction> luaGetPathTo(Room * destination);
 
     /// @brief Specific function used by lua to add an equipment item.
     void luaAddEquipment(Item * item);

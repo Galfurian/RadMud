@@ -24,6 +24,7 @@
 
 #include <string>
 #include <vector>
+#include <cassert>
 
 extern "C"
 {
@@ -86,11 +87,8 @@ public:
     /// @return  Read-only (constant) reference to data.
     T at(const unsigned int index)
     {
-        if ((index >= 0) && (index < vector.size()))
-        {
-            return vector.at(index);
-        }
-        return NULL;
+        assert((index >= 0) && (index < vector.size()));
+        return vector.at(index);
     }
 
     /// @brief  Add data to the end of the vector.

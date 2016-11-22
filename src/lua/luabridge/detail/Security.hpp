@@ -52,3 +52,9 @@ private:
         return settings;
     }
 };
+
+/// @brief Change whether or not metatables are hidden (on by default).
+inline void setHideMetatables(bool shouldHide)
+{
+    Security::setHideMetatables(shouldHide);
+}

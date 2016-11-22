@@ -25,7 +25,18 @@ end
 
 -- Handle a random action.
 EventRandom = function(self)
-    -- Put event code here.
+    Mud.Log("[" .. self.name .. "] Searching for someone to follow.");
+    local charactersInSight = self:getCharactersInSight();
+    if (not charactersInSight:empty())
+    then
+        for i = 0, (charactersInSight:size() - 1) do
+            local character = charactersInSight:at(i);
+            if (self.room.vnum ~= character.room.vnum) then
+                GoToCharacter(self, character, self:luaGetPathTo(character.room));
+                break;
+            end
+        end
+    end
 end
 
 -- Handle the actions when is Morning.
@@ -56,4 +67,14 @@ end
 -- Handle the main behaviour of the character.
 EventMain = function(self)
     -- Put event code here.
+end
+
+GoToCharacter = function(self, character, path)
+    Mud.Log("[" .. self.name .. "] Moving to :" .. character.name);
+    if (not path:empty()) then
+        for j = 0, (path:size() - 1) do
+            self:doCommand(path:at(j):toString());
+            Mud.Sleep(2);
+        end
+    end
 end

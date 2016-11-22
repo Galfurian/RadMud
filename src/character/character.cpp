@@ -22,6 +22,7 @@
 
 #include "character.hpp"
 
+#include "aStar.hpp"
 #include "rangedWeaponItem.hpp"
 #include "meleeWeaponItem.hpp"
 #include "armorItem.hpp"
@@ -1435,6 +1436,7 @@ void Character::loadScript(const std::string & scriptFilename)
     Exit::luaRegister(L);
     Room::luaRegister(L);
     ModelType::luaRegister(L);
+    Direction::luaRegister(L);
 
     if (luaL_dofile(L, scriptFilename.c_str()) != LUABRIDGE_LUA_OK)
     {
@@ -1443,13 +1445,78 @@ void Character::loadScript(const std::string & scriptFilename)
     }
 }
 
-VectorHelper<Character *> Character::luaGetTargets()
+VectorHelper<Character *> Character::luaGetCharactersInSight()
 {
+    VectorHelper<Character *> vectorHelper;
     if (room != nullptr)
     {
-        return VectorHelper<Character *>(room->characters);
+        CharacterContainer exceptions;
+        exceptions.emplace_back_character(this);
+        for (auto it : room->area->getCharactersInSight(exceptions, room->coord, this->getViewDistance()))
+        {
+            vectorHelper.push_back(it);
+        }
     }
-    return VectorHelper<Character *>();
+    return vectorHelper;
+}
+
+VectorHelper<Item *> Character::luaGetItemsInSight()
+{
+    VectorHelper<Item *> vectorHelper;
+    if (room != nullptr)
+    {
+        ItemContainer exceptions;
+        for (auto it : room->area->getItemsInSight(exceptions, room->coord, this->getViewDistance()))
+        {
+            vectorHelper.push_back(it);
+        }
+    }
+    return vectorHelper;
+}
+
+VectorHelper<Direction> Character::luaGetPathTo(Room * destination)
+{
+    auto checkFunction = [&](Room * from, Room * to)
+    {
+        // Get the direction.
+        auto direction = Area::getDirection(from->coord, to->coord);
+        // Get the exit;
+        auto destExit = from->findExit(direction);
+        // If the direction is upstairs, check if there is a stair.
+        if (direction == Direction::Up)
+        {
+            if (!HasFlag(destExit->flags, ExitFlag::Stairs)) return false;
+        }
+        // Check if the destination is correct.
+        if (destExit->destination == nullptr) return false;
+        // Check if the destination is bocked by a door.
+        auto door = destExit->destination->findDoor();
+        if (door != nullptr)
+        {
+            if (HasFlag(door->flags, ItemFlag::Closed)) return false;
+        }
+        // Check if the destination has a floor.
+        auto destDown = destExit->destination->findExit(Direction::Down);
+        if (destDown != nullptr)
+        {
+            if (!HasFlag(destDown->flags, ExitFlag::Stairs)) return false;
+        }
+        // Check if the destination is forbidden for mobiles.
+        return !(this->isMobile() && HasFlag(destExit->flags, ExitFlag::NoMob));
+    };
+    AStar<Room *> aStar;
+    std::vector<Room *> path;
+    VectorHelper<Direction> vectorHelper;
+    if (aStar.findPath(this->room, destination, path, checkFunction))
+    {
+        Coordinates previous = this->room->coord;
+        for (auto node : path)
+        {
+            vectorHelper.push_back(Area::getDirection(previous, node->coord));
+            previous = node->coord;
+        }
+    }
+    return vectorHelper;
 }
 
 void Character::luaAddEquipment(Item * item)
@@ -1495,7 +1562,9 @@ void Character::luaRegister(lua_State * L)
         .addFunction("equipmentAdd", &Character::luaAddEquipment)
         .addFunction("equipmentRem", &Character::luaRemEquipment)
         .addFunction("doCommand", &Character::doCommand)
-        .addFunction("getTargets", &Character::luaGetTargets)
+        .addFunction("getCharactersInSight", &Character::luaGetCharactersInSight)
+        .addFunction("getItemsInSight", &Character::luaGetItemsInSight)
+        .addFunction("luaGetPathTo", &Character::luaGetPathTo)
         .addFunction("isMobile", &Character::isMobile)
         .endClass()
         .deriveClass<Mobile, Character>("Mobile")

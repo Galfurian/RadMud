@@ -1,4 +1,3 @@
-///----------------------------------------------------------------------------
 /// @file   LuaBridge.h
 /// @copyright
 /// Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
@@ -23,12 +22,9 @@
 /// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 /// SOFTWARE.
-///----------------------------------------------------------------------------
 
 #pragma once
 
-// All #include dependencies are listed here
-// instead of in the individual header files.
 #include <cassert>
 #include <sstream>
 #include <stdexcept>
@@ -48,40 +44,11 @@ namespace luabridge
 #include "FuncTraits.hpp"
 #include "Constructor.hpp"
 #include "classInfo.hpp"
-
-class LuaRef;
-
 #include "LuaException.hpp"
 #include "LuaRef.hpp"
 #include "Iterator.hpp"
-
 #include "Security.hpp"
-
 #include "Userdata.hpp"
 #include "CFunctions.hpp"
 #include "Namespace.hpp"
-
-
-/// @brief Push an object onto the Lua stack.
-template<class T>
-inline void push(lua_State * L, T t)
-{
-    Stack<T>::push(L, t);
-}
-
-/// @brief Set a global value in the lua_State.
-/// @note This works on any type specialized by `Stack`,
-///        including `LuaRef` and its table proxies.
-template<class T>
-inline void setGlobal(lua_State * L, T t, char const * name)
-{
-    push(L, t);
-    lua_setglobal(L, name);
-}
-
-/// @brief Change whether or not metatables are hidden (on by default).
-inline void setHideMetatables(bool shouldHide)
-{
-    Security::setHideMetatables(shouldHide);
-}
 }

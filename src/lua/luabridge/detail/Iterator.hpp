@@ -28,8 +28,7 @@
 
 #include "LuaRef.hpp"
 
-/** Allows table iteration.
- */
+/// @brief Allows table iteration.
 class Iterator
 {
 private:

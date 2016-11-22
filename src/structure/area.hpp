@@ -122,6 +122,12 @@ public:
     /// @return The list of characters at the given coordinates.
     CharacterContainer getCharactersAt(const CharacterContainer & exceptions, const Coordinates & coordinates);
 
+    /// @brief Provides all the items inside the room at the given coordinates.
+    /// @param exceptions  The exceptions.
+    /// @param coordinates The desired coordinates.
+    /// @return The list of items at the given coordinates.
+    ItemContainer getItemsAt(const ItemContainer & exceptions, const Coordinates & coordinates);
+
     /// @brief Add the passed room to its coordinates inside the area.
     /// @param room The room that has to be added.
     /// @return <b>True</b> if the room has been added,<br>
@@ -164,6 +170,13 @@ public:
     CharacterContainer getCharactersInSight(CharacterContainer & exceptions,
                                             Coordinates & origin,
                                             const unsigned int & radius);
+
+    /// @brief Provides a list of items which are in sight.
+    /// @param exceptions A list of excections.
+    /// @param origin The coordinate of the central room.
+    /// @param radius     The radius of visibility.
+    /// @return The list containing the items.
+    ItemContainer getItemsInSight(ItemContainer & exceptions, Coordinates & origin, const unsigned int & radius);
 
     /// @brief A Field of View algorithm which provides all the rooms which are inside the
     ///         radius of the field of view.

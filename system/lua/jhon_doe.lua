@@ -31,7 +31,20 @@ end
 
 -- Handle a random action.
 EventRandom = function(self)
-    -- Put event code here.
+--    Mud.Log("[" .. self.name .. "] Looking around for usefull stuff.");
+--    local itemsInSight = self:getItemsInSight();
+--    if (not itemsInSight:empty()) then
+--        for i = 0, (itemsInSight:size() - 1) do
+--            local item = itemsInSight:at(i);
+--            Mud.Log("[" .. self.name .. "] I can see :" .. item:getName());
+--            local path = self:luaGetPathTo(item.room);
+--            if (not path:empty()) then
+--                for j = 0, (path:size() - 1) do
+--                    Mud.Log("[" .. self.name .. "] " .. path:at(j):toString());
+--                end
+--            end
+--        end
+--    end
 end
 
 -- Handle the actions when is Morning.
@@ -63,12 +76,12 @@ end
 EventMain = function(self)
     if (posessAxe == false) then
         Mud.Log("[" .. self.name .. "] I need to find an axe.");
-        SearchAxe(self);
+        --SearchAxe(self);
     else
         Mud.Log("[" .. self.name .. "] I have an axe.");
         if (foundTree == false) then
             Mud.Log("[" .. self.name .. "] I need to find a suitable tree.");
-            SearchTree(self);
+            --SearchTree(self);
         else
             Mud.Log("[" .. self.name .. "] I have found a tree.");
         end

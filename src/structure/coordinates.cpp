@@ -120,6 +120,7 @@ void Coordinates::luaRegister(lua_State * L)
 {
     luabridge::getGlobalNamespace(L)
         .beginClass<Coordinates>("Coordinates")
+        .addFunction("toString", &Coordinates::toString)
         .addData("x", &Coordinates::x, false)
         .addData("y", &Coordinates::y, false)
         .addData("z", &Coordinates::z, false)

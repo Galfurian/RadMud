@@ -126,4 +126,15 @@ void LuaRegisterUtils(lua_State * L)
         .addFunction("pop_back", &VectorHelper<Exit *>::pop_back)
         .addFunction("empty", &VectorHelper<Exit *>::empty)
         .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<VectorHelper<Direction> >("DirectionVector")
+        .addFunction("size", &VectorHelper<Direction>::size)
+        .addFunction("back", &VectorHelper<Direction>::back)
+        .addFunction("front", &VectorHelper<Direction>::front)
+        .addFunction("at", &VectorHelper<Direction>::at)
+        .addFunction("push_back", &VectorHelper<Direction>::push_back)
+        .addFunction("pop_back", &VectorHelper<Direction>::pop_back)
+        .addFunction("empty", &VectorHelper<Direction>::empty)
+        .endClass();
 }

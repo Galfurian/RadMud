@@ -101,7 +101,13 @@ inline int get_length(lua_State * L, int idx)
 
 #endif
 
-lua_State * get_main_thread(lua_State * thread);
+inline lua_State * get_main_thread(lua_State * thread)
+{
+    lua_rawgeti(thread, LUA_REGISTRYINDEX, LUA_RIDX_MAINTHREAD);
+    lua_State * L = lua_tothread(thread, -1);
+    lua_pop(thread, 1);
+    return L;
+}
 
 #ifndef LUA_OK
 #define LUABRIDGE_LUA_OK 0
@@ -110,16 +116,35 @@ lua_State * get_main_thread(lua_State * thread);
 #endif
 
 /// @brief Get a table value, bypassing metamethods.
-void rawgetfield(lua_State * L, int index, char const * key);
+inline void rawgetfield(lua_State * L, int index, char const * key)
+{
+    assert(lua_istable(L, index));
+    index = lua_absindex(L, index);
+    lua_pushstring(L, key);
+    lua_rawget(L, index);
+}
 
 /// @brief Set a table value, bypassing metamethods.
-void rawsetfield(lua_State * L, int index, char const * key);
+inline void rawsetfield(lua_State * L, int index, char const * key)
+{
+    assert(lua_istable(L, index));
+    index = lua_absindex(L, index);
+    lua_pushstring(L, key);
+    lua_insert(L, -2);
+    lua_rawset(L, index);
+}
 
 /// @brief Returns true if the value is a full userdata (not light).
-bool isfulluserdata(lua_State * L, int index);
+inline bool isfulluserdata(lua_State * L, int index)
+{
+    return lua_isuserdata(L, index) && !lua_islightuserdata(L, index);
+}
 
 /// @brief Test lua_State objects for global equality.
 /// @details This can determine if two different lua_State objects really point
 ///           to the same global state, such as when using coroutines.
 /// @note This is used for assertions.
-bool equalstates(lua_State * L1, lua_State * L2);
+inline bool equalstates(lua_State * L1, lua_State * L2)
+{
+    return lua_topointer(L1, LUA_REGISTRYINDEX) == lua_topointer(L2, LUA_REGISTRYINDEX);
+}
