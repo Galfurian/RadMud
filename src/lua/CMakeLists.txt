@@ -1,9 +1,9 @@
 #############################################
 # Include Directories
 set(PROJECT_INC ${PROJECT_INC}
-        ./src/lua
-        ./src/lua/luabridge
         ./src/lua/luabridge/detail
+        ./src/lua/luabridge
+        ./src/lua
         PARENT_SCOPE
         )
 
