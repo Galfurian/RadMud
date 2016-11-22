@@ -1,4 +1,3 @@
-///----------------------------------------------------------------------------
 /// @file   classInfo.hpp
 /// @copyright
 /// Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
@@ -22,17 +21,14 @@
 /// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 /// SOFTWARE.
-///----------------------------------------------------------------------------
 
 #pragma once
 
-/**
- * Unique Lua registry keys for a class.
-
- Each registered class inserts three keys into the registry, whose
- values are the corresponding static, class, and const metatables. This
- allows a quick and reliable lookup for a metatable from a template type.
- */
+/// @brief Unique Lua registry keys for a class.
+/// @details
+/// Each registered class inserts three keys into the registry, whose
+///  values are the corresponding static, class, and const metatables. This
+///  allows a quick and reliable lookup for a metatable from a template type.
 template<class T>
 class ClassInfo
 {
