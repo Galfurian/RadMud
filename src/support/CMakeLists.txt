@@ -9,6 +9,7 @@ set(PROJECT_INC ${PROJECT_INC}
 # Source Files
 set(PROJECT_SRC ${PROJECT_SRC}
         ${CMAKE_SOURCE_DIR}/src/support/ability.cpp
+        ${CMAKE_SOURCE_DIR}/src/support/toolType.cpp
         ${CMAKE_SOURCE_DIR}/src/support/direction.cpp
         ${CMAKE_SOURCE_DIR}/src/support/modelType.cpp
         ${CMAKE_SOURCE_DIR}/src/support/telnetChar.cpp

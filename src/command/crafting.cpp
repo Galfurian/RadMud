@@ -96,7 +96,7 @@ void DoProfession(Character * character, Profession * profession, ArgumentHandle
         return;
     }
     // Search the needed workbench.
-    if (production->workbench != ToolType::NoType)
+    if (production->workbench != ToolType::None)
     {
         auto workbench = character->findNearbyTool(production->workbench, std::vector<Item *>(), true, false, false);
         if (workbench == nullptr)

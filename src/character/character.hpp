@@ -563,9 +563,16 @@ public:
     /// @param scriptFilename The name of the script that has to be loaded.
     void loadScript(const std::string & scriptFilename);
 
-    /// @brief Returns the list of available targets using the vector
-    ///         structure made for lua environment.
-    /// @return The vector of targets.
+    /// @brief Returns the list of equipped items.
+    luabridge::LuaRef luaGetEquipmentItems();
+
+    /// @brief Returns the list of items inside the inventory.
+    luabridge::LuaRef luaGetInventoryItems();
+
+    /// @brief Returns the list of rooms in sight.
+    luabridge::LuaRef luaGetRoomsInSight();
+
+    /// @brief Returns the list of characters in sight.
     luabridge::LuaRef luaGetCharactersInSight();
 
     /// @brief Returns the list of items in sight.

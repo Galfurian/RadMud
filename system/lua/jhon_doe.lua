@@ -1,184 +1,187 @@
 --package.path = package.path .. ";../system/lua/luann.lua"
 --local luann = require("luann")
 
-local posessAxe = false;
-local foundTree = false;
+--- List of already checked rooms.
+local alreadyCheckedRooms = {};
 
--- Handle the actions when the character is created.
+--- Check if the given table contains the value.
+-- @param tab The table.
+-- @param val The value that has to be found.
+-- @return If the table contains the value.
+function has_value(tab, val)
+    for index, value in ipairs(tab) do
+        if value == val then
+            return true
+        end
+    end
+    return false
+end
+
+--- Handle the actions when the character is created.
+-- @param self The character linked to the event.
 EventInit = function(self)
     -- Put event code here.
 end
 
--- Handle the actions when in combat.
+--- Handle the actions when in combat.
+-- @param self The character linked to the event.
+-- @param character The other character.
 EventFight = function(self, character)
     -- Put event code here.
 end
 
--- Handle the actions when a character enters the room.
+--- Handle the actions when a character enters the room.
+-- @param self The character linked to the event.
+-- @param character The other character.
 EventEnter = function(self, character)
     -- Put event code here.
 end
 
--- Handle the actions when a character exits the room.
+--- Handle the actions when a character exits the room.
+-- @param self The character linked to the event.
+-- @param character The other character.
 EventExit = function(self, character)
     -- Put event code here.
 end
 
--- Handle conversation.
+--- Handle conversation.
+-- @param self The character linked to the event.
+-- @param character The other character.
+-- @param message The message which 'character' said to 'self'.
 EventMessage = function(self, character, message)
     -- Put event code here.
 end
 
--- Handle a random action.
+--- Handle a random action.
+-- @param self The character linked to the event.
 EventRandom = function(self)
-    local roomExits = self.room:getExits();
-    for key, value in pairs(roomExits) do
-        print(key, value:getDirection())
-    end
-    --    Mud.Log("[" .. self.name .. "] Looking around for usefull stuff.");
-    --    for i = 0, 10000 do
-    --        local itemsInSight = self:getItemsInSight();
-    --        for key, value in pairs(itemsInSight) do print(key, value) end
-    --    end
-    --    for item in itemsInSight do
-    --        Mud.Log("[" .. self.name .. "] I can see :" .. item:getName());
-    --    end
-    --    if (not itemsInSight:empty()) then
-    --        for i = 0, (itemsInSight:size() - 1) do
-    --            local item = itemsInSight:at(i);
-    --            Mud.Log("[" .. self.name .. "] I can see :" .. item:getName());
-    --            local path = self:luaGetPathTo(item.room);
-    --            if (not path:empty()) then
-    --                for j = 0, (path:size() - 1) do
-    --                    Mud.Log("[" .. self.name .. "] " .. path:at(j):toString());
-    --                end
-    --            end
-    --        end
-    --    end
+    EventMain(self);
 end
 
--- Handle the actions when is Morning.
+--- Handle the actions when is Morning.
+-- @param self The character linked to the event.
 EventMorning = function(self)
     -- Put event code here.
 end
 
--- Handle the actions when is the middle of the day.
+--- Handle the actions when is the middle of the day.
+-- @param self The character linked to the event.
 EventDay = function(self)
     -- Put event code here.
 end
 
--- Handle the actions when is Evening.
+--- Handle the actions when is Evening.
+-- @param self The character linked to the event.
 EventDusk = function(self)
     -- Put event code here.
 end
 
--- Handle the actions when is Night.
+--- Handle the actions when is Night.
+-- @param self The character linked to the event.
 EventNight = function(self)
     -- Put event code here.
 end
 
--- Handle the actions when the mobile dies.
+--- Handle the actions when the mobile dies.
+-- @param self The character linked to the event.
 EventDeath = function(self)
     -- Put event code here.
 end
 
--- Handle the main behaviour of the character.
+--- Handle the main behaviour of the character.
+-- @param self The character linked to the event.
 EventMain = function(self)
-    if (posessAxe == false) then
+    if (not EquipPosessedAxe(self)) then
         Mud.Log("[" .. self.name .. "] I need to find an axe.");
-        --        SearchAxe(self);
-    else
-        Mud.Log("[" .. self.name .. "] I have an axe.");
-        if (foundTree == false) then
-            Mud.Log("[" .. self.name .. "] I need to find a suitable tree.");
-            --SearchTree(self);
-        else
-            Mud.Log("[" .. self.name .. "] I have found a tree.");
-        end
+        SearchAxe(self);
     end
-    if ((posessAxe) and (foundTree)) then
-        Mud.Log("[" .. self.name .. "] Now I can cut down the tree.");
-    end
+    Mud.Log("[" .. self.name .. "] Now I have an axe.");
+    --    if (foundTree == false) then
+    --        Mud.Log("[" .. self.name .. "] I need to find a suitable tree.");
+    --        --SearchTree(self);
+    --    else
+    --        Mud.Log("[" .. self.name .. "] I have found a tree.");
+    --    end
+    --    if ((posessAxe) and (foundTree)) then
+    --        Mud.Log("[" .. self.name .. "] Now I can cut down the tree.");
+    --    end
 end
 
+--- Try to equip a posessed axe.
+-- @param self The character.
+-- @return If the character has equipped an axe.
+EquipPosessedAxe = function(self)
+    for itemKey, item in pairs(self:getEquipmentItems()) do
+        if (CheckIfItemIsAnAxe(item)) then
+            return true;
+        end
+    end
+    for itemKey, item in pairs(self:getInventoryItems()) do
+        if (CheckIfItemIsAnAxe(item)) then
+            self:doCommand("wield " .. item.vnum);
+            return true;
+        end
+    end
+    return false;
+end
+
+--- Search an axe everywhere inside the area.
+-- @param self The character who is searching for the axe.
 SearchAxe = function(self)
-    while (posessAxe == false) do
-        -- Serach the Axe inside the room.
-        SearchAxeRoom(self);
-        -- If we have found the axe, stop the loop.
-        if (posessAxe == true) then
-            Mud.Log("[" .. self.name .. "] Ok, I've found an axe.");
-            break;
-        else
-            Mud.Log("[" .. self.name .. "] I've not found an axe, I need to move.");
-            -- Get the possible directions.
-            local exits = self.room:getExits();
-            -- If there are no exits, just stop the loop.
-            if (exits:size() == 0) then
-                break;
+    -- Cycle until we find an axe inside the current room.
+    while (not SearchAxeRoom(self)) do
+        Mud.Log("[" .. self.name .. "] Searching for an axe...");
+        for roomKey, room in pairs(self:getRoomsInSight()) do
+            for itemKey, item in pairs(room:getItems()) do
+                -- Check if the room contains an axe.
+                if (CheckIfItemIsAnAxe(item)) then
+                    GetToDestination(self, self:luaGetPathTo(item.room));
+                end
             end
-            -- Choose at random among the possible exits.
-            local choosenExit = exits:at(Mud.Random(0, exits:size() - 1));
-            -- Go to the next direction.
-            Mud.Log("[" .. self.name .. "] Moving...");
-            self:doCommand(choosenExit:getDirection());
-            Mud.Sleep(4);
-            Mud.Log("[" .. self.name .. "] Done...");
         end
+        Mud.Sleep(1);
     end
 end
 
+--- Search for an axe inside the given room.
+-- @param self The character searching for the axe.
 SearchAxeRoom = function(self)
     -- Get the list of items inside the current room.
-    local itemList = self.room:getItems();
-    if (not itemList:empty())
-    then
-        for i = 0, (itemList:size() - 1) do
-            local item = itemList:at(i);
-            if (item.model:getType() == ModelType.Tool) then
-                Mud.Log("[" .. self.name .. "] I've found an axe!");
-                self:doCommand("take " .. item.vnum);
-                self:doCommand("wield " .. item.vnum);
-                posessAxe = true;
-            end
+    for itemKey, item in pairs(self.room:getItems()) do
+        if (CheckIfItemIsAnAxe(item)) then
+            Mud.Log("[" .. self.name .. "] I've found an axe!");
+            --            self:doCommand("take " .. item.vnum);
+            --            self:doCommand("wield " .. item.vnum);
+            return true;
         end
+    end
+    return false;
+end
+
+--- Move the character through the given path.
+-- @param self The character to move.
+-- @param path The path to follow.
+GetToDestination = function(self, path)
+    for directionKey, direction in pairs(path) do
+        self:doCommand(direction:toString());
+        Mud.Sleep(2);
     end
 end
 
-SearchTree = function(self)
-    -- Get the current room.
-    local currentRoom = self.room.vnum;
-    -- Serach the Tree inside the room.
-    SearchTreeRoom(self);
-    if (foundTree == true)
-    then
-        Mud.Log("[" .. self.name .. "] Ok, I've found a tree.");
-    else
-        Mud.Log("[" .. self.name .. "] I've not found a tree, I need to move.");
-        -- Get the possible directions.
-        local exits = self.room:getExits();
-        if (exits:size() > 0)
-        then
-            local choosenExit = exits:at(Mud.Random(0, exits:size() - 1));
-            -- Go to the next direction.
-            self:doCommand(choosenExit:getDirection());
+--- Check if the given item is an axe.
+-- @param item The item to check.
+-- @return If the item is an axe.
+CheckIfItemIsAnAxe = function(item)
+    -- Check the item is a tool.
+    if (item:getTypeName() == "Tool") then
+        local modelToTool = item.model:toTool();
+        -- Transformed to tool.
+        local modelToolType = modelToTool.toolType;
+        -- Retrieved tool type.
+        if (modelToolType:toString() == "WoodcutterAxe") then
+            -- Found woodcutter axe.
+            return true;
         end
     end
-end
-
-SearchTreeRoom = function(self)
-    -- Get the list of items inside the current room.
-    local itemList = self.room:getItems();
-    if (itemList:size() > 0)
-    then
-        for i = 0, (itemList:size() - 1)
-        do
-            local item = itemList:at(i);
-            if (item.model.vnum == 3100)
-            then
-                Mud.Log("[" .. self.name .. "] I've found a tree!");
-                foundTree = true;
-            end
-        end
-    end
+    return false;
 end

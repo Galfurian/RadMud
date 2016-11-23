@@ -181,6 +181,18 @@ bool ModelType::operator<(const ModelType & rhs) const
 void ModelType::luaRegister(lua_State * L)
 {
     luabridge::getGlobalNamespace(L)
+        .beginClass<ModelType>("ModelType")
+        .addConstructor < void(*)(const std::string &)>()
+        .addFunction("toString", &ModelType::toString)
+//        .addEnum("North", Direction::North)
+//        .addEnum("South", Direction::South)
+//        .addEnum("West", Direction::West)
+//        .addEnum("East", Direction::East)
+//        .addEnum("Up", Direction::Up)
+//        .addEnum("Down", Direction::Down)
+        .endClass();
+    /*
+    luabridge::getGlobalNamespace(L)
         .beginNamespace("ModelType")
         .addEnum("Corpse", ModelType::Corpse)
         .addEnum("MeleeWeapon", ModelType::MeleeWeapon)
@@ -207,4 +219,5 @@ void ModelType::luaRegister(lua_State * L)
         .addEnum("Magazine", ModelType::Magazine)
         .addEnum("None", ModelType::None)
         .endNamespace();
+        */
 }

@@ -1435,14 +1435,51 @@ void Character::loadScript(const std::string & scriptFilename)
     Coordinates::luaRegister(L);
     Exit::luaRegister(L);
     Room::luaRegister(L);
-    ModelType::luaRegister(L);
+
     Direction::luaRegister(L);
+    ModelType::luaRegister(L);
+    ToolType::luaRegister(L);
 
     if (luaL_dofile(L, scriptFilename.c_str()) != LUABRIDGE_LUA_OK)
     {
         Logger::log(LogLevel::Error, "Can't open script+" + scriptFilename + ".");
         Logger::log(LogLevel::Error, "Error :" + std::string(lua_tostring(L, -1)));
     }
+}
+
+luabridge::LuaRef Character::luaGetEquipmentItems()
+{
+    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
+    for (auto item : this->equipment)
+    {
+        luaRef.append(item);
+    }
+    return luaRef;
+}
+
+luabridge::LuaRef Character::luaGetInventoryItems()
+{
+    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
+    for (auto item : this->inventory)
+    {
+        luaRef.append(item);
+    }
+    return luaRef;
+}
+
+luabridge::LuaRef Character::luaGetRoomsInSight()
+{
+    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
+    if (room != nullptr)
+    {
+        CharacterContainer characterContainer;
+        auto validCoordinates = room->area->fov(room->coord, this->getViewDistance());
+        for (auto coordinates : validCoordinates)
+        {
+            luaRef.append(room->area->getRoom(coordinates));
+        }
+    }
+    return luaRef;
 }
 
 luabridge::LuaRef Character::luaGetCharactersInSight()
@@ -1585,6 +1622,9 @@ void Character::luaRegister(lua_State * L)
         .addFunction("equipmentAdd", &Character::luaAddEquipment)
         .addFunction("equipmentRem", &Character::luaRemEquipment)
         .addFunction("doCommand", &Character::doCommand)
+        .addFunction("getEquipmentItems", &Character::luaGetEquipmentItems)
+        .addFunction("getInventoryItems", &Character::luaGetInventoryItems)
+        .addFunction("getRoomsInSight", &Character::luaGetRoomsInSight)
         .addFunction("getCharactersInSight", &Character::luaGetCharactersInSight)
         .addFunction("getItemsInSight", &Character::luaGetItemsInSight)
         .addFunction("luaGetPathTo", &Character::luaGetPathTo)
