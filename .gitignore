@@ -4,3 +4,4 @@
 build
 build-clang
 Default
+cmake-build-debug/
