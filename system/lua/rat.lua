@@ -25,18 +25,18 @@ end
 
 -- Handle a random action.
 EventRandom = function(self)
-    Mud.Log("[" .. self.name .. "] Searching for someone to follow.");
-    local charactersInSight = self:getCharactersInSight();
-    if (not charactersInSight:empty())
-    then
-        for i = 0, (charactersInSight:size() - 1) do
-            local character = charactersInSight:at(i);
-            if (self.room.vnum ~= character.room.vnum) then
-                GoToCharacter(self, character, self:luaGetPathTo(character.room));
-                break;
-            end
-        end
-    end
+--    Mud.Log("[" .. self.name .. "] Searching for someone to follow.");
+--    local charactersInSight = self:getCharactersInSight();
+--    if (not charactersInSight:empty())
+--    then
+--        for i = 0, (charactersInSight:size() - 1) do
+--            local character = charactersInSight:at(i);
+--            if (self.room.vnum ~= character.room.vnum) then
+--                GoToCharacter(self, character, self:luaGetPathTo(character.room));
+--                break;
+--            end
+--        end
+--    end
 end
 
 -- Handle the actions when is Morning.

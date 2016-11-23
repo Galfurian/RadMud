@@ -1445,36 +1445,36 @@ void Character::loadScript(const std::string & scriptFilename)
     }
 }
 
-VectorHelper<Character *> Character::luaGetCharactersInSight()
+luabridge::LuaRef Character::luaGetCharactersInSight()
 {
-    VectorHelper<Character *> vectorHelper;
+    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
     if (room != nullptr)
     {
         CharacterContainer exceptions;
         exceptions.emplace_back_character(this);
         for (auto it : room->area->getCharactersInSight(exceptions, room->coord, this->getViewDistance()))
         {
-            vectorHelper.push_back(it);
+            luaRef.append(it);
         }
     }
-    return vectorHelper;
+    return luaRef;
 }
 
-VectorHelper<Item *> Character::luaGetItemsInSight()
+luabridge::LuaRef Character::luaGetItemsInSight()
 {
-    VectorHelper<Item *> vectorHelper;
+    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
     if (room != nullptr)
     {
         ItemContainer exceptions;
         for (auto it : room->area->getItemsInSight(exceptions, room->coord, this->getViewDistance()))
         {
-            vectorHelper.push_back(it);
+            luaRef.append(it);
         }
     }
-    return vectorHelper;
+    return luaRef;
 }
 
-VectorHelper<Direction> Character::luaGetPathTo(Room * destination)
+luabridge::LuaRef Character::luaGetPathTo(Room * destination)
 {
     auto checkFunction = [&](Room * from, Room * to)
     {
@@ -1506,17 +1506,40 @@ VectorHelper<Direction> Character::luaGetPathTo(Room * destination)
     };
     AStar<Room *> aStar;
     std::vector<Room *> path;
-    VectorHelper<Direction> vectorHelper;
+
+    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
     if (aStar.findPath(this->room, destination, path, checkFunction))
     {
         Coordinates previous = this->room->coord;
         for (auto node : path)
         {
-            vectorHelper.push_back(Area::getDirection(previous, node->coord));
+            luaRef.append(Area::getDirection(previous, node->coord));
             previous = node->coord;
         }
     }
-    return vectorHelper;
+    return luaRef;
+}
+
+Item * Character::luaLoadItem(int vnumModel, int vnumMaterial, unsigned int qualityValue)
+{
+    auto model = Mud::instance().findItemModel(vnumModel);
+    if (model == nullptr)
+    {
+        Logger::log(LogLevel::Error, "Can't find model :" + ToString(vnumModel));
+        return nullptr;
+    }
+    auto composition = Mud::instance().findMaterial(vnumMaterial);
+    if (composition == nullptr)
+    {
+        Logger::log(LogLevel::Error, "Can't find material :" + ToString(vnumMaterial));
+        return nullptr;
+    }
+    ItemQuality quality = ItemQuality::Normal;
+    if (ItemQuality::isValid(qualityValue))
+    {
+        quality = ItemQuality(qualityValue);
+    }
+    return model->createItem(this->getName(), composition, true, quality);
 }
 
 void Character::luaAddEquipment(Item * item)
@@ -1565,6 +1588,7 @@ void Character::luaRegister(lua_State * L)
         .addFunction("getCharactersInSight", &Character::luaGetCharactersInSight)
         .addFunction("getItemsInSight", &Character::luaGetItemsInSight)
         .addFunction("luaGetPathTo", &Character::luaGetPathTo)
+        .addFunction("loadItem", &Character::luaLoadItem)
         .addFunction("isMobile", &Character::isMobile)
         .endClass()
         .deriveClass<Mobile, Character>("Mobile")

@@ -1,19 +1,19 @@
 -- Handle the actions when the character is created.
 EventInit = function(self)
     -- Put event code here.
-    local helm = Mud.LoadItem(self, 1500, 10, Mud.Random(1, 5));
+    local helm = self.loadItem(self, 1500, 10, Mud.Random(1, 5));
     if (helm ~= nil) then
         self:equipmentAdd(helm);
     end
-    local cuirass = Mud.LoadItem(self, 1501, 10, Mud.Random(1, 5));
+    local cuirass = self.loadItem(self, 1501, 10, Mud.Random(1, 5));
     if (cuirass ~= nil) then
         self:equipmentAdd(cuirass);
     end
-    local greave = Mud.LoadItem(self, 1502, 10, Mud.Random(1, 5));
+    local greave = self.loadItem(self, 1502, 10, Mud.Random(1, 5));
     if (greave ~= nil) then
         self:equipmentAdd(greave);
     end
-    local boots = Mud.LoadItem(self, 1503, 10, Mud.Random(1, 5));
+    local boots = self.loadItem(self, 1503, 10, Mud.Random(1, 5));
     if (boots ~= nil) then
         self:equipmentAdd(boots);
     end

@@ -31,20 +31,30 @@ end
 
 -- Handle a random action.
 EventRandom = function(self)
---    Mud.Log("[" .. self.name .. "] Looking around for usefull stuff.");
---    local itemsInSight = self:getItemsInSight();
---    if (not itemsInSight:empty()) then
---        for i = 0, (itemsInSight:size() - 1) do
---            local item = itemsInSight:at(i);
---            Mud.Log("[" .. self.name .. "] I can see :" .. item:getName());
---            local path = self:luaGetPathTo(item.room);
---            if (not path:empty()) then
---                for j = 0, (path:size() - 1) do
---                    Mud.Log("[" .. self.name .. "] " .. path:at(j):toString());
---                end
---            end
---        end
---    end
+    local roomExits = self.room:getExits();
+    for key, value in pairs(roomExits) do
+        print(key, value:getDirection())
+    end
+    --    Mud.Log("[" .. self.name .. "] Looking around for usefull stuff.");
+    --    for i = 0, 10000 do
+    --        local itemsInSight = self:getItemsInSight();
+    --        for key, value in pairs(itemsInSight) do print(key, value) end
+    --    end
+    --    for item in itemsInSight do
+    --        Mud.Log("[" .. self.name .. "] I can see :" .. item:getName());
+    --    end
+    --    if (not itemsInSight:empty()) then
+    --        for i = 0, (itemsInSight:size() - 1) do
+    --            local item = itemsInSight:at(i);
+    --            Mud.Log("[" .. self.name .. "] I can see :" .. item:getName());
+    --            local path = self:luaGetPathTo(item.room);
+    --            if (not path:empty()) then
+    --                for j = 0, (path:size() - 1) do
+    --                    Mud.Log("[" .. self.name .. "] " .. path:at(j):toString());
+    --                end
+    --            end
+    --        end
+    --    end
 end
 
 -- Handle the actions when is Morning.
@@ -76,7 +86,7 @@ end
 EventMain = function(self)
     if (posessAxe == false) then
         Mud.Log("[" .. self.name .. "] I need to find an axe.");
-        --SearchAxe(self);
+        --        SearchAxe(self);
     else
         Mud.Log("[" .. self.name .. "] I have an axe.");
         if (foundTree == false) then
@@ -124,7 +134,6 @@ SearchAxeRoom = function(self)
     if (not itemList:empty())
     then
         for i = 0, (itemList:size() - 1) do
-            Mud.Log("Getting index :" .. i);
             local item = itemList:at(i);
             if (item.model:getType() == ModelType.Tool) then
                 Mud.Log("[" .. self.name .. "] I've found an axe!");

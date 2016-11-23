@@ -36,6 +36,7 @@
 #include "combatAction.hpp"
 #include "argumentHandler.hpp"
 #include "characterContainer.hpp"
+#include "LuaBridge.hpp"
 
 #include <deque>
 
@@ -565,13 +566,20 @@ public:
     /// @brief Returns the list of available targets using the vector
     ///         structure made for lua environment.
     /// @return The vector of targets.
-    VectorHelper<Character *> luaGetCharactersInSight();
+    luabridge::LuaRef luaGetCharactersInSight();
 
     /// @brief Returns the list of items in sight.
-    VectorHelper<Item *> luaGetItemsInSight();
+    luabridge::LuaRef luaGetItemsInSight();
 
     /// @brief Returns the list of items in sight.
-    VectorHelper<Direction> luaGetPathTo(Room * destination);
+    luabridge::LuaRef luaGetPathTo(Room * destination);
+
+    /// @brief Allow from lua to load an item.
+    /// @param vnumModel    The vnum of the model.
+    /// @param vnumMaterial The vnum of the material.
+    /// @param qualityValue The initial quality of the item.
+    /// @return The newly created item.
+    Item * luaLoadItem(int vnumModel, int vnumMaterial, unsigned int qualityValue);
 
     /// @brief Specific function used by lua to add an equipment item.
     void luaAddEquipment(Item * item);
