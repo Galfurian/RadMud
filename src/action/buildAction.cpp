@@ -27,8 +27,6 @@
 #include "logger.hpp"
 #include "room.hpp"
 
-using namespace std::chrono;
-
 BuildAction::BuildAction(Character * _actor,
                          Building * _schematics,
                          Item * _building,

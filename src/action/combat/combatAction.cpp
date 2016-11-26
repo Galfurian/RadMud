@@ -25,8 +25,6 @@
 #include "logger.hpp"
 #include "room.hpp"
 
-using namespace std::chrono;
-
 CombatAction::CombatAction(Character * _actor) :
     GeneralAction(_actor)
 {

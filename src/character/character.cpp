@@ -29,8 +29,6 @@
 #include "logger.hpp"
 #include "mud.hpp"
 
-using namespace std::chrono;
-
 Character::Character() :
     name(),
     description(),

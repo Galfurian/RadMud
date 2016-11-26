@@ -23,8 +23,6 @@
 #include "generalAction.hpp"
 #include "combatAction.hpp"
 
-using namespace std::chrono;
-
 GeneralAction::GeneralAction(Character * _actor) :
     actor(_actor),
     actionCooldown()
@@ -39,12 +37,14 @@ GeneralAction::~GeneralAction()
 
 bool GeneralAction::checkElapsed() const
 {
-    return (duration_cast<seconds>(actionCooldown - system_clock::now()).count() <= 0);
+    return (std::chrono::duration_cast<std::chrono::seconds>(actionCooldown
+                                                             - std::chrono::system_clock::now()).count() <= 0);
 }
 
 long int GeneralAction::getElapsed() const
 {
-    return duration_cast<seconds>(actionCooldown - system_clock::now()).count();
+    return std::chrono::duration_cast<std::chrono::seconds>(actionCooldown
+                                                            - std::chrono::system_clock::now()).count();
 }
 
 bool GeneralAction::check(std::string & error) const
@@ -79,12 +79,14 @@ ActionStatus GeneralAction::perform()
 
 void GeneralAction::resetCooldown(const unsigned int & _actionCooldown)
 {
-    this->actionCooldown = system_clock::now() + seconds(_actionCooldown);
+    this->actionCooldown = std::chrono::system_clock::now() + std::chrono::seconds(_actionCooldown);
 }
 
 unsigned int GeneralAction::getCooldown()
 {
-    return static_cast<unsigned int>(duration_cast<seconds>(actionCooldown - system_clock::now()).count());
+    return static_cast<unsigned int>(
+            std::chrono::duration_cast<std::chrono::seconds>(actionCooldown
+                                                             - std::chrono::system_clock::now()).count());
 }
 
 std::shared_ptr<CombatAction> GeneralAction::toCombatAction()

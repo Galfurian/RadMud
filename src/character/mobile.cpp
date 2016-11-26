@@ -25,8 +25,6 @@
 #include "logger.hpp"
 #include "mud.hpp"
 
-using namespace std::chrono;
-
 Mobile::Mobile() :
     id(),
     respawnRoom(),
@@ -208,7 +206,7 @@ void Mobile::kill()
     // Call the method of the father class.
     Character::kill();
     // Set to 0 the cycle that this mobile has passed dead.
-    nextRespawn = system_clock::now() + seconds(10 * this->level);
+    nextRespawn = std::chrono::system_clock::now() + std::chrono::seconds(10 * this->level);
     // Call the LUA function: Event_Death.
     this->triggerEventDeath();
 }
@@ -216,7 +214,7 @@ void Mobile::kill()
 int64_t Mobile::getRespawnTime() const
 {
     // Return the check if the mobile can be respawned.
-    return duration_cast<seconds>(system_clock::now() - nextRespawn).count();
+    return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - nextRespawn).count();
 }
 
 bool Mobile::canRespawn()

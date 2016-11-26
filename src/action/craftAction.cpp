@@ -26,8 +26,6 @@
 #include "logger.hpp"
 #include "room.hpp"
 
-using namespace std::chrono;
-
 CraftAction::CraftAction(Character * _actor,
                          Production * _production,
                          Material * _material,
