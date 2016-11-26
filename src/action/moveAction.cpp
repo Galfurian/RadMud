@@ -27,8 +27,6 @@
 #include "logger.hpp"
 #include "room.hpp"
 
-using namespace std::chrono;
-
 MoveAction::MoveAction(Character * _actor, Room * _destination, Direction _direction) :
     GeneralAction(_actor),
     destination(_destination),
