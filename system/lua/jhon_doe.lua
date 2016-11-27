@@ -1,21 +1,9 @@
 --package.path = package.path .. ";../system/lua/luann.lua"
 --local luann = require("luann")
+package.path = package.path .. ";../system/lua/?.lua"
+require 'explorer'
 
---- List of already checked rooms.
-local alreadyCheckedRooms = {};
-
---- Check if the given table contains the value.
--- @param tab The table.
--- @param val The value that has to be found.
--- @return If the table contains the value.
-function has_value(tab, val)
-    for index, value in ipairs(tab) do
-        if value == val then
-            return true
-        end
-    end
-    return false
-end
+local JhonExplorer = Explorer()
 
 --- Handle the actions when the character is created.
 -- @param self The character linked to the event.
@@ -93,9 +81,15 @@ end
 EventMain = function(self)
     if (not EquipPosessedAxe(self)) then
         Mud.Log("[" .. self.name .. "] I need to find an axe.");
-        SearchAxe(self);
+        JhonExplorer = Explorer()
+        if (SearchAxe(self)) then
+            Mud.Log("[" .. self.name .. "] I've found an axe!");
+        else
+            Mud.Log("[" .. self.name .. "] There is no axe in the area!");
+            Mud.Sleep(15);
+        end
     end
-    Mud.Log("[" .. self.name .. "] Now I have an axe.");
+    --    Mud.Log("[" .. self.name .. "] Now I have an axe.");
     --    if (foundTree == false) then
     --        Mud.Log("[" .. self.name .. "] I need to find a suitable tree.");
     --        --SearchTree(self);
@@ -135,12 +129,38 @@ SearchAxe = function(self)
             for itemKey, item in pairs(room:getItems()) do
                 -- Check if the room contains an axe.
                 if (CheckIfItemIsAnAxe(item)) then
+                    Mud.Log("[" .. self.name .. "] I've seen an axe, moving to position...");
                     GetToDestination(self, self:luaGetPathTo(item.room));
+                    return true
                 end
             end
+            JhonExplorer:setRoomAsVisited(room)
         end
-        Mud.Sleep(1);
+        JhonExplorer:updateNotVisitedRooms()
+        Mud.Log("[" .. self.name .. "] I've not found an axe, moving to another position...");
+        if (not JhonExplorer.notVisited:empty()) then
+            while (not JhonExplorer.notVisited:empty()) do
+                local nextRoom = JhonExplorer.notVisited:popfirst()
+                if nextRoom == nil then
+                    break
+                end
+                print("Removing room " .. nextRoom.vnum .. " from the NOT visited rooms")
+                local pathToNextRoom = self:luaGetPathTo(nextRoom)
+                if next(pathToNextRoom) ~= nil then
+                    Mud.Log("[" .. self.name .. "] Moving to position " .. nextRoom.vnum .. " ...");
+                    GetToDestination(self, pathToNextRoom)
+                    break
+                else
+                    print("There is no valid path to room '" .. nextRoom.vnum .. "'")
+                    JhonExplorer.invalidRooms:pushfirst(nextRoom)
+                end
+            end
+        else
+            break
+        end
+        Mud.Sleep(2);
     end
+    return false
 end
 
 --- Search for an axe inside the given room.
@@ -149,13 +169,10 @@ SearchAxeRoom = function(self)
     -- Get the list of items inside the current room.
     for itemKey, item in pairs(self.room:getItems()) do
         if (CheckIfItemIsAnAxe(item)) then
-            Mud.Log("[" .. self.name .. "] I've found an axe!");
-            --            self:doCommand("take " .. item.vnum);
-            --            self:doCommand("wield " .. item.vnum);
-            return true;
+            return item
         end
     end
-    return false;
+    return nil;
 end
 
 --- Move the character through the given path.
@@ -163,9 +180,11 @@ end
 -- @param path The path to follow.
 GetToDestination = function(self, path)
     for directionKey, direction in pairs(path) do
+        print(direction:toString())
         self:doCommand(direction:toString());
         Mud.Sleep(2);
     end
+    Mud.Log("[" .. self.name .. "] Reached destination!");
 end
 
 --- Check if the given item is an axe.
