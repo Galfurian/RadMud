@@ -42,7 +42,7 @@ Profession::Profession() :
 
 Profession::~Profession()
 {
-    Logger::log(LogLevel::Debug, "Deleted profession\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
+    //Logger::log(LogLevel::Debug, "Deleted profession\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
 }
 
 bool Profession::check()

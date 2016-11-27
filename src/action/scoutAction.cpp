@@ -31,14 +31,14 @@ ScoutAction::ScoutAction(Character * _actor) :
     GeneralAction(_actor)
 {
     // Debugging message.
-    Logger::log(LogLevel::Debug, "Created ScoutAction.");
+    //Logger::log(LogLevel::Debug, "Created ScoutAction.");
     // Reset the cooldown of the action.
     this->resetCooldown(ScoutAction::getScoutTime(_actor));
 }
 
 ScoutAction::~ScoutAction()
 {
-    Logger::log(LogLevel::Debug, "Deleted scout action.");
+    //Logger::log(LogLevel::Debug, "Deleted scout action.");
 }
 
 bool ScoutAction::check(std::string & error) const

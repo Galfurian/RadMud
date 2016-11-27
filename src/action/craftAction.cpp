@@ -38,14 +38,14 @@ CraftAction::CraftAction(Character * _actor,
     ingredients(_ingredients)
 {
     // Debugging message.
-    Logger::log(LogLevel::Debug, "Created CraftAction.");
+    //Logger::log(LogLevel::Debug, "Created CraftAction.");
     // Reset the cooldown of the action.
     this->resetCooldown(CraftAction::getCooldown(_actor, _production));
 }
 
 CraftAction::~CraftAction()
 {
-    Logger::log(LogLevel::Debug, "Deleted crafting action.");
+    //Logger::log(LogLevel::Debug, "Deleted crafting action.");
 }
 
 bool CraftAction::check(std::string & error) const

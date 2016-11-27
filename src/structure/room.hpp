@@ -67,7 +67,7 @@ public:
     /// A long description of the room.
     std::string description;
     /// List of exits.
-    ExitVector exits;
+    std::vector<std::shared_ptr<Exit> > exits;
     /// List of items in the room.
     ItemContainer items;
     /// List of characters in the room.

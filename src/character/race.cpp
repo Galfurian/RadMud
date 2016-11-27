@@ -43,7 +43,7 @@ Race::Race() :
 
 Race::~Race()
 {
-    Logger::log(LogLevel::Debug, "Deleted race\t\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
+    //Logger::log(LogLevel::Debug, "Deleted race\t\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
 }
 
 void Race::initializeCorpse(const std::string & corpseDescription)

@@ -83,10 +83,6 @@ public:
     /// @return The opposite exit.
     std::shared_ptr<Exit> getOppositeExit() const;
 
-    /// @brief Get the direction.
-    /// @return The direction.
-    std::string getDirection() const;
-
     /// @brief Unlink the current exit from its source.
     /// @return <b>True</b> if the operation succeeded,<br>
     ///         <b>False</b> otherwise.
@@ -102,9 +98,6 @@ public:
     /// @param L The lua environment.
     static void luaRegister(lua_State * L);
 };
-
-/// Exit list handler.
-using ExitVector = std::vector<std::shared_ptr<Exit> >;
 
 /// @addtogroup FlagsToList
 /// @{

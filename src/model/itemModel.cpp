@@ -66,7 +66,7 @@ ItemModel::ItemModel() :
 
 ItemModel::~ItemModel()
 {
-    Logger::log(LogLevel::Debug, "Deleted model\t\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
+    //Logger::log(LogLevel::Debug, "Deleted model\t\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
 }
 
 ModelType ItemModel::getType() const

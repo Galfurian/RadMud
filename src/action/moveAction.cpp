@@ -33,14 +33,14 @@ MoveAction::MoveAction(Character * _actor, Room * _destination, Direction _direc
     direction(_direction)
 {
     // Debugging message.
-    Logger::log(LogLevel::Debug, "Created MoveAction.");
+    //Logger::log(LogLevel::Debug, "Created MoveAction.");
     // Reset the cooldown of the action.
     this->resetCooldown(MoveAction::getCooldown(_actor));
 }
 
 MoveAction::~MoveAction()
 {
-    Logger::log(LogLevel::Debug, "Deleted move action.");
+    //Logger::log(LogLevel::Debug, "Deleted move action.");
 }
 
 bool MoveAction::check(std::string & error) const

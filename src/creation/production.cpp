@@ -44,11 +44,7 @@ Production::Production() :
 
 Production::~Production()
 {
-    Logger::log(
-        LogLevel::Debug,
-        "Deleted production\t[%s]\t\t(%s)",
-        ToString(this->vnum),
-        this->name);
+    //Logger::log(LogLevel::Debug, "Deleted production\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
 }
 
 bool Production::setOutcome(const std::string & source)

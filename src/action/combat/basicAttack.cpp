@@ -36,14 +36,14 @@ BasicAttack::BasicAttack(Character * _actor) :
     CombatAction(_actor)
 {
     // Debugging message.
-    Logger::log(LogLevel::Debug, "Created BasicAttack.");
+    //Logger::log(LogLevel::Debug, "Created BasicAttack.");
     // Reset the cooldown of the action.
     this->resetCooldown(CombatAction::getCooldown(_actor));
 }
 
 BasicAttack::~BasicAttack()
 {
-    Logger::log(LogLevel::Debug, "Deleted BasicAttack.");
+    //Logger::log(LogLevel::Debug, "Deleted BasicAttack.");
 }
 
 bool BasicAttack::check(std::string & error) const

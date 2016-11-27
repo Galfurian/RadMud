@@ -76,7 +76,7 @@ Player::~Player()
     {
         room->removeCharacter(this);
     }
-    Logger::log(LogLevel::Debug, "Deleted player\t\t\t\t(%s)", this->getNameCapital());
+    //Logger::log(LogLevel::Debug, "Deleted player\t\t\t\t(%s)", this->getNameCapital());
 }
 
 bool Player::check() const

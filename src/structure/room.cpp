@@ -58,7 +58,7 @@ Room::~Room()
     {
         area->remRoom(this);
     }
-    Logger::log(LogLevel::Debug, "Deleted room\t\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
+    //Logger::log(LogLevel::Debug, "Deleted room\t\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
 }
 
 bool Room::check(bool complete)
@@ -675,7 +675,7 @@ bool CreateRoom(Coordinates coord, Room * source_room)
 bool ConnectRoom(Room * room)
 {
     bool status = true;
-    ExitVector generatedExits;
+    std::vector<std::shared_ptr<Exit> > generatedExits;
     Logger::log(LogLevel::Info, "[ConnectRoom] Connecting the room to near rooms...");
     for (auto iterator : Mud::instance().mudDirections)
     {
