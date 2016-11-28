@@ -74,12 +74,18 @@ function Queue:poplast()
     return value
 end
 
+function Queue:reset()
+    for key in pairs(self.elements) do
+        self.elements[key] = nil
+    end
+end
+
 function Queue:__tostring()
---    local content = {}
---    for k, v in pairs(self.elements) do
---        content[#content + 1] = v
---    end
---    return self.name .. "\t [" .. self.first .. " : " .. self.last .. "]" .. "\t {" .. table.concat(content, ",") .. "}"
+    --    local content = {}
+    --    for k, v in pairs(self.elements) do
+    --        content[#content + 1] = v
+    --    end
+    --    return self.name .. "\t [" .. self.first .. " : " .. self.last .. "]" .. "\t {" .. table.concat(content, ",") .. "}"
     return self.name .. "\t [" .. self.first .. " : " .. self.last .. "]"
 end
 

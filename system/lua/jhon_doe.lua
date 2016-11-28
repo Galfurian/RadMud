@@ -81,11 +81,13 @@ end
 EventMain = function(self)
     if (not EquipPosessedAxe(self)) then
         Mud.Log("[" .. self.name .. "] I need to find an axe.");
-        JhonExplorer = Explorer()
+        JhonExplorer:reset()
         if (SearchAxe(self)) then
             Mud.Log("[" .. self.name .. "] I've found an axe!");
+            JhonExplorer:print()
         else
             Mud.Log("[" .. self.name .. "] There is no axe in the area!");
+            JhonExplorer:print()
             Mud.Sleep(15);
         end
     end
@@ -99,24 +101,6 @@ EventMain = function(self)
     --    if ((posessAxe) and (foundTree)) then
     --        Mud.Log("[" .. self.name .. "] Now I can cut down the tree.");
     --    end
-end
-
---- Try to equip a posessed axe.
--- @param self The character.
--- @return If the character has equipped an axe.
-EquipPosessedAxe = function(self)
-    for itemKey, item in pairs(self:getEquipmentItems()) do
-        if (CheckIfItemIsAnAxe(item)) then
-            return true;
-        end
-    end
-    for itemKey, item in pairs(self:getInventoryItems()) do
-        if (CheckIfItemIsAnAxe(item)) then
-            self:doCommand("wield " .. item.vnum);
-            return true;
-        end
-    end
-    return false;
 end
 
 --- Search an axe everywhere inside the area.
@@ -144,14 +128,13 @@ SearchAxe = function(self)
                 if nextRoom == nil then
                     break
                 end
-                print("Removing room " .. nextRoom.vnum .. " from the NOT visited rooms")
                 local pathToNextRoom = self:luaGetPathTo(nextRoom)
                 if next(pathToNextRoom) ~= nil then
-                    Mud.Log("[" .. self.name .. "] Moving to position " .. nextRoom.vnum .. " ...");
+                    Mud.Log("[" .. self.name .. "] Moving to " .. nextRoom.vnum .. " ...");
                     GetToDestination(self, pathToNextRoom)
                     break
                 else
-                    print("There is no valid path to room '" .. nextRoom.vnum .. "'")
+                    Mud.Log("[" .. self.name .. "] Cannot find a path to " .. nextRoom.vnum .. " ...");
                     JhonExplorer.invalidRooms:pushfirst(nextRoom)
                 end
             end
@@ -175,12 +158,30 @@ SearchAxeRoom = function(self)
     return nil;
 end
 
+--- Try to equip a posessed axe.
+-- @param self The character.
+-- @return If the character has equipped an axe.
+EquipPosessedAxe = function(self)
+    for itemKey, item in pairs(self:getEquipmentItems()) do
+        if (CheckIfItemIsAnAxe(item)) then
+            return true;
+        end
+    end
+    for itemKey, item in pairs(self:getInventoryItems()) do
+        if (CheckIfItemIsAnAxe(item)) then
+            self:doCommand("wield " .. item.vnum);
+            return true;
+        end
+    end
+    return false;
+end
+
 --- Move the character through the given path.
 -- @param self The character to move.
 -- @param path The path to follow.
 GetToDestination = function(self, path)
     for directionKey, direction in pairs(path) do
-        print(direction:toString())
+        Mud.Log("[" .. self.name .. "] Movind " .. direction:toString());
         self:doCommand(direction:toString());
         Mud.Sleep(2);
     end

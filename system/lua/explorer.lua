@@ -53,13 +53,10 @@ end
 --- Set the given room as visited.
 function Explorer:setRoomAsVisited(room)
     if (not self:findRoomInTable(self.alreadyVisited.elements, room)) then
+        -- Push the room inside the queue of already visited rooms.
         self.alreadyVisited:pushfirst(room)
-        print("Setting room " .. room.vnum .. " as visited")
-        if (self:findRoomInTable(self.notVisited.elements, room)) then
-            if (self:removeRoomFromTable(self.notVisited.elements, room)) then
-                print("Removing room " .. room.vnum .. " from the NOT visited rooms")
-            end
-        end
+        -- Remove the room from the the queue of not visited rooms.
+        self:removeRoomFromTable(self.notVisited.elements, room)
         return true
     end
     return false
@@ -74,7 +71,6 @@ function Explorer:updateNotVisitedRooms()
                 if (not self:findRoomInTable(self.alreadyVisited.elements, destination)) then
                     if (not self:findRoomInTable(self.invalidRooms.elements, destination)) then
                         self.notVisited:pushfirst(destination);
-                        print("Setting room " .. destination.vnum .. " to the NOT visited rooms")
                     end
                 end
             end
@@ -82,21 +78,25 @@ function Explorer:updateNotVisitedRooms()
     end
 end
 
-function Explorer:test()
-    print("Running Explorer test...")
-    print(self.alreadyVisited)
-    print(self.notVisited)
-    local room = "test"
-    self.alreadyVisited:pushfirst(room)
-    print(self.alreadyVisited)
-    print(self.notVisited)
-    self.notVisited:pushfirst(room)
-    print(self.alreadyVisited)
-    print(self.notVisited)
-    self.alreadyVisited:popfirst()
-    self.notVisited:popfirst()
-    print(self.alreadyVisited)
-    print(self.notVisited)
+function Explorer:reset()
+    self.alreadyVisited:reset()
+    self.notVisited:reset()
+    self.invalidRooms:reset()
+end
+
+function Explorer:print()
+    print("Already Visited:")
+    for roomKey, room in pairs(self.alreadyVisited.elements) do
+        print("    " .. room.vnum)
+    end
+    print("Not Visited    :")
+    for roomKey, room in pairs(self.notVisited.elements) do
+        print("    " .. room.vnum)
+    end
+    print("Invalid Rooms  :")
+    for roomKey, room in pairs(self.invalidRooms.elements) do
+        print("    " .. room.vnum)
+    end
 end
 
 function Explorer:__tostring()
