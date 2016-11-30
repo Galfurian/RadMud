@@ -16,6 +16,7 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+#include <thread>
 #include "logger.hpp"
 
 Logger::Logger()
@@ -81,13 +82,18 @@ LogLevel Logger::castFromInt(const unsigned int & level)
 
 void Logger::log(const LogLevel & level, const std::string & msg)
 {
-    std::string output("[" + Logger::levelToString(level) + "][" + Logger::getDateTime() + "] " + msg + "\n");
     if (Logger::getStream().is_open())
     {
         // Write the log message inside the file.
-        Logger::getStream() << output;
+        Logger::getStream() << "[" << std::hex << std::this_thread::get_id() << "]";
+        Logger::getStream() << "[" << Logger::levelToString(level) << "]";
+        Logger::getStream() << "[" << Logger::getDateTime() << "] ";
+        Logger::getStream() << msg << "\n";
     }
-    Logger::getOutputStream(level) << output;
+    Logger::getOutputStream(level) << "[" << std::hex << std::this_thread::get_id() << "]";
+    Logger::getOutputStream(level) << "[" << Logger::levelToString(level) << "]";
+    Logger::getOutputStream(level) << "[" << Logger::getDateTime() << "] ";
+    Logger::getOutputStream(level) << msg << "\n";
 }
 
 std::fstream & Logger::getStream()
@@ -101,7 +107,7 @@ std::string Logger::getDateTime()
     time_t now = time(nullptr);
     char buffer[32];
     // Format: H:M
-    strftime(buffer, 32, "%H:%M", localtime(&now));
+    strftime(buffer, 32, "%H:%M:%S", localtime(&now));
     return std::string(buffer);
 }
 

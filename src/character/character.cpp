@@ -1542,7 +1542,7 @@ luabridge::LuaRef Character::luaGetPathTo(Room * destination)
     AStar<Room *> aStar;
     std::vector<Room *> path;
 
-    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
+    luabridge::LuaRef luaRef(L, luabridge::LuaRef::newTable(L));
     if (aStar.findPath(this->room, destination, path, checkFunction))
     {
         Coordinates previous = this->room->coord;

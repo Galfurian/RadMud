@@ -70,11 +70,11 @@ EventMain = function(self)
 end
 
 GoToCharacter = function(self, character, path)
-    Mud.Log("[" .. self.name .. "] Moving to :" .. character.name);
+    Mud.log("[" .. self.name .. "] Moving to :" .. character.name);
     if (not path:empty()) then
         for j = 0, (path:size() - 1) do
             self:doCommand(path:at(j):toString());
-            Mud.Sleep(2);
+            Mud.sleep(2);
         end
     end
 end

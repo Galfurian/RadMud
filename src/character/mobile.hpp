@@ -63,6 +63,8 @@ public:
     /// The item of which this mobile is the manager.
     Item * managedItem;
 
+    std::thread t;
+
     /// @brief Constructor.
     Mobile();
 

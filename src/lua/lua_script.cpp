@@ -50,8 +50,8 @@ void LuaRegisterUtils(lua_State * L)
 {
     luabridge::getGlobalNamespace(L)
         .beginNamespace("Mud")
-        .addFunction("Log", LuaLog)
-        .addFunction("Sleep", LuaSleep)
-        .addFunction("Random", LuaRandom)
+        .addFunction("log", LuaLog)
+        .addFunction("sleep", LuaSleep)
+        .addFunction("random", LuaRandom)
         .endNamespace();
 }

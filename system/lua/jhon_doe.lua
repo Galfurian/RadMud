@@ -1,6 +1,6 @@
 --package.path = package.path .. ";../system/lua/luann.lua"
 --local luann = require("luann")
-package.path = package.path .. ";../system/lua/?.lua"
+package.path = package.path .. ";../system/lua/lib/?.lua"
 require 'explorer'
 
 local JhonExplorer = Explorer()
@@ -43,7 +43,7 @@ end
 --- Handle a random action.
 -- @param self The character linked to the event.
 EventRandom = function(self)
-    EventMain(self);
+    EventMain(self)
 end
 
 --- Handle the actions when is Morning.
@@ -80,26 +80,26 @@ end
 -- @param self The character linked to the event.
 EventMain = function(self)
     if (not EquipPosessedAxe(self)) then
-        Mud.Log("[" .. self.name .. "] I need to find an axe.");
+        Mud.log("[" .. self.name .. "] I need to find an axe.")
         JhonExplorer:reset()
         if (SearchAxe(self)) then
-            Mud.Log("[" .. self.name .. "] I've found an axe!");
+            Mud.log("[" .. self.name .. "] I've found an axe!")
             JhonExplorer:print()
         else
-            Mud.Log("[" .. self.name .. "] There is no axe in the area!");
+            Mud.log("[" .. self.name .. "] There is no axe in the area!")
             JhonExplorer:print()
-            Mud.Sleep(15);
+            Mud.sleep(15)
         end
     end
-    --    Mud.Log("[" .. self.name .. "] Now I have an axe.");
+    --    Mud.log("[" .. self.name .. "] Now I have an axe.")
     --    if (foundTree == false) then
-    --        Mud.Log("[" .. self.name .. "] I need to find a suitable tree.");
-    --        --SearchTree(self);
+    --        Mud.log("[" .. self.name .. "] I need to find a suitable tree.")
+    --        --SearchTree(self)
     --    else
-    --        Mud.Log("[" .. self.name .. "] I have found a tree.");
+    --        Mud.log("[" .. self.name .. "] I have found a tree.")
     --    end
     --    if ((posessAxe) and (foundTree)) then
-    --        Mud.Log("[" .. self.name .. "] Now I can cut down the tree.");
+    --        Mud.log("[" .. self.name .. "] Now I can cut down the tree.")
     --    end
 end
 
@@ -108,20 +108,20 @@ end
 SearchAxe = function(self)
     -- Cycle until we find an axe inside the current room.
     while (not SearchAxeRoom(self)) do
-        Mud.Log("[" .. self.name .. "] Searching for an axe...");
+        Mud.log("[" .. self.name .. "] Searching for an axe...")
         for roomKey, room in pairs(self:getRoomsInSight()) do
             for itemKey, item in pairs(room:getItems()) do
                 -- Check if the room contains an axe.
                 if (CheckIfItemIsAnAxe(item)) then
-                    Mud.Log("[" .. self.name .. "] I've seen an axe, moving to position...");
-                    GetToDestination(self, self:luaGetPathTo(item.room));
+                    Mud.log("[" .. self.name .. "] I've seen an axe, moving to position...")
+                    GetToDestination(self, self:luaGetPathTo(item.room))
                     return true
                 end
             end
             JhonExplorer:setRoomAsVisited(room)
         end
         JhonExplorer:updateNotVisitedRooms()
-        Mud.Log("[" .. self.name .. "] I've not found an axe, moving to another position...");
+        Mud.log("[" .. self.name .. "] I've not found an axe, moving to another position...")
         if (not JhonExplorer.notVisited:empty()) then
             while (not JhonExplorer.notVisited:empty()) do
                 local nextRoom = JhonExplorer.notVisited:popfirst()
@@ -130,18 +130,18 @@ SearchAxe = function(self)
                 end
                 local pathToNextRoom = self:luaGetPathTo(nextRoom)
                 if next(pathToNextRoom) ~= nil then
-                    Mud.Log("[" .. self.name .. "] Moving to " .. nextRoom.vnum .. " ...");
+                    Mud.log("[" .. self.name .. "] Moving to " .. nextRoom.vnum .. " ...")
                     GetToDestination(self, pathToNextRoom)
                     break
                 else
-                    Mud.Log("[" .. self.name .. "] Cannot find a path to " .. nextRoom.vnum .. " ...");
+                    Mud.log("[" .. self.name .. "] Cannot find a path to " .. nextRoom.vnum .. " ...")
                     JhonExplorer.invalidRooms:pushfirst(nextRoom)
                 end
             end
         else
             break
         end
-        Mud.Sleep(2);
+        Mud.sleep(4)
     end
     return false
 end
@@ -155,7 +155,7 @@ SearchAxeRoom = function(self)
             return item
         end
     end
-    return nil;
+    return nil
 end
 
 --- Try to equip a posessed axe.
@@ -164,16 +164,16 @@ end
 EquipPosessedAxe = function(self)
     for itemKey, item in pairs(self:getEquipmentItems()) do
         if (CheckIfItemIsAnAxe(item)) then
-            return true;
+            return true
         end
     end
     for itemKey, item in pairs(self:getInventoryItems()) do
         if (CheckIfItemIsAnAxe(item)) then
-            self:doCommand("wield " .. item.vnum);
-            return true;
+            self:doCommand("wield " .. item.vnum)
+            return true
         end
     end
-    return false;
+    return false
 end
 
 --- Move the character through the given path.
@@ -181,11 +181,11 @@ end
 -- @param path The path to follow.
 GetToDestination = function(self, path)
     for directionKey, direction in pairs(path) do
-        Mud.Log("[" .. self.name .. "] Movind " .. direction:toString());
-        self:doCommand(direction:toString());
-        Mud.Sleep(2);
+        Mud.log("[" .. self.name .. "] Movind " .. direction:toString())
+        self:doCommand(direction:toString())
+        Mud.sleep(Mud.random(4, 8))
     end
-    Mud.Log("[" .. self.name .. "] Reached destination!");
+    Mud.log("[" .. self.name .. "] Reached destination!")
 end
 
 --- Check if the given item is an axe.
@@ -194,14 +194,14 @@ end
 CheckIfItemIsAnAxe = function(item)
     -- Check the item is a tool.
     if (item:getTypeName() == "Tool") then
-        local modelToTool = item.model:toTool();
+        local modelToTool = item.model:toTool()
         -- Transformed to tool.
-        local modelToolType = modelToTool.toolType;
+        local modelToolType = modelToTool.toolType
         -- Retrieved tool type.
         if (modelToolType:toString() == "WoodcutterAxe") then
             -- Found woodcutter axe.
-            return true;
+            return true
         end
     end
-    return false;
+    return false
 end

@@ -263,7 +263,7 @@ bool Mobile::mobileThread(std::string event, Character * character, std::string 
 {
     // Lock to the mutex.
     lua_mutex.lock();
-    //Logger::log(LogLevel::Trace, "Starting thread '" + event + "'");
+    Logger::log(LogLevel::Trace, "Starting thread for event '%s'", event);
     try
     {
         luabridge::LuaRef f = luabridge::getGlobal(L, event.c_str());
@@ -294,80 +294,80 @@ bool Mobile::mobileThread(std::string event, Character * character, std::string 
     {
         Logger::log(LogLevel::Error, e.what());
     }
+    Logger::log(LogLevel::Trace, "Ending   thread for event '%s'", event);
     // Unlock the mutex.
     lua_mutex.unlock();
-    //Logger::log(LogLevel::Trace, "Ending thread '" + event + "'");
     return true;
 }
 
 void Mobile::triggerEventInit()
 {
-    std::thread t(&Mobile::mobileThread, this, "EventInit", nullptr, "");
+    t = std::thread(&Mobile::mobileThread, this, "EventInit", nullptr, "");
     t.detach();
 }
 
 void Mobile::triggerEventFight(Character * character)
 {
-    std::thread t(&Mobile::mobileThread, this, "EventFight", character, "");
+    t = std::thread(&Mobile::mobileThread, this, "EventFight", character, "");
     t.detach();
 }
 
 void Mobile::triggerEventEnter(Character * character)
 {
-    std::thread t(&Mobile::mobileThread, this, "EventEnter", character, "");
+    t = std::thread(&Mobile::mobileThread, this, "EventEnter", character, "");
     t.detach();
 }
 
 void Mobile::triggerEventExit(Character * character)
 {
-    std::thread t(&Mobile::mobileThread, this, "EventExit", character, "");
+    t = std::thread(&Mobile::mobileThread, this, "EventExit", character, "");
     t.detach();
 }
 
 void Mobile::triggerEventMessage(Character * character, std::string message)
 {
-    std::thread t(&Mobile::mobileThread, this, "EventMessage", character, message);
+    t = std::thread(&Mobile::mobileThread, this, "EventMessage", character, message);
     t.detach();
 }
 
 void Mobile::triggerEventRandom()
 {
-    std::thread t(&Mobile::mobileThread, this, "EventRandom", nullptr, "");
+    t = std::thread(&Mobile::mobileThread, this, "EventRandom", nullptr, "");
     t.detach();
 }
 
 void Mobile::triggerEventMorning()
 {
-    std::thread t(&Mobile::mobileThread, this, "EventMorning", nullptr, "");
+    t = std::thread(&Mobile::mobileThread, this, "EventMorning", nullptr, "");
     t.detach();
 }
 
 void Mobile::triggerEventDay()
 {
-    std::thread t(&Mobile::mobileThread, this, "EventDay", nullptr, "");
+    t = std::thread(&Mobile::mobileThread, this, "EventDay", nullptr, "");
     t.detach();
 }
 
 void Mobile::triggerEventDusk()
 {
-    std::thread t(&Mobile::mobileThread, this, "EventDusk", nullptr, "");
+    t = std::thread(&Mobile::mobileThread, this, "EventDusk", nullptr, "");
     t.detach();
 }
 
 void Mobile::triggerEventNight()
 {
-    std::thread t(&Mobile::mobileThread, this, "EventNight", nullptr, "");
+    t = std::thread(&Mobile::mobileThread, this, "EventNight", nullptr, "");
     t.detach();
 }
 
 void Mobile::triggerEventDeath()
 {
-    std::thread t(&Mobile::mobileThread, this, "EventDeath", nullptr, "");
+    t = std::thread(&Mobile::mobileThread, this, "EventDeath", nullptr, "");
     t.detach();
 }
 
 void Mobile::triggerEventMain()
 {
-    std::thread t(&Mobile::mobileThread, this, "EventMain", nullptr, "");
+    t = std::thread(&Mobile::mobileThread, this, "EventMain", nullptr, "");
     t.detach();
 }
