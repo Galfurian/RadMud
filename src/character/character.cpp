@@ -1405,10 +1405,10 @@ Item * Character::createCorpse()
     return corpse;
 }
 
-void Character::doCommand(const std::string & command)
+bool Character::doCommand(const std::string & command)
 {
     ArgumentHandler argumentHandler(command);
-    inputProcessor->process(this, argumentHandler);
+    return inputProcessor->process(this, argumentHandler);
 }
 
 Player * Character::toPlayer()

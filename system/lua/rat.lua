@@ -68,13 +68,3 @@ end
 EventMain = function(self)
     -- Put event code here.
 end
-
-GoToCharacter = function(self, character, path)
-    Mud.log("[" .. self.name .. "] Moving to :" .. character.name);
-    if (not path:empty()) then
-        for j = 0, (path:size() - 1) do
-            self:doCommand(path:at(j):toString());
-            Mud.sleep(2);
-        end
-    end
-end

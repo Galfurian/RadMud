@@ -21,6 +21,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "generalAction.hpp"
+#include "character.hpp"
 
 GeneralAction::GeneralAction(Character * _actor) :
     actor(_actor),

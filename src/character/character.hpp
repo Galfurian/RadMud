@@ -549,7 +549,8 @@ public:
 
     /// @brief Handle character input.
     /// @param command Command that need to be handled.
-    void doCommand(const std::string & command);
+    /// @return <b>True</b> if the command has been correctly executed,<br><b>False</b> otherwise.
+    bool doCommand(const std::string & command);
 
     /// @brief Returns the character <b>statically</b> casted to player.
     /// @return The player version of the character.

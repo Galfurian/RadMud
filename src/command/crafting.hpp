@@ -32,15 +32,15 @@ void LoadCraftingCommands();
 /// @{
 
 /// Execute a profession.
-void DoProfession(Character * character, Profession * profession, ArgumentHandler & args);
+bool DoProfession(Character * character, Profession * profession, ArgumentHandler & args);
 
 /// Build something.
-void DoBuild(Character * character, ArgumentHandler & args);
+bool DoBuild(Character * character, ArgumentHandler & args);
 
 /// Deconstruct something.
-void DoDeconstruct(Character * character, ArgumentHandler & args);
+bool DoDeconstruct(Character * character, ArgumentHandler & args);
 
 /// The character read a book.
-void DoRead(Character * character, ArgumentHandler & args);
+bool DoRead(Character * character, ArgumentHandler & args);
 
 ///@}

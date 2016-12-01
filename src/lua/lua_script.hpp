@@ -47,6 +47,8 @@ void LuaSleep(int sleepTime);
 /// @return The generated random value.
 int LuaRandom(int min, int max);
 
+void LuaStopScript();
+
 /// @brief Register in Lua all the functions.
 /// @param L The lua state.
 void LuaRegisterUtils(lua_State * L);

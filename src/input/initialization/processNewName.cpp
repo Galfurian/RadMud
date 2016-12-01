@@ -25,7 +25,7 @@
 #include "processPlayerName.hpp"
 #include "processNewPassword.hpp"
 
-void ProcessNewName::process(Character * character, ArgumentHandler & args)
+bool ProcessNewName::process(Character * character, ArgumentHandler & args)
 {
     auto player = character->toPlayer();
     auto input = args.getOriginal();
@@ -42,6 +42,7 @@ void ProcessNewName::process(Character * character, ArgumentHandler & args)
         player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->rollBack(character);
+        return true;
     }
     else if (input.find_first_not_of(VALID_CHARACTERS_NAME) != std::string::npos)
     {
@@ -69,7 +70,9 @@ void ProcessNewName::process(Character * character, ArgumentHandler & args)
         player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->advance(character);
+        return true;
     }
+    return false;
 }
 
 void ProcessNewName::advance(Character * character, const std::string & error)

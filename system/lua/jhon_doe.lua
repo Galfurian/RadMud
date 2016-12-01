@@ -2,6 +2,7 @@
 --local luann = require("luann")
 package.path = package.path .. ";../system/lua/lib/?.lua"
 require 'explorer'
+require 'utils'
 
 local JhonExplorer = Explorer()
 
@@ -149,6 +150,9 @@ end
 --- Search for an axe inside the given room.
 -- @param self The character searching for the axe.
 SearchAxeRoom = function(self)
+    if self.room == nil then
+        Mud.stop()
+    end
     -- Get the list of items inside the current room.
     for itemKey, item in pairs(self.room:getItems()) do
         if (CheckIfItemIsAnAxe(item)) then
@@ -169,23 +173,10 @@ EquipPosessedAxe = function(self)
     end
     for itemKey, item in pairs(self:getInventoryItems()) do
         if (CheckIfItemIsAnAxe(item)) then
-            self:doCommand("wield " .. item.vnum)
-            return true
+            return self:doCommand("wield " .. item.vnum)
         end
     end
     return false
-end
-
---- Move the character through the given path.
--- @param self The character to move.
--- @param path The path to follow.
-GetToDestination = function(self, path)
-    for directionKey, direction in pairs(path) do
-        Mud.log("[" .. self.name .. "] Movind " .. direction:toString())
-        self:doCommand(direction:toString())
-        Mud.sleep(Mud.random(4, 8))
-    end
-    Mud.log("[" .. self.name .. "] Reached destination!")
 end
 
 --- Check if the given item is an axe.

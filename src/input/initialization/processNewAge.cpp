@@ -25,7 +25,7 @@
 #include "processNewDescription.hpp"
 #include "processNewGender.hpp"
 
-void ProcessNewAge::process(Character * character, ArgumentHandler & args)
+bool ProcessNewAge::process(Character * character, ArgumentHandler & args)
 {
     // Transform the character into player.
     auto player = character->toPlayer();
@@ -44,6 +44,7 @@ void ProcessNewAge::process(Character * character, ArgumentHandler & args)
     else if (!IsNumber(input))
     {
         this->advance(character, "Not a valid age.");
+        return false;
     }
     else
     {
@@ -51,11 +52,14 @@ void ProcessNewAge::process(Character * character, ArgumentHandler & args)
         if (age < 18)
         {
             this->advance(character, "A creature so young is not suitable for a world so wicked.");
+            return false;
         }
         else if (50 < age)
         {
             this->advance(character,
                           "Life expectancy in this world is 70 years, in order to still be competitive you can choose 50 years at most.");
+
+            return false;
         }
         else
         {
@@ -68,6 +72,7 @@ void ProcessNewAge::process(Character * character, ArgumentHandler & args)
             newStep->advance(character);
         }
     }
+    return true;
 }
 
 void ProcessNewAge::advance(Character * character, const std::string & error)

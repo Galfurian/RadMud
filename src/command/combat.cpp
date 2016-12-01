@@ -106,7 +106,7 @@ void LoadCombatCommands()
     }
 }
 
-void DoKill(Character * character, ArgumentHandler & args)
+bool DoKill(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -114,20 +114,20 @@ void DoKill(Character * character, ArgumentHandler & args)
     if (args.size() != 1)
     {
         character->sendMsg("You have to specify whom to kill.\n");
+        return false;
     }
     // Retrieve the target.
-    auto target = character->room->findCharacter(args[0].getContent(), args[0].getIndex(), {
-        character});
+    auto target = character->room->findCharacter(args[0].getContent(), args[0].getIndex(), {character});
     if (!target)
     {
         character->sendMsg("You don't see '%s' anywhere.\n", args[0].getContent());
-        return;
+        return false;
     }
     // Check if the attacker can see the target.
     if (!character->canSee(target))
     {
         character->sendMsg("You don't see '%s' anywhere.\n", args[0].getContent());
-        return;
+        return false;
     }
     // Check if the two characters are both already in combat.
     if (character->getAction()->getType() == ActionType::Combat)
@@ -142,13 +142,14 @@ void DoKill(Character * character, ArgumentHandler & args)
                 if (predefinedTarget == target)
                 {
                     character->sendMsg("You are already doing your best to kill %s!\n", target->getName());
-                    return;
+                    return false;
                 }
             }
             // Set the target as predefined target.
             character->combatHandler.setPredefinedTarget(target);
             // Notify to the character.
             character->sendMsg("You focus your attacks on %s!\n", target->getName());
+            return true;
         }
         else
         {
@@ -171,21 +172,23 @@ void DoKill(Character * character, ArgumentHandler & args)
             character->combatHandler.setPredefinedTarget(target);
             // Notify the character.
             character->sendMsg("You attack %s.\n", target->getName());
+            return true;
         }
         else
         {
             character->sendMsg("You were not able to attack %s.\n", target->getName());
         }
     }
+    return false;
 }
 
-void DoFlee(Character * character, ArgumentHandler & /*args*/)
+bool DoFlee(Character * character, ArgumentHandler & /*args*/)
 {
     // Check if the character is in combat.
     if (character->getAction()->getType() != ActionType::Combat)
     {
         character->sendMsg("You are not fighting.\n");
-        return;
+        return false;
     }
     // Check if the actor is already trying to flee.
     if (character->getAction()->getType() == ActionType::Combat)
@@ -194,7 +197,7 @@ void DoFlee(Character * character, ArgumentHandler & /*args*/)
         if (character->getAction()->toCombatAction()->getCombatActionType() == CombatActionType::Flee)
         {
             character->sendMsg("You are already trying to flee.\n");
-            return;
+            return false;
         }
     }
     auto flee = std::make_shared<Flee>(character);
@@ -205,14 +208,13 @@ void DoFlee(Character * character, ArgumentHandler & /*args*/)
         character->setAction(flee);
         // Notify the character.
         character->sendMsg("You prepare to flee...\n");
+        return true;
     }
-    else
-    {
-        character->sendMsg(error + "\n");
-    }
+    character->sendMsg(error + "\n");
+    return false;
 }
 
-void DoScout(Character * character, ArgumentHandler & /*args*/)
+bool DoScout(Character * character, ArgumentHandler & /*args*/)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -225,21 +227,20 @@ void DoScout(Character * character, ArgumentHandler & /*args*/)
         character->sendMsg("You start scouting the area...\n");
         // Set the new action.
         character->setAction(newAction);
+        return true;
     }
-    else
-    {
-        character->sendMsg("%s\n", error);
-    }
+    character->sendMsg("%s\n", error);
+    return false;
 }
 
-void DoLoad(Character * character, ArgumentHandler & args)
+bool DoLoad(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
     if (args.size() != 2)
     {
         character->sendMsg("What do you want to load with what?\n");
-        return;
+        return false;
     }
     // Search the magazine.
     auto itemToLoad = character->findEquipmentItem(args[0].getContent(), args[0].getIndex());
@@ -249,14 +250,14 @@ void DoLoad(Character * character, ArgumentHandler & args)
         if (itemToLoad == nullptr)
         {
             character->sendMsg("You don't have %s.\n", args[0].getContent());
-            return;
+            return false;
         }
     }
     // Check if the item is a magazine.
     if (itemToLoad->getType() != ModelType::Magazine)
     {
         character->sendMsg("You can't load %s.\n", itemToLoad->getName(true));
-        return;
+        return false;
     }
     // Transform the item into a magazine.
     auto magazine = itemToLoad->toMagazineItem();
@@ -268,7 +269,7 @@ void DoLoad(Character * character, ArgumentHandler & args)
         if (projectile == nullptr)
         {
             character->sendMsg("You don't have %s.\n", args[1].getContent());
-            return;
+            return false;
         }
     }
     // Check if the projectiles can be loaded inside the magazine.
@@ -277,7 +278,7 @@ void DoLoad(Character * character, ArgumentHandler & args)
     if (!magazine->getAmountToLoad(projectile, ammountToLoad, error))
     {
         character->sendMsg("%s\n", error);
-        return;
+        return false;
     }
     // Create the load action.
     auto newAction = std::make_shared<LoadAction>(character, magazine, projectile, ammountToLoad);
@@ -291,21 +292,20 @@ void DoLoad(Character * character, ArgumentHandler & args)
                            projectile->getName(true));
         // Set the new action.
         character->setAction(newAction);
+        return true;
     }
-    else
-    {
-        character->sendMsg("%s\n", error);
-    }
+    character->sendMsg("%s\n", error);
+    return false;
 }
 
-void DoUnload(Character * character, ArgumentHandler & args)
+bool DoUnload(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
     if (args.size() != 1)
     {
         character->sendMsg("What do you want to unload?\n");
-        return;
+        return false;
     }
     // Search the magazine.
     auto itemToUnload = character->findEquipmentItem(args[0].getContent(), args[0].getIndex());
@@ -315,19 +315,19 @@ void DoUnload(Character * character, ArgumentHandler & args)
         if (itemToUnload == nullptr)
         {
             character->sendMsg("You don't have %s.\n", args[0].getContent());
-            return;
+            return false;
         }
     }
     // Check if the item is a magazine or a ranged weapon.
     if ((itemToUnload->getType() != ModelType::Magazine) && (itemToUnload->getType() != ModelType::RangedWeapon))
     {
         character->sendMsg("You can't unload %s.\n", itemToUnload->getName(true));
-        return;
+        return false;
     }
     if (itemToUnload->isEmpty())
     {
         character->sendMsg("%s is already empty...\n", itemToUnload->getNameCapital(true));
-        return;
+        return false;
     }
     // Set the required time to unloaded the item.
     if (itemToUnload->getType() == ModelType::Magazine)
@@ -337,7 +337,7 @@ void DoUnload(Character * character, ArgumentHandler & args)
         {
             character->sendMsg("Something is gone wrong while you were unloading %s...\n\n",
                                itemToUnload->getName(true));
-            return;
+            return false;
         }
     }
     // Create the unload action.
@@ -350,21 +350,20 @@ void DoUnload(Character * character, ArgumentHandler & args)
         character->sendMsg("You start unloading %s.\n", itemToUnload->getName(true));
         // Set the new action.
         character->setAction(newAction);
+        return true;
     }
-    else
-    {
-        character->sendMsg("%s\n", error);
-    }
+    character->sendMsg("%s\n", error);
+    return false;
 }
 
-void DoReload(Character * character, ArgumentHandler & args)
+bool DoReload(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
     if (args.size() != 2)
     {
         character->sendMsg("What do you want to reload with what?\n");
-        return;
+        return false;
     }
     auto itemToReload = character->findEquipmentItem(args[0].getContent(), args[0].getIndex());
     if (itemToReload == nullptr)
@@ -373,13 +372,13 @@ void DoReload(Character * character, ArgumentHandler & args)
         if (itemToReload == nullptr)
         {
             character->sendMsg("You don't have %s.\n", args[0].getContent());
-            return;
+            return false;
         }
     }
     if (itemToReload->getType() != ModelType::RangedWeapon)
     {
         character->sendMsg("You can't reload %s.\n", itemToReload->getName(true));
-        return;
+        return false;
     }
     // Transform the item into a ranged weapons.
     auto rangedWeapon = itemToReload->toRangedWeaponItem();
@@ -391,7 +390,7 @@ void DoReload(Character * character, ArgumentHandler & args)
         if (magazine == nullptr)
         {
             character->sendMsg("You don't have %s.\n", args[1].getContent());
-            return;
+            return false;
         }
     }
     if (magazine->getType() != ModelType::Magazine)
@@ -399,7 +398,7 @@ void DoReload(Character * character, ArgumentHandler & args)
         character->sendMsg("You can't reload %s with %s.\n",
                            rangedWeapon->getName(true),
                            magazine->getName(true));
-        return;
+        return false;
     }
     auto newAction = std::make_shared<ReloadAction>(character, rangedWeapon, magazine);
     std::string error;
@@ -412,26 +411,25 @@ void DoReload(Character * character, ArgumentHandler & args)
                            magazine->getName(true));
         // Set the new action.
         character->setAction(newAction);
+        return true;
     }
-    else
-    {
-        character->sendMsg("%s\n", error);
-    }
+    character->sendMsg("%s\n", error);
+    return false;
 }
 
-void DoAim(Character * character, ArgumentHandler & args)
+bool DoAim(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
     if (args.size() != 1)
     {
         character->sendMsg("Who or what do you want to aim?\n");
-        return;
+        return false;
     }
     if (character->getActiveRangedWeapons().empty())
     {
         character->sendMsg("You don't have a ranged weapon equipped.\n");
-        return;
+        return false;
     }
     // Prepare a pointer to the aimed character.
     Character * aimedCharacter = nullptr;
@@ -444,7 +442,7 @@ void DoAim(Character * character, ArgumentHandler & args)
     if (aimedCharacter == nullptr)
     {
         character->sendMsg("You don't see '%s' anywhere...\n", args[0].getContent());
-        return;
+        return false;
     }
     // Check the room of the target.
     if (aimedCharacter->room == nullptr)
@@ -465,6 +463,7 @@ void DoAim(Character * character, ArgumentHandler & args)
                 character->sendMsg("You start aiming at %s...\n", aimedCharacter->getName());
                 // Set the new action.
                 character->setAction(newAction);
+                return true;
             }
             else
             {
@@ -476,9 +475,10 @@ void DoAim(Character * character, ArgumentHandler & args)
             character->sendMsg("%s is out of your line of sight...\n", aimedCharacter->getNameCapital());
         }
     }
+    return false;
 }
 
-void DoFire(Character * character, ArgumentHandler & /*args*/)
+bool DoFire(Character * character, ArgumentHandler & /*args*/)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -486,14 +486,14 @@ void DoFire(Character * character, ArgumentHandler & /*args*/)
     if (character->combatHandler.getAimedTarget() == nullptr)
     {
         character->sendMsg("You first need to aim at someone or something.\n");
-        return;
+        return false;
     }
     auto aimedTarget = character->combatHandler.getAimedTarget();
     // Check if the target is still in sight.
     if (!character->isAtRange(character->combatHandler.getAimedTarget(), character->getViewDistance()))
     {
         character->sendMsg("%s is out of your line of sight...\n", aimedTarget->getNameCapital());
-        return;
+        return false;
     }
     // Retrive the active ranged weapons.
     auto rangedWeapons = character->getActiveRangedWeapons();
@@ -501,7 +501,7 @@ void DoFire(Character * character, ArgumentHandler & /*args*/)
     if (rangedWeapons.empty())
     {
         character->sendMsg("You don't have any ranged weapon equipped.\n");
-        return;
+        return false;
     }
     // For each ranged weapon check if it is able to reach the target.
     bool canAttack = false;
@@ -527,6 +527,7 @@ void DoFire(Character * character, ArgumentHandler & /*args*/)
             // Set the predefined target.
             character->combatHandler.setPredefinedTarget(aimedTarget);
             character->sendMsg("You start firing at %s...\n", aimedTarget->getName());
+            return true;
         }
         else
         {
@@ -537,4 +538,5 @@ void DoFire(Character * character, ArgumentHandler & /*args*/)
     {
         character->sendMsg("%s is out of your reach...\n", aimedTarget->getNameCapital());
     }
+    return false;
 }

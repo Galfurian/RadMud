@@ -46,6 +46,11 @@ int LuaRandom(int min, int max)
     return TRandInteger<int>(min, max);
 }
 
+void LuaStopScript()
+{
+    throw std::logic_error("Stopped Lua Script");
+}
+
 void LuaRegisterUtils(lua_State * L)
 {
     luabridge::getGlobalNamespace(L)
@@ -53,5 +58,6 @@ void LuaRegisterUtils(lua_State * L)
         .addFunction("log", LuaLog)
         .addFunction("sleep", LuaSleep)
         .addFunction("random", LuaRandom)
+        .addFunction("stop", LuaStopScript)
         .endNamespace();
 }

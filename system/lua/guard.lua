@@ -3,19 +3,19 @@ EventInit = function(self)
     -- Put event code here.
     local helm = self.loadItem(self, 1500, 10, Mud.random(1, 5));
     if (helm ~= nil) then
-        self:equipmentAdd(helm);
+        if (not self:equipmentAdd(helm)) then return end
     end
     local cuirass = self.loadItem(self, 1501, 10, Mud.random(1, 5));
     if (cuirass ~= nil) then
-        self:equipmentAdd(cuirass);
+        if (not self:equipmentAdd(cuirass)) then return end
     end
     local greave = self.loadItem(self, 1502, 10, Mud.random(1, 5));
     if (greave ~= nil) then
-        self:equipmentAdd(greave);
+        if (not self:equipmentAdd(greave)) then return end
     end
     local boots = self.loadItem(self, 1503, 10, Mud.random(1, 5));
     if (boots ~= nil) then
-        self:equipmentAdd(boots);
+        if (not self:equipmentAdd(boots)) then return end
     end
 end
 

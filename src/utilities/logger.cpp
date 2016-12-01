@@ -85,12 +85,12 @@ void Logger::log(const LogLevel & level, const std::string & msg)
     if (Logger::getStream().is_open())
     {
         // Write the log message inside the file.
-        Logger::getStream() << "[" << std::hex << std::this_thread::get_id() << "]";
+        Logger::getStream() << "[" << std::this_thread::get_id() << "]";
         Logger::getStream() << "[" << Logger::levelToString(level) << "]";
         Logger::getStream() << "[" << Logger::getDateTime() << "] ";
         Logger::getStream() << msg << "\n";
     }
-    Logger::getOutputStream(level) << "[" << std::hex << std::this_thread::get_id() << "]";
+    Logger::getOutputStream(level) << "[" << std::this_thread::get_id() << "]";
     Logger::getOutputStream(level) << "[" << Logger::levelToString(level) << "]";
     Logger::getOutputStream(level) << "[" << Logger::getDateTime() << "] ";
     Logger::getOutputStream(level) << msg << "\n";

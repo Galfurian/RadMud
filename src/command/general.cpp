@@ -180,7 +180,7 @@ void LoadGeneralCommands()
 
 }
 
-void DoDirection(Character * character, Direction direction)
+bool DoDirection(Character * character, Direction direction)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -188,7 +188,7 @@ void DoDirection(Character * character, Direction direction)
     if (!MoveAction::canMoveTo(character, direction, error, false))
     {
         character->sendMsg(error + "\n");
-        return;
+        return false;
     }
     // Get the destination.
     auto destination = character->room->findExit(direction)->destination;
@@ -212,14 +212,13 @@ void DoDirection(Character * character, Direction direction)
         {
             character->sendMsg("You begin to crawl to %s...\n", direction.toString());
         }
+        return true;
     }
-    else
-    {
-        character->sendMsg("%s\n", error);
-    }
+    character->sendMsg("%s\n", error);
+    return false;
 }
 
-void DoTravel(Character * character, ArgumentHandler & /*args*/)
+bool DoTravel(Character * character, ArgumentHandler & /*args*/)
 {
     // Stop any ongoing action.
     StopAction(character);
@@ -227,22 +226,23 @@ void DoTravel(Character * character, ArgumentHandler & /*args*/)
     if (!HasFlag(character->room->flags, RoomFlag::TravelPoint))
     {
         character->sendMsg("You can't travel from here.\n");
-        return;
+        return false;
     }
     auto destination = Mud::instance().findTravelPoint(character->room);
     if (destination == nullptr)
     {
         character->sendMsg("You can't find an exit from here.\n");
-        return;
+        return false;
     }
     auto msgDepart = character->getNameCapital() + " goes outside.\n";
     auto msgArrive = character->getNameCapital() + " enter the room.\n";
     auto msgChar = "You begin to travel...";
     // Move character.
     character->moveTo(destination, msgDepart, msgArrive, msgChar);
+    return true;
 }
 
-void DoQuit(Character * character, ArgumentHandler & /*args*/)
+bool DoQuit(Character * character, ArgumentHandler & /*args*/)
 {
     // Prevent mobiles to execute this command.
     NoMobile(character);
@@ -265,10 +265,12 @@ void DoQuit(Character * character, ArgumentHandler & /*args*/)
         Logger::log(LogLevel::Global, "Player %s has left the game.", player->getName());
         // End of properly connected.
         player->closeConnection();
+        return true;
     }
+    return false;
 }
 
-void DoWho(Character * character, ArgumentHandler & /*args*/)
+bool DoWho(Character * character, ArgumentHandler & /*args*/)
 {
     Table table = Table();
     table.addColumn("Player", StringAlign::Left);
@@ -294,9 +296,10 @@ void DoWho(Character * character, ArgumentHandler & /*args*/)
         Formatter::yellow(),
         Formatter::reset(),
         ToString(table.getNumRows()));
+    return true;
 }
 
-void DoSet(Character * character, ArgumentHandler & args)
+bool DoSet(Character * character, ArgumentHandler & args)
 {
     if (args.empty())
     {
@@ -316,24 +319,28 @@ void DoSet(Character * character, ArgumentHandler & args)
                 character->description = newDescription;
                 character->sendMsg("You had set your description:\n");
                 character->sendMsg(character->description + "\n");
+                return true;
             }
         }
     }
     character->sendMsg("Usage: set <opt> <arguments>  \n");
     character->sendMsg("       ---------------------  \n");
     character->sendMsg("            des  [description]\n");
+    return false;
 }
 
-void DoStop(Character * character, ArgumentHandler & /*args*/)
+bool DoStop(Character * character, ArgumentHandler & /*args*/)
 {
     if (character->getAction()->getType() != ActionType::Combat)
     {
         character->sendMsg(character->getAction()->stop() + "\n");
         character->popAction();
+        return true;
     }
+    return false;
 }
 
-void DoLook(Character * character, ArgumentHandler & args)
+bool DoLook(Character * character, ArgumentHandler & args)
 {
     // If there are no arguments, show the room.
     if (args.empty())
@@ -356,13 +363,14 @@ void DoLook(Character * character, ArgumentHandler & args)
                     // Notify to other character, that this one are looking at him.
                     target->sendMsg("%s looks at you.\n\n", character->getNameCapital());
                 }
-                return;
+                return true;
             }
         }
         auto item = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
-        if (item)
+        if (item != nullptr)
         {
             character->sendMsg(item->getLook());
+            return true;
         }
         else
         {
@@ -371,10 +379,9 @@ void DoLook(Character * character, ArgumentHandler & args)
     }
     else if (args.size() == 2)
     {
-        auto target = character->room->findCharacter(args[1].getContent(), args[1].getIndex(), {
-            character});
+        auto target = character->room->findCharacter(args[1].getContent(), args[1].getIndex(), {character});
         auto container = character->findNearbyItem(args[1].getContent(), args[1].getIndex());
-        if (target)
+        if (target != nullptr)
         {
             if (character->canSee(target))
             {
@@ -382,6 +389,7 @@ void DoLook(Character * character, ArgumentHandler & args)
                 if (item != nullptr)
                 {
                     character->sendMsg(item->getLook());
+                    return true;
                 }
                 else
                 {
@@ -406,6 +414,7 @@ void DoLook(Character * character, ArgumentHandler & args)
                 if (item)
                 {
                     character->sendMsg(item->getLook());
+                    return true;
                 }
                 else
                 {
@@ -428,9 +437,10 @@ void DoLook(Character * character, ArgumentHandler & args)
     {
         character->sendMsg("You don't remeber how to look?\n");
     }
+    return false;
 }
 
-void DoHelp(Character * character, ArgumentHandler & args)
+bool DoHelp(Character * character, ArgumentHandler & args)
 {
     if (args.empty())
     {
@@ -505,15 +515,17 @@ void DoHelp(Character * character, ArgumentHandler & args)
                     msg += Formatter::yellow() + " Help      : " + Formatter::reset()
                            + iterator.help + "\n";
                     character->sendMsg(msg);
-                    return;
+                    return true;
                 }
             }
         }
         character->sendMsg("There is no help for '%s'.\n", args.getOriginal());
+        return false;
     }
+    return true;
 }
 
-void DoPrompt(Character * character, ArgumentHandler & args)
+bool DoPrompt(Character * character, ArgumentHandler & args)
 {
     NoMobile(character);
     auto player = character->toPlayer();
@@ -522,31 +534,36 @@ void DoPrompt(Character * character, ArgumentHandler & args)
         character->sendMsg("Current prompt:\n");
         character->sendMsg("    %s\n", player->prompt);
         character->sendMsg("Type %sprompt help %sto read the guide.\n", Formatter::yellow(), Formatter::reset());
-        return;
     }
-    if (args[0].getContent() == "help")
+    else
     {
-        std::string msg;
-        std::string ITL = Formatter::italic(), RES = Formatter::reset();
-        msg += Formatter::yellow() + "Prompt Help" + Formatter::reset() + "\n";
-        msg += "You can set the prompt you prefer, respectfully to this constraints:\n";
-        msg += " - Not more than 15 characters.\n";
-        msg += "\n";
-        msg += "You can use the following shortcuts in you prompt:\n";
-        msg += "    " + ITL + "&n" + RES + " - Player name.\n";
-        msg += "    " + ITL + "&N" + RES + " - Player name capitalized.\n";
-        msg += "    " + ITL + "&h" + RES + " - Player current health.\n";
-        msg += "    " + ITL + "&H" + RES + " - Player maximum health.\n";
-        msg += "    " + ITL + "&s" + RES + " - Player current stamina.\n";
-        msg += "    " + ITL + "&S" + RES + " - Player maximum stamina.\n";
-        msg += "    " + ITL + "&T" + RES + " - Currently aimed character.\n";
-        player->sendMsg(msg);
-        return;
+        if (args[0].getContent() == "help")
+        {
+            std::string msg;
+            std::string ITL = Formatter::italic(), RES = Formatter::reset();
+            msg += Formatter::yellow() + "Prompt Help" + Formatter::reset() + "\n";
+            msg += "You can set the prompt you prefer, respectfully to this constraints:\n";
+            msg += " - Not more than 15 characters.\n";
+            msg += "\n";
+            msg += "You can use the following shortcuts in you prompt:\n";
+            msg += "    " + ITL + "&n" + RES + " - Player name.\n";
+            msg += "    " + ITL + "&N" + RES + " - Player name capitalized.\n";
+            msg += "    " + ITL + "&h" + RES + " - Player current health.\n";
+            msg += "    " + ITL + "&H" + RES + " - Player maximum health.\n";
+            msg += "    " + ITL + "&s" + RES + " - Player current stamina.\n";
+            msg += "    " + ITL + "&S" + RES + " - Player maximum stamina.\n";
+            msg += "    " + ITL + "&T" + RES + " - Currently aimed character.\n";
+            player->sendMsg(msg);
+        }
+        else
+        {
+            player->prompt = args.substr(0);
+        }
     }
-    player->prompt = args.substr(0);
+    return true;
 }
 
-void DoTime(Character * character, ArgumentHandler & /*args*/)
+bool DoTime(Character * character, ArgumentHandler & /*args*/)
 {
     if (MudUpdater::instance().getDayPhase() == DayPhase::Morning)
     {
@@ -565,74 +582,80 @@ void DoTime(Character * character, ArgumentHandler & /*args*/)
     {
         character->sendMsg("%sThe darkness surrounds you.%s\n", Formatter::blue(), Formatter::reset());
     }
+    return true;
 }
 
-void DoStand(Character * character, ArgumentHandler & /*args*/)
+bool DoStand(Character * character, ArgumentHandler & /*args*/)
 {
     // Stop any action the character is executing.
     StopAction(character);
     if (character->posture == CharacterPosture::Stand)
     {
         character->sendMsg("You are already standing.\n");
-        return;
+        return false;
     }
     character->posture = CharacterPosture::Stand;
     character->sendMsg("You stand up.\n");
+    return true;
 }
 
-void DoCrouch(Character * character, ArgumentHandler & /*args*/)
+bool DoCrouch(Character * character, ArgumentHandler & /*args*/)
 {
     // Stop any action the character is executing.
     StopAction(character);
     if (character->posture == CharacterPosture::Crouch)
     {
         character->sendMsg("You are already crouched.\n");
-        return;
+        return false;
     }
     character->posture = CharacterPosture::Crouch;
     character->sendMsg("You put yourself crouched.\n");
+    return true;
 }
 
-void DoSit(Character * character, ArgumentHandler & /*args*/)
+bool DoSit(Character * character, ArgumentHandler & /*args*/)
 {
     // Stop any action the character is executing.
     StopAction(character);
     if (character->posture == CharacterPosture::Sit)
     {
         character->sendMsg("You are already seated.\n");
-        return;
+        return false;
     }
     character->posture = CharacterPosture::Sit;
     character->sendMsg("You sit down.\n");
+    return true;
 }
 
-void DoProne(Character * character, ArgumentHandler & /*args*/)
+bool DoProne(Character * character, ArgumentHandler & /*args*/)
 {
     // Stop any action the character is executing.
     StopAction(character);
     if (character->posture == CharacterPosture::Prone)
     {
         character->sendMsg("You are already prone.\n");
-        return;
+        return false;
     }
     character->posture = CharacterPosture::Prone;
     character->sendMsg("You put yourself prone.\n");
+    return true;
 }
 
-void DoRest(Character * character, ArgumentHandler & /*args*/)
+bool DoRest(Character * character, ArgumentHandler & /*args*/)
 {
     // Stop any action the character is executing.
     StopAction(character);
     if (character->posture == CharacterPosture::Rest)
     {
         character->sendMsg("You are already resting.\n");
-        return;
+        return false;
     }
     character->posture = CharacterPosture::Rest;
     character->sendMsg("You lie down.\n");
+    return true;
 }
 
-void DoStatistics(Character * character, ArgumentHandler & /*args*/)
+bool DoStatistics(Character * character, ArgumentHandler & /*args*/)
 {
     NoMobile(character);
     auto player = character->toPlayer();
@@ -693,9 +716,10 @@ void DoStatistics(Character * character, ArgumentHandler & /*args*/)
         msg += "You are aiming at " + BLD + player->combatHandler.getAimedTarget()->getName() + RES + ".\n";
     }
     player->sendMsg(msg);
+    return true;
 }
 
-void DoRent(Character * character, ArgumentHandler & /*args*/)
+bool DoRent(Character * character, ArgumentHandler & /*args*/)
 {
     NoMobile(character);
     auto player = character->toPlayer();
@@ -703,16 +727,17 @@ void DoRent(Character * character, ArgumentHandler & /*args*/)
     if (!HasFlag(player->room->flags, RoomFlag::Rent))
     {
         character->sendMsg("You can't rent here.\n");
-        return;
+        return false;
     }
     else
     {
         player->rent_room = player->room->vnum;
         player->doCommand("quit");
     }
+    return true;
 }
 
-void DoSkills(Character * character, ArgumentHandler & /*args*/)
+bool DoSkills(Character * character, ArgumentHandler & /*args*/)
 {
     NoMobile(character);
     auto player = character->toPlayer();
@@ -728,9 +753,10 @@ void DoSkills(Character * character, ArgumentHandler & /*args*/)
         }
     }
     character->sendMsg(table.getTable());
+    return true;
 }
 
-void DoServer(Character * character, ArgumentHandler & /*args*/)
+bool DoServer(Character * character, ArgumentHandler & /*args*/)
 {
     std::string msg = "    Mud         : RadMud.\n";
     msg += "    Version     : ";
@@ -756,4 +782,5 @@ void DoServer(Character * character, ArgumentHandler & /*args*/)
     msg += "    News        : " + ToString(Mud::instance().mudNews.size()) + "\n";
     msg += "    Commands    : " + ToString(Mud::instance().mudCommands.size()) + "\n";
     character->sendMsg(msg);
+    return true;
 }

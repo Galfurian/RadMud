@@ -25,7 +25,7 @@
 #include "formatter.hpp"
 #include "player.hpp"
 
-void ProcessNewPassword::process(Character * character, ArgumentHandler & args)
+bool ProcessNewPassword::process(Character * character, ArgumentHandler & args)
 {
     auto player = character->toPlayer();
     auto input = args.getOriginal();
@@ -42,6 +42,7 @@ void ProcessNewPassword::process(Character * character, ArgumentHandler & args)
         player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->rollBack(character);
+        return true;
     }
     else if (input.find_first_not_of(VALID_CHARACTERS_NAME) != std::string::npos)
     {
@@ -56,7 +57,9 @@ void ProcessNewPassword::process(Character * character, ArgumentHandler & args)
         player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->advance(character);
+        return true;
     }
+    return false;
 }
 
 void ProcessNewPassword::advance(Character * character, const std::string & error)

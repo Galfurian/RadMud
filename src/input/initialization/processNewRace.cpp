@@ -25,7 +25,7 @@
 #include "processNewStory.hpp"
 #include "processNewAttributes.hpp"
 
-void ProcessNewRace::process(Character * character, ArgumentHandler & args)
+bool ProcessNewRace::process(Character * character, ArgumentHandler & args)
 {
     auto player = character->toPlayer();
     // Player_password can't be blank.
@@ -41,6 +41,7 @@ void ProcessNewRace::process(Character * character, ArgumentHandler & args)
         player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->rollBack(character);
+        return true;
     }
     else if (BeginWith(ToLower(args[0].getContent()), "help"))
     {
@@ -71,6 +72,7 @@ void ProcessNewRace::process(Character * character, ArgumentHandler & args)
                 helpMessage += "  Constitution " + ToString(race->getAbility(Ability::Constitution)) + "\n";
                 helpMessage += "  Intelligence " + ToString(race->getAbility(Ability::Intelligence)) + "\n";
                 this->advance(character, helpMessage);
+                return true;
             }
         }
     }
@@ -107,8 +109,10 @@ void ProcessNewRace::process(Character * character, ArgumentHandler & args)
             player->inputProcessor = newStep;
             // Advance to the next step.
             newStep->advance(character);
+            return true;
         }
     }
+    return false;
 }
 
 void ProcessNewRace::advance(Character * character, const std::string & error)

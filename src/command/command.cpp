@@ -48,7 +48,7 @@ Command::Command(const bool & _gods,
                  const std::string & _name,
                  const std::string & _help,
                  const std::string & _arguments,
-                 const std::function<void(Character * character, ArgumentHandler & args)> & _hndl,
+                 const std::function<bool(Character * character, ArgumentHandler & args)> & _hndl,
                  const bool & _canUseInCombat,
                  const bool & _typedCompletely) :
     gods(_gods),
@@ -86,7 +86,7 @@ Command & Command::setArgs(const std::string & _arguments)
     return *this;
 }
 
-Command & Command::setHndl(const std::function<void(Character * character, ArgumentHandler & args)> & _hndl)
+Command & Command::setHndl(const std::function<bool(Character * character, ArgumentHandler & args)> & _hndl)
 {
     hndl = _hndl;
     return *this;

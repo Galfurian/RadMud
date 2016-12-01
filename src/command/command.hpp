@@ -44,7 +44,7 @@ public:
             const std::string & _name,
             const std::string & _help,
             const std::string & _arguments,
-            const std::function<void(Character * character, ArgumentHandler & args)> & _hndl,
+            const std::function<bool(Character * character, ArgumentHandler & args)> & _hndl,
             const bool & _canUseInCombat,
             const bool & _typedCompletely);
 
@@ -61,7 +61,7 @@ public:
     Command & setArgs(const std::string & _arguments);
 
     /// @brief Set the functions used to implement the command.
-    Command & setHndl(const std::function<void(Character * character, ArgumentHandler & args)> & _hndl);
+    Command & setHndl(const std::function<bool(Character * character, ArgumentHandler & args)> & _hndl);
 
     /// @brief Set if the command can be used in combat.
     Command & setCanUseInCombat(const bool & _canUseInCombat);
@@ -84,7 +84,7 @@ public:
     /// The arguemtns of the command.
     std::string arguments;
     /// The handler of the command.
-    std::function<void(Character * character, ArgumentHandler & args)> hndl;
+    std::function<bool(Character * character, ArgumentHandler & args)> hndl;
     /// Flag which determines if the command can be used in combat.
     bool canUseInCombat;
     /// Flag which determines if the command must be typed completely.

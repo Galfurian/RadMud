@@ -24,7 +24,7 @@
 #include "mud.hpp"
 #include "processNewWeight.hpp"
 
-void ProcessNewConfirm::process(Character * character, ArgumentHandler & args)
+bool ProcessNewConfirm::process(Character * character, ArgumentHandler & args)
 {
     auto player = character->toPlayer();
     auto input = args.getOriginal();
@@ -36,6 +36,7 @@ void ProcessNewConfirm::process(Character * character, ArgumentHandler & args)
         player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->rollBack(character);
+        return true;
     }
     else if (ToLower(input) == "confirm")
     {
@@ -53,17 +54,16 @@ void ProcessNewConfirm::process(Character * character, ArgumentHandler & args)
             player->enterGame();
             // Set the connection state to playing.
             player->connectionState = ConnectionState::Playing;
+            return true;
         }
-        else
-        {
-            player->closeConnection();
-        }
+        player->closeConnection();
         SQLiteDbms::instance().endTransaction();
     }
     else
     {
         this->advance(character, "You must write 'confirm' if you agree.");
     }
+    return false;
 }
 
 void ProcessNewConfirm::advance(Character * character, const std::string & error)
