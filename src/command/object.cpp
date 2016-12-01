@@ -195,6 +195,11 @@ bool DoTake(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
+    if ((args.size() != 1) && (args.size() != 2))
+    {
+        character->sendMsg("Wrong number of parameters.\n");
+        return false;
+    }
     // Try to take the item inside the room.
     if (args.size() == 1)
     {
@@ -248,245 +253,226 @@ bool DoTake(Character * character, ArgumentHandler & args)
                                            character->getSubjectPronoun());
                 return true;
             }
-            else
-            {
-                character->sendMsg("You've picked up nothing.\n");
-            }
+            character->sendMsg("You've picked up nothing.\n");
+            return false;
         }
-        else
+        auto item = character->room->findItem(args[0].getContent(), args[0].getIndex());
+        // If the item is null.
+        if (item == nullptr)
         {
-            auto item = character->room->findItem(args[0].getContent(), args[0].getIndex());
-            // If the item is null.
-            if (item == nullptr)
+            // Try to check if the character is a mobile, since mobiles can take
+            //  items by providing the specific vnum.
+            if (character->isMobile() && IsNumber(args[0].getContent()))
             {
-                // Try to check if the character is a mobile, since mobiles can take
-                //  items by providing the specific vnum.
-                if (character->isMobile() && IsNumber(args[0].getContent()))
+                for (auto it : character->room->items)
                 {
-                    for (auto it : character->room->items)
+                    if (it->vnum == ToNumber<int>(args[0].getContent()))
                     {
-                        if (it->vnum == ToNumber<int>(args[0].getContent()))
-                        {
-                            item = it;
-                        }
+                        item = it;
                     }
                 }
-                // Check if the item is still null.
-                if (item == nullptr)
-                {
-                    character->sendMsg("You don't see that item inside the room.\n");
-                    return false;
-                }
             }
-            // Check if the item has the flag Static.
-            if (HasFlag(item->model->modelFlags, ModelFlag::Static))
+            // Check if the item is still null.
+            if (item == nullptr)
             {
-                character->sendMsg("You can't pick up %s!\n", item->getName(true));
+                character->sendMsg("You don't see that item inside the room.\n");
                 return false;
             }
-            if (HasFlag(item->flags, ItemFlag::Built))
-            {
-                character->sendMsg("You can't pick up something which is built!\n");
-                return false;
-            }
-            // Set the quantity.
-            auto quantity = args[0].getMultiplier();
-            if (item->quantity < quantity)
-            {
-                quantity = item->quantity;
-            }
-            // Check if the player can carry the item.
-            if (!character->canCarry(item, quantity))
-            {
-                character->sendMsg("You can't carry %s!\n", item->getName(true));
-                return false;
-            }
-            // Start a transaction.
-            SQLiteDbms::instance().beginTransaction();
-            if (item->quantity <= quantity)
-            {
-                // Remove the item from the room.
-                character->room->removeItem(item);
-                // Add the item to the player's inventory.
-                character->addInventoryItem(item);
-                // Send the messages.
-                character->sendMsg("You take %s.\n", item->getName(true));
-                character->room->sendToAll("%s has picked up %s.\n",
-                                           {character},
-                                           character->getNameCapital(),
-                                           item->getName(true));
-                return true;
-            }
-            else
-            {
-                // Remove a stack from item.
-                auto newStack = item->removeFromStack(character, quantity);
-                if (newStack == nullptr)
-                {
-                    character->sendMsg("You failed to drop %s.\n", item->getName(true));
-                    // Rollback the transaction.
-                    SQLiteDbms::instance().rollbackTransection();
-                    return false;
-                }
-                // Add the item to the player's inventory.
-                character->addInventoryItem(newStack);
-                // Send the messages.
-                character->sendMsg("You take a part of %s.\n", item->getName(true));
-                character->room->sendToAll("%s has picked up part of %s.\n",
-                                           {character},
-                                           character->getNameCapital(),
-                                           item->getName(true));
-                return true;
-            }
-            // Conclude the transaction.
-            SQLiteDbms::instance().endTransaction();
         }
-    }
-    else if (args.size() == 2)
-    {
-        auto container = character->findNearbyItem(args[1].getContent(), args[1].getIndex());
-        if (container == nullptr)
+        // Check if the item has the flag Static.
+        if (HasFlag(item->model->modelFlags, ModelFlag::Static))
         {
-            character->sendMsg("You don't see that container.\n");
+            character->sendMsg("You can't pick up %s!\n", item->getName(true));
             return false;
         }
-        if (HasFlag(container->flags, ItemFlag::Locked))
+        if (HasFlag(item->flags, ItemFlag::Built))
         {
-            character->sendMsg("You have first to unlock %s first.\n", container->getName(true));
+            character->sendMsg("You can't pick up something which is built!\n");
             return false;
         }
-        if (HasFlag(container->flags, ItemFlag::Closed))
+        // Set the quantity.
+        auto quantity = args[0].getMultiplier();
+        if (item->quantity < quantity)
         {
-            character->sendMsg("You have first to open %s first.\n", container->getName(true));
+            quantity = item->quantity;
+        }
+        // Check if the player can carry the item.
+        if (!character->canCarry(item, quantity))
+        {
+            character->sendMsg("You can't carry %s!\n", item->getName(true));
             return false;
         }
-        if (ToLower(args[0].getContent()) == "all")
+        // Start a transaction.
+        SQLiteDbms::instance().beginTransaction();
+        if (item->quantity <= quantity)
         {
-            if (container->content.empty())
-            {
-                character->sendMsg("There is nothing inside %s.\n", container->getName(true));
-                return false;
-            }
-            // Make a temporary copy of the character's inventory.
-            auto originalList = container->content;
-            // Start a transaction.
-            SQLiteDbms::instance().beginTransaction();
-            // Used to determine if the character has picked up something.
-            auto takenSomething = false;
-            for (auto iterator : originalList)
-            {
-                // Check if the item is static.
-                if (HasFlag(iterator->model->modelFlags, ModelFlag::Static))
-                {
-                    continue;
-                }
-                // Check if the player can carry the item.
-                if (!character->canCarry(iterator, iterator->quantity))
-                {
-                    continue;
-                }
-                // Remove the item from the container.
-                container->takeOut(iterator);
-                // Add the item to the player's inventory.
-                character->addInventoryItem(iterator);
-                // Set that he has picked up something.
-                takenSomething = true;
-            }
-            // Conclude the transaction.
-            SQLiteDbms::instance().endTransaction();
-            // Handle output only if the player has really taken something.
-            if (takenSomething)
-            {
-                // Send the messages.
-                character->sendMsg("You've taken everything you could from %s.\n", container->getName(true));
-                character->room->sendToAll("%s has taken everything %s could from %s.\n",
-                                           {character},
-                                           character->getNameCapital(),
-                                           character->getSubjectPronoun(),
-                                           container->getName(true));
-                return true;
-            }
-            else
-            {
-                character->sendMsg("You've taken nothing from %s.\n", container->getName(true));
-            }
+            // Remove the item from the room.
+            character->room->removeItem(item);
+            // Add the item to the player's inventory.
+            character->addInventoryItem(item);
+            // Send the messages.
+            character->sendMsg("You take %s.\n", item->getName(true));
+            character->room->sendToAll("%s has picked up %s.\n",
+                                       {character},
+                                       character->getNameCapital(),
+                                       item->getName(true));
         }
         else
         {
-            auto item = container->findContent(args[0].getContent(), args[0].getIndex());
-            if (item == nullptr)
+            // Remove a stack from item.
+            auto newStack = item->removeFromStack(character, quantity);
+            if (newStack == nullptr)
             {
-                character->sendMsg("You don't see that item inside the container.\n");
+                character->sendMsg("You failed to drop %s.\n", item->getName(true));
+                // Rollback the transaction.
+                SQLiteDbms::instance().rollbackTransection();
                 return false;
             }
-            // Check if the item has the flag kNoPick.
-            if (HasFlag(item->model->modelFlags, ModelFlag::Static))
+            // Add the item to the player's inventory.
+            character->addInventoryItem(newStack);
+            // Send the messages.
+            character->sendMsg("You take a part of %s.\n", item->getName(true));
+            character->room->sendToAll("%s has picked up part of %s.\n",
+                                       {character},
+                                       character->getNameCapital(),
+                                       item->getName(true));
+        }
+        // Conclude the transaction.
+        SQLiteDbms::instance().endTransaction();
+        return true;
+    }
+
+    auto container = character->findNearbyItem(args[1].getContent(), args[1].getIndex());
+    if (container == nullptr)
+    {
+        character->sendMsg("You don't see that container.\n");
+        return false;
+    }
+    if (HasFlag(container->flags, ItemFlag::Locked))
+    {
+        character->sendMsg("You have first to unlock %s first.\n", container->getName(true));
+        return false;
+    }
+    if (HasFlag(container->flags, ItemFlag::Closed))
+    {
+        character->sendMsg("You have first to open %s first.\n", container->getName(true));
+        return false;
+    }
+    if (ToLower(args[0].getContent()) == "all")
+    {
+        if (container->content.empty())
+        {
+            character->sendMsg("There is nothing inside %s.\n", container->getName(true));
+            return false;
+        }
+        // Make a temporary copy of the character's inventory.
+        auto originalList = container->content;
+        // Start a transaction.
+        SQLiteDbms::instance().beginTransaction();
+        // Used to determine if the character has picked up something.
+        auto takenSomething = false;
+        for (auto iterator : originalList)
+        {
+            // Check if the item is static.
+            if (HasFlag(iterator->model->modelFlags, ModelFlag::Static))
             {
-                character->sendMsg("You can't pick up this kind of items!\n");
-                return false;
-            }
-            // Set the quantity.
-            auto quantity = args[0].getMultiplier();
-            if (item->quantity < quantity)
-            {
-                quantity = item->quantity;
+                continue;
             }
             // Check if the player can carry the item.
-            if (!character->canCarry(item, quantity))
+            if (!character->canCarry(iterator, iterator->quantity))
             {
-                character->sendMsg("You are not strong enough to carry that object.\n");
-                return false;
+                continue;
             }
-            // Start a transaction.
-            SQLiteDbms::instance().beginTransaction();
-            if (item->quantity <= quantity)
-            {
-                // Remove the item from the container.
-                container->takeOut(item);
-                // Add the item to the player's inventory.
-                character->addInventoryItem(item);
-                // Send the messages.
-                character->sendMsg("You take out %s from %s.\n", item->getName(true), container->getName(true));
-                character->room->sendToAll("%s takes out %s from %s.\n",
-                                           {character},
-                                           character->getNameCapital(),
-                                           item->getName(true),
-                                           container->getName(true));
-                return true;
-            }
-            else
-            {
-                // Remove a stack from item.
-                auto newStack = item->removeFromStack(character, quantity);
-                if (newStack == nullptr)
-                {
-                    character->sendMsg("You failed to take part of %s.\n", item->getName(true));
-                    // Rollback the transaction.
-                    SQLiteDbms::instance().rollbackTransection();
-                    return false;
-                }
-                // Add the item to the player's inventory.
-                character->addInventoryItem(newStack);
-                // Send the messages.
-                character->sendMsg("You take out part of %s from %s.\n",
+            // Remove the item from the container.
+            container->takeOut(iterator);
+            // Add the item to the player's inventory.
+            character->addInventoryItem(iterator);
+            // Set that he has picked up something.
+            takenSomething = true;
+        }
+        // Conclude the transaction.
+        SQLiteDbms::instance().endTransaction();
+        // Handle output only if the player has really taken something.
+        if (takenSomething)
+        {
+            // Send the messages.
+            character->sendMsg("You've taken everything you could from %s.\n", container->getName(true));
+            character->room->sendToAll("%s has taken everything %s could from %s.\n",
+                                       {character},
+                                       character->getNameCapital(),
+                                       character->getSubjectPronoun(),
+                                       container->getName(true));
+            return true;
+        }
+        character->sendMsg("You've taken nothing from %s.\n", container->getName(true));
+        return false;
+    }
+    auto item = container->findContent(args[0].getContent(), args[0].getIndex());
+    if (item == nullptr)
+    {
+        character->sendMsg("You don't see that item inside the container.\n");
+        return false;
+    }
+    // Check if the item has the flag kNoPick.
+    if (HasFlag(item->model->modelFlags, ModelFlag::Static))
+    {
+        character->sendMsg("You can't pick up this kind of items!\n");
+        return false;
+    }
+    // Set the quantity.
+    auto quantity = args[0].getMultiplier();
+    if (item->quantity < quantity)
+    {
+        quantity = item->quantity;
+    }
+    // Check if the player can carry the item.
+    if (!character->canCarry(item, quantity))
+    {
+        character->sendMsg("You are not strong enough to carry that object.\n");
+        return false;
+    }
+    // Start a transaction.
+    SQLiteDbms::instance().beginTransaction();
+    if (item->quantity <= quantity)
+    {
+        // Remove the item from the container.
+        container->takeOut(item);
+        // Add the item to the player's inventory.
+        character->addInventoryItem(item);
+        // Send the messages.
+        character->sendMsg("You take out %s from %s.\n", item->getName(true), container->getName(true));
+        character->room->sendToAll("%s takes out %s from %s.\n",
+                                   {character},
+                                   character->getNameCapital(),
                                    item->getName(true),
                                    container->getName(true));
-                character->room->sendToAll("%s takes out %s from %s.\n",
-                                           {character},
-                                           character->getNameCapital(),
-                                           item->getName(true),
-                                           container->getName(true));
-                return true;
-            }
-            // Conclude the transaction.
-            SQLiteDbms::instance().endTransaction();
-        }
     }
     else
     {
-        character->sendMsg("What do you want to pick up?\n");
+        // Remove a stack from item.
+        auto newStack = item->removeFromStack(character, quantity);
+        if (newStack == nullptr)
+        {
+            character->sendMsg("You failed to take part of %s.\n", item->getName(true));
+            // Rollback the transaction.
+            SQLiteDbms::instance().rollbackTransection();
+            return false;
+        }
+        // Add the item to the player's inventory.
+        character->addInventoryItem(newStack);
+        // Send the messages.
+        character->sendMsg("You take out part of %s from %s.\n",
+                           item->getName(true),
+                           container->getName(true));
+        character->room->sendToAll("%s takes out %s from %s.\n",
+                                   {character},
+                                   character->getNameCapital(),
+                                   item->getName(true),
+                                   container->getName(true));
     }
-    return false;
+    // Conclude the transaction.
+    SQLiteDbms::instance().endTransaction();
+    return true;
 }
 
 bool DoDrop(Character * character, ArgumentHandler & args)
@@ -532,63 +518,58 @@ bool DoDrop(Character * character, ArgumentHandler & args)
                                    character->getPossessivePronoun());
         return true;
     }
+    // Get the item.
+    auto item = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
+    // Check if the player has the item that he want to drop.
+    if (item == nullptr)
+    {
+        character->sendMsg("You don't have that item.\n");
+        return false;
+    }
+    // Set the quantity.
+    auto quantity = args[0].getMultiplier();
+    if (item->quantity < quantity)
+    {
+        quantity = item->quantity;
+    }
+    // Start a transaction.
+    SQLiteDbms::instance().beginTransaction();
+    if (item->quantity <= quantity)
+    {
+        // Remove the item from the player's inventory.
+        character->remInventoryItem(item);
+        // Put the item inside the room.
+        character->room->addItem(item);
+        // Send the messages.
+        character->sendMsg("You drop %s.\n", item->getName(true));
+        character->room->sendToAll("%s has dropped %s.\n",
+                                   {character},
+                                   character->getNameCapital(),
+                                   item->getName(true));
+    }
     else
     {
-        // Get the item.
-        auto item = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
-        // Check if the player has the item that he want to drop.
-        if (item == nullptr)
+        // Remove from the stack.
+        auto newStack = item->removeFromStack(character, quantity);
+        if (newStack == nullptr)
         {
-            character->sendMsg("You don't have that item.\n");
+            character->sendMsg("You failed to drop %s.\n", item->getName(true));
+            // Rollback the transaction.
+            SQLiteDbms::instance().rollbackTransection();
             return false;
         }
-        // Set the quantity.
-        auto quantity = args[0].getMultiplier();
-        if (item->quantity < quantity)
-        {
-            quantity = item->quantity;
-        }
-        // Start a transaction.
-        SQLiteDbms::instance().beginTransaction();
-        if (item->quantity <= quantity)
-        {
-            // Remove the item from the player's inventory.
-            character->remInventoryItem(item);
-            // Put the item inside the room.
-            character->room->addItem(item);
-            // Send the messages.
-            character->sendMsg("You drop %s.\n", item->getName(true));
-            character->room->sendToAll("%s has dropped %s.\n",
-                                       {character},
-                                       character->getNameCapital(),
-                                       item->getName(true));
-            return true;
-        }
-        else
-        {
-            // Remove from the stack.
-            auto newStack = item->removeFromStack(character, quantity);
-            if (newStack == nullptr)
-            {
-                character->sendMsg("You failed to drop %s.\n", item->getName(true));
-                // Rollback the transaction.
-                SQLiteDbms::instance().rollbackTransection();
-                return false;
-            }
-            // Put the item inside the room.
-            character->room->addItem(newStack);
-            // Send the messages.
-            character->sendMsg("You drop part of %s.\n", item->getName(true));
-            character->room->sendToAll("%s has dropped %s.\n",
-                                       {character},
-                                       character->getNameCapital(),
-                                       item->getName(true));
-            return true;
-        }
-        // Conclude the transaction.
-        SQLiteDbms::instance().endTransaction();
+        // Put the item inside the room.
+        character->room->addItem(newStack);
+        // Send the messages.
+        character->sendMsg("You drop part of %s.\n", item->getName(true));
+        character->room->sendToAll("%s has dropped %s.\n",
+                                   {character},
+                                   character->getNameCapital(),
+                                   item->getName(true));
     }
-    return false;
+    // Conclude the transaction.
+    SQLiteDbms::instance().endTransaction();
+    return true;
 }
 
 bool DoGive(Character * character, ArgumentHandler & args)

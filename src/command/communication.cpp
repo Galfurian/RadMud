@@ -96,22 +96,19 @@ bool DoSay(Character * character, ArgumentHandler & args)
         // Eat the space between the name and the message.
         message = Trim(message, " ");
         // Player send.
-        character->sendMsg(
-            "You say to %s, \"%s\"\n",
-            receiver->getName(),
-            Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
+        character->sendMsg("You say to %s, \"%s\"\n",
+                           receiver->getName(),
+                           Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
         // Target receive.
-        receiver->sendMsg(
-            "%s say to you, \"%s\"\n\n",
-            character->getName(),
-            Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
+        receiver->sendMsg("%s say to you, \"%s\"\n\n",
+                          character->getName(),
+                          Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
         // Send the message inside the room.
-        character->room->sendToAll(
-            "%s says to %s, \"%s\".\n",
-            {character, receiver},
-            character->getName(),
-            receiver->getName(),
-            Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
+        character->room->sendToAll("%s says to %s, \"%s\".\n",
+                                   {character, receiver},
+                                   character->getName(),
+                                   receiver->getName(),
+                                   Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
         // If it's a mobile, activate the trigger.
         if (receiver->isMobile())
         {
@@ -120,15 +117,13 @@ bool DoSay(Character * character, ArgumentHandler & args)
     }
     else
     {
-        character->sendMsg(
-            "You say \"%s\".\n",
-            Formatter::cyan() + Formatter::italic() + args.getOriginal() + Formatter::reset());
+        character->sendMsg("You say \"%s\".\n",
+                           Formatter::cyan() + Formatter::italic() + args.getOriginal() + Formatter::reset());
         // Send the message inside the room.
-        character->room->sendToAll(
-            "%s says \"%s\".\n",
-            {character},
-            character->getName(),
-            Formatter::cyan() + Formatter::italic() + args.getOriginal() + Formatter::reset());
+        character->room->sendToAll("%s says \"%s\".\n",
+                                   {character},
+                                   character->getName(),
+                                   Formatter::cyan() + Formatter::italic() + args.getOriginal() + Formatter::reset());
     }
     return true;
 }
@@ -158,17 +153,15 @@ bool DoWhisper(Character * character, ArgumentHandler & args)
     // Check if the sender is invisible.
     auto sender = (receiver->canSee(character)) ? "Someone" : character->getNameCapital();
     // Send the message.
-    character->sendMsg(
-        "%sYou whisper to %s, %s\"%s\".\n",
-        Formatter::magenta(),
-        receiver->getName(),
-        Formatter::reset(),
-        message);
-    receiver->sendMsg(
-        "%s whisper to you, %s\"%s\"\n\n",
-        Formatter::magenta() + sender,
-        Formatter::reset(),
-        message);
+    character->sendMsg("%sYou whisper to %s, %s\"%s\".\n",
+                       Formatter::magenta(),
+                       receiver->getName(),
+                       Formatter::reset(),
+                       message);
+    receiver->sendMsg("%s whisper to you, %s\"%s\"\n\n",
+                      Formatter::magenta() + sender,
+                      Formatter::reset(),
+                      message);
     return true;
 }
 

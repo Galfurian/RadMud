@@ -17,6 +17,7 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <thread>
+#include <mutex>
 #include "logger.hpp"
 
 Logger::Logger()
@@ -82,18 +83,24 @@ LogLevel Logger::castFromInt(const unsigned int & level)
 
 void Logger::log(const LogLevel & level, const std::string & msg)
 {
+    // Define a mutex for the log function.
+    static std::mutex logMutex;
+    // Lock the mutex.
+    logMutex.lock();
     if (Logger::getStream().is_open())
     {
         // Write the log message inside the file.
-        Logger::getStream() << "[" << std::this_thread::get_id() << "]";
+        Logger::getStream() << "[" << std::hex << std::this_thread::get_id() << "]";
         Logger::getStream() << "[" << Logger::levelToString(level) << "]";
         Logger::getStream() << "[" << Logger::getDateTime() << "] ";
         Logger::getStream() << msg << "\n";
     }
-    Logger::getOutputStream(level) << "[" << std::this_thread::get_id() << "]";
+    Logger::getOutputStream(level) << "[" << std::hex << std::this_thread::get_id() << "]";
     Logger::getOutputStream(level) << "[" << Logger::levelToString(level) << "]";
     Logger::getOutputStream(level) << "[" << Logger::getDateTime() << "] ";
     Logger::getOutputStream(level) << msg << "\n";
+    // Unlock the mutex.
+    logMutex.unlock();
 }
 
 std::fstream & Logger::getStream()
