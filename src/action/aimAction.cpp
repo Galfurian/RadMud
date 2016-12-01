@@ -109,9 +109,9 @@ ActionStatus AimAction::perform()
 unsigned int AimAction::getAimTime(Character * source, Character * target)
 {
     unsigned int requiredTime = 2;
-    if (source && target)
+    if ((source != nullptr) && (target != nullptr))
     {
-        if (source->room && target->room)
+        if ((source->room != nullptr) && (target->room != nullptr))
         {
             requiredTime = SafeSum(requiredTime, Area::getDistance(source->room->coord, target->room->coord));
         }

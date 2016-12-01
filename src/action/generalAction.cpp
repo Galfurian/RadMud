@@ -21,7 +21,6 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "generalAction.hpp"
-#include "combatAction.hpp"
 
 GeneralAction::GeneralAction(Character * _actor) :
     actor(_actor),
@@ -49,12 +48,17 @@ long int GeneralAction::getElapsed() const
 
 bool GeneralAction::check(std::string & error) const
 {
-    bool correct = true;
     if (actor == nullptr)
     {
         error = "You cannot begin the action.";
+        return false;
     }
-    return correct;
+    if (actor->room == nullptr)
+    {
+        error = "You are currently nowhere.";
+        return false;
+    }
+    return true;
 }
 
 ActionType GeneralAction::getType() const
@@ -85,8 +89,8 @@ void GeneralAction::resetCooldown(const unsigned int & _actionCooldown)
 unsigned int GeneralAction::getCooldown()
 {
     return static_cast<unsigned int>(
-            std::chrono::duration_cast<std::chrono::seconds>(actionCooldown
-                                                             - std::chrono::system_clock::now()).count());
+        std::chrono::duration_cast<std::chrono::seconds>(actionCooldown
+                                                         - std::chrono::system_clock::now()).count());
 }
 
 std::shared_ptr<CombatAction> GeneralAction::toCombatAction()

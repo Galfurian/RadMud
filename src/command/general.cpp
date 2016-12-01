@@ -699,17 +699,15 @@ void DoRent(Character * character, ArgumentHandler & /*args*/)
 {
     NoMobile(character);
     auto player = character->toPlayer();
-    // Get the current room.
-    auto room = player->room;
     // Check if the room allow to rent.
-    if (!HasFlag(room->flags, RoomFlag::Rent))
+    if (!HasFlag(player->room->flags, RoomFlag::Rent))
     {
         character->sendMsg("You can't rent here.\n");
         return;
     }
     else
     {
-        player->rent_room = room->vnum;
+        player->rent_room = player->room->vnum;
         player->doCommand("quit");
     }
 }

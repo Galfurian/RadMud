@@ -42,6 +42,11 @@ void ProcessInput::process(Character * character, ArgumentHandler & args)
         character->sendMsg("Huh?\n");
         return;
     }
+    if (character->room == nullptr)
+    {
+        character->sendMsg("You are in a wrong room.\n");
+        return;
+    }
     // Get the command.
     auto command = args[0].getContent();
     // Erase the first element which is the command.

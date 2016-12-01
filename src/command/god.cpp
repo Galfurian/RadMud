@@ -608,7 +608,6 @@ void DoFindPath(Character * character, ArgumentHandler & args)
                 // Check if the destination is forbidden for mobiles.
                 return !(character->isMobile() && HasFlag(destExit->flags, ExitFlag::NoMob));
             };
-
             if (aStar.findPath(character->room, room, path, checkFunction))
             {
                 character->sendMsg("You have to go:\n");
@@ -1826,7 +1825,14 @@ void DoPlayerList(Character * character, ArgumentHandler & /*args*/)
         // Prepare the row.
         TableRow row;
         row.push_back(iterator->name);
-        row.push_back(iterator->room->name);
+        if (iterator->room != nullptr)
+        {
+            row.push_back(iterator->room->name);
+        }
+        else
+        {
+            row.push_back("Nowhere!");
+        }
         // Add the row to the table.
         table.addRow(row);
     }

@@ -161,6 +161,10 @@ unsigned int MoveAction::getCooldown(const Character * character)
 
 bool MoveAction::canMoveTo(Character * character, const Direction & direction, std::string & error, bool allowInCombat)
 {
+    if (character->room == nullptr)
+    {
+        return false;
+    }
     if ((character->getAction()->getType() == ActionType::Combat) && !allowInCombat)
     {
         // Check if the character is locked into close combat.

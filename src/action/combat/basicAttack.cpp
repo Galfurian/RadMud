@@ -73,6 +73,12 @@ ActionStatus BasicAttack::perform()
     {
         return ActionStatus::Running;
     }
+    std::string error;
+    if (!this->check(error))
+    {
+        actor->sendMsg(error + "\n\n");
+        return ActionStatus::Error;
+    }
     // If there are no enemies, just stop fighting.
     if (actor->combatHandler.empty())
     {
@@ -144,7 +150,6 @@ ActionStatus BasicAttack::perform()
             auto topAggro = actor->combatHandler.getTopAggro();
             if (topAggro->aggressor != nullptr)
             {
-                std::string error;
                 auto chaseAction = std::make_shared<Chase>(actor, topAggro->aggressor);
                 if (chaseAction->check(error))
                 {

@@ -72,11 +72,6 @@ bool Chase::check(std::string & error) const
         error = "You are not able to chase your target.";
         return false;
     }
-    if (actor->room == nullptr)
-    {
-        error = "You are in a wrong room.";
-        return false;
-    }
     if (target == nullptr)
     {
         error = "You don't have a valid target.";

@@ -652,8 +652,17 @@ Item * Character::findEquipmentSlotTool(EquipmentSlot slot, ToolType type)
 Item * Character::findNearbyItem(const std::string & itemName, int & number)
 {
     auto item = this->findInventoryItem(itemName, number);
-    if (item == nullptr) item = this->findEquipmentItem(itemName, number);
-    if (item == nullptr) item = room->findItem(itemName, number);
+    if (item == nullptr)
+    {
+        item = this->findEquipmentItem(itemName, number);
+    }
+    if (item == nullptr)
+    {
+        if(room != nullptr)
+        {
+            item = room->findItem(itemName, number);
+        }
+    }
     return item;
 }
 
@@ -1543,13 +1552,16 @@ luabridge::LuaRef Character::luaGetPathTo(Room * destination)
     std::vector<Room *> path;
 
     luabridge::LuaRef luaRef(L, luabridge::LuaRef::newTable(L));
-    if (aStar.findPath(this->room, destination, path, checkFunction))
+    if (this->room != nullptr)
     {
-        Coordinates previous = this->room->coord;
-        for (auto node : path)
+        if (aStar.findPath(this->room, destination, path, checkFunction))
         {
-            luaRef.append(Area::getDirection(previous, node->coord));
-            previous = node->coord;
+            Coordinates previous = this->room->coord;
+            for (auto node : path)
+            {
+                luaRef.append(Area::getDirection(previous, node->coord));
+                previous = node->coord;
+            }
         }
     }
     return luaRef;
