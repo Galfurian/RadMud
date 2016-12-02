@@ -80,7 +80,7 @@ bool Mobile::setAbilities(const std::string & source)
     return true;
 }
 
-void Mobile::respawn()
+void Mobile::respawn(bool actNow)
 {
     // Set the mobile to Alive.
     this->setHealth(this->getMaxHealth(), true);
@@ -95,7 +95,14 @@ void Mobile::respawn()
     // Send the message inside the room.
     this->room->sendToAll("%s apear from somewhere.\n", exceptions, this->getNameCapital());
     // Set the next action time.
-    nextActionCooldown = std::chrono::system_clock::now() + std::chrono::seconds(10 * level);
+    if (actNow)
+    {
+        nextActionCooldown = std::chrono::system_clock::now();
+    }
+    else
+    {
+        nextActionCooldown = std::chrono::system_clock::now() + std::chrono::seconds(10 * level);
+    }
     // Log to the mud.
     Logger::log(LogLevel::Debug, "Respawning " + this->id);
 }

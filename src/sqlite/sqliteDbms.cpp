@@ -372,6 +372,17 @@ bool SQLiteDbms::loadPlayerInformation(Player * player)
         player->setHunger(result->getNextInteger());
         player->setThirst(result->getNextInteger());
         player->rent_room = result->getNextInteger();
+        std::string dbLuaVariables = result->getNextString();
+        auto variables = SplitString(dbLuaVariables, ";");
+        for (auto it : variables)
+        {
+            auto fields = SplitString(it, "=");
+            if (fields.size() == 2)
+            {
+                player->setLuaVariable(fields[0], fields[1]);
+            }
+        }
+
         if (player->room == nullptr)
         {
             player->room = Mud::instance().findRoom(player->rent_room);

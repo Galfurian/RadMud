@@ -29,9 +29,9 @@ GetToDestination = function(self, path)
     for directionKey, direction in pairs(path) do
         Mud.log("[" .. self.name .. "] Movind " .. direction:toString())
         if (not self:doCommand(direction:toString())) then
-            Mud.stop()
+            return false
         end
         Mud.sleep(Mud.random(4, 8))
     end
-    Mud.log("[" .. self.name .. "] Reached destination!")
+    return true
 end

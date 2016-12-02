@@ -83,13 +83,12 @@ EventMain = function(self)
     if (not EquipPosessedAxe(self)) then
         Mud.log("[" .. self.name .. "] I need to find an axe.")
         JhonExplorer:reset()
-        if (SearchAxe(self)) then
-            Mud.log("[" .. self.name .. "] I've found an axe!")
-            JhonExplorer:print()
-        else
+        local axe = SearchAxe(self);
+        if (axe == nil) then
             Mud.log("[" .. self.name .. "] There is no axe in the area!")
-            JhonExplorer:print()
             Mud.sleep(15)
+        else
+            Mud.log("[" .. self.name .. "] I've found an axe!")
         end
     end
     --    Mud.log("[" .. self.name .. "] Now I have an axe.")
@@ -104,75 +103,98 @@ EventMain = function(self)
     --    end
 end
 
---- Search an axe everywhere inside the area.
--- @param self The character who is searching for the axe.
+--- Search an axe everywhere inside the area and return it.
 SearchAxe = function(self)
     -- Cycle until we find an axe inside the current room.
-    while (not SearchAxeRoom(self)) do
+    while true do
         Mud.log("[" .. self.name .. "] Searching for an axe...")
+        -- Search for an axe.
         for roomKey, room in pairs(self:getRoomsInSight()) do
+            -- Check if the room contains an axe.
             for itemKey, item in pairs(room:getItems()) do
-                -- Check if the room contains an axe.
-                if (CheckIfItemIsAnAxe(item)) then
+                -- Check if the item inside the room is an axe.
+                if (IsAnAxe(item)) then
                     Mud.log("[" .. self.name .. "] I've seen an axe, moving to position...")
-                    GetToDestination(self, self:luaGetPathTo(item.room))
-                    return true
+                    -- Get the path to the given room.
+                    local pathToNextRoom = self:luaGetPathTo(room)
+                    -- If the path is not empty, then move to destination.
+                    if next(pathToNextRoom) ~= nil then
+                        Mud.log("[" .. self.name .. "] Moving to " .. nextRoom.vnum .. " ...")
+                        if (GetToDestination(self, pathToNextRoom)) then
+                            return item
+                        else
+                            Mud.log("[" .. self.name .. "] Cannot reach an axe in sight!")
+                            Mud.stop()
+                        end
+                    else
+                        Mud.log("[" .. self.name .. "] Cannot find a path to " .. nextRoom.vnum .. " ...")
+                        JhonExplorer.invalidRooms:pushfirst(nextRoom)
+                    end
                 end
             end
+            -- If the given room does not contain any axe, set it as visited.
             JhonExplorer:setRoomAsVisited(room)
         end
+        -- Update the list of not visited rooms.
         JhonExplorer:updateNotVisitedRooms()
+        -- Move to a non-visited room.
         Mud.log("[" .. self.name .. "] I've not found an axe, moving to another position...")
-        if (not JhonExplorer.notVisited:empty()) then
-            while (not JhonExplorer.notVisited:empty()) do
-                local nextRoom = JhonExplorer.notVisited:popfirst()
-                if nextRoom == nil then
-                    break
-                end
-                local pathToNextRoom = self:luaGetPathTo(nextRoom)
-                if next(pathToNextRoom) ~= nil then
-                    Mud.log("[" .. self.name .. "] Moving to " .. nextRoom.vnum .. " ...")
-                    GetToDestination(self, pathToNextRoom)
+        -- If there is no more rooms that need to be visited, stop the algorithm.
+        if (JhonExplorer.notVisited:empty()) then
+            break
+        end
+        -- Continue until the list of non-visited rooms is empty.
+        while (not JhonExplorer.notVisited:empty()) do
+            -- Get the first of the non-visited rooms.
+            local nextRoom = JhonExplorer.notVisited:popfirst()
+            -- If such room is nil, stop the algorithm.
+            if nextRoom == nil then
+                break
+            end
+            -- Get the path to the given room.
+            local pathToNextRoom = self:luaGetPathTo(nextRoom)
+            -- If the path is not empty, then move to destination.
+            if next(pathToNextRoom) ~= nil then
+                Mud.log("[" .. self.name .. "] Moving to " .. nextRoom.vnum .. " ...")
+                if (GetToDestination(self, pathToNextRoom)) then
                     break
                 else
-                    Mud.log("[" .. self.name .. "] Cannot find a path to " .. nextRoom.vnum .. " ...")
-                    JhonExplorer.invalidRooms:pushfirst(nextRoom)
+                    Mud.log("[" .. self.name .. "] Cannot reach an axe in sight!")
+                    Mud.stop()
                 end
+            else
+                Mud.log("[" .. self.name .. "] Cannot find a path to " .. nextRoom.vnum .. " ...")
+                JhonExplorer.invalidRooms:pushfirst(nextRoom)
             end
-        else
-            break
         end
         Mud.sleep(4)
     end
-    return false
+    return nil
 end
 
 --- Search for an axe inside the given room.
--- @param self The character searching for the axe.
-SearchAxeRoom = function(self)
-    if self.room == nil then
-        Mud.stop()
-    end
-    -- Get the list of items inside the current room.
-    for itemKey, item in pairs(self.room:getItems()) do
-        if (CheckIfItemIsAnAxe(item)) then
-            return item
+SearchAxeRoom = function(room)
+    -- Check if the room is valid.
+    if room ~= nil then
+        -- Get the list of items inside the current room.
+        for key, item in pairs(room:getItems()) do
+            if (IsAnAxe(item)) then
+                return item
+            end
         end
     end
     return nil
 end
 
 --- Try to equip a posessed axe.
--- @param self The character.
--- @return If the character has equipped an axe.
 EquipPosessedAxe = function(self)
-    for itemKey, item in pairs(self:getEquipmentItems()) do
-        if (CheckIfItemIsAnAxe(item)) then
+    for key, item in pairs(self:getEquipmentItems()) do
+        if (IsAnAxe(item)) then
             return true
         end
     end
-    for itemKey, item in pairs(self:getInventoryItems()) do
-        if (CheckIfItemIsAnAxe(item)) then
+    for key, item in pairs(self:getInventoryItems()) do
+        if (IsAnAxe(item)) then
             return self:doCommand("wield " .. item.vnum)
         end
     end
@@ -180,17 +202,10 @@ EquipPosessedAxe = function(self)
 end
 
 --- Check if the given item is an axe.
--- @param item The item to check.
--- @return If the item is an axe.
-CheckIfItemIsAnAxe = function(item)
+IsAnAxe = function(item)
     -- Check the item is a tool.
     if (item:getTypeName() == "Tool") then
-        local modelToTool = item.model:toTool()
-        -- Transformed to tool.
-        local modelToolType = modelToTool.toolType
-        -- Retrieved tool type.
-        if (modelToolType:toString() == "WoodcutterAxe") then
-            -- Found woodcutter axe.
+        if (item.model:toTool().toolType:toString() == "WoodcutterAxe") then
             return true
         end
     end

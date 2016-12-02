@@ -381,7 +381,7 @@ bool LoadMobile(ResultSet * result)
         // Load the script.
         mobile->loadScript(Mud::instance().getMudSystemDirectory() + "lua/" + mobile->lua_script);
         // Respawn it.
-        mobile->respawn();
+        mobile->respawn(true);
     }
     return true;
 }

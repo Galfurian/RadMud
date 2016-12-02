@@ -81,6 +81,8 @@ public:
     unsigned int connectionFlags;
     /// MSDP Variables.
     std::map<std::string, std::string> msdpVariables;
+    /// Lua variables.
+    std::map<std::string, std::string> luaVariables;
 
     /// @brief Constructor.
     /// @param socket    Player socket.
@@ -164,4 +166,11 @@ public:
     /// @brief Output to player (any type).
     /// @param msg String to sent.
     void sendMsg(const std::string & msg) override;
+
+    void setLuaVariable(std::string variableName, std::string variableValue);
+
+    std::string getLuaVariable(std::string variableName);
+
+    bool removeLuaVariable(std::string variableName);
+
 };

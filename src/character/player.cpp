@@ -43,7 +43,8 @@ Player::Player(const int & _socket, const int & _port, const std::string & _addr
     closing(),
     logged_in(),
     connectionFlags(),
-    msdpVariables()
+    msdpVariables(),
+    luaVariables()
 {
     // Nothing to do.
 }
@@ -255,6 +256,12 @@ bool Player::updateOnDB()
     arguments.push_back(ToString(this->getHunger()));
     arguments.push_back(ToString(this->getThirst()));
     arguments.push_back(ToString(rent_room));
+    std::string dbLuaVariable;
+    for (auto it : luaVariables)
+    {
+        dbLuaVariable += it.first + "=" + it.second + ";";
+    }
+    arguments.push_back(dbLuaVariable);
     if (!SQLiteDbms::instance().insertInto("Player", arguments, false, true))
     {
         Logger::log(LogLevel::Error, "Error during player creation on database.");
@@ -478,4 +485,25 @@ void Player::processException()
 void Player::sendMsg(const std::string & msg)
 {
     outbuf += msg;
+}
+
+void Player::setLuaVariable(std::string variableName, std::string variableValue)
+{
+    luaVariables[variableName] = variableValue;
+}
+
+std::string Player::getLuaVariable(std::string variableName)
+{
+    return luaVariables[variableName];
+}
+
+bool Player::removeLuaVariable(std::string variableName)
+{
+    auto it = luaVariables.find(variableName);
+    if (it == luaVariables.end())
+    {
+        return false;
+    }
+    it->second = "";
+    return true;
 }

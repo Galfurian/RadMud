@@ -32,6 +32,14 @@ EventEnter = function(self, character)
         self:doCommand("look " .. character.name);
         Mud.sleep(2);
         self:doCommand("say " .. character.name .. " Stand aside, citizen!")
+        if (character:isPlayer()) then
+            local variable = character:toPlayer():getVariable("seen_by_guard")
+            if variable then
+                print("Previous :" .. variable)
+            end
+            character:toPlayer():setVariable("seen_by_guard", "" .. Mud.random(1, 10))
+            print("New : " .. character:toPlayer():getVariable("seen_by_guard"))
+        end
     end
 end
 
