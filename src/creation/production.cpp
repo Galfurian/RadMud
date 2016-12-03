@@ -36,7 +36,7 @@ Production::Production() :
     quantity(),
     tools(),
     ingredients(),
-    workbench(ToolType::NoType),
+    workbench(ToolType::None),
     material(ResourceType::NoType)
 {
     // Nothing to do.
@@ -44,11 +44,7 @@ Production::Production() :
 
 Production::~Production()
 {
-    Logger::log(
-        LogLevel::Debug,
-        "Deleted production\t[%s]\t\t(%s)",
-        ToString(this->vnum),
-        this->name);
+    //Logger::log(LogLevel::Debug, "Deleted production\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
 }
 
 bool Production::setOutcome(const std::string & source)
@@ -102,8 +98,8 @@ bool Production::setTool(const std::string & source)
     bool correct = true;
     for (auto iterator : toolList)
     {
-        ToolType toolType = static_cast<ToolType>(ToNumber<int>(iterator));
-        if (toolType == ToolType::NoType)
+        ToolType toolType(ToNumber<unsigned int>(iterator));
+        if (toolType == ToolType::None)
         {
             Logger::log(LogLevel::Error, "Can't find the Tool Type:" + iterator);
             correct = false;
@@ -173,7 +169,7 @@ bool Production::check()
     assert(!tools.empty());
     for (auto it : tools)
     {
-        assert(it != ToolType::NoType);
+        assert(it != ToolType::None);
     }
     for (auto it : ingredients)
     {

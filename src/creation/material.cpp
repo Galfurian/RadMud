@@ -39,11 +39,7 @@ Material::Material() :
 
 Material::~Material()
 {
-    Logger::log(
-        LogLevel::Debug,
-        "Deleted material\t[%s]\t\t(%s)",
-        ToString(this->vnum),
-        this->name);
+    //Logger::log(LogLevel::Debug, "Deleted material\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
 }
 
 bool Material::check()

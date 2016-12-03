@@ -23,7 +23,7 @@
 #include "processNewPassword.hpp"
 #include "processNewStory.hpp"
 
-void ProcessNewPasswordConfirm::process(Character * character, ArgumentHandler & args)
+bool ProcessNewPasswordConfirm::process(Character * character, ArgumentHandler & args)
 {
     auto player = character->toPlayer();
     auto input = args.getOriginal();
@@ -36,6 +36,7 @@ void ProcessNewPasswordConfirm::process(Character * character, ArgumentHandler &
         player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->rollBack(character);
+        return true;
     }
     else if (input != player->password)
     {
@@ -49,7 +50,9 @@ void ProcessNewPasswordConfirm::process(Character * character, ArgumentHandler &
         player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->advance(character);
+        return true;
     }
+    return false;
 }
 
 void ProcessNewPasswordConfirm::advance(Character * character, const std::string & error)

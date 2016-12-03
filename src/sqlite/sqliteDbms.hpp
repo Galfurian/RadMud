@@ -27,15 +27,7 @@
 #include "sqliteWrapper.hpp"
 #include "tableLoader.hpp"
 
-class Character;
-
 class Player;
-
-class Skill;
-
-class Item;
-
-class Room;
 
 /// @brief A query list of FIELD+VALUE.
 using QueryList = std::vector<std::pair<std::string, std::string> >;
@@ -149,6 +141,9 @@ private:
 
     /// @brief Function used to retrieve information about the skills of the player.
     bool loadPlayerSkill(Player * player);
+
+    /// @brief Function used to retrieve information about the lua variables of the player.
+    bool loadPlayerLuaVariables(Player * player);
 
     /// Loading function for sqlite3 tables.
     using ClassLoadingFunction = std::function<bool(ResultSet * result)>;

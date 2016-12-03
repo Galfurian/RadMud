@@ -74,11 +74,6 @@ std::shared_ptr<Exit> Exit::getOppositeExit() const
     return nullptr;
 }
 
-std::string Exit::getDirection() const
-{
-    return direction.toString();
-}
-
 bool Exit::unlink() const
 {
     if (source != nullptr)
@@ -102,7 +97,7 @@ void Exit::luaRegister(lua_State * L)
         .beginClass<Exit>("Exit")
         .addData("source", &Exit::source)
         .addData("destination", &Exit::destination)
-        .addFunction("getDirection", &Exit::getDirection)
+        .addData("direction", &Exit::direction)
         .endClass();
 }
 

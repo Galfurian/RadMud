@@ -23,24 +23,7 @@
 #pragma once
 
 #include "itemModel.hpp"
-
-/// Used to determine the type of the tool.
-using ToolType = enum class ToolType_t
-{
-    NoType = 0,
-    Pickaxe = 1,
-    WoodcutterAxe = 10,
-    Saw = 11,
-    PrecisionChisel = 12,
-    Hammer = 20,
-    PlaneChisel = 21,
-    Forge = 30,
-    Anvil = 31,
-    BlacksmithHammer = 32,
-    Bellows = 33,
-    Crucible = 34,
-    Tinderbox = 40
-};
+#include "toolType.hpp"
 
 /// @brief Model of a tool.
 class ToolModel :

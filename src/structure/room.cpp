@@ -58,7 +58,7 @@ Room::~Room()
     {
         area->remRoom(this);
     }
-    Logger::log(LogLevel::Debug, "Deleted room\t\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
+    //Logger::log(LogLevel::Debug, "Deleted room\t\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
 }
 
 bool Room::check(bool complete)
@@ -542,14 +542,26 @@ void Room::funcSendToAll(const std::string & message, std::function<bool(Charact
     }
 }
 
-VectorHelper<Exit *> Room::luaGetExits()
+int Room::luaGetExits(lua_State * L)
 {
-    VectorHelper<Exit *> ret;
+    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
     for (auto it : this->exits)
     {
-        ret.push_back(it.get());
+        luaRef.append(it.get());
     }
-    return ret;
+    luabridge::push(L, luaRef);
+    return 1;
+}
+
+int Room::luaGetItems(lua_State * L)
+{
+    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
+    for (auto it : this->items)
+    {
+        luaRef.append(it);
+    }
+    luabridge::push(L, luaRef);
+    return 1;
 }
 
 void Room::luaRegister(lua_State * L)
@@ -560,7 +572,8 @@ void Room::luaRegister(lua_State * L)
         .addData("name", &Room::name, false)
         .addData("coord", &Room::coord, false)
         .addData("terrain", &Room::terrain, false)
-        .addFunction("getExits", &Room::luaGetExits)
+        .addCFunction("getExits", &Room::luaGetExits)
+        .addCFunction("getItems", &Room::luaGetItems)
         .endClass();
 }
 
@@ -662,7 +675,7 @@ bool CreateRoom(Coordinates coord, Room * source_room)
 bool ConnectRoom(Room * room)
 {
     bool status = true;
-    ExitVector generatedExits;
+    std::vector<std::shared_ptr<Exit> > generatedExits;
     Logger::log(LogLevel::Info, "[ConnectRoom] Connecting the room to near rooms...");
     for (auto iterator : Mud::instance().mudDirections)
     {

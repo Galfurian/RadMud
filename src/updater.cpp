@@ -101,38 +101,28 @@ void MudUpdater::updateTime()
     mudHour++;
     if (mudHour == 6)
     {
-        Mud::instance().broadcastMsg(
-            0,
-            Formatter::yellow() + "The sun rises from the east.\n" + Formatter::reset());
+        Mud::instance().broadcastMsg(0, Formatter::yellow() + "The sun rises from the east.\n" + Formatter::reset());
         mudDayPhase = DayPhase::Morning;
     }
     else if (mudHour == 12)
     {
-        Mud::instance().broadcastMsg(
-            0,
-            Formatter::yellow() + "The sun is just above you.\n" + Formatter::reset());
+        Mud::instance().broadcastMsg(0, Formatter::yellow() + "The sun is just above you.\n" + Formatter::reset());
         mudDayPhase = DayPhase::Day;
     }
     else if (mudHour == 18)
     {
-        Mud::instance().broadcastMsg(
-            0,
-            Formatter::yellow() + "The sun begins to set.\n" + Formatter::reset());
+        Mud::instance().broadcastMsg(0, Formatter::yellow() + "The sun begins to set.\n" + Formatter::reset());
         mudDayPhase = DayPhase::Dusk;
     }
     else if (mudHour == 24)
     {
-        Mud::instance().broadcastMsg(
-            0,
-            Formatter::yellow() + "Darkness engulfs you.\n" + Formatter::reset());
+        Mud::instance().broadcastMsg(0, Formatter::yellow() + "Darkness engulfs you.\n" + Formatter::reset());
         mudDayPhase = DayPhase::Night;
         mudHour = 0;
     }
     else
     {
-        Mud::instance().broadcastMsg(
-            0,
-            Formatter::yellow() + "Another hour has passed." + Formatter::reset());
+        Mud::instance().broadcastMsg(0, Formatter::yellow() + "Another hour has passed." + Formatter::reset());
     }
 }
 
@@ -218,7 +208,7 @@ void MudUpdater::updateItems()
     Logger::log(LogLevel::Debug, "Updating corpses...");
     for (auto it : Mud::instance().mudCorpses)
     {
-        Item * corpse = it.second;
+        auto corpse = it.second;
         if (HasFlag(corpse->model->modelFlags, ModelFlag::Unbreakable))
         {
             continue;
@@ -232,7 +222,7 @@ void MudUpdater::updateItems()
     Logger::log(LogLevel::Debug, "Updating items...");
     for (auto it : Mud::instance().mudItems)
     {
-        Item * item = it.second;
+        auto item = it.second;
         Logger::log(LogLevel::Debug, "Updating '" + item->getName() + "'...");
         if (HasFlag(item->model->modelFlags, ModelFlag::Unbreakable))
         {

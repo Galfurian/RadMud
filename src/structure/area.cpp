@@ -42,7 +42,7 @@ Area::Area() :
 
 Area::~Area()
 {
-    Logger::log(LogLevel::Debug, "Deleted area\t\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
+    //Logger::log(LogLevel::Debug, "Deleted area\t\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
 }
 
 bool Area::check()
@@ -137,6 +137,24 @@ CharacterContainer Area::getCharactersAt(const CharacterContainer & exceptions, 
         }
     }
     return characterContainer;
+}
+
+ItemContainer Area::getItemsAt(const ItemContainer & exceptions, const Coordinates & coordinates)
+{
+    ItemContainer itemContainer;
+    if (this->isValid(coordinates))
+    {
+        Room * room = this->getRoom(coordinates);
+        // Check if there is a character inside the room.
+        for (auto it : room->items)
+        {
+            if (!exceptions.findItem(it->vnum))
+            {
+                itemContainer.emplace_back(it);
+            }
+        }
+    }
+    return itemContainer;
 }
 
 bool Area::addRoom(Room * room)
@@ -484,6 +502,20 @@ CharacterContainer Area::getCharactersInSight(CharacterContainer & exceptions,
         characterContainer.addUnique(this->getCharactersAt(exceptions, coordinates));
     }
     return characterContainer;
+}
+
+ItemContainer Area::getItemsInSight(ItemContainer & exceptions, Coordinates & origin, const unsigned int & radius)
+{
+    ItemContainer foundItems;
+    auto validCoordinates = this->fov(origin, radius);
+    for (auto coordinates : validCoordinates)
+    {
+        for (auto it :this->getItemsAt(exceptions, coordinates))
+        {
+            foundItems.emplace_back(it);
+        }
+    }
+    return foundItems;
 }
 
 std::vector<Coordinates> Area::fov(Coordinates & origin, const unsigned int & radius)

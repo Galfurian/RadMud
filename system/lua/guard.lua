@@ -1,21 +1,21 @@
 -- Handle the actions when the character is created.
 EventInit = function(self)
     -- Put event code here.
-    local helm = Mud.LoadItem(self, 1500, 10, Mud.Random(1, 5));
+    local helm = self.loadItem(self, 1500, 10, Mud.random(1, 5));
     if (helm ~= nil) then
-        self:equipmentAdd(helm);
+        if (not self:equipmentAdd(helm)) then return end
     end
-    local cuirass = Mud.LoadItem(self, 1501, 10, Mud.Random(1, 5));
+    local cuirass = self.loadItem(self, 1501, 10, Mud.random(1, 5));
     if (cuirass ~= nil) then
-        self:equipmentAdd(cuirass);
+        if (not self:equipmentAdd(cuirass)) then return end
     end
-    local greave = Mud.LoadItem(self, 1502, 10, Mud.Random(1, 5));
+    local greave = self.loadItem(self, 1502, 10, Mud.random(1, 5));
     if (greave ~= nil) then
-        self:equipmentAdd(greave);
+        if (not self:equipmentAdd(greave)) then return end
     end
-    local boots = Mud.LoadItem(self, 1503, 10, Mud.Random(1, 5));
+    local boots = self.loadItem(self, 1503, 10, Mud.random(1, 5));
     if (boots ~= nil) then
-        self:equipmentAdd(boots);
+        if (not self:equipmentAdd(boots)) then return end
     end
 end
 
@@ -27,11 +27,19 @@ end
 -- Handle the actions when a character enters the room.
 EventEnter = function(self, character)
     -- Put event code here.
-    if (Mud.Random(1, 10) > 7)
+    if (Mud.random(1, 10) > 7)
     then
         self:doCommand("look " .. character.name);
-        Mud.Sleep(2);
+        Mud.sleep(2);
         self:doCommand("say " .. character.name .. " Stand aside, citizen!")
+        if (character:isPlayer()) then
+            local variable = character:toPlayer():getVariable("seen_by_guard")
+            if variable then
+                print("Previous :" .. variable)
+            end
+            character:toPlayer():setVariable("seen_by_guard", "" .. Mud.random(1, 10))
+            print("New : " .. character:toPlayer():getVariable("seen_by_guard"))
+        end
     end
 end
 

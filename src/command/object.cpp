@@ -191,10 +191,15 @@ void LoadObjectCommands()
     }
 }
 
-void DoTake(Character * character, ArgumentHandler & args)
+bool DoTake(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
+    if ((args.size() != 1) && (args.size() != 2))
+    {
+        character->sendMsg("Wrong number of parameters.\n");
+        return false;
+    }
     // Try to take the item inside the room.
     if (args.size() == 1)
     {
@@ -203,7 +208,7 @@ void DoTake(Character * character, ArgumentHandler & args)
             if (character->room->items.empty())
             {
                 character->sendMsg("There is nothing to pick up.\n");
-                return;
+                return false;
             }
             // Make a temporary copy of the character's inventory.
             auto originalList = character->room->items;
@@ -242,263 +247,235 @@ void DoTake(Character * character, ArgumentHandler & args)
             {
                 // Send the messages.
                 character->sendMsg("You've picked up everything you could.\n");
-                character->room->sendToAll(
-                    "%s has picked up everything %s could.\n",
-                    {character},
-                    character->getNameCapital(),
-                    character->getSubjectPronoun());
+                character->room->sendToAll("%s has picked up everything %s could.\n",
+                                           {character},
+                                           character->getNameCapital(),
+                                           character->getSubjectPronoun());
+                return true;
             }
-            else
-            {
-                character->sendMsg("You've picked up nothing.\n");
-            }
+            character->sendMsg("You've picked up nothing.\n");
+            return false;
         }
-        else
+        auto item = character->room->findItem(args[0].getContent(), args[0].getIndex());
+        // If the item is null.
+        if (item == nullptr)
         {
-            auto item = character->room->findItem(args[0].getContent(), args[0].getIndex());
-            // If the item is null.
-            if (item == nullptr)
+            // Try to check if the character is a mobile, since mobiles can take
+            //  items by providing the specific vnum.
+            if (character->isMobile() && IsNumber(args[0].getContent()))
             {
-                // Try to check if the character is a mobile, since mobiles can take
-                //  items by providing the specific vnum.
-                if (character->isMobile() && IsNumber(args[0].getContent()))
+                for (auto it : character->room->items)
                 {
-                    for (auto it : character->room->items)
+                    if (it->vnum == ToNumber<int>(args[0].getContent()))
                     {
-                        if (it->vnum == ToNumber<int>(args[0].getContent()))
-                        {
-                            item = it;
-                        }
+                        item = it;
                     }
                 }
-                // Check if the item is still null.
-                if (item == nullptr)
-                {
-                    character->sendMsg("You don't see that item inside the room.\n");
-                    return;
-                }
             }
-            // Check if the item has the flag Static.
-            if (HasFlag(item->model->modelFlags, ModelFlag::Static))
+            // Check if the item is still null.
+            if (item == nullptr)
             {
-                character->sendMsg("You can't pick up %s!\n", item->getName(true));
-                return;
+                character->sendMsg("You don't see that item inside the room.\n");
+                return false;
             }
-            if (HasFlag(item->flags, ItemFlag::Built))
-            {
-                character->sendMsg("You can't pick up something which is built!\n");
-                return;
-            }
-            // Set the quantity.
-            auto quantity = args[0].getMultiplier();
-            if (item->quantity < quantity)
-            {
-                quantity = item->quantity;
-            }
-            // Check if the player can carry the item.
-            if (!character->canCarry(item, quantity))
-            {
-                character->sendMsg("You can't carry %s!\n", item->getName(true));
-                return;
-            }
-            // Start a transaction.
-            SQLiteDbms::instance().beginTransaction();
-            if (item->quantity <= quantity)
-            {
-                // Remove the item from the room.
-                character->room->removeItem(item);
-                // Add the item to the player's inventory.
-                character->addInventoryItem(item);
-                // Send the messages.
-                character->sendMsg(
-                    "You take %s.\n",
-                    item->getName(true));
-                character->room->sendToAll(
-                    "%s has picked up %s.\n",
-                    {character},
-                    character->getNameCapital(),
-                    item->getName(true));
-            }
-            else
-            {
-                // Remove a stack from item.
-                auto newStack = item->removeFromStack(character, quantity);
-                if (newStack == nullptr)
-                {
-                    character->sendMsg("You failed to drop %s.\n", item->getName(true));
-                    // Rollback the transaction.
-                    SQLiteDbms::instance().rollbackTransection();
-                    return;
-                }
-                // Add the item to the player's inventory.
-                character->addInventoryItem(newStack);
-                // Send the messages.
-                character->sendMsg(
-                    "You take a part of %s.\n",
-                    item->getName(true));
-                character->room->sendToAll(
-                    "%s has picked up part of %s.\n",
-                    {character},
-                    character->getNameCapital(),
-                    item->getName(true));
-            }
-            // Conclude the transaction.
-            SQLiteDbms::instance().endTransaction();
         }
-    }
-    else if (args.size() == 2)
-    {
-        auto container = character->findNearbyItem(args[1].getContent(), args[1].getIndex());
-        if (container == nullptr)
+        // Check if the item has the flag Static.
+        if (HasFlag(item->model->modelFlags, ModelFlag::Static))
         {
-            character->sendMsg("You don't see that container.\n");
-            return;
+            character->sendMsg("You can't pick up %s!\n", item->getName(true));
+            return false;
         }
-        if (HasFlag(container->flags, ItemFlag::Locked))
+        if (HasFlag(item->flags, ItemFlag::Built))
         {
-            character->sendMsg("You have first to unlock %s first.\n", container->getName(true));
-            return;
+            character->sendMsg("You can't pick up something which is built!\n");
+            return false;
         }
-        if (HasFlag(container->flags, ItemFlag::Closed))
+        // Set the quantity.
+        auto quantity = args[0].getMultiplier();
+        if (item->quantity < quantity)
         {
-            character->sendMsg("You have first to open %s first.\n", container->getName(true));
-            return;
+            quantity = item->quantity;
         }
-        if (ToLower(args[0].getContent()) == "all")
+        // Check if the player can carry the item.
+        if (!character->canCarry(item, quantity))
         {
-            if (container->content.empty())
-            {
-                character->sendMsg("There is nothing inside %s.\n", container->getName(true));
-                return;
-            }
-            // Make a temporary copy of the character's inventory.
-            auto originalList = container->content;
-            // Start a transaction.
-            SQLiteDbms::instance().beginTransaction();
-            // Used to determine if the character has picked up something.
-            auto takenSomething = false;
-            for (auto iterator : originalList)
-            {
-                // Check if the item is static.
-                if (HasFlag(iterator->model->modelFlags, ModelFlag::Static))
-                {
-                    continue;
-                }
-                // Check if the player can carry the item.
-                if (!character->canCarry(iterator, iterator->quantity))
-                {
-                    continue;
-                }
-                // Remove the item from the container.
-                container->takeOut(iterator);
-                // Add the item to the player's inventory.
-                character->addInventoryItem(iterator);
-                // Set that he has picked up something.
-                takenSomething = true;
-            }
-            // Conclude the transaction.
-            SQLiteDbms::instance().endTransaction();
-            // Handle output only if the player has really taken something.
-            if (takenSomething)
-            {
-                // Send the messages.
-                character->sendMsg(
-                    "You've taken everything you could from %s.\n",
-                    container->getName(true));
-                character->room->sendToAll(
-                    "%s has taken everything %s could from %s.\n",
-                    {character},
-                    character->getNameCapital(),
-                    character->getSubjectPronoun(),
-                    container->getName(true));
-            }
-            else
-            {
-                character->sendMsg("You've taken nothing from %s.\n", container->getName(true));
-            }
+            character->sendMsg("You can't carry %s!\n", item->getName(true));
+            return false;
+        }
+        // Start a transaction.
+        SQLiteDbms::instance().beginTransaction();
+        if (item->quantity <= quantity)
+        {
+            // Remove the item from the room.
+            character->room->removeItem(item);
+            // Add the item to the player's inventory.
+            character->addInventoryItem(item);
+            // Send the messages.
+            character->sendMsg("You take %s.\n", item->getName(true));
+            character->room->sendToAll("%s has picked up %s.\n",
+                                       {character},
+                                       character->getNameCapital(),
+                                       item->getName(true));
         }
         else
         {
-            auto item = container->findContent(args[0].getContent(), args[0].getIndex());
-            if (item == nullptr)
+            // Remove a stack from item.
+            auto newStack = item->removeFromStack(character, quantity);
+            if (newStack == nullptr)
             {
-                character->sendMsg("You don't see that item inside the container.\n");
-                return;
+                character->sendMsg("You failed to drop %s.\n", item->getName(true));
+                // Rollback the transaction.
+                SQLiteDbms::instance().rollbackTransection();
+                return false;
             }
-            // Check if the item has the flag kNoPick.
-            if (HasFlag(item->model->modelFlags, ModelFlag::Static))
+            // Add the item to the player's inventory.
+            character->addInventoryItem(newStack);
+            // Send the messages.
+            character->sendMsg("You take a part of %s.\n", item->getName(true));
+            character->room->sendToAll("%s has picked up part of %s.\n",
+                                       {character},
+                                       character->getNameCapital(),
+                                       item->getName(true));
+        }
+        // Conclude the transaction.
+        SQLiteDbms::instance().endTransaction();
+        return true;
+    }
+
+    auto container = character->findNearbyItem(args[1].getContent(), args[1].getIndex());
+    if (container == nullptr)
+    {
+        character->sendMsg("You don't see that container.\n");
+        return false;
+    }
+    if (HasFlag(container->flags, ItemFlag::Locked))
+    {
+        character->sendMsg("You have first to unlock %s first.\n", container->getName(true));
+        return false;
+    }
+    if (HasFlag(container->flags, ItemFlag::Closed))
+    {
+        character->sendMsg("You have first to open %s first.\n", container->getName(true));
+        return false;
+    }
+    if (ToLower(args[0].getContent()) == "all")
+    {
+        if (container->content.empty())
+        {
+            character->sendMsg("There is nothing inside %s.\n", container->getName(true));
+            return false;
+        }
+        // Make a temporary copy of the character's inventory.
+        auto originalList = container->content;
+        // Start a transaction.
+        SQLiteDbms::instance().beginTransaction();
+        // Used to determine if the character has picked up something.
+        auto takenSomething = false;
+        for (auto iterator : originalList)
+        {
+            // Check if the item is static.
+            if (HasFlag(iterator->model->modelFlags, ModelFlag::Static))
             {
-                character->sendMsg("You can't pick up this kind of items!\n");
-                return;
-            }
-            // Set the quantity.
-            auto quantity = args[0].getMultiplier();
-            if (item->quantity < quantity)
-            {
-                quantity = item->quantity;
+                continue;
             }
             // Check if the player can carry the item.
-            if (!character->canCarry(item, quantity))
+            if (!character->canCarry(iterator, iterator->quantity))
             {
-                character->sendMsg("You are not strong enough to carry that object.\n");
-                return;
+                continue;
             }
-            // Start a transaction.
-            SQLiteDbms::instance().beginTransaction();
-            if (item->quantity <= quantity)
-            {
-                // Remove the item from the container.
-                container->takeOut(item);
-                // Add the item to the player's inventory.
-                character->addInventoryItem(item);
-                // Send the messages.
-                character->sendMsg(
-                    "You take out %s from %s.\n",
-                    item->getName(true),
-                    container->getName(true));
-                character->room->sendToAll(
-                    "%s takes out %s from %s.\n",
-                    {character},
-                    character->getNameCapital(),
-                    item->getName(true),
-                    container->getName(true));
-            }
-            else
-            {
-                // Remove a stack from item.
-                auto newStack = item->removeFromStack(character, quantity);
-                if (newStack == nullptr)
-                {
-                    character->sendMsg("You failed to take part of %s.\n", item->getName(true));
-                    // Rollback the transaction.
-                    SQLiteDbms::instance().rollbackTransection();
-                    return;
-                }
-                // Add the item to the player's inventory.
-                character->addInventoryItem(newStack);
-                // Send the messages.
-                character->sendMsg(
-                    "You take out part of %s from %s.\n",
-                    item->getName(true),
-                    container->getName(true));
-                character->room->sendToAll(
-                    "%s takes out %s from %s.\n",
-                    {character},
-                    character->getNameCapital(),
-                    item->getName(true),
-                    container->getName(true));
-            }
-            // Conclude the transaction.
-            SQLiteDbms::instance().endTransaction();
+            // Remove the item from the container.
+            container->takeOut(iterator);
+            // Add the item to the player's inventory.
+            character->addInventoryItem(iterator);
+            // Set that he has picked up something.
+            takenSomething = true;
         }
+        // Conclude the transaction.
+        SQLiteDbms::instance().endTransaction();
+        // Handle output only if the player has really taken something.
+        if (takenSomething)
+        {
+            // Send the messages.
+            character->sendMsg("You've taken everything you could from %s.\n", container->getName(true));
+            character->room->sendToAll("%s has taken everything %s could from %s.\n",
+                                       {character},
+                                       character->getNameCapital(),
+                                       character->getSubjectPronoun(),
+                                       container->getName(true));
+            return true;
+        }
+        character->sendMsg("You've taken nothing from %s.\n", container->getName(true));
+        return false;
+    }
+    auto item = container->findContent(args[0].getContent(), args[0].getIndex());
+    if (item == nullptr)
+    {
+        character->sendMsg("You don't see that item inside the container.\n");
+        return false;
+    }
+    // Check if the item has the flag kNoPick.
+    if (HasFlag(item->model->modelFlags, ModelFlag::Static))
+    {
+        character->sendMsg("You can't pick up this kind of items!\n");
+        return false;
+    }
+    // Set the quantity.
+    auto quantity = args[0].getMultiplier();
+    if (item->quantity < quantity)
+    {
+        quantity = item->quantity;
+    }
+    // Check if the player can carry the item.
+    if (!character->canCarry(item, quantity))
+    {
+        character->sendMsg("You are not strong enough to carry that object.\n");
+        return false;
+    }
+    // Start a transaction.
+    SQLiteDbms::instance().beginTransaction();
+    if (item->quantity <= quantity)
+    {
+        // Remove the item from the container.
+        container->takeOut(item);
+        // Add the item to the player's inventory.
+        character->addInventoryItem(item);
+        // Send the messages.
+        character->sendMsg("You take out %s from %s.\n", item->getName(true), container->getName(true));
+        character->room->sendToAll("%s takes out %s from %s.\n",
+                                   {character},
+                                   character->getNameCapital(),
+                                   item->getName(true),
+                                   container->getName(true));
     }
     else
     {
-        character->sendMsg("What do you want to pick up?\n");
+        // Remove a stack from item.
+        auto newStack = item->removeFromStack(character, quantity);
+        if (newStack == nullptr)
+        {
+            character->sendMsg("You failed to take part of %s.\n", item->getName(true));
+            // Rollback the transaction.
+            SQLiteDbms::instance().rollbackTransection();
+            return false;
+        }
+        // Add the item to the player's inventory.
+        character->addInventoryItem(newStack);
+        // Send the messages.
+        character->sendMsg("You take out part of %s from %s.\n",
+                           item->getName(true),
+                           container->getName(true));
+        character->room->sendToAll("%s takes out %s from %s.\n",
+                                   {character},
+                                   character->getNameCapital(),
+                                   item->getName(true),
+                                   container->getName(true));
     }
+    // Conclude the transaction.
+    SQLiteDbms::instance().endTransaction();
+    return true;
 }
 
-void DoDrop(Character * character, ArgumentHandler & args)
+bool DoDrop(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -506,17 +483,17 @@ void DoDrop(Character * character, ArgumentHandler & args)
     if (args.size() == 0)
     {
         character->sendMsg("Drop what?\n");
-        return;
+        return false;
     }
     if (args.size() > 1)
     {
         character->sendMsg("Too many arguments!\n");
-        return;
+        return false;
     }
     if (character->inventory.empty())
     {
         character->sendMsg("You have nothing to drop.\n");
-        return;
+        return false;
     }
     if (ToLower(args[0].getContent()) == "all")
     {
@@ -535,75 +512,67 @@ void DoDrop(Character * character, ArgumentHandler & args)
         SQLiteDbms::instance().endTransaction();
         // Send the messages.
         character->sendMsg("You dropped all.\n");
-        character->room->sendToAll(
-            "%s has dropped all %s items.\n",
-            {character},
-            character->getNameCapital(),
-            character->getPossessivePronoun());
+        character->room->sendToAll("%s has dropped all %s items.\n",
+                                   {character},
+                                   character->getNameCapital(),
+                                   character->getPossessivePronoun());
+        return true;
+    }
+    // Get the item.
+    auto item = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
+    // Check if the player has the item that he want to drop.
+    if (item == nullptr)
+    {
+        character->sendMsg("You don't have that item.\n");
+        return false;
+    }
+    // Set the quantity.
+    auto quantity = args[0].getMultiplier();
+    if (item->quantity < quantity)
+    {
+        quantity = item->quantity;
+    }
+    // Start a transaction.
+    SQLiteDbms::instance().beginTransaction();
+    if (item->quantity <= quantity)
+    {
+        // Remove the item from the player's inventory.
+        character->remInventoryItem(item);
+        // Put the item inside the room.
+        character->room->addItem(item);
+        // Send the messages.
+        character->sendMsg("You drop %s.\n", item->getName(true));
+        character->room->sendToAll("%s has dropped %s.\n",
+                                   {character},
+                                   character->getNameCapital(),
+                                   item->getName(true));
     }
     else
     {
-        // Get the item.
-        auto item = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
-        // Check if the player has the item that he want to drop.
-        if (item == nullptr)
+        // Remove from the stack.
+        auto newStack = item->removeFromStack(character, quantity);
+        if (newStack == nullptr)
         {
-            character->sendMsg("You don't have that item.\n");
-            return;
+            character->sendMsg("You failed to drop %s.\n", item->getName(true));
+            // Rollback the transaction.
+            SQLiteDbms::instance().rollbackTransection();
+            return false;
         }
-        // Set the quantity.
-        auto quantity = args[0].getMultiplier();
-        if (item->quantity < quantity)
-        {
-            quantity = item->quantity;
-        }
-        // Start a transaction.
-        SQLiteDbms::instance().beginTransaction();
-        if (item->quantity <= quantity)
-        {
-            // Remove the item from the player's inventory.
-            character->remInventoryItem(item);
-            // Put the item inside the room.
-            character->room->addItem(item);
-            // Send the messages.
-            character->sendMsg(
-                "You drop %s.\n",
-                item->getName(true));
-            character->room->sendToAll(
-                "%s has dropped %s.\n",
-                {character},
-                character->getNameCapital(),
-                item->getName(true));
-        }
-        else
-        {
-            // Remove from the stack.
-            auto newStack = item->removeFromStack(character, quantity);
-            if (newStack == nullptr)
-            {
-                character->sendMsg("You failed to drop %s.\n", item->getName(true));
-                // Rollback the transaction.
-                SQLiteDbms::instance().rollbackTransection();
-                return;
-            }
-            // Put the item inside the room.
-            character->room->addItem(newStack);
-            // Send the messages.
-            character->sendMsg(
-                "You drop part of %s.\n",
-                item->getName(true));
-            character->room->sendToAll(
-                "%s has dropped %s.\n",
-                {character},
-                character->getNameCapital(),
-                item->getName(true));
-        }
-        // Conclude the transaction.
-        SQLiteDbms::instance().endTransaction();
+        // Put the item inside the room.
+        character->room->addItem(newStack);
+        // Send the messages.
+        character->sendMsg("You drop part of %s.\n", item->getName(true));
+        character->room->sendToAll("%s has dropped %s.\n",
+                                   {character},
+                                   character->getNameCapital(),
+                                   item->getName(true));
     }
+    // Conclude the transaction.
+    SQLiteDbms::instance().endTransaction();
+    return true;
 }
 
-void DoGive(Character * character, ArgumentHandler & args)
+bool DoGive(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -611,27 +580,27 @@ void DoGive(Character * character, ArgumentHandler & args)
     if (args.size() != 2)
     {
         character->sendMsg("Give what to whom?\n");
-        return;
+        return false;
     }
     // Get the item.
     auto item = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
     if (item == nullptr)
     {
         character->sendMsg("You don't have that item.\n");
-        return;
+        return false;
     }
     auto target = character->room->findCharacter(args[1].getContent(), args[1].getIndex(), {
         character});
     if (target == nullptr)
     {
         character->sendMsg("You don't see that person.\n");
-        return;
+        return false;
     }
     // Check if the target player can carry the item.
     if (!target->canCarry(item, item->quantity))
     {
         character->sendMsg(target->getNameCapital() + " can't carry anymore items.\n");
-        return;
+        return false;
     }
     // Set the quantity.
     auto quantity = args[0].getMultiplier();
@@ -648,20 +617,13 @@ void DoGive(Character * character, ArgumentHandler & args)
         // Add the item to the target inventory.
         target->addInventoryItem(item);
         // Send all the messages.
-        character->sendMsg(
-            "You give %s to %s.\n",
-            item->getName(true),
-            target->getName());
-        target->sendMsg(
-            "%s gives you %s.\n\n",
-            character->getNameCapital(),
-            item->getName(true));
-        character->room->sendToAll(
-            "%s gives %s to %s.\n",
-            {character, target},
-            character->getNameCapital(),
-            item->getName(true),
-            target->getName());
+        character->sendMsg("You give %s to %s.\n", item->getName(true), target->getName());
+        target->sendMsg("%s gives you %s.\n\n", character->getNameCapital(), item->getName(true));
+        character->room->sendToAll("%s gives %s to %s.\n",
+                                   {character, target},
+                                   character->getNameCapital(),
+                                   item->getName(true),
+                                   target->getName());
     }
     else
     {
@@ -669,37 +631,28 @@ void DoGive(Character * character, ArgumentHandler & args)
         auto newStack = item->removeFromStack(character, quantity);
         if (newStack == nullptr)
         {
-            character->sendMsg(
-                "You failed to give part of %s to %s.\n",
-                item->getName(true),
-                target->getName());
+            character->sendMsg("You failed to give part of %s to %s.\n", item->getName(true), target->getName());
             // Rollback the transaction.
             SQLiteDbms::instance().rollbackTransection();
-            return;
+            return false;
         }
         // Add the stack to the target inventory.
         target->addInventoryItem(newStack);
         // Send all the messages.
-        character->sendMsg(
-            "You give part of %s to %s.\n",
-            item->getName(true),
-            target->getName());
-        target->sendMsg(
-            "%s gives you %s.\n\n",
-            character->getNameCapital(),
-            item->getName(true));
-        character->room->sendToAll(
-            "%s gives %s to %s.\n",
-            {character, target},
-            character->getNameCapital(),
-            item->getName(true),
-            target->getName());
+        character->sendMsg("You give part of %s to %s.\n", item->getName(true), target->getName());
+        target->sendMsg("%s gives you %s.\n\n", character->getNameCapital(), item->getName(true));
+        character->room->sendToAll("%s gives %s to %s.\n",
+                                   {character, target},
+                                   character->getNameCapital(),
+                                   item->getName(true),
+                                   target->getName());
     }
     // Conclude the transaction.
     SQLiteDbms::instance().endTransaction();
+    return true;
 }
 
-void DoEquipments(Character * character, ArgumentHandler & /*args*/)
+bool DoEquipments(Character * character, ArgumentHandler & /*args*/)
 {
     auto head = character->findEquipmentSlotItem(EquipmentSlot::Head);
     auto back = character->findEquipmentSlotItem(EquipmentSlot::Back);
@@ -744,11 +697,11 @@ void DoEquipments(Character * character, ArgumentHandler & /*args*/)
         output += "\tLeft Hand  : " + left->getNameCapital(true) + "\n";
     }
     output += Formatter::yellow() + "#----------------------------------#\n" + Formatter::reset();
-
     character->sendMsg(output);
+    return true;
 }
 
-void DoWield(Character * character, ArgumentHandler & args)
+bool DoWield(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -756,12 +709,12 @@ void DoWield(Character * character, ArgumentHandler & args)
     if (args.empty())
     {
         character->sendMsg("Wield what?\n");
-        return;
+        return false;
     }
     if (args.size() > 1)
     {
         character->sendMsg("Too many arguments.\n");
-        return;
+        return false;
     }
     // Get the item.
     auto item = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
@@ -785,7 +738,7 @@ void DoWield(Character * character, ArgumentHandler & args)
     if (item == nullptr)
     {
         character->sendMsg("You don't have that item.\n");
-        return;
+        return false;
     }
     // Check if can be wielded.
     if (!item->model->mustBeWielded())
@@ -796,7 +749,7 @@ void DoWield(Character * character, ArgumentHandler & args)
         {
             character->sendMsg("Try to wear it instead.\n");
         }
-        return;
+        return false;
     }
     // String where the error message will be put.
     std::string errMessage;
@@ -806,7 +759,7 @@ void DoWield(Character * character, ArgumentHandler & args)
     if (!character->canWield(item, errMessage, destinationSlot))
     {
         character->sendMsg(errMessage);
-        return;
+        return false;
     }
     // Set the item slot.
     item->setCurrentSlot(destinationSlot);
@@ -825,15 +778,15 @@ void DoWield(Character * character, ArgumentHandler & args)
     }
     character->sendMsg("You wield %s with %s.\n", object, where);
     // Send the message inside the room.
-    character->room->sendToAll(
-        "%s wields %s with %s.\n",
-        {character},
-        character->getNameCapital(),
-        item->getName(true),
-        whereOthers);
+    character->room->sendToAll("%s wields %s with %s.\n",
+                               {character},
+                               character->getNameCapital(),
+                               item->getName(true),
+                               whereOthers);
+    return true;
 }
 
-void DoWear(Character * character, ArgumentHandler & args)
+bool DoWear(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -841,12 +794,12 @@ void DoWear(Character * character, ArgumentHandler & args)
     if (args.size() == 0)
     {
         character->sendMsg("Wear what?\n");
-        return;
+        return false;
     }
     if (args.size() > 1)
     {
         character->sendMsg("Too many arguments.\n");
-        return;
+        return false;
     }
     if (args[0].getContent() == "all")
     {
@@ -870,65 +823,63 @@ void DoWear(Character * character, ArgumentHandler & args)
         if (!wearedSomething)
         {
             character->sendMsg("You had nothing to wear.\n");
-            return;
+            return false;
         }
         character->sendMsg("You have weared everything you could.\n");
         // Send the message inside the room.
-        character->room->sendToAll(
-            "%s has weared all %s could.\n",
-            {character},
-            character->getNameCapital(),
-            character->getSubjectPronoun());
-        return;
+        character->room->sendToAll("%s has weared all %s could.\n",
+                                   {character},
+                                   character->getNameCapital(),
+                                   character->getSubjectPronoun());
     }
-    auto item = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
-    // Check if the item is null.
-    if (item == nullptr)
+    else
     {
-        // Try to check if the character is a mobile, since mobiles can take
-        //  items by providing the specific vnum.
-        if (character->isMobile() && IsNumber(args[0].getContent()))
+        auto item = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
+        // Check if the item is null.
+        if (item == nullptr)
         {
-            for (auto it : character->inventory)
+            // Try to check if the character is a mobile, since mobiles can take
+            //  items by providing the specific vnum.
+            if (character->isMobile() && IsNumber(args[0].getContent()))
             {
-                if (it->vnum == ToNumber<int>(args[0].getContent()))
+                for (auto it : character->inventory)
                 {
-                    item = it;
+                    if (it->vnum == ToNumber<int>(args[0].getContent()))
+                    {
+                        item = it;
+                    }
                 }
             }
         }
+        if (item == nullptr)
+        {
+            character->sendMsg("You don't have that item.\n");
+            return false;
+        }
+        std::string errMessage;
+        if (!character->canWear(item, errMessage))
+        {
+            character->sendMsg(errMessage);
+            return false;
+        }
+        // Remove the item from the player's inventory.
+        character->remInventoryItem(item);
+        // Add the item to the equipment.
+        character->addEquipmentItem(item);
+        // Notify to character.
+        character->sendMsg("You wear %s on your %s.\n", item->getName(true), ToLower(item->getCurrentSlotName()));
+        // Send the message inside the room.
+        character->room->sendToAll("%s wears %s on %s %s.\n",
+                                   {character},
+                                   character->getNameCapital(),
+                                   item->getName(true),
+                                   character->getPossessivePronoun(),
+                                   ToLower(item->getCurrentSlotName()));
     }
-    if (item == nullptr)
-    {
-        character->sendMsg("You don't have that item.\n");
-        return;
-    }
-    std::string errMessage;
-    if (!character->canWear(item, errMessage))
-    {
-        character->sendMsg(errMessage);
-        return;
-    }
-    // Remove the item from the player's inventory.
-    character->remInventoryItem(item);
-    // Add the item to the equipment.
-    character->addEquipmentItem(item);
-    // Notify to character.
-    character->sendMsg(
-        "You wear %s on your %s.\n",
-        item->getName(true),
-        ToLower(item->getCurrentSlotName()));
-    // Send the message inside the room.
-    character->room->sendToAll(
-        "%s wears %s on %s %s.\n",
-        {character},
-        character->getNameCapital(),
-        item->getName(true),
-        character->getPossessivePronoun(),
-        ToLower(item->getCurrentSlotName()));
+    return true;
 }
 
-void DoRemove(Character * character, ArgumentHandler & args)
+bool DoRemove(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -936,12 +887,12 @@ void DoRemove(Character * character, ArgumentHandler & args)
     if (args.size() == 0)
     {
         character->sendMsg("Remove what?\n");
-        return;
+        return false;
     }
     if (args.size() > 1)
     {
         character->sendMsg("Too many arguments.\n");
-        return;
+        return false;
     }
     // Define a function which checks if all the ranged weapons have been removed.
     auto CheckIfRemovedAllRangedWeapons = [&character]()
@@ -975,7 +926,7 @@ void DoRemove(Character * character, ArgumentHandler & args)
         if (character->equipment.empty())
         {
             character->sendMsg("You have nothing to remove.\n");
-            return;
+            return false;
         }
         auto untouchedList = character->equipment;
         for (auto iterator : untouchedList)
@@ -987,10 +938,7 @@ void DoRemove(Character * character, ArgumentHandler & args)
         }
         character->sendMsg("You have removed everything.\n");
         // Send the message inside the room.
-        character->room->sendToAll(
-            "%s has undressed all he could.\n",
-            {character},
-            character->getNameCapital());
+        character->room->sendToAll("%s has undressed all he could.\n", {character}, character->getNameCapital());
         // Check if we have just removed ALL the USED Ranged Weapons.
         if (character->combatHandler.getAimedTarget() != nullptr)
         {
@@ -1000,7 +948,7 @@ void DoRemove(Character * character, ArgumentHandler & args)
                 character->combatHandler.setAimedTarget(nullptr);
             }
         }
-        return;
+        return false;
     }
     // Get the item.
     auto item = character->findEquipmentItem(args[0].getContent(), args[0].getIndex());
@@ -1008,25 +956,21 @@ void DoRemove(Character * character, ArgumentHandler & args)
     if (item == nullptr)
     {
         character->sendMsg("You don't have that item equipped.\n");
-        return;
+        return false;
     }
     // Remove the item from the player's equipment.
     character->remEquipmentItem(item);
     // Add the item to the inventory.
     character->addInventoryItem(item);
     // Notify the character.
-    character->sendMsg(
-        "You remove %s from your %s.\n",
-        item->getName(true),
-        ToLower(item->getCurrentSlotName()));
+    character->sendMsg("You remove %s from your %s.\n", item->getName(true), ToLower(item->getCurrentSlotName()));
     // Send the message inside the room.
-    character->room->sendToAll(
-        "%s removes %s from %s %s.\n",
-        {character},
-        character->getNameCapital(),
-        item->getName(true),
-        character->getPossessivePronoun(),
-        ToLower(item->getCurrentSlotName()));
+    character->room->sendToAll("%s removes %s from %s %s.\n",
+                               {character},
+                               character->getNameCapital(),
+                               item->getName(true),
+                               character->getPossessivePronoun(),
+                               ToLower(item->getCurrentSlotName()));
     // Check if we have just removed ALL the USED Ranged Weapons.
     if (character->combatHandler.getAimedTarget() != nullptr)
     {
@@ -1036,14 +980,14 @@ void DoRemove(Character * character, ArgumentHandler & args)
             character->combatHandler.setAimedTarget(nullptr);
         }
     }
+    return true;
 }
 
-void DoInventory(Character * character, ArgumentHandler & /*args*/)
+bool DoInventory(Character * character, ArgumentHandler & /*args*/)
 {
     if (character->inventory.empty())
     {
-        character->sendMsg(
-            Formatter::gray() + "    You are carrying anything.\n" + Formatter::reset());
+        character->sendMsg(Formatter::gray() + "    You are carrying anything.\n" + Formatter::reset());
     }
     Table table = Table("Inventory");
     table.addColumn("Item", StringAlign::Left);
@@ -1055,16 +999,16 @@ void DoInventory(Character * character, ArgumentHandler & /*args*/)
         table.addRow({it->getNameCapital(), ToString(it->quantity), ToString(it->getWeight(true))});
     }
     character->sendMsg(table.getTable());
-    character->sendMsg(
-        "\n%sTotal carrying weight%s: %s of %s %s.\n",
-        Formatter::yellow(),
-        Formatter::reset(),
-        ToString(character->getCarryingWeight()),
-        ToString(character->getMaxCarryingWeight()),
-        Mud::instance().getWeightMeasure());
+    character->sendMsg("\n%sTotal carrying weight%s: %s of %s %s.\n",
+                       Formatter::yellow(),
+                       Formatter::reset(),
+                       ToString(character->getCarryingWeight()),
+                       ToString(character->getMaxCarryingWeight()),
+                       Mud::instance().getWeightMeasure());
+    return true;
 }
 
-void DoOrganize(Character * character, ArgumentHandler & args)
+bool DoOrganize(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -1072,7 +1016,7 @@ void DoOrganize(Character * character, ArgumentHandler & args)
     if (args.empty())
     {
         character->sendMsg("Organize what?\n");
-        return;
+        return false;
     }
     auto order = ItemContainer::Order::ByName;
     if (BeginWith("name", ToLower(args[0].getContent())))
@@ -1107,6 +1051,7 @@ void DoOrganize(Character * character, ArgumentHandler & args)
                 container->content.orderBy(order);
                 // Organize the target container.
                 character->sendMsg("You have organized %s, by %s.\n", container->getName(true), name);
+                return true;
             }
         }
         else if (BeginWith("inventory", args[1].getContent()))
@@ -1114,6 +1059,7 @@ void DoOrganize(Character * character, ArgumentHandler & args)
             character->inventory.orderBy(order);
             // Organize the target container.
             character->sendMsg("You have organized your inventory, by %s.\n", name);
+            return true;
         }
         else
         {
@@ -1124,9 +1070,10 @@ void DoOrganize(Character * character, ArgumentHandler & args)
     {
         character->sendMsg("Too much arguments.\n");
     }
+    return false;
 }
 
-void DoOpen(Character * character, ArgumentHandler & args)
+bool DoOpen(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -1134,7 +1081,7 @@ void DoOpen(Character * character, ArgumentHandler & args)
     if (args.size() != 1)
     {
         character->sendMsg("What do you want to open?\n");
-        return;
+        return false;
     }
     // Check if the character want to open something in onother direction.
     auto direction = Mud::instance().findDirection(args[0].getContent(), false);
@@ -1145,29 +1092,29 @@ void DoOpen(Character * character, ArgumentHandler & args)
         if (roomExit == nullptr)
         {
             character->sendMsg("There is nothing in that direction.\n");
-            return;
+            return false;
         }
         auto destination = roomExit->destination;
         if (destination == nullptr)
         {
             character->sendMsg("There is nothing in that direction.\n");
-            return;
+            return false;
         }
         auto door = destination->findDoor();
         if (door == nullptr)
         {
             character->sendMsg("There is no door in that direction.\n");
-            return;
+            return false;
         }
         if (HasFlag(door->flags, ItemFlag::Locked))
         {
             character->sendMsg("You have first to unlock it.\n");
-            return;
+            return false;
         }
         if (!HasFlag(door->flags, ItemFlag::Closed))
         {
             character->sendMsg("There door it's already opened.\n");
-            return;
+            return false;
         }
 
         ClearFlag(&door->flags, ItemFlag::Closed);
@@ -1177,19 +1124,13 @@ void DoOpen(Character * character, ArgumentHandler & args)
         {
             character->sendMsg("You have opened a hidden door!\n");
             // Send the message inside the room.
-            character->room->sendToAll(
-                "%s opens a hidden door!\n",
-                {character},
-                character->getNameCapital());
+            character->room->sendToAll("%s opens a hidden door!\n", {character}, character->getNameCapital());
         }
         else
         {
             character->sendMsg("You have opened the door.\n");
             // Send the message inside the room.
-            character->room->sendToAll(
-                "%s opens a door.\n",
-                {character},
-                character->getNameCapital());
+            character->room->sendToAll("%s opens a door.\n", {character}, character->getNameCapital());
         }
         for (auto it : destination->exits)
         {
@@ -1204,9 +1145,7 @@ void DoOpen(Character * character, ArgumentHandler & args)
             if (HasFlag(it->flags, ExitFlag::Hidden))
             {
                 // Show the action in the next room.
-                it->destination->sendToAll(
-                    "Someone opens a secret passage from the other side.\n",
-                    {});
+                it->destination->sendToAll("Someone opens a secret passage from the other side.\n", {});
             }
             else
             {
@@ -1220,31 +1159,31 @@ void DoOpen(Character * character, ArgumentHandler & args)
         if (container == nullptr)
         {
             character->sendMsg("What do you want to open?\n");
-            return;
+            return false;
         }
         if (HasFlag(container->flags, ItemFlag::Locked))
         {
             character->sendMsg("You have first to unlock it.\n");
-            return;
+            return false;
         }
         if (!HasFlag(container->flags, ItemFlag::Closed))
         {
             character->sendMsg("It is already opened.\n");
-            return;
+            return false;
         }
         ClearFlag(&container->flags, ItemFlag::Closed);
         // Send the message to the character.
         character->sendMsg("You open %s.\n", container->getName(true));
         // Send the message inside the room.
-        character->room->sendToAll(
-            "%s opens %s.\n",
-            {character},
-            character->getNameCapital(),
-            container->getName(true));
+        character->room->sendToAll("%s opens %s.\n",
+                                   {character},
+                                   character->getNameCapital(),
+                                   container->getName(true));
     }
+    return true;
 }
 
-void DoClose(Character * character, ArgumentHandler & args)
+bool DoClose(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -1252,7 +1191,7 @@ void DoClose(Character * character, ArgumentHandler & args)
     if (args.size() != 1)
     {
         character->sendMsg("What do you want to close?\n");
-        return;
+        return false;
     }
     // Check if the character want to open something in onother direction.
     auto direction = Mud::instance().findDirection(args[0].getContent(), false);
@@ -1263,34 +1202,34 @@ void DoClose(Character * character, ArgumentHandler & args)
         if (roomExit == nullptr)
         {
             character->sendMsg("There is nothing in that direction.\n");
-            return;
+            return false;
         }
         auto destination = roomExit->destination;
         if (destination == nullptr)
         {
             character->sendMsg("There is nothing in that direction.\n");
-            return;
+            return false;
         }
         auto door = destination->findDoor();
         if (door == nullptr)
         {
             character->sendMsg("There is no door in that direction.\n");
-            return;
+            return false;
         }
         if (HasFlag(door->flags, ItemFlag::Closed))
         {
             character->sendMsg("There door it's already closed.\n");
-            return;
+            return false;
         }
         if (destination->items.size() > 1)
         {
             character->sendMsg("There are items on the way, you can't close the door.\n");
-            return;
+            return false;
         }
         if (destination->characters.size() >= 1)
         {
             character->sendMsg("There are someone on the way, you can't close the door.\n");
-            return;
+            return false;
         }
         SetFlag(&door->flags, ItemFlag::Closed);
         // Display message.
@@ -1298,19 +1237,13 @@ void DoClose(Character * character, ArgumentHandler & args)
         {
             character->sendMsg("You have closed a hidden door!\n");
             // Send the message inside the room.
-            character->room->sendToAll(
-                "%s closes a hidden door!\n",
-                {character},
-                character->getNameCapital());
+            character->room->sendToAll("%s closes a hidden door!\n", {character}, character->getNameCapital());
         }
         else
         {
             character->sendMsg("You have closed the door.\n");
             // Send the message inside the room.
-            character->room->sendToAll(
-                "%s closes a door.\n",
-                {character},
-                character->getNameCapital());
+            character->room->sendToAll("%s closes a door.\n", {character}, character->getNameCapital());
         }
         for (auto it : destination->exits)
         {
@@ -1325,9 +1258,7 @@ void DoClose(Character * character, ArgumentHandler & args)
             if (HasFlag(it->flags, ExitFlag::Hidden))
             {
                 // Send the message inside the room.
-                it->destination->sendToAll(
-                    "Someone closes a secret passage from the other side.\n",
-                    {});
+                it->destination->sendToAll("Someone closes a secret passage from the other side.\n", {});
             }
             else
             {
@@ -1335,7 +1266,6 @@ void DoClose(Character * character, ArgumentHandler & args)
                 it->destination->sendToAll("Someone closes a door from the other side.\n", {});
             }
         }
-        return;
     }
     else
     {
@@ -1343,70 +1273,69 @@ void DoClose(Character * character, ArgumentHandler & args)
         if (container == nullptr)
         {
             character->sendMsg("What do you want to close?\n");
-            return;
+            return false;
         }
         if (HasFlag(container->flags, ItemFlag::Closed))
         {
             character->sendMsg("It is already closed.\n");
-            return;
+            return false;
         }
         if (!HasFlag(container->model->modelFlags, ModelFlag::CanClose))
         {
             character->sendMsg("It cannot be closed.\n");
-            return;
+            return false;
         }
         SetFlag(&container->flags, ItemFlag::Closed);
         // Send the message to the character.
         character->sendMsg("You close %s.\n", container->getName(true));
         // Send the message inside the room.
-        character->room->sendToAll(
-            "%s closes %s.\n",
-            {character},
-            character->getNameCapital(),
-            container->getName(true));
+        character->room->sendToAll("%s closes %s.\n",
+                                   {character},
+                                   character->getNameCapital(),
+                                   container->getName(true));
     }
-    return;
+    return true;
 }
 
-void DoPut(Character * character, ArgumentHandler & args)
+bool DoPut(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
     if (args.size() != 2)
     {
         character->sendMsg("Put what inside what?\n");
-        return;
+        return false;
     }
     auto container = character->findNearbyItem(args[1].getContent(), args[1].getIndex());
     if (container == nullptr)
     {
         character->sendMsg("You don't see any container named '%s' here.\n", args[1].getContent());
-        return;
+        return false;
     }
     if (!container->isAContainer())
     {
         character->sendMsg("%s is not a valid container.\n", container->getNameCapital());
-        return;
+        return false;
     }
     if (container->model->getType() == ModelType::Corpse)
     {
         character->sendMsg("You don't really want to put something inside that body...\n");
-        return;
+        return false;
     }
     if (HasFlag(container->flags, ItemFlag::Locked))
     {
         character->sendMsg("You have first to unlock %s.\n", container->getName(true));
-        return;
+        return false;
     }
     if (HasFlag(container->flags, ItemFlag::Closed))
     {
         character->sendMsg("You have first to open %s.\n", container->getName(true));
-        return;
+        return false;
     }
     if (character->inventory.empty())
     {
         character->sendMsg("You don't have anything to put in a container.");
-        return;
+        return false;
     }
     // Check if the player wants to put all in the container.
     if (args[0].getContent() == "all")
@@ -1431,13 +1360,11 @@ void DoPut(Character * character, ArgumentHandler & args)
         SQLiteDbms::instance().endTransaction();
         // Send the messages.
         character->sendMsg("You put everything you could in %s.\n", container->getName(true));
-        character->room->sendToAll(
-            "%s puts everything %s could inside %s.\n",
-            {character},
-            character->getNameCapital(),
-            character->getSubjectPronoun(),
-            container->getName(true));
-        return;
+        character->room->sendToAll("%s puts everything %s could inside %s.\n",
+                                   {character},
+                                   character->getNameCapital(),
+                                   character->getSubjectPronoun(),
+                                   container->getName(true));
     }
     else
     {
@@ -1446,7 +1373,7 @@ void DoPut(Character * character, ArgumentHandler & args)
         if (item == nullptr)
         {
             character->sendMsg("You don't have any '%s'.\n", args[0].getContent());
-            return;
+            return false;
         }
         // Set the quantity.
         auto quantity = args[0].getMultiplier();
@@ -1458,7 +1385,7 @@ void DoPut(Character * character, ArgumentHandler & args)
         if (!container->canContain(item, quantity))
         {
             character->sendMsg("%s can't contain any more items.\n", container->getNameCapital());
-            return;
+            return false;
         }
         // Start a transaction.
         SQLiteDbms::instance().beginTransaction();
@@ -1469,16 +1396,12 @@ void DoPut(Character * character, ArgumentHandler & args)
             // Put the item inside the container.
             container->putInside(item);
             // Send the messages.
-            character->sendMsg(
-                "You put %s inside %s.\n",
-                item->getName(true),
-                container->getName(true));
-            character->room->sendToAll(
-                "%s puts %s inside %s.\n",
-                {character},
-                character->getNameCapital(),
-                item->getName(true),
-                container->getName(true));
+            character->sendMsg("You put %s inside %s.\n", item->getName(true), container->getName(true));
+            character->room->sendToAll("%s puts %s inside %s.\n",
+                                       {character},
+                                       character->getNameCapital(),
+                                       item->getName(true),
+                                       container->getName(true));
         }
         else
         {
@@ -1486,41 +1409,37 @@ void DoPut(Character * character, ArgumentHandler & args)
             auto newStack = item->removeFromStack(character, quantity);
             if (newStack == nullptr)
             {
-                character->sendMsg(
-                    "You failed to put part of %s inside %s.\n",
-                    item->getName(true),
-                    container->getName(true));
+                character->sendMsg("You failed to put part of %s inside %s.\n",
+                                   item->getName(true),
+                                   container->getName(true));
                 // Rollback the transaction.
                 SQLiteDbms::instance().rollbackTransection();
-                return;
+                return false;
             }
             // Put the stack inside the container.
             container->putInside(newStack);
             // Send the messages.
-            character->sendMsg(
-                "You put part of %s inside %s.\n",
-                item->getName(true),
-                container->getName(true));
-            character->room->sendToAll(
-                "%s puts %s inside %s.\n",
-                {character},
-                character->getNameCapital(),
-                item->getName(true),
-                container->getName(true));
+            character->sendMsg("You put part of %s inside %s.\n", item->getName(true), container->getName(true));
+            character->room->sendToAll("%s puts %s inside %s.\n",
+                                       {character},
+                                       character->getNameCapital(),
+                                       item->getName(true),
+                                       container->getName(true));
         }
         // Conclude the transaction.
         SQLiteDbms::instance().endTransaction();
     }
+    return true;
 }
 
-void DoDrink(Character * character, ArgumentHandler & args)
+bool DoDrink(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
     if (args.empty())
     {
         character->sendMsg("Drink from what?\n");
-        return;
+        return false;
     }
     auto container = character->findEquipmentItem(args[0].getContent(), args[0].getIndex());
     if (container == nullptr)
@@ -1532,7 +1451,7 @@ void DoDrink(Character * character, ArgumentHandler & args)
             if (container == nullptr)
             {
                 character->sendMsg("You don't see that container.\n");
-                return;
+                return false;
             }
         }
     }
@@ -1540,44 +1459,43 @@ void DoDrink(Character * character, ArgumentHandler & args)
     if (HasFlag(container->flags, ItemFlag::Locked))
     {
         character->sendMsg("You have first to unlock %s.\n", container->getName(true));
-        return;
+        return false;
     }
     if (HasFlag(container->flags, ItemFlag::Closed))
     {
         character->sendMsg("You have first to open %s.\n", container->getName(true));
-        return;
+        return false;
     }
     if (container->model->getType() != ModelType::LiquidContainer)
     {
         character->sendMsg("%s is not a container for liquids.\n", container->getNameCapital(true));
-        return;
+        return false;
     }
     if (container->isEmpty())
     {
         character->sendMsg("%s is empty.\n", container->getNameCapital(true));
-        return;
+        return false;
     }
     // Take out the liquid.
     auto liquid = container->contentLiq.first;
     if (!container->pourOut(1))
     {
-        character->sendMsg(
-            "You were not able to drink some %s from %s.\n",
-            liquid->getName(),
-            container->getName(true));
-        return;
+        character->sendMsg("You were not able to drink some %s from %s.\n",
+                           liquid->getName(),
+                           container->getName(true));
+        return false;
     }
     character->sendMsg("You drink some %s from %s.\n", liquid->getName(), container->getName(true));
     // Send the message inside the room.
-    character->room->sendToAll(
-        "%s drinks some %s from %s.\n",
-        {character},
-        character->getNameCapital(),
-        liquid->getName(),
-        container->getName(true));
+    character->room->sendToAll("%s drinks some %s from %s.\n",
+                               {character},
+                               character->getNameCapital(),
+                               liquid->getName(),
+                               container->getName(true));
+    return true;
 }
 
-void DoFill(Character * character, ArgumentHandler & args)
+bool DoFill(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -1585,7 +1503,7 @@ void DoFill(Character * character, ArgumentHandler & args)
     if (args.size() != 2)
     {
         character->sendMsg("You have to fill something from a source.\n");
-        return;
+        return false;
     }
     // Search the container.
     auto container = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
@@ -1595,7 +1513,7 @@ void DoFill(Character * character, ArgumentHandler & args)
         if (container == nullptr)
         {
             character->sendMsg("You don't have any '%s' with you.\n", args[0].getContent());
-            return;
+            return false;
         }
     }
     // Search the source.
@@ -1609,47 +1527,47 @@ void DoFill(Character * character, ArgumentHandler & args)
             if (source == nullptr)
             {
                 character->sendMsg("You don't see any '%s'.\n", args[1].getContent());
-                return;
+                return false;
             }
         }
     }
     if (HasFlag(source->flags, ItemFlag::Locked))
     {
         character->sendMsg("You have first to unlock %s.\n", source->getName(true));
-        return;
+        return false;
     }
     if (HasFlag(source->flags, ItemFlag::Closed))
     {
         character->sendMsg("You have first to open %s.\n", source->getName(true));
-        return;
+        return false;
     }
     if (HasFlag(container->flags, ItemFlag::Locked))
     {
         character->sendMsg("You have first to unlock %s.\n", container->getName(true));
-        return;
+        return false;
     }
     if (HasFlag(container->flags, ItemFlag::Closed))
     {
         character->sendMsg("You have first to open %s.\n", container->getName(true));
-        return;
+        return false;
     }
     // Check if the items are suitable source and container of liquids.
     if (container->model->getType() != ModelType::LiquidContainer)
     {
         character->sendMsg("%s is not a suitable container.\n", container->getNameCapital());
-        return;
+        return false;
     }
     if (source->model->getType() != ModelType::LiquidContainer)
     {
         character->sendMsg("%s is not a suitable source of liquids.\n", source->getNameCapital());
-        return;
+        return false;
     }
     auto liquidModelSource = source->model->toLiquidContainer();
     // Check if source is empty.
     if (source->isEmpty())
     {
         character->sendMsg("%s is empty.\n", source->getNameCapital());
-        return;
+        return false;
     }
 
     // Get the liquid from the source and eventually from the container.
@@ -1661,7 +1579,7 @@ void DoFill(Character * character, ArgumentHandler & args)
         if (sourLiquid != contLiquid)
         {
             character->sendMsg("You can't mix those two liquids.\n");
-            return;
+            return false;
         }
     }
     // Fill the container from the source.
@@ -1676,32 +1594,29 @@ void DoFill(Character * character, ArgumentHandler & args)
     }
     if (!source->pourOut(quantity))
     {
-        character->sendMsg(
-            "You failed to take out the liquid from a %s.\n",
-            source->getNameCapital());
-        return;
+        character->sendMsg("You failed to take out the liquid from a %s.\n", source->getNameCapital());
+        return false;
     }
     if (!container->pourIn(sourLiquid, quantity))
     {
         character->sendMsg("You failed to fill the container with the liquid.\n");
-        return;
+        return false;
     }
     // Send the messages.
-    character->sendMsg(
-        "You fill %s with %s from %s.\n",
-        container->getName(true),
-        sourLiquid->getName(),
-        source->getName(true));
-    character->room->sendToAll(
-        "%s fills %s with %s from %s.\n",
-        {character},
-        character->getNameCapital(),
-        container->getName(true),
-        sourLiquid->getName(),
-        source->getName(true));
+    character->sendMsg("You fill %s with %s from %s.\n",
+                       container->getName(true),
+                       sourLiquid->getName(),
+                       source->getName(true));
+    character->room->sendToAll("%s fills %s with %s from %s.\n",
+                               {character},
+                               character->getNameCapital(),
+                               container->getName(true),
+                               sourLiquid->getName(),
+                               source->getName(true));
+    return true;
 }
 
-void DoPour(Character * character, ArgumentHandler & args)
+bool DoPour(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -1709,7 +1624,7 @@ void DoPour(Character * character, ArgumentHandler & args)
     if (args.size() != 2)
     {
         character->sendMsg("You have to pour something into something else.\n");
-        return;
+        return false;
     }
     // Search the container.
     auto source = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
@@ -1719,7 +1634,7 @@ void DoPour(Character * character, ArgumentHandler & args)
         if (source == nullptr)
         {
             character->sendMsg("You don't have any '%s' with you.\n", args[0].getContent());
-            return;
+            return false;
         }
     }
     // Search the source.
@@ -1733,48 +1648,48 @@ void DoPour(Character * character, ArgumentHandler & args)
             if (container == nullptr)
             {
                 character->sendMsg("You don't see any '%s'.\n", args[1].getContent());
-                return;
+                return false;
             }
         }
     }
     if (HasFlag(source->flags, ItemFlag::Locked))
     {
         character->sendMsg("You have first to unlock %s.\n", source->getName(true));
-        return;
+        return false;
     }
     if (HasFlag(source->flags, ItemFlag::Closed))
     {
         character->sendMsg("You have first to open %s.\n", source->getName(true));
-        return;
+        return false;
     }
 
     if (HasFlag(container->flags, ItemFlag::Locked))
     {
         character->sendMsg("You have first to unlock %s.\n", container->getName(true));
-        return;
+        return false;
     }
     if (HasFlag(container->flags, ItemFlag::Closed))
     {
         character->sendMsg("You have first to open %s.\n", container->getName(true));
-        return;
+        return false;
     }
     // Check if the items are suitable source and container of liquids.
     if (container->model->getType() != ModelType::LiquidContainer)
     {
         character->sendMsg("%s is not a suitable container.\n", container->getNameCapital());
-        return;
+        return false;
     }
     if (source->model->getType() != ModelType::LiquidContainer)
     {
         character->sendMsg("%s is not a suitable source of liquids.\n", source->getNameCapital());
-        return;
+        return false;
     }
     auto liquidModelSource = source->model->toLiquidContainer();
     // Check if source is empty.
     if (source->isEmpty())
     {
         character->sendMsg("%s is empty.\n", source->getNameCapital());
-        return;
+        return false;
     }
     // Get the liquid from the source and eventually from the container.
     auto sourLiquid = source->contentLiq.first;
@@ -1785,7 +1700,7 @@ void DoPour(Character * character, ArgumentHandler & args)
         if (sourLiquid != contLiquid)
         {
             character->sendMsg("You can't mix those two liquids.\n");
-            return;
+            return false;
         }
     }
     // Fill the container from the source.
@@ -1801,29 +1716,28 @@ void DoPour(Character * character, ArgumentHandler & args)
     if (!source->pourOut(quantity))
     {
         character->sendMsg("You failed to pour out the liquid from %s.\n", source->getName(true));
-        return;
+        return false;
     }
     if (!container->pourIn(sourLiquid, quantity))
     {
         character->sendMsg("You failed to pour the liquid into %s.\n", source->getName(true));
-        return;
+        return false;
     }
     // Send the messages.
-    character->sendMsg(
-        "You pour %s of %s into %s.\n",
-        sourLiquid->getName(),
-        source->getName(true),
-        container->getName(true));
-    character->room->sendToAll(
-        "%s pour %s of %s into %s.\n",
-        {character},
-        character->getNameCapital(),
-        sourLiquid->getName(),
-        source->getName(true),
-        container->getName(true));
+    character->sendMsg("You pour %s of %s into %s.\n",
+                       sourLiquid->getName(),
+                       source->getName(true),
+                       container->getName(true));
+    character->room->sendToAll("%s pour %s of %s into %s.\n",
+                               {character},
+                               character->getNameCapital(),
+                               sourLiquid->getName(),
+                               source->getName(true),
+                               container->getName(true));
+    return true;
 }
 
-void DoDeposit(Character * character, ArgumentHandler & args)
+bool DoDeposit(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -1831,7 +1745,7 @@ void DoDeposit(Character * character, ArgumentHandler & args)
     if (args.size() != 2)
     {
         character->sendMsg("What do you want to deposit?\n");
-        return;
+        return false;
     }
     auto item = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
     auto building = character->room->findBuilding(args[1].getContent(), args[1].getIndex());
@@ -1839,23 +1753,23 @@ void DoDeposit(Character * character, ArgumentHandler & args)
     if (item == nullptr)
     {
         character->sendMsg("You don't have that item.\n");
-        return;
+        return false;
     }
     if (item->getType() != ModelType::Currency)
     {
         character->sendMsg("You can't deposit %s.\n", item->getName(true));
-        return;
+        return false;
     }
     // Check the building.
     if (building == nullptr)
     {
         character->sendMsg("You don't see that building.\n");
-        return;
+        return false;
     }
     if (building->getType() != ModelType::Shop)
     {
         character->sendMsg("You can't deposit %s in %s.\n", item->getName(true), building->getName(true));
-        return;
+        return false;
     }
     // Set the quantity.
     auto quantity = args[0].getMultiplier();
@@ -1870,9 +1784,10 @@ void DoDeposit(Character * character, ArgumentHandler & args)
         item->quantity -= quantity;
         building->toShopItem()->balance += item->getPrice(false) * quantity;
     }
+    return true;
 }
 
-void DoSell(Character * character, ArgumentHandler & args)
+bool DoSell(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -1880,7 +1795,7 @@ void DoSell(Character * character, ArgumentHandler & args)
     if (args.size() != 2)
     {
         character->sendMsg("Sell what to whom?\n");
-        return;
+        return false;
     }
 
     // Get the item and the target.
@@ -1889,12 +1804,12 @@ void DoSell(Character * character, ArgumentHandler & args)
     if (item == nullptr)
     {
         character->sendMsg("You don't have that item.\n");
-        return;
+        return false;
     }
     if (item->getType() == ModelType::Currency)
     {
         character->sendMsg("You can't sell %s.\n", item->getName(true));
-        return;
+        return false;
     }
 
     // Get the target.
@@ -1902,12 +1817,12 @@ void DoSell(Character * character, ArgumentHandler & args)
     if (target == nullptr)
     {
         character->sendMsg("You don't see '%s' here.\n", args[1].getContent());
-        return;
+        return false;
     }
     if (target->getType() != ModelType::Shop)
     {
         character->sendMsg("%s is not a shop.\n", target->getNameCapital());
-        return;
+        return false;
     }
 
     // Set the quantity.
@@ -1922,7 +1837,7 @@ void DoSell(Character * character, ArgumentHandler & args)
     if (!shop->canUse(error))
     {
         character->sendMsg(error + "\n");
-        return;
+        return false;
     }
 
     auto shopKeeper = shop->shopKeeper;
@@ -1930,7 +1845,7 @@ void DoSell(Character * character, ArgumentHandler & args)
     {
         auto phrase = "The shop is full, come back another day.";
         shopKeeper->doCommand("say " + character->getName() + " " + phrase);
-        return;
+        return false;
     }
 
     auto price = shop->evaluateSellPrice(item) * quantity;
@@ -1938,7 +1853,7 @@ void DoSell(Character * character, ArgumentHandler & args)
     {
         auto phrase = "I can't afford to buy your goods.";
         shopKeeper->doCommand("say " + character->getName() + " " + phrase);
-        return;
+        return false;
     }
 
     auto currency = shopKeeper->faction->currency;
@@ -1948,7 +1863,7 @@ void DoSell(Character * character, ArgumentHandler & args)
     if (coins.empty())
     {
         character->sendMsg("You failed to sell %s.\n", item->getName(true));
-        return;
+        return false;
     }
 
     SQLiteDbms::instance().beginTransaction();
@@ -1976,7 +1891,7 @@ void DoSell(Character * character, ArgumentHandler & args)
             }
             // Rollback the transaction.
             SQLiteDbms::instance().rollbackTransection();
-            return;
+            return false;
         }
         // Put the item inside the container.
         shop->putInside(newStack);
@@ -1990,9 +1905,10 @@ void DoSell(Character * character, ArgumentHandler & args)
         character->addInventoryItem(coin);
     }
     SQLiteDbms::instance().endTransaction();
+    return true;
 }
 
-void DoBuy(Character * character, ArgumentHandler & args)
+bool DoBuy(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -2000,7 +1916,7 @@ void DoBuy(Character * character, ArgumentHandler & args)
     if (args.size() != 2)
     {
         character->sendMsg("Buy what from which shop?\n");
-        return;
+        return false;
     }
 
     // Get the target.
@@ -2008,12 +1924,12 @@ void DoBuy(Character * character, ArgumentHandler & args)
     if (target == nullptr)
     {
         character->sendMsg("You don't see '%s' here.\n", args[1].getContent());
-        return;
+        return false;
     }
     if (target->getType() != ModelType::Shop)
     {
         character->sendMsg("%s is not a shop.\n", target->getNameCapital(true));
-        return;
+        return false;
     }
 
     // Get the shop.
@@ -2022,7 +1938,7 @@ void DoBuy(Character * character, ArgumentHandler & args)
     if (!shop->canUse(error))
     {
         character->sendMsg(error + "\n");
-        return;
+        return false;
     }
     auto shopKeeper = shop->shopKeeper;
 
@@ -2033,7 +1949,7 @@ void DoBuy(Character * character, ArgumentHandler & args)
     {
         auto phrase = "There is no " + args[0].getContent() + " on sale.\n";
         shopKeeper->doCommand("say " + character->getName() + " " + phrase);
-        return;
+        return false;
     }
     // Set the quantity.
     auto quantity = args[0].getMultiplier();
@@ -2045,7 +1961,7 @@ void DoBuy(Character * character, ArgumentHandler & args)
     {
         auto phrase = "It seems that you can't carry " + item->getName(true) + ".\n";
         shopKeeper->doCommand("say " + character->getName() + " " + phrase);
-        return;
+        return false;
     }
 
     // Check if the character has enough coins.
@@ -2072,7 +1988,7 @@ void DoBuy(Character * character, ArgumentHandler & args)
     {
         auto phrase = "You can't afford to buy " + item->getName(true) + ".\n";
         shopKeeper->doCommand("say " + character->getName() + " " + phrase);
-        return;
+        return false;
     }
     if (providedValue > requiredValue)
     {
@@ -2083,7 +1999,7 @@ void DoBuy(Character * character, ArgumentHandler & args)
         {
             auto phrase = "Sorry but I cannot sell " + item->getName(true) + " to you.\n";
             shopKeeper->doCommand("say " + character->getName() + " " + phrase);
-            return;
+            return false;
         }
     }
     SQLiteDbms::instance().beginTransaction();
@@ -2103,7 +2019,7 @@ void DoBuy(Character * character, ArgumentHandler & args)
         {
             // Rollback the transaction.
             SQLiteDbms::instance().rollbackTransection();
-            return;
+            return false;
         }
         character->addInventoryItem(newStack);
         character->sendMsg("You buy part of %s from %s.\n", item->getName(true), shop->getName(true));
@@ -2127,15 +2043,16 @@ void DoBuy(Character * character, ArgumentHandler & args)
         }
     }
     SQLiteDbms::instance().endTransaction();
+    return true;
 }
 
-void DoBalance(Character * character, ArgumentHandler & args)
+bool DoBalance(Character * character, ArgumentHandler & args)
 {
     // Check the number of arguments.
     if (!args.empty())
     {
         character->sendMsg("You have provided unecessary arguments.\n");
-        return;
+        return false;
     }
     unsigned int balance = 0;
     for (auto coin : character->findCoins())
@@ -2143,4 +2060,5 @@ void DoBalance(Character * character, ArgumentHandler & args)
         balance += coin->getPrice(true);
     }
     character->sendMsg("Your balance is: %s.\n", ToString(balance));
+    return true;
 }

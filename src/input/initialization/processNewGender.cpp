@@ -25,7 +25,7 @@
 #include "processNewAttributes.hpp"
 #include "processNewAge.hpp"
 
-void ProcessNewGender::process(Character * character, ArgumentHandler & args)
+bool ProcessNewGender::process(Character * character, ArgumentHandler & args)
 {
     auto player = character->toPlayer();
     auto input = args.getOriginal();
@@ -38,6 +38,7 @@ void ProcessNewGender::process(Character * character, ArgumentHandler & args)
         player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->rollBack(character);
+        return true;
     }
     else if (input == "1")
     {
@@ -48,6 +49,7 @@ void ProcessNewGender::process(Character * character, ArgumentHandler & args)
         player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->advance(character);
+        return true;
     }
     else if (input == "2")
     {
@@ -58,11 +60,10 @@ void ProcessNewGender::process(Character * character, ArgumentHandler & args)
         player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->advance(character);
+        return true;
     }
-    else
-    {
-        this->advance(character, "Not a valid gender.");
-    }
+    this->advance(character, "Not a valid gender.");
+    return false;
 }
 
 void ProcessNewGender::advance(Character * character, const std::string & error)

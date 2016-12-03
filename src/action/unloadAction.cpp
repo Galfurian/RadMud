@@ -31,14 +31,14 @@ UnloadAction::UnloadAction(Character * _actor, Item * _itemToBeUnloaded) :
     itemToBeUnloaded(_itemToBeUnloaded)
 {
     // Debugging message.
-    Logger::log(LogLevel::Debug, "Created UnloadAction.");
+    //Logger::log(LogLevel::Debug, "Created UnloadAction.");
     // Reset the cooldown of the action.
     this->resetCooldown(UnloadAction::getUnloadTime(_itemToBeUnloaded));
 }
 
 UnloadAction::~UnloadAction()
 {
-    Logger::log(LogLevel::Debug, "Deleted unload action.");
+    //Logger::log(LogLevel::Debug, "Deleted unload action.");
 }
 
 bool UnloadAction::check(std::string & error) const

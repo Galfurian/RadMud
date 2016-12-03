@@ -27,8 +27,6 @@
 #include "logger.hpp"
 #include "room.hpp"
 
-using namespace std::chrono;
-
 BuildAction::BuildAction(Character * _actor,
                          Building * _schematics,
                          Item * _building,
@@ -41,14 +39,14 @@ BuildAction::BuildAction(Character * _actor,
     ingredients(_ingredients)
 {
     // Debugging message.
-    Logger::log(LogLevel::Debug, "Created BuildAction.");
+    //Logger::log(LogLevel::Debug, "Created BuildAction.");
     // Reset the cooldown of the action.
     this->resetCooldown(BuildAction::getCooldown(_actor, _schematics));
 }
 
 BuildAction::~BuildAction()
 {
-    Logger::log(LogLevel::Debug, "Deleted building action.");
+    //Logger::log(LogLevel::Debug, "Deleted building action.");
 }
 
 bool BuildAction::check(std::string & error) const

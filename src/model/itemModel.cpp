@@ -66,12 +66,12 @@ ItemModel::ItemModel() :
 
 ItemModel::~ItemModel()
 {
-    Logger::log(LogLevel::Debug, "Deleted model\t\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
+    //Logger::log(LogLevel::Debug, "Deleted model\t\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
 }
 
 ModelType ItemModel::getType() const
 {
-    return ModelType::NoType;
+    return ModelType::None;
 }
 
 void ItemModel::getSheet(Table & sheet) const
@@ -291,7 +291,56 @@ void ItemModel::luaRegister(lua_State * L)
         .addData("vnum", &ItemModel::vnum)
         .addData("condition", &ItemModel::condition)
         .addData("decay", &ItemModel::decay)
+        .addFunction("toTool", &ItemModel::toTool)
         .addFunction("getType", &ItemModel::getType)
+        .endClass()
+        .deriveClass<ToolModel, ItemModel>("ToolModel")
+        .addData("toolType", &ToolModel::toolType)
+        .addFunction("getTypeName", &ToolModel::getTypeName)
+        .endClass()
+        .deriveClass<ArmorModel, ItemModel>("ArmorModel")
+        .endClass()
+        .deriveClass<BookModel, ItemModel>("BookModel")
+        .endClass()
+        .deriveClass<ContainerModel, ItemModel>("ContainerModel")
+        .endClass()
+        .deriveClass<CorpseModel, ItemModel>("CorpseModel")
+        .endClass()
+        .deriveClass<CurrencyModel, ItemModel>("CurrencyModel")
+        .endClass()
+        .deriveClass<FoodModel, ItemModel>("FoodModel")
+        .endClass()
+        .deriveClass<FurnitureModel, ItemModel>("FurnitureModel")
+        .endClass()
+        .deriveClass<KeyModel, ItemModel>("KeyModel")
+        .endClass()
+        .deriveClass<LightModel, ItemModel>("LightModel")
+        .endClass()
+        .deriveClass<LiquidContainerModel, ItemModel>("LiquidContainerModel")
+        .endClass()
+        .deriveClass<MagazineItem, ItemModel>("MagazineItem")
+        .endClass()
+        .deriveClass<MechanismModel, ItemModel>("MechanismModel")
+        .endClass()
+        .deriveClass<MeleeWeaponModel, ItemModel>("MeleeWeaponModel")
+        .endClass()
+        .deriveClass<NodeModel, ItemModel>("NodeModel")
+        .endClass()
+        .deriveClass<ProjectileModel, ItemModel>("ProjectileModel")
+        .endClass()
+        .deriveClass<RangedWeaponModel, ItemModel>("RangedWeaponModel")
+        .endClass()
+        .deriveClass<ResourceModel, ItemModel>("ResourceModel")
+        .endClass()
+        .deriveClass<RopeModel, ItemModel>("RopeModel")
+        .endClass()
+        .deriveClass<SeedModel, ItemModel>("SeedModel")
+        .endClass()
+        .deriveClass<ShieldModel, ItemModel>("ShieldModel")
+        .endClass()
+        .deriveClass<ShopModel, ItemModel>("ShopModel")
+        .endClass()
+        .deriveClass<VehicleModel, ItemModel>("VehicleModel")
         .endClass();
 }
 

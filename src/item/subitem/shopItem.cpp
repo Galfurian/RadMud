@@ -137,10 +137,10 @@ std::string ShopItem::lookContent()
         saleTable.addColumn("Good", StringAlign::Left);
         saleTable.addColumn("Quantity", StringAlign::Center);
         saleTable.addColumn("Weight (Single)", StringAlign::Right);
-        saleTable.addColumn("Weight (Stack)", StringAlign::Right);
+        saleTable.addColumn("Weight (stack)", StringAlign::Right);
         saleTable.addColumn("Buy", StringAlign::Right);
         saleTable.addColumn("Sell (Single)", StringAlign::Right);
-        saleTable.addColumn("Sell (Stack)", StringAlign::Right);
+        saleTable.addColumn("Sell (stack)", StringAlign::Right);
         for (auto iterator : content)
         {
             // Prepare the row.

@@ -25,7 +25,7 @@
 #include "processNewDescription.hpp"
 #include "processNewConfirm.hpp"
 
-void ProcessNewWeight::process(Character * character, ArgumentHandler & args)
+bool ProcessNewWeight::process(Character * character, ArgumentHandler & args)
 {
     auto player = character->toPlayer();
     auto input = args.getOriginal();
@@ -38,6 +38,7 @@ void ProcessNewWeight::process(Character * character, ArgumentHandler & args)
         player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->rollBack(character);
+        return true;
     }
     else if (!IsNumber(input))
     {
@@ -63,8 +64,10 @@ void ProcessNewWeight::process(Character * character, ArgumentHandler & args)
             player->inputProcessor = newStep;
             // Advance to the next step.
             newStep->advance(character);
+            return true;
         }
     }
+    return false;
 }
 
 void ProcessNewWeight::advance(Character * character, const std::string & error)

@@ -69,8 +69,6 @@ class Item
 public:
     /// Item vnum.
     int vnum;
-    /// The type of item.
-    ModelType type;
     /// Item model.
     ItemModel * model;
     /// The number of stacked items.

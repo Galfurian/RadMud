@@ -43,7 +43,8 @@ Player::Player(const int & _socket, const int & _port, const std::string & _addr
     closing(),
     logged_in(),
     connectionFlags(),
-    msdpVariables()
+    msdpVariables(),
+    luaVariables()
 {
     // Nothing to do.
 }
@@ -76,7 +77,7 @@ Player::~Player()
     {
         room->removeCharacter(this);
     }
-    Logger::log(LogLevel::Debug, "Deleted player\t\t\t\t(%s)", this->getNameCapital());
+    //Logger::log(LogLevel::Debug, "Deleted player\t\t\t\t(%s)", this->getNameCapital());
 }
 
 bool Player::check() const
@@ -270,6 +271,19 @@ bool Player::updateOnDB()
         if (!SQLiteDbms::instance().insertInto("Advancement", arguments, false, true))
         {
             Logger::log(LogLevel::Error, "Error during player Skill creation on database.");
+            return false;
+        }
+    }
+    // Prepare the arguments of the query for lua variables table.
+    for (auto iterator : luaVariables)
+    {
+        arguments.clear();
+        arguments.push_back(name);
+        arguments.push_back(iterator.first);
+        arguments.push_back(iterator.second);
+        if (!SQLiteDbms::instance().insertInto("PlayerVariable", arguments, false, true))
+        {
+            Logger::log(LogLevel::Error, "Error during player Lua Variables creation on database.");
             return false;
         }
     }
@@ -478,4 +492,25 @@ void Player::processException()
 void Player::sendMsg(const std::string & msg)
 {
     outbuf += msg;
+}
+
+void Player::setLuaVariable(std::string variableName, std::string variableValue)
+{
+    luaVariables[variableName] = variableValue;
+}
+
+std::string Player::getLuaVariable(std::string variableName)
+{
+    return luaVariables[variableName];
+}
+
+bool Player::removeLuaVariable(std::string variableName)
+{
+    auto it = luaVariables.find(variableName);
+    if (it == luaVariables.end())
+    {
+        return false;
+    }
+    it->second = "";
+    return true;
 }

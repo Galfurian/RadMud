@@ -1,16 +1,17 @@
 #############################################
 # SQLite Include Directories
 set(PROJECT_INC ${PROJECT_INC}
-        ./src/sqlite
+        ${CMAKE_SOURCE_DIR}/src/sqlite
         PARENT_SCOPE
         )
 
 #############################################
 # SQLite Source Files
 set(PROJECT_SRC ${PROJECT_SRC}
-        ./src/sqlite/sqliteDbms.cpp
-        ./src/sqlite/tableLoader.cpp
-        ./src/sqlite/sqliteWrapper.cpp
-        ./src/sqlite/sqliteLoadFunctions.cpp
+        ${CMAKE_SOURCE_DIR}/src/sqlite/sqliteDbms.cpp
+        ${CMAKE_SOURCE_DIR}/src/sqlite/tableLoader.cpp
+        ${CMAKE_SOURCE_DIR}/src/sqlite/sqliteWrapper.cpp
+        ${CMAKE_SOURCE_DIR}/src/sqlite/sqliteLoadFunctions.cpp
+        ${CMAKE_SOURCE_DIR}/src/sqlite/dbFunctionsPlayer.cpp
         PARENT_SCOPE
         )

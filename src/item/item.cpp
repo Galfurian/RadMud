@@ -36,7 +36,6 @@
 
 Item::Item() :
     vnum(),
-    type(),
     model(),
     quantity(),
     maker(),
@@ -58,11 +57,7 @@ Item::Item() :
 
 Item::~Item()
 {
-    Logger::log(
-        LogLevel::Debug,
-        "Deleted item\t\t[%s]\t\t(%s)",
-        ToString(this->vnum),
-        this->getNameCapital());
+    //Logger::log(LogLevel::Debug, "Deleted item\t\t[%s]\t\t(%s)", ToString(this->vnum), this->getNameCapital());
 }
 
 bool Item::check(bool complete)
@@ -871,6 +866,9 @@ void Item::luaRegister(lua_State * L)
         .addData("vnum", &Item::vnum)
         .addData("model", &Item::model)
         .addFunction("getName", &Item::getName)
+        .addFunction("hasKey", &Item::hasKey)
+        .addFunction("getType", &Item::getType)
+        .addFunction("getTypeName", &Item::getTypeName)
         .addData("maker", &Item::maker)
         .addData("condition", &Item::condition)
         .addData("weight", &Item::weight)

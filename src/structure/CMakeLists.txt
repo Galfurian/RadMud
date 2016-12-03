@@ -1,18 +1,18 @@
 #############################################
 # Include Directories
 set(PROJECT_INC ${PROJECT_INC}
-        ./src/structure
+        ${CMAKE_SOURCE_DIR}/src/structure
         PARENT_SCOPE
         )
 
 #############################################
 # Source Files
 set(PROJECT_SRC ${PROJECT_SRC}
-        ./src/structure/exit.cpp
-        ./src/structure/room.cpp
-        ./src/structure/area.cpp
-        ./src/structure/continent.cpp
-        ./src/structure/coordinates.cpp
-        ./src/structure/generator.cpp
+        ${CMAKE_SOURCE_DIR}/src/structure/exit.cpp
+        ${CMAKE_SOURCE_DIR}/src/structure/room.cpp
+        ${CMAKE_SOURCE_DIR}/src/structure/area.cpp
+        ${CMAKE_SOURCE_DIR}/src/structure/continent.cpp
+        ${CMAKE_SOURCE_DIR}/src/structure/coordinates.cpp
+        ${CMAKE_SOURCE_DIR}/src/structure/generator.cpp
         PARENT_SCOPE
         )

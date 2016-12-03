@@ -23,7 +23,7 @@
 #include "processNewPassword.hpp"
 #include "processNewRace.hpp"
 
-void ProcessNewStory::process(Character * character, ArgumentHandler & args)
+bool ProcessNewStory::process(Character * character, ArgumentHandler & args)
 {
     auto player = character->toPlayer();
     auto input = args.getOriginal();
@@ -40,6 +40,7 @@ void ProcessNewStory::process(Character * character, ArgumentHandler & args)
         player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->rollBack(character);
+        return true;
     }
     else if (input != "continue")
     {
@@ -53,7 +54,9 @@ void ProcessNewStory::process(Character * character, ArgumentHandler & args)
         player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->advance(character);
+        return true;
     }
+    return false;
 }
 
 void ProcessNewStory::advance(Character * character, const std::string & error)

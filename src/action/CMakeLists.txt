@@ -1,22 +1,22 @@
 #############################################
 # Include Directories
 set(PROJECT_INC ${PROJECT_INC}
-        ./src/action
+        ${CMAKE_SOURCE_DIR}/src/action
         PARENT_SCOPE
         )
 
 #############################################
 # Source Files
 set(PROJECT_SRC ${PROJECT_SRC}
-        ./src/action/generalAction.cpp
-        ./src/action/buildAction.cpp
-        ./src/action/craftAction.cpp
-        ./src/action/moveAction.cpp
-        ./src/action/scoutAction.cpp
-        ./src/action/reloadAction.cpp
-        ./src/action/loadAction.cpp
-        ./src/action/unloadAction.cpp
-        ./src/action/aimAction.cpp
+        ${CMAKE_SOURCE_DIR}/src/action/generalAction.cpp
+        ${CMAKE_SOURCE_DIR}/src/action/buildAction.cpp
+        ${CMAKE_SOURCE_DIR}/src/action/craftAction.cpp
+        ${CMAKE_SOURCE_DIR}/src/action/moveAction.cpp
+        ${CMAKE_SOURCE_DIR}/src/action/scoutAction.cpp
+        ${CMAKE_SOURCE_DIR}/src/action/reloadAction.cpp
+        ${CMAKE_SOURCE_DIR}/src/action/loadAction.cpp
+        ${CMAKE_SOURCE_DIR}/src/action/unloadAction.cpp
+        ${CMAKE_SOURCE_DIR}/src/action/aimAction.cpp
         ${RADMUD_COMBAT_ACTION_SRC}
         PARENT_SCOPE
         )

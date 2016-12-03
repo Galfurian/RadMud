@@ -67,7 +67,7 @@ public:
     /// A long description of the room.
     std::string description;
     /// List of exits.
-    ExitVector exits;
+    std::vector<std::shared_ptr<Exit> > exits;
     /// List of items in the room.
     ItemContainer items;
     /// List of characters in the room.
@@ -303,7 +303,10 @@ public:
     /// @brief Returns the list of available exits from the current room
     ///         using the vector structure made for lua environment.
     /// @return The vector of exits.
-    VectorHelper<Exit *> luaGetExits();
+    int luaGetExits(lua_State * L);
+
+    /// @brief Returns the list of items inside the room.
+    int luaGetItems(lua_State * L);
 
     /// @brief Function used to register inside the lua environment the class.
     /// @param L The lua environment.

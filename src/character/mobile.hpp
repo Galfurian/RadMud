@@ -63,6 +63,8 @@ public:
     /// The item of which this mobile is the manager.
     Item * managedItem;
 
+    std::thread t;
+
     /// @brief Constructor.
     Mobile();
 
@@ -82,7 +84,7 @@ public:
     bool setAbilities(const std::string & source);
 
     /// @brief Initialize mobile.
-    void respawn();
+    void respawn(bool actNow = false);
 
     /// @brief Checks if the mobile is alive.
     /// @return <b>True</b> if is alive,<br>

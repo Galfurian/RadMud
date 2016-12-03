@@ -36,14 +36,14 @@ BasicAttack::BasicAttack(Character * _actor) :
     CombatAction(_actor)
 {
     // Debugging message.
-    Logger::log(LogLevel::Debug, "Created BasicAttack.");
+    //Logger::log(LogLevel::Debug, "Created BasicAttack.");
     // Reset the cooldown of the action.
     this->resetCooldown(CombatAction::getCooldown(_actor));
 }
 
 BasicAttack::~BasicAttack()
 {
-    Logger::log(LogLevel::Debug, "Deleted BasicAttack.");
+    //Logger::log(LogLevel::Debug, "Deleted BasicAttack.");
 }
 
 bool BasicAttack::check(std::string & error) const
@@ -72,6 +72,12 @@ ActionStatus BasicAttack::perform()
     if (!this->checkElapsed())
     {
         return ActionStatus::Running;
+    }
+    std::string error;
+    if (!this->check(error))
+    {
+        actor->sendMsg(error + "\n\n");
+        return ActionStatus::Error;
     }
     // If there are no enemies, just stop fighting.
     if (actor->combatHandler.empty())
@@ -144,7 +150,6 @@ ActionStatus BasicAttack::perform()
             auto topAggro = actor->combatHandler.getTopAggro();
             if (topAggro->aggressor != nullptr)
             {
-                std::string error;
                 auto chaseAction = std::make_shared<Chase>(actor, topAggro->aggressor);
                 if (chaseAction->check(error))
                 {

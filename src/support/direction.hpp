@@ -24,6 +24,11 @@
 
 #include <string>
 
+extern "C"
+{
+#include "lua.h"
+}
+
 class Coordinates;
 
 /// Provides a complete controll on directions.
@@ -80,6 +85,10 @@ public:
 
     /// @brief Inequality operator w.r.t. a direction enum.
     bool operator!=(const Direction::Enum & rhs) const;
+
+    /// @brief Function used to register inside the lua environment the class.
+    /// @param L The lua environment.
+    static void luaRegister(lua_State * L);
 
 private:
     /// Internal direction value.

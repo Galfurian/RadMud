@@ -23,7 +23,7 @@
 #include "player.hpp"
 #include "mud.hpp"
 
-void ProcessPlayerPassword::process(Character * character, ArgumentHandler & args)
+bool ProcessPlayerPassword::process(Character * character, ArgumentHandler & args)
 {
     auto player = character->toPlayer();
     auto input = args.getOriginal();
@@ -50,7 +50,9 @@ void ProcessPlayerPassword::process(Character * character, ArgumentHandler & arg
         player->enterGame();
         // Set the connection state to playing.
         player->connectionState = ConnectionState::Playing;
+        return true;
     }
+    return false;
 }
 
 void ProcessPlayerPassword::advance(Character * character, const std::string & error)

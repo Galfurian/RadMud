@@ -37,26 +37,26 @@ void LoadManagerCommands()
     }
 }
 
-void DoAssign(Character * character, ArgumentHandler & args)
+bool DoAssign(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
     if (args.size() != 2)
     {
         character->sendMsg("You need to specify who you want assign to which building.\n");
-        return;
+        return false;
     }
     auto mobile = character->room->findMobile(args[0].getContent(), args[0].getIndex(), {});
     if (mobile == nullptr)
     {
         character->sendMsg("You don't see that person.\n");
-        return;
+        return false;
     }
     auto building = character->room->findBuilding(args[1].getContent(), args[1].getIndex());
     if (building == nullptr)
     {
         character->sendMsg("You don't see the desired building here.\n");
-        return;
+        return false;
     }
     if (building->getType() == ModelType::Shop)
     {
@@ -81,10 +81,12 @@ void DoAssign(Character * character, ArgumentHandler & args)
         {
             shop->setNewShopKeeper(mobile);
             character->sendMsg("You assign %s to %s.\n", mobile->getName(), building->getName(true));
+            return true;
         }
     }
     else
     {
         character->sendMsg("You cannot assign %s to %s.\n", mobile->getName(), building->getName(true));
     }
+    return false;
 }

@@ -35,13 +35,19 @@ ProcessInput::~ProcessInput()
     // Nothing to do.
 }
 
-void ProcessInput::process(Character * character, ArgumentHandler & args)
+bool ProcessInput::process(Character * character, ArgumentHandler & args)
 {
     if (args.empty())
     {
         character->sendMsg("Huh?\n");
-        return;
+        return false;
     }
+    if (character->room == nullptr)
+    {
+        character->sendMsg("You are in a wrong room.\n");
+        return false;
+    }
+    bool executionStatus = false;
     // Get the command.
     auto command = args[0].getContent();
     // Erase the first element which is the command.
@@ -51,6 +57,7 @@ void ProcessInput::process(Character * character, ArgumentHandler & args)
     if (direction != Direction::None)
     {
         DoDirection(character, direction);
+        executionStatus = true;
     }
     else
     {
@@ -81,7 +88,7 @@ void ProcessInput::process(Character * character, ArgumentHandler & args)
             }
             else
             {
-                iterator.hndl(character, args);
+                executionStatus = iterator.hndl(character, args);
                 done = true;
                 break;
             }
@@ -92,7 +99,7 @@ void ProcessInput::process(Character * character, ArgumentHandler & args)
             auto profession = Mud::instance().findProfession(command);
             if (profession != nullptr)
             {
-                DoProfession(character, profession, args);
+                executionStatus = DoProfession(character, profession, args);
             }
             else
             {
@@ -101,4 +108,5 @@ void ProcessInput::process(Character * character, ArgumentHandler & args)
         }
     }
     character->sendMsg("\n");
+    return executionStatus;
 }

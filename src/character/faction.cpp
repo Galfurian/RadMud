@@ -36,7 +36,7 @@ Faction::Faction() :
 
 Faction::~Faction()
 {
-    Logger::log(LogLevel::Debug, "Deleted faction\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
+    //Logger::log(LogLevel::Debug, "Deleted faction\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
 }
 
 bool Faction::check()

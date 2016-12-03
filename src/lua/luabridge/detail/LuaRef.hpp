@@ -25,6 +25,11 @@
 /// SOFTWARE.
 ///----------------------------------------------------------------------------
 
+#pragma once
+
+#include "LuaHelpers.hpp"
+#include "LuaException.hpp"
+
 /**
  Type tag for representing LUA_TNIL.
 
@@ -38,8 +43,6 @@
 struct Nil
 {
 };
-
-#include "LuaHelpers.hpp"
 
 //------------------------------------------------------------------------------
 /**
@@ -239,6 +242,11 @@ private:
         inline bool isNil() const
         {
             return type() == LUA_TNIL;
+        }
+
+        inline bool isBool() const
+        {
+            return type() == LUA_TBOOLEAN;
         }
 
         inline bool isNumber() const

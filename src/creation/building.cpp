@@ -66,7 +66,7 @@ bool Building::check()
     assert(!tools.empty());
     for (auto it : tools)
     {
-        assert(it != ToolType::NoType);
+        assert(it != ToolType::None);
     }
     for (auto it : ingredients)
     {
@@ -103,7 +103,7 @@ bool Building::setTool(const std::string & source)
             return false;
         }
         ToolType toolType = static_cast<ToolType>(static_cast<unsigned int>(value));
-        if (toolType == ToolType::NoType)
+        if (toolType == ToolType::None)
         {
             Logger::log(LogLevel::Error, "Can't find the Tool :" + it);
             return false;

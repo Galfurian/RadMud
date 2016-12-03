@@ -22,13 +22,12 @@
 
 #include "character.hpp"
 
+#include "aStar.hpp"
 #include "rangedWeaponItem.hpp"
 #include "meleeWeaponItem.hpp"
 #include "armorItem.hpp"
 #include "logger.hpp"
 #include "mud.hpp"
-
-using namespace std::chrono;
 
 Character::Character() :
     name(),
@@ -653,8 +652,17 @@ Item * Character::findEquipmentSlotTool(EquipmentSlot slot, ToolType type)
 Item * Character::findNearbyItem(const std::string & itemName, int & number)
 {
     auto item = this->findInventoryItem(itemName, number);
-    if (item == nullptr) item = this->findEquipmentItem(itemName, number);
-    if (item == nullptr) item = room->findItem(itemName, number);
+    if (item == nullptr)
+    {
+        item = this->findEquipmentItem(itemName, number);
+    }
+    if (item == nullptr)
+    {
+        if(room != nullptr)
+        {
+            item = room->findItem(itemName, number);
+        }
+    }
     return item;
 }
 
@@ -1397,10 +1405,10 @@ Item * Character::createCorpse()
     return corpse;
 }
 
-void Character::doCommand(const std::string & command)
+bool Character::doCommand(const std::string & command)
 {
     ArgumentHandler argumentHandler(command);
-    inputProcessor->process(this, argumentHandler);
+    return inputProcessor->process(this, argumentHandler);
 }
 
 Player * Character::toPlayer()
@@ -1435,6 +1443,10 @@ void Character::loadScript(const std::string & scriptFilename)
     Exit::luaRegister(L);
     Room::luaRegister(L);
 
+    Direction::luaRegister(L);
+    ModelType::luaRegister(L);
+    ToolType::luaRegister(L);
+
     if (luaL_dofile(L, scriptFilename.c_str()) != LUABRIDGE_LUA_OK)
     {
         Logger::log(LogLevel::Error, "Can't open script+" + scriptFilename + ".");
@@ -1442,13 +1454,139 @@ void Character::loadScript(const std::string & scriptFilename)
     }
 }
 
-VectorHelper<Character *> Character::luaGetTargets()
+luabridge::LuaRef Character::luaGetEquipmentItems()
 {
+    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
+    for (auto item : this->equipment)
+    {
+        luaRef.append(item);
+    }
+    return luaRef;
+}
+
+luabridge::LuaRef Character::luaGetInventoryItems()
+{
+    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
+    for (auto item : this->inventory)
+    {
+        luaRef.append(item);
+    }
+    return luaRef;
+}
+
+luabridge::LuaRef Character::luaGetRoomsInSight()
+{
+    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
     if (room != nullptr)
     {
-        return VectorHelper<Character *>(room->characters);
+        CharacterContainer characterContainer;
+        auto validCoordinates = room->area->fov(room->coord, this->getViewDistance());
+        for (auto coordinates : validCoordinates)
+        {
+            luaRef.append(room->area->getRoom(coordinates));
+        }
     }
-    return VectorHelper<Character *>();
+    return luaRef;
+}
+
+luabridge::LuaRef Character::luaGetCharactersInSight()
+{
+    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
+    if (room != nullptr)
+    {
+        CharacterContainer exceptions;
+        exceptions.emplace_back_character(this);
+        for (auto it : room->area->getCharactersInSight(exceptions, room->coord, this->getViewDistance()))
+        {
+            luaRef.append(it);
+        }
+    }
+    return luaRef;
+}
+
+luabridge::LuaRef Character::luaGetItemsInSight()
+{
+    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
+    if (room != nullptr)
+    {
+        ItemContainer exceptions;
+        for (auto it : room->area->getItemsInSight(exceptions, room->coord, this->getViewDistance()))
+        {
+            luaRef.append(it);
+        }
+    }
+    return luaRef;
+}
+
+luabridge::LuaRef Character::luaGetPathTo(Room * destination)
+{
+    auto checkFunction = [&](Room * from, Room * to)
+    {
+        // Get the direction.
+        auto direction = Area::getDirection(from->coord, to->coord);
+        // Get the exit;
+        auto destExit = from->findExit(direction);
+        // If the direction is upstairs, check if there is a stair.
+        if (direction == Direction::Up)
+        {
+            if (!HasFlag(destExit->flags, ExitFlag::Stairs)) return false;
+        }
+        // Check if the destination is correct.
+        if (destExit->destination == nullptr) return false;
+        // Check if the destination is bocked by a door.
+        auto door = destExit->destination->findDoor();
+        if (door != nullptr)
+        {
+            if (HasFlag(door->flags, ItemFlag::Closed)) return false;
+        }
+        // Check if the destination has a floor.
+        auto destDown = destExit->destination->findExit(Direction::Down);
+        if (destDown != nullptr)
+        {
+            if (!HasFlag(destDown->flags, ExitFlag::Stairs)) return false;
+        }
+        // Check if the destination is forbidden for mobiles.
+        return !(this->isMobile() && HasFlag(destExit->flags, ExitFlag::NoMob));
+    };
+    AStar<Room *> aStar;
+    std::vector<Room *> path;
+
+    luabridge::LuaRef luaRef(L, luabridge::LuaRef::newTable(L));
+    if (this->room != nullptr)
+    {
+        if (aStar.findPath(this->room, destination, path, checkFunction))
+        {
+            Coordinates previous = this->room->coord;
+            for (auto node : path)
+            {
+                luaRef.append(Area::getDirection(previous, node->coord));
+                previous = node->coord;
+            }
+        }
+    }
+    return luaRef;
+}
+
+Item * Character::luaLoadItem(int vnumModel, int vnumMaterial, unsigned int qualityValue)
+{
+    auto model = Mud::instance().findItemModel(vnumModel);
+    if (model == nullptr)
+    {
+        Logger::log(LogLevel::Error, "Can't find model :" + ToString(vnumModel));
+        return nullptr;
+    }
+    auto composition = Mud::instance().findMaterial(vnumMaterial);
+    if (composition == nullptr)
+    {
+        Logger::log(LogLevel::Error, "Can't find material :" + ToString(vnumMaterial));
+        return nullptr;
+    }
+    ItemQuality quality = ItemQuality::Normal;
+    if (ItemQuality::isValid(qualityValue))
+    {
+        quality = ItemQuality(qualityValue);
+    }
+    return model->createItem(this->getName(), composition, true, quality);
 }
 
 void Character::luaAddEquipment(Item * item)
@@ -1494,8 +1632,17 @@ void Character::luaRegister(lua_State * L)
         .addFunction("equipmentAdd", &Character::luaAddEquipment)
         .addFunction("equipmentRem", &Character::luaRemEquipment)
         .addFunction("doCommand", &Character::doCommand)
-        .addFunction("getTargets", &Character::luaGetTargets)
+        .addFunction("getEquipmentItems", &Character::luaGetEquipmentItems)
+        .addFunction("getInventoryItems", &Character::luaGetInventoryItems)
+        .addFunction("getRoomsInSight", &Character::luaGetRoomsInSight)
+        .addFunction("getCharactersInSight", &Character::luaGetCharactersInSight)
+        .addFunction("getItemsInSight", &Character::luaGetItemsInSight)
+        .addFunction("luaGetPathTo", &Character::luaGetPathTo)
+        .addFunction("loadItem", &Character::luaLoadItem)
         .addFunction("isMobile", &Character::isMobile)
+        .addFunction("isPlayer", &Character::isPlayer)
+        .addFunction("toMobile", &Character::toMobile)
+        .addFunction("toPlayer", &Character::toPlayer)
         .endClass()
         .deriveClass<Mobile, Character>("Mobile")
         .addData("id", &Mobile::id)
@@ -1514,6 +1661,10 @@ void Character::luaRegister(lua_State * L)
         .addData("rent_room", &Player::rent_room, false)
         .addData("remaining_points", &Player::remaining_points, false)
         .addData("rent_room", &Player::rent_room, false)
+        .addFunction("setVariable", &Player::setLuaVariable)
+        .addFunction("getVariable", &Player::getLuaVariable)
+        .addFunction("removeVariable", &Player::removeLuaVariable)
+        .addFunction("isPlayer", &Player::isPlayer)
         .endClass();
 }
 

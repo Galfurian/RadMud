@@ -1,4 +1,3 @@
-///----------------------------------------------------------------------------
 /// @file   CFunctions.hpp
 /// @copyright
 /// Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
@@ -22,21 +21,26 @@
 /// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 /// SOFTWARE.
-///----------------------------------------------------------------------------
 
-// We use a structure so we can define everything in the header.
-//
+#pragma once
+
+#include "LuaHelpers.hpp"
+#include "FuncTraits.hpp"
+#include "TypeList.hpp"
+#include "Userdata.hpp"
+#include "stack.hpp"
+
+#include <string>
+
+/// @brief We use a structure so we can define everything in the header.
 struct CFunc
 {
-    //----------------------------------------------------------------------------
-    /**
-     __index metamethod for a namespace or class static members.
-
-     This handles:
-     Retrieving functions and class static methods, stored in the metatable.
-     Reading global and class static data, stored in the __propget table.
-     Reading global and class properties, stored in the __propget table.
-     */
+    /// @brief Metamethod for a namespace or class static members.
+    /// @details
+    /// This handles:
+    ///    Retrieving functions and class static methods, stored in the metatable.
+    ///    Reading global and class static data, stored in the __propget table.
+    ///    Reading global and class properties, stored in the __propget table.
     static int indexMetaMethod(lua_State * L)
     {
         int result = 0;
@@ -93,14 +97,11 @@ struct CFunc
         return result;
     }
 
-    //----------------------------------------------------------------------------
-    /**
-     __newindex metamethod for a namespace or class static members.
-
-     The __propset table stores proxy functions for assignment to:
-     Global and class static data.
-     Global and class properties.
-     */
+    /// @brief Metamethod for a namespace or class static members.
+    /// @details
+    /// The __propset table stores proxy functions for assignment to:
+    ///    Global and class static data.
+    ///    Global and class properties.
     static int newindexMetaMethod(lua_State * L)
     {
         int result = 0;
@@ -143,29 +144,20 @@ struct CFunc
         return result;
     }
 
-    //----------------------------------------------------------------------------
-    /**
-     lua_CFunction to report an error writing to a read-only value.
-
-     The name of the variable is in the first upvalue.
-     */
+    /// @brief lua_CFunction to report an error writing to a read-only value.
+    /// @details
+    /// The name of the variable is in the first upvalue.
     static int readOnlyError(lua_State * L)
     {
         std::string s;
-
         s = s + "'" + lua_tostring(L, lua_upvalueindex(1)) + "' is read-only";
-
         return luaL_error(L, s.c_str());
     }
 
-    //----------------------------------------------------------------------------
-    /**
-     lua_CFunction to get a variable.
-
-     This is used for global variables or class static data members.
-
-     The pointer to the data is in the first upvalue.
-     */
+    /// @brief lua_CFunction to get a variable.
+    /// @details
+    /// This is used for global variables or class static data members.
+    /// The pointer to the data is in the first upvalue.
     template<class T>
     static int getVariable(lua_State * L)
     {
@@ -176,14 +168,10 @@ struct CFunc
         return 1;
     }
 
-    //----------------------------------------------------------------------------
-    /**
-     lua_CFunction to set a variable.
-
-     This is used for global variables or class static data members.
-
-     The pointer to the data is in the first upvalue.
-     */
+    /// @brief lua_CFunction to set a variable.
+    /// @details
+    /// This is used for global variables or class static data members.
+    /// The pointer to the data is in the first upvalue.
     template<class T>
     static int setVariable(lua_State * L)
     {
@@ -194,15 +182,10 @@ struct CFunc
         return 0;
     }
 
-    //----------------------------------------------------------------------------
-    /**
-     lua_CFunction to call a function with a return value.
-
-     This is used for global functions, global properties, class static methods,
-     and class static properties.
-
-     The function pointer is in the first upvalue.
-     */
+    /// @brief lua_CFunction to call a function with a return value.
+    /// @details
+    /// This is used for global functions, global properties, class static methods,
+    /// and class static properties. The function pointer is in the first upvalue.
     template<class FnPtr, class ReturnType = typename FuncTraits<FnPtr>::ReturnType>
     struct Call
     {
@@ -215,7 +198,7 @@ struct CFunc
                 assert(isfulluserdata(L, lua_upvalueindex(1)));
                 FnPtr const & fnptr = *static_cast<FnPtr const *>(lua_touserdata(L, lua_upvalueindex(1)));
                 assert(fnptr != 0);
-                ArgList <Params> args(L);
+                ArgList<Params> args(L);
                 Stack<typename FuncTraits<FnPtr>::ReturnType>::push(L,
                                                                     FuncTraits<FnPtr>::call(fnptr, args));
             }
@@ -229,15 +212,10 @@ struct CFunc
         }
     };
 
-    //----------------------------------------------------------------------------
-    /**
-     lua_CFunction to call a function with no return value.
-
-     This is used for global functions, global properties, class static methods,
-     and class static properties.
-
-     The function pointer is in the first upvalue.
-     */
+    /// @brief lua_CFunction to call a function with no return value.
+    /// @details
+    /// This is used for global functions, global properties, class static methods,
+    /// and class static properties. The function pointer is in the first upvalue.
     template<class FnPtr>
     struct Call<FnPtr, void>
     {
@@ -250,7 +228,7 @@ struct CFunc
                 assert(isfulluserdata(L, lua_upvalueindex(1)));
                 FnPtr const & fnptr = *static_cast<FnPtr const *>(lua_touserdata(L, lua_upvalueindex(1)));
                 assert(fnptr != 0);
-                ArgList <Params> args(L);
+                ArgList<Params> args(L);
                 FuncTraits<FnPtr>::call(fnptr, args);
             }
             catch (std::exception & e)
@@ -264,13 +242,10 @@ struct CFunc
         }
     };
 
-    //----------------------------------------------------------------------------
-    /**
-     lua_CFunction to call a class member function with a return value.
-
-     The member function pointer is in the first upvalue.
-     The class userdata object is at the top of the Lua stack.
-     */
+    /// @brief lua_CFunction to call a class member function with a return value.
+    /// @details
+    /// The member function pointer is in the first upvalue.
+    /// The class userdata object is at the top of the Lua stack.
     template<class MemFnPtr, class ReturnType = typename FuncTraits<MemFnPtr>::ReturnType>
     struct CallMember
     {
@@ -298,6 +273,10 @@ struct CFunc
         }
     };
 
+    /// @brief lua_CFunction to call a const class member function with a return value.
+    /// @details
+    /// The const member function pointer is in the first upvalue.
+    /// The class userdata object is at the top of the Lua stack.
     template<class MemFnPtr, class ReturnType = typename FuncTraits<MemFnPtr>::ReturnType>
     struct CallConstMember
     {
@@ -325,13 +304,10 @@ struct CFunc
         }
     };
 
-    //----------------------------------------------------------------------------
-    /**
-     lua_CFunction to call a class member function with no return value.
-
-     The member function pointer is in the first upvalue.
-     The class userdata object is at the top of the Lua stack.
-     */
+    /// @brief lua_CFunction to call a class member function with no return value.
+    /// @details
+    /// The member function pointer is in the first upvalue.
+    /// The class userdata object is at the top of the Lua stack.
     template<class MemFnPtr>
     struct CallMember<MemFnPtr, void>
     {
@@ -359,6 +335,10 @@ struct CFunc
         }
     };
 
+    /// @brief lua_CFunction to call a const class member function with no return value.
+    /// @details
+    /// The const member function pointer is in the first upvalue.
+    /// The class userdata object is at the top of the Lua stack.
     template<class MemFnPtr>
     struct CallConstMember<MemFnPtr, void>
     {
@@ -386,13 +366,10 @@ struct CFunc
         }
     };
 
-    //--------------------------------------------------------------------------
-    /**
-     lua_CFunction to call a class member lua_CFunction.
-
-     The member function pointer is in the first upvalue.
-     The class userdata object is at the top of the Lua stack.
-     */
+    /// @brief lua_CFunction to call a class member lua_CFunction.
+    /// @details
+    /// The member function pointer is in the first upvalue.
+    /// The class userdata object is at the top of the Lua stack.
     template<class T>
     struct CallMemberCFunction
     {
@@ -417,6 +394,10 @@ struct CFunc
         }
     };
 
+    /// @brief lua_CFunction to call a const class member lua_CFunction.
+    /// @details
+    /// The const member function pointer is in the first upvalue.
+    /// The class userdata object is at the top of the Lua stack.
     template<class T>
     struct CallConstMemberCFunction
     {
@@ -440,8 +421,6 @@ struct CFunc
             }
         }
     };
-
-    //--------------------------------------------------------------------------
 
     // SFINAE Helpers
 
@@ -469,10 +448,7 @@ struct CFunc
         }
     };
 
-    //--------------------------------------------------------------------------
-    /**
-     __gc metamethod for a class.
-     */
+    /// @brief gc metamethod for a class.
     template<class C>
     static int gcMetaMethod(lua_State * L)
     {
@@ -481,13 +457,10 @@ struct CFunc
         return 0;
     }
 
-    //--------------------------------------------------------------------------
-    /**
-     lua_CFunction to get a class data member.
-
-     The pointer-to-member is in the first upvalue.
-     The class userdata object is at the top of the Lua stack.
-     */
+    /// @brief lua_CFunction to get a class data member.
+    /// @details
+    /// The pointer-to-member is in the first upvalue.
+    /// The class userdata object is at the top of the Lua stack.
     template<class C, typename T>
     static int getProperty(lua_State * L)
     {
@@ -497,13 +470,10 @@ struct CFunc
         return 1;
     }
 
-    //--------------------------------------------------------------------------
-    /**
-     lua_CFunction to set a class data member.
-
-     The pointer-to-member is in the first upvalue.
-     The class userdata object is at the top of the Lua stack.
-     */
+    /// @brief lua_CFunction to set a class data member.
+    /// @details
+    /// The pointer-to-member is in the first upvalue.
+    /// The class userdata object is at the top of the Lua stack.
     template<class C, typename T>
     static int setProperty(lua_State * L)
     {

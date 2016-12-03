@@ -25,8 +25,6 @@
 #include "logger.hpp"
 #include "mud.hpp"
 
-using namespace std::chrono;
-
 Mobile::Mobile() :
     id(),
     respawnRoom(),
@@ -59,7 +57,7 @@ Mobile::~Mobile()
     {
         room->removeCharacter(this);
     }
-    Logger::log(LogLevel::Debug, "Deleted mobile\t\t\t\t(%s)", this->getNameCapital());
+    //Logger::log(LogLevel::Debug, "Deleted mobile\t\t\t\t(%s)", this->getNameCapital());
 }
 
 bool Mobile::setAbilities(const std::string & source)
@@ -82,7 +80,7 @@ bool Mobile::setAbilities(const std::string & source)
     return true;
 }
 
-void Mobile::respawn()
+void Mobile::respawn(bool actNow)
 {
     // Set the mobile to Alive.
     this->setHealth(this->getMaxHealth(), true);
@@ -97,7 +95,14 @@ void Mobile::respawn()
     // Send the message inside the room.
     this->room->sendToAll("%s apear from somewhere.\n", exceptions, this->getNameCapital());
     // Set the next action time.
-    nextActionCooldown = std::chrono::system_clock::now() + std::chrono::seconds(10 * level);
+    if (actNow)
+    {
+        nextActionCooldown = std::chrono::system_clock::now();
+    }
+    else
+    {
+        nextActionCooldown = std::chrono::system_clock::now() + std::chrono::seconds(10 * level);
+    }
     // Log to the mud.
     Logger::log(LogLevel::Debug, "Respawning " + this->id);
 }
@@ -208,7 +213,7 @@ void Mobile::kill()
     // Call the method of the father class.
     Character::kill();
     // Set to 0 the cycle that this mobile has passed dead.
-    nextRespawn = system_clock::now() + seconds(10 * this->level);
+    nextRespawn = std::chrono::system_clock::now() + std::chrono::seconds(10 * this->level);
     // Call the LUA function: Event_Death.
     this->triggerEventDeath();
 }
@@ -216,7 +221,7 @@ void Mobile::kill()
 int64_t Mobile::getRespawnTime() const
 {
     // Return the check if the mobile can be respawned.
-    return duration_cast<seconds>(system_clock::now() - nextRespawn).count();
+    return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - nextRespawn).count();
 }
 
 bool Mobile::canRespawn()
@@ -263,12 +268,9 @@ void Mobile::sendMsg(const std::string & msg)
 
 bool Mobile::mobileThread(std::string event, Character * character, std::string message)
 {
-    (void) character;
-    (void) message;
-
     // Lock to the mutex.
     lua_mutex.lock();
-
+    Logger::log(LogLevel::Trace, "Starting thread for event '%s'", event);
     try
     {
         luabridge::LuaRef f = luabridge::getGlobal(L, event.c_str());
@@ -299,7 +301,7 @@ bool Mobile::mobileThread(std::string event, Character * character, std::string 
     {
         Logger::log(LogLevel::Error, e.what());
     }
-
+    Logger::log(LogLevel::Trace, "Ending   thread for event '%s'", event);
     // Unlock the mutex.
     lua_mutex.unlock();
     return true;
@@ -307,72 +309,72 @@ bool Mobile::mobileThread(std::string event, Character * character, std::string 
 
 void Mobile::triggerEventInit()
 {
-    std::thread t(&Mobile::mobileThread, this, "EventInit", nullptr, "");
+    t = std::thread(&Mobile::mobileThread, this, "EventInit", nullptr, "");
     t.detach();
 }
 
 void Mobile::triggerEventFight(Character * character)
 {
-    std::thread t(&Mobile::mobileThread, this, "EventFight", character, "");
+    t = std::thread(&Mobile::mobileThread, this, "EventFight", character, "");
     t.detach();
 }
 
 void Mobile::triggerEventEnter(Character * character)
 {
-    std::thread t(&Mobile::mobileThread, this, "EventEnter", character, "");
+    t = std::thread(&Mobile::mobileThread, this, "EventEnter", character, "");
     t.detach();
 }
 
 void Mobile::triggerEventExit(Character * character)
 {
-    std::thread t(&Mobile::mobileThread, this, "EventExit", character, "");
+    t = std::thread(&Mobile::mobileThread, this, "EventExit", character, "");
     t.detach();
 }
 
 void Mobile::triggerEventMessage(Character * character, std::string message)
 {
-    std::thread t(&Mobile::mobileThread, this, "EventMessage", character, message);
+    t = std::thread(&Mobile::mobileThread, this, "EventMessage", character, message);
     t.detach();
 }
 
 void Mobile::triggerEventRandom()
 {
-    std::thread t(&Mobile::mobileThread, this, "EventRandom", nullptr, "");
+    t = std::thread(&Mobile::mobileThread, this, "EventRandom", nullptr, "");
     t.detach();
 }
 
 void Mobile::triggerEventMorning()
 {
-    std::thread t(&Mobile::mobileThread, this, "EventMorning", nullptr, "");
+    t = std::thread(&Mobile::mobileThread, this, "EventMorning", nullptr, "");
     t.detach();
 }
 
 void Mobile::triggerEventDay()
 {
-    std::thread t(&Mobile::mobileThread, this, "EventDay", nullptr, "");
+    t = std::thread(&Mobile::mobileThread, this, "EventDay", nullptr, "");
     t.detach();
 }
 
 void Mobile::triggerEventDusk()
 {
-    std::thread t(&Mobile::mobileThread, this, "EventDusk", nullptr, "");
+    t = std::thread(&Mobile::mobileThread, this, "EventDusk", nullptr, "");
     t.detach();
 }
 
 void Mobile::triggerEventNight()
 {
-    std::thread t(&Mobile::mobileThread, this, "EventNight", nullptr, "");
+    t = std::thread(&Mobile::mobileThread, this, "EventNight", nullptr, "");
     t.detach();
 }
 
 void Mobile::triggerEventDeath()
 {
-    std::thread t(&Mobile::mobileThread, this, "EventDeath", nullptr, "");
+    t = std::thread(&Mobile::mobileThread, this, "EventDeath", nullptr, "");
     t.detach();
 }
 
 void Mobile::triggerEventMain()
 {
-    std::thread t(&Mobile::mobileThread, this, "EventMain", nullptr, "");
+    t = std::thread(&Mobile::mobileThread, this, "EventMain", nullptr, "");
     t.detach();
 }

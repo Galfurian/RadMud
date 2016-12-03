@@ -110,7 +110,7 @@ Generator::Generator()
 
 Generator::~Generator()
 {
-    Logger::log(LogLevel::Debug, "Deleted: Generator.");
+    //Logger::log(LogLevel::Debug, "Deleted: Generator.");
 }
 
 Generator & Generator::instance()

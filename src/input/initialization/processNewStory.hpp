@@ -28,7 +28,7 @@ class ProcessNewStory :
     public ProcessInitialization
 {
 public:
-    void process(Character * character, ArgumentHandler & args);
+    bool process(Character * character, ArgumentHandler & args);
 
     void advance(Character * character, const std::string & error = std::string());
 

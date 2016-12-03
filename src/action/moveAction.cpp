@@ -27,22 +27,20 @@
 #include "logger.hpp"
 #include "room.hpp"
 
-using namespace std::chrono;
-
 MoveAction::MoveAction(Character * _actor, Room * _destination, Direction _direction) :
     GeneralAction(_actor),
     destination(_destination),
     direction(_direction)
 {
     // Debugging message.
-    Logger::log(LogLevel::Debug, "Created MoveAction.");
+    //Logger::log(LogLevel::Debug, "Created MoveAction.");
     // Reset the cooldown of the action.
     this->resetCooldown(MoveAction::getCooldown(_actor));
 }
 
 MoveAction::~MoveAction()
 {
-    Logger::log(LogLevel::Debug, "Deleted move action.");
+    //Logger::log(LogLevel::Debug, "Deleted move action.");
 }
 
 bool MoveAction::check(std::string & error) const
@@ -163,6 +161,10 @@ unsigned int MoveAction::getCooldown(const Character * character)
 
 bool MoveAction::canMoveTo(Character * character, const Direction & direction, std::string & error, bool allowInCombat)
 {
+    if (character->room == nullptr)
+    {
+        return false;
+    }
     if ((character->getAction()->getType() == ActionType::Combat) && !allowInCombat)
     {
         // Check if the character is locked into close combat.

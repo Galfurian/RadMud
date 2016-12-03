@@ -238,7 +238,7 @@ bool LoadModel(ResultSet * result)
     {
         // Retrieve the vnum and the type of model.
         auto vnum = result->getNextInteger();
-        auto type = static_cast<ModelType>(result->getNextInteger());
+        auto type = ModelType(result->getNextUnsignedInteger());
         // Create a pointer to the new item model.
         auto itemModel = ModelFactory::newModel(type);
         if (itemModel == nullptr)
@@ -381,7 +381,7 @@ bool LoadMobile(ResultSet * result)
         // Load the script.
         mobile->loadScript(Mud::instance().getMudSystemDirectory() + "lua/" + mobile->lua_script);
         // Respawn it.
-        mobile->respawn();
+        mobile->respawn(true);
     }
     return true;
 }
@@ -697,7 +697,7 @@ bool LoadProduction(ResultSet * result)
         check &= production->setTool(result->getNextString());
         check &= production->setIngredient(result->getNextString());
         production->material = static_cast<ResourceType>(result->getNextInteger());
-        production->workbench = static_cast<ToolType>(result->getNextInteger());
+        production->workbench = ToolType(result->getNextUnsignedInteger());
         // ////////////////////////////////////////////////////////////////
         // Check the correctness.
         if (!check)

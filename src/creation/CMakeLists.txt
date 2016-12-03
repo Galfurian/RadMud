@@ -1,17 +1,17 @@
 #############################################
 # Include Directories
 set(PROJECT_INC ${PROJECT_INC}
-        ./src/creation/
+        ${CMAKE_SOURCE_DIR}/src/creation/
         PARENT_SCOPE
         )
 
 #############################################
 # Source Files
 set(PROJECT_SRC ${PROJECT_SRC}
-        ./src/creation/building.cpp
-        ./src/creation/production.cpp
-        ./src/creation/liquid.cpp
-        ./src/creation/material.cpp
-        ./src/creation/profession.cpp
+        ${CMAKE_SOURCE_DIR}/src/creation/building.cpp
+        ${CMAKE_SOURCE_DIR}/src/creation/production.cpp
+        ${CMAKE_SOURCE_DIR}/src/creation/liquid.cpp
+        ${CMAKE_SOURCE_DIR}/src/creation/material.cpp
+        ${CMAKE_SOURCE_DIR}/src/creation/profession.cpp
         PARENT_SCOPE
         )

@@ -25,12 +25,13 @@
 #include "processNewRace.hpp"
 #include "processNewGender.hpp"
 
-void ProcessNewAttributes::process(Character * character, ArgumentHandler & args)
+bool ProcessNewAttributes::process(Character * character, ArgumentHandler & args)
 {
     auto player = character->toPlayer();
     if ((args.size() != 1) && (args.size() != 2))
     {
         this->advance(character, "Invalid input.");
+        return false;
     }
     else if (ToLower(args[0].getContent()) == "back")
     {
@@ -40,6 +41,7 @@ void ProcessNewAttributes::process(Character * character, ArgumentHandler & args
         player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->rollBack(character);
+        return true;
     }
     else if (ToLower(args[0].getContent()) == "reset")
     {
@@ -50,6 +52,7 @@ void ProcessNewAttributes::process(Character * character, ArgumentHandler & args
         player->setAbility(Ability::Constitution, player->race->getAbility(Ability::Constitution));
         player->setAbility(Ability::Intelligence, player->race->getAbility(Ability::Intelligence));
         this->advance(character, Formatter::cyan() + "Attribute has been set by default." + Formatter::reset() + "\n");
+        return true;
     }
     else if (BeginWith(ToLower(args[0].getContent()), "continue"))
     {
@@ -59,6 +62,7 @@ void ProcessNewAttributes::process(Character * character, ArgumentHandler & args
         player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->advance(character);
+        return true;
     }
     else if (BeginWith(ToLower(args[0].getContent()), "help"))
     {
@@ -108,6 +112,7 @@ void ProcessNewAttributes::process(Character * character, ArgumentHandler & args
                 helpMessage = "No help for that attribute.";
             }
             this->advance(character, helpMessage);
+            return true;
         }
     }
     else
@@ -142,6 +147,7 @@ void ProcessNewAttributes::process(Character * character, ArgumentHandler & args
                 {
                     player->remaining_points -= modifier;
                     player->setAbility(Ability::Strength, static_cast<unsigned int>(result));
+                    return true;
                 }
             }
             else if (args[0].getContent() == "2")
@@ -165,6 +171,7 @@ void ProcessNewAttributes::process(Character * character, ArgumentHandler & args
                 {
                     player->remaining_points -= modifier;
                     player->setAbility(Ability::Agility, static_cast<unsigned int>(result));
+                    return true;
                 }
             }
             else if (args[0].getContent() == "3")
@@ -188,6 +195,7 @@ void ProcessNewAttributes::process(Character * character, ArgumentHandler & args
                 {
                     player->remaining_points -= modifier;
                     player->setAbility(Ability::Perception, static_cast<unsigned int>(result));
+                    return true;
                 }
             }
             else if (args[0].getContent() == "4")
@@ -211,6 +219,7 @@ void ProcessNewAttributes::process(Character * character, ArgumentHandler & args
                 {
                     player->remaining_points -= modifier;
                     player->setAbility(Ability::Constitution, static_cast<unsigned int>(result));
+                    return true;
                 }
             }
             else if (args[0].getContent() == "5")
@@ -234,6 +243,7 @@ void ProcessNewAttributes::process(Character * character, ArgumentHandler & args
                 {
                     player->remaining_points -= modifier;
                     player->setAbility(Ability::Intelligence, static_cast<unsigned int>(result));
+                    return true;
                 }
             }
             else
@@ -247,6 +257,7 @@ void ProcessNewAttributes::process(Character * character, ArgumentHandler & args
             this->advance(character, "Type [#attribute +/-(value)].");
         }
     }
+    return false;
 }
 
 void ProcessNewAttributes::advance(Character * character, const std::string & error)

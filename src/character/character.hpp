@@ -36,6 +36,7 @@
 #include "combatAction.hpp"
 #include "argumentHandler.hpp"
 #include "characterContainer.hpp"
+#include "LuaBridge.hpp"
 
 #include <deque>
 
@@ -548,7 +549,8 @@ public:
 
     /// @brief Handle character input.
     /// @param command Command that need to be handled.
-    void doCommand(const std::string & command);
+    /// @return <b>True</b> if the command has been correctly executed,<br><b>False</b> otherwise.
+    bool doCommand(const std::string & command);
 
     /// @brief Returns the character <b>statically</b> casted to player.
     /// @return The player version of the character.
@@ -562,10 +564,30 @@ public:
     /// @param scriptFilename The name of the script that has to be loaded.
     void loadScript(const std::string & scriptFilename);
 
-    /// @brief Returns the list of available targets using the vector
-    ///         structure made for lua environment.
-    /// @return The vector of targets.
-    VectorHelper<Character *> luaGetTargets();
+    /// @brief Returns the list of equipped items.
+    luabridge::LuaRef luaGetEquipmentItems();
+
+    /// @brief Returns the list of items inside the inventory.
+    luabridge::LuaRef luaGetInventoryItems();
+
+    /// @brief Returns the list of rooms in sight.
+    luabridge::LuaRef luaGetRoomsInSight();
+
+    /// @brief Returns the list of characters in sight.
+    luabridge::LuaRef luaGetCharactersInSight();
+
+    /// @brief Returns the list of items in sight.
+    luabridge::LuaRef luaGetItemsInSight();
+
+    /// @brief Returns the list of items in sight.
+    luabridge::LuaRef luaGetPathTo(Room * destination);
+
+    /// @brief Allow from lua to load an item.
+    /// @param vnumModel    The vnum of the model.
+    /// @param vnumMaterial The vnum of the material.
+    /// @param qualityValue The initial quality of the item.
+    /// @return The newly created item.
+    Item * luaLoadItem(int vnumModel, int vnumMaterial, unsigned int qualityValue);
 
     /// @brief Specific function used by lua to add an equipment item.
     void luaAddEquipment(Item * item);

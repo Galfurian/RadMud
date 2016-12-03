@@ -25,7 +25,7 @@
 #include "processNewAge.hpp"
 #include "processNewWeight.hpp"
 
-void ProcessNewDescription::process(Character * character, ArgumentHandler & args)
+bool ProcessNewDescription::process(Character * character, ArgumentHandler & args)
 {
     auto player = character->toPlayer();
     auto input = args.getOriginal();
@@ -42,6 +42,7 @@ void ProcessNewDescription::process(Character * character, ArgumentHandler & arg
         player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->rollBack(character);
+        return true;
     }
     else if (ToLower(input) == "skip")
     {
@@ -53,6 +54,7 @@ void ProcessNewDescription::process(Character * character, ArgumentHandler & arg
         player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->advance(character);
+        return true;
     }
     else if (input.find_first_not_of(VALID_CHARACTERS_DESC) != std::string::npos)
     {
@@ -67,7 +69,9 @@ void ProcessNewDescription::process(Character * character, ArgumentHandler & arg
         player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->advance(character);
+        return true;
     }
+    return false;
 }
 
 void ProcessNewDescription::advance(Character * character, const std::string & error)

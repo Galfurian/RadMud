@@ -25,7 +25,7 @@
 #include "processNewName.hpp"
 #include "processPlayerPassword.hpp"
 
-void ProcessPlayerName::process(Character * character, ArgumentHandler & args)
+bool ProcessPlayerName::process(Character * character, ArgumentHandler & args)
 {
     auto player = character->toPlayer();
     auto input = args.getOriginal();
@@ -42,6 +42,7 @@ void ProcessPlayerName::process(Character * character, ArgumentHandler & args)
         player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->advance(character);
+        return true;
     }
     else if (ToLower(input) == "quit")
     {
@@ -75,12 +76,14 @@ void ProcessPlayerName::process(Character * character, ArgumentHandler & args)
             player->inputProcessor = newStep;
             // Advance to the next step.
             newStep->advance(character);
+            return true;
         }
         else
         {
             player->closeConnection();
         }
     }
+    return false;
 }
 
 void ProcessPlayerName::advance(Character * character, const std::string & error)

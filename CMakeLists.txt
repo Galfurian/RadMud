@@ -72,34 +72,32 @@ find_package(Sqlite3 REQUIRED)
 #################################################
 # Add root project sources...
 set(PROJECT_SRC
-        src/main.cpp
-        src/mud.cpp
-        src/updater.cpp
+        ${CMAKE_SOURCE_DIR}/src/main.cpp
+        ${CMAKE_SOURCE_DIR}/src/mud.cpp
+        ${CMAKE_SOURCE_DIR}/src/updater.cpp
         )
 
-set(PROJECT_INC
-        src
-        )
+set(PROJECT_INC ${CMAKE_SOURCE_DIR}/src)
 
 #################################################
 # Add subdirectories...
-add_subdirectory(src/character)
-add_subdirectory(src/utilities)
-add_subdirectory(src/structure)
-add_subdirectory(src/structure/algorithms)
-add_subdirectory(src/creation)
-add_subdirectory(src/command)
-add_subdirectory(src/support)
-add_subdirectory(src/sqlite)
-add_subdirectory(src/action)
-add_subdirectory(src/action/combat)
-add_subdirectory(src/input)
-add_subdirectory(src/input/initialization)
-add_subdirectory(src/model)
-add_subdirectory(src/model/submodel)
-add_subdirectory(src/item)
-add_subdirectory(src/item/subitem)
-add_subdirectory(src/lua)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/character)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/utilities)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/structure)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/structure/algorithms)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/creation)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/command)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/support)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/sqlite)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/action)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/action/combat)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/input)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/input/initialization)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/model)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/model/submodel)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/item)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/item/subitem)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/lua)
 
 #################################################
 # Add project includes...

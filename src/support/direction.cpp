@@ -20,6 +20,7 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
+#include <functional>
 #include "direction.hpp"
 #include "coordinates.hpp"
 
@@ -125,4 +126,19 @@ bool Direction::operator==(const Direction::Enum & rhs) const
 bool Direction::operator!=(const Direction::Enum & rhs) const
 {
     return direction != rhs;
+}
+
+void Direction::luaRegister(lua_State * L)
+{
+    luabridge::getGlobalNamespace(L)
+        .beginClass<Direction>("Direction")
+        .addConstructor < void(*)(const std::string &)>()
+        .addFunction("toString", &Direction::toString)
+//        .addEnum("North", Direction::North)
+//        .addEnum("South", Direction::South)
+//        .addEnum("West", Direction::West)
+//        .addEnum("East", Direction::East)
+//        .addEnum("Up", Direction::Up)
+//        .addEnum("Down", Direction::Down)
+        .endClass();
 }
