@@ -12,5 +12,6 @@ set(PROJECT_SRC ${PROJECT_SRC}
         ${CMAKE_SOURCE_DIR}/src/sqlite/tableLoader.cpp
         ${CMAKE_SOURCE_DIR}/src/sqlite/sqliteWrapper.cpp
         ${CMAKE_SOURCE_DIR}/src/sqlite/sqliteLoadFunctions.cpp
+        ${CMAKE_SOURCE_DIR}/src/sqlite/dbFunctionsPlayer.cpp
         PARENT_SCOPE
         )

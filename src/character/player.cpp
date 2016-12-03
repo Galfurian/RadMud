@@ -256,12 +256,6 @@ bool Player::updateOnDB()
     arguments.push_back(ToString(this->getHunger()));
     arguments.push_back(ToString(this->getThirst()));
     arguments.push_back(ToString(rent_room));
-    std::string dbLuaVariable;
-    for (auto it : luaVariables)
-    {
-        dbLuaVariable += it.first + "=" + it.second + ";";
-    }
-    arguments.push_back(dbLuaVariable);
     if (!SQLiteDbms::instance().insertInto("Player", arguments, false, true))
     {
         Logger::log(LogLevel::Error, "Error during player creation on database.");
@@ -277,6 +271,19 @@ bool Player::updateOnDB()
         if (!SQLiteDbms::instance().insertInto("Advancement", arguments, false, true))
         {
             Logger::log(LogLevel::Error, "Error during player Skill creation on database.");
+            return false;
+        }
+    }
+    // Prepare the arguments of the query for lua variables table.
+    for (auto iterator : luaVariables)
+    {
+        arguments.clear();
+        arguments.push_back(name);
+        arguments.push_back(iterator.first);
+        arguments.push_back(iterator.second);
+        if (!SQLiteDbms::instance().insertInto("PlayerVariable", arguments, false, true))
+        {
+            Logger::log(LogLevel::Error, "Error during player Lua Variables creation on database.");
             return false;
         }
     }
