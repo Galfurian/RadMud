@@ -25,6 +25,7 @@
 #include "mud.hpp"
 #include "logger.hpp"
 #include "shopItem.hpp"
+#include "lightItem.hpp"
 #include "shopModel.hpp"
 #include "armorItem.hpp"
 #include "corpseItem.hpp"
@@ -857,6 +858,11 @@ CorpseItem * Item::toCorpseItem()
 MagazineItem * Item::toMagazineItem()
 {
     return static_cast<MagazineItem *>(this);
+}
+
+LightItem * Item::toLightItem()
+{
+    return static_cast<LightItem *>(this);
 }
 
 void Item::luaRegister(lua_State * L)

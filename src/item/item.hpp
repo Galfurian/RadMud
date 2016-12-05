@@ -63,6 +63,8 @@ class CorpseItem;
 
 class MagazineItem;
 
+class LightItem;
+
 /// @brief Holds details about items.
 class Item
 {
@@ -327,6 +329,9 @@ public:
 
     /// @brief Returns the model <b>statically</b> casted to Magazine.
     MagazineItem * toMagazineItem();
+
+    /// @brief Returns the model <b>statically</b> casted to Light.
+    LightItem * toLightItem();
 
     /// @brief Function used to register inside the lua environment the class.
     /// @param L The lua environment.

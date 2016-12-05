@@ -1,7 +1,7 @@
-/// @file   lightModel.hpp
-/// @brief  Define variables and methods of Light.
+/// @file   lightItem.hpp
+/// @brief  
 /// @author Enrico Fraccaroli
-/// @date   Jul 6 2016
+/// @date   05/12/2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -22,32 +22,27 @@
 
 #pragma once
 
-#include "resourceType.hpp"
-#include "itemModel.hpp"
+#include "item.hpp"
 
-/// @brief Model of a light.
-class LightModel :
-    public ItemModel
+/// @brief Holds details about lights.
+class LightItem :
+    public Item
 {
 public:
-    /// The type of fuel used to keep the light on.
-    ResourceType fuelType;
-    /// The maximum light intensity.
-    unsigned int maxIntensity;
-    /// Maximum number of hours autonomy.
-    unsigned int maxHours;
-    /// Recharging polocy
-    unsigned int policy;
+    /// The remaining number of hours of autonomy.
+    unsigned int remainingHours;
 
-    LightModel();
+    LightItem();
 
-    virtual ~LightModel();
-
-    ModelType getType() const override;
-
-    std::string getTypeName() const override;
-
-    bool setModel(const std::string & source) override;
+    virtual ~LightItem();
 
     void getSheet(Table & sheet) const override;
+
+    bool canRefillWith(Item * item, std::string & error) const;
+
+    bool getAmmountToRefill(Item * item, unsigned int & ammount, std::string & error) const;
+
+    /// @brief Provides the list of already loaded fuel.
+    /// @return The contained fuel.
+    Item * getAlreadyLoadedFuel() const;
 };

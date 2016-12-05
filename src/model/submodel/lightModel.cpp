@@ -25,7 +25,7 @@
 #include "logger.hpp"
 
 LightModel::LightModel() :
-    lightType(),
+    fuelType(),
     maxIntensity(),
     maxHours(),
     policy()
@@ -52,19 +52,19 @@ bool LightModel::setModel(const std::string & source)
 {
     if (source.empty())
     {
-        Logger::log(LogLevel::Error, "Function list is empty (%s).", this->name);
+        Logger::log(LogLevel::Error, "Function list is empty (%s).", name);
         return false;
     }
     auto functionList = SplitString(source, " ");
     if (functionList.size() != 4)
     {
-        Logger::log(LogLevel::Error, "Wrong number of parameters for Light Model (%s)[%s].", this->name, source);
+        Logger::log(LogLevel::Error, "Wrong number of parameters for Light Model (%s)[%s].", name, source);
         return false;
     }
-    this->lightType = static_cast<Enum>(ToNumber<unsigned int>(functionList[0]));
-    this->maxIntensity = ToNumber<unsigned int>(functionList[1]);
-    this->maxHours = ToNumber<unsigned int>(functionList[2]);
-    this->policy = ToNumber<unsigned int>(functionList[3]);
+    fuelType = ResourceType(ToNumber<unsigned int>(functionList[0]));
+    maxIntensity = ToNumber<unsigned int>(functionList[1]);
+    maxHours = ToNumber<unsigned int>(functionList[2]);
+    policy = ToNumber<unsigned int>(functionList[3]);
     return true;
 }
 
@@ -75,8 +75,8 @@ void LightModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow({"Type", EnumToString(this->lightType)});
-    sheet.addRow({"Max Intensity", ToString(this->maxIntensity)});
-    sheet.addRow({"Max Hours", ToString(this->maxHours)});
-    sheet.addRow({"Policy", ToString(this->policy)});
+    sheet.addRow({"Fuel Type", fuelType.toString()});
+    sheet.addRow({"Max Intensity", ToString(maxIntensity)});
+    sheet.addRow({"Max Hours", ToString(maxHours)});
+    sheet.addRow({"Policy", ToString(policy)});
 }

@@ -24,6 +24,7 @@
 
 #include "mud.hpp"
 #include "shopItem.hpp"
+#include "lightItem.hpp"
 #include "currencyModel.hpp"
 #include "liquidContainerModel.hpp"
 
@@ -181,14 +182,16 @@ void LoadObjectCommands()
         command.hndl = DoBuy;
         Mud::instance().addCommand(command);
     }
-    {
-        Command command;
-        command.name = "balance";
-        command.help = "Shows the character's balance.";
-        command.arguments = "";
-        command.hndl = DoBalance;
-        Mud::instance().addCommand(command);
-    }
+    Mud::instance().addCommand(
+        Command(false, "balance",
+                "Shows the character's balance.",
+                "",
+                DoBalance, false, false));
+    Mud::instance().addCommand(
+        Command(false, "refill",
+                "Allows to refill a light source.",
+                "(light_source) (fuel)",
+                DoRefill, false, false));
 }
 
 bool DoTake(Character * character, ArgumentHandler & args)
@@ -2060,5 +2063,48 @@ bool DoBalance(Character * character, ArgumentHandler & args)
         balance += coin->getPrice(true);
     }
     character->sendMsg("Your balance is: %s.\n", ToString(balance));
+    return true;
+}
+
+bool DoRefill(Character * character, ArgumentHandler & args)
+{
+    // Stop any action the character is executing.
+    StopAction(character);
+    // Check the number of arguments.
+    if (args.size() != 2)
+    {
+        character->sendMsg("What do you want to refill with what?\n");
+        return false;
+    }
+    // Retrieve the item that has to be refilled.
+    auto item = character->findEquipmentItem(args[0].getContent(), args[0].getIndex());
+    if (item == nullptr)
+    {
+        item = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
+        if (item == nullptr)
+        {
+            character->sendMsg("You don't have %s.\n", args[0].getContent());
+            return false;
+        }
+    }
+    // Retrieve the fuel.
+    auto fuel = character->findEquipmentItem(args[1].getContent(), args[1].getIndex());
+    if (fuel == nullptr)
+    {
+        fuel = character->findInventoryItem(args[1].getContent(), args[1].getIndex());
+        if (fuel == nullptr)
+        {
+            character->sendMsg("You don't have %s.\n", args[1].getContent());
+            return false;
+        }
+    }
+    std::string error;
+    unsigned int ammountToLoad = 0;
+    if (!item->toLightItem()->getAmmountToRefill(fuel, ammountToLoad, error))
+    {
+        character->sendMsg(error + "\n");
+        return false;
+    }
+    character->sendMsg("You can put inside %s.\n", ammountToLoad);
     return true;
 }

@@ -79,6 +79,9 @@ public:
     bool operator==(const ResourceType::Enum & rhs) const;
 
     /// @brief Inequality operator.
+    bool operator!=(const ResourceType & rhs) const;
+
+    /// @brief Inequality operator.
     bool operator!=(const ResourceType::Enum & rhs) const;
 
     /// @brief Lesser operator.

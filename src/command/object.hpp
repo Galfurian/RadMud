@@ -88,4 +88,7 @@ bool DoBuy(Character * character, ArgumentHandler & args);
 /// Shows the total ammount of monney.
 bool DoBalance(Character * character, ArgumentHandler & args);
 
+/// Allows to refill a light source.
+bool DoRefill(Character * character, ArgumentHandler & args);
+
 ///@}

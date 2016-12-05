@@ -11,11 +11,12 @@ set(PROJECT_INC
 set(PROJECT_SRC
         ${PROJECT_SRC}
         ${CMAKE_SOURCE_DIR}/src/item/subitem/shopItem.cpp
+        ${CMAKE_SOURCE_DIR}/src/item/subitem/lightItem.cpp
         ${CMAKE_SOURCE_DIR}/src/item/subitem/armorItem.cpp
         ${CMAKE_SOURCE_DIR}/src/item/subitem/corpseItem.cpp
         ${CMAKE_SOURCE_DIR}/src/item/subitem/currencyItem.cpp
+        ${CMAKE_SOURCE_DIR}/src/item/subitem/magazineItem.cpp
         ${CMAKE_SOURCE_DIR}/src/item/subitem/meleeWeaponItem.cpp
         ${CMAKE_SOURCE_DIR}/src/item/subitem/rangedWeaponItem.cpp
-        ${CMAKE_SOURCE_DIR}/src/item/subitem/magazineItem.cpp
         PARENT_SCOPE
         )
