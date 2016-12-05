@@ -166,16 +166,19 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
 
-    // Item's Model.
-    {
-        Command command;
-        command.gods = true;
-        command.name = "imodel";
-        command.help = "List all the information about a model.";
-        command.arguments = "(Model.vnum)";
-        command.hndl = DoModelInfo;
-        Mud::instance().addCommand(command);
-    }
+    // ////////////////////////////////////////////////////////////////////////
+    // Model related commands.
+    // ////////////////////////////////////////////////////////////////////////
+    Mud::instance().addCommand(
+        Command(true, "model_info",
+                "List all the information about a model.",
+                "(Model.vnum)",
+                DoModelInfo, true, false));
+    Mud::instance().addCommand(
+        Command(true, "model_list",
+                "List all the models.",
+                "Type --help for more information.",
+                DoModelList, true, false));
 
     // ////////////////////////////////////////////////////////////////////////
     // Item related commands.
@@ -203,8 +206,9 @@ void LoadGodCommands()
     Mud::instance().addCommand(
         Command(true, "item_list",
                 "List all the items.",
-                "",
+                "Type --help for more information.",
                 DoItemList, true, false));
+
     // ////////////////////////////////////////////////////////////////////////
 
     // Areas.
@@ -360,15 +364,6 @@ void LoadGodCommands()
     //
     // LISTS
     //
-    {
-        Command command;
-        command.gods = true;
-        command.name = "lmodel";
-        command.help = "List all the models for the items.";
-        command.arguments = "NONE";
-        command.hndl = DoModelList;
-        Mud::instance().addCommand(command);
-    }
     {
         Command command;
         command.gods = true;
@@ -753,6 +748,101 @@ bool DoClearFlag(Character * character, ArgumentHandler & args)
 }
 
 // ////////////////////////////////////////////////////////////////////////////
+// Model related commands.
+// ////////////////////////////////////////////////////////////////////////////
+
+bool DoModelInfo(Character * character, ArgumentHandler & args)
+{
+    if (args.size() != 1)
+    {
+        character->sendMsg("You must insert a model vnum.\n");
+        return false;
+    }
+    auto itemModel = Mud::instance().findItemModel(ToNumber<int>(args[0].getContent()));
+    if (itemModel == nullptr)
+    {
+        character->sendMsg("Item model not found.\n");
+        return false;
+    }
+    // Create a table.
+    Table sheet;
+    // Get the sheet.
+    itemModel->getSheet(sheet);
+    // Show the seet to character.
+    character->sendMsg(sheet.getTable());
+    return true;
+}
+
+bool DoModelList(Character * character, ArgumentHandler & args)
+{
+    // Variables used to filter the listed items.
+    std::string modelName;
+    std::string modelType;
+    int modelVnum = -1;
+    for (size_t argIt = 0; argIt < args.size(); ++argIt)
+    {
+        if (args[argIt].getContent() == "--help")
+        {
+            character->sendMsg("Usage:\n");
+            character->sendMsg("    model_list [options]\n");
+            character->sendMsg("Options:\n");
+            character->sendMsg("    -n [string]     Search models with the name which contains the given string.\n");
+            character->sendMsg("    -t [type_name]  Search models of the given type.\n");
+            character->sendMsg("    -m [model_vnum] Search models with the given vnum.\n");
+            return true;
+        }
+        if ((argIt + 1) < args.size())
+        {
+            if (args[argIt].getContent() == "-n")
+            {
+                modelName = args[argIt + 1].getContent();
+            }
+            if (args[argIt].getContent() == "-t")
+            {
+                modelType = args[argIt + 1].getContent();
+            }
+            if (args[argIt].getContent() == "-m")
+            {
+                modelVnum = ToNumber<int>(args[argIt + 1].getContent());
+            }
+        }
+    }
+    Table table;
+    table.addColumn("VNUM", StringAlign::Right);
+    table.addColumn("NAME", StringAlign::Left);
+    table.addColumn("TYPE", StringAlign::Left);
+    table.addColumn("SLOT", StringAlign::Left);
+    table.addColumn("FLAGS", StringAlign::Right);
+    for (auto iterator : Mud::instance().mudItemModels)
+    {
+        ItemModel * itemModel = iterator.second;
+        if (!modelName.empty())
+        {
+            if (itemModel->name.find(modelName) == std::string::npos) continue;
+        }
+        if (!modelType.empty())
+        {
+            if (!BeginWith(ToLower(itemModel->getTypeName()), ToLower(modelType))) continue;
+        }
+        if (modelVnum != -1)
+        {
+            if (itemModel->vnum != modelVnum) continue;
+        }
+        // Prepare the row.
+        TableRow row;
+        row.push_back(ToString(itemModel->vnum));
+        row.push_back(itemModel->name);
+        row.push_back(itemModel->getTypeName());
+        row.push_back(itemModel->slot.toString());
+        row.push_back(ToString(itemModel->modelFlags));
+        // Add the row to the table.
+        table.addRow(row);
+    }
+    character->sendMsg(table.getTable());
+    return true;
+}
+
+// ////////////////////////////////////////////////////////////////////////////
 // Item related commands.
 // ////////////////////////////////////////////////////////////////////////////
 
@@ -910,7 +1000,7 @@ bool DoItemInfo(Character * character, ArgumentHandler & args)
 
 bool DoItemList(Character * character, ArgumentHandler & args)
 {
-    // String used to filter the items by their type.
+    // Variables used to filter the listed items.
     std::string itemName;
     std::string typeName;
     int modelVnum = -1;
@@ -1229,6 +1319,10 @@ bool DoRoomEdit(Character * character, ArgumentHandler & args)
     }
     return false;
 }
+
+// ////////////////////////////////////////////////////////////////////////////
+// Mobile related commands.
+// ////////////////////////////////////////////////////////////////////////////
 
 bool DoMobileKill(Character * character, ArgumentHandler & args)
 {
@@ -1564,28 +1658,6 @@ bool DoGodInfo(Character * character, ArgumentHandler & args)
     return true;
 }
 
-bool DoModelInfo(Character * character, ArgumentHandler & args)
-{
-    if (args.size() != 1)
-    {
-        character->sendMsg("You must insert a model vnum.\n");
-        return false;
-    }
-    auto itemModel = Mud::instance().findItemModel(ToNumber<int>(args[0].getContent()));
-    if (itemModel == nullptr)
-    {
-        character->sendMsg("Item model not found.\n");
-        return false;
-    }
-    // Create a table.
-    Table sheet;
-    // Get the sheet.
-    itemModel->getSheet(sheet);
-    // Show the seet to character.
-    character->sendMsg(sheet.getTable());
-    return true;
-}
-
 bool DoAreaInfo(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 1)
@@ -1812,31 +1884,6 @@ bool DoAggroList(Character * character, ArgumentHandler & args)
             character->sendMsg("%s\t%s", ToString(aggressor->aggression), aggressor->aggressor->getNameCapital());
         }
     }
-    return true;
-}
-
-bool DoModelList(Character * character, ArgumentHandler & /*args*/)
-{
-    Table table;
-    table.addColumn("VNUM", StringAlign::Right);
-    table.addColumn("NAME", StringAlign::Left);
-    table.addColumn("TYPE", StringAlign::Left);
-    table.addColumn("SLOT", StringAlign::Left);
-    table.addColumn("FLAGS", StringAlign::Right);
-    for (auto iterator : Mud::instance().mudItemModels)
-    {
-        ItemModel * itemModel = iterator.second;
-        // Prepare the row.
-        TableRow row;
-        row.push_back(ToString(itemModel->vnum));
-        row.push_back(itemModel->name);
-        row.push_back(itemModel->getTypeName());
-        row.push_back(itemModel->slot.toString());
-        row.push_back(ToString(itemModel->modelFlags));
-        // Add the row to the table.
-        table.addRow(row);
-    }
-    character->sendMsg(table.getTable());
     return true;
 }
 
