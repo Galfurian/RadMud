@@ -37,7 +37,7 @@ Production::Production() :
     tools(),
     ingredients(),
     workbench(ToolType::None),
-    material(ResourceType::NoType)
+    material(ResourceType::None)
 {
     // Nothing to do.
 }
@@ -119,42 +119,33 @@ bool Production::setIngredient(const std::string & source)
     }
     // Split the string of ingredients.
     std::vector<std::string> ingredientList = SplitString(source, ";");
-    // Flag used to determine if all goes well.
-    bool correct = true;
     for (auto iterator : ingredientList)
     {
         // Split the string with the information about the ingredient.
         std::vector<std::string> ingredientInfo = SplitString(iterator, "*");
         if (ingredientInfo.size() != 2)
         {
-            correct = false;
-            break;
+            return false;
         }
-        ResourceType ingredient = static_cast<ResourceType>(ToNumber<int>(ingredientInfo[0]));
-        if (ingredient == ResourceType::NoType)
+        ResourceType ingredient = ResourceType(ToNumber<unsigned int>(ingredientInfo[0]));
+        if (ingredient == ResourceType::None)
         {
             Logger::log(LogLevel::Error, "Can't find the Ingredient :" + ingredientInfo[0]);
-            correct = false;
-            break;
+            return false;
         }
-
         int ingredientQuantity = ToNumber<int>(ingredientInfo[1]);
         if (ingredientQuantity == 0)
         {
-            Logger::log(
-                LogLevel::Error,
-                "Can't find the quantity of the Outcome :" + ingredientInfo[0]);
-            correct = false;
-            break;
+            Logger::log(LogLevel::Error, "Can't find the quantity of the Outcome :" + ingredientInfo[0]);
+            return false;
         }
         if (!this->ingredients.insert(std::make_pair(ingredient, ingredientQuantity)).second)
         {
             Logger::log(LogLevel::Error, "Cannot insert the ingredient");
-            correct = false;
-            break;
+            return false;
         }
     }
-    return correct;
+    return true;
 }
 
 bool Production::check()
@@ -173,10 +164,10 @@ bool Production::check()
     }
     for (auto it : ingredients)
     {
-        assert(it.first != ResourceType::NoType);
+        assert(it.first != ResourceType::None);
         assert(it.second > 0);
     }
-    assert(material != ResourceType::NoType);
+    assert(material != ResourceType::None);
     return true;
 }
 

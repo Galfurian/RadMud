@@ -1768,7 +1768,6 @@ bool DoLiquidInfo(Character * character, ArgumentHandler & args)
 
 bool DoProductionInfo(Character * character, ArgumentHandler & args)
 {
-
     if (args.size() != 1)
     {
         character->sendMsg("You must provide a production vnum.\n");
@@ -1787,8 +1786,7 @@ bool DoProductionInfo(Character * character, ArgumentHandler & args)
     msg += "Difficulty  : " + ToString(production->difficulty) + "\n";
     msg += "Time        : " + ToString(production->time) + "\n";
     msg += "Assisted    : " + ToString(production->assisted) + "\n";
-    msg += "Outcome     : " + production->outcome->name + "*" + ToString(production->quantity)
-           + "\n";
+    msg += "Outcome     : " + production->outcome->name + "*" + ToString(production->quantity) + "\n";
     msg += "Tools       :\n";
     for (auto iterator : production->tools)
     {
@@ -1797,8 +1795,7 @@ bool DoProductionInfo(Character * character, ArgumentHandler & args)
     msg += "Ingredients :\n";
     for (auto iterator : production->ingredients)
     {
-        msg += "                  " + GetResourceTypeName(iterator.first) + "("
-               + ToString(iterator.second) + ")\n";
+        msg += "                  " + iterator.first.toString() + "(" + ToString(iterator.second) + ")\n";
     }
     msg += "Workbench   :" + GetToolTypeName(production->workbench) + "\n";
     character->sendMsg(msg);

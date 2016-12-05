@@ -37,6 +37,7 @@ Building::Building() :
     ingredients(),
     unique()
 {
+    // Nothing to do.
 }
 
 Building::Building(const Building & source) :
@@ -50,10 +51,12 @@ Building::Building(const Building & source) :
     ingredients(source.ingredients),
     unique(source.unique)
 {
+    // Nothing to do.
 }
 
 Building::~Building()
 {
+    // Nothing to do.
 }
 
 bool Building::check()
@@ -70,7 +73,7 @@ bool Building::check()
     }
     for (auto it : ingredients)
     {
-        assert(it.first != ResourceType::NoType);
+        assert(it.first != ResourceType::None);
         assert(it.second > 0);
     }
     return true;
@@ -130,8 +133,8 @@ bool Building::setIngredient(const std::string & source)
             Logger::log(LogLevel::Error, "Ingredient is not composed by [Ingredient*Quantity]");
             return false;
         }
-        ResourceType ingredient = static_cast<ResourceType>(ToNumber<int>(ingredientInfo[0]));
-        if (ingredient == ResourceType::NoType)
+        ResourceType ingredient = ResourceType(ToNumber<unsigned int>(ingredientInfo[0]));
+        if (ingredient == ResourceType::None)
         {
             Logger::log(LogLevel::Error, "Can't find the Ingredient :" + ingredientInfo[0]);
             return false;
@@ -139,9 +142,7 @@ bool Building::setIngredient(const std::string & source)
         int quantity = ToNumber<int>(ingredientInfo[1]);
         if (quantity <= 0)
         {
-            Logger::log(
-                LogLevel::Error,
-                "Can't find the quantity of the Outcome :" + ingredientInfo[0]);
+            Logger::log(LogLevel::Error, "Can't find the quantity of the Outcome :" + ingredientInfo[0]);
             return false;
         }
         this->ingredients[ingredient] = static_cast<unsigned int>(quantity);

@@ -696,7 +696,7 @@ bool LoadProduction(ResultSet * result)
         check &= production->setOutcome(result->getNextString());
         check &= production->setTool(result->getNextString());
         check &= production->setIngredient(result->getNextString());
-        production->material = static_cast<ResourceType>(result->getNextInteger());
+        production->material = ResourceType(result->getNextUnsignedInteger());
         production->workbench = ToolType(result->getNextUnsignedInteger());
         // ////////////////////////////////////////////////////////////////
         // Check the correctness.

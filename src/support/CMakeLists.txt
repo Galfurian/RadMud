@@ -14,6 +14,7 @@ set(PROJECT_SRC ${PROJECT_SRC}
         ${CMAKE_SOURCE_DIR}/src/support/modelType.cpp
         ${CMAKE_SOURCE_DIR}/src/support/telnetChar.cpp
         ${CMAKE_SOURCE_DIR}/src/support/itemQuality.cpp
+        ${CMAKE_SOURCE_DIR}/src/support/resourceType.cpp
         ${CMAKE_SOURCE_DIR}/src/support/equipmentSlot.cpp
         ${CMAKE_SOURCE_DIR}/src/support/characterPosture.cpp
         PARENT_SCOPE
