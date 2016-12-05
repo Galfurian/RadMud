@@ -29,6 +29,8 @@ class LightModel :
     public ItemModel
 {
 public:
+    /// The maximum light intensity.
+    unsigned int maxIntensity;
     /// Maximum number of hours autonomy.
     unsigned int maxHours;
     /// Recharging polocy

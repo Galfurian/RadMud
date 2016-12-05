@@ -53,17 +53,15 @@ bool LightModel::setModel(const std::string & source)
         Logger::log(LogLevel::Error, "Function list is empty (%s).", this->name);
         return false;
     }
-    std::vector<std::string> functionList = SplitString(source, " ");
-    if (functionList.size() != 2)
+    auto functionList = SplitString(source, " ");
+    if (functionList.size() != 3)
     {
-        Logger::log(
-            LogLevel::Error,
-            "Wrong number of parameters for Light Model (%s).",
-            this->name);
+        Logger::log(LogLevel::Error, "Wrong number of parameters for Light Model (%s)[%s].", this->name, source);
         return false;
     }
-    this->maxHours = ToNumber<unsigned int>(functionList[0]);
-    this->policy = ToNumber<unsigned int>(functionList[1]);
+    this->maxIntensity = ToNumber<unsigned int>(functionList[0]);
+    this->maxHours = ToNumber<unsigned int>(functionList[1]);
+    this->policy = ToNumber<unsigned int>(functionList[2]);
     return true;
 }
 
@@ -74,6 +72,7 @@ void LightModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
+    sheet.addRow({"Max Intensity", ToString(this->maxIntensity)});
     sheet.addRow({"Max Hours", ToString(this->maxHours)});
     sheet.addRow({"Policy", ToString(this->policy)});
 }

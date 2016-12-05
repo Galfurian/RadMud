@@ -68,8 +68,7 @@ bool MechanismModel::setModel(const std::string & source)
     }
     this->mechanismType = static_cast<MechanismType>(ToNumber<unsigned int>(functionList[0]));
 
-    if ((this->mechanismType == MechanismType::Door)
-        || (this->mechanismType == MechanismType::Lock))
+    if ((this->mechanismType == MechanismType::Door) || (this->mechanismType == MechanismType::Lock))
     {
         this->key = ToNumber<unsigned int>(functionList[1]);
         this->difficulty = ToNumber<unsigned int>(functionList[2]);
