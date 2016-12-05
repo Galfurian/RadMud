@@ -177,43 +177,35 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
 
-    // Items.
-    {
-        Command command;
-        command.gods = true;
-        command.name = "iitem";
-        command.help = "Show information about an item.";
-        command.arguments = "(Item.vnum)";
-        command.hndl = DoItemInfo;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.gods = true;
-        command.name = "citem";
-        command.help = "Create a new item, if not set the quality will be Normal.";
-        command.arguments = "(Model.vnum)(Material.vnum)[Quality]";
-        command.hndl = DoItemCreate;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.gods = true;
-        command.name = "ditem";
-        command.help = "Destroy the desired object.";
-        command.arguments = "(Item.vnum)";
-        command.hndl = DoItemDestroy;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.gods = true;
-        command.name = "gitem";
-        command.help = "Materialize the desired object.";
-        command.arguments = "(Item.vnum)";
-        command.hndl = DoItemGet;
-        Mud::instance().addCommand(command);
-    }
+    // ////////////////////////////////////////////////////////////////////////
+    // Item related commands.
+    // ////////////////////////////////////////////////////////////////////////
+    Mud::instance().addCommand(
+        Command(true, "item_create",
+                "Create a new item, if not set the quality will be Normal.",
+                "(Model.vnum)(Material.vnum)[Quality]",
+                DoItemCreate, true, false));
+    Mud::instance().addCommand(
+        Command(true, "item_destroy",
+                "Destroy the desired object.",
+                "(Item.vnum)",
+                DoItemDestroy, true, false));
+    Mud::instance().addCommand(
+        Command(true, "item_get",
+                "Materialize the desired object.",
+                "(Item.vnum)",
+                DoItemGet, true, false));
+    Mud::instance().addCommand(
+        Command(true, "item_information",
+                "Show information about an item.",
+                "(Item.vnum)",
+                DoItemInfo, true, false));
+    Mud::instance().addCommand(
+        Command(true, "item_list",
+                "List all the items.",
+                "",
+                DoItemList, true, false));
+    // ////////////////////////////////////////////////////////////////////////
 
     // Areas.
     {
@@ -380,15 +372,6 @@ void LoadGodCommands()
     {
         Command command;
         command.gods = true;
-        command.name = "litem";
-        command.help = "List all the items.";
-        command.arguments = "NONE";
-        command.hndl = DoItemList;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.gods = true;
         command.name = "lmobile";
         command.help = "List all the mobiles.";
         command.arguments = "NONE";
@@ -523,7 +506,7 @@ void LoadGodCommands()
     }
 }
 
-bool DoShutdown(Character * character, ArgumentHandler & /*args*/)
+bool DoShutdown(Character * character, ArgumentHandler &)
 {
     // Send message to all the players.
     Mud::instance().broadcastMsg(0, character->getNameCapital() + " has shut down the game!");
@@ -531,7 +514,7 @@ bool DoShutdown(Character * character, ArgumentHandler & /*args*/)
     return true;
 }
 
-bool DoMudSave(Character * character, ArgumentHandler & /*args*/)
+bool DoMudSave(Character * character, ArgumentHandler &)
 {
     if (!Mud::instance().saveMud())
     {
@@ -769,6 +752,10 @@ bool DoClearFlag(Character * character, ArgumentHandler & args)
     return true;
 }
 
+// ////////////////////////////////////////////////////////////////////////////
+// Item related commands.
+// ////////////////////////////////////////////////////////////////////////////
+
 bool DoItemCreate(Character * character, ArgumentHandler & args)
 {
     // Prevent mobiles to execute this command.
@@ -818,6 +805,31 @@ bool DoItemCreate(Character * character, ArgumentHandler & args)
     return true;
 }
 
+bool DoItemDestroy(Character * character, ArgumentHandler & args)
+{
+    if (args.size() != 1)
+    {
+        character->sendMsg("You must instert an item vnum.\n");
+        return false;
+    }
+    auto item = Mud::instance().findItem(ToNumber<int>(args[0].getContent()));
+    if (item == nullptr)
+    {
+        character->sendMsg("Invalid vnum.\n");
+        return false;
+    }
+    if (!item->isEmpty())
+    {
+        character->sendMsg("You cannot destroy an item which has item inside.\n");
+        return false;
+    }
+    item->removeFromMud();
+    item->removeOnDB();
+    delete (item);
+    character->sendMsg("You have destroyed the desired object.\n");
+    return true;
+}
+
 bool DoItemGet(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 1)
@@ -840,10 +852,7 @@ bool DoItemGet(Character * character, ArgumentHandler & args)
     }
     if (item->room != nullptr)
     {
-        character->sendMsg(
-            "The item was inside the room '%s' (%s)\n",
-            item->room->name,
-            ToString(item->room->vnum));
+        character->sendMsg("The item was inside the room '%s' (%s)\n", item->room->name, ToString(item->room->vnum));
         item->room->removeItem(item);
     }
     else if (item->owner != nullptr)
@@ -872,30 +881,120 @@ bool DoItemGet(Character * character, ArgumentHandler & args)
     return true;
 }
 
-bool DoItemDestroy(Character * character, ArgumentHandler & args)
+bool DoItemInfo(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 1)
     {
-        character->sendMsg("You must instert an item vnum.\n");
+        character->sendMsg("You must instert the item vnum or the name of the item inside the room.\n");
         return false;
     }
     auto item = Mud::instance().findItem(ToNumber<int>(args[0].getContent()));
     if (item == nullptr)
     {
-        character->sendMsg("Invalid vnum.\n");
-        return false;
+        item = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
+        if (item == nullptr)
+        {
+
+            character->sendMsg("Cannot find the target item (provide vnum or item name).\n");
+            return false;
+        }
     }
-    if (!item->isEmpty())
-    {
-        character->sendMsg("You cannot destroy an item which has item inside.\n");
-        return false;
-    }
-    item->removeFromMud();
-    item->removeOnDB();
-    delete (item);
-    character->sendMsg("You have destroyed the desired object.\n");
+    // Create a table.
+    Table sheet(item->getNameCapital());
+    // Get the sheet.
+    item->getSheet(sheet);
+    // Show the seet to character.
+    character->sendMsg(sheet.getTable());
     return true;
 }
+
+bool DoItemList(Character * character, ArgumentHandler & args)
+{
+    // String used to filter the items by their type.
+    std::string itemName;
+    std::string typeName;
+    int modelVnum = -1;
+    for (size_t argIt = 0; argIt < args.size(); ++argIt)
+    {
+        if (args[argIt].getContent() == "--help")
+        {
+            character->sendMsg("Usage:\n");
+            character->sendMsg("    item_list [options]\n");
+            character->sendMsg("Options:\n");
+            character->sendMsg("    -n [string]     Search items with the name which contains the given string.\n");
+            character->sendMsg("    -t [type_name]  Search items of the given type.\n");
+            character->sendMsg("    -m [model_vnum] Search the items of the model having the given vnum.\n");
+            return true;
+        }
+        if ((argIt + 1) < args.size())
+        {
+            if (args[argIt].getContent() == "-n")
+            {
+                itemName = args[argIt + 1].getContent();
+            }
+            if (args[argIt].getContent() == "-t")
+            {
+                typeName = args[argIt + 1].getContent();
+            }
+            if (args[argIt].getContent() == "-m")
+            {
+                modelVnum = ToNumber<int>(args[argIt + 1].getContent());
+            }
+        }
+    }
+    Table table;
+    table.addColumn("Vnum", StringAlign::Right);
+    table.addColumn("Name", StringAlign::Left);
+    table.addColumn("Type", StringAlign::Left);
+    table.addColumn("Model", StringAlign::Left);
+    table.addColumn("Location", StringAlign::Left);
+    for (auto iterator : Mud::instance().mudItems)
+    {
+        auto item = iterator.second;
+        if (!itemName.empty())
+        {
+            if (item->getName(false).find(itemName) == std::string::npos) continue;
+        }
+        if (!typeName.empty())
+        {
+            if (!BeginWith(ToLower(item->getTypeName()), ToLower(typeName))) continue;
+        }
+        if (modelVnum != -1)
+        {
+            if (item->model->vnum != modelVnum) continue;
+        }
+        // Prepare the row.
+        TableRow row;
+        row.push_back(ToString(item->vnum));
+        row.push_back(item->getNameCapital());
+        row.push_back(item->getTypeName());
+        row.push_back(ToString(item->model->vnum));
+        if (item->owner != nullptr)
+        {
+            row.push_back(" Owner  : " + item->owner->getName());
+        }
+        else if (item->room != nullptr)
+        {
+            row.push_back(" Room   : " + ToString(item->room->vnum));
+        }
+        else if (item->container != nullptr)
+        {
+            row.push_back(" Inside : " + ToString(item->container->vnum));
+        }
+        else
+        {
+            row.push_back(" Is nowhere.");
+        }
+        // Add the row to the table.
+        table.addRow(row);
+    }
+    character->sendMsg(table.getTable());
+    return true;
+}
+
+// ////////////////////////////////////////////////////////////////////////////
+// Room related commands.
+// ////////////////////////////////////////////////////////////////////////////
 
 bool DoRoomCreate(Character * character, ArgumentHandler & args)
 {
@@ -1487,33 +1586,6 @@ bool DoModelInfo(Character * character, ArgumentHandler & args)
     return true;
 }
 
-bool DoItemInfo(Character * character, ArgumentHandler & args)
-{
-    if (args.size() != 1)
-    {
-        character->sendMsg("You must instert the item vnum or the name of the item inside the room.\n");
-        return false;
-    }
-    auto item = Mud::instance().findItem(ToNumber<int>(args[0].getContent()));
-    if (item == nullptr)
-    {
-        item = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
-        if (item == nullptr)
-        {
-
-            character->sendMsg("Cannot find the target item (provide vnum or item name).\n");
-            return false;
-        }
-    }
-    // Create a table.
-    Table sheet(item->getNameCapital());
-    // Get the sheet.
-    item->getSheet(sheet);
-    // Show the seet to character.
-    character->sendMsg(sheet.getTable());
-    return true;
-}
-
 bool DoAreaInfo(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 1)
@@ -1761,46 +1833,6 @@ bool DoModelList(Character * character, ArgumentHandler & /*args*/)
         row.push_back(itemModel->getTypeName());
         row.push_back(itemModel->slot.toString());
         row.push_back(ToString(itemModel->modelFlags));
-        // Add the row to the table.
-        table.addRow(row);
-    }
-    character->sendMsg(table.getTable());
-    return true;
-}
-
-bool DoItemList(Character * character, ArgumentHandler & /*args*/)
-{
-    Table table;
-    table.addColumn("Vnum", StringAlign::Right);
-    table.addColumn("Name", StringAlign::Left);
-    table.addColumn("Type", StringAlign::Left);
-    table.addColumn("Model", StringAlign::Left);
-    table.addColumn("Location", StringAlign::Left);
-    for (auto iterator : Mud::instance().mudItems)
-    {
-        auto item = iterator.second;
-        // Prepare the row.
-        TableRow row;
-        row.push_back(ToString(item->vnum));
-        row.push_back(item->getNameCapital());
-        row.push_back(item->getTypeName());
-        row.push_back(ToString(item->model->vnum));
-        if (item->owner != nullptr)
-        {
-            row.push_back(" Owner  : " + item->owner->getName());
-        }
-        else if (item->room != nullptr)
-        {
-            row.push_back(" Room   : " + ToString(item->room->vnum));
-        }
-        else if (item->container != nullptr)
-        {
-            row.push_back(" Inside : " + ToString(item->container->vnum));
-        }
-        else
-        {
-            row.push_back(" Is nowhere.");
-        }
         // Add the row to the table.
         table.addRow(row);
     }

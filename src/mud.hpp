@@ -298,7 +298,7 @@ public:
     bool addTravelPoint(Room * source, Room * target);
 
     /// Add a command to the mud.
-    void addCommand(Command & command);
+    void addCommand(const Command & command);
 
     /// Add a direction to the mud.
     bool addDirection(std::string name, const Direction & direction);

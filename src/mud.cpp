@@ -321,7 +321,7 @@ bool Mud::addTravelPoint(Room * source, Room * target)
     return mudTravelPoints.insert(std::make_pair(source, target)).second;
 }
 
-void Mud::addCommand(Command & command)
+void Mud::addCommand(const Command & command)
 {
     mudCommands.push_back(command);
 }

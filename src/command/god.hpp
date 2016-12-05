@@ -51,18 +51,23 @@ bool DoFeast(Character * character, ArgumentHandler & args);
 
 /// Set a flag to a character.
 bool DoSetFlag(Character * character, ArgumentHandler & args);
-
 /// Remove a flag from the character.
 bool DoClearFlag(Character * character, ArgumentHandler & args);
 
 /// Generate a new item from the vnum of a model.
 bool DoItemCreate(Character * character, ArgumentHandler & args);
 
+/// Destroy an item.
+bool DoItemDestroy(Character * character, ArgumentHandler & args);
+
 /// Materialize an item from everywere.
 bool DoItemGet(Character * character, ArgumentHandler & args);
 
-/// Destroy an item.
-bool DoItemDestroy(Character * character, ArgumentHandler & args);
+/// Get information about an item.
+bool DoItemInfo(Character * character, ArgumentHandler & args);
+
+/// List all the items in the Mud.
+bool DoItemList(Character * character, ArgumentHandler & args);
 
 /// Create a room in the given direction.
 bool DoRoomCreate(Character * character, ArgumentHandler & args);
@@ -109,9 +114,6 @@ bool DoGodInfo(Character * character, ArgumentHandler & args);
 /// Show all the information fo the desired model.
 bool DoModelInfo(Character * character, ArgumentHandler & args);
 
-/// Get information about an item.
-bool DoItemInfo(Character * character, ArgumentHandler & args);
-
 /// Show the informations about an area.
 bool DoAreaInfo(Character * character, ArgumentHandler & args);
 
@@ -138,9 +140,6 @@ bool DoAggroList(Character * character, ArgumentHandler & args);
 
 /// List all the model used to define items.
 bool DoModelList(Character * character, ArgumentHandler & args);
-
-/// List all the items in the Mud.
-bool DoItemList(Character * character, ArgumentHandler & args);
 
 /// List all the mobiles.
 bool DoMobileList(Character * character, ArgumentHandler & args);
