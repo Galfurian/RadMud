@@ -27,7 +27,7 @@
 
 Material::Material() :
     vnum(),
-    type(MaterialType::NoType),
+    type(MaterialType::None),
     name(),
     article(),
     worth(),
@@ -47,7 +47,7 @@ bool Material::check()
     assert(vnum > 0);
     assert(!name.empty());
     assert(!article.empty());
-    assert(type != MaterialType::NoType);
+    assert(type != MaterialType::None);
     assert(worth > 0);
     assert(hardness > 0);
     assert(lightness > 0);
@@ -81,19 +81,4 @@ void Material::luaRegister(lua_State * L)
         .addData("hardness", &Material::hardness, false)
         .addData("lightness", &Material::lightness, false)
         .endClass();
-}
-
-std::string GetMaterialTypeName(MaterialType type)
-{
-    if (type == MaterialType::Metal) return "Metal";
-    if (type == MaterialType::Stone) return "Stone";
-    if (type == MaterialType::Wood) return "Wood";
-    if (type == MaterialType::Skin) return "Skin";
-    if (type == MaterialType::Cloth) return "Cloth";
-    if (type == MaterialType::Vegetable) return "Vegetable";
-    if (type == MaterialType::Meat) return "Meat";
-    if (type == MaterialType::Glass) return "Glass";
-    if (type == MaterialType::Paper) return "Paper";
-    if (type == MaterialType::Coal) return "Coal";
-    return "No Material Type";
 }

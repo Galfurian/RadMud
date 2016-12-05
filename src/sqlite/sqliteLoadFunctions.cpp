@@ -259,7 +259,7 @@ bool LoadModel(ResultSet * result)
         itemModel->basePrice = result->getNextUnsignedInteger();
         itemModel->condition = result->getNextUnsignedInteger();
         itemModel->decay = result->getNextUnsignedInteger();
-        itemModel->material = static_cast<MaterialType>(result->getNextInteger());
+        itemModel->material = MaterialType(result->getNextUnsignedInteger());
         itemModel->tileSet = result->getNextInteger();
         itemModel->tileId = result->getNextInteger();
         if (!itemModel->setModel(result->getNextString()))
@@ -623,7 +623,7 @@ bool LoadMaterial(ResultSet * result)
         auto material = new Material();
         // Intialize the material.
         material->vnum = result->getNextInteger();
-        material->type = static_cast<MaterialType>(result->getNextInteger());
+        material->type = MaterialType(result->getNextUnsignedInteger());
         material->name = result->getNextString();
         material->article = result->getNextString();
         material->worth = result->getNextUnsignedInteger();

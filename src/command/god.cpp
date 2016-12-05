@@ -1736,7 +1736,7 @@ bool DoMaterialInfo(Character * character, ArgumentHandler & args)
     }
     std::string msg;
     msg += "Vnum      : " + ToString(material->vnum) + "\n";
-    msg += "Type      : " + GetMaterialTypeName(material->type) + "\n";
+    msg += "Type      : " + material->type.toString() + "\n";
     msg += "Name      : " + material->name + "\n";
     msg += "Worth     : " + ToString(material->worth) + "\n";
     msg += "Hardness  : " + ToString(material->hardness) + "\n";
@@ -2148,7 +2148,7 @@ bool DoMaterialList(Character * character, ArgumentHandler & /*args*/)
         // Prepare the row.
         TableRow row;
         row.push_back(ToString(iterator.second->vnum));
-        row.push_back(GetMaterialTypeName(iterator.second->type));
+        row.push_back(iterator.second->type.toString());
         row.push_back(iterator.second->name);
         row.push_back(ToString(iterator.second->worth));
         row.push_back(ToString(iterator.second->hardness));

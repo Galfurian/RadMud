@@ -96,7 +96,7 @@ void ItemModel::getSheet(Table & sheet) const
     sheet.addRow({"Flags", GetModelFlagString(this->modelFlags)});
     sheet.addRow({"Condition", ToString(this->condition)});
     sheet.addRow({"Decay", ToString(this->decay)});
-    sheet.addRow({"Material", GetMaterialTypeName(this->material)});
+    sheet.addRow({"Material", this->material.toString()});
     sheet.addRow({"Tile", ToString(this->condition)});
     sheet.addRow({"Condition", ToString(this->tileSet) + ":" + ToString(this->tileId)});
 }
@@ -224,7 +224,7 @@ bool ItemModel::check()
     }
     assert(condition > 0);
     assert(decay > 0);
-    assert(this->material != MaterialType::NoType);
+    assert(this->material != MaterialType::None);
     assert(tileSet >= 0);
     assert(tileId >= 0);
     return true;
