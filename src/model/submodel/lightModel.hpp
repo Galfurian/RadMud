@@ -29,6 +29,15 @@ class LightModel :
     public ItemModel
 {
 public:
+    /// The type of light.
+    enum Enum
+    {
+        SelfConsuming,  ///< [0] The item consumes itself when turned on.
+        CoalBased,      ///< [1] The item consumes coal.
+        OilBased        ///< [2] The item consumes oil.
+    };
+    /// The type of light.
+    Enum lightType;
     /// The maximum light intensity.
     unsigned int maxIntensity;
     /// Maximum number of hours autonomy.

@@ -25,6 +25,8 @@
 #include "logger.hpp"
 
 LightModel::LightModel() :
+    lightType(),
+    maxIntensity(),
     maxHours(),
     policy()
 {
@@ -54,14 +56,15 @@ bool LightModel::setModel(const std::string & source)
         return false;
     }
     auto functionList = SplitString(source, " ");
-    if (functionList.size() != 3)
+    if (functionList.size() != 4)
     {
         Logger::log(LogLevel::Error, "Wrong number of parameters for Light Model (%s)[%s].", this->name, source);
         return false;
     }
-    this->maxIntensity = ToNumber<unsigned int>(functionList[0]);
-    this->maxHours = ToNumber<unsigned int>(functionList[1]);
-    this->policy = ToNumber<unsigned int>(functionList[2]);
+    this->lightType = static_cast<Enum>(ToNumber<unsigned int>(functionList[0]));
+    this->maxIntensity = ToNumber<unsigned int>(functionList[1]);
+    this->maxHours = ToNumber<unsigned int>(functionList[2]);
+    this->policy = ToNumber<unsigned int>(functionList[3]);
     return true;
 }
 
@@ -72,6 +75,7 @@ void LightModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
+    sheet.addRow({"Type", EnumToString(this->lightType)});
     sheet.addRow({"Max Intensity", ToString(this->maxIntensity)});
     sheet.addRow({"Max Hours", ToString(this->maxHours)});
     sheet.addRow({"Policy", ToString(this->policy)});
