@@ -180,7 +180,7 @@ ActionStatus BuildAction::perform()
     for (auto iterator : tools)
     {
         // Update the condition of the involved objects.
-        if (iterator->triggerDecay())
+        if (iterator->updateCondition())
         {
             actor->sendMsg(iterator->getName(true) + " falls into pieces.");
             destroyItems.push_back(iterator);

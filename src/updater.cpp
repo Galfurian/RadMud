@@ -214,8 +214,16 @@ void MudUpdater::updateItems()
             continue;
         }
         // Trigger decay function.
-        if (corpse->triggerDecay())
+        if (corpse->updateCondition())
         {
+            //First take everything out from the item.
+            if ((corpse->room != nullptr) && (!corpse->isEmpty()))
+            {
+                for (auto it2: corpse->content)
+                {
+                    corpse->room->addItem(it2, true);
+                }
+            }
             itemToDestroy.insert(itemToDestroy.end(), corpse);
         }
     }
@@ -229,8 +237,16 @@ void MudUpdater::updateItems()
             continue;
         }
         // Trigger decay function.
-        if (item->triggerDecay())
+        if (item->updateCondition())
         {
+            //First take everything out from the item.
+            if ((item->room != nullptr) && (!item->isEmpty()))
+            {
+                for (auto it2: item->content)
+                {
+                    item->room->addItem(it2, true);
+                }
+            }
             itemToDestroy.insert(itemToDestroy.end(), item);
         }
     }

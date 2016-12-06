@@ -22,15 +22,16 @@
 
 #include "combatHandler.hpp"
 
-#include "utils.hpp"
+#include "room.hpp"
+#include "area.hpp"
 #include "logger.hpp"
-#include "character.hpp"
 
 CombatHandler::CombatHandler(Character * _owner) :
     owner(_owner),
     opponents(),
     predefinedTarget(),
-    aimedCharacter()
+    aimedCharacter(),
+    charactersInSight()
 {
     // Nothing to do.
 }
@@ -100,6 +101,16 @@ bool CombatHandler::hasOpponent(Character * character)
                         {
                             return element->aggressor->name == character->name;
                         }) != opponents.end();
+}
+
+void CombatHandler::updateCharactersInSight()
+{
+    // Get the characters in sight.
+    CharacterContainer exceptions;
+    exceptions.emplace_back(owner);
+    charactersInSight = owner->room->area->getCharactersInSight(exceptions,
+                                                                owner->room->coord,
+                                                                owner->getViewDistance());
 }
 
 void CombatHandler::setPredefinedTarget(Character * character)
@@ -252,12 +263,12 @@ void CombatHandler::resetList()
     opponents.clear();
 }
 
-CombatHandler::iterator CombatHandler::begin()
+std::vector<std::shared_ptr<CombatHandler::Aggression> >::iterator CombatHandler::begin()
 {
     return opponents.begin();
 }
 
-CombatHandler::iterator CombatHandler::end()
+std::vector<std::shared_ptr<CombatHandler::Aggression> >::iterator CombatHandler::end()
 {
     return opponents.end();
 }

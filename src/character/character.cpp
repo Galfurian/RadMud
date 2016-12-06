@@ -22,11 +22,12 @@
 
 #include "character.hpp"
 
-#include "aStar.hpp"
 #include "rangedWeaponItem.hpp"
 #include "meleeWeaponItem.hpp"
 #include "armorItem.hpp"
 #include "logger.hpp"
+#include "aStar.hpp"
+#include "item.hpp"
 #include "mud.hpp"
 
 Character::Character() :
@@ -50,7 +51,6 @@ Character::Character() :
     L(luaL_newstate()),
     combatHandler(this),
     actionQueue(),
-    charactersInSight(),
     inputProcessor(std::make_shared<ProcessInput>())
 {
     actionQueue.push_back(std::make_shared<GeneralAction>(this));
@@ -658,7 +658,7 @@ Item * Character::findNearbyItem(const std::string & itemName, int & number)
     }
     if (item == nullptr)
     {
-        if(room != nullptr)
+        if (room != nullptr)
         {
             item = room->findItem(itemName, number);
         }

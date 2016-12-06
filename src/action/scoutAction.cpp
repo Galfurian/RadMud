@@ -95,19 +95,16 @@ ActionStatus ScoutAction::perform()
     }
     // Get the amount of required stamina and try to consume it.
     actor->remStamina(this->getConsumedStamina(actor));
-    // Get the characters in sight.
-    CharacterContainer exceptions;
-    exceptions.emplace_back(actor);
-    actor->charactersInSight = actor->room->area->getCharactersInSight(exceptions,
-                                                                       actor->room->coord,
-                                                                       actor->getViewDistance());
-    if (actor->charactersInSight.empty())
+    // Update the list of characters in sight.
+    actor->combatHandler.updateCharactersInSight();
+    // Check if there are characters in sight.
+    if (actor->combatHandler.charactersInSight.empty())
     {
         actor->sendMsg("You have found nothing...\n");
         return ActionStatus::Error;
     }
     actor->sendMsg("Nearby you can see...\n");
-    for (auto it : actor->charactersInSight)
+    for (auto it : actor->combatHandler.charactersInSight)
     {
         actor->sendMsg("    %s\n", it->getName());
     }

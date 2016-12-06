@@ -94,11 +94,7 @@ void Item::removeFromMud()
         auto itemRoom = room;
         if (room->removeItem(this))
         {
-            Logger::log(
-                LogLevel::Debug,
-                "Removing item '%s' from room '%s'.",
-                this->getName(),
-                itemRoom->name);
+            Logger::log(LogLevel::Debug, "Removing item '%s' from room '%s'.", this->getName(), itemRoom->name);
         }
     }
     if (owner != nullptr)
@@ -106,19 +102,13 @@ void Item::removeFromMud()
         auto itemOwner = owner;
         if (owner->equipment.removeItem(this))
         {
-            Logger::log(
-                LogLevel::Debug,
-                "Removing item '%s' from '%s' equipment.",
-                this->getName(),
-                itemOwner->getName());
+            Logger::log(LogLevel::Debug, "Removing item '%s' from '%s' equipment.",
+                        this->getName(), itemOwner->getName());
         }
         if (owner->inventory.removeItem(this))
         {
-            Logger::log(
-                LogLevel::Debug,
-                "Removing item '%s' from '%s' inventory.",
-                this->getName(),
-                itemOwner->getName());
+            Logger::log(LogLevel::Debug, "Removing item '%s' from '%s' inventory.", this->getName(),
+                        itemOwner->getName());
         }
     }
     if (container != nullptr)
@@ -126,11 +116,8 @@ void Item::removeFromMud()
         auto itemContainer = container;
         if (container->content.removeItem(this))
         {
-            Logger::log(
-                LogLevel::Debug,
-                "Removing item '%s' from container '%s'.",
-                this->getName(),
-                itemContainer->getName());
+            Logger::log(LogLevel::Debug, "Removing item '%s' from container '%s'.", this->getName(),
+                        itemContainer->getName());
         }
     }
     if (this->model->getType() != ModelType::Corpse)
@@ -312,7 +299,7 @@ unsigned int Item::getMaxCondition() const
     return this->maxCondition;
 }
 
-bool Item::triggerDecay()
+bool Item::updateCondition()
 {
     if (condition < model->decay)
     {

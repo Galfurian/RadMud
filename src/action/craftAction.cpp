@@ -247,7 +247,7 @@ ActionStatus CraftAction::perform()
     for (auto iterator : tools)
     {
         // Update the condition of the involved objects.
-        if (iterator->triggerDecay())
+        if (iterator->updateCondition())
         {
             actor->sendMsg("%s falls into pieces.", iterator->getNameCapital(true));
             destroyItems.push_back(iterator);

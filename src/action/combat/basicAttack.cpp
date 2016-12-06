@@ -600,43 +600,41 @@ void BasicAttack::handleRangedHit(Character * target, RangedWeaponItem * weapon)
         {
             target->sendMsg("Someone fires a projectile that hits you.\n\n");
         }
-        actor->room->funcSendToAll("%s fires and hits %s with %s.\n",
-                                   [&](Character * character)
-                                   {
-                                       if ((character == actor) || (character == target)) return false;
-                                       if (character->charactersInSight.containsCharacter(target)) return true;
-                                       return character->combatHandler.getAimedTarget() == target;
-                                   },
-                                   actor->getNameCapital(),
-                                   target->getName(),
-                                   weapon->getName(true));
-        actor->room->funcSendToAll("%s fires at someone or something with %s.\n",
-                                   [&](Character * character)
-                                   {
-                                       if ((character == actor) || (character == target)) return false;
-                                       if (character->charactersInSight.containsCharacter(target)) return false;
-                                       return character->combatHandler.getAimedTarget() != target;
-                                   },
-                                   actor->getNameCapital(),
-                                   weapon->getName(true));
-        target->room->funcSendToAll("%s fires a projectile which hits %s.\n",
-                                    [&](Character * character)
-                                    {
-                                        if ((character == actor) || (character == target)) return false;
-                                        if (character->charactersInSight.containsCharacter(actor)) return true;
-                                        return character->combatHandler.getAimedTarget() == actor;
-                                    },
-                                    actor->getNameCapital(),
-                                    target->getName(),
-                                    weapon->getName(true));
-        target->room->funcSendToAll("Someone fires a projectile which hits %s.\n",
-                                    [&](Character * character)
-                                    {
-                                        if ((character == actor) || (character == target)) return false;
-                                        if (character->charactersInSight.containsCharacter(actor)) return false;
-                                        return character->combatHandler.getAimedTarget() != actor;
-                                    },
-                                    target->getName());
+        actor->room->funcSendToAll(
+            "%s fires and hits %s with %s.\n",
+            [&](Character * character)
+            {
+                if ((character == actor) || (character == target)) return false;
+                if (character->combatHandler.charactersInSight.containsCharacter(target)) return true;
+                return character->combatHandler.getAimedTarget() == target;
+            }, actor->getNameCapital(), target->getName(), weapon->getName(true));
+
+        actor->room->funcSendToAll(
+            "%s fires at someone or something with %s.\n",
+            [&](Character * character)
+            {
+                if ((character == actor) || (character == target)) return false;
+                if (character->combatHandler.charactersInSight.containsCharacter(target)) return false;
+                return character->combatHandler.getAimedTarget() != target;
+            }, actor->getNameCapital(), weapon->getName(true));
+
+        target->room->funcSendToAll(
+            "%s fires a projectile which hits %s.\n",
+            [&](Character * character)
+            {
+                if ((character == actor) || (character == target)) return false;
+                if (character->combatHandler.charactersInSight.containsCharacter(actor)) return true;
+                return character->combatHandler.getAimedTarget() == actor;
+            }, actor->getNameCapital(), target->getName(), weapon->getName(true));
+
+        target->room->funcSendToAll(
+            "Someone fires a projectile which hits %s.\n",
+            [&](Character * character)
+            {
+                if ((character == actor) || (character == target)) return false;
+                if (character->combatHandler.charactersInSight.containsCharacter(actor)) return false;
+                return character->combatHandler.getAimedTarget() != actor;
+            }, target->getName());
     }
 }
 
@@ -645,12 +643,8 @@ void BasicAttack::handleMeleeMiss(Character * target, MeleeWeaponItem * weapon)
     // Notify the actor, enemy and others.
     if (weapon != nullptr)
     {
-        actor->sendMsg("You miss %s with %s.\n\n",
-                       target->getName(),
-                       weapon->getName(true));
-        target->sendMsg("%s misses you with %s.\n\n",
-                        actor->getNameCapital(),
-                        weapon->getName(true));
+        actor->sendMsg("You miss %s with %s.\n\n", target->getName(), weapon->getName(true));
+        target->sendMsg("%s misses you with %s.\n\n", actor->getNameCapital(), weapon->getName(true));
         target->room->sendToAll("%s misses %s with %s.\n", {actor, target},
                                 actor->getNameCapital(),
                                 target->getName(),
@@ -658,9 +652,7 @@ void BasicAttack::handleMeleeMiss(Character * target, MeleeWeaponItem * weapon)
     }
     else
     {
-        actor->sendMsg("You miss %s with your %s.\n\n",
-                       target->getName(),
-                       actor->race->naturalWeapon);
+        actor->sendMsg("You miss %s with your %s.\n\n", target->getName(), actor->race->naturalWeapon);
         target->sendMsg("%s misses you with %s %s.\n\n",
                         actor->getNameCapital(),
                         actor->getPossessivePronoun(),
@@ -681,14 +673,12 @@ void BasicAttack::handleRangedMiss(Character * target, RangedWeaponItem * weapon
     if (actor->room == target->room)
     {
         target->sendMsg("%s fires an misses you.\n\n", actor->getName());
-        actor->room->funcSendToAll("%s fires and misses %s with %s.\n",
-                                   [&](Character * character)
-                                   {
-                                       return !((character == actor) || (character == target));
-                                   },
-                                   actor->getNameCapital(),
-                                   target->getName(),
-                                   weapon->getName(true));
+        actor->room->funcSendToAll(
+            "%s fires and misses %s with %s.\n",
+            [&](Character * character)
+            {
+                return !((character == actor) || (character == target));
+            }, actor->getNameCapital(), target->getName(), weapon->getName(true));
     }
     else
     {
@@ -701,42 +691,40 @@ void BasicAttack::handleRangedMiss(Character * target, RangedWeaponItem * weapon
         {
             target->sendMsg("Someone fired at you, but missed.\n\n");
         }
-        actor->room->funcSendToAll("%s fires and misses %s with %s.\n",
-                                   [&](Character * character)
-                                   {
-                                       if ((character == actor) || (character == target)) return false;
-                                       if (character->charactersInSight.containsCharacter(target)) return true;
-                                       return character->combatHandler.getAimedTarget() == target;
-                                   },
-                                   actor->getNameCapital(),
-                                   target->getName(),
-                                   weapon->getName(true));
-        actor->room->funcSendToAll("%s fires at someone or something with %s.\n",
-                                   [&](Character * character)
-                                   {
-                                       if ((character == actor) || (character == target)) return false;
-                                       if (character->charactersInSight.containsCharacter(target)) return false;
-                                       return character->combatHandler.getAimedTarget() != target;
-                                   },
-                                   actor->getNameCapital(),
-                                   weapon->getName(true));
-        target->room->funcSendToAll("%s fires a projectile which whizzes nearby %s.\n",
-                                    [&](Character * character)
-                                    {
-                                        if ((character == actor) || (character == target)) return false;
-                                        if (character->charactersInSight.containsCharacter(actor)) return true;
-                                        return character->combatHandler.getAimedTarget() == actor;
-                                    },
-                                    actor->getNameCapital(),
-                                    target->getName(),
-                                    weapon->getName(true));
-        target->room->funcSendToAll("Something whizzes nearby %s.\n",
-                                    [&](Character * character)
-                                    {
-                                        if ((character == actor) || (character == target)) return false;
-                                        if (character->charactersInSight.containsCharacter(actor)) return false;
-                                        return character->combatHandler.getAimedTarget() != actor;
-                                    },
-                                    target->getName());
+        actor->room->funcSendToAll(
+            "%s fires and misses %s with %s.\n",
+            [&](Character * character)
+            {
+                if ((character == actor) || (character == target)) return false;
+                if (character->combatHandler.charactersInSight.containsCharacter(target)) return true;
+                return character->combatHandler.getAimedTarget() == target;
+            }, actor->getNameCapital(), target->getName(), weapon->getName(true));
+
+        actor->room->funcSendToAll(
+            "%s fires at someone or something with %s.\n",
+            [&](Character * character)
+            {
+                if ((character == actor) || (character == target)) return false;
+                if (character->combatHandler.charactersInSight.containsCharacter(target)) return false;
+                return character->combatHandler.getAimedTarget() != target;
+            }, actor->getNameCapital(), weapon->getName(true));
+
+        target->room->funcSendToAll(
+            "%s fires a projectile which whizzes nearby %s.\n",
+            [&](Character * character)
+            {
+                if ((character == actor) || (character == target)) return false;
+                if (character->combatHandler.charactersInSight.containsCharacter(actor)) return true;
+                return character->combatHandler.getAimedTarget() == actor;
+            }, actor->getNameCapital(), target->getName(), weapon->getName(true));
+
+        target->room->funcSendToAll(
+            "Something whizzes nearby %s.\n",
+            [&](Character * character)
+            {
+                if ((character == actor) || (character == target)) return false;
+                if (character->combatHandler.charactersInSight.containsCharacter(actor)) return false;
+                return character->combatHandler.getAimedTarget() != actor;
+            }, target->getName());
     }
 }

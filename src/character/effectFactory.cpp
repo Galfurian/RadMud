@@ -32,7 +32,7 @@ Effect EffectFactory::clearTargets(Character * actor, const unsigned int & durat
                   "",
                   [](Character * character)
                   {
-                      if (character != nullptr) character->charactersInSight.clear();
+                      if (character != nullptr) character->combatHandler.charactersInSight.clear();
                   },
                   0,
                   0,

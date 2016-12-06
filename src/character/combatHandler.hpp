@@ -22,12 +22,12 @@
 
 #pragma once
 
-class Character;
-
 #include <set>
 #include <vector>
 #include <string>
 #include <memory>
+
+#include "characterContainer.hpp"
 
 /// @brief Data structure used to store an ordered list of opponents during a combat.
 class CombatHandler
@@ -54,10 +54,6 @@ public:
         /// The level of aggression.
         mutable unsigned int aggression;
     };
-    /// Iterator for an aggressor vector.
-    using iterator  = typename std::vector<std::shared_ptr<Aggression> >::iterator;
-    /// Constant iterator for an aggressor vector.
-    using const_iterator = typename std::vector<std::shared_ptr<Aggression> >::const_iterator;
 private:
     /// Owner of the list.
     Character * owner;
@@ -72,6 +68,9 @@ private:
     Character * aimedCharacter;
 
 public:
+    /// List of characters in sight.
+    CharacterContainer charactersInSight;
+
     /// @brief Constructor.
     CombatHandler(Character * _owner);
 
@@ -96,6 +95,8 @@ public:
     /// @return <b>True</b> if the opponent has been found,<br>
     ///         <b>False</b> otherwise.
     bool hasOpponent(Character * character);
+
+    void updateCharactersInSight();
 
     /// @brief Allows to elect the given character as predefined target.
     /// @param character The character to set as predefined target.
@@ -157,11 +158,11 @@ public:
 
     /// @brief Provides an iterator to the begin of the list of aggressors.
     /// @return An iterator to the begin of the vector of aggressors.
-    iterator begin();
+    std::vector<std::shared_ptr<Aggression> >::iterator begin();
 
     /// @brief Provides an iterator to the end of the list of aggressors.
     /// @return An iterator to the end of the vector of aggressors.
-    iterator end();
+    std::vector<std::shared_ptr<Aggression> >::iterator end();
 
 private:
     /// @brief Sort the list of opponents.

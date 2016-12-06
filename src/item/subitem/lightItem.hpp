@@ -29,6 +29,8 @@ class LightItem :
     public Item
 {
 public:
+    /// Activity status.
+    bool active;
     /// The remaining number of hours of autonomy.
     unsigned int remainingHours;
 
@@ -37,6 +39,8 @@ public:
     virtual ~LightItem();
 
     void getSheet(Table & sheet) const override;
+
+    bool updateCondition() override;
 
     bool canRefillWith(Item * item, std::string & error) const;
 

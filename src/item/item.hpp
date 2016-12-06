@@ -183,7 +183,7 @@ public:
     /// @brief Trigger a decay cycle.
     /// @return <b>True</b> if the item is destroyed,<br>
     ///         <b>False</b> otherwise.
-    bool triggerDecay();
+    virtual bool updateCondition();
 
     /// @brief Provides the modifier due to the item's condition.
     double getConditionModifier() const;

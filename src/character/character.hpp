@@ -112,8 +112,6 @@ public:
     CombatHandler combatHandler;
     /// Character current action.
     std::deque<std::shared_ptr<GeneralAction> > actionQueue;
-    /// List of characters in sight.
-    CharacterContainer charactersInSight;
     /// The input handler.
     std::shared_ptr<ProcessInput> inputProcessor;
 
