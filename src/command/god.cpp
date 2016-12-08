@@ -1679,7 +1679,7 @@ bool DoAreaInfo(Character * character, ArgumentHandler & args)
     msg += " Width     :" + ToString(area->width) + "\n";
     msg += " Height    :" + ToString(area->height) + "\n";
     msg += " Elevation :" + ToString(area->elevation) + "\n";
-    msg += " N. Rooms  :" + ToString(area->areaMap.size()) + "\n";
+    msg += " N. Rooms  :" + ToString(area->map.size()) + "\n";
     character->sendMsg(msg);
     return true;
 }
@@ -1958,7 +1958,7 @@ bool DoAreaList(Character * character, ArgumentHandler & /*args*/)
         row.push_back(ToString(area->vnum));
         row.push_back(area->name);
         row.push_back(area->builder);
-        row.push_back(ToString(area->areaMap.size()));
+        row.push_back(ToString(area->map.size()));
         // Add the row to the table.
         table.addRow(row);
     }
