@@ -448,11 +448,7 @@ bool Item::isAContainer() const
     {
         return true;
     }
-    if ((model->getType() == ModelType::Shop) && HasFlag(this->flags, ItemFlag::Built))
-    {
-        return true;
-    }
-    return false;
+    return ((model->getType() == ModelType::Shop) && HasFlag(this->flags, ItemFlag::Built));
 }
 
 bool Item::isEmpty() const
@@ -547,13 +543,10 @@ void Item::putInside(Item *& item, bool updateDB)
     // Update the database.
     if (updateDB)
     {
-        SQLiteDbms::instance().insertInto("ItemContent",
-                                          {ToString(this->vnum), ToString(item->vnum)},
-                                          false,
-                                          true);
+        SQLiteDbms::instance().insertInto("ItemContent", {ToString(this->vnum), ToString(item->vnum)}, false, true);
     }
     // Log it.
-    Logger::log(LogLevel::Debug, "Item '%s' added to '%s';", item->getName(), this->getName());
+    //Logger::log(LogLevel::Debug, "Item '%s' added to '%s';", item->getName(), this->getName());
 }
 
 bool Item::takeOut(Item * item, bool updateDB)
@@ -570,10 +563,7 @@ bool Item::takeOut(Item * item, bool updateDB)
         SQLiteDbms::instance().deleteFrom("ItemContent", {std::make_pair("item", ToString(item->vnum))});
     }
     // Log it.
-    Logger::log(LogLevel::Debug,
-                "Item '%s' taken out from '%s';",
-                item->getName(),
-                this->getName());
+    //Logger::log(LogLevel::Debug, "Item '%s' taken out from '%s';", item->getName(), this->getName());
     return true;
 }
 

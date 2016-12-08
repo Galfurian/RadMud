@@ -104,4 +104,7 @@ bool LoadShop(ResultSet * result);
 
 /// @brief Function used to load currencies.
 bool LoadCurrency(ResultSet * result);
+
+/// @brief Function used to load terrains.
+bool LoadTerrain(ResultSet * result);
 ///@}

@@ -1217,25 +1217,6 @@ bool DoRoomEdit(Character * character, ArgumentHandler & args)
         character->sendMsg("Room description modified.\n");
         return true;
     }
-    else if (args[0].getContent() == "ter")
-    {
-        auto input = args.substr(1);
-        if (input.empty())
-        {
-            character->sendMsg("You can't set an empty terrain.\n");
-            return false;
-        }
-        QueryList value = {std::make_pair("terrain", input)};
-        QueryList where = {std::make_pair("vnum", ToString(character->room->vnum))};
-        if (!SQLiteDbms::instance().updateInto("Room", value, where))
-        {
-            character->sendMsg("Command gone wrong.\n");
-            return false;
-        }
-        character->room->terrain = input;
-        character->sendMsg("Room terrain modified.\n");
-        return true;
-    }
     else if (args[0].getContent() == "nam")
     {
         auto input = args.substr(1);
@@ -1714,7 +1695,7 @@ bool DoRoomInfo(Character * character, ArgumentHandler & args)
     msg += " Z           :" + ToString(room->coord.z) + "\n";
     msg += " Name        :" + room->name + "\n";
     msg += " Description :" + room->description + "\n";
-    msg += " Terrain     :" + room->terrain + "\n";
+    msg += " Terrain     :" + room->terrain->name + "\n";
     msg += " Flags       :" + GetRoomFlagString(room->flags) + "\n";
     character->sendMsg(msg);
     return true;
@@ -1991,7 +1972,7 @@ bool DoRoomList(Character * character, ArgumentHandler & /*args*/)
         row.push_back(
             ToString(room->coord.x) + ' ' + ToString(room->coord.y) + ' '
             + ToString(room->coord.z));
-        row.push_back(room->terrain);
+        row.push_back(room->terrain->name);
         row.push_back(room->name);
         // Add the row to the table.
         table.addRow(row);

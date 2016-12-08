@@ -104,7 +104,7 @@ void Mobile::respawn(bool actNow)
         nextActionCooldown = std::chrono::system_clock::now() + std::chrono::seconds(10 * level);
     }
     // Log to the mud.
-    Logger::log(LogLevel::Debug, "Respawning " + this->id);
+    //Logger::log(LogLevel::Debug, "Respawning " + this->id);
 }
 
 bool Mobile::isAlive() const
@@ -270,7 +270,7 @@ bool Mobile::mobileThread(std::string event, Character * character, std::string 
 {
     // Lock to the mutex.
     lua_mutex.lock();
-    Logger::log(LogLevel::Trace, "Starting thread for event '%s'", event);
+    //Logger::log(LogLevel::Trace, "Starting thread for event '%s'", event);
     try
     {
         luabridge::LuaRef f = luabridge::getGlobal(L, event.c_str());
@@ -301,7 +301,7 @@ bool Mobile::mobileThread(std::string event, Character * character, std::string 
     {
         Logger::log(LogLevel::Error, e.what());
     }
-    Logger::log(LogLevel::Trace, "Ending   thread for event '%s'", event);
+    //Logger::log(LogLevel::Trace, "Ending   thread for event '%s'", event);
     // Unlock the mutex.
     lua_mutex.unlock();
     return true;

@@ -23,7 +23,7 @@
 #include "mud.hpp"
 
 #include <unistd.h>
-#include <signal.h>
+#include <sys/signal.h>
 
 #include "processPlayerName.hpp"
 #include "CMacroWrapper.hpp"
@@ -336,6 +336,11 @@ bool Mud::addBuilding(Building & building)
     return mudBuildings.insert(std::make_pair(building.vnum, building)).second;
 }
 
+bool Mud::addTerrain(std::shared_ptr<Terrain> terrain)
+{
+    return mudTerrains.insert(std::make_pair(terrain->vnum, terrain)).second;
+}
+
 Player * Mud::findPlayer(const std::string & name)
 {
     for (auto iterator : mudPlayers)
@@ -586,6 +591,18 @@ Building * Mud::findBuilding(int vnum)
         if (iterator->second.buildingModel->vnum == vnum)
         {
             return &(iterator->second);
+        }
+    }
+    return nullptr;
+}
+
+std::shared_ptr<Terrain> Mud::findTerrain(unsigned int vnum)
+{
+    for (auto it : mudTerrains)
+    {
+        if (it.second->vnum == vnum)
+        {
+            return it.second;
         }
     }
     return nullptr;

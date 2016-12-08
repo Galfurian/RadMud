@@ -72,10 +72,9 @@ bool Room::check(bool complete)
     assert(coord.x <= 100);
     assert(coord.y <= 100);
     assert(coord.z <= 100);
-    assert(!terrain.empty());
+    assert(terrain != nullptr);
     assert(!name.empty());
     assert(!description.empty());
-    assert(!terrain.empty());
     return true;
 }
 
@@ -88,13 +87,9 @@ void Room::addItem(Item *& item, bool updateDB)
     // Update the database.
     if (updateDB && (item->getType() != ModelType::Corpse))
     {
-        SQLiteDbms::instance().insertInto(
-            "ItemRoom",
-            {ToString(this->vnum), ToString(item->vnum)},
-            false,
-            true);
+        SQLiteDbms::instance().insertInto("ItemRoom", {ToString(this->vnum), ToString(item->vnum)}, false, true);
     }
-    Logger::log(LogLevel::Debug, "Item '" + item->getName() + "' added to '" + this->name + "';");
+    //Logger::log(LogLevel::Debug, "Item '" + item->getName() + "' added to '" + this->name + "';");
 }
 
 void Room::addBuilding(Item * item, bool updateDB)
@@ -127,14 +122,10 @@ bool Room::removeItem(Item * item, bool updateDB)
         // Update the database.
         if (updateDB && (item->getType() != ModelType::Corpse))
         {
-            SQLiteDbms::instance().deleteFrom(
-                "ItemRoom",
-                {std::make_pair("item", ToString(item->vnum))});
+            SQLiteDbms::instance().deleteFrom("ItemRoom", {std::make_pair("item", ToString(item->vnum))});
         }
         // Log it.
-        Logger::log(
-            LogLevel::Debug,
-            "Item '" + item->getName() + "' removed from '" + this->name + "';");
+        //Logger::log(LogLevel::Debug, "Item '" + item->getName() + "' removed from '" + this->name + "';");
         return true;
     }
     return false;
@@ -216,7 +207,7 @@ bool Room::updateOnDB()
     arguments.push_back(ToString(this->coord.x));
     arguments.push_back(ToString(this->coord.y));
     arguments.push_back(ToString(this->coord.z));
-    arguments.push_back(this->terrain);
+    arguments.push_back(ToString(this->terrain->vnum));
     arguments.push_back(this->name);
     arguments.push_back(this->description);
     arguments.push_back(ToString(this->flags));
@@ -447,9 +438,7 @@ std::string Room::getLook(Character * exception)
         }
         else if (continent != nullptr)
         {
-            std::vector<std::string> layers = continent->drawFov(
-                this,
-                exception->getViewDistance());
+            std::vector<std::string> layers = continent->drawFov(this, exception->getViewDistance());
             output += Formatter::doClearMap();
             for (auto layer : layers)
             {
@@ -597,9 +586,7 @@ bool CreateRoom(Coordinates coord, Room * source_room)
     new_room->area = source_room->area;
     new_room->coord = coord;
     new_room->terrain = source_room->terrain;
-    new_room->name = Generator::instance().generateName(
-        source_room->area->type,
-        source_room->area->status);
+    new_room->name = Generator::instance().generateName(source_room->area->type, source_room->area->status);
     new_room->description = Generator::instance().generateDescription(
         source_room->area->type,
         source_room->area->status,
@@ -613,7 +600,7 @@ bool CreateRoom(Coordinates coord, Room * source_room)
     arguments.push_back(ToString(new_room->coord.x));
     arguments.push_back(ToString(new_room->coord.y));
     arguments.push_back(ToString(new_room->coord.z));
-    arguments.push_back(new_room->terrain);
+    arguments.push_back(ToString(new_room->terrain->vnum));
     arguments.push_back(new_room->name);
     arguments.push_back(new_room->description);
     arguments.push_back(ToString(new_room->flags));

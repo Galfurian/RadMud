@@ -32,6 +32,7 @@
 #include "mobile.hpp"
 #include "characterContainer.hpp"
 #include "itemContainer.hpp"
+#include "terrain.hpp"
 
 class Item;
 
@@ -60,8 +61,8 @@ public:
     Continent * continent;
     /// The current room coordinates.
     Coordinates coord;
-    /// The terrain where the room is situated.
-    std::string terrain;
+    /// The type of terrain of the room.
+    std::shared_ptr<Terrain> terrain;
     /// The name of the room.
     std::string name;
     /// A long description of the room.

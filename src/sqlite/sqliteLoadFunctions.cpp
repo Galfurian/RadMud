@@ -396,7 +396,7 @@ bool LoadRoom(ResultSet * result)
         room->coord.x = result->getNextInteger();
         room->coord.y = result->getNextInteger();
         room->coord.z = result->getNextInteger();
-        room->terrain = result->getNextString();
+        room->terrain = Mud::instance().findTerrain(result->getNextUnsignedInteger());
         room->name = result->getNextString();
         room->description = result->getNextString();
         room->flags = result->getNextUnsignedInteger();
@@ -926,6 +926,24 @@ bool LoadCurrency(ResultSet * result)
         if (!currency->addPrice(materialVnum, worth))
         {
             Logger::log(LogLevel::Error, "Can't add the price for (%s).", ToString(modelVnum));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadTerrain(ResultSet * result)
+{
+    while (result->next())
+    {
+        std::shared_ptr<Terrain> terrain = std::make_shared<Terrain>();
+        if (!result->getDataUnsignedInteger(0, terrain->vnum)) return false;
+        if (!result->getDataString(1, terrain->name)) return false;
+        if (!result->getDataUnsignedInteger(2, terrain->flags)) return false;
+        if (!result->getDataUnsignedInteger(3, terrain->space)) return false;
+        if (!Mud::instance().addTerrain(terrain))
+        {
+            Logger::log(LogLevel::Error, "Can't add the terrain (%s) %s.", terrain->vnum, terrain->name);
             return false;
         }
     }

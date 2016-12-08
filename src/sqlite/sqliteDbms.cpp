@@ -31,6 +31,7 @@ SQLiteDbms::SQLiteDbms()
     loaders.push_back(TableLoader("BadName", LoadBadName));
     loaders.push_back(TableLoader("BlockedIp", LoadBlockedIp));
     loaders.push_back(TableLoader("News", LoadNews));
+    loaders.push_back(TableLoader("Terrain", LoadTerrain));
     loaders.push_back(TableLoader("Material", LoadMaterial));
     loaders.push_back(TableLoader("Skill", LoadSkill));
     loaders.push_back(TableLoader("Continent", LoadContinent));

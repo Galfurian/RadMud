@@ -48,6 +48,7 @@
 #include "sqliteDbms.hpp"
 #include "table.hpp"
 #include "formatter.hpp"
+#include "terrain.hpp"
 
 class Direction;
 
@@ -206,6 +207,8 @@ public:
     std::map<std::string, Direction> mudDirections;
     /// Map of buildings schematic.
     std::map<int, Building> mudBuildings;
+    /// Map of buildings schematic.
+    std::map<unsigned int, std::shared_ptr<Terrain>> mudTerrains;
 
     /// @brief Update all the player on the database.
     /// @return <b>True</b> if the operations succeeded,<br>
@@ -305,6 +308,9 @@ public:
 
     /// Add a building to the mud.
     bool addBuilding(Building & building);
+
+    /// Add a terrain to the mud.
+    bool addTerrain(std::shared_ptr<Terrain> terrain);
     ///@}
 
     /// @defgroup GlobalFind Global Find Functions
@@ -379,6 +385,9 @@ public:
 
     /// Find a building given the vnum of the model to build.
     Building * findBuilding(int vnum);
+
+    /// Find a terrain given its vnum.
+    std::shared_ptr<Terrain> findTerrain(unsigned int vnum);
 
     /// Find the direction.
     Direction findDirection(const std::string & direction, bool exact);

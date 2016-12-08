@@ -894,7 +894,7 @@ void Character::addInventoryItem(Item *& item)
     // Set the owner of the item.
     item->owner = this;
     // Log it.
-    Logger::log(LogLevel::Debug, "Item '%s' added to '%s' inventory;", item->getName(), this->getName());
+    //Logger::log(LogLevel::Debug, "Item '%s' added to '%s' inventory;", item->getName(), this->getName());
 }
 
 void Character::addEquipmentItem(Item *& item)
@@ -904,7 +904,7 @@ void Character::addEquipmentItem(Item *& item)
     // Set the owner of the item.
     item->owner = this;
     // Log it.
-    Logger::log(LogLevel::Debug, "Item '%s' added to '%s' equipment;", item->getName(), this->getName());
+    //Logger::log(LogLevel::Debug, "Item '%s' added to '%s' equipment;", item->getName(), this->getName());
 }
 
 bool Character::remInventoryItem(Item * item)
@@ -917,7 +917,7 @@ bool Character::remInventoryItem(Item * item)
     // Clear the owner of the item.
     item->owner = nullptr;
     // Log it.
-    Logger::log(LogLevel::Debug, "Item '%s' removed from '%s';", item->getName(), this->getName());
+    //Logger::log(LogLevel::Debug, "Item '%s' removed from '%s';", item->getName(), this->getName());
     return true;
 }
 
@@ -931,7 +931,7 @@ bool Character::remEquipmentItem(Item * item)
     // Clear the owner of the item.
     item->owner = nullptr;
     // Log it.
-    Logger::log(LogLevel::Debug, "Item '%s' removed from '%s';", item->getName(), this->getName());
+    //Logger::log(LogLevel::Debug, "Item '%s' removed from '%s';", item->getName(), this->getName());
     return true;
 }
 
@@ -1423,8 +1423,7 @@ Mobile * Character::toMobile()
 
 void Character::loadScript(const std::string & scriptFilename)
 {
-    Logger::log(LogLevel::Debug, "Loading script '%s'...", scriptFilename);
-
+    //Logger::log(LogLevel::Debug, "Loading script '%s'...", scriptFilename);
     // Open lua libraries.
     luaL_openlibs(L);
 
@@ -1441,6 +1440,7 @@ void Character::loadScript(const std::string & scriptFilename)
     Race::luaRegister(L);
     Coordinates::luaRegister(L);
     Exit::luaRegister(L);
+    Terrain::luaRegister(L);
     Room::luaRegister(L);
 
     Direction::luaRegister(L);
