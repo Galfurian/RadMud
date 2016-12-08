@@ -59,8 +59,7 @@ bool LoadNews(ResultSet * result)
 {
     while (result->next())
     {
-        if (!Mud::instance().mudNews.insert(
-            std::make_pair(result->getNextString(), result->getNextString())).second)
+        if (!Mud::instance().mudNews.insert(std::make_pair(result->getNextString(), result->getNextString())).second)
         {
             Logger::log(LogLevel::Error, "Error during news loading.");
             return false;
@@ -348,7 +347,7 @@ bool LoadMobile(ResultSet * result)
         mobile->race = Mud::instance().findRace(result->getNextInteger());
         mobile->faction = Mud::instance().findFaction(result->getNextInteger());
         mobile->gender = static_cast<GenderType>(result->getNextInteger());
-        mobile->weight = result->getNextUnsignedInteger();
+        mobile->weight = result->getNextDouble();
         mobile->actions = GetWords(result->getNextString());
         mobile->flags = result->getNextUnsignedInteger();
         mobile->level = result->getNextUnsignedInteger();

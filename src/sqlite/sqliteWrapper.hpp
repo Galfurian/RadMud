@@ -47,19 +47,39 @@ public:
     virtual int getColumnCount() = 0;
 
     /// @brief Get the name of the given column.
-    /// @param column The column number.
-    /// @return The name of the column.
-    virtual std::string getColumnName(const int & column) = 0;
+    /// @param column       The column number.
+    /// @param columnName   The name of the column.
+    /// @return <b>True</b> if the data has been retrieved,<br>
+    ///         <b>False</b> otherwise.
+    virtual bool getColumnName(const int & column, std::string & columnName) = 0;
 
     /// @brief Get the given coloumn data as a string.
     /// @param column The column number.
-    /// @return The string retrieved from the cell.
-    virtual std::string getDataString(const int & column) = 0;
+    /// @param data   The string retrieved from the cell.
+    /// @return <b>True</b> if the data has been retrieved,<br>
+    ///         <b>False</b> otherwise.
+    virtual bool getDataString(const int & column, std::string & data) = 0;
 
     /// @brief Get the given coloumn data as an integer.
     /// @param column The number of the column.
-    /// @return The integer retrieved from the cell.
-    virtual int getDataInteger(const int & column) = 0;
+    /// @param data   The integer retrieved from the cell.
+    /// @return <b>True</b> if the data has been retrieved,<br>
+    ///         <b>False</b> otherwise.
+    virtual bool getDataInteger(const int & column, int & data) = 0;
+
+    /// @brief Get the given coloumn data as an unsigned integer.
+    /// @param column The number of the column.
+    /// @param data   The unsigned integer retrieved from the cell.
+    /// @return <b>True</b> if the data has been retrieved,<br>
+    ///         <b>False</b> otherwise.
+    virtual bool getDataUnsignedInteger(const int & column, unsigned int & data) = 0;
+
+    /// @brief Get the given coloumn data as a double.
+    /// @param column The number of the column.
+    /// @param data   The double retrieved from the cell.
+    /// @return <b>True</b> if the data has been retrieved,<br>
+    ///         <b>False</b> otherwise.
+    virtual bool getDataDouble(const int & column, double & data) = 0;
 
     /// @brief Get the next coloumn data as a string.
     /// @return The string retrieved from the cell.
@@ -169,11 +189,15 @@ private:
 
     int getColumnCount() override;
 
-    std::string getColumnName(const int & column) override;
+    bool getColumnName(const int & column, std::string & columnName) override;
 
-    std::string getDataString(const int & column) override;
+    bool getDataString(const int & column, std::string & data) override;
 
-    int getDataInteger(const int & column) override;
+    bool getDataInteger(const int & column, int & data) override;
+
+    bool getDataUnsignedInteger(const int & column, unsigned int & data) override;
+
+    bool getDataDouble(const int & column, double & data) override;
 
     std::string getNextString() override;
 

@@ -111,8 +111,7 @@ ResultSet * SQLiteWrapper::executeSelect(const char * query)
     {
         return NULL;
     }
-    if (sqlite3_prepare_v2(dbDetails.dbConnection, query, -1, &dbDetails.dbStatement,
-                           NULL) != SQLITE_OK)
+    if (sqlite3_prepare_v2(dbDetails.dbConnection, query, -1, &dbDetails.dbStatement, NULL) != SQLITE_OK)
     {
         errorMessage = sqlite3_errmsg(dbDetails.dbConnection);
         errorCode = sqlite3_finalize(dbDetails.dbStatement);
@@ -204,64 +203,114 @@ int SQLiteWrapper::getColumnCount()
     return num_col;
 }
 
-std::string SQLiteWrapper::getColumnName(const int & column)
+bool SQLiteWrapper::getColumnName(const int & column, std::string & columnName)
 {
-    if (column > num_col)
+    // Check if the given column is inside the boundaries.
+    if ((column < 0) || (column > num_col))
     {
-        return "";
+        Logger::log(LogLevel::Error, "Column index (%s) is outside the boundaries.", column);
+        return false;
     }
-    return sqlite3_column_name(dbDetails.dbStatement, column);
+    columnName = sqlite3_column_name(dbDetails.dbStatement, column);
+    return true;
 }
 
-std::string SQLiteWrapper::getDataString(const int & column)
+bool SQLiteWrapper::getDataString(const int & column, std::string & data)
 {
-    // Check if the given column is beyond the limit.
-    if (column > num_col)
+    // Check if the given column is inside the boundaries.
+    if ((column < 0) || (column > num_col))
     {
-        return "";
+        Logger::log(LogLevel::Error, "Column index (%s) is outside the boundaries.", column);
+        return false;
+    }
+    // Check if the retrieved data is a string.
+    if (sqlite3_column_type(dbDetails.dbStatement, column) != SQLITE_TEXT)
+    {
+        Logger::log(LogLevel::Error, "Column at index (%s) does not contain a Text.", column);
+        return false;
     }
     // Check the input in case is a valid value.
-    const char * ptr = reinterpret_cast<const char *>(sqlite3_column_text(
-        dbDetails.dbStatement,
-        column));
-    if (ptr)
+    const char * ptr = reinterpret_cast<const char *>(sqlite3_column_text(dbDetails.dbStatement, column));
+    if (ptr == nullptr)
     {
-        return std::string(ptr);
+        return false;
     }
-    else
-    {
-        return "";
-    }
+    // Set the data.
+    data = std::string(ptr);
+    return true;
 }
 
-int SQLiteWrapper::getDataInteger(const int & column)
+bool SQLiteWrapper::getDataInteger(const int & column, int & data)
 {
-    // Check if the given column is beyond the limit.
-    if (column > num_col)
+    // Check if the given column is inside the boundaries.
+    if ((column < 0) || (column > num_col))
     {
-        return -1;
+        Logger::log(LogLevel::Error, "Column index (%s) is outside the boundaries.", column);
+        return false;
     }
-    return sqlite3_column_int(dbDetails.dbStatement, column);
+    // Check if the retrieved data is an integer.
+    if (sqlite3_column_type(dbDetails.dbStatement, column) != SQLITE_INTEGER)
+    {
+        Logger::log(LogLevel::Error, "Column at index (%s) does not contain an Integer.", column);
+        return false;
+    }
+    data = sqlite3_column_int(dbDetails.dbStatement, column);
+    return true;
+}
+
+bool SQLiteWrapper::getDataUnsignedInteger(const int & column, unsigned int & data)
+{
+    // Check if the given column is inside the boundaries.
+    if ((column < 0) || (column > num_col))
+    {
+        Logger::log(LogLevel::Error, "Column index is outside the boundaries.");
+        return false;
+    }
+    // Check if the retrieved data is an integer.
+    if (sqlite3_column_type(dbDetails.dbStatement, column) != SQLITE_INTEGER)
+    {
+        Logger::log(LogLevel::Error, "Column at index (%s) does not contain an Unsigned Integer.", column);
+        return false;
+    }
+    int retrievedData = sqlite3_column_int(dbDetails.dbStatement, column);
+    if (retrievedData < 0)
+    {
+        Logger::log(LogLevel::Error, "Column at index (%s) does not contain an Unsigned Integer.", column);
+        return false;
+    }
+    data = static_cast<unsigned int>(retrievedData);
+    return true;
+}
+
+bool SQLiteWrapper::getDataDouble(const int & column, double & data)
+{
+    // Check if the given column is inside the boundaries.
+    if ((column < 0) || (column > num_col))
+    {
+        Logger::log(LogLevel::Error, "Column index is outside the boundaries.");
+        return false;
+    }
+    // Check if the retrieved data is an integer.
+    if (sqlite3_column_type(dbDetails.dbStatement, column) != SQLITE_FLOAT)
+    {
+        if (sqlite3_column_type(dbDetails.dbStatement, column) != SQLITE_INTEGER)
+        {
+            Logger::log(LogLevel::Error, "Column at index (%s) does not contain a Double.", column);
+            return false;
+        }
+    }
+    data = sqlite3_column_double(dbDetails.dbStatement, column);
+    return true;
 }
 
 std::string SQLiteWrapper::getNextString()
 {
-    // Check if the column is beyond the limit.
-    if (currentColumn >= num_col)
+    std::string data;
+    if (this->getDataString(currentColumn, data))
     {
-        release();
-        Logger::log(LogLevel::Error, "Number column exceded ( %s >= %s ).", ToString(currentColumn), ToString(num_col));
-        return "";
-    }
-    // Check the input in case is a valid value.
-    const char * ptr = reinterpret_cast<const char *>(sqlite3_column_text(
-        dbDetails.dbStatement,
-        currentColumn));
-    // Increase the column index.
-    currentColumn += 1;
-    if (ptr)
-    {
-        return std::string(ptr);
+        // Increase the column index.
+        currentColumn++;
+        return data;
     }
     else
     {
@@ -271,52 +320,45 @@ std::string SQLiteWrapper::getNextString()
 
 int SQLiteWrapper::getNextInteger()
 {
-    // Check if the column is beyond the limit.
-    if (currentColumn >= num_col)
+    int data;
+    if (this->getDataInteger(currentColumn, data))
     {
-        release();
-        Logger::log(LogLevel::Error, "Number column exceded ( %s >= %s ).", ToString(currentColumn), ToString(num_col));
+        // Increase the column index.
+        currentColumn++;
+        return data;
+    }
+    else
+    {
         return 0;
     }
-    int value = sqlite3_column_int(dbDetails.dbStatement, currentColumn);
-    // Increase the column index.
-    currentColumn += 1;
-    return value;
 }
 
 unsigned int SQLiteWrapper::getNextUnsignedInteger()
 {
-    // Check if the column is beyond the limit.
-    if (currentColumn >= num_col)
+    unsigned int data;
+    if (this->getDataUnsignedInteger(currentColumn, data))
     {
-        release();
-        Logger::log(LogLevel::Error, "Number column exceded ( %s >= %s ).", ToString(currentColumn), ToString(num_col));
-        return 0;
-    }
-    int value = sqlite3_column_int(dbDetails.dbStatement, currentColumn);
-    // Increase the column index.
-    currentColumn += 1;
-    if (value < 0)
-    {
-        return 0;
+        // Increase the column index.
+        currentColumn++;
+        return data;
     }
     else
     {
-        return static_cast<unsigned int>(value);
+        return 0;
     }
 }
 
 double SQLiteWrapper::getNextDouble()
 {
-    // Check if the column is beyond the limit.
-    if (currentColumn >= num_col)
+    double data;
+    if (this->getDataDouble(currentColumn, data))
     {
-        release();
-        Logger::log(LogLevel::Error, "Number column exceded ( %s >= %s ).", ToString(currentColumn), ToString(num_col));
+        // Increase the column index.
+        currentColumn++;
+        return data;
+    }
+    else
+    {
         return 0;
     }
-    auto value = sqlite3_column_double(dbDetails.dbStatement, currentColumn);
-    // Increase the column index.
-    currentColumn += 1;
-    return value;
 }

@@ -90,11 +90,10 @@ public:
     /// @param orReplace Flag used to enable the OR REPLACE option.
     /// @return <b>True</b> if the operations succeeded,<br>
     ///         <b>False</b> Otherwise.
-    bool insertInto(
-        std::string table,
-        std::vector<std::string> args,
-        bool orIgnore = true,
-        bool orReplace = false);
+    bool insertInto(std::string table,
+                    std::vector<std::string> args,
+                    bool orIgnore = true,
+                    bool orReplace = false);
 
     /// @brief Execute a Delete From query.
     /// @param table The name of the table.
@@ -144,9 +143,6 @@ private:
 
     /// @brief Function used to retrieve information about the lua variables of the player.
     bool loadPlayerLuaVariables(Player * player);
-
-    /// Loading function for sqlite3 tables.
-    using ClassLoadingFunction = std::function<bool(ResultSet * result)>;
 
     /// The connection, used to communicate with the database.
     SQLiteWrapper dbConnection;

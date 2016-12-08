@@ -77,7 +77,7 @@ public:
     /// Character gender.
     GenderType gender;
     /// Character weight.
-    unsigned int weight;
+    double weight;
     /// Character level.
     unsigned int level;
     /// Character flags.
