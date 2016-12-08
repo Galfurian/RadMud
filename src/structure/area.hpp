@@ -52,15 +52,6 @@ using AreaStatus = enum class AreaStatus_t
 /// @brief This class contains all the information regarding an entire area.
 class Area
 {
-private:
-    /// The list of integer used to identify different obstacles inside the map.
-    using MapTile = enum class MapTile_t
-    {
-        Void,       ///< It's an empty tile.
-        Walkable,   ///< It's a walkable tile.
-        ClosedDoor, ///< It's a closed door.
-    };
-
 public:
     /// The virtual number of the area.
     int vnum;
@@ -68,10 +59,8 @@ public:
     std::string name;
     /// The name of the original builder of this area.
     std::string builder;
-    /// The continent where the area is placed.
-    std::string continent;
     /// The 3D grid of the map.
-    Map3D<Room *> areaMap;
+    Map3D<Room *> map;
     /// The width of the area.
     int width;
     /// The height of the area.
@@ -154,36 +143,34 @@ public:
     /// @param centerRoom The room from where the algorithm has to compute the Field of View.
     /// @param radius     The radius of visibility of the character.
     /// @return The map containing all the Information about the Field of View of a character.
-    std::vector<std::string> drawFov(Room * centerRoom, const unsigned int & radius);
+    std::vector<std::string> drawFov(Room * centerRoom, const int & radius);
 
     /// @brief Draw the Filed of View for a character (ASCII).
     /// @param centerRoom The room from where the algorithm has to compute the Field of View.
     /// @param radius     The radius of visibility of the character.
     /// @return The map containing all the Information about the Field of View of a character.
-    std::string drawASCIIFov(Room * centerRoom, const unsigned int & radius);
+    std::string drawASCIIFov(Room * centerRoom, const int & radius);
 
     /// @brief Provides a list of characters which are in sight.
     /// @param exceptions A list of excections.
     /// @param origin The coordinate of the central room.
     /// @param radius     The radius of visibility.
     /// @return The list containing the targets.
-    CharacterContainer getCharactersInSight(CharacterContainer & exceptions,
-                                            Coordinates & origin,
-                                            const unsigned int & radius);
+    CharacterContainer getCharactersInSight(CharacterContainer & exceptions, Coordinates & origin, const int & radius);
 
     /// @brief Provides a list of items which are in sight.
     /// @param exceptions A list of excections.
     /// @param origin The coordinate of the central room.
     /// @param radius     The radius of visibility.
     /// @return The list containing the items.
-    ItemContainer getItemsInSight(ItemContainer & exceptions, Coordinates & origin, const unsigned int & radius);
+    ItemContainer getItemsInSight(ItemContainer & exceptions, Coordinates & origin, const int & radius);
 
     /// @brief A Field of View algorithm which provides all the rooms which are inside the
     ///         radius of the field of view.
     /// @param origin The coordinate of the central room.
     /// @param radius The radius of visibility of the character.
     /// @return A vector containing all the coordinates of valid rooms.
-    std::vector<Coordinates> fov(Coordinates & origin, const unsigned int & radius);
+    std::vector<Coordinates> fov(Coordinates & origin, const int & radius);
 
     /// @brief Determine if a coordinate is in sight from a starting one.
     /// @param source The coordinates of the origin.
@@ -191,7 +178,7 @@ public:
     /// @param radius   The radius of visibility.
     /// @return <b>True</b> if the target room is in sight,<br>
     ///         <b>False</b> otherwise.
-    bool los(const Coordinates & source, const Coordinates & target, const unsigned int & radius);
+    bool los(const Coordinates & source, const Coordinates & target, const int & radius);
 
     /// @brief Function used to register inside the lua environment the class.
     /// @param L The lua environment.

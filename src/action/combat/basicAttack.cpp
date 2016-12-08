@@ -130,7 +130,7 @@ ActionStatus BasicAttack::perform()
             for (auto weapon : rangedWeapons)
             {
                 // Check if the target is at range of the weapon.
-                if (actor->isAtRange(predefinedTarget, weapon->getRange()))
+                if (actor->isAtRange(predefinedTarget, static_cast<int>(weapon->getRange())))
                 {
                     // Set that the actor has actually attacked the target.
                     hasAttackedTheTarget = true;
@@ -288,7 +288,7 @@ bool BasicAttack::checkTarget(Character * target)
         // TODO: This does not check if the weapon is USABLE!
         for (auto weapon : rangedWeapons)
         {
-            if (actor->isAtRange(target, weapon->getRange()))
+            if (actor->isAtRange(target, static_cast<int>(weapon->getRange())))
             {
                 Logger::log(LogLevel::Debug, "[%s] The target is at range with %s.", actor->getNameCapital(),
                             weapon->getName(false));

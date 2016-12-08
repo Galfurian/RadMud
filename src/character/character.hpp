@@ -300,7 +300,7 @@ public:
 
     /// @brief Evaluate the maximum distance at which the character can still see.
     /// @return The maximum radius of view.
-    unsigned int getViewDistance() const;
+    int getViewDistance() const;
 
     /// @brief Allows to set an action.
     /// @param _action The action that has to be set.
@@ -528,7 +528,7 @@ public:
     /// @param range The maximum range.
     /// @return <b>True</b> if the target is in sight,<br>
     ///         <b>False</b> otherwise.
-    bool isAtRange(Character * target, const unsigned int & range);
+    bool isAtRange(Character * target, const int & range);
 
     /// @brief Provides the list of active melee weapons (Left and Right hands).
     /// @return Vector of melee weapons.

@@ -1676,7 +1676,6 @@ bool DoAreaInfo(Character * character, ArgumentHandler & args)
     msg += " Vnum      :" + ToString(area->vnum) + "\n";
     msg += " Name      :" + area->name + "\n";
     msg += " Builder   :" + area->builder + "\n";
-    msg += " Continent :" + area->continent + "\n";
     msg += " Width     :" + ToString(area->width) + "\n";
     msg += " Height    :" + ToString(area->height) + "\n";
     msg += " Elevation :" + ToString(area->elevation) + "\n";
@@ -1950,7 +1949,6 @@ bool DoAreaList(Character * character, ArgumentHandler & /*args*/)
     table.addColumn("VNUM", StringAlign::Center);
     table.addColumn("NAME", StringAlign::Left);
     table.addColumn("BUILDER", StringAlign::Left);
-    table.addColumn("CONTINENT", StringAlign::Center);
     table.addColumn("ROOMS", StringAlign::Center);
     for (auto iterator : Mud::instance().mudAreas)
     {
@@ -1960,7 +1958,6 @@ bool DoAreaList(Character * character, ArgumentHandler & /*args*/)
         row.push_back(ToString(area->vnum));
         row.push_back(area->name);
         row.push_back(area->builder);
-        row.push_back(area->continent);
         row.push_back(ToString(area->areaMap.size()));
         // Add the row to the table.
         table.addRow(row);

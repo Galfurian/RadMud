@@ -507,7 +507,6 @@ bool LoadArea(ResultSet * result)
         area->vnum = result->getNextInteger();
         area->name = result->getNextString();
         area->builder = result->getNextString();
-        area->continent = result->getNextString();
         area->width = result->getNextInteger();
         area->height = result->getNextInteger();
         area->elevation = result->getNextInteger();

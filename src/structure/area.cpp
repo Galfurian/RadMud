@@ -29,8 +29,7 @@ Area::Area() :
     vnum(),
     name(),
     builder(),
-    continent(),
-    areaMap(),
+    map(),
     width(),
     height(),
     elevation(),
@@ -50,7 +49,6 @@ bool Area::check()
     assert(vnum > 0);
     assert(!name.empty());
     assert(!builder.empty());
-    assert(!continent.empty());
     assert(width > 0);
     assert(height > 0);
     assert(elevation > 0);
@@ -62,61 +60,50 @@ bool Area::inBoundaries(const Coordinates & coordinates) const
 {
     if ((coordinates.x < 0) || (coordinates.x > width)) return false;
     if ((coordinates.y < 0) || (coordinates.y > height)) return false;
-    if ((coordinates.z < 0) || (coordinates.z > elevation)) return false;
-    return true;
+    return !((coordinates.z < 0) || (coordinates.z > elevation));
 }
 
 bool Area::isValid(const Coordinates & coordinates)
 {
     // Check if out of boundaries.
-    if (!this->inBoundaries(coordinates))
-    {
-        return false;
-    }
-    // Get the room at the coordinates.
-    Room * currentRoom = this->getRoom(coordinates);
-    if (currentRoom == nullptr)
-    {
-        return false;
-    }
+    if (!this->inBoundaries(coordinates)) return false;
+    // Get the room at the coordinates and check if there is a room.
+    auto room = this->getRoom(coordinates);
+    if (room == nullptr) return false;
     // Check if there is a door.
-    Item * door = currentRoom->findDoor();
+    auto door = room->findDoor();
     if (door != nullptr)
     {
-        if (HasFlag(door->flags, ItemFlag::Closed))
-        {
-            return false;
-        }
+        // Check if the door is closed.
+        if (HasFlag(door->flags, ItemFlag::Closed)) return false;
     }
     return true;
 }
 
 int Area::getDistance(const Coordinates & source, const Coordinates & target)
 {
-    return static_cast<int>(std::sqrt((source.x - target.x) * (source.x - target.x) +
-                                      (source.y - target.y) * (source.y - target.y) +
-                                      (source.z - target.z) * (source.z - target.z)));
+    return static_cast<int>(std::sqrt(pow(source.x - target.x, 2) +
+                                      pow(source.y - target.y, 2) +
+                                      pow(source.z - target.z, 2)));
 }
 
 Direction Area::getDirection(const Coordinates & source, const Coordinates & target)
 {
-    auto dx = std::abs(source.x - target.x);
-    auto dy = std::abs(source.y - target.y);
-    auto dz = std::abs(source.z - target.z);
+    auto dx = std::abs(source.x - target.x), dy = std::abs(source.y - target.y), dz = std::abs(source.z - target.z);
     if ((dx > dy) && (dx > dz))
     {
         if (source.x > target.x) return Direction::West;
-        if (source.x < target.x) return Direction::East;
+        else if (source.x < target.x) return Direction::East;
     }
-    if ((dy > dx) && (dy > dz))
+    else if ((dy > dx) && (dy > dz))
     {
         if (source.y > target.y) return Direction::South;
-        if (source.y < target.y) return Direction::North;
+        else if (source.y < target.y) return Direction::North;
     }
-    if ((dz > dx) && (dz > dy))
+    else if ((dz > dx) && (dz > dy))
     {
         if (source.z > target.z) return Direction::Down;
-        if (source.z < target.z) return Direction::Up;
+        else if (source.z < target.z) return Direction::Up;
     }
     return Direction::None;
 }
@@ -126,9 +113,7 @@ CharacterContainer Area::getCharactersAt(const CharacterContainer & exceptions, 
     CharacterContainer characterContainer;
     if (this->isValid(coordinates))
     {
-        Room * room = this->getRoom(coordinates);
-        // Check if there is a character inside the room.
-        for (auto it : room->characters)
+        for (auto it : this->getRoom(coordinates)->characters)
         {
             if (!exceptions.containsCharacter(it))
             {
@@ -144,9 +129,7 @@ ItemContainer Area::getItemsAt(const ItemContainer & exceptions, const Coordinat
     ItemContainer itemContainer;
     if (this->isValid(coordinates))
     {
-        Room * room = this->getRoom(coordinates);
-        // Check if there is a character inside the room.
-        for (auto it : room->items)
+        for (auto it : this->getRoom(coordinates)->items)
         {
             if (!exceptions.findItem(it->vnum))
             {
@@ -161,7 +144,7 @@ bool Area::addRoom(Room * room)
 {
     if (this->inBoundaries(room->coord))
     {
-        if (areaMap.set(room->coord.x, room->coord.y, room->coord.z, room))
+        if (map.set(room->coord.x, room->coord.y, room->coord.z, room))
         {
             // Set the room area to be this one.
             room->area = this;
@@ -181,20 +164,26 @@ bool Area::addRoom(Room * room)
 
 bool Area::remRoom(Room * room)
 {
-    return (areaMap.erase(room->coord.x, room->coord.y, room->coord.z) != areaMap.end());
+    return map.erase(room->coord.x, room->coord.y, room->coord.z);
 }
 
 Room * Area::getRoom(int room_vnum)
 {
-    // TODO: Apparently there are elements inside the map which has coordinates but a nullptr room.
-    auto it = std::find_if(areaMap.begin(), areaMap.end(), [&room_vnum](decltype(*areaMap.begin()) & element)
+    for (auto it : map)
     {
-        if (element.second != nullptr) return (element.second->vnum == room_vnum);
-        return false;
-    });
-    if (it != areaMap.end())
-    {
-        return it->second;
+        for (auto it2: it.second)
+        {
+            for (auto it3: it2.second)
+            {
+                if (it3.second != nullptr)
+                {
+                    if (it3.second->vnum == room_vnum)
+                    {
+                        return it3.second;
+                    }
+                }
+            }
+        }
     }
     return nullptr;
 }
@@ -203,32 +192,28 @@ Room * Area::getRoom(const Coordinates & coordinates)
 {
     if (this->inBoundaries(coordinates))
     {
-        return areaMap.get(coordinates.x, coordinates.y, coordinates.z);
+        return map.get(coordinates.x, coordinates.y, coordinates.z);
     }
     return nullptr;
 }
 
-std::vector<std::string> Area::drawFov(Room * centerRoom, const unsigned int & radius)
+std::vector<std::string> Area::drawFov(Room * centerRoom, const int & radius)
 {
     std::vector<std::string> layers(3);
     if (!this->inBoundaries(centerRoom->coord))
     {
         return layers;
     }
-    int signedRadius = static_cast<int>(radius);
     // Retrieve the coordinates of the room.
     int origin_x = centerRoom->coord.x;
     int origin_y = centerRoom->coord.y;
     int origin_z = centerRoom->coord.z;
     // Evaluate the minimum and maximum value for x and y.
-    int min_x = (origin_x < signedRadius) ? 0 : (origin_x - signedRadius);
-    int max_x = ((origin_x + signedRadius) > this->width) ? this->width : (origin_x + signedRadius);
-    int min_y = (origin_y < signedRadius) ? 0 : (origin_y - signedRadius);
-    int max_y = ((origin_y + signedRadius - 1) > this->height) ? this->height : (origin_y + signedRadius - 1);
-    // Create a 2D map of characters.
-    Map2D<MapTile> map(signedRadius * 2, signedRadius * 2);
+    int min_x = (origin_x < radius) ? 0 : (origin_x - radius);
+    int max_x = ((origin_x + radius) > this->width) ? this->width : (origin_x + radius);
+    int min_y = (origin_y < radius) ? 0 : (origin_y - radius);
+    int max_y = ((origin_y + radius - 1) > this->height) ? this->height : (origin_y + radius - 1);
     // Evaluate the field of view.
-    //this->fov(map, origin_x, origin_y, origin_z, radius);
     auto coordinatesInFov = this->fov(centerRoom->coord, radius);
     // Prepare Environment layer.
     for (int y = max_y; y >= min_y; --y)
@@ -283,7 +268,7 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, const unsigned int & r
                 }
             }
             layers[0] += tileCode;
-            if (x != (origin_x + signedRadius - 1))
+            if (x != (origin_x + radius - 1))
             {
                 layers[0] += ",";
             }
@@ -331,7 +316,7 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, const unsigned int & r
                 }
             }
             layers[1] += tileCode;
-            if (x != (origin_x + signedRadius - 1))
+            if (x != (origin_x + radius - 1))
             {
                 layers[1] += ",";
             }
@@ -376,7 +361,7 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, const unsigned int & r
                 }
             }
             layers[2] += tileCode;
-            if (x != (origin_x + signedRadius - 1))
+            if (x != (origin_x + radius - 1))
             {
                 layers[2] += ",";
             }
@@ -386,24 +371,23 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, const unsigned int & r
     return layers;
 }
 
-std::string Area::drawASCIIFov(Room * centerRoom, const unsigned int & radius)
+std::string Area::drawASCIIFov(Room * centerRoom, const int & radius)
 {
     std::string result;
     if (!this->inBoundaries(centerRoom->coord))
     {
         return result;
     }
-    int signedRadius = static_cast<int>(radius);
     // Retrieve the coordinates of the room.
     int origin_x = centerRoom->coord.x;
     int origin_y = centerRoom->coord.y;
     int origin_z = centerRoom->coord.z;
     (void) origin_z;
     // Evaluate the minimum and maximum value for x and y.
-    int min_x = (origin_x - signedRadius);
-    int min_y = (origin_y - signedRadius);
-    int max_x = (origin_x + signedRadius);
-    int max_y = (origin_y + signedRadius);
+    int min_x = (origin_x - radius);
+    int min_y = (origin_y - radius);
+    int max_x = (origin_x + radius);
+    int max_y = (origin_y + radius);
     // Evaluate the field of view.
     auto validFov = this->fov(centerRoom->coord, radius);
     for (int y = max_y; y >= min_y; --y)
@@ -491,9 +475,7 @@ std::string Area::drawASCIIFov(Room * centerRoom, const unsigned int & radius)
     return result;
 }
 
-CharacterContainer Area::getCharactersInSight(CharacterContainer & exceptions,
-                                              Coordinates & origin,
-                                              const unsigned int & radius)
+CharacterContainer Area::getCharactersInSight(CharacterContainer & exceptions, Coordinates & origin, const int & radius)
 {
     CharacterContainer characterContainer;
     auto validCoordinates = this->fov(origin, radius);
@@ -504,7 +486,7 @@ CharacterContainer Area::getCharactersInSight(CharacterContainer & exceptions,
     return characterContainer;
 }
 
-ItemContainer Area::getItemsInSight(ItemContainer & exceptions, Coordinates & origin, const unsigned int & radius)
+ItemContainer Area::getItemsInSight(ItemContainer & exceptions, Coordinates & origin, const int & radius)
 {
     ItemContainer foundItems;
     auto validCoordinates = this->fov(origin, radius);
@@ -518,14 +500,13 @@ ItemContainer Area::getItemsInSight(ItemContainer & exceptions, Coordinates & or
     return foundItems;
 }
 
-std::vector<Coordinates> Area::fov(Coordinates & origin, const unsigned int & radius)
+std::vector<Coordinates> Area::fov(Coordinates & origin, const int & radius)
 {
     std::vector<Coordinates> fovCoordinates;
-    int signedRadius = static_cast<int>(radius);
     Coordinates target, point;
-    while (point.x <= signedRadius)
+    while (point.x <= radius)
     {
-        while ((point.y <= point.x) && (point.square() <= (signedRadius * signedRadius)))
+        while ((point.y <= point.x) && (point.square() <= pow(radius, 2)))
         {
             target = Coordinates(origin.x + point.x, origin.y + point.y, origin.z);
             if ((target.x == origin.x) && (target.y == origin.y))
@@ -565,7 +546,7 @@ std::vector<Coordinates> Area::fov(Coordinates & origin, const unsigned int & ra
     return fovCoordinates;
 }
 
-bool Area::los(const Coordinates & source, const Coordinates & target, const unsigned int & radius)
+bool Area::los(const Coordinates & source, const Coordinates & target, const int & radius)
 {
     // Deal with the easiest case.
     if (source == target)
@@ -578,7 +559,7 @@ bool Area::los(const Coordinates & source, const Coordinates & target, const uns
         return false;
     }
     // Ensure that the line will not extend too long.
-    if (Area::getDistance(source, target) > static_cast<int>(radius))
+    if (Area::getDistance(source, target) > radius)
     {
         return false;
     }
@@ -626,7 +607,6 @@ void Area::luaRegister(lua_State * L)
         .addData("vnum", &Area::vnum, false)
         .addData("name", &Area::name, false)
         .addData("builder", &Area::builder, false)
-        .addData("continent", &Area::continent, false)
         .addData("width", &Area::width, false)
         .addData("height", &Area::height, false)
         .addData("elevation", &Area::elevation, false)

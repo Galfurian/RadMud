@@ -489,12 +489,12 @@ std::string Character::getStaminaCondition()
     else return "are too tired, you can't even blink your eyes";
 }
 
-unsigned int Character::getViewDistance() const
+int Character::getViewDistance() const
 {
     // Value = 4 + LogMod(PER)
     // MIN   = 4.0
     // MAX   = 7.2
-    return 4 + this->getAbilityLog(Ability::Perception, 0.0, 1.0);
+    return 4 + static_cast<int>(this->getAbilityLog(Ability::Perception, 0.0, 1.0));
 }
 
 void Character::setAction(std::shared_ptr<GeneralAction> _action)
@@ -1302,7 +1302,7 @@ bool Character::canAttackWith(const EquipmentSlot & slot) const
     return false;
 }
 
-bool Character::isAtRange(Character * target, const unsigned int & range)
+bool Character::isAtRange(Character * target, const int & range)
 {
     if (WrongAssert(this->room == nullptr)) return false;
     if (WrongAssert(this->room->area == nullptr)) return false;

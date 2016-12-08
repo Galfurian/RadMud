@@ -508,7 +508,7 @@ bool DoFire(Character * character, ArgumentHandler & /*args*/)
     for (auto weapon : rangedWeapons)
     {
         auto weaponRange = weapon->getRange();
-        if (character->isAtRange(aimedTarget, weaponRange))
+        if (character->isAtRange(aimedTarget, static_cast<int>(weaponRange)))
         {
             canAttack = true;
             break;

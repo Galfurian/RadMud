@@ -99,7 +99,7 @@ Room * Continent::getRoom(Coordinates coord)
     return &continentMap.get(coord.x, coord.y, coord.z);
 }
 
-std::vector<std::string> Continent::drawFov(Room * centerRoom, const unsigned int & radius)
+std::vector<std::string> Continent::drawFov(Room * centerRoom, const int & radius)
 {
     std::vector<std::string> layers(3);
     if (!this->inBoundaries(centerRoom->coord))
@@ -266,7 +266,7 @@ std::vector<std::string> Continent::drawFov(Room * centerRoom, const unsigned in
 }
 
 void Continent::fieldOfView(Map2D<ContinentTile> & map, int origin_x, int origin_y, int origin_z,
-                            const unsigned int & radius)
+                            const int & radius)
 {
     double incr_x = 0.0;
     double incr_y = 0.0;
@@ -288,13 +288,13 @@ void Continent::lineOfSight(
     double incr_x,
     double incr_y,
     double incr_z,
-    const unsigned int & radius)
+    const int & radius)
 {
     double ox = origin_x + static_cast<double>(0.5f);
     double oy = origin_y + static_cast<double>(0.5f);
     double oz = origin_z;
 
-    for (unsigned int i = 0; i <= radius; ++i)
+    for (int i = 0; i <= radius; ++i)
     {
         // Transform into integer the coordinates.
         int curr_x = static_cast<int>(ox);
