@@ -171,9 +171,9 @@ Room * Area::getRoom(int room_vnum)
 {
     for (auto it : map)
     {
-        for (auto it2: it.second)
+        for (auto it2 : it.second)
         {
-            for (auto it3: it2.second)
+            for (auto it3 : it2.second)
             {
                 if (it3.second != nullptr)
                 {

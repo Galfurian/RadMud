@@ -20,13 +20,14 @@
 #pragma once
 
 #include <map>
-#include <unordered_map>
 
 /// Used to create and manage a tridimensional map.
 template<typename T>
 class Map3D
 {
 private:
+    using map_t = typename std::map<const int, std::map<const int, std::map<const int, T> > >;
+
     /// Width of th map.
     int width;
     /// Height of th map.
@@ -34,7 +35,7 @@ private:
     /// Elevation of th map.
     int elevation;
     /// Data contained inside the map.
-    std::map<int, std::map<int, std::map<int, T>>> data;
+    map_t data;
 
 public:
     /// @brief Constructor.
@@ -77,7 +78,7 @@ public:
             {
                 for (int x = 0; x < height; ++x)
                 {
-                    data[z][y][x] = value;
+                    data[x][y][z] = value;
                 }
             }
         }
@@ -122,6 +123,10 @@ public:
     ///         <b>False</b> otherwise.
     bool set(int x, int y, int z, T value)
     {
+        if (this->has(x, y, z))
+        {
+            return false;
+        }
         data[x][y][z] = value;
         return true;
     }
@@ -144,13 +149,13 @@ public:
     ///         <b>False</b> otherwise.
     bool has(int x, int y, int z) const
     {
-        typename std::map<int, std::map<int, std::map<int, T>>>::const_iterator it = data.find(x);
+        typename std::map<const int, std::map<const int, std::map<const int, T> > >::const_iterator it = data.find(x);
         if (it != data.end())
         {
-            typename std::map<int, std::map<int, T>>::const_iterator it2 = it->second.find(y);
+            typename std::map<const int, std::map<const int, T> >::const_iterator it2 = it->second.find(y);
             if (it2 != it->second.end())
             {
-                return it2->second.find(z) != it2->second.end();
+                return (it2->second.find(z) != it2->second.end());
             }
         }
         return false;
@@ -166,8 +171,7 @@ public:
     {
         if (this->has(x, y, z))
         {
-            auto it = data[x][y].find(z);
-            data[x][y].erase(it);
+            data[x][y].erase(data[x][y].find(z));
             return true;
         }
         return false;
@@ -175,14 +179,14 @@ public:
 
     /// @brief Provides an iterator to the begin of the list of data.
     /// @return An iterator to the begin of the 3D map.
-    typename std::map<int, std::map<int, std::map<int, T>>>::iterator begin()
+    typename map_t::iterator begin()
     {
         return data.begin();
     }
 
     /// @brief Provides an iterator to the end of the list of data.
     /// @return An iterator to the end of the 3D map.
-    typename std::map<int, std::map<int, std::map<int, T>>>::iterator end()
+    typename map_t::iterator end()
     {
         return data.end();
     }
