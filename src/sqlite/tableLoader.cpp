@@ -22,7 +22,7 @@
 #include "tableLoader.hpp"
 
 TableLoader::TableLoader(std::string _table,
-                         std::function<bool(std::shared_ptr<ResultSet> result)> _loadFunction,
+                         std::function<bool(ResultSet * result)> _loadFunction,
                          std::string _loadQuery) :
     table(_table),
     loadFunction(_loadFunction),

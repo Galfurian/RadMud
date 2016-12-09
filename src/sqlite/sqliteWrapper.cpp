@@ -21,21 +21,22 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "sqliteWrapper.hpp"
-
-#include "utils.hpp"
 #include "logger.hpp"
 
 ResultSet::~ResultSet()
 {
-
+    // Nothing to do.
 }
 
-SQLiteWrapper::SQLiteWrapper()
+SQLiteWrapper::SQLiteWrapper() :
+    dbDetails(),
+    connected(),
+    errorMessage(),
+    errorCode(),
+    num_col(),
+    currentColumn()
 {
-    currentColumn = 0;
-    num_col = 0;
-    errorCode = 0;
-    connected = false;
+    // Nothing to do.
 }
 
 SQLiteWrapper::~SQLiteWrapper()
@@ -47,14 +48,9 @@ bool SQLiteWrapper::openConnection(std::string dbName, std::string dbDirectory)
 {
     dbDetails.dbName = dbName;
     dbDetails.dbDirectory = dbDirectory;
-
     connected = true;
-
-    errorCode = sqlite3_open(
-        (dbDetails.dbDirectory + dbDetails.dbName).c_str(),
-        &(dbDetails.dbConnection));
+    errorCode = sqlite3_open((dbDetails.dbDirectory + dbDetails.dbName).c_str(), &(dbDetails.dbConnection));
     errorMessage = sqlite3_errmsg(dbDetails.dbConnection);
-
     if (errorCode != SQLITE_OK)
     {
         if (errorMessage.find("not an error") == std::string::npos)
@@ -67,7 +63,6 @@ bool SQLiteWrapper::openConnection(std::string dbName, std::string dbDirectory)
     {
         connected = false;
     }
-
     return connected;
 }
 
@@ -106,14 +101,14 @@ bool SQLiteWrapper::closeConnection()
     return result;
 }
 
-std::shared_ptr<ResultSet> SQLiteWrapper::executeSelect(const char * query)
+ResultSet * SQLiteWrapper::executeSelect(const char * query)
 {
     if (this->isConnected())
     {
         if (sqlite3_prepare_v2(dbDetails.dbConnection, query, -1, &dbDetails.dbStatement, NULL) == SQLITE_OK)
         {
             num_col = sqlite3_column_count(dbDetails.dbStatement);
-            return this->shared_from_this();
+            return this;
         }
         errorMessage = sqlite3_errmsg(dbDetails.dbConnection);
         errorCode = sqlite3_finalize(dbDetails.dbStatement);
@@ -129,10 +124,8 @@ int SQLiteWrapper::executeQuery(const char * query)
     {
         return 0;
     }
-
     errorCode = sqlite3_exec(dbDetails.dbConnection, query, NULL, NULL, NULL);
     errorMessage = sqlite3_errmsg(dbDetails.dbConnection);
-
     if (errorCode != SQLITE_OK)
     {
         Logger::log(LogLevel::Error, "Error code :" + ToString(errorCode));

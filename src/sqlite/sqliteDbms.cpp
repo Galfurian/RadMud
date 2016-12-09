@@ -26,7 +26,9 @@
 #include "logger.hpp"
 #include "mud.hpp"
 
-SQLiteDbms::SQLiteDbms()
+SQLiteDbms::SQLiteDbms() :
+    dbConnection(),
+    loaders()
 {
     loaders.push_back(TableLoader("BadName", LoadBadName));
     loaders.push_back(TableLoader("BlockedIp", LoadBlockedIp));

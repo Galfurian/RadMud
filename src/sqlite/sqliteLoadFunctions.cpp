@@ -28,7 +28,7 @@
 #include "logger.hpp"
 #include "mud.hpp"
 
-bool LoadBadName(std::shared_ptr<ResultSet> result)
+bool LoadBadName(ResultSet * result)
 {
     while (result->next())
     {
@@ -41,7 +41,7 @@ bool LoadBadName(std::shared_ptr<ResultSet> result)
     return true;
 }
 
-bool LoadBlockedIp(std::shared_ptr<ResultSet> result)
+bool LoadBlockedIp(ResultSet * result)
 {
     while (result->next())
     {
@@ -54,7 +54,7 @@ bool LoadBlockedIp(std::shared_ptr<ResultSet> result)
     return true;
 }
 
-bool LoadNews(std::shared_ptr<ResultSet> result)
+bool LoadNews(ResultSet * result)
 {
     while (result->next())
     {
@@ -68,7 +68,7 @@ bool LoadNews(std::shared_ptr<ResultSet> result)
     return true;
 }
 
-bool LoadContent(std::shared_ptr<ResultSet> result)
+bool LoadContent(ResultSet * result)
 {
     while (result->next())
     {
@@ -94,7 +94,7 @@ bool LoadContent(std::shared_ptr<ResultSet> result)
     return true;
 }
 
-bool LoadItem(std::shared_ptr<ResultSet> result)
+bool LoadItem(ResultSet * result)
 {
     while (result->next())
     {
@@ -164,7 +164,7 @@ bool LoadItem(std::shared_ptr<ResultSet> result)
     return true;
 }
 
-bool LoadSkill(std::shared_ptr<ResultSet> result)
+bool LoadSkill(ResultSet * result)
 {
     while (result->next())
     {
@@ -189,7 +189,7 @@ bool LoadSkill(std::shared_ptr<ResultSet> result)
     return true;
 }
 
-bool LoadFaction(std::shared_ptr<ResultSet> result)
+bool LoadFaction(ResultSet * result)
 {
     while (result->next())
     {
@@ -231,7 +231,7 @@ bool LoadFaction(std::shared_ptr<ResultSet> result)
     return true;
 }
 
-bool LoadModel(std::shared_ptr<ResultSet> result)
+bool LoadModel(ResultSet * result)
 {
     while (result->next())
     {
@@ -288,7 +288,7 @@ bool LoadModel(std::shared_ptr<ResultSet> result)
     return true;
 }
 
-bool LoadRace(std::shared_ptr<ResultSet> result)
+bool LoadRace(ResultSet * result)
 {
     while (result->next())
     {
@@ -329,7 +329,7 @@ bool LoadRace(std::shared_ptr<ResultSet> result)
     return true;
 }
 
-bool LoadMobile(std::shared_ptr<ResultSet> result)
+bool LoadMobile(ResultSet * result)
 {
     while (result->next())
     {
@@ -385,7 +385,7 @@ bool LoadMobile(std::shared_ptr<ResultSet> result)
     return true;
 }
 
-bool LoadRoom(std::shared_ptr<ResultSet> result)
+bool LoadRoom(ResultSet * result)
 {
     while (result->next())
     {
@@ -419,7 +419,7 @@ bool LoadRoom(std::shared_ptr<ResultSet> result)
     return true;
 }
 
-bool LoadExit(std::shared_ptr<ResultSet> result)
+bool LoadExit(ResultSet * result)
 {
     while (result->next())
     {
@@ -461,7 +461,7 @@ bool LoadExit(std::shared_ptr<ResultSet> result)
     return true;
 }
 
-bool LoadItemRoom(std::shared_ptr<ResultSet> result)
+bool LoadItemRoom(ResultSet * result)
 {
     while (result->next())
     {
@@ -496,7 +496,7 @@ bool LoadItemRoom(std::shared_ptr<ResultSet> result)
     return true;
 }
 
-bool LoadArea(std::shared_ptr<ResultSet> result)
+bool LoadArea(ResultSet * result)
 {
     while (result->next())
     {
@@ -527,7 +527,7 @@ bool LoadArea(std::shared_ptr<ResultSet> result)
     return true;
 }
 
-bool LoadAreaList(std::shared_ptr<ResultSet> result)
+bool LoadAreaList(ResultSet * result)
 {
     while (result->next())
     {
@@ -557,7 +557,7 @@ bool LoadAreaList(std::shared_ptr<ResultSet> result)
     return true;
 }
 
-bool LoadWriting(std::shared_ptr<ResultSet> result)
+bool LoadWriting(ResultSet * result)
 {
     while (result->next())
     {
@@ -584,7 +584,7 @@ bool LoadWriting(std::shared_ptr<ResultSet> result)
     return true;
 }
 
-bool LoadContinent(std::shared_ptr<ResultSet> result)
+bool LoadContinent(ResultSet * result)
 {
     while (result->next())
     {
@@ -613,7 +613,7 @@ bool LoadContinent(std::shared_ptr<ResultSet> result)
     return true;
 }
 
-bool LoadMaterial(std::shared_ptr<ResultSet> result)
+bool LoadMaterial(ResultSet * result)
 {
     while (result->next())
     {
@@ -642,7 +642,7 @@ bool LoadMaterial(std::shared_ptr<ResultSet> result)
     return true;
 }
 
-bool LoadProfession(std::shared_ptr<ResultSet> result)
+bool LoadProfession(ResultSet * result)
 {
     while (result->next())
     {
@@ -676,7 +676,7 @@ bool LoadProfession(std::shared_ptr<ResultSet> result)
     return true;
 }
 
-bool LoadProduction(std::shared_ptr<ResultSet> result)
+bool LoadProduction(ResultSet * result)
 {
     while (result->next())
     {
@@ -717,7 +717,7 @@ bool LoadProduction(std::shared_ptr<ResultSet> result)
     return true;
 }
 
-bool LoadLiquid(std::shared_ptr<ResultSet> result)
+bool LoadLiquid(ResultSet * result)
 {
     while (result->next())
     {
@@ -742,7 +742,7 @@ bool LoadLiquid(std::shared_ptr<ResultSet> result)
     return true;
 }
 
-bool LoadContentLiq(std::shared_ptr<ResultSet> result)
+bool LoadContentLiq(ResultSet * result)
 {
     while (result->next())
     {
@@ -775,7 +775,7 @@ bool LoadContentLiq(std::shared_ptr<ResultSet> result)
     return true;
 }
 
-bool LoadTravelPoint(std::shared_ptr<ResultSet> result)
+bool LoadTravelPoint(ResultSet * result)
 {
     while (result->next())
     {
@@ -825,7 +825,7 @@ bool LoadTravelPoint(std::shared_ptr<ResultSet> result)
     return true;
 }
 
-bool LoadBuilding(std::shared_ptr<ResultSet> result)
+bool LoadBuilding(ResultSet * result)
 {
     while (result->next())
     {
@@ -860,7 +860,7 @@ bool LoadBuilding(std::shared_ptr<ResultSet> result)
     return true;
 }
 
-bool LoadShop(std::shared_ptr<ResultSet> result)
+bool LoadShop(ResultSet * result)
 {
     while (result->next())
     {
@@ -896,7 +896,7 @@ bool LoadShop(std::shared_ptr<ResultSet> result)
     return true;
 }
 
-bool LoadCurrency(std::shared_ptr<ResultSet> result)
+bool LoadCurrency(ResultSet * result)
 {
     while (result->next())
     {
@@ -932,7 +932,7 @@ bool LoadCurrency(std::shared_ptr<ResultSet> result)
     return true;
 }
 
-bool LoadTerrain(std::shared_ptr<ResultSet> result)
+bool LoadTerrain(ResultSet * result)
 {
     while (result->next())
     {

@@ -36,6 +36,12 @@ using QueryList = std::vector<std::pair<std::string, std::string> >;
 class SQLiteDbms
 {
 private:
+    /// The connection, used to communicate with the database.
+    SQLiteWrapper dbConnection;
+
+    /// List of the tables with their loader.
+    std::vector<TableLoader> loaders;
+
     /// @brief Constructor.
     SQLiteDbms();
 
@@ -143,10 +149,4 @@ private:
 
     /// @brief Function used to retrieve information about the lua variables of the player.
     bool loadPlayerLuaVariables(Player * player);
-
-    /// The connection, used to communicate with the database.
-    SQLiteWrapper dbConnection;
-
-    /// List of the tables with their loader.
-    std::vector<TableLoader> loaders;
 };

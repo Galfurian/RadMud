@@ -24,11 +24,9 @@
 
 #include <sqlite3.h>
 #include <string>
-#include <memory>
 
 /// @brief Interface class for result set of all the query.
-class ResultSet :
-    public std::enable_shared_from_this<ResultSet>
+class ResultSet
 {
 public:
     /// @brief Destructor.
@@ -104,6 +102,38 @@ public:
 class SQLiteWrapper :
     public ResultSet
 {
+private:
+    /// @brief SQLite Connection Object.
+    using DBDetails = struct
+    {
+        /// SQLite connection object.
+        sqlite3 * dbConnection;
+        /// Database name.
+        std::string dbName;
+        /// Databse file directory.
+        std::string dbDirectory;
+        /// SQLite statement object.
+        sqlite3_stmt * dbStatement;
+    };
+
+    /// SQLite Connection Details.
+    DBDetails dbDetails;
+
+    /// Connection status to the database.
+    bool connected;
+
+    /// Last error message.
+    std::string errorMessage;
+
+    /// Last error code.
+    int errorCode;
+
+    /// Number of column in the result set.
+    int num_col;
+
+    /// Current column.
+    int currentColumn;
+
 public:
     /// @brief Constructor.
     SQLiteWrapper();
@@ -124,7 +154,7 @@ public:
     /// @brief This method is used to execute a SELECT Query.
     /// @param query The query that has to be executed.
     /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
-    std::shared_ptr<ResultSet> executeSelect(const char * query);
+    ResultSet * executeSelect(const char * query);
 
     /// @brief This method is used to execute a INSERT/DELETE/UPDATE Query.
     /// @param query The query that has to be executed.
@@ -153,38 +183,6 @@ public:
     bool isConnected();
 
 private:
-    /// @brief SQLite Connection Object.
-    using DBDetails = struct
-    {
-    public:
-        /// SQLite connection object.
-        sqlite3 * dbConnection;
-        /// Database name.
-        std::string dbName;
-        /// Databse file directory.
-        std::string dbDirectory;
-        /// SQLite statement object.
-        sqlite3_stmt * dbStatement;
-    };
-
-    /// Connection status to the database.
-    bool connected;
-
-    /// Last error message.
-    std::string errorMessage;
-
-    /// Last error code.
-    int errorCode;
-
-    /// Number of column in the result set.
-    int num_col;
-
-    /// Current column.
-    int currentColumn;
-
-    /// SQLite Connection Details.
-    DBDetails dbDetails;
-
     bool next() override;
 
     bool release() override;
