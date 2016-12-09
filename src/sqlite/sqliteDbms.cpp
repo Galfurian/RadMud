@@ -112,7 +112,6 @@ bool SQLiteDbms::loadTables()
         {
             // Log an error.
             Logger::log(LogLevel::Error, "Error when loading table: " + iterator.table);
-            this->showLastError();
             status = false;
         }
         // release the resource.

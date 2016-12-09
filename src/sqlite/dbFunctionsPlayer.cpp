@@ -1,5 +1,5 @@
 /// @file   playerLoadFunctions.cpp
-/// @brief  
+/// @brief
 /// @author Enrico Fraccaroli
 /// @date   03/12/2016
 /// @copyright
@@ -30,10 +30,29 @@ bool SQLiteDbms::loadPlayer(Player * player)
     Logger::log(LogLevel::Debug, "Loading player " + player->getName() + ".");
     Stopwatch<std::chrono::milliseconds> stopwatch("LoadPlayer");
     stopwatch.start();
-    if (!this->loadPlayerInformation(player))
+    // Retrieve the information concerning the player.
     {
-        Logger::log(LogLevel::Error, "Encountered an error during loading Player Information.");
-        return false;
+        std::string query = "SELECT * FROM Player WHERE name = \"" + player->name + "\";";
+        // Execute the query.
+        auto result = dbConnection.executeSelect(query.c_str());
+        // Check the result.
+        if (result == nullptr)
+        {
+            this->showLastError();
+            return false;
+        }
+        if (!result->next())
+        {
+            this->showLastError();
+            result->release();
+            return false;
+        }
+        if (!this->loadPlayerInformation(result, player))
+        {
+            this->showLastError();
+            result->release();
+            return false;
+        }
     }
     if (!this->loadPlayerItems(player))
     {
@@ -82,54 +101,134 @@ bool SQLiteDbms::searchPlayer(const std::string & name)
     return outcome;
 }
 
-bool SQLiteDbms::loadPlayerInformation(Player * player)
+//    player->name = result->getNextString();
+//    player->password = result->getNextString();
+//    player->race = Mud::instance().findRace(result->getNextInteger());
+//    player->setAbility(Ability::Strength, result->getNextUnsignedInteger());
+//    player->setAbility(Ability::Agility, result->getNextUnsignedInteger());
+//    player->setAbility(Ability::Perception, result->getNextUnsignedInteger());
+//    player->setAbility(Ability::Constitution, result->getNextUnsignedInteger());
+//    player->setAbility(Ability::Intelligence, result->getNextUnsignedInteger());
+//    player->gender = static_cast<GenderType>(result->getNextInteger());
+//    player->age = result->getNextInteger();
+//    player->description = result->getNextString();
+//    player->weight = result->getNextUnsignedInteger();
+//    player->faction = Mud::instance().findFaction(result->getNextInteger());
+//    player->level = result->getNextUnsignedInteger();
+//    player->experience = result->getNextInteger();
+//    player->room = Mud::instance().findRoom(result->getNextInteger());
+//    player->prompt = result->getNextString();
+//    player->flags = result->getNextUnsignedInteger();
+//    player->setHealth(result->getNextUnsignedInteger(), true);
+//    player->setStamina(result->getNextUnsignedInteger(), true);
+//    player->setHunger(result->getNextInteger());
+//    player->setThirst(result->getNextInteger());
+//    player->rent_room = result->getNextInteger();
+bool SQLiteDbms::loadPlayerInformation(ResultSet * result, Player * player)
 {
-    // Prepare the query.
-    std::string query = "SELECT * FROM Player WHERE name = \"" + player->name + "\";";
-    // Execute the query.
-    auto result = dbConnection.executeSelect(query.c_str());
-    // Check the result.
-    if (result == nullptr)
-    {
-        Logger::log(LogLevel::Error, "Query result is empty.");
-        this->showLastError();
-        return false;
-    }
     // Loading status.
     bool status = true;
-    if (!result->next())
+    // The column counter.
+    int column = 0;
+    // Name
+    if (!result->getDataString(column++, player->name)) return false;
+    // Password
+    if (!result->getDataString(column++, player->password))return false;
+    // Race
     {
-        Logger::log(LogLevel::Error, "Query result is empty.");
-        // Show the last error.
-        this->showLastError();
-        // Release the resource.
-        result->release();
-        return false;
+        int value;
+        if (!result->getDataInteger(column++, value)) return false;
+        if ((player->race = Mud::instance().findRace(value)) == nullptr) return false;
     }
-    // Set the values.
-    player->name = result->getNextString();
-    player->password = result->getNextString();
-    player->race = Mud::instance().findRace(result->getNextInteger());
-    player->setAbility(Ability::Strength, result->getNextUnsignedInteger());
-    player->setAbility(Ability::Agility, result->getNextUnsignedInteger());
-    player->setAbility(Ability::Perception, result->getNextUnsignedInteger());
-    player->setAbility(Ability::Constitution, result->getNextUnsignedInteger());
-    player->setAbility(Ability::Intelligence, result->getNextUnsignedInteger());
-    player->gender = static_cast<GenderType>(result->getNextInteger());
-    player->age = result->getNextInteger();
-    player->description = result->getNextString();
-    player->weight = result->getNextUnsignedInteger();
-    player->faction = Mud::instance().findFaction(result->getNextInteger());
-    player->level = result->getNextUnsignedInteger();
-    player->experience = result->getNextInteger();
-    player->room = Mud::instance().findRoom(result->getNextInteger());
-    player->prompt = result->getNextString();
-    player->flags = result->getNextUnsignedInteger();
-    player->setHealth(result->getNextUnsignedInteger(), true);
-    player->setStamina(result->getNextUnsignedInteger(), true);
-    player->setHunger(result->getNextInteger());
-    player->setThirst(result->getNextInteger());
-    player->rent_room = result->getNextInteger();
+    // Strength
+    {
+        unsigned int value;
+        if (!result->getDataUnsignedInteger(column++, value)) return false;
+        if (!player->setAbility(Ability::Strength, value)) return false;
+    }
+    // Agility
+    {
+        unsigned int value;
+        if (!result->getDataUnsignedInteger(column++, value)) return false;
+        if (!player->setAbility(Ability::Agility, value)) return false;
+    }
+    // Perception
+    {
+        unsigned int value;
+        if (!result->getDataUnsignedInteger(column++, value)) return false;
+        if (!player->setAbility(Ability::Perception, value)) return false;
+    }
+    // Constitution
+    {
+        unsigned int value;
+        if (!result->getDataUnsignedInteger(column++, value)) return false;
+        if (!player->setAbility(Ability::Constitution, value)) return false;
+    }
+    // Intelligence
+    {
+        unsigned int value;
+        if (!result->getDataUnsignedInteger(column++, value)) return false;
+        if (!player->setAbility(Ability::Intelligence, value)) return false;
+    }
+    // Gender
+    {
+        int value;
+        if (!result->getDataInteger(column++, value)) return false;
+        player->gender = static_cast<GenderType>(value);
+    }
+    // Age
+    if (!result->getDataInteger(column++, player->age)) return false;
+    // Description
+    if (!result->getDataString(column++, player->description)) return false;
+    // Weight
+    if (!result->getDataDouble(column++, player->weight)) return false;
+    // Race
+    {
+        int value;
+        if (!result->getDataInteger(column++, value)) return false;
+        if ((player->faction = Mud::instance().findFaction(value)) == nullptr) return false;
+    }
+    // Level
+    if (!result->getDataUnsignedInteger(column++, player->level)) return false;
+    // Experience
+    if (!result->getDataInteger(column++, player->experience)) return false;
+    // Room
+    {
+        int value;
+        if (!result->getDataInteger(column++, value)) return false;
+        if ((player->room = Mud::instance().findRoom(value)) == nullptr) return false;
+    }
+    // Prompt
+    if (!result->getDataString(column++, player->prompt)) return false;
+    // Flags
+    if (!result->getDataUnsignedInteger(column++, player->flags)) return false;
+    // Health
+    {
+        unsigned int value;
+        if (!result->getDataUnsignedInteger(column++, value)) return false;
+        player->setHealth(value, true);
+    }
+    // Stamina
+    {
+        unsigned int value;
+        if (!result->getDataUnsignedInteger(column++, value)) return false;
+        player->setStamina(value, true);
+    }
+    // Hunger
+    {
+        int value;
+        if (!result->getDataInteger(column++, value)) return false;
+        player->setHunger(value);
+    }
+    // Thirst
+    {
+        int value;
+        if (!result->getDataInteger(column++, value)) return false;
+        player->setThirst(value);
+    }
+    // Rent Room
+    if (!result->getDataInteger(column++, player->rent_room)) return false;
+    // Check the room.
     if (player->room == nullptr)
     {
         player->room = Mud::instance().findRoom(player->rent_room);

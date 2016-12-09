@@ -38,7 +38,6 @@ class SQLiteDbms
 private:
     /// The connection, used to communicate with the database.
     SQLiteWrapper dbConnection;
-
     /// List of the tables with their loader.
     std::vector<TableLoader> loaders;
 
@@ -139,7 +138,7 @@ public:
 
 private:
     /// @brief Function used to retrieve information about Player.
-    bool loadPlayerInformation(Player * player);
+    bool loadPlayerInformation(ResultSet * result, Player * player);
 
     /// @brief Function used to retrieve information about the item posessed by the player.
     bool loadPlayerItems(Player * player);

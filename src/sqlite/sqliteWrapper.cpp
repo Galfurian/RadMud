@@ -22,11 +22,7 @@
 
 #include "sqliteWrapper.hpp"
 #include "logger.hpp"
-
-ResultSet::~ResultSet()
-{
-    // Nothing to do.
-}
+#include "sqliteException.hpp"
 
 SQLiteWrapper::SQLiteWrapper() :
     dbDetails(),
@@ -101,6 +97,17 @@ bool SQLiteWrapper::closeConnection()
     return result;
 }
 
+std::string SQLiteWrapper::getLastErrorMsg() const
+{
+    return errorMessage;
+}
+
+int SQLiteWrapper::getLastErrorCode() const
+{
+    return errorCode;
+}
+
+
 ResultSet * SQLiteWrapper::executeSelect(const char * query)
 {
     if (this->isConnected())
@@ -148,16 +155,6 @@ void SQLiteWrapper::endTransaction()
 void SQLiteWrapper::rollbackTransection()
 {
     executeQuery("ROLLBACK TRANSACTION");
-}
-
-std::string SQLiteWrapper::getLastErrorMsg() const
-{
-    return errorMessage;
-}
-
-int SQLiteWrapper::getLastErrorCode() const
-{
-    return errorCode;
 }
 
 bool SQLiteWrapper::isConnected()
@@ -311,7 +308,7 @@ std::string SQLiteWrapper::getNextString()
         currentColumn++;
         return data;
     }
-    return "";
+    throw SQLiteException(errorCode, errorMessage);
 }
 
 int SQLiteWrapper::getNextInteger()
@@ -323,7 +320,7 @@ int SQLiteWrapper::getNextInteger()
         currentColumn++;
         return data;
     }
-    return 0;
+    throw SQLiteException(errorCode, errorMessage);
 }
 
 unsigned int SQLiteWrapper::getNextUnsignedInteger()
@@ -335,7 +332,7 @@ unsigned int SQLiteWrapper::getNextUnsignedInteger()
         currentColumn++;
         return data;
     }
-    return 0;
+    throw SQLiteException(errorCode, errorMessage);
 }
 
 double SQLiteWrapper::getNextDouble()
@@ -347,5 +344,5 @@ double SQLiteWrapper::getNextDouble()
         currentColumn++;
         return data;
     }
-    return 0;
+    throw SQLiteException(errorCode, errorMessage);
 }
