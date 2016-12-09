@@ -59,7 +59,8 @@ bool LoadNews(ResultSet * result)
 {
     while (result->next())
     {
-        if (!Mud::instance().mudNews.insert(std::make_pair(result->getNextString(), result->getNextString())).second)
+        if (!Mud::instance().mudNews.insert(
+            std::make_pair(result->getNextString(), result->getNextString())).second)
         {
             Logger::log(LogLevel::Error, "Error during news loading.");
             return false;
@@ -937,10 +938,10 @@ bool LoadTerrain(ResultSet * result)
     while (result->next())
     {
         std::shared_ptr<Terrain> terrain = std::make_shared<Terrain>();
-        if (!result->getDataUnsignedInteger(0, terrain->vnum)) return false;
-        if (!result->getDataString(1, terrain->name)) return false;
-        if (!result->getDataUnsignedInteger(2, terrain->flags)) return false;
-        if (!result->getDataUnsignedInteger(3, terrain->space)) return false;
+        terrain->vnum = result->getNextUnsignedInteger();
+        terrain->name = result->getNextString();
+        terrain->flags = result->getNextUnsignedInteger();
+        terrain->space = result->getNextUnsignedInteger();
         if (!Mud::instance().addTerrain(terrain))
         {
             Logger::log(LogLevel::Error, "Can't add the terrain (%s) %s.", terrain->vnum, terrain->name);

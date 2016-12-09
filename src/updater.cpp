@@ -36,11 +36,9 @@ MudUpdater::MudUpdater() :
     bandwidth_out(),
     bandwidth_uncompressed(),
     ticTime(std::chrono::system_clock::now()),
-    mudTime(std::chrono::system_clock::now()),
     ticSize(10),
-    secondSize(50),
-    hourSize(secondSize * 3600),
-    daySize(secondSize * 86400),
+    hourTicSize(18),
+    hourTicCounter(),
     mudHour(),
     mudDayPhase(DayPhase::Morning)
 {
@@ -61,18 +59,68 @@ MudUpdater & MudUpdater::instance()
     return instance;
 }
 
-void MudUpdater::initTimers()
+void MudUpdater::updateBandIn(const size_t & size)
 {
-    ticTime = std::chrono::system_clock::now();
-    mudTime = std::chrono::system_clock::now();
+    bandwidth_in += size;
+}
+
+void MudUpdater::updateBandOut(const size_t & size)
+{
+    bandwidth_out += size;
+}
+
+void MudUpdater::updateBandUncompressed(const size_t & size)
+{
+    bandwidth_uncompressed += size;
+}
+
+size_t MudUpdater::getBandIn()
+{
+    return bandwidth_in;
+}
+
+size_t MudUpdater::getBandOut()
+{
+    return bandwidth_out;
+}
+
+size_t MudUpdater::getBandUncompressed()
+{
+    return bandwidth_uncompressed;
+}
+
+DayPhase MudUpdater::getDayPhase()
+{
+    return mudDayPhase;
+}
+
+void MudUpdater::advanceTime()
+{
+    // Check if a tic is passed.
+    if (this->hasTicPassed())
+    {
+        // Update the characters.
+        this->updateCharacters();
+        // Check if a hour is passed.
+        if (hourTicCounter++ >= hourTicSize)
+        {
+            // Update the day phase.
+            this->updateDayPhase();
+            // Update the items.
+            this->updateItems();
+            // Reset the hour counter.
+            hourTicCounter = 0;
+        }
+    }
+    // Perform characters pending actions.
+    this->performActions();
 }
 
 bool MudUpdater::hasTicPassed()
 {
-    // Get the current time.
-    std::chrono::time_point<std::chrono::system_clock> currentTime = std::chrono::system_clock::now();
-    // Return the check if a tic has passed.
-    if (std::chrono::duration_cast<std::chrono::seconds>(currentTime - ticTime).count() >= ticSize)
+    // Check if the tic is passed.
+    if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() -
+                                                         ticTime).count() >= ticSize)
     {
         // Reset Tic Time.
         ticTime = std::chrono::system_clock::now();
@@ -81,21 +129,7 @@ bool MudUpdater::hasTicPassed()
     return false;
 }
 
-bool MudUpdater::hasHourPassed()
-{
-    // Get the current time.
-    std::chrono::time_point<std::chrono::system_clock> currentTime = std::chrono::system_clock::now();
-    // Return the check if a hour is passed.
-    if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - mudTime).count() >= hourSize)
-    {
-        // Reset Mud Time.
-        mudTime = std::chrono::system_clock::now();
-        return true;
-    }
-    return false;
-}
-
-void MudUpdater::updateTime()
+void MudUpdater::updateDayPhase()
 {
     // Increment the current mud hour.
     mudHour++;
@@ -118,15 +152,42 @@ void MudUpdater::updateTime()
     {
         Mud::instance().broadcastMsg(0, Formatter::yellow() + "Darkness engulfs you.\n" + Formatter::reset());
         mudDayPhase = DayPhase::Night;
+        // Reset the mud hour.
         mudHour = 0;
     }
     else
     {
         Mud::instance().broadcastMsg(0, Formatter::yellow() + "Another hour has passed." + Formatter::reset());
     }
+    for (auto iterator : Mud::instance().mudMobiles)
+    {
+        if (iterator.second->isAlive())
+        {
+            if (mudHour == 6)
+            {
+                iterator.second->triggerEventMorning();
+            }
+            else if (mudHour == 12)
+            {
+                iterator.second->triggerEventDay();
+            }
+            else if (mudHour == 18)
+            {
+                iterator.second->triggerEventDusk();
+            }
+            else if (mudHour == 24)
+            {
+                iterator.second->triggerEventNight();
+            }
+            else
+            {
+                iterator.second->triggerEventRandom();
+            }
+        }
+    }
 }
 
-void MudUpdater::updatePlayers()
+void MudUpdater::updateCharacters()
 {
     for (auto iterator : Mud::instance().mudPlayers)
     {
@@ -143,10 +204,6 @@ void MudUpdater::updatePlayers()
         iterator->updateExpiredEffects();
         iterator->updateActivatedEffects();
     }
-}
-
-void MudUpdater::updateMobiles()
-{
     for (auto iterator : Mud::instance().mudMobiles)
     {
         auto mobile = iterator.second;
@@ -167,37 +224,6 @@ void MudUpdater::updateMobiles()
             mobile->updateThirst();
             mobile->updateExpiredEffects();
             mobile->updateActivatedEffects();
-        }
-    }
-}
-
-void MudUpdater::updateMobilesHour()
-{
-    for (auto iterator : Mud::instance().mudMobiles)
-    {
-        auto mobile = iterator.second;
-        if (mobile->isAlive())
-        {
-            if (mudHour == 6)
-            {
-                mobile->triggerEventMorning();
-            }
-            else if (mudHour == 12)
-            {
-                mobile->triggerEventDay();
-            }
-            else if (mudHour == 18)
-            {
-                mobile->triggerEventDusk();
-            }
-            else if (mudHour == 24)
-            {
-                mobile->triggerEventNight();
-            }
-            else
-            {
-                mobile->triggerEventRandom();
-            }
         }
     }
 }
@@ -304,54 +330,4 @@ void MudUpdater::performActions()
             mobile->popAction();
         }
     }
-}
-
-void MudUpdater::updateBandIn(const size_t & size)
-{
-    bandwidth_in += size;
-}
-
-void MudUpdater::updateBandOut(const size_t & size)
-{
-    bandwidth_out += size;
-}
-
-void MudUpdater::updateBandUncompressed(const size_t & size)
-{
-    bandwidth_uncompressed += size;
-}
-
-DayPhase MudUpdater::getDayPhase()
-{
-    return mudDayPhase;
-}
-
-unsigned int MudUpdater::getSecondSize()
-{
-    return secondSize;
-}
-
-unsigned int MudUpdater::getHourSize()
-{
-    return hourSize;
-}
-
-unsigned int MudUpdater::getDaySize()
-{
-    return daySize;
-}
-
-size_t MudUpdater::getBandIn()
-{
-    return bandwidth_in;
-}
-
-size_t MudUpdater::getBandOut()
-{
-    return bandwidth_out;
-}
-
-size_t MudUpdater::getBandUncompressed()
-{
-    return bandwidth_uncompressed;
 }

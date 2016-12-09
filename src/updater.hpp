@@ -46,19 +46,14 @@ private:
     /// The number of bytes without compression.
     size_t bandwidth_uncompressed;
 
-    /// Mud current time.
+    /// The timer usd to determine if a TIC is passed.
     std::chrono::time_point<std::chrono::system_clock> ticTime;
-    /// Mud current time.
-    std::chrono::time_point<std::chrono::system_clock> mudTime;
-
-    /// Mud tic length.
+    /// Mud TIC length in seconds.
     unsigned int ticSize;
-    /// Mud seconds length.
-    unsigned int secondSize;
-    /// Mud hour length.
-    unsigned int hourSize;
-    /// Mud day length.
-    unsigned int daySize;
+    /// The lenght of an hour in TIC.
+    unsigned int hourTicSize;
+    /// Counter used to determine if an hour is passed.
+    unsigned int hourTicCounter;
 
     /// Mud current hour.
     unsigned int mudHour;
@@ -88,33 +83,6 @@ public:
     /// @return The static and uniquie MudUpdater variable.
     static MudUpdater & instance();
 
-    /// @brief Initialize the timers.
-    void initTimers();
-
-    /// @brief Check if the mud tic has passed.
-    bool hasTicPassed();
-
-    /// @brief Check if the mud hour has passed.
-    bool hasHourPassed();
-
-    /// @brief Update the day phase and the hour of the mud.
-    void updateTime();
-
-    /// @brief Update every player in the mud.
-    void updatePlayers();
-
-    /// @brief Update every mobile in the mud.
-    void updateMobiles();
-
-    /// @brief Update every mobile in the mud.
-    void updateMobilesHour();
-
-    /// @brief Update every item in the mud.
-    void updateItems();
-
-    /// @brief Perform pending actions.
-    void performActions();
-
     /// @brief Update input bandwidth.
     void updateBandIn(const size_t & size);
 
@@ -124,31 +92,34 @@ public:
     /// @brief Update uncompressed bandwidth.
     void updateBandUncompressed(const size_t & size);
 
-    /// @brief Provides the current mud day phase.
-    /// @return The enumberator which identifies the day phase.
-    DayPhase getDayPhase();
-
-    /// @brief Provides the size of a second in terms of milliseconds (MS).
-    /// @return The size of a second.
-    unsigned int getSecondSize();
-
-    /// @brief Provides the size of a hour in terms of milliseconds (MS).
-    /// @return The size of a hour.
-    unsigned int getHourSize();
-
-    /// @brief Provides the size of a day in terms of milliseconds (MS).
-    /// @return The size of a day.
-    unsigned int getDaySize();
-
     /// @brief Provides the total input (from clients) bandwidth.
-    /// @return The input bandwidth.
     size_t getBandIn();
 
     /// @brief Provides the total output (to clients) bandwidth.
-    /// @return The output bandwidth.
     size_t getBandOut();
 
     /// @brief Provides the total uncompressed (to clients) bandwidth.
-    /// @return The uncompressed bandwidth.
     size_t getBandUncompressed();
+
+    /// @brief Provides the current mud day phase.
+    DayPhase getDayPhase();
+
+    /// @brief Allows the time to advance.
+    void advanceTime();
+
+private:
+    /// @brief Check if the mud tic has passed.
+    bool hasTicPassed();
+
+    /// @brief Update the day phase and the hour of the mud.
+    void updateDayPhase();
+
+    /// @brief Update every characters in the mud.
+    void updateCharacters();
+
+    /// @brief Update every item in the mud.
+    void updateItems();
+
+    /// @brief Perform pending actions.
+    void performActions();
 };

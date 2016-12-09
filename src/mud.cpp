@@ -653,26 +653,7 @@ bool Mud::runMud()
     // We will go through this loop roughly every timeout seconds.
     do
     {
-        // Check if an hour has passed.
-        if (MudUpdater::instance().hasHourPassed())
-        {
-            // Update mud time.
-            MudUpdater::instance().updateTime();
-            // Update mud mobile.
-            MudUpdater::instance().updateMobilesHour();
-            // Update items.
-            MudUpdater::instance().updateItems();
-        }
-        if (MudUpdater::instance().hasTicPassed())
-        {
-            // Update players.
-            MudUpdater::instance().updatePlayers();
-            // Update mobiles.
-            MudUpdater::instance().updateMobiles();
-        }
-
-        // Perform characters pending actions.
-        MudUpdater::instance().performActions();
+        MudUpdater::instance().advanceTime();
 
         // Delete players who have closed their comms.
         this->removeInactivePlayers();
@@ -981,13 +962,8 @@ bool Mud::initVariables()
     Mud::instance().addDirection("east", Direction::East);
     Mud::instance().addDirection("up", Direction::Up);
     Mud::instance().addDirection("down", Direction::Down);
-
-    // Init the updater timers.
-    MudUpdater::instance().initTimers();
-
     // Set the boot time.
     time(&_bootTime);
-
     return true;
 }
 

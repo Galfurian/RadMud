@@ -208,7 +208,8 @@ bool SQLiteWrapper::getColumnName(const int & column, std::string & columnName)
     // Check if the given column is inside the boundaries.
     if ((column < 0) || (column > num_col))
     {
-        Logger::log(LogLevel::Error, "Column index (%s) is outside the boundaries.", column);
+        errorMessage = "Column index (" + ToString(column) + ") is outside the boundaries.";
+        errorCode = SQLITE_CONSTRAINT;
         return false;
     }
     columnName = sqlite3_column_name(dbDetails.dbStatement, column);
@@ -220,13 +221,15 @@ bool SQLiteWrapper::getDataString(const int & column, std::string & data)
     // Check if the given column is inside the boundaries.
     if ((column < 0) || (column > num_col))
     {
-        Logger::log(LogLevel::Error, "Column index (%s) is outside the boundaries.", column);
+        errorMessage = "Column index (" + ToString(column) + ") is outside the boundaries.";
+        errorCode = SQLITE_CONSTRAINT;
         return false;
     }
     // Check if the retrieved data is a string.
     if (sqlite3_column_type(dbDetails.dbStatement, column) != SQLITE_TEXT)
     {
-        Logger::log(LogLevel::Error, "Column at index (%s) does not contain a Text.", column);
+        errorMessage = "Column at index (" + ToString(column) + ") does not contain a Text.";
+        errorCode = SQLITE_MISMATCH;
         return false;
     }
     // Check the input in case is a valid value.
@@ -245,13 +248,15 @@ bool SQLiteWrapper::getDataInteger(const int & column, int & data)
     // Check if the given column is inside the boundaries.
     if ((column < 0) || (column > num_col))
     {
-        Logger::log(LogLevel::Error, "Column index (%s) is outside the boundaries.", column);
+        errorMessage = "Column index (" + ToString(column) + ") is outside the boundaries.";
+        errorCode = SQLITE_CONSTRAINT;
         return false;
     }
     // Check if the retrieved data is an integer.
     if (sqlite3_column_type(dbDetails.dbStatement, column) != SQLITE_INTEGER)
     {
-        Logger::log(LogLevel::Error, "Column at index (%s) does not contain an Integer.", column);
+        errorMessage = "Column at index (" + ToString(column) + ") does not contain an Integer.";
+        errorCode = SQLITE_MISMATCH;
         return false;
     }
     data = sqlite3_column_int(dbDetails.dbStatement, column);
@@ -263,19 +268,22 @@ bool SQLiteWrapper::getDataUnsignedInteger(const int & column, unsigned int & da
     // Check if the given column is inside the boundaries.
     if ((column < 0) || (column > num_col))
     {
-        Logger::log(LogLevel::Error, "Column index is outside the boundaries.");
+        errorMessage = "Column index (" + ToString(column) + ") is outside the boundaries.";
+        errorCode = SQLITE_CONSTRAINT;
         return false;
     }
     // Check if the retrieved data is an integer.
     if (sqlite3_column_type(dbDetails.dbStatement, column) != SQLITE_INTEGER)
     {
-        Logger::log(LogLevel::Error, "Column at index (%s) does not contain an Unsigned Integer.", column);
+        errorMessage = "Column at index (" + ToString(column) + ") does not contain an Unsigned Integer.";
+        errorCode = SQLITE_MISMATCH;
         return false;
     }
     int retrievedData = sqlite3_column_int(dbDetails.dbStatement, column);
     if (retrievedData < 0)
     {
-        Logger::log(LogLevel::Error, "Column at index (%s) does not contain an Unsigned Integer.", column);
+        errorMessage = "Column at index (" + ToString(column) + ") does not contain an Unsigned Integer.";
+        errorCode = SQLITE_MISMATCH;
         return false;
     }
     data = static_cast<unsigned int>(retrievedData);
@@ -287,7 +295,8 @@ bool SQLiteWrapper::getDataDouble(const int & column, double & data)
     // Check if the given column is inside the boundaries.
     if ((column < 0) || (column > num_col))
     {
-        Logger::log(LogLevel::Error, "Column index is outside the boundaries.");
+        errorMessage = "Column index (" + ToString(column) + ") is outside the boundaries.";
+        errorCode = SQLITE_CONSTRAINT;
         return false;
     }
     // Check if the retrieved data is an integer.
@@ -295,7 +304,8 @@ bool SQLiteWrapper::getDataDouble(const int & column, double & data)
     {
         if (sqlite3_column_type(dbDetails.dbStatement, column) != SQLITE_INTEGER)
         {
-            Logger::log(LogLevel::Error, "Column at index (%s) does not contain a Double.", column);
+            errorMessage = "Column at index (" + ToString(column) + ") does not contain a Double.";
+            errorCode = SQLITE_MISMATCH;
             return false;
         }
     }
@@ -312,10 +322,7 @@ std::string SQLiteWrapper::getNextString()
         currentColumn++;
         return data;
     }
-    else
-    {
-        return "";
-    }
+    return "";
 }
 
 int SQLiteWrapper::getNextInteger()
@@ -327,10 +334,7 @@ int SQLiteWrapper::getNextInteger()
         currentColumn++;
         return data;
     }
-    else
-    {
-        return 0;
-    }
+    return 0;
 }
 
 unsigned int SQLiteWrapper::getNextUnsignedInteger()
@@ -342,10 +346,7 @@ unsigned int SQLiteWrapper::getNextUnsignedInteger()
         currentColumn++;
         return data;
     }
-    else
-    {
-        return 0;
-    }
+    return 0;
 }
 
 double SQLiteWrapper::getNextDouble()
@@ -357,8 +358,5 @@ double SQLiteWrapper::getNextDouble()
         currentColumn++;
         return data;
     }
-    else
-    {
-        return 0;
-    }
+    return 0;
 }

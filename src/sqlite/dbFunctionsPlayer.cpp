@@ -97,42 +97,49 @@ bool SQLiteDbms::loadPlayerInformation(Player * player)
     }
     // Loading status.
     bool status = true;
-    if (result->next())
+    if (!result->next())
     {
-        player->name = result->getNextString();
-        player->password = result->getNextString();
-        player->race = Mud::instance().findRace(result->getNextInteger());
-        player->setAbility(Ability::Strength, result->getNextUnsignedInteger());
-        player->setAbility(Ability::Agility, result->getNextUnsignedInteger());
-        player->setAbility(Ability::Perception, result->getNextUnsignedInteger());
-        player->setAbility(Ability::Constitution, result->getNextUnsignedInteger());
-        player->setAbility(Ability::Intelligence, result->getNextUnsignedInteger());
-        player->gender = static_cast<GenderType>(result->getNextInteger());
-        player->age = result->getNextInteger();
-        player->description = result->getNextString();
-        player->weight = result->getNextUnsignedInteger();
-        player->faction = Mud::instance().findFaction(result->getNextInteger());
-        player->level = result->getNextUnsignedInteger();
-        player->experience = result->getNextInteger();
-        player->room = Mud::instance().findRoom(result->getNextInteger());
-        player->prompt = result->getNextString();
-        player->flags = result->getNextUnsignedInteger();
-        player->setHealth(result->getNextUnsignedInteger(), true);
-        player->setStamina(result->getNextUnsignedInteger(), true);
-        player->setHunger(result->getNextInteger());
-        player->setThirst(result->getNextInteger());
-        player->rent_room = result->getNextInteger();
+        Logger::log(LogLevel::Error, "Query result is empty.");
+        // Show the last error.
+        this->showLastError();
+        // Release the resource.
+        result->release();
+        return false;
+    }
+    // Set the values.
+    player->name = result->getNextString();
+    player->password = result->getNextString();
+    player->race = Mud::instance().findRace(result->getNextInteger());
+    player->setAbility(Ability::Strength, result->getNextUnsignedInteger());
+    player->setAbility(Ability::Agility, result->getNextUnsignedInteger());
+    player->setAbility(Ability::Perception, result->getNextUnsignedInteger());
+    player->setAbility(Ability::Constitution, result->getNextUnsignedInteger());
+    player->setAbility(Ability::Intelligence, result->getNextUnsignedInteger());
+    player->gender = static_cast<GenderType>(result->getNextInteger());
+    player->age = result->getNextInteger();
+    player->description = result->getNextString();
+    player->weight = result->getNextUnsignedInteger();
+    player->faction = Mud::instance().findFaction(result->getNextInteger());
+    player->level = result->getNextUnsignedInteger();
+    player->experience = result->getNextInteger();
+    player->room = Mud::instance().findRoom(result->getNextInteger());
+    player->prompt = result->getNextString();
+    player->flags = result->getNextUnsignedInteger();
+    player->setHealth(result->getNextUnsignedInteger(), true);
+    player->setStamina(result->getNextUnsignedInteger(), true);
+    player->setHunger(result->getNextInteger());
+    player->setThirst(result->getNextInteger());
+    player->rent_room = result->getNextInteger();
+    if (player->room == nullptr)
+    {
+        player->room = Mud::instance().findRoom(player->rent_room);
         if (player->room == nullptr)
         {
-            player->room = Mud::instance().findRoom(player->rent_room);
-            if (player->room == nullptr)
-            {
-                Logger::log(LogLevel::Error, "No room has been set.");
-                status = false;
-            }
+            Logger::log(LogLevel::Error, "No room has been set.");
+            status = false;
         }
     }
-    // release the resource.
+    // Release the resource.
     result->release();
     return status;
 }
