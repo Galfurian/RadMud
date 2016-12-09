@@ -28,83 +28,83 @@
 
 /// @{
 /// @brief Function used to retrieve information about bad names.
-bool LoadBadName(ResultSet * result);
+bool LoadBadName(std::shared_ptr<ResultSet> result);
 
 /// @brief Function used to retrieve information about blocked ips.
-bool LoadBlockedIp(ResultSet * result);
+bool LoadBlockedIp(std::shared_ptr<ResultSet> result);
 
 /// @brief Function used to retrieve information about the news from the developers.
-bool LoadNews(ResultSet * result);
+bool LoadNews(std::shared_ptr<ResultSet> result);
 
 /// @brief Function used to retrieve information about items inside containers.
-bool LoadContent(ResultSet * result);
+bool LoadContent(std::shared_ptr<ResultSet> result);
 
 /// @brief Function used to retrieve information about all the items.
-bool LoadItem(ResultSet * result);
+bool LoadItem(std::shared_ptr<ResultSet> result);
 
 /// @brief Function used to retrieve information about skills.
-bool LoadSkill(ResultSet * result);
+bool LoadSkill(std::shared_ptr<ResultSet> result);
 
 /// @brief Function used to retrieve information about factions.
-bool LoadFaction(ResultSet * result);
+bool LoadFaction(std::shared_ptr<ResultSet> result);
 
 /// @brief Function used to retrieve information about models of items.
-bool LoadModel(ResultSet * result);
+bool LoadModel(std::shared_ptr<ResultSet> result);
 
 /// @brief Function used to retrieve information about races.
-bool LoadRace(ResultSet * result);
+bool LoadRace(std::shared_ptr<ResultSet> result);
 
 /// @brief Function used to retrieve information about all the mobiles.
-bool LoadMobile(ResultSet * result);
+bool LoadMobile(std::shared_ptr<ResultSet> result);
 
 /// @brief Function used to retrieve information about all the rooms.
-bool LoadRoom(ResultSet * result);
+bool LoadRoom(std::shared_ptr<ResultSet> result);
 
 /// @brief Function used to retrieve information about exits of rooms.
-bool LoadExit(ResultSet * result);
+bool LoadExit(std::shared_ptr<ResultSet> result);
 
 /// @brief Function used to retrieve information about the item placed inside the rooms.
-bool LoadItemRoom(ResultSet * result);
+bool LoadItemRoom(std::shared_ptr<ResultSet> result);
 
 /// @brief Function used to retrieve information about all the areas of the mud.
-bool LoadArea(ResultSet * result);
+bool LoadArea(std::shared_ptr<ResultSet> result);
 
 /// @brief Function used to retrieve information about the rooms associated with every area.
-bool LoadAreaList(ResultSet * result);
+bool LoadAreaList(std::shared_ptr<ResultSet> result);
 
 /// @brief Function used to retrieve the writings
-bool LoadWriting(ResultSet * result);
+bool LoadWriting(std::shared_ptr<ResultSet> result);
 
 /// @brief Function used to retrieve information about all the continents of the mud.
-bool LoadContinent(ResultSet * result);
+bool LoadContinent(std::shared_ptr<ResultSet> result);
 
 /// @brief Function used to retrieve information about all the materials.
-bool LoadMaterial(ResultSet * result);
+bool LoadMaterial(std::shared_ptr<ResultSet> result);
 
 /// @brief Function used to retrieve information about all the professions.
-bool LoadProfession(ResultSet * result);
+bool LoadProfession(std::shared_ptr<ResultSet> result);
 
 /// @brief Function used to retrieve information about all the productions.
-bool LoadProduction(ResultSet * result);
+bool LoadProduction(std::shared_ptr<ResultSet> result);
 
 /// @brief Function used to retrieve information about all the liquids.
-bool LoadLiquid(ResultSet * result);
+bool LoadLiquid(std::shared_ptr<ResultSet> result);
 
 /// @brief Function used to retrieve information about liquids inside containers.
-bool LoadContentLiq(ResultSet * result);
+bool LoadContentLiq(std::shared_ptr<ResultSet> result);
 
 /// @brief Function used to retrieve information about all the travelling point.
-bool LoadTravelPoint(ResultSet * result);
+bool LoadTravelPoint(std::shared_ptr<ResultSet> result);
 
 /// @brief Function used to retrieve information about all the buildings.
-bool LoadBuilding(ResultSet * result);
+bool LoadBuilding(std::shared_ptr<ResultSet> result);
 
 /// @brief Function used to load shops.
-bool LoadShop(ResultSet * result);
+bool LoadShop(std::shared_ptr<ResultSet> result);
 
 /// @brief Function used to load currencies.
-bool LoadCurrency(ResultSet * result);
+bool LoadCurrency(std::shared_ptr<ResultSet> result);
 
 /// @brief Function used to load terrains.
-bool LoadTerrain(ResultSet * result);
+bool LoadTerrain(std::shared_ptr<ResultSet> result);
 ///@}

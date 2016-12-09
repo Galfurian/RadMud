@@ -22,11 +22,13 @@
 
 #pragma once
 
-#include <string>
 #include <sqlite3.h>
+#include <string>
+#include <memory>
 
 /// @brief Interface class for result set of all the query.
-class ResultSet
+class ResultSet :
+    public std::enable_shared_from_this<ResultSet>
 {
 public:
     /// @brief Destructor.
@@ -122,7 +124,7 @@ public:
     /// @brief This method is used to execute a SELECT Query.
     /// @param query The query that has to be executed.
     /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
-    ResultSet * executeSelect(const char * query);
+    std::shared_ptr<ResultSet> executeSelect(const char * query);
 
     /// @brief This method is used to execute a INSERT/DELETE/UPDATE Query.
     /// @param query The query that has to be executed.

@@ -32,14 +32,14 @@ public:
     /// The name of the table.
     std::string table;
     /// The loading function.
-    std::function<bool(ResultSet * result)> loadFunction;
+    std::function<bool(std::shared_ptr<ResultSet> result)> loadFunction;
     /// The custom loading query.
     std::string loadQuery;
 
     /// @brief Constructor.
     TableLoader(
         std::string _table,
-        std::function<bool(ResultSet * result)> _loadFunction,
+        std::function<bool(std::shared_ptr<ResultSet> result)> _loadFunction,
         std::string _loadQuery = "");
 
     /// Provide the query required to load the table.

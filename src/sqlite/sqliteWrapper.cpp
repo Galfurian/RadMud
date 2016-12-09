@@ -40,6 +40,7 @@ SQLiteWrapper::SQLiteWrapper()
 
 SQLiteWrapper::~SQLiteWrapper()
 {
+    // Nothing to do.
 }
 
 bool SQLiteWrapper::openConnection(std::string dbName, std::string dbDirectory)
@@ -105,26 +106,21 @@ bool SQLiteWrapper::closeConnection()
     return result;
 }
 
-ResultSet * SQLiteWrapper::executeSelect(const char * query)
+std::shared_ptr<ResultSet> SQLiteWrapper::executeSelect(const char * query)
 {
-    if (!isConnected())
+    if (this->isConnected())
     {
-        return NULL;
-    }
-    if (sqlite3_prepare_v2(dbDetails.dbConnection, query, -1, &dbDetails.dbStatement, NULL) != SQLITE_OK)
-    {
+        if (sqlite3_prepare_v2(dbDetails.dbConnection, query, -1, &dbDetails.dbStatement, NULL) == SQLITE_OK)
+        {
+            num_col = sqlite3_column_count(dbDetails.dbStatement);
+            return this->shared_from_this();
+        }
         errorMessage = sqlite3_errmsg(dbDetails.dbConnection);
         errorCode = sqlite3_finalize(dbDetails.dbStatement);
         Logger::log(LogLevel::Error, "Error code :" + ToString(errorCode));
         Logger::log(LogLevel::Error, "Last error :" + errorMessage);
-        return NULL;
     }
-    else
-    {
-        num_col = sqlite3_column_count(dbDetails.dbStatement);
-        ResultSet * ires = this;
-        return ires;
-    }
+    return nullptr;
 }
 
 int SQLiteWrapper::executeQuery(const char * query)

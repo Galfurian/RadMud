@@ -67,7 +67,7 @@ bool SQLiteDbms::searchPlayer(const std::string & name)
     // Prepare the query.
     std::string query = "SELECT count(*) FROM Player WHERE name=\"" + name + "\";";
     // Execute the query.
-    ResultSet * result = SQLiteDbms::instance().dbConnection.executeSelect(query.c_str());
+    auto result = SQLiteDbms::instance().dbConnection.executeSelect(query.c_str());
     if (result != nullptr)
     {
         if (result->next())
@@ -87,7 +87,7 @@ bool SQLiteDbms::loadPlayerInformation(Player * player)
     // Prepare the query.
     std::string query = "SELECT * FROM Player WHERE name = \"" + player->name + "\";";
     // Execute the query.
-    ResultSet * result = dbConnection.executeSelect(query.c_str());
+    auto result = dbConnection.executeSelect(query.c_str());
     // Check the result.
     if (result == nullptr)
     {
@@ -149,7 +149,7 @@ bool SQLiteDbms::loadPlayerItems(Player * player)
     // Prepare the query.
     std::string query = "SELECT item, position FROM ItemPlayer WHERE owner = \"" + player->name + "\";";
     // Execute the query.
-    ResultSet * result = dbConnection.executeSelect(query.c_str());
+    auto result = dbConnection.executeSelect(query.c_str());
     // Check the result.
     if (result == nullptr)
     {
@@ -213,7 +213,7 @@ bool SQLiteDbms::loadPlayerSkill(Player * player)
     // Prepare the query.
     std::string query = "SELECT skill, value FROM Advancement WHERE player=\"" + player->name + "\";";
     // Execute the query.
-    ResultSet * result = dbConnection.executeSelect(query.c_str());
+    auto result = dbConnection.executeSelect(query.c_str());
     // Check the result.
     if (result == nullptr)
     {
@@ -245,7 +245,7 @@ bool SQLiteDbms::loadPlayerLuaVariables(Player * player)
     // Prepare the query.
     std::string query = "SELECT name, value FROM PlayerVariable WHERE player=\"" + player->name + "\";";
     // Execute the query.
-    ResultSet * result = dbConnection.executeSelect(query.c_str());
+    auto result = dbConnection.executeSelect(query.c_str());
     // Check the result.
     if (result == nullptr)
     {
