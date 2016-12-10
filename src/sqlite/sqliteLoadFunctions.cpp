@@ -75,8 +75,8 @@ bool LoadNews(ResultSet * result)
     {
         try
         {
-            if (!Mud::instance().mudNews.insert(
-                std::make_pair(result->getNextString(), result->getNextString())).second)
+            if (!Mud::instance().mudNews.insert(std::make_pair(result->getNextString(),
+                                                               result->getNextString())).second)
             {
                 throw SQLiteException("Error during news loading.");
             }
@@ -97,20 +97,16 @@ bool LoadContent(ResultSet * result)
         try
         {
             auto container = Mud::instance().findItem(result->getNextInteger());
-            auto contained = Mud::instance().findItem(result->getNextInteger());
             if (container == nullptr)
             {
                 throw SQLiteException("Can't find container item.");
             }
+            auto contained = Mud::instance().findItem(result->getNextInteger());
             if (contained == nullptr)
             {
                 throw SQLiteException("Can't find contained item.");
             }
             container->putInside(contained, false);
-            if (!contained->check(true))
-            {
-                throw SQLiteException("Error during error checking.");
-            }
         }
         catch (SQLiteException & e)
         {
@@ -127,48 +123,25 @@ bool LoadItem(ResultSet * result)
     {
         try
         {
-            // Retrieve the values.
             auto itemVnum = result->getNextInteger();
-            auto itemModelVnum = result->getNextInteger();
-            auto itemQuantity = result->getNextUnsignedInteger();
-            auto itemMaker = result->getNextString();
-            auto itemPrice = result->getNextUnsignedInteger();
-            auto itemWeight = result->getNextDouble();
-            auto itemCondition = result->getNextUnsignedInteger();
-            auto itemMaxCondition = result->getNextUnsignedInteger();
-            auto itemCompositionVnum = result->getNextInteger();
-            auto itemQualityValue = result->getNextUnsignedInteger();
-            auto itemFlags = result->getNextUnsignedInteger();
-
-            // Retrieve the model vnum.
-            auto itemModel = Mud::instance().findItemModel(itemModelVnum);
+            auto itemModel = Mud::instance().findItemModel(result->getNextInteger());
             if (itemModel == nullptr)
             {
-                throw SQLiteException("Item has wrong model (" + ToString(itemModelVnum) + ")");
+                throw SQLiteException("Item has wrong model (" + ToString(itemVnum) + ")");
             }
-            // Check the dynamic attributes.
-            auto itemComposition = Mud::instance().findMaterial(itemCompositionVnum);
-            if (itemComposition == nullptr)
-            {
-                throw SQLiteException("Item has wrong material (" + ToString(itemCompositionVnum) + ")");
-            }
-            if (!ItemQuality::isValid(itemQualityValue))
-            {
-                throw SQLiteException("Item has wrong quality (" + ToString(itemQualityValue) + ")");
-            }
-            // Set the item values.
+            // Create the item.
             auto item = ItemFactory::newItem(itemModel->getType());
             item->vnum = itemVnum;
             item->model = itemModel;
-            item->quantity = itemQuantity;
-            item->price = itemPrice;
-            item->weight = itemWeight;
-            item->condition = itemCondition;
-            item->maxCondition = itemMaxCondition;
-            item->maker = itemMaker;
-            item->composition = itemComposition;
-            item->quality = ItemQuality(itemQualityValue);
-            item->flags = itemFlags;
+            item->quantity = result->getNextUnsignedInteger();
+            item->maker = result->getNextString();
+            item->price = result->getNextUnsignedInteger();
+            item->weight = result->getNextDouble();
+            item->condition = result->getNextUnsignedInteger();
+            item->maxCondition = result->getNextUnsignedInteger();
+            item->composition = Mud::instance().findMaterial(result->getNextInteger());
+            item->quality = ItemQuality(result->getNextUnsignedInteger());
+            item->flags = result->getNextUnsignedInteger();
             // Check correctness of attributes.
             if (!item->check())
             {
@@ -228,9 +201,11 @@ bool LoadFaction(ResultSet * result)
     {
         try
         {
-            auto vnum = result->getNextInteger();
-            auto name = result->getNextString();
-            auto description = result->getNextString();
+            // Create an empty Faction.
+            auto faction = new Faction();
+            faction->vnum = result->getNextInteger();
+            faction->name = result->getNextString();
+            faction->description = result->getNextString();
             auto currencyVnum = result->getNextInteger();
             auto currencyModel = Mud::instance().findItemModel(currencyVnum);
             if (currencyModel == nullptr)
@@ -241,13 +216,7 @@ bool LoadFaction(ResultSet * result)
             {
                 throw SQLiteException("Model is not currency " + ToString(currencyVnum));
             }
-            auto currency = currencyModel->toCurrency();
-            // Create an empty Faction.
-            auto faction = new Faction();
-            faction->vnum = vnum;
-            faction->name = name;
-            faction->description = description;
-            faction->currency = currency;
+            faction->currency = currencyModel->toCurrency();
             // Translate new_line.
             FindAndReplace(&faction->description, "%r", "\n");
             // Check the correctness.
@@ -277,9 +246,8 @@ bool LoadModel(ResultSet * result)
         {
             // Retrieve the vnum and the type of model.
             auto vnum = result->getNextInteger();
-            auto type = ModelType(result->getNextUnsignedInteger());
             // Create a pointer to the new item model.
-            auto itemModel = ModelFactory::newModel(type);
+            auto itemModel = ModelFactory::newModel(ModelType(result->getNextUnsignedInteger()));
             if (itemModel == nullptr)
             {
                 throw SQLiteException("Wrong type of model " + ToString(vnum));

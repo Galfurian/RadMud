@@ -40,8 +40,6 @@ public:
 
     void getSheet(Table & sheet) const override;
 
-    bool updateCondition() override;
-
     bool canRefillWith(Item * item, std::string & error) const;
 
     bool getAmmountToRefill(Item * item, unsigned int & ammount, std::string & error) const;
@@ -49,4 +47,8 @@ public:
     /// @brief Provides the list of already loaded fuel.
     /// @return The contained fuel.
     Item * getAlreadyLoadedFuel() const;
+
+protected:
+    void updateHourImpl() override;
+
 };

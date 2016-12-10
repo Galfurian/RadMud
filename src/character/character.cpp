@@ -27,7 +27,6 @@
 #include "armorItem.hpp"
 #include "logger.hpp"
 #include "aStar.hpp"
-#include "item.hpp"
 #include "mud.hpp"
 
 Character::Character() :
@@ -1681,6 +1680,21 @@ bool Character::operator==(const class Character & source) const
 void Character::sendMsg(const std::string & msg)
 {
     Logger::log(LogLevel::Error, "[SEND_MESSAGE] Msg :" + msg);
+}
+
+void Character::updateTicImpl()
+{
+    this->updateHealth();
+    this->updateStamina();
+    this->updateHunger();
+    this->updateThirst();
+    this->updateExpiredEffects();
+    this->updateActivatedEffects();
+}
+
+void Character::updateHourImpl()
+{
+    // Nothing to do.
 }
 
 std::string GetGenderTypeName(GenderType type)

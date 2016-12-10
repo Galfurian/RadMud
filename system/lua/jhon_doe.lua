@@ -81,25 +81,24 @@ end
 -- @param self The character linked to the event.
 EventMain = function(self)
     if (not EquipPosessedAxe(self)) then
-        Mud.log("[" .. self.name .. "] I need to find an axe.")
         JhonExplorer:reset()
         local axe = SearchAxe(self);
         if (axe == nil) then
-            Mud.log("[" .. self.name .. "] There is no axe in the area!")
+            -- There is no axe in the area!
             Mud.sleep(15)
         else
-            Mud.log("[" .. self.name .. "] I've found an axe!")
+            -- I've found an axe!
         end
     end
-    --    Mud.log("[" .. self.name .. "] Now I have an axe.")
+    --    --  Now I have an axe.
     --    if (foundTree == false) then
-    --        Mud.log("[" .. self.name .. "] I need to find a suitable tree.")
+    --        -- I need to find a suitable tree.
     --        --SearchTree(self)
     --    else
-    --        Mud.log("[" .. self.name .. "] I have found a tree.")
+    --        -- I have found a tree.
     --    end
     --    if ((posessAxe) and (foundTree)) then
-    --        Mud.log("[" .. self.name .. "] Now I can cut down the tree.")
+    --        -- Now I can cut down the tree.
     --    end
 end
 
@@ -107,27 +106,25 @@ end
 SearchAxe = function(self)
     -- Cycle until we find an axe inside the current room.
     while true do
-        Mud.log("[" .. self.name .. "] Searching for an axe...")
         -- Search for an axe.
         for roomKey, room in pairs(self:getRoomsInSight()) do
             -- Check if the room contains an axe.
             for itemKey, item in pairs(room:getItems()) do
                 -- Check if the item inside the room is an axe.
                 if (IsAnAxe(item)) then
-                    Mud.log("[" .. self.name .. "] I've seen an axe, moving to position...")
                     -- Get the path to the given room.
                     local pathToNextRoom = self:luaGetPathTo(room)
                     -- If the path is not empty, then move to destination.
                     if next(pathToNextRoom) ~= nil then
-                        Mud.log("[" .. self.name .. "] Moving to " .. nextRoom.vnum .. " ...")
+                        --  Moving to nextRoom
                         if (GetToDestination(self, pathToNextRoom)) then
                             return item
                         else
-                            Mud.log("[" .. self.name .. "] Cannot reach an axe in sight!")
+                            -- Cannot reach an axe in sight!
                             Mud.stop()
                         end
                     else
-                        Mud.log("[" .. self.name .. "] Cannot find a path to " .. nextRoom.vnum .. " ...")
+                        -- Cannot find a path to nextRoom
                         JhonExplorer.invalidRooms:pushfirst(nextRoom)
                     end
                 end
@@ -138,7 +135,7 @@ SearchAxe = function(self)
         -- Update the list of not visited rooms.
         JhonExplorer:updateNotVisitedRooms()
         -- Move to a non-visited room.
-        Mud.log("[" .. self.name .. "] I've not found an axe, moving to another position...")
+        -- I've not found an axe, moving to another position...
         -- If there is no more rooms that need to be visited, stop the algorithm.
         if (JhonExplorer.notVisited:empty()) then
             break
@@ -155,15 +152,15 @@ SearchAxe = function(self)
             local pathToNextRoom = self:luaGetPathTo(nextRoom)
             -- If the path is not empty, then move to destination.
             if next(pathToNextRoom) ~= nil then
-                Mud.log("[" .. self.name .. "] Moving to " .. nextRoom.vnum .. " ...")
+                --  Moving to nextRoom.vnum
                 if (GetToDestination(self, pathToNextRoom)) then
                     break
                 else
-                    Mud.log("[" .. self.name .. "] Cannot reach an axe in sight!")
+                    --  Cannot reach an axe in sight!
                     Mud.stop()
                 end
             else
-                Mud.log("[" .. self.name .. "] Cannot find a path to " .. nextRoom.vnum .. " ...")
+                --  Cannot find a path to nextRoom
                 JhonExplorer.invalidRooms:pushfirst(nextRoom)
             end
         end

@@ -67,7 +67,8 @@ using CharacterFlag = enum class CharacterFlag_t
 /// It's the main class that contains all the information that both
 /// players and npcs shares. In order to allow dynamic casting(polymorphism),
 /// i've created a mthod called isMobile, used to identify the subtype of the subclass.
-class Character
+class Character :
+    public UpdateInterface
 {
 public:
     /// Character name.
@@ -646,6 +647,11 @@ public:
     {
         this->sendMsg(msg, ToString(first), args ...);
     }
+
+protected:
+    void updateTicImpl() override;
+
+    void updateHourImpl() override;
 };
 
 /// @addtogroup FlagsToList

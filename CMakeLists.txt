@@ -74,7 +74,6 @@ find_package(Sqlite3 REQUIRED)
 set(PROJECT_SRC
         ${CMAKE_SOURCE_DIR}/src/main.cpp
         ${CMAKE_SOURCE_DIR}/src/mud.cpp
-        ${CMAKE_SOURCE_DIR}/src/updater.cpp
         )
 
 set(PROJECT_INC ${CMAKE_SOURCE_DIR}/src)
@@ -88,6 +87,7 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/src/structure)
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/structure/algorithms)
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/creation)
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/command)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/updater)
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/sqlite)
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/action)
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/action/combat)

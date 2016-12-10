@@ -22,7 +22,6 @@
 
 #include "buildAction.hpp"
 
-#include "sqliteDbms.hpp"
 #include "formatter.hpp"
 #include "logger.hpp"
 #include "room.hpp"
@@ -180,7 +179,8 @@ ActionStatus BuildAction::perform()
     for (auto iterator : tools)
     {
         // Update the condition of the involved objects.
-        if (iterator->updateCondition())
+        iterator->triggerDecay();
+        if (iterator->condition == 0)
         {
             actor->sendMsg(iterator->getName(true) + " falls into pieces.");
             destroyItems.push_back(iterator);

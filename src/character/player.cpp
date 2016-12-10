@@ -514,3 +514,17 @@ bool Player::removeLuaVariable(std::string variableName)
     it->second = "";
     return true;
 }
+
+void Player::updateTicImpl()
+{
+    // Check if the player is playing.
+    if (this->isPlaying())
+    {
+        Character::updateTicImpl();
+    }
+}
+
+void Player::updateHourImpl()
+{
+    // Nothing to do.
+}

@@ -1,7 +1,7 @@
-/// @file   itemQuality.hpp
-/// @brief  Define the item quality class.
+/// @file   updateInterface.hpp
+/// @brief  
 /// @author Enrico Fraccaroli
-/// @date   Nov 19 2016
+/// @date   09/12/2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -22,47 +22,17 @@
 
 #pragma once
 
-#include <string>
-
-/// The quality of an item.
-class ItemQuality
+class UpdateInterface
 {
 public:
-    /// List of possible quality values.
-    enum Enum
-    {
-        Disastrous,
-        Poor,
-        Normal,
-        Fine,
-        Masterful
-    };
+    virtual ~UpdateInterface();
 
-    /// @brief Constructor from number.
-    ItemQuality(const unsigned int & _quality);
+    void updateTic();
 
-    /// @brief Constructor from enum.
-    ItemQuality(const Enum & _quality);
-
-    /// @brief Check is the given number is a valid quality.
-    static bool isValid(const unsigned int & _quality);
-
-    /// @brief Returns the quality as string.
-    std::string toString() const;
-
-    /// @brief Returns the quality as number.
-    unsigned int toUInt() const;
-
-    /// @brief Returns the quality modifier.
-    double getModifier() const;
-
-    /// @brief Equality operator w.r.t. a quality enum.
-    bool operator==(const ItemQuality::Enum & rhs) const;
-
-    /// @brief Inequality operator w.r.t. a quality enum.
-    bool operator!=(const ItemQuality::Enum & rhs) const;
+    void updateHour();
 
 private:
-    /// Internal quality value.
-    Enum quality;
+    virtual void updateTicImpl() = 0;
+
+    virtual void updateHourImpl() = 0;
 };

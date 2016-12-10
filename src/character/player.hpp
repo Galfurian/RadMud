@@ -173,4 +173,9 @@ public:
 
     bool removeLuaVariable(std::string variableName);
 
+protected:
+    void updateTicImpl() override;
+
+    void updateHourImpl() override;
+
 };

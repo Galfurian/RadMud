@@ -27,7 +27,7 @@ end
 -- @param path The path to follow.
 GetToDestination = function(self, path)
     for directionKey, direction in pairs(path) do
-        Mud.log("[" .. self.name .. "] Movind " .. direction:toString())
+        -- Movind to direction.
         if (not self:doCommand(direction:toString())) then
             return false
         end

@@ -20,11 +20,13 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
+#include <updater/updater.hpp>
 #include "craftAction.hpp"
 
-#include "sqliteDbms.hpp"
 #include "logger.hpp"
 #include "room.hpp"
+
+typedef Item * pItem;
 
 CraftAction::CraftAction(Character * _actor,
                          Production * _production,
@@ -175,14 +177,15 @@ ActionStatus CraftAction::perform()
     auto consumedStamina = this->getConsumedStamina(actor);
     actor->remStamina(consumedStamina, true);
     // Vector which will contain the list of created items and items to destroy.
-    std::vector<Item *> createdItems, destroyItems;
+    std::vector<Item *> createdItems;
     // Add the ingredients to the list of items to destroy.
     for (auto it : ingredients)
     {
         auto ingredient = it.first;
         if (ingredient->quantity == it.second)
         {
-            destroyItems.push_back(ingredient);
+            // Add the ingredient to the list of items that has to be deleted.
+            MudUpdater::instance().addItemToDestroy(ingredient);
         }
         else
         {
@@ -194,12 +197,12 @@ ActionStatus CraftAction::perform()
     if (HasFlag(outcomeModel->modelFlags, ModelFlag::CanBeStacked))
     {
         // Create the item.
-        auto newItem = outcomeModel->createItem(
-            actor->getName(),
-            material,
-            false,
-            ItemQuality::Normal,
-            production->quantity);
+        // TODO: FIX WRONG TYPE OF MATERIAL!
+        pItem newItem = outcomeModel->createItem(actor->getName(),
+                                                 material,
+                                                 false,
+                                                 ItemQuality::Normal,
+                                                 production->quantity);
         if (newItem == nullptr)
         {
             Logger::log(LogLevel::Error, actor->getName() + "Crafted item is a null pointer.");
@@ -220,7 +223,7 @@ ActionStatus CraftAction::perform()
                 // Delete all the items created so far.
                 for (auto createdItem : createdItems)
                 {
-                    delete (createdItem);
+                    MudUpdater::instance().addItemToDestroy(createdItem);
                 }
                 // Notify the character.
                 actor->sendMsg("\nYou have failed your action.\n");
@@ -247,27 +250,14 @@ ActionStatus CraftAction::perform()
     for (auto iterator : tools)
     {
         // Update the condition of the involved objects.
-        if (iterator->updateCondition())
+        iterator->triggerDecay();
+        if (iterator->condition == 0)
         {
             actor->sendMsg("%s falls into pieces.", iterator->getNameCapital(true));
-            destroyItems.push_back(iterator);
         }
     }
-    // Consume the items.
-    for (auto it : destroyItems)
-    {
-        // First, remove the item from the mud.
-        it->removeFromMud();
-        // Then, remove it from the database.
-        it->removeOnDB();
-        // Finally, delete it.
-        delete (it);
-    }
     // Send conclusion message.
-    actor->sendMsg(
-        "%s %s.\n\n",
-        production->profession->finishMessage,
-        createdItems.back()->getName(true));
+    actor->sendMsg("%s %s.\n\n", production->profession->finishMessage, createdItems.back()->getName(true));
     if (dropped)
     {
         actor->sendMsg("some of the items have been placed on the ground.\n\n");

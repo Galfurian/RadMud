@@ -22,9 +22,13 @@
 
 #pragma once
 
-/// @brief Enumerator which identifies the day phase.
 #include <chrono>
+#include <list>
 
+// Forward declarations.
+class Item;
+
+/// @brief Enumerator which identifies the day phase.
 using DayPhase = enum class DayPhase_t
 {
     Morning,    ///< General logging level.
@@ -60,6 +64,10 @@ private:
     /// Mud current day phase.
     DayPhase mudDayPhase;
 
+    // Garbage collection structures.
+    /// List of item that has to be descroyed at the end of the mud cycle.
+    std::list<Item *> itemToDestroy;
+
     /// @brief Constructor.
     MudUpdater();
 
@@ -92,17 +100,22 @@ public:
     /// @brief Update uncompressed bandwidth.
     void updateBandUncompressed(const size_t & size);
 
+    void addItemToDestroy(Item * item);
+
     /// @brief Provides the total input (from clients) bandwidth.
-    size_t getBandIn();
+    size_t getBandIn() const;
 
     /// @brief Provides the total output (to clients) bandwidth.
-    size_t getBandOut();
+    size_t getBandOut() const;
 
     /// @brief Provides the total uncompressed (to clients) bandwidth.
-    size_t getBandUncompressed();
+    size_t getBandUncompressed() const;
+
+    /// @brief Provides the current mud hour.
+    unsigned int getMudHour() const;
 
     /// @brief Provides the current mud day phase.
-    DayPhase getDayPhase();
+    DayPhase getDayPhase() const;
 
     /// @brief Allows the time to advance.
     void advanceTime();
@@ -113,12 +126,6 @@ private:
 
     /// @brief Update the day phase and the hour of the mud.
     void updateDayPhase();
-
-    /// @brief Update every characters in the mud.
-    void updateCharacters();
-
-    /// @brief Update every item in the mud.
-    void updateItems();
 
     /// @brief Perform pending actions.
     void performActions();

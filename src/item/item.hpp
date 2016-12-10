@@ -26,6 +26,7 @@
 #include <list>
 #include <map>
 
+#include "updateInterface.hpp"
 #include "itemContainer.hpp"
 #include "itemQuality.hpp"
 #include "lua_script.hpp"
@@ -66,7 +67,8 @@ class MagazineItem;
 class LightItem;
 
 /// @brief Holds details about items.
-class Item
+class Item :
+    public UpdateInterface
 {
 public:
     /// Item vnum.
@@ -181,9 +183,7 @@ public:
     unsigned int getMaxCondition() const;
 
     /// @brief Trigger a decay cycle.
-    /// @return <b>True</b> if the item is destroyed,<br>
-    ///         <b>False</b> otherwise.
-    virtual bool updateCondition();
+    virtual void triggerDecay();
 
     /// @brief Provides the modifier due to the item's condition.
     double getConditionModifier() const;
@@ -339,4 +339,10 @@ public:
 
     /// @brief Operator used to order the items based on their name.
     bool operator<(Item & rhs) const;
+
+protected:
+    void updateTicImpl() override;
+
+    void updateHourImpl() override;
+
 };

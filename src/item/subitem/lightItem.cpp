@@ -47,35 +47,6 @@ void LightItem::getSheet(Table & sheet) const
     sheet.addRow({"Remaining Autonomy", ToString(remainingHours) + " h"});
 }
 
-bool LightItem::updateCondition()
-{
-    // First check if the light source itself is destroyed.
-    if (Item::updateCondition())
-    {
-        return true;
-    }
-    auto fuel = this->getAlreadyLoadedFuel();
-    if (fuel != nullptr)
-    {
-        // Check if it is the last unit of fuel.
-        if (fuel->quantity == 1)
-        {
-            // Start a transaction.
-            SQLiteDbms::instance().beginTransaction();
-            fuel->removeOnDB();
-            fuel->removeFromMud();
-            delete (fuel);
-            // Conclude the transaction.
-            SQLiteDbms::instance().endTransaction();
-        }
-        else
-        {
-            fuel->quantity--;
-        }
-    }
-    return false;
-}
-
 bool LightItem::canRefillWith(Item * item, std::string & error) const
 {
     if (item == nullptr)
@@ -150,4 +121,29 @@ Item * LightItem::getAlreadyLoadedFuel() const
         }
     }
     return nullptr;
+}
+
+void LightItem::updateHourImpl()
+{
+    auto fuel = this->getAlreadyLoadedFuel();
+    if (fuel != nullptr)
+    {
+        // Check if it is the last unit of fuel.
+        if (fuel->quantity == 1)
+        {
+            // Start a transaction.
+            SQLiteDbms::instance().beginTransaction();
+            fuel->removeOnDB();
+            fuel->removeFromMud();
+            delete (fuel);
+            // Conclude the transaction.
+            SQLiteDbms::instance().endTransaction();
+        }
+        else
+        {
+            fuel->quantity--;
+        }
+    }
+    // Call the hourly update.
+    Item::updateHourImpl();
 }

@@ -22,7 +22,7 @@
 
 #include "itemQuality.hpp"
 
-ItemQuality::ItemQuality(unsigned int & _quality) :
+ItemQuality::ItemQuality(const unsigned int & _quality) :
     quality()
 {
     if (_quality == 0) quality = Disastrous;

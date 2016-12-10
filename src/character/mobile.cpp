@@ -378,3 +378,49 @@ void Mobile::triggerEventMain()
     t = std::thread(&Mobile::mobileThread, this, "EventMain", nullptr, "");
     t.detach();
 }
+
+void Mobile::updateTicImpl()
+{
+    // Check if the mobile is alive.
+    if (this->isAlive())
+    {
+        Character::updateTicImpl();
+    }
+    else
+    {
+        // Check if the mobile can be respawned.
+        if (this->canRespawn())
+        {
+            // Respawn the mobile.
+            this->respawn();
+        }
+    }
+}
+
+void Mobile::updateHourImpl()
+{
+    if (this->isAlive())
+    {
+        auto mudHour = MudUpdater::instance().getMudHour();
+        if (mudHour == 6)
+        {
+            this->triggerEventMorning();
+        }
+        else if (mudHour == 12)
+        {
+            this->triggerEventDay();
+        }
+        else if (mudHour == 18)
+        {
+            this->triggerEventDusk();
+        }
+        else if (mudHour == 24)
+        {
+            this->triggerEventNight();
+        }
+        else
+        {
+            this->triggerEventRandom();
+        }
+    }
+}

@@ -37,7 +37,8 @@ MudUpdater::MudUpdater() :
     bandwidth_uncompressed(),
     ticTime(std::chrono::system_clock::now()),
     ticSize(10),
-    hourTicSize(18),
+    //hourTicSize(18),
+    hourTicSize(2),
     hourTicCounter(),
     mudHour(),
     mudDayPhase(DayPhase::Morning)
@@ -74,22 +75,32 @@ void MudUpdater::updateBandUncompressed(const size_t & size)
     bandwidth_uncompressed += size;
 }
 
-size_t MudUpdater::getBandIn()
+void MudUpdater::addItemToDestroy(Item * item)
+{
+    itemToDestroy.insert(itemToDestroy.end(), item);
+}
+
+size_t MudUpdater::getBandIn() const
 {
     return bandwidth_in;
 }
 
-size_t MudUpdater::getBandOut()
+size_t MudUpdater::getBandOut() const
 {
     return bandwidth_out;
 }
 
-size_t MudUpdater::getBandUncompressed()
+size_t MudUpdater::getBandUncompressed() const
 {
     return bandwidth_uncompressed;
 }
 
-DayPhase MudUpdater::getDayPhase()
+unsigned int MudUpdater::getMudHour() const
+{
+    return mudHour;
+}
+
+DayPhase MudUpdater::getDayPhase() const
 {
     return mudDayPhase;
 }
@@ -99,21 +110,65 @@ void MudUpdater::advanceTime()
     // Check if a tic is passed.
     if (this->hasTicPassed())
     {
-        // Update the characters.
-        this->updateCharacters();
+        // [TIC] Update the Players.
+        for (auto iterator : Mud::instance().mudPlayers)
+        {
+            iterator->updateTic();
+        }
+        // [TIC] Update the Mobiles.
+        for (auto iterator : Mud::instance().mudMobiles)
+        {
+            iterator.second->updateTic();
+        }
+        // [TIC] Update the Items.
+        for (auto iterator : Mud::instance().mudItems)
+        {
+            iterator.second->updateTic();
+        }
         // Check if a hour is passed.
         if (hourTicCounter++ >= hourTicSize)
         {
-            // Update the day phase.
+            // [HOUR] Update the day phase.
             this->updateDayPhase();
-            // Update the items.
-            this->updateItems();
-            // Reset the hour counter.
+            // [HOUR] Update the Players.
+            for (auto iterator : Mud::instance().mudPlayers)
+            {
+                iterator->updateHour();
+            }
+            // [HOUR] Update the Mobiles.
+            for (auto iterator : Mud::instance().mudMobiles)
+            {
+                iterator.second->updateHour();
+            }
+            // [HOUR] Update the Corpses.
+            for (auto it : Mud::instance().mudCorpses)
+            {
+                it.second->updateHour();
+            }
+            // [HOUR] Update the Items.
+            for (auto it : Mud::instance().mudItems)
+            {
+                it.second->updateHour();
+            }
+            // [HOUR] Reset the hour counter.
             hourTicCounter = 0;
         }
     }
-    // Perform characters pending actions.
+    // [DELTA] Perform characters pending actions.
     this->performActions();
+    // [DELTA] Destroy all the registered items.
+    for (auto it = itemToDestroy.begin(); it != itemToDestroy.end(); ++it)
+    {
+        // Back-up the iterator.
+        auto currentIt = it++;
+        // Delete the item.
+        auto item = (*currentIt);
+        item->removeFromMud();
+        item->removeOnDB();
+        delete (item);
+        // Erase the element.
+        itemToDestroy.erase(currentIt);
+    }
 }
 
 bool MudUpdater::hasTicPassed()
@@ -159,130 +214,6 @@ void MudUpdater::updateDayPhase()
     {
         Mud::instance().broadcastMsg(0, Formatter::yellow() + "Another hour has passed." + Formatter::reset());
     }
-    for (auto iterator : Mud::instance().mudMobiles)
-    {
-        if (iterator.second->isAlive())
-        {
-            if (mudHour == 6)
-            {
-                iterator.second->triggerEventMorning();
-            }
-            else if (mudHour == 12)
-            {
-                iterator.second->triggerEventDay();
-            }
-            else if (mudHour == 18)
-            {
-                iterator.second->triggerEventDusk();
-            }
-            else if (mudHour == 24)
-            {
-                iterator.second->triggerEventNight();
-            }
-            else
-            {
-                iterator.second->triggerEventRandom();
-            }
-        }
-    }
-}
-
-void MudUpdater::updateCharacters()
-{
-    for (auto iterator : Mud::instance().mudPlayers)
-    {
-        // If the player is not playing, continue.
-        if (!iterator->isPlaying())
-        {
-            continue;
-        }
-        // Update the player conditions.
-        iterator->updateHealth();
-        iterator->updateStamina();
-        iterator->updateHunger();
-        iterator->updateThirst();
-        iterator->updateExpiredEffects();
-        iterator->updateActivatedEffects();
-    }
-    for (auto iterator : Mud::instance().mudMobiles)
-    {
-        auto mobile = iterator.second;
-        if (!mobile->isAlive())
-        {
-            if (mobile->canRespawn())
-            {
-                // Initialize the mobile, good as new.
-                mobile->respawn();
-            }
-        }
-        else
-        {
-            // Update the condition.
-            mobile->updateHealth();
-            mobile->updateStamina();
-            mobile->updateHunger();
-            mobile->updateThirst();
-            mobile->updateExpiredEffects();
-            mobile->updateActivatedEffects();
-        }
-    }
-}
-
-void MudUpdater::updateItems()
-{
-    std::list<Item *> itemToDestroy;
-    Logger::log(LogLevel::Debug, "Updating corpses...");
-    for (auto it : Mud::instance().mudCorpses)
-    {
-        auto corpse = it.second;
-        if (HasFlag(corpse->model->modelFlags, ModelFlag::Unbreakable))
-        {
-            continue;
-        }
-        // Trigger decay function.
-        if (corpse->updateCondition())
-        {
-            //First take everything out from the item.
-            if ((corpse->room != nullptr) && (!corpse->isEmpty()))
-            {
-                for (auto it2: corpse->content)
-                {
-                    corpse->room->addItem(it2, true);
-                }
-            }
-            itemToDestroy.insert(itemToDestroy.end(), corpse);
-        }
-    }
-    Logger::log(LogLevel::Debug, "Updating items...");
-    for (auto it : Mud::instance().mudItems)
-    {
-        auto item = it.second;
-        Logger::log(LogLevel::Debug, "Updating '" + item->getName() + "'...");
-        if (HasFlag(item->model->modelFlags, ModelFlag::Unbreakable))
-        {
-            continue;
-        }
-        // Trigger decay function.
-        if (item->updateCondition())
-        {
-            //First take everything out from the item.
-            if ((item->room != nullptr) && (!item->isEmpty()))
-            {
-                for (auto it2: item->content)
-                {
-                    item->room->addItem(it2, true);
-                }
-            }
-            itemToDestroy.insert(itemToDestroy.end(), item);
-        }
-    }
-    for (auto it : itemToDestroy)
-    {
-        it->removeFromMud();
-        it->removeOnDB();
-        delete (it);
-    }
-    Logger::log(LogLevel::Debug, "Done!");
 }
 
 void MudUpdater::performActions()

@@ -171,6 +171,11 @@ public:
     void triggerEventMain();
     ///@}
 
+protected:
+    void updateTicImpl() override;
+
+    void updateHourImpl() override;
+
 private:
     /// @brief Disable copy constructor.
     Mobile(const Mobile & source);

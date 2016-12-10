@@ -299,14 +299,29 @@ unsigned int Item::getMaxCondition() const
     return this->maxCondition;
 }
 
-bool Item::updateCondition()
+void Item::triggerDecay()
 {
-    if (condition < model->decay)
+    if (!HasFlag(model->modelFlags, ModelFlag::Unbreakable))
     {
-        return true;
+        if (condition < model->decay)
+        {
+            condition = 0;
+            // Take everything out from the item.
+            if ((this->room != nullptr) && (!this->isEmpty()))
+            {
+                for (auto it: this->content)
+                {
+                    this->room->addItem(it, true);
+                }
+            }
+            // Add the item to the list of items that has to be destroyed.
+            MudUpdater::instance().addItemToDestroy(this);
+        }
+        else
+        {
+            condition -= model->decay;
+        }
     }
-    condition -= model->decay;
-    return false;
 }
 
 double Item::getConditionModifier() const
@@ -881,4 +896,14 @@ bool Item::operator<(Item & rhs) const
 {
     Logger::log(LogLevel::Debug, "%s < %s", ToString(this->vnum), ToString(rhs.vnum));
     return getName() < rhs.getName();
+}
+
+void Item::updateTicImpl()
+{
+    // Nothing to do.
+}
+
+void Item::updateHourImpl()
+{
+    this->triggerDecay();
 }
