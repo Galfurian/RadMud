@@ -20,9 +20,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include <updater/updater.hpp>
 #include "craftAction.hpp"
 
+#include "updater.hpp"
 #include "logger.hpp"
 #include "room.hpp"
 

@@ -329,6 +329,26 @@ void LoadGodCommands()
         Mud::instance().addCommand(command);
     }
 
+    // Buildings.
+    {
+        Command command;
+        command.gods = true;
+        command.name = "building_list";
+        command.help = "List all the buildings.";
+        command.arguments = "NONE";
+        command.hndl = DoBuildingList;
+        Mud::instance().addCommand(command);
+    }
+    {
+        Command command;
+        command.gods = true;
+        command.name = "building_info";
+        command.help = "Provides information about a building.";
+        command.arguments = "(Building.vnum)";
+        command.hndl = DoBuildingInfo;
+        Mud::instance().addCommand(command);
+    }
+
     // Productions.
     {
         Command command;
@@ -488,15 +508,6 @@ void LoadGodCommands()
         command.help = "List all the liquids.";
         command.arguments = "NONE";
         command.hndl = DoLiquidList;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.gods = true;
-        command.name = "lbuild";
-        command.help = "List all the buildings.";
-        command.arguments = "NONE";
-        command.hndl = DoBuildingList;
         Mud::instance().addCommand(command);
     }
 }
@@ -913,10 +924,8 @@ bool DoItemDestroy(Character * character, ArgumentHandler & args)
         character->sendMsg("You cannot destroy an item which has item inside.\n");
         return false;
     }
-    item->removeFromMud();
-    item->removeOnDB();
-    delete (item);
     character->sendMsg("You have destroyed the desired object.\n");
+    MudUpdater::instance().addItemToDestroy(item);
     return true;
 }
 
@@ -1598,6 +1607,70 @@ bool DoLiquidCreate(Character * character, ArgumentHandler & args)
 }
 
 // ////////////////////////////////////////////////////////////////////////////
+// Building related commands.
+// ////////////////////////////////////////////////////////////////////////////
+
+bool DoBuildingList(Character * character, ArgumentHandler & /*args*/)
+{
+    Table table;
+    table.addColumn("VNUM", StringAlign::Center);
+    table.addColumn("NAME", StringAlign::Center);
+    table.addColumn("DIFFICULTY", StringAlign::Left);
+    table.addColumn("TIME", StringAlign::Center);
+    table.addColumn("UNIQUE", StringAlign::Center);
+    for (auto iterator : Mud::instance().mudBuildings)
+    {
+        auto building = &(iterator.second);
+        // Prepare the row.
+        TableRow row;
+        row.push_back(ToString(building->vnum));
+        row.push_back(building->name);
+        row.push_back(ToString(building->difficulty));
+        row.push_back(ToString(building->time));
+        row.push_back(ToString(building->unique));
+        // Add the row to the table.
+        table.addRow(row);
+    }
+    character->sendMsg(table.getTable());
+    return true;
+}
+
+bool DoBuildingInfo(Character * character, ArgumentHandler & args)
+{
+    if (args.size() != 1)
+    {
+        character->sendMsg("You must provide a building vnum.\n");
+        return false;
+    }
+    auto building = Mud::instance().findBuilding(ToNumber<int>(args[0].getContent()));
+    if (building == nullptr)
+    {
+        character->sendMsg("Can't find the desire building.\n");
+        return false;
+    }
+    std::string msg;
+    msg += "Vnum        : " + ToString(building->vnum) + "\n";
+    msg += "Name        : " + building->name + "\n";
+    msg += "Difficulty  : " + ToString(building->difficulty) + "\n";
+    msg += "Time        : " + ToString(building->time) + "\n";
+    msg += "Assisted    : " + ToString(building->assisted) + "\n";
+    msg += "Tools       :\n";
+    for (auto iterator : building->tools)
+    {
+        msg += "                  " + GetToolTypeName(iterator) + "\n";
+    }
+    msg += "Building    : " + building->buildingModel->name + "\n";
+    msg += "Ingredients :\n";
+    for (auto iterator : building->ingredients)
+    {
+        msg += "                  " + iterator.first.toString() + "(" + ToString(iterator.second) + ")\n";
+    }
+    msg += "Unique      : " + ToString(building->unique) + "\n";
+    character->sendMsg(msg);
+    return true;
+}
+
+// ////////////////////////////////////////////////////////////////////////////
 // INFORMATION
 // ////////////////////////////////////////////////////////////////////////////
 
@@ -2195,31 +2268,6 @@ bool DoLiquidList(Character * character, ArgumentHandler & /*args*/)
         row.push_back(ToString(iterator.second->vnum));
         row.push_back(iterator.second->getNameCapital());
         row.push_back(ToString(iterator.second->worth));
-        // Add the row to the table.
-        table.addRow(row);
-    }
-    character->sendMsg(table.getTable());
-    return true;
-}
-
-bool DoBuildingList(Character * character, ArgumentHandler & /*args*/)
-{
-    Table table;
-    table.addColumn("VNUM", StringAlign::Center);
-    table.addColumn("NAME", StringAlign::Center);
-    table.addColumn("DIFFICULTY", StringAlign::Left);
-    table.addColumn("TIME", StringAlign::Center);
-    table.addColumn("UNIQUE", StringAlign::Center);
-    for (auto iterator : Mud::instance().mudBuildings)
-    {
-        auto building = &(iterator.second);
-        // Prepare the row.
-        TableRow row;
-        row.push_back(ToString(building->vnum));
-        row.push_back(building->name);
-        row.push_back(ToString(building->difficulty));
-        row.push_back(ToString(building->time));
-        row.push_back(ToString(building->unique));
         // Add the row to the table.
         table.addRow(row);
     }

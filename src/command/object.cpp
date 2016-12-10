@@ -1779,8 +1779,7 @@ bool DoDeposit(Character * character, ArgumentHandler & args)
     if (item->quantity <= quantity)
     {
         building->toShopItem()->balance += item->getPrice(true);
-        item->removeFromMud();
-        delete (item);
+        MudUpdater::instance().addItemToDestroy(item);
     }
     else
     {
@@ -2031,18 +2030,17 @@ bool DoBuy(Character * character, ArgumentHandler & args)
     {
         character->addInventoryItem(coin);
     }
-    for (auto coin : givenCoins)
+    for (auto iterator : givenCoins)
     {
-        if (coin.second == coin.first->quantity)
+        auto coin = iterator.first;
+        if (iterator.second == coin->quantity)
         {
-            coin.first->removeFromMud();
-            coin.first->removeOnDB();
-            delete (coin.first);
+            MudUpdater::instance().addItemToDestroy(coin);
         }
         else
         {
-            coin.first->quantity -= coin.second;
-            coin.first->updateOnDB();
+            coin->quantity -= iterator.second;
+            coin->updateOnDB();
         }
     }
     SQLiteDbms::instance().endTransaction();

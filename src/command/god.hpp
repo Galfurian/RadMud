@@ -108,6 +108,14 @@ bool DoModAttr(Character * character, ArgumentHandler & args);
 /// Create the item with the given liquid inside a container.
 bool DoLiquidCreate(Character * character, ArgumentHandler & args);
 
+
+/// Get the list of buildings.
+bool DoBuildingList(Character * character, ArgumentHandler & args);
+
+/// Provides information about a building.
+bool DoBuildingInfo(Character * character, ArgumentHandler & args);
+
+
 /// Get information about a character.
 bool DoGodInfo(Character * character, ArgumentHandler & args);
 
@@ -182,8 +190,5 @@ bool DoProductionList(Character * character, ArgumentHandler & args);
 
 /// Get the list of liquids.
 bool DoLiquidList(Character * character, ArgumentHandler & args);
-
-/// Get the list of buildings.
-bool DoBuildingList(Character * character, ArgumentHandler & args);
 
 ///@}

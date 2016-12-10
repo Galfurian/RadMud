@@ -21,6 +21,7 @@
 
 #include "itemContainer.hpp"
 
+#include "updater.hpp"
 #include "item.hpp"
 
 ItemContainer::ItemContainer()
@@ -37,9 +38,7 @@ void ItemContainer::push_back_item(Item *& item)
         if (item->canStackWith(content))
         {
             content->quantity += item->quantity;
-            item->removeFromMud();
-            item->removeOnDB();
-            delete (item);
+            MudUpdater::instance().addItemToDestroy(item);
             item = content;
             stacked = true;
             content->updateOnDB();

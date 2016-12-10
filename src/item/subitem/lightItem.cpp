@@ -24,6 +24,7 @@
 #include "lightModel.hpp"
 #include "sqliteDbms.hpp"
 #include "resourceModel.hpp"
+#include "updater.hpp"
 
 LightItem::LightItem() :
     active(),
@@ -131,13 +132,7 @@ void LightItem::updateHourImpl()
         // Check if it is the last unit of fuel.
         if (fuel->quantity == 1)
         {
-            // Start a transaction.
-            SQLiteDbms::instance().beginTransaction();
-            fuel->removeOnDB();
-            fuel->removeFromMud();
-            delete (fuel);
-            // Conclude the transaction.
-            SQLiteDbms::instance().endTransaction();
+            MudUpdater::instance().addItemToDestroy(fuel);
         }
         else
         {

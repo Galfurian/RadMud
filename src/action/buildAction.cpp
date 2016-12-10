@@ -23,6 +23,7 @@
 #include "buildAction.hpp"
 
 #include "formatter.hpp"
+#include "updater.hpp"
 #include "logger.hpp"
 #include "room.hpp"
 
@@ -161,15 +162,14 @@ ActionStatus BuildAction::perform()
     actor->remStamina(consumedStamina, true);
     actor->remInventoryItem(building);
     actor->room->addBuilding(building);
-    // Vector which will contain the list of items to destroy.
-    std::vector<Item *> destroyItems;
     // Add the ingredients to the list of items to destroy.
     for (auto it : ingredients)
     {
         auto ingredient = it.first;
         if (ingredient->quantity == it.second)
         {
-            destroyItems.push_back(ingredient);
+            // Add the ingredient to the list of items that has to be deleted.
+            MudUpdater::instance().addItemToDestroy(ingredient);
         }
         else
         {
@@ -183,15 +183,7 @@ ActionStatus BuildAction::perform()
         if (iterator->condition == 0)
         {
             actor->sendMsg(iterator->getName(true) + " falls into pieces.");
-            destroyItems.push_back(iterator);
         }
-    }
-    // Consume the items.
-    for (auto it : destroyItems)
-    {
-        it->removeFromMud();
-        it->removeOnDB();
-        delete (it);
     }
     // Send conclusion message.
     actor->sendMsg("You have finished building %s.\n\n",

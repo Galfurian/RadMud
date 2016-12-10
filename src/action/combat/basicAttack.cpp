@@ -27,6 +27,7 @@
 #include "meleeWeaponItem.hpp"
 #include "sqliteDbms.hpp"
 #include "formatter.hpp"
+#include "updater.hpp"
 #include "logger.hpp"
 #include "chase.hpp"
 #include "room.hpp"
@@ -518,13 +519,7 @@ void BasicAttack::performRangedAttack(Character * target, RangedWeaponItem * wea
     // Check if it is the last projectile.
     if (projectile->quantity == 1)
     {
-        // Start a transaction.
-        SQLiteDbms::instance().beginTransaction();
-        projectile->removeOnDB();
-        projectile->removeFromMud();
-        delete (projectile);
-        // Conclude the transaction.
-        SQLiteDbms::instance().endTransaction();
+        MudUpdater::instance().addItemToDestroy(projectile);
     }
     else
     {
