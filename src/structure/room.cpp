@@ -23,6 +23,7 @@
 #include "room.hpp"
 
 #include "mechanismModel.hpp"
+#include "lightItem.hpp"
 #include "generator.hpp"
 #include "logger.hpp"
 #include "mud.hpp"
@@ -372,6 +373,72 @@ Item * Room::findDoor()
     return nullptr;
 }
 
+bool Room::isLit()
+{
+    Logger::log(LogLevel::Debug, "Check if the room is lit");
+    auto CheckRoomForLights = [](Room * room)
+    {
+        auto IsActiveLight = [](Item * item)
+        {
+            if (item != nullptr)
+            {
+                if (item->getType() == ModelType::Light)
+                {
+                    if (item->toLightItem()->active)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        };
+        for (auto it : room->items)
+        {
+            if (IsActiveLight(it))
+            {
+                Logger::log(LogLevel::Debug, "Found active light '%s'", it->getName(true));
+                return true;
+            }
+        }
+        for (auto it: room->characters)
+        {
+            for (auto it2: it->equipment)
+            {
+                if (IsActiveLight(it2))
+                {
+                    Logger::log(LogLevel::Debug, "Found active light '%s' equipped by '%s'",
+                                it2->getName(true),
+                                it->getName());
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+    // Get the day phase.
+    auto dayPhase = MudUpdater::instance().getDayPhase();
+    if ((!terrain->inside) && (dayPhase != DayPhase::Night))
+    {
+        Logger::log(LogLevel::Debug, "Room is lit (outside)(!night)");
+        return true;
+    }
+    // First check inside the current room.
+    auto validCoordinates = area->fov(coord, 5);
+    for (auto coordinates : validCoordinates)
+    {
+        auto room = area->getRoom(coordinates);
+        if (room != nullptr)
+        {
+            if (CheckRoomForLights(room))
+            {
+                Logger::log(LogLevel::Debug, "Room is lit (LitByLight)");
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 std::vector<Direction> Room::getAvailableDirections()
 {
     std::vector<Direction> directions;
@@ -405,13 +472,12 @@ bool Room::removeExit(const Direction & direction)
     return false;
 }
 
-std::string Room::getLook(Character * exception)
+std::string Room::getLook(Character * actor)
 {
     std::string output = "";
     // The player want to look at the entire room.
     output += Formatter::bold() + name + Formatter::reset() + "\n";
     output += description + "\n";
-
     if (exits.empty())
     {
         output += "There is no exit from here!\n";
@@ -420,11 +486,10 @@ std::string Room::getLook(Character * exception)
     {
         if (area != nullptr)
         {
-            if (Formatter::getFormat() == Formatter::TELNET)
+            if (Formatter::getFormat() == Formatter::CLIENT)
             {
-                std::vector<std::string> layers = area->drawFov(this, exception->getViewDistance());
                 output += Formatter::doClearMap();
-                for (auto layer : layers)
+                for (auto layer : area->drawFov(this, actor->getViewDistance()))
                 {
                     output += Formatter::doDrawMap();
                     output += layer;
@@ -433,14 +498,13 @@ std::string Room::getLook(Character * exception)
             }
             else
             {
-                output += area->drawASCIIFov(this, exception->getViewDistance());
+                output += area->drawASCIIFov(this, actor->getViewDistance());
             }
         }
         else if (continent != nullptr)
         {
-            std::vector<std::string> layers = continent->drawFov(this, exception->getViewDistance());
             output += Formatter::doClearMap();
-            for (auto layer : layers)
+            for (auto layer : continent->drawFov(this, actor->getViewDistance()))
             {
                 output += Formatter::doDrawMap();
                 output += layer;
@@ -448,7 +512,6 @@ std::string Room::getLook(Character * exception)
             }
         }
     }
-
     ///////////////////////////////////////////////////////////////////////////
     // List all the items placed in the same room.
     for (auto it : items)
@@ -458,12 +521,10 @@ std::string Room::getLook(Character * exception)
         {
             continue;
         }
-
         if (HasFlag(it->flags, ItemFlag::Built))
         {
             output += "[B]";
         }
-
         // If there are more of this item, show the counter.
         if (it->quantity > 1)
         {
@@ -475,29 +536,26 @@ std::string Room::getLook(Character * exception)
             output += Formatter::cyan() + it->getNameCapital() + Formatter::reset() + " is here.\n";
         }
     }
-
     ///////////////////////////////////////////////////////////////////////////
     // List mobile in the same room.
-    for (auto iterator : getAllMobile(exception))
+    for (auto iterator : getAllMobile(actor))
     {
-        if (!exception->canSee(iterator))
+        if (!actor->canSee(iterator))
         {
             continue;
         }
         output += Formatter::blue() + iterator->getStaticDesc() + Formatter::reset() + "\n";
     }
-
     ///////////////////////////////////////////////////////////////////////////
     // List other players in the same room.
-    for (auto iterator : getAllPlayer(exception))
+    for (auto iterator : getAllPlayer(actor))
     {
-        if (!exception->canSee(iterator))
+        if (!actor->canSee(iterator))
         {
             continue;
         }
         output += Formatter::gray() + iterator->getStaticDesc() + Formatter::reset() + "\n";
     }
-
     return output;
 }
 
@@ -589,7 +647,6 @@ void Room::updateHourImpl()
 bool CreateRoom(Coordinates coord, Room * source_room)
 {
     Room * new_room = new Room();
-
     // Create a new room.
     Logger::log(LogLevel::Info, "[CreateRoom] Setting up the room...");
     new_room->vnum = Mud::instance().getMaxVnumRoom() + 1;

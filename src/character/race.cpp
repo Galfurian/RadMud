@@ -173,7 +173,7 @@ void Race::luaRegister(lua_State * L)
 
 std::string Race::getTile()
 {
-    if (Formatter::getFormat() == Formatter::TELNET)
+    if (Formatter::getFormat() == Formatter::CLIENT)
     {
         return ToString(tileSet) + ":" + ToString(tileId);
     }

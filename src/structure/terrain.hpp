@@ -36,12 +36,16 @@ public:
     unsigned int flags;
     /// The available space inside the terrain.
     unsigned int space;
+    /// If there is natural light on this terrain.
+    bool inside;
+    /// If there is natural light on this terrain.
+    bool light;
     /// The lua_State associated with this terrain.
     lua_State * L;
 
     Terrain();
 
-    Terrain(unsigned int _vnum, std::string _name, unsigned int _flags, unsigned int _space);
+    Terrain(unsigned int _vnum, std::string _name, unsigned int _flags, unsigned int _space, bool _inside, bool _light);
 
     /// @brief Function used to register inside the lua environment the class.
     /// @param L The lua environment.

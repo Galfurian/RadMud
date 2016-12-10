@@ -188,6 +188,11 @@ void LoadObjectCommands()
                 "",
                 DoBalance, false, false));
     Mud::instance().addCommand(
+        Command(false, "turn",
+                "Allows to turn on and off an activatable item.",
+                "(item)",
+                DoTurn, true, false));
+    Mud::instance().addCommand(
         Command(false, "refill",
                 "Allows to refill a light source.",
                 "(light_source) (fuel)",
@@ -2064,6 +2069,53 @@ bool DoBalance(Character * character, ArgumentHandler & args)
     return true;
 }
 
+bool DoTurn(Character * character, ArgumentHandler & args)
+{
+    // Stop any action the character is executing.
+    StopAction(character);
+    // Check the number of arguments.
+    if (args.size() != 1)
+    {
+        character->sendMsg("What do you want to turn on/off?\n");
+        return false;
+    }
+    // Retrieve the item that has to be turned on/off.
+    auto item = character->findEquipmentItem(args[0].getContent(), args[0].getIndex());
+    if (item == nullptr)
+    {
+        item = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
+        if (item == nullptr)
+        {
+            character->sendMsg("You don't have %s.\n", args[0].getContent());
+            return false;
+        }
+    }
+    if (item->getType() == ModelType::Light)
+    {
+        auto lightItem = item->toLightItem();
+        if (lightItem->active)
+        {
+            character->sendMsg("You turn off %s.\n", item->getName(true));
+            lightItem->active = false;
+            return true;
+        }
+        else
+        {
+            if (lightItem->getRemainingHour() > 0)
+            {
+                character->sendMsg("You turn on %s.\n", item->getName(true));
+                lightItem->active = true;
+                return true;
+            }
+            else
+            {
+                character->sendMsg("You cannot turn on %s.\n", item->getName(true));
+            }
+        }
+    }
+    return false;
+}
+
 bool DoRefill(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
@@ -2103,6 +2155,6 @@ bool DoRefill(Character * character, ArgumentHandler & args)
         character->sendMsg(error + "\n");
         return false;
     }
-    character->sendMsg("You can put inside %s.\n", ammountToLoad);
+    character->sendMsg("You can put %s of %s inside %s.\n", fuel->getName(true), ammountToLoad, item->getName(true));
     return true;
 }

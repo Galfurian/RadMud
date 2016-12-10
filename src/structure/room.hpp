@@ -169,30 +169,27 @@ public:
     /// @param number    Number of the player we are looking for.
     /// @param exceptions The list of exceptions.
     /// @return The character, if it's in the room.
-    Character * findCharacter(
-        std::string target,
-        int & number,
-        const std::vector<Character *> & exceptions = std::vector<Character *>()) const;
+    Character * findCharacter(std::string target,
+                              int & number,
+                              const std::vector<Character *> & exceptions = std::vector<Character *>()) const;
 
     /// @brief Search for the player in the room.
     /// @param target    The player to search.
     /// @param number    Number of the player we are looking for.
     /// @param exceptions The list of exceptions.
     /// @return The player, if it's in the room.
-    Player * findPlayer(
-        std::string target,
-        int & number,
-        const std::vector<Character *> & exceptions = std::vector<Character *>()) const;
+    Player * findPlayer(std::string target,
+                        int & number,
+                        const std::vector<Character *> & exceptions = std::vector<Character *>()) const;
 
     /// @brief Search for the mobile in the room.
     /// @param target    The mobile to search.
     /// @param number    Number of the mobile we are looking for.
     /// @param exceptions The list of exceptions.
     /// @return The mobile, if it's in the room.
-    Mobile * findMobile(
-        std::string target,
-        int & number,
-        const std::vector<Character *> & exceptions = std::vector<Character *>()) const;
+    Mobile * findMobile(std::string target,
+                        int & number,
+                        const std::vector<Character *> & exceptions = std::vector<Character *>()) const;
 
     /// @brief Add the provided exit to the room list of exits.
     /// @param exit The exit to add to the list.
@@ -225,14 +222,17 @@ public:
     /// @return The contained door if there is one.
     Item * findDoor();
 
+    /// @brief Check if the room is lit or not.
+    bool isLit();
+
     /// @brief Provides the list of directions where an exit is present.
     /// @return Vector of directions.
     std::vector<Direction> getAvailableDirections();
 
     /// @brief Provide a detailed description of the room.
-    /// @param exception The one who are looking.
+    /// @param actor The one who is looking.
     /// @return A detailed description of the room.
-    std::string getLook(Character * exception);
+    std::string getLook(Character * actor);
 
     /// @brief Send a message to all the player in the room, can specify exceptions.
     /// @param message    The message to send.

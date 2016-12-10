@@ -162,7 +162,7 @@ public:
     static Mud & instance();
 
     /// List of all connected players.
-    std::set<Player *> mudPlayers;
+    std::list<Player *> mudPlayers;
     /// List all the mobile.
     std::map<std::string, Mobile *> mudMobiles;
     /// List of all items.
@@ -235,7 +235,7 @@ public:
     /// @{
 
     /// Add a player to the list of connected players.
-    bool addPlayer(Player * player);
+    void addPlayer(Player * player);
 
     /// Remove a player from the list of connected players.
     bool remPlayer(Player * player);

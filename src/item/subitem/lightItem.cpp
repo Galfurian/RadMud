@@ -27,8 +27,7 @@
 #include "updater.hpp"
 
 LightItem::LightItem() :
-    active(),
-    remainingHours()
+    active()
 {
     // Nothing to do.
 }
@@ -45,7 +44,7 @@ void LightItem::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow({"Remaining Autonomy", ToString(remainingHours) + " h"});
+    sheet.addRow({"Remaining Autonomy", ToString(this->getRemainingHour()) + " h"});
 }
 
 bool LightItem::canRefillWith(Item * item, std::string & error) const
@@ -84,59 +83,109 @@ bool LightItem::getAmmountToRefill(Item * item, unsigned int & ammount, std::str
     {
         return false;
     }
-    // Set by default the ammout to load to the maximum.
-    ammount = this->model->toLight()->maxHours;
-    unsigned int ammountAlreadyLoaded = 0;
-    // Retrieve any already loaded fuel.
-    Item * alreadyLoaded = this->getAlreadyLoadedFuel();
-    if (alreadyLoaded != nullptr)
+    // Set by default the ammout to the maximum.
+    auto maxHours = this->model->toLight()->maxHours;
+    // Get the remaining hour.
+    unsigned int remainingHours = this->getRemainingHour();
+    if (remainingHours == maxHours)
     {
-        // Set the ammount of already loaded fuel.
-        ammountAlreadyLoaded = alreadyLoaded->quantity;
-        if (ammount <= ammountAlreadyLoaded)
-        {
-            error = this->getNameCapital(true) + " is already at full capacity.";
-            return false;
-        }
-        ammount -= ammountAlreadyLoaded;
+        error = this->getNameCapital(true) + " is already at full capacity.";
+        return false;
     }
+    // Get the remaining hour.
+    auto canRefill = maxHours - remainingHours;
+    // Set the ammount.
+    ammount = (canRefill < item->quantity) ? canRefill : item->quantity;
     return true;
-
 }
 
-Item * LightItem::getAlreadyLoadedFuel() const
+std::vector<Item *> LightItem::getAlreadyLoadedFuel() const
 {
-    if (model->toLight()->fuelType == ResourceType::None)
+    std::vector<Item *> fuel;
+    if (model->toLight()->fuelType != ResourceType::None)
     {
-        return nullptr;
-    }
-    if (!this->isEmpty())
-    {
-        Item * fuel = this->content.front();
-        if (fuel != nullptr)
+        if (!this->isEmpty())
         {
-            if (fuel->getType() == ModelType::Resource)
+            for (auto it : content)
             {
-                return fuel;
+                if (it->getType() == ModelType::Resource)
+                {
+                    fuel.push_back(it);
+                }
             }
         }
     }
-    return nullptr;
+    return fuel;
+}
+
+unsigned int LightItem::getRemainingHour() const
+{
+    unsigned int remainingHour = 0;
+    if (model->getType() == ModelType::Light)
+    {
+        if (model->toLight()->fuelType == ResourceType::None)
+        {
+            remainingHour = this->condition;
+        }
+        else
+        {
+            auto loadedFuel = this->getAlreadyLoadedFuel();
+            if (!loadedFuel.empty())
+            {
+                for (auto fuel : loadedFuel)
+                {
+                    if (fuel != nullptr)
+                    {
+                        remainingHour += fuel->quantity;
+                    }
+                }
+            }
+        }
+    }
+    return remainingHour;
 }
 
 void LightItem::updateHourImpl()
 {
-    auto fuel = this->getAlreadyLoadedFuel();
-    if (fuel != nullptr)
+    if (active)
     {
-        // Check if it is the last unit of fuel.
-        if (fuel->quantity == 1)
+        if (model->getType() == ModelType::Light)
         {
-            MudUpdater::instance().addItemToDestroy(fuel);
-        }
-        else
-        {
-            fuel->quantity--;
+            if (model->toLight()->fuelType == ResourceType::None)
+            {
+                // This will result in a double call to trigger decay,
+                //  one in the base class and one here.
+                this->triggerDecay();
+                // Just for precaution, deactivate the light source.
+                active = false;
+            }
+            else
+            {
+                auto loadedFuel = this->getAlreadyLoadedFuel();
+                if (loadedFuel.empty())
+                {
+                    active = false;
+                }
+                else
+                {
+                    for (auto fuel : loadedFuel)
+                    {
+                        if (fuel != nullptr)
+                        {
+                            // Check if it is the last unit of fuel.
+                            if (fuel->quantity == 1)
+                            {
+                                // Set the fuel to destroy.
+                                MudUpdater::instance().addItemToDestroy(fuel);
+                            }
+                            else
+                            {
+                                fuel->quantity--;
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
     // Call the hourly update.

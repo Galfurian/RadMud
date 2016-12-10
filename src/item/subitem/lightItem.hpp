@@ -31,8 +31,6 @@ class LightItem :
 public:
     /// Activity status.
     bool active;
-    /// The remaining number of hours of autonomy.
-    unsigned int remainingHours;
 
     LightItem();
 
@@ -44,9 +42,9 @@ public:
 
     bool getAmmountToRefill(Item * item, unsigned int & ammount, std::string & error) const;
 
-    /// @brief Provides the list of already loaded fuel.
-    /// @return The contained fuel.
-    Item * getAlreadyLoadedFuel() const;
+    std::vector<Item *> getAlreadyLoadedFuel() const;
+
+    unsigned int getRemainingHour() const;
 
 protected:
     void updateHourImpl() override;

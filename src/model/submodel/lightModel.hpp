@@ -32,8 +32,8 @@ class LightModel :
 public:
     /// The type of fuel used to keep the light on.
     ResourceType fuelType;
-    /// The maximum light intensity.
-    unsigned int maxIntensity;
+    /// The maximum radius of the light.
+    unsigned int radius;
     /// Maximum number of hours autonomy.
     unsigned int maxHours;
     /// Recharging polocy

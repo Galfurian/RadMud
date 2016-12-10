@@ -346,7 +346,7 @@ void ItemModel::luaRegister(lua_State * L)
 
 std::string ItemModel::getTile(int offset)
 {
-    if (Formatter::getFormat() == Formatter::TELNET)
+    if (Formatter::getFormat() == Formatter::CLIENT)
     {
         return ToString(tileSet) + ":" + ToString(tileId + offset);
     }

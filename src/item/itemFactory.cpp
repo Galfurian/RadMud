@@ -22,12 +22,14 @@
 
 #include "itemFactory.hpp"
 
-#include "shopItem.hpp"
 #include "armorItem.hpp"
 #include "corpseItem.hpp"
 #include "currencyItem.hpp"
+#include "lightItem.hpp"
+#include "magazineItem.hpp"
 #include "meleeWeaponItem.hpp"
 #include "rangedWeaponItem.hpp"
+#include "shopItem.hpp"
 
 Item * ItemFactory::newItem(const ModelType & type)
 {
@@ -39,9 +41,21 @@ Item * ItemFactory::newItem(const ModelType & type)
     {
         return new ArmorItem();
     }
-    if (type == ModelType::Shop)
+    if (type == ModelType::Corpse)
     {
-        return new ShopItem();
+        return new CorpseItem();
+    }
+    if (type == ModelType::Currency)
+    {
+        return new CurrencyItem();
+    }
+    if (type == ModelType::Light)
+    {
+        return new LightItem();
+    }
+    if (type == ModelType::Magazine)
+    {
+        return new MagazineItem();
     }
     if (type == ModelType::MeleeWeapon)
     {
@@ -51,17 +65,9 @@ Item * ItemFactory::newItem(const ModelType & type)
     {
         return new RangedWeaponItem();
     }
-    if (type == ModelType::Currency)
+    if (type == ModelType::Shop)
     {
-        return new CurrencyItem();
-    }
-    if (type == ModelType::Corpse)
-    {
-        return new CorpseItem();
-    }
-    if (type == ModelType::Magazine)
-    {
-        return new MagazineItem();
+        return new ShopItem();
     }
     return new Item();
 }

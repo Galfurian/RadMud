@@ -378,93 +378,90 @@ std::string Area::drawASCIIFov(Room * centerRoom, const int & radius)
     {
         return result;
     }
-    // Retrieve the coordinates of the room.
-    int origin_x = centerRoom->coord.x;
-    int origin_y = centerRoom->coord.y;
-    int origin_z = centerRoom->coord.z;
-    (void) origin_z;
     // Evaluate the minimum and maximum value for x and y.
-    int min_x = (origin_x - radius);
-    int min_y = (origin_y - radius);
-    int max_x = (origin_x + radius);
-    int max_y = (origin_y + radius);
+    int min_x = (centerRoom->coord.x - radius), max_x = (centerRoom->coord.x + radius);
+    int min_y = (centerRoom->coord.y - radius), max_y = (centerRoom->coord.y + radius);
     // Evaluate the field of view.
     auto validFov = this->fov(centerRoom->coord, radius);
-    for (int y = max_y; y >= min_y; --y)
+    // Draw the fov.
+    Coordinates point = centerRoom->coord;
+    for (point.y = max_y; point.y >= min_y; --point.y)
     {
-        for (int x = min_x; x <= max_x; ++x)
+        for (point.x = min_x; point.x <= max_x; ++point.x)
         {
             std::string tile = " ";
-            Coordinates coordinates(x, y, origin_z);
-            if (std::find(validFov.begin(), validFov.end(), coordinates) != validFov.end())
+            if (std::find(validFov.begin(), validFov.end(), point) != validFov.end())
             {
-                Room * room = this->getRoom(Coordinates(x, y, origin_z));
+                Room * room = this->getRoom(point);
                 if (room != nullptr)
                 {
-                    std::shared_ptr<Exit> up = room->findExit(Direction::Up);
-                    std::shared_ptr<Exit> down = room->findExit(Direction::Down);
-                    // VI  - WALKABLE
-                    tile = ".";
-                    // V   - OPEN DOOR
-                    Item * door = room->findDoor();
-                    if (door != nullptr)
+                    if (room->isLit())
                     {
-                        if (HasFlag(door->flags, ItemFlag::Closed))
+                        std::shared_ptr<Exit> up = room->findExit(Direction::Up);
+                        std::shared_ptr<Exit> down = room->findExit(Direction::Down);
+                        // VI  - WALKABLE
+                        tile = ".";
+                        // V   - OPEN DOOR
+                        Item * door = room->findDoor();
+                        if (door != nullptr)
                         {
-                            tile = 'D';
-                        }
-                        else
-                        {
-                            tile = 'O';
-                        }
-                    }
-                    // IV  - STAIRS
-                    if ((up != nullptr) && (down != nullptr))
-                    {
-                        if (HasFlag(up->flags, ExitFlag::Stairs)
-                            && HasFlag(down->flags, ExitFlag::Stairs))
-                        {
-                            tile = "X";
-                        }
-                    }
-                    else if (up != nullptr)
-                    {
-                        if (HasFlag(up->flags, ExitFlag::Stairs))
-                        {
-                            tile = ">";
-                        }
-                    }
-                    else if (down != nullptr)
-                    {
-                        if (HasFlag(down->flags, ExitFlag::Stairs))
-                        {
-                            tile = "<";
-                        }
-                        else
-                        {
-                            tile = " ";
-                        }
-                    }
-                    // III - ITEMS
-                    if (room->items.size() > 0)
-                    {
-                        tile = room->items.back()->model->getTile();
-                    }
-                    // II  - CHARACTERS
-                    if (room->characters.size() > 0)
-                    {
-                        for (auto iterator : room->characters)
-                        {
-                            if (!HasFlag(iterator->flags, CharacterFlag::Invisible))
+                            if (HasFlag(door->flags, ItemFlag::Closed))
                             {
-                                tile = iterator->race->getTile();
+                                tile = 'D';
+                            }
+                            else
+                            {
+                                tile = 'O';
                             }
                         }
-                    }
-                    // I   - PLAYER
-                    if ((origin_x == x) && (origin_y == y))
-                    {
-                        tile = "@";
+                        // IV  - STAIRS
+                        if ((up != nullptr) && (down != nullptr))
+                        {
+                            if (HasFlag(up->flags, ExitFlag::Stairs)
+                                && HasFlag(down->flags, ExitFlag::Stairs))
+                            {
+                                tile = "X";
+                            }
+                        }
+                        else if (up != nullptr)
+                        {
+                            if (HasFlag(up->flags, ExitFlag::Stairs))
+                            {
+                                tile = ">";
+                            }
+                        }
+                        else if (down != nullptr)
+                        {
+                            if (HasFlag(down->flags, ExitFlag::Stairs))
+                            {
+                                tile = "<";
+                            }
+                            else
+                            {
+                                tile = " ";
+                            }
+                        }
+                        // III - ITEMS
+                        if (room->items.size() > 0)
+                        {
+                            tile = room->items.back()->model->getTile();
+                        }
+                        // II  - CHARACTERS
+                        if (room->characters.size() > 0)
+                        {
+                            for (auto iterator : room->characters)
+                            {
+                                if (!HasFlag(iterator->flags, CharacterFlag::Invisible))
+                                {
+                                    tile = iterator->race->getTile();
+                                }
+                            }
+                        }
+                        // I   - PLAYER
+                        if (centerRoom->coord == point)
+                        {
+                            tile = "@";
+                        }
                     }
                 }
             }

@@ -23,7 +23,7 @@
 #include "mud.hpp"
 
 #include <unistd.h>
-#include <sys/signal.h>
+#include <signal.h>
 
 #include "processPlayerName.hpp"
 #include "CMacroWrapper.hpp"
@@ -180,14 +180,22 @@ bool Mud::saveMud()
     return result;
 }
 
-bool Mud::addPlayer(Player * player)
+void Mud::addPlayer(Player * player)
 {
-    return mudPlayers.insert(player).second;
+    mudPlayers.insert(mudPlayers.end(), player);
 }
 
 bool Mud::remPlayer(Player * player)
 {
-    return (FindErase(mudPlayers, player) != mudPlayers.end());
+    for (auto it = mudPlayers.begin(); it != mudPlayers.end(); ++it)
+    {
+        if ((*it)->name == player->name)
+        {
+            mudPlayers.erase(it);
+            return true;
+        }
+    }
+    return false;
 }
 
 bool Mud::addMobile(Mobile * mobile)
@@ -653,35 +661,29 @@ bool Mud::runMud()
     // We will go through this loop roughly every timeout seconds.
     do
     {
+        // Let the time advance.
         MudUpdater::instance().advanceTime();
-
-        // Delete players who have closed their comms.
+        // Delete the inactive players.
         this->removeInactivePlayers();
-
         // Get ready for "select" function.
         FD_ZERO(&in_set);
         FD_ZERO(&out_set);
         FD_ZERO(&exc_set);
-
         // Add our control socket, needed for new connections.
         CMacroWrapper::FdSet(_servSocket, &in_set);
-
         // Set the max file descriptor to the server socket.
         _maxDesc = _servSocket;
-
         // Set bits in in_set, out_set etc. for each connected player.
         for (auto iterator : mudPlayers)
         {
             this->setupDescriptor(iterator);
         }
-
         // Check for activity, timeout after 'timeout' seconds.
         int activity = select((_maxDesc + 1), &in_set, &out_set, &exc_set, &timeoutVal);
         if ((activity < 0) && (errno != EINTR))
         {
             perror("Select");
         }
-
         // Check if there are new connections on control port.
         if (CMacroWrapper::FdIsSet(_servSocket, &in_set))
         {
@@ -690,14 +692,12 @@ bool Mud::runMud()
                 Logger::log(LogLevel::Error, "Error during processing a new connection.");
             }
         }
-
         // Handle all player input/output.
         for (auto iterator : mudPlayers)
         {
             this->processDescriptor(iterator);
         }
     } while (!_shutdownSignal);
-
     if (!this->stopMud())
     {
         Logger::log(LogLevel::Error, "Something gone wrong during the shutdown.");
