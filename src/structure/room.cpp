@@ -576,6 +576,16 @@ bool Room::operator==(const Room & right) const
     return vnum == right.vnum;
 }
 
+void Room::updateTicImpl()
+{
+    // Nothing to do.
+}
+
+void Room::updateHourImpl()
+{
+    // Nothing to do.
+}
+
 bool CreateRoom(Coordinates coord, Room * source_room)
 {
     Room * new_room = new Room();

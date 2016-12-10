@@ -125,6 +125,11 @@ void MudUpdater::advanceTime()
         {
             iterator.second->updateTic();
         }
+        // [TIC] Update the Rooms.
+        for (auto iterator : Mud::instance().mudRooms)
+        {
+            iterator.second->updateTic();
+        }
         // Check if a hour is passed.
         if (hourTicCounter++ >= hourTicSize)
         {
@@ -149,6 +154,11 @@ void MudUpdater::advanceTime()
             for (auto it : Mud::instance().mudItems)
             {
                 it.second->updateHour();
+            }
+            // [HOUR] Update the Rooms.
+            for (auto iterator : Mud::instance().mudRooms)
+            {
+                iterator.second->updateHour();
             }
             // [HOUR] Reset the hour counter.
             hourTicCounter = 0;

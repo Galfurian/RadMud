@@ -50,7 +50,8 @@ using RoomFlag = enum class RoomFlags
 };
 
 /// @brief Holds details about room.
-class Room
+class Room :
+    public UpdateInterface
 {
 public:
     /// The current room vnum.
@@ -324,6 +325,11 @@ public:
     /// @return <b>True</b> if this and the other room have the same vnum,<br>
     ///         <b>False</b> otherwise.
     bool operator==(const Room & right) const;
+
+protected:
+    void updateTicImpl() override;
+
+    void updateHourImpl() override;
 };
 
 /// @brief Create a room in the desired position.
