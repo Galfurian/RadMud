@@ -218,11 +218,6 @@ public:
     /// @return A detailed description of the item.
     std::string getLook();
 
-    /// @brief Check if the item is a node of the given type.
-    /// @param nodeType The type of node to check.
-    /// @return <b>True</b> if the node has the right node type,<br><b>False</b> otherwise.
-    bool hasNodeType(NodeType nodeType);
-
     /// @brief Check if the item is a valid container.
     /// @return <b>True</b> if it is a valid container,<br>
     ///         <b>False</b> otherwise.

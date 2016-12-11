@@ -437,19 +437,6 @@ std::string Item::getLook()
     return output;
 }
 
-bool Item::hasNodeType(NodeType nodeType)
-{
-    if (model == nullptr)
-    {
-        return false;
-    }
-    if (model->getType() != ModelType::Node)
-    {
-        return false;
-    }
-    return (model->toNode()->nodeType == nodeType);
-}
-
 bool Item::isAContainer() const
 {
     if (model->getType() == ModelType::Container)
