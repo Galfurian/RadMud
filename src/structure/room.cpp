@@ -23,6 +23,7 @@
 #include "room.hpp"
 
 #include "mechanismModel.hpp"
+#include "lightModel.hpp"
 #include "lightItem.hpp"
 #include "generator.hpp"
 #include "logger.hpp"
@@ -376,9 +377,9 @@ Item * Room::findDoor()
 bool Room::isLit()
 {
     Logger::log(LogLevel::Debug, "Check if the room is lit");
-    auto CheckRoomForLights = [](Room * room)
+    auto CheckRoomForLights = [this](Room * room)
     {
-        auto IsActiveLight = [](Item * item)
+        auto LightIsActiveAndInRange = [this, room](Item * item)
         {
             if (item != nullptr)
             {
@@ -386,7 +387,10 @@ bool Room::isLit()
                 {
                     if (item->toLightItem()->active)
                     {
-                        return true;
+                        if (Area::getDistance(coord, room->coord) <= item->model->toLight()->radius)
+                        {
+                            return true;
+                        }
                     }
                 }
             }
@@ -394,7 +398,7 @@ bool Room::isLit()
         };
         for (auto it : room->items)
         {
-            if (IsActiveLight(it))
+            if (LightIsActiveAndInRange(it))
             {
                 Logger::log(LogLevel::Debug, "Found active light '%s'", it->getName(true));
                 return true;
@@ -404,7 +408,7 @@ bool Room::isLit()
         {
             for (auto it2: it->equipment)
             {
-                if (IsActiveLight(it2))
+                if (LightIsActiveAndInRange(it2))
                 {
                     Logger::log(LogLevel::Debug, "Found active light '%s' equipped by '%s'",
                                 it2->getName(true),
@@ -475,9 +479,15 @@ bool Room::removeExit(const Direction & direction)
 std::string Room::getLook(Character * actor)
 {
     std::string output = "";
-    // The player want to look at the entire room.
-    output += Formatter::bold() + name + Formatter::reset() + "\n";
-    output += description + "\n";
+    if (this->isLit())
+    {
+        output += Formatter::bold() + name + Formatter::reset() + "\n";
+        output += description + "\n";
+    }
+    else
+    {
+        output += "You don't see anything nearby.\n";
+    }
     if (exits.empty())
     {
         output += "There is no exit from here!\n";
