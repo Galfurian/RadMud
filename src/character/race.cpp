@@ -58,7 +58,6 @@ void Race::initializeCorpse(const std::string & corpseDescription)
     corpse.slot = EquipmentSlot::None;
     corpse.modelFlags = 0;
     corpse.condition = 10;
-    corpse.decay = 1;
     corpse.material = this->material->type;
     corpse.tileSet = this->tileSet;
     corpse.tileId = this->tileId;

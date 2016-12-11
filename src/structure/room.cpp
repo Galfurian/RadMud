@@ -90,7 +90,7 @@ void Room::addItem(Item *& item, bool updateDB)
     {
         SQLiteDbms::instance().insertInto("ItemRoom", {ToString(this->vnum), ToString(item->vnum)}, false, true);
     }
-    //Logger::log(LogLevel::Debug, "Item '" + item->getName() + "' added to '" + this->name + "';");
+    Logger::log(LogLevel::Debug, "Item '" + item->getName() + "' added to '" + this->name + "';");
 }
 
 void Room::addBuilding(Item * item, bool updateDB)
@@ -126,7 +126,7 @@ bool Room::removeItem(Item * item, bool updateDB)
             SQLiteDbms::instance().deleteFrom("ItemRoom", {std::make_pair("item", ToString(item->vnum))});
         }
         // Log it.
-        //Logger::log(LogLevel::Debug, "Item '" + item->getName() + "' removed from '" + this->name + "';");
+        Logger::log(LogLevel::Debug, "Item '" + item->getName() + "' removed from '" + this->name + "';");
         return true;
     }
     return false;

@@ -27,7 +27,6 @@
 LightModel::LightModel() :
     fuelType(),
     radius(),
-    maxHours(),
     policy()
 {
     // Nothing to do.
@@ -63,8 +62,8 @@ bool LightModel::setModel(const std::string & source)
     }
     fuelType = ResourceType(ToNumber<unsigned int>(functionList[0]));
     radius = ToNumber<unsigned int>(functionList[1]);
-    maxHours = ToNumber<unsigned int>(functionList[2]);
-    policy = ToNumber<unsigned int>(functionList[3]);
+    policy = ToNumber<unsigned int>(functionList[2]);
+    maxWeight = ToNumber<double>(functionList[3]);
     return true;
 }
 
@@ -77,6 +76,6 @@ void LightModel::getSheet(Table & sheet) const
     // Set the values.
     sheet.addRow({"Fuel Type", fuelType.toString()});
     sheet.addRow({"Radius", ToString(radius)});
-    sheet.addRow({"Max Hours", ToString(maxHours)});
     sheet.addRow({"Policy", ToString(policy)});
+    sheet.addRow({"Max Weight", ToString(maxWeight)});
 }

@@ -26,6 +26,7 @@
 #include "logger.hpp"
 #include "shopItem.hpp"
 #include "lightItem.hpp"
+#include "lightModel.hpp"
 #include "shopModel.hpp"
 #include "armorItem.hpp"
 #include "corpseItem.hpp"
@@ -176,7 +177,7 @@ void Item::getSheet(Table & sheet) const
     sheet.addRow({"model", model->name});
     sheet.addRow({"quantity", ToString(quantity)});
     sheet.addRow({"maker", maker});
-    sheet.addRow({"condition", ToString(condition) + "/" + ToString(this->getMaxCondition())});
+    sheet.addRow({"condition", ToString(condition) + "/" + ToString(maxCondition)});
     sheet.addRow({"Material", composition->name});
     sheet.addRow({"Quality", quality.toString()});
     sheet.addRow({"Weight", ToString(this->getWeight(true))});
@@ -294,18 +295,18 @@ bool Item::hasKey(std::string key)
     return false;
 }
 
-unsigned int Item::getMaxCondition() const
+double Item::getDecayRate() const
 {
-    return this->maxCondition;
+    return (maxCondition / (composition->hardness * 10)) / quality.getModifier();
 }
 
 void Item::triggerDecay()
 {
     if (!HasFlag(model->modelFlags, ModelFlag::Unbreakable))
     {
-        if (condition < model->decay)
+        condition -= this->getDecayRate();
+        if (condition < 0)
         {
-            condition = 0;
             // Take everything out from the item.
             if ((this->room != nullptr) && (!this->isEmpty()))
             {
@@ -317,16 +318,12 @@ void Item::triggerDecay()
             // Add the item to the list of items that has to be destroyed.
             MudUpdater::instance().addItemToDestroy(this);
         }
-        else
-        {
-            condition -= model->decay;
-        }
     }
 }
 
 double Item::getConditionModifier() const
 {
-    auto percent = ((100 * this->condition) / this->getMaxCondition());
+    auto percent = ((100 * condition) / maxCondition);
     if (percent >= 75) return 1.00;
     if (percent >= 50) return 0.75;
     if (percent >= 25) return 0.50;
@@ -335,7 +332,7 @@ double Item::getConditionModifier() const
 
 std::string Item::getConditionDescription()
 {
-    auto percent = ((100 * this->condition) / this->getMaxCondition());
+    auto percent = ((100 * condition) / maxCondition);
     if (percent >= 100) return "is in perfect condition";
     if (percent >= 75) return "is scratched";
     if (percent >= 50) return "is ruined";
@@ -470,7 +467,8 @@ bool Item::isEmpty() const
 {
     if (this->isAContainer() ||
         (model->getType() == ModelType::Magazine) ||
-        (model->getType() == ModelType::RangedWeapon))
+        (model->getType() == ModelType::RangedWeapon) ||
+        (model->getType() == ModelType::Light))
     {
         return content.empty();
     }
@@ -483,34 +481,30 @@ bool Item::isEmpty() const
 
 double Item::getTotalSpace() const
 {
+    // The base space.
+    double spaceBase = 0.0;
     if (model->getType() == ModelType::Container)
     {
-        // Evaluate the base space.
-        auto spBase = model->toContainer()->maxWeight;
-        // Evaluate the modifier due to item's quality.
-        auto spQuality = spBase * quality.getModifier();
-        // Evaluate the result.
-        return ((spBase + spQuality) / 2);
+        // Set the base space.
+        spaceBase = model->toContainer()->maxWeight;
     }
     if (model->getType() == ModelType::LiquidContainer)
     {
-        // Evaluate the base space.
-        auto spBase = model->toLiquidContainer()->maxWeight;
-        // Evaluate the modifier due to item's quality.
-        auto spQuality = spBase * quality.getModifier();
-        // Evaluate the result.
-        return ((spBase + spQuality) / 2);
+        // Set the base space.
+        spaceBase = model->toLiquidContainer()->maxWeight;
+    }
+    if (model->getType() == ModelType::Light)
+    {
+        // Set the base space.
+        spaceBase = model->toLight()->maxWeight;
     }
     if (model->getType() == ModelType::Shop)
     {
-        // Evaluate the base space.
-        auto spBase = model->toShop()->maxWeight;
-        // Evaluate the modifier due to item's quality.
-        auto spQuality = spBase * quality.getModifier();
-        // Evaluate the result.
-        return ((spBase + spQuality) / 2);
+        // Set the base space.
+        spaceBase = model->toShop()->maxWeight;
     }
-    return 0.0;
+    // Evaluate the result.
+    return ((spaceBase + (spaceBase * quality.getModifier())) / 2);
 }
 
 double Item::getUsedSpace() const
@@ -561,7 +555,7 @@ void Item::putInside(Item *& item, bool updateDB)
         SQLiteDbms::instance().insertInto("ItemContent", {ToString(this->vnum), ToString(item->vnum)}, false, true);
     }
     // Log it.
-    //Logger::log(LogLevel::Debug, "Item '%s' added to '%s';", item->getName(), this->getName());
+    Logger::log(LogLevel::Debug, "Item '%s' added to '%s';", item->getName(), this->getName());
 }
 
 bool Item::takeOut(Item * item, bool updateDB)
@@ -578,7 +572,7 @@ bool Item::takeOut(Item * item, bool updateDB)
         SQLiteDbms::instance().deleteFrom("ItemContent", {std::make_pair("item", ToString(item->vnum))});
     }
     // Log it.
-    //Logger::log(LogLevel::Debug, "Item '%s' taken out from '%s';", item->getName(), this->getName());
+    Logger::log(LogLevel::Debug, "Item '%s' taken out from '%s';", item->getName(), this->getName());
     return true;
 }
 
@@ -722,6 +716,20 @@ std::string Item::lookContent()
                       + Formatter::reset();
             output += " out of " + Formatter::yellow() + ToString(getTotalSpace())
                       + Formatter::reset() + " " + Mud::instance().getWeightMeasure() + ".\n";
+        }
+    }
+    else if (model->getType() == ModelType::Light)
+    {
+        if (content.empty())
+        {
+            output += Formatter::italic() + "It does not contain any fuel.\n" + Formatter::reset();
+        }
+        else
+        {
+            auto remainingFuel = this->toLightItem()->getRemainingFuel();
+            output += Formatter::italic();
+            output += "It contains enough fuel for " + ToString(remainingFuel) + " h.\n";
+            output += Formatter::reset();
         }
     }
     else if (model->getType() == ModelType::Magazine)

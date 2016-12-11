@@ -180,7 +180,7 @@ ActionStatus BuildAction::perform()
     {
         // Update the condition of the involved objects.
         iterator->triggerDecay();
-        if (iterator->condition == 0)
+        if (iterator->condition < 0)
         {
             actor->sendMsg(iterator->getName(true) + " falls into pieces.");
         }

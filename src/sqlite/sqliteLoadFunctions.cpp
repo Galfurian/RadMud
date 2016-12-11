@@ -137,8 +137,8 @@ bool LoadItem(ResultSet * result)
             item->maker = result->getNextString();
             item->price = result->getNextUnsignedInteger();
             item->weight = result->getNextDouble();
-            item->condition = result->getNextUnsignedInteger();
-            item->maxCondition = result->getNextUnsignedInteger();
+            item->condition = result->getNextDouble();
+            item->maxCondition = result->getNextDouble();
             item->composition = Mud::instance().findMaterial(result->getNextInteger());
             item->quality = ItemQuality(result->getNextUnsignedInteger());
             item->flags = result->getNextUnsignedInteger();
@@ -263,8 +263,7 @@ bool LoadModel(ResultSet * result)
             itemModel->modelFlags = result->getNextUnsignedInteger();
             itemModel->baseWeight = result->getNextDouble();
             itemModel->basePrice = result->getNextUnsignedInteger();
-            itemModel->condition = result->getNextUnsignedInteger();
-            itemModel->decay = result->getNextUnsignedInteger();
+            itemModel->condition = result->getNextDouble();
             itemModel->material = MaterialType(result->getNextUnsignedInteger());
             itemModel->tileSet = result->getNextInteger();
             itemModel->tileId = result->getNextInteger();

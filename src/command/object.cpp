@@ -2101,7 +2101,7 @@ bool DoTurn(Character * character, ArgumentHandler & args)
         }
         else
         {
-            if (lightItem->getRemainingHour() > 0)
+            if (lightItem->getRemainingFuel() > 0)
             {
                 character->sendMsg("You turn on %s.\n", item->getName(true));
                 lightItem->active = true;
@@ -2127,34 +2127,66 @@ bool DoRefill(Character * character, ArgumentHandler & args)
         return false;
     }
     // Retrieve the item that has to be refilled.
-    auto item = character->findEquipmentItem(args[0].getContent(), args[0].getIndex());
-    if (item == nullptr)
+    auto itemToRefill = character->findEquipmentItem(args[0].getContent(), args[0].getIndex());
+    if (itemToRefill == nullptr)
     {
-        item = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
-        if (item == nullptr)
+        itemToRefill = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
+        if (itemToRefill == nullptr)
         {
             character->sendMsg("You don't have %s.\n", args[0].getContent());
             return false;
         }
     }
     // Retrieve the fuel.
-    auto fuel = character->findEquipmentItem(args[1].getContent(), args[1].getIndex());
+    auto fuel = character->findInventoryItem(args[1].getContent(), args[1].getIndex());
     if (fuel == nullptr)
     {
-        fuel = character->findInventoryItem(args[1].getContent(), args[1].getIndex());
-        if (fuel == nullptr)
-        {
-            character->sendMsg("You don't have %s.\n", args[1].getContent());
-            return false;
-        }
+        character->sendMsg("You don't have %s.\n", args[1].getContent());
+        return false;
     }
     std::string error;
     unsigned int ammountToLoad = 0;
-    if (!item->toLightItem()->getAmmountToRefill(fuel, ammountToLoad, error))
+    if (!itemToRefill->toLightItem()->getAmmountToRefill(fuel, ammountToLoad, error))
     {
         character->sendMsg(error + "\n");
         return false;
     }
-    character->sendMsg("You can put %s of %s inside %s.\n", fuel->getName(true), ammountToLoad, item->getName(true));
+    // Start a transaction.
+    SQLiteDbms::instance().beginTransaction();
+    if (fuel->quantity <= ammountToLoad)
+    {
+        // Remove the item from the player's inventory.
+        character->remInventoryItem(fuel);
+        // Put the item inside the container.
+        itemToRefill->putInside(fuel);
+        // Send the messages.
+        character->sendMsg("You refill %s with %s.\n", itemToRefill->getName(true), fuel->getName(true));
+        character->room->sendToAll("%s refills %s with %s.\n",
+                                   {character},
+                                   character->getNameCapital(), itemToRefill->getName(true), fuel->getName(true));
+    }
+    else
+    {
+        // Remove from the stack.
+        auto newStack = fuel->removeFromStack(character, ammountToLoad);
+        if (newStack == nullptr)
+        {
+            character->sendMsg("You failed to refill %s with part of %s.\n",
+                               itemToRefill->getName(true),
+                               fuel->getName(true));
+            // Rollback the transaction.
+            SQLiteDbms::instance().rollbackTransection();
+            return false;
+        }
+        // Put the stack inside the container.
+        itemToRefill->putInside(newStack);
+        // Send the messages.
+        character->sendMsg("You put refill %s with part of %s.\n", itemToRefill->getName(true), fuel->getName(true));
+        character->room->sendToAll("%s refills %s with part of %s.\n",
+                                   {character},
+                                   character->getNameCapital(), itemToRefill->getName(true), fuel->getName(true));
+    }
+    // Conclude the transaction.
+    SQLiteDbms::instance().endTransaction();
     return true;
 }

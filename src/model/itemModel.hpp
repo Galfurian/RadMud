@@ -124,9 +124,7 @@ public:
     /// The model base price.
     unsigned int basePrice;
     /// The model maximum condition.
-    unsigned int condition;
-    /// The model maximum condition.
-    unsigned int decay;
+    double condition;
     /// The model's material.
     MaterialType material;
     /// TileSet of the icon.

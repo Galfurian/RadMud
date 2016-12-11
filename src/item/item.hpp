@@ -84,9 +84,9 @@ public:
     /// The item's weight.
     double weight;
     /// The item's condition.
-    unsigned int condition;
+    double condition;
     /// The maximum condition.
-    unsigned int maxCondition;
+    double maxCondition;
     /// The composing material of the item.
     Material * composition;
     /// The quality of the item.
@@ -178,9 +178,7 @@ public:
     ///         <b>False</b> Otherwise.
     bool hasKey(std::string key);
 
-    /// @brief Provides the maximum condition of the item, given
-    ///         quality and material.
-    unsigned int getMaxCondition() const;
+    virtual double getDecayRate() const;
 
     /// @brief Trigger a decay cycle.
     virtual void triggerDecay();

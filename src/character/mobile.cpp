@@ -201,10 +201,10 @@ void Mobile::kill()
         // Add the item to the mud.
         Mud::instance().addItem(item);
         // Evaluate the minimum and maximum condition.
-        unsigned int min = (item->getMaxCondition() / 100) * 10;
-        unsigned int max = (item->getMaxCondition() / 100) * 50;
+        auto min = (item->maxCondition / 100) * 10;
+        auto max = (item->maxCondition / 100) * 50;
         // Set a random condition for the new item.
-        item->condition = TRandInteger<unsigned int>(min, max);
+        item->condition = TRandReal<double>(min, max);
     };
     // Before calling the character kill function, set the vnum for the new
     //  items, and set the item condition to a random value from 10% to 50%.

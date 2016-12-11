@@ -255,17 +255,28 @@ std::string EnumToString(const ValueType & value)
 template<typename ValueType>
 ValueType TRandInteger(const ValueType & lowerBound, const ValueType & upperBound)
 {
-    static_assert((
-                      std::is_same<ValueType, bool>::value ||
-                      std::is_same<ValueType, int>::value ||
-                      std::is_same<ValueType, int64_t>::value ||
-                      std::is_same<ValueType, unsigned int>::value ||
-                      std::is_same<ValueType, uint64_t>::value ||
-                      std::is_same<ValueType, double>::value), "template parameter is of the wrong type");
+    static_assert((std::is_same<ValueType, bool>::value || std::is_same<ValueType, int>::value ||
+                   std::is_same<ValueType, int64_t>::value || std::is_same<ValueType, unsigned int>::value ||
+                   std::is_same<ValueType, uint64_t>::value), "template parameter is of the wrong type");
+    std::uniform_int_distribution<ValueType> distribution(lowerBound, upperBound);
+    std::random_device randomDevice;
+    std::default_random_engine generator(randomDevice());
+    return distribution(generator);
+}
 
-    std::random_device rng;
-    std::uniform_int_distribution<ValueType> uid(lowerBound, upperBound);
-    return uid(rng);
+/// @brief Generate a random integral value between the defined range.
+/// @param lowerBound The lower bound for the random value.
+/// @param upperBound The upper bound for the random value.
+/// @return The generated random value.
+template<typename ValueType>
+ValueType TRandReal(const ValueType & lowerBound, const ValueType & upperBound)
+{
+    static_assert((std::is_same<ValueType, double>::value || std::is_same<ValueType, float>::value),
+                  "template parameter is of the wrong type");
+    std::uniform_real_distribution<ValueType> distribution(lowerBound, upperBound);
+    std::random_device randomDevice;
+    std::default_random_engine generator(randomDevice());
+    return distribution(generator);
 }
 
 /// @brief Check if the string is a number.

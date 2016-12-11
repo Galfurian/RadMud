@@ -56,7 +56,6 @@ ItemModel::ItemModel() :
     baseWeight(),
     basePrice(),
     condition(),
-    decay(),
     material(),
     tileSet(),
     tileId()
@@ -95,7 +94,6 @@ void ItemModel::getSheet(Table & sheet) const
     sheet.addRow({"Slot", this->slot.toString()});
     sheet.addRow({"Flags", GetModelFlagString(this->modelFlags)});
     sheet.addRow({"Condition", ToString(this->condition)});
-    sheet.addRow({"Decay", ToString(this->decay)});
     sheet.addRow({"Material", this->material.toString()});
     sheet.addRow({"Tile", ToString(this->condition)});
     sheet.addRow({"Condition", ToString(this->tileSet) + ":" + ToString(this->tileId)});
@@ -165,9 +163,9 @@ Item * ItemModel::createItem(
         // Evaluate the base value.
         auto valBase = this->condition;
         // Evaluate the modifier due to item's quality.
-        auto valQuality = static_cast<unsigned int>(valBase * itemQuality.getModifier());
+        auto valQuality = valBase * itemQuality.getModifier();
         // Evaluate the modifier due to item's material.
-        auto valMaterial = static_cast<unsigned int>(valBase * composition->getHardnessModifier());
+        auto valMaterial = valBase * composition->getHardnessModifier();
         // Evaluate the result.
         newItem->maxCondition = ((valBase + valQuality + valMaterial) / 3);
         newItem->condition = newItem->maxCondition;
@@ -223,7 +221,6 @@ bool ItemModel::check()
         assert(slot != EquipmentSlot::None);
     }
     assert(condition > 0);
-    assert(decay > 0);
     assert(this->material != MaterialType::None);
     assert(tileSet >= 0);
     assert(tileId >= 0);
@@ -290,7 +287,6 @@ void ItemModel::luaRegister(lua_State * L)
         .beginClass<ItemModel>("ItemModel")
         .addData("vnum", &ItemModel::vnum)
         .addData("condition", &ItemModel::condition)
-        .addData("decay", &ItemModel::decay)
         .addFunction("toTool", &ItemModel::toTool)
         .addFunction("getType", &ItemModel::getType)
         .endClass()

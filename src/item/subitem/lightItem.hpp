@@ -38,15 +38,19 @@ public:
 
     void getSheet(Table & sheet) const override;
 
+    std::string lookContent() override;
+
     bool canRefillWith(Item * item, std::string & error) const;
 
     bool getAmmountToRefill(Item * item, unsigned int & ammount, std::string & error) const;
 
     std::vector<Item *> getAlreadyLoadedFuel() const;
 
-    unsigned int getRemainingHour() const;
+    double getRemainingFuel() const;
 
 protected:
+    void updateTicImpl() override;
+
     void updateHourImpl() override;
 
 };

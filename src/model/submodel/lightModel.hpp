@@ -34,10 +34,10 @@ public:
     ResourceType fuelType;
     /// The maximum radius of the light.
     unsigned int radius;
-    /// Maximum number of hours autonomy.
-    unsigned int maxHours;
     /// Recharging polocy
     unsigned int policy;
+    /// Maximum contained weight.
+    double maxWeight;
 
     LightModel();
 
