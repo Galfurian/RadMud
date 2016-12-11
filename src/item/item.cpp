@@ -705,55 +705,6 @@ std::string Item::lookContent()
                       + Formatter::reset() + " " + Mud::instance().getWeightMeasure() + ".\n";
         }
     }
-    else if (model->getType() == ModelType::Light)
-    {
-        if (content.empty())
-        {
-            output += Formatter::italic() + "It does not contain any fuel.\n" + Formatter::reset();
-        }
-        else
-        {
-            auto remainingFuel = this->toLightItem()->getRemainingFuel();
-            output += Formatter::italic();
-            output += "It contains enough fuel for " + ToString(remainingFuel) + " h.\n";
-            output += Formatter::reset();
-        }
-    }
-    else if (model->getType() == ModelType::Magazine)
-    {
-        if (content.empty())
-        {
-            output += Formatter::italic() + "It does not contain any projectiles.\n" + Formatter::reset();
-        }
-        else
-        {
-            auto loadedProjectiles = content.front();
-            if (loadedProjectiles != nullptr)
-            {
-                output += Formatter::italic();
-                output += "It contains " + loadedProjectiles->getName(true) + "[";
-                output += ToString(loadedProjectiles->quantity) + "].\n";
-                output += Formatter::reset();
-            }
-        }
-    }
-    else if (model->getType() == ModelType::RangedWeapon)
-    {
-        if (content.empty())
-        {
-            output += Formatter::italic() + "It does not contain any magazine.\n" + Formatter::reset();
-        }
-        else
-        {
-            auto containedMagazine = content.front();
-            if (containedMagazine != nullptr)
-            {
-                output += Formatter::italic();
-                output += "It is loaded with " + containedMagazine->getName(true) + "\n";
-                output += Formatter::reset();
-            }
-        }
-    }
     else if (model->getType() == ModelType::LiquidContainer)
     {
         if (HasFlag(this->flags, ItemFlag::Closed))

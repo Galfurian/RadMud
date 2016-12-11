@@ -23,6 +23,7 @@
 #include "rangedWeaponModel.hpp"
 #include "magazineModel.hpp"
 #include "projectileModel.hpp"
+#include "formatter.hpp"
 
 RangedWeaponItem::RangedWeaponItem()
 {
@@ -44,6 +45,26 @@ void RangedWeaponItem::getSheet(Table & sheet) const
     sheet.addRow({"Min Damage", ToString(this->getMinDamage())});
     sheet.addRow({"Max Damage", ToString(this->getMaxDamage())});
     sheet.addRow({"Range     ", ToString(this->getRange())});
+}
+
+std::string RangedWeaponItem::lookContent()
+{
+    std::string output;
+    if (content.empty())
+    {
+        output += Formatter::italic() + "It does not contain any magazine.\n" + Formatter::reset();
+    }
+    else
+    {
+        auto containedMagazine = this->getAlreadyLoadedMagazine();
+        if (containedMagazine != nullptr)
+        {
+            output += Formatter::italic();
+            output += "It is loaded with " + containedMagazine->getName(true) + "\n";
+            output += Formatter::reset();
+        }
+    }
+    return output;
 }
 
 unsigned int RangedWeaponItem::rollDamage() const

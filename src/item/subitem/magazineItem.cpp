@@ -21,6 +21,7 @@
 
 #include "magazineItem.hpp"
 #include "magazineModel.hpp"
+#include "formatter.hpp"
 
 MagazineItem::MagazineItem()
 {
@@ -55,6 +56,27 @@ void MagazineItem::getSheet(Table & sheet) const
             sheet.addRow({"Projectile", projectile->getName(false)});
         }
     }
+}
+
+std::string MagazineItem::lookContent()
+{
+    std::string output;
+    if (content.empty())
+    {
+        output += Formatter::italic() + "It does not contain any projectiles.\n" + Formatter::reset();
+    }
+    else
+    {
+        auto loadedProjectiles = this->getAlreadyLoadedProjectile();
+        if (loadedProjectiles != nullptr)
+        {
+            output += Formatter::italic();
+            output += "It contains " + loadedProjectiles->getName(true) + "[";
+            output += ToString(loadedProjectiles->quantity) + "].\n";
+            output += Formatter::reset();
+        }
+    }
+    return output;
 }
 
 bool MagazineItem::canLoadWith(Item * projectile, std::string & error) const

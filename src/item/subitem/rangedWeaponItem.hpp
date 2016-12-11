@@ -37,6 +37,8 @@ public:
 
     void getSheet(Table & sheet) const override;
 
+    std::string lookContent() override;
+
     /// Randomly roll the weapon damage.
     unsigned int rollDamage() const;
 

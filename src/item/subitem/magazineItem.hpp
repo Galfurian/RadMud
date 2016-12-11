@@ -34,6 +34,8 @@ public:
 
     void getSheet(Table & sheet) const override;
 
+    std::string lookContent() override;
+
     /// @brief Checks if the current magazine can be loaded with the given item.
     /// @param projectile The projectile to load.
     /// @param error      An error string, set when the projectile cannot be loaded.
