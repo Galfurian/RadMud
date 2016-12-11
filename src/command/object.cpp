@@ -662,6 +662,7 @@ bool DoGive(Character * character, ArgumentHandler & args)
 
 bool DoEquipments(Character * character, ArgumentHandler & /*args*/)
 {
+    // Retrieve the equipment.
     auto head = character->findEquipmentSlotItem(EquipmentSlot::Head);
     auto back = character->findEquipmentSlotItem(EquipmentSlot::Back);
     auto torso = character->findEquipmentSlotItem(EquipmentSlot::Torso);
@@ -669,19 +670,55 @@ bool DoEquipments(Character * character, ArgumentHandler & /*args*/)
     auto feet = character->findEquipmentSlotItem(EquipmentSlot::Feet);
     auto right = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
     auto left = character->findEquipmentSlotItem(EquipmentSlot::LeftHand);
+    // Check if the room is lit.
+    bool roomIsLit = false;
+    if (character->room != nullptr)
+    {
+        roomIsLit = character->room->isLit();
+    }
     std::string output;
     // Print what is wearing.
     output += Formatter::yellow() + "#------------ Equipment -----------#\n" + Formatter::reset();
     // Equipment Slot : HEAD
-    output += "\tHead       : " + ((head != nullptr) ? head->getNameCapital(true) : "Nothing") + "\n";
+    output += "\tHead       : ";
+    if (head != nullptr)
+    {
+        if (roomIsLit) output += head->getNameCapital(true);
+        else output += "Something";
+    }
+    output += "\n";
     // Equipment Slot : BACK
-    output += "\tBack       : " + ((back != nullptr) ? back->getNameCapital(true) : "Nothing") + "\n";
+    output += "\tBack       : ";
+    if (back != nullptr)
+    {
+        if (roomIsLit) output += back->getNameCapital(true);
+        else output += "Something";
+    }
+    output += "\n";
     // Equipment Slot : TORSO
-    output += "\tTorso      : " + ((torso != nullptr) ? torso->getNameCapital(true) : "Nothing") + "\n";
+    output += "\tTorso      : ";
+    if (torso != nullptr)
+    {
+        if (roomIsLit) output += torso->getNameCapital(true);
+        else output += "Something";
+    }
+    output += "\n";
     // Equipment Slot : LEGS
-    output += "\tLegs       : " + ((legs != nullptr) ? legs->getNameCapital(true) : "Nothing") + "\n";
+    output += "\tLegs       : ";
+    if (legs != nullptr)
+    {
+        if (roomIsLit) output += legs->getNameCapital(true);
+        else output += "Something";
+    }
+    output += "\n";
     // Equipment Slot : FEET
-    output += "\tFeet       : " + ((feet != nullptr) ? feet->getNameCapital(true) : "Nothing") + "\n";
+    output += "\tFeet       : ";
+    if (feet != nullptr)
+    {
+        if (roomIsLit) output += feet->getNameCapital(true);
+        else output += "Something";
+    }
+    output += "\n";
     // Print what is wielding.
     if (right != nullptr)
     {
@@ -693,16 +730,17 @@ bool DoEquipments(Character * character, ArgumentHandler & /*args*/)
         {
             output += "\tRight Hand : ";
         }
-        output += right->getNameCapital(true) + "\n";
+        if (roomIsLit) output += right->getNameCapital(true);
+        else output += "Something";
+        output += "\n";
     }
-    else
-    {
-        output += "\tRight Hand : Nothing\n";
-    }
-
     if (left != nullptr)
     {
-        output += "\tLeft Hand  : " + left->getNameCapital(true) + "\n";
+        output += "\tLeft Hand  : ";
+
+        if (roomIsLit) output += left->getNameCapital(true);
+        else output += "Something";
+        output += "\n";
     }
     output += Formatter::yellow() + "#----------------------------------#\n" + Formatter::reset();
     character->sendMsg(output);
@@ -997,6 +1035,32 @@ bool DoInventory(Character * character, ArgumentHandler & /*args*/)
     {
         character->sendMsg(Formatter::gray() + "    You are carrying anything.\n" + Formatter::reset());
     }
+    bool roomIsLit = false;
+    bool inventoryLight = false;
+    // Check if the room is lit.
+    if (character->room != nullptr)
+    {
+        if ((!character->room->terrain->inside) && (MudUpdater::instance().getDayPhase() != DayPhase::Night))
+        {
+            roomIsLit = true;
+        }
+        else
+        {
+            roomIsLit = character->room->isLit();
+        }
+    }
+    // Check if the inventory contains a lit light source.
+    for (auto item : character->inventory)
+    {
+        if (item->getType() == ModelType::Light)
+        {
+            if (item->toLightItem()->active)
+            {
+                inventoryLight = true;
+                break;
+            }
+        }
+    }
     Table table = Table("Inventory");
     table.addColumn("Item", StringAlign::Left);
     table.addColumn("Quantity", StringAlign::Right);
@@ -1004,7 +1068,25 @@ bool DoInventory(Character * character, ArgumentHandler & /*args*/)
     // List all the items in inventory
     for (auto it : character->inventory)
     {
-        table.addRow({it->getNameCapital(), ToString(it->quantity), ToString(it->getWeight(true))});
+        TableRow row;
+        row.emplace_back((roomIsLit || inventoryLight) ? it->getNameCapital() : "Something");
+        if (roomIsLit || inventoryLight)
+        {
+            row.emplace_back(ToString(it->quantity));
+        }
+        else
+        {
+            if (it->quantity == 1)
+            {
+                row.emplace_back((roomIsLit || inventoryLight) ? it->getNameCapital() : "One");
+            }
+            else
+            {
+                row.emplace_back((roomIsLit || inventoryLight) ? it->getNameCapital() : "Some");
+            }
+        }
+        row.emplace_back(ToString(it->getWeight(true)));
+        table.addRow(row);
     }
     character->sendMsg(table.getTable());
     character->sendMsg("\n%sTotal carrying weight%s: %s of %s %s.\n",

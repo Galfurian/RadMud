@@ -20,6 +20,7 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
+#include <utilities/stopwatch.hpp>
 #include "room.hpp"
 
 #include "mechanismModel.hpp"
@@ -376,7 +377,7 @@ Item * Room::findDoor()
 
 bool Room::isLit()
 {
-    Logger::log(LogLevel::Debug, "Check if the room is lit");
+    Stopwatch<std::chrono::microseconds> stopwatch("isList");
     auto CheckRoomForLights = [this](Room * room)
     {
         auto LightIsActiveAndInRange = [this, room](Item * item)
@@ -400,7 +401,6 @@ bool Room::isLit()
         {
             if (LightIsActiveAndInRange(it))
             {
-                Logger::log(LogLevel::Debug, "Found active light '%s'", it->getName(true));
                 return true;
             }
         }
@@ -410,9 +410,6 @@ bool Room::isLit()
             {
                 if (LightIsActiveAndInRange(it2))
                 {
-                    Logger::log(LogLevel::Debug, "Found active light '%s' equipped by '%s'",
-                                it2->getName(true),
-                                it->getName());
                     return true;
                 }
             }
@@ -423,11 +420,11 @@ bool Room::isLit()
     auto dayPhase = MudUpdater::instance().getDayPhase();
     if ((!terrain->inside) && (dayPhase != DayPhase::Night))
     {
-        Logger::log(LogLevel::Debug, "Room is lit (outside)(!night)");
+        Logger::log(LogLevel::Debug, "Room is lit (outside)(!night)(%s us)", stopwatch.stop());
         return true;
     }
     // First check inside the current room.
-    auto validCoordinates = area->fov(coord, 5);
+    auto validCoordinates = area->fov(coord, 10);
     for (auto coordinates : validCoordinates)
     {
         auto room = area->getRoom(coordinates);
@@ -435,11 +432,12 @@ bool Room::isLit()
         {
             if (CheckRoomForLights(room))
             {
-                Logger::log(LogLevel::Debug, "Room is lit (LitByLight)");
+                Logger::log(LogLevel::Debug, "Room is lit (LitByLight)     (%s us)", stopwatch.stop());
                 return true;
             }
         }
     }
+    Logger::log(LogLevel::Debug, "Room is not lit              (%s us)", stopwatch.stop());
     return false;
 }
 
@@ -479,15 +477,20 @@ bool Room::removeExit(const Direction & direction)
 std::string Room::getLook(Character * actor)
 {
     std::string output = "";
-    if (this->isLit())
+    // Check if the room is lit.
+    bool roomIsLit = this->isLit();
+    // Show the name of the room.
+    output += Formatter::bold() + name + Formatter::reset() + "\n";
+    // Show the description of the room only if it is lit.
+    if (roomIsLit)
     {
-        output += Formatter::bold() + name + Formatter::reset() + "\n";
         output += description + "\n";
     }
     else
     {
         output += "You don't see anything nearby.\n";
     }
+    // Show the map.
     if (exits.empty())
     {
         output += "There is no exit from here!\n";
@@ -522,49 +525,50 @@ std::string Room::getLook(Character * actor)
             }
         }
     }
-    ///////////////////////////////////////////////////////////////////////////
-    // List all the items placed in the same room.
-    for (auto it : items)
+    // Show the characters/items inside the room only if it is lit.
+    if (roomIsLit)
     {
-        // If the item is invisible, don't show it.
-        if (HasFlag(it->model->modelFlags, ModelFlag::Invisible))
+        // List all the items placed in the same room.
+        for (auto it : items)
         {
-            continue;
+            // If the item is invisible, don't show it.
+            if (HasFlag(it->model->modelFlags, ModelFlag::Invisible))
+            {
+                continue;
+            }
+            if (HasFlag(it->flags, ItemFlag::Built))
+            {
+                output += "[B]";
+            }
+            // If there are more of this item, show the counter.
+            if (it->quantity > 1)
+            {
+                output += Formatter::cyan() + it->getNameCapital() + Formatter::reset() + " are here.["
+                          + ToString(it->quantity) + "]\n";
+            }
+            else
+            {
+                output += Formatter::cyan() + it->getNameCapital() + Formatter::reset() + " is here.\n";
+            }
         }
-        if (HasFlag(it->flags, ItemFlag::Built))
+        // List mobile in the same room.
+        for (auto iterator : getAllMobile(actor))
         {
-            output += "[B]";
+            if (!actor->canSee(iterator))
+            {
+                continue;
+            }
+            output += Formatter::blue() + iterator->getStaticDesc() + Formatter::reset() + "\n";
         }
-        // If there are more of this item, show the counter.
-        if (it->quantity > 1)
+        // List other players in the same room.
+        for (auto iterator : getAllPlayer(actor))
         {
-            output += Formatter::cyan() + it->getNameCapital() + Formatter::reset() + " are here.["
-                      + ToString(it->quantity) + "]\n";
+            if (!actor->canSee(iterator))
+            {
+                continue;
+            }
+            output += Formatter::gray() + iterator->getStaticDesc() + Formatter::reset() + "\n";
         }
-        else
-        {
-            output += Formatter::cyan() + it->getNameCapital() + Formatter::reset() + " is here.\n";
-        }
-    }
-    ///////////////////////////////////////////////////////////////////////////
-    // List mobile in the same room.
-    for (auto iterator : getAllMobile(actor))
-    {
-        if (!actor->canSee(iterator))
-        {
-            continue;
-        }
-        output += Formatter::blue() + iterator->getStaticDesc() + Formatter::reset() + "\n";
-    }
-    ///////////////////////////////////////////////////////////////////////////
-    // List other players in the same room.
-    for (auto iterator : getAllPlayer(actor))
-    {
-        if (!actor->canSee(iterator))
-        {
-            continue;
-        }
-        output += Formatter::gray() + iterator->getStaticDesc() + Formatter::reset() + "\n";
     }
     return output;
 }
