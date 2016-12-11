@@ -33,7 +33,7 @@ public:
     /// The type of fuel used to keep the light on.
     ResourceType fuelType;
     /// The maximum radius of the light.
-    unsigned int radius;
+    int radius;
     /// Recharging polocy
     unsigned int policy;
     /// Maximum contained weight.

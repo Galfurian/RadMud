@@ -27,7 +27,8 @@
 LightModel::LightModel() :
     fuelType(),
     radius(),
-    policy()
+    policy(),
+    maxWeight()
 {
     // Nothing to do.
 }
@@ -61,7 +62,7 @@ bool LightModel::setModel(const std::string & source)
         return false;
     }
     fuelType = ResourceType(ToNumber<unsigned int>(functionList[0]));
-    radius = ToNumber<unsigned int>(functionList[1]);
+    radius = ToNumber<int>(functionList[1]);
     policy = ToNumber<unsigned int>(functionList[2]);
     maxWeight = ToNumber<double>(functionList[3]);
     return true;
