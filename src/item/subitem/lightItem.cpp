@@ -160,8 +160,11 @@ void LightItem::updateTicImpl()
             // This will result in a double call to trigger decay,
             //  one in the base class and one here.
             this->triggerDecay();
-            // Just for precaution, deactivate the light source.
-            active = false;
+            // Just for precaution, deactivate the light source if the condition is below zero.
+            if (this->condition < 0)
+            {
+                active = false;
+            }
         }
         else
         {
