@@ -20,6 +20,7 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
+#include <item/subitem/resourceItem.hpp>
 #include "itemFactory.hpp"
 
 #include "armorItem.hpp"
@@ -68,6 +69,10 @@ Item * ItemFactory::newItem(const ModelType & type)
     if (type == ModelType::Shop)
     {
         return new ShopItem();
+    }
+    if (type == ModelType::Resource)
+    {
+        return new ResourceItem();
     }
     return new Item();
 }

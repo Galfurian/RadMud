@@ -2187,7 +2187,7 @@ bool DoTurn(Character * character, ArgumentHandler & args)
         }
         else
         {
-            if (lightItem->getRemainingFuel() > 0)
+            if (lightItem->getAutonomy() > 0)
             {
                 character->sendMsg("You turn on %s.\n", item->getName(true));
                 lightItem->active = true;

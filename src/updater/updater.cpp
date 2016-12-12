@@ -80,6 +80,16 @@ void MudUpdater::addItemToDestroy(Item * item)
     itemToDestroy.insert(itemToDestroy.end(), item);
 }
 
+unsigned int MudUpdater::getTicSize() const
+{
+    return ticSize;
+}
+
+unsigned int MudUpdater::getHourTicSize() const
+{
+    return hourTicSize;
+}
+
 size_t MudUpdater::getBandIn() const
 {
     return bandwidth_in;

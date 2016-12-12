@@ -297,14 +297,16 @@ bool Item::hasKey(std::string key)
 
 double Item::getDecayRate() const
 {
-    return (maxCondition / (composition->hardness * 10)) / quality.getModifier();
+    return (SafeLog10(maxCondition) / (composition->hardness * 10)) / quality.getModifier();
 }
 
 void Item::triggerDecay()
 {
     if (!HasFlag(model->modelFlags, ModelFlag::Unbreakable))
     {
+        Logger::log(LogLevel::Debug, "[%s] Before: %s", this->getName(true), condition);
         condition -= this->getDecayRate();
+        Logger::log(LogLevel::Debug, "[%s] Before: %s", this->getName(true), condition);
         if (condition < 0)
         {
             // Take everything out from the item.

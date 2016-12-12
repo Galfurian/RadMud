@@ -1,7 +1,7 @@
-/// @file   lightItem.hpp
+/// @file   resourceItem.hpp
 /// @brief  
 /// @author Enrico Fraccaroli
-/// @date   05/12/2016
+/// @date   12/12/2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -25,36 +25,14 @@
 #include "item.hpp"
 
 /// @brief Holds details about lights.
-class LightItem :
+class ResourceItem :
     public Item
 {
 public:
-    /// Activity status.
-    bool active;
 
-    LightItem();
+    ResourceItem();
 
-    virtual ~LightItem();
+    virtual ~ResourceItem();
 
-    std::string getName(bool colored = false) const override;
-
-    std::string getNameCapital(bool colored = false) const override;
-
-    void getSheet(Table & sheet) const override;
-
-    std::string lookContent() override;
-
-    bool canRefillWith(Item * item, std::string & error) const;
-
-    bool getAmmountToRefill(Item * item, unsigned int & ammount, std::string & error) const;
-
-    std::vector<Item *> getAlreadyLoadedFuel() const;
-
-    double getAutonomy() const;
-
-protected:
-    void updateTicImpl() override;
-
-    void updateHourImpl() override;
-
+    double getDecayRate() const override;
 };

@@ -178,6 +178,7 @@ public:
     ///         <b>False</b> Otherwise.
     bool hasKey(std::string key);
 
+    /// @brief Provides the rate at which the item decays each TIC.
     virtual double getDecayRate() const;
 
     /// @brief Trigger a decay cycle.

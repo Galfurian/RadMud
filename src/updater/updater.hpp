@@ -102,6 +102,10 @@ public:
 
     void addItemToDestroy(Item * item);
 
+    unsigned int getTicSize() const;
+
+    unsigned int getHourTicSize() const;
+
     /// @brief Provides the total input (from clients) bandwidth.
     size_t getBandIn() const;
 
