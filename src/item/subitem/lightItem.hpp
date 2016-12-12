@@ -36,6 +36,10 @@ public:
 
     virtual ~LightItem();
 
+    std::string getName(bool colored = false) const override;
+
+    std::string getNameCapital(bool colored = false) const override;
+
     void getSheet(Table & sheet) const override;
 
     std::string lookContent() override;

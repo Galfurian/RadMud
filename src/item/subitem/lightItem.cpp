@@ -39,6 +39,26 @@ LightItem::~LightItem()
     // Nothing to do.
 }
 
+std::string LightItem::getName(bool colored) const
+{
+    std::string itemName = Item::getName(colored);
+    if (this->active)
+    {
+        itemName += " (lit)";
+    }
+    return itemName;
+}
+
+std::string LightItem::getNameCapital(bool colored) const
+{
+    std::string itemName = Item::getNameCapital(colored);
+    if (this->active)
+    {
+        itemName += " (lit)";
+    }
+    return itemName;
+}
+
 void LightItem::getSheet(Table & sheet) const
 {
     // Call the function of the father class.

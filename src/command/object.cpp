@@ -2168,8 +2168,12 @@ bool DoTurn(Character * character, ArgumentHandler & args)
         item = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
         if (item == nullptr)
         {
-            character->sendMsg("You don't have %s.\n", args[0].getContent());
-            return false;
+            item = character->room->findItem(args[0].getContent(), args[0].getIndex());
+            if (item == nullptr)
+            {
+                character->sendMsg("You don't see '%s' anywhere.\n", args[0].getContent());
+                return false;
+            }
         }
     }
     if (item->getType() == ModelType::Light)
