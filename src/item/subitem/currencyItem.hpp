@@ -37,4 +37,6 @@ public:
     unsigned int getPrice(bool entireStack) const override;
 
     double getWeight(bool entireStack) const override;
+
+    void triggerDecay() override;
 };

@@ -60,3 +60,8 @@ double CurrencyItem::getWeight(bool) const
 {
     return 0.0;
 }
+
+void CurrencyItem::triggerDecay()
+{
+    // Nothing to do.
+}
