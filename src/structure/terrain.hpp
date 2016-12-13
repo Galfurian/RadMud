@@ -43,8 +43,10 @@ public:
     /// The lua_State associated with this terrain.
     lua_State * L;
 
+    /// @brief Constructor.
     Terrain();
 
+    /// @brief Constructor.
     Terrain(unsigned int _vnum, std::string _name, unsigned int _flags, unsigned int _space, bool _inside, bool _light);
 
     /// @brief Function used to register inside the lua environment the class.

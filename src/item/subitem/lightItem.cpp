@@ -143,7 +143,7 @@ bool LightItem::getAmmountToRefill(Item * item, unsigned int & ammount, std::str
     // Set by default the ammout to the maximum.
     auto maxWeight = this->model->toLight()->maxWeight;
     // Evaluate the weight of the content.
-    auto contentWeight = 0;
+    auto contentWeight = 0.0;
     for (auto it : content)
     {
         contentWeight += it->getWeight(true);

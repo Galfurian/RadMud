@@ -65,7 +65,7 @@ public:
            std::string _name,
            unsigned int _remainingTic,
            std::string _messageActivate,
-           std::string _messageFade,
+           std::string _messageExpire,
            std::function<void(Character * character)> _expireFunction,
            int _health,
            int _stamina,

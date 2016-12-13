@@ -43,7 +43,9 @@ bool Logger::openLog(const std::string & filename)
 {
     if (!Logger::getStream().is_open())
     {
-        Logger::getStream().open(filename.c_str(), std::ios::in | std::ios::out | std::ios::app);
+        Logger::getStream().open(filename.c_str(), std::ios::in |
+                                                   std::ios::out |
+                                                   std::ios::app);
     }
     return Logger::getStream().is_open();
 }
@@ -90,15 +92,17 @@ void Logger::log(const LogLevel & level, const std::string & msg)
     if (Logger::getStream().is_open())
     {
         // Write the log message inside the file.
-        Logger::getStream() << "[" << std::hex << std::this_thread::get_id() << std::dec << "]";
-        Logger::getStream() << "[" << Logger::levelToString(level) << "]";
-        Logger::getStream() << "[" << Logger::getDateTime() << "] ";
-        Logger::getStream() << msg << "\n";
+        Logger::getStream()
+            << "[" << std::hex << std::this_thread::get_id() << std::dec << "]"
+            << "[" << Logger::levelToString(level) << "]"
+            << "[" << Logger::getDateTime() << "] "
+            << msg << "\n";
     }
-    Logger::getOutputStream(level) << "[" << std::hex << std::this_thread::get_id() << std::dec << "]";
-    Logger::getOutputStream(level) << "[" << Logger::levelToString(level) << "]";
-    Logger::getOutputStream(level) << "[" << Logger::getDateTime() << "] ";
-    Logger::getOutputStream(level) << msg << "\n";
+    Logger::getOutputStream(level)
+        << "[" << std::hex << std::this_thread::get_id() << std::dec << "]"
+        << "[" << Logger::levelToString(level) << "]"
+        << "[" << Logger::getDateTime() << "] "
+        << msg << "\n";
     // Unlock the mutex.
     logMutex.unlock();
 }

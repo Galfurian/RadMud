@@ -20,17 +20,17 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include <item/subitem/resourceItem.hpp>
 #include "itemFactory.hpp"
 
+#include "shopItem.hpp"
 #include "armorItem.hpp"
+#include "lightItem.hpp"
 #include "corpseItem.hpp"
 #include "currencyItem.hpp"
-#include "lightItem.hpp"
+#include "resourceItem.hpp"
 #include "magazineItem.hpp"
 #include "meleeWeaponItem.hpp"
 #include "rangedWeaponItem.hpp"
-#include "shopItem.hpp"
 
 Item * ItemFactory::newItem(const ModelType & type)
 {

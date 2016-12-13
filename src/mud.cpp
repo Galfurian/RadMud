@@ -55,7 +55,31 @@ Mud::Mud() :
     _minVnumCorpses(),
     _mudMeasure("stones"),
     _mudDatabaseName("radmud.db"),
-    _mudSystemDirectory("../system/")
+    _mudSystemDirectory("../system/"),
+    mudPlayers(),
+    mudMobiles(),
+    mudItems(),
+    mudRooms(),
+    mudItemModels(),
+    mudAreas(),
+    mudRaces(),
+    mudFactions(),
+    mudSkills(),
+    mudWritings(),
+    mudCorpses(),
+    mudContinents(),
+    mudMaterials(),
+    mudProfessions(),
+    mudProductions(),
+    mudLiquids(),
+    mudTravelPoints(),
+    blockedIPs(),
+    badNames(),
+    mudNews(),
+    mudCommands(),
+    mudDirections(),
+    mudBuildings(),
+    mudTerrains()
 {
     // Nothing to do.
 }
@@ -171,11 +195,14 @@ bool Mud::saveRooms()
 bool Mud::saveMud()
 {
     bool result = true;
-    Logger::log(LogLevel::Global, "Saving information on Database for : Players...");
+    Logger::log(LogLevel::Global,
+                "Saving information on Database for : Players...");
     result &= Mud::instance().savePlayers();
-    Logger::log(LogLevel::Global, "Saving information on Database for : Items...");
+    Logger::log(LogLevel::Global,
+                "Saving information on Database for : Items...");
     result &= Mud::instance().saveItems();
-    Logger::log(LogLevel::Global, "Saving information on Database for : Rooms...");
+    Logger::log(LogLevel::Global,
+                "Saving information on Database for : Rooms...");
     result &= Mud::instance().saveRooms();
     return result;
 }
@@ -271,7 +298,8 @@ bool Mud::remCorpse(Item * corpse)
 
 bool Mud::addItemModel(ItemModel * model)
 {
-    return (model == nullptr) ? false : mudItemModels.insert(std::make_pair(model->vnum, model)).second;
+    return (model == nullptr) ? false : mudItemModels.insert(
+        std::make_pair(model->vnum, model)).second;
 }
 
 bool Mud::addArea(Area * area)
@@ -281,17 +309,20 @@ bool Mud::addArea(Area * area)
 
 bool Mud::addRace(Race * race)
 {
-    return (race == nullptr) ? false : mudRaces.insert(std::make_pair(race->vnum, race)).second;
+    return (race == nullptr) ? false : mudRaces.insert(
+        std::make_pair(race->vnum, race)).second;
 }
 
 bool Mud::addFaction(Faction * faction)
 {
-    return (faction == nullptr) ? false : mudFactions.insert(std::make_pair(faction->vnum, faction)).second;
+    return (faction == nullptr) ? false : mudFactions.insert(
+        std::make_pair(faction->vnum, faction)).second;
 }
 
 bool Mud::addSkill(Skill * skill)
 {
-    return (skill == nullptr) ? false : mudSkills.insert(std::make_pair(skill->vnum, skill)).second;
+    return (skill == nullptr) ? false : mudSkills.insert(
+        std::make_pair(skill->vnum, skill)).second;
 }
 
 bool Mud::addWriting(Writing * writing)
@@ -301,27 +332,32 @@ bool Mud::addWriting(Writing * writing)
 
 bool Mud::addContinent(Continent * continent)
 {
-    return mudContinents.insert(std::make_pair(continent->vnum, continent)).second;
+    return mudContinents.insert(
+        std::make_pair(continent->vnum, continent)).second;
 }
 
 bool Mud::addMaterial(Material * material)
 {
-    return (material == nullptr) ? false : mudMaterials.insert(std::make_pair(material->vnum, material)).second;
+    return (material == nullptr) ? false : mudMaterials.insert(
+        std::make_pair(material->vnum, material)).second;
 }
 
 bool Mud::addProfession(Profession * profession)
 {
-    return (profession == nullptr) ? false : mudProfessions.insert(std::make_pair(profession->vnum, profession)).second;
+    return (profession == nullptr) ? false : mudProfessions.insert(
+        std::make_pair(profession->vnum, profession)).second;
 }
 
 bool Mud::addProduction(Production * production)
 {
-    return (production == nullptr) ? false : mudProductions.insert(std::make_pair(production->vnum, production)).second;
+    return (production == nullptr) ? false : mudProductions.insert(
+        std::make_pair(production->vnum, production)).second;
 }
 
 bool Mud::addLiquid(Liquid * liquid)
 {
-    return (liquid == nullptr) ? false : mudLiquids.insert(std::make_pair(liquid->vnum, liquid)).second;
+    return (liquid == nullptr) ? false : mudLiquids.insert(
+        std::make_pair(liquid->vnum, liquid)).second;
 }
 
 bool Mud::addTravelPoint(Room * source, Room * target)
@@ -428,7 +464,8 @@ Race * Mud::findRace(int vnum)
 
 Race * Mud::findRace(std::string name)
 {
-    for (std::map<int, Race *>::iterator iterator = mudRaces.begin(); iterator != mudRaces.end();
+    for (std::map<int, Race *>::iterator iterator = mudRaces.begin();
+         iterator != mudRaces.end();
          ++iterator)
     {
         if (ToLower(iterator->second->name) == ToLower(name))
@@ -514,7 +551,8 @@ Material * Mud::findMaterial(int vnum)
 
 Profession * Mud::findProfession(unsigned int vnum)
 {
-    std::map<unsigned int, Profession *>::iterator iterator = mudProfessions.find(vnum);
+    std::map<unsigned int, Profession *>::iterator iterator = mudProfessions.find(
+        vnum);
     if (iterator != mudProfessions.end())
     {
         return iterator->second;
@@ -641,7 +679,8 @@ Direction Mud::findDirection(const std::string & direction, bool exact)
 bool Mud::runMud()
 {
     // Open logging file.
-    if (!Logger::instance().openLog(Mud::instance().getMudSystemDirectory() + GetDate() + ".log"))
+    if (!Logger::instance().openLog(
+        Mud::instance().getMudSystemDirectory() + GetDate() + ".log"))
     {
         std::cerr << "Can't create the logging file." << std::endl;
         return false;
@@ -679,7 +718,8 @@ bool Mud::runMud()
             this->setupDescriptor(iterator);
         }
         // Check for activity, timeout after 'timeout' seconds.
-        int activity = select((_maxDesc + 1), &in_set, &out_set, &exc_set, &timeoutVal);
+        int activity = select((_maxDesc + 1), &in_set, &out_set, &exc_set,
+                              &timeoutVal);
         if ((activity < 0) && (errno != EINTR))
         {
             perror("Select");
@@ -689,7 +729,8 @@ bool Mud::runMud()
         {
             if (!this->processNewConnection())
             {
-                Logger::log(LogLevel::Error, "Error during processing a new connection.");
+                Logger::log(LogLevel::Error,
+                            "Error during processing a new connection.");
             }
         }
         // Handle all player input/output.
@@ -700,7 +741,8 @@ bool Mud::runMud()
     } while (!_shutdownSignal);
     if (!this->stopMud())
     {
-        Logger::log(LogLevel::Error, "Something gone wrong during the shutdown.");
+        Logger::log(LogLevel::Error,
+                    "Something gone wrong during the shutdown.");
         return false;
     }
     return true;
@@ -717,7 +759,8 @@ bool Mud::checkSocket(const int & socket) const
 {
     int error_code;
     socklen_t error_code_size = sizeof(error_code);
-    return getsockopt(socket, SOL_SOCKET, SO_ERROR, &error_code, &error_code_size) == 0;
+    return getsockopt(socket, SOL_SOCKET, SO_ERROR, &error_code,
+                      &error_code_size) == 0;
 }
 
 bool Mud::closeSocket(const int & socket) const
@@ -800,12 +843,14 @@ void Mud::removeInactivePlayers()
             toRemove.insert(iterator);
         }
     }
-    for (auto iterator = toRemove.begin(); iterator != toRemove.end(); ++iterator)
+    for (auto iterator = toRemove.begin();
+         iterator != toRemove.end(); ++iterator)
     {
         // Get the player at the given position.
         auto player = *iterator;
         // Log the action of removing.
-        Logger::log(LogLevel::Global, "Removing inactive player : " + player->getName());
+        Logger::log(LogLevel::Global,
+                    "Removing inactive player : " + player->getName());
         // Only if the player has successfully logged in, save its state on DB.
         if (player->logged_in)
         {
@@ -877,7 +922,8 @@ bool Mud::processNewConnection()
         // Immediately close connections from blocked IP addresses.
         if (blockedIPs.find(address) != blockedIPs.end())
         {
-            Logger::log(LogLevel::Global, "Rejected connection from " + address + "!");
+            Logger::log(LogLevel::Global,
+                        "Rejected connection from " + address + "!");
             closeSocket(socketFileDescriptor);
             continue;
         }
@@ -885,7 +931,8 @@ bool Mud::processNewConnection()
         // Insert the player in the list of players.
         this->addPlayer(player);
         Logger::log(LogLevel::Global, "#--------- New Connection ---------#");
-        Logger::log(LogLevel::Global, " Socket  : " + ToString(socketFileDescriptor));
+        Logger::log(LogLevel::Global,
+                    " Socket  : " + ToString(socketFileDescriptor));
         Logger::log(LogLevel::Global, " Address : " + address);
         Logger::log(LogLevel::Global, " Port    : " + ToString(port));
         Logger::log(LogLevel::Global, "#----------------------------------#");
@@ -1040,7 +1087,8 @@ bool Mud::initComunications()
     struct linger ld = linger();
 
     // Don't allow closed sockets to linger.
-    if (setsockopt(_servSocket, SOL_SOCKET, SO_LINGER, reinterpret_cast<char *>(&ld), sizeof ld) < 0)
+    if (setsockopt(_servSocket, SOL_SOCKET, SO_LINGER,
+                   reinterpret_cast<char *>(&ld), sizeof ld) < 0)
     {
         perror("Setsockopt (SO_LINGER)");
         return false;
@@ -1049,7 +1097,8 @@ bool Mud::initComunications()
     int x = 1;
 
     // Allow address reuse.
-    if (setsockopt(_servSocket, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char *>(&x), sizeof x) == -1)
+    if (setsockopt(_servSocket, SOL_SOCKET, SO_REUSEADDR,
+                   reinterpret_cast<char *>(&x), sizeof x) == -1)
     {
         perror("Setsockopt (SO_REUSEADDR)");
         return false;
@@ -1060,7 +1109,8 @@ bool Mud::initComunications()
     socketAddress.sin_addr.s_addr = INADDR_ANY; // Change to listen on a specific adapter.
 
     // Bind the socket to our connection port.
-    if (::bind(_servSocket, reinterpret_cast<struct sockaddr *>(&socketAddress), sizeof(socketAddress)) < 0)
+    if (::bind(_servSocket, reinterpret_cast<struct sockaddr *>(&socketAddress),
+               sizeof(socketAddress)) < 0)
     {
         perror("BIND");
         return false;
@@ -1084,14 +1134,16 @@ bool Mud::initComunications()
 
 bool Mud::closeComunications()
 {
-    return (_servSocket == NO_SOCKET_COMMUNICATION) ? false : this->closeSocket(_servSocket);
+    return (_servSocket == NO_SOCKET_COMMUNICATION) ? false : this->closeSocket(
+        _servSocket);
 }
 
 bool Mud::startMud()
 {
     // Create a stopwatch for general timing information.
     Stopwatch<std::chrono::milliseconds> stopwatch("Boot");
-    Logger::log(LogLevel::Global, "#--------------------------------------------#");
+    Logger::log(LogLevel::Global,
+                "#--------------------------------------------#");
     Logger::log(LogLevel::Global, "             XXXXXXXXXXXXX                ");
     Logger::log(LogLevel::Global, "  /'--_###XXXXXXXXXXXXXXXXXXX###_--'\\    ");
     Logger::log(LogLevel::Global, "  \\##/#/#XXXXXXXXXXXXXXXXXXXXX#\\#\\##/  ");
@@ -1108,16 +1160,22 @@ bool Mud::startMud()
     Logger::log(LogLevel::Global, "      ##    #XXXX XXX XXX #    ##         ");
     Logger::log(LogLevel::Global, "       ##..##  XXXXXXXXX  ##..##          ");
     Logger::log(LogLevel::Global, "        ###      XXXXX     ####           ");
-    Logger::log(LogLevel::Global, "#--------------------------------------------#");
-    Logger::log(LogLevel::Global, "|                   RadMud                   |");
-    Logger::log(LogLevel::Global, "| Created by : Enrico Fraccaroli.            |");
-    Logger::log(LogLevel::Global, "| Date       : 29 September 2014             |");
-    Logger::log(LogLevel::Global, "#--------------------------------------------#");
+    Logger::log(LogLevel::Global,
+                "#--------------------------------------------#");
+    Logger::log(LogLevel::Global,
+                "|                   RadMud                   |");
+    Logger::log(LogLevel::Global,
+                "| Created by : Enrico Fraccaroli.            |");
+    Logger::log(LogLevel::Global,
+                "| Date       : 29 September 2014             |");
+    Logger::log(LogLevel::Global,
+                "#--------------------------------------------#");
     Logger::log(LogLevel::Global, "Booting...");
     Logger::log(LogLevel::Global, "Initializing Mud Variables...");
     if (!this->initVariables())
     {
-        Logger::log(LogLevel::Error, "Something gone wrong during variables initialization.");
+        Logger::log(LogLevel::Error,
+                    "Something gone wrong during variables initialization.");
         return false;
     }
 
@@ -1127,18 +1185,21 @@ bool Mud::startMud()
     Logger::log(LogLevel::Global, "Initializing Database...");
     if (!this->initDatabase())
     {
-        Logger::log(LogLevel::Error, "Something gone wrong during database initialization.");
+        Logger::log(LogLevel::Error,
+                    "Something gone wrong during database initialization.");
         return false;
     }
 
     Logger::log(LogLevel::Global, "Initializing Communications...");
     if (!this->initComunications())
     {
-        Logger::log(LogLevel::Error, "Something gone wrong during initialization of comunication.");
+        Logger::log(LogLevel::Error,
+                    "Something gone wrong during initialization of comunication.");
         return false;
     }
 
-    Logger::log(LogLevel::Global, "Booting Done (" + ToString(stopwatch.elapsed()) + ").");
+    Logger::log(LogLevel::Global,
+                "Booting Done (" + ToString(stopwatch.elapsed()) + ").");
     return true;
 }
 
@@ -1150,21 +1211,25 @@ bool Mud::stopMud()
     Logger::log(LogLevel::Global, "Closing Communications...");
     if (!Mud::instance().closeComunications())
     {
-        Logger::log(LogLevel::Error, "The communication has not been closed correctly.");
+        Logger::log(LogLevel::Error,
+                    "The communication has not been closed correctly.");
     }
 
     Logger::log(LogLevel::Global, "Saving Mud Information...");
     if (!Mud::instance().saveMud())
     {
-        Logger::log(LogLevel::Error, "Somwthing has gone wrong during data saving.");
+        Logger::log(LogLevel::Error,
+                    "Somwthing has gone wrong during data saving.");
     }
 
     Logger::log(LogLevel::Global, "Closing Database...");
     if (!SQLiteDbms::instance().closeDatabase())
     {
-        Logger::log(LogLevel::Error, "The database has not been closed correctly.");
+        Logger::log(LogLevel::Error,
+                    "The database has not been closed correctly.");
     }
-    Logger::log(LogLevel::Global, "Shutdown Completed (" + ToString(stopwatch.elapsed()) + ").");
+    Logger::log(LogLevel::Global,
+                "Shutdown Completed (" + ToString(stopwatch.elapsed()) + ").");
 
     ///////////////////////////////////////////////////////////////////////////
     size_t bIn = MudUpdater::instance().getBandIn();
@@ -1174,10 +1239,14 @@ bool Mud::stopMud()
     // Print some statistics.
     Logger::log(LogLevel::Info, "");
     Logger::log(LogLevel::Info, "Statistics");
-    Logger::log(LogLevel::Info, "    In            = " + ToString(bIn) + " Bytes.");
-    Logger::log(LogLevel::Info, "    Output        = " + ToString(bOut) + " Bytes.");
-    Logger::log(LogLevel::Info, "    Uncompressed  = " + ToString(bUnc) + " Bytes.");
-    Logger::log(LogLevel::Info, "    Band. Saved   = " + ToString(bUnc - bOut) + " Bytes.");
+    Logger::log(LogLevel::Info,
+                "    In            = " + ToString(bIn) + " Bytes.");
+    Logger::log(LogLevel::Info,
+                "    Output        = " + ToString(bOut) + " Bytes.");
+    Logger::log(LogLevel::Info,
+                "    Uncompressed  = " + ToString(bUnc) + " Bytes.");
+    Logger::log(LogLevel::Info,
+                "    Band. Saved   = " + ToString(bUnc - bOut) + " Bytes.");
     Logger::log(LogLevel::Info, "");
     return true;
 }

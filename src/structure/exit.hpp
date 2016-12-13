@@ -65,7 +65,10 @@ public:
     /// @param _destination The destination room.
     /// @param _direction   The direction of the exit.
     /// @param _flags       The exit flags.
-    Exit(Room * _source, Room * _destination, Direction _direction, unsigned int _flags);
+    Exit(Room * _source,
+         Room * _destination,
+         Direction _direction,
+         unsigned int _flags);
 
     /// Exit deconstructor.
     ~Exit();
@@ -88,7 +91,7 @@ public:
     ///         <b>False</b> otherwise.
     bool unlink() const;
 
-    /// @brief Define operator eual.
+    /// @brief Define equal operator.
     /// @param right The comparison exit.
     /// @return <b>True</b> if this and the right element has the same direction,<br>
     ///         <b>False</b> otherwise.
