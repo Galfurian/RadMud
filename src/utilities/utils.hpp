@@ -74,12 +74,15 @@ double SafeLog10(const double & source);
 /// @param first  The first (unsigned) value.
 /// @param second The second value.
 /// @return The sum of the two values.
-template<typename T>
-unsigned int SafeSum(const unsigned int & first, const T & second)
+template<typename UnsignedType, typename SignedType>
+UnsignedType SafeSum(const UnsignedType & first, const SignedType & second)
 {
-    T signedFirst = static_cast<T>(first);
-    T result = signedFirst + second;
-    return (result < 0) ? 0 : static_cast<unsigned int>(result);
+    SignedType signedFirst = static_cast<SignedType>(first);
+    if (signedFirst < second)
+    {
+        return 0;
+    }
+    return static_cast<UnsignedType>(signedFirst + second);
 }
 
 /// @brief Check if the passed value has the given flag set.
@@ -90,7 +93,8 @@ unsigned int SafeSum(const unsigned int & first, const T & second)
 template<typename Enum>
 bool HasFlag(const unsigned int & flags, Enum flag)
 {
-    static_assert(std::is_enum<Enum>::value, "template parameter is not an enum type");
+    static_assert(std::is_enum<Enum>::value,
+                  "template parameter is not an enum type");
     return (flags & static_cast<unsigned int>(flag)) != 0;
 }
 
@@ -100,7 +104,8 @@ bool HasFlag(const unsigned int & flags, Enum flag)
 template<typename Enum>
 void SetFlag(unsigned int * flags, Enum flag)
 {
-    static_assert(std::is_enum<Enum>::value, "template parameter is not an enum type");
+    static_assert(std::is_enum<Enum>::value,
+                  "template parameter is not an enum type");
     (*flags) |= static_cast<unsigned int>(flag);
 }
 
@@ -110,33 +115,39 @@ void SetFlag(unsigned int * flags, Enum flag)
 template<typename Enum>
 void ClearFlag(unsigned int * flags, Enum flag)
 {
-    static_assert(std::is_enum<Enum>::value, "template parameter is not an enum type");
+    static_assert(std::is_enum<Enum>::value,
+                  "template parameter is not an enum type");
     (*flags) &= ~static_cast<unsigned int>(flag);
 }
 
 /// @brief Check if the source string begin with a given prefix.
 /// @param source Source string.
 /// @param prefix Prefix string.
-/// @return <b>True</b> if the source begin with the given prefix, <br> <b>False</b> otherwise.
+/// @return <b>True</b> if the source begin with the given prefix,<br>
+///         <b>False</b> otherwise.
 bool BeginWith(const std::string & source, const std::string & prefix);
 
 /// @brief Check if the source string end with a given string.
 /// @param source Source string.
 /// @param suffix Final string.
-/// @return <b>True</b> if the source end with the given postfix, <b>False</b> otherwise.
+/// @return <b>True</b> if the source end with the given postfix,<br>
+///         <b>False</b> otherwise.
 bool EndWith(const std::string & source, const std::string & suffix);
 
 /// @brief Find and replace in a string.
 /// @param source      Source string.
 /// @param target      Target sub-string.
 /// @param replacement Replacement for the sub-string.
-void FindAndReplace(std::string * source, const std::string & target, const std::string & replacement);
+void FindAndReplace(std::string * source,
+                    const std::string & target,
+                    const std::string & replacement);
 
 /// @brief Get rid of leading and trailing spaces from a string
 /// @param source Source string.
 /// @param trim   Trim condition.
 /// @return String modified.
-std::string Trim(const std::string & source, const std::string & trim = std::string(" \t\r\n"));
+std::string Trim(const std::string & source,
+                 const std::string & trim = std::string(" \t\r\n"));
 
 /// @brief Convert all the stirng to lowercase.
 /// @param source Source string.
@@ -148,11 +159,13 @@ std::string ToLower(const std::string & source);
 /// @return String modified.
 std::string ToCapitals(const std::string & source);
 
-/// @brief Given a string and a delimiter, the string is splitted using the delimiter.
+/// @brief Given a string and a delimiter, the string is splitted
+///         by using the delimiter.
 /// @param source    The source string.
 /// @param delimiter The delimiter which has to be used.
 /// @return The splitted string.
-std::vector<std::string> SplitString(const std::string & source, const std::string & delimiter);
+std::vector<std::string> SplitString(const std::string & source,
+                                     const std::string & delimiter);
 
 /// @brief Get all the words in the source string.
 /// @param source The source string.
@@ -171,7 +184,8 @@ std::vector<ValueType> GetNumberVect(const std::string & source)
                       std::is_same<ValueType, long int>::value ||
                       std::is_same<ValueType, unsigned int>::value ||
                       std::is_same<ValueType, long unsigned int>::value ||
-                      std::is_same<ValueType, double>::value), "template parameter is of the wrong type");
+                      std::is_same<ValueType, double>::value),
+                  "template parameter is of the wrong type");
     std::stringstream line(source);
     std::vector<ValueType> output_vector;
     ValueType buffer;
@@ -190,11 +204,13 @@ std::string GetFormattedTime();
 /// @return The current date.
 std::string GetDate();
 
-/// @brief Return a vector containing all the files having the given extension in a folder.
+/// @brief Return a vector containing all the files having the
+///         given extension in a folder.
 /// @param folder    The folder where to look for files.
 /// @param extension Needed files extension.
 /// @return The list of the files.
-std::vector<std::string> GetAllFilesInFolder(const std::string & folder, const std::string & extension);
+std::vector<std::string> GetAllFilesInFolder(const std::string & folder,
+                                             const std::string & extension);
 
 /// @brief Transform a boolean into Yes or No.
 /// @param value The value to turn into string.
@@ -213,7 +229,8 @@ ValueType ToNumber(const std::string & source)
                       std::is_same<ValueType, int64_t>::value ||
                       std::is_same<ValueType, unsigned int>::value ||
                       std::is_same<ValueType, uint64_t>::value ||
-                      std::is_same<ValueType, double>::value), "template parameter is of the wrong type");
+                      std::is_same<ValueType, double>::value),
+                  "template parameter is of the wrong type");
     char * pEnd;
     return static_cast<ValueType>(strtol(source.c_str(), &pEnd, 10));
 }
@@ -230,7 +247,8 @@ std::string ToString(const ValueType & value)
                       std::is_same<ValueType, int64_t>::value ||
                       std::is_same<ValueType, unsigned int>::value ||
                       std::is_same<ValueType, uint64_t>::value ||
-                      std::is_same<ValueType, double>::value), "template parameter is of the wrong type");
+                      std::is_same<ValueType, double>::value),
+                  "template parameter is of the wrong type");
     std::ostringstream stm;
     stm << value;
     return stm.str();
@@ -242,7 +260,8 @@ std::string ToString(const ValueType & value)
 template<typename ValueType>
 std::string EnumToString(const ValueType & value)
 {
-    static_assert((std::is_enum<ValueType>::value), "template parameter is not an enum type");
+    static_assert((std::is_enum<ValueType>::value),
+                  "template parameter is not an enum type");
     std::ostringstream stm;
     stm << static_cast<unsigned int>(value);
     return stm.str();
@@ -253,12 +272,17 @@ std::string EnumToString(const ValueType & value)
 /// @param upperBound The upper bound for the random value.
 /// @return The generated random value.
 template<typename ValueType>
-ValueType TRandInteger(const ValueType & lowerBound, const ValueType & upperBound)
+ValueType TRandInteger(const ValueType & lowerBound,
+                       const ValueType & upperBound)
 {
-    static_assert((std::is_same<ValueType, bool>::value || std::is_same<ValueType, int>::value ||
-                   std::is_same<ValueType, int64_t>::value || std::is_same<ValueType, unsigned int>::value ||
-                   std::is_same<ValueType, uint64_t>::value), "template parameter is of the wrong type");
-    std::uniform_int_distribution<ValueType> distribution(lowerBound, upperBound);
+    static_assert((std::is_same<ValueType, bool>::value ||
+                   std::is_same<ValueType, int>::value ||
+                   std::is_same<ValueType, int64_t>::value ||
+                   std::is_same<ValueType, unsigned int>::value ||
+                   std::is_same<ValueType, uint64_t>::value),
+                  "template parameter is of the wrong type");
+    std::uniform_int_distribution<ValueType> distribution(lowerBound,
+                                                          upperBound);
     std::random_device randomDevice;
     std::default_random_engine generator(randomDevice());
     return distribution(generator);
@@ -271,9 +295,11 @@ ValueType TRandInteger(const ValueType & lowerBound, const ValueType & upperBoun
 template<typename ValueType>
 ValueType TRandReal(const ValueType & lowerBound, const ValueType & upperBound)
 {
-    static_assert((std::is_same<ValueType, double>::value || std::is_same<ValueType, float>::value),
+    static_assert((std::is_same<ValueType, double>::value ||
+                   std::is_same<ValueType, float>::value),
                   "template parameter is of the wrong type");
-    std::uniform_real_distribution<ValueType> distribution(lowerBound, upperBound);
+    std::uniform_real_distribution<ValueType> distribution(lowerBound,
+                                                           upperBound);
     std::random_device randomDevice;
     std::default_random_engine generator(randomDevice());
     return distribution(generator);
@@ -368,7 +394,8 @@ typename std::set<T>::iterator FindErase(std::set<T> & set, const T & item)
 /// Complexity: <b>Log(n)</b>.<br>
 /// Where n is the number of members in the map.
 template<typename K, typename T>
-inline typename std::map<K, T>::iterator FindErase(std::map<K, T> & map, const K & key)
+inline typename std::map<K, T>::iterator FindErase(std::map<K, T> & map,
+                                                   const K & key)
 {
     auto it = map.find(key);
     if (it != map.end())

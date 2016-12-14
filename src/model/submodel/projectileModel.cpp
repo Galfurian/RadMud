@@ -65,7 +65,7 @@ bool ProjectileModel::setModel(const std::string & source)
     }
     this->projectileType = static_cast<RangedWeaponType>(ToNumber<unsigned int>(functionList[0]));
     this->damageBonus = ToNumber<unsigned int>(functionList[1]);
-    this->rangeBonus = ToNumber<unsigned int>(functionList[2]);
+    this->rangeBonus = ToNumber<int>(functionList[2]);
     return true;
 }
 

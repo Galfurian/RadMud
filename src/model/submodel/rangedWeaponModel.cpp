@@ -67,7 +67,7 @@ bool RangedWeaponModel::setModel(const std::string & source)
     this->rangedWeaponType = static_cast<RangedWeaponType>(ToNumber<unsigned int>(functionList[0]));
     this->minDamage = ToNumber<unsigned int>(functionList[1]);
     this->maxDamage = ToNumber<unsigned int>(functionList[2]);
-    this->range = ToNumber<unsigned int>(functionList[3]);
+    this->range = ToNumber<int>(functionList[3]);
     return true;
 }
 

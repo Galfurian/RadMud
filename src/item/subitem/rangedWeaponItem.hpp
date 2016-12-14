@@ -49,7 +49,7 @@ public:
     unsigned int getMaxDamage() const;
 
     /// Provides the range of this weapon.
-    unsigned int getRange() const;
+    int getRange() const;
 
     /// @brief Checks if the current weapon can be reloaded with the given item.
     /// @param magazine The magazine to check.

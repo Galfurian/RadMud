@@ -52,7 +52,8 @@ std::string RangedWeaponItem::lookContent()
     std::string output;
     if (content.empty())
     {
-        output += Formatter::italic() + "It does not contain any magazine.\n" + Formatter::reset();
+        output += Formatter::italic() + "It does not contain any magazine.\n" +
+                  Formatter::reset();
     }
     else
     {
@@ -60,7 +61,8 @@ std::string RangedWeaponItem::lookContent()
         if (containedMagazine != nullptr)
         {
             output += Formatter::italic();
-            output += "It is loaded with " + containedMagazine->getName(true) + "\n";
+            output +=
+                "It is loaded with " + containedMagazine->getName(true) + "\n";
             output += Formatter::reset();
         }
     }
@@ -69,7 +71,8 @@ std::string RangedWeaponItem::lookContent()
 
 unsigned int RangedWeaponItem::rollDamage() const
 {
-    return TRandInteger<unsigned int>(this->getMinDamage(), this->getMaxDamage());
+    return TRandInteger<unsigned int>(this->getMinDamage(),
+                                      this->getMaxDamage());
 }
 
 unsigned int RangedWeaponItem::getMinDamage() const
@@ -87,7 +90,8 @@ unsigned int RangedWeaponItem::getMinDamage() const
     auto projectile = this->retrieveProjectile(error);
     if (projectile != nullptr)
     {
-        valBase = SafeSum(valBase, projectile->model->toProjectile()->damageBonus);
+        valBase = SafeSum(valBase,
+                          projectile->model->toProjectile()->damageBonus);
     }
     return valBase;
 }
@@ -107,60 +111,63 @@ unsigned int RangedWeaponItem::getMaxDamage() const
     auto projectile = this->retrieveProjectile(error);
     if (projectile != nullptr)
     {
-        valBase = SafeSum(valBase, projectile->model->toProjectile()->damageBonus);
+        valBase = SafeSum(valBase,
+                          projectile->model->toProjectile()->damageBonus);
     }
     return valBase;
 }
 
-unsigned int RangedWeaponItem::getRange() const
+int RangedWeaponItem::getRange() const
 {
     // Add the base value.
     auto valBase = this->model->toRangedWeapon()->range;
     // Evaluate the modifier due to item's quality.
-    valBase = SafeSum(valBase, valBase * quality.getModifier());
+    valBase += static_cast<int>(valBase * quality.getModifier());
     // Evaluate the modifier due to item's condition.
-    valBase = SafeSum(valBase, valBase * this->getConditionModifier());
+    valBase += static_cast<int>(valBase * this->getConditionModifier());
     // Evaluate the mean.
-    valBase = (valBase / 3);
+    valBase /= 3;
     // Add the bonus from the contained projectiles.
     std::string error;
     auto projectile = this->retrieveProjectile(error);
     if (projectile != nullptr)
     {
-        valBase = SafeSum(valBase, projectile->model->toProjectile()->rangeBonus);
+        valBase += projectile->model->toProjectile()->rangeBonus;
     }
     return valBase;
 }
 
 bool RangedWeaponItem::canBeReloadedWith(Item * magazine) const
 {
-    RangedWeaponModel * rangedWeaponModel = this->model->toRangedWeapon();
-    if (magazine->getType() == ModelType::Magazine)
+    if (magazine->getType() != ModelType::Magazine)
     {
-        MagazineModel * magazineModel = magazine->model->toMagazine();
-        if (magazineModel->projectileType == rangedWeaponModel->rangedWeaponType)
-        {
-            return true;
-        }
+        return false;
     }
-    return false;
+    if (model->getType() != ModelType::Projectile)
+    {
+        return false;
+    }
+    return (magazine->model->toMagazine()->projectileType ==
+            model->toRangedWeapon()->rangedWeaponType);
 }
 
 
 MagazineItem * RangedWeaponItem::getAlreadyLoadedMagazine() const
 {
-    if (!this->isEmpty())
+    if (this->isEmpty())
     {
-        Item * magazine = this->content.front();
-        if (magazine != nullptr)
-        {
-            if (magazine->getType() == ModelType::Magazine)
-            {
-                return magazine->toMagazineItem();
-            }
-        }
+        return nullptr;
     }
-    return nullptr;
+    Item * magazine = this->content.front();
+    if (magazine == nullptr)
+    {
+        return nullptr;
+    }
+    if (magazine->getType() != ModelType::Magazine)
+    {
+        return nullptr;
+    }
+    return magazine->toMagazineItem();
 }
 
 Item * RangedWeaponItem::retrieveProjectile(std::string & error) const
