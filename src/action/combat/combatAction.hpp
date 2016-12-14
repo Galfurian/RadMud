@@ -1,5 +1,6 @@
 /// @file   combatAction.hpp
-/// @brief  Contais the definition of the virtual class for general combat actions.
+/// @brief  Contais the definition of the virtual class for
+///          general combat actions.
 /// @author Enrico Fraccaroli
 /// @date   Jul 16 2016
 /// @copyright

@@ -1,5 +1,6 @@
 /// @file   flee.cpp
-/// @brief  Contais the implementation of the class for the action of fleeing from combat.
+/// @brief  Contais the implementation of the class for the action
+///          of fleeing from combat.
 /// @author Enrico Fraccaroli
 /// @date   Jul 14 2016
 /// @copyright
@@ -91,7 +92,8 @@ ActionStatus Flee::perform()
         return ActionStatus::Error;
     }
     // Get the character chance of fleeing (D20).
-    size_t fleeChance = TRandInteger<size_t>(0, 20) + actor->getAbilityModifier(Ability::Agility);
+    size_t fleeChance = TRandInteger<size_t>(0, 20) +
+                        actor->getAbilityModifier(Ability::Agility);
     // Get the required stamina.
     auto consumedStamina = this->getConsumedStamina(actor);
     // Base the escape level on how many enemies are surrounding the character.
@@ -107,7 +109,10 @@ ActionStatus Flee::perform()
         std::vector<Direction> directions;
         for (auto it : actor->room->getAvailableDirections())
         {
-            if (MoveAction::canMoveTo(actor, it, error, true)) directions.emplace_back(it);
+            if (MoveAction::canMoveTo(actor, it, error, true))
+            {
+                directions.emplace_back(it);
+            }
         }
         // Pick a random direction, from the poll of the available ones.
         auto randomDirValue = TRandInteger<size_t>(0, directions.size() - 1);
@@ -117,8 +122,8 @@ ActionStatus Flee::perform()
         // Check that the picked exit is not a null pointer.
         if (selected == nullptr)
         {
-            Logger::log(LogLevel::Error, "Selected null exit during action Flee.");
-            actor->sendMsg("You were not able to escape from your attackers.\n");
+            Logger::log(LogLevel::Error, "Selected null exit while fleeing.");
+            actor->sendMsg("You were not able to escape.\n");
         }
         else
         {
@@ -154,8 +159,10 @@ unsigned int Flee::getConsumedStamina(Character * character)
     // CARRIED  [+0.0 to +2.48]
     unsigned int consumedStamina = 1;
     consumedStamina -= character->getAbilityLog(Ability::Strength, 0.0, 1.0);
-    consumedStamina = SafeSum(consumedStamina, SafeLog10(character->weight));
-    consumedStamina = SafeSum(consumedStamina, SafeLog10(character->getCarryingWeight()));
+    consumedStamina = SafeSum(consumedStamina,
+                              SafeLog10(character->weight));
+    consumedStamina = SafeSum(consumedStamina,
+                              SafeLog10(character->getCarryingWeight()));
     return consumedStamina;
 }
 
@@ -174,13 +181,13 @@ unsigned int Flee::getCooldown(Character * character)
     cooldown = SafeSum(cooldown, SafeLog10(character->getCarryingWeight()));
     if (character->canAttackWith(EquipmentSlot::RightHand))
     {
-        auto weapon = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
-        cooldown = SafeSum(cooldown, SafeLog10(weapon->getWeight(true)));
+        auto wnp = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
+        cooldown = SafeSum(cooldown, SafeLog10(wnp->getWeight(true)));
     }
     if (character->canAttackWith(EquipmentSlot::LeftHand))
     {
-        auto weapon = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
-        cooldown = SafeSum(cooldown, SafeLog10(weapon->getWeight(true)));
+        auto wnp = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
+        cooldown = SafeSum(cooldown, SafeLog10(wnp->getWeight(true)));
     }
     return cooldown;
 }

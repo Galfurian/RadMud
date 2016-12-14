@@ -1,5 +1,6 @@
 /// @file   combatAction.cpp
-/// @brief  Contais the implementation of the virtual class for general combat actions.
+/// @brief  Contais the implementation of the virtual class for
+///          general combat actions.
 /// @author Enrico Fraccaroli
 /// @date   Jul 14 2016
 /// @copyright

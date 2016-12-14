@@ -65,9 +65,8 @@ public:
 
     /// @brief Returns the stamina required to execute the action.
     /// @param character The character.
-    /// @param posture   The character posture.
     /// @return The required stamina.
-    static unsigned int getConsumedStamina(Character * character, const CharacterPosture & posture);
+    static unsigned int getConsumedStamina(Character * character);
 
     /// @brief Provides the cooldown required to execute this action.
     /// @param character The character which has to execute the action.
