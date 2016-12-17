@@ -80,7 +80,7 @@ bool LoadAction::check(std::string & error) const
         if (loaded == nullptr)
         {
             Logger::log(LogLevel::Error, "The item already contains an item "
-                                         "which is a null pointer.");
+                "which is a null pointer.");
             error = "Something is gone wrong while you were loading " +
                     itemToBeLoaded->getName(true) + ".";
             return false;
@@ -89,7 +89,7 @@ bool LoadAction::check(std::string & error) const
         //  projectiles are compatible.
         if (!projectile->canStackWith(loaded))
         {
-            error = "You cannot stack the item with the one inside the container.";
+            error = "You cannot stack the item with the one inside.";
             return false;
         }
         if (itemToBeLoaded->model->toMagazine()->maxAmount <= loaded->quantity)
@@ -157,13 +157,15 @@ ActionStatus LoadAction::perform()
         }
         else
         {
-            auto newProjectileStack = projectile->removeFromStack(actor, amount);
+            auto newProjectileStack = projectile->removeFromStack(actor,
+                                                                  amount);
             if (newProjectileStack == nullptr)
             {
                 // Rollback the transaction.
                 SQLiteDbms::instance().rollbackTransection();
-                actor->sendMsg("Something is gone wrong while you were loading %s...\n\n",
-                               itemToBeLoaded->getName(true));
+                actor->sendMsg(
+                    "Something is gone wrong while you were loading %s.\n\n",
+                    itemToBeLoaded->getName(true));
                 return ActionStatus::Error;
             }
             itemToBeLoaded->putInside(newProjectileStack);
@@ -180,5 +182,6 @@ unsigned int LoadAction::getLoadTime(Item * projectile,
                                      const unsigned int & amountToLoad)
 {
     // Evaluates the required time for loading the magazine.
-    return static_cast<unsigned int>(projectile->getWeight(false) * amountToLoad);
+    return static_cast<unsigned int>(
+        projectile->getWeight(false) * amountToLoad);
 }

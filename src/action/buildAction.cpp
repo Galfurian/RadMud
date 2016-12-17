@@ -63,7 +63,8 @@ bool BuildAction::check(std::string & error) const
     }
     if (schematics == nullptr)
     {
-        Logger::log(LogLevel::Error, "The schematics for a building are a null pointer.");
+        Logger::log(LogLevel::Error,
+                    "The schematics for a building are a null pointer.");
         error = "You don't have a valid schematics set.";
         return false;
     }
@@ -72,7 +73,8 @@ bool BuildAction::check(std::string & error) const
         // Check if the ingredient has been deleted.
         if (iterator.first == nullptr)
         {
-            Logger::log(LogLevel::Error, "One of the ingredients is a null pointer.");
+            Logger::log(LogLevel::Error,
+                        "One of the ingredients is a null pointer.");
             error = "One of your ingredient is missing.";
             return false;
         }
@@ -187,7 +189,8 @@ ActionStatus BuildAction::perform()
     }
     // Send conclusion message.
     actor->sendMsg("You have finished building %s.\n\n",
-                   Formatter::yellow() + schematics->buildingModel->getName() + Formatter::reset());
+                   Formatter::yellow() + schematics->buildingModel->getName() +
+                   Formatter::reset());
     return ActionStatus::Finished;
 }
 
@@ -200,7 +203,8 @@ unsigned int BuildAction::getConsumedStamina(Character * character)
     unsigned int consumedStamina = 1;
     consumedStamina -= character->getAbilityLog(Ability::Strength, 0.0, 1.0);
     consumedStamina = SafeSum(consumedStamina, SafeLog10(character->weight));
-    consumedStamina = SafeSum(consumedStamina, SafeLog10(character->getCarryingWeight()));
+    consumedStamina = SafeSum(consumedStamina,
+                              SafeLog10(character->getCarryingWeight()));
     return consumedStamina;
 }
 

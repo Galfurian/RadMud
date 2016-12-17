@@ -113,7 +113,9 @@ unsigned int AimAction::getAimTime(Character * source, Character * target)
     {
         if ((source->room != nullptr) && (target->room != nullptr))
         {
-            requiredTime = SafeSum(requiredTime, Area::getDistance(source->room->coord, target->room->coord));
+            requiredTime = SafeSum(requiredTime,
+                                   Area::getDistance(source->room->coord,
+                                                     target->room->coord));
         }
     }
     return requiredTime;

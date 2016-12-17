@@ -118,11 +118,3 @@ public:
     /// @brief Returns the action <b>statically</b> casted to CombatAction.
     std::shared_ptr<CombatAction> toCombatAction();
 };
-
-/// @addtogroup EnumToString
-/// @{
-
-/// Return the string describing the type of Action.
-std::string GetActionTypeName(ActionType type);
-
-/// @}

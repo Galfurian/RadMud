@@ -76,5 +76,6 @@ public:
     /// @param character   The actor.
     /// @param _production The production used to performe the action.
     /// @return The non-decreasing value of the cooldown.
-    static unsigned int getCooldown(Character * character, Production * _production);
+    static unsigned int getCooldown(Character * character,
+                                    Production * _production);
 };

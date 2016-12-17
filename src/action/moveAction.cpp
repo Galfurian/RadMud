@@ -27,7 +27,9 @@
 #include "logger.hpp"
 #include "room.hpp"
 
-MoveAction::MoveAction(Character * _actor, Room * _destination, Direction _direction) :
+MoveAction::MoveAction(Character * _actor,
+                       Room * _destination,
+                       Direction _direction) :
     GeneralAction(_actor),
     destination(_destination),
     direction(_direction)
@@ -113,17 +115,20 @@ ActionStatus MoveAction::perform()
     // Check if the actor was aiming.
     if (actor->combatHandler.getAimedTarget() != nullptr)
     {
-        actor->effects.forceAddEffect(EffectFactory::disturbedAim(actor, 1, -3));
+        actor->effects.forceAddEffect(
+            EffectFactory::disturbedAim(actor, 1, -3));
     }
     // Move character.
     actor->moveTo(
         destination,
         actor->getNameCapital() + " goes " + direction.toString() + ".\n",
-        actor->getNameCapital() + " arrives from " + direction.getOpposite().toString() + ".\n");
+        actor->getNameCapital() + " arrives from " +
+        direction.getOpposite().toString() + ".\n");
     return ActionStatus::Finished;
 }
 
-unsigned int MoveAction::getConsumedStamina(const Character * character, const CharacterPosture & posture)
+unsigned int MoveAction::getConsumedStamina(const Character * character,
+                                            const CharacterPosture & posture)
 {
     auto multiplier = 1.0;
     if (posture == CharacterPosture::Crouch)
@@ -141,7 +146,8 @@ unsigned int MoveAction::getConsumedStamina(const Character * character, const C
     unsigned int consumedStamina = 1;
     consumedStamina -= character->getAbilityLog(Ability::Strength, 0.0, 1.0);
     consumedStamina = SafeSum(consumedStamina, SafeLog10(character->weight));
-    consumedStamina = SafeSum(consumedStamina, SafeLog10(character->getCarryingWeight()));
+    consumedStamina = SafeSum(consumedStamina,
+                              SafeLog10(character->getCarryingWeight()));
     return static_cast<unsigned int>(consumedStamina * multiplier);
 }
 
@@ -159,13 +165,17 @@ unsigned int MoveAction::getCooldown(const Character * character)
     return cooldown;
 }
 
-bool MoveAction::canMoveTo(Character * character, const Direction & direction, std::string & error, bool allowInCombat)
+bool MoveAction::canMoveTo(Character * character,
+                           const Direction & direction,
+                           std::string & error,
+                           bool allowInCombat)
 {
     if (character->room == nullptr)
     {
         return false;
     }
-    if ((character->getAction()->getType() == ActionType::Combat) && !allowInCombat)
+    if ((character->getAction()->getType() == ActionType::Combat) &&
+        !allowInCombat)
     {
         // Check if the character is locked into close combat.
         bool lockedInCombat = false;
@@ -184,7 +194,8 @@ bool MoveAction::canMoveTo(Character * character, const Direction & direction, s
         // Check even the aimed character.
         if (character->combatHandler.getAimedTarget() != nullptr)
         {
-            if (character->combatHandler.getAimedTarget()->room == character->room)
+            if (character->combatHandler.getAimedTarget()->room ==
+                character->room)
             {
                 lockedInCombat = true;
             }
@@ -211,7 +222,8 @@ bool MoveAction::canMoveTo(Character * character, const Direction & direction, s
         return false;
     }
     // Check if the actor has enough stamina to execute the action.
-    if (MoveAction::getConsumedStamina(character, character->posture) > character->getStamina())
+    if (MoveAction::getConsumedStamina(character, character->posture) >
+        character->getStamina())
     {
         error = "You are too tired to move.\n";
         return false;
@@ -242,7 +254,7 @@ bool MoveAction::canMoveTo(Character * character, const Direction & direction, s
         }
     }
     // Check if the destination has a floor.
-    std::shared_ptr<Exit> destDown = destExit->destination->findExit(Direction::Down);
+    auto destDown = destExit->destination->findExit(Direction::Down);
     if (destDown != nullptr)
     {
         if (!HasFlag(destDown->flags, ExitFlag::Stairs))
@@ -252,5 +264,6 @@ bool MoveAction::canMoveTo(Character * character, const Direction & direction, s
         }
     }
     // Check if the destination is forbidden for mobiles.
-    return !(character->isMobile() && HasFlag(destExit->flags, ExitFlag::NoMob));
+    return !(character->isMobile() &&
+             HasFlag(destExit->flags, ExitFlag::NoMob));
 }
