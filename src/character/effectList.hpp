@@ -24,7 +24,7 @@
 
 #include "effect.hpp"
 
-/// @brief A class which allows to manage a buffer of Active and Pending effects.
+/// @brief A class which allows to manage a buffer of effects.
 class EffectList
 {
 public:
@@ -85,14 +85,19 @@ public:
     /// @param effect The one which has to be added to the buffer.
     void addPendingEffect(const Effect & effect);
 
-    /// @brief One by one moves the pending effects inside the buffer of Active effects.
-    /// @param messages A vector of messages which is populated with the logs of the pending effects.
-    /// @return <b>True</b> if there is a message to show,<br><b>False</b> otherwise.
+    /// @brief One by one moves the pending effects inside the buffer of
+    ///         Active effects.
+    /// @param messages A vector of messages which is populated with the logs
+    ///                  of the pending effects.
+    /// @return <b>True</b> if there is a message to show,<br>
+    ///         <b>False</b> otherwise.
     bool effectActivate(std::vector<std::string> & messages);
 
     /// @brief One by one updates the active effects.
-    /// @param messages A vector of messages which is populated with the logs of the effects.
-    /// @return <b>True</b> if there is a message to show,<br><b>False</b> otherwise.
+    /// @param messages A vector of messages which is populated with the logs
+    ///                  of the effects.
+    /// @return <b>True</b> if there is a message to show,<br>
+    ///         <b>False</b> otherwise.
     bool effectUpdate(std::vector<std::string> & messages);
 
     /// @brief Sort the list of effects.
@@ -101,12 +106,14 @@ public:
     /// @brief Provides an iterator to the begin of the list of active effects.
     iterator begin();
 
-    /// @brief Provides a const_iterator to the begin of the list of active effects.
+    /// @brief Provides a const_iterator to the begin of the list of
+    ///         active effects.
     const_iterator begin() const;
 
     /// @brief Provides an iterator to the end of the list of active effects.
     iterator end();
 
-    /// @brief Provides a const_iterator to the end of the list of active effects.
+    /// @brief Provides a const_iterator to the end of the list of
+    ///         active effects.
     const_iterator end() const;
 };

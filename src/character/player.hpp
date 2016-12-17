@@ -105,6 +105,8 @@ public:
 
     void getSheet(Table & sheet) const override;
 
+    std::string getName() const override;
+
     void addInventoryItem(Item *& item) override;
 
     void addEquipmentItem(Item *& item) override;

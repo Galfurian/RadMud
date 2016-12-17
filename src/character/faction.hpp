@@ -68,7 +68,7 @@ public:
     ///         <b>False</b> otherwise.
     bool check();
 
-    /// @brief Fills the provided table with the information concerning the faction.
+    /// @brief Fills the provided table with the faction informations.
     /// @param sheet The table that has to be filled.
     void getSheet(Table & sheet) const;
 

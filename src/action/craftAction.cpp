@@ -108,7 +108,7 @@ bool CraftAction::check(std::string & error) const
         }
     }
     // Check if the actor has enough stamina to execute the action.
-    if (this->getConsumedStamina(actor) > actor->getStamina())
+    if (this->getConsumedStamina(actor) > actor->stamina)
     {
         error = "You are too tired right now.";
         return false;
@@ -273,7 +273,7 @@ unsigned int CraftAction::getConsumedStamina(Character * character)
     // WEIGHT   [+1.6 to +2.51]
     // CARRIED  [+0.0 to +2.48]
     unsigned int consumedStamina = 1;
-    consumedStamina -= character->getAbilityLog(Ability::Strength, 0.0, 1.0);
+    consumedStamina -= character->getAbilityLog(Ability::Strength);
     consumedStamina = SafeSum(consumedStamina, SafeLog10(character->weight));
     consumedStamina = SafeSum(consumedStamina,
                               SafeLog10(character->getCarryingWeight()));

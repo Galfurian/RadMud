@@ -57,7 +57,7 @@ bool ScoutAction::check(std::string & error) const
         Logger::log(LogLevel::Error, "The room's area is a nullptr.");
         return false;
     }
-    if (this->getConsumedStamina(actor) > actor->getStamina())
+    if (this->getConsumedStamina(actor) > actor->stamina)
     {
         error = "You are too tired to scout the area.";
         return false;
@@ -124,9 +124,7 @@ unsigned int ScoutAction::getConsumedStamina(Character * character)
     // CARRIED  [+0.0 to +2.48]
     unsigned int consumedStamina = 1;
     consumedStamina = SafeSum(consumedStamina,
-                              -character->getAbilityLog(Ability::Strength,
-                                                        0.0,
-                                                        1.0));
+                              -character->getAbilityLog(Ability::Strength));
     consumedStamina = SafeSum(consumedStamina, SafeLog10(character->weight));
     consumedStamina = SafeSum(consumedStamina,
                               SafeLog10(character->getCarryingWeight()));
@@ -139,8 +137,6 @@ unsigned int ScoutAction::getScoutTime(Character * character)
     // PERCEPTION [-0.0 to -2.80]
     unsigned int requiredTime = 3;
     requiredTime = SafeSum(requiredTime,
-                           -character->getAbilityLog(Ability::Perception,
-                                                     0.0,
-                                                     1.0));
+                           -character->getAbilityLog(Ability::Perception));
     return requiredTime;
 }

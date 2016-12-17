@@ -691,10 +691,10 @@ bool DoStatistics(Character * character, ArgumentHandler & /*args*/)
     msg += "(" + ToString(player->effects.getAbilityModifier(Ability::Intelligence)) + ")";
     msg += "[" + ToString(player->getAbilityModifier(Ability::Intelligence)) + "]\n";
     msg += MAG + "    Health    " + RES;
-    msg += ToString(player->getHealth()) + "/" + ToString(player->getMaxHealth());
+    msg += ToString(player->health) + "/" + ToString(player->getMaxHealth());
     msg += "(" + ToString(player->effects.getHealthMod()) + ")\n";
     msg += MAG + "    Stamina   " + RES;
-    msg += ToString(player->getStamina()) + "/" + ToString(player->getMaxStamina());
+    msg += ToString(player->stamina) + "/" + ToString(player->getMaxStamina());
     msg += "(" + ToString(player->effects.getHealthMod()) + ")\n";
     msg += MAG + "Armor Class : " + RES;
     msg += ToString(player->getArmorClass()) + "\n";

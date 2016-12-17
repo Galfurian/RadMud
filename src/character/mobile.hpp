@@ -77,6 +77,8 @@ public:
 
     void getSheet(Table & sheet) const override;
 
+    std::string getName() const override;
+
     /// @brief Allows to pass a string which contains the abilities.
     /// @param source The string which containts the values
     /// @return <b>True</b> if the string is correct,<br>
@@ -126,48 +128,52 @@ public:
     /// @param event     The event name.
     /// @param character The target character.
     /// @param message   The received message.
-    /// @return <b>True</b> if the operations succeeded,<br><b>False</b> Otherwise.
-    bool mobileThread(std::string event, Character * character, std::string message);
+    /// @return <b>True</b> if the operations succeeded,<br>
+    ///         <b>False</b> Otherwise.
+    bool mobileThread(std::string event, Character * character,
+                      std::string message);
 
     /// @defgroup MobileLuaEvent Mobile Lua Events Function
     /// @brief All the functions necessary to call the correspondent Function on Lua file,
     /// in order to react to a particular event.
     /// @{
 
-    /// This event is triggered when the mobile it's created, usually it's used to load the mobile equipment.
+    /// @brief This event is triggered when the mobile it's created,
+    ///         usually it's used to load the mobile equipment.
     void triggerEventInit();
 
-    /// This event is triggered at the beginning of every fight turn.
+    /// @brief This event is triggered at the beginning of every fight turn.
     void triggerEventFight(Character * character);
 
-    /// This event is triggered when the passed character enters the room.
+    /// @brief This event is triggered when the passed character enters the room.
     void triggerEventEnter(Character * character);
 
-    /// This event is triggered when the passed character exits the room.
+    /// @brief This event is triggered when the passed character exits the room.
     void triggerEventExit(Character * character);
 
-    /// This event is triggered when the passed character send a message to this mobile.
+    /// @brief This event is triggered when the passed character
+    ///         send a message to this mobile.
     void triggerEventMessage(Character * character, std::string message);
 
-    /// This event is triggered at random every 10 seconds.
+    /// @brief This event is triggered at random every 10 seconds.
     void triggerEventRandom();
 
-    /// This event is triggered at the beginning of Morning.
+    /// @brief This event is triggered at the beginning of Morning.
     void triggerEventMorning();
 
-    /// This event is triggered at the beginning of the Day.
+    /// @brief This event is triggered at the beginning of the Day.
     void triggerEventDay();
 
-    /// This event is triggered at the beginning of Dusk.
+    /// @brief This event is triggered at the beginning of Dusk.
     void triggerEventDusk();
 
-    /// This event is triggered at the beginning of Night.
+    /// @brief This event is triggered at the beginning of Night.
     void triggerEventNight();
 
-    /// This event is triggered when the mobile dies.
+    /// @brief This event is triggered when the mobile dies.
     void triggerEventDeath();
 
-    /// This event is triggered at every time tick.
+    /// @brief This event is triggered at every time tick.
     void triggerEventMain();
     ///@}
 

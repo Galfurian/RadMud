@@ -80,10 +80,10 @@ int EffectList::getRangedDamMod() const
 int EffectList::getAbilityModifier(const Ability & ability) const
 {
     int result = 0;
-    for (const_iterator it = activeEffects.begin(); it != activeEffects.end(); ++it)
+    for(const auto & it: activeEffects)
     {
-        auto abilityIt = it->abilities.find(ability);
-        if (abilityIt != it->abilities.end())
+        auto abilityIt = it.abilities.find(ability);
+        if (abilityIt != it.abilities.end())
         {
             result += abilityIt->second;
         }
@@ -165,20 +165,20 @@ bool EffectList::effectActivate(std::vector<std::string> & messages)
 
 bool EffectList::effectUpdate(std::vector<std::string> & messages)
 {
-    for (auto iterator = activeEffects.begin(); iterator != activeEffects.end();)
+    for (auto it = activeEffects.begin(); it != activeEffects.end();)
     {
-        if (iterator->update())
+        if (it->update())
         {
-            if (!iterator->messageExpire.empty())
+            if (!it->messageExpire.empty())
             {
-                messages.push_back(iterator->messageExpire);
+                messages.push_back(it->messageExpire);
             }
-            iterator = activeEffects.erase(iterator);
+            it = activeEffects.erase(it);
             this->sortList();
         }
         else
         {
-            ++iterator;
+            ++it;
         }
     }
     return !messages.empty();

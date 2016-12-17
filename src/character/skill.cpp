@@ -37,7 +37,10 @@ Skill::Skill() :
 
 Skill::~Skill()
 {
-    //Logger::log(LogLevel::Debug, "Deleted skill\t\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
+    //Logger::log(LogLevel::Debug,
+    //            "Deleted skill\t\t[%s]\t\t(%s)",
+    //            ToString(this->vnum),
+    //            this->name);
 }
 
 bool Skill::check()

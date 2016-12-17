@@ -54,7 +54,8 @@ Character * CharacterContainer::findCharacter(const std::string & target,
     for (const_iterator it = this->begin(); it != this->end(); ++it)
     {
         Character * character = (*it);
-        if ((skipMobile && character->isMobile()) || (skipPlayer && character->isPlayer()))
+        if ((skipMobile && character->isMobile()) ||
+            (skipPlayer && character->isPlayer()))
         {
             continue;
         }
@@ -81,7 +82,8 @@ Character * CharacterContainer::findCharacter(const std::string & target,
         {
             if (character->toPlayer()->isPlaying())
             {
-                if (BeginWith(character->toPlayer()->getName(), ToLower(target)))
+                if (BeginWith(character->toPlayer()->getName(),
+                              ToLower(target)))
                 {
                     if (number > 1)
                     {

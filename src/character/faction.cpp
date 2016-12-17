@@ -36,7 +36,10 @@ Faction::Faction() :
 
 Faction::~Faction()
 {
-    //Logger::log(LogLevel::Debug, "Deleted faction\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
+//    Logger::log(LogLevel::Debug,
+//                "Deleted faction\t[%s]\t\t(%s)",
+//                ToString(this->vnum),
+//                this->name);
 }
 
 bool Faction::check()
@@ -57,7 +60,10 @@ void Faction::getSheet(Table & sheet) const
     sheet.addRow({"Vnum", ToString(this->vnum)});
     sheet.addRow({"Name", this->name});
     sheet.addRow({"Description", this->description});
-    sheet.addRow({"Currency", currency->getName() + " (" + ToString(currency->vnum) + ")"});
+    sheet.addRow({
+                     "Currency",
+                     currency->getName() + " (" + ToString(currency->vnum) + ")"
+                 });
 }
 
 std::string Faction::getName()

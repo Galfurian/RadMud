@@ -192,7 +192,7 @@ unsigned int BasicAttack::getConsumedStamina(Character * character,
     // WEIGHT   [+1.6 to +2.51]
     // CARRIED  [+0.0 to +2.48]
     unsigned int consumedStamina = 1;
-    consumedStamina -= character->getAbilityLog(Ability::Strength, 0.0, 1.0);
+    consumedStamina -= character->getAbilityLog(Ability::Strength);
     consumedStamina = SafeSum(consumedStamina, SafeLog10(character->weight));
     consumedStamina = SafeSum(consumedStamina,
                               SafeLog10(character->getCarryingWeight()));
@@ -348,7 +348,7 @@ void BasicAttack::performMeleeAttack(Character * target,
     // Get the required stamina.
     auto consumedStamina = this->getConsumedStamina(actor, weapon);
     // Check if the actor has enough stamina to execute the action.
-    if (consumedStamina > actor->getStamina())
+    if (consumedStamina > actor->stamina)
     {
         if (weapon != nullptr)
         {
@@ -470,7 +470,7 @@ void BasicAttack::performRangedAttack(Character * target,
     // Get the required stamina.
     auto consumedStamina = this->getConsumedStamina(actor, weapon);
     // Check if the actor has enough stamina to execute the action.
-    if (consumedStamina > actor->getStamina())
+    if (consumedStamina > actor->stamina)
     {
         actor->sendMsg("You are too tired to attack with %s.\n",
                        weapon->getName(true));
