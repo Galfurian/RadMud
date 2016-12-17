@@ -274,14 +274,14 @@ bool DoLoad(Character * character, ArgumentHandler & args)
     }
     // Check if the projectiles can be loaded inside the magazine.
     std::string error;
-    unsigned int ammountToLoad = 0;
-    if (!magazine->getAmountToLoad(projectile, ammountToLoad, error))
+    unsigned int amountToLoad = 0;
+    if (!magazine->getAmountToLoad(projectile, amountToLoad, error))
     {
         character->sendMsg("%s\n", error);
         return false;
     }
     // Create the load action.
-    auto newAction = std::make_shared<LoadAction>(character, magazine, projectile, ammountToLoad);
+    auto newAction = std::make_shared<LoadAction>(character, magazine, projectile, amountToLoad);
     // Check the new action.
     error = std::string();
     if (newAction->check(error))

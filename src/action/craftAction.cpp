@@ -26,8 +26,6 @@
 #include "logger.hpp"
 #include "room.hpp"
 
-typedef Item * pItem;
-
 CraftAction::CraftAction(Character * _actor,
                          Production * _production,
                          Material * _material,
@@ -198,7 +196,7 @@ ActionStatus CraftAction::perform()
     {
         // Create the item.
         // TODO: FIX WRONG TYPE OF MATERIAL!
-        pItem newItem = outcomeModel->createItem(actor->getName(),
+        auto newItem = outcomeModel->createItem(actor->getName(),
                                                  material,
                                                  false,
                                                  ItemQuality::Normal,

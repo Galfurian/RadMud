@@ -62,7 +62,7 @@ public:
     std::chrono::time_point<std::chrono::system_clock> nextActionCooldown;
     /// The item of which this mobile is the manager.
     Item * managedItem;
-
+    /// The thread used to execute the LUA code.
     std::thread t;
 
     /// @brief Constructor.

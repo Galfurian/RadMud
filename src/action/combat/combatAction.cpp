@@ -77,13 +77,13 @@ unsigned int CombatAction::getCooldown(Character * character)
     cooldown = SafeSum(cooldown, SafeLog10(character->getCarryingWeight()));
     if (character->canAttackWith(EquipmentSlot::RightHand))
     {
-        auto weapon = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
-        cooldown = SafeSum(cooldown, SafeLog10(weapon->getWeight(true)));
+        auto wpn = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
+        cooldown = SafeSum(cooldown, SafeLog10(wpn->getWeight(true)));
     }
     if (character->canAttackWith(EquipmentSlot::LeftHand))
     {
-        auto weapon = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
-        cooldown = SafeSum(cooldown, SafeLog10(weapon->getWeight(true)));
+        auto wpn = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
+        cooldown = SafeSum(cooldown, SafeLog10(wpn->getWeight(true)));
     }
     return cooldown;
 }

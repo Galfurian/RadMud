@@ -429,7 +429,7 @@ public:
 
     /// @brief Check if the player can carry the item.
     /// @param item     The item we want to check.
-    /// @param quantity The ammount of item to check (by default it is 1).
+    /// @param quantity The amount of item to check (by default it is 1).
     /// @return <b>True</b> if the character can lift the item,<br><b>False</b> otherwise.
     bool canCarry(Item * item, unsigned int quantity) const;
 

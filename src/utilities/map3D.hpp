@@ -26,7 +26,13 @@ template<typename T>
 class Map3D
 {
 private:
-    using map_t = typename std::map<const int, std::map<const int, std::map<const int, T> > >;
+    /// Define the type of internal 2D data structure.
+    using two_dim_map_t = typename
+    std::map<const int, std::map<const int, T> >;
+
+    /// Define the type of internal 3D data structure.
+    using three_dim_map_t = typename
+    std::map<const int, std::map<const int, std::map<const int, T> > >;
 
     /// Width of th map.
     int width;
@@ -35,7 +41,7 @@ private:
     /// Elevation of th map.
     int elevation;
     /// Data contained inside the map.
-    map_t data;
+    three_dim_map_t data;
 
 public:
     /// @brief Constructor.
@@ -149,10 +155,11 @@ public:
     ///         <b>False</b> otherwise.
     bool has(int x, int y, int z) const
     {
-        typename std::map<const int, std::map<const int, std::map<const int, T> > >::const_iterator it = data.find(x);
+
+        typename three_dim_map_t::const_iterator it = data.find(x);
         if (it != data.end())
         {
-            typename std::map<const int, std::map<const int, T> >::const_iterator it2 = it->second.find(y);
+            typename two_dim_map_t::const_iterator it2 = it->second.find(y);
             if (it2 != it->second.end())
             {
                 return (it2->second.find(z) != it2->second.end());
@@ -179,14 +186,14 @@ public:
 
     /// @brief Provides an iterator to the begin of the list of data.
     /// @return An iterator to the begin of the 3D map.
-    typename map_t::iterator begin()
+    typename three_dim_map_t::iterator begin()
     {
         return data.begin();
     }
 
     /// @brief Provides an iterator to the end of the list of data.
     /// @return An iterator to the end of the 3D map.
-    typename map_t::iterator end()
+    typename three_dim_map_t::iterator end()
     {
         return data.end();
     }

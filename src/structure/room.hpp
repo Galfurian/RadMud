@@ -304,7 +304,6 @@ public:
 
     /// @brief Returns the list of available exits from the current room
     ///         using the vector structure made for lua environment.
-    /// @return The vector of exits.
     int luaGetExits(lua_State * L);
 
     /// @brief Returns the list of items inside the room.

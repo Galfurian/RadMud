@@ -1040,7 +1040,7 @@ bool DoInventory(Character * character, ArgumentHandler & /*args*/)
     // Check if the room is lit.
     if (character->room != nullptr)
     {
-        if ((!character->room->terrain->inside) && (MudUpdater::instance().getDayPhase() != DayPhase::Night))
+        if ((!character->room->terrain->indoor) && (MudUpdater::instance().getDayPhase() != DayPhase::Night))
         {
             roomIsLit = true;
         }
@@ -2231,15 +2231,15 @@ bool DoRefill(Character * character, ArgumentHandler & args)
         return false;
     }
     std::string error;
-    unsigned int ammountToLoad = 0;
-    if (!itemToRefill->toLightItem()->getAmmountToRefill(fuel, ammountToLoad, error))
+    unsigned int amountToLoad = 0;
+    if (!itemToRefill->toLightItem()->getAmountToRefill(fuel, amountToLoad, error))
     {
         character->sendMsg(error + "\n");
         return false;
     }
     // Start a transaction.
     SQLiteDbms::instance().beginTransaction();
-    if (fuel->quantity <= ammountToLoad)
+    if (fuel->quantity <= amountToLoad)
     {
         // Remove the item from the player's inventory.
         character->remInventoryItem(fuel);
@@ -2254,7 +2254,7 @@ bool DoRefill(Character * character, ArgumentHandler & args)
     else
     {
         // Remove from the stack.
-        auto newStack = fuel->removeFromStack(character, ammountToLoad);
+        auto newStack = fuel->removeFromStack(character, amountToLoad);
         if (newStack == nullptr)
         {
             character->sendMsg("You failed to refill %s with part of %s.\n",

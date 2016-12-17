@@ -122,18 +122,21 @@ public:
     std::string getAddress() const;
 
     /// @brief Check if player is connected.
-    /// @return <b>True</b> if player is connected,<br><b>False</b> otherwise.
+    /// @return <b>True</b> if player is connected,<br>
+    ///         <b>False</b> otherwise.
     bool checkConnection() const;
 
     /// @brief Close this player's connection.
     void closeConnection();
 
     /// @brief Check if this player actively playing.
-    /// @return <b>True</b> if player is playing,<br><b>False</b> otherwise.
+    /// @return <b>True</b> if player is playing,<br>
+    ///         <b>False</b> otherwise.
     bool isPlaying() const;
 
     /// @brief Check if player has pending output.
-    /// @return <b>True</b> if we have something to send them,<br><b>False</b> otherwise.
+    /// @return <b>True</b> if we have something to send them,<br>
+    ///         <b>False</b> otherwise.
     bool hasPendingOutput() const;
 
     /// @brief Create an updated entry for the player inside the database.
@@ -154,10 +157,6 @@ public:
     void processRead();
 
     /// @brief Output text to player.
-    /// @details
-    /// Here when we can send stuff to the player. We are allowing for large
-    /// volumes of output that might not be sent all at once, so whatever cannot
-    /// go this time gets put into the list of outstanding strings for this player.
     void processWrite();
 
     /// @brief Handle player exception on socket.
@@ -167,10 +166,15 @@ public:
     /// @param msg String to sent.
     void sendMsg(const std::string & msg) override;
 
+    /// @brief Adds a variable to the list of LUA-Visible variables.
+    /// @param variableName  The name of the variable.
+    /// @param variableValue The value of the variable.
     void setLuaVariable(std::string variableName, std::string variableValue);
 
+    /// @brief Provides the value of the given LUA-Visible variable.
     std::string getLuaVariable(std::string variableName);
 
+    /// @brief Removes the variable from the list of LUA-Visible variables.
     bool removeLuaVariable(std::string variableName);
 
 protected:

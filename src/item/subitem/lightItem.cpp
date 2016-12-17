@@ -132,7 +132,7 @@ bool LightItem::canRefillWith(Item * item, std::string & error) const
     return true;
 }
 
-bool LightItem::getAmmountToRefill(Item * item, unsigned int & ammount, std::string & error) const
+bool LightItem::getAmountToRefill(Item * item, unsigned int & amount, std::string & error) const
 {
     if (!this->canRefillWith(item, error))
     {
@@ -140,7 +140,7 @@ bool LightItem::getAmmountToRefill(Item * item, unsigned int & ammount, std::str
     }
     // Get the weight of the fuel.
     auto fuelWeight = item->getWeight(false);
-    // Set by default the ammout to the maximum.
+    // Set by default the amount to the maximum.
     auto maxWeight = this->model->toLight()->maxWeight;
     // Evaluate the weight of the content.
     auto contentWeight = 0.0;
@@ -157,8 +157,8 @@ bool LightItem::getAmmountToRefill(Item * item, unsigned int & ammount, std::str
     }
     // Get the weight that can still be used.
     auto canRefill = (maxWeight - contentWeight) / fuelWeight;
-    // Set the ammount.
-    ammount = static_cast<unsigned int>(std::floor(canRefill));
+    // Set the amount.
+    amount = static_cast<unsigned int>(std::floor(canRefill));
     return true;
 }
 

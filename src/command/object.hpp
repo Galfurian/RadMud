@@ -85,7 +85,7 @@ bool DoSell(Character * character, ArgumentHandler & args);
 /// Buy an item.
 bool DoBuy(Character * character, ArgumentHandler & args);
 
-/// Shows the total ammount of monney.
+/// Shows the total amount of money.
 bool DoBalance(Character * character, ArgumentHandler & args);
 
 /// Allows to turn on and off an activatable item.

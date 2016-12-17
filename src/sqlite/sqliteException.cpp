@@ -1,5 +1,5 @@
-/// @file   SQLiteException.cpp
-/// @brief  
+/// @file   sqliteException.cpp
+/// @brief  Implementation of SQLiteException class functions.
 /// @author Enrico Fraccaroli
 /// @date   09/12/2016
 /// @copyright
@@ -41,5 +41,6 @@ SQLiteException::SQLiteException(int _errorCode, std::string _errorMessage) :
 
 char const * SQLiteException::what() const noexcept
 {
-    return std::string("Code : " + ToString(errorCode) + " | Message : " + errorMessage).c_str();
+    return std::string("Code : " + ToString(errorCode) + " | Message : " +
+                       errorMessage).c_str();
 }

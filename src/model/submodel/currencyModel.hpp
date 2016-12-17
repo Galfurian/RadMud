@@ -91,9 +91,8 @@ public:
     ///         <b>False</b> otherwise.
     bool findPrice(const int & materialVnum, unsigned int & price) const;
 
-    /// @brief Generates an ammount of currency with a worth equal to the variable value.
-    /// @details
-    ///     <b>This function starts and ends a SQLITE3 Transaction.</b>
+    /// @brief Generates an amount of currency with a worth equal to the variable value.
+    /// @details <b>This function starts and ends a SQLITE3 Transaction.</b>
     /// @param maker Who has generated the currency.
     /// @param value The total worth that has to be generate.
     /// @return The list of generated currencies.

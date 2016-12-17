@@ -654,8 +654,7 @@ void BasicAttack::handleRangedHit(Character * target, RangedWeaponItem * weapon)
         {
             if ((character == actor) || (character == target)) return false;
             if (character->combatHandler.charactersInSight.containsCharacter(
-                target))
-                return true;
+                target)) return true;
             return character->combatHandler.getAimedTarget() == target;
         }, actor->getNameCapital(), target->getName(),
         weapon->getName(true));
@@ -666,8 +665,7 @@ void BasicAttack::handleRangedHit(Character * target, RangedWeaponItem * weapon)
         {
             if ((character == actor) || (character == target)) return false;
             if (character->combatHandler.charactersInSight.containsCharacter(
-                target))
-                return false;
+                target)) return false;
             return character->combatHandler.getAimedTarget() != target;
         }, actor->getNameCapital(), weapon->getName(true));
 
@@ -677,8 +675,7 @@ void BasicAttack::handleRangedHit(Character * target, RangedWeaponItem * weapon)
         {
             if ((character == actor) || (character == target)) return false;
             if (character->combatHandler.charactersInSight.containsCharacter(
-                actor))
-                return true;
+                actor)) return true;
             return character->combatHandler.getAimedTarget() == actor;
         }, actor->getNameCapital(), target->getName(), weapon->getName(true));
 
@@ -688,8 +685,7 @@ void BasicAttack::handleRangedHit(Character * target, RangedWeaponItem * weapon)
         {
             if ((character == actor) || (character == target)) return false;
             if (character->combatHandler.charactersInSight.containsCharacter(
-                actor))
-                return false;
+                actor)) return false;
             return character->combatHandler.getAimedTarget() != actor;
         }, target->getName());
 }
@@ -761,8 +757,7 @@ BasicAttack::handleRangedMiss(Character * target, RangedWeaponItem * weapon)
         {
             if ((character == actor) || (character == target)) return false;
             if (character->combatHandler.charactersInSight.containsCharacter(
-                target))
-                return true;
+                target)) return true;
             return character->combatHandler.getAimedTarget() == target;
         }, actor->getNameCapital(), target->getName(), weapon->getName(true));
 
@@ -772,8 +767,7 @@ BasicAttack::handleRangedMiss(Character * target, RangedWeaponItem * weapon)
         {
             if ((character == actor) || (character == target)) return false;
             if (character->combatHandler.charactersInSight.containsCharacter(
-                target))
-                return false;
+                target)) return false;
             return character->combatHandler.getAimedTarget() != target;
         }, actor->getNameCapital(), weapon->getName(true));
 
@@ -783,8 +777,7 @@ BasicAttack::handleRangedMiss(Character * target, RangedWeaponItem * weapon)
         {
             if ((character == actor) || (character == target)) return false;
             if (character->combatHandler.charactersInSight.containsCharacter(
-                actor))
-                return true;
+                actor)) return true;
             return character->combatHandler.getAimedTarget() == actor;
         }, actor->getNameCapital(), target->getName(), weapon->getName(true));
 
@@ -794,8 +787,7 @@ BasicAttack::handleRangedMiss(Character * target, RangedWeaponItem * weapon)
         {
             if ((character == actor) || (character == target)) return false;
             if (character->combatHandler.charactersInSight.containsCharacter(
-                actor))
-                return false;
+                actor)) return false;
             return character->combatHandler.getAimedTarget() != actor;
         }, target->getName());
 }

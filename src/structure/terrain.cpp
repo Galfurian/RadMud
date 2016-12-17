@@ -1,5 +1,5 @@
 /// @file   terrain.cpp
-/// @brief  
+/// @brief  Implementation of Terrain class functions.
 /// @author Enrico Fraccaroli
 /// @date   08/12/2016
 /// @copyright
@@ -28,7 +28,7 @@ Terrain::Terrain() :
     name(),
     flags(),
     space(),
-    inside(),
+    indoor(),
     light()
 {
     // Nothing to do.
@@ -38,13 +38,13 @@ Terrain::Terrain(unsigned int _vnum,
                  std::string _name,
                  unsigned int _flags,
                  unsigned int _space,
-                 bool _inside,
+                 bool _indoor,
                  bool _light) :
     vnum(_vnum),
     name(_name),
     flags(_flags),
     space(_space),
-    inside(_inside),
+    indoor(_indoor),
     light(_light)
 {
     // Nothing to do.
@@ -58,6 +58,7 @@ void Terrain::luaRegister(lua_State * L)
         .addData("name", &Terrain::name, false)
         .addData("flags", &Terrain::flags, false)
         .addData("space", &Terrain::space, false)
+        .addData("indoor", &Terrain::indoor, false)
         .addData("light", &Terrain::light, false)
         .endClass();
 }

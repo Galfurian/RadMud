@@ -27,16 +27,19 @@
 #include "character.hpp"
 #include "logger.hpp"
 
-LoadAction::LoadAction(Character * _actor, Item * _itemToBeLoaded, Item * _projectile, const unsigned int & _ammount) :
+LoadAction::LoadAction(Character * _actor,
+                       Item * _itemToBeLoaded,
+                       Item * _projectile,
+                       const unsigned int & _amount) :
     GeneralAction(_actor),
     itemToBeLoaded(_itemToBeLoaded),
     projectile(_projectile),
-    ammount(_ammount)
+    amount(_amount)
 {
     // Debugging message.
     //Logger::log(LogLevel::Debug, "Created LoadAction.");
     // Reset the cooldown of the action.
-    this->resetCooldown(LoadAction::getLoadTime(_projectile, _ammount));
+    this->resetCooldown(LoadAction::getLoadTime(_projectile, _amount));
 }
 
 LoadAction::~LoadAction()
@@ -76,17 +79,20 @@ bool LoadAction::check(std::string & error) const
         auto loaded = itemToBeLoaded->content.front();
         if (loaded == nullptr)
         {
-            Logger::log(LogLevel::Error, "The item already contains an item which is a null pointer.");
-            error = "Something is gone wrong while you were loading " + itemToBeLoaded->getName(true) + ".";
+            Logger::log(LogLevel::Error, "The item already contains an item "
+                                         "which is a null pointer.");
+            error = "Something is gone wrong while you were loading " +
+                    itemToBeLoaded->getName(true) + ".";
             return false;
         }
-        // If there are projectiles inside, check if the two types of projectiles are compatible.
+        // If there are projectiles inside, check if the two types of
+        //  projectiles are compatible.
         if (!projectile->canStackWith(loaded))
         {
             error = "You cannot stack the item with the one inside the container.";
             return false;
         }
-        if (itemToBeLoaded->model->toMagazine()->maxAmmount <= loaded->quantity)
+        if (itemToBeLoaded->model->toMagazine()->maxAmount <= loaded->quantity)
         {
             error = "The item is already at full capacity.";
             return false;
@@ -128,14 +134,14 @@ ActionStatus LoadAction::perform()
     {
         auto loaded = itemToBeLoaded->content.front();
         SQLiteDbms::instance().beginTransaction();
-        if (projectile->quantity < ammount)
+        if (projectile->quantity < amount)
         {
             itemToBeLoaded->putInside(projectile);
         }
         else
         {
-            loaded->quantity += ammount;
-            projectile->quantity -= ammount;
+            loaded->quantity += amount;
+            projectile->quantity -= amount;
             loaded->updateOnDB();
             projectile->updateOnDB();
         }
@@ -144,14 +150,14 @@ ActionStatus LoadAction::perform()
     else
     {
         SQLiteDbms::instance().beginTransaction();
-        if (projectile->quantity <= ammount)
+        if (projectile->quantity <= amount)
         {
             actor->remInventoryItem(projectile);
             itemToBeLoaded->putInside(projectile);
         }
         else
         {
-            auto newProjectileStack = projectile->removeFromStack(actor, ammount);
+            auto newProjectileStack = projectile->removeFromStack(actor, amount);
             if (newProjectileStack == nullptr)
             {
                 // Rollback the transaction.
@@ -170,8 +176,9 @@ ActionStatus LoadAction::perform()
     return ActionStatus::Finished;
 }
 
-unsigned int LoadAction::getLoadTime(Item * projectile, const unsigned int & ammountToLoad)
+unsigned int LoadAction::getLoadTime(Item * projectile,
+                                     const unsigned int & amountToLoad)
 {
     // Evaluates the required time for loading the magazine.
-    return static_cast<unsigned int>(projectile->getWeight(false) * ammountToLoad);
+    return static_cast<unsigned int>(projectile->getWeight(false) * amountToLoad);
 }

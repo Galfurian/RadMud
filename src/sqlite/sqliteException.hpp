@@ -1,5 +1,5 @@
-/// @file   SQLiteException.hpp
-/// @brief  
+/// @file   sqliteException.hpp
+/// @brief  Declaration of SQLiteException class.
 /// @author Enrico Fraccaroli
 /// @date   09/12/2016
 /// @copyright
@@ -24,6 +24,7 @@
 
 #include <stdexcept>
 
+/// @brief A custom exception handler for the loading function used by the mud.
 class SQLiteException :
     public std::runtime_error
 {
@@ -32,10 +33,17 @@ private:
     int errorCode;
     /// The error message associated with the exception.
     std::string errorMessage;
+
 public:
+    /// @brief Constructor.
+    /// @param _errorMessage The error message.
     SQLiteException(std::string _errorMessage);
 
+    /// @brief Constructor.
+    /// @param _errorCode    The SQLITE error code.
+    /// @param _errorMessage The error message.
     SQLiteException(int _errorCode, std::string _errorMessage);
 
+    /// @brief Return what is the subject of the exception.
     char const * what() const noexcept override;
 };

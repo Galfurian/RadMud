@@ -26,7 +26,7 @@
 
 MagazineModel::MagazineModel() :
     projectileType(),
-    maxAmmount()
+    maxAmount()
 {
     // Nothing to do.
 }
@@ -63,7 +63,7 @@ bool MagazineModel::setModel(const std::string & source)
         return false;
     }
     this->projectileType = static_cast<RangedWeaponType>(ToNumber<unsigned int>(functionList[0]));
-    this->maxAmmount = ToNumber<unsigned int>(functionList[1]);
+    this->maxAmount = ToNumber<unsigned int>(functionList[1]);
     return true;
 }
 
@@ -75,5 +75,5 @@ void MagazineModel::getSheet(Table & sheet) const
     sheet.addDivider();
     // Set the values.
     sheet.addRow({"Contained Type", GetRangedWeaponTypeName(this->projectileType)});
-    sheet.addRow({"Maximum Ammount", ToString(this->maxAmmount)});
+    sheet.addRow({"Maximum Amount", ToString(this->maxAmount)});
 }

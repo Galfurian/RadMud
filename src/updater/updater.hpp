@@ -100,10 +100,14 @@ public:
     /// @brief Update uncompressed bandwidth.
     void updateBandUncompressed(const size_t & size);
 
+    /// @brief Add the item to the list of items that will be destroyed at
+    /// the end of the MUD TIC.
     void addItemToDestroy(Item * item);
 
+    /// @brief Provides the dimension of the TIC.
     unsigned int getTicSize() const;
 
+    /// @brief Provides the dimension of the hour in TICs.
     unsigned int getHourTicSize() const;
 
     /// @brief Provides the total input (from clients) bandwidth.

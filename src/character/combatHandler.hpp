@@ -96,6 +96,7 @@ public:
     ///         <b>False</b> otherwise.
     bool hasOpponent(Character * character);
 
+    /// @brief Updates the list of characters in sight.
     void updateCharactersInSight();
 
     /// @brief Allows to elect the given character as predefined target.

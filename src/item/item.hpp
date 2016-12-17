@@ -242,11 +242,11 @@ public:
     double getFreeSpace() const;
 
     /// @brief Check if this item can contain the passed one.
-    /// @param item    The item to check.
-    /// @param ammount The ammount to check.
+    /// @param item   The item to check.
+    /// @param amount The amount to check.
     /// @return <b>True</b> if it can be contained,<br>
     ///         <b>False</b> otherwise.
-    bool canContain(Item * item, const unsigned int & ammount) const;
+    bool canContain(Item * item, const unsigned int & amount) const;
 
     /// @brief Load an item inside the container and update the database.
     /// @param item     The item to load in.
@@ -261,25 +261,25 @@ public:
     bool takeOut(Item * item, bool updateDB = true);
 
     /// @brief Check if this item can contain the passed one.
-    /// @param liquid  The liquid to pour in.
-    /// @param ammount The ammount of liquid.
+    /// @param liquid The liquid to pour in.
+    /// @param amount The amount of liquid.
     /// @return <b>True</b> if it can be contained,<br>
     ///         <b>False</b> otherwise.
-    bool canContainLiquid(Liquid * liquid, const double & ammount) const;
+    bool canContainLiquid(Liquid * liquid, const double & amount) const;
 
     /// @brief Load some liquid inside the container and update the database.
-    /// @param liquid   The liquid to load in.
-    /// @param ammount  The ammount of liquid.
+    /// @param liquid The liquid to load in.
+    /// @param amount The amount of liquid.
     /// @param updateDB If the action has to be updated on the database.
     /// @return <b>True</b> if the operation is a success,<br>
     ///         <b>False</b> otherwise.
-    bool pourIn(Liquid * liquid, const double & ammount, bool updateDB = true);
+    bool pourIn(Liquid * liquid, const double & amount, bool updateDB = true);
 
     /// @brief Extract some liquid from the container and update the database.
-    /// @param ammount  The ammount of liquid.
+    /// @param amount   The amount of liquid.
     /// @param updateDB If the action has to be updated on the database.
     /// @return <b>True</b> if the operation is a success,<br><b>False</b> otherwise.
-    bool pourOut(const double & ammount, bool updateDB = true);
+    bool pourOut(const double & amount, bool updateDB = true);
 
     /// @brief Search for the item inside the container.
     /// @param search_parameter The item to search.

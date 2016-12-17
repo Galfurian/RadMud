@@ -527,9 +527,9 @@ double Item::getFreeSpace() const
     return totalSpace - usedSpace;
 }
 
-bool Item::canContain(Item * item, const unsigned int & ammount) const
+bool Item::canContain(Item * item, const unsigned int & amount) const
 {
-    return (item->getWeight(false) * ammount) <= this->getFreeSpace();
+    return (item->getWeight(false) * amount) <= this->getFreeSpace();
 }
 
 void Item::putInside(Item *& item, bool updateDB)
@@ -565,9 +565,9 @@ bool Item::takeOut(Item * item, bool updateDB)
     return true;
 }
 
-bool Item::canContainLiquid(Liquid * liquid, const double & ammount) const
+bool Item::canContainLiquid(Liquid * liquid, const double & amount) const
 {
-    if (ammount > this->getFreeSpace())
+    if (amount > this->getFreeSpace())
     {
         return false;
     }
@@ -578,20 +578,20 @@ bool Item::canContainLiquid(Liquid * liquid, const double & ammount) const
     return true;
 }
 
-bool Item::pourIn(Liquid * liquid, const double & ammount, bool updateDB)
+bool Item::pourIn(Liquid * liquid, const double & amount, bool updateDB)
 {
-    if (this->canContainLiquid(liquid, ammount))
+    if (this->canContainLiquid(liquid, amount))
     {
         if (contentLiq.first == nullptr)
         {
-            // Set the liquid ammount.
+            // Set the liquid amount.
             contentLiq.first = liquid;
-            contentLiq.second = ammount;
+            contentLiq.second = amount;
         }
         else if (contentLiq.first == liquid)
         {
-            // Increment the liquid ammount.
-            contentLiq.second += ammount;
+            // Increment the liquid amount.
+            contentLiq.second += amount;
         }
         // Prepare the query arguments.
         if (updateDB)
@@ -607,7 +607,7 @@ bool Item::pourIn(Liquid * liquid, const double & ammount, bool updateDB)
     return false;
 }
 
-bool Item::pourOut(const double & ammount, bool updateDB)
+bool Item::pourOut(const double & amount, bool updateDB)
 {
     if (model->getType() != ModelType::LiquidContainer)
     {
@@ -618,11 +618,11 @@ bool Item::pourOut(const double & ammount, bool updateDB)
     {
         return true;
     }
-    // Check if the container has the necessary ammount of liquid.
-    if (contentLiq.second >= ammount)
+    // Check if the container has the necessary amount of liquid.
+    if (contentLiq.second >= amount)
     {
-        // Decrement the liquid ammount.
-        contentLiq.second -= ammount;
+        // Decrement the liquid amount.
+        contentLiq.second -= amount;
         if (updateDB)
         {
             // Check if the quantity has dropped to zero.
@@ -736,7 +736,7 @@ std::string Item::lookContent()
 
             if (percent >= 100) output += "It's full of ";
             else if (percent >= 75) output += "It's half full of ";
-            else if (percent >= 50) output += "Contains a discrete ammount of ";
+            else if (percent >= 50) output += "Contains a discrete amount of ";
             else if (percent >= 25) output += "It contains a little bit of ";
             else if (percent >= 0) output += "It contains some drops of ";
             else output += "It's empty, but you can see some ";

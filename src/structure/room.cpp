@@ -418,7 +418,7 @@ bool Room::isLit()
     };
     // Get the day phase.
     auto dayPhase = MudUpdater::instance().getDayPhase();
-    if ((!terrain->inside) && (dayPhase != DayPhase::Night))
+    if ((!terrain->indoor) && (dayPhase != DayPhase::Night))
     {
         Logger::log(LogLevel::Debug, "Room is lit (outside)(!night)(%s us)", stopwatch.stop());
         return true;
