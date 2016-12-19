@@ -27,52 +27,30 @@
 
 void LoadCommunicationCommands()
 {
-    Command command;
-    command.gods = false;
-    {
-        command.name = "say";
-        command.help = "Talk to people in the current room.";
-        command.arguments = "[someone] (something)";
-        command.hndl = DoSay;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "whisper";
-        command.help = "Whisper secretly to a single character.";
-        command.arguments = "(someone) (something)";
-        command.hndl = DoWhisper;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "emote";
-        command.help = "Execute and emote.";
-        command.arguments = "(emotion)";
-        command.hndl = DoEmote;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "bug";
-        command.help = "Report a bug, your character's name, location and date will be saved.";
-        command.arguments = "(message)";
-        command.hndl = DoBug;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "idea";
-        command.help = "Send an idea, try to be as clear as possible.";
-        command.arguments = "(message)";
-        command.hndl = DoIdea;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "typo";
-        command.help = "Report a typo.";
-        command.arguments = "(message)";
-        command.hndl = DoTypo;
-        Mud::instance().addCommand(command);
-    }
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoSay, "say", "[someone] (something)",
+        "Talk to people in the current room.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoWhisper, "whisper", "(someone) (something)",
+        "Whisper secretly to a single character.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoEmote, "emote", "(emotion)",
+        "Express an emotion.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoBug, "bug", "(message)",
+        "Report a bug, your character's name, location and date will be saved.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoIdea, "idea", "(message)",
+        "Send an idea, try to be as clear as possible.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoTypo, "typo", "(message)",
+        "Report a typo.",
+        false, true, false));
 }
 
 bool DoSay(Character * character, ArgumentHandler & args)

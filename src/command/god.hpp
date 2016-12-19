@@ -173,9 +173,6 @@ bool DoSkillList(Character * character, ArgumentHandler & args);
 /// List all the writings.
 bool DoWritingList(Character * character, ArgumentHandler & args);
 
-/// List all the corpses
-bool DoCorpseList(Character * character, ArgumentHandler & args);
-
 /// List all the continents.
 bool DoContinentList(Character * character, ArgumentHandler & args);
 

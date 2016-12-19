@@ -63,7 +63,8 @@ public:
     ~Building();
 
     /// @brief Check the correctness of the building.
-    /// @return <b>True</b> if the profession has correct values,<br> <b>False</b> otherwise.
+    /// @return <b>True</b> if the profession has correct values,<br>
+    ///         <b>False</b> otherwise.
     bool check();
 
     /// @brief Return the name of the building.

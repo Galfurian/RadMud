@@ -28,156 +28,78 @@
 
 void LoadGeneralCommands()
 {
-    {
-        Mud::instance().addCommand(Command().setName("quit")
-                                            .setHelp("Leave the game.")
-                                            .setHndl(DoQuit)
-                                            .setTypedCompletely(true));
-    }
-    {
-        Mud::instance().addCommand(Command().setName("who")
-                                            .setHelp("List all the character online.")
-                                            .setHndl(DoWho));
-    }
-    {
-        Command command;
-        command.name = "set";
-        command.help = "Set some character texts(eg. descr).";
-        command.arguments = "(setting) (value)";
-        command.hndl = DoSet;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "stop";
-        command.help = "Stop the current character action.";
-        command.arguments = "NONE";
-        command.hndl = DoStop;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "look";
-        command.help = "Look at something or someone.";
-        command.arguments = "[(something) or (someone)]";
-        command.hndl = DoLook;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "help";
-        command.help = "Show the list of commands or show help for a given command.";
-        command.arguments = "(command)";
-        command.hndl = DoHelp;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "prompt";
-        command.help = "Modify your prompt.";
-        command.arguments = "(help)|(prompt definition)";
-        command.hndl = DoPrompt;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "time";
-        command.help = "Give the current day phase.";
-        command.arguments = "NONE";
-        command.hndl = DoTime;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "stand";
-        command.help = "Make the player stand.";
-        command.arguments = "NONE";
-        command.hndl = DoStand;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "crouch";
-        command.help = "The player crouches down himself, it's a good stance for hiding.";
-        command.arguments = "NONE";
-        command.hndl = DoCrouch;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "sit";
-        command.help = "The player sits down, ideal for a quick break.";
-        command.arguments = "NONE";
-        command.hndl = DoSit;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "prone";
-        command.help = "The player starts prone, a perfect position to shoot long distance.";
-        command.arguments = "NONE";
-        command.hndl = DoProne;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "rest";
-        command.help = "The player lies down and begin to rest.";
-        command.arguments = "NONE";
-        command.hndl = DoRest;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "statistics";
-        command.help = "Show player statistics.";
-        command.arguments = "NONE";
-        command.hndl = DoStatistics;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "rent";
-        command.help = "Allow player to rent and disconnect.";
-        command.arguments = "NONE";
-        command.hndl = DoRent;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "skills";
-        command.help = "Shows the playes skills and their level.";
-        command.arguments = "NONE";
-        command.hndl = DoSkills;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "server";
-        command.help = "Shows the server statistics.";
-        command.arguments = "NONE";
-        command.hndl = DoServer;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "travel";
-        command.help = "Allow the character to travel between areas.";
-        command.arguments = "NONE";
-        command.hndl = DoTravel;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoQuit, "quit", "",
+        "Leave the game.",
+        false, false, true));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoWho, "who", "",
+        "List all the character online.",
+        false, false, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoSet, "set", "(setting) (value)",
+        "Set some character texts(eg. descr).",
+        false, false, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoStop, "stop", "",
+        "Stop the current character action.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoLook, "look", "[(something) or (someone)]",
+        "Look at something or someone.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoHelp, "help", "(command)",
+        "Show the list of commands or show help for a given command.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoPrompt, "prompt", "(help)|(prompt definition)",
+        "Modify your prompt.",
+        false, false, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoTime, "time", "",
+        "Give the current day phase.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoStand, "stand", "",
+        "Stand up.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoCrouch, "crouch", "",
+        "The character crouches down himself, it's a good stance for hiding.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoSit, "sit", "",
+        "The player sits down, ideal for a quick break.",
+        false, false, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoProne, "prone", "",
+        "The player starts prone, a perfect position to shoot long distance.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoRest, "rest", "",
+        "The player lies down and begin to rest.",
+        false, false, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoStatistics, "statistics", "",
+        "Show player statistics.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoRent, "rent", "",
+        "Allow player to rent and disconnect.",
+        false, false, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoSkills, "skills", "",
+        "Shows the playes skills and their level.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoServer, "server", "",
+        "Shows the server statistics.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoTravel, "travel", "",
+        "Allow the character to travel between areas.",
+        false, true, false));
 }
 
 bool DoDirection(Character * character, Direction direction)
@@ -454,11 +376,11 @@ bool DoHelp(Character * character, ArgumentHandler & args)
         }
         for (auto it : Mud::instance().mudCommands)
         {
-            if (it.canUse(character))
+            if (it->canUse(character))
             {
-                if (it.gods)
+                if (it->gods)
                 {
-                    godsRow.push_back(it.name);
+                    godsRow.push_back(it->name);
                     if (godsRow.size() == numColumns)
                     {
                         godsCommands.addRow(godsRow);
@@ -467,7 +389,7 @@ bool DoHelp(Character * character, ArgumentHandler & args)
                 }
                 else
                 {
-                    baseRow.push_back(it.name);
+                    baseRow.push_back(it->name);
                     if (baseRow.size() == numColumns)
                     {
                         baseCommands.addRow(baseRow);
@@ -498,22 +420,22 @@ bool DoHelp(Character * character, ArgumentHandler & args)
     else if (args.size() == 1)
     {
         auto command = args[0].getContent();
-        for (auto iterator : Mud::instance().mudCommands)
+        for (auto it : Mud::instance().mudCommands)
         {
-            if (iterator.canUse(character))
+            if (it->canUse(character))
             {
-                if (BeginWith(ToLower(iterator.name), command))
+                if (BeginWith(ToLower(it->name), command))
                 {
                     std::string msg;
-                    msg += "Showing help for command :" + iterator.name + "\n";
+                    msg += "Showing help for command :" + it->name + "\n";
                     msg += Formatter::yellow() + " Command   : " + Formatter::reset()
-                           + iterator.name + "\n";
+                           + it->name + "\n";
                     msg += Formatter::yellow() + " Level     : " + Formatter::reset()
-                           + ToString(iterator.gods) + "\n";
+                           + ToString(it->gods) + "\n";
                     msg += Formatter::yellow() + " Arguments : " + Formatter::reset()
-                           + iterator.arguments + "\n";
+                           + it->arguments + "\n";
                     msg += Formatter::yellow() + " Help      : " + Formatter::reset()
-                           + iterator.help + "\n";
+                           + it->help + "\n";
                     character->sendMsg(msg);
                     return true;
                 }

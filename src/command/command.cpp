@@ -31,77 +31,36 @@
 #include "god.hpp"
 #include "manager.hpp"
 #include "object.hpp"
+#include "logger.hpp"
 
 Command::Command() :
-    gods(),
+    handler(),
     name(),
-    help(),
     arguments(),
-    hndl(),
+    help(),
+    gods(),
     canUseInCombat(),
     typedCompletely()
 {
     // Nothing to do.
 }
 
-Command::Command(const bool & _gods,
+Command::Command(const std::function<bool(Character * character, ArgumentHandler & args)> & _handler,
                  const std::string & _name,
-                 const std::string & _help,
                  const std::string & _arguments,
-                 const std::function<bool(Character * character, ArgumentHandler & args)> & _hndl,
+                 const std::string & _help,
+                 const bool & _gods,
                  const bool & _canUseInCombat,
                  const bool & _typedCompletely) :
-    gods(_gods),
+    handler(_handler),
     name(_name),
-    help(_help),
     arguments(_arguments),
-    hndl(_hndl),
+    help(_help),
+    gods(_gods),
     canUseInCombat(_canUseInCombat),
     typedCompletely(_typedCompletely)
 {
     // Nothing to do.
-}
-
-Command & Command::setGods(const bool & _gods)
-{
-    gods = _gods;
-    return *this;
-}
-
-Command & Command::setName(const std::string & _name)
-{
-    name = _name;
-    return *this;
-}
-
-Command & Command::setHelp(const std::string & _help)
-{
-    help = _help;
-    return *this;
-}
-
-Command & Command::setArgs(const std::string & _arguments)
-{
-    arguments = _arguments;
-    return *this;
-}
-
-Command & Command::setHndl(const std::function<bool(Character * character, ArgumentHandler & args)> & _hndl)
-{
-    hndl = _hndl;
-    return *this;
-}
-
-Command & Command::setCanUseInCombat(const bool & _canUseInCombat)
-{
-    canUseInCombat = _canUseInCombat;
-    return *this;
-}
-
-Command & Command::setTypedCompletely(const bool & _typedCompletely)
-{
-    typedCompletely = _typedCompletely;
-    return *this;
 }
 
 bool Command::canUse(Character * character) const

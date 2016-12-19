@@ -202,7 +202,7 @@ public:
     /// Mud news.
     std::map<std::string, std::string> mudNews;
     /// List of commands (eg. look, quit, north etc.).
-    std::vector<Command> mudCommands;
+    std::vector<std::shared_ptr<Command> > mudCommands;
     /// Mud possible directions.
     std::map<std::string, Direction> mudDirections;
     /// Map of buildings schematic.
@@ -301,7 +301,7 @@ public:
     bool addTravelPoint(Room * source, Room * target);
 
     /// Add a command to the mud.
-    void addCommand(const Command & command);
+    void addCommand(std::shared_ptr<Command> command);
 
     /// Add a direction to the mud.
     bool addDirection(std::string name, const Direction & direction);

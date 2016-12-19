@@ -31,79 +31,39 @@
 
 void LoadCombatCommands()
 {
-    {
-        Command command;
-        command.name = "kill";
-        command.help = "Engage in combat the desired target.";
-        command.arguments = "(target)";
-        command.hndl = DoKill;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "flee";
-        command.help = "Try to flee from combat.";
-        command.arguments = "NONE";
-        command.hndl = DoFlee;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "scout";
-        command.help = "Provides information about the surrounding area.";
-        command.arguments = "NONE";
-        command.hndl = DoScout;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "load";
-        command.help = "Allows to load a magazine with projectiles.";
-        command.arguments = "(magazine)(projectiles)";
-        command.hndl = DoLoad;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "unload";
-        command.help = "Allows to unload an magazine.";
-        command.arguments = "(magazine)";
-        command.hndl = DoUnload;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "reload";
-        command.help = "Allows to reload a firearm with a magazine.";
-        command.arguments = "(firearm)(magazine)";
-        command.hndl = DoReload;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "aim";
-        command.help = "Allows to aim a target in sight.\n If the target is not inside the same room";
-        command.help += "If the target is not inside the same room, you have first to scout the area.";
-        command.arguments = "(target)";
-        command.hndl = DoAim;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "fire";
-        command.help = "Allows to fire with an equipped ranged weapon to an aimed target.";
-        command.arguments = "NONE";
-        command.hndl = DoFire;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoKill, "kill", "(target)",
+        "Engage in combat the desired target.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoFlee, "flee", "",
+        "Try to flee from combat.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoScout, "scout", "",
+        "Provides information about the surrounding area.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoLoad, "load", "(magazine) (projectiles)",
+        "Allows to load a magazine with projectiles.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoUnload, "unload", "(magazine)",
+        "Allows to unload an magazine.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoReload, "reload", "(firearm) (magazine)",
+        "Allows to reload a firearm with a magazine.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoAim, "aim", "(target)",
+        "Allows to aim a target in sight.\n"
+            "If the target is not inside the same room, you have first to scout the area.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoFire, "fire", "(firearm) (magazine)",
+        "Allows to fire with an equipped ranged weapon to an aimed target.",
+        false, true, false));
 }
 
 bool DoKill(Character * character, ArgumentHandler & args)

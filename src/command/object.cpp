@@ -30,173 +30,90 @@
 
 void LoadObjectCommands()
 {
-    {
-        Command command;
-        command.name = "take";
-        command.help = "Take something from the ground or from a container.";
-        command.arguments = "(item) [(container)]";
-        command.hndl = DoTake;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "drop";
-        command.help = "Drop an object.";
-        command.arguments = "(item)";
-        command.hndl = DoDrop;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "give";
-        command.help = "Give an object to someone.";
-        command.arguments = "(item) (someone)";
-        command.hndl = DoGive;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "equipments";
-        command.help = "List all the items you are wearing.";
-        command.arguments = "";
-        command.hndl = DoEquipments;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "wield";
-        command.help = "Wield a weapon, a shield or maybe a tool.";
-        command.arguments = "(item)";
-        command.hndl = DoWield;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "wear";
-        command.help = "Puts on a piece of equipment.";
-        command.arguments = "(item)";
-        command.hndl = DoWear;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "remove";
-        command.help = "Remove a weared or wielded item.";
-        command.arguments = "(item)";
-        command.hndl = DoRemove;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "inventory";
-        command.help = "Show character's inventory.";
-        command.arguments = "";
-        command.hndl = DoInventory;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "organize";
-        command.help = "Order the desired container or if no target is passed, the room.";
-        command.arguments = "(name|weight) [(target)]";
-        command.hndl = DoOrganize;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "open";
-        command.help = "Open a door in a given direction.";
-        command.arguments = "(item)|(direction)";
-        command.hndl = DoOpen;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "close";
-        command.help = "Close a door in a given direction.";
-        command.arguments = "(item)|(direction)";
-        command.hndl = DoClose;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "put";
-        command.help = "Put something inside a container.";
-        command.arguments = "(something) (container)";
-        command.hndl = DoPut;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "drink";
-        command.help = "Drink from a container of liquids.";
-        command.arguments = "(container)";
-        command.hndl = DoDrink;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "fill";
-        command.help = "Fill a container of liquids from a source of liquid.";
-        command.arguments = "(container) (source)";
-        command.hndl = DoFill;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "pour";
-        command.help = "Pour the content of the container into another one or on the ground.";
-        command.arguments = "(container) [container]";
-        command.hndl = DoPour;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "deposit";
-        command.help = "Deposit a coin inside a shop.";
-        command.arguments = "(item) (shop)";
-        command.hndl = DoDeposit;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "sell";
-        command.help = "Sell an item to a shop keeper.";
-        command.arguments = "(item) (shop)";
-        command.hndl = DoSell;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "buy";
-        command.help = "Allows to buy an item from a shop.";
-        command.arguments = "(item) (shop)";
-        command.hndl = DoBuy;
-        Mud::instance().addCommand(command);
-    }
-    Mud::instance().addCommand(
-        Command(false, "balance",
-                "Shows the character's balance.",
-                "",
-                DoBalance, false, false));
-    Mud::instance().addCommand(
-        Command(false, "turn",
-                "Allows to turn on and off an activatable item.",
-                "(item)",
-                DoTurn, true, false));
-    Mud::instance().addCommand(
-        Command(false, "refill",
-                "Allows to refill a light source.",
-                "(light_source) (fuel)",
-                DoRefill, false, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoTake, "take", "(item|all) [(container)]",
+        "Take something from the ground or from a container.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoDrop, "drop", "(item|all)",
+        "Drop an object.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoGive, "give", "(item|all) (someone)",
+        "Give an object to someone.",
+        false, false, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoEquipments, "equipments", "",
+        "List all the items you are wearing.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoWield, "wield", "(item)",
+        "Wield a weapon, a shield or maybe a tool.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoWear, "wear", "(item)",
+        "Puts on a piece of equipment.",
+        false, false, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoRemove, "remove", "(item)",
+        "Remove a weared or wielded item.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoInventory, "inventory", "",
+        "Show character's inventory.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoOrganize, "organize", "(name|weight) [(container)]",
+        "Order the desired container or if no target is passed, the room.",
+        false, false, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoOpen, "open", "(container)|(direction)",
+        "Open a door in a given direction or a container.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoClose, "close", "(container)|(direction)",
+        "Close a door in a given direction or a container.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoPut, "put", "(something) (container)",
+        "Put something inside a container.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoDrink, "drink", "(liquid container)",
+        "Drink from a container of liquids.",
+        false, false, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoFill, "fill", "(liquid container) (source of liquid)",
+        "Fill a container of liquids from a source of liquid.",
+        false, false, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoPour, "pour", "(liquid container) [liquid container]",
+        "Pour the content of the container into another one or on the ground.",
+        false, false, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoDeposit, "deposit", "(coin) (shop)",
+        "Deposit a coin inside a shop.",
+        false, false, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoSell, "sell", "(item) (shop)",
+        "Sell an item to a shop keeper.",
+        false, false, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoBuy, "buy", "(item) (shop)",
+        "Allows to buy an item from a shop.",
+        false, false, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoBalance, "balance", "",
+        "Shows the character's balance.",
+        false, false, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoTurn, "turn", "(item)",
+        "Allows to turn on and off an activatable item.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoRefill, "refill", "(light source) (fuel)",
+        "Allows to refill a light source.",
+        false, true, false));
 }
 
 bool DoTake(Character * character, ArgumentHandler & args)

@@ -28,30 +28,18 @@
 
 void LoadCraftingCommands()
 {
-    {
-        Command command;
-        command.name = "build";
-        command.help = "Build something.";
-        command.arguments = "(item)";
-        command.hndl = DoBuild;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "deconstruct";
-        command.help = "Deconstruct a building.";
-        command.arguments = "(building)";
-        command.hndl = DoDeconstruct;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "read";
-        command.help = "Read an inscription from an item.";
-        command.arguments = "(item)";
-        command.hndl = DoRead;
-        Mud::instance().addCommand(command);
-    }
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoBuild, "build", "(item)",
+        "Build something.",
+        false, false, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoDeconstruct, "deconstruct", "(building)",
+        "Deconstruct a building.",
+        false, false, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoRead, "read", "(item)",
+        "Read an inscription from an item.",
+        false, false, false));
 }
 
 bool DoProfession(Character * character, Profession * profession, ArgumentHandler & args)

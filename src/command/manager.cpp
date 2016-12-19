@@ -27,14 +27,10 @@
 
 void LoadManagerCommands()
 {
-    {
-        Command command;
-        command.name = "assign";
-        command.help = "Allows to assign a mobile to a task/building.";
-        command.arguments = "(mobile)(building)";
-        command.hndl = DoAssign;
-        Mud::instance().addCommand(command);
-    }
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoAssign, "assign", "(mobile) (building)",
+        "Allows to assign a mobile to a task/building.",
+        false, false, false));
 }
 
 bool DoAssign(Character * character, ArgumentHandler & args)
