@@ -114,7 +114,8 @@ bool DoDirection(Character * character, Direction direction)
     }
     // Get the destination.
     auto destination = character->room->findExit(direction)->destination;
-    auto moveAction = std::make_shared<MoveAction>(character, destination, direction);
+    auto moveAction = std::make_shared<MoveAction>(character, destination,
+                                                   direction);
     // Check the new action.
     error = std::string();
     if (moveAction->check(error))
@@ -124,15 +125,18 @@ bool DoDirection(Character * character, Direction direction)
         // Calculate the time needed to move.
         if (character->posture == CharacterPosture::Stand)
         {
-            character->sendMsg("You start to go %s...\n", direction.toString());
+            character->sendMsg("You start to go %s...\n",
+                               direction.toString());
         }
         else if (character->posture == CharacterPosture::Crouch)
         {
-            character->sendMsg("You move crouching towards %s...\n", direction.toString());
+            character->sendMsg("You move crouching towards %s...\n",
+                               direction.toString());
         }
         else if (character->posture == CharacterPosture::Prone)
         {
-            character->sendMsg("You begin to crawl to %s...\n", direction.toString());
+            character->sendMsg("You begin to crawl to %s...\n",
+                               direction.toString());
         }
         return true;
     }
@@ -184,7 +188,8 @@ bool DoQuit(Character * character, ArgumentHandler & /*args*/)
                 {character},
                 player->getName());
         }
-        Logger::log(LogLevel::Global, "Player %s has left the game.", player->getName());
+        Logger::log(LogLevel::Global, "Player %s has left the game.",
+                    player->getName());
         // End of properly connected.
         player->closeConnection();
         return true;
@@ -271,8 +276,9 @@ bool DoLook(Character * character, ArgumentHandler & args)
     }
     else if (args.size() == 1)
     {
-        auto target = character->room->findCharacter(args[0].getContent(), args[0].getIndex(), {
-            character});
+        auto target = character->room->findCharacter(args[0].getContent(),
+                                                     args[0].getIndex(),
+                                                     {character});
         if (target)
         {
             if (character->canSee(target))
@@ -283,12 +289,14 @@ bool DoLook(Character * character, ArgumentHandler & args)
                 if (target->canSee(character))
                 {
                     // Notify to other character, that this one are looking at him.
-                    target->sendMsg("%s looks at you.\n\n", character->getNameCapital());
+                    target->sendMsg("%s looks at you.\n\n",
+                                    character->getNameCapital());
                 }
                 return true;
             }
         }
-        auto item = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
+        auto item = character->findNearbyItem(args[0].getContent(),
+                                              args[0].getIndex());
         if (item != nullptr)
         {
             character->sendMsg(item->getLook());
@@ -296,18 +304,23 @@ bool DoLook(Character * character, ArgumentHandler & args)
         }
         else
         {
-            character->sendMsg("You don't see '%s' anywhere.\n", args[0].getContent());
+            character->sendMsg("You don't see '%s' anywhere.\n",
+                               args[0].getContent());
         }
     }
     else if (args.size() == 2)
     {
-        auto target = character->room->findCharacter(args[1].getContent(), args[1].getIndex(), {character});
-        auto container = character->findNearbyItem(args[1].getContent(), args[1].getIndex());
+        auto target = character->room->findCharacter(args[1].getContent(),
+                                                     args[1].getIndex(),
+                                                     {character});
+        auto container = character->findNearbyItem(args[1].getContent(),
+                                                   args[1].getIndex());
         if (target != nullptr)
         {
             if (character->canSee(target))
             {
-                auto item = target->findEquipmentItem(args[0].getContent(), args[0].getIndex());
+                auto item = target->findEquipmentItem(args[0].getContent(),
+                                                      args[0].getIndex());
                 if (item != nullptr)
                 {
                     character->sendMsg(item->getLook());
@@ -315,10 +328,9 @@ bool DoLook(Character * character, ArgumentHandler & args)
                 }
                 else
                 {
-                    character->sendMsg(
-                        "You don't see %s on %s.\n",
-                        args[0].getContent(),
-                        target->getName());
+                    character->sendMsg("You don't see %s on %s.\n",
+                                       args[0].getContent(),
+                                       target->getName());
                 }
             }
             else
@@ -332,7 +344,8 @@ bool DoLook(Character * character, ArgumentHandler & args)
         {
             if (container->isAContainer())
             {
-                auto item = container->findContent(args[0].getContent(), args[0].getIndex());
+                auto item = container->findContent(args[0].getContent(),
+                                                   args[0].getIndex());
                 if (item)
                 {
                     character->sendMsg(item->getLook());
@@ -340,24 +353,25 @@ bool DoLook(Character * character, ArgumentHandler & args)
                 }
                 else
                 {
-                    character->sendMsg("It's not insiede %s.\n", container->getName(true));
+                    character->sendMsg("It's not insiede %s.\n",
+                                       container->getName(true));
                 }
             }
             else
             {
-                character->sendMsg("%s is not a container.\n", container->getNameCapital(true));
+                character->sendMsg("%s is not a container.\n",
+                                   container->getNameCapital(true));
             }
         }
         else
         {
-            character->sendMsg(
-                "You don't see the container '%s' anywhere.\n",
-                args[1].getContent());
+            character->sendMsg("You don't see the container '%s' anywhere.\n",
+                               args[1].getContent());
         }
     }
     else
     {
-        character->sendMsg("You don't remeber how to look?\n");
+        character->sendMsg("You don't remember how to look?\n");
     }
     return false;
 }
@@ -428,13 +442,17 @@ bool DoHelp(Character * character, ArgumentHandler & args)
                 {
                     std::string msg;
                     msg += "Showing help for command :" + it->name + "\n";
-                    msg += Formatter::yellow() + " Command   : " + Formatter::reset()
+                    msg += Formatter::yellow() + " Command   : " +
+                           Formatter::reset()
                            + it->name + "\n";
-                    msg += Formatter::yellow() + " Level     : " + Formatter::reset()
+                    msg += Formatter::yellow() + " Level     : " +
+                           Formatter::reset()
                            + ToString(it->gods) + "\n";
-                    msg += Formatter::yellow() + " Arguments : " + Formatter::reset()
+                    msg += Formatter::yellow() + " Arguments : " +
+                           Formatter::reset()
                            + it->arguments + "\n";
-                    msg += Formatter::yellow() + " Help      : " + Formatter::reset()
+                    msg += Formatter::yellow() + " Help      : " +
+                           Formatter::reset()
                            + it->help + "\n";
                     character->sendMsg(msg);
                     return true;
@@ -455,26 +473,34 @@ bool DoPrompt(Character * character, ArgumentHandler & args)
     {
         character->sendMsg("Current prompt:\n");
         character->sendMsg("    %s\n", player->prompt);
-        character->sendMsg("Type %sprompt help %sto read the guide.\n", Formatter::yellow(), Formatter::reset());
+        character->sendMsg("Type %sprompt help %sto read the guide.\n",
+                           Formatter::yellow(), Formatter::reset());
     }
     else
     {
         if (args[0].getContent() == "help")
         {
+            auto yellow = [](std::string s)
+            {
+                return Formatter::yellow() + s + Formatter::reset();
+            };
+            auto italic = [](std::string s)
+            {
+                return Formatter::italic() + s + Formatter::reset();
+            };
             std::string msg;
-            std::string ITL = Formatter::italic(), RES = Formatter::reset();
-            msg += Formatter::yellow() + "Prompt Help" + Formatter::reset() + "\n";
+            msg += yellow("Prompt Help") + "\n";
             msg += "You can set the prompt you prefer, respectfully to this constraints:\n";
             msg += " - Not more than 15 characters.\n";
             msg += "\n";
             msg += "You can use the following shortcuts in you prompt:\n";
-            msg += "    " + ITL + "&n" + RES + " - Player name.\n";
-            msg += "    " + ITL + "&N" + RES + " - Player name capitalized.\n";
-            msg += "    " + ITL + "&h" + RES + " - Player current health.\n";
-            msg += "    " + ITL + "&H" + RES + " - Player maximum health.\n";
-            msg += "    " + ITL + "&s" + RES + " - Player current stamina.\n";
-            msg += "    " + ITL + "&S" + RES + " - Player maximum stamina.\n";
-            msg += "    " + ITL + "&T" + RES + " - Currently aimed character.\n";
+            msg += "    " + italic("&n") + " - Player name.\n";
+            msg += "    " + italic("&N") + " - Player name capitalized.\n";
+            msg += "    " + italic("&h") + " - Player current health.\n";
+            msg += "    " + italic("&H") + " - Player maximum health.\n";
+            msg += "    " + italic("&s") + " - Player current stamina.\n";
+            msg += "    " + italic("&S") + " - Player maximum stamina.\n";
+            msg += "    " + italic("&T") + " - Currently aimed character.\n";
             player->sendMsg(msg);
         }
         else
@@ -489,20 +515,28 @@ bool DoTime(Character * character, ArgumentHandler & /*args*/)
 {
     if (MudUpdater::instance().getDayPhase() == DayPhase::Morning)
     {
-        character->sendMsg("%sThe sun has just risen.%s\n", Formatter::yellow(), Formatter::reset());
+        character->sendMsg("%sThe sun has just risen.%s\n",
+                           Formatter::yellow(),
+                           Formatter::reset());
     }
     else if (MudUpdater::instance().getDayPhase() == DayPhase::Day)
     {
-        character->sendMsg("%sThe sun is high in the sky.%s\n", Formatter::yellow(), Formatter::reset());
+        character->sendMsg("%sThe sun is high in the sky.%s\n",
+                           Formatter::yellow(),
+                           Formatter::reset());
     }
     else if (MudUpdater::instance().getDayPhase() == DayPhase::Dusk)
     {
-        character->sendMsg("%sThe sun is setting, the shadows begin to prevail.%s\n",
-                           Formatter::cyan(), Formatter::reset());
+        character->sendMsg(
+            "%sThe sun is setting, the shadows begin to prevail.%s\n",
+            Formatter::cyan(),
+            Formatter::reset());
     }
     else if (MudUpdater::instance().getDayPhase() == DayPhase::Night)
     {
-        character->sendMsg("%sThe darkness surrounds you.%s\n", Formatter::blue(), Formatter::reset());
+        character->sendMsg("%sThe darkness surrounds you.%s\n",
+                           Formatter::blue(),
+                           Formatter::reset());
     }
     return true;
 }
@@ -582,60 +616,85 @@ bool DoStatistics(Character * character, ArgumentHandler & /*args*/)
     NoMobile(character);
     auto player = character->toPlayer();
 
+    auto BLD = [](std::string s)
+    {
+        return Formatter::bold() + s + Formatter::reset();
+    };
+    auto MAG = [](std::string s)
+    {
+        return Formatter::magenta() + s + Formatter::reset();
+    };
     std::string msg;
-    std::string MAG = Formatter::magenta();
-    std::string BLD = Formatter::bold();
-    std::string RES = Formatter::reset();
-    msg += MAG + "Name        : " + RES + player->getName() + " ";
-    msg += MAG + "Gender : " + RES + GetGenderTypeName(player->gender) + " ";
-    msg += MAG + "Race : " + RES + player->race->name + "\n";
-    msg += MAG + "Weight      : " + RES + ToString(player->weight) + " " + Mud::instance().getWeightMeasure() + "\n";
-    msg += MAG + "Affiliation : " + RES + player->faction->name + "\n";
-    msg += MAG + "Experience  : " + RES + ToString(player->experience) + " px\n";
-    msg += MAG + "    Str       " + RES;
-    msg += ToString(player->getAbility(Ability::Strength, false));
-    msg += "(" + ToString(player->effects.getAbilityModifier(Ability::Strength)) + ")";
-    msg += "[" + ToString(player->getAbilityModifier(Ability::Strength)) + "]\n";
-    msg += MAG + "    Agi       " + RES;
-    msg += ToString(player->getAbility(Ability::Agility, false));
-    msg += "(" + ToString(player->effects.getAbilityModifier(Ability::Agility)) + ")";
-    msg += "[" + ToString(player->getAbilityModifier(Ability::Agility)) + "]\n";
-    msg += MAG + "    Per       " + RES;
-    msg += ToString(player->getAbility(Ability::Perception, false));
-    msg += "(" + ToString(player->effects.getAbilityModifier(Ability::Perception)) + ")";
-    msg += "[" + ToString(player->getAbilityModifier(Ability::Perception)) + "]\n";
-    msg += MAG + "    Con       " + RES;
-    msg += ToString(player->getAbility(Ability::Constitution, false));
-    msg += "(" + ToString(player->effects.getAbilityModifier(Ability::Constitution)) + ")";
-    msg += "[" + ToString(player->getAbilityModifier(Ability::Constitution)) + "]\n";
-    msg += MAG + "    Int       " + RES;
-    msg += ToString(player->getAbility(Ability::Intelligence, false));
-    msg += "(" + ToString(player->effects.getAbilityModifier(Ability::Intelligence)) + ")";
-    msg += "[" + ToString(player->getAbilityModifier(Ability::Intelligence)) + "]\n";
-    msg += MAG + "    Health    " + RES;
+    msg += MAG("Name        : ") + player->getName() + " ";
+    msg += MAG("Gender : ") + GetGenderTypeName(player->gender) + " ";
+    msg += MAG("Race : ") + player->race->name + "\n";
+    msg += MAG("Weight      : ") + ToString(player->weight) + " ";
+    msg += Mud::instance().getWeightMeasure() + "\n";
+    msg += MAG("Affiliation : ") + player->faction->name + "\n";
+    msg += MAG("Experience  : ") + ToString(player->experience) + " px\n";
+    // Add the abilities.
+    msg += MAG("    Str       ");
+    msg += ToString(player->getAbility(Ability::Strength, false)) + "(";
+    msg += ToString(player->effects.getAbilityModifier(Ability::Strength));
+    msg += ")[";
+    msg += ToString(player->getAbilityModifier(Ability::Strength)) + "]\n";
+    msg += MAG("    Agi       ");
+    msg += ToString(player->getAbility(Ability::Agility, false)) + "(";
+    msg += ToString(player->effects.getAbilityModifier(Ability::Agility));
+    msg += ")[";
+    msg += ToString(player->getAbilityModifier(Ability::Agility)) + "]\n";
+    msg += MAG("    Per       ");
+    msg += ToString(player->getAbility(Ability::Perception, false)) + "(";
+    msg += ToString(player->effects.getAbilityModifier(Ability::Perception));
+    msg += ")[";
+    msg += ToString(player->getAbilityModifier(Ability::Perception)) + "]\n";
+    msg += MAG("    Con       ");
+    msg += ToString(player->getAbility(Ability::Constitution, false)) + "(";
+    msg += ToString(player->effects.getAbilityModifier(Ability::Constitution));
+    msg += ")[";
+    msg += ToString(player->getAbilityModifier(Ability::Constitution)) + "]\n";
+    msg += MAG("    Int       ");
+    msg += ToString(player->getAbility(Ability::Intelligence, false)) + "(";
+    msg += ToString(player->effects.getAbilityModifier(Ability::Intelligence));
+    msg += ")[";
+    // Add the health and the stamina.
+    msg += ToString(player->getAbilityModifier(Ability::Intelligence)) + "]\n";
+    msg += MAG("    Health    ");
     msg += ToString(player->health) + "/" + ToString(player->getMaxHealth());
     msg += "(" + ToString(player->effects.getHealthMod()) + ")\n";
-    msg += MAG + "    Stamina   " + RES;
+    msg += MAG("    Stamina   ");
     msg += ToString(player->stamina) + "/" + ToString(player->getMaxStamina());
     msg += "(" + ToString(player->effects.getHealthMod()) + ")\n";
-    msg += MAG + "Armor Class : " + RES;
-    msg += ToString(player->getArmorClass()) + "\n";
-    msg += "You " + BLD + player->getHealthCondition(true) + RES + ".\n";
-    msg += "You " + BLD + player->getStaminaCondition() + RES + ".\n";
-    msg += "You " + BLD + player->getHungerCondition() + RES + ".\n";
-    msg += "You " + BLD + player->getThirstCondition() + RES + ".\n";
-    msg += "You are " + BLD + player->posture.toString() + RES + ".\n\n";
+    // Add the Armor Class.
+    msg += MAG("Armor Class : ") + ToString(player->getArmorClass()) + "\n";
+    // Add the health and stamina conditions.
+    msg += "You " + BLD(player->getHealthCondition(true)) + ".\n";
+    msg += "You " + BLD(player->getStaminaCondition()) + ".\n";
+    // Add the hunger and thirst conditions.
+    msg += "You " + BLD(player->getHungerCondition()) + ".\n";
+    msg += "You " + BLD(player->getThirstCondition()) + ".\n";
+    // Add the posture.
+    msg += "You are " + BLD(player->posture.toString()) + ".\n\n";
+    // [IF EXIST] Add the current action.
     if (player->getAction()->getType() != ActionType::Wait)
     {
-        msg += "You are " + BLD + player->getAction()->getDescription() + RES + ".\n";
+        msg += "You are ";
+        msg += BLD(player->getAction()->getDescription());
+        msg += ".\n";
     }
+    // [IF EXIST] Add the current opponent.
     if (player->combatHandler.getPredefinedTarget() != nullptr)
     {
-        msg += "You are fighting with " + BLD + player->combatHandler.getPredefinedTarget()->getName() + RES + ".\n";
+        msg += "You are fighting with ";
+        msg += BLD(player->combatHandler.getPredefinedTarget()->getName());
+        msg += ".\n";
     }
+    // [IF EXIST] Add the current aimed opponent.
     if (player->combatHandler.getAimedTarget() != nullptr)
     {
-        msg += "You are aiming at " + BLD + player->combatHandler.getAimedTarget()->getName() + RES + ".\n";
+        msg += "You are aiming at ";
+        msg += BLD(player->combatHandler.getAimedTarget()->getName());
+        msg += ".\n";
     }
     player->sendMsg(msg);
     return true;
@@ -680,29 +739,52 @@ bool DoSkills(Character * character, ArgumentHandler & /*args*/)
 
 bool DoServer(Character * character, ArgumentHandler & /*args*/)
 {
-    std::string msg = "    Mud         : RadMud.\n";
-    msg += "    Version     : ";
-    msg += ToString(RADMUD_MAJOR_VERSION) + ToString(RADMUD_MINOR_VERSION) + ToString(RADMUD_VERSION) + "\n";
-    msg += "    Uptime      : " + ToString(Mud::instance().getUpTime()) + " s\n";
-    msg += "    Players     : " + ToString(Mud::instance().mudPlayers.size()) + "\n";
-    msg += "    Mobiles     : " + ToString(Mud::instance().mudMobiles.size()) + "\n";
-    msg += "    Models      : " + ToString(Mud::instance().mudItemModels.size()) + "\n";
-    msg += "    Items       : " + ToString(Mud::instance().mudItems.size()) + "\n";
-    msg += "    Corpses     : " + ToString(Mud::instance().mudCorpses.size()) + "\n";
-    msg += "    Continents  : " + ToString(Mud::instance().mudContinents.size()) + "\n";
-    msg += "    Areas       : " + ToString(Mud::instance().mudAreas.size()) + "\n";
-    msg += "    Rooms       : " + ToString(Mud::instance().mudRooms.size()) + "\n";
-    msg += "    Races       : " + ToString(Mud::instance().mudRaces.size()) + "\n";
-    msg += "    Factions    : " + ToString(Mud::instance().mudFactions.size()) + "\n";
-    msg += "    Skills      : " + ToString(Mud::instance().mudSkills.size()) + "\n";
-    msg += "    Writings    : " + ToString(Mud::instance().mudWritings.size()) + "\n";
-    msg += "    Materials   : " + ToString(Mud::instance().mudMaterials.size()) + "\n";
-    msg += "    Professions : " + ToString(Mud::instance().mudProfessions.size()) + "\n";
-    msg += "    Productions : " + ToString(Mud::instance().mudProductions.size()) + "\n";
-    msg += "    Schematics  : " + ToString(Mud::instance().mudBuildings.size()) + "\n";
-    msg += "    Liquids     : " + ToString(Mud::instance().mudLiquids.size()) + "\n";
-    msg += "    News        : " + ToString(Mud::instance().mudNews.size()) + "\n";
-    msg += "    Commands    : " + ToString(Mud::instance().mudCommands.size()) + "\n";
+    std::string msg;
+    msg += "Mud         : RadMud.\n";
+    msg += "Version     : ";
+    msg += ToString(RADMUD_MAJOR_VERSION) + ".";
+    msg += ToString(RADMUD_MINOR_VERSION) + ".";
+    msg += ToString(RADMUD_VERSION) + "\n";
+    msg += "    Uptime      : ";
+    msg += ToString(Mud::instance().getUpTime()) + " s\n";
+    msg += "    Players     : ";
+    msg += ToString(Mud::instance().mudPlayers.size()) + "\n";
+    msg += "    Mobiles     : ";
+    msg += ToString(Mud::instance().mudMobiles.size()) + "\n";
+    msg += "    Models      : ";
+    msg += ToString(Mud::instance().mudItemModels.size()) + "\n";
+    msg += "    Items       : ";
+    msg += ToString(Mud::instance().mudItems.size()) + "\n";
+    msg += "    Corpses     : ";
+    msg += ToString(Mud::instance().mudCorpses.size()) + "\n";
+    msg += "    Continents  : ";
+    msg += ToString(Mud::instance().mudContinents.size()) + "\n";
+    msg += "    Areas       : ";
+    msg += ToString(Mud::instance().mudAreas.size()) + "\n";
+    msg += "    Rooms       : ";
+    msg += ToString(Mud::instance().mudRooms.size()) + "\n";
+    msg += "    Races       : ";
+    msg += ToString(Mud::instance().mudRaces.size()) + "\n";
+    msg += "    Factions    : ";
+    msg += ToString(Mud::instance().mudFactions.size()) + "\n";
+    msg += "    Skills      : ";
+    msg += ToString(Mud::instance().mudSkills.size()) + "\n";
+    msg += "    Writings    : ";
+    msg += ToString(Mud::instance().mudWritings.size()) + "\n";
+    msg += "    Materials   : ";
+    msg += ToString(Mud::instance().mudMaterials.size()) + "\n";
+    msg += "    Professions : ";
+    msg += ToString(Mud::instance().mudProfessions.size()) + "\n";
+    msg += "    Productions : ";
+    msg += ToString(Mud::instance().mudProductions.size()) + "\n";
+    msg += "    Schematics  : ";
+    msg += ToString(Mud::instance().mudBuildings.size()) + "\n";
+    msg += "    Liquids     : ";
+    msg += ToString(Mud::instance().mudLiquids.size()) + "\n";
+    msg += "    News        : ";
+    msg += ToString(Mud::instance().mudNews.size()) + "\n";
+    msg += "    Commands    : ";
+    msg += ToString(Mud::instance().mudCommands.size()) + "\n";
     character->sendMsg(msg);
     return true;
 }

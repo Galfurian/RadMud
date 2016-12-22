@@ -28,7 +28,8 @@
 void LoadCombatCommands();
 
 /// @defgroup ComInterfaces Commands List Interface.
-/// @brief All the functions necessary to handle the commands that a player can execute.
+/// @brief All the functions necessary to handle the commands that a player
+///         can execute.
 /// @{
 
 /// Engage in combat the desired target.

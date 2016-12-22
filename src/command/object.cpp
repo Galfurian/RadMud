@@ -172,16 +172,18 @@ bool DoTake(Character * character, ArgumentHandler & args)
             {
                 // Send the messages.
                 character->sendMsg("You've picked up everything you could.\n");
-                character->room->sendToAll("%s has picked up everything %s could.\n",
-                                           {character},
-                                           character->getNameCapital(),
-                                           character->getSubjectPronoun());
+                character->room->sendToAll(
+                    "%s has picked up everything %s could.\n",
+                    {character},
+                    character->getNameCapital(),
+                    character->getSubjectPronoun());
                 return true;
             }
             character->sendMsg("You've picked up nothing.\n");
             return false;
         }
-        auto item = character->room->findItem(args[0].getContent(), args[0].getIndex());
+        auto item = character->room->findItem(args[0].getContent(),
+                                              args[0].getIndex());
         // If the item is null.
         if (item == nullptr)
         {
@@ -200,7 +202,7 @@ bool DoTake(Character * character, ArgumentHandler & args)
             // Check if the item is still null.
             if (item == nullptr)
             {
-                character->sendMsg("You don't see that item inside the room.\n");
+                character->sendMsg("You don't see that item.\n");
                 return false;
             }
         }
@@ -248,7 +250,8 @@ bool DoTake(Character * character, ArgumentHandler & args)
             auto newStack = item->removeFromStack(character, quantity);
             if (newStack == nullptr)
             {
-                character->sendMsg("You failed to drop %s.\n", item->getName(true));
+                character->sendMsg("You failed to drop %s.\n",
+                                   item->getName(true));
                 // Rollback the transaction.
                 SQLiteDbms::instance().rollbackTransection();
                 return false;
@@ -267,7 +270,8 @@ bool DoTake(Character * character, ArgumentHandler & args)
         return true;
     }
 
-    auto container = character->findNearbyItem(args[1].getContent(), args[1].getIndex());
+    auto container = character->findNearbyItem(args[1].getContent(),
+                                               args[1].getIndex());
     if (container == nullptr)
     {
         character->sendMsg("You don't see that container.\n");
@@ -275,19 +279,22 @@ bool DoTake(Character * character, ArgumentHandler & args)
     }
     if (HasFlag(container->flags, ItemFlag::Locked))
     {
-        character->sendMsg("You have first to unlock %s first.\n", container->getName(true));
+        character->sendMsg("You have first to unlock %s first.\n",
+                           container->getName(true));
         return false;
     }
     if (HasFlag(container->flags, ItemFlag::Closed))
     {
-        character->sendMsg("You have first to open %s first.\n", container->getName(true));
+        character->sendMsg("You have first to open %s first.\n",
+                           container->getName(true));
         return false;
     }
     if (ToLower(args[0].getContent()) == "all")
     {
         if (container->content.empty())
         {
-            character->sendMsg("There is nothing inside %s.\n", container->getName(true));
+            character->sendMsg("There is nothing inside %s.\n",
+                               container->getName(true));
             return false;
         }
         // Make a temporary copy of the character's inventory.
@@ -321,18 +328,22 @@ bool DoTake(Character * character, ArgumentHandler & args)
         if (takenSomething)
         {
             // Send the messages.
-            character->sendMsg("You've taken everything you could from %s.\n", container->getName(true));
-            character->room->sendToAll("%s has taken everything %s could from %s.\n",
-                                       {character},
-                                       character->getNameCapital(),
-                                       character->getSubjectPronoun(),
-                                       container->getName(true));
+            character->sendMsg("You've taken everything you could from %s.\n",
+                               container->getName(true));
+            character->room->sendToAll(
+                "%s has taken everything %s could from %s.\n",
+                {character},
+                character->getNameCapital(),
+                character->getSubjectPronoun(),
+                container->getName(true));
             return true;
         }
-        character->sendMsg("You've taken nothing from %s.\n", container->getName(true));
+        character->sendMsg("You've taken nothing from %s.\n",
+                           container->getName(true));
         return false;
     }
-    auto item = container->findContent(args[0].getContent(), args[0].getIndex());
+    auto item = container->findContent(args[0].getContent(),
+                                       args[0].getIndex());
     if (item == nullptr)
     {
         character->sendMsg("You don't see that item inside the container.\n");
@@ -365,7 +376,8 @@ bool DoTake(Character * character, ArgumentHandler & args)
         // Add the item to the player's inventory.
         character->addInventoryItem(item);
         // Send the messages.
-        character->sendMsg("You take out %s from %s.\n", item->getName(true), container->getName(true));
+        character->sendMsg("You take out %s from %s.\n", item->getName(true),
+                           container->getName(true));
         character->room->sendToAll("%s takes out %s from %s.\n",
                                    {character},
                                    character->getNameCapital(),
@@ -378,7 +390,8 @@ bool DoTake(Character * character, ArgumentHandler & args)
         auto newStack = item->removeFromStack(character, quantity);
         if (newStack == nullptr)
         {
-            character->sendMsg("You failed to take part of %s.\n", item->getName(true));
+            character->sendMsg("You failed to take part of %s.\n",
+                               item->getName(true));
             // Rollback the transaction.
             SQLiteDbms::instance().rollbackTransection();
             return false;
@@ -444,7 +457,8 @@ bool DoDrop(Character * character, ArgumentHandler & args)
         return true;
     }
     // Get the item.
-    auto item = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
+    auto item = character->findInventoryItem(args[0].getContent(),
+                                             args[0].getIndex());
     // Check if the player has the item that he want to drop.
     if (item == nullptr)
     {
@@ -508,14 +522,16 @@ bool DoGive(Character * character, ArgumentHandler & args)
         return false;
     }
     // Get the item.
-    auto item = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
+    auto item = character->findInventoryItem(args[0].getContent(),
+                                             args[0].getIndex());
     if (item == nullptr)
     {
         character->sendMsg("You don't have that item.\n");
         return false;
     }
-    auto target = character->room->findCharacter(args[1].getContent(), args[1].getIndex(), {
-        character});
+    auto target = character->room->findCharacter(args[1].getContent(),
+                                                 args[1].getIndex(),
+                                                 {character});
     if (target == nullptr)
     {
         character->sendMsg("You don't see that person.\n");
@@ -524,7 +540,8 @@ bool DoGive(Character * character, ArgumentHandler & args)
     // Check if the target player can carry the item.
     if (!target->canCarry(item, item->quantity))
     {
-        character->sendMsg(target->getNameCapital() + " can't carry anymore items.\n");
+        character->sendMsg("%s can't carry anymore items.\n",
+                           target->getNameCapital());
         return false;
     }
     // Set the quantity.
@@ -542,8 +559,12 @@ bool DoGive(Character * character, ArgumentHandler & args)
         // Add the item to the target inventory.
         target->addInventoryItem(item);
         // Send all the messages.
-        character->sendMsg("You give %s to %s.\n", item->getName(true), target->getName());
-        target->sendMsg("%s gives you %s.\n\n", character->getNameCapital(), item->getName(true));
+        character->sendMsg("You give %s to %s.\n",
+                           item->getName(true),
+                           target->getName());
+        target->sendMsg("%s gives you %s.\n\n",
+                        character->getNameCapital(),
+                        item->getName(true));
         character->room->sendToAll("%s gives %s to %s.\n",
                                    {character, target},
                                    character->getNameCapital(),
@@ -556,7 +577,9 @@ bool DoGive(Character * character, ArgumentHandler & args)
         auto newStack = item->removeFromStack(character, quantity);
         if (newStack == nullptr)
         {
-            character->sendMsg("You failed to give part of %s to %s.\n", item->getName(true), target->getName());
+            character->sendMsg("You failed to give part of %s to %s.\n",
+                               item->getName(true),
+                               target->getName());
             // Rollback the transaction.
             SQLiteDbms::instance().rollbackTransection();
             return false;
@@ -564,8 +587,12 @@ bool DoGive(Character * character, ArgumentHandler & args)
         // Add the stack to the target inventory.
         target->addInventoryItem(newStack);
         // Send all the messages.
-        character->sendMsg("You give part of %s to %s.\n", item->getName(true), target->getName());
-        target->sendMsg("%s gives you %s.\n\n", character->getNameCapital(), item->getName(true));
+        character->sendMsg("You give part of %s to %s.\n",
+                           item->getName(true),
+                           target->getName());
+        target->sendMsg("%s gives you %s.\n\n",
+                        character->getNameCapital(),
+                        item->getName(true));
         character->room->sendToAll("%s gives %s to %s.\n",
                                    {character, target},
                                    character->getNameCapital(),
@@ -595,7 +622,9 @@ bool DoEquipments(Character * character, ArgumentHandler & /*args*/)
     }
     std::string output;
     // Print what is wearing.
-    output += Formatter::yellow() + "#------------ Equipment -----------#\n" + Formatter::reset();
+    output += Formatter::yellow();
+    output += "#------------ Equipment -----------#\n";
+    output += Formatter::reset();
     // Equipment Slot : HEAD
     output += "\tHead       : ";
     if (head != nullptr)
@@ -659,7 +688,9 @@ bool DoEquipments(Character * character, ArgumentHandler & /*args*/)
         else output += "Something";
         output += "\n";
     }
-    output += Formatter::yellow() + "#----------------------------------#\n" + Formatter::reset();
+    output += Formatter::yellow();
+    output += "#----------------------------------#\n";
+    output += Formatter::reset();
     character->sendMsg(output);
     return true;
 }
@@ -680,7 +711,8 @@ bool DoWield(Character * character, ArgumentHandler & args)
         return false;
     }
     // Get the item.
-    auto item = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
+    auto item = character->findInventoryItem(args[0].getContent(),
+                                             args[0].getIndex());
     // Check if the item is null.
     if (item == nullptr)
     {
@@ -733,7 +765,8 @@ bool DoWield(Character * character, ArgumentHandler & args)
     // Show the proper message.
     auto object = item->getName(true);
     auto where = "with your " + item->getCurrentSlotName();
-    auto whereOthers = character->getPossessivePronoun() + " " + item->getCurrentSlotName();
+    auto whereOthers = character->getPossessivePronoun();
+    whereOthers += " " + item->getCurrentSlotName();
     if (HasFlag(item->model->modelFlags, ModelFlag::TwoHand))
     {
         where = "both your hands";

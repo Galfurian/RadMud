@@ -28,11 +28,14 @@
 void LoadCraftingCommands();
 
 /// @defgroup ComInterfaces Commands List Interface.
-/// @brief All the functions necessary to handle the commands that a player can execute.
+/// @brief All the functions necessary to handle the commands that a player
+///         can execute.
 /// @{
 
 /// Execute a profession.
-bool DoProfession(Character * character, Profession * profession, ArgumentHandler & args);
+bool DoProfession(Character * character,
+                  Profession * profession,
+                  ArgumentHandler & args);
 
 /// Build something.
 bool DoBuild(Character * character, ArgumentHandler & args);

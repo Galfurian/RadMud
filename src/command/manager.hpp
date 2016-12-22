@@ -28,7 +28,8 @@
 void LoadManagerCommands();
 
 /// @defgroup ComInterfaces Commands List Interface.
-/// @brief All the functions necessary to handle the commands that a player can execute.
+/// @brief All the functions necessary to handle the commands that a player
+///         can execute.
 /// @{
 
 /// Allows to assign a mobile to a task/building.

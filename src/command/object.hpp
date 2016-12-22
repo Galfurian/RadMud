@@ -28,10 +28,12 @@
 void LoadObjectCommands();
 
 /// @defgroup ComInterfaces Commands List Interface.
-/// @brief All the functions necessary to handle the commands that a player can execute.
+/// @brief All the functions necessary to handle the commands that a player
+///         can execute.
 /// @{
 
-/// Allow the character to pick up an object, or take an object from another one.
+/// Allow the character to pick up an object, or take an object
+///  from another one.
 bool DoTake(Character * character, ArgumentHandler & args);
 
 /// Allow the character to drop an object.
