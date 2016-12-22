@@ -34,7 +34,10 @@ Liquid::Liquid() :
 
 Liquid::~Liquid()
 {
-    //Logger::log(LogLevel::Debug, "Deleted liquid\t\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
+//    Logger::log(LogLevel::Debug,
+//                "Deleted liquid\t\t[%s]\t\t(%s)",
+//                ToString(this->vnum),
+//                this->name);
 }
 
 bool Liquid::check()

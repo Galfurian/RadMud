@@ -54,7 +54,8 @@ public:
     ~Liquid();
 
     /// @brief Check the correctness of the liquid.
-    /// @return <b>True</b> if the liquid has correct values,<br><b>False</b> otherwise.
+    /// @return <b>True</b> if the liquid has correct values,<br>
+    ///         <b>False</b> otherwise.
     bool check();
 
     /// @brief Return the name of the liquid.

@@ -102,7 +102,8 @@ bool DoKill(Character * character, ArgumentHandler & args)
         if (character->combatHandler.hasOpponent(target))
         {
             // Check if the current predefined target is the target.
-            auto predefinedTarget = character->combatHandler.getPredefinedTarget();
+            auto predefinedTarget = character->combatHandler
+                                             .getPredefinedTarget();
             if (predefinedTarget != nullptr)
             {
                 if (predefinedTarget == target)
@@ -314,7 +315,8 @@ bool DoUnload(Character * character, ArgumentHandler & args)
     // Set the required time to unloaded the item.
     if (itemToUnload->getType() == ModelType::Magazine)
     {
-        auto loadedItem = itemToUnload->toMagazineItem()->getAlreadyLoadedProjectile();
+        auto loadedItem = itemToUnload->toMagazineItem()
+                                      ->getAlreadyLoadedProjectile();
         if (loadedItem == nullptr)
         {
             character->sendMsg(

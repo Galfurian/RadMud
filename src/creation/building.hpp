@@ -50,7 +50,8 @@ public:
     ItemModel * buildingModel;
     /// The list of needed type of ingredients and their quantity.
     std::map<ResourceType, unsigned int> ingredients;
-    /// Flag which determine if in the same room only one of this building can be present.
+    /// Flag which determine if in the same room only one of this building
+    ///  can be present.
     bool unique;
 
     /// @brief Constructor.
@@ -71,7 +72,7 @@ public:
     /// @return The name of the building.
     std::string getName();
 
-    /// @brief Return the name of the building with the first letter capitalized.
+    /// @brief Return the name with the first letter capitalized.
     /// @return The name of the building capitalized.
     std::string getNameCapital();
 

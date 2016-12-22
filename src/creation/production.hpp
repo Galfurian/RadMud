@@ -80,33 +80,34 @@ public:
     /// @brief Destructor.
     ~Production();
 
-    /// @brief Given a predefined formatted string, the function sets the outcome.
+    /// @brief Given a predefined formatted string, it sets the outcome.
     /// @param source The source string.
-    /// @return <b>True</b> if the operation concluded successfuly,<br>
+    /// @return <b>True</b> if the operation concluded successfully,<br>
     ///         <b>False</b> otherwise.
     bool setOutcome(const std::string & source);
 
-    /// @brief Given a predefined formatted string, the function sets the tools.
+    /// @brief Given a predefined formatted string, it sets the tools.
     /// @param source The source string.
-    /// @return <b>True</b> if the operation concluded successfuly,<br>
+    /// @return <b>True</b> if the operation concluded successfully,<br>
     ///         <b>False</b> otherwise.
     bool setTool(const std::string & source);
 
-    /// @brief Given a predefined formatted string, the function sets the ingredients.
+    /// @brief Given a predefined formatted string, it sets the ingredients.
     /// @param source The source string.
-    /// @return <b>True</b> if the operation concluded successfuly,<br>
+    /// @return <b>True</b> if the operation concluded successfully,<br>
     ///         <b>False</b> otherwise.
     bool setIngredient(const std::string & source);
 
     /// @brief Check the correctness of the production.
-    /// @return <b>True</b> if the profession has correct values,<br> <b>False</b> otherwise.
+    /// @return <b>True</b> if the profession has correct values,<br>
+    ///         <b>False</b> otherwise.
     bool check();
 
     /// @brief Return the name of the production.
     /// @return The name of the production.
     std::string getName();
 
-    /// @brief Return the name of the production with the first letter capitalized.
+    /// @brief Return the name with the first letter capitalized.
     /// @return The name of the production capitalized.
     std::string getNameCapital();
 

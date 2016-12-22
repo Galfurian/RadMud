@@ -45,7 +45,8 @@ Command::Command() :
     // Nothing to do.
 }
 
-Command::Command(const std::function<bool(Character * character, ArgumentHandler & args)> & _handler,
+Command::Command(const std::function<bool(Character * character,
+                                          ArgumentHandler & args)> & _handler,
                  const std::string & _name,
                  const std::string & _arguments,
                  const std::string & _help,
@@ -72,7 +73,8 @@ void NoMobile(Character * character)
 {
     if (character->isMobile())
     {
-        throw std::runtime_error("Npcs are not allowed to execute this command.\n");
+        throw std::runtime_error(
+            "Npcs are not allowed to execute this command.\n");
     }
 }
 
@@ -90,8 +92,10 @@ void StopAction(Character * character)
 void LoadCommands()
 {
     // Beware the order is important.
-    // Changing the order will not compromise the correct execution of the Mud, but...
-    // If a player just types 'l' or 'lo' in order to 'look' the first commant which get hit is the 'load' command.
+    // Changing the order will not compromise the correct
+    //  execution of the Mud, but...
+    // If a player just types 'l' or 'lo' in order to 'look'
+    //  the first command which get hit is the 'load' command.
     LoadGeneralCommands();
     LoadObjectCommands();
     LoadCommunicationCommands();

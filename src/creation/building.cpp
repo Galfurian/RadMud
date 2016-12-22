@@ -99,13 +99,7 @@ bool Building::setTool(const std::string & source)
     std::vector<std::string> toolList = SplitString(source, " ");
     for (auto it : toolList)
     {
-        int value = ToNumber<int>(it);
-        if (value < 0)
-        {
-            Logger::log(LogLevel::Error, "Tool list contains a negative value.");
-            return false;
-        }
-        ToolType toolType = static_cast<ToolType>(static_cast<unsigned int>(value));
+        ToolType toolType = ToolType(ToNumber<unsigned int>(it));
         if (toolType == ToolType::None)
         {
             Logger::log(LogLevel::Error, "Can't find the Tool :" + it);
@@ -127,22 +121,28 @@ bool Building::setIngredient(const std::string & source)
     for (auto iterator : ingredientList)
     {
         // Split the string with the information about the ingredient.
-        std::vector<std::string> ingredientInfo = SplitString(iterator, "*");
-        if (ingredientInfo.size() != 2)
+        std::vector<std::string> info = SplitString(iterator, "*");
+        if (info.size() != 2)
         {
-            Logger::log(LogLevel::Error, "Ingredient is not composed by [Ingredient*Quantity]");
+            Logger::log(LogLevel::Error, "Ingredient is not composed by"
+                " [Ingredient*Quantity]");
             return false;
         }
-        ResourceType ingredient = ResourceType(ToNumber<unsigned int>(ingredientInfo[0]));
+        auto ingredient = ResourceType(
+            ToNumber<unsigned int>(info[0]));
         if (ingredient == ResourceType::None)
         {
-            Logger::log(LogLevel::Error, "Can't find the Ingredient :" + ingredientInfo[0]);
+            Logger::log(LogLevel::Error,
+                        "Can't find the Ingredient :%s",
+                        info[0]);
             return false;
         }
-        int quantity = ToNumber<int>(ingredientInfo[1]);
+        int quantity = ToNumber<int>(info[1]);
         if (quantity <= 0)
         {
-            Logger::log(LogLevel::Error, "Can't find the quantity of the Outcome :" + ingredientInfo[0]);
+            Logger::log(LogLevel::Error,
+                        "Can't find the quantity of the Outcome :" +
+                        info[0]);
             return false;
         }
         this->ingredients[ingredient] = static_cast<unsigned int>(quantity);

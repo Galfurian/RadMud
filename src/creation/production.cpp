@@ -44,7 +44,10 @@ Production::Production() :
 
 Production::~Production()
 {
-    //Logger::log(LogLevel::Debug, "Deleted production\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
+//    Logger::log(LogLevel::Debug,
+//                "Deleted production\t[%s]\t\t(%s)",
+//                ToString(this->vnum),
+//                this->name);
 }
 
 bool Production::setOutcome(const std::string & source)
@@ -68,16 +71,18 @@ bool Production::setOutcome(const std::string & source)
         outcome = Mud::instance().findItemModel(ToNumber<int>(outcomeInfo[0]));
         if (outcome == nullptr)
         {
-            Logger::log(LogLevel::Error, "Can't find the Outcome :" + outcomeInfo[0]);
+            Logger::log(LogLevel::Error,
+                        "Can't find the Outcome : %s",
+                        outcomeInfo[0]);
             correct = false;
             break;
         }
         int outcomeQuantity = ToNumber<int>(outcomeInfo[1]);
         if (outcomeQuantity <= 0)
         {
-            Logger::log(
-                LogLevel::Error,
-                "Can't find the quantity of the Outcome :" + outcomeInfo[0]);
+            Logger::log(LogLevel::Error,
+                        "Can't find the quantity of the Outcome : %s",
+                        outcomeInfo[0]);
             correct = false;
             break;
         }
@@ -101,7 +106,9 @@ bool Production::setTool(const std::string & source)
         ToolType toolType(ToNumber<unsigned int>(iterator));
         if (toolType == ToolType::None)
         {
-            Logger::log(LogLevel::Error, "Can't find the Tool Type:" + iterator);
+            Logger::log(LogLevel::Error,
+                        "Can't find the Tool Type: %s",
+                        iterator);
             correct = false;
             break;
         }
@@ -127,19 +134,25 @@ bool Production::setIngredient(const std::string & source)
         {
             return false;
         }
-        ResourceType ingredient = ResourceType(ToNumber<unsigned int>(ingredientInfo[0]));
+        auto ingredient = ResourceType(
+            ToNumber<unsigned int>(ingredientInfo[0]));
         if (ingredient == ResourceType::None)
         {
-            Logger::log(LogLevel::Error, "Can't find the Ingredient :" + ingredientInfo[0]);
+            Logger::log(LogLevel::Error,
+                        "Can't find the Ingredient :" + ingredientInfo[0]);
             return false;
         }
         int ingredientQuantity = ToNumber<int>(ingredientInfo[1]);
         if (ingredientQuantity == 0)
         {
-            Logger::log(LogLevel::Error, "Can't find the quantity of the Outcome :" + ingredientInfo[0]);
+            Logger::log(LogLevel::Error,
+                        "Can't find the quantity of the Outcome :" +
+                        ingredientInfo[0]);
             return false;
         }
-        if (!this->ingredients.insert(std::make_pair(ingredient, ingredientQuantity)).second)
+        if (!this->ingredients.insert(
+                     std::make_pair(ingredient,
+                                    ingredientQuantity)).second)
         {
             Logger::log(LogLevel::Error, "Cannot insert the ingredient");
             return false;
