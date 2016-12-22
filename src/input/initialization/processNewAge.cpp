@@ -35,58 +35,69 @@ bool ProcessNewAge::process(Character * character, ArgumentHandler & args)
     if (ToLower(input) == "back")
     {
         // Create a shared pointer to the previous step.
-        std::shared_ptr<ProcessNewGender> newStep = std::make_shared<ProcessNewGender>();
+        auto newStep = std::make_shared<ProcessNewGender>();
         // Set the handler.
         player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->rollBack(character);
+        return true;
     }
-    else if (!IsNumber(input))
+    // Check if the input is a number.
+    if (!IsNumber(input))
     {
         this->advance(character, "Not a valid age.");
         return false;
     }
-    else
+    // Get the value of age.
+    int age = ToNumber<int>(input);
+    if (age < 18)
     {
-        int age = ToNumber<int>(input);
-        if (age < 18)
-        {
-            this->advance(character, "A creature so young is not suitable for a world so wicked.");
-            return false;
-        }
-        else if (50 < age)
-        {
-            this->advance(character,
-                          "Life expectancy in this world is 70 years, in order to still be competitive you can choose 50 years at most.");
-
-            return false;
-        }
-        else
-        {
-            player->age = age;
-            // Create a shared pointer to the next step.
-            std::shared_ptr<ProcessNewDescription> newStep = std::make_shared<ProcessNewDescription>();
-            // Set the handler.
-            player->inputProcessor = newStep;
-            // Advance to the next step.
-            newStep->advance(character);
-        }
+        this->advance(character,
+                      "A creature so young is not suitable"
+                          "for a world so wicked.");
+        return false;
     }
+    if (50 < age)
+    {
+        this->advance(character,
+                      "Life expectancy in this world is 70 years,"
+                          " in order to still be competitive you"
+                          " can choose 50 years at most.");
+
+        return false;
+    }
+    // Set the age.
+    player->age = age;
+    // Create a shared pointer to the next step.
+    auto newStep = std::make_shared<ProcessNewDescription>();
+    // Set the handler.
+    player->inputProcessor = newStep;
+    // Advance to the next step.
+    newStep->advance(character);
     return true;
 }
 
 void ProcessNewAge::advance(Character * character, const std::string & error)
 {
     // Print the choices.
-    this->printChices(character);
-    // The message that has to be sent.
-    character->sendMsg("# %sCharacter's Age.%s\n", Formatter::bold(), Formatter::reset());
-    character->sendMsg("# Choose the age of your character.\n");
-    character->sendMsg("# Type [%sback%s] to return to the previus step.\n", Formatter::magenta(), Formatter::reset());
+    this->printChoices(character);
+    auto Bold = [](const std::string & s)
+    {
+        return Formatter::magenta() + s + Formatter::reset();
+    };
+    auto Magenta = [](const std::string & s)
+    {
+        return Formatter::magenta() + s + Formatter::reset();
+    };
+    std::string msg;
+    msg += "# " + Bold("Character's Age.") + "\n";
+    msg += "# Choose the age of your character.\n";
+    msg += "# Type [" + Magenta("back") + "] to return to the previous step.\n";
     if (!error.empty())
     {
-        character->sendMsg("# " + error + "\n");
+        msg += "# " + error + "\n";
     }
+    character->sendMsg(msg);
 }
 
 void ProcessNewAge::rollBack(Character * character)

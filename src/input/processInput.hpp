@@ -39,8 +39,9 @@ public:
     virtual ~ProcessInput();
 
     /// @brief Process the input with the given 'character'.
-    /// @param character    The character which activated the processing function.
-    /// @param args         An argument handler which contains the input.
-    /// @return <b>True</b> with a correct execution,<br><b>False</b> otherwise.
+    /// @param character The character which activated the processing function.
+    /// @param args      An argument handler which contains the input.
+    /// @return <b>True</b> with a correct execution,<br>
+    /// <b>False</b> otherwise.
     virtual bool process(Character * character, ArgumentHandler & args);
 };

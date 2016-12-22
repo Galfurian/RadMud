@@ -28,7 +28,8 @@ class ProcessNewAttributes :
 public:
     bool process(Character * character, ArgumentHandler & args);
 
-    void advance(Character * character, const std::string & error = std::string());
+    void advance(Character * character,
+                 const std::string & error = std::string());
 
     void rollBack(Character * character);
 };

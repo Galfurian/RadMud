@@ -32,12 +32,12 @@
 /// @details
 /// The initialization steps comprises all the input processing functions
 ///  executed before the player is actually logged inside the game.<br>
-/// For instance, if I want to add a new step inside the character creation phase,
-///  I just need to implement a new class which extends this A.C. and plug it inside
-///  the creation process.
-/// In details, if I want to add a "Choose Skin Color" step, after the "Chose Description"
-///  and "Chose Weight", I just need to go inside those classes and simply change their
-///  "next" and "previous" step.
+/// For instance, if I want to add a new step inside the character
+///  creation phase, I just need to implement a new class which extends this
+///  A.C. and plug it inside the creation process.
+/// In details, if I want to add a "Choose Skin Color" step, after the
+///  "Chose Description" and "Chose Weight", I just need to go inside those
+///  classes and simply change their "next" and "previous" step.
 class ProcessInitialization :
     public ProcessInput
 {
@@ -50,12 +50,13 @@ public:
 
     /// @brief Print the values inserted until now.
     /// @param character The player whose creating a new character.
-    void printChices(Character * character);
+    void printChoices(Character * character);
 
     /// @brief Print the advancement in the character creation.
     /// @param character The player whose creating a new character.
     /// @param error     An optional message used only during error handling.
-    virtual void advance(Character * character, const std::string & error = std::string()) = 0;
+    virtual void advance(Character * character,
+                         const std::string & error = std::string()) = 0;
 
     /// @brief Reset the informations inserted in the previous state.
     /// @param character The player whose creating a new character.

@@ -37,26 +37,30 @@ bool ProcessNewName::process(Character * character, ArgumentHandler & args)
     else if (ToLower(input) == "back")
     {
         // Create a shared pointer to the previous step.
-        std::shared_ptr<ProcessPlayerName> newStep = std::make_shared<ProcessPlayerName>();
+        auto newStep = std::make_shared<ProcessPlayerName>();
         // Set the handler.
         player->inputProcessor = newStep;
         // Advance to the next step.
         newStep->rollBack(character);
         return true;
     }
-    else if (input.find_first_not_of(VALID_CHARACTERS_NAME) != std::string::npos)
+    else if (input.find_first_not_of(VALID_CHARACTERS_NAME) !=
+             std::string::npos)
     {
-        this->advance(character, "That player name contains disallowed characters.");
+        this->advance(character,
+                      "That player name contains disallowed characters.");
     }
         // Check for bad names here.
-    else if (Mud::instance().badNames.find(input) != Mud::instance().badNames.end())
+    else if (Mud::instance().badNames.find(input) !=
+             Mud::instance().badNames.end())
     {
         this->advance(character, "That name is not permitted.");
     }
         // Check if the player name has already been used.
     else if (SQLiteDbms::instance().searchPlayer(ToCapitals(input)))
     {
-        this->advance(character, "That player already exists, please choose another name.");
+        this->advance(character,
+                      "That player already exists, please choose another name.");
     }
     else
     {
@@ -65,7 +69,7 @@ bool ProcessNewName::process(Character * character, ArgumentHandler & args)
         player->faction = Mud::instance().findFaction(1);
         player->password_attempts = 0;
         // Create a shared pointer to the next step.
-        std::shared_ptr<ProcessNewPassword> newStep = std::make_shared<ProcessNewPassword>();
+        auto newStep = std::make_shared<ProcessNewPassword>();
         // Set the handler.
         player->inputProcessor = newStep;
         // Advance to the next step.
@@ -78,17 +82,26 @@ bool ProcessNewName::process(Character * character, ArgumentHandler & args)
 void ProcessNewName::advance(Character * character, const std::string & error)
 {
     // Print the choices.
-    this->printChices(character);
-    character->sendMsg("# %sCharacter's Name.%s\n", Formatter::bold(), Formatter::reset());
-    character->sendMsg("# Choose carefully, because this it's the only chance you have");
-    character->sendMsg(" to pick a legendary name, maybe one day it will be whispered all over the lands.\n");
-    character->sendMsg("# Type [%sback%s] to return to the previous step.\n",
-                       Formatter::magenta(),
-                       Formatter::reset());
+    this->printChoices(character);
+    auto Bold = [](const std::string & s)
+    {
+        return Formatter::magenta() + s + Formatter::reset();
+    };
+    auto Magenta = [](const std::string & s)
+    {
+        return Formatter::magenta() + s + Formatter::reset();
+    };
+    std::string msg;
+    msg += "# " + Bold("Character's Name.") + "\n";
+    msg += "# Choose carefully, because this it's the only chance you have";
+    msg += " to pick a legendary name, maybe one day it will";
+    msg += " be whispered all over the lands.\n";
+    msg += "# Type [" + Magenta("back") + "] to return to the previous step.\n";
     if (!error.empty())
     {
-        character->sendMsg("# " + error + "\n");
+        msg += "# " + error + "\n";
     }
+    character->sendMsg(msg);
 }
 
 void ProcessNewName::rollBack(Character * character)

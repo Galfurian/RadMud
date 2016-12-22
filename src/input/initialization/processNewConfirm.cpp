@@ -31,7 +31,7 @@ bool ProcessNewConfirm::process(Character * character, ArgumentHandler & args)
     if (ToLower(input) == "back")
     {
         // Create a shared pointer to the previous step.
-        std::shared_ptr<ProcessNewWeight> newStep = std::make_shared<ProcessNewWeight>();
+        auto newStep = std::make_shared<ProcessNewWeight>();
         // Set the handler.
         player->inputProcessor = newStep;
         // Advance to the next step.
@@ -66,23 +66,32 @@ bool ProcessNewConfirm::process(Character * character, ArgumentHandler & args)
     return false;
 }
 
-void ProcessNewConfirm::advance(Character * character, const std::string & error)
+void ProcessNewConfirm::advance(Character * character,
+                                const std::string & error)
 {
     // Print the choices.
-    this->printChices(character);
+    this->printChoices(character);
+    auto Green = [](const std::string & s)
+    {
+        return Formatter::green() + s + Formatter::reset();
+    };
+    auto Magenta = [](const std::string & s)
+    {
+        return Formatter::magenta() + s + Formatter::reset();
+    };
     std::string msg;
     msg += "# Give a look to the information you have provided, now it's the right time";
     msg += " to decide if you want to change something.\n";
-    msg += "# Type [" + Formatter::magenta() + "confirm" + Formatter::reset()
-           + "] to conclude the character creation.\n";
-    msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset()
-           + "]    to return to the previus step.\n";
-    msg += Formatter::green() + "Do you confirm? " + Formatter::reset() + "\n";
-    character->sendMsg(msg);
+    msg += "# Type [" + Magenta("confirm") +
+           "] to conclude the character creation.\n";
+    msg += "# Type [" + Magenta("back") +
+           "]    to return to the previous step.\n";
+    msg += Green("Do you confirm?") + "\n";
     if (!error.empty())
     {
-        character->sendMsg("# " + error + "\n");
+        msg += "# " + error + "\n";
     }
+    character->sendMsg(msg);
 }
 
 void ProcessNewConfirm::rollBack(Character *)

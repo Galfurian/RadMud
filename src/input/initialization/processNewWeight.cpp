@@ -33,7 +33,7 @@ bool ProcessNewWeight::process(Character * character, ArgumentHandler & args)
     if (ToLower(input) == "back")
     {
         // Create a shared pointer to the previous step.
-        std::shared_ptr<ProcessNewDescription> newStep = std::make_shared<ProcessNewDescription>();
+        auto newStep = std::make_shared<ProcessNewDescription>();
         // Set the handler.
         player->inputProcessor = newStep;
         // Advance to the next step.
@@ -59,7 +59,7 @@ bool ProcessNewWeight::process(Character * character, ArgumentHandler & args)
         {
             player->weight = static_cast<unsigned int>(weight);
             // Create a shared pointer to the next step.
-            std::shared_ptr<ProcessNewConfirm> newStep = std::make_shared<ProcessNewConfirm>();
+            auto newStep = std::make_shared<ProcessNewConfirm>();
             // Set the handler.
             player->inputProcessor = newStep;
             // Advance to the next step.
@@ -70,20 +70,29 @@ bool ProcessNewWeight::process(Character * character, ArgumentHandler & args)
     return false;
 }
 
-void ProcessNewWeight::advance(Character * character, const std::string & error)
+void ProcessNewWeight::advance(Character * character,
+                               const std::string & error)
 {
     // Print the choices.
-    this->printChices(character);
+    this->printChoices(character);
+    auto Bold = [](const std::string & s)
+    {
+        return Formatter::magenta() + s + Formatter::reset();
+    };
+    auto Magenta = [](const std::string & s)
+    {
+        return Formatter::magenta() + s + Formatter::reset();
+    };
     std::string msg;
-    msg += "# " + Formatter::bold() + "Character's Weight." + Formatter::reset() + "\n";
-    msg += "# Choose the wheight of your character.\n";
-    msg += "# Type [" + Formatter::magenta() + "back" + Formatter::reset()
-           + "] to return to the previus step.\n";
-    character->sendMsg(msg);
+    msg += "# " + Bold("Character's Weight.") + "\n";
+    msg += "# Choose the weight of your character.\n";
+    msg += "# Type [" + Magenta("back") +
+           "] to return to the previous step.\n";
     if (!error.empty())
     {
-        character->sendMsg("# " + error + "\n");
+        msg += "# " + error + "\n";
     }
+    character->sendMsg(msg);
 }
 
 void ProcessNewWeight::rollBack(Character * character)

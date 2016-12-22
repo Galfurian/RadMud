@@ -23,7 +23,8 @@
 #include "processNewPassword.hpp"
 #include "processNewStory.hpp"
 
-bool ProcessNewPasswordConfirm::process(Character * character, ArgumentHandler & args)
+bool ProcessNewPasswordConfirm::process(Character * character,
+                                        ArgumentHandler & args)
 {
     auto player = character->toPlayer();
     auto input = args.getOriginal();
@@ -31,7 +32,7 @@ bool ProcessNewPasswordConfirm::process(Character * character, ArgumentHandler &
     if (ToLower(input) == "back")
     {
         // Create a shared pointer to the previous step.
-        std::shared_ptr<ProcessNewPassword> newStep = std::make_shared<ProcessNewPassword>();
+        auto newStep = std::make_shared<ProcessNewPassword>();
         // Set the handler.
         player->inputProcessor = newStep;
         // Advance to the next step.
@@ -45,7 +46,7 @@ bool ProcessNewPasswordConfirm::process(Character * character, ArgumentHandler &
     else
     {
         // Create a shared pointer to the next step.
-        std::shared_ptr<ProcessNewStory> newStep = std::make_shared<ProcessNewStory>();
+        auto newStep = std::make_shared<ProcessNewStory>();
         // Set the handler.
         player->inputProcessor = newStep;
         // Advance to the next step.
@@ -55,11 +56,14 @@ bool ProcessNewPasswordConfirm::process(Character * character, ArgumentHandler &
     return false;
 }
 
-void ProcessNewPasswordConfirm::advance(Character * character, const std::string & error)
+void ProcessNewPasswordConfirm::advance(Character * character,
+                                        const std::string & error)
 {
     // Print the choices.
-    this->printChices(character);
-    character->sendMsg("%sRe-enter the password...%s\n", Formatter::green(), Formatter::reset());
+    this->printChoices(character);
+    character->sendMsg("%sRe-enter the password...%s\n",
+                       Formatter::green(),
+                       Formatter::reset());
     if (!error.empty())
     {
         character->sendMsg("# " + error + "\n");
@@ -69,7 +73,7 @@ void ProcessNewPasswordConfirm::advance(Character * character, const std::string
 void ProcessNewPasswordConfirm::rollBack(Character * character)
 {
     // Do not stop this step, just go back to ProcessNewPassword.
-    std::shared_ptr<ProcessNewPassword> newStep = std::make_shared<ProcessNewPassword>();
+    auto newStep = std::make_shared<ProcessNewPassword>();
     character->inputProcessor = newStep;
     newStep->rollBack(character);
 }

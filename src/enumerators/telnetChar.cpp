@@ -116,7 +116,8 @@ std::string TelnetChar::toString() const
     if (telnetChar == MSDP_ARRAY_OPEN) return "MSDP_ARRAY_OPEN";
     if (telnetChar == MSDP_ARRAY_CLOSE) return "MSDP_ARRAY_CLOSE";
     if (telnetChar == TerminalType) return "TerminalType";
-    if (telnetChar == NegotiateAboutWindowSize) return "NegotiateAboutWindowSize";
+    if (telnetChar == NegotiateAboutWindowSize)
+        return "NegotiateAboutWindowSize";
     if (telnetChar == TerminalSpeed) return "TerminalSpeed";
     if (telnetChar == RemoteFlowControl) return "RemoteFlowControl";
     if (telnetChar == LineMode) return "LineMode";

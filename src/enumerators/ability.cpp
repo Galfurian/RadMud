@@ -80,6 +80,44 @@ std::string Ability::toString() const
     else return "none";
 }
 
+std::string Ability::getDescription() const
+{
+    if (ability == Ability::Strength)
+    {
+        return std::string() +
+               "Strength is important for increasing the" +
+               " Carrying Weight and satisfying the minimum" +
+               " Strength requirements for some weapons and armors.";
+    }
+    if (ability == Ability::Agility)
+    {
+        return std::string() +
+               "Besides increasing mobility in combat, it increases" +
+               " the recharge speed of all the weapons, as well as" +
+               " the ability to use light armor.";
+    }
+    if (ability == Ability::Perception)
+    {
+        return std::string() +
+               "The ability to see, hear, taste and notice unusual" +
+               " things. A high Perception is important for a" +
+               " sharpshooter.";
+    }
+    if (ability == Ability::Constitution)
+    {
+        return std::string() +
+               "Stamina and physical toughness. A character with" +
+               " a high Endurance will survive where others may not.";
+    }
+    if (ability == Ability::Intelligence)
+    {
+        return std::string() +
+               "Knowledge, wisdom and the ability to think quickly," +
+               " this attribute is important for any character.";
+    }
+    return "none";
+}
+
 unsigned int Ability::toUInt() const
 {
     return static_cast<unsigned int>(ability);

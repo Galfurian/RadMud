@@ -23,7 +23,6 @@
 #include "mud.hpp"
 
 #include <unistd.h>
-#include <signal.h>
 
 #include "processPlayerName.hpp"
 #include "CMacroWrapper.hpp"
@@ -562,7 +561,7 @@ Profession * Mud::findProfession(unsigned int vnum)
 
 Profession * Mud::findProfession(std::string command)
 {
-    for (std::map<unsigned int, Profession *>::iterator iterator = mudProfessions.begin();
+    for (auto iterator = mudProfessions.begin();
          iterator != mudProfessions.end(); ++iterator)
     {
         if (ToLower(iterator->second->command) == ToLower(command))
@@ -585,7 +584,7 @@ Production * Mud::findProduction(int vnum)
 
 Production * Mud::findProduction(std::string name)
 {
-    for (std::map<int, Production *>::iterator iterator = mudProductions.begin();
+    for (auto iterator = mudProductions.begin();
          iterator != mudProductions.end(); ++iterator)
     {
         if (ToLower(iterator->second->name) == ToLower(name))
@@ -1104,9 +1103,10 @@ bool Mud::initComunications()
         return false;
     }
 
+    // Change to listen on a specific adapter.
     socketAddress.sin_family = AF_INET;
     socketAddress.sin_port = htons(mudPort);
-    socketAddress.sin_addr.s_addr = INADDR_ANY; // Change to listen on a specific adapter.
+    socketAddress.sin_addr.s_addr = INADDR_ANY;
 
     // Bind the socket to our connection port.
     if (::bind(_servSocket, reinterpret_cast<struct sockaddr *>(&socketAddress),
