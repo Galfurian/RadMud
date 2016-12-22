@@ -23,6 +23,7 @@
 #include "mud.hpp"
 
 #include <unistd.h>
+#include <signal.h>
 
 #include "processPlayerName.hpp"
 #include "CMacroWrapper.hpp"
