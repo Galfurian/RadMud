@@ -49,16 +49,21 @@ bool SeedModel::setModel(const std::string & source)
 {
     if (source.empty())
     {
-        Logger::log(LogLevel::Error, "Function list is empty (%s).", this->name);
+        Logger::log(LogLevel::Error,
+                    "Function list is empty (%s).",
+                    this->name);
         return false;
     }
     std::vector<std::string> functionList = SplitString(source, " ");
     if (functionList.size() != 1)
     {
-        Logger::log(LogLevel::Error, "Wrong number of parameters for Seed Model (%s).", this->name);
+        Logger::log(LogLevel::Error,
+                    "Wrong number of parameters for Seed Model (%s).",
+                    this->name);
         return false;
     }
-    this->seedType = static_cast<SeedType>(ToNumber<unsigned int>(functionList[0]));
+    this->seedType = static_cast<SeedType>(ToNumber<unsigned int>(
+        functionList[0]));
     return true;
 }
 

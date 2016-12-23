@@ -38,7 +38,8 @@ public:
 
     /// @brief Checks if the current magazine can be loaded with the given item.
     /// @param projectile The projectile to load.
-    /// @param error      An error string, set when the projectile cannot be loaded.
+    /// @param error      An error string, set when the projectile
+    ///                    cannot be loaded.
     /// @return <b>True</b> if the projectile can be loaded,<br>
     ///         <b>False</b> otherwise.
     bool canLoadWith(Item * projectile, std::string & error) const;
@@ -46,10 +47,13 @@ public:
     /// @brief Evaluates the amount of projectiles which can be loaded.
     /// @param projectile The projectile to load.
     /// @param amount     The amount to load.
-    /// @param error      An error string, set when the projectile cannot be loaded.
+    /// @param error      An error string, set when the projectile cannot
+    ///                    be loaded.
     /// @return <b>True</b> if the projectile can be loaded,<br>
     ///         <b>False</b> otherwise.
-    bool getAmountToLoad(Item * projectile, unsigned int & amount, std::string & error) const;
+    bool getAmountToLoad(Item * projectile,
+                         unsigned int & amount,
+                         std::string & error) const;
 
     /// @brief Provides the list of already loaded projectiles.
     /// @return The contained projectiles.

@@ -55,7 +55,8 @@ public:
     /// @param amount The amount of required fuel.
     /// @param error  The error message in case something goes wrong.
     /// @return If the value amount has been set correctly.
-    bool getAmountToRefill(Item * item, unsigned int & amount, std::string & error) const;
+    bool getAmountToRefill(Item * item, unsigned int & amount,
+                           std::string & error) const;
 
     /// @brief Provides the list already loaded fuel items.
     std::vector<Item *> getAlreadyLoadedFuel() const;

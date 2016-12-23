@@ -65,7 +65,10 @@ ItemModel::ItemModel() :
 
 ItemModel::~ItemModel()
 {
-    //Logger::log(LogLevel::Debug, "Deleted model\t\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
+    Logger::log(LogLevel::Debug,
+                "Deleted model\t\t[%s]\t\t(%s)",
+                ToString(this->vnum),
+                this->name);
 }
 
 ModelType ItemModel::getType() const
@@ -96,7 +99,8 @@ void ItemModel::getSheet(Table & sheet) const
     sheet.addRow({"Condition", ToString(this->condition)});
     sheet.addRow({"Material", this->material.toString()});
     sheet.addRow({"Tile", ToString(this->condition)});
-    sheet.addRow({"Condition", ToString(this->tileSet) + ":" + ToString(this->tileId)});
+    sheet.addRow({"Condition", ToString(this->tileSet) + ":" +
+                               ToString(this->tileId)});
 }
 
 Item * ItemModel::createItem(
@@ -143,9 +147,11 @@ Item * ItemModel::createItem(
         // Evaluate the base value.
         auto valBase = this->basePrice;
         // Evaluate the modifier due to item's quality.
-        auto valQuality = static_cast<unsigned int>(valBase * itemQuality.getModifier());
+        auto valQuality = static_cast<unsigned int>(valBase *
+                                                    itemQuality.getModifier());
         // Evaluate the modifier due to item's material.
-        auto valMaterial = static_cast<unsigned int>(valBase * composition->getWorthModifier());
+        auto valMaterial = static_cast<unsigned int>(valBase *
+                                                     composition->getWorthModifier());
         // Evaluate the result.
         newItem->price = ((valBase + valQuality + valMaterial) / 3);
     }
@@ -172,7 +178,8 @@ Item * ItemModel::createItem(
     }
     newItem->currentSlot = slot;
 
-    // If the item is for a mobile, do not add the item to the MUD nor to the DB and do not check its correctness.
+    // If the item is for a mobile, do not add the item to the MUD nor to the
+    //  DB and do not check its correctness.
     if (isForMobile)
     {
         return newItem;
@@ -237,7 +244,8 @@ bool ItemModel::replaceSymbols(
     {
         modified = true;
         FindAndReplace(&source, "&m", ToLower(itemMaterial->name));
-        FindAndReplace(&source, "&M", ToLower(itemMaterial->article + ' ' + itemMaterial->name));
+        FindAndReplace(&source, "&M", ToLower(
+            itemMaterial->article + ' ' + itemMaterial->name));
     }
     else
     {
@@ -256,7 +264,8 @@ bool ItemModel::replaceSymbols(
     return modified;
 }
 
-std::string ItemModel::getName(Material * itemMaterial, const ItemQuality & itemQuality) const
+std::string ItemModel::getName(Material * itemMaterial,
+                               const ItemQuality & itemQuality) const
 {
     // Make a copy of the short description.
     std::string output = shortdesc;
@@ -268,7 +277,8 @@ std::string ItemModel::getName(Material * itemMaterial, const ItemQuality & item
     return output;
 }
 
-std::string ItemModel::getDescription(Material * itemMaterial, const ItemQuality & itemQuality)
+std::string ItemModel::getDescription(Material * itemMaterial,
+                                      const ItemQuality & itemQuality)
 {
     // Make a copy of the description.
     std::string output = description;
@@ -278,7 +288,8 @@ std::string ItemModel::getDescription(Material * itemMaterial, const ItemQuality
 
 bool ItemModel::mustBeWielded()
 {
-    return ((slot == EquipmentSlot::RightHand) || (slot == EquipmentSlot::LeftHand));
+    return ((slot == EquipmentSlot::RightHand) ||
+            (slot == EquipmentSlot::LeftHand));
 }
 
 void ItemModel::luaRegister(lua_State * L)
@@ -351,7 +362,8 @@ std::string ItemModel::getTile(int offset)
     {
         return "a";
     }
-    if ((this->getType() == ModelType::MeleeWeapon) || (this->getType() == ModelType::RangedWeapon))
+    if ((this->getType() == ModelType::MeleeWeapon) ||
+        (this->getType() == ModelType::RangedWeapon))
     {
         return "w";
     }

@@ -64,7 +64,8 @@ bool ShopItem::updateOnDB()
         {
             arguments.push_back("");
         }
-        return SQLiteDbms::instance().insertInto("Shop", arguments, false, true);
+        return SQLiteDbms::instance().insertInto("Shop", arguments, false,
+                                                 true);
     }
     return false;
 }
@@ -73,7 +74,11 @@ bool ShopItem::removeOnDB()
 {
     if (Item::removeOnDB())
     {
-        if (SQLiteDbms::instance().deleteFrom("Shop", {std::make_pair("vnum", ToString(vnum))}))
+        if (SQLiteDbms::instance().deleteFrom("Shop",
+                                              {
+                                                  std::make_pair("vnum",
+                                                                 ToString(vnum))
+                                              }))
         {
             return true;
         }
@@ -126,10 +131,12 @@ std::string ShopItem::lookContent()
         output += Item::lookContent();
         return output;
     }
-    output += this->shopKeeper->getNameCapital() + " is currently managing the shop.\n";
+    output += this->shopKeeper->getNameCapital() +
+              " is currently managing the shop.\n";
     if (content.empty())
     {
-        return Formatter::italic() + "There is nothing on sale.\n" + Formatter::reset();
+        return Formatter::italic() + "There is nothing on sale.\n" +
+               Formatter::reset();
     }
     else
     {
@@ -160,7 +167,8 @@ std::string ShopItem::lookContent()
             row.push_back(ToString(this->evaluateSellPrice(iterator)));
             if (iterator->quantity > 1)
             {
-                row.push_back(ToString(this->evaluateSellPrice(iterator) * iterator->quantity));
+                row.push_back(ToString(
+                    this->evaluateSellPrice(iterator) * iterator->quantity));
             }
             else
             {
@@ -171,9 +179,11 @@ std::string ShopItem::lookContent()
         }
         output += saleTable.getTable();
         output += "Has been used ";
-        output += Formatter::yellow() + ToString(this->getUsedSpace()) + Formatter::reset();
+        output += Formatter::yellow() + ToString(this->getUsedSpace()) +
+                  Formatter::reset();
         output += " out of ";
-        output += Formatter::yellow() + ToString(this->getTotalSpace()) + Formatter::reset();
+        output += Formatter::yellow() + ToString(this->getTotalSpace()) +
+                  Formatter::reset();
         output += " " + Mud::instance().getWeightMeasure() + ".\n";
     }
     output += "\n";

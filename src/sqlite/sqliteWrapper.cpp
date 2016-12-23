@@ -45,7 +45,8 @@ bool SQLiteWrapper::openConnection(std::string dbName, std::string dbDirectory)
     dbDetails.dbName = dbName;
     dbDetails.dbDirectory = dbDirectory;
     connected = true;
-    errorCode = sqlite3_open((dbDetails.dbDirectory + dbDetails.dbName).c_str(), &(dbDetails.dbConnection));
+    errorCode = sqlite3_open((dbDetails.dbDirectory + dbDetails.dbName).c_str(),
+                             &(dbDetails.dbConnection));
     errorMessage = sqlite3_errmsg(dbDetails.dbConnection);
     if (errorCode != SQLITE_OK)
     {
@@ -112,7 +113,10 @@ ResultSet * SQLiteWrapper::executeSelect(const char * query)
 {
     if (this->isConnected())
     {
-        if (sqlite3_prepare_v2(dbDetails.dbConnection, query, -1, &dbDetails.dbStatement, NULL) == SQLITE_OK)
+        if (sqlite3_prepare_v2(dbDetails.dbConnection,
+                               query,
+                               -1,
+                               &dbDetails.dbStatement, NULL) == SQLITE_OK)
         {
             num_col = sqlite3_column_count(dbDetails.dbStatement);
             return this;
@@ -194,7 +198,8 @@ bool SQLiteWrapper::getColumnName(const int & column, std::string & columnName)
     // Check if the given column is inside the boundaries.
     if ((column < 0) || (column > num_col))
     {
-        errorMessage = "Column index (" + ToString(column) + ") is outside the boundaries.";
+        errorMessage = "Column index (" + ToString(column) +
+                       ") is outside the boundaries.";
         errorCode = SQLITE_CONSTRAINT;
         return false;
     }
@@ -207,19 +212,22 @@ bool SQLiteWrapper::getDataString(const int & column, std::string & data)
     // Check if the given column is inside the boundaries.
     if ((column < 0) || (column > num_col))
     {
-        errorMessage = "Column index (" + ToString(column) + ") is outside the boundaries.";
+        errorMessage = "Column index (" + ToString(column) +
+                       ") is outside the boundaries.";
         errorCode = SQLITE_CONSTRAINT;
         return false;
     }
     // Check if the retrieved data is a string.
     if (sqlite3_column_type(dbDetails.dbStatement, column) != SQLITE_TEXT)
     {
-        errorMessage = "Column at index (" + ToString(column) + ") does not contain a Text.";
+        errorMessage = "Column at index (" + ToString(column) +
+                       ") does not contain a Text.";
         errorCode = SQLITE_MISMATCH;
         return false;
     }
     // Check the input in case is a valid value.
-    const char * ptr = reinterpret_cast<const char *>(sqlite3_column_text(dbDetails.dbStatement, column));
+    const char * ptr = reinterpret_cast<const char *>(
+        sqlite3_column_text(dbDetails.dbStatement, column));
     if (ptr == nullptr)
     {
         return false;
@@ -234,14 +242,16 @@ bool SQLiteWrapper::getDataInteger(const int & column, int & data)
     // Check if the given column is inside the boundaries.
     if ((column < 0) || (column > num_col))
     {
-        errorMessage = "Column index (" + ToString(column) + ") is outside the boundaries.";
+        errorMessage = "Column index (" + ToString(column) +
+                       ") is outside the boundaries.";
         errorCode = SQLITE_CONSTRAINT;
         return false;
     }
     // Check if the retrieved data is an integer.
     if (sqlite3_column_type(dbDetails.dbStatement, column) != SQLITE_INTEGER)
     {
-        errorMessage = "Column at index (" + ToString(column) + ") does not contain an Integer.";
+        errorMessage = "Column at index (" + ToString(column) +
+                       ") does not contain an Integer.";
         errorCode = SQLITE_MISMATCH;
         return false;
     }
@@ -249,26 +259,30 @@ bool SQLiteWrapper::getDataInteger(const int & column, int & data)
     return true;
 }
 
-bool SQLiteWrapper::getDataUnsignedInteger(const int & column, unsigned int & data)
+bool
+SQLiteWrapper::getDataUnsignedInteger(const int & column, unsigned int & data)
 {
     // Check if the given column is inside the boundaries.
     if ((column < 0) || (column > num_col))
     {
-        errorMessage = "Column index (" + ToString(column) + ") is outside the boundaries.";
+        errorMessage = "Column index (" + ToString(column) +
+                       ") is outside the boundaries.";
         errorCode = SQLITE_CONSTRAINT;
         return false;
     }
     // Check if the retrieved data is an integer.
     if (sqlite3_column_type(dbDetails.dbStatement, column) != SQLITE_INTEGER)
     {
-        errorMessage = "Column at index (" + ToString(column) + ") does not contain an Unsigned Integer.";
+        errorMessage = "Column at index (" + ToString(column) +
+                       ") does not contain an Unsigned Integer.";
         errorCode = SQLITE_MISMATCH;
         return false;
     }
     int retrievedData = sqlite3_column_int(dbDetails.dbStatement, column);
     if (retrievedData < 0)
     {
-        errorMessage = "Column at index (" + ToString(column) + ") does not contain an Unsigned Integer.";
+        errorMessage = "Column at index (" + ToString(column) +
+                       ") does not contain an Unsigned Integer.";
         errorCode = SQLITE_MISMATCH;
         return false;
     }
@@ -281,16 +295,19 @@ bool SQLiteWrapper::getDataDouble(const int & column, double & data)
     // Check if the given column is inside the boundaries.
     if ((column < 0) || (column > num_col))
     {
-        errorMessage = "Column index (" + ToString(column) + ") is outside the boundaries.";
+        errorMessage = "Column index (" + ToString(column) +
+                       ") is outside the boundaries.";
         errorCode = SQLITE_CONSTRAINT;
         return false;
     }
     // Check if the retrieved data is an integer.
     if (sqlite3_column_type(dbDetails.dbStatement, column) != SQLITE_FLOAT)
     {
-        if (sqlite3_column_type(dbDetails.dbStatement, column) != SQLITE_INTEGER)
+        if (sqlite3_column_type(dbDetails.dbStatement, column) !=
+            SQLITE_INTEGER)
         {
-            errorMessage = "Column at index (" + ToString(column) + ") does not contain a Double.";
+            errorMessage = "Column at index (" + ToString(column) +
+                           ") does not contain a Double.";
             errorCode = SQLITE_MISMATCH;
             return false;
         }

@@ -53,7 +53,8 @@ public:
 
     /// @brief Checks if the current weapon can be reloaded with the given item.
     /// @param magazine The magazine to check.
-    /// @return <b>True</b> if the ranged weapon can be reloaded with the given magazine,<br>
+    /// @return <b>True</b> if the ranged weapon can be reloaded with the
+    ///                      given magazine,<br>
     ///         <b>False</b> otherwise.
     bool canBeReloadedWith(Item * magazine) const;
 
@@ -62,7 +63,8 @@ public:
     MagazineItem * getAlreadyLoadedMagazine() const;
 
     /// @brief Retrieves the projectiles used by the weapon.
-    /// @param error The error message if the function has not found any projectiles inside.
+    /// @param error The error message if the function has not found any
+    ///               projectiles inside.
     /// @return The projectiles contained inside the weapon.
     Item * retrieveProjectile(std::string & error) const;
 };

@@ -50,7 +50,9 @@ bool CorpseModel::setModel(const std::string & source)
 {
     if (source.empty())
     {
-        Logger::log(LogLevel::Error, "Function list is empty (%s).", this->name);
+        Logger::log(LogLevel::Error,
+                    "Function list is empty (%s).",
+                    this->name);
         return false;
     }
     std::vector<std::string> functionList = SplitString(source, " ");
@@ -73,7 +75,11 @@ void CorpseModel::getSheet(Table & sheet) const
     //sheet.addDivider();
 }
 
-Item * CorpseModel::createItem(std::string, Material *, bool, const ItemQuality &, const unsigned int &)
+Item * CorpseModel::createItem(std::string,
+                               Material *,
+                               bool,
+                               const ItemQuality &,
+                               const unsigned int &)
 {
     Logger::log(LogLevel::Error, "Use the proper createCorpse function.");
     return nullptr;

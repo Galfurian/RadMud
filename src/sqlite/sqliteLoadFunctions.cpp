@@ -35,7 +35,8 @@ bool LoadBadName(ResultSet * result)
     {
         try
         {
-            if (!Mud::instance().badNames.insert(result->getNextString()).second)
+            if (!Mud::instance().badNames.insert(
+                result->getNextString()).second)
             {
                 throw SQLiteException("Error during bad name loading.");
             }
@@ -55,7 +56,8 @@ bool LoadBlockedIp(ResultSet * result)
     {
         try
         {
-            if (!Mud::instance().blockedIPs.insert(result->getNextString()).second)
+            if (!Mud::instance().blockedIPs.insert(
+                result->getNextString()).second)
             {
                 throw SQLiteException("Error during blocked ips loading.");
             }
@@ -75,8 +77,9 @@ bool LoadNews(ResultSet * result)
     {
         try
         {
-            if (!Mud::instance().mudNews.insert(std::make_pair(result->getNextString(),
-                                                               result->getNextString())).second)
+            if (!Mud::instance().mudNews.insert(
+                std::make_pair(result->getNextString(),
+                               result->getNextString())).second)
             {
                 throw SQLiteException("Error during news loading.");
             }
@@ -124,10 +127,12 @@ bool LoadItem(ResultSet * result)
         try
         {
             auto itemVnum = result->getNextInteger();
-            auto itemModel = Mud::instance().findItemModel(result->getNextInteger());
+            auto itemModel = Mud::instance().findItemModel(
+                result->getNextInteger());
             if (itemModel == nullptr)
             {
-                throw SQLiteException("Item has wrong model (" + ToString(itemVnum) + ")");
+                throw SQLiteException(
+                    "Item has wrong model (" + ToString(itemVnum) + ")");
             }
             // Create the item.
             auto item = ItemFactory::newItem(itemModel->getType());
@@ -139,7 +144,8 @@ bool LoadItem(ResultSet * result)
             item->weight = result->getNextDouble();
             item->condition = result->getNextDouble();
             item->maxCondition = result->getNextDouble();
-            item->composition = Mud::instance().findMaterial(result->getNextInteger());
+            item->composition = Mud::instance().findMaterial(
+                result->getNextInteger());
             item->quality = ItemQuality(result->getNextUnsignedInteger());
             item->flags = result->getNextUnsignedInteger();
             // Check correctness of attributes.
@@ -210,11 +216,13 @@ bool LoadFaction(ResultSet * result)
             auto currencyModel = Mud::instance().findItemModel(currencyVnum);
             if (currencyModel == nullptr)
             {
-                throw SQLiteException("Can't find the currency " + ToString(currencyVnum));
+                throw SQLiteException(
+                    "Can't find the currency " + ToString(currencyVnum));
             }
             if (currencyModel->getType() != ModelType::Currency)
             {
-                throw SQLiteException("Model is not currency " + ToString(currencyVnum));
+                throw SQLiteException(
+                    "Model is not currency " + ToString(currencyVnum));
             }
             faction->currency = currencyModel->toCurrency();
             // Translate new_line.
@@ -247,7 +255,8 @@ bool LoadModel(ResultSet * result)
             // Retrieve the vnum and the type of model.
             auto vnum = result->getNextInteger();
             // Create a pointer to the new item model.
-            auto itemModel = ModelFactory::newModel(ModelType(result->getNextUnsignedInteger()));
+            auto itemModel = ModelFactory::newModel(
+                ModelType(result->getNextUnsignedInteger()));
             if (itemModel == nullptr)
             {
                 throw SQLiteException("Wrong type of model " + ToString(vnum));
@@ -264,7 +273,8 @@ bool LoadModel(ResultSet * result)
             itemModel->baseWeight = result->getNextDouble();
             itemModel->basePrice = result->getNextUnsignedInteger();
             itemModel->condition = result->getNextDouble();
-            itemModel->material = MaterialType(result->getNextUnsignedInteger());
+            itemModel->material = MaterialType(
+                result->getNextUnsignedInteger());
             itemModel->tileSet = result->getNextInteger();
             itemModel->tileId = result->getNextInteger();
             if (!itemModel->setModel(result->getNextString()))
@@ -304,7 +314,8 @@ bool LoadRace(ResultSet * result)
             race->article = result->getNextString();
             race->name = result->getNextString();
             race->description = result->getNextString();
-            race->material = Mud::instance().findMaterial(result->getNextInteger());
+            race->material = Mud::instance().findMaterial(
+                result->getNextInteger());
             race->setAbilities(result->getNextString());
             if (!race->setAvailableFactions(result->getNextString()))
             {
@@ -348,7 +359,8 @@ bool LoadMobile(ResultSet * result)
             auto mobile = new Mobile();
             // Initialize the mobile.
             mobile->id = result->getNextString();
-            mobile->respawnRoom = Mud::instance().findRoom(result->getNextInteger());
+            mobile->respawnRoom = Mud::instance().findRoom(
+                result->getNextInteger());
             mobile->room = mobile->respawnRoom;
             mobile->name = result->getNextString();
             mobile->keys = GetWords(result->getNextString());
@@ -356,7 +368,8 @@ bool LoadMobile(ResultSet * result)
             mobile->staticdesc = result->getNextString();
             mobile->description = result->getNextString();
             mobile->race = Mud::instance().findRace(result->getNextInteger());
-            mobile->faction = Mud::instance().findFaction(result->getNextInteger());
+            mobile->faction = Mud::instance().findFaction(
+                result->getNextInteger());
             mobile->gender = static_cast<GenderType>(result->getNextInteger());
             mobile->weight = result->getNextDouble();
             mobile->actions = GetWords(result->getNextString());
@@ -386,7 +399,9 @@ bool LoadMobile(ResultSet * result)
                 throw SQLiteException("Error during mobile insertion.");
             }
             // Load the script.
-            mobile->loadScript(Mud::instance().getMudSystemDirectory() + "lua/" + mobile->lua_script);
+            mobile->loadScript(
+                Mud::instance().getMudSystemDirectory() + "lua/" +
+                mobile->lua_script);
             // Respawn it.
             mobile->respawn(true);
         }
@@ -412,7 +427,8 @@ bool LoadRoom(ResultSet * result)
             room->coord.x = result->getNextInteger();
             room->coord.y = result->getNextInteger();
             room->coord.z = result->getNextInteger();
-            room->terrain = Mud::instance().findTerrain(result->getNextUnsignedInteger());
+            room->terrain = Mud::instance().findTerrain(
+                result->getNextUnsignedInteger());
             room->name = result->getNextString();
             room->description = result->getNextString();
             room->flags = result->getNextUnsignedInteger();
@@ -456,16 +472,19 @@ bool LoadExit(ResultSet * result)
             newExit->source = Mud::instance().findRoom(sourceVnum);
             if (newExit->source == nullptr)
             {
-                throw SQLiteException("Can't find source " + ToString(sourceVnum));
+                throw SQLiteException(
+                    "Can't find source " + ToString(sourceVnum));
             }
             newExit->destination = Mud::instance().findRoom(destinationVnum);
             if (newExit->destination == nullptr)
             {
-                throw SQLiteException("Can't find destination " + ToString(destinationVnum));
+                throw SQLiteException(
+                    "Can't find destination " + ToString(destinationVnum));
             }
             if (!Direction::isValid(directionValue))
             {
-                throw SQLiteException("Direction si not valid " + ToString(directionValue));
+                throw SQLiteException(
+                    "Direction si not valid " + ToString(directionValue));
             }
             newExit->direction = Direction(directionValue);
             newExit->flags = flagValue;
@@ -575,11 +594,13 @@ bool LoadAreaList(ResultSet * result)
             // Check the correctness.
             if (area == nullptr)
             {
-                throw SQLiteException("Can't find the area " + ToString(areaVnum));
+                throw SQLiteException(
+                    "Can't find the area " + ToString(areaVnum));
             }
             if (room == nullptr)
             {
-                throw SQLiteException("Can't find the room " + ToString(roomVnum));
+                throw SQLiteException(
+                    "Can't find the room " + ToString(roomVnum));
             }
             // Load the room inside the area.
             area->addRoom(room);
@@ -614,7 +635,8 @@ bool LoadWriting(ResultSet * result)
             auto item = Mud::instance().findItem(writing->vnum);
             if (item == nullptr)
             {
-                throw SQLiteException("Can't find the item " + ToString(writing->vnum));
+                throw SQLiteException(
+                    "Can't find the item " + ToString(writing->vnum));
             }
             if (!Mud::instance().addWriting(writing))
             {
@@ -713,7 +735,8 @@ bool LoadProfession(ResultSet * result)
             professions->name = result->getNextString();
             professions->description = result->getNextString();
             professions->command = result->getNextString();
-            professions->posture = CharacterPosture(result->getNextUnsignedInteger());
+            professions->posture = CharacterPosture(
+                result->getNextUnsignedInteger());
             professions->action = result->getNextString();
             professions->startMessage = result->getNextString();
             professions->finishMessage = result->getNextString();
@@ -753,20 +776,23 @@ bool LoadProduction(ResultSet * result)
             // Initialize the Production.
             production->vnum = result->getNextInteger();
             production->name = result->getNextString();
-            production->profession = Mud::instance().findProfession(result->getNextString());
+            production->profession = Mud::instance().findProfession(
+                result->getNextString());
             production->difficulty = result->getNextUnsignedInteger();
             production->time = result->getNextUnsignedInteger();
             production->assisted = result->getNextInteger();
             check &= production->setOutcome(result->getNextString());
             check &= production->setTool(result->getNextString());
             check &= production->setIngredient(result->getNextString());
-            production->material = ResourceType(result->getNextUnsignedInteger());
+            production->material = ResourceType(
+                result->getNextUnsignedInteger());
             production->workbench = ToolType(result->getNextUnsignedInteger());
             // ////////////////////////////////////////////////////////////////
             // Check the correctness.
             if (!check)
             {
-                throw SQLiteException("The production is incorrect " + production->name);
+                throw SQLiteException(
+                    "The production is incorrect " + production->name);
             }
             if (!production->check())
             {
@@ -855,7 +881,8 @@ bool LoadTravelPoint(ResultSet * result)
     {
         try
         {
-            auto sourceArea = Mud::instance().findArea(result->getNextInteger());
+            auto sourceArea = Mud::instance().findArea(
+                result->getNextInteger());
             if (sourceArea == nullptr)
             {
                 throw SQLiteException("Can't find the source area.");
@@ -865,7 +892,8 @@ bool LoadTravelPoint(ResultSet * result)
             {
                 throw SQLiteException("Can't find the source room.");
             }
-            auto targetArea = Mud::instance().findArea(result->getNextInteger());
+            auto targetArea = Mud::instance().findArea(
+                result->getNextInteger());
             if (targetArea == nullptr)
             {
                 throw SQLiteException("Can't find the target area.");
@@ -910,7 +938,8 @@ bool LoadBuilding(ResultSet * result)
             building.time = result->getNextUnsignedInteger();
             building.assisted = result->getNextInteger();
             building.setTool(result->getNextString());
-            building.buildingModel = Mud::instance().findItemModel(result->getNextInteger());
+            building.buildingModel = Mud::instance().findItemModel(
+                result->getNextInteger());
             building.setIngredient(result->getNextString());
             building.unique = static_cast<bool>(result->getNextInteger());
             if (building.buildingModel == nullptr)
@@ -948,7 +977,8 @@ bool LoadShop(ResultSet * result)
             auto buy = result->getNextUnsignedInteger();
             auto sell = result->getNextUnsignedInteger();
             auto balance = result->getNextUnsignedInteger();
-            auto shopKeeper = Mud::instance().findMobile(result->getNextString());
+            auto shopKeeper = Mud::instance().findMobile(
+                result->getNextString());
             if (item == nullptr)
             {
                 throw SQLiteException("Can't find the item " + ToString(vnum));
@@ -991,21 +1021,25 @@ bool LoadCurrency(ResultSet * result)
             auto model = Mud::instance().findItemModel(modelVnum);
             if (model == nullptr)
             {
-                throw SQLiteException("Can't find the model " + ToString(modelVnum));
+                throw SQLiteException(
+                    "Can't find the model " + ToString(modelVnum));
             }
             if (model->getType() != ModelType::Currency)
             {
-                throw SQLiteException("Wrong type of model " + ToString(modelVnum));
+                throw SQLiteException(
+                    "Wrong type of model " + ToString(modelVnum));
             }
             auto material = Mud::instance().findMaterial(materialVnum);
             if (material == nullptr)
             {
-                throw SQLiteException("Can't find the material " + ToString(materialVnum));
+                throw SQLiteException(
+                    "Can't find the material " + ToString(materialVnum));
             }
             auto currency = model->toCurrency();
             if (!currency->addPrice(materialVnum, worth))
             {
-                throw SQLiteException("Can't add the price for " + ToString(modelVnum));
+                throw SQLiteException(
+                    "Can't add the price for " + ToString(modelVnum));
             }
         }
         catch (SQLiteException & e)
@@ -1032,7 +1066,9 @@ bool LoadTerrain(ResultSet * result)
             terrain->light = result->getNextUnsignedInteger();
             if (!Mud::instance().addTerrain(terrain))
             {
-                throw SQLiteException("Can't add the terrain " + ToString(terrain->vnum) + " - " + terrain->name);
+                throw SQLiteException(
+                    "Can't add the terrain " + ToString(terrain->vnum) + " - " +
+                    terrain->name);
             }
         }
         catch (SQLiteException & e)

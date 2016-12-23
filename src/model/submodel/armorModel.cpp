@@ -52,7 +52,8 @@ bool ArmorModel::setModel(const std::string & source)
 {
     if (source.empty())
     {
-        Logger::log(LogLevel::Error, "Function list is empty (%s).", this->name);
+        Logger::log(LogLevel::Error, "Function list is empty (%s).",
+                    this->name);
         return false;
     }
     std::vector<std::string> functionList = SplitString(source, " ");
@@ -64,7 +65,8 @@ bool ArmorModel::setModel(const std::string & source)
             this->name);
         return false;
     }
-    this->size = static_cast<ArmorSize>(ToNumber<unsigned int>(functionList[0]));
+    this->size = static_cast<ArmorSize>(ToNumber<unsigned int>(
+        functionList[0]));
     this->armorClass = ToNumber<unsigned int>(functionList[1]);
     this->allowedAnatomy = ToNumber<unsigned int>(functionList[2]);
     return true;

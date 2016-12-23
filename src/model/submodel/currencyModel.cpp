@@ -25,7 +25,8 @@
 #include "logger.hpp"
 #include "mud.hpp"
 
-CurrencyModel::Price::Price(const int & _material, const unsigned int & _price) :
+CurrencyModel::Price::Price(const int & _material,
+                            const unsigned int & _price) :
     material(_material),
     price(_price)
 {
@@ -99,7 +100,11 @@ Item * CurrencyModel::createItem(
     auto it = std::find(prices.begin(), prices.end(), composition->vnum);
     if (it != prices.end())
     {
-        return ItemModel::createItem(maker, composition, isForMobile, itemQuality, quantity);
+        return ItemModel::createItem(maker,
+                                     composition,
+                                     isForMobile,
+                                     itemQuality,
+                                     quantity);
     }
     else
     {
@@ -108,7 +113,8 @@ Item * CurrencyModel::createItem(
     }
 }
 
-bool CurrencyModel::addPrice(const int & materialVnum, const unsigned int & price)
+bool
+CurrencyModel::addPrice(const int & materialVnum, const unsigned int & price)
 {
     auto it = std::find(prices.begin(), prices.end(), materialVnum);
     if (it == prices.end())
@@ -120,7 +126,8 @@ bool CurrencyModel::addPrice(const int & materialVnum, const unsigned int & pric
     return false;
 }
 
-bool CurrencyModel::findPrice(const int & materialVnum, unsigned int & price) const
+bool
+CurrencyModel::findPrice(const int & materialVnum, unsigned int & price) const
 {
     auto it = std::find(prices.begin(), prices.end(), materialVnum);
     if (it != prices.end())
@@ -147,7 +154,8 @@ std::vector<Item *> CurrencyModel::generateCurrency(
         {
             continue;
         }
-        auto coin = this->createItem(maker, coinMaterial, false, ItemQuality::Normal, coinQuantity);
+        auto coin = this->createItem(maker, coinMaterial, false,
+                                     ItemQuality::Normal, coinQuantity);
         if (coin != nullptr)
         {
             coins.push_back(coin);

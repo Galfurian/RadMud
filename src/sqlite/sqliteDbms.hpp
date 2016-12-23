@@ -1,5 +1,6 @@
 /// @file   sqliteDbms.hpp
-/// @brief  Definition of the class SQLiteDbms, that allows to interact whit a SQLITE3 Database.
+/// @brief  Definition of the class SQLiteDbms, that allows to interact
+///          with a SQLITE3 Database.
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2014
 /// @copyright
@@ -32,7 +33,8 @@ class Player;
 /// @brief A query list of FIELD+VALUE.
 using QueryList = std::vector<std::pair<std::string, std::string> >;
 
-/// @brief It's used to connect to a database and retrieve information as well as update them.
+/// @brief It's used to connect to a database and retrieve information
+///         as well as update them.
 class SQLiteDbms
 {
 private:
@@ -65,15 +67,18 @@ public:
     static SQLiteDbms & instance();
 
     /// @brief Open database connection.
-    /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
+    /// @return <b>True</b> if the operations succeeded,<br>
+    ///         <b>False</b> Otherwise.
     bool openDatabase();
 
     /// @brief Close database connection.
-    /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
+    /// @return <b>True</b> if the operations succeeded,<br>
+    ///         <b>False</b> Otherwise.
     bool closeDatabase();
 
     /// @brief Load tables values.
-    /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
+    /// @return <b>True</b> if the operations succeeded,<br>
+    ///         <b>False</b> Otherwise.
     bool loadTables();
 
     /// @brief Load all the vital information about the player.
@@ -140,12 +145,15 @@ private:
     /// @brief Function used to retrieve information about Player.
     bool loadPlayerInformation(ResultSet * result, Player * player);
 
-    /// @brief Function used to retrieve information about the item posessed by the player.
+    /// @brief Function used to retrieve information about the item
+    ///         possessed by the player.
     bool loadPlayerItems(Player * player);
 
-    /// @brief Function used to retrieve information about the skills of the player.
+    /// @brief Function used to retrieve information about the
+    ///         skills of the player.
     bool loadPlayerSkill(Player * player);
 
-    /// @brief Function used to retrieve information about the lua variables of the player.
+    /// @brief Function used to retrieve information about the
+    ///         lua variables of the player.
     bool loadPlayerLuaVariables(Player * player);
 };

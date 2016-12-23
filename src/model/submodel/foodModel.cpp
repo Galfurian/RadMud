@@ -50,13 +50,16 @@ bool FoodModel::setModel(const std::string & source)
 {
     if (source.empty())
     {
-        Logger::log(LogLevel::Error, "Function list is empty (%s).", this->name);
+        Logger::log(LogLevel::Error, "Function list is empty (%s).",
+                    this->name);
         return false;
     }
     std::vector<std::string> functionList = SplitString(source, " ");
     if (functionList.size() != 2)
     {
-        Logger::log(LogLevel::Error, "Wrong number of parameters for Food Model (%s).", this->name);
+        Logger::log(LogLevel::Error,
+                    "Wrong number of parameters for Food Model (%s).",
+                    this->name);
         return false;
     }
     this->hours = ToNumber<unsigned int>(functionList[0]);

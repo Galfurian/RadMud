@@ -52,7 +52,9 @@ bool RangedWeaponModel::setModel(const std::string & source)
 {
     if (source.empty())
     {
-        Logger::log(LogLevel::Error, "Function list is empty (%s).", this->name);
+        Logger::log(LogLevel::Error,
+                    "Function list is empty (%s).",
+                    this->name);
         return false;
     }
     std::vector<std::string> functionList = SplitString(source, " ");
@@ -64,7 +66,8 @@ bool RangedWeaponModel::setModel(const std::string & source)
             this->name);
         return false;
     }
-    this->rangedWeaponType = static_cast<RangedWeaponType>(ToNumber<unsigned int>(functionList[0]));
+    this->rangedWeaponType = static_cast<RangedWeaponType>(ToNumber<unsigned int>(
+        functionList[0]));
     this->minDamage = ToNumber<unsigned int>(functionList[1]);
     this->maxDamage = ToNumber<unsigned int>(functionList[2]);
     this->range = ToNumber<int>(functionList[3]);
@@ -78,7 +81,8 @@ void RangedWeaponModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow({"Ranged Weapon Type", GetRangedWeaponTypeName(this->rangedWeaponType)});
+    sheet.addRow({"Ranged Weapon Type",
+                  GetRangedWeaponTypeName(this->rangedWeaponType)});
     sheet.addRow({"Minimum Damage", ToString(this->minDamage)});
     sheet.addRow({"Maximum Damage", ToString(this->maxDamage)});
     sheet.addRow({"Range", ToString(this->range)});
@@ -92,7 +96,8 @@ std::string GetRangedWeaponTypeName(RangedWeaponType type)
     if (type == RangedWeaponType::HeavyWeapon) return "Heavy Weapon";
     if (type == RangedWeaponType::EnergyPistol) return "Energy Pistol";
     if (type == RangedWeaponType::EnergyRifle) return "Energy Rifle";
-    if (type == RangedWeaponType::EnergyHeavyWeapon) return "Energy Heavy Weapon";
+    if (type == RangedWeaponType::EnergyHeavyWeapon)
+        return "Energy Heavy Weapon";
     if (type == RangedWeaponType::Granade) return "Granade";
     if (type == RangedWeaponType::Thrown) return "Thrown";
     return "No Weapon Type";

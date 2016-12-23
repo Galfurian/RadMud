@@ -39,7 +39,9 @@ void CorpseItem::removeFromMud()
     Item::removeFromMud();
     if (Mud::instance().remCorpse(this))
     {
-        Logger::log(LogLevel::Debug, "Removing item '%s' from MUD corpses.", this->getName());
+        Logger::log(LogLevel::Debug,
+                    "Removing item '%s' from MUD corpses.",
+                    this->getName());
     }
 }
 
