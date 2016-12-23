@@ -171,7 +171,8 @@ public:
     /// @return The character, if it's in the room.
     Character * findCharacter(std::string target,
                               int & number,
-                              const std::vector<Character *> & exceptions = std::vector<Character *>()) const;
+                              const std::vector<Character *> & exceptions =
+                              std::vector<Character *>()) const;
 
     /// @brief Search for the player in the room.
     /// @param target    The player to search.
@@ -180,7 +181,8 @@ public:
     /// @return The player, if it's in the room.
     Player * findPlayer(std::string target,
                         int & number,
-                        const std::vector<Character *> & exceptions = std::vector<Character *>()) const;
+                        const std::vector<Character *> & exceptions =
+                        std::vector<Character *>()) const;
 
     /// @brief Search for the mobile in the room.
     /// @param target    The mobile to search.
@@ -189,11 +191,13 @@ public:
     /// @return The mobile, if it's in the room.
     Mobile * findMobile(std::string target,
                         int & number,
-                        const std::vector<Character *> & exceptions = std::vector<Character *>()) const;
+                        const std::vector<Character *> & exceptions =
+                        std::vector<Character *>()) const;
 
     /// @brief Add the provided exit to the room list of exits.
     /// @param exit The exit to add to the list.
-    /// @return <b>True</b> if there is NO other exits in the same direction,<br>
+    /// @return <b>True</b> if there is NO other exits
+    ///                      in the same direction,<br>
     ///         <b>False</b> otherwise.
     bool addExit(std::shared_ptr<Exit> exit);
 
@@ -203,7 +207,8 @@ public:
     ///         <b>False</b> otherwise.
     bool removeExit(const Direction & direction);
 
-    /// @brief Search for the desired exit in a direction, provided as an enumerator.
+    /// @brief Search for the desired exit in a direction,
+    ///         provided as an enumerator.
     /// @param direction The direction to search.
     /// @return The desired exit.
     std::shared_ptr<Exit> findExit(Direction direction);
@@ -234,10 +239,12 @@ public:
     /// @return A detailed description of the room.
     std::string getLook(Character * actor);
 
-    /// @brief Send a message to all the player in the room, can specify exceptions.
+    /// @brief Send a message to all the player in the room,
+    ///         can specify exceptions.
     /// @param message    The message to send.
     /// @param exceptions The list of exceptions.
-    void sendToAll(const std::string & message, const std::vector<Character *> & exceptions);
+    void sendToAll(const std::string & message,
+                   const std::vector<Character *> & exceptions);
 
     /// @brief Sends a message to all the characters inside the room.
     /// @param message    The message to send.
@@ -263,7 +270,8 @@ public:
         }
     }
 
-    /// @brief Sends a message to all the characters inside the room. This one in particular handles integers.
+    /// @brief Sends a message to all the characters inside the room.
+    ///         This one in particular handles integers.
     template<typename ... Args>
     void sendToAll(const std::string & message,
                    const std::vector<Character *> & exceptions,
@@ -273,12 +281,15 @@ public:
         this->sendToAll(message, exceptions, ToString(first), args ...);
     }
 
-    /// @brief Send a message to all the characters inside the room which pass the checking function.
+    /// @brief Send a message to all the characters inside the room which
+    ///         pass the checking function.
     /// @param message        The message to send.
     /// @param checkException The checking function.
-    void funcSendToAll(const std::string & message, std::function<bool(Character * character)> checkException);
+    void funcSendToAll(const std::string & message,
+                       std::function<bool(Character * character)> checkException);
 
-    /// @brief Send a message to all the characters inside the room which pass the checking function.
+    /// @brief Send a message to all the characters inside the room
+    ///         which pass the checking function.
     /// @param message        The message to send.
     /// @param checkException The checking function.
     /// @param first          The first value to unpack.
@@ -333,8 +344,9 @@ protected:
 
 /// @brief Create a room in the desired position.
 /// @param coord       The coordinates where create the room.
-/// @param source_room During mining, the emthod uses source_room to connect rooms.
-/// @return <b>True</b> if the execution goes well,<br><b>False</b> otherwise.
+/// @param source_room Used to connect rooms.
+/// @return <b>True</b> if the execution goes well,<br>
+///         <b>False</b> otherwise.
 bool CreateRoom(Coordinates coord, Room * source_room = NULL);
 
 /// @brief Connect the room with the near rooms.

@@ -98,7 +98,8 @@ public:
     /// @param maker Who has generated the currency.
     /// @param value The total worth that has to be generate.
     /// @return The list of generated currencies.
-    std::vector<Item *> generateCurrency(const std::string & maker, const unsigned int & value);
+    std::vector<Item *> generateCurrency(const std::string & maker,
+                                         const unsigned int & value);
 
 private:
     /// @brief Sort the list of prices.

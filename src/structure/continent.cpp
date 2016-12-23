@@ -45,7 +45,10 @@ Continent::Continent() :
 
 Continent::~Continent()
 {
-    //Logger::log(LogLevel::Debug, "Deleted continent\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
+//    Logger::log(LogLevel::Debug,
+//                "Deleted continent\t[%s]\t\t(%s)",
+//                ToString(this->vnum),
+//                this->name);
 }
 
 bool Continent::check()
@@ -99,7 +102,8 @@ Room * Continent::getRoom(Coordinates coord)
     return &continentMap.get(coord.x, coord.y, coord.z);
 }
 
-std::vector<std::string> Continent::drawFov(Room * centerRoom, const int & radius)
+std::vector<std::string> Continent::drawFov(Room * centerRoom,
+                                            const int & radius)
 {
     std::vector<std::string> layers(3);
     if (!this->inBoundaries(centerRoom->coord))
@@ -113,9 +117,11 @@ std::vector<std::string> Continent::drawFov(Room * centerRoom, const int & radiu
     int origin_z = centerRoom->coord.z;
     // Evaluate the minimum and maximum value for x and y.
     int min_x = (origin_x < signedRadius) ? 0 : (origin_x - signedRadius);
-    int max_x = ((origin_x + signedRadius) > this->width) ? this->width : (origin_x + signedRadius);
+    int max_x = ((origin_x + signedRadius) > this->width) ?
+                this->width : (origin_x + signedRadius);
     int min_y = (origin_y < signedRadius) ? 0 : (origin_y - signedRadius);
-    int max_y = ((origin_y + signedRadius) > this->height) ? this->height : (origin_y + signedRadius);
+    int max_y = ((origin_y + signedRadius) > this->height) ?
+                this->height : (origin_y + signedRadius);
     // Create a 2D map of chararacters.
     Map2D<ContinentTile> map(signedRadius * 2, signedRadius * 2);
     // Evaluate the field of view.
@@ -128,7 +134,8 @@ std::vector<std::string> Continent::drawFov(Room * centerRoom, const int & radiu
             ContinentTile tile = map.get(x, y);
             std::string tileCode = " : ";
 
-            if ((tile == ContinentTile::Walk) || (tile == ContinentTile::DoorOpen))
+            if ((tile == ContinentTile::Walk) ||
+                (tile == ContinentTile::DoorOpen))
             {
                 Room * room = this->getRoom(x, y, origin_z);
                 std::shared_ptr<Exit> up = room->findExit(Direction::Up);
@@ -140,27 +147,32 @@ std::vector<std::string> Continent::drawFov(Room * centerRoom, const int & radiu
                 // III - Check if there are STAIRS in the tile.
                 if ((up != nullptr) && (down != nullptr))
                 {
-                    if (HasFlag(up->flags, ExitFlag::Stairs) && HasFlag(down->flags, ExitFlag::Stairs))
+                    if (HasFlag(up->flags, ExitFlag::Stairs) &&
+                        HasFlag(down->flags, ExitFlag::Stairs))
                     {
-                        tileCode = ToString(18) + ":" + ToString(this->tileSet + 1);
+                        tileCode = ToString(18) + ":" +
+                            ToString(this->tileSet + 1);
                     }
                 }
                 else if (up != nullptr)
                 {
                     if (HasFlag(up->flags, ExitFlag::Stairs))
                     {
-                        tileCode = ToString(18) + ":" + ToString(this->tileSet + 1);
+                        tileCode = ToString(18) + ":" +
+                            ToString(this->tileSet + 1);
                     }
                 }
                 else if (down != nullptr)
                 {
                     if (HasFlag(down->flags, ExitFlag::Stairs))
                     {
-                        tileCode = ToString(18) + ":" + ToString(this->tileSet + 0);
+                        tileCode = ToString(18) + ":" +
+                            ToString(this->tileSet + 0);
                     }
                     else
                     {
-                        tileCode = ToString(18) + ":" + ToString(this->tileSet + 4);
+                        tileCode = ToString(18) + ":" +
+                            ToString(this->tileSet + 4);
                     }
                 }
             }
@@ -265,7 +277,8 @@ std::vector<std::string> Continent::drawFov(Room * centerRoom, const int & radiu
     return layers;
 }
 
-void Continent::fieldOfView(Map2D<ContinentTile> & map, int origin_x, int origin_y, int origin_z,
+void Continent::fieldOfView(Map2D<ContinentTile> & map,
+                            int origin_x, int origin_y, int origin_z,
                             const int & radius)
 {
     double incr_x = 0.0;
@@ -276,7 +289,8 @@ void Continent::fieldOfView(Map2D<ContinentTile> & map, int origin_x, int origin
         // The x and y coordinates used by LOS Algorithm.
         incr_x = cos(static_cast<double>(i * 0.0174533f));
         incr_y = sin(static_cast<double>(i * 0.0174533f));
-        this->lineOfSight(map, origin_x, origin_y, origin_z, incr_x, incr_y, incr_z, radius);
+        this->lineOfSight(map, origin_x, origin_y, origin_z,
+                          incr_x, incr_y, incr_z, radius);
     }
 }
 

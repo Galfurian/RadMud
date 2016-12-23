@@ -1,8 +1,8 @@
 /// @file    coordinates.hpp
 /// @brief   Define the class Coordinates.
-/// @details This class allows to hadle localization by means of the three main coordinates,
-///           x;y;z, and also define a series of operators useful for coordinates manipulation
-///           and comparison.
+/// @details This class allows to hadle localization by means of the three
+///           main coordinates (x;y;z), and also define a series of operators
+///           useful for coordinates manipulation and comparison.
 /// @author  Enrico Fraccaroli
 /// @date   Sep 8 2015
 /// @copyright
