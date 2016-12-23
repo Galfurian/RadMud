@@ -167,7 +167,7 @@ bool Item::updateOnDB()
 bool Item::removeOnDB()
 {
     Logger::log(LogLevel::Debug, "Removing %s from DB...", this->getName());
-    QueryList where = {std::make_pair("vnum", ToString(vnum))}
+    QueryList where = {std::make_pair("vnum", ToString(vnum))};
     // Prepare the where clause.
     if (SQLiteDbms::instance().deleteFrom("Item", where))
     {
