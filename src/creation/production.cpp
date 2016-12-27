@@ -151,8 +151,7 @@ bool Production::setIngredient(const std::string & source)
             return false;
         }
         if (!this->ingredients.insert(
-                     std::make_pair(ingredient,
-                                    ingredientQuantity)).second)
+            std::make_pair(ingredient, ingredientQuantity)).second)
         {
             Logger::log(LogLevel::Error, "Cannot insert the ingredient");
             return false;

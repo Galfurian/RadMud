@@ -36,13 +36,15 @@ bool AStarNode<Room *>::isEqualTo(std::shared_ptr<AStarNode<Room *>> other)
 template<>
 int AStarNode<Room *>::getDistance(std::shared_ptr<AStarNode<Room *>> other)
 {
-    auto distance = element->area->getDistance(element->coord, other->getElement()->coord);
+    auto distance = element->area->getDistance(element->coord,
+                                               other->getElement()->coord);
     return distance;
 }
 
 /// @brief Specilize the get neighbours function between AStar nodes that contain rooms.
 template<>
-std::vector<std::shared_ptr<AStarNode<Room *>>> AStarNode<Room *>::getNeighbours(
+std::vector<std::shared_ptr<AStarNode<Room *>>>
+AStarNode<Room *>::getNeighbours(
     std::vector<std::shared_ptr<AStarNode<Room *>>> & nodes,
     std::shared_ptr<AStarNode<Room *>> endNode,
     const std::function<bool(Room * from, Room * to)> & checkFunction)

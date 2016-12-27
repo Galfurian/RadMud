@@ -648,7 +648,8 @@ bool DoItemCreate(Character * character, ArgumentHandler & args)
     auto material = Mud::instance().findMaterial(materialVnum);
     if (material == nullptr)
     {
-        character->sendMsg("Cannot find material '%s'.\n", args[1].getContent());
+        character->sendMsg("Cannot find material '%s'.\n",
+                           args[1].getContent());
         return false;
     }
     // Get the quality.
@@ -1622,7 +1623,7 @@ bool DoLiquidInfo(Character * character, ArgumentHandler & args)
     auto liquid = Mud::instance().findLiquid(liquidVnum);
     if (liquid == nullptr)
     {
-        character->sendMsg("Can't find the desire liquid %s.\n",liquidVnum);
+        character->sendMsg("Can't find the desire liquid %s.\n", liquidVnum);
         return false;
     }
     std::string msg;
@@ -1666,7 +1667,7 @@ bool DoProductionInfo(Character * character, ArgumentHandler & args)
     for (auto iterator : production->ingredients)
     {
         msg += "    " + iterator.first.toString();
-        msg +="(" + ToString(iterator.second) + ")\n";
+        msg += "(" + ToString(iterator.second) + ")\n";
     }
     msg += "Workbench   :" + GetToolTypeName(production->workbench) + "\n";
     character->sendMsg(msg);

@@ -50,10 +50,15 @@ bool BeginWith(const std::string & source, const std::string & prefix)
 
 bool EndWith(const std::string & source, const std::string & suffix)
 {
-    return source.size() >= suffix.size() && source.compare(source.size() - suffix.size(), suffix.size(), suffix) == 0;
+    return (source.size() >= suffix.size()) &&
+           (source.compare(source.size() - suffix.size(),
+                           suffix.size(),
+                           suffix) == 0);
 }
 
-void FindAndReplace(std::string * source, const std::string & target, const std::string & replacement)
+void FindAndReplace(std::string * source,
+                    const std::string & target,
+                    const std::string & replacement)
 {
     size_t start_pos = 0;
     while ((start_pos = source->find(target, start_pos)) != std::string::npos)
@@ -116,7 +121,8 @@ std::string ToCapitals(const std::string & source)
     return working;
 }
 
-std::vector<std::string> SplitString(const std::string & source, const std::string & delimiter)
+std::vector<std::string> SplitString(const std::string & source,
+                                     const std::string & delimiter)
 {
     std::vector<std::string> result;
     size_t pos = 0;

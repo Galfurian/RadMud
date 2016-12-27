@@ -151,7 +151,7 @@ std::vector<std::string> Continent::drawFov(Room * centerRoom,
                         HasFlag(down->flags, ExitFlag::Stairs))
                     {
                         tileCode = ToString(18) + ":" +
-                            ToString(this->tileSet + 1);
+                                   ToString(this->tileSet + 1);
                     }
                 }
                 else if (up != nullptr)
@@ -159,7 +159,7 @@ std::vector<std::string> Continent::drawFov(Room * centerRoom,
                     if (HasFlag(up->flags, ExitFlag::Stairs))
                     {
                         tileCode = ToString(18) + ":" +
-                            ToString(this->tileSet + 1);
+                                   ToString(this->tileSet + 1);
                     }
                 }
                 else if (down != nullptr)
@@ -167,12 +167,12 @@ std::vector<std::string> Continent::drawFov(Room * centerRoom,
                     if (HasFlag(down->flags, ExitFlag::Stairs))
                     {
                         tileCode = ToString(18) + ":" +
-                            ToString(this->tileSet + 0);
+                                   ToString(this->tileSet + 0);
                     }
                     else
                     {
                         tileCode = ToString(18) + ":" +
-                            ToString(this->tileSet + 4);
+                                   ToString(this->tileSet + 4);
                     }
                 }
             }

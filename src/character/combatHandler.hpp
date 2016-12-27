@@ -55,6 +55,7 @@ public:
         /// The level of aggression.
         mutable unsigned int aggression;
     };
+
 private:
     /// Owner of the list.
     Character * owner;

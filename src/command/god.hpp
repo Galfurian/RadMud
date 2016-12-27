@@ -52,6 +52,7 @@ bool DoFeast(Character * character, ArgumentHandler & args);
 
 /// Set a flag to a character.
 bool DoSetFlag(Character * character, ArgumentHandler & args);
+
 /// Remove a flag from the character.
 bool DoClearFlag(Character * character, ArgumentHandler & args);
 

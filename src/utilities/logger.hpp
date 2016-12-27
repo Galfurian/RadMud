@@ -92,7 +92,10 @@ public:
     /// @param first The first unpacked argument.
     /// @param args  Packed arguments.
     template<typename ... Args>
-    static void log(const LogLevel & level, const std::string & msg, const std::string & first, const Args & ... args)
+    static void log(const LogLevel & level,
+                    const std::string & msg,
+                    const std::string & first,
+                    const Args & ... args)
     {
         std::string::size_type pos = msg.find("%s");
         if (pos == std::string::npos)
@@ -109,35 +112,50 @@ public:
 
     /// @brief Print to consol and to logging file the given integer.
     template<typename ... Args>
-    static void log(const LogLevel & level, const std::string & msg, const int & first, const Args & ... args)
+    static void log(const LogLevel & level,
+                    const std::string & msg,
+                    const int & first,
+                    const Args & ... args)
     {
         Logger::log(level, msg, ToString(first), args ...);
     }
 
     /// @brief Print to consol and to logging file the given unsign integer.
     template<typename ... Args>
-    static void log(const LogLevel & level, const std::string & msg, const unsigned int & first, const Args & ... args)
+    static void log(const LogLevel & level,
+                    const std::string & msg,
+                    const unsigned int & first,
+                    const Args & ... args)
     {
         Logger::log(level, msg, ToString(first), args ...);
     }
 
     /// @brief Print to consol and to logging file the given double.
     template<typename ... Args>
-    static void log(const LogLevel & level, const std::string & msg, const unsigned long & first, const Args & ... args)
+    static void log(const LogLevel & level,
+                    const std::string & msg,
+                    const unsigned long & first,
+                    const Args & ... args)
     {
         Logger::log(level, msg, ToString(first), args ...);
     }
 
     /// @brief Print to consol and to logging file the given double.
     template<typename ... Args>
-    static void log(const LogLevel & level, const std::string & msg, const double & first, const Args & ... args)
+    static void log(const LogLevel & level,
+                    const std::string & msg,
+                    const double & first,
+                    const Args & ... args)
     {
         Logger::log(level, msg, ToString(first), args ...);
     }
 
     /// @brief Print to consol and to logging file the given coordiantes.
     template<typename ... Args>
-    static void log(const LogLevel & level, const std::string & msg, const Coordinates & first, const Args & ... args)
+    static void log(const LogLevel & level,
+                    const std::string & msg,
+                    const Coordinates & first,
+                    const Args & ... args)
     {
         Logger::log(level, msg, first.toString(), args ...);
     }

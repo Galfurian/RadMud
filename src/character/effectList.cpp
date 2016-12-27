@@ -80,7 +80,7 @@ int EffectList::getRangedDamMod() const
 int EffectList::getAbilityModifier(const Ability & ability) const
 {
     int result = 0;
-    for(const auto & it: activeEffects)
+    for (const auto & it: activeEffects)
     {
         auto abilityIt = it.abilities.find(ability);
         if (abilityIt != it.abilities.end())

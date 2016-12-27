@@ -48,5 +48,6 @@ public:
     virtual bool findPath(ElementType start,
                           ElementType end,
                           std::vector<ElementType> & path,
-                          const std::function<bool(ElementType from, ElementType to)> & _checkFunction) = 0;
+                          const std::function<bool(ElementType from,
+                                                   ElementType to)> & _checkFunction) = 0;
 };

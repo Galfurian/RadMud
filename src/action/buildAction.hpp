@@ -74,5 +74,6 @@ public:
     /// @param character   The actor.
     /// @param _schematics The schematics used to performe the action.
     /// @return The non-decreasing value of the cooldown.
-    static unsigned int getCooldown(Character * character, Building * _schematics);
+    static unsigned int getCooldown(Character * character,
+                                    Building * _schematics);
 };

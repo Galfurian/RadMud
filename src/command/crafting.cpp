@@ -184,7 +184,8 @@ bool DoBuild(Character * character, ArgumentHandler & args)
     }
     // Search the needed ingredients.
     std::vector<std::pair<Item *, unsigned int>> usedIngredients;
-    if (!character->findNearbyResouces(schematics->ingredients, usedIngredients))
+    if (!character->findNearbyResouces(schematics->ingredients,
+                                       usedIngredients))
     {
         character->sendMsg("You don't have enough material.\n");
         return false;

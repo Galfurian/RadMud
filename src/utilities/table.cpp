@@ -23,7 +23,9 @@
 
 #include "logger.hpp"
 
-TableColumn::TableColumn(std::string _title, StringAlign _alignment, size_t _width) :
+TableColumn::TableColumn(std::string _title,
+                         StringAlign _alignment,
+                         size_t _width) :
     title(std::move(_title)),
     alignment(std::move(_alignment)),
     width(std::move(_width))
@@ -73,16 +75,20 @@ Table::Table(std::string _title) :
     // Nothing to do.
 }
 
-void Table::addColumn(std::string columnTitle, const StringAlign & columnAlignment, size_t columnWidth)
+void Table::addColumn(std::string columnTitle,
+                      const StringAlign & columnAlignment,
+                      size_t columnWidth)
 {
-    columns.emplace_back(TableColumn(columnTitle, columnAlignment, columnWidth));
+    columns.emplace_back(
+        TableColumn(columnTitle, columnAlignment, columnWidth));
 }
 
 void Table::addRow(TableRow row)
 {
     if (row.size() != columns.size())
     {
-        Logger::log(LogLevel::Warning, "Column number and provided row cells are different.");
+        Logger::log(LogLevel::Warning,
+                    "Column number and provided row cells are different.");
         return;
     }
     for (size_t idx = 0; idx < columns.size(); ++idx)
@@ -111,8 +117,9 @@ std::string Table::getTable(bool withoutHeaders)
         unsigned int column = 0;
         for (const auto & cell : row)
         {
-            output += "#"
-                      + AlignString(cell, columns[column].getAlignment(), columns[column].getWidth());
+            output += "#" + AlignString(cell,
+                                        columns[column].getAlignment(),
+                                        columns[column].getWidth());
             column++;
         }
         output += "#\n";
@@ -157,8 +164,9 @@ std::string Table::getDivider()
 
 std::string Table::getTitle()
 {
-    return "#" + AlignString(title, StringAlign::Center, getTotalWidth() + (columns.size() - 1))
-           + "#\n";
+    return "#" + AlignString(title,
+                             StringAlign::Center,
+                             getTotalWidth() + (columns.size() - 1)) + "#\n";
 }
 
 std::string Table::getHeaders()
@@ -166,7 +174,8 @@ std::string Table::getHeaders()
     std::string output;
     for (auto it : columns)
     {
-        output += "#" + AlignString(it.getTitle(), StringAlign::Center, it.getWidth());
+        output += "#" + AlignString(it.getTitle(), StringAlign::Center,
+                                    it.getWidth());
     }
     output += "#\n";
     return output;

@@ -112,7 +112,8 @@ public:
     std::vector<std::shared_ptr<AStarNode<ElementType>>> getNeighbours(
         std::vector<std::shared_ptr<AStarNode<ElementType>>> & nodes,
         std::shared_ptr<AStarNode<ElementType>> endNode,
-        const std::function<bool(ElementType from, ElementType to)> & checkFunction);
+        const std::function<bool(ElementType from,
+                                 ElementType to)> & checkFunction);
 };
 
 #include "aStarNode.i.hpp"
