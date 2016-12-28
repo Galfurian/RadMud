@@ -63,7 +63,9 @@ std::string MagazineItem::lookContent()
     std::string output;
     if (content.empty())
     {
-        output += Formatter::italic() + "It does not contain any projectiles.\n" + Formatter::reset();
+        output +=
+            Formatter::italic() + "It does not contain any projectiles.\n" +
+            Formatter::reset();
     }
     else
     {
@@ -83,44 +85,50 @@ bool MagazineItem::canLoadWith(Item * projectile, std::string & error) const
 {
     if (projectile->getType() != ModelType::Projectile)
     {
-        error = "You can't load " + this->getName(true) + " with " + projectile->getName(true);
+        error = "You can't load " + this->getName(true) + " with " +
+                projectile->getName(true);
         return false;
     }
     // Retrieve any already loaded projectiles.
     Item * alreadyLoaded = this->getAlreadyLoadedProjectile();
     if (alreadyLoaded != nullptr)
     {
-        // If there are projectiles inside, check if the two types of projectiles are compatible.
+        // If there are projectiles inside, check if the two types of
+        //  projectiles are compatible.
         if (!alreadyLoaded->canStackWith(projectile))
         {
-            error = "The magazine already contains a different type of projectiles";
+            error = "The magazine already contains a different"
+                " type of projectiles";
             return false;
         }
     }
     return true;
 }
 
-bool MagazineItem::getAmountToLoad(Item * projectile, unsigned int & ammount, std::string & error) const
+bool MagazineItem::getAmountToLoad(Item * projectile,
+                                   unsigned int & amount,
+                                   std::string & error) const
 {
     if (!this->canLoadWith(projectile, error))
     {
         return false;
     }
     // Set by default the ammout to load to the maximum.
-    ammount = this->model->toMagazine()->maxAmmount;
-    unsigned int ammountAlreadyLoaded = 0;
+    amount = this->model->toMagazine()->maxAmount;
+    unsigned int amountAlreadyLoaded = 0;
     // Retrieve any already loaded projectiles.
     Item * alreadyLoaded = this->getAlreadyLoadedProjectile();
     if (alreadyLoaded != nullptr)
     {
-        // Set the ammount of already loaded projectiles.
-        ammountAlreadyLoaded = alreadyLoaded->quantity;
-        if (ammount <= ammountAlreadyLoaded)
+        // Set the amount of already loaded projectiles.
+        amountAlreadyLoaded = alreadyLoaded->quantity;
+        if (amount <= amountAlreadyLoaded)
         {
-            error = this->getNameCapital(true) + " is already at full capacity.";
+            error = this->getNameCapital(true) +
+                    " is already at full capacity.";
             return false;
         }
-        ammount -= ammountAlreadyLoaded;
+        amount -= amountAlreadyLoaded;
     }
     return true;
 }

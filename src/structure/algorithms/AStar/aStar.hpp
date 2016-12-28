@@ -51,7 +51,8 @@ public:
     bool findPath(ElementType start,
                   ElementType end,
                   std::vector<ElementType> & path,
-                  const std::function<bool(ElementType from, ElementType to)> & _checkFunction) override;
+                  const std::function<bool(ElementType from,
+                                           ElementType to)> & _checkFunction) override;
 
 private:
     /// @brief Recursive function used to search the path from the

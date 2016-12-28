@@ -1,4 +1,4 @@
-/// @file   playerLoadFunctions.cpp
+/// @file   dbFunctionsPlayer.cpp
 /// @brief
 /// @author Enrico Fraccaroli
 /// @date   03/12/2016
@@ -32,7 +32,8 @@ bool SQLiteDbms::loadPlayer(Player * player)
     stopwatch.start();
     // Retrieve the information concerning the player.
     {
-        std::string query = "SELECT * FROM Player WHERE name = \"" + player->name + "\";";
+        std::string query = "SELECT * FROM Player WHERE"
+                                " name = \"" + player->name + "\";";
         // Execute the query.
         auto result = dbConnection.executeSelect(query.c_str());
         // Check the result.
@@ -56,17 +57,20 @@ bool SQLiteDbms::loadPlayer(Player * player)
     }
     if (!this->loadPlayerItems(player))
     {
-        Logger::log(LogLevel::Error, "Encountered an error during loading Player Items.");
+        Logger::log(LogLevel::Error,
+                    "Encountered an error during loading Player Items.");
         return false;
     }
     if (!this->loadPlayerSkill(player))
     {
-        Logger::log(LogLevel::Error, "Encountered an error during loading Player Skills.");
+        Logger::log(LogLevel::Error,
+                    "Encountered an error during loading Player Skills.");
         return false;
     }
     if (!this->loadPlayerLuaVariables(player))
     {
-        Logger::log(LogLevel::Error, "Encountered an error during loading Player Lua Variables.");
+        Logger::log(LogLevel::Error,
+                    "Encountered an error during loading Player Lua Variables.");
         return false;
     }
     // Check the loaded player.
@@ -76,7 +80,8 @@ bool SQLiteDbms::loadPlayer(Player * player)
         return false;
     }
     // Log the elapsed time.
-    Logger::log(LogLevel::Debug, "Elapsed Time (" + ToString(stopwatch.elapsed()) + " ms).");
+    Logger::log(LogLevel::Debug,
+                "Elapsed Time (" + ToString(stopwatch.elapsed()) + " ms).");
     return true;
 }
 
@@ -84,9 +89,10 @@ bool SQLiteDbms::searchPlayer(const std::string & name)
 {
     bool outcome = false;
     // Prepare the query.
-    std::string query = "SELECT count(*) FROM Player WHERE name=\"" + name + "\";";
+    std::string query = "SELECT count(*) FROM Player WHERE"
+                            " name=\"" + name + "\";";
     // Execute the query.
-    auto result = SQLiteDbms::instance().dbConnection.executeSelect(query.c_str());
+    auto result = dbConnection.executeSelect(query.c_str());
     if (result != nullptr)
     {
         if (result->next())
@@ -101,29 +107,6 @@ bool SQLiteDbms::searchPlayer(const std::string & name)
     return outcome;
 }
 
-//    player->name = result->getNextString();
-//    player->password = result->getNextString();
-//    player->race = Mud::instance().findRace(result->getNextInteger());
-//    player->setAbility(Ability::Strength, result->getNextUnsignedInteger());
-//    player->setAbility(Ability::Agility, result->getNextUnsignedInteger());
-//    player->setAbility(Ability::Perception, result->getNextUnsignedInteger());
-//    player->setAbility(Ability::Constitution, result->getNextUnsignedInteger());
-//    player->setAbility(Ability::Intelligence, result->getNextUnsignedInteger());
-//    player->gender = static_cast<GenderType>(result->getNextInteger());
-//    player->age = result->getNextInteger();
-//    player->description = result->getNextString();
-//    player->weight = result->getNextUnsignedInteger();
-//    player->faction = Mud::instance().findFaction(result->getNextInteger());
-//    player->level = result->getNextUnsignedInteger();
-//    player->experience = result->getNextInteger();
-//    player->room = Mud::instance().findRoom(result->getNextInteger());
-//    player->prompt = result->getNextString();
-//    player->flags = result->getNextUnsignedInteger();
-//    player->setHealth(result->getNextUnsignedInteger(), true);
-//    player->setStamina(result->getNextUnsignedInteger(), true);
-//    player->setHunger(result->getNextInteger());
-//    player->setThirst(result->getNextInteger());
-//    player->rent_room = result->getNextInteger();
 bool SQLiteDbms::loadPlayerInformation(ResultSet * result, Player * player)
 {
     // Loading status.
@@ -138,7 +121,8 @@ bool SQLiteDbms::loadPlayerInformation(ResultSet * result, Player * player)
     {
         int value;
         if (!result->getDataInteger(column++, value)) return false;
-        if ((player->race = Mud::instance().findRace(value)) == nullptr) return false;
+        if ((player->race = Mud::instance().findRace(value)) == nullptr)
+            return false;
     }
     // Strength
     {
@@ -186,7 +170,9 @@ bool SQLiteDbms::loadPlayerInformation(ResultSet * result, Player * player)
     {
         int value;
         if (!result->getDataInteger(column++, value)) return false;
-        if ((player->faction = Mud::instance().findFaction(value)) == nullptr) return false;
+        if ((player->faction = Mud::instance().findFaction(value)) ==
+            nullptr)
+            return false;
     }
     // Level
     if (!result->getDataUnsignedInteger(column++, player->level)) return false;
@@ -196,7 +182,8 @@ bool SQLiteDbms::loadPlayerInformation(ResultSet * result, Player * player)
     {
         int value;
         if (!result->getDataInteger(column++, value)) return false;
-        if ((player->room = Mud::instance().findRoom(value)) == nullptr) return false;
+        if ((player->room = Mud::instance().findRoom(value)) == nullptr)
+            return false;
     }
     // Prompt
     if (!result->getDataString(column++, player->prompt)) return false;
@@ -246,7 +233,9 @@ bool SQLiteDbms::loadPlayerInformation(ResultSet * result, Player * player)
 bool SQLiteDbms::loadPlayerItems(Player * player)
 {
     // Prepare the query.
-    std::string query = "SELECT item, position FROM ItemPlayer WHERE owner = \"" + player->name + "\";";
+    std::string query =
+        "SELECT item, position FROM ItemPlayer WHERE owner = \"" +
+        player->name + "\";";
     // Execute the query.
     auto result = dbConnection.executeSelect(query.c_str());
     // Check the result.
@@ -310,7 +299,9 @@ bool SQLiteDbms::loadPlayerItems(Player * player)
 bool SQLiteDbms::loadPlayerSkill(Player * player)
 {
     // Prepare the query.
-    std::string query = "SELECT skill, value FROM Advancement WHERE player=\"" + player->name + "\";";
+    std::string query =
+        "SELECT skill, value FROM Advancement WHERE "
+            "player=\"" + player->name + "\";";
     // Execute the query.
     auto result = dbConnection.executeSelect(query.c_str());
     // Check the result.
@@ -342,7 +333,8 @@ bool SQLiteDbms::loadPlayerSkill(Player * player)
 bool SQLiteDbms::loadPlayerLuaVariables(Player * player)
 {
     // Prepare the query.
-    std::string query = "SELECT name, value FROM PlayerVariable WHERE player=\"" + player->name + "\";";
+    std::string query = "SELECT name, value FROM PlayerVariable WHERE"
+                            " player=\"" + player->name + "\";";
     // Execute the query.
     auto result = dbConnection.executeSelect(query.c_str());
     // Check the result.
@@ -359,7 +351,8 @@ bool SQLiteDbms::loadPlayerLuaVariables(Player * player)
         std::string variableName = result->getNextString();
         std::string variableValue = result->getNextString();
         player->setLuaVariable(variableName, variableValue);
-        Logger::log(LogLevel::Debug, variableName + " = " + variableValue + ";");
+        Logger::log(LogLevel::Debug,
+                    variableName + " = " + variableValue + ";");
     }
     // release the resource.
     result->release();

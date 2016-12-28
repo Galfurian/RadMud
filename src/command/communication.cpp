@@ -27,52 +27,30 @@
 
 void LoadCommunicationCommands()
 {
-    Command command;
-    command.gods = false;
-    {
-        command.name = "say";
-        command.help = "Talk to people in the current room.";
-        command.arguments = "[someone] (something)";
-        command.hndl = DoSay;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "whisper";
-        command.help = "Whisper secretly to a single character.";
-        command.arguments = "(someone) (something)";
-        command.hndl = DoWhisper;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "emote";
-        command.help = "Execute and emote.";
-        command.arguments = "(emotion)";
-        command.hndl = DoEmote;
-        command.canUseInCombat = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "bug";
-        command.help = "Report a bug, your character's name, location and date will be saved.";
-        command.arguments = "(message)";
-        command.hndl = DoBug;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "idea";
-        command.help = "Send an idea, try to be as clear as possible.";
-        command.arguments = "(message)";
-        command.hndl = DoIdea;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "typo";
-        command.help = "Report a typo.";
-        command.arguments = "(message)";
-        command.hndl = DoTypo;
-        Mud::instance().addCommand(command);
-    }
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoSay, "say", "[someone] (something)",
+        "Talk to people in the current room.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoWhisper, "whisper", "(someone) (something)",
+        "Whisper secretly to a single character.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoEmote, "emote", "(emotion)",
+        "Express an emotion.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoBug, "bug", "(message)",
+        "Report a bug, your character's name, location and date will be saved.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoIdea, "idea", "(message)",
+        "Send an idea, try to be as clear as possible.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoTypo, "typo", "(message)",
+        "Report a typo.",
+        false, true, false));
 }
 
 bool DoSay(Character * character, ArgumentHandler & args)
@@ -83,14 +61,17 @@ bool DoSay(Character * character, ArgumentHandler & args)
         return false;
     }
     // Check if the character are talking to another character.
-    auto receiver = character->room->findCharacter(args.get(0).getContent(), args.get(0).getIndex(), {character});
+    auto receiver = character->room->findCharacter(args.get(0).getContent(),
+                                                   args.get(0).getIndex(),
+                                                   {character});
     if (receiver != nullptr)
     {
         // Get the rest of the message, minus the first word.
         auto message = args.substr(1);
         if (message.empty())
         {
-            character->sendMsg("My dear friend, say what to %s?\n", receiver->getName());
+            character->sendMsg("My dear friend, say what to %s?\n",
+                               receiver->getName());
             return false;
         }
         // Eat the space between the name and the message.
@@ -98,17 +79,20 @@ bool DoSay(Character * character, ArgumentHandler & args)
         // Player send.
         character->sendMsg("You say to %s, \"%s\"\n",
                            receiver->getName(),
-                           Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
+                           Formatter::cyan() + Formatter::italic() + message +
+                           Formatter::reset());
         // Target receive.
         receiver->sendMsg("%s say to you, \"%s\"\n\n",
                           character->getName(),
-                          Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
+                          Formatter::cyan() + Formatter::italic() + message +
+                          Formatter::reset());
         // Send the message inside the room.
         character->room->sendToAll("%s says to %s, \"%s\".\n",
                                    {character, receiver},
                                    character->getName(),
                                    receiver->getName(),
-                                   Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
+                                   Formatter::cyan() + Formatter::italic() +
+                                   message + Formatter::reset());
         // If it's a mobile, activate the trigger.
         if (receiver->isMobile())
         {
@@ -118,12 +102,14 @@ bool DoSay(Character * character, ArgumentHandler & args)
     else
     {
         character->sendMsg("You say \"%s\".\n",
-                           Formatter::cyan() + Formatter::italic() + args.getOriginal() + Formatter::reset());
+                           Formatter::cyan() + Formatter::italic() +
+                           args.getOriginal() + Formatter::reset());
         // Send the message inside the room.
         character->room->sendToAll("%s says \"%s\".\n",
                                    {character},
                                    character->getName(),
-                                   Formatter::cyan() + Formatter::italic() + args.getOriginal() + Formatter::reset());
+                                   Formatter::cyan() + Formatter::italic() +
+                                   args.getOriginal() + Formatter::reset());
     }
     return true;
 }
@@ -135,9 +121,10 @@ bool DoWhisper(Character * character, ArgumentHandler & args)
         character->sendMsg("Whisper to whom?\n");
         return false;
     }
-    // Check the existance of the target character.
-    auto receiver = character->room->findCharacter(args[0].getContent(), args[0].getIndex(), {
-        character});
+    // Check the existence of the target character.
+    auto receiver = character->room->findCharacter(args[0].getContent(),
+                                                   args[0].getIndex(),
+                                                   {character});
     if (receiver == nullptr)
     {
         character->sendMsg("You don't see %s here.\n", args[0].getContent());
@@ -147,11 +134,13 @@ bool DoWhisper(Character * character, ArgumentHandler & args)
     auto message = args.substr(1);
     if (message.empty())
     {
-        character->sendMsg("What do you want to whisper to %s?\n", receiver->getName());
+        character->sendMsg("What do you want to whisper to %s?\n",
+                           receiver->getName());
         return false;
     }
     // Check if the sender is invisible.
-    auto sender = (receiver->canSee(character)) ? "Someone" : character->getNameCapital();
+    auto sender = (receiver->canSee(character)) ? "Someone"
+                                                : character->getNameCapital();
     // Send the message.
     character->sendMsg("%sYou whisper to %s, %s\"%s\".\n",
                        Formatter::magenta(),
@@ -173,7 +162,8 @@ bool DoEmote(Character * character, ArgumentHandler & args)
         return false;
     }
     // Send the messages.
-    character->sendMsg("%sYou %s\n", Formatter::yellow(), args.getOriginal() + Formatter::reset());
+    character->sendMsg("%sYou %s\n", Formatter::yellow(),
+                       args.getOriginal() + Formatter::reset());
     character->room->sendToAll(
         "%s %s\n",
         {character},
@@ -198,7 +188,7 @@ bool DoBug(Character * character, ArgumentHandler & args)
     SQLiteDbms::instance().beginTransaction();
     if (!SQLiteDbms::instance().insertInto("Board", arguments))
     {
-        character->sendMsg("Something gone wrong during the storing of your bug.\n");
+        character->sendMsg("Something gone wrong while reporting your bug.\n");
         SQLiteDbms::instance().rollbackTransection();
         return false;
     }
@@ -227,7 +217,7 @@ bool DoIdea(Character * character, ArgumentHandler & args)
     SQLiteDbms::instance().beginTransaction();
     if (!SQLiteDbms::instance().insertInto("Board", arguments))
     {
-        character->sendMsg("Something gone wrong during the storing of your idea.\n");
+        character->sendMsg("Something gone wrong while reporting your idea.\n");
         SQLiteDbms::instance().rollbackTransection();
         return false;
     }
@@ -255,7 +245,7 @@ bool DoTypo(Character * character, ArgumentHandler & args)
     SQLiteDbms::instance().beginTransaction();
     if (!SQLiteDbms::instance().insertInto("Board", arguments))
     {
-        character->sendMsg("Something gone wrong during the storing of the Typo.\n");
+        character->sendMsg("Something gone wrong while reporting your Typo.\n");
         SQLiteDbms::instance().rollbackTransection();
         return false;
     }

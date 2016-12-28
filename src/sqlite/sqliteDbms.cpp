@@ -75,7 +75,8 @@ SQLiteDbms & SQLiteDbms::instance()
 
 bool SQLiteDbms::openDatabase()
 {
-    if (!dbConnection.openConnection(Mud::instance().getMudDatabaseName(), Mud::instance().getMudSystemDirectory()))
+    if (!dbConnection.openConnection(Mud::instance().getMudDatabaseName(),
+                                     Mud::instance().getMudSystemDirectory()))
     {
         this->showLastError();
         return false;
@@ -99,7 +100,8 @@ bool SQLiteDbms::loadTables()
     bool status = true;
     for (auto iterator : loaders)
     {
-        Logger::log(LogLevel::Debug, "    Loading Table: " + iterator.table + ".");
+        Logger::log(LogLevel::Debug,
+                    "    Loading Table: " + iterator.table + ".");
         // Execute the query.
         auto result = dbConnection.executeSelect(iterator.getQuery().c_str());
         // Check the result.
@@ -111,7 +113,8 @@ bool SQLiteDbms::loadTables()
         if (!iterator.loadFunction(result))
         {
             // Log an error.
-            Logger::log(LogLevel::Error, "Error when loading table: " + iterator.table);
+            Logger::log(LogLevel::Error,
+                        "Error when loading table: " + iterator.table);
             status = false;
         }
         // release the resource.
@@ -163,11 +166,13 @@ bool SQLiteDbms::deleteFrom(std::string table, QueryList where)
         auto clause = (*it);
         if ((it + 1) == where.end())
         {
-            stream << "    " << clause.first << " = \"" << clause.second << "\";" << std::endl;
+            stream << "    " << clause.first
+                   << " = \"" << clause.second << "\";" << std::endl;
         }
         else
         {
-            stream << "    " << clause.first << " = \"" << clause.second << "\" AND" << std::endl;
+            stream << "    " << clause.first
+                   << " = \"" << clause.second << "\" AND" << std::endl;
         }
     }
     return (dbConnection.executeQuery(stream.str().c_str()) != 0);
@@ -183,11 +188,13 @@ bool SQLiteDbms::updateInto(std::string table, QueryList value, QueryList where)
         auto clause = (*it);
         if ((it + 1) == value.end())
         {
-            stream << "    " << clause.first << " = \"" << clause.second << "\"" << std::endl;
+            stream << "    " << clause.first
+                   << " = \"" << clause.second << "\"" << std::endl;
         }
         else
         {
-            stream << "    " << clause.first << " = \"" << clause.second << "\"," << std::endl;
+            stream << "    " << clause.first
+                   << " = \"" << clause.second << "\"," << std::endl;
         }
     }
     stream << "WHERE" << std::endl;
@@ -196,11 +203,13 @@ bool SQLiteDbms::updateInto(std::string table, QueryList value, QueryList where)
         auto clause = (*it);
         if ((it + 1) == where.end())
         {
-            stream << "    " << clause.first << " = \"" << clause.second << "\";" << std::endl;
+            stream << "    " << clause.first
+                   << " = \"" << clause.second << "\";" << std::endl;
         }
         else
         {
-            stream << "    " << clause.first << " = \"" << clause.second << "\" AND" << std::endl;
+            stream << "    " << clause.first
+                   << " = \"" << clause.second << "\" AND" << std::endl;
         }
     }
     return (dbConnection.executeQuery(stream.str().c_str()) != 0);
@@ -216,7 +225,8 @@ bool SQLiteDbms::updatePlayers()
         {
             if (!player->updateOnDB())
             {
-                Logger::log(LogLevel::Error, "Can't save the player '%s'.", player->getName());
+                Logger::log(LogLevel::Error,
+                            "Can't save the player '%s'.", player->getName());
                 this->showLastError();
             }
         }
@@ -234,7 +244,8 @@ bool SQLiteDbms::updateItems()
     {
         if (!it.second->updateOnDB())
         {
-            Logger::log(LogLevel::Error, "Can't save the item '%s'.", it.second->getName());
+            Logger::log(LogLevel::Error,
+                        "Can't save the item '%s'.", it.second->getName());
             this->showLastError();
         }
     }
@@ -251,7 +262,8 @@ bool SQLiteDbms::updateRooms()
     {
         if (!it.second->updateOnDB())
         {
-            Logger::log(LogLevel::Error, "Can't save the room '%s'.", it.second->name);
+            Logger::log(LogLevel::Error,
+                        "Can't save the room '%s'.", it.second->name);
             this->showLastError();
         }
     }
@@ -277,6 +289,8 @@ void SQLiteDbms::endTransaction()
 
 void SQLiteDbms::showLastError() const
 {
-    Logger::log(LogLevel::Error, "Error code :" + ToString(dbConnection.getLastErrorCode()));
-    Logger::log(LogLevel::Error, "Last error :" + dbConnection.getLastErrorMsg());
+    Logger::log(LogLevel::Error,
+                "Error code :" + ToString(dbConnection.getLastErrorCode()));
+    Logger::log(LogLevel::Error,
+                "Last error :" + dbConnection.getLastErrorMsg());
 }

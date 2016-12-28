@@ -23,10 +23,6 @@
 
 class Character;
 
-class Mobile;
-
-class Player;
-
 #include <vector>
 #include <string>
 
@@ -42,8 +38,10 @@ public:
     /// @param target       The character to search.
     /// @param number       The index of the character to search.
     /// @param exceptions   The vector of exceptions.
-    /// @param skipMobile   <b>True</b> skips mobiles,<br> <b>False</b> count also the mobiles.
-    /// @param skipPlayer   <b>True</b> skips players,<br> <b>False</b> count also the players.
+    /// @param skipMobile   <b>True</b> skips mobiles,<br>
+    ///                     <b>False</b> count also the mobiles.
+    /// @param skipPlayer   <b>True</b> skips players,<br>
+    ///                     <b>False</b> count also the players.
     /// @return The character if it has been found.
     Character * findCharacter(
         const std::string & target,
@@ -58,11 +56,13 @@ public:
     ///         <b>False</b> otherwise.
     bool containsCharacter(Character * character) const;
 
-    /// @brief Allows to add a character to the vector, if it is not already inside the vector.
+    /// @brief Allows to add a character to the vector, if it is not
+    ///         already inside the vector.
     /// @param character The character to add.
     void emplace_back_character(Character * character);
 
-    /// @brief Allows to add the characters contained inside another container into this one.
+    /// @brief Allows to add the characters contained inside another
+    ///         container into this one.
     /// @param other The other container.
     void addUnique(const CharacterContainer & other);
 };

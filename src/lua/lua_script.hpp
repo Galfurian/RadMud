@@ -47,6 +47,8 @@ void LuaSleep(int sleepTime);
 /// @return The generated random value.
 int LuaRandom(int min, int max);
 
+/// @brief Allows to stop the script (and the Thread) from inside the Lua
+/// Environment.
 void LuaStopScript();
 
 /// @brief Register in Lua all the functions.

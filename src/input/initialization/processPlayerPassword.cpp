@@ -23,7 +23,8 @@
 #include "player.hpp"
 #include "mud.hpp"
 
-bool ProcessPlayerPassword::process(Character * character, ArgumentHandler & args)
+bool ProcessPlayerPassword::process(Character * character,
+                                    ArgumentHandler & args)
 {
     auto player = character->toPlayer();
     auto input = args.getOriginal();
@@ -55,7 +56,8 @@ bool ProcessPlayerPassword::process(Character * character, ArgumentHandler & arg
     return false;
 }
 
-void ProcessPlayerPassword::advance(Character * character, const std::string & error)
+void ProcessPlayerPassword::advance(Character * character,
+                                    const std::string & error)
 {
     if (!error.empty())
     {

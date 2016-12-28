@@ -34,7 +34,8 @@ public:
 
     void getSheet(Table & sheet) const override;
 
-    /// Provides the AC of the armor based on its quality, material and condition.
+    /// @brief Provides the AC of the armor based on its quality,
+    ///         material and condition.
     /// @return the armor class.
     unsigned int getArmorClass() const;
 };

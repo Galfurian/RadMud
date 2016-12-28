@@ -1,5 +1,5 @@
 /// @file   updateInterface.cpp
-/// @brief  
+/// @brief  Implementation of the UpdateInterface class functions.
 /// @author Enrico Fraccaroli
 /// @date   09/12/2016
 /// @copyright

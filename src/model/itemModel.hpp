@@ -38,15 +38,15 @@
 /// Used to determine the flag of the model.
 using ModelFlag = enum class ModelFlag_t
 {
-    None = 0,           ///< [0]    No flag.
-    Static = 1,         ///< [1]    The item can't be collected, put down or moved.
-    Invisible = 2,      ///< [2]    The item can't be seen.
-    Unbreakable = 4,    ///< [4]    The item can't be damaged.
-    NoSaleable = 8,     ///< [8]    The item cannot be sold.
-    TwoHand = 16,       ///< [16]   Must be wielded with two hands.
-    CanClose = 32,      ///< [32]   It can be closed.
-    CanSeeThrough = 64, ///< [64]   Even if it is closed, a character can see through it.
-    CanBeStacked = 128  ///< [128]  The items with this flag can be stacked.
+    None = 0,           ///< [0]   No flag.
+    Static = 1,         ///< [1]   The item can't be moved.
+    Invisible = 2,      ///< [2]   The item can't be seen.
+    Unbreakable = 4,    ///< [4]   The item can't be damaged.
+    NoSaleable = 8,     ///< [8]   The item cannot be sold.
+    TwoHand = 16,       ///< [16]  Must be wielded with two hands.
+    CanClose = 32,      ///< [32]  It can be closed.
+    CanSeeThrough = 64, ///< [64]  Can see through it, even if closed.
+    CanBeStacked = 128  ///< [128] The items with this flag can be stacked.
 };
 
 class Item;
@@ -163,14 +163,16 @@ public:
     ///         <b>False</b> otherwise.
     virtual bool setModel(const std::string & source) = 0;
 
-    /// @brief Fills the provided table with the information concerning the model.
+    /// @brief Fills the provided table with the information concerning
+    ///         the model.
     /// @param sheet The table that has to be filled.
     virtual void getSheet(Table & sheet) const;
 
     /// @brief Create a new item starting from this model.
     /// @param maker       The player that create the item.
     /// @param composition The composition of the item.
-    /// @param isForMobile Defines if the item is for a mobile, thus it is not save on the DB nor on the MUD.
+    /// @param isForMobile Defines if the item is for a mobile,
+    ///                     thus it is not save on the DB nor on the MUD.
     /// @param itemQuality The quality of the item.
     /// @param quantity    The quantity.
     /// @return The newly created item.
@@ -186,8 +188,8 @@ public:
     ///         <b>False</b> otherwise.
     bool check();
 
-    /// @brief Given the argumtens the function replace the symbols inside the source string
-    ///         using the provided arguments.
+    /// @brief Given the argumtens the function replace the symbols
+    ///         inside the source string using the provided arguments.
     /// @param source       The source string.
     /// @param itemMaterial The material of which the model is made.
     /// @param itemQuality  The quality of the model.
@@ -202,10 +204,12 @@ public:
     /// @param itemMaterial The material of which the model is made.
     /// @param itemQuality  The quality of the model.
     /// @return The specific name of the model.
-    std::string getName(Material * itemMaterial = nullptr, const ItemQuality & itemQuality =
-    ItemQuality::Normal) const;
+    std::string getName(Material * itemMaterial = nullptr,
+                        const ItemQuality & itemQuality =
+                        ItemQuality::Normal) const;
 
-    /// @brief Returns the description of the model depending on the passed arguments.
+    /// @brief Returns the description of the model depending
+    ///         on the passed arguments.
     /// @param itemMaterial The material of which the model is made.
     /// @param itemQuality  The quality of the model.
     /// @return The specific description of the model.
@@ -214,7 +218,8 @@ public:
         const ItemQuality & itemQuality = ItemQuality::Normal);
 
     /// @brief Check if the item must be wielded.
-    /// @return <b>True</b> if the item must be wielded,<br><b>False</b> Otherwise.
+    /// @return <b>True</b> if the item must be wielded,<br>
+    ///         <b>False</b> Otherwise.
     bool mustBeWielded();
 
     /// @brief Function used to register inside the lua environment the class.
@@ -298,7 +303,8 @@ public:
 };
 
 /// @defgroup FlagsToList Flags to List of Strings.
-/// @brief All the functions necessary to transform into a list of string a pool of flags.
+/// @brief All the functions necessary to transform into a list of string a
+///         pool of flags.
 /// @{
 
 /// Return a list of string containg the Model flags contained inside the value.

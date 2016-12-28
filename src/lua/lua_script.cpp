@@ -1,5 +1,6 @@
 /// @file   lua_script.cpp
-/// @brief  Implements all the methods used by lua to interract and communicate with the mud.
+/// @brief  Implements all the methods used by lua to interact and communicate
+///          with the mud.
 /// @author Enrico Fraccaroli
 /// @date   Aug 25 2014
 /// @copyright

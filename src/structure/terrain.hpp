@@ -1,5 +1,5 @@
 /// @file   terrain.hpp
-/// @brief  
+/// @brief  Declaration of Terrain class.
 /// @author Enrico Fraccaroli
 /// @date   08/12/2016
 /// @copyright
@@ -25,6 +25,7 @@
 #include <string>
 #include <lua.hpp>
 
+/// @brief Holds information about a type of terrain.
 class Terrain
 {
 public:
@@ -36,8 +37,8 @@ public:
     unsigned int flags;
     /// The available space inside the terrain.
     unsigned int space;
-    /// If there is natural light on this terrain.
-    bool inside;
+    /// If the terrain is indoor.
+    bool indoor;
     /// If there is natural light on this terrain.
     bool light;
     /// The lua_State associated with this terrain.
@@ -47,7 +48,12 @@ public:
     Terrain();
 
     /// @brief Constructor.
-    Terrain(unsigned int _vnum, std::string _name, unsigned int _flags, unsigned int _space, bool _inside, bool _light);
+    Terrain(unsigned int _vnum,
+            std::string _name,
+            unsigned int _flags,
+            unsigned int _space,
+            bool _indoor,
+            bool _light);
 
     /// @brief Function used to register inside the lua environment the class.
     /// @param L The lua environment.

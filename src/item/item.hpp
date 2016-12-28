@@ -121,11 +121,12 @@ public:
     /// @brief Disable Move assign.
     Item & operator=(Item &&) = delete;
 
-    /// @brief Destructor - Is a method which is automatically invoked when the object is destroyed.
+    /// @brief Destructor.
     virtual ~Item();
 
     /// @brief Check the correctness of the item.
-    /// @param complete <b>True</b> also the variables which are set after the placement are checked,<br>
+    /// @param complete <b>True</b> also the variables which are set after
+    ///                              the placement are checked,<br>
     ///                 <b>False</b> only the basic variables are checked.
     /// @return <b>True</b> if the item has correct values,<br>
     ///         <b>False</b> otherwise.
@@ -144,12 +145,14 @@ public:
     ///         <b>False</b> otherwise.
     virtual bool removeOnDB();
 
-    /// @brief Fills the provided table with the information concerning the item.
+    /// @brief Fills the provided table with the information
+    ///         concerning the item.
     /// @param sheet The table that has to be filled.
     virtual void getSheet(Table & sheet) const;
 
     /// @brief Check if the item can be deconstructed.
-    /// @param error In case the item cannot be deconstructed, error contains the reason.
+    /// @param error In case the item cannot be deconstructed,
+    ///               error contains the reason.
     /// @return <b>True</b> if it can be deconstructed,<br>
     ///         <b>False</b> otherwise.
     virtual bool canDeconstruct(std::string & error) const;
@@ -191,13 +194,16 @@ public:
     /// @return The condition of the item.
     std::string getConditionDescription();
 
-    /// @brief Provides the price of the item based on its quality, material and condition.
-    /// @param entireStack If <b>true</b> this function returns the price of the entire stack.
+    /// @brief Provides the price of the item based on its quality,
+    ///         material and condition.
+    /// @param entireStack If <b>true</b> this function returns the
+    ///                     price of the entire stack.
     /// @return The price of the item.
     virtual unsigned int getPrice(bool entireStack) const;
 
     /// @brief Get the item weight, plus eventually contained item weight.
-    /// @param entireStack If <b>true</b> this function returns the weight of the entire stack.
+    /// @param entireStack If <b>true</b> this function returns
+    ///                     the weight of the entire stack.
     /// @return The total weight of the item.
     virtual double getWeight(bool entireStack) const;
 
@@ -215,7 +221,8 @@ public:
     /// @return The description of the item.
     std::string getDescription();
 
-    /// @brief Provide a detailed description of the item, including it's condition.
+    /// @brief Provide a detailed description of the item,
+    ///         including it's condition.
     /// @return A detailed description of the item.
     std::string getLook();
 
@@ -242,11 +249,11 @@ public:
     double getFreeSpace() const;
 
     /// @brief Check if this item can contain the passed one.
-    /// @param item    The item to check.
-    /// @param ammount The ammount to check.
+    /// @param item   The item to check.
+    /// @param amount The amount to check.
     /// @return <b>True</b> if it can be contained,<br>
     ///         <b>False</b> otherwise.
-    bool canContain(Item * item, const unsigned int & ammount) const;
+    bool canContain(Item * item, const unsigned int & amount) const;
 
     /// @brief Load an item inside the container and update the database.
     /// @param item     The item to load in.
@@ -261,25 +268,26 @@ public:
     bool takeOut(Item * item, bool updateDB = true);
 
     /// @brief Check if this item can contain the passed one.
-    /// @param liquid  The liquid to pour in.
-    /// @param ammount The ammount of liquid.
+    /// @param liquid The liquid to pour in.
+    /// @param amount The amount of liquid.
     /// @return <b>True</b> if it can be contained,<br>
     ///         <b>False</b> otherwise.
-    bool canContainLiquid(Liquid * liquid, const double & ammount) const;
+    bool canContainLiquid(Liquid * liquid, const double & amount) const;
 
     /// @brief Load some liquid inside the container and update the database.
-    /// @param liquid   The liquid to load in.
-    /// @param ammount  The ammount of liquid.
+    /// @param liquid The liquid to load in.
+    /// @param amount The amount of liquid.
     /// @param updateDB If the action has to be updated on the database.
     /// @return <b>True</b> if the operation is a success,<br>
     ///         <b>False</b> otherwise.
-    bool pourIn(Liquid * liquid, const double & ammount, bool updateDB = true);
+    bool pourIn(Liquid * liquid, const double & amount, bool updateDB = true);
 
     /// @brief Extract some liquid from the container and update the database.
-    /// @param ammount  The ammount of liquid.
+    /// @param amount   The amount of liquid.
     /// @param updateDB If the action has to be updated on the database.
-    /// @return <b>True</b> if the operation is a success,<br><b>False</b> otherwise.
-    bool pourOut(const double & ammount, bool updateDB = true);
+    /// @return <b>True</b> if the operation is a success,<br>
+    ///         <b>False</b> otherwise.
+    bool pourOut(const double & amount, bool updateDB = true);
 
     /// @brief Search for the item inside the container.
     /// @param search_parameter The item to search.

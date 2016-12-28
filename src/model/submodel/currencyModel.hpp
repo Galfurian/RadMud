@@ -29,8 +29,8 @@ class CurrencyModel :
     public ItemModel
 {
 private:
-    /// @brief Give a currency, this class is used to determine the value of the currency
-    ///         based on material and a pre-defined price.
+    /// @brief Give a currency, this class is used to determine the value
+    ///         of the currency based on material and a pre-defined price.
     class Price
     {
     public:
@@ -84,20 +84,22 @@ public:
     ///         <b>False</b> otherwise.
     bool addPrice(const int & materialVnum, const unsigned int & price);
 
-    /// @brief Given a specific material, this function returns the associated price.
+    /// @brief Given a specific material, this function returns the
+    ///         associated price.
     /// @param materialVnum The vnum of the material.
     /// @param price        Variable where the found price is saved.
     /// @return <b>True</b> if the price has been found,<br>
     ///         <b>False</b> otherwise.
     bool findPrice(const int & materialVnum, unsigned int & price) const;
 
-    /// @brief Generates an ammount of currency with a worth equal to the variable value.
-    /// @details
-    ///     <b>This function starts and ends a SQLITE3 Transaction.</b>
+    /// @brief Generates an amount of currency with a worth equal to
+    ///         the variable value.
+    /// @details <b>This function starts and ends a SQLITE3 Transaction.</b>
     /// @param maker Who has generated the currency.
     /// @param value The total worth that has to be generate.
     /// @return The list of generated currencies.
-    std::vector<Item *> generateCurrency(const std::string & maker, const unsigned int & value);
+    std::vector<Item *> generateCurrency(const std::string & maker,
+                                         const unsigned int & value);
 
 private:
     /// @brief Sort the list of prices.

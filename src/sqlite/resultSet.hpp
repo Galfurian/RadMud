@@ -35,7 +35,8 @@ public:
     virtual ~ResultSet();
 
     /// @brief Advance in the rows.
-    /// @return <b>True</b> if there are still rows in the resultset of the last executed query,<br>
+    /// @return <b>True</b> if there are still rows in the result set of
+    ///                      the last executed query,<br>
     ///         <b>False</b> if no row present.
     virtual bool next() = 0;
 
@@ -44,7 +45,8 @@ public:
     ///         <b>False</b> otherwise.
     virtual bool release() = 0;
 
-    /// @brief This function return the number of columns present in the resultset of the last executed query.
+    /// @brief This function return the number of columns present in the
+    ///         result set of the last executed query.
     /// @return The number of the columns.
     virtual int getColumnCount() = 0;
 
@@ -53,49 +55,51 @@ public:
     /// @param columnName   The name of the column.
     /// @return <b>True</b> if the data has been retrieved,<br>
     ///         <b>False</b> otherwise.
-    virtual bool getColumnName(const int & column, std::string & columnName) = 0;
+    virtual bool getColumnName(const int & column,
+                               std::string & columnName) = 0;
 
-    /// @brief Get the given coloumn data as a string.
+    /// @brief Get the given column data as a string.
     /// @param column The column number.
     /// @param data   The string retrieved from the cell.
     /// @return <b>True</b> if the data has been retrieved,<br>
     ///         <b>False</b> otherwise.
     virtual bool getDataString(const int & column, std::string & data) = 0;
 
-    /// @brief Get the given coloumn data as an integer.
+    /// @brief Get the given column data as an integer.
     /// @param column The number of the column.
     /// @param data   The integer retrieved from the cell.
     /// @return <b>True</b> if the data has been retrieved,<br>
     ///         <b>False</b> otherwise.
     virtual bool getDataInteger(const int & column, int & data) = 0;
 
-    /// @brief Get the given coloumn data as an unsigned integer.
+    /// @brief Get the given column data as an unsigned integer.
     /// @param column The number of the column.
     /// @param data   The unsigned integer retrieved from the cell.
     /// @return <b>True</b> if the data has been retrieved,<br>
     ///         <b>False</b> otherwise.
-    virtual bool getDataUnsignedInteger(const int & column, unsigned int & data) = 0;
+    virtual bool getDataUnsignedInteger(const int & column,
+                                        unsigned int & data) = 0;
 
-    /// @brief Get the given coloumn data as a double.
+    /// @brief Get the given column data as a double.
     /// @param column The number of the column.
     /// @param data   The double retrieved from the cell.
     /// @return <b>True</b> if the data has been retrieved,<br>
     ///         <b>False</b> otherwise.
     virtual bool getDataDouble(const int & column, double & data) = 0;
 
-    /// @brief Get the next coloumn data as a string.
+    /// @brief Get the next column data as a string.
     /// @return The string retrieved from the cell.
     virtual std::string getNextString() = 0;
 
-    /// @brief Get the next coloumn data as an integer.
+    /// @brief Get the next column data as an integer.
     /// @return The integer retrieved from the cell.
     virtual int getNextInteger() = 0;
 
-    /// @brief Get the next coloumn data as an unsigned integer.
+    /// @brief Get the next column data as an unsigned integer.
     /// @return The unsigned integer retrieved from the cell.
     virtual unsigned int getNextUnsignedInteger() = 0;
 
-    /// @brief Get the next coloumn data as a double.
+    /// @brief Get the next column data as a double.
     /// @return The double retrieved from the cell.
     virtual double getNextDouble() = 0;
 };

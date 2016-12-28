@@ -37,7 +37,7 @@ bool ProcessPlayerName::process(Character * character, ArgumentHandler & args)
     else if (ToLower(input) == "new")
     {
         // Create a shared pointer to the next step.
-        std::shared_ptr<ProcessNewName> newStep = std::make_shared<ProcessNewName>();
+        auto newStep = std::make_shared<ProcessNewName>();
         // Set the handler.
         player->inputProcessor = newStep;
         // Advance to the next step.
@@ -48,9 +48,11 @@ bool ProcessPlayerName::process(Character * character, ArgumentHandler & args)
     {
         player->closeConnection();
     }
-    else if (input.find_first_not_of(VALID_CHARACTERS_NAME) != std::string::npos)
+    else if (input.find_first_not_of(VALID_CHARACTERS_NAME) !=
+             std::string::npos)
     {
-        this->advance(character, "That player name contains disallowed characters.");
+        this->advance(character,
+                      "That player name contains disallowed characters.");
     }
     else if (Mud::instance().findPlayer(input))
     {
@@ -71,7 +73,7 @@ bool ProcessPlayerName::process(Character * character, ArgumentHandler & args)
             // Set to 0 the current password attempts.
             player->password_attempts = 0;
             // Create a shared pointer to the next step.
-            std::shared_ptr<ProcessPlayerPassword> newStep = std::make_shared<ProcessPlayerPassword>();
+            auto newStep = std::make_shared<ProcessPlayerPassword>();
             // Set the handler.
             player->inputProcessor = newStep;
             // Advance to the next step.
@@ -86,7 +88,8 @@ bool ProcessPlayerName::process(Character * character, ArgumentHandler & args)
     return false;
 }
 
-void ProcessPlayerName::advance(Character * character, const std::string & error)
+void ProcessPlayerName::advance(Character * character,
+                                const std::string & error)
 {
     std::string msg;
     msg += Formatter::clearScreen();
@@ -114,8 +117,9 @@ void ProcessPlayerName::advance(Character * character, const std::string & error
     msg += "| In Date    : 21 Agosto 2014                |\n";
     msg += "#--------------------------------------------#\n";
     msg += Formatter::reset();
-    msg += "# Enter your name, or type '" + Formatter::magenta() + "new" + Formatter::reset();
-    msg += "' in order to create a new character!\n";
+    msg += "# Enter your name, or type '" +
+           Formatter::magenta() + "new" + Formatter::reset() +
+           "' in order to create a new character!\n";
     if (!error.empty())
     {
         msg += "# " + error + "\n";

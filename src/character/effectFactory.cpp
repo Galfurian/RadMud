@@ -23,7 +23,8 @@
 #include "effectFactory.hpp"
 #include "character.hpp"
 
-Effect EffectFactory::clearTargets(Character * actor, const unsigned int & duration)
+Effect EffectFactory::clearTargets(Character * actor,
+                                   const unsigned int & duration)
 {
     return Effect(actor,
                   "ClearTargets",
@@ -32,7 +33,10 @@ Effect EffectFactory::clearTargets(Character * actor, const unsigned int & durat
                   "",
                   [](Character * character)
                   {
-                      if (character != nullptr) character->combatHandler.charactersInSight.clear();
+                      if (character != nullptr)
+                      {
+                          character->combatHandler.charactersInSight.clear();
+                      }
                   },
                   0,
                   0,
@@ -43,7 +47,9 @@ Effect EffectFactory::clearTargets(Character * actor, const unsigned int & durat
                   0);
 }
 
-Effect EffectFactory::disturbedAim(Character * actor, const unsigned int & duration, const int & magnitude)
+Effect EffectFactory::disturbedAim(Character * actor,
+                                   const unsigned int & duration,
+                                   const int & magnitude)
 {
     return Effect(actor,
                   "DisturbedAim",

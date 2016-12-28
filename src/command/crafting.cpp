@@ -28,33 +28,23 @@
 
 void LoadCraftingCommands()
 {
-    {
-        Command command;
-        command.name = "build";
-        command.help = "Build something.";
-        command.arguments = "(item)";
-        command.hndl = DoBuild;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "deconstruct";
-        command.help = "Deconstruct a building.";
-        command.arguments = "(building)";
-        command.hndl = DoDeconstruct;
-        Mud::instance().addCommand(command);
-    }
-    {
-        Command command;
-        command.name = "read";
-        command.help = "Read an inscription from an item.";
-        command.arguments = "(item)";
-        command.hndl = DoRead;
-        Mud::instance().addCommand(command);
-    }
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoBuild, "build", "(item)",
+        "Build something.",
+        false, false, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoDeconstruct, "deconstruct", "(building)",
+        "Deconstruct a building.",
+        false, false, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoRead, "read", "(item)",
+        "Read an inscription from an item.",
+        false, false, false));
 }
 
-bool DoProfession(Character * character, Profession * profession, ArgumentHandler & args)
+bool DoProfession(Character * character,
+                  Profession * profession,
+                  ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
@@ -67,30 +57,34 @@ bool DoProfession(Character * character, Profession * profession, ArgumentHandle
     auto production = Mud::instance().findProduction(args[0].getContent());
     if (production == nullptr)
     {
-        character->sendMsg("%s '%s'.\n", profession->notFoundMessage, args[0].getContent());
+        character->sendMsg("%s '%s'.\n", profession->notFoundMessage,
+                           args[0].getContent());
         return false;
     }
     if (production->profession != profession)
     {
-        character->sendMsg("%s '%s'.\n", profession->notFoundMessage, args[0].getContent());
+        character->sendMsg("%s '%s'.\n", profession->notFoundMessage,
+                           args[0].getContent());
         return false;
     }
     // Check if the actor has enough stamina to execute the action.
-    if (CraftAction::getConsumedStamina(character) > character->getStamina())
+    if (CraftAction::getConsumedStamina(character) > character->stamina)
     {
         character->sendMsg("You are too tired right now.\n");
         return false;
     }
     // Search the needed tools.
     std::vector<Item *> usedTools;
-    if (!character->findNearbyTools(production->tools, usedTools, false, true, true))
+    if (!character->findNearbyTools(production->tools, usedTools, false, true,
+                                    true))
     {
         character->sendMsg("You don't have the right tools.\n");
         return false;
     }
     // Search the needed ingredients.
     std::vector<std::pair<Item *, unsigned int>> usedIngredients;
-    if (!character->findNearbyResouces(production->ingredients, usedIngredients))
+    if (!character->findNearbyResouces(production->ingredients,
+                                       usedIngredients))
     {
         character->sendMsg("You don't have enough material.\n");
         return false;
@@ -98,7 +92,11 @@ bool DoProfession(Character * character, Profession * profession, ArgumentHandle
     // Search the needed workbench.
     if (production->workbench != ToolType::None)
     {
-        auto workbench = character->findNearbyTool(production->workbench, std::vector<Item *>(), true, false, false);
+        auto workbench = character->findNearbyTool(production->workbench,
+                                                   std::vector<Item *>(),
+                                                   true,
+                                                   false,
+                                                   false);
         if (workbench == nullptr)
         {
             character->sendMsg("The proper workbench is not present.\n");
@@ -126,7 +124,11 @@ bool DoProfession(Character * character, Profession * profession, ArgumentHandle
         return false;
     }
     // Prepare the action.
-    auto craftAction = std::make_shared<CraftAction>(character, production, craftMaterial, usedTools, usedIngredients);
+    auto craftAction = std::make_shared<CraftAction>(character,
+                                                     production,
+                                                     craftMaterial,
+                                                     usedTools,
+                                                     usedIngredients);
     // Check the new action.
     std::string error;
     if (craftAction->check(error))
@@ -137,7 +139,8 @@ bool DoProfession(Character * character, Profession * profession, ArgumentHandle
         character->sendMsg(
             "%s %s.\n",
             profession->startMessage,
-            Formatter::yellow() + production->outcome->getName() + Formatter::reset());
+            Formatter::yellow() + production->outcome->getName() +
+            Formatter::reset());
         character->room->sendToAll(
             "%s has started %s something...\n",
             {character},
@@ -161,41 +164,48 @@ bool DoBuild(Character * character, ArgumentHandler & args)
     auto schematics = Mud::instance().findBuilding(args[0].getContent());
     if (schematics == nullptr)
     {
-        character->sendMsg("You don't know how to build '%s'.\n", args[0].getContent());
+        character->sendMsg("You don't know how to build '%s'.\n",
+                           args[0].getContent());
         return false;
     }
     // Check if the actor has enough stamina to execute the action.
-    if (BuildAction::getConsumedStamina(character) > character->getStamina())
+    if (BuildAction::getConsumedStamina(character) > character->stamina)
     {
         character->sendMsg("You are too tired right now.\n");
         return false;
     }
     // Search the needed tools.
     std::vector<Item *> usedTools;
-    if (!character->findNearbyTools(schematics->tools, usedTools, true, true, true))
+    if (!character->findNearbyTools(schematics->tools,
+                                    usedTools, true, true, true))
     {
         character->sendMsg("You don't have the right tools.\n");
         return false;
     }
     // Search the needed ingredients.
     std::vector<std::pair<Item *, unsigned int>> usedIngredients;
-    if (!character->findNearbyResouces(schematics->ingredients, usedIngredients))
+    if (!character->findNearbyResouces(schematics->ingredients,
+                                       usedIngredients))
     {
         character->sendMsg("You don't have enough material.\n");
         return false;
     }
     // Search the model that has to be built.
     auto it = std::find_if(character->inventory.begin(),
-                           character->inventory.end(), [&schematics](Item * item)
+                           character->inventory.end(),
+                           [&schematics](Item * item)
                            {
-                               return (item->model->vnum == schematics->buildingModel->vnum);
+                               return (item->model->vnum ==
+                                       schematics->buildingModel->vnum);
                            });
     if (it == character->inventory.end())
     {
         it = std::find_if(character->room->items.begin(),
-                          character->room->items.end(), [&schematics](Item * item)
+                          character->room->items.end(),
+                          [&schematics](Item * item)
                           {
-                              return (item->model->vnum == schematics->buildingModel->vnum);
+                              return (item->model->vnum ==
+                                      schematics->buildingModel->vnum);
                           });
         if (it == character->room->items.end())
         {
@@ -205,7 +215,8 @@ bool DoBuild(Character * character, ArgumentHandler & args)
         }
     }
     auto building = (*it);
-    // Check if there is already something built inside the room with the Unique flag.
+    // Check if there is already something built inside the room
+    //  with the Unique flag.
     for (auto iterator : character->room->items)
     {
         if (HasFlag(iterator->flags, ItemFlag::Built))
@@ -216,7 +227,8 @@ bool DoBuild(Character * character, ArgumentHandler & args)
                 character->sendMsg("There are already something built here.\n");
                 return false;
             }
-            auto builtSchematics = Mud::instance().findBuilding(iterator->model->vnum);
+            auto builtSchematics = Mud::instance().findBuilding(
+                iterator->model->vnum);
             if (builtSchematics)
             {
                 if (builtSchematics->unique)
@@ -229,7 +241,9 @@ bool DoBuild(Character * character, ArgumentHandler & args)
         }
     }
     // Prepare the action.
-    auto buildAction = std::make_shared<BuildAction>(character, schematics, building, usedTools, usedIngredients);
+    auto buildAction = std::make_shared<BuildAction>(character, schematics,
+                                                     building, usedTools,
+                                                     usedIngredients);
     // Check the new action.
     std::string error;
     if (buildAction->check(error))
@@ -238,7 +252,8 @@ bool DoBuild(Character * character, ArgumentHandler & args)
         character->setAction(buildAction);
         character->sendMsg(
             "You start building %s.\n",
-            Formatter::yellow() + schematics->buildingModel->getName() + Formatter::reset());
+            Formatter::yellow() + schematics->buildingModel->getName() +
+            Formatter::reset());
         // Send the message inside the room.
         character->room->sendToAll(
             "%s has started building something...\n",
@@ -259,14 +274,15 @@ bool DoDeconstruct(Character * character, ArgumentHandler & args)
         character->sendMsg("What do you want to deconstruct, sai?\n");
         return false;
     }
-    auto item = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
+    auto item = character->findNearbyItem(args[0].getContent(),
+                                          args[0].getIndex());
     if (item == nullptr)
     {
         character->sendMsg("You can't find want you to deconstruct.\n");
         return false;
     }
     // Check if the actor has enough stamina to execute the action.
-    if (BuildAction::getConsumedStamina(character) > character->getStamina())
+    if (BuildAction::getConsumedStamina(character) > character->stamina)
     {
         character->sendMsg("You are too tired right now.\n");
         return false;
@@ -292,7 +308,8 @@ bool DoRead(Character * character, ArgumentHandler & args)
         character->sendMsg("What do you want to read today, sai?\n");
         return false;
     }
-    auto item = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
+    auto item = character->findNearbyItem(args[0].getContent(),
+                                          args[0].getIndex());
     if (item == nullptr)
     {
         character->sendMsg("You can't find want you to read.\n");
@@ -301,7 +318,8 @@ bool DoRead(Character * character, ArgumentHandler & args)
     auto writing = Mud::instance().findWriting(item->vnum);
     if (writing == nullptr)
     {
-        character->sendMsg("There is nothing written on %s.\n", item->getName(true));
+        character->sendMsg("There is nothing written on %s.\n",
+                           item->getName(true));
         return false;
     }
     character->sendMsg("You start reading %s...\n", item->getName(true));
@@ -316,4 +334,3 @@ bool DoRead(Character * character, ArgumentHandler & args)
     }
     return true;
 }
-

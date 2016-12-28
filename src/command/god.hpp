@@ -28,7 +28,8 @@
 void LoadGodCommands();
 
 /// @defgroup ComInterfaces Commands List Interface.
-/// @brief All the functions necessary to handle the commands that a player can execute.
+/// @brief All the functions necessary to handle the commands that a player
+///         can execute.
 /// @{
 
 /// Shutdown the Mud.
@@ -51,6 +52,7 @@ bool DoFeast(Character * character, ArgumentHandler & args);
 
 /// Set a flag to a character.
 bool DoSetFlag(Character * character, ArgumentHandler & args);
+
 /// Remove a flag from the character.
 bool DoClearFlag(Character * character, ArgumentHandler & args);
 
@@ -172,9 +174,6 @@ bool DoSkillList(Character * character, ArgumentHandler & args);
 
 /// List all the writings.
 bool DoWritingList(Character * character, ArgumentHandler & args);
-
-/// List all the corpses
-bool DoCorpseList(Character * character, ArgumentHandler & args);
 
 /// List all the continents.
 bool DoContinentList(Character * character, ArgumentHandler & args);

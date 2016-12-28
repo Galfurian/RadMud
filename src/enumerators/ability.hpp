@@ -60,6 +60,9 @@ public:
     /// @brief Returns the ability as string.
     std::string toString() const;
 
+    /// @brief Returns the description of the ability.
+    std::string getDescription() const;
+
     /// @brief Returns the ability as number.
     unsigned int toUInt() const;
 

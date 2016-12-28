@@ -54,7 +54,7 @@ bool Flee::check(std::string & error) const
         return false;
     }
     // Check if the actor has enough stamina to execute the action.
-    if (this->getConsumedStamina(actor) > actor->getStamina())
+    if (this->getConsumedStamina(actor) > actor->stamina)
     {
         error = "You are too tired to flee from the battle.";
         return false;
@@ -158,7 +158,7 @@ unsigned int Flee::getConsumedStamina(Character * character)
     // WEIGHT   [+1.6 to +2.51]
     // CARRIED  [+0.0 to +2.48]
     unsigned int consumedStamina = 1;
-    consumedStamina -= character->getAbilityLog(Ability::Strength, 0.0, 1.0);
+    consumedStamina -= character->getAbilityLog(Ability::Strength);
     consumedStamina = SafeSum(consumedStamina,
                               SafeLog10(character->weight));
     consumedStamina = SafeSum(consumedStamina,
@@ -175,8 +175,8 @@ unsigned int Flee::getCooldown(Character * character)
     // CARRIED  [+0.0 to +2.48]
     // WEAPON   [+0.0 to +1.60]
     unsigned int cooldown = 5;
-    cooldown -= character->getAbilityLog(Ability::Strength, 0.0, 1.0);
-    cooldown -= character->getAbilityLog(Ability::Agility, 0.0, 1.0);
+    cooldown -= character->getAbilityLog(Ability::Strength);
+    cooldown -= character->getAbilityLog(Ability::Agility);
     cooldown = SafeSum(cooldown, SafeLog10(character->weight));
     cooldown = SafeSum(cooldown, SafeLog10(character->getCarryingWeight()));
     if (character->canAttackWith(EquipmentSlot::RightHand))

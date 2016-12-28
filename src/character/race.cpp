@@ -43,7 +43,10 @@ Race::Race() :
 
 Race::~Race()
 {
-    //Logger::log(LogLevel::Debug, "Deleted race\t\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
+//    Logger::log(LogLevel::Debug,
+//                "Deleted race\t\t[%s]\t\t(%s)",
+//                ToString(this->vnum),
+//                this->name);
 }
 
 void Race::initializeCorpse(const std::string & corpseDescription)
@@ -76,7 +79,7 @@ bool Race::check()
 std::string Race::getShortDescription(bool capital)
 {
     std::string shortDescription = this->article + " " + this->name;
-    if (capital)
+    if (capital && !shortDescription.empty())
     {
         shortDescription[0] = static_cast<char>(toupper(shortDescription[0]));
     }
@@ -85,18 +88,17 @@ std::string Race::getShortDescription(bool capital)
 
 bool Race::setAbilities(std::string source)
 {
-    if (source.empty())
-    {
-        return false;
-    }
+    // Check if it is received an empty string.
+    if (source.empty()) return false;
+    // Split the string.
     std::vector<std::string> abilityList = SplitString(source, ";");
-    if (abilityList.size() != 5)
-    {
-        return false;
-    }
+    // Check if the number of chunks is correct.
+    if (abilityList.size() != 5) return false;
+    // For each chunk set the ability value.
     for (unsigned int it = 0; it < abilityList.size(); ++it)
     {
-        Ability ability = static_cast<Ability>(it);
+        auto ability = Ability(it);
+        if (ability == Ability::None) return false;
         abilities[ability] = ToNumber<unsigned int>(abilityList[it]);
     }
     return true;
@@ -104,22 +106,19 @@ bool Race::setAbilities(std::string source)
 
 bool Race::setAvailableFactions(const std::string & source)
 {
-    if (source.empty())
-    {
-        return true;
-    }
+    // Check if it is received an empty string.
+    if (source.empty()) return true;
+    // Split the string.
     std::vector<std::string> factionList = SplitString(source, ";");
-    if (factionList.empty())
+    // Check if the number of chunks is correct.
+    if (factionList.empty()) return false;
+    // For each chunk add the faction.
+    for (auto it : factionList)
     {
-        return false;
-    }
-    for (unsigned int it = 0; it < factionList.size(); ++it)
-    {
-        int factionVnum = ToNumber<int>(factionList[it]);
-        Faction * faction = Mud::instance().findFaction(factionVnum);
+        Faction * faction = Mud::instance().findFaction(ToNumber<int>(it));
         if (faction == nullptr)
         {
-            Logger::log(LogLevel::Error, "Can't find the faction: %s.", factionList[it]);
+            Logger::log(LogLevel::Error, "Can't find the faction: %s.", it);
             return false;
         }
         availableFaction.push_back(faction);

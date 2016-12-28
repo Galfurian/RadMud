@@ -71,11 +71,13 @@ public:
     /// @brief Open database connection.
     /// @param dbName      The name of the database.
     /// @param dbDirectory The directory where the database resides.
-    /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
+    /// @return <b>True</b> if the operations succeeded,<br>
+    ///         <b>False</b> Otherwise.
     bool openConnection(std::string dbName, std::string dbDirectory);
 
     /// @brief Close database connection.
-    /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
+    /// @return <b>True</b> if the operations succeeded,<br>
+    ///         <b>False</b> Otherwise.
     bool closeConnection();
 
     /// @brief Get the last error message.
@@ -88,7 +90,8 @@ public:
 
     /// @brief This method is used to execute a SELECT Query.
     /// @param query The query that has to be executed.
-    /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
+    /// @return <b>True</b> if the operations succeeded,<br>
+    ///         <b>False</b> Otherwise.
     ResultSet * executeSelect(const char * query);
 
     /// @brief This method is used to execute a INSERT/DELETE/UPDATE Query.
@@ -106,7 +109,8 @@ public:
     void rollbackTransection();
 
     /// @brief Check if the databse is connected
-    /// @return <b>True</b> if databse is connected,<br> <b>False</b> Otherwise.
+    /// @return <b>True</b> if databse is connected,<br>
+    ///         <b>False</b> Otherwise.
     bool isConnected();
 
 private:
@@ -122,7 +126,8 @@ private:
 
     bool getDataInteger(const int & column, int & data) override;
 
-    bool getDataUnsignedInteger(const int & column, unsigned int & data) override;
+    bool getDataUnsignedInteger(const int & column,
+                                unsigned int & data) override;
 
     bool getDataDouble(const int & column, double & data) override;
 

@@ -365,7 +365,7 @@ bool Mud::addTravelPoint(Room * source, Room * target)
     return mudTravelPoints.insert(std::make_pair(source, target)).second;
 }
 
-void Mud::addCommand(const Command & command)
+void Mud::addCommand(std::shared_ptr<Command> command)
 {
     mudCommands.push_back(command);
 }
@@ -551,8 +551,7 @@ Material * Mud::findMaterial(int vnum)
 
 Profession * Mud::findProfession(unsigned int vnum)
 {
-    std::map<unsigned int, Profession *>::iterator iterator = mudProfessions.find(
-        vnum);
+    auto iterator = mudProfessions.find(vnum);
     if (iterator != mudProfessions.end())
     {
         return iterator->second;
@@ -562,7 +561,7 @@ Profession * Mud::findProfession(unsigned int vnum)
 
 Profession * Mud::findProfession(std::string command)
 {
-    for (std::map<unsigned int, Profession *>::iterator iterator = mudProfessions.begin();
+    for (auto iterator = mudProfessions.begin();
          iterator != mudProfessions.end(); ++iterator)
     {
         if (ToLower(iterator->second->command) == ToLower(command))
@@ -585,7 +584,7 @@ Production * Mud::findProduction(int vnum)
 
 Production * Mud::findProduction(std::string name)
 {
-    for (std::map<int, Production *>::iterator iterator = mudProductions.begin();
+    for (auto iterator = mudProductions.begin();
          iterator != mudProductions.end(); ++iterator)
     {
         if (ToLower(iterator->second->name) == ToLower(name))
@@ -874,9 +873,10 @@ bool Mud::processNewConnection()
     // Loop until all outstanding connections are accepted.
     while (true)
     {
-        socketFileDescriptor = accept(_servSocket,
-                                      reinterpret_cast<struct sockaddr *>(&socketAddress),
-                                      &socketAddressSize);
+        socketFileDescriptor = accept(
+            _servSocket,
+            reinterpret_cast<struct sockaddr *>(&socketAddress),
+            &socketAddressSize);
         // A bad socket probably means no more connections are outstanding.
         if (socketFileDescriptor == NO_SOCKET_COMMUNICATION)
         {
@@ -903,7 +903,7 @@ bool Mud::processNewConnection()
         }
 #elif __CYGWIN__
         int flags = fcntl(_servSocket, F_GETFL, 0);
-        //if (fcntl(_servSocket, F_SETFL, flags | O_NONBLOCK | O_RDWR | O_NOCTTY | O_NDELAY) == -1)
+        // O_NONBLOCK | O_RDWR | O_NOCTTY | O_NDELAY
         if (fcntl(_servSocket, F_SETFL, flags | O_NDELAY | O_NONBLOCK) == -1)
         {
             perror("FCNTL on player socket");
@@ -937,7 +937,7 @@ bool Mud::processNewConnection()
         Logger::log(LogLevel::Global, " Port    : " + ToString(port));
         Logger::log(LogLevel::Global, "#----------------------------------#");
         // Create a shared pointer to the next step.
-        std::shared_ptr<ProcessPlayerName> newStep = std::make_shared<ProcessPlayerName>();
+        auto newStep = std::make_shared<ProcessPlayerName>();
         // Set the handler.
         player->inputProcessor = newStep;
         // Advance to the next step.
@@ -945,7 +945,7 @@ bool Mud::processNewConnection()
 //        // Activate the procedure of negotiation.
 //        NegotiateProtocol(player, ConnectionState::NegotiatingMSDP);
 //        // Create a shared pointer to the next step.
-//        std::shared_ptr<ProcessTelnetCommand> newStep = std::make_shared<ProcessTelnetCommand>();
+//        auto newStep = std::make_shared<ProcessTelnetCommand>();
 //        // Set the handler.
 //        player->inputProcessor = newStep;
     }
@@ -1068,7 +1068,7 @@ bool Mud::initComunications()
 #elif __CYGWIN__
 
     int flags = fcntl(_servSocket, F_GETFL, 0);
-    //if (fcntl(_servSocket, F_SETFL, flags | O_NONBLOCK | O_RDWR | O_NOCTTY | O_NDELAY) == -1)
+    // O_NONBLOCK | O_RDWR | O_NOCTTY | O_NDELAY
     if (fcntl(_servSocket, F_SETFL, flags | O_NDELAY | O_NONBLOCK) == -1)
     {
         perror("FCNTL on Control Socket");
@@ -1104,9 +1104,10 @@ bool Mud::initComunications()
         return false;
     }
 
+    // Change to listen on a specific adapter.
     socketAddress.sin_family = AF_INET;
     socketAddress.sin_port = htons(mudPort);
-    socketAddress.sin_addr.s_addr = INADDR_ANY; // Change to listen on a specific adapter.
+    socketAddress.sin_addr.s_addr = INADDR_ANY;
 
     // Bind the socket to our connection port.
     if (::bind(_servSocket, reinterpret_cast<struct sockaddr *>(&socketAddress),
@@ -1134,8 +1135,8 @@ bool Mud::initComunications()
 
 bool Mud::closeComunications()
 {
-    return (_servSocket == NO_SOCKET_COMMUNICATION) ? false : this->closeSocket(
-        _servSocket);
+    return (_servSocket == NO_SOCKET_COMMUNICATION) ?
+           false : this->closeSocket(_servSocket);
 }
 
 bool Mud::startMud()

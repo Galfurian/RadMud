@@ -65,8 +65,9 @@ using CharacterFlag = enum class CharacterFlag_t
 /// @brief Character class, father of Player and Mobile.
 /// @details
 /// It's the main class that contains all the information that both
-/// players and npcs shares. In order to allow dynamic casting(polymorphism),
-/// i've created a mthod called isMobile, used to identify the subtype of the subclass.
+/// players and NPCs shares. In order to allow dynamic casting(polymorphism),
+/// i've created a method called isMobile, used to identify the subtype of the
+/// subclass.
 class Character :
     public UpdateInterface
 {
@@ -143,13 +144,14 @@ public:
     ///         <b>False</b> otherwise.
     virtual bool isPlayer() const;
 
-    /// @brief Fills the provided table with the information concerning the character.
+    /// @brief Fills the provided table with the information concerning the
+    ///         character.
     /// @param sheet The table that has to be filled.
     virtual void getSheet(Table & sheet) const;
 
     /// @brief Return the name of the character with all lowercase characters.
     /// @return The name of the character.
-    std::string getName() const;
+    virtual std::string getName() const = 0;
 
     /// @brief Return the name of the character.
     /// @return The name of the character.
@@ -181,7 +183,8 @@ public:
     ///                     ability value without the contribution due to
     ///                     the active effects.
     /// @return The overall ability value.
-    unsigned int getAbility(const Ability & ability, bool withEffects = true) const;
+    unsigned int getAbility(const Ability & ability,
+                            bool withEffects = true) const;
 
     /// @brief Provides the modifier of the given ability.
     /// @param ability The ability of which the modifier has to be
@@ -190,7 +193,8 @@ public:
     ///                     ability modifier without the contribution due
     ///                     to the active effects.
     /// @return The overall ability modifer.
-    unsigned int getAbilityModifier(const Ability & ability, bool withEffects = true) const;
+    unsigned int getAbilityModifier(const Ability & ability,
+                                    bool withEffects = true) const;
 
     /// @brief Provides the base ten logarithm of the desired ability
     ///         modifier, multiplied by an optional multiplier. Also,
@@ -206,8 +210,8 @@ public:
     /// @return The overall base ten logarithm of the given ability modifer.
     unsigned int getAbilityLog(
         const Ability & ability,
-        const double & base,
-        const double & multiplier,
+        const double & base = 0.0,
+        const double & multiplier = 1.0,
         const bool & withEffects = true) const;
 
     /// @brief Allows to SET the health value.
@@ -239,10 +243,6 @@ public:
     /// @return <b>True</b> if the function has removed the value,<br>
     ///         <b>False</b> otherwise.
     bool remHealth(const unsigned int & value, const bool & force = false);
-
-    /// @brief Get character level of health.
-    /// @return Health of this character.
-    unsigned int getHealth() const;
 
     /// @brief Return the max health value.
     /// @param withEffects <b>True</b> also add the health due to effects,<br>
@@ -284,10 +284,6 @@ public:
     /// @return <b>True</b> if the function has removed the value,<br>
     ///         <b>False</b> otherwise.
     bool remStamina(const unsigned int & value, const bool & force = false);
-
-    /// @brief Get character level of stamina.
-    /// @return Stamina of this character.
-    unsigned int getStamina() const;
 
     /// @brief Return the max stamina value.
     /// @param withEffects  <b>True</b> also add the stamina due to effects,<br>
@@ -399,12 +395,14 @@ public:
 
     /// @brief Allows to check if an item is inside the inventory.
     /// @param item The item to search.
-    /// @return <b>True</b> if the item is inside the inventory,<br><b>False</b> otherwise.
+    /// @return <b>True</b> if the item is inside the inventory,<br>
+    ///         <b>False</b> otherwise.
     bool hasInventoryItem(Item * item);
 
     /// @brief Allows to check if an item is inside the equipment.
     /// @param item The item to search.
-    /// @return <b>True</b> if the item is inside the equipment,<br><b>False</b> otherwise.
+    /// @return <b>True</b> if the item is inside the equipment,<br>
+    ///         <b>False</b> otherwise.
     bool hasEquipmentItem(Item * item);
 
     /// @brief Add the passed item to character's inventory.
@@ -429,8 +427,9 @@ public:
 
     /// @brief Check if the player can carry the item.
     /// @param item     The item we want to check.
-    /// @param quantity The ammount of item to check (by default it is 1).
-    /// @return <b>True</b> if the character can lift the item,<br><b>False</b> otherwise.
+    /// @param quantity The amount of item to check (by default it is 1).
+    /// @return <b>True</b> if the character can lift the item,<br>
+    ///         <b>False</b> otherwise.
     bool canCarry(Item * item, unsigned int quantity) const;
 
     /// @brief The total carrying weight for this character.
@@ -447,7 +446,9 @@ public:
     /// @param where Where the item has been wielded.
     /// @return <b>True</b> if the operation goes well,<br>
     ///         <b>False</b> otherwise.
-    bool canWield(Item * item, std::string & error, EquipmentSlot & where) const;
+    bool canWield(Item * item,
+                  std::string & error,
+                  EquipmentSlot & where) const;
 
     /// @brief Check if the character can wear a given item.
     /// @param item  The item to wear.
@@ -462,10 +463,6 @@ public:
     ///         <b>False</b> otherwise.
     bool setThirst(int value);
 
-    /// @brief Provides the current level of thirst.
-    /// @return The current value.
-    unsigned int getThirst() const;
-
     /// @brief Get character level of thirst.
     /// @return Thirst of this character.
     std::string getThirstCondition() const;
@@ -475,10 +472,6 @@ public:
     /// @return <b>True</b> if the new value is geq 0,<br>
     ///         <b>False</b> otherwise.
     bool setHunger(int value);
-
-    /// @brief Provides the current level of hunger.
-    /// @return The current value.
-    unsigned int getHunger() const;
 
     /// @brief Get character level of hunger.
     /// @return Hunger of this character.
@@ -548,7 +541,8 @@ public:
 
     /// @brief Handle character input.
     /// @param command Command that need to be handled.
-    /// @return <b>True</b> if the command has been correctly executed,<br><b>False</b> otherwise.
+    /// @return <b>True</b> if the command has been correctly executed,<br>
+    ///         <b>False</b> otherwise.
     bool doCommand(const std::string & command);
 
     /// @brief Returns the character <b>statically</b> casted to player.
@@ -586,7 +580,9 @@ public:
     /// @param vnumMaterial The vnum of the material.
     /// @param qualityValue The initial quality of the item.
     /// @return The newly created item.
-    Item * luaLoadItem(int vnumModel, int vnumMaterial, unsigned int qualityValue);
+    Item * luaLoadItem(int vnumModel,
+                       int vnumMaterial,
+                       unsigned int qualityValue);
 
     /// @brief Specific function used by lua to add an equipment item.
     void luaAddEquipment(Item * item);
@@ -619,7 +615,9 @@ public:
     /// @param first The first unpacked argument.
     /// @param args  Packed arguments.
     template<typename ... Args>
-    void sendMsg(const std::string & msg, const std::string & first, const Args & ... args)
+    void sendMsg(const std::string & msg,
+                 const std::string & first,
+                 const Args & ... args)
     {
         std::string::size_type pos = msg.find("%s");
         if (pos == std::string::npos)
@@ -634,16 +632,21 @@ public:
         }
     }
 
-    /// @brief Sends a message to the character. This one in particular handles unsigned integer.
+    /// @brief Sends a message to the character.
+    /// This one in particular handles unsigned integer.
     template<typename ... Args>
-    void sendMsg(const std::string & msg, const unsigned int & first, const Args & ... args)
+    void sendMsg(const std::string & msg,
+                 const unsigned int & first,
+                 const Args & ... args)
     {
         this->sendMsg(msg, ToString(first), args ...);
     }
 
     /// @brief Sends a message to the character. This one in particular handles unsigned integer.
     template<typename ... Args>
-    void sendMsg(const std::string & msg, const int & first, const Args & ... args)
+    void sendMsg(const std::string & msg,
+                 const int & first,
+                 const Args & ... args)
     {
         this->sendMsg(msg, ToString(first), args ...);
     }

@@ -194,8 +194,9 @@ void MudUpdater::advanceTime()
 bool MudUpdater::hasTicPassed()
 {
     // Check if the tic is passed.
-    if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() -
-                                                         ticTime).count() >= ticSize)
+    if (std::chrono::duration_cast<std::chrono::seconds>(
+        std::chrono::system_clock::now() -
+        ticTime).count() >= ticSize)
     {
         // Reset Tic Time.
         ticTime = std::chrono::system_clock::now();
@@ -210,29 +211,40 @@ void MudUpdater::updateDayPhase()
     mudHour++;
     if (mudHour == 6)
     {
-        Mud::instance().broadcastMsg(0, Formatter::yellow() + "The sun rises from the east.\n" + Formatter::reset());
+        Mud::instance().broadcastMsg(0,
+                                     Formatter::yellow() +
+                                     "The sun rises from the east.\n" +
+                                     Formatter::reset());
         mudDayPhase = DayPhase::Morning;
     }
     else if (mudHour == 12)
     {
-        Mud::instance().broadcastMsg(0, Formatter::yellow() + "The sun is just above you.\n" + Formatter::reset());
+        Mud::instance().broadcastMsg(0, Formatter::yellow() +
+                                        "The sun is just above you.\n" +
+                                        Formatter::reset());
         mudDayPhase = DayPhase::Day;
     }
     else if (mudHour == 18)
     {
-        Mud::instance().broadcastMsg(0, Formatter::yellow() + "The sun begins to set.\n" + Formatter::reset());
+        Mud::instance().broadcastMsg(0, Formatter::yellow() +
+                                        "The sun begins to set.\n" +
+                                        Formatter::reset());
         mudDayPhase = DayPhase::Dusk;
     }
     else if (mudHour == 24)
     {
-        Mud::instance().broadcastMsg(0, Formatter::yellow() + "Darkness engulfs you.\n" + Formatter::reset());
+        Mud::instance().broadcastMsg(0, Formatter::yellow() +
+                                        "Darkness engulfs you.\n" +
+                                        Formatter::reset());
         mudDayPhase = DayPhase::Night;
         // Reset the mud hour.
         mudHour = 0;
     }
     else
     {
-        Mud::instance().broadcastMsg(0, Formatter::yellow() + "Another hour has passed." + Formatter::reset());
+        Mud::instance().broadcastMsg(0, Formatter::yellow() +
+                                        "Another hour has passed." +
+                                        Formatter::reset());
     }
 }
 
@@ -250,7 +262,8 @@ void MudUpdater::performActions()
             continue;
         }
         ActionStatus actionStatus = iterator->getAction()->perform();
-        if ((actionStatus == ActionStatus::Finished) || (actionStatus == ActionStatus::Error))
+        if ((actionStatus == ActionStatus::Finished) ||
+            (actionStatus == ActionStatus::Error))
         {
             // Remove the from action.
             iterator->popAction();
@@ -264,18 +277,21 @@ void MudUpdater::performActions()
             continue;
         }
         auto end = std::chrono::system_clock::now();
-        auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(mobile->nextActionCooldown - end).count();
+        auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
+            mobile->nextActionCooldown - end).count();
         if (elapsed < 0)
         {
             mobile->triggerEventRandom();
-            mobile->nextActionCooldown = end + std::chrono::seconds(TRandInteger<int>(30, 60));
+            mobile->nextActionCooldown = end + std::chrono::seconds(
+                TRandInteger<int>(30, 60));
         }
         if (mobile->getAction()->getType() == ActionType::Wait)
         {
             continue;
         }
         ActionStatus actionStatus = mobile->getAction()->perform();
-        if ((actionStatus == ActionStatus::Finished) || (actionStatus == ActionStatus::Error))
+        if ((actionStatus == ActionStatus::Finished) ||
+            (actionStatus == ActionStatus::Error))
         {
             // Remove the last action.
             mobile->popAction();

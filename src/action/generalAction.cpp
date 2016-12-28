@@ -37,14 +37,14 @@ GeneralAction::~GeneralAction()
 
 bool GeneralAction::checkElapsed() const
 {
-    return (std::chrono::duration_cast<std::chrono::seconds>(actionCooldown
-                                                             - std::chrono::system_clock::now()).count() <= 0);
+    return (std::chrono::duration_cast<std::chrono::seconds>(
+        actionCooldown - std::chrono::system_clock::now()).count() <= 0);
 }
 
 long int GeneralAction::getElapsed() const
 {
-    return std::chrono::duration_cast<std::chrono::seconds>(actionCooldown
-                                                            - std::chrono::system_clock::now()).count();
+    return std::chrono::duration_cast<std::chrono::seconds>(
+        actionCooldown - std::chrono::system_clock::now()).count();
 }
 
 bool GeneralAction::check(std::string & error) const
@@ -84,32 +84,18 @@ ActionStatus GeneralAction::perform()
 
 void GeneralAction::resetCooldown(const unsigned int & _actionCooldown)
 {
-    this->actionCooldown = std::chrono::system_clock::now() + std::chrono::seconds(_actionCooldown);
+    this->actionCooldown = std::chrono::system_clock::now() +
+                           std::chrono::seconds(_actionCooldown);
 }
 
 unsigned int GeneralAction::getCooldown()
 {
     return static_cast<unsigned int>(
-        std::chrono::duration_cast<std::chrono::seconds>(actionCooldown
-                                                         - std::chrono::system_clock::now()).count());
+        std::chrono::duration_cast<std::chrono::seconds>(
+            actionCooldown - std::chrono::system_clock::now()).count());
 }
 
 std::shared_ptr<CombatAction> GeneralAction::toCombatAction()
 {
     return std::static_pointer_cast<CombatAction>(this->shared_from_this());
-}
-
-std::string GetActionTypeName(ActionType type)
-{
-    if (type == ActionType::Wait) return "Waiting";
-    if (type == ActionType::Move) return "Moving";
-    if (type == ActionType::Crafting) return "Crafting";
-    if (type == ActionType::Building) return "Building";
-    if (type == ActionType::Combat) return "Fighting";
-    if (type == ActionType::Scout) return "Scouting";
-    if (type == ActionType::Reload) return "Reloading";
-    if (type == ActionType::Load) return "Loading";
-    if (type == ActionType::Unload) return "Unloading";
-    if (type == ActionType::Aim) return "Aiming";
-    return "No Action";
 }

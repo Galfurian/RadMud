@@ -66,29 +66,33 @@ bool ProcessInput::process(Character * character, ArgumentHandler & args)
         for (auto iterator : Mud::instance().mudCommands)
         {
             // Skip the commands which do not start with the given command.
-            if (!BeginWith(iterator.name, command))
+            if (!BeginWith(iterator->name, command))
             {
                 continue;
             }
-            // If the command is the right one, check if the character can execute the command.
-            if (!iterator.canUse(character))
+            // If the command is the right one, check if the character
+            //  can execute the command.
+            if (!iterator->canUse(character))
             {
                 continue;
             }
-            // Check if the command can be used in combat and if the character is actually in combat.
-            if ((!iterator.canUseInCombat) && (character->getAction()->getType() == ActionType::Combat))
+            // Check if the command can be used in combat and if the
+            //  character is actually in combat.
+            if ((!iterator->canUseInCombat) &&
+                (character->getAction()->getType() == ActionType::Combat))
             {
                 character->sendMsg("You cannot do that in combat.\n");
                 break;
             }
-            else if (iterator.typedCompletely && (command != iterator.name))
+            else if (iterator->typedCompletely && (command != iterator->name))
             {
-                character->sendMsg("You have to type completely \"" + iterator.name + "\".\n");
+                character->sendMsg("You have to type completely"
+                                       "\"" + iterator->name + "\".\n");
                 break;
             }
             else
             {
-                executionStatus = iterator.hndl(character, args);
+                executionStatus = iterator->handler(character, args);
                 done = true;
                 break;
             }

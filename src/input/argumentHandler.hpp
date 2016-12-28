@@ -69,6 +69,6 @@ public:
     void dump() const;
 
 private:
-    /// Given that original string has been set, it fills the vector of arguments.
+    /// Given that original string has been set, fills the vector of arguments.
     void evaluateArguments();
 };

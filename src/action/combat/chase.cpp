@@ -121,7 +121,7 @@ ActionStatus Chase::perform()
     }
     // Check if the actor has enough stamina to execute the action.
     auto consumedStamina = Chase::getConsumedStamina(actor);
-    if (consumedStamina > actor->getStamina())
+    if (consumedStamina > actor->stamina)
     {
         actor->sendMsg("You are too tired to chase your target.\n\n");
     }
@@ -234,7 +234,7 @@ unsigned int Chase::getConsumedStamina(Character * character)
     // WEIGHT   [+1.6 to +2.51]
     // CARRIED  [+0.0 to +2.48]
     unsigned int consumedStamina = 1;
-    consumedStamina -= character->getAbilityLog(Ability::Strength, 0.0, 1.0);
+    consumedStamina -= character->getAbilityLog(Ability::Strength);
     consumedStamina = SafeSum(consumedStamina, SafeLog10(character->weight));
     consumedStamina = SafeSum(consumedStamina,
                               SafeLog10(character->getCarryingWeight()));
@@ -250,10 +250,8 @@ unsigned int Chase::getCooldown(Character * character)
     // CARRIED  [+0.0 to +2.48]
     // WEAPON   [+0.0 to +1.60]
     unsigned int cooldown = 4;
-    cooldown = SafeSum(cooldown,
-                       -character->getAbilityLog(Ability::Strength, 0.0, 1.0));
-    cooldown = SafeSum(cooldown,
-                       -character->getAbilityLog(Ability::Agility, 0.0, 1.0));
+    cooldown = SafeSum(cooldown, -character->getAbilityLog(Ability::Strength));
+    cooldown = SafeSum(cooldown, -character->getAbilityLog(Ability::Agility));
     cooldown = SafeSum(cooldown, SafeLog10(character->weight));
     cooldown = SafeSum(cooldown, SafeLog10(character->getCarryingWeight()));
     return cooldown;

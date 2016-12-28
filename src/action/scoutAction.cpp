@@ -57,7 +57,7 @@ bool ScoutAction::check(std::string & error) const
         Logger::log(LogLevel::Error, "The room's area is a nullptr.");
         return false;
     }
-    if (this->getConsumedStamina(actor) > actor->getStamina())
+    if (this->getConsumedStamina(actor) > actor->stamina)
     {
         error = "You are too tired to scout the area.";
         return false;
@@ -111,7 +111,8 @@ ActionStatus ScoutAction::perform()
     actor->sendMsg("\n");
     // Add the effect.
     unsigned int modifier = actor->getAbilityModifier(Ability::Perception);
-    actor->effects.forceAddEffect(EffectFactory::clearTargets(actor, 2 + modifier));
+    actor->effects.forceAddEffect(EffectFactory::clearTargets(actor,
+                                                              2 + modifier));
     return ActionStatus::Finished;
 }
 
@@ -122,9 +123,11 @@ unsigned int ScoutAction::getConsumedStamina(Character * character)
     // WEIGHT   [+1.6 to +2.51]
     // CARRIED  [+0.0 to +2.48]
     unsigned int consumedStamina = 1;
-    consumedStamina = SafeSum(consumedStamina, -character->getAbilityLog(Ability::Strength, 0.0, 1.0));
+    consumedStamina = SafeSum(consumedStamina,
+                              -character->getAbilityLog(Ability::Strength));
     consumedStamina = SafeSum(consumedStamina, SafeLog10(character->weight));
-    consumedStamina = SafeSum(consumedStamina, SafeLog10(character->getCarryingWeight()));
+    consumedStamina = SafeSum(consumedStamina,
+                              SafeLog10(character->getCarryingWeight()));
     return consumedStamina;
 }
 
@@ -133,6 +136,7 @@ unsigned int ScoutAction::getScoutTime(Character * character)
     // BASE       [+3.0]
     // PERCEPTION [-0.0 to -2.80]
     unsigned int requiredTime = 3;
-    requiredTime = SafeSum(requiredTime, -character->getAbilityLog(Ability::Perception, 0.0, 1.0));
+    requiredTime = SafeSum(requiredTime,
+                           -character->getAbilityLog(Ability::Perception));
     return requiredTime;
 }

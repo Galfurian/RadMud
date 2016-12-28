@@ -33,9 +33,9 @@ Argument::Argument(const std::string & _original) :
     this->evaluateMultiplier();
     // Then, evaluate the index.
     this->evaluateIndex();
-    //Logger::log(LogLevel::Debug, "Content    : '" + content + "';");
-    //Logger::log(LogLevel::Debug, "Index      : '" + ToString(index) + "';");
-    //Logger::log(LogLevel::Debug, "Multiplier : '" + ToString(multiplier) + "';");
+    //Logger::log(LogLevel::Debug, "Content    :" + content + ";");
+    //Logger::log(LogLevel::Debug, "Index      :" + ToString(index) + ";");
+    //Logger::log(LogLevel::Debug, "Multiplier :" + ToString(multiplier) + ";");
 }
 
 std::string Argument::getOriginal() const

@@ -28,10 +28,12 @@
 void LoadObjectCommands();
 
 /// @defgroup ComInterfaces Commands List Interface.
-/// @brief All the functions necessary to handle the commands that a player can execute.
+/// @brief All the functions necessary to handle the commands that a player
+///         can execute.
 /// @{
 
-/// Allow the character to pick up an object, or take an object from another one.
+/// Allow the character to pick up an object, or take an object
+///  from another one.
 bool DoTake(Character * character, ArgumentHandler & args);
 
 /// Allow the character to drop an object.
@@ -85,7 +87,7 @@ bool DoSell(Character * character, ArgumentHandler & args);
 /// Buy an item.
 bool DoBuy(Character * character, ArgumentHandler & args);
 
-/// Shows the total ammount of monney.
+/// Shows the total amount of money.
 bool DoBalance(Character * character, ArgumentHandler & args);
 
 /// Allows to turn on and off an activatable item.

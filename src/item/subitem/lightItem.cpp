@@ -73,7 +73,8 @@ void LightItem::getSheet(Table & sheet) const
 std::string LightItem::lookContent()
 {
     std::string output;
-    auto autonomyInHour = this->getAutonomy() / MudUpdater::instance().getHourTicSize();
+    auto autonomyInHour = this->getAutonomy() /
+                          MudUpdater::instance().getHourTicSize();
     output += Formatter::italic();
     if (model->toLight()->fuelType != ResourceType::None)
     {
@@ -83,12 +84,14 @@ std::string LightItem::lookContent()
         }
         else
         {
-            output += "It contains enough fuel for " + ToString(autonomyInHour) + "h.\n";
+            output += "It contains enough fuel for " +
+                      ToString(autonomyInHour) + "h.\n";
         }
     }
     else
     {
-        output += "It should have an autonomy of " + ToString(autonomyInHour) + "h.\n";
+        output += "It should have an autonomy of " +
+                  ToString(autonomyInHour) + "h.\n";
     }
     if (active)
     {
@@ -111,12 +114,14 @@ bool LightItem::canRefillWith(Item * item, std::string & error) const
     }
     if (item->getType() != ModelType::Resource)
     {
-        error = "You can't refill " + this->getName(true) + " with " + item->getName(true);
+        error = "You can't refill " + this->getName(true) + " with " +
+                item->getName(true);
         return false;
     }
     if (model->getType() != ModelType::Light)
     {
-        error = "You can't refill " + this->getName(true) + " with " + item->getName(true);
+        error = "You can't refill " + this->getName(true) + " with " +
+                item->getName(true);
         return false;
     }
     if (model->toLight()->fuelType == ResourceType::None)
@@ -126,13 +131,15 @@ bool LightItem::canRefillWith(Item * item, std::string & error) const
     }
     if (model->toLight()->fuelType != item->model->toResource()->resourceType)
     {
-        error = "You can't refill " + this->getName(true) + " with " + item->getName(true);
+        error = "You can't refill " + this->getName(true) + " with " +
+                item->getName(true);
         return false;
     }
     return true;
 }
 
-bool LightItem::getAmmountToRefill(Item * item, unsigned int & ammount, std::string & error) const
+bool LightItem::getAmountToRefill(Item * item, unsigned int & amount,
+                                  std::string & error) const
 {
     if (!this->canRefillWith(item, error))
     {
@@ -140,7 +147,7 @@ bool LightItem::getAmmountToRefill(Item * item, unsigned int & ammount, std::str
     }
     // Get the weight of the fuel.
     auto fuelWeight = item->getWeight(false);
-    // Set by default the ammout to the maximum.
+    // Set by default the amount to the maximum.
     auto maxWeight = this->model->toLight()->maxWeight;
     // Evaluate the weight of the content.
     auto contentWeight = 0.0;
@@ -151,14 +158,18 @@ bool LightItem::getAmmountToRefill(Item * item, unsigned int & ammount, std::str
     // Check if the weight of the fuel exceeds the available space.
     if ((maxWeight - contentWeight) < fuelWeight)
     {
-        Logger::log(LogLevel::Debug, "(%s - %s) < %s", maxWeight, contentWeight, fuelWeight);
+        Logger::log(LogLevel::Debug,
+                    "(%s - %s) < %s",
+                    maxWeight,
+                    contentWeight,
+                    fuelWeight);
         error = this->getNameCapital(true) + " is already at full capacity.";
         return false;
     }
     // Get the weight that can still be used.
     auto canRefill = (maxWeight - contentWeight) / fuelWeight;
-    // Set the ammount.
-    ammount = static_cast<unsigned int>(std::floor(canRefill));
+    // Set the amount.
+    amount = static_cast<unsigned int>(std::floor(canRefill));
     return true;
 }
 
@@ -204,7 +215,8 @@ void LightItem::updateTicImpl()
         {
             // Trigger the dacay.
             this->triggerDecay();
-            // Just for precaution, deactivate the light source if the condition is below zero.
+            // Just for precaution, deactivate the light source if
+            //  the condition is below zero.
             if (this->condition < 0)
             {
                 active = false;
@@ -221,7 +233,7 @@ void LightItem::updateTicImpl()
             {
                 // Get the first element of fuel.
                 auto fuel = loadedFuel.front();
-                // Trigger the dacay.
+                // Trigger the decay.
                 fuel->triggerDecay();
                 // Check if it is the last unit of fuel.
                 if (fuel->condition < 0)

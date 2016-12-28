@@ -24,7 +24,8 @@
 #include "sqliteWrapper.hpp"
 
 /// @defgroup SQLLoadFun Sqlite3 Loading Functions
-/// @brief All the functions necessary to load information from a SQLITE3 database.
+/// @brief All the functions necessary to load information from
+///         a SQLITE3 database.
 
 /// @{
 /// @brief Function used to retrieve information about bad names.
@@ -33,7 +34,8 @@ bool LoadBadName(ResultSet * result);
 /// @brief Function used to retrieve information about blocked ips.
 bool LoadBlockedIp(ResultSet * result);
 
-/// @brief Function used to retrieve information about the news from the developers.
+/// @brief Function used to retrieve information about the news from
+///         the developers.
 bool LoadNews(ResultSet * result);
 
 /// @brief Function used to retrieve information about items inside containers.
@@ -63,19 +65,22 @@ bool LoadRoom(ResultSet * result);
 /// @brief Function used to retrieve information about exits of rooms.
 bool LoadExit(ResultSet * result);
 
-/// @brief Function used to retrieve information about the item placed inside the rooms.
+/// @brief Function used to retrieve information about the item
+///         placed inside the rooms.
 bool LoadItemRoom(ResultSet * result);
 
 /// @brief Function used to retrieve information about all the areas of the mud.
 bool LoadArea(ResultSet * result);
 
-/// @brief Function used to retrieve information about the rooms associated with every area.
+/// @brief Function used to retrieve information about the rooms
+///         associated with every area.
 bool LoadAreaList(ResultSet * result);
 
 /// @brief Function used to retrieve the writings
 bool LoadWriting(ResultSet * result);
 
-/// @brief Function used to retrieve information about all the continents of the mud.
+/// @brief Function used to retrieve information about all the
+///         continents of the mud.
 bool LoadContinent(ResultSet * result);
 
 /// @brief Function used to retrieve information about all the materials.
@@ -90,7 +95,8 @@ bool LoadProduction(ResultSet * result);
 /// @brief Function used to retrieve information about all the liquids.
 bool LoadLiquid(ResultSet * result);
 
-/// @brief Function used to retrieve information about liquids inside containers.
+/// @brief Function used to retrieve information about liquids
+///         inside containers.
 bool LoadContentLiq(ResultSet * result);
 
 /// @brief Function used to retrieve information about all the travelling point.

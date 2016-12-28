@@ -63,8 +63,10 @@ bool UnloadAction::check(std::string & error) const
         auto loadedItem = itemToBeUnloaded->content.front();
         if (loadedItem == nullptr)
         {
-            Logger::log(LogLevel::Error, "The item does not contain any loaded item.");
-            error = "Something is gone wrong while you were unloading " + itemToBeUnloaded->getName(true) + ".";
+            Logger::log(LogLevel::Error,
+                        "The item does not contain any loaded item.");
+            error = "Something is gone wrong while you were unloading " +
+                    itemToBeUnloaded->getName(true) + ".";
             return false;
         }
     }
@@ -108,7 +110,8 @@ ActionStatus UnloadAction::perform()
     itemToBeUnloaded->takeOut(loadedItem);
     actor->addInventoryItem(loadedItem);
     SQLiteDbms::instance().endTransaction();
-    actor->sendMsg("You have finished unloading %s...\n\n", itemToBeUnloaded->getName(true));
+    actor->sendMsg("You have finished unloading %s...\n\n",
+                   itemToBeUnloaded->getName(true));
     return ActionStatus::Finished;
 }
 
@@ -116,10 +119,12 @@ unsigned int UnloadAction::getUnloadTime(Item * _itemToBeUnloaded)
 {
     if (_itemToBeUnloaded->getType() == ModelType::Magazine)
     {
-        auto loadedItem = _itemToBeUnloaded->toMagazineItem()->getAlreadyLoadedProjectile();
+        auto loadedItem = _itemToBeUnloaded->toMagazineItem()
+                                           ->getAlreadyLoadedProjectile();
         if (loadedItem != nullptr)
         {
-            return static_cast<unsigned int>(loadedItem->getWeight(false) * loadedItem->quantity);
+            return static_cast<unsigned int>(loadedItem->getWeight(false) *
+                                             loadedItem->quantity);
         }
     }
     return 1;

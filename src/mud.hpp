@@ -202,7 +202,7 @@ public:
     /// Mud news.
     std::map<std::string, std::string> mudNews;
     /// List of commands (eg. look, quit, north etc.).
-    std::vector<Command> mudCommands;
+    std::vector<std::shared_ptr<Command> > mudCommands;
     /// Mud possible directions.
     std::map<std::string, Direction> mudDirections;
     /// Map of buildings schematic.
@@ -231,7 +231,8 @@ public:
     bool saveMud();
 
     /// @defgroup GlobalAddRemove Global Add and Remove Functions
-    /// @brief All the functions necessary to add and remove objects from their correspondent global list.
+    /// @brief All the functions necessary to add and remove objects from their
+    ///         correspondent global list.
     /// @{
 
     /// Add a player to the list of connected players.
@@ -301,7 +302,7 @@ public:
     bool addTravelPoint(Room * source, Room * target);
 
     /// Add a command to the mud.
-    void addCommand(const Command & command);
+    void addCommand(std::shared_ptr<Command> command);
 
     /// Add a direction to the mud.
     bool addDirection(std::string name, const Direction & direction);
@@ -314,7 +315,8 @@ public:
     ///@}
 
     /// @defgroup GlobalFind Global Find Functions
-    /// @brief All the functions necessary to find objects from their correspondent global list.
+    /// @brief All the functions necessary to find objects from their
+    ///         correspondent global list.
     /// @{
 
     /// Find an item given its vnum.
@@ -455,7 +457,7 @@ private:
     /// @brief Handle all the comunication descriptor, it's the socket value.
     void setupDescriptor(Player * player);
 
-    /// @brief Handle communications with player using descriptor previusly set.
+    /// @brief Process player communications.
     void processDescriptor(Player * player);
 
     /// @brief Set up the mud variables.

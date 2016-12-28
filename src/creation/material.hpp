@@ -67,7 +67,8 @@ public:
     ~Material();
 
     /// @brief Check the correctness of the material.
-    /// @return <b>True</b> if the material has correct values,<br><b>False</b> otherwise.
+    /// @return <b>True</b> if the material has correct values,<br>
+    ///         <b>False</b> otherwise.
     bool check();
 
     /// @brief Provides the modifier w.r.t. the material worth value.

@@ -1,5 +1,5 @@
 /// @file   exit.hpp
-/// @brief  An exit connects two rooms and store information about: doors and exit's flags.
+/// @brief  An exit connects two rooms and store information about exits.
 /// @author Enrico Fraccaroli
 /// @date   Mar 10 2015
 /// @copyright
@@ -93,7 +93,8 @@ public:
 
     /// @brief Define equal operator.
     /// @param right The comparison exit.
-    /// @return <b>True</b> if this and the right element has the same direction,<br>
+    /// @return <b>True</b> if this and the right element has the
+    ///                      same direction,<br>
     ///         <b>False</b> otherwise.
     bool operator==(const Exit & right) const;
 

@@ -62,8 +62,12 @@ EquipmentSlot::EquipmentSlot(const std::string & _equipmentSlot) :
 
 bool EquipmentSlot::isValid(const unsigned int & _equipmentSlot)
 {
-    return (_equipmentSlot == 1) || (_equipmentSlot == 2) || (_equipmentSlot == 4) ||
-           (_equipmentSlot == 8) || (_equipmentSlot == 16) || (_equipmentSlot == 32) ||
+    return (_equipmentSlot == 1) ||
+           (_equipmentSlot == 2) ||
+           (_equipmentSlot == 4) ||
+           (_equipmentSlot == 8) ||
+           (_equipmentSlot == 16) ||
+           (_equipmentSlot == 32) ||
            (_equipmentSlot == 64);
 }
 

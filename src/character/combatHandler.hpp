@@ -29,7 +29,8 @@
 
 #include "characterContainer.hpp"
 
-/// @brief Data structure used to store an ordered list of opponents during a combat.
+/// @brief Data structure used to store an ordered list of opponents
+///         during a combat.
 class CombatHandler
 {
     friend class Character;
@@ -54,6 +55,7 @@ public:
         /// The level of aggression.
         mutable unsigned int aggression;
     };
+
 private:
     /// Owner of the list.
     Character * owner;
@@ -79,14 +81,14 @@ public:
 
     /// @brief Tries to add the given character to the list of opponents.
     /// @param character The opponent to add.
-    /// @param initAggro The initial value of aggression against the given opponent.
-    /// @return <b>True</b> if the operation concluded successfuly,<br>
+    /// @param initAggro The initial value of aggression given an opponent.
+    /// @return <b>True</b> if the operation concluded successfully,<br>
     ///         <b>False</b> otherwise.
     bool addOpponent(Character * character, unsigned int initAggro = 0);
 
     /// @brief Tries to remove the given character from the list of opponents.
     /// @param character The opponent to remove.
-    /// @return <b>True</b> if the operation concluded successfuly,<br>
+    /// @return <b>True</b> if the operation concluded successfully,<br>
     ///         <b>False</b> otherwise.
     bool remOpponent(Character * character);
 
@@ -96,6 +98,7 @@ public:
     ///         <b>False</b> otherwise.
     bool hasOpponent(Character * character);
 
+    /// @brief Updates the list of characters in sight.
     void updateCharactersInSight();
 
     /// @brief Allows to elect the given character as predefined target.
@@ -115,7 +118,7 @@ public:
     /// @brief Allows to the a new aggression level to the given opponent.
     /// @param character      The opponent
     /// @param newAggression The new aggression level.
-    /// @return <b>True</b> if the operation concluded successfuly,<br>
+    /// @return <b>True</b> if the operation concluded successfully,<br>
     ///         <b>False</b> otherwise.
     bool setAggro(Character * character, unsigned int newAggression);
 
@@ -126,21 +129,21 @@ public:
     /// @brief Allows to elect the given character as the opponent with
     ///         the top level of aggro.
     /// @param character The character to move on top of aggro list.
-    /// @return <b>True</b> if the operation concluded successfuly,<br>
+    /// @return <b>True</b> if the operation concluded successfully,<br>
     ///         <b>False</b> otherwise.
     bool moveToTopAggro(Character * character);
 
-    /// @brief Given a character it returns the intial value of aggression against him.
+    /// @brief Given a character it returns the initial value of aggression.
     /// @param character The other character.
     /// @return The initial value of aggression.
     unsigned int getInitialAggro(Character * character);
 
-    /// @brief Provides the value of aggression againts a given character.
+    /// @brief Provides the value of aggression against a given character.
     /// @param character The other character.
     /// @return The value of aggression.
     unsigned int getAggro(Character * character);
 
-    /// @brief Provides the size of the aggessors list.
+    /// @brief Provides the size of the aggressors list.
     std::size_t getSize();
 
     /// @brief Returns true if the vector is empty.

@@ -76,7 +76,9 @@ int Coordinates::square() const
 
 std::string Coordinates::toString() const
 {
-    return "[X:" + ToString(x) + "; Y:" + ToString(y) + "; Z:" + ToString(z) + "]";
+    return "[X:" + ToString(x) + ";" +
+           " Y:" + ToString(y) + ";" +
+           " Z:" + ToString(z) + "]";
 }
 
 Coordinates Coordinates::round(double x, double y, double z)
@@ -113,7 +115,9 @@ Coordinates Coordinates::round(double x, double y, double z)
             rz -= s;
         }
     }
-    return Coordinates(static_cast<int>(rx), static_cast<int>(ry), static_cast<int>(rz));
+    return Coordinates(static_cast<int>(rx),
+                       static_cast<int>(ry),
+                       static_cast<int>(rz));
 }
 
 void Coordinates::luaRegister(lua_State * L)

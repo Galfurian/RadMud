@@ -44,12 +44,24 @@ public:
 
     std::string lookContent() override;
 
+    /// @brief Determines if this can be refilled with the given item.
+    /// @param item  The item, probably the fuel.
+    /// @param error The error message in case it cannot be used as fuel.
+    /// @return If this can be refilled with item.
     bool canRefillWith(Item * item, std::string & error) const;
 
-    bool getAmmountToRefill(Item * item, unsigned int & ammount, std::string & error) const;
+    /// @brief Provides the amount of the given item is required to fill this.
+    /// @param item   The item, probably the fuel.
+    /// @param amount The amount of required fuel.
+    /// @param error  The error message in case something goes wrong.
+    /// @return If the value amount has been set correctly.
+    bool getAmountToRefill(Item * item, unsigned int & amount,
+                           std::string & error) const;
 
+    /// @brief Provides the list already loaded fuel items.
     std::vector<Item *> getAlreadyLoadedFuel() const;
 
+    /// @brief Provides the remaining TIC, IF the light is turned on.
     double getAutonomy() const;
 
 protected:

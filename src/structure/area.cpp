@@ -41,7 +41,10 @@ Area::Area() :
 
 Area::~Area()
 {
-    //Logger::log(LogLevel::Debug, "Deleted area\t\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
+//    Logger::log(LogLevel::Debug,
+//                "Deleted area\t\t[%s]\t\t(%s)",
+//                ToString(this->vnum),
+//                this->name);
 }
 
 bool Area::check()
@@ -87,9 +90,12 @@ int Area::getDistance(const Coordinates & source, const Coordinates & target)
                                       pow(source.z - target.z, 2)));
 }
 
-Direction Area::getDirection(const Coordinates & source, const Coordinates & target)
+Direction Area::getDirection(const Coordinates & source,
+                             const Coordinates & target)
 {
-    auto dx = std::abs(source.x - target.x), dy = std::abs(source.y - target.y), dz = std::abs(source.z - target.z);
+    auto dx = std::abs(source.x - target.x);
+    auto dy = std::abs(source.y - target.y);
+    auto dz = std::abs(source.z - target.z);
     if ((dx > dy) && (dx > dz))
     {
         if (source.x > target.x) return Direction::West;
@@ -108,7 +114,8 @@ Direction Area::getDirection(const Coordinates & source, const Coordinates & tar
     return Direction::None;
 }
 
-CharacterContainer Area::getCharactersAt(const CharacterContainer & exceptions, const Coordinates & coordinates)
+CharacterContainer Area::getCharactersAt(const CharacterContainer & exceptions,
+                                         const Coordinates & coordinates)
 {
     CharacterContainer characterContainer;
     if (this->isValid(coordinates))
@@ -124,7 +131,8 @@ CharacterContainer Area::getCharactersAt(const CharacterContainer & exceptions, 
     return characterContainer;
 }
 
-ItemContainer Area::getItemsAt(const ItemContainer & exceptions, const Coordinates & coordinates)
+ItemContainer Area::getItemsAt(const ItemContainer & exceptions,
+                               const Coordinates & coordinates)
 {
     ItemContainer itemContainer;
     if (this->isValid(coordinates))
@@ -152,12 +160,16 @@ bool Area::addRoom(Room * room)
         }
         else
         {
-            Logger::log(LogLevel::Error, "Room's insertion could not be completed %s.", room->coord);
+            Logger::log(LogLevel::Error,
+                        "Room's insertion could not be completed %s.",
+                        room->coord);
         }
     }
     else
     {
-        Logger::log(LogLevel::Error, "Room's coordinates are not inside the boundaries %s.", room->coord);
+        Logger::log(LogLevel::Error,
+                    "Room's coordinates are not inside the boundaries %s.",
+                    room->coord);
     }
     return false;
 }
@@ -210,9 +222,11 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, const int & radius)
     int origin_z = centerRoom->coord.z;
     // Evaluate the minimum and maximum value for x and y.
     int min_x = (origin_x < radius) ? 0 : (origin_x - radius);
-    int max_x = ((origin_x + radius) > this->width) ? this->width : (origin_x + radius);
+    int max_x = ((origin_x + radius) > this->width)
+                ? this->width : (origin_x + radius);
     int min_y = (origin_y < radius) ? 0 : (origin_y - radius);
-    int max_y = ((origin_y + radius - 1) > this->height) ? this->height : (origin_y + radius - 1);
+    int max_y = ((origin_y + radius - 1) > this->height)
+                ? this->height : (origin_y + radius - 1);
     // Evaluate the field of view.
     auto coordinatesInFov = this->fov(centerRoom->coord, radius);
     // Prepare Environment layer.
@@ -245,25 +259,29 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, const int & radius)
                     if (HasFlag(up->flags, ExitFlag::Stairs)
                         && HasFlag(down->flags, ExitFlag::Stairs))
                     {
-                        tileCode = ToString(18) + ":" + ToString(this->tileSet + 1);
+                        tileCode = ToString(18) + ":" +
+                                   ToString(this->tileSet + 1);
                     }
                 }
                 else if (up != nullptr)
                 {
                     if (HasFlag(up->flags, ExitFlag::Stairs))
                     {
-                        tileCode = ToString(18) + ":" + ToString(this->tileSet + 1);
+                        tileCode = ToString(18) + ":" +
+                                   ToString(this->tileSet + 1);
                     }
                 }
                 else if (down != nullptr)
                 {
                     if (HasFlag(down->flags, ExitFlag::Stairs))
                     {
-                        tileCode = ToString(18) + ":" + ToString(this->tileSet + 0);
+                        tileCode = ToString(18) + ":" +
+                                   ToString(this->tileSet + 0);
                     }
                     else
                     {
-                        tileCode = ToString(18) + ":" + ToString(this->tileSet + 4);
+                        tileCode = ToString(18) + ":" +
+                                   ToString(this->tileSet + 4);
                     }
                 }
             }
@@ -379,8 +397,10 @@ std::string Area::drawASCIIFov(Room * centerRoom, const int & radius)
         return result;
     }
     // Evaluate the minimum and maximum value for x and y.
-    int min_x = (centerRoom->coord.x - radius), max_x = (centerRoom->coord.x + radius);
-    int min_y = (centerRoom->coord.y - radius), max_y = (centerRoom->coord.y + radius);
+    int min_x = (centerRoom->coord.x - radius);
+    int max_x = (centerRoom->coord.x + radius);
+    int min_y = (centerRoom->coord.y - radius);
+    int max_y = (centerRoom->coord.y + radius);
     // Evaluate the field of view.
     auto validFov = this->fov(centerRoom->coord, radius);
     // Draw the fov.
@@ -390,15 +410,16 @@ std::string Area::drawASCIIFov(Room * centerRoom, const int & radius)
         for (point.x = min_x; point.x <= max_x; ++point.x)
         {
             std::string tile = " ";
-            if (std::find(validFov.begin(), validFov.end(), point) != validFov.end())
+            if (std::find(validFov.begin(), validFov.end(), point)
+                != validFov.end())
             {
                 Room * room = this->getRoom(point);
                 if (room != nullptr)
                 {
                     if (room->isLit())
                     {
-                        std::shared_ptr<Exit> up = room->findExit(Direction::Up);
-                        std::shared_ptr<Exit> down = room->findExit(Direction::Down);
+                        auto up = room->findExit(Direction::Up);
+                        auto down = room->findExit(Direction::Down);
                         // VI  - WALKABLE
                         tile = ".";
                         // V   - OPEN DOOR
@@ -451,7 +472,8 @@ std::string Area::drawASCIIFov(Room * centerRoom, const int & radius)
                         {
                             for (auto iterator : room->characters)
                             {
-                                if (!HasFlag(iterator->flags, CharacterFlag::Invisible))
+                                if (!HasFlag(iterator->flags,
+                                             CharacterFlag::Invisible))
                                 {
                                     tile = iterator->race->getTile();
                                 }
@@ -472,18 +494,23 @@ std::string Area::drawASCIIFov(Room * centerRoom, const int & radius)
     return result;
 }
 
-CharacterContainer Area::getCharactersInSight(CharacterContainer & exceptions, Coordinates & origin, const int & radius)
+CharacterContainer Area::getCharactersInSight(CharacterContainer & exceptions,
+                                              Coordinates & origin,
+                                              const int & radius)
 {
     CharacterContainer characterContainer;
     auto validCoordinates = this->fov(origin, radius);
     for (auto coordinates : validCoordinates)
     {
-        characterContainer.addUnique(this->getCharactersAt(exceptions, coordinates));
+        characterContainer.addUnique(
+            this->getCharactersAt(exceptions, coordinates));
     }
     return characterContainer;
 }
 
-ItemContainer Area::getItemsInSight(ItemContainer & exceptions, Coordinates & origin, const int & radius)
+ItemContainer Area::getItemsInSight(ItemContainer & exceptions,
+                                    Coordinates & origin,
+                                    const int & radius)
 {
     ItemContainer foundItems;
     auto validCoordinates = this->fov(origin, radius);
@@ -505,35 +532,44 @@ std::vector<Coordinates> Area::fov(Coordinates & origin, const int & radius)
     {
         while ((point.y <= point.x) && (point.square() <= pow(radius, 2)))
         {
-            target = Coordinates(origin.x + point.x, origin.y + point.y, origin.z);
+            target = Coordinates(origin.x + point.x,
+                                 origin.y + point.y, origin.z);
             if ((target.x == origin.x) && (target.y == origin.y))
             {
                 fovCoordinates.emplace_back(target);
             }
             else
             {
-                if (this->los(origin, target, radius)) fovCoordinates.emplace_back(target);
-
-                target = Coordinates(origin.x - point.x, origin.y + point.y, origin.z);
-                if (this->los(origin, target, radius)) fovCoordinates.emplace_back(target);
-
-                target = Coordinates(origin.x + point.x, origin.y - point.y, origin.z);
-                if (this->los(origin, target, radius)) fovCoordinates.emplace_back(target);
-
-                target = Coordinates(origin.x - point.x, origin.y - point.y, origin.z);
-                if (this->los(origin, target, radius)) fovCoordinates.emplace_back(target);
-
-                target = Coordinates(origin.x + point.y, origin.y + point.x, origin.z);
-                if (this->los(origin, target, radius)) fovCoordinates.emplace_back(target);
-
-                target = Coordinates(origin.x - point.y, origin.y + point.x, origin.z);
-                if (this->los(origin, target, radius)) fovCoordinates.emplace_back(target);
-
-                target = Coordinates(origin.x + point.y, origin.y - point.x, origin.z);
-                if (this->los(origin, target, radius)) fovCoordinates.emplace_back(target);
-
-                target = Coordinates(origin.x - point.y, origin.y - point.x, origin.z);
-                if (this->los(origin, target, radius)) fovCoordinates.emplace_back(target);
+                if (this->los(origin, target, radius))
+                    fovCoordinates.emplace_back(target);
+                target = Coordinates(origin.x - point.x,
+                                     origin.y + point.y, origin.z);
+                if (this->los(origin, target, radius))
+                    fovCoordinates.emplace_back(target);
+                target = Coordinates(origin.x + point.x,
+                                     origin.y - point.y, origin.z);
+                if (this->los(origin, target, radius))
+                    fovCoordinates.emplace_back(target);
+                target = Coordinates(origin.x - point.x,
+                                     origin.y - point.y, origin.z);
+                if (this->los(origin, target, radius))
+                    fovCoordinates.emplace_back(target);
+                target = Coordinates(origin.x + point.y,
+                                     origin.y + point.x, origin.z);
+                if (this->los(origin, target, radius))
+                    fovCoordinates.emplace_back(target);
+                target = Coordinates(origin.x - point.y,
+                                     origin.y + point.x, origin.z);
+                if (this->los(origin, target, radius))
+                    fovCoordinates.emplace_back(target);
+                target = Coordinates(origin.x + point.y,
+                                     origin.y - point.x, origin.z);
+                if (this->los(origin, target, radius))
+                    fovCoordinates.emplace_back(target);
+                target = Coordinates(origin.x - point.y,
+                                     origin.y - point.x, origin.z);
+                if (this->los(origin, target, radius))
+                    fovCoordinates.emplace_back(target);
             }
             ++point.y;
         }
@@ -543,7 +579,9 @@ std::vector<Coordinates> Area::fov(Coordinates & origin, const int & radius)
     return fovCoordinates;
 }
 
-bool Area::los(const Coordinates & source, const Coordinates & target, const int & radius)
+bool Area::los(const Coordinates & source,
+               const Coordinates & target,
+               const int & radius)
 {
     // Deal with the easiest case.
     if (source == target)
@@ -566,7 +604,8 @@ bool Area::los(const Coordinates & source, const Coordinates & target, const int
     // Evaluate the distance between the
     double distance = std::sqrt((dx * dx) + (dy * dy));
     // Evaluate the unit increment for both X and Y.
-    // Decrease the value of precision for a faster execution with a worsening in terms of accuracy (default 6).
+    // Decrease the value of precision for a faster execution with
+    //  a worsening in terms of accuracy (default 6).
     double precision = 10;
     double unitx = dx / (distance * precision);
     double unity = dy / (distance * precision);
@@ -578,7 +617,8 @@ bool Area::los(const Coordinates & source, const Coordinates & target, const int
     Coordinates coordinates(source.x, source.y, source.z);
     for (double i = 0; i <= distance; i += min)
     {
-        // Evaluate the integer version of the coordinates using the floor value.
+        // Evaluate the integer version of the coordinates
+        //  using the floor value.
         int floor_x = static_cast<int>(std::floor(x));
         int floor_y = static_cast<int>(std::floor(y));
         coordinates = Coordinates(floor_x, floor_y, source.z);

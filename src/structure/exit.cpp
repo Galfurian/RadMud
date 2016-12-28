@@ -32,7 +32,10 @@ Exit::Exit() :
     // Nothing to do.
 }
 
-Exit::Exit(Room * _source, Room * _destination, Direction _direction, unsigned int _flags) :
+Exit::Exit(Room * _source,
+           Room * _destination,
+           Direction _direction,
+           unsigned int _flags) :
     source(_source),
     destination(_destination),
     direction(_direction),

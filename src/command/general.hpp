@@ -28,7 +28,8 @@
 void LoadGeneralCommands();
 
 /// @defgroup ComInterfaces Commands List Interface.
-/// @brief All the functions necessary to handle the commands that a player can execute.
+/// @brief All the functions necessary to handle the commands that a player
+///         can execute.
 /// @{
 
 /// Execute character movement.
@@ -49,7 +50,8 @@ bool DoSet(Character * character, ArgumentHandler & args);
 /// Stop the current action of the character.
 bool DoStop(Character * character, ArgumentHandler & args);
 
-/// The character look at: the current room, the near rooms, an object, a player, a character, and so on.
+/// The character look at: the current room, the near rooms, an object,
+///  a player, a character, and so on.
 bool DoLook(Character * character, ArgumentHandler & args);
 
 /// Provide a complete help on the mud.

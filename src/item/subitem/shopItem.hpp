@@ -65,7 +65,8 @@ public:
     unsigned int getBalance() const;
 
     /// Check if the shop can be used.
-    /// @param error In case it cannot be used, the reason is stored in this variable.
+    /// @param error In case it cannot be used, the reason is stored
+    ///               in this variable.
     /// @return <b>True</b> if it can be used,<br>
     ///         <b>False</b> otherwise.
     bool canUse(std::string & error);
