@@ -407,7 +407,7 @@ Item * Room::findDoor()
 
 bool Room::isLit()
 {
-    Stopwatch<std::chrono::microseconds> stopwatch("isList");
+//    Stopwatch<std::chrono::microseconds> stopwatch("isList");
     auto CheckRoomForLights = [this](Room * room)
     {
         auto LightIsActiveAndInRange = [this, room](Item * item)
@@ -451,9 +451,9 @@ bool Room::isLit()
     auto dayPhase = MudUpdater::instance().getDayPhase();
     if ((!terrain->indoor) && (dayPhase != DayPhase::Night))
     {
-        Logger::log(LogLevel::Debug,
-                    "Room is lit (outside)(!night)(%s us)",
-                    stopwatch.stop());
+//        Logger::log(LogLevel::Debug,
+//                    "Room is lit (outside)(!night)(%s us)",
+//                    stopwatch.stop());
         return true;
     }
     // First check inside the current room.
@@ -465,16 +465,16 @@ bool Room::isLit()
         {
             if (CheckRoomForLights(room))
             {
-                Logger::log(LogLevel::Debug,
-                            "Room is lit (LitByLight)     (%s us)",
-                            stopwatch.stop());
+//                Logger::log(LogLevel::Debug,
+//                            "Room is lit (LitByLight)     (%s us)",
+//                            stopwatch.stop());
                 return true;
             }
         }
     }
-    Logger::log(LogLevel::Debug,
-                "Room is not lit              (%s us)",
-                stopwatch.stop());
+//    Logger::log(LogLevel::Debug,
+//                "Room is not lit              (%s us)",
+//                stopwatch.stop());
     return false;
 }
 

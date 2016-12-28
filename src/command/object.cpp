@@ -125,18 +125,23 @@ bool DoTake(Character * character, ArgumentHandler & args)
         character->sendMsg("Wrong number of parameters.\n");
         return false;
     }
+    // Take to room.
+    auto room = character->room;
+    // Check if the room is lit by a light.
+    auto roomIsLit = room->isLit();
     // Try to take the item inside the room.
     if (args.size() == 1)
     {
+        // Check if the character wants to take everything.
         if (ToLower(args[0].getContent()) == "all")
         {
-            if (character->room->items.empty())
+            if (room->items.empty())
             {
                 character->sendMsg("There is nothing to pick up.\n");
                 return false;
             }
             // Make a temporary copy of the character's inventory.
-            auto originalList = character->room->items;
+            auto originalList = room->items;
             // Start a transaction.
             SQLiteDbms::instance().beginTransaction();
             // Used to determine if the character has picked up something.
@@ -159,7 +164,7 @@ bool DoTake(Character * character, ArgumentHandler & args)
                     continue;
                 }
                 // Remove the item from the room.
-                character->room->removeItem(iterator);
+                room->removeItem(iterator);
                 // Add the item to the player's inventory.
                 character->addInventoryItem(iterator);
                 // Set that he has picked up something.
@@ -172,7 +177,7 @@ bool DoTake(Character * character, ArgumentHandler & args)
             {
                 // Send the messages.
                 character->sendMsg("You've picked up everything you could.\n");
-                character->room->sendToAll(
+                room->sendToAll(
                     "%s has picked up everything %s could.\n",
                     {character},
                     character->getNameCapital(),
@@ -182,8 +187,15 @@ bool DoTake(Character * character, ArgumentHandler & args)
             character->sendMsg("You've picked up nothing.\n");
             return false;
         }
-        auto item = character->room->findItem(args[0].getContent(),
-                                              args[0].getIndex());
+        // Check if the character wants to take a specific item.
+        auto item = room->findItem(args[0].getContent(),
+                                   args[0].getIndex());
+        // If the room is NOT lit, pick a random item.
+        if (!roomIsLit)
+        {
+            // Pick from the items.
+            item = room->items[TRandInteger<size_t>(0, room->items.size() - 1)];
+        }
         // If the item is null.
         if (item == nullptr)
         {
@@ -191,7 +203,7 @@ bool DoTake(Character * character, ArgumentHandler & args)
             //  items by providing the specific vnum.
             if (character->isMobile() && IsNumber(args[0].getContent()))
             {
-                for (auto it : character->room->items)
+                for (auto it : room->items)
                 {
                     if (it->vnum == ToNumber<int>(args[0].getContent()))
                     {
@@ -234,15 +246,15 @@ bool DoTake(Character * character, ArgumentHandler & args)
         if (item->quantity <= quantity)
         {
             // Remove the item from the room.
-            character->room->removeItem(item);
+            room->removeItem(item);
             // Add the item to the player's inventory.
             character->addInventoryItem(item);
             // Send the messages.
             character->sendMsg("You take %s.\n", item->getName(true));
-            character->room->sendToAll("%s has picked up %s.\n",
-                                       {character},
-                                       character->getNameCapital(),
-                                       item->getName(true));
+            room->sendToAll("%s has picked up %s.\n",
+                            {character},
+                            character->getNameCapital(),
+                            item->getName(true));
         }
         else
         {
@@ -260,10 +272,10 @@ bool DoTake(Character * character, ArgumentHandler & args)
             character->addInventoryItem(newStack);
             // Send the messages.
             character->sendMsg("You take a part of %s.\n", item->getName(true));
-            character->room->sendToAll("%s has picked up part of %s.\n",
-                                       {character},
-                                       character->getNameCapital(),
-                                       item->getName(true));
+            room->sendToAll("%s has picked up part of %s.\n",
+                            {character},
+                            character->getNameCapital(),
+                            item->getName(true));
         }
         // Conclude the transaction.
         SQLiteDbms::instance().endTransaction();
@@ -330,7 +342,7 @@ bool DoTake(Character * character, ArgumentHandler & args)
             // Send the messages.
             character->sendMsg("You've taken everything you could from %s.\n",
                                container->getName(true));
-            character->room->sendToAll(
+            room->sendToAll(
                 "%s has taken everything %s could from %s.\n",
                 {character},
                 character->getNameCapital(),
@@ -344,6 +356,12 @@ bool DoTake(Character * character, ArgumentHandler & args)
     }
     auto item = container->findContent(args[0].getContent(),
                                        args[0].getIndex());
+    // If the room is NOT lit, pick a random item from the container.
+    if (!roomIsLit)
+    {
+        auto it = TRandInteger<size_t>(0, container->content.size() - 1);
+        item = container->content[it];
+    }
     if (item == nullptr)
     {
         character->sendMsg("You don't see that item inside the container.\n");
@@ -378,11 +396,11 @@ bool DoTake(Character * character, ArgumentHandler & args)
         // Send the messages.
         character->sendMsg("You take out %s from %s.\n", item->getName(true),
                            container->getName(true));
-        character->room->sendToAll("%s takes out %s from %s.\n",
-                                   {character},
-                                   character->getNameCapital(),
-                                   item->getName(true),
-                                   container->getName(true));
+        room->sendToAll("%s takes out %s from %s.\n",
+                        {character},
+                        character->getNameCapital(),
+                        item->getName(true),
+                        container->getName(true));
     }
     else
     {
@@ -402,11 +420,11 @@ bool DoTake(Character * character, ArgumentHandler & args)
         character->sendMsg("You take out part of %s from %s.\n",
                            item->getName(true),
                            container->getName(true));
-        character->room->sendToAll("%s takes out %s from %s.\n",
-                                   {character},
-                                   character->getNameCapital(),
-                                   item->getName(true),
-                                   container->getName(true));
+        room->sendToAll("%s takes out %s from %s.\n",
+                        {character},
+                        character->getNameCapital(),
+                        item->getName(true),
+                        container->getName(true));
     }
     // Conclude the transaction.
     SQLiteDbms::instance().endTransaction();
@@ -459,6 +477,30 @@ bool DoDrop(Character * character, ArgumentHandler & args)
     // Get the item.
     auto item = character->findInventoryItem(args[0].getContent(),
                                              args[0].getIndex());
+    // If the room is not lit by a light, check if the inventory contains a
+    //  light.
+    if (!character->room->isLit())
+    {
+        // Check if the inventory contains a lit light source.
+        bool inventoryIsLit = false;
+        for (auto it : character->inventory)
+        {
+            if (it->getType() == ModelType::Light)
+            {
+                if (it->toLightItem()->active)
+                {
+                    inventoryIsLit = true;
+                    break;
+                }
+            }
+        }
+        // If the inventory is NOT lit, pick a random item and try to drop it.
+        if (!inventoryIsLit)
+        {
+            auto it = TRandInteger<size_t>(0, character->inventory.size() - 1);
+            item = character->inventory[it];
+        }
+    }
     // Check if the player has the item that he want to drop.
     if (item == nullptr)
     {
@@ -524,6 +566,30 @@ bool DoGive(Character * character, ArgumentHandler & args)
     // Get the item.
     auto item = character->findInventoryItem(args[0].getContent(),
                                              args[0].getIndex());
+    // If the room is not lit by a light, check if the inventory contains a
+    //  light.
+    if (!character->room->isLit())
+    {
+        // Check if the inventory contains a lit light source.
+        bool inventoryIsLit = false;
+        for (auto it : character->inventory)
+        {
+            if (it->getType() == ModelType::Light)
+            {
+                if (it->toLightItem()->active)
+                {
+                    inventoryIsLit = true;
+                    break;
+                }
+            }
+        }
+        // If the inventory is NOT lit, pick a random item and try to drop it.
+        if (!inventoryIsLit)
+        {
+            auto it = TRandInteger<size_t>(0, character->inventory.size() - 1);
+            item = character->inventory[it];
+        }
+    }
     if (item == nullptr)
     {
         character->sendMsg("You don't have that item.\n");

@@ -273,9 +273,17 @@ bool DoLook(Character * character, ArgumentHandler & args)
     if (args.empty())
     {
         character->sendMsg(character->room->getLook(character));
+        return true;
     }
-    else if (args.size() == 1)
+    if (args.size() == 1)
     {
+        // Check if the room is lit by a light.
+        if(!character->room->isLit())
+        {
+            character->sendMsg("You can't see.\n");
+            return false;
+        }
+        // Check if the character is looking at another character.
         auto target = character->room->findCharacter(args[0].getContent(),
                                                      args[0].getIndex(),
                                                      {character});
@@ -295,26 +303,28 @@ bool DoLook(Character * character, ArgumentHandler & args)
                 return true;
             }
         }
+        // Check if the character is looking at an item.
         auto item = character->findNearbyItem(args[0].getContent(),
                                               args[0].getIndex());
-        if (item != nullptr)
+        if (item)
         {
             character->sendMsg(item->getLook());
             return true;
         }
-        else
-        {
-            character->sendMsg("You don't see '%s' anywhere.\n",
-                               args[0].getContent());
-        }
+        character->sendMsg("You don't see '%s' anywhere.\n",
+                           args[0].getContent());
     }
-    else if (args.size() == 2)
+    if (args.size() == 2)
     {
+        // Check if the room is lit by a light.
+        if(!character->room->isLit())
+        {
+            character->sendMsg("You can't see.\n");
+            return false;
+        }
         auto target = character->room->findCharacter(args[1].getContent(),
                                                      args[1].getIndex(),
                                                      {character});
-        auto container = character->findNearbyItem(args[1].getContent(),
-                                                   args[1].getIndex());
         if (target != nullptr)
         {
             if (character->canSee(target))
@@ -326,21 +336,19 @@ bool DoLook(Character * character, ArgumentHandler & args)
                     character->sendMsg(item->getLook());
                     return true;
                 }
-                else
-                {
-                    character->sendMsg("You don't see %s on %s.\n",
-                                       args[0].getContent(),
-                                       target->getName());
-                }
+                character->sendMsg("You don't see %s on %s.\n",
+                                   args[0].getContent(),
+                                   target->getName());
+                return false;
             }
-            else
-            {
-                character->sendMsg(
-                    "You don't see the container '%s' anywhere.\n",
-                    args[1].getContent());
-            }
+            character->sendMsg(
+                "You don't see the container '%s' anywhere.\n",
+                args[1].getContent());
+            return false;
         }
-        else if (container)
+        auto container = character->findNearbyItem(args[1].getContent(),
+                                                   args[1].getIndex());
+        if (container)
         {
             if (container->isAContainer())
             {
@@ -351,25 +359,18 @@ bool DoLook(Character * character, ArgumentHandler & args)
                     character->sendMsg(item->getLook());
                     return true;
                 }
-                else
-                {
-                    character->sendMsg("It's not insiede %s.\n",
-                                       container->getName(true));
-                }
+                character->sendMsg("It's not inside %s.\n",
+                                   container->getName(true));
+                return false;
             }
-            else
-            {
-                character->sendMsg("%s is not a container.\n",
-                                   container->getNameCapital(true));
-            }
+            character->sendMsg("%s is not a container.\n",
+                               container->getNameCapital(true));
+            return false;
         }
-        else
-        {
-            character->sendMsg("You don't see the container '%s' anywhere.\n",
-                               args[1].getContent());
-        }
+        character->sendMsg("You don't see the container '%s' anywhere.\n",
+                           args[1].getContent());
     }
-    else
+    if (args.size() > 2)
     {
         character->sendMsg("You don't remember how to look?\n");
     }
