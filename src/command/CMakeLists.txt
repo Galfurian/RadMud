@@ -1,4 +1,8 @@
 #############################################
+# Sub-directories
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/command/object)
+
+#############################################
 # Include Directories
 set(PROJECT_INC ${PROJECT_INC}
         ${CMAKE_SOURCE_DIR}/src/command
@@ -15,6 +19,5 @@ set(PROJECT_SRC ${PROJECT_SRC}
         ${CMAKE_SOURCE_DIR}/src/command/manager.cpp
         ${CMAKE_SOURCE_DIR}/src/command/general.cpp
         ${CMAKE_SOURCE_DIR}/src/command/god.cpp
-        ${CMAKE_SOURCE_DIR}/src/command/object.cpp
         PARENT_SCOPE
         )

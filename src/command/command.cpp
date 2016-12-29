@@ -30,7 +30,7 @@
 #include "general.hpp"
 #include "god.hpp"
 #include "manager.hpp"
-#include "object.hpp"
+#include "commandObject.hpp"
 #include "logger.hpp"
 
 Command::Command() :

@@ -1,6 +1,7 @@
-/// @file   object.hpp
+/// @file   commandObjectCharacter.hpp
+/// @brief  
 /// @author Enrico Fraccaroli
-/// @date   Aug 23 2016
+/// @date   29/12/2016
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -21,26 +22,13 @@
 
 #pragma once
 
-#include "argumentHandler.hpp"
-#include "character.hpp"
+#include "commandObject.hpp"
 
-/// Loads all the commands concerning objects.
-void LoadObjectCommands();
 
 /// @defgroup ComInterfaces Commands List Interface.
 /// @brief All the functions necessary to handle the commands that a player
 ///         can execute.
 /// @{
-
-/// Allow the character to pick up an object, or take an object
-///  from another one.
-bool DoTake(Character * character, ArgumentHandler & args);
-
-/// Allow the character to drop an object.
-bool DoDrop(Character * character, ArgumentHandler & args);
-
-/// Allow the character to give an object to another character.
-bool DoGive(Character * character, ArgumentHandler & args);
 
 /// List all the item equipped by the character.
 bool DoEquipments(Character * character, ArgumentHandler & args);
@@ -56,44 +44,5 @@ bool DoRemove(Character * character, ArgumentHandler & args);
 
 /// List the character's inventory.
 bool DoInventory(Character * character, ArgumentHandler & args);
-
-/// Organize the items in the room.
-bool DoOrganize(Character * character, ArgumentHandler & args);
-
-/// Open a door if not unlocked.
-bool DoOpen(Character * character, ArgumentHandler & args);
-
-/// Close a door.
-bool DoClose(Character * character, ArgumentHandler & args);
-
-/// Put an object inside a container.
-bool DoPut(Character * character, ArgumentHandler & args);
-
-/// Drink from a container of liquids.
-bool DoDrink(Character * character, ArgumentHandler & args);
-
-/// Fill a container of liquids from a source of liquid.
-bool DoFill(Character * character, ArgumentHandler & args);
-
-/// Pour the container of liquids into another one or on the ground.
-bool DoPour(Character * character, ArgumentHandler & args);
-
-/// Deposit a currency inside a shop.
-bool DoDeposit(Character * character, ArgumentHandler & args);
-
-/// Sell an item.
-bool DoSell(Character * character, ArgumentHandler & args);
-
-/// Buy an item.
-bool DoBuy(Character * character, ArgumentHandler & args);
-
-/// Shows the total amount of money.
-bool DoBalance(Character * character, ArgumentHandler & args);
-
-/// Allows to turn on and off an activatable item.
-bool DoTurn(Character * character, ArgumentHandler & args);
-
-/// Allows to refill a light source.
-bool DoRefill(Character * character, ArgumentHandler & args);
 
 ///@}
