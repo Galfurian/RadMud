@@ -77,7 +77,6 @@ Mud::Mud() :
     badNames(),
     mudNews(),
     mudCommands(),
-    mudDirections(),
     mudBuildings(),
     mudTerrains()
 {
@@ -370,11 +369,6 @@ void Mud::addCommand(std::shared_ptr<Command> command)
     mudCommands.push_back(command);
 }
 
-bool Mud::addDirection(std::string name, const Direction & direction)
-{
-    return mudDirections.insert(std::make_pair(name, direction)).second;
-}
-
 bool Mud::addBuilding(Building & building)
 {
     return mudBuildings.insert(std::make_pair(building.vnum, building)).second;
@@ -651,28 +645,6 @@ std::shared_ptr<Terrain> Mud::findTerrain(unsigned int vnum)
         }
     }
     return nullptr;
-}
-
-Direction Mud::findDirection(const std::string & direction, bool exact)
-{
-    for (auto iterator : mudDirections)
-    {
-        if (exact)
-        {
-            if (iterator.first == ToLower(direction))
-            {
-                return iterator.second;
-            }
-        }
-        else
-        {
-            if (BeginWith(iterator.first, ToLower(direction)))
-            {
-                return iterator.second;
-            }
-        }
-    }
-    return Direction::None;
 }
 
 bool Mud::runMud()
@@ -1000,20 +972,6 @@ void Mud::processDescriptor(Player * player)
     }
 }
 
-bool Mud::initVariables()
-{
-    // First map all the mud directions.
-    Mud::instance().addDirection("north", Direction::North);
-    Mud::instance().addDirection("south", Direction::South);
-    Mud::instance().addDirection("west", Direction::West);
-    Mud::instance().addDirection("east", Direction::East);
-    Mud::instance().addDirection("up", Direction::Up);
-    Mud::instance().addDirection("down", Direction::Down);
-    // Set the boot time.
-    time(&_bootTime);
-    return true;
-}
-
 bool Mud::initDatabase()
 {
     if (!SQLiteDbms::instance().openDatabase())
@@ -1172,17 +1130,10 @@ bool Mud::startMud()
     Logger::log(LogLevel::Global,
                 "#--------------------------------------------#");
     Logger::log(LogLevel::Global, "Booting...");
-    Logger::log(LogLevel::Global, "Initializing Mud Variables...");
-    if (!this->initVariables())
-    {
-        Logger::log(LogLevel::Error,
-                    "Something gone wrong during variables initialization.");
-        return false;
-    }
-
+    // Set the boot time.
+    time(&_bootTime);
     Logger::log(LogLevel::Global, "Initializing Commands...");
     LoadCommands();
-
     Logger::log(LogLevel::Global, "Initializing Database...");
     if (!this->initDatabase())
     {

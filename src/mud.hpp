@@ -203,8 +203,6 @@ public:
     std::map<std::string, std::string> mudNews;
     /// List of commands (eg. look, quit, north etc.).
     std::vector<std::shared_ptr<Command> > mudCommands;
-    /// Mud possible directions.
-    std::map<std::string, Direction> mudDirections;
     /// Map of buildings schematic.
     std::map<int, Building> mudBuildings;
     /// Map of buildings schematic.
@@ -304,9 +302,6 @@ public:
     /// Add a command to the mud.
     void addCommand(std::shared_ptr<Command> command);
 
-    /// Add a direction to the mud.
-    bool addDirection(std::string name, const Direction & direction);
-
     /// Add a building to the mud.
     bool addBuilding(Building & building);
 
@@ -390,9 +385,6 @@ public:
 
     /// Find a terrain given its vnum.
     std::shared_ptr<Terrain> findTerrain(unsigned int vnum);
-
-    /// Find the direction.
-    Direction findDirection(const std::string & direction, bool exact);
     ///@}
 
     /// @brief Main processing loop.
@@ -459,11 +451,6 @@ private:
 
     /// @brief Process player communications.
     void processDescriptor(Player * player);
-
-    /// @brief Set up the mud variables.
-    /// @return <b>True</b> if there are no errors,<br>
-    ///         <b>False</b> otherwise.
-    bool initVariables();
 
     /// @brief Load data from the database.
     /// @return <b>True</b> if there are no errors,<br>

@@ -25,7 +25,6 @@
 #include "mechanismModel.hpp"
 #include "lightModel.hpp"
 #include "lightItem.hpp"
-#include "stopwatch.hpp"
 #include "generator.hpp"
 #include "logger.hpp"
 #include "mud.hpp"
@@ -796,39 +795,41 @@ bool ConnectRoom(Room * room)
     std::vector<std::shared_ptr<Exit> > generatedExits;
     Logger::log(LogLevel::Info,
                 "[ConnectRoom] Connecting the room to near rooms...");
-    for (auto iterator : Mud::instance().mudDirections)
+    std::vector<Direction> directions = {
+        Direction::North,
+        Direction::South,
+        Direction::West,
+        Direction::East,
+        Direction::Up,
+        Direction::Down
+    };
+    for (auto iterator : directions)
     {
         // Get the coordinate modifier.
-        auto coordinates = room->coord + iterator.second.getCoordinates();
+        auto coordinates = room->coord + iterator.getCoordinates();
         // Get the room at the given coordinates.
         auto near = room->area->getRoom(coordinates);
         if (near != nullptr)
         {
             // Create the two exits.
-            auto forward = std::make_shared<Exit>(
-                room,
-                near,
-                iterator.second, 0);
-            auto backward = std::make_shared<Exit>(
-                near,
-                room,
-                forward->getOppositeDirection(),
-                0);
+            auto forward = std::make_shared<Exit>(room,
+                                                  near,
+                                                  iterator, 0);
+            auto backward = std::make_shared<Exit>(near,
+                                                   room,
+                                                   forward->getOppositeDirection(),
+                                                   0);
             generatedExits.push_back(forward);
             generatedExits.push_back(backward);
-
             // In case the connection is Up/Down set the presence of stairs.
-            if (iterator.second == Direction::Up ||
-                iterator.second == Direction::Down)
+            if (iterator == Direction::Up || iterator == Direction::Down)
             {
                 SetFlag(&forward->flags, ExitFlag::Stairs);
                 SetFlag(&backward->flags, ExitFlag::Stairs);
             }
-
             // Insert in both the rooms exits the connection.
             room->addExit(forward);
             near->addExit(backward);
-
             // Update the values on Database.
             std::vector<std::string> arguments;
             arguments.push_back(ToString(forward->source->vnum));
@@ -841,7 +842,6 @@ bool ConnectRoom(Room * room)
                 status = false;
                 break;
             }
-
             std::vector<std::string> arguments2;
             arguments2.push_back(ToString(backward->source->vnum));
             arguments2.push_back(ToString(backward->destination->vnum));

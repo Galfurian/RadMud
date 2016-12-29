@@ -24,6 +24,7 @@
 
 #include "rangedWeaponItem.hpp"
 #include "meleeWeaponItem.hpp"
+#include "lightItem.hpp"
 #include "armorItem.hpp"
 #include "logger.hpp"
 #include "aStar.hpp"
@@ -894,24 +895,6 @@ std::vector<Item *> Character::findCoins()
     return foundCoins;
 }
 
-bool Character::hasInventoryItem(Item * item)
-{
-    for (auto it : inventory)
-    {
-        if (it->vnum == item->vnum) return true;
-    }
-    return false;
-}
-
-bool Character::hasEquipmentItem(Item * item)
-{
-    for (auto it : equipment)
-    {
-        if (it->vnum == item->vnum) return true;
-    }
-    return false;
-}
-
 void Character::addInventoryItem(Item *& item)
 {
     // Add the item to the inventory.
@@ -1072,6 +1055,21 @@ bool Character::canWear(Item * item, std::string & error) const
         return false;
     }
     return true;
+}
+
+bool Character::inventoryIsLit() const
+{
+    for (auto it : inventory)
+    {
+        if (it->getType() == ModelType::Light)
+        {
+            if (it->toLightItem()->active)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 bool Character::setThirst(int value)

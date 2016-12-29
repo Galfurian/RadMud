@@ -57,7 +57,9 @@ public:
     Direction(Enum _direction);
 
     /// @brief Constructor from string.
-    Direction(const std::string & _direction);
+    /// @param _direction The string representing the direction.
+    /// @param exact      If the string must be the exact name of the direction.
+    Direction(const std::string & _direction, const bool & exact = true);
 
     /// @brief Check is the given number is a valid direction.
     static bool isValid(const unsigned int & _direction);

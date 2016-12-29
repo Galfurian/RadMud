@@ -477,25 +477,11 @@ bool DoDrop(Character * character, ArgumentHandler & args)
     // Get the item.
     auto item = character->findInventoryItem(args[0].getContent(),
                                              args[0].getIndex());
-    // If the room is not lit by a light, check if the inventory contains a
-    //  light.
+    // If the room is not lit, check if the inventory contains a light.
     if (!character->room->isLit())
     {
-        // Check if the inventory contains a lit light source.
-        bool inventoryIsLit = false;
-        for (auto it : character->inventory)
-        {
-            if (it->getType() == ModelType::Light)
-            {
-                if (it->toLightItem()->active)
-                {
-                    inventoryIsLit = true;
-                    break;
-                }
-            }
-        }
-        // If the inventory is NOT lit, pick a random item and try to drop it.
-        if (!inventoryIsLit)
+        // If the inventory is NOT lit, pick a random item.
+        if (!character->inventoryIsLit())
         {
             auto it = TRandInteger<size_t>(0, character->inventory.size() - 1);
             item = character->inventory[it];
@@ -566,25 +552,11 @@ bool DoGive(Character * character, ArgumentHandler & args)
     // Get the item.
     auto item = character->findInventoryItem(args[0].getContent(),
                                              args[0].getIndex());
-    // If the room is not lit by a light, check if the inventory contains a
-    //  light.
+    // If the room is not lit, check if the inventory contains a light.
     if (!character->room->isLit())
     {
-        // Check if the inventory contains a lit light source.
-        bool inventoryIsLit = false;
-        for (auto it : character->inventory)
-        {
-            if (it->getType() == ModelType::Light)
-            {
-                if (it->toLightItem()->active)
-                {
-                    inventoryIsLit = true;
-                    break;
-                }
-            }
-        }
-        // If the inventory is NOT lit, pick a random item and try to drop it.
-        if (!inventoryIsLit)
+        // If the inventory is NOT lit, pick a random item.
+        if (!character->inventoryIsLit())
         {
             auto it = TRandInteger<size_t>(0, character->inventory.size() - 1);
             item = character->inventory[it];
@@ -779,6 +751,16 @@ bool DoWield(Character * character, ArgumentHandler & args)
     // Get the item.
     auto item = character->findInventoryItem(args[0].getContent(),
                                              args[0].getIndex());
+    // If the room is not lit, check if the inventory contains a light.
+    if (!character->room->isLit())
+    {
+        // If the inventory is NOT lit, pick a random item.
+        if (!character->inventoryIsLit())
+        {
+            auto it = TRandInteger<size_t>(0, character->inventory.size() - 1);
+            item = character->inventory[it];
+        }
+    }
     // Check if the item is null.
     if (item == nullptr)
     {
@@ -893,53 +875,61 @@ bool DoWear(Character * character, ArgumentHandler & args)
                                    {character},
                                    character->getNameCapital(),
                                    character->getSubjectPronoun());
+        return true;
     }
-    else
+    auto item = character->findInventoryItem(args[0].getContent(),
+                                             args[0].getIndex());
+    // If the room is not lit, check if the inventory contains a light.
+    if (!character->room->isLit())
     {
-        auto item = character->findInventoryItem(args[0].getContent(),
-                                                 args[0].getIndex());
-        // Check if the item is null.
-        if (item == nullptr)
+        // If the inventory is NOT lit, pick a random item.
+        if (!character->inventoryIsLit())
         {
-            // Try to check if the character is a mobile, since mobiles can take
-            //  items by providing the specific vnum.
-            if (character->isMobile() && IsNumber(args[0].getContent()))
+            auto it = TRandInteger<size_t>(0, character->inventory.size() - 1);
+            item = character->inventory[it];
+        }
+    }
+    // Check if the item is null.
+    if (item == nullptr)
+    {
+        // Try to check if the character is a mobile, since mobiles can take
+        //  items by providing the specific vnum.
+        if (character->isMobile() && IsNumber(args[0].getContent()))
+        {
+            for (auto it : character->inventory)
             {
-                for (auto it : character->inventory)
+                if (it->vnum == ToNumber<int>(args[0].getContent()))
                 {
-                    if (it->vnum == ToNumber<int>(args[0].getContent()))
-                    {
-                        item = it;
-                    }
+                    item = it;
                 }
             }
         }
-        if (item == nullptr)
-        {
-            character->sendMsg("You don't have that item.\n");
-            return false;
-        }
-        std::string errMessage;
-        if (!character->canWear(item, errMessage))
-        {
-            character->sendMsg(errMessage);
-            return false;
-        }
-        // Remove the item from the player's inventory.
-        character->remInventoryItem(item);
-        // Add the item to the equipment.
-        character->addEquipmentItem(item);
-        // Notify to character.
-        character->sendMsg("You wear %s on your %s.\n", item->getName(true),
-                           ToLower(item->getCurrentSlotName()));
-        // Send the message inside the room.
-        character->room->sendToAll("%s wears %s on %s %s.\n",
-                                   {character},
-                                   character->getNameCapital(),
-                                   item->getName(true),
-                                   character->getPossessivePronoun(),
-                                   ToLower(item->getCurrentSlotName()));
     }
+    if (item == nullptr)
+    {
+        character->sendMsg("You don't have that item.\n");
+        return false;
+    }
+    std::string errMessage;
+    if (!character->canWear(item, errMessage))
+    {
+        character->sendMsg(errMessage);
+        return false;
+    }
+    // Remove the item from the player's inventory.
+    character->remInventoryItem(item);
+    // Add the item to the equipment.
+    character->addEquipmentItem(item);
+    // Notify to character.
+    character->sendMsg("You wear %s on your %s.\n", item->getName(true),
+                       ToLower(item->getCurrentSlotName()));
+    // Send the message inside the room.
+    character->room->sendToAll("%s wears %s on %s %s.\n",
+                               {character},
+                               character->getNameCapital(),
+                               item->getName(true),
+                               character->getPossessivePronoun(),
+                               ToLower(item->getCurrentSlotName()));
     return true;
 }
 
@@ -1022,6 +1012,12 @@ bool DoRemove(Character * character, ArgumentHandler & args)
     // Get the item.
     auto item = character->findEquipmentItem(args[0].getContent(),
                                              args[0].getIndex());
+    // If the room is not lit, pick a random item.
+    if (!character->room->isLit())
+    {
+        auto it = TRandInteger<size_t>(0, character->equipment.size() - 1);
+        item = character->equipment[it];
+    }
     // Check if the player has the item equipped.
     if (item == nullptr)
     {
@@ -1066,33 +1062,11 @@ bool DoInventory(Character * character, ArgumentHandler & /*args*/)
             Formatter::gray() + "    You are carrying anything.\n" +
             Formatter::reset());
     }
-    bool roomIsLit = false;
-    bool inventoryLight = false;
     // Check if the room is lit.
-    if (character->room != nullptr)
-    {
-        if ((!character->room->terrain->indoor) &&
-            (MudUpdater::instance().getDayPhase() != DayPhase::Night))
-        {
-            roomIsLit = true;
-        }
-        else
-        {
-            roomIsLit = character->room->isLit();
-        }
-    }
+    bool roomIsLit = character->room->isLit();
     // Check if the inventory contains a lit light source.
-    for (auto item : character->inventory)
-    {
-        if (item->getType() == ModelType::Light)
-        {
-            if (item->toLightItem()->active)
-            {
-                inventoryLight = true;
-                break;
-            }
-        }
-    }
+    bool inventoryIsLit = character->inventoryIsLit();
+    // Prepare the table for the inventory.
     Table table = Table("Inventory");
     table.addColumn("Item", StringAlign::Left);
     table.addColumn("Quantity", StringAlign::Right);
@@ -1101,9 +1075,9 @@ bool DoInventory(Character * character, ArgumentHandler & /*args*/)
     for (auto it : character->inventory)
     {
         TableRow row;
-        row.emplace_back(
-            (roomIsLit || inventoryLight) ? it->getNameCapital() : "Something");
-        if (roomIsLit || inventoryLight)
+        row.emplace_back((roomIsLit || inventoryIsLit) ?
+                         it->getNameCapital() : "Something");
+        if (roomIsLit || inventoryIsLit)
         {
             row.emplace_back(ToString(it->quantity));
         }
@@ -1111,15 +1085,13 @@ bool DoInventory(Character * character, ArgumentHandler & /*args*/)
         {
             if (it->quantity == 1)
             {
-                row.emplace_back(
-                    (roomIsLit || inventoryLight) ? it->getNameCapital()
-                                                  : "One");
+                row.emplace_back((roomIsLit || inventoryIsLit) ?
+                                 it->getNameCapital() : "One");
             }
             else
             {
-                row.emplace_back(
-                    (roomIsLit || inventoryLight) ? it->getNameCapital()
-                                                  : "Some");
+                row.emplace_back((roomIsLit || inventoryIsLit) ?
+                                 it->getNameCapital() : "Some");
             }
         }
         row.emplace_back(ToString(it->getWeight(true)));
@@ -1139,6 +1111,12 @@ bool DoOrganize(Character * character, ArgumentHandler & args)
 {
     // Stop any action the character is executing.
     StopAction(character);
+    // Check if the room is lit.
+    if (!character->room->isLit())
+    {
+        character->sendMsg("You can't see.\n");
+        return false;
+    }
     // Check the number of arguments.
     if (args.empty())
     {
@@ -1214,8 +1192,8 @@ bool DoOpen(Character * character, ArgumentHandler & args)
         character->sendMsg("What do you want to open?\n");
         return false;
     }
-    // Check if the character want to open something in onother direction.
-    auto direction = Mud::instance().findDirection(args[0].getContent(), false);
+    // Check if the character want to open something in another direction.
+    Direction direction = Direction(args[0].getContent(), false);
     if (direction != Direction::None)
     {
         // Check if the direction exists.
@@ -1333,10 +1311,17 @@ bool DoClose(Character * character, ArgumentHandler & args)
         character->sendMsg("What do you want to close?\n");
         return false;
     }
-    // Check if the character want to open something in onother direction.
-    auto direction = Mud::instance().findDirection(args[0].getContent(), false);
+    // Check if the character want to open something in another direction.
+    auto direction = Direction(args[0].getContent(), false);
     if (direction != Direction::None)
     {
+        // If the room is not lit, pick a random direction.
+        if (!character->room->isLit())
+        {
+            auto directions = character->room->getAvailableDirections();
+            auto it = TRandInteger<size_t>(0, directions.size() - 1);
+            direction = directions[it];
+        }
         // Check if the direction exists.
         auto roomExit = character->room->findExit(direction);
         if (roomExit == nullptr)
@@ -1419,8 +1404,29 @@ bool DoClose(Character * character, ArgumentHandler & args)
     }
     else
     {
-        auto container = character->findNearbyItem(args[0].getContent(),
-                                                   args[0].getIndex());
+        Item * container = nullptr;
+        // Check if the room is lit.
+        bool roomIsLit = character->room->isLit();
+        // Check if the inventory is lit.
+        auto inventoryIsLit = character->inventoryIsLit();
+        // If neither the room and the inventory are lit, just stop.
+        if (!roomIsLit && !inventoryIsLit)
+        {
+            character->sendMsg("You can't see.\n");
+            return false;
+        }
+        // If the room is not lit but the inventory is.
+        if (!roomIsLit && inventoryIsLit)
+        {
+            container = character->findInventoryItem(args[0].getContent(),
+                                                     args[0].getIndex());
+        }
+        // If the room is lit.
+        if (roomIsLit)
+        {
+            container = character->findNearbyItem(args[0].getContent(),
+                                                  args[0].getIndex());
+        }
         if (container == nullptr)
         {
             character->sendMsg("What do you want to close?\n");

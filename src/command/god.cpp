@@ -902,7 +902,7 @@ bool DoRoomCreate(Character * character, ArgumentHandler & args)
         return false;
     }
     // Check if it's a direction.
-    auto direction = Mud::instance().findDirection(args[0].getContent(), false);
+    auto direction = Direction(args[0].getContent(), true);
     if (direction == Direction::None)
     {
         character->sendMsg("You must insert a valid direction!\n");
@@ -948,7 +948,7 @@ bool DoRoomDelete(Character * character, ArgumentHandler & args)
         return false;
     }
     // Check if it's a direction.
-    auto direction = Mud::instance().findDirection(args[0].getContent(), false);
+    auto direction = Direction(args[0].getContent(), true);
     if (direction == Direction::None)
     {
         character->sendMsg("You must insert a valid direction!\n");

@@ -393,18 +393,6 @@ public:
     /// @return List of found coins.
     std::vector<Item *> findCoins();
 
-    /// @brief Allows to check if an item is inside the inventory.
-    /// @param item The item to search.
-    /// @return <b>True</b> if the item is inside the inventory,<br>
-    ///         <b>False</b> otherwise.
-    bool hasInventoryItem(Item * item);
-
-    /// @brief Allows to check if an item is inside the equipment.
-    /// @param item The item to search.
-    /// @return <b>True</b> if the item is inside the equipment,<br>
-    ///         <b>False</b> otherwise.
-    bool hasEquipmentItem(Item * item);
-
     /// @brief Add the passed item to character's inventory.
     /// @param item The item to add to inventory.
     virtual void addInventoryItem(Item *& item);
@@ -456,6 +444,11 @@ public:
     /// @return <b>True</b> if the operation goes well,<br>
     ///         <b>False</b> otherwise.
     bool canWear(Item * item, std::string & error) const;
+
+    /// @brief Checks if inside the inventory there is a light source.
+    /// @return <b>True</b> if there is a light source,<br>
+    ///         <b>False</b> otherwise.
+    bool inventoryIsLit() const;
 
     /// @brief Sums the given value to the current thirst.
     /// @param value The value to sum.

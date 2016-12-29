@@ -21,6 +21,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include <functional>
+#include <utilities/utils.hpp>
 #include "direction.hpp"
 #include "coordinates.hpp"
 
@@ -48,15 +49,39 @@ Direction::Direction(Enum _direction) :
     // Nothing to do.
 }
 
-Direction::Direction(const std::string & _direction) :
+Direction::Direction(const std::string & _direction, const bool & exact) :
     direction()
 {
-    if (_direction == "north") direction = North;
-    else if (_direction == "south") direction = South;
-    else if (_direction == "west") direction = West;
-    else if (_direction == "east") direction = East;
-    else if (_direction == "up") direction = Up;
-    else if (_direction == "down") direction = Down;
+    if ((exact && (_direction == "north")) ||
+        (!exact && BeginWith(_direction, "north")))
+    {
+        direction = North;
+    }
+    else if ((exact && (_direction == "south")) ||
+             (!exact && BeginWith(_direction, "south")))
+    {
+        direction = South;
+    }
+    else if ((exact && (_direction == "west")) ||
+             (!exact && BeginWith(_direction, "west")))
+    {
+        direction = West;
+    }
+    else if ((exact && (_direction == "east")) ||
+             (!exact && BeginWith(_direction, "east")))
+    {
+        direction = East;
+    }
+    else if ((exact && (_direction == "up")) ||
+             (!exact && BeginWith(_direction, "up")))
+    {
+        direction = Up;
+    }
+    else if ((exact && (_direction == "down")) ||
+             (!exact && BeginWith(_direction, "down")))
+    {
+        direction = Down;
+    }
     else direction = None;
 }
 
