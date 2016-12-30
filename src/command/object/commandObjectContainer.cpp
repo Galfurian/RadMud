@@ -113,9 +113,16 @@ bool DoOpen(Character * character, ArgumentHandler & args)
         return false;
     }
     // Check if the character want to open something in another direction.
-    Direction direction = Direction(args[0].getContent(), false);
+    auto direction = Direction(args[0].getContent(), false);
     if (direction != Direction::None)
     {
+        // If the room is NOT lit and HAS some exits, pick a random direction.
+        auto directions = character->room->getAvailableDirections();
+        if (!character->room->isLit() && !directions.empty())
+        {
+            auto it = TRandInteger<size_t>(0, directions.size() - 1);
+            direction = directions[it];
+        }
         // Check if the direction exists.
         auto roomExit = character->room->findExit(direction);
         if (roomExit == nullptr)
@@ -192,8 +199,31 @@ bool DoOpen(Character * character, ArgumentHandler & args)
     }
     else
     {
-        auto container = character->findNearbyItem(args[0].getContent(),
-                                                   args[0].getIndex());
+        Item * container = nullptr;
+        // Check if the room is lit.
+        bool roomIsLit = character->room->isLit();
+        // Check if the inventory is lit.
+        auto inventoryIsLit = character->inventoryIsLit();
+        // If the room is lit.
+        if (roomIsLit)
+        {
+            container = character->findNearbyItem(args[0].getContent(),
+                                                  args[0].getIndex());
+        }
+        else
+        {
+            // If the room is not lit but the inventory is.
+            if (inventoryIsLit)
+            {
+                container = character->findInventoryItem(args[0].getContent(),
+                                                         args[0].getIndex());
+            }
+            else
+            {
+                character->sendMsg("You can't see.\n");
+                return false;
+            }
+        }
         if (container == nullptr)
         {
             character->sendMsg("What do you want to open?\n");
@@ -235,10 +265,10 @@ bool DoClose(Character * character, ArgumentHandler & args)
     auto direction = Direction(args[0].getContent(), false);
     if (direction != Direction::None)
     {
-        // If the room is not lit, pick a random direction.
-        if (!character->room->isLit())
+        // If the room is NOT lit and HAS some exits, pick a random direction.
+        auto directions = character->room->getAvailableDirections();
+        if (!character->room->isLit() && !directions.empty())
         {
-            auto directions = character->room->getAvailableDirections();
             auto it = TRandInteger<size_t>(0, directions.size() - 1);
             direction = directions[it];
         }
@@ -329,23 +359,25 @@ bool DoClose(Character * character, ArgumentHandler & args)
         bool roomIsLit = character->room->isLit();
         // Check if the inventory is lit.
         auto inventoryIsLit = character->inventoryIsLit();
-        // If neither the room and the inventory are lit, just stop.
-        if (!roomIsLit && !inventoryIsLit)
-        {
-            character->sendMsg("You can't see.\n");
-            return false;
-        }
-        // If the room is not lit but the inventory is.
-        if (!roomIsLit && inventoryIsLit)
-        {
-            container = character->findInventoryItem(args[0].getContent(),
-                                                     args[0].getIndex());
-        }
         // If the room is lit.
         if (roomIsLit)
         {
             container = character->findNearbyItem(args[0].getContent(),
                                                   args[0].getIndex());
+        }
+        else
+        {
+            // If the room is not lit but the inventory is.
+            if (inventoryIsLit)
+            {
+                container = character->findInventoryItem(args[0].getContent(),
+                                                         args[0].getIndex());
+            }
+            else
+            {
+                character->sendMsg("You can't see.\n");
+                return false;
+            }
         }
         if (container == nullptr)
         {
@@ -384,24 +416,37 @@ bool DoTurn(Character * character, ArgumentHandler & args)
         character->sendMsg("What do you want to turn on/off?\n");
         return false;
     }
-    // Retrieve the item that has to be turned on/off.
-    auto item = character->findEquipmentItem(args[0].getContent(),
-                                             args[0].getIndex());
+    Item * item = nullptr;
+    // Check if the room is lit.
+    bool roomIsLit = character->room->isLit();
+    // Check if the inventory is lit.
+    auto inventoryIsLit = character->inventoryIsLit();
+    // If the room is lit.
+    if (roomIsLit)
+    {
+        item = character->findNearbyItem(args[0].getContent(),
+                                         args[0].getIndex());
+    }
+    else
+    {
+        // If the room is not lit but the inventory is.
+        if (inventoryIsLit)
+        {
+            item = character->findInventoryItem(args[0].getContent(),
+                                                args[0].getIndex());
+        }
+        else if (!character->inventory.empty())
+        {
+            // If the inventory is NOT empty, pick a random item.
+            auto it = TRandInteger<size_t>(0, character->inventory.size() - 1);
+            item = character->inventory[it];
+        }
+    }
     if (item == nullptr)
     {
-        item = character->findInventoryItem(args[0].getContent(),
-                                            args[0].getIndex());
-        if (item == nullptr)
-        {
-            item = character->room->findItem(args[0].getContent(),
-                                             args[0].getIndex());
-            if (item == nullptr)
-            {
-                character->sendMsg("You don't see '%s' anywhere.\n",
-                                   args[0].getContent());
-                return false;
-            }
-        }
+        character->sendMsg("You don't see '%s' anywhere.\n",
+                           args[0].getContent());
+        return false;
     }
     if (item->getType() == ModelType::Light)
     {
@@ -427,6 +472,11 @@ bool DoTurn(Character * character, ArgumentHandler & args)
             }
         }
     }
+    else
+    {
+        character->sendMsg("%s is not a light source.\n",
+                           item->getNameCapital(true));
+    }
     return false;
 }
 
@@ -440,25 +490,45 @@ bool DoRefill(Character * character, ArgumentHandler & args)
         character->sendMsg("What do you want to refill with what?\n");
         return false;
     }
-    // Retrieve the item that has to be refilled.
-    auto itemToRefill = character->findEquipmentItem(args[0].getContent(),
-                                                     args[0].getIndex());
-    if (itemToRefill == nullptr)
+    Item * itemToRefill = nullptr;
+    Item * fuel = nullptr;
+    // Check if the room is lit.
+    bool roomIsLit = character->room->isLit();
+    // Check if the inventory is lit.
+    auto inventoryIsLit = character->inventoryIsLit();
+    // If the room is lit.
+    if (roomIsLit)
     {
-        itemToRefill = character->findInventoryItem(args[0].getContent(),
-                                                    args[0].getIndex());
-        if (itemToRefill == nullptr)
+        itemToRefill = character->findNearbyItem(args[0].getContent(),
+                                                 args[0].getIndex());
+        fuel = character->findNearbyItem(args[1].getContent(),
+                                         args[1].getIndex());
+    }
+    else
+    {
+        // If the room is not lit but the inventory is.
+        if (inventoryIsLit)
         {
-            character->sendMsg("You don't have %s.\n", args[0].getContent());
+            itemToRefill = character->findInventoryItem(args[0].getContent(),
+                                                        args[0].getIndex());
+            fuel = character->findInventoryItem(args[1].getContent(),
+                                                args[1].getIndex());
+        }
+        else
+        {
+            character->sendMsg("You can't do that without seeing,"
+                                   "you could waste most of the fuel.\n");
             return false;
         }
     }
-    // Retrieve the fuel.
-    auto fuel = character->findInventoryItem(args[1].getContent(),
-                                             args[1].getIndex());
+    if (itemToRefill == nullptr)
+    {
+        character->sendMsg("You don't have '%s'.\n", args[0].getContent());
+        return false;
+    }
     if (fuel == nullptr)
     {
-        character->sendMsg("You don't have %s.\n", args[1].getContent());
+        character->sendMsg("You don't have '%s'.\n", args[1].getContent());
         return false;
     }
     std::string error;

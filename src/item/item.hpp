@@ -299,7 +299,7 @@ public:
     /// @return The string describing the content.
     virtual std::string lookContent();
 
-    /// @brief Set the equipment slot where this item must be weared.
+    /// @brief Set the equipment slot where this item must be worn.
     /// @param _currentSlot The new equipment slot.
     void setCurrentSlot(EquipmentSlot _currentSlot);
 

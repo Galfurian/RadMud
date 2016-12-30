@@ -1046,7 +1046,7 @@ bool Character::canWear(Item * item, std::string & error) const
     }
     if (!result)
     {
-        error = "The item is not meant to be weared.\n";
+        error = "The item is not meant to be worn.\n";
         return false;
     }
     if (findEquipmentSlotItem(item->getCurrentSlot()) != nullptr)

@@ -57,7 +57,7 @@ void LoadObjectCommands()
         false, false, false));
     Mud::instance().addCommand(std::make_shared<Command>(
         DoRemove, "remove", "(item)",
-        "Remove a weared or wielded item.",
+        "Remove a worn or wielded item.",
         false, true, false));
     Mud::instance().addCommand(std::make_shared<Command>(
         DoInventory, "inventory", "",

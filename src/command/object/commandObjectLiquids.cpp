@@ -34,22 +34,40 @@ bool DoDrink(Character * character, ArgumentHandler & args)
         character->sendMsg("Drink from what?\n");
         return false;
     }
-    auto container = character->findEquipmentItem(args[0].getContent(),
-                                                  args[0].getIndex());
-    if (container == nullptr)
+    Item * container = nullptr;
+    // Check if the room is lit.
+    bool roomIsLit = character->room->isLit();
+    // Check if the inventory is lit.
+    auto inventoryIsLit = character->inventoryIsLit();
+    // If the room is lit.
+    if (roomIsLit)
     {
-        container = character->findInventoryItem(args[0].getContent(),
-                                                 args[0].getIndex());
-        if (container == nullptr)
+        container = character->findNearbyItem(args[0].getContent(),
+                                              args[0].getIndex());
+    }
+    else
+    {
+        // If the room is not lit but the inventory is.
+        if (inventoryIsLit)
         {
-            container = character->room->findItem(args[0].getContent(),
-                                                  args[0].getIndex());
-            if (container == nullptr)
+            container = character->findInventoryItem(args[0].getContent(),
+                                                     args[0].getIndex());
+        }
+        else
+        {
+            // If the inventory is NOT empty, pick a random item.
+            if (!character->inventory.empty())
             {
-                character->sendMsg("You don't see that container.\n");
-                return false;
+                auto it = TRandInteger<size_t>(0,
+                                               character->inventory.size() - 1);
+                container = character->inventory[it];
             }
         }
+    }
+    if (container == nullptr)
+    {
+        character->sendMsg("You don't see '%s'.\n", args[0].getContent());
+        return false;
     }
     // Execute every necessary checks.
     if (HasFlag(container->flags, ItemFlag::Locked))
@@ -106,38 +124,47 @@ bool DoFill(Character * character, ArgumentHandler & args)
         character->sendMsg("You have to fill something from a source.\n");
         return false;
     }
-    // Search the container.
-    auto container = character->findInventoryItem(args[0].getContent(),
-                                                  args[0].getIndex());
-    if (container == nullptr)
+    Item * container = nullptr;
+    Item * source = nullptr;
+    // Check if the room is lit.
+    bool roomIsLit = character->room->isLit();
+    // Check if the inventory is lit.
+    auto inventoryIsLit = character->inventoryIsLit();
+    // If the room is lit.
+    if (roomIsLit)
     {
-        container = character->findEquipmentItem(args[0].getContent(),
-                                                 args[0].getIndex());
-        if (container == nullptr)
+        container = character->findNearbyItem(args[0].getContent(),
+                                              args[0].getIndex());
+        source = character->findNearbyItem(args[1].getContent(),
+                                           args[1].getIndex());
+    }
+    else
+    {
+        // If the room is not lit but the inventory is.
+        if (inventoryIsLit)
         {
-            character->sendMsg("You don't have any '%s' with you.\n",
-                               args[0].getContent());
+            container = character->findInventoryItem(args[0].getContent(),
+                                                     args[0].getIndex());
+            source = character->findInventoryItem(args[1].getContent(),
+                                                  args[1].getIndex());
+        }
+        else
+        {
+            character->sendMsg("You can't do that without seeing,"
+                                   "you could waste most of the liquid.\n");
             return false;
         }
     }
-    // Search the source.
-    auto source = character->findInventoryItem(args[1].getContent(),
-                                               args[1].getIndex());
-    if ((source == nullptr) || (source == container))
+    if (container == nullptr)
     {
-        source = character->findEquipmentItem(args[1].getContent(),
-                                              args[1].getIndex());
-        if ((source == nullptr) || (source == container))
-        {
-            source = character->room->findItem(args[1].getContent(),
-                                               args[1].getIndex());
-            if (source == nullptr)
-            {
-                character->sendMsg("You don't see any '%s'.\n",
-                                   args[1].getContent());
-                return false;
-            }
-        }
+        character->sendMsg("You don't have any '%s' with you.\n",
+                           args[0].getContent());
+        return false;
+    }
+    if (source == nullptr)
+    {
+        character->sendMsg("You don't see any '%s'.\n", args[1].getContent());
+        return false;
     }
     if (HasFlag(source->flags, ItemFlag::Locked))
     {
@@ -242,37 +269,35 @@ bool DoPour(Character * character, ArgumentHandler & args)
         character->sendMsg("You have to pour something into something else.\n");
         return false;
     }
-    // Search the container.
-    auto source = character->findInventoryItem(args[0].getContent(),
-                                               args[0].getIndex());
-    if (source == nullptr)
+    Item * container = nullptr;
+    Item * source = nullptr;
+    // Check if the room is lit.
+    bool roomIsLit = character->room->isLit();
+    // Check if the inventory is lit.
+    auto inventoryIsLit = character->inventoryIsLit();
+    // If the room is lit.
+    if (roomIsLit)
     {
-        source = character->findEquipmentItem(args[0].getContent(),
-                                              args[0].getIndex());
-        if (source == nullptr)
-        {
-            character->sendMsg("You don't have any '%s' with you.\n",
-                               args[0].getContent());
-            return false;
-        }
+        source = character->findNearbyItem(args[0].getContent(),
+                                           args[0].getIndex());
+        container = character->findNearbyItem(args[1].getContent(),
+                                              args[1].getIndex());
     }
-    // Search the source.
-    auto container = character->findInventoryItem(args[1].getContent(),
-                                                  args[1].getIndex());
-    if ((container == nullptr) || (container == source))
+    else
     {
-        container = character->findEquipmentItem(args[1].getContent(),
-                                                 args[1].getIndex());
-        if ((container == nullptr) || (container == source))
+        // If the room is not lit but the inventory is.
+        if (inventoryIsLit)
         {
-            container = character->room->findItem(args[1].getContent(),
-                                                  args[1].getIndex());
-            if (container == nullptr)
-            {
-                character->sendMsg("You don't see any '%s'.\n",
-                                   args[1].getContent());
-                return false;
-            }
+            source = character->findInventoryItem(args[0].getContent(),
+                                                  args[0].getIndex());
+            container = character->findInventoryItem(args[1].getContent(),
+                                                     args[1].getIndex());
+        }
+        else
+        {
+            character->sendMsg("You can't do that without seeing,"
+                                   "you could waste most of the liquid.\n");
+            return false;
         }
     }
     if (HasFlag(source->flags, ItemFlag::Locked))

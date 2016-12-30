@@ -139,8 +139,8 @@ bool DoWield(Character * character, ArgumentHandler & args)
     // If the room is not lit, check if the inventory contains a light.
     if (!character->room->isLit())
     {
-        // If the inventory is NOT lit, pick a random item.
-        if (!character->inventoryIsLit())
+        // If the inventory is NOT lit and NOT empty, pick a random item.
+        if (!character->inventoryIsLit() && !character->inventory.empty())
         {
             auto it = TRandInteger<size_t>(0, character->inventory.size() - 1);
             item = character->inventory[it];
@@ -172,7 +172,7 @@ bool DoWield(Character * character, ArgumentHandler & args)
     if (!item->model->mustBeWielded())
     {
         character->sendMsg("This item it's not meant to be wield.\n");
-        // In case the item must be weared, advise the player.
+        // In case the item must be worn, advise the player.
         if (item->model->getType() == ModelType::Armor)
         {
             character->sendMsg("Try to wear it instead.\n");
@@ -232,7 +232,7 @@ bool DoWear(Character * character, ArgumentHandler & args)
     }
     if (args[0].getContent() == "all")
     {
-        auto wearedSomething = false;
+        auto wornSomething = false;
         auto untouchedList = character->inventory;
         for (auto iterator : untouchedList)
         {
@@ -246,10 +246,10 @@ bool DoWear(Character * character, ArgumentHandler & args)
             // Add the item to the equipment.
             character->addEquipmentItem(iterator);
             // Notify that something was worn.
-            wearedSomething = true;
+            wornSomething = true;
         }
         // Handle output only if the player has really worn something.
-        if (!wearedSomething)
+        if (!wornSomething)
         {
             character->sendMsg("You had nothing to wear.\n");
             return false;
@@ -267,8 +267,8 @@ bool DoWear(Character * character, ArgumentHandler & args)
     // If the room is not lit, check if the inventory contains a light.
     if (!character->room->isLit())
     {
-        // If the inventory is NOT lit, pick a random item.
-        if (!character->inventoryIsLit())
+        // If the inventory is NOT lit and NOT empty, pick a random item.
+        if (!character->inventoryIsLit() && !character->inventory.empty())
         {
             auto it = TRandInteger<size_t>(0, character->inventory.size() - 1);
             item = character->inventory[it];
@@ -397,8 +397,8 @@ bool DoRemove(Character * character, ArgumentHandler & args)
     // Get the item.
     auto item = character->findEquipmentItem(args[0].getContent(),
                                              args[0].getIndex());
-    // If the room is not lit, pick a random item.
-    if (!character->room->isLit())
+    // If the room is NOT lit and NOT empty, pick a random item.
+    if (!character->room->isLit() && !character->equipment.empty())
     {
         auto it = TRandInteger<size_t>(0, character->equipment.size() - 1);
         item = character->equipment[it];

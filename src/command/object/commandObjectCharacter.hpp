@@ -36,7 +36,7 @@ bool DoEquipments(Character * character, ArgumentHandler & args);
 /// Wield a object, if it can be wielded.
 bool DoWield(Character * character, ArgumentHandler & args);
 
-/// Wear a object, if it can be weared.
+/// Wear a object, if it can be worn.
 bool DoWear(Character * character, ArgumentHandler & args);
 
 /// Remove an equipped or wielded item.
