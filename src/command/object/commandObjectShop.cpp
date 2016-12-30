@@ -39,6 +39,12 @@ bool DoDeposit(Character * character, ArgumentHandler & args)
         character->sendMsg("What do you want to deposit?\n");
         return false;
     }
+    // Check if the room is NOT lit.
+    if (!character->room->isLit())
+    {
+        character->sendMsg("You cannot do that without light.\n");
+        return false;
+    }
     auto item = character->findInventoryItem(args[0].getContent(),
                                              args[0].getIndex());
     auto building = character->room->findBuilding(args[1].getContent(),
@@ -91,7 +97,12 @@ bool DoBuy(Character * character, ArgumentHandler & args)
         character->sendMsg("Buy what from which shop?\n");
         return false;
     }
-
+    // Check if the room is NOT lit.
+    if (!character->room->isLit())
+    {
+        character->sendMsg("You cannot do that without light.\n");
+        return false;
+    }
     // Get the target.
     auto target = character->room->findItem(args[1].getContent(),
                                             args[1].getIndex());
@@ -238,7 +249,12 @@ bool DoSell(Character * character, ArgumentHandler & args)
         character->sendMsg("Sell what to whom?\n");
         return false;
     }
-
+    // Check if the room is NOT lit.
+    if (!character->room->isLit())
+    {
+        character->sendMsg("You cannot do that without light.\n");
+        return false;
+    }
     // Get the item and the target.
     auto item = character->findInventoryItem(args[0].getContent(),
                                              args[0].getIndex());
@@ -362,7 +378,13 @@ bool DoBalance(Character * character, ArgumentHandler & args)
     // Check the number of arguments.
     if (!args.empty())
     {
-        character->sendMsg("You have provided unecessary arguments.\n");
+        character->sendMsg("You have provided unnecessary arguments.\n");
+        return false;
+    }
+    // Check if the room is NOT lit.
+    if (!character->room->isLit())
+    {
+        character->sendMsg("You cannot do that without light.\n");
         return false;
     }
     unsigned int balance = 0;
@@ -370,6 +392,6 @@ bool DoBalance(Character * character, ArgumentHandler & args)
     {
         balance += coin->getPrice(true);
     }
-    character->sendMsg("Your balance is: %s.\n", ToString(balance));
+    character->sendMsg("Your balance is: %s.\n", balance);
     return true;
 }

@@ -97,13 +97,20 @@ bool DoTake(Character * character, ArgumentHandler & args)
             return false;
         }
         // Check if the character wants to take a specific item.
-        auto item = room->findItem(args[0].getContent(),
-                                   args[0].getIndex());
-        // If the room is NOT lit, pick a random item.
+        Item * item = nullptr;
+        // If the room is NOT lit and NOT empty, pick a random item.
         if (!roomIsLit)
         {
             // Pick from the items.
-            item = room->items[TRandInteger<size_t>(0, room->items.size() - 1)];
+            if (!room->items.empty())
+            {
+                item = room->items[TRandInteger<size_t>(0, room->items.size() -
+                                                           1)];
+            }
+        }
+        else
+        {
+            item = room->findItem(args[0].getContent(), args[0].getIndex());
         }
         // If the item is null.
         if (item == nullptr)
@@ -190,9 +197,31 @@ bool DoTake(Character * character, ArgumentHandler & args)
         SQLiteDbms::instance().endTransaction();
         return true;
     }
-
-    auto container = character->findNearbyItem(args[1].getContent(),
-                                               args[1].getIndex());
+    // If the character wants to take an item from a container, the container
+    //  MUST be visible.
+    Item * container = nullptr;
+    // Check if the inventory is lit.
+    auto inventoryIsLit = character->inventoryIsLit();
+    // If the room is lit.
+    if (roomIsLit)
+    {
+        container = character->findNearbyItem(args[0].getContent(),
+                                              args[0].getIndex());
+    }
+    else
+    {
+        // If the room is not lit but the inventory is.
+        if (inventoryIsLit)
+        {
+            container = character->findInventoryItem(args[0].getContent(),
+                                                     args[0].getIndex());
+        }
+        else
+        {
+            character->sendMsg("You can't see.\n");
+            return false;
+        }
+    }
     if (container == nullptr)
     {
         character->sendMsg("You don't see that container.\n");
@@ -263,14 +292,9 @@ bool DoTake(Character * character, ArgumentHandler & args)
                            container->getName(true));
         return false;
     }
+    // Search the item inside the container.
     auto item = container->findContent(args[0].getContent(),
                                        args[0].getIndex());
-    // If the room is NOT lit, pick a random item from the container.
-    if (!roomIsLit)
-    {
-        auto it = TRandInteger<size_t>(0, container->content.size() - 1);
-        item = container->content[it];
-    }
     if (item == nullptr)
     {
         character->sendMsg("You don't see that item inside the container.\n");
@@ -384,13 +408,13 @@ bool DoDrop(Character * character, ArgumentHandler & args)
         return true;
     }
     // Get the item.
-    auto item = character->findInventoryItem(args[0].getContent(),
-                                             args[0].getIndex());
+    Item * item = character->findInventoryItem(args[0].getContent(),
+                                               args[0].getIndex());
     // If the room is not lit, check if the inventory contains a light.
     if (!character->room->isLit())
     {
-        // If the inventory is NOT lit, pick a random item.
-        if (!character->inventoryIsLit())
+        // If the inventory is NOT lit and NOT empty, pick a random item.
+        if (!character->inventoryIsLit() && !character->inventory.empty())
         {
             auto it = TRandInteger<size_t>(0, character->inventory.size() - 1);
             item = character->inventory[it];
@@ -523,77 +547,84 @@ bool DoPut(Character * character, ArgumentHandler & args)
                                    character->getNameCapital(),
                                    character->getSubjectPronoun(),
                                    container->getName(true));
+        return true;
+    }
+    // Find the specific item inside the inventory.
+    auto item = character->findInventoryItem(args[0].getContent(),
+                                             args[0].getIndex());
+    // If the room is not lit, check if the inventory contains a light.
+    if (!character->room->isLit())
+    {
+        // If the inventory is NOT lit and NOT empty, pick a random item.
+        if (!character->inventoryIsLit() && !character->inventory.empty())
+        {
+            auto it = TRandInteger<size_t>(0, character->inventory.size() - 1);
+            item = character->inventory[it];
+        }
+    }
+    if (item == nullptr)
+    {
+        character->sendMsg("You don't have any '%s'.\n", args[0].getContent());
+        return false;
+    }
+    // Set the quantity.
+    auto quantity = args[0].getMultiplier();
+    if (item->quantity < quantity)
+    {
+        quantity = item->quantity;
+    }
+    // Check if the item can be contained inside the destination.
+    if (!container->canContain(item, quantity))
+    {
+        character->sendMsg("%s can't contain any more items.\n",
+                           container->getNameCapital());
+        return false;
+    }
+    // Start a transaction.
+    SQLiteDbms::instance().beginTransaction();
+    if (item->quantity <= quantity)
+    {
+        // Remove the item from the player's inventory.
+        character->remInventoryItem(item);
+        // Put the item inside the container.
+        container->putInside(item);
+        // Send the messages.
+        character->sendMsg("You put %s inside %s.\n",
+                           item->getName(true),
+                           container->getName(true));
+        character->room->sendToAll("%s puts %s inside %s.\n",
+                                   {character},
+                                   character->getNameCapital(),
+                                   item->getName(true),
+                                   container->getName(true));
     }
     else
     {
-        // Find the specific item inside the inventory.
-        auto item = character->findInventoryItem(args[0].getContent(),
-                                                 args[0].getIndex());
-        if (item == nullptr)
+        // Remove from the stack.
+        auto newStack = item->removeFromStack(character, quantity);
+        if (newStack == nullptr)
         {
-            character->sendMsg("You don't have any '%s'.\n",
-                               args[0].getContent());
-            return false;
-        }
-        // Set the quantity.
-        auto quantity = args[0].getMultiplier();
-        if (item->quantity < quantity)
-        {
-            quantity = item->quantity;
-        }
-        // Check if the item can be contained inside the destination.
-        if (!container->canContain(item, quantity))
-        {
-            character->sendMsg("%s can't contain any more items.\n",
-                               container->getNameCapital());
-            return false;
-        }
-        // Start a transaction.
-        SQLiteDbms::instance().beginTransaction();
-        if (item->quantity <= quantity)
-        {
-            // Remove the item from the player's inventory.
-            character->remInventoryItem(item);
-            // Put the item inside the container.
-            container->putInside(item);
-            // Send the messages.
-            character->sendMsg("You put %s inside %s.\n",
+            character->sendMsg("You failed to put part of %s inside %s.\n",
                                item->getName(true),
                                container->getName(true));
-            character->room->sendToAll("%s puts %s inside %s.\n",
-                                       {character},
-                                       character->getNameCapital(),
-                                       item->getName(true),
-                                       container->getName(true));
+            // Rollback the transaction.
+            SQLiteDbms::instance().rollbackTransection();
+            return false;
         }
-        else
-        {
-            // Remove from the stack.
-            auto newStack = item->removeFromStack(character, quantity);
-            if (newStack == nullptr)
-            {
-                character->sendMsg("You failed to put part of %s inside %s.\n",
+        // Put the stack inside the container.
+        container->putInside(newStack);
+        // Send the messages.
+        character->sendMsg("You put part of %s inside %s.\n",
+                           item->getName(true),
+                           container->getName(true));
+        character->room->sendToAll("%s puts %s inside %s.\n",
+                                   {character},
+                                   character->getNameCapital(),
                                    item->getName(true),
                                    container->getName(true));
-                // Rollback the transaction.
-                SQLiteDbms::instance().rollbackTransection();
-                return false;
-            }
-            // Put the stack inside the container.
-            container->putInside(newStack);
-            // Send the messages.
-            character->sendMsg("You put part of %s inside %s.\n",
-                               item->getName(true),
-                               container->getName(true));
-            character->room->sendToAll("%s puts %s inside %s.\n",
-                                       {character},
-                                       character->getNameCapital(),
-                                       item->getName(true),
-                                       container->getName(true));
-        }
-        // Conclude the transaction.
-        SQLiteDbms::instance().endTransaction();
     }
+    // Conclude the transaction.
+    SQLiteDbms::instance().endTransaction();
     return true;
 }
 
@@ -613,8 +644,8 @@ bool DoGive(Character * character, ArgumentHandler & args)
     // If the room is not lit, check if the inventory contains a light.
     if (!character->room->isLit())
     {
-        // If the inventory is NOT lit, pick a random item.
-        if (!character->inventoryIsLit())
+        // If the inventory is NOT lit and NOT empty, pick a random item.
+        if (!character->inventoryIsLit() && !character->inventory.empty())
         {
             auto it = TRandInteger<size_t>(0, character->inventory.size() - 1);
             item = character->inventory[it];
