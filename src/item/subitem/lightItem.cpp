@@ -42,7 +42,7 @@ LightItem::~LightItem()
 std::string LightItem::getName(bool colored) const
 {
     std::string itemName = Item::getName(colored);
-    if (this->active)
+    if (this->isActive())
     {
         itemName += " (lit)";
     }
@@ -52,7 +52,7 @@ std::string LightItem::getName(bool colored) const
 std::string LightItem::getNameCapital(bool colored) const
 {
     std::string itemName = Item::getNameCapital(colored);
-    if (this->active)
+    if (this->isActive())
     {
         itemName += " (lit)";
     }
@@ -69,14 +69,21 @@ void LightItem::getSheet(Table & sheet) const
     sheet.addRow({"Remaining Autonomy", ToString(this->getAutonomy()) + " h"});
 }
 
-
 std::string LightItem::lookContent()
 {
     std::string output;
     auto autonomyInHour = this->getAutonomy() /
                           MudUpdater::instance().getHourTicSize();
     output += Formatter::italic();
-    if (model->toLight()->fuelType != ResourceType::None)
+    if (model->toLight()->fuelType == ResourceType::None)
+    {
+        if (!HasFlag(model->modelFlags, ModelFlag::Unbreakable))
+        {
+            output += "It should have an autonomy of " +
+                      ToString(autonomyInHour) + "h.\n";
+        }
+    }
+    else
     {
         if (content.empty())
         {
@@ -88,12 +95,7 @@ std::string LightItem::lookContent()
                       ToString(autonomyInHour) + "h.\n";
         }
     }
-    else
-    {
-        output += "It should have an autonomy of " +
-                  ToString(autonomyInHour) + "h.\n";
-    }
-    if (active)
+    if (this->isActive())
     {
         output += "It is lit.";
     }
@@ -103,6 +105,11 @@ std::string LightItem::lookContent()
     }
     output += Formatter::reset() + "\n";
     return output;
+}
+
+bool LightItem::isActive() const
+{
+    return active || model->toLight()->alwaysActive;
 }
 
 bool LightItem::canRefillWith(Item * item, std::string & error) const
@@ -209,7 +216,7 @@ double LightItem::getAutonomy() const
 
 void LightItem::updateTicImpl()
 {
-    if (active)
+    if (this->isActive())
     {
         if (model->toLight()->fuelType == ResourceType::None)
         {

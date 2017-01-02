@@ -1,5 +1,4 @@
 /// @file   object.cpp
-/// @brief  Implements the methods used by the player in order to <b>interract with objects</b>.
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2014
 /// @copyright

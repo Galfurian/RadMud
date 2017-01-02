@@ -34,8 +34,8 @@ public:
     ResourceType fuelType;
     /// The maximum radius of the light.
     int radius;
-    /// Recharging polocy
-    unsigned int policy;
+    /// If the light is always active.
+    bool alwaysActive;
     /// Maximum contained weight.
     double maxWeight;
 

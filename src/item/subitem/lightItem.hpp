@@ -44,6 +44,8 @@ public:
 
     std::string lookContent() override;
 
+    bool isActive() const;
+
     /// @brief Determines if this can be refilled with the given item.
     /// @param item  The item, probably the fuel.
     /// @param error The error message in case it cannot be used as fuel.

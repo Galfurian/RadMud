@@ -1,5 +1,4 @@
 /// @file   commandObjectCharacter.cpp
-/// @brief  
 /// @author Enrico Fraccaroli
 /// @date   29/12/2016
 /// @copyright

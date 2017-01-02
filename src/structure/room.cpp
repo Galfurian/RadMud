@@ -415,7 +415,7 @@ bool Room::isLit()
             {
                 if (item->getType() == ModelType::Light)
                 {
-                    if (item->toLightItem()->active)
+                    if (item->toLightItem()->isActive())
                     {
                         if (Area::getDistance(coord, room->coord) <=
                             item->model->toLight()->radius)

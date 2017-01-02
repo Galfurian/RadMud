@@ -53,32 +53,32 @@ Direction::Direction(const std::string & _direction, const bool & exact) :
     direction()
 {
     if ((exact && (_direction == "north")) ||
-        (!exact && BeginWith(_direction, "north")))
+        (!exact && BeginWith("north", _direction)))
     {
         direction = North;
     }
     else if ((exact && (_direction == "south")) ||
-             (!exact && BeginWith(_direction, "south")))
+             (!exact && BeginWith("south", _direction)))
     {
         direction = South;
     }
     else if ((exact && (_direction == "west")) ||
-             (!exact && BeginWith(_direction, "west")))
+             (!exact && BeginWith("west", _direction)))
     {
         direction = West;
     }
     else if ((exact && (_direction == "east")) ||
-             (!exact && BeginWith(_direction, "east")))
+             (!exact && BeginWith("east", _direction)))
     {
         direction = East;
     }
     else if ((exact && (_direction == "up")) ||
-             (!exact && BeginWith(_direction, "up")))
+             (!exact && BeginWith("up", _direction)))
     {
         direction = Up;
     }
     else if ((exact && (_direction == "down")) ||
-             (!exact && BeginWith(_direction, "down")))
+             (!exact && BeginWith("down", _direction)))
     {
         direction = Down;
     }

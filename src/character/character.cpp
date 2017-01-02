@@ -1063,7 +1063,7 @@ bool Character::inventoryIsLit() const
     {
         if (it->getType() == ModelType::Light)
         {
-            if (it->toLightItem()->active)
+            if (it->toLightItem()->isActive())
             {
                 return true;
             }

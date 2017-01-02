@@ -1,5 +1,4 @@
 /// @file   commandObjectContainer.cpp
-/// @brief  
 /// @author Enrico Fraccaroli
 /// @date   29/12/2016
 /// @copyright
@@ -23,6 +22,7 @@
 #include "commandObjectContainer.hpp"
 
 #include "sqliteDbms.hpp"
+#include "lightModel.hpp"
 #include "lightItem.hpp"
 #include "command.hpp"
 #include "room.hpp"
@@ -453,12 +453,24 @@ bool DoTurn(Character * character, ArgumentHandler & args)
         auto lightItem = item->toLightItem();
         if (lightItem->active)
         {
+            if (lightItem->model->toLight()->alwaysActive)
+            {
+                character->sendMsg("You cannot turn off %s.\n",
+                                   item->getName(true));
+                return false;
+            }
             character->sendMsg("You turn off %s.\n", item->getName(true));
             lightItem->active = false;
             return true;
         }
         else
         {
+            if (lightItem->model->toLight()->alwaysActive)
+            {
+                character->sendMsg("You cannot turn on %s.\n",
+                                   item->getName(true));
+                return false;
+            }
             if (lightItem->getAutonomy() > 0)
             {
                 character->sendMsg("You turn on %s.\n", item->getName(true));

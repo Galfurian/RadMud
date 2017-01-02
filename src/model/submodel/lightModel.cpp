@@ -27,7 +27,7 @@
 LightModel::LightModel() :
     fuelType(),
     radius(),
-    policy(),
+    alwaysActive(),
     maxWeight()
 {
     // Nothing to do.
@@ -65,7 +65,7 @@ bool LightModel::setModel(const std::string & source)
     }
     fuelType = ResourceType(ToNumber<unsigned int>(functionList[0]));
     radius = ToNumber<int>(functionList[1]);
-    policy = ToNumber<unsigned int>(functionList[2]);
+    alwaysActive = ToNumber<bool>(functionList[2]);
     maxWeight = ToNumber<double>(functionList[3]);
     return true;
 }
@@ -79,6 +79,6 @@ void LightModel::getSheet(Table & sheet) const
     // Set the values.
     sheet.addRow({"Fuel Type", fuelType.toString()});
     sheet.addRow({"Radius", ToString(radius)});
-    sheet.addRow({"Policy", ToString(policy)});
+    sheet.addRow({"Always Active", ToString(alwaysActive)});
     sheet.addRow({"Max Weight", ToString(maxWeight)});
 }
