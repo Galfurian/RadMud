@@ -28,10 +28,10 @@
 #include "communication.hpp"
 #include "crafting.hpp"
 #include "general.hpp"
-#include "god.hpp"
 #include "manager.hpp"
 #include "commandObject.hpp"
 #include "logger.hpp"
+#include "commandGod.hpp"
 
 Command::Command() :
     handler(),
