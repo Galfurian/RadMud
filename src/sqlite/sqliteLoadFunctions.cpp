@@ -20,14 +20,15 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "sqliteLoadFunctions.hpp"
+#include "sqliteException.hpp"
 
+#include "liquidContainerItem.hpp"
 #include "currencyModel.hpp"
 #include "modelFactory.hpp"
 #include "itemFactory.hpp"
 #include "shopItem.hpp"
 #include "logger.hpp"
 #include "mud.hpp"
-#include "sqliteException.hpp"
 
 bool LoadBadName(ResultSet * result)
 {
@@ -824,6 +825,7 @@ bool LoadLiquid(ResultSet * result)
             liquid->vnum = result->getNextInteger();
             liquid->name = result->getNextString();
             liquid->worth = result->getNextInteger();
+            liquid->quench = result->getNextDouble();
             // Check the correctness.
             if (!liquid->check())
             {
@@ -851,20 +853,21 @@ bool LoadContentLiq(ResultSet * result)
         {
             auto container = Mud::instance().findItem(result->getNextInteger());
             auto liquid = Mud::instance().findLiquid(result->getNextInteger());
-            unsigned int quantity = result->getNextUnsignedInteger();
+            auto quantity = result->getNextDouble();
             if (container == nullptr)
             {
                 throw SQLiteException("Can't find container item.");
+            }
+            if (container->getType() != ModelType::LiquidContainer)
+            {
+                throw SQLiteException("Wrong container for liquids.");
             }
             if (liquid == nullptr)
             {
                 throw SQLiteException("Can't find liquid.");
             }
-            if (quantity == 0)
-            {
-                throw SQLiteException("Liquid content quantity misplaced.");
-            }
-            container->pourIn(liquid, quantity, false);
+            auto liquidContainer = container->toLiquidContainerItem();
+            liquidContainer->pourIn(liquid, quantity, false);
         }
         catch (SQLiteException & e)
         {

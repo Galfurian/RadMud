@@ -1072,57 +1072,35 @@ bool Character::inventoryIsLit() const
     return false;
 }
 
-bool Character::setThirst(int value)
+void Character::addThirst(const int & value)
 {
-    int result = static_cast<int>(this->thirst) + value;
-    if (result < 0)
-    {
-        return false;
-    }
-    else if (result > 100)
-    {
-        this->thirst = 100;
-    }
-    else
-    {
-        this->thirst = static_cast<unsigned int>(result);
-    }
-    return true;
+    thirst += value;
+    if (thirst < 0) thirst = 0;
+    else if (thirst > 100) thirst = 100;
 }
 
 std::string Character::getThirstCondition() const
 {
     // Determine the correct description.
-    if (this->thirst >= 90) return "are not thirsty";
-    else if (this->thirst >= 60) return "are quite thirsty";
-    else if (this->thirst >= 30) return "are thirsty";
+    if (thirst >= 90) return "are not thirsty";
+    else if (thirst >= 60) return "are quite thirsty";
+    else if (thirst >= 30) return "are thirsty";
     else return "are dying of thirst";
 }
 
-bool Character::setHunger(int value)
+void Character::addHunger(const int & value)
 {
-    int result = static_cast<int>(this->hunger) + value;
-    if (result < 0)
-    {
-        return false;
-    }
-    else if (result > 100)
-    {
-        this->hunger = 100;
-    }
-    else
-    {
-        this->hunger = static_cast<unsigned int>(result);
-    }
-    return true;
+    hunger += value;
+    if (hunger < 0) hunger = 0;
+    else if (hunger > 100) hunger = 100;
 }
 
 std::string Character::getHungerCondition() const
 {
     // Determine the correct description.
-    if (this->hunger >= 90) return "are not hungry";
-    else if (this->hunger >= 60) return "are quite hungry";
-    else if (this->hunger >= 30) return "are hungry";
+    if (hunger >= 90) return "are not hungry";
+    else if (hunger >= 60) return "are quite hungry";
+    else if (hunger >= 30) return "are hungry";
     else return "are dying of hunger";
 }
 
@@ -1164,28 +1142,12 @@ void Character::updateStamina()
 
 void Character::updateHunger()
 {
-    unsigned int reduction = 10;
-    if (this->hunger < reduction)
-    {
-        this->hunger = 0;
-    }
-    else
-    {
-        this->hunger -= reduction;
-    }
+    hunger = ((hunger - 1) < 0) ? 0 : hunger - 1;
 }
 
 void Character::updateThirst()
 {
-    unsigned int reduction = 10;
-    if (this->thirst < reduction)
-    {
-        this->thirst = 0;
-    }
-    else
-    {
-        this->thirst -= reduction;
-    }
+    thirst = ((thirst - 1) < 0) ? 0 : thirst - 1;
 }
 
 void Character::updateExpiredEffects()

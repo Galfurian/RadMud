@@ -63,3 +63,8 @@ void CorpseItem::getSheet(Table & sheet) const
     sheet.addDivider();
     // Set the values.
 }
+
+bool CorpseItem::isAContainer() const
+{
+    return true;
+}

@@ -34,6 +34,8 @@ public:
     std::string name;
     /// Liquid's value on market.
     int worth;
+    /// How much the liquid is able to quench the thirst.
+    double quench;
 
     /// @brief Constructor.
     Liquid();

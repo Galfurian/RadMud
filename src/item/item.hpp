@@ -66,6 +66,8 @@ class MagazineItem;
 
 class LightItem;
 
+class LiquidContainerItem;
+
 /// @brief Holds details about items.
 class Item :
     public UpdateInterface
@@ -103,8 +105,6 @@ public:
     EquipmentSlot currentSlot;
     /// List of items contained in this one.
     ItemContainer content;
-    /// The liquid inside the container.
-    std::pair<Liquid *, double> contentLiq;
 
     /// @brief Constructor - Create a new empty item.
     Item();
@@ -229,20 +229,20 @@ public:
     /// @brief Check if the item is a valid container.
     /// @return <b>True</b> if it is a valid container,<br>
     ///         <b>False</b> otherwise.
-    bool isAContainer() const;
+    virtual bool isAContainer() const;
 
     /// @brief Check if the container is empty.
     /// @return <b>True</b> if the item is empty,<br>
     ///         <b>False</b> otherwise.
-    bool isEmpty() const;
+    virtual bool isEmpty() const;
 
     /// @brief Return the total space of the container.
     /// @return The total space as an integer.
-    double getTotalSpace() const;
+    virtual double getTotalSpace() const;
 
     /// @brief Return the used space of the container.
     /// @return The used space as an integer.
-    double getUsedSpace() const;
+    virtual double getUsedSpace() const;
 
     /// @brief Return the free space inside the container.
     /// @return The free unit of space as an integer.
@@ -266,28 +266,6 @@ public:
     /// @return <b>True</b> if the item has been taken out,<br>
     ///         <b>False</b> otherwise.
     bool takeOut(Item * item, bool updateDB = true);
-
-    /// @brief Check if this item can contain the passed one.
-    /// @param liquid The liquid to pour in.
-    /// @param amount The amount of liquid.
-    /// @return <b>True</b> if it can be contained,<br>
-    ///         <b>False</b> otherwise.
-    bool canContainLiquid(Liquid * liquid, const double & amount) const;
-
-    /// @brief Load some liquid inside the container and update the database.
-    /// @param liquid The liquid to load in.
-    /// @param amount The amount of liquid.
-    /// @param updateDB If the action has to be updated on the database.
-    /// @return <b>True</b> if the operation is a success,<br>
-    ///         <b>False</b> otherwise.
-    bool pourIn(Liquid * liquid, const double & amount, bool updateDB = true);
-
-    /// @brief Extract some liquid from the container and update the database.
-    /// @param amount   The amount of liquid.
-    /// @param updateDB If the action has to be updated on the database.
-    /// @return <b>True</b> if the operation is a success,<br>
-    ///         <b>False</b> otherwise.
-    bool pourOut(const double & amount, bool updateDB = true);
 
     /// @brief Search for the item inside the container.
     /// @param search_parameter The item to search.
@@ -334,6 +312,9 @@ public:
 
     /// @brief Returns the model <b>statically</b> casted to Light.
     LightItem * toLightItem();
+
+    /// @brief Returns the model <b>statically</b> casted to Liquid Container.
+    LiquidContainerItem * toLiquidContainerItem();
 
     /// @brief Function used to register inside the lua environment the class.
     /// @param L The lua environment.

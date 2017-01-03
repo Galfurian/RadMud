@@ -280,50 +280,6 @@ bool DoItemList(Character * character, ArgumentHandler & args)
     return true;
 }
 
-bool DoLiquidCreate(Character * character, ArgumentHandler & args)
-{
-    if (args.size() != 3)
-    {
-        character->sendMsg("Usage: [Item] [Liquid] [Quantity].\n");
-        return false;
-    }
-    auto item = character->findNearbyItem(args[0].getContent(),
-                                          args[0].getIndex());
-    if (item == nullptr)
-    {
-        character->sendMsg("Can't find the desire item.\n");
-        return false;
-    }
-    if (item->model->getType() != ModelType::LiquidContainer)
-    {
-        character->sendMsg("The item is not a container of liquids.\n");
-        return false;
-    }
-    auto liquidVnum = ToNumber<int>(args[1].getContent());
-    auto liquid = Mud::instance().findLiquid(liquidVnum);
-    if (liquid == nullptr)
-    {
-        character->sendMsg("Can't find the desire liquid %s.\n", liquidVnum);
-        return false;
-    }
-    auto quantity = ToNumber<int>(args[2].getContent());
-    if ((quantity <= 0) || (quantity >= 100))
-    {
-        character->sendMsg("Accepted quantity of liquids (from 1 to 99).\n");
-        return false;
-    }
-    if (!item->pourIn(liquid, static_cast<unsigned int>(quantity)))
-    {
-        character->sendMsg("Item can't contain that quantity of liquid.\n");
-        return false;
-    }
-    character->sendMsg("You materialise %s units of %s inside %s.\n",
-                       ToString(quantity),
-                       liquid->getName(),
-                       item->getName(true));
-    return true;
-}
-
 bool DoModelInfo(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 1)

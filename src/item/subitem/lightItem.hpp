@@ -42,6 +42,8 @@ public:
 
     void getSheet(Table & sheet) const override;
 
+    double getTotalSpace() const override;
+
     std::string lookContent() override;
 
     bool isActive() const;

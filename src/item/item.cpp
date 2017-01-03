@@ -26,15 +26,13 @@
 #include "logger.hpp"
 #include "shopItem.hpp"
 #include "lightItem.hpp"
-#include "lightModel.hpp"
-#include "shopModel.hpp"
 #include "armorItem.hpp"
 #include "corpseItem.hpp"
 #include "currencyItem.hpp"
 #include "containerModel.hpp"
 #include "meleeWeaponItem.hpp"
 #include "rangedWeaponItem.hpp"
-#include "liquidContainerModel.hpp"
+#include "liquidContainerItem.hpp"
 
 Item::Item() :
     vnum(),
@@ -52,8 +50,7 @@ Item::Item() :
     owner(),
     container(),
     currentSlot(EquipmentSlot::None),
-    content(),
-    contentLiq()
+    content()
 {
 }
 
@@ -231,14 +228,6 @@ void Item::getSheet(Table & sheet) const
         }
         sheet.addDivider();
     }
-    if (model->getType() == ModelType::LiquidContainer)
-    {
-        sheet.addDivider();
-        sheet.addRow({"Liquid", "Quantity"});
-        sheet.addRow({contentLiq.first->getNameCapital(),
-                      ToString(contentLiq.second)});
-        sheet.addDivider();
-    }
     if (this->isAContainer() ||
         (model->getType() == ModelType::LiquidContainer))
     {
@@ -400,13 +389,6 @@ double Item::getWeight(bool entireStack) const
             totalWeight += iterator->getWeight(true);
         }
     }
-    else if (model->getType() == ModelType::LiquidContainer)
-    {
-        if (!this->isEmpty())
-        {
-            totalWeight += contentLiq.second;
-        }
-    }
     return totalWeight;
 }
 
@@ -473,16 +455,7 @@ std::string Item::getLook()
 
 bool Item::isAContainer() const
 {
-    if (model->getType() == ModelType::Container)
-    {
-        return true;
-    }
-    if (model->getType() == ModelType::Corpse)
-    {
-        return true;
-    }
-    return ((model->getType() == ModelType::Shop)
-            && HasFlag(this->flags, ItemFlag::Built));
+    return (model->getType() == ModelType::Container);
 }
 
 bool Item::isEmpty() const
@@ -494,39 +467,19 @@ bool Item::isEmpty() const
     {
         return content.empty();
     }
-    if (model->getType() == ModelType::LiquidContainer)
-    {
-        return contentLiq.first == nullptr;
-    }
     return true;
 }
 
 double Item::getTotalSpace() const
 {
-    // The base space.
-    double spaceBase = 0.0;
     if (model->getType() == ModelType::Container)
     {
-        // Set the base space.
-        spaceBase = model->toContainer()->maxWeight;
+        // The base space.
+        double spaceBase = model->toContainer()->maxWeight;
+        // Evaluate the result.
+        return ((spaceBase + (spaceBase * quality.getModifier())) / 2);
     }
-    if (model->getType() == ModelType::LiquidContainer)
-    {
-        // Set the base space.
-        spaceBase = model->toLiquidContainer()->maxWeight;
-    }
-    if (model->getType() == ModelType::Light)
-    {
-        // Set the base space.
-        spaceBase = model->toLight()->maxWeight;
-    }
-    if (model->getType() == ModelType::Shop)
-    {
-        // Set the base space.
-        spaceBase = model->toShop()->maxWeight;
-    }
-    // Evaluate the result.
-    return ((spaceBase + (spaceBase * quality.getModifier())) / 2);
+    return 0.0;
 }
 
 double Item::getUsedSpace() const
@@ -537,13 +490,6 @@ double Item::getUsedSpace() const
         for (auto iterator : content)
         {
             used += iterator->getWeight(true);
-        }
-    }
-    else if (model->getType() == ModelType::LiquidContainer)
-    {
-        if (contentLiq.first != nullptr)
-        {
-            used += contentLiq.second;
         }
     }
     return used;
@@ -611,102 +557,6 @@ bool Item::takeOut(Item * item, bool updateDB)
     return true;
 }
 
-bool Item::canContainLiquid(Liquid * liquid, const double & amount) const
-{
-    if (amount > this->getFreeSpace())
-    {
-        return false;
-    }
-    if (contentLiq.first != liquid)
-    {
-        return false;
-    }
-    return true;
-}
-
-bool Item::pourIn(Liquid * liquid, const double & amount, bool updateDB)
-{
-    if (this->canContainLiquid(liquid, amount))
-    {
-        if (contentLiq.first == nullptr)
-        {
-            // Set the liquid amount.
-            contentLiq.first = liquid;
-            contentLiq.second = amount;
-        }
-        else if (contentLiq.first == liquid)
-        {
-            // Increment the liquid amount.
-            contentLiq.second += amount;
-        }
-        // Prepare the query arguments.
-        if (updateDB)
-        {
-            SQLiteDbms::instance().insertInto(
-                "ItemContentLiq",
-                {ToString(vnum), ToString(contentLiq.first->vnum),
-                 ToString(contentLiq.second)},
-                false,
-                true);
-        }
-        return true;
-    }
-    return false;
-}
-
-bool Item::pourOut(const double & amount, bool updateDB)
-{
-    if (model->getType() != ModelType::LiquidContainer)
-    {
-        return false;
-    }
-    // If the item has an Endless provision of liquid, don't do any check.
-    if (HasFlag(model->toLiquidContainer()->liquidFlags,
-                LiqContainerFlag::Endless))
-    {
-        return true;
-    }
-    // Check if the container has the necessary amount of liquid.
-    if (contentLiq.second >= amount)
-    {
-        // Decrement the liquid amount.
-        contentLiq.second -= amount;
-        if (updateDB)
-        {
-            // Check if the quantity has dropped to zero.
-            if (contentLiq.second < 0.1)
-            {
-                QueryList where;
-                where.push_back(
-                    std::make_pair("container",
-                                   ToString(vnum)));
-                where.push_back(
-                    std::make_pair("content",
-                                   ToString(contentLiq.first->vnum)));
-                // If the container is empty, remove the entry from
-                //  the liquid contained table.
-                SQLiteDbms::instance().deleteFrom("ItemContentLiq", where);
-                // Erase the key of the liquid.
-                contentLiq.first = nullptr;
-            }
-            else
-            {
-                SQLiteDbms::instance().insertInto(
-                    "ItemContentLiq",
-                    {
-                        ToString(vnum),
-                        ToString(contentLiq.first->vnum),
-                        ToString(contentLiq.second)
-                    },
-                    false,
-                    true);
-            }
-        }
-        return true;
-    }
-    return false;
-}
-
 Item * Item::findContent(std::string search_parameter, int & number)
 {
     if (this->isEmpty())
@@ -729,6 +579,11 @@ Item * Item::findContent(std::string search_parameter, int & number)
 
 std::string Item::lookContent()
 {
+    if (!this->isAContainer())
+    {
+        return "";
+    }
+    std::string output;
     auto Italic = [](const std::string & s)
     {
         return Formatter::italic() + s + Formatter::reset();
@@ -737,82 +592,39 @@ std::string Item::lookContent()
     {
         return Formatter::yellow() + s + Formatter::reset();
     };
-    std::string output;
-    if (this->isAContainer())
+    if (HasFlag(this->flags, ItemFlag::Closed))
     {
-        if (HasFlag(this->flags, ItemFlag::Closed))
+        output += Italic("It is closed.\n");
+        if (!HasFlag(this->model->modelFlags, ModelFlag::CanSeeThrough))
         {
-            output += Italic("It is closed.\n");
-            if (!HasFlag(this->model->modelFlags, ModelFlag::CanSeeThrough))
-            {
-                return output + "\n";
-            }
-        }
-        if (content.empty())
-        {
-            output += Italic("It's empty.\n");
-        }
-        else
-        {
-            output += "Looking inside you see:\n";
-            Table table = Table();
-            table.addColumn("Item", StringAlign::Left);
-            table.addColumn("Quantity", StringAlign::Right);
-            table.addColumn("Weight", StringAlign::Right);
-            // List all the contained items.
-            for (auto it : content)
-            {
-                table.addRow(
-                    {
-                        it->getNameCapital(),
-                        ToString(it->quantity),
-                        ToString(it->getWeight(true))
-                    });
-            }
-            output += table.getTable();
-            output += "Has been used " + Yellow(ToString(getUsedSpace()));
-            output += " out of " + Yellow(ToString(getTotalSpace())) +
-                      " " + Mud::instance().getWeightMeasure() + ".\n";
+            return output + "\n";
         }
     }
-    else if (model->getType() == ModelType::LiquidContainer)
+    if (content.empty())
     {
-        if (HasFlag(this->flags, ItemFlag::Closed))
+        output += Italic("It's empty.\n");
+    }
+    else
+    {
+        output += "Looking inside you see:\n";
+        Table table = Table();
+        table.addColumn("Item", StringAlign::Left);
+        table.addColumn("Quantity", StringAlign::Right);
+        table.addColumn("Weight", StringAlign::Right);
+        // List all the contained items.
+        for (auto it : content)
         {
-            output += Italic("It is closed.\n");
-            if (!HasFlag(this->model->modelFlags, ModelFlag::CanSeeThrough))
-            {
-                return output + "\n";
-            }
+            table.addRow(
+                {
+                    it->getNameCapital(),
+                    ToString(it->quantity),
+                    ToString(it->getWeight(true))
+                });
         }
-        if (contentLiq.first == nullptr)
-        {
-            output += Formatter::italic() + "It does not contain any liquid.\n"
-                      + Formatter::reset();
-        }
-        else
-        {
-            int percent = 0;
-            if (HasFlag(this->model->toLiquidContainer()->liquidFlags,
-                        LiqContainerFlag::Endless))
-            {
-                percent = 100;
-            }
-            else if (getUsedSpace() > 0)
-            {
-                percent = static_cast<int>((100.0 * this->getUsedSpace()) /
-                                           this->getTotalSpace());
-            }
-
-            if (percent >= 100) output += "It's full of ";
-            else if (percent >= 75) output += "It's half full of ";
-            else if (percent >= 50) output += "Contains a discrete amount of ";
-            else if (percent >= 25) output += "It contains a little bit of ";
-            else if (percent >= 0) output += "It contains some drops of ";
-            else output += "It's empty, but you can see some ";
-            output += Formatter::cyan() + contentLiq.first->getName() +
-                      Formatter::reset() + ".\n";
-        }
+        output += table.getTable();
+        output += "Has been used " + Yellow(ToString(getUsedSpace()));
+        output += " out of " + Yellow(ToString(getTotalSpace())) +
+                  " " + Mud::instance().getWeightMeasure() + ".\n";
     }
     return output;
 }
@@ -874,6 +686,11 @@ MagazineItem * Item::toMagazineItem()
 LightItem * Item::toLightItem()
 {
     return static_cast<LightItem *>(this);
+}
+
+LiquidContainerItem * Item::toLiquidContainerItem()
+{
+    return static_cast<LiquidContainerItem *>(this);
 }
 
 void Item::luaRegister(lua_State * L)

@@ -93,9 +93,9 @@ public:
     /// Character stamina value.
     unsigned int stamina;
     /// Character level of hunger
-    unsigned int hunger;
+    int hunger;
     /// Character level of thirst.
-    unsigned int thirst;
+    int thirst;
     /// Character abilities.
     std::map<Ability, unsigned int> abilities;
     /// The current room the character is in.
@@ -452,9 +452,7 @@ public:
 
     /// @brief Sums the given value to the current thirst.
     /// @param value The value to sum.
-    /// @return <b>True</b> if the new value is geq 0,<br>
-    ///         <b>False</b> otherwise.
-    bool setThirst(int value);
+    void addThirst(const int & value);
 
     /// @brief Get character level of thirst.
     /// @return Thirst of this character.
@@ -462,9 +460,7 @@ public:
 
     /// @brief Sums the given value to the current hunger.
     /// @param value The value to sum.
-    /// @return <b>True</b> if the new value is geq 0,<br>
-    ///         <b>False</b> otherwise.
-    bool setHunger(int value);
+    void addHunger(const int & value);
 
     /// @brief Get character level of hunger.
     /// @return Hunger of this character.

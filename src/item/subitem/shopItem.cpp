@@ -22,6 +22,7 @@
 #include "shopItem.hpp"
 
 #include "currencyItem.hpp"
+#include "shopModel.hpp"
 #include "logger.hpp"
 #include "mud.hpp"
 
@@ -120,6 +121,20 @@ bool ShopItem::canDeconstruct(std::string & error) const
         return false;
     }
     return true;
+}
+
+bool ShopItem::isAContainer() const
+{
+    // The shop can be considered a container only if built.
+    return HasFlag(this->flags, ItemFlag::Built);
+}
+
+double ShopItem::getTotalSpace() const
+{
+    // The base space.
+    double spaceBase = model->toShop()->maxWeight;
+    // Evaluate the result.
+    return ((spaceBase + (spaceBase * quality.getModifier())) / 2);
 }
 
 std::string ShopItem::lookContent()

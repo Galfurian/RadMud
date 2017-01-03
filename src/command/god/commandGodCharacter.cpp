@@ -189,8 +189,8 @@ bool DoFeast(Character * character, ArgumentHandler & args)
     }
     target->setHealth(target->getMaxHealth(), true);
     target->setStamina(target->getMaxStamina(), true);
-    target->setThirst(100);
-    target->setHunger(100);
+    target->thirst = 100;
+    target->hunger = 100;
     target->sendMsg(
         "%sA banquet with any kind of delicacy appears from nowhere!%s%s\n",
         Formatter::magenta(), Formatter::reset(),

@@ -1,6 +1,6 @@
-/// @file   commandGodItem.hpp
+/// @file   commandGodLiquid.hpp
 /// @author Enrico Fraccaroli
-/// @date   Jan 02 2017
+/// @date   Jan 03 2017
 /// @copyright
 /// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -23,26 +23,11 @@
 
 #include "commandGod.hpp"
 
-/// Generate a new item from the vnum of a model.
-bool DoItemCreate(Character * character, ArgumentHandler & args);
+/// Provide all the information regarding the given liquid.
+bool DoLiquidInfo(Character * character, ArgumentHandler & args);
 
-/// Destroy an item.
-bool DoItemDestroy(Character * character, ArgumentHandler & args);
+/// Get the list of liquids.
+bool DoLiquidList(Character * character, ArgumentHandler & args);
 
-/// Materialize an item from everywhere.
-bool DoItemGet(Character * character, ArgumentHandler & args);
-
-/// Get information about an item.
-bool DoItemInfo(Character * character, ArgumentHandler & args);
-
-/// List all the items in the Mud.
-bool DoItemList(Character * character, ArgumentHandler & args);
-
-/// Show all the information fo the desired model.
-bool DoModelInfo(Character * character, ArgumentHandler & args);
-
-/// List all the model used to define items.
-bool DoModelList(Character * character, ArgumentHandler & args);
-
-/// List all the writings.
-bool DoWritingList(Character * character, ArgumentHandler & args);
+/// Create the item with the given liquid inside a container.
+bool DoLiquidCreate(Character * character, ArgumentHandler & args);

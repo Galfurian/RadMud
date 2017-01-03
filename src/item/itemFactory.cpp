@@ -31,6 +31,7 @@
 #include "magazineItem.hpp"
 #include "meleeWeaponItem.hpp"
 #include "rangedWeaponItem.hpp"
+#include "liquidContainerItem.hpp"
 
 Item * ItemFactory::newItem(const ModelType & type)
 {
@@ -73,6 +74,10 @@ Item * ItemFactory::newItem(const ModelType & type)
     if (type == ModelType::Resource)
     {
         return new ResourceItem();
+    }
+    if (type == ModelType::LiquidContainer)
+    {
+        return new LiquidContainerItem();
     }
     return new Item();
 }

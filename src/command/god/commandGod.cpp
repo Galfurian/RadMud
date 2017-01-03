@@ -26,6 +26,7 @@
 #include "commandGodMud.hpp"
 #include "commandGodItem.hpp"
 #include "commandGodMobile.hpp"
+#include "commandGodLiquid.hpp"
 #include "commandGodCreation.hpp"
 #include "commandGodCharacter.hpp"
 #include "commandGodStructure.hpp"
@@ -177,10 +178,6 @@ void LoadGodCommands()
         "List all the items.",
         true, true, false));
     Mud::instance().addCommand(std::make_shared<Command>(
-        DoLiquidCreate, "liquid_create", "(container)(liquid vnum) (quantity)",
-        "Materialize some liquid sinde a container.",
-        true, true, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
         DoModelInfo, "model_info", "(model vnum)",
         "List all the information about a model.",
         true, true, false));
@@ -235,14 +232,6 @@ void LoadGodCommands()
         "List all the buildings.",
         true, true, false));
     Mud::instance().addCommand(std::make_shared<Command>(
-        DoLiquidInfo, "liquid_information", "(liquid name)",
-        "Show the information about a specific liquid.",
-        true, true, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoLiquidList, "liquid_list", "",
-        "List all the liquids.",
-        true, true, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
         DoProfessionInfo, "profession_information", "(profession command)",
         "Provide all the information regarding the given profession.",
         true, true, false));
@@ -257,5 +246,20 @@ void LoadGodCommands()
     Mud::instance().addCommand(std::make_shared<Command>(
         DoProductionList, "production_list", "",
         "Get the list of all the productions.",
+        true, true, false));
+
+    // ////////////////////////////////////////////////////////////////////////
+    // COMMAND GOD LIQUID
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoLiquidInfo, "liquid_information", "(liquid name)",
+        "Show the information about a specific liquid.",
+        true, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoLiquidList, "liquid_list", "",
+        "List all the liquids.",
+        true, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoLiquidCreate, "liquid_create", "(container)(liquid vnum) (quantity)",
+        "Materialize some liquid sinde a container.",
         true, true, false));
 }

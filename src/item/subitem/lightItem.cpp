@@ -69,6 +69,14 @@ void LightItem::getSheet(Table & sheet) const
     sheet.addRow({"Remaining Autonomy", ToString(this->getAutonomy()) + " h"});
 }
 
+double LightItem::getTotalSpace() const
+{
+    // The base space.
+    double spaceBase = model->toLight()->maxWeight;
+    // Evaluate the result.
+    return ((spaceBase + (spaceBase * quality.getModifier())) / 2);
+}
+
 std::string LightItem::lookContent()
 {
     std::string output;

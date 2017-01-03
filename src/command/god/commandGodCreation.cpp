@@ -137,48 +137,6 @@ bool DoBuildingList(Character * character, ArgumentHandler & /*args*/)
     return true;
 }
 
-bool DoLiquidInfo(Character * character, ArgumentHandler & args)
-{
-    if (args.size() != 1)
-    {
-        character->sendMsg("You must provide a liquid vnum.\n");
-        return false;
-    }
-    auto liquidVnum = ToNumber<int>(args[0].getContent());
-    auto liquid = Mud::instance().findLiquid(liquidVnum);
-    if (liquid == nullptr)
-    {
-        character->sendMsg("Can't find the desire liquid %s.\n", liquidVnum);
-        return false;
-    }
-    std::string msg;
-    msg += "Vnum  : " + ToString(liquid->vnum) + "\n";
-    msg += "Name  : " + liquid->getNameCapital() + "\n";
-    msg += "Worth : " + ToString(liquid->worth) + "\n";
-    character->sendMsg(msg);
-    return true;
-}
-
-bool DoLiquidList(Character * character, ArgumentHandler & /*args*/)
-{
-    Table table;
-    table.addColumn("VNUM", StringAlign::Center);
-    table.addColumn("NAME", StringAlign::Right);
-    table.addColumn("WORTH", StringAlign::Right);
-    for (auto iterator : Mud::instance().mudLiquids)
-    {
-        // Prepare the row.
-        TableRow row;
-        row.push_back(ToString(iterator.second->vnum));
-        row.push_back(iterator.second->getNameCapital());
-        row.push_back(ToString(iterator.second->worth));
-        // Add the row to the table.
-        table.addRow(row);
-    }
-    character->sendMsg(table.getTable());
-    return true;
-}
-
 bool DoProfessionInfo(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 1)

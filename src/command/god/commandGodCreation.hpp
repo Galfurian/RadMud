@@ -35,12 +35,6 @@ bool DoBuildingInfo(Character * character, ArgumentHandler & args);
 /// Get the list of buildings.
 bool DoBuildingList(Character * character, ArgumentHandler & args);
 
-/// Provide all the information regarding the given liquid.
-bool DoLiquidInfo(Character * character, ArgumentHandler & args);
-
-/// Get the list of liquids.
-bool DoLiquidList(Character * character, ArgumentHandler & args);
-
 /// Provide all the information regarding the given profession.
 bool DoProfessionInfo(Character * character, ArgumentHandler & args);
 

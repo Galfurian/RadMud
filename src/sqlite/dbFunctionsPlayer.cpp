@@ -205,13 +205,13 @@ bool SQLiteDbms::loadPlayerInformation(ResultSet * result, Player * player)
     {
         int value;
         if (!result->getDataInteger(column++, value)) return false;
-        player->setHunger(value);
+        player->hunger = value;
     }
     // Thirst
     {
         int value;
         if (!result->getDataInteger(column++, value)) return false;
-        player->setThirst(value);
+        player->thirst = value;
     }
     // Rent Room
     if (!result->getDataInteger(column++, player->rent_room)) return false;

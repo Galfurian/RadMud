@@ -55,6 +55,10 @@ public:
 
     bool canDeconstruct(std::string & error) const override;
 
+    bool isAContainer() const override;
+
+    double getTotalSpace() const override;
+
     std::string lookContent() override;
 
     /// @brief Allows to set the new shop keeper.

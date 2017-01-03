@@ -27,7 +27,8 @@
 Liquid::Liquid() :
     vnum(),
     name(),
-    worth()
+    worth(),
+    quench()
 {
     // Nothing to do.
 }
