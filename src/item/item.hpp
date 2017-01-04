@@ -35,6 +35,15 @@
 #include "liquid.hpp"
 #include "table.hpp"
 
+// Forward declarations.
+#include "forwardedItems.hpp"
+
+class Room;
+
+class Character;
+
+class Material;
+
 /// Used to determine the flag of the item.
 using ItemFlag = enum class ItemFlag_t
 {
@@ -43,30 +52,6 @@ using ItemFlag = enum class ItemFlag_t
     Locked = 2,
     Built = 4
 };
-
-class Room;
-
-class Character;
-
-class Material;
-
-class ShopItem;
-
-class ArmorItem;
-
-class MeleeWeaponItem;
-
-class RangedWeaponItem;
-
-class CurrencyItem;
-
-class CorpseItem;
-
-class MagazineItem;
-
-class LightItem;
-
-class LiquidContainerItem;
 
 /// @brief Holds details about items.
 class Item :

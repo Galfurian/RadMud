@@ -204,16 +204,16 @@ bool DoTake(Character * character, ArgumentHandler & args)
     // If the room is lit.
     if (roomIsLit)
     {
-        container = character->findNearbyItem(args[0].getContent(),
-                                              args[0].getIndex());
+        container = character->findNearbyItem(args[1].getContent(),
+                                              args[1].getIndex());
     }
     else
     {
         // If the room is not lit but the inventory is.
         if (inventoryIsLit)
         {
-            container = character->findInventoryItem(args[0].getContent(),
-                                                     args[0].getIndex());
+            container = character->findInventoryItem(args[1].getContent(),
+                                                     args[1].getIndex());
         }
         else
         {

@@ -1,9 +1,8 @@
-/// @file   unloadAction.hpp
-/// @brief  Class which manage unloading activities.
+/// @file   forwardedItems.hpp
 /// @author Enrico Fraccaroli
-/// @date   Oct 10 2016
+/// @date   Jan 04 2017
 /// @copyright
-/// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
+/// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
 /// copy of this software and associated documentation files (the "Software"),
 /// to deal in the Software without restriction, including without limitation
@@ -22,34 +21,22 @@
 
 #pragma once
 
-#include "generalAction.hpp"
-#include "rangedWeaponItem.hpp"
+class ShopItem;
 
-/// @brief Allows to load something.
-class UnloadAction :
-    public GeneralAction
-{
-private:
-    /// The item which has to be unloaded.
-    Item * item;
+class ArmorItem;
 
-public:
-    /// @brief Constructor.
-    UnloadAction(Character * _actor, Item * _item);
+class MeleeWeaponItem;
 
-    /// @brief Destructor.
-    virtual ~UnloadAction();
+class RangedWeaponItem;
 
-    bool check(std::string & error) const override;
+class CurrencyItem;
 
-    ActionType getType() const override;
+class CorpseItem;
 
-    std::string getDescription() const override;
+class MagazineItem;
 
-    std::string stop() override;
+class LightItem;
 
-    ActionStatus perform() override;
+class LiquidContainerItem;
 
-    /// @brief Provides the required time for the item to be unloaded.
-    static unsigned int getUnloadTime(Item * _itemToBeUnloaded);
-};
+class ContainerItem;

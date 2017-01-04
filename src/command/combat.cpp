@@ -312,19 +312,6 @@ bool DoUnload(Character * character, ArgumentHandler & args)
                            itemToUnload->getNameCapital(true));
         return false;
     }
-    // Set the required time to unloaded the item.
-    if (itemToUnload->getType() == ModelType::Magazine)
-    {
-        auto loadedItem = itemToUnload->toMagazineItem()
-                                      ->getAlreadyLoadedProjectile();
-        if (loadedItem == nullptr)
-        {
-            character->sendMsg(
-                "Something is gone wrong while you were unloading %s...\n\n",
-                itemToUnload->getName(true));
-            return false;
-        }
-    }
     // Create the unload action.
     auto newAction = std::make_shared<UnloadAction>(character, itemToUnload);
     std::string error;

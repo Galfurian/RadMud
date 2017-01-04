@@ -26,14 +26,14 @@
 #include "character.hpp"
 #include "logger.hpp"
 
-UnloadAction::UnloadAction(Character * _actor, Item * _itemToBeUnloaded) :
+UnloadAction::UnloadAction(Character * _actor, Item * _item) :
     GeneralAction(_actor),
-    itemToBeUnloaded(_itemToBeUnloaded)
+    item(_item)
 {
     // Debugging message.
     //Logger::log(LogLevel::Debug, "Created UnloadAction.");
     // Reset the cooldown of the action.
-    this->resetCooldown(UnloadAction::getUnloadTime(_itemToBeUnloaded));
+    this->resetCooldown(UnloadAction::getUnloadTime(_item));
 }
 
 UnloadAction::~UnloadAction()
@@ -47,26 +47,26 @@ bool UnloadAction::check(std::string & error) const
     {
         return false;
     }
-    if (itemToBeUnloaded == nullptr)
+    if (item == nullptr)
     {
         Logger::log(LogLevel::Error, "The item is a null pointer.");
         error = "The item you want to unload is missing.";
         return false;
     }
-    if (itemToBeUnloaded->isEmpty())
+    if (item->isEmpty())
     {
-        error = itemToBeUnloaded->getNameCapital(true) + " is already empty.";
+        error = item->getNameCapital(true) + " is already empty.";
         return false;
     }
-    if (!itemToBeUnloaded->isEmpty())
+    if (!item->isEmpty())
     {
-        auto loadedItem = itemToBeUnloaded->content.front();
+        auto loadedItem = item->content.front();
         if (loadedItem == nullptr)
         {
             Logger::log(LogLevel::Error,
                         "The item does not contain any loaded item.");
             error = "Something is gone wrong while you were unloading " +
-                    itemToBeUnloaded->getName(true) + ".";
+                    item->getName(true) + ".";
             return false;
         }
     }
@@ -85,9 +85,9 @@ std::string UnloadAction::getDescription() const
 
 std::string UnloadAction::stop()
 {
-    if (itemToBeUnloaded != nullptr)
+    if (item != nullptr)
     {
-        return "You stop unloading " + itemToBeUnloaded->getName(true) + ".";
+        return "You stop unloading " + item->getName(true) + ".";
     }
     return "You stop unloading.";
 }
@@ -105,26 +105,31 @@ ActionStatus UnloadAction::perform()
         actor->sendMsg(error + "\n\n");
         return ActionStatus::Error;
     }
-    auto loadedItem = itemToBeUnloaded->content.front();
+    // Retrieve the already loaded item.
+    auto loadedItem = item->content.front();
+    // Proceed and move the loaded item to the inventory of the actor.
     SQLiteDbms::instance().beginTransaction();
-    itemToBeUnloaded->takeOut(loadedItem);
+    item->takeOut(loadedItem);
     actor->addInventoryItem(loadedItem);
     SQLiteDbms::instance().endTransaction();
     actor->sendMsg("You have finished unloading %s...\n\n",
-                   itemToBeUnloaded->getName(true));
+                   item->getName(true));
     return ActionStatus::Finished;
 }
 
-unsigned int UnloadAction::getUnloadTime(Item * _itemToBeUnloaded)
+unsigned int UnloadAction::getUnloadTime(Item * _item)
 {
-    if (_itemToBeUnloaded->getType() == ModelType::Magazine)
+    if (_item->getType() == ModelType::Magazine)
     {
-        auto loadedItem = _itemToBeUnloaded->toMagazineItem()
-                                           ->getAlreadyLoadedProjectile();
-        if (loadedItem != nullptr)
+        // Transform the item to magazine.
+        auto magazine = _item->toMagazineItem();
+        // Get the loaded projectile.
+        auto loadedProjectile = magazine->getAlreadyLoadedProjectile();
+        if (loadedProjectile != nullptr)
         {
-            return static_cast<unsigned int>(loadedItem->getWeight(false) *
-                                             loadedItem->quantity);
+            return static_cast<unsigned int>(
+                loadedProjectile->getWeight(false) *
+                loadedProjectile->quantity);
         }
     }
     return 1;

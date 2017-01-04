@@ -21,11 +21,11 @@
 
 #pragma once
 
-#include "item.hpp"
+#include "containerItem.hpp"
 
 /// @brief Holds details about a magazine.
 class MagazineItem :
-    public Item
+    public ContainerItem
 {
 public:
     MagazineItem();
@@ -37,21 +37,21 @@ public:
     std::string lookContent() override;
 
     /// @brief Checks if the current magazine can be loaded with the given item.
-    /// @param projectile The projectile to load.
-    /// @param error      An error string, set when the projectile
+    /// @param _projectile The projectile to load.
+    /// @param error       An error string, set when the projectile
     ///                    cannot be loaded.
     /// @return <b>True</b> if the projectile can be loaded,<br>
     ///         <b>False</b> otherwise.
-    bool canLoadWith(Item * projectile, std::string & error) const;
+    bool canLoadWith(Item * _projectile, std::string & error) const;
 
     /// @brief Evaluates the amount of projectiles which can be loaded.
-    /// @param projectile The projectile to load.
-    /// @param amount     The amount to load.
-    /// @param error      An error string, set when the projectile cannot
+    /// @param _projectile The projectile to load.
+    /// @param amount      The amount to load.
+    /// @param error       An error string, set when the projectile cannot
     ///                    be loaded.
     /// @return <b>True</b> if the projectile can be loaded,<br>
     ///         <b>False</b> otherwise.
-    bool getAmountToLoad(Item * projectile,
+    bool getAmountToLoad(Item * _projectile,
                          unsigned int & amount,
                          std::string & error) const;
 

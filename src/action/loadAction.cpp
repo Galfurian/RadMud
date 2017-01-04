@@ -28,11 +28,11 @@
 #include "logger.hpp"
 
 LoadAction::LoadAction(Character * _actor,
-                       Item * _itemToBeLoaded,
+                       MagazineItem * _magazine,
                        Item * _projectile,
                        const unsigned int & _amount) :
     GeneralAction(_actor),
-    itemToBeLoaded(_itemToBeLoaded),
+    magazine(_magazine),
     projectile(_projectile),
     amount(_amount)
 {
@@ -53,20 +53,11 @@ bool LoadAction::check(std::string & error) const
     {
         return false;
     }
-    if (itemToBeLoaded == nullptr)
+    if (magazine == nullptr)
     {
-        Logger::log(LogLevel::Error, "The item is a null pointer.");
-        error = "You don't have a valid item to load.";
+        Logger::log(LogLevel::Error, "The magazine is a null pointer.");
+        error = "You don't have a valid magazine to load.";
         return false;
-    }
-    else
-    {
-        if (itemToBeLoaded->model->getType() != ModelType::Magazine)
-        {
-            Logger::log(LogLevel::Error, "The item is not a magazine.");
-            error = "You cannot load " + itemToBeLoaded->getName(true);
-            return false;
-        }
     }
     if (projectile == nullptr)
     {
@@ -74,25 +65,18 @@ bool LoadAction::check(std::string & error) const
         error = "You don't have valid projectiles to load.";
         return false;
     }
-    if (!itemToBeLoaded->isEmpty())
+    auto loadedProjectile = magazine->getAlreadyLoadedProjectile();
+    if (loadedProjectile != nullptr)
     {
-        auto loaded = itemToBeLoaded->content.front();
-        if (loaded == nullptr)
-        {
-            Logger::log(LogLevel::Error, "The item already contains an item "
-                "which is a null pointer.");
-            error = "Something is gone wrong while you were loading " +
-                    itemToBeLoaded->getName(true) + ".";
-            return false;
-        }
         // If there are projectiles inside, check if the two types of
         //  projectiles are compatible.
-        if (!projectile->canStackWith(loaded))
+        if (!projectile->canStackWith(loadedProjectile))
         {
             error = "You cannot stack the item with the one inside.";
             return false;
         }
-        if (itemToBeLoaded->model->toMagazine()->maxAmount <= loaded->quantity)
+        if (magazine->model->toMagazine()->maxAmount <=
+            loadedProjectile->quantity)
         {
             error = "The item is already at full capacity.";
             return false;
@@ -113,7 +97,7 @@ std::string LoadAction::getDescription() const
 
 std::string LoadAction::stop()
 {
-    return "You stop loading " + itemToBeLoaded->getName(true) + ".";
+    return "You stop loading " + magazine->getName(true) + ".";
 }
 
 ActionStatus LoadAction::perform()
@@ -130,19 +114,19 @@ ActionStatus LoadAction::perform()
         return ActionStatus::Error;
     }
     // First check if there are already some projectiles inside the magazine.
-    if (!itemToBeLoaded->isEmpty())
+    auto loadedProjectile = magazine->getAlreadyLoadedProjectile();
+    if (loadedProjectile != nullptr)
     {
-        auto loaded = itemToBeLoaded->content.front();
         SQLiteDbms::instance().beginTransaction();
         if (projectile->quantity < amount)
         {
-            itemToBeLoaded->putInside(projectile);
+            magazine->putInside(projectile);
         }
         else
         {
-            loaded->quantity += amount;
+            loadedProjectile->quantity += amount;
             projectile->quantity -= amount;
-            loaded->updateOnDB();
+            loadedProjectile->updateOnDB();
             projectile->updateOnDB();
         }
         SQLiteDbms::instance().endTransaction();
@@ -153,7 +137,7 @@ ActionStatus LoadAction::perform()
         if (projectile->quantity <= amount)
         {
             actor->remInventoryItem(projectile);
-            itemToBeLoaded->putInside(projectile);
+            magazine->putInside(projectile);
         }
         else
         {
@@ -165,15 +149,15 @@ ActionStatus LoadAction::perform()
                 SQLiteDbms::instance().rollbackTransection();
                 actor->sendMsg(
                     "Something is gone wrong while you were loading %s.\n\n",
-                    itemToBeLoaded->getName(true));
+                    magazine->getName(true));
                 return ActionStatus::Error;
             }
-            itemToBeLoaded->putInside(newProjectileStack);
+            magazine->putInside(newProjectileStack);
         }
         SQLiteDbms::instance().endTransaction();
     }
     actor->sendMsg("You have finished loading %s with %s...\n\n",
-                   itemToBeLoaded->getName(true),
+                   magazine->getName(true),
                    projectile->getName(true));
     return ActionStatus::Finished;
 }
