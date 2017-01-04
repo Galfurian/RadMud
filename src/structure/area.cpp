@@ -131,10 +131,10 @@ CharacterContainer Area::getCharactersAt(const CharacterContainer & exceptions,
     return characterContainer;
 }
 
-ItemContainer Area::getItemsAt(const ItemContainer & exceptions,
+ItemVector Area::getItemsAt(const ItemVector & exceptions,
                                const Coordinates & coordinates)
 {
-    ItemContainer itemContainer;
+    ItemVector itemContainer;
     if (this->isValid(coordinates))
     {
         for (auto it : this->getRoom(coordinates)->items)
@@ -508,11 +508,11 @@ CharacterContainer Area::getCharactersInSight(CharacterContainer & exceptions,
     return characterContainer;
 }
 
-ItemContainer Area::getItemsInSight(ItemContainer & exceptions,
+ItemVector Area::getItemsInSight(ItemVector & exceptions,
                                     Coordinates & origin,
                                     const int & radius)
 {
-    ItemContainer foundItems;
+    ItemVector foundItems;
     auto validCoordinates = this->fov(origin, radius);
     for (auto coordinates : validCoordinates)
     {

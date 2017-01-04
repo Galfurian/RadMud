@@ -27,7 +27,7 @@
 #include <map>
 
 #include "updateInterface.hpp"
-#include "itemContainer.hpp"
+#include "itemVector.hpp"
 #include "itemQuality.hpp"
 #include "lua_script.hpp"
 #include "itemModel.hpp"
@@ -104,7 +104,7 @@ public:
     /// Current equipment slot.
     EquipmentSlot currentSlot;
     /// List of items contained in this one.
-    ItemContainer content;
+    ItemVector content;
 
     /// @brief Constructor - Create a new empty item.
     Item();

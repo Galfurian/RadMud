@@ -50,11 +50,11 @@ public:
         Resource,        ///< [11] A resource.
         Seed,            ///< [12] Any kind of seed.
         Key,             ///< [13] A key.
-        Furniture,       ///< [14] A forniture (eg. chair, bed, painting, table and so on).
+        Furniture,       ///< [14] A furniture (eg. chair, bed, painting, table and so on).
         Food,            ///< [15] A food.
         Light,           ///< [16] A source of light ((eg. torch, lamp, candle and so on).
         Vehicle,         ///< [17] Any kind of vehicle.
-        Book,            ///< [18] Container of parchements.
+        Book,            ///< [18] Container of parchments.
         Rope,            ///< [19] A generic rope.
         Mechanism,       ///< [20] Any kind of mechanism.
         Currency,        ///< [21] Any kind of currency.

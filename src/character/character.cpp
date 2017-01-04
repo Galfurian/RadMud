@@ -863,7 +863,7 @@ bool Character::findNearbyResouces(
 
 std::vector<Item *> Character::findCoins()
 {
-    ItemContainer foundCoins;
+    ItemVector foundCoins;
     auto findCointInContainer = [&](Item * item)
     {
         if (item->isAContainer() && !item->isEmpty())
@@ -892,7 +892,7 @@ std::vector<Item *> Character::findCoins()
             findCointInContainer(it);
         }
     }
-    foundCoins.orderBy(ItemContainer::ByPrice);
+    foundCoins.orderBy(ItemVector::ByPrice);
     return foundCoins;
 }
 
@@ -1489,7 +1489,7 @@ luabridge::LuaRef Character::luaGetItemsInSight()
     luabridge::LuaRef luaRef(L, luabridge::newTable(L));
     if (room != nullptr)
     {
-        ItemContainer exceptions;
+        ItemVector exceptions;
         for (auto it : room->area->getItemsInSight(exceptions,
                                                    room->coord,
                                                    this->getViewDistance()))

@@ -11,6 +11,6 @@ set(PROJECT_SRC ${PROJECT_SRC}
         ${CMAKE_SOURCE_DIR}/src/item/item.cpp
         ${CMAKE_SOURCE_DIR}/src/item/writing.cpp
         ${CMAKE_SOURCE_DIR}/src/item/itemFactory.cpp
-        ${CMAKE_SOURCE_DIR}/src/item/itemContainer.cpp
+        ${CMAKE_SOURCE_DIR}/src/item/itemVector.cpp
         PARENT_SCOPE
         )

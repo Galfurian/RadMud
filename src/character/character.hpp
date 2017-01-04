@@ -101,9 +101,9 @@ public:
     /// The current room the character is in.
     Room * room;
     /// Character's inventory.
-    ItemContainer inventory;
+    ItemVector inventory;
     /// Character's equipment.
-    ItemContainer equipment;
+    ItemVector equipment;
     /// Character's posture.
     CharacterPosture posture;
     /// Active effects on player.

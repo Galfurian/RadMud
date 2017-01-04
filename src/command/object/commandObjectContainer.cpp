@@ -43,20 +43,20 @@ bool DoOrganize(Character * character, ArgumentHandler & args)
         character->sendMsg("Organize what?\n");
         return false;
     }
-    auto order = ItemContainer::Order::ByName;
+    auto order = ItemVector::Order::ByName;
     if (BeginWith("name", ToLower(args[0].getContent())))
     {
-        order = ItemContainer::Order::ByName;
+        order = ItemVector::Order::ByName;
     }
     else if (BeginWith("weight", ToLower(args[0].getContent())))
     {
-        order = ItemContainer::Order::ByWeight;
+        order = ItemVector::Order::ByWeight;
     }
     else if (BeginWith("price", ToLower(args[0].getContent())))
     {
-        order = ItemContainer::Order::ByPrice;
+        order = ItemVector::Order::ByPrice;
     }
-    auto name = ItemContainer::orderToString(order);
+    auto name = ItemVector::orderToString(order);
     if (args.size() == 1)
     {
         character->room->items.orderBy(order);

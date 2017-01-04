@@ -19,17 +19,16 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "itemContainer.hpp"
-
+#include "itemVector.hpp"
 #include "updater.hpp"
 #include "item.hpp"
 
-ItemContainer::ItemContainer()
+ItemVector::ItemVector()
 {
     // Nothing to do.
 }
 
-void ItemContainer::push_back_item(Item *& item)
+void ItemVector::push_back_item(Item *& item)
 {
     auto stacked = false;
     for (auto it = this->begin(); it != this->end(); ++it)
@@ -51,7 +50,7 @@ void ItemContainer::push_back_item(Item *& item)
     }
 }
 
-bool ItemContainer::removeItem(Item * item)
+bool ItemVector::removeItem(Item * item)
 {
     for (auto it = this->begin(); it != this->end(); ++it)
     {
@@ -65,7 +64,7 @@ bool ItemContainer::removeItem(Item * item)
     return false;
 }
 
-Item * ItemContainer::findItem(const int & vnum) const
+Item * ItemVector::findItem(const int & vnum) const
 {
     for (const_iterator it = this->begin(); it != this->end(); ++it)
     {
@@ -77,7 +76,7 @@ Item * ItemContainer::findItem(const int & vnum) const
     return nullptr;
 }
 
-std::vector<std::pair<Item *, int>> ItemContainer::toStack() const
+std::vector<std::pair<Item *, int>> ItemVector::toStack() const
 {
     std::vector<std::pair<Item *, int>> numberedItems;
     for (auto item : (*this))
@@ -112,38 +111,38 @@ std::vector<std::pair<Item *, int>> ItemContainer::toStack() const
     return numberedItems;
 }
 
-void ItemContainer::orderBy(const ItemContainer::Order & order)
+void ItemVector::orderBy(const ItemVector::Order & order)
 {
-    auto orderingFunction = ItemContainer::orderItemByName;
+    auto orderingFunction = ItemVector::orderItemByName;
     if (order == Order::ByWeight)
     {
-        orderingFunction = ItemContainer::orderItemByWeight;
+        orderingFunction = ItemVector::orderItemByWeight;
     }
     else if (order == Order::ByPrice)
     {
-        orderingFunction = ItemContainer::orderItemByPrice;
+        orderingFunction = ItemVector::orderItemByPrice;
     }
     std::sort(this->begin(), this->end(), orderingFunction);
 }
 
-std::string ItemContainer::orderToString(const Order & order)
+std::string ItemVector::orderToString(const Order & order)
 {
     if (order == Order::ByName) return "name";
     else if (order == Order::ByWeight) return "weight";
     else return "price";
 }
 
-bool ItemContainer::orderItemByName(Item * first, Item * second)
+bool ItemVector::orderItemByName(Item * first, Item * second)
 {
     return first->getName() < second->getName();
 }
 
-bool ItemContainer::orderItemByWeight(Item * first, Item * second)
+bool ItemVector::orderItemByWeight(Item * first, Item * second)
 {
     return first->getWeight(true) < second->getWeight(true);
 }
 
-bool ItemContainer::orderItemByPrice(Item * first, Item * second)
+bool ItemVector::orderItemByPrice(Item * first, Item * second)
 {
     return first->getPrice(true) < second->getPrice(true);
 }
