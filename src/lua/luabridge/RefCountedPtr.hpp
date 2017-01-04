@@ -25,8 +25,7 @@
 /// SOFTWARE.
 ///----------------------------------------------------------------------------
 
-#ifndef LUABRIDGE_REFCOUNTEDPTR_HEADER
-#define LUABRIDGE_REFCOUNTEDPTR_HEADER
+#pragma once
 
 #ifdef _MSC_VER
 # include <hash_map>
@@ -252,5 +251,3 @@ struct ContainerTraits<RefCountedPtr<T> >
 };
 
 }
-
-#endif

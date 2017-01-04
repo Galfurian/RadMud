@@ -27,7 +27,7 @@
 #include <vector>
 
 #include "corpseModel.hpp"
-#include "defines.hpp"
+#include "ability.hpp"
 #include "faction.hpp"
 
 class Material;
@@ -112,12 +112,12 @@ public:
     /// @return The overall ability value.
     unsigned int getAbility(const Ability & ability) const;
 
-    /// @brief Provides the value of the given ability IF the ability number is correct.
+    /// @brief Provides the value of the given ability.
     /// @param abilityNumber The ability to retrieve.
-    /// @return The overall ability value (if the number is not valid it returns 0).
+    /// @return The overall ability value (if not valid it returns 0).
     unsigned int getAbilityLua(const unsigned int & abilityNumber);
 
-    /// @brief Given a faction vnum, answer True if it's compatible with this race.
+    /// @brief Checks if the given faction is compatible with this race.
     /// @param factionVnum The given faction vnum.
     /// @return If the faction is compatible.
     bool factionAllowed(int factionVnum);

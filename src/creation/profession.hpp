@@ -24,7 +24,8 @@
 
 #include <string>
 #include <map>
-#include "defines.hpp"
+
+#include "characterPosture.hpp"
 
 /// @brief Holds details about a profession.
 class Profession
@@ -38,7 +39,7 @@ public:
     std::string description;
     /// The command used in this profession.
     std::string command;
-    /// The posture which the character must have while performing this profession.
+    /// The posture which the character must have to perform this profession.
     CharacterPosture posture;
     /// The verb describing the action performed in this profession.
     std::string action;
@@ -74,14 +75,15 @@ public:
     ~Profession();
 
     /// @brief Check the correctness of the profession.
-    /// @return <b>True</b> if the profession has correct values,<br><b>False</b> otherwise.
+    /// @return <b>True</b> if the profession has correct values,<br>
+    ///         <b>False</b> otherwise.
     bool check();
 
     /// @brief Return the name of the profession.
     /// @return The name of the profession.
     std::string getName();
 
-    /// @brief Return the name of the profession with the first letter capitalized.
+    /// @brief Returns the name with the first letter capitalized.
     /// @return The name of the profession.
     std::string getNameCapital();
 };

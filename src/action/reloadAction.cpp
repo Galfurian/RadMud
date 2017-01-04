@@ -21,23 +21,27 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "reloadAction.hpp"
-#include "character.hpp"
-#include "sqliteDbms.hpp"
 
-ReloadAction::ReloadAction(Character * _actor, RangedWeaponItem * _weapon, Item * _magazine) :
+#include "sqliteDbms.hpp"
+#include "character.hpp"
+#include "logger.hpp"
+
+ReloadAction::ReloadAction(Character * _actor,
+                           RangedWeaponItem * _weapon,
+                           Item * _magazine) :
     GeneralAction(_actor),
     weapon(_weapon),
     magazine(_magazine)
 {
     // Debugging message.
-    Logger::log(LogLevel::Debug, "Created ReloadAction.");
+    //Logger::log(LogLevel::Debug, "Created ReloadAction.");
     // Reset the cooldown of the action.
     this->resetCooldown(ReloadAction::getReloadTime(_weapon, _magazine));
 }
 
 ReloadAction::~ReloadAction()
 {
-    Logger::log(LogLevel::Debug, "Deleted reload action.");
+    //Logger::log(LogLevel::Debug, "Deleted reload action.");
 }
 
 bool ReloadAction::check(std::string & error) const
@@ -81,7 +85,8 @@ std::string ReloadAction::stop()
 {
     if ((weapon != nullptr) && (magazine != nullptr))
     {
-        return "You stop reloading " + weapon->getName(true) + " with " + magazine->getName(true) + ".";
+        return "You stop reloading " + weapon->getName(true) + " with " +
+               magazine->getName(true) + ".";
     }
     return "You stop reloading.";
 }
@@ -100,21 +105,28 @@ ActionStatus ReloadAction::perform()
         return ActionStatus::Error;
     }
     SQLiteDbms::instance().beginTransaction();
-    if (!actor->remEquipmentItem(magazine) && !actor->remInventoryItem(magazine))
+    if (!actor->remEquipmentItem(magazine) &&
+        !actor->remInventoryItem(magazine))
     {
         // Rollback the transaction.
         SQLiteDbms::instance().rollbackTransection();
-        actor->sendMsg("Something is gone wrong while you were reloading %s...\n\n", weapon->getName(true));
+        actor->sendMsg(
+            "Something is gone wrong while you were reloading %s...\n\n",
+            weapon->getName(true));
         return ActionStatus::Error;
     }
     weapon->putInside(magazine);
     SQLiteDbms::instance().endTransaction();
-    actor->sendMsg("You have finished reloading %s...\n\n", this->weapon->getName(true));
+    actor->sendMsg("You have finished reloading %s...\n\n",
+                   this->weapon->getName(true));
     return ActionStatus::Finished;
 }
 
-unsigned int ReloadAction::getReloadTime(RangedWeaponItem * _weapon, Item * _magazine)
+unsigned int ReloadAction::getReloadTime(RangedWeaponItem * _weapon,
+                                         Item * _magazine)
 {
     // Evaluates the required time for loading the magazine.
-    return static_cast<unsigned int>(1 + SafeLog10(_weapon->getWeight(false)) + SafeLog10(_magazine->getWeight(false)));
+    return static_cast<unsigned int>(1 +
+                                     SafeLog10(_weapon->getWeight(false)) +
+                                     SafeLog10(_magazine->getWeight(false)));
 }

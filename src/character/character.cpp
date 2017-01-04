@@ -20,17 +20,15 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-// Basic Include.
 #include "character.hpp"
 
-// Other Include.
-#include "mud.hpp"
-
-#include "armorItem.hpp"
-#include "meleeWeaponItem.hpp"
 #include "rangedWeaponItem.hpp"
-
-using namespace std::chrono;
+#include "meleeWeaponItem.hpp"
+#include "lightItem.hpp"
+#include "armorItem.hpp"
+#include "logger.hpp"
+#include "aStar.hpp"
+#include "mud.hpp"
 
 Character::Character() :
     name(),
@@ -53,7 +51,7 @@ Character::Character() :
     L(luaL_newstate()),
     combatHandler(this),
     actionQueue(),
-    charactersInSight()
+    inputProcessor(std::make_shared<ProcessInput>())
 {
     actionQueue.push_back(std::make_shared<GeneralAction>(this));
     // Nothing to do.
@@ -82,7 +80,8 @@ bool Character::check() const
     safe &= CorrectAssert(this->getAbility(Ability::Constitution, false) <= 60);
     safe &= CorrectAssert(this->getAbility(Ability::Intelligence, false) > 0);
     safe &= CorrectAssert(this->getAbility(Ability::Intelligence, false) <= 60);
-    safe &= CorrectAssert(thirst > 0);
+    safe &= CorrectAssert(hunger >= 0);
+    safe &= CorrectAssert(thirst >= 0);
     safe &= CorrectAssert(room != nullptr);
     safe &= CorrectAssert(L != nullptr);
     return safe;
@@ -104,91 +103,116 @@ void Character::getSheet(Table & sheet) const
     sheet.addColumn("Attribute", StringAlign::Left);
     sheet.addColumn("Value", StringAlign::Left);
     // Set the values.
-    sheet.addRow({"Proper Noun", this->name});
-    sheet.addRow({"Description", this->description});
-    sheet.addRow({"Gender", GetGenderTypeName(this->gender)});
-    sheet.addRow({"Weight", ToString(this->weight)});
-    sheet.addRow({"Level", ToString(this->level)});
-    sheet.addRow({"Flags", GetCharacterFlagString(this->flags)});
-    if (CorrectAssert(this->race != nullptr))
+    sheet.addRow({"Proper Noun", name});
+    sheet.addRow({"Description", description});
+    sheet.addRow({"Gender", GetGenderTypeName(gender)});
+    sheet.addRow({"Weight", ToString(weight)});
+    sheet.addRow({"Level", ToString(level)});
+    sheet.addRow({"Flags", GetCharacterFlagString(flags)});
+    if (CorrectAssert(race != nullptr))
     {
-        sheet.addRow({"Race", this->race->name});
+        sheet.addRow({"Race", race->name});
     }
     else
     {
         sheet.addRow({"Race", "NONE"});
     }
-    if (CorrectAssert(this->faction != nullptr))
+    if (CorrectAssert(faction != nullptr))
     {
-        sheet.addRow({"Faction", this->faction->name});
+        sheet.addRow({"Faction", faction->name});
     }
     else
     {
         sheet.addRow({"Faction", "NONE"});
     }
-    sheet.addRow({"Health", ToString(this->getHealth())});
-    sheet.addRow({"Stamina", ToString(this->getStamina())});
-    sheet.addRow({"Hunger", ToString(this->getHunger())});
-    sheet.addRow({"Thirst", ToString(this->getThirst())});
-    sheet.addRow({"Strength", ToString(this->getAbility(Ability::Strength, false)) + " [" +
-                              ToString(this->effects.getAbilityModifier(Ability::Strength)) + "]"});
-    sheet.addRow({"Agility", ToString(this->getAbility(Ability::Agility, false)) + " [" +
-                             ToString(this->effects.getAbilityModifier(Ability::Agility)) + "]"});
-    sheet.addRow({"Perception", ToString(this->getAbility(Ability::Perception, false)) + " [" +
-                                ToString(this->effects.getAbilityModifier(Ability::Perception)) + "]"});
-    sheet.addRow({"Constitution", ToString(this->getAbility(Ability::Constitution, false)) + " [" +
-                                  ToString(this->effects.getAbilityModifier(Ability::Constitution)) + "]"});
-    sheet.addRow({"Intelligence", ToString(this->getAbility(Ability::Intelligence, false)) + " [" +
-                                  ToString(this->effects.getAbilityModifier(Ability::Intelligence)) + "]"});
+    sheet.addRow({"Health", ToString(health)});
+    sheet.addRow({"Stamina", ToString(stamina)});
+    sheet.addRow({"Hunger", ToString(hunger)});
+    sheet.addRow({"Thirst", ToString(thirst)});
+    sheet.addRow(
+        {
+            "Strength",
+            ToString(this->getAbility(Ability::Strength, false)) +
+            " [" +
+            ToString(effects.getAbilityModifier(Ability::Strength)) +
+            "]"});
+    sheet.addRow(
+        {
+            "Agility",
+            ToString(this->getAbility(Ability::Agility, false)) +
+            " [" +
+            ToString(effects.getAbilityModifier(Ability::Agility)) +
+            "]"});
+    sheet.addRow(
+        {
+            "Perception",
+            ToString(this->getAbility(Ability::Perception, false)) +
+            " [" +
+            ToString(effects.getAbilityModifier(Ability::Perception)) +
+            "]"});
+    sheet.addRow(
+        {
+            "Constitution",
+            ToString(this->getAbility(Ability::Constitution, false)) +
+            " [" +
+            ToString(effects.getAbilityModifier(Ability::Constitution)) +
+            "]"});
+    sheet.addRow(
+        {
+            "Intelligence",
+            ToString(this->getAbility(Ability::Intelligence, false)) +
+            " [" +
+            ToString(effects.getAbilityModifier(Ability::Intelligence)) +
+            "]"});
     if (CorrectAssert(this->room != nullptr))
     {
-        sheet.addRow({"Room", this->room->name + " [" + ToString(this->room->vnum) + "]"});
+        sheet.addRow({"Room", room->name + " [" + ToString(room->vnum) + "]"});
     }
     else
     {
         sheet.addRow({"Room", "NONE"});
     }
-    sheet.addRow({"Posture", GetPostureName(this->posture)});
+    sheet.addRow({"Posture", posture.toString()});
     sheet.addRow({"Action", this->getAction()->getDescription()});
     sheet.addDivider();
     sheet.addRow({"## Equipment", "## Inventory"});
-    for (size_t it = 0; it < std::max(this->inventory.size(), this->equipment.size()); ++it)
+    for (size_t it = 0; it < std::max(inventory.size(), equipment.size()); ++it)
     {
         std::string equipmentItem, inventoryItem;
-        if (it < this->equipment.size())
+        if (it < equipment.size())
         {
-            equipmentItem = this->equipment.at(it)->getName();
+            equipmentItem = equipment.at(it)->getName();
         }
-        if (it < this->inventory.size())
+        if (it < inventory.size())
         {
-            inventoryItem = this->inventory.at(it)->getName();
+            inventoryItem = inventory.at(it)->getName();
         }
         sheet.addRow({equipmentItem, inventoryItem});
     }
     sheet.addDivider();
     sheet.addRow({"## Effect Name", "## Remaining TIC"});
-    for (EffectList::const_iterator it = this->effects.begin(); it != this->effects.end(); ++it)
+    for (const auto & it : effects)
     {
-        sheet.addRow({it->name, ToString(it->remainingTic)});
+        sheet.addRow({it.name, ToString(it.remainingTic)});
     }
 }
 
-std::string Character::getName() const
-{
-    if (this->isPlayer())
-    {
-        return ToLower(this->name);
-    }
-    else if (this->isMobile())
-    {
-        const Mobile * mobile = dynamic_cast<const Mobile *>(this);
-        return ToLower(mobile->staticdesc);
-    }
-    else
-    {
-        return "No name";
-    }
-}
+//std::string Character::getName() const
+//{
+//    if (this->isPlayer())
+//    {
+//        return ToLower(name);
+//    }
+//    else if (this->isMobile())
+//    {
+//        auto mobile = dynamic_cast<const Mobile *>(this);
+//        return ToLower(mobile->staticdesc);
+//    }
+//    else
+//    {
+//        return "No name";
+//    }
+//}
 
 std::string Character::getNameCapital() const
 {
@@ -203,7 +227,7 @@ std::string Character::getStaticDesc() const
     desc += " is";
     if (posture != CharacterPosture::Stand)
     {
-        desc += " " + GetPostureName(posture);
+        desc += " " + posture.toString();
     }
     desc += " here";
     if (this->getAction()->getType() != ActionType::Wait)
@@ -246,7 +270,8 @@ bool Character::setAbility(const Ability & ability, const unsigned int & value)
     return false;
 }
 
-unsigned int Character::getAbility(const Ability & ability, bool withEffects) const
+unsigned int
+Character::getAbility(const Ability & ability, bool withEffects) const
 {
     auto overall = 0;
     // Try to find the ability value.
@@ -272,9 +297,10 @@ unsigned int Character::getAbility(const Ability & ability, bool withEffects) co
     return static_cast<unsigned int>(overall);
 }
 
-unsigned int Character::getAbilityModifier(const Ability & ability, bool withEffects) const
+unsigned int
+Character::getAbilityModifier(const Ability & ability, bool withEffects) const
 {
-    return GetAbilityModifier(this->getAbility(ability, withEffects));
+    return Ability::getModifier(this->getAbility(ability, withEffects));
 }
 
 unsigned int Character::getAbilityLog(
@@ -344,11 +370,6 @@ bool Character::remHealth(const unsigned int & value, const bool & force)
     return true;
 }
 
-unsigned int Character::getHealth() const
-{
-    return this->health;
-}
-
 unsigned int Character::getMaxHealth(bool withEffects) const
 {
     // Value = 5 + (5 * AbilityModifier(Constitution))
@@ -405,7 +426,7 @@ bool Character::setStamina(const unsigned int & value, const bool & force)
     {
         if (force)
         {
-            this->stamina = maximum;
+            stamina = maximum;
             return true;
         }
         else
@@ -413,14 +434,14 @@ bool Character::setStamina(const unsigned int & value, const bool & force)
             return false;
         }
     }
-    this->stamina = value;
+    stamina = value;
     return true;
 }
 
 bool Character::addStamina(const unsigned int & value, const bool & force)
 {
     unsigned int maximum = this->getMaxStamina();
-    unsigned int result = this->stamina + value;
+    unsigned int result = stamina + value;
     if (result > maximum)
     {
         if (force)
@@ -432,13 +453,13 @@ bool Character::addStamina(const unsigned int & value, const bool & force)
             return false;
         }
     }
-    this->stamina = result;
+    stamina = result;
     return true;
 }
 
 bool Character::remStamina(const unsigned int & value, const bool & force)
 {
-    int result = static_cast<int>(this->stamina) - static_cast<int>(value);
+    int result = static_cast<int>(stamina) - static_cast<int>(value);
     if (result < 0)
     {
         if (force)
@@ -450,13 +471,8 @@ bool Character::remStamina(const unsigned int & value, const bool & force)
             return false;
         }
     }
-    this->stamina = static_cast<unsigned int>(result);
+    stamina = static_cast<unsigned int>(result);
     return true;
-}
-
-unsigned int Character::getStamina() const
-{
-    return this->stamina;
 }
 
 unsigned int Character::getMaxStamina(bool withEffects) const
@@ -481,7 +497,7 @@ unsigned int Character::getMaxStamina(bool withEffects) const
 std::string Character::getStaminaCondition()
 {
     // Determine the percentage of current health.
-    auto percent = (100 * this->stamina) / this->getMaxStamina(true);
+    auto percent = (100 * stamina) / this->getMaxStamina(true);
     // Determine the correct description.
     if (percent >= 100) return "look fresh as a daisy";
     else if (percent >= 80) return "are slightly weary";
@@ -491,29 +507,32 @@ std::string Character::getStaminaCondition()
     else return "are too tired, you can't even blink your eyes";
 }
 
-unsigned int Character::getViewDistance() const
+int Character::getViewDistance() const
 {
     // Value = 4 + LogMod(PER)
     // MIN   = 4.0
     // MAX   = 7.2
-    return 4 + this->getAbilityLog(Ability::Perception, 0.0, 1.0);
+    return 4 + static_cast<int>(this->getAbilityLog(Ability::Perception));
 }
 
 void Character::setAction(std::shared_ptr<GeneralAction> _action)
 {
-    this->actionQueue.push_front(_action);
+    if (_action->getType() != ActionType::Wait)
+    {
+        actionQueue.push_front(_action);
+    }
 }
 
 std::shared_ptr<GeneralAction> Character::getAction() const
 {
-    return this->actionQueue.front();
+    return actionQueue.front();
 }
 
 void Character::popAction()
 {
-    if (this->actionQueue.front()->getType() != ActionType::Wait)
+    if (actionQueue.front()->getType() != ActionType::Wait)
     {
-        this->actionQueue.pop_front();
+        actionQueue.pop_front();
     }
 }
 
@@ -532,7 +551,8 @@ void Character::moveTo(
     // Check if the destination exist.
     if (destination == nullptr)
     {
-        Logger::log(LogLevel::Error, "Character::moveTo: DESTINATION is a NULLPTR.");
+        Logger::log(LogLevel::Error,
+                    "Character::moveTo: DESTINATION is a NULLPTR.");
         return;
     }
 
@@ -654,8 +674,17 @@ Item * Character::findEquipmentSlotTool(EquipmentSlot slot, ToolType type)
 Item * Character::findNearbyItem(const std::string & itemName, int & number)
 {
     auto item = this->findInventoryItem(itemName, number);
-    if (item == nullptr) item = this->findEquipmentItem(itemName, number);
-    if (item == nullptr) item = room->findItem(itemName, number);
+    if (item == nullptr)
+    {
+        item = this->findEquipmentItem(itemName, number);
+    }
+    if (item == nullptr)
+    {
+        if (room != nullptr)
+        {
+            item = room->findItem(itemName, number);
+        }
+    }
     return item;
 }
 
@@ -676,10 +705,13 @@ Item * Character::findNearbyTool(
                 if (toolModel->toolType == toolType)
                 {
                     // Check if the item is inside the exception list.
-                    auto findIt = std::find_if(exceptions.begin(), exceptions.end(), [&iterator](Item * item)
-                    {
-                        return (item->vnum == iterator->vnum);
-                    });
+                    auto findIt = std::find_if(exceptions.begin(),
+                                               exceptions.end(),
+                                               [&iterator](Item * item)
+                                               {
+                                                   return (item->vnum ==
+                                                           iterator->vnum);
+                                               });
                     // If not, return the item.
                     if (findIt == exceptions.end())
                     {
@@ -691,14 +723,15 @@ Item * Character::findNearbyTool(
     }
     if (searchInventory)
     {
-        for (auto iterator : this->inventory)
+        for (auto iterator : inventory)
         {
             if (iterator->model->getType() == ModelType::Tool)
             {
                 ToolModel * toolModel = iterator->model->toTool();
                 if (toolModel->toolType == toolType)
                 {
-                    auto findIt = std::find(exceptions.begin(), exceptions.end(), iterator);
+                    auto findIt = std::find(exceptions.begin(),
+                                            exceptions.end(), iterator);
                     if (findIt == exceptions.end())
                     {
                         return iterator;
@@ -709,14 +742,15 @@ Item * Character::findNearbyTool(
     }
     if (searchEquipment)
     {
-        for (auto iterator : this->equipment)
+        for (auto iterator : equipment)
         {
             if (iterator->model->getType() == ModelType::Tool)
             {
                 ToolModel * toolModel = iterator->model->toTool();
                 if (toolModel->toolType == toolType)
                 {
-                    auto findIt = std::find(exceptions.begin(), exceptions.end(), iterator);
+                    auto findIt = std::find(exceptions.begin(),
+                                            exceptions.end(), iterator);
                     if (findIt == exceptions.end())
                     {
                         return iterator;
@@ -862,24 +896,6 @@ std::vector<Item *> Character::findCoins()
     return foundCoins;
 }
 
-bool Character::hasInventoryItem(Item * item)
-{
-    for (auto it : inventory)
-    {
-        if (it->vnum == item->vnum) return true;
-    }
-    return false;
-}
-
-bool Character::hasEquipmentItem(Item * item)
-{
-    for (auto it : equipment)
-    {
-        if (it->vnum == item->vnum) return true;
-    }
-    return false;
-}
-
 void Character::addInventoryItem(Item *& item)
 {
     // Add the item to the inventory.
@@ -887,7 +903,10 @@ void Character::addInventoryItem(Item *& item)
     // Set the owner of the item.
     item->owner = this;
     // Log it.
-    Logger::log(LogLevel::Debug, "Item '%s' added to '%s' inventory;", item->getName(), this->getName());
+    Logger::log(LogLevel::Debug,
+                "Item '%s' added to '%s' inventory;",
+                item->getName(),
+                this->getName());
 }
 
 void Character::addEquipmentItem(Item *& item)
@@ -897,7 +916,9 @@ void Character::addEquipmentItem(Item *& item)
     // Set the owner of the item.
     item->owner = this;
     // Log it.
-    Logger::log(LogLevel::Debug, "Item '%s' added to '%s' equipment;", item->getName(), this->getName());
+    Logger::log(LogLevel::Debug,
+                "Item '%s' added to '%s' equipment;",
+                item->getName(), this->getName());
 }
 
 bool Character::remInventoryItem(Item * item)
@@ -910,7 +931,9 @@ bool Character::remInventoryItem(Item * item)
     // Clear the owner of the item.
     item->owner = nullptr;
     // Log it.
-    Logger::log(LogLevel::Debug, "Item '%s' removed from '%s';", item->getName(), this->getName());
+    Logger::log(LogLevel::Debug,
+                "Item '%s' removed from '%s';",
+                item->getName(), this->getName());
     return true;
 }
 
@@ -924,13 +947,16 @@ bool Character::remEquipmentItem(Item * item)
     // Clear the owner of the item.
     item->owner = nullptr;
     // Log it.
-    Logger::log(LogLevel::Debug, "Item '%s' removed from '%s';", item->getName(), this->getName());
+    Logger::log(LogLevel::Debug,
+                "Item '%s' removed from '%s';",
+                item->getName(), this->getName());
     return true;
 }
 
 bool Character::canCarry(Item * item, unsigned int quantity) const
 {
-    return ((this->getCarryingWeight() + (item->getWeight(false) * quantity)) < this->getMaxCarryingWeight());
+    return ((this->getCarryingWeight() + (item->getWeight(false) * quantity)) <
+            this->getMaxCarryingWeight());
 }
 
 double Character::getCarryingWeight() const
@@ -955,7 +981,9 @@ double Character::getMaxCarryingWeight() const
     return 50 + (this->getAbilityModifier(Ability::Strength) * 10);
 }
 
-bool Character::canWield(Item * item, std::string & error, EquipmentSlot & where) const
+bool Character::canWield(Item * item,
+                         std::string & error,
+                         EquipmentSlot & where) const
 {
     // Gather the item in the right hand, if there is one.
     auto rightHand = findEquipmentSlotItem(EquipmentSlot::RightHand);
@@ -1019,7 +1047,7 @@ bool Character::canWear(Item * item, std::string & error) const
     }
     if (!result)
     {
-        error = "The item is not meant to be weared.\n";
+        error = "The item is not meant to be worn.\n";
         return false;
     }
     if (findEquipmentSlotItem(item->getCurrentSlot()) != nullptr)
@@ -1030,74 +1058,57 @@ bool Character::canWear(Item * item, std::string & error) const
     return true;
 }
 
-bool Character::setThirst(int value)
+bool Character::inventoryIsLit() const
 {
-    int result = static_cast<int>(this->thirst) + value;
-    if (result < 0)
+    for (auto it : inventory)
     {
-        return false;
+        if (it->getType() == ModelType::Light)
+        {
+            if (it->toLightItem()->isActive())
+            {
+                return true;
+            }
+        }
     }
-    else if (result > 100)
-    {
-        this->thirst = 100;
-    }
-    else
-    {
-        this->thirst = static_cast<unsigned int>(result);
-    }
-    return true;
+    return false;
 }
 
-unsigned int Character::getThirst() const
+void Character::addThirst(const int & value)
 {
-    return this->thirst;
+    thirst += value;
+    if (thirst < 0) thirst = 0;
+    else if (thirst > 100) thirst = 100;
 }
 
 std::string Character::getThirstCondition() const
 {
     // Determine the correct description.
-    if (this->thirst >= 90) return "are not thirsty";
-    else if (this->thirst >= 60) return "are quite thirsty";
-    else if (this->thirst >= 30) return "are thirsty";
+    if (thirst >= 90) return "are not thirsty";
+    else if (thirst >= 60) return "are quite thirsty";
+    else if (thirst >= 30) return "are thirsty";
     else return "are dying of thirst";
 }
 
-bool Character::setHunger(int value)
+void Character::addHunger(const int & value)
 {
-    int result = static_cast<int>(this->hunger) + value;
-    if (result < 0)
-    {
-        return false;
-    }
-    else if (result > 100)
-    {
-        this->hunger = 100;
-    }
-    else
-    {
-        this->hunger = static_cast<unsigned int>(result);
-    }
-    return true;
-}
-
-unsigned int Character::getHunger() const
-{
-    return this->hunger;
+    hunger += value;
+    if (hunger < 0) hunger = 0;
+    else if (hunger > 100) hunger = 100;
 }
 
 std::string Character::getHungerCondition() const
 {
     // Determine the correct description.
-    if (this->hunger >= 90) return "are not hungry";
-    else if (this->hunger >= 60) return "are quite hungry";
-    else if (this->hunger >= 30) return "are hungry";
+    if (hunger >= 90) return "are not hungry";
+    else if (hunger >= 60) return "are quite hungry";
+    else if (hunger >= 30) return "are hungry";
     else return "are dying of hunger";
 }
 
 void Character::updateHealth()
 {
     unsigned int posModifier = 0;
-    unsigned int logModifier = this->getAbilityLog(Ability::Constitution, 0.0, 1.0);
+    auto logModifier = this->getAbilityLog(Ability::Constitution);
     if (posture == CharacterPosture::Sit)
     {
         posModifier = 2;
@@ -1115,7 +1126,7 @@ void Character::updateHealth()
 void Character::updateStamina()
 {
     unsigned int posModifier = 0;
-    unsigned int logModifier = this->getAbilityLog(Ability::Constitution, 0.0, 1.0);
+    auto logModifier = this->getAbilityLog(Ability::Constitution);
     if (posture == CharacterPosture::Sit)
     {
         posModifier = 3;
@@ -1124,7 +1135,7 @@ void Character::updateStamina()
     {
         posModifier = 5;
     }
-    if (this->stamina < this->getMaxStamina())
+    if (stamina < this->getMaxStamina())
     {
         this->addStamina((1 + 4 * logModifier) * (1 + 3 * posModifier), true);
     }
@@ -1132,28 +1143,12 @@ void Character::updateStamina()
 
 void Character::updateHunger()
 {
-    unsigned int reduction = 10;
-    if (this->hunger < reduction)
-    {
-        this->hunger = 0;
-    }
-    else
-    {
-        this->hunger -= reduction;
-    }
+    hunger = ((hunger - 1) < 0) ? 0 : hunger - 1;
 }
 
 void Character::updateThirst()
 {
-    unsigned int reduction = 10;
-    if (this->thirst < reduction)
-    {
-        this->thirst = 0;
-    }
-    else
-    {
-        this->thirst -= reduction;
-    }
+    thirst = ((thirst - 1) < 0) ? 0 : thirst - 1;
 }
 
 void Character::updateExpiredEffects()
@@ -1182,87 +1177,78 @@ void Character::updateActivatedEffects()
 
 std::string Character::getLook()
 {
-    std::string output = "You look at " + this->getName() + ".\n";
+    std::string output;
+    output += "You look at " + this->getName() + ".\n";
     // Add the condition.
-    output += ToCapitals(this->getSubjectPronoun()) + " " + this->getHealthCondition() + ".\n";
+    output += ToCapitals(this->getSubjectPronoun());
+    output += " " + this->getHealthCondition() + ".\n";
     // Add the description.
-    output += this->description + "\n";
+    output += description + "\n";
     // Add what the target is wearing.
     if (equipment.empty())
     {
         output += Formatter::italic();
-        output += ToCapitals(this->getSubjectPronoun()) + " is wearing nothing.\n";
+        output += ToCapitals(this->getSubjectPronoun());
+        output += " is wearing nothing.\n";
         output += Formatter::reset();
         return output;
     }
     output += ToCapitals(this->getSubjectPronoun()) + " is wearing:\n";
-
-    // Equipment Slot : HEAD
+    // Retrieve the equipment.
     auto head = this->findEquipmentSlotItem(EquipmentSlot::Head);
-    if (head)
-    {
-        output += "  " + Formatter::yellow() + "Head" + Formatter::reset() + "       : ";
-        output += Formatter::cyan() + head->getNameCapital() + Formatter::reset() + ".\n";
-    }
-    // Equipment Slot : BACK
     auto back = this->findEquipmentSlotItem(EquipmentSlot::Back);
-    if (back)
-    {
-        output += "  " + Formatter::yellow() + "Back" + Formatter::reset() + "       : ";
-        output += Formatter::cyan() + back->getNameCapital() + Formatter::reset() + ".\n";
-    }
-    // Equipment Slot : TORSO
     auto torso = this->findEquipmentSlotItem(EquipmentSlot::Torso);
-    if (torso)
-    {
-        output += "  " + Formatter::yellow() + "Torso" + Formatter::reset() + "      : ";
-        output += Formatter::cyan() + torso->getNameCapital() + Formatter::reset() + ".\n";
-    }
-    // Equipment Slot : LEGS
     auto legs = this->findEquipmentSlotItem(EquipmentSlot::Legs);
-    if (legs)
-    {
-        output += "  " + Formatter::yellow() + "Legs" + Formatter::reset() + "       : ";
-        output += Formatter::cyan() + legs->getNameCapital() + Formatter::reset() + ".\n";
-    }
-    // Equipment Slot : FEET
     auto feet = this->findEquipmentSlotItem(EquipmentSlot::Feet);
-    if (feet)
-    {
-        output += "  " + Formatter::yellow() + "Feet" + Formatter::reset() + "       : ";
-        output += Formatter::cyan() + feet->getNameCapital() + Formatter::reset() + ".\n";
-    }
-    // Print what is wielding.
     auto right = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
-    if (right)
+    auto left = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
+    if (head != nullptr)
+    {
+        output += "\tHead       : " + head->getNameCapital(true) + "\n";
+    }
+    if (back != nullptr)
+    {
+        output += "\tBack       : " + back->getNameCapital(true) + "\n";
+    }
+    if (torso != nullptr)
+    {
+        output += "\tTorso      : " + torso->getNameCapital(true) + "\n";
+    }
+    if (legs != nullptr)
+    {
+        output += "\tLegs       : " + legs->getNameCapital(true) + "\n";
+    }
+    if (feet != nullptr)
+    {
+        output += "\tFeet       : " + feet->getNameCapital(true) + "\n";
+    }
+    if (right != nullptr)
     {
         if (HasFlag(right->model->modelFlags, ModelFlag::TwoHand))
         {
-            output += "  " + Formatter::yellow() + "Both Hands" + Formatter::reset() + " : ";
+            output += "\tBoth Hands : ";
         }
         else
         {
-            output += "  " + Formatter::yellow() + "Right Hand" + Formatter::reset() + " : ";
+            output += "\tRight Hand : ";
         }
-        output += Formatter::cyan() + right->getNameCapital() + Formatter::reset() + ".\n";
+        output += right->getNameCapital() + "\n";
     }
-    auto left = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
-    if (left)
+    if (left != nullptr)
     {
-        output += "  " + Formatter::yellow() + "Left Hand" + Formatter::reset() + "  : ";
-        output += Formatter::cyan() + left->getNameCapital() + Formatter::reset() + ".\n";
+        output += "\tLeft Hand  : " + left->getNameCapital(true) + "\n";
     }
     return output;
 }
 
 bool Character::canSee(Character * target) const
 {
-    return !HasFlag(target->flags, CharacterFlag::Invisible) || HasFlag(this->flags, CharacterFlag::IsGod);
+    return !HasFlag(target->flags, CharacterFlag::Invisible) ||
+           HasFlag(flags, CharacterFlag::IsGod);
 }
 
 unsigned int Character::getArmorClass() const
 {
-    // 10
     unsigned int result = 10;
     // + AGILITY MODIFIER
     result += this->getAbilityModifier(Ability::Agility);
@@ -1281,12 +1267,12 @@ bool Character::canAttackWith(const EquipmentSlot & slot) const
 {
     if ((slot == EquipmentSlot::RightHand) || (slot == EquipmentSlot::LeftHand))
     {
-        auto weapon = this->findEquipmentSlotItem(slot);
-        if (weapon != nullptr)
+        auto wpn = this->findEquipmentSlotItem(slot);
+        if (wpn != nullptr)
         {
             // Check if there is actually a weapon equiped.
-            if ((weapon->model->getType() == ModelType::MeleeWeapon) ||
-                (weapon->model->getType() == ModelType::RangedWeapon))
+            if ((wpn->model->getType() == ModelType::MeleeWeapon) ||
+                (wpn->model->getType() == ModelType::RangedWeapon))
             {
                 return true;
             }
@@ -1295,7 +1281,7 @@ bool Character::canAttackWith(const EquipmentSlot & slot) const
     return false;
 }
 
-bool Character::isAtRange(Character * target, const unsigned int & range)
+bool Character::isAtRange(Character * target, const int & range)
 {
     if (WrongAssert(this->room == nullptr)) return false;
     if (WrongAssert(this->room->area == nullptr)) return false;
@@ -1312,40 +1298,40 @@ bool Character::isAtRange(Character * target, const unsigned int & range)
 std::vector<MeleeWeaponItem *> Character::getActiveMeleeWeapons()
 {
     std::vector<MeleeWeaponItem *> gatheredWeapons;
-    auto retrieveWeapon = [&](const EquipmentSlot & slot)
+    auto RetrieveWeapon = [&](const EquipmentSlot & slot)
     {
         // First get the item at the given position.
-        auto weapon = this->findEquipmentSlotItem(slot);
-        if (weapon != nullptr)
+        auto wpn = this->findEquipmentSlotItem(slot);
+        if (wpn != nullptr)
         {
-            if (weapon->getType() == ModelType::MeleeWeapon)
+            if (wpn->getType() == ModelType::MeleeWeapon)
             {
-                gatheredWeapons.emplace_back(weapon->toMeleeWeaponItem());
+                gatheredWeapons.emplace_back(wpn->toMeleeWeaponItem());
             }
         }
     };
-    retrieveWeapon(EquipmentSlot::RightHand);
-    retrieveWeapon(EquipmentSlot::LeftHand);
+    RetrieveWeapon(EquipmentSlot::RightHand);
+    RetrieveWeapon(EquipmentSlot::LeftHand);
     return gatheredWeapons;
 }
 
 std::vector<RangedWeaponItem *> Character::getActiveRangedWeapons()
 {
     std::vector<RangedWeaponItem *> gatheredWeapons;
-    auto retrieveWeapon = [&](const EquipmentSlot & slot)
+    auto RetrieveWeapon = [&](const EquipmentSlot & slot)
     {
         // First get the item at the given position.
-        auto weapon = this->findEquipmentSlotItem(slot);
-        if (weapon != nullptr)
+        auto wpn = this->findEquipmentSlotItem(slot);
+        if (wpn != nullptr)
         {
-            if (weapon->getType() == ModelType::RangedWeapon)
+            if (wpn->getType() == ModelType::RangedWeapon)
             {
-                gatheredWeapons.emplace_back(weapon->toRangedWeaponItem());
+                gatheredWeapons.emplace_back(wpn->toRangedWeaponItem());
             }
         }
     };
-    retrieveWeapon(EquipmentSlot::RightHand);
-    retrieveWeapon(EquipmentSlot::LeftHand);
+    RetrieveWeapon(EquipmentSlot::RightHand);
+    RetrieveWeapon(EquipmentSlot::LeftHand);
     return gatheredWeapons;
 }
 
@@ -1354,30 +1340,26 @@ void Character::kill()
     // Create a corpse at the current position.
     auto corpse = this->createCorpse();
     // Transfer all the items from the character to the corpse.
-    auto tempInventory = this->inventory;
+    auto tempInventory = inventory;
     for (auto it = tempInventory.begin(); it != tempInventory.end(); ++it)
     {
         auto item = (*it);
         // Remove the item from the inventory.
         this->remInventoryItem(item);
         // Add the item to the corpse.
-        corpse->content.push_back_item(item);
-        // Set the corpse as container of the item.
-        item->container = corpse;
+        corpse->putInside(item);
     }
-    auto tempEquipment = this->equipment;
+    auto tempEquipment = equipment;
     for (auto it = tempEquipment.begin(); it != tempEquipment.end(); ++it)
     {
         auto item = (*it);
         // Remove the item from the inventory.
         this->remEquipmentItem(item);
         // Add the item to the corpse.
-        corpse->content.push_back_item(item);
-        // Set the corpse as container of the item.
-        item->container = corpse;
+        corpse->putInside(item);
     }
     // Reset the action of the character.
-    this->actionQueue.clear();
+    actionQueue.clear();
     this->setAction(std::make_shared<GeneralAction>(this));
     // Reset the list of opponents.
     this->combatHandler.resetList();
@@ -1391,17 +1373,17 @@ void Character::kill()
 Item * Character::createCorpse()
 {
     // Create the corpse.
-    auto corpse = race->corpse.createCorpse(this->name, race->material, this->weight);
+    auto corpse = race->corpse.createCorpse(name, race->material, weight);
     // Add the corpse to the room.
     room->addItem(corpse);
     // Return the corpse.
     return corpse;
 }
 
-void Character::doCommand(const std::string & command)
+bool Character::doCommand(const std::string & command)
 {
     ArgumentHandler argumentHandler(command);
-    ProcessCommand(this, argumentHandler);
+    return inputProcessor->process(this, argumentHandler);
 }
 
 Player * Character::toPlayer()
@@ -1416,8 +1398,7 @@ Mobile * Character::toMobile()
 
 void Character::loadScript(const std::string & scriptFilename)
 {
-    Logger::log(LogLevel::Debug, "Loading script '%s'...", scriptFilename);
-
+    //Logger::log(LogLevel::Debug, "Loading script '%s'...", scriptFilename);
     // Open lua libraries.
     luaL_openlibs(L);
 
@@ -1434,27 +1415,169 @@ void Character::loadScript(const std::string & scriptFilename)
     Race::luaRegister(L);
     Coordinates::luaRegister(L);
     Exit::luaRegister(L);
+    Terrain::luaRegister(L);
     Room::luaRegister(L);
+
+    Direction::luaRegister(L);
+    ModelType::luaRegister(L);
+    ToolType::luaRegister(L);
 
     if (luaL_dofile(L, scriptFilename.c_str()) != LUABRIDGE_LUA_OK)
     {
-        Logger::log(LogLevel::Error, "Can't open script+" + scriptFilename + ".");
-        Logger::log(LogLevel::Error, "Error :" + std::string(lua_tostring(L, -1)));
+        Logger::log(LogLevel::Error, "Can't open script %s.", scriptFilename);
+        Logger::log(LogLevel::Error,
+                    "Error :%s",
+                    std::string(lua_tostring(L, -1)));
     }
 }
 
-VectorHelper<Character *> Character::luaGetTargets()
+luabridge::LuaRef Character::luaGetEquipmentItems()
 {
+    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
+    for (auto item : equipment)
+    {
+        luaRef.append(item);
+    }
+    return luaRef;
+}
+
+luabridge::LuaRef Character::luaGetInventoryItems()
+{
+    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
+    for (auto item : inventory)
+    {
+        luaRef.append(item);
+    }
+    return luaRef;
+}
+
+luabridge::LuaRef Character::luaGetRoomsInSight()
+{
+    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
     if (room != nullptr)
     {
-        return VectorHelper<Character *>(room->characters);
+        CharacterContainer characterContainer;
+        auto validCoordinates = room->area->fov(room->coord,
+                                                this->getViewDistance());
+        for (auto coordinates : validCoordinates)
+        {
+            luaRef.append(room->area->getRoom(coordinates));
+        }
     }
-    return VectorHelper<Character *>();
+    return luaRef;
+}
+
+luabridge::LuaRef Character::luaGetCharactersInSight()
+{
+    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
+    if (room != nullptr)
+    {
+        CharacterContainer exceptions;
+        exceptions.emplace_back_character(this);
+        for (auto it : room->area->getCharactersInSight(exceptions,
+                                                        room->coord,
+                                                        this->getViewDistance()))
+        {
+            luaRef.append(it);
+        }
+    }
+    return luaRef;
+}
+
+luabridge::LuaRef Character::luaGetItemsInSight()
+{
+    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
+    if (room != nullptr)
+    {
+        ItemContainer exceptions;
+        for (auto it : room->area->getItemsInSight(exceptions,
+                                                   room->coord,
+                                                   this->getViewDistance()))
+        {
+            luaRef.append(it);
+        }
+    }
+    return luaRef;
+}
+
+luabridge::LuaRef Character::luaGetPathTo(Room * destination)
+{
+    auto checkFunction = [&](Room * from, Room * to)
+    {
+        // Get the direction.
+        auto direction = Area::getDirection(from->coord, to->coord);
+        // Get the exit;
+        auto destExit = from->findExit(direction);
+        // If the direction is upstairs, check if there is a stair.
+        if (direction == Direction::Up)
+        {
+            if (!HasFlag(destExit->flags, ExitFlag::Stairs)) return false;
+        }
+        // Check if the destination is correct.
+        if (destExit->destination == nullptr) return false;
+        // Check if the destination is bocked by a door.
+        auto door = destExit->destination->findDoor();
+        if (door != nullptr)
+        {
+            if (HasFlag(door->flags, ItemFlag::Closed)) return false;
+        }
+        // Check if the destination has a floor.
+        auto destDown = destExit->destination->findExit(Direction::Down);
+        if (destDown != nullptr)
+        {
+            if (!HasFlag(destDown->flags, ExitFlag::Stairs)) return false;
+        }
+        // Check if the destination is forbidden for mobiles.
+        return !(this->isMobile() && HasFlag(destExit->flags, ExitFlag::NoMob));
+    };
+    AStar<Room *> aStar;
+    std::vector<Room *> path;
+
+    luabridge::LuaRef luaRef(L, luabridge::LuaRef::newTable(L));
+    if (this->room != nullptr)
+    {
+        if (aStar.findPath(this->room, destination, path, checkFunction))
+        {
+            Coordinates previous = this->room->coord;
+            for (auto node : path)
+            {
+                luaRef.append(Area::getDirection(previous, node->coord));
+                previous = node->coord;
+            }
+        }
+    }
+    return luaRef;
+}
+
+Item * Character::luaLoadItem(int vnumModel,
+                              int vnumMaterial,
+                              unsigned int qualityValue)
+{
+    auto model = Mud::instance().findItemModel(vnumModel);
+    if (model == nullptr)
+    {
+        Logger::log(LogLevel::Error,
+                    "Can't find model :" + ToString(vnumModel));
+        return nullptr;
+    }
+    auto composition = Mud::instance().findMaterial(vnumMaterial);
+    if (composition == nullptr)
+    {
+        Logger::log(LogLevel::Error,
+                    "Can't find material :" + ToString(vnumMaterial));
+        return nullptr;
+    }
+    ItemQuality quality = ItemQuality::Normal;
+    if (ItemQuality::isValid(qualityValue))
+    {
+        quality = ItemQuality(qualityValue);
+    }
+    return model->createItem(this->getName(), composition, true, quality);
 }
 
 void Character::luaAddEquipment(Item * item)
 {
-    this->equipment.push_back(item);
+    equipment.push_back(item);
 }
 
 bool Character::luaRemEquipment(Item * item)
@@ -1469,7 +1592,7 @@ bool Character::luaRemEquipment(Item * item)
 
 void Character::luaAddInventory(Item * item)
 {
-    this->equipment.push_back(item);
+    equipment.push_back(item);
 }
 
 bool Character::luaRemInventory(Item * item)
@@ -1490,13 +1613,25 @@ void Character::luaRegister(lua_State * L)
         .addData("race", &Character::race)
         .addData("faction", &Character::faction)
         .addData("room", &Character::room)
+        .addFunction("getName", &Character::getName)
+        .addFunction("getNameCapital", &Character::getNameCapital)
         .addFunction("inventoryAdd", &Character::luaAddInventory)
         .addFunction("inventoryRem", &Character::luaRemInventory)
         .addFunction("equipmentAdd", &Character::luaAddEquipment)
         .addFunction("equipmentRem", &Character::luaRemEquipment)
         .addFunction("doCommand", &Character::doCommand)
-        .addFunction("getTargets", &Character::luaGetTargets)
+        .addFunction("getEquipmentItems", &Character::luaGetEquipmentItems)
+        .addFunction("getInventoryItems", &Character::luaGetInventoryItems)
+        .addFunction("getRoomsInSight", &Character::luaGetRoomsInSight)
+        .addFunction("getCharactersInSight",
+                     &Character::luaGetCharactersInSight)
+        .addFunction("getItemsInSight", &Character::luaGetItemsInSight)
+        .addFunction("luaGetPathTo", &Character::luaGetPathTo)
+        .addFunction("loadItem", &Character::luaLoadItem)
         .addFunction("isMobile", &Character::isMobile)
+        .addFunction("isPlayer", &Character::isPlayer)
+        .addFunction("toMobile", &Character::toMobile)
+        .addFunction("toPlayer", &Character::toPlayer)
         .endClass()
         .deriveClass<Mobile, Character>("Mobile")
         .addData("id", &Mobile::id)
@@ -1515,6 +1650,10 @@ void Character::luaRegister(lua_State * L)
         .addData("rent_room", &Player::rent_room, false)
         .addData("remaining_points", &Player::remaining_points, false)
         .addData("rent_room", &Player::rent_room, false)
+        .addFunction("setVariable", &Player::setLuaVariable)
+        .addFunction("getVariable", &Player::getLuaVariable)
+        .addFunction("removeVariable", &Player::removeLuaVariable)
+        .addFunction("isPlayer", &Player::isPlayer)
         .endClass();
 }
 
@@ -1531,6 +1670,35 @@ bool Character::operator==(const class Character & source) const
 void Character::sendMsg(const std::string & msg)
 {
     Logger::log(LogLevel::Error, "[SEND_MESSAGE] Msg :" + msg);
+}
+
+void Character::updateTicImpl()
+{
+    this->updateHealth();
+    this->updateStamina();
+    this->updateHunger();
+    this->updateThirst();
+    this->updateExpiredEffects();
+    this->updateActivatedEffects();
+}
+
+void Character::updateHourImpl()
+{
+    // Nothing to do.
+}
+
+std::string GetGenderTypeName(GenderType type)
+{
+    if (type == GenderType::Male) return "Male";
+    if (type == GenderType::Female) return "Female";
+    return "none";
+}
+
+std::string GetCharacterFlagName(CharacterFlag flag)
+{
+    if (flag == CharacterFlag::IsGod) return "IsGod";
+    if (flag == CharacterFlag::IsGod) return "Invisible";
+    return "None";
 }
 
 std::string GetCharacterFlagString(unsigned int flags)

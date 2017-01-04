@@ -30,14 +30,16 @@ AStar<ElementType>::AStar() :
 }
 
 template<typename ElementType>
-bool AStar<ElementType>::findPath(ElementType start,
-                                  ElementType end,
-                                  std::vector<ElementType> & path,
-                                  const std::function<bool(ElementType from, ElementType to)> & _checkFunction)
+bool AStar<ElementType>::findPath(
+    ElementType start,
+    ElementType end,
+    std::vector<ElementType> & path,
+    const std::function<bool(ElementType from,
+                             ElementType to)> & _checkFunction)
 {
     // Create the starting and end nodes.
-    startNode = std::make_shared<AStarNode<ElementType>>(start);
-    endNode = std::make_shared<AStarNode<ElementType>>(end);
+    startNode = std::make_shared<AStarNode<ElementType >>(start);
+    endNode = std::make_shared<AStarNode<ElementType >>(end);
     // Add the starting and ending nodes to the list of nodes.
     nodes.emplace_back(startNode);
     nodes.emplace_back(endNode);
@@ -65,18 +67,21 @@ bool AStar<ElementType>::findPath(ElementType start,
 }
 
 template<typename ElementType>
-bool AStar<ElementType>::search(std::shared_ptr<AStarNode<ElementType>> currentNode)
+bool AStar<ElementType>::search(
+    std::shared_ptr<AStarNode<ElementType>> currentNode)
 {
     // Set the current node to Closed since it cannot be traversed more than once
     currentNode->setNodeState(AStarNodeState::Closed);
     // Get the next nodes.
     auto neighbours = currentNode->getNeighbours(nodes, endNode, checkFunction);
     // Reorder the neighbours so that the one with the lesser G-Value comes first.
-    std::sort(neighbours.begin(), neighbours.end(), [](const std::shared_ptr<AStarNode<ElementType>> & left,
-                                                       const std::shared_ptr<AStarNode<ElementType>> & right)
-    {
-        return left->getF() < right->getF();
-    });
+    std::sort(neighbours.begin(),
+              neighbours.end(),
+              [](const std::shared_ptr<AStarNode<ElementType>> & left,
+                 const std::shared_ptr<AStarNode<ElementType>> & right)
+              {
+                  return left->getF() < right->getF();
+              });
     // Continue the search for each neighbour.
     for (auto it = neighbours.begin(); it != neighbours.end(); ++it)
     {

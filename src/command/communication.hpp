@@ -28,25 +28,26 @@
 void LoadCommunicationCommands();
 
 /// @defgroup ComInterfaces Commands List Interface.
-/// @brief All the functions necessary to handle the commands that a player can execute.
+/// @brief All the functions necessary to handle the commands that a player
+///         can execute.
 /// @{
 
 /// The character say something.
-void DoSay(Character * character, ArgumentHandler & args);
+bool DoSay(Character * character, ArgumentHandler & args);
 
 /// The character whisper something to someone, even in distance.
-void DoWhisper(Character * character, ArgumentHandler & args);
+bool DoWhisper(Character * character, ArgumentHandler & args);
 
 /// The character emote something.
-void DoEmote(Character * character, ArgumentHandler & args);
+bool DoEmote(Character * character, ArgumentHandler & args);
 
 /// The character report a bug.
-void DoBug(Character * character, ArgumentHandler & args);
+bool DoBug(Character * character, ArgumentHandler & args);
 
 /// The character send an idea.
-void DoIdea(Character * character, ArgumentHandler & args);
+bool DoIdea(Character * character, ArgumentHandler & args);
 
 /// The character report a typo.
-void DoTypo(Character * character, ArgumentHandler & args);
+bool DoTypo(Character * character, ArgumentHandler & args);
 
 ///@}

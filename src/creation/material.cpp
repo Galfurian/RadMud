@@ -22,9 +22,12 @@
 
 #include "material.hpp"
 
+#include "LuaBridge.hpp"
+#include "logger.hpp"
+
 Material::Material() :
     vnum(),
-    type(MaterialType::NoType),
+    type(MaterialType::None),
     name(),
     article(),
     worth(),
@@ -36,11 +39,10 @@ Material::Material() :
 
 Material::~Material()
 {
-    Logger::log(
-        LogLevel::Debug,
-        "Deleted material\t[%s]\t\t(%s)",
-        ToString(this->vnum),
-        this->name);
+//    Logger::log(LogLevel::Debug,
+//                "Deleted material\t[%s]\t\t(%s)",
+//                ToString(this->vnum),
+//                this->name);
 }
 
 bool Material::check()
@@ -48,7 +50,7 @@ bool Material::check()
     assert(vnum > 0);
     assert(!name.empty());
     assert(!article.empty());
-    assert(type != MaterialType::NoType);
+    assert(type != MaterialType::None);
     assert(worth > 0);
     assert(hardness > 0);
     assert(lightness > 0);

@@ -27,96 +27,72 @@
 
 void LoadCommunicationCommands()
 {
-    Command command;
-    command.gods = false;
-    {
-        command.name = "say";
-        command.help = "Talk to people in the current room.";
-        command.args = "[someone] (something)";
-        command.hndl = DoSay;
-        command.cuic = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "whisper";
-        command.help = "Whisper secretly to a single character.";
-        command.args = "(someone) (something)";
-        command.hndl = DoWhisper;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "emote";
-        command.help = "Execute and emote.";
-        command.args = "(emotion)";
-        command.hndl = DoEmote;
-        command.cuic = true;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "bug";
-        command.help = "Report a bug, your character's name, location and date will be saved.";
-        command.args = "(message)";
-        command.hndl = DoBug;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "idea";
-        command.help = "Send an idea, try to be as clear as possible.";
-        command.args = "(message)";
-        command.hndl = DoIdea;
-        Mud::instance().addCommand(command);
-    }
-    {
-        command.name = "typo";
-        command.help = "Report a typo.";
-        command.args = "(message)";
-        command.hndl = DoTypo;
-        Mud::instance().addCommand(command);
-    }
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoSay, "say", "[someone] (something)",
+        "Talk to people in the current room.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoWhisper, "whisper", "(someone) (something)",
+        "Whisper secretly to a single character.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoEmote, "emote", "(emotion)",
+        "Express an emotion.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoBug, "bug", "(message)",
+        "Report a bug, your character's name, location and date will be saved.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoIdea, "idea", "(message)",
+        "Send an idea, try to be as clear as possible.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoTypo, "typo", "(message)",
+        "Report a typo.",
+        false, true, false));
 }
 
-void DoSay(Character * character, ArgumentHandler & args)
+bool DoSay(Character * character, ArgumentHandler & args)
 {
     if (args.empty())
     {
         character->sendMsg("My dear friend, say what?\n");
-        return;
+        return false;
     }
     // Check if the character are talking to another character.
-    auto receiver = character->room->findCharacter(
-        args.get(0).getContent(),
-        args.get(0).getIndex(),
-        {character});
+    auto receiver = character->room->findCharacter(args.get(0).getContent(),
+                                                   args.get(0).getIndex(),
+                                                   {character});
     if (receiver != nullptr)
     {
         // Get the rest of the message, minus the first word.
         auto message = args.substr(1);
         if (message.empty())
         {
-            character->sendMsg("My dear friend, say what to %s?\n", receiver->getName());
-            return;
+            character->sendMsg("My dear friend, say what to %s?\n",
+                               receiver->getName());
+            return false;
         }
         // Eat the space between the name and the message.
         message = Trim(message, " ");
         // Player send.
-        character->sendMsg(
-            "You say to %s, \"%s\"\n",
-            receiver->getName(),
-            Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
-
+        character->sendMsg("You say to %s, \"%s\"\n",
+                           receiver->getName(),
+                           Formatter::cyan() + Formatter::italic() + message +
+                           Formatter::reset());
         // Target receive.
-        receiver->sendMsg(
-            "%s say to you, \"%s\"\n\n",
-            character->getName(),
-            Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
-
+        receiver->sendMsg("%s say to you, \"%s\"\n\n",
+                          character->getName(),
+                          Formatter::cyan() + Formatter::italic() + message +
+                          Formatter::reset());
         // Send the message inside the room.
-        character->room->sendToAll(
-            "%s says to %s, \"%s\".\n",
-            {character, receiver},
-            character->getName(),
-            receiver->getName(),
-            Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
+        character->room->sendToAll("%s says to %s, \"%s\".\n",
+                                   {character, receiver},
+                                   character->getName(),
+                                   receiver->getName(),
+                                   Formatter::cyan() + Formatter::italic() +
+                                   message + Formatter::reset());
         // If it's a mobile, activate the trigger.
         if (receiver->isMobile())
         {
@@ -125,78 +101,83 @@ void DoSay(Character * character, ArgumentHandler & args)
     }
     else
     {
-        character->sendMsg(
-            "You say \"%s\".\n",
-            Formatter::cyan() + Formatter::italic() + args.getOriginal() + Formatter::reset());
+        character->sendMsg("You say \"%s\".\n",
+                           Formatter::cyan() + Formatter::italic() +
+                           args.getOriginal() + Formatter::reset());
         // Send the message inside the room.
-        character->room->sendToAll(
-            "%s says \"%s\".\n",
-            {character},
-            character->getName(),
-            Formatter::cyan() + Formatter::italic() + args.getOriginal() + Formatter::reset());
+        character->room->sendToAll("%s says \"%s\".\n",
+                                   {character},
+                                   character->getName(),
+                                   Formatter::cyan() + Formatter::italic() +
+                                   args.getOriginal() + Formatter::reset());
     }
+    return true;
 }
 
-void DoWhisper(Character * character, ArgumentHandler & args)
+bool DoWhisper(Character * character, ArgumentHandler & args)
 {
     if (args.empty())
     {
         character->sendMsg("Whisper to whom?\n");
-        return;
+        return false;
     }
-    // Check the existance of the target character.
-    auto receiver = character->room->findCharacter(args[0].getContent(), args[0].getIndex(), {
-        character});
+    // Check the existence of the target character.
+    auto receiver = character->room->findCharacter(args[0].getContent(),
+                                                   args[0].getIndex(),
+                                                   {character});
     if (receiver == nullptr)
     {
         character->sendMsg("You don't see %s here.\n", args[0].getContent());
-        return;
+        return false;
     }
     // Retrieve the message.
     auto message = args.substr(1);
     if (message.empty())
     {
-        character->sendMsg("What do you want to whisper to %s?\n", receiver->getName());
-        return;
+        character->sendMsg("What do you want to whisper to %s?\n",
+                           receiver->getName());
+        return false;
     }
     // Check if the sender is invisible.
-    auto sender = (receiver->canSee(character)) ? "Someone" : character->getNameCapital();
+    auto sender = (receiver->canSee(character)) ? "Someone"
+                                                : character->getNameCapital();
     // Send the message.
-    character->sendMsg(
-        "%sYou whisper to %s, %s\"%s\".\n",
-        Formatter::magenta(),
-        receiver->getName(),
-        Formatter::reset(),
-        message);
-    receiver->sendMsg(
-        "%s whisper to you, %s\"%s\"\n\n",
-        Formatter::magenta() + sender,
-        Formatter::reset(),
-        message);
+    character->sendMsg("%sYou whisper to %s, %s\"%s\".\n",
+                       Formatter::magenta(),
+                       receiver->getName(),
+                       Formatter::reset(),
+                       message);
+    receiver->sendMsg("%s whisper to you, %s\"%s\"\n\n",
+                      Formatter::magenta() + sender,
+                      Formatter::reset(),
+                      message);
+    return true;
 }
 
-void DoEmote(Character * character, ArgumentHandler & args)
+bool DoEmote(Character * character, ArgumentHandler & args)
 {
     if (args.empty())
     {
         character->sendMsg("My dear friend, emote what?\n");
-        return;
+        return false;
     }
     // Send the messages.
-    character->sendMsg("%sYou %s\n", Formatter::yellow(), args.getOriginal() + Formatter::reset());
+    character->sendMsg("%sYou %s\n", Formatter::yellow(),
+                       args.getOriginal() + Formatter::reset());
     character->room->sendToAll(
         "%s %s\n",
         {character},
         Formatter::yellow() + character->getName(),
         args.getOriginal() + Formatter::reset());
+    return true;
 }
 
-void DoBug(Character * character, ArgumentHandler & args)
+bool DoBug(Character * character, ArgumentHandler & args)
 {
     if (args.empty())
     {
         character->sendMsg("Writing nothing won't help us!\n");
-        return;
+        return false;
     }
     std::vector<std::string> arguments;
     arguments.push_back(character->getName()); // Author
@@ -207,9 +188,9 @@ void DoBug(Character * character, ArgumentHandler & args)
     SQLiteDbms::instance().beginTransaction();
     if (!SQLiteDbms::instance().insertInto("Board", arguments))
     {
-        character->sendMsg("Something gone wrong during the storing of your bug.\n");
+        character->sendMsg("Something gone wrong while reporting your bug.\n");
         SQLiteDbms::instance().rollbackTransection();
-        return;
+        return false;
     }
     SQLiteDbms::instance().endTransaction();
     character->sendMsg("Bug posted on Board correctly.\n");
@@ -217,14 +198,15 @@ void DoBug(Character * character, ArgumentHandler & args)
     character->sendMsg("# Date     :%s\n", GetDate());
     character->sendMsg("# Location :%s\n", character->room->name);
     character->sendMsg("# Message  :%s\n", args.getOriginal());
+    return true;
 }
 
-void DoIdea(Character * character, ArgumentHandler & args)
+bool DoIdea(Character * character, ArgumentHandler & args)
 {
     if (args.empty())
     {
         character->sendMsg("Writing nothing won't help us!\n");
-        return;
+        return false;
     }
     std::vector<std::string> arguments;
     arguments.push_back(character->getName()); // Author
@@ -235,22 +217,23 @@ void DoIdea(Character * character, ArgumentHandler & args)
     SQLiteDbms::instance().beginTransaction();
     if (!SQLiteDbms::instance().insertInto("Board", arguments))
     {
-        character->sendMsg("Something gone wrong during the storing of your idea.\n");
+        character->sendMsg("Something gone wrong while reporting your idea.\n");
         SQLiteDbms::instance().rollbackTransection();
-        return;
+        return false;
     }
     SQLiteDbms::instance().endTransaction();
     character->sendMsg("Idea posted on Board correctly.\n");
     character->sendMsg("# Author   :%s\n", character->getName());
     character->sendMsg("# Message  :%s\n", args.getOriginal());
+    return true;
 }
 
-void DoTypo(Character * character, ArgumentHandler & args)
+bool DoTypo(Character * character, ArgumentHandler & args)
 {
     if (args.empty())
     {
         character->sendMsg("Writing nothing won't help us!\n");
-        return;
+        return false;
     }
     std::vector<std::string> arguments;
     arguments.push_back(character->getName()); // Author
@@ -262,9 +245,9 @@ void DoTypo(Character * character, ArgumentHandler & args)
     SQLiteDbms::instance().beginTransaction();
     if (!SQLiteDbms::instance().insertInto("Board", arguments))
     {
-        character->sendMsg("Something gone wrong during the storing of the Typo.\n");
+        character->sendMsg("Something gone wrong while reporting your Typo.\n");
         SQLiteDbms::instance().rollbackTransection();
-        return;
+        return false;
     }
     SQLiteDbms::instance().endTransaction();
 
@@ -273,4 +256,5 @@ void DoTypo(Character * character, ArgumentHandler & args)
     character->sendMsg("# Date     :%s\n", GetDate());
     character->sendMsg("# Location :%s\n", character->room->name);
     character->sendMsg("# Message  :%s\n", args.getOriginal());
+    return true;
 }

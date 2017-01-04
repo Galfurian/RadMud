@@ -21,11 +21,11 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "buildAction.hpp"
-#include "room.hpp"
-#include "sqliteDbms.hpp"
-#include "formatter.hpp"
 
-using namespace std::chrono;
+#include "formatter.hpp"
+#include "updater.hpp"
+#include "logger.hpp"
+#include "room.hpp"
 
 BuildAction::BuildAction(Character * _actor,
                          Building * _schematics,
@@ -39,14 +39,14 @@ BuildAction::BuildAction(Character * _actor,
     ingredients(_ingredients)
 {
     // Debugging message.
-    Logger::log(LogLevel::Debug, "Created BuildAction.");
+    //Logger::log(LogLevel::Debug, "Created BuildAction.");
     // Reset the cooldown of the action.
     this->resetCooldown(BuildAction::getCooldown(_actor, _schematics));
 }
 
 BuildAction::~BuildAction()
 {
-    Logger::log(LogLevel::Debug, "Deleted building action.");
+    //Logger::log(LogLevel::Debug, "Deleted building action.");
 }
 
 bool BuildAction::check(std::string & error) const
@@ -63,7 +63,8 @@ bool BuildAction::check(std::string & error) const
     }
     if (schematics == nullptr)
     {
-        Logger::log(LogLevel::Error, "The schematics for a building are a null pointer.");
+        Logger::log(LogLevel::Error,
+                    "The schematics for a building are a null pointer.");
         error = "You don't have a valid schematics set.";
         return false;
     }
@@ -72,7 +73,8 @@ bool BuildAction::check(std::string & error) const
         // Check if the ingredient has been deleted.
         if (iterator.first == nullptr)
         {
-            Logger::log(LogLevel::Error, "One of the ingredients is a null pointer.");
+            Logger::log(LogLevel::Error,
+                        "One of the ingredients is a null pointer.");
             error = "One of your ingredient is missing.";
             return false;
         }
@@ -94,7 +96,7 @@ bool BuildAction::check(std::string & error) const
         }
     }
     // Check if the actor has enough stamina to execute the action.
-    if (this->getConsumedStamina(actor) > actor->getStamina())
+    if (this->getConsumedStamina(actor) > actor->stamina)
     {
         error = "You are too tired right now.";
         return false;
@@ -162,15 +164,14 @@ ActionStatus BuildAction::perform()
     actor->remStamina(consumedStamina, true);
     actor->remInventoryItem(building);
     actor->room->addBuilding(building);
-    // Vector which will contain the list of items to destroy.
-    std::vector<Item *> destroyItems;
     // Add the ingredients to the list of items to destroy.
     for (auto it : ingredients)
     {
         auto ingredient = it.first;
         if (ingredient->quantity == it.second)
         {
-            destroyItems.push_back(ingredient);
+            // Add the ingredient to the list of items that has to be deleted.
+            MudUpdater::instance().addItemToDestroy(ingredient);
         }
         else
         {
@@ -180,22 +181,16 @@ ActionStatus BuildAction::perform()
     for (auto iterator : tools)
     {
         // Update the condition of the involved objects.
-        if (iterator->triggerDecay())
+        iterator->triggerDecay();
+        if (iterator->condition < 0)
         {
             actor->sendMsg(iterator->getName(true) + " falls into pieces.");
-            destroyItems.push_back(iterator);
         }
-    }
-    // Consume the items.
-    for (auto it : destroyItems)
-    {
-        it->removeFromMud();
-        it->removeOnDB();
-        delete (it);
     }
     // Send conclusion message.
     actor->sendMsg("You have finished building %s.\n\n",
-                   Formatter::yellow() + schematics->buildingModel->getName() + Formatter::reset());
+                   Formatter::yellow() + schematics->buildingModel->getName() +
+                   Formatter::reset());
     return ActionStatus::Finished;
 }
 
@@ -206,9 +201,10 @@ unsigned int BuildAction::getConsumedStamina(Character * character)
     // WEIGHT   [+1.6 to +2.51]
     // CARRIED  [+0.0 to +2.48]
     unsigned int consumedStamina = 1;
-    consumedStamina -= character->getAbilityLog(Ability::Strength, 0.0, 1.0);
+    consumedStamina -= character->getAbilityLog(Ability::Strength);
     consumedStamina = SafeSum(consumedStamina, SafeLog10(character->weight));
-    consumedStamina = SafeSum(consumedStamina, SafeLog10(character->getCarryingWeight()));
+    consumedStamina = SafeSum(consumedStamina,
+                              SafeLog10(character->getCarryingWeight()));
     return consumedStamina;
 }
 

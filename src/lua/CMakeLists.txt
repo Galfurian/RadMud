@@ -1,16 +1,15 @@
 #############################################
-# Directories
-set(RADMUD_LUA_INC
-        ./src/lua/luabridge/detail
-        ./src/lua/luabridge
-        ./src/lua
+# Include Directories
+set(PROJECT_INC ${PROJECT_INC}
+        ${CMAKE_SOURCE_DIR}/src/lua/luabridge/detail
+        ${CMAKE_SOURCE_DIR}/src/lua/luabridge
+        ${CMAKE_SOURCE_DIR}/src/lua
         PARENT_SCOPE
         )
 
 #############################################
-# Files
-set(RADMUD_LUA_SRC
-        ./src/lua/lua_script.cpp
-        ./src/lua/luabridge/detail/LuaHelpers.cpp
+# Source Files
+set(PROJECT_SRC ${PROJECT_SRC}
+        ${CMAKE_SOURCE_DIR}/src/lua/lua_script.cpp
         PARENT_SCOPE
         )

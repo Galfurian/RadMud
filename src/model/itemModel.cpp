@@ -23,7 +23,6 @@
 #include "itemModel.hpp"
 
 #include "mud.hpp"
-
 #include "armorModel.hpp"
 #include "bookModel.hpp"
 #include "containerModel.hpp"
@@ -42,8 +41,8 @@
 #include "vehicleModel.hpp"
 #include "magazineModel.hpp"
 #include "meleeWeaponModel.hpp"
-
 #include "itemFactory.hpp"
+#include "logger.hpp"
 
 ItemModel::ItemModel() :
     vnum(),
@@ -57,7 +56,6 @@ ItemModel::ItemModel() :
     baseWeight(),
     basePrice(),
     condition(),
-    decay(),
     material(),
     tileSet(),
     tileId()
@@ -67,12 +65,15 @@ ItemModel::ItemModel() :
 
 ItemModel::~ItemModel()
 {
-    Logger::log(LogLevel::Debug, "Deleted model\t\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
+    Logger::log(LogLevel::Debug,
+                "Deleted model\t\t[%s]\t\t(%s)",
+                ToString(this->vnum),
+                this->name);
 }
 
 ModelType ItemModel::getType() const
 {
-    return ModelType::NoType;
+    return ModelType::None;
 }
 
 void ItemModel::getSheet(Table & sheet) const
@@ -93,13 +94,13 @@ void ItemModel::getSheet(Table & sheet) const
     sheet.addRow({"Keys", keyGroup});
     sheet.addRow({"Description", this->description});
     sheet.addRow({"Type", this->getTypeName()});
-    sheet.addRow({"Slot", GetEquipmentSlotName(this->slot)});
+    sheet.addRow({"Slot", this->slot.toString()});
     sheet.addRow({"Flags", GetModelFlagString(this->modelFlags)});
     sheet.addRow({"Condition", ToString(this->condition)});
-    sheet.addRow({"Decay", ToString(this->decay)});
-    sheet.addRow({"Material", GetMaterialTypeName(this->material)});
+    sheet.addRow({"Material", this->material.toString()});
     sheet.addRow({"Tile", ToString(this->condition)});
-    sheet.addRow({"Condition", ToString(this->tileSet) + ":" + ToString(this->tileId)});
+    sheet.addRow({"Condition", ToString(this->tileSet) + ":" +
+                               ToString(this->tileId)});
 }
 
 Item * ItemModel::createItem(
@@ -146,9 +147,11 @@ Item * ItemModel::createItem(
         // Evaluate the base value.
         auto valBase = this->basePrice;
         // Evaluate the modifier due to item's quality.
-        auto valQuality = static_cast<unsigned int>(valBase * itemQuality.getModifier());
+        auto valQuality = static_cast<unsigned int>(valBase *
+                                                    itemQuality.getModifier());
         // Evaluate the modifier due to item's material.
-        auto valMaterial = static_cast<unsigned int>(valBase * composition->getWorthModifier());
+        auto valMaterial = static_cast<unsigned int>(valBase *
+                                                     composition->getWorthModifier());
         // Evaluate the result.
         newItem->price = ((valBase + valQuality + valMaterial) / 3);
     }
@@ -166,16 +169,17 @@ Item * ItemModel::createItem(
         // Evaluate the base value.
         auto valBase = this->condition;
         // Evaluate the modifier due to item's quality.
-        auto valQuality = static_cast<unsigned int>(valBase * itemQuality.getModifier());
+        auto valQuality = valBase * itemQuality.getModifier();
         // Evaluate the modifier due to item's material.
-        auto valMaterial = static_cast<unsigned int>(valBase * composition->getHardnessModifier());
+        auto valMaterial = valBase * composition->getHardnessModifier();
         // Evaluate the result.
         newItem->maxCondition = ((valBase + valQuality + valMaterial) / 3);
         newItem->condition = newItem->maxCondition;
     }
     newItem->currentSlot = slot;
 
-    // If the item is for a mobile, do not add the item to the MUD nor to the DB and do not check its correctness.
+    // If the item is for a mobile, do not add the item to the MUD nor to the
+    //  DB and do not check its correctness.
     if (isForMobile)
     {
         return newItem;
@@ -224,8 +228,7 @@ bool ItemModel::check()
         assert(slot != EquipmentSlot::None);
     }
     assert(condition > 0);
-    assert(decay > 0);
-    assert(this->material != MaterialType::NoType);
+    assert(this->material != MaterialType::None);
     assert(tileSet >= 0);
     assert(tileId >= 0);
     return true;
@@ -241,7 +244,8 @@ bool ItemModel::replaceSymbols(
     {
         modified = true;
         FindAndReplace(&source, "&m", ToLower(itemMaterial->name));
-        FindAndReplace(&source, "&M", ToLower(itemMaterial->article + ' ' + itemMaterial->name));
+        FindAndReplace(&source, "&M", ToLower(
+            itemMaterial->article + ' ' + itemMaterial->name));
     }
     else
     {
@@ -260,7 +264,8 @@ bool ItemModel::replaceSymbols(
     return modified;
 }
 
-std::string ItemModel::getName(Material * itemMaterial, const ItemQuality & itemQuality) const
+std::string ItemModel::getName(Material * itemMaterial,
+                               const ItemQuality & itemQuality) const
 {
     // Make a copy of the short description.
     std::string output = shortdesc;
@@ -272,7 +277,8 @@ std::string ItemModel::getName(Material * itemMaterial, const ItemQuality & item
     return output;
 }
 
-std::string ItemModel::getDescription(Material * itemMaterial, const ItemQuality & itemQuality)
+std::string ItemModel::getDescription(Material * itemMaterial,
+                                      const ItemQuality & itemQuality)
 {
     // Make a copy of the description.
     std::string output = description;
@@ -282,7 +288,8 @@ std::string ItemModel::getDescription(Material * itemMaterial, const ItemQuality
 
 bool ItemModel::mustBeWielded()
 {
-    return ((slot == EquipmentSlot::RightHand) || (slot == EquipmentSlot::LeftHand));
+    return ((slot == EquipmentSlot::RightHand) ||
+            (slot == EquipmentSlot::LeftHand));
 }
 
 void ItemModel::luaRegister(lua_State * L)
@@ -291,14 +298,62 @@ void ItemModel::luaRegister(lua_State * L)
         .beginClass<ItemModel>("ItemModel")
         .addData("vnum", &ItemModel::vnum)
         .addData("condition", &ItemModel::condition)
-        .addData("decay", &ItemModel::decay)
+        .addFunction("toTool", &ItemModel::toTool)
         .addFunction("getType", &ItemModel::getType)
+        .endClass()
+        .deriveClass<ToolModel, ItemModel>("ToolModel")
+        .addData("toolType", &ToolModel::toolType)
+        .addFunction("getTypeName", &ToolModel::getTypeName)
+        .endClass()
+        .deriveClass<ArmorModel, ItemModel>("ArmorModel")
+        .endClass()
+        .deriveClass<BookModel, ItemModel>("BookModel")
+        .endClass()
+        .deriveClass<ContainerModel, ItemModel>("ContainerModel")
+        .endClass()
+        .deriveClass<CorpseModel, ItemModel>("CorpseModel")
+        .endClass()
+        .deriveClass<CurrencyModel, ItemModel>("CurrencyModel")
+        .endClass()
+        .deriveClass<FoodModel, ItemModel>("FoodModel")
+        .endClass()
+        .deriveClass<FurnitureModel, ItemModel>("FurnitureModel")
+        .endClass()
+        .deriveClass<KeyModel, ItemModel>("KeyModel")
+        .endClass()
+        .deriveClass<LightModel, ItemModel>("LightModel")
+        .endClass()
+        .deriveClass<LiquidContainerModel, ItemModel>("LiquidContainerModel")
+        .endClass()
+        .deriveClass<MagazineItem, ItemModel>("MagazineItem")
+        .endClass()
+        .deriveClass<MechanismModel, ItemModel>("MechanismModel")
+        .endClass()
+        .deriveClass<MeleeWeaponModel, ItemModel>("MeleeWeaponModel")
+        .endClass()
+        .deriveClass<NodeModel, ItemModel>("NodeModel")
+        .endClass()
+        .deriveClass<ProjectileModel, ItemModel>("ProjectileModel")
+        .endClass()
+        .deriveClass<RangedWeaponModel, ItemModel>("RangedWeaponModel")
+        .endClass()
+        .deriveClass<ResourceModel, ItemModel>("ResourceModel")
+        .endClass()
+        .deriveClass<RopeModel, ItemModel>("RopeModel")
+        .endClass()
+        .deriveClass<SeedModel, ItemModel>("SeedModel")
+        .endClass()
+        .deriveClass<ShieldModel, ItemModel>("ShieldModel")
+        .endClass()
+        .deriveClass<ShopModel, ItemModel>("ShopModel")
+        .endClass()
+        .deriveClass<VehicleModel, ItemModel>("VehicleModel")
         .endClass();
 }
 
 std::string ItemModel::getTile(int offset)
 {
-    if (Formatter::getFormat() == Formatter::TELNET)
+    if (Formatter::getFormat() == Formatter::CLIENT)
     {
         return ToString(tileSet) + ":" + ToString(tileId + offset);
     }
@@ -307,7 +362,8 @@ std::string ItemModel::getTile(int offset)
     {
         return "a";
     }
-    if ((this->getType() == ModelType::MeleeWeapon) || (this->getType() == ModelType::RangedWeapon))
+    if ((this->getType() == ModelType::MeleeWeapon) ||
+        (this->getType() == ModelType::RangedWeapon))
     {
         return "w";
     }

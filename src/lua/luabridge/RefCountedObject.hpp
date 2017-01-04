@@ -34,6 +34,8 @@
 /// Copyright 2004-11 by Raw Material Software Ltd.
 ///----------------------------------------------------------------------------
 
+#include <cassert>
+
 /**
  Adds reference-counting to an object.
 

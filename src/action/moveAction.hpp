@@ -22,7 +22,9 @@
 
 #pragma once
 
+#include "characterPosture.hpp"
 #include "generalAction.hpp"
+#include "direction.hpp"
 
 /// @brief An action which allows to move characters.
 class MoveAction :
@@ -55,7 +57,8 @@ public:
     ActionStatus perform() override;
 
     /// @brief Given an action, it returns the stamina required to execute it.
-    static unsigned int getConsumedStamina(const Character * character, const CharacterPosture & posture);
+    static unsigned int getConsumedStamina(const Character * character,
+                                           const CharacterPosture & posture);
 
     /// @brief Given an action, it returns the necessary cooldown.
     /// @param character The actor.
@@ -63,10 +66,16 @@ public:
     static unsigned int getCooldown(const Character * character);
 
     /// @brief Check if the character can move in the given direction.
-    /// @param character The character that wants to move.
-    /// @param direction The direction where the character whats to move.
-    /// @param error     A reference to a string which will contain error message in case of failure.
-    /// @return <b>True</b> if the character can move toward the given direction,<br>
+    /// @param character     The character that wants to move.
+    /// @param direction     The direction where the character whats to move.
+    /// @param error         A reference to a string which will contain error
+    ///                       message in case of failure.
+    /// @param allowInCombat If true, the function does not check if the
+    ///                       character is in close-combat.
+    /// @return <b>True</b> if the character can move to the given direction,<br>
     ///         <b>False</b> otherwise.
-    static bool canMoveTo(Character * character, const Direction & direction, std::string & error);
+    static bool canMoveTo(Character * character,
+                          const Direction & direction,
+                          std::string & error,
+                          bool allowInCombat);
 };

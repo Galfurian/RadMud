@@ -22,119 +22,17 @@
 
 #pragma once
 
-#include <string>
+#include "resultSet.hpp"
 #include <sqlite3.h>
-
-/// @brief Interface class for result set of all the query.
-class ResultSet
-{
-public:
-    /// @brief Destructor.
-    virtual ~ResultSet();
-
-    /// @brief Advance in the rows.
-    /// @return <b>True</b> if there are still rows in the resultset of the last executed query,<br>
-    ///         <b>False</b> if no row present.
-    virtual bool next() = 0;
-
-    /// @brief Release all the result set, as well as reset all the data.
-    /// @return <b>True</b> if the finalize is OK,<br>
-    ///         <b>False</b> otherwise.
-    virtual bool release() = 0;
-
-    /// @brief This function return the number of columns present in the resultset of the last executed query.
-    /// @return The number of the columns.
-    virtual int getColumnCount() = 0;
-
-    /// @brief Get the name of the given column.
-    /// @param column The column number.
-    /// @return The name of the column.
-    virtual std::string getColumnName(const int & column) = 0;
-
-    /// @brief Get the given coloumn data as a string.
-    /// @param column The column number.
-    /// @return The string retrieved from the cell.
-    virtual std::string getDataString(const int & column) = 0;
-
-    /// @brief Get the given coloumn data as an integer.
-    /// @param column The number of the column.
-    /// @return The integer retrieved from the cell.
-    virtual int getDataInteger(const int & column) = 0;
-
-    /// @brief Get the next coloumn data as a string.
-    /// @return The string retrieved from the cell.
-    virtual std::string getNextString() = 0;
-
-    /// @brief Get the next coloumn data as an integer.
-    /// @return The integer retrieved from the cell.
-    virtual int getNextInteger() = 0;
-
-    /// @brief Get the next coloumn data as an unsigned integer.
-    /// @return The unsigned integer retrieved from the cell.
-    virtual unsigned int getNextUnsignedInteger() = 0;
-
-    /// @brief Get the next coloumn data as a double.
-    /// @return The double retrieved from the cell.
-    virtual double getNextDouble() = 0;
-};
 
 /// @brief Class necessary to execute query on the Database.
 class SQLiteWrapper :
     public ResultSet
 {
-public:
-    /// @brief Constructor.
-    SQLiteWrapper();
-
-    /// Deconstructor for the class SQLiteWrapper.
-    virtual ~SQLiteWrapper();
-
-    /// @brief Open database connection.
-    /// @param dbName      The name of the database.
-    /// @param dbDirectory The directory where the database resides.
-    /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
-    bool openConnection(std::string dbName, std::string dbDirectory);
-
-    /// @brief Close database connection.
-    /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
-    bool closeConnection();
-
-    /// @brief This method is used to execute a SELECT Query.
-    /// @param query The query that has to be executed.
-    /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
-    ResultSet * executeSelect(const char * query);
-
-    /// @brief This method is used to execute a INSERT/DELETE/UPDATE Query.
-    /// @param query The query that has to be executed.
-    /// @return The number of affected data by the query.
-    int executeQuery(const char * query);
-
-    /// @brief Begin a transaction.
-    void beginTransaction();
-
-    /// @brief End a transaction.
-    void endTransaction();
-
-    /// @brief Rollback a Transaction.
-    void rollbackTransection();
-
-    /// @brief Get the last error message.
-    /// @return The string of the last error message.
-    std::string getLastErrorMsg() const;
-
-    /// @brief Get the last error code.
-    /// @return The last error code.
-    int getLastErrorCode() const;
-
-    /// @brief Check if the databse is connected
-    /// @return <b>True</b> if databse is connected,<br> <b>False</b> Otherwise.
-    bool isConnected();
-
 private:
     /// @brief SQLite Connection Object.
     using DBDetails = struct
     {
-    public:
         /// SQLite connection object.
         sqlite3 * dbConnection;
         /// Database name.
@@ -144,6 +42,9 @@ private:
         /// SQLite statement object.
         sqlite3_stmt * dbStatement;
     };
+
+    /// SQLite Connection Details.
+    DBDetails dbDetails;
 
     /// Connection status to the database.
     bool connected;
@@ -160,20 +61,75 @@ private:
     /// Current column.
     int currentColumn;
 
-    /// SQLite Connection Details.
-    DBDetails dbDetails;
+public:
+    /// @brief Constructor.
+    SQLiteWrapper();
 
+    /// Deconstructor for the class SQLiteWrapper.
+    virtual ~SQLiteWrapper();
+
+    /// @brief Open database connection.
+    /// @param dbName      The name of the database.
+    /// @param dbDirectory The directory where the database resides.
+    /// @return <b>True</b> if the operations succeeded,<br>
+    ///         <b>False</b> Otherwise.
+    bool openConnection(std::string dbName, std::string dbDirectory);
+
+    /// @brief Close database connection.
+    /// @return <b>True</b> if the operations succeeded,<br>
+    ///         <b>False</b> Otherwise.
+    bool closeConnection();
+
+    /// @brief Get the last error message.
+    /// @return The string of the last error message.
+    std::string getLastErrorMsg() const;
+
+    /// @brief Get the last error code.
+    /// @return The last error code.
+    int getLastErrorCode() const;
+
+    /// @brief This method is used to execute a SELECT Query.
+    /// @param query The query that has to be executed.
+    /// @return <b>True</b> if the operations succeeded,<br>
+    ///         <b>False</b> Otherwise.
+    ResultSet * executeSelect(const char * query);
+
+    /// @brief This method is used to execute a INSERT/DELETE/UPDATE Query.
+    /// @param query The query that has to be executed.
+    /// @return The number of affected data by the query.
+    int executeQuery(const char * query);
+
+    /// @brief Begin a transaction.
+    void beginTransaction();
+
+    /// @brief End a transaction.
+    void endTransaction();
+
+    /// @brief Rollback a Transaction.
+    void rollbackTransection();
+
+    /// @brief Check if the databse is connected
+    /// @return <b>True</b> if databse is connected,<br>
+    ///         <b>False</b> Otherwise.
+    bool isConnected();
+
+private:
     bool next() override;
 
     bool release() override;
 
     int getColumnCount() override;
 
-    std::string getColumnName(const int & column) override;
+    bool getColumnName(const int & column, std::string & columnName) override;
 
-    std::string getDataString(const int & column) override;
+    bool getDataString(const int & column, std::string & data) override;
 
-    int getDataInteger(const int & column) override;
+    bool getDataInteger(const int & column, int & data) override;
+
+    bool getDataUnsignedInteger(const int & column,
+                                unsigned int & data) override;
+
+    bool getDataDouble(const int & column, double & data) override;
 
     std::string getNextString() override;
 

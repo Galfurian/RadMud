@@ -22,6 +22,8 @@
 
 #include "shieldModel.hpp"
 
+#include "logger.hpp"
+
 ShieldModel::ShieldModel() :
     size(),
     parryChance()
@@ -48,7 +50,9 @@ bool ShieldModel::setModel(const std::string & source)
 {
     if (source.empty())
     {
-        Logger::log(LogLevel::Error, "Function list is empty (%s).", this->name);
+        Logger::log(LogLevel::Error,
+                    "Function list is empty (%s).",
+                    this->name);
         return false;
     }
     std::vector<std::string> functionList = SplitString(source, " ");
@@ -60,7 +64,8 @@ bool ShieldModel::setModel(const std::string & source)
             this->name);
         return false;
     }
-    this->size = static_cast<ShieldSize>(ToNumber<unsigned int>(functionList[0]));
+    this->size = static_cast<ShieldSize>(ToNumber<unsigned int>(
+        functionList[0]));
     this->parryChance = ToNumber<unsigned int>(functionList[1]);
     return true;
 }

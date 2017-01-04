@@ -22,6 +22,8 @@
 
 #include "liquidContainerModel.hpp"
 
+#include "logger.hpp"
+
 LiquidContainerModel::LiquidContainerModel() :
     maxWeight(),
     liquidFlags()
@@ -48,7 +50,9 @@ bool LiquidContainerModel::setModel(const std::string & source)
 {
     if (source.empty())
     {
-        Logger::log(LogLevel::Error, "Function list is empty (%s).", this->name);
+        Logger::log(LogLevel::Error,
+                    "Function list is empty (%s).",
+                    this->name);
         return false;
     }
     std::vector<std::string> functionList = SplitString(source, " ");

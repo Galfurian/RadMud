@@ -25,15 +25,18 @@
 
 #pragma once
 
-#include "defines.hpp"
+#include "ability.hpp"
+#include "characterPosture.hpp"
 #include "exit.hpp"
 #include "race.hpp"
 #include "item.hpp"
 #include "faction.hpp"
 #include "effectList.hpp"
+#include "processInput.hpp"
 #include "combatAction.hpp"
 #include "argumentHandler.hpp"
 #include "characterContainer.hpp"
+#include "LuaBridge.hpp"
 
 #include <deque>
 
@@ -43,12 +46,30 @@ class Player;
 
 class Mobile;
 
+/// The list of possible actions.
+using GenderType = enum class GenderType_t
+{
+    None,   ///< The character has no gender (robot).
+    Female, ///< The character is a female.
+    Male    ///< The character is a male.
+};
+
+/// Used to determine the flag of the character.
+using CharacterFlag = enum class CharacterFlag_t
+{
+    None = 0,       ///< No flag.
+    IsGod = 1,      ///< The character is a GOD.
+    Invisible = 2   ///< The character is invisible.
+};
+
 /// @brief Character class, father of Player and Mobile.
 /// @details
 /// It's the main class that contains all the information that both
-/// players and npcs shares. In order to allow dynamic casting(polymorphism),
-/// i've created a mthod called isMobile, used to identify the subtype of the subclass.
-class Character
+/// players and NPCs shares. In order to allow dynamic casting(polymorphism),
+/// i've created a method called isMobile, used to identify the subtype of the
+/// subclass.
+class Character :
+    public UpdateInterface
 {
 public:
     /// Character name.
@@ -58,7 +79,7 @@ public:
     /// Character gender.
     GenderType gender;
     /// Character weight.
-    unsigned int weight;
+    double weight;
     /// Character level.
     unsigned int level;
     /// Character flags.
@@ -72,9 +93,9 @@ public:
     /// Character stamina value.
     unsigned int stamina;
     /// Character level of hunger
-    unsigned int hunger;
+    int hunger;
     /// Character level of thirst.
-    unsigned int thirst;
+    int thirst;
     /// Character abilities.
     std::map<Ability, unsigned int> abilities;
     /// The current room the character is in.
@@ -93,8 +114,8 @@ public:
     CombatHandler combatHandler;
     /// Character current action.
     std::deque<std::shared_ptr<GeneralAction> > actionQueue;
-    /// List of characters in sight.
-    CharacterContainer charactersInSight;
+    /// The input handler.
+    std::shared_ptr<ProcessInput> inputProcessor;
 
     /// @brief Constructor.
     Character();
@@ -123,13 +144,14 @@ public:
     ///         <b>False</b> otherwise.
     virtual bool isPlayer() const;
 
-    /// @brief Fills the provided table with the information concerning the character.
+    /// @brief Fills the provided table with the information concerning the
+    ///         character.
     /// @param sheet The table that has to be filled.
     virtual void getSheet(Table & sheet) const;
 
     /// @brief Return the name of the character with all lowercase characters.
     /// @return The name of the character.
-    std::string getName() const;
+    virtual std::string getName() const = 0;
 
     /// @brief Return the name of the character.
     /// @return The name of the character.
@@ -161,7 +183,8 @@ public:
     ///                     ability value without the contribution due to
     ///                     the active effects.
     /// @return The overall ability value.
-    unsigned int getAbility(const Ability & ability, bool withEffects = true) const;
+    unsigned int getAbility(const Ability & ability,
+                            bool withEffects = true) const;
 
     /// @brief Provides the modifier of the given ability.
     /// @param ability The ability of which the modifier has to be
@@ -170,7 +193,8 @@ public:
     ///                     ability modifier without the contribution due
     ///                     to the active effects.
     /// @return The overall ability modifer.
-    unsigned int getAbilityModifier(const Ability & ability, bool withEffects = true) const;
+    unsigned int getAbilityModifier(const Ability & ability,
+                                    bool withEffects = true) const;
 
     /// @brief Provides the base ten logarithm of the desired ability
     ///         modifier, multiplied by an optional multiplier. Also,
@@ -186,8 +210,8 @@ public:
     /// @return The overall base ten logarithm of the given ability modifer.
     unsigned int getAbilityLog(
         const Ability & ability,
-        const double & base,
-        const double & multiplier,
+        const double & base = 0.0,
+        const double & multiplier = 1.0,
         const bool & withEffects = true) const;
 
     /// @brief Allows to SET the health value.
@@ -219,10 +243,6 @@ public:
     /// @return <b>True</b> if the function has removed the value,<br>
     ///         <b>False</b> otherwise.
     bool remHealth(const unsigned int & value, const bool & force = false);
-
-    /// @brief Get character level of health.
-    /// @return Health of this character.
-    unsigned int getHealth() const;
 
     /// @brief Return the max health value.
     /// @param withEffects <b>True</b> also add the health due to effects,<br>
@@ -265,10 +285,6 @@ public:
     ///         <b>False</b> otherwise.
     bool remStamina(const unsigned int & value, const bool & force = false);
 
-    /// @brief Get character level of stamina.
-    /// @return Stamina of this character.
-    unsigned int getStamina() const;
-
     /// @brief Return the max stamina value.
     /// @param withEffects  <b>True</b> also add the stamina due to effects,<br>
     ///                     <b>False</b> otherwise.
@@ -281,7 +297,7 @@ public:
 
     /// @brief Evaluate the maximum distance at which the character can still see.
     /// @return The maximum radius of view.
-    unsigned int getViewDistance() const;
+    int getViewDistance() const;
 
     /// @brief Allows to set an action.
     /// @param _action The action that has to be set.
@@ -377,16 +393,6 @@ public:
     /// @return List of found coins.
     std::vector<Item *> findCoins();
 
-    /// @brief Allows to check if an item is inside the inventory.
-    /// @param item The item to search.
-    /// @return <b>True</b> if the item is inside the inventory,<br><b>False</b> otherwise.
-    bool hasInventoryItem(Item * item);
-
-    /// @brief Allows to check if an item is inside the equipment.
-    /// @param item The item to search.
-    /// @return <b>True</b> if the item is inside the equipment,<br><b>False</b> otherwise.
-    bool hasEquipmentItem(Item * item);
-
     /// @brief Add the passed item to character's inventory.
     /// @param item The item to add to inventory.
     virtual void addInventoryItem(Item *& item);
@@ -409,8 +415,9 @@ public:
 
     /// @brief Check if the player can carry the item.
     /// @param item     The item we want to check.
-    /// @param quantity The ammount of item to check (by default it is 1).
-    /// @return <b>True</b> if the character can lift the item,<br><b>False</b> otherwise.
+    /// @param quantity The amount of item to check (by default it is 1).
+    /// @return <b>True</b> if the character can lift the item,<br>
+    ///         <b>False</b> otherwise.
     bool canCarry(Item * item, unsigned int quantity) const;
 
     /// @brief The total carrying weight for this character.
@@ -427,7 +434,9 @@ public:
     /// @param where Where the item has been wielded.
     /// @return <b>True</b> if the operation goes well,<br>
     ///         <b>False</b> otherwise.
-    bool canWield(Item * item, std::string & error, EquipmentSlot & where) const;
+    bool canWield(Item * item,
+                  std::string & error,
+                  EquipmentSlot & where) const;
 
     /// @brief Check if the character can wear a given item.
     /// @param item  The item to wear.
@@ -436,15 +445,14 @@ public:
     ///         <b>False</b> otherwise.
     bool canWear(Item * item, std::string & error) const;
 
+    /// @brief Checks if inside the inventory there is a light source.
+    /// @return <b>True</b> if there is a light source,<br>
+    ///         <b>False</b> otherwise.
+    bool inventoryIsLit() const;
+
     /// @brief Sums the given value to the current thirst.
     /// @param value The value to sum.
-    /// @return <b>True</b> if the new value is geq 0,<br>
-    ///         <b>False</b> otherwise.
-    bool setThirst(int value);
-
-    /// @brief Provides the current level of thirst.
-    /// @return The current value.
-    unsigned int getThirst() const;
+    void addThirst(const int & value);
 
     /// @brief Get character level of thirst.
     /// @return Thirst of this character.
@@ -452,13 +460,7 @@ public:
 
     /// @brief Sums the given value to the current hunger.
     /// @param value The value to sum.
-    /// @return <b>True</b> if the new value is geq 0,<br>
-    ///         <b>False</b> otherwise.
-    bool setHunger(int value);
-
-    /// @brief Provides the current level of hunger.
-    /// @return The current value.
-    unsigned int getHunger() const;
+    void addHunger(const int & value);
 
     /// @brief Get character level of hunger.
     /// @return Hunger of this character.
@@ -509,7 +511,7 @@ public:
     /// @param range The maximum range.
     /// @return <b>True</b> if the target is in sight,<br>
     ///         <b>False</b> otherwise.
-    bool isAtRange(Character * target, const unsigned int & range);
+    bool isAtRange(Character * target, const int & range);
 
     /// @brief Provides the list of active melee weapons (Left and Right hands).
     /// @return Vector of melee weapons.
@@ -528,7 +530,9 @@ public:
 
     /// @brief Handle character input.
     /// @param command Command that need to be handled.
-    void doCommand(const std::string & command);
+    /// @return <b>True</b> if the command has been correctly executed,<br>
+    ///         <b>False</b> otherwise.
+    bool doCommand(const std::string & command);
 
     /// @brief Returns the character <b>statically</b> casted to player.
     /// @return The player version of the character.
@@ -542,10 +546,32 @@ public:
     /// @param scriptFilename The name of the script that has to be loaded.
     void loadScript(const std::string & scriptFilename);
 
-    /// @brief Returns the list of available targets using the vector
-    ///         structure made for lua environment.
-    /// @return The vector of targets.
-    VectorHelper<Character *> luaGetTargets();
+    /// @brief Returns the list of equipped items.
+    luabridge::LuaRef luaGetEquipmentItems();
+
+    /// @brief Returns the list of items inside the inventory.
+    luabridge::LuaRef luaGetInventoryItems();
+
+    /// @brief Returns the list of rooms in sight.
+    luabridge::LuaRef luaGetRoomsInSight();
+
+    /// @brief Returns the list of characters in sight.
+    luabridge::LuaRef luaGetCharactersInSight();
+
+    /// @brief Returns the list of items in sight.
+    luabridge::LuaRef luaGetItemsInSight();
+
+    /// @brief Returns the list of items in sight.
+    luabridge::LuaRef luaGetPathTo(Room * destination);
+
+    /// @brief Allow from lua to load an item.
+    /// @param vnumModel    The vnum of the model.
+    /// @param vnumMaterial The vnum of the material.
+    /// @param qualityValue The initial quality of the item.
+    /// @return The newly created item.
+    Item * luaLoadItem(int vnumModel,
+                       int vnumMaterial,
+                       unsigned int qualityValue);
 
     /// @brief Specific function used by lua to add an equipment item.
     void luaAddEquipment(Item * item);
@@ -578,7 +604,9 @@ public:
     /// @param first The first unpacked argument.
     /// @param args  Packed arguments.
     template<typename ... Args>
-    void sendMsg(const std::string & msg, const std::string & first, const Args & ... args)
+    void sendMsg(const std::string & msg,
+                 const std::string & first,
+                 const Args & ... args)
     {
         std::string::size_type pos = msg.find("%s");
         if (pos == std::string::npos)
@@ -593,16 +621,39 @@ public:
         }
     }
 
-    /// @brief Sends a message to the character. This one in particular handles unsigned integer.
+    /// @brief Sends a message to the character.
+    /// This one in particular handles unsigned integer.
     template<typename ... Args>
-    void sendMsg(const std::string & msg, const unsigned int & first, const Args & ... args)
+    void sendMsg(const std::string & msg,
+                 const unsigned int & first,
+                 const Args & ... args)
     {
         this->sendMsg(msg, ToString(first), args ...);
     }
+
+    /// @brief Sends a message to the character. This one in particular handles unsigned integer.
+    template<typename ... Args>
+    void sendMsg(const std::string & msg,
+                 const int & first,
+                 const Args & ... args)
+    {
+        this->sendMsg(msg, ToString(first), args ...);
+    }
+
+protected:
+    void updateTicImpl() override;
+
+    void updateHourImpl() override;
 };
 
 /// @addtogroup FlagsToList
 /// @{
+
+/// Return the string describing the type of Gender.
+std::string GetGenderTypeName(GenderType type);
+
+/// Return the string describing the given character flag.
+std::string GetCharacterFlagName(CharacterFlag flag);
 
 /// Return a list of string containg the Character flags contained inside the value.
 std::string GetCharacterFlagString(unsigned int flags);

@@ -22,6 +22,8 @@
 
 #include "projectileModel.hpp"
 
+#include "logger.hpp"
+
 ProjectileModel::ProjectileModel() :
     projectileType(),
     damageBonus(),
@@ -49,7 +51,9 @@ bool ProjectileModel::setModel(const std::string & source)
 {
     if (source.empty())
     {
-        Logger::log(LogLevel::Error, "Function list is empty (%s).", this->name);
+        Logger::log(LogLevel::Error,
+                    "Function list is empty (%s).",
+                    this->name);
         return false;
     }
     std::vector<std::string> functionList = SplitString(source, " ");
@@ -61,9 +65,10 @@ bool ProjectileModel::setModel(const std::string & source)
             this->name);
         return false;
     }
-    this->projectileType = static_cast<RangedWeaponType>(ToNumber<unsigned int>(functionList[0]));
+    this->projectileType = static_cast<RangedWeaponType>(ToNumber<unsigned int>(
+        functionList[0]));
     this->damageBonus = ToNumber<unsigned int>(functionList[1]);
-    this->rangeBonus = ToNumber<unsigned int>(functionList[2]);
+    this->rangeBonus = ToNumber<int>(functionList[2]);
     return true;
 }
 
@@ -74,7 +79,8 @@ void ProjectileModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow({"Projectile Type", GetRangedWeaponTypeName(this->projectileType)});
+    sheet.addRow(
+        {"Projectile Type", GetRangedWeaponTypeName(this->projectileType)});
     sheet.addRow({"Damage Bonus", ToString(this->damageBonus)});
     sheet.addRow({"Range  Bonus", ToString(this->rangeBonus)});
 }

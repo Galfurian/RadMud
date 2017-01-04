@@ -31,8 +31,8 @@ class MagazineModel :
 public:
     /// The type of projectiles which can be contained.
     RangedWeaponType projectileType;
-    /// The maximum ammount.
-    unsigned int maxAmmount;
+    /// The maximum amount.
+    unsigned int maxAmount;
 
     MagazineModel();
 

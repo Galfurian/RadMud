@@ -16,6 +16,8 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+#include <thread>
+#include <mutex>
 #include "logger.hpp"
 
 Logger::Logger()
@@ -41,7 +43,9 @@ bool Logger::openLog(const std::string & filename)
 {
     if (!Logger::getStream().is_open())
     {
-        Logger::getStream().open(filename.c_str(), std::ios::in | std::ios::out | std::ios::app);
+        Logger::getStream().open(filename.c_str(), std::ios::in |
+                                                   std::ios::out |
+                                                   std::ios::app);
     }
     return Logger::getStream().is_open();
 }
@@ -81,13 +85,26 @@ LogLevel Logger::castFromInt(const unsigned int & level)
 
 void Logger::log(const LogLevel & level, const std::string & msg)
 {
-    std::string output("[" + Logger::levelToString(level) + "][" + Logger::getDateTime() + "] " + msg + "\n");
+    // Define a mutex for the log function.
+    static std::mutex logMutex;
+    // Lock the mutex.
+    logMutex.lock();
     if (Logger::getStream().is_open())
     {
         // Write the log message inside the file.
-        Logger::getStream() << output;
+        Logger::getStream()
+            << "[" << std::hex << std::this_thread::get_id() << std::dec << "]"
+            << "[" << Logger::levelToString(level) << "]"
+            << "[" << Logger::getDateTime() << "] "
+            << msg << "\n";
     }
-    Logger::getOutputStream(level) << output;
+    Logger::getOutputStream(level)
+        << "[" << std::hex << std::this_thread::get_id() << std::dec << "]"
+        << "[" << Logger::levelToString(level) << "]"
+        << "[" << Logger::getDateTime() << "] "
+        << msg << "\n";
+    // Unlock the mutex.
+    logMutex.unlock();
 }
 
 std::fstream & Logger::getStream()
@@ -101,7 +118,7 @@ std::string Logger::getDateTime()
     time_t now = time(nullptr);
     char buffer[32];
     // Format: H:M
-    strftime(buffer, 32, "%H:%M", localtime(&now));
+    strftime(buffer, 32, "%H:%M:%S", localtime(&now));
     return std::string(buffer);
 }
 

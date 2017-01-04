@@ -1,16 +1,19 @@
 #############################################
 # SQLite Include Directories
-set(RADMUD_SQLITE_INC
-        ./src/sqlite
+set(PROJECT_INC ${PROJECT_INC}
+        ${CMAKE_SOURCE_DIR}/src/sqlite
         PARENT_SCOPE
         )
 
 #############################################
 # SQLite Source Files
-set(RADMUD_SQLITE_SRC
-        ./src/sqlite/sqliteDbms.cpp
-        ./src/sqlite/tableLoader.cpp
-        ./src/sqlite/sqliteWrapper.cpp
-        ./src/sqlite/sqliteLoadFunctions.cpp
+set(PROJECT_SRC ${PROJECT_SRC}
+        ${CMAKE_SOURCE_DIR}/src/sqlite/resultSet.cpp
+        ${CMAKE_SOURCE_DIR}/src/sqlite/sqliteDbms.cpp
+        ${CMAKE_SOURCE_DIR}/src/sqlite/tableLoader.cpp
+        ${CMAKE_SOURCE_DIR}/src/sqlite/sqliteWrapper.cpp
+        ${CMAKE_SOURCE_DIR}/src/sqlite/sqliteException.cpp
+        ${CMAKE_SOURCE_DIR}/src/sqlite/sqliteLoadFunctions.cpp
+        ${CMAKE_SOURCE_DIR}/src/sqlite/dbFunctionsPlayer.cpp
         PARENT_SCOPE
         )

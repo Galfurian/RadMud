@@ -58,6 +58,7 @@ public:
     ~Skill();
 
     /// @brief Check the correctness of the continent.
-    /// @return <b>True</b> if it has correct values,<br><b>False</b> otherwise.
+    /// @return <b>True</b> if it has correct values,<br>
+    ///         <b>False</b> otherwise.
     bool check();
 };

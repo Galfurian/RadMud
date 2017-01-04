@@ -20,9 +20,6 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "room.hpp"
-#include "area.hpp"
-
 template<typename ElementType>
 AStarNode<ElementType>::AStarNode(ElementType _element) :
     element(_element),
@@ -60,7 +57,8 @@ void AStarNode<ElementType>::setH(const int & _h)
 }
 
 template<typename ElementType>
-void AStarNode<ElementType>::setParentNode(std::shared_ptr<AStarNode<ElementType>> _parentNode)
+void AStarNode<ElementType>::setParentNode(
+    std::shared_ptr<AStarNode<ElementType>> _parentNode)
 {
     parentNode = _parentNode;
 }
@@ -107,14 +105,20 @@ bool AStarNode<ElementType>::isEndNode() const
     return endNodeFlag;
 }
 
+class Room;
+
+/// @brief Specilize the equality function between AStar nodes that contain rooms.
 template<>
 bool AStarNode<Room *>::isEqualTo(std::shared_ptr<AStarNode<Room *>> other);
 
+/// @brief Specilize the distance function between AStar nodes that contain rooms.
 template<>
 int AStarNode<Room *>::getDistance(std::shared_ptr<AStarNode<Room *>> other);
 
+/// @brief Specilize the get neighbours function between AStar nodes that contain rooms.
 template<>
-std::vector<std::shared_ptr<AStarNode<Room *>>> AStarNode<Room *>::getNeighbours(
+std::vector<std::shared_ptr<AStarNode<Room *>>>
+AStarNode<Room *>::getNeighbours(
     std::vector<std::shared_ptr<AStarNode<Room *>>> & nodes,
     std::shared_ptr<AStarNode<Room *>> endNode,
     const std::function<bool(Room * from, Room * to)> & checkFunction);

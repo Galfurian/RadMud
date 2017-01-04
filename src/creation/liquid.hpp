@@ -23,7 +23,6 @@
 #pragma once
 
 #include <map>
-#include "defines.hpp"
 
 /// @brief Holds details about a liquid.
 class Liquid
@@ -35,6 +34,8 @@ public:
     std::string name;
     /// Liquid's value on market.
     int worth;
+    /// How much the liquid is able to quench the thirst.
+    double quench;
 
     /// @brief Constructor.
     Liquid();
@@ -55,7 +56,8 @@ public:
     ~Liquid();
 
     /// @brief Check the correctness of the liquid.
-    /// @return <b>True</b> if the liquid has correct values,<br><b>False</b> otherwise.
+    /// @return <b>True</b> if the liquid has correct values,<br>
+    ///         <b>False</b> otherwise.
     bool check();
 
     /// @brief Return the name of the liquid.

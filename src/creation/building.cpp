@@ -23,6 +23,7 @@
 // Basic Include.
 #include "building.hpp"
 
+#include "logger.hpp"
 #include "room.hpp"
 
 Building::Building() :
@@ -36,6 +37,7 @@ Building::Building() :
     ingredients(),
     unique()
 {
+    // Nothing to do.
 }
 
 Building::Building(const Building & source) :
@@ -49,10 +51,12 @@ Building::Building(const Building & source) :
     ingredients(source.ingredients),
     unique(source.unique)
 {
+    // Nothing to do.
 }
 
 Building::~Building()
 {
+    // Nothing to do.
 }
 
 bool Building::check()
@@ -65,11 +69,11 @@ bool Building::check()
     assert(!tools.empty());
     for (auto it : tools)
     {
-        assert(it != ToolType::NoType);
+        assert(it != ToolType::None);
     }
     for (auto it : ingredients)
     {
-        assert(it.first != ResourceType::NoType);
+        assert(it.first != ResourceType::None);
         assert(it.second > 0);
     }
     return true;
@@ -95,14 +99,8 @@ bool Building::setTool(const std::string & source)
     std::vector<std::string> toolList = SplitString(source, " ");
     for (auto it : toolList)
     {
-        int value = ToNumber<int>(it);
-        if (value < 0)
-        {
-            Logger::log(LogLevel::Error, "Tool list contains a negative value.");
-            return false;
-        }
-        ToolType toolType = static_cast<ToolType>(static_cast<unsigned int>(value));
-        if (toolType == ToolType::NoType)
+        ToolType toolType = ToolType(ToNumber<unsigned int>(it));
+        if (toolType == ToolType::None)
         {
             Logger::log(LogLevel::Error, "Can't find the Tool :" + it);
             return false;
@@ -123,24 +121,28 @@ bool Building::setIngredient(const std::string & source)
     for (auto iterator : ingredientList)
     {
         // Split the string with the information about the ingredient.
-        std::vector<std::string> ingredientInfo = SplitString(iterator, "*");
-        if (ingredientInfo.size() != 2)
+        std::vector<std::string> info = SplitString(iterator, "*");
+        if (info.size() != 2)
         {
-            Logger::log(LogLevel::Error, "Ingredient is not composed by [Ingredient*Quantity]");
+            Logger::log(LogLevel::Error, "Ingredient is not composed by"
+                " [Ingredient*Quantity]");
             return false;
         }
-        ResourceType ingredient = static_cast<ResourceType>(ToNumber<int>(ingredientInfo[0]));
-        if (ingredient == ResourceType::NoType)
+        auto ingredient = ResourceType(
+            ToNumber<unsigned int>(info[0]));
+        if (ingredient == ResourceType::None)
         {
-            Logger::log(LogLevel::Error, "Can't find the Ingredient :" + ingredientInfo[0]);
+            Logger::log(LogLevel::Error,
+                        "Can't find the Ingredient :%s",
+                        info[0]);
             return false;
         }
-        int quantity = ToNumber<int>(ingredientInfo[1]);
+        int quantity = ToNumber<int>(info[1]);
         if (quantity <= 0)
         {
-            Logger::log(
-                LogLevel::Error,
-                "Can't find the quantity of the Outcome :" + ingredientInfo[0]);
+            Logger::log(LogLevel::Error,
+                        "Can't find the quantity of the Outcome :" +
+                        info[0]);
             return false;
         }
         this->ingredients[ingredient] = static_cast<unsigned int>(quantity);

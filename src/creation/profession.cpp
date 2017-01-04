@@ -21,6 +21,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "profession.hpp"
+#include "logger.hpp"
 
 Profession::Profession() :
     vnum(),
@@ -41,7 +42,10 @@ Profession::Profession() :
 
 Profession::~Profession()
 {
-    Logger::log(LogLevel::Debug, "Deleted profession\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
+//    Logger::log(LogLevel::Debug,
+//                "Deleted profession\t[%s]\t\t(%s)",
+//                ToString(this->vnum),
+//                this->name);
 }
 
 bool Profession::check()
@@ -50,7 +54,7 @@ bool Profession::check()
     assert(!name.empty());
     assert(!description.empty());
     assert(!command.empty());
-    assert(posture != CharacterPosture::NoPosure);
+    assert(posture != CharacterPosture::None);
     assert(!action.empty());
     assert(!startMessage.empty());
     assert(!finishMessage.empty());

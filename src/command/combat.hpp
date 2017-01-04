@@ -28,31 +28,32 @@
 void LoadCombatCommands();
 
 /// @defgroup ComInterfaces Commands List Interface.
-/// @brief All the functions necessary to handle the commands that a player can execute.
+/// @brief All the functions necessary to handle the commands that a player
+///         can execute.
 /// @{
 
 /// Engage in combat the desired target.
-void DoKill(Character * character, ArgumentHandler & args);
+bool DoKill(Character * character, ArgumentHandler & args);
 
 /// Try to flee from combat.
-void DoFlee(Character * character, ArgumentHandler & args);
+bool DoFlee(Character * character, ArgumentHandler & args);
 
 /// Provides information about the surrounding area.
-void DoScout(Character * character, ArgumentHandler & args);
+bool DoScout(Character * character, ArgumentHandler & args);
 
 /// Allows to load a magazine with projectiles.
-void DoLoad(Character * character, ArgumentHandler & args);
+bool DoLoad(Character * character, ArgumentHandler & args);
 
 /// Allows to unload a magazine with projectiles.
-void DoUnload(Character * character, ArgumentHandler & args);
+bool DoUnload(Character * character, ArgumentHandler & args);
 
 /// Allows to reload a firearm.
-void DoReload(Character * character, ArgumentHandler & args);
+bool DoReload(Character * character, ArgumentHandler & args);
 
 /// Allows to aim at a target.
-void DoAim(Character * character, ArgumentHandler & args);
+bool DoAim(Character * character, ArgumentHandler & args);
 
 /// Allows to shot with an equipped ranged weapon to an aimed target.
-void DoFire(Character * character, ArgumentHandler & args);
+bool DoFire(Character * character, ArgumentHandler & args);
 
 ///@}

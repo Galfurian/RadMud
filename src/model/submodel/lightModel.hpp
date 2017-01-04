@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "resourceType.hpp"
 #include "itemModel.hpp"
 
 /// @brief Model of a light.
@@ -29,10 +30,14 @@ class LightModel :
     public ItemModel
 {
 public:
-    /// Maximum number of hours autonomy.
-    unsigned int maxHours;
-    /// Recharging polocy
-    unsigned int policy;
+    /// The type of fuel used to keep the light on.
+    ResourceType fuelType;
+    /// The maximum radius of the light.
+    int radius;
+    /// If the light is always active.
+    bool alwaysActive;
+    /// Maximum contained weight.
+    double maxWeight;
 
     LightModel();
 

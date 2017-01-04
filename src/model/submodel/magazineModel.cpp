@@ -22,9 +22,11 @@
 
 #include "magazineModel.hpp"
 
+#include "logger.hpp"
+
 MagazineModel::MagazineModel() :
     projectileType(),
-    maxAmmount()
+    maxAmount()
 {
     // Nothing to do.
 }
@@ -48,7 +50,9 @@ bool MagazineModel::setModel(const std::string & source)
 {
     if (source.empty())
     {
-        Logger::log(LogLevel::Error, "Function list is empty (%s).", this->name);
+        Logger::log(LogLevel::Error,
+                    "Function list is empty (%s).",
+                    this->name);
         return false;
     }
     std::vector<std::string> functionList = SplitString(source, " ");
@@ -60,8 +64,9 @@ bool MagazineModel::setModel(const std::string & source)
             this->name);
         return false;
     }
-    this->projectileType = static_cast<RangedWeaponType>(ToNumber<unsigned int>(functionList[0]));
-    this->maxAmmount = ToNumber<unsigned int>(functionList[1]);
+    this->projectileType = static_cast<RangedWeaponType>(ToNumber<unsigned int>(
+        functionList[0]));
+    this->maxAmount = ToNumber<unsigned int>(functionList[1]);
     return true;
 }
 
@@ -72,6 +77,7 @@ void MagazineModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow({"Contained Type", GetRangedWeaponTypeName(this->projectileType)});
-    sheet.addRow({"Maximum Ammount", ToString(this->maxAmmount)});
+    sheet.addRow(
+        {"Contained Type", GetRangedWeaponTypeName(this->projectileType)});
+    sheet.addRow({"Maximum Amount", ToString(this->maxAmount)});
 }

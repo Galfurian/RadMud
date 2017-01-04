@@ -17,7 +17,7 @@
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "formatter.hpp"
-#include "defines.hpp"
+#include "telnetChar.hpp"
 
 Formatter::Formatter()
 {
@@ -37,7 +37,7 @@ Formatter::Format Formatter::getFormat()
 std::string Formatter::doClearMap()
 {
     std::string output;
-    if (getFormat() == Format::TELNET)
+    if (getFormat() == Format::CLIENT)
     {
         output += '\0';
         output += static_cast<char>(TelnetChar::IAC);
@@ -51,7 +51,7 @@ std::string Formatter::doClearMap()
 std::string Formatter::doDrawMap()
 {
     std::string output;
-    if (getFormat() == Format::TELNET)
+    if (getFormat() == Format::CLIENT)
     {
         output += '\0';
         output += static_cast<char>(TelnetChar::IAC);
@@ -65,7 +65,7 @@ std::string Formatter::doDrawMap()
 std::string Formatter::dontDrawMap()
 {
     std::string output;
-    if (getFormat() == Format::TELNET)
+    if (getFormat() == Format::CLIENT)
     {
         output += '\0';
         output += static_cast<char>(TelnetChar::IAC);
@@ -78,7 +78,7 @@ std::string Formatter::dontDrawMap()
 
 std::string Formatter::reset()
 {
-    if (getFormat() == Format::TELNET)
+    if (getFormat() == Format::CLIENT)
     {
         return doFormat() + "RESET" + dontFormat();
     }
@@ -90,7 +90,7 @@ std::string Formatter::reset()
 
 std::string Formatter::cursorHome()
 {
-    if (getFormat() == Format::TELNET)
+    if (getFormat() == Format::CLIENT)
     {
         return doFormat() + "CURSOR-HOME" + dontFormat();
     }
@@ -102,7 +102,7 @@ std::string Formatter::cursorHome()
 
 std::string Formatter::clearScreen()
 {
-    if (getFormat() == Format::TELNET)
+    if (getFormat() == Format::CLIENT)
     {
         return doFormat() + "CLEAR-SCREEN" + dontFormat();
     }
@@ -114,7 +114,7 @@ std::string Formatter::clearScreen()
 
 std::string Formatter::bold()
 {
-    if (getFormat() == Format::TELNET)
+    if (getFormat() == Format::CLIENT)
     {
         return doFormat() + "BOLD" + dontFormat();
     }
@@ -126,7 +126,7 @@ std::string Formatter::bold()
 
 std::string Formatter::italic()
 {
-    if (getFormat() == Format::TELNET)
+    if (getFormat() == Format::CLIENT)
     {
         return doFormat() + "ITALIC" + dontFormat();
     }
@@ -138,7 +138,7 @@ std::string Formatter::italic()
 
 std::string Formatter::black()
 {
-    if (getFormat() == Format::TELNET)
+    if (getFormat() == Format::CLIENT)
     {
         return doFormat() + "BLACK" + dontFormat();
     }
@@ -150,7 +150,7 @@ std::string Formatter::black()
 
 std::string Formatter::red()
 {
-    if (getFormat() == Format::TELNET)
+    if (getFormat() == Format::CLIENT)
     {
         return doFormat() + "RED" + dontFormat();
     }
@@ -162,7 +162,7 @@ std::string Formatter::red()
 
 std::string Formatter::green()
 {
-    if (getFormat() == Format::TELNET)
+    if (getFormat() == Format::CLIENT)
     {
         return doFormat() + "GREEN" + dontFormat();
     }
@@ -174,7 +174,7 @@ std::string Formatter::green()
 
 std::string Formatter::brown()
 {
-    if (getFormat() == Format::TELNET)
+    if (getFormat() == Format::CLIENT)
     {
         return doFormat() + "BROWN" + dontFormat();
     }
@@ -186,7 +186,7 @@ std::string Formatter::brown()
 
 std::string Formatter::yellow()
 {
-    if (getFormat() == Format::TELNET)
+    if (getFormat() == Format::CLIENT)
     {
         return doFormat() + "YELLOW" + dontFormat();
     }
@@ -198,7 +198,7 @@ std::string Formatter::yellow()
 
 std::string Formatter::blue()
 {
-    if (getFormat() == Format::TELNET)
+    if (getFormat() == Format::CLIENT)
     {
         return doFormat() + "BLUE" + dontFormat();
     }
@@ -210,7 +210,7 @@ std::string Formatter::blue()
 
 std::string Formatter::magenta()
 {
-    if (getFormat() == Format::TELNET)
+    if (getFormat() == Format::CLIENT)
     {
         return doFormat() + "MAGENTA" + dontFormat();
     }
@@ -222,7 +222,7 @@ std::string Formatter::magenta()
 
 std::string Formatter::cyan()
 {
-    if (getFormat() == Format::TELNET)
+    if (getFormat() == Format::CLIENT)
     {
         return doFormat() + "CYAN" + dontFormat();
     }
@@ -234,7 +234,7 @@ std::string Formatter::cyan()
 
 std::string Formatter::gray()
 {
-    if (getFormat() == Format::TELNET)
+    if (getFormat() == Format::CLIENT)
     {
         return doFormat() + "GRAY" + dontFormat();
     }
@@ -246,7 +246,7 @@ std::string Formatter::gray()
 
 std::string Formatter::darkGray()
 {
-    if (getFormat() == Format::TELNET)
+    if (getFormat() == Format::CLIENT)
     {
         return doFormat() + "DARK-GRAY" + dontFormat();
     }
@@ -259,7 +259,7 @@ std::string Formatter::darkGray()
 std::string Formatter::doFormat()
 {
     std::string output;
-    if (getFormat() == Format::TELNET)
+    if (getFormat() == Format::CLIENT)
     {
         output += '\0';
         output += static_cast<char>(TelnetChar::IAC);
@@ -273,7 +273,7 @@ std::string Formatter::doFormat()
 std::string Formatter::dontFormat()
 {
     std::string output;
-    if (getFormat() == Format::TELNET)
+    if (getFormat() == Format::CLIENT)
     {
         output += '\0';
         output += static_cast<char>(TelnetChar::IAC);

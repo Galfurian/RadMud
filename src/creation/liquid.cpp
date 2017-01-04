@@ -22,17 +22,23 @@
 
 #include "liquid.hpp"
 
+#include "logger.hpp"
+
 Liquid::Liquid() :
     vnum(),
     name(),
-    worth()
+    worth(),
+    quench()
 {
     // Nothing to do.
 }
 
 Liquid::~Liquid()
 {
-    Logger::log(LogLevel::Debug, "Deleted liquid\t\t[%s]\t\t(%s)", ToString(this->vnum), this->name);
+//    Logger::log(LogLevel::Debug,
+//                "Deleted liquid\t\t[%s]\t\t(%s)",
+//                ToString(this->vnum),
+//                this->name);
 }
 
 bool Liquid::check()

@@ -34,7 +34,7 @@ public:
     /// The increment to the damage dealt.
     unsigned int damageBonus;
     /// The increment to the range of the weapon.
-    unsigned int rangeBonus;
+    int rangeBonus;
 
     ProjectileModel();
 

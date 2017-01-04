@@ -1,23 +1,22 @@
 #############################################
+# Sub-directories
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/command/object)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/command/god)
+
+#############################################
 # Include Directories
-set(RADMUD_COMMAND_INC
-        ./src/command
+set(PROJECT_INC ${PROJECT_INC}
+        ${CMAKE_SOURCE_DIR}/src/command
         PARENT_SCOPE
         )
 
 #############################################
 # Source Files
-set(RADMUD_COMMAND_SRC
-        ./src/command/argumentHandler.cpp
-        ./src/command/argument.cpp
-        ./src/command/command.cpp
-        ./src/command/combat.cpp
-        ./src/command/communication.cpp
-        ./src/command/crafting.cpp
-        ./src/command/manager.cpp
-        ./src/command/general.cpp
-        ./src/command/god.cpp
-        ./src/command/object.cpp
-        ./src/command/protocol.cpp
-        PARENT_SCOPE
-        )
+set(PROJECT_SRC ${PROJECT_SRC}
+        ${CMAKE_SOURCE_DIR}/src/command/command.cpp
+        ${CMAKE_SOURCE_DIR}/src/command/combat.cpp
+        ${CMAKE_SOURCE_DIR}/src/command/communication.cpp
+        ${CMAKE_SOURCE_DIR}/src/command/crafting.cpp
+        ${CMAKE_SOURCE_DIR}/src/command/manager.cpp
+        ${CMAKE_SOURCE_DIR}/src/command/general.cpp
+        PARENT_SCOPE)

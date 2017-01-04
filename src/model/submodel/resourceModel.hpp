@@ -23,26 +23,7 @@
 #pragma once
 
 #include "itemModel.hpp"
-
-/// Used to determine the type of the resource.
-using ResourceType = enum class ResourceType_t
-{
-    NoType,
-    Coal,           ///< [1] COAL
-    Ore,            ///< [2] ORE
-    Bar,            ///< [3] BAR
-    Log,            ///< [4] LOG
-    Plank,          ///< [5] PLANK
-    Tree,           ///< [6] TREE
-    Fastener,       ///< [7] FASTENER
-    Leather,        ///< [8] LEATHER
-    Cloth,          ///< [9] CLOTH
-    StoneBlock,     ///< [10] STONE_BLOCK
-    MetalVein,      ///< [11] METAL_VEIN
-    StoneMonolith,  ///< [12] STONE_MONOLITH
-    Pen,            ///< [13] Pen
-    Trash           ///< [14] Trash (Anything which has no specific use)
-};
+#include "resourceType.hpp"
 
 /// @brief Model of resources.
 class ResourceModel :
@@ -64,11 +45,3 @@ public:
 
     void getSheet(Table & sheet) const override;
 };
-
-/// @addtogroup EnumToString
-/// @{
-
-/// Return the string describing the type of a Resource.
-std::string GetResourceTypeName(ResourceType type);
-
-///@}

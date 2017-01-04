@@ -31,6 +31,13 @@
 #include "character.hpp"
 #include "skill.hpp"
 
+/// Handle all the player's phases during login.
+using ConnectionState = enum class ConnectionState_t
+{
+    LoggingIn, ///< The player is logging in.
+    Playing    ///< The player is playing.
+};
+
 /// @brief Holds details about each connected player.
 class Player :
     public Character
@@ -56,8 +63,6 @@ public:
     int experience;
     /// The current prompt.
     std::string prompt;
-    /// A backup of the player prompt.
-    std::string prompt_save;
     /// The place where the player has slept last time.
     int rent_room;
     /// The player's list of skills.
@@ -65,7 +70,7 @@ public:
     /// Points that could be spent during character creation.
     int remaining_points;
     /// Connection state.
-    ConnectionState connection_state;
+    ConnectionState connectionState;
     /// Password guessing attempts.
     int password_attempts;
     /// True if they are about to leave us.
@@ -76,6 +81,8 @@ public:
     unsigned int connectionFlags;
     /// MSDP Variables.
     std::map<std::string, std::string> msdpVariables;
+    /// Lua variables.
+    std::map<std::string, std::string> luaVariables;
 
     /// @brief Constructor.
     /// @param socket    Player socket.
@@ -98,6 +105,8 @@ public:
 
     void getSheet(Table & sheet) const override;
 
+    std::string getName() const override;
+
     void addInventoryItem(Item *& item) override;
 
     void addEquipmentItem(Item *& item) override;
@@ -115,18 +124,21 @@ public:
     std::string getAddress() const;
 
     /// @brief Check if player is connected.
-    /// @return <b>True</b> if player is connected,<br><b>False</b> otherwise.
+    /// @return <b>True</b> if player is connected,<br>
+    ///         <b>False</b> otherwise.
     bool checkConnection() const;
 
     /// @brief Close this player's connection.
     void closeConnection();
 
     /// @brief Check if this player actively playing.
-    /// @return <b>True</b> if player is playing,<br><b>False</b> otherwise.
+    /// @return <b>True</b> if player is playing,<br>
+    ///         <b>False</b> otherwise.
     bool isPlaying() const;
 
     /// @brief Check if player has pending output.
-    /// @return <b>True</b> if we have something to send them,<br><b>False</b> otherwise.
+    /// @return <b>True</b> if we have something to send them,<br>
+    ///         <b>False</b> otherwise.
     bool hasPendingOutput() const;
 
     /// @brief Create an updated entry for the player inside the database.
@@ -143,19 +155,10 @@ public:
     /// @brief Handle player has entered the game.
     void enterGame();
 
-    /// @brief Process player input - check connection state, and act accordingly.
-    /// @param player  Player that submitted input.
-    /// @param command Player's input command.
-    void processInput(Player * player, const std::string & command);
-
     /// @brief Get player input.
     void processRead();
 
     /// @brief Output text to player.
-    /// @details
-    /// Here when we can send stuff to the player. We are allowing for large
-    /// volumes of output that might not be sent all at once, so whatever cannot
-    /// go this time gets put into the list of outstanding strings for this player.
     void processWrite();
 
     /// @brief Handle player exception on socket.
@@ -164,4 +167,21 @@ public:
     /// @brief Output to player (any type).
     /// @param msg String to sent.
     void sendMsg(const std::string & msg) override;
+
+    /// @brief Adds a variable to the list of LUA-Visible variables.
+    /// @param variableName  The name of the variable.
+    /// @param variableValue The value of the variable.
+    void setLuaVariable(std::string variableName, std::string variableValue);
+
+    /// @brief Provides the value of the given LUA-Visible variable.
+    std::string getLuaVariable(std::string variableName);
+
+    /// @brief Removes the variable from the list of LUA-Visible variables.
+    bool removeLuaVariable(std::string variableName);
+
+protected:
+    void updateTicImpl() override;
+
+    void updateHourImpl() override;
+
 };

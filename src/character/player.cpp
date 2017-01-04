@@ -20,13 +20,14 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-// Basic Include.
 #include "player.hpp"
 
-// Other Include.
+#include "logger.hpp"
 #include "mud.hpp"
 
-Player::Player(const int & _socket, const int & _port, const std::string & _address) :
+Player::Player(const int & _socket,
+               const int & _port,
+               const std::string & _address) :
     psocket(_socket),
     port(_port),
     address(_address),
@@ -36,16 +37,16 @@ Player::Player(const int & _socket, const int & _port, const std::string & _addr
     age(),
     experience(),
     prompt(),
-    prompt_save(),
     rent_room(),
     skills(),
     remaining_points(),
-    connection_state(ConnectionState::NoState),
+    connectionState(ConnectionState::LoggingIn),
     password_attempts(),
     closing(),
     logged_in(),
     connectionFlags(),
-    msdpVariables()
+    msdpVariables(),
+    luaVariables()
 {
     // Nothing to do.
 }
@@ -60,7 +61,7 @@ Player::~Player()
     {
         if (!Mud::instance().closeSocket(psocket))
         {
-            Logger::log(LogLevel::Error, "Something has gone wrong during player socket closure.");
+            Logger::log(LogLevel::Error, "Error during player socket closure.");
         }
     }
     // Unlink the inventory items.
@@ -78,7 +79,7 @@ Player::~Player()
     {
         room->removeCharacter(this);
     }
-    Logger::log(LogLevel::Debug, "Deleted player\t\t\t\t(%s)", this->getNameCapital());
+    //Logger::log(LogLevel::Debug, "Deleted player\t\t\t\t(%s)", this->getNameCapital());
 }
 
 bool Player::check() const
@@ -90,18 +91,15 @@ bool Player::check() const
     safe &= CorrectAssert(!password.empty());
     safe &= CorrectAssert(age > 0);
     safe &= CorrectAssert(experience >= 0);
-    safe &= CorrectAssert(!prompt.empty());
-    safe &= CorrectAssert(!prompt_save.empty());
     safe &= CorrectAssert(rent_room >= 0);
-    safe &= CorrectAssert(connection_state != ConnectionState::NoState);
     //safe &= CorrectAssert(!skills.empty());
     //safe &= CorrectAssert(skills.size() == Mud::instance().mudSkills.size());
     for (auto iterator : Mud::instance().mudSkills)
     {
-        std::map<int, unsigned int>::const_iterator iterator2 = skills.find(iterator.first);
-        if (iterator2 == skills.end())
+        if (skills.find(iterator.first) == skills.end())
         {
-            Logger::log(LogLevel::Error, "The skill %s has been set.", iterator.second->name);
+            Logger::log(LogLevel::Error, "The skill %s has been set.",
+                        iterator.second->name);
             safe &= false;
         }
     }
@@ -133,13 +131,19 @@ void Player::getSheet(Table & sheet) const
     {
         if (this->skills.find(it.first) != this->skills.end())
         {
-            sheet.addRow({it.second->name, ToString(this->skills.at(it.first))});
+            sheet.addRow({it.second->name,
+                          ToString(this->skills.at(it.first))});
         }
         else
         {
             sheet.addRow({it.second->name, "0"});
         }
     }
+}
+
+std::string Player::getName() const
+{
+    return ToLower(name);
 }
 
 void Player::addInventoryItem(Item *& item)
@@ -164,7 +168,11 @@ void Player::addEquipmentItem(Item *& item)
     {
         SQLiteDbms::instance().insertInto(
             "ItemPlayer",
-            {name, ToString(item->vnum), EnumToString(item->getCurrentSlot())},
+            {
+                name,
+                ToString(item->vnum),
+                ToString(item->getCurrentSlot().toUInt())
+            },
             false,
             true);
     }
@@ -179,7 +187,9 @@ bool Player::remInventoryItem(Item * item)
         {
             SQLiteDbms::instance().deleteFrom(
                 "ItemPlayer",
-                {std::make_pair("item", ToString(item->vnum))});
+                {
+                    std::make_pair("item", ToString(item->vnum))
+                });
         }
         return true;
     }
@@ -195,7 +205,9 @@ bool Player::remEquipmentItem(Item * item)
         {
             SQLiteDbms::instance().deleteFrom(
                 "ItemPlayer",
-                {std::make_pair("item", ToString(item->vnum))});
+                {
+                    std::make_pair("item", ToString(item->vnum))
+                });
         }
         return true;
     }
@@ -224,8 +236,10 @@ void Player::closeConnection()
 
 bool Player::isPlaying() const
 {
-    return checkConnection() && (connection_state == ConnectionState::Playing) && (!closing)
-           && logged_in;
+    return checkConnection() &&
+           (connectionState == ConnectionState::Playing) &&
+           (!closing) &&
+           logged_in;
 }
 
 bool Player::hasPendingOutput() const
@@ -235,46 +249,68 @@ bool Player::hasPendingOutput() const
 
 bool Player::updateOnDB()
 {
-    std::vector<std::string> arguments;
+    std::vector<std::string> args;
     // Prepare the arguments of the query.
-    arguments.push_back(name);
-    arguments.push_back(password);
-    arguments.push_back(ToString(race->vnum));
-    arguments.push_back(ToString(this->getAbility(Ability::Strength, false)));
-    arguments.push_back(ToString(this->getAbility(Ability::Agility, false)));
-    arguments.push_back(ToString(this->getAbility(Ability::Perception, false)));
-    arguments.push_back(ToString(this->getAbility(Ability::Constitution, false)));
-    arguments.push_back(ToString(this->getAbility(Ability::Intelligence, false)));
-    arguments.push_back(ToString(static_cast<int>(gender)));
-    arguments.push_back(ToString(age));
-    arguments.push_back(description);
-    arguments.push_back(ToString(weight));
-    arguments.push_back(ToString(faction->vnum));
-    arguments.push_back(ToString(level));
-    arguments.push_back(ToString(experience));
-    arguments.push_back(ToString(room->vnum));
-    arguments.push_back(prompt);
-    arguments.push_back(ToString(flags));
-    arguments.push_back(ToString(this->getHealth()));
-    arguments.push_back(ToString(this->getStamina()));
-    arguments.push_back(ToString(this->getHunger()));
-    arguments.push_back(ToString(this->getThirst()));
-    arguments.push_back(ToString(rent_room));
-    if (!SQLiteDbms::instance().insertInto("Player", arguments, false, true))
+    args.push_back(name);
+    args.push_back(password);
+    args.push_back(ToString(race->vnum));
+    args.push_back(ToString(this->getAbility(Ability::Strength, false)));
+    args.push_back(ToString(this->getAbility(Ability::Agility, false)));
+    args.push_back(ToString(this->getAbility(Ability::Perception, false)));
+    args.push_back(ToString(this->getAbility(Ability::Constitution, false)));
+    args.push_back(ToString(this->getAbility(Ability::Intelligence, false)));
+    args.push_back(ToString(static_cast<int>(gender)));
+    args.push_back(ToString(age));
+    args.push_back(description);
+    args.push_back(ToString(weight));
+    args.push_back(ToString(faction->vnum));
+    args.push_back(ToString(level));
+    args.push_back(ToString(experience));
+    args.push_back(ToString(room->vnum));
+    args.push_back(prompt);
+    args.push_back(ToString(flags));
+    args.push_back(ToString(health));
+    args.push_back(ToString(stamina));
+    args.push_back(ToString(hunger));
+    args.push_back(ToString(thirst));
+    args.push_back(ToString(rent_room));
+    if (!SQLiteDbms::instance().insertInto("Player", args, false, true))
     {
-        Logger::log(LogLevel::Error, "Error during player creation on database.");
+        Logger::log(LogLevel::Error,
+                    "Error during player creation on DB.");
         return false;
     }
     // Prepare the arguments of the query for skill table.
     for (auto iterator : skills)
     {
-        arguments.clear();
-        arguments.push_back(name);
-        arguments.push_back(ToString(iterator.first));
-        arguments.push_back(ToString(iterator.second));
-        if (!SQLiteDbms::instance().insertInto("Advancement", arguments, false, true))
+        args.clear();
+        args.push_back(name);
+        args.push_back(ToString(iterator.first));
+        args.push_back(ToString(iterator.second));
+        if (!SQLiteDbms::instance().insertInto("Advancement",
+                                               args,
+                                               false,
+                                               true))
         {
-            Logger::log(LogLevel::Error, "Error during player Skill creation on database.");
+            Logger::log(LogLevel::Error,
+                        "Error during player Skill creation on DB.");
+            return false;
+        }
+    }
+    // Prepare the arguments of the query for lua variables table.
+    for (auto iterator : luaVariables)
+    {
+        args.clear();
+        args.push_back(name);
+        args.push_back(iterator.first);
+        args.push_back(iterator.second);
+        if (!SQLiteDbms::instance().insertInto("PlayerVariable",
+                                               args,
+                                               false,
+                                               true))
+        {
+            Logger::log(LogLevel::Error,
+                        "Error during player Lua Variables creation on DB.");
             return false;
         }
     }
@@ -291,14 +327,24 @@ void Player::sendPrompt()
             std::string out(prompt + "\n");
             FindAndReplace(&out, "&n", ToLower(name));
             FindAndReplace(&out, "&N", name);
-            FindAndReplace(&out, "&h", ToString(this->getHealth()));
+            FindAndReplace(&out, "&h", ToString(health));
             FindAndReplace(&out, "&H", ToString(this->getMaxHealth()));
-            FindAndReplace(&out, "&s", ToString(this->getStamina()));
+            FindAndReplace(&out, "&s", ToString(stamina));
             FindAndReplace(&out, "&S", ToString(this->getMaxStamina()));
-            FindAndReplace(&out, "&T", (this->combatHandler.getPredefinedTarget() == nullptr) ? "" :
-                                       "[" + this->combatHandler.getPredefinedTarget()->getName() + "]");
-            FindAndReplace(&out, "&A", (this->combatHandler.getAimedTarget() == nullptr) ? "" :
-                                       "[" + this->combatHandler.getAimedTarget()->getName() + "]");
+            FindAndReplace(
+                &out,
+                "&T",
+                (this->combatHandler.getPredefinedTarget() == nullptr) ? "" :
+                "[" +
+                this->combatHandler.getPredefinedTarget()->getName() +
+                "]");
+            FindAndReplace(
+                &out,
+                "&A",
+                (this->combatHandler.getAimedTarget() == nullptr) ? "" :
+                "[" +
+                this->combatHandler.getAimedTarget()->getName() +
+                "]");
             this->sendMsg(out);
         }
         else
@@ -320,18 +366,24 @@ void Player::kill()
     // Set values of health and stamina to 1.
     this->setHealth(1, true);
     this->setStamina(1, true);
-    Character::sendMsg("%sYou have %sdied%s.. but don't worry your fight is not over...%s\n\n\n",
-                       Formatter::gray(), Formatter::red(), Formatter::gray(), Formatter::reset());
+    Character::sendMsg(
+        "%sYou have%s died%s... "
+            "but don't worry your fight is not over...%s\n\n\n",
+        Formatter::gray(), Formatter::red(),
+        Formatter::gray(), Formatter::reset());
 }
 
 void Player::enterGame()
 {
     this->sendMsg(Formatter::clearScreen());
     // Greet them.
-    this->sendMsg(Formatter::bold() + "Welcome, " + name + "!\n" + Formatter::reset());
+    Character::sendMsg("%sWelcome, " + name + "!%s\n",
+                       Formatter::bold(),
+                       Formatter::reset());
     // Load the news.
     this->sendMsg("#---------------- Global News ----------------#\n");
-    for (auto it = Mud::instance().mudNews.rbegin(); it != Mud::instance().mudNews.rend(); ++it)
+    for (auto it = Mud::instance().mudNews.rbegin();
+         it != Mud::instance().mudNews.rend(); ++it)
     {
         this->sendMsg("Date :" + it->first + "\n");
         this->sendMsg(it->second + "\n");
@@ -342,11 +394,8 @@ void Player::enterGame()
     if (room != nullptr)
     {
         room->addCharacter(this);
-        // Set the list of exceptions.
-        std::vector<Character *> exceptions;
-        exceptions.push_back(this);
         // Send the message inside the room.
-        room->sendToAll("%s appears.\n", exceptions, name);
+        room->sendToAll("%s appears.\n", {this}, name);
     }
     else
     {
@@ -358,20 +407,6 @@ void Player::enterGame()
 
     // New player looks around.
     doCommand("look");
-}
-
-void Player::processInput(Player * player, const std::string & command)
-{
-    ActionHandler _action = Mud::instance().findStateAction(player->connection_state);
-    try
-    {
-        ArgumentHandler argumentHandler(command);
-        _action(player, argumentHandler);
-    }
-    catch (std::runtime_error & e)
-    {
-        sendMsg(std::string(e.what()) + "\n");
-    }
 }
 
 /// Size of buffers used for communications.
@@ -392,10 +427,12 @@ void Player::processRead()
         // Close the socket.
         if (Mud::instance().closeSocket(psocket))
         {
-            Logger::log(LogLevel::Error, "Something has gone wrong during player socket closure.");
+            Logger::log(LogLevel::Error,
+                        "Something has gone wrong during socket closure.");
         }
         // Log the error.
-        Logger::log(LogLevel::Error, "Connection " + ToString(psocket) + " closed.");
+        Logger::log(LogLevel::Error,
+                    "Connection " + ToString(psocket) + " closed.");
         // Clear the socket.
         this->psocket = NO_SOCKET_COMMUNICATION;
         // Close the connection.
@@ -408,8 +445,8 @@ void Player::processRead()
     inbuf = std::string(buffer, uRead);
     // Update received data.
     MudUpdater::instance().updateBandIn(uRead);
-    // Process the input.
-    this->processInput(this, Trim(inbuf));
+    // Execute the received command.
+    this->doCommand(Trim(inbuf));
     // Null-terminate the buffer.
     inbuf[uRead] = 0;
 }
@@ -449,7 +486,8 @@ void Player::processWrite()
         Mud::instance().getUpdater().updateBandWidth(2, uncompressed.size());
 #else
         // Send to player.
-        ssize_t nWrite = send(psocket, outbuf.c_str(), outbuf.size(), MSG_NOSIGNAL);
+        ssize_t nWrite = send(psocket, outbuf.c_str(), outbuf.size(),
+                              MSG_NOSIGNAL);
 #endif
 #if 0
         // Decompress the sent data for checking.
@@ -466,7 +504,8 @@ void Player::processWrite()
         {
             if (errno == EPIPE)
             {
-                Logger::log(LogLevel::Error, "Sending on a closed connection...");
+                Logger::log(LogLevel::Error,
+                            "Sending on a closed connection...");
             }
             else
             {
@@ -497,4 +536,39 @@ void Player::processException()
 void Player::sendMsg(const std::string & msg)
 {
     outbuf += msg;
+}
+
+void Player::setLuaVariable(std::string variableName, std::string variableValue)
+{
+    luaVariables[variableName] = variableValue;
+}
+
+std::string Player::getLuaVariable(std::string variableName)
+{
+    return luaVariables[variableName];
+}
+
+bool Player::removeLuaVariable(std::string variableName)
+{
+    auto it = luaVariables.find(variableName);
+    if (it == luaVariables.end())
+    {
+        return false;
+    }
+    it->second = "";
+    return true;
+}
+
+void Player::updateTicImpl()
+{
+    // Check if the player is playing.
+    if (this->isPlaying())
+    {
+        Character::updateTicImpl();
+    }
+}
+
+void Player::updateHourImpl()
+{
+    // Nothing to do.
 }

@@ -20,47 +20,32 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include <queue>
 #include "chase.hpp"
-#include "aStar.hpp"
+
 #include "effectFactory.hpp"
+#include "moveAction.hpp"
+#include "logger.hpp"
+#include "aStar.hpp"
+#include "area.hpp"
+#include "room.hpp"
+#include <queue>
 
 Chase::Chase(Character * _actor, Character * _target) :
     CombatAction(_actor),
     target(_target),
     lastRoom(_target->room),
     valid(),
-    checkFunction([&](Room * from, Room * to)
-                  {
-                      // Get the direction.
-                      auto direction = Area::getDirection(from->coord, to->coord);
-                      // Get the exit;
-                      auto destExit = from->findExit(direction);
-                      // If the direction is upstairs, check if there is a stair.
-                      if (direction == Direction::Up)
-                      {
-                          if (!HasFlag(destExit->flags, ExitFlag::Stairs)) return false;
-                      }
-                      // Check if the destination is correct.
-                      if (destExit->destination == nullptr) return false;
-                      // Check if the destination is bocked by a door.
-                      auto door = destExit->destination->findDoor();
-                      if (door != nullptr)
-                      {
-                          if (HasFlag(door->flags, ItemFlag::Closed)) return false;
-                      }
-                      // Check if the destination has a floor.
-                      auto destDown = destExit->destination->findExit(Direction::Down);
-                      if (destDown != nullptr)
-                      {
-                          if (!HasFlag(destDown->flags, ExitFlag::Stairs)) return false;
-                      }
-                      // Check if the destination is forbidden for mobiles.
-                      return !(actor->isMobile() && HasFlag(destExit->flags, ExitFlag::NoMob));
-                  })
+    checkFunction(
+        [&](Room * from, Room * to)
+        {
+            // Get the direction.
+            std::string error;
+            auto direction = Area::getDirection(from->coord, to->coord);
+            return MoveAction::canMoveTo(actor, direction, error, true);
+        })
 {
     // Debugging message.
-    Logger::log(LogLevel::Debug, "Created Chase.");
+    //Logger::log(LogLevel::Debug, "Created Chase.");
     // Reset the cooldown of the action.
     this->resetCooldown(Chase::getCooldown(_actor));
     // Find the path from the actor to the target.
@@ -74,7 +59,7 @@ Chase::Chase(Character * _actor, Character * _target) :
 
 Chase::~Chase()
 {
-    Logger::log(LogLevel::Debug, "Deleted Chase.");
+    //Logger::log(LogLevel::Debug, "Deleted Chase.");
 }
 
 bool Chase::check(std::string & error) const
@@ -86,11 +71,6 @@ bool Chase::check(std::string & error) const
     if (!valid)
     {
         error = "You are not able to chase your target.";
-        return false;
-    }
-    if (actor->room == nullptr)
-    {
-        error = "You are in a wrong room.";
         return false;
     }
     if (target == nullptr)
@@ -140,8 +120,8 @@ ActionStatus Chase::perform()
         return ActionStatus::Finished;
     }
     // Check if the actor has enough stamina to execute the action.
-    auto consumedStamina = Chase::getConsumedStamina(actor, actor->posture);
-    if (consumedStamina > actor->getStamina())
+    auto consumedStamina = Chase::getConsumedStamina(actor);
+    if (consumedStamina > actor->stamina)
     {
         actor->sendMsg("You are too tired to chase your target.\n\n");
     }
@@ -155,19 +135,23 @@ ActionStatus Chase::perform()
             if (nextRoom != nullptr)
             {
                 // Get the direction of the next room.
-                Direction direction = Area::getDirection(actor->room->coord, nextRoom->coord);
+                Direction direction = Area::getDirection(actor->room->coord,
+                                                         nextRoom->coord);
                 // Check if the actor was aiming.
                 if (actor->combatHandler.getAimedTarget() != nullptr)
                 {
-                    actor->effects.forceAddEffect(EffectFactory::disturbedAim(actor, 1, -3));
+                    actor->effects.forceAddEffect(
+                        EffectFactory::disturbedAim(actor, 1, -3));
                 }
                 // Consume the stamina.
                 actor->remStamina(consumedStamina, true);
                 // Move character.
                 actor->moveTo(
                     nextRoom,
-                    actor->getNameCapital() + " goes " + direction.toString() + ".\n",
-                    actor->getNameCapital() + " arrives from " + direction.getOpposite().toString() + ".\n");
+                    actor->getNameCapital() + " goes " +
+                    direction.toString() + ".\n",
+                    actor->getNameCapital() + " arrives from " +
+                    direction.getOpposite().toString() + ".\n");
                 // Pop the room.
                 path.erase(path.begin());
             }
@@ -181,26 +165,33 @@ ActionStatus Chase::perform()
             Logger::log(LogLevel::Debug, "The target moved.");
             // Find the path from the actor to the target.
             AStar<Room *> aStar;
-            valid = aStar.findPath(actor->room, target->room, path, checkFunction);
+            valid = aStar.findPath(actor->room,
+                                   target->room,
+                                   path,
+                                   checkFunction);
             if (valid)
             {
                 Room * nextRoom = path.front();
                 if (nextRoom != nullptr)
                 {
                     // Get the direction of the next room.
-                    Direction direction = Area::getDirection(actor->room->coord, nextRoom->coord);
+                    Direction direction = Area::getDirection(actor->room->coord,
+                                                             nextRoom->coord);
                     // Check if the actor was aiming.
                     if (actor->combatHandler.getAimedTarget() != nullptr)
                     {
-                        actor->effects.forceAddEffect(EffectFactory::disturbedAim(actor, 1, -3));
+                        actor->effects.forceAddEffect(
+                            EffectFactory::disturbedAim(actor, 1, -3));
                     }
                     // Consume the stamina.
                     actor->remStamina(consumedStamina, true);
                     // Move character.
                     actor->moveTo(
                         nextRoom,
-                        actor->getNameCapital() + " goes " + direction.toString() + ".\n",
-                        actor->getNameCapital() + " arrives from " + direction.getOpposite().toString() + ".\n");
+                        actor->getNameCapital() + " goes " +
+                        direction.toString() + ".\n",
+                        actor->getNameCapital() + " arrives from " +
+                        direction.getOpposite().toString() + ".\n");
                     // Pop the room.
                     path.erase(path.begin());
                 }
@@ -227,14 +218,14 @@ CombatActionType Chase::getCombatActionType() const
     return CombatActionType::Chase;
 }
 
-unsigned int Chase::getConsumedStamina(Character * character, const CharacterPosture & posture)
+unsigned int Chase::getConsumedStamina(Character * character)
 {
     auto multiplier = 1.0;
-    if (posture == CharacterPosture::Crouch)
+    if (character->posture == CharacterPosture::Crouch)
     {
         multiplier = 0.75;
     }
-    else if (posture == CharacterPosture::Prone)
+    else if (character->posture == CharacterPosture::Prone)
     {
         multiplier = 0.50;
     }
@@ -243,9 +234,10 @@ unsigned int Chase::getConsumedStamina(Character * character, const CharacterPos
     // WEIGHT   [+1.6 to +2.51]
     // CARRIED  [+0.0 to +2.48]
     unsigned int consumedStamina = 1;
-    consumedStamina -= character->getAbilityLog(Ability::Strength, 0.0, 1.0);
+    consumedStamina -= character->getAbilityLog(Ability::Strength);
     consumedStamina = SafeSum(consumedStamina, SafeLog10(character->weight));
-    consumedStamina = SafeSum(consumedStamina, SafeLog10(character->getCarryingWeight()));
+    consumedStamina = SafeSum(consumedStamina,
+                              SafeLog10(character->getCarryingWeight()));
     return static_cast<unsigned int>(consumedStamina * multiplier);
 }
 
@@ -258,8 +250,8 @@ unsigned int Chase::getCooldown(Character * character)
     // CARRIED  [+0.0 to +2.48]
     // WEAPON   [+0.0 to +1.60]
     unsigned int cooldown = 4;
-    cooldown = SafeSum(cooldown, -character->getAbilityLog(Ability::Strength, 0.0, 1.0));
-    cooldown = SafeSum(cooldown, -character->getAbilityLog(Ability::Agility, 0.0, 1.0));
+    cooldown = SafeSum(cooldown, -character->getAbilityLog(Ability::Strength));
+    cooldown = SafeSum(cooldown, -character->getAbilityLog(Ability::Agility));
     cooldown = SafeSum(cooldown, SafeLog10(character->weight));
     cooldown = SafeSum(cooldown, SafeLog10(character->getCarryingWeight()));
     return cooldown;

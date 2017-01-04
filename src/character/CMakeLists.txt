@@ -1,27 +1,23 @@
 #############################################
-# Add Subdirectories
-add_subdirectory(effects)
-
-#############################################
 # Include Directories
-set(RADMUD_CHARACTER_INC
-        ./src/character
-        ${RADMUD_EFFECTS_INC}
+set(PROJECT_INC ${PROJECT_INC}
+        ${CMAKE_SOURCE_DIR}/src/character
         PARENT_SCOPE
         )
 
 #############################################
 # Source Files
-set(RADMUD_CHARACTER_SRC
-        ./src/character/character.cpp
-        ./src/character/mobile.cpp
-        ./src/character/player.cpp
-        ./src/character/characterContainer.cpp
-        ./src/character/faction.cpp
-        ./src/character/race.cpp
-        ./src/character/skill.cpp
-        ./src/character/aggression.cpp
-        ./src/character/combatHandler.cpp
-        ${RADMUD_EFFECTS_SRC}
+set(PROJECT_SRC ${PROJECT_SRC}
+        ${CMAKE_SOURCE_DIR}/src/character/character.cpp
+        ${CMAKE_SOURCE_DIR}/src/character/mobile.cpp
+        ${CMAKE_SOURCE_DIR}/src/character/player.cpp
+        ${CMAKE_SOURCE_DIR}/src/character/characterContainer.cpp
+        ${CMAKE_SOURCE_DIR}/src/character/faction.cpp
+        ${CMAKE_SOURCE_DIR}/src/character/race.cpp
+        ${CMAKE_SOURCE_DIR}/src/character/skill.cpp
+        ${CMAKE_SOURCE_DIR}/src/character/combatHandler.cpp
+        ${CMAKE_SOURCE_DIR}/src/character/effect.cpp
+        ${CMAKE_SOURCE_DIR}/src/character/effectList.cpp
+        ${CMAKE_SOURCE_DIR}/src/character/effectFactory.cpp
         PARENT_SCOPE
         )

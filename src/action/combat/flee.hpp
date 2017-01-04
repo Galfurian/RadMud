@@ -1,5 +1,6 @@
 /// @file   flee.hpp
-/// @brief  Contais the definition of the class for the action of fleeing from combat.
+/// @brief  Contais the definition of the class for the
+///          action of fleeing from combat.
 /// @author Enrico Fraccaroli
 /// @date   Jul 16 2016
 /// @copyright

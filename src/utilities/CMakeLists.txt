@@ -1,17 +1,17 @@
 #############################################
 # Include Directories
-set(RADMUD_UTILITIES_INC
-        ./src/utilities/
+set(PROJECT_INC ${PROJECT_INC}
+        ${CMAKE_SOURCE_DIR}/src/utilities/
         PARENT_SCOPE
         )
 
 #############################################
 # Source Files
-set(RADMUD_UTILITIES_SRC
-        ./src/utilities/CMacroWrapper.cpp
-        ./src/utilities/formatter.cpp
-        ./src/utilities/table.cpp
-        ./src/utilities/logger.cpp
-        ./src/utilities/utils.cpp
+set(PROJECT_SRC ${PROJECT_SRC}
+        ${CMAKE_SOURCE_DIR}/src/utilities/CMacroWrapper.cpp
+        ${CMAKE_SOURCE_DIR}/src/utilities/formatter.cpp
+        ${CMAKE_SOURCE_DIR}/src/utilities/table.cpp
+        ${CMAKE_SOURCE_DIR}/src/utilities/logger.cpp
+        ${CMAKE_SOURCE_DIR}/src/utilities/utils.cpp
         PARENT_SCOPE
         )

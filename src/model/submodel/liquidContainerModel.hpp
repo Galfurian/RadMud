@@ -59,7 +59,8 @@ public:
 /// @addtogroup FlagsToList
 /// @{
 
-/// Return a list of string containg the Container of Liquids flags contained inside the value.
+/// Return a list of string containg the Container of Liquids flags
+///  contained inside the value.
 std::string GetLiqContainerFlagString(unsigned int flags);
 
 /// @}

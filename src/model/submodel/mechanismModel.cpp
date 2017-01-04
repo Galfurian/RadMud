@@ -22,6 +22,8 @@
 
 #include "mechanismModel.hpp"
 
+#include "logger.hpp"
+
 MechanismModel::MechanismModel() :
     mechanismType(),
     key(),
@@ -52,7 +54,9 @@ bool MechanismModel::setModel(const std::string & source)
 {
     if (source.empty())
     {
-        Logger::log(LogLevel::Error, "Function list is empty (%s).", this->name);
+        Logger::log(LogLevel::Error,
+                    "Function list is empty (%s).",
+                    this->name);
         return false;
     }
     std::vector<std::string> functionList = SplitString(source, " ");
@@ -64,10 +68,11 @@ bool MechanismModel::setModel(const std::string & source)
             this->name);
         return false;
     }
-    this->mechanismType = static_cast<MechanismType>(ToNumber<unsigned int>(functionList[0]));
+    this->mechanismType = static_cast<MechanismType>(ToNumber<unsigned int>(
+        functionList[0]));
 
-    if ((this->mechanismType == MechanismType::Door)
-        || (this->mechanismType == MechanismType::Lock))
+    if ((this->mechanismType == MechanismType::Door) ||
+        (this->mechanismType == MechanismType::Lock))
     {
         this->key = ToNumber<unsigned int>(functionList[1]);
         this->difficulty = ToNumber<unsigned int>(functionList[2]);

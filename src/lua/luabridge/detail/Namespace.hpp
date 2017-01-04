@@ -25,6 +25,18 @@
 /// SOFTWARE.
 ///----------------------------------------------------------------------------
 
+#pragma once
+
+#include <type_traits>
+#include <stdexcept>
+#include "LuaHelpers.hpp"
+#include "Userdata.hpp"
+#include "Constructor.hpp"
+#include "classInfo.hpp"
+#include "CFunctions.hpp"
+#include "TypeTraits.hpp"
+#include "Security.hpp"
+
 /** Provides C++ to Lua registration capabilities.
 
  This class is not instantiated directly, call `getGlobalNamespace` to start
@@ -462,11 +474,11 @@ private:
                 lua_pop(L, 1);
 
                 createConstTable(name);
-                lua_pushcfunction(L, &CFunc::gcMetaMethod < T > );
+                lua_pushcfunction(L, &CFunc::gcMetaMethod<T>);
                 rawsetfield(L, -2, "__gc");
 
                 createClassTable(name);
-                lua_pushcfunction(L, &CFunc::gcMetaMethod < T > );
+                lua_pushcfunction(L, &CFunc::gcMetaMethod<T>);
                 rawsetfield(L, -2, "__gc");
 
                 createStaticTable(name);
@@ -503,11 +515,11 @@ private:
             assert(lua_istable(L, -1));
 
             createConstTable(name);
-            lua_pushcfunction(L, &CFunc::gcMetaMethod < T > );
+            lua_pushcfunction(L, &CFunc::gcMetaMethod<T>);
             rawsetfield(L, -2, "__gc");
 
             createClassTable(name);
-            lua_pushcfunction(L, &CFunc::gcMetaMethod < T > );
+            lua_pushcfunction(L, &CFunc::gcMetaMethod<T>);
             rawsetfield(L, -2, "__gc");
 
             createStaticTable(name);
@@ -552,7 +564,7 @@ private:
             rawgetfield(L, -1, "__propget");
             assert(lua_istable(L, -1));
             lua_pushlightuserdata(L, pu);
-            lua_pushcclosure(L, &CFunc::getVariable < U > , 1);
+            lua_pushcclosure(L, &CFunc::getVariable<U>, 1);
             rawsetfield(L, -2, name);
             lua_pop(L, 1);
 
@@ -561,7 +573,7 @@ private:
             if (isWritable)
             {
                 lua_pushlightuserdata(L, pu);
-                lua_pushcclosure(L, &CFunc::setVariable < U > , 1);
+                lua_pushcclosure(L, &CFunc::setVariable<U>, 1);
             }
             else
             {
@@ -600,7 +612,7 @@ private:
             if (set != 0)
             {
                 new(lua_newuserdata(L, sizeof(set))) set_t(set);
-                lua_pushcclosure(L, &CFunc::Call < void(*)(U) > ::f, 1);
+                lua_pushcclosure(L, &CFunc::Call<void (*)(U)>::f, 1);
             }
             else
             {
@@ -638,6 +650,35 @@ private:
             return *this;
         }
 
+        //----------------------------------------------------------------------------
+        /// @brief Add a value.
+        /// @param name  The name of the value.
+        /// @param value The value to add.
+        /// @return A reference to the current namespace.
+        template<class U>
+        Class<T> & addIntegral(char const * name, U value)
+        {
+            static_assert(std::is_integral<U>::value, "Integer required.");
+            assert(lua_istable(L, -1));
+            lua_pushnumber(L, value);
+            rawsetfield(L, -2, name);
+            return *this;
+        }
+
+        /// @brief Add an enum value.
+        /// @param name  The name of the value.
+        /// @param value The value to add.
+        /// @return A reference to the current namespace.
+        template<class U>
+        Class<T> & addEnum(char const * name, U value)
+        {
+            static_assert(std::is_enum<U>::value, "Enum required.");
+            lua_pushnumber(L, static_cast<unsigned int>(value));
+            rawsetfield(L, -2, name);
+            lua_pop(L, 2);
+            return *this;
+        }
+
         //--------------------------------------------------------------------------
         /**
          Add or replace a data member.
@@ -652,7 +693,7 @@ private:
                 rawgetfield(L, -2, "__propget");
                 rawgetfield(L, -4, "__propget");
                 new(lua_newuserdata(L, sizeof(mp_t))) mp_t(mp);
-                lua_pushcclosure(L, &CFunc::getProperty < T, U > , 1);
+                lua_pushcclosure(L, &CFunc::getProperty<T, U>, 1);
                 lua_pushvalue(L, -1);
                 rawsetfield(L, -4, name);
                 rawsetfield(L, -2, name);
@@ -665,7 +706,7 @@ private:
                 rawgetfield(L, -2, "__propset");
                 assert(lua_istable(L, -1));
                 new(lua_newuserdata(L, sizeof(mp_t))) mp_t(mp);
-                lua_pushcclosure(L, &CFunc::setProperty < T, U > , 1);
+                lua_pushcclosure(L, &CFunc::setProperty<T, U>, 1);
                 rawsetfield(L, -2, name);
                 lua_pop(L, 1);
             }
@@ -792,10 +833,10 @@ private:
         template<class R, class MemFn>
         Class<T> & addFunction(char const * name, R MemFn::*mf)
         {
-            CFunc::CallMemberFunctionHelper < R
-            MemFn::*, FuncTraits < R
-            MemFn::* > ::isConstMemberFunction > ::add(L,
-                                                       name, mf);
+            CFunc::CallMemberFunctionHelper<R
+            MemFn::*, FuncTraits<R
+            MemFn::*>::isConstMemberFunction>::add(L,
+                                                   name, mf);
             return *this;
         }
 
@@ -1019,6 +1060,35 @@ public:
     }
 
     //----------------------------------------------------------------------------
+    /// @brief Add a value.
+    /// @param name  The name of the value.
+    /// @param value The value to add.
+    /// @return A reference to the current namespace.
+    template<class IntType>
+    Namespace & addIntegral(char const * name, IntType value)
+    {
+        static_assert(std::is_integral<IntType>::value, "Integer required.");
+        assert(lua_istable(L, -1));
+        lua_pushnumber(L, value);
+        rawsetfield(L, -2, name);
+        return *this;
+    }
+
+    /// @brief Add an enum value.
+    /// @param name  The name of the value.
+    /// @param value The value to add.
+    /// @return A reference to the current namespace.
+    template<class EnumType>
+    Namespace & addEnum(char const * name, EnumType value)
+    {
+        static_assert(std::is_enum<EnumType>::value, "Enum required.");
+        assert(lua_istable(L, -1));
+        lua_pushnumber(L, static_cast<unsigned int>(value));
+        rawsetfield(L, -2, name);
+        return *this;
+    }
+
+    //----------------------------------------------------------------------------
     /**
      Add or replace a variable.
      */
@@ -1030,7 +1100,7 @@ public:
         rawgetfield(L, -1, "__propget");
         assert(lua_istable(L, -1));
         lua_pushlightuserdata(L, pt);
-        lua_pushcclosure(L, &CFunc::getVariable < T > , 1);
+        lua_pushcclosure(L, &CFunc::getVariable<T>, 1);
         rawsetfield(L, -2, name);
         lua_pop(L, 1);
 
@@ -1039,7 +1109,7 @@ public:
         if (isWritable)
         {
             lua_pushlightuserdata(L, pt);
-            lua_pushcclosure(L, &CFunc::setVariable < T > , 1);
+            lua_pushcclosure(L, &CFunc::setVariable<T>, 1);
         }
         else
         {
@@ -1077,7 +1147,7 @@ public:
         {
             typedef void (* set_t)(TS);
             new(lua_newuserdata(L, sizeof(set_t))) set_t(set);
-            lua_pushcclosure(L, &CFunc::Call < void(*)(TS) > ::f, 1);
+            lua_pushcclosure(L, &CFunc::Call<void (*)(TS)>::f, 1);
         }
         else
         {

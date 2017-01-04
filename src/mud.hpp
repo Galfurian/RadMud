@@ -39,20 +39,18 @@
 #include "updater.hpp"
 #include "writing.hpp"
 #include "material.hpp"
-
 #include "area.hpp"
 #include "room.hpp"
 #include "continent.hpp"
-
 #include "mobile.hpp"
 #include "player.hpp"
-
 #include "command.hpp"
-
 #include "sqliteDbms.hpp"
-
 #include "table.hpp"
 #include "formatter.hpp"
+#include "terrain.hpp"
+
+class Direction;
 
 #ifdef __linux__
 
@@ -164,7 +162,7 @@ public:
     static Mud & instance();
 
     /// List of all connected players.
-    std::set<Player *> mudPlayers;
+    std::list<Player *> mudPlayers;
     /// List all the mobile.
     std::map<std::string, Mobile *> mudMobiles;
     /// List of all items.
@@ -204,13 +202,11 @@ public:
     /// Mud news.
     std::map<std::string, std::string> mudNews;
     /// List of commands (eg. look, quit, north etc.).
-    std::vector<Command> mudCommands;
-    /// Mud possible directions.
-    std::map<std::string, Direction> mudDirections;
-    /// Map of things to do for various connection states.
-    std::map<ConnectionState, ActionHandler> mudStateActions;
+    std::vector<std::shared_ptr<Command> > mudCommands;
     /// Map of buildings schematic.
     std::map<int, Building> mudBuildings;
+    /// Map of buildings schematic.
+    std::map<unsigned int, std::shared_ptr<Terrain>> mudTerrains;
 
     /// @brief Update all the player on the database.
     /// @return <b>True</b> if the operations succeeded,<br>
@@ -233,11 +229,12 @@ public:
     bool saveMud();
 
     /// @defgroup GlobalAddRemove Global Add and Remove Functions
-    /// @brief All the functions necessary to add and remove objects from their correspondent global list.
+    /// @brief All the functions necessary to add and remove objects from their
+    ///         correspondent global list.
     /// @{
 
     /// Add a player to the list of connected players.
-    bool addPlayer(Player * player);
+    void addPlayer(Player * player);
 
     /// Remove a player from the list of connected players.
     bool remPlayer(Player * player);
@@ -303,20 +300,18 @@ public:
     bool addTravelPoint(Room * source, Room * target);
 
     /// Add a command to the mud.
-    void addCommand(Command & command);
-
-    /// Add a direction to the mud.
-    bool addDirection(std::string name, Direction direction);
-
-    /// Add a state action to the mud.
-    bool addStateAction(ConnectionState state, ActionHandler action);
+    void addCommand(std::shared_ptr<Command> command);
 
     /// Add a building to the mud.
     bool addBuilding(Building & building);
+
+    /// Add a terrain to the mud.
+    bool addTerrain(std::shared_ptr<Terrain> terrain);
     ///@}
 
     /// @defgroup GlobalFind Global Find Functions
-    /// @brief All the functions necessary to find objects from their correspondent global list.
+    /// @brief All the functions necessary to find objects from their
+    ///         correspondent global list.
     /// @{
 
     /// Find an item given its vnum.
@@ -329,7 +324,7 @@ public:
     Mobile * findMobile(std::string id);
 
     /// Find a player given his name.
-    Player * findPlayer(std::string name);
+    Player * findPlayer(const std::string & name);
 
     /// Find an area given its vnum.
     Area * findArea(int vnum);
@@ -382,17 +377,14 @@ public:
     /// Find the destination room of a travel point, given its starting room.
     Room * findTravelPoint(Room * room);
 
-    /// Find the action handler given a connection state.
-    ActionHandler & findStateAction(ConnectionState state);
-
     /// Find a building given its name.
     Building * findBuilding(std::string name);
 
     /// Find a building given the vnum of the model to build.
     Building * findBuilding(int vnum);
 
-    /// Find the direction.
-    Direction findDirection(const std::string & direction, bool exact);
+    /// Find a terrain given its vnum.
+    std::shared_ptr<Terrain> findTerrain(unsigned int vnum);
     ///@}
 
     /// @brief Main processing loop.
@@ -450,18 +442,15 @@ private:
     void removeInactivePlayers();
 
     /// @brief New player has connected.
-    void processNewConnection();
+    /// @return <b>True</b> if there are no errors,<br>
+    ///         <b>False</b> otherwise.
+    bool processNewConnection();
 
     /// @brief Handle all the comunication descriptor, it's the socket value.
     void setupDescriptor(Player * player);
 
-    /// @brief Handle communications with player using descriptor previusly set.
+    /// @brief Process player communications.
     void processDescriptor(Player * player);
-
-    /// @brief Set up the mud variables.
-    /// @return <b>True</b> if there are no errors,<br>
-    ///         <b>False</b> otherwise.
-    bool initVariables();
 
     /// @brief Load data from the database.
     /// @return <b>True</b> if there are no errors,<br>

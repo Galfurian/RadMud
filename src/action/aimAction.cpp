@@ -21,7 +21,9 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "aimAction.hpp"
+
 #include "character.hpp"
+#include "logger.hpp"
 #include "area.hpp"
 #include "room.hpp"
 
@@ -30,14 +32,14 @@ AimAction::AimAction(Character * _actor, Character * _target) :
     target(_target)
 {
     // Debugging message.
-    Logger::log(LogLevel::Debug, "Created aim action.");
+    //Logger::log(LogLevel::Debug, "Created aim action.");
     // Reset the cooldown of the action.
     this->resetCooldown(AimAction::getAimTime(_actor, _target));
 }
 
 AimAction::~AimAction()
 {
-    Logger::log(LogLevel::Debug, "Deleted aim action.");
+    //Logger::log(LogLevel::Debug, "Deleted aim action.");
 }
 
 bool AimAction::check(std::string & error) const
@@ -107,11 +109,13 @@ ActionStatus AimAction::perform()
 unsigned int AimAction::getAimTime(Character * source, Character * target)
 {
     unsigned int requiredTime = 2;
-    if (source && target)
+    if ((source != nullptr) && (target != nullptr))
     {
-        if (source->room && target->room)
+        if ((source->room != nullptr) && (target->room != nullptr))
         {
-            requiredTime = SafeSum(requiredTime, Area::getDistance(source->room->coord, target->room->coord));
+            requiredTime = SafeSum(requiredTime,
+                                   Area::getDistance(source->room->coord,
+                                                     target->room->coord));
         }
     }
     return requiredTime;

@@ -1,24 +1,16 @@
 #############################################
 # Include Directories
-set(RADMUD_ITEM_INC
-        ./src/item
-        ./src/item/subtype
+set(PROJECT_INC ${PROJECT_INC}
+        ${CMAKE_SOURCE_DIR}/src/item
         PARENT_SCOPE
         )
 
 #############################################
 # Source Files
-set(RADMUD_ITEM_SRC
-        ./src/item/item.cpp
-        ./src/item/writing.cpp
-        ./src/item/itemFactory.cpp
-        ./src/item/itemContainer.cpp
-        ./src/item/subtype/shopItem.cpp
-        ./src/item/subtype/armorItem.cpp
-        ./src/item/subtype/corpseItem.cpp
-        ./src/item/subtype/currencyItem.cpp
-        ./src/item/subtype/meleeWeaponItem.cpp
-        ./src/item/subtype/rangedWeaponItem.cpp
-        ./src/item/subtype/magazineItem.cpp
+set(PROJECT_SRC ${PROJECT_SRC}
+        ${CMAKE_SOURCE_DIR}/src/item/item.cpp
+        ${CMAKE_SOURCE_DIR}/src/item/writing.cpp
+        ${CMAKE_SOURCE_DIR}/src/item/itemFactory.cpp
+        ${CMAKE_SOURCE_DIR}/src/item/itemContainer.cpp
         PARENT_SCOPE
         )

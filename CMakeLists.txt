@@ -14,40 +14,57 @@ SET(PROJECT_SOURCE_DIR src)
 #################################################
 # Initialize CXXFLAGS...
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weffc++")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpedantic")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic-errors")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wshadow")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wconversion")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wsign-compare")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wsign-conversion")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcast-align")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcast-qual")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wdisabled-optimization")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wfloat-equal")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wfloat-conversion")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wformat=2")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wformat-nonliteral")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wformat-security")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wformat-y2k")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wimport")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Winit-self")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Winline")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Winvalid-pch")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wlong-long")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wmissing-field-initializers")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wmissing-format-attribute")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wmissing-include-dirs")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wmissing-noreturn")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpacked")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpadded")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpointer-arith")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wredundant-decls")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wshadow")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wstack-protector")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wstrict-aliasing=2")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch-default")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch-enum")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunreachable-code")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunused")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunused-function")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunused-label")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunused-parameter")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunused-value")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunused-variable")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wvariadic-macros")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wwrite-strings")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wsign-compare")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wsign-conversion")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wuninitialized")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch-default")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch-enum")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic-errors")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmessage-length=0")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-switch-default")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1")
-
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++98-compat")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++98-compat-pedantic")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-documentation-unknown-command")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-noreturn")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-weak-vtables")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-padded")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-exit-time-destructors")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-prototypes")
-endif ()
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-non-virtual-dtor")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-switch-default")
 
 #################################################
 # Activate compiler-specific C++11...
@@ -65,59 +82,47 @@ endif ()
 #################################################
 # Add cmake modules folder...
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
-
 find_package(Lua52 REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(Sqlite3 REQUIRED)
 
 #################################################
-# Add subdirectories...
-add_subdirectory(src/lua)
-add_subdirectory(src/item)
-add_subdirectory(src/model)
-add_subdirectory(src/sqlite)
-add_subdirectory(src/action)
-add_subdirectory(src/command)
-add_subdirectory(src/creation)
-add_subdirectory(src/character)
-add_subdirectory(src/utilities)
-add_subdirectory(src/structure)
+# Add root project sources...
+set(PROJECT_SRC
+        ${CMAKE_SOURCE_DIR}/src/main.cpp
+        ${CMAKE_SOURCE_DIR}/src/mud.cpp
+        )
+
+set(PROJECT_INC ${CMAKE_SOURCE_DIR}/src)
 
 #################################################
-# Add project sources...
-set(PROJECT_SRC
-        ./src/defines.cpp
-        ./src/main.cpp
-        ./src/mud.cpp
-        ./src/updater.cpp
-        ${RADMUD_LUA_SRC}
-        ${RADMUD_ITEM_SRC}
-        ${RADMUD_MODEL_SRC}
-        ${RADMUD_ACTION_SRC}
-        ${RADMUD_SQLITE_SRC}
-        ${RADMUD_COMMAND_SRC}
-        ${RADMUD_CREATION_SRC}
-        ${RADMUD_CHARACTER_SRC}
-        ${RADMUD_UTILITIES_SRC}
-        ${RADMUD_STRUCTURE_SRC})
+# Add subdirectories...
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/enumerators)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/character)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/utilities)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/structure)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/structure/algorithms)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/creation)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/command)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/updater)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/sqlite)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/action)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/action/combat)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/input)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/input/initialization)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/model)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/model/submodel)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/item)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/item/subitem)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/lua)
 
 #################################################
 # Add project includes...
 include_directories(
+        ${PROJECT_INC}
         ${LUA_INCLUDE_DIR}
         ${ZLIB_INCLUDE_DIR}
         ${SQLITE3_INCLUDE_DIR}
-        ${RADMUD_STRUCTURE_INC}
-        ${RADMUD_UTILITIES_INC}
-        ${RADMUD_CHARACTER_INC}
-        ${RADMUD_CREATION_INC}
-        ${RADMUD_COMMAND_INC}
-        ${RADMUD_SQLITE_INC}
-        ${RADMUD_ACTION_INC}
-        ${RADMUD_MODEL_INC}
-        ${RADMUD_ITEM_INC}
-        ${RADMUD_LUA_INC}
-        ./src
 )
 
 #################################################

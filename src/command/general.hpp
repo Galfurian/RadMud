@@ -28,64 +28,66 @@
 void LoadGeneralCommands();
 
 /// @defgroup ComInterfaces Commands List Interface.
-/// @brief All the functions necessary to handle the commands that a player can execute.
+/// @brief All the functions necessary to handle the commands that a player
+///         can execute.
 /// @{
 
 /// Execute character movement.
-void DoDirection(Character * character, Direction direction);
+bool DoDirection(Character * character, Direction direction);
 
 /// Allow the character to mote the continental map.
-void DoTravel(Character * character, ArgumentHandler & args);
+bool DoTravel(Character * character, ArgumentHandler & args);
 
 /// Disconnect the player from the Mud.
-void DoQuit(Character * character, ArgumentHandler & args);
+bool DoQuit(Character * character, ArgumentHandler & args);
 
 /// Shows a list of all the online players.
-void DoWho(Character * character, ArgumentHandler & args);
+bool DoWho(Character * character, ArgumentHandler & args);
 
 /// Allow to modify the character informations.
-void DoSet(Character * character, ArgumentHandler & args);
+bool DoSet(Character * character, ArgumentHandler & args);
 
 /// Stop the current action of the character.
-void DoStop(Character * character, ArgumentHandler & args);
+bool DoStop(Character * character, ArgumentHandler & args);
 
-/// The character look at: the current room, the near rooms, an object, a player, a character, and so on.
-void DoLook(Character * character, ArgumentHandler & args);
+/// The character look at: the current room, the near rooms, an object,
+///  a player, a character, and so on.
+bool DoLook(Character * character, ArgumentHandler & args);
 
 /// Provide a complete help on the mud.
-void DoHelp(Character * character, ArgumentHandler & args);
+bool DoHelp(Character * character, ArgumentHandler & args);
 
 /// Allow character to modify his prompt.
-void DoPrompt(Character * character, ArgumentHandler & args);
+bool DoPrompt(Character * character, ArgumentHandler & args);
 
 /// Report the current day phase.
-void DoTime(Character * character, ArgumentHandler & args);
+bool DoTime(Character * character, ArgumentHandler & args);
 
 /// Make the player stand up.
-void DoStand(Character * character, ArgumentHandler & args);
+bool DoStand(Character * character, ArgumentHandler & args);
 
 /// Make the player crouch.
-void DoCrouch(Character * character, ArgumentHandler & args);
+bool DoCrouch(Character * character, ArgumentHandler & args);
 
 /// Make the player sit.
-void DoSit(Character * character, ArgumentHandler & args);
+bool DoSit(Character * character, ArgumentHandler & args);
 
 /// Make the player prone.
-void DoProne(Character * character, ArgumentHandler & args);
+bool DoProne(Character * character, ArgumentHandler & args);
 
 /// Make the player lie down and rest.
-void DoRest(Character * character, ArgumentHandler & args);
+bool DoRest(Character * character, ArgumentHandler & args);
 
 /// Show player statistics.
-void DoStatistics(Character * character, ArgumentHandler & args);
+bool DoStatistics(Character * character, ArgumentHandler & args);
 
 /// Allow player to rent and disconnect.
-void DoRent(Character * character, ArgumentHandler & args);
+bool DoRent(Character * character, ArgumentHandler & args);
 
 /// Show player skills.
-void DoSkills(Character * character, ArgumentHandler & args);
+bool DoSkills(Character * character, ArgumentHandler & args);
 
 /// Show server informations and statistics.
-void DoServer(Character * character, ArgumentHandler & args);
+bool DoServer(Character * character, ArgumentHandler & args);
 
 ///@}

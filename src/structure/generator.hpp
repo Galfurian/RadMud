@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "defines.hpp"
+#include "area.hpp"
 
 /// @brief Provides a method which generate a room description and name.
 class Generator
@@ -51,12 +51,14 @@ private:
         std::string name;
         /// The list of status for rooms inside this kind of zone.
         std::vector<std::string> namesStatus;
-        /// The list of modified descriptions for rooms inside this kind of zone.
+        /// The list of modified descriptions for rooms inside this
+        ///  kind of zone.
         std::vector<std::string> descriptionStatus;
     };
     /// Map between a type of area and the corresponding naming struct.
     std::map<AreaType, ZoneBaseNaming> mapBase;
-    /// Map between the status of an area and the corresponding status naming struct.
+    /// Map between the status of an area and the corresponding status
+    ///  naming struct.
     std::map<AreaStatus, ZoneStatusNaming> mapStatus;
 
 public:

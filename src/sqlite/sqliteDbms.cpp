@@ -23,15 +23,17 @@
 #include "sqliteDbms.hpp"
 
 #include "sqliteLoadFunctions.hpp"
-
+#include "logger.hpp"
 #include "mud.hpp"
-#include "stopwatch.hpp"
 
-SQLiteDbms::SQLiteDbms()
+SQLiteDbms::SQLiteDbms() :
+    dbConnection(),
+    loaders()
 {
     loaders.push_back(TableLoader("BadName", LoadBadName));
     loaders.push_back(TableLoader("BlockedIp", LoadBlockedIp));
     loaders.push_back(TableLoader("News", LoadNews));
+    loaders.push_back(TableLoader("Terrain", LoadTerrain));
     loaders.push_back(TableLoader("Material", LoadMaterial));
     loaders.push_back(TableLoader("Skill", LoadSkill));
     loaders.push_back(TableLoader("Continent", LoadContinent));
@@ -73,7 +75,8 @@ SQLiteDbms & SQLiteDbms::instance()
 
 bool SQLiteDbms::openDatabase()
 {
-    if (!dbConnection.openConnection(Mud::instance().getMudDatabaseName(), Mud::instance().getMudSystemDirectory()))
+    if (!dbConnection.openConnection(Mud::instance().getMudDatabaseName(),
+                                     Mud::instance().getMudSystemDirectory()))
     {
         this->showLastError();
         return false;
@@ -95,13 +98,12 @@ bool SQLiteDbms::loadTables()
 {
     // Status variable for loading operation.
     bool status = true;
-    // Create a result variable.
-    ResultSet * result = nullptr;
     for (auto iterator : loaders)
     {
-        Logger::log(LogLevel::Debug, "    Loading Table: " + iterator.table + ".");
+        Logger::log(LogLevel::Debug,
+                    "    Loading Table: " + iterator.table + ".");
         // Execute the query.
-        result = dbConnection.executeSelect(iterator.getQuery().c_str());
+        auto result = dbConnection.executeSelect(iterator.getQuery().c_str());
         // Check the result.
         if (result == nullptr)
         {
@@ -111,8 +113,8 @@ bool SQLiteDbms::loadTables()
         if (!iterator.loadFunction(result))
         {
             // Log an error.
-            Logger::log(LogLevel::Error, "Error when loading table: " + iterator.table);
-            this->showLastError();
+            Logger::log(LogLevel::Error,
+                        "Error when loading table: " + iterator.table);
             status = false;
         }
         // release the resource.
@@ -122,61 +124,10 @@ bool SQLiteDbms::loadTables()
     return status;
 }
 
-bool SQLiteDbms::loadPlayer(Player * player)
-{
-    Logger::log(LogLevel::Debug, "Loading player " + player->getName() + ".");
-    Stopwatch<std::chrono::milliseconds> stopwatch("LoadPlayer");
-    stopwatch.start();
-    if (!this->loadPlayerInformation(player))
-    {
-        Logger::log(LogLevel::Error, "Encountered an error during loading Player Information.");
-        return false;
-    }
-    if (!this->loadPlayerItems(player))
-    {
-        Logger::log(LogLevel::Error, "Encountered an error during loading Player Items.");
-        return false;
-    }
-    if (!this->loadPlayerSkill(player))
-    {
-        Logger::log(LogLevel::Error, "Encountered an error during loading Player Skills.");
-        return false;
-    }
-    // Check the loaded player.
-    if (!player->check())
-    {
-        Logger::log(LogLevel::Error, "Error during error checking.");
-        return false;
-    }
-    // Log the elapsed time.
-    Logger::log(LogLevel::Debug, "Elapsed Time (" + ToString(stopwatch.elapsed()) + " ms).");
-    return true;
-}
-
-bool SQLiteDbms::searchPlayer(const std::string & name)
-{
-    bool outcome = false;
-    ResultSet * result = dbConnection.executeSelect(
-        ("SELECT count(*) FROM Player WHERE name=\"" + name + "\";").c_str());
-    if (result != nullptr)
-    {
-        if (result->next())
-        {
-            if (result->getNextInteger() == 1)
-            {
-                outcome = true;
-            }
-        }
-        result->release();
-    }
-    return outcome;
-}
-
-bool SQLiteDbms::insertInto(
-    std::string table,
-    std::vector<std::string> args,
-    bool orIgnore,
-    bool orReplace)
+bool SQLiteDbms::insertInto(std::string table,
+                            std::vector<std::string> args,
+                            bool orIgnore,
+                            bool orReplace)
 {
     std::stringstream stream;
     stream << "INSERT";
@@ -190,10 +141,10 @@ bool SQLiteDbms::insertInto(
     }
     stream << " INTO `" << table << "`" << std::endl;
     stream << "VALUES(" << std::endl;
-    for (unsigned int it = 0; it < args.size(); it++)
+    for (auto it = args.begin(); it != args.end(); ++it)
     {
-        std::string value = args.at(it);
-        if (it == (args.size() - 1))
+        auto value = (*it);
+        if ((it + 1) == args.end())
         {
             stream << "\"" << value << "\");";
         }
@@ -210,16 +161,18 @@ bool SQLiteDbms::deleteFrom(std::string table, QueryList where)
     std::stringstream stream;
     stream << "DELETE FROM " << table << std::endl;
     stream << "WHERE" << std::endl;
-    for (unsigned int it = 0; it < where.size(); ++it)
+    for (auto it = where.begin(); it != where.end(); ++it)
     {
-        std::pair<std::string, std::string> clause = where.at(it);
-        if (it == (where.size() - 1))
+        auto clause = (*it);
+        if ((it + 1) == where.end())
         {
-            stream << "    " << clause.first << " = \"" << clause.second << "\";" << std::endl;
+            stream << "    " << clause.first
+                   << " = \"" << clause.second << "\";" << std::endl;
         }
         else
         {
-            stream << "    " << clause.first << " = \"" << clause.second << "\" AND" << std::endl;
+            stream << "    " << clause.first
+                   << " = \"" << clause.second << "\" AND" << std::endl;
         }
     }
     return (dbConnection.executeQuery(stream.str().c_str()) != 0);
@@ -230,29 +183,33 @@ bool SQLiteDbms::updateInto(std::string table, QueryList value, QueryList where)
     std::stringstream stream;
     stream << "UPDATE " << table << std::endl;
     stream << "SET" << std::endl;
-    for (unsigned int it = 0; it < value.size(); ++it)
+    for (auto it = value.begin(); it != value.end(); ++it)
     {
-        std::pair<std::string, std::string> clause = value.at(it);
-        if (it == (value.size() - 1))
+        auto clause = (*it);
+        if ((it + 1) == value.end())
         {
-            stream << "    " << clause.first << " = \"" << clause.second << "\"" << std::endl;
+            stream << "    " << clause.first
+                   << " = \"" << clause.second << "\"" << std::endl;
         }
         else
         {
-            stream << "    " << clause.first << " = \"" << clause.second << "\"," << std::endl;
+            stream << "    " << clause.first
+                   << " = \"" << clause.second << "\"," << std::endl;
         }
     }
     stream << "WHERE" << std::endl;
-    for (unsigned int it = 0; it < where.size(); ++it)
+    for (auto it = where.begin(); it != where.end(); ++it)
     {
-        std::pair<std::string, std::string> clause = where.at(it);
-        if (it == (where.size() - 1))
+        auto clause = (*it);
+        if ((it + 1) == where.end())
         {
-            stream << "    " << clause.first << " = \"" << clause.second << "\";" << std::endl;
+            stream << "    " << clause.first
+                   << " = \"" << clause.second << "\";" << std::endl;
         }
         else
         {
-            stream << "    " << clause.first << " = \"" << clause.second << "\" AND" << std::endl;
+            stream << "    " << clause.first
+                   << " = \"" << clause.second << "\" AND" << std::endl;
         }
     }
     return (dbConnection.executeQuery(stream.str().c_str()) != 0);
@@ -268,7 +225,8 @@ bool SQLiteDbms::updatePlayers()
         {
             if (!player->updateOnDB())
             {
-                Logger::log(LogLevel::Error, "Can't save the player '%s'.", player->getName());
+                Logger::log(LogLevel::Error,
+                            "Can't save the player '%s'.", player->getName());
                 this->showLastError();
             }
         }
@@ -286,7 +244,8 @@ bool SQLiteDbms::updateItems()
     {
         if (!it.second->updateOnDB())
         {
-            Logger::log(LogLevel::Error, "Can't save the item '%s'.", it.second->getName());
+            Logger::log(LogLevel::Error,
+                        "Can't save the item '%s'.", it.second->getName());
             this->showLastError();
         }
     }
@@ -303,7 +262,8 @@ bool SQLiteDbms::updateRooms()
     {
         if (!it.second->updateOnDB())
         {
-            Logger::log(LogLevel::Error, "Can't save the room '%s'.", it.second->name);
+            Logger::log(LogLevel::Error,
+                        "Can't save the room '%s'.", it.second->name);
             this->showLastError();
         }
     }
@@ -329,156 +289,8 @@ void SQLiteDbms::endTransaction()
 
 void SQLiteDbms::showLastError() const
 {
-    Logger::log(LogLevel::Error, "Error code :" + ToString(dbConnection.getLastErrorCode()));
-    Logger::log(LogLevel::Error, "Last error :" + dbConnection.getLastErrorMsg());
-}
-
-bool SQLiteDbms::loadPlayerInformation(Player * player)
-{
-    // Prepare the query.
-    std::string query = "SELECT * FROM Player WHERE name = \"" + player->name + "\";";
-    // Execute the query.
-    ResultSet * result = dbConnection.executeSelect(query.c_str());
-    // Check the result.
-    if (result == nullptr)
-    {
-        Logger::log(LogLevel::Error, "Query result is empty.");
-        return false;
-    }
-    // Loading status.
-    bool status = true;
-    if (result->next())
-    {
-        player->name = result->getNextString();
-        player->password = result->getNextString();
-        player->race = Mud::instance().findRace(result->getNextInteger());
-        player->setAbility(Ability::Strength, result->getNextUnsignedInteger());
-        player->setAbility(Ability::Agility, result->getNextUnsignedInteger());
-        player->setAbility(Ability::Perception, result->getNextUnsignedInteger());
-        player->setAbility(Ability::Constitution, result->getNextUnsignedInteger());
-        player->setAbility(Ability::Intelligence, result->getNextUnsignedInteger());
-        player->gender = static_cast<GenderType>(result->getNextInteger());
-        player->age = result->getNextInteger();
-        player->description = result->getNextString();
-        player->weight = result->getNextUnsignedInteger();
-        player->faction = Mud::instance().findFaction(result->getNextInteger());
-        player->level = result->getNextUnsignedInteger();
-        player->experience = result->getNextInteger();
-        player->room = Mud::instance().findRoom(result->getNextInteger());
-        player->prompt = player->prompt_save = result->getNextString();
-        player->flags = result->getNextUnsignedInteger();
-        player->setHealth(result->getNextUnsignedInteger(), true);
-        player->setStamina(result->getNextUnsignedInteger(), true);
-        player->setHunger(result->getNextInteger());
-        player->setThirst(result->getNextInteger());
-        player->rent_room = result->getNextInteger();
-        if (player->room == nullptr)
-        {
-            player->room = Mud::instance().findRoom(player->rent_room);
-            if (player->room == nullptr)
-            {
-                Logger::log(LogLevel::Error, "No room has been set.");
-                status = false;
-            }
-        }
-    }
-    // release the resource.
-    result->release();
-    return status;
-}
-
-bool SQLiteDbms::loadPlayerItems(Player * player)
-{
-    // Prepare the query.
-    std::string query = "SELECT item, position FROM ItemPlayer WHERE owner = \"" + player->name
-                        + "\";";
-    // Execute the query.
-    ResultSet * result = dbConnection.executeSelect(query.c_str());
-    // Check the result.
-    if (result == nullptr)
-    {
-        Logger::log(LogLevel::Error, "Query result is empty.");
-        return false;
-    }
-    // Loading status.
-    bool status = true;
-    while (result->next())
-    {
-        // The pointer to the object.
-        Item * item = Mud::instance().findItem(result->getNextInteger());
-        EquipmentSlot slot = static_cast<EquipmentSlot>(result->getNextInteger());
-
-        if (item == nullptr)
-        {
-            Logger::log(LogLevel::Error, "Item not found!");
-            status = false;
-            break;
-        }
-        if (item->room != nullptr)
-        {
-            Logger::log(LogLevel::Error, "The item is no more available.");
-            status = false;
-            break;
-        }
-        if (item->owner != nullptr)
-        {
-            if (item->owner != player)
-            {
-                Logger::log(LogLevel::Error, "The item is no more available.");
-                status = false;
-                break;
-            }
-        }
-        if (slot == EquipmentSlot::None)
-        {
-            // Add the item to the inventory.
-            player->inventory.push_back_item(item);
-            // Set the owner of the item.
-            item->owner = player;
-        }
-        else
-        {
-            // Change the slot of the item.
-            item->setCurrentSlot(slot);
-            // Add the item to the inventory.
-            player->equipment.push_back_item(item);
-            // Set the owner of the item.
-            item->owner = player;
-        }
-    }
-    // release the resource.
-    result->release();
-    return status;
-}
-
-bool SQLiteDbms::loadPlayerSkill(Player * player)
-{
-    // Prepare the query.
-    std::string query = "SELECT skill, value FROM Advancement WHERE player=\"" + player->name
-                        + "\";";
-    // Execute the query.
-    ResultSet * result = dbConnection.executeSelect(query.c_str());
-    // Check the result.
-    if (result == nullptr)
-    {
-        Logger::log(LogLevel::Error, "Query result is empty.");
-        return false;
-    }
-    // Loading status.
-    bool status = true;
-    while (result->next())
-    {
-        Skill * skill = Mud::instance().findSkill(result->getNextInteger());
-        unsigned int value = result->getNextUnsignedInteger();
-        if (skill == nullptr)
-        {
-            Logger::log(LogLevel::Error, "Wrong skill id.");
-            status = false;
-            break;
-        }
-        player->skills[skill->vnum] = value;
-    }
-    // release the resource.
-    result->release();
-    return status;
+    Logger::log(LogLevel::Error,
+                "Error code :" + ToString(dbConnection.getLastErrorCode()));
+    Logger::log(LogLevel::Error,
+                "Last error :" + dbConnection.getLastErrorMsg());
 }

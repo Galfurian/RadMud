@@ -20,20 +20,31 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "sqliteLoadFunctions.hpp"
-#include "sqliteDbms.hpp"
-#include "mud.hpp"
+#include "sqliteException.hpp"
+
+#include "liquidContainerItem.hpp"
 #include "currencyModel.hpp"
-#include "shopItem.hpp"
 #include "modelFactory.hpp"
 #include "itemFactory.hpp"
+#include "shopItem.hpp"
+#include "logger.hpp"
+#include "mud.hpp"
 
 bool LoadBadName(ResultSet * result)
 {
     while (result->next())
     {
-        if (!Mud::instance().badNames.insert(result->getNextString()).second)
+        try
         {
-            Logger::log(LogLevel::Error, "Error during bad name loading.");
+            if (!Mud::instance().badNames.insert(
+                result->getNextString()).second)
+            {
+                throw SQLiteException("Error during bad name loading.");
+            }
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
             return false;
         }
     }
@@ -44,9 +55,17 @@ bool LoadBlockedIp(ResultSet * result)
 {
     while (result->next())
     {
-        if (!Mud::instance().blockedIPs.insert(result->getNextString()).second)
+        try
         {
-            Logger::log(LogLevel::Error, "Error during blocked ips loading.");
+            if (!Mud::instance().blockedIPs.insert(
+                result->getNextString()).second)
+            {
+                throw SQLiteException("Error during blocked ips loading.");
+            }
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
             return false;
         }
     }
@@ -57,10 +76,18 @@ bool LoadNews(ResultSet * result)
 {
     while (result->next())
     {
-        if (!Mud::instance().mudNews.insert(
-            std::make_pair(result->getNextString(), result->getNextString())).second)
+        try
         {
-            Logger::log(LogLevel::Error, "Error during news loading.");
+            if (!Mud::instance().mudNews.insert(
+                std::make_pair(result->getNextString(),
+                               result->getNextString())).second)
+            {
+                throw SQLiteException("Error during news loading.");
+            }
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
             return false;
         }
     }
@@ -71,22 +98,23 @@ bool LoadContent(ResultSet * result)
 {
     while (result->next())
     {
-        auto container = Mud::instance().findItem(result->getNextInteger());
-        auto contained = Mud::instance().findItem(result->getNextInteger());
-        if (container == nullptr)
+        try
         {
-            Logger::log(LogLevel::Error, "Can't find container item.");
-            return false;
+            auto container = Mud::instance().findItem(result->getNextInteger());
+            if (container == nullptr)
+            {
+                throw SQLiteException("Can't find container item.");
+            }
+            auto contained = Mud::instance().findItem(result->getNextInteger());
+            if (contained == nullptr)
+            {
+                throw SQLiteException("Can't find contained item.");
+            }
+            container->putInside(contained, false);
         }
-        if (contained == nullptr)
+        catch (SQLiteException & e)
         {
-            Logger::log(LogLevel::Error, "Can't find contained item.");
-            return false;
-        }
-        container->putInside(contained, false);
-        if (!contained->check(true))
-        {
-            Logger::log(LogLevel::Error, "Error during error checking.");
+            Logger::log(LogLevel::Error, std::string(e.what()));
             return false;
         }
     }
@@ -97,66 +125,46 @@ bool LoadItem(ResultSet * result)
 {
     while (result->next())
     {
-        // Retrieve the values.
-        auto itemVnum = result->getNextInteger();
-        auto itemModelVnum = result->getNextInteger();
-        auto itemQuantity = result->getNextUnsignedInteger();
-        auto itemMaker = result->getNextString();
-        auto itemPrice = result->getNextUnsignedInteger();
-        auto itemWeight = result->getNextDouble();
-        auto itemCondition = result->getNextUnsignedInteger();
-        auto itemMaxCondition = result->getNextUnsignedInteger();
-        auto itemCompositionVnum = result->getNextInteger();
-        auto itemQualityValue = result->getNextUnsignedInteger();
-        auto itemFlags = result->getNextUnsignedInteger();
-
-        // Retrieve the model vnum.
-        ItemModel * itemModel = Mud::instance().findItemModel(itemModelVnum);
-        if (itemModel == nullptr)
+        try
         {
-            Logger::log(LogLevel::Error, "Item has wrong model (%s)", ToString(itemModelVnum));
-            return false;
+            auto itemVnum = result->getNextInteger();
+            auto itemModel = Mud::instance().findItemModel(
+                result->getNextInteger());
+            if (itemModel == nullptr)
+            {
+                throw SQLiteException(
+                    "Item has wrong model (" + ToString(itemVnum) + ")");
+            }
+            // Create the item.
+            auto item = ItemFactory::newItem(itemModel->getType());
+            item->vnum = itemVnum;
+            item->model = itemModel;
+            item->quantity = result->getNextUnsignedInteger();
+            item->maker = result->getNextString();
+            item->price = result->getNextUnsignedInteger();
+            item->weight = result->getNextDouble();
+            item->condition = result->getNextDouble();
+            item->maxCondition = result->getNextDouble();
+            item->composition = Mud::instance().findMaterial(
+                result->getNextInteger());
+            item->quality = ItemQuality(result->getNextUnsignedInteger());
+            item->flags = result->getNextUnsignedInteger();
+            // Check correctness of attributes.
+            if (!item->check())
+            {
+                delete (item);
+                throw SQLiteException("Error during error checking.");
+            }
+            // Add the item to the map of items.
+            if (!Mud::instance().addItem(item))
+            {
+                delete (item);
+                throw SQLiteException("Error during error checking.");
+            }
         }
-        // Check the dynamic attributes.
-        Material * itemComposition = Mud::instance().findMaterial(itemCompositionVnum);
-        if (itemComposition == nullptr)
+        catch (SQLiteException & e)
         {
-            Logger::log(
-                LogLevel::Error,
-                "Item has wrong material (%s)",
-                ToString(itemCompositionVnum));
-            return false;
-        }
-        if (!ItemQuality::isValid(itemQualityValue))
-        {
-            Logger::log(LogLevel::Error, "Item has wrong quality (%s)", ToString(itemQualityValue));
-            return false;
-        }
-        // Set the item values.
-        auto item = ItemFactory::newItem(itemModel->getType());
-        item->vnum = itemVnum;
-        item->model = itemModel;
-        item->quantity = itemQuantity;
-        item->price = itemPrice;
-        item->weight = itemWeight;
-        item->condition = itemCondition;
-        item->maxCondition = itemMaxCondition;
-        item->maker = itemMaker;
-        item->composition = itemComposition;
-        item->quality = ItemQuality(itemQualityValue);
-        item->flags = itemFlags;
-        // Check correctness of attributes.
-        if (!item->check())
-        {
-            Logger::log(LogLevel::Error, "Error during error checking.");
-            delete (item);
-            return false;
-        }
-        // Add the item to the map of items.
-        if (!Mud::instance().addItem(item))
-        {
-            Logger::log(LogLevel::Error, "Error during item insertion.");
-            delete (item);
+            Logger::log(LogLevel::Error, std::string(e.what()));
             return false;
         }
     }
@@ -167,21 +175,27 @@ bool LoadSkill(ResultSet * result)
 {
     while (result->next())
     {
-        // Create an empty Skill.
-        Skill * skill = new Skill();
-        skill->vnum = result->getNextInteger();
-        skill->name = result->getNextString();
-        skill->description = result->getNextString();
-        skill->attribute = result->getNextInteger();
-        // Check the correctness.
-        if (!skill->check())
+        try
         {
-            Logger::log(LogLevel::Error, "Error during error checking.");
-            return false;
+            // Create an empty Skill.
+            auto skill = new Skill();
+            skill->vnum = result->getNextInteger();
+            skill->name = result->getNextString();
+            skill->description = result->getNextString();
+            skill->attribute = result->getNextInteger();
+            // Check the correctness.
+            if (!skill->check())
+            {
+                throw SQLiteException("Error during error checking.");
+            }
+            if (!Mud::instance().addSkill(skill))
+            {
+                throw SQLiteException("Error during skill insertion.");
+            }
         }
-        if (!Mud::instance().addSkill(skill))
+        catch (SQLiteException & e)
         {
-            Logger::log(LogLevel::Error, "Error during skill insertion.");
+            Logger::log(LogLevel::Error, std::string(e.what()));
             return false;
         }
     }
@@ -192,40 +206,41 @@ bool LoadFaction(ResultSet * result)
 {
     while (result->next())
     {
-        auto vnum = result->getNextInteger();
-        auto name = result->getNextString();
-        auto description = result->getNextString();
-        auto currencyVnum = result->getNextInteger();
-
-        auto currencyModel = Mud::instance().findItemModel(currencyVnum);
-        if (currencyModel == nullptr)
+        try
         {
-            Logger::log(LogLevel::Error, "Can't find the currency %s", ToString(currencyVnum));
-            return false;
+            // Create an empty Faction.
+            auto faction = new Faction();
+            faction->vnum = result->getNextInteger();
+            faction->name = result->getNextString();
+            faction->description = result->getNextString();
+            auto currencyVnum = result->getNextInteger();
+            auto currencyModel = Mud::instance().findItemModel(currencyVnum);
+            if (currencyModel == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the currency " + ToString(currencyVnum));
+            }
+            if (currencyModel->getType() != ModelType::Currency)
+            {
+                throw SQLiteException(
+                    "Model is not currency " + ToString(currencyVnum));
+            }
+            faction->currency = currencyModel->toCurrency();
+            // Translate new_line.
+            FindAndReplace(&faction->description, "%r", "\n");
+            // Check the correctness.
+            if (!faction->check())
+            {
+                throw SQLiteException("Error during error checking.");
+            }
+            if (!Mud::instance().addFaction(faction))
+            {
+                throw SQLiteException("Error during faction insertion.");
+            }
         }
-        if (currencyModel->getType() != ModelType::Currency)
+        catch (SQLiteException & e)
         {
-            Logger::log(LogLevel::Error, "Model is not currency %s", ToString(currencyVnum));
-            return false;
-        }
-        auto currency = currencyModel->toCurrency();
-
-        // Create an empty Faction.
-        Faction * faction = new Faction();
-        faction->vnum = vnum;
-        faction->name = name;
-        faction->description = description;
-        faction->currency = currency;
-        // Translate new_line.
-        FindAndReplace(&faction->description, "%r", "\n");
-        // Check the correctness.
-        if (!faction->check())
-        {
-            Logger::log(LogLevel::Error, "Error during error checking.");
-        }
-        if (!Mud::instance().addFaction(faction))
-        {
-            Logger::log(LogLevel::Error, "Error during faction insertion.");
+            Logger::log(LogLevel::Error, std::string(e.what()));
             return false;
         }
     }
@@ -236,54 +251,52 @@ bool LoadModel(ResultSet * result)
 {
     while (result->next())
     {
-        // Retrieve the vnum and the type of model.
-        int vnum = result->getNextInteger();
-        ModelType type = static_cast<ModelType>(result->getNextInteger());
-        // Create a pointer to the new item model.
-        ItemModel * itemModel = ModelFactory::newModel(type);
-        if (itemModel == nullptr)
+        try
         {
-            Logger::log(LogLevel::Error, "Wrong type of model %s.", ToString(vnum));
-            return false;
+            // Retrieve the vnum and the type of model.
+            auto vnum = result->getNextInteger();
+            // Create a pointer to the new item model.
+            auto itemModel = ModelFactory::newModel(
+                ModelType(result->getNextUnsignedInteger()));
+            if (itemModel == nullptr)
+            {
+                throw SQLiteException("Wrong type of model " + ToString(vnum));
+            }
+            // Set the values of the new model.
+            itemModel->vnum = vnum;
+            itemModel->name = result->getNextString();
+            itemModel->article = result->getNextString();
+            itemModel->shortdesc = result->getNextString();
+            itemModel->keys = SplitString(result->getNextString(), " ");
+            itemModel->description = result->getNextString();
+            itemModel->slot = EquipmentSlot(result->getNextUnsignedInteger());
+            itemModel->modelFlags = result->getNextUnsignedInteger();
+            itemModel->baseWeight = result->getNextDouble();
+            itemModel->basePrice = result->getNextUnsignedInteger();
+            itemModel->condition = result->getNextDouble();
+            itemModel->material = MaterialType(
+                result->getNextUnsignedInteger());
+            itemModel->tileSet = result->getNextInteger();
+            itemModel->tileId = result->getNextInteger();
+            if (!itemModel->setModel(result->getNextString()))
+            {
+                throw SQLiteException("Error when setting the model.");
+            }
+            // Translate new_line.
+            FindAndReplace(&itemModel->description, "%r", "\n");
+            // Check the correctness.
+            if (!itemModel->check())
+            {
+                throw SQLiteException("Error during error checking.");
+            }
+            if (!Mud::instance().addItemModel(itemModel))
+            {
+                throw SQLiteException("Error during itemModel insertion.");
+            }
         }
-
-        // Set the values of the new model.
-        itemModel->vnum = vnum;
-        itemModel->name = result->getNextString();
-        itemModel->article = result->getNextString();
-        itemModel->shortdesc = result->getNextString();
-        itemModel->keys = SplitString(result->getNextString(), " ");
-        itemModel->description = result->getNextString();
-        itemModel->slot = static_cast<EquipmentSlot>(result->getNextInteger());
-        itemModel->modelFlags = result->getNextUnsignedInteger();
-        itemModel->baseWeight = result->getNextDouble();
-        itemModel->basePrice = result->getNextUnsignedInteger();
-        itemModel->condition = result->getNextUnsignedInteger();
-        itemModel->decay = result->getNextUnsignedInteger();
-        itemModel->material = static_cast<MaterialType>(result->getNextInteger());
-        itemModel->tileSet = result->getNextInteger();
-        itemModel->tileId = result->getNextInteger();
-        if (!itemModel->setModel(result->getNextString()))
+        catch (SQLiteException & e)
         {
-            Logger::log(LogLevel::Error, "Error when setting the model.");
-            return false;
-        }
-        //if (!itemModel->setFunctions(result->getNextString()))
-        //{
-        //    Logger::log(LogLevel::Error, "Wrong number of function arguments %s.", ToString(vnum));
-        //    return false;
-        //}
-        // Translate new_line.
-        FindAndReplace(&itemModel->description, "%r", "\n");
-        // Check the correctness.
-        if (!itemModel->check())
-        {
-            Logger::log(LogLevel::Error, "Error during error checking.");
-            return false;
-        }
-        if (!Mud::instance().addItemModel(itemModel))
-        {
-            Logger::log(LogLevel::Error, "Error during itemModel insertion.");
+            Logger::log(LogLevel::Error, std::string(e.what()));
             return false;
         }
     }
@@ -294,37 +307,43 @@ bool LoadRace(ResultSet * result)
 {
     while (result->next())
     {
-        // Create an empty Race.
-        Race * race = new Race();
-        race->vnum = result->getNextInteger();
-        race->article = result->getNextString();
-        race->name = result->getNextString();
-        race->description = result->getNextString();
-        race->material = Mud::instance().findMaterial(result->getNextInteger());
-        race->setAbilities(result->getNextString());
-        if (!race->setAvailableFactions(result->getNextString()))
+        try
         {
-            Logger::log(LogLevel::Error, "Error when setting race factions.");
-            return false;
+            // Create an empty Race.
+            auto race = new Race();
+            race->vnum = result->getNextInteger();
+            race->article = result->getNextString();
+            race->name = result->getNextString();
+            race->description = result->getNextString();
+            race->material = Mud::instance().findMaterial(
+                result->getNextInteger());
+            race->setAbilities(result->getNextString());
+            if (!race->setAvailableFactions(result->getNextString()))
+            {
+                throw SQLiteException("Error when setting race factions.");
+            }
+            race->player_allow = result->getNextInteger();
+            race->tileSet = result->getNextInteger();
+            race->tileId = result->getNextInteger();
+            std::string corpseDescription = result->getNextString();
+            race->naturalWeapon = result->getNextString();
+            // Translate new_line.
+            FindAndReplace(&race->description, "%r", "\n");
+            // Intialize the corpse.
+            race->initializeCorpse(corpseDescription);
+            // Check the correctness.
+            if (!race->check())
+            {
+                throw SQLiteException("Error during error checking.");
+            }
+            if (!Mud::instance().addRace(race))
+            {
+                throw SQLiteException("Error during race insertion.");
+            }
         }
-        race->player_allow = result->getNextInteger();
-        race->tileSet = result->getNextInteger();
-        race->tileId = result->getNextInteger();
-        std::string corpseDescription = result->getNextString();
-        race->naturalWeapon = result->getNextString();
-        // Translate new_line.
-        FindAndReplace(&race->description, "%r", "\n");
-        // Intialize the corpse.
-        race->initializeCorpse(corpseDescription);
-        // Check the correctness.
-        if (!race->check())
+        catch (SQLiteException & e)
         {
-            Logger::log(LogLevel::Error, "Error during error checking.");
-            return false;
-        }
-        if (!Mud::instance().addRace(race))
-        {
-            Logger::log(LogLevel::Error, "Error during race insertion.");
+            Logger::log(LogLevel::Error, std::string(e.what()));
             return false;
         }
     }
@@ -335,54 +354,63 @@ bool LoadMobile(ResultSet * result)
 {
     while (result->next())
     {
-        // Create an empty Mobile.
-        Mobile * mobile = new Mobile();
-        // Initialize the mobile.
-        mobile->id = result->getNextString();
-        mobile->respawnRoom = Mud::instance().findRoom(result->getNextInteger());
-        mobile->room = mobile->respawnRoom;
-        mobile->name = result->getNextString();
-        mobile->keys = GetWords(result->getNextString());
-        mobile->shortdesc = result->getNextString();
-        mobile->staticdesc = result->getNextString();
-        mobile->description = result->getNextString();
-        mobile->race = Mud::instance().findRace(result->getNextInteger());
-        mobile->faction = Mud::instance().findFaction(result->getNextInteger());
-        mobile->gender = static_cast<GenderType>(result->getNextInteger());
-        mobile->weight = result->getNextUnsignedInteger();
-        mobile->actions = GetWords(result->getNextString());
-        mobile->flags = result->getNextUnsignedInteger();
-        mobile->level = result->getNextUnsignedInteger();
-        if (!mobile->setAbilities(result->getNextString()))
+        try
         {
-            Logger::log(LogLevel::Error, "Wrong characteristics.");
-            delete (mobile);
-            return false;
-        }
-        mobile->lua_script = result->getNextString();
+            // Create an empty Mobile.
+            auto mobile = new Mobile();
+            // Initialize the mobile.
+            mobile->id = result->getNextString();
+            mobile->respawnRoom = Mud::instance().findRoom(
+                result->getNextInteger());
+            mobile->room = mobile->respawnRoom;
+            mobile->name = result->getNextString();
+            mobile->keys = GetWords(result->getNextString());
+            mobile->shortdesc = result->getNextString();
+            mobile->staticdesc = result->getNextString();
+            mobile->description = result->getNextString();
+            mobile->race = Mud::instance().findRace(result->getNextInteger());
+            mobile->faction = Mud::instance().findFaction(
+                result->getNextInteger());
+            mobile->gender = static_cast<GenderType>(result->getNextInteger());
+            mobile->weight = result->getNextDouble();
+            mobile->actions = GetWords(result->getNextString());
+            mobile->flags = result->getNextUnsignedInteger();
+            mobile->level = result->getNextUnsignedInteger();
+            if (!mobile->setAbilities(result->getNextString()))
+            {
+                delete (mobile);
+                throw SQLiteException("Wrong characteristics.");
+            }
+            mobile->lua_script = result->getNextString();
 
-        mobile->setHealth(mobile->getMaxHealth(), true);
-        mobile->setStamina(mobile->getMaxStamina(), true);
+            mobile->setHealth(mobile->getMaxHealth(), true);
+            mobile->setStamina(mobile->getMaxStamina(), true);
 
-        // Translate new_line.
-        FindAndReplace(&mobile->description, "%r", "\n");
-        // Check the correctness.
-        if (!mobile->check())
+            // Translate new_line.
+            FindAndReplace(&mobile->description, "%r", "\n");
+            // Check the correctness.
+            if (!mobile->check())
+            {
+                delete (mobile);
+                throw SQLiteException("Error during error checking.");
+            }
+            if (!Mud::instance().addMobile(mobile))
+            {
+                delete (mobile);
+                throw SQLiteException("Error during mobile insertion.");
+            }
+            // Load the script.
+            mobile->loadScript(
+                Mud::instance().getMudSystemDirectory() + "lua/" +
+                mobile->lua_script);
+            // Respawn it.
+            mobile->respawn(true);
+        }
+        catch (SQLiteException & e)
         {
-            Logger::log(LogLevel::Error, "Error during error checking.");
-            delete (mobile);
+            Logger::log(LogLevel::Error, std::string(e.what()));
             return false;
         }
-        if (!Mud::instance().addMobile(mobile))
-        {
-            Logger::log(LogLevel::Error, "Error during mobile insertion.");
-            delete (mobile);
-            return false;
-        }
-        // Load the script.
-        mobile->loadScript(Mud::instance().getMudSystemDirectory() + "lua/" + mobile->lua_script);
-        // Respawn it.
-        mobile->respawn();
     }
     return true;
 }
@@ -391,30 +419,37 @@ bool LoadRoom(ResultSet * result)
 {
     while (result->next())
     {
-        // Create an empty Room.
-        Room * room = new Room();
-        // Initialize the Room.
-        room->vnum = result->getNextInteger();
-        room->coord.x = result->getNextInteger();
-        room->coord.y = result->getNextInteger();
-        room->coord.z = result->getNextInteger();
-        room->terrain = result->getNextString();
-        room->name = result->getNextString();
-        room->description = result->getNextString();
-        room->flags = result->getNextUnsignedInteger();
-        // Translate new_line.
-        FindAndReplace(&room->description, "%r", "\n");
-        // Check the correctness.
-        if (!room->check())
+        try
         {
-            Logger::log(LogLevel::Error, "Error during error checking.");
-            delete (room);
-            return false;
+            // Create an empty Room.
+            auto room = new Room();
+            // Initialize the Room.
+            room->vnum = result->getNextInteger();
+            room->coord.x = result->getNextInteger();
+            room->coord.y = result->getNextInteger();
+            room->coord.z = result->getNextInteger();
+            room->terrain = Mud::instance().findTerrain(
+                result->getNextUnsignedInteger());
+            room->name = result->getNextString();
+            room->description = result->getNextString();
+            room->flags = result->getNextUnsignedInteger();
+            // Translate new_line.
+            FindAndReplace(&room->description, "%r", "\n");
+            // Check the correctness.
+            if (!room->check())
+            {
+                delete (room);
+                throw SQLiteException("Error during error checking.");
+            }
+            if (!Mud::instance().addRoom(room))
+            {
+                delete (room);
+                throw SQLiteException("Error during room insertion.");
+            }
         }
-        if (!Mud::instance().addRoom(room))
+        catch (SQLiteException & e)
         {
-            Logger::log(LogLevel::Error, "Error during room insertion.");
-            delete (room);
+            Logger::log(LogLevel::Error, std::string(e.what()));
             return false;
         }
     }
@@ -425,40 +460,47 @@ bool LoadExit(ResultSet * result)
 {
     while (result->next())
     {
-        // Create an empty exit.
-        auto newExit = std::make_shared<Exit>();
-        // retrive the values.
-        auto sourceVnum = result->getNextInteger();
-        auto destinationVnum = result->getNextInteger();
-        auto directionValue = result->getNextUnsignedInteger();
-        auto flagValue = result->getNextUnsignedInteger();
-        // Check the correctness.
-        newExit->source = Mud::instance().findRoom(sourceVnum);
-        if (newExit->source == nullptr)
+        try
         {
-            Logger::log(LogLevel::Error, "Can't find source (%s).", ToString(sourceVnum));
+            // Create an empty exit.
+            auto newExit = std::make_shared<Exit>();
+            // retrive the values.
+            auto sourceVnum = result->getNextInteger();
+            auto destinationVnum = result->getNextInteger();
+            auto directionValue = result->getNextUnsignedInteger();
+            auto flagValue = result->getNextUnsignedInteger();
+            // Check the correctness.
+            newExit->source = Mud::instance().findRoom(sourceVnum);
+            if (newExit->source == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find source " + ToString(sourceVnum));
+            }
+            newExit->destination = Mud::instance().findRoom(destinationVnum);
+            if (newExit->destination == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find destination " + ToString(destinationVnum));
+            }
+            if (!Direction::isValid(directionValue))
+            {
+                throw SQLiteException(
+                    "Direction si not valid " + ToString(directionValue));
+            }
+            newExit->direction = Direction(directionValue);
+            newExit->flags = flagValue;
+            if (!newExit->check())
+            {
+                throw SQLiteException("Error during error checking.");
+            }
+            // Push this exit into the list of exits of the source room.
+            newExit->source->addExit(newExit);
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
             return false;
         }
-        newExit->destination = Mud::instance().findRoom(destinationVnum);
-        if (newExit->destination == nullptr)
-        {
-            Logger::log(LogLevel::Error, "Can't find destination (%s).", ToString(destinationVnum));
-            return false;
-        }
-        if (!Direction::isValid(directionValue))
-        {
-            Logger::log(LogLevel::Error, "Direction si not valid (%s).", ToString(directionValue));
-            return false;
-        }
-        newExit->direction = Direction(directionValue);
-        newExit->flags = flagValue;
-        if (!newExit->check())
-        {
-            Logger::log(LogLevel::Error, "Error during error checking.");
-            return false;
-        }
-        // Push this exit into the list of exits of the source room.
-        newExit->source->addExit(newExit);
     }
     return true;
 }
@@ -467,32 +509,36 @@ bool LoadItemRoom(ResultSet * result)
 {
     while (result->next())
     {
-        Room * room = Mud::instance().findRoom(result->getNextInteger());
-        Item * item = Mud::instance().findItem(result->getNextInteger());
-
-        // Check the correctness.
-        if (room == nullptr)
+        try
         {
-            Logger::log(LogLevel::Error, "Can't find the room.");
-            return false;
+            auto room = Mud::instance().findRoom(result->getNextInteger());
+            auto item = Mud::instance().findItem(result->getNextInteger());
+            // Check the correctness.
+            if (room == nullptr)
+            {
+                throw SQLiteException("Can't find the room.");
+            }
+            if (item == nullptr)
+            {
+                throw SQLiteException("Can't find the item.");
+            }
+            // Load the item inside the room.
+            if (HasFlag(item->flags, ItemFlag::Built))
+            {
+                room->addBuilding(item, false);
+            }
+            else
+            {
+                room->addItem(item, false);
+            }
+            if (!item->check(true))
+            {
+                throw SQLiteException("Error during error checking.");
+            }
         }
-        if (item == nullptr)
+        catch (SQLiteException & e)
         {
-            Logger::log(LogLevel::Error, "Can't find the item.");
-            return false;
-        }
-        // Load the item inside the room.
-        if (HasFlag(item->flags, ItemFlag::Built))
-        {
-            room->addBuilding(item, false);
-        }
-        else
-        {
-            room->addItem(item, false);
-        }
-        if (!item->check(true))
-        {
-            Logger::log(LogLevel::Error, "Error during error checking.");
+            Logger::log(LogLevel::Error, std::string(e.what()));
             return false;
         }
     }
@@ -503,28 +549,33 @@ bool LoadArea(ResultSet * result)
 {
     while (result->next())
     {
-        // Create an empty area.
-        Area * area = new Area();
-        // Initialize the area.
-        area->vnum = result->getNextInteger();
-        area->name = result->getNextString();
-        area->builder = result->getNextString();
-        area->continent = result->getNextString();
-        area->width = result->getNextInteger();
-        area->height = result->getNextInteger();
-        area->elevation = result->getNextInteger();
-        area->tileSet = result->getNextInteger();
-        area->type = static_cast<AreaType>(result->getNextUnsignedInteger());
-        area->status = static_cast<AreaStatus>(result->getNextUnsignedInteger());
-        // Check the correctness.
-        if (!area->check())
+        try
         {
-            Logger::log(LogLevel::Error, "Error during error checking.");
-            return false;
+            // Create an empty area.
+            auto area = new Area();
+            // Initialize the area.
+            area->vnum = result->getNextInteger();
+            area->name = result->getNextString();
+            area->builder = result->getNextString();
+            area->width = result->getNextInteger();
+            area->height = result->getNextInteger();
+            area->elevation = result->getNextInteger();
+            area->tileSet = result->getNextInteger();
+            area->type = static_cast<AreaType>(result->getNextUnsignedInteger());
+            area->status = static_cast<AreaStatus>(result->getNextUnsignedInteger());
+            // Check the correctness.
+            if (!area->check())
+            {
+                throw SQLiteException("Error during error checking.");
+            }
+            if (!Mud::instance().addArea(area))
+            {
+                throw SQLiteException("Error during area insertion.");
+            }
         }
-        if (!Mud::instance().addArea(area))
+        catch (SQLiteException & e)
         {
-            Logger::log(LogLevel::Error, "Error during area insertion.");
+            Logger::log(LogLevel::Error, std::string(e.what()));
             return false;
         }
     }
@@ -535,26 +586,33 @@ bool LoadAreaList(ResultSet * result)
 {
     while (result->next())
     {
-        int areaVnum = result->getNextInteger();
-        int roomVnum = result->getNextInteger();
-        Area * area = Mud::instance().findArea(areaVnum);
-        Room * room = Mud::instance().findRoom(roomVnum);
-        // Check the correctness.
-        if (area == nullptr)
+        try
         {
-            Logger::log(LogLevel::Error, "Can't find the area (%s).", ToString(areaVnum));
-            return false;
+            int areaVnum = result->getNextInteger();
+            int roomVnum = result->getNextInteger();
+            auto area = Mud::instance().findArea(areaVnum);
+            auto room = Mud::instance().findRoom(roomVnum);
+            // Check the correctness.
+            if (area == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the area " + ToString(areaVnum));
+            }
+            if (room == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the room " + ToString(roomVnum));
+            }
+            // Load the room inside the area.
+            area->addRoom(room);
+            if (!room->check(true))
+            {
+                throw SQLiteException("Wrong room data.");
+            }
         }
-        if (room == nullptr)
+        catch (SQLiteException & e)
         {
-            Logger::log(LogLevel::Error, "Can't find the room (%s).", ToString(roomVnum));
-            return false;
-        }
-        // Load the room inside the area.
-        area->addRoom(room);
-        if (!room->check(true))
-        {
-            Logger::log(LogLevel::Error, "Wrong room data.");
+            Logger::log(LogLevel::Error, std::string(e.what()));
             return false;
         }
     }
@@ -565,23 +623,30 @@ bool LoadWriting(ResultSet * result)
 {
     while (result->next())
     {
-        // Create an empty Writing.
-        Writing * writing = new Writing();
-        // Initialize the Writing.
-        writing->vnum = result->getNextInteger();
-        writing->title = result->getNextString();
-        writing->author = result->getNextString();
-        writing->content = result->getNextString();
-        // Fid the item on which the writing is attached.
-        Item * item = Mud::instance().findItem(writing->vnum);
-        if (item == nullptr)
+        try
         {
-            Logger::log(LogLevel::Error, "Can't find the item :" + ToString(writing->vnum));
-            return false;
+            // Create an empty Writing.
+            auto writing = new Writing();
+            // Initialize the Writing.
+            writing->vnum = result->getNextInteger();
+            writing->title = result->getNextString();
+            writing->author = result->getNextString();
+            writing->content = result->getNextString();
+            // Fid the item on which the writing is attached.
+            auto item = Mud::instance().findItem(writing->vnum);
+            if (item == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the item " + ToString(writing->vnum));
+            }
+            if (!Mud::instance().addWriting(writing))
+            {
+                throw SQLiteException("Error during writing insertion.");
+            }
         }
-        if (!Mud::instance().addWriting(writing))
+        catch (SQLiteException & e)
         {
-            Logger::log(LogLevel::Error, "Error during writing insertion.");
+            Logger::log(LogLevel::Error, std::string(e.what()));
             return false;
         }
     }
@@ -592,25 +657,31 @@ bool LoadContinent(ResultSet * result)
 {
     while (result->next())
     {
-        Continent * continent = new Continent();
-        // Initialize the continent.
-        continent->vnum = result->getNextInteger();
-        continent->name = result->getNextString();
-        continent->builder = result->getNextString();
-        continent->width = result->getNextInteger();
-        continent->height = result->getNextInteger();
-        continent->txtMap = result->getNextString();
-        // Add the continent to the map.
-        continent->init();
-        // Check the correctness.
-        if (!continent->check())
+        try
         {
-            Logger::log(LogLevel::Error, "Error during error checking.");
-            return false;
+            auto continent = new Continent();
+            // Initialize the continent.
+            continent->vnum = result->getNextInteger();
+            continent->name = result->getNextString();
+            continent->builder = result->getNextString();
+            continent->width = result->getNextInteger();
+            continent->height = result->getNextInteger();
+            continent->txtMap = result->getNextString();
+            // Add the continent to the map.
+            continent->init();
+            // Check the correctness.
+            if (!continent->check())
+            {
+                throw SQLiteException("Error during error checking.");
+            }
+            if (!Mud::instance().addContinent(continent))
+            {
+                throw SQLiteException("Error during continent insertion.");
+            }
         }
-        if (!Mud::instance().addContinent(continent))
+        catch (SQLiteException & e)
         {
-            Logger::log(LogLevel::Error, "Error during continent insertion.");
+            Logger::log(LogLevel::Error, std::string(e.what()));
             return false;
         }
     }
@@ -621,25 +692,31 @@ bool LoadMaterial(ResultSet * result)
 {
     while (result->next())
     {
-        // Create an empty Material.
-        Material * material = new Material();
-        // Intialize the material.
-        material->vnum = result->getNextInteger();
-        material->type = static_cast<MaterialType>(result->getNextInteger());
-        material->name = result->getNextString();
-        material->article = result->getNextString();
-        material->worth = result->getNextUnsignedInteger();
-        material->hardness = result->getNextUnsignedInteger();
-        material->lightness = result->getNextUnsignedInteger();
-        // Check the correctness.
-        if (!material->check())
+        try
         {
-            Logger::log(LogLevel::Error, "Error during error checking.");
-            return false;
+            // Create an empty Material.
+            auto material = new Material();
+            // Intialize the material.
+            material->vnum = result->getNextInteger();
+            material->type = MaterialType(result->getNextUnsignedInteger());
+            material->name = result->getNextString();
+            material->article = result->getNextString();
+            material->worth = result->getNextUnsignedInteger();
+            material->hardness = result->getNextUnsignedInteger();
+            material->lightness = result->getNextUnsignedInteger();
+            // Check the correctness.
+            if (!material->check())
+            {
+                throw SQLiteException("Error during error checking.");
+            }
+            if (!Mud::instance().addMaterial(material))
+            {
+                throw SQLiteException("Error during material insertion.");
+            }
         }
-        if (!Mud::instance().addMaterial(material))
+        catch (SQLiteException & e)
         {
-            Logger::log(LogLevel::Error, "Error during material insertion.");
+            Logger::log(LogLevel::Error, std::string(e.what()));
             return false;
         }
     }
@@ -650,30 +727,37 @@ bool LoadProfession(ResultSet * result)
 {
     while (result->next())
     {
-        // Create an empty Profession.
-        Profession * professions = new Profession();
-        // Initialize the profession.
-        professions->vnum = result->getNextUnsignedInteger();
-        professions->name = result->getNextString();
-        professions->description = result->getNextString();
-        professions->command = result->getNextString();
-        professions->posture = static_cast<CharacterPosture>(result->getNextInteger());
-        professions->action = result->getNextString();
-        professions->startMessage = result->getNextString();
-        professions->finishMessage = result->getNextString();
-        professions->successMessage = result->getNextString();
-        professions->failureMessage = result->getNextString();
-        professions->interruptMessage = result->getNextString();
-        professions->notFoundMessage = result->getNextString();
-        // Check the correctness.
-        if (!professions->check())
+        try
         {
-            Logger::log(LogLevel::Error, "Error during error checking.");
-            return false;
+            // Create an empty Profession.
+            auto professions = new Profession();
+            // Initialize the profession.
+            professions->vnum = result->getNextUnsignedInteger();
+            professions->name = result->getNextString();
+            professions->description = result->getNextString();
+            professions->command = result->getNextString();
+            professions->posture = CharacterPosture(
+                result->getNextUnsignedInteger());
+            professions->action = result->getNextString();
+            professions->startMessage = result->getNextString();
+            professions->finishMessage = result->getNextString();
+            professions->successMessage = result->getNextString();
+            professions->failureMessage = result->getNextString();
+            professions->interruptMessage = result->getNextString();
+            professions->notFoundMessage = result->getNextString();
+            // Check the correctness.
+            if (!professions->check())
+            {
+                throw SQLiteException("Error during error checking.");
+            }
+            if (!Mud::instance().addProfession(professions))
+            {
+                throw SQLiteException("Error during professions insertion.");
+            }
         }
-        if (!Mud::instance().addProfession(professions))
+        catch (SQLiteException & e)
         {
-            Logger::log(LogLevel::Error, "Error during professions insertion.");
+            Logger::log(LogLevel::Error, std::string(e.what()));
             return false;
         }
     }
@@ -684,39 +768,45 @@ bool LoadProduction(ResultSet * result)
 {
     while (result->next())
     {
-        // Checker flag.
-        bool check = true;
-
-        // Create an empty Production.
-        Production * production = new Production();
-        // Initialize the Production.
-        production->vnum = result->getNextInteger();
-        production->name = result->getNextString();
-        production->profession = Mud::instance().findProfession(result->getNextString());
-        production->difficulty = result->getNextUnsignedInteger();
-        production->time = result->getNextUnsignedInteger();
-        production->assisted = result->getNextInteger();
-        check &= production->setOutcome(result->getNextString());
-        check &= production->setTool(result->getNextString());
-        check &= production->setIngredient(result->getNextString());
-        production->material = static_cast<ResourceType>(result->getNextInteger());
-        production->workbench = static_cast<ToolType>(result->getNextInteger());
-
-        // ////////////////////////////////////////////////////////////////
-        // Check the correctness.
-        if (!check)
+        try
         {
-            Logger::log(LogLevel::Error, "The production is incorrect " + production->name);
-            return false;
+            // Checker flag.
+            bool check = true;
+            // Create an empty Production.
+            auto production = new Production();
+            // Initialize the Production.
+            production->vnum = result->getNextInteger();
+            production->name = result->getNextString();
+            production->profession = Mud::instance().findProfession(
+                result->getNextString());
+            production->difficulty = result->getNextUnsignedInteger();
+            production->time = result->getNextUnsignedInteger();
+            production->assisted = result->getNextInteger();
+            check &= production->setOutcome(result->getNextString());
+            check &= production->setTool(result->getNextString());
+            check &= production->setIngredient(result->getNextString());
+            production->material = ResourceType(
+                result->getNextUnsignedInteger());
+            production->workbench = ToolType(result->getNextUnsignedInteger());
+            // ////////////////////////////////////////////////////////////////
+            // Check the correctness.
+            if (!check)
+            {
+                throw SQLiteException(
+                    "The production is incorrect " + production->name);
+            }
+            if (!production->check())
+            {
+                throw SQLiteException("Error during error checking.");
+            }
+            if (!Mud::instance().addProduction(production))
+            {
+                throw SQLiteException("Error during production insertion.");
+            }
         }
-        if (!production->check())
+        catch (SQLiteException & e)
         {
-            Logger::log(LogLevel::Error, "Error during error checking.");
-            return false;
-        }
-        if (!Mud::instance().addProduction(production))
-        {
-            Logger::log(LogLevel::Error, "Error during production insertion.");
+            Logger::log(LogLevel::Error, std::string(e.what()));
             return false;
         }
     }
@@ -727,21 +817,28 @@ bool LoadLiquid(ResultSet * result)
 {
     while (result->next())
     {
-        // Create an empty Liquid.
-        Liquid * liquid = new Liquid();
-        // Load the liquid.
-        liquid->vnum = result->getNextInteger();
-        liquid->name = result->getNextString();
-        liquid->worth = result->getNextInteger();
-        // Check the correctness.
-        if (!liquid->check())
+        try
         {
-            Logger::log(LogLevel::Error, "Error during error checking.");
-            return false;
+            // Create an empty Liquid.
+            auto liquid = new Liquid();
+            // Load the liquid.
+            liquid->vnum = result->getNextInteger();
+            liquid->name = result->getNextString();
+            liquid->worth = result->getNextInteger();
+            liquid->quench = result->getNextDouble();
+            // Check the correctness.
+            if (!liquid->check())
+            {
+                throw SQLiteException("Error during error checking.");
+            }
+            if (!Mud::instance().addLiquid(liquid))
+            {
+                throw SQLiteException("Error during liquid insertion.");
+            }
         }
-        if (!Mud::instance().addLiquid(liquid))
+        catch (SQLiteException & e)
         {
-            Logger::log(LogLevel::Error, "Error during liquid insertion.");
+            Logger::log(LogLevel::Error, std::string(e.what()));
             return false;
         }
     }
@@ -752,31 +849,31 @@ bool LoadContentLiq(ResultSet * result)
 {
     while (result->next())
     {
-        Item * container = Mud::instance().findItem(result->getNextInteger());
-        Liquid * liquid = Mud::instance().findLiquid(result->getNextInteger());
-        unsigned int quantity = result->getNextUnsignedInteger();
-        bool check = true;
-        if (container == nullptr)
+        try
         {
-            Logger::log(LogLevel::Error, "Can't find container item.");
-            check = false;
+            auto container = Mud::instance().findItem(result->getNextInteger());
+            auto liquid = Mud::instance().findLiquid(result->getNextInteger());
+            auto quantity = result->getNextDouble();
+            if (container == nullptr)
+            {
+                throw SQLiteException("Can't find container item.");
+            }
+            if (container->getType() != ModelType::LiquidContainer)
+            {
+                throw SQLiteException("Wrong container for liquids.");
+            }
+            if (liquid == nullptr)
+            {
+                throw SQLiteException("Can't find liquid.");
+            }
+            auto liquidContainer = container->toLiquidContainerItem();
+            liquidContainer->pourIn(liquid, quantity, false);
         }
-        if (liquid == nullptr)
+        catch (SQLiteException & e)
         {
-            Logger::log(LogLevel::Error, "Can't find liquid.");
-            check = false;
-        }
-        if (quantity == 0)
-        {
-            Logger::log(LogLevel::Error, "Liquid content quantity misplaced.");
-            check = false;
-        }
-        if (!check)
-        {
-            Logger::log(LogLevel::Error, "Error during error checking.");
+            Logger::log(LogLevel::Error, std::string(e.what()));
             return false;
         }
-        container->pourIn(liquid, quantity, false);
     }
     return true;
 }
@@ -785,48 +882,46 @@ bool LoadTravelPoint(ResultSet * result)
 {
     while (result->next())
     {
-        Area * sourceArea = Mud::instance().findArea(result->getNextInteger());
-        Room * sourceRoom = sourceArea->getRoom(result->getNextInteger());
-        Area * targetArea = Mud::instance().findArea(result->getNextInteger());
-        Room * targetRoom = targetArea->getRoom(result->getNextInteger());
-        bool check = true;
-        if (sourceArea == nullptr)
+        try
         {
-            Logger::log(LogLevel::Error, "Can't find the source area.");
-            check = false;
+            auto sourceArea = Mud::instance().findArea(
+                result->getNextInteger());
+            if (sourceArea == nullptr)
+            {
+                throw SQLiteException("Can't find the source area.");
+            }
+            auto sourceRoom = sourceArea->getRoom(result->getNextInteger());
+            if (sourceRoom == nullptr)
+            {
+                throw SQLiteException("Can't find the source room.");
+            }
+            auto targetArea = Mud::instance().findArea(
+                result->getNextInteger());
+            if (targetArea == nullptr)
+            {
+                throw SQLiteException("Can't find the target area.");
+            }
+            auto targetRoom = targetArea->getRoom(result->getNextInteger());
+            if (targetRoom == nullptr)
+            {
+                throw SQLiteException("Can't find the target room.");
+            }
+            if (!Mud::instance().addTravelPoint(sourceRoom, targetRoom))
+            {
+                throw SQLiteException("Error during TravelPoint insertion.");
+            }
+            if (!Mud::instance().addTravelPoint(targetRoom, sourceRoom))
+            {
+                throw SQLiteException("Error during TravelPoint insertion.");
+            }
+            SetFlag(&sourceRoom->flags, RoomFlag::TravelPoint);
+            SetFlag(&targetRoom->flags, RoomFlag::TravelPoint);
         }
-        if (sourceRoom == nullptr)
+        catch (SQLiteException & e)
         {
-            Logger::log(LogLevel::Error, "Can't find the source room.");
-            check = false;
-        }
-        if (targetArea == nullptr)
-        {
-            Logger::log(LogLevel::Error, "Can't find the target area.");
-            check = false;
-        }
-        if (targetRoom == nullptr)
-        {
-            Logger::log(LogLevel::Error, "Can't find the target room.");
-            check = false;
-        }
-        if (!check)
-        {
-            Logger::log(LogLevel::Error, "Error during error checking.");
+            Logger::log(LogLevel::Error, std::string(e.what()));
             return false;
         }
-        if (!Mud::instance().addTravelPoint(sourceRoom, targetRoom))
-        {
-            Logger::log(LogLevel::Error, "Error during TravelPoint insertion.");
-            return false;
-        }
-        if (!Mud::instance().addTravelPoint(targetRoom, sourceRoom))
-        {
-            Logger::log(LogLevel::Error, "Error during TravelPoint insertion.");
-            return false;
-        }
-        SetFlag(&sourceRoom->flags, RoomFlag::TravelPoint);
-        SetFlag(&targetRoom->flags, RoomFlag::TravelPoint);
     }
     return true;
 }
@@ -835,33 +930,37 @@ bool LoadBuilding(ResultSet * result)
 {
     while (result->next())
     {
-        // Create an empty Building.
-        Building building;
-        // Initialize the Production.
-
-        building.vnum = result->getNextInteger();
-        building.name = result->getNextString();
-        building.difficulty = result->getNextUnsignedInteger();
-        building.time = result->getNextUnsignedInteger();
-        building.assisted = result->getNextInteger();
-        building.setTool(result->getNextString());
-        building.buildingModel = Mud::instance().findItemModel(result->getNextInteger());
-        building.setIngredient(result->getNextString());
-        building.unique = static_cast<bool>(result->getNextInteger());
-
-        if (building.buildingModel == nullptr)
+        try
         {
-            Logger::log(LogLevel::Error, "Can't find the building itemModel.");
-            break;
+            // Create an empty Building.
+            Building building;
+            // Initialize the Production.
+            building.vnum = result->getNextInteger();
+            building.name = result->getNextString();
+            building.difficulty = result->getNextUnsignedInteger();
+            building.time = result->getNextUnsignedInteger();
+            building.assisted = result->getNextInteger();
+            building.setTool(result->getNextString());
+            building.buildingModel = Mud::instance().findItemModel(
+                result->getNextInteger());
+            building.setIngredient(result->getNextString());
+            building.unique = static_cast<bool>(result->getNextInteger());
+            if (building.buildingModel == nullptr)
+            {
+                throw SQLiteException("Can't find the building itemModel.");
+            }
+            if (!building.check())
+            {
+                throw SQLiteException("Error during error checking.");
+            }
+            if (!Mud::instance().addBuilding(building))
+            {
+                throw SQLiteException("Error during building insertion.");
+            }
         }
-        if (!building.check())
+        catch (SQLiteException & e)
         {
-            Logger::log(LogLevel::Error, "Error during error checking.");
-            return false;
-        }
-        if (!Mud::instance().addBuilding(building))
-        {
-            Logger::log(LogLevel::Error, "Error during building insertion.");
+            Logger::log(LogLevel::Error, std::string(e.what()));
             return false;
         }
     }
@@ -872,33 +971,40 @@ bool LoadShop(ResultSet * result)
 {
     while (result->next())
     {
-        // Retrieve the item vnum.
-        auto vnum = result->getNextInteger();
-        auto item = Mud::instance().findItem(vnum);
-        auto name = result->getNextString();
-        auto buy = result->getNextUnsignedInteger();
-        auto sell = result->getNextUnsignedInteger();
-        auto balance = result->getNextUnsignedInteger();
-        auto shopKeeper = Mud::instance().findMobile(result->getNextString());
-        if (item == nullptr)
+        try
         {
-            Logger::log(LogLevel::Error, "Can't find the item (%s).", ToString(vnum));
-            return false;
+            // Retrieve the item vnum.
+            auto vnum = result->getNextInteger();
+            auto item = Mud::instance().findItem(vnum);
+            auto name = result->getNextString();
+            auto buy = result->getNextUnsignedInteger();
+            auto sell = result->getNextUnsignedInteger();
+            auto balance = result->getNextUnsignedInteger();
+            auto shopKeeper = Mud::instance().findMobile(
+                result->getNextString());
+            if (item == nullptr)
+            {
+                throw SQLiteException("Can't find the item " + ToString(vnum));
+            }
+            if (item->getType() != ModelType::Shop)
+            {
+                throw SQLiteException("Wrong type of item " + ToString(vnum));
+            }
+            auto shop = item->toShopItem();
+            shop->shopName = name;
+            shop->shopBuyTax = buy;
+            shop->shopSellTax = sell;
+            shop->balance = balance;
+            shop->shopKeeper = shopKeeper;
+            if (shopKeeper != nullptr)
+            {
+                shopKeeper->managedItem = shop;
+            }
         }
-        if (item->getType() != ModelType::Shop)
+        catch (SQLiteException & e)
         {
-            Logger::log(LogLevel::Error, "Wrong type of item (%s).", ToString(vnum));
+            Logger::log(LogLevel::Error, std::string(e.what()));
             return false;
-        }
-        ShopItem * shop = item->toShopItem();
-        shop->shopName = name;
-        shop->shopBuyTax = buy;
-        shop->shopSellTax = sell;
-        shop->balance = balance;
-        shop->shopKeeper = shopKeeper;
-        if (shopKeeper != nullptr)
-        {
-            shopKeeper->managedItem = shop;
         }
     }
     return true;
@@ -908,32 +1014,69 @@ bool LoadCurrency(ResultSet * result)
 {
     while (result->next())
     {
-        // Retrieve the item vnum.
-        auto modelVnum = result->getNextInteger();
-        auto materialVnum = result->getNextInteger();
-        auto worth = result->getNextUnsignedInteger();
+        try
+        {
+            // Retrieve the item vnum.
+            auto modelVnum = result->getNextInteger();
+            auto materialVnum = result->getNextInteger();
+            auto worth = result->getNextUnsignedInteger();
 
-        auto model = Mud::instance().findItemModel(modelVnum);
-        if (model == nullptr)
+            auto model = Mud::instance().findItemModel(modelVnum);
+            if (model == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the model " + ToString(modelVnum));
+            }
+            if (model->getType() != ModelType::Currency)
+            {
+                throw SQLiteException(
+                    "Wrong type of model " + ToString(modelVnum));
+            }
+            auto material = Mud::instance().findMaterial(materialVnum);
+            if (material == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the material " + ToString(materialVnum));
+            }
+            auto currency = model->toCurrency();
+            if (!currency->addPrice(materialVnum, worth))
+            {
+                throw SQLiteException(
+                    "Can't add the price for " + ToString(modelVnum));
+            }
+        }
+        catch (SQLiteException & e)
         {
-            Logger::log(LogLevel::Error, "Can't find the model (%s).", ToString(modelVnum));
+            Logger::log(LogLevel::Error, std::string(e.what()));
             return false;
         }
-        if (model->getType() != ModelType::Currency)
+    }
+    return true;
+}
+
+bool LoadTerrain(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
         {
-            Logger::log(LogLevel::Error, "Wrong type of model (%s).", ToString(modelVnum));
-            return false;
+            std::shared_ptr<Terrain> terrain = std::make_shared<Terrain>();
+            terrain->vnum = result->getNextUnsignedInteger();
+            terrain->name = result->getNextString();
+            terrain->flags = result->getNextUnsignedInteger();
+            terrain->space = result->getNextUnsignedInteger();
+            terrain->indoor = result->getNextUnsignedInteger();
+            terrain->light = result->getNextUnsignedInteger();
+            if (!Mud::instance().addTerrain(terrain))
+            {
+                throw SQLiteException(
+                    "Can't add the terrain " + ToString(terrain->vnum) + " - " +
+                    terrain->name);
+            }
         }
-        auto material = Mud::instance().findMaterial(materialVnum);
-        if (material == nullptr)
+        catch (SQLiteException & e)
         {
-            Logger::log(LogLevel::Error, "Can't find the material (%s).", ToString(materialVnum));
-            return false;
-        }
-        CurrencyModel * currency = model->toCurrency();
-        if (!currency->addPrice(materialVnum, worth))
-        {
-            Logger::log(LogLevel::Error, "Can't add the price for (%s).", ToString(modelVnum));
+            Logger::log(LogLevel::Error, std::string(e.what()));
             return false;
         }
     }

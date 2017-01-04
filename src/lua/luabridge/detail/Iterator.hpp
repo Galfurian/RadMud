@@ -24,8 +24,11 @@
 /// SOFTWARE.
 ///----------------------------------------------------------------------------
 
-/** Allows table iteration.
- */
+#pragma once
+
+#include "LuaRef.hpp"
+
+/// @brief Allows table iteration.
 class Iterator
 {
 private:

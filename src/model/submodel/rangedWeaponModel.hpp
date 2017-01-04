@@ -51,7 +51,7 @@ public:
     /// The maximum damage of the weapon.
     unsigned int maxDamage;
     /// The range of the weapon.
-    unsigned int range;
+    int range;
 
     RangedWeaponModel();
 

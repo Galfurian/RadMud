@@ -22,6 +22,8 @@
 
 #include "meleeWeaponModel.hpp"
 
+#include "logger.hpp"
+
 MeleeWeaponModel::MeleeWeaponModel() :
     meleeWeaponType(),
     minDamage(),
@@ -49,7 +51,9 @@ bool MeleeWeaponModel::setModel(const std::string & source)
 {
     if (source.empty())
     {
-        Logger::log(LogLevel::Error, "Function list is empty (%s).", this->name);
+        Logger::log(LogLevel::Error,
+                    "Function list is empty (%s).",
+                    this->name);
         return false;
     }
     std::vector<std::string> functionList = SplitString(source, " ");
@@ -61,7 +65,8 @@ bool MeleeWeaponModel::setModel(const std::string & source)
             this->name);
         return false;
     }
-    this->meleeWeaponType = static_cast<MeleeWeaponType>(ToNumber<unsigned int>(functionList[0]));
+    this->meleeWeaponType = static_cast<MeleeWeaponType>(ToNumber<unsigned int>(
+        functionList[0]));
     this->minDamage = ToNumber<unsigned int>(functionList[1]);
     this->maxDamage = ToNumber<unsigned int>(functionList[2]);
     return true;
@@ -74,7 +79,8 @@ void MeleeWeaponModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow({"Melee Weapon Type", GetMeleeWeaponTypeName(this->meleeWeaponType)});
+    sheet.addRow(
+        {"Melee Weapon Type", GetMeleeWeaponTypeName(this->meleeWeaponType)});
     sheet.addRow({"Minimum Damage", ToString(this->minDamage)});
     sheet.addRow({"Maximum Damage", ToString(this->maxDamage)});
 }

@@ -1,6 +1,5 @@
-function MessageContains(message, what)
-    return string.match(' ' .. message .. ' ', '%W' .. what .. '%W') ~= nil
-end
+package.path = package.path .. ";../system/lua/lib/?.lua"
+require 'utils'
 
 -- Handle the actions when the character is created.
 EventInit = function(self)
@@ -15,7 +14,7 @@ end
 -- Handle the actions when a character enters the room.
 EventEnter = function(self, character)
     -- Put event code here.
-    if (Mud.Random(1, 10) > 5)
+    if (Mud.random(1, 10) > 5)
     then
         self:doCommand("look " .. character.name);
     end
@@ -31,7 +30,7 @@ EventMessage = function(self, character, message)
     -- Put event code here.
     if (MessageContains(message, "hi"))
     then
-        Mud.Sleep(1);
+        Mud.sleep(1);
         self:doCommand("say " .. character.name .. " hi to you!");
     end
 end

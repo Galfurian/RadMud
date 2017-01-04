@@ -28,7 +28,7 @@ public:
     enum Format
     {
         ASCII,
-        TELNET
+        CLIENT
     };
 
     /// @brief Constructor.

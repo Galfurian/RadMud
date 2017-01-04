@@ -1,5 +1,6 @@
 /// @file   sqliteDbms.hpp
-/// @brief  Definition of the class SQLiteDbms, that allows to interact whit a SQLITE3 Database.
+/// @brief  Definition of the class SQLiteDbms, that allows to interact
+///          with a SQLITE3 Database.
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2014
 /// @copyright
@@ -27,23 +28,21 @@
 #include "sqliteWrapper.hpp"
 #include "tableLoader.hpp"
 
-class Character;
-
 class Player;
-
-class Skill;
-
-class Item;
-
-class Room;
 
 /// @brief A query list of FIELD+VALUE.
 using QueryList = std::vector<std::pair<std::string, std::string> >;
 
-/// @brief It's used to connect to a database and retrieve information as well as update them.
+/// @brief It's used to connect to a database and retrieve information
+///         as well as update them.
 class SQLiteDbms
 {
 private:
+    /// The connection, used to communicate with the database.
+    SQLiteWrapper dbConnection;
+    /// List of the tables with their loader.
+    std::vector<TableLoader> loaders;
+
     /// @brief Constructor.
     SQLiteDbms();
 
@@ -68,15 +67,18 @@ public:
     static SQLiteDbms & instance();
 
     /// @brief Open database connection.
-    /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
+    /// @return <b>True</b> if the operations succeeded,<br>
+    ///         <b>False</b> Otherwise.
     bool openDatabase();
 
     /// @brief Close database connection.
-    /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
+    /// @return <b>True</b> if the operations succeeded,<br>
+    ///         <b>False</b> Otherwise.
     bool closeDatabase();
 
     /// @brief Load tables values.
-    /// @return <b>True</b> if the operations succeeded,<br> <b>False</b> Otherwise.
+    /// @return <b>True</b> if the operations succeeded,<br>
+    ///         <b>False</b> Otherwise.
     bool loadTables();
 
     /// @brief Load all the vital information about the player.
@@ -98,11 +100,10 @@ public:
     /// @param orReplace Flag used to enable the OR REPLACE option.
     /// @return <b>True</b> if the operations succeeded,<br>
     ///         <b>False</b> Otherwise.
-    bool insertInto(
-        std::string table,
-        std::vector<std::string> args,
-        bool orIgnore = true,
-        bool orReplace = false);
+    bool insertInto(std::string table,
+                    std::vector<std::string> args,
+                    bool orIgnore = true,
+                    bool orReplace = false);
 
     /// @brief Execute a Delete From query.
     /// @param table The name of the table.
@@ -142,20 +143,17 @@ public:
 
 private:
     /// @brief Function used to retrieve information about Player.
-    bool loadPlayerInformation(Player * player);
+    bool loadPlayerInformation(ResultSet * result, Player * player);
 
-    /// @brief Function used to retrieve information about the item posessed by the player.
+    /// @brief Function used to retrieve information about the item
+    ///         possessed by the player.
     bool loadPlayerItems(Player * player);
 
-    /// @brief Function used to retrieve information about the skills of the player.
+    /// @brief Function used to retrieve information about the
+    ///         skills of the player.
     bool loadPlayerSkill(Player * player);
 
-    /// Loading function for sqlite3 tables.
-    using ClassLoadingFunction = std::function<bool(ResultSet * result)>;
-
-    /// The connection, used to communicate with the database.
-    SQLiteWrapper dbConnection;
-
-    /// List of the tables with their loader.
-    std::vector<TableLoader> loaders;
+    /// @brief Function used to retrieve information about the
+    ///         lua variables of the player.
+    bool loadPlayerLuaVariables(Player * player);
 };

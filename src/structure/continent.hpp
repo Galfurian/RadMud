@@ -118,12 +118,14 @@ public:
     Room * getRoom(Coordinates coord);
 
     /// @brief Draw the Filed of View for a character.
-    /// @param room   The room from where the algorithm has to compute the Field of View.
+    /// @param room   The room from where the algorithm has to compute
+    ///                the Field of View.
     /// @param radius The radius of visibility of the character.
-    /// @return The map containing all the Information about the Field of View of a character.
-    std::vector<std::string> drawFov(Room * room, const unsigned int & radius);
+    /// @return The map containing all the Information about the
+    ///          Field of View of a character.
+    std::vector<std::string> drawFov(Room * room, const int & radius);
 
-    /// @brief A faster but a little inacurate version of a FOV alforithm.
+    /// @brief A faster but a little inacurate version of a FOV algorithm.
     /// @param map      A 2D map, where the the Field of View will be drawn.
     /// @param origin_x The x coordinate of the central room.
     /// @param origin_y The y coordinate of the central room.
@@ -134,16 +136,16 @@ public:
         int origin_x,
         int origin_y,
         int origin_z,
-        const unsigned int & radius);
+        const int & radius);
 
     /// @brief A fast line of sight algorithm between two points.
     /// @param map      The map where the LOS algorithm has to write the line.
     /// @param origin_x The x coordinate of the central room.
     /// @param origin_y The y coordinate of the central room.
     /// @param origin_z The z coordinate of the central room.
-    /// @param incr_x   The value of which the x coordiante must be incremented at each step.
-    /// @param incr_y   The value of which the y coordiante must be incremented at each step.
-    /// @param incr_z   The value of which the z coordiante must be incremented at each step.
+    /// @param incr_x   The value of increment for the x coordinates.
+    /// @param incr_y   The value of increment for the y coordinates.
+    /// @param incr_z   The value of increment for the z coordinates.
     /// @param radius   The radius of visibility of the character.
     void lineOfSight(
         Map2D<ContinentTile> & map,
@@ -153,5 +155,5 @@ public:
         double incr_x,
         double incr_y,
         double incr_z,
-        const unsigned int & radius);
+        const int & radius);
 };

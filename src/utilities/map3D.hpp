@@ -26,6 +26,14 @@ template<typename T>
 class Map3D
 {
 private:
+    /// Define the type of internal 2D data structure.
+    using two_dim_map_t = typename
+    std::map<const int, std::map<const int, T> >;
+
+    /// Define the type of internal 3D data structure.
+    using three_dim_map_t = typename
+    std::map<const int, std::map<const int, std::map<const int, T> > >;
+
     /// Width of th map.
     int width;
     /// Height of th map.
@@ -33,14 +41,9 @@ private:
     /// Elevation of th map.
     int elevation;
     /// Data contained inside the map.
-    std::map<std::tuple<int, int, int>, T> data;
+    three_dim_map_t data;
 
 public:
-    /// Iterator for the 3D structure.
-    using iterator = typename std::map<std::tuple<int, int, int>, T>::iterator;
-    /// Const iterator for the 3D structure.
-    using const_iterator = typename std::map<std::tuple<int, int, int>, T>::const_iterator;
-
     /// @brief Constructor.
     Map3D() :
         width(),
@@ -75,17 +78,23 @@ public:
         elevation(_elevation),
         data()
     {
-        for (int z = 0; z < width; z++)
+        for (int z = 0; z < width; ++z)
         {
-            for (int y = 0; y < height; y++)
+            for (int y = 0; y < height; ++y)
             {
-                for (int x = 0; x < height; x++)
+                for (int x = 0; x < height; ++x)
                 {
-                    data[std::make_tuple(z, y, x)] = value;
+                    data[x][y][z] = value;
                 }
             }
         }
     }
+
+    /// Disable copy constructor.
+    Map3D(const Map3D<T> &) = delete;
+
+    /// Disable assignment.
+    Map3D & operator=(const Map3D<T> &) = delete;
 
     /// @brief Destructor.
     ~Map3D()
@@ -111,7 +120,6 @@ public:
         return elevation;
     }
 
-
     /// @brief Set the object at the given Coordinates3D.
     /// @param x     Coordinate on width.
     /// @param y     Coordinate on heigth.
@@ -121,22 +129,12 @@ public:
     ///         <b>False</b> otherwise.
     bool set(int x, int y, int z, T value)
     {
-#if 0
-        const key_t key = std::make_tuple(x, y, z);
-        auto ret = data.insert(std::make_pair(key, value));
-        if (!ret.second)
+        if (this->has(x, y, z))
         {
-            std::cout << "Not unique at " << ToString(x) << " " << ToString(y) << " " << ToString(z) << "\n";
+            return false;
         }
-        else
-        {
-            std::cout << "Set at " << ToString(x) << " " << ToString(y) << " " << ToString(z) << "\n";
-        }
-        return ret.second;
-#else
-        data[std::make_tuple(x, y, z)] = value;
+        data[x][y][z] = value;
         return true;
-#endif
     }
 
     /// @brief Retrieve the object at the given Coordinates3D.
@@ -146,7 +144,7 @@ public:
     /// @return The object at the given Coordinates3D.
     T & get(int x, int y, int z)
     {
-        return data[std::make_tuple(x, y, z)];
+        return data[x][y][z];
     }
 
     /// @brief Checks if there is an object at the given Coordinates3D.
@@ -157,29 +155,45 @@ public:
     ///         <b>False</b> otherwise.
     bool has(int x, int y, int z) const
     {
-        return data.find(std::make_tuple(x, y, z)) != data.end();
+
+        typename three_dim_map_t::const_iterator it = data.find(x);
+        if (it != data.end())
+        {
+            typename two_dim_map_t::const_iterator it2 = it->second.find(y);
+            if (it2 != it->second.end())
+            {
+                return (it2->second.find(z) != it2->second.end());
+            }
+        }
+        return false;
     }
 
     /// @brief Erase the object at the given Coordinates3D and returns an iterator to the.
     /// @param x Coordinate on width axis.
     /// @param y Coordinate on heigth axis.
     /// @param z Coordinate on altitude axis.
-    /// @return The object at the given Coordinates3D.
-    iterator erase(int x, int y, int z)
+    /// @return <b>True</b> if if the object where removed,<br>
+    ///         <b>False</b> otherwise.
+    bool erase(int x, int y, int z)
     {
-        return FindErase(data, std::make_tuple(x, y, z));
+        if (this->has(x, y, z))
+        {
+            data[x][y].erase(data[x][y].find(z));
+            return true;
+        }
+        return false;
     }
 
     /// @brief Provides an iterator to the begin of the list of data.
     /// @return An iterator to the begin of the 3D map.
-    iterator begin()
+    typename three_dim_map_t::iterator begin()
     {
         return data.begin();
     }
 
     /// @brief Provides an iterator to the end of the list of data.
     /// @return An iterator to the end of the 3D map.
-    iterator end()
+    typename three_dim_map_t::iterator end()
     {
         return data.end();
     }
@@ -190,10 +204,4 @@ public:
     {
         return data.size();
     }
-
-    /// Disable copy constructor.
-    Map3D(const Map3D<T> &) = delete;
-
-    /// Disable assignment.
-    Map3D & operator=(const Map3D<T> &) = delete;
 };

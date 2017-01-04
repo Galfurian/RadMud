@@ -21,7 +21,6 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "exit.hpp"
-
 #include "room.hpp"
 
 Exit::Exit() :
@@ -33,7 +32,10 @@ Exit::Exit() :
     // Nothing to do.
 }
 
-Exit::Exit(Room * _source, Room * _destination, Direction _direction, unsigned int _flags) :
+Exit::Exit(Room * _source,
+           Room * _destination,
+           Direction _direction,
+           unsigned int _flags) :
     source(_source),
     destination(_destination),
     direction(_direction),
@@ -75,11 +77,6 @@ std::shared_ptr<Exit> Exit::getOppositeExit() const
     return nullptr;
 }
 
-std::string Exit::getDirection() const
-{
-    return direction.toString();
-}
-
 bool Exit::unlink() const
 {
     if (source != nullptr)
@@ -103,7 +100,7 @@ void Exit::luaRegister(lua_State * L)
         .beginClass<Exit>("Exit")
         .addData("source", &Exit::source)
         .addData("destination", &Exit::destination)
-        .addFunction("getDirection", &Exit::getDirection)
+        .addData("direction", &Exit::direction)
         .endClass();
 }
 

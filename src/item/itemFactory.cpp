@@ -24,15 +24,18 @@
 
 #include "shopItem.hpp"
 #include "armorItem.hpp"
+#include "lightItem.hpp"
 #include "corpseItem.hpp"
 #include "currencyItem.hpp"
+#include "resourceItem.hpp"
+#include "magazineItem.hpp"
 #include "meleeWeaponItem.hpp"
 #include "rangedWeaponItem.hpp"
-#include "magazineItem.hpp"
+#include "liquidContainerItem.hpp"
 
 Item * ItemFactory::newItem(const ModelType & type)
 {
-    if (type == ModelType::NoType)
+    if (type == ModelType::None)
     {
         return nullptr;
     }
@@ -40,9 +43,21 @@ Item * ItemFactory::newItem(const ModelType & type)
     {
         return new ArmorItem();
     }
-    if (type == ModelType::Shop)
+    if (type == ModelType::Corpse)
     {
-        return new ShopItem();
+        return new CorpseItem();
+    }
+    if (type == ModelType::Currency)
+    {
+        return new CurrencyItem();
+    }
+    if (type == ModelType::Light)
+    {
+        return new LightItem();
+    }
+    if (type == ModelType::Magazine)
+    {
+        return new MagazineItem();
     }
     if (type == ModelType::MeleeWeapon)
     {
@@ -52,17 +67,17 @@ Item * ItemFactory::newItem(const ModelType & type)
     {
         return new RangedWeaponItem();
     }
-    if (type == ModelType::Currency)
+    if (type == ModelType::Shop)
     {
-        return new CurrencyItem();
+        return new ShopItem();
     }
-    if (type == ModelType::Corpse)
+    if (type == ModelType::Resource)
     {
-        return new CorpseItem();
+        return new ResourceItem();
     }
-    if (type == ModelType::Magazine)
+    if (type == ModelType::LiquidContainer)
     {
-        return new MagazineItem();
+        return new LiquidContainerItem();
     }
     return new Item();
 }

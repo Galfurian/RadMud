@@ -21,10 +21,9 @@
 
 #include "tableLoader.hpp"
 
-TableLoader::TableLoader(
-    std::string _table,
-    std::function<bool(ResultSet * result)> _loadFunction,
-    std::string _loadQuery) :
+TableLoader::TableLoader(std::string _table,
+                         std::function<bool(ResultSet * result)> _loadFunction,
+                         std::string _loadQuery) :
     table(_table),
     loadFunction(_loadFunction),
     loadQuery(_loadQuery)

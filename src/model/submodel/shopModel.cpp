@@ -24,6 +24,8 @@
 
 #include "mud.hpp"
 
+#include "logger.hpp"
+
 ShopModel::ShopModel() :
     maxWeight()
 {
@@ -49,13 +51,17 @@ bool ShopModel::setModel(const std::string & source)
 {
     if (source.empty())
     {
-        Logger::log(LogLevel::Error, "Function list is empty (%s).", this->name);
+        Logger::log(LogLevel::Error,
+                    "Function list is empty (%s).",
+                    this->name);
         return false;
     }
     std::vector<std::string> functionList = SplitString(source, " ");
     if (functionList.size() != 1)
     {
-        Logger::log(LogLevel::Error, "Wrong number of parameters for Shop Model (%s).", this->name);
+        Logger::log(LogLevel::Error,
+                    "Wrong number of parameters for Shop Model (%s).",
+                    this->name);
         return false;
     }
     this->maxWeight = ToNumber<unsigned int>(functionList[0]);

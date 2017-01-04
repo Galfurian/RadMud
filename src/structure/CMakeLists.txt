@@ -1,21 +1,19 @@
 #############################################
 # Include Directories
-set(RADMUD_STRUCTURE_INC
-        ./src/structure/
-        ./src/structure/algorithms
-        ./src/structure/algorithms/AStar
+set(PROJECT_INC ${PROJECT_INC}
+        ${CMAKE_SOURCE_DIR}/src/structure
         PARENT_SCOPE
         )
 
 #############################################
 # Source Files
-set(RADMUD_STRUCTURE_SRC
-        ./src/structure/exit.cpp
-        ./src/structure/room.cpp
-        ./src/structure/area.cpp
-        ./src/structure/continent.cpp
-        ./src/structure/coordinates.cpp
-        ./src/structure/generator.cpp
-        ./src/structure/algorithms/AStar/aStarNode.cpp
+set(PROJECT_SRC ${PROJECT_SRC}
+        ${CMAKE_SOURCE_DIR}/src/structure/exit.cpp
+        ${CMAKE_SOURCE_DIR}/src/structure/room.cpp
+        ${CMAKE_SOURCE_DIR}/src/structure/area.cpp
+        ${CMAKE_SOURCE_DIR}/src/structure/continent.cpp
+        ${CMAKE_SOURCE_DIR}/src/structure/coordinates.cpp
+        ${CMAKE_SOURCE_DIR}/src/structure/generator.cpp
+        ${CMAKE_SOURCE_DIR}/src/structure/terrain.cpp
         PARENT_SCOPE
         )

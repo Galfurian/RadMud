@@ -1,5 +1,5 @@
 /// @file   exit.hpp
-/// @brief  An exit connects two rooms and store information about: doors and exit's flags.
+/// @brief  An exit connects two rooms and store information about exits.
 /// @author Enrico Fraccaroli
 /// @date   Mar 10 2015
 /// @copyright
@@ -22,13 +22,27 @@
 
 #pragma once
 
+extern "C"
+{
+#include "lua.h"
+}
+
+#include "direction.hpp"
+
 #include <string>
 #include <vector>
 #include <memory>
 
-#include "defines.hpp"
-
 class Room;
+
+/// Used to determine the flag of the exit.
+using ExitFlag = enum class ExitFlag_t
+{
+    None = 0,   ///< No flag.
+    NoMob = 1,  ///< A mob can't move through this exit.
+    Hidden = 2, ///< The exit it's hidden.
+    Stairs = 4, ///< The exit has stairs.
+};
 
 /// @brief Holds details about room.
 class Exit
@@ -51,7 +65,10 @@ public:
     /// @param _destination The destination room.
     /// @param _direction   The direction of the exit.
     /// @param _flags       The exit flags.
-    Exit(Room * _source, Room * _destination, Direction _direction, unsigned int _flags);
+    Exit(Room * _source,
+         Room * _destination,
+         Direction _direction,
+         unsigned int _flags);
 
     /// Exit deconstructor.
     ~Exit();
@@ -69,18 +86,15 @@ public:
     /// @return The opposite exit.
     std::shared_ptr<Exit> getOppositeExit() const;
 
-    /// @brief Get the direction.
-    /// @return The direction.
-    std::string getDirection() const;
-
     /// @brief Unlink the current exit from its source.
     /// @return <b>True</b> if the operation succeeded,<br>
     ///         <b>False</b> otherwise.
     bool unlink() const;
 
-    /// @brief Define operator eual.
+    /// @brief Define equal operator.
     /// @param right The comparison exit.
-    /// @return <b>True</b> if this and the right element has the same direction,<br>
+    /// @return <b>True</b> if this and the right element has the
+    ///                      same direction,<br>
     ///         <b>False</b> otherwise.
     bool operator==(const Exit & right) const;
 
@@ -88,9 +102,6 @@ public:
     /// @param L The lua environment.
     static void luaRegister(lua_State * L);
 };
-
-/// Exit list handler.
-using ExitVector = std::vector<std::shared_ptr<Exit> >;
 
 /// @addtogroup FlagsToList
 /// @{
