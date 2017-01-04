@@ -80,7 +80,8 @@ bool Character::check() const
     safe &= CorrectAssert(this->getAbility(Ability::Constitution, false) <= 60);
     safe &= CorrectAssert(this->getAbility(Ability::Intelligence, false) > 0);
     safe &= CorrectAssert(this->getAbility(Ability::Intelligence, false) <= 60);
-    safe &= CorrectAssert(thirst > 0);
+    safe &= CorrectAssert(hunger >= 0);
+    safe &= CorrectAssert(thirst >= 0);
     safe &= CorrectAssert(room != nullptr);
     safe &= CorrectAssert(L != nullptr);
     return safe;
