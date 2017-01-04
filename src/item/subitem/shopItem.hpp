@@ -61,6 +61,8 @@ public:
 
     std::string lookContent() override;
 
+    bool isEmpty() const override;
+
     /// @brief Allows to set the new shop keeper.
     /// @param _shopKeeper The new shop keeper.
     void setNewShopKeeper(Mobile * _shopKeeper);

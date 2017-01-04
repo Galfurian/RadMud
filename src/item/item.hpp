@@ -35,9 +35,6 @@
 #include "liquid.hpp"
 #include "table.hpp"
 
-// Forward declarations.
-#include "forwardedItems.hpp"
-
 class Room;
 
 class Character;
@@ -211,6 +208,10 @@ public:
     /// @return A detailed description of the item.
     std::string getLook();
 
+    /// @brief Return the description of the content.
+    /// @return The string describing the content.
+    virtual std::string lookContent();
+
     /// @brief Check if the item is a valid container.
     /// @return <b>True</b> if it is a valid container,<br>
     ///         <b>False</b> otherwise.
@@ -258,10 +259,6 @@ public:
     /// @return The item, if it's in the container.
     Item * findContent(std::string search_parameter, int & number);
 
-    /// @brief Return the description of the content.
-    /// @return The string describing the content.
-    virtual std::string lookContent();
-
     /// @brief Set the equipment slot where this item must be worn.
     /// @param _currentSlot The new equipment slot.
     void setCurrentSlot(EquipmentSlot _currentSlot);
@@ -273,33 +270,6 @@ public:
     /// @brief Return the current equipment slot name.
     /// @return The equipment slot name.
     std::string getCurrentSlotName();
-
-    /// @brief Returns the model <b>statically</b> casted to Shop.
-    ShopItem * toShopItem();
-
-    /// @brief Returns the model <b>statically</b> casted to Armor.
-    ArmorItem * toArmorItem();
-
-    /// @brief Returns the model <b>statically</b> casted to Melee Weapon.
-    MeleeWeaponItem * toMeleeWeaponItem();
-
-    /// @brief Returns the model <b>statically</b> casted to Ranged Weapon.
-    RangedWeaponItem * toRangedWeaponItem();
-
-    /// @brief Returns the model <b>statically</b> casted to Currency.
-    CurrencyItem * toCurrencyItem();
-
-    /// @brief Returns the model <b>statically</b> casted to Corpse.
-    CorpseItem * toCorpseItem();
-
-    /// @brief Returns the model <b>statically</b> casted to Magazine.
-    MagazineItem * toMagazineItem();
-
-    /// @brief Returns the model <b>statically</b> casted to Light.
-    LightItem * toLightItem();
-
-    /// @brief Returns the model <b>statically</b> casted to Liquid Container.
-    LiquidContainerItem * toLiquidContainerItem();
 
     /// @brief Function used to register inside the lua environment the class.
     /// @param L The lua environment.

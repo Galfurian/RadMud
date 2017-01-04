@@ -33,4 +33,12 @@ public:
     virtual ~ContainerItem();
 
     void getSheet(Table & sheet) const override;
+
+    bool isAContainer() const override;
+
+    bool isEmpty() const override;
+
+    double getTotalSpace() const override;
+
+    std::string lookContent() override;
 };

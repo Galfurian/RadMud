@@ -205,6 +205,11 @@ std::string ShopItem::lookContent()
     return output;
 }
 
+bool ShopItem::isEmpty() const
+{
+    return content.empty();
+}
+
 void ShopItem::setNewShopKeeper(Mobile * _shopKeeper)
 {
     if (this->shopKeeper == nullptr)

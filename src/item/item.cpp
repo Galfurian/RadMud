@@ -453,32 +453,23 @@ std::string Item::getLook()
     return output;
 }
 
+std::string Item::lookContent()
+{
+    return "";
+}
+
 bool Item::isAContainer() const
 {
-    return (model->getType() == ModelType::Container);
+    return false;
 }
 
 bool Item::isEmpty() const
 {
-    if (this->isAContainer() ||
-        (model->getType() == ModelType::Magazine) ||
-        (model->getType() == ModelType::RangedWeapon) ||
-        (model->getType() == ModelType::Light))
-    {
-        return content.empty();
-    }
     return true;
 }
 
 double Item::getTotalSpace() const
 {
-    if (model->getType() == ModelType::Container)
-    {
-        // The base space.
-        double spaceBase = model->toContainer()->maxWeight;
-        // Evaluate the result.
-        return ((spaceBase + (spaceBase * quality.getModifier())) / 2);
-    }
     return 0.0;
 }
 
@@ -577,58 +568,6 @@ Item * Item::findContent(std::string search_parameter, int & number)
     return nullptr;
 }
 
-std::string Item::lookContent()
-{
-    if (!this->isAContainer())
-    {
-        return "";
-    }
-    std::string output;
-    auto Italic = [](const std::string & s)
-    {
-        return Formatter::italic() + s + Formatter::reset();
-    };
-    auto Yellow = [](const std::string & s)
-    {
-        return Formatter::yellow() + s + Formatter::reset();
-    };
-    if (HasFlag(this->flags, ItemFlag::Closed))
-    {
-        output += Italic("It is closed.\n");
-        if (!HasFlag(this->model->modelFlags, ModelFlag::CanSeeThrough))
-        {
-            return output + "\n";
-        }
-    }
-    if (content.empty())
-    {
-        output += Italic("It's empty.\n");
-    }
-    else
-    {
-        output += "Looking inside you see:\n";
-        Table table = Table();
-        table.addColumn("Item", StringAlign::Left);
-        table.addColumn("Quantity", StringAlign::Right);
-        table.addColumn("Weight", StringAlign::Right);
-        // List all the contained items.
-        for (auto it : content)
-        {
-            table.addRow(
-                {
-                    it->getNameCapital(),
-                    ToString(it->quantity),
-                    ToString(it->getWeight(true))
-                });
-        }
-        output += table.getTable();
-        output += "Has been used " + Yellow(ToString(getUsedSpace()));
-        output += " out of " + Yellow(ToString(getTotalSpace())) +
-                  " " + Mud::instance().getWeightMeasure() + ".\n";
-    }
-    return output;
-}
-
 void Item::setCurrentSlot(EquipmentSlot _currentSlot)
 {
     currentSlot = _currentSlot;
@@ -646,51 +585,6 @@ EquipmentSlot Item::getCurrentSlot()
 std::string Item::getCurrentSlotName()
 {
     return getCurrentSlot().toString();
-}
-
-ShopItem * Item::toShopItem()
-{
-    return static_cast<ShopItem *>(this);
-}
-
-ArmorItem * Item::toArmorItem()
-{
-    return static_cast<ArmorItem *>(this);
-}
-
-MeleeWeaponItem * Item::toMeleeWeaponItem()
-{
-    return static_cast<MeleeWeaponItem *>(this);
-}
-
-RangedWeaponItem * Item::toRangedWeaponItem()
-{
-    return static_cast<RangedWeaponItem *>(this);
-}
-
-CurrencyItem * Item::toCurrencyItem()
-{
-    return static_cast<CurrencyItem *>(this);
-}
-
-CorpseItem * Item::toCorpseItem()
-{
-    return static_cast<CorpseItem *>(this);
-}
-
-MagazineItem * Item::toMagazineItem()
-{
-    return static_cast<MagazineItem *>(this);
-}
-
-LightItem * Item::toLightItem()
-{
-    return static_cast<LightItem *>(this);
-}
-
-LiquidContainerItem * Item::toLiquidContainerItem()
-{
-    return static_cast<LiquidContainerItem *>(this);
 }
 
 void Item::luaRegister(lua_State * L)

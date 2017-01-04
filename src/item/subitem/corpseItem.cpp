@@ -68,3 +68,8 @@ bool CorpseItem::isAContainer() const
 {
     return true;
 }
+
+bool CorpseItem::isEmpty() const
+{
+    return content.empty();
+}

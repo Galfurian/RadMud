@@ -23,6 +23,8 @@
 #pragma once
 
 #include "combatAction.hpp"
+#include "meleeWeaponItem.hpp"
+#include "rangedWeaponItem.hpp"
 
 /// @brief An action executed by characters when fighting at close range.
 class BasicAttack :

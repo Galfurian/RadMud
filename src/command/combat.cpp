@@ -235,7 +235,7 @@ bool DoLoad(Character * character, ArgumentHandler & args)
         return false;
     }
     // Transform the item into a magazine.
-    auto magazine = itemToLoad->toMagazineItem();
+    auto magazine = static_cast<MagazineItem *>(itemToLoad);
     // Search the projectiles.
     auto projectile = character->findEquipmentItem(args[1].getContent(),
                                                    args[1].getIndex());
@@ -357,7 +357,7 @@ bool DoReload(Character * character, ArgumentHandler & args)
         return false;
     }
     // Transform the item into a ranged weapons.
-    auto rangedWeapon = itemToReload->toRangedWeaponItem();
+    auto rangedWeapon = static_cast<RangedWeaponItem *>(itemToReload);
     // Search the magazine.
     auto magazine = character->findEquipmentItem(args[1].getContent(),
                                                  args[1].getIndex());

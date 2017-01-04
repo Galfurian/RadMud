@@ -79,6 +79,11 @@ std::string MagazineItem::lookContent()
     return output;
 }
 
+bool MagazineItem::isEmpty() const
+{
+    return content.empty();
+}
+
 bool MagazineItem::canLoadWith(Item * _projectile, std::string & error) const
 {
     if (_projectile->getType() != ModelType::Projectile)

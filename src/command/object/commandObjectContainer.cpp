@@ -64,23 +64,29 @@ bool DoOrganize(Character * character, ArgumentHandler & args)
     }
     else if (args.size() == 2)
     {
-        auto container = character->findNearbyItem(args[1].getContent(),
-                                                   args[1].getIndex());
-        if (container != nullptr)
+        auto item = character->findNearbyItem(args[1].getContent(),
+                                              args[1].getIndex());
+        if (item != nullptr)
         {
-            if (container->content.empty())
+            if (item->getType() == ModelType::Container)
             {
-                character->sendMsg(
-                    "You can't organize " + container->getName(true) + "\n");
-            }
-            else
-            {
-                container->content.orderBy(order);
+                // Cast the item to container.
+                auto containerItem = static_cast<ContainerItem *>(item);
+                if (containerItem->isEmpty())
+                {
+                    character->sendMsg("%s is empty\n",
+                                       item->getNameCapital(true));
+                    return false;
+                }
+                // Order the content of the container.
+                containerItem->content.orderBy(order);
                 // Organize the target container.
                 character->sendMsg("You have organized %s, by %s.\n",
-                                   container->getName(true), name);
+                                   containerItem->getName(true), name);
                 return true;
             }
+            character->sendMsg("You can't organize %s\n", item->getName(true));
+            return false;
         }
         else if (BeginWith("inventory", args[1].getContent()))
         {
@@ -90,10 +96,7 @@ bool DoOrganize(Character * character, ArgumentHandler & args)
                                name);
             return true;
         }
-        else
-        {
-            character->sendMsg("What do you want to organize?\n");
-        }
+        character->sendMsg("What do you want to organize?\n");
     }
     else
     {
@@ -450,7 +453,8 @@ bool DoTurn(Character * character, ArgumentHandler & args)
     }
     if (item->getType() == ModelType::Light)
     {
-        auto lightItem = item->toLightItem();
+        // Cast the item to light.
+        auto lightItem = static_cast<LightItem *>(item);
         if (lightItem->active)
         {
             if (lightItem->model->toLight()->alwaysActive)
@@ -502,8 +506,8 @@ bool DoRefill(Character * character, ArgumentHandler & args)
         character->sendMsg("What do you want to refill with what?\n");
         return false;
     }
-    Item * itemToRefill = nullptr;
-    Item * fuel = nullptr;
+    // Prepare a variable for the light source.
+    Item * item = nullptr, * fuel = nullptr;
     // Check if the room is lit.
     bool roomIsLit = character->room->isLit();
     // Check if the inventory is lit.
@@ -511,8 +515,8 @@ bool DoRefill(Character * character, ArgumentHandler & args)
     // If the room is lit.
     if (roomIsLit)
     {
-        itemToRefill = character->findNearbyItem(args[0].getContent(),
-                                                 args[0].getIndex());
+        item = character->findNearbyItem(args[0].getContent(),
+                                         args[0].getIndex());
         fuel = character->findNearbyItem(args[1].getContent(),
                                          args[1].getIndex());
     }
@@ -521,8 +525,8 @@ bool DoRefill(Character * character, ArgumentHandler & args)
         // If the room is not lit but the inventory is.
         if (inventoryIsLit)
         {
-            itemToRefill = character->findInventoryItem(args[0].getContent(),
-                                                        args[0].getIndex());
+            item = character->findInventoryItem(args[0].getContent(),
+                                                args[0].getIndex());
             fuel = character->findInventoryItem(args[1].getContent(),
                                                 args[1].getIndex());
         }
@@ -533,9 +537,16 @@ bool DoRefill(Character * character, ArgumentHandler & args)
             return false;
         }
     }
-    if (itemToRefill == nullptr)
+    // Check the light source.
+    if (item == nullptr)
     {
         character->sendMsg("You don't have '%s'.\n", args[0].getContent());
+        return false;
+    }
+    if (item->getType() != ModelType::Light)
+    {
+        character->sendMsg("%s is not a light source.\n",
+                           args[0].getContent());
         return false;
     }
     if (fuel == nullptr)
@@ -543,11 +554,12 @@ bool DoRefill(Character * character, ArgumentHandler & args)
         character->sendMsg("You don't have '%s'.\n", args[1].getContent());
         return false;
     }
+    // Cast the item to light.
+    auto lightSource = static_cast<LightItem *>(item);
+    // Get the amount of fuel required to refill the light source.
     std::string error;
     unsigned int amountToLoad = 0;
-    if (!itemToRefill->toLightItem()->getAmountToRefill(fuel,
-                                                        amountToLoad,
-                                                        error))
+    if (!lightSource->getAmountToRefill(fuel, amountToLoad, error))
     {
         character->sendMsg(error + "\n");
         return false;
@@ -559,15 +571,15 @@ bool DoRefill(Character * character, ArgumentHandler & args)
         // Remove the item from the player's inventory.
         character->remInventoryItem(fuel);
         // Put the item inside the container.
-        itemToRefill->putInside(fuel);
+        lightSource->putInside(fuel);
         // Send the messages.
         character->sendMsg("You refill %s with %s.\n",
-                           itemToRefill->getName(true),
+                           lightSource->getName(true),
                            fuel->getName(true));
         character->room->sendToAll("%s refills %s with %s.\n",
                                    {character},
                                    character->getNameCapital(),
-                                   itemToRefill->getName(true),
+                                   lightSource->getName(true),
                                    fuel->getName(true));
     }
     else
@@ -577,22 +589,22 @@ bool DoRefill(Character * character, ArgumentHandler & args)
         if (newStack == nullptr)
         {
             character->sendMsg("You failed to refill %s with part of %s.\n",
-                               itemToRefill->getName(true),
+                               lightSource->getName(true),
                                fuel->getName(true));
             // Rollback the transaction.
             SQLiteDbms::instance().rollbackTransection();
             return false;
         }
         // Put the stack inside the container.
-        itemToRefill->putInside(newStack);
+        lightSource->putInside(newStack);
         // Send the messages.
         character->sendMsg("You put refill %s with part of %s.\n",
-                           itemToRefill->getName(true),
+                           lightSource->getName(true),
                            fuel->getName(true));
         character->room->sendToAll("%s refills %s with part of %s.\n",
                                    {character},
                                    character->getNameCapital(),
-                                   itemToRefill->getName(true),
+                                   lightSource->getName(true),
                                    fuel->getName(true));
     }
     // Conclude the transaction.

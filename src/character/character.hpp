@@ -26,17 +26,19 @@
 #pragma once
 
 #include "ability.hpp"
-#include "characterPosture.hpp"
 #include "exit.hpp"
 #include "race.hpp"
 #include "item.hpp"
 #include "faction.hpp"
+#include "LuaBridge.hpp"
 #include "effectList.hpp"
 #include "processInput.hpp"
 #include "combatAction.hpp"
 #include "argumentHandler.hpp"
+#include "meleeWeaponItem.hpp"
+#include "rangedWeaponItem.hpp"
+#include "characterPosture.hpp"
 #include "characterContainer.hpp"
-#include "LuaBridge.hpp"
 
 #include <deque>
 

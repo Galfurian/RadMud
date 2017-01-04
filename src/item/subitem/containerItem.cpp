@@ -20,6 +20,9 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "containerItem.hpp"
+#include "containerModel.hpp"
+#include "formatter.hpp"
+#include "mud.hpp"
 
 ContainerItem::ContainerItem()
 {
@@ -38,4 +41,70 @@ void ContainerItem::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
+}
+
+bool ContainerItem::isAContainer() const
+{
+    return true;
+}
+
+bool ContainerItem::isEmpty() const
+{
+    return content.empty();
+}
+
+double ContainerItem::getTotalSpace() const
+{
+    // The base space.
+    double spaceBase = model->toContainer()->maxWeight;
+    // Evaluate the result.
+    return ((spaceBase + (spaceBase * quality.getModifier())) / 2);
+}
+
+std::string ContainerItem::lookContent()
+{
+    std::string output;
+    auto Italic = [](const std::string & s)
+    {
+        return Formatter::italic() + s + Formatter::reset();
+    };
+    auto Yellow = [](const std::string & s)
+    {
+        return Formatter::yellow() + s + Formatter::reset();
+    };
+    if (HasFlag(this->flags, ItemFlag::Closed))
+    {
+        output += Italic("It is closed.\n");
+        if (!HasFlag(this->model->modelFlags, ModelFlag::CanSeeThrough))
+        {
+            return output + "\n";
+        }
+    }
+    if (content.empty())
+    {
+        output += Italic("It's empty.\n");
+    }
+    else
+    {
+        output += "Looking inside you see:\n";
+        Table table = Table();
+        table.addColumn("Item", StringAlign::Left);
+        table.addColumn("Quantity", StringAlign::Right);
+        table.addColumn("Weight", StringAlign::Right);
+        // List all the contained items.
+        for (auto it : content)
+        {
+            table.addRow(
+                {
+                    it->getNameCapital(),
+                    ToString(it->quantity),
+                    ToString(it->getWeight(true))
+                });
+        }
+        output += table.getTable();
+        output += "Has been used " + Yellow(ToString(getUsedSpace()));
+        output += " out of " + Yellow(ToString(getTotalSpace())) +
+                  " " + Mud::instance().getWeightMeasure() + ".\n";
+    }
+    return output;
 }

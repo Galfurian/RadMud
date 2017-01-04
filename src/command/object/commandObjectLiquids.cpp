@@ -85,7 +85,8 @@ bool DoDrink(Character * character, ArgumentHandler & args)
         character->sendMsg("You are full.\n");
         return false;
     }
-    auto liqConSrc = source->toLiquidContainerItem();
+    // Cast the source item to liquid container.
+    auto liqConSrc = static_cast<LiquidContainerItem *>(source);
     if (source->isEmpty())
     {
         character->sendMsg("%s is empty.\n", source->getNameCapital(true));
@@ -214,9 +215,10 @@ bool DoFill(Character * character, ArgumentHandler & args)
                            destination->getNameCapital());
         return false;
     }
-    // Get the liquid from the source and eventually from the destination.
-    auto liqConSrc = source->toLiquidContainerItem();
-    auto liqConDst = destination->toLiquidContainerItem();
+    // Cast the source item to liquid container.
+    auto liqConSrc = static_cast<LiquidContainerItem *>(source);
+    // Cast the destination item to liquid container.
+    auto liqConDst = static_cast<LiquidContainerItem *>(destination);
     // Check if source is empty.
     if (source->isEmpty())
     {
@@ -357,9 +359,10 @@ bool DoPour(Character * character, ArgumentHandler & args)
                            destination->getNameCapital());
         return false;
     }
-    // Get the liquid from the source and eventually from the destination.
-    auto liqConSrc = source->toLiquidContainerItem();
-    auto liqConDst = destination->toLiquidContainerItem();
+    // Cast the source item to liquid container.
+    auto liqConSrc = static_cast<LiquidContainerItem *>(source);
+    // Cast the destination item to liquid container.
+    auto liqConDst = static_cast<LiquidContainerItem *>(destination);
     // Check if source is empty.
     if (liqConSrc->isEmpty())
     {

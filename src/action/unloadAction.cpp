@@ -49,24 +49,28 @@ bool UnloadAction::check(std::string & error) const
     }
     if (item == nullptr)
     {
-        Logger::log(LogLevel::Error, "The item is a null pointer.");
         error = "The item you want to unload is missing.";
         return false;
     }
-    if (item->isEmpty())
+    if (item->getType() == ModelType::Magazine)
     {
-        error = item->getNameCapital(true) + " is already empty.";
-        return false;
-    }
-    if (!item->isEmpty())
-    {
-        auto loadedItem = item->content.front();
-        if (loadedItem == nullptr)
+        // Cast the item to magazine.
+        auto magazine = static_cast<MagazineItem *>(item);
+        // Get the loaded projectile.
+        if (magazine->getAlreadyLoadedProjectile() == nullptr)
         {
-            Logger::log(LogLevel::Error,
-                        "The item does not contain any loaded item.");
-            error = "Something is gone wrong while you were unloading " +
-                    item->getName(true) + ".";
+            error = item->getNameCapital(true) + " is already empty.";
+            return false;
+        }
+    }
+    if (item->getType() == ModelType::RangedWeapon)
+    {
+        // Cast the item to ranged weapon.
+        auto magazine = static_cast<RangedWeaponItem *>(item);
+        // Get the loaded magazine.
+        if (magazine->getAlreadyLoadedMagazine() == nullptr)
+        {
+            error = item->getNameCapital(true) + " is already empty.";
             return false;
         }
     }
@@ -105,15 +109,32 @@ ActionStatus UnloadAction::perform()
         actor->sendMsg(error + "\n\n");
         return ActionStatus::Error;
     }
-    // Retrieve the already loaded item.
-    auto loadedItem = item->content.front();
-    // Proceed and move the loaded item to the inventory of the actor.
+    // Prepare a variable for the loaded item.
+    Item * loadedItem = nullptr;
+    if (item->getType() == ModelType::Magazine)
+    {
+        // Cast the item to magazine.
+        auto magazine = static_cast<MagazineItem *>(item);
+        // Get the loaded projectile.
+        loadedItem = magazine->getAlreadyLoadedProjectile();
+    }
+    if (item->getType() == ModelType::RangedWeapon)
+    {
+        // Cast the item to ranged weapon.
+        auto magazine = static_cast<RangedWeaponItem *>(item);
+        // Get the loaded magazine.
+        loadedItem = magazine->getAlreadyLoadedMagazine();
+    }
+    // Start a transaction.
     SQLiteDbms::instance().beginTransaction();
+    // Take out the item.
     item->takeOut(loadedItem);
+    // Add the item to the inventory of the actor.
     actor->addInventoryItem(loadedItem);
+    // End the transaction.
     SQLiteDbms::instance().endTransaction();
-    actor->sendMsg("You have finished unloading %s...\n\n",
-                   item->getName(true));
+    // Show a message.
+    actor->sendMsg("You finish unloading %s.\n\n", item->getName(true));
     return ActionStatus::Finished;
 }
 
@@ -122,7 +143,7 @@ unsigned int UnloadAction::getUnloadTime(Item * _item)
     if (_item->getType() == ModelType::Magazine)
     {
         // Transform the item to magazine.
-        auto magazine = _item->toMagazineItem();
+        auto magazine = static_cast<MagazineItem *>(_item);
         // Get the loaded projectile.
         auto loadedProjectile = magazine->getAlreadyLoadedProjectile();
         if (loadedProjectile != nullptr)

@@ -22,8 +22,6 @@
 
 #include "character.hpp"
 
-#include "rangedWeaponItem.hpp"
-#include "meleeWeaponItem.hpp"
 #include "lightItem.hpp"
 #include "armorItem.hpp"
 #include "logger.hpp"
@@ -864,11 +862,13 @@ bool Character::findNearbyResouces(
 std::vector<Item *> Character::findCoins()
 {
     ItemVector foundCoins;
-    auto findCointInContainer = [&](Item * item)
+    auto FindCoinInContainer = [&](Item * item)
     {
-        if (item->isAContainer() && !item->isEmpty())
+        if (item->getType() == ModelType::Container)
         {
-            for (auto content : item->content)
+            // Cast the item to container.
+            auto containerItem = static_cast<ContainerItem *>(item);
+            for (auto content : containerItem->content)
             {
                 if (content->getType() == ModelType::Currency)
                 {
@@ -879,7 +879,7 @@ std::vector<Item *> Character::findCoins()
     };
     for (auto it : equipment)
     {
-        findCointInContainer(it);
+        FindCoinInContainer(it);
     }
     for (auto it : inventory)
     {
@@ -889,7 +889,7 @@ std::vector<Item *> Character::findCoins()
         }
         else
         {
-            findCointInContainer(it);
+            FindCoinInContainer(it);
         }
     }
     foundCoins.orderBy(ItemVector::ByPrice);
@@ -1064,7 +1064,7 @@ bool Character::inventoryIsLit() const
     {
         if (it->getType() == ModelType::Light)
         {
-            if (it->toLightItem()->isActive())
+            if (static_cast<LightItem *>(it)->isActive())
             {
                 return true;
             }
@@ -1257,7 +1257,8 @@ unsigned int Character::getArmorClass() const
     {
         if (item->model->getType() == ModelType::Armor)
         {
-            result += item->toArmorItem()->getArmorClass();
+            // Cast the item to armor.
+            result += static_cast<ArmorItem *>(item)->getArmorClass();
         }
     }
     return result;
@@ -1297,7 +1298,7 @@ bool Character::isAtRange(Character * target, const int & range)
 
 std::vector<MeleeWeaponItem *> Character::getActiveMeleeWeapons()
 {
-    std::vector<MeleeWeaponItem *> gatheredWeapons;
+    std::vector<MeleeWeaponItem *> weapons;
     auto RetrieveWeapon = [&](const EquipmentSlot & slot)
     {
         // First get the item at the given position.
@@ -1306,18 +1307,18 @@ std::vector<MeleeWeaponItem *> Character::getActiveMeleeWeapons()
         {
             if (wpn->getType() == ModelType::MeleeWeapon)
             {
-                gatheredWeapons.emplace_back(wpn->toMeleeWeaponItem());
+                weapons.emplace_back(static_cast<MeleeWeaponItem *>(wpn));
             }
         }
     };
     RetrieveWeapon(EquipmentSlot::RightHand);
     RetrieveWeapon(EquipmentSlot::LeftHand);
-    return gatheredWeapons;
+    return weapons;
 }
 
 std::vector<RangedWeaponItem *> Character::getActiveRangedWeapons()
 {
-    std::vector<RangedWeaponItem *> gatheredWeapons;
+    std::vector<RangedWeaponItem *> weapons;
     auto RetrieveWeapon = [&](const EquipmentSlot & slot)
     {
         // First get the item at the given position.
@@ -1326,13 +1327,13 @@ std::vector<RangedWeaponItem *> Character::getActiveRangedWeapons()
         {
             if (wpn->getType() == ModelType::RangedWeapon)
             {
-                gatheredWeapons.emplace_back(wpn->toRangedWeaponItem());
+                weapons.emplace_back(static_cast<RangedWeaponItem *>(wpn));
             }
         }
     };
     RetrieveWeapon(EquipmentSlot::RightHand);
     RetrieveWeapon(EquipmentSlot::LeftHand);
-    return gatheredWeapons;
+    return weapons;
 }
 
 void Character::kill()

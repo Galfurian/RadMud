@@ -69,6 +69,11 @@ std::string RangedWeaponItem::lookContent()
     return output;
 }
 
+bool RangedWeaponItem::isEmpty() const
+{
+    return content.empty();
+}
+
 unsigned int RangedWeaponItem::rollDamage() const
 {
     return TRandInteger<unsigned int>(this->getMinDamage(),
@@ -167,7 +172,7 @@ MagazineItem * RangedWeaponItem::getAlreadyLoadedMagazine() const
     {
         return nullptr;
     }
-    return magazine->toMagazineItem();
+    return static_cast<MagazineItem *>(magazine);
 }
 
 Item * RangedWeaponItem::retrieveProjectile(std::string & error) const
