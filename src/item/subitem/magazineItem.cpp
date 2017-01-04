@@ -79,9 +79,9 @@ std::string MagazineItem::lookContent()
     return output;
 }
 
-bool MagazineItem::isEmpty() const
+bool MagazineItem::isAContainer() const
 {
-    return content.empty();
+    return true;
 }
 
 bool MagazineItem::canLoadWith(Item * _projectile, std::string & error) const

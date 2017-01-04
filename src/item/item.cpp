@@ -25,14 +25,9 @@
 #include "mud.hpp"
 #include "logger.hpp"
 #include "shopItem.hpp"
-#include "lightItem.hpp"
 #include "armorItem.hpp"
 #include "corpseItem.hpp"
 #include "currencyItem.hpp"
-#include "containerModel.hpp"
-#include "meleeWeaponItem.hpp"
-#include "rangedWeaponItem.hpp"
-#include "liquidContainerItem.hpp"
 
 Item::Item() :
     vnum(),
@@ -465,7 +460,7 @@ bool Item::isAContainer() const
 
 bool Item::isEmpty() const
 {
-    return true;
+    return (!this->isAContainer() || content.empty());
 }
 
 double Item::getTotalSpace() const
@@ -488,13 +483,11 @@ double Item::getUsedSpace() const
 
 double Item::getFreeSpace() const
 {
-    auto totalSpace = this->getTotalSpace();
-    auto usedSpace = this->getUsedSpace();
-    if (totalSpace < usedSpace)
+    if (this->isAContainer())
     {
-        return 0.0;
+        return this->getTotalSpace() - this->getUsedSpace();
     }
-    return totalSpace - usedSpace;
+    return 0.0;
 }
 
 bool Item::canContain(Item * item, const unsigned int & amount) const
@@ -512,11 +505,10 @@ void Item::putInside(Item *& item, bool updateDB)
     if (updateDB && (this->getType() != ModelType::Corpse))
     {
         SQLiteDbms::instance().insertInto(
-            "ItemContent", {
+            "ItemContent",
+            {
                 ToString(this->vnum), ToString(item->vnum)
-            },
-            false,
-            true);
+            }, false, true);
     }
     // Log it.
     Logger::log(LogLevel::Debug,
@@ -550,19 +542,18 @@ bool Item::takeOut(Item * item, bool updateDB)
 
 Item * Item::findContent(std::string search_parameter, int & number)
 {
-    if (this->isEmpty())
+    if (this->isAContainer())
     {
-        return nullptr;
-    }
-    for (auto iterator : content)
-    {
-        if (iterator->hasKey(ToLower(search_parameter)))
+        for (auto iterator : content)
         {
-            if (number == 1)
+            if (iterator->hasKey(ToLower(search_parameter)))
             {
-                return iterator;
+                if (number == 1)
+                {
+                    return iterator;
+                }
+                number -= 1;
             }
-            number -= 1;
         }
     }
     return nullptr;

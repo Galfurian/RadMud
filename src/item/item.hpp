@@ -232,7 +232,7 @@ public:
 
     /// @brief Return the free space inside the container.
     /// @return The free unit of space as an integer.
-    double getFreeSpace() const;
+    virtual double getFreeSpace() const;
 
     /// @brief Check if this item can contain the passed one.
     /// @param item   The item to check.

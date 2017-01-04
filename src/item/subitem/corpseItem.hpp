@@ -41,6 +41,4 @@ public:
     void getSheet(Table & sheet) const override;
 
     bool isAContainer() const override;
-
-    bool isEmpty() const override;
 };

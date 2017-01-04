@@ -39,7 +39,7 @@ public:
 
     std::string lookContent() override;
 
-    bool isEmpty() const override;
+    bool isAContainer() const override;
 
     /// Randomly roll the weapon damage.
     unsigned int rollDamage() const;

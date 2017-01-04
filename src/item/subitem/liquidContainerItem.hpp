@@ -39,9 +39,11 @@ public:
 
     void getSheet(Table & sheet) const override;
 
+    double getWeight(bool entireStack) const override;
+
     std::string lookContent() override;
 
-    double getWeight(bool entireStack) const override;
+    bool isAContainer() const override;
 
     bool isEmpty() const override;
 

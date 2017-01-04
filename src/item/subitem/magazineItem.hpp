@@ -36,7 +36,7 @@ public:
 
     std::string lookContent() override;
 
-    bool isEmpty() const override;
+    bool isAContainer() const override;
 
     /// @brief Checks if the current magazine can be loaded with the given item.
     /// @param _projectile The projectile to load.

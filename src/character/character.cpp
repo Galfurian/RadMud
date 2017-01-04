@@ -52,7 +52,6 @@ Character::Character() :
     inputProcessor(std::make_shared<ProcessInput>())
 {
     actionQueue.push_back(std::make_shared<GeneralAction>(this));
-    // Nothing to do.
 }
 
 Character::~Character()

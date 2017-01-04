@@ -69,9 +69,9 @@ std::string RangedWeaponItem::lookContent()
     return output;
 }
 
-bool RangedWeaponItem::isEmpty() const
+bool RangedWeaponItem::isAContainer() const
 {
-    return content.empty();
+    return true;
 }
 
 unsigned int RangedWeaponItem::rollDamage() const

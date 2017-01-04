@@ -285,11 +285,17 @@ void MudUpdater::performActions()
             mobile->nextActionCooldown = end + std::chrono::seconds(
                 TRandInteger<int>(30, 60));
         }
-        if (mobile->getAction()->getType() == ActionType::Wait)
+        auto currentAction = mobile->getAction();
+        if (currentAction.get() == nullptr)
+        {
+            Logger::log(LogLevel::Fatal, "Nullptr action!");
+            continue;
+        }
+        if (currentAction->getType() == ActionType::Wait)
         {
             continue;
         }
-        ActionStatus actionStatus = mobile->getAction()->perform();
+        ActionStatus actionStatus = currentAction->perform();
         if ((actionStatus == ActionStatus::Finished) ||
             (actionStatus == ActionStatus::Error))
         {
