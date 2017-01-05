@@ -145,22 +145,10 @@ private:
 
     /// @brief Manages the database contents from disk to memory and
     /// vice-versa.
-    /// @details
-    /// This function is used to load the contents of a database
-    /// file on disk into the "main" database of open database connection pInMemory, or
-    /// to save the current contents of the database opened by pInMemory into
-    /// a database file on disk. pInMemory is probably an in-memory database,
-    /// but this function will also work fine if it is not.
-    /// Parameter zFilename points to a nul-terminated string containing the
-    /// name of the database file on disk to load from or save to. If parameter
-    /// isSave is non-zero, then the contents of the file zFilename are
-    /// overwritten with the contents of the database opened by pInMemory. If
-    /// parameter isSave is zero, then the contents of the database opened by
-    /// pInMemory are replaced by data loaded from the file zFilename.
-    /// If the operation is successful, SQLITE_OK is returned. Otherwise, if
-    /// an error occurs, an SQLite error code is returned.
     /// For more deailts, see:
-    /// @param save
-    /// @return
+    /// @param save <b>True</b> save the in-memory database to file,<br>
+    ///             <b>False</b> vice-versa.
+    /// @return If the operation is successful, SQLITE_OK is returned.
+    /// Otherwise, if an error occurs, an SQLite error code is returned.
     int loadOrSaveDb(bool save);
 };
