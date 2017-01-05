@@ -26,7 +26,6 @@
 
 SQLiteWrapper::SQLiteWrapper() :
     dbDetails(),
-    connected(),
     errorMessage(),
     errorCode(),
     num_col(),
@@ -40,62 +39,105 @@ SQLiteWrapper::~SQLiteWrapper()
     // Nothing to do.
 }
 
-bool SQLiteWrapper::openConnection(std::string dbName, std::string dbDirectory)
+bool SQLiteWrapper::openConnection(const std::string & dbName,
+                                   const std::string & dbDirectory,
+                                   const bool & openInMemory)
 {
+    // Set the database details.
     dbDetails.dbName = dbName;
     dbDetails.dbDirectory = dbDirectory;
-    connected = true;
-    errorCode = sqlite3_open((dbDetails.dbDirectory + dbDetails.dbName).c_str(),
-                             &(dbDetails.dbConnection));
+    dbDetails.connected = true;
+    dbDetails.dbIsInMemory = openInMemory;
+    auto dbPath = dbDetails.dbDirectory + dbDetails.dbName;
+    // Open an in-memory database.
+    if (openInMemory)
+    {
+        // First open the database in memory.
+        errorCode = sqlite3_open(":memory:", &(dbDetails.dbConnection));
+        errorMessage = sqlite3_errmsg(dbDetails.dbConnection);
+        if (errorCode != SQLITE_OK)
+        {
+            if (errorMessage.find("not an error") == std::string::npos)
+            {
+                dbDetails.connected = false;
+                return false;
+            }
+        }
+        errorCode = this->loadOrSaveDb(false);
+        errorMessage = sqlite3_errmsg(dbDetails.dbConnection);
+        if (errorCode != SQLITE_OK)
+        {
+            if (errorMessage.find("not an error") == std::string::npos)
+            {
+                dbDetails.connected = false;
+                return false;
+            }
+        }
+    }
+    else
+    {
+        // Open the database.
+        errorCode = sqlite3_open(dbPath.c_str(), &(dbDetails.dbConnection));
+        errorMessage = sqlite3_errmsg(dbDetails.dbConnection);
+        if (errorCode != SQLITE_OK)
+        {
+            if (errorMessage.find("not an error") == std::string::npos)
+            {
+                dbDetails.connected = false;
+                return false;
+            }
+        }
+    }
+    errorCode = executeQuery("PRAGMA foreign_keys = ON;");
     errorMessage = sqlite3_errmsg(dbDetails.dbConnection);
     if (errorCode != SQLITE_OK)
     {
         if (errorMessage.find("not an error") == std::string::npos)
         {
-            connected = false;
+            dbDetails.connected = false;
+            return false;
         }
     }
-    errorCode = executeQuery("PRAGMA foreign_keys = ON;");
-    if (errorCode != SQLITE_OK)
-    {
-        connected = false;
-    }
-    return connected;
+    return true;
 }
 
 bool SQLiteWrapper::closeConnection()
 {
-    bool result = false;
     if (dbDetails.dbConnection)
     {
-        errorCode = sqlite3_close(dbDetails.dbConnection);
-        if (errorCode != SQLITE_OK)
+        bool retry = false;
+        int numberOfRetries = 0;
+        do
         {
+            // If the database has been opened in memory, save it to the file.
+            if (dbDetails.dbIsInMemory)
+            {
+                auto dbPath = dbDetails.dbDirectory + dbDetails.dbName;
+                errorCode = this->loadOrSaveDb(true);
+                errorMessage = sqlite3_errmsg(dbDetails.dbConnection);
+                if (errorCode != SQLITE_OK)
+                {
+                    Logger::log(LogLevel::Error, "Error while saving the "
+                        "in-memory database to file.");
+                }
+            }
+            errorCode = sqlite3_close(dbDetails.dbConnection);
+            if (errorCode == SQLITE_OK)
+            {
+                return true;
+            }
             if (errorCode == SQLITE_BUSY)
             {
-                bool retry = false;
-                int numberOfRetries = 0;
                 Logger::log(LogLevel::Error, "Database busy, can't be closed.");
-                do
+                retry = true;
+                if (numberOfRetries++ > 10)
                 {
-                    errorCode = sqlite3_close(dbDetails.dbConnection);
-                    if (SQLITE_BUSY == errorCode)
-                    {
-                        retry = true;
-                        if (numberOfRetries++ > 10)
-                        {
-                            sqlite3_finalize(dbDetails.dbStatement);
-                        }
-                    }
-                } while (retry);
+                    sqlite3_finalize(dbDetails.dbStatement);
+                }
             }
-        }
-        else
-        {
-            result = true;
-        }
+        } while (retry);
     }
-    return result;
+    return false;
 }
 
 std::string SQLiteWrapper::getLastErrorMsg() const
@@ -163,7 +205,7 @@ void SQLiteWrapper::rollbackTransection()
 
 bool SQLiteWrapper::isConnected()
 {
-    return connected;
+    return dbDetails.connected;
 }
 
 bool SQLiteWrapper::next()
@@ -362,4 +404,55 @@ double SQLiteWrapper::getNextDouble()
         return data;
     }
     throw SQLiteException(errorCode, errorMessage);
+}
+
+int SQLiteWrapper::loadOrSaveDb(bool save)
+{
+    // Prepare the path to the database.
+    auto dbPath = dbDetails.dbDirectory + dbDetails.dbName;
+    // Function return code.
+    int rc;
+    // Database connection opened on dbPath.
+    sqlite3 * dbOnFile;
+    // Backup object used to copy data.
+    sqlite3_backup * dbBackup;
+    // Database to copy to.
+    sqlite3 * dbTo;
+    // Database to copy from.
+    sqlite3 * dbFrom;
+    // Open the database file identified by dbPath.
+    // Exit early if this fails for any reason.
+    rc = sqlite3_open(dbPath.c_str(), &dbOnFile);
+    if (rc == SQLITE_OK)
+    {
+        // If this is a 'load' operation (save == false), then data is copied
+        // from the on-file database just opened to the in-memory database.
+        // Otherwise, if this is a 'save' operation (save == true), then data is
+        // copied from the in-memory database to the on-file database.
+        // Set the variables dbFrom and dbTo accordingly.
+        dbFrom = (save ? dbDetails.dbConnection : dbOnFile);
+        dbTo = (save ? dbOnFile : dbDetails.dbConnection);
+        // Set up the backup procedure to copy from the "main" of the dbFrom
+        // connection to the main of the dbTo connection.
+        // If something goes wrong, dbBackup will be set to NULL and an error
+        // code and message left in connection dbTo.
+        // If the backup object is successfully created, call backup_step()
+        // to copy data from dbFrom to dbTo.
+        // Then call backup_finish() to release resources associated with
+        // the backup object.
+        // If an error occurred, then an error code and message will be left in
+        // connection dbTo. If no error occurred, then the error code belonging
+        // to dbTo is set to SQLITE_OK.
+        dbBackup = sqlite3_backup_init(dbTo, "main", dbFrom, "main");
+        if (dbBackup)
+        {
+            sqlite3_backup_step(dbBackup, -1);
+            sqlite3_backup_finish(dbBackup);
+        }
+        rc = sqlite3_errcode(dbTo);
+    }
+    // Close the database connection opened on database file and return the
+    // result of this function.
+    sqlite3_close(dbOnFile);
+    return rc;
 }
