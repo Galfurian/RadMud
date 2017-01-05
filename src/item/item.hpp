@@ -27,13 +27,19 @@
 #include <map>
 
 #include "updateInterface.hpp"
-#include "itemContainer.hpp"
+#include "itemVector.hpp"
 #include "itemQuality.hpp"
 #include "lua_script.hpp"
 #include "itemModel.hpp"
 #include "nodeModel.hpp"
 #include "liquid.hpp"
 #include "table.hpp"
+
+class Room;
+
+class Character;
+
+class Material;
 
 /// Used to determine the flag of the item.
 using ItemFlag = enum class ItemFlag_t
@@ -43,30 +49,6 @@ using ItemFlag = enum class ItemFlag_t
     Locked = 2,
     Built = 4
 };
-
-class Room;
-
-class Character;
-
-class Material;
-
-class ShopItem;
-
-class ArmorItem;
-
-class MeleeWeaponItem;
-
-class RangedWeaponItem;
-
-class CurrencyItem;
-
-class CorpseItem;
-
-class MagazineItem;
-
-class LightItem;
-
-class LiquidContainerItem;
 
 /// @brief Holds details about items.
 class Item :
@@ -104,7 +86,7 @@ public:
     /// Current equipment slot.
     EquipmentSlot currentSlot;
     /// List of items contained in this one.
-    ItemContainer content;
+    ItemVector content;
 
     /// @brief Constructor - Create a new empty item.
     Item();
@@ -125,12 +107,9 @@ public:
     virtual ~Item();
 
     /// @brief Check the correctness of the item.
-    /// @param complete <b>True</b> also the variables which are set after
-    ///                              the placement are checked,<br>
-    ///                 <b>False</b> only the basic variables are checked.
     /// @return <b>True</b> if the item has correct values,<br>
     ///         <b>False</b> otherwise.
-    virtual bool check(bool complete = false);
+    virtual bool check();
 
     /// @brief This function is used to remove the item from everywhere.
     virtual void removeFromMud();
@@ -226,6 +205,10 @@ public:
     /// @return A detailed description of the item.
     std::string getLook();
 
+    /// @brief Return the description of the content.
+    /// @return The string describing the content.
+    virtual std::string lookContent();
+
     /// @brief Check if the item is a valid container.
     /// @return <b>True</b> if it is a valid container,<br>
     ///         <b>False</b> otherwise.
@@ -246,7 +229,7 @@ public:
 
     /// @brief Return the free space inside the container.
     /// @return The free unit of space as an integer.
-    double getFreeSpace() const;
+    virtual double getFreeSpace() const;
 
     /// @brief Check if this item can contain the passed one.
     /// @param item   The item to check.
@@ -273,10 +256,6 @@ public:
     /// @return The item, if it's in the container.
     Item * findContent(std::string search_parameter, int & number);
 
-    /// @brief Return the description of the content.
-    /// @return The string describing the content.
-    virtual std::string lookContent();
-
     /// @brief Set the equipment slot where this item must be worn.
     /// @param _currentSlot The new equipment slot.
     void setCurrentSlot(EquipmentSlot _currentSlot);
@@ -288,33 +267,6 @@ public:
     /// @brief Return the current equipment slot name.
     /// @return The equipment slot name.
     std::string getCurrentSlotName();
-
-    /// @brief Returns the model <b>statically</b> casted to Shop.
-    ShopItem * toShopItem();
-
-    /// @brief Returns the model <b>statically</b> casted to Armor.
-    ArmorItem * toArmorItem();
-
-    /// @brief Returns the model <b>statically</b> casted to Melee Weapon.
-    MeleeWeaponItem * toMeleeWeaponItem();
-
-    /// @brief Returns the model <b>statically</b> casted to Ranged Weapon.
-    RangedWeaponItem * toRangedWeaponItem();
-
-    /// @brief Returns the model <b>statically</b> casted to Currency.
-    CurrencyItem * toCurrencyItem();
-
-    /// @brief Returns the model <b>statically</b> casted to Corpse.
-    CorpseItem * toCorpseItem();
-
-    /// @brief Returns the model <b>statically</b> casted to Magazine.
-    MagazineItem * toMagazineItem();
-
-    /// @brief Returns the model <b>statically</b> casted to Light.
-    LightItem * toLightItem();
-
-    /// @brief Returns the model <b>statically</b> casted to Liquid Container.
-    LiquidContainerItem * toLiquidContainerItem();
 
     /// @brief Function used to register inside the lua environment the class.
     /// @param L The lua environment.

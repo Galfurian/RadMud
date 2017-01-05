@@ -22,8 +22,6 @@
 
 #include "character.hpp"
 
-#include "rangedWeaponItem.hpp"
-#include "meleeWeaponItem.hpp"
 #include "lightItem.hpp"
 #include "armorItem.hpp"
 #include "logger.hpp"
@@ -54,7 +52,6 @@ Character::Character() :
     inputProcessor(std::make_shared<ProcessInput>())
 {
     actionQueue.push_back(std::make_shared<GeneralAction>(this));
-    // Nothing to do.
 }
 
 Character::~Character()
@@ -690,7 +687,7 @@ Item * Character::findNearbyItem(const std::string & itemName, int & number)
 
 Item * Character::findNearbyTool(
     const ToolType & toolType,
-    const std::vector<Item *> & exceptions,
+    const ItemVector & exceptions,
     bool searchRoom,
     bool searchInventory,
     bool searchEquipment)
@@ -764,7 +761,7 @@ Item * Character::findNearbyTool(
 
 bool Character::findNearbyTools(
     std::set<ToolType> tools,
-    std::vector<Item *> & foundOnes,
+    ItemVector & foundOnes,
     bool searchRoom,
     bool searchInventory,
     bool searchEquipment)
@@ -861,14 +858,16 @@ bool Character::findNearbyResouces(
     return true;
 }
 
-std::vector<Item *> Character::findCoins()
+ItemVector Character::findCoins()
 {
-    ItemContainer foundCoins;
-    auto findCointInContainer = [&](Item * item)
+    ItemVector foundCoins;
+    auto FindCoinInContainer = [&](Item * item)
     {
-        if (item->isAContainer() && !item->isEmpty())
+        if (item->getType() == ModelType::Container)
         {
-            for (auto content : item->content)
+            // Cast the item to container.
+            auto containerItem = static_cast<ContainerItem *>(item);
+            for (auto content : containerItem->content)
             {
                 if (content->getType() == ModelType::Currency)
                 {
@@ -879,7 +878,7 @@ std::vector<Item *> Character::findCoins()
     };
     for (auto it : equipment)
     {
-        findCointInContainer(it);
+        FindCoinInContainer(it);
     }
     for (auto it : inventory)
     {
@@ -889,10 +888,10 @@ std::vector<Item *> Character::findCoins()
         }
         else
         {
-            findCointInContainer(it);
+            FindCoinInContainer(it);
         }
     }
-    foundCoins.orderBy(ItemContainer::ByPrice);
+    foundCoins.orderBy(ItemVector::ByPrice);
     return foundCoins;
 }
 
@@ -1064,7 +1063,7 @@ bool Character::inventoryIsLit() const
     {
         if (it->getType() == ModelType::Light)
         {
-            if (it->toLightItem()->isActive())
+            if (static_cast<LightItem *>(it)->isActive())
             {
                 return true;
             }
@@ -1257,7 +1256,8 @@ unsigned int Character::getArmorClass() const
     {
         if (item->model->getType() == ModelType::Armor)
         {
-            result += item->toArmorItem()->getArmorClass();
+            // Cast the item to armor.
+            result += static_cast<ArmorItem *>(item)->getArmorClass();
         }
     }
     return result;
@@ -1297,7 +1297,7 @@ bool Character::isAtRange(Character * target, const int & range)
 
 std::vector<MeleeWeaponItem *> Character::getActiveMeleeWeapons()
 {
-    std::vector<MeleeWeaponItem *> gatheredWeapons;
+    std::vector<MeleeWeaponItem *> weapons;
     auto RetrieveWeapon = [&](const EquipmentSlot & slot)
     {
         // First get the item at the given position.
@@ -1306,18 +1306,18 @@ std::vector<MeleeWeaponItem *> Character::getActiveMeleeWeapons()
         {
             if (wpn->getType() == ModelType::MeleeWeapon)
             {
-                gatheredWeapons.emplace_back(wpn->toMeleeWeaponItem());
+                weapons.emplace_back(static_cast<MeleeWeaponItem *>(wpn));
             }
         }
     };
     RetrieveWeapon(EquipmentSlot::RightHand);
     RetrieveWeapon(EquipmentSlot::LeftHand);
-    return gatheredWeapons;
+    return weapons;
 }
 
 std::vector<RangedWeaponItem *> Character::getActiveRangedWeapons()
 {
-    std::vector<RangedWeaponItem *> gatheredWeapons;
+    std::vector<RangedWeaponItem *> weapons;
     auto RetrieveWeapon = [&](const EquipmentSlot & slot)
     {
         // First get the item at the given position.
@@ -1326,13 +1326,13 @@ std::vector<RangedWeaponItem *> Character::getActiveRangedWeapons()
         {
             if (wpn->getType() == ModelType::RangedWeapon)
             {
-                gatheredWeapons.emplace_back(wpn->toRangedWeaponItem());
+                weapons.emplace_back(static_cast<RangedWeaponItem *>(wpn));
             }
         }
     };
     RetrieveWeapon(EquipmentSlot::RightHand);
     RetrieveWeapon(EquipmentSlot::LeftHand);
-    return gatheredWeapons;
+    return weapons;
 }
 
 void Character::kill()
@@ -1489,7 +1489,7 @@ luabridge::LuaRef Character::luaGetItemsInSight()
     luabridge::LuaRef luaRef(L, luabridge::newTable(L));
     if (room != nullptr)
     {
-        ItemContainer exceptions;
+        ItemVector exceptions;
         for (auto it : room->area->getItemsInSight(exceptions,
                                                    room->coord,
                                                    this->getViewDistance()))

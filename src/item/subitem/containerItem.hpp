@@ -1,9 +1,8 @@
-/// @file   unloadAction.hpp
-/// @brief  Class which manage unloading activities.
+/// @file   containerItem.hpp
 /// @author Enrico Fraccaroli
-/// @date   Oct 10 2016
+/// @date   Jan 04 2017
 /// @copyright
-/// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
+/// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
 /// copy of this software and associated documentation files (the "Software"),
 /// to deal in the Software without restriction, including without limitation
@@ -22,34 +21,24 @@
 
 #pragma once
 
-#include "generalAction.hpp"
-#include "rangedWeaponItem.hpp"
+#include "item.hpp"
 
-/// @brief Allows to load something.
-class UnloadAction :
-    public GeneralAction
+/// @brief Holds details about armors.
+class ContainerItem :
+    public Item
 {
-private:
-    /// The item which has to be unloaded.
-    Item * item;
-
 public:
-    /// @brief Constructor.
-    UnloadAction(Character * _actor, Item * _item);
+    ContainerItem();
 
-    /// @brief Destructor.
-    virtual ~UnloadAction();
+    virtual ~ContainerItem();
 
-    bool check(std::string & error) const override;
+    void getSheet(Table & sheet) const override;
 
-    ActionType getType() const override;
+    bool isAContainer() const override;
 
-    std::string getDescription() const override;
+    bool isEmpty() const override;
 
-    std::string stop() override;
+    double getTotalSpace() const override;
 
-    ActionStatus perform() override;
-
-    /// @brief Provides the required time for the item to be unloaded.
-    static unsigned int getUnloadTime(Item * _itemToBeUnloaded);
+    std::string lookContent() override;
 };

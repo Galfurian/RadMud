@@ -23,6 +23,7 @@
 #pragma once
 
 #include "itemModel.hpp"
+#include "itemVector.hpp"
 
 /// @brief Model of a currency.
 class CurrencyModel :
@@ -38,6 +39,9 @@ private:
         int material;
         /// The associated price.
         unsigned int price;
+
+        /// @brief Constructor.
+        Price();
 
         /// @brief Constructor.
         /// @param _material The material.
@@ -98,8 +102,8 @@ public:
     /// @param maker Who has generated the currency.
     /// @param value The total worth that has to be generate.
     /// @return The list of generated currencies.
-    std::vector<Item *> generateCurrency(const std::string & maker,
-                                         const unsigned int & value);
+    ItemVector generateCurrency(const std::string & maker,
+                                const unsigned int & value);
 
 private:
     /// @brief Sort the list of prices.

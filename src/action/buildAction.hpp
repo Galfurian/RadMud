@@ -34,7 +34,7 @@ private:
     /// The item, target of the action.
     Item * building;
     /// The tool used by the actor for the action.
-    std::vector<Item *> tools;
+    ItemVector tools;
     /// The ingredients used by the actor for the action.
     std::vector<std::pair<Item *, unsigned int>> ingredients;
 
@@ -49,7 +49,7 @@ public:
         Character * _actor,
         Building * _schematics,
         Item * _building,
-        std::vector<Item *> & _tools,
+        ItemVector & _tools,
         std::vector<std::pair<Item *, unsigned int>> & _ingredients);
 
     /// @brief Destructor.

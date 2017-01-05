@@ -101,7 +101,8 @@ bool DoLiquidCreate(Character * character, ArgumentHandler & args)
         character->sendMsg("Accepted quantity of liquids (from 1 to 99).\n");
         return false;
     }
-    auto liquidContainer = item->toLiquidContainerItem();
+    // Cast the item to liquid container.
+    auto liquidContainer = static_cast<LiquidContainerItem *>(item);
     if (!liquidContainer->pourIn(liquid, quantity))
     {
         character->sendMsg("Item can't contain that quantity of liquid.\n");

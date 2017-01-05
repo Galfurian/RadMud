@@ -121,8 +121,8 @@ public:
     /// @param exceptions  The exceptions.
     /// @param coordinates The desired coordinates.
     /// @return The list of items at the given coordinates.
-    ItemContainer getItemsAt(const ItemContainer & exceptions,
-                             const Coordinates & coordinates);
+    ItemVector getItemsAt(const ItemVector & exceptions,
+                          const Coordinates & coordinates);
 
     /// @brief Add the passed room to its coordinates inside the area.
     /// @param room The room that has to be added.
@@ -176,9 +176,9 @@ public:
     /// @param origin The coordinate of the central room.
     /// @param radius     The radius of visibility.
     /// @return The list containing the items.
-    ItemContainer getItemsInSight(ItemContainer & exceptions,
-                                  Coordinates & origin,
-                                  const int & radius);
+    ItemVector getItemsInSight(ItemVector & exceptions,
+                               Coordinates & origin,
+                               const int & radius);
 
     /// @brief A Field of View algorithm which provides all the rooms
     ///         which are inside the radius of the field of view.

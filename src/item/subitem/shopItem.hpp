@@ -45,8 +45,6 @@ public:
 
     virtual ~ShopItem();
 
-    bool check(bool complete = false) override;
-
     bool updateOnDB() override;
 
     bool removeOnDB() override;
@@ -55,11 +53,11 @@ public:
 
     bool canDeconstruct(std::string & error) const override;
 
+    std::string lookContent() override;
+
     bool isAContainer() const override;
 
     double getTotalSpace() const override;
-
-    std::string lookContent() override;
 
     /// @brief Allows to set the new shop keeper.
     /// @param _shopKeeper The new shop keeper.

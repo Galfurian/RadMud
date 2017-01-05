@@ -31,7 +31,7 @@
 #include "lua_script.hpp"
 #include "mobile.hpp"
 #include "characterContainer.hpp"
-#include "itemContainer.hpp"
+#include "itemVector.hpp"
 #include "terrain.hpp"
 
 class Item;
@@ -71,7 +71,7 @@ public:
     /// List of exits.
     std::vector<std::shared_ptr<Exit> > exits;
     /// List of items in the room.
-    ItemContainer items;
+    ItemVector items;
     /// List of characters in the room.
     CharacterContainer characters;
     /// Integer that describe the flags of the room.
@@ -162,7 +162,7 @@ public:
     /// @brief Search for the buildings of the given type inside the room.
     /// @param type The type of the buildings.
     /// @return The buildings list.
-    std::vector<Item *> findBuildings(ModelType type);
+    ItemVector findBuildings(ModelType type);
 
     /// @brief Search for the character in the room.
     /// @param target    The character to search.

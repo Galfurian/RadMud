@@ -531,10 +531,6 @@ bool LoadItemRoom(ResultSet * result)
             {
                 room->addItem(item, false);
             }
-            if (!item->check(true))
-            {
-                throw SQLiteException("Error during error checking.");
-            }
         }
         catch (SQLiteException & e)
         {
@@ -866,7 +862,9 @@ bool LoadContentLiq(ResultSet * result)
             {
                 throw SQLiteException("Can't find liquid.");
             }
-            auto liquidContainer = container->toLiquidContainerItem();
+            // Cast the item to liquid container.
+            auto liquidContainer = static_cast<LiquidContainerItem *>(container);
+            // Pour in the liquid.
             liquidContainer->pourIn(liquid, quantity, false);
         }
         catch (SQLiteException & e)
@@ -990,7 +988,8 @@ bool LoadShop(ResultSet * result)
             {
                 throw SQLiteException("Wrong type of item " + ToString(vnum));
             }
-            auto shop = item->toShopItem();
+            // Cast the item to shop.
+            auto shop = static_cast<ShopItem *>(item);
             shop->shopName = name;
             shop->shopBuyTax = buy;
             shop->shopSellTax = sell;

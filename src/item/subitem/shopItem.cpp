@@ -41,11 +41,6 @@ ShopItem::~ShopItem()
     // Nothing to do.
 }
 
-bool ShopItem::check(bool complete)
-{
-    return Item::check(complete);
-}
-
 bool ShopItem::updateOnDB()
 {
     if (Item::updateOnDB())
@@ -123,20 +118,6 @@ bool ShopItem::canDeconstruct(std::string & error) const
     return true;
 }
 
-bool ShopItem::isAContainer() const
-{
-    // The shop can be considered a container only if built.
-    return HasFlag(this->flags, ItemFlag::Built);
-}
-
-double ShopItem::getTotalSpace() const
-{
-    // The base space.
-    double spaceBase = model->toShop()->maxWeight;
-    // Evaluate the result.
-    return ((spaceBase + (spaceBase * quality.getModifier())) / 2);
-}
-
 std::string ShopItem::lookContent()
 {
     std::string output, error;
@@ -203,6 +184,20 @@ std::string ShopItem::lookContent()
     }
     output += "\n";
     return output;
+}
+
+bool ShopItem::isAContainer() const
+{
+    // The shop can be considered a container only if built.
+    return HasFlag(this->flags, ItemFlag::Built);
+}
+
+double ShopItem::getTotalSpace() const
+{
+    // The base space.
+    double spaceBase = model->toShop()->maxWeight;
+    // Evaluate the result.
+    return ((spaceBase + (spaceBase * quality.getModifier())) / 2);
 }
 
 void ShopItem::setNewShopKeeper(Mobile * _shopKeeper)

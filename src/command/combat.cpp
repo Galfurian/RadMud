@@ -235,7 +235,7 @@ bool DoLoad(Character * character, ArgumentHandler & args)
         return false;
     }
     // Transform the item into a magazine.
-    auto magazine = itemToLoad->toMagazineItem();
+    auto magazine = static_cast<MagazineItem *>(itemToLoad);
     // Search the projectiles.
     auto projectile = character->findEquipmentItem(args[1].getContent(),
                                                    args[1].getIndex());
@@ -312,19 +312,6 @@ bool DoUnload(Character * character, ArgumentHandler & args)
                            itemToUnload->getNameCapital(true));
         return false;
     }
-    // Set the required time to unloaded the item.
-    if (itemToUnload->getType() == ModelType::Magazine)
-    {
-        auto loadedItem = itemToUnload->toMagazineItem()
-                                      ->getAlreadyLoadedProjectile();
-        if (loadedItem == nullptr)
-        {
-            character->sendMsg(
-                "Something is gone wrong while you were unloading %s...\n\n",
-                itemToUnload->getName(true));
-            return false;
-        }
-    }
     // Create the unload action.
     auto newAction = std::make_shared<UnloadAction>(character, itemToUnload);
     std::string error;
@@ -370,7 +357,7 @@ bool DoReload(Character * character, ArgumentHandler & args)
         return false;
     }
     // Transform the item into a ranged weapons.
-    auto rangedWeapon = itemToReload->toRangedWeaponItem();
+    auto rangedWeapon = static_cast<RangedWeaponItem *>(itemToReload);
     // Search the magazine.
     auto magazine = character->findEquipmentItem(args[1].getContent(),
                                                  args[1].getIndex());

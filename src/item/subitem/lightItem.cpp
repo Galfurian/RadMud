@@ -69,14 +69,6 @@ void LightItem::getSheet(Table & sheet) const
     sheet.addRow({"Remaining Autonomy", ToString(this->getAutonomy()) + " h"});
 }
 
-double LightItem::getTotalSpace() const
-{
-    // The base space.
-    double spaceBase = model->toLight()->maxWeight;
-    // Evaluate the result.
-    return ((spaceBase + (spaceBase * quality.getModifier())) / 2);
-}
-
 std::string LightItem::lookContent()
 {
     std::string output;
@@ -113,6 +105,14 @@ std::string LightItem::lookContent()
     }
     output += Formatter::reset() + "\n";
     return output;
+}
+
+double LightItem::getTotalSpace() const
+{
+    // The base space.
+    double spaceBase = model->toLight()->maxWeight;
+    // Evaluate the result.
+    return ((spaceBase + (spaceBase * quality.getModifier())) / 2);
 }
 
 bool LightItem::isActive() const
@@ -188,9 +188,9 @@ bool LightItem::getAmountToRefill(Item * item, unsigned int & amount,
     return true;
 }
 
-std::vector<Item *> LightItem::getAlreadyLoadedFuel() const
+ItemVector LightItem::getAlreadyLoadedFuel() const
 {
-    std::vector<Item *> fuel;
+    ItemVector fuel;
     if (model->toLight()->fuelType != ResourceType::None)
     {
         for (auto it : content)

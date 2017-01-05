@@ -27,7 +27,7 @@ class Item;
 #include <string>
 
 /// @brief Custom vector of items.
-class ItemContainer :
+class ItemVector :
     public std::vector<Item *>
 {
 public:
@@ -40,7 +40,7 @@ public:
     };
 
     /// @brief Constructor.
-    ItemContainer();
+    ItemVector();
 
     /// @brief Special function used to add an item to the container.
     /// @details

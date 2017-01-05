@@ -59,7 +59,7 @@ bool DoAssign(Character * character, ArgumentHandler & args)
     }
     if (building->getType() == ModelType::Shop)
     {
-        auto shop = building->toShopItem();
+        auto shop = static_cast<ShopItem *>(building);
         if (mobile->managedItem != nullptr)
         {
             if (mobile->managedItem == shop)

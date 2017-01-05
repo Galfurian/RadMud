@@ -73,15 +73,17 @@ bool DoDeposit(Character * character, ArgumentHandler & args)
     }
     // Set the quantity.
     auto quantity = args[0].getMultiplier();
+    // Cast the building to shop.
+    auto shopBuilding = static_cast<ShopItem *>(building);
     if (item->quantity <= quantity)
     {
-        building->toShopItem()->balance += item->getPrice(true);
+        shopBuilding->balance += item->getPrice(true);
         MudUpdater::instance().addItemToDestroy(item);
     }
     else
     {
         item->quantity -= quantity;
-        building->toShopItem()->balance += item->getPrice(false) * quantity;
+        shopBuilding->balance += item->getPrice(false) * quantity;
     }
     return true;
 }
@@ -117,7 +119,7 @@ bool DoBuy(Character * character, ArgumentHandler & args)
     }
 
     // Get the shop.
-    auto shop = target->toShopItem();
+    auto shop = static_cast<ShopItem *>(target);
     std::string error;
     if (!shop->canUse(error))
     {
@@ -151,7 +153,7 @@ bool DoBuy(Character * character, ArgumentHandler & args)
 
     // Check if the character has enough coins.
     auto availableCoins = character->findCoins();
-    std::vector<Item *> changedCoins;
+    ItemVector changedCoins;
     std::vector<std::pair<Item *, unsigned int>> givenCoins;
     unsigned int requiredValue = shop->evaluateBuyPrice(item) * quantity;
     unsigned int providedValue = 0;
@@ -282,15 +284,15 @@ bool DoSell(Character * character, ArgumentHandler & args)
         character->sendMsg("%s is not a shop.\n", target->getNameCapital());
         return false;
     }
-
     // Set the quantity.
     auto quantity = args[0].getMultiplier();
     if (item->quantity < quantity)
     {
         quantity = item->quantity;
     }
-
-    auto shop = target->toShopItem();
+    // Cast the item to shop.
+    auto shop = static_cast<ShopItem *>(target);
+    // Check if the shop can be used.
     std::string error;
     if (!shop->canUse(error))
     {

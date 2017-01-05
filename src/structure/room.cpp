@@ -160,15 +160,16 @@ bool Room::removeBuilding(Item * item, bool updateDB)
 
 void Room::removeCharacter(Character * character)
 {
-    if (FindErase(characters, character))
+    for (auto it = characters.begin(); it != characters.end(); ++it)
     {
-        character->room = nullptr;
+        if ((*it)->name == character->name)
+        {
+            characters.erase(it);
+            character->room = nullptr;
+            return;
+        }
     }
-    else
-    {
-        Logger::log(LogLevel::Error,
-                    "Error during character removal from room.");
-    }
+    Logger::log(LogLevel::Error, "Error during character removal from room.");
 }
 
 std::set<Player *> Room::getAllPlayer(Character * exception)
@@ -297,9 +298,9 @@ Item * Room::findBuilding(int buildingVnum)
     return nullptr;
 }
 
-std::vector<Item *> Room::findBuildings(ModelType type)
+ItemVector Room::findBuildings(ModelType type)
 {
-    std::vector<Item *> buildingsList;
+    ItemVector buildingsList;
     for (auto iterator : items)
     {
         if ((iterator->model->getType() == type) &&
@@ -415,7 +416,7 @@ bool Room::isLit()
             {
                 if (item->getType() == ModelType::Light)
                 {
-                    if (item->toLightItem()->isActive())
+                    if (static_cast<LightItem *>(item)->isActive())
                     {
                         if (Area::getDistance(coord, room->coord) <=
                             item->model->toLight()->radius)
@@ -499,11 +500,11 @@ bool Room::addExit(std::shared_ptr<Exit> exit)
 
 bool Room::removeExit(const Direction & direction)
 {
-    for (auto it : exits)
+    for (auto it = exits.begin(); it != exits.end(); ++it)
     {
-        if (it->direction == direction)
+        if ((*it)->direction == direction)
         {
-            FindErase(this->exits, it);
+            exits.erase(it);
             return true;
         }
     }

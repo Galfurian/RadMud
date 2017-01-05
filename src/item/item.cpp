@@ -25,14 +25,9 @@
 #include "mud.hpp"
 #include "logger.hpp"
 #include "shopItem.hpp"
-#include "lightItem.hpp"
 #include "armorItem.hpp"
 #include "corpseItem.hpp"
 #include "currencyItem.hpp"
-#include "containerModel.hpp"
-#include "meleeWeaponItem.hpp"
-#include "rangedWeaponItem.hpp"
-#include "liquidContainerItem.hpp"
 
 Item::Item() :
     vnum(),
@@ -62,7 +57,7 @@ Item::~Item()
 //                this->getNameCapital());
 }
 
-bool Item::check(bool complete)
+bool Item::check()
 {
     bool safe = true;
     safe &= CorrectAssert(vnum > 0);
@@ -71,20 +66,7 @@ bool Item::check(bool complete)
     safe &= CorrectAssert(!maker.empty());
     safe &= CorrectAssert(condition > 0);
     safe &= CorrectAssert(composition != nullptr);
-    if (complete)
-    {
-        safe &= CorrectAssert(!((room != nullptr) && (owner != nullptr)));
-        safe &= CorrectAssert(!((room != nullptr) && (container != nullptr)));
-        safe &= CorrectAssert(!((owner != nullptr) && (container != nullptr)));
-        safe &= CorrectAssert((room != nullptr) ||
-                              (owner != nullptr) ||
-                              (container != nullptr));
-    }
     //safe &= CorrectAssert(currentSlot != EquipmentSlot::kNoEquipSlot);
-    if (!safe)
-    {
-        Logger::log(LogLevel::Error, "Item :" + ToString(vnum));
-    }
     return safe;
 }
 
@@ -453,32 +435,23 @@ std::string Item::getLook()
     return output;
 }
 
+std::string Item::lookContent()
+{
+    return "";
+}
+
 bool Item::isAContainer() const
 {
-    return (model->getType() == ModelType::Container);
+    return false;
 }
 
 bool Item::isEmpty() const
 {
-    if (this->isAContainer() ||
-        (model->getType() == ModelType::Magazine) ||
-        (model->getType() == ModelType::RangedWeapon) ||
-        (model->getType() == ModelType::Light))
-    {
-        return content.empty();
-    }
-    return true;
+    return (!this->isAContainer() || content.empty());
 }
 
 double Item::getTotalSpace() const
 {
-    if (model->getType() == ModelType::Container)
-    {
-        // The base space.
-        double spaceBase = model->toContainer()->maxWeight;
-        // Evaluate the result.
-        return ((spaceBase + (spaceBase * quality.getModifier())) / 2);
-    }
     return 0.0;
 }
 
@@ -497,18 +470,20 @@ double Item::getUsedSpace() const
 
 double Item::getFreeSpace() const
 {
-    auto totalSpace = this->getTotalSpace();
-    auto usedSpace = this->getUsedSpace();
-    if (totalSpace < usedSpace)
+    if (this->isAContainer())
     {
-        return 0.0;
+        return this->getTotalSpace() - this->getUsedSpace();
     }
-    return totalSpace - usedSpace;
+    return 0.0;
 }
 
 bool Item::canContain(Item * item, const unsigned int & amount) const
 {
-    return (item->getWeight(false) * amount) <= this->getFreeSpace();
+    if (this->isAContainer())
+    {
+        return (item->getWeight(false) * amount) <= this->getFreeSpace();
+    }
+    return false;
 }
 
 void Item::putInside(Item *& item, bool updateDB)
@@ -521,11 +496,10 @@ void Item::putInside(Item *& item, bool updateDB)
     if (updateDB && (this->getType() != ModelType::Corpse))
     {
         SQLiteDbms::instance().insertInto(
-            "ItemContent", {
+            "ItemContent",
+            {
                 ToString(this->vnum), ToString(item->vnum)
-            },
-            false,
-            true);
+            }, false, true);
     }
     // Log it.
     Logger::log(LogLevel::Debug,
@@ -559,74 +533,21 @@ bool Item::takeOut(Item * item, bool updateDB)
 
 Item * Item::findContent(std::string search_parameter, int & number)
 {
-    if (this->isEmpty())
+    if (this->isAContainer())
     {
-        return nullptr;
-    }
-    for (auto iterator : content)
-    {
-        if (iterator->hasKey(ToLower(search_parameter)))
+        for (auto iterator : content)
         {
-            if (number == 1)
+            if (iterator->hasKey(ToLower(search_parameter)))
             {
-                return iterator;
+                if (number == 1)
+                {
+                    return iterator;
+                }
+                number -= 1;
             }
-            number -= 1;
         }
     }
     return nullptr;
-}
-
-std::string Item::lookContent()
-{
-    if (!this->isAContainer())
-    {
-        return "";
-    }
-    std::string output;
-    auto Italic = [](const std::string & s)
-    {
-        return Formatter::italic() + s + Formatter::reset();
-    };
-    auto Yellow = [](const std::string & s)
-    {
-        return Formatter::yellow() + s + Formatter::reset();
-    };
-    if (HasFlag(this->flags, ItemFlag::Closed))
-    {
-        output += Italic("It is closed.\n");
-        if (!HasFlag(this->model->modelFlags, ModelFlag::CanSeeThrough))
-        {
-            return output + "\n";
-        }
-    }
-    if (content.empty())
-    {
-        output += Italic("It's empty.\n");
-    }
-    else
-    {
-        output += "Looking inside you see:\n";
-        Table table = Table();
-        table.addColumn("Item", StringAlign::Left);
-        table.addColumn("Quantity", StringAlign::Right);
-        table.addColumn("Weight", StringAlign::Right);
-        // List all the contained items.
-        for (auto it : content)
-        {
-            table.addRow(
-                {
-                    it->getNameCapital(),
-                    ToString(it->quantity),
-                    ToString(it->getWeight(true))
-                });
-        }
-        output += table.getTable();
-        output += "Has been used " + Yellow(ToString(getUsedSpace()));
-        output += " out of " + Yellow(ToString(getTotalSpace())) +
-                  " " + Mud::instance().getWeightMeasure() + ".\n";
-    }
-    return output;
 }
 
 void Item::setCurrentSlot(EquipmentSlot _currentSlot)
@@ -646,51 +567,6 @@ EquipmentSlot Item::getCurrentSlot()
 std::string Item::getCurrentSlotName()
 {
     return getCurrentSlot().toString();
-}
-
-ShopItem * Item::toShopItem()
-{
-    return static_cast<ShopItem *>(this);
-}
-
-ArmorItem * Item::toArmorItem()
-{
-    return static_cast<ArmorItem *>(this);
-}
-
-MeleeWeaponItem * Item::toMeleeWeaponItem()
-{
-    return static_cast<MeleeWeaponItem *>(this);
-}
-
-RangedWeaponItem * Item::toRangedWeaponItem()
-{
-    return static_cast<RangedWeaponItem *>(this);
-}
-
-CurrencyItem * Item::toCurrencyItem()
-{
-    return static_cast<CurrencyItem *>(this);
-}
-
-CorpseItem * Item::toCorpseItem()
-{
-    return static_cast<CorpseItem *>(this);
-}
-
-MagazineItem * Item::toMagazineItem()
-{
-    return static_cast<MagazineItem *>(this);
-}
-
-LightItem * Item::toLightItem()
-{
-    return static_cast<LightItem *>(this);
-}
-
-LiquidContainerItem * Item::toLiquidContainerItem()
-{
-    return static_cast<LiquidContainerItem *>(this);
 }
 
 void Item::luaRegister(lua_State * L)

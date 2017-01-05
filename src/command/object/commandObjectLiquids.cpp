@@ -85,7 +85,8 @@ bool DoDrink(Character * character, ArgumentHandler & args)
         character->sendMsg("You are full.\n");
         return false;
     }
-    auto liqConSrc = source->toLiquidContainerItem();
+    // Cast the source item to liquid container.
+    auto liqConSrc = static_cast<LiquidContainerItem *>(source);
     if (source->isEmpty())
     {
         character->sendMsg("%s is empty.\n", source->getNameCapital(true));
@@ -214,9 +215,10 @@ bool DoFill(Character * character, ArgumentHandler & args)
                            destination->getNameCapital());
         return false;
     }
-    // Get the liquid from the source and eventually from the destination.
-    auto liqConSrc = source->toLiquidContainerItem();
-    auto liqConDst = destination->toLiquidContainerItem();
+    // Cast the source item to liquid container.
+    auto liqConSrc = static_cast<LiquidContainerItem *>(source);
+    // Cast the destination item to liquid container.
+    auto liqConDst = static_cast<LiquidContainerItem *>(destination);
     // Check if source is empty.
     if (source->isEmpty())
     {
@@ -279,7 +281,7 @@ bool DoPour(Character * character, ArgumentHandler & args)
     // Stop any action the character is executing.
     StopAction(character);
     // Check the arguments.
-    if (args.size() != 2)
+    if ((args.size() != 1) && (args.size() != 2))
     {
         character->sendMsg("You have to pour something into something else.\n");
         return false;
@@ -289,18 +291,26 @@ bool DoPour(Character * character, ArgumentHandler & args)
     // If the room is lit.
     if (character->room->isLit())
     {
-        source = character->findNearbyItem(args[0].getContent(),
-                                           args[0].getIndex());
-        destination = character->findNearbyItem(args[1].getContent(),
-                                                args[1].getIndex());
+        // Liquids can be poured inside another container only if from
+        // a container inside the inventory.
+        source = character->findInventoryItem(args[0].getContent(),
+                                              args[0].getIndex());
+        if (args.size() == 2)
+        {
+            destination = character->findNearbyItem(args[1].getContent(),
+                                                    args[1].getIndex());
+        }
     }
     else if (character->inventoryIsLit())
     {
         // If the room is not lit but the inventory is.
         source = character->findInventoryItem(args[0].getContent(),
                                               args[0].getIndex());
-        destination = character->findInventoryItem(args[1].getContent(),
-                                                   args[1].getIndex());
+        if (args.size() == 2)
+        {
+            destination = character->findInventoryItem(args[1].getContent(),
+                                                       args[1].getIndex());
+        }
     }
     else
     {
@@ -332,6 +342,32 @@ bool DoPour(Character * character, ArgumentHandler & args)
                            source->getNameCapital());
         return false;
     }
+    // If the number of arguments is only one, pour the content of the source
+    // on the ground.
+    if (args.size() == 1)
+    {
+        // Cast the source item to liquid container.
+        auto liqConSrc = static_cast<LiquidContainerItem *>(source);
+        // Before pouring out the liquid, store the pointer to it.
+        auto pouredLiquid = liqConSrc->liquidContent;
+        // Now pour out the liquid.
+        if (!liqConSrc->pourOut(liqConSrc->liquidQuantity))
+        {
+            character->sendMsg("You failed to pour out the liquid from %s.\n",
+                               source->getName(true));
+            return false;
+        }
+        // Send the messages.
+        character->sendMsg("You pour %s from %s on the ground.\n",
+                           pouredLiquid->getName(),
+                           liqConSrc->getName());
+        character->room->sendToAll("%s pours %s from %s on the ground.\n",
+                                   {character},
+                                   character->getNameCapital(),
+                                   pouredLiquid->getName(),
+                                   liqConSrc->getName(true));
+        return true;
+    }
     // Check the destination item.
     if (destination == nullptr)
     {
@@ -357,9 +393,10 @@ bool DoPour(Character * character, ArgumentHandler & args)
                            destination->getNameCapital());
         return false;
     }
-    // Get the liquid from the source and eventually from the destination.
-    auto liqConSrc = source->toLiquidContainerItem();
-    auto liqConDst = destination->toLiquidContainerItem();
+    // Cast the source item to liquid container.
+    auto liqConSrc = static_cast<LiquidContainerItem *>(source);
+    // Cast the destination item to liquid container.
+    auto liqConDst = static_cast<LiquidContainerItem *>(destination);
     // Check if source is empty.
     if (liqConSrc->isEmpty())
     {
@@ -404,13 +441,13 @@ bool DoPour(Character * character, ArgumentHandler & args)
     }
     // Send the messages.
     character->sendMsg("You pour %s of %s into %s.\n",
-                       liqConSrc->getName(),
+                       pouredLiquid->getName(),
                        source->getName(true),
                        destination->getName(true));
     character->room->sendToAll("%s pour %s of %s into %s.\n",
                                {character},
                                character->getNameCapital(),
-                               liqConSrc->getName(),
+                               pouredLiquid->getName(),
                                source->getName(true),
                                destination->getName(true));
     return true;

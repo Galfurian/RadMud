@@ -39,6 +39,8 @@ public:
 
     std::string lookContent() override;
 
+    bool isAContainer() const override;
+
     /// Randomly roll the weapon damage.
     unsigned int rollDamage() const;
 

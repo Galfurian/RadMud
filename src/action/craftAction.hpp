@@ -36,7 +36,7 @@ private:
     /// The material of which the production will be made of.
     Material * material;
     /// The tool used by the actor for the action.
-    std::vector<Item *> tools;
+    ItemVector tools;
     /// The ingredients used by the actor for the action.
     std::vector<std::pair<Item *, unsigned int>> ingredients;
 
@@ -51,7 +51,7 @@ public:
         Character * _actor,
         Production * _production,
         Material * _material,
-        std::vector<Item *> & _tools,
+        ItemVector & _tools,
         std::vector<std::pair<Item *, unsigned int>> & _ingredients);
 
     /// @brief Destructor.
