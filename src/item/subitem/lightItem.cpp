@@ -188,9 +188,9 @@ bool LightItem::getAmountToRefill(Item * item, unsigned int & amount,
     return true;
 }
 
-std::vector<Item *> LightItem::getAlreadyLoadedFuel() const
+ItemVector LightItem::getAlreadyLoadedFuel() const
 {
-    std::vector<Item *> fuel;
+    ItemVector fuel;
     if (model->toLight()->fuelType != ResourceType::None)
     {
         for (auto it : content)

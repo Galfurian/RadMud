@@ -107,12 +107,9 @@ public:
     virtual ~Item();
 
     /// @brief Check the correctness of the item.
-    /// @param complete <b>True</b> also the variables which are set after
-    ///                              the placement are checked,<br>
-    ///                 <b>False</b> only the basic variables are checked.
     /// @return <b>True</b> if the item has correct values,<br>
     ///         <b>False</b> otherwise.
-    virtual bool check(bool complete = false);
+    virtual bool check();
 
     /// @brief This function is used to remove the item from everywhere.
     virtual void removeFromMud();

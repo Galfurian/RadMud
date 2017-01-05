@@ -45,8 +45,6 @@ public:
 
     virtual ~ShopItem();
 
-    bool check(bool complete = false) override;
-
     bool updateOnDB() override;
 
     bool removeOnDB() override;

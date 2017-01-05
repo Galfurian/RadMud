@@ -687,7 +687,7 @@ Item * Character::findNearbyItem(const std::string & itemName, int & number)
 
 Item * Character::findNearbyTool(
     const ToolType & toolType,
-    const std::vector<Item *> & exceptions,
+    const ItemVector & exceptions,
     bool searchRoom,
     bool searchInventory,
     bool searchEquipment)
@@ -761,7 +761,7 @@ Item * Character::findNearbyTool(
 
 bool Character::findNearbyTools(
     std::set<ToolType> tools,
-    std::vector<Item *> & foundOnes,
+    ItemVector & foundOnes,
     bool searchRoom,
     bool searchInventory,
     bool searchEquipment)
@@ -858,7 +858,7 @@ bool Character::findNearbyResouces(
     return true;
 }
 
-std::vector<Item *> Character::findCoins()
+ItemVector Character::findCoins()
 {
     ItemVector foundCoins;
     auto FindCoinInContainer = [&](Item * item)

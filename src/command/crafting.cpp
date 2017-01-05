@@ -74,7 +74,7 @@ bool DoProfession(Character * character,
         return false;
     }
     // Search the needed tools.
-    std::vector<Item *> usedTools;
+    ItemVector usedTools;
     if (!character->findNearbyTools(production->tools, usedTools, false, true,
                                     true))
     {
@@ -93,7 +93,7 @@ bool DoProfession(Character * character,
     if (production->workbench != ToolType::None)
     {
         auto workbench = character->findNearbyTool(production->workbench,
-                                                   std::vector<Item *>(),
+                                                   ItemVector(),
                                                    true,
                                                    false,
                                                    false);
@@ -175,7 +175,7 @@ bool DoBuild(Character * character, ArgumentHandler & args)
         return false;
     }
     // Search the needed tools.
-    std::vector<Item *> usedTools;
+    ItemVector usedTools;
     if (!character->findNearbyTools(schematics->tools,
                                     usedTools, true, true, true))
     {

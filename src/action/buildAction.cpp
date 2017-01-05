@@ -30,7 +30,7 @@
 BuildAction::BuildAction(Character * _actor,
                          Building * _schematics,
                          Item * _building,
-                         std::vector<Item *> & _tools,
+                         ItemVector & _tools,
                          std::vector<std::pair<Item *, unsigned int>> & _ingredients) :
     GeneralAction(_actor),
     schematics(_schematics),

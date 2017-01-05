@@ -162,7 +162,7 @@ public:
     /// @brief Search for the buildings of the given type inside the room.
     /// @param type The type of the buildings.
     /// @return The buildings list.
-    std::vector<Item *> findBuildings(ModelType type);
+    ItemVector findBuildings(ModelType type);
 
     /// @brief Search for the character in the room.
     /// @param target    The character to search.

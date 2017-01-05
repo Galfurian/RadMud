@@ -25,6 +25,13 @@
 #include "logger.hpp"
 #include "mud.hpp"
 
+CurrencyModel::Price::Price() :
+    material(),
+    price()
+{
+    // Nothing to do.
+}
+
 CurrencyModel::Price::Price(const int & _material,
                             const unsigned int & _price) :
     material(_material),
@@ -138,13 +145,13 @@ CurrencyModel::findPrice(const int & materialVnum, unsigned int & price) const
     return false;
 }
 
-std::vector<Item *> CurrencyModel::generateCurrency(
+ItemVector CurrencyModel::generateCurrency(
     const std::string & maker,
     const unsigned int & value)
 {
     auto status = true;
     auto currentValue = value;
-    std::vector<Item *> coins;
+    ItemVector coins;
     SQLiteDbms::instance().beginTransaction();
     for (auto it : prices)
     {

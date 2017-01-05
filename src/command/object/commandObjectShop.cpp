@@ -153,7 +153,7 @@ bool DoBuy(Character * character, ArgumentHandler & args)
 
     // Check if the character has enough coins.
     auto availableCoins = character->findCoins();
-    std::vector<Item *> changedCoins;
+    ItemVector changedCoins;
     std::vector<std::pair<Item *, unsigned int>> givenCoins;
     unsigned int requiredValue = shop->evaluateBuyPrice(item) * quantity;
     unsigned int providedValue = 0;

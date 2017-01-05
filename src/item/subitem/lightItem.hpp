@@ -63,7 +63,7 @@ public:
                            std::string & error) const;
 
     /// @brief Provides the list already loaded fuel items.
-    std::vector<Item *> getAlreadyLoadedFuel() const;
+    ItemVector getAlreadyLoadedFuel() const;
 
     /// @brief Provides the remaining TIC, IF the light is turned on.
     double getAutonomy() const;

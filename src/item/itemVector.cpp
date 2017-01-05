@@ -30,7 +30,6 @@ ItemVector::ItemVector()
 
 void ItemVector::push_back_item(Item *& item)
 {
-    auto stacked = false;
     for (auto it = this->begin(); it != this->end(); ++it)
     {
         Item * content = (*it);
@@ -39,15 +38,11 @@ void ItemVector::push_back_item(Item *& item)
             content->quantity += item->quantity;
             MudUpdater::instance().addItemToDestroy(item);
             item = content;
-            stacked = true;
             content->updateOnDB();
-            break;
+            return;
         }
     }
-    if (!stacked)
-    {
-        this->push_back(item);
-    }
+    this->emplace_back(item);
 }
 
 bool ItemVector::removeItem(Item * item)
@@ -105,7 +100,7 @@ std::vector<std::pair<Item *, int>> ItemVector::toStack() const
         }
         if (missing)
         {
-            numberedItems.push_back(std::make_pair(item, 1));
+            numberedItems.emplace_back(std::make_pair(item, 1));
         }
     }
     return numberedItems;

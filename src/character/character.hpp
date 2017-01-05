@@ -362,7 +362,7 @@ public:
     /// @return The searched tool.
     Item * findNearbyTool(
         const ToolType & toolType,
-        const std::vector<Item *> & exceptions,
+        const ItemVector & exceptions,
         bool searchRoom,
         bool searchInventory,
         bool searchEquipment);
@@ -377,7 +377,7 @@ public:
     ///         <b>False</b> otherwise.
     bool findNearbyTools(
         std::set<ToolType> tools,
-        std::vector<Item *> & foundOnes,
+        ItemVector & foundOnes,
         bool searchRoom,
         bool searchInventory,
         bool searchEquipment);
@@ -393,7 +393,7 @@ public:
 
     /// @brief Search the coins on the character.
     /// @return List of found coins.
-    std::vector<Item *> findCoins();
+    ItemVector findCoins();
 
     /// @brief Add the passed item to character's inventory.
     /// @param item The item to add to inventory.

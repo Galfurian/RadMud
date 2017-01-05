@@ -231,7 +231,15 @@ bool Mud::addMobile(Mobile * mobile)
 
 bool Mud::remMobile(Mobile * mobile)
 {
-    return (FindErase(mudMobiles, mobile->id) != mudMobiles.end());
+    for (auto it = mudMobiles.begin(); it != mudMobiles.end(); ++it)
+    {
+        if (it->second->id == mobile->id)
+        {
+            mudMobiles.erase(it);
+            return true;
+        }
+    }
+    return false;
 }
 
 bool Mud::addItem(Item * item)
@@ -269,7 +277,15 @@ bool Mud::addRoom(Room * room)
 
 bool Mud::remRoom(Room * room)
 {
-    return (FindErase(mudRooms, room->vnum) != mudRooms.end());
+    for (auto it = mudRooms.begin(); it != mudRooms.end(); ++it)
+    {
+        if (it->second->vnum == room->vnum)
+        {
+            mudRooms.erase(it);
+            return true;
+        }
+    }
+    return false;
 }
 
 bool Mud::addCorpse(Item * corpse)

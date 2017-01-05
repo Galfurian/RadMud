@@ -531,10 +531,6 @@ bool LoadItemRoom(ResultSet * result)
             {
                 room->addItem(item, false);
             }
-            if (!item->check(true))
-            {
-                throw SQLiteException("Error during error checking.");
-            }
         }
         catch (SQLiteException & e)
         {

@@ -57,7 +57,7 @@ Item::~Item()
 //                this->getNameCapital());
 }
 
-bool Item::check(bool complete)
+bool Item::check()
 {
     bool safe = true;
     safe &= CorrectAssert(vnum > 0);
@@ -66,20 +66,7 @@ bool Item::check(bool complete)
     safe &= CorrectAssert(!maker.empty());
     safe &= CorrectAssert(condition > 0);
     safe &= CorrectAssert(composition != nullptr);
-    if (complete)
-    {
-        safe &= CorrectAssert(!((room != nullptr) && (owner != nullptr)));
-        safe &= CorrectAssert(!((room != nullptr) && (container != nullptr)));
-        safe &= CorrectAssert(!((owner != nullptr) && (container != nullptr)));
-        safe &= CorrectAssert((room != nullptr) ||
-                              (owner != nullptr) ||
-                              (container != nullptr));
-    }
     //safe &= CorrectAssert(currentSlot != EquipmentSlot::kNoEquipSlot);
-    if (!safe)
-    {
-        Logger::log(LogLevel::Error, "Item :" + ToString(vnum));
-    }
     return safe;
 }
 
@@ -492,7 +479,11 @@ double Item::getFreeSpace() const
 
 bool Item::canContain(Item * item, const unsigned int & amount) const
 {
-    return (item->getWeight(false) * amount) <= this->getFreeSpace();
+    if (this->isAContainer())
+    {
+        return (item->getWeight(false) * amount) <= this->getFreeSpace();
+    }
+    return false;
 }
 
 void Item::putInside(Item *& item, bool updateDB)

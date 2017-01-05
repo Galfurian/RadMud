@@ -41,11 +41,6 @@ ShopItem::~ShopItem()
     // Nothing to do.
 }
 
-bool ShopItem::check(bool complete)
-{
-    return Item::check(complete);
-}
-
 bool ShopItem::updateOnDB()
 {
     if (Item::updateOnDB())

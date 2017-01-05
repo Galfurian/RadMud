@@ -29,7 +29,7 @@
 CraftAction::CraftAction(Character * _actor,
                          Production * _production,
                          Material * _material,
-                         std::vector<Item *> & _tools,
+                         ItemVector & _tools,
                          std::vector<std::pair<Item *, unsigned int>> & _ingredients) :
     GeneralAction(_actor),
     production(_production),
@@ -175,7 +175,7 @@ ActionStatus CraftAction::perform()
     auto consumedStamina = this->getConsumedStamina(actor);
     actor->remStamina(consumedStamina, true);
     // Vector which will contain the list of created items and items to destroy.
-    std::vector<Item *> createdItems;
+    ItemVector createdItems;
     // Add the ingredients to the list of items to destroy.
     for (auto it : ingredients)
     {
