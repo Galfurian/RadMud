@@ -165,86 +165,79 @@ bool DoSkillList(Character * character, ArgumentHandler & /*args*/)
 
 bool DoGenerateMap(Character * character, ArgumentHandler & args)
 {
-    int width = 60;
-    int height = 30;
-    int mountains = 50;
-    int minMountainRadius = 5;
-    int maxMountainRadius = 15;
-    int numRivers = 0;
-    int minRiverDistance = 8;
+    MapGeneratorConfiguration configuration;
+    configuration.width = 60;
+    configuration.height = 30;
+    configuration.numMountains = 50;
+    configuration.minMountainRadius = 5;
+    configuration.maxMountainRadius = 15;
+    configuration.numRivers = 0;
+    configuration.minRiverDistance = 8;
     if (args.size() >= 1)
     {
         if (IsNumber(args[0].getContent()))
         {
-            width = ToNumber<int>(args[0].getContent());
+            configuration.width = ToNumber<int>(args[0].getContent());
         }
     }
     if (args.size() >= 2)
     {
         if (IsNumber(args[1].getContent()))
         {
-            height = ToNumber<int>(args[1].getContent());
+            configuration.height = ToNumber<int>(args[1].getContent());
         }
     }
     if (args.size() >= 3)
     {
         if (IsNumber(args[2].getContent()))
         {
-            mountains = ToNumber<int>(args[2].getContent());
+            configuration.numMountains = ToNumber<int>(args[2].getContent());
         }
     }
     if (args.size() >= 4)
     {
         if (IsNumber(args[3].getContent()))
         {
-            minMountainRadius = ToNumber<int>(args[3].getContent());
+            configuration.minMountainRadius = ToNumber<int>(
+                args[3].getContent());
         }
     }
     if (args.size() >= 5)
     {
         if (IsNumber(args[4].getContent()))
         {
-            maxMountainRadius = ToNumber<int>(args[4].getContent());
+            configuration.maxMountainRadius = ToNumber<int>(
+                args[4].getContent());
         }
     }
     if (args.size() >= 6)
     {
         if (IsNumber(args[5].getContent()))
         {
-            numRivers = ToNumber<int>(args[5].getContent());
+            configuration.numRivers = ToNumber<int>(args[5].getContent());
         }
     }
     if (args.size() >= 7)
     {
         if (IsNumber(args[6].getContent()))
         {
-            minRiverDistance = ToNumber<int>(args[6].getContent());
+            configuration.minRiverDistance = ToNumber<int>(
+                args[6].getContent());
         }
     }
-    MapGenerator mapGenerator;
-    auto map = std::move(mapGenerator.generateMap(width,
-                                                  height,
-                                                  mountains,
-                                                  minMountainRadius,
-                                                  maxMountainRadius,
-                                                  numRivers,
-                                                  minRiverDistance));
+    MapGenerator mapGenerator(configuration);
+    auto map = mapGenerator.generateMap();
     std::string drawnMap;
-    for (int y = 0; y < height; ++y)
+    for (int y = 0; y < map.getHeight(); ++y)
     {
-        for (int x = 0; x < width; ++x)
+        for (int x = 0; x < map.getWidth(); ++x)
         {
             drawnMap += map.get(x, y).heightMap.toSymbol();
         }
         drawnMap += "\n";
     }
+    character->sendMsg(configuration.toString());
     character->sendMsg(drawnMap);
     character->sendMsg(Formatter::reset());
-    character->sendMsg("The values where:\n");
-    character->sendMsg("WDT:%s;  HGT:%s;  MNT:%s;  MIN_RAD:%s;  MAX_RAD:%s;  "
-                           "RIVERS:%s;  MIN_RIVER_DIST:%s",
-                       width, height, mountains,
-                       minMountainRadius, maxMountainRadius,
-                       numRivers, minRiverDistance);
     return true;
 }

@@ -23,31 +23,51 @@
 
 #include "mapCell.hpp"
 #include "map2D.hpp"
+#include "utils.hpp"
 #include <memory>
+
+struct MapGeneratorConfiguration
+{
+public:
+    int width;
+    int height;
+    int numMountains;
+    int minMountainRadius;
+    int maxMountainRadius;
+    int numRivers;
+    int minRiverDistance;
+
+    std::string toString() const
+    {
+        std::string output;
+        output += "Width             :" + ToString(width) + ";\n";
+        output += "Height            :" + ToString(height) + ";\n";
+        output += "NumMountains      :" + ToString(numMountains) + ";\n";
+        output += "MinMountainRadius :" + ToString(minMountainRadius) + ";\n";
+        output += "MaxMountainRadius :" + ToString(maxMountainRadius) + ";\n";
+        output += "NumRivers         :" + ToString(numRivers) + ";\n";
+        output += "MinRiverDistance  :" + ToString(minRiverDistance) + ";\n";
+        return output;
+    }
+};
 
 class MapGenerator
 {
 public:
+    MapGeneratorConfiguration configuration;
+
     /// @brief Constructor.
-    MapGenerator();
+    MapGenerator(const MapGeneratorConfiguration & _configuration);
 
     /// @brief Generates a new map.
-    Map2D<MapCell> generateMap(int width,
-                               int height,
-                               int numMountains,
-                               int minMountainRadius,
-                               int maxMountainRadius,
-                               int numRivers,
-                               int minRiverDistance);
+    Map2D<MapCell> generateMap();
 
 private:
-    void dropMountain(Map2D<MapCell> & map,
-                      int minMountainRadius,
-                      int maxMountainRadius);
+    void dropMountain(Map2D<MapCell> & map);
 
     void normalizeMap(Map2D<MapCell> & map);
 
-    void dropRivers(Map2D<MapCell> & map, int numRivers, int minRiverDistance);
+    void dropRivers(Map2D<MapCell> & map);
 
     void clearMap(Map2D<MapCell> & map);
 

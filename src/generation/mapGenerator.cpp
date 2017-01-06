@@ -24,34 +24,29 @@
 #include "utils.hpp"
 #include "area.hpp"
 
-MapGenerator::MapGenerator()
+MapGenerator::MapGenerator(const MapGeneratorConfiguration & _configuration) :
+    configuration(_configuration)
 {
     // Nothing to do.
 }
 
-Map2D<MapCell> MapGenerator::generateMap(int width,
-                                         int height,
-                                         int numMountains,
-                                         int minMountainRadius,
-                                         int maxMountainRadius,
-                                         int numRivers,
-                                         int minRiverDistance)
+Map2D<MapCell> MapGenerator::generateMap()
 {
     // Prepare the map.
-    Map2D<MapCell> map(width, height, MapCell());
+    Map2D<MapCell> map(configuration.width, configuration.height, MapCell());
     // Initialize the map cells.
-    for (auto x = 0; x < width; ++x)
+    for (auto x = 0; x < map.getWidth(); ++x)
     {
-        for (auto y = 0; y < height; ++y)
+        for (auto y = 0; y < map.getHeight(); ++y)
         {
             map.get(x, y).coordinates = Coordinates(x, y, 0);
             map.get(x, y).addNeighbours(map);
         }
     }
     // Drop the mountains.
-    for (int i = 0; i < numMountains; ++i)
+    for (int i = 0; i < configuration.numMountains; ++i)
     {
-        this->dropMountain(map, minMountainRadius, maxMountainRadius);
+        this->dropMountain(map);
     }
     // Normalize the map in order to have values between 0 and 1.
     this->normalizeMap(map);
@@ -60,16 +55,15 @@ Map2D<MapCell> MapGenerator::generateMap(int width,
     heightMapper.setNormalThresholds();
     heightMapper.applyHeightMap(map);
     // Drop the rivers.
-    this->dropRivers(map, numRivers, minRiverDistance);
+    this->dropRivers(map);
     return map;
 }
 
-void MapGenerator::dropMountain(Map2D<MapCell> & map,
-                                int minMountainRadius,
-                                int maxMountainRadius)
+void MapGenerator::dropMountain(Map2D<MapCell> & map)
 {
     // Generate a random dimension for the mountain.
-    auto radius = TRandInteger<int>(minMountainRadius, maxMountainRadius);
+    auto radius = TRandInteger<int>(configuration.minMountainRadius,
+                                    configuration.maxMountainRadius);
     // Generate a random place for the mountain.
     auto xCenter = TRandInteger<int>(-radius, map.getWidth() + radius);
     auto yCenter = TRandInteger<int>(-radius, map.getHeight() + radius);
@@ -127,9 +121,7 @@ void MapGenerator::normalizeMap(Map2D<MapCell> & map)
     }
 }
 
-void MapGenerator::dropRivers(Map2D<MapCell> & map,
-                              int numRivers,
-                              int minRiverDistance)
+void MapGenerator::dropRivers(Map2D<MapCell> & map)
 {
     std::list<MapCell *> startingPoints;
     // Lamba used to check if a cell is far away from pre-existing starting
@@ -144,7 +136,7 @@ void MapGenerator::dropRivers(Map2D<MapCell> & map,
         {
             auto distance = Area::getDistance(cell->coordinates,
                                               point->coordinates);
-            if (distance <= minRiverDistance)
+            if (distance <= configuration.minRiverDistance)
             {
                 return false;
             }
@@ -163,7 +155,7 @@ void MapGenerator::dropRivers(Map2D<MapCell> & map,
             }
         }
     }
-    auto iterations = std::min(static_cast<size_t >(numRivers),
+    auto iterations = std::min(static_cast<size_t >(configuration.numRivers),
                                startingPoints.size());
     // Prepare a vector for the rivers.
     std::vector<std::vector<MapCell *>> rivers;
