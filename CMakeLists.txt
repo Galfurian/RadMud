@@ -98,6 +98,7 @@ set(PROJECT_INC ${CMAKE_SOURCE_DIR}/src)
 #################################################
 # Add subdirectories...
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/enumerators)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/generation)
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/character)
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/utilities)
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/structure)

@@ -23,6 +23,9 @@
 
 #include "commandGod.hpp"
 
+/// @addtogroup ComInterfaces
+/// @{
+
 /// Generate a new item from the vnum of a model.
 bool DoItemCreate(Character * character, ArgumentHandler & args);
 
@@ -46,3 +49,5 @@ bool DoModelList(Character * character, ArgumentHandler & args);
 
 /// List all the writings.
 bool DoWritingList(Character * character, ArgumentHandler & args);
+
+/// @}

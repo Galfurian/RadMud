@@ -48,6 +48,10 @@ void LoadGodCommands()
         "Go to another room.",
         true, true, false));
     Mud::instance().addCommand(std::make_shared<Command>(
+        DoGenerateMap, "mud_generate_map", "",
+        "Generate a map.",
+        true, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
         DoFactionInfo, "faction_information", "(faction vnum)",
         "Provide all the information regarding the given faction.",
         true, true, false));

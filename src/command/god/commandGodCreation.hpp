@@ -23,6 +23,9 @@
 
 #include "commandGod.hpp"
 
+/// @addtogroup ComInterfaces
+/// @{
+
 /// Provide all the information regarding the given material.
 bool DoMaterialInfo(Character * character, ArgumentHandler & args);
 
@@ -46,3 +49,5 @@ bool DoProductionInfo(Character * character, ArgumentHandler & args);
 
 /// Get the list of all the productions.
 bool DoProductionList(Character * character, ArgumentHandler & args);
+
+/// @}

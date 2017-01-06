@@ -1,6 +1,6 @@
-/// @file   commandGodsMud.hpp
+/// @file   mapGenerator.hpp
 /// @author Enrico Fraccaroli
-/// @date   Jan 02 2017
+/// @date   Jan 05 2017
 /// @copyright
 /// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -21,35 +21,41 @@
 
 #pragma once
 
-#include "commandGod.hpp"
+#include "coordinates.hpp"
+#include "map2D.hpp"
 
-/// @defgroup ComInterfaces Commands List Interface.
-/// @brief All the functions necessary to handle the commands that a player
-///         can execute.
-/// @{
+class MapGenerator
+{
+private:
+    /// The width of the map.
+    int width;
+    /// The height of the map.
+    int height;
+    /// The number of mountains.
+    int numMountains;
+    /// The minimum radius of a mountain.
+    int minMountainRadius;
+    /// The maximum radius of a mountain.
+    int maxMountainRadius;
 
-/// Shutdown the Mud.
-bool DoShutdown(Character * character, ArgumentHandler & args);
+public:
+    /// The generated map.
+    Map2D<double> map;
 
-/// Save the Mud.
-bool DoMudSave(Character * character, ArgumentHandler & args);
+    /// @brief Constructor.
+    MapGenerator(int _width,
+                 int _height,
+                 int _numMountains,
+                 int _minMountainRadius,
+                 int _maxMountainRadius);
 
-/// Go to the desired room.
-bool DoGoTo(Character * character, ArgumentHandler & args);
+    /// @brief Generates a new map.
+    void generateMap();
 
-/// Shows the information about a faction.
-bool DoFactionInfo(Character * character, ArgumentHandler & args);
+private:
+    void dropMountain();
 
-/// List all the factions.
-bool DoFactionList(Character * character, ArgumentHandler & args);
+    void normalizeMap();
 
-/// List all the races.
-bool DoRaceList(Character * character, ArgumentHandler & args);
-
-/// List all the skills.
-bool DoSkillList(Character * character, ArgumentHandler & args);
-
-/// Generate a new map.
-bool DoGenerateMap(Character * character, ArgumentHandler & args);
-
-///@}
+    void clearMap();
+};

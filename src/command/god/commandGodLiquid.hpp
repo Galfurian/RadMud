@@ -23,6 +23,9 @@
 
 #include "commandGod.hpp"
 
+/// @addtogroup ComInterfaces
+/// @{
+
 /// Provide all the information regarding the given liquid.
 bool DoLiquidInfo(Character * character, ArgumentHandler & args);
 
@@ -31,3 +34,5 @@ bool DoLiquidList(Character * character, ArgumentHandler & args);
 
 /// Create the item with the given liquid inside a container.
 bool DoLiquidCreate(Character * character, ArgumentHandler & args);
+
+/// @}

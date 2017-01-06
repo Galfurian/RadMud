@@ -26,10 +26,3 @@
 
 /// Loads all the commands used by gods.
 void LoadGodCommands();
-
-/// @defgroup ComInterfaces Commands List Interface.
-/// @brief All the functions necessary to handle the commands that a player
-///         can execute.
-/// @{
-
-///@}

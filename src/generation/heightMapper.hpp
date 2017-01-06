@@ -1,6 +1,6 @@
-/// @file   commandGodsMud.hpp
+/// @file   heightMapper.hpp
 /// @author Enrico Fraccaroli
-/// @date   Jan 02 2017
+/// @date   gen 05 2017
 /// @copyright
 /// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -21,35 +21,48 @@
 
 #pragma once
 
-#include "commandGod.hpp"
+#include <string>
+#include <vector>
 
-/// @defgroup ComInterfaces Commands List Interface.
-/// @brief All the functions necessary to handle the commands that a player
-///         can execute.
-/// @{
+class Threshold
+{
+public:
+    /// The threshold value.
+    double threshold;
+    /// The associated tile.
+    std::string tile;
 
-/// Shutdown the Mud.
-bool DoShutdown(Character * character, ArgumentHandler & args);
+    /// @brief Constructor.
+    Threshold() :
+        threshold(),
+        tile()
+    {
+        // Nothing to do.
+    }
 
-/// Save the Mud.
-bool DoMudSave(Character * character, ArgumentHandler & args);
+    /// @brief Constructor.
+    Threshold(double _threshold, std::string _tile) :
+        threshold(_threshold),
+        tile(_tile)
+    {
+        // Nothing to do.
+    }
+};
 
-/// Go to the desired room.
-bool DoGoTo(Character * character, ArgumentHandler & args);
+/// @brief Class which maps the values of an height-map to types of terrain.
+class HeightMapper
+{
+private:
+    std::vector<Threshold> thresholds;
 
-/// Shows the information about a faction.
-bool DoFactionInfo(Character * character, ArgumentHandler & args);
+public:
+    HeightMapper();
 
-/// List all the factions.
-bool DoFactionList(Character * character, ArgumentHandler & args);
+    void addThreshold(const Threshold & threshold);
 
-/// List all the races.
-bool DoRaceList(Character * character, ArgumentHandler & args);
+    std::string getTypeByElevation(double elevation);
 
-/// List all the skills.
-bool DoSkillList(Character * character, ArgumentHandler & args);
+    void setNormalThresholds();
 
-/// Generate a new map.
-bool DoGenerateMap(Character * character, ArgumentHandler & args);
-
-///@}
+    void setIslandsThresholds();
+};

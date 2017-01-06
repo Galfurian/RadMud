@@ -23,7 +23,7 @@
 #include "mud.hpp"
 
 /// @brief  It's the main program.
-/// @return Errore code.
+/// @return Error code.
 int main()
 {
     if (Mud::instance().runMud())

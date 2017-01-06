@@ -23,6 +23,9 @@
 
 #include "commandGod.hpp"
 
+/// @addtogroup ComInterfaces
+/// @{
+
 /// Kill the desired mobile, in the same room.
 bool DoMobileKill(Character * character, ArgumentHandler & args);
 
@@ -37,3 +40,5 @@ bool DoMobileTrigger(Character * character, ArgumentHandler & args);
 
 /// Show the mobile's log.
 bool DoMobileLog(Character * character, ArgumentHandler & args);
+
+/// @}

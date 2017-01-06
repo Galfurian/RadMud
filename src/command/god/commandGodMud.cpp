@@ -20,6 +20,8 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "commandGodMud.hpp"
+#include "heightMapper.hpp"
+#include "mapGenerator.hpp"
 #include "mud.hpp"
 
 bool DoShutdown(Character * character, ArgumentHandler &)
@@ -159,5 +161,59 @@ bool DoSkillList(Character * character, ArgumentHandler & /*args*/)
         table.addRow(row);
     }
     character->sendMsg(table.getTable());
+    return true;
+}
+
+bool DoGenerateMap(Character * character, ArgumentHandler & args)
+{
+    int width = 60;
+    int height = 30;
+    int mountains = 50;
+    int minMountainRadius = 5;
+    int maxMountainRadius = 15;
+    if (args.size() >= 1)
+    {
+        width = ToNumber<int>(args[0].getContent());
+    }
+    if (args.size() >= 2)
+    {
+        height = ToNumber<int>(args[1].getContent());
+    }
+    if (args.size() >= 3)
+    {
+        mountains = ToNumber<int>(args[2].getContent());
+    }
+    if (args.size() >= 4)
+    {
+        minMountainRadius = ToNumber<int>(args[3].getContent());
+    }
+    if (args.size() >= 5)
+    {
+        maxMountainRadius = ToNumber<int>(args[4].getContent());
+    }
+    MapGenerator mapGenerator(width,
+                              height,
+                              mountains,
+                              minMountainRadius,
+                              maxMountainRadius);
+    mapGenerator.generateMap();
+    HeightMapper heightMapper;
+    heightMapper.setNormalThresholds();
+    std::string map;
+    for (int y = 0; y < height; ++y)
+    {
+        for (int x = 0; x < width; ++x)
+        {
+            auto elevation = mapGenerator.map.get(x, y);
+            map += heightMapper.getTypeByElevation(elevation);
+        }
+        map += "\n";
+    }
+    character->sendMsg(map);
+    character->sendMsg(Formatter::reset());
+    character->sendMsg("The values where:\n");
+    character->sendMsg("WDT:%s;  HGT:%s;  MNT:%s;  MIN_RAD:%s;  MAX_RAD:%s",
+                       width, height, mountains,
+                       minMountainRadius, maxMountainRadius);
     return true;
 }
