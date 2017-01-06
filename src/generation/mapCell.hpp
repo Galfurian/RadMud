@@ -1,6 +1,6 @@
 /// @file   mapCell.hpp
 /// @author Enrico Fraccaroli
-/// @date   gen 06 2017
+/// @date   Jan 06 2017
 /// @copyright
 /// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -21,13 +21,19 @@
 
 #pragma once
 
+#include "coordinates.hpp"
+
+/// @brief Holds information about the cell of an automatically generated map.
 class MapCell
 {
 public:
-    int x;
-    int y;
+    /// The cell coordinates.
+    Coordinates coordinates;
+    /// The height of the cell.
     double height;
 
-    MapCell(int _x, int _y,double _height);
+    /// @brief Constructor.
+    MapCell(const Coordinates & _coordinates,
+            const double & _height);
 };
 

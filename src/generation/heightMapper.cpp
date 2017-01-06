@@ -1,6 +1,6 @@
 /// @file   heightMapper.cpp
 /// @author Enrico Fraccaroli
-/// @date   gen 05 2017
+/// @date   Jan 05 2017
 /// @copyright
 /// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a

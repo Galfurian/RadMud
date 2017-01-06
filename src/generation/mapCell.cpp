@@ -1,6 +1,6 @@
 /// @file   mapCell.cpp
 /// @author Enrico Fraccaroli
-/// @date   gen 06 2017
+/// @date   Jan 06 2017
 /// @copyright
 /// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -21,9 +21,9 @@
 
 #include "mapCell.hpp"
 
-MapCell::MapCell(int _x, int _y, double _height) :
-    x(_x),
-    y(_y),
+MapCell::MapCell(const Coordinates & _coordinates,
+                 const double & _height) :
+    coordinates(_coordinates),
     height(_height)
 {
     // Nothing to do.
