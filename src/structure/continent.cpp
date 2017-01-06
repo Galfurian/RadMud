@@ -123,7 +123,9 @@ std::vector<std::string> Continent::drawFov(Room * centerRoom,
     int max_y = ((origin_y + signedRadius) > this->height) ?
                 this->height : (origin_y + signedRadius);
     // Create a 2D map of chararacters.
-    Map2D<ContinentTile> map(signedRadius * 2, signedRadius * 2);
+    Map2D<ContinentTile> map(signedRadius * 2,
+                             signedRadius * 2,
+                             ContinentTile::Void);
     // Evaluate the field of view.
     this->fieldOfView(map, origin_x, origin_y, origin_z, radius);
     // Prepare Enviroment layer.

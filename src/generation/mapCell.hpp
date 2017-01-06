@@ -1,6 +1,6 @@
-/// @file   mapGenerator.hpp
+/// @file   mapCell.hpp
 /// @author Enrico Fraccaroli
-/// @date   Jan 05 2017
+/// @date   gen 06 2017
 /// @copyright
 /// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -21,32 +21,13 @@
 
 #pragma once
 
-#include "coordinates.hpp"
-#include "mapCell.hpp"
-#include "map2D.hpp"
-
-class MapGenerator
+class MapCell
 {
 public:
-    /// @brief Constructor.
-    MapGenerator();
+    int x;
+    int y;
+    double height;
 
-    /// @brief Generates a new map.
-    Map2D<double> generateMap(int width,
-                              int height,
-                              int numMountains,
-                              int minMountainRadius,
-                              int maxMountainRadius,
-                              int numRivers);
-
-private:
-    void dropMountain(Map2D<double> & map,
-                      int minMountainRadius,
-                      int maxMountainRadius);
-
-    void normalizeMap(Map2D<double> & map);
-
-    void dropRiver(Map2D<double> & map);
-
-    void clearMap(Map2D<double> & map);
+    MapCell(int _x, int _y,double _height);
 };
+

@@ -171,49 +171,72 @@ bool DoGenerateMap(Character * character, ArgumentHandler & args)
     int mountains = 50;
     int minMountainRadius = 5;
     int maxMountainRadius = 15;
+    int numRivers = 0;
     if (args.size() >= 1)
     {
-        width = ToNumber<int>(args[0].getContent());
+        if (IsNumber(args[0].getContent()))
+        {
+            width = ToNumber<int>(args[0].getContent());
+        }
     }
     if (args.size() >= 2)
     {
-        height = ToNumber<int>(args[1].getContent());
+        if (IsNumber(args[1].getContent()))
+        {
+            height = ToNumber<int>(args[1].getContent());
+        }
     }
     if (args.size() >= 3)
     {
-        mountains = ToNumber<int>(args[2].getContent());
+        if (IsNumber(args[2].getContent()))
+        {
+            mountains = ToNumber<int>(args[2].getContent());
+        }
     }
     if (args.size() >= 4)
     {
-        minMountainRadius = ToNumber<int>(args[3].getContent());
+        if (IsNumber(args[3].getContent()))
+        {
+            minMountainRadius = ToNumber<int>(args[3].getContent());
+        }
     }
     if (args.size() >= 5)
     {
-        maxMountainRadius = ToNumber<int>(args[4].getContent());
+        if (IsNumber(args[4].getContent()))
+        {
+            maxMountainRadius = ToNumber<int>(args[4].getContent());
+        }
     }
-    MapGenerator mapGenerator(width,
-                              height,
-                              mountains,
-                              minMountainRadius,
-                              maxMountainRadius);
-    mapGenerator.generateMap();
+    if (args.size() >= 6)
+    {
+        if (IsNumber(args[5].getContent()))
+        {
+            numRivers = ToNumber<int>(args[5].getContent());
+        }
+    }
+    MapGenerator mapGenerator;
+    auto map = std::move(mapGenerator.generateMap(width, height, mountains,
+                                                  minMountainRadius,
+                                                  maxMountainRadius,
+                                                  numRivers));
     HeightMapper heightMapper;
     heightMapper.setNormalThresholds();
-    std::string map;
+    std::string drawnMap;
     for (int y = 0; y < height; ++y)
     {
         for (int x = 0; x < width; ++x)
         {
-            auto elevation = mapGenerator.map.get(x, y);
-            map += heightMapper.getTypeByElevation(elevation);
+            drawnMap += heightMapper.getTypeByElevation(map.get(x, y));
         }
-        map += "\n";
+        drawnMap += "\n";
     }
-    character->sendMsg(map);
+    character->sendMsg(drawnMap);
     character->sendMsg(Formatter::reset());
     character->sendMsg("The values where:\n");
-    character->sendMsg("WDT:%s;  HGT:%s;  MNT:%s;  MIN_RAD:%s;  MAX_RAD:%s",
+    character->sendMsg("WDT:%s;  HGT:%s;  MNT:%s;  MIN_RAD:%s;  MAX_RAD:%s;  "
+                           "RIVERS:%s",
                        width, height, mountains,
-                       minMountainRadius, maxMountainRadius);
+                       minMountainRadius, maxMountainRadius,
+                       numRivers);
     return true;
 }
