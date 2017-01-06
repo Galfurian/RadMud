@@ -89,6 +89,9 @@ public:
         // Nothing to do.
     }
 
+    /// Disable copy constructor.
+    Map2D(const Map2D<T> &) = delete;
+
     /// @brief Destructor.
     ~Map2D()
     {
@@ -159,13 +162,10 @@ public:
         set(x, y, nullValue);
     }
 
-    /// Disable copy constructor.
-    Map2D(const Map2D<T> &) = delete;
-
-    /// Disable copy constructor.
+    /// Disable assign operator.
     Map2D & operator=(const Map2D<T> &) = delete;
 
-    /// @brief Move constructor.
+    /// @brief Move operator.
     Map2D & operator=(const Map2D<T> && right)
     {
         data = std::move(right.data);

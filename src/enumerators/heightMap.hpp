@@ -1,4 +1,4 @@
-/// @file   mapCell.hpp
+/// @file   heightMap.hpp
 /// @author Enrico Fraccaroli
 /// @date   Jan 06 2017
 /// @copyright
@@ -21,39 +21,50 @@
 
 #pragma once
 
-#include "heightMap.hpp"
-#include "map2D.hpp"
-#include <vector>
+#include <string>
 
-/// @brief Holds information about the cell of an automatically generated map.
-class MapCell
+/// The different types of heights.
+class HeightMap
 {
 public:
-    /// The cell coordinates.
-    Coordinates coordinates;
-    /// The height of the cell.
-    double height;
-    /// Associated height.
-    HeightMap heightMap;
-    /// List of neighbours.
-    std::vector<MapCell *> neighbours;
+    /// List of possible heights.
+    enum Enum
+    {
+        Void,
+        DeepWater,
+        ShallowWater,
+        Coast,
+        Plain,
+        Hill,
+        Mountain,
+        HighMountain
+    };
 
-    /// @brief Constructor.
-    MapCell();
+    /// @brief Constructor from number.
+    HeightMap(const unsigned int & _height);
 
-    /// @brief Constructor.
-    MapCell(const Coordinates & _coordinates,
-            const double & _height);
+    /// @brief Constructor from enum.
+    HeightMap(const Enum & _height);
 
-    /// @brief Add the neighbours based on the given map.
-    void addNeighbours(Map2D<MapCell> & map);
+    /// @brief Check is the given number is a valid height.
+    static bool isValid(const unsigned int & _height);
 
-    /// @brief Find all the nearby cells w.r.t. the policy (lowest/highest).
-    /// @param lowest If true it resturns the lowest cell, the highest
-    ///               otherwise.
-    /// @return The found cell.
-    MapCell * findCellNearby(bool lowest);
+    /// @brief Returns the height as string.
+    std::string toString() const;
 
-    /// @brief Equality operator.
-    bool operator==(const MapCell & other) const;
+    /// @brief Returns the height as number.
+    unsigned int toUInt() const;
+
+    /// @brief Returns the height as a symbol.
+    std::string toSymbol(bool color = true) const;
+
+    /// @brief Eheight operator w.r.t. a height enum.
+    bool operator==(const HeightMap::Enum & rhs) const;
+
+    /// @brief Ineheight operator w.r.t. a height enum.
+    bool operator!=(const HeightMap::Enum & rhs) const;
+
+private:
+    /// Internal height value.
+    Enum height;
 };

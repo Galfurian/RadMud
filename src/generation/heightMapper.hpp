@@ -21,29 +21,29 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
+#include "heightMap.hpp"
+#include "mapCell.hpp"
 
 class Threshold
 {
 public:
     /// The threshold value.
     double threshold;
-    /// The associated tile.
-    std::string tile;
+    /// The associated height.
+    HeightMap heightMap;
 
     /// @brief Constructor.
     Threshold() :
         threshold(),
-        tile()
+        heightMap(HeightMap::Void)
     {
         // Nothing to do.
     }
 
     /// @brief Constructor.
-    Threshold(double _threshold, std::string _tile) :
+    Threshold(double _threshold, HeightMap _heightMap) :
         threshold(_threshold),
-        tile(_tile)
+        heightMap(_heightMap)
     {
         // Nothing to do.
     }
@@ -53,6 +53,7 @@ public:
 class HeightMapper
 {
 private:
+    /// The current thresholds.
     std::vector<Threshold> thresholds;
 
 public:
@@ -60,9 +61,12 @@ public:
 
     void addThreshold(const Threshold & threshold);
 
-    std::string getTypeByElevation(double elevation);
-
     void setNormalThresholds();
 
-    void setIslandsThresholds();
+    void setIslandThresholds();
+
+    void applyHeightMap(Map2D<MapCell> & map);
+
+//    std::string getTypeByElevation(double elevation);
+
 };

@@ -20,7 +20,6 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "heightMapper.hpp"
-#include "formatter.hpp"
 #include <algorithm>
 
 HeightMapper::HeightMapper()
@@ -38,48 +37,48 @@ void HeightMapper::addThreshold(const Threshold & threshold)
     std::sort(thresholds.begin(), thresholds.end(), SortThreshold);
 }
 
-std::string HeightMapper::getTypeByElevation(double elevation)
-{
-    // Search for the tile.
-    for (auto it : thresholds)
-    {
-        if (elevation < it.threshold)
-        {
-            return it.tile;
-        }
-    }
-    // Apply the last threshold.
-    if (!thresholds.empty())
-    {
-        return thresholds.back().tile;
-    }
-    return Formatter::reset() + " ";
-}
-
 void HeightMapper::setNormalThresholds()
 {
     thresholds.clear();
-    this->addThreshold(Threshold(1.5, Formatter::blue() + "W"));
-    this->addThreshold(Threshold(2.0, Formatter::cyan() + "w"));
-    this->addThreshold(Threshold(2.5, Formatter::yellow() + "c"));
-    this->addThreshold(Threshold(5.0, Formatter::reset() + "."));
-    this->addThreshold(Threshold(8.5, Formatter::gray() + "m"));
-    this->addThreshold(Threshold(9.5, Formatter::gray() +
-                                      Formatter::bold() + "M"));
-    this->addThreshold(Threshold(10.0, Formatter::reset() +
-                                       Formatter::bold() + "P"));
+    this->addThreshold(Threshold(1.5, HeightMap::DeepWater));
+    this->addThreshold(Threshold(2.0, HeightMap::ShallowWater));
+    this->addThreshold(Threshold(2.5, HeightMap::Coast));
+    this->addThreshold(Threshold(5.0, HeightMap::Plain));
+    this->addThreshold(Threshold(8.5, HeightMap::Hill));
+    this->addThreshold(Threshold(9.5, HeightMap::Mountain));
+    this->addThreshold(Threshold(10.0, HeightMap::HighMountain));
 }
 
-void HeightMapper::setIslandsThresholds()
+void HeightMapper::setIslandThresholds()
 {
     thresholds.clear();
-    this->addThreshold(Threshold(4.0, Formatter::blue() + "W"));
-    this->addThreshold(Threshold(5.5, Formatter::cyan() + "w"));
-    this->addThreshold(Threshold(6.0, Formatter::yellow() + "c"));
-    this->addThreshold(Threshold(8.0, Formatter::reset() + "."));
-    this->addThreshold(Threshold(8.5, Formatter::gray() + "m"));
-    this->addThreshold(Threshold(9.5, Formatter::gray() +
-                                      Formatter::bold() + "M"));
-    this->addThreshold(Threshold(10.0, Formatter::reset() +
-                                       Formatter::bold() + "P"));
+    this->addThreshold(Threshold(4.0, HeightMap::DeepWater));
+    this->addThreshold(Threshold(5.5, HeightMap::ShallowWater));
+    this->addThreshold(Threshold(6.0, HeightMap::Coast));
+    this->addThreshold(Threshold(8.0, HeightMap::Plain));
+    this->addThreshold(Threshold(8.5, HeightMap::Hill));
+    this->addThreshold(Threshold(9.5, HeightMap::Mountain));
+    this->addThreshold(Threshold(10.0, HeightMap::HighMountain));
+}
+
+void HeightMapper::applyHeightMap(Map2D<MapCell> & map)
+{
+    if (thresholds.empty())
+    {
+        this->setNormalThresholds();
+    }
+    for (auto x = 0; x < map.getWidth(); ++x)
+    {
+        for (auto y = 0; y < map.getHeight(); ++y)
+        {
+            for (auto it : thresholds)
+            {
+                if (map.get(x, y).height <= it.threshold)
+                {
+                    map.get(x, y).heightMap = it.heightMap;
+                    break;
+                }
+            }
+        }
+    }
 }

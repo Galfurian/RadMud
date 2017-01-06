@@ -223,12 +223,13 @@ bool DoGenerateMap(Character * character, ArgumentHandler & args)
                                                   numRivers));
     HeightMapper heightMapper;
     heightMapper.setNormalThresholds();
+    heightMapper.applyHeightMap(map);
     std::string drawnMap;
     for (int y = 0; y < height; ++y)
     {
         for (int x = 0; x < width; ++x)
         {
-            drawnMap += heightMapper.getTypeByElevation(map.get(x, y).height);
+            drawnMap += map.get(x, y).heightMap.toSymbol();
 //            drawnMap += ToString(static_cast<int>(map.get(x, y).height));
         }
         drawnMap += "\n";

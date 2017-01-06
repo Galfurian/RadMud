@@ -24,6 +24,7 @@
 MapCell::MapCell() :
     coordinates(),
     height(),
+    heightMap(HeightMap::Void),
     neighbours()
 {
     // Nothing to do.
@@ -32,7 +33,9 @@ MapCell::MapCell() :
 MapCell::MapCell(const Coordinates & _coordinates,
                  const double & _height) :
     coordinates(_coordinates),
-    height(_height)
+    height(_height),
+    heightMap(HeightMap::Void),
+    neighbours()
 {
     // Nothing to do.
 }
