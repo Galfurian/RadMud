@@ -20,7 +20,6 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "mapGenerator.hpp"
-#include "pathFinder.hpp"
 #include "utils.hpp"
 
 MapGenerator::MapGenerator()
@@ -43,6 +42,7 @@ Map2D<MapCell> MapGenerator::generateMap(int width,
         for (auto y = 0; y < height; ++y)
         {
             map.get(x, y).coordinates = Coordinates(x, y, 0);
+            map.get(x, y).addNeighbours(map);
         }
     }
     // Drop the mountains.
@@ -52,7 +52,6 @@ Map2D<MapCell> MapGenerator::generateMap(int width,
     }
     // Normalize the map in order to have values between 0 and 1.
     this->normalizeMap(map);
-    // Drop the rivers.
     for (int i = 0; i < numRivers; ++i)
     {
         this->dropRiver(map);
@@ -110,14 +109,14 @@ void MapGenerator::normalizeMap(Map2D<MapCell> & map)
     // If the map is quite plain, clear it.
     if (!DoubleEquality(maxHeight, minHeight))
     {
-        // Normalize the heights to values between 0 and 1.
+        // Normalize the heights to values between 0 and 10.
         for (int x = 0; x < map.getWidth(); ++x)
         {
             for (int y = 0; y < map.getHeight(); ++y)
             {
-                map.get(x, y).height =
-                    (map.get(x, y).height - minHeight) /
-                    (maxHeight - minHeight);
+                map.get(x, y).height = this->normalize(map.get(x, y).height,
+                                                        minHeight, maxHeight,
+                                                        0.0, 10.0);
             }
         }
     }
@@ -125,87 +124,36 @@ void MapGenerator::normalizeMap(Map2D<MapCell> & map)
 
 void MapGenerator::dropRiver(Map2D<MapCell> & map)
 {
-    int xSource = 0, ySource = 0;
-    double heightSource = 0.0;
-    auto SearchNextCell = [&](int currentX,
-                              int currentY,
-                              double currentHeight)
-    {
-        int nextX = currentX, nextY = currentY;
-        double nextHeight = currentHeight;
-        if (currentX - 1 > 0) // West
-        {
-            auto h = map.get(currentX - 1, currentY).height;
-            if (h < nextHeight)
-            {
-                nextX = currentX - 1;
-                nextY = currentY;
-                nextHeight = h;
-            }
-        }
-        if (currentX + 1 < map.getWidth()) // East
-        {
-            auto h = map.get(currentX + 1, currentY).height;
-            if (h < nextHeight)
-            {
-                nextX = currentX + 1;
-                nextY = currentY;
-                nextHeight = h;
-            }
-        }
-        if (currentY - 1 > 0) // South
-        {
-            auto h = map.get(currentX, currentY - 1).height;
-            if (h < nextHeight)
-            {
-                nextX = currentX;
-                nextY = currentY - 1;
-                nextHeight = h;
-            }
-        }
-        if (currentY + 1 < map.getHeight()) // North
-        {
-            auto h = map.get(currentX, currentY + 1).height;
-            if (h < nextHeight)
-            {
-                nextX = currentX;
-                nextY = currentY + 1;
-            }
-        }
-        return std::make_pair(nextX, nextY);
-    };
-    // Find the minimum and maximum heights.
+    MapCell currentCell;
+    // Find the highest cell.
     for (auto x = 0; x < map.getWidth(); ++x)
     {
         for (auto y = 0; y < map.getHeight(); ++y)
         {
-            auto cellHeight = map.get(x, y).height;
-            if (cellHeight > heightSource)
+            auto cell = map.get(x, y);
+            if (cell.height > currentCell.height)
             {
-                xSource = x;
-                ySource = y;
-                heightSource = cellHeight;
+                currentCell = cell;
             }
         }
     }
-    std::vector<std::pair<int, int> > riverPath;
-    int currentX = xSource, currentY = ySource;
+    // Prepare a vector of cells for the river.
+    std::vector<MapCell *> riverPath;
     while (true)
     {
-        auto nextCell = SearchNextCell(currentX,
-                                       currentY,
-                                       map.get(currentX, currentY).height);
+        // Get the lowest nearby cell.
+        auto nextCell = currentCell.findCellNearby(false);
+        // Check if the lowest is the current cell itself.
+        if (nextCell->coordinates == currentCell.coordinates) break;
+        // Add the next cell to the path of the river.
         riverPath.push_back(nextCell);
-        if ((nextCell.first == currentX) && (nextCell.second == currentY))
-        {
-            break;
-        }
-        currentX = nextCell.first;
-        currentY = nextCell.second;
+        // Set the current cell to the next cell.
+        currentCell = *nextCell;
     }
-    for (auto nextCell :riverPath)
+    // Modify the height of the river.
+    for (auto nextCell : riverPath)
     {
-        map.get(nextCell.first, nextCell.second).height = -10;
+        nextCell->height = -10;
     }
 }
 
@@ -218,4 +166,13 @@ void MapGenerator::clearMap(Map2D<MapCell> & map)
             map.get(x, y).height = 0.0;
         }
     }
+}
+
+double MapGenerator::normalize(double value,
+                               double LbFrom,
+                               double UbFrom,
+                               double LbTo,
+                               double UbTo) const
+{
+    return (((UbTo - LbTo) * (value - LbFrom)) / ((UbFrom - LbFrom))) + LbTo;
 }

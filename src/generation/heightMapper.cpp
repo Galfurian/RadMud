@@ -59,27 +59,27 @@ std::string HeightMapper::getTypeByElevation(double elevation)
 void HeightMapper::setNormalThresholds()
 {
     thresholds.clear();
-    this->addThreshold(Threshold(0.15, Formatter::blue() + "W"));
-    this->addThreshold(Threshold(0.20, Formatter::cyan() + "w"));
-    this->addThreshold(Threshold(0.25, Formatter::yellow() + "c"));
-    this->addThreshold(Threshold(0.50, Formatter::reset() + "."));
-    this->addThreshold(Threshold(0.85, Formatter::gray() + "m"));
-    this->addThreshold(Threshold(0.95, Formatter::gray() +
-                                       Formatter::bold() + "M"));
-    this->addThreshold(Threshold(1.00, Formatter::reset() +
+    this->addThreshold(Threshold(1.5, Formatter::blue() + "W"));
+    this->addThreshold(Threshold(2.0, Formatter::cyan() + "w"));
+    this->addThreshold(Threshold(2.5, Formatter::yellow() + "c"));
+    this->addThreshold(Threshold(5.0, Formatter::reset() + "."));
+    this->addThreshold(Threshold(8.5, Formatter::gray() + "m"));
+    this->addThreshold(Threshold(9.5, Formatter::gray() +
+                                      Formatter::bold() + "M"));
+    this->addThreshold(Threshold(10.0, Formatter::reset() +
                                        Formatter::bold() + "P"));
 }
 
 void HeightMapper::setIslandsThresholds()
 {
     thresholds.clear();
-    this->addThreshold(Threshold(0.40, Formatter::blue() + "W"));
-    this->addThreshold(Threshold(0.55, Formatter::cyan() + "w"));
-    this->addThreshold(Threshold(0.60, Formatter::yellow() + "c"));
-    this->addThreshold(Threshold(0.80, Formatter::reset() + "."));
-    this->addThreshold(Threshold(0.85, Formatter::gray() + "m"));
-    this->addThreshold(Threshold(0.95, Formatter::gray() +
-                                       Formatter::bold() + "M"));
-    this->addThreshold(Threshold(1.00, Formatter::reset() +
+    this->addThreshold(Threshold(4.0, Formatter::blue() + "W"));
+    this->addThreshold(Threshold(5.5, Formatter::cyan() + "w"));
+    this->addThreshold(Threshold(6.0, Formatter::yellow() + "c"));
+    this->addThreshold(Threshold(8.0, Formatter::reset() + "."));
+    this->addThreshold(Threshold(8.5, Formatter::gray() + "m"));
+    this->addThreshold(Threshold(9.5, Formatter::gray() +
+                                      Formatter::bold() + "M"));
+    this->addThreshold(Threshold(10.0, Formatter::reset() +
                                        Formatter::bold() + "P"));
 }

@@ -24,6 +24,7 @@
 
 #include "pathFinder.hpp"
 #include "aStarNode.hpp"
+#include <algorithm>
 
 /// @brief The AStar algorithm.
 template<typename ElementType>

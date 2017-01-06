@@ -215,7 +215,9 @@ bool DoGenerateMap(Character * character, ArgumentHandler & args)
         }
     }
     MapGenerator mapGenerator;
-    auto map = std::move(mapGenerator.generateMap(width, height, mountains,
+    auto map = std::move(mapGenerator.generateMap(width,
+                                                  height,
+                                                  mountains,
                                                   minMountainRadius,
                                                   maxMountainRadius,
                                                   numRivers));
@@ -227,6 +229,7 @@ bool DoGenerateMap(Character * character, ArgumentHandler & args)
         for (int x = 0; x < width; ++x)
         {
             drawnMap += heightMapper.getTypeByElevation(map.get(x, y).height);
+//            drawnMap += ToString(static_cast<int>(map.get(x, y).height));
         }
         drawnMap += "\n";
     }

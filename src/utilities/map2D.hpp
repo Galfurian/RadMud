@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "coordinates.hpp"
 #include <map>
 
 /// @brief Used to create and manage a bidimensional map.

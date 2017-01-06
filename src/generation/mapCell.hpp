@@ -21,7 +21,8 @@
 
 #pragma once
 
-#include "coordinates.hpp"
+#include "map2D.hpp"
+#include <vector>
 
 /// @brief Holds information about the cell of an automatically generated map.
 class MapCell
@@ -31,6 +32,8 @@ public:
     Coordinates coordinates;
     /// The height of the cell.
     double height;
+    /// List of neighbours.
+    std::vector<MapCell *> neighbours;
 
     /// @brief Constructor.
     MapCell();
@@ -38,5 +41,16 @@ public:
     /// @brief Constructor.
     MapCell(const Coordinates & _coordinates,
             const double & _height);
-};
 
+    /// @brief Add the neighbours based on the given map.
+    void addNeighbours(Map2D<MapCell> & map);
+
+    /// @brief Find all the nearby cells w.r.t. the policy (lowest/highest).
+    /// @param lowest If true it resturns the lowest cell, the highest
+    ///               otherwise.
+    /// @return The found cell.
+    MapCell * findCellNearby(bool lowest);
+
+    /// @brief Equality operator.
+    bool operator==(const MapCell & other) const;
+};

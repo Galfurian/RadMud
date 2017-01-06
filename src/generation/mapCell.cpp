@@ -23,7 +23,8 @@
 
 MapCell::MapCell() :
     coordinates(),
-    height()
+    height(),
+    neighbours()
 {
     // Nothing to do.
 }
@@ -34,4 +35,43 @@ MapCell::MapCell(const Coordinates & _coordinates,
     height(_height)
 {
     // Nothing to do.
+}
+
+void MapCell::addNeighbours(Map2D<MapCell> & map)
+{
+    if (coordinates.x - 1 > 0)
+    {
+        neighbours.emplace_back(&map.get(coordinates.x - 1, coordinates.y));
+    }
+    if (coordinates.x + 1 < map.getWidth())
+    {
+        neighbours.emplace_back(&map.get(coordinates.x + 1, coordinates.y));
+    }
+    if (coordinates.y - 1 > 0)
+    {
+        neighbours.emplace_back(&map.get(coordinates.x, coordinates.y - 1));
+    }
+    if (coordinates.y + 1 < map.getHeight())
+    {
+        neighbours.emplace_back(&map.get(coordinates.x, coordinates.y + 1));
+    }
+}
+
+MapCell * MapCell::findCellNearby(bool lowest)
+{
+    MapCell * selectedCell = this;
+    for (auto neighbour : neighbours)
+    {
+        if (((neighbour->height < selectedCell->height) && !lowest) ||
+            ((neighbour->height > selectedCell->height) && lowest))
+        {
+            selectedCell = neighbour;
+        }
+    }
+    return selectedCell;
+}
+
+bool MapCell::operator==(const MapCell & other) const
+{
+    return (coordinates == other.coordinates);
 }

@@ -21,9 +21,9 @@
 
 #pragma once
 
-#include "coordinates.hpp"
 #include "mapCell.hpp"
 #include "map2D.hpp"
+#include <memory>
 
 class MapGenerator
 {
@@ -33,11 +33,11 @@ public:
 
     /// @brief Generates a new map.
     Map2D<MapCell> generateMap(int width,
-                              int height,
-                              int numMountains,
-                              int minMountainRadius,
-                              int maxMountainRadius,
-                              int numRivers);
+                               int height,
+                               int numMountains,
+                               int minMountainRadius,
+                               int maxMountainRadius,
+                               int numRivers);
 
 private:
     void dropMountain(Map2D<MapCell> & map,
@@ -49,4 +49,10 @@ private:
     void dropRiver(Map2D<MapCell> & map);
 
     void clearMap(Map2D<MapCell> & map);
+
+    inline double normalize(double value,
+                            double LbFrom,
+                            double UbFrom,
+                            double LbTo,
+                            double UbTo) const;
 };

@@ -107,15 +107,15 @@ bool AStarNode<ElementType>::isEndNode() const
 
 class Room;
 
-/// @brief Specilize the equality function between AStar nodes that contain rooms.
+/// @brief Specialize the equality function between AStar nodes that contain rooms.
 template<>
 bool AStarNode<Room *>::isEqualTo(std::shared_ptr<AStarNode<Room *>> other);
 
-/// @brief Specilize the distance function between AStar nodes that contain rooms.
+/// @brief Specialize the distance function between AStar nodes that contain rooms.
 template<>
 int AStarNode<Room *>::getDistance(std::shared_ptr<AStarNode<Room *>> other);
 
-/// @brief Specilize the get neighbours function between AStar nodes that contain rooms.
+/// @brief Specialize the get neighbours function between AStar nodes that contain rooms.
 template<>
 std::vector<std::shared_ptr<AStarNode<Room *>>>
 AStarNode<Room *>::getNeighbours(
