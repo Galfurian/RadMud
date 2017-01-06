@@ -57,3 +57,11 @@ The mud can be accessed using telnet with the port **4000**.
 ```
 telnet localhost 4000
 ```
+## Login as a Divinity
+The credentials used to log in as a divinity are:
+
+User: **asd**
+
+Pwd : **asd**
+
+I'm a lazy person...
