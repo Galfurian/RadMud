@@ -20,7 +20,6 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "commandGodMud.hpp"
-#include "heightMapper.hpp"
 #include "mapGenerator.hpp"
 #include "mud.hpp"
 
@@ -172,6 +171,7 @@ bool DoGenerateMap(Character * character, ArgumentHandler & args)
     int minMountainRadius = 5;
     int maxMountainRadius = 15;
     int numRivers = 0;
+    int minRiverDistance = 8;
     if (args.size() >= 1)
     {
         if (IsNumber(args[0].getContent()))
@@ -214,23 +214,27 @@ bool DoGenerateMap(Character * character, ArgumentHandler & args)
             numRivers = ToNumber<int>(args[5].getContent());
         }
     }
+    if (args.size() >= 7)
+    {
+        if (IsNumber(args[6].getContent()))
+        {
+            minRiverDistance = ToNumber<int>(args[6].getContent());
+        }
+    }
     MapGenerator mapGenerator;
     auto map = std::move(mapGenerator.generateMap(width,
                                                   height,
                                                   mountains,
                                                   minMountainRadius,
                                                   maxMountainRadius,
-                                                  numRivers));
-    HeightMapper heightMapper;
-    heightMapper.setNormalThresholds();
-    heightMapper.applyHeightMap(map);
+                                                  numRivers,
+                                                  minRiverDistance));
     std::string drawnMap;
     for (int y = 0; y < height; ++y)
     {
         for (int x = 0; x < width; ++x)
         {
             drawnMap += map.get(x, y).heightMap.toSymbol();
-//            drawnMap += ToString(static_cast<int>(map.get(x, y).height));
         }
         drawnMap += "\n";
     }
@@ -238,9 +242,9 @@ bool DoGenerateMap(Character * character, ArgumentHandler & args)
     character->sendMsg(Formatter::reset());
     character->sendMsg("The values where:\n");
     character->sendMsg("WDT:%s;  HGT:%s;  MNT:%s;  MIN_RAD:%s;  MAX_RAD:%s;  "
-                           "RIVERS:%s",
+                           "RIVERS:%s;  MIN_RIVER_DIST:%s",
                        width, height, mountains,
                        minMountainRadius, maxMountainRadius,
-                       numRivers);
+                       numRivers, minRiverDistance);
     return true;
 }

@@ -48,11 +48,9 @@ public:
     /// @brief Add the neighbours based on the given map.
     void addNeighbours(Map2D<MapCell> & map);
 
-    /// @brief Find all the nearby cells w.r.t. the policy (lowest/highest).
-    /// @param lowest If true it resturns the lowest cell, the highest
-    ///               otherwise.
+    /// @brief Find the lowest nearby cell.
     /// @return The found cell.
-    MapCell * findCellNearby(bool lowest);
+    MapCell * findLowestNearbyCell();
 
     /// @brief Equality operator.
     bool operator==(const MapCell & other) const;

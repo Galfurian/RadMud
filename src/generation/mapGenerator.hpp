@@ -37,7 +37,8 @@ public:
                                int numMountains,
                                int minMountainRadius,
                                int maxMountainRadius,
-                               int numRivers);
+                               int numRivers,
+                               int minRiverDistance);
 
 private:
     void dropMountain(Map2D<MapCell> & map,
@@ -46,7 +47,7 @@ private:
 
     void normalizeMap(Map2D<MapCell> & map);
 
-    void dropRiver(Map2D<MapCell> & map);
+    void dropRivers(Map2D<MapCell> & map, int numRivers, int minRiverDistance);
 
     void clearMap(Map2D<MapCell> & map);
 

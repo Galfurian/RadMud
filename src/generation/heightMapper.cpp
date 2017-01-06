@@ -40,25 +40,25 @@ void HeightMapper::addThreshold(const Threshold & threshold)
 void HeightMapper::setNormalThresholds()
 {
     thresholds.clear();
-    this->addThreshold(Threshold(1.5, HeightMap::DeepWater));
-    this->addThreshold(Threshold(2.0, HeightMap::ShallowWater));
-    this->addThreshold(Threshold(2.5, HeightMap::Coast));
-    this->addThreshold(Threshold(5.0, HeightMap::Plain));
-    this->addThreshold(Threshold(8.5, HeightMap::Hill));
-    this->addThreshold(Threshold(9.5, HeightMap::Mountain));
-    this->addThreshold(Threshold(10.0, HeightMap::HighMountain));
+    this->addThreshold(Threshold(15, HeightMap::DeepWater));
+    this->addThreshold(Threshold(20, HeightMap::ShallowWater));
+    this->addThreshold(Threshold(25, HeightMap::Coast));
+    this->addThreshold(Threshold(50, HeightMap::Plain));
+    this->addThreshold(Threshold(85, HeightMap::Hill));
+    this->addThreshold(Threshold(95, HeightMap::Mountain));
+    this->addThreshold(Threshold(100, HeightMap::HighMountain));
 }
 
 void HeightMapper::setIslandThresholds()
 {
     thresholds.clear();
-    this->addThreshold(Threshold(4.0, HeightMap::DeepWater));
-    this->addThreshold(Threshold(5.5, HeightMap::ShallowWater));
-    this->addThreshold(Threshold(6.0, HeightMap::Coast));
-    this->addThreshold(Threshold(8.0, HeightMap::Plain));
-    this->addThreshold(Threshold(8.5, HeightMap::Hill));
-    this->addThreshold(Threshold(9.5, HeightMap::Mountain));
-    this->addThreshold(Threshold(10.0, HeightMap::HighMountain));
+    this->addThreshold(Threshold(40, HeightMap::DeepWater));
+    this->addThreshold(Threshold(55, HeightMap::ShallowWater));
+    this->addThreshold(Threshold(60, HeightMap::Coast));
+    this->addThreshold(Threshold(80, HeightMap::Plain));
+    this->addThreshold(Threshold(85, HeightMap::Hill));
+    this->addThreshold(Threshold(95, HeightMap::Mountain));
+    this->addThreshold(Threshold(100, HeightMap::HighMountain));
 }
 
 void HeightMapper::applyHeightMap(Map2D<MapCell> & map)

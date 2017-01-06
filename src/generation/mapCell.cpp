@@ -60,16 +60,19 @@ void MapCell::addNeighbours(Map2D<MapCell> & map)
     }
 }
 
-MapCell * MapCell::findCellNearby(bool lowest)
+MapCell * MapCell::findLowestNearbyCell()
 {
     MapCell * selectedCell = this;
     for (auto neighbour : neighbours)
     {
-        if (((neighbour->height < selectedCell->height) && !lowest) ||
-            ((neighbour->height > selectedCell->height) && lowest))
+        if (neighbour->height < selectedCell->height)
         {
             selectedCell = neighbour;
         }
+    }
+    if (selectedCell == this)
+    {
+
     }
     return selectedCell;
 }

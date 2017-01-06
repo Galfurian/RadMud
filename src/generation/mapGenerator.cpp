@@ -20,7 +20,9 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "mapGenerator.hpp"
+#include "heightMapper.hpp"
 #include "utils.hpp"
+#include "area.hpp"
 
 MapGenerator::MapGenerator()
 {
@@ -32,7 +34,8 @@ Map2D<MapCell> MapGenerator::generateMap(int width,
                                          int numMountains,
                                          int minMountainRadius,
                                          int maxMountainRadius,
-                                         int numRivers)
+                                         int numRivers,
+                                         int minRiverDistance)
 {
     // Prepare the map.
     Map2D<MapCell> map(width, height, MapCell());
@@ -52,10 +55,12 @@ Map2D<MapCell> MapGenerator::generateMap(int width,
     }
     // Normalize the map in order to have values between 0 and 1.
     this->normalizeMap(map);
-    for (int i = 0; i < numRivers; ++i)
-    {
-        this->dropRiver(map);
-    }
+    // Apply the heights to the map.
+    HeightMapper heightMapper;
+    heightMapper.setNormalThresholds();
+    heightMapper.applyHeightMap(map);
+    // Drop the rivers.
+    this->dropRivers(map, numRivers, minRiverDistance);
     return map;
 }
 
@@ -115,45 +120,98 @@ void MapGenerator::normalizeMap(Map2D<MapCell> & map)
             for (int y = 0; y < map.getHeight(); ++y)
             {
                 map.get(x, y).height = this->normalize(map.get(x, y).height,
-                                                        minHeight, maxHeight,
-                                                        0.0, 10.0);
+                                                       minHeight, maxHeight,
+                                                       0.0, 100.0);
             }
         }
     }
 }
 
-void MapGenerator::dropRiver(Map2D<MapCell> & map)
+void MapGenerator::dropRivers(Map2D<MapCell> & map,
+                              int numRivers,
+                              int minRiverDistance)
 {
-    MapCell currentCell;
-    // Find the highest cell.
+    std::list<MapCell *> startingPoints;
+    // Lamba used to check if a cell is far away from pre-existing starting
+    // points and if it is a mountain.
+    auto IsSuitable = [&](MapCell * cell)
+    {
+        if (cell->heightMap != HeightMap::Mountain)
+        {
+            return false;
+        }
+        for (auto point : startingPoints)
+        {
+            auto distance = Area::getDistance(cell->coordinates,
+                                              point->coordinates);
+            if (distance <= minRiverDistance)
+            {
+                return false;
+            }
+        }
+        return true;
+    };
+    // Retrieve all the starting points for rivers.
     for (auto x = 0; x < map.getWidth(); ++x)
     {
         for (auto y = 0; y < map.getHeight(); ++y)
         {
-            auto cell = map.get(x, y);
-            if (cell.height > currentCell.height)
+            auto cell = &map.get(x, y);
+            if (IsSuitable(cell))
             {
-                currentCell = cell;
+                startingPoints.emplace_back(cell);
             }
         }
     }
-    // Prepare a vector of cells for the river.
-    std::vector<MapCell *> riverPath;
-    while (true)
+    auto iterations = std::min(static_cast<size_t >(numRivers),
+                               startingPoints.size());
+    // Prepare a vector for the rivers.
+    std::vector<std::vector<MapCell *>> rivers;
+    for (unsigned int it = 0; it < iterations; ++it)
     {
-        // Get the lowest nearby cell.
-        auto nextCell = currentCell.findCellNearby(false);
-        // Check if the lowest is the current cell itself.
-        if (nextCell->coordinates == currentCell.coordinates) break;
-        // Add the next cell to the path of the river.
-        riverPath.push_back(nextCell);
-        // Set the current cell to the next cell.
-        currentCell = *nextCell;
+        // Prepare a vector for the river.
+        std::vector<MapCell *> river;
+        // Set the starting cell.
+        MapCell * cell = startingPoints.front();
+        startingPoints.pop_front();
+        // Add the starting cell to the river.
+        river.push_back(cell);
+        while (true)
+        {
+            // Get the lowest nearby cell.
+            auto nextCell = cell->findLowestNearbyCell();
+            // Check if the lowest is the current cell itself.
+            if (nextCell->coordinates == cell->coordinates)
+            {
+                break;
+            }
+            if ((nextCell->heightMap == HeightMap::ShallowWater) ||
+                (nextCell->heightMap == HeightMap::DeepWater))
+            {
+                break;
+            }
+            // Add the next cell to the path of the river.
+            river.push_back(nextCell);
+            // Set the current cell to the next cell.
+            cell = nextCell;
+        }
+        rivers.emplace_back(river);
     }
     // Modify the height of the river.
-    for (auto nextCell : riverPath)
+    for (auto river : rivers)
     {
-        nextCell->height = -10;
+        for (auto it = river.begin(); it != river.end(); ++it)
+        {
+            auto cell = (*it);
+            if (it == river.begin())
+            {
+                cell->height = 0;
+                cell->heightMap = HeightMap::DeepWater;
+                continue;
+            }
+            cell->height -= 1;
+            cell->heightMap = HeightMap::ShallowWater;
+        }
     }
 }
 
