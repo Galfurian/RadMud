@@ -100,12 +100,32 @@ std::string HeightMap::toSymbol(bool color) const
     }
 }
 
-bool HeightMap::operator==(const HeightMap::Enum & rhs) const
+bool HeightMap::operator==(const HeightMap & rhs) const
 {
-    return height == rhs;
+    return height == rhs.height;
 }
 
-bool HeightMap::operator!=(const HeightMap::Enum & rhs) const
+bool HeightMap::operator!=(const HeightMap & rhs) const
 {
-    return height != rhs;
+    return height != rhs.height;
+}
+
+bool HeightMap::operator>(const HeightMap & rhs) const
+{
+    return height > rhs.height;
+}
+
+bool HeightMap::operator>=(const HeightMap & rhs) const
+{
+    return height >= rhs.height;
+}
+
+bool HeightMap::operator<(const HeightMap & rhs) const
+{
+    return height < rhs.height;
+}
+
+bool HeightMap::operator<=(const HeightMap & rhs) const
+{
+    return height <= rhs.height;
 }

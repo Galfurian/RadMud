@@ -11,5 +11,6 @@ set(PROJECT_SRC ${PROJECT_SRC}
         ${CMAKE_SOURCE_DIR}/src/generation/mapCell.cpp
         ${CMAKE_SOURCE_DIR}/src/generation/mapGenerator.cpp
         ${CMAKE_SOURCE_DIR}/src/generation/heightMapper.cpp
+        ${CMAKE_SOURCE_DIR}/src/generation/mapGeneratorConfiguration.cpp
         PARENT_SCOPE
         )

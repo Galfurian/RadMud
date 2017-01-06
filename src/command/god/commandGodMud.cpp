@@ -166,13 +166,7 @@ bool DoSkillList(Character * character, ArgumentHandler & /*args*/)
 bool DoGenerateMap(Character * character, ArgumentHandler & args)
 {
     MapGeneratorConfiguration configuration;
-    configuration.width = 60;
-    configuration.height = 30;
-    configuration.numMountains = 50;
-    configuration.minMountainRadius = 5;
-    configuration.maxMountainRadius = 15;
-    configuration.numRivers = 0;
-    configuration.minRiverDistance = 8;
+    HeightMapper heightMapper;
     if (args.size() >= 1)
     {
         if (IsNumber(args[0].getContent()))
@@ -225,17 +219,21 @@ bool DoGenerateMap(Character * character, ArgumentHandler & args)
                 args[6].getContent());
         }
     }
-    MapGenerator mapGenerator(configuration);
+    // Instantiate the map generator.
+    MapGenerator mapGenerator(configuration, heightMapper);
+    // Generate the map.
     auto map = mapGenerator.generateMap();
+    // Draw the map.
     std::string drawnMap;
     for (int y = 0; y < map.getHeight(); ++y)
     {
         for (int x = 0; x < map.getWidth(); ++x)
         {
-            drawnMap += map.get(x, y).heightMap.toSymbol();
+            drawnMap += map.get(x, y).getTile();
         }
         drawnMap += "\n";
     }
+    // First send the configuration.
     character->sendMsg(configuration.toString());
     character->sendMsg(drawnMap);
     character->sendMsg(Formatter::reset());

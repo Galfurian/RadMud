@@ -1,6 +1,6 @@
-/// @file   mapGenerator.hpp
+/// @file   mapGeneratorConfiguration.cpp
 /// @author Enrico Fraccaroli
-/// @date   Jan 05 2017
+/// @date   Jan 06 2017
 /// @copyright
 /// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -19,44 +19,34 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#pragma once
-
-#include "mapCell.hpp"
-#include "map2D.hpp"
-#include "utils.hpp"
-#include "heightMapper.hpp"
-#include <memory>
 #include "mapGeneratorConfiguration.hpp"
+#include "utils.hpp"
 
-class MapGenerator
+MapGeneratorConfiguration::MapGeneratorConfiguration() :
+    width(60),
+    height(30),
+    numMountains(50),
+    minMountainRadius(5),
+    maxMountainRadius(15),
+    numRivers(2),
+    minRiverDistance(8),
+    numForests(2),
+    minForestDistance(8)
 {
-public:
-    /// Generator configuration.
-    MapGeneratorConfiguration configuration;
-    /// Height mapper.
-    HeightMapper heightMapper;
+    // Nothing to do.
+}
 
-    /// @brief Constructor.
-    MapGenerator(const MapGeneratorConfiguration & _configuration,
-                 const HeightMapper & _heightMapper);
-
-    /// @brief Generates a new map.
-    Map2D<MapCell> generateMap();
-
-private:
-    void dropMountain(Map2D<MapCell> & map);
-
-    void normalizeMap(Map2D<MapCell> & map);
-
-    void dropRivers(Map2D<MapCell> & map);
-
-    void addForests(Map2D<MapCell> & map);
-
-    void clearMap(Map2D<MapCell> & map);
-
-    inline double normalize(double value,
-                            double LbFrom,
-                            double UbFrom,
-                            double LbTo,
-                            double UbTo) const;
-};
+std::string MapGeneratorConfiguration::toString() const
+{
+    std::string output;
+    output += "Width             :" + ToString(width) + ";\n";
+    output += "Height            :" + ToString(height) + ";\n";
+    output += "NumMountains      :" + ToString(numMountains) + ";\n";
+    output += "MinMountainRadius :" + ToString(minMountainRadius) + ";\n";
+    output += "MaxMountainRadius :" + ToString(maxMountainRadius) + ";\n";
+    output += "NumRivers         :" + ToString(numRivers) + ";\n";
+    output += "MinRiverDistance  :" + ToString(minRiverDistance) + ";\n";
+    output += "NumForests        :" + ToString(numForests) + ";\n";
+    output += "MinForestDistance :" + ToString(minForestDistance) + ";\n";
+    return output;
+}

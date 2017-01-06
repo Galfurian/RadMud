@@ -20,12 +20,13 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "mapGenerator.hpp"
-#include "heightMapper.hpp"
-#include "utils.hpp"
+#include "formatter.hpp"
 #include "area.hpp"
 
-MapGenerator::MapGenerator(const MapGeneratorConfiguration & _configuration) :
-    configuration(_configuration)
+MapGenerator::MapGenerator(const MapGeneratorConfiguration & _configuration,
+                           const HeightMapper & _heightMapper) :
+    configuration(_configuration),
+    heightMapper(_heightMapper)
 {
     // Nothing to do.
 }
@@ -51,11 +52,11 @@ Map2D<MapCell> MapGenerator::generateMap()
     // Normalize the map in order to have values between 0 and 1.
     this->normalizeMap(map);
     // Apply the heights to the map.
-    HeightMapper heightMapper;
-    heightMapper.setNormalThresholds();
     heightMapper.applyHeightMap(map);
     // Drop the rivers.
     this->dropRivers(map);
+    // Add the forests.
+    this->addForests(map);
     return map;
 }
 
@@ -123,12 +124,14 @@ void MapGenerator::normalizeMap(Map2D<MapCell> & map)
 
 void MapGenerator::dropRivers(Map2D<MapCell> & map)
 {
+    // List of possible starting points for a river.
     std::list<MapCell *> startingPoints;
     // Lamba used to check if a cell is far away from pre-existing starting
     // points and if it is a mountain.
     auto IsSuitable = [&](MapCell * cell)
     {
-        if (cell->heightMap != HeightMap::Mountain)
+        if ((cell->heightMap != HeightMap::Mountain) &&
+            (cell->heightMap != HeightMap::HighMountain))
         {
             return false;
         }
@@ -149,12 +152,14 @@ void MapGenerator::dropRivers(Map2D<MapCell> & map)
         for (auto y = 0; y < map.getHeight(); ++y)
         {
             auto cell = &map.get(x, y);
+            // Check if it is a suitable cell.
             if (IsSuitable(cell))
             {
                 startingPoints.emplace_back(cell);
             }
         }
     }
+    // Number of dropped rivers.
     auto iterations = std::min(static_cast<size_t >(configuration.numRivers),
                                startingPoints.size());
     // Prepare a vector for the rivers.
@@ -173,10 +178,8 @@ void MapGenerator::dropRivers(Map2D<MapCell> & map)
             // Get the lowest nearby cell.
             auto nextCell = cell->findLowestNearbyCell();
             // Check if the lowest is the current cell itself.
-            if (nextCell->coordinates == cell->coordinates)
-            {
-                break;
-            }
+            if (nextCell->coordinates == cell->coordinates) break;
+            // If water is reached stop.
             if ((nextCell->heightMap == HeightMap::ShallowWater) ||
                 (nextCell->heightMap == HeightMap::DeepWater))
             {
@@ -189,7 +192,7 @@ void MapGenerator::dropRivers(Map2D<MapCell> & map)
         }
         rivers.emplace_back(river);
     }
-    // Modify the height of the river.
+    // Drop the rivers on the map.
     for (auto river : rivers)
     {
         for (auto it = river.begin(); it != river.end(); ++it)
@@ -207,6 +210,48 @@ void MapGenerator::dropRivers(Map2D<MapCell> & map)
     }
 }
 
+void MapGenerator::addForests(Map2D<MapCell> & map)
+{
+    // List of locations for forests.
+    std::list<MapCell *> forestDropPoints;
+    // Lamba used to check if a cell is far away from pre-existing drop points
+    // and if it is nearby a source of water.
+    auto IsSuitable = [&](MapCell * cell)
+    {
+        // Check if the cell is a Plain|Hill|Mountain.
+        if ((cell->heightMap != HeightMap::Plain) &&
+            (cell->heightMap != HeightMap::Hill) &&
+            (cell->heightMap != HeightMap::Mountain))
+        {
+            return false;
+        }
+        // Check the distance from another forest drop point.
+        for (auto point : forestDropPoints)
+        {
+            auto distance = Area::getDistance(cell->coordinates,
+                                              point->coordinates);
+            if (distance <= configuration.minForestDistance)
+            {
+                return false;
+            }
+        }
+        return false;
+    };
+    // Retrieve all the starting points for rivers.
+    for (auto x = 0; x < map.getWidth(); ++x)
+    {
+        for (auto y = 0; y < map.getHeight(); ++y)
+        {
+            auto cell = &map.get(x, y);
+            // Check if it is a suitable cell.
+            if (IsSuitable(cell))
+            {
+                forestDropPoints.emplace_back(cell);
+            }
+        }
+    }
+}
+
 void MapGenerator::clearMap(Map2D<MapCell> & map)
 {
     for (int x = 0; x < map.getWidth(); ++x)
@@ -218,11 +263,8 @@ void MapGenerator::clearMap(Map2D<MapCell> & map)
     }
 }
 
-double MapGenerator::normalize(double value,
-                               double LbFrom,
-                               double UbFrom,
-                               double LbTo,
-                               double UbTo) const
+double MapGenerator::normalize(double value, double LbFrom, double UbFrom,
+                               double LbTo, double UbTo) const
 {
     return (((UbTo - LbTo) * (value - LbFrom)) / ((UbFrom - LbFrom))) + LbTo;
 }

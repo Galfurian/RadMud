@@ -58,11 +58,23 @@ public:
     /// @brief Returns the height as a symbol.
     std::string toSymbol(bool color = true) const;
 
-    /// @brief Eheight operator w.r.t. a height enum.
-    bool operator==(const HeightMap::Enum & rhs) const;
+    /// @brief Equality operator w.r.t. a height enum.
+    bool operator==(const HeightMap & rhs) const;
 
-    /// @brief Ineheight operator w.r.t. a height enum.
-    bool operator!=(const HeightMap::Enum & rhs) const;
+    /// @brief Inequality operator w.r.t. a height enum.
+    bool operator!=(const HeightMap & rhs) const;
+
+    /// @brief Greater operator w.r.t. a height enum.
+    bool operator>(const HeightMap & rhs) const;
+
+    /// @brief Greater-Equal operator w.r.t. a height enum.
+    bool operator>=(const HeightMap & rhs) const;
+
+    /// @brief Lesser operator w.r.t. a height enum.
+    bool operator<(const HeightMap & rhs) const;
+
+    /// @brief Lesser-Equal operator w.r.t. a height enum.
+    bool operator<=(const HeightMap & rhs) const;
 
 private:
     /// Internal height value.

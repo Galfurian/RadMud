@@ -22,63 +22,54 @@
 #include "heightMapper.hpp"
 #include <algorithm>
 
-HeightMapper::HeightMapper()
+HeightMapper::HeightMapper() :
+    thresholdMap()
 {
-    // Nothing to do.
+    this->reset();
 }
 
-void HeightMapper::addThreshold(const Threshold & threshold)
+void HeightMapper::reset()
 {
-    thresholds.emplace_back(threshold);
-    auto SortThreshold = [](const Threshold & left, const Threshold & right)
+    thresholdMap[HeightMap::DeepWater] = 15;
+    thresholdMap[HeightMap::ShallowWater] = 20;
+    thresholdMap[HeightMap::Coast] = 25;
+    thresholdMap[HeightMap::Plain] = 50;
+    thresholdMap[HeightMap::Hill] = 85;
+    thresholdMap[HeightMap::Mountain] = 95;
+    thresholdMap[HeightMap::HighMountain] = 100;
+}
+
+HeightMap HeightMapper::getHeightMap(const double & height)
+{
+    for (auto it : thresholdMap)
     {
-        return left.threshold < right.threshold;
-    };
-    std::sort(thresholds.begin(), thresholds.end(), SortThreshold);
+        if (height <= it.second)
+        {
+            return it.first;
+        }
+    }
+    return HeightMap::Void;
 }
 
-void HeightMapper::setNormalThresholds()
+double HeightMapper::getThreshold(const HeightMap & heightMap)
 {
-    thresholds.clear();
-    this->addThreshold(Threshold(15, HeightMap::DeepWater));
-    this->addThreshold(Threshold(20, HeightMap::ShallowWater));
-    this->addThreshold(Threshold(25, HeightMap::Coast));
-    this->addThreshold(Threshold(50, HeightMap::Plain));
-    this->addThreshold(Threshold(85, HeightMap::Hill));
-    this->addThreshold(Threshold(95, HeightMap::Mountain));
-    this->addThreshold(Threshold(100, HeightMap::HighMountain));
-}
-
-void HeightMapper::setIslandThresholds()
-{
-    thresholds.clear();
-    this->addThreshold(Threshold(40, HeightMap::DeepWater));
-    this->addThreshold(Threshold(55, HeightMap::ShallowWater));
-    this->addThreshold(Threshold(60, HeightMap::Coast));
-    this->addThreshold(Threshold(80, HeightMap::Plain));
-    this->addThreshold(Threshold(85, HeightMap::Hill));
-    this->addThreshold(Threshold(95, HeightMap::Mountain));
-    this->addThreshold(Threshold(100, HeightMap::HighMountain));
+    for (auto it : thresholds)
+    {
+        if (it.heightMap == heightMap)
+        {
+            return it.threshold;
+        }
+    }
+    return thresholdMap[HeightMap::HighMountain];
 }
 
 void HeightMapper::applyHeightMap(Map2D<MapCell> & map)
 {
-    if (thresholds.empty())
-    {
-        this->setNormalThresholds();
-    }
     for (auto x = 0; x < map.getWidth(); ++x)
     {
         for (auto y = 0; y < map.getHeight(); ++y)
         {
-            for (auto it : thresholds)
-            {
-                if (map.get(x, y).height <= it.threshold)
-                {
-                    map.get(x, y).heightMap = it.heightMap;
-                    break;
-                }
-            }
+            map.get(x, y).heightMap = this->getHeightMap(map.get(x, y).height);
         }
     }
 }

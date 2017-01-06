@@ -37,6 +37,8 @@ public:
     HeightMap heightMap;
     /// List of neighbours.
     std::vector<MapCell *> neighbours;
+    /// Specific content.
+    std::string content;
 
     /// @brief Constructor.
     MapCell();
@@ -51,6 +53,8 @@ public:
     /// @brief Find the lowest nearby cell.
     /// @return The found cell.
     MapCell * findLowestNearbyCell();
+
+    std::string getTile() const;
 
     /// @brief Equality operator.
     bool operator==(const MapCell & other) const;

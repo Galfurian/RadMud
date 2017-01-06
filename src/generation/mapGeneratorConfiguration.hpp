@@ -1,6 +1,6 @@
-/// @file   mapGenerator.hpp
+/// @file   mapGeneratorConfiguration.hpp
 /// @author Enrico Fraccaroli
-/// @date   Jan 05 2017
+/// @date   Jan 06 2017
 /// @copyright
 /// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -21,42 +21,22 @@
 
 #pragma once
 
-#include "mapCell.hpp"
-#include "map2D.hpp"
-#include "utils.hpp"
-#include "heightMapper.hpp"
-#include <memory>
-#include "mapGeneratorConfiguration.hpp"
+#include <string>
 
-class MapGenerator
+class MapGeneratorConfiguration
 {
 public:
-    /// Generator configuration.
-    MapGeneratorConfiguration configuration;
-    /// Height mapper.
-    HeightMapper heightMapper;
+    int width;
+    int height;
+    int numMountains;
+    int minMountainRadius;
+    int maxMountainRadius;
+    int numRivers;
+    int minRiverDistance;
+    int numForests;
+    int minForestDistance;
 
-    /// @brief Constructor.
-    MapGenerator(const MapGeneratorConfiguration & _configuration,
-                 const HeightMapper & _heightMapper);
+    MapGeneratorConfiguration();
 
-    /// @brief Generates a new map.
-    Map2D<MapCell> generateMap();
-
-private:
-    void dropMountain(Map2D<MapCell> & map);
-
-    void normalizeMap(Map2D<MapCell> & map);
-
-    void dropRivers(Map2D<MapCell> & map);
-
-    void addForests(Map2D<MapCell> & map);
-
-    void clearMap(Map2D<MapCell> & map);
-
-    inline double normalize(double value,
-                            double LbFrom,
-                            double UbFrom,
-                            double LbTo,
-                            double UbTo) const;
+    std::string toString() const;
 };

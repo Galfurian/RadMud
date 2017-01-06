@@ -55,18 +55,22 @@ class HeightMapper
 private:
     /// The current thresholds.
     std::vector<Threshold> thresholds;
+    std::map<HeightMap, double> thresholdMap;
 
 public:
+    /// @brief Constructor.
     HeightMapper();
 
-    void addThreshold(const Threshold & threshold);
+    /// @brief Reset the thresholds to default values.
+    void reset();
 
-    void setNormalThresholds();
+    /// @brief Returns the HeightMap associated with the given height w.r.t.
+    /// the current thresholds.
+    HeightMap getHeightMap(const double & height);
 
-    void setIslandThresholds();
+    /// @brief Returns the threshold associated with the given HeightMap w.r.t.
+    /// the current set thresholds.
+    double getThreshold(const HeightMap & heightMap);
 
     void applyHeightMap(Map2D<MapCell> & map);
-
-//    std::string getTypeByElevation(double elevation);
-
 };
