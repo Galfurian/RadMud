@@ -28,15 +28,23 @@ MapGenerator::MapGenerator()
     // Nothing to do.
 }
 
-Map2D<double> MapGenerator::generateMap(int width,
-                                        int height,
-                                        int numMountains,
-                                        int minMountainRadius,
-                                        int maxMountainRadius,
-                                        int numRivers)
+Map2D<MapCell> MapGenerator::generateMap(int width,
+                                         int height,
+                                         int numMountains,
+                                         int minMountainRadius,
+                                         int maxMountainRadius,
+                                         int numRivers)
 {
     // Prepare the map.
-    Map2D<double> map(width, height, 0.0);
+    Map2D<MapCell> map(width, height, MapCell());
+    // Initialize the map cells.
+    for (auto x = 0; x < width; ++x)
+    {
+        for (auto y = 0; y < height; ++y)
+        {
+            map.get(x, y).coordinates = Coordinates(x, y, 0);
+        }
+    }
     // Drop the mountains.
     for (int i = 0; i < numMountains; ++i)
     {
@@ -52,7 +60,7 @@ Map2D<double> MapGenerator::generateMap(int width,
     return map;
 }
 
-void MapGenerator::dropMountain(Map2D<double> & map,
+void MapGenerator::dropMountain(Map2D<MapCell> & map,
                                 int minMountainRadius,
                                 int maxMountainRadius)
 {
@@ -80,13 +88,13 @@ void MapGenerator::dropMountain(Map2D<double> & map,
             // Set the height value on the map.
             if (cellHeight > 0)
             {
-                map.set(x, y, map.get(x, y) + cellHeight);
+                map.get(x, y).height += cellHeight;
             }
         }
     }
 }
 
-void MapGenerator::normalizeMap(Map2D<double> & map)
+void MapGenerator::normalizeMap(Map2D<MapCell> & map)
 {
     auto minHeight = 0.0, maxHeight = 0.0;
     // Find the minimum and maximum heights.
@@ -94,7 +102,7 @@ void MapGenerator::normalizeMap(Map2D<double> & map)
     {
         for (auto y = 0; y < map.getHeight(); ++y)
         {
-            auto cellHeight = map.get(x, y);
+            auto cellHeight = map.get(x, y).height;
             if (cellHeight < minHeight) minHeight = cellHeight;
             if (cellHeight > maxHeight) maxHeight = cellHeight;
         }
@@ -107,14 +115,15 @@ void MapGenerator::normalizeMap(Map2D<double> & map)
         {
             for (int y = 0; y < map.getHeight(); ++y)
             {
-                map.set(x, y,
-                        (map.get(x, y) - minHeight) / (maxHeight - minHeight));
+                map.get(x, y).height =
+                    (map.get(x, y).height - minHeight) /
+                    (maxHeight - minHeight);
             }
         }
     }
 }
 
-void MapGenerator::dropRiver(Map2D<double> & map)
+void MapGenerator::dropRiver(Map2D<MapCell> & map)
 {
     int xSource = 0, ySource = 0;
     double heightSource = 0.0;
@@ -126,7 +135,7 @@ void MapGenerator::dropRiver(Map2D<double> & map)
         double nextHeight = currentHeight;
         if (currentX - 1 > 0) // West
         {
-            auto h = map.get(currentX - 1, currentY);
+            auto h = map.get(currentX - 1, currentY).height;
             if (h < nextHeight)
             {
                 nextX = currentX - 1;
@@ -136,7 +145,7 @@ void MapGenerator::dropRiver(Map2D<double> & map)
         }
         if (currentX + 1 < map.getWidth()) // East
         {
-            auto h = map.get(currentX + 1, currentY);
+            auto h = map.get(currentX + 1, currentY).height;
             if (h < nextHeight)
             {
                 nextX = currentX + 1;
@@ -146,7 +155,7 @@ void MapGenerator::dropRiver(Map2D<double> & map)
         }
         if (currentY - 1 > 0) // South
         {
-            auto h = map.get(currentX, currentY - 1);
+            auto h = map.get(currentX, currentY - 1).height;
             if (h < nextHeight)
             {
                 nextX = currentX;
@@ -156,7 +165,7 @@ void MapGenerator::dropRiver(Map2D<double> & map)
         }
         if (currentY + 1 < map.getHeight()) // North
         {
-            auto h = map.get(currentX, currentY + 1);
+            auto h = map.get(currentX, currentY + 1).height;
             if (h < nextHeight)
             {
                 nextX = currentX;
@@ -170,7 +179,7 @@ void MapGenerator::dropRiver(Map2D<double> & map)
     {
         for (auto y = 0; y < map.getHeight(); ++y)
         {
-            auto cellHeight = map.get(x, y);
+            auto cellHeight = map.get(x, y).height;
             if (cellHeight > heightSource)
             {
                 xSource = x;
@@ -185,7 +194,7 @@ void MapGenerator::dropRiver(Map2D<double> & map)
     {
         auto nextCell = SearchNextCell(currentX,
                                        currentY,
-                                       map.get(currentX, currentY));
+                                       map.get(currentX, currentY).height);
         riverPath.push_back(nextCell);
         if ((nextCell.first == currentX) && (nextCell.second == currentY))
         {
@@ -196,17 +205,17 @@ void MapGenerator::dropRiver(Map2D<double> & map)
     }
     for (auto nextCell :riverPath)
     {
-        map.set(nextCell.first, nextCell.second, -10);
+        map.get(nextCell.first, nextCell.second).height = -10;
     }
 }
 
-void MapGenerator::clearMap(Map2D<double> & map)
+void MapGenerator::clearMap(Map2D<MapCell> & map)
 {
     for (int x = 0; x < map.getWidth(); ++x)
     {
         for (int y = 0; y < map.getHeight(); ++y)
         {
-            map.set(x, y, 0.0);
+            map.get(x, y).height = 0.0;
         }
     }
 }

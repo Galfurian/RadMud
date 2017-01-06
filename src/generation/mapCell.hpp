@@ -33,6 +33,9 @@ public:
     double height;
 
     /// @brief Constructor.
+    MapCell();
+
+    /// @brief Constructor.
     MapCell(const Coordinates & _coordinates,
             const double & _height);
 };

@@ -21,6 +21,13 @@
 
 #include "mapCell.hpp"
 
+MapCell::MapCell() :
+    coordinates(),
+    height()
+{
+    // Nothing to do.
+}
+
 MapCell::MapCell(const Coordinates & _coordinates,
                  const double & _height) :
     coordinates(_coordinates),

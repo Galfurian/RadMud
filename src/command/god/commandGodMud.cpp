@@ -226,7 +226,7 @@ bool DoGenerateMap(Character * character, ArgumentHandler & args)
     {
         for (int x = 0; x < width; ++x)
         {
-            drawnMap += heightMapper.getTypeByElevation(map.get(x, y));
+            drawnMap += heightMapper.getTypeByElevation(map.get(x, y).height);
         }
         drawnMap += "\n";
     }

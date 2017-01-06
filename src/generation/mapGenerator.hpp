@@ -32,7 +32,7 @@ public:
     MapGenerator();
 
     /// @brief Generates a new map.
-    Map2D<double> generateMap(int width,
+    Map2D<MapCell> generateMap(int width,
                               int height,
                               int numMountains,
                               int minMountainRadius,
@@ -40,13 +40,13 @@ public:
                               int numRivers);
 
 private:
-    void dropMountain(Map2D<double> & map,
+    void dropMountain(Map2D<MapCell> & map,
                       int minMountainRadius,
                       int maxMountainRadius);
 
-    void normalizeMap(Map2D<double> & map);
+    void normalizeMap(Map2D<MapCell> & map);
 
-    void dropRiver(Map2D<double> & map);
+    void dropRiver(Map2D<MapCell> & map);
 
-    void clearMap(Map2D<double> & map);
+    void clearMap(Map2D<MapCell> & map);
 };
