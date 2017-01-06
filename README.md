@@ -16,8 +16,10 @@
 ## Introduction
 The idea is to create a Multi User Dungeon (MUD) set in a post-nuclear world.
 Right now there is a minimal content since all the development effort is used to implement new features.
-The philosophy behind each choice is to **make the MUD as much customizable as possible** from players and **easily**.
-Also the idea is to provide to a Master the means to prepare quests, create special NPCs and so forth, online, without re-starting the MUD. This feature is **already implemented**, by means of a **lua interface** with the structures of the MUD. Such scripts have access to the information about the objects/npcs/rooms through specific functions, **preventing any misuse or mistake**. Furthermore, the idea is to implement an **easy** and enjoyable **ranged combat**.
+The philosophy behind each choice is to **make the MUD as much customizable as possible** (and **easily**) from players.
+Also the idea is to provide to a Master the means to prepare quests, create special NPCs and so forth, online without re-starting the MUD.
+This feature is **already implemented**, by means of a **lua interface** with the structures of the MUD.
+Such scripts have access to the information about the objects/npcs/rooms through specific functions, **preventing any misuse or mistake**.
 
 ## Features
 Follow the **main features** which are currently implemented
@@ -55,3 +57,11 @@ The mud can be accessed using telnet with the port **4000**.
 ```
 telnet localhost 4000
 ```
+## Login as a Divinity
+The credentials used to log in as a divinity are:
+
+User: **asd**
+
+Pwd : **asd**
+
+I'm a lazy person...
