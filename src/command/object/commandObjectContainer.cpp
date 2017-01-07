@@ -29,6 +29,12 @@
 
 bool DoOrganize(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     // Check if the room is lit.
@@ -107,6 +113,12 @@ bool DoOrganize(Character * character, ArgumentHandler & args)
 
 bool DoOpen(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     // Check the arguments.
@@ -256,6 +268,12 @@ bool DoOpen(Character * character, ArgumentHandler & args)
 
 bool DoClose(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     // Check the arguments.
@@ -411,6 +429,12 @@ bool DoClose(Character * character, ArgumentHandler & args)
 
 bool DoTurn(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     // Check the number of arguments.
@@ -498,6 +522,12 @@ bool DoTurn(Character * character, ArgumentHandler & args)
 
 bool DoRefill(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     // Check the number of arguments.

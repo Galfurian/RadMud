@@ -23,7 +23,6 @@
 // Basic Include.
 #include "command.hpp"
 #include "mud.hpp"
-
 #include "combat.hpp"
 #include "communication.hpp"
 #include "crafting.hpp"
@@ -32,6 +31,7 @@
 #include "commandObject.hpp"
 #include "logger.hpp"
 #include "commandGod.hpp"
+#include "movement.hpp"
 
 Command::Command() :
     handler(),
@@ -87,6 +87,7 @@ void LoadCommands()
     //  execution of the Mud, but...
     // If a player just types 'l' or 'lo' in order to 'look'
     //  the first command which get hit is the 'load' command.
+    LoadMovementCommands();
     LoadGeneralCommands();
     LoadObjectCommands();
     LoadCommunicationCommands();

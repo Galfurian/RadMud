@@ -27,6 +27,12 @@
 
 bool DoDrink(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     if (args.empty())
@@ -134,6 +140,12 @@ bool DoDrink(Character * character, ArgumentHandler & args)
 
 bool DoFill(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     // Check the arguments.
@@ -278,6 +290,12 @@ bool DoFill(Character * character, ArgumentHandler & args)
 
 bool DoPour(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     // Check the arguments.

@@ -26,6 +26,12 @@
 
 bool DoTake(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     if ((args.size() != 1) && (args.size() != 2))
@@ -372,6 +378,12 @@ bool DoTake(Character * character, ArgumentHandler & args)
 
 bool DoDrop(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     // Check the number of arguments.
@@ -480,6 +492,12 @@ bool DoDrop(Character * character, ArgumentHandler & args)
 
 bool DoPut(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     if (args.size() != 2)
@@ -636,6 +654,12 @@ bool DoPut(Character * character, ArgumentHandler & args)
 
 bool DoGive(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     // Check the number of arguments.

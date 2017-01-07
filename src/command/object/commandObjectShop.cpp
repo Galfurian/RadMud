@@ -30,6 +30,12 @@
 
 bool DoDeposit(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     // Check the number of arguments.
@@ -90,6 +96,12 @@ bool DoDeposit(Character * character, ArgumentHandler & args)
 
 bool DoBuy(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     // Check the number of arguments.
@@ -242,6 +254,12 @@ bool DoBuy(Character * character, ArgumentHandler & args)
 
 bool DoSell(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     // Check the number of arguments.
@@ -376,6 +394,12 @@ bool DoSell(Character * character, ArgumentHandler & args)
 
 bool DoBalance(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Check the number of arguments.
     if (!args.empty())
     {

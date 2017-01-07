@@ -69,6 +69,12 @@ void LoadCombatCommands()
 
 bool DoKill(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     // If there are no arguments, show the room.
@@ -189,6 +195,12 @@ bool DoFlee(Character * character, ArgumentHandler & /*args*/)
 
 bool DoScout(Character * character, ArgumentHandler & /*args*/)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     auto newAction = std::make_shared<ScoutAction>(character);
@@ -208,6 +220,12 @@ bool DoScout(Character * character, ArgumentHandler & /*args*/)
 
 bool DoLoad(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     if (args.size() != 2)
@@ -278,6 +296,12 @@ bool DoLoad(Character * character, ArgumentHandler & args)
 
 bool DoUnload(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     if (args.size() != 1)
@@ -331,6 +355,12 @@ bool DoUnload(Character * character, ArgumentHandler & args)
 
 bool DoReload(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     if (args.size() != 2)
@@ -398,6 +428,12 @@ bool DoReload(Character * character, ArgumentHandler & args)
 
 bool DoAim(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     if (args.size() != 1)
@@ -459,6 +495,12 @@ bool DoAim(Character * character, ArgumentHandler & args)
 
 bool DoFire(Character * character, ArgumentHandler & /*args*/)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     // Check if the pointer to the aimed target is still valid.

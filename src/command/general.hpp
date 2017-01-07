@@ -32,12 +32,6 @@ void LoadGeneralCommands();
 ///         can execute.
 /// @{
 
-/// Execute character movement.
-bool DoDirection(Character * character, Direction direction);
-
-/// Allow the character to mote the continental map.
-bool DoTravel(Character * character, ArgumentHandler & args);
-
 /// Disconnect the player from the Mud.
 bool DoQuit(Character * character, ArgumentHandler & args);
 
@@ -46,9 +40,6 @@ bool DoWho(Character * character, ArgumentHandler & args);
 
 /// Allow to modify the character informations.
 bool DoSet(Character * character, ArgumentHandler & args);
-
-/// Stop the current action of the character.
-bool DoStop(Character * character, ArgumentHandler & args);
 
 /// The character look at: the current room, the near rooms, an object,
 ///  a player, a character, and so on.
@@ -62,27 +53,6 @@ bool DoPrompt(Character * character, ArgumentHandler & args);
 
 /// Report the current day phase.
 bool DoTime(Character * character, ArgumentHandler & args);
-
-/// Make the player stand up.
-bool DoStand(Character * character, ArgumentHandler & args);
-
-/// Make the player crouch.
-bool DoCrouch(Character * character, ArgumentHandler & args);
-
-/// Make the player sit.
-bool DoSit(Character * character, ArgumentHandler & args);
-
-/// Make the player prone.
-bool DoProne(Character * character, ArgumentHandler & args);
-
-/// Make the player lie down and rest.
-bool DoRest(Character * character, ArgumentHandler & args);
-
-/// Make the player lie down and sleep.
-bool DoSleep(Character * character, ArgumentHandler & args);
-
-/// Make the player wake up.
-bool DoWake(Character * character, ArgumentHandler & args);
 
 /// Show player statistics.
 bool DoStatistics(Character * character, ArgumentHandler & args);

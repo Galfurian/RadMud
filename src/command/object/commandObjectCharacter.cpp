@@ -28,6 +28,12 @@
 
 bool DoEquipments(Character * character, ArgumentHandler & /*args*/)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Retrieve the equipment.
     auto head = character->findEquipmentSlotItem(EquipmentSlot::Head);
     auto back = character->findEquipmentSlotItem(EquipmentSlot::Back);
@@ -119,6 +125,12 @@ bool DoEquipments(Character * character, ArgumentHandler & /*args*/)
 
 bool DoWield(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     // Check the arguments.
@@ -216,6 +228,12 @@ bool DoWield(Character * character, ArgumentHandler & args)
 
 bool DoWear(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     // Check the arguments.
@@ -319,6 +337,12 @@ bool DoWear(Character * character, ArgumentHandler & args)
 
 bool DoRemove(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     // Check the arguments.
@@ -440,6 +464,12 @@ bool DoRemove(Character * character, ArgumentHandler & args)
 
 bool DoInventory(Character * character, ArgumentHandler & /*args*/)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     if (character->inventory.empty())
     {
         character->sendMsg(

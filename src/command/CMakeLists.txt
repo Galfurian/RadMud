@@ -19,4 +19,5 @@ set(PROJECT_SRC ${PROJECT_SRC}
         ${CMAKE_SOURCE_DIR}/src/command/crafting.cpp
         ${CMAKE_SOURCE_DIR}/src/command/manager.cpp
         ${CMAKE_SOURCE_DIR}/src/command/general.cpp
+        ${CMAKE_SOURCE_DIR}/src/command/movement.cpp
         PARENT_SCOPE)

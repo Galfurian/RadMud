@@ -22,7 +22,7 @@
 #include "processInput.hpp"
 #include "character.hpp"
 #include "crafting.hpp"
-#include "general.hpp"
+#include "movement.hpp"
 #include "mud.hpp"
 
 ProcessInput::ProcessInput()
