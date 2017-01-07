@@ -145,15 +145,20 @@ bool Item::updateOnDB()
 
 bool Item::removeOnDB()
 {
-    Logger::log(LogLevel::Debug, "Removing %s from DB...", this->getName());
-    QueryList where = {std::make_pair("vnum", ToString(vnum))};
-    // Prepare the where clause.
-    if (SQLiteDbms::instance().deleteFrom("Item", where))
+    Logger::log(LogLevel::Debug, "Removing '%s' from DB...",
+                this->getName(true));
+    if (SQLiteDbms::instance().deleteFrom(
+        "Item", {std::make_pair("vnum", ToString(vnum))}))
     {
         // Remove the item from everywhere.
-        SQLiteDbms::instance().deleteFrom("ItemPlayer", where);
-        SQLiteDbms::instance().deleteFrom("ItemRoom", where);
-        SQLiteDbms::instance().deleteFrom("ItemContent", where);
+        SQLiteDbms::instance().deleteFrom(
+            "ItemPlayer", {std::make_pair("item", ToString(vnum))});
+        SQLiteDbms::instance().deleteFrom(
+            "ItemRoom", {std::make_pair("item", ToString(vnum))});
+        SQLiteDbms::instance().deleteFrom(
+            "ItemContent", {std::make_pair("container", ToString(vnum))});
+        SQLiteDbms::instance().deleteFrom(
+            "ItemContent", {std::make_pair("item", ToString(vnum))});
         return true;
     }
     Logger::log(LogLevel::Error, "Can't delete the item from the database!");

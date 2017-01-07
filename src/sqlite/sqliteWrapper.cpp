@@ -88,7 +88,7 @@ bool SQLiteWrapper::openConnection(const std::string & dbName,
             }
         }
     }
-    errorCode = executeQuery("PRAGMA foreign_keys = ON;");
+    errorCode = this->executeQuery("PRAGMA foreign_keys=ON;");
     errorMessage = sqlite3_errmsg(dbDetails.dbConnection);
     if (errorCode != SQLITE_OK)
     {
