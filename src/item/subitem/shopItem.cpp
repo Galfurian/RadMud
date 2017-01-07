@@ -21,7 +21,6 @@
 
 #include "shopItem.hpp"
 
-#include "currencyItem.hpp"
 #include "shopModel.hpp"
 #include "logger.hpp"
 #include "mud.hpp"
@@ -120,6 +119,11 @@ bool ShopItem::canDeconstruct(std::string & error) const
 
 std::string ShopItem::lookContent()
 {
+    // If the shop is not built, show the item normal content.
+    if (!HasFlag(this->flags, ItemFlag::Built))
+    {
+        return Item::lookContent();
+    }
     std::string output, error;
     if (!this->canUse(error))
     {
