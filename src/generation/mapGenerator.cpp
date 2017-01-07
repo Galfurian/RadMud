@@ -20,7 +20,6 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "mapGenerator.hpp"
-#include "formatter.hpp"
 #include "area.hpp"
 
 MapGenerator::MapGenerator(const MapGeneratorConfiguration & _configuration,
@@ -40,8 +39,9 @@ Map2D<MapCell> MapGenerator::generateMap()
     {
         for (auto y = 0; y < map.getHeight(); ++y)
         {
-            map.get(x, y).coordinates = Coordinates(x, y, 0);
-            map.get(x, y).addNeighbours(map);
+            auto cell = &map.get(x, y);
+            cell->coordinates = Coordinates(x, y, 0);
+            cell->addNeighbours(map);
         }
     }
     // Drop the mountains.
@@ -52,7 +52,7 @@ Map2D<MapCell> MapGenerator::generateMap()
     // Normalize the map in order to have values between 0 and 1.
     this->normalizeMap(map);
     // Apply the heights to the map.
-    heightMapper.applyHeightMap(map);
+    this->applyMapTiles(map);
     // Drop the rivers.
     this->dropRivers(map);
     // Add the forests.
@@ -80,6 +80,7 @@ void MapGenerator::dropMountain(Map2D<MapCell> & map)
     {
         for (auto y = yMin; y <= yMax; ++y)
         {
+            auto cell = &map.get(x, y);
             // Determine the distance between the cell and the center.
             auto distance = pow(xCenter - x, 2) + pow(yCenter - y, 2);
             // Determine the height of the cell based on the distance.
@@ -87,7 +88,7 @@ void MapGenerator::dropMountain(Map2D<MapCell> & map)
             // Set the height value on the map.
             if (cellHeight > 0)
             {
-                map.get(x, y).height += cellHeight;
+                cell->height += cellHeight;
             }
         }
     }
@@ -101,22 +102,29 @@ void MapGenerator::normalizeMap(Map2D<MapCell> & map)
     {
         for (auto y = 0; y < map.getHeight(); ++y)
         {
-            auto cellHeight = map.get(x, y).height;
-            if (cellHeight < minHeight) minHeight = cellHeight;
-            if (cellHeight > maxHeight) maxHeight = cellHeight;
+            auto cell = &map.get(x, y);
+            if (cell->height < minHeight) minHeight = cell->height;
+            if (cell->height > maxHeight) maxHeight = cell->height;
         }
     }
     // If the map is quite plain, clear it.
-    if (!DoubleEquality(maxHeight, minHeight))
+    if (DoubleEquality(maxHeight, minHeight))
+    {
+        this->clearMap(map);
+    }
+    else
     {
         // Normalize the heights to values between 0 and 10.
         for (int x = 0; x < map.getWidth(); ++x)
         {
             for (int y = 0; y < map.getHeight(); ++y)
             {
-                map.get(x, y).height = this->normalize(map.get(x, y).height,
-                                                       minHeight, maxHeight,
-                                                       0.0, 100.0);
+                auto cell = &map.get(x, y);
+                cell->height = this->normalize(cell->height,
+                                               minHeight,
+                                               maxHeight,
+                                               0.0,
+                                               100.0);
             }
         }
     }
@@ -130,8 +138,8 @@ void MapGenerator::dropRivers(Map2D<MapCell> & map)
     // points and if it is a mountain.
     auto IsSuitable = [&](MapCell * cell)
     {
-        if ((cell->heightMap != HeightMap::Mountain) &&
-            (cell->heightMap != HeightMap::HighMountain))
+        if ((cell->mapTile != MapTile::Mountain) &&
+            (cell->mapTile != MapTile::HighMountain))
         {
             return false;
         }
@@ -180,8 +188,10 @@ void MapGenerator::dropRivers(Map2D<MapCell> & map)
             // Check if the lowest is the current cell itself.
             if (nextCell->coordinates == cell->coordinates) break;
             // If water is reached stop.
-            if ((nextCell->heightMap == HeightMap::ShallowWater) ||
-                (nextCell->heightMap == HeightMap::DeepWater))
+            if ((nextCell->mapTile == MapTile::ShallowWater) ||
+                (nextCell->mapTile == MapTile::DeepWater) ||
+                (nextCell->mapTile == MapTile::River) ||
+                (nextCell->mapTile == MapTile::WaterSpring))
             {
                 break;
             }
@@ -200,12 +210,10 @@ void MapGenerator::dropRivers(Map2D<MapCell> & map)
             auto cell = (*it);
             if (it == river.begin())
             {
-                cell->height = 0;
-                cell->heightMap = HeightMap::DeepWater;
+                cell->mapTile = MapTile::WaterSpring;
                 continue;
             }
-            cell->height -= 1;
-            cell->heightMap = HeightMap::ShallowWater;
+            cell->mapTile = MapTile::River;
         }
     }
 }
@@ -219,9 +227,9 @@ void MapGenerator::addForests(Map2D<MapCell> & map)
     auto IsSuitable = [&](MapCell * cell)
     {
         // Check if the cell is a Plain|Hill|Mountain.
-        if ((cell->heightMap != HeightMap::Plain) &&
-            (cell->heightMap != HeightMap::Hill) &&
-            (cell->heightMap != HeightMap::Mountain))
+        if ((cell->mapTile != MapTile::Plain) &&
+            (cell->mapTile != MapTile::Hill) &&
+            (cell->mapTile != MapTile::Mountain))
         {
             return false;
         }
@@ -254,19 +262,19 @@ void MapGenerator::addForests(Map2D<MapCell> & map)
     FloodFill = [&](int x, int y, int iterationLeft)
     {
         auto cell = &map.get(x, y);
-        if ((!cell->content.empty()) || (iterationLeft == 0))
+        if ((cell->mapTile == MapTile::Forest) || (iterationLeft == 0))
         {
             return;
         }
-        if (cell->heightMap == HeightMap::Plain)
+        if (cell->mapTile == MapTile::Plain)
         {
             if (TRandInteger<int>(0, 100) < 20) return;
         }
-        else if (cell->heightMap == HeightMap::Hill)
+        else if (cell->mapTile == MapTile::Hill)
         {
             if (TRandInteger<int>(0, 100) < 40) return;
         }
-        else if (cell->heightMap == HeightMap::Mountain)
+        else if (cell->mapTile == MapTile::Mountain)
         {
             if (TRandInteger<int>(0, 100) < 65) return;
         }
@@ -274,7 +282,7 @@ void MapGenerator::addForests(Map2D<MapCell> & map)
         {
             return;
         }
-        cell->content = Formatter::green() + "t";
+        cell->mapTile = MapTile::Forest;
         iterationLeft--;
         FloodFill(std::max(x - 1, 0), y, iterationLeft);
         FloodFill(std::min(x + 1, map.getWidth() - 1), y, iterationLeft);
@@ -308,6 +316,18 @@ void MapGenerator::clearMap(Map2D<MapCell> & map)
         for (int y = 0; y < map.getHeight(); ++y)
         {
             map.get(x, y).height = 0.0;
+        }
+    }
+}
+
+void MapGenerator::applyMapTiles(Map2D<MapCell> & map)
+{
+    for (auto x = 0; x < map.getWidth(); ++x)
+    {
+        for (auto y = 0; y < map.getHeight(); ++y)
+        {
+            auto cell = &map.get(x, y);
+            cell->mapTile = heightMapper.getHeightMap(cell->height);
         }
     }
 }

@@ -23,11 +23,11 @@
 
 #include <string>
 
-/// The different types of heights.
-class HeightMap
+/// The different types of map tiles.
+class MapTile
 {
 public:
-    /// List of possible heights.
+    /// List of possible map tiles.
     enum Enum
     {
         Void,
@@ -35,48 +35,51 @@ public:
         ShallowWater,
         Coast,
         Plain,
+        Forest,
+        River,
+        WaterSpring,
         Hill,
         Mountain,
         HighMountain
     };
 
     /// @brief Constructor from number.
-    HeightMap(const unsigned int & _height);
+    MapTile(const unsigned int & _mapTile);
 
     /// @brief Constructor from enum.
-    HeightMap(const Enum & _height);
+    MapTile(const Enum & _mapTile);
 
-    /// @brief Check is the given number is a valid height.
-    static bool isValid(const unsigned int & _height);
+    /// @brief Check is the given number is a valid mapTile.
+    static bool isValid(const unsigned int & _mapTile);
 
-    /// @brief Returns the height as string.
+    /// @brief Returns the mapTile as string.
     std::string toString() const;
 
-    /// @brief Returns the height as number.
+    /// @brief Returns the mapTile as number.
     unsigned int toUInt() const;
 
-    /// @brief Returns the height as a symbol.
+    /// @brief Returns the mapTile as a symbol.
     std::string toSymbol(bool color = true) const;
 
-    /// @brief Equality operator w.r.t. a height enum.
-    bool operator==(const HeightMap & rhs) const;
+    /// @brief Equality operator w.r.t. a mapTile enum.
+    bool operator==(const MapTile & rhs) const;
 
-    /// @brief Inequality operator w.r.t. a height enum.
-    bool operator!=(const HeightMap & rhs) const;
+    /// @brief Inequality operator w.r.t. a mapTile enum.
+    bool operator!=(const MapTile & rhs) const;
 
-    /// @brief Greater operator w.r.t. a height enum.
-    bool operator>(const HeightMap & rhs) const;
+    /// @brief Greater operator w.r.t. a mapTile enum.
+    bool operator>(const MapTile & rhs) const;
 
-    /// @brief Greater-Equal operator w.r.t. a height enum.
-    bool operator>=(const HeightMap & rhs) const;
+    /// @brief Greater-Equal operator w.r.t. a mapTile enum.
+    bool operator>=(const MapTile & rhs) const;
 
-    /// @brief Lesser operator w.r.t. a height enum.
-    bool operator<(const HeightMap & rhs) const;
+    /// @brief Lesser operator w.r.t. a mapTile enum.
+    bool operator<(const MapTile & rhs) const;
 
-    /// @brief Lesser-Equal operator w.r.t. a height enum.
-    bool operator<=(const HeightMap & rhs) const;
+    /// @brief Lesser-Equal operator w.r.t. a mapTile enum.
+    bool operator<=(const MapTile & rhs) const;
 
 private:
-    /// Internal height value.
-    Enum height;
+    /// Internal mapTile value.
+    Enum mapTile;
 };

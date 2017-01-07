@@ -24,9 +24,8 @@
 MapCell::MapCell() :
     coordinates(),
     height(),
-    heightMap(HeightMap::Void),
-    neighbours(),
-    content()
+    mapTile(MapTile::Void),
+    neighbours()
 {
     // Nothing to do.
 }
@@ -35,9 +34,8 @@ MapCell::MapCell(const Coordinates & _coordinates,
                  const double & _height) :
     coordinates(_coordinates),
     height(_height),
-    heightMap(HeightMap::Void),
-    neighbours(),
-    content()
+    mapTile(MapTile::Void),
+    neighbours()
 {
     // Nothing to do.
 }
@@ -81,11 +79,7 @@ MapCell * MapCell::findLowestNearbyCell()
 
 std::string MapCell::getTile() const
 {
-    if (content.empty())
-    {
-        return heightMap.toSymbol();
-    }
-    return content;
+    return mapTile.toSymbol();
 }
 
 bool MapCell::operator==(const MapCell & other) const

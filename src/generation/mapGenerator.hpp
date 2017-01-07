@@ -54,6 +54,8 @@ private:
 
     void clearMap(Map2D<MapCell> & map);
 
+    void applyMapTiles(Map2D<MapCell> & map);
+
     inline double normalize(double value,
                             double LbFrom,
                             double UbFrom,

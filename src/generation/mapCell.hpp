@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "heightMap.hpp"
+#include "mapTile.hpp"
 #include "map2D.hpp"
 #include <vector>
 
@@ -33,12 +33,10 @@ public:
     Coordinates coordinates;
     /// The height of the cell.
     double height;
-    /// Associated height.
-    HeightMap heightMap;
+    /// Associated tile.
+    MapTile mapTile;
     /// List of neighbours.
     std::vector<MapCell *> neighbours;
-    /// Specific content.
-    std::string content;
 
     /// @brief Constructor.
     MapCell();
