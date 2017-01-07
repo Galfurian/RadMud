@@ -28,10 +28,10 @@ MapGeneratorConfiguration::MapGeneratorConfiguration() :
     numMountains(50),
     minMountainRadius(5),
     maxMountainRadius(15),
-    numRivers(2),
+    numRivers(4),
     minRiverDistance(8),
-    numForests(2),
-    minForestDistance(8)
+    numForests(12),
+    minForestDistance(12)
 {
     // Nothing to do.
 }

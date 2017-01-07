@@ -235,7 +235,7 @@ void MapGenerator::addForests(Map2D<MapCell> & map)
                 return false;
             }
         }
-        return false;
+        return true;
     };
     // Retrieve all the starting points for rivers.
     for (auto x = 0; x < map.getWidth(); ++x)
@@ -249,6 +249,55 @@ void MapGenerator::addForests(Map2D<MapCell> & map)
                 forestDropPoints.emplace_back(cell);
             }
         }
+    }
+    std::function<void(int, int, int &)> FloodFill;
+    FloodFill = [&](int x, int y, int iterationLeft)
+    {
+        auto cell = &map.get(x, y);
+        if ((!cell->content.empty()) || (iterationLeft == 0))
+        {
+            return;
+        }
+        if (cell->heightMap == HeightMap::Plain)
+        {
+            if (TRandInteger<int>(0, 100) < 20) return;
+        }
+        else if (cell->heightMap == HeightMap::Hill)
+        {
+            if (TRandInteger<int>(0, 100) < 40) return;
+        }
+        else if (cell->heightMap == HeightMap::Mountain)
+        {
+            if (TRandInteger<int>(0, 100) < 65) return;
+        }
+        else
+        {
+            return;
+        }
+        cell->content = Formatter::green() + "t";
+        iterationLeft--;
+        FloodFill(std::max(x - 1, 0), y, iterationLeft);
+        FloodFill(std::min(x + 1, map.getWidth() - 1), y, iterationLeft);
+        FloodFill(x, std::max(y - 1, 0), iterationLeft);
+        FloodFill(x, std::min(y + 1, map.getHeight() - 1), iterationLeft);
+    };
+    auto maxForestExpansion = TRandInteger(3,
+                                           configuration.minForestDistance - 1);
+    // Number of dropped rivers.
+    auto iterations = std::min(static_cast<size_t>(configuration.numForests),
+                               forestDropPoints.size());
+    for (unsigned int it = 0; it < iterations; ++it)
+    {
+        // Pick a random forest drop point.
+        auto dpIt = forestDropPoints.begin();
+        std::advance(dpIt,
+                     TRandInteger<size_t>(0, forestDropPoints.size() - 1));
+        MapCell * cell = (*dpIt);
+        forestDropPoints.erase(dpIt);
+        // Create the forest.
+        FloodFill(cell->coordinates.x,
+                  cell->coordinates.y,
+                  maxForestExpansion);
     }
 }
 
