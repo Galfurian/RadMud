@@ -634,13 +634,10 @@ Building * Mud::findBuilding(std::string name)
 
 Building * Mud::findBuilding(int vnum)
 {
-    for (std::map<int, Building>::iterator iterator = mudBuildings.begin();
-         iterator != mudBuildings.end(); ++iterator)
+    auto it = mudBuildings.find(vnum);
+    if (it != mudBuildings.end())
     {
-        if (iterator->second.buildingModel->vnum == vnum)
-        {
-            return &(iterator->second);
-        }
+        return &it->second;
     }
     return nullptr;
 }
