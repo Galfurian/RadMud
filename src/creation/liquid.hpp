@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "liquidType.hpp"
 #include <map>
 
 /// @brief Holds details about a liquid.
@@ -30,8 +31,12 @@ class Liquid
 public:
     /// Virtual number.
     int vnum;
+    /// The type of liquid.
+    LiquidType type;
     /// Liquid's name.
     std::string name;
+    /// Short description of the liquid.
+    std::string description;
     /// Liquid's value on market.
     int worth;
     /// How much the liquid is able to quench the thirst.

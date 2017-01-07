@@ -819,7 +819,9 @@ bool LoadLiquid(ResultSet * result)
             auto liquid = new Liquid();
             // Load the liquid.
             liquid->vnum = result->getNextInteger();
+            liquid->type = LiquidType(result->getNextUnsignedInteger());
             liquid->name = result->getNextString();
+            liquid->description = result->getNextString();
             liquid->worth = result->getNextInteger();
             liquid->quench = result->getNextDouble();
             // Check the correctness.

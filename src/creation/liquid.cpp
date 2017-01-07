@@ -26,7 +26,9 @@
 
 Liquid::Liquid() :
     vnum(),
+    type(),
     name(),
+    description(),
     worth(),
     quench()
 {
@@ -44,7 +46,9 @@ Liquid::~Liquid()
 bool Liquid::check()
 {
     assert(vnum > 0);
+    assert(type != LiquidType::None);
     assert(!name.empty());
+    assert(!description.empty());
     assert(worth > 0);
     return true;
 }

@@ -1,9 +1,8 @@
-/// @file   toolType.hpp
-/// @brief  Define the toolType class.
+/// @file   liquidType.hpp
 /// @author Enrico Fraccaroli
-/// @date   Nov 23 2016
+/// @date   gen 07 2017
 /// @copyright
-/// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
+/// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
 /// copy of this software and associated documentation files (the "Software"),
 /// to deal in the Software without restriction, including without limitation
@@ -29,45 +28,37 @@ extern "C"
 #include "lua.h"
 }
 
-/// @brief Used to determine the type of the tools.
-class ToolType
+/// @brief Used to determine the type of the model.
+class LiquidType
 {
 public:
-    /// The possible types of tools.
+    /// The possible types of model.
     enum Enum
     {
-        None = 0,
-        Pickaxe = 1,
-        WoodcutterAxe = 10,
-        Saw = 11,
-        PrecisionChisel = 12,
-        Hammer = 20,
-        PlaneChisel = 21,
-        Forge = 30,
-        Anvil = 31,
-        BlacksmithHammer = 32,
-        Bellows = 33,
-        Crucible = 34,
-        Tinderbox = 40
+        None,    ///< [0] No type of liquid.
+        Normal,  ///< [1] Normal liquid.
+        Alcohol, ///< [2] The liquid is alcohol.
+        Poison,  ///< [3] The liquid is poison.
+        Blood,   ///< [4] The liquid is blood.
     };
 
-    /// @brief Constructor from uint.
-    ToolType();
+    /// @brief Constructor.
+    LiquidType();
 
-    /// @brief Constructor from uint.
-    ToolType(const unsigned int & _toolType);
+    /// @brief Constructor.
+    LiquidType(const unsigned int & _liquidType);
 
-    /// @brief Constructor from enum.
-    ToolType(const Enum & _toolType);
+    /// @brief Constructor.
+    LiquidType(const Enum & _liquidType);
 
-    /// @brief Constructor from string.
-    ToolType(const std::string & _toolType);
+    /// @brief Constructor.
+    LiquidType(const std::string & _liquidType);
 
     /// @brief Check is the given number is a valid type of model.
-    static bool isValid(const unsigned int & _toolType);
+    static bool isValid(const unsigned int & _liquidType);
 
     /// @brief Check is the given string is a valid type of model.
-    static bool isValid(const std::string & _toolType);
+    static bool isValid(const std::string & _liquidType);
 
     /// @brief Returns the type of model as string.
     std::string toString() const;
@@ -76,22 +67,16 @@ public:
     unsigned int toUInt() const;
 
     /// @brief Equality operator w.r.t. a type of model object.
-    bool operator==(const ToolType & rhs) const;
+    bool operator==(const LiquidType & rhs) const;
 
-    /// @brief Equality operator w.r.t. a type of model enum.
-    bool operator==(const ToolType::Enum & rhs) const;
-
-    /// @brief Inequality operator w.r.t. a type of model enum.
-    bool operator!=(const ToolType::Enum & rhs) const;
-
-    /// @brief Equality operator w.r.t. a type of model object.
-    bool operator<(const ToolType & rhs) const;
+    /// @brief Inequality operator w.r.t. a type of model object.
+    bool operator!=(const LiquidType & rhs) const;
 
     /// @brief Function used to register inside the lua environment the class.
     /// @param L The lua environment.
     static void luaRegister(lua_State * L);
 
 private:
-    /// Internal type of model.
-    Enum toolType;
+    /// Internal type of liquid.
+    Enum liquidType;
 };
