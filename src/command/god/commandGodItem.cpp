@@ -345,7 +345,7 @@ bool DoModelList(Character * character, ArgumentHandler & args)
     table.addColumn("FLAGS", StringAlign::Right);
     for (auto iterator : Mud::instance().mudItemModels)
     {
-        ItemModel * itemModel = iterator.second;
+        auto itemModel = iterator.second;
         if (!modelName.empty())
         {
             if (itemModel->name.find(modelName) == std::string::npos)

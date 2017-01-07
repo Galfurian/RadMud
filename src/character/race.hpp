@@ -25,6 +25,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "corpseModel.hpp"
 #include "ability.hpp"
@@ -58,7 +59,7 @@ public:
     /// TileId of the icon.
     int tileId;
     /// Corpse model.
-    CorpseModel corpse;
+    std::shared_ptr<CorpseModel> corpse;
     /// The text describing the natural weapons used by this race.
     std::string naturalWeapon;
 

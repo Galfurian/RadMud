@@ -657,7 +657,7 @@ Item * Character::findEquipmentSlotTool(EquipmentSlot slot, ToolType type)
         {
             if (tool->model->getType() == ModelType::Tool)
             {
-                ToolModel * toolModel = tool->model->toTool();
+                auto toolModel = tool->model->toTool();
                 if (toolModel->toolType == type)
                 {
                     return tool;
@@ -698,7 +698,7 @@ Item * Character::findNearbyTool(
         {
             if (iterator->model->getType() == ModelType::Tool)
             {
-                ToolModel * toolModel = iterator->model->toTool();
+                auto toolModel = iterator->model->toTool();
                 if (toolModel->toolType == toolType)
                 {
                     // Check if the item is inside the exception list.
@@ -724,7 +724,7 @@ Item * Character::findNearbyTool(
         {
             if (iterator->model->getType() == ModelType::Tool)
             {
-                ToolModel * toolModel = iterator->model->toTool();
+                auto toolModel = iterator->model->toTool();
                 if (toolModel->toolType == toolType)
                 {
                     auto findIt = std::find(exceptions.begin(),
@@ -743,7 +743,7 @@ Item * Character::findNearbyTool(
         {
             if (iterator->model->getType() == ModelType::Tool)
             {
-                ToolModel * toolModel = iterator->model->toTool();
+                auto toolModel = iterator->model->toTool();
                 if (toolModel->toolType == toolType)
                 {
                     auto findIt = std::find(exceptions.begin(),
@@ -1365,7 +1365,7 @@ void Character::kill()
 Item * Character::createCorpse()
 {
     // Create the corpse.
-    auto corpse = race->corpse.createCorpse(name, race->material, weight);
+    auto corpse = race->corpse->createCorpse(name, race->material, weight);
     // Add the corpse to the room.
     room->addItem(corpse);
     // Return the corpse.

@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <map>
 
@@ -47,7 +48,7 @@ public:
     /// The list of needed type of tools.
     std::set<ToolType> tools;
     /// The model that has to be built.
-    ItemModel * buildingModel;
+    std::shared_ptr<ItemModel> buildingModel;
     /// The list of needed type of ingredients and their quantity.
     std::map<ResourceType, unsigned int> ingredients;
     /// Flag which determine if in the same room only one of this building

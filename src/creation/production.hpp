@@ -50,7 +50,7 @@ public:
     /// A flag which indicates if the maker can be assisted by someone.
     bool assisted;
     /// A pointer to the outcome model.
-    ItemModel * outcome;
+    std::shared_ptr<ItemModel> outcome;
     /// The quantity of the outcome.
     unsigned int quantity;
     /// The list of needed type of tools.

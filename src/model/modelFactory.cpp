@@ -45,99 +45,99 @@
 #include "magazineModel.hpp"
 #include "meleeWeaponModel.hpp"
 
-ItemModel * ModelFactory::newModel(const ModelType & type)
+std::shared_ptr<ItemModel> ModelFactory::newModel(const ModelType & type)
 {
     if (type == ModelType::Corpse)
     {
-        return new CorpseModel();
+        return std::make_shared<CorpseModel>();
     }
     if (type == ModelType::MeleeWeapon)
     {
-        return new MeleeWeaponModel();
+        return std::make_shared<MeleeWeaponModel>();
     }
     if (type == ModelType::RangedWeapon)
     {
-        return new RangedWeaponModel();
+        return std::make_shared<RangedWeaponModel>();
     }
     if (type == ModelType::Armor)
     {
-        return new ArmorModel();
+        return std::make_shared<ArmorModel>();
     }
     if (type == ModelType::Book)
     {
-        return new BookModel();
+        return std::make_shared<BookModel>();
     }
     if (type == ModelType::Container)
     {
-        return new ContainerModel();
+        return std::make_shared<ContainerModel>();
     }
     if (type == ModelType::Currency)
     {
-        return new CurrencyModel();
+        return std::make_shared<CurrencyModel>();
     }
     if (type == ModelType::Food)
     {
-        return new FoodModel();
+        return std::make_shared<FoodModel>();
     }
     if (type == ModelType::Furniture)
     {
-        return new FurnitureModel();
+        return std::make_shared<FurnitureModel>();
     }
     if (type == ModelType::Key)
     {
-        return new KeyModel();
+        return std::make_shared<KeyModel>();
     }
     if (type == ModelType::Light)
     {
-        return new LightModel();
+        return std::make_shared<LightModel>();
     }
     if (type == ModelType::LiquidContainer)
     {
-        return new LiquidContainerModel();
+        return std::make_shared<LiquidContainerModel>();
     }
     if (type == ModelType::Mechanism)
     {
-        return new MechanismModel();
+        return std::make_shared<MechanismModel>();
     }
     if (type == ModelType::Node)
     {
-        return new NodeModel();
+        return std::make_shared<NodeModel>();
     }
     if (type == ModelType::Projectile)
     {
-        return new ProjectileModel();
+        return std::make_shared<ProjectileModel>();
     }
     if (type == ModelType::Resource)
     {
-        return new ResourceModel();
+        return std::make_shared<ResourceModel>();
     }
     if (type == ModelType::Rope)
     {
-        return new RopeModel();
+        return std::make_shared<RopeModel>();
     }
     if (type == ModelType::Seed)
     {
-        return new SeedModel();
+        return std::make_shared<SeedModel>();
     }
     if (type == ModelType::Shield)
     {
-        return new ShieldModel();
+        return std::make_shared<ShieldModel>();
     }
     if (type == ModelType::Shop)
     {
-        return new ShopModel();
+        return std::make_shared<ShopModel>();
     }
     if (type == ModelType::Tool)
     {
-        return new ToolModel();
+        return std::make_shared<ToolModel>();
     }
     if (type == ModelType::Vehicle)
     {
-        return new VehicleModel();
+        return std::make_shared<VehicleModel>();
     }
     if (type == ModelType::Magazine)
     {
-        return new MagazineModel();
+        return std::make_shared<MagazineModel>();
     }
     return nullptr;
 }

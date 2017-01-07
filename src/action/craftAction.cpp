@@ -122,7 +122,7 @@ bool CraftAction::check(std::string & error) const
             auto item = it2.first;
             if (item->getType() == ModelType::Resource)
             {
-                ResourceModel * resourceModel = item->model->toResource();
+                auto resourceModel = item->model->toResource();
                 if (resourceModel->resourceType == it.first)
                 {
                     required -= item->quantity;

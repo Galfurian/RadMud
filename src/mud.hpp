@@ -170,7 +170,7 @@ public:
     /// List of all the rooms.
     std::map<int, Room *> mudRooms;
     /// List all the items model.
-    std::map<int, ItemModel *> mudItemModels;
+    std::map<int, std::shared_ptr<ItemModel>> mudItemModels;
     /// List of all the areas.
     std::map<int, Area *> mudAreas;
     /// List of all the races.
@@ -264,7 +264,7 @@ public:
     bool remCorpse(Item * corpse);
 
     /// Add the given item model to the mud.
-    bool addItemModel(ItemModel * model);
+    bool addItemModel(std::shared_ptr<ItemModel> model);
 
     /// Add the given area to the mud.
     bool addArea(Area * area);
@@ -318,7 +318,7 @@ public:
     Item * findItem(int vnum);
 
     /// Find an item model given its vnum.
-    ItemModel * findItemModel(int vnum);
+    std::shared_ptr<ItemModel> findItemModel(int vnum);
 
     /// Find a mobile given his id.
     Mobile * findMobile(std::string id);

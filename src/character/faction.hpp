@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <memory>
 
 #include "lua_script.hpp"
 #include "table.hpp"
@@ -43,7 +44,7 @@ public:
     /// The description of the faction.
     std::string description;
     /// The currency used by this faction.
-    CurrencyModel * currency;
+    std::shared_ptr<CurrencyModel> currency;
 
     /// @brief Contructor.
     Faction();

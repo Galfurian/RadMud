@@ -58,7 +58,7 @@ public:
     /// Item vnum.
     int vnum;
     /// Item model.
-    ItemModel * model;
+    std::shared_ptr<ItemModel> model;
     /// The number of stacked items.
     unsigned int quantity;
     /// The player that created the item.

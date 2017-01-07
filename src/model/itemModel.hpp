@@ -22,11 +22,6 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-#include <set>
-#include <map>
-
 #include "equipmentSlot.hpp"
 #include "itemQuality.hpp"
 #include "lua_script.hpp"
@@ -34,6 +29,12 @@
 #include "material.hpp"
 #include "table.hpp"
 #include "utils.hpp"
+
+#include <string>
+#include <vector>
+#include <set>
+#include <map>
+#include <memory>
 
 /// Used to determine the flag of the model.
 using ModelFlag = enum class ModelFlag_t
@@ -100,7 +101,8 @@ class RangedWeaponModel;
 class MagazineModel;
 
 /// @brief Holds details about a model of item.
-class ItemModel
+class ItemModel :
+    public std::enable_shared_from_this<ItemModel>
 {
 public:
     /// Unique vnum.
@@ -233,73 +235,73 @@ public:
 
 public:
     /// @brief Returns the model <b>statically</b> casted to Armor.
-    ArmorModel * toArmor();
+    std::shared_ptr<ArmorModel> toArmor();
 
     /// @brief Returns the model <b>statically</b> casted to Book.
-    BookModel * toBook();
+    std::shared_ptr<BookModel> toBook();
 
     /// @brief Returns the model <b>statically</b> casted to Container.
-    ContainerModel * toContainer();
+    std::shared_ptr<ContainerModel> toContainer();
 
     /// @brief Returns the model <b>statically</b> casted to Corpse.
-    CorpseModel * toCorpse();
+    std::shared_ptr<CorpseModel> toCorpse();
 
     /// @brief Returns the model <b>statically</b> casted to Currency.
-    CurrencyModel * toCurrency();
+    std::shared_ptr<CurrencyModel> toCurrency();
 
     /// @brief Returns the model <b>statically</b> casted to Food.
-    FoodModel * toFood();
+    std::shared_ptr<FoodModel> toFood();
 
     /// @brief Returns the model <b>statically</b> casted to Furniture.
-    FurnitureModel * toFurniture();
+    std::shared_ptr<FurnitureModel> toFurniture();
 
     /// @brief Returns the model <b>statically</b> casted to Key.
-    KeyModel * toKey();
+    std::shared_ptr<KeyModel> toKey();
 
     /// @brief Returns the model <b>statically</b> casted to Light.
-    LightModel * toLight();
+    std::shared_ptr<LightModel> toLight();
 
     /// @brief Returns the model <b>statically</b> casted to Liquid Container.
-    LiquidContainerModel * toLiquidContainer();
+    std::shared_ptr<LiquidContainerModel> toLiquidContainer();
 
     /// @brief Returns the model <b>statically</b> casted to Mechanism.
-    MechanismModel * toMechanism();
+    std::shared_ptr<MechanismModel> toMechanism();
 
     /// @brief Returns the model <b>statically</b> casted to Node.
-    NodeModel * toNode();
+    std::shared_ptr<NodeModel> toNode();
 
     /// @brief Returns the model <b>statically</b> casted to Projectile.
-    ProjectileModel * toProjectile();
+    std::shared_ptr<ProjectileModel> toProjectile();
 
     /// @brief Returns the model <b>statically</b> casted to Resource.
-    ResourceModel * toResource();
+    std::shared_ptr<ResourceModel> toResource();
 
     /// @brief Returns the model <b>statically</b> casted to Rope.
-    RopeModel * toRope();
+    std::shared_ptr<RopeModel> toRope();
 
     /// @brief Returns the model <b>statically</b> casted to Seed.
-    SeedModel * toSeed();
+    std::shared_ptr<SeedModel> toSeed();
 
     /// @brief Returns the model <b>statically</b> casted to Shield.
-    ShieldModel * toShield();
+    std::shared_ptr<ShieldModel> toShield();
 
     /// @brief Returns the model <b>statically</b> casted to shop.
-    ShopModel * toShop();
+    std::shared_ptr<ShopModel> toShop();
 
     /// @brief Returns the model <b>statically</b> casted to Tool.
-    ToolModel * toTool();
+    std::shared_ptr<ToolModel> toTool();
 
     /// @brief Returns the model <b>statically</b> casted to Vehicle.
-    VehicleModel * toVehicle();
+    std::shared_ptr<VehicleModel> toVehicle();
 
     /// @brief Returns the model <b>statically</b> casted to Melee Weapon.
-    MeleeWeaponModel * toMeleeWeapon();
+    std::shared_ptr<MeleeWeaponModel> toMeleeWeapon();
 
     /// @brief Returns the model <b>statically</b> casted to Ranged Weapon.
-    RangedWeaponModel * toRangedWeapon();
+    std::shared_ptr<RangedWeaponModel> toRangedWeapon();
 
     /// @brief Returns the model <b>statically</b> casted to Magazine.
-    MagazineModel * toMagazine();
+    std::shared_ptr<MagazineModel> toMagazine();
 };
 
 /// @defgroup FlagsToList Flags to List of Strings.

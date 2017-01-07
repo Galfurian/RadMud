@@ -51,19 +51,20 @@ Race::~Race()
 
 void Race::initializeCorpse(const std::string & corpseDescription)
 {
-    corpse.vnum = 0;
-    corpse.name = "corpse";
-    corpse.article = "a";
-    corpse.shortdesc = "the corpse of " + this->getShortDescription();
-    corpse.keys.push_back("corpse");
-    corpse.keys.push_back(name);
-    corpse.description = corpseDescription;
-    corpse.slot = EquipmentSlot::None;
-    corpse.modelFlags = 0;
-    corpse.condition = 10;
-    corpse.material = this->material->type;
-    corpse.tileSet = this->tileSet;
-    corpse.tileId = this->tileId;
+    corpse = std::make_shared<CorpseModel>();
+    corpse->vnum = 0;
+    corpse->name = "corpse";
+    corpse->article = "a";
+    corpse->shortdesc = "the corpse of " + this->getShortDescription();
+    corpse->keys.push_back("corpse");
+    corpse->keys.push_back(name);
+    corpse->description = corpseDescription;
+    corpse->slot = EquipmentSlot::None;
+    corpse->modelFlags = 0;
+    corpse->condition = 10;
+    corpse->material = this->material->type;
+    corpse->tileSet = this->tileSet;
+    corpse->tileId = this->tileId;
 }
 
 bool Race::check()

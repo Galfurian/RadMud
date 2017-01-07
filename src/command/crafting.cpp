@@ -116,7 +116,7 @@ bool DoProfession(Character * character,
         auto item = iterator.first;
         if (item->model->getType() == ModelType::Resource)
         {
-            ResourceModel * resourceModel = item->model->toResource();
+            auto resourceModel = item->model->toResource();
             if (resourceModel->resourceType == production->material)
             {
                 craftMaterial = item->composition;
