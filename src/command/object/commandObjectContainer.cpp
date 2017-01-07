@@ -74,21 +74,20 @@ bool DoOrganize(Character * character, ArgumentHandler & args)
                                               args[1].getIndex());
         if (item != nullptr)
         {
-            if (item->getType() == ModelType::Container)
+            if (item->isAContainer())
             {
                 // Cast the item to container.
-                auto containerItem = static_cast<ContainerItem *>(item);
-                if (containerItem->isEmpty())
+                if (item->isEmpty())
                 {
                     character->sendMsg("%s is empty\n",
                                        item->getNameCapital(true));
                     return false;
                 }
                 // Order the content of the container.
-                containerItem->content.orderBy(order);
+                item->content.orderBy(order);
                 // Organize the target container.
                 character->sendMsg("You have organized %s, by %s.\n",
-                                   containerItem->getName(true), name);
+                                   item->getName(true), name);
                 return true;
             }
             character->sendMsg("You can't organize %s\n", item->getName(true));

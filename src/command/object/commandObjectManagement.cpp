@@ -201,17 +201,17 @@ bool DoTake(Character * character, ArgumentHandler & args)
     {
         // If the character wants to take an item from a container,
         // the container MUST be visible.
-        Item * foundContainer = nullptr;
+        Item * container = nullptr;
         // If the room is lit.
         if (roomIsLit)
         {
-            foundContainer = character->findNearbyItem(args[1].getContent(),
+            container = character->findNearbyItem(args[1].getContent(),
                                                        args[1].getIndex());
         }
         else if (character->inventoryIsLit())
         {
             // If the room is not lit but the inventory is.
-            foundContainer = character->findInventoryItem(args[1].getContent(),
+            container = character->findInventoryItem(args[1].getContent(),
                                                           args[1].getIndex());
         }
         else
@@ -220,19 +220,18 @@ bool DoTake(Character * character, ArgumentHandler & args)
             return false;
         }
         // Check if a container has been found.
-        if (foundContainer == nullptr)
+        if (container == nullptr)
         {
             character->sendMsg("You don't see that container.\n");
             return false;
         }
         // Check if the item is a container.
-        if (foundContainer->getType() != ModelType::Container)
+        if (!container->isAContainer())
         {
             character->sendMsg("%s is not a container.\n",
-                               foundContainer->getNameCapital(true));
+                               container->getNameCapital(true));
             return false;
         }
-        auto container = static_cast<ContainerItem *>(foundContainer);
         // Check if it is locked.
         if (HasFlag(container->flags, ItemFlag::Locked))
         {
