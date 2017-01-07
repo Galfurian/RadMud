@@ -178,8 +178,12 @@ bool DoTravel(Character * character, ArgumentHandler & /*args*/)
 
 bool DoQuit(Character * character, ArgumentHandler & /*args*/)
 {
-    // Prevent mobiles to execute this command.
-    NoMobile(character);
+    // Check if the character is a mobile.
+    if (character->isMobile())
+    {
+        character->sendMsg("Npcs are not allowed to execute this command.\n");
+        return false;
+    }
     // Stop any ongoing action.
     StopAction(character);
     auto player = character->toPlayer();
@@ -482,7 +486,12 @@ bool DoHelp(Character * character, ArgumentHandler & args)
 
 bool DoPrompt(Character * character, ArgumentHandler & args)
 {
-    NoMobile(character);
+    // Check if the character is a mobile.
+    if (character->isMobile())
+    {
+        character->sendMsg("Npcs are not allowed to execute this command.\n");
+        return false;
+    }
     auto player = character->toPlayer();
     if (args.empty())
     {
@@ -528,6 +537,12 @@ bool DoPrompt(Character * character, ArgumentHandler & args)
 
 bool DoTime(Character * character, ArgumentHandler & /*args*/)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("You can't see anything, you're sleeping.\n");
+        return false;
+    }
     if (MudUpdater::instance().getDayPhase() == DayPhase::Morning)
     {
         character->sendMsg("%sThe sun has just risen.%s\n",
@@ -691,7 +706,12 @@ bool DoWake(Character * character, ArgumentHandler & /*args*/)
 
 bool DoStatistics(Character * character, ArgumentHandler & /*args*/)
 {
-    NoMobile(character);
+    // Check if the character is a mobile.
+    if (character->isMobile())
+    {
+        character->sendMsg("Npcs are not allowed to execute this command.\n");
+        return false;
+    }
     auto player = character->toPlayer();
 
     auto BLD = [](std::string s)
@@ -780,7 +800,18 @@ bool DoStatistics(Character * character, ArgumentHandler & /*args*/)
 
 bool DoRent(Character * character, ArgumentHandler & /*args*/)
 {
-    NoMobile(character);
+    // Check if the character is a mobile.
+    if (character->isMobile())
+    {
+        character->sendMsg("Npcs are not allowed to execute this command.\n");
+        return false;
+    }
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("You can't see anything, you're sleeping.\n");
+        return false;
+    }
     auto player = character->toPlayer();
     // Check if the room allow to rent.
     if (!HasFlag(player->room->flags, RoomFlag::Rent))
@@ -798,7 +829,12 @@ bool DoRent(Character * character, ArgumentHandler & /*args*/)
 
 bool DoSkills(Character * character, ArgumentHandler & /*args*/)
 {
-    NoMobile(character);
+    // Check if the character is a mobile.
+    if (character->isMobile())
+    {
+        character->sendMsg("Npcs are not allowed to execute this command.\n");
+        return false;
+    }
     auto player = character->toPlayer();
     Table table = Table();
     table.addColumn("LvL", StringAlign::Left);

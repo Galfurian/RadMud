@@ -24,8 +24,6 @@
 
 bool DoItemCreate(Character * character, ArgumentHandler & args)
 {
-    // Prevent mobiles to execute this command.
-    NoMobile(character);
     // Stop any ongoing action.
     StopAction(character);
     // Check the number of arguments.

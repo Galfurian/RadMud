@@ -69,15 +69,6 @@ bool Command::canUse(Character * character) const
     return (gods && HasFlag(character->flags, CharacterFlag::IsGod)) || (!gods);
 }
 
-void NoMobile(Character * character)
-{
-    if (character->isMobile())
-    {
-        throw std::runtime_error(
-            "Npcs are not allowed to execute this command.\n");
-    }
-}
-
 void StopAction(Character * character)
 {
     if ((character->getAction()->getType() != ActionType::Wait))
