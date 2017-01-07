@@ -78,6 +78,12 @@ bool DoProne(Character * character, ArgumentHandler & args);
 /// Make the player lie down and rest.
 bool DoRest(Character * character, ArgumentHandler & args);
 
+/// Make the player lie down and sleep.
+bool DoSleep(Character * character, ArgumentHandler & args);
+
+/// Make the player wake up.
+bool DoWake(Character * character, ArgumentHandler & args);
+
 /// Show player statistics.
 bool DoStatistics(Character * character, ArgumentHandler & args);
 

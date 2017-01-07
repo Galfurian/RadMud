@@ -81,6 +81,14 @@ void LoadGeneralCommands()
         "The player lies down and begin to rest.",
         false, false, false));
     Mud::instance().addCommand(std::make_shared<Command>(
+        DoSleep, "sleep", "",
+        "The player lies down, closes its eyes and sleep.",
+        false, false, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoWake, "wake", "",
+        "The player wake up.",
+        false, false, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
         DoStatistics, "statistics", "",
         "Show player statistics.",
         false, true, false));
@@ -269,6 +277,12 @@ bool DoStop(Character * character, ArgumentHandler & /*args*/)
 
 bool DoLook(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("You can't see anything, you're sleeping.\n");
+        return false;
+    }
     // If there are no arguments, show the room.
     if (args.empty())
     {
@@ -278,7 +292,7 @@ bool DoLook(Character * character, ArgumentHandler & args)
     if (args.size() == 1)
     {
         // Check if the room is lit by a light.
-        if(!character->room->isLit())
+        if (!character->room->isLit())
         {
             character->sendMsg("You can't see.\n");
             return false;
@@ -317,7 +331,7 @@ bool DoLook(Character * character, ArgumentHandler & args)
     if (args.size() == 2)
     {
         // Check if the room is lit by a light.
-        if(!character->room->isLit())
+        if (!character->room->isLit())
         {
             character->sendMsg("You can't see.\n");
             return false;
@@ -551,8 +565,15 @@ bool DoStand(Character * character, ArgumentHandler & /*args*/)
         character->sendMsg("You are already standing.\n");
         return false;
     }
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("You wake and stand up.\n");
+    }
+    else
+    {
+        character->sendMsg("You stand up.\n");
+    }
     character->posture = CharacterPosture::Stand;
-    character->sendMsg("You stand up.\n");
     return true;
 }
 
@@ -565,8 +586,15 @@ bool DoCrouch(Character * character, ArgumentHandler & /*args*/)
         character->sendMsg("You are already crouched.\n");
         return false;
     }
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("You wake up and put yourself crouched.\n");
+    }
+    else
+    {
+        character->sendMsg("You put yourself crouched.\n");
+    }
     character->posture = CharacterPosture::Crouch;
-    character->sendMsg("You put yourself crouched.\n");
     return true;
 }
 
@@ -579,8 +607,15 @@ bool DoSit(Character * character, ArgumentHandler & /*args*/)
         character->sendMsg("You are already seated.\n");
         return false;
     }
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("You wake up and sit.\n");
+    }
+    else
+    {
+        character->sendMsg("You sit down.\n");
+    }
     character->posture = CharacterPosture::Sit;
-    character->sendMsg("You sit down.\n");
     return true;
 }
 
@@ -593,8 +628,15 @@ bool DoProne(Character * character, ArgumentHandler & /*args*/)
         character->sendMsg("You are already prone.\n");
         return false;
     }
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("You wake up and put yourself prone.\n");
+    }
+    else
+    {
+        character->sendMsg("You put yourself prone.\n");
+    }
     character->posture = CharacterPosture::Prone;
-    character->sendMsg("You put yourself prone.\n");
     return true;
 }
 
@@ -607,8 +649,43 @@ bool DoRest(Character * character, ArgumentHandler & /*args*/)
         character->sendMsg("You are already resting.\n");
         return false;
     }
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("You wake up and begin to rest.\n");
+    }
+    else
+    {
+        character->sendMsg("You lie down.\n");
+    }
     character->posture = CharacterPosture::Rest;
-    character->sendMsg("You lie down.\n");
+    return true;
+}
+
+bool DoSleep(Character * character, ArgumentHandler & /*args*/)
+{
+    // Stop any action the character is executing.
+    StopAction(character);
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("You are already sleeping.\n");
+        return false;
+    }
+    character->sendMsg("You lie down and begin to sleep.\n");
+    character->posture = CharacterPosture::Sleep;
+    return true;
+}
+
+bool DoWake(Character * character, ArgumentHandler & /*args*/)
+{
+    // Stop any action the character is executing.
+    StopAction(character);
+    if (character->posture != CharacterPosture::Sleep)
+    {
+        character->sendMsg("You are already awaken.\n");
+        return false;
+    }
+    character->posture = CharacterPosture::Sit;
+    character->sendMsg("You wake up and sit.\n");
     return true;
 }
 
@@ -675,7 +752,7 @@ bool DoStatistics(Character * character, ArgumentHandler & /*args*/)
     msg += "You " + BLD(player->getHungerCondition()) + ".\n";
     msg += "You " + BLD(player->getThirstCondition()) + ".\n";
     // Add the posture.
-    msg += "You are " + BLD(player->posture.toString()) + ".\n\n";
+    msg += "You are " + BLD(player->posture.getAction()) + ".\n\n";
     // [IF EXIST] Add the current action.
     if (player->getAction()->getType() != ActionType::Wait)
     {

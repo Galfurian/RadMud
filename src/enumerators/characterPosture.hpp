@@ -37,6 +37,7 @@ public:
         Sit,    ///< The character it's sitting.
         Prone,  ///< The character it's prone.
         Rest,   ///< The character it's lying down.
+        Sleep,  ///< The character is sleeping.
     };
 
     /// @brief Constructor from uint.
@@ -57,14 +58,22 @@ public:
     /// @brief Returns the character posture as number.
     unsigned int toUInt() const;
 
-    /// @brief EcharacterPosture operator w.r.t. a character posture enum.
-    bool operator==(const CharacterPosture::Enum & rhs) const;
+    /// @brief Returns the action describing the posture.
+    std::string getAction() const;
 
-    /// @brief InecharacterPosture operator w.r.t. a character posture enum.
-    bool operator!=(const CharacterPosture::Enum & rhs) const;
+    /// @brief Equality operator.
+    bool operator==(const CharacterPosture & rhs) const;
+
+    /// @brief Inequality operator.
+    bool operator!=(const CharacterPosture & rhs) const;
+
+    /// @brief Lesser-Equal operator.
+    bool operator<=(const CharacterPosture & rhs) const;
+
+    /// @brief Greater-Equal operator.
+    bool operator>=(const CharacterPosture & rhs) const;
 
 private:
     /// Internal character posture value.
     Enum characterPosture;
 };
-

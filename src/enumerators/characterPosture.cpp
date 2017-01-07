@@ -23,7 +23,7 @@
 #include "characterPosture.hpp"
 
 CharacterPosture::CharacterPosture() :
-    characterPosture(None)
+    characterPosture()
 {
     // Nothing to do.
 }
@@ -36,6 +36,7 @@ CharacterPosture::CharacterPosture(const unsigned int & _characterPosture) :
     else if (_characterPosture == 3) characterPosture = Sit;
     else if (_characterPosture == 4) characterPosture = Prone;
     else if (_characterPosture == 5) characterPosture = Rest;
+    else if (_characterPosture == 6) characterPosture = Sleep;
     else characterPosture = None;
 }
 
@@ -47,17 +48,18 @@ CharacterPosture::CharacterPosture(const Enum & _characterPosture) :
 
 bool CharacterPosture::isValid(const unsigned int & _characterPosture)
 {
-    return (_characterPosture >= 1) && (_characterPosture <= 5);
+    return (_characterPosture >= 1) && (_characterPosture <= 6);
 }
 
 std::string CharacterPosture::toString() const
 {
-    if (characterPosture == Stand) return "standing";
-    else if (characterPosture == Crouch) return "crouched";
-    else if (characterPosture == Sit) return "sitting";
-    else if (characterPosture == Prone) return "prone";
-    else if (characterPosture == Rest) return "resting";
-    else return "none";
+    if (characterPosture == Stand) return "Stand";
+    else if (characterPosture == Crouch) return "Crouch";
+    else if (characterPosture == Sit) return "Sit";
+    else if (characterPosture == Prone) return "Prone";
+    else if (characterPosture == Rest) return "Rest";
+    else if (characterPosture == Sleep) return "Sleep";
+    else return "None";
 }
 
 unsigned int CharacterPosture::toUInt() const
@@ -65,12 +67,33 @@ unsigned int CharacterPosture::toUInt() const
     return static_cast<unsigned int>(characterPosture);
 }
 
-bool CharacterPosture::operator==(const CharacterPosture::Enum & rhs) const
+std::string CharacterPosture::getAction() const
 {
-    return characterPosture == rhs;
+    if (characterPosture == Stand) return "standing";
+    else if (characterPosture == Crouch) return "crouched";
+    else if (characterPosture == Sit) return "sitting";
+    else if (characterPosture == Prone) return "prone";
+    else if (characterPosture == Rest) return "resting";
+    else if (characterPosture == Sleep) return "sleeping";
+    else return "none";
 }
 
-bool CharacterPosture::operator!=(const CharacterPosture::Enum & rhs) const
+bool CharacterPosture::operator==(const CharacterPosture & rhs) const
 {
-    return characterPosture != rhs;
+    return characterPosture == rhs.characterPosture;
+}
+
+bool CharacterPosture::operator!=(const CharacterPosture & rhs) const
+{
+    return characterPosture != rhs.characterPosture;
+}
+
+bool CharacterPosture::operator<=(const CharacterPosture & rhs) const
+{
+    return characterPosture <= rhs.characterPosture;
+}
+
+bool CharacterPosture::operator>=(const CharacterPosture & rhs) const
+{
+    return characterPosture >= rhs.characterPosture;
 }

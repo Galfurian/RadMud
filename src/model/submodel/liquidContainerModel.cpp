@@ -83,7 +83,6 @@ void LiquidContainerModel::getSheet(Table & sheet) const
 std::string GetLiqContainerFlagString(unsigned int flags)
 {
     std::string flagList;
-    if (HasFlag(flags, LiqContainerFlag::Poisoned)) flagList += "|Poisoned";
     if (HasFlag(flags, LiqContainerFlag::Endless)) flagList += "|Endless";
     if (HasFlag(flags, LiqContainerFlag::Destroy)) flagList += "|Destroy";
     flagList += "|";

@@ -224,7 +224,7 @@ std::string Character::getStaticDesc() const
     desc += " is";
     if (posture != CharacterPosture::Stand)
     {
-        desc += " " + posture.toString();
+        desc += " " + posture.getAction();
     }
     desc += " here";
     if (this->getAction()->getType() != ActionType::Wait)
@@ -1106,16 +1106,12 @@ std::string Character::getHungerCondition() const
 
 void Character::updateHealth()
 {
-    unsigned int posModifier = 0;
     auto logModifier = this->getAbilityLog(Ability::Constitution);
-    if (posture == CharacterPosture::Sit)
-    {
-        posModifier = 2;
-    }
-    else if (posture == CharacterPosture::Rest)
-    {
-        posModifier = 4;
-    }
+    // Set the modifier due to the posture.
+    unsigned int posModifier = 0;
+    if (posture == CharacterPosture::Sit) posModifier = 2;
+    else if (posture == CharacterPosture::Rest) posModifier = 4;
+    else if (posture == CharacterPosture::Rest) posModifier = 8;
     if (this->health < this->getMaxHealth())
     {
         this->addHealth((1 + 3 * logModifier) * (1 + 2 * posModifier), true);
@@ -1124,16 +1120,12 @@ void Character::updateHealth()
 
 void Character::updateStamina()
 {
-    unsigned int posModifier = 0;
     auto logModifier = this->getAbilityLog(Ability::Constitution);
-    if (posture == CharacterPosture::Sit)
-    {
-        posModifier = 3;
-    }
-    else if (posture == CharacterPosture::Rest)
-    {
-        posModifier = 5;
-    }
+    // Set the modifier due to the posture.
+    unsigned int posModifier = 0;
+    if (posture == CharacterPosture::Sit) posModifier = 3;
+    else if (posture == CharacterPosture::Rest) posModifier = 5;
+    else if (posture == CharacterPosture::Rest) posModifier = 10;
     if (stamina < this->getMaxStamina())
     {
         this->addStamina((1 + 4 * logModifier) * (1 + 3 * posModifier), true);

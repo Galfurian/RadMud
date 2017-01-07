@@ -207,11 +207,15 @@ bool MoveAction::canMoveTo(Character * character,
         return !lockedInCombat;
     }
     // Check if the character is in a no-walk position.
-    if ((character->posture != CharacterPosture::Stand) &&
-        (character->posture != CharacterPosture::Crouch) &&
-        (character->posture != CharacterPosture::Prone))
+    if ((character->posture >= CharacterPosture::Sit) &&
+        (character->posture <= CharacterPosture::Rest))
     {
         error = "You first need to stand up.";
+        return false;
+    }
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        error = "You first need to wake up.";
         return false;
     }
     // Find the exit to the destination.
