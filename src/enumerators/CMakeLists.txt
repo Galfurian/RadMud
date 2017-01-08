@@ -18,7 +18,6 @@ set(PROJECT_SRC ${PROJECT_SRC}
         ${CMAKE_SOURCE_DIR}/src/enumerators/itemQuality.cpp
         ${CMAKE_SOURCE_DIR}/src/enumerators/materialType.cpp
         ${CMAKE_SOURCE_DIR}/src/enumerators/resourceType.cpp
-        ${CMAKE_SOURCE_DIR}/src/enumerators/equipmentSlot.cpp
         ${CMAKE_SOURCE_DIR}/src/enumerators/characterPosture.cpp
         PARENT_SCOPE
         )

@@ -44,7 +44,7 @@ Item::Item() :
     room(),
     owner(),
     container(),
-    currentSlot(EquipmentSlot::None),
+    currentBodyPart(),
     content()
 {
 }
@@ -203,7 +203,10 @@ void Item::getSheet(Table & sheet) const
         locationRow.push_back("Nowhere");
     }
     sheet.addRow(locationRow);
-    sheet.addRow({"Equipment Slot", currentSlot.toString()});
+    if(currentBodyPart != nullptr)
+    {
+        sheet.addRow({"Equipment Slot", currentBodyPart->name});
+    }
     if (!content.empty())
     {
         sheet.addDivider();
@@ -555,23 +558,23 @@ Item * Item::findContent(std::string search_parameter, int & number)
     return nullptr;
 }
 
-void Item::setCurrentSlot(EquipmentSlot _currentSlot)
+void Item::setCurrentSlot(std::shared_ptr<BodyPart> _currentBodyPart)
 {
-    currentSlot = _currentSlot;
+    currentBodyPart = _currentBodyPart;
 }
 
-EquipmentSlot Item::getCurrentSlot()
+std::shared_ptr<BodyPart> Item::getCurrentSlot(Race * race)
 {
-    if (currentSlot == EquipmentSlot::None)
+    if (currentBodyPart == nullptr)
     {
-        return model->slot;
+        return model->slot[race->vnum];
     }
-    return currentSlot;
+    return currentBodyPart;
 }
 
-std::string Item::getCurrentSlotName()
+std::string Item::getCurrentSlotName(Race * race)
 {
-    return getCurrentSlot().toString();
+    return this->getCurrentSlot(race)->name;
 }
 
 void Item::luaRegister(lua_State * L)

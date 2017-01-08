@@ -30,6 +30,7 @@
 #include "race.hpp"
 #include "item.hpp"
 #include "faction.hpp"
+#include "bodyPart.hpp"
 #include "LuaBridge.hpp"
 #include "effectList.hpp"
 #include "processInput.hpp"
@@ -330,6 +331,11 @@ public:
     /// @return The item, if it's in the character's inventory.
     Item * findInventoryItem(std::string search_parameter, int & number);
 
+    std::vector<std::shared_ptr<BodyPart>> getBodyParts(
+        const std::vector<BodyPartFlag> & requiredFlags = {
+            BodyPartFlag::None
+        }) const;
+
     /// @brief Search for the item in equipment.
     /// @param search_parameter The item to search.
     /// @param number           Position of the item we want to look for.
@@ -339,13 +345,13 @@ public:
     /// @brief Search the item at given position and return it.
     /// @param slot The slot where the method need to search the item.
     /// @return The item, if it's in the character's equipment.
-    Item * findEquipmentSlotItem(EquipmentSlot slot) const;
+    Item * findEquipmentSlotItem(std::shared_ptr<BodyPart> slot) const;
 
     /// @brief Search the tool in the given equipment slot.
     /// @param slot The slot where the tool can be found.
     /// @param type The type of the tool we are looking for.
     /// @return The tool, if it's in the given slot.
-    Item * findEquipmentSlotTool(EquipmentSlot slot, ToolType type);
+    Item * findEquipmentSlotTool(std::shared_ptr<BodyPart> slot, ToolType type);
 
     /// @brief Search an item nearby, (eq, inv, room).
     /// @param itemName The name of the item.
@@ -438,7 +444,7 @@ public:
     ///         <b>False</b> otherwise.
     bool canWield(Item * item,
                   std::string & error,
-                  EquipmentSlot & where) const;
+                  std::shared_ptr<BodyPart> where) const;
 
     /// @brief Check if the character can wear a given item.
     /// @param item  The item to wear.
@@ -506,7 +512,7 @@ public:
     /// @param slot The slot in which the weapon should be.
     /// @return <b>True</b> if the item is there,<br>
     ///         <b>False</b> otherwise.
-    bool canAttackWith(const EquipmentSlot & slot) const;
+    bool canAttackWith(std::shared_ptr<BodyPart> slot) const;
 
     /// @brief Checks if the given target is both In Sight and within the Range of Sight.
     /// @param target The target character.

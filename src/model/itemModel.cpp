@@ -94,7 +94,10 @@ void ItemModel::getSheet(Table & sheet) const
     sheet.addRow({"Keys", keyGroup});
     sheet.addRow({"Description", this->description});
     sheet.addRow({"Type", this->getTypeName()});
-    sheet.addRow({"Slot", this->slot.toString()});
+    for (auto bodyPart : slot)
+    {
+        sheet.addRow({"Body Part", bodyPart.second->name});
+    }
     sheet.addRow({"Flags", GetModelFlagString(this->modelFlags)});
     sheet.addRow({"Condition", ToString(this->condition)});
     sheet.addRow({"Material", this->material.toString()});
@@ -176,7 +179,7 @@ Item * ItemModel::createItem(
         newItem->maxCondition = ((valBase + valQuality + valMaterial) / 3);
         newItem->condition = newItem->maxCondition;
     }
-    newItem->currentSlot = slot;
+    newItem->currentBodyPart = nullptr;
 
     // If the item is for a mobile, do not add the item to the MUD nor to the
     //  DB and do not check its correctness.
@@ -225,7 +228,7 @@ bool ItemModel::check()
         (this->getType() == ModelType::MeleeWeapon) ||
         (this->getType() == ModelType::RangedWeapon))
     {
-        assert(slot != EquipmentSlot::None);
+        assert(!slot.empty());
     }
     assert(condition > 0);
     assert(this->material != MaterialType::None);
@@ -286,10 +289,14 @@ std::string ItemModel::getDescription(Material * itemMaterial,
     return output;
 }
 
-bool ItemModel::mustBeWielded()
+bool ItemModel::mustBeWielded(Race * race)
 {
-    return ((slot == EquipmentSlot::RightHand) ||
-            (slot == EquipmentSlot::LeftHand));
+    auto bodyPart = slot[race->vnum];
+    if (bodyPart == nullptr)
+    {
+        return false;
+    }
+    return HasFlag(bodyPart->flags, BodyPartFlag::CanWield);
 }
 
 void ItemModel::luaRegister(lua_State * L)
@@ -418,7 +425,8 @@ std::shared_ptr<LightModel> ItemModel::toLight()
 
 std::shared_ptr<LiquidContainerModel> ItemModel::toLiquidContainer()
 {
-    return std::static_pointer_cast<LiquidContainerModel>(this->shared_from_this());
+    return std::static_pointer_cast<LiquidContainerModel>(
+        this->shared_from_this());
 }
 
 std::shared_ptr<MechanismModel> ItemModel::toMechanism()
@@ -478,7 +486,8 @@ std::shared_ptr<MeleeWeaponModel> ItemModel::toMeleeWeapon()
 
 std::shared_ptr<RangedWeaponModel> ItemModel::toRangedWeapon()
 {
-    return std::static_pointer_cast<RangedWeaponModel>(this->shared_from_this());
+    return std::static_pointer_cast<RangedWeaponModel>(
+        this->shared_from_this());
 }
 
 std::shared_ptr<MagazineModel> ItemModel::toMagazine()

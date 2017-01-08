@@ -84,7 +84,7 @@ public:
     /// Pointer to the item which contains this item.
     Item * container;
     /// Current equipment slot.
-    EquipmentSlot currentSlot;
+    std::shared_ptr<BodyPart> currentBodyPart;
     /// List of items contained in this one.
     ItemVector content;
 
@@ -257,16 +257,16 @@ public:
     Item * findContent(std::string search_parameter, int & number);
 
     /// @brief Set the equipment slot where this item must be worn.
-    /// @param _currentSlot The new equipment slot.
-    void setCurrentSlot(EquipmentSlot _currentSlot);
+    /// @param _currentBodyPart The new equipment slot.
+    void setCurrentSlot(std::shared_ptr<BodyPart> _currentBodyPart);
 
     /// @brief Return the current equipment slot.
     /// @return The equipment slot.
-    EquipmentSlot getCurrentSlot();
+    std::shared_ptr<BodyPart> getCurrentSlot(Race * race);
 
     /// @brief Return the current equipment slot name.
     /// @return The equipment slot name.
-    std::string getCurrentSlotName();
+    std::string getCurrentSlotName(Race * race);
 
     /// @brief Function used to register inside the lua environment the class.
     /// @param L The lua environment.

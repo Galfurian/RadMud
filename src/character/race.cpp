@@ -59,7 +59,6 @@ void Race::initializeCorpse(const std::string & corpseDescription)
     corpse->keys.push_back("corpse");
     corpse->keys.push_back(name);
     corpse->description = corpseDescription;
-    corpse->slot = EquipmentSlot::None;
     corpse->modelFlags = 0;
     corpse->condition = 10;
     corpse->material = this->material->type;

@@ -376,10 +376,11 @@ void BasicAttack::performMeleeAttack(Character * target,
         {
             // Evaluate the penalty to the hit roll.
             unsigned int penalty = 0;
+            // TODO: Implement penalities with the new body part system.
             // On the RIGHT hand the penality is 6.
             // On the LEFT  hand the penality is 10.
-            if (weapon->currentSlot == EquipmentSlot::RightHand) penalty = 6;
-            if (weapon->currentSlot == EquipmentSlot::LeftHand) penalty = 10;
+            //if (weapon->currentSlot == EquipmentSlot::RightHand) penalty = 6;
+            //if (weapon->currentSlot == EquipmentSlot::LeftHand) penalty = 10;
             // Safely apply the penality.
             hitRoll = (hitRoll < penalty) ? 0 : (hitRoll - penalty);
         }
@@ -491,10 +492,11 @@ void BasicAttack::performRangedAttack(Character * target,
     {
         // Evaluate the penalty to the hit roll.
         unsigned int penalty = 0;
+        // TODO: Implement penalities with the new body part system.
         // On the RIGHT hand the penality is 6.
         // On the LEFT  hand the penality is 10.
-        if (weapon->currentSlot == EquipmentSlot::RightHand) penalty = 6;
-        if (weapon->currentSlot == EquipmentSlot::LeftHand) penalty = 10;
+        //if (weapon->currentSlot == EquipmentSlot::RightHand) penalty = 6;
+        //if (weapon->currentSlot == EquipmentSlot::LeftHand) penalty = 10;
         // Safely apply the penality.
         hitRoll = (hitRoll < penalty) ? 0 : (hitRoll - penalty);
     }

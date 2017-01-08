@@ -34,14 +34,6 @@ bool DoEquipments(Character * character, ArgumentHandler & /*args*/)
         character->sendMsg("Not while you're sleeping.\n");
         return false;
     }
-    // Retrieve the equipment.
-    auto head = character->findEquipmentSlotItem(EquipmentSlot::Head);
-    auto back = character->findEquipmentSlotItem(EquipmentSlot::Back);
-    auto torso = character->findEquipmentSlotItem(EquipmentSlot::Torso);
-    auto legs = character->findEquipmentSlotItem(EquipmentSlot::Legs);
-    auto feet = character->findEquipmentSlotItem(EquipmentSlot::Feet);
-    auto right = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
-    auto left = character->findEquipmentSlotItem(EquipmentSlot::LeftHand);
     // Check if the room is lit.
     bool roomIsLit = false;
     if (character->room != nullptr)
@@ -53,68 +45,13 @@ bool DoEquipments(Character * character, ArgumentHandler & /*args*/)
     output += Formatter::yellow();
     output += "#------------ Equipment -----------#\n";
     output += Formatter::reset();
-    // Equipment Slot : HEAD
-    output += "\tHead       : ";
-    if (head != nullptr)
+    // Retrieve the equipment.
+    for (auto equipmentItem : character->equipment)
     {
-        if (roomIsLit) output += head->getNameCapital(true);
+        output += "\t";
+        output += equipmentItem->getCurrentSlot(character->race)->name + " : ";
+        if (roomIsLit) output += equipmentItem->getNameCapital(true);
         else output += "Something";
-    }
-    output += "\n";
-    // Equipment Slot : BACK
-    output += "\tBack       : ";
-    if (back != nullptr)
-    {
-        if (roomIsLit) output += back->getNameCapital(true);
-        else output += "Something";
-    }
-    output += "\n";
-    // Equipment Slot : TORSO
-    output += "\tTorso      : ";
-    if (torso != nullptr)
-    {
-        if (roomIsLit) output += torso->getNameCapital(true);
-        else output += "Something";
-    }
-    output += "\n";
-    // Equipment Slot : LEGS
-    output += "\tLegs       : ";
-    if (legs != nullptr)
-    {
-        if (roomIsLit) output += legs->getNameCapital(true);
-        else output += "Something";
-    }
-    output += "\n";
-    // Equipment Slot : FEET
-    output += "\tFeet       : ";
-    if (feet != nullptr)
-    {
-        if (roomIsLit) output += feet->getNameCapital(true);
-        else output += "Something";
-    }
-    output += "\n";
-    // Print what is wielding.
-    if (right != nullptr)
-    {
-        if (HasFlag(right->model->modelFlags, ModelFlag::TwoHand))
-        {
-            output += "\tBoth Hands : ";
-        }
-        else
-        {
-            output += "\tRight Hand : ";
-        }
-        if (roomIsLit) output += right->getNameCapital(true);
-        else output += "Something";
-        output += "\n";
-    }
-    if (left != nullptr)
-    {
-        output += "\tLeft Hand  : ";
-
-        if (roomIsLit) output += left->getNameCapital(true);
-        else output += "Something";
-        output += "\n";
     }
     output += Formatter::yellow();
     output += "#----------------------------------#\n";
@@ -180,7 +117,7 @@ bool DoWield(Character * character, ArgumentHandler & args)
         return false;
     }
     // Check if can be wielded.
-    if (!item->model->mustBeWielded())
+    if (!item->model->mustBeWielded(character->race))
     {
         character->sendMsg("This item it's not meant to be wield.\n");
         // In case the item must be worn, advise the player.
@@ -193,24 +130,24 @@ bool DoWield(Character * character, ArgumentHandler & args)
     // String where the error message will be put.
     std::string errMessage;
     // The destination slot.
-    EquipmentSlot destinationSlot;
+    std::shared_ptr<BodyPart> bodyPart;
     // Check if the character can wield the item.
-    if (!character->canWield(item, errMessage, destinationSlot))
+    if (!character->canWield(item, errMessage, bodyPart))
     {
         character->sendMsg(errMessage);
         return false;
     }
     // Set the item slot.
-    item->setCurrentSlot(destinationSlot);
+    item->setCurrentSlot(bodyPart);
     // Remove the item from the inventory.
     character->remInventoryItem(item);
     // Equip the item.
     character->addEquipmentItem(item);
     // Show the proper message.
     auto object = item->getName(true);
-    auto where = "with your " + item->getCurrentSlotName();
+    auto where = "with your " + item->getCurrentSlotName(character->race);
     auto whereOthers = character->getPossessivePronoun();
-    whereOthers += " " + item->getCurrentSlotName();
+    whereOthers += " " + item->getCurrentSlotName(character->race);
     if (HasFlag(item->model->modelFlags, ModelFlag::TwoHand))
     {
         where = "both your hands";
@@ -324,14 +261,15 @@ bool DoWear(Character * character, ArgumentHandler & args)
     character->addEquipmentItem(item);
     // Notify to character.
     character->sendMsg("You wear %s on your %s.\n", item->getName(true),
-                       ToLower(item->getCurrentSlotName()));
+                       ToLower(item->getCurrentSlotName(character->race)));
     // Send the message inside the room.
     character->room->sendToAll("%s wears %s on %s %s.\n",
                                {character},
                                character->getNameCapital(),
                                item->getName(true),
                                character->getPossessivePronoun(),
-                               ToLower(item->getCurrentSlotName()));
+                               ToLower(
+                                   item->getCurrentSlotName(character->race)));
     return true;
 }
 
@@ -363,25 +301,22 @@ bool DoRemove(Character * character, ArgumentHandler & args)
         {
             return false;
         }
-        auto left = character->findEquipmentSlotItem(EquipmentSlot::LeftHand);
-        if (left != nullptr)
+        for (auto equipmentItem : character->equipment)
         {
-            if (left->getType() == ModelType::RangedWeapon)
+            auto bodyPart = equipmentItem->getCurrentSlot(character->race);
+            if (bodyPart != nullptr)
             {
-                return false;
-            }
-        }
-        auto right = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
-        if (right != nullptr)
-        {
-            if (right->getType() == ModelType::RangedWeapon)
-            {
-                return false;
+                if (HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
+                {
+                    if (equipmentItem->getType() == ModelType::RangedWeapon)
+                    {
+                        return false;
+                    }
+                }
             }
         }
         return true;
     };
-
     if (args[0].getContent() == "all")
     {
         // Handle output only if the player has really removed something.
@@ -439,14 +374,14 @@ bool DoRemove(Character * character, ArgumentHandler & args)
     // Notify the character.
     character->sendMsg("You remove %s from your %s.\n",
                        item->getName(true),
-                       ToLower(item->getCurrentSlotName()));
+                       ToLower(item->getCurrentSlotName(character->race)));
     // Send the message inside the room.
     character->room->sendToAll("%s removes %s from %s %s.\n",
                                {character},
                                character->getNameCapital(),
                                item->getName(true),
                                character->getPossessivePronoun(),
-                               ToLower(item->getCurrentSlotName()));
+                               ToLower(item->getCurrentSlotName(character->race)));
     // Check if we have just removed ALL the USED Ranged Weapons.
     if (character->combatHandler.getAimedTarget() != nullptr)
     {

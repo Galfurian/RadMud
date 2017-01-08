@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "equipmentSlot.hpp"
 #include "itemQuality.hpp"
 #include "lua_script.hpp"
 #include "modelType.hpp"
+#include "bodyPart.hpp"
 #include "material.hpp"
 #include "table.hpp"
 #include "utils.hpp"
@@ -118,7 +118,7 @@ public:
     /// The model description.
     std::string description;
     /// Store here the position where the model can be equipped.
-    EquipmentSlot slot;
+    std::map<int, std::shared_ptr<BodyPart> > slot;
     /// The model flags.
     unsigned int modelFlags;
     /// The model base weight.
@@ -222,7 +222,7 @@ public:
     /// @brief Check if the item must be wielded.
     /// @return <b>True</b> if the item must be wielded,<br>
     ///         <b>False</b> Otherwise.
-    bool mustBeWielded();
+    bool mustBeWielded(Race * race);
 
     /// @brief Function used to register inside the lua environment the class.
     /// @param L The lua environment.

@@ -154,7 +154,7 @@ void Player::addInventoryItem(Item *& item)
     {
         SQLiteDbms::instance().insertInto(
             "ItemPlayer",
-            {name, ToString(item->vnum), EnumToString(EquipmentSlot::None)},
+            {name, ToString(item->vnum), "0"},
             false,
             true);
     }
@@ -171,7 +171,7 @@ void Player::addEquipmentItem(Item *& item)
             {
                 name,
                 ToString(item->vnum),
-                ToString(item->getCurrentSlot().toUInt())
+                ToString(item->getCurrentSlot(this->race)->id)
             },
             false,
             true);

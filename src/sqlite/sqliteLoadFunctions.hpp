@@ -113,4 +113,8 @@ bool LoadCurrency(ResultSet * result);
 
 /// @brief Function used to load terrains.
 bool LoadTerrain(ResultSet * result);
+
+/// @brief Function used to load body parts.
+bool LoadBodyPart(ResultSet * result);
+
 ///@}

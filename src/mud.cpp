@@ -34,7 +34,7 @@
 static fd_set in_set;
 /// Output file descriptor.
 static fd_set out_set;
-/// Exceptino file descriptor.
+/// Exception file descriptor.
 static fd_set exc_set;
 
 void Bailout(int signal)
@@ -78,7 +78,8 @@ Mud::Mud() :
     mudNews(),
     mudCommands(),
     mudBuildings(),
-    mudTerrains()
+    mudTerrains(),
+    mudBodyParts()
 {
     // Nothing to do.
 }
@@ -649,6 +650,18 @@ std::shared_ptr<Terrain> Mud::findTerrain(unsigned int vnum)
         if (it.second->vnum == vnum)
         {
             return it.second;
+        }
+    }
+    return nullptr;
+}
+
+std::shared_ptr<BodyPart> Mud::findBodyPart(int raceVnum, unsigned int id)
+{
+    for (auto bodyPart : mudBodyParts)
+    {
+        if ((bodyPart->raceVnum == raceVnum) && (bodyPart->id == id))
+        {
+            return bodyPart;
         }
     }
     return nullptr;

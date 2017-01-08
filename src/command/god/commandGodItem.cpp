@@ -370,7 +370,12 @@ bool DoModelList(Character * character, ArgumentHandler & args)
         row.push_back(ToString(itemModel->vnum));
         row.push_back(itemModel->name);
         row.push_back(itemModel->getTypeName());
-        row.push_back(itemModel->slot.toString());
+        std::string bodyParts;
+        for (auto bodyPart : itemModel->slot)
+        {
+            bodyParts += bodyPart.second->name;
+        }
+        row.push_back(bodyParts);
         row.push_back(ToString(itemModel->modelFlags));
         // Add the row to the table.
         table.addRow(row);
