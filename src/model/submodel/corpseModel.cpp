@@ -109,7 +109,6 @@ Item * CorpseModel::createCorpse(
     newItem->weight = weight;
     newItem->condition = static_cast<unsigned int>(weight);
     newItem->maxCondition = static_cast<unsigned int>(weight);
-    newItem->currentSlot = slot;
 
     Mud::instance().addCorpse(newItem);
     return newItem;

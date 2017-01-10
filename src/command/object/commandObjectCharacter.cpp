@@ -34,91 +34,33 @@ bool DoEquipments(Character * character, ArgumentHandler & /*args*/)
         character->sendMsg("Not while you're sleeping.\n");
         return false;
     }
-    // Retrieve the equipment.
-    auto head = character->findEquipmentSlotItem(EquipmentSlot::Head);
-    auto back = character->findEquipmentSlotItem(EquipmentSlot::Back);
-    auto torso = character->findEquipmentSlotItem(EquipmentSlot::Torso);
-    auto legs = character->findEquipmentSlotItem(EquipmentSlot::Legs);
-    auto feet = character->findEquipmentSlotItem(EquipmentSlot::Feet);
-    auto right = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
-    auto left = character->findEquipmentSlotItem(EquipmentSlot::LeftHand);
     // Check if the room is lit.
     bool roomIsLit = false;
     if (character->room != nullptr)
     {
         roomIsLit = character->room->isLit();
     }
+    // Go through all the body parts of the race.
     std::string output;
-    // Print what is wearing.
-    output += Formatter::yellow();
-    output += "#------------ Equipment -----------#\n";
-    output += Formatter::reset();
-    // Equipment Slot : HEAD
-    output += "\tHead       : ";
-    if (head != nullptr)
+    for (auto bodyPart : character->race->bodyParts)
     {
-        if (roomIsLit) output += head->getNameCapital(true);
-        else output += "Something";
-    }
-    output += "\n";
-    // Equipment Slot : BACK
-    output += "\tBack       : ";
-    if (back != nullptr)
-    {
-        if (roomIsLit) output += back->getNameCapital(true);
-        else output += "Something";
-    }
-    output += "\n";
-    // Equipment Slot : TORSO
-    output += "\tTorso      : ";
-    if (torso != nullptr)
-    {
-        if (roomIsLit) output += torso->getNameCapital(true);
-        else output += "Something";
-    }
-    output += "\n";
-    // Equipment Slot : LEGS
-    output += "\tLegs       : ";
-    if (legs != nullptr)
-    {
-        if (roomIsLit) output += legs->getNameCapital(true);
-        else output += "Something";
-    }
-    output += "\n";
-    // Equipment Slot : FEET
-    output += "\tFeet       : ";
-    if (feet != nullptr)
-    {
-        if (roomIsLit) output += feet->getNameCapital(true);
-        else output += "Something";
-    }
-    output += "\n";
-    // Print what is wielding.
-    if (right != nullptr)
-    {
-        if (HasFlag(right->model->modelFlags, ModelFlag::TwoHand))
+        // Add the body part name to the row.
+        output += AlignString(bodyPart->getDescription(true),
+                              StringAlign::Left, 15);
+        auto item = character->findItemAtBodyPart(bodyPart);
+        if (item != nullptr)
         {
-            output += "\tBoth Hands : ";
+            if (roomIsLit)
+            {
+                output += " - " + item->getNameCapital(true);
+            }
+            else
+            {
+                output += " - Something";
+            }
         }
-        else
-        {
-            output += "\tRight Hand : ";
-        }
-        if (roomIsLit) output += right->getNameCapital(true);
-        else output += "Something";
         output += "\n";
     }
-    if (left != nullptr)
-    {
-        output += "\tLeft Hand  : ";
-
-        if (roomIsLit) output += left->getNameCapital(true);
-        else output += "Something";
-        output += "\n";
-    }
-    output += Formatter::yellow();
-    output += "#----------------------------------#\n";
-    output += Formatter::reset();
     character->sendMsg(output);
     return true;
 }
@@ -179,44 +121,39 @@ bool DoWield(Character * character, ArgumentHandler & args)
         character->sendMsg("You don't have that item.\n");
         return false;
     }
-    // Check if can be wielded.
-    if (!item->model->mustBeWielded())
-    {
-        character->sendMsg("This item it's not meant to be wield.\n");
-        // In case the item must be worn, advise the player.
-        if (item->model->getType() == ModelType::Armor)
-        {
-            character->sendMsg("Try to wear it instead.\n");
-        }
-        return false;
-    }
     // String where the error message will be put.
     std::string errMessage;
-    // The destination slot.
-    EquipmentSlot destinationSlot;
+    // The occupied body parts.
+    auto bodyParts = character->canWield(item, errMessage);
     // Check if the character can wield the item.
-    if (!character->canWield(item, errMessage, destinationSlot))
+    if (bodyParts.empty())
     {
         character->sendMsg(errMessage);
         return false;
     }
-    // Set the item slot.
-    item->setCurrentSlot(destinationSlot);
+    // Set the item body part.
+    item->setOccupiedBodyParts(bodyParts);
     // Remove the item from the inventory.
     character->remInventoryItem(item);
     // Equip the item.
     character->addEquipmentItem(item);
     // Show the proper message.
-    auto object = item->getName(true);
-    auto where = "with your " + item->getCurrentSlotName();
-    auto whereOthers = character->getPossessivePronoun();
-    whereOthers += " " + item->getCurrentSlotName();
-    if (HasFlag(item->model->modelFlags, ModelFlag::TwoHand))
+    std::string where, whereOthers;
+    for (auto it = bodyParts.begin(); it != bodyParts.end();)
     {
-        where = "both your hands";
-        whereOthers = "both " + character->getPossessivePronoun() + " hands";
+        where += "your " + (*it)->getDescription();
+        whereOthers += character->getPossessivePronoun() + " ";
+        whereOthers += (*it)->getDescription();
+        it++;
+        if (it != bodyParts.end())
+        {
+            where += ", ";
+            whereOthers += ", ";
+        }
     }
-    character->sendMsg("You wield %s with %s.\n", object, where);
+    character->sendMsg("You wield %s with %s.\n",
+                       item->getName(true),
+                       where);
     // Send the message inside the room.
     character->room->sendToAll("%s wields %s with %s.\n",
                                {character},
@@ -253,11 +190,16 @@ bool DoWear(Character * character, ArgumentHandler & args)
         auto untouchedList = character->inventory;
         for (auto iterator : untouchedList)
         {
+            // String where the error message will be put.
             std::string errMessage;
-            if (!character->canWear(iterator, errMessage))
+            // The destination bodyParts.
+            auto bodyParts = character->canWear(iterator, errMessage);
+            if (bodyParts.empty())
             {
                 continue;
             }
+            // Set the body part occupied by the item.
+            iterator->setOccupiedBodyParts(bodyParts);
             // Remove the item from the player's inventory.
             character->remInventoryItem(iterator);
             // Add the item to the equipment.
@@ -312,26 +254,45 @@ bool DoWear(Character * character, ArgumentHandler & args)
         character->sendMsg("You don't have that item.\n");
         return false;
     }
+    // String where the error message will be put.
     std::string errMessage;
-    if (!character->canWear(item, errMessage))
+    // Get the body parts required by the item.
+    auto bodyParts = character->canWear(item, errMessage);
+    if (bodyParts.empty())
     {
         character->sendMsg(errMessage);
         return false;
     }
+    // Set the body parts occupied by the item.
+    item->setOccupiedBodyParts(bodyParts);
     // Remove the item from the player's inventory.
     character->remInventoryItem(item);
     // Add the item to the equipment.
     character->addEquipmentItem(item);
+    // Show the proper message.
+    std::string where, whereOthers;
+    for (auto it = bodyParts.begin(); it != bodyParts.end();)
+    {
+        where += "your " + (*it)->getDescription();
+        whereOthers += character->getPossessivePronoun() + " ";
+        whereOthers += (*it)->getDescription();
+        it++;
+        if (it != bodyParts.end())
+        {
+            where += ", ";
+            whereOthers += ", ";
+        }
+    }
     // Notify to character.
-    character->sendMsg("You wear %s on your %s.\n", item->getName(true),
-                       ToLower(item->getCurrentSlotName()));
+    character->sendMsg("You wear %s on your %s.\n",
+                       item->getName(true),
+                       where);
     // Send the message inside the room.
-    character->room->sendToAll("%s wears %s on %s %s.\n",
+    character->room->sendToAll("%s wears %s on %s.\n",
                                {character},
                                character->getNameCapital(),
                                item->getName(true),
-                               character->getPossessivePronoun(),
-                               ToLower(item->getCurrentSlotName()));
+                               whereOthers);
     return true;
 }
 
@@ -356,32 +317,6 @@ bool DoRemove(Character * character, ArgumentHandler & args)
         character->sendMsg("Too many arguments.\n");
         return false;
     }
-    // Define a function which checks if all the ranged weapons have been removed.
-    auto CheckIfRemovedAllRangedWeapons = [&character]()
-    {
-        if (character->combatHandler.getAimedTarget() == nullptr)
-        {
-            return false;
-        }
-        auto left = character->findEquipmentSlotItem(EquipmentSlot::LeftHand);
-        if (left != nullptr)
-        {
-            if (left->getType() == ModelType::RangedWeapon)
-            {
-                return false;
-            }
-        }
-        auto right = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
-        if (right != nullptr)
-        {
-            if (right->getType() == ModelType::RangedWeapon)
-            {
-                return false;
-            }
-        }
-        return true;
-    };
-
     if (args[0].getContent() == "all")
     {
         // Handle output only if the player has really removed something.
@@ -406,7 +341,7 @@ bool DoRemove(Character * character, ArgumentHandler & args)
         // Check if we have just removed ALL the USED Ranged Weapons.
         if (character->combatHandler.getAimedTarget() != nullptr)
         {
-            if (CheckIfRemovedAllRangedWeapons())
+            if (character->getActiveRangedWeapons().empty())
             {
                 character->sendMsg("You stop aiming %s.\n",
                                    character->combatHandler
@@ -432,25 +367,39 @@ bool DoRemove(Character * character, ArgumentHandler & args)
         character->sendMsg("You don't have that item equipped.\n");
         return false;
     }
+    // Prepare the message showing from the where the item has been removed.
+    std::string where, whereOthers;
+    for (auto it = item->occupiedBodyParts.begin();
+         it != item->occupiedBodyParts.end();)
+    {
+        where += "your " + (*it)->getDescription();
+        whereOthers += character->getPossessivePronoun() + " ";
+        whereOthers += (*it)->getDescription();
+        it++;
+        if (it != item->occupiedBodyParts.end())
+        {
+            where += ", ";
+            whereOthers += ", ";
+        }
+    }
     // Remove the item from the player's equipment.
     character->remEquipmentItem(item);
     // Add the item to the inventory.
     character->addInventoryItem(item);
     // Notify the character.
-    character->sendMsg("You remove %s from your %s.\n",
+    character->sendMsg("You remove %s from %s.\n",
                        item->getName(true),
-                       ToLower(item->getCurrentSlotName()));
+                       where);
     // Send the message inside the room.
-    character->room->sendToAll("%s removes %s from %s %s.\n",
+    character->room->sendToAll("%s removes %s from %s.\n",
                                {character},
                                character->getNameCapital(),
                                item->getName(true),
-                               character->getPossessivePronoun(),
-                               ToLower(item->getCurrentSlotName()));
+                               whereOthers);
     // Check if we have just removed ALL the USED Ranged Weapons.
     if (character->combatHandler.getAimedTarget() != nullptr)
     {
-        if (CheckIfRemovedAllRangedWeapons())
+        if (character->getActiveRangedWeapons().empty())
         {
             character->sendMsg("You stop aiming %s.\n",
                                character->combatHandler

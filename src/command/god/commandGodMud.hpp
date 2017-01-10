@@ -1,4 +1,4 @@
-/// @file   commandGodsMud.hpp
+/// @file   commandGodMud.hpp
 /// @author Enrico Fraccaroli
 /// @date   Jan 02 2017
 /// @copyright

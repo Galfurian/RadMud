@@ -44,7 +44,7 @@ Item::Item() :
     room(),
     owner(),
     container(),
-    currentSlot(EquipmentSlot::None),
+    occupiedBodyParts(),
     content()
 {
 }
@@ -66,7 +66,6 @@ bool Item::check()
     safe &= CorrectAssert(!maker.empty());
     safe &= CorrectAssert(condition > 0);
     safe &= CorrectAssert(composition != nullptr);
-    //safe &= CorrectAssert(currentSlot != EquipmentSlot::kNoEquipSlot);
     return safe;
 }
 
@@ -203,7 +202,10 @@ void Item::getSheet(Table & sheet) const
         locationRow.push_back("Nowhere");
     }
     sheet.addRow(locationRow);
-    sheet.addRow({"Equipment Slot", currentSlot.toString()});
+    for(auto bodyPart : occupiedBodyParts)
+    {
+        sheet.addRow({"Body Part", bodyPart->getDescription()});
+    }
     if (!content.empty())
     {
         sheet.addDivider();
@@ -555,23 +557,10 @@ Item * Item::findContent(std::string search_parameter, int & number)
     return nullptr;
 }
 
-void Item::setCurrentSlot(EquipmentSlot _currentSlot)
+void Item::setOccupiedBodyParts(
+    std::vector<std::shared_ptr<BodyPart>> _occupiedBodyParts)
 {
-    currentSlot = _currentSlot;
-}
-
-EquipmentSlot Item::getCurrentSlot()
-{
-    if (currentSlot == EquipmentSlot::None)
-    {
-        return model->slot;
-    }
-    return currentSlot;
-}
-
-std::string Item::getCurrentSlotName()
-{
-    return getCurrentSlot().toString();
+    occupiedBodyParts = _occupiedBodyParts;
 }
 
 void Item::luaRegister(lua_State * L)

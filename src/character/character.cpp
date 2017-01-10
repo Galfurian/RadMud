@@ -636,32 +636,15 @@ Item * Character::findEquipmentItem(std::string search_parameter, int & number)
     return nullptr;
 }
 
-Item * Character::findEquipmentSlotItem(EquipmentSlot slot) const
+Item * Character::findItemAtBodyPart(std::shared_ptr<BodyPart> bodyPart) const
 {
-    for (auto iterator : equipment)
+    for (auto item : equipment)
     {
-        if (iterator->getCurrentSlot() == slot)
+        for (auto occupiedBodyPart : item->occupiedBodyParts)
         {
-            return iterator;
-        }
-    }
-    return nullptr;
-}
-
-Item * Character::findEquipmentSlotTool(EquipmentSlot slot, ToolType type)
-{
-    auto tool = findEquipmentSlotItem(slot);
-    if (tool != nullptr)
-    {
-        if (tool->model != nullptr)
-        {
-            if (tool->model->getType() == ModelType::Tool)
+            if (occupiedBodyPart->vnum == bodyPart->vnum)
             {
-                auto toolModel = tool->model->toTool();
-                if (toolModel->toolType == type)
-                {
-                    return tool;
-                }
+                return item;
             }
         }
     }
@@ -945,6 +928,8 @@ bool Character::remEquipmentItem(Item * item)
     }
     // Clear the owner of the item.
     item->owner = nullptr;
+    // Empty the occupied body parts.
+    item->occupiedBodyParts.clear();
     // Log it.
     Logger::log(LogLevel::Debug,
                 "Item '%s' removed from '%s';",
@@ -974,87 +959,91 @@ double Character::getCarryingWeight() const
 
 double Character::getMaxCarryingWeight() const
 {
-    // Value = 50 + (AbilMod(STR) * 10)
-    // MIN   =  50
-    // MAX   = 300
-    return 50 + (this->getAbilityModifier(Ability::Strength) * 10);
+    // Value = 100 + (AbilMod(STR) * 10)
+    // MIN   = 100
+    // MAX   = 350
+    return 100 + (this->getAbilityModifier(Ability::Strength) * 10);
 }
 
-bool Character::canWield(Item * item,
-                         std::string & error,
-                         EquipmentSlot & where) const
+std::vector<std::shared_ptr<BodyPart>> Character::canWield(
+    Item * item,
+    std::string & error) const
 {
-    // Gather the item in the right hand, if there is one.
-    auto rightHand = findEquipmentSlotItem(EquipmentSlot::RightHand);
-    // Gather the item in the left hand, if there is one.
-    auto leftHand = findEquipmentSlotItem(EquipmentSlot::LeftHand);
-    if (HasFlag(item->model->modelFlags, ModelFlag::TwoHand))
+    // Prepare the list of occupied body parts.
+    std::vector<std::shared_ptr<BodyPart>> occupiedBodyParts;
+    // Get the compatible body parts.
+    auto compatibleBodyParts = item->model->getBodyParts(race);
+    if (compatibleBodyParts.empty())
     {
-        if ((rightHand != nullptr) || (leftHand != nullptr))
-        {
-            error = "You must have both your hand free to wield it.\n";
-            return false;
-        }
-        where = EquipmentSlot::RightHand;
+        error = "It is not designed for your fisionomy.\n";
+        return occupiedBodyParts;
     }
-    else
+    for (auto bodyPart : compatibleBodyParts)
     {
-        if ((rightHand != nullptr) && (leftHand != nullptr))
+        if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
         {
-            error = "You have both your hand occupied.\n";
-            return false;
+            continue;
         }
-        else if ((rightHand == nullptr) && (leftHand != nullptr))
+        if (this->findItemAtBodyPart(bodyPart) != nullptr)
         {
-            if (HasFlag(leftHand->model->modelFlags, ModelFlag::TwoHand))
-            {
-                error = "You have both your hand occupied.\n";
-                return false;
-            }
-            where = EquipmentSlot::RightHand;
+            continue;
         }
-        else if ((rightHand != nullptr) && (leftHand == nullptr))
+        occupiedBodyParts.emplace_back(bodyPart);
+        if (!HasFlag(item->model->modelFlags, ModelFlag::TwoHand))
         {
-            if (HasFlag(rightHand->model->modelFlags, ModelFlag::TwoHand))
-            {
-                error = "You have both your hand occupied.\n";
-                return false;
-            }
-            where = EquipmentSlot::LeftHand;
+            break;
         }
         else
         {
-            where = EquipmentSlot::RightHand;
+            if (occupiedBodyParts.size() == 2)
+            {
+                break;
+            }
         }
     }
-    return true;
+    if (HasFlag(item->model->modelFlags, ModelFlag::TwoHand) &&
+        (occupiedBodyParts.size() != 2))
+    {
+        occupiedBodyParts.clear();
+    }
+    if (occupiedBodyParts.empty())
+    {
+        error = "There is no room where it can be wielded.\n";
+    }
+    return occupiedBodyParts;
 }
 
-bool Character::canWear(Item * item, std::string & error) const
+std::vector<std::shared_ptr<BodyPart>> Character::canWear(
+    Item * item,
+    std::string & error) const
 {
-    bool result = false;
-    if (item->model->getType() == ModelType::Armor)
+    // Prepare the list of occupied body parts.
+    std::vector<std::shared_ptr<BodyPart>> occupiedBodyParts;
+    // Get the compatible body parts.
+    auto compatibleBodyParts = item->model->getBodyParts(race);
+    if (compatibleBodyParts.empty())
     {
-        result = true;
+        error = "It is not designed for your fisionomy.\n";
+        return occupiedBodyParts;
     }
-    else if (item->model->getType() == ModelType::Container)
+    for (auto bodyPart : compatibleBodyParts)
     {
-        if (item->getCurrentSlot() != EquipmentSlot::None)
+        if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWear))
         {
-            result = true;
+            continue;
         }
+        if (this->findItemAtBodyPart(bodyPart) != nullptr)
+        {
+            continue;
+        }
+        occupiedBodyParts.emplace_back(bodyPart);
+        break;
     }
-    if (!result)
+    if (occupiedBodyParts.empty())
     {
-        error = "The item is not meant to be worn.\n";
-        return false;
+        error = "There is no room where it can be worn.\n";
     }
-    if (findEquipmentSlotItem(item->getCurrentSlot()) != nullptr)
-    {
-        error = "There is already something in that location.\n";
-        return false;
-    }
-    return true;
+    return occupiedBodyParts;
 }
 
 bool Character::inventoryIsLit() const
@@ -1168,6 +1157,12 @@ void Character::updateActivatedEffects()
 
 std::string Character::getLook()
 {
+    // Check if the room is lit.
+    bool roomIsLit = false;
+    if (this->room != nullptr)
+    {
+        roomIsLit = this->room->isLit();
+    }
     std::string output;
     output += "You look at " + this->getName() + ".\n";
     // Add the condition.
@@ -1175,59 +1170,72 @@ std::string Character::getLook()
     output += " " + this->getHealthCondition() + ".\n";
     // Add the description.
     output += description + "\n";
-    // Add what the target is wearing.
-    if (equipment.empty())
+
+    for (auto bodyPart : this->race->bodyParts)
     {
-        output += Formatter::italic();
-        output += ToCapitals(this->getSubjectPronoun());
-        output += " is wearing nothing.\n";
-        output += Formatter::reset();
-        return output;
-    }
-    output += ToCapitals(this->getSubjectPronoun()) + " is wearing:\n";
-    // Retrieve the equipment.
-    auto head = this->findEquipmentSlotItem(EquipmentSlot::Head);
-    auto back = this->findEquipmentSlotItem(EquipmentSlot::Back);
-    auto torso = this->findEquipmentSlotItem(EquipmentSlot::Torso);
-    auto legs = this->findEquipmentSlotItem(EquipmentSlot::Legs);
-    auto feet = this->findEquipmentSlotItem(EquipmentSlot::Feet);
-    auto right = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
-    auto left = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
-    if (head != nullptr)
-    {
-        output += "\tHead       : " + head->getNameCapital(true) + "\n";
-    }
-    if (back != nullptr)
-    {
-        output += "\tBack       : " + back->getNameCapital(true) + "\n";
-    }
-    if (torso != nullptr)
-    {
-        output += "\tTorso      : " + torso->getNameCapital(true) + "\n";
-    }
-    if (legs != nullptr)
-    {
-        output += "\tLegs       : " + legs->getNameCapital(true) + "\n";
-    }
-    if (feet != nullptr)
-    {
-        output += "\tFeet       : " + feet->getNameCapital(true) + "\n";
-    }
-    if (right != nullptr)
-    {
-        if (HasFlag(right->model->modelFlags, ModelFlag::TwoHand))
+#if 0 // Tabular version
+        // Add the body part name to the row.
+        output += AlignString(bodyPart->getDescription(true),
+                              StringAlign::Left, 15);
+        auto item = this->findItemAtBodyPart(bodyPart);
+        if (item != nullptr)
         {
-            output += "\tBoth Hands : ";
+            if (roomIsLit)
+            {
+                output += " - " + item->getNameCapital(true);
+            }
+            else
+            {
+                output += " - Something";
+            }
+        }
+        output += "\n";
+#else
+        auto item = this->findItemAtBodyPart(bodyPart);
+        output += ToCapitals(this->getSubjectPronoun()) + " is ";
+        if (item == nullptr)
+        {
+//            if (HasFlag(bodyPart->flags, BodyPartFlag::CanWear))
+//            {
+//                output += "not wearing anything on ";
+//            }
+//            else
+//            {
+//                output += "not wielding anything with ";
+//            }
         }
         else
         {
-            output += "\tRight Hand : ";
+            if (HasFlag(bodyPart->flags, BodyPartFlag::CanWear))
+            {
+                output += "wearing ";
+            }
+            else
+            {
+                output += "wielding ";
+            }
+            if (roomIsLit)
+            {
+                output += item->getName(true) + " ";
+            }
+            else
+            {
+                output += "something ";
+            }
+            if (HasFlag(bodyPart->flags, BodyPartFlag::CanWear))
+            {
+                output += "on ";
+            }
+            else
+            {
+                output += "with ";
+            }
         }
-        output += right->getNameCapital() + "\n";
-    }
-    if (left != nullptr)
-    {
-        output += "\tLeft Hand  : " + left->getNameCapital(true) + "\n";
+        output += this->getPossessivePronoun() + " ";
+        output += Formatter::yellow();
+        output += bodyPart->getDescription(false);
+        output += Formatter::reset() + ". ";
+#endif
     }
     return output;
 }
@@ -1255,14 +1263,14 @@ unsigned int Character::getArmorClass() const
     return result;
 }
 
-bool Character::canAttackWith(const EquipmentSlot & slot) const
+bool Character::canAttackWith(std::shared_ptr<BodyPart> bodyPart) const
 {
-    if ((slot == EquipmentSlot::RightHand) || (slot == EquipmentSlot::LeftHand))
+    if (HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
     {
-        auto wpn = this->findEquipmentSlotItem(slot);
+        auto wpn = this->findItemAtBodyPart(bodyPart);
         if (wpn != nullptr)
         {
-            // Check if there is actually a weapon equiped.
+            // Check if there is actually a weapon equipped.
             if ((wpn->model->getType() == ModelType::MeleeWeapon) ||
                 (wpn->model->getType() == ModelType::RangedWeapon))
             {
@@ -1290,40 +1298,50 @@ bool Character::isAtRange(Character * target, const int & range)
 std::vector<MeleeWeaponItem *> Character::getActiveMeleeWeapons()
 {
     std::vector<MeleeWeaponItem *> weapons;
-    auto RetrieveWeapon = [&](const EquipmentSlot & slot)
+    for (auto item : equipment)
     {
-        // First get the item at the given position.
-        auto wpn = this->findEquipmentSlotItem(slot);
-        if (wpn != nullptr)
+        // If at least one of the occupied body parts can be used to wield
+        // a weapon, consider it an active weapon.
+        for (auto bodyPart : item->occupiedBodyParts)
         {
-            if (wpn->getType() == ModelType::MeleeWeapon)
+            if (HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
             {
-                weapons.emplace_back(static_cast<MeleeWeaponItem *>(wpn));
+                if (item->getType() == ModelType::MeleeWeapon)
+                {
+                    auto wpn = static_cast<MeleeWeaponItem *>(item);
+                    weapons.emplace_back(wpn);
+                    // Break the loop otherwise the weapon would be added
+                    // for each occupied body part.
+                    break;
+                }
             }
         }
-    };
-    RetrieveWeapon(EquipmentSlot::RightHand);
-    RetrieveWeapon(EquipmentSlot::LeftHand);
+    }
     return weapons;
 }
 
 std::vector<RangedWeaponItem *> Character::getActiveRangedWeapons()
 {
     std::vector<RangedWeaponItem *> weapons;
-    auto RetrieveWeapon = [&](const EquipmentSlot & slot)
+    for (auto item : equipment)
     {
-        // First get the item at the given position.
-        auto wpn = this->findEquipmentSlotItem(slot);
-        if (wpn != nullptr)
+        // If at least one of the occupied body parts can be used to wield
+        // a range weapon, consider it an active weapon.
+        for (auto bodyPart : item->occupiedBodyParts)
         {
-            if (wpn->getType() == ModelType::RangedWeapon)
+            if (HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
             {
-                weapons.emplace_back(static_cast<RangedWeaponItem *>(wpn));
+                if (item->getType() == ModelType::RangedWeapon)
+                {
+                    auto wpn = static_cast<RangedWeaponItem *>(item);
+                    weapons.emplace_back(wpn);
+                    // Break the loop otherwise the weapon would be added
+                    // for each occupied body part.
+                    break;
+                }
             }
         }
-    };
-    RetrieveWeapon(EquipmentSlot::RightHand);
-    RetrieveWeapon(EquipmentSlot::LeftHand);
+    }
     return weapons;
 }
 

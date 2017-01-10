@@ -30,6 +30,7 @@
 #include "race.hpp"
 #include "item.hpp"
 #include "faction.hpp"
+#include "bodyPart.hpp"
 #include "LuaBridge.hpp"
 #include "effectList.hpp"
 #include "processInput.hpp"
@@ -337,15 +338,9 @@ public:
     Item * findEquipmentItem(std::string search_parameter, int & number);
 
     /// @brief Search the item at given position and return it.
-    /// @param slot The slot where the method need to search the item.
+    /// @param bodyPart The body part where the method need to search the item.
     /// @return The item, if it's in the character's equipment.
-    Item * findEquipmentSlotItem(EquipmentSlot slot) const;
-
-    /// @brief Search the tool in the given equipment slot.
-    /// @param slot The slot where the tool can be found.
-    /// @param type The type of the tool we are looking for.
-    /// @return The tool, if it's in the given slot.
-    Item * findEquipmentSlotTool(EquipmentSlot slot, ToolType type);
+    Item * findItemAtBodyPart(std::shared_ptr<BodyPart> bodyPart) const;
 
     /// @brief Search an item nearby, (eq, inv, room).
     /// @param itemName The name of the item.
@@ -433,19 +428,16 @@ public:
     /// @brief Check if the character can wield a given item.
     /// @param item  The item to wield.
     /// @param error The error message.
-    /// @param where Where the item has been wielded.
-    /// @return <b>True</b> if the operation goes well,<br>
-    ///         <b>False</b> otherwise.
-    bool canWield(Item * item,
-                  std::string & error,
-                  EquipmentSlot & where) const;
+    /// @return Where the item can be wielded.
+    std::vector<std::shared_ptr<BodyPart>> canWield(Item * item,
+                                                    std::string & error) const;
 
     /// @brief Check if the character can wear a given item.
     /// @param item  The item to wear.
     /// @param error The error message.
-    /// @return <b>True</b> if the operation goes well,<br>
-    ///         <b>False</b> otherwise.
-    bool canWear(Item * item, std::string & error) const;
+    /// @return Where the item can be worn.
+    std::vector<std::shared_ptr<BodyPart>> canWear(Item * item,
+                                                   std::string & error) const;
 
     /// @brief Checks if inside the inventory there is a light source.
     /// @return <b>True</b> if there is a light source,<br>
@@ -501,12 +493,12 @@ public:
     /// @return The armor class.
     unsigned int getArmorClass() const;
 
-    /// @brief Function which checks if the character can attack with a weapon equipped
-    ///         in the given slot.
-    /// @param slot The slot in which the weapon should be.
+    /// @brief Function which checks if the character can attack
+    ///         with a weapon equipped at the given body part.
+    /// @param bodyPart The body part at which the weapon could be.
     /// @return <b>True</b> if the item is there,<br>
     ///         <b>False</b> otherwise.
-    bool canAttackWith(const EquipmentSlot & slot) const;
+    bool canAttackWith(std::shared_ptr<BodyPart> bodyPart) const;
 
     /// @brief Checks if the given target is both In Sight and within the Range of Sight.
     /// @param target The target character.

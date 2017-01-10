@@ -49,8 +49,6 @@ public:
     }
 
     /// @brief Constructor.
-    /// @param _width  The width of the 2D map.
-    /// @param _height The height of the 2D map.
     Map2D(int _width, int _height, T _nullValue) :
         width(_width),
         height(_height),
@@ -61,9 +59,6 @@ public:
     }
 
     /// @brief Constructor.
-    /// @param _width  The width of the 2D map.
-    /// @param _height The height of the 2D map.
-    /// @param value  The initial value of the cells.
     Map2D(int _width, int _height, T _nullValue, T value) :
         width(_width),
         height(_height),

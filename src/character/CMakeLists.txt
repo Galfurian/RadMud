@@ -8,6 +8,7 @@ set(PROJECT_INC ${PROJECT_INC}
 #############################################
 # Source Files
 set(PROJECT_SRC ${PROJECT_SRC}
+        ${CMAKE_SOURCE_DIR}/src/character/bodyPart.cpp
         ${CMAKE_SOURCE_DIR}/src/character/character.cpp
         ${CMAKE_SOURCE_DIR}/src/character/mobile.cpp
         ${CMAKE_SOURCE_DIR}/src/character/player.cpp

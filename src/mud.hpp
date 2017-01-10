@@ -49,6 +49,7 @@
 #include "table.hpp"
 #include "formatter.hpp"
 #include "terrain.hpp"
+#include "bodyPart.hpp"
 
 class Direction;
 
@@ -207,6 +208,8 @@ public:
     std::map<int, Building> mudBuildings;
     /// Map of buildings schematic.
     std::map<unsigned int, std::shared_ptr<Terrain>> mudTerrains;
+    /// List of all the bodyparts.
+    std::vector<std::shared_ptr<BodyPart>> mudBodyParts;
 
     /// @brief Update all the player on the database.
     /// @return <b>True</b> if the operations succeeded,<br>
@@ -385,6 +388,9 @@ public:
 
     /// Find a terrain given its vnum.
     std::shared_ptr<Terrain> findTerrain(unsigned int vnum);
+
+    /// Find a body part.
+    std::shared_ptr<BodyPart> findBodyPart(unsigned int vnum);
     ///@}
 
     /// @brief Main processing loop.

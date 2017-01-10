@@ -1,6 +1,6 @@
-/// @file   mapCell.hpp
+/// @file   bodyPart.cpp
 /// @author Enrico Fraccaroli
-/// @date   Jan 06 2017
+/// @date   Jan 08 2017
 /// @copyright
 /// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -19,42 +19,33 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#pragma once
+#include "bodyPart.hpp"
+#include "utils.hpp"
+#include <cassert>
 
-#include "mapTile.hpp"
-#include "map2D.hpp"
-#include <vector>
-
-/// @brief Holds information about the cell of an automatically generated map.
-class MapCell
+BodyPart::BodyPart() :
+    vnum(),
+    name(),
+    description(),
+    flags()
 {
-public:
-    /// The cell coordinates.
-    Coordinates coordinates;
-    /// The height of the cell.
-    double height;
-    /// Associated tile.
-    MapTile mapTile;
-    /// List of neighbours.
-    std::vector<MapCell *> neighbours;
+    // Nothing to do.
+}
 
-    /// @brief Constructor.
-    MapCell();
+BodyPart::~BodyPart()
+{
+    // Nothing to do.
+}
 
-    /// @brief Constructor.
-    MapCell(const Coordinates & _coordinates,
-            const double & _height);
+bool BodyPart::check()
+{
+    assert(vnum > 0);
+    assert(!name.empty());
+    assert(!description.empty());
+    return true;
+}
 
-    /// @brief Add the neighbours based on the given map.
-    void addNeighbours(Map2D<MapCell> & map);
-
-    /// @brief Find the lowest nearby cell.
-    /// @return The found cell.
-    MapCell * findLowestNearbyCell();
-
-    /// @brief Returns the tile describing the cell.
-    std::string getTile() const;
-
-    /// @brief Equality operator.
-    bool operator==(const MapCell & other) const;
-};
+std::string BodyPart::getDescription(bool capital) const
+{
+    return (capital) ? ToCapitals(description) : description;
+}

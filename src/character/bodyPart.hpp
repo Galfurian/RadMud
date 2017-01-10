@@ -1,6 +1,6 @@
-/// @file   mapCell.hpp
+/// @file   bodyPart.hpp
 /// @author Enrico Fraccaroli
-/// @date   Jan 06 2017
+/// @date   Jan 08 2017
 /// @copyright
 /// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -21,40 +21,42 @@
 
 #pragma once
 
-#include "mapTile.hpp"
-#include "map2D.hpp"
-#include <vector>
+#include <string>
 
-/// @brief Holds information about the cell of an automatically generated map.
-class MapCell
+/// The flags of a body part.
+using BodyPartFlag = enum class BodyPartFlag_t
+{
+    None = 0,     ///< Null flag.
+    CanWear = 1,  ///< The equipment can be worn on the the body part.
+    CanWield = 2, ///< The body part can be used to wield something.
+};
+
+/// @brief An anatomic part of the body.
+class BodyPart
 {
 public:
-    /// The cell coordinates.
-    Coordinates coordinates;
-    /// The height of the cell.
-    double height;
-    /// Associated tile.
-    MapTile mapTile;
-    /// List of neighbours.
-    std::vector<MapCell *> neighbours;
+    /// The virtual number.
+    unsigned int vnum;
+    /// The name.
+    std::string name;
+    /// The description.
+    std::string description;
+    /// The flags associated with the body part.
+    unsigned int flags;
 
     /// @brief Constructor.
-    MapCell();
+    BodyPart();
 
-    /// @brief Constructor.
-    MapCell(const Coordinates & _coordinates,
-            const double & _height);
+    virtual ~BodyPart();
 
-    /// @brief Add the neighbours based on the given map.
-    void addNeighbours(Map2D<MapCell> & map);
+    /// @brief Check the correctness of the body part.
+    /// @return <b>True</b> if the body part has correct values,<br>
+    ///         <b>False</b> otherwise.
+    bool check();
 
-    /// @brief Find the lowest nearby cell.
-    /// @return The found cell.
-    MapCell * findLowestNearbyCell();
-
-    /// @brief Returns the tile describing the cell.
-    std::string getTile() const;
-
-    /// @brief Equality operator.
-    bool operator==(const MapCell & other) const;
+    /// @brief Return the name of the body part with all lowercase characters.
+    /// @param capital If true the first letters of the description are
+    ///                 changed to upper case.
+    /// @return The name of the character.
+    std::string getDescription(bool capital = false) const;
 };

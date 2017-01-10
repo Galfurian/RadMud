@@ -43,6 +43,7 @@
 #include "meleeWeaponModel.hpp"
 #include "itemFactory.hpp"
 #include "logger.hpp"
+#include "race.hpp"
 
 ItemModel::ItemModel() :
     vnum(),
@@ -51,7 +52,7 @@ ItemModel::ItemModel() :
     shortdesc(),
     keys(),
     description(),
-    slot(),
+    bodyParts(),
     modelFlags(),
     baseWeight(),
     basePrice(),
@@ -94,7 +95,10 @@ void ItemModel::getSheet(Table & sheet) const
     sheet.addRow({"Keys", keyGroup});
     sheet.addRow({"Description", this->description});
     sheet.addRow({"Type", this->getTypeName()});
-    sheet.addRow({"Slot", this->slot.toString()});
+    for (auto bodyPart : bodyParts)
+    {
+        sheet.addRow({"Body Part", bodyPart->name});
+    }
     sheet.addRow({"Flags", GetModelFlagString(this->modelFlags)});
     sheet.addRow({"Condition", ToString(this->condition)});
     sheet.addRow({"Material", this->material.toString()});
@@ -141,7 +145,6 @@ Item * ItemModel::createItem(
     newItem->maker = maker;
     newItem->composition = composition;
     newItem->quality = itemQuality;
-
     // Then set the rest.
     {
         // Evaluate the base value.
@@ -176,8 +179,6 @@ Item * ItemModel::createItem(
         newItem->maxCondition = ((valBase + valQuality + valMaterial) / 3);
         newItem->condition = newItem->maxCondition;
     }
-    newItem->currentSlot = slot;
-
     // If the item is for a mobile, do not add the item to the MUD nor to the
     //  DB and do not check its correctness.
     if (isForMobile)
@@ -221,12 +222,6 @@ bool ItemModel::check()
     assert(!shortdesc.empty());
     assert(!keys.empty());
     assert(!description.empty());
-    if ((this->getType() == ModelType::Armor) ||
-        (this->getType() == ModelType::MeleeWeapon) ||
-        (this->getType() == ModelType::RangedWeapon))
-    {
-        assert(slot != EquipmentSlot::None);
-    }
     assert(condition > 0);
     assert(this->material != MaterialType::None);
     assert(tileSet >= 0);
@@ -286,10 +281,20 @@ std::string ItemModel::getDescription(Material * itemMaterial,
     return output;
 }
 
-bool ItemModel::mustBeWielded()
+std::vector<std::shared_ptr<BodyPart>> ItemModel::getBodyParts(Race * race)
 {
-    return ((slot == EquipmentSlot::RightHand) ||
-            (slot == EquipmentSlot::LeftHand));
+    std::vector<std::shared_ptr<BodyPart>> filteredBodyParts;
+    for (auto raceBodyPart: race->bodyParts)
+    {
+        for (auto bodyPart : bodyParts)
+        {
+            if (raceBodyPart->vnum == bodyPart->vnum)
+            {
+                filteredBodyParts.emplace_back(bodyPart);
+            }
+        }
+    }
+    return filteredBodyParts;
 }
 
 void ItemModel::luaRegister(lua_State * L)
@@ -418,7 +423,8 @@ std::shared_ptr<LightModel> ItemModel::toLight()
 
 std::shared_ptr<LiquidContainerModel> ItemModel::toLiquidContainer()
 {
-    return std::static_pointer_cast<LiquidContainerModel>(this->shared_from_this());
+    return std::static_pointer_cast<LiquidContainerModel>(
+        this->shared_from_this());
 }
 
 std::shared_ptr<MechanismModel> ItemModel::toMechanism()
@@ -478,7 +484,8 @@ std::shared_ptr<MeleeWeaponModel> ItemModel::toMeleeWeapon()
 
 std::shared_ptr<RangedWeaponModel> ItemModel::toRangedWeapon()
 {
-    return std::static_pointer_cast<RangedWeaponModel>(this->shared_from_this());
+    return std::static_pointer_cast<RangedWeaponModel>(
+        this->shared_from_this());
 }
 
 std::shared_ptr<MagazineModel> ItemModel::toMagazine()

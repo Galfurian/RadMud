@@ -341,7 +341,7 @@ bool DoModelList(Character * character, ArgumentHandler & args)
     table.addColumn("VNUM", StringAlign::Right);
     table.addColumn("NAME", StringAlign::Left);
     table.addColumn("TYPE", StringAlign::Left);
-    table.addColumn("SLOT", StringAlign::Left);
+    table.addColumn("BODY PARTS", StringAlign::Left);
     table.addColumn("FLAGS", StringAlign::Right);
     for (auto iterator : Mud::instance().mudItemModels)
     {
@@ -370,7 +370,12 @@ bool DoModelList(Character * character, ArgumentHandler & args)
         row.push_back(ToString(itemModel->vnum));
         row.push_back(itemModel->name);
         row.push_back(itemModel->getTypeName());
-        row.push_back(itemModel->slot.toString());
+        std::string bodyParts;
+        for (auto bodyPart : itemModel->bodyParts)
+        {
+            bodyParts += bodyPart->name + " ";
+        }
+        row.push_back(bodyParts);
         row.push_back(ToString(itemModel->modelFlags));
         // Add the row to the table.
         table.addRow(row);

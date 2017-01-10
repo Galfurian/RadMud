@@ -41,8 +41,8 @@ bool DoWho(Character * character, ArgumentHandler & args);
 /// Allow to modify the character informations.
 bool DoSet(Character * character, ArgumentHandler & args);
 
-/// The character look at: the current room, the near rooms, an object,
-///  a player, a character, and so on.
+/// @brief The character look at: the current room, the near rooms, an
+/// object, a player, a character, and so on.
 bool DoLook(Character * character, ArgumentHandler & args);
 
 /// Provide a complete help on the mud.

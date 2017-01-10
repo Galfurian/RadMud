@@ -1,4 +1,4 @@
-/// @file   god.hpp
+/// @file   commandGod.hpp
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2016
 /// @copyright

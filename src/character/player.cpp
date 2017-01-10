@@ -154,7 +154,7 @@ void Player::addInventoryItem(Item *& item)
     {
         SQLiteDbms::instance().insertInto(
             "ItemPlayer",
-            {name, ToString(item->vnum), EnumToString(EquipmentSlot::None)},
+            {name, ToString(item->vnum), "0"},
             false,
             true);
     }
@@ -166,15 +166,18 @@ void Player::addEquipmentItem(Item *& item)
     // Update on database.
     if (item->getType() != ModelType::Corpse)
     {
-        SQLiteDbms::instance().insertInto(
-            "ItemPlayer",
-            {
-                name,
-                ToString(item->vnum),
-                ToString(item->getCurrentSlot().toUInt())
-            },
-            false,
-            true);
+        for (auto bodyPart : item->occupiedBodyParts)
+        {
+            SQLiteDbms::instance().insertInto(
+                "ItemPlayer",
+                {
+                    name,
+                    ToString(item->vnum),
+                    ToString(bodyPart->vnum)
+                },
+                false,
+                true);
+        }
     }
 }
 

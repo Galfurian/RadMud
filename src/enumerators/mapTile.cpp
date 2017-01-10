@@ -1,4 +1,4 @@
-/// @file   heightMap.cpp
+/// @file   mapTile.cpp
 /// @author Enrico Fraccaroli
 /// @date   Jan 06 2017
 /// @copyright

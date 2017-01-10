@@ -110,13 +110,15 @@ ActionStatus BasicAttack::perform()
             }
             else
             {
-                // Check if the actor is dual-wielding.
-                bool dualWielding = (meleeWeapons.size() > 1);
+                // Set the progressive number of the attack to 0.
+                unsigned int attackNumber = 0;
                 // Perform the attack for each weapon.
                 for (auto weapon : meleeWeapons)
                 {
                     // Perform the attack passing the melee weapon.
-                    this->performMeleeAttack(predefined, weapon, dualWielding);
+                    this->performMeleeAttack(predefined, weapon, attackNumber);
+                    // Increment the number of executed attacks.
+                    attackNumber++;
                 }
             }
         }
@@ -124,8 +126,8 @@ ActionStatus BasicAttack::perform()
         {
             // Retrieve all the ranged weapons.
             auto rangedWeapons = actor->getActiveRangedWeapons();
-            // Check if the actor is dual-wielding.
-            bool dualWielding = (rangedWeapons.size() > 1);
+            // Set the progressive number of the attack to 0.
+            unsigned int attackNumber = 0;
             // Perform the attack for each weapon.
             for (auto weapon : rangedWeapons)
             {
@@ -135,7 +137,9 @@ ActionStatus BasicAttack::perform()
                     // Set that the actor has actually attacked the target.
                     hasAttackedTheTarget = true;
                     // Perform the attack passing the ranged weapon.
-                    this->performRangedAttack(predefined, weapon, dualWielding);
+                    this->performRangedAttack(predefined, weapon, attackNumber);
+                    // Increment the number of executed attacks.
+                    attackNumber++;
                 }
             }
         }
@@ -341,7 +345,7 @@ void BasicAttack::handleStop()
 
 void BasicAttack::performMeleeAttack(Character * target,
                                      MeleeWeaponItem * weapon,
-                                     const bool dualWielding)
+                                     unsigned int attackNumber)
 {
     // Get the required stamina.
     auto consumedStamina = this->getConsumedStamina(actor, weapon);
@@ -364,23 +368,18 @@ void BasicAttack::performMeleeAttack(Character * target,
     auto hitRoll = TRandInteger<unsigned int>(1, 20);
     // The amount of damage dealt.
     unsigned int damageRoll = 0;
-    // Get the strenth modifier.
+    // Get the strength modifier.
     auto strengthMod = actor->getAbilityModifier(Ability::Strength);
     if (weapon != nullptr)
     {
         // Check if:
-        //  1. The number of active weapons is more than 1,
-        //      then we have to apply a penality to the hit roll.
+        //  1. The number of already executed attacks is greater-than 0.
         //  2. The value is NOT a natural 20 (hit).
-        if (dualWielding && (hitRoll != 20))
+        if ((attackNumber > 0) && (hitRoll != 20))
         {
             // Evaluate the penalty to the hit roll.
-            unsigned int penalty = 0;
-            // On the RIGHT hand the penality is 6.
-            // On the LEFT  hand the penality is 10.
-            if (weapon->currentSlot == EquipmentSlot::RightHand) penalty = 6;
-            if (weapon->currentSlot == EquipmentSlot::LeftHand) penalty = 10;
-            // Safely apply the penality.
+            unsigned int penalty = (attackNumber * 3);
+            // Safely apply the penalty.
             hitRoll = (hitRoll < penalty) ? 0 : (hitRoll - penalty);
         }
         // Natural roll for the damage.
@@ -388,7 +387,7 @@ void BasicAttack::performMeleeAttack(Character * target,
         // Check if the character is wielding a two-handed weapon.
         if (HasFlag(weapon->model->modelFlags, ModelFlag::TwoHand))
         {
-            // Add to the damage rool one and half the strenth value.
+            // Add to the damage rool one and half the strength value.
             damageRoll += strengthMod + (strengthMod / 2);
         }
     }
@@ -426,7 +425,7 @@ void BasicAttack::performMeleeAttack(Character * target,
         }
         // Add effects modifier.
         hitRoll = SafeSum(hitRoll, actor->effects.getMeleeHitMod());
-        // Procede and remove the damage from the health of the target.
+        // Proceede and remove the damage from the health of the target.
         if (!target->remHealth(damageRoll))
         {
             // Notify the others.
@@ -463,7 +462,7 @@ void BasicAttack::performMeleeAttack(Character * target,
 
 void BasicAttack::performRangedAttack(Character * target,
                                       RangedWeaponItem * weapon,
-                                      const bool dualWielding)
+                                      unsigned int attackNumber)
 {
     // Get the required stamina.
     auto consumedStamina = this->getConsumedStamina(actor, weapon);
@@ -484,18 +483,13 @@ void BasicAttack::performRangedAttack(Character * target,
     // Natural roll for the hit rool.
     auto hitRoll = TRandInteger<unsigned int>(1, 20);
     // Check if:
-    //  1. The number of active weapons is more than 1,
-    //      then we have to apply a penality to the hit roll.
+    //  1. The number of already executed attacks is greater-than 0.
     //  2. The value is NOT a natural 20 (hit).
-    if (dualWielding && (hitRoll != 20))
+    if ((attackNumber > 0) && (hitRoll != 20))
     {
         // Evaluate the penalty to the hit roll.
-        unsigned int penalty = 0;
-        // On the RIGHT hand the penality is 6.
-        // On the LEFT  hand the penality is 10.
-        if (weapon->currentSlot == EquipmentSlot::RightHand) penalty = 6;
-        if (weapon->currentSlot == EquipmentSlot::LeftHand) penalty = 10;
-        // Safely apply the penality.
+        unsigned int penalty = (attackNumber * 3);
+        // Safely apply the penalty.
         hitRoll = (hitRoll < penalty) ? 0 : (hitRoll - penalty);
     }
     // Add effects modifier.

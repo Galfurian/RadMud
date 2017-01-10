@@ -251,8 +251,8 @@ bool SQLiteDbms::loadPlayerItems(Player * player)
     {
         // The pointer to the object.
         auto item = Mud::instance().findItem(result->getNextInteger());
-        EquipmentSlot slot(result->getNextUnsignedInteger());
-
+        auto bodyPart = Mud::instance().findBodyPart(
+            result->getNextUnsignedInteger());
         if (item == nullptr)
         {
             Logger::log(LogLevel::Error, "Item not found!");
@@ -274,7 +274,7 @@ bool SQLiteDbms::loadPlayerItems(Player * player)
                 break;
             }
         }
-        if (slot == EquipmentSlot::None)
+        if (bodyPart == nullptr)
         {
             // Add the item to the inventory.
             player->inventory.push_back_item(item);
@@ -283,8 +283,8 @@ bool SQLiteDbms::loadPlayerItems(Player * player)
         }
         else
         {
-            // Change the slot of the item.
-            item->setCurrentSlot(slot);
+            // Add the body part to the list of occupied body parts.
+            item->occupiedBodyParts.emplace_back(bodyPart);
             // Add the item to the inventory.
             player->equipment.push_back_item(item);
             // Set the owner of the item.

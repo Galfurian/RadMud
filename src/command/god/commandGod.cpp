@@ -1,4 +1,4 @@
-/// @file   god.cpp
+/// @file   commandGod.cpp
 /// @brief  Implements the methods used by <b>gods</b>.
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2014
