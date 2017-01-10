@@ -39,6 +39,10 @@ public:
     unsigned int balance;
     /// The mobile which is managing the shop.
     Mobile * shopKeeper;
+    /// The opening hour.
+    unsigned int openingHour;
+    /// The closing hour.
+    unsigned int closingHour;
 
     /// @brief Constructor.
     ShopItem();

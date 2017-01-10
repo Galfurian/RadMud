@@ -975,12 +975,6 @@ bool LoadShop(ResultSet * result)
             // Retrieve the item vnum.
             auto vnum = result->getNextInteger();
             auto item = Mud::instance().findItem(vnum);
-            auto name = result->getNextString();
-            auto buy = result->getNextUnsignedInteger();
-            auto sell = result->getNextUnsignedInteger();
-            auto balance = result->getNextUnsignedInteger();
-            auto shopKeeper = Mud::instance().findMobile(
-                result->getNextString());
             if (item == nullptr)
             {
                 throw SQLiteException("Can't find the item " + ToString(vnum));
@@ -991,14 +985,17 @@ bool LoadShop(ResultSet * result)
             }
             // Cast the item to shop.
             auto shop = static_cast<ShopItem *>(item);
-            shop->shopName = name;
-            shop->shopBuyTax = buy;
-            shop->shopSellTax = sell;
-            shop->balance = balance;
-            shop->shopKeeper = shopKeeper;
-            if (shopKeeper != nullptr)
+            shop->shopName = result->getNextString();
+            shop->shopBuyTax = result->getNextUnsignedInteger();
+            shop->shopSellTax = result->getNextUnsignedInteger();
+            shop->balance = result->getNextUnsignedInteger();
+            shop->shopKeeper = Mud::instance().findMobile(
+                result->getNextString());
+            shop->openingHour = result->getNextUnsignedInteger();
+            shop->closingHour = result->getNextUnsignedInteger();
+            if (shop->shopKeeper != nullptr)
             {
-                shopKeeper->managedItem = shop;
+                shop->shopKeeper->managedItem = shop;
             }
         }
         catch (SQLiteException & e)
