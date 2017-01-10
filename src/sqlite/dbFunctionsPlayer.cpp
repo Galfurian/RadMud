@@ -300,7 +300,7 @@ bool SQLiteDbms::loadPlayerSkill(Player * player)
 {
     // Prepare the query.
     std::string query =
-        "SELECT skill, value FROM Advancement WHERE "
+        "SELECT skill, value FROM PlayerSkill WHERE "
             "player=\"" + player->name + "\";";
     // Execute the query.
     auto result = dbConnection.executeSelect(query.c_str());
