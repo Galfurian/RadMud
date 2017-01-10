@@ -251,8 +251,8 @@ bool SQLiteDbms::loadPlayerItems(Player * player)
     {
         // The pointer to the object.
         auto item = Mud::instance().findItem(result->getNextInteger());
-        auto bodyPart = Mud::instance().findBodyPart(player->race->vnum,
-                                                     result->getNextUnsignedInteger());
+        auto bodyPart = Mud::instance().findBodyPart(
+            result->getNextUnsignedInteger());
         if (item == nullptr)
         {
             Logger::log(LogLevel::Error, "Item not found!");

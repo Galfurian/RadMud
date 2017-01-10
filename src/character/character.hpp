@@ -343,9 +343,9 @@ public:
     Item * findEquipmentItem(std::string search_parameter, int & number);
 
     /// @brief Search the item at given position and return it.
-    /// @param slot The slot where the method need to search the item.
+    /// @param bodyPart The slot where the method need to search the item.
     /// @return The item, if it's in the character's equipment.
-    Item * findEquipmentSlotItem(std::shared_ptr<BodyPart> slot) const;
+    Item * findEquipmentSlotItem(std::shared_ptr<BodyPart> bodyPart) const;
 
     /// @brief Search the tool in the given equipment slot.
     /// @param slot The slot where the tool can be found.
@@ -442,16 +442,14 @@ public:
     /// @param where Where the item has been wielded.
     /// @return <b>True</b> if the operation goes well,<br>
     ///         <b>False</b> otherwise.
-    bool canWield(Item * item,
-                  std::string & error,
-                  std::shared_ptr<BodyPart> where) const;
+    std::shared_ptr<BodyPart> canWield(Item * item, std::string & error) const;
 
     /// @brief Check if the character can wear a given item.
     /// @param item  The item to wear.
     /// @param error The error message.
     /// @return <b>True</b> if the operation goes well,<br>
     ///         <b>False</b> otherwise.
-    bool canWear(Item * item, std::string & error) const;
+    std::shared_ptr<BodyPart> canWear(Item * item, std::string & error) const;
 
     /// @brief Checks if inside the inventory there is a light source.
     /// @return <b>True</b> if there is a light source,<br>

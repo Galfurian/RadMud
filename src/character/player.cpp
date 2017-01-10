@@ -166,15 +166,18 @@ void Player::addEquipmentItem(Item *& item)
     // Update on database.
     if (item->getType() != ModelType::Corpse)
     {
-        SQLiteDbms::instance().insertInto(
-            "ItemPlayer",
-            {
-                name,
-                ToString(item->vnum),
-                ToString(item->getCurrentSlot(this->race)->id)
-            },
-            false,
-            true);
+        if (item->currentBodyPart != nullptr)
+        {
+            SQLiteDbms::instance().insertInto(
+                "ItemPlayer",
+                {
+                    name,
+                    ToString(item->vnum),
+                    ToString(item->currentBodyPart->vnum)
+                },
+                false,
+                true);
+        }
     }
 }
 

@@ -117,4 +117,10 @@ bool LoadTerrain(ResultSet * result);
 /// @brief Function used to load body parts.
 bool LoadBodyPart(ResultSet * result);
 
+/// @brief Function used to load body parts associated to races.
+bool LoadRaceBodyPart(ResultSet * result);
+
+/// @brief Function used to load the body parts where a model can be equipped.
+bool LoadModelBodyPart(ResultSet * result);
+
 ///@}

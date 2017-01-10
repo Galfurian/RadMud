@@ -371,9 +371,9 @@ bool DoModelList(Character * character, ArgumentHandler & args)
         row.push_back(itemModel->name);
         row.push_back(itemModel->getTypeName());
         std::string bodyParts;
-        for (auto bodyPart : itemModel->slot)
+        for (auto bodyPart : itemModel->bodyParts)
         {
-            bodyParts += bodyPart.second->name;
+            bodyParts += bodyPart->name + " ";
         }
         row.push_back(bodyParts);
         row.push_back(ToString(itemModel->modelFlags));

@@ -269,27 +269,6 @@ bool LoadModel(ResultSet * result)
             itemModel->shortdesc = result->getNextString();
             itemModel->keys = SplitString(result->getNextString(), " ");
             itemModel->description = result->getNextString();
-            //1:1;2:1;3:1;
-            auto bodyParts = SplitString(result->getNextString(), ";");
-            for (auto it : bodyParts)
-            {
-                auto bodyPart = SplitString(it, ":");
-                if (bodyPart.size() != 2)
-                {
-                    throw SQLiteException("Wrong form for body parts " +
-                                          ToString(vnum));
-                }
-                auto raceVnum = ToNumber<int>(bodyPart[0]);
-                auto bodyPartId = ToNumber<unsigned int>(bodyPart[1]);
-                auto foundBodyPart = Mud::instance().findBodyPart(raceVnum,
-                                                                  bodyPartId);
-                if (foundBodyPart == nullptr)
-                {
-                    throw SQLiteException("Can't find race for body part " +
-                                          ToString(vnum));
-                }
-                itemModel->slot[raceVnum] = foundBodyPart;
-            }
             itemModel->modelFlags = result->getNextUnsignedInteger();
             itemModel->baseWeight = result->getNextDouble();
             itemModel->basePrice = result->getNextUnsignedInteger();
@@ -1111,8 +1090,7 @@ bool LoadBodyPart(ResultSet * result)
         try
         {
             std::shared_ptr<BodyPart> bodyPart = std::make_shared<BodyPart>();
-            bodyPart->raceVnum = result->getNextInteger();
-            bodyPart->id = result->getNextUnsignedInteger();
+            bodyPart->vnum = result->getNextUnsignedInteger();
             bodyPart->name = result->getNextString();
             bodyPart->description = result->getNextString();
             bodyPart->flags = result->getNextUnsignedInteger();
@@ -1120,6 +1098,51 @@ bool LoadBodyPart(ResultSet * result)
             {
                 Mud::instance().mudBodyParts.emplace_back(bodyPart);
             }
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadRaceBodyPart(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto race = Mud::instance().findRace(result->getNextInteger());
+            auto bodyPart = Mud::instance().findBodyPart(
+                result->getNextUnsignedInteger());
+            assert(race != nullptr);
+            assert(bodyPart != nullptr);
+            race->bodyParts.emplace_back(bodyPart);
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadModelBodyPart(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto model = Mud::instance().findItemModel(
+                result->getNextInteger());
+            auto bodyPart = Mud::instance().findBodyPart(
+                result->getNextUnsignedInteger());
+            assert(model != nullptr);
+            assert(bodyPart != nullptr);
+            model->bodyParts.emplace_back(bodyPart);
         }
         catch (SQLiteException & e)
         {

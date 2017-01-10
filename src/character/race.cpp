@@ -36,7 +36,8 @@ Race::Race() :
     tileSet(),
     tileId(),
     corpse(),
-    naturalWeapon()
+    naturalWeapon(),
+    bodyParts()
 {
     // Nothing to do.
 }

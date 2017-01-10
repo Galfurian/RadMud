@@ -23,8 +23,6 @@
 
 #include <string>
 
-class Race;
-
 /// The flags of a body part.
 using BodyPartFlag = enum class BodyPartFlag_t
 {
@@ -37,10 +35,8 @@ using BodyPartFlag = enum class BodyPartFlag_t
 class BodyPart
 {
 public:
-    /// The associated race.
-    int raceVnum;
-    /// The unique id.
-    unsigned int id;
+    /// The virtual number.
+    unsigned int vnum;
     /// The name.
     std::string name;
     /// The description.
@@ -57,4 +53,8 @@ public:
     /// @return <b>True</b> if the body part has correct values,<br>
     ///         <b>False</b> otherwise.
     bool check();
+
+    /// @brief Return the name of the body part with all lowercase characters.
+    /// @return The name of the character.
+    std::string getDescription(bool capital = false) const;
 };

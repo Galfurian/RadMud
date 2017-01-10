@@ -390,7 +390,7 @@ public:
     std::shared_ptr<Terrain> findTerrain(unsigned int vnum);
 
     /// Find a body part.
-    std::shared_ptr<BodyPart> findBodyPart(int raceVnum, unsigned int id);
+    std::shared_ptr<BodyPart> findBodyPart(unsigned int vnum);
     ///@}
 
     /// @brief Main processing loop.

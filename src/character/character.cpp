@@ -658,13 +658,17 @@ Item * Character::findEquipmentItem(std::string search_parameter, int & number)
     return nullptr;
 }
 
-Item * Character::findEquipmentSlotItem(std::shared_ptr<BodyPart> slot) const
+Item * Character::findEquipmentSlotItem(
+    std::shared_ptr<BodyPart> bodyPart) const
 {
     for (auto iterator : equipment)
     {
-        if (iterator->getCurrentSlot(this->race)->id == slot->id)
+        if (iterator->currentBodyPart != nullptr)
         {
-            return iterator;
+            if (iterator->currentBodyPart->vnum == bodyPart->vnum)
+            {
+                return iterator;
+            }
         }
     }
     return nullptr;
@@ -1003,50 +1007,54 @@ double Character::getMaxCarryingWeight() const
     return 50 + (this->getAbilityModifier(Ability::Strength) * 10);
 }
 
-bool Character::canWield(Item * item,
-                         std::string & error,
-                         std::shared_ptr<BodyPart> where) const
+std::shared_ptr<BodyPart> Character::canWield(Item * item,
+                                              std::string & error) const
 {
-    auto requiredBodyPart = item->getCurrentSlot(this->race);
-    if (requiredBodyPart == nullptr)
+    auto acceptedBodyParts = item->model->getBodyParts(race);
+    if (acceptedBodyParts.empty())
     {
-        return false;
+        error = "It is not designed for your fisionomy.\n";
+        return nullptr;
     }
-    auto bodyParts = this->getBodyParts({BodyPartFlag::CanWield});
-    for (auto bodyPart : bodyParts)
+    for (auto bodyPart : acceptedBodyParts)
     {
-        if (bodyPart->id == where->id)
+        if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
         {
-            if (this->findEquipmentSlotItem(bodyPart) != nullptr)
-            {
-                error = "You are not able to grasp it.\n";
-                return false;
-            }
+            continue;
         }
+        if (this->findEquipmentSlotItem(bodyPart) != nullptr)
+        {
+            continue;
+        }
+        return bodyPart;
     }
-    return true;
+    error = "There is already something in that location.\n";
+    return nullptr;
 }
 
-bool Character::canWear(Item * item, std::string & error) const
+std::shared_ptr<BodyPart> Character::canWear(Item * item,
+                                             std::string & error) const
 {
-    auto requiredBodyPart = item->getCurrentSlot(this->race);
-    if (requiredBodyPart == nullptr)
+    auto acceptedBodyParts = item->model->getBodyParts(race);
+    if (acceptedBodyParts.empty())
     {
-        return false;
+        error = "It is not designed for your fisionomy.\n";
+        return nullptr;
     }
-    auto bodyParts = this->getBodyParts({BodyPartFlag::CanWear});
-    for (auto bodyPart : bodyParts)
+    for (auto bodyPart : acceptedBodyParts)
     {
-        if (bodyPart->id == requiredBodyPart->id)
+        if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWear))
         {
-            if (this->findEquipmentSlotItem(bodyPart) != nullptr)
-            {
-                error = "There is already something in that location.\n";
-                return false;
-            }
+            continue;
         }
+        if (this->findEquipmentSlotItem(bodyPart) != nullptr)
+        {
+            continue;
+        }
+        return bodyPart;
     }
-    return true;
+    error = "There is already something in that location.\n";
+    return nullptr;
 }
 
 bool Character::inventoryIsLit() const
@@ -1181,8 +1189,12 @@ std::string Character::getLook()
     for (auto equipmentItem : equipment)
     {
         output += "\t";
-        output += equipmentItem->getCurrentSlot(this->race)->name + " : ";
-        output += equipmentItem->getNameCapital(true) + "\n";
+        auto bodyPart = equipmentItem->currentBodyPart;
+        if (bodyPart != nullptr)
+        {
+            output += bodyPart->getDescription(true) + " : ";
+            output += equipmentItem->getNameCapital(true) + "\n";
+        }
     }
     return output;
 }
@@ -1247,10 +1259,10 @@ std::vector<MeleeWeaponItem *> Character::getActiveMeleeWeapons()
     std::vector<MeleeWeaponItem *> weapons;
     for (auto equipmentItem : equipment)
     {
-        auto currentSlot = equipmentItem->getCurrentSlot(this->race);
-        if (currentSlot != nullptr)
+        auto current = equipmentItem->currentBodyPart;
+        if (current != nullptr)
         {
-            if (HasFlag(currentSlot->flags, BodyPartFlag::CanWield))
+            if (HasFlag(current->flags, BodyPartFlag::CanWield))
             {
                 if (equipmentItem->getType() == ModelType::MeleeWeapon)
                 {
@@ -1268,10 +1280,10 @@ std::vector<RangedWeaponItem *> Character::getActiveRangedWeapons()
     std::vector<RangedWeaponItem *> weapons;
     for (auto equipmentItem : equipment)
     {
-        auto currentSlot = equipmentItem->getCurrentSlot(this->race);
-        if (currentSlot != nullptr)
+        auto current = equipmentItem->currentBodyPart;
+        if (current != nullptr)
         {
-            if (HasFlag(currentSlot->flags, BodyPartFlag::CanWield))
+            if (HasFlag(current->flags, BodyPartFlag::CanWield))
             {
                 if (equipmentItem->getType() == ModelType::RangedWeapon)
                 {

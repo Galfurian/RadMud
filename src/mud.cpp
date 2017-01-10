@@ -655,11 +655,11 @@ std::shared_ptr<Terrain> Mud::findTerrain(unsigned int vnum)
     return nullptr;
 }
 
-std::shared_ptr<BodyPart> Mud::findBodyPart(int raceVnum, unsigned int id)
+std::shared_ptr<BodyPart> Mud::findBodyPart(unsigned int vnum)
 {
     for (auto bodyPart : mudBodyParts)
     {
-        if ((bodyPart->raceVnum == raceVnum) && (bodyPart->id == id))
+        if (bodyPart->vnum == vnum)
         {
             return bodyPart;
         }

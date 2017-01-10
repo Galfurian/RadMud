@@ -260,14 +260,6 @@ public:
     /// @param _currentBodyPart The new equipment slot.
     void setCurrentSlot(std::shared_ptr<BodyPart> _currentBodyPart);
 
-    /// @brief Return the current equipment slot.
-    /// @return The equipment slot.
-    std::shared_ptr<BodyPart> getCurrentSlot(Race * race);
-
-    /// @brief Return the current equipment slot name.
-    /// @return The equipment slot name.
-    std::string getCurrentSlotName(Race * race);
-
     /// @brief Function used to register inside the lua environment the class.
     /// @param L The lua environment.
     static void luaRegister(lua_State * L);

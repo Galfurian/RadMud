@@ -20,18 +20,17 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "bodyPart.hpp"
-#include "race.hpp"
+#include "utils.hpp"
+#include <cassert>
 
 BodyPart::BodyPart() :
-    raceVnum(),
-    id(),
+    vnum(),
     name(),
     description(),
     flags()
 {
     // Nothing to do.
 }
-
 
 BodyPart::~BodyPart()
 {
@@ -40,8 +39,13 @@ BodyPart::~BodyPart()
 
 bool BodyPart::check()
 {
-    assert(raceVnum > 0);
+    assert(vnum > 0);
     assert(!name.empty());
     assert(!description.empty());
     return true;
+}
+
+std::string BodyPart::getDescription(bool capital) const
+{
+    return (capital) ? ToCapitals(description) : description;
 }

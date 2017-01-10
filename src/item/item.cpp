@@ -203,7 +203,7 @@ void Item::getSheet(Table & sheet) const
         locationRow.push_back("Nowhere");
     }
     sheet.addRow(locationRow);
-    if(currentBodyPart != nullptr)
+    if (currentBodyPart != nullptr)
     {
         sheet.addRow({"Equipment Slot", currentBodyPart->name});
     }
@@ -561,20 +561,6 @@ Item * Item::findContent(std::string search_parameter, int & number)
 void Item::setCurrentSlot(std::shared_ptr<BodyPart> _currentBodyPart)
 {
     currentBodyPart = _currentBodyPart;
-}
-
-std::shared_ptr<BodyPart> Item::getCurrentSlot(Race * race)
-{
-    if (currentBodyPart == nullptr)
-    {
-        return model->slot[race->vnum];
-    }
-    return currentBodyPart;
-}
-
-std::string Item::getCurrentSlotName(Race * race)
-{
-    return this->getCurrentSlot(race)->name;
 }
 
 void Item::luaRegister(lua_State * L)

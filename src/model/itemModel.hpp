@@ -50,6 +50,8 @@ using ModelFlag = enum class ModelFlag_t
     CanBeStacked = 128  ///< [128] The items with this flag can be stacked.
 };
 
+class Race;
+
 class Item;
 
 class Player;
@@ -118,7 +120,7 @@ public:
     /// The model description.
     std::string description;
     /// Store here the position where the model can be equipped.
-    std::map<int, std::shared_ptr<BodyPart> > slot;
+    std::vector<std::shared_ptr<BodyPart>> bodyParts;
     /// The model flags.
     unsigned int modelFlags;
     /// The model base weight.
@@ -222,7 +224,7 @@ public:
     /// @brief Check if the item must be wielded.
     /// @return <b>True</b> if the item must be wielded,<br>
     ///         <b>False</b> Otherwise.
-    bool mustBeWielded(Race * race);
+    std::vector<std::shared_ptr<BodyPart>> getBodyParts(Race * race);
 
     /// @brief Function used to register inside the lua environment the class.
     /// @param L The lua environment.
