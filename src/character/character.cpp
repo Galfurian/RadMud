@@ -1125,6 +1125,12 @@ void Character::updateActivatedEffects()
 
 std::string Character::getLook()
 {
+    // Check if the room is lit.
+    bool roomIsLit = false;
+    if (this->room != nullptr)
+    {
+        roomIsLit = this->room->isLit();
+    }
     std::string output;
     output += "You look at " + this->getName() + ".\n";
     // Add the condition.
@@ -1132,26 +1138,72 @@ std::string Character::getLook()
     output += " " + this->getHealthCondition() + ".\n";
     // Add the description.
     output += description + "\n";
-    // Add what the target is wearing.
-    if (equipment.empty())
+
+    for (auto bodyPart : this->race->bodyParts)
     {
-        output += Formatter::italic();
-        output += ToCapitals(this->getSubjectPronoun());
-        output += " is wearing nothing.\n";
-        output += Formatter::reset();
-        return output;
-    }
-    output += ToCapitals(this->getSubjectPronoun()) + " is wearing:\n";
-    // Retrieve the equipment.
-    for (auto equipmentItem : equipment)
-    {
-        output += "\t";
-        auto bodyPart = equipmentItem->currentBodyPart;
-        if (bodyPart != nullptr)
+#if 0 // Tabular version
+        // Add the body part name to the row.
+        output += AlignString(bodyPart->getDescription(true),
+                              StringAlign::Left, 15);
+        auto item = this->findItemAtBodyPart(bodyPart);
+        if (item != nullptr)
         {
-            output += bodyPart->getDescription(true) + " : ";
-            output += equipmentItem->getNameCapital(true) + "\n";
+            if (roomIsLit)
+            {
+                output += " - " + item->getNameCapital(true);
+            }
+            else
+            {
+                output += " - Something";
+            }
         }
+        output += "\n";
+#else
+        auto item = this->findItemAtBodyPart(bodyPart);
+        output += ToCapitals(this->getSubjectPronoun()) + " is ";
+        if (item == nullptr)
+        {
+            if (HasFlag(bodyPart->flags, BodyPartFlag::CanWear))
+            {
+                output += "not wearing anything on ";
+            }
+            else
+            {
+                output += "not wielding anything with ";
+            }
+        }
+        else
+        {
+            if (HasFlag(bodyPart->flags, BodyPartFlag::CanWear))
+            {
+                output += "wearing ";
+            }
+            else
+            {
+                output += "wielding ";
+            }
+            if (roomIsLit)
+            {
+                output += item->getName(true) + " ";
+            }
+            else
+            {
+                output += "something ";
+            }
+            if (HasFlag(bodyPart->flags, BodyPartFlag::CanWear))
+            {
+                output += "on ";
+            }
+            else
+            {
+                output += "with ";
+            }
+        }
+        output += this->getPossessivePronoun() + " ";
+        output += Formatter::yellow();
+        output += bodyPart->getDescription(false);
+        output += Formatter::reset() + ". ";
+#endif
     }
     return output;
 }
