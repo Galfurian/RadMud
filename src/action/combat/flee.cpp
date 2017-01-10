@@ -179,11 +179,14 @@ unsigned int Flee::getCooldown(Character * character)
     cooldown -= character->getAbilityLog(Ability::Agility);
     cooldown = SafeSum(cooldown, SafeLog10(character->weight));
     cooldown = SafeSum(cooldown, SafeLog10(character->getCarryingWeight()));
-    auto bodyParts = character->getBodyParts({BodyPartFlag::CanWield});
-    for (auto bodyPart : bodyParts)
+    for (auto bodyPart : character->race->bodyParts)
     {
-        auto wpn = character->findEquipmentSlotItem(bodyPart);
-        cooldown = SafeSum(cooldown, SafeLog10(wpn->getWeight(true)));
+        if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWield)) continue;
+        auto wpn = character->findItemAtBodyPart(bodyPart);
+        if (wpn != nullptr)
+        {
+            cooldown = SafeSum(cooldown, SafeLog10(wpn->getWeight(true)));
+        }
     }
     return cooldown;
 }

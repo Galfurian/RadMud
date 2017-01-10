@@ -76,20 +76,20 @@ private:
     void handleStop();
 
     /// @brief Performs a melee attack with the given weapon.
-    /// @param target The character to attack.
-    /// @param weapon The melee weapon used to attack.
-    /// @param dualWielding If the actor is dual wielding.
+    /// @param target       The character to attack.
+    /// @param weapon       The melee weapon used to attack.
+    /// @param attackNumber The number of already executed attacks.
     void performMeleeAttack(Character * target,
                             MeleeWeaponItem * weapon,
-                            const bool dualWielding);
+                            unsigned int attackNumber);
 
     /// @brief Performs a ranged attack with the given weapon.
-    /// @param target The character to attack.
-    /// @param weapon The ranged weapon used to attack.
-    /// @param dualWielding If the actor is dual wielding.
+    /// @param target       The character to attack.
+    /// @param weapon       The ranged weapon used to attack.
+    /// @param attackNumber The number of already executed attacks.
     void performRangedAttack(Character * target,
                              RangedWeaponItem * weapon,
-                             const bool dualWielding);
+                             unsigned int attackNumber);
 
     /// @brief Send the messages when the actor hits with a close ranged attack.
     /// @param target The character which is involved in the attack.

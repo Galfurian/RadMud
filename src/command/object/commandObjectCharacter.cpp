@@ -40,27 +40,27 @@ bool DoEquipments(Character * character, ArgumentHandler & /*args*/)
     {
         roomIsLit = character->room->isLit();
     }
+    // Go through all the body parts of the race.
     std::string output;
-    // Print what is wearing.
-    output += Formatter::yellow();
-    output += "#------------ Equipment -----------#\n";
-    output += Formatter::reset();
-    // Retrieve the equipment.
-    for (auto equipmentItem : character->equipment)
+    for (auto bodyPart : character->race->bodyParts)
     {
-        auto bodyPart = equipmentItem->currentBodyPart;
-        if (bodyPart != nullptr)
+        // Add the body part name to the row.
+        output += AlignString(bodyPart->getDescription(true),
+                              StringAlign::Left, 15);
+        auto item = character->findItemAtBodyPart(bodyPart);
+        if (item != nullptr)
         {
-            output += "\t";
-            output += bodyPart->getDescription(true) + " : ";
-            if (roomIsLit) output += equipmentItem->getNameCapital(true);
-            else output += "Something";
-            output += "\n";
+            if (roomIsLit)
+            {
+                output += " - " + item->getNameCapital(true);
+            }
+            else
+            {
+                output += " - Something";
+            }
         }
+        output += "\n";
     }
-    output += Formatter::yellow();
-    output += "#----------------------------------#\n";
-    output += Formatter::reset();
     character->sendMsg(output);
     return true;
 }

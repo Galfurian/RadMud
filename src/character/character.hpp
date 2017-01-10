@@ -331,11 +331,6 @@ public:
     /// @return The item, if it's in the character's inventory.
     Item * findInventoryItem(std::string search_parameter, int & number);
 
-    std::vector<std::shared_ptr<BodyPart>> getBodyParts(
-        const std::vector<BodyPartFlag> & requiredFlags = {
-            BodyPartFlag::None
-        }) const;
-
     /// @brief Search for the item in equipment.
     /// @param search_parameter The item to search.
     /// @param number           Position of the item we want to look for.
@@ -343,15 +338,9 @@ public:
     Item * findEquipmentItem(std::string search_parameter, int & number);
 
     /// @brief Search the item at given position and return it.
-    /// @param bodyPart The slot where the method need to search the item.
+    /// @param bodyPart The body part where the method need to search the item.
     /// @return The item, if it's in the character's equipment.
-    Item * findEquipmentSlotItem(std::shared_ptr<BodyPart> bodyPart) const;
-
-    /// @brief Search the tool in the given equipment slot.
-    /// @param slot The slot where the tool can be found.
-    /// @param type The type of the tool we are looking for.
-    /// @return The tool, if it's in the given slot.
-    Item * findEquipmentSlotTool(std::shared_ptr<BodyPart> slot, ToolType type);
+    Item * findItemAtBodyPart(std::shared_ptr<BodyPart> bodyPart) const;
 
     /// @brief Search an item nearby, (eq, inv, room).
     /// @param itemName The name of the item.
@@ -505,12 +494,12 @@ public:
     /// @return The armor class.
     unsigned int getArmorClass() const;
 
-    /// @brief Function which checks if the character can attack with a weapon equipped
-    ///         in the given slot.
-    /// @param slot The slot in which the weapon should be.
+    /// @brief Function which checks if the character can attack
+    ///         with a weapon equipped at the given body part.
+    /// @param bodyPart The body part at which the weapon could be.
     /// @return <b>True</b> if the item is there,<br>
     ///         <b>False</b> otherwise.
-    bool canAttackWith(std::shared_ptr<BodyPart> slot) const;
+    bool canAttackWith(std::shared_ptr<BodyPart> bodyPart) const;
 
     /// @brief Checks if the given target is both In Sight and within the Range of Sight.
     /// @param target The target character.

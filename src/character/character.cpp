@@ -620,28 +620,6 @@ Item * Character::findInventoryItem(std::string search_parameter, int & number)
     return nullptr;
 }
 
-std::vector<std::shared_ptr<BodyPart>> Character::getBodyParts(
-    const std::vector<BodyPartFlag> & requiredFlags) const
-{
-    auto IsValid = [requiredFlags](const unsigned int & bodyPartFlags)
-    {
-        for (auto requiredFlag : requiredFlags)
-        {
-            if (!HasFlag(bodyPartFlags, requiredFlag))
-            {
-                return false;
-            }
-        }
-        return true;
-    };
-    std::vector<std::shared_ptr<BodyPart>> foundBodyParts;
-    for (auto bodyPart : Mud::instance().mudBodyParts)
-    {
-        if (IsValid(bodyPart->flags)) foundBodyParts.emplace_back(bodyPart);
-    }
-    return foundBodyParts;
-}
-
 Item * Character::findEquipmentItem(std::string search_parameter, int & number)
 {
     for (auto iterator : equipment)
@@ -658,8 +636,7 @@ Item * Character::findEquipmentItem(std::string search_parameter, int & number)
     return nullptr;
 }
 
-Item * Character::findEquipmentSlotItem(
-    std::shared_ptr<BodyPart> bodyPart) const
+Item * Character::findItemAtBodyPart(std::shared_ptr<BodyPart> bodyPart) const
 {
     for (auto iterator : equipment)
     {
@@ -668,27 +645,6 @@ Item * Character::findEquipmentSlotItem(
             if (iterator->currentBodyPart->vnum == bodyPart->vnum)
             {
                 return iterator;
-            }
-        }
-    }
-    return nullptr;
-}
-
-Item * Character::findEquipmentSlotTool(std::shared_ptr<BodyPart> slot,
-                                        ToolType type)
-{
-    auto tool = this->findEquipmentSlotItem(slot);
-    if (tool != nullptr)
-    {
-        if (tool->model != nullptr)
-        {
-            if (tool->model->getType() == ModelType::Tool)
-            {
-                auto toolModel = tool->model->toTool();
-                if (toolModel->toolType == type)
-                {
-                    return tool;
-                }
             }
         }
     }
@@ -1010,50 +966,51 @@ double Character::getMaxCarryingWeight() const
 std::shared_ptr<BodyPart> Character::canWield(Item * item,
                                               std::string & error) const
 {
-    auto acceptedBodyParts = item->model->getBodyParts(race);
-    if (acceptedBodyParts.empty())
+    // Get the compatible body parts.
+    auto compatibleBodyParts = item->model->getBodyParts(race);
+    if (compatibleBodyParts.empty())
     {
         error = "It is not designed for your fisionomy.\n";
         return nullptr;
     }
-    for (auto bodyPart : acceptedBodyParts)
+    for (auto bodyPart : compatibleBodyParts)
     {
         if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
         {
             continue;
         }
-        if (this->findEquipmentSlotItem(bodyPart) != nullptr)
+        if (this->findItemAtBodyPart(bodyPart) != nullptr)
         {
             continue;
         }
         return bodyPart;
     }
-    error = "There is already something in that location.\n";
+    error = "There is no room where it can be wielded.\n";
     return nullptr;
 }
 
 std::shared_ptr<BodyPart> Character::canWear(Item * item,
                                              std::string & error) const
 {
-    auto acceptedBodyParts = item->model->getBodyParts(race);
-    if (acceptedBodyParts.empty())
+    auto compatibleBodyParts = item->model->getBodyParts(race);
+    if (compatibleBodyParts.empty())
     {
         error = "It is not designed for your fisionomy.\n";
         return nullptr;
     }
-    for (auto bodyPart : acceptedBodyParts)
+    for (auto bodyPart : compatibleBodyParts)
     {
         if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWear))
         {
             continue;
         }
-        if (this->findEquipmentSlotItem(bodyPart) != nullptr)
+        if (this->findItemAtBodyPart(bodyPart) != nullptr)
         {
             continue;
         }
         return bodyPart;
     }
-    error = "There is already something in that location.\n";
+    error = "There is no room where it can be worn.\n";
     return nullptr;
 }
 
@@ -1222,14 +1179,14 @@ unsigned int Character::getArmorClass() const
     return result;
 }
 
-bool Character::canAttackWith(std::shared_ptr<BodyPart> slot) const
+bool Character::canAttackWith(std::shared_ptr<BodyPart> bodyPart) const
 {
-    if (HasFlag(slot->flags, BodyPartFlag::CanWield))
+    if (HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
     {
-        auto wpn = this->findEquipmentSlotItem(slot);
+        auto wpn = this->findItemAtBodyPart(bodyPart);
         if (wpn != nullptr)
         {
-            // Check if there is actually a weapon equiped.
+            // Check if there is actually a weapon equipped.
             if ((wpn->model->getType() == ModelType::MeleeWeapon) ||
                 (wpn->model->getType() == ModelType::RangedWeapon))
             {

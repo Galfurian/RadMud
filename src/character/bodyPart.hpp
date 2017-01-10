@@ -1,6 +1,6 @@
 /// @file   bodyPart.hpp
 /// @author Enrico Fraccaroli
-/// @date   gen 08 2017
+/// @date   Jan 08 2017
 /// @copyright
 /// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -26,8 +26,8 @@
 /// The flags of a body part.
 using BodyPartFlag = enum class BodyPartFlag_t
 {
-    None = 0,     ///< No flag.
-    CanWear = 1,  ///< Equipment can be worn on the body part.
+    None = 0,     ///< Null flag.
+    CanWear = 1,  ///< The equipment can be worn on the the body part.
     CanWield = 2, ///< The body part can be used to wield something.
 };
 
@@ -41,7 +41,7 @@ public:
     std::string name;
     /// The description.
     std::string description;
-    /// The flags.
+    /// The flags associated with the body part.
     unsigned int flags;
 
     /// @brief Constructor.
