@@ -55,6 +55,8 @@ public:
     bool check();
 
     /// @brief Return the name of the body part with all lowercase characters.
+    /// @param capital If true the first letters of the description are
+    ///                 changed to upper case.
     /// @return The name of the character.
     std::string getDescription(bool capital = false) const;
 };

@@ -428,17 +428,14 @@ public:
     /// @brief Check if the character can wield a given item.
     /// @param item  The item to wield.
     /// @param error The error message.
-    /// @param where Where the item has been wielded.
-    /// @return <b>True</b> if the operation goes well,<br>
-    ///         <b>False</b> otherwise.
+    /// @return Where the item can be wielded.
     std::vector<std::shared_ptr<BodyPart>> canWield(Item * item,
                                                     std::string & error) const;
 
     /// @brief Check if the character can wear a given item.
     /// @param item  The item to wear.
     /// @param error The error message.
-    /// @return <b>True</b> if the operation goes well,<br>
-    ///         <b>False</b> otherwise.
+    /// @return Where the item can be worn.
     std::vector<std::shared_ptr<BodyPart>> canWear(Item * item,
                                                    std::string & error) const;
 

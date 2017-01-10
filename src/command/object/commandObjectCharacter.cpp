@@ -131,7 +131,7 @@ bool DoWield(Character * character, ArgumentHandler & args)
         character->sendMsg(errMessage);
         return false;
     }
-    // Set the item slot.
+    // Set the item body part.
     item->setOccupiedBodyParts(bodyParts);
     // Remove the item from the inventory.
     character->remInventoryItem(item);
@@ -198,7 +198,7 @@ bool DoWear(Character * character, ArgumentHandler & args)
             {
                 continue;
             }
-            // Set the item slot.
+            // Set the body part occupied by the item.
             iterator->setOccupiedBodyParts(bodyParts);
             // Remove the item from the player's inventory.
             character->remInventoryItem(iterator);
@@ -256,14 +256,14 @@ bool DoWear(Character * character, ArgumentHandler & args)
     }
     // String where the error message will be put.
     std::string errMessage;
-    // The destination slot.
+    // Get the body parts required by the item.
     auto bodyParts = character->canWear(item, errMessage);
     if (bodyParts.empty())
     {
         character->sendMsg(errMessage);
         return false;
     }
-    // Set the item slot.
+    // Set the body parts occupied by the item.
     item->setOccupiedBodyParts(bodyParts);
     // Remove the item from the player's inventory.
     character->remInventoryItem(item);

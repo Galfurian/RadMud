@@ -1,4 +1,4 @@
-/// @file   itemContainer.hpp
+/// @file   itemVector.hpp
 /// @author Enrico Fraccaroli
 /// @date   Aug 12, 2016
 /// @copyright

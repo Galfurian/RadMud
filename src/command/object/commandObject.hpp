@@ -1,4 +1,4 @@
-/// @file   object.hpp
+/// @file   commandObject.hpp
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2016
 /// @copyright

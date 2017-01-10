@@ -83,7 +83,7 @@ public:
     Character * owner;
     /// Pointer to the item which contains this item.
     Item * container;
-    /// Current equipment slot.
+    /// The body parts occupied by the item.
     std::vector<std::shared_ptr<BodyPart>> occupiedBodyParts;
     /// List of items contained in this one.
     ItemVector content;
@@ -256,8 +256,8 @@ public:
     /// @return The item, if it's in the container.
     Item * findContent(std::string search_parameter, int & number);
 
-    /// @brief Set the equipment slot where this item must be worn.
-    /// @param _currentBodyPart The new equipment slot.
+    /// @brief Set the body parts occupied by the item.
+    /// @param _occupiedBodyParts The occupied body parts.
     void setOccupiedBodyParts(
         std::vector<std::shared_ptr<BodyPart>> _occupiedBodyParts);
 

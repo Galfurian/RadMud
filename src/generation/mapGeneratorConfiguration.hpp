@@ -23,20 +23,32 @@
 
 #include <string>
 
+/// @brief Configuration class for the map generator.
 class MapGeneratorConfiguration
 {
 public:
+    /// The width of the map.
     int width;
+    /// The height of the map.
     int height;
+    /// The number of mountains that has to be created.
     int numMountains;
+    /// The minimum radius of each mountain.
     int minMountainRadius;
+    /// The maximum radius of each mountain.
     int maxMountainRadius;
+    /// The number of rivers that has to be created.
     int numRivers;
+    /// The minimum distance between rivers.
     int minRiverDistance;
+    /// The number of forests that has to be created.
     int numForests;
+    /// The minimum distance between forests.
     int minForestDistance;
 
+    /// @brief Constructor.
     MapGeneratorConfiguration();
 
+    /// @brief Returns the string representing the values.
     std::string toString() const;
 };

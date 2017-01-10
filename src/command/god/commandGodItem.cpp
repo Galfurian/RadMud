@@ -341,7 +341,7 @@ bool DoModelList(Character * character, ArgumentHandler & args)
     table.addColumn("VNUM", StringAlign::Right);
     table.addColumn("NAME", StringAlign::Left);
     table.addColumn("TYPE", StringAlign::Left);
-    table.addColumn("SLOT", StringAlign::Left);
+    table.addColumn("BODY PARTS", StringAlign::Left);
     table.addColumn("FLAGS", StringAlign::Right);
     for (auto iterator : Mud::instance().mudItemModels)
     {

@@ -1,4 +1,4 @@
-/// @file   object.cpp
+/// @file   commandObject.cpp
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2014
 /// @copyright

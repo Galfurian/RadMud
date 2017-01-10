@@ -283,7 +283,7 @@ bool SQLiteDbms::loadPlayerItems(Player * player)
         }
         else
         {
-            // Change the slot of the item.
+            // Add the body part to the list of occupied body parts.
             item->occupiedBodyParts.emplace_back(bodyPart);
             // Add the item to the inventory.
             player->equipment.push_back_item(item);

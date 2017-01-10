@@ -221,9 +221,9 @@ public:
         Material * itemMaterial = nullptr,
         const ItemQuality & itemQuality = ItemQuality::Normal);
 
-    /// @brief Check if the item must be wielded.
-    /// @return <b>True</b> if the item must be wielded,<br>
-    ///         <b>False</b> Otherwise.
+    /// @brief Gets the body parts in common between the model and the race.
+    /// @param race The race with which the check must be performed.
+    /// @return The body parts in common between the model and the race.
     std::vector<std::shared_ptr<BodyPart>> getBodyParts(Race * race);
 
     /// @brief Function used to register inside the lua environment the class.

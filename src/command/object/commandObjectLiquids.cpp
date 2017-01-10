@@ -1,4 +1,4 @@
-/// @file   commObjectLiquids.cpp
+/// @file   commandObjectLiquids.cpp
 /// @author Enrico Fraccaroli
 /// @date   29/12/2016
 /// @copyright

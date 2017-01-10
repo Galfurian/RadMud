@@ -46,6 +46,7 @@ public:
 
     double getTotalSpace() const override;
 
+    /// @brief Checks if the light source is active.
     bool isActive() const;
 
     /// @brief Determines if this can be refilled with the given item.

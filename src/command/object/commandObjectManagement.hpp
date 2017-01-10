@@ -26,8 +26,8 @@
 /// @addtogroup ComInterfaces
 /// @{
 
-/// Allow the character to pick up an object, or take an object
-///  from another one.
+/// @brief Allow the character to pick up an object, or take an object from
+///         another one.
 bool DoTake(Character * character, ArgumentHandler & args);
 
 /// Allow the character to drop an object.

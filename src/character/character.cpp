@@ -959,10 +959,10 @@ double Character::getCarryingWeight() const
 
 double Character::getMaxCarryingWeight() const
 {
-    // Value = 50 + (AbilMod(STR) * 10)
-    // MIN   =  50
-    // MAX   = 300
-    return 50 + (this->getAbilityModifier(Ability::Strength) * 10);
+    // Value = 100 + (AbilMod(STR) * 10)
+    // MIN   = 100
+    // MAX   = 350
+    return 100 + (this->getAbilityModifier(Ability::Strength) * 10);
 }
 
 std::vector<std::shared_ptr<BodyPart>> Character::canWield(
@@ -1195,14 +1195,14 @@ std::string Character::getLook()
         output += ToCapitals(this->getSubjectPronoun()) + " is ";
         if (item == nullptr)
         {
-            if (HasFlag(bodyPart->flags, BodyPartFlag::CanWear))
-            {
-                output += "not wearing anything on ";
-            }
-            else
-            {
-                output += "not wielding anything with ";
-            }
+//            if (HasFlag(bodyPart->flags, BodyPartFlag::CanWear))
+//            {
+//                output += "not wearing anything on ";
+//            }
+//            else
+//            {
+//                output += "not wielding anything with ";
+//            }
         }
         else
         {

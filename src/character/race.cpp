@@ -129,10 +129,12 @@ bool Race::setAvailableFactions(const std::string & source)
 
 unsigned int Race::getAbility(const Ability & ability) const
 {
-    auto it = abilities.find(ability);
-    if (it != abilities.end())
+    for (auto it : abilities)
     {
-        return it->second;
+        if (it.first == ability)
+        {
+            return it.second;
+        }
     }
     return 0;
 }
@@ -148,9 +150,9 @@ unsigned int Race::getAbilityLua(const unsigned int & abilityNumber)
 
 bool Race::factionAllowed(int factionVnum)
 {
-    for (unsigned int it = 0; it < availableFaction.size(); ++it)
+    for (auto it : availableFaction)
     {
-        if (availableFaction.at(it)->vnum == factionVnum)
+        if (it->vnum == factionVnum)
         {
             return true;
         }

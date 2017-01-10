@@ -66,7 +66,6 @@ bool Item::check()
     safe &= CorrectAssert(!maker.empty());
     safe &= CorrectAssert(condition > 0);
     safe &= CorrectAssert(composition != nullptr);
-    //safe &= CorrectAssert(currentSlot != EquipmentSlot::kNoEquipSlot);
     return safe;
 }
 
