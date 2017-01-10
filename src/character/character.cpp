@@ -638,13 +638,13 @@ Item * Character::findEquipmentItem(std::string search_parameter, int & number)
 
 Item * Character::findItemAtBodyPart(std::shared_ptr<BodyPart> bodyPart) const
 {
-    for (auto iterator : equipment)
+    for (auto item : equipment)
     {
-        if (iterator->currentBodyPart != nullptr)
+        for (auto occupiedBodyPart : item->occupiedBodyParts)
         {
-            if (iterator->currentBodyPart->vnum == bodyPart->vnum)
+            if (occupiedBodyPart->vnum == bodyPart->vnum)
             {
-                return iterator;
+                return item;
             }
         }
     }
@@ -928,6 +928,8 @@ bool Character::remEquipmentItem(Item * item)
     }
     // Clear the owner of the item.
     item->owner = nullptr;
+    // Empty the occupied body parts.
+    item->occupiedBodyParts.clear();
     // Log it.
     Logger::log(LogLevel::Debug,
                 "Item '%s' removed from '%s';",
@@ -963,15 +965,18 @@ double Character::getMaxCarryingWeight() const
     return 50 + (this->getAbilityModifier(Ability::Strength) * 10);
 }
 
-std::shared_ptr<BodyPart> Character::canWield(Item * item,
-                                              std::string & error) const
+std::vector<std::shared_ptr<BodyPart>> Character::canWield(
+    Item * item,
+    std::string & error) const
 {
+    // Prepare the list of occupied body parts.
+    std::vector<std::shared_ptr<BodyPart>> occupiedBodyParts;
     // Get the compatible body parts.
     auto compatibleBodyParts = item->model->getBodyParts(race);
     if (compatibleBodyParts.empty())
     {
         error = "It is not designed for your fisionomy.\n";
-        return nullptr;
+        return occupiedBodyParts;
     }
     for (auto bodyPart : compatibleBodyParts)
     {
@@ -983,20 +988,43 @@ std::shared_ptr<BodyPart> Character::canWield(Item * item,
         {
             continue;
         }
-        return bodyPart;
+        occupiedBodyParts.emplace_back(bodyPart);
+        if (!HasFlag(item->model->modelFlags, ModelFlag::TwoHand))
+        {
+            break;
+        }
+        else
+        {
+            if (occupiedBodyParts.size() == 2)
+            {
+                break;
+            }
+        }
     }
-    error = "There is no room where it can be wielded.\n";
-    return nullptr;
+    if (HasFlag(item->model->modelFlags, ModelFlag::TwoHand) &&
+        (occupiedBodyParts.size() != 2))
+    {
+        occupiedBodyParts.clear();
+    }
+    if (occupiedBodyParts.empty())
+    {
+        error = "There is no room where it can be wielded.\n";
+    }
+    return occupiedBodyParts;
 }
 
-std::shared_ptr<BodyPart> Character::canWear(Item * item,
-                                             std::string & error) const
+std::vector<std::shared_ptr<BodyPart>> Character::canWear(
+    Item * item,
+    std::string & error) const
 {
+    // Prepare the list of occupied body parts.
+    std::vector<std::shared_ptr<BodyPart>> occupiedBodyParts;
+    // Get the compatible body parts.
     auto compatibleBodyParts = item->model->getBodyParts(race);
     if (compatibleBodyParts.empty())
     {
         error = "It is not designed for your fisionomy.\n";
-        return nullptr;
+        return occupiedBodyParts;
     }
     for (auto bodyPart : compatibleBodyParts)
     {
@@ -1008,10 +1036,14 @@ std::shared_ptr<BodyPart> Character::canWear(Item * item,
         {
             continue;
         }
-        return bodyPart;
+        occupiedBodyParts.emplace_back(bodyPart);
+        break;
     }
-    error = "There is no room where it can be worn.\n";
-    return nullptr;
+    if (occupiedBodyParts.empty())
+    {
+        error = "There is no room where it can be worn.\n";
+    }
+    return occupiedBodyParts;
 }
 
 bool Character::inventoryIsLit() const
@@ -1266,17 +1298,21 @@ bool Character::isAtRange(Character * target, const int & range)
 std::vector<MeleeWeaponItem *> Character::getActiveMeleeWeapons()
 {
     std::vector<MeleeWeaponItem *> weapons;
-    for (auto equipmentItem : equipment)
+    for (auto item : equipment)
     {
-        auto current = equipmentItem->currentBodyPart;
-        if (current != nullptr)
+        // If at least one of the occupied body parts can be used to wield
+        // a weapon, consider it an active weapon.
+        for (auto bodyPart : item->occupiedBodyParts)
         {
-            if (HasFlag(current->flags, BodyPartFlag::CanWield))
+            if (HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
             {
-                if (equipmentItem->getType() == ModelType::MeleeWeapon)
+                if (item->getType() == ModelType::MeleeWeapon)
                 {
-                    auto wpn = static_cast<MeleeWeaponItem *>(equipmentItem);
+                    auto wpn = static_cast<MeleeWeaponItem *>(item);
                     weapons.emplace_back(wpn);
+                    // Break the loop otherwise the weapon would be added
+                    // for each occupied body part.
+                    break;
                 }
             }
         }
@@ -1287,17 +1323,21 @@ std::vector<MeleeWeaponItem *> Character::getActiveMeleeWeapons()
 std::vector<RangedWeaponItem *> Character::getActiveRangedWeapons()
 {
     std::vector<RangedWeaponItem *> weapons;
-    for (auto equipmentItem : equipment)
+    for (auto item : equipment)
     {
-        auto current = equipmentItem->currentBodyPart;
-        if (current != nullptr)
+        // If at least one of the occupied body parts can be used to wield
+        // a range weapon, consider it an active weapon.
+        for (auto bodyPart : item->occupiedBodyParts)
         {
-            if (HasFlag(current->flags, BodyPartFlag::CanWield))
+            if (HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
             {
-                if (equipmentItem->getType() == ModelType::RangedWeapon)
+                if (item->getType() == ModelType::RangedWeapon)
                 {
-                    auto wpn = static_cast<RangedWeaponItem *>(equipmentItem);
+                    auto wpn = static_cast<RangedWeaponItem *>(item);
                     weapons.emplace_back(wpn);
+                    // Break the loop otherwise the weapon would be added
+                    // for each occupied body part.
+                    break;
                 }
             }
         }

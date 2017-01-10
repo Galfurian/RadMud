@@ -431,14 +431,16 @@ public:
     /// @param where Where the item has been wielded.
     /// @return <b>True</b> if the operation goes well,<br>
     ///         <b>False</b> otherwise.
-    std::shared_ptr<BodyPart> canWield(Item * item, std::string & error) const;
+    std::vector<std::shared_ptr<BodyPart>> canWield(Item * item,
+                                                    std::string & error) const;
 
     /// @brief Check if the character can wear a given item.
     /// @param item  The item to wear.
     /// @param error The error message.
     /// @return <b>True</b> if the operation goes well,<br>
     ///         <b>False</b> otherwise.
-    std::shared_ptr<BodyPart> canWear(Item * item, std::string & error) const;
+    std::vector<std::shared_ptr<BodyPart>> canWear(Item * item,
+                                                   std::string & error) const;
 
     /// @brief Checks if inside the inventory there is a light source.
     /// @return <b>True</b> if there is a light source,<br>

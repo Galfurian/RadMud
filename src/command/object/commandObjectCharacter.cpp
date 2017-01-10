@@ -123,33 +123,37 @@ bool DoWield(Character * character, ArgumentHandler & args)
     }
     // String where the error message will be put.
     std::string errMessage;
-    // The destination slot.
-    auto bodyPart = character->canWield(item, errMessage);
+    // The occupied body parts.
+    auto bodyParts = character->canWield(item, errMessage);
     // Check if the character can wield the item.
-    if (bodyPart == nullptr)
+    if (bodyParts.empty())
     {
         character->sendMsg(errMessage);
         return false;
     }
     // Set the item slot.
-    item->setCurrentSlot(bodyPart);
+    item->setOccupiedBodyParts(bodyParts);
     // Remove the item from the inventory.
     character->remInventoryItem(item);
     // Equip the item.
     character->addEquipmentItem(item);
-    // Get the name of the body part.
-    auto bodyPartName = item->currentBodyPart->getDescription();
     // Show the proper message.
-    auto object = item->getName(true);
-    auto where = "with your " + bodyPartName;
-    auto whereOthers = character->getPossessivePronoun();
-    whereOthers += " " + bodyPartName;
-    if (HasFlag(item->model->modelFlags, ModelFlag::TwoHand))
+    std::string where, whereOthers;
+    for (auto it = bodyParts.begin(); it != bodyParts.end();)
     {
-        where = "both your hands";
-        whereOthers = "both " + character->getPossessivePronoun() + " hands";
+        where += "your " + (*it)->getDescription();
+        whereOthers += character->getPossessivePronoun() + " ";
+        whereOthers += (*it)->getDescription();
+        it++;
+        if (it != bodyParts.end())
+        {
+            where += ", ";
+            whereOthers += ", ";
+        }
     }
-    character->sendMsg("You wield %s with %s.\n", object, where);
+    character->sendMsg("You wield %s with %s.\n",
+                       item->getName(true),
+                       where);
     // Send the message inside the room.
     character->room->sendToAll("%s wields %s with %s.\n",
                                {character},
@@ -188,11 +192,14 @@ bool DoWear(Character * character, ArgumentHandler & args)
         {
             // String where the error message will be put.
             std::string errMessage;
-            // The destination slot.
-            auto bodyPart = character->canWear(iterator, errMessage);
-            if (bodyPart == nullptr) continue;
+            // The destination bodyParts.
+            auto bodyParts = character->canWear(iterator, errMessage);
+            if (bodyParts.empty())
+            {
+                continue;
+            }
             // Set the item slot.
-            iterator->setCurrentSlot(bodyPart);
+            iterator->setOccupiedBodyParts(bodyParts);
             // Remove the item from the player's inventory.
             character->remInventoryItem(iterator);
             // Add the item to the equipment.
@@ -250,30 +257,42 @@ bool DoWear(Character * character, ArgumentHandler & args)
     // String where the error message will be put.
     std::string errMessage;
     // The destination slot.
-    auto bodyPart = character->canWear(item, errMessage);
-    if (bodyPart == nullptr)
+    auto bodyParts = character->canWear(item, errMessage);
+    if (bodyParts.empty())
     {
         character->sendMsg(errMessage);
         return false;
     }
     // Set the item slot.
-    item->setCurrentSlot(bodyPart);
+    item->setOccupiedBodyParts(bodyParts);
     // Remove the item from the player's inventory.
     character->remInventoryItem(item);
     // Add the item to the equipment.
     character->addEquipmentItem(item);
-    // Get the name of the body part.
-    auto bodyPartName = item->currentBodyPart->getDescription();
+    // Show the proper message.
+    std::string where, whereOthers;
+    for (auto it = bodyParts.begin(); it != bodyParts.end();)
+    {
+        where += "your " + (*it)->getDescription();
+        whereOthers += character->getPossessivePronoun() + " ";
+        whereOthers += (*it)->getDescription();
+        it++;
+        if (it != bodyParts.end())
+        {
+            where += ", ";
+            whereOthers += ", ";
+        }
+    }
     // Notify to character.
-    character->sendMsg("You wear %s on your %s.\n", item->getName(true),
-                       bodyPartName);
+    character->sendMsg("You wear %s on your %s.\n",
+                       item->getName(true),
+                       where);
     // Send the message inside the room.
-    character->room->sendToAll("%s wears %s on %s %s.\n",
+    character->room->sendToAll("%s wears %s on %s.\n",
                                {character},
                                character->getNameCapital(),
                                item->getName(true),
-                               character->getPossessivePronoun(),
-                               bodyPartName);
+                               whereOthers);
     return true;
 }
 
@@ -298,29 +317,6 @@ bool DoRemove(Character * character, ArgumentHandler & args)
         character->sendMsg("Too many arguments.\n");
         return false;
     }
-    // Define a function which checks if all the ranged weapons have been removed.
-    auto CheckIfRemovedAllRangedWeapons = [&character]()
-    {
-        if (character->combatHandler.getAimedTarget() == nullptr)
-        {
-            return false;
-        }
-        for (auto equipmentItem : character->equipment)
-        {
-            auto bodyPart = equipmentItem->currentBodyPart;
-            if (bodyPart != nullptr)
-            {
-                if (HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
-                {
-                    if (equipmentItem->getType() == ModelType::RangedWeapon)
-                    {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
-    };
     if (args[0].getContent() == "all")
     {
         // Handle output only if the player has really removed something.
@@ -345,7 +341,7 @@ bool DoRemove(Character * character, ArgumentHandler & args)
         // Check if we have just removed ALL the USED Ranged Weapons.
         if (character->combatHandler.getAimedTarget() != nullptr)
         {
-            if (CheckIfRemovedAllRangedWeapons())
+            if (character->getActiveRangedWeapons().empty())
             {
                 character->sendMsg("You stop aiming %s.\n",
                                    character->combatHandler
@@ -371,27 +367,39 @@ bool DoRemove(Character * character, ArgumentHandler & args)
         character->sendMsg("You don't have that item equipped.\n");
         return false;
     }
-    // Get the name of the body part.
-    auto bodyPartName = item->currentBodyPart->getDescription();
+    // Prepare the message showing from the where the item has been removed.
+    std::string where, whereOthers;
+    for (auto it = item->occupiedBodyParts.begin();
+         it != item->occupiedBodyParts.end();)
+    {
+        where += "your " + (*it)->getDescription();
+        whereOthers += character->getPossessivePronoun() + " ";
+        whereOthers += (*it)->getDescription();
+        it++;
+        if (it != item->occupiedBodyParts.end())
+        {
+            where += ", ";
+            whereOthers += ", ";
+        }
+    }
     // Remove the item from the player's equipment.
     character->remEquipmentItem(item);
     // Add the item to the inventory.
     character->addInventoryItem(item);
     // Notify the character.
-    character->sendMsg("You remove %s from your %s.\n",
+    character->sendMsg("You remove %s from %s.\n",
                        item->getName(true),
-                       bodyPartName);
+                       where);
     // Send the message inside the room.
-    character->room->sendToAll("%s removes %s from %s %s.\n",
+    character->room->sendToAll("%s removes %s from %s.\n",
                                {character},
                                character->getNameCapital(),
                                item->getName(true),
-                               character->getPossessivePronoun(),
-                               bodyPartName);
+                               whereOthers);
     // Check if we have just removed ALL the USED Ranged Weapons.
     if (character->combatHandler.getAimedTarget() != nullptr)
     {
-        if (CheckIfRemovedAllRangedWeapons())
+        if (character->getActiveRangedWeapons().empty())
         {
             character->sendMsg("You stop aiming %s.\n",
                                character->combatHandler

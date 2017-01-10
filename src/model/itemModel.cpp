@@ -145,7 +145,6 @@ Item * ItemModel::createItem(
     newItem->maker = maker;
     newItem->composition = composition;
     newItem->quality = itemQuality;
-
     // Then set the rest.
     {
         // Evaluate the base value.
@@ -180,8 +179,6 @@ Item * ItemModel::createItem(
         newItem->maxCondition = ((valBase + valQuality + valMaterial) / 3);
         newItem->condition = newItem->maxCondition;
     }
-    newItem->currentBodyPart = nullptr;
-
     // If the item is for a mobile, do not add the item to the MUD nor to the
     //  DB and do not check its correctness.
     if (isForMobile)

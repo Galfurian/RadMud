@@ -44,7 +44,7 @@ Item::Item() :
     room(),
     owner(),
     container(),
-    currentBodyPart(),
+    occupiedBodyParts(),
     content()
 {
 }
@@ -203,9 +203,9 @@ void Item::getSheet(Table & sheet) const
         locationRow.push_back("Nowhere");
     }
     sheet.addRow(locationRow);
-    if (currentBodyPart != nullptr)
+    for(auto bodyPart : occupiedBodyParts)
     {
-        sheet.addRow({"Equipment Slot", currentBodyPart->name});
+        sheet.addRow({"Body Part", bodyPart->getDescription()});
     }
     if (!content.empty())
     {
@@ -558,9 +558,10 @@ Item * Item::findContent(std::string search_parameter, int & number)
     return nullptr;
 }
 
-void Item::setCurrentSlot(std::shared_ptr<BodyPart> _currentBodyPart)
+void Item::setOccupiedBodyParts(
+    std::vector<std::shared_ptr<BodyPart>> _occupiedBodyParts)
 {
-    currentBodyPart = _currentBodyPart;
+    occupiedBodyParts = _occupiedBodyParts;
 }
 
 void Item::luaRegister(lua_State * L)
