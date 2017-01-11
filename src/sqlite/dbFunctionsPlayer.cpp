@@ -286,9 +286,21 @@ bool SQLiteDbms::loadPlayerItems(Player * player)
             // Add the body part to the list of occupied body parts.
             item->occupiedBodyParts.emplace_back(bodyPart);
             // Add the item to the inventory.
-            player->equipment.push_back_item(item);
-            // Set the owner of the item.
-            item->owner = player;
+            bool alreadyPresent = false;
+            for (auto equipmentItem : player->equipment)
+            {
+                if (equipmentItem->vnum == item->vnum)
+                {
+                    alreadyPresent = true;
+                    break;
+                }
+            }
+            if (!alreadyPresent)
+            {
+                player->equipment.push_back_item(item);
+                // Set the owner of the item.
+                item->owner = player;
+            }
         }
     }
     // release the resource.
