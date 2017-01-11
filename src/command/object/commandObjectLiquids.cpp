@@ -428,7 +428,7 @@ bool DoPour(Character * character, ArgumentHandler & args)
         }
         // Send the messages.
         // If the liquid content is alcohol, make some explosions.
-        if (pouredLiquid->type == LiquidType::Alcohol)
+        if (HasFlag(pouredLiquid->flags, LiquidFlags::Inflammable))
         {
             character->sendMsg("As soon as you pour %s from %s on %s, a blaze "
                                    "of fire arises from %s and hits you.\n",

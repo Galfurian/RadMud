@@ -859,6 +859,7 @@ bool LoadLiquid(ResultSet * result)
             liquid->type = LiquidType(result->getNextUnsignedInteger());
             liquid->name = result->getNextString();
             liquid->description = result->getNextString();
+            liquid->flags = result->getNextUnsignedInteger();
             liquid->worth = result->getNextInteger();
             liquid->quench = result->getNextDouble();
             // Check the correctness.

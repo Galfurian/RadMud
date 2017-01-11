@@ -25,6 +25,20 @@
 #include "liquidType.hpp"
 #include <map>
 
+/// Flags of a liquid.
+using LiquidFlags = enum class LiquidFlags_t
+{
+    None,              ///< [0]   No flag.
+    Inflammable = 1,   ///< [1]   The liquid is inflammable.
+    AlcoholicBase = 2, ///< [2]   The liquid can be used as base for mixtures.
+    ///< [4]
+    ///< [8]
+    ///< [16]
+    ///< [32]
+    ///< [64]
+    ///< [128]
+};
+
 /// @brief Holds details about a liquid.
 class Liquid
 {
@@ -37,6 +51,8 @@ public:
     std::string name;
     /// Short description of the liquid.
     std::string description;
+    /// The liquid's flags.
+    unsigned int flags;
     /// Liquid's value on market.
     int worth;
     /// How much the liquid is able to quench the thirst.
