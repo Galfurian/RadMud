@@ -326,15 +326,7 @@ bool Mud::addFaction(Faction * faction)
 
 bool Mud::addSkill(std::shared_ptr<Skill> skill)
 {
-    for (auto it : mudSkills)
-    {
-        if (it->vnum == skill->vnum)
-        {
-            return false;
-        }
-    }
-    mudSkills.push_back(skill);
-    return true;
+    return mudSkills.insert(std::make_pair(skill->vnum, skill)).second;
 }
 
 bool Mud::addWriting(Writing * writing)
@@ -508,11 +500,11 @@ Faction * Mud::findFaction(std::string name)
 
 std::shared_ptr<Skill> Mud::findSkill(int vnum)
 {
-    for (auto skill : mudSkills)
+    for (auto it : mudSkills)
     {
-        if (skill->vnum == vnum)
+        if (it.first == vnum)
         {
-            return skill;
+            return it.second;
         }
     }
     return nullptr;
@@ -1211,7 +1203,6 @@ bool Mud::stopMud()
     size_t bIn = MudUpdater::instance().getBandIn();
     size_t bOut = MudUpdater::instance().getBandOut();
     size_t bUnc = MudUpdater::instance().getBandUncompressed();
-
     // Print some statistics.
     Logger::log(LogLevel::Info, "");
     Logger::log(LogLevel::Info, "Statistics");
@@ -1221,8 +1212,6 @@ bool Mud::stopMud()
                 "    Output        = " + ToString(bOut) + " Bytes.");
     Logger::log(LogLevel::Info,
                 "    Uncompressed  = " + ToString(bUnc) + " Bytes.");
-    Logger::log(LogLevel::Info,
-                "    Band. Saved   = " + ToString(bUnc - bOut) + " Bytes.");
     Logger::log(LogLevel::Info, "");
     return true;
 }

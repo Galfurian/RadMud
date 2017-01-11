@@ -153,9 +153,9 @@ bool DoSkillList(Character * character, ArgumentHandler & /*args*/)
     {
         // Prepare the row.
         TableRow row;
-        row.push_back(ToString(iterator->vnum));
-        row.push_back(iterator->name);
-        row.push_back(GetAttributeName(iterator->attribute, true));
+        row.push_back(ToString(iterator.first));
+        row.push_back(iterator.second->name);
+        row.push_back(GetAttributeName(iterator.second->attribute, true));
         // Add the row to the table.
         table.addRow(row);
     }

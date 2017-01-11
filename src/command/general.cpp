@@ -592,13 +592,9 @@ bool DoSkills(Character * character, ArgumentHandler & /*args*/)
     Table table = Table();
     table.addColumn("LvL", StringAlign::Left);
     table.addColumn("Skill", StringAlign::Left);
-    for (auto iterator : player->skills)
+    for (auto it : player->skills)
     {
-        auto skill = Mud::instance().findSkill(iterator.first);
-        if (skill)
-        {
-            table.addRow({skill->name, ToString(iterator.second)});
-        }
+        table.addRow({it.first->name, ToString(it.second)});
     }
     character->sendMsg(table.getTable());
     return true;

@@ -118,11 +118,7 @@ void Player::getSheet(Table & sheet) const
     sheet.addRow({"## Skill", "## Points"});
     for (auto it : skills)
     {
-        auto skill = Mud::instance().findSkill(it.first);
-        if (skill != nullptr)
-        {
-            sheet.addRow({skill->name, ToString(it.second)});
-        }
+        sheet.addRow({it.first->name, ToString(it.second)});
     }
 }
 
@@ -269,12 +265,12 @@ bool Player::updateOnDB()
         return false;
     }
     // Prepare the arguments of the query for skill table.
-    for (auto iterator : skills)
+    for (auto it : skills)
     {
         args.clear();
         args.push_back(name);
-        args.push_back(ToString(iterator.first));
-        args.push_back(ToString(iterator.second));
+        args.push_back(ToString(it.first->vnum));
+        args.push_back(ToString(it.second));
         if (!SQLiteDbms::instance().insertInto("PlayerSkill",
                                                args,
                                                false,

@@ -350,26 +350,43 @@ bool DoPlayerModSkill(Character * character, ArgumentHandler & args)
         character->sendMsg("You must insert a valid modifier.\n");
         return false;
     }
-    auto modified = static_cast<int>(target->skills[skill->vnum]) + modifier;
+    std::pair<std::shared_ptr<Skill>, int> * playerSkill = nullptr;
+    for (auto it : target->skills)
+    {
+        if (it.first->vnum == skill->vnum)
+        {
+            playerSkill = &it;
+            break;
+        }
+    }
+    if (playerSkill == nullptr)
+    {
+        character->sendMsg("%s does not possess that skill.\n",
+                           target->getNameCapital());
+        return false;
+    }
+    auto modified = playerSkill->second + modifier;
     if (modified <= 0)
     {
-        character->sendMsg("You cannot reduce the skill level <= 0.\n");
+        character->sendMsg("You cannot reduce the skill <= 0 (%s).\n",
+                           modified);
         return false;
     }
     if (modified >= 100)
     {
-        character->sendMsg("You cannot increase the skill to 100 or above.\n");
+        character->sendMsg("You cannot increase the skill to 100 or above (%s)."
+                               "\n", modified);
         return false;
     }
     // Change the skill value.
-    target->skills[skill->vnum] = static_cast<unsigned int>(modified);
+    playerSkill->second = modified;
     // Notify.
     character->sendMsg("You have successfully %s by %s the \"%s\" skill,"
                            "the new level is %s.\n",
                        ((modifier > 0) ? "increased " : "decreased"),
-                       ToString(modifier),
+                       modifier,
                        skill->name,
-                       ToString(target->skills[skill->vnum]));
+                       playerSkill->second);
     return true;
 }
 
