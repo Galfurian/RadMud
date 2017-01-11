@@ -156,11 +156,6 @@ Mud::~Mud()
     {
         delete (iterator.second);
     }
-    Logger::log(LogLevel::Global, "Freeing memory occupied by skills...");
-    for (auto iterator : Mud::instance().mudSkills)
-    {
-        delete (iterator.second);
-    }
 }
 
 Mud & Mud::instance()
@@ -329,10 +324,17 @@ bool Mud::addFaction(Faction * faction)
         std::make_pair(faction->vnum, faction)).second;
 }
 
-bool Mud::addSkill(Skill * skill)
+bool Mud::addSkill(std::shared_ptr<Skill> skill)
 {
-    return (skill == nullptr) ? false : mudSkills.insert(
-        std::make_pair(skill->vnum, skill)).second;
+    for (auto it : mudSkills)
+    {
+        if (it->vnum == skill->vnum)
+        {
+            return false;
+        }
+    }
+    mudSkills.push_back(skill);
+    return true;
 }
 
 bool Mud::addWriting(Writing * writing)
@@ -504,12 +506,14 @@ Faction * Mud::findFaction(std::string name)
     return nullptr;
 }
 
-Skill * Mud::findSkill(int vnum)
+std::shared_ptr<Skill> Mud::findSkill(int vnum)
 {
-    std::map<int, Skill *>::iterator iterator = mudSkills.find(vnum);
-    if (iterator != mudSkills.end())
+    for (auto skill : mudSkills)
     {
-        return iterator->second;
+        if (skill->vnum == vnum)
+        {
+            return skill;
+        }
     }
     return nullptr;
 }

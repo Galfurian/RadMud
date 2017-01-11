@@ -315,7 +315,7 @@ bool SQLiteDbms::loadPlayerSkill(Player * player)
     bool status = true;
     while (result->next())
     {
-        Skill * skill = Mud::instance().findSkill(result->getNextInteger());
+        auto skill = Mud::instance().findSkill(result->getNextInteger());
         unsigned int value = result->getNextUnsignedInteger();
         if (skill == nullptr)
         {

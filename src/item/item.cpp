@@ -560,6 +560,7 @@ Item * Item::findContent(std::string search_parameter, int & number)
 void Item::setOccupiedBodyParts(
     std::vector<std::shared_ptr<BodyPart>> _occupiedBodyParts)
 {
+    // Set the new list of occupied body parts.
     occupiedBodyParts = _occupiedBodyParts;
 }
 

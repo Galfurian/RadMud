@@ -92,17 +92,6 @@ bool Player::check() const
     safe &= CorrectAssert(age > 0);
     safe &= CorrectAssert(experience >= 0);
     safe &= CorrectAssert(rent_room >= 0);
-    //safe &= CorrectAssert(!skills.empty());
-    //safe &= CorrectAssert(skills.size() == Mud::instance().mudSkills.size());
-    for (auto iterator : Mud::instance().mudSkills)
-    {
-        if (skills.find(iterator.first) == skills.end())
-        {
-            Logger::log(LogLevel::Error, "The skill %s has been set.",
-                        iterator.second->name);
-            safe &= false;
-        }
-    }
     safe &= CorrectAssert(password_attempts >= 0);
     safe &= CorrectAssert(!closing);
     safe &= CorrectAssert(!logged_in);
@@ -127,16 +116,12 @@ void Player::getSheet(Table & sheet) const
     sheet.addRow({"Rent Room", ToString(this->rent_room)});
     sheet.addDivider();
     sheet.addRow({"## Skill", "## Points"});
-    for (auto it : Mud::instance().mudSkills)
+    for (auto it : skills)
     {
-        if (this->skills.find(it.first) != this->skills.end())
+        auto skill = Mud::instance().findSkill(it.first);
+        if (skill != nullptr)
         {
-            sheet.addRow({it.second->name,
-                          ToString(this->skills.at(it.first))});
-        }
-        else
-        {
-            sheet.addRow({it.second->name, "0"});
+            sheet.addRow({skill->name, ToString(it.second)});
         }
     }
 }
@@ -290,7 +275,7 @@ bool Player::updateOnDB()
         args.push_back(name);
         args.push_back(ToString(iterator.first));
         args.push_back(ToString(iterator.second));
-        if (!SQLiteDbms::instance().insertInto("Advancement",
+        if (!SQLiteDbms::instance().insertInto("PlayerSkill",
                                                args,
                                                false,
                                                true))

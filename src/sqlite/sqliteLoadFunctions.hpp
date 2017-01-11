@@ -47,6 +47,9 @@ bool LoadItem(ResultSet * result);
 /// @brief Function used to retrieve information about skills.
 bool LoadSkill(ResultSet * result);
 
+/// @brief Function used to retrieve information about skills requirements.
+bool LoadSkillRequirements(ResultSet * result);
+
 /// @brief Function used to retrieve information about factions.
 bool LoadFaction(ResultSet * result);
 

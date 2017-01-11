@@ -24,6 +24,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 #include <map>
 
 /// @brief Holds details about a skill.
@@ -38,6 +39,10 @@ public:
     std::string description;
     /// The main attribute of the skill.
     int attribute;
+    /// The overall stage of the skill.
+    int stage;
+    /// The list of required skills.
+    std::vector<std::pair<std::shared_ptr<Skill>, int>> requiredSkills;
 
     /// @brief Constructor.
     Skill();

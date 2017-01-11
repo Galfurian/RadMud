@@ -30,17 +30,19 @@ Skill::Skill() :
     vnum(),
     name(),
     description(),
-    attribute()
+    attribute(),
+    stage(),
+    requiredSkills()
 {
     // Nothing to do.
 }
 
 Skill::~Skill()
 {
-    //Logger::log(LogLevel::Debug,
-    //            "Deleted skill\t\t[%s]\t\t(%s)",
-    //            ToString(this->vnum),
-    //            this->name);
+//    Logger::log(LogLevel::Debug,
+//                "Deleted skill\t\t[%s]\t\t(%s)",
+//                ToString(this->vnum),
+//                this->name);
 }
 
 bool Skill::check()
@@ -49,5 +51,6 @@ bool Skill::check()
     assert(!name.empty());
     assert(!description.empty());
     assert(attribute > 0);
+    assert(stage > 0);
     return true;
 }

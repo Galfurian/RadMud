@@ -178,11 +178,12 @@ bool LoadSkill(ResultSet * result)
         try
         {
             // Create an empty Skill.
-            auto skill = new Skill();
+            auto skill = std::make_shared<Skill>();
             skill->vnum = result->getNextInteger();
             skill->name = result->getNextString();
             skill->description = result->getNextString();
             skill->attribute = result->getNextInteger();
+            skill->stage = result->getNextInteger();
             // Check the correctness.
             if (!skill->check())
             {
@@ -192,6 +193,43 @@ bool LoadSkill(ResultSet * result)
             {
                 throw SQLiteException("Error during skill insertion.");
             }
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadSkillRequirements(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto skillVnum = result->getNextInteger();
+            auto requiredSkillVnum = result->getNextInteger();
+            auto requiredLevel = result->getNextInteger();
+
+            auto skill = Mud::instance().findSkill(skillVnum);
+            auto requiredSkill = Mud::instance().findSkill(requiredSkillVnum);
+            if (skill == nullptr)
+            {
+                throw SQLiteException("Can't find the skill " +
+                                      ToString(skillVnum));
+            }
+            if (requiredSkill == nullptr)
+            {
+                throw SQLiteException("Can't find the skill " +
+                                      ToString(requiredSkillVnum) +
+                                      " required by the skill " +
+                                      ToString(skillVnum));
+            }
+            skill->requiredSkills.emplace_back(
+                std::make_pair(requiredSkill,
+                               requiredLevel));
         }
         catch (SQLiteException & e)
         {
