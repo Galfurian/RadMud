@@ -43,7 +43,7 @@ ToolType::ToolType(const unsigned int & _toolType) :
     else if (_toolType == 32) toolType = BlacksmithHammer;
     else if (_toolType == 33) toolType = Bellows;
     else if (_toolType == 34) toolType = Crucible;
-    else if (_toolType == 40) toolType = Tinderbox;
+    else if (_toolType == 40) toolType = Firelighter;
     else toolType = None;
 }
 
@@ -67,7 +67,7 @@ ToolType::ToolType(const std::string & _toolType) :
     else if (_toolType == "BlacksmithHammer") toolType = BlacksmithHammer;
     else if (_toolType == "Bellows") toolType = Bellows;
     else if (_toolType == "Crucible") toolType = Crucible;
-    else if (_toolType == "Tinderbox") toolType = Tinderbox;
+    else if (_toolType == "Firelighter") toolType = Firelighter;
     else toolType = None;
 }
 
@@ -89,7 +89,7 @@ bool ToolType::isValid(const std::string & _toolType)
     if (_toolType == "BlacksmithHammer") return true;
     if (_toolType == "Bellows") return true;
     if (_toolType == "Crucible") return true;
-    if (_toolType == "Tinderbox") return true;
+    if (_toolType == "Firelighter") return true;
     return false;
 }
 
@@ -106,7 +106,7 @@ std::string ToolType::toString() const
     if (toolType == BlacksmithHammer) return "BlacksmithHammer";
     if (toolType == Bellows) return "Bellows";
     if (toolType == Crucible) return "Crucible";
-    if (toolType == Tinderbox) return "Tinderbox";
+    if (toolType == Firelighter) return "Firelighter";
     return "None";
 }
 

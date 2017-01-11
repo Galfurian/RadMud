@@ -8,6 +8,7 @@ set(PROJECT_INC ${PROJECT_INC}
 #############################################
 # Source Files
 set(PROJECT_SRC ${PROJECT_SRC}
+        ${CMAKE_SOURCE_DIR}/src/command/object/commandObjectLightSource.cpp
         ${CMAKE_SOURCE_DIR}/src/command/object/commandObjectManagement.cpp
         ${CMAKE_SOURCE_DIR}/src/command/object/commandObjectContainer.cpp
         ${CMAKE_SOURCE_DIR}/src/command/object/commandObjectCharacter.cpp

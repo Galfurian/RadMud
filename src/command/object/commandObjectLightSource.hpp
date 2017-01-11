@@ -1,8 +1,8 @@
-/// @file   commandObjectContainer.hpp
+/// @file   commandObjectLightSource.hpp
 /// @author Enrico Fraccaroli
-/// @date   29/12/2016
+/// @date   gen 11 2017
 /// @copyright
-/// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
+/// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
 /// copy of this software and associated documentation files (the "Software"),
 /// to deal in the Software without restriction, including without limitation
@@ -26,13 +26,13 @@
 /// @addtogroup ComInterfaces
 /// @{
 
-/// Organize the items in the room.
-bool DoOrganize(Character * character, ArgumentHandler & args);
+/// Allows to turn on and off an activatable item.
+bool DoTurn(Character * character, ArgumentHandler & args);
 
-/// Open a door if not unlocked.
-bool DoOpen(Character * character, ArgumentHandler & args);
+/// Allows to kindle a light source.
+bool DoKindle(Character * character, ArgumentHandler & args);
 
-/// Close a door.
-bool DoClose(Character * character, ArgumentHandler & args);
+/// Allows to refill a light source.
+bool DoRefill(Character * character, ArgumentHandler & args);
 
 ///@}

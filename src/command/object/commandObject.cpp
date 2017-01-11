@@ -21,6 +21,7 @@
 
 #include "commandObject.hpp"
 
+#include "commandObjectLightSource.hpp"
 #include "commandObjectManagement.hpp"
 #include "commandObjectContainer.hpp"
 #include "commandObjectCharacter.hpp"
@@ -30,6 +31,8 @@
 
 void LoadObjectCommands()
 {
+    // ////////////////////////////////////////////////////////////////////////
+    // COMMAND MANAGEMENT
     Mud::instance().addCommand(std::make_shared<Command>(
         DoTake, "take", "(item|all) [(container)]",
         "Take something from the ground or from a container.",
@@ -39,9 +42,46 @@ void LoadObjectCommands()
         "Drop an object.",
         false, true, false));
     Mud::instance().addCommand(std::make_shared<Command>(
+        DoPut, "put", "(something) (container)",
+        "Put something inside a container.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
         DoGive, "give", "(item|all) (someone)",
         "Give an object to someone.",
         false, false, false));
+
+    // ////////////////////////////////////////////////////////////////////////
+    // COMMAND LIQUIDS
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoDrink, "drink", "(liquid container)",
+        "Drink from a container of liquids.",
+        false, false, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoFill, "fill", "(liquid container) (source of liquid)",
+        "Fill a container of liquids from a source of liquid.",
+        false, false, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoPour, "pour", "(liquid container) [liquid container]",
+        "Pour the content of the container into another one or on the ground.",
+        false, false, false));
+
+    // ////////////////////////////////////////////////////////////////////////
+    // COMMAND CONTAINER
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoOrganize, "organize", "(name|weight) [(container)]",
+        "Order the desired container or if no target is passed, the room.",
+        false, false, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoOpen, "open", "(container)|(direction)",
+        "Open a door in a given direction or a container.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoClose, "close", "(container)|(direction)",
+        "Close a door in a given direction or a container.",
+        false, true, false));
+
+    // ////////////////////////////////////////////////////////////////////////
+    // COMMAND CHARACTER
     Mud::instance().addCommand(std::make_shared<Command>(
         DoEquipments, "equipments", "",
         "List all the items you are wearing.",
@@ -62,34 +102,9 @@ void LoadObjectCommands()
         DoInventory, "inventory", "",
         "Show character's inventory.",
         false, true, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoOrganize, "organize", "(name|weight) [(container)]",
-        "Order the desired container or if no target is passed, the room.",
-        false, false, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoOpen, "open", "(container)|(direction)",
-        "Open a door in a given direction or a container.",
-        false, true, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoClose, "close", "(container)|(direction)",
-        "Close a door in a given direction or a container.",
-        false, true, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoPut, "put", "(something) (container)",
-        "Put something inside a container.",
-        false, true, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoDrink, "drink", "(liquid container)",
-        "Drink from a container of liquids.",
-        false, false, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoFill, "fill", "(liquid container) (source of liquid)",
-        "Fill a container of liquids from a source of liquid.",
-        false, false, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoPour, "pour", "(liquid container) [liquid container]",
-        "Pour the content of the container into another one or on the ground.",
-        false, false, false));
+
+    // ////////////////////////////////////////////////////////////////////////
+    // COMMAND SHOP
     Mud::instance().addCommand(std::make_shared<Command>(
         DoDeposit, "deposit", "(coin) (shop)",
         "Deposit a coin inside a shop.",
@@ -106,9 +121,16 @@ void LoadObjectCommands()
         DoBalance, "balance", "",
         "Shows the character's balance.",
         false, false, false));
+
+    // ////////////////////////////////////////////////////////////////////////
+    // COMMAND LIGHT SOURCE
     Mud::instance().addCommand(std::make_shared<Command>(
         DoTurn, "turn", "(item)",
-        "Allows to turn on and off an activatable item.",
+        "Allows to turn on and off an actionable item.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoKindle, "kindle", "(item) (ignition source)",
+        "Allows to kindle a fire.",
         false, true, false));
     Mud::instance().addCommand(std::make_shared<Command>(
         DoRefill, "refill", "(light source) (fuel)",

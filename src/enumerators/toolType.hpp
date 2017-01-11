@@ -48,7 +48,7 @@ public:
         BlacksmithHammer = 32,
         Bellows = 33,
         Crucible = 34,
-        Tinderbox = 40
+        Firelighter = 40
     };
 
     /// @brief Constructor from uint.

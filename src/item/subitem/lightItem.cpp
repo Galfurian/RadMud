@@ -117,7 +117,8 @@ double LightItem::getTotalSpace() const
 
 bool LightItem::isActive() const
 {
-    return active || model->toLight()->alwaysActive;
+    return active || HasFlag(model->toLight()->lightSourceFlags,
+                             LightModelFlags::AlwaysActive);
 }
 
 bool LightItem::canRefillWith(Item * item, std::string & error) const
