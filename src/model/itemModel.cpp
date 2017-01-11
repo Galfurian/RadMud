@@ -43,7 +43,6 @@
 #include "meleeWeaponModel.hpp"
 #include "itemFactory.hpp"
 #include "logger.hpp"
-#include "race.hpp"
 
 ItemModel::ItemModel() :
     vnum(),

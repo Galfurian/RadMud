@@ -54,12 +54,12 @@ SQLiteDbms::SQLiteDbms() :
     loaders.push_back(TableLoader("Writings", LoadWriting));
     loaders.push_back(TableLoader("Profession", LoadProfession));
     loaders.push_back(TableLoader("Production", LoadProduction));
-    loaders.push_back(TableLoader("Mobile", LoadMobile));
     loaders.push_back(TableLoader("Building", LoadBuilding));
     loaders.push_back(TableLoader("Shop", LoadShop));
     loaders.push_back(TableLoader("Currency", LoadCurrency));
     loaders.push_back(TableLoader("RaceBodyPart", LoadRaceBodyPart));
     loaders.push_back(TableLoader("ModelBodyPart", LoadModelBodyPart));
+    loaders.push_back(TableLoader("Mobile", LoadMobile));
 }
 
 SQLiteDbms::~SQLiteDbms()

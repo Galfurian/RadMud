@@ -128,7 +128,7 @@ bool DoWield(Character * character, ArgumentHandler & args)
     // Check if the character can wield the item.
     if (bodyParts.empty())
     {
-        character->sendMsg(errMessage);
+        character->sendMsg(errMessage + "\n");
         return false;
     }
     // Set the item body part.
@@ -245,6 +245,7 @@ bool DoWear(Character * character, ArgumentHandler & args)
                 if (it->vnum == ToNumber<int>(args[0].getContent()))
                 {
                     item = it;
+                    break;
                 }
             }
         }
@@ -260,7 +261,7 @@ bool DoWear(Character * character, ArgumentHandler & args)
     auto bodyParts = character->canWear(item, errMessage);
     if (bodyParts.empty())
     {
-        character->sendMsg(errMessage);
+        character->sendMsg(errMessage + "\n");
         return false;
     }
     // Set the body parts occupied by the item.

@@ -975,7 +975,7 @@ std::vector<std::shared_ptr<BodyPart>> Character::canWield(
     auto compatibleBodyParts = item->model->getBodyParts(race);
     if (compatibleBodyParts.empty())
     {
-        error = "It is not designed for your fisionomy.\n";
+        error = "It is not designed for your fisionomy.";
         return occupiedBodyParts;
     }
     for (auto bodyPart : compatibleBodyParts)
@@ -1008,7 +1008,7 @@ std::vector<std::shared_ptr<BodyPart>> Character::canWield(
     }
     if (occupiedBodyParts.empty())
     {
-        error = "There is no room where it can be wielded.\n";
+        error = "There is no room where it can be wielded.";
     }
     return occupiedBodyParts;
 }
@@ -1023,7 +1023,7 @@ std::vector<std::shared_ptr<BodyPart>> Character::canWear(
     auto compatibleBodyParts = item->model->getBodyParts(race);
     if (compatibleBodyParts.empty())
     {
-        error = "It is not designed for your fisionomy.\n";
+        error = "It is not designed for your fisionomy.";
         return occupiedBodyParts;
     }
     for (auto bodyPart : compatibleBodyParts)
@@ -1041,7 +1041,7 @@ std::vector<std::shared_ptr<BodyPart>> Character::canWear(
     }
     if (occupiedBodyParts.empty())
     {
-        error = "There is no room where it can be worn.\n";
+        error = "There is no room where it can be worn.";
     }
     return occupiedBodyParts;
 }
@@ -1192,44 +1192,34 @@ std::string Character::getLook()
         output += "\n";
 #else
         auto item = this->findItemAtBodyPart(bodyPart);
-        output += ToCapitals(this->getSubjectPronoun()) + " is ";
         if (item == nullptr)
         {
-//            if (HasFlag(bodyPart->flags, BodyPartFlag::CanWear))
-//            {
-//                output += "not wearing anything on ";
-//            }
-//            else
-//            {
-//                output += "not wielding anything with ";
-//            }
+            continue;
+        }
+        output += ToCapitals(this->getSubjectPronoun()) + " is ";
+        if (HasFlag(bodyPart->flags, BodyPartFlag::CanWear))
+        {
+            output += "wearing ";
         }
         else
         {
-            if (HasFlag(bodyPart->flags, BodyPartFlag::CanWear))
-            {
-                output += "wearing ";
-            }
-            else
-            {
-                output += "wielding ";
-            }
-            if (roomIsLit)
-            {
-                output += item->getName(true) + " ";
-            }
-            else
-            {
-                output += "something ";
-            }
-            if (HasFlag(bodyPart->flags, BodyPartFlag::CanWear))
-            {
-                output += "on ";
-            }
-            else
-            {
-                output += "with ";
-            }
+            output += "wielding ";
+        }
+        if (roomIsLit)
+        {
+            output += item->getName(true) + " ";
+        }
+        else
+        {
+            output += "something ";
+        }
+        if (HasFlag(bodyPart->flags, BodyPartFlag::CanWear))
+        {
+            output += "on ";
+        }
+        else
+        {
+            output += "with ";
         }
         output += this->getPossessivePronoun() + " ";
         output += Formatter::yellow();
@@ -1587,32 +1577,37 @@ Item * Character::luaLoadItem(int vnumModel,
 
 void Character::luaAddEquipment(Item * item)
 {
-    equipment.push_back(item);
+    std::string error;
+    auto occupiedBodyParts = this->canWear(item, error);
+    if (occupiedBodyParts.empty())
+    {
+        Logger::log(LogLevel::Error,
+                    "The mobile %s cannot equip %s.",
+                    this->getName(),
+                    item->getName());
+        Logger::log(LogLevel::Error, "Error: %s", error);
+        return;
+    }
+    else
+    {
+        item->setOccupiedBodyParts(occupiedBodyParts);
+        this->addEquipmentItem(item);
+    }
 }
 
 bool Character::luaRemEquipment(Item * item)
 {
-    if (equipment.removeItem(item))
-    {
-        item->owner = nullptr;
-        return true;
-    }
-    return false;
+    return this->remEquipmentItem(item);
 }
 
 void Character::luaAddInventory(Item * item)
 {
-    equipment.push_back(item);
+    this->addInventoryItem(item);
 }
 
 bool Character::luaRemInventory(Item * item)
 {
-    if (inventory.removeItem(item))
-    {
-        item->owner = nullptr;
-        return true;
-    }
-    return false;
+    return this->remInventoryItem(item);
 }
 
 void Character::luaRegister(lua_State * L)
