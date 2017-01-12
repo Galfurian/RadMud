@@ -109,30 +109,9 @@ bool DoProfession(Character * character,
             return false;
         }
     }
-    // Search the production material among the selected ingredients.
-    Material * craftMaterial = nullptr;
-    for (auto iterator : usedIngredients)
-    {
-        auto item = iterator.first;
-        if (item->model->getType() == ModelType::Resource)
-        {
-            auto resourceModel = item->model->toResource();
-            if (resourceModel->resourceType == production->material)
-            {
-                craftMaterial = item->composition;
-                break;
-            }
-        }
-    }
-    if (craftMaterial == nullptr)
-    {
-        character->sendMsg("You cannot decide which will be the material.\n");
-        return false;
-    }
     // Prepare the action.
     auto craftAction = std::make_shared<CraftAction>(character,
                                                      production,
-                                                     craftMaterial,
                                                      usedTools,
                                                      usedIngredients);
     // Check the new action.

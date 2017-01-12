@@ -113,7 +113,7 @@ Item * ItemModel::createItem(
     const ItemQuality & itemQuality,
     const unsigned int & quantity)
 {
-    if(composition == nullptr)
+    if (composition == nullptr)
     {
         Logger::log(LogLevel::Error, "Received nullptr material.");
         return nullptr;
@@ -304,7 +304,6 @@ void ItemModel::luaRegister(lua_State * L)
         .beginClass<ItemModel>("ItemModel")
         .addData("vnum", &ItemModel::vnum)
         .addData("condition", &ItemModel::condition)
-        .addFunction("toTool", &ItemModel::toTool)
         .addFunction("getType", &ItemModel::getType)
         .endClass()
         .deriveClass<ToolModel, ItemModel>("ToolModel")

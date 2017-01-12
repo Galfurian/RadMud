@@ -28,17 +28,19 @@
 
 CraftAction::CraftAction(Character * _actor,
                          Production * _production,
-                         Material * _material,
                          ItemVector & _tools,
                          std::vector<std::pair<Item *, unsigned int>> & _ingredients) :
     GeneralAction(_actor),
     production(_production),
-    material(_material),
     tools(_tools),
-    ingredients(_ingredients)
+    ingredients(_ingredients),
+    material()
 {
     // Debugging message.
     //Logger::log(LogLevel::Debug, "Created CraftAction.");
+    // Determine the material of the creation based on the ammount of each
+    // single involved item.
+    this->determineMaterial();
     // Reset the cooldown of the action.
     this->resetCooldown(CraftAction::getCooldown(_actor, _production));
 }
@@ -264,6 +266,72 @@ ActionStatus CraftAction::perform()
         actor->sendMsg("some of the items have been placed on the ground.\n\n");
     }
     return ActionStatus::Finished;
+}
+
+void CraftAction::determineMaterial()
+{
+    /// TODO: Simplify...
+    // The material of the outcome is determined by summing the weights of
+    // the items with the same material. Then, the material with the highest
+    // weight is chosen.
+    struct MaterialEntry
+    {
+        /// The material.
+        Material * material;
+        /// The accumulated weight for the material.
+        double weight;
+
+        /// @brief Constructor.
+        MaterialEntry() :
+            material(),
+            weight()
+        {
+            // Nothing to do.
+        }
+
+        /// @brief Constructor.
+        MaterialEntry(Material * _material, double _weight) :
+            material(_material),
+            weight(_weight)
+        {
+            // Nothing to do.
+        }
+    };
+    std::vector<MaterialEntry> materials;
+    for (auto ingr : ingredients)
+    {
+        // Check if the ingredient has a material.
+        if (ingr.first->composition == nullptr)
+        {
+            continue;
+        }
+        // Create a new material entry.
+        MaterialEntry entry(ingr.first->composition,
+                            ingr.first->getWeight(false) * ingr.second);
+        bool found = false;
+        for (auto it : materials)
+        {
+            if (it.material->vnum == entry.material->vnum)
+            {
+                found = true;
+                it.weight += entry.weight;
+                break;
+            }
+        }
+        if (!found)
+        {
+            materials.emplace_back(entry);
+        }
+    }
+    double weight = 0;
+    for (auto it : materials)
+    {
+        if (it.weight > weight)
+        {
+            material = it.material;
+            weight = it.weight;
+        }
+    }
 }
 
 unsigned int CraftAction::getConsumedStamina(Character * character)

@@ -36,8 +36,7 @@ Production::Production() :
     quantity(),
     tools(),
     ingredients(),
-    workbench(ToolType::None),
-    material(ResourceType::None)
+    workbench(ToolType::None)
 {
     // Nothing to do.
 }
@@ -179,7 +178,6 @@ bool Production::check()
         assert(it.first != ResourceType::None);
         assert(it.second > 0);
     }
-    assert(material != ResourceType::None);
     return true;
 }
 

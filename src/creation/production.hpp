@@ -59,8 +59,6 @@ public:
     std::map<ResourceType, unsigned int> ingredients;
     /// The type of the workbench.
     ToolType workbench;
-    /// The ingredient from which the material of the production is choosen.
-    ResourceType material;
 
     /// @brief Constructor.
     Production();
