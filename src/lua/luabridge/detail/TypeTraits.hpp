@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include <type_traits>
+
 //------------------------------------------------------------------------------
 /**
  Container traits.
@@ -56,59 +58,6 @@ struct ContainerTraits
     using isNotContainer = bool;
 };
 
-/**
- Container Construction traits.
-
- Unspecialized ContainerConstructionTraits implement default container
- construction with the containers constructor. Specializing this trait
- can be used to tell LuaBridge how to obtain a container from raw pointers
- in cases where special care has to be taken such as in the case of
- std::shared_ptr.
-
- Example:
-
- class A : public std::enable_shared_from_this<A> {
- public:
- std::shared_ptr<A> get_shared() { return shared_from_this(); }
- ...
- }
-
- namespace luabridge {
- // register shared_ptr as container
- template <class T>
- struct ContainerTraits <std::shared_ptr<T> >
- {
- static T* get (std::shared_ptr<T> const& c)
- {
- return c.get();
- }
- };
-
- // make sure shared_ptr isn't usable with not instrumented types
- template <class T>
- struct ContainerConstructionTraits< std::shared_ptr<T> > { };
-
- // creation traits specify how to obtain a shared_ptr from a raw pointer
- template <>
- struct ContainerConstructionTraits< std::shared_ptr<A> >
- {
- static std::shared_ptr<A> constructContainer(A *t)
- {
- return t->get_shared();
- }
- };
- }
- */
-template<class C>
-struct ContainerConstructionTraits
-{
-    using T = typename ContainerTraits<C>::Type;
-
-    static C constructContainer(T * t)
-    {
-        return C(t);
-    }
-};
 
 //------------------------------------------------------------------------------
 /**
@@ -137,7 +86,17 @@ struct TypeTraits
         static yes & test(...);
 
     public:
-        static const bool value = sizeof(test<ContainerTraits<T> >(0)) == sizeof(yes);
+        static const bool value =
+            sizeof(test<ContainerTraits<T> >(0)) == sizeof(yes);
+    };
+
+    /** Determine if T is an enum */
+    template<typename T>
+    class isEnum
+    {
+    public:
+        //static const bool value = std::is_enum<T>::value; // C++11
+        static const bool value = std::is_enum<T>::value;
     };
 
     /** Determine if T is const qualified.

@@ -46,7 +46,10 @@ public:
     }
 
     /// @brief Constructor.
-    LuaException(lua_State * L, char const *, char const *, long) :
+    LuaException(lua_State * L,
+                 char const *,
+                 char const *,
+                 long) :
         m_L(L),
         m_what()
     {

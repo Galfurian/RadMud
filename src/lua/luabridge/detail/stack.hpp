@@ -2,6 +2,7 @@
 /// @copyright
 /// Copyright 2007, Nathan Reed
 /// Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
+/// Copyright 2016, Robin Gareus <robin@gareus.org>
 ///
 /// License: The MIT License (http://www.opensource.org/licenses/mit-license.php)
 ///

@@ -37,6 +37,23 @@ private:
     LuaRef m_key;
     LuaRef m_value;
 
+    void next()
+    {
+        m_table.push(m_L);
+        m_key.push(m_L);
+        if (lua_next(m_L, -2))
+        {
+            m_value.pop(m_L);
+            m_key.pop(m_L);
+        }
+        else
+        {
+            m_key = Nil();
+            m_value = Nil();
+        }
+        lua_pop(m_L, 1);
+    }
+
 public:
     explicit Iterator(LuaRef table) :
         m_L(table.state()),
@@ -44,7 +61,7 @@ public:
         m_key(table.state()),
         m_value(table.state())
     {
-        //m_table.push (
+        next(); // get the first (key, value) pair from table
     }
 
     lua_State * state() const
@@ -64,7 +81,16 @@ public:
 
     Iterator & operator++()
     {
-        return *this;
+        if (this->isNil())
+        {
+            // if the iterator reaches the end, do nothing
+            return *this;
+        }
+        else
+        {
+            next();
+            return *this;
+        }
     }
 
     inline bool isNil() const

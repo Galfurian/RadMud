@@ -32,6 +32,22 @@
 #include <typeinfo>
 #include <functional>
 
+#include <cassert>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <typeinfo>
+
+#include <bitset>
+#include <list>
+#include <map>
+#include <set>
+#include <vector>
+
+#include <inttypes.h>
+#include <type_traits>
+#include <memory>
+
 #define LUABRIDGE_MAJOR_VERSION   2
 #define LUABRIDGE_MINOR_VERSION   0
 #define LUABRIDGE_VERSION       200

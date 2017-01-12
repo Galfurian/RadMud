@@ -1,8 +1,8 @@
 ///----------------------------------------------------------------------------
 /// @file   TypeList.hpp
 /// @copyright
-/// Copyright 2007, Nathan Reed
 /// Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
+/// Copyright 2007, Nathan Reed
 ///
 /// License: The MIT License (http://www.opensource.org/licenses/mit-license.php)
 ///
@@ -52,11 +52,9 @@
  */
 using None = void;
 
-template<typename H, typename T = None>
+template<typename Head, typename Tail = None>
 struct TypeList
 {
-    using Head = H;
-    using Tail = T;
 };
 
 /**
@@ -90,7 +88,8 @@ struct TypeListValues<TypeList<Head, Tail> >
     {
         std::string s;
 
-        if (comma) s = ", ";
+        if (comma)
+            s = ", ";
 
         s = s + typeid(Head).name();
 
@@ -118,7 +117,8 @@ struct TypeListValues<TypeList<Head &, Tail> >
     {
         std::string s;
 
-        if (comma) s = ", ";
+        if (comma)
+            s = ", ";
 
         s = s + typeid(Head).name() + "&";
 
@@ -142,7 +142,8 @@ struct TypeListValues<TypeList<Head const &, Tail> >
     {
         std::string s;
 
-        if (comma) s = ", ";
+        if (comma)
+            s = ", ";
 
         s = s + typeid(Head).name() + " const&";
 
@@ -174,7 +175,8 @@ struct ArgList<TypeList<Head, Tail>, Start> :
     public TypeListValues<TypeList<Head, Tail> >
 {
     ArgList(lua_State * L) :
-        TypeListValues<TypeList<Head, Tail> >(Stack<Head>::get(L, Start), ArgList<Tail, Start + 1>(L))
+        TypeListValues<TypeList<Head, Tail> >(Stack<Head>::get(L, Start),
+                                              ArgList<Tail, Start + 1>(L))
     {
     }
 };

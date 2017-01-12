@@ -1,8 +1,8 @@
 ///----------------------------------------------------------------------------
 /// @file   LuaRef.hpp
 /// @copyright
-/// Copyright 2008, Nigel Atkinson <suprapilot+LuaCode@gmail.com>
 /// Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
+/// Copyright 2008, Nigel Atkinson <suprapilot+LuaCode@gmail.com>
 ///
 /// License: The MIT License (http://www.opensource.org/licenses/mit-license.php)
 ///
@@ -282,14 +282,6 @@ private:
         inline bool isLightUserdata() const
         {
             return type() == LUA_TLIGHTUSERDATA;
-        }
-
-        template<class T>
-        inline bool is() const
-        {
-            StackPop p(m_L, 1);
-            push(m_L);
-            return Stack<T>::is_a(m_L, lua_gettop(m_L));
         }
 
         //--------------------------------------------------------------------------
@@ -859,6 +851,17 @@ public:
 
     //----------------------------------------------------------------------------
     /**
+        Pop the top of Lua stack and assign the ref to m_ref
+    */
+    void pop(lua_State * L)
+    {
+        assert (equalstates(L, m_L));
+        luaL_unref(m_L, LUA_REGISTRYINDEX, m_ref);
+        m_ref = luaL_ref(m_L, LUA_REGISTRYINDEX);
+    }
+
+    //----------------------------------------------------------------------------
+    /**
      Determine the object type.
 
      The return values are the same as for `lua_type`.
@@ -922,14 +925,6 @@ public:
     inline bool isLightUserdata() const
     {
         return type() == LUA_TLIGHTUSERDATA;
-    }
-
-    template<class T>
-    inline bool is() const
-    {
-        StackPop p(m_L, 1);
-        push(m_L);
-        return Stack<T>::is_a(m_L, lua_gettop(m_L));
     }
 
     /** @} */

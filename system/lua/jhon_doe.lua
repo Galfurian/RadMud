@@ -202,9 +202,9 @@ end
 IsAnAxe = function(item)
     -- Check the item is a tool.
     if (item:getTypeName() == "Tool") then
---        if (item:getModel():toTool().toolType:toString() == "WoodcutterAxe") then
---            return true
---        end
+        if (item.model:toTool().toolType:toString() == "WoodcutterAxe") then
+            return true
+        end
     end
     return false
 end

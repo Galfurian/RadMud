@@ -192,7 +192,7 @@ void ModelType::luaRegister(lua_State * L)
 //        .addEnum("Down", Direction::Down)
         .endClass();
     /*
-    luabridge::getGlobalNamespace(L)
+    luabridge2::getGlobalNamespace(L)
         .beginNamespace("ModelType")
         .addEnum("Corpse", ModelType::Corpse)
         .addEnum("MeleeWeapon", ModelType::MeleeWeapon)
