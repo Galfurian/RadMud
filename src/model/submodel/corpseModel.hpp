@@ -29,6 +29,9 @@ class CorpseModel :
     public ItemModel
 {
 public:
+    /// The race associated with the corpse model.
+    Race * corpseRace;
+
     CorpseModel();
 
     virtual ~CorpseModel();

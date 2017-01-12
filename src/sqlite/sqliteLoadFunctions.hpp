@@ -59,6 +59,12 @@ bool LoadModel(ResultSet * result);
 /// @brief Function used to retrieve information about races.
 bool LoadRace(ResultSet * result);
 
+/// @brief Function used to load body parts associated to races.
+bool LoadRaceBodyPart(ResultSet * result);
+
+/// @brief Function used to load corpses associated to races.
+bool LoadRaceCorpse(ResultSet * result);
+
 /// @brief Function used to retrieve information about all the mobiles.
 bool LoadMobile(ResultSet * result);
 
@@ -120,10 +126,10 @@ bool LoadTerrain(ResultSet * result);
 /// @brief Function used to load body parts.
 bool LoadBodyPart(ResultSet * result);
 
-/// @brief Function used to load body parts associated to races.
-bool LoadRaceBodyPart(ResultSet * result);
-
 /// @brief Function used to load the body parts where a model can be equipped.
 bool LoadModelBodyPart(ResultSet * result);
+
+/// @brief Function used to load the resources produced from a body part.
+bool LoadBodyPartResources(ResultSet * result);
 
 ///@}

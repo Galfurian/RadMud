@@ -26,7 +26,8 @@
 #include "logger.hpp"
 #include "mud.hpp"
 
-CorpseModel::CorpseModel()
+CorpseModel::CorpseModel() :
+    corpseRace()
 {
     // Nothing to do.
 }
@@ -72,7 +73,11 @@ void CorpseModel::getSheet(Table & sheet) const
     // Call the function of the father class.
     ItemModel::getSheet(sheet);
     // Add a divider.
-    //sheet.addDivider();
+    sheet.addDivider();
+    if (corpseRace != nullptr)
+    {
+        sheet.addRow({"Corpse", corpseRace->name});
+    }
 }
 
 Item * CorpseModel::createItem(std::string,

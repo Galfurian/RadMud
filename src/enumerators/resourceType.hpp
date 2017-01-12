@@ -45,7 +45,10 @@ public:
         MetalVein,      ///< [11] METAL_VEIN
         StoneMonolith,  ///< [12] STONE_MONOLITH
         Pen,            ///< [13] Pen
-        Trash           ///< [14] Trash (Anything which has no specific use)
+        Trash,          ///< [14] Trash (Anything which has no specific use)
+        Meat,           ///< [15] MEAT
+        Bone,           ///< [16] BONE
+        Skull           ///< [17] SKULL
     };
 
     /// @brief Constructor from uint.

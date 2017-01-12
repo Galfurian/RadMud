@@ -251,6 +251,14 @@ void LoadGodCommands()
         DoProductionList, "production_list", "",
         "Get the list of all the productions.",
         true, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoBodyPartList, "body_part_list", "",
+        "Get the list of all the body parts.",
+        true, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoBodyPartInfo, "body_part_information", "",
+        "Get information about a body part.",
+        true, true, false));
 
     // ////////////////////////////////////////////////////////////////////////
     // COMMAND GOD LIQUID

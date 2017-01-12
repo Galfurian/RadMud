@@ -50,4 +50,10 @@ bool DoProductionInfo(Character * character, ArgumentHandler & args);
 /// Get the list of all the productions.
 bool DoProductionList(Character * character, ArgumentHandler & args);
 
+/// Get the list of all the body parts.
+bool DoBodyPartList(Character * character, ArgumentHandler & args);
+
+/// Provide all the information regarding the given body part.
+bool DoBodyPartInfo(Character * character, ArgumentHandler & args);
+
 /// @}

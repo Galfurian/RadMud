@@ -21,6 +21,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "materialType.hpp"
+#include "utils.hpp"
 
 MaterialType::MaterialType() :
     materialType(None)
@@ -41,6 +42,7 @@ MaterialType::MaterialType(const unsigned int & _materialType) :
     else if (_materialType == 8) materialType = Glass;
     else if (_materialType == 9) materialType = Paper;
     else if (_materialType == 10) materialType = Coal;
+    else if (_materialType == 11) materialType = Bone;
     else materialType = None;
 }
 
@@ -53,36 +55,38 @@ MaterialType::MaterialType(const Enum & _materialType) :
 MaterialType::MaterialType(const std::string & _materialType) :
     materialType()
 {
-    if (_materialType == "Metal") materialType = Metal;
-    else if (_materialType == "Stone") materialType = Stone;
-    else if (_materialType == "Wood") materialType = Wood;
-    else if (_materialType == "Skin") materialType = Skin;
-    else if (_materialType == "Cloth") materialType = Cloth;
-    else if (_materialType == "Vegetable") materialType = Vegetable;
-    else if (_materialType == "Meat") materialType = Meat;
-    else if (_materialType == "Glass") materialType = Glass;
-    else if (_materialType == "Paper") materialType = Paper;
-    else if (_materialType == "Coal") materialType = Coal;
+    if (ToLower(_materialType) == "metal") materialType = Metal;
+    else if (ToLower(_materialType) == "stone") materialType = Stone;
+    else if (ToLower(_materialType) == "wood") materialType = Wood;
+    else if (ToLower(_materialType) == "skin") materialType = Skin;
+    else if (ToLower(_materialType) == "cloth") materialType = Cloth;
+    else if (ToLower(_materialType) == "vegetable") materialType = Vegetable;
+    else if (ToLower(_materialType) == "meat") materialType = Meat;
+    else if (ToLower(_materialType) == "glass") materialType = Glass;
+    else if (ToLower(_materialType) == "paper") materialType = Paper;
+    else if (ToLower(_materialType) == "coal") materialType = Coal;
+    else if (ToLower(_materialType) == "bone") materialType = Bone;
     else materialType = None;
 }
 
 bool MaterialType::isValid(const unsigned int & _materialType)
 {
-    return (_materialType >= 1) && (_materialType <= 10);
+    return (_materialType >= 1) && (_materialType <= 11);
 }
 
 bool MaterialType::isValid(const std::string & _materialType)
 {
-    if (_materialType == "Metal") return true;
-    if (_materialType == "Stone") return true;
-    if (_materialType == "Wood") return true;
-    if (_materialType == "Skin") return true;
-    if (_materialType == "Cloth") return true;
-    if (_materialType == "Vegetable") return true;
-    if (_materialType == "Meat") return true;
-    if (_materialType == "Glass") return true;
-    if (_materialType == "Paper") return true;
-    return (_materialType == "Coal");
+    if (ToLower(_materialType) == "metal") return true;
+    if (ToLower(_materialType) == "stone") return true;
+    if (ToLower(_materialType) == "wood") return true;
+    if (ToLower(_materialType) == "skin") return true;
+    if (ToLower(_materialType) == "cloth") return true;
+    if (ToLower(_materialType) == "vegetable") return true;
+    if (ToLower(_materialType) == "meat") return true;
+    if (ToLower(_materialType) == "glass") return true;
+    if (ToLower(_materialType) == "paper") return true;
+    if (ToLower(_materialType) == "bone") return true;
+    return (ToLower(_materialType) == "coal");
 }
 
 std::string MaterialType::toString() const
@@ -97,6 +101,7 @@ std::string MaterialType::toString() const
     if (materialType == MaterialType::Glass) return "Glass";
     if (materialType == MaterialType::Paper) return "Paper";
     if (materialType == MaterialType::Coal) return "Coal";
+    if (materialType == MaterialType::Bone) return "Bone";
     return "None";
 }
 

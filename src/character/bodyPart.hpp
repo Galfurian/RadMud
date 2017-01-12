@@ -21,14 +21,25 @@
 
 #pragma once
 
+#include "table.hpp"
 #include <string>
+#include <vector>
+#include <memory>
+
+class ResourceModel;
 
 /// The flags of a body part.
 using BodyPartFlag = enum class BodyPartFlag_t
 {
-    None = 0,     ///< Null flag.
-    CanWear = 1,  ///< The equipment can be worn on the the body part.
-    CanWield = 2, ///< The body part can be used to wield something.
+    None = 0,     ///< [0]   No flag.
+    CanWear = 1,  ///< [1]   The equipment can be worn on the the body part.
+    CanWield = 2, ///< [2]   The body part can be used to wield something.
+    Internal = 4  ///< [4]   The body part is an internal part.
+    ///< [8]
+    ///< [16]
+    ///< [32]
+    ///< [64]
+    ///< [128]
 };
 
 /// @brief An anatomic part of the body.
@@ -43,10 +54,13 @@ public:
     std::string description;
     /// The flags associated with the body part.
     unsigned int flags;
+    /// The resources which can be produced from this body part.
+    std::vector<std::pair<std::shared_ptr<ResourceModel>, int>> resources;
 
     /// @brief Constructor.
     BodyPart();
 
+    /// @brief Destructor.
     virtual ~BodyPart();
 
     /// @brief Check the correctness of the body part.
@@ -59,4 +73,8 @@ public:
     ///                 changed to upper case.
     /// @return The name of the character.
     std::string getDescription(bool capital = false) const;
+
+    /// @brief Fills the provided table with the information concerning
+    ///         the body part.
+    void getSheet(Table & sheet) const;
 };

@@ -14,6 +14,7 @@ set(PROJECT_SRC ${PROJECT_SRC}
         ${CMAKE_SOURCE_DIR}/src/command/object/commandObjectCharacter.cpp
         ${CMAKE_SOURCE_DIR}/src/command/object/commandObjectLiquids.cpp
         ${CMAKE_SOURCE_DIR}/src/command/object/commandObjectShop.cpp
+        ${CMAKE_SOURCE_DIR}/src/command/object/commandObjectFood.cpp
         ${CMAKE_SOURCE_DIR}/src/command/object/commandObject.cpp
         PARENT_SCOPE
         )

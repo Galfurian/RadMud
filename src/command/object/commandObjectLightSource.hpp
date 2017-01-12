@@ -1,6 +1,6 @@
 /// @file   commandObjectLightSource.hpp
 /// @author Enrico Fraccaroli
-/// @date   gen 11 2017
+/// @date   Jan 11 2017
 /// @copyright
 /// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a

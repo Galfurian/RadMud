@@ -45,6 +45,8 @@ SQLiteDbms::SQLiteDbms() :
     loaders.push_back(TableLoader("Model", LoadModel));
     loaders.push_back(TableLoader("Faction", LoadFaction));
     loaders.push_back(TableLoader("Race", LoadRace));
+    loaders.push_back(TableLoader("RaceBodyPart", LoadRaceBodyPart));
+    loaders.push_back(TableLoader("RaceCorpse", LoadRaceCorpse));
     loaders.push_back(TableLoader("Liquid", LoadLiquid));
     loaders.push_back(TableLoader("Item", LoadItem));
     loaders.push_back(TableLoader("ItemContent", LoadContent));
@@ -56,11 +58,11 @@ SQLiteDbms::SQLiteDbms() :
     loaders.push_back(TableLoader("Building", LoadBuilding));
     loaders.push_back(TableLoader("Shop", LoadShop));
     loaders.push_back(TableLoader("Currency", LoadCurrency));
-    loaders.push_back(TableLoader("RaceBodyPart", LoadRaceBodyPart));
     loaders.push_back(TableLoader("ModelBodyPart", LoadModelBodyPart));
     loaders.push_back(TableLoader("Mobile", LoadMobile));
     loaders.push_back(TableLoader("Skill", LoadSkill));
     loaders.push_back(TableLoader("SkillRequirements", LoadSkillRequirements));
+    loaders.push_back(TableLoader("BodyPartResources", LoadBodyPartResources));
 }
 
 SQLiteDbms::~SQLiteDbms()

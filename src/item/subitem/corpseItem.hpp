@@ -28,6 +28,7 @@ class CorpseItem :
     public Item
 {
 public:
+    /// @brief Constructor.
     CorpseItem();
 
     virtual ~CorpseItem();

@@ -41,7 +41,8 @@ public:
         Meat,       ///< [7] Meat
         Glass,      ///< [8] Glass
         Paper,      ///< [9] Paper
-        Coal        ///< [10] Coal
+        Coal,       ///< [10] Coal
+        Bone        ///< [11] Coal
     };
 
     /// @brief Constructor from uint.

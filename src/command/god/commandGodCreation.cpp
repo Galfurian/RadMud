@@ -249,3 +249,41 @@ bool DoProductionList(Character * character, ArgumentHandler & /*args*/)
     character->sendMsg(table.getTable());
     return true;
 }
+
+bool DoBodyPartList(Character * character, ArgumentHandler &)
+{
+    Table table;
+    table.addColumn("VNUM", StringAlign::Center);
+    table.addColumn("NAME", StringAlign::Left);
+    for (auto it : Mud::instance().mudBodyParts)
+    {
+        // Prepare the row.
+        TableRow row;
+        row.push_back(ToString(it->vnum));
+        row.push_back(it->name);
+        // Add the row to the table.
+        table.addRow(row);
+    }
+    character->sendMsg(table.getTable());
+    return true;
+}
+
+bool DoBodyPartInfo(Character * character, ArgumentHandler & args)
+{
+    if (args.size() != 1)
+    {
+        character->sendMsg("You must insert a valid body part vnum.\n");
+        return false;
+    }
+    auto vnum = ToNumber<unsigned int>(args[0].getContent());
+    auto bodyPart = Mud::instance().findBodyPart(vnum);
+    if (bodyPart == nullptr)
+    {
+        character->sendMsg("Can't find the desire body part %s.\n", vnum);
+        return false;
+    }
+    Table table;
+    bodyPart->getSheet(table);
+    character->sendMsg(table.getTable());
+    return true;
+}

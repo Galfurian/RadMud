@@ -362,12 +362,9 @@ bool LoadRace(ResultSet * result)
             race->player_allow = result->getNextInteger();
             race->tileSet = result->getNextInteger();
             race->tileId = result->getNextInteger();
-            std::string corpseDescription = result->getNextString();
             race->naturalWeapon = result->getNextString();
             // Translate new_line.
             FindAndReplace(&race->description, "%r", "\n");
-            // Intialize the corpse.
-            race->initializeCorpse(corpseDescription);
             // Check the correctness.
             if (!race->check())
             {
@@ -377,6 +374,63 @@ bool LoadRace(ResultSet * result)
             {
                 throw SQLiteException("Error during race insertion.");
             }
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadRaceBodyPart(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto race = Mud::instance().findRace(result->getNextInteger());
+            auto bodyPart = Mud::instance().findBodyPart(
+                result->getNextUnsignedInteger());
+            assert(race != nullptr);
+            assert(bodyPart != nullptr);
+            race->bodyParts.emplace_back(bodyPart);
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadRaceCorpse(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto race = Mud::instance().findRace(result->getNextInteger());
+            assert(race != nullptr);
+            auto corpse = std::make_shared<CorpseModel>();
+            corpse->vnum = 0;
+            corpse->name = "corpse";
+            corpse->article = "a";
+            corpse->shortdesc = "the corpse of " + race->getShortDescription();
+            for (auto key : SplitString(race->name, " "))
+            {
+                corpse->keys.emplace_back(key);
+            }
+            corpse->keys.emplace_back("corpse");
+            corpse->description = result->getNextString();
+            corpse->modelFlags = 0;
+            corpse->condition = 10;
+            corpse->material = race->material->type;
+            corpse->tileSet = race->tileSet;
+            corpse->tileId = race->tileId;
+            race->corpse = corpse;
         }
         catch (SQLiteException & e)
         {
@@ -1144,28 +1198,6 @@ bool LoadBodyPart(ResultSet * result)
     return true;
 }
 
-bool LoadRaceBodyPart(ResultSet * result)
-{
-    while (result->next())
-    {
-        try
-        {
-            auto race = Mud::instance().findRace(result->getNextInteger());
-            auto bodyPart = Mud::instance().findBodyPart(
-                result->getNextUnsignedInteger());
-            assert(race != nullptr);
-            assert(bodyPart != nullptr);
-            race->bodyParts.emplace_back(bodyPart);
-        }
-        catch (SQLiteException & e)
-        {
-            Logger::log(LogLevel::Error, std::string(e.what()));
-            return false;
-        }
-    }
-    return true;
-}
-
 bool LoadModelBodyPart(ResultSet * result)
 {
     while (result->next())
@@ -1179,6 +1211,32 @@ bool LoadModelBodyPart(ResultSet * result)
             assert(model != nullptr);
             assert(bodyPart != nullptr);
             model->bodyParts.emplace_back(bodyPart);
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadBodyPartResources(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto bodyPart = Mud::instance().findBodyPart(
+                result->getNextUnsignedInteger());
+            assert(bodyPart != nullptr);
+            auto model = Mud::instance().findItemModel(
+                result->getNextInteger());
+            assert(model != nullptr);
+            assert(model->getType() == ModelType::Resource);
+            auto quantity = result->getNextInteger();
+            bodyPart->resources.emplace_back(
+                std::make_pair(model->toResource(), quantity));
         }
         catch (SQLiteException & e)
         {

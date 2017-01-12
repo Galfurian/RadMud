@@ -21,6 +21,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "resourceType.hpp"
+#include "utils.hpp"
 
 ResourceType::ResourceType() :
     resourceType(None)
@@ -45,6 +46,9 @@ ResourceType::ResourceType(const unsigned int & _resourceType) :
     else if (_resourceType == 12) resourceType = StoneMonolith;
     else if (_resourceType == 13) resourceType = Pen;
     else if (_resourceType == 14) resourceType = Trash;
+    else if (_resourceType == 15) resourceType = Meat;
+    else if (_resourceType == 16) resourceType = Bone;
+    else if (_resourceType == 17) resourceType = Skull;
     else resourceType = None;
 }
 
@@ -57,44 +61,51 @@ ResourceType::ResourceType(const Enum & _resourceType) :
 ResourceType::ResourceType(const std::string & _resourceType) :
     resourceType()
 {
-    if (_resourceType == "Coal") resourceType = Coal;
-    else if (_resourceType == "Ore") resourceType = Ore;
-    else if (_resourceType == "Bar") resourceType = Bar;
-    else if (_resourceType == "Log") resourceType = Log;
-    else if (_resourceType == "Plank") resourceType = Plank;
-    else if (_resourceType == "Tree") resourceType = Tree;
-    else if (_resourceType == "Fastener") resourceType = Fastener;
-    else if (_resourceType == "Leather") resourceType = Leather;
-    else if (_resourceType == "Cloth") resourceType = Cloth;
-    else if (_resourceType == "StoneBlock") resourceType = StoneBlock;
-    else if (_resourceType == "MetalVein") resourceType = MetalVein;
-    else if (_resourceType == "StoneMonolith") resourceType = StoneMonolith;
-    else if (_resourceType == "Pen") resourceType = Pen;
-    else if (_resourceType == "Trash") resourceType = Trash;
+    if (ToLower(_resourceType) == "coal") resourceType = Coal;
+    else if (ToLower(_resourceType) == "ore") resourceType = Ore;
+    else if (ToLower(_resourceType) == "bar") resourceType = Bar;
+    else if (ToLower(_resourceType) == "log") resourceType = Log;
+    else if (ToLower(_resourceType) == "plank") resourceType = Plank;
+    else if (ToLower(_resourceType) == "tree") resourceType = Tree;
+    else if (ToLower(_resourceType) == "fastener") resourceType = Fastener;
+    else if (ToLower(_resourceType) == "leather") resourceType = Leather;
+    else if (ToLower(_resourceType) == "cloth") resourceType = Cloth;
+    else if (ToLower(_resourceType) == "stoneblock") resourceType = StoneBlock;
+    else if (ToLower(_resourceType) == "metalvein") resourceType = MetalVein;
+    else if (ToLower(_resourceType) == "stonemonolith")
+        resourceType = StoneMonolith;
+    else if (ToLower(_resourceType) == "pen") resourceType = Pen;
+    else if (ToLower(_resourceType) == "trash") resourceType = Trash;
+    else if (ToLower(_resourceType) == "meat") resourceType = Meat;
+    else if (ToLower(_resourceType) == "bone") resourceType = Bone;
+    else if (ToLower(_resourceType) == "skull") resourceType = Skull;
     else resourceType = None;
 }
 
 bool ResourceType::isValid(const unsigned int & _resourceType)
 {
-    return (_resourceType >= 1) && (_resourceType <= 14);
+    return (_resourceType >= 1) && (_resourceType <= 17);
 }
 
 bool ResourceType::isValid(const std::string & _resourceType)
 {
-    if (_resourceType == "Coal") return true;
-    if (_resourceType == "Ore") return true;
-    if (_resourceType == "Bar") return true;
-    if (_resourceType == "Log") return true;
-    if (_resourceType == "Plank") return true;
-    if (_resourceType == "Tree") return true;
-    if (_resourceType == "Fastener") return true;
-    if (_resourceType == "Leather") return true;
-    if (_resourceType == "Cloth") return true;
-    if (_resourceType == "StoneBlock") return true;
-    if (_resourceType == "MetalVein") return true;
-    if (_resourceType == "StoneMonolith") return true;
-    if (_resourceType == "Pen") return true;
-    return (_resourceType == "Trash");
+    if (ToLower(_resourceType) == "coal") return true;
+    if (ToLower(_resourceType) == "ore") return true;
+    if (ToLower(_resourceType) == "bar") return true;
+    if (ToLower(_resourceType) == "log") return true;
+    if (ToLower(_resourceType) == "plank") return true;
+    if (ToLower(_resourceType) == "tree") return true;
+    if (ToLower(_resourceType) == "fastener") return true;
+    if (ToLower(_resourceType) == "leather") return true;
+    if (ToLower(_resourceType) == "cloth") return true;
+    if (ToLower(_resourceType) == "stoneblock") return true;
+    if (ToLower(_resourceType) == "metalvein") return true;
+    if (ToLower(_resourceType) == "stonemonolith") return true;
+    if (ToLower(_resourceType) == "pen") return true;
+    if (ToLower(_resourceType) == "meat") return true;
+    if (ToLower(_resourceType) == "bone") return true;
+    if (ToLower(_resourceType) == "skull") return true;
+    return (ToLower(_resourceType) == "trash");
 }
 
 std::string ResourceType::toString() const
@@ -113,6 +124,9 @@ std::string ResourceType::toString() const
     if (resourceType == ResourceType::StoneMonolith) return "Stone Monolith";
     if (resourceType == ResourceType::Pen) return "Pen";
     if (resourceType == ResourceType::Trash) return "Trash";
+    if (resourceType == ResourceType::Meat) return "Meat";
+    if (resourceType == ResourceType::Bone) return "Bone";
+    if (resourceType == ResourceType::Skull) return "Skull";
     return "None";
 }
 
