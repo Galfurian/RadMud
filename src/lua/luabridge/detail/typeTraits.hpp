@@ -28,6 +28,9 @@
 
 #include <type_traits>
 
+namespace luabridge
+{
+
 //------------------------------------------------------------------------------
 /**
  Container traits.
@@ -131,3 +134,5 @@ struct TypeTraits
     };
     /**@}*/
 };
+
+}

@@ -36,6 +36,9 @@
 
 #include <cassert>
 
+namespace luabridge
+{
+
 /**
  Adds reference-counting to an object.
 
@@ -187,8 +190,10 @@ public:
      This will increment the object's reference-count (if it is non-null).
      */
     template<class DerivedClass>
-    inline RefCountedObjectPtr(const RefCountedObjectPtr<DerivedClass> & other) :
-        referencedObject(static_cast<ReferenceCountedObjectClass *>(other.getObject()))
+    inline
+    RefCountedObjectPtr(const RefCountedObjectPtr<DerivedClass> & other) :
+        referencedObject(
+            static_cast<ReferenceCountedObjectClass *>(other.getObject()))
     {
         if (referencedObject != 0) referencedObject->incReferenceCount();
     }
@@ -209,9 +214,11 @@ public:
      deleted if it hits zero. The new object's count is incremented.
      */
     template<class DerivedClass>
-    RefCountedObjectPtr & operator=(const RefCountedObjectPtr<DerivedClass> & other)
+    RefCountedObjectPtr &
+    operator=(const RefCountedObjectPtr<DerivedClass> & other)
     {
-        return operator=(static_cast<ReferenceCountedObjectClass *>(other.getObject()));
+        return operator=(
+            static_cast<ReferenceCountedObjectClass *>(other.getObject()));
     }
 
 #if LUABRIDGE_COMPILER_SUPPORTS_MOVE_SEMANTICS
@@ -228,7 +235,8 @@ public:
      The reference count of the old object is decremented, and it might be
      deleted if it hits zero. The new object's count is incremented.
      */
-    RefCountedObjectPtr & operator=(ReferenceCountedObjectClass * const newObject)
+    RefCountedObjectPtr &
+    operator=(ReferenceCountedObjectClass * const newObject)
     {
         if (referencedObject != newObject)
         {
@@ -282,46 +290,52 @@ private:
 
 /** Compares two ReferenceCountedObjectPointers. */
 template<class ReferenceCountedObjectClass>
-bool operator==(const RefCountedObjectPtr<ReferenceCountedObjectClass> & object1,
-                ReferenceCountedObjectClass * const object2)
+bool
+operator==(const RefCountedObjectPtr<ReferenceCountedObjectClass> & object1,
+           ReferenceCountedObjectClass * const object2)
 {
     return object1.getObject() == object2;
 }
 
 /** Compares two ReferenceCountedObjectPointers. */
 template<class ReferenceCountedObjectClass>
-bool operator==(const RefCountedObjectPtr<ReferenceCountedObjectClass> & object1,
-                const RefCountedObjectPtr<ReferenceCountedObjectClass> & object2)
+bool
+operator==(const RefCountedObjectPtr<ReferenceCountedObjectClass> & object1,
+           const RefCountedObjectPtr<ReferenceCountedObjectClass> & object2)
 {
     return object1.getObject() == object2.getObject();
 }
 
 /** Compares two ReferenceCountedObjectPointers. */
 template<class ReferenceCountedObjectClass>
-bool operator==(ReferenceCountedObjectClass * object1, RefCountedObjectPtr<ReferenceCountedObjectClass> & object2)
+bool operator==(ReferenceCountedObjectClass * object1,
+                RefCountedObjectPtr<ReferenceCountedObjectClass> & object2)
 {
     return object1 == object2.getObject();
 }
 
 /** Compares two ReferenceCountedObjectPointers. */
 template<class ReferenceCountedObjectClass>
-bool operator!=(const RefCountedObjectPtr<ReferenceCountedObjectClass> & object1,
-                const ReferenceCountedObjectClass * object2)
+bool
+operator!=(const RefCountedObjectPtr<ReferenceCountedObjectClass> & object1,
+           const ReferenceCountedObjectClass * object2)
 {
     return object1.getObject() != object2;
 }
 
 /** Compares two ReferenceCountedObjectPointers. */
 template<class ReferenceCountedObjectClass>
-bool operator!=(const RefCountedObjectPtr<ReferenceCountedObjectClass> & object1,
-                RefCountedObjectPtr<ReferenceCountedObjectClass> & object2)
+bool
+operator!=(const RefCountedObjectPtr<ReferenceCountedObjectClass> & object1,
+           RefCountedObjectPtr<ReferenceCountedObjectClass> & object2)
 {
     return object1.getObject() != object2.getObject();
 }
 
 /** Compares two ReferenceCountedObjectPointers. */
 template<class ReferenceCountedObjectClass>
-bool operator!=(ReferenceCountedObjectClass * object1, RefCountedObjectPtr<ReferenceCountedObjectClass> & object2)
+bool operator!=(ReferenceCountedObjectClass * object1,
+                RefCountedObjectPtr<ReferenceCountedObjectClass> & object2)
 {
     return object1 != object2.getObject();
 }
@@ -351,3 +365,5 @@ struct ContainerTraits<RefCountedObjectPtr<T> >
 //==============================================================================
 
 #endif
+
+}

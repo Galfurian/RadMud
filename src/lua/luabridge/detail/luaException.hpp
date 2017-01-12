@@ -29,6 +29,9 @@
 
 #include <stdexcept>
 
+namespace luabridge
+{
+
 class LuaException :
     public std::exception
 {
@@ -85,7 +88,8 @@ public:
     }
 
     /// @brief Wrapper for lua_pcall that throws.
-    static void pcall(lua_State * L, int nargs = 0, int nresults = 0, int msgh = 0)
+    static void
+    pcall(lua_State * L, int nargs = 0, int nresults = 0, int msgh = 0)
     {
         int code = lua_pcall(L, nargs, nresults, msgh);
         if (code != LUABRIDGE_LUA_OK)
@@ -111,3 +115,5 @@ protected:
         }
     }
 };
+
+}

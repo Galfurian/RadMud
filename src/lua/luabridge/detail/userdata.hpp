@@ -33,6 +33,9 @@
 #include "classInfo.hpp"
 #include "typeTraits.hpp"
 
+namespace luabridge
+{
+
 /**
  Return the identity pointer for our lightuserdata tokens.
 
@@ -867,3 +870,5 @@ struct Stack<T const &>
         return helper_t::get(L, index);
     }
 };
+
+}

@@ -41,6 +41,9 @@
 #include <vector>
 #include <list>
 
+namespace luabridge
+{
+
 /** Provides C++ to Lua registration capabilities.
 
  This class is not instantiated directly, call `getGlobalNamespace` to start
@@ -675,7 +678,9 @@ private:
          Add or replace a lua_CFunction.
          */
         Class<T> &
-        addStaticCFunction(char const * name, int (* const fp)(lua_State *))
+        addStaticCFunction(char const * name, int (* const fp)(lua_State *)
+
+        )
         {
             lua_pushcfunction(L, fp);
             rawsetfield(L, -2, name);
@@ -934,7 +939,9 @@ private:
         /**
          Add or replace a member lua_CFunction.
          */
-        Class<T> & addCFunction(char const * name, int (T::*mfp)(lua_State *))
+        Class<T> & addCFunction(char const * name, int (T::*mfp)(lua_State *)
+
+        )
         {
             typedef int (T::*MFP)(lua_State *);
             assert(lua_istable(L, -1));
@@ -948,7 +955,9 @@ private:
         // custom callback - extend existing classes
         // with non-class member functions (e.g STL iterator)
         Class<T> &
-        addExtCFunction(char const * name, int (* const fp)(lua_State *))
+        addExtCFunction(char const * name, int (* const fp)(lua_State *)
+
+        )
         {
             assert (lua_istable(L, -1));
             lua_pushcclosure(L, fp, 0);
@@ -961,7 +970,9 @@ private:
          Add or replace a const member lua_CFunction.
          */
         Class<T> &
-        addCFunction(char const * name, int (T::*mfp)(lua_State *) const)
+        addCFunction(char const * name, int (T::*mfp)(lua_State *) const
+
+        )
         {
             typedef int (T::*MFP)(lua_State *) const;
             assert(lua_istable(L, -1));
@@ -1224,7 +1235,9 @@ private:
         }
 
         WSPtrClass<T> & addExtCFunction(char const * name,
-                                        int (* const fp)(lua_State *))
+                                        int (* const fp)(lua_State *)
+
+        )
         {
             set_weak_class();
             assert (lua_istable(L, -1));
@@ -1677,7 +1690,9 @@ public:
     /**
      Add or replace a lua_CFunction.
      */
-    Namespace & addCFunction(char const * name, int (* const fp)(lua_State *))
+    Namespace & addCFunction(char const * name, int (* const fp)(lua_State *)
+
+    )
     {
         lua_pushcfunction(L, fp);
         rawsetfield(L, -2, name);
@@ -1862,4 +1877,6 @@ public:
 inline Namespace getGlobalNamespace(lua_State * L)
 {
     return Namespace::getGlobalNamespace(L);
+}
+
 }

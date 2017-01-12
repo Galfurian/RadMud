@@ -26,6 +26,9 @@
 
 #pragma once
 
+namespace luabridge
+{
+
 /// Forward declaration.
 template<class T>
 struct Stack;
@@ -45,6 +48,8 @@ inline void setGlobal(lua_State * L, T t, char const * name)
 {
     push(L, t);
     lua_setglobal(L, name);
+}
+
 }
 
 #include "stack.i.hpp"

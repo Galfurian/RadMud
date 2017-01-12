@@ -30,6 +30,9 @@
 #include "luaHelpers.hpp"
 #include "luaException.hpp"
 
+namespace luabridge
+{
+
 /**
  Type tag for representing LUA_TNIL.
 
@@ -528,7 +531,8 @@ private:
         }
 
         template<class P1, class P2, class P3, class P4, class P5, class P6, class P7>
-        LuaRef const operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7) const
+        LuaRef const
+        operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7) const
         {
             push(m_L);
             Stack<P1>::push(m_L, p1);
@@ -543,7 +547,8 @@ private:
         }
 
         template<class P1, class P2, class P3, class P4, class P5, class P6, class P7, class P8>
-        LuaRef const operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8) const
+        LuaRef const
+        operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8) const
         {
             push(m_L);
             Stack<P1>::push(m_L, p1);
@@ -1157,7 +1162,8 @@ public:
     }
 
     template<class P1, class P2, class P3, class P4, class P5, class P6, class P7>
-    LuaRef const operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7) const
+    LuaRef const
+    operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7) const
     {
         push(m_L);
         Stack<P1>::push(m_L, p1);
@@ -1172,7 +1178,8 @@ public:
     }
 
     template<class P1, class P2, class P3, class P4, class P5, class P6, class P7, class P8>
-    LuaRef const operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8) const
+    LuaRef const
+    operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8) const
     {
         push(m_L);
         Stack<P1>::push(m_L, p1);
@@ -1287,4 +1294,6 @@ template<class T>
 inline T LuaRef_cast(LuaRef const & lr)
 {
     return lr.cast<T>();
+}
+
 }

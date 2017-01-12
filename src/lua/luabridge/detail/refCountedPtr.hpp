@@ -27,6 +27,9 @@
 
 #pragma once
 
+namespace luabridge
+{
+
 #ifdef _MSC_VER
 # include <hash_map>
 #else
@@ -206,7 +209,9 @@ public:
 
      @return The number of active references.
      */
-    long use_count() const
+    long
+
+    use_count() const
     {
         return getRefCounts()[m_p];
     }
@@ -249,5 +254,7 @@ struct ContainerTraits<RefCountedPtr<T> >
         return c.get();
     }
 };
+
+}
 
 }

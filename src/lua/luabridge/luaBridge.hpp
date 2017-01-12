@@ -52,8 +52,6 @@
 #define LUABRIDGE_MINOR_VERSION   0
 #define LUABRIDGE_VERSION       200
 
-namespace luabridge
-{
 #include "stack.hpp"
 #include "luaHelpers.hpp"
 #include "typeTraits.hpp"
@@ -68,4 +66,3 @@ namespace luabridge
 #include "userdata.hpp"
 #include "cFunctions.hpp"
 #include "namespace.hpp"
-}

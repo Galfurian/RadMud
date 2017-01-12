@@ -28,6 +28,9 @@
 
 #include "luaRef.hpp"
 
+namespace luabridge
+{
+
 /// @brief Allows table iteration.
 class Iterator
 {
@@ -113,3 +116,4 @@ private:
     Iterator operator++(int);
 };
 
+}

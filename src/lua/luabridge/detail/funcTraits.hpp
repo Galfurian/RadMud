@@ -26,14 +26,17 @@
 
 #pragma once
 
+#include "typeList.hpp"
+
+namespace luabridge
+{
+
 /**
   Since the throw specification is part of a function signature, the FuncTraits
   family of templates needs to be specialized for both types. The
   LUABRIDGE_THROWSPEC macro controls whether we use the 'throw ()' form, or
   'noexcept' (if C++11 is available) to distinguish the functions.
 */
-#include "typeList.hpp"
-
 #if defined (__APPLE_CPP__) || defined(__APPLE_CC__) || defined(__clang__) || defined(__GNUC__) || \
     (defined (_MSC_VER) && (_MSC_VER >= 1700))
 // Do not define LUABRIDGE_THROWSPEC since the Xcode and gcc  compilers do not
@@ -1023,5 +1026,6 @@ struct FuncTraits <R (T::*) (P1, P2, P3, P4, P5, P6, P7, P8, P9) const LUABRIDGE
   }
 };
 
-
 #endif
+
+}

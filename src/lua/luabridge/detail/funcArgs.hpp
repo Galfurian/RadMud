@@ -28,6 +28,9 @@
 #include "typeList.hpp"
 #include "luaRef.hpp"
 
+namespace luabridge
+{
+
 template<typename List, int Start = 1>
 struct FuncArgs
 {
@@ -50,3 +53,5 @@ struct FuncArgs<TypeList<Head, Tail>, Start>
         FuncArgs<Tail, Start + 1>::refs(l, tvl.tl);
     }
 };
+
+}

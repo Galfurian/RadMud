@@ -47,6 +47,9 @@
 
 #include <string>
 
+namespace luabridge
+{
+
 /**
  None type means void parameters or return value.
  */
@@ -180,3 +183,5 @@ struct ArgList<TypeList<Head, Tail>, Start> :
     {
     }
 };
+
+}

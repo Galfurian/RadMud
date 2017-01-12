@@ -39,6 +39,9 @@
 #include <map>
 #include <set>
 
+namespace luabridge
+{
+
 /// @brief We use a structure so we can define everything in the header.
 struct CFunc
 {
@@ -1621,3 +1624,5 @@ struct CFunc
     }
 
 };
+
+}

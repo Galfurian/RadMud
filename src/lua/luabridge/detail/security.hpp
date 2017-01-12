@@ -19,6 +19,9 @@
 
 #pragma once
 
+namespace luabridge
+{
+
 /// @brief Class needed for secuirity options.
 class Security
 {
@@ -55,4 +58,6 @@ private:
 inline void setHideMetatables(bool shouldHide)
 {
     Security::setHideMetatables(shouldHide);
+}
+
 }

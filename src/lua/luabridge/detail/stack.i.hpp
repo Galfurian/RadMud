@@ -23,6 +23,9 @@
 
 #include "luaHelpers.hpp"
 
+namespace luabridge
+{
+
 #include <string>
 
 //------------------------------------------------------------------------------
@@ -774,3 +777,5 @@ struct Stack<std::string &>
         return *x;
     }
 };
+
+}
