@@ -1,8 +1,8 @@
-/// @file   corpseItem.cpp
+/// @file   commandObjectProcess.hpp
 /// @author Enrico Fraccaroli
-/// @date   Aug 17 2016
+/// @date   gen 12 2017
 /// @copyright
-/// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
+/// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
 /// copy of this software and associated documentation files (the "Software"),
 /// to deal in the Software without restriction, including without limitation
@@ -19,57 +19,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "corpseItem.hpp"
+#pragma once
 
-#include "logger.hpp"
-#include "mud.hpp"
+#include "commandObject.hpp"
 
-CorpseItem::CorpseItem() :
-    remainingBodyParts()
-{
-    // Nothing to do.
-}
-
-CorpseItem::~CorpseItem()
-{
-    // Nothing to do.
-}
-
-void CorpseItem::removeFromMud()
-{
-    Item::removeFromMud();
-    if (Mud::instance().remCorpse(this))
-    {
-        Logger::log(LogLevel::Debug,
-                    "Removing item '%s' from MUD corpses.",
-                    this->getName());
-    }
-}
-
-bool CorpseItem::updateOnDB()
-{
-    return true;
-}
-
-bool CorpseItem::removeOnDB()
-{
-    return true;
-}
-
-void CorpseItem::getSheet(Table & sheet) const
-{
-    // Call the function of the father class.
-    Item::getSheet(sheet);
-    // Add a divider.
-    sheet.addDivider();
-    // Set the values.
-    for (auto it : remainingBodyParts)
-    {
-        sheet.addRow({"Body Part", it->name});
-    }
-}
-
-bool CorpseItem::isAContainer() const
-{
-    return true;
-}
+/// Allows to dismember a corpse.
+bool DoDismember(Character * character, ArgumentHandler & args);

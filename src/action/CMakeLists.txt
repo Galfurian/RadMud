@@ -17,6 +17,5 @@ set(PROJECT_SRC ${PROJECT_SRC}
         ${CMAKE_SOURCE_DIR}/src/action/loadAction.cpp
         ${CMAKE_SOURCE_DIR}/src/action/unloadAction.cpp
         ${CMAKE_SOURCE_DIR}/src/action/aimAction.cpp
-        ${RADMUD_COMBAT_ACTION_SRC}
         PARENT_SCOPE
         )

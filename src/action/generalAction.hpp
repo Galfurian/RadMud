@@ -50,7 +50,8 @@ using ActionType = enum class ActionType_t
     Reload,     ///< The character is reloading a firearm.
     Load,       ///< The character is loading something.
     Unload,     ///< The character is unloading something.
-    Aim         ///< The character is aiming a target.
+    Aim,        ///< The character is aiming a target.
+    Dismember   ///< The character is dismembering a corpse.
 };
 
 /// The list of possible actions.

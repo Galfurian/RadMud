@@ -25,8 +25,10 @@
 #include "commandObjectManagement.hpp"
 #include "commandObjectContainer.hpp"
 #include "commandObjectCharacter.hpp"
+#include "commandObjectProcess.hpp"
 #include "commandObjectLiquids.hpp"
 #include "commandObjectShop.hpp"
+#include "commandObjectFood.hpp"
 #include "mud.hpp"
 
 void LoadObjectCommands()
@@ -135,5 +137,12 @@ void LoadObjectCommands()
     Mud::instance().addCommand(std::make_shared<Command>(
         DoRefill, "refill", "(light source) (fuel)",
         "Allows to refill a light source.",
+        false, true, false));
+
+    // ////////////////////////////////////////////////////////////////////////
+    // COMMAND LIGHT PROCESS
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoDismember, "dismember", "(corpse)",
+        "Allows to dismember a corpse.",
         false, true, false));
 }

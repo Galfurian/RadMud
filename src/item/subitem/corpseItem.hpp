@@ -28,6 +28,9 @@ class CorpseItem :
     public Item
 {
 public:
+    /// Store the remaining body parts not yet processed.
+    std::vector<std::shared_ptr<BodyPart>> remainingBodyParts;
+
     /// @brief Constructor.
     CorpseItem();
 

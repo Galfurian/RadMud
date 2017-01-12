@@ -21,8 +21,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "corpseModel.hpp"
-
-#include "itemFactory.hpp"
+#include "corpseItem.hpp"
 #include "logger.hpp"
 #include "mud.hpp"
 
@@ -96,8 +95,8 @@ Item * CorpseModel::createCorpse(
     const double & weight)
 {
     // Instantiate the new item.
-    auto newItem = ItemFactory::newItem(this->getType());
-    if (newItem == nullptr)
+    auto newCorpse = new CorpseItem();
+    if (newCorpse == nullptr)
     {
         Logger::log(LogLevel::Error, "Cannot create the new item.");
         // Return pointer to nothing.
@@ -105,16 +104,17 @@ Item * CorpseModel::createCorpse(
     }
 
     // First set: Vnum, Model, Maker, Composition, Quality.
-    newItem->vnum = Mud::instance().getMinVnumCorpse() - 1;
-    newItem->model = this->shared_from_this();
-    newItem->maker = maker;
-    newItem->quality = ItemQuality::Normal;
+    newCorpse->vnum = Mud::instance().getMinVnumCorpse() - 1;
+    newCorpse->model = this->shared_from_this();
+    newCorpse->maker = maker;
+    newCorpse->quality = ItemQuality::Normal;
     // Then set the rest.
-    newItem->weight = weight;
-    newItem->condition = static_cast<unsigned int>(weight);
-    newItem->maxCondition = static_cast<unsigned int>(weight);
-    newItem->composition = corpseComposition;
+    newCorpse->weight = weight;
+    newCorpse->condition = static_cast<unsigned int>(weight);
+    newCorpse->maxCondition = static_cast<unsigned int>(weight);
+    newCorpse->composition = corpseComposition;
+    newCorpse->remainingBodyParts = corpseRace->bodyParts;
 
-    Mud::instance().addCorpse(newItem);
-    return newItem;
+    Mud::instance().addCorpse(newCorpse);
+    return newCorpse;
 }

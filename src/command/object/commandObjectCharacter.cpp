@@ -44,6 +44,11 @@ bool DoEquipments(Character * character, ArgumentHandler & /*args*/)
     std::string output;
     for (auto bodyPart : character->race->bodyParts)
     {
+        // Skip the internal body parts.
+        if (HasFlag(bodyPart->flags, BodyPartFlag::Internal))
+        {
+            continue;
+        }
         // Add the body part name to the row.
         output += AlignString(bodyPart->getDescription(true),
                               StringAlign::Left, 15);
