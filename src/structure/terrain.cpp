@@ -21,7 +21,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "terrain.hpp"
-#include "LuaBridge.hpp"
+#include "luaBridge.hpp"
 
 Terrain::Terrain() :
     vnum(),

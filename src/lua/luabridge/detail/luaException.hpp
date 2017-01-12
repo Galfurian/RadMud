@@ -1,7 +1,7 @@
-/// @file   LuaException.hpp
+/// @file   luaException.hpp
 /// @copyright
-/// Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
 /// Copyright 2008, Nigel Atkinson <suprapilot+LuaCode@gmail.com>
+/// Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
 ///
 /// License: The MIT License (http://www.opensource.org/licenses/mit-license.php)
 ///
@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include "LuaHelpers.hpp"
+#include "luaHelpers.hpp"
 
 #include <stdexcept>
 

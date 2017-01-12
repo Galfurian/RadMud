@@ -31,7 +31,7 @@
 #include "item.hpp"
 #include "faction.hpp"
 #include "bodyPart.hpp"
-#include "LuaBridge.hpp"
+#include "luaBridge.hpp"
 #include "effectList.hpp"
 #include "processInput.hpp"
 #include "combatAction.hpp"

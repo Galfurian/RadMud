@@ -1,7 +1,7 @@
-/// @file   LuaBridge.h
+/// @file   funcArgs.hpp
 /// @copyright
 /// Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
-/// Copyright 2007, Nathan Reed
+/// Copyright 2016, Robin Gareus <robin@gareus.org>
 ///
 /// License: The MIT License (http://www.opensource.org/licenses/mit-license.php)
 ///
@@ -25,47 +25,28 @@
 
 #pragma once
 
-#include <cassert>
-#include <sstream>
-#include <stdexcept>
-#include <string>
-#include <typeinfo>
-#include <functional>
+#include "typeList.hpp"
+#include "luaRef.hpp"
 
-#include <cassert>
-#include <sstream>
-#include <stdexcept>
-#include <string>
-#include <typeinfo>
-
-#include <bitset>
-#include <list>
-#include <map>
-#include <set>
-#include <vector>
-
-#include <inttypes.h>
-#include <type_traits>
-#include <memory>
-
-#define LUABRIDGE_MAJOR_VERSION   2
-#define LUABRIDGE_MINOR_VERSION   0
-#define LUABRIDGE_VERSION       200
-
-namespace luabridge
+template<typename List, int Start = 1>
+struct FuncArgs
 {
-#include "stack.hpp"
-#include "LuaHelpers.hpp"
-#include "TypeTraits.hpp"
-#include "TypeList.hpp"
-#include "FuncTraits.hpp"
-#include "Constructor.hpp"
-#include "classInfo.hpp"
-#include "LuaException.hpp"
-#include "LuaRef.hpp"
-#include "Iterator.hpp"
-#include "Security.hpp"
-#include "Userdata.hpp"
-#include "CFunctions.hpp"
-#include "Namespace.hpp"
-}
+};
+
+template<int Start>
+struct FuncArgs<None, Start>
+{
+    static void refs(LuaRef, TypeListValues<None>)
+    {
+    }
+};
+
+template<typename Head, typename Tail, int Start>
+struct FuncArgs<TypeList<Head, Tail>, Start>
+{
+    static void refs(LuaRef l, TypeListValues<TypeList<Head, Tail> > tvl)
+    {
+        l[Start + 1] = tvl.hd;
+        FuncArgs<Tail, Start + 1>::refs(l, tvl.tl);
+    }
+};

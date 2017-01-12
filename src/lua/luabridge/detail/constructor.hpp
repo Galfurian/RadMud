@@ -1,4 +1,4 @@
-/// @file   Constructor.hpp
+/// @file   constructor.hpp
 /// @copyright
 /// Copyright 2007, Nathan Reed
 /// Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include "TypeList.hpp"
+#include "typeList.hpp"
 
 /*
  * Constructor generators.  These templates allow you to call operator new and

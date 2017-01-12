@@ -1,6 +1,4 @@
 /// @file   security.hpp
-/// @author Enrico Fraccaroli
-/// @date   Nov 21 2015
 /// @copyright
 /// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a

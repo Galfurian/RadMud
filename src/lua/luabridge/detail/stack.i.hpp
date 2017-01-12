@@ -1,6 +1,4 @@
-/// @file   security.hpp
-/// @author Enrico Fraccaroli
-/// @date   Nov 21 2015
+/// @file   stack.i.hpp
 /// @copyright
 /// Copyright 2007, Nathan Reed
 /// Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
@@ -23,7 +21,7 @@
 
 #pragma once
 
-#include "LuaHelpers.hpp"
+#include "luaHelpers.hpp"
 
 #include <string>
 

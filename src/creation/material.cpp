@@ -22,7 +22,7 @@
 
 #include "material.hpp"
 
-#include "LuaBridge.hpp"
+#include "luaBridge.hpp"
 #include "logger.hpp"
 
 Material::Material() :

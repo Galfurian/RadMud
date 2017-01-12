@@ -21,7 +21,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "modelType.hpp"
-#include "LuaBridge.hpp"
+#include "luaBridge.hpp"
 
 ModelType::ModelType() :
     modelType(None)

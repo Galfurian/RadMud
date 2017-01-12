@@ -1,7 +1,7 @@
-/// @file   CFunctions.hpp
+/// @file   cFunctions.hpp
 /// @copyright
-/// Copyright 2016, Robin Gareus <robin@gareus.org>
 /// Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
+/// Copyright 2016, Robin Gareus <robin@gareus.org>
 ///
 /// License: The MIT License (http://www.opensource.org/licenses/mit-license.php)
 ///
@@ -25,12 +25,12 @@
 
 #pragma once
 
-#include "LuaHelpers.hpp"
-#include "FuncTraits.hpp"
-#include "TypeList.hpp"
-#include "FuncArgs.hpp"
-#include "Userdata.hpp"
-#include "LuaRef.hpp"
+#include "luaHelpers.hpp"
+#include "funcTraits.hpp"
+#include "typeList.hpp"
+#include "funcArgs.hpp"
+#include "userdata.hpp"
+#include "luaRef.hpp"
 #include "stack.hpp"
 
 #include <string>

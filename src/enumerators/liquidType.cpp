@@ -20,7 +20,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "liquidType.hpp"
-#include "LuaBridge.hpp"
+#include "luaBridge.hpp"
 #include "utils.hpp"
 
 LiquidType::LiquidType() :

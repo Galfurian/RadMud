@@ -1,5 +1,5 @@
 ///----------------------------------------------------------------------------
-/// @file   Iterator.hpp
+/// @file   iterator.hpp
 /// @copyright
 /// Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
 ///
@@ -26,7 +26,7 @@
 
 #pragma once
 
-#include "LuaRef.hpp"
+#include "luaRef.hpp"
 
 /// @brief Allows table iteration.
 class Iterator

@@ -1,5 +1,5 @@
 ///----------------------------------------------------------------------------
-/// @file   Userdata.hpp
+/// @file   userdata.hpp
 /// @copyright
 /// Copyright 2007, Nathan Reed
 /// Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
@@ -29,9 +29,9 @@
 #pragma once
 
 #include <cassert>
-#include "LuaHelpers.hpp"
+#include "luaHelpers.hpp"
 #include "classInfo.hpp"
-#include "TypeTraits.hpp"
+#include "typeTraits.hpp"
 
 /**
  Return the identity pointer for our lightuserdata tokens.

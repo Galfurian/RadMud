@@ -1,5 +1,5 @@
 ///----------------------------------------------------------------------------
-/// @file   LuaRef.hpp
+/// @file   luaRef.hpp
 /// @copyright
 /// Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
 /// Copyright 2008, Nigel Atkinson <suprapilot+LuaCode@gmail.com>
@@ -27,8 +27,8 @@
 
 #pragma once
 
-#include "LuaHelpers.hpp"
-#include "LuaException.hpp"
+#include "luaHelpers.hpp"
+#include "luaException.hpp"
 
 /**
  Type tag for representing LUA_TNIL.

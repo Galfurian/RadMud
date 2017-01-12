@@ -21,7 +21,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "toolType.hpp"
-#include "LuaBridge.hpp"
+#include "luaBridge.hpp"
 
 ToolType::ToolType() :
     toolType(None)

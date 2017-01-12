@@ -1,8 +1,8 @@
 ///----------------------------------------------------------------------------
-/// @file   RefCountedObject.hpp
+/// @file   refCountedObject.hpp
 /// @copyright
-/// Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
 /// Copyright 2004-11 by Raw Material Software Ltd.
+/// Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
 ///
 /// This is a derivative work used by permission from part of
 /// JUCE, available at http://www.rawaterialsoftware.com

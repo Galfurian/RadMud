@@ -1,5 +1,5 @@
 ///----------------------------------------------------------------------------
-/// @file   ClassInfo.hpp
+/// @file   funcTraits.hpp
 /// @copyright
 /// Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
 ///
@@ -32,7 +32,7 @@
   LUABRIDGE_THROWSPEC macro controls whether we use the 'throw ()' form, or
   'noexcept' (if C++11 is available) to distinguish the functions.
 */
-#include "TypeList.hpp"
+#include "typeList.hpp"
 
 #if defined (__APPLE_CPP__) || defined(__APPLE_CC__) || defined(__clang__) || defined(__GNUC__) || \
     (defined (_MSC_VER) && (_MSC_VER >= 1700))
