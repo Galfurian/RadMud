@@ -654,7 +654,7 @@ int Room::luaGetExits(lua_State * L)
     luabridge::LuaRef luaRef(L, luabridge::newTable(L));
     for (auto it : this->exits)
     {
-        luaRef.append(it.get());
+        luaRef.append(it);
     }
     luabridge::push(L, luaRef);
     return 1;
