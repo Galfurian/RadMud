@@ -47,12 +47,11 @@ public:
     /// @param _material    The material of the outcome.
     /// @param _tools       The list of used tools.
     /// @param _ingredients The list of used ingredients.
-    CraftAction(
-        Character * _actor,
-        Production * _production,
-        Material * _material,
-        ItemVector & _tools,
-        std::vector<std::pair<Item *, unsigned int>> & _ingredients);
+    CraftAction(Character * _actor,
+                Production * _production,
+                Material * _material,
+                ItemVector & _tools,
+                std::vector<std::pair<Item *, unsigned int>> & _ingredients);
 
     /// @brief Destructor.
     virtual ~CraftAction();

@@ -52,9 +52,12 @@ unsigned int ArmorItem::getArmorClass() const
     auto acCondition = static_cast<unsigned int>(acBase *
                                                  this->getConditionModifier());
     // Evaluate the modifier due to item's material.
-    auto acMaterial = static_cast<unsigned int>(acBase *
-                                                this->composition
-                                                    ->getHardnessModifier());
+    unsigned int acMaterial = 0;
+    if (composition != nullptr)
+    {
+        acMaterial = static_cast<unsigned int>(acBase *
+                                               composition->getHardnessModifier());
+    }
     // The resulting armor class.
     return ((acBase + acQuality + acCondition + acMaterial) / 4);
 }

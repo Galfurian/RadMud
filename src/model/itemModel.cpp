@@ -113,13 +113,16 @@ Item * ItemModel::createItem(
     const ItemQuality & itemQuality,
     const unsigned int & quantity)
 {
+    if(composition == nullptr)
+    {
+        Logger::log(LogLevel::Error, "Received nullptr material.");
+        return nullptr;
+    }
     if (composition->type != this->material)
     {
         Logger::log(LogLevel::Error, "Wrong type of material.");
-        // Return pointer to nothing.
         return nullptr;
     }
-
     // Instantiate the new item.
     auto newItem = ItemFactory::newItem(this->getType());
     if (newItem == nullptr)
@@ -128,7 +131,6 @@ Item * ItemModel::createItem(
         // Return pointer to nothing.
         return nullptr;
     }
-
     // First set: Vnum, Model, Maker, Composition, Quality.
     // If the item is for a mobile, set the vnum to -1.
     if (isForMobile)

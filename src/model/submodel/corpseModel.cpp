@@ -27,7 +27,8 @@
 #include "mud.hpp"
 
 CorpseModel::CorpseModel() :
-    corpseRace()
+    corpseRace(),
+    corpseComposition()
 {
     // Nothing to do.
 }
@@ -92,7 +93,6 @@ Item * CorpseModel::createItem(std::string,
 
 Item * CorpseModel::createCorpse(
     std::string maker,
-    Material * composition,
     const double & weight)
 {
     // Instantiate the new item.
@@ -108,12 +108,12 @@ Item * CorpseModel::createCorpse(
     newItem->vnum = Mud::instance().getMinVnumCorpse() - 1;
     newItem->model = this->shared_from_this();
     newItem->maker = maker;
-    newItem->composition = composition;
     newItem->quality = ItemQuality::Normal;
     // Then set the rest.
     newItem->weight = weight;
     newItem->condition = static_cast<unsigned int>(weight);
     newItem->maxCondition = static_cast<unsigned int>(weight);
+    newItem->composition = corpseComposition;
 
     Mud::instance().addCorpse(newItem);
     return newItem;

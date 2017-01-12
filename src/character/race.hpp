@@ -45,8 +45,6 @@ public:
     std::string name;
     /// The description of the race.
     std::string description;
-    /// The material of which are made the entity of this race.
-    Material * material;
     /// Base race abilities.
     std::map<Ability, unsigned int> abilities;
     /// The factions that a player of this race can choose.
@@ -82,9 +80,6 @@ public:
 
     /// @brief Destructor.
     ~Race();
-
-    /// @brief Initialize the corpse specific of this race.
-    void initializeCorpse(const std::string & corpseDescription);
 
     /// @brief Check the correctness of the race.
     /// @return <b>True</b> if the race has correct values,<br>

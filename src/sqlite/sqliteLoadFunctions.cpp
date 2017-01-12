@@ -352,8 +352,6 @@ bool LoadRace(ResultSet * result)
             race->article = result->getNextString();
             race->name = result->getNextString();
             race->description = result->getNextString();
-            race->material = Mud::instance().findMaterial(
-                result->getNextInteger());
             race->setAbilities(result->getNextString());
             if (!race->setAvailableFactions(result->getNextString()))
             {
@@ -412,8 +410,13 @@ bool LoadRaceCorpse(ResultSet * result)
     {
         try
         {
-            auto race = Mud::instance().findRace(result->getNextInteger());
-            assert(race != nullptr);
+            auto raceVnum = result->getNextInteger();
+            auto race = Mud::instance().findRace(raceVnum);
+            if (race == nullptr)
+            {
+                throw SQLiteException("Cannot find the race " +
+                                      ToString(raceVnum) + " for a corpse.");
+            }
             auto corpse = std::make_shared<CorpseModel>();
             corpse->vnum = 0;
             corpse->name = "corpse";
@@ -424,12 +427,23 @@ bool LoadRaceCorpse(ResultSet * result)
                 corpse->keys.emplace_back(key);
             }
             corpse->keys.emplace_back("corpse");
-            corpse->description = result->getNextString();
             corpse->modelFlags = 0;
             corpse->condition = 10;
-            corpse->material = race->material->type;
             corpse->tileSet = race->tileSet;
             corpse->tileId = race->tileId;
+            corpse->description = result->getNextString();
+            // Retrieve and set the values.
+            corpse->corpseRace = race;
+            auto corpseCompositionVnum = result->getNextInteger();
+            auto corpseComposition = Mud::instance().findMaterial(
+                corpseCompositionVnum);
+            if (corpseComposition == nullptr)
+            {
+                throw SQLiteException("Cannot find the material " +
+                                      ToString(corpseCompositionVnum) +
+                                      " for a corpse.");
+            }
+            corpse->corpseComposition = corpseComposition;
             race->corpse = corpse;
         }
         catch (SQLiteException & e)

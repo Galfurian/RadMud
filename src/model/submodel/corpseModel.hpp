@@ -31,6 +31,8 @@ class CorpseModel :
 public:
     /// The race associated with the corpse model.
     Race * corpseRace;
+    /// The basic composition of the corpse.
+    Material * corpseComposition;
 
     CorpseModel();
 
@@ -53,10 +55,7 @@ public:
 
     /// Creates a new corpse.
     /// @param maker       The player that create the corpse.
-    /// @param composition The composition of the corpse.
     /// @param weight      The custom weight of the corpse.
     /// @return The created corpse.
-    Item * createCorpse(std::string maker,
-                        Material * composition,
-                        const double & weight);
+    Item * createCorpse(std::string maker, const double & weight);
 };

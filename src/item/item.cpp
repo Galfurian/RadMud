@@ -202,7 +202,7 @@ void Item::getSheet(Table & sheet) const
         locationRow.push_back("Nowhere");
     }
     sheet.addRow(locationRow);
-    for(auto bodyPart : occupiedBodyParts)
+    for (auto bodyPart : occupiedBodyParts)
     {
         sheet.addRow({"Body Part", bodyPart->getDescription()});
     }
@@ -253,9 +253,13 @@ std::string Item::getTypeName() const
 
 bool Item::canStackWith(Item * item) const
 {
+    if (model == nullptr) return false;
+    if (composition == nullptr) return false;
+    if (item->model == nullptr) return false;
+    if (item->composition == nullptr) return false;
     return HasFlag(this->model->modelFlags, ModelFlag::CanBeStacked)
-           && (this->model->vnum == item->model->vnum)
-           && (this->composition->vnum == item->composition->vnum);
+           && (model->vnum == item->model->vnum)
+           && (composition->vnum == item->composition->vnum);
 }
 
 Item * Item::removeFromStack(Character * actor, unsigned int & _quantity)
@@ -264,9 +268,9 @@ Item * Item::removeFromStack(Character * actor, unsigned int & _quantity)
     {
         // Generate a copty of this item with the given quantity.
         auto newStack = this->model->createItem(actor->getName(),
-                                                this->composition,
+                                                composition,
                                                 false,
-                                                this->quality,
+                                                quality,
                                                 _quantity);
         if (newStack != nullptr)
         {

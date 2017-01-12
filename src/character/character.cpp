@@ -1373,7 +1373,7 @@ void Character::kill()
 Item * Character::createCorpse()
 {
     // Create the corpse.
-    auto corpse = race->corpse->createCorpse(name, race->material, weight);
+    auto corpse = race->corpse->createCorpse(name, weight);
     // Add the corpse to the room.
     room->addItem(corpse);
     // Return the corpse.
