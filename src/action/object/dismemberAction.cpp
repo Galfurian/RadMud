@@ -46,6 +46,16 @@ bool DismemberAction::check(std::string & error) const
     {
         return false;
     }
+    if (corpse == nullptr)
+    {
+        error = "You cannot find the corpse you want to dismember.";
+        return false;
+    }
+    if (bodyPart == nullptr)
+    {
+        error = "You don't know what to dismember from the corpse.";
+        return false;
+    }
     return true;
 }
 
