@@ -71,9 +71,9 @@ bool Command::canUse(Character * character) const
 
 void StopAction(Character * character)
 {
-    if ((character->getAction()->getType() != ActionType::Wait))
+    if ((character->action->getType() != ActionType::Wait))
     {
-        if (character->getAction()->getType() != ActionType::Combat)
+        if (character->action->getType() != ActionType::Combat)
         {
             character->doCommand("stop");
         }

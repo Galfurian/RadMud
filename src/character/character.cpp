@@ -48,10 +48,10 @@ Character::Character() :
     effects(),
     L(luaL_newstate()),
     combatHandler(this),
-    actionQueue(),
+    action(std::make_shared<GeneralAction>(this)),
     inputProcessor(std::make_shared<ProcessInput>())
 {
-    actionQueue.push_back(std::make_shared<GeneralAction>(this));
+    // Nothing to do.
 }
 
 Character::~Character()
@@ -190,7 +190,7 @@ void Character::getSheet(Table & sheet) const
         sheet.addRow({"Room", "NONE"});
     }
     sheet.addRow({"Posture", posture.toString()});
-    sheet.addRow({"Action", this->getAction()->getDescription()});
+    sheet.addRow({"Action", action->getDescription()});
     sheet.addDivider();
     sheet.addRow({"## Equipment", "## Inventory"});
     for (size_t it = 0; it < std::max(inventory.size(), equipment.size()); ++it)
@@ -247,10 +247,10 @@ std::string Character::getStaticDesc() const
         desc += " " + posture.getAction();
     }
     desc += " here";
-    if (this->getAction()->getType() != ActionType::Wait)
+    if (action->getType() != ActionType::Wait)
     {
         desc += ", " + this->getSubjectPronoun() + " is ";
-        desc += this->getAction()->getDescription();
+        desc += action->getDescription();
     }
     desc += ".";
     return desc;
@@ -527,25 +527,17 @@ int Character::getViewDistance() const
     return 4 + static_cast<int>(this->getAbilityLog(Ability::Perception));
 }
 
-void Character::setAction(std::shared_ptr<GeneralAction> _action)
+void Character::setAction(const std::shared_ptr<GeneralAction> & _action)
 {
     if (_action->getType() != ActionType::Wait)
     {
-        actionQueue.push_front(_action);
+        action = _action;
     }
-}
-
-std::shared_ptr<GeneralAction> Character::getAction() const
-{
-    return actionQueue.front();
 }
 
 void Character::popAction()
 {
-    if (actionQueue.front()->getType() != ActionType::Wait)
-    {
-        actionQueue.pop_front();
-    }
+    action = std::make_shared<GeneralAction>(this);
 }
 
 void Character::moveTo(
@@ -651,7 +643,8 @@ Item * Character::findEquipmentItem(std::string search_parameter, int & number)
     return nullptr;
 }
 
-Item * Character::findItemAtBodyPart(std::shared_ptr<BodyPart> bodyPart) const
+Item * Character::findItemAtBodyPart(
+    const std::shared_ptr<BodyPart> & bodyPart) const
 {
     for (auto item : equipment)
     {
@@ -1268,7 +1261,7 @@ unsigned int Character::getArmorClass() const
     return result;
 }
 
-bool Character::canAttackWith(std::shared_ptr<BodyPart> bodyPart) const
+bool Character::canAttackWith(const std::shared_ptr<BodyPart> & bodyPart) const
 {
     if (HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
     {
@@ -1374,7 +1367,6 @@ void Character::kill()
         corpse->putInside(item);
     }
     // Reset the action of the character.
-    actionQueue.clear();
     this->setAction(std::make_shared<GeneralAction>(this));
     // Reset the list of opponents.
     this->combatHandler.resetList();

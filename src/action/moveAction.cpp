@@ -35,14 +35,14 @@ MoveAction::MoveAction(Character * _actor,
     direction(_direction)
 {
     // Debugging message.
-    //Logger::log(LogLevel::Debug, "Created MoveAction.");
+    Logger::log(LogLevel::Debug, "Created MoveAction.");
     // Reset the cooldown of the action.
     this->resetCooldown(MoveAction::getCooldown(_actor));
 }
 
 MoveAction::~MoveAction()
 {
-    //Logger::log(LogLevel::Debug, "Deleted move action.");
+    Logger::log(LogLevel::Debug, "Deleted move action.");
 }
 
 bool MoveAction::check(std::string & error) const
@@ -174,7 +174,7 @@ bool MoveAction::canMoveTo(Character * character,
     {
         return false;
     }
-    if ((character->getAction()->getType() == ActionType::Combat) &&
+    if ((character->action->getType() == ActionType::Combat) &&
         !allowInCombat)
     {
         // Check if the character is locked into close combat.

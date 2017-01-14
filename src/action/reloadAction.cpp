@@ -34,14 +34,14 @@ ReloadAction::ReloadAction(Character * _actor,
     magazine(_magazine)
 {
     // Debugging message.
-    //Logger::log(LogLevel::Debug, "Created ReloadAction.");
+    Logger::log(LogLevel::Debug, "Created ReloadAction.");
     // Reset the cooldown of the action.
     this->resetCooldown(ReloadAction::getReloadTime(_weapon, _magazine));
 }
 
 ReloadAction::~ReloadAction()
 {
-    //Logger::log(LogLevel::Debug, "Deleted reload action.");
+    Logger::log(LogLevel::Debug, "Deleted reload action.");
 }
 
 bool ReloadAction::check(std::string & error) const

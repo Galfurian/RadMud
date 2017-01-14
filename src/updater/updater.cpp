@@ -257,11 +257,11 @@ void MudUpdater::performActions()
         {
             continue;
         }
-        if (iterator->getAction()->getType() == ActionType::Wait)
+        if (iterator->action->getType() == ActionType::Wait)
         {
             continue;
         }
-        ActionStatus actionStatus = iterator->getAction()->perform();
+        ActionStatus actionStatus = iterator->action->perform();
         if ((actionStatus == ActionStatus::Finished) ||
             (actionStatus == ActionStatus::Error))
         {
@@ -285,12 +285,11 @@ void MudUpdater::performActions()
             mobile->nextActionCooldown = end + std::chrono::seconds(
                 TRandInteger<int>(30, 60));
         }
-        std::cout << mobile->getName() << "\n";
-        if (mobile->getAction()->getType() == ActionType::Wait)
+        if (mobile->action->getType() == ActionType::Wait)
         {
             continue;
         }
-        ActionStatus actionStatus = mobile->getAction()->perform();
+        ActionStatus actionStatus = mobile->action->perform();
         if ((actionStatus == ActionStatus::Finished) ||
             (actionStatus == ActionStatus::Error))
         {

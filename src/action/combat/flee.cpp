@@ -32,14 +32,14 @@ Flee::Flee(Character * _actor) :
     CombatAction(_actor)
 {
     // Debugging message.
-    //Logger::log(LogLevel::Debug, "Created Flee.");
+    Logger::log(LogLevel::Debug, "Created Flee.");
     // Reset the cooldown of the action.
     this->resetCooldown(Flee::getCooldown(_actor));
 }
 
 Flee::~Flee()
 {
-    //Logger::log(LogLevel::Debug, "Deleted Flee.");
+    Logger::log(LogLevel::Debug, "Deleted Flee.");
 }
 
 bool Flee::check(std::string & error) const
@@ -141,7 +141,7 @@ ActionStatus Flee::perform()
         }
     }
     // Reset the cooldown.
-    actor->getAction()->resetCooldown(BasicAttack::getCooldown(actor));
+    actor->action->resetCooldown(BasicAttack::getCooldown(actor));
     // Return that the action is still running.
     return ActionStatus::Running;
 }

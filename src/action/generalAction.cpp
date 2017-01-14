@@ -22,17 +22,19 @@
 
 #include "generalAction.hpp"
 #include "character.hpp"
+#include "logger.hpp"
 
 GeneralAction::GeneralAction(Character * _actor) :
     actor(_actor),
     actionCooldown()
 {
-    // Nothing to do.
+    // Debugging message.
+    Logger::log(LogLevel::Debug, "Created GeneralAction.");
 }
 
 GeneralAction::~GeneralAction()
 {
-    // Nothing to do.
+    Logger::log(LogLevel::Debug, "Deleted GeneralAction.");
 }
 
 bool GeneralAction::checkElapsed() const

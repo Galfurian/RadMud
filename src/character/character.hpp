@@ -116,7 +116,7 @@ public:
     /// List of opponents.
     CombatHandler combatHandler;
     /// Character current action.
-    std::deque<std::shared_ptr<GeneralAction> > actionQueue;
+    std::shared_ptr<GeneralAction> action;
     /// The input handler.
     std::shared_ptr<ProcessInput> inputProcessor;
 
@@ -304,11 +304,7 @@ public:
 
     /// @brief Allows to set an action.
     /// @param _action The action that has to be set.
-    void setAction(std::shared_ptr<GeneralAction> _action);
-
-    /// @brief Provides a pointer to the action object associated to this character.
-    /// @return A pointer to action.
-    std::shared_ptr<GeneralAction> getAction() const;
+    void setAction(const std::shared_ptr<GeneralAction> & _action);
 
     /// @brief Provides a pointer to the action at the front position and
     ///         then remove it from the queue.
@@ -340,7 +336,7 @@ public:
     /// @brief Search the item at given position and return it.
     /// @param bodyPart The body part where the method need to search the item.
     /// @return The item, if it's in the character's equipment.
-    Item * findItemAtBodyPart(std::shared_ptr<BodyPart> bodyPart) const;
+    Item * findItemAtBodyPart(const std::shared_ptr<BodyPart> & bodyPart) const;
 
     /// @brief Search an item nearby, (eq, inv, room).
     /// @param itemName The name of the item.
@@ -498,7 +494,7 @@ public:
     /// @param bodyPart The body part at which the weapon could be.
     /// @return <b>True</b> if the item is there,<br>
     ///         <b>False</b> otherwise.
-    bool canAttackWith(std::shared_ptr<BodyPart> bodyPart) const;
+    bool canAttackWith(const std::shared_ptr<BodyPart> & bodyPart) const;
 
     /// @brief Checks if the given target is both In Sight and within the Range of Sight.
     /// @param target The target character.

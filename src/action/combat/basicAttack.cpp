@@ -35,14 +35,14 @@ BasicAttack::BasicAttack(Character * _actor) :
     CombatAction(_actor)
 {
     // Debugging message.
-    //Logger::log(LogLevel::Debug, "Created BasicAttack.");
+    Logger::log(LogLevel::Debug, "Created BasicAttack.");
     // Reset the cooldown of the action.
     this->resetCooldown(CombatAction::getCooldown(_actor));
 }
 
 BasicAttack::~BasicAttack()
 {
-    //Logger::log(LogLevel::Debug, "Deleted BasicAttack.");
+    Logger::log(LogLevel::Debug, "Deleted BasicAttack.");
 }
 
 bool BasicAttack::check(std::string & error) const
@@ -176,7 +176,7 @@ ActionStatus BasicAttack::perform()
         actor->sendMsg("Try to get closer to your enemy.\n\n");
     }
     // Reset the cooldown.
-    actor->getAction()->resetCooldown(CombatAction::getCooldown(actor));
+    actor->action->resetCooldown(CombatAction::getCooldown(actor));
     // Return that the action is still running.
     return ActionStatus::Running;
 }
@@ -466,10 +466,9 @@ void BasicAttack::performMeleeAttack(Character * target,
     if (!target->combatHandler.hasOpponent(actor))
     {
         target->combatHandler.addOpponent(actor);
-        if (target->getAction()->getType() != ActionType::Combat)
+        if (target->action->getType() != ActionType::Combat)
         {
-            target->actionQueue.push_front(
-                std::make_shared<BasicAttack>(target));
+            target->setAction(std::make_shared<BasicAttack>(target));
         }
     }
     if (!actor->combatHandler.hasOpponent(target))
@@ -573,10 +572,9 @@ void BasicAttack::performRangedAttack(Character * target,
             if (!target->combatHandler.hasOpponent(actor))
             {
                 target->combatHandler.addOpponent(actor);
-                if (target->getAction()->getType() != ActionType::Combat)
+                if (target->action->getType() != ActionType::Combat)
                 {
-                    target->actionQueue.push_front(
-                        std::make_shared<BasicAttack>(target));
+                    target->setAction(std::make_shared<BasicAttack>(target));
                 }
             }
             if (!actor->combatHandler.hasOpponent(target))

@@ -76,7 +76,7 @@ std::map<AbilityModifier, int> & operator+=(
         }
     }
     return left;
-};
+}
 
 std::map<AbilityModifier, int> & operator-=(
     std::map<AbilityModifier, int> & left,
@@ -95,7 +95,7 @@ std::map<AbilityModifier, int> & operator-=(
         }
     }
     return left;
-};
+}
 
 std::map<CombatModifier, int> & operator+=(
     std::map<CombatModifier, int> & left,
@@ -114,7 +114,7 @@ std::map<CombatModifier, int> & operator+=(
         }
     }
     return left;
-};
+}
 
 std::map<CombatModifier, int> & operator-=(
     std::map<CombatModifier, int> & left,
@@ -133,7 +133,7 @@ std::map<CombatModifier, int> & operator-=(
         }
     }
     return left;
-};
+}
 
 std::map<StatusModifier, int> & operator+=(
     std::map<StatusModifier, int> & left,
@@ -152,7 +152,7 @@ std::map<StatusModifier, int> & operator+=(
         }
     }
     return left;
-};
+}
 
 std::map<StatusModifier, int> & operator-=(
     std::map<StatusModifier, int> & left,
@@ -171,7 +171,7 @@ std::map<StatusModifier, int> & operator-=(
         }
     }
     return left;
-};
+}
 
 std::map<Knowledge, bool> & operator+=(
     std::map<Knowledge, bool> & left,
@@ -190,7 +190,7 @@ std::map<Knowledge, bool> & operator+=(
         }
     }
     return left;
-};
+}
 
 std::map<Knowledge, bool> & operator-=(
     std::map<Knowledge, bool> & left,
@@ -205,4 +205,4 @@ std::map<Knowledge, bool> & operator-=(
         }
     }
     return left;
-};
+}

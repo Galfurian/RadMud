@@ -32,14 +32,14 @@ AimAction::AimAction(Character * _actor, Character * _target) :
     target(_target)
 {
     // Debugging message.
-    //Logger::log(LogLevel::Debug, "Created aim action.");
+    Logger::log(LogLevel::Debug, "Created aim action.");
     // Reset the cooldown of the action.
     this->resetCooldown(AimAction::getAimTime(_actor, _target));
 }
 
 AimAction::~AimAction()
 {
-    //Logger::log(LogLevel::Debug, "Deleted aim action.");
+    Logger::log(LogLevel::Debug, "Deleted aim action.");
 }
 
 bool AimAction::check(std::string & error) const

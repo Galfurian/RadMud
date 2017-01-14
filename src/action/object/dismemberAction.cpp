@@ -21,6 +21,7 @@
 
 #include "dismemberAction.hpp"
 #include "character.hpp"
+#include "logger.hpp"
 
 DismemberAction::DismemberAction(Character * _actor,
                                  CorpseItem * _corpse,
@@ -30,14 +31,14 @@ DismemberAction::DismemberAction(Character * _actor,
     bodyPart(_bodyPart)
 {
     // Debugging message.
-    //Logger::log(LogLevel::Debug, "Created DismemberAction.");
+    Logger::log(LogLevel::Debug, "Created DismemberAction.");
     // Reset the cooldown of the action.
     this->resetCooldown(DismemberAction::getCooldown(_actor, _bodyPart));
 }
 
 DismemberAction::~DismemberAction()
 {
-    //Logger::log(LogLevel::Debug, "Deleted move action.");
+    Logger::log(LogLevel::Debug, "Deleted move action.");
 }
 
 bool DismemberAction::check(std::string & error) const
