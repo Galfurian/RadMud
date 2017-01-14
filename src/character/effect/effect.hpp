@@ -23,6 +23,10 @@
 #pragma once
 
 #include "ability.hpp"
+#include "abilityModifier.hpp"
+#include "combatModifier.hpp"
+#include "statusModifier.hpp"
+#include "knowledge.hpp"
 #include "utils.hpp"
 
 #include <functional>
@@ -45,20 +49,14 @@ public:
     std::string messageExpire;
     /// Function executed when the effect expires.
     std::function<void(Character * character)> expireFunction;
-    /// Health modifier.
-    int health;
-    /// Stamina modifier.
-    int stamina;
-    /// Abilities modifier.
-    std::map<Ability, int> abilities;
-    /// Melee hit chance modifier.
-    int meleeHit;
-    /// Melee damage modifier.
-    int meleeDamage;
-    /// Ranged hit chance modifier.
-    int rangedHit;
-    /// Ranged damage modifier.
-    int rangedDamage;
+    /// The map of abilities modifiers.
+    std::map<AbilityModifier, int> abilityModifier;
+    /// The map of combat modifiers.
+    std::map<CombatModifier, int> combatModifier;
+    /// The map of status modifiers.
+    std::map<StatusModifier, int> statusModifier;
+    /// The map of knowledge.
+    std::map<Knowledge, int> knowledge;
 
     /// @brief Constructor.
     Effect(Character * _affected,
@@ -66,14 +64,7 @@ public:
            unsigned int _remainingTic,
            std::string _messageActivate,
            std::string _messageExpire,
-           std::function<void(Character * character)> _expireFunction,
-           int _health,
-           int _stamina,
-           std::map<Ability, int> _abilities,
-           int _meleeHit,
-           int _meleeDamage,
-           int _rangedHit,
-           int _rangedDamage);
+           std::function<void(Character * character)> _expireFunction);
 
     /// @brief Update the cooldown of the effect.
     /// @return <b>True</b> if the effect is expired,<br>
@@ -81,5 +72,8 @@ public:
     bool update();
 
     /// @brief Operator used to order the effect based on the remaining time.
-    bool operator<(const Effect & right) const;
+    bool operator<(const Effect & right) const
+    {
+        return remainingTic < right.remainingTic;
+    }
 };

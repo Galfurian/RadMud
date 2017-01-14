@@ -37,31 +37,15 @@ Effect EffectFactory::clearTargets(Character * actor,
                       {
                           character->combatHandler.charactersInSight.clear();
                       }
-                  },
-                  0,
-                  0,
-                  std::map<Ability, int>(),
-                  0,
-                  0,
-                  0,
-                  0);
+                  });
 }
 
 Effect EffectFactory::disturbedAim(Character * actor,
                                    const unsigned int & duration,
                                    const int & magnitude)
 {
-    return Effect(actor,
-                  "DisturbedAim",
-                  duration,
-                  "",
-                  "",
-                  nullptr,
-                  0,
-                  0,
-                  std::map<Ability, int>(),
-                  0,
-                  0,
-                  magnitude,
-                  0);
+    auto effect = Effect(actor, "DisturbedAim", duration, "", "", nullptr);
+    effect.combatModifier.insert(
+        std::make_pair(CombatModifier::DecreaseRangedWeaponHitRoll, magnitude));
+    return effect;
 }

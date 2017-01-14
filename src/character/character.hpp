@@ -32,7 +32,7 @@
 #include "faction.hpp"
 #include "bodyPart.hpp"
 #include "luaBridge.hpp"
-#include "effectList.hpp"
+#include "effectManager.hpp"
 #include "processInput.hpp"
 #include "combatAction.hpp"
 #include "argumentHandler.hpp"
@@ -110,7 +110,7 @@ public:
     /// Character's posture.
     CharacterPosture posture;
     /// Active effects on player.
-    EffectList effects;
+    EffectManager effects;
     /// The lua_State associated with this character.
     lua_State * L;
     /// List of opponents.

@@ -25,57 +25,28 @@
 #include "effect.hpp"
 
 /// @brief A class which allows to manage a buffer of effects.
-class EffectList
+class EffectManager
 {
-public:
-    /// Type of structure which contains effects.
-    using EffectVector = typename std::vector<Effect>;
-    /// Iterator for an effects vector.
-    using iterator = typename std::vector<Effect>::iterator;
-    /// Constant iterator for an effects vector.
-    using const_iterator = typename std::vector<Effect>::const_iterator;
-
 private:
-    /// The list of active effects.
-    EffectVector activeEffects;
-    /// The list of pending effects.
-    EffectVector pendingEffects;
+    /// The overall ability modifier.
+    std::map<AbilityModifier, int> abilityModifier;
+    /// The overall combat modifier.
+    std::map<CombatModifier, int> combatModifier;
+    /// The overall status modifier.
+    std::map<StatusModifier, int> statusModifier;
+    /// The overall knowledge.
+    std::map<Knowledge, int> knowledge;
+    /// The vector of active effects.
+    std::vector<Effect> activeEffects;
+    /// The vector of pending effects.
+    std::vector<Effect> pendingEffects;
 
 public:
     /// @brief Constructor.
-    EffectList();
+    EffectManager();
 
     /// @brief Destructor.
-    ~EffectList();
-
-    /// @brief Provides the overall health modifier.
-    /// @return The total modifier.
-    int getHealthMod() const;
-
-    /// @brief Provides the overall stamina modifier.
-    /// @return The total modifier.
-    int getStaminaMod() const;
-
-    /// @brief Provides the overall melee hit modifier.
-    /// @return The total modifier.
-    int getMeleeHitMod() const;
-
-    /// @brief Provides the overall melee damage modifier.
-    /// @return The total modifier.
-    int getMeleeDamMod() const;
-
-    /// @brief Provides the overall ranged hit modifier.
-    /// @return The total modifier.
-    int getRangedHitMod() const;
-
-    /// @brief Provides the overall ranged damage modifier.
-    /// @return The total modifier.
-    int getRangedDamMod() const;
-
-    /// @brief Provides the overall ability.
-    /// @param ability The ability.
-    /// @return The total modifier.
-    int getAbilityModifier(const Ability & ability) const;
+    ~EffectManager();
 
     /// @brief Allows to add an effect.
     /// @param effect The effect that has to be added.
@@ -104,16 +75,47 @@ public:
     void sortList();
 
     /// @brief Provides an iterator to the begin of the list of active effects.
-    iterator begin();
+    std::vector<Effect>::iterator begin();
+
+    /// @brief Provides an iterator to the end of the list of active effects.
+    std::vector<Effect>::iterator end();
 
     /// @brief Provides a const_iterator to the begin of the list of
     ///         active effects.
-    const_iterator begin() const;
-
-    /// @brief Provides an iterator to the end of the list of active effects.
-    iterator end();
+    std::vector<Effect>::const_iterator begin() const;
 
     /// @brief Provides a const_iterator to the end of the list of
     ///         active effects.
-    const_iterator end() const;
+    std::vector<Effect>::const_iterator end() const;
+
+    /// DEPRECATED
+public:
+    /// @brief Provides the overall health modifier.
+    /// @return The total modifier.
+    int getHealthMod() const;
+
+    /// @brief Provides the overall stamina modifier.
+    /// @return The total modifier.
+    int getStaminaMod() const;
+
+    /// @brief Provides the overall melee hit modifier.
+    /// @return The total modifier.
+    int getMeleeHitMod() const;
+
+    /// @brief Provides the overall melee damage modifier.
+    /// @return The total modifier.
+    int getMeleeDamMod() const;
+
+    /// @brief Provides the overall ranged hit modifier.
+    /// @return The total modifier.
+    int getRangedHitMod() const;
+
+    /// @brief Provides the overall ranged damage modifier.
+    /// @return The total modifier.
+    int getRangedDamMod() const;
+
+    /// @brief Provides the overall ability.
+    /// @param ability The ability.
+    /// @return The total modifier.
+    int getAbilityModifier(const Ability & ability) const;
 };

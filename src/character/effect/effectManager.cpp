@@ -20,78 +20,25 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "effectList.hpp"
+#include "effectManager.hpp"
 
-
-EffectList::EffectList() :
+EffectManager::EffectManager() :
+    abilityModifier(),
+    combatModifier(),
+    statusModifier(),
+    knowledge(),
     activeEffects(),
     pendingEffects()
 {
     // Nothing to do.
 }
 
-EffectList::~EffectList()
+EffectManager::~EffectManager()
 {
     // Nothing to do.
 }
 
-int EffectList::getHealthMod() const
-{
-    int result = 0;
-    for (auto & it : activeEffects) result += it.health;
-    return result;
-}
-
-int EffectList::getStaminaMod() const
-{
-    int result = 0;
-    for (auto & it : activeEffects) result += it.stamina;
-    return result;
-}
-
-int EffectList::getMeleeHitMod() const
-{
-    int result = 0;
-    for (auto & it : activeEffects) result += it.meleeHit;
-    return result;
-}
-
-int EffectList::getMeleeDamMod() const
-{
-    int result = 0;
-    for (auto & it : activeEffects) result += it.meleeDamage;
-    return result;
-}
-
-int EffectList::getRangedHitMod() const
-{
-    int result = 0;
-    for (auto & it : activeEffects) result += it.rangedHit;
-    return result;
-}
-
-int EffectList::getRangedDamMod() const
-{
-    int result = 0;
-    for (auto & it : activeEffects) result += it.rangedDamage;
-    return result;
-}
-
-int EffectList::getAbilityModifier(const Ability & ability) const
-{
-    int result = 0;
-    for (const auto & it: activeEffects)
-    {
-        auto abilityIt = it.abilities.find(ability);
-        if (abilityIt != it.abilities.end())
-        {
-            result += abilityIt->second;
-        }
-    }
-    return result;
-}
-
-void EffectList::forceAddEffect(const Effect & effect)
+void EffectManager::forceAddEffect(const Effect & effect)
 {
     bool present = false;
     for (auto & iterator : pendingEffects)
@@ -113,7 +60,7 @@ void EffectList::forceAddEffect(const Effect & effect)
     }
 }
 
-void EffectList::addPendingEffect(const Effect & effect)
+void EffectManager::addPendingEffect(const Effect & effect)
 {
     bool present = false;
     for (auto & iterator : pendingEffects)
@@ -135,7 +82,7 @@ void EffectList::addPendingEffect(const Effect & effect)
     }
 }
 
-bool EffectList::effectActivate(std::vector<std::string> & messages)
+bool EffectManager::effectActivate(std::vector<std::string> & messages)
 {
     for (auto & iterator : pendingEffects)
     {
@@ -163,7 +110,7 @@ bool EffectList::effectActivate(std::vector<std::string> & messages)
     return !messages.empty();
 }
 
-bool EffectList::effectUpdate(std::vector<std::string> & messages)
+bool EffectManager::effectUpdate(std::vector<std::string> & messages)
 {
     for (auto it = activeEffects.begin(); it != activeEffects.end();)
     {
@@ -184,27 +131,62 @@ bool EffectList::effectUpdate(std::vector<std::string> & messages)
     return !messages.empty();
 }
 
-void EffectList::sortList()
+void EffectManager::sortList()
 {
     std::sort(activeEffects.begin(), activeEffects.end(), std::less<Effect>());
 }
 
-EffectList::iterator EffectList::begin()
+std::vector<Effect>::iterator EffectManager::begin()
 {
     return activeEffects.begin();
 }
 
-EffectList::const_iterator EffectList::begin() const
+std::vector<Effect>::const_iterator EffectManager::begin() const
 {
     return activeEffects.begin();
 }
 
-EffectList::iterator EffectList::end()
+std::vector<Effect>::iterator EffectManager::end()
 {
     return activeEffects.end();
 }
 
-EffectList::const_iterator EffectList::end() const
+std::vector<Effect>::const_iterator EffectManager::end() const
 {
     return activeEffects.end();
+}
+
+int EffectManager::getHealthMod() const
+{
+    return 0;
+}
+
+int EffectManager::getStaminaMod() const
+{
+    return 0;
+}
+
+int EffectManager::getMeleeHitMod() const
+{
+    return 0;
+}
+
+int EffectManager::getMeleeDamMod() const
+{
+    return 0;
+}
+
+int EffectManager::getRangedHitMod() const
+{
+    return 0;
+}
+
+int EffectManager::getRangedDamMod() const
+{
+    return 0;
+}
+
+int EffectManager::getAbilityModifier(const Ability &) const
+{
+    return 0;
 }

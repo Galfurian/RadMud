@@ -29,27 +29,17 @@ Effect::Effect(Character * _affected,
                unsigned int _remainingTic,
                std::string _messageActivate,
                std::string _messageExpire,
-               std::function<void(Character * character)> _expireFunction,
-               int _health,
-               int _stamina,
-               std::map<Ability, int> _abilities,
-               int _meleeHit,
-               int _meleeDamage,
-               int _rangedHit,
-               int _rangedDamage) :
+               std::function<void(Character * character)> _expireFunction) :
     affected(_affected),
     name(_name),
     remainingTic(_remainingTic),
     messageActivate(_messageActivate),
     messageExpire(_messageExpire),
     expireFunction(_expireFunction),
-    health(_health),
-    stamina(_stamina),
-    abilities(_abilities),
-    meleeHit(_meleeHit),
-    meleeDamage(_meleeDamage),
-    rangedHit(_rangedHit),
-    rangedDamage(_rangedDamage)
+    abilityModifier(),
+    combatModifier(),
+    statusModifier(),
+    knowledge()
 {
     Logger::log(LogLevel::Debug, "Created effect %s.", name);
     // Nothing to do.
@@ -69,7 +59,3 @@ bool Effect::update()
     return false;
 }
 
-bool Effect::operator<(const Effect & right) const
-{
-    return remainingTic < right.remainingTic;
-}
