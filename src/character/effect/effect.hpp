@@ -50,13 +50,13 @@ public:
     /// Function executed when the effect expires.
     std::function<void(Character * character)> expireFunction;
     /// The map of abilities modifiers.
-    std::map<AbilityModifier, int> abilityModifier;
+    std::map<AbilityModifier, int> effectAbilityModifier;
     /// The map of combat modifiers.
-    std::map<CombatModifier, int> combatModifier;
+    std::map<CombatModifier, int> effectCombatModifier;
     /// The map of status modifiers.
-    std::map<StatusModifier, int> statusModifier;
+    std::map<StatusModifier, int> effectStatusModifier;
     /// The map of knowledge.
-    std::map<Knowledge, int> knowledge;
+    std::map<Knowledge, bool> effectKnowledge;
 
     /// @brief Constructor.
     Effect(Character * _affected,
@@ -76,4 +76,50 @@ public:
     {
         return remainingTic < right.remainingTic;
     }
+
+    /// @brief Equality operator between the names of two effects.
+    bool operator==(const Effect & right) const
+    {
+        return name < right.name;
+    }
 };
+
+/// @brief Addition-Assignment operator for two AbilityModifier maps.
+std::map<AbilityModifier, int> & operator+=(
+    std::map<AbilityModifier, int> & left,
+    const std::map<AbilityModifier, int> & right);
+
+/// @brief Subtraction-Assignment operator for two AbilityModifier maps.
+std::map<AbilityModifier, int> & operator-=(
+    std::map<AbilityModifier, int> & left,
+    const std::map<AbilityModifier, int> & right);
+
+/// @brief Addition-Assignment operator for two CombatModifier maps.
+std::map<CombatModifier, int> & operator+=(
+    std::map<CombatModifier, int> & left,
+    const std::map<CombatModifier, int> & right);
+
+/// @brief Subtraction-Assignment operator for two CombatModifier maps.
+std::map<CombatModifier, int> & operator-=(
+    std::map<CombatModifier, int> & left,
+    const std::map<CombatModifier, int> & right);
+
+/// @brief Addition-Assignment operator for two StatusModifier maps.
+std::map<StatusModifier, int> & operator+=(
+    std::map<StatusModifier, int> & left,
+    const std::map<StatusModifier, int> & right);
+
+/// @brief Subtraction-Assignment operator for two StatusModifier maps.
+std::map<StatusModifier, int> & operator-=(
+    std::map<StatusModifier, int> & left,
+    const std::map<StatusModifier, int> & right);
+
+/// @brief Addition-Assignment operator for two Knowledge maps.
+std::map<Knowledge, bool> & operator+=(
+    std::map<Knowledge, bool> & left,
+    const std::map<Knowledge, bool> & right);
+
+/// @brief Subtraction-Assignment operator for two Knowledge maps.
+std::map<Knowledge, bool> & operator-=(
+    std::map<Knowledge, bool> & left,
+    const std::map<Knowledge, bool> & right);

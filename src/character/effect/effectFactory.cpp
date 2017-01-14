@@ -45,7 +45,7 @@ Effect EffectFactory::disturbedAim(Character * actor,
                                    const int & magnitude)
 {
     auto effect = Effect(actor, "DisturbedAim", duration, "", "", nullptr);
-    effect.combatModifier.insert(
+    effect.effectCombatModifier.insert(
         std::make_pair(CombatModifier::DecreaseRangedWeaponHitRoll, magnitude));
     return effect;
 }

@@ -36,10 +36,10 @@ Effect::Effect(Character * _affected,
     messageActivate(_messageActivate),
     messageExpire(_messageExpire),
     expireFunction(_expireFunction),
-    abilityModifier(),
-    combatModifier(),
-    statusModifier(),
-    knowledge()
+    effectAbilityModifier(),
+    effectCombatModifier(),
+    effectStatusModifier(),
+    effectKnowledge()
 {
     Logger::log(LogLevel::Debug, "Created effect %s.", name);
     // Nothing to do.
@@ -59,3 +59,150 @@ bool Effect::update()
     return false;
 }
 
+std::map<AbilityModifier, int> & operator+=(
+    std::map<AbilityModifier, int> & left,
+    const std::map<AbilityModifier, int> & right)
+{
+    for (auto & rightModifier : right)
+    {
+        auto leftModifier = left.find(rightModifier.first);
+        if (leftModifier != left.end())
+        {
+            leftModifier->second += rightModifier.second;
+        }
+        else
+        {
+            left.insert(rightModifier);
+        }
+    }
+    return left;
+};
+
+std::map<AbilityModifier, int> & operator-=(
+    std::map<AbilityModifier, int> & left,
+    const std::map<AbilityModifier, int> & right)
+{
+    for (auto & rightModifier : right)
+    {
+        auto leftModifier = left.find(rightModifier.first);
+        if (leftModifier != left.end())
+        {
+            leftModifier->second -= rightModifier.second;
+            if (leftModifier->second < 0)
+            {
+                leftModifier->second = 0;
+            }
+        }
+    }
+    return left;
+};
+
+std::map<CombatModifier, int> & operator+=(
+    std::map<CombatModifier, int> & left,
+    const std::map<CombatModifier, int> & right)
+{
+    for (auto & rightModifier : right)
+    {
+        auto leftModifier = left.find(rightModifier.first);
+        if (leftModifier != left.end())
+        {
+            leftModifier->second += rightModifier.second;
+        }
+        else
+        {
+            left.insert(rightModifier);
+        }
+    }
+    return left;
+};
+
+std::map<CombatModifier, int> & operator-=(
+    std::map<CombatModifier, int> & left,
+    const std::map<CombatModifier, int> & right)
+{
+    for (auto & rightModifier : right)
+    {
+        auto leftModifier = left.find(rightModifier.first);
+        if (leftModifier != left.end())
+        {
+            leftModifier->second -= rightModifier.second;
+            if (leftModifier->second < 0)
+            {
+                leftModifier->second = 0;
+            }
+        }
+    }
+    return left;
+};
+
+std::map<StatusModifier, int> & operator+=(
+    std::map<StatusModifier, int> & left,
+    const std::map<StatusModifier, int> & right)
+{
+    for (auto & rightModifier : right)
+    {
+        auto leftModifier = left.find(rightModifier.first);
+        if (leftModifier != left.end())
+        {
+            leftModifier->second += rightModifier.second;
+        }
+        else
+        {
+            left.insert(rightModifier);
+        }
+    }
+    return left;
+};
+
+std::map<StatusModifier, int> & operator-=(
+    std::map<StatusModifier, int> & left,
+    const std::map<StatusModifier, int> & right)
+{
+    for (auto & rightModifier : right)
+    {
+        auto leftModifier = left.find(rightModifier.first);
+        if (leftModifier != left.end())
+        {
+            leftModifier->second -= rightModifier.second;
+            if (leftModifier->second < 0)
+            {
+                leftModifier->second = 0;
+            }
+        }
+    }
+    return left;
+};
+
+std::map<Knowledge, bool> & operator+=(
+    std::map<Knowledge, bool> & left,
+    const std::map<Knowledge, bool> & right)
+{
+    for (auto & rightModifier : right)
+    {
+        auto leftModifier = left.find(rightModifier.first);
+        if (leftModifier != left.end())
+        {
+            leftModifier->second = true;
+        }
+        else
+        {
+            left.insert(rightModifier);
+        }
+    }
+    return left;
+};
+
+std::map<Knowledge, bool> & operator-=(
+    std::map<Knowledge, bool> & left,
+    const std::map<Knowledge, bool> & right)
+{
+    for (auto & rightModifier : right)
+    {
+        auto leftModifier = left.find(rightModifier.first);
+        if (leftModifier != left.end())
+        {
+            leftModifier->second = false;
+        }
+    }
+    return left;
+};

@@ -347,9 +347,16 @@ void BasicAttack::performMeleeAttack(Character * target,
                                      MeleeWeaponItem * weapon,
                                      unsigned int attackNumber)
 {
+    // -------------------------------------------------------------------------
+    // Preamble: Evaluate all the values which are required by the function.
+    // -------------------------------------------------------------------------
+    // Get the strength modifier.
+    auto strengthMod = actor->getAbilityModifier(Ability::Strength);
     // Get the required stamina.
     auto consumedStamina = this->getConsumedStamina(actor, weapon);
-    // Check if the actor has enough stamina to execute the action.
+    // -------------------------------------------------------------------------
+    // Phase 1: Check if the actor has enough stamina to execute the action.
+    // -------------------------------------------------------------------------
     if (consumedStamina > actor->stamina)
     {
         if (weapon != nullptr)
@@ -364,18 +371,22 @@ void BasicAttack::performMeleeAttack(Character * target,
         }
         return;
     }
-    // Natural roll for the attack.
-    auto hitRoll = TRandInteger<unsigned int>(1, 20);
+    // -------------------------------------------------------------------------
+    // Phase 2: Roll the hit and damage.
+    // -------------------------------------------------------------------------
+    // Evaluate the natural roll for the attack.
+    unsigned int hitRoll = TRandInteger<unsigned int>(1, 20);
     // The amount of damage dealt.
     unsigned int damageRoll = 0;
-    // Get the strength modifier.
-    auto strengthMod = actor->getAbilityModifier(Ability::Strength);
+    // Boolean variable which identifies if the hit is a critical hit.
+    bool isCritical = (hitRoll == 20);
+    // If there is a weapon, roll the damage.
     if (weapon != nullptr)
     {
-        // Check if:
+        // Apply the penalty due to multi-wield, check if:
         //  1. The number of already executed attacks is greater-than 0.
-        //  2. The value is NOT a natural 20 (hit).
-        if ((attackNumber > 0) && (hitRoll != 20))
+        //  2. The attack is not a critical hit.
+        if ((attackNumber > 0) && (!isCritical))
         {
             // Evaluate the penalty to the hit roll.
             unsigned int penalty = (attackNumber * 3);
@@ -387,25 +398,44 @@ void BasicAttack::performMeleeAttack(Character * target,
         // Check if the character is wielding a two-handed weapon.
         if (HasFlag(weapon->model->modelFlags, ModelFlag::TwoHand))
         {
-            // Add to the damage rool one and half the strength value.
+            // Add to the damage roll one and half the strength value.
             damageRoll += strengthMod + (strengthMod / 2);
         }
+        // Apply the modifier to the hit roll with melee weapons.
+        hitRoll = SafeSum(hitRoll, +actor->effects.getCombatModifier(
+            CombatModifier::IncreaseMeleeWeaponHitRoll));
+        hitRoll = SafeSum(hitRoll, -actor->effects.getCombatModifier(
+            CombatModifier::DecreaseMeleeWeaponHitRoll));
+        // Apply the modifier to the damage roll with melee weapons.
+        damageRoll = SafeSum(damageRoll, +actor->effects.getCombatModifier(
+            CombatModifier::IncreaseMeleeWeaponDamage));
+        damageRoll = SafeSum(damageRoll, -actor->effects.getCombatModifier(
+            CombatModifier::DecreaseMeleeWeaponDamage));
     }
     else
     {
         // Natural roll for the damage.
         damageRoll = TRandInteger<unsigned int>(1, 3 + strengthMod);
+        // Apply the modifier to the hit roll when unarmed fighting.
+        hitRoll = SafeSum(hitRoll, +actor->effects.getCombatModifier(
+            CombatModifier::IncreaseUnarmedHitRoll));
+        hitRoll = SafeSum(hitRoll, -actor->effects.getCombatModifier(
+            CombatModifier::DecreaseUnarmedHitRoll));
+        // Apply the modifier to the damage roll when unarmed fighting.
+        damageRoll = SafeSum(damageRoll, +actor->effects.getCombatModifier(
+            CombatModifier::IncreaseUnarmedDamage));
+        damageRoll = SafeSum(damageRoll, -actor->effects.getCombatModifier(
+            CombatModifier::DecreaseUnarmedDamage));
     }
-    // Add effects modifier.
-    hitRoll = SafeSum(hitRoll, actor->effects.getMeleeHitMod());
+    // -------------------------------------------------------------------------
+    // Phase 3: Check if the target is hit.
+    // -------------------------------------------------------------------------
     // Evaluate the armor class of the enemy.
     auto armorClass = target->getArmorClass();
-    // Flag used to check if the target is alive.
-    bool targetIsAlive = true;
     // Check if:
     //  1. The hit roll is lesser than the armor class of the opponent.
-    //  2. The hit roll is not a natural 20.
-    if ((hitRoll < armorClass) && (hitRoll != 20))
+    //  2. The hit roll is not a critical.
+    if ((hitRoll < armorClass) && (!isCritical))
     {
         // Show miss messages.
         this->handleMeleeMiss(target, weapon);
@@ -418,45 +448,33 @@ void BasicAttack::performMeleeAttack(Character * target,
         this->handleMeleeHit(target, weapon);
         // Consume the stamina.
         actor->remStamina(consumedStamina, true);
-        // If the character has rolled a natural 20, then multiply the damage by two.
-        if (hitRoll == 20)
-        {
-            damageRoll *= 2;
-        }
-        // Add effects modifier.
-        hitRoll = SafeSum(hitRoll, actor->effects.getMeleeHitMod());
-        // Proceede and remove the damage from the health of the target.
+        // If the character has rolled a critical: multiply the damage by two.
+        if (isCritical) damageRoll *= 2;
+        // Proceed and remove the damage from the health of the target.
         if (!target->remHealth(damageRoll))
         {
             // Notify the others.
-            target->room->funcSendToAll(
-                "%s%s screams in pain and then die!%s\n",
-                [&](Character * character)
-                {
-                    return character != target;
-                },
+            target->room->sendToAll(
+                "%s%s screams in pain and then die!%s\n", {target},
                 Formatter::red(), target->getNameCapital(), Formatter::reset());
             // The target has received the damage and now it is dead.
             target->kill();
-            // Set to false the targetIsAlive flag.
-            targetIsAlive = false;
+            // Interrupt the function.
+            return;
         }
     }
-    if (targetIsAlive)
+    if (!target->combatHandler.hasOpponent(actor))
     {
-        if (!target->combatHandler.hasOpponent(actor))
+        target->combatHandler.addOpponent(actor);
+        if (target->getAction()->getType() != ActionType::Combat)
         {
-            target->combatHandler.addOpponent(actor);
-            if (target->getAction()->getType() != ActionType::Combat)
-            {
-                auto targetBasicAttack = std::make_shared<BasicAttack>(target);
-                target->actionQueue.push_front(targetBasicAttack);
-            }
+            target->actionQueue.push_front(
+                std::make_shared<BasicAttack>(target));
         }
-        if (!actor->combatHandler.hasOpponent(target))
-        {
-            actor->combatHandler.addOpponent(target);
-        }
+    }
+    if (!actor->combatHandler.hasOpponent(target))
+    {
+        actor->combatHandler.addOpponent(target);
     }
 }
 
@@ -464,15 +482,23 @@ void BasicAttack::performRangedAttack(Character * target,
                                       RangedWeaponItem * weapon,
                                       unsigned int attackNumber)
 {
+    // -------------------------------------------------------------------------
+    // Preamble: Evaluate all the values which are required by the function.
+    // -------------------------------------------------------------------------
     // Get the required stamina.
     auto consumedStamina = this->getConsumedStamina(actor, weapon);
-    // Check if the actor has enough stamina to execute the action.
+    // -------------------------------------------------------------------------
+    // Phase 1: Check if the actor has enough stamina to execute the action.
+    // -------------------------------------------------------------------------
     if (consumedStamina > actor->stamina)
     {
         actor->sendMsg("You are too tired to attack with %s.\n",
                        weapon->getName(true));
         return;
     }
+    // -------------------------------------------------------------------------
+    // Phase 2: Check if the ranged weapon has enough projectiles.
+    // -------------------------------------------------------------------------
     std::string error;
     auto projectile = weapon->retrieveProjectile(error);
     if (projectile == nullptr)
@@ -480,28 +506,46 @@ void BasicAttack::performRangedAttack(Character * target,
         actor->sendMsg(error + ".\n\n");
         return;
     }
-    // Natural roll for the hit rool.
-    auto hitRoll = TRandInteger<unsigned int>(1, 20);
-    // Check if:
+    // -------------------------------------------------------------------------
+    // Phase 3: Roll the hit and damage.
+    // -------------------------------------------------------------------------
+    // Evaluate the natural roll for the attack.
+    unsigned int hitRoll = TRandInteger<unsigned int>(1, 20);
+    // The amount of damage dealt.
+    unsigned int damageRoll = 0;
+    // Boolean variable which identifies if the hit is a critical hit.
+    bool isCritical = (hitRoll == 20);
+    // Apply the penalty due to multi-wield, check if:
     //  1. The number of already executed attacks is greater-than 0.
-    //  2. The value is NOT a natural 20 (hit).
-    if ((attackNumber > 0) && (hitRoll != 20))
+    //  2. The attack is not a critical hit.
+    if ((attackNumber > 0) && (!isCritical))
     {
         // Evaluate the penalty to the hit roll.
         unsigned int penalty = (attackNumber * 3);
         // Safely apply the penalty.
         hitRoll = (hitRoll < penalty) ? 0 : (hitRoll - penalty);
     }
-    // Add effects modifier.
-    hitRoll = SafeSum(hitRoll, actor->effects.getMeleeHitMod());
+    // Natural roll for the damage.
+    damageRoll = weapon->rollDamage();
+    // Apply the modifier to the hit roll with ranged weapons.
+    hitRoll = SafeSum(hitRoll, +actor->effects.getCombatModifier(
+        CombatModifier::IncreaseRangedWeaponHitRoll));
+    hitRoll = SafeSum(hitRoll, -actor->effects.getCombatModifier(
+        CombatModifier::DecreaseRangedWeaponHitRoll));
+    // Apply the modifier to the damage roll with ranged weapons.
+    damageRoll = SafeSum(damageRoll, +actor->effects.getCombatModifier(
+        CombatModifier::IncreaseRangedWeaponDamage));
+    damageRoll = SafeSum(damageRoll, -actor->effects.getCombatModifier(
+        CombatModifier::DecreaseRangedWeaponDamage));
+    // -------------------------------------------------------------------------
+    // Phase 3: Check if the target is hit.
+    // -------------------------------------------------------------------------
     // Evaluate the armor class of the aimed character.
     auto armorClass = target->getArmorClass();
-    // Flag used to check if the target is alive.
-    bool targetIsAlive = true;
     // Check if:
     //  1. The hit roll is lesser than the armor class of the opponent.
     //  2. The hit roll is not a natural 20.
-    if ((hitRoll < armorClass) && (hitRoll != 20))
+    if ((hitRoll < armorClass) && (!isCritical))
     {
         this->handleRangedMiss(target, weapon);
         // Consume half the stamina.
@@ -512,15 +556,9 @@ void BasicAttack::performRangedAttack(Character * target,
         this->handleRangedHit(target, weapon);
         // Consume the stamina.
         actor->remStamina(consumedStamina, true);
-        // Natural roll for the damage rool.
-        auto damageRoll = weapon->rollDamage();
-        // If the character has rolled a natural 20, then multiply the damage by two.
-        if (hitRoll == 20)
-        {
-            damageRoll *= 2;
-        }
-        // Add effects modifier.
-        damageRoll = SafeSum(damageRoll, actor->effects.getRangedHitMod());
+        // If the character has rolled a critical: multiply the damage by two.
+        if (isCritical) damageRoll *= 2;
+        // Proceed and remove the damage from the health of the target.
         if (!target->remHealth(damageRoll))
         {
             // Notify the others.
@@ -529,24 +567,22 @@ void BasicAttack::performRangedAttack(Character * target,
                 Formatter::red(), target->getNameCapital(), Formatter::reset());
             // The target has received the damage and now it is dead.
             target->kill();
-            // Set to false the targetIsAlive flag.
-            targetIsAlive = false;
         }
-    }
-    if (targetIsAlive)
-    {
-        if (!target->combatHandler.hasOpponent(actor))
+        else
         {
-            target->combatHandler.addOpponent(actor);
-            if (target->getAction()->getType() != ActionType::Combat)
+            if (!target->combatHandler.hasOpponent(actor))
             {
-                auto targetBasicAttack = std::make_shared<BasicAttack>(target);
-                target->actionQueue.push_front(targetBasicAttack);
+                target->combatHandler.addOpponent(actor);
+                if (target->getAction()->getType() != ActionType::Combat)
+                {
+                    target->actionQueue.push_front(
+                        std::make_shared<BasicAttack>(target));
+                }
             }
-        }
-        if (!actor->combatHandler.hasOpponent(target))
-        {
-            actor->combatHandler.addOpponent(target);
+            if (!actor->combatHandler.hasOpponent(target))
+            {
+                actor->combatHandler.addOpponent(target);
+            }
         }
     }
     // Check if it is the last projectile.

@@ -484,38 +484,31 @@ bool DoStatistics(Character * character, ArgumentHandler & /*args*/)
     msg += MAG("Affiliation : ") + player->faction->name + "\n";
     msg += MAG("Experience  : ") + ToString(player->experience) + " px\n";
     // Add the abilities.
+    // STRENGTH
     msg += MAG("    Str       ");
-    msg += ToString(player->getAbility(Ability::Strength, false)) + "(";
-    msg += ToString(player->effects.getAbilityModifier(Ability::Strength));
-    msg += ")[";
-    msg += ToString(player->getAbilityModifier(Ability::Strength)) + "]\n";
+    msg += ToString(player->getAbility(Ability::Strength)) + "(";
+    msg += ToString(player->getAbilityModifier(Ability::Strength)) + ")";
+    // AGILITY
     msg += MAG("    Agi       ");
-    msg += ToString(player->getAbility(Ability::Agility, false)) + "(";
-    msg += ToString(player->effects.getAbilityModifier(Ability::Agility));
-    msg += ")[";
-    msg += ToString(player->getAbilityModifier(Ability::Agility)) + "]\n";
+    msg += ToString(player->getAbility(Ability::Agility)) + "(";
+    msg += ToString(player->getAbilityModifier(Ability::Agility)) + ")";
+    // PERCEPTION
     msg += MAG("    Per       ");
-    msg += ToString(player->getAbility(Ability::Perception, false)) + "(";
-    msg += ToString(player->effects.getAbilityModifier(Ability::Perception));
-    msg += ")[";
-    msg += ToString(player->getAbilityModifier(Ability::Perception)) + "]\n";
+    msg += ToString(player->getAbility(Ability::Perception)) + "(";
+    msg += ToString(player->getAbilityModifier(Ability::Perception)) + ")";
+    // CONSTITUTION
     msg += MAG("    Con       ");
-    msg += ToString(player->getAbility(Ability::Constitution, false)) + "(";
-    msg += ToString(player->effects.getAbilityModifier(Ability::Constitution));
-    msg += ")[";
-    msg += ToString(player->getAbilityModifier(Ability::Constitution)) + "]\n";
+    msg += ToString(player->getAbility(Ability::Constitution)) + "(";
+    msg += ToString(player->getAbilityModifier(Ability::Constitution)) + ")";
+    // INTELLIGENCE
     msg += MAG("    Int       ");
-    msg += ToString(player->getAbility(Ability::Intelligence, false)) + "(";
-    msg += ToString(player->effects.getAbilityModifier(Ability::Intelligence));
-    msg += ")[";
-    // Add the health and the stamina.
-    msg += ToString(player->getAbilityModifier(Ability::Intelligence)) + "]\n";
+    msg += ToString(player->getAbility(Ability::Intelligence)) + "(";
+    msg += ToString(player->getAbilityModifier(Ability::Constitution)) + ")";
+    // HEALTH
     msg += MAG("    Health    ");
     msg += ToString(player->health) + "/" + ToString(player->getMaxHealth());
-    msg += "(" + ToString(player->effects.getHealthMod()) + ")\n";
     msg += MAG("    Stamina   ");
     msg += ToString(player->stamina) + "/" + ToString(player->getMaxStamina());
-    msg += "(" + ToString(player->effects.getHealthMod()) + ")\n";
     // Add the Armor Class.
     msg += MAG("Armor Class : ") + ToString(player->getArmorClass()) + "\n";
     // Add the health and stamina conditions.

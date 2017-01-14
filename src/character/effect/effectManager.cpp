@@ -23,10 +23,10 @@
 #include "effectManager.hpp"
 
 EffectManager::EffectManager() :
-    abilityModifier(),
-    combatModifier(),
-    statusModifier(),
-    knowledge(),
+    activeAbilityModifier(),
+    activeCombatModifier(),
+    activeStatusModifier(),
+    activeKnowledge(),
     activeEffects(),
     pendingEffects()
 {
@@ -40,100 +40,112 @@ EffectManager::~EffectManager()
 
 void EffectManager::forceAddEffect(const Effect & effect)
 {
-    bool present = false;
+    // First check if the same effect is already active.
     for (auto & iterator : pendingEffects)
     {
-        if (iterator.name == effect.name)
+        // Check the equality between the effects.
+        if (iterator == effect)
         {
+            // If the effect is already active, set the remaining time to the
+            // longest one.
             if (iterator.remainingTic < effect.remainingTic)
             {
                 iterator.remainingTic = effect.remainingTic;
             }
-            present = true;
-            break;
+            return;
         }
     }
-    if (!present)
-    {
-        activeEffects.push_back(effect);
-        this->sortList();
-    }
+    // Add the effect to the active effects.
+    activeEffects.push_back(effect);
+    // Activate the effect.
+    this->activateEffect(effect);
+    // Sort the list of active effects.
+    this->sortList();
 }
 
 void EffectManager::addPendingEffect(const Effect & effect)
 {
-    bool present = false;
+    // First check if the same effect is already in the pending queue.
     for (auto & iterator : pendingEffects)
     {
-        if (iterator.name == effect.name)
+        // Check the equality between the effects.
+        if (iterator == effect)
         {
+            // If the effect is already active, set the remaining time to the
+            // longest one.
             if (iterator.remainingTic < effect.remainingTic)
             {
                 iterator.remainingTic = effect.remainingTic;
             }
-            present = true;
-            break;
+            return;
         }
     }
-    if (!present)
-    {
-        pendingEffects.push_back(effect);
-        this->sortList();
-    }
+    // Add the effect to the pending effects.
+    pendingEffects.push_back(effect);
 }
 
 bool EffectManager::effectActivate(std::vector<std::string> & messages)
 {
-    for (auto & iterator : pendingEffects)
+    // Define a function which checks if an effect is already active.
+    auto CheckEffectPresence = [&](Effect & effect)
     {
-        bool present = false;
-        for (auto & iterator2 : activeEffects)
+        for (auto & activeEffect : activeEffects)
         {
-            if (iterator.name == iterator2.name)
+            if (effect == activeEffect)
             {
-                messages.push_back("An effect cannot be activated.");
-                present = true;
-                break;
+                return true;
             }
         }
-        if (!present)
+        return false;
+    };
+    // First check if the same effect is already active.
+    for (auto & pendingEffect : pendingEffects)
+    {
+        if (!CheckEffectPresence(pendingEffect))
         {
-            if (!iterator.messageActivate.empty())
+            if (!pendingEffect.messageActivate.empty())
             {
-                messages.push_back(iterator.messageActivate);
+                messages.push_back(pendingEffect.messageActivate);
             }
-            activeEffects.push_back(iterator);
+            // Add the effect to the active effects.
+            activeEffects.push_back(pendingEffect);
+            // Activate the effect.
+            this->activateEffect(pendingEffect);
+            // Sort the list of active effects.
             this->sortList();
         }
     }
+    // Empty out the list of pending effects.
     pendingEffects.clear();
     return !messages.empty();
 }
 
 bool EffectManager::effectUpdate(std::vector<std::string> & messages)
 {
-    for (auto it = activeEffects.begin(); it != activeEffects.end();)
+    // Iterate trough the active effects.
+    auto it = activeEffects.begin();
+    while (it != activeEffects.end())
     {
+        // If the effect is expired, remove it.
         if (it->update())
         {
+            // If the effect has an expiration message, add it to the list of
+            // output messages.
             if (!it->messageExpire.empty())
             {
                 messages.push_back(it->messageExpire);
             }
+            // Remove the effect from the list of active effects.
             it = activeEffects.erase(it);
+            // Deactivate the effect.
+            this->deactivateEffect(*it);
+            // Sort the list of active effects.
             this->sortList();
+            continue;
         }
-        else
-        {
-            ++it;
-        }
+        ++it;
     }
     return !messages.empty();
-}
-
-void EffectManager::sortList()
-{
-    std::sort(activeEffects.begin(), activeEffects.end(), std::less<Effect>());
 }
 
 std::vector<Effect>::iterator EffectManager::begin()
@@ -156,37 +168,71 @@ std::vector<Effect>::const_iterator EffectManager::end() const
     return activeEffects.end();
 }
 
-int EffectManager::getHealthMod() const
+int EffectManager::getAbilityModifier(const AbilityModifier & modifier) const
 {
+    auto it = activeAbilityModifier.find(modifier);
+    if (it != activeAbilityModifier.end())
+    {
+        return it->second;
+    }
     return 0;
 }
 
-int EffectManager::getStaminaMod() const
+int EffectManager::getCombatModifier(const CombatModifier & modifier) const
 {
+    auto it = activeCombatModifier.find(modifier);
+    if (it != activeCombatModifier.end())
+    {
+        return it->second;
+    }
     return 0;
 }
 
-int EffectManager::getMeleeHitMod() const
+int EffectManager::getStatusModifier(const StatusModifier & modifier) const
 {
+    auto it = activeStatusModifier.find(modifier);
+    if (it != activeStatusModifier.end())
+    {
+        return it->second;
+    }
     return 0;
 }
 
-int EffectManager::getMeleeDamMod() const
+bool EffectManager::getKnowledge(const Knowledge & knowledge) const
 {
-    return 0;
+    auto it = activeKnowledge.find(knowledge);
+    if (it != activeKnowledge.end())
+    {
+        return it->second;
+    }
+    return false;
 }
 
-int EffectManager::getRangedHitMod() const
+void EffectManager::activateEffect(const Effect & effect)
 {
-    return 0;
+    // Add the ability modifier of the effect to the pool.
+    activeAbilityModifier += effect.effectAbilityModifier;
+    // Add the combat modifier of the effect to the pool.
+    activeCombatModifier += effect.effectCombatModifier;
+    // Add the status modifier of the effect to the pool.
+    activeStatusModifier += effect.effectStatusModifier;
+    // Add the knowledge of the effect to the pool.
+    activeKnowledge += effect.effectKnowledge;
 }
 
-int EffectManager::getRangedDamMod() const
+void EffectManager::deactivateEffect(const Effect & effect)
 {
-    return 0;
+    // Remove the ability modifier of the effect to the pool.
+    activeAbilityModifier -= effect.effectAbilityModifier;
+    // Remove the combat modifier of the effect to the pool.
+    activeCombatModifier -= effect.effectCombatModifier;
+    // Remove the status modifier of the effect to the pool.
+    activeStatusModifier -= effect.effectStatusModifier;
+    // Remove the knowledge of the effect to the pool.
+    activeKnowledge -= effect.effectKnowledge;
 }
 
-int EffectManager::getAbilityModifier(const Ability &) const
+void EffectManager::sortList()
 {
-    return 0;
+    std::sort(activeEffects.begin(), activeEffects.end(), std::less<Effect>());
 }

@@ -29,13 +29,13 @@ class EffectManager
 {
 private:
     /// The overall ability modifier.
-    std::map<AbilityModifier, int> abilityModifier;
+    std::map<AbilityModifier, int> activeAbilityModifier;
     /// The overall combat modifier.
-    std::map<CombatModifier, int> combatModifier;
+    std::map<CombatModifier, int> activeCombatModifier;
     /// The overall status modifier.
-    std::map<StatusModifier, int> statusModifier;
+    std::map<StatusModifier, int> activeStatusModifier;
     /// The overall knowledge.
-    std::map<Knowledge, int> knowledge;
+    std::map<Knowledge, bool> activeKnowledge;
     /// The vector of active effects.
     std::vector<Effect> activeEffects;
     /// The vector of pending effects.
@@ -47,6 +47,9 @@ public:
 
     /// @brief Destructor.
     ~EffectManager();
+
+    // -------------------------------------------------------------------------
+    // Management functions
 
     /// @brief Allows to add an effect.
     /// @param effect The effect that has to be added.
@@ -71,8 +74,8 @@ public:
     ///         <b>False</b> otherwise.
     bool effectUpdate(std::vector<std::string> & messages);
 
-    /// @brief Sort the list of effects.
-    void sortList();
+    // -------------------------------------------------------------------------
+    // Iterators
 
     /// @brief Provides an iterator to the begin of the list of active effects.
     std::vector<Effect>::iterator begin();
@@ -88,34 +91,36 @@ public:
     ///         active effects.
     std::vector<Effect>::const_iterator end() const;
 
-    /// DEPRECATED
-public:
-    /// @brief Provides the overall health modifier.
-    /// @return The total modifier.
-    int getHealthMod() const;
+    /// @brief Retrieve the overall ability modifier.
+    /// @param modifier The modifier to retrieve.
+    /// @return The overall value of the given modifier.
+    int getAbilityModifier(const AbilityModifier & modifier) const;
 
-    /// @brief Provides the overall stamina modifier.
-    /// @return The total modifier.
-    int getStaminaMod() const;
+    /// @brief Retrieve the overall combat modifier.
+    /// @param modifier The modifier to retrieve.
+    /// @return The overall value of the given modifier.
+    int getCombatModifier(const CombatModifier & modifier) const;
 
-    /// @brief Provides the overall melee hit modifier.
-    /// @return The total modifier.
-    int getMeleeHitMod() const;
+    /// @brief Retrieve the overall status modifier.
+    /// @param modifier The modifier to retrieve.
+    /// @return The overall value of the given modifier.
+    int getStatusModifier(const StatusModifier & modifier) const;
 
-    /// @brief Provides the overall melee damage modifier.
-    /// @return The total modifier.
-    int getMeleeDamMod() const;
+    /// @brief Retrieve the knowledge.
+    /// @param knowledge The knowledge to retrieve.
+    /// @return The status of the given knowledge.
+    bool getKnowledge(const Knowledge & knowledge) const;
 
-    /// @brief Provides the overall ranged hit modifier.
-    /// @return The total modifier.
-    int getRangedHitMod() const;
+private:
 
-    /// @brief Provides the overall ranged damage modifier.
-    /// @return The total modifier.
-    int getRangedDamMod() const;
+    /// @brief Activate an effect by adding all the modifiers brought by the
+    /// effect.
+    void activateEffect(const Effect & effect);
 
-    /// @brief Provides the overall ability.
-    /// @param ability The ability.
-    /// @return The total modifier.
-    int getAbilityModifier(const Ability & ability) const;
+    /// @brief Deactivate an effect by removing all the modifiers brought by
+    /// the effect.
+    void deactivateEffect(const Effect & effect);
+
+    /// @brief Sort the list of active effects.
+    void sortList();
 };

@@ -132,6 +132,36 @@ unsigned int Ability::getModifier(const unsigned int & value)
     return (value - 10) / 2;
 }
 
+AbilityModifier Ability::getIncreaseModifier() const
+{
+    if (ability == Ability::Strength)
+        return AbilityModifier::IncreaseStrength;
+    if (ability == Ability::Agility)
+        return AbilityModifier::IncreaseAgility;
+    if (ability == Ability::Perception)
+        return AbilityModifier::IncreasePerception;
+    if (ability == Ability::Constitution)
+        return AbilityModifier::IncreaseConstitution;
+    if (ability == Ability::Intelligence)
+        return AbilityModifier::IncreaseIntelligence;
+    return AbilityModifier::None;
+}
+
+AbilityModifier Ability::getDecreaseModifier() const
+{
+    if (ability == Ability::Strength)
+        return AbilityModifier::DecreaseStrength;
+    if (ability == Ability::Agility)
+        return AbilityModifier::DecreaseAgility;
+    if (ability == Ability::Perception)
+        return AbilityModifier::DecreasePerception;
+    if (ability == Ability::Constitution)
+        return AbilityModifier::DecreaseConstitution;
+    if (ability == Ability::Intelligence)
+        return AbilityModifier::DecreaseIntelligence;
+    return AbilityModifier::None;
+}
+
 bool Ability::operator==(const Ability & rhs) const
 {
     return ability == rhs.ability;
