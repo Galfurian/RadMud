@@ -371,12 +371,14 @@ void Player::kill()
 
 void Player::enterGame()
 {
+    // -------------------------------------------------------------------------
+    // Phase 1: Clear the screen and show the welcome message.
     this->sendMsg(Formatter::clearScreen());
     // Greet them.
-    Character::sendMsg("%sWelcome, " + name + "!%s\n",
-                       Formatter::bold(),
+    Character::sendMsg("%sWelcome, %s!%s\n", Formatter::bold(), name,
                        Formatter::reset());
-    // Load the news.
+    // -------------------------------------------------------------------------
+    // Phase 2: Show the news.
     this->sendMsg("#---------------- Global News ----------------#\n");
     for (auto it = Mud::instance().mudNews.rbegin();
          it != Mud::instance().mudNews.rend(); ++it)
@@ -385,6 +387,8 @@ void Player::enterGame()
         this->sendMsg(it->second + "\n");
     }
     this->sendMsg("#---------------------------------------------#\n\n");
+    // -------------------------------------------------------------------------
+    // Phase 3: Place the player.
     this->sendMsg("You walked through the mist and came into the world...\n\n");
     // Notice all the players in the same room.
     if (room != nullptr)
@@ -395,14 +399,19 @@ void Player::enterGame()
     }
     else
     {
-        closeConnection();
+        this->closeConnection();
     }
-
     // Set the player as logged in.
     logged_in = true;
-
-    // New player looks around.
-    doCommand("look");
+    // -------------------------------------------------------------------------
+    // Phase 4: Activate the effects due to the skills.
+    for (auto skill : skills)
+    {
+        skill.first->updateSkillEffects(this);
+    }
+    // -------------------------------------------------------------------------
+    // Phase 5: Look around.
+    this->doCommand("look");
 }
 
 /// Size of buffers used for communications.

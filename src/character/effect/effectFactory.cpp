@@ -49,3 +49,9 @@ Effect EffectFactory::disturbedAim(Character * actor,
         std::make_pair(CombatModifier::DecreaseRangedWeaponHitRoll, magnitude));
     return effect;
 }
+
+Effect EffectFactory::skillEffect(Character * actor,
+                                  const std::string & skillName)
+{
+    return Effect(actor, skillName, 0, "", "", nullptr);
+}

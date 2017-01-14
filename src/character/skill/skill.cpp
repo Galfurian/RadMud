@@ -21,8 +21,9 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "skill.hpp"
-
-#include "logger.hpp"
+#include "effectManager.hpp"
+#include "effectFactory.hpp"
+#include "player.hpp"
 
 Skill::Skill() :
     vnum(),
@@ -55,4 +56,91 @@ bool Skill::check()
     assert(attribute > 0);
     assert(stage > 0);
     return true;
+}
+
+void Skill::updateSkillEffects(Player * player)
+{
+    // TODO: Determine the increment brought by each skill based on its rank.
+    // -------------------------------------------------------------------------
+    // Phase 1: Deactivate all the passive effects.
+    player->effects.removeAllPassiveEffect();
+    // -------------------------------------------------------------------------
+    // Phase 2: Activate all the passive effects due to the skills.
+    // Create a new skill effect.
+    auto skillEffect = EffectFactory::skillEffect(player, name);
+    // Iterate the player's skills.
+    for (auto it : player->skills)
+    {
+        // Save the skill.
+        auto skill = it.first;
+        // Save the skill rank.
+        auto skillRank = it.second;
+        // Iterate through the modifiers of the skill.
+        for (auto it2 : skill->abilityModifier)
+        {
+            // Skip the ability modifier if the rank is lower.
+            if (skillRank < it2.second) continue;
+            // Otherwise add the modifier based on the skill rank.
+            auto it3 = skillEffect.effectAbilityModifier.find(it2.first);
+            if (it3 == skillEffect.effectAbilityModifier.end())
+            {
+                skillEffect.effectAbilityModifier.insert(it2);
+            }
+            else
+            {
+                it3->second += 1;
+            }
+        }
+        // Iterate through the modifiers of the skill.
+        for (auto it2 : skill->combatModifier)
+        {
+            // Skip the ability modifier if the rank is lower.
+            if (skillRank < it2.second) continue;
+            // Otherwise add the modifier based on the skill rank.
+            auto it3 = skillEffect.effectCombatModifier.find(it2.first);
+            if (it3 == skillEffect.effectCombatModifier.end())
+            {
+                skillEffect.effectCombatModifier.insert(it2);
+            }
+            else
+            {
+                it3->second += 1;
+            }
+        }
+        // Iterate through the modifiers of the skill.
+        for (auto it2 : skill->statusModifier)
+        {
+            // Skip the ability modifier if the rank is lower.
+            if (skillRank < it2.second) continue;
+            // Otherwise add the modifier based on the skill rank.
+            auto it3 = skillEffect.effectStatusModifier.find(it2.first);
+            if (it3 == skillEffect.effectStatusModifier.end())
+            {
+                skillEffect.effectStatusModifier.insert(it2);
+            }
+            else
+            {
+                it3->second += 1;
+            }
+        }
+        // Iterate through the modifiers of the skill.
+        for (auto it2 : skill->knowledge)
+        {
+            // Skip the ability modifier if the rank is lower.
+            if (skillRank < it2.second) continue;
+            // Otherwise add the modifier based on the skill rank.
+            auto it3 = skillEffect.effectKnowledge.find(it2.first);
+            if (it3 == skillEffect.effectKnowledge.end())
+            {
+                skillEffect.effectKnowledge.insert(it2);
+            }
+            else
+            {
+                it3->second = true;
+            }
+        }
+    }
+    // -------------------------------------------------------------------------
+    // Phase 3: Add the passive effect to the player.
+    player->effects.addPassiveEffect(skillEffect);
 }

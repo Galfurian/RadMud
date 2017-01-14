@@ -28,7 +28,8 @@ EffectManager::EffectManager() :
     activeStatusModifier(),
     activeKnowledge(),
     activeEffects(),
-    pendingEffects()
+    pendingEffects(),
+    passiveEffects()
 {
     // Nothing to do.
 }
@@ -36,6 +37,58 @@ EffectManager::EffectManager() :
 EffectManager::~EffectManager()
 {
     // Nothing to do.
+}
+
+void EffectManager::addPassiveEffect(const Effect & effect)
+{
+    // First check if the same effect is already active.
+    for (auto & iterator : passiveEffects)
+    {
+        // Check the equality between the effects.
+        if (iterator == effect)
+        {
+            // If the effect is already active, set the remaining time to the
+            // longest one.
+            if (iterator.remainingTic < effect.remainingTic)
+            {
+                iterator.remainingTic = effect.remainingTic;
+            }
+            return;
+        }
+    }
+    // Add the effect to the active effects.
+    passiveEffects.push_back(effect);
+    // Activate the effect.
+    this->activateEffect(effect);
+}
+
+void EffectManager::removePassiveEffect(const Effect & effect)
+{
+    // Iterate trough the active effects.
+    for (auto it = passiveEffects.begin(); it != passiveEffects.end(); ++it)
+    {
+        if (it->name == effect.name)
+        {
+            // Deactivate the effect.
+            this->deactivateEffect(*it);
+            // Remove the effect from the list of active effects.
+            passiveEffects.erase(it);
+            // Stop the loop.
+            break;
+        }
+    }
+}
+
+void EffectManager::removeAllPassiveEffect()
+{
+    // Iterate trough the active effects.
+    for (auto it = passiveEffects.begin(); it != passiveEffects.end();)
+    {
+        // Deactivate the effect.
+        this->deactivateEffect(*it);
+        // Remove the effect from the list of active effects.
+        it = passiveEffects.erase(it);
+    }
 }
 
 void EffectManager::forceAddEffect(const Effect & effect)
@@ -135,10 +188,10 @@ bool EffectManager::effectUpdate(std::vector<std::string> & messages)
             {
                 messages.push_back(it->messageExpire);
             }
-            // Remove the effect from the list of active effects.
-            it = activeEffects.erase(it);
             // Deactivate the effect.
             this->deactivateEffect(*it);
+            // Remove the effect from the list of active effects.
+            it = activeEffects.erase(it);
             // Sort the list of active effects.
             this->sortList();
             continue;

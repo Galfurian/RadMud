@@ -210,16 +210,14 @@ bool LoadSkillPrerequisite(ResultSet * result)
         try
         {
             auto skillVnum = result->getNextInteger();
-            auto requiredSkillVnum = result->getNextInteger();
-            auto requiredLevel = result->getNextInteger();
-
             auto skill = Mud::instance().findSkill(skillVnum);
-            auto requiredSkill = Mud::instance().findSkill(requiredSkillVnum);
             if (skill == nullptr)
             {
                 throw SQLiteException("Can't find the skill " +
                                       ToString(skillVnum));
             }
+            auto requiredSkillVnum = result->getNextInteger();
+            auto requiredSkill = Mud::instance().findSkill(requiredSkillVnum);
             if (requiredSkill == nullptr)
             {
                 throw SQLiteException("Can't find the skill " +
@@ -227,6 +225,7 @@ bool LoadSkillPrerequisite(ResultSet * result)
                                       " required by the skill " +
                                       ToString(skillVnum));
             }
+            auto requiredLevel = result->getNextInteger();
             skill->requiredSkills.emplace_back(
                 std::make_pair(requiredSkill,
                                requiredLevel));
@@ -262,6 +261,10 @@ bool LoadSkillBenefit(ResultSet * result)
             auto ben1 = AbilityModifier(result->getNextUnsignedInteger());
             if (ben1 != AbilityModifier::None)
             {
+                // Add the ability modifier.
+                skill->abilityModifier.emplace_back(
+                    std::make_pair(ben1, requiredRank));
+                // Log it.
                 Logger::log(LogLevel::Debug,
                             "\t%s%s at level %s",
                             AlignString(skill->name, StringAlign::Left, 25),
@@ -271,6 +274,10 @@ bool LoadSkillBenefit(ResultSet * result)
             auto ben2 = StatusModifier(result->getNextUnsignedInteger());
             if (ben2 != StatusModifier::None)
             {
+                // Add the status modifier.
+                skill->statusModifier.emplace_back(
+                    std::make_pair(ben2, requiredRank));
+                // Log it.
                 Logger::log(LogLevel::Debug,
                             "\t%s%s at level %s",
                             AlignString(skill->name, StringAlign::Left, 25),
@@ -280,6 +287,10 @@ bool LoadSkillBenefit(ResultSet * result)
             auto ben3 = CombatModifier(result->getNextUnsignedInteger());
             if (ben3 != CombatModifier::None)
             {
+                // Add the combat modifier.
+                skill->combatModifier.emplace_back(
+                    std::make_pair(ben3, requiredRank));
+                // Log it.
                 Logger::log(LogLevel::Debug,
                             "\t%s%s at level %s",
                             AlignString(skill->name, StringAlign::Left, 25),
@@ -289,6 +300,10 @@ bool LoadSkillBenefit(ResultSet * result)
             auto ben4 = Knowledge(result->getNextUnsignedInteger());
             if (ben4 != Knowledge::None)
             {
+                // Add the knowledge.
+                skill->knowledge.emplace_back(
+                    std::make_pair(ben4, requiredRank));
+                // Log it.
                 Logger::log(LogLevel::Debug,
                             "\t%s%s at level %s",
                             AlignString(skill->name, StringAlign::Left, 25),

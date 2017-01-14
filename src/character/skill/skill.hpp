@@ -31,6 +31,8 @@
 #include "statusModifier.hpp"
 #include "knowledge.hpp"
 
+class Player;
+
 /// @brief Holds details about a skill.
 class Skill
 {
@@ -47,13 +49,14 @@ public:
     int stage;
     /// The list of required skills.
     std::vector<std::pair<std::shared_ptr<Skill>, int>> requiredSkills;
-    /// The list of abilities modifiers.
+    /// The list of abilities modifiers and the rank at which they became
+    /// activate.
     std::vector<std::pair<AbilityModifier, int>> abilityModifier;
-    /// The list of combat modifiers.
+    /// The list of combat modifiers and the rank at which they became activate.
     std::vector<std::pair<CombatModifier, int>> combatModifier;
-    /// The list of status modifiers.
+    /// The list of status modifiers and the rank at which they became activate.
     std::vector<std::pair<StatusModifier, int>> statusModifier;
-    /// The list of knowledge.
+    /// The list of knowledge and the rank at which they became activate.
     std::vector<std::pair<Knowledge, int>> knowledge;
 
     /// @brief Constructor.
@@ -78,4 +81,7 @@ public:
     /// @return <b>True</b> if it has correct values,<br>
     ///         <b>False</b> otherwise.
     bool check();
+
+    /// @brief Activate the effects on the player based on its skill ranks.
+    void updateSkillEffects(Player * player);
 };

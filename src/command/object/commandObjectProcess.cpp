@@ -22,6 +22,7 @@
 #include "commandObjectProcess.hpp"
 #include "corpseItem.hpp"
 #include "command.hpp"
+#include "player.hpp"
 #include "room.hpp"
 
 bool DoDismember(Character * character, ArgumentHandler & args)
@@ -34,6 +35,19 @@ bool DoDismember(Character * character, ArgumentHandler & args)
     }
     // Stop any action the character is executing.
     StopAction(character);
+    // If the character is a Player, check if the character has the required
+    // knowledge.
+    if (character->isPlayer())
+    {
+        // Transform the character to player.
+        auto player = character->toPlayer();
+        // Check if the player can butcher animals.
+        if (!player->effects.getKnowledge(Knowledge::ButcherAnimal))
+        {
+            character->sendMsg("You don't know how to dismember corpses.\n");
+            return false;
+        }
+    }
     // Check the arguments.
     if (args.size() != 1)
     {

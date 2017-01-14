@@ -56,4 +56,6 @@ public:
     static Effect disturbedAim(Character * actor,
                                const unsigned int & duration,
                                const int & magnitude);
+
+    static Effect skillEffect(Character * actor, const std::string & skillName);
 };

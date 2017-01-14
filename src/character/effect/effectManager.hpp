@@ -40,6 +40,8 @@ private:
     std::vector<Effect> activeEffects;
     /// The vector of pending effects.
     std::vector<Effect> pendingEffects;
+    /// The vector of passive effects.
+    std::vector<Effect> passiveEffects;
 
 public:
     /// @brief Constructor.
@@ -50,6 +52,17 @@ public:
 
     // -------------------------------------------------------------------------
     // Management functions
+
+    /// @brief Allows to add a passive effect.
+    /// @param effect The effect that has to be added.
+    void addPassiveEffect(const Effect & effect);
+
+    /// @brief Allows to remove a passive effect.
+    /// @param effect The effect that has to be added.
+    void removePassiveEffect(const Effect & effect);
+
+    /// @brief Allows to remove all the passive effects.
+    void removeAllPassiveEffect();
 
     /// @brief Allows to add an effect.
     /// @param effect The effect that has to be added.
