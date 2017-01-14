@@ -64,6 +64,8 @@ SQLiteDbms::SQLiteDbms() :
     loaders.push_back(TableLoader("SkillPrerequisite", LoadSkillPrerequisite));
     loaders.push_back(TableLoader("SkillBenefit", LoadSkillBenefit));
     loaders.push_back(TableLoader("BodyPartResources", LoadBodyPartResources));
+    loaders.push_back(TableLoader("RaceBaseSkill", LoadRaceBaseSkill));
+    loaders.push_back(TableLoader("RaceBaseAbility", LoadRaceBaseAbility));
 }
 
 SQLiteDbms::~SQLiteDbms()

@@ -68,6 +68,12 @@ bool LoadRaceBodyPart(ResultSet * result);
 /// @brief Function used to load corpses associated to races.
 bool LoadRaceCorpse(ResultSet * result);
 
+/// @brief Function used to load the base skills of a race.
+bool LoadRaceBaseSkill(ResultSet * result);
+
+/// @brief Function used to load the base abilities of a race.
+bool LoadRaceBaseAbility(ResultSet * result);
+
 /// @brief Function used to retrieve information about all the mobiles.
 bool LoadMobile(ResultSet * result);
 

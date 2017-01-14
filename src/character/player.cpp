@@ -198,6 +198,18 @@ bool Player::remEquipmentItem(Item * item)
     return false;
 }
 
+void Player::initialize()
+{
+    level = 0;
+    experience = 0;
+    flags = 0;
+    rent_room = 1000;
+    for (auto it : race->baseSkills)
+    {
+        skills.emplace_back(it);
+    }
+}
+
 int Player::getSocket() const
 {
     return psocket;

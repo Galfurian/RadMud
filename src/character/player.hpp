@@ -115,6 +115,8 @@ public:
 
     bool remEquipmentItem(Item * item) override;
 
+    void initialize();
+
     /// @brief Return player socket.
     /// @return Player sockec.
     int getSocket() const;

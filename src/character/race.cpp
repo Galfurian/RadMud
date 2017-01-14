@@ -30,13 +30,13 @@ Race::Race() :
     name(),
     description(),
     abilities(),
-    availableFaction(),
     player_allow(),
     tileSet(),
     tileId(),
     corpse(),
     naturalWeapon(),
-    bodyParts()
+    bodyParts(),
+    baseSkills()
 {
     // Nothing to do.
 }
@@ -68,46 +68,6 @@ std::string Race::getShortDescription(bool capital)
     return shortDescription;
 }
 
-bool Race::setAbilities(std::string source)
-{
-    // Check if it is received an empty string.
-    if (source.empty()) return false;
-    // Split the string.
-    std::vector<std::string> abilityList = SplitString(source, ";");
-    // Check if the number of chunks is correct.
-    if (abilityList.size() != 5) return false;
-    // For each chunk set the ability value.
-    for (unsigned int it = 0; it < abilityList.size(); ++it)
-    {
-        auto ability = Ability(it);
-        if (ability == Ability::None) return false;
-        abilities[ability] = ToNumber<unsigned int>(abilityList[it]);
-    }
-    return true;
-}
-
-bool Race::setAvailableFactions(const std::string & source)
-{
-    // Check if it is received an empty string.
-    if (source.empty()) return true;
-    // Split the string.
-    std::vector<std::string> factionList = SplitString(source, ";");
-    // Check if the number of chunks is correct.
-    if (factionList.empty()) return false;
-    // For each chunk add the faction.
-    for (auto it : factionList)
-    {
-        Faction * faction = Mud::instance().findFaction(ToNumber<int>(it));
-        if (faction == nullptr)
-        {
-            Logger::log(LogLevel::Error, "Can't find the faction: %s.", it);
-            return false;
-        }
-        availableFaction.push_back(faction);
-    }
-    return true;
-}
-
 unsigned int Race::getAbility(const Ability & ability) const
 {
     for (auto it : abilities)
@@ -129,18 +89,6 @@ unsigned int Race::getAbilityLua(const unsigned int & abilityNumber)
     return 0;
 }
 
-bool Race::factionAllowed(int factionVnum)
-{
-    for (auto it : availableFaction)
-    {
-        if (it->vnum == factionVnum)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
 void Race::luaRegister(lua_State * L)
 {
     luabridge::getGlobalNamespace(L)
@@ -148,7 +96,6 @@ void Race::luaRegister(lua_State * L)
         .addData("vnum", &Race::vnum)
         .addData("name", &Race::name)
         .addFunction("getAbility", &Race::getAbilityLua)
-        .addData("available_faction", &Race::availableFaction)
         .endClass();
 }
 

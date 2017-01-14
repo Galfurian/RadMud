@@ -40,11 +40,9 @@ bool ProcessNewConfirm::process(Character * character, ArgumentHandler & args)
     }
     else if (ToLower(input) == "confirm")
     {
-        // Set the last variables.
-        player->level = 0;
-        player->experience = 0;
-        player->flags = 0;
-        player->rent_room = 1000;
+        // Initialize the player.
+        player->initialize();
+        // Update the player on the database.
         SQLiteDbms::instance().beginTransaction();
         if (player->updateOnDB())
         {

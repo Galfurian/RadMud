@@ -230,6 +230,11 @@ bool LoadSkillPrerequisite(ResultSet * result)
             skill->requiredSkills.emplace_back(
                 std::make_pair(requiredSkill,
                                requiredLevel));
+            Logger::log(LogLevel::Debug,
+                        "\t%s requires %s at level %s",
+                        AlignString(skill->name, StringAlign::Left, 25),
+                        AlignString(requiredSkill->name, StringAlign::Left, 25),
+                        requiredLevel);
         }
         catch (SQLiteException & e)
         {
@@ -258,36 +263,36 @@ bool LoadSkillBenefit(ResultSet * result)
             if (ben1 != AbilityModifier::None)
             {
                 Logger::log(LogLevel::Debug,
-                            "%s %s at %s",
-                            skill->name,
-                            ben1.toString(),
+                            "\t%s%s at level %s",
+                            AlignString(skill->name, StringAlign::Left, 25),
+                            AlignString(ben1.toString(), StringAlign::Left, 35),
                             requiredRank);
             }
             auto ben2 = StatusModifier(result->getNextUnsignedInteger());
             if (ben2 != StatusModifier::None)
             {
                 Logger::log(LogLevel::Debug,
-                            "%s %s at %s",
-                            skill->name,
-                            ben2.toString(),
+                            "\t%s%s at level %s",
+                            AlignString(skill->name, StringAlign::Left, 25),
+                            AlignString(ben2.toString(), StringAlign::Left, 35),
                             requiredRank);
             }
             auto ben3 = CombatModifier(result->getNextUnsignedInteger());
             if (ben3 != CombatModifier::None)
             {
                 Logger::log(LogLevel::Debug,
-                            "%s %s at %s",
-                            skill->name,
-                            ben3.toString(),
+                            "\t%s%s at level %s",
+                            AlignString(skill->name, StringAlign::Left, 25),
+                            AlignString(ben3.toString(), StringAlign::Left, 35),
                             requiredRank);
             }
             auto ben4 = Knowledge(result->getNextUnsignedInteger());
             if (ben4 != Knowledge::None)
             {
                 Logger::log(LogLevel::Debug,
-                            "%s allows to %s at %s",
-                            skill->name,
-                            ben4.toString(),
+                            "\t%s%s at level %s",
+                            AlignString(skill->name, StringAlign::Left, 25),
+                            AlignString(ben4.toString(), StringAlign::Left, 35),
                             requiredRank);
             }
         }
@@ -412,11 +417,6 @@ bool LoadRace(ResultSet * result)
             race->article = result->getNextString();
             race->name = result->getNextString();
             race->description = result->getNextString();
-            race->setAbilities(result->getNextString());
-            if (!race->setAvailableFactions(result->getNextString()))
-            {
-                throw SQLiteException("Error when setting race factions.");
-            }
             race->player_allow = result->getNextInteger();
             race->tileSet = result->getNextInteger();
             race->tileId = result->getNextInteger();
@@ -448,12 +448,26 @@ bool LoadRaceBodyPart(ResultSet * result)
     {
         try
         {
-            auto race = Mud::instance().findRace(result->getNextInteger());
-            auto bodyPart = Mud::instance().findBodyPart(
-                result->getNextUnsignedInteger());
-            assert(race != nullptr);
-            assert(bodyPart != nullptr);
+            auto raceVnum = result->getNextInteger();
+            auto race = Mud::instance().findRace(raceVnum);
+            if (race == nullptr)
+            {
+                throw SQLiteException("Cannot find the race " +
+                                      ToString(raceVnum));
+            }
+            auto bodyPartVnum = result->getNextUnsignedInteger();
+            auto bodyPart = Mud::instance().findBodyPart(bodyPartVnum);
+            if (bodyPart == nullptr)
+            {
+                throw SQLiteException("Cannot find the body part " +
+                                      ToString(bodyPartVnum));
+            }
+            // Add the body part to the race.
             race->bodyParts.emplace_back(bodyPart);
+            // Log the body part.
+            Logger::log(LogLevel::Debug, "\t%s%s",
+                        AlignString(race->name, StringAlign::Left, 25),
+                        AlignString(bodyPart->name, StringAlign::Left, 25));
         }
         catch (SQLiteException & e)
         {
@@ -475,7 +489,7 @@ bool LoadRaceCorpse(ResultSet * result)
             if (race == nullptr)
             {
                 throw SQLiteException("Cannot find the race " +
-                                      ToString(raceVnum) + " for a corpse.");
+                                      ToString(raceVnum));
             }
             auto corpse = std::make_shared<CorpseModel>();
             corpse->vnum = 0;
@@ -505,6 +519,84 @@ bool LoadRaceCorpse(ResultSet * result)
             }
             corpse->corpseComposition = corpseComposition;
             race->corpse = corpse;
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadRaceBaseSkill(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto raceVnum = result->getNextInteger();
+            auto race = Mud::instance().findRace(raceVnum);
+            if (race == nullptr)
+            {
+                throw SQLiteException("Cannot find the race " +
+                                      ToString(raceVnum));
+            }
+            auto skillVnum = result->getNextInteger();
+            auto skill = Mud::instance().findSkill(skillVnum);
+            if (skill == nullptr)
+            {
+                throw SQLiteException("Cannot find the skill " +
+                                      ToString(skillVnum));
+            }
+            auto rank = result->getNextInteger();
+            // Set the base skill of the race.
+            race->baseSkills.emplace_back(std::make_pair(skill, rank));
+            // Log the skill.
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s%s",
+                        AlignString(race->name, StringAlign::Left, 25),
+                        AlignString(skill->name, StringAlign::Left, 25),
+                        rank);
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadRaceBaseAbility(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto raceVnum = result->getNextInteger();
+            auto race = Mud::instance().findRace(raceVnum);
+            if (race == nullptr)
+            {
+                throw SQLiteException("Cannot find the race " +
+                                      ToString(raceVnum));
+            }
+            auto abilityVnum = result->getNextUnsignedInteger();
+            auto ability = Ability(abilityVnum);
+            if (ability == Ability::None)
+            {
+                throw SQLiteException("Cannot find the ability " +
+                                      ToString(abilityVnum));
+            }
+            auto value = result->getNextUnsignedInteger();
+            // Set the base ability value of the race.
+            race->abilities[ability] = value;
+            // Log the ability.
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s%s",
+                        AlignString(race->name, StringAlign::Left, 25),
+                        AlignString(ability.toString(), StringAlign::Left, 25),
+                        value);
         }
         catch (SQLiteException & e)
         {

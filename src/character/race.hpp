@@ -30,6 +30,7 @@
 #include "corpseModel.hpp"
 #include "ability.hpp"
 #include "faction.hpp"
+#include "skill.hpp"
 
 class Material;
 
@@ -47,8 +48,6 @@ public:
     std::string description;
     /// Base race abilities.
     std::map<Ability, unsigned int> abilities;
-    /// The factions that a player of this race can choose.
-    std::vector<Faction *> availableFaction;
     /// The flag that indicates if the race is selectable by the player during
     ///  character creation.
     bool player_allow;
@@ -62,6 +61,8 @@ public:
     std::string naturalWeapon;
     /// The list of body parts.
     std::vector<std::shared_ptr<BodyPart>> bodyParts;
+    /// Base skills rank.map<
+    std::vector<std::pair<std::shared_ptr<Skill>, int>> baseSkills;
 
     /// @brief Constructor.
     Race();
@@ -91,20 +92,6 @@ public:
     /// @return The short description.
     std::string getShortDescription(bool capital = false);
 
-    /// @brief Given a source string, this function parse the string
-    ///         and sets the race abilities.
-    /// @param source Contains the list of abilities.
-    /// @return <b>True</b> if the operation succeeded,<br>
-    ///         <b>False</b> otherwise.
-    bool setAbilities(std::string source);
-
-    /// @brief Given a source string, this function parse the string
-    ///         and sets the list of available factions for this race.
-    /// @param source Contains the list of available factions.
-    /// @return <b>True</b> if the operation succeeded,<br>
-    ///         <b>False</b> otherwise.
-    bool setAvailableFactions(const std::string & source);
-
     /// @brief Provides the value of the given ability.
     /// @param ability The ability to retrieve.
     /// @return The overall ability value.
@@ -114,11 +101,6 @@ public:
     /// @param abilityNumber The ability to retrieve.
     /// @return The overall ability value (if not valid it returns 0).
     unsigned int getAbilityLua(const unsigned int & abilityNumber);
-
-    /// @brief Checks if the given faction is compatible with this race.
-    /// @param factionVnum The given faction vnum.
-    /// @return If the faction is compatible.
-    bool factionAllowed(int factionVnum);
 
     /// @brief Function used to register inside the lua environment the class.
     /// @param L The lua environment.
