@@ -24,15 +24,17 @@
 
 #include "logger.hpp"
 
-#include <cassert>
-
 Skill::Skill() :
     vnum(),
     name(),
     description(),
     attribute(),
     stage(),
-    requiredSkills()
+    requiredSkills(),
+    abilityModifier(),
+    combatModifier(),
+    statusModifier(),
+    knowledge()
 {
     // Nothing to do.
 }

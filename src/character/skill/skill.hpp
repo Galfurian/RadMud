@@ -26,6 +26,10 @@
 #include <vector>
 #include <memory>
 #include <map>
+#include "abilityModifier.hpp"
+#include "combatModifier.hpp"
+#include "statusModifier.hpp"
+#include "knowledge.hpp"
 
 /// @brief Holds details about a skill.
 class Skill
@@ -43,6 +47,14 @@ public:
     int stage;
     /// The list of required skills.
     std::vector<std::pair<std::shared_ptr<Skill>, int>> requiredSkills;
+    /// The list of abilities modifiers.
+    std::vector<std::pair<AbilityModifier, int>> abilityModifier;
+    /// The list of combat modifiers.
+    std::vector<std::pair<CombatModifier, int>> combatModifier;
+    /// The list of status modifiers.
+    std::vector<std::pair<StatusModifier, int>> statusModifier;
+    /// The list of knowledge.
+    std::vector<std::pair<Knowledge, int>> knowledge;
 
     /// @brief Constructor.
     Skill();

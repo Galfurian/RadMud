@@ -61,7 +61,8 @@ SQLiteDbms::SQLiteDbms() :
     loaders.push_back(TableLoader("ModelBodyPart", LoadModelBodyPart));
     loaders.push_back(TableLoader("Mobile", LoadMobile));
     loaders.push_back(TableLoader("Skill", LoadSkill));
-    loaders.push_back(TableLoader("SkillRequirements", LoadSkillRequirements));
+    loaders.push_back(TableLoader("SkillPrerequisite", LoadSkillPrerequisite));
+    loaders.push_back(TableLoader("SkillBenefit", LoadSkillBenefit));
     loaders.push_back(TableLoader("BodyPartResources", LoadBodyPartResources));
 }
 

@@ -203,7 +203,7 @@ bool LoadSkill(ResultSet * result)
     return true;
 }
 
-bool LoadSkillRequirements(ResultSet * result)
+bool LoadSkillPrerequisite(ResultSet * result)
 {
     while (result->next())
     {
@@ -230,6 +230,66 @@ bool LoadSkillRequirements(ResultSet * result)
             skill->requiredSkills.emplace_back(
                 std::make_pair(requiredSkill,
                                requiredLevel));
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadSkillBenefit(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto skillVnum = result->getNextInteger();
+            auto skill = Mud::instance().findSkill(skillVnum);
+            if (skill == nullptr)
+            {
+                throw SQLiteException("Can't find the skill " +
+                                      ToString(skillVnum));
+            }
+            auto requiredRank = result->getNextInteger();
+            auto ben1 = AbilityModifier(result->getNextUnsignedInteger());
+            if (ben1 != AbilityModifier::None)
+            {
+                Logger::log(LogLevel::Debug,
+                            "%s %s at %s",
+                            skill->name,
+                            ben1.toString(),
+                            requiredRank);
+            }
+            auto ben2 = StatusModifier(result->getNextUnsignedInteger());
+            if (ben2 != StatusModifier::None)
+            {
+                Logger::log(LogLevel::Debug,
+                            "%s %s at %s",
+                            skill->name,
+                            ben2.toString(),
+                            requiredRank);
+            }
+            auto ben3 = CombatModifier(result->getNextUnsignedInteger());
+            if (ben3 != CombatModifier::None)
+            {
+                Logger::log(LogLevel::Debug,
+                            "%s %s at %s",
+                            skill->name,
+                            ben3.toString(),
+                            requiredRank);
+            }
+            auto ben4 = Knowledge(result->getNextUnsignedInteger());
+            if (ben4 != Knowledge::None)
+            {
+                Logger::log(LogLevel::Debug,
+                            "%s allows to %s at %s",
+                            skill->name,
+                            ben4.toString(),
+                            requiredRank);
+            }
         }
         catch (SQLiteException & e)
         {
