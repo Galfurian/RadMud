@@ -119,7 +119,7 @@ bool DoProfession(Character * character,
     if (craftAction->check(error))
     {
         // Set the new action.
-        character->setAction(craftAction);
+        character->pushAction(craftAction);
         // Send the messages.
         character->sendMsg(
             "%s %s.\n",
@@ -240,7 +240,7 @@ bool DoBuild(Character * character, ArgumentHandler & args)
     if (buildAction->check(error))
     {
         // Set the new action.
-        character->setAction(buildAction);
+        character->pushAction(buildAction);
         character->sendMsg(
             "You start building %s.\n",
             Formatter::yellow() + schematics->buildingModel->getName() +

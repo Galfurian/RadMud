@@ -42,6 +42,7 @@
 #include "characterContainer.hpp"
 
 #include <deque>
+#include <mutex>
 
 class Room;
 
@@ -306,7 +307,7 @@ public:
 
     /// @brief Allows to set an action.
     /// @param _action The action that has to be set.
-    void setAction(const std::shared_ptr<GeneralAction> & _action);
+    void pushAction(const std::shared_ptr<GeneralAction> & _action);
 
     /// @brief Provides a pointer to the action at the front position and
     ///         then remove it from the queue.
@@ -314,6 +315,9 @@ public:
 
     /// @brief Provides a pointer to the current action.
     std::shared_ptr<GeneralAction> & getAction();
+
+    /// @brief Allows to reset the entire action queue.
+    void resetActionQueue();
 
     /// @brief Move the character to another room.
     /// @param destination Destination room.

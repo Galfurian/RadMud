@@ -159,7 +159,7 @@ ActionStatus BasicAttack::perform()
                 if (chaseAction->check(error))
                 {
                     // Add the action.
-                    actor->setAction(chaseAction);
+                    actor->pushAction(chaseAction);
                     // Return that the action is still running.
                     return ActionStatus::Running;
                 }
@@ -468,7 +468,7 @@ void BasicAttack::performMeleeAttack(Character * target,
         target->combatHandler.addOpponent(actor);
         if (target->getAction()->getType() != ActionType::Combat)
         {
-            target->setAction(std::make_shared<BasicAttack>(target));
+            target->pushAction(std::make_shared<BasicAttack>(target));
         }
     }
     if (!actor->combatHandler.hasOpponent(target))
@@ -574,7 +574,7 @@ void BasicAttack::performRangedAttack(Character * target,
                 target->combatHandler.addOpponent(actor);
                 if (target->getAction()->getType() != ActionType::Combat)
                 {
-                    target->setAction(std::make_shared<BasicAttack>(target));
+                    target->pushAction(std::make_shared<BasicAttack>(target));
                 }
             }
             if (!actor->combatHandler.hasOpponent(target))

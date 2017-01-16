@@ -84,7 +84,7 @@ bool DoDirection(Character * character, Direction direction)
     if (moveAction->check(error))
     {
         // Set the new action.
-        character->setAction(moveAction);
+        character->pushAction(moveAction);
         // Calculate the time needed to move.
         if (character->posture == CharacterPosture::Stand)
         {

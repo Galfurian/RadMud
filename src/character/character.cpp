@@ -52,9 +52,8 @@ Character::Character() :
     actionQueueMutex(),
     inputProcessor(std::make_shared<ProcessInput>())
 {
-    // Push the Wait action on the action queue.
-    std::lock_guard<std::mutex> lock(actionQueueMutex);
-    actionQueue.push_front(std::make_shared<GeneralAction>(this));
+    // Initialize the action queue.
+    this->resetActionQueue();
 }
 
 Character::~Character()
@@ -530,7 +529,7 @@ int Character::getViewDistance() const
     return 4 + static_cast<int>(this->getAbilityLog(Ability::Perception));
 }
 
-void Character::setAction(const std::shared_ptr<GeneralAction> & _action)
+void Character::pushAction(const std::shared_ptr<GeneralAction> & _action)
 {
     std::lock_guard<std::mutex> lock(actionQueueMutex);
     if (_action->getType() != ActionType::Wait)
@@ -549,6 +548,13 @@ std::shared_ptr<GeneralAction> & Character::getAction()
 {
     std::lock_guard<std::mutex> lock(actionQueueMutex);
     return actionQueue.front();
+}
+
+void Character::resetActionQueue()
+{
+    std::lock_guard<std::mutex> lock(actionQueueMutex);
+    actionQueue.clear();
+    actionQueue.emplace_back(std::make_shared<GeneralAction>(this));
 }
 
 void Character::moveTo(
@@ -1378,7 +1384,7 @@ void Character::kill()
         corpse->putInside(item);
     }
     // Reset the action of the character.
-    this->setAction(std::make_shared<GeneralAction>(this));
+    this->resetActionQueue();
     // Reset the list of opponents.
     this->combatHandler.resetList();
     // Remove the character from the current room.
