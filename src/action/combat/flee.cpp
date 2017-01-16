@@ -141,7 +141,7 @@ ActionStatus Flee::perform()
         }
     }
     // Reset the cooldown.
-    actor->action->resetCooldown(BasicAttack::getCooldown(actor));
+    actor->getAction()->resetCooldown(BasicAttack::getCooldown(actor));
     // Return that the action is still running.
     return ActionStatus::Running;
 }

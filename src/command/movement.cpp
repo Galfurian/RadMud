@@ -133,9 +133,9 @@ bool DoTravel(Character * character, ArgumentHandler & /*args*/)
 
 bool DoStop(Character * character, ArgumentHandler & /*args*/)
 {
-    if (character->action->getType() != ActionType::Combat)
+    if (character->getAction()->getType() != ActionType::Combat)
     {
-        character->sendMsg(character->action->stop() + "\n");
+        character->sendMsg(character->getAction()->stop() + "\n");
         return true;
     }
     return false;

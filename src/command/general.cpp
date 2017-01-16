@@ -538,10 +538,10 @@ bool DoStatistics(Character * character, ArgumentHandler & /*args*/)
     // Add the posture.
     msg += "You are " + BLD(player->posture.getAction()) + ".\n\n";
     // [IF EXIST] Add the current action.
-    if (player->action->getType() != ActionType::Wait)
+    if (player->getAction()->getType() != ActionType::Wait)
     {
         msg += "You are ";
-        msg += BLD(player->action->getDescription());
+        msg += BLD(player->getAction()->getDescription());
         msg += ".\n";
     }
     // [IF EXIST] Add the current opponent.

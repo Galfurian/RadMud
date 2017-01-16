@@ -116,7 +116,9 @@ public:
     /// List of opponents.
     CombatHandler combatHandler;
     /// Character current action.
-    std::shared_ptr<GeneralAction> action;
+    std::deque<std::shared_ptr<GeneralAction>> actionQueue;
+    /// mutex for the action queue.
+    mutable std::mutex actionQueueMutex;
     /// The input handler.
     std::shared_ptr<ProcessInput> inputProcessor;
 
@@ -309,6 +311,9 @@ public:
     /// @brief Provides a pointer to the action at the front position and
     ///         then remove it from the queue.
     void popAction();
+
+    /// @brief Provides a pointer to the current action.
+    std::shared_ptr<GeneralAction> & getAction();
 
     /// @brief Move the character to another room.
     /// @param destination Destination room.

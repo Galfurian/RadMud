@@ -176,7 +176,7 @@ ActionStatus BasicAttack::perform()
         actor->sendMsg("Try to get closer to your enemy.\n\n");
     }
     // Reset the cooldown.
-    actor->action->resetCooldown(CombatAction::getCooldown(actor));
+    actor->getAction()->resetCooldown(CombatAction::getCooldown(actor));
     // Return that the action is still running.
     return ActionStatus::Running;
 }
@@ -466,7 +466,7 @@ void BasicAttack::performMeleeAttack(Character * target,
     if (!target->combatHandler.hasOpponent(actor))
     {
         target->combatHandler.addOpponent(actor);
-        if (target->action->getType() != ActionType::Combat)
+        if (target->getAction()->getType() != ActionType::Combat)
         {
             target->setAction(std::make_shared<BasicAttack>(target));
         }
@@ -572,7 +572,7 @@ void BasicAttack::performRangedAttack(Character * target,
             if (!target->combatHandler.hasOpponent(actor))
             {
                 target->combatHandler.addOpponent(actor);
-                if (target->action->getType() != ActionType::Combat)
+                if (target->getAction()->getType() != ActionType::Combat)
                 {
                     target->setAction(std::make_shared<BasicAttack>(target));
                 }

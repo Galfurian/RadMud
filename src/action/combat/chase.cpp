@@ -208,7 +208,7 @@ ActionStatus Chase::perform()
         }
     }
     // Reset the cooldown.
-    actor->action->resetCooldown(Chase::getCooldown(actor));
+    actor->getAction()->resetCooldown(Chase::getCooldown(actor));
     // Return that the action is still running.
     return ActionStatus::Running;
 }

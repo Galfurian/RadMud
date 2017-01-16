@@ -79,7 +79,7 @@ bool ProcessInput::process(Character * character, ArgumentHandler & args)
             // Check if the command can be used in combat and if the
             //  character is actually in combat.
             if ((!iterator->canUseInCombat) &&
-                (character->action->getType() == ActionType::Combat))
+                (character->getAction()->getType() == ActionType::Combat))
             {
                 character->sendMsg("You cannot do that in combat.\n");
                 break;

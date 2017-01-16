@@ -48,10 +48,13 @@ Character::Character() :
     effects(),
     L(luaL_newstate()),
     combatHandler(this),
-    action(std::make_shared<GeneralAction>(this)),
+    actionQueue(),
+    actionQueueMutex(),
     inputProcessor(std::make_shared<ProcessInput>())
 {
-    // Nothing to do.
+    // Push the Wait action on the action queue.
+    std::lock_guard<std::mutex> lock(actionQueueMutex);
+    actionQueue.push_front(std::make_shared<GeneralAction>(this));
 }
 
 Character::~Character()
@@ -190,7 +193,7 @@ void Character::getSheet(Table & sheet) const
         sheet.addRow({"Room", "NONE"});
     }
     sheet.addRow({"Posture", posture.toString()});
-    sheet.addRow({"Action", action->getDescription()});
+//    sheet.addRow({"Action", actionQueue.front()->getDescription()});
     sheet.addDivider();
     sheet.addRow({"## Equipment", "## Inventory"});
     for (size_t it = 0; it < std::max(inventory.size(), equipment.size()); ++it)
@@ -247,11 +250,11 @@ std::string Character::getStaticDesc() const
         desc += " " + posture.getAction();
     }
     desc += " here";
-    if (action->getType() != ActionType::Wait)
-    {
-        desc += ", " + this->getSubjectPronoun() + " is ";
-        desc += action->getDescription();
-    }
+//    if (actionQueue.front()->getType() != ActionType::Wait)
+//    {
+//        desc += ", " + this->getSubjectPronoun() + " is ";
+//        desc += actionQueue.front()->getDescription();
+//    }
     desc += ".";
     return desc;
 }
@@ -529,15 +532,23 @@ int Character::getViewDistance() const
 
 void Character::setAction(const std::shared_ptr<GeneralAction> & _action)
 {
+    std::lock_guard<std::mutex> lock(actionQueueMutex);
     if (_action->getType() != ActionType::Wait)
     {
-        action = _action;
+        actionQueue.push_front(_action);
     }
 }
 
 void Character::popAction()
 {
-    action = std::make_shared<GeneralAction>(this);
+    std::lock_guard<std::mutex> lock(actionQueueMutex);
+    actionQueue.pop_front();
+}
+
+std::shared_ptr<GeneralAction> & Character::getAction()
+{
+    std::lock_guard<std::mutex> lock(actionQueueMutex);
+    return actionQueue.front();
 }
 
 void Character::moveTo(
@@ -902,7 +913,7 @@ void Character::addInventoryItem(Item *& item)
 void Character::addEquipmentItem(Item *& item)
 {
     // Add the item to the equipment.
-    equipment.push_back(item);
+    equipment.push_back_item(item);
     // Set the owner of the item.
     item->owner = this;
     // Log it.
