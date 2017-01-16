@@ -118,7 +118,11 @@ void Player::getSheet(Table & sheet) const
     sheet.addRow({"## Skill", "## Points"});
     for (auto it : skills)
     {
-        sheet.addRow({it.first->name, ToString(it.second)});
+        auto skill = Mud::instance().findSkill(it.first);
+        if (skill)
+        {
+            sheet.addRow({skill->name, ToString(it.second)});
+        }
     }
 }
 
@@ -206,7 +210,7 @@ void Player::initialize()
     rent_room = 1000;
     for (auto it : race->baseSkills)
     {
-        skills.emplace_back(it);
+        skills.insert(it);
     }
 }
 
@@ -277,12 +281,12 @@ bool Player::updateOnDB()
         return false;
     }
     // Prepare the arguments of the query for skill table.
-    for (auto it : skills)
+    for (auto skill : skills)
     {
         args.clear();
         args.push_back(name);
-        args.push_back(ToString(it.first->vnum));
-        args.push_back(ToString(it.second));
+        args.push_back(ToString(skill.first));
+        args.push_back(ToString(skill.second));
         if (!SQLiteDbms::instance().insertInto("PlayerSkill",
                                                args,
                                                false,
@@ -405,10 +409,7 @@ void Player::enterGame()
     logged_in = true;
     // -------------------------------------------------------------------------
     // Phase 4: Activate the effects due to the skills.
-    for (auto skill : skills)
-    {
-        skill.first->updateSkillEffects(this);
-    }
+    Skill::updateSkillEffects(this);
     // -------------------------------------------------------------------------
     // Phase 5: Look around.
     this->doCommand("look");

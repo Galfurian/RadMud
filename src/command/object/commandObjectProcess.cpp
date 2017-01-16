@@ -86,5 +86,11 @@ bool DoDismember(Character * character, ArgumentHandler & args)
     character->sendMsg("You dismember %s and extract some useful stuff.\n",
                        item->getName(true));
     // TODO: Complete the command.
+    if (character->isPlayer())
+    {
+        // Transform the character to player.
+        auto player = character->toPlayer();
+        Skill::improveSkillKnowledge(player, Knowledge::ButcherAnimal);
+    }
     return true;
 }

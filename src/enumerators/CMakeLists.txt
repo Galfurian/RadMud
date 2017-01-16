@@ -13,6 +13,7 @@ set(PROJECT_SRC ${PROJECT_SRC}
         ${CMAKE_SOURCE_DIR}/src/enumerators/toolType.cpp
         ${CMAKE_SOURCE_DIR}/src/enumerators/direction.cpp
         ${CMAKE_SOURCE_DIR}/src/enumerators/modelType.cpp
+        ${CMAKE_SOURCE_DIR}/src/enumerators/skillRank.cpp
         ${CMAKE_SOURCE_DIR}/src/enumerators/liquidType.cpp
         ${CMAKE_SOURCE_DIR}/src/enumerators/telnetChar.cpp
         ${CMAKE_SOURCE_DIR}/src/enumerators/itemQuality.cpp

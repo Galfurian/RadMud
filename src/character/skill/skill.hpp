@@ -48,16 +48,16 @@ public:
     /// The overall stage of the skill.
     int stage;
     /// The list of required skills.
-    std::vector<std::pair<std::shared_ptr<Skill>, int>> requiredSkills;
+    std::map<int, bool> requiredSkills;
     /// The list of abilities modifiers and the rank at which they became
     /// activate.
-    std::vector<std::pair<AbilityModifier, int>> abilityModifier;
+    std::map<AbilityModifier, bool> abilityModifier;
     /// The list of combat modifiers and the rank at which they became activate.
-    std::vector<std::pair<CombatModifier, int>> combatModifier;
+    std::map<CombatModifier, bool> combatModifier;
     /// The list of status modifiers and the rank at which they became activate.
-    std::vector<std::pair<StatusModifier, int>> statusModifier;
+    std::map<StatusModifier, bool> statusModifier;
     /// The list of knowledge and the rank at which they became activate.
-    std::vector<std::pair<Knowledge, int>> knowledge;
+    std::map<Knowledge, bool> knowledge;
 
     /// @brief Constructor.
     Skill();
@@ -83,5 +83,21 @@ public:
     bool check();
 
     /// @brief Activate the effects on the player based on its skill ranks.
-    void updateSkillEffects(Player * player);
+    static void updateSkillEffects(Player * player);
+
+    /// @brief Improves the skills which provides the given ability modifier.
+    static void improveSkillAbilityModifier(Player * player,
+                                            const AbilityModifier & abilityModifier);
+
+    /// @brief Improves the skills which provides the given status modifier.
+    static void improveSkillStatusModifier(Player * player,
+                                           const StatusModifier & statusModifier);
+
+    /// @brief Improves the skills which provides the given combat modifier.
+    static void improveSkillCombatModifier(Player * player,
+                                           const CombatModifier & combatModifier);
+
+    /// @brief Improves the skills which provides the given knowledge.
+    static void improveSkillKnowledge(Player * player,
+                                      const Knowledge & knowledge);
 };

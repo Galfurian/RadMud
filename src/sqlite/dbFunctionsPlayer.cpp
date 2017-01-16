@@ -328,14 +328,14 @@ bool SQLiteDbms::loadPlayerSkill(Player * player)
     while (result->next())
     {
         auto skill = Mud::instance().findSkill(result->getNextInteger());
-        int value = result->getNextInteger();
+        auto value = result->getNextUnsignedInteger();
         if (skill == nullptr)
         {
             Logger::log(LogLevel::Error, "Wrong skill id.");
             status = false;
             break;
         }
-        player->skills.emplace_back(std::make_pair(skill, value));
+        player->skills[skill->vnum] = value;
     }
     // release the resource.
     result->release();

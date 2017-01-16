@@ -20,10 +20,12 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
+#include <enumerators/skillRank.hpp>
 #include "skill.hpp"
 #include "effectManager.hpp"
 #include "effectFactory.hpp"
 #include "player.hpp"
+#include "mud.hpp"
 
 Skill::Skill() :
     vnum(),
@@ -61,86 +63,143 @@ bool Skill::check()
 void Skill::updateSkillEffects(Player * player)
 {
     // TODO: Determine the increment brought by each skill based on its rank.
+    // TODO: Right now the modifier is based on the rank of the skill.
     // -------------------------------------------------------------------------
     // Phase 1: Deactivate all the passive effects.
     player->effects.removeAllPassiveEffect();
-    // -------------------------------------------------------------------------
-    // Phase 2: Activate all the passive effects due to the skills.
-    // Create a new skill effect.
-    auto skillEffect = EffectFactory::skillEffect(player, name);
     // Iterate the player's skills.
     for (auto it : player->skills)
     {
+        // ---------------------------------------------------------------------
+        // Phase 2: Activate all the passive effects due to the skill.
         // Save the skill.
-        auto skill = it.first;
+        auto skill = Mud::instance().findSkill(it.first);
         // Save the skill rank.
-        auto skillRank = it.second;
+        auto skillRank = SkillRank::getSkillRank(it.second);
+        // Create a new skill effect.
+        auto skillEffect = EffectFactory::skillEffect(player, skill->name);
         // Iterate through the modifiers of the skill.
         for (auto it2 : skill->abilityModifier)
         {
-            // Skip the ability modifier if the rank is lower.
-            if (skillRank < it2.second) continue;
             // Otherwise add the modifier based on the skill rank.
             auto it3 = skillEffect.effectAbilityModifier.find(it2.first);
             if (it3 == skillEffect.effectAbilityModifier.end())
             {
-                skillEffect.effectAbilityModifier.insert(it2);
+                skillEffect.effectAbilityModifier.insert(
+                    std::make_pair(it2.first, skillRank.toUInt()));
             }
             else
             {
-                it3->second += 1;
+                it3->second += skillRank.toUInt();
             }
         }
         // Iterate through the modifiers of the skill.
         for (auto it2 : skill->combatModifier)
         {
-            // Skip the ability modifier if the rank is lower.
-            if (skillRank < it2.second) continue;
             // Otherwise add the modifier based on the skill rank.
             auto it3 = skillEffect.effectCombatModifier.find(it2.first);
             if (it3 == skillEffect.effectCombatModifier.end())
             {
-                skillEffect.effectCombatModifier.insert(it2);
+                skillEffect.effectCombatModifier.insert(
+                    std::make_pair(it2.first, skillRank.toUInt()));
             }
             else
             {
-                it3->second += 1;
+                it3->second += skillRank.toUInt();
             }
         }
         // Iterate through the modifiers of the skill.
         for (auto it2 : skill->statusModifier)
         {
-            // Skip the ability modifier if the rank is lower.
-            if (skillRank < it2.second) continue;
             // Otherwise add the modifier based on the skill rank.
             auto it3 = skillEffect.effectStatusModifier.find(it2.first);
             if (it3 == skillEffect.effectStatusModifier.end())
             {
-                skillEffect.effectStatusModifier.insert(it2);
+                skillEffect.effectStatusModifier.insert(
+                    std::make_pair(it2.first, skillRank.toUInt()));
             }
             else
             {
-                it3->second += 1;
+                it3->second += skillRank.toUInt();
             }
         }
         // Iterate through the modifiers of the skill.
         for (auto it2 : skill->knowledge)
         {
-            // Skip the ability modifier if the rank is lower.
-            if (skillRank < it2.second) continue;
             // Otherwise add the modifier based on the skill rank.
             auto it3 = skillEffect.effectKnowledge.find(it2.first);
             if (it3 == skillEffect.effectKnowledge.end())
             {
-                skillEffect.effectKnowledge.insert(it2);
+                skillEffect.effectKnowledge.insert(
+                    std::make_pair(it2.first, true));
             }
             else
             {
                 it3->second = true;
             }
         }
+        // ---------------------------------------------------------------------
+        // Phase 3: Add the passive effect to the player.
+        player->effects.addPassiveEffect(skillEffect);
     }
-    // -------------------------------------------------------------------------
-    // Phase 3: Add the passive effect to the player.
-    player->effects.addPassiveEffect(skillEffect);
+}
+
+void Skill::improveSkillAbilityModifier(Player * player,
+                                        const AbilityModifier & abilityModifier)
+{
+    for (auto it : player->skills)
+    {
+        // Get the skill.
+        auto skill = Mud::instance().findSkill(it.first);
+        // If the skill provides the given ability modifier, improve the skill.
+        if (skill->abilityModifier[abilityModifier])
+        {
+            it.second += 50;
+        }
+    }
+}
+
+void Skill::improveSkillStatusModifier(Player * player,
+                                       const StatusModifier & statusModifier)
+{
+    for (auto it : player->skills)
+    {
+        // Get the skill.
+        auto skill = Mud::instance().findSkill(it.first);
+        // If the skill provides the given ability modifier, improve the skill.
+        if (skill->statusModifier[statusModifier])
+        {
+            it.second += 50;
+        }
+    }
+}
+
+void Skill::improveSkillCombatModifier(Player * player,
+                                       const CombatModifier & combatModifier)
+{
+    for (auto it : player->skills)
+    {
+        // Get the skill.
+        auto skill = Mud::instance().findSkill(it.first);
+        // If the skill provides the given ability modifier, improve the skill.
+        if (skill->combatModifier[combatModifier])
+        {
+            it.second += 50;
+        }
+    }
+}
+
+void Skill::improveSkillKnowledge(Player * player,
+                                  const Knowledge & knowledge)
+{
+    for (auto it : player->skills)
+    {
+        // Get the skill.
+        auto skill = Mud::instance().findSkill(it.first);
+        // If the skill provides the given ability modifier, improve the skill.
+        if (skill->knowledge[knowledge])
+        {
+            it.second += 50;
+        }
+    }
 }

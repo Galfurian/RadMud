@@ -225,15 +225,12 @@ bool LoadSkillPrerequisite(ResultSet * result)
                                       " required by the skill " +
                                       ToString(skillVnum));
             }
-            auto requiredLevel = result->getNextInteger();
-            skill->requiredSkills.emplace_back(
-                std::make_pair(requiredSkill,
-                               requiredLevel));
+            skill->requiredSkills[requiredSkillVnum] = true;
             Logger::log(LogLevel::Debug,
-                        "\t%s requires %s at level %s",
+                        "\t%s requires %s",
                         AlignString(skill->name, StringAlign::Left, 25),
-                        AlignString(requiredSkill->name, StringAlign::Left, 25),
-                        requiredLevel);
+                        AlignString(requiredSkill->name,
+                                    StringAlign::Left, 25));
         }
         catch (SQLiteException & e)
         {
@@ -257,58 +254,53 @@ bool LoadSkillBenefit(ResultSet * result)
                 throw SQLiteException("Can't find the skill " +
                                       ToString(skillVnum));
             }
-            auto requiredRank = result->getNextInteger();
             auto ben1 = AbilityModifier(result->getNextUnsignedInteger());
             if (ben1 != AbilityModifier::None)
             {
                 // Add the ability modifier.
-                skill->abilityModifier.emplace_back(
-                    std::make_pair(ben1, requiredRank));
+                skill->abilityModifier[ben1] = true;
                 // Log it.
                 Logger::log(LogLevel::Debug,
-                            "\t%s%s at level %s",
+                            "\t%s%s",
                             AlignString(skill->name, StringAlign::Left, 25),
-                            AlignString(ben1.toString(), StringAlign::Left, 35),
-                            requiredRank);
+                            AlignString(ben1.toString(),
+                                        StringAlign::Left, 35));
             }
             auto ben2 = StatusModifier(result->getNextUnsignedInteger());
             if (ben2 != StatusModifier::None)
             {
                 // Add the status modifier.
-                skill->statusModifier.emplace_back(
-                    std::make_pair(ben2, requiredRank));
+                skill->statusModifier[ben2] = true;
                 // Log it.
                 Logger::log(LogLevel::Debug,
-                            "\t%s%s at level %s",
+                            "\t%s%s",
                             AlignString(skill->name, StringAlign::Left, 25),
-                            AlignString(ben2.toString(), StringAlign::Left, 35),
-                            requiredRank);
+                            AlignString(ben2.toString(),
+                                        StringAlign::Left, 35));
             }
             auto ben3 = CombatModifier(result->getNextUnsignedInteger());
             if (ben3 != CombatModifier::None)
             {
                 // Add the combat modifier.
-                skill->combatModifier.emplace_back(
-                    std::make_pair(ben3, requiredRank));
+                skill->combatModifier[ben3] = true;
                 // Log it.
                 Logger::log(LogLevel::Debug,
-                            "\t%s%s at level %s",
+                            "\t%s%s",
                             AlignString(skill->name, StringAlign::Left, 25),
-                            AlignString(ben3.toString(), StringAlign::Left, 35),
-                            requiredRank);
+                            AlignString(ben3.toString(),
+                                        StringAlign::Left, 35));
             }
             auto ben4 = Knowledge(result->getNextUnsignedInteger());
             if (ben4 != Knowledge::None)
             {
                 // Add the knowledge.
-                skill->knowledge.emplace_back(
-                    std::make_pair(ben4, requiredRank));
+                skill->knowledge[ben4] = true;
                 // Log it.
                 Logger::log(LogLevel::Debug,
-                            "\t%s%s at level %s",
+                            "\t%s%s",
                             AlignString(skill->name, StringAlign::Left, 25),
-                            AlignString(ben4.toString(), StringAlign::Left, 35),
-                            requiredRank);
+                            AlignString(ben4.toString(),
+                                        StringAlign::Left, 35));
             }
         }
         catch (SQLiteException & e)
@@ -564,9 +556,9 @@ bool LoadRaceBaseSkill(ResultSet * result)
                 throw SQLiteException("Cannot find the skill " +
                                       ToString(skillVnum));
             }
-            auto rank = result->getNextInteger();
+            auto rank = result->getNextUnsignedInteger();
             // Set the base skill of the race.
-            race->baseSkills.emplace_back(std::make_pair(skill, rank));
+            race->baseSkills.insert(std::make_pair(skillVnum, rank));
             // Log the skill.
             Logger::log(LogLevel::Debug,
                         "\t%s%s%s",

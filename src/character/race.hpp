@@ -61,8 +61,8 @@ public:
     std::string naturalWeapon;
     /// The list of body parts.
     std::vector<std::shared_ptr<BodyPart>> bodyParts;
-    /// Base skills rank.map<
-    std::vector<std::pair<std::shared_ptr<Skill>, int>> baseSkills;
+    /// Base skills.
+    std::map<int, unsigned int> baseSkills;
 
     /// @brief Constructor.
     Race();

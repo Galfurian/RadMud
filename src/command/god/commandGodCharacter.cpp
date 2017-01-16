@@ -350,10 +350,10 @@ bool DoPlayerModSkill(Character * character, ArgumentHandler & args)
         character->sendMsg("You must insert a valid modifier.\n");
         return false;
     }
-    std::pair<std::shared_ptr<Skill>, int> * playerSkill = nullptr;
+    std::pair<const int, unsigned int> * playerSkill = nullptr;
     for (auto it : target->skills)
     {
-        if (it.first->vnum == skill->vnum)
+        if (it.first == skill->vnum)
         {
             playerSkill = &it;
             break;
@@ -365,7 +365,7 @@ bool DoPlayerModSkill(Character * character, ArgumentHandler & args)
                            target->getNameCapital());
         return false;
     }
-    auto modified = playerSkill->second + modifier;
+    auto modified = static_cast<int>(playerSkill->second) + modifier;
     if (modified <= 0)
     {
         character->sendMsg("You cannot reduce the skill <= 0 (%s).\n",
@@ -379,7 +379,7 @@ bool DoPlayerModSkill(Character * character, ArgumentHandler & args)
         return false;
     }
     // Change the skill value.
-    playerSkill->second = modified;
+    playerSkill->second = static_cast<unsigned int>(modified);
     // Notify.
     character->sendMsg("You have successfully %s by %s the \"%s\" skill,"
                            "the new level is %s.\n",

@@ -192,7 +192,7 @@ void Character::getSheet(Table & sheet) const
         sheet.addRow({"Room", "NONE"});
     }
     sheet.addRow({"Posture", posture.toString()});
-//    sheet.addRow({"Action", actionQueue.front()->getDescription()});
+    sheet.addRow({"Action", this->getAction()->getDescription()});
     sheet.addDivider();
     sheet.addRow({"## Equipment", "## Inventory"});
     for (size_t it = 0; it < std::max(inventory.size(), equipment.size()); ++it)
@@ -249,11 +249,11 @@ std::string Character::getStaticDesc() const
         desc += " " + posture.getAction();
     }
     desc += " here";
-//    if (actionQueue.front()->getType() != ActionType::Wait)
-//    {
-//        desc += ", " + this->getSubjectPronoun() + " is ";
-//        desc += actionQueue.front()->getDescription();
-//    }
+    if (this->getAction()->getType() != ActionType::Wait)
+    {
+        desc += ", " + this->getSubjectPronoun() + " is ";
+        desc += this->getAction()->getDescription();
+    }
     desc += ".";
     return desc;
 }
@@ -545,6 +545,12 @@ void Character::popAction()
 }
 
 std::shared_ptr<GeneralAction> & Character::getAction()
+{
+    std::lock_guard<std::mutex> lock(actionQueueMutex);
+    return actionQueue.front();
+}
+
+std::shared_ptr<GeneralAction> const & Character::getAction() const
 {
     std::lock_guard<std::mutex> lock(actionQueueMutex);
     return actionQueue.front();
