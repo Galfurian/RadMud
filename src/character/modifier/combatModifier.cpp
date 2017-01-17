@@ -89,3 +89,20 @@ unsigned int CombatModifier::toUInt() const
 {
     return static_cast<unsigned int>(value);
 }
+
+int CombatModifier::getSign(const CombatModifier & right)
+{
+    if (right == CombatModifier::IncreaseUnarmedHitRoll) return 1;
+    if (right == CombatModifier::DecreaseUnarmedHitRoll) return -1;
+    if (right == CombatModifier::IncreaseUnarmedDamage) return 1;
+    if (right == CombatModifier::DecreaseUnarmedDamage) return -1;
+    if (right == CombatModifier::IncreaseMeleeWeaponHitRoll) return 1;
+    if (right == CombatModifier::DecreaseMeleeWeaponHitRoll) return -1;
+    if (right == CombatModifier::IncreaseMeleeWeaponDamage) return 1;
+    if (right == CombatModifier::DecreaseMeleeWeaponDamage) return -1;
+    if (right == CombatModifier::IncreaseRangedWeaponHitRoll) return 1;
+    if (right == CombatModifier::DecreaseRangedWeaponHitRoll) return -1;
+    if (right == CombatModifier::IncreaseRangedWeaponDamage) return 1;
+    if (right == CombatModifier::DecreaseRangedWeaponDamage) return -1;
+    return 1;
+}

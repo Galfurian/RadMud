@@ -59,6 +59,9 @@ public:
     /// @brief Returns the enumerator as number.
     unsigned int toUInt() const;
 
+    /// @brief Returns the sign of the given modifier (+1 | -1).
+    static int getSign(const StatusModifier & right);
+
     /// @brief Equality operator.
     bool operator==(const StatusModifier & right) const
     {

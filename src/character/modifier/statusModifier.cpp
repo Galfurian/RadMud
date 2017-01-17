@@ -77,3 +77,16 @@ unsigned int StatusModifier::toUInt() const
 {
     return static_cast<unsigned int>(value);
 }
+
+int StatusModifier::getSign(const StatusModifier & right)
+{
+    if (right == StatusModifier::IncreaseHealth) return 1;
+    if (right == StatusModifier::DecreaseHealth) return -1;
+    if (right == StatusModifier::IncreaseHealthRegeneration) return 1;
+    if (right == StatusModifier::DecreaseHealthRegeneration) return -1;
+    if (right == StatusModifier::IncreaseStamina) return 1;
+    if (right == StatusModifier::DecreaseStamina) return -1;
+    if (right == StatusModifier::IncreaseStaminaRegeneration) return 1;
+    if (right == StatusModifier::DecreaseStaminaRegeneration) return -1;
+    return 1;
+}

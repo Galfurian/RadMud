@@ -110,3 +110,18 @@ unsigned int AbilityModifier::toUInt() const
 {
     return static_cast<unsigned int>(value);
 }
+
+int AbilityModifier::getSign(const AbilityModifier & right)
+{
+    if (right == AbilityModifier::IncreaseStrength) return 1;
+    if (right == AbilityModifier::DecreaseStrength) return -1;
+    if (right == AbilityModifier::IncreaseAgility) return 1;
+    if (right == AbilityModifier::DecreaseAgility) return -1;
+    if (right == AbilityModifier::IncreasePerception) return 1;
+    if (right == AbilityModifier::DecreasePerception) return -1;
+    if (right == AbilityModifier::IncreaseConstitution) return 1;
+    if (right == AbilityModifier::DecreaseConstitution) return -1;
+    if (right == AbilityModifier::IncreaseIntelligence) return 1;
+    if (right == AbilityModifier::DecreaseIntelligence) return -1;
+    return 1;
+}
