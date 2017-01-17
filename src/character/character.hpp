@@ -102,6 +102,8 @@ public:
     int thirst;
     /// Character abilities.
     std::map<Ability, unsigned int> abilities;
+    /// The player's list of skills.
+    std::map<int, unsigned int> skills;
     /// The current room the character is in.
     Room * room;
     /// Character's inventory.
@@ -154,6 +156,9 @@ public:
     ///         character.
     /// @param sheet The table that has to be filled.
     virtual void getSheet(Table & sheet) const;
+
+    /// @brief Initializes the variables of the chracter.
+    virtual void initialize();
 
     /// @brief Return the name of the character with all lowercase characters.
     /// @return The name of the character.

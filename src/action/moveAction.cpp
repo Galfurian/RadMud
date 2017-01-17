@@ -42,7 +42,7 @@ MoveAction::MoveAction(Character * _actor,
 
 MoveAction::~MoveAction()
 {
-    Logger::log(LogLevel::Debug, "Deleted move action.");
+    Logger::log(LogLevel::Debug, "Deleted MoveAction.");
 }
 
 bool MoveAction::check(std::string & error) const

@@ -41,6 +41,7 @@ Character::Character() :
     stamina(),
     hunger(100),
     thirst(100),
+    skills(),
     room(),
     inventory(),
     equipment(),
@@ -183,6 +184,15 @@ void Character::getSheet(Table & sheet) const
             ToString(effects.getAbilityModifier(
                 AbilityModifier::DecreaseIntelligence)) +
             "]"});
+    sheet.addRow({"## Skill", "## Points"});
+    for (auto it : skills)
+    {
+        auto skill = Mud::instance().findSkill(it.first);
+        if (skill)
+        {
+            sheet.addRow({skill->name, ToString(it.second)});
+        }
+    }
     if (CorrectAssert(this->room != nullptr))
     {
         sheet.addRow({"Room", room->name + " [" + ToString(room->vnum) + "]"});
@@ -214,6 +224,11 @@ void Character::getSheet(Table & sheet) const
     {
         sheet.addRow({it.name, ToString(it.remainingTic)});
     }
+}
+
+void Character::initialize()
+{
+    Skill::updateSkillEffects(this);
 }
 
 //std::string Character::getName() const

@@ -31,7 +31,7 @@
 #include "statusModifier.hpp"
 #include "knowledge.hpp"
 
-class Player;
+class Character;
 
 /// @brief Holds details about a skill.
 class Skill
@@ -82,22 +82,22 @@ public:
     ///         <b>False</b> otherwise.
     bool check();
 
-    /// @brief Activate the effects on the player based on its skill ranks.
-    static void updateSkillEffects(Player * player);
+    /// @brief Activate the effects on the character based on its skill ranks.
+    static void updateSkillEffects(Character * character);
 
     /// @brief Improves the skills which provides the given ability modifier.
-    static void improveSkillAbilityModifier(Player * player,
+    static void improveSkillAbilityModifier(Character * character,
                                             const AbilityModifier & abilityModifier);
 
     /// @brief Improves the skills which provides the given status modifier.
-    static void improveSkillStatusModifier(Player * player,
+    static void improveSkillStatusModifier(Character * character,
                                            const StatusModifier & statusModifier);
 
     /// @brief Improves the skills which provides the given combat modifier.
-    static void improveSkillCombatModifier(Player * player,
+    static void improveSkillCombatModifier(Character * character,
                                            const CombatModifier & combatModifier);
 
     /// @brief Improves the skills which provides the given knowledge.
-    static void improveSkillKnowledge(Player * player,
+    static void improveSkillKnowledge(Character * character,
                                       const Knowledge & knowledge);
 };

@@ -376,8 +376,6 @@ void BasicAttack::performMeleeAttack(Character * target,
     // -------------------------------------------------------------------------
     // Evaluate the natural roll for the attack.
     unsigned int hitRoll = TRandInteger<unsigned int>(1, 20);
-    // The amount of damage dealt.
-    unsigned int damageRoll = 0;
     // Boolean variable which identifies if the hit is a critical hit.
     bool isCritical = (hitRoll == 20);
     // If there is a weapon, roll the damage.
@@ -393,39 +391,33 @@ void BasicAttack::performMeleeAttack(Character * target,
             // Safely apply the penalty.
             hitRoll = (hitRoll < penalty) ? 0 : (hitRoll - penalty);
         }
-        // Natural roll for the damage.
-        damageRoll = weapon->rollDamage();
-        // Check if the character is wielding a two-handed weapon.
-        if (HasFlag(weapon->model->modelFlags, ModelFlag::TwoHand))
-        {
-            // Add to the damage roll one and half the strength value.
-            damageRoll += strengthMod + (strengthMod / 2);
-        }
         // Apply the modifier to the hit roll with melee weapons.
-        hitRoll = SafeSum(hitRoll, +actor->effects.getCombatModifier(
-            CombatModifier::IncreaseMeleeWeaponHitRoll));
-        hitRoll = SafeSum(hitRoll, -actor->effects.getCombatModifier(
-            CombatModifier::DecreaseMeleeWeaponHitRoll));
-        // Apply the modifier to the damage roll with melee weapons.
-        damageRoll = SafeSum(damageRoll, +actor->effects.getCombatModifier(
-            CombatModifier::IncreaseMeleeWeaponDamage));
-        damageRoll = SafeSum(damageRoll, -actor->effects.getCombatModifier(
-            CombatModifier::DecreaseMeleeWeaponDamage));
+        hitRoll = SafeSum(hitRoll,
+                          +actor->effects.getCombatModifier(
+                              CombatModifier::IncreaseMeleeWeaponHitRoll));
+        hitRoll = SafeSum(hitRoll,
+                          -actor->effects.getCombatModifier(
+                              CombatModifier::DecreaseMeleeWeaponHitRoll));
+        // Improve the skills which has contributed to the hit roll.
+        Skill::improveSkillCombatModifier(
+            actor, CombatModifier::IncreaseMeleeWeaponHitRoll);
+        Skill::improveSkillCombatModifier(
+            actor, CombatModifier::DecreaseMeleeWeaponHitRoll);
     }
     else
     {
-        // Natural roll for the damage.
-        damageRoll = TRandInteger<unsigned int>(1, 3 + strengthMod);
         // Apply the modifier to the hit roll when unarmed fighting.
-        hitRoll = SafeSum(hitRoll, +actor->effects.getCombatModifier(
-            CombatModifier::IncreaseUnarmedHitRoll));
-        hitRoll = SafeSum(hitRoll, -actor->effects.getCombatModifier(
-            CombatModifier::DecreaseUnarmedHitRoll));
-        // Apply the modifier to the damage roll when unarmed fighting.
-        damageRoll = SafeSum(damageRoll, +actor->effects.getCombatModifier(
-            CombatModifier::IncreaseUnarmedDamage));
-        damageRoll = SafeSum(damageRoll, -actor->effects.getCombatModifier(
-            CombatModifier::DecreaseUnarmedDamage));
+        hitRoll = SafeSum(hitRoll,
+                          +actor->effects.getCombatModifier(
+                              CombatModifier::IncreaseUnarmedHitRoll));
+        hitRoll = SafeSum(hitRoll,
+                          -actor->effects.getCombatModifier(
+                              CombatModifier::DecreaseUnarmedHitRoll));
+        // Improve the skills which has contributed to the hit roll.
+        Skill::improveSkillCombatModifier(
+            actor, CombatModifier::IncreaseUnarmedHitRoll);
+        Skill::improveSkillCombatModifier(
+            actor, CombatModifier::DecreaseUnarmedHitRoll);
     }
     // -------------------------------------------------------------------------
     // Phase 3: Check if the target is hit.
@@ -444,6 +436,47 @@ void BasicAttack::performMeleeAttack(Character * target,
     }
     else
     {
+        // The amount of damage dealt.
+        unsigned int damageRoll = 0;
+        // If there is a weapon, roll the damage.
+        if (weapon != nullptr)
+        {
+            // Natural roll for the damage.
+            damageRoll = weapon->rollDamage();
+            // Check if the character is wielding a two-handed weapon.
+            if (HasFlag(weapon->model->modelFlags, ModelFlag::TwoHand))
+            {
+                // Add to the damage roll one and half the strength value.
+                damageRoll += strengthMod + (strengthMod / 2);
+            }
+            // Apply the modifier to the damage roll with melee weapons.
+            damageRoll = SafeSum(damageRoll,
+                                 +actor->effects.getCombatModifier(
+                                     CombatModifier::IncreaseMeleeWeaponDamage));
+            damageRoll = SafeSum(damageRoll,
+                                 -actor->effects.getCombatModifier(
+                                     CombatModifier::DecreaseMeleeWeaponDamage));
+            // Improve the skills which has contributed to the damage roll.
+            Skill::improveSkillCombatModifier(
+                actor, CombatModifier::IncreaseMeleeWeaponDamage);
+            Skill::improveSkillCombatModifier(
+                actor, CombatModifier::DecreaseMeleeWeaponDamage);
+        }
+        else
+        {
+            // Natural roll for the damage.
+            damageRoll = TRandInteger<unsigned int>(1, 3 + strengthMod);
+            // Apply the modifier to the damage roll when unarmed fighting.
+            damageRoll = SafeSum(damageRoll, +actor->effects.getCombatModifier(
+                CombatModifier::IncreaseUnarmedDamage));
+            damageRoll = SafeSum(damageRoll, -actor->effects.getCombatModifier(
+                CombatModifier::DecreaseUnarmedDamage));
+            // Improve the skills which has contributed to the damage roll.
+            Skill::improveSkillCombatModifier(
+                actor, CombatModifier::IncreaseUnarmedDamage);
+            Skill::improveSkillCombatModifier(
+                actor, CombatModifier::DecreaseUnarmedDamage);
+        }
         // Show hit messages.
         this->handleMeleeHit(target, weapon);
         // Consume the stamina.
@@ -510,8 +543,6 @@ void BasicAttack::performRangedAttack(Character * target,
     // -------------------------------------------------------------------------
     // Evaluate the natural roll for the attack.
     unsigned int hitRoll = TRandInteger<unsigned int>(1, 20);
-    // The amount of damage dealt.
-    unsigned int damageRoll = 0;
     // Boolean variable which identifies if the hit is a critical hit.
     bool isCritical = (hitRoll == 20);
     // Apply the penalty due to multi-wield, check if:
@@ -524,18 +555,16 @@ void BasicAttack::performRangedAttack(Character * target,
         // Safely apply the penalty.
         hitRoll = (hitRoll < penalty) ? 0 : (hitRoll - penalty);
     }
-    // Natural roll for the damage.
-    damageRoll = weapon->rollDamage();
     // Apply the modifier to the hit roll with ranged weapons.
     hitRoll = SafeSum(hitRoll, +actor->effects.getCombatModifier(
         CombatModifier::IncreaseRangedWeaponHitRoll));
     hitRoll = SafeSum(hitRoll, -actor->effects.getCombatModifier(
         CombatModifier::DecreaseRangedWeaponHitRoll));
-    // Apply the modifier to the damage roll with ranged weapons.
-    damageRoll = SafeSum(damageRoll, +actor->effects.getCombatModifier(
-        CombatModifier::IncreaseRangedWeaponDamage));
-    damageRoll = SafeSum(damageRoll, -actor->effects.getCombatModifier(
-        CombatModifier::DecreaseRangedWeaponDamage));
+    // Improve the skills which has contributed to the hit roll.
+    Skill::improveSkillCombatModifier(
+        actor, CombatModifier::IncreaseRangedWeaponHitRoll);
+    Skill::improveSkillCombatModifier(
+        actor, CombatModifier::DecreaseRangedWeaponHitRoll);
     // -------------------------------------------------------------------------
     // Phase 3: Check if the target is hit.
     // -------------------------------------------------------------------------
@@ -552,6 +581,19 @@ void BasicAttack::performRangedAttack(Character * target,
     }
     else
     {
+        // Natural roll for the damage.
+        unsigned int damageRoll = weapon->rollDamage();
+        // Apply the modifier to the damage roll with ranged weapons.
+        damageRoll = SafeSum(damageRoll, +actor->effects.getCombatModifier(
+            CombatModifier::IncreaseRangedWeaponDamage));
+        damageRoll = SafeSum(damageRoll, -actor->effects.getCombatModifier(
+            CombatModifier::DecreaseRangedWeaponDamage));
+        // Improve the skills which has contributed to the damage roll.
+        Skill::improveSkillCombatModifier(
+            actor, CombatModifier::IncreaseRangedWeaponDamage);
+        Skill::improveSkillCombatModifier(
+            actor, CombatModifier::DecreaseRangedWeaponDamage);
+        // Show the message.
         this->handleRangedHit(target, weapon);
         // Consume the stamina.
         actor->remStamina(consumedStamina, true);

@@ -22,6 +22,7 @@
 
 #include "general.hpp"
 
+#include "skillRank.hpp"
 #include "logger.hpp"
 #include "mud.hpp"
 
@@ -608,7 +609,8 @@ bool DoSkills(Character * character, ArgumentHandler & /*args*/)
         auto skill = Mud::instance().findSkill(it.first);
         if (skill)
         {
-            table.addRow({skill->name, ToString(it.second)});
+            table.addRow({skill->name,
+                          SkillRank::getSkillRank(it.second).toString()});
         }
     }
     character->sendMsg(table.getTable());

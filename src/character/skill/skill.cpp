@@ -20,11 +20,12 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include <enumerators/skillRank.hpp>
 #include "skill.hpp"
 #include "effectManager.hpp"
 #include "effectFactory.hpp"
-#include "player.hpp"
+#include "skillRank.hpp"
+#include "character.hpp"
+#include "logger.hpp"
 #include "mud.hpp"
 
 Skill::Skill() :
@@ -60,15 +61,15 @@ bool Skill::check()
     return true;
 }
 
-void Skill::updateSkillEffects(Player * player)
+void Skill::updateSkillEffects(Character * character)
 {
     // TODO: Determine the increment brought by each skill based on its rank.
     // TODO: Right now the modifier is based on the rank of the skill.
     // -------------------------------------------------------------------------
     // Phase 1: Deactivate all the passive effects.
-    player->effects.removeAllPassiveEffect();
-    // Iterate the player's skills.
-    for (auto it : player->skills)
+    character->effects.removeAllPassiveEffect();
+    // Iterate the character's skills.
+    for (auto it : character->skills)
     {
         // ---------------------------------------------------------------------
         // Phase 2: Activate all the passive effects due to the skill.
@@ -77,7 +78,7 @@ void Skill::updateSkillEffects(Player * player)
         // Save the skill rank.
         auto skillRank = SkillRank::getSkillRank(it.second);
         // Create a new skill effect.
-        auto skillEffect = EffectFactory::skillEffect(player, skill->name);
+        auto skillEffect = EffectFactory::skillEffect(character, skill->name);
         // Iterate through the modifiers of the skill.
         for (auto it2 : skill->abilityModifier)
         {
@@ -148,15 +149,15 @@ void Skill::updateSkillEffects(Player * player)
             }
         }
         // ---------------------------------------------------------------------
-        // Phase 3: Add the passive effect to the player.
-        player->effects.addPassiveEffect(skillEffect);
+        // Phase 3: Add the passive effect to the character.
+        character->effects.addPassiveEffect(skillEffect);
     }
 }
 
-void Skill::improveSkillAbilityModifier(Player * player,
+void Skill::improveSkillAbilityModifier(Character * character,
                                         const AbilityModifier & abilityModifier)
 {
-    for (auto it : player->skills)
+    for (auto & it : character->skills)
     {
         // Get the skill.
         auto skill = Mud::instance().findSkill(it.first);
@@ -168,10 +169,10 @@ void Skill::improveSkillAbilityModifier(Player * player,
     }
 }
 
-void Skill::improveSkillStatusModifier(Player * player,
+void Skill::improveSkillStatusModifier(Character * character,
                                        const StatusModifier & statusModifier)
 {
-    for (auto it : player->skills)
+    for (auto & it : character->skills)
     {
         // Get the skill.
         auto skill = Mud::instance().findSkill(it.first);
@@ -183,25 +184,34 @@ void Skill::improveSkillStatusModifier(Player * player,
     }
 }
 
-void Skill::improveSkillCombatModifier(Player * player,
+void Skill::improveSkillCombatModifier(Character * character,
                                        const CombatModifier & combatModifier)
 {
-    for (auto it : player->skills)
+    Logger::log(LogLevel::Debug, "[%s] Trying to increase %s",
+                character->getName(),
+                combatModifier.toString());
+    for (auto & it : character->skills)
     {
         // Get the skill.
         auto skill = Mud::instance().findSkill(it.first);
         // If the skill provides the given ability modifier, improve the skill.
-        if (skill->combatModifier[combatModifier])
+        if (skill != nullptr)
         {
-            it.second += 50;
+            if (skill->combatModifier[combatModifier])
+            {
+                Logger::log(LogLevel::Debug, "[%s] Increasing %s",
+                            character->getName(),
+                            combatModifier.toString());
+                it.second += 50;
+            }
         }
     }
 }
 
-void Skill::improveSkillKnowledge(Player * player,
+void Skill::improveSkillKnowledge(Character * character,
                                   const Knowledge & knowledge)
 {
-    for (auto it : player->skills)
+    for (auto & it : character->skills)
     {
         // Get the skill.
         auto skill = Mud::instance().findSkill(it.first);

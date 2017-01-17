@@ -38,7 +38,6 @@ Player::Player(const int & _socket,
     experience(),
     prompt(),
     rent_room(),
-    skills(),
     remaining_points(),
     connectionState(ConnectionState::LoggingIn),
     password_attempts(),
@@ -114,16 +113,6 @@ void Player::getSheet(Table & sheet) const
     sheet.addRow({"Experience", ToString(this->experience)});
     sheet.addRow({"Prompt", this->prompt});
     sheet.addRow({"Rent Room", ToString(this->rent_room)});
-    sheet.addDivider();
-    sheet.addRow({"## Skill", "## Points"});
-    for (auto it : skills)
-    {
-        auto skill = Mud::instance().findSkill(it.first);
-        if (skill)
-        {
-            sheet.addRow({skill->name, ToString(it.second)});
-        }
-    }
 }
 
 std::string Player::getName() const
@@ -204,14 +193,7 @@ bool Player::remEquipmentItem(Item * item)
 
 void Player::initialize()
 {
-    level = 0;
-    experience = 0;
-    flags = 0;
-    rent_room = 1000;
-    for (auto it : race->baseSkills)
-    {
-        skills.insert(it);
-    }
+    Character::initialize();
 }
 
 int Player::getSocket() const
@@ -408,8 +390,8 @@ void Player::enterGame()
     // Set the player as logged in.
     logged_in = true;
     // -------------------------------------------------------------------------
-    // Phase 4: Activate the effects due to the skills.
-    Skill::updateSkillEffects(this);
+    // Phase 4: Initialize the player.
+    this->initialize();
     // -------------------------------------------------------------------------
     // Phase 5: Look around.
     this->doCommand("look");
