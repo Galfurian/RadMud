@@ -31,10 +31,10 @@ public:
     enum Enum
     {
         None,
-        IncreaseUnarmedHitRoll,
-        DecreaseUnarmedHitRoll,
-        IncreaseUnarmedDamage,
-        DecreaseUnarmedDamage,
+        IncreaseUnarmedHitRoll,         /// < Unarmed Hit
+        DecreaseUnarmedHitRoll,         /// < Unarmed Hit
+        IncreaseUnarmedDamage,          /// < Unarmed Damage
+        DecreaseUnarmedDamage,          /// < Unarmed Damage
         IncreaseMeleeWeaponHitRoll,
         DecreaseMeleeWeaponHitRoll,
         IncreaseMeleeWeaponDamage,

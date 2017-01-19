@@ -1,6 +1,5 @@
 #############################################
 # Sub-directories
-add_subdirectory(${CMAKE_SOURCE_DIR}/src/character/modifier)
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/character/effect)
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/character/skill)
 
