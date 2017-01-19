@@ -23,7 +23,6 @@
 #pragma once
 
 #include "ability.hpp"
-#include "abilityModifier.hpp"
 #include "combatModifier.hpp"
 #include "statusModifier.hpp"
 #include "knowledge.hpp"
@@ -50,7 +49,7 @@ public:
     /// Function executed when the effect expires.
     std::function<void(Character * character)> expireFunction;
     /// The map of abilities modifiers.
-    std::map<AbilityModifier, int> effectAbilityModifier;
+    std::map<Ability, int> effectAbilityModifier;
     /// The map of combat modifiers.
     std::map<CombatModifier, int> effectCombatModifier;
     /// The map of status modifiers.
@@ -84,15 +83,15 @@ public:
     }
 };
 
-/// @brief Addition-Assignment operator for two AbilityModifier maps.
-std::map<AbilityModifier, int> & operator+=(
-    std::map<AbilityModifier, int> & left,
-    const std::map<AbilityModifier, int> & right);
+/// @brief Addition-Assignment operator for two Ability Modifier maps.
+std::map<Ability, int> & operator+=(
+    std::map<Ability, int> & left,
+    const std::map<Ability, int> & right);
 
-/// @brief Subtraction-Assignment operator for two AbilityModifier maps.
-std::map<AbilityModifier, int> & operator-=(
-    std::map<AbilityModifier, int> & left,
-    const std::map<AbilityModifier, int> & right);
+/// @brief Subtraction-Assignment operator for two Ability Modifier maps.
+std::map<Ability, int> & operator-=(
+    std::map<Ability, int> & left,
+    const std::map<Ability, int> & right);
 
 /// @brief Addition-Assignment operator for two CombatModifier maps.
 std::map<CombatModifier, int> & operator+=(

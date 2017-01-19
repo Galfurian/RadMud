@@ -31,18 +31,14 @@ public:
     enum Enum
     {
         None,
-        IncreaseUnarmedHitRoll,         /// < Unarmed Hit
-        DecreaseUnarmedHitRoll,         /// < Unarmed Hit
-        IncreaseUnarmedDamage,          /// < Unarmed Damage
-        DecreaseUnarmedDamage,          /// < Unarmed Damage
-        IncreaseMeleeWeaponHitRoll,
-        DecreaseMeleeWeaponHitRoll,
-        IncreaseMeleeWeaponDamage,
-        DecreaseMeleeWeaponDamage,
-        IncreaseRangedWeaponHitRoll,
-        DecreaseRangedWeaponHitRoll,
-        IncreaseRangedWeaponDamage,
-        DecreaseRangedWeaponDamage
+        UnarmedHitRoll,             /// < Unarmed Hit
+        UnarmedDamage,              /// < Unarmed Damage
+        MeleeWeaponHitRoll = 10,    /// < Melee Weapon Hit
+        MeleeWeaponDamage = 11,     /// < Melee Weapon Damage
+        RangedWeaponHitRoll = 20,   /// < Ranged Weapon Hit
+        RangedWeaponDamage = 21,    /// < Ranged Weapon Damage
+        RangedAimSpeed = 22,        /// < Ranged Weapon Aim Speed
+        ArmorClass = 30,            /// < Armor Class
     };
 
     /// @brief Constructor from unsigned ind.
@@ -62,9 +58,6 @@ public:
 
     /// @brief Returns the enumerator as number.
     unsigned int toUInt() const;
-
-    /// @brief Returns the sign of the given modifier (+1 | -1).
-    static int getSign(const CombatModifier & right);
 
     /// @brief Equality operator.
     bool operator==(const CombatModifier & right) const

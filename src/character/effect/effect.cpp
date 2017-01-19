@@ -59,9 +59,8 @@ bool Effect::update()
     return false;
 }
 
-std::map<AbilityModifier, int> & operator+=(
-    std::map<AbilityModifier, int> & left,
-    const std::map<AbilityModifier, int> & right)
+std::map<Ability, int> & operator+=(std::map<Ability, int> & left,
+                                    const std::map<Ability, int> & right)
 {
     for (auto & rightModifier : right)
     {
@@ -78,9 +77,8 @@ std::map<AbilityModifier, int> & operator+=(
     return left;
 }
 
-std::map<AbilityModifier, int> & operator-=(
-    std::map<AbilityModifier, int> & left,
-    const std::map<AbilityModifier, int> & right)
+std::map<Ability, int> & operator-=(std::map<Ability, int> & left,
+                                    const std::map<Ability, int> & right)
 {
     for (auto & rightModifier : right)
     {
@@ -97,9 +95,8 @@ std::map<AbilityModifier, int> & operator-=(
     return left;
 }
 
-std::map<CombatModifier, int> & operator+=(
-    std::map<CombatModifier, int> & left,
-    const std::map<CombatModifier, int> & right)
+std::map<CombatModifier, int> & operator+=(std::map<CombatModifier, int> & left,
+                                           const std::map<CombatModifier, int> & right)
 {
     for (auto & rightModifier : right)
     {
@@ -116,9 +113,8 @@ std::map<CombatModifier, int> & operator+=(
     return left;
 }
 
-std::map<CombatModifier, int> & operator-=(
-    std::map<CombatModifier, int> & left,
-    const std::map<CombatModifier, int> & right)
+std::map<CombatModifier, int> & operator-=(std::map<CombatModifier, int> & left,
+                                           const std::map<CombatModifier, int> & right)
 {
     for (auto & rightModifier : right)
     {
@@ -135,9 +131,8 @@ std::map<CombatModifier, int> & operator-=(
     return left;
 }
 
-std::map<StatusModifier, int> & operator+=(
-    std::map<StatusModifier, int> & left,
-    const std::map<StatusModifier, int> & right)
+std::map<StatusModifier, int> & operator+=(std::map<StatusModifier, int> & left,
+                                           const std::map<StatusModifier, int> & right)
 {
     for (auto & rightModifier : right)
     {
@@ -154,9 +149,8 @@ std::map<StatusModifier, int> & operator+=(
     return left;
 }
 
-std::map<StatusModifier, int> & operator-=(
-    std::map<StatusModifier, int> & left,
-    const std::map<StatusModifier, int> & right)
+std::map<StatusModifier, int> & operator-=(std::map<StatusModifier, int> & left,
+                                           const std::map<StatusModifier, int> & right)
 {
     for (auto & rightModifier : right)
     {
@@ -173,9 +167,8 @@ std::map<StatusModifier, int> & operator-=(
     return left;
 }
 
-std::map<Knowledge, bool> & operator+=(
-    std::map<Knowledge, bool> & left,
-    const std::map<Knowledge, bool> & right)
+std::map<Knowledge, bool> & operator+=(std::map<Knowledge, bool> & left,
+                                       const std::map<Knowledge, bool> & right)
 {
     for (auto & rightModifier : right)
     {
@@ -192,9 +185,8 @@ std::map<Knowledge, bool> & operator+=(
     return left;
 }
 
-std::map<Knowledge, bool> & operator-=(
-    std::map<Knowledge, bool> & left,
-    const std::map<Knowledge, bool> & right)
+std::map<Knowledge, bool> & operator-=(std::map<Knowledge, bool> & left,
+                                       const std::map<Knowledge, bool> & right)
 {
     for (auto & rightModifier : right)
     {

@@ -30,14 +30,10 @@ StatusModifier::StatusModifier() :
 StatusModifier::StatusModifier(const unsigned int & _value) :
     value()
 {
-    if (_value == 1) value = IncreaseHealth;
-    else if (_value == 2) value = DecreaseHealth;
-    else if (_value == 3) value = IncreaseHealthRegeneration;
-    else if (_value == 4) value = DecreaseHealthRegeneration;
-    else if (_value == 5) value = IncreaseStamina;
-    else if (_value == 6) value = DecreaseStamina;
-    else if (_value == 7) value = IncreaseStaminaRegeneration;
-    else if (_value == 8) value = DecreaseStaminaRegeneration;
+    if (_value == 1) value = Health;
+    else if (_value == 2) value = HealthRegeneration;
+    else if (_value == 3) value = Stamina;
+    else if (_value == 4) value = StaminaRegeneration;
     else value = None;
 }
 
@@ -54,39 +50,18 @@ bool StatusModifier::isValid(const unsigned int & _value)
 
 std::string StatusModifier::toString() const
 {
-    if (value == StatusModifier::IncreaseHealth)
-        return "IncreaseHealth";
-    if (value == StatusModifier::DecreaseHealth)
-        return "DecreaseHealth";
-    if (value == StatusModifier::IncreaseHealthRegeneration)
-        return "IncreaseHealthRegeneration";
-    if (value == StatusModifier::DecreaseHealthRegeneration)
-        return "DecreaseHealthRegeneration";
-    if (value == StatusModifier::IncreaseStamina)
-        return "IncreaseStamina";
-    if (value == StatusModifier::DecreaseStamina)
-        return "DecreaseStamina";
-    if (value == StatusModifier::IncreaseStaminaRegeneration)
-        return "IncreaseStaminaRegeneration";
-    if (value == StatusModifier::DecreaseStaminaRegeneration)
-        return "DecreaseStaminaRegeneration";
+    if (value == StatusModifier::Health)
+        return "Health";
+    if (value == StatusModifier::HealthRegeneration)
+        return "HealthRegeneration";
+    if (value == StatusModifier::Stamina)
+        return "Stamina";
+    if (value == StatusModifier::StaminaRegeneration)
+        return "StaminaRegeneration";
     else return "None";
 }
 
 unsigned int StatusModifier::toUInt() const
 {
     return static_cast<unsigned int>(value);
-}
-
-int StatusModifier::getSign(const StatusModifier & right)
-{
-    if (right == StatusModifier::IncreaseHealth) return 1;
-    if (right == StatusModifier::DecreaseHealth) return -1;
-    if (right == StatusModifier::IncreaseHealthRegeneration) return 1;
-    if (right == StatusModifier::DecreaseHealthRegeneration) return -1;
-    if (right == StatusModifier::IncreaseStamina) return 1;
-    if (right == StatusModifier::DecreaseStamina) return -1;
-    if (right == StatusModifier::IncreaseStaminaRegeneration) return 1;
-    if (right == StatusModifier::DecreaseStaminaRegeneration) return -1;
-    return 1;
 }

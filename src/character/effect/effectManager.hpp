@@ -29,7 +29,7 @@ class EffectManager
 {
 private:
     /// The overall ability modifier.
-    std::map<AbilityModifier, int> activeAbilityModifier;
+    std::map<Ability, int> activeAbilityModifier;
     /// The overall combat modifier.
     std::map<CombatModifier, int> activeCombatModifier;
     /// The overall status modifier.
@@ -107,7 +107,7 @@ public:
     /// @brief Retrieve the overall ability modifier.
     /// @param modifier The modifier to retrieve.
     /// @return The overall value of the given modifier.
-    int getAbilityModifier(const AbilityModifier & modifier) const;
+    int getAbilityModifier(const Ability & modifier) const;
 
     /// @brief Retrieve the overall combat modifier.
     /// @param modifier The modifier to retrieve.

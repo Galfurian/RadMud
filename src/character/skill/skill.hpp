@@ -26,7 +26,7 @@
 #include <vector>
 #include <memory>
 #include <map>
-#include "abilityModifier.hpp"
+#include "ability.hpp"
 #include "combatModifier.hpp"
 #include "statusModifier.hpp"
 #include "knowledge.hpp"
@@ -51,11 +51,11 @@ public:
     std::map<int, bool> requiredSkills;
     /// The list of abilities modifiers and the rank at which they became
     /// activate.
-    std::map<AbilityModifier, bool> abilityModifier;
+    std::map<Ability, int> abilityModifier;
     /// The list of combat modifiers and the rank at which they became activate.
-    std::map<CombatModifier, bool> combatModifier;
+    std::map<CombatModifier, int> combatModifier;
     /// The list of status modifiers and the rank at which they became activate.
-    std::map<StatusModifier, bool> statusModifier;
+    std::map<StatusModifier, int> statusModifier;
     /// The list of knowledge and the rank at which they became activate.
     std::map<Knowledge, bool> knowledge;
 
@@ -87,7 +87,7 @@ public:
 
     /// @brief Improves the skills which provides the given ability modifier.
     static void improveSkillAbilityModifier(Character * character,
-                                            const AbilityModifier & abilityModifier);
+                                            const Ability & abilityModifier);
 
     /// @brief Improves the skills which provides the given status modifier.
     static void improveSkillStatusModifier(Character * character,

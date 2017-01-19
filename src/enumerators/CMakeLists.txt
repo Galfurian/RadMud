@@ -22,7 +22,6 @@ set(PROJECT_SRC ${PROJECT_SRC}
         ${CMAKE_SOURCE_DIR}/src/enumerators/resourceType.cpp
         ${CMAKE_SOURCE_DIR}/src/enumerators/statusModifier.cpp
         ${CMAKE_SOURCE_DIR}/src/enumerators/combatModifier.cpp
-        ${CMAKE_SOURCE_DIR}/src/enumerators/abilityModifier.cpp
         ${CMAKE_SOURCE_DIR}/src/enumerators/characterPosture.cpp
         PARENT_SCOPE
         )

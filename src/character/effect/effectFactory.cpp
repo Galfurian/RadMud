@@ -42,11 +42,14 @@ Effect EffectFactory::clearTargets(Character * actor,
 
 Effect EffectFactory::disturbedAim(Character * actor,
                                    const unsigned int & duration,
-                                   const int & magnitude)
+                                   const int & negativeMagnitude)
 {
     auto effect = Effect(actor, "DisturbedAim", duration, "", "", nullptr);
     effect.effectCombatModifier.insert(
-        std::make_pair(CombatModifier::DecreaseRangedWeaponHitRoll, magnitude));
+        std::make_pair(CombatModifier::RangedWeaponHitRoll,
+                       negativeMagnitude
+        )
+    );
     return effect;
 }
 

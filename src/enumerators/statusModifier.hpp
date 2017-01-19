@@ -31,14 +31,10 @@ public:
     enum Enum
     {
         None,
-        IncreaseHealth,
-        DecreaseHealth,
-        IncreaseHealthRegeneration,
-        DecreaseHealthRegeneration,
-        IncreaseStamina,
-        DecreaseStamina,
-        IncreaseStaminaRegeneration,
-        DecreaseStaminaRegeneration,
+        Health,
+        HealthRegeneration,
+        Stamina,
+        StaminaRegeneration,
     };
 
     /// @brief Constructor from unsigned ind.
@@ -58,9 +54,6 @@ public:
 
     /// @brief Returns the enumerator as number.
     unsigned int toUInt() const;
-
-    /// @brief Returns the sign of the given modifier (+1 | -1).
-    static int getSign(const StatusModifier & right);
 
     /// @brief Equality operator.
     bool operator==(const StatusModifier & right) const

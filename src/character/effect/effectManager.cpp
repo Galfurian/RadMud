@@ -221,7 +221,7 @@ std::vector<Effect>::const_iterator EffectManager::end() const
     return activeEffects.end();
 }
 
-int EffectManager::getAbilityModifier(const AbilityModifier & modifier) const
+int EffectManager::getAbilityModifier(const Ability & modifier) const
 {
     auto it = activeAbilityModifier.find(modifier);
     if (it != activeAbilityModifier.end())

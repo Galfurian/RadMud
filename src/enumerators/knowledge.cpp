@@ -30,13 +30,32 @@ Knowledge::Knowledge() :
 Knowledge::Knowledge(const unsigned int & _value) :
     value()
 {
-    if (_value == 1) value = GatherWood;
-    else if (_value == 2) value = GatherStone;
-    else if (_value == 3) value = GatherErbs;
-    else if (_value == 4) value = GatherPlant;
-    else if (_value == 5) value = ButcherAnimal;
-    else if (_value == 6) value = SkinAnimal;
-    else if (_value == 7) value = TanHide;
+    if (_value == static_cast<unsigned int>(GatherWood))
+        value = GatherWood;
+    else if (_value == static_cast<unsigned int>(GatherStone))
+        value = GatherStone;
+    else if (_value == static_cast<unsigned int>(GatherHerbs))
+        value = GatherHerbs;
+    else if (_value == static_cast<unsigned int>(GatherPlant))
+        value = GatherPlant;
+    else if (_value == static_cast<unsigned int>(ButcherAnimal))
+        value = ButcherAnimal;
+    else if (_value == static_cast<unsigned int>(SkinAnimal))
+        value = SkinAnimal;
+    else if (_value == static_cast<unsigned int>(TanHide))
+        value = TanHide;
+    else if (_value == static_cast<unsigned int>(ReadBook))
+        value = ReadBook;
+    else if (_value == static_cast<unsigned int>(Climb))
+        value = Climb;
+    else if (_value == static_cast<unsigned int>(Run))
+        value = Run;
+    else if (_value == static_cast<unsigned int>(Dash))
+        value = Dash;
+    else if (_value == static_cast<unsigned int>(CraftSurvivalTool))
+        value = CraftSurvivalTool;
+    else if (_value == static_cast<unsigned int>(BasicArmorProficiency))
+        value = BasicArmorProficiency;
     else value = None;
 }
 
@@ -48,7 +67,7 @@ Knowledge::Knowledge(const Enum & _value) :
 
 bool Knowledge::isValid(const unsigned int & _value)
 {
-    return (_value >= 1) && (_value <= 7);
+    return (_value >= 1) && (_value <= 8);
 }
 
 std::string Knowledge::toString() const
@@ -57,8 +76,8 @@ std::string Knowledge::toString() const
         return "GatherWood";
     if (value == Knowledge::GatherStone)
         return "GatherStone";
-    if (value == Knowledge::GatherErbs)
-        return "GatherErbs";
+    if (value == Knowledge::GatherHerbs)
+        return "GatherHerbs";
     if (value == Knowledge::GatherPlant)
         return "GatherPlant";
     if (value == Knowledge::ButcherAnimal)
@@ -67,6 +86,18 @@ std::string Knowledge::toString() const
         return "SkinAnimal";
     if (value == Knowledge::TanHide)
         return "TanHide";
+    if (value == Knowledge::ReadBook)
+        return "ReadBook";
+    if (value == Knowledge::Climb)
+        return "Climb";
+    if (value == Knowledge::Run)
+        return "Run";
+    if (value == Knowledge::Dash)
+        return "Dash";
+    if (value == Knowledge::CraftSurvivalTool)
+        return "CraftSurvivalTool";
+    if (value == Knowledge::BasicArmorProficiency)
+        return "BasicArmorProficiency";
     else return "None";
 }
 

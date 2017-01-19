@@ -21,7 +21,6 @@
 
 #include "bodyPart.hpp"
 #include "resourceModel.hpp"
-#include "abilityModifier.hpp"
 #include <cassert>
 
 BodyPart::BodyPart() :
@@ -71,5 +70,4 @@ void BodyPart::getSheet(Table & sheet) const
             sheet.addRow({it.first->name, ToString(it.second)});
         }
     }
-    AbilityModifier modifier;
 }

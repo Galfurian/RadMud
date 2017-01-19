@@ -83,7 +83,7 @@ void Skill::updateSkillEffects(Character * character)
         for (auto it2 : skill->abilityModifier)
         {
             // Get the sign.
-            auto signedModifier = AbilityModifier::getSign(it2.first) *
+            auto signedModifier = it2.second *
                                   static_cast<int>(skillRank.toUInt());
             // Otherwise add the modifier based on the skill rank.
             auto it3 = skillEffect.effectAbilityModifier.find(it2.first);
@@ -101,7 +101,7 @@ void Skill::updateSkillEffects(Character * character)
         for (auto it2 : skill->combatModifier)
         {
             // Get the sign.
-            auto signedModifier = CombatModifier::getSign(it2.first) *
+            auto signedModifier = it2.second *
                                   static_cast<int>(skillRank.toUInt());
             // Otherwise add the modifier based on the skill rank.
             auto it3 = skillEffect.effectCombatModifier.find(it2.first);
@@ -119,7 +119,7 @@ void Skill::updateSkillEffects(Character * character)
         for (auto it2 : skill->statusModifier)
         {
             // Get the sign.
-            auto signedModifier = StatusModifier::getSign(it2.first) *
+            auto signedModifier = it2.second *
                                   static_cast<int>(skillRank.toUInt());
             // Otherwise add the modifier based on the skill rank.
             auto it3 = skillEffect.effectStatusModifier.find(it2.first);
@@ -155,16 +155,19 @@ void Skill::updateSkillEffects(Character * character)
 }
 
 void Skill::improveSkillAbilityModifier(Character * character,
-                                        const AbilityModifier & abilityModifier)
+                                        const Ability & abilityModifier)
 {
     for (auto & it : character->skills)
     {
         // Get the skill.
         auto skill = Mud::instance().findSkill(it.first);
         // If the skill provides the given ability modifier, improve the skill.
-        if (skill->abilityModifier[abilityModifier])
+        if (skill != nullptr)
         {
-            it.second += 50;
+            if (skill->abilityModifier[abilityModifier] > 0)
+            {
+                it.second += 50;
+            }
         }
     }
 }
@@ -177,9 +180,12 @@ void Skill::improveSkillStatusModifier(Character * character,
         // Get the skill.
         auto skill = Mud::instance().findSkill(it.first);
         // If the skill provides the given ability modifier, improve the skill.
-        if (skill->statusModifier[statusModifier])
+        if (skill != nullptr)
         {
-            it.second += 50;
+            if (skill->statusModifier[statusModifier] > 0)
+            {
+                it.second += 50;
+            }
         }
     }
 }
@@ -187,9 +193,6 @@ void Skill::improveSkillStatusModifier(Character * character,
 void Skill::improveSkillCombatModifier(Character * character,
                                        const CombatModifier & combatModifier)
 {
-    Logger::log(LogLevel::Debug, "[%s] Trying to increase %s",
-                character->getName(),
-                combatModifier.toString());
     for (auto & it : character->skills)
     {
         // Get the skill.
@@ -197,11 +200,8 @@ void Skill::improveSkillCombatModifier(Character * character,
         // If the skill provides the given ability modifier, improve the skill.
         if (skill != nullptr)
         {
-            if (skill->combatModifier[combatModifier])
+            if (skill->combatModifier[combatModifier] > 0)
             {
-                Logger::log(LogLevel::Debug, "[%s] Increasing %s",
-                            character->getName(),
-                            combatModifier.toString());
                 it.second += 50;
             }
         }
@@ -216,9 +216,12 @@ void Skill::improveSkillKnowledge(Character * character,
         // Get the skill.
         auto skill = Mud::instance().findSkill(it.first);
         // If the skill provides the given ability modifier, improve the skill.
-        if (skill->knowledge[knowledge])
+        if (skill != nullptr)
         {
-            it.second += 50;
+            if (skill->knowledge[knowledge])
+            {
+                it.second += 50;
+            }
         }
     }
 }

@@ -135,10 +135,10 @@ void Character::getSheet(Table & sheet) const
             ToString(this->getAbility(Ability::Strength, false)) +
             " [" +
             ToString(
-                effects.getAbilityModifier(AbilityModifier::IncreaseStrength)) +
+                effects.getAbilityModifier(Ability::Strength)) +
             "][" +
             ToString(
-                effects.getAbilityModifier(AbilityModifier::DecreaseStrength)) +
+                effects.getAbilityModifier(Ability::Strength)) +
             "]"});
     sheet.addRow(
         {
@@ -146,10 +146,10 @@ void Character::getSheet(Table & sheet) const
             ToString(this->getAbility(Ability::Agility, false)) +
             " [" +
             ToString(
-                effects.getAbilityModifier(AbilityModifier::IncreaseAgility)) +
+                effects.getAbilityModifier(Ability::Agility)) +
             "][" +
             ToString(
-                effects.getAbilityModifier(AbilityModifier::DecreaseAgility)) +
+                effects.getAbilityModifier(Ability::Agility)) +
             "]"});
     sheet.addRow(
         {
@@ -157,10 +157,10 @@ void Character::getSheet(Table & sheet) const
             ToString(this->getAbility(Ability::Perception, false)) +
             " [" +
             ToString(effects.getAbilityModifier(
-                AbilityModifier::IncreasePerception)) +
+                Ability::Perception)) +
             "][" +
             ToString(effects.getAbilityModifier(
-                AbilityModifier::DecreasePerception)) +
+                Ability::Perception)) +
             "]"});
     sheet.addRow(
         {
@@ -168,10 +168,10 @@ void Character::getSheet(Table & sheet) const
             ToString(this->getAbility(Ability::Constitution, false)) +
             " [" +
             ToString(effects.getAbilityModifier(
-                AbilityModifier::IncreaseConstitution)) +
+                Ability::Constitution)) +
             "][" +
             ToString(effects.getAbilityModifier(
-                AbilityModifier::DecreaseConstitution)) +
+                Ability::Constitution)) +
             "]"});
     sheet.addRow(
         {
@@ -179,10 +179,10 @@ void Character::getSheet(Table & sheet) const
             ToString(this->getAbility(Ability::Intelligence, false)) +
             " [" +
             ToString(effects.getAbilityModifier(
-                AbilityModifier::IncreaseIntelligence)) +
+                Ability::Intelligence)) +
             "][" +
             ToString(effects.getAbilityModifier(
-                AbilityModifier::DecreaseIntelligence)) +
+                Ability::Intelligence)) +
             "]"});
     sheet.addRow({"## Skill", "## Points"});
     for (auto it : skills)
@@ -318,9 +318,7 @@ unsigned int Character::getAbility(const Ability & ability,
     if (withEffects)
     {
         // Add the effects which increase the ability.
-        overall += effects.getAbilityModifier(ability.getIncreaseModifier());
-        // Add the effects which decrease the ability.
-        overall -= effects.getAbilityModifier(ability.getDecreaseModifier());
+        overall += effects.getAbilityModifier(ability);
         // Prune the value if exceed the boundaries.
         if (overall < 0)
         {
@@ -415,8 +413,7 @@ unsigned int Character::getMaxHealth(bool withEffects) const
     if (!withEffects) return BASE;
     // Otherwise evaluate the overall max health with the effects.
     int overall = static_cast<int>(BASE);
-    overall += effects.getStatusModifier(StatusModifier::IncreaseHealth);
-    overall -= effects.getStatusModifier(StatusModifier::DecreaseHealth);
+    overall += effects.getStatusModifier(StatusModifier::Health);
     // If the maximum value is lesser than zero, return zero.
     if (overall < 0) return 0;
     return static_cast<unsigned int>(overall);
@@ -516,8 +513,7 @@ unsigned int Character::getMaxStamina(bool withEffects) const
     if (!withEffects) return BASE;
     // Otherwise evaluate the overall max stamina with the effects.
     int overall = static_cast<int>(BASE);
-    overall += effects.getStatusModifier(StatusModifier::IncreaseStamina);
-    overall -= effects.getStatusModifier(StatusModifier::DecreaseStamina);
+    overall += effects.getStatusModifier(StatusModifier::Stamina);
     // If the maximum value is lesser than zero, return zero.
     if (overall < 0) return 0;
     return static_cast<unsigned int>(overall);

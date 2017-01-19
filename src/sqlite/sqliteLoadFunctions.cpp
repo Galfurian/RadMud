@@ -241,7 +241,7 @@ bool LoadSkillPrerequisite(ResultSet * result)
     return true;
 }
 
-bool LoadSkillBenefit(ResultSet * result)
+bool LoadSkillAbilityModifier(ResultSet * result)
 {
     while (result->next())
     {
@@ -254,54 +254,138 @@ bool LoadSkillBenefit(ResultSet * result)
                 throw SQLiteException("Can't find the skill " +
                                       ToString(skillVnum));
             }
-            auto ben1 = AbilityModifier(result->getNextUnsignedInteger());
-            if (ben1 != AbilityModifier::None)
+            auto abilityNumber = result->getNextUnsignedInteger();
+            auto ability = Ability(abilityNumber);
+            if (ability == Ability::None)
             {
-                // Add the ability modifier.
-                skill->abilityModifier[ben1] = true;
-                // Log it.
-                Logger::log(LogLevel::Debug,
-                            "\t%s%s",
-                            AlignString(skill->name, StringAlign::Left, 25),
-                            AlignString(ben1.toString(),
-                                        StringAlign::Left, 35));
+                throw SQLiteException("Can't find the ability " +
+                                      ToString(abilityNumber));
             }
-            auto ben2 = StatusModifier(result->getNextUnsignedInteger());
-            if (ben2 != StatusModifier::None)
+            auto modifier = result->getNextInteger();
+            skill->abilityModifier.insert(std::make_pair(ability, modifier));
+            // Log it.
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s%s",
+                        AlignString(skill->name, StringAlign::Left, 25),
+                        AlignString(ability.toString(), StringAlign::Left, 35),
+                        AlignString(ToString(modifier), StringAlign::Left, 35));
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadSkillStatusModifier(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto skillVnum = result->getNextInteger();
+            auto skill = Mud::instance().findSkill(skillVnum);
+            if (skill == nullptr)
             {
-                // Add the status modifier.
-                skill->statusModifier[ben2] = true;
-                // Log it.
-                Logger::log(LogLevel::Debug,
-                            "\t%s%s",
-                            AlignString(skill->name, StringAlign::Left, 25),
-                            AlignString(ben2.toString(),
-                                        StringAlign::Left, 35));
+                throw SQLiteException("Can't find the skill " +
+                                      ToString(skillVnum));
             }
-            auto ben3 = CombatModifier(result->getNextUnsignedInteger());
-            if (ben3 != CombatModifier::None)
+            auto statusModifierNumber = result->getNextUnsignedInteger();
+            auto statusModifier = StatusModifier(statusModifierNumber);
+            if (statusModifier == StatusModifier::None)
             {
-                // Add the combat modifier.
-                skill->combatModifier[ben3] = true;
-                // Log it.
-                Logger::log(LogLevel::Debug,
-                            "\t%s%s",
-                            AlignString(skill->name, StringAlign::Left, 25),
-                            AlignString(ben3.toString(),
-                                        StringAlign::Left, 35));
+                throw SQLiteException("Can't find the status modifier " +
+                                      ToString(statusModifierNumber));
             }
-            auto ben4 = Knowledge(result->getNextUnsignedInteger());
-            if (ben4 != Knowledge::None)
+            auto modifier = result->getNextInteger();
+            skill->statusModifier.insert(
+                std::make_pair(statusModifier, modifier));
+            // Log it.
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s%s",
+                        AlignString(skill->name, StringAlign::Left, 25),
+                        AlignString(statusModifier.toString(),
+                                    StringAlign::Left, 35),
+                        AlignString(ToString(modifier), StringAlign::Left, 35));
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadSkillCombatModifier(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto skillVnum = result->getNextInteger();
+            auto skill = Mud::instance().findSkill(skillVnum);
+            if (skill == nullptr)
             {
-                // Add the knowledge.
-                skill->knowledge[ben4] = true;
-                // Log it.
-                Logger::log(LogLevel::Debug,
-                            "\t%s%s",
-                            AlignString(skill->name, StringAlign::Left, 25),
-                            AlignString(ben4.toString(),
-                                        StringAlign::Left, 35));
+                throw SQLiteException("Can't find the skill " +
+                                      ToString(skillVnum));
             }
+            auto combatModifierNumber = result->getNextUnsignedInteger();
+            auto combatModifier = CombatModifier(combatModifierNumber);
+            if (combatModifier == CombatModifier::None)
+            {
+                throw SQLiteException("Can't find the combat modifier " +
+                                      ToString(combatModifierNumber));
+            }
+            auto modifier = result->getNextInteger();
+            skill->combatModifier.insert(
+                std::make_pair(combatModifier, modifier));
+            // Log it.
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s%s",
+                        AlignString(skill->name, StringAlign::Left, 25),
+                        AlignString(combatModifier.toString(),
+                                    StringAlign::Left, 35),
+                        AlignString(ToString(modifier), StringAlign::Left, 35));
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadSkillKnowledge(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto skillVnum = result->getNextInteger();
+            auto skill = Mud::instance().findSkill(skillVnum);
+            if (skill == nullptr)
+            {
+                throw SQLiteException("Can't find the skill " +
+                                      ToString(skillVnum));
+            }
+            auto knowledgeNumber = result->getNextUnsignedInteger();
+            auto knowledge = Knowledge(knowledgeNumber);
+            if (knowledge == Ability::None)
+            {
+                throw SQLiteException("Can't find the knowledge " +
+                                      ToString(knowledgeNumber));
+            }
+            skill->knowledge.insert(std::make_pair(knowledge, true));
+            // Log it.
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s",
+                        AlignString(skill->name, StringAlign::Left, 25),
+                        AlignString(knowledge.toString(),
+                                    StringAlign::Left, 35));
         }
         catch (SQLiteException & e)
         {

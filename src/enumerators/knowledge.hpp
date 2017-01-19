@@ -31,13 +31,19 @@ public:
     enum Enum
     {
         None,
-        GatherWood,
-        GatherStone,
-        GatherErbs,
-        GatherPlant,
-        ButcherAnimal,
-        SkinAnimal,
-        TanHide
+        GatherWood,                     /// < Gather Wood
+        GatherStone,                    /// < Gather Stone
+        GatherHerbs,                    /// < Gather Herbs
+        GatherPlant,                    /// < Gather Plant
+        ButcherAnimal,                  /// < Butcher Animal
+        SkinAnimal,                     /// < Skin Animal
+        TanHide,                        /// < Tan Hide
+        ReadBook,                       /// < Read Book
+        Climb = 10,                     /// < Climb
+        Run = 11,                       /// < Run
+        Dash = 12,                      /// < Dash
+        CraftSurvivalTool = 30,         /// < Craft Survival Tool
+        BasicArmorProficiency = 40      /// < Basic Armor Proficiency
     };
 
     /// @brief Constructor from unsigned ind.

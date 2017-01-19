@@ -62,7 +62,14 @@ SQLiteDbms::SQLiteDbms() :
     loaders.push_back(TableLoader("Mobile", LoadMobile));
     loaders.push_back(TableLoader("Skill", LoadSkill));
     loaders.push_back(TableLoader("SkillPrerequisite", LoadSkillPrerequisite));
-    loaders.push_back(TableLoader("SkillBenefit", LoadSkillBenefit));
+    loaders.push_back(TableLoader("SkillAbilityModifier",
+                                  LoadSkillAbilityModifier));
+    loaders.push_back(TableLoader("SkillStatusModifier",
+                                  LoadSkillStatusModifier));
+    loaders.push_back(TableLoader("SkillCombatModifier",
+                                  LoadSkillCombatModifier));
+    loaders.push_back(TableLoader("SkillKnowledge",
+                                  LoadSkillKnowledge));
     loaders.push_back(TableLoader("BodyPartResources", LoadBodyPartResources));
     loaders.push_back(TableLoader("RaceBaseSkill", LoadRaceBaseSkill));
     loaders.push_back(TableLoader("RaceBaseAbility", LoadRaceBaseAbility));

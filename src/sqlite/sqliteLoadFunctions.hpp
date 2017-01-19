@@ -50,8 +50,17 @@ bool LoadSkill(ResultSet * result);
 /// @brief Function used to retrieve information about skills prerequisites.
 bool LoadSkillPrerequisite(ResultSet * result);
 
-/// @brief Function used to retrieve information about skills benefits.
-bool LoadSkillBenefit(ResultSet * result);
+/// @brief Loads the ability modifier associated with a skill.
+bool LoadSkillAbilityModifier(ResultSet * result);
+
+/// @brief Loads the status modifier associated with a skill.
+bool LoadSkillStatusModifier(ResultSet * result);
+
+/// @brief Loads the combat modifier associated with a skill.
+bool LoadSkillCombatModifier(ResultSet * result);
+
+/// @brief Loads the knowledge associated with a skill.
+bool LoadSkillKnowledge(ResultSet * result);
 
 /// @brief Function used to retrieve information about factions.
 bool LoadFaction(ResultSet * result);

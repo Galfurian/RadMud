@@ -22,8 +22,6 @@
 
 #pragma once
 
-#include "abilityModifier.hpp"
-
 #include <string>
 
 /// @brief The list of character's abilities.
@@ -72,12 +70,6 @@ public:
     /// @param value The total ability value.
     /// @return The ability modifier.
     static unsigned int getModifier(const unsigned int & value);
-
-    /// @brief Returns the modifier identifying an increase of the ability.
-    AbilityModifier getIncreaseModifier() const;
-
-    /// @brief Returns the modifier identifying a decrease of the ability.
-    AbilityModifier getDecreaseModifier() const;
 
     /// @brief Equality operator w.r.t. a ability object.
     bool operator==(const Ability & rhs) const;

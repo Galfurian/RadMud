@@ -30,18 +30,22 @@ CombatModifier::CombatModifier() :
 CombatModifier::CombatModifier(const unsigned int & _value) :
     value()
 {
-    if (_value == 1) value = IncreaseUnarmedHitRoll;
-    else if (_value == 2) value = DecreaseUnarmedHitRoll;
-    else if (_value == 3) value = IncreaseUnarmedDamage;
-    else if (_value == 4) value = DecreaseUnarmedDamage;
-    else if (_value == 5) value = IncreaseMeleeWeaponHitRoll;
-    else if (_value == 6) value = DecreaseMeleeWeaponHitRoll;
-    else if (_value == 7) value = IncreaseMeleeWeaponDamage;
-    else if (_value == 8) value = DecreaseMeleeWeaponDamage;
-    else if (_value == 9) value = IncreaseRangedWeaponHitRoll;
-    else if (_value == 10) value = DecreaseRangedWeaponHitRoll;
-    else if (_value == 11) value = IncreaseRangedWeaponDamage;
-    else if (_value == 12) value = DecreaseRangedWeaponDamage;
+    if (_value == static_cast<unsigned int>(UnarmedHitRoll))
+        value = UnarmedHitRoll;
+    else if (_value == static_cast<unsigned int>(UnarmedDamage))
+        value = UnarmedDamage;
+    else if (_value == static_cast<unsigned int>(MeleeWeaponHitRoll))
+        value = MeleeWeaponHitRoll;
+    else if (_value == static_cast<unsigned int>(MeleeWeaponDamage))
+        value = MeleeWeaponDamage;
+    else if (_value == static_cast<unsigned int>(RangedWeaponHitRoll))
+        value = RangedWeaponHitRoll;
+    else if (_value == static_cast<unsigned int>(RangedWeaponDamage))
+        value = RangedWeaponDamage;
+    else if (_value == static_cast<unsigned int>(RangedAimSpeed))
+        value = RangedAimSpeed;
+    else if (_value == static_cast<unsigned int>(ArmorClass))
+        value = ArmorClass;
     else value = None;
 }
 
@@ -53,56 +57,31 @@ CombatModifier::CombatModifier(const Enum & _value) :
 
 bool CombatModifier::isValid(const unsigned int & _value)
 {
-    return (_value >= 1) && (_value <= 12);
+    return (_value >= 1) && (_value <= 7);
 }
 
 std::string CombatModifier::toString() const
 {
-    if (value == CombatModifier::IncreaseUnarmedHitRoll)
-        return "IncreaseUnarmedHitRoll";
-    if (value == CombatModifier::DecreaseUnarmedHitRoll)
-        return "DecreaseUnarmedHitRoll";
-    if (value == CombatModifier::IncreaseUnarmedDamage)
-        return "IncreaseUnarmedDamage";
-    if (value == CombatModifier::DecreaseUnarmedDamage)
-        return "DecreaseUnarmedDamage";
-    if (value == CombatModifier::IncreaseMeleeWeaponHitRoll)
-        return "IncreaseMeleeWeaponHitRoll";
-    if (value == CombatModifier::DecreaseMeleeWeaponHitRoll)
-        return "DecreaseMeleeWeaponHitRoll";
-    if (value == CombatModifier::IncreaseMeleeWeaponDamage)
-        return "IncreaseMeleeWeaponDamage";
-    if (value == CombatModifier::DecreaseMeleeWeaponDamage)
-        return "DecreaseMeleeWeaponDamage";
-    if (value == CombatModifier::IncreaseRangedWeaponHitRoll)
-        return "IncreaseRangedWeaponHitRoll";
-    if (value == CombatModifier::DecreaseRangedWeaponHitRoll)
-        return "DecreaseRangedWeaponHitRoll";
-    if (value == CombatModifier::IncreaseRangedWeaponDamage)
-        return "IncreaseRangedWeaponDamage";
-    if (value == CombatModifier::DecreaseRangedWeaponDamage)
-        return "DecreaseRangedWeaponDamage";
+    if (value == CombatModifier::UnarmedHitRoll)
+        return "UnarmedHitRoll";
+    if (value == CombatModifier::UnarmedDamage)
+        return "UnarmedDamage";
+    if (value == CombatModifier::MeleeWeaponHitRoll)
+        return "MeleeWeaponHitRoll";
+    if (value == CombatModifier::MeleeWeaponDamage)
+        return "MeleeWeaponDamage";
+    if (value == CombatModifier::RangedWeaponHitRoll)
+        return "RangedWeaponHitRoll";
+    if (value == CombatModifier::RangedWeaponDamage)
+        return "RangedWeaponDamage";
+    if (value == CombatModifier::RangedAimSpeed)
+        return "RangedAimSpeed";
+    if (value == CombatModifier::ArmorClass)
+        return "ArmorClass";
     else return "None";
 }
 
 unsigned int CombatModifier::toUInt() const
 {
     return static_cast<unsigned int>(value);
-}
-
-int CombatModifier::getSign(const CombatModifier & right)
-{
-    if (right == CombatModifier::IncreaseUnarmedHitRoll) return 1;
-    if (right == CombatModifier::DecreaseUnarmedHitRoll) return -1;
-    if (right == CombatModifier::IncreaseUnarmedDamage) return 1;
-    if (right == CombatModifier::DecreaseUnarmedDamage) return -1;
-    if (right == CombatModifier::IncreaseMeleeWeaponHitRoll) return 1;
-    if (right == CombatModifier::DecreaseMeleeWeaponHitRoll) return -1;
-    if (right == CombatModifier::IncreaseMeleeWeaponDamage) return 1;
-    if (right == CombatModifier::DecreaseMeleeWeaponDamage) return -1;
-    if (right == CombatModifier::IncreaseRangedWeaponHitRoll) return 1;
-    if (right == CombatModifier::DecreaseRangedWeaponHitRoll) return -1;
-    if (right == CombatModifier::IncreaseRangedWeaponDamage) return 1;
-    if (right == CombatModifier::DecreaseRangedWeaponDamage) return -1;
-    return 1;
 }
