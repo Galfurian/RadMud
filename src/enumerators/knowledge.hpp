@@ -31,18 +31,25 @@ public:
     enum Enum
     {
         None,
-        GatherWood,                     /// < Gather Wood
-        GatherStone,                    /// < Gather Stone
-        GatherHerbs,                    /// < Gather Herbs
-        GatherPlant,                    /// < Gather Plant
-        ButcherAnimal,                  /// < Butcher Animal
-        SkinAnimal,                     /// < Skin Animal
-        TanHide,                        /// < Tan Hide
-        ReadBook,                       /// < Read Book
+        GatherHerbs = 3,                /// < Gather Herbs
+        GatherPlant = 4,                /// < Gather Plant
+        ButcherAnimal = 5,              /// < Butcher Animal
+        SkinAnimal = 6,                 /// < Skin Animal
+        TanHide = 7,                    /// < Tan Hide
+        ReadBook = 8,                   /// < Read Book
         Climb = 10,                     /// < Climb
         Run = 11,                       /// < Run
         Dash = 12,                      /// < Dash
+        Woodcutting = 15,               /// < Woodcutting
+        Carpentry = 16,                 /// < Carpentry
+        Woodcarving = 17,               /// < Woodcarving
+        Mining = 20,                    /// < Mining
+        Smelting = 21,                  /// < Smelting
+        Blacksmithing = 22,             /// < Blacksmithing
+        MetalWeaponCrafting = 23,       /// < Metal Weapon Crafting
+        MetalArmorCrafting = 24,        /// < Metal Armor Crafting
         CraftSurvivalTool = 30,         /// < Craft Survival Tool
+        Scavenge = 35,                  /// < Scavenge
         BasicArmorProficiency = 40      /// < Basic Armor Proficiency
     };
 

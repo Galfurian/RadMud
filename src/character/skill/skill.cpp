@@ -32,7 +32,7 @@ Skill::Skill() :
     vnum(),
     name(),
     description(),
-    attribute(),
+    ability(),
     stage(),
     requiredSkills(),
     abilityModifier(),
@@ -56,7 +56,7 @@ bool Skill::check()
     assert(vnum > 0);
     assert(!name.empty());
     assert(!description.empty());
-    assert(attribute > 0);
+    assert(ability != Ability::None);
     assert(stage > 0);
     return true;
 }

@@ -43,8 +43,8 @@ public:
     std::string name;
     /// The description of the skill.
     std::string description;
-    /// The main attribute of the skill.
-    int attribute;
+    /// The main ability of the skill.
+    Ability ability;
     /// The overall stage of the skill.
     int stage;
     /// The list of required skills.

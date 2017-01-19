@@ -30,11 +30,7 @@ Knowledge::Knowledge() :
 Knowledge::Knowledge(const unsigned int & _value) :
     value()
 {
-    if (_value == static_cast<unsigned int>(GatherWood))
-        value = GatherWood;
-    else if (_value == static_cast<unsigned int>(GatherStone))
-        value = GatherStone;
-    else if (_value == static_cast<unsigned int>(GatherHerbs))
+    if (_value == static_cast<unsigned int>(GatherHerbs))
         value = GatherHerbs;
     else if (_value == static_cast<unsigned int>(GatherPlant))
         value = GatherPlant;
@@ -52,6 +48,24 @@ Knowledge::Knowledge(const unsigned int & _value) :
         value = Run;
     else if (_value == static_cast<unsigned int>(Dash))
         value = Dash;
+    else if (_value == static_cast<unsigned int>(Woodcutting))
+        value = Woodcutting;
+    else if (_value == static_cast<unsigned int>(Carpentry))
+        value = Carpentry;
+    else if (_value == static_cast<unsigned int>(Woodcarving))
+        value = Woodcarving;
+    else if (_value == static_cast<unsigned int>(Mining))
+        value = Mining;
+    else if (_value == static_cast<unsigned int>(Smelting))
+        value = Smelting;
+    else if (_value == static_cast<unsigned int>(Blacksmithing))
+        value = Blacksmithing;
+    else if (_value == static_cast<unsigned int>(MetalWeaponCrafting))
+        value = MetalWeaponCrafting;
+    else if (_value == static_cast<unsigned int>(MetalArmorCrafting))
+        value = MetalArmorCrafting;
+    else if (_value == static_cast<unsigned int>(Scavenge))
+        value = Scavenge;
     else if (_value == static_cast<unsigned int>(CraftSurvivalTool))
         value = CraftSurvivalTool;
     else if (_value == static_cast<unsigned int>(BasicArmorProficiency))
@@ -72,10 +86,6 @@ bool Knowledge::isValid(const unsigned int & _value)
 
 std::string Knowledge::toString() const
 {
-    if (value == Knowledge::GatherWood)
-        return "GatherWood";
-    if (value == Knowledge::GatherStone)
-        return "GatherStone";
     if (value == Knowledge::GatherHerbs)
         return "GatherHerbs";
     if (value == Knowledge::GatherPlant)
@@ -94,6 +104,24 @@ std::string Knowledge::toString() const
         return "Run";
     if (value == Knowledge::Dash)
         return "Dash";
+    if (value == Knowledge::Woodcutting)
+        return "Woodcutting";
+    if (value == Knowledge::Carpentry)
+        return "Carpentry";
+    if (value == Knowledge::Woodcarving)
+        return "Woodcarving";
+    if (value == Knowledge::Mining)
+        return "Mining";
+    if (value == Knowledge::Smelting)
+        return "Smelting";
+    if (value == Knowledge::Blacksmithing)
+        return "Blacksmithing";
+    if (value == Knowledge::MetalWeaponCrafting)
+        return "MetalWeaponCrafting";
+    if (value == Knowledge::MetalArmorCrafting)
+        return "MetalArmorCrafting";
+    if (value == Knowledge::Scavenge)
+        return "Scavenge";
     if (value == Knowledge::CraftSurvivalTool)
         return "CraftSurvivalTool";
     if (value == Knowledge::BasicArmorProficiency)

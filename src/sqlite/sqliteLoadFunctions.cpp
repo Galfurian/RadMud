@@ -182,7 +182,7 @@ bool LoadSkill(ResultSet * result)
             skill->vnum = result->getNextInteger();
             skill->name = result->getNextString();
             skill->description = result->getNextString();
-            skill->attribute = result->getNextInteger();
+            skill->ability = Ability(result->getNextUnsignedInteger());
             skill->stage = result->getNextInteger();
             // Check the correctness.
             if (!skill->check())
@@ -193,6 +193,12 @@ bool LoadSkill(ResultSet * result)
             {
                 throw SQLiteException("Error during skill insertion.");
             }
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s%s",
+                        AlignString(skill->name, StringAlign::Left, 25),
+                        AlignString(skill->ability.toString(),
+                                    StringAlign::Left, 25),
+                        skill->description);
         }
         catch (SQLiteException & e)
         {
