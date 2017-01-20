@@ -70,14 +70,34 @@ bool Ability::isValid(const std::string & _ability)
     return (_ability == "intelligence");
 }
 
-std::string Ability::toString() const
+std::string Ability::toString(const bool & caps) const
 {
-    if (ability == Ability::Strength) return "strength";
-    else if (ability == Ability::Agility) return "agility";
-    else if (ability == Ability::Perception) return "perception";
-    else if (ability == Ability::Constitution) return "constitution";
-    else if (ability == Ability::Intelligence) return "intelligence";
+    if (ability == Ability::Strength)
+        if (caps) return "Strength"; else return "strength";
+    else if (ability == Ability::Agility)
+        if (caps) return "Agility"; else return "agility";
+    else if (ability == Ability::Perception)
+        if (caps) return "Perception"; else return "perception";
+    else if (ability == Ability::Constitution)
+        if (caps) return "Constitution"; else return "constitution";
+    else if (ability == Ability::Intelligence)
+        if (caps) return "Intelligence"; else return "intelligence";
     else return "none";
+}
+
+std::string Ability::getAbbreviation(const bool & caps) const
+{
+    if (ability == Ability::Strength)
+        if (caps) return "Str"; else return "str";
+    else if (ability == Ability::Agility)
+        if (caps) return "Agi"; else return "agi";
+    else if (ability == Ability::Perception)
+        if (caps) return "Per"; else return "per";
+    else if (ability == Ability::Constitution)
+        if (caps) return "Con"; else return "con";
+    else if (ability == Ability::Intelligence)
+        if (caps) return "Int"; else return "int";
+    else return "Nil";
 }
 
 std::string Ability::getDescription() const

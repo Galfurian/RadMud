@@ -486,40 +486,14 @@ bool DoStatistics(Character * character, ArgumentHandler & /*args*/)
     msg += MAG("Experience  : ") + ToString(player->experience) + " px\n";
     // Add the abilities.
     // STRENGTH
-    msg += "    " + MAG("Str    ");
-    msg += AlignString(ToString(player->getAbility(Ability::Strength)),
-                       StringAlign::Right, 5) + "(";
-    msg += AlignString(
-        ToString(player->getAbilityModifier(Ability::Strength)),
-        StringAlign::Right, 3) + ")\n";
-    // AGILITY
-    msg += "    " + MAG("Agi    ");
-    msg += AlignString(ToString(player->getAbility(Ability::Agility)),
-                       StringAlign::Right, 5) + "(";
-    msg += AlignString(
-        ToString(player->getAbilityModifier(Ability::Agility)),
-        StringAlign::Right, 3) + ")\n";
-    // PERCEPTION
-    msg += "    " + MAG("Per    ");
-    msg += AlignString(ToString(player->getAbility(Ability::Perception)),
-                       StringAlign::Right, 5) + "(";
-    msg += AlignString(
-        ToString(player->getAbilityModifier(Ability::Perception)),
-        StringAlign::Right, 3) + ")\n";
-    // CONSTITUTION
-    msg += "    " + MAG("Con    ");
-    msg += AlignString(ToString(player->getAbility(Ability::Constitution)),
-                       StringAlign::Right, 5) + "(";
-    msg += AlignString(
-        ToString(player->getAbilityModifier(Ability::Constitution)),
-        StringAlign::Right, 3) + ")\n";
-    // INTELLIGENCE
-    msg += "    " + MAG("Int    ");
-    msg += AlignString(ToString(player->getAbility(Ability::Intelligence)),
-                       StringAlign::Right, 5) + "(";
-    msg += AlignString(
-        ToString(player->getAbilityModifier(Ability::Intelligence)),
-        StringAlign::Right, 3) + ")\n";
+    for (auto const & ability:player->abilities)
+    {
+        msg += "    " + MAG(ability.first.getAbbreviation(true)) + "    ";
+        msg += AlignString(player->getAbility(ability.first),
+                           StringAlign::Right, 5) + "(";
+        msg += AlignString(player->getAbilityModifier(ability.first),
+                           StringAlign::Right, 3) + ")\n";
+    }
     // HEALTH
     msg += "    " + MAG("Health  ");
     msg += ToString(player->health) + "/" + ToString(player->getMaxHealth());

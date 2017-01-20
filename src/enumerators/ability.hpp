@@ -58,7 +58,10 @@ public:
     static bool isValid(const std::string & _ability);
 
     /// @brief Returns the ability as string.
-    std::string toString() const;
+    std::string toString(const bool & caps = false) const;
+
+    /// @brief Returns the abbreviation of the ability name.
+    std::string getAbbreviation(const bool & caps = false) const;
 
     /// @brief Returns the description of the ability.
     std::string getDescription() const;

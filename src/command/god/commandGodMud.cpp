@@ -155,7 +155,7 @@ bool DoSkillList(Character * character, ArgumentHandler & /*args*/)
         TableRow row;
         row.push_back(ToString(iterator.first));
         row.push_back(iterator.second->name);
-        row.push_back(iterator.second->ability.toString());
+        row.push_back(iterator.second->ability.toString(true));
         // Add the row to the table.
         table.addRow(row);
     }

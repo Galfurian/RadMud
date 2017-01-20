@@ -197,7 +197,7 @@ bool LoadSkill(ResultSet * result)
                         "\t%s%s%s",
                         AlignString(skill->name, StringAlign::Left, 25),
                         AlignString(skill->ability.toString(),
-                                    StringAlign::Left, 25),
+                                    StringAlign::Left, 15),
                         skill->description);
         }
         catch (SQLiteException & e)
@@ -274,7 +274,7 @@ bool LoadSkillAbilityModifier(ResultSet * result)
                         "\t%s%s%s",
                         AlignString(skill->name, StringAlign::Left, 25),
                         AlignString(ability.toString(), StringAlign::Left, 35),
-                        AlignString(ToString(modifier), StringAlign::Left, 35));
+                        AlignString(modifier, StringAlign::Left, 35));
         }
         catch (SQLiteException & e)
         {
@@ -314,7 +314,7 @@ bool LoadSkillStatusModifier(ResultSet * result)
                         AlignString(skill->name, StringAlign::Left, 25),
                         AlignString(statusModifier.toString(),
                                     StringAlign::Left, 35),
-                        AlignString(ToString(modifier), StringAlign::Left, 35));
+                        AlignString(modifier, StringAlign::Left, 35));
         }
         catch (SQLiteException & e)
         {
@@ -354,7 +354,7 @@ bool LoadSkillCombatModifier(ResultSet * result)
                         AlignString(skill->name, StringAlign::Left, 25),
                         AlignString(combatModifier.toString(),
                                     StringAlign::Left, 35),
-                        AlignString(ToString(modifier), StringAlign::Left, 35));
+                        AlignString(modifier, StringAlign::Left, 35));
         }
         catch (SQLiteException & e)
         {
