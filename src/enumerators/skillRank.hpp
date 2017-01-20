@@ -67,6 +67,8 @@ public:
 
     static SkillRank getSkillRank(unsigned int & _value);
 
+    static unsigned int getSkillCap();
+
     /// @brief Equality operator.
     bool operator==(const SkillRank & rhs) const;
 

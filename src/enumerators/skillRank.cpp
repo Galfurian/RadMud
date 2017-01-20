@@ -130,6 +130,11 @@ SkillRank SkillRank::getSkillRank(unsigned int & _value)
     return Newbie;
 }
 
+unsigned int SkillRank::getSkillCap()
+{
+    return 119000;
+}
+
 bool SkillRank::operator==(const SkillRank & rhs) const
 {
     return value == rhs.value;

@@ -20,6 +20,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "commandGodCharacter.hpp"
+#include "skillRank.hpp"
 #include "mud.hpp"
 
 bool DoGodInfo(Character * character, ArgumentHandler & args)
@@ -345,48 +346,40 @@ bool DoPlayerModSkill(Character * character, ArgumentHandler & args)
         return false;
     }
     int modifier = ToNumber<int>(args[2].getContent());
-    if ((modifier == 0) || (modifier < -100) || (modifier > 100))
+    if (modifier == 0)
     {
         character->sendMsg("You must insert a valid modifier.\n");
         return false;
     }
-    std::pair<const int, unsigned int> * playerSkill = nullptr;
-    for (auto it : target->skills)
-    {
-        if (it.first == skill->vnum)
-        {
-            playerSkill = &it;
-            break;
-        }
-    }
-    if (playerSkill == nullptr)
+    auto skillEntry = target->skills.find(skill->vnum);
+    if (skillEntry == target->skills.end())
     {
         character->sendMsg("%s does not possess that skill.\n",
                            target->getNameCapital());
         return false;
     }
-    auto modified = static_cast<int>(playerSkill->second) + modifier;
+    auto modified = static_cast<int>(skillEntry->second) + modifier;
     if (modified <= 0)
     {
         character->sendMsg("You cannot reduce the skill <= 0 (%s).\n",
                            modified);
         return false;
     }
-    if (modified >= 100)
+    auto skillCap = SkillRank::getSkillCap();
+    if (modified >= static_cast<int>(skillCap))
     {
-        character->sendMsg("You cannot increase the skill to 100 or above (%s)."
-                               "\n", modified);
-        return false;
+        modified = static_cast<int>(skillCap);
     }
     // Change the skill value.
-    playerSkill->second = static_cast<unsigned int>(modified);
+    skillEntry->second = static_cast<unsigned int>(modified);
     // Notify.
     character->sendMsg("You have successfully %s by %s the \"%s\" skill,"
                            "the new level is %s.\n",
                        ((modifier > 0) ? "increased " : "decreased"),
                        modifier,
                        skill->name,
-                       playerSkill->second);
+                       skillEntry->second);
+    Skill::updateSkillEffects(character);
     return true;
 }
 

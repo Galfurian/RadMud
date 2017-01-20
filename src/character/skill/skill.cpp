@@ -161,12 +161,23 @@ void Skill::improveSkillAbilityModifier(Character * character,
     {
         // Get the skill.
         auto skill = Mud::instance().findSkill(it.first);
+        // Get the current skill rank.
+        auto skillRank = SkillRank::getSkillRank(it.second);
         // If the skill provides the given ability modifier, improve the skill.
         if (skill != nullptr)
         {
-            if (skill->abilityModifier[abilityModifier] > 0)
+            if (skill->abilityModifier.find(abilityModifier) !=
+                skill->abilityModifier.end())
             {
                 it.second += 50;
+                // Get the new skill rank.
+                auto newSkillRank = SkillRank::getSkillRank(it.second);
+                // Check if the skill has advanced on the ranking.
+                if (skillRank < newSkillRank)
+                {
+                    // Update the effects due to the skills.
+                    Skill::updateSkillEffects(character);
+                }
             }
         }
     }
@@ -179,12 +190,23 @@ void Skill::improveSkillStatusModifier(Character * character,
     {
         // Get the skill.
         auto skill = Mud::instance().findSkill(it.first);
+        // Get the current skill rank.
+        auto skillRank = SkillRank::getSkillRank(it.second);
         // If the skill provides the given ability modifier, improve the skill.
         if (skill != nullptr)
         {
-            if (skill->statusModifier[statusModifier] > 0)
+            if (skill->statusModifier.find(statusModifier) !=
+                skill->statusModifier.end())
             {
                 it.second += 50;
+                // Get the new skill rank.
+                auto newSkillRank = SkillRank::getSkillRank(it.second);
+                // Check if the skill has advanced on the ranking.
+                if (skillRank < newSkillRank)
+                {
+                    // Update the effects due to the skills.
+                    Skill::updateSkillEffects(character);
+                }
             }
         }
     }
@@ -197,12 +219,23 @@ void Skill::improveSkillCombatModifier(Character * character,
     {
         // Get the skill.
         auto skill = Mud::instance().findSkill(it.first);
+        // Get the current skill rank.
+        auto skillRank = SkillRank::getSkillRank(it.second);
         // If the skill provides the given ability modifier, improve the skill.
         if (skill != nullptr)
         {
-            if (skill->combatModifier[combatModifier] > 0)
+            if (skill->combatModifier.find(combatModifier) !=
+                skill->combatModifier.end())
             {
                 it.second += 50;
+                // Get the new skill rank.
+                auto newSkillRank = SkillRank::getSkillRank(it.second);
+                // Check if the skill has advanced on the ranking.
+                if (skillRank < newSkillRank)
+                {
+                    // Update the effects due to the skills.
+                    Skill::updateSkillEffects(character);
+                }
             }
         }
     }
@@ -215,12 +248,23 @@ void Skill::improveSkillKnowledge(Character * character,
     {
         // Get the skill.
         auto skill = Mud::instance().findSkill(it.first);
+        // Get the current skill rank.
+        auto skillRank = SkillRank::getSkillRank(it.second);
         // If the skill provides the given ability modifier, improve the skill.
         if (skill != nullptr)
         {
-            if (skill->knowledge[knowledge])
+            if (skill->knowledge.find(knowledge) !=
+                skill->knowledge.end())
             {
                 it.second += 50;
+                // Get the new skill rank.
+                auto newSkillRank = SkillRank::getSkillRank(it.second);
+                // Check if the skill has advanced on the ranking.
+                if (skillRank < newSkillRank)
+                {
+                    // Update the effects due to the skills.
+                    Skill::updateSkillEffects(character);
+                }
             }
         }
     }
