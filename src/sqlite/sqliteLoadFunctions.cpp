@@ -1495,9 +1495,15 @@ bool LoadBodyPartResources(ResultSet * result)
                 result->getNextInteger());
             assert(model != nullptr);
             assert(model->getType() == ModelType::Resource);
+            auto material = Mud::instance().findMaterial(
+                result->getNextInteger());
+            assert(material != nullptr);
             auto quantity = result->getNextInteger();
-            bodyPart->resources.emplace_back(
-                std::make_pair(model->toResource(), quantity));
+            BodyPart::BodyResource resource;
+            resource.material = material;
+            resource.resource = model->toResource();
+            resource.quantity = quantity;
+            bodyPart->resources.emplace_back(resource);
         }
         catch (SQLiteException & e)
         {

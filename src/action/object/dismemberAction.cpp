@@ -22,23 +22,21 @@
 #include "dismemberAction.hpp"
 #include "character.hpp"
 #include "logger.hpp"
+#include "room.hpp"
 
-DismemberAction::DismemberAction(Character * _actor,
-                                 CorpseItem * _corpse,
-                                 std::shared_ptr<BodyPart> _bodyPart) :
+DismemberAction::DismemberAction(Character * _actor, CorpseItem * _corpse) :
     GeneralAction(_actor),
-    corpse(_corpse),
-    bodyPart(_bodyPart)
+    corpse(_corpse)
 {
     // Debugging message.
     Logger::log(LogLevel::Debug, "Created DismemberAction.");
     // Reset the cooldown of the action.
-    this->resetCooldown(DismemberAction::getCooldown(_actor, _bodyPart));
+    this->resetCooldown(DismemberAction::getCooldown(_actor));
 }
 
 DismemberAction::~DismemberAction()
 {
-    Logger::log(LogLevel::Debug, "Deleted move action.");
+    Logger::log(LogLevel::Debug, "Deleted DismemberAction.");
 }
 
 bool DismemberAction::check(std::string & error) const
@@ -50,11 +48,6 @@ bool DismemberAction::check(std::string & error) const
     if (corpse == nullptr)
     {
         error = "You cannot find the corpse you want to dismember.";
-        return false;
-    }
-    if (bodyPart == nullptr)
-    {
-        error = "You don't know what to dismember from the corpse.";
         return false;
     }
     return true;
@@ -82,13 +75,44 @@ ActionStatus DismemberAction::perform()
     {
         return ActionStatus::Running;
     }
+    // Get the first available body part.
+    auto it = corpse->remainingBodyParts.begin();
+    if (it == corpse->remainingBodyParts.end())
+    {
+        actor->sendMsg("You fail to dismember %s.",
+                       corpse->getName(true));
+        return ActionStatus::Error;
+    }
+    auto bodyPart = (*it);
+    // Remove the body part.
+    corpse->remainingBodyParts.erase(it);
+    corpse->remainingBodyParts.shrink_to_fit();
+    // Create the resources of the given body part.
+    for (auto resources : bodyPart->resources)
+    {
+        auto item = resources.resource->createItem(
+            actor->getName(),
+            resources.material,
+            false,
+            ItemQuality::Normal,
+            static_cast<unsigned int>(resources.quantity));
+        if (actor->canCarry(item, item->quantity))
+        {
+            actor->addInventoryItem(item);
+        }
+        else if (actor->room != nullptr)
+        {
+            actor->room->addItem(item);
+        }
+        Skill::improveSkillKnowledge(actor, Knowledge::Butchery);
+        actor->sendMsg("You successfully butcher %s and produce %s.",
+                       corpse->getName(true),
+                       item->getName(true));
+    }
     return ActionStatus::Finished;
 }
 
-unsigned int DismemberAction::getCooldown(Character * /*character*/,
-                                          std::shared_ptr<BodyPart>
-                                          /*_bodyPart*/)
+unsigned int DismemberAction::getCooldown(Character * /*character*/)
 {
-    // TODO: Evaluate the required time based on the skills of the character.
     return 3;
 }

@@ -33,7 +33,7 @@ public:
         None,
         GatherHerbs = 3,                /// < Gather Herbs
         GatherPlant = 4,                /// < Gather Plant
-        ButcherAnimal = 5,              /// < Butcher Animal
+        Butchery = 5,                   /// < Butcher Animal
         SkinAnimal = 6,                 /// < Skin Animal
         TanHide = 7,                    /// < Tan Hide
         ReadBook = 8,                   /// < Read Book

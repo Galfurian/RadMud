@@ -22,6 +22,7 @@
 #pragma once
 
 #include "table.hpp"
+#include "material.hpp"
 #include <string>
 #include <vector>
 #include <memory>
@@ -46,6 +47,13 @@ using BodyPartFlag = enum class BodyPartFlag_t
 class BodyPart
 {
 public:
+    struct BodyResource
+    {
+        std::shared_ptr<ResourceModel> resource;
+        Material * material;
+        int quantity;
+    };
+
     /// The virtual number.
     unsigned int vnum;
     /// The name.
@@ -55,7 +63,7 @@ public:
     /// The flags associated with the body part.
     unsigned int flags;
     /// The resources which can be produced from this body part.
-    std::vector<std::pair<std::shared_ptr<ResourceModel>, int>> resources;
+    std::vector<BodyResource> resources;
 
     /// @brief Constructor.
     BodyPart();

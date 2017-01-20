@@ -34,8 +34,8 @@ Knowledge::Knowledge(const unsigned int & _value) :
         value = GatherHerbs;
     else if (_value == static_cast<unsigned int>(GatherPlant))
         value = GatherPlant;
-    else if (_value == static_cast<unsigned int>(ButcherAnimal))
-        value = ButcherAnimal;
+    else if (_value == static_cast<unsigned int>(Butchery))
+        value = Butchery;
     else if (_value == static_cast<unsigned int>(SkinAnimal))
         value = SkinAnimal;
     else if (_value == static_cast<unsigned int>(TanHide))
@@ -90,8 +90,8 @@ std::string Knowledge::toString() const
         return "GatherHerbs";
     if (value == Knowledge::GatherPlant)
         return "GatherPlant";
-    if (value == Knowledge::ButcherAnimal)
-        return "ButcherAnimal";
+    if (value == Knowledge::Butchery)
+        return "Butchery";
     if (value == Knowledge::SkinAnimal)
         return "SkinAnimal";
     if (value == Knowledge::TanHide)

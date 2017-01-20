@@ -24,6 +24,7 @@
 #include "command.hpp"
 #include "player.hpp"
 #include "room.hpp"
+#include "dismemberAction.hpp"
 
 bool DoDismember(Character * character, ArgumentHandler & args)
 {
@@ -42,7 +43,7 @@ bool DoDismember(Character * character, ArgumentHandler & args)
         // Transform the character to player.
         auto player = character->toPlayer();
         // Check if the player can butcher animals.
-        if (!player->effects.getKnowledge(Knowledge::ButcherAnimal))
+        if (!player->effects.getKnowledge(Knowledge::Butchery))
         {
             character->sendMsg("You don't know how to dismember corpses.\n");
             return false;
@@ -81,16 +82,20 @@ bool DoDismember(Character * character, ArgumentHandler & args)
                            item->getNameCapital(true));
         return false;
     }
-    // Get the first body part.
-    auto bodyPart = corpse->remainingBodyParts.back();
-    character->sendMsg("You dismember %s and extract some useful stuff.\n",
-                       item->getName(true));
-    // TODO: Complete the command.
-    if (character->isPlayer())
+    auto dismemberAction = std::make_shared<DismemberAction>(character,
+                                                             corpse);
+    std::string error;
+    if (!dismemberAction->check(error))
     {
-        // Transform the character to player.
-        auto player = character->toPlayer();
-        Skill::improveSkillKnowledge(player, Knowledge::ButcherAnimal);
+        character->sendMsg(error + "\n");
+        return false;
     }
+    character->pushAction(dismemberAction);
+    character->sendMsg("You start dismembering %s...\n",
+                       corpse->getName(true));
+    character->room->sendToAll("%s starts dismembering %s...\n",
+                               {character},
+                               character->getNameCapital(),
+                               corpse->getName(true));
     return true;
 }

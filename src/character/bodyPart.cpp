@@ -67,7 +67,7 @@ void BodyPart::getSheet(Table & sheet) const
         sheet.addRow({"Resource", "Quantity"});
         for (auto it : resources)
         {
-            sheet.addRow({it.first->name, ToString(it.second)});
+            sheet.addRow({it.resource->name, ToString(it.quantity)});
         }
     }
 }

@@ -31,14 +31,10 @@ class DismemberAction :
 private:
     /// The corpse.
     CorpseItem * corpse;
-    /// The body part that has to be dismembered.
-    std::shared_ptr<BodyPart> bodyPart;
 
 public:
     /// @brief Constructor.
-    DismemberAction(Character * _actor,
-                    CorpseItem * _corpse,
-                    std::shared_ptr<BodyPart> _bodyPart);
+    DismemberAction(Character * _actor, CorpseItem * _corpse);
 
     /// @brief Destructor.
     virtual ~DismemberAction();
@@ -55,8 +51,6 @@ public:
 
     /// @brief Given an action, it returns the necessary cooldown.
     /// @param character The actor.
-    /// @param _bodyPart The body part to dismember.
     /// @return The non-decreasing value of the cooldown.
-    static unsigned int getCooldown(Character * character,
-                                    std::shared_ptr<BodyPart> _bodyPart);
+    static unsigned int getCooldown(Character * character);
 };
