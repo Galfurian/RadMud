@@ -73,3 +73,33 @@ bool CorpseItem::isAContainer() const
 {
     return true;
 }
+
+std::shared_ptr<BodyPart> CorpseItem::getAvailableBodyPart()
+{
+    // Lock the access to the item.
+    std::lock_guard<std::mutex> lock(itemMutex);
+    // Proceed with the function.
+    if (remainingBodyParts.empty())
+    {
+        return nullptr;
+    }
+    return remainingBodyParts.front();
+}
+
+bool CorpseItem::removeBodyPart(const std::shared_ptr<BodyPart> & bodyPart)
+{
+    // Lock the access to the item.
+    std::lock_guard<std::mutex> lock(itemMutex);
+    // Proceed with the function.
+    for (auto it = remainingBodyParts.begin();
+         it != remainingBodyParts.end(); ++it)
+    {
+        if ((*it)->vnum == bodyPart->vnum)
+        {
+            remainingBodyParts.erase(it);
+            remainingBodyParts.shrink_to_fit();
+            return true;
+        }
+    }
+    return false;
+}

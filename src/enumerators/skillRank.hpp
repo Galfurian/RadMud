@@ -65,6 +65,16 @@ public:
     /// @brief Returns the skill rank as number.
     unsigned int toUInt() const;
 
+    template<typename ValueType>
+    ValueType cast_to() const
+    {
+        static_assert((std::is_same<ValueType, int>::value ||
+                       std::is_same<ValueType, unsigned int>::value ||
+                       std::is_same<ValueType, double>::value),
+                      "template parameter is of the wrong type");
+        return static_cast<ValueType>(value);
+    }
+
     static SkillRank getSkillRank(unsigned int & _value);
 
     static unsigned int getSkillCap();

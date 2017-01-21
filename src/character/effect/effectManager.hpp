@@ -35,7 +35,7 @@ private:
     /// The overall status modifier.
     std::map<StatusModifier, int> activeStatusModifier;
     /// The overall knowledge.
-    std::map<Knowledge, bool> activeKnowledge;
+    std::map<Knowledge, int> activeKnowledge;
     /// The vector of active effects.
     std::vector<Effect> activeEffects;
     /// The vector of pending effects.
@@ -122,7 +122,7 @@ public:
     /// @brief Retrieve the knowledge.
     /// @param knowledge The knowledge to retrieve.
     /// @return The status of the given knowledge.
-    bool getKnowledge(const Knowledge & knowledge) const;
+    int getKnowledge(const Knowledge & knowledge) const;
 
 private:
 

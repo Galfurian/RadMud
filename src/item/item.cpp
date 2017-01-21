@@ -45,7 +45,8 @@ Item::Item() :
     owner(),
     container(),
     occupiedBodyParts(),
-    content()
+    content(),
+    itemMutex()
 {
 }
 

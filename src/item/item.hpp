@@ -25,6 +25,7 @@
 #include <vector>
 #include <list>
 #include <map>
+#include <mutex>
 
 #include "updateInterface.hpp"
 #include "itemVector.hpp"
@@ -87,6 +88,8 @@ public:
     std::vector<std::shared_ptr<BodyPart>> occupiedBodyParts;
     /// List of items contained in this one.
     ItemVector content;
+    /// Mutex used to protect the actions on the item.
+    std::mutex itemMutex;
 
     /// @brief Constructor - Create a new empty item.
     Item();

@@ -55,7 +55,7 @@ public:
     /// The map of status modifiers.
     std::map<StatusModifier, int> effectStatusModifier;
     /// The map of knowledge.
-    std::map<Knowledge, bool> effectKnowledge;
+    std::map<Knowledge, int> effectKnowledge;
 
     /// @brief Constructor.
     Effect(Character * _affected,
@@ -114,11 +114,11 @@ std::map<StatusModifier, int> & operator-=(
     const std::map<StatusModifier, int> & right);
 
 /// @brief Addition-Assignment operator for two Knowledge maps.
-std::map<Knowledge, bool> & operator+=(
-    std::map<Knowledge, bool> & left,
-    const std::map<Knowledge, bool> & right);
+std::map<Knowledge, int> & operator+=(
+    std::map<Knowledge, int> & left,
+    const std::map<Knowledge, int> & right);
 
 /// @brief Subtraction-Assignment operator for two Knowledge maps.
-std::map<Knowledge, bool> & operator-=(
-    std::map<Knowledge, bool> & left,
-    const std::map<Knowledge, bool> & right);
+std::map<Knowledge, int> & operator-=(
+    std::map<Knowledge, int> & left,
+    const std::map<Knowledge, int> & right);

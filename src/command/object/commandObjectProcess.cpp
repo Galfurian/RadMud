@@ -76,14 +76,17 @@ bool DoDismember(Character * character, ArgumentHandler & args)
     }
     // Cast the item to corpse.
     auto corpse = static_cast<CorpseItem *>(item);
-    if (corpse->remainingBodyParts.empty())
+    // Get a valid body part.
+    auto bodyPart = corpse->getAvailableBodyPart();
+    if (bodyPart == nullptr)
     {
         character->sendMsg("%s does not contain anything useful.\n",
                            item->getNameCapital(true));
         return false;
     }
     auto dismemberAction = std::make_shared<DismemberAction>(character,
-                                                             corpse);
+                                                             corpse,
+                                                             bodyPart);
     std::string error;
     if (!dismemberAction->check(error))
     {

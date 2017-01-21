@@ -45,4 +45,8 @@ public:
     void getSheet(Table & sheet) const override;
 
     bool isAContainer() const override;
+
+    std::shared_ptr<BodyPart> getAvailableBodyPart();
+
+    bool removeBodyPart(const std::shared_ptr<BodyPart> & bodyPart);
 };

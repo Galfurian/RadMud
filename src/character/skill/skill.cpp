@@ -76,61 +76,58 @@ void Skill::updateSkillEffects(Character * character)
         // Save the skill.
         auto skill = Mud::instance().findSkill(it.first);
         // Save the skill rank.
-        auto skillRank = SkillRank::getSkillRank(it.second);
+        auto skillRank = SkillRank::getSkillRank(it.second).cast_to<int>();
         // Create a new skill effect.
         auto skillEffect = EffectFactory::skillEffect(character, skill->name);
         // Iterate through the modifiers of the skill.
         for (auto it2 : skill->abilityModifier)
         {
-            // Get the sign.
-            auto signedModifier = it2.second *
-                                  static_cast<int>(skillRank.toUInt());
+            // Evaluate the modifier.
+            auto modifier = it2.second * skillRank;
             // Otherwise add the modifier based on the skill rank.
             auto it3 = skillEffect.effectAbilityModifier.find(it2.first);
             if (it3 == skillEffect.effectAbilityModifier.end())
             {
                 skillEffect.effectAbilityModifier.insert(
-                    std::make_pair(it2.first, signedModifier));
+                    std::make_pair(it2.first, modifier));
             }
             else
             {
-                it3->second += signedModifier;
+                it3->second += modifier;
             }
         }
         // Iterate through the modifiers of the skill.
         for (auto it2 : skill->combatModifier)
         {
-            // Get the sign.
-            auto signedModifier = it2.second *
-                                  static_cast<int>(skillRank.toUInt());
+            // Evaluate the modifier.
+            auto modifier = it2.second * skillRank;
             // Otherwise add the modifier based on the skill rank.
             auto it3 = skillEffect.effectCombatModifier.find(it2.first);
             if (it3 == skillEffect.effectCombatModifier.end())
             {
                 skillEffect.effectCombatModifier.insert(
-                    std::make_pair(it2.first, signedModifier));
+                    std::make_pair(it2.first, modifier));
             }
             else
             {
-                it3->second += signedModifier;
+                it3->second += modifier;
             }
         }
         // Iterate through the modifiers of the skill.
         for (auto it2 : skill->statusModifier)
         {
-            // Get the sign.
-            auto signedModifier = it2.second *
-                                  static_cast<int>(skillRank.toUInt());
+            // Evaluate the modifier.
+            auto modifier = it2.second * skillRank;
             // Otherwise add the modifier based on the skill rank.
             auto it3 = skillEffect.effectStatusModifier.find(it2.first);
             if (it3 == skillEffect.effectStatusModifier.end())
             {
                 skillEffect.effectStatusModifier.insert(
-                    std::make_pair(it2.first, signedModifier));
+                    std::make_pair(it2.first, modifier));
             }
             else
             {
-                it3->second += signedModifier;
+                it3->second += modifier;
             }
         }
         // Iterate through the modifiers of the skill.
@@ -141,11 +138,11 @@ void Skill::updateSkillEffects(Character * character)
             if (it3 == skillEffect.effectKnowledge.end())
             {
                 skillEffect.effectKnowledge.insert(
-                    std::make_pair(it2.first, true));
+                    std::make_pair(it2.first, skillRank));
             }
             else
             {
-                it3->second = true;
+                it3->second += skillRank;
             }
         }
         // ---------------------------------------------------------------------

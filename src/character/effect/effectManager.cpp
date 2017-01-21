@@ -251,14 +251,14 @@ int EffectManager::getStatusModifier(const StatusModifier & modifier) const
     return 0;
 }
 
-bool EffectManager::getKnowledge(const Knowledge & knowledge) const
+int EffectManager::getKnowledge(const Knowledge & knowledge) const
 {
     auto it = activeKnowledge.find(knowledge);
     if (it != activeKnowledge.end())
     {
         return it->second;
     }
-    return false;
+    return 0;
 }
 
 void EffectManager::activateEffect(const Effect & effect)

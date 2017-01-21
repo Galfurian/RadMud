@@ -24,14 +24,17 @@
 #include "logger.hpp"
 #include "room.hpp"
 
-DismemberAction::DismemberAction(Character * _actor, CorpseItem * _corpse) :
+DismemberAction::DismemberAction(Character * _actor,
+                                 CorpseItem * _corpse,
+                                 const std::shared_ptr<BodyPart> & _bodyPart) :
     GeneralAction(_actor),
-    corpse(_corpse)
+    corpse(_corpse),
+    bodyPart(_bodyPart)
 {
     // Debugging message.
     Logger::log(LogLevel::Debug, "Created DismemberAction.");
     // Reset the cooldown of the action.
-    this->resetCooldown(DismemberAction::getCooldown(_actor));
+    this->resetCooldown(DismemberAction::getCooldown(_actor, _bodyPart));
 }
 
 DismemberAction::~DismemberAction()
@@ -48,6 +51,11 @@ bool DismemberAction::check(std::string & error) const
     if (corpse == nullptr)
     {
         error = "You cannot find the corpse you want to dismember.";
+        return false;
+    }
+    if (bodyPart == nullptr)
+    {
+        error = "You were not able to dismember the corpse.";
         return false;
     }
     return true;
@@ -75,19 +83,14 @@ ActionStatus DismemberAction::perform()
     {
         return ActionStatus::Running;
     }
-    // Get the first available body part.
-    auto it = corpse->remainingBodyParts.begin();
-    if (it == corpse->remainingBodyParts.end())
+    // First try to remove the body part.
+    if (!corpse->removeBodyPart(bodyPart))
     {
-        actor->sendMsg("You fail to dismember %s.",
-                       corpse->getName(true));
+        actor->sendMsg("You fail to dismember %s.", corpse->getName(true));
         return ActionStatus::Error;
     }
-    auto bodyPart = (*it);
-    // Remove the body part.
-    corpse->remainingBodyParts.erase(it);
-    corpse->remainingBodyParts.shrink_to_fit();
     // Create the resources of the given body part.
+    bool dismemberedSomthing = false;
     for (auto resources : bodyPart->resources)
     {
         auto item = resources.resource->createItem(
@@ -96,23 +99,48 @@ ActionStatus DismemberAction::perform()
             false,
             ItemQuality::Normal,
             static_cast<unsigned int>(resources.quantity));
+        if (item == nullptr)
+        {
+            actor->sendMsg("You fail to dismember %s.", corpse->getName(true));
+            return ActionStatus::Error;
+        }
+        Skill::improveSkillKnowledge(actor, Knowledge::Butchery);
+        actor->sendMsg("You successfully butcher %s and produce %s.\n\n",
+                       corpse->getName(true),
+                       item->getName(true));
         if (actor->canCarry(item, item->quantity))
         {
             actor->addInventoryItem(item);
         }
         else if (actor->room != nullptr)
         {
+            actor->sendMsg("%s has been placed on the ground.",
+                           corpse->getNameCapital(true));
             actor->room->addItem(item);
         }
-        Skill::improveSkillKnowledge(actor, Knowledge::Butchery);
-        actor->sendMsg("You successfully butcher %s and produce %s.",
-                       corpse->getName(true),
-                       item->getName(true));
+        else
+        {
+            actor->sendMsg("You fail to dismember %s.", corpse->getName(true));
+            return ActionStatus::Error;
+        }
+        dismemberedSomthing = true;
+    }
+    if (!dismemberedSomthing)
+    {
+        actor->sendMsg("You produced nothing from %s.", corpse->getName(true));
+        return ActionStatus::Error;
     }
     return ActionStatus::Finished;
 }
 
-unsigned int DismemberAction::getCooldown(Character * /*character*/)
+unsigned int DismemberAction::getCooldown(
+    Character * character,
+    const std::shared_ptr<BodyPart> & /*_bodyPart*/)
 {
-    return 3;
+    double required = 6;
+    Logger::log(LogLevel::Debug, "Base time  :%s", required);
+    required -= (required *
+                 character->effects.getKnowledge(Knowledge::Butchery)) / 100;
+    Logger::log(LogLevel::Debug, "With skill :%s", required);
+    return static_cast<unsigned int>(required);
 }
