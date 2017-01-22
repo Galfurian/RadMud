@@ -79,7 +79,7 @@ public:
     /// @brief Equality operator between the names of two effects.
     bool operator==(const Effect & right) const
     {
-        return name < right.name;
+        return name == right.name;
     }
 };
 
