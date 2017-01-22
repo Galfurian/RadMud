@@ -1083,12 +1083,9 @@ bool LoadProfession(ResultSet * result)
             auto professions = new Profession();
             // Initialize the profession.
             professions->vnum = result->getNextUnsignedInteger();
-            professions->name = result->getNextString();
-            professions->description = result->getNextString();
             professions->command = result->getNextString();
-            professions->posture = CharacterPosture(
-                result->getNextUnsignedInteger());
             professions->action = result->getNextString();
+            professions->description = result->getNextString();
             professions->startMessage = result->getNextString();
             professions->finishMessage = result->getNextString();
             professions->successMessage = result->getNextString();
@@ -1120,37 +1117,124 @@ bool LoadProduction(ResultSet * result)
     {
         try
         {
-            // Checker flag.
-            bool check = true;
             // Create an empty Production.
             auto production = new Production();
             // Initialize the Production.
             production->vnum = result->getNextInteger();
             production->name = result->getNextString();
+            auto professionVnum = result->getNextUnsignedInteger();
             production->profession = Mud::instance().findProfession(
-                result->getNextString());
-            production->difficulty = result->getNextUnsignedInteger();
-            production->time = result->getNextUnsignedInteger();
-            production->assisted = result->getNextInteger();
-            check &= production->setOutcome(result->getNextString());
-            check &= production->setTool(result->getNextString());
-            check &= production->setIngredient(result->getNextString());
-            production->workbench = ToolType(result->getNextUnsignedInteger());
-            // ////////////////////////////////////////////////////////////////
-            // Check the correctness.
-            if (!check)
+                professionVnum);
+            if (production->profession == nullptr)
             {
                 throw SQLiteException(
-                    "The production is incorrect " + production->name);
+                    "Can't find the profession " + ToString(professionVnum));
             }
-            if (!production->check())
-            {
-                throw SQLiteException("Error during error checking.");
-            }
+            production->difficulty = result->getNextUnsignedInteger();
+            production->time = result->getNextDouble();
+            production->assisted = static_cast<bool>(result->getNextInteger());
+            auto workbenchValue = result->getNextUnsignedInteger();
+            production->workbench = ToolType(workbenchValue);
             if (!Mud::instance().addProduction(production))
             {
                 throw SQLiteException("Error during production insertion.");
             }
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadProductionTool(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto productionVnum = result->getNextInteger();
+            auto production = Mud::instance().findProduction(productionVnum);
+            if (production == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the production " + ToString(productionVnum));
+            }
+            auto toolTypeNumber = result->getNextUnsignedInteger();
+            auto toolType = ToolType(toolTypeNumber);
+            if (toolType == ToolType::None)
+            {
+                throw SQLiteException(
+                    "Can't find the tool type " + ToString(toolTypeNumber));
+            }
+            production->tools.emplace_back(toolType);
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadProductionOutcome(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto productionVnum = result->getNextInteger();
+            auto production = Mud::instance().findProduction(productionVnum);
+            if (production == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the production " + ToString(productionVnum));
+            }
+            auto outcomeVnum = result->getNextInteger();
+            auto outcome = Mud::instance().findItemModel(outcomeVnum);
+            if (outcome == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the outcome " + ToString(outcomeVnum));
+            }
+            production->outcome = outcome;
+            production->quantity = result->getNextUnsignedInteger();
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadProductionIngredient(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto productionVnum = result->getNextInteger();
+            auto production = Mud::instance().findProduction(productionVnum);
+            if (production == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the production " + ToString(productionVnum));
+            }
+            auto ingredientNumber = result->getNextUnsignedInteger();
+            auto ingredient = ResourceType(ingredientNumber);
+            if (ingredient == ResourceType::None)
+            {
+                throw SQLiteException(
+                    "Can't find the ingredient " + ToString(ingredientNumber));
+            }
+            production->ingredients.insert(
+                std::make_pair(ingredient, result->getNextUnsignedInteger())
+            );
         }
         catch (SQLiteException & e)
         {

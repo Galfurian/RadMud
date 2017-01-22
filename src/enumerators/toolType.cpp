@@ -32,18 +32,30 @@ ToolType::ToolType() :
 ToolType::ToolType(const unsigned int & _toolType) :
     toolType()
 {
-    if (_toolType == 1) toolType = Pickaxe;
-    else if (_toolType == 10) toolType = WoodcutterAxe;
-    else if (_toolType == 11) toolType = Saw;
-    else if (_toolType == 12) toolType = PrecisionChisel;
-    else if (_toolType == 20) toolType = Hammer;
-    else if (_toolType == 21) toolType = PlaneChisel;
-    else if (_toolType == 30) toolType = Forge;
-    else if (_toolType == 31) toolType = Anvil;
-    else if (_toolType == 32) toolType = BlacksmithHammer;
-    else if (_toolType == 33) toolType = Bellows;
-    else if (_toolType == 34) toolType = Crucible;
-    else if (_toolType == 40) toolType = Firelighter;
+    if (_toolType == static_cast<unsigned int>(Pickaxe))
+        toolType = Pickaxe;
+    else if (_toolType == static_cast<unsigned int>(WoodcutterAxe))
+        toolType = WoodcutterAxe;
+    else if (_toolType == static_cast<unsigned int>(Saw))
+        toolType = Saw;
+    else if (_toolType == static_cast<unsigned int>(PrecisionChisel))
+        toolType = PrecisionChisel;
+    else if (_toolType == static_cast<unsigned int>(Hammer))
+        toolType = Hammer;
+    else if (_toolType == static_cast<unsigned int>(PlaneChisel))
+        toolType = PlaneChisel;
+    else if (_toolType == static_cast<unsigned int>(Forge))
+        toolType = Forge;
+    else if (_toolType == static_cast<unsigned int>(Anvil))
+        toolType = Anvil;
+    else if (_toolType == static_cast<unsigned int>(BlacksmithHammer))
+        toolType = BlacksmithHammer;
+    else if (_toolType == static_cast<unsigned int>(Bellows))
+        toolType = Bellows;
+    else if (_toolType == static_cast<unsigned int>(Crucible))
+        toolType = Crucible;
+    else if (_toolType == static_cast<unsigned int>(Firelighter))
+        toolType = Firelighter;
     else toolType = None;
 }
 
@@ -69,28 +81,6 @@ ToolType::ToolType(const std::string & _toolType) :
     else if (_toolType == "Crucible") toolType = Crucible;
     else if (_toolType == "Firelighter") toolType = Firelighter;
     else toolType = None;
-}
-
-bool ToolType::isValid(const unsigned int & _toolType)
-{
-    return (_toolType >= 1) && (_toolType <= 40);
-}
-
-bool ToolType::isValid(const std::string & _toolType)
-{
-    if (_toolType == "Pickaxe") return true;
-    if (_toolType == "WoodcutterAxe")return true;
-    if (_toolType == "Saw")return true;
-    if (_toolType == "PrecisionChisel")return true;
-    if (_toolType == "Hammer") return true;
-    if (_toolType == "PlaneChisel") return true;
-    if (_toolType == "Forge") return true;
-    if (_toolType == "Anvil") return true;
-    if (_toolType == "BlacksmithHammer") return true;
-    if (_toolType == "Bellows") return true;
-    if (_toolType == "Crucible") return true;
-    if (_toolType == "Firelighter") return true;
-    return false;
 }
 
 std::string ToolType::toString() const

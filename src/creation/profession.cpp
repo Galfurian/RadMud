@@ -25,11 +25,9 @@
 
 Profession::Profession() :
     vnum(),
-    name(),
-    description(),
     command(),
-    posture(),
     action(),
+    description(),
     startMessage(),
     finishMessage(),
     successMessage(),
@@ -51,10 +49,8 @@ Profession::~Profession()
 bool Profession::check()
 {
     assert(vnum != 0);
-    assert(!name.empty());
-    assert(!description.empty());
     assert(!command.empty());
-    assert(posture != CharacterPosture::None);
+    assert(!description.empty());
     assert(!action.empty());
     assert(!startMessage.empty());
     assert(!finishMessage.empty());
@@ -63,14 +59,4 @@ bool Profession::check()
     assert(!interruptMessage.empty());
     assert(!notFoundMessage.empty());
     return true;
-}
-
-std::string Profession::getName()
-{
-    return ToLower(name);
-}
-
-std::string Profession::getNameCapital()
-{
-    return name;
 }

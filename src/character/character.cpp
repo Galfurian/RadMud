@@ -785,7 +785,7 @@ Item * Character::findNearbyTool(
 }
 
 bool Character::findNearbyTools(
-    std::set<ToolType> tools,
+    std::vector<ToolType> tools,
     ItemVector & foundOnes,
     bool searchRoom,
     bool searchInventory,

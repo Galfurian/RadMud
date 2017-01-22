@@ -46,7 +46,7 @@ public:
     /// A flag which indicates if the maker can be assisted by someone.
     bool assisted;
     /// The list of needed type of tools.
-    std::set<ToolType> tools;
+    std::vector<ToolType> tools;
     /// The model that has to be built.
     std::shared_ptr<ItemModel> buildingModel;
     /// The list of needed type of ingredients and their quantity.

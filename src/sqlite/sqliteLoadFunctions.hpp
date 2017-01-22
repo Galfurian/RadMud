@@ -119,6 +119,18 @@ bool LoadProfession(ResultSet * result);
 /// @brief Function used to retrieve information about all the productions.
 bool LoadProduction(ResultSet * result);
 
+/// @brief Function used to retrieve information about the tools
+/// required by productions.
+bool LoadProductionTool(ResultSet * result);
+
+/// @brief Function used to retrieve information about the outcomes
+/// of productions.
+bool LoadProductionOutcome(ResultSet * result);
+
+/// @brief Function used to retrieve information about the ingredients
+/// required by productions.
+bool LoadProductionIngredient(ResultSet * result);
+
 /// @brief Function used to retrieve information about all the liquids.
 bool LoadLiquid(ResultSet * result);
 

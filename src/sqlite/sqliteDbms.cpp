@@ -55,6 +55,10 @@ SQLiteDbms::SQLiteDbms() :
     loaders.push_back(TableLoader("Writings", LoadWriting));
     loaders.push_back(TableLoader("Profession", LoadProfession));
     loaders.push_back(TableLoader("Production", LoadProduction));
+    loaders.push_back(TableLoader("ProductionTool", LoadProductionTool));
+    loaders.push_back(TableLoader("ProductionOutcome", LoadProductionOutcome));
+    loaders.push_back(TableLoader("ProductionIngredient",
+                                  LoadProductionIngredient));
     loaders.push_back(TableLoader("Building", LoadBuilding));
     loaders.push_back(TableLoader("Shop", LoadShop));
     loaders.push_back(TableLoader("Currency", LoadCurrency));

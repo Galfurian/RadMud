@@ -384,7 +384,7 @@ public:
     /// @return <b>True</b> if the operation goes well,<br>
     ///         <b>False</b> otherwise.
     bool findNearbyTools(
-        std::set<ToolType> tools,
+        std::vector<ToolType> tools,
         ItemVector & foundOnes,
         bool searchRoom,
         bool searchInventory,

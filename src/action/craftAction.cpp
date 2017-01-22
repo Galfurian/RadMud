@@ -350,5 +350,7 @@ unsigned int CraftAction::getConsumedStamina(Character * character)
 
 unsigned int CraftAction::getCooldown(Character *, Production * _production)
 {
-    return _production->time;
+    auto requiredTime = _production->time;
+
+    return static_cast<unsigned int>(requiredTime);
 }
