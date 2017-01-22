@@ -261,6 +261,41 @@ int EffectManager::getKnowledge(const Knowledge & knowledge) const
     return 0;
 }
 
+std::map<Ability, int> EffectManager::getActiveAbilityModifier() const
+{
+    return activeAbilityModifier;
+}
+
+std::map<CombatModifier, int> EffectManager::getActiveCombatModifier() const
+{
+    return activeCombatModifier;
+}
+
+std::map<StatusModifier, int> EffectManager::getActiveStatusModifier() const
+{
+    return activeStatusModifier;
+}
+
+std::map<Knowledge, int> EffectManager::getActiveKnowledge() const
+{
+    return activeKnowledge;
+}
+
+std::vector<Effect> EffectManager::getActiveEffects() const
+{
+    return activeEffects;
+}
+
+std::vector<Effect> EffectManager::getPendingEffects() const
+{
+    return pendingEffects;
+}
+
+std::vector<Effect> EffectManager::getPassiveEffects() const
+{
+    return passiveEffects;
+}
+
 void EffectManager::activateEffect(const Effect & effect)
 {
     // Add the ability modifier of the effect to the pool.

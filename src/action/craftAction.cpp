@@ -348,9 +348,16 @@ unsigned int CraftAction::getConsumedStamina(Character * character)
     return consumedStamina;
 }
 
-unsigned int CraftAction::getCooldown(Character *, Production * _production)
+unsigned int CraftAction::getCooldown(Character * character,
+                                      Production * _production)
 {
-    auto requiredTime = _production->time;
-
+    double requiredTime = _production->time;
+    Logger::log(LogLevel::Debug, "Base time  :%s", requiredTime);
+    for (auto knowledge : _production->requiredKnowledge)
+    {
+        requiredTime -= (requiredTime *
+                         character->effects.getKnowledge(knowledge)) / 100;
+    }
+    Logger::log(LogLevel::Debug, "With skill :%s", requiredTime);
     return static_cast<unsigned int>(requiredTime);
 }

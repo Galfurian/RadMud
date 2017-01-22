@@ -124,6 +124,27 @@ public:
     /// @return The status of the given knowledge.
     int getKnowledge(const Knowledge & knowledge) const;
 
+    /// @brief Provides the list of active ability modifiers.
+    std::map<Ability, int> getActiveAbilityModifier() const;
+
+    /// @brief Provides the list of active combat modifiers.
+    std::map<CombatModifier, int> getActiveCombatModifier() const;
+
+    /// @brief Provides the list of active status modifiers.
+    std::map<StatusModifier, int> getActiveStatusModifier() const;
+
+    /// @brief Provides the list of active knowledge.
+    std::map<Knowledge, int> getActiveKnowledge() const;
+
+    /// @brief Provides the list of active effects.
+    std::vector<Effect> getActiveEffects() const;
+
+    /// @brief Provides the list of pending effects.
+    std::vector<Effect> getPendingEffects() const;
+
+    /// @brief Provides the list of passive effects.
+    std::vector<Effect> getPassiveEffects() const;
+
 private:
 
     /// @brief Activate an effect by adding all the modifiers brought by the

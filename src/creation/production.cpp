@@ -87,6 +87,7 @@ bool Production::hasRequiredKnowledge(Character * character)
 {
     for (auto knowledge : requiredKnowledge)
     {
+        Logger::log(LogLevel::Debug, "Required :%s", knowledge.toString());
         auto knowledgeLevel = character->effects.getKnowledge(knowledge);
         if (knowledgeLevel <= 0)
         {

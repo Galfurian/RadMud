@@ -20,7 +20,6 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "commandGodCharacter.hpp"
-#include "skillRank.hpp"
 #include "mud.hpp"
 
 bool DoGodInfo(Character * character, ArgumentHandler & args)
@@ -380,6 +379,7 @@ bool DoPlayerModSkill(Character * character, ArgumentHandler & args)
                        skill->name,
                        skillEntry->second);
     Skill::updateSkillEffects(character);
+    Skill::checkIfUnlockedSkills(character);
     return true;
 }
 

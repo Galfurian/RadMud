@@ -22,7 +22,6 @@
 
 #include "general.hpp"
 
-#include "skillRank.hpp"
 #include "logger.hpp"
 #include "mud.hpp"
 
@@ -59,6 +58,10 @@ void LoadGeneralCommands()
     Mud::instance().addCommand(std::make_shared<Command>(
         DoStatistics, "statistics", "",
         "Show player statistics.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoEffects, "effects", "",
+        "Show player active effects.",
         false, true, false));
     Mud::instance().addCommand(std::make_shared<Command>(
         DoRent, "rent", "",
@@ -534,6 +537,45 @@ bool DoStatistics(Character * character, ArgumentHandler & /*args*/)
         msg += ".\n";
     }
     player->sendMsg(msg);
+    return true;
+}
+
+bool DoEffects(Character * character, ArgumentHandler &)
+{
+    std::string msg;
+    for (auto const & effect : character->effects.getActiveEffects())
+    {
+        msg += AlignString(effect.name, StringAlign::Left, 30) + "\n";
+    }
+    for (auto const & effect : character->effects.getPassiveEffects())
+    {
+        msg += AlignString(effect.name, StringAlign::Left, 30) + "\n";
+    }
+    for (auto const & effect : character->effects.getActiveAbilityModifier())
+    {
+        msg += AlignString(effect.first.getAbbreviation(),
+                           StringAlign::Left, 30);
+        msg += AlignString(effect.second, StringAlign::Right, 5) + "\n";
+    }
+    for (auto const & effect : character->effects.getActiveCombatModifier())
+    {
+        msg += AlignString(effect.first.toString(),
+                           StringAlign::Left, 30);
+        msg += AlignString(effect.second, StringAlign::Right, 5) + "\n";
+    }
+    for (auto const & effect : character->effects.getActiveStatusModifier())
+    {
+        msg += AlignString(effect.first.toString(),
+                           StringAlign::Left, 30);
+        msg += AlignString(effect.second, StringAlign::Right, 5) + "\n";
+    }
+    for (auto const & effect : character->effects.getActiveKnowledge())
+    {
+        msg += AlignString(effect.first.toString(),
+                           StringAlign::Left, 30);
+        msg += AlignString(effect.second, StringAlign::Right, 5) + "\n";
+    }
+    character->sendMsg(msg);
     return true;
 }
 

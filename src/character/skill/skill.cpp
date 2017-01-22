@@ -75,10 +75,16 @@ void Skill::updateSkillEffects(Character * character)
         // Phase 2: Activate all the passive effects due to the skill.
         // Save the skill.
         auto skill = Mud::instance().findSkill(it.first);
+        if (skill == nullptr)
+        {
+            Logger::log(LogLevel::Error, "Can't find the skill '%s'", it.first);
+            continue;
+        }
         // Save the skill rank.
         auto skillRank = SkillRank::getSkillRank(it.second).cast_to<int>();
         // Create a new skill effect.
-        auto skillEffect = EffectFactory::skillEffect(character, skill->name);
+        auto skillEffect = EffectFactory::skillEffect(character,
+                                                      skill->name);
         // Iterate through the modifiers of the skill.
         for (auto it2 : skill->abilityModifier)
         {
@@ -151,6 +157,55 @@ void Skill::updateSkillEffects(Character * character)
     }
 }
 
+void Skill::checkIfUnlockedSkills(Character * character)
+{
+    std::vector<int> masterSkills;
+    for (auto it : character->skills)
+    {
+        // Get the skill.
+        auto skill = Mud::instance().findSkill(it.first);
+        if (skill == nullptr)
+        {
+            Logger::log(LogLevel::Error, "Can't find the skill '%s'", it.first);
+            continue;
+        }
+        // Get the current skill rank.
+        auto skillRank = SkillRank::getSkillRank(it.second);
+        if (skillRank == SkillRank::Master)
+        {
+            masterSkills.emplace_back(skill->vnum);
+        }
+    }
+    for (auto it : Mud::instance().mudSkills)
+    {
+        // Get the skill.
+        auto skill = it.second;
+        // Check if the character posses the skill.
+        if (character->skills.find(skill->vnum) != character->skills.end())
+        {
+            continue;
+        }
+        // Check if the character has the pre-requisite for the skill.
+        bool hasRequiredSkill = true;
+        for (auto requiredSkill : skill->requiredSkills)
+        {
+            auto findIt = std::find(masterSkills.begin(),
+                                    masterSkills.end(),
+                                    requiredSkill);
+            if (findIt == masterSkills.end())
+            {
+                hasRequiredSkill = false;
+                break;
+            }
+        }
+        // Add the new skill to the character.
+        if (hasRequiredSkill)
+        {
+            character->skills.insert(std::make_pair(skill->vnum, 1));
+        }
+    }
+}
+
 void Skill::improveSkillAbilityModifier(Character * character,
                                         const Ability & abilityModifier)
 {
@@ -158,24 +213,33 @@ void Skill::improveSkillAbilityModifier(Character * character,
     {
         // Get the skill.
         auto skill = Mud::instance().findSkill(it.first);
+        if (skill == nullptr)
+        {
+            Logger::log(LogLevel::Error, "Can't find the skill '%s'", it.first);
+            continue;
+        }
+        // Check if the skill provides the given modifier.
+        if (skill->abilityModifier.find(abilityModifier) ==
+            skill->abilityModifier.end())
+        {
+            continue;
+        }
         // Get the current skill rank.
         auto skillRank = SkillRank::getSkillRank(it.second);
-        // If the skill provides the given ability modifier, improve the skill.
-        if (skill != nullptr)
+        it.second += 50;
+        // Get the new skill rank.
+        auto newSkillRank = SkillRank::getSkillRank(it.second);
+        // Check if the skill has advanced on the ranking.
+        if (skillRank < newSkillRank)
         {
-            if (skill->abilityModifier.find(abilityModifier) !=
-                skill->abilityModifier.end())
+            // Before updating the effects of the skills, check if the
+            // character has unlocked some new skills.
+            if (newSkillRank == SkillRank::Master)
             {
-                it.second += 50;
-                // Get the new skill rank.
-                auto newSkillRank = SkillRank::getSkillRank(it.second);
-                // Check if the skill has advanced on the ranking.
-                if (skillRank < newSkillRank)
-                {
-                    // Update the effects due to the skills.
-                    Skill::updateSkillEffects(character);
-                }
+                Skill::checkIfUnlockedSkills(character);
             }
+            // Update the effects due to the skills.
+            Skill::updateSkillEffects(character);
         }
     }
 }
@@ -187,24 +251,33 @@ void Skill::improveSkillStatusModifier(Character * character,
     {
         // Get the skill.
         auto skill = Mud::instance().findSkill(it.first);
+        if (skill == nullptr)
+        {
+            Logger::log(LogLevel::Error, "Can't find the skill '%s'", it.first);
+            continue;
+        }
+        // Check if the skill provides the given modifier.
+        if (skill->statusModifier.find(statusModifier) ==
+            skill->statusModifier.end())
+        {
+            continue;
+        }
         // Get the current skill rank.
         auto skillRank = SkillRank::getSkillRank(it.second);
-        // If the skill provides the given ability modifier, improve the skill.
-        if (skill != nullptr)
+        it.second += 50;
+        // Get the new skill rank.
+        auto newSkillRank = SkillRank::getSkillRank(it.second);
+        // Check if the skill has advanced on the ranking.
+        if (skillRank < newSkillRank)
         {
-            if (skill->statusModifier.find(statusModifier) !=
-                skill->statusModifier.end())
+            // Before updating the effects of the skills, check if the
+            // character has unlocked some new skills.
+            if (newSkillRank == SkillRank::Master)
             {
-                it.second += 50;
-                // Get the new skill rank.
-                auto newSkillRank = SkillRank::getSkillRank(it.second);
-                // Check if the skill has advanced on the ranking.
-                if (skillRank < newSkillRank)
-                {
-                    // Update the effects due to the skills.
-                    Skill::updateSkillEffects(character);
-                }
+                Skill::checkIfUnlockedSkills(character);
             }
+            // Update the effects due to the skills.
+            Skill::updateSkillEffects(character);
         }
     }
 }
@@ -216,24 +289,33 @@ void Skill::improveSkillCombatModifier(Character * character,
     {
         // Get the skill.
         auto skill = Mud::instance().findSkill(it.first);
+        if (skill == nullptr)
+        {
+            Logger::log(LogLevel::Error, "Can't find the skill '%s'", it.first);
+            continue;
+        }
+        // Check if the skill provides the given modifier.
+        if (skill->combatModifier.find(combatModifier) ==
+            skill->combatModifier.end())
+        {
+            continue;
+        }
         // Get the current skill rank.
         auto skillRank = SkillRank::getSkillRank(it.second);
-        // If the skill provides the given ability modifier, improve the skill.
-        if (skill != nullptr)
+        it.second += 50;
+        // Get the new skill rank.
+        auto newSkillRank = SkillRank::getSkillRank(it.second);
+        // Check if the skill has advanced on the ranking.
+        if (skillRank < newSkillRank)
         {
-            if (skill->combatModifier.find(combatModifier) !=
-                skill->combatModifier.end())
+            // Before updating the effects of the skills, check if the
+            // character has unlocked some new skills.
+            if (newSkillRank == SkillRank::Master)
             {
-                it.second += 50;
-                // Get the new skill rank.
-                auto newSkillRank = SkillRank::getSkillRank(it.second);
-                // Check if the skill has advanced on the ranking.
-                if (skillRank < newSkillRank)
-                {
-                    // Update the effects due to the skills.
-                    Skill::updateSkillEffects(character);
-                }
+                Skill::checkIfUnlockedSkills(character);
             }
+            // Update the effects due to the skills.
+            Skill::updateSkillEffects(character);
         }
     }
 }
@@ -245,24 +327,32 @@ void Skill::improveSkillKnowledge(Character * character,
     {
         // Get the skill.
         auto skill = Mud::instance().findSkill(it.first);
+        if (skill == nullptr)
+        {
+            Logger::log(LogLevel::Error, "Can't find the skill '%s'", it.first);
+            continue;
+        }
+        // Check if the skill provides the given knowledge.
+        if (skill->knowledge.find(knowledge) == skill->knowledge.end())
+        {
+            continue;
+        }
         // Get the current skill rank.
         auto skillRank = SkillRank::getSkillRank(it.second);
-        // If the skill provides the given ability modifier, improve the skill.
-        if (skill != nullptr)
+        it.second += 50;
+        // Get the new skill rank.
+        auto newSkillRank = SkillRank::getSkillRank(it.second);
+        // Check if the skill has advanced on the ranking.
+        if (skillRank < newSkillRank)
         {
-            if (skill->knowledge.find(knowledge) !=
-                skill->knowledge.end())
+            // Before updating the effects of the skills, check if the
+            // character has unlocked some new skills.
+            if (newSkillRank == SkillRank::Master)
             {
-                it.second += 50;
-                // Get the new skill rank.
-                auto newSkillRank = SkillRank::getSkillRank(it.second);
-                // Check if the skill has advanced on the ranking.
-                if (skillRank < newSkillRank)
-                {
-                    // Update the effects due to the skills.
-                    Skill::updateSkillEffects(character);
-                }
+                Skill::checkIfUnlockedSkills(character);
             }
+            // Update the effects due to the skills.
+            Skill::updateSkillEffects(character);
         }
     }
 }

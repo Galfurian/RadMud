@@ -57,6 +57,9 @@ bool DoTime(Character * character, ArgumentHandler & args);
 /// Show player statistics.
 bool DoStatistics(Character * character, ArgumentHandler & args);
 
+/// Show player effects.
+bool DoEffects(Character * character, ArgumentHandler & args);
+
 /// Allow player to rent and disconnect.
 bool DoRent(Character * character, ArgumentHandler & args);
 

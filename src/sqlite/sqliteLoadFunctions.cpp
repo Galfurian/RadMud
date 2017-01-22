@@ -231,7 +231,7 @@ bool LoadSkillPrerequisite(ResultSet * result)
                                       " required by the skill " +
                                       ToString(skillVnum));
             }
-            skill->requiredSkills[requiredSkillVnum] = true;
+            skill->requiredSkills.emplace_back(requiredSkillVnum);
             Logger::log(LogLevel::Debug,
                         "\t%s requires %s",
                         AlignString(skill->name, StringAlign::Left, 25),

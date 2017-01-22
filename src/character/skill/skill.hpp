@@ -48,7 +48,7 @@ public:
     /// The overall stage of the skill.
     int stage;
     /// The list of required skills.
-    std::map<int, bool> requiredSkills;
+    std::vector<int> requiredSkills;
     /// The list of abilities modifiers and the rank at which they became
     /// activate.
     std::map<Ability, int> abilityModifier;
@@ -84,6 +84,9 @@ public:
 
     /// @brief Activate the effects on the character based on its skill ranks.
     static void updateSkillEffects(Character * character);
+
+    /// @brief Checks if the given character has unlocked new skills.
+    static void checkIfUnlockedSkills(Character * character);
 
     /// @brief Improves the skills which provides the given ability modifier.
     static void improveSkillAbilityModifier(Character * character,
