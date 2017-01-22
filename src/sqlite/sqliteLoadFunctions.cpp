@@ -1123,13 +1123,13 @@ bool LoadProduction(ResultSet * result)
             production->vnum = result->getNextInteger();
             production->name = result->getNextString();
             auto professionVnum = result->getNextUnsignedInteger();
-            production->profession = Mud::instance().findProfession(
-                professionVnum);
-            if (production->profession == nullptr)
+            auto profession = Mud::instance().findProfession(professionVnum);
+            if (profession == nullptr)
             {
                 throw SQLiteException(
                     "Can't find the profession " + ToString(professionVnum));
             }
+            production->profession = profession;
             production->difficulty = result->getNextUnsignedInteger();
             production->time = result->getNextDouble();
             production->assisted = static_cast<bool>(result->getNextInteger());
@@ -1139,6 +1139,12 @@ bool LoadProduction(ResultSet * result)
             {
                 throw SQLiteException("Error during production insertion.");
             }
+            // Log it.
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s",
+                        AlignString(production->name, StringAlign::Left, 25),
+                        AlignString(profession->command,
+                                    StringAlign::Left, 35));
         }
         catch (SQLiteException & e)
         {
@@ -1170,6 +1176,12 @@ bool LoadProductionTool(ResultSet * result)
                     "Can't find the tool type " + ToString(toolTypeNumber));
             }
             production->tools.emplace_back(toolType);
+            // Log it.
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s",
+                        AlignString(production->name, StringAlign::Left, 25),
+                        AlignString(toolType.toString(),
+                                    StringAlign::Left, 35));
         }
         catch (SQLiteException & e)
         {
@@ -1202,6 +1214,13 @@ bool LoadProductionOutcome(ResultSet * result)
             }
             production->outcome = outcome;
             production->quantity = result->getNextUnsignedInteger();
+            // Log it.
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s%s",
+                        AlignString(production->name, StringAlign::Left, 25),
+                        AlignString(outcome->name, StringAlign::Left, 35),
+                        AlignString(production->quantity,
+                                    StringAlign::Left, 35));
         }
         catch (SQLiteException & e)
         {
@@ -1232,9 +1251,59 @@ bool LoadProductionIngredient(ResultSet * result)
                 throw SQLiteException(
                     "Can't find the ingredient " + ToString(ingredientNumber));
             }
+            auto quantity = result->getNextUnsignedInteger();
+            if (quantity == 0)
+            {
+                throw SQLiteException(
+                    "Wrong quantity " + ToString(quantity));
+            }
             production->ingredients.insert(
-                std::make_pair(ingredient, result->getNextUnsignedInteger())
+                std::make_pair(ingredient, quantity)
             );
+            // Log it.
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s%s",
+                        AlignString(production->name, StringAlign::Left, 25),
+                        AlignString(ingredient.toString(), StringAlign::Left,
+                                    35),
+                        AlignString(quantity, StringAlign::Left, 35));
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadProductionKnowledge(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto productionVnum = result->getNextInteger();
+            auto production = Mud::instance().findProduction(productionVnum);
+            if (production == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the production " + ToString(productionVnum));
+            }
+            auto knowledgeNumber = result->getNextUnsignedInteger();
+            auto knowledge = Knowledge(knowledgeNumber);
+            if (knowledge == ResourceType::None)
+            {
+                throw SQLiteException(
+                    "Can't find the ingredient " + ToString(knowledgeNumber));
+            }
+            production->requiredKnowledge.emplace_back(knowledge);
+            // Log it.
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s",
+                        AlignString(production->name, StringAlign::Left, 25),
+                        AlignString(knowledge.toString(),
+                                    StringAlign::Left, 35));
         }
         catch (SQLiteException & e)
         {

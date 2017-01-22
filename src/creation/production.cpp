@@ -22,6 +22,7 @@
 
 #include "production.hpp"
 
+#include "character.hpp"
 #include "logger.hpp"
 #include "mud.hpp"
 
@@ -36,7 +37,8 @@ Production::Production() :
     quantity(),
     tools(),
     ingredients(),
-    workbench(ToolType::None)
+    workbench(ToolType::None),
+    requiredKnowledge()
 {
     // Nothing to do.
 }
@@ -79,4 +81,17 @@ std::string Production::getName()
 std::string Production::getNameCapital()
 {
     return name;
+}
+
+bool Production::hasRequiredKnowledge(Character * character)
+{
+    for (auto knowledge : requiredKnowledge)
+    {
+        auto knowledgeLevel = character->effects.getKnowledge(knowledge);
+        if (knowledgeLevel <= 0)
+        {
+            return false;
+        }
+    }
+    return true;
 }

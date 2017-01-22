@@ -131,6 +131,10 @@ bool LoadProductionOutcome(ResultSet * result);
 /// required by productions.
 bool LoadProductionIngredient(ResultSet * result);
 
+/// @brief Function used to retrieve information about the knowledge
+/// required by productions.
+bool LoadProductionKnowledge(ResultSet * result);
+
 /// @brief Function used to retrieve information about all the liquids.
 bool LoadLiquid(ResultSet * result);
 

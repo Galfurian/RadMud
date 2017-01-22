@@ -33,6 +33,9 @@ class Character;
 #include "toolModel.hpp"
 #include "resourceModel.hpp"
 
+#include "knowledge.hpp"
+#include "skillRank.hpp"
+
 /// @brief Holds details about a production.
 class Production
 {
@@ -59,6 +62,8 @@ public:
     std::map<ResourceType, unsigned int> ingredients;
     /// The type of the workbench.
     ToolType workbench;
+    /// The required knowledge levels for the given production.
+    std::vector<Knowledge> requiredKnowledge;
 
     /// @brief Constructor.
     Production();
@@ -90,5 +95,11 @@ public:
     /// @brief Return the name with the first letter capitalized.
     /// @return The name of the production capitalized.
     std::string getNameCapital();
+
+    /// @brief Checks if the character has the required knowledge.
+    /// @param character Tha target character.
+    /// @return <b>True</b> has the required knowledge,<br>
+    ///         <b>False</b> otherwise.
+    bool hasRequiredKnowledge(Character * character);
 
 };

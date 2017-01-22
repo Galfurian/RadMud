@@ -73,6 +73,12 @@ bool DoProfession(Character * character,
                            args[0].getContent());
         return false;
     }
+    if (!production->hasRequiredKnowledge(character))
+    {
+        character->sendMsg("%s '%s'.\n", profession->notFoundMessage,
+                           args[0].getContent());
+        return false;
+    }
     // Check if the actor has enough stamina to execute the action.
     if (CraftAction::getConsumedStamina(character) > character->stamina)
     {
