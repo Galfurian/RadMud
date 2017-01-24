@@ -57,6 +57,14 @@ public:
     static unsigned int getConsumedStamina(Character * character,
                                            Item * weapon);
 
+    /// @brief Returns the stamina required to execute the action.
+    /// @param character The actor.
+    /// @param weapon    The weapon used to performe the action.
+    /// @return The required stamina.
+    static unsigned int getConsumedStamina(
+        Character * character,
+        const std::shared_ptr<BodyPart::BodyWeapon> & weapon);
+
 private:
 
     /// @brief Sets the predefined target. If there is already one, it checks
@@ -75,6 +83,15 @@ private:
     /// @brief Unset all the variables used for combat.
     void handleStop();
 
+    /// @brief Performs an attack with a natural weapon.
+    /// @param target       The character to attack.
+    /// @param weapon       The melee weapon used to attack.
+    /// @param attackNumber The number of already executed attacks.
+    void performAttackNaturalWeapon(
+        Character * target,
+        const std::shared_ptr<BodyPart::BodyWeapon> & weapon,
+        unsigned int attackNumber);
+
     /// @brief Performs a melee attack with the given weapon.
     /// @param target       The character to attack.
     /// @param weapon       The melee weapon used to attack.
@@ -91,6 +108,13 @@ private:
                              RangedWeaponItem * weapon,
                              unsigned int attackNumber);
 
+    /// @brief Send the messages when the actor hits with a natural weapon.
+    /// @param target The character which is involved in the attack.
+    /// @param weapon The weapon used to attack.
+    void handleNaturalWeaponHit(
+        Character * target,
+        const std::shared_ptr<BodyPart::BodyWeapon> & weapon);
+
     /// @brief Send the messages when the actor hits with a close ranged attack.
     /// @param target The character which is involved in the attack.
     /// @param weapon The weapon used to attack.
@@ -100,6 +124,14 @@ private:
     /// @param target The character which is involved in the attack.
     /// @param weapon The weapon used to attack.
     void handleRangedHit(Character * target, RangedWeaponItem * weapon);
+
+    /// @brief Send the messages when the actor misses the target with
+    ///         a natural weapon.
+    /// @param target The character which is involved in the attack.
+    /// @param weapon The weapon used to attack.
+    void handleNaturalWeaponMiss(
+        Character * target,
+        const std::shared_ptr<BodyPart::BodyWeapon> & weapon);
 
     /// @brief Send the messages when the actor misses the target with
     ///         a close ranged attack.

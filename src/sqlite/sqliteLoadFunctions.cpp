@@ -517,7 +517,6 @@ bool LoadRace(ResultSet * result)
             race->player_allow = result->getNextInteger();
             race->tileSet = result->getNextInteger();
             race->tileId = result->getNextInteger();
-            race->naturalWeapon = result->getNextString();
             // Translate new_line.
             FindAndReplace(&race->description, "%r", "\n");
             // Check the correctness.
@@ -1657,6 +1656,36 @@ bool LoadBodyPartResources(ResultSet * result)
             resource.resource = model->toResource();
             resource.quantity = quantity;
             bodyPart->resources.emplace_back(resource);
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadBodyPartWeapon(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto bodyPartVnum = result->getNextUnsignedInteger();
+            auto bodyPart = Mud::instance().findBodyPart(bodyPartVnum);
+            if (bodyPart == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't add the body part" + ToString(bodyPartVnum));
+            }
+            auto bodyWeapon = std::make_shared<BodyPart::BodyWeapon>();
+            bodyWeapon->name = result->getNextString();
+            bodyWeapon->article = result->getNextString();
+            bodyWeapon->minDamage = result->getNextUnsignedInteger();
+            bodyWeapon->maxDamage = result->getNextUnsignedInteger();
+            bodyWeapon->range = result->getNextInteger();
+            bodyPart->weapon = bodyWeapon;
         }
         catch (SQLiteException & e)
         {

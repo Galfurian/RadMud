@@ -71,15 +71,23 @@ unsigned int CombatAction::getCooldown(Character * character)
     // CARRIED  [+0.0 to +2.48]
     // WEAPON   [+0.0 to +1.60]
     unsigned int cooldown = 5;
-    cooldown -= character->getAbilityLog(Ability::Strength);
-    cooldown -= character->getAbilityLog(Ability::Agility);
+    cooldown = SafeSum(cooldown, -character->getAbilityLog(Ability::Strength));
+    cooldown = SafeSum(cooldown, -character->getAbilityLog(Ability::Agility));
     cooldown = SafeSum(cooldown, SafeLog10(character->weight));
     cooldown = SafeSum(cooldown, SafeLog10(character->getCarryingWeight()));
     for (auto bodyPart : character->race->bodyParts)
     {
-        if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWield)) continue;
+        if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
+        {
+            continue;
+        }
         auto wpn = character->findItemAtBodyPart(bodyPart);
-        if (wpn != nullptr)
+        if (wpn == nullptr)
+        {
+            continue;
+        }
+        if ((wpn->getType() == ModelType::MeleeWeapon) ||
+            (wpn->getType() == ModelType::RangedWeapon))
         {
             cooldown = SafeSum(cooldown, SafeLog10(wpn->getWeight(true)));
         }

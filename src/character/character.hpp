@@ -120,7 +120,7 @@ public:
     CombatHandler combatHandler;
     /// Character current action.
     std::deque<std::shared_ptr<GeneralAction>> actionQueue;
-    /// mutex for the action queue.
+    /// Mutex for the action queue.
     mutable std::mutex actionQueueMutex;
     /// The input handler.
     std::shared_ptr<ProcessInput> inputProcessor;
@@ -527,6 +527,10 @@ public:
     /// @brief Provides the list of active ranged weapons (Left and Right hands).
     /// @return Vector of ranged weapons.
     std::vector<RangedWeaponItem *> getActiveRangedWeapons();
+
+    /// @brief Provides the list of active natural weapons.
+    std::vector<
+        std::shared_ptr<BodyPart::BodyWeapon>> getActiveNaturalWeapons();
 
     /// @brief Handle what happend when this character die.
     virtual void kill();

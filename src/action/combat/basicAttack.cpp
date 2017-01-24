@@ -101,31 +101,34 @@ ActionStatus BasicAttack::perform()
             hasAttackedTheTarget = true;
             // Retrieve all the melee weapons.
             auto meleeWeapons = actor->getActiveMeleeWeapons();
-            // If there are no melee weapons available,
-            //  use the natural weapons.
-            if (meleeWeapons.empty())
+            // Retrieve all the natural weapons.
+            auto naturalWeapon = actor->getActiveNaturalWeapons();
+            // Set the progressive number of the attack to 0.
+            unsigned int attackNumber = 0;
+            // Perform the attack for each melee weapon.
+            for (auto weapon : meleeWeapons)
             {
-                // Perform the attack.
-                this->performMeleeAttack(predefined, nullptr, false);
+                // Perform the attack passing the melee weapon.
+                this->performMeleeAttack(predefined, weapon, attackNumber);
+                // Increment the number of executed attacks.
+                attackNumber++;
             }
-            else
+            // Perform the attack for each natural weapon.
+            for (auto weapon : naturalWeapon)
             {
-                // Set the progressive number of the attack to 0.
-                unsigned int attackNumber = 0;
-                // Perform the attack for each weapon.
-                for (auto weapon : meleeWeapons)
-                {
-                    // Perform the attack passing the melee weapon.
-                    this->performMeleeAttack(predefined, weapon, attackNumber);
-                    // Increment the number of executed attacks.
-                    attackNumber++;
-                }
+                // Perform the attack passing the melee weapon.
+                this->performAttackNaturalWeapon(predefined, weapon,
+                                                 attackNumber);
+                // Increment the number of executed attacks.
+                attackNumber++;
             }
         }
         else
         {
             // Retrieve all the ranged weapons.
             auto rangedWeapons = actor->getActiveRangedWeapons();
+            // Retrieve all the natural weapons.
+            auto naturalWeapon = actor->getActiveNaturalWeapons();
             // Set the progressive number of the attack to 0.
             unsigned int attackNumber = 0;
             // Perform the attack for each weapon.
@@ -138,6 +141,20 @@ ActionStatus BasicAttack::perform()
                     hasAttackedTheTarget = true;
                     // Perform the attack passing the ranged weapon.
                     this->performRangedAttack(predefined, weapon, attackNumber);
+                    // Increment the number of executed attacks.
+                    attackNumber++;
+                }
+            }
+            // Perform the attack for each natural weapon.
+            for (auto weapon : naturalWeapon)
+            {
+                // Check if the target is at range of the weapon.
+                if (actor->isAtRange(predefined, weapon->range))
+                {
+                    // Perform the attack passing the melee weapon.
+                    this->performAttackNaturalWeapon(predefined,
+                                                     weapon,
+                                                     attackNumber);
                     // Increment the number of executed attacks.
                     attackNumber++;
                 }
@@ -218,6 +235,21 @@ unsigned int BasicAttack::getConsumedStamina(Character * character,
                                   SafeLog10(weapon->getWeight(true)));
     }
     return consumedStamina;
+}
+
+unsigned int BasicAttack::getConsumedStamina(
+    Character * character,
+    const std::shared_ptr<BodyPart::BodyWeapon> &)
+{
+    // BASE     [+1.0]
+    // STRENGTH [-0.0 to -1.40]
+    // WEIGHT   [+1.6 to +2.51]
+    // CARRIED  [+0.0 to +2.48]
+    unsigned int result = 1;
+    result -= character->getAbilityLog(Ability::Strength);
+    result = SafeSum(result, SafeLog10(character->weight));
+    result = SafeSum(result, SafeLog10(character->getCarryingWeight()));
+    return result;
 }
 
 bool BasicAttack::setPredefinedTarget()
@@ -343,6 +375,114 @@ void BasicAttack::handleStop()
     actor->combatHandler.setAimedTarget(nullptr);
 }
 
+void BasicAttack::performAttackNaturalWeapon(
+    Character * target,
+    const std::shared_ptr<BodyPart::BodyWeapon> & weapon,
+    unsigned int attackNumber)
+{
+    // -------------------------------------------------------------------------
+    // Preamble: Evaluate all the values which are required by the function.
+    // -------------------------------------------------------------------------
+    // Get the strength modifier.
+    auto strengthMod = actor->getAbilityModifier(Ability::Strength);
+    // Get the required stamina.
+    auto consumedStamina = this->getConsumedStamina(actor, weapon);
+    // -------------------------------------------------------------------------
+    // Phase 1: Check if the actor has enough stamina to execute the action.
+    // -------------------------------------------------------------------------
+    if (consumedStamina > actor->stamina)
+    {
+        actor->sendMsg("You are too tired to attack with %s.\n",
+                       weapon->getName(true));
+        return;
+    }
+    // -------------------------------------------------------------------------
+    // Phase 2: Roll the hit and damage.
+    // -------------------------------------------------------------------------
+    // Evaluate the natural roll for the attack.
+    unsigned int hitRoll = TRandInteger<unsigned int>(1, 20);
+    // Boolean variable which identifies if the hit is a critical hit.
+    bool isCritical = (hitRoll == 20);
+    // Apply the penalty due to multi-wield, check if:
+    //  1. The number of already executed attacks is greater-than 0.
+    //  2. The attack is not a critical hit.
+    if ((attackNumber > 0) && (!isCritical))
+    {
+        // Evaluate the penalty to the hit roll.
+        unsigned int penalty = (attackNumber * 3);
+        // Safely apply the penalty.
+        hitRoll = (hitRoll < penalty) ? 0 : (hitRoll - penalty);
+    }
+    // Apply the modifier to the hit roll when unarmed fighting.
+    hitRoll = SafeSum(hitRoll,
+                      actor->effects.getCombatModifier(
+                          CombatModifier::UnarmedHitRoll));
+    // Improve the skills which has contributed to the hit roll.
+    Skill::improveSkillCombatModifier(actor,
+                                      CombatModifier::UnarmedHitRoll);
+    // -------------------------------------------------------------------------
+    // Phase 3: Check if the target is hit.
+    // -------------------------------------------------------------------------
+    // Evaluate the armor class of the enemy.
+    auto armorClass = target->getArmorClass();
+    // Check if:
+    //  1. The hit roll is lesser than the armor class of the opponent.
+    //  2. The hit roll is not a critical.
+    if ((hitRoll < armorClass) && (!isCritical))
+    {
+        // Show miss messages.
+        this->handleNaturalWeaponMiss(target, weapon);
+        // Consume half the stamina.
+        actor->remStamina(consumedStamina / 2, true);
+    }
+    else
+    {
+        // The amount of damage dealt.
+        unsigned int damageRoll = 0;
+        // Natural roll for the damage.
+        damageRoll = weapon->rollDamage();
+        // Add the strenght modifier.
+        damageRoll += strengthMod;
+        // Apply the modifier to the damage roll when unarmed fighting.
+        damageRoll = SafeSum(damageRoll,
+                             actor->effects.getCombatModifier(
+                                 CombatModifier::UnarmedDamage));
+        // Improve the skills which has contributed to the damage roll.
+        Skill::improveSkillCombatModifier(actor,
+                                          CombatModifier::UnarmedDamage);
+        // Show hit messages.
+        this->handleNaturalWeaponHit(target, weapon);
+        // Consume the stamina.
+        actor->remStamina(consumedStamina, true);
+        // If the character has rolled a critical: multiply the damage by two.
+        if (isCritical) damageRoll *= 2;
+        // Proceed and remove the damage from the health of the target.
+        if (!target->remHealth(damageRoll))
+        {
+            // Notify the others.
+            target->room->sendToAll(
+                "%s%s screams in pain and then die!%s\n", {target},
+                Formatter::red(), target->getNameCapital(), Formatter::reset());
+            // The target has received the damage and now it is dead.
+            target->kill();
+            // Interrupt the function.
+            return;
+        }
+    }
+    if (!target->combatHandler.hasOpponent(actor))
+    {
+        target->combatHandler.addOpponent(actor);
+        if (target->getAction()->getType() != ActionType::Combat)
+        {
+            target->pushAction(std::make_shared<BasicAttack>(target));
+        }
+    }
+    if (!actor->combatHandler.hasOpponent(target))
+    {
+        actor->combatHandler.addOpponent(target);
+    }
+}
+
 void BasicAttack::performMeleeAttack(Character * target,
                                      MeleeWeaponItem * weapon,
                                      unsigned int attackNumber)
@@ -359,16 +499,8 @@ void BasicAttack::performMeleeAttack(Character * target,
     // -------------------------------------------------------------------------
     if (consumedStamina > actor->stamina)
     {
-        if (weapon != nullptr)
-        {
-            actor->sendMsg("You are too tired to attack with %s.\n",
-                           weapon->getName(true));
-        }
-        else
-        {
-            actor->sendMsg("You are too tired to attack with your %s.\n",
-                           actor->race->naturalWeapon);
-        }
+        actor->sendMsg("You are too tired to attack with %s.\n",
+                       weapon->getName(true));
         return;
     }
     // -------------------------------------------------------------------------
@@ -378,37 +510,23 @@ void BasicAttack::performMeleeAttack(Character * target,
     unsigned int hitRoll = TRandInteger<unsigned int>(1, 20);
     // Boolean variable which identifies if the hit is a critical hit.
     bool isCritical = (hitRoll == 20);
-    // If there is a weapon, roll the damage.
-    if (weapon != nullptr)
+    // Apply the penalty due to multi-wield, check if:
+    //  1. The number of already executed attacks is greater-than 0.
+    //  2. The attack is not a critical hit.
+    if ((attackNumber > 0) && (!isCritical))
     {
-        // Apply the penalty due to multi-wield, check if:
-        //  1. The number of already executed attacks is greater-than 0.
-        //  2. The attack is not a critical hit.
-        if ((attackNumber > 0) && (!isCritical))
-        {
-            // Evaluate the penalty to the hit roll.
-            unsigned int penalty = (attackNumber * 3);
-            // Safely apply the penalty.
-            hitRoll = (hitRoll < penalty) ? 0 : (hitRoll - penalty);
-        }
-        // Apply the modifier to the hit roll with melee weapons.
-        hitRoll = SafeSum(hitRoll,
-                          actor->effects.getCombatModifier(
-                              CombatModifier::MeleeWeaponHitRoll));
-        // Improve the skills which has contributed to the hit roll.
-        Skill::improveSkillCombatModifier(actor,
-                                          CombatModifier::MeleeWeaponHitRoll);
+        // Evaluate the penalty to the hit roll.
+        unsigned int penalty = (attackNumber * 3);
+        // Safely apply the penalty.
+        hitRoll = (hitRoll < penalty) ? 0 : (hitRoll - penalty);
     }
-    else
-    {
-        // Apply the modifier to the hit roll when unarmed fighting.
-        hitRoll = SafeSum(hitRoll,
-                          actor->effects.getCombatModifier(
-                              CombatModifier::UnarmedHitRoll));
-        // Improve the skills which has contributed to the hit roll.
-        Skill::improveSkillCombatModifier(actor,
-                                          CombatModifier::UnarmedHitRoll);
-    }
+    // Apply the modifier to the hit roll with melee weapons.
+    hitRoll = SafeSum(hitRoll,
+                      actor->effects.getCombatModifier(
+                          CombatModifier::MeleeWeaponHitRoll));
+    // Improve the skills which has contributed to the hit roll.
+    Skill::improveSkillCombatModifier(actor,
+                                      CombatModifier::MeleeWeaponHitRoll);
     // -------------------------------------------------------------------------
     // Phase 3: Check if the target is hit.
     // -------------------------------------------------------------------------
@@ -428,37 +546,21 @@ void BasicAttack::performMeleeAttack(Character * target,
     {
         // The amount of damage dealt.
         unsigned int damageRoll = 0;
-        // If there is a weapon, roll the damage.
-        if (weapon != nullptr)
+        // Natural roll for the damage.
+        damageRoll = weapon->rollDamage();
+        // Check if the character is wielding a two-handed weapon.
+        if (HasFlag(weapon->model->modelFlags, ModelFlag::TwoHand))
         {
-            // Natural roll for the damage.
-            damageRoll = weapon->rollDamage();
-            // Check if the character is wielding a two-handed weapon.
-            if (HasFlag(weapon->model->modelFlags, ModelFlag::TwoHand))
-            {
-                // Add to the damage roll one and half the strength value.
-                damageRoll += strengthMod + (strengthMod / 2);
-            }
-            // Apply the modifier to the damage roll with melee weapons.
-            damageRoll = SafeSum(damageRoll,
-                                 actor->effects.getCombatModifier(
-                                     CombatModifier::MeleeWeaponDamage));
-            // Improve the skills which has contributed to the damage roll.
-            Skill::improveSkillCombatModifier(
-                actor, CombatModifier::MeleeWeaponDamage);
+            // Add to the damage roll one and half the strength value.
+            damageRoll += strengthMod + (strengthMod / 2);
         }
-        else
-        {
-            // Natural roll for the damage.
-            damageRoll = TRandInteger<unsigned int>(1, 3 + strengthMod);
-            // Apply the modifier to the damage roll when unarmed fighting.
-            damageRoll = SafeSum(damageRoll,
-                                 actor->effects.getCombatModifier(
-                                     CombatModifier::UnarmedDamage));
-            // Improve the skills which has contributed to the damage roll.
-            Skill::improveSkillCombatModifier(actor,
-                                              CombatModifier::UnarmedDamage);
-        }
+        // Apply the modifier to the damage roll with melee weapons.
+        damageRoll = SafeSum(damageRoll,
+                             actor->effects.getCombatModifier(
+                                 CombatModifier::MeleeWeaponDamage));
+        // Improve the skills which has contributed to the damage roll.
+        Skill::improveSkillCombatModifier(
+            actor, CombatModifier::MeleeWeaponDamage);
         // Show hit messages.
         this->handleMeleeHit(target, weapon);
         // Consume the stamina.
@@ -612,51 +714,51 @@ void BasicAttack::performRangedAttack(Character * target,
     }
 }
 
+void BasicAttack::handleNaturalWeaponHit(
+    Character * target,
+    const std::shared_ptr<BodyPart::BodyWeapon> & weapon)
+{
+    // The target has received the damage but it is still alive.
+    actor->sendMsg("You hit %s with your %s.\n\n",
+                   target->getName(), weapon->getName(true));
+    // Notify the target.
+    target->sendMsg(
+        "%s hits you with %s %s.\n\n",
+        actor->getNameCapital(),
+        actor->getPossessivePronoun(),
+        weapon->getName(true));
+    // Notify the other characters.
+    target->room->funcSendToAll(
+        "%s hits %s with %s %s.\n",
+        [&](Character * character)
+        {
+            return !((character == actor) || (character == target));
+        },
+        actor->getNameCapital(),
+        target->getName(),
+        actor->getPossessivePronoun(),
+        weapon->getName(true));
+}
+
 void BasicAttack::handleMeleeHit(Character * target,
                                  MeleeWeaponItem * weapon)
 {
-    if (weapon != nullptr)
-    {
-        // The target has received the damage but it is still alive.
-        actor->sendMsg("You hit %s with %s.\n\n",
-                       target->getName(), weapon->getName(true));
-        // Notify the target.
-        target->sendMsg("%s hits you with %s.\n\n",
-                        actor->getNameCapital(), weapon->getName(true));
-        // Notify the other characters.
-        target->room->funcSendToAll(
-            "%s hits %s with %s.\n",
-            [&](Character * character)
-            {
-                return !((character == actor) || (character == target));
-            },
-            actor->getNameCapital(),
-            target->getName(),
-            weapon->getName(true));
-    }
-    else
-    {
-        // The target has received the damage but it is still alive.
-        actor->sendMsg("You hit %s with your %s.\n\n",
-                       target->getName(), actor->race->naturalWeapon);
-        // Notify the target.
-        target->sendMsg(
-            "%s hits you with %s %s.\n\n",
-            actor->getNameCapital(),
-            actor->getPossessivePronoun(),
-            actor->race->naturalWeapon);
-        // Notify the other characters.
-        target->room->funcSendToAll(
-            "%s hits %s with %s %s.\n",
-            [&](Character * character)
-            {
-                return !((character == actor) || (character == target));
-            },
-            actor->getNameCapital(),
-            target->getName(),
-            actor->getPossessivePronoun(),
-            actor->race->naturalWeapon);
-    }
+    // The target has received the damage but it is still alive.
+    actor->sendMsg("You hit %s with %s.\n\n",
+                   target->getName(), weapon->getName(true));
+    // Notify the target.
+    target->sendMsg("%s hits you with %s.\n\n",
+                    actor->getNameCapital(), weapon->getName(true));
+    // Notify the other characters.
+    target->room->funcSendToAll(
+        "%s hits %s with %s.\n",
+        [&](Character * character)
+        {
+            return !((character == actor) || (character == target));
+        },
+        actor->getNameCapital(),
+        target->getName(),
+        weapon->getName(true));
 }
 
 void BasicAttack::handleRangedHit(Character * target, RangedWeaponItem * weapon)
@@ -737,35 +839,38 @@ void BasicAttack::handleRangedHit(Character * target, RangedWeaponItem * weapon)
         }, target->getName());
 }
 
-void BasicAttack::handleMeleeMiss(Character * target, MeleeWeaponItem * weapon)
+void BasicAttack::handleNaturalWeaponMiss(
+    Character * target,
+    const std::shared_ptr<BodyPart::BodyWeapon> & weapon)
 {
-    // Notify the actor, enemy and others.
-    if (weapon != nullptr)
-    {
-        actor->sendMsg("You miss %s with %s.\n\n",
-                       target->getName(),
-                       weapon->getName(true));
-        target->sendMsg("%s misses you with %s.\n\n",
-                        actor->getNameCapital(),
-                        weapon->getName(true));
-        target->room->sendToAll("%s misses %s with %s.\n",
-                                {actor, target},
-                                actor->getNameCapital(),
-                                target->getName(),
-                                weapon->getName(true));
-        return;
-    }
-    actor->sendMsg("You miss %s with your %s.\n\n", target->getName(),
-                   actor->race->naturalWeapon);
+    actor->sendMsg("You miss %s with your %s.\n\n",
+                   target->getName(),
+                   weapon->getName(true));
     target->sendMsg("%s misses you with %s %s.\n\n",
                     actor->getNameCapital(),
                     actor->getPossessivePronoun(),
-                    actor->race->naturalWeapon);
+                    weapon->getName(true));
     target->room->sendToAll("%s misses %s with %s %s.\n", {actor, target},
                             actor->getNameCapital(),
                             target->getName(),
                             actor->getPossessivePronoun(),
-                            actor->race->naturalWeapon);
+                            weapon->getName(true));
+}
+
+void BasicAttack::handleMeleeMiss(Character * target, MeleeWeaponItem * weapon)
+{
+    // Notify the actor, enemy and others.
+    actor->sendMsg("You miss %s with %s.\n\n",
+                   target->getName(),
+                   weapon->getName(true));
+    target->sendMsg("%s misses you with %s.\n\n",
+                    actor->getNameCapital(),
+                    weapon->getName(true));
+    target->room->sendToAll("%s misses %s with %s.\n",
+                            {actor, target},
+                            actor->getNameCapital(),
+                            target->getName(),
+                            weapon->getName(true));
 }
 
 void

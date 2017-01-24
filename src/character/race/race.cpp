@@ -34,7 +34,6 @@ Race::Race() :
     tileSet(),
     tileId(),
     corpse(),
-    naturalWeapon(),
     bodyParts(),
     baseSkills()
 {
@@ -54,7 +53,6 @@ bool Race::check()
     assert(vnum > 0);
     assert(!name.empty());
     assert(!description.empty());
-    assert(!naturalWeapon.empty());
     return true;
 }
 

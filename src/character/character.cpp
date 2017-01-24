@@ -552,7 +552,10 @@ void Character::pushAction(const std::shared_ptr<GeneralAction> & _action)
 void Character::popAction()
 {
     std::lock_guard<std::mutex> lock(actionQueueMutex);
-    actionQueue.pop_front();
+    if (actionQueue.size() > 1)
+    {
+        actionQueue.pop_front();
+    }
 }
 
 std::shared_ptr<GeneralAction> & Character::getAction()
@@ -1143,10 +1146,13 @@ void Character::updateHealth()
     if (posture == CharacterPosture::Sit) posModifier = 2;
     else if (posture == CharacterPosture::Rest) posModifier = 4;
     else if (posture == CharacterPosture::Rest) posModifier = 8;
-    if (this->health < this->getMaxHealth())
-    {
-        this->addHealth((1 + 3 * logModifier) * (1 + 2 * posModifier), true);
-    }
+    // Set the modifier due to effects.
+    auto effModifier = static_cast<unsigned int>(
+        effects.getStatusModifier(StatusModifier::HealthRegeneration));
+    // Add the health.
+    this->addHealth((1 + 3 * logModifier) *
+                    (1 + 2 * posModifier) +
+                    (1 + 2 * effModifier), true);
 }
 
 void Character::updateStamina()
@@ -1157,10 +1163,13 @@ void Character::updateStamina()
     if (posture == CharacterPosture::Sit) posModifier = 3;
     else if (posture == CharacterPosture::Rest) posModifier = 5;
     else if (posture == CharacterPosture::Rest) posModifier = 10;
-    if (stamina < this->getMaxStamina())
-    {
-        this->addStamina((1 + 4 * logModifier) * (1 + 3 * posModifier), true);
-    }
+    // Set the modifier due to effects.
+    auto effModifier = static_cast<unsigned int>(
+        effects.getStatusModifier(StatusModifier::StaminaRegeneration));
+    // Add the stamina.
+    this->addHealth((1 + 4 * logModifier) *
+                    (1 + 3 * posModifier) +
+                    (1 + 2 * effModifier), true);
 }
 
 void Character::updateHunger()
@@ -1375,6 +1384,24 @@ std::vector<RangedWeaponItem *> Character::getActiveRangedWeapons()
         }
     }
     return weapons;
+}
+
+std::vector<
+    std::shared_ptr<BodyPart::BodyWeapon>> Character::getActiveNaturalWeapons()
+{
+    std::vector<std::shared_ptr<BodyPart::BodyWeapon>> naturalWeapons;
+    for (auto bodyPart : race->bodyParts)
+    {
+        if (this->findItemAtBodyPart(bodyPart) != nullptr)
+        {
+            continue;
+        }
+        if (bodyPart->weapon != nullptr)
+        {
+            naturalWeapons.emplace_back(bodyPart->weapon);
+        }
+    }
+    return naturalWeapons;
 }
 
 void Character::kill()

@@ -57,8 +57,6 @@ public:
     int tileId;
     /// Corpse model.
     std::shared_ptr<CorpseModel> corpse;
-    /// The text describing the natural weapons used by this race.
-    std::string naturalWeapon;
     /// The list of body parts.
     std::vector<std::shared_ptr<BodyPart>> bodyParts;
     /// Base skills.
