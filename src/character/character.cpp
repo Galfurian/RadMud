@@ -41,6 +41,7 @@ Character::Character() :
     stamina(),
     hunger(100),
     thirst(100),
+    skills(),
     room(),
     inventory(),
     equipment(),
@@ -49,9 +50,11 @@ Character::Character() :
     L(luaL_newstate()),
     combatHandler(this),
     actionQueue(),
+    actionQueueMutex(),
     inputProcessor(std::make_shared<ProcessInput>())
 {
-    actionQueue.push_back(std::make_shared<GeneralAction>(this));
+    // Initialize the action queue.
+    this->resetActionQueue();
 }
 
 Character::~Character()
@@ -131,36 +134,65 @@ void Character::getSheet(Table & sheet) const
             "Strength",
             ToString(this->getAbility(Ability::Strength, false)) +
             " [" +
-            ToString(effects.getAbilityModifier(Ability::Strength)) +
+            ToString(
+                effects.getAbilityModifier(Ability::Strength)) +
+            "][" +
+            ToString(
+                effects.getAbilityModifier(Ability::Strength)) +
             "]"});
     sheet.addRow(
         {
             "Agility",
             ToString(this->getAbility(Ability::Agility, false)) +
             " [" +
-            ToString(effects.getAbilityModifier(Ability::Agility)) +
+            ToString(
+                effects.getAbilityModifier(Ability::Agility)) +
+            "][" +
+            ToString(
+                effects.getAbilityModifier(Ability::Agility)) +
             "]"});
     sheet.addRow(
         {
             "Perception",
             ToString(this->getAbility(Ability::Perception, false)) +
             " [" +
-            ToString(effects.getAbilityModifier(Ability::Perception)) +
+            ToString(effects.getAbilityModifier(
+                Ability::Perception)) +
+            "][" +
+            ToString(effects.getAbilityModifier(
+                Ability::Perception)) +
             "]"});
     sheet.addRow(
         {
             "Constitution",
             ToString(this->getAbility(Ability::Constitution, false)) +
             " [" +
-            ToString(effects.getAbilityModifier(Ability::Constitution)) +
+            ToString(effects.getAbilityModifier(
+                Ability::Constitution)) +
+            "][" +
+            ToString(effects.getAbilityModifier(
+                Ability::Constitution)) +
             "]"});
     sheet.addRow(
         {
             "Intelligence",
             ToString(this->getAbility(Ability::Intelligence, false)) +
             " [" +
-            ToString(effects.getAbilityModifier(Ability::Intelligence)) +
+            ToString(effects.getAbilityModifier(
+                Ability::Intelligence)) +
+            "][" +
+            ToString(effects.getAbilityModifier(
+                Ability::Intelligence)) +
             "]"});
+    sheet.addRow({"## Skill", "## Points"});
+    for (auto it : skills)
+    {
+        auto skill = Mud::instance().findSkill(it.first);
+        if (skill)
+        {
+            sheet.addRow({skill->name, ToString(it.second)});
+        }
+    }
     if (CorrectAssert(this->room != nullptr))
     {
         sheet.addRow({"Room", room->name + " [" + ToString(room->vnum) + "]"});
@@ -192,6 +224,11 @@ void Character::getSheet(Table & sheet) const
     {
         sheet.addRow({it.name, ToString(it.remainingTic)});
     }
+}
+
+void Character::initialize()
+{
+    Skill::updateSkillEffects(this);
 }
 
 //std::string Character::getName() const
@@ -267,8 +304,8 @@ bool Character::setAbility(const Ability & ability, const unsigned int & value)
     return false;
 }
 
-unsigned int
-Character::getAbility(const Ability & ability, bool withEffects) const
+unsigned int Character::getAbility(const Ability & ability,
+                                   bool withEffects) const
 {
     auto overall = 0;
     // Try to find the ability value.
@@ -280,9 +317,10 @@ Character::getAbility(const Ability & ability, bool withEffects) const
     // Add the effects if needed.
     if (withEffects)
     {
+        // Add the effects which increase the ability.
         overall += effects.getAbilityModifier(ability);
         // Prune the value if exceed the boundaries.
-        if (overall <= 0)
+        if (overall < 0)
         {
             overall = 0;
         }
@@ -294,8 +332,8 @@ Character::getAbility(const Ability & ability, bool withEffects) const
     return static_cast<unsigned int>(overall);
 }
 
-unsigned int
-Character::getAbilityModifier(const Ability & ability, bool withEffects) const
+unsigned int Character::getAbilityModifier(const Ability & ability,
+                                           bool withEffects) const
 {
     return Ability::getModifier(this->getAbility(ability, withEffects));
 }
@@ -371,19 +409,14 @@ unsigned int Character::getMaxHealth(bool withEffects) const
 {
     // Value = 5 + (5 * AbilityModifier(Constitution))
     unsigned int BASE = 5 + (5 * this->getAbility(Ability::Constitution));
-    if (!withEffects)
-    {
-        return BASE;
-    }
-    int overall = static_cast<int>(BASE) + effects.getHealthMod();
-    if (overall <= 0)
-    {
-        return 0;
-    }
-    else
-    {
-        return static_cast<unsigned int>(overall);
-    }
+    // Return it, if the maximum health is required without the effects.
+    if (!withEffects) return BASE;
+    // Otherwise evaluate the overall max health with the effects.
+    int overall = static_cast<int>(BASE);
+    overall += effects.getStatusModifier(StatusModifier::Health);
+    // If the maximum value is lesser than zero, return zero.
+    if (overall < 0) return 0;
+    return static_cast<unsigned int>(overall);
 }
 
 std::string Character::getHealthCondition(const bool & self)
@@ -476,19 +509,14 @@ unsigned int Character::getMaxStamina(bool withEffects) const
 {
     // Value = 10 + (10 * Ability(Constitution))
     unsigned int BASE = 10 + (10 * this->getAbility(Ability::Constitution));
-    if (!withEffects)
-    {
-        return BASE;
-    }
-    int overall = static_cast<int>(BASE) + effects.getStaminaMod();
-    if (overall <= 0)
-    {
-        return 0;
-    }
-    else
-    {
-        return static_cast<unsigned int>(overall);
-    }
+    // Return it, if the maximum stamina is required without the effects.
+    if (!withEffects) return BASE;
+    // Otherwise evaluate the overall max stamina with the effects.
+    int overall = static_cast<int>(BASE);
+    overall += effects.getStatusModifier(StatusModifier::Stamina);
+    // If the maximum value is lesser than zero, return zero.
+    if (overall < 0) return 0;
+    return static_cast<unsigned int>(overall);
 }
 
 std::string Character::getStaminaCondition()
@@ -512,25 +540,41 @@ int Character::getViewDistance() const
     return 4 + static_cast<int>(this->getAbilityLog(Ability::Perception));
 }
 
-void Character::setAction(std::shared_ptr<GeneralAction> _action)
+void Character::pushAction(const std::shared_ptr<GeneralAction> & _action)
 {
+    std::lock_guard<std::mutex> lock(actionQueueMutex);
     if (_action->getType() != ActionType::Wait)
     {
         actionQueue.push_front(_action);
     }
 }
 
-std::shared_ptr<GeneralAction> Character::getAction() const
-{
-    return actionQueue.front();
-}
-
 void Character::popAction()
 {
-    if (actionQueue.front()->getType() != ActionType::Wait)
+    std::lock_guard<std::mutex> lock(actionQueueMutex);
+    if (actionQueue.size() > 1)
     {
         actionQueue.pop_front();
     }
+}
+
+std::shared_ptr<GeneralAction> & Character::getAction()
+{
+    std::lock_guard<std::mutex> lock(actionQueueMutex);
+    return actionQueue.front();
+}
+
+std::shared_ptr<GeneralAction> const & Character::getAction() const
+{
+    std::lock_guard<std::mutex> lock(actionQueueMutex);
+    return actionQueue.front();
+}
+
+void Character::resetActionQueue()
+{
+    std::lock_guard<std::mutex> lock(actionQueueMutex);
+    actionQueue.clear();
+    actionQueue.emplace_back(std::make_shared<GeneralAction>(this));
 }
 
 void Character::moveTo(
@@ -636,7 +680,8 @@ Item * Character::findEquipmentItem(std::string search_parameter, int & number)
     return nullptr;
 }
 
-Item * Character::findItemAtBodyPart(std::shared_ptr<BodyPart> bodyPart) const
+Item * Character::findItemAtBodyPart(
+    const std::shared_ptr<BodyPart> & bodyPart) const
 {
     for (auto item : equipment)
     {
@@ -743,7 +788,7 @@ Item * Character::findNearbyTool(
 }
 
 bool Character::findNearbyTools(
-    std::set<ToolType> tools,
+    std::vector<ToolType> tools,
     ItemVector & foundOnes,
     bool searchRoom,
     bool searchInventory,
@@ -894,7 +939,7 @@ void Character::addInventoryItem(Item *& item)
 void Character::addEquipmentItem(Item *& item)
 {
     // Add the item to the equipment.
-    equipment.push_back(item);
+    equipment.push_back_item(item);
     // Set the owner of the item.
     item->owner = this;
     // Log it.
@@ -1101,10 +1146,13 @@ void Character::updateHealth()
     if (posture == CharacterPosture::Sit) posModifier = 2;
     else if (posture == CharacterPosture::Rest) posModifier = 4;
     else if (posture == CharacterPosture::Rest) posModifier = 8;
-    if (this->health < this->getMaxHealth())
-    {
-        this->addHealth((1 + 3 * logModifier) * (1 + 2 * posModifier), true);
-    }
+    // Set the modifier due to effects.
+    auto effModifier = static_cast<unsigned int>(
+        effects.getStatusModifier(StatusModifier::HealthRegeneration));
+    // Add the health.
+    this->addHealth((1 + 3 * logModifier) *
+                    (1 + 2 * posModifier) +
+                    (1 + 2 * effModifier), true);
 }
 
 void Character::updateStamina()
@@ -1115,10 +1163,13 @@ void Character::updateStamina()
     if (posture == CharacterPosture::Sit) posModifier = 3;
     else if (posture == CharacterPosture::Rest) posModifier = 5;
     else if (posture == CharacterPosture::Rest) posModifier = 10;
-    if (stamina < this->getMaxStamina())
-    {
-        this->addStamina((1 + 4 * logModifier) * (1 + 3 * posModifier), true);
-    }
+    // Set the modifier due to effects.
+    auto effModifier = static_cast<unsigned int>(
+        effects.getStatusModifier(StatusModifier::StaminaRegeneration));
+    // Add the stamina.
+    this->addHealth((1 + 4 * logModifier) *
+                    (1 + 3 * posModifier) +
+                    (1 + 2 * effModifier), true);
 }
 
 void Character::updateHunger()
@@ -1253,7 +1304,7 @@ unsigned int Character::getArmorClass() const
     return result;
 }
 
-bool Character::canAttackWith(std::shared_ptr<BodyPart> bodyPart) const
+bool Character::canAttackWith(const std::shared_ptr<BodyPart> & bodyPart) const
 {
     if (HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
     {
@@ -1335,6 +1386,24 @@ std::vector<RangedWeaponItem *> Character::getActiveRangedWeapons()
     return weapons;
 }
 
+std::vector<
+    std::shared_ptr<BodyPart::BodyWeapon>> Character::getActiveNaturalWeapons()
+{
+    std::vector<std::shared_ptr<BodyPart::BodyWeapon>> naturalWeapons;
+    for (auto bodyPart : race->bodyParts)
+    {
+        if (this->findItemAtBodyPart(bodyPart) != nullptr)
+        {
+            continue;
+        }
+        if (bodyPart->weapon != nullptr)
+        {
+            naturalWeapons.emplace_back(bodyPart->weapon);
+        }
+    }
+    return naturalWeapons;
+}
+
 void Character::kill()
 {
     // Create a corpse at the current position.
@@ -1359,8 +1428,7 @@ void Character::kill()
         corpse->putInside(item);
     }
     // Reset the action of the character.
-    actionQueue.clear();
-    this->setAction(std::make_shared<GeneralAction>(this));
+    this->resetActionQueue();
     // Reset the list of opponents.
     this->combatHandler.resetList();
     // Remove the character from the current room.

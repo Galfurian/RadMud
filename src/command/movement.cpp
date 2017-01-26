@@ -84,7 +84,7 @@ bool DoDirection(Character * character, Direction direction)
     if (moveAction->check(error))
     {
         // Set the new action.
-        character->setAction(moveAction);
+        character->pushAction(moveAction);
         // Calculate the time needed to move.
         if (character->posture == CharacterPosture::Stand)
         {
@@ -136,7 +136,6 @@ bool DoStop(Character * character, ArgumentHandler & /*args*/)
     if (character->getAction()->getType() != ActionType::Combat)
     {
         character->sendMsg(character->getAction()->stop() + "\n");
-        character->popAction();
         return true;
     }
     return false;

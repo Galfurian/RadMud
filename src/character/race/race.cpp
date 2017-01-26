@@ -1,5 +1,5 @@
-/// @file   skill.cpp
-/// @brief  Implements the skill functions.
+/// @file   race.cpp
+/// @brief  Implement race methods.
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2014
 /// @copyright
@@ -20,37 +20,88 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "skill.hpp"
+#include "race.hpp"
 
 #include "logger.hpp"
+#include "mud.hpp"
 
-#include <cassert>
-
-Skill::Skill() :
+Race::Race() :
     vnum(),
     name(),
     description(),
-    attribute(),
-    stage(),
-    requiredSkills()
+    abilities(),
+    player_allow(),
+    tileSet(),
+    tileId(),
+    corpse(),
+    bodyParts(),
+    baseSkills()
 {
     // Nothing to do.
 }
 
-Skill::~Skill()
+Race::~Race()
 {
 //    Logger::log(LogLevel::Debug,
-//                "Deleted skill\t\t[%s]\t\t(%s)",
+//                "Deleted race\t\t[%s]\t\t(%s)",
 //                ToString(this->vnum),
 //                this->name);
 }
 
-bool Skill::check()
+bool Race::check()
 {
     assert(vnum > 0);
     assert(!name.empty());
     assert(!description.empty());
-    assert(attribute > 0);
-    assert(stage > 0);
     return true;
+}
+
+std::string Race::getShortDescription(bool capital)
+{
+    std::string shortDescription = this->article + " " + this->name;
+    if (capital && !shortDescription.empty())
+    {
+        shortDescription[0] = static_cast<char>(toupper(shortDescription[0]));
+    }
+    return shortDescription;
+}
+
+unsigned int Race::getAbility(const Ability & ability) const
+{
+    for (auto it : abilities)
+    {
+        if (it.first == ability)
+        {
+            return it.second;
+        }
+    }
+    return 0;
+}
+
+unsigned int Race::getAbilityLua(const unsigned int & abilityNumber)
+{
+    if (Ability::isValid(abilityNumber))
+    {
+        return this->getAbility(Ability(abilityNumber));
+    }
+    return 0;
+}
+
+void Race::luaRegister(lua_State * L)
+{
+    luabridge::getGlobalNamespace(L)
+        .beginClass<Race>("Race")
+        .addData("vnum", &Race::vnum)
+        .addData("name", &Race::name)
+        .addFunction("getAbility", &Race::getAbilityLua)
+        .endClass();
+}
+
+std::string Race::getTile()
+{
+    if (Formatter::getFormat() == Formatter::CLIENT)
+    {
+        return ToString(tileSet) + ":" + ToString(tileId);
+    }
+    return "c";
 }

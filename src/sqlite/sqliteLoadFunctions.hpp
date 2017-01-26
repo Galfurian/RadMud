@@ -47,8 +47,20 @@ bool LoadItem(ResultSet * result);
 /// @brief Function used to retrieve information about skills.
 bool LoadSkill(ResultSet * result);
 
-/// @brief Function used to retrieve information about skills requirements.
-bool LoadSkillRequirements(ResultSet * result);
+/// @brief Function used to retrieve information about skills prerequisites.
+bool LoadSkillPrerequisite(ResultSet * result);
+
+/// @brief Loads the ability modifier associated with a skill.
+bool LoadSkillAbilityModifier(ResultSet * result);
+
+/// @brief Loads the status modifier associated with a skill.
+bool LoadSkillStatusModifier(ResultSet * result);
+
+/// @brief Loads the combat modifier associated with a skill.
+bool LoadSkillCombatModifier(ResultSet * result);
+
+/// @brief Loads the knowledge associated with a skill.
+bool LoadSkillKnowledge(ResultSet * result);
 
 /// @brief Function used to retrieve information about factions.
 bool LoadFaction(ResultSet * result);
@@ -64,6 +76,12 @@ bool LoadRaceBodyPart(ResultSet * result);
 
 /// @brief Function used to load corpses associated to races.
 bool LoadRaceCorpse(ResultSet * result);
+
+/// @brief Function used to load the base skills of a race.
+bool LoadRaceBaseSkill(ResultSet * result);
+
+/// @brief Function used to load the base abilities of a race.
+bool LoadRaceBaseAbility(ResultSet * result);
 
 /// @brief Function used to retrieve information about all the mobiles.
 bool LoadMobile(ResultSet * result);
@@ -101,6 +119,22 @@ bool LoadProfession(ResultSet * result);
 /// @brief Function used to retrieve information about all the productions.
 bool LoadProduction(ResultSet * result);
 
+/// @brief Function used to retrieve information about the tools
+/// required by productions.
+bool LoadProductionTool(ResultSet * result);
+
+/// @brief Function used to retrieve information about the outcomes
+/// of productions.
+bool LoadProductionOutcome(ResultSet * result);
+
+/// @brief Function used to retrieve information about the ingredients
+/// required by productions.
+bool LoadProductionIngredient(ResultSet * result);
+
+/// @brief Function used to retrieve information about the knowledge
+/// required by productions.
+bool LoadProductionKnowledge(ResultSet * result);
+
 /// @brief Function used to retrieve information about all the liquids.
 bool LoadLiquid(ResultSet * result);
 
@@ -131,5 +165,8 @@ bool LoadModelBodyPart(ResultSet * result);
 
 /// @brief Function used to load the resources produced from a body part.
 bool LoadBodyPartResources(ResultSet * result);
+
+/// @brief Function used to load the attack properties of body parts.
+bool LoadBodyPartWeapon(ResultSet * result);
 
 ///@}

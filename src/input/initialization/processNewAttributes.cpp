@@ -47,16 +47,11 @@ ProcessNewAttributes::process(Character * character, ArgumentHandler & args)
     if (ToLower(args[0].getContent()) == "reset")
     {
         player->remaining_points = 0;
-        player->setAbility(Ability::Strength,
-                           player->race->getAbility(Ability::Strength));
-        player->setAbility(Ability::Agility,
-                           player->race->getAbility(Ability::Agility));
-        player->setAbility(Ability::Perception,
-                           player->race->getAbility(Ability::Perception));
-        player->setAbility(Ability::Constitution,
-                           player->race->getAbility(Ability::Constitution));
-        player->setAbility(Ability::Intelligence,
-                           player->race->getAbility(Ability::Intelligence));
+        for (auto & ability : player->abilities)
+        {
+            player->setAbility(ability.first,
+                               player->race->getAbility(ability.first));
+        }
         this->advance(character,
                       Formatter::cyan() +
                       "Attribute has been set by default." +
@@ -89,7 +84,7 @@ ProcessNewAttributes::process(Character * character, ArgumentHandler & args)
             return false;
         }
         std::string help;
-        help += "Help about " + ability.toString() + ".\n";
+        help += "Help about " + ability.toString(true) + ".\n";
         help += Formatter::italic() + ability.getDescription() + "\n";
         this->advance(character, help);
         return true;
@@ -169,16 +164,14 @@ ProcessNewAttributes::advance(Character * character, const std::string & error)
     };
     std::string msg;
     msg += "# " + Bold("Character's Attributes.") + "\n";
-    msg += "#    [1] Strength     : " +
-           ToString(player->getAbility(Ability::Strength, false)) + "\n";
-    msg += "#    [2] Agility      : " +
-           ToString(player->getAbility(Ability::Agility, false)) + "\n";
-    msg += "#    [3] Perception   : " +
-           ToString(player->getAbility(Ability::Perception, false)) + "\n";
-    msg += "#    [4] Constitution : " +
-           ToString(player->getAbility(Ability::Constitution, false)) + "\n";
-    msg += "#    [5] Intelligence : " +
-           ToString(player->getAbility(Ability::Intelligence, false)) + "\n";
+    for (auto ability : player->abilities)
+    {
+        msg += "#    [" + ToString(ability.first.toUInt()) + "]";
+        msg += AlignString(ability.first.toString(true),
+                           StringAlign::Left, 15);
+        msg += " : ";
+        msg += ToString(player->getAbility(Ability::Strength, false));
+    }
     msg += "#\n";
     msg += "# Remaining Points: ";
     msg += (player->remaining_points > 0) ? Formatter::green()
@@ -207,15 +200,10 @@ ProcessNewAttributes::advance(Character * character, const std::string & error)
 void ProcessNewAttributes::rollBack(Character * character)
 {
     auto player = character->toPlayer();
-    player->setAbility(Ability::Strength,
-                       player->race->getAbility(Ability::Strength));
-    player->setAbility(Ability::Agility,
-                       player->race->getAbility(Ability::Agility));
-    player->setAbility(Ability::Perception,
-                       player->race->getAbility(Ability::Perception));
-    player->setAbility(Ability::Constitution,
-                       player->race->getAbility(Ability::Constitution));
-    player->setAbility(Ability::Intelligence,
-                       player->race->getAbility(Ability::Intelligence));
+    for (auto & ability : player->abilities)
+    {
+        player->setAbility(ability.first,
+                           player->race->getAbility(ability.first));
+    }
     this->advance(character);
 }

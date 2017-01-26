@@ -38,7 +38,6 @@ Player::Player(const int & _socket,
     experience(),
     prompt(),
     rent_room(),
-    skills(),
     remaining_points(),
     connectionState(ConnectionState::LoggingIn),
     password_attempts(),
@@ -114,12 +113,6 @@ void Player::getSheet(Table & sheet) const
     sheet.addRow({"Experience", ToString(this->experience)});
     sheet.addRow({"Prompt", this->prompt});
     sheet.addRow({"Rent Room", ToString(this->rent_room)});
-    sheet.addDivider();
-    sheet.addRow({"## Skill", "## Points"});
-    for (auto it : skills)
-    {
-        sheet.addRow({it.first->name, ToString(it.second)});
-    }
 }
 
 std::string Player::getName() const
@@ -198,6 +191,11 @@ bool Player::remEquipmentItem(Item * item)
     return false;
 }
 
+void Player::initialize()
+{
+    Character::initialize();
+}
+
 int Player::getSocket() const
 {
     return psocket;
@@ -265,12 +263,12 @@ bool Player::updateOnDB()
         return false;
     }
     // Prepare the arguments of the query for skill table.
-    for (auto it : skills)
+    for (auto skill : skills)
     {
         args.clear();
         args.push_back(name);
-        args.push_back(ToString(it.first->vnum));
-        args.push_back(ToString(it.second));
+        args.push_back(ToString(skill.first));
+        args.push_back(ToString(skill.second));
         if (!SQLiteDbms::instance().insertInto("PlayerSkill",
                                                args,
                                                false,
@@ -359,12 +357,14 @@ void Player::kill()
 
 void Player::enterGame()
 {
+    // -------------------------------------------------------------------------
+    // Phase 1: Clear the screen and show the welcome message.
     this->sendMsg(Formatter::clearScreen());
     // Greet them.
-    Character::sendMsg("%sWelcome, " + name + "!%s\n",
-                       Formatter::bold(),
+    Character::sendMsg("%sWelcome, %s!%s\n", Formatter::bold(), name,
                        Formatter::reset());
-    // Load the news.
+    // -------------------------------------------------------------------------
+    // Phase 2: Show the news.
     this->sendMsg("#---------------- Global News ----------------#\n");
     for (auto it = Mud::instance().mudNews.rbegin();
          it != Mud::instance().mudNews.rend(); ++it)
@@ -373,6 +373,8 @@ void Player::enterGame()
         this->sendMsg(it->second + "\n");
     }
     this->sendMsg("#---------------------------------------------#\n\n");
+    // -------------------------------------------------------------------------
+    // Phase 3: Place the player.
     this->sendMsg("You walked through the mist and came into the world...\n\n");
     // Notice all the players in the same room.
     if (room != nullptr)
@@ -383,14 +385,16 @@ void Player::enterGame()
     }
     else
     {
-        closeConnection();
+        this->closeConnection();
     }
-
     // Set the player as logged in.
     logged_in = true;
-
-    // New player looks around.
-    doCommand("look");
+    // -------------------------------------------------------------------------
+    // Phase 4: Initialize the player.
+    this->initialize();
+    // -------------------------------------------------------------------------
+    // Phase 5: Look around.
+    this->doCommand("look");
 }
 
 /// Size of buffers used for communications.

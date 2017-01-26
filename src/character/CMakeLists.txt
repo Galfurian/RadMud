@@ -1,4 +1,10 @@
 #############################################
+# Sub-directories
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/character/effect)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/character/skill)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/character/race)
+
+#############################################
 # Include Directories
 set(PROJECT_INC ${PROJECT_INC}
         ${CMAKE_SOURCE_DIR}/src/character
@@ -14,11 +20,6 @@ set(PROJECT_SRC ${PROJECT_SRC}
         ${CMAKE_SOURCE_DIR}/src/character/player.cpp
         ${CMAKE_SOURCE_DIR}/src/character/characterContainer.cpp
         ${CMAKE_SOURCE_DIR}/src/character/faction.cpp
-        ${CMAKE_SOURCE_DIR}/src/character/race.cpp
-        ${CMAKE_SOURCE_DIR}/src/character/skill.cpp
         ${CMAKE_SOURCE_DIR}/src/character/combatHandler.cpp
-        ${CMAKE_SOURCE_DIR}/src/character/effect.cpp
-        ${CMAKE_SOURCE_DIR}/src/character/effectList.cpp
-        ${CMAKE_SOURCE_DIR}/src/character/effectFactory.cpp
         PARENT_SCOPE
         )

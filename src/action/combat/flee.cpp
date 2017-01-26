@@ -32,14 +32,14 @@ Flee::Flee(Character * _actor) :
     CombatAction(_actor)
 {
     // Debugging message.
-    //Logger::log(LogLevel::Debug, "Created Flee.");
+    Logger::log(LogLevel::Debug, "Created Flee.");
     // Reset the cooldown of the action.
     this->resetCooldown(Flee::getCooldown(_actor));
 }
 
 Flee::~Flee()
 {
-    //Logger::log(LogLevel::Debug, "Deleted Flee.");
+    Logger::log(LogLevel::Debug, "Deleted Flee.");
 }
 
 bool Flee::check(std::string & error) const
@@ -173,20 +173,10 @@ unsigned int Flee::getCooldown(Character * character)
     // AGILITY  [-0.0 to -1.40]
     // WEIGHT   [+1.6 to +2.51]
     // CARRIED  [+0.0 to +2.48]
-    // WEAPON   [+0.0 to +1.60]
     unsigned int cooldown = 5;
-    cooldown -= character->getAbilityLog(Ability::Strength);
-    cooldown -= character->getAbilityLog(Ability::Agility);
+    cooldown = SafeSum(cooldown, -character->getAbilityLog(Ability::Strength));
+    cooldown = SafeSum(cooldown, -character->getAbilityLog(Ability::Agility));
     cooldown = SafeSum(cooldown, SafeLog10(character->weight));
     cooldown = SafeSum(cooldown, SafeLog10(character->getCarryingWeight()));
-    for (auto bodyPart : character->race->bodyParts)
-    {
-        if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWield)) continue;
-        auto wpn = character->findItemAtBodyPart(bodyPart);
-        if (wpn != nullptr)
-        {
-            cooldown = SafeSum(cooldown, SafeLog10(wpn->getWeight(true)));
-        }
-    }
     return cooldown;
 }

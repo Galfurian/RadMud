@@ -151,10 +151,8 @@ bool DoProfessionInfo(Character * character, ArgumentHandler & args)
         return false;
     }
     std::string msg;
-    msg += "Name          : " + profession->name + "\n";
     msg += "Description   : " + profession->description + "\n";
     msg += "Command       : " + profession->command + "\n";
-    msg += "Posture       : " + profession->posture.toString() + "\n";
     msg += "Action        : " + profession->action + "\n";
     msg += "    Start     : " + profession->startMessage + "\n";
     msg += "    Finish    : " + profession->finishMessage + "\n";
@@ -169,17 +167,13 @@ bool DoProfessionInfo(Character * character, ArgumentHandler & args)
 bool DoProfessionList(Character * character, ArgumentHandler & /*args*/)
 {
     Table table;
-    table.addColumn("NAME", StringAlign::Center);
     table.addColumn("COMMAND", StringAlign::Center);
-    table.addColumn("POSTURE", StringAlign::Center);
     table.addColumn("ACTION", StringAlign::Center);
     for (auto iterator : Mud::instance().mudProfessions)
     {
         // Prepare the row.
         TableRow row;
-        row.push_back(iterator.second->name);
         row.push_back(iterator.second->command);
-        row.push_back(iterator.second->posture.toString());
         row.push_back(iterator.second->action);
         // Add the row to the table.
         table.addRow(row);

@@ -45,7 +45,7 @@ Chase::Chase(Character * _actor, Character * _target) :
         })
 {
     // Debugging message.
-    //Logger::log(LogLevel::Debug, "Created Chase.");
+    Logger::log(LogLevel::Debug, "Created Chase.");
     // Reset the cooldown of the action.
     this->resetCooldown(Chase::getCooldown(_actor));
     // Find the path from the actor to the target.
@@ -59,7 +59,7 @@ Chase::Chase(Character * _actor, Character * _target) :
 
 Chase::~Chase()
 {
-    //Logger::log(LogLevel::Debug, "Deleted Chase.");
+    Logger::log(LogLevel::Debug, "Deleted Chase.");
 }
 
 bool Chase::check(std::string & error) const

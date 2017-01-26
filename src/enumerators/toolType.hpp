@@ -63,12 +63,6 @@ public:
     /// @brief Constructor from string.
     ToolType(const std::string & _toolType);
 
-    /// @brief Check is the given number is a valid type of model.
-    static bool isValid(const unsigned int & _toolType);
-
-    /// @brief Check is the given string is a valid type of model.
-    static bool isValid(const std::string & _toolType);
-
     /// @brief Returns the type of model as string.
     std::string toString() const;
 

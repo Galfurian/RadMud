@@ -234,31 +234,6 @@ std::string GetFileContents(const char * filename)
     return (contents);
 }
 
-std::string GetAttributeName(const int & id, const bool & abbreviated)
-{
-    if (id == 1)
-    {
-        return (abbreviated) ? "Str" : "Strength";
-    }
-    if (id == 2)
-    {
-        return (abbreviated) ? "Agi" : "Agility";
-    }
-    if (id == 3)
-    {
-        return (abbreviated) ? "Per" : "Perception";
-    }
-    if (id == 4)
-    {
-        return (abbreviated) ? "Con" : "Constitution";
-    }
-    if (id == 5)
-    {
-        return (abbreviated) ? "Int" : "Intelligence";
-    }
-    return (abbreviated) ? "Err:" + ToString(id) : "Error:" + ToString(id);
-}
-
 /// Check if the return code from Zlib is an error.
 #define ZCHECK_ERROR(err, msg)\
 if ((err) != Z_OK) {\

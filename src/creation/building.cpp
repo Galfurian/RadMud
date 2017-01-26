@@ -105,7 +105,7 @@ bool Building::setTool(const std::string & source)
             Logger::log(LogLevel::Error, "Can't find the Tool :" + it);
             return false;
         }
-        tools.insert(toolType);
+        tools.emplace_back(toolType);
     }
     return true;
 }

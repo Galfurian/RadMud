@@ -55,14 +55,31 @@ SQLiteDbms::SQLiteDbms() :
     loaders.push_back(TableLoader("Writings", LoadWriting));
     loaders.push_back(TableLoader("Profession", LoadProfession));
     loaders.push_back(TableLoader("Production", LoadProduction));
+    loaders.push_back(TableLoader("ProductionTool", LoadProductionTool));
+    loaders.push_back(TableLoader("ProductionOutcome", LoadProductionOutcome));
+    loaders.push_back(TableLoader("ProductionIngredient",
+                                  LoadProductionIngredient));
+    loaders.push_back(TableLoader("ProductionKnowledge",
+                                  LoadProductionKnowledge));
     loaders.push_back(TableLoader("Building", LoadBuilding));
     loaders.push_back(TableLoader("Shop", LoadShop));
     loaders.push_back(TableLoader("Currency", LoadCurrency));
     loaders.push_back(TableLoader("ModelBodyPart", LoadModelBodyPart));
     loaders.push_back(TableLoader("Mobile", LoadMobile));
     loaders.push_back(TableLoader("Skill", LoadSkill));
-    loaders.push_back(TableLoader("SkillRequirements", LoadSkillRequirements));
+    loaders.push_back(TableLoader("SkillPrerequisite", LoadSkillPrerequisite));
+    loaders.push_back(TableLoader("SkillAbilityModifier",
+                                  LoadSkillAbilityModifier));
+    loaders.push_back(TableLoader("SkillStatusModifier",
+                                  LoadSkillStatusModifier));
+    loaders.push_back(TableLoader("SkillCombatModifier",
+                                  LoadSkillCombatModifier));
+    loaders.push_back(TableLoader("SkillKnowledge",
+                                  LoadSkillKnowledge));
     loaders.push_back(TableLoader("BodyPartResources", LoadBodyPartResources));
+    loaders.push_back(TableLoader("BodyPartWeapon", LoadBodyPartWeapon));
+    loaders.push_back(TableLoader("RaceBaseSkill", LoadRaceBaseSkill));
+    loaders.push_back(TableLoader("RaceBaseAbility", LoadRaceBaseAbility));
 }
 
 SQLiteDbms::~SQLiteDbms()

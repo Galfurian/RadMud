@@ -32,7 +32,7 @@
 #include "faction.hpp"
 #include "bodyPart.hpp"
 #include "luaBridge.hpp"
-#include "effectList.hpp"
+#include "effectManager.hpp"
 #include "processInput.hpp"
 #include "combatAction.hpp"
 #include "argumentHandler.hpp"
@@ -42,6 +42,7 @@
 #include "characterContainer.hpp"
 
 #include <deque>
+#include <mutex>
 
 class Room;
 
@@ -101,6 +102,8 @@ public:
     int thirst;
     /// Character abilities.
     std::map<Ability, unsigned int> abilities;
+    /// The player's list of skills.
+    std::map<int, unsigned int> skills;
     /// The current room the character is in.
     Room * room;
     /// Character's inventory.
@@ -110,13 +113,15 @@ public:
     /// Character's posture.
     CharacterPosture posture;
     /// Active effects on player.
-    EffectList effects;
+    EffectManager effects;
     /// The lua_State associated with this character.
     lua_State * L;
     /// List of opponents.
     CombatHandler combatHandler;
     /// Character current action.
-    std::deque<std::shared_ptr<GeneralAction> > actionQueue;
+    std::deque<std::shared_ptr<GeneralAction>> actionQueue;
+    /// Mutex for the action queue.
+    mutable std::mutex actionQueueMutex;
     /// The input handler.
     std::shared_ptr<ProcessInput> inputProcessor;
 
@@ -151,6 +156,9 @@ public:
     ///         character.
     /// @param sheet The table that has to be filled.
     virtual void getSheet(Table & sheet) const;
+
+    /// @brief Initializes the variables of the chracter.
+    virtual void initialize();
 
     /// @brief Return the name of the character with all lowercase characters.
     /// @return The name of the character.
@@ -304,15 +312,20 @@ public:
 
     /// @brief Allows to set an action.
     /// @param _action The action that has to be set.
-    void setAction(std::shared_ptr<GeneralAction> _action);
-
-    /// @brief Provides a pointer to the action object associated to this character.
-    /// @return A pointer to action.
-    std::shared_ptr<GeneralAction> getAction() const;
+    void pushAction(const std::shared_ptr<GeneralAction> & _action);
 
     /// @brief Provides a pointer to the action at the front position and
     ///         then remove it from the queue.
     void popAction();
+
+    /// @brief Provides a pointer to the current action.
+    std::shared_ptr<GeneralAction> & getAction();
+
+    /// @brief Provides a pointer to the current action.
+    std::shared_ptr<GeneralAction> const & getAction() const;
+
+    /// @brief Allows to reset the entire action queue.
+    void resetActionQueue();
 
     /// @brief Move the character to another room.
     /// @param destination Destination room.
@@ -340,7 +353,7 @@ public:
     /// @brief Search the item at given position and return it.
     /// @param bodyPart The body part where the method need to search the item.
     /// @return The item, if it's in the character's equipment.
-    Item * findItemAtBodyPart(std::shared_ptr<BodyPart> bodyPart) const;
+    Item * findItemAtBodyPart(const std::shared_ptr<BodyPart> & bodyPart) const;
 
     /// @brief Search an item nearby, (eq, inv, room).
     /// @param itemName The name of the item.
@@ -371,7 +384,7 @@ public:
     /// @return <b>True</b> if the operation goes well,<br>
     ///         <b>False</b> otherwise.
     bool findNearbyTools(
-        std::set<ToolType> tools,
+        std::vector<ToolType> tools,
         ItemVector & foundOnes,
         bool searchRoom,
         bool searchInventory,
@@ -498,7 +511,7 @@ public:
     /// @param bodyPart The body part at which the weapon could be.
     /// @return <b>True</b> if the item is there,<br>
     ///         <b>False</b> otherwise.
-    bool canAttackWith(std::shared_ptr<BodyPart> bodyPart) const;
+    bool canAttackWith(const std::shared_ptr<BodyPart> & bodyPart) const;
 
     /// @brief Checks if the given target is both In Sight and within the Range of Sight.
     /// @param target The target character.
@@ -514,6 +527,10 @@ public:
     /// @brief Provides the list of active ranged weapons (Left and Right hands).
     /// @return Vector of ranged weapons.
     std::vector<RangedWeaponItem *> getActiveRangedWeapons();
+
+    /// @brief Provides the list of active natural weapons.
+    std::vector<
+        std::shared_ptr<BodyPart::BodyWeapon>> getActiveNaturalWeapons();
 
     /// @brief Handle what happend when this character die.
     virtual void kill();

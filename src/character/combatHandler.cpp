@@ -169,7 +169,7 @@ std::shared_ptr<CombatHandler::Aggression> CombatHandler::getTopAggro()
     {
         return nullptr;
     }
-    return *(opponents.begin());
+    return opponents.front();
 }
 
 bool CombatHandler::moveToTopAggro(Character * character)
@@ -292,7 +292,8 @@ void CombatHandler::sortList()
 {
     std::sort(
         opponents.begin(), opponents.end(),
-        [](std::shared_ptr<Aggression> a, std::shared_ptr<Aggression> b)
+        [](const std::shared_ptr<Aggression> & a,
+           const std::shared_ptr<Aggression> & b)
         {
             return a->aggression > b->aggression;
         });

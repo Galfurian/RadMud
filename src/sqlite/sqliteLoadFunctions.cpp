@@ -182,7 +182,7 @@ bool LoadSkill(ResultSet * result)
             skill->vnum = result->getNextInteger();
             skill->name = result->getNextString();
             skill->description = result->getNextString();
-            skill->attribute = result->getNextInteger();
+            skill->ability = Ability(result->getNextUnsignedInteger());
             skill->stage = result->getNextInteger();
             // Check the correctness.
             if (!skill->check())
@@ -193,6 +193,12 @@ bool LoadSkill(ResultSet * result)
             {
                 throw SQLiteException("Error during skill insertion.");
             }
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s%s",
+                        AlignString(skill->name, StringAlign::Left, 25),
+                        AlignString(skill->ability.toString(),
+                                    StringAlign::Left, 15),
+                        skill->description);
         }
         catch (SQLiteException & e)
         {
@@ -203,23 +209,21 @@ bool LoadSkill(ResultSet * result)
     return true;
 }
 
-bool LoadSkillRequirements(ResultSet * result)
+bool LoadSkillPrerequisite(ResultSet * result)
 {
     while (result->next())
     {
         try
         {
             auto skillVnum = result->getNextInteger();
-            auto requiredSkillVnum = result->getNextInteger();
-            auto requiredLevel = result->getNextInteger();
-
             auto skill = Mud::instance().findSkill(skillVnum);
-            auto requiredSkill = Mud::instance().findSkill(requiredSkillVnum);
             if (skill == nullptr)
             {
                 throw SQLiteException("Can't find the skill " +
                                       ToString(skillVnum));
             }
+            auto requiredSkillVnum = result->getNextInteger();
+            auto requiredSkill = Mud::instance().findSkill(requiredSkillVnum);
             if (requiredSkill == nullptr)
             {
                 throw SQLiteException("Can't find the skill " +
@@ -227,9 +231,167 @@ bool LoadSkillRequirements(ResultSet * result)
                                       " required by the skill " +
                                       ToString(skillVnum));
             }
-            skill->requiredSkills.emplace_back(
-                std::make_pair(requiredSkill,
-                               requiredLevel));
+            skill->requiredSkills.emplace_back(requiredSkillVnum);
+            Logger::log(LogLevel::Debug,
+                        "\t%s requires %s",
+                        AlignString(skill->name, StringAlign::Left, 25),
+                        AlignString(requiredSkill->name,
+                                    StringAlign::Left, 25));
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadSkillAbilityModifier(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto skillVnum = result->getNextInteger();
+            auto skill = Mud::instance().findSkill(skillVnum);
+            if (skill == nullptr)
+            {
+                throw SQLiteException("Can't find the skill " +
+                                      ToString(skillVnum));
+            }
+            auto abilityNumber = result->getNextUnsignedInteger();
+            auto ability = Ability(abilityNumber);
+            if (ability == Ability::None)
+            {
+                throw SQLiteException("Can't find the ability " +
+                                      ToString(abilityNumber));
+            }
+            auto modifier = result->getNextInteger();
+            skill->abilityModifier.insert(std::make_pair(ability, modifier));
+            // Log it.
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s%s",
+                        AlignString(skill->name, StringAlign::Left, 25),
+                        AlignString(ability.toString(), StringAlign::Left, 35),
+                        AlignString(modifier, StringAlign::Left, 35));
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadSkillStatusModifier(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto skillVnum = result->getNextInteger();
+            auto skill = Mud::instance().findSkill(skillVnum);
+            if (skill == nullptr)
+            {
+                throw SQLiteException("Can't find the skill " +
+                                      ToString(skillVnum));
+            }
+            auto statusModifierNumber = result->getNextUnsignedInteger();
+            auto statusModifier = StatusModifier(statusModifierNumber);
+            if (statusModifier == StatusModifier::None)
+            {
+                throw SQLiteException("Can't find the status modifier " +
+                                      ToString(statusModifierNumber));
+            }
+            auto modifier = result->getNextInteger();
+            skill->statusModifier.insert(
+                std::make_pair(statusModifier, modifier));
+            // Log it.
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s%s",
+                        AlignString(skill->name, StringAlign::Left, 25),
+                        AlignString(statusModifier.toString(),
+                                    StringAlign::Left, 35),
+                        AlignString(modifier, StringAlign::Left, 35));
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadSkillCombatModifier(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto skillVnum = result->getNextInteger();
+            auto skill = Mud::instance().findSkill(skillVnum);
+            if (skill == nullptr)
+            {
+                throw SQLiteException("Can't find the skill " +
+                                      ToString(skillVnum));
+            }
+            auto combatModifierNumber = result->getNextUnsignedInteger();
+            auto combatModifier = CombatModifier(combatModifierNumber);
+            if (combatModifier == CombatModifier::None)
+            {
+                throw SQLiteException("Can't find the combat modifier " +
+                                      ToString(combatModifierNumber));
+            }
+            auto modifier = result->getNextInteger();
+            skill->combatModifier.insert(
+                std::make_pair(combatModifier, modifier));
+            // Log it.
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s%s",
+                        AlignString(skill->name, StringAlign::Left, 25),
+                        AlignString(combatModifier.toString(),
+                                    StringAlign::Left, 35),
+                        AlignString(modifier, StringAlign::Left, 35));
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadSkillKnowledge(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto skillVnum = result->getNextInteger();
+            auto skill = Mud::instance().findSkill(skillVnum);
+            if (skill == nullptr)
+            {
+                throw SQLiteException("Can't find the skill " +
+                                      ToString(skillVnum));
+            }
+            auto knowledgeNumber = result->getNextUnsignedInteger();
+            auto knowledge = Knowledge(knowledgeNumber);
+            if (knowledge == Ability::None)
+            {
+                throw SQLiteException("Can't find the knowledge " +
+                                      ToString(knowledgeNumber));
+            }
+            skill->knowledge.insert(std::make_pair(knowledge, true));
+            // Log it.
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s",
+                        AlignString(skill->name, StringAlign::Left, 25),
+                        AlignString(knowledge.toString(),
+                                    StringAlign::Left, 35));
         }
         catch (SQLiteException & e)
         {
@@ -352,15 +514,9 @@ bool LoadRace(ResultSet * result)
             race->article = result->getNextString();
             race->name = result->getNextString();
             race->description = result->getNextString();
-            race->setAbilities(result->getNextString());
-            if (!race->setAvailableFactions(result->getNextString()))
-            {
-                throw SQLiteException("Error when setting race factions.");
-            }
             race->player_allow = result->getNextInteger();
             race->tileSet = result->getNextInteger();
             race->tileId = result->getNextInteger();
-            race->naturalWeapon = result->getNextString();
             // Translate new_line.
             FindAndReplace(&race->description, "%r", "\n");
             // Check the correctness.
@@ -388,12 +544,26 @@ bool LoadRaceBodyPart(ResultSet * result)
     {
         try
         {
-            auto race = Mud::instance().findRace(result->getNextInteger());
-            auto bodyPart = Mud::instance().findBodyPart(
-                result->getNextUnsignedInteger());
-            assert(race != nullptr);
-            assert(bodyPart != nullptr);
+            auto raceVnum = result->getNextInteger();
+            auto race = Mud::instance().findRace(raceVnum);
+            if (race == nullptr)
+            {
+                throw SQLiteException("Cannot find the race " +
+                                      ToString(raceVnum));
+            }
+            auto bodyPartVnum = result->getNextUnsignedInteger();
+            auto bodyPart = Mud::instance().findBodyPart(bodyPartVnum);
+            if (bodyPart == nullptr)
+            {
+                throw SQLiteException("Cannot find the body part " +
+                                      ToString(bodyPartVnum));
+            }
+            // Add the body part to the race.
             race->bodyParts.emplace_back(bodyPart);
+            // Log the body part.
+            Logger::log(LogLevel::Debug, "\t%s%s",
+                        AlignString(race->name, StringAlign::Left, 25),
+                        AlignString(bodyPart->name, StringAlign::Left, 25));
         }
         catch (SQLiteException & e)
         {
@@ -415,7 +585,7 @@ bool LoadRaceCorpse(ResultSet * result)
             if (race == nullptr)
             {
                 throw SQLiteException("Cannot find the race " +
-                                      ToString(raceVnum) + " for a corpse.");
+                                      ToString(raceVnum));
             }
             auto corpse = std::make_shared<CorpseModel>();
             corpse->vnum = 0;
@@ -445,6 +615,84 @@ bool LoadRaceCorpse(ResultSet * result)
             }
             corpse->corpseComposition = corpseComposition;
             race->corpse = corpse;
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadRaceBaseSkill(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto raceVnum = result->getNextInteger();
+            auto race = Mud::instance().findRace(raceVnum);
+            if (race == nullptr)
+            {
+                throw SQLiteException("Cannot find the race " +
+                                      ToString(raceVnum));
+            }
+            auto skillVnum = result->getNextInteger();
+            auto skill = Mud::instance().findSkill(skillVnum);
+            if (skill == nullptr)
+            {
+                throw SQLiteException("Cannot find the skill " +
+                                      ToString(skillVnum));
+            }
+            auto rank = result->getNextUnsignedInteger();
+            // Set the base skill of the race.
+            race->baseSkills.insert(std::make_pair(skillVnum, rank));
+            // Log the skill.
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s%s",
+                        AlignString(race->name, StringAlign::Left, 25),
+                        AlignString(skill->name, StringAlign::Left, 25),
+                        rank);
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadRaceBaseAbility(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto raceVnum = result->getNextInteger();
+            auto race = Mud::instance().findRace(raceVnum);
+            if (race == nullptr)
+            {
+                throw SQLiteException("Cannot find the race " +
+                                      ToString(raceVnum));
+            }
+            auto abilityVnum = result->getNextUnsignedInteger();
+            auto ability = Ability(abilityVnum);
+            if (ability == Ability::None)
+            {
+                throw SQLiteException("Cannot find the ability " +
+                                      ToString(abilityVnum));
+            }
+            auto value = result->getNextUnsignedInteger();
+            // Set the base ability value of the race.
+            race->abilities[ability] = value;
+            // Log the ability.
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s%s",
+                        AlignString(race->name, StringAlign::Left, 25),
+                        AlignString(ability.toString(), StringAlign::Left, 25),
+                        value);
         }
         catch (SQLiteException & e)
         {
@@ -834,12 +1082,9 @@ bool LoadProfession(ResultSet * result)
             auto professions = new Profession();
             // Initialize the profession.
             professions->vnum = result->getNextUnsignedInteger();
-            professions->name = result->getNextString();
-            professions->description = result->getNextString();
             professions->command = result->getNextString();
-            professions->posture = CharacterPosture(
-                result->getNextUnsignedInteger());
             professions->action = result->getNextString();
+            professions->description = result->getNextString();
             professions->startMessage = result->getNextString();
             professions->finishMessage = result->getNextString();
             professions->successMessage = result->getNextString();
@@ -871,37 +1116,193 @@ bool LoadProduction(ResultSet * result)
     {
         try
         {
-            // Checker flag.
-            bool check = true;
             // Create an empty Production.
             auto production = new Production();
             // Initialize the Production.
             production->vnum = result->getNextInteger();
             production->name = result->getNextString();
-            production->profession = Mud::instance().findProfession(
-                result->getNextString());
-            production->difficulty = result->getNextUnsignedInteger();
-            production->time = result->getNextUnsignedInteger();
-            production->assisted = result->getNextInteger();
-            check &= production->setOutcome(result->getNextString());
-            check &= production->setTool(result->getNextString());
-            check &= production->setIngredient(result->getNextString());
-            production->workbench = ToolType(result->getNextUnsignedInteger());
-            // ////////////////////////////////////////////////////////////////
-            // Check the correctness.
-            if (!check)
+            auto professionVnum = result->getNextUnsignedInteger();
+            auto profession = Mud::instance().findProfession(professionVnum);
+            if (profession == nullptr)
             {
                 throw SQLiteException(
-                    "The production is incorrect " + production->name);
+                    "Can't find the profession " + ToString(professionVnum));
             }
-            if (!production->check())
-            {
-                throw SQLiteException("Error during error checking.");
-            }
+            production->profession = profession;
+            production->difficulty = result->getNextUnsignedInteger();
+            production->time = result->getNextDouble();
+            production->assisted = static_cast<bool>(result->getNextInteger());
+            auto workbenchValue = result->getNextUnsignedInteger();
+            production->workbench = ToolType(workbenchValue);
             if (!Mud::instance().addProduction(production))
             {
                 throw SQLiteException("Error during production insertion.");
             }
+            // Log it.
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s",
+                        AlignString(production->name, StringAlign::Left, 25),
+                        AlignString(profession->command,
+                                    StringAlign::Left, 35));
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadProductionTool(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto productionVnum = result->getNextInteger();
+            auto production = Mud::instance().findProduction(productionVnum);
+            if (production == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the production " + ToString(productionVnum));
+            }
+            auto toolTypeNumber = result->getNextUnsignedInteger();
+            auto toolType = ToolType(toolTypeNumber);
+            if (toolType == ToolType::None)
+            {
+                throw SQLiteException(
+                    "Can't find the tool type " + ToString(toolTypeNumber));
+            }
+            production->tools.emplace_back(toolType);
+            // Log it.
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s",
+                        AlignString(production->name, StringAlign::Left, 25),
+                        AlignString(toolType.toString(),
+                                    StringAlign::Left, 35));
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadProductionOutcome(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto productionVnum = result->getNextInteger();
+            auto production = Mud::instance().findProduction(productionVnum);
+            if (production == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the production " + ToString(productionVnum));
+            }
+            auto outcomeVnum = result->getNextInteger();
+            auto outcome = Mud::instance().findItemModel(outcomeVnum);
+            if (outcome == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the outcome " + ToString(outcomeVnum));
+            }
+            production->outcome = outcome;
+            production->quantity = result->getNextUnsignedInteger();
+            // Log it.
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s%s",
+                        AlignString(production->name, StringAlign::Left, 25),
+                        AlignString(outcome->name, StringAlign::Left, 35),
+                        AlignString(production->quantity,
+                                    StringAlign::Left, 35));
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadProductionIngredient(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto productionVnum = result->getNextInteger();
+            auto production = Mud::instance().findProduction(productionVnum);
+            if (production == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the production " + ToString(productionVnum));
+            }
+            auto ingredientNumber = result->getNextUnsignedInteger();
+            auto ingredient = ResourceType(ingredientNumber);
+            if (ingredient == ResourceType::None)
+            {
+                throw SQLiteException(
+                    "Can't find the ingredient " + ToString(ingredientNumber));
+            }
+            auto quantity = result->getNextUnsignedInteger();
+            if (quantity == 0)
+            {
+                throw SQLiteException(
+                    "Wrong quantity " + ToString(quantity));
+            }
+            production->ingredients.insert(
+                std::make_pair(ingredient, quantity)
+            );
+            // Log it.
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s%s",
+                        AlignString(production->name, StringAlign::Left, 25),
+                        AlignString(ingredient.toString(), StringAlign::Left,
+                                    35),
+                        AlignString(quantity, StringAlign::Left, 35));
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadProductionKnowledge(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto productionVnum = result->getNextInteger();
+            auto production = Mud::instance().findProduction(productionVnum);
+            if (production == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the production " + ToString(productionVnum));
+            }
+            auto knowledgeNumber = result->getNextUnsignedInteger();
+            auto knowledge = Knowledge(knowledgeNumber);
+            if (knowledge == ResourceType::None)
+            {
+                throw SQLiteException(
+                    "Can't find the ingredient " + ToString(knowledgeNumber));
+            }
+            production->requiredKnowledge.emplace_back(knowledge);
+            // Log it.
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s",
+                        AlignString(production->name, StringAlign::Left, 25),
+                        AlignString(knowledge.toString(),
+                                    StringAlign::Left, 35));
         }
         catch (SQLiteException & e)
         {
@@ -1246,9 +1647,45 @@ bool LoadBodyPartResources(ResultSet * result)
                 result->getNextInteger());
             assert(model != nullptr);
             assert(model->getType() == ModelType::Resource);
+            auto material = Mud::instance().findMaterial(
+                result->getNextInteger());
+            assert(material != nullptr);
             auto quantity = result->getNextInteger();
-            bodyPart->resources.emplace_back(
-                std::make_pair(model->toResource(), quantity));
+            BodyPart::BodyResource resource;
+            resource.material = material;
+            resource.resource = model->toResource();
+            resource.quantity = quantity;
+            bodyPart->resources.emplace_back(resource);
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadBodyPartWeapon(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto bodyPartVnum = result->getNextUnsignedInteger();
+            auto bodyPart = Mud::instance().findBodyPart(bodyPartVnum);
+            if (bodyPart == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't add the body part" + ToString(bodyPartVnum));
+            }
+            auto bodyWeapon = std::make_shared<BodyPart::BodyWeapon>();
+            bodyWeapon->name = result->getNextString();
+            bodyWeapon->article = result->getNextString();
+            bodyWeapon->minDamage = result->getNextUnsignedInteger();
+            bodyWeapon->maxDamage = result->getNextUnsignedInteger();
+            bodyWeapon->range = result->getNextInteger();
+            bodyPart->weapon = bodyWeapon;
         }
         catch (SQLiteException & e)
         {

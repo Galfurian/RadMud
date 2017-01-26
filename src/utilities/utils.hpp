@@ -315,12 +315,6 @@ bool IsNumber(const std::string & source);
 /// @return The content of the file.
 std::string GetFileContents(const char * filename);
 
-/// @brief  Return the string of the attribute.
-/// @param  id          The id of the attribute.
-/// @param  abbreviated If <b>true</b> abbreviate the name of the attribute.
-/// @return The name of the attribute.
-std::string GetAttributeName(const int & id, const bool & abbreviated = false);
-
 /// @brief It creates a compressed strem of data.
 /// @param uncompressed The input non-compressed stream of data.
 /// @return The resulting compressed stream of data.

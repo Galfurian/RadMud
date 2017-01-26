@@ -37,14 +37,14 @@ LoadAction::LoadAction(Character * _actor,
     amount(_amount)
 {
     // Debugging message.
-    //Logger::log(LogLevel::Debug, "Created LoadAction.");
+    Logger::log(LogLevel::Debug, "Created LoadAction.");
     // Reset the cooldown of the action.
     this->resetCooldown(LoadAction::getLoadTime(_projectile, _amount));
 }
 
 LoadAction::~LoadAction()
 {
-    //Logger::log(LogLevel::Debug, "Deleted load action.");
+    Logger::log(LogLevel::Debug, "Deleted load action.");
 }
 
 bool LoadAction::check(std::string & error) const

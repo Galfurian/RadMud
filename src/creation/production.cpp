@@ -22,6 +22,7 @@
 
 #include "production.hpp"
 
+#include "character.hpp"
 #include "logger.hpp"
 #include "mud.hpp"
 
@@ -36,7 +37,8 @@ Production::Production() :
     quantity(),
     tools(),
     ingredients(),
-    workbench(ToolType::None)
+    workbench(ToolType::None),
+    requiredKnowledge()
 {
     // Nothing to do.
 }
@@ -47,116 +49,6 @@ Production::~Production()
 //                "Deleted production\t[%s]\t\t(%s)",
 //                ToString(this->vnum),
 //                this->name);
-}
-
-bool Production::setOutcome(const std::string & source)
-{
-    if (source.empty())
-    {
-        Logger::log(LogLevel::Error, "No outcome set.");
-        return false;
-    }
-    std::vector<std::string> outcomeList = SplitString(source, ";");
-    // Flag used to determine if all goes well.
-    bool correct = true;
-    for (auto iterator : outcomeList)
-    {
-        std::vector<std::string> outcomeInfo = SplitString(iterator, "*");
-        if (outcomeInfo.size() != 2)
-        {
-            correct = false;
-        }
-
-        outcome = Mud::instance().findItemModel(ToNumber<int>(outcomeInfo[0]));
-        if (outcome == nullptr)
-        {
-            Logger::log(LogLevel::Error,
-                        "Can't find the Outcome : %s",
-                        outcomeInfo[0]);
-            correct = false;
-            break;
-        }
-        int outcomeQuantity = ToNumber<int>(outcomeInfo[1]);
-        if (outcomeQuantity <= 0)
-        {
-            Logger::log(LogLevel::Error,
-                        "Can't find the quantity of the Outcome : %s",
-                        outcomeInfo[0]);
-            correct = false;
-            break;
-        }
-        quantity = static_cast<unsigned int>(outcomeQuantity);
-    }
-    return correct;
-}
-
-bool Production::setTool(const std::string & source)
-{
-    if (source.empty())
-    {
-        Logger::log(LogLevel::Error, "No tool set.");
-        return false;
-    }
-    std::vector<std::string> toolList = SplitString(source, ";");
-    // Flag used to determine if all goes well.
-    bool correct = true;
-    for (auto iterator : toolList)
-    {
-        ToolType toolType(ToNumber<unsigned int>(iterator));
-        if (toolType == ToolType::None)
-        {
-            Logger::log(LogLevel::Error,
-                        "Can't find the Tool Type: %s",
-                        iterator);
-            correct = false;
-            break;
-        }
-        this->tools.insert(toolType);
-    }
-    return (!toolList.empty()) && correct;
-}
-
-bool Production::setIngredient(const std::string & source)
-{
-    if (source.empty())
-    {
-        Logger::log(LogLevel::Error, "No outcome set.");
-        return true;
-    }
-    // Split the string of ingredients.
-    std::vector<std::string> ingredientList = SplitString(source, ";");
-    for (auto iterator : ingredientList)
-    {
-        // Split the string with the information about the ingredient.
-        std::vector<std::string> ingredientInfo = SplitString(iterator, "*");
-        if (ingredientInfo.size() != 2)
-        {
-            return false;
-        }
-        auto ingredient = ResourceType(
-            ToNumber<unsigned int>(ingredientInfo[0]));
-        if (ingredient == ResourceType::None)
-        {
-            Logger::log(LogLevel::Error,
-                        "Can't find the Ingredient :" + ingredientInfo[0]);
-            return false;
-        }
-        int ingredientQuantity = ToNumber<int>(ingredientInfo[1]);
-        if (ingredientQuantity == 0)
-        {
-            Logger::log(LogLevel::Error,
-                        "Can't find the quantity of the Outcome :" +
-                        ingredientInfo[0]);
-            return false;
-        }
-        if (!this->ingredients.insert(
-            std::make_pair(ingredient, ingredientQuantity)).second)
-        {
-            Logger::log(LogLevel::Error, "Cannot insert the ingredient");
-            return false;
-        }
-    }
-    return true;
 }
 
 bool Production::check()
@@ -189,4 +81,18 @@ std::string Production::getName()
 std::string Production::getNameCapital()
 {
     return name;
+}
+
+bool Production::hasRequiredKnowledge(Character * character)
+{
+    for (auto knowledge : requiredKnowledge)
+    {
+        Logger::log(LogLevel::Debug, "Required :%s", knowledge.toString());
+        auto knowledgeLevel = character->effects.getKnowledge(knowledge);
+        if (knowledgeLevel <= 0)
+        {
+            return false;
+        }
+    }
+    return true;
 }

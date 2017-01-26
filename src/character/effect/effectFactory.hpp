@@ -49,11 +49,13 @@ public:
     /// @details
     /// If a character which is aiming to a target moves, then it suffers
     ///  a penality to hit.
-    /// @param actor     The character affected by the effect.
-    /// @param duration  The duration in TIC of the effect.
-    /// @param magnitude The magnitude of the disturbance.
+    /// @param actor             The character affected by the effect.
+    /// @param duration          The duration in TIC of the effect.
+    /// @param negativeMagnitude The magnitude of the disturbance.
     /// @return The created effect.
     static Effect disturbedAim(Character * actor,
                                const unsigned int & duration,
-                               const int & magnitude);
+                               const int & negativeMagnitude);
+
+    static Effect skillEffect(Character * actor, const std::string & skillName);
 };

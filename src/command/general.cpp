@@ -60,6 +60,10 @@ void LoadGeneralCommands()
         "Show player statistics.",
         false, true, false));
     Mud::instance().addCommand(std::make_shared<Command>(
+        DoEffects, "effects", "",
+        "Show player active effects.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
         DoRent, "rent", "",
         "Allow player to rent and disconnect.",
         false, false, false));
@@ -484,40 +488,25 @@ bool DoStatistics(Character * character, ArgumentHandler & /*args*/)
     msg += MAG("Affiliation : ") + player->faction->name + "\n";
     msg += MAG("Experience  : ") + ToString(player->experience) + " px\n";
     // Add the abilities.
-    msg += MAG("    Str       ");
-    msg += ToString(player->getAbility(Ability::Strength, false)) + "(";
-    msg += ToString(player->effects.getAbilityModifier(Ability::Strength));
-    msg += ")[";
-    msg += ToString(player->getAbilityModifier(Ability::Strength)) + "]\n";
-    msg += MAG("    Agi       ");
-    msg += ToString(player->getAbility(Ability::Agility, false)) + "(";
-    msg += ToString(player->effects.getAbilityModifier(Ability::Agility));
-    msg += ")[";
-    msg += ToString(player->getAbilityModifier(Ability::Agility)) + "]\n";
-    msg += MAG("    Per       ");
-    msg += ToString(player->getAbility(Ability::Perception, false)) + "(";
-    msg += ToString(player->effects.getAbilityModifier(Ability::Perception));
-    msg += ")[";
-    msg += ToString(player->getAbilityModifier(Ability::Perception)) + "]\n";
-    msg += MAG("    Con       ");
-    msg += ToString(player->getAbility(Ability::Constitution, false)) + "(";
-    msg += ToString(player->effects.getAbilityModifier(Ability::Constitution));
-    msg += ")[";
-    msg += ToString(player->getAbilityModifier(Ability::Constitution)) + "]\n";
-    msg += MAG("    Int       ");
-    msg += ToString(player->getAbility(Ability::Intelligence, false)) + "(";
-    msg += ToString(player->effects.getAbilityModifier(Ability::Intelligence));
-    msg += ")[";
-    // Add the health and the stamina.
-    msg += ToString(player->getAbilityModifier(Ability::Intelligence)) + "]\n";
-    msg += MAG("    Health    ");
+    // STRENGTH
+    for (auto const & ability:player->abilities)
+    {
+        msg += "    " + MAG(ability.first.getAbbreviation(true)) + "    ";
+        msg += AlignString(player->getAbility(ability.first),
+                           StringAlign::Right, 5) + "(";
+        msg += AlignString(player->getAbilityModifier(ability.first),
+                           StringAlign::Right, 3) + ")\n";
+    }
+    // HEALTH
+    msg += "    " + MAG("Health  ");
     msg += ToString(player->health) + "/" + ToString(player->getMaxHealth());
-    msg += "(" + ToString(player->effects.getHealthMod()) + ")\n";
-    msg += MAG("    Stamina   ");
+    msg += "\n";
+    msg += "    " + MAG("Stamina ");
     msg += ToString(player->stamina) + "/" + ToString(player->getMaxStamina());
-    msg += "(" + ToString(player->effects.getHealthMod()) + ")\n";
+    msg += "\n";
     // Add the Armor Class.
-    msg += MAG("Armor Class : ") + ToString(player->getArmorClass()) + "\n";
+    msg += "    " + MAG("Armor Class ") + ToString(player->getArmorClass());
+    msg += "\n";
     // Add the health and stamina conditions.
     msg += "You " + BLD(player->getHealthCondition(true)) + ".\n";
     msg += "You " + BLD(player->getStaminaCondition()) + ".\n";
@@ -548,6 +537,45 @@ bool DoStatistics(Character * character, ArgumentHandler & /*args*/)
         msg += ".\n";
     }
     player->sendMsg(msg);
+    return true;
+}
+
+bool DoEffects(Character * character, ArgumentHandler &)
+{
+    std::string msg;
+    for (auto const & effect : character->effects.getActiveEffects())
+    {
+        msg += AlignString(effect.name, StringAlign::Left, 30) + "\n";
+    }
+    for (auto const & effect : character->effects.getPassiveEffects())
+    {
+        msg += AlignString(effect.name, StringAlign::Left, 30) + "\n";
+    }
+    for (auto const & effect : character->effects.getActiveAbilityModifier())
+    {
+        msg += AlignString(effect.first.getAbbreviation(),
+                           StringAlign::Left, 30);
+        msg += AlignString(effect.second, StringAlign::Right, 5) + "\n";
+    }
+    for (auto const & effect : character->effects.getActiveCombatModifier())
+    {
+        msg += AlignString(effect.first.toString(),
+                           StringAlign::Left, 30);
+        msg += AlignString(effect.second, StringAlign::Right, 5) + "\n";
+    }
+    for (auto const & effect : character->effects.getActiveStatusModifier())
+    {
+        msg += AlignString(effect.first.toString(),
+                           StringAlign::Left, 30);
+        msg += AlignString(effect.second, StringAlign::Right, 5) + "\n";
+    }
+    for (auto const & effect : character->effects.getActiveKnowledge())
+    {
+        msg += AlignString(effect.first.toString(),
+                           StringAlign::Left, 30);
+        msg += AlignString(effect.second, StringAlign::Right, 5) + "\n";
+    }
+    character->sendMsg(msg);
     return true;
 }
 
@@ -594,7 +622,12 @@ bool DoSkills(Character * character, ArgumentHandler & /*args*/)
     table.addColumn("Skill", StringAlign::Left);
     for (auto it : player->skills)
     {
-        table.addRow({it.first->name, ToString(it.second)});
+        auto skill = Mud::instance().findSkill(it.first);
+        if (skill)
+        {
+            table.addRow({skill->name,
+                          SkillRank::getSkillRank(it.second).toString()});
+        }
     }
     character->sendMsg(table.getTable());
     return true;

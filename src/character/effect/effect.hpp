@@ -23,6 +23,9 @@
 #pragma once
 
 #include "ability.hpp"
+#include "combatModifier.hpp"
+#include "statusModifier.hpp"
+#include "knowledge.hpp"
 #include "utils.hpp"
 
 #include <functional>
@@ -45,20 +48,14 @@ public:
     std::string messageExpire;
     /// Function executed when the effect expires.
     std::function<void(Character * character)> expireFunction;
-    /// Health modifier.
-    int health;
-    /// Stamina modifier.
-    int stamina;
-    /// Abilities modifier.
-    std::map<Ability, int> abilities;
-    /// Melee hit chance modifier.
-    int meleeHit;
-    /// Melee damage modifier.
-    int meleeDamage;
-    /// Ranged hit chance modifier.
-    int rangedHit;
-    /// Ranged damage modifier.
-    int rangedDamage;
+    /// The map of abilities modifiers.
+    std::map<Ability, int> effectAbilityModifier;
+    /// The map of combat modifiers.
+    std::map<CombatModifier, int> effectCombatModifier;
+    /// The map of status modifiers.
+    std::map<StatusModifier, int> effectStatusModifier;
+    /// The map of knowledge.
+    std::map<Knowledge, int> effectKnowledge;
 
     /// @brief Constructor.
     Effect(Character * _affected,
@@ -66,14 +63,7 @@ public:
            unsigned int _remainingTic,
            std::string _messageActivate,
            std::string _messageExpire,
-           std::function<void(Character * character)> _expireFunction,
-           int _health,
-           int _stamina,
-           std::map<Ability, int> _abilities,
-           int _meleeHit,
-           int _meleeDamage,
-           int _rangedHit,
-           int _rangedDamage);
+           std::function<void(Character * character)> _expireFunction);
 
     /// @brief Update the cooldown of the effect.
     /// @return <b>True</b> if the effect is expired,<br>
@@ -81,5 +71,54 @@ public:
     bool update();
 
     /// @brief Operator used to order the effect based on the remaining time.
-    bool operator<(const Effect & right) const;
+    bool operator<(const Effect & right) const
+    {
+        return remainingTic < right.remainingTic;
+    }
+
+    /// @brief Equality operator between the names of two effects.
+    bool operator==(const Effect & right) const
+    {
+        return name == right.name;
+    }
 };
+
+/// @brief Addition-Assignment operator for two Ability Modifier maps.
+std::map<Ability, int> & operator+=(
+    std::map<Ability, int> & left,
+    const std::map<Ability, int> & right);
+
+/// @brief Subtraction-Assignment operator for two Ability Modifier maps.
+std::map<Ability, int> & operator-=(
+    std::map<Ability, int> & left,
+    const std::map<Ability, int> & right);
+
+/// @brief Addition-Assignment operator for two CombatModifier maps.
+std::map<CombatModifier, int> & operator+=(
+    std::map<CombatModifier, int> & left,
+    const std::map<CombatModifier, int> & right);
+
+/// @brief Subtraction-Assignment operator for two CombatModifier maps.
+std::map<CombatModifier, int> & operator-=(
+    std::map<CombatModifier, int> & left,
+    const std::map<CombatModifier, int> & right);
+
+/// @brief Addition-Assignment operator for two StatusModifier maps.
+std::map<StatusModifier, int> & operator+=(
+    std::map<StatusModifier, int> & left,
+    const std::map<StatusModifier, int> & right);
+
+/// @brief Subtraction-Assignment operator for two StatusModifier maps.
+std::map<StatusModifier, int> & operator-=(
+    std::map<StatusModifier, int> & left,
+    const std::map<StatusModifier, int> & right);
+
+/// @brief Addition-Assignment operator for two Knowledge maps.
+std::map<Knowledge, int> & operator+=(
+    std::map<Knowledge, int> & left,
+    const std::map<Knowledge, int> & right);
+
+/// @brief Subtraction-Assignment operator for two Knowledge maps.
+std::map<Knowledge, int> & operator-=(
+    std::map<Knowledge, int> & left,
+    const std::map<Knowledge, int> & right);

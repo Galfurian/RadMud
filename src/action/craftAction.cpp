@@ -37,7 +37,7 @@ CraftAction::CraftAction(Character * _actor,
     material()
 {
     // Debugging message.
-    //Logger::log(LogLevel::Debug, "Created CraftAction.");
+    Logger::log(LogLevel::Debug, "Created CraftAction.");
     // Determine the material of the creation based on the ammount of each
     // single involved item.
     this->determineMaterial();
@@ -47,7 +47,7 @@ CraftAction::CraftAction(Character * _actor,
 
 CraftAction::~CraftAction()
 {
-    //Logger::log(LogLevel::Debug, "Deleted crafting action.");
+    Logger::log(LogLevel::Debug, "Deleted crafting action.");
 }
 
 bool CraftAction::check(std::string & error) const
@@ -348,7 +348,16 @@ unsigned int CraftAction::getConsumedStamina(Character * character)
     return consumedStamina;
 }
 
-unsigned int CraftAction::getCooldown(Character *, Production * _production)
+unsigned int CraftAction::getCooldown(Character * character,
+                                      Production * _production)
 {
-    return _production->time;
+    double requiredTime = _production->time;
+    Logger::log(LogLevel::Debug, "Base time  :%s", requiredTime);
+    for (auto knowledge : _production->requiredKnowledge)
+    {
+        requiredTime -= (requiredTime *
+                         character->effects.getKnowledge(knowledge)) / 100;
+    }
+    Logger::log(LogLevel::Debug, "With skill :%s", requiredTime);
+    return static_cast<unsigned int>(requiredTime);
 }

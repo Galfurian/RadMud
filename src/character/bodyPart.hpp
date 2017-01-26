@@ -22,6 +22,7 @@
 #pragma once
 
 #include "table.hpp"
+#include "material.hpp"
 #include <string>
 #include <vector>
 #include <memory>
@@ -46,6 +47,40 @@ using BodyPartFlag = enum class BodyPartFlag_t
 class BodyPart
 {
 public:
+    /// @brief A structure to hold information about the resources provided
+    /// by a body part.
+    struct BodyResource
+    {
+        /// The provided resource.
+        std::shared_ptr<ResourceModel> resource;
+        /// The material of the resource.
+        Material * material;
+        /// The quantity.
+        int quantity;
+    };
+
+    /// @brief A structure which holds information about the attack which can
+    /// be performed with a body part.
+    struct BodyWeapon
+    {
+        /// The name of the attack.
+        std::string name;
+        /// The article of the attack.
+        std::string article;
+        /// The minimum damage.
+        unsigned int minDamage;
+        /// The maximum damage.
+        unsigned int maxDamage;
+        /// The range of the natural weapon.
+        int range;
+
+        /// Returns the name of the attack.
+        std::string getName(bool colored = false) const;
+
+        /// Randomly roll the weapon damage.
+        unsigned int rollDamage() const;
+    };
+
     /// The virtual number.
     unsigned int vnum;
     /// The name.
@@ -55,7 +90,9 @@ public:
     /// The flags associated with the body part.
     unsigned int flags;
     /// The resources which can be produced from this body part.
-    std::vector<std::pair<std::shared_ptr<ResourceModel>, int>> resources;
+    std::vector<BodyResource> resources;
+    /// The weapon ability of this body part.
+    std::shared_ptr<BodyWeapon> weapon;
 
     /// @brief Constructor.
     BodyPart();
@@ -77,4 +114,5 @@ public:
     /// @brief Fills the provided table with the information concerning
     ///         the body part.
     void getSheet(Table & sheet) const;
+
 };

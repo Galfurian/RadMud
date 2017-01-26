@@ -22,7 +22,9 @@
 #include "commandObjectProcess.hpp"
 #include "corpseItem.hpp"
 #include "command.hpp"
+#include "player.hpp"
 #include "room.hpp"
+#include "dismemberAction.hpp"
 
 bool DoDismember(Character * character, ArgumentHandler & args)
 {
@@ -34,6 +36,19 @@ bool DoDismember(Character * character, ArgumentHandler & args)
     }
     // Stop any action the character is executing.
     StopAction(character);
+    // If the character is a Player, check if the character has the required
+    // knowledge.
+    if (character->isPlayer())
+    {
+        // Transform the character to player.
+        auto player = character->toPlayer();
+        // Check if the player can butcher animals.
+        if (!player->effects.getKnowledge(Knowledge::Butchery))
+        {
+            character->sendMsg("You don't know how to dismember corpses.\n");
+            return false;
+        }
+    }
     // Check the arguments.
     if (args.size() != 1)
     {
@@ -61,16 +76,29 @@ bool DoDismember(Character * character, ArgumentHandler & args)
     }
     // Cast the item to corpse.
     auto corpse = static_cast<CorpseItem *>(item);
-    if (corpse->remainingBodyParts.empty())
+    // Get a valid body part.
+    auto bodyPart = corpse->getAvailableBodyPart();
+    if (bodyPart == nullptr)
     {
         character->sendMsg("%s does not contain anything useful.\n",
                            item->getNameCapital(true));
         return false;
     }
-    // Get the first body part.
-    auto bodyPart = corpse->remainingBodyParts.back();
-    character->sendMsg("You dismember %s and extract some useful stuff.\n",
-                       item->getName(true));
-    // TODO: Complete the command.
+    auto dismemberAction = std::make_shared<DismemberAction>(character,
+                                                             corpse,
+                                                             bodyPart);
+    std::string error;
+    if (!dismemberAction->check(error))
+    {
+        character->sendMsg(error + "\n");
+        return false;
+    }
+    character->pushAction(dismemberAction);
+    character->sendMsg("You start dismembering %s...\n",
+                       corpse->getName(true));
+    character->room->sendToAll("%s starts dismembering %s...\n",
+                               {character},
+                               character->getNameCapital(),
+                               corpse->getName(true));
     return true;
 }

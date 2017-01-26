@@ -21,6 +21,7 @@
 
 #include "bodyPart.hpp"
 #include "resourceModel.hpp"
+#include "formatter.hpp"
 #include <cassert>
 
 BodyPart::BodyPart() :
@@ -67,7 +68,21 @@ void BodyPart::getSheet(Table & sheet) const
         sheet.addRow({"Resource", "Quantity"});
         for (auto it : resources)
         {
-            sheet.addRow({it.first->name, ToString(it.second)});
+            sheet.addRow({it.resource->name, ToString(it.quantity)});
         }
     }
+}
+
+std::string BodyPart::BodyWeapon::getName(bool colored) const
+{
+    if (colored)
+    {
+        return Formatter::cyan() + name + Formatter::reset();
+    }
+    return name;
+}
+
+unsigned int BodyPart::BodyWeapon::rollDamage() const
+{
+    return TRandInteger<unsigned int>(minDamage, maxDamage);
 }

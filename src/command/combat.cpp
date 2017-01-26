@@ -144,7 +144,7 @@ bool DoKill(Character * character, ArgumentHandler & args)
             // Add the target to the list of opponents.
             character->combatHandler.addOpponent(target);
             // Add the action to the character's combat queue.
-            character->setAction(basicAttack);
+            character->pushAction(basicAttack);
             // Set the predefined target.
             character->combatHandler.setPredefinedTarget(target);
             // Notify the character.
@@ -184,7 +184,7 @@ bool DoFlee(Character * character, ArgumentHandler & /*args*/)
     if (flee->check(error))
     {
         // Add the action to the character's combat queue.
-        character->setAction(flee);
+        character->pushAction(flee);
         // Notify the character.
         character->sendMsg("You prepare to flee...\n");
         return true;
@@ -211,7 +211,7 @@ bool DoScout(Character * character, ArgumentHandler & /*args*/)
         // Send the starting message.
         character->sendMsg("You start scouting the area...\n");
         // Set the new action.
-        character->setAction(newAction);
+        character->pushAction(newAction);
         return true;
     }
     character->sendMsg("%s\n", error);
@@ -287,7 +287,7 @@ bool DoLoad(Character * character, ArgumentHandler & args)
                            magazine->getName(true),
                            projectile->getName(true));
         // Set the new action.
-        character->setAction(newAction);
+        character->pushAction(newAction);
         return true;
     }
     character->sendMsg("%s\n", error);
@@ -346,7 +346,7 @@ bool DoUnload(Character * character, ArgumentHandler & args)
         character->sendMsg("You start unloading %s.\n",
                            itemToUnload->getName(true));
         // Set the new action.
-        character->setAction(newAction);
+        character->pushAction(newAction);
         return true;
     }
     character->sendMsg("%s\n", error);
@@ -419,7 +419,7 @@ bool DoReload(Character * character, ArgumentHandler & args)
                            rangedWeapon->getName(true),
                            magazine->getName(true));
         // Set the new action.
-        character->setAction(newAction);
+        character->pushAction(newAction);
         return true;
     }
     character->sendMsg("%s\n", error);
@@ -489,7 +489,7 @@ bool DoAim(Character * character, ArgumentHandler & args)
     character->sendMsg("You start aiming at %s...\n",
                        aimedCharacter->getName());
     // Set the new action.
-    character->setAction(newAction);
+    character->pushAction(newAction);
     return true;
 }
 
@@ -565,7 +565,7 @@ bool DoFire(Character * character, ArgumentHandler & /*args*/)
     // Add the aimedTarget to the list of opponents.
     character->combatHandler.addOpponent(aimedTarget);
     // Add the action to the character's combat queue.
-    character->setAction(basicAttack);
+    character->pushAction(basicAttack);
     // Set the predefined target.
     character->combatHandler.setPredefinedTarget(aimedTarget);
     character->sendMsg("You start firing at %s...\n",

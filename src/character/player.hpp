@@ -65,8 +65,6 @@ public:
     std::string prompt;
     /// The place where the player has slept last time.
     int rent_room;
-    /// The player's list of skills.
-    std::vector<std::pair<std::shared_ptr<Skill>, int>> skills;
     /// Points that could be spent during character creation.
     int remaining_points;
     /// Connection state.
@@ -114,6 +112,8 @@ public:
     bool remInventoryItem(Item * item) override;
 
     bool remEquipmentItem(Item * item) override;
+
+    void initialize() override;
 
     /// @brief Return player socket.
     /// @return Player sockec.
