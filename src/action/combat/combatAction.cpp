@@ -62,6 +62,14 @@ ActionStatus CombatAction::perform()
     return ActionStatus::Running;
 }
 
+void CombatAction::handleStop()
+{
+    // Send the stop message.
+    actor->sendMsg(this->stop() + "\n\n");
+    // Reset the list of aggressors.
+    actor->combatHandler.resetList();
+}
+
 unsigned int CombatAction::getCooldown(Character * character)
 {
     // BASE     [+5.0]

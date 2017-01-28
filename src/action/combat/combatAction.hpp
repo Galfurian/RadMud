@@ -56,6 +56,9 @@ public:
 
     ActionStatus perform() override;
 
+    /// @brief Unset all the variables used for combat.
+    void handleStop();
+
     /// @brief Provides the type of combat action.
     /// @return The type of combat action.
     virtual CombatActionType getCombatActionType() const = 0;

@@ -127,10 +127,7 @@ bool DoKill(Character * character, ArgumentHandler & args)
                                target->getName());
             return true;
         }
-        else
-        {
-            character->sendMsg("You have already your share of troubles!\n");
-        }
+        character->sendMsg("You have already your share of troubles!\n");
     }
     else
     {
@@ -151,11 +148,8 @@ bool DoKill(Character * character, ArgumentHandler & args)
             character->sendMsg("You attack %s.\n", target->getName());
             return true;
         }
-        else
-        {
-            character->sendMsg("You were not able to attack %s.\n",
-                               target->getName());
-        }
+        character->sendMsg("You were not able to attack %s.\n",
+                           target->getName());
     }
     return false;
 }

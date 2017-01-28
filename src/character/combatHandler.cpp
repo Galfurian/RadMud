@@ -57,6 +57,7 @@ bool CombatHandler::addOpponent(Character * character, unsigned int initAggro)
                     owner->getNameCapital(),
                     character->getName(),
                     initAggro);
+        this->printList();
         return true;
     }
     return false;
@@ -91,6 +92,17 @@ bool CombatHandler::remOpponent(Character * character)
                         "%s disengages %s",
                         owner->getNameCapital(),
                         character->getName());
+            this->printList();
+            // If the list of opponents is empty, stop the fighting.
+            if (this->empty())
+            {
+                auto action = owner->getAction();
+                if(action->getType() == ActionType::Combat)
+                {
+                    auto combatAction = action->toCombatAction();
+                    combatAction->handleStop();
+                }
+            }
             return true;
         }
     }
@@ -98,6 +110,7 @@ bool CombatHandler::remOpponent(Character * character)
                 "Cannot find %s among the aggressors of %s",
                 character->getName(),
                 owner->getNameCapital());
+    this->printList();
     return false;
 }
 
@@ -157,6 +170,7 @@ bool CombatHandler::setAggro(Character * character, unsigned int newAggression)
         (*it)->aggression = newAggression;
         // Sort the list.
         this->sortList();
+        this->printList();
         // Set return value to success.
         ret = true;
     }
@@ -264,7 +278,14 @@ void CombatHandler::resetList()
         else
         {
             // Remove the owner from its list.
-            if (!it->aggressor->combatHandler.remOpponent(owner))
+            if (it->aggressor->combatHandler.remOpponent(owner))
+            {
+                Logger::log(LogLevel::Debug,
+                            "%s disengages %s",
+                            owner->getNameCapital(),
+                            it->aggressor->getName());
+            }
+            else
             {
                 Logger::log(LogLevel::Error,
                             "Could not remove %s from opponents of %s.",
@@ -274,6 +295,10 @@ void CombatHandler::resetList()
         }
     }
     opponents.clear();
+    // Clear the predefined target.
+    this->setPredefinedTarget(nullptr);
+    // Clear the aimed character.
+    this->setAimedTarget(nullptr);
 }
 
 std::vector<std::shared_ptr<CombatHandler::Aggression> >::iterator

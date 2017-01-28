@@ -169,7 +169,7 @@ ActionStatus BasicAttack::perform()
         {
             // Take the enemy with the higher value of aggro.
             auto topAggro = actor->combatHandler.getTopAggro();
-            if (topAggro->aggressor != nullptr)
+            if (topAggro != nullptr)
             {
                 auto chaseAction = std::make_shared<Chase>(actor,
                                                            topAggro->aggressor);
@@ -363,18 +363,6 @@ bool BasicAttack::checkTarget(Character * target)
     return false;
 }
 
-void BasicAttack::handleStop()
-{
-    // Send the stop message.
-    actor->sendMsg(this->stop() + "\n\n");
-    // Reset the list of aggressors.
-    actor->combatHandler.resetList();
-    // Clear the predefined target.
-    actor->combatHandler.setPredefinedTarget(nullptr);
-    // Clear the aimed character.
-    actor->combatHandler.setAimedTarget(nullptr);
-}
-
 void BasicAttack::performAttackNaturalWeapon(
     Character * target,
     const std::shared_ptr<BodyPart::BodyWeapon> & weapon,
@@ -465,18 +453,37 @@ void BasicAttack::performAttackNaturalWeapon(
                 Formatter::red(), target->getNameCapital(), Formatter::reset());
             // The target has received the damage and now it is dead.
             target->kill();
+            // TODO: This is a solution in case the attack is a one-shot and
+            // the target does not has the actor among the opponents.
+            // Remove the target from the list of opponents.
+            if (actor->combatHandler.hasOpponent(target))
+            {
+                actor->combatHandler.remOpponent(target);
+            }
             // Interrupt the function.
             return;
         }
+        // Update the aggro of the target towards the actor.
+        auto aggro = target->combatHandler.getAggro(actor);
+        aggro += ((damageRoll * 100) / target->getMaxHealth(true));
+        target->combatHandler.setAggro(actor, aggro);
     }
+    // -------------------------------------------------------------------------
+    // Phase 4: Check if the target and the actor are in combat.
+    // -------------------------------------------------------------------------
+    // Check if the target has the actor as opponent.
     if (!target->combatHandler.hasOpponent(actor))
     {
+        // Add the actor to the list of opponents of the target.
         target->combatHandler.addOpponent(actor);
+        // If the target is not already fighting, add a new basic attack
+        // action to its queue.
         if (target->getAction()->getType() != ActionType::Combat)
         {
             target->pushAction(std::make_shared<BasicAttack>(target));
         }
     }
+    // Check if the actor has the target as opponent.
     if (!actor->combatHandler.hasOpponent(target))
     {
         actor->combatHandler.addOpponent(target);
@@ -576,9 +583,20 @@ void BasicAttack::performMeleeAttack(Character * target,
                 Formatter::red(), target->getNameCapital(), Formatter::reset());
             // The target has received the damage and now it is dead.
             target->kill();
+            // TODO: This is a solution in case the attack is a one-shot and
+            // the target does not has the actor among the opponents.
+            // Remove the target from the list of opponents.
+            if (actor->combatHandler.hasOpponent(target))
+            {
+                actor->combatHandler.remOpponent(target);
+            }
             // Interrupt the function.
             return;
         }
+        // Update the aggro of the target towards the actor.
+        auto aggro = target->combatHandler.getAggro(actor);
+        aggro += ((damageRoll * 100) / target->getMaxHealth(true));
+        target->combatHandler.setAggro(actor, aggro);
     }
     if (!target->combatHandler.hasOpponent(actor))
     {
@@ -647,7 +665,19 @@ void BasicAttack::performRangedAttack(Character * target,
     Skill::improveSkillCombatModifier(actor,
                                       CombatModifier::RangedWeaponHitRoll);
     // -------------------------------------------------------------------------
-    // Phase 3: Check if the target is hit.
+    // Phase 3: Consume the projectiles.
+    // -------------------------------------------------------------------------
+    // Check if it is the last projectile.
+    if (projectile->quantity == 1)
+    {
+        MudUpdater::instance().addItemToDestroy(projectile);
+    }
+    else
+    {
+        projectile->quantity -= 1;
+    }
+    // -------------------------------------------------------------------------
+    // Phase 4: Check if the target is hit.
     // -------------------------------------------------------------------------
     // Evaluate the armor class of the aimed character.
     auto armorClass = target->getArmorClass();
@@ -686,31 +716,36 @@ void BasicAttack::performRangedAttack(Character * target,
                 Formatter::red(), target->getNameCapital(), Formatter::reset());
             // The target has received the damage and now it is dead.
             target->kill();
+            // TODO: This is a solution in case the attack is a one-shot and
+            // the target does not has the actor among the opponents.
+            // Remove the target from the list of opponents.
+            if (actor->combatHandler.hasOpponent(target))
+            {
+                actor->combatHandler.remOpponent(target);
+            }
+            // Interrupt the function.
+            return;
         }
-        else
+        // Update the aggro of the target towards the actor.
+        auto aggro = target->combatHandler.getAggro(actor);
+        aggro += ((damageRoll * 100) / target->getMaxHealth(true));
+        target->combatHandler.setAggro(actor, aggro);
+    }
+    // -------------------------------------------------------------------------
+    // Phase 5: Check if the target and the actor are in combat.
+    // -------------------------------------------------------------------------
+    // Check if the target has the actor as opponent.
+    if (!target->combatHandler.hasOpponent(actor))
+    {
+        target->combatHandler.addOpponent(actor);
+        if (target->getAction()->getType() != ActionType::Combat)
         {
-            if (!target->combatHandler.hasOpponent(actor))
-            {
-                target->combatHandler.addOpponent(actor);
-                if (target->getAction()->getType() != ActionType::Combat)
-                {
-                    target->pushAction(std::make_shared<BasicAttack>(target));
-                }
-            }
-            if (!actor->combatHandler.hasOpponent(target))
-            {
-                actor->combatHandler.addOpponent(target);
-            }
+            target->pushAction(std::make_shared<BasicAttack>(target));
         }
     }
-    // Check if it is the last projectile.
-    if (projectile->quantity == 1)
+    if (!actor->combatHandler.hasOpponent(target))
     {
-        MudUpdater::instance().addItemToDestroy(projectile);
-    }
-    else
-    {
-        projectile->quantity -= 1;
+        actor->combatHandler.addOpponent(target);
     }
 }
 

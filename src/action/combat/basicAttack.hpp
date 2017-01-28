@@ -80,9 +80,6 @@ private:
     ///         <b>False</b> otherwise.
     bool checkTarget(Character * target);
 
-    /// @brief Unset all the variables used for combat.
-    void handleStop();
-
     /// @brief Performs an attack with a natural weapon.
     /// @param target       The character to attack.
     /// @param weapon       The melee weapon used to attack.
