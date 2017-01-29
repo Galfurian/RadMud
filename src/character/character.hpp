@@ -327,17 +327,6 @@ public:
     /// @brief Allows to reset the entire action queue.
     void resetActionQueue();
 
-    /// @brief Move the character to another room.
-    /// @param destination Destination room.
-    /// @param msgDepart   Tell people in original room.
-    /// @param msgArrive   Tell people in new room.
-    /// @param msgChar     What to tell the character.
-    void moveTo(
-        Room * destination,
-        const std::string & msgDepart,
-        const std::string & msgArrive,
-        const std::string & msgChar = "");
-
     /// @brief Search for the item in the inventory.
     /// @param search_parameter The item to search.
     /// @param number           Position of the item we want to look for.
@@ -350,58 +339,16 @@ public:
     /// @return The item, if it's in the character's equipment.
     Item * findEquipmentItem(std::string search_parameter, int & number);
 
-    /// @brief Search the item at given position and return it.
-    /// @param bodyPart The body part where the method need to search the item.
-    /// @return The item, if it's in the character's equipment.
-    Item * findItemAtBodyPart(const std::shared_ptr<BodyPart> & bodyPart) const;
-
     /// @brief Search an item nearby, (eq, inv, room).
     /// @param itemName The name of the item.
     /// @param number   Position of the item we want to look for.
     /// @return The item, if it's found.
     Item * findNearbyItem(const std::string & itemName, int & number);
 
-    /// @brief Search the given type of tool in the proximity of the character.
-    /// @param toolType        The type of tool that has to be searched.
-    /// @param exceptions      Items which cannot be selected.
-    /// @param searchRoom      Search inside the room.
-    /// @param searchInventory Search inside the character's inventory.
-    /// @param searchEquipment Search inside the character's equipment.
-    /// @return The searched tool.
-    Item * findNearbyTool(
-        const ToolType & toolType,
-        const ItemVector & exceptions,
-        bool searchRoom,
-        bool searchInventory,
-        bool searchEquipment);
-
-    /// @brief Search the list of tools nearby the character.
-    /// @param tools           The list of tools and their quantities.
-    /// @param foundOnes       The list of found tools.
-    /// @param searchRoom      Search inside the room.
-    /// @param searchInventory Search inside the character's inventory.
-    /// @param searchEquipment Search inside the character's equipment.
-    /// @return <b>True</b> if the operation goes well,<br>
-    ///         <b>False</b> otherwise.
-    bool findNearbyTools(
-        std::vector<ToolType> tools,
-        ItemVector & foundOnes,
-        bool searchRoom,
-        bool searchInventory,
-        bool searchEquipment);
-
-    /// @brief Search the list of ingredients nearby the character.
-    /// @param ingredients The list of ingredients and their quantities.
-    /// @param foundOnes   The list of found ingredients.
-    /// @return <b>True</b> if the operation goes well,<br>
-    ///         <b>False</b> otherwise.
-    bool findNearbyResouces(
-        std::map<ResourceType, unsigned int> ingredients,
-        std::vector<std::pair<Item *, unsigned int>> & foundOnes);
-
-    /// @brief Search the coins on the character.
-    /// @return List of found coins.
-    ItemVector findCoins();
+    /// @brief Search the item at given position and return it.
+    /// @param bodyPart The body part where the method need to search the item.
+    /// @return The item, if it's in the character's equipment.
+    Item * findItemAtBodyPart(const std::shared_ptr<BodyPart> & bodyPart) const;
 
     /// @brief Add the passed item to character's inventory.
     /// @param item The item to add to inventory.
@@ -519,18 +466,6 @@ public:
     /// @return <b>True</b> if the target is in sight,<br>
     ///         <b>False</b> otherwise.
     bool isAtRange(Character * target, const int & range);
-
-    /// @brief Provides the list of active melee weapons (Left and Right hands).
-    /// @return Vector of melee weapons.
-    std::vector<MeleeWeaponItem *> getActiveMeleeWeapons();
-
-    /// @brief Provides the list of active ranged weapons (Left and Right hands).
-    /// @return Vector of ranged weapons.
-    std::vector<RangedWeaponItem *> getActiveRangedWeapons();
-
-    /// @brief Provides the list of active natural weapons.
-    std::vector<
-        std::shared_ptr<BodyPart::BodyWeapon>> getActiveNaturalWeapons();
 
     /// @brief Handle what happend when this character die.
     virtual void kill();

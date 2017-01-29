@@ -21,6 +21,7 @@
 
 #include "commandObjectShop.hpp"
 
+#include "characterUtilities.hpp"
 #include "currencyModel.hpp"
 #include "sqliteDbms.hpp"
 #include "shopItem.hpp"
@@ -164,7 +165,7 @@ bool DoBuy(Character * character, ArgumentHandler & args)
     }
 
     // Check if the character has enough coins.
-    auto availableCoins = character->findCoins();
+    auto availableCoins = FindPosessedCoins(character);
     ItemVector changedCoins;
     std::vector<std::pair<Item *, unsigned int>> givenCoins;
     unsigned int requiredValue = shop->evaluateBuyPrice(item) * quantity;
@@ -413,7 +414,7 @@ bool DoBalance(Character * character, ArgumentHandler & args)
         return false;
     }
     unsigned int balance = 0;
-    for (auto coin : character->findCoins())
+    for (auto coin : FindPosessedCoins(character))
     {
         balance += coin->getPrice(true);
     }

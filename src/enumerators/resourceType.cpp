@@ -140,27 +140,12 @@ bool ResourceType::operator==(const ResourceType & rhs) const
     return resourceType == rhs.resourceType;
 }
 
-bool ResourceType::operator==(const ResourceType::Enum & rhs) const
-{
-    return resourceType == rhs;
-}
-
 bool ResourceType::operator!=(const ResourceType & rhs) const
 {
     return resourceType != rhs.resourceType;
 }
 
-bool ResourceType::operator!=(const ResourceType::Enum & rhs) const
-{
-    return resourceType != rhs;
-}
-
 bool ResourceType::operator<(const ResourceType & rhs) const
 {
     return resourceType < rhs.resourceType;
-}
-
-bool ResourceType::operator<(const ResourceType::Enum & rhs) const
-{
-    return resourceType < rhs;
 }

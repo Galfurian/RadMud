@@ -27,6 +27,7 @@
 #include "unloadAction.hpp"
 #include "aimAction.hpp"
 #include "basicAttack.hpp"
+#include "characterUtilities.hpp"
 #include "flee.hpp"
 
 void LoadCombatCommands()
@@ -435,7 +436,7 @@ bool DoAim(Character * character, ArgumentHandler & args)
         character->sendMsg("Who or what do you want to aim?\n");
         return false;
     }
-    if (character->getActiveRangedWeapons().empty())
+    if (GetActiveRangedWeapons(character).empty())
     {
         character->sendMsg("You don't have a ranged weapon equipped.\n");
         return false;
@@ -513,7 +514,7 @@ bool DoFire(Character * character, ArgumentHandler & /*args*/)
         return false;
     }
     // Retrieve the active ranged weapons.
-    auto rangedWeapons = character->getActiveRangedWeapons();
+    auto rangedWeapons = GetActiveRangedWeapons(character);
     // Check if the character has some ranged weapons equipped.
     if (rangedWeapons.empty())
     {

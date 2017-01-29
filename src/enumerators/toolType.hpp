@@ -72,11 +72,8 @@ public:
     /// @brief Equality operator w.r.t. a type of model object.
     bool operator==(const ToolType & rhs) const;
 
-    /// @brief Equality operator w.r.t. a type of model enum.
-    bool operator==(const ToolType::Enum & rhs) const;
-
     /// @brief Inequality operator w.r.t. a type of model enum.
-    bool operator!=(const ToolType::Enum & rhs) const;
+    bool operator!=(const ToolType & rhs) const;
 
     /// @brief Equality operator w.r.t. a type of model object.
     bool operator<(const ToolType & rhs) const;

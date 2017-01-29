@@ -20,6 +20,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "commandGodCharacter.hpp"
+#include "characterUtilities.hpp"
 #include "mud.hpp"
 
 bool DoGodInfo(Character * character, ArgumentHandler & args)
@@ -102,7 +103,8 @@ bool DoTransfer(Character * character, ArgumentHandler & args)
     StopAction(target);
     // Prepare messages.
     // Move player.
-    target->moveTo(
+    MoveCharacterTo(
+        target,
         destination,
         target->getNameCapital() + " is yanked away by unseen forces!",
         target->getNameCapital() + " appears breathlessly!",

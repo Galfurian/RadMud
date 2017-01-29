@@ -21,6 +21,7 @@
 
 #include "commandObjectCharacter.hpp"
 
+#include "characterUtilities.hpp"
 #include "formatter.hpp"
 #include "command.hpp"
 #include "room.hpp"
@@ -347,7 +348,7 @@ bool DoRemove(Character * character, ArgumentHandler & args)
         // Check if we have just removed ALL the USED Ranged Weapons.
         if (character->combatHandler.getAimedTarget() != nullptr)
         {
-            if (character->getActiveRangedWeapons().empty())
+            if (GetActiveRangedWeapons(character).empty())
             {
                 character->sendMsg("You stop aiming %s.\n",
                                    character->combatHandler
@@ -405,7 +406,7 @@ bool DoRemove(Character * character, ArgumentHandler & args)
     // Check if we have just removed ALL the USED Ranged Weapons.
     if (character->combatHandler.getAimedTarget() != nullptr)
     {
-        if (character->getActiveRangedWeapons().empty())
+        if (GetActiveRangedWeapons(character).empty())
         {
             character->sendMsg("You stop aiming %s.\n",
                                character->combatHandler

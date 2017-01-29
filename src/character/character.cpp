@@ -577,77 +577,6 @@ void Character::resetActionQueue()
     actionQueue.emplace_back(std::make_shared<GeneralAction>(this));
 }
 
-void Character::moveTo(
-    Room * destination,
-    const std::string & msgDepart,
-    const std::string & msgArrive,
-    const std::string & msgChar)
-{
-    // Check if the current room exist.
-    if (room == nullptr)
-    {
-        Logger::log(LogLevel::Error, "Character::moveTo: room is a NULLPTR.");
-        return;
-    }
-    // Check if the destination exist.
-    if (destination == nullptr)
-    {
-        Logger::log(LogLevel::Error,
-                    "Character::moveTo: DESTINATION is a NULLPTR.");
-        return;
-    }
-
-    // Activate the entrance event for every mobile in the room.
-    for (auto mobile : room->getAllMobile(this))
-    {
-        if (mobile == this)
-        {
-            continue;
-        }
-        if (mobile->canSee(this))
-        {
-            mobile->triggerEventExit(this);
-        }
-    }
-
-    // Show a message to the character, if is set.
-    if (!msgChar.empty())
-    {
-        this->sendMsg(msgChar);
-    }
-
-    // Set the list of exceptions.
-    std::vector<Character *> exceptions;
-    exceptions.push_back(this);
-    // Tell others where the character went and remove s/he from the old room.
-    room->sendToAll(msgDepart, exceptions);
-
-    // Remove the player from the current room.
-    room->removeCharacter(this);
-
-    // Add the character to the destionation room.
-    destination->addCharacter(this);
-
-    // Look around new room.
-    this->doCommand("look");
-
-    // Tell others s/he has arrived and move the character to the new room.
-    destination->sendToAll(msgArrive, exceptions);
-
-    // Activate the entrance event for every mobile in the room.
-    for (auto mobile : room->getAllMobile(this))
-    {
-        if (mobile == this)
-        {
-            continue;
-        }
-        if (mobile->canSee(this))
-        {
-            mobile->triggerEventEnter(this);
-        }
-    }
-}
-
 Item * Character::findInventoryItem(std::string search_parameter, int & number)
 {
     for (auto iterator : inventory)
@@ -680,22 +609,6 @@ Item * Character::findEquipmentItem(std::string search_parameter, int & number)
     return nullptr;
 }
 
-Item * Character::findItemAtBodyPart(
-    const std::shared_ptr<BodyPart> & bodyPart) const
-{
-    for (auto item : equipment)
-    {
-        for (auto occupiedBodyPart : item->occupiedBodyParts)
-        {
-            if (occupiedBodyPart->vnum == bodyPart->vnum)
-            {
-                return item;
-            }
-        }
-    }
-    return nullptr;
-}
-
 Item * Character::findNearbyItem(const std::string & itemName, int & number)
 {
     auto item = this->findInventoryItem(itemName, number);
@@ -713,214 +626,20 @@ Item * Character::findNearbyItem(const std::string & itemName, int & number)
     return item;
 }
 
-Item * Character::findNearbyTool(
-    const ToolType & toolType,
-    const ItemVector & exceptions,
-    bool searchRoom,
-    bool searchInventory,
-    bool searchEquipment)
+Item * Character::findItemAtBodyPart(
+    const std::shared_ptr<BodyPart> & bodyPart) const
 {
-    if (searchRoom)
+    for (auto item : equipment)
     {
-        for (auto iterator : room->items)
+        for (auto occupiedBodyPart : item->occupiedBodyParts)
         {
-            if (iterator->model->getType() == ModelType::Tool)
+            if (occupiedBodyPart->vnum == bodyPart->vnum)
             {
-                auto toolModel = iterator->model->toTool();
-                if (toolModel->toolType == toolType)
-                {
-                    // Check if the item is inside the exception list.
-                    auto findIt = std::find_if(exceptions.begin(),
-                                               exceptions.end(),
-                                               [&iterator](Item * item)
-                                               {
-                                                   return (item->vnum ==
-                                                           iterator->vnum);
-                                               });
-                    // If not, return the item.
-                    if (findIt == exceptions.end())
-                    {
-                        return iterator;
-                    }
-                }
-            }
-        }
-    }
-    if (searchInventory)
-    {
-        for (auto iterator : inventory)
-        {
-            if (iterator->model->getType() == ModelType::Tool)
-            {
-                auto toolModel = iterator->model->toTool();
-                if (toolModel->toolType == toolType)
-                {
-                    auto findIt = std::find(exceptions.begin(),
-                                            exceptions.end(), iterator);
-                    if (findIt == exceptions.end())
-                    {
-                        return iterator;
-                    }
-                }
-            }
-        }
-    }
-    if (searchEquipment)
-    {
-        for (auto iterator : equipment)
-        {
-            if (iterator->model->getType() == ModelType::Tool)
-            {
-                auto toolModel = iterator->model->toTool();
-                if (toolModel->toolType == toolType)
-                {
-                    auto findIt = std::find(exceptions.begin(),
-                                            exceptions.end(), iterator);
-                    if (findIt == exceptions.end())
-                    {
-                        return iterator;
-                    }
-                }
+                return item;
             }
         }
     }
     return nullptr;
-}
-
-bool Character::findNearbyTools(
-    std::vector<ToolType> tools,
-    ItemVector & foundOnes,
-    bool searchRoom,
-    bool searchInventory,
-    bool searchEquipment)
-{
-    // TODO: Prepare a map with key the tool type and as value:
-    //  Option A: A bool which determine if the tool has been found.
-    //  Option B: A pointer to the found tool (more interesting, can pass to
-    //              this function as reference the map and then update it with
-    //              the found tools inside this function).
-    for (auto toolType : tools)
-    {
-        auto tool = this->findNearbyTool(
-            toolType,
-            foundOnes,
-            searchRoom,
-            searchInventory,
-            searchEquipment);
-        if (tool == nullptr)
-        {
-            return false;
-        }
-        else
-        {
-            foundOnes.push_back(tool);
-        }
-    }
-    return true;
-}
-
-bool Character::findNearbyResouces(
-    std::map<ResourceType, unsigned int> ingredients,
-    std::vector<std::pair<Item *, unsigned int>> & foundOnes)
-{
-    for (auto ingredient : ingredients)
-    {
-        // Quantity of ingredients that has to be found.
-        auto quantityNeeded = ingredient.second;
-        for (auto item : inventory)
-        {
-            auto model = item->model;
-            if (model->getType() == ModelType::Resource)
-            {
-                auto resourceModel = model->toResource();
-                if (resourceModel->resourceType == ingredient.first)
-                {
-                    auto quantityAvailable = item->quantity;
-                    auto quantityUsed = quantityAvailable;
-                    if (quantityAvailable > quantityNeeded)
-                    {
-                        quantityUsed = (quantityAvailable - quantityNeeded);
-                    }
-                    foundOnes.push_back(std::make_pair(item, quantityUsed));
-                    quantityNeeded -= quantityUsed;
-                    if (quantityNeeded == 0)
-                    {
-                        break;
-                    }
-                }
-            }
-        }
-        // If the ingredients are not enough, search even in the room.
-        if (quantityNeeded > 0)
-        {
-            for (auto item : room->items)
-            {
-                auto model = item->model;
-                if (model->getType() == ModelType::Resource)
-                {
-                    auto resourceModel = model->toResource();
-                    if (resourceModel->resourceType == ingredient.first)
-                    {
-                        auto quantityAvailable = item->quantity;
-                        auto quantityUsed = quantityAvailable;
-                        if (quantityAvailable > quantityNeeded)
-                        {
-                            quantityUsed = (quantityAvailable - quantityNeeded);
-                        }
-                        foundOnes.push_back(std::make_pair(item, quantityUsed));
-                        quantityNeeded -= quantityUsed;
-                        if (quantityNeeded == 0)
-                        {
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        // If the ingredients are still not enough, return false.
-        if (quantityNeeded > 0)
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-ItemVector Character::findCoins()
-{
-    ItemVector foundCoins;
-    auto FindCoinInContainer = [&](Item * item)
-    {
-        if (item->getType() == ModelType::Container)
-        {
-            // Cast the item to container.
-            auto containerItem = static_cast<ContainerItem *>(item);
-            for (auto content : containerItem->content)
-            {
-                if (content->getType() == ModelType::Currency)
-                {
-                    foundCoins.emplace_back(content);
-                }
-            }
-        }
-    };
-    for (auto it : equipment)
-    {
-        FindCoinInContainer(it);
-    }
-    for (auto it : inventory)
-    {
-        if (it->getType() == ModelType::Currency)
-        {
-            foundCoins.emplace_back(it);
-        }
-        else
-        {
-            FindCoinInContainer(it);
-        }
-    }
-    foundCoins.orderBy(ItemVector::ByPrice);
-    return foundCoins;
 }
 
 void Character::addInventoryItem(Item *& item)
@@ -1334,74 +1053,6 @@ bool Character::isAtRange(Character * target, const int & range)
         if (WrongAssert(!target->toMobile()->isAlive())) return false;
     }
     return this->room->area->los(this->room->coord, target->room->coord, range);
-}
-
-std::vector<MeleeWeaponItem *> Character::getActiveMeleeWeapons()
-{
-    std::vector<MeleeWeaponItem *> weapons;
-    for (auto item : equipment)
-    {
-        // If at least one of the occupied body parts can be used to wield
-        // a weapon, consider it an active weapon.
-        for (auto bodyPart : item->occupiedBodyParts)
-        {
-            if (HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
-            {
-                if (item->getType() == ModelType::MeleeWeapon)
-                {
-                    auto wpn = static_cast<MeleeWeaponItem *>(item);
-                    weapons.emplace_back(wpn);
-                    // Break the loop otherwise the weapon would be added
-                    // for each occupied body part.
-                    break;
-                }
-            }
-        }
-    }
-    return weapons;
-}
-
-std::vector<RangedWeaponItem *> Character::getActiveRangedWeapons()
-{
-    std::vector<RangedWeaponItem *> weapons;
-    for (auto item : equipment)
-    {
-        // If at least one of the occupied body parts can be used to wield
-        // a range weapon, consider it an active weapon.
-        for (auto bodyPart : item->occupiedBodyParts)
-        {
-            if (HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
-            {
-                if (item->getType() == ModelType::RangedWeapon)
-                {
-                    auto wpn = static_cast<RangedWeaponItem *>(item);
-                    weapons.emplace_back(wpn);
-                    // Break the loop otherwise the weapon would be added
-                    // for each occupied body part.
-                    break;
-                }
-            }
-        }
-    }
-    return weapons;
-}
-
-std::vector<
-    std::shared_ptr<BodyPart::BodyWeapon>> Character::getActiveNaturalWeapons()
-{
-    std::vector<std::shared_ptr<BodyPart::BodyWeapon>> naturalWeapons;
-    for (auto bodyPart : race->bodyParts)
-    {
-        if (this->findItemAtBodyPart(bodyPart) != nullptr)
-        {
-            continue;
-        }
-        if (bodyPart->weapon != nullptr)
-        {
-            naturalWeapons.emplace_back(bodyPart->weapon);
-        }
-    }
-    return naturalWeapons;
 }
 
 void Character::kill()

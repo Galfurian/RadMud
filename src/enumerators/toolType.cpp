@@ -110,14 +110,9 @@ bool ToolType::operator==(const ToolType & rhs) const
     return toolType == rhs.toolType;
 }
 
-bool ToolType::operator==(const ToolType::Enum & rhs) const
+bool ToolType::operator!=(const ToolType & rhs) const
 {
-    return toolType == rhs;
-}
-
-bool ToolType::operator!=(const ToolType::Enum & rhs) const
-{
-    return toolType != rhs;
+    return toolType != rhs.toolType;
 }
 
 bool ToolType::operator<(const ToolType & rhs) const

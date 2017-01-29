@@ -23,6 +23,7 @@
 
 #include "basicAttack.hpp"
 
+#include "characterUtilities.hpp"
 #include "rangedWeaponModel.hpp"
 #include "formatter.hpp"
 #include "updater.hpp"
@@ -100,9 +101,9 @@ ActionStatus BasicAttack::perform()
             // Since at melee weapon.
             hasAttackedTheTarget = true;
             // Retrieve all the melee weapons.
-            auto meleeWeapons = actor->getActiveMeleeWeapons();
+            auto meleeWeapons = GetActiveMeleeWeapons(actor);
             // Retrieve all the natural weapons.
-            auto naturalWeapon = actor->getActiveNaturalWeapons();
+            auto naturalWeapon = GetActiveNaturalWeapons(actor);
             // Set the progressive number of the attack to 0.
             unsigned int attackNumber = 0;
             // Perform the attack for each melee weapon.
@@ -126,9 +127,9 @@ ActionStatus BasicAttack::perform()
         else
         {
             // Retrieve all the ranged weapons.
-            auto rangedWeapons = actor->getActiveRangedWeapons();
+            auto rangedWeapons = GetActiveRangedWeapons(actor);
             // Retrieve all the natural weapons.
-            auto naturalWeapon = actor->getActiveNaturalWeapons();
+            auto naturalWeapon = GetActiveNaturalWeapons(actor);
             // Set the progressive number of the attack to 0.
             unsigned int attackNumber = 0;
             // Perform the attack for each weapon.
@@ -333,7 +334,7 @@ bool BasicAttack::checkTarget(Character * target)
                     "[%s] The aimed character and the target are the same character.",
                     actor->getNameCapital());
         // Retrieve all the ranged weapons.
-        auto rangedWeapons = actor->getActiveRangedWeapons();
+        auto rangedWeapons = GetActiveRangedWeapons(actor);
         // Check if the actor has no ranged weapon equipped.
         if (rangedWeapons.empty())
         {

@@ -20,6 +20,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "commandGodMud.hpp"
+#include "characterUtilities.hpp"
 #include "mapGenerator.hpp"
 #include "mud.hpp"
 
@@ -63,7 +64,8 @@ bool DoGoTo(Character * character, ArgumentHandler & args)
     // Stop any action the character is executing.
     StopAction(character);
     // Move player.
-    character->moveTo(
+    MoveCharacterTo(
+        character,
         destination,
         character->getNameCapital() + " disappears in a puff of smoke!\n",
         character->getNameCapital() + " appears in a puff of smoke!\n",

@@ -22,6 +22,7 @@
 
 #include "chase.hpp"
 
+#include "characterUtilities.hpp"
 #include "effectFactory.hpp"
 #include "moveAction.hpp"
 #include "logger.hpp"
@@ -35,17 +36,26 @@ Chase::Chase(Character * _actor, Character * _target) :
     target(_target),
     lastRoom(_target->room),
     valid(),
-    checkFunction(
-        [&](Room * from, Room * to)
-        {
-            // Get the direction.
-            std::string error;
-            auto direction = Area::getDirection(from->coord, to->coord);
-            return MoveAction::canMoveTo(actor, direction, error, true);
-        })
+    checkFunction()
 {
     // Debugging message.
     Logger::log(LogLevel::Debug, "Created Chase.");
+    // Set the check function.
+    checkFunction = [&](Room * from, Room * to)
+    {
+        // Prepare the error string.
+        std::string error;
+        // Evaluate the direction from the current room to the next.
+        auto direction = Area::getDirection(from->coord, to->coord);
+        // Get the required stamina.
+        auto requiredStamina = MoveAction::getConsumedStamina(actor);
+        return CanMoveCharacterTo(actor,
+                                  direction,
+                                  error,
+                                  requiredStamina,
+                                  true);
+    };
+
     // Reset the cooldown of the action.
     this->resetCooldown(Chase::getCooldown(_actor));
     // Find the path from the actor to the target.
@@ -146,7 +156,8 @@ ActionStatus Chase::perform()
                 // Consume the stamina.
                 actor->remStamina(consumedStamina, true);
                 // Move character.
-                actor->moveTo(
+                MoveCharacterTo(
+                    actor,
                     nextRoom,
                     actor->getNameCapital() + " goes " +
                     direction.toString() + ".\n",
@@ -186,7 +197,8 @@ ActionStatus Chase::perform()
                     // Consume the stamina.
                     actor->remStamina(consumedStamina, true);
                     // Move character.
-                    actor->moveTo(
+                    MoveCharacterTo(
+                        actor,
                         nextRoom,
                         actor->getNameCapital() + " goes " +
                         direction.toString() + ".\n",

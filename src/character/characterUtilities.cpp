@@ -1,0 +1,469 @@
+/// @file   characterUtilities.cpp
+/// @author Enrico Fraccaroli
+/// @date   Jan 29 2017
+/// @copyright
+/// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
+/// Permission is hereby granted, free of charge, to any person obtaining a
+/// copy of this software and associated documentation files (the "Software"),
+/// to deal in the Software without restriction, including without limitation
+/// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+/// and/or sell copies of the Software, and to permit persons to whom the
+/// Software is furnished to do so, subject to the following conditions:
+///     The above copyright notice and this permission notice shall be included
+///     in all copies or substantial portions of the Software.
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+/// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+/// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+/// DEALINGS IN THE SOFTWARE.
+
+#include "characterUtilities.hpp"
+#include "rangedWeaponItem.hpp"
+#include "meleeWeaponItem.hpp"
+#include "resourceType.hpp"
+#include "character.hpp"
+#include "logger.hpp"
+#include "room.hpp"
+
+std::vector<MeleeWeaponItem *> GetActiveMeleeWeapons(Character * character)
+{
+    std::vector<MeleeWeaponItem *> weapons;
+    for (auto item : character->equipment)
+    {
+        // If at least one of the occupied body parts can be used to wield
+        // a weapon, consider it an active weapon.
+        for (auto bodyPart : item->occupiedBodyParts)
+        {
+            if (HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
+            {
+                if (item->getType() == ModelType::MeleeWeapon)
+                {
+                    auto wpn = static_cast<MeleeWeaponItem *>(item);
+                    weapons.emplace_back(wpn);
+                    // Break the loop otherwise the weapon would be added
+                    // for each occupied body part.
+                    break;
+                }
+            }
+        }
+    }
+    return weapons;
+}
+
+std::vector<RangedWeaponItem *> GetActiveRangedWeapons(Character * character)
+{
+    std::vector<RangedWeaponItem *> weapons;
+    for (auto item : character->equipment)
+    {
+        // If at least one of the occupied body parts can be used to wield
+        // a range weapon, consider it an active weapon.
+        for (auto bodyPart : item->occupiedBodyParts)
+        {
+            if (HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
+            {
+                if (item->getType() == ModelType::RangedWeapon)
+                {
+                    auto wpn = static_cast<RangedWeaponItem *>(item);
+                    weapons.emplace_back(wpn);
+                    // Break the loop otherwise the weapon would be added
+                    // for each occupied body part.
+                    break;
+                }
+            }
+        }
+    }
+    return weapons;
+}
+
+std::vector<std::shared_ptr<BodyPart::BodyWeapon>> GetActiveNaturalWeapons(
+    Character * character)
+{
+    std::vector<std::shared_ptr<BodyPart::BodyWeapon>> naturalWeapons;
+    for (auto bodyPart : character->race->bodyParts)
+    {
+        // If the body part is holding an item, skip it.
+        if (character->findItemAtBodyPart(bodyPart) != nullptr) continue;
+        // If the body part cannot be used as natural weapon, skip it.
+        if (bodyPart->weapon == nullptr) continue;
+        // Add the natural weapon to the vector.
+        naturalWeapons.emplace_back(bodyPart->weapon);
+    }
+    return naturalWeapons;
+}
+
+ItemVector FindPosessedCoins(Character * character)
+{
+    ItemVector foundCoins;
+    auto FindCoinInContainer = [&](Item * item)
+    {
+        if (item->getType() == ModelType::Container)
+        {
+            // Cast the item to container.
+            auto containerItem = static_cast<ContainerItem *>(item);
+            for (auto content : containerItem->content)
+            {
+                if (content->getType() == ModelType::Currency)
+                {
+                    foundCoins.emplace_back(content);
+                }
+            }
+        }
+    };
+    for (auto it : character->equipment)
+    {
+        FindCoinInContainer(it);
+    }
+    for (auto it : character->inventory)
+    {
+        if (it->getType() == ModelType::Currency)
+        {
+            foundCoins.emplace_back(it);
+        }
+        else
+        {
+            FindCoinInContainer(it);
+        }
+    }
+    foundCoins.orderBy(ItemVector::ByPrice);
+    return foundCoins;
+}
+
+SearchOptionsCharacter::SearchOptionsCharacter() :
+    searchInRoom(),
+    searchInInventory(),
+    searchInEquipment()
+{
+    // Nothing to do.
+}
+
+SearchOptionsCharacter::SearchOptionsCharacter(
+    const SearchOptionsCharacter & other) :
+    searchInRoom(other.searchInRoom),
+    searchInInventory(other.searchInInventory),
+    searchInEquipment(other.searchInEquipment)
+{
+    // Nothing to do.
+}
+
+SearchOptionsCharacter::~SearchOptionsCharacter()
+{
+    // Nothing to do.
+}
+
+SearchOptionsCharacter & SearchOptionsCharacter::operator=(
+    const SearchOptionsCharacter & right)
+{
+    searchInRoom = right.searchInRoom;
+    searchInInventory = right.searchInInventory;
+    searchInEquipment = right.searchInEquipment;
+    return *this;
+}
+
+bool FindNearbyResouces(
+    Character * character,
+    std::map<ResourceType, unsigned int> requiredResources,
+    std::vector<std::pair<Item *, unsigned int>> & foundResources,
+    const SearchOptionsCharacter & searchOptions)
+{
+    // Create a function which checks if the given item is of the required type.
+    auto IsValidResource = [](Item * item, const ResourceType & resourceType)
+    {
+        // Check the pointer to the model.
+        if (item->model == nullptr) return false;
+        // Check if the item is a resource.
+        if (item->model->getType() != ModelType::Resource) return false;
+        // Cast the model to ResourceModel.
+        auto resourceModel = item->model->toResource();
+        // Check if the type of resource is the same.
+        return (resourceModel->resourceType == resourceType);
+    };
+    // Create a function which reduces the required quantity and checks if
+    // the zero has been reached.
+    auto DecrementRequired = [&foundResources](Item * item,
+                                               unsigned int & requiredQuantity)
+    {
+        // Get the available quantity.
+        auto quantityAvailable = item->quantity;
+        // Set the used quantity.
+        auto quantityUsed = quantityAvailable;
+        if (quantityAvailable > requiredQuantity)
+        {
+            quantityUsed = (quantityAvailable - requiredQuantity);
+        }
+        // Add the item to the list of used resources.
+        foundResources.emplace_back(std::make_pair(item, quantityUsed));
+        // Reduce the quantity needed.
+        requiredQuantity -= quantityUsed;
+        // Returns if we've reached the needed quantity.
+        return (requiredQuantity == 0);
+    };
+    for (auto resource : requiredResources)
+    {
+        // Quantity of ingredients that has to be found.
+        auto quantityNeeded = resource.second;
+        // Check if we need to search inside the room.
+        // TODO: Probably I need to check if a given item is not selected twice.
+        if (searchOptions.searchInRoom)
+        {
+            for (auto item : character->room->items)
+            {
+                // Check if the item is a valid resource.
+                if (!IsValidResource(item, resource.first)) continue;
+                // Decrement the required quantity. If we've reached the
+                // needed quantity stop the loop.
+                if (DecrementRequired(item, quantityNeeded)) break;
+            }
+        }
+        // Check if we need to search inside the character's equipment.
+        if (searchOptions.searchInEquipment)
+        {
+            for (auto item : character->equipment)
+            {
+                // Check if the item is a valid resource.
+                if (!IsValidResource(item, resource.first)) continue;
+                // Decrement the required quantity. If we've reached the
+                // needed quantity stop the loop.
+                if (DecrementRequired(item, quantityNeeded)) break;
+            }
+        }
+        // Check if we need to search inside the character's inventory.
+        if (searchOptions.searchInInventory)
+        {
+            for (auto item : character->inventory)
+            {
+                // Check if the item is a valid resource.
+                if (!IsValidResource(item, resource.first)) continue;
+                // Decrement the required quantity. If we've reached the
+                // needed quantity stop the loop.
+                if (DecrementRequired(item, quantityNeeded)) break;
+            }
+        }
+        // If the ingredients are still not enough, return false.
+        if (quantityNeeded > 0) return false;
+    }
+    return true;
+}
+
+Item * FindNearbyTool(
+    Character * character,
+    const ToolType & toolType,
+    const ItemVector & exceptions,
+    const SearchOptionsCharacter & searchOptions)
+{
+    // Create a function which checks if the given item is of the required type.
+    auto IsValidTool = [toolType, exceptions](Item * item)
+    {
+        // Check the pointer to the model.
+        if (item->model == nullptr) return false;
+        // Check if the item is a resource.
+        if (item->model->getType() != ModelType::Tool) return false;
+        // Cast the model to ResourceModel.
+        auto toolModel = item->model->toTool();
+        // Check if the type of resource is the same.
+        if (toolModel->toolType != toolType) return false;
+        // Check if the item is inside the exception list.
+        return std::find_if(exceptions.begin(),
+                            exceptions.end(),
+                            [item](Item * exception)
+                            {
+                                return (item->vnum == exception->vnum);
+                            }) == exceptions.end();
+    };
+    if (searchOptions.searchInRoom)
+    {
+        for (auto item : character->room->items)
+        {
+            // Check if it is a valid item.
+            if (IsValidTool(item)) return item;
+        }
+    }
+    if (searchOptions.searchInEquipment)
+    {
+        for (auto item : character->equipment)
+        {
+            // Check if it is a valid item.
+            if (IsValidTool(item)) return item;
+        }
+    }
+
+    if (searchOptions.searchInInventory)
+    {
+        for (auto item : character->inventory)
+        {
+            // Check if it is a valid item.
+            if (IsValidTool(item)) return item;
+        }
+    }
+    return nullptr;
+}
+
+bool FindNearbyTools(
+    Character * character,
+    std::vector<ToolType> requiredTools,
+    ItemVector & foundTools,
+    const SearchOptionsCharacter & searchOptions)
+{
+    for (auto requiredTool : requiredTools)
+    {
+        auto tool = FindNearbyTool(character,
+                                   requiredTool,
+                                   foundTools,
+                                   searchOptions);
+        if (tool == nullptr) return false;
+        foundTools.emplace_back(tool);
+    }
+    return true;
+}
+
+bool CanMoveCharacterTo(Character * character,
+                        const Direction & direction,
+                        std::string & error,
+                        unsigned int & consumedStamina,
+                        bool allowInCombat)
+{
+    if (character->room == nullptr)
+    {
+        return false;
+    }
+    if ((character->getAction()->getType() == ActionType::Combat) &&
+        !allowInCombat)
+    {
+        // Check if the character is locked into close combat.
+        bool lockedInCombat = false;
+        // Check if he is in the same room of one of its aggressors.
+        for (auto iterator : character->combatHandler)
+        {
+            if (iterator->aggressor != nullptr)
+            {
+                if (iterator->aggressor->room == character->room)
+                {
+                    lockedInCombat = true;
+                    break;
+                }
+            }
+        }
+        // Check even the aimed character.
+        if (character->combatHandler.getAimedTarget() != nullptr)
+        {
+            if (character->combatHandler.getAimedTarget()->room ==
+                character->room)
+            {
+                lockedInCombat = true;
+            }
+        }
+        if (lockedInCombat)
+        {
+            error = "You cannot move while fighting in close combat.";
+        }
+        return !lockedInCombat;
+    }
+    // Check if the character is in a no-walk position.
+    if ((character->posture >= CharacterPosture::Sit) &&
+        (character->posture <= CharacterPosture::Rest))
+    {
+        error = "You first need to stand up.";
+        return false;
+    }
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        error = "You first need to wake up.";
+        return false;
+    }
+    // Find the exit to the destination.
+    auto destExit = character->room->findExit(direction);
+    if (destExit == nullptr)
+    {
+        error = "You cannot go that way.";
+        return false;
+    }
+    // Check if the actor has enough stamina to execute the action.
+    if (consumedStamina > character->stamina)
+    {
+        error = "You are too tired to move.\n";
+        return false;
+    }
+    // If the direction is upstairs, check if there is a stair.
+    if (direction == Direction::Up)
+    {
+        if (!HasFlag(destExit->flags, ExitFlag::Stairs))
+        {
+            error = "You can't go upstairs, there are no stairs.";
+            return false;
+        }
+    }
+    // Check if the destination is correct.
+    if (destExit->destination == nullptr)
+    {
+        error = "That direction can't take you anywhere.";
+        return false;
+    }
+    // Check if the destination is bocked by a door.
+    auto door = destExit->destination->findDoor();
+    if (door != nullptr)
+    {
+        if (HasFlag(door->flags, ItemFlag::Closed))
+        {
+            error = "Maybe you have to open that door first.";
+            return false;
+        }
+    }
+    // Check if the destination has a floor.
+    auto destDown = destExit->destination->findExit(Direction::Down);
+    if (destDown != nullptr)
+    {
+        if (!HasFlag(destDown->flags, ExitFlag::Stairs))
+        {
+            error = "Do you really want to fall in that pit?";
+            return false;
+        }
+    }
+    // Check if the destination is forbidden for mobiles.
+    return !(character->isMobile() &&
+             HasFlag(destExit->flags, ExitFlag::NoMob));
+}
+
+bool MoveCharacterTo(
+    Character * character,
+    Room * destination,
+    const std::string & msgDepart,
+    const std::string & msgArrive,
+    const std::string & msgChar)
+{
+    // Check if the function has received a valid character.
+    if (WrongAssert(character == nullptr)) return false;
+    // Check if the function has received a valid destination.
+    if (WrongAssert(destination == nullptr)) return false;
+    // Check if the character is inside a valid room.
+    if (WrongAssert(character->room == nullptr)) return false;
+    // Activate the entrance event for every mobile in the room.
+    for (auto mobile : character->room->getAllMobile(character))
+    {
+        if (mobile->canSee(character))
+        {
+            mobile->triggerEventExit(character);
+        }
+    }
+    // Show a message to the character, if is set.
+    if (!msgChar.empty()) character->sendMsg(msgChar);
+    // Tell others where the character went and remove s/he from the old room.
+    character->room->sendToAll(msgDepart, {character});
+    // Remove the player from the current room.
+    character->room->removeCharacter(character);
+    // Add the character to the destionation room.
+    destination->addCharacter(character);
+    // Look around new room.
+    character->doCommand("look");
+    // Tell others s/he has arrived and move the character to the new room.
+    destination->sendToAll(msgArrive, {character});
+    // Activate the entrance event for every mobile in the room.
+    for (auto mobile : character->room->getAllMobile(character))
+    {
+        if (mobile->canSee(character))
+        {
+            mobile->triggerEventEnter(character);
+        }
+    }
+    return true;
+}

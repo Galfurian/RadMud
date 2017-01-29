@@ -20,6 +20,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "movement.hpp"
+#include "characterUtilities.hpp"
 #include "moveAction.hpp"
 #include "logger.hpp"
 #include "mud.hpp"
@@ -64,20 +65,24 @@ void LoadMovementCommands()
         false, false, false));
 }
 
-
 bool DoDirection(Character * character, Direction direction)
 {
     // Stop any action the character is executing.
     StopAction(character);
+    // Prepare a string for the error.
     std::string error;
-    if (!MoveAction::canMoveTo(character, direction, error, false))
+    // Evaluate the required stamina.
+    auto reqStamina = MoveAction::getConsumedStamina(character);
+    // Check if the character can move to the destination.
+    if (!CanMoveCharacterTo(character, direction, error, reqStamina, false))
     {
         character->sendMsg(error + "\n");
         return false;
     }
     // Get the destination.
     auto destination = character->room->findExit(direction)->destination;
-    auto moveAction = std::make_shared<MoveAction>(character, destination,
+    auto moveAction = std::make_shared<MoveAction>(character,
+                                                   destination,
                                                    direction);
     // Check the new action.
     error = std::string();
@@ -127,7 +132,7 @@ bool DoTravel(Character * character, ArgumentHandler & /*args*/)
     auto msgArrive = character->getNameCapital() + " enter the room.\n";
     auto msgChar = "You begin to travel...";
     // Move character.
-    character->moveTo(destination, msgDepart, msgArrive, msgChar);
+    MoveCharacterTo(character, destination, msgDepart, msgArrive, msgChar);
     return true;
 }
 

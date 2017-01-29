@@ -23,6 +23,7 @@
 #include "aimAction.hpp"
 
 #include "character.hpp"
+#include "characterUtilities.hpp"
 #include "logger.hpp"
 #include "area.hpp"
 #include "room.hpp"
@@ -94,7 +95,7 @@ ActionStatus AimAction::perform()
         actor->sendMsg(error + "\n\n");
         return ActionStatus::Error;
     }
-    if (actor->getActiveRangedWeapons().empty())
+    if (GetActiveRangedWeapons(actor).empty())
     {
         actor->sendMsg("You don't have a ranged weapon equipped.\n\n");
         return ActionStatus::Error;

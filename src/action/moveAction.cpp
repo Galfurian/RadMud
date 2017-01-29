@@ -22,6 +22,7 @@
 
 #include "moveAction.hpp"
 
+#include "characterUtilities.hpp"
 #include "effectFactory.hpp"
 #include "character.hpp"
 #include "logger.hpp"
@@ -102,14 +103,18 @@ ActionStatus MoveAction::perform()
         actor->sendMsg(error + "\n\n");
         return ActionStatus::Error;
     }
-    if (!MoveAction::canMoveTo(actor, direction, error, false))
+    // Evaluate the amount of required stamina.
+    auto consumedStamina = this->getConsumedStamina(actor);
+    if (!CanMoveCharacterTo(actor,
+                            direction,
+                            error,
+                            consumedStamina,
+                            false))
     {
         // Notify that the actor can't move because too tired.
         actor->sendMsg(error + "\n");
         return ActionStatus::Error;
     }
-    // Get the amount of required stamina.
-    auto consumedStamina = this->getConsumedStamina(actor, actor->posture);
     // Consume the stamina.
     actor->remStamina(consumedStamina, true);
     // Check if the actor was aiming.
@@ -119,7 +124,8 @@ ActionStatus MoveAction::perform()
             EffectFactory::disturbedAim(actor, 1, -3));
     }
     // Move character.
-    actor->moveTo(
+    MoveCharacterTo(
+        actor,
         destination,
         actor->getNameCapital() + " goes " + direction.toString() + ".\n",
         actor->getNameCapital() + " arrives from " +
@@ -127,15 +133,14 @@ ActionStatus MoveAction::perform()
     return ActionStatus::Finished;
 }
 
-unsigned int MoveAction::getConsumedStamina(const Character * character,
-                                            const CharacterPosture & posture)
+unsigned int MoveAction::getConsumedStamina(Character * character)
 {
     auto multiplier = 1.0;
-    if (posture == CharacterPosture::Crouch)
+    if (character->posture == CharacterPosture::Crouch)
     {
         multiplier = 0.75;
     }
-    else if (posture == CharacterPosture::Prone)
+    else if (character->posture == CharacterPosture::Prone)
     {
         multiplier = 0.50;
     }
@@ -226,7 +231,7 @@ bool MoveAction::canMoveTo(Character * character,
         return false;
     }
     // Check if the actor has enough stamina to execute the action.
-    if (MoveAction::getConsumedStamina(character, character->posture) >
+    if (MoveAction::getConsumedStamina(character) >
         character->stamina)
     {
         error = "You are too tired to move.\n";

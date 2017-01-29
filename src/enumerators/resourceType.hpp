@@ -78,20 +78,11 @@ public:
     /// @brief Equality operator.
     bool operator==(const ResourceType & rhs) const;
 
-    /// @brief Equality operator.
-    bool operator==(const ResourceType::Enum & rhs) const;
-
     /// @brief Inequality operator.
     bool operator!=(const ResourceType & rhs) const;
 
-    /// @brief Inequality operator.
-    bool operator!=(const ResourceType::Enum & rhs) const;
-
     /// @brief Lesser operator.
     bool operator<(const ResourceType & rhs) const;
-
-    /// @brief Lesser operator.
-    bool operator<(const ResourceType::Enum & rhs) const;
 
 private:
     /// Internal value.

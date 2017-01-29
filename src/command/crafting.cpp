@@ -25,6 +25,7 @@
 #include "mud.hpp"
 #include "buildAction.hpp"
 #include "craftAction.hpp"
+#include "characterUtilities.hpp"
 
 void LoadCraftingCommands()
 {
@@ -87,16 +88,30 @@ bool DoProfession(Character * character,
     }
     // Search the needed tools.
     ItemVector usedTools;
-    if (!character->findNearbyTools(production->tools, usedTools, false, true,
-                                    true))
+    // Prepare a structure to set the options of the search.
+    SearchOptionsCharacter searchOptions;
+    searchOptions.searchInRoom = true;
+    searchOptions.searchInEquipment = true;
+    searchOptions.searchInInventory = true;
+    if (!FindNearbyTools(character,
+                         production->tools,
+                         usedTools,
+                         searchOptions))
     {
         character->sendMsg("You don't have the right tools.\n");
         return false;
     }
     // Search the needed ingredients.
     std::vector<std::pair<Item *, unsigned int>> usedIngredients;
-    if (!character->findNearbyResouces(production->ingredients,
-                                       usedIngredients))
+    // Do not search the ingredients inside the equipment.
+    searchOptions.searchInRoom = true;
+    searchOptions.searchInEquipment = false;
+    searchOptions.searchInInventory = true;
+    // Search the resources nearby.
+    if (!FindNearbyResouces(character,
+                            production->ingredients,
+                            usedIngredients,
+                            searchOptions))
     {
         character->sendMsg("You don't have enough material.\n");
         return false;
@@ -104,11 +119,14 @@ bool DoProfession(Character * character,
     // Search the needed workbench.
     if (production->workbench != ToolType::None)
     {
-        auto workbench = character->findNearbyTool(production->workbench,
-                                                   ItemVector(),
-                                                   true,
-                                                   false,
-                                                   false);
+        // Just check inside the room.
+        searchOptions.searchInRoom = true;
+        searchOptions.searchInEquipment = false;
+        searchOptions.searchInInventory = false;
+        auto workbench = FindNearbyTool(character,
+                                        production->workbench,
+                                        ItemVector(),
+                                        searchOptions);
         if (workbench == nullptr)
         {
             character->sendMsg("The proper workbench is not present.\n");
@@ -173,16 +191,30 @@ bool DoBuild(Character * character, ArgumentHandler & args)
     }
     // Search the needed tools.
     ItemVector usedTools;
-    if (!character->findNearbyTools(schematics->tools,
-                                    usedTools, true, true, true))
+    // Prepare a structure to set the options of the search.
+    SearchOptionsCharacter searchOptions;
+    searchOptions.searchInRoom = true;
+    searchOptions.searchInEquipment = true;
+    searchOptions.searchInInventory = true;
+    if (!FindNearbyTools(character,
+                         schematics->tools,
+                         usedTools,
+                         searchOptions))
     {
         character->sendMsg("You don't have the right tools.\n");
         return false;
     }
     // Search the needed ingredients.
     std::vector<std::pair<Item *, unsigned int>> usedIngredients;
-    if (!character->findNearbyResouces(schematics->ingredients,
-                                       usedIngredients))
+    // Do not search the ingredients inside the equipment.
+    searchOptions.searchInRoom = true;
+    searchOptions.searchInEquipment = false;
+    searchOptions.searchInInventory = true;
+    // Search the resources nearby.
+    if (!FindNearbyResouces(character,
+                            schematics->ingredients,
+                            usedIngredients,
+                            searchOptions))
     {
         character->sendMsg("You don't have enough material.\n");
         return false;

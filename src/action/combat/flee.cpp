@@ -23,6 +23,7 @@
 
 #include "flee.hpp"
 
+#include "characterUtilities.hpp"
 #include "basicAttack.hpp"
 #include "moveAction.hpp"
 #include "logger.hpp"
@@ -109,7 +110,7 @@ ActionStatus Flee::perform()
         std::vector<Direction> directions;
         for (auto it : actor->room->getAvailableDirections())
         {
-            if (MoveAction::canMoveTo(actor, it, error, true))
+            if (CanMoveCharacterTo(actor, it, error, consumedStamina, true))
             {
                 directions.emplace_back(it);
             }
@@ -132,7 +133,8 @@ ActionStatus Flee::perform()
             // Stop the current action.
             actor->sendMsg(this->stop() + "\n\n");
             // Move the actor to the random direction.
-            actor->moveTo(
+            MoveCharacterTo(
+                actor,
                 selected->destination,
                 actor->getName() + " flees from the battlefield.\n\n",
                 actor->getName() + " arives fleeing.\n\n",

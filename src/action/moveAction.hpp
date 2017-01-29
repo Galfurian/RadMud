@@ -57,8 +57,7 @@ public:
     ActionStatus perform() override;
 
     /// @brief Given an action, it returns the stamina required to execute it.
-    static unsigned int getConsumedStamina(const Character * character,
-                                           const CharacterPosture & posture);
+    static unsigned int getConsumedStamina(Character * character);
 
     /// @brief Given an action, it returns the necessary cooldown.
     /// @param character The actor.
