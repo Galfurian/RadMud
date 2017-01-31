@@ -25,6 +25,15 @@
 #include <string>
 #include <lua.hpp>
 
+/// Used to determine the flag of the room.
+using TerrainFlag = enum class TerrainFlags
+{
+    None = 0,           ///< No flag.
+    Indoor = 2,         ///< The terrain is indoor.
+    NaturalLight = 4,   ///< There is natural light on this terrain.
+    //8
+};
+
 /// @brief Holds information about a type of terrain.
 class Terrain
 {
@@ -37,10 +46,6 @@ public:
     unsigned int flags;
     /// The available space inside the terrain.
     unsigned int space;
-    /// If the terrain is indoor.
-    bool indoor;
-    /// If there is natural light on this terrain.
-    bool light;
     /// The lua_State associated with this terrain.
     lua_State * L;
 
@@ -51,9 +56,7 @@ public:
     Terrain(unsigned int _vnum,
             std::string _name,
             unsigned int _flags,
-            unsigned int _space,
-            bool _indoor,
-            bool _light);
+            unsigned int _space);
 
     /// @brief Function used to register inside the lua environment the class.
     /// @param L The lua environment.

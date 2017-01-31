@@ -27,9 +27,7 @@ Terrain::Terrain() :
     vnum(),
     name(),
     flags(),
-    space(),
-    indoor(),
-    light()
+    space()
 {
     // Nothing to do.
 }
@@ -37,15 +35,11 @@ Terrain::Terrain() :
 Terrain::Terrain(unsigned int _vnum,
                  std::string _name,
                  unsigned int _flags,
-                 unsigned int _space,
-                 bool _indoor,
-                 bool _light) :
+                 unsigned int _space) :
     vnum(_vnum),
     name(_name),
     flags(_flags),
-    space(_space),
-    indoor(_indoor),
-    light(_light)
+    space(_space)
 {
     // Nothing to do.
 }
@@ -58,7 +52,5 @@ void Terrain::luaRegister(lua_State * L)
         .addData("name", &Terrain::name, false)
         .addData("flags", &Terrain::flags, false)
         .addData("space", &Terrain::space, false)
-        .addData("indoor", &Terrain::indoor, false)
-        .addData("light", &Terrain::light, false)
         .endClass();
 }

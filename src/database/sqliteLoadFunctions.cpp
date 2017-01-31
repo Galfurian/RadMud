@@ -1568,8 +1568,6 @@ bool LoadTerrain(ResultSet * result)
             terrain->name = result->getNextString();
             terrain->flags = result->getNextUnsignedInteger();
             terrain->space = result->getNextUnsignedInteger();
-            terrain->indoor = result->getNextUnsignedInteger();
-            terrain->light = result->getNextUnsignedInteger();
             if (!Mud::instance().addTerrain(terrain))
             {
                 throw SQLiteException(
