@@ -1,4 +1,8 @@
 #############################################
+# Add sub-directory
+add_subdirectory(map_generation)
+
+#############################################
 # Include Directories
 set(PROJECT_INC ${PROJECT_INC}
         ${CMAKE_SOURCE_DIR}/src/structure

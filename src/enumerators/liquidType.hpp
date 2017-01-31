@@ -35,11 +35,12 @@ public:
     /// The possible types of model.
     enum Enum
     {
-        None,    ///< [0] No type of liquid.
-        Normal,  ///< [1] Normal liquid.
-        Alcohol, ///< [2] The liquid is alcohol.
-        Poison,  ///< [3] The liquid is poison.
-        Blood,   ///< [4] The liquid is blood.
+        None,       ///< [0] No type of liquid.
+        Normal,     ///< [1] Normal liquid.
+        Alcohol,    ///< [2] The liquid is alcohol.
+        Poison,     ///< [3] The liquid is poison.
+        Blood,      ///< [4] The liquid is blood.
+        Lava,       ///< [5] The liquid is laval.
     };
 
     /// @brief Constructor.
@@ -53,12 +54,6 @@ public:
 
     /// @brief Constructor.
     LiquidType(const std::string & _liquidType);
-
-    /// @brief Check is the given number is a valid type of model.
-    static bool isValid(const unsigned int & _liquidType);
-
-    /// @brief Check is the given string is a valid type of model.
-    static bool isValid(const std::string & _liquidType);
 
     /// @brief Returns the type of model as string.
     std::string toString() const;

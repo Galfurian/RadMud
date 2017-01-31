@@ -32,10 +32,16 @@ LiquidType::LiquidType() :
 LiquidType::LiquidType(const unsigned int & _liquidType) :
     liquidType()
 {
-    if (_liquidType == 1) liquidType = Normal;
-    else if (_liquidType == 2) liquidType = Alcohol;
-    else if (_liquidType == 3) liquidType = Poison;
-    else if (_liquidType == 4) liquidType = Blood;
+    if (_liquidType == static_cast<unsigned int>(Normal))
+        liquidType = Normal;
+    else if (_liquidType == static_cast<unsigned int>(Alcohol))
+        liquidType = Alcohol;
+    else if (_liquidType == static_cast<unsigned int>(Poison))
+        liquidType = Poison;
+    else if (_liquidType == static_cast<unsigned int>(Blood))
+        liquidType = Blood;
+    else if (_liquidType == static_cast<unsigned int>(Lava))
+        liquidType = Lava;
     else liquidType = None;
 }
 
@@ -52,20 +58,8 @@ LiquidType::LiquidType(const std::string & _liquidType) :
     else if (ToLower(_liquidType) == "alcohol") liquidType = Alcohol;
     else if (ToLower(_liquidType) == "poison") liquidType = Poison;
     else if (ToLower(_liquidType) == "blood") liquidType = Blood;
+    else if (ToLower(_liquidType) == "lava") liquidType = Lava;
     else liquidType = None;
-}
-
-bool LiquidType::isValid(const unsigned int & _liquidType)
-{
-    return (_liquidType >= 1) && (_liquidType <= 4);
-}
-
-bool LiquidType::isValid(const std::string & _liquidType)
-{
-    if (ToLower(_liquidType) == "normal") return true;
-    if (ToLower(_liquidType) == "alcohol") return true;
-    if (ToLower(_liquidType) == "poison") return true;
-    return (ToLower(_liquidType) == "blood");
 }
 
 std::string LiquidType::toString() const
@@ -74,6 +68,7 @@ std::string LiquidType::toString() const
     if (liquidType == Alcohol) return "Alcohol";
     if (liquidType == Poison) return "Poison";
     if (liquidType == Blood) return "Blood";
+    if (liquidType == Lava) return "Lava";
     return "None";
 }
 

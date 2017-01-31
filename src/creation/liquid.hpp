@@ -28,10 +28,10 @@
 /// Flags of a liquid.
 using LiquidFlags = enum class LiquidFlags_t
 {
-    None,              ///< [0]   No flag.
-    Inflammable = 1,   ///< [1]   The liquid is inflammable.
-    AlcoholicBase = 2, ///< [2]   The liquid can be used as base for mixtures.
-    ///< [4]
+    None,               ///< [0]   No flag.
+    Inflammable = 1,    ///< [1]   The liquid is inflammable.
+    AlcoholicBase = 2,  ///< [2]   The liquid can be used as base for mixtures.
+    DealDamage = 4      ///< [4]   The liquid deals damage over time.
     ///< [8]
     ///< [16]
     ///< [32]
