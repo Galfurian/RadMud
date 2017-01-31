@@ -41,10 +41,6 @@ public:
     /// @brief Constructor.
     MapCell();
 
-    /// @brief Constructor.
-    MapCell(const Coordinates & _coordinates,
-            const double & _height);
-
     /// @brief Add the neighbours based on the given map.
     void addNeighbours(Map2D<MapCell> & map);
 

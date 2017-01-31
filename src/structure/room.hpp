@@ -63,7 +63,7 @@ public:
     /// The current room coordinates.
     Coordinates coord;
     /// The type of terrain of the room.
-    std::shared_ptr<Terrain> terrain;
+    std::shared_ptr<terrain::Terrain> terrain;
     /// The name of the room.
     std::string name;
     /// A long description of the room.

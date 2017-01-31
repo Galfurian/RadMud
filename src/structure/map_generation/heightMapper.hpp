@@ -24,25 +24,33 @@
 #include "mapTile.hpp"
 #include "mapCell.hpp"
 
+namespace terrain
+{
+class Terrain;
+}
+
 /// @brief Class which maps the values of an height-map to types of terrain.
 class HeightMapper
 {
-private:
+public:
+    /// The vnum of the mapper.
+    unsigned int vnum;
+    /// The name of the mapper.
+    std::string name;
     /// The current thresholds.
     std::map<MapTile, double> thresholdMap;
 
-public:
     /// @brief Constructor.
-    HeightMapper();
+    HeightMapper(const unsigned int & _vnum,
+                 const std::string & _name);
 
     /// @brief Reset the thresholds to default values.
     void reset();
 
+    void addThreshold(const std::shared_ptr<terrain::Terrain> & terrain,
+                      const double & threshold);
+
     /// @brief Returns the MapTile associated with the given height w.r.t.
     /// the current thresholds.
     MapTile getHeightMap(const double & height);
-
-    /// @brief Returns the threshold associated with the given MapTile w.r.t.
-    /// the current set thresholds.
-    double getThreshold(const MapTile & heightMap);
 };

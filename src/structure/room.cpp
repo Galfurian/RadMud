@@ -448,13 +448,13 @@ bool Room::isLit()
         return false;
     };
     // If the room has a natural light.
-    if (HasFlag(terrain->flags, TerrainFlag::NaturalLight))
+    if (HasFlag(terrain->flags, terrain::TerrainFlag::NaturalLight))
     {
         return true;
     }
     // Get the day phase.
     auto dayPhase = MudUpdater::instance().getDayPhase();
-    if (!HasFlag(terrain->flags, TerrainFlag::Indoor) &&
+    if (!HasFlag(terrain->flags, terrain::TerrainFlag::Indoor) &&
         (dayPhase != DayPhase::Night))
     {
 //        Logger::log(LogLevel::Debug,

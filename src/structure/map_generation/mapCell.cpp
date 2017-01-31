@@ -30,16 +30,6 @@ MapCell::MapCell() :
     // Nothing to do.
 }
 
-MapCell::MapCell(const Coordinates & _coordinates,
-                 const double & _height) :
-    coordinates(_coordinates),
-    height(_height),
-    mapTile(MapTile::Void),
-    neighbours()
-{
-    // Nothing to do.
-}
-
 void MapCell::addNeighbours(Map2D<MapCell> & map)
 {
     if (coordinates.x - 1 > 0)

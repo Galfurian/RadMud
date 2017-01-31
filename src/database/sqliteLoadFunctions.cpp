@@ -1563,7 +1563,7 @@ bool LoadTerrain(ResultSet * result)
     {
         try
         {
-            std::shared_ptr<Terrain> terrain = std::make_shared<Terrain>();
+            auto terrain = std::make_shared<terrain::Terrain>();
             terrain->vnum = result->getNextUnsignedInteger();
             terrain->name = result->getNextString();
             terrain->flags = result->getNextUnsignedInteger();
@@ -1595,9 +1595,10 @@ bool LoadBodyPart(ResultSet * result)
             bodyPart->name = result->getNextString();
             bodyPart->description = result->getNextString();
             bodyPart->flags = result->getNextUnsignedInteger();
-            if (bodyPart->check())
+            if (!Mud::instance().addBodyPart(bodyPart))
             {
-                Mud::instance().mudBodyParts.emplace_back(bodyPart);
+                throw SQLiteException(
+                    "Can't add the body part" + bodyPart->name);
             }
         }
         catch (SQLiteException & e)
@@ -1684,6 +1685,69 @@ bool LoadBodyPartWeapon(ResultSet * result)
             bodyWeapon->maxDamage = result->getNextUnsignedInteger();
             bodyWeapon->range = result->getNextInteger();
             bodyPart->weapon = bodyWeapon;
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadHeightMap(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto vnum = result->getNextUnsignedInteger();
+            auto name = result->getNextString();
+            auto heightMap = std::make_shared<HeightMapper>(vnum, name);
+            if (!Mud::instance().addHeightMapper(heightMap))
+            {
+                throw SQLiteException(
+                    "Can't add the height map " + name);
+            }
+            Logger::log(LogLevel::Debug, "\t%s%s",
+                        AlignString(vnum, StringAlign::Left, 25),
+                        AlignString(name, StringAlign::Left, 25));
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadHeightMapThreshold(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto heightMapVnum = result->getNextUnsignedInteger();
+            auto heightMap = Mud::instance().findHeightMapper(heightMapVnum);
+            if (heightMap == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the height map " + ToString(heightMapVnum));
+            }
+            auto terrainVnum = result->getNextUnsignedInteger();
+            auto terrain = Mud::instance().findTerrain(terrainVnum);
+            if (terrain == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the terrain " + ToString(terrainVnum));
+            }
+            auto threshold = result->getNextDouble();
+            heightMap->addThreshold(terrain, threshold);
+            Logger::log(LogLevel::Debug, "\t%s%s%s",
+                        AlignString(heightMap->name, StringAlign::Left, 25),
+                        AlignString(terrain->name, StringAlign::Left, 25),
+                        AlignString(threshold, StringAlign::Left, 25));
         }
         catch (SQLiteException & e)
         {

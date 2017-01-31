@@ -1134,7 +1134,7 @@ void Character::loadScript(const std::string & scriptFilename)
     Race::luaRegister(L);
     Coordinates::luaRegister(L);
     Exit::luaRegister(L);
-    Terrain::luaRegister(L);
+    terrain::Terrain::luaRegister(L);
     Room::luaRegister(L);
 
     Direction::luaRegister(L);

@@ -21,7 +21,10 @@
 
 #include "heightMapper.hpp"
 
-HeightMapper::HeightMapper() :
+HeightMapper::HeightMapper(const unsigned int & _vnum,
+                           const std::string & _name) :
+    vnum(_vnum),
+    name(_name),
     thresholdMap()
 {
     this->reset();
@@ -38,6 +41,15 @@ void HeightMapper::reset()
     thresholdMap[MapTile::HighMountain] = 100;
 }
 
+
+void HeightMapper::addThreshold(
+    const std::shared_ptr<terrain::Terrain> & terrain,
+    const double & threshold)
+{
+    (void) terrain;
+    (void) threshold;
+}
+
 MapTile HeightMapper::getHeightMap(const double & height)
 {
     for (auto it : thresholdMap)
@@ -48,16 +60,4 @@ MapTile HeightMapper::getHeightMap(const double & height)
         }
     }
     return MapTile::Void;
-}
-
-double HeightMapper::getThreshold(const MapTile & heightMap)
-{
-    for (auto it : thresholdMap)
-    {
-        if (heightMap == it.first)
-        {
-            return it.second;
-        }
-    }
-    return thresholdMap[MapTile::HighMountain];
 }

@@ -191,7 +191,7 @@ void MapGenerator::dropRivers(Map2D<MapCell> & map)
             if ((nextCell->mapTile == MapTile::ShallowWater) ||
                 (nextCell->mapTile == MapTile::DeepWater) ||
                 (nextCell->mapTile == MapTile::River) ||
-                (nextCell->mapTile == MapTile::WaterSpring))
+                (nextCell->mapTile == MapTile::LiquidSource))
             {
                 break;
             }
@@ -210,7 +210,7 @@ void MapGenerator::dropRivers(Map2D<MapCell> & map)
             auto cell = (*it);
             if (it == river.begin())
             {
-                cell->mapTile = MapTile::WaterSpring;
+                cell->mapTile = MapTile::LiquidSource;
                 continue;
             }
             cell->mapTile = MapTile::River;

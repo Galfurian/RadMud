@@ -1,5 +1,5 @@
-/// @file   terrain.hpp
-/// @brief  Declaration of Terrain class.
+/// @file   terrain.cpp
+/// @brief  Implementation of Terrain class functions.
 /// @author Enrico Fraccaroli
 /// @date   08/12/2016
 /// @copyright
@@ -20,45 +20,42 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#pragma once
+#include "terrain.hpp"
+#include "luaBridge.hpp"
 
-#include <string>
-#include <lua.hpp>
-
-/// Used to determine the flag of the room.
-using TerrainFlag = enum class TerrainFlags
+namespace terrain
 {
-    None = 0,           ///< No flag.
-    Indoor = 2,         ///< The terrain is indoor.
-    NaturalLight = 4,   ///< There is natural light on this terrain.
-    //8
-};
 
-/// @brief Holds information about a type of terrain.
-class Terrain
+Terrain::Terrain() :
+    vnum(),
+    name(),
+    flags(),
+    space()
 {
-public:
-    /// The vnum.
-    unsigned int vnum;
-    /// The unique name.
-    std::string name;
-    /// The flags of the terrain.
-    unsigned int flags;
-    /// The available space inside the terrain.
-    unsigned int space;
-    /// The lua_State associated with this terrain.
-    lua_State * L;
+    // Nothing to do.
+}
 
-    /// @brief Constructor.
-    Terrain();
+Terrain::Terrain(unsigned int _vnum,
+                 std::string _name,
+                 unsigned int _flags,
+                 unsigned int _space) :
+    vnum(_vnum),
+    name(_name),
+    flags(_flags),
+    space(_space)
+{
+    // Nothing to do.
+}
 
-    /// @brief Constructor.
-    Terrain(unsigned int _vnum,
-            std::string _name,
-            unsigned int _flags,
-            unsigned int _space);
+void Terrain::luaRegister(lua_State * L)
+{
+    luabridge::getGlobalNamespace(L)
+        .beginClass<Terrain>("Terrain")
+        .addData("vnum", &Terrain::vnum, false)
+        .addData("name", &Terrain::name, false)
+        .addData("flags", &Terrain::flags, false)
+        .addData("space", &Terrain::space, false)
+        .endClass();
+}
 
-    /// @brief Function used to register inside the lua environment the class.
-    /// @param L The lua environment.
-    static void luaRegister(lua_State * L);
-};
+}

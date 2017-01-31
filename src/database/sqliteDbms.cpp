@@ -80,6 +80,9 @@ SQLiteDbms::SQLiteDbms() :
     loaders.push_back(TableLoader("BodyPartWeapon", LoadBodyPartWeapon));
     loaders.push_back(TableLoader("RaceBaseSkill", LoadRaceBaseSkill));
     loaders.push_back(TableLoader("RaceBaseAbility", LoadRaceBaseAbility));
+    loaders.push_back(TableLoader("HeightMap", LoadHeightMap));
+    loaders.push_back(TableLoader("HeightMapThreshold",
+                                  LoadHeightMapThreshold));
 }
 
 SQLiteDbms::~SQLiteDbms()

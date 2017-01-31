@@ -169,4 +169,10 @@ bool LoadBodyPartResources(ResultSet * result);
 /// @brief Function used to load the attack properties of body parts.
 bool LoadBodyPartWeapon(ResultSet * result);
 
+/// @brief Loads the height maps.
+bool LoadHeightMap(ResultSet * result);
+
+/// @brief Loads the height maps thresholds.
+bool LoadHeightMapThreshold(ResultSet * result);
+
 ///@}

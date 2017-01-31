@@ -50,6 +50,7 @@
 #include "formatter.hpp"
 #include "terrain.hpp"
 #include "bodyPart.hpp"
+#include "heightMapper.hpp"
 
 class Direction;
 
@@ -207,9 +208,12 @@ public:
     /// Map of buildings schematic.
     std::map<int, Building> mudBuildings;
     /// Map of buildings schematic.
-    std::map<unsigned int, std::shared_ptr<Terrain>> mudTerrains;
+    std::map<unsigned int, std::shared_ptr<terrain::Terrain>> mudTerrains;
     /// List of all the bodyparts.
-    std::vector<std::shared_ptr<BodyPart>> mudBodyParts;
+    std::map<unsigned int, std::shared_ptr<BodyPart>> mudBodyParts;
+    /// List of all the bodyparts.
+    std::map<unsigned int, std::shared_ptr<HeightMapper>> mudHeightMappers;
+
 
     /// @brief Update all the player on the database.
     /// @return <b>True</b> if the operations succeeded,<br>
@@ -303,13 +307,19 @@ public:
     bool addTravelPoint(Room * source, Room * target);
 
     /// Add a command to the mud.
-    void addCommand(std::shared_ptr<Command> command);
+    void addCommand(const std::shared_ptr<Command> & command);
 
     /// Add a building to the mud.
     bool addBuilding(Building & building);
 
     /// Add a terrain to the mud.
-    bool addTerrain(std::shared_ptr<Terrain> terrain);
+    bool addTerrain(const std::shared_ptr<terrain::Terrain> & terrain);
+
+    /// Add a body part to the mud.
+    bool addBodyPart(const std::shared_ptr<BodyPart> & bodyPart);
+
+    /// @brief Add an height map.
+    bool addHeightMapper(const std::shared_ptr<HeightMapper> & heightMap);
     ///@}
 
     /// @defgroup GlobalFind Global Find Functions
@@ -387,10 +397,12 @@ public:
     Building * findBuilding(int vnum);
 
     /// Find a terrain given its vnum.
-    std::shared_ptr<Terrain> findTerrain(unsigned int vnum);
+    std::shared_ptr<terrain::Terrain> findTerrain(unsigned int vnum);
 
     /// Find a body part.
     std::shared_ptr<BodyPart> findBodyPart(unsigned int vnum);
+
+    std::shared_ptr<HeightMapper> findHeightMapper(const unsigned int & vnum);
     ///@}
 
     /// @brief Main processing loop.

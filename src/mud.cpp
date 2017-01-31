@@ -369,7 +369,7 @@ bool Mud::addTravelPoint(Room * source, Room * target)
     return mudTravelPoints.insert(std::make_pair(source, target)).second;
 }
 
-void Mud::addCommand(std::shared_ptr<Command> command)
+void Mud::addCommand(const std::shared_ptr<Command> & command)
 {
     mudCommands.push_back(command);
 }
@@ -379,9 +379,20 @@ bool Mud::addBuilding(Building & building)
     return mudBuildings.insert(std::make_pair(building.vnum, building)).second;
 }
 
-bool Mud::addTerrain(std::shared_ptr<Terrain> terrain)
+bool Mud::addTerrain(const std::shared_ptr<terrain::Terrain> & terrain)
 {
     return mudTerrains.insert(std::make_pair(terrain->vnum, terrain)).second;
+}
+
+bool Mud::addBodyPart(const std::shared_ptr<BodyPart> & bodyPart)
+{
+    return mudBodyParts.insert(std::make_pair(bodyPart->vnum, bodyPart)).second;
+}
+
+bool Mud::addHeightMapper(const std::shared_ptr<HeightMapper> & heightMap)
+{
+    return mudHeightMappers.insert(std::make_pair(heightMap->vnum,
+                                                  heightMap)).second;
 }
 
 Player * Mud::findPlayer(const std::string & name)
@@ -639,28 +650,26 @@ Building * Mud::findBuilding(int vnum)
     return nullptr;
 }
 
-std::shared_ptr<Terrain> Mud::findTerrain(unsigned int vnum)
+std::shared_ptr<terrain::Terrain> Mud::findTerrain(unsigned int vnum)
 {
-    for (auto it : mudTerrains)
-    {
-        if (it.second->vnum == vnum)
-        {
-            return it.second;
-        }
-    }
-    return nullptr;
+    auto it = mudTerrains.find(vnum);
+    if (it == mudTerrains.end()) return nullptr;
+    return it->second;
 }
 
 std::shared_ptr<BodyPart> Mud::findBodyPart(unsigned int vnum)
 {
-    for (auto bodyPart : mudBodyParts)
-    {
-        if (bodyPart->vnum == vnum)
-        {
-            return bodyPart;
-        }
-    }
-    return nullptr;
+    auto it = mudBodyParts.find(vnum);
+    if (it == mudBodyParts.end()) return nullptr;
+    return it->second;
+}
+
+
+std::shared_ptr<HeightMapper> Mud::findHeightMapper(const unsigned int & vnum)
+{
+    auto it = mudHeightMappers.find(vnum);
+    if (it == mudHeightMappers.end()) return nullptr;
+    return it->second;
 }
 
 bool Mud::runMud()
