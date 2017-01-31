@@ -421,7 +421,7 @@ std::string Area::drawASCIIFov(Room * centerRoom, const int & radius)
                         auto up = room->findExit(Direction::Up);
                         auto down = room->findExit(Direction::Down);
                         // VI  - WALKABLE
-                        tile = ".";
+                        tile = room->terrain->symbol;
                         // V   - OPEN DOOR
                         Item * door = room->findDoor();
                         if (door != nullptr)

@@ -653,8 +653,6 @@ bool DoServer(Character * character, ArgumentHandler & /*args*/)
     msg += ToString(Mud::instance().mudItems.size()) + "\n";
     msg += "    Corpses     : ";
     msg += ToString(Mud::instance().mudCorpses.size()) + "\n";
-    msg += "    Continents  : ";
-    msg += ToString(Mud::instance().mudContinents.size()) + "\n";
     msg += "    Areas       : ";
     msg += ToString(Mud::instance().mudAreas.size()) + "\n";
     msg += "    Rooms       : ";

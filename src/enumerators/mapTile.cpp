@@ -25,7 +25,7 @@
 MapTile::MapTile(const unsigned int & _mapTile) :
     mapTile()
 {
-    if (_mapTile == 0) mapTile = Void;
+    if (_mapTile == static_cast<unsigned int>(Void)) mapTile = Void;
     else if (_mapTile == 1) mapTile = DeepWater;
     else if (_mapTile == 2) mapTile = ShallowWater;
     else if (_mapTile == 3) mapTile = Coast;

@@ -1,4 +1,4 @@
-/// @file   heightMapper.hpp
+/// @file   heightMap.hpp
 /// @author Enrico Fraccaroli
 /// @date   Jan 05 2017
 /// @copyright
@@ -30,7 +30,7 @@ class Terrain;
 }
 
 /// @brief Class which maps the values of an height-map to types of terrain.
-class HeightMapper
+class HeightMap
 {
 public:
     /// The vnum of the mapper.
@@ -38,19 +38,16 @@ public:
     /// The name of the mapper.
     std::string name;
     /// The current thresholds.
-    std::map<MapTile, double> thresholdMap;
+    std::vector<std::pair<double, std::shared_ptr<terrain::Terrain>>> thresholds;
 
     /// @brief Constructor.
-    HeightMapper(const unsigned int & _vnum,
+    HeightMap(const unsigned int & _vnum,
                  const std::string & _name);
-
-    /// @brief Reset the thresholds to default values.
-    void reset();
 
     void addThreshold(const std::shared_ptr<terrain::Terrain> & terrain,
                       const double & threshold);
 
-    /// @brief Returns the MapTile associated with the given height w.r.t.
+    /// @brief Returns the terrain associated with the given height w.r.t.
     /// the current thresholds.
-    MapTile getHeightMap(const double & height);
+    std::shared_ptr<terrain::Terrain> getTerrain(const double & height);
 };

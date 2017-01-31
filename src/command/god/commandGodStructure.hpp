@@ -50,7 +50,4 @@ bool DoAreaInfo(Character * character, ArgumentHandler & args);
 /// List all the areas.
 bool DoAreaList(Character * character, ArgumentHandler & args);
 
-/// List all the continents.
-bool DoContinentList(Character * character, ArgumentHandler & args);
-
 /// @}

@@ -169,77 +169,44 @@ bool DoGenerateMap(Character * character, ArgumentHandler & args)
 {
     (void) character;
     (void) args;
-//    MapGeneratorConfiguration configuration;
-//    HeightMapper heightMapper;
-//    if (args.size() >= 1)
-//    {
-//        if (IsNumber(args[0].getContent()))
-//        {
-//            configuration.width = ToNumber<int>(args[0].getContent());
-//        }
-//    }
-//    if (args.size() >= 2)
-//    {
-//        if (IsNumber(args[1].getContent()))
-//        {
-//            configuration.height = ToNumber<int>(args[1].getContent());
-//        }
-//    }
-//    if (args.size() >= 3)
-//    {
-//        if (IsNumber(args[2].getContent()))
-//        {
-//            configuration.numMountains = ToNumber<int>(args[2].getContent());
-//        }
-//    }
-//    if (args.size() >= 4)
-//    {
-//        if (IsNumber(args[3].getContent()))
-//        {
-//            configuration.minMountainRadius = ToNumber<int>(
-//                args[3].getContent());
-//        }
-//    }
-//    if (args.size() >= 5)
-//    {
-//        if (IsNumber(args[4].getContent()))
-//        {
-//            configuration.maxMountainRadius = ToNumber<int>(
-//                args[4].getContent());
-//        }
-//    }
-//    if (args.size() >= 6)
-//    {
-//        if (IsNumber(args[5].getContent()))
-//        {
-//            configuration.numRivers = ToNumber<int>(args[5].getContent());
-//        }
-//    }
-//    if (args.size() >= 7)
-//    {
-//        if (IsNumber(args[6].getContent()))
-//        {
-//            configuration.minRiverDistance = ToNumber<int>(
-//                args[6].getContent());
-//        }
-//    }
-//    // Instantiate the map generator.
-//    MapGenerator mapGenerator(configuration, heightMapper);
-//    // Generate the map.
-//    auto map = mapGenerator.generateMap();
-//    // Draw the map.
-//    std::string drawnMap;
-//    for (int y = 0; y < map.getHeight(); ++y)
-//    {
-//        for (int x = 0; x < map.getWidth(); ++x)
-//        {
-//            drawnMap += map.get(x, y).getTile();
-//        }
-//        drawnMap += "\n";
-//    }
-//    // First send the configuration.
-//    character->sendMsg(configuration.toString());
-//    character->sendMsg(drawnMap);
-//    character->sendMsg(Formatter::reset());
+    std::shared_ptr<HeightMap> heightMap = nullptr;
+    if (args.size() == 1)
+    {
+        heightMap = Mud::instance().findHeightMap(
+            ToNumber<unsigned int>(args[0].getContent()));
+    }
+    if (heightMap == nullptr)
+    {
+        character->sendMsg("You must provide a valid height map vnum:");
+        for (auto it : Mud::instance().mudHeightMaps)
+        {
+            character->sendMsg("    [%s] %s\n", it.first, it.second->name);
+        }
+        return false;
+    }
+    MapGeneratorConfiguration configuration;
+    // Instantiate the map generator.
+    MapGenerator mapGenerator(configuration, heightMap);
+    // Generate the map.
+    Map2D<MapCell> map;
+    if (!mapGenerator.generateMap(map))
+    {
+        character->sendMsg("Error while generating the map.");
+        return false;
+    }
+    // Draw the map.
+    std::string drawnMap;
+    for (int y = 0; y < map.getHeight(); ++y)
+    {
+        for (int x = 0; x < map.getWidth(); ++x)
+        {
+            drawnMap += map.get(x, y).getTile();
+        }
+        drawnMap += "\n";
+    }
+    // First send the configuration.
+    character->sendMsg(configuration.toString());
+    character->sendMsg(drawnMap);
+    character->sendMsg(Formatter::reset());
     return true;
 }

@@ -106,10 +106,6 @@ bool LoadAreaList(ResultSet * result);
 /// @brief Function used to retrieve the writings
 bool LoadWriting(ResultSet * result);
 
-/// @brief Function used to retrieve information about all the
-///         continents of the mud.
-bool LoadContinent(ResultSet * result);
-
 /// @brief Function used to retrieve information about all the materials.
 bool LoadMaterial(ResultSet * result);
 
@@ -156,6 +152,12 @@ bool LoadCurrency(ResultSet * result);
 
 /// @brief Function used to load terrains.
 bool LoadTerrain(ResultSet * result);
+
+/// @brief Loads the liquids which fill the terrains.
+bool LoadTerrainLiquid(ResultSet * result);
+
+/// @brief Function used to load terrains liquid sources.
+bool LoadTerrainLiquidSources(ResultSet * result);
 
 /// @brief Function used to load body parts.
 bool LoadBodyPart(ResultSet * result);

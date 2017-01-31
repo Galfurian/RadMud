@@ -154,10 +154,6 @@ void LoadGodCommands()
         DoAreaList, "area_list", "",
         "List all the areas.",
         true, true, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoContinentList, "continent_list", "",
-        "List all the continents.",
-        true, true, false));
 
     // ////////////////////////////////////////////////////////////////////////
     // COMMAND GOD ITEM

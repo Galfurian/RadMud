@@ -44,7 +44,7 @@ class Liquid
 {
 public:
     /// Virtual number.
-    int vnum;
+    unsigned int vnum;
     /// The type of liquid.
     LiquidType type;
     /// Liquid's name.

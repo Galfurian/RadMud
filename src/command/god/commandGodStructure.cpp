@@ -421,8 +421,3 @@ bool DoAreaList(Character * character, ArgumentHandler & /*args*/)
     character->sendMsg(table.getTable());
     return true;
 }
-
-bool DoContinentList(Character * /*character*/, ArgumentHandler & /*args*/)
-{
-    return true;
-}

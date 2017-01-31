@@ -1,4 +1,4 @@
-/// @file   heightMapper.cpp
+/// @file   heightMap.cpp
 /// @author Enrico Fraccaroli
 /// @date   Jan 05 2017
 /// @copyright
@@ -19,45 +19,40 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "heightMapper.hpp"
+#include "heightMap.hpp"
+#include <algorithm>
 
-HeightMapper::HeightMapper(const unsigned int & _vnum,
+HeightMap::HeightMap(const unsigned int & _vnum,
                            const std::string & _name) :
     vnum(_vnum),
     name(_name),
-    thresholdMap()
+    thresholds()
 {
-    this->reset();
+    // Nothing to do.
 }
 
-void HeightMapper::reset()
-{
-    thresholdMap[MapTile::DeepWater] = 10;
-    thresholdMap[MapTile::ShallowWater] = 20;
-    thresholdMap[MapTile::Coast] = 25;
-    thresholdMap[MapTile::Plain] = 70;
-    thresholdMap[MapTile::Hill] = 85;
-    thresholdMap[MapTile::Mountain] = 95;
-    thresholdMap[MapTile::HighMountain] = 100;
-}
-
-
-void HeightMapper::addThreshold(
+void HeightMap::addThreshold(
     const std::shared_ptr<terrain::Terrain> & terrain,
     const double & threshold)
 {
-    (void) terrain;
-    (void) threshold;
+    thresholds.emplace_back(std::make_pair(threshold, terrain));
+    std::sort(thresholds.begin(), thresholds.end(), [](
+        const std::pair<double, std::shared_ptr<terrain::Terrain>> & left,
+        const std::pair<double, std::shared_ptr<terrain::Terrain>> & right)
+    {
+        return left.first < right.first;
+    });
 }
 
-MapTile HeightMapper::getHeightMap(const double & height)
+std::shared_ptr<terrain::Terrain> HeightMap::getTerrain(
+    const double & height)
 {
-    for (auto it : thresholdMap)
+    for (auto it : thresholds)
     {
-        if (height <= it.second)
+        if (height <= it.first)
         {
-            return it.first;
+            return it.second;
         }
     }
-    return MapTile::Void;
+    return nullptr;
 }

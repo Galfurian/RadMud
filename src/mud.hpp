@@ -41,7 +41,6 @@
 #include "material.hpp"
 #include "area.hpp"
 #include "room.hpp"
-#include "continent.hpp"
 #include "mobile.hpp"
 #include "player.hpp"
 #include "command.hpp"
@@ -50,7 +49,7 @@
 #include "formatter.hpp"
 #include "terrain.hpp"
 #include "bodyPart.hpp"
-#include "heightMapper.hpp"
+#include "heightMap.hpp"
 
 class Direction;
 
@@ -185,8 +184,6 @@ public:
     std::map<int, Writing *> mudWritings;
     /// List of all the corpses.
     std::map<int, Item *> mudCorpses;
-    /// List of all the continents.
-    std::map<int, Continent *> mudContinents;
     /// List of all the materials.
     std::map<int, Material *> mudMaterials;
     /// List of all the professions.
@@ -194,7 +191,7 @@ public:
     /// List of all the productions.
     std::map<int, Production *> mudProductions;
     /// List of all the liquids.
-    std::map<int, Liquid *> mudLiquids;
+    std::map<unsigned int, Liquid *> mudLiquids;
     /// List of all the travelling points.
     std::map<Room *, Room *> mudTravelPoints;
     /// Blocked IP addresses.
@@ -212,7 +209,7 @@ public:
     /// List of all the bodyparts.
     std::map<unsigned int, std::shared_ptr<BodyPart>> mudBodyParts;
     /// List of all the bodyparts.
-    std::map<unsigned int, std::shared_ptr<HeightMapper>> mudHeightMappers;
+    std::map<unsigned int, std::shared_ptr<HeightMap>> mudHeightMaps;
 
 
     /// @brief Update all the player on the database.
@@ -288,9 +285,6 @@ public:
     /// Add the given writing to the mud.
     bool addWriting(Writing * writing);
 
-    /// Add the given continent to the mud.
-    bool addContinent(Continent * continent);
-
     /// Add the given material to the mud.
     bool addMaterial(Material * material);
 
@@ -319,7 +313,7 @@ public:
     bool addBodyPart(const std::shared_ptr<BodyPart> & bodyPart);
 
     /// @brief Add an height map.
-    bool addHeightMapper(const std::shared_ptr<HeightMapper> & heightMap);
+    bool addHeightMap(const std::shared_ptr<HeightMap> & heightMap);
     ///@}
 
     /// @defgroup GlobalFind Global Find Functions
@@ -366,9 +360,6 @@ public:
     /// Find a corpse given its vnum.
     Item * findCorpse(int vnum);
 
-    /// Find a continent given its vnum.
-    Continent * findContinent(int vnum);
-
     /// Find a material given its vnum.
     Material * findMaterial(int vnum);
 
@@ -385,7 +376,7 @@ public:
     Production * findProduction(std::string name);
 
     /// Find a liquid given its vnum.
-    Liquid * findLiquid(int vnum);
+    Liquid * findLiquid(const unsigned int & vnum);
 
     /// Find the destination room of a travel point, given its starting room.
     Room * findTravelPoint(Room * room);
@@ -402,7 +393,7 @@ public:
     /// Find a body part.
     std::shared_ptr<BodyPart> findBodyPart(unsigned int vnum);
 
-    std::shared_ptr<HeightMapper> findHeightMapper(const unsigned int & vnum);
+    std::shared_ptr<HeightMap> findHeightMap(const unsigned int & vnum);
     ///@}
 
     /// @brief Main processing loop.

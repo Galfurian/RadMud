@@ -38,8 +38,6 @@ class Item;
 
 class Area;
 
-class Continent;
-
 /// Used to determine the flag of the room.
 using RoomFlag = enum class RoomFlags
 {
@@ -58,8 +56,6 @@ public:
     int vnum;
     /// The area where is located the room.
     Area * area;
-    /// The continent where is located the room.
-    Continent * continent;
     /// The current room coordinates.
     Coordinates coord;
     /// The type of terrain of the room.
@@ -76,6 +72,8 @@ public:
     CharacterContainer characters;
     /// Integer that describe the flags of the room.
     unsigned int flags;
+    /// The liquid which fills the room.
+    std::pair<Liquid *, unsigned int> liquid;
 
     /// @brief Constructor.
     Room();
@@ -85,7 +83,7 @@ public:
 
     /// @brief Function used to check the correctness of the room.
     /// @param complete If set to true, the function check if the room has
-    ///                  been placed inside an area or a continent.
+    ///                  been placed inside an area.
     /// @return <b>True</b> if the room values are correct,<br>
     ///         <b>False</b> otherwise.
     bool check(bool complete = false);

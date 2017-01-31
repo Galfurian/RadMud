@@ -35,7 +35,6 @@ SQLiteDbms::SQLiteDbms() :
     loaders.push_back(TableLoader("News", LoadNews));
     loaders.push_back(TableLoader("Terrain", LoadTerrain));
     loaders.push_back(TableLoader("Material", LoadMaterial));
-    loaders.push_back(TableLoader("Continent", LoadContinent));
     loaders.push_back(TableLoader("Area", LoadArea));
     loaders.push_back(TableLoader("Room", LoadRoom));
     loaders.push_back(TableLoader("Exit", LoadExit));
@@ -83,6 +82,10 @@ SQLiteDbms::SQLiteDbms() :
     loaders.push_back(TableLoader("HeightMap", LoadHeightMap));
     loaders.push_back(TableLoader("HeightMapThreshold",
                                   LoadHeightMapThreshold));
+    loaders.push_back(TableLoader("TerrainLiquid",
+                                  LoadTerrainLiquid));
+    loaders.push_back(TableLoader("TerrainLiquidSources",
+                                  LoadTerrainLiquidSources));
 }
 
 SQLiteDbms::~SQLiteDbms()

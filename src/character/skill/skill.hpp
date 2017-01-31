@@ -77,7 +77,7 @@ public:
     /// @brief Destructor.
     ~Skill();
 
-    /// @brief Check the correctness of the continent.
+    /// @brief Check the correctness of the skill.
     /// @return <b>True</b> if it has correct values,<br>
     ///         <b>False</b> otherwise.
     bool check();

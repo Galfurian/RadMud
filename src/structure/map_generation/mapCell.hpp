@@ -21,20 +21,24 @@
 
 #pragma once
 
+#include "terrain.hpp"
 #include "mapTile.hpp"
 #include "map2D.hpp"
+#include "room.hpp"
 #include <vector>
 
 /// @brief Holds information about the cell of an automatically generated map.
 class MapCell
 {
 public:
+    /// The room associated with the map cell.
+    Room * room;
     /// The cell coordinates.
     Coordinates coordinates;
     /// The height of the cell.
     double height;
     /// Associated tile.
-    MapTile mapTile;
+    std::shared_ptr<terrain::Terrain> terrain;
     /// List of neighbours.
     std::vector<MapCell *> neighbours;
 

@@ -49,6 +49,16 @@ public:
     }
 
     /// @brief Constructor.
+    Map2D(const int & _width, const int & _height) :
+        width(_width),
+        height(_height),
+        nullValue(),
+        data()
+    {
+        // Nothing to do.
+    }
+
+    /// @brief Constructor.
     Map2D(int _width, int _height, T _nullValue) :
         width(_width),
         height(_height),
@@ -91,6 +101,18 @@ public:
     ~Map2D()
     {
         // Nothing to do.
+    }
+
+    /// @brief Allows to set the width of the map.
+    void setWidth(const int & _width)
+    {
+        width = _width;
+    }
+
+    /// @brief Allows to set the height of the map.
+    void setHeight(const int & _height)
+    {
+        height = _height;
     }
 
     /// @brief Provide the width of the map.

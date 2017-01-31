@@ -32,7 +32,6 @@
 Room::Room() :
     vnum(),
     area(),
-    continent(),
     coord(),
     terrain(),
     name(),
@@ -40,7 +39,8 @@ Room::Room() :
     exits(),
     items(),
     characters(),
-    flags()
+    flags(),
+    liquid()
 {
     // Nothing to do.
 }
@@ -71,8 +71,7 @@ bool Room::check(bool complete)
     assert(vnum > 0);
     if (complete)
     {
-        assert((area != nullptr) || (continent != nullptr));
-        assert(!((area != nullptr) && (continent != nullptr)));
+        assert(area != nullptr);
     }
     assert(coord.x <= 100);
     assert(coord.y <= 100);
@@ -556,17 +555,6 @@ std::string Room::getLook(Character * actor)
             {
                 output += area->drawASCIIFov(this,
                                              actor->getViewDistance());
-            }
-        }
-        else if (continent != nullptr)
-        {
-            output += Formatter::doClearMap();
-            for (auto layer : continent->drawFov(this,
-                                                 actor->getViewDistance()))
-            {
-                output += Formatter::doDrawMap();
-                output += layer;
-                output += Formatter::dontDrawMap();
             }
         }
     }

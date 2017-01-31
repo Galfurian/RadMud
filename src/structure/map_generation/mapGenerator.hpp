@@ -24,7 +24,7 @@
 #include "mapCell.hpp"
 #include "map2D.hpp"
 #include "utils.hpp"
-#include "heightMapper.hpp"
+#include "heightMap.hpp"
 #include "mapGeneratorConfiguration.hpp"
 
 #include <memory>
@@ -32,38 +32,46 @@
 /// @brief Automatic generator of maps.
 class MapGenerator
 {
-public:
+private:
     /// Generator configuration.
     MapGeneratorConfiguration configuration;
-    /// Height mapper.
-    HeightMapper heightMapper;
+    /// Height map.
+    std::shared_ptr<HeightMap> heightMap;
+
+public:
 
     /// @brief Constructor.
     MapGenerator(const MapGeneratorConfiguration & _configuration,
-                 const HeightMapper & _heightMapper);
+                 const std::shared_ptr<HeightMap> & _heightMap);
 
     /// @brief Generates a new map.
-    Map2D<MapCell> generateMap();
+    bool generateMap(Map2D<MapCell> & map);
 
 private:
-    /// @brief Creates a mountain on the map.
-    void dropMountain(Map2D<MapCell> & map);
+    /// @brief Creates the general structure of the map.
+    bool generateStructure(Map2D<MapCell> & map);
+
+    /// @brief Creates the mountains on the map.
+    bool generateMountains(Map2D<MapCell> & map);
 
     /// @brief Normalizes the map with values between a specific range
-    /// according to the HeightMapper.
-    void normalizeMap(Map2D<MapCell> & map);
+    /// according to the HeightMap.
+    bool normalizeMap(Map2D<MapCell> & map);
+
+    /// @brief Apply the terrain on the map based on the height map.
+    bool applyTerrain(Map2D<MapCell> & map);
+
+    /// @brief Generates the rooms for the map.
+    bool generateRooms(Map2D<MapCell> & map);
 
     /// @brief Creates the rivers on the map.
-    void dropRivers(Map2D<MapCell> & map);
+    bool generateRivers(Map2D<MapCell> & map);
 
     /// @brief Add the forests to the map.
     void addForests(Map2D<MapCell> & map);
 
     /// @brief Clears the map.
     void clearMap(Map2D<MapCell> & map);
-
-    /// @brief Sets to each cell the tile based on the HeightMapper.
-    void applyMapTiles(Map2D<MapCell> & map);
 
     /// @brief Normalizes the value from the range (LbFrom, UbFrom) to the
     /// range (LbTo, UbTo).

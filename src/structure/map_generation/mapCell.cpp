@@ -22,9 +22,10 @@
 #include "mapCell.hpp"
 
 MapCell::MapCell() :
+    room(),
     coordinates(),
     height(),
-    mapTile(MapTile::Void),
+    terrain(),
     neighbours()
 {
     // Nothing to do.
@@ -69,7 +70,15 @@ MapCell * MapCell::findLowestNearbyCell()
 
 std::string MapCell::getTile() const
 {
-    return mapTile.toSymbol();
+    if (room != nullptr)
+    {
+        if (room->liquid.first != nullptr)
+        {
+            return "w";
+        }
+        return room->terrain->symbol;
+    }
+    return "X";
 }
 
 bool MapCell::operator==(const MapCell & other) const

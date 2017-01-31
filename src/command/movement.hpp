@@ -34,7 +34,7 @@ void LoadMovementCommands();
 /// Execute character movement.
 bool DoDirection(Character * character, Direction direction);
 
-/// Allow the character to mote the continental map.
+/// Allow the character to move between areas.
 bool DoTravel(Character * character, ArgumentHandler & args);
 
 /// Stop the current action of the character.
