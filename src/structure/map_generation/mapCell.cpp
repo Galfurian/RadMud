@@ -76,6 +76,10 @@ std::string MapCell::getTile() const
         {
             return "w";
         }
+        if (HasFlag(room->flags, RoomFlags::SpawnTree))
+        {
+            return "t";
+        }
         return room->terrain->symbol;
     }
     return "X";

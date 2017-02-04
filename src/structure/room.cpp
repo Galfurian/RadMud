@@ -871,7 +871,7 @@ std::string GetRoomFlagString(unsigned int flags)
     if (HasFlag(flags, RoomFlag::Rent)) flagList += "|Rent";
     if (HasFlag(flags, RoomFlag::Peaceful)) flagList += "|Peaceful";
     if (HasFlag(flags, RoomFlag::TravelPoint)) flagList += "|TravelPoint";
-    if (HasFlag(flags, RoomFlag::SpawnPoint)) flagList += "|SpawnPoint";
+    if (HasFlag(flags, RoomFlag::SpawnTree)) flagList += "|SpawnTree";
     flagList += "|";
     return flagList;
 }

@@ -44,7 +44,7 @@ using RoomFlag = enum class RoomFlags
     Rent = 1,           ///< A player can rent and disconnect.
     Peaceful = 2,       ///< Everyone here can't be harmful.
     TravelPoint = 4,    ///< From here a player can travel to another location.
-    SpawnPoint = 8      ///< It is a spawn room for players.
+    SpawnTree = 8       ///< The room spawns trees.
 };
 
 /// @brief Holds details about room.

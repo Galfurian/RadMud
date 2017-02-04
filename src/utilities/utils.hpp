@@ -305,6 +305,25 @@ ValueType TRandReal(const ValueType & lowerBound, const ValueType & upperBound)
     return distribution(generator);
 }
 
+
+/// @brief Normalizes the value from a range to another.
+/// @param value            The value that has to be normalized.
+/// @param LoweBoundFrom    The lower bound of the original range.
+/// @param UpperBoundFrom   The upper bound of the original range.
+/// @param LoweBoundTo      The lower bound of the destination range.
+/// @param UpperBoundTo     The upper bound of the destination range.
+/// @return The normalized value.
+template<typename ValueType>
+ValueType Normalize(ValueType value,
+                    ValueType LoweBoundFrom,
+                    ValueType UpperBoundFrom,
+                    ValueType LoweBoundTo,
+                    ValueType UpperBoundTo)
+{
+    return (((UpperBoundTo - LoweBoundTo) * (value - LoweBoundFrom)) /
+            ((UpperBoundFrom - LoweBoundFrom))) + LoweBoundTo;
+}
+
 /// @brief Check if the string is a number.
 /// @param source The string to check.
 /// @return <b>True</b> if the string it's a number, <b>False</b> otherwise.

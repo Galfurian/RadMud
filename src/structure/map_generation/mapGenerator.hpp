@@ -68,22 +68,8 @@ private:
     bool generateRivers(Map2D<MapCell> & map);
 
     /// @brief Add the forests to the map.
-    void addForests(Map2D<MapCell> & map);
+    bool generateForests(Map2D<MapCell> & map);
 
     /// @brief Clears the map.
     void clearMap(Map2D<MapCell> & map);
-
-    /// @brief Normalizes the value from the range (LbFrom, UbFrom) to the
-    /// range (LbTo, UbTo).
-    /// @param value  The value that has to be normalized.
-    /// @param LbFrom The lower bound of the original range.
-    /// @param UbFrom The upper bound of the original range.
-    /// @param LbTo   The lower bound of the destiantion range.
-    /// @param UbTo   The upper bound of the destiantion range.
-    /// @return The normalized value.
-    inline double normalize(double value,
-                            double LbFrom,
-                            double UbFrom,
-                            double LbTo,
-                            double UbTo) const;
 };

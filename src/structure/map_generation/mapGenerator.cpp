@@ -39,14 +39,18 @@ bool MapGenerator::generateMap(Map2D<MapCell> & map)
         Logger::log(LogLevel::Error, "While generating the structure.");
         return false;
     }
-    // Drop the rivers.
+    // Generate the rivers.
     if (!this->generateRivers(map))
     {
         Logger::log(LogLevel::Error, "While generating the rivers.");
         return false;
     }
-//    // Add the forests.
-//    this->addForests(map);
+    // Generate the forests.
+    if (!this->generateForests(map))
+    {
+        Logger::log(LogLevel::Error, "While generating the forests.");
+        return false;
+    }
     return true;
 }
 
@@ -162,11 +166,11 @@ bool MapGenerator::normalizeMap(Map2D<MapCell> & map)
         for (int y = 0; y < map.getHeight(); ++y)
         {
             auto cell = &map.get(x, y);
-            cell->height = this->normalize(cell->height,
-                                           minHeight,
-                                           maxHeight,
-                                           0.0,
-                                           100.0);
+            cell->height = Normalize(cell->height,
+                                     minHeight,
+                                     maxHeight,
+                                     0.0,
+                                     100.0);
         }
     }
     return true;
@@ -223,7 +227,7 @@ bool MapGenerator::generateRivers(Map2D<MapCell> & map)
     // points and if it is a mountain.
     auto IsSuitable = [&](MapCell * cell)
     {
-        if(cell->terrain->liquidSources.empty())
+        if (cell->terrain->liquidSources.empty())
         {
             return false;
         }
@@ -306,96 +310,112 @@ bool MapGenerator::generateRivers(Map2D<MapCell> & map)
     return true;
 }
 
-void MapGenerator::addForests(Map2D<MapCell> & map)
+bool MapGenerator::generateForests(Map2D<MapCell> & map)
 {
-    (void) map;
-//    // List of locations for forests.
-//    std::list<MapCell *> forestDropPoints;
-//    // Lamba used to check if a cell is far away from pre-existing drop points
-//    // and if it is nearby a source of water.
-//    auto IsSuitable = [&](MapCell * cell)
-//    {
-//        // Check if the cell is a Plain|Hill|Mountain.
-//        if ((cell->mapTile != MapTile::Plain) &&
-//            (cell->mapTile != MapTile::Hill) &&
-//            (cell->mapTile != MapTile::Mountain))
-//        {
-//            return false;
-//        }
-//        // Check the distance from another forest drop point.
-//        for (auto point : forestDropPoints)
-//        {
-//            auto distance = Area::getDistance(cell->coordinates,
-//                                              point->coordinates);
-//            if (distance <= configuration.minForestDistance)
-//            {
-//                return false;
-//            }
-//        }
-//        return true;
-//    };
-//    // Retrieve all the starting points for rivers.
-//    for (auto x = 0; x < map.getWidth(); ++x)
-//    {
-//        for (auto y = 0; y < map.getHeight(); ++y)
-//        {
-//            auto cell = &map.get(x, y);
-//            // Check if it is a suitable cell.
-//            if (IsSuitable(cell))
-//            {
-//                forestDropPoints.emplace_back(cell);
-//            }
-//        }
-//    }
-//    std::function<void(int, int, int &)> FloodFill;
-//    FloodFill = [&](int x, int y, int iterationLeft)
-//    {
-//        auto cell = &map.get(x, y);
-//        if ((cell->mapTile == MapTile::Forest) || (iterationLeft == 0))
-//        {
-//            return;
-//        }
-//        if (cell->mapTile == MapTile::Plain)
-//        {
-//            if (TRandInteger<int>(0, 100) < 20) return;
-//        }
-//        else if (cell->mapTile == MapTile::Hill)
-//        {
-//            if (TRandInteger<int>(0, 100) < 40) return;
-//        }
-//        else if (cell->mapTile == MapTile::Mountain)
-//        {
-//            if (TRandInteger<int>(0, 100) < 65) return;
-//        }
-//        else
-//        {
-//            return;
-//        }
-//        cell->mapTile = MapTile::Forest;
-//        iterationLeft--;
-//        FloodFill(std::max(x - 1, 0), y, iterationLeft);
-//        FloodFill(std::min(x + 1, map.getWidth() - 1), y, iterationLeft);
-//        FloodFill(x, std::max(y - 1, 0), iterationLeft);
-//        FloodFill(x, std::min(y + 1, map.getHeight() - 1), iterationLeft);
-//    };
-//    auto maxForestExpansion = TRandInteger(3,
-//                                           configuration.minForestDistance - 1);
-//    // Number of dropped rivers.
-//    auto iterations = std::min(static_cast<size_t>(configuration.numForests),
-//                               forestDropPoints.size());
-//    for (unsigned int it = 0; it < iterations; ++it)
-//    {
-//        // Pick a random forest drop point.
-//        auto dpIt = forestDropPoints.begin();
-//        std::advance(dpIt,
-//                     TRandInteger<size_t>(0, forestDropPoints.size() - 1));
-//        MapCell * cell = (*dpIt);
-//        forestDropPoints.erase(dpIt);
-//        // Create the forest.
-//        FloodFill(cell->coordinates.x,
-//                  cell->coordinates.y,
-//                  maxForestExpansion);
-//    }
+    // List of locations for forests.
+    std::list<MapCell *> forestDropPoints;
+    // Lamba used to check if a cell is far away from pre-existing drop points
+    // and if it is nearby a source of water.
+    auto IsSuitable = [&](MapCell * cell)
+    {
+        // Check if the cell can host a forest.
+        if (!HasFlag(cell->terrain->generationFlags,
+                     terrain::TerrainGenerationFlags::CanHostForest))
+        {
+            return false;
+        }
+        // Check the distance from another forest drop point.
+        for (auto point : forestDropPoints)
+        {
+            auto distance = Area::getDistance(cell->coordinates,
+                                              point->coordinates);
+            if (distance <= configuration.minForestDistance)
+            {
+                return false;
+            }
+        }
+        return true;
+    };
+    // Retrieve all the starting points for rivers.
+    for (auto x = 0; x < map.getWidth(); ++x)
+    {
+        for (auto y = 0; y < map.getHeight(); ++y)
+        {
+            auto cell = &map.get(x, y);
+            // Check if it is a suitable cell.
+            if (IsSuitable(cell))
+            {
+                forestDropPoints.emplace_back(cell);
+            }
+        }
+    }
+    std::function<bool(const int &, const int &, const int &, int)> FloodFill;
+    FloodFill = [&](const int & x,
+                    const int & y,
+                    const int & iterationTotal,
+                    int iterationLeft)
+    {
+        auto cell = &map.get(x, y);
+        auto room = map.get(x, y).room;
+        if (room == nullptr)
+        {
+            return false;
+        }
+        if (iterationLeft == 0) return true;
+        if (HasFlag(room->flags, RoomFlags::SpawnTree)) return true;
+        // Check if the cell can host a forest.
+        if (!HasFlag(cell->terrain->generationFlags,
+                     terrain::TerrainGenerationFlags::CanHostForest))
+        {
+            return true;
+        }
+        auto normalized = Normalize(iterationLeft, 0, iterationTotal, 0,
+                                    100);
+        if (TRandInteger<int>(0, 100) >= normalized) return true;
+        SetFlag(&room->flags, RoomFlags::SpawnTree);
+        iterationLeft--;
+        if (!FloodFill(std::max(x - 1, 0), y, iterationTotal, iterationLeft))
+        {
+            return false;
+        }
+        if (!FloodFill(std::min(x + 1, map.getWidth() - 1), y,
+                       iterationTotal,
+                       iterationLeft))
+        {
+            return false;
+        }
+        if (!FloodFill(x, std::max(y - 1, 0), iterationTotal, iterationLeft))
+        {
+            return false;
+        }
+        return FloodFill(x, std::min(y + 1, map.getHeight() - 1),
+                         iterationTotal,
+                         iterationLeft);
+    };
+    auto maxForestExpansion = TRandInteger(3,
+                                           configuration.minForestDistance - 1);
+    // Number of dropped rivers.
+    auto iterations = std::min(static_cast<size_t>(configuration.numForests),
+                               forestDropPoints.size());
+    for (unsigned int it = 0; it < iterations; ++it)
+    {
+        // Pick a random forest drop point.
+        auto dpIt = forestDropPoints.begin();
+        std::advance(dpIt,
+                     TRandInteger<size_t>(0, forestDropPoints.size() - 1));
+        MapCell * cell = (*dpIt);
+        forestDropPoints.erase(dpIt);
+        // Create the forest.
+        if (!FloodFill(cell->coordinates.x,
+                       cell->coordinates.y,
+                       maxForestExpansion,
+                       maxForestExpansion))
+        {
+            Logger::log(LogLevel::Error, "Found nullptr room.");
+            return false;
+        }
+    }
+    return true;
 }
 
 void MapGenerator::clearMap(Map2D<MapCell> & map)
@@ -407,10 +427,4 @@ void MapGenerator::clearMap(Map2D<MapCell> & map)
             map.get(x, y).height = 0.0;
         }
     }
-}
-
-double MapGenerator::normalize(double value, double LbFrom, double UbFrom,
-                               double LbTo, double UbTo) const
-{
-    return (((UbTo - LbTo) * (value - LbFrom)) / ((UbFrom - LbFrom))) + LbTo;
 }
