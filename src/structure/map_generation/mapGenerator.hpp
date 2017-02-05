@@ -21,9 +21,7 @@
 
 #pragma once
 
-#include "mapCell.hpp"
-#include "map2D.hpp"
-#include "utils.hpp"
+#include "mapWrapper.hpp"
 #include "heightMap.hpp"
 #include "mapGeneratorConfiguration.hpp"
 
@@ -45,31 +43,28 @@ public:
                  const std::shared_ptr<HeightMap> & _heightMap);
 
     /// @brief Generates a new map.
-    bool generateMap(Map2D<MapCell> & map);
+    bool generateMap(const std::shared_ptr<MapWrapper> & map);
 
 private:
-    /// @brief Creates the general structure of the map.
-    bool generateStructure(Map2D<MapCell> & map);
+    /// @brief Initializes the map.
+    bool initializeMap(const std::shared_ptr<MapWrapper> & map);
 
     /// @brief Creates the mountains on the map.
-    bool generateMountains(Map2D<MapCell> & map);
+    bool generateMountains(const std::shared_ptr<MapWrapper> & map);
 
     /// @brief Normalizes the map with values between a specific range
     /// according to the HeightMap.
-    bool normalizeMap(Map2D<MapCell> & map);
+    bool normalizeMap(const std::shared_ptr<MapWrapper> & map);
 
     /// @brief Apply the terrain on the map based on the height map.
-    bool applyTerrain(Map2D<MapCell> & map);
-
-    /// @brief Generates the rooms for the map.
-    bool generateRooms(Map2D<MapCell> & map);
+    bool applyTerrain(const std::shared_ptr<MapWrapper> & map);
 
     /// @brief Creates the rivers on the map.
-    bool generateRivers(Map2D<MapCell> & map);
+    bool generateRivers(const std::shared_ptr<MapWrapper> & map);
 
     /// @brief Add the forests to the map.
-    bool generateForests(Map2D<MapCell> & map);
+    bool generateForests(const std::shared_ptr<MapWrapper> & map);
 
     /// @brief Clears the map.
-    void clearMap(Map2D<MapCell> & map);
+    void clearMap(const std::shared_ptr<MapWrapper> & map);
 };

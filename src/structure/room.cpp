@@ -49,7 +49,7 @@ Room::~Room()
 {
     for (auto it : exits)
     {
-        std::shared_ptr<Exit> oppositeExit = it->getOppositeExit();
+        auto oppositeExit = it->getOppositeExit();
         if (oppositeExit != nullptr)
         {
             oppositeExit->unlink();
@@ -62,8 +62,8 @@ Room::~Room()
     }
 //    Logger::log(LogLevel::Debug,
 //                "Deleted room\t\t[%s]\t\t(%s)",
-//                ToString(this->vnum),
-//                this->name);
+//                ToString(vnum),
+//                name);
 }
 
 bool Room::check(bool complete)
@@ -78,7 +78,6 @@ bool Room::check(bool complete)
     assert(coord.z <= 100);
     assert(terrain != nullptr);
     assert(!name.empty());
-    assert(!description.empty());
     return true;
 }
 
@@ -94,11 +93,11 @@ void Room::addItem(Item *& item, bool updateDB)
         SQLiteDbms::instance().insertInto(
             "ItemRoom",
             {
-                ToString(this->vnum), ToString(item->vnum)
+                ToString(vnum), ToString(item->vnum)
             }, false, true);
     }
     Logger::log(LogLevel::Debug,
-                "Item '%s' added to '%s';", item->getName(), this->name);
+                "Item '%s' added to '%s';", item->getName(), name);
 }
 
 void Room::addBuilding(Item * item, bool updateDB)
@@ -106,7 +105,7 @@ void Room::addBuilding(Item * item, bool updateDB)
     // Set the item as built.
     SetFlag(&item->flags, ItemFlag::Built);
     // Check if the item is already inside the room.
-    for (auto iterator : this->items)
+    for (auto iterator : items)
     {
         if (iterator->vnum == item->vnum)
         {
@@ -140,7 +139,7 @@ bool Room::removeItem(Item * item, bool updateDB)
         // Log it.
         Logger::log(LogLevel::Debug, "Item '%s' removed from '%s';",
                     item->getName(),
-                    this->name);
+                    name);
         return true;
     }
     return false;
@@ -220,14 +219,14 @@ std::vector<Mobile *> Room::getAllMobile(Character * exception)
 bool Room::updateOnDB()
 {
     std::vector<std::string> arguments;
-    arguments.push_back(ToString(this->vnum));
-    arguments.push_back(ToString(this->coord.x));
-    arguments.push_back(ToString(this->coord.y));
-    arguments.push_back(ToString(this->coord.z));
-    arguments.push_back(ToString(this->terrain->vnum));
-    arguments.push_back(this->name);
-    arguments.push_back(this->description);
-    arguments.push_back(ToString(this->flags));
+    arguments.push_back(ToString(vnum));
+    arguments.push_back(ToString(coord.x));
+    arguments.push_back(ToString(coord.y));
+    arguments.push_back(ToString(coord.z));
+    arguments.push_back(ToString(terrain->vnum));
+    arguments.push_back(name);
+    arguments.push_back(description);
+    arguments.push_back(ToString(flags));
     return SQLiteDbms::instance().insertInto("Room", arguments, false, true);
 }
 
@@ -354,11 +353,11 @@ Mobile * Room::findMobile(
 
 std::shared_ptr<Exit> Room::findExit(Direction direction)
 {
-    for (auto it : exits)
+    for (auto it = exits.begin(); it != exits.end(); ++it)
     {
-        if (it->direction == direction)
+        if ((*it)->direction == direction)
         {
-            return it;
+            return *it;
         }
     }
     return nullptr;
@@ -493,13 +492,13 @@ std::vector<Direction> Room::getAvailableDirections()
     return directions;
 }
 
-bool Room::addExit(std::shared_ptr<Exit> exit)
+bool Room::addExit(const std::shared_ptr<Exit> & exit)
 {
     if (this->findExit(exit->direction))
     {
         return false;
     }
-    this->exits.push_back(std::move(exit));
+    exits.emplace_back(exit);
     return true;
 }
 
@@ -646,7 +645,7 @@ void Room::funcSendToAll(const std::string & message,
 int Room::luaGetExits(lua_State * L)
 {
     luabridge::LuaRef luaRef(L, luabridge::newTable(L));
-    for (auto it : this->exits)
+    for (auto it : exits)
     {
         luaRef.append(it);
     }
@@ -657,7 +656,7 @@ int Room::luaGetExits(lua_State * L)
 int Room::luaGetItems(lua_State * L)
 {
     luabridge::LuaRef luaRef(L, luabridge::newTable(L));
-    for (auto it : this->items)
+    for (auto it : items)
     {
         luaRef.append(it);
     }
@@ -798,10 +797,10 @@ bool ConnectRoom(Room * room)
         Direction::Up,
         Direction::Down
     };
-    for (auto iterator : directions)
+    for (auto direction : directions)
     {
         // Get the coordinate modifier.
-        auto coordinates = room->coord + iterator.getCoordinates();
+        auto coordinates = room->coord + direction.getCoordinates();
         // Get the room at the given coordinates.
         auto near = room->area->getRoom(coordinates);
         if (near != nullptr)
@@ -809,15 +808,15 @@ bool ConnectRoom(Room * room)
             // Create the two exits.
             auto forward = std::make_shared<Exit>(room,
                                                   near,
-                                                  iterator, 0);
+                                                  direction, 0);
             auto backward = std::make_shared<Exit>(near,
                                                    room,
-                                                   forward->getOppositeDirection(),
+                                                   direction.getOpposite(),
                                                    0);
             generatedExits.push_back(forward);
             generatedExits.push_back(backward);
             // In case the connection is Up/Down set the presence of stairs.
-            if (iterator == Direction::Up || iterator == Direction::Down)
+            if (direction == Direction::Up || direction == Direction::Down)
             {
                 SetFlag(&forward->flags, ExitFlag::Stairs);
                 SetFlag(&backward->flags, ExitFlag::Stairs);

@@ -197,7 +197,7 @@ public:
     /// @return <b>True</b> if there is NO other exits
     ///                      in the same direction,<br>
     ///         <b>False</b> otherwise.
-    bool addExit(std::shared_ptr<Exit> exit);
+    bool addExit(const std::shared_ptr<Exit> & exit);
 
     /// @brief Remove from the list of exits the one on the given direction.
     /// @param direction The direction to removed.

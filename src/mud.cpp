@@ -53,6 +53,7 @@ Mud::Mud() :
     _maxVnumRoom(),
     _maxVnumItem(),
     _minVnumCorpses(),
+    _maxVnumGeneratedMaps(),
     _mudMeasure("stones"),
     _mudDatabaseName("radmud.db"),
     _mudSystemDirectory("../system/"),
@@ -379,7 +380,19 @@ bool Mud::addBodyPart(const std::shared_ptr<BodyPart> & bodyPart)
 bool Mud::addHeightMap(const std::shared_ptr<HeightMap> & heightMap)
 {
     return mudHeightMaps.insert(std::make_pair(heightMap->vnum,
-                                                  heightMap)).second;
+                                               heightMap)).second;
+}
+
+bool Mud::addGeneratedMap(const std::shared_ptr<MapWrapper> & mapWrapper)
+{
+    bool result = mudGeneratedMaps.insert(
+        std::make_pair(mapWrapper->vnum, mapWrapper)).second;
+    if (result)
+    {
+        _maxVnumGeneratedMaps = std::max(_maxVnumGeneratedMaps,
+                                         mapWrapper->vnum);
+    }
+    return result;
 }
 
 Player * Mud::findPlayer(const std::string & name)
@@ -587,7 +600,7 @@ Production * Mud::findProduction(std::string name)
 Liquid * Mud::findLiquid(const unsigned int & vnum)
 {
     auto it = mudLiquids.find(vnum);
-    if(it == mudLiquids.end()) return nullptr;
+    if (it == mudLiquids.end()) return nullptr;
     return it->second;
 }
 
@@ -764,6 +777,21 @@ int Mud::getMaxVnumItem() const
 int Mud::getMinVnumCorpse() const
 {
     return _minVnumCorpses;
+}
+
+unsigned int Mud::getMaxVnumGeneratedMaps() const
+{
+    return _maxVnumGeneratedMaps;
+}
+
+int Mud::getUniqueAreaVnum() const
+{
+    int vnum;
+    do
+    {
+        vnum = TRandInteger<int>(0, INT8_MAX);
+    } while (mudAreas.find(vnum) != mudAreas.end());
+    return vnum;
 }
 
 void Mud::broadcastMsg(const int & level, const std::string & message) const

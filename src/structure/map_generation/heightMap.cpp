@@ -20,10 +20,9 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "heightMap.hpp"
-#include <algorithm>
 
 HeightMap::HeightMap(const unsigned int & _vnum,
-                           const std::string & _name) :
+                     const std::string & _name) :
     vnum(_vnum),
     name(_name),
     thresholds()

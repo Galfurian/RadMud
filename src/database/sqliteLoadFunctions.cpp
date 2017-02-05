@@ -817,7 +817,7 @@ bool LoadExit(ResultSet * result)
         {
             // Create an empty exit.
             auto newExit = std::make_shared<Exit>();
-            // retrive the values.
+            // Retrieve the values.
             auto sourceVnum = result->getNextInteger();
             auto destinationVnum = result->getNextInteger();
             auto directionValue = result->getNextUnsignedInteger();

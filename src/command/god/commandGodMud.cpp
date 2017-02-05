@@ -167,8 +167,6 @@ bool DoSkillList(Character * character, ArgumentHandler & /*args*/)
 
 bool DoGenerateMap(Character * character, ArgumentHandler & args)
 {
-    (void) character;
-    (void) args;
     std::shared_ptr<HeightMap> heightMap = nullptr;
     if (args.size() == 1)
     {
@@ -177,7 +175,7 @@ bool DoGenerateMap(Character * character, ArgumentHandler & args)
     }
     if (heightMap == nullptr)
     {
-        character->sendMsg("You must provide a valid height map vnum:");
+        character->sendMsg("You must provide a valid height map vnum:\n");
         for (auto it : Mud::instance().mudHeightMaps)
         {
             character->sendMsg("    [%s] %s\n", it.first, it.second->name);
@@ -188,7 +186,7 @@ bool DoGenerateMap(Character * character, ArgumentHandler & args)
     // Instantiate the map generator.
     MapGenerator mapGenerator(configuration, heightMap);
     // Generate the map.
-    Map2D<MapCell> map;
+    auto map = std::make_shared<MapWrapper>();
     if (!mapGenerator.generateMap(map))
     {
         character->sendMsg("Error while generating the map.");
@@ -196,11 +194,11 @@ bool DoGenerateMap(Character * character, ArgumentHandler & args)
     }
     // Draw the map.
     std::string drawnMap;
-    for (int y = 0; y < map.getHeight(); ++y)
+    for (int y = 0; y < map->getHeight(); ++y)
     {
-        for (int x = 0; x < map.getWidth(); ++x)
+        for (int x = 0; x < map->getWidth(); ++x)
         {
-            drawnMap += map.get(x, y).getTile();
+            drawnMap += map->getCell(x, y)->getTile();
         }
         drawnMap += "\n";
     }
@@ -208,5 +206,91 @@ bool DoGenerateMap(Character * character, ArgumentHandler & args)
     character->sendMsg(configuration.toString());
     character->sendMsg(drawnMap);
     character->sendMsg(Formatter::reset());
+    // Add the map to the list of generated maps.
+    Mud::instance().addGeneratedMap(map);
+    return true;
+}
+
+bool DoShowGenerateMap(Character * character, ArgumentHandler & args)
+{
+    if (args.empty())
+    {
+        character->sendMsg("List of generated maps:\n");
+        for (auto generatedMap : Mud::instance().mudGeneratedMaps)
+        {
+            character->sendMsg("    %s", generatedMap.second->vnum);
+        }
+        return true;
+    }
+    if (args.size() != 1)
+    {
+        character->sendMsg("You must provide the vnum of a generated map.");
+        return false;
+    }
+    auto vnum = ToNumber<unsigned int>(args[0].getContent());
+    auto generatedMap = Mud::instance().mudGeneratedMaps.find(vnum);
+    if (generatedMap == Mud::instance().mudGeneratedMaps.end())
+    {
+        character->sendMsg("Can't find the generated map '%s'.", vnum);
+        return false;
+    }
+    auto map = generatedMap->second;
+    // Draw the map.
+    std::string drawnMap;
+    for (int y = 0; y < map->getHeight(); ++y)
+    {
+        for (int x = 0; x < map->getWidth(); ++x)
+        {
+            drawnMap += map->getCell(x, y)->getTile();
+        }
+        drawnMap += "\n";
+    }
+    // First send the configuration.
+    character->sendMsg(drawnMap);
+    character->sendMsg(Formatter::reset());
+    return true;
+}
+
+bool DoDeleteGenerateMap(Character * character, ArgumentHandler & args)
+{
+    if (args.size() != 1)
+    {
+        character->sendMsg("You must provide the vnum of a generated map.");
+        return false;
+    }
+    auto vnum = ToNumber<unsigned int>(args[0].getContent());
+    auto generatedMap = Mud::instance().mudGeneratedMaps.find(vnum);
+    if (generatedMap == Mud::instance().mudGeneratedMaps.end())
+    {
+        character->sendMsg("Can't find the generated map '%s'.", vnum);
+        return false;
+    }
+    auto map = generatedMap->second;
+    Mud::instance().mudGeneratedMaps.erase(generatedMap);
+    map->destroy();
+    return true;
+}
+
+bool DoBuildGenerateMap(Character * character, ArgumentHandler & args)
+{
+    if (args.size() != 1)
+    {
+        character->sendMsg("You must provide the vnum of a generated map.");
+        return false;
+    }
+    auto vnum = ToNumber<unsigned int>(args[0].getContent());
+    auto generatedMap = Mud::instance().mudGeneratedMaps.find(vnum);
+    if (generatedMap == Mud::instance().mudGeneratedMaps.end())
+    {
+        character->sendMsg("Can't find the generated map '%s'.", vnum);
+        return false;
+    }
+    auto map = generatedMap->second;
+    Mud::instance().mudGeneratedMaps.erase(generatedMap);
+    if (!map->buildMap())
+    {
+        character->sendMsg("Can't build the map '%s'.", vnum);
+        return false;
+    }
     return true;
 }

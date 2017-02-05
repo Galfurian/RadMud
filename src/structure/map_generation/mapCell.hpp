@@ -23,15 +23,15 @@
 
 #include "terrain.hpp"
 #include "mapTile.hpp"
-#include "map2D.hpp"
 #include "room.hpp"
+
 #include <vector>
 
 /// @brief Holds information about the cell of an automatically generated map.
 class MapCell
 {
 public:
-    /// The room associated with the map cell.
+    /// The associated room.
     Room * room;
     /// The cell coordinates.
     Coordinates coordinates;
@@ -41,12 +41,13 @@ public:
     std::shared_ptr<terrain::Terrain> terrain;
     /// List of neighbours.
     std::vector<MapCell *> neighbours;
+    /// The flags of the room.
+    unsigned int flags;
+    /// The liquid which will fill the room.
+    std::pair<Liquid *, unsigned int> liquid;
 
     /// @brief Constructor.
     MapCell();
-
-    /// @brief Add the neighbours based on the given map.
-    void addNeighbours(Map2D<MapCell> & map);
 
     /// @brief Find the lowest nearby cell.
     /// @return The found cell.

@@ -1,6 +1,6 @@
-/// @file   heightMap.hpp
+/// @file   sqliteWriteFunctions.hpp
 /// @author Enrico Fraccaroli
-/// @date   Jan 05 2017
+/// @date   feb 05 2017
 /// @copyright
 /// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -21,36 +21,18 @@
 
 #pragma once
 
-#include "mapTile.hpp"
-#include "mapCell.hpp"
+#include <memory>
 
-namespace terrain
-{
-class Terrain;
-}
+class Area;
 
-/// @brief Class which maps the values of an height-map to types of terrain.
-class HeightMap
-{
-public:
-    /// The vnum of the mapper.
-    unsigned int vnum;
-    /// The name of the mapper.
-    std::string name;
-    /// The current thresholds.
-    std::vector<std::pair<double, std::shared_ptr<terrain::Terrain>>> thresholds;
+class Room;
 
-    /// @brief Constructor.
-    HeightMap(const unsigned int & _vnum,
-              const std::string & _name);
+class Exit;
 
-    /// @brief Add a new threshold.
-    /// @param terrain      The terrain associated with the new threshold.
-    /// @param threshold    The threshold value.
-    void addThreshold(const std::shared_ptr<terrain::Terrain> & terrain,
-                      const double & threshold);
+bool SaveArea(Area * area);
 
-    /// @brief Returns the terrain associated with the given height w.r.t.
-    /// the current thresholds.
-    std::shared_ptr<terrain::Terrain> getTerrain(const double & height);
-};
+bool SaveRoom(Room * room);
+
+bool SaveAreaList(Area * area, Room * room);
+
+bool SaveRoomExit(const std::shared_ptr<Exit> & roomExit);

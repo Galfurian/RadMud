@@ -94,7 +94,7 @@ public:
         // Nothing to do.
     }
 
-    /// Disable copy constructor.
+    /// @brief Disable Copy Constructor.
     Map2D(const Map2D<T> &) = delete;
 
     /// @brief Destructor.

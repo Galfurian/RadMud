@@ -55,7 +55,6 @@ bool Area::check()
     assert(width > 0);
     assert(height > 0);
     assert(elevation > 0);
-    assert(type != AreaType::NoType);
     return true;
 }
 
@@ -132,7 +131,7 @@ CharacterContainer Area::getCharactersAt(const CharacterContainer & exceptions,
 }
 
 ItemVector Area::getItemsAt(const ItemVector & exceptions,
-                               const Coordinates & coordinates)
+                            const Coordinates & coordinates)
 {
     ItemVector itemContainer;
     if (this->isValid(coordinates))
@@ -247,9 +246,9 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, const int & radius)
             }
             if (found)
             {
-                Room * room = this->getRoom(Coordinates(x, y, origin_z));
-                std::shared_ptr<Exit> up = room->findExit(Direction::Up);
-                std::shared_ptr<Exit> down = room->findExit(Direction::Down);
+                auto room = this->getRoom(Coordinates(x, y, origin_z));
+                auto up = room->findExit(Direction::Up);
+                auto down = room->findExit(Direction::Down);
 
                 // By default set it to walkable tile.
                 tileCode = ToString(15) + ":" + ToString(this->tileSet + 0);
@@ -421,6 +420,14 @@ std::string Area::drawASCIIFov(Room * centerRoom, const int & radius)
                         auto up = room->findExit(Direction::Up);
                         auto down = room->findExit(Direction::Down);
                         // VI  - WALKABLE
+                        if (room->liquid.first != nullptr)
+                        {
+                            tile = "w";
+                        }
+                        else if (HasFlag(room->flags, RoomFlags::SpawnTree))
+                        {
+                            tile = "t";
+                        }
                         tile = room->terrain->symbol;
                         // V   - OPEN DOOR
                         Item * door = room->findDoor();
@@ -509,8 +516,8 @@ CharacterContainer Area::getCharactersInSight(CharacterContainer & exceptions,
 }
 
 ItemVector Area::getItemsInSight(ItemVector & exceptions,
-                                    Coordinates & origin,
-                                    const int & radius)
+                                 Coordinates & origin,
+                                 const int & radius)
 {
     ItemVector foundItems;
     auto validCoordinates = this->fov(origin, radius);

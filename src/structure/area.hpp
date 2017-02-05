@@ -35,7 +35,7 @@ class Room;
 /// Used to determine the type of Zone.
 using AreaType = enum class AreaType_t
 {
-    NoType,     ///< No type.
+    Normal,     ///< The area is quite normal.
     Cavern,     ///< Identifies a cavern.
     Underdark   ///< Identifies a region of the underdark.
 };

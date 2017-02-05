@@ -50,6 +50,7 @@
 #include "terrain.hpp"
 #include "bodyPart.hpp"
 #include "heightMap.hpp"
+#include "mapWrapper.hpp"
 
 class Direction;
 
@@ -129,6 +130,8 @@ private:
     int _maxVnumItem;
     /// Lowest value of vnum for corpses.
     int _minVnumCorpses;
+    /// Highest value of vnum for generated maps.
+    unsigned int _maxVnumGeneratedMaps;
 
     /// Mud weight measure.
     const std::string _mudMeasure;
@@ -210,7 +213,8 @@ public:
     std::map<unsigned int, std::shared_ptr<BodyPart>> mudBodyParts;
     /// List of all the bodyparts.
     std::map<unsigned int, std::shared_ptr<HeightMap>> mudHeightMaps;
-
+    /// List of generated maps.
+    std::map<unsigned int, std::shared_ptr<MapWrapper>> mudGeneratedMaps;
 
     /// @brief Update all the player on the database.
     /// @return <b>True</b> if the operations succeeded,<br>
@@ -314,6 +318,9 @@ public:
 
     /// @brief Add an height map.
     bool addHeightMap(const std::shared_ptr<HeightMap> & heightMap);
+
+    /// @brief Add a generated map.
+    bool addGeneratedMap(const std::shared_ptr<MapWrapper> & mapWrapper);
     ///@}
 
     /// @defgroup GlobalFind Global Find Functions
@@ -431,6 +438,12 @@ public:
     /// @brief Returns the current minimum vnum used for corpses.
     /// @return The minimum corpses vnum.
     int getMinVnumCorpse() const;
+
+    /// @brief Returns the current maximum vnum used for generated maps.
+    unsigned int getMaxVnumGeneratedMaps() const;
+
+    /// @brief Provides an unique vnum for an area.
+    int getUniqueAreaVnum() const;
 
     /// @brief Send message to all connected players.
     /// @param level   The level of the player: 0 normal, 1 admin.

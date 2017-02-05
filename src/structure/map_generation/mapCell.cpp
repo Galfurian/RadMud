@@ -20,35 +20,18 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "mapCell.hpp"
+#include "logger.hpp"
 
 MapCell::MapCell() :
     room(),
     coordinates(),
     height(),
     terrain(),
-    neighbours()
+    neighbours(),
+    flags(),
+    liquid()
 {
     // Nothing to do.
-}
-
-void MapCell::addNeighbours(Map2D<MapCell> & map)
-{
-    if (coordinates.x - 1 > 0)
-    {
-        neighbours.emplace_back(&map.get(coordinates.x - 1, coordinates.y));
-    }
-    if (coordinates.x + 1 < map.getWidth())
-    {
-        neighbours.emplace_back(&map.get(coordinates.x + 1, coordinates.y));
-    }
-    if (coordinates.y - 1 > 0)
-    {
-        neighbours.emplace_back(&map.get(coordinates.x, coordinates.y - 1));
-    }
-    if (coordinates.y + 1 < map.getHeight())
-    {
-        neighbours.emplace_back(&map.get(coordinates.x, coordinates.y + 1));
-    }
 }
 
 MapCell * MapCell::findLowestNearbyCell()
@@ -61,28 +44,20 @@ MapCell * MapCell::findLowestNearbyCell()
             selectedCell = neighbour;
         }
     }
-    if (selectedCell == this)
-    {
-
-    }
     return selectedCell;
 }
 
 std::string MapCell::getTile() const
 {
-    if (room != nullptr)
+    if (liquid.first != nullptr)
     {
-        if (room->liquid.first != nullptr)
-        {
-            return "w";
-        }
-        if (HasFlag(room->flags, RoomFlags::SpawnTree))
-        {
-            return "t";
-        }
-        return room->terrain->symbol;
+        return "w";
     }
-    return "X";
+    if (HasFlag(flags, RoomFlags::SpawnTree))
+    {
+        return "t";
+    }
+    return terrain->symbol;
 }
 
 bool MapCell::operator==(const MapCell & other) const
