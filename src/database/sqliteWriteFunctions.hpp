@@ -22,12 +22,33 @@
 #pragma once
 
 #include <memory>
+#include <item/subitem/shopItem.hpp>
 
 class Area;
 
 class Room;
 
 class Exit;
+
+class Player;
+
+class Item;
+
+bool SavePlayer(Player * player);
+
+bool SavePlayerSkills(Player * player);
+
+bool SavePlayerLuaVariables(Player * player);
+
+bool SaveItemPlayer(Player * player,
+                    Item * item,
+                    const unsigned int & bodyPartVnum);
+
+bool SaveShopItem(ShopItem * item,
+                  const bool & transaction);
+
+bool SaveItem(Item * item,
+              const bool & transaction);
 
 bool SaveArea(Area * area);
 

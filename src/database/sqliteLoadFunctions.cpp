@@ -1748,15 +1748,23 @@ bool LoadHeightMap(ResultSet * result)
         {
             auto vnum = result->getNextUnsignedInteger();
             auto name = result->getNextString();
-            auto heightMap = std::make_shared<HeightMap>(vnum, name);
+            auto seaLevelVnum = result->getNextUnsignedInteger();
+            auto seaLevel = Mud::instance().findTerrain(seaLevelVnum);
+            if (seaLevel == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the terrain " + ToString(seaLevelVnum));
+            }
+            auto heightMap = std::make_shared<HeightMap>(vnum, name, seaLevel);
             if (!Mud::instance().addHeightMap(heightMap))
             {
                 throw SQLiteException(
                     "Can't add the height map " + name);
             }
-            Logger::log(LogLevel::Debug, "\t%s%s",
+            Logger::log(LogLevel::Debug, "\t%s%s%s",
                         AlignString(vnum, StringAlign::Left, 25),
-                        AlignString(name, StringAlign::Left, 25));
+                        AlignString(name, StringAlign::Left, 25),
+                        AlignString(seaLevel->name, StringAlign::Left, 25));
         }
         catch (SQLiteException & e)
         {

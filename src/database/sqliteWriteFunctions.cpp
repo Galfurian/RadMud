@@ -22,24 +22,178 @@
 #include "sqliteWriteFunctions.hpp"
 #include "sqliteDbms.hpp"
 #include "logger.hpp"
+#include "player.hpp"
 #include "area.hpp"
 #include "room.hpp"
 
-bool SaveArea(Area * area)
+bool SavePlayer(Player * player)
 {
-    std::vector<std::string> arguments;
-    arguments.push_back(ToString(area->vnum));
-    arguments.push_back(area->name);
-    arguments.push_back(area->builder);
-    arguments.push_back(ToString(area->width));
-    arguments.push_back(ToString(area->height));
-    arguments.push_back(ToString(area->elevation));
-    arguments.push_back("0");
-    arguments.push_back(EnumToString(area->type));
-    arguments.push_back(EnumToString(area->status));
+    std::vector<std::string> args;
+    // Prepare the arguments of the query.
+    args.push_back(player->name);
+    args.push_back(player->password);
+    args.push_back(ToString(player->race->vnum));
+    args.push_back(ToString(player->getAbility(Ability::Strength, false)));
+    args.push_back(ToString(player->getAbility(Ability::Agility, false)));
+    args.push_back(ToString(player->getAbility(Ability::Perception, false)));
+    args.push_back(ToString(player->getAbility(Ability::Constitution, false)));
+    args.push_back(ToString(player->getAbility(Ability::Intelligence, false)));
+    args.push_back(ToString(static_cast<int>(player->gender)));
+    args.push_back(ToString(player->age));
+    args.push_back(player->description);
+    args.push_back(ToString(player->weight));
+    args.push_back(ToString(player->faction->vnum));
+    args.push_back(ToString(player->level));
+    args.push_back(ToString(player->experience));
+    args.push_back(ToString(player->room->vnum));
+    args.push_back(player->prompt);
+    args.push_back(ToString(player->flags));
+    args.push_back(ToString(player->health));
+    args.push_back(ToString(player->stamina));
+    args.push_back(ToString(player->hunger));
+    args.push_back(ToString(player->thirst));
+    args.push_back(ToString(player->rent_room));
+    // Start a transaction.
+    if (!SQLiteDbms::instance().insertInto("Player", args, false, true))
+    {
+        return false;
+    }
+    return true;
+}
+
+bool SavePlayerSkills(Player * player)
+{
+    for (auto skill : player->skills)
+    {
+        std::vector<std::string> args;
+        args.push_back(player->name);
+        args.push_back(ToString(skill.first));
+        args.push_back(ToString(skill.second));
+        if (!SQLiteDbms::instance().insertInto("PlayerSkill", args, false,
+                                               true))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool SavePlayerLuaVariables(Player * player)
+{
+    // Prepare the arguments of the query for lua variables table.
+    for (auto iterator : player->luaVariables)
+    {
+        std::vector<std::string> args;
+        args.push_back(player->name);
+        args.push_back(iterator.first);
+        args.push_back(iterator.second);
+        if (!SQLiteDbms::instance().insertInto("PlayerVariable", args,
+                                               false, true))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool SaveItemPlayer(Player * player,
+                    Item * item,
+                    const unsigned int & bodyPartVnum)
+{
+    std::vector<std::string> args;
+    args.emplace_back(player->name);
+    args.emplace_back(ToString(item->vnum));
+    args.emplace_back(ToString(bodyPartVnum));
     // Start a transaction.
     SQLiteDbms::instance().beginTransaction();
-    if (!SQLiteDbms::instance().insertInto("Area", arguments, false, true))
+    if (!SQLiteDbms::instance().insertInto("ItemPlayer", args, false, true))
+    {
+        SQLiteDbms::instance().rollbackTransection();
+        return false;
+    }
+    SQLiteDbms::instance().endTransaction();
+    return true;
+}
+
+bool SaveShopItem(ShopItem * item,
+                  const bool & transaction)
+{
+    // Prepare the vector used to insert into the database.
+    std::vector<std::string> args;
+    args.push_back(ToString(item->vnum));
+    args.push_back(item->shopName);
+    args.push_back(ToString(item->shopBuyTax));
+    args.push_back(ToString(item->shopSellTax));
+    args.push_back(ToString(item->balance));
+    if (item->shopKeeper != nullptr)
+    {
+        args.push_back(item->shopKeeper->id);
+    }
+    else
+    {
+        args.push_back("");
+    }
+    args.push_back(ToString(item->openingHour));
+    args.push_back(ToString(item->closingHour));
+    if (!transaction)
+    {
+        return SQLiteDbms::instance().insertInto("Shop", args, false, true);
+    }
+    SQLiteDbms::instance().beginTransaction();
+    if (!SQLiteDbms::instance().insertInto("Shop", args, false, true))
+    {
+        SQLiteDbms::instance().rollbackTransection();
+        return false;
+    }
+    SQLiteDbms::instance().endTransaction();
+    return true;
+}
+
+bool SaveItem(Item * item,
+              const bool & transaction)
+{
+    // Prepare the vector used to insert into the database.
+    std::vector<std::string> args;
+    args.push_back(ToString(item->vnum));
+    args.push_back(ToString(item->model->vnum));
+    args.push_back(ToString(item->quantity));
+    args.push_back(item->maker);
+    args.push_back(ToString(item->price));
+    args.push_back(ToString(item->weight));
+    args.push_back(ToString(item->condition));
+    args.push_back(ToString(item->maxCondition));
+    args.push_back(ToString(item->composition->vnum));
+    args.push_back(ToString(item->quality.toUInt()));
+    args.push_back(ToString(item->flags));
+    if (!transaction)
+    {
+        return SQLiteDbms::instance().insertInto("Item", args, false, true);
+    }
+    SQLiteDbms::instance().beginTransaction();
+    if (!SQLiteDbms::instance().insertInto("Item", args, false, true))
+    {
+        SQLiteDbms::instance().rollbackTransection();
+        return false;
+    }
+    SQLiteDbms::instance().endTransaction();
+    return true;
+}
+
+bool SaveArea(Area * area)
+{
+    std::vector<std::string> args;
+    args.push_back(ToString(area->vnum));
+    args.push_back(area->name);
+    args.push_back(area->builder);
+    args.push_back(ToString(area->width));
+    args.push_back(ToString(area->height));
+    args.push_back(ToString(area->elevation));
+    args.push_back("0");
+    args.push_back(EnumToString(area->type));
+    args.push_back(EnumToString(area->status));
+    // Start a transaction.
+    SQLiteDbms::instance().beginTransaction();
+    if (!SQLiteDbms::instance().insertInto("Area", args, false, true))
     {
         Logger::log(LogLevel::Error, "I was not able to save the area.");
         SQLiteDbms::instance().rollbackTransection();
@@ -52,18 +206,18 @@ bool SaveArea(Area * area)
 bool SaveRoom(Room * room)
 {
     // Insert into table Room the newly created room.
-    std::vector<std::string> arguments;
-    arguments.push_back(ToString(room->vnum));
-    arguments.push_back(ToString(room->coord.x));
-    arguments.push_back(ToString(room->coord.y));
-    arguments.push_back(ToString(room->coord.z));
-    arguments.push_back(ToString(room->terrain->vnum));
-    arguments.push_back(room->name);
-    arguments.push_back(room->description);
-    arguments.push_back(ToString(room->flags));
+    std::vector<std::string> args;
+    args.push_back(ToString(room->vnum));
+    args.push_back(ToString(room->coord.x));
+    args.push_back(ToString(room->coord.y));
+    args.push_back(ToString(room->coord.z));
+    args.push_back(ToString(room->terrain->vnum));
+    args.push_back(room->name);
+    args.push_back(room->description);
+    args.push_back(ToString(room->flags));
     // Start a transaction.
     SQLiteDbms::instance().beginTransaction();
-    if (!SQLiteDbms::instance().insertInto("Room", arguments, false, true))
+    if (!SQLiteDbms::instance().insertInto("Room", args, false, true))
     {
         Logger::log(LogLevel::Error, "I was not able to save the room.");
         SQLiteDbms::instance().rollbackTransection();
@@ -76,12 +230,12 @@ bool SaveRoom(Room * room)
 bool SaveAreaList(Area * area, Room * room)
 {
     // Insert Room in AreaList.
-    std::vector<std::string> arguments;
-    arguments.push_back(ToString(area->vnum));
-    arguments.push_back(ToString(room->vnum));
+    std::vector<std::string> args;
+    args.push_back(ToString(area->vnum));
+    args.push_back(ToString(room->vnum));
     // Start a transaction.
     SQLiteDbms::instance().beginTransaction();
-    if (!SQLiteDbms::instance().insertInto("AreaList", arguments, false, true))
+    if (!SQLiteDbms::instance().insertInto("AreaList", args, false, true))
     {
         Logger::log(LogLevel::Error, "I was not able to save the area list.");
         SQLiteDbms::instance().rollbackTransection();
@@ -94,14 +248,14 @@ bool SaveAreaList(Area * area, Room * room)
 bool SaveRoomExit(const std::shared_ptr<Exit> & roomExit)
 {
     // Update the values on Database.
-    std::vector<std::string> arguments;
-    arguments.push_back(ToString(roomExit->source->vnum));
-    arguments.push_back(ToString(roomExit->destination->vnum));
-    arguments.push_back(ToString(roomExit->direction.toUInt()));
-    arguments.push_back(ToString(roomExit->flags));
+    std::vector<std::string> args;
+    args.push_back(ToString(roomExit->source->vnum));
+    args.push_back(ToString(roomExit->destination->vnum));
+    args.push_back(ToString(roomExit->direction.toUInt()));
+    args.push_back(ToString(roomExit->flags));
     // Start a transaction.
     SQLiteDbms::instance().beginTransaction();
-    if (!SQLiteDbms::instance().insertInto("Exit", arguments, false, true))
+    if (!SQLiteDbms::instance().insertInto("Exit", args, false, true))
     {
         Logger::log(LogLevel::Error, "I was not able to save the exit.");
         SQLiteDbms::instance().rollbackTransection();

@@ -269,7 +269,7 @@ bool SQLiteDbms::updatePlayers()
 bool SQLiteDbms::updateItems()
 {
     // Start a transaction.
-    dbConnection.beginTransaction();
+//    dbConnection.beginTransaction();
     for (auto it : Mud::instance().mudItems)
     {
         if (!it.second->updateOnDB())
@@ -280,14 +280,14 @@ bool SQLiteDbms::updateItems()
         }
     }
     // Complete the transaction.
-    dbConnection.endTransaction();
+//    dbConnection.endTransaction();
     return true;
 }
 
 bool SQLiteDbms::updateRooms()
 {
     // Start a new transaction.
-    dbConnection.beginTransaction();
+//    dbConnection.beginTransaction();
     for (auto it : Mud::instance().mudRooms)
     {
         if (!it.second->updateOnDB())
@@ -298,7 +298,7 @@ bool SQLiteDbms::updateRooms()
         }
     }
     // Complete the transaction.
-    dbConnection.endTransaction();
+//    dbConnection.endTransaction();
     return true;
 }
 

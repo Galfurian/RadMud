@@ -608,19 +608,22 @@ bool Area::los(const Coordinates & source,
     // Evaluates the difference.
     double dx = target.x - source.x;
     double dy = target.y - source.y;
+    double dz = target.z - source.z;
     // Evaluate the distance between the
-    double distance = std::sqrt((dx * dx) + (dy * dy));
+    double distance = std::sqrt((dx * dx) + (dy * dy) + (dz * dz));
     // Evaluate the unit increment for both X and Y.
     // Decrease the value of precision for a faster execution with
     //  a worsening in terms of accuracy (default 6).
     double precision = 10;
     double unitx = dx / (distance * precision);
     double unity = dy / (distance * precision);
+    double unitz = dz / (distance * precision);
     // Evaluate the minimum value of increment.
-    double min = std::min(unitx, unity);
+    double min = std::min(std::min(unitx, unity), unitz);
     // Set the initial values for X and Y.
     double x = source.x + 0.5;
     double y = source.y + 0.5;
+    double z = source.z + 0.5;
     Coordinates coordinates(source.x, source.y, source.z);
     for (double i = 0; i <= distance; i += min)
     {
@@ -628,7 +631,8 @@ bool Area::los(const Coordinates & source,
         //  using the floor value.
         int floor_x = static_cast<int>(std::floor(x));
         int floor_y = static_cast<int>(std::floor(y));
-        coordinates = Coordinates(floor_x, floor_y, source.z);
+        int floor_z = static_cast<int>(std::floor(z));
+        coordinates = Coordinates(floor_x, floor_y, floor_z);
         if (coordinates == target)
         {
             return true;
@@ -637,9 +641,10 @@ bool Area::los(const Coordinates & source,
         {
             return false;
         }
-        // Increment both x and y.
+        // Increment the coordinates.
         x += unitx;
         y += unity;
+        z += unitz;
     }
     return false;
 }

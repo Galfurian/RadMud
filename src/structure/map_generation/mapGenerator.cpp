@@ -69,6 +69,12 @@ bool MapGenerator::generateMap(const std::shared_ptr<MapWrapper> & map)
         Logger::log(LogLevel::Error, "While generating the forests.");
         return false;
     }
+    // Set the z coordinates.
+    if (!this->setZCoordinates(map))
+    {
+        Logger::log(LogLevel::Error, "While setting the z coordinates.");
+        return false;
+    }
     return true;
 }
 
@@ -195,7 +201,7 @@ bool MapGenerator::normalizeMap(const std::shared_ptr<MapWrapper> & map)
     {
         Logger::log(LogLevel::Error, "Min and max height are the same.");
         // Clear the map.
-        this->clearMap(map);
+        map->destroy();
         return false;
     }
     // Normalize the heights to values between 0 and 10.
@@ -431,7 +437,15 @@ bool MapGenerator::generateForests(const std::shared_ptr<MapWrapper> & map)
     return true;
 }
 
-void MapGenerator::clearMap(const std::shared_ptr<MapWrapper> & map)
+bool MapGenerator::setZCoordinates(const std::shared_ptr<MapWrapper> & map)
 {
-    map->destroy();
+    for (auto x = 0; x < map->getWidth(); ++x)
+    {
+        for (auto y = 0; y < map->getHeight(); ++y)
+        {
+            auto cell = map->getCell(x, y);
+            cell->coordinates.z = 50 + heightMap->getOffset(cell->terrain);
+        }
+    }
+    return true;
 }

@@ -22,9 +22,11 @@
 #include "heightMap.hpp"
 
 HeightMap::HeightMap(const unsigned int & _vnum,
-                     const std::string & _name) :
+                     const std::string & _name,
+                     const std::shared_ptr<terrain::Terrain> & _seaLevelTerrain) :
     vnum(_vnum),
     name(_name),
+    seaLevelTerrain(_seaLevelTerrain),
     thresholds()
 {
     // Nothing to do.
@@ -54,4 +56,22 @@ std::shared_ptr<terrain::Terrain> HeightMap::getTerrain(
         }
     }
     return nullptr;
+}
+
+int HeightMap::getOffset(
+    const std::shared_ptr<terrain::Terrain> & terrain) const
+{
+    int terrainLevel = 0;
+    for (auto it : thresholds)
+    {
+        if (it.second->vnum == terrain->vnum) break;
+        ++terrainLevel;
+    }
+    int seaLevel = 0;
+    for (auto it : thresholds)
+    {
+        if (it.second->vnum == seaLevelTerrain->vnum) break;
+        ++seaLevel;
+    }
+    return terrainLevel - seaLevel;
 }

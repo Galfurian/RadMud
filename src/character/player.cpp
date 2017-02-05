@@ -22,6 +22,7 @@
 
 #include "player.hpp"
 
+#include "sqliteWriteFunctions.hpp"
 #include "logger.hpp"
 #include "mud.hpp"
 
@@ -126,11 +127,7 @@ void Player::addInventoryItem(Item *& item)
     // Update on database.
     if (item->getType() != ModelType::Corpse)
     {
-        SQLiteDbms::instance().insertInto(
-            "ItemPlayer",
-            {name, ToString(item->vnum), "0"},
-            false,
-            true);
+        SaveItemPlayer(this, item, 0);
     }
 }
 
@@ -142,15 +139,7 @@ void Player::addEquipmentItem(Item *& item)
     {
         for (auto bodyPart : item->occupiedBodyParts)
         {
-            SQLiteDbms::instance().insertInto(
-                "ItemPlayer",
-                {
-                    name,
-                    ToString(item->vnum),
-                    ToString(bodyPart->vnum)
-                },
-                false,
-                true);
+            SaveItemPlayer(this, item, bodyPart->vnum);
         }
     }
 }
@@ -231,70 +220,20 @@ bool Player::hasPendingOutput() const
 
 bool Player::updateOnDB()
 {
-    std::vector<std::string> args;
-    // Prepare the arguments of the query.
-    args.push_back(name);
-    args.push_back(password);
-    args.push_back(ToString(race->vnum));
-    args.push_back(ToString(this->getAbility(Ability::Strength, false)));
-    args.push_back(ToString(this->getAbility(Ability::Agility, false)));
-    args.push_back(ToString(this->getAbility(Ability::Perception, false)));
-    args.push_back(ToString(this->getAbility(Ability::Constitution, false)));
-    args.push_back(ToString(this->getAbility(Ability::Intelligence, false)));
-    args.push_back(ToString(static_cast<int>(gender)));
-    args.push_back(ToString(age));
-    args.push_back(description);
-    args.push_back(ToString(weight));
-    args.push_back(ToString(faction->vnum));
-    args.push_back(ToString(level));
-    args.push_back(ToString(experience));
-    args.push_back(ToString(room->vnum));
-    args.push_back(prompt);
-    args.push_back(ToString(flags));
-    args.push_back(ToString(health));
-    args.push_back(ToString(stamina));
-    args.push_back(ToString(hunger));
-    args.push_back(ToString(thirst));
-    args.push_back(ToString(rent_room));
-    if (!SQLiteDbms::instance().insertInto("Player", args, false, true))
+    if (!SavePlayer(this))
     {
-        Logger::log(LogLevel::Error,
-                    "Error during player creation on DB.");
+        Logger::log(LogLevel::Error, "Creating player on DB.");
         return false;
     }
-    // Prepare the arguments of the query for skill table.
-    for (auto skill : skills)
+    if(!SavePlayerSkills(this))
     {
-        args.clear();
-        args.push_back(name);
-        args.push_back(ToString(skill.first));
-        args.push_back(ToString(skill.second));
-        if (!SQLiteDbms::instance().insertInto("PlayerSkill",
-                                               args,
-                                               false,
-                                               true))
-        {
-            Logger::log(LogLevel::Error,
-                        "Error during player Skill creation on DB.");
-            return false;
-        }
+        Logger::log(LogLevel::Error, "Saving player skills on DB.");
+        return false;
     }
-    // Prepare the arguments of the query for lua variables table.
-    for (auto iterator : luaVariables)
+    if(!SavePlayerLuaVariables(this))
     {
-        args.clear();
-        args.push_back(name);
-        args.push_back(iterator.first);
-        args.push_back(iterator.second);
-        if (!SQLiteDbms::instance().insertInto("PlayerVariable",
-                                               args,
-                                               false,
-                                               true))
-        {
-            Logger::log(LogLevel::Error,
-                        "Error during player Lua Variables creation on DB.");
-            return false;
-        }
+        Logger::log(LogLevel::Error, "Saving player lua variables on DB.");
+        return false;
     }
     return true;
 }

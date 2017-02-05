@@ -37,12 +37,15 @@ public:
     unsigned int vnum;
     /// The name of the mapper.
     std::string name;
+    /// The sea level.
+    std::shared_ptr<terrain::Terrain> seaLevelTerrain;
     /// The current thresholds.
     std::vector<std::pair<double, std::shared_ptr<terrain::Terrain>>> thresholds;
 
     /// @brief Constructor.
     HeightMap(const unsigned int & _vnum,
-              const std::string & _name);
+              const std::string & _name,
+              const std::shared_ptr<terrain::Terrain> & _seaLevelTerrain);
 
     /// @brief Add a new threshold.
     /// @param terrain      The terrain associated with the new threshold.
@@ -53,4 +56,6 @@ public:
     /// @brief Returns the terrain associated with the given height w.r.t.
     /// the current thresholds.
     std::shared_ptr<terrain::Terrain> getTerrain(const double & height);
+
+    int getOffset(const std::shared_ptr<terrain::Terrain> & terrain) const;
 };
