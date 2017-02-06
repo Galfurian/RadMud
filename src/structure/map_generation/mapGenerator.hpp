@@ -67,4 +67,7 @@ private:
 
     /// @brief Sets the z coordinates of the cells inside the map.
     bool setZCoordinates(const std::shared_ptr<MapWrapper> & map);
+
+    /// @brief Add the empty rooms which represent the air.
+    bool fillWithAir(const std::shared_ptr<MapWrapper> & map);
 };

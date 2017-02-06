@@ -400,104 +400,125 @@ std::string Area::drawASCIIFov(Room * centerRoom, const int & radius)
     int max_x = (centerRoom->coord.x + radius);
     int min_y = (centerRoom->coord.y - radius);
     int max_y = (centerRoom->coord.y + radius);
+    int min_z = (centerRoom->coord.z - radius);
+    int max_z = (centerRoom->coord.z + radius);
     // Evaluate the field of view.
-    auto validFov = this->fov(centerRoom->coord, radius);
+    auto view = this->fov(centerRoom->coord, radius);
     // Draw the fov.
     Coordinates point = centerRoom->coord;
+//    for (point.z = min_z; point.z <= max_z; ++point.z)
+//    {
     for (point.y = max_y; point.y >= min_y; --point.y)
     {
         for (point.x = min_x; point.x <= max_x; ++point.x)
         {
-            std::string tile = " ";
-            if (std::find(validFov.begin(), validFov.end(), point)
-                != validFov.end())
+            if (std::find(view.begin(), view.end(), point) == view.end())
             {
-                Room * room = this->getRoom(point);
-                if (room != nullptr)
+                result += " ";
+                continue;
+            }
+            Room * room = this->getRoom(point);
+            if (room == nullptr)
+            {
+                result += " ";
+                continue;
+            }
+            if (!room->isLit())
+            {
+                result += " ";
+                continue;
+            }
+            std::string tile = " ";
+            auto up = room->findExit(Direction::Up);
+            auto down = room->findExit(Direction::Down);
+            // VI  - WALKABLE
+            if (room->liquid.first != nullptr)
+            {
+                tile = "w";
+            }
+            else if (HasFlag(room->flags, RoomFlags::SpawnTree))
+            {
+                tile = "t";
+            }
+            tile = room->terrain->symbol;
+            // V   - OPEN DOOR
+            Item * door = room->findDoor();
+            if (door != nullptr)
+            {
+                if (HasFlag(door->flags, ItemFlag::Closed))
                 {
-                    if (room->isLit())
+                    tile = 'D';
+                }
+                else
+                {
+                    tile = 'O';
+                }
+            }
+            // IV  - STAIRS
+            if ((up != nullptr) && (down != nullptr))
+            {
+                if (HasFlag(up->flags, ExitFlag::Stairs)
+                    && HasFlag(down->flags, ExitFlag::Stairs))
+                {
+                    tile = "X";
+                }
+            }
+            else if (up != nullptr)
+            {
+                if (HasFlag(up->flags, ExitFlag::Stairs))
+                {
+                    tile = ">";
+                }
+            }
+            else if (down != nullptr)
+            {
+                if (HasFlag(down->flags, ExitFlag::Stairs))
+                {
+                    tile = "<";
+                }
+                else
+                {
+                    tile = " ";
+                    Coordinates below = point;
+                    for (below.z = min_z; below.z <= max_z; ++below.z)
                     {
-                        auto up = room->findExit(Direction::Up);
-                        auto down = room->findExit(Direction::Down);
-                        // VI  - WALKABLE
-                        if (room->liquid.first != nullptr)
+                        if (std::find(view.begin(), view.end(), below) ==
+                            view.end())
                         {
-                            tile = "w";
-                        }
-                        else if (HasFlag(room->flags, RoomFlags::SpawnTree))
-                        {
-                            tile = "t";
-                        }
-                        tile = room->terrain->symbol;
-                        // V   - OPEN DOOR
-                        Item * door = room->findDoor();
-                        if (door != nullptr)
-                        {
-                            if (HasFlag(door->flags, ItemFlag::Closed))
-                            {
-                                tile = 'D';
-                            }
-                            else
-                            {
-                                tile = 'O';
-                            }
-                        }
-                        // IV  - STAIRS
-                        if ((up != nullptr) && (down != nullptr))
-                        {
-                            if (HasFlag(up->flags, ExitFlag::Stairs)
-                                && HasFlag(down->flags, ExitFlag::Stairs))
-                            {
-                                tile = "X";
-                            }
-                        }
-                        else if (up != nullptr)
-                        {
-                            if (HasFlag(up->flags, ExitFlag::Stairs))
-                            {
-                                tile = ">";
-                            }
-                        }
-                        else if (down != nullptr)
-                        {
-                            if (HasFlag(down->flags, ExitFlag::Stairs))
-                            {
-                                tile = "<";
-                            }
-                            else
-                            {
-                                tile = " ";
-                            }
-                        }
-                        // III - ITEMS
-                        if (room->items.size() > 0)
-                        {
-                            tile = room->items.back()->model->getTile();
-                        }
-                        // II  - CHARACTERS
-                        if (room->characters.size() > 0)
-                        {
-                            for (auto iterator : room->characters)
-                            {
-                                if (!HasFlag(iterator->flags,
-                                             CharacterFlag::Invisible))
-                                {
-                                    tile = iterator->race->getTile();
-                                }
-                            }
-                        }
-                        // I   - PLAYER
-                        if (centerRoom->coord == point)
-                        {
-                            tile = "@";
+                            tile = "*";
+                            break;
                         }
                     }
                 }
+            }
+            // III - ITEMS
+            if (room->items.size() > 0)
+            {
+                tile = room->items.back()->model->getTile();
+            }
+            // II  - CHARACTERS
+            if (room->characters.size() > 0)
+            {
+                for (auto iterator : room->characters)
+                {
+                    if (!HasFlag(iterator->flags,
+                                 CharacterFlag::Invisible))
+                    {
+                        tile = iterator->race->getTile();
+                    }
+                }
+            }
+            // I   - PLAYER
+            if (centerRoom->coord == point)
+            {
+                tile = "@";
             }
             result += tile;
         }
         result += "\n";
     }
+//        result += "\n";
+//    }
     return result;
 }
 
@@ -533,57 +554,98 @@ ItemVector Area::getItemsInSight(ItemVector & exceptions,
 
 std::vector<Coordinates> Area::fov(Coordinates & origin, const int & radius)
 {
-    std::vector<Coordinates> fovCoordinates;
-    Coordinates target, point;
-    while (point.x <= radius)
+    unsigned int checkedPoints = 0;
+    std::map<Coordinates, bool> checked;
+    std::vector<Coordinates> cfov;
+    auto CheckCoordinates = [&](const Coordinates & coordinates)
     {
-        while ((point.y <= point.x) && (point.square() <= pow(radius, 2)))
+        if (!checked[coordinates])
         {
-            target = Coordinates(origin.x + point.x,
-                                 origin.y + point.y, origin.z);
-            if ((target.x == origin.x) && (target.y == origin.y))
+            checked[coordinates] = true;
+            if (this->los(origin, coordinates, radius))
             {
-                fovCoordinates.emplace_back(target);
+                cfov.emplace_back(coordinates);
             }
-            else
-            {
-                if (this->los(origin, target, radius))
-                    fovCoordinates.emplace_back(target);
-                target = Coordinates(origin.x - point.x,
-                                     origin.y + point.y, origin.z);
-                if (this->los(origin, target, radius))
-                    fovCoordinates.emplace_back(target);
-                target = Coordinates(origin.x + point.x,
-                                     origin.y - point.y, origin.z);
-                if (this->los(origin, target, radius))
-                    fovCoordinates.emplace_back(target);
-                target = Coordinates(origin.x - point.x,
-                                     origin.y - point.y, origin.z);
-                if (this->los(origin, target, radius))
-                    fovCoordinates.emplace_back(target);
-                target = Coordinates(origin.x + point.y,
-                                     origin.y + point.x, origin.z);
-                if (this->los(origin, target, radius))
-                    fovCoordinates.emplace_back(target);
-                target = Coordinates(origin.x - point.y,
-                                     origin.y + point.x, origin.z);
-                if (this->los(origin, target, radius))
-                    fovCoordinates.emplace_back(target);
-                target = Coordinates(origin.x + point.y,
-                                     origin.y - point.x, origin.z);
-                if (this->los(origin, target, radius))
-                    fovCoordinates.emplace_back(target);
-                target = Coordinates(origin.x - point.y,
-                                     origin.y - point.x, origin.z);
-                if (this->los(origin, target, radius))
-                    fovCoordinates.emplace_back(target);
-            }
-            ++point.y;
+            checkedPoints++;
         }
+    };
+    Coordinates point;
+    while (point.z <= radius)
+    {
+        while ((point.x <= (radius - point.z)) && (point.square() <=
+                                                   pow(radius, 2)))
+        {
+            while ((point.y <= point.x) && (point.square() <= pow(radius, 2)))
+            {
+                // ---------------------------------------------------------
+                CheckCoordinates(Coordinates(origin.x + point.x,
+                                             origin.y + point.y,
+                                             origin.z + point.z));
+                CheckCoordinates(Coordinates(origin.x + point.x,
+                                             origin.y + point.y,
+                                             origin.z - point.z));
+                // ---------------------------------------------------------
+                CheckCoordinates(Coordinates(origin.x - point.x,
+                                             origin.y + point.y,
+                                             origin.z + point.z));
+                CheckCoordinates(Coordinates(origin.x - point.x,
+                                             origin.y + point.y,
+                                             origin.z - point.z));
+                // ---------------------------------------------------------
+                CheckCoordinates(Coordinates(origin.x + point.x,
+                                             origin.y - point.y,
+                                             origin.z + point.z));
+                CheckCoordinates(Coordinates(origin.x + point.x,
+                                             origin.y - point.y,
+                                             origin.z - point.z));
+                // ---------------------------------------------------------
+                CheckCoordinates(Coordinates(origin.x - point.x,
+                                             origin.y - point.y,
+                                             origin.z + point.z));
+                CheckCoordinates(Coordinates(origin.x - point.x,
+                                             origin.y - point.y,
+                                             origin.z - point.z));
+                // ---------------------------------------------------------
+                CheckCoordinates(Coordinates(origin.x + point.y,
+                                             origin.y + point.x,
+                                             origin.z + point.z));
+                CheckCoordinates(Coordinates(origin.x + point.y,
+                                             origin.y + point.x,
+                                             origin.z - point.z));
+                // ---------------------------------------------------------
+                CheckCoordinates(Coordinates(origin.x - point.y,
+                                             origin.y + point.x,
+                                             origin.z + point.z));
+                CheckCoordinates(Coordinates(origin.x - point.y,
+                                             origin.y + point.x,
+                                             origin.z - point.z));
+                // ---------------------------------------------------------
+                CheckCoordinates(Coordinates(origin.x + point.y,
+                                             origin.y - point.x,
+                                             origin.z + point.z));
+                CheckCoordinates(Coordinates(origin.x + point.y,
+                                             origin.y - point.x,
+                                             origin.z - point.z));
+                // ---------------------------------------------------------
+                CheckCoordinates(Coordinates(origin.x - point.y,
+                                             origin.y - point.x,
+                                             origin.z + point.z));
+                CheckCoordinates(Coordinates(origin.x - point.y,
+                                             origin.y - point.x,
+                                             origin.z - point.z));
+                // ---------------------------------------------------------
+                ++point.y;
+            }
+            ++point.x;
+            point.y = 0;
+        }
+        point.x = 0;
         point.y = 0;
-        ++point.x;
+        ++point.z;
     }
-    return fovCoordinates;
+    Logger::log(LogLevel::Debug, "RAD[%s] PTS[%s]",
+                radius, checkedPoints);
+    return cfov;
 }
 
 bool Area::los(const Coordinates & source,
@@ -625,6 +687,7 @@ bool Area::los(const Coordinates & source,
     double y = source.y + 0.5;
     double z = source.z + 0.5;
     Coordinates coordinates(source.x, source.y, source.z);
+    Coordinates previous = coordinates;
     for (double i = 0; i <= distance; i += min)
     {
         // Evaluate the integer version of the coordinates
@@ -640,6 +703,22 @@ bool Area::los(const Coordinates & source,
         if (!this->isValid(coordinates))
         {
             return false;
+        }
+        if (coordinates.z > previous.z)
+        {
+            auto downstair = this->getRoom(previous);
+            if (!downstair->findExit(Direction::Up))
+            {
+                return false;
+            }
+        }
+        if (coordinates.z < previous.z)
+        {
+            auto upstair = this->getRoom(previous);
+            if (!upstair->findExit(Direction::Down))
+            {
+                return false;
+            }
         }
         // Increment the coordinates.
         x += unitx;

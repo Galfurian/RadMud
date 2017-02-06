@@ -75,6 +75,12 @@ bool MapGenerator::generateMap(const std::shared_ptr<MapWrapper> & map)
         Logger::log(LogLevel::Error, "While setting the z coordinates.");
         return false;
     }
+    // Fill with air.
+    if (!this->fillWithAir(map))
+    {
+        Logger::log(LogLevel::Error, "While filling with air.");
+        return false;
+    }
     return true;
 }
 
@@ -109,7 +115,7 @@ bool MapGenerator::initializeMap(const std::shared_ptr<MapWrapper> & map)
                     Logger::log(LogLevel::Error, "Found nullptr neighbour");
                     return false;
                 }
-                cell->neighbours.emplace_back(neighbour);
+                cell->addNeighbour(Direction::West, neighbour);
             }
             if (x + 1 < map->getWidth())
             {
@@ -119,7 +125,7 @@ bool MapGenerator::initializeMap(const std::shared_ptr<MapWrapper> & map)
                     Logger::log(LogLevel::Error, "Found nullptr neighbour");
                     return false;
                 }
-                cell->neighbours.emplace_back(neighbour);
+                cell->addNeighbour(Direction::East, neighbour);
             }
             if (y - 1 >= 0)
             {
@@ -129,7 +135,7 @@ bool MapGenerator::initializeMap(const std::shared_ptr<MapWrapper> & map)
                     Logger::log(LogLevel::Error, "Found nullptr neighbour");
                     return false;
                 }
-                cell->neighbours.emplace_back(neighbour);
+                cell->addNeighbour(Direction::South, neighbour);
             }
             if (y + 1 < map->getHeight())
             {
@@ -139,7 +145,7 @@ bool MapGenerator::initializeMap(const std::shared_ptr<MapWrapper> & map)
                     Logger::log(LogLevel::Error, "Found nullptr neighbour");
                     return false;
                 }
-                cell->neighbours.emplace_back(neighbour);
+                cell->addNeighbour(Direction::North, neighbour);
             }
         }
     }
@@ -445,6 +451,35 @@ bool MapGenerator::setZCoordinates(const std::shared_ptr<MapWrapper> & map)
         {
             auto cell = map->getCell(x, y);
             cell->coordinates.z = 50 + heightMap->getOffset(cell->terrain);
+        }
+    }
+    return true;
+}
+
+bool MapGenerator::fillWithAir(const std::shared_ptr<MapWrapper> & map)
+{
+    // Get the highest cell.
+    auto highest = 0;
+    for (auto x = 0; x < map->getWidth(); ++x)
+    {
+        for (auto y = 0; y < map->getHeight(); ++y)
+        {
+            auto cell = map->getCell(x, y);
+            if (cell->coordinates.z > highest)
+            {
+                highest = cell->coordinates.z;
+            }
+        }
+    }
+    for (auto x = 0; x < map->getWidth(); ++x)
+    {
+        for (auto y = 0; y < map->getHeight(); ++y)
+        {
+            auto cell = map->getCell(x, y);
+            for (auto z = cell->coordinates.z; z < highest; ++z)
+            {
+//                auto aboveCell = map->getCell(x, y);
+            }
         }
     }
     return true;

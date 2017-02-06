@@ -143,14 +143,14 @@ bool Direction::operator==(const Direction & rhs) const
     return direction == rhs.direction;
 }
 
-bool Direction::operator==(const Direction::Enum & rhs) const
+bool Direction::operator!=(const Direction & rhs) const
 {
-    return direction == rhs;
+    return direction != rhs.direction;
 }
 
-bool Direction::operator!=(const Direction::Enum & rhs) const
+bool Direction::operator<(const Direction & rhs) const
 {
-    return direction != rhs;
+    return direction < rhs.direction;
 }
 
 void Direction::luaRegister(lua_State * L)

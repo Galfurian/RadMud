@@ -40,7 +40,7 @@ public:
     /// Associated tile.
     std::shared_ptr<terrain::Terrain> terrain;
     /// List of neighbours.
-    std::vector<MapCell *> neighbours;
+    std::map<Direction, MapCell *> neighbours;
     /// The flags of the room.
     unsigned int flags;
     /// The liquid which will fill the room.
@@ -48,6 +48,9 @@ public:
 
     /// @brief Constructor.
     MapCell();
+
+    /// @brief Tries to add the given cell map in the given direction.
+    bool addNeighbour(const Direction & direction, MapCell * mapCell);
 
     /// @brief Find the lowest nearby cell.
     /// @return The found cell.

@@ -34,14 +34,20 @@ MapCell::MapCell() :
     // Nothing to do.
 }
 
+bool MapCell::addNeighbour(const Direction & direction,
+                           MapCell * mapCell)
+{
+    return neighbours.insert(std::make_pair(direction, mapCell)).second;
+}
+
 MapCell * MapCell::findLowestNearbyCell()
 {
     MapCell * selectedCell = this;
     for (auto neighbour : neighbours)
     {
-        if (neighbour->height < selectedCell->height)
+        if (neighbour.second->height < selectedCell->height)
         {
-            selectedCell = neighbour;
+            selectedCell = neighbour.second;
         }
     }
     return selectedCell;

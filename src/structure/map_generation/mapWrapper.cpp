@@ -133,28 +133,28 @@ bool MapWrapper::buildMap()
             for (auto neighbour : cell->neighbours)
             {
                 // Get the room of the neighbour.
-                if (neighbour->room == nullptr)
+                if (neighbour.second->room == nullptr)
                 {
                     Logger::log(LogLevel::Error,
                                 "A neighbour has a nullptr room %s->%s.\n",
                                 cell->coordinates.toString(),
-                                neighbour->coordinates.toString());
+                                neighbour.second->coordinates.toString());
                     return false;
                 }
-                // Get the direction.
-                auto direction = Area::getDirection(cell->coordinates,
-                                                    neighbour->coordinates);
                 // Create the two exits.
-                auto forward = std::make_shared<Exit>(cell->room,
-                                                      neighbour->room,
-                                                      direction,
-                                                      0);
-                auto backward = std::make_shared<Exit>(neighbour->room,
-                                                       cell->room,
-                                                       direction.getOpposite(),
-                                                       0);
+                auto forward = std::make_shared<Exit>(
+                    cell->room,
+                    neighbour.second->room,
+                    neighbour.first,
+                    0);
+                auto backward = std::make_shared<Exit>(
+                    neighbour.second->room,
+                    cell->room,
+                    neighbour.first.getOpposite(),
+                    0);
                 // In case the connection is Up/Down set the presence of stairs.
-                if (direction == Direction::Up || direction == Direction::Down)
+                if ((neighbour.first == Direction::Up) ||
+                    (neighbour.first == Direction::Down))
                 {
                     SetFlag(&forward->flags, ExitFlag::Stairs);
                     SetFlag(&backward->flags, ExitFlag::Stairs);
@@ -169,7 +169,7 @@ bool MapWrapper::buildMap()
                         return false;
                     }
                 }
-                if (neighbour->room->addExit(backward))
+                if (neighbour.second->room->addExit(backward))
                 {
                     if (!SaveRoomExit(backward))
                     {
