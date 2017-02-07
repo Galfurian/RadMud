@@ -1,6 +1,6 @@
-/// @file   mapCell.hpp
+/// @file   terrainFactory.hpp
 /// @author Enrico Fraccaroli
-/// @date   Jan 06 2017
+/// @date   feb 07 2017
 /// @copyright
 /// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -22,41 +22,12 @@
 #pragma once
 
 #include "terrain.hpp"
-#include "mapTile.hpp"
-#include "room.hpp"
+#include <memory>
 
-#include <vector>
-
-/// @brief Holds information about the cell of an automatically generated map.
-class MapCell
+/// @brief Factory which allows to create predefined terrains.
+class TerrainFactory
 {
 public:
-    /// The associated room.
-    Room * room;
-    /// The cell coordinates.
-    Coordinates coordinates;
-    /// Associated tile.
-    std::shared_ptr<terrain::Terrain> terrain;
-    /// List of neighbours.
-    std::map<Direction, MapCell *> neighbours;
-    /// The flags of the room.
-    unsigned int flags;
-    /// The liquid which will fill the room.
-    std::pair<Liquid *, unsigned int> liquid;
+    static std::shared_ptr<terrain::Terrain> getAir();
 
-    /// @brief Constructor.
-    MapCell();
-
-    /// @brief Tries to add the given cell map in the given direction.
-    bool addNeighbour(const Direction & direction, MapCell * mapCell);
-
-    /// @brief Find the lowest nearby cell.
-    /// @return The found cell.
-    MapCell * findLowestNearbyCell();
-
-    /// @brief Returns the tile describing the cell.
-    std::string getTile() const;
-
-    /// @brief Equality operator.
-    bool operator==(const MapCell & other) const;
 };

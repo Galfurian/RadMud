@@ -40,7 +40,7 @@ public:
     /// The sea level.
     std::shared_ptr<terrain::Terrain> seaLevelTerrain;
     /// The current thresholds.
-    std::vector<std::pair<double, std::shared_ptr<terrain::Terrain>>> thresholds;
+    std::vector<std::pair<int, std::shared_ptr<terrain::Terrain>>> thresholds;
 
     /// @brief Constructor.
     HeightMap(const unsigned int & _vnum,
@@ -51,11 +51,11 @@ public:
     /// @param terrain      The terrain associated with the new threshold.
     /// @param threshold    The threshold value.
     void addThreshold(const std::shared_ptr<terrain::Terrain> & terrain,
-                      const double & threshold);
+                      const int & threshold);
 
     /// @brief Returns the terrain associated with the given height w.r.t.
     /// the current thresholds.
-    std::shared_ptr<terrain::Terrain> getTerrain(const double & height);
+    std::shared_ptr<terrain::Terrain> getTerrain(const int & height);
 
     int getOffset(const std::shared_ptr<terrain::Terrain> & terrain) const;
 };

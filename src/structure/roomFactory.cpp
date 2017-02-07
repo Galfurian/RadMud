@@ -1,6 +1,6 @@
-/// @file   mapCell.hpp
+/// @file   roomFactory.cpp
 /// @author Enrico Fraccaroli
-/// @date   Jan 06 2017
+/// @date   feb 07 2017
 /// @copyright
 /// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -19,44 +19,18 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#pragma once
+#include "roomFactory.hpp"
+#include "terrainFactory.hpp"
+#include "mud.hpp"
 
-#include "terrain.hpp"
-#include "mapTile.hpp"
-#include "room.hpp"
-
-#include <vector>
-
-/// @brief Holds information about the cell of an automatically generated map.
-class MapCell
+Room * RoomFactory::createRoomAir()
 {
-public:
-    /// The associated room.
-    Room * room;
-    /// The cell coordinates.
-    Coordinates coordinates;
-    /// Associated tile.
-    std::shared_ptr<terrain::Terrain> terrain;
-    /// List of neighbours.
-    std::map<Direction, MapCell *> neighbours;
-    /// The flags of the room.
-    unsigned int flags;
-    /// The liquid which will fill the room.
-    std::pair<Liquid *, unsigned int> liquid;
-
-    /// @brief Constructor.
-    MapCell();
-
-    /// @brief Tries to add the given cell map in the given direction.
-    bool addNeighbour(const Direction & direction, MapCell * mapCell);
-
-    /// @brief Find the lowest nearby cell.
-    /// @return The found cell.
-    MapCell * findLowestNearbyCell();
-
-    /// @brief Returns the tile describing the cell.
-    std::string getTile() const;
-
-    /// @brief Equality operator.
-    bool operator==(const MapCell & other) const;
-};
+    // Create an empty Room.
+    auto airRoom = new Room();
+    // Initialize the Room.
+    airRoom->terrain = TerrainFactory::getAir();
+    airRoom->name = "Air";
+    airRoom->description = "You are floating in the air";
+    SetFlag(&airRoom->flags, RoomFlags::Air);
+    return airRoom;
+}

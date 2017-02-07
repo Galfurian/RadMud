@@ -22,6 +22,7 @@
 #include "mapGenerator.hpp"
 #include "logger.hpp"
 #include "area.hpp"
+#include "terrainFactory.hpp"
 
 MapGenerator::MapGenerator(const MapGeneratorConfiguration & _configuration,
                            const std::shared_ptr<HeightMap> & _heightMap) :
@@ -181,7 +182,8 @@ bool MapGenerator::generateMountains(const std::shared_ptr<MapWrapper> & map)
                 // Set the height value on the map.
                 if (cellHeight > 0)
                 {
-                    map->getCell(x, y)->height += cellHeight;
+                    map->getCell(x, y)->coordinates.z +=
+                        static_cast<int>(std::ceil(cellHeight));
                 }
             }
         }
@@ -191,15 +193,21 @@ bool MapGenerator::generateMountains(const std::shared_ptr<MapWrapper> & map)
 
 bool MapGenerator::normalizeMap(const std::shared_ptr<MapWrapper> & map)
 {
-    auto minHeight = 0.0, maxHeight = 0.0;
+    auto minHeight = 0, maxHeight = 0;
     // Find the minimum and maximum heights.
     for (auto x = 0; x < map->getWidth(); ++x)
     {
         for (auto y = 0; y < map->getHeight(); ++y)
         {
             auto cell = map->getCell(x, y);
-            if (cell->height < minHeight) minHeight = cell->height;
-            if (cell->height > maxHeight) maxHeight = cell->height;
+            if (cell->coordinates.z < minHeight)
+            {
+                minHeight = cell->coordinates.z;
+            }
+            if (cell->coordinates.z > maxHeight)
+            {
+                maxHeight = cell->coordinates.z;
+            }
         }
     }
     // Drop the map if it is quite plain.
@@ -216,11 +224,11 @@ bool MapGenerator::normalizeMap(const std::shared_ptr<MapWrapper> & map)
         for (int y = 0; y < map->getHeight(); ++y)
         {
             auto cell = map->getCell(x, y);
-            cell->height = Normalize(cell->height,
-                                     minHeight,
-                                     maxHeight,
-                                     0.0,
-                                     100.0);
+            cell->coordinates.z = Normalize(cell->coordinates.z,
+                                            minHeight,
+                                            maxHeight,
+                                            0,
+                                            100);
         }
     }
     return true;
@@ -238,7 +246,7 @@ bool MapGenerator::applyTerrain(const std::shared_ptr<MapWrapper> & map)
         for (auto y = 0; y < map->getHeight(); ++y)
         {
             auto cell = map->getCell(x, y);
-            cell->terrain = heightMap->getTerrain(cell->height);
+            cell->terrain = heightMap->getTerrain(cell->coordinates.z);
             if (cell->terrain == nullptr)
             {
                 Logger::log(LogLevel::Error, "Applying a terrain.");
@@ -329,11 +337,9 @@ bool MapGenerator::generateRivers(const std::shared_ptr<MapWrapper> & map)
             auto riverCell = (*it2);
             if (it2 == river.begin())
             {
-//                riverCell->room->coord.z -= 2;
                 riverCell->liquid = std::make_pair(liquid, 100);
                 continue;
             }
-//            riverCell->room->coord.z -= 2;
             riverCell->liquid = std::make_pair(liquid, 100);
         }
     }
@@ -471,14 +477,84 @@ bool MapGenerator::fillWithAir(const std::shared_ptr<MapWrapper> & map)
             }
         }
     }
+    // Create the air cells.
     for (auto x = 0; x < map->getWidth(); ++x)
     {
         for (auto y = 0; y < map->getHeight(); ++y)
         {
             auto cell = map->getCell(x, y);
-            for (auto z = cell->coordinates.z; z < highest; ++z)
+            auto airStack = map->getAirStack(x, y);
+            for (auto z = cell->coordinates.z + 1; z < highest; ++z)
             {
-//                auto aboveCell = map->getCell(x, y);
+                // Create a new cell an add it to the stack.
+                airStack->emplace_back(MapCell());
+                // Get the current cell.
+                auto currentCell = &airStack->back();
+                // Set the coordinates.
+                currentCell->coordinates = cell->coordinates;
+                currentCell->coordinates.z = z;
+                // Set the terrain.
+                currentCell->terrain = TerrainFactory::getAir();
+                // Set the flag.
+                SetFlag(&currentCell->flags, RoomFlags::Air);
+            }
+        }
+    }
+    // Connect the cells.
+    for (auto x = 0; x < map->getWidth(); ++x)
+    {
+        for (auto y = 0; y < map->getHeight(); ++y)
+        {
+            auto cell = map->getCell(x, y);
+            auto previousCell = cell;
+            for (auto z = cell->coordinates.z + 1; z < highest; ++z)
+            {
+                auto currentCell = map->findCell(cell->coordinates.x,
+                                                 cell->coordinates.y,
+                                                 z);
+                if (currentCell == nullptr)
+                {
+                    Logger::log(LogLevel::Error, "Found nullptr air tile.");
+                    return false;
+                }
+                // Set the coordinates.
+                currentCell->coordinates = cell->coordinates;
+                currentCell->coordinates.z = z;
+                // Set the terrain.
+                currentCell->terrain = TerrainFactory::getAir();
+                // Set the flag.
+                SetFlag(&currentCell->flags, RoomFlags::Air);
+                // Set the neighbours.
+                // Set the direction: UP.
+                previousCell->addNeighbour(Direction::Up, currentCell);
+                // Set the direction: DOWN.
+                currentCell->addNeighbour(Direction::Down, previousCell);
+                // Set the direction: NORTH.
+                currentCell->addNeighbour(
+                    Direction::North,
+                    map->findCell(currentCell->coordinates.x,
+                                  currentCell->coordinates.y + 1,
+                                  currentCell->coordinates.z));
+                // Set the direction: SOUTH.
+                currentCell->addNeighbour(
+                    Direction::South,
+                    map->findCell(currentCell->coordinates.x,
+                                  currentCell->coordinates.y - 1,
+                                  currentCell->coordinates.z));
+                // Set the direction: WEST.
+                currentCell->addNeighbour(
+                    Direction::West,
+                    map->findCell(currentCell->coordinates.x - 1,
+                                  currentCell->coordinates.y,
+                                  currentCell->coordinates.z));
+                // Set the direction: NORTH.
+                currentCell->addNeighbour(
+                    Direction::East,
+                    map->findCell(currentCell->coordinates.x + 1,
+                                  currentCell->coordinates.y,
+                                  currentCell->coordinates.z));
+                // Set the previous cell.
+                previousCell = currentCell;
             }
         }
     }

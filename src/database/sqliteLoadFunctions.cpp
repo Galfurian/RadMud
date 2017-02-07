@@ -1795,7 +1795,7 @@ bool LoadHeightMapThreshold(ResultSet * result)
                 throw SQLiteException(
                     "Can't find the terrain " + ToString(terrainVnum));
             }
-            auto threshold = result->getNextDouble();
+            auto threshold = result->getNextInteger();
             heightMap->addThreshold(terrain, threshold);
             Logger::log(LogLevel::Debug, "\t%s%s%s",
                         AlignString(heightMap->name, StringAlign::Left, 25),

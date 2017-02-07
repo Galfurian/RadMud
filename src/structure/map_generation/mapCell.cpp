@@ -25,7 +25,6 @@
 MapCell::MapCell() :
     room(),
     coordinates(),
-    height(),
     terrain(),
     neighbours(),
     flags(),
@@ -37,6 +36,10 @@ MapCell::MapCell() :
 bool MapCell::addNeighbour(const Direction & direction,
                            MapCell * mapCell)
 {
+    if (mapCell == nullptr)
+    {
+        return false;
+    }
     return neighbours.insert(std::make_pair(direction, mapCell)).second;
 }
 
@@ -45,7 +48,7 @@ MapCell * MapCell::findLowestNearbyCell()
     MapCell * selectedCell = this;
     for (auto neighbour : neighbours)
     {
-        if (neighbour.second->height < selectedCell->height)
+        if (neighbour.second->coordinates.z < selectedCell->coordinates.z)
         {
             selectedCell = neighbour.second;
         }

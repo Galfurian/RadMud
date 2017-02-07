@@ -34,19 +34,19 @@ HeightMap::HeightMap(const unsigned int & _vnum,
 
 void HeightMap::addThreshold(
     const std::shared_ptr<terrain::Terrain> & terrain,
-    const double & threshold)
+    const int & threshold)
 {
     thresholds.emplace_back(std::make_pair(threshold, terrain));
     std::sort(thresholds.begin(), thresholds.end(), [](
-        const std::pair<double, std::shared_ptr<terrain::Terrain>> & left,
-        const std::pair<double, std::shared_ptr<terrain::Terrain>> & right)
+        const std::pair<int, std::shared_ptr<terrain::Terrain>> & left,
+        const std::pair<int, std::shared_ptr<terrain::Terrain>> & right)
     {
         return left.first < right.first;
     });
 }
 
 std::shared_ptr<terrain::Terrain> HeightMap::getTerrain(
-    const double & height)
+    const int & height)
 {
     for (auto it : thresholds)
     {
@@ -64,13 +64,19 @@ int HeightMap::getOffset(
     int terrainLevel = 0;
     for (auto it : thresholds)
     {
-        if (it.second->vnum == terrain->vnum) break;
+        if (it.second->vnum == terrain->vnum)
+        {
+            break;
+        }
         ++terrainLevel;
     }
     int seaLevel = 0;
     for (auto it : thresholds)
     {
-        if (it.second->vnum == seaLevelTerrain->vnum) break;
+        if (it.second->vnum == seaLevelTerrain->vnum)
+        {
+            break;
+        }
         ++seaLevel;
     }
     return terrainLevel - seaLevel;

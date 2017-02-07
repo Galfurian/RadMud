@@ -22,18 +22,21 @@
 #pragma once
 
 #include "mapCell.hpp"
+#include <vector>
 
 class MapWrapper
 {
 public:
     /// The unique virtual number.
     unsigned int vnum;
-    /// Width of th map.
+    /// Width of the map.
     int width;
-    /// Height of th map.
+    /// Height of the map.
     int height;
     /// The map.
     std::map<int, std::map<int, MapCell>> map;
+    /// The air map.
+    std::map<int, std::map<int, std::vector<MapCell>>> airMap;
 
     /// @brief Constructor.
     MapWrapper();
@@ -73,9 +76,68 @@ public:
         return &map[x][y];
     }
 
+    /// @brief Returns the cell at the given position.
+    inline std::vector<MapCell> * getAirStack(int x, int y)
+    {
+        if ((x < 0) || (x >= width)) return nullptr;
+        if ((y < 0) || (y >= height)) return nullptr;
+        auto it = airMap.find(x);
+        if (it != airMap.end())
+        {
+            auto it2 = it->second.find(y);
+            if (it2 != it->second.end())
+            {
+                return &it2->second;
+            }
+        }
+        return &(airMap[x][y] = std::vector<MapCell>());
+    }
+
+    /// @brief Returns the cell at the given position.
+    inline MapCell * findCell(int x, int y)
+    {
+        if ((x < 0) || (x >= width)) return nullptr;
+        if ((y < 0) || (y >= height)) return nullptr;
+        auto it = map.find(x);
+        if (it != map.end())
+        {
+            auto it2 = it->second.find(y);
+            if (it2 != it->second.end())
+            {
+                return &it2->second;
+            }
+        }
+        return nullptr;
+    }
+
+    /// @brief Returns the cell at the given position.
+    inline MapCell * findCell(int x, int y, int z)
+    {
+        if ((x < 0) || (x >= width)) return nullptr;
+        if ((y < 0) || (y >= height)) return nullptr;
+        auto it = airMap.find(x);
+        if (it != airMap.end())
+        {
+            auto it2 = it->second.find(y);
+            if (it2 != it->second.end())
+            {
+                for (auto it3 = it2->second.begin(); it3 != it2->second.end();
+                     ++it3)
+                {
+                    if (it3->coordinates.z == z)
+                    {
+                        return &(*it3);
+                    }
+                }
+            }
+        }
+        return nullptr;
+    }
+
     /// @brief Set the object at the given Coordinates2D.
-    /// @param x     Coordinate on width axis.
-    /// @param y     Coordinate on height axis.
+    /// @param x     Coordinate on x-axis.
+    /// @param y     Coordinate on y-axis.
+    /// @param z     Coordinate on z-axis.
     /// @param value The value that has to be set.
     inline void set(int x,
                     int y,
