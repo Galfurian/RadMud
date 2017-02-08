@@ -41,12 +41,16 @@ Coordinates::Coordinates(const int & _x, const int & _y, const int & _z) :
 
 bool Coordinates::operator==(const Coordinates & right) const
 {
-    return (x == right.x) && (y == right.y) && (z == right.z);
+    if (x != right.x) return false;
+    if (y != right.y) return false;
+    return (z == right.z);
 }
 
 bool Coordinates::operator!=(const Coordinates & right) const
 {
-    return (x != right.x) || (y != right.y) || (z != right.z);
+    if (x != right.x) return true;
+    if (y != right.y) return true;
+    return (z != right.z);
 }
 
 bool Coordinates::operator<(const Coordinates & right) const
@@ -62,11 +66,7 @@ bool Coordinates::operator<(const Coordinates & right) const
 
 Coordinates Coordinates::operator+(const Coordinates & right) const
 {
-    Coordinates coord;
-    coord.x = x + right.x;
-    coord.y = y + right.y;
-    coord.z = z + right.z;
-    return coord;
+    return Coordinates(x + right.x, y + right.y, z + right.z);
 }
 
 int Coordinates::square() const

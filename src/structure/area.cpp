@@ -390,59 +390,59 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, const int & radius)
 
 std::string Area::drawASCIIFov(Room * centerRoom, const int & radius)
 {
-    std::string result;
     if (!this->inBoundaries(centerRoom->coord))
     {
-        return result;
+        return "";
     }
+    std::string result;
+    result.reserve(static_cast<size_t >(radius * radius));
     // Evaluate the minimum and maximum value for x and y.
     int min_x = (centerRoom->coord.x - radius);
     int max_x = (centerRoom->coord.x + radius);
     int min_y = (centerRoom->coord.y - radius);
     int max_y = (centerRoom->coord.y + radius);
-    int min_z = (centerRoom->coord.z - radius);
-    int max_z = (centerRoom->coord.z + radius);
     // Evaluate the field of view.
     auto view = this->fov(centerRoom->coord, radius);
     // Draw the fov.
     Coordinates point = centerRoom->coord;
-//    for (point.z = min_z; point.z <= max_z; ++point.z)
-//    {
     for (point.y = max_y; point.y >= min_y; --point.y)
     {
         for (point.x = min_x; point.x <= max_x; ++point.x)
         {
             if (std::find(view.begin(), view.end(), point) == view.end())
             {
-                result += " ";
+                result += ' ';
                 continue;
             }
             Room * room = this->getRoom(point);
             if (room == nullptr)
             {
-                result += " ";
+                result += ' ';
                 continue;
             }
             if (!room->isLit())
             {
-                result += " ";
+                result += ' ';
                 continue;
             }
-            std::string tile = " ";
+            std::string tile;
             auto up = room->findExit(Direction::Up);
             auto down = room->findExit(Direction::Down);
             // VI  - WALKABLE
             if (room->liquid.first != nullptr)
             {
-                tile = "w";
+                tile = 'w';
             }
             else if (HasFlag(room->flags, RoomFlags::SpawnTree))
             {
-                tile = "t";
+                tile = 't';
             }
-            tile = room->terrain->symbol;
+            else
+            {
+                tile = room->terrain->symbol;
+            }
             // V   - OPEN DOOR
-            Item * door = room->findDoor();
+            auto door = room->findDoor();
             if (door != nullptr)
             {
                 if (HasFlag(door->flags, ItemFlag::Closed))
@@ -460,35 +460,25 @@ std::string Area::drawASCIIFov(Room * centerRoom, const int & radius)
                 if (HasFlag(up->flags, ExitFlag::Stairs)
                     && HasFlag(down->flags, ExitFlag::Stairs))
                 {
-                    tile = "X";
+                    tile = 'X';
                 }
             }
             else if (up != nullptr)
             {
                 if (HasFlag(up->flags, ExitFlag::Stairs))
                 {
-                    tile = ">";
+                    tile = '>';
                 }
             }
             else if (down != nullptr)
             {
                 if (HasFlag(down->flags, ExitFlag::Stairs))
                 {
-                    tile = "<";
+                    tile = '<';
                 }
                 else
                 {
-                    tile = " ";
-                    Coordinates below = point;
-                    for (below.z = min_z; below.z <= max_z; ++below.z)
-                    {
-                        if (std::find(view.begin(), view.end(), below) ==
-                            view.end())
-                        {
-                            tile = "*";
-                            break;
-                        }
-                    }
+                    tile = ' ';
                 }
             }
             // III - ITEMS
@@ -511,14 +501,12 @@ std::string Area::drawASCIIFov(Room * centerRoom, const int & radius)
             // I   - PLAYER
             if (centerRoom->coord == point)
             {
-                tile = "@";
+                tile = '@';
             }
             result += tile;
         }
-        result += "\n";
+        result += '\n';
     }
-//        result += "\n";
-//    }
     return result;
 }
 
@@ -562,7 +550,11 @@ std::vector<Coordinates> Area::fov(Coordinates & origin, const int & radius)
         if (!checked[coordinates])
         {
             checked[coordinates] = true;
-            if (this->los(origin, coordinates, radius))
+            if (origin == coordinates)
+            {
+                cfov.emplace_back(coordinates);
+            }
+            else if (this->los(origin, coordinates, radius))
             {
                 cfov.emplace_back(coordinates);
             }
@@ -570,81 +562,49 @@ std::vector<Coordinates> Area::fov(Coordinates & origin, const int & radius)
         }
     };
     Coordinates point;
-    while (point.z <= radius)
+    while (point.x <= radius)
     {
-        while ((point.x <= (radius - point.z)) && (point.square() <=
-                                                   pow(radius, 2)))
+        while ((point.y <= point.x) && (point.square() <= pow(radius, 2)))
         {
-            while ((point.y <= point.x) && (point.square() <= pow(radius, 2)))
-            {
-                // ---------------------------------------------------------
-                CheckCoordinates(Coordinates(origin.x + point.x,
-                                             origin.y + point.y,
-                                             origin.z + point.z));
-                CheckCoordinates(Coordinates(origin.x + point.x,
-                                             origin.y + point.y,
-                                             origin.z - point.z));
-                // ---------------------------------------------------------
-                CheckCoordinates(Coordinates(origin.x - point.x,
-                                             origin.y + point.y,
-                                             origin.z + point.z));
-                CheckCoordinates(Coordinates(origin.x - point.x,
-                                             origin.y + point.y,
-                                             origin.z - point.z));
-                // ---------------------------------------------------------
-                CheckCoordinates(Coordinates(origin.x + point.x,
-                                             origin.y - point.y,
-                                             origin.z + point.z));
-                CheckCoordinates(Coordinates(origin.x + point.x,
-                                             origin.y - point.y,
-                                             origin.z - point.z));
-                // ---------------------------------------------------------
-                CheckCoordinates(Coordinates(origin.x - point.x,
-                                             origin.y - point.y,
-                                             origin.z + point.z));
-                CheckCoordinates(Coordinates(origin.x - point.x,
-                                             origin.y - point.y,
-                                             origin.z - point.z));
-                // ---------------------------------------------------------
-                CheckCoordinates(Coordinates(origin.x + point.y,
-                                             origin.y + point.x,
-                                             origin.z + point.z));
-                CheckCoordinates(Coordinates(origin.x + point.y,
-                                             origin.y + point.x,
-                                             origin.z - point.z));
-                // ---------------------------------------------------------
-                CheckCoordinates(Coordinates(origin.x - point.y,
-                                             origin.y + point.x,
-                                             origin.z + point.z));
-                CheckCoordinates(Coordinates(origin.x - point.y,
-                                             origin.y + point.x,
-                                             origin.z - point.z));
-                // ---------------------------------------------------------
-                CheckCoordinates(Coordinates(origin.x + point.y,
-                                             origin.y - point.x,
-                                             origin.z + point.z));
-                CheckCoordinates(Coordinates(origin.x + point.y,
-                                             origin.y - point.x,
-                                             origin.z - point.z));
-                // ---------------------------------------------------------
-                CheckCoordinates(Coordinates(origin.x - point.y,
-                                             origin.y - point.x,
-                                             origin.z + point.z));
-                CheckCoordinates(Coordinates(origin.x - point.y,
-                                             origin.y - point.x,
-                                             origin.z - point.z));
-                // ---------------------------------------------------------
-                ++point.y;
-            }
-            ++point.x;
-            point.y = 0;
+            // ---------------------------------------------------------
+            CheckCoordinates(Coordinates(origin.x + point.x,
+                                         origin.y + point.y,
+                                         origin.z + point.z));
+            // ---------------------------------------------------------
+            CheckCoordinates(Coordinates(origin.x - point.x,
+                                         origin.y + point.y,
+                                         origin.z + point.z));
+            // ---------------------------------------------------------
+            CheckCoordinates(Coordinates(origin.x + point.x,
+                                         origin.y - point.y,
+                                         origin.z + point.z));
+            // ---------------------------------------------------------
+            CheckCoordinates(Coordinates(origin.x - point.x,
+                                         origin.y - point.y,
+                                         origin.z + point.z));
+            // ---------------------------------------------------------
+            CheckCoordinates(Coordinates(origin.x + point.y,
+                                         origin.y + point.x,
+                                         origin.z + point.z));
+            // ---------------------------------------------------------
+            CheckCoordinates(Coordinates(origin.x - point.y,
+                                         origin.y + point.x,
+                                         origin.z + point.z));
+            // ---------------------------------------------------------
+            CheckCoordinates(Coordinates(origin.x + point.y,
+                                         origin.y - point.x,
+                                         origin.z + point.z));
+            // ---------------------------------------------------------
+            CheckCoordinates(Coordinates(origin.x - point.y,
+                                         origin.y - point.x,
+                                         origin.z + point.z));
+            // ---------------------------------------------------------
+            ++point.y;
         }
-        point.x = 0;
+        ++point.x;
         point.y = 0;
-        ++point.z;
     }
-    Logger::log(LogLevel::Debug, "RAD[%s] PTS[%s]",
-                radius, checkedPoints);
+    Logger::log(LogLevel::Debug, "RAD[%s] PTS[%s]", radius, checkedPoints);
     return cfov;
 }
 
@@ -676,12 +636,18 @@ bool Area::los(const Coordinates & source,
     // Evaluate the unit increment for both X and Y.
     // Decrease the value of precision for a faster execution with
     //  a worsening in terms of accuracy (default 6).
-    double precision = 10;
+    double precision = 5;
     double unitx = dx / (distance * precision);
     double unity = dy / (distance * precision);
     double unitz = dz / (distance * precision);
     // Evaluate the minimum value of increment.
-    double min = std::min(std::min(unitx, unity), unitz);
+    double min = 0.1;
+    auto absX = std::abs(unitx);
+    auto absY = std::abs(unity);
+    auto absZ = std::abs(unitz);
+    if (absX > 0.0) min = std::min(min, absX);
+    if (absY > 0.0) min = std::min(min, absY);
+    if (absZ > 0.0) min = std::min(min, absZ);
     // Set the initial values for X and Y.
     double x = source.x + 0.5;
     double y = source.y + 0.5;
@@ -696,10 +662,6 @@ bool Area::los(const Coordinates & source,
         int floor_y = static_cast<int>(std::floor(y));
         int floor_z = static_cast<int>(std::floor(z));
         coordinates = Coordinates(floor_x, floor_y, floor_z);
-        if (coordinates == target)
-        {
-            return true;
-        }
         if (!this->isValid(coordinates))
         {
             return false;
@@ -719,6 +681,10 @@ bool Area::los(const Coordinates & source,
             {
                 return false;
             }
+        }
+        if (coordinates == target)
+        {
+            return true;
         }
         // Increment the coordinates.
         x += unitx;
