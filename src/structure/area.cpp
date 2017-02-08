@@ -98,17 +98,17 @@ Direction Area::getDirection(const Coordinates & source,
     if ((dx > dy) && (dx > dz))
     {
         if (source.x > target.x) return Direction::West;
-        else if (source.x < target.x) return Direction::East;
+        if (source.x < target.x) return Direction::East;
     }
-    else if ((dy > dx) && (dy > dz))
+    if ((dy > dx) && (dy > dz))
     {
         if (source.y > target.y) return Direction::South;
-        else if (source.y < target.y) return Direction::North;
+        if (source.y < target.y) return Direction::North;
     }
-    else if ((dz > dx) && (dz > dy))
+    if ((dz > dx) && (dz > dy))
     {
         if (source.z > target.z) return Direction::Down;
-        else if (source.z < target.z) return Direction::Up;
+        if (source.z < target.z) return Direction::Up;
     }
     return Direction::None;
 }
@@ -542,14 +542,11 @@ ItemVector Area::getItemsInSight(ItemVector & exceptions,
 
 std::vector<Coordinates> Area::fov(Coordinates & origin, const int & radius)
 {
-    unsigned int checkedPoints = 0;
-    std::map<Coordinates, bool> checked;
     std::vector<Coordinates> cfov;
     auto CheckCoordinates = [&](const Coordinates & coordinates)
     {
-        if (!checked[coordinates])
+        if (std::find(cfov.begin(), cfov.end(), coordinates) == cfov.end())
         {
-            checked[coordinates] = true;
             if (origin == coordinates)
             {
                 cfov.emplace_back(coordinates);
@@ -558,7 +555,6 @@ std::vector<Coordinates> Area::fov(Coordinates & origin, const int & radius)
             {
                 cfov.emplace_back(coordinates);
             }
-            checkedPoints++;
         }
     };
     Coordinates point;
@@ -604,7 +600,6 @@ std::vector<Coordinates> Area::fov(Coordinates & origin, const int & radius)
         ++point.x;
         point.y = 0;
     }
-    Logger::log(LogLevel::Debug, "RAD[%s] PTS[%s]", radius, checkedPoints);
     return cfov;
 }
 
@@ -658,10 +653,7 @@ bool Area::los(const Coordinates & source,
     {
         // Evaluate the integer version of the coordinates
         //  using the floor value.
-        int floor_x = static_cast<int>(std::floor(x));
-        int floor_y = static_cast<int>(std::floor(y));
-        int floor_z = static_cast<int>(std::floor(z));
-        coordinates = Coordinates(floor_x, floor_y, floor_z);
+        coordinates = Coordinates(std::floor(x), std::floor(y), std::floor(z));
         if (!this->isValid(coordinates))
         {
             return false;

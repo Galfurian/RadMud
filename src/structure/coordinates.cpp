@@ -39,6 +39,16 @@ Coordinates::Coordinates(const int & _x, const int & _y, const int & _z) :
     // Nothing to do.
 }
 
+Coordinates::Coordinates(const double & _x,
+                         const double & _y,
+                         const double & _z) :
+    x(static_cast<int>(_x)),
+    y(static_cast<int>(_y)),
+    z(static_cast<int>(_z))
+{
+    // Nothing to do.
+}
+
 bool Coordinates::operator==(const Coordinates & right) const
 {
     if (x != right.x) return false;
@@ -79,45 +89,6 @@ std::string Coordinates::toString() const
     return "[X:" + ToString(x) + ";" +
            " Y:" + ToString(y) + ";" +
            " Z:" + ToString(z) + "]";
-}
-
-Coordinates Coordinates::round(double x, double y, double z)
-{
-    double rx = std::round(x), ry = std::round(y), rz = std::round(z);
-    double s = rx + ry + rz;
-    if (!DoubleEquality(s, 0.0))
-    {
-        double x_err = std::abs(rx - x);
-        double y_err = std::abs(ry - y);
-        double z_err = std::abs(rz - z);
-        if ((x_err >= y_err) && (x_err >= z_err))
-        {
-            rx -= s;
-            if (DoubleEquality(x_err, y_err))
-            {
-                ry -= s;
-            }
-            if (DoubleEquality(x_err, z_err))
-            {
-                rz -= s;
-            }
-        }
-        else if (y_err > z_err)
-        {
-            ry -= s;
-            if (DoubleEquality(y_err, z_err))
-            {
-                rz -= s;
-            }
-        }
-        else
-        {
-            rz -= s;
-        }
-    }
-    return Coordinates(static_cast<int>(rx),
-                       static_cast<int>(ry),
-                       static_cast<int>(rz));
 }
 
 void Coordinates::luaRegister(lua_State * L)

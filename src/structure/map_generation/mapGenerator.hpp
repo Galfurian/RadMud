@@ -65,9 +65,6 @@ private:
     /// @brief Add the forests to the map.
     bool generateForests(const std::shared_ptr<MapWrapper> & map);
 
-    /// @brief Sets the z coordinates of the cells inside the map.
-    bool setZCoordinates(const std::shared_ptr<MapWrapper> & map);
-
-    /// @brief Add the empty rooms which represent the air.
-    bool fillWithAir(const std::shared_ptr<MapWrapper> & map);
+    /// @brief Resets the z coordinates of the cells inside the map to 50.
+    bool resetZCoordinates(const std::shared_ptr<MapWrapper> & map);
 };

@@ -54,6 +54,7 @@ void MapWrapper::destroy()
 
 bool MapWrapper::buildMap()
 {
+    // -------------------------------------------------------------------------
     // First create a new area.
     auto area = new Area();
     area->vnum = Mud::instance().getUniqueAreaVnum();
@@ -75,6 +76,7 @@ bool MapWrapper::buildMap()
         Logger::log(LogLevel::Error, "While saving the area on the DB.\n");
         return false;
     }
+    // -------------------------------------------------------------------------
     // Generate the normal rooms.
     for (int x = 0; x < width; ++x)
     {
@@ -115,65 +117,12 @@ bool MapWrapper::buildMap()
                             "While saving the Area List.\n");
                 return false;
             }
-            // Log.
             Logger::log(LogLevel::Debug, "Created room at %s",
                         cell->room->coord.toString());
         }
     }
-    // Generate the air rooms.
-    for (auto x = 0; x < width; ++x)
-    {
-        for (auto y = 0; y < height; ++y)
-        {
-            auto airStack = this->getAirStack(x, y);
-            if (airStack == nullptr)
-            {
-                Logger::log(LogLevel::Error,
-                            "Cannot find the air stack at %s:%s", x, y);
-            }
-            for (auto it = airStack->begin(); it != airStack->end(); ++it)
-            {
-                auto cell = &(*it);
-                cell->room = new Room();
-                cell->room->vnum = Mud::instance().getMaxVnumRoom() + 1;
-                cell->room->area = area;
-                cell->room->coord = cell->coordinates;
-                cell->room->terrain = cell->terrain;
-                cell->room->name = cell->terrain->name;
-                cell->room->liquid = cell->liquid;
-                cell->room->description = "";
-                cell->room->flags = cell->flags;
-                // Add the created room to the room_map.
-                if (!Mud::instance().addRoom(cell->room))
-                {
-                    Logger::log(LogLevel::Error,
-                                "Cannot add the room to the mud.\n");
-                    return false;
-                }
-                if (!cell->room->area->addRoom(cell->room))
-                {
-                    Logger::log(LogLevel::Error,
-                                "Cannot add the room to the area.\n");
-                    return false;
-                }
-                if (!SaveRoom(cell->room))
-                {
-                    Logger::log(LogLevel::Error,
-                                "While saving the room on DB.\n");
-                    return false;
-                }
-                if (!SaveAreaList(area, cell->room))
-                {
-                    Logger::log(LogLevel::Error,
-                                "While saving the Area List.\n");
-                    return false;
-                }
-                // Log.
-                Logger::log(LogLevel::Debug, "Created room at %s",
-                            cell->room->coord.toString());
-            }
-        }
-    }
+    // -------------------------------------------------------------------------
+    // Generate the exits.
     for (int x = 0; x < width; ++x)
     {
         for (int y = 0; y < height; ++y)
@@ -225,79 +174,6 @@ bool MapWrapper::buildMap()
                         Logger::log(LogLevel::Error,
                                     "While saving the exit on DB.\n");
                         return false;
-                    }
-                }
-            }
-        }
-    }
-    // Generate the air rooms.
-    for (auto x = 0; x < width; ++x)
-    {
-        for (auto y = 0; y < height; ++y)
-        {
-            auto airStack = this->getAirStack(x, y);
-            if (airStack == nullptr)
-            {
-                Logger::log(LogLevel::Error,
-                            "Cannot find the air stack at %s:%s", x, y);
-            }
-            for (auto it = airStack->begin(); it != airStack->end(); ++it)
-            {
-                auto cell = &(*it);
-                if (cell->room == nullptr)
-                {
-                    Logger::log(LogLevel::Error,
-                                "A cell has a nullptr room at %s.\n",
-                                cell->coordinates.toString());
-                    return false;
-                }
-                for (auto neighbour : cell->neighbours)
-                {
-                    // Get the room of the neighbour.
-                    if (neighbour.second->room == nullptr)
-                    {
-                        Logger::log(LogLevel::Error,
-                                    "A neighbour has a nullptr room %s->%s.\n",
-                                    cell->coordinates.toString(),
-                                    neighbour.second->coordinates.toString());
-                        return false;
-                    }
-                    // Create the two exits.
-                    auto forward = std::make_shared<Exit>(
-                        cell->room,
-                        neighbour.second->room,
-                        neighbour.first,
-                        0);
-                    auto backward = std::make_shared<Exit>(
-                        neighbour.second->room,
-                        cell->room,
-                        neighbour.first.getOpposite(),
-                        0);
-                    // In case the connection is Up/Down set the presence of stairs.
-                    if ((neighbour.first == Direction::Up) ||
-                        (neighbour.first == Direction::Down))
-                    {
-                        SetFlag(&forward->flags, ExitFlag::Stairs);
-                        SetFlag(&backward->flags, ExitFlag::Stairs);
-                    }
-                    // Insert in both the rooms exits the connection.
-                    if (cell->room->addExit(forward))
-                    {
-                        if (!SaveRoomExit(forward))
-                        {
-                            Logger::log(LogLevel::Error,
-                                        "While saving the exit on DB.\n");
-                            return false;
-                        }
-                    }
-                    if (neighbour.second->room->addExit(backward))
-                    {
-                        if (!SaveRoomExit(backward))
-                        {
-                            Logger::log(LogLevel::Error,
-                                        "While saving the exit on DB.\n");
-                            return false;
-                        }
                     }
                 }
             }

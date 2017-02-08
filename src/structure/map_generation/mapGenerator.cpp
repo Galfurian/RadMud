@@ -70,16 +70,10 @@ bool MapGenerator::generateMap(const std::shared_ptr<MapWrapper> & map)
         Logger::log(LogLevel::Error, "While generating the forests.");
         return false;
     }
-    // Set the z coordinates.
-    if (!this->setZCoordinates(map))
+    // Reset the z coordinates.
+    if (!this->resetZCoordinates(map))
     {
         Logger::log(LogLevel::Error, "While setting the z coordinates.");
-        return false;
-    }
-    // Fill with air.
-    if (!this->fillWithAir(map))
-    {
-        Logger::log(LogLevel::Error, "While filling with air.");
         return false;
     }
     return true;
@@ -449,113 +443,14 @@ bool MapGenerator::generateForests(const std::shared_ptr<MapWrapper> & map)
     return true;
 }
 
-bool MapGenerator::setZCoordinates(const std::shared_ptr<MapWrapper> & map)
+bool MapGenerator::resetZCoordinates(const std::shared_ptr<MapWrapper> & map)
 {
     for (auto x = 0; x < map->getWidth(); ++x)
     {
         for (auto y = 0; y < map->getHeight(); ++y)
         {
             auto cell = map->getCell(x, y);
-            cell->coordinates.z = 50 + heightMap->getOffset(cell->terrain);
-        }
-    }
-    return true;
-}
-
-bool MapGenerator::fillWithAir(const std::shared_ptr<MapWrapper> & map)
-{
-    // Get the highest cell.
-    auto highest = 0;
-    for (auto x = 0; x < map->getWidth(); ++x)
-    {
-        for (auto y = 0; y < map->getHeight(); ++y)
-        {
-            auto cell = map->getCell(x, y);
-            if (cell->coordinates.z > highest)
-            {
-                highest = cell->coordinates.z;
-            }
-        }
-    }
-    // Create the air cells.
-    for (auto x = 0; x < map->getWidth(); ++x)
-    {
-        for (auto y = 0; y < map->getHeight(); ++y)
-        {
-            auto cell = map->getCell(x, y);
-            auto airStack = map->getAirStack(x, y);
-            for (auto z = cell->coordinates.z + 1; z < highest; ++z)
-            {
-                // Create a new cell an add it to the stack.
-                airStack->emplace_back(MapCell());
-                // Get the current cell.
-                auto currentCell = &airStack->back();
-                // Set the coordinates.
-                currentCell->coordinates = cell->coordinates;
-                currentCell->coordinates.z = z;
-                // Set the terrain.
-                currentCell->terrain = TerrainFactory::getAir();
-                // Set the flag.
-                SetFlag(&currentCell->flags, RoomFlags::Air);
-            }
-        }
-    }
-    // Connect the cells.
-    for (auto x = 0; x < map->getWidth(); ++x)
-    {
-        for (auto y = 0; y < map->getHeight(); ++y)
-        {
-            auto cell = map->getCell(x, y);
-            auto previousCell = cell;
-            for (auto z = cell->coordinates.z + 1; z < highest; ++z)
-            {
-                auto currentCell = map->findCell(cell->coordinates.x,
-                                                 cell->coordinates.y,
-                                                 z);
-                if (currentCell == nullptr)
-                {
-                    Logger::log(LogLevel::Error, "Found nullptr air tile.");
-                    return false;
-                }
-                // Set the coordinates.
-                currentCell->coordinates = cell->coordinates;
-                currentCell->coordinates.z = z;
-                // Set the terrain.
-                currentCell->terrain = TerrainFactory::getAir();
-                // Set the flag.
-                SetFlag(&currentCell->flags, RoomFlags::Air);
-                // Set the neighbours.
-                // Set the direction: UP.
-                previousCell->addNeighbour(Direction::Up, currentCell);
-                // Set the direction: DOWN.
-                currentCell->addNeighbour(Direction::Down, previousCell);
-                // Set the direction: NORTH.
-                currentCell->addNeighbour(
-                    Direction::North,
-                    map->findCell(currentCell->coordinates.x,
-                                  currentCell->coordinates.y + 1,
-                                  currentCell->coordinates.z));
-                // Set the direction: SOUTH.
-                currentCell->addNeighbour(
-                    Direction::South,
-                    map->findCell(currentCell->coordinates.x,
-                                  currentCell->coordinates.y - 1,
-                                  currentCell->coordinates.z));
-                // Set the direction: WEST.
-                currentCell->addNeighbour(
-                    Direction::West,
-                    map->findCell(currentCell->coordinates.x - 1,
-                                  currentCell->coordinates.y,
-                                  currentCell->coordinates.z));
-                // Set the direction: NORTH.
-                currentCell->addNeighbour(
-                    Direction::East,
-                    map->findCell(currentCell->coordinates.x + 1,
-                                  currentCell->coordinates.y,
-                                  currentCell->coordinates.z));
-                // Set the previous cell.
-                previousCell = currentCell;
-            }
+            cell->coordinates.z = 50;
         }
     }
     return true;
