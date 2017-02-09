@@ -273,12 +273,14 @@ bool DoDeleteGenerateMap(Character * character, ArgumentHandler & args)
 
 bool DoBuildGenerateMap(Character * character, ArgumentHandler & args)
 {
-    if (args.size() != 1)
+    if (args.size() != 2)
     {
-        character->sendMsg("You must provide the vnum of a generated map.");
+        character->sendMsg("You must provide the vnum of a generated map and "
+                               "the name of the new map.");
         return false;
     }
     auto vnum = ToNumber<unsigned int>(args[0].getContent());
+    auto mapName = args[1].getContent();
     auto generatedMap = Mud::instance().mudGeneratedMaps.find(vnum);
     if (generatedMap == Mud::instance().mudGeneratedMaps.end())
     {
@@ -287,7 +289,7 @@ bool DoBuildGenerateMap(Character * character, ArgumentHandler & args)
     }
     auto map = generatedMap->second;
     Mud::instance().mudGeneratedMaps.erase(generatedMap);
-    if (!map->buildMap())
+    if (!map->buildMap(mapName, character->getNameCapital()))
     {
         character->sendMsg("Can't build the map '%s'.", vnum);
         return false;

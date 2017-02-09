@@ -52,14 +52,15 @@ void MapWrapper::destroy()
     }
 }
 
-bool MapWrapper::buildMap()
+bool MapWrapper::buildMap(const std::string & mapName,
+                          const std::string & builder)
 {
     // -------------------------------------------------------------------------
     // First create a new area.
     auto area = new Area();
     area->vnum = Mud::instance().getUniqueAreaVnum();
-    area->name = "No Name";
-    area->builder = "God";
+    area->name = mapName;
+    area->builder = builder;
     area->width = width;
     area->height = height;
     area->elevation = 100;

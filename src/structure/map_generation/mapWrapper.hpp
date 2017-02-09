@@ -150,5 +150,6 @@ public:
     void destroy();
 
     /// @brief Build the map.
-    bool buildMap();
+    bool buildMap(const std::string & mapName,
+                  const std::string & builder);
 };

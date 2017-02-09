@@ -332,7 +332,7 @@ bool IsNumber(const std::string & source);
 /// @brief  Retrieve the content of a file.
 /// @param  filename The path and name of the file to read.
 /// @return The content of the file.
-std::string GetFileContents(const char * filename);
+bool GetFileContents(const char * filename, std::string & contents);
 
 /// @brief It creates a compressed strem of data.
 /// @param uncompressed The input non-compressed stream of data.
