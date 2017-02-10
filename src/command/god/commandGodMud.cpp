@@ -218,7 +218,7 @@ bool DoShowGenerateMap(Character * character, ArgumentHandler & args)
         character->sendMsg("List of generated maps:\n");
         for (auto generatedMap : Mud::instance().mudGeneratedMaps)
         {
-            character->sendMsg("    %s", generatedMap.second->vnum);
+            character->sendMsg("    %s\n", generatedMap.second->vnum);
         }
         return true;
     }
@@ -287,9 +287,7 @@ bool DoBuildGenerateMap(Character * character, ArgumentHandler & args)
         character->sendMsg("Can't find the generated map '%s'.", vnum);
         return false;
     }
-    auto map = generatedMap->second;
-    Mud::instance().mudGeneratedMaps.erase(generatedMap);
-    if (!map->buildMap(mapName, character->getNameCapital()))
+    if (!generatedMap->second->buildMap(mapName, character->getNameCapital()))
     {
         character->sendMsg("Can't build the map '%s'.", vnum);
         return false;

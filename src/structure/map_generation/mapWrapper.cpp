@@ -25,7 +25,7 @@
 #include "mud.hpp"
 
 MapWrapper::MapWrapper() :
-    vnum(Mud::instance().getMaxVnumGeneratedMaps() + 1),
+    vnum(),
     width(),
     height(),
     map()

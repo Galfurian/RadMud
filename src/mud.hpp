@@ -130,8 +130,6 @@ private:
     int _maxVnumItem;
     /// Lowest value of vnum for corpses.
     int _minVnumCorpses;
-    /// Highest value of vnum for generated maps.
-    unsigned int _maxVnumGeneratedMaps;
 
     /// Mud weight measure.
     const std::string _mudMeasure;
@@ -438,9 +436,6 @@ public:
     /// @brief Returns the current minimum vnum used for corpses.
     /// @return The minimum corpses vnum.
     int getMinVnumCorpse() const;
-
-    /// @brief Returns the current maximum vnum used for generated maps.
-    unsigned int getMaxVnumGeneratedMaps() const;
 
     /// @brief Provides an unique vnum for an area.
     int getUniqueAreaVnum() const;

@@ -53,7 +53,6 @@ Mud::Mud() :
     _maxVnumRoom(),
     _maxVnumItem(),
     _minVnumCorpses(),
-    _maxVnumGeneratedMaps(),
     _mudMeasure("stones"),
     _mudDatabaseName("radmud.db"),
     _mudSystemDirectory("../system/"),
@@ -385,14 +384,12 @@ bool Mud::addHeightMap(const std::shared_ptr<HeightMap> & heightMap)
 
 bool Mud::addGeneratedMap(const std::shared_ptr<MapWrapper> & mapWrapper)
 {
-    bool result = mudGeneratedMaps.insert(
-        std::make_pair(mapWrapper->vnum, mapWrapper)).second;
-    if (result)
+    while (!mudGeneratedMaps.insert(std::make_pair(mapWrapper->vnum,
+                                                   mapWrapper)).second)
     {
-        _maxVnumGeneratedMaps = std::max(_maxVnumGeneratedMaps,
-                                         mapWrapper->vnum);
+        mapWrapper->vnum++;
     }
-    return result;
+    return true;
 }
 
 Player * Mud::findPlayer(const std::string & name)
@@ -779,11 +776,6 @@ int Mud::getMinVnumCorpse() const
     return _minVnumCorpses;
 }
 
-unsigned int Mud::getMaxVnumGeneratedMaps() const
-{
-    return _maxVnumGeneratedMaps;
-}
-
 int Mud::getUniqueAreaVnum() const
 {
     int vnum;
@@ -853,7 +845,7 @@ void Mud::removeInactivePlayers()
         if (player->logged_in)
         {
             SQLiteDbms::instance().beginTransaction();
-            if(!player->updateOnDB())
+            if (!player->updateOnDB())
             {
                 SQLiteDbms::instance().rollbackTransection();
             }
