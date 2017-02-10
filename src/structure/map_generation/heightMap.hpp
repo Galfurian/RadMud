@@ -1,6 +1,6 @@
-/// @file   mapCell.hpp
+/// @file   heightMap.hpp
 /// @author Enrico Fraccaroli
-/// @date   Jan 06 2017
+/// @date   Jan 05 2017
 /// @copyright
 /// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -21,42 +21,41 @@
 
 #pragma once
 
-#include "terrain.hpp"
 #include "mapTile.hpp"
-#include "room.hpp"
+#include "mapCell.hpp"
 
-#include <vector>
+namespace terrain
+{
+class Terrain;
+}
 
-/// @brief Holds information about the cell of an automatically generated map.
-class MapCell
+/// @brief Class which maps the values of an height-map to types of terrain.
+class HeightMap
 {
 public:
-    /// The associated room.
-    Room * room;
-    /// The cell coordinates.
-    Coordinates coordinates;
-    /// Associated tile.
-    std::shared_ptr<terrain::Terrain> terrain;
-    /// List of neighbours.
-    std::map<Direction, MapCell *> neighbours;
-    /// The flags of the room.
-    unsigned int flags;
-    /// The liquid which will fill the room.
-    std::pair<Liquid *, unsigned int> liquid;
+    /// The vnum of the mapper.
+    unsigned int vnum;
+    /// The name of the mapper.
+    std::string name;
+    /// The sea level.
+    std::shared_ptr<terrain::Terrain> seaLevelTerrain;
+    /// The current thresholds.
+    std::vector<std::pair<int, std::shared_ptr<terrain::Terrain>>> thresholds;
 
     /// @brief Constructor.
-    MapCell();
+    HeightMap(const unsigned int & _vnum,
+              const std::string & _name,
+              const std::shared_ptr<terrain::Terrain> & _seaLevelTerrain);
 
-    /// @brief Tries to add the given cell map in the given direction.
-    bool addNeighbour(const Direction & direction, MapCell * mapCell);
+    /// @brief Add a new threshold.
+    /// @param terrain      The terrain associated with the new threshold.
+    /// @param threshold    The threshold value.
+    void addThreshold(const std::shared_ptr<terrain::Terrain> & terrain,
+                      const int & threshold);
 
-    /// @brief Find the lowest nearby cell.
-    /// @return The found cell.
-    MapCell * findLowestNearbyCell();
+    /// @brief Returns the terrain associated with the given height w.r.t.
+    /// the current thresholds.
+    std::shared_ptr<terrain::Terrain> getTerrain(const int & height);
 
-    /// @brief Returns the tile describing the cell.
-    std::string getTile() const;
-
-    /// @brief Equality operator.
-    bool operator==(const MapCell & other) const;
+    int getOffset(const std::shared_ptr<terrain::Terrain> & terrain) const;
 };

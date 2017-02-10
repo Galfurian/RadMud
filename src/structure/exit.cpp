@@ -22,6 +22,7 @@
 
 #include "exit.hpp"
 #include "room.hpp"
+#include "logger.hpp"
 
 Exit::Exit() :
     source(),
@@ -46,7 +47,7 @@ Exit::Exit(Room * _source,
 
 Exit::~Exit()
 {
-    //Logger::log(LogLevel::Debug, "Deleted: Exit.");
+//    Logger::log(LogLevel::Debug, "Deleted: Exit.");
 }
 
 bool Exit::check() const
@@ -55,11 +56,6 @@ bool Exit::check() const
     assert(destination != nullptr);
     assert(direction != Direction::None);
     return true;
-}
-
-Direction Exit::getOppositeDirection() const
-{
-    return direction.getOpposite();
 }
 
 std::shared_ptr<Exit> Exit::getOppositeExit() const

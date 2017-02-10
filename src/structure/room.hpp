@@ -38,15 +38,14 @@ class Item;
 
 class Area;
 
-class Continent;
-
 /// Used to determine the flag of the room.
 using RoomFlag = enum class RoomFlags
 {
     Rent = 1,           ///< A player can rent and disconnect.
     Peaceful = 2,       ///< Everyone here can't be harmful.
     TravelPoint = 4,    ///< From here a player can travel to another location.
-    SpawnPoint = 8      ///< It is a spawn room for players.
+    SpawnTree = 8,      ///< The room spawns trees.
+    Air = 16,           ///< The room has no structure is just air.
 };
 
 /// @brief Holds details about room.
@@ -58,12 +57,10 @@ public:
     int vnum;
     /// The area where is located the room.
     Area * area;
-    /// The continent where is located the room.
-    Continent * continent;
     /// The current room coordinates.
     Coordinates coord;
     /// The type of terrain of the room.
-    std::shared_ptr<Terrain> terrain;
+    std::shared_ptr<terrain::Terrain> terrain;
     /// The name of the room.
     std::string name;
     /// A long description of the room.
@@ -76,6 +73,8 @@ public:
     CharacterContainer characters;
     /// Integer that describe the flags of the room.
     unsigned int flags;
+    /// The liquid which fills the room.
+    std::pair<Liquid *, unsigned int> liquid;
 
     /// @brief Constructor.
     Room();
@@ -85,7 +84,7 @@ public:
 
     /// @brief Function used to check the correctness of the room.
     /// @param complete If set to true, the function check if the room has
-    ///                  been placed inside an area or a continent.
+    ///                  been placed inside an area.
     /// @return <b>True</b> if the room values are correct,<br>
     ///         <b>False</b> otherwise.
     bool check(bool complete = false);
@@ -199,7 +198,7 @@ public:
     /// @return <b>True</b> if there is NO other exits
     ///                      in the same direction,<br>
     ///         <b>False</b> otherwise.
-    bool addExit(std::shared_ptr<Exit> exit);
+    bool addExit(const std::shared_ptr<Exit> & exit);
 
     /// @brief Remove from the list of exits the one on the given direction.
     /// @param direction The direction to removed.

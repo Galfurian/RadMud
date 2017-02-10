@@ -67,7 +67,6 @@ Mud::Mud() :
     mudSkills(),
     mudWritings(),
     mudCorpses(),
-    mudContinents(),
     mudMaterials(),
     mudProfessions(),
     mudProductions(),
@@ -148,11 +147,6 @@ Mud::~Mud()
     }
     Logger::log(LogLevel::Global, "Freeing memory occupied by materials...");
     for (auto iterator : Mud::instance().mudMaterials)
-    {
-        delete (iterator.second);
-    }
-    Logger::log(LogLevel::Global, "Freeing memory occupied by continents...");
-    for (auto iterator : Mud::instance().mudContinents)
     {
         delete (iterator.second);
     }
@@ -334,12 +328,6 @@ bool Mud::addWriting(Writing * writing)
     return mudWritings.insert(std::make_pair(writing->vnum, writing)).second;
 }
 
-bool Mud::addContinent(Continent * continent)
-{
-    return mudContinents.insert(
-        std::make_pair(continent->vnum, continent)).second;
-}
-
 bool Mud::addMaterial(Material * material)
 {
     return (material == nullptr) ? false : mudMaterials.insert(
@@ -360,8 +348,7 @@ bool Mud::addProduction(Production * production)
 
 bool Mud::addLiquid(Liquid * liquid)
 {
-    return (liquid == nullptr) ? false : mudLiquids.insert(
-        std::make_pair(liquid->vnum, liquid)).second;
+    return mudLiquids.insert(std::make_pair(liquid->vnum, liquid)).second;
 }
 
 bool Mud::addTravelPoint(Room * source, Room * target)
@@ -369,7 +356,7 @@ bool Mud::addTravelPoint(Room * source, Room * target)
     return mudTravelPoints.insert(std::make_pair(source, target)).second;
 }
 
-void Mud::addCommand(std::shared_ptr<Command> command)
+void Mud::addCommand(const std::shared_ptr<Command> & command)
 {
     mudCommands.push_back(command);
 }
@@ -379,9 +366,30 @@ bool Mud::addBuilding(Building & building)
     return mudBuildings.insert(std::make_pair(building.vnum, building)).second;
 }
 
-bool Mud::addTerrain(std::shared_ptr<Terrain> terrain)
+bool Mud::addTerrain(const std::shared_ptr<terrain::Terrain> & terrain)
 {
     return mudTerrains.insert(std::make_pair(terrain->vnum, terrain)).second;
+}
+
+bool Mud::addBodyPart(const std::shared_ptr<BodyPart> & bodyPart)
+{
+    return mudBodyParts.insert(std::make_pair(bodyPart->vnum, bodyPart)).second;
+}
+
+bool Mud::addHeightMap(const std::shared_ptr<HeightMap> & heightMap)
+{
+    return mudHeightMaps.insert(std::make_pair(heightMap->vnum,
+                                               heightMap)).second;
+}
+
+bool Mud::addGeneratedMap(const std::shared_ptr<MapWrapper> & mapWrapper)
+{
+    while (!mudGeneratedMaps.insert(std::make_pair(mapWrapper->vnum,
+                                                   mapWrapper)).second)
+    {
+        mapWrapper->vnum++;
+    }
+    return true;
 }
 
 Player * Mud::findPlayer(const std::string & name)
@@ -530,16 +538,6 @@ Item * Mud::findCorpse(int vnum)
     return nullptr;
 }
 
-Continent * Mud::findContinent(int vnum)
-{
-    std::map<int, Continent *>::iterator iterator = mudContinents.find(vnum);
-    if (iterator != mudContinents.end())
-    {
-        return iterator->second;
-    }
-    return nullptr;
-}
-
 Material * Mud::findMaterial(int vnum)
 {
     std::map<int, Material *>::iterator iterator = mudMaterials.find(vnum);
@@ -596,14 +594,11 @@ Production * Mud::findProduction(std::string name)
     return nullptr;
 }
 
-Liquid * Mud::findLiquid(int vnum)
+Liquid * Mud::findLiquid(const unsigned int & vnum)
 {
-    std::map<int, Liquid *>::iterator iterator = mudLiquids.find(vnum);
-    if (iterator != mudLiquids.end())
-    {
-        return iterator->second;
-    }
-    return nullptr;
+    auto it = mudLiquids.find(vnum);
+    if (it == mudLiquids.end()) return nullptr;
+    return it->second;
 }
 
 Room * Mud::findTravelPoint(Room * room)
@@ -639,28 +634,26 @@ Building * Mud::findBuilding(int vnum)
     return nullptr;
 }
 
-std::shared_ptr<Terrain> Mud::findTerrain(unsigned int vnum)
+std::shared_ptr<terrain::Terrain> Mud::findTerrain(unsigned int vnum)
 {
-    for (auto it : mudTerrains)
-    {
-        if (it.second->vnum == vnum)
-        {
-            return it.second;
-        }
-    }
-    return nullptr;
+    auto it = mudTerrains.find(vnum);
+    if (it == mudTerrains.end()) return nullptr;
+    return it->second;
 }
 
 std::shared_ptr<BodyPart> Mud::findBodyPart(unsigned int vnum)
 {
-    for (auto bodyPart : mudBodyParts)
-    {
-        if (bodyPart->vnum == vnum)
-        {
-            return bodyPart;
-        }
-    }
-    return nullptr;
+    auto it = mudBodyParts.find(vnum);
+    if (it == mudBodyParts.end()) return nullptr;
+    return it->second;
+}
+
+
+std::shared_ptr<HeightMap> Mud::findHeightMap(const unsigned int & vnum)
+{
+    auto it = mudHeightMaps.find(vnum);
+    if (it == mudHeightMaps.end()) return nullptr;
+    return it->second;
 }
 
 bool Mud::runMud()
@@ -783,6 +776,16 @@ int Mud::getMinVnumCorpse() const
     return _minVnumCorpses;
 }
 
+int Mud::getUniqueAreaVnum() const
+{
+    int vnum;
+    do
+    {
+        vnum = TRandInteger<int>(0, INT8_MAX);
+    } while (mudAreas.find(vnum) != mudAreas.end());
+    return vnum;
+}
+
 void Mud::broadcastMsg(const int & level, const std::string & message) const
 {
     for (auto iterator : mudPlayers)
@@ -842,7 +845,10 @@ void Mud::removeInactivePlayers()
         if (player->logged_in)
         {
             SQLiteDbms::instance().beginTransaction();
-            player->updateOnDB();
+            if (!player->updateOnDB())
+            {
+                SQLiteDbms::instance().rollbackTransection();
+            }
             SQLiteDbms::instance().endTransaction();
         }
         // Remove the player from the list of players.

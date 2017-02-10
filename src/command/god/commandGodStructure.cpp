@@ -339,8 +339,23 @@ bool DoRoomInfo(Character * character, ArgumentHandler & args)
     return true;
 }
 
-bool DoRoomList(Character * character, ArgumentHandler & /*args*/)
+bool DoRoomList(Character * character, ArgumentHandler & args)
 {
+    Area * area = nullptr;
+    if (args.size() == 1)
+    {
+        auto areaVnum = ToNumber<int>(args[0].getOriginal());
+        area = Mud::instance().findArea(areaVnum);
+    }
+    if (area == nullptr)
+    {
+        character->sendMsg("You must provide the vnum of a valid area:\n");
+        for (auto it: Mud::instance().mudAreas)
+        {
+            character->sendMsg("[%s] %s.\n", it.first, it.second->name);
+        }
+        return false;
+    }
     Table table;
     table.addColumn("VNUM", StringAlign::Center);
     table.addColumn("AREA", StringAlign::Left);
@@ -350,6 +365,7 @@ bool DoRoomList(Character * character, ArgumentHandler & /*args*/)
     for (auto iterator : Mud::instance().mudRooms)
     {
         Room * room = iterator.second;
+        if (room->area->vnum != area->vnum) continue;
         // Prepare the row.
         TableRow row;
         row.push_back(ToString(room->vnum));
@@ -419,10 +435,5 @@ bool DoAreaList(Character * character, ArgumentHandler & /*args*/)
         table.addRow(row);
     }
     character->sendMsg(table.getTable());
-    return true;
-}
-
-bool DoContinentList(Character * /*character*/, ArgumentHandler & /*args*/)
-{
     return true;
 }

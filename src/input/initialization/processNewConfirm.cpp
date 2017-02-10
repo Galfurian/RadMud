@@ -63,6 +63,10 @@ bool ProcessNewConfirm::process(Character * character, ArgumentHandler & args)
             player->connectionState = ConnectionState::Playing;
             return true;
         }
+        else
+        {
+            SQLiteDbms::instance().rollbackTransection();
+        }
         player->closeConnection();
         SQLiteDbms::instance().endTransaction();
     }

@@ -35,7 +35,6 @@ SQLiteDbms::SQLiteDbms() :
     loaders.push_back(TableLoader("News", LoadNews));
     loaders.push_back(TableLoader("Terrain", LoadTerrain));
     loaders.push_back(TableLoader("Material", LoadMaterial));
-    loaders.push_back(TableLoader("Continent", LoadContinent));
     loaders.push_back(TableLoader("Area", LoadArea));
     loaders.push_back(TableLoader("Room", LoadRoom));
     loaders.push_back(TableLoader("Exit", LoadExit));
@@ -80,6 +79,13 @@ SQLiteDbms::SQLiteDbms() :
     loaders.push_back(TableLoader("BodyPartWeapon", LoadBodyPartWeapon));
     loaders.push_back(TableLoader("RaceBaseSkill", LoadRaceBaseSkill));
     loaders.push_back(TableLoader("RaceBaseAbility", LoadRaceBaseAbility));
+    loaders.push_back(TableLoader("HeightMap", LoadHeightMap));
+    loaders.push_back(TableLoader("HeightMapThreshold",
+                                  LoadHeightMapThreshold));
+    loaders.push_back(TableLoader("TerrainLiquid",
+                                  LoadTerrainLiquid));
+    loaders.push_back(TableLoader("TerrainLiquidSources",
+                                  LoadTerrainLiquidSources));
 }
 
 SQLiteDbms::~SQLiteDbms()
@@ -263,7 +269,7 @@ bool SQLiteDbms::updatePlayers()
 bool SQLiteDbms::updateItems()
 {
     // Start a transaction.
-    dbConnection.beginTransaction();
+//    dbConnection.beginTransaction();
     for (auto it : Mud::instance().mudItems)
     {
         if (!it.second->updateOnDB())
@@ -274,14 +280,14 @@ bool SQLiteDbms::updateItems()
         }
     }
     // Complete the transaction.
-    dbConnection.endTransaction();
+//    dbConnection.endTransaction();
     return true;
 }
 
 bool SQLiteDbms::updateRooms()
 {
     // Start a new transaction.
-    dbConnection.beginTransaction();
+//    dbConnection.beginTransaction();
     for (auto it : Mud::instance().mudRooms)
     {
         if (!it.second->updateOnDB())
@@ -292,7 +298,7 @@ bool SQLiteDbms::updateRooms()
         }
     }
     // Complete the transaction.
-    dbConnection.endTransaction();
+//    dbConnection.endTransaction();
     return true;
 }
 

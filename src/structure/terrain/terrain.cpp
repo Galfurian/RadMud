@@ -22,26 +22,58 @@
 
 #include "terrain.hpp"
 #include "luaBridge.hpp"
+#include "utils.hpp"
+
+namespace terrain
+{
 
 Terrain::Terrain() :
     vnum(),
     name(),
     flags(),
-    space()
+    generationFlags(),
+    space(),
+    symbol(),
+    liquidContent(),
+    liquidSources()
 {
     // Nothing to do.
 }
 
-Terrain::Terrain(unsigned int _vnum,
-                 std::string _name,
-                 unsigned int _flags,
-                 unsigned int _space) :
-    vnum(_vnum),
-    name(_name),
-    flags(_flags),
-    space(_space)
+void Terrain::addLiquidSource(Liquid * _liquid,
+                              const unsigned int & _assignedProbability)
 {
-    // Nothing to do.
+    LiquidSource liquidSource;
+    liquidSource.liquid = _liquid;
+    liquidSource.assignedProbability = _assignedProbability;
+    if (liquidSources.empty())
+    {
+        liquidSource.cumulativeProbability = _assignedProbability;
+    }
+    else
+    {
+        liquidSource.cumulativeProbability =
+            _assignedProbability + liquidSources.back().cumulativeProbability;
+    }
+    liquidSources.emplace_back(liquidSource);
+}
+
+Liquid * Terrain::getRandomLiquidSource() const
+{
+    if (liquidSources.empty())
+    {
+        return nullptr;
+    }
+    auto pickedValue = TRandInteger<unsigned int>(
+        0, liquidSources.back().cumulativeProbability - 1);
+    for (auto liquidSource : liquidSources)
+    {
+        if (pickedValue <= liquidSource.cumulativeProbability)
+        {
+            return liquidSource.liquid;
+        }
+    }
+    return nullptr;
 }
 
 void Terrain::luaRegister(lua_State * L)
@@ -53,4 +85,6 @@ void Terrain::luaRegister(lua_State * L)
         .addData("flags", &Terrain::flags, false)
         .addData("space", &Terrain::space, false)
         .endClass();
+}
+
 }

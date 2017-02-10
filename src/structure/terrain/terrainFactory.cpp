@@ -1,6 +1,6 @@
-/// @file   commandGodStructure.hpp
+/// @file   terrainFactory.cpp
 /// @author Enrico Fraccaroli
-/// @date   Jan 02 2017
+/// @date   feb 07 2017
 /// @copyright
 /// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -19,35 +19,19 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#pragma once
+#include "terrainFactory.hpp"
 
-#include "commandGod.hpp"
-
-/// @addtogroup ComInterfaces
-/// @{
-
-/// Get the path to the given room.
-bool DoFindPath(Character * character, ArgumentHandler & args);
-
-/// Create a room in the given direction.
-bool DoRoomCreate(Character * character, ArgumentHandler & args);
-
-/// Delete a room in the given direction.
-bool DoRoomDelete(Character * character, ArgumentHandler & args);
-
-/// Edit a room name or description.
-bool DoRoomEdit(Character * character, ArgumentHandler & args);
-
-/// Show the information about a room.
-bool DoRoomInfo(Character * character, ArgumentHandler & args);
-
-/// List all the rooms.
-bool DoRoomList(Character * character, ArgumentHandler & args);
-
-/// Show the information about an area.
-bool DoAreaInfo(Character * character, ArgumentHandler & args);
-
-/// List all the areas.
-bool DoAreaList(Character * character, ArgumentHandler & args);
-
-/// @}
+std::shared_ptr<terrain::Terrain> TerrainFactory::getAir()
+{
+    static std::shared_ptr<terrain::Terrain> airTerrain;
+    if (airTerrain == nullptr)
+    {
+        airTerrain = std::make_shared<terrain::Terrain>();
+        airTerrain->name = "Air";
+        airTerrain->flags = 0;
+        airTerrain->generationFlags = 0;
+        airTerrain->space = 1000;
+        airTerrain->symbol = " ";
+    }
+    return airTerrain;
+}

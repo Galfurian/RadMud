@@ -82,11 +82,11 @@ public:
     /// @brief Equality operator w.r.t. a direction object.
     bool operator==(const Direction & rhs) const;
 
-    /// @brief Equality operator w.r.t. a direction enum.
-    bool operator==(const Direction::Enum & rhs) const;
-
     /// @brief Inequality operator w.r.t. a direction enum.
-    bool operator!=(const Direction::Enum & rhs) const;
+    bool operator!=(const Direction & rhs) const;
+
+    /// @brief Lesser operator w.r.t. a direction enum.
+    bool operator<(const Direction & rhs) const;
 
     /// @brief Function used to register inside the lua environment the class.
     /// @param L The lua environment.

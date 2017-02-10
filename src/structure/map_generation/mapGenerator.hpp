@@ -21,10 +21,8 @@
 
 #pragma once
 
-#include "mapCell.hpp"
-#include "map2D.hpp"
-#include "utils.hpp"
-#include "heightMapper.hpp"
+#include "mapWrapper.hpp"
+#include "heightMap.hpp"
 #include "mapGeneratorConfiguration.hpp"
 
 #include <memory>
@@ -32,50 +30,41 @@
 /// @brief Automatic generator of maps.
 class MapGenerator
 {
-public:
+private:
     /// Generator configuration.
     MapGeneratorConfiguration configuration;
-    /// Height mapper.
-    HeightMapper heightMapper;
+    /// Height map.
+    std::shared_ptr<HeightMap> heightMap;
+
+public:
 
     /// @brief Constructor.
     MapGenerator(const MapGeneratorConfiguration & _configuration,
-                 const HeightMapper & _heightMapper);
+                 const std::shared_ptr<HeightMap> & _heightMap);
 
     /// @brief Generates a new map.
-    Map2D<MapCell> generateMap();
+    bool generateMap(const std::shared_ptr<MapWrapper> & map);
 
 private:
-    /// @brief Creates a mountain on the map.
-    void dropMountain(Map2D<MapCell> & map);
+    /// @brief Initializes the map.
+    bool initializeMap(const std::shared_ptr<MapWrapper> & map);
+
+    /// @brief Creates the mountains on the map.
+    bool generateMountains(const std::shared_ptr<MapWrapper> & map);
 
     /// @brief Normalizes the map with values between a specific range
-    /// according to the HeightMapper.
-    void normalizeMap(Map2D<MapCell> & map);
+    /// according to the HeightMap.
+    bool normalizeMap(const std::shared_ptr<MapWrapper> & map);
+
+    /// @brief Apply the terrain on the map based on the height map.
+    bool applyTerrain(const std::shared_ptr<MapWrapper> & map);
 
     /// @brief Creates the rivers on the map.
-    void dropRivers(Map2D<MapCell> & map);
+    bool generateRivers(const std::shared_ptr<MapWrapper> & map);
 
     /// @brief Add the forests to the map.
-    void addForests(Map2D<MapCell> & map);
+    bool generateForests(const std::shared_ptr<MapWrapper> & map);
 
-    /// @brief Clears the map.
-    void clearMap(Map2D<MapCell> & map);
-
-    /// @brief Sets to each cell the tile based on the HeightMapper.
-    void applyMapTiles(Map2D<MapCell> & map);
-
-    /// @brief Normalizes the value from the range (LbFrom, UbFrom) to the
-    /// range (LbTo, UbTo).
-    /// @param value  The value that has to be normalized.
-    /// @param LbFrom The lower bound of the original range.
-    /// @param UbFrom The upper bound of the original range.
-    /// @param LbTo   The lower bound of the destiantion range.
-    /// @param UbTo   The upper bound of the destiantion range.
-    /// @return The normalized value.
-    inline double normalize(double value,
-                            double LbFrom,
-                            double UbFrom,
-                            double LbTo,
-                            double UbTo) const;
+    /// @brief Resets the z coordinates of the cells inside the map to 50.
+    bool resetZCoordinates(const std::shared_ptr<MapWrapper> & map);
 };

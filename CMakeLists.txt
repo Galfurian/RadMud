@@ -95,9 +95,13 @@ find_package(Sqlite3 REQUIRED)
 set(PROJECT_SRC
         ${CMAKE_SOURCE_DIR}/src/main.cpp
         ${CMAKE_SOURCE_DIR}/src/mud.cpp
+        ${CMAKE_SOURCE_DIR}/src/utilities/name_generator/nameGenerator.cpp
         )
 
-set(PROJECT_INC ${CMAKE_SOURCE_DIR}/src)
+set(PROJECT_INC
+        ${CMAKE_SOURCE_DIR}/src
+        ${CMAKE_SOURCE_DIR}/src/utilities/name_generator
+        )
 
 #################################################
 # Add subdirectories...

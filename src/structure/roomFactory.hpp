@@ -1,6 +1,6 @@
-/// @file   commandGodStructure.hpp
+/// @file   roomFactory.hpp
 /// @author Enrico Fraccaroli
-/// @date   Jan 02 2017
+/// @date   feb 07 2017
 /// @copyright
 /// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -21,33 +21,13 @@
 
 #pragma once
 
-#include "commandGod.hpp"
+#include "room.hpp"
+#include <memory>
 
-/// @addtogroup ComInterfaces
-/// @{
+/// @brief Factory which allows to create predefined rooms.
+class RoomFactory
+{
+public:
+    static Room * createRoomAir();
 
-/// Get the path to the given room.
-bool DoFindPath(Character * character, ArgumentHandler & args);
-
-/// Create a room in the given direction.
-bool DoRoomCreate(Character * character, ArgumentHandler & args);
-
-/// Delete a room in the given direction.
-bool DoRoomDelete(Character * character, ArgumentHandler & args);
-
-/// Edit a room name or description.
-bool DoRoomEdit(Character * character, ArgumentHandler & args);
-
-/// Show the information about a room.
-bool DoRoomInfo(Character * character, ArgumentHandler & args);
-
-/// List all the rooms.
-bool DoRoomList(Character * character, ArgumentHandler & args);
-
-/// Show the information about an area.
-bool DoAreaInfo(Character * character, ArgumentHandler & args);
-
-/// List all the areas.
-bool DoAreaList(Character * character, ArgumentHandler & args);
-
-/// @}
+};

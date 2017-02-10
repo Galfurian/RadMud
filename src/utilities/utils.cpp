@@ -210,9 +210,8 @@ bool IsNumber(const std::string & source)
     return true;
 }
 
-std::string GetFileContents(const char * filename)
+bool GetFileContents(const char * filename, std::string & contents)
 {
-    std::string contents;
     std::ifstream in(filename, std::ios::in | std::ios::binary);
     if (in.good())
     {
@@ -225,13 +224,10 @@ std::string GetFileContents(const char * filename)
             in.read(&contents[0], totalSize);
             in.close();
         }
+        return true;
     }
-    else
-    {
-        contents = "";
-        Logger::log(LogLevel::Error, "Can't open :" + std::string(filename));
-    }
-    return (contents);
+    Logger::log(LogLevel::Error, "Can't open :" + std::string(filename));
+    return false;
 }
 
 /// Check if the return code from Zlib is an error.

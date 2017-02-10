@@ -78,10 +78,6 @@ public:
     ///         <b>False</b> otherwise.
     bool check() const;
 
-    /// @brief Get the opposite direction.
-    /// @return The opposite direction.
-    Direction getOppositeDirection() const;
-
     /// @brief Get the exit on the opposite side.
     /// @return The opposite exit.
     std::shared_ptr<Exit> getOppositeExit() const;

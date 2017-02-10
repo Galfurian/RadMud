@@ -37,7 +37,7 @@ public:
         Plain,
         Forest,
         River,
-        WaterSpring,
+        LiquidSource,
         Hill,
         Mountain,
         HighMountain

@@ -253,8 +253,8 @@ bool DoBodyPartList(Character * character, ArgumentHandler &)
     {
         // Prepare the row.
         TableRow row;
-        row.push_back(ToString(it->vnum));
-        row.push_back(it->name);
+        row.push_back(ToString(it.first));
+        row.push_back(it.second->name);
         // Add the row to the table.
         table.addRow(row);
     }

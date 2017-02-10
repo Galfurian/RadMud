@@ -25,14 +25,14 @@
 MapTile::MapTile(const unsigned int & _mapTile) :
     mapTile()
 {
-    if (_mapTile == 0) mapTile = Void;
+    if (_mapTile == static_cast<unsigned int>(Void)) mapTile = Void;
     else if (_mapTile == 1) mapTile = DeepWater;
     else if (_mapTile == 2) mapTile = ShallowWater;
     else if (_mapTile == 3) mapTile = Coast;
     else if (_mapTile == 4) mapTile = Plain;
     else if (_mapTile == 5) mapTile = Forest;
     else if (_mapTile == 6) mapTile = River;
-    else if (_mapTile == 7) mapTile = WaterSpring;
+    else if (_mapTile == 7) mapTile = LiquidSource;
     else if (_mapTile == 8) mapTile = Hill;
     else if (_mapTile == 9) mapTile = Mountain;
     else if (_mapTile == 10) mapTile = HighMountain;
@@ -53,13 +53,13 @@ bool MapTile::isValid(const unsigned int & _mapTile)
 std::string MapTile::toString() const
 {
     if (mapTile == MapTile::Void) return "Void";
-    if (mapTile == MapTile::DeepWater) return "DeepWater";
-    if (mapTile == MapTile::ShallowWater) return "ShallowWater";
+    if (mapTile == MapTile::DeepWater) return "Deep Water";
+    if (mapTile == MapTile::ShallowWater) return "Shallow Water";
     if (mapTile == MapTile::Coast) return "Coast";
     if (mapTile == MapTile::Plain) return "Plain";
     if (mapTile == MapTile::Forest) return "Forest";
     if (mapTile == MapTile::River) return "River";
-    if (mapTile == MapTile::WaterSpring) return "WaterSpring";
+    if (mapTile == MapTile::LiquidSource) return "Liquid Source";
     if (mapTile == MapTile::Hill) return "Hill";
     if (mapTile == MapTile::Mountain) return "Mountain";
     else return "HighMountain";
@@ -100,7 +100,7 @@ std::string MapTile::toSymbol(bool color) const
     {
         return ((color) ? Formatter::cyan() : "") + "r";
     }
-    if (mapTile == MapTile::WaterSpring)
+    if (mapTile == MapTile::LiquidSource)
     {
         return ((color) ? Formatter::blue() : "") + "S";
     }

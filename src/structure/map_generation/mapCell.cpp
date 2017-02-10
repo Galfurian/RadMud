@@ -20,44 +20,27 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "mapCell.hpp"
+#include "logger.hpp"
 
 MapCell::MapCell() :
+    room(),
     coordinates(),
-    height(),
-    mapTile(MapTile::Void),
-    neighbours()
+    terrain(),
+    neighbours(),
+    flags(),
+    liquid()
 {
     // Nothing to do.
 }
 
-MapCell::MapCell(const Coordinates & _coordinates,
-                 const double & _height) :
-    coordinates(_coordinates),
-    height(_height),
-    mapTile(MapTile::Void),
-    neighbours()
+bool MapCell::addNeighbour(const Direction & direction,
+                           MapCell * mapCell)
 {
-    // Nothing to do.
-}
-
-void MapCell::addNeighbours(Map2D<MapCell> & map)
-{
-    if (coordinates.x - 1 > 0)
+    if (mapCell == nullptr)
     {
-        neighbours.emplace_back(&map.get(coordinates.x - 1, coordinates.y));
+        return false;
     }
-    if (coordinates.x + 1 < map.getWidth())
-    {
-        neighbours.emplace_back(&map.get(coordinates.x + 1, coordinates.y));
-    }
-    if (coordinates.y - 1 > 0)
-    {
-        neighbours.emplace_back(&map.get(coordinates.x, coordinates.y - 1));
-    }
-    if (coordinates.y + 1 < map.getHeight())
-    {
-        neighbours.emplace_back(&map.get(coordinates.x, coordinates.y + 1));
-    }
+    return neighbours.insert(std::make_pair(direction, mapCell)).second;
 }
 
 MapCell * MapCell::findLowestNearbyCell()
@@ -65,21 +48,25 @@ MapCell * MapCell::findLowestNearbyCell()
     MapCell * selectedCell = this;
     for (auto neighbour : neighbours)
     {
-        if (neighbour->height < selectedCell->height)
+        if (neighbour.second->coordinates.z < selectedCell->coordinates.z)
         {
-            selectedCell = neighbour;
+            selectedCell = neighbour.second;
         }
-    }
-    if (selectedCell == this)
-    {
-
     }
     return selectedCell;
 }
 
 std::string MapCell::getTile() const
 {
-    return mapTile.toSymbol();
+    if (liquid.first != nullptr)
+    {
+        return "w";
+    }
+    if (HasFlag(flags, RoomFlags::SpawnTree))
+    {
+        return "t";
+    }
+    return terrain->symbol;
 }
 
 bool MapCell::operator==(const MapCell & other) const

@@ -52,4 +52,13 @@ bool DoSkillList(Character * character, ArgumentHandler & args);
 /// Generate a new map.
 bool DoGenerateMap(Character * character, ArgumentHandler & args);
 
+/// Shows a generated map.
+bool DoShowGenerateMap(Character * character, ArgumentHandler & args);
+
+/// Deletes a generated map.
+bool DoDeleteGenerateMap(Character * character, ArgumentHandler & args);
+
+/// Builds a generated map.
+bool DoBuildGenerateMap(Character * character, ArgumentHandler & args);
+
 ///@}

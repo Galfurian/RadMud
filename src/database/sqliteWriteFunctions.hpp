@@ -1,6 +1,6 @@
-/// @file   heightMapper.cpp
+/// @file   sqliteWriteFunctions.hpp
 /// @author Enrico Fraccaroli
-/// @date   Jan 05 2017
+/// @date   feb 05 2017
 /// @copyright
 /// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -19,45 +19,41 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "heightMapper.hpp"
+#pragma once
 
-HeightMapper::HeightMapper() :
-    thresholdMap()
-{
-    this->reset();
-}
+#include <memory>
+#include <item/subitem/shopItem.hpp>
 
-void HeightMapper::reset()
-{
-    thresholdMap[MapTile::DeepWater] = 10;
-    thresholdMap[MapTile::ShallowWater] = 20;
-    thresholdMap[MapTile::Coast] = 25;
-    thresholdMap[MapTile::Plain] = 70;
-    thresholdMap[MapTile::Hill] = 85;
-    thresholdMap[MapTile::Mountain] = 95;
-    thresholdMap[MapTile::HighMountain] = 100;
-}
+class Area;
 
-MapTile HeightMapper::getHeightMap(const double & height)
-{
-    for (auto it : thresholdMap)
-    {
-        if (height <= it.second)
-        {
-            return it.first;
-        }
-    }
-    return MapTile::Void;
-}
+class Room;
 
-double HeightMapper::getThreshold(const MapTile & heightMap)
-{
-    for (auto it : thresholdMap)
-    {
-        if (heightMap == it.first)
-        {
-            return it.second;
-        }
-    }
-    return thresholdMap[MapTile::HighMountain];
-}
+class Exit;
+
+class Player;
+
+class Item;
+
+bool SavePlayer(Player * player);
+
+bool SavePlayerSkills(Player * player);
+
+bool SavePlayerLuaVariables(Player * player);
+
+bool SaveItemPlayer(Player * player,
+                    Item * item,
+                    const unsigned int & bodyPartVnum);
+
+bool SaveShopItem(ShopItem * item,
+                  const bool & transaction);
+
+bool SaveItem(Item * item,
+              const bool & transaction);
+
+bool SaveArea(Area * area);
+
+bool SaveRoom(Room * room);
+
+bool SaveAreaList(Area * area, Room * room);
+
+bool SaveRoomExit(const std::shared_ptr<Exit> & roomExit);

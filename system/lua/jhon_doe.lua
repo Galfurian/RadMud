@@ -80,16 +80,16 @@ end
 --- Handle the main behaviour of the character.
 -- @param self The character linked to the event.
 EventMain = function(self)
-    if (not EquipPosessedAxe(self)) then
-        JhonExplorer:reset()
-        local axe = SearchAxe(self);
-        if (axe == nil) then
-            -- There is no axe in the area!
-            Mud.sleep(15)
-        else
-            -- I've found an axe!
-        end
-    end
+--    if (not EquipPosessedAxe(self)) then
+--        JhonExplorer:reset()
+--        local axe = SearchAxe(self);
+--        if (axe == nil) then
+--            -- There is no axe in the area!
+--            Mud.sleep(15)
+--        else
+--            -- I've found an axe!
+--        end
+--    end
     --    --  Now I have an axe.
     --    if (foundTree == false) then
     --        -- I need to find a suitable tree.

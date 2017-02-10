@@ -167,71 +167,38 @@ bool DoSkillList(Character * character, ArgumentHandler & /*args*/)
 
 bool DoGenerateMap(Character * character, ArgumentHandler & args)
 {
+    std::shared_ptr<HeightMap> heightMap = nullptr;
+    if (args.size() == 1)
+    {
+        heightMap = Mud::instance().findHeightMap(
+            ToNumber<unsigned int>(args[0].getContent()));
+    }
+    if (heightMap == nullptr)
+    {
+        character->sendMsg("You must provide a valid height map vnum:\n");
+        for (auto it : Mud::instance().mudHeightMaps)
+        {
+            character->sendMsg("    [%s] %s\n", it.first, it.second->name);
+        }
+        return false;
+    }
     MapGeneratorConfiguration configuration;
-    HeightMapper heightMapper;
-    if (args.size() >= 1)
-    {
-        if (IsNumber(args[0].getContent()))
-        {
-            configuration.width = ToNumber<int>(args[0].getContent());
-        }
-    }
-    if (args.size() >= 2)
-    {
-        if (IsNumber(args[1].getContent()))
-        {
-            configuration.height = ToNumber<int>(args[1].getContent());
-        }
-    }
-    if (args.size() >= 3)
-    {
-        if (IsNumber(args[2].getContent()))
-        {
-            configuration.numMountains = ToNumber<int>(args[2].getContent());
-        }
-    }
-    if (args.size() >= 4)
-    {
-        if (IsNumber(args[3].getContent()))
-        {
-            configuration.minMountainRadius = ToNumber<int>(
-                args[3].getContent());
-        }
-    }
-    if (args.size() >= 5)
-    {
-        if (IsNumber(args[4].getContent()))
-        {
-            configuration.maxMountainRadius = ToNumber<int>(
-                args[4].getContent());
-        }
-    }
-    if (args.size() >= 6)
-    {
-        if (IsNumber(args[5].getContent()))
-        {
-            configuration.numRivers = ToNumber<int>(args[5].getContent());
-        }
-    }
-    if (args.size() >= 7)
-    {
-        if (IsNumber(args[6].getContent()))
-        {
-            configuration.minRiverDistance = ToNumber<int>(
-                args[6].getContent());
-        }
-    }
     // Instantiate the map generator.
-    MapGenerator mapGenerator(configuration, heightMapper);
+    MapGenerator mapGenerator(configuration, heightMap);
     // Generate the map.
-    auto map = mapGenerator.generateMap();
+    auto map = std::make_shared<MapWrapper>();
+    if (!mapGenerator.generateMap(map))
+    {
+        character->sendMsg("Error while generating the map.");
+        return false;
+    }
     // Draw the map.
     std::string drawnMap;
-    for (int y = 0; y < map.getHeight(); ++y)
+    for (int y = 0; y < map->getHeight(); ++y)
     {
-        for (int x = 0; x < map.getWidth(); ++x)
+        for (int x = 0; x < map->getWidth(); ++x)
         {
-            drawnMap += map.get(x, y).getTile();
+            drawnMap += map->getCell(x, y)->getTile();
         }
         drawnMap += "\n";
     }
@@ -239,5 +206,91 @@ bool DoGenerateMap(Character * character, ArgumentHandler & args)
     character->sendMsg(configuration.toString());
     character->sendMsg(drawnMap);
     character->sendMsg(Formatter::reset());
+    // Add the map to the list of generated maps.
+    Mud::instance().addGeneratedMap(map);
+    return true;
+}
+
+bool DoShowGenerateMap(Character * character, ArgumentHandler & args)
+{
+    if (args.empty())
+    {
+        character->sendMsg("List of generated maps:\n");
+        for (auto generatedMap : Mud::instance().mudGeneratedMaps)
+        {
+            character->sendMsg("    %s\n", generatedMap.second->vnum);
+        }
+        return true;
+    }
+    if (args.size() != 1)
+    {
+        character->sendMsg("You must provide the vnum of a generated map.");
+        return false;
+    }
+    auto vnum = ToNumber<unsigned int>(args[0].getContent());
+    auto generatedMap = Mud::instance().mudGeneratedMaps.find(vnum);
+    if (generatedMap == Mud::instance().mudGeneratedMaps.end())
+    {
+        character->sendMsg("Can't find the generated map '%s'.", vnum);
+        return false;
+    }
+    auto map = generatedMap->second;
+    // Draw the map.
+    std::string drawnMap;
+    for (int y = 0; y < map->getHeight(); ++y)
+    {
+        for (int x = 0; x < map->getWidth(); ++x)
+        {
+            drawnMap += map->getCell(x, y)->getTile();
+        }
+        drawnMap += "\n";
+    }
+    // First send the configuration.
+    character->sendMsg(drawnMap);
+    character->sendMsg(Formatter::reset());
+    return true;
+}
+
+bool DoDeleteGenerateMap(Character * character, ArgumentHandler & args)
+{
+    if (args.size() != 1)
+    {
+        character->sendMsg("You must provide the vnum of a generated map.");
+        return false;
+    }
+    auto vnum = ToNumber<unsigned int>(args[0].getContent());
+    auto generatedMap = Mud::instance().mudGeneratedMaps.find(vnum);
+    if (generatedMap == Mud::instance().mudGeneratedMaps.end())
+    {
+        character->sendMsg("Can't find the generated map '%s'.", vnum);
+        return false;
+    }
+    auto map = generatedMap->second;
+    Mud::instance().mudGeneratedMaps.erase(generatedMap);
+    map->destroy();
+    return true;
+}
+
+bool DoBuildGenerateMap(Character * character, ArgumentHandler & args)
+{
+    if (args.size() != 2)
+    {
+        character->sendMsg("You must provide the vnum of a generated map and "
+                               "the name of the new map.");
+        return false;
+    }
+    auto vnum = ToNumber<unsigned int>(args[0].getContent());
+    auto mapName = args[1].getContent();
+    auto generatedMap = Mud::instance().mudGeneratedMaps.find(vnum);
+    if (generatedMap == Mud::instance().mudGeneratedMaps.end())
+    {
+        character->sendMsg("Can't find the generated map '%s'.", vnum);
+        return false;
+    }
+    if (!generatedMap->second->buildMap(mapName, character->getNameCapital()))
+    {
+        character->sendMsg("Can't build the map '%s'.", vnum);
+        return false;
+    }
     return true;
 }

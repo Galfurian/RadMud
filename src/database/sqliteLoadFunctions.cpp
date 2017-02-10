@@ -817,7 +817,7 @@ bool LoadExit(ResultSet * result)
         {
             // Create an empty exit.
             auto newExit = std::make_shared<Exit>();
-            // retrive the values.
+            // Retrieve the values.
             auto sourceVnum = result->getNextInteger();
             auto destinationVnum = result->getNextInteger();
             auto directionValue = result->getNextUnsignedInteger();
@@ -991,41 +991,6 @@ bool LoadWriting(ResultSet * result)
             if (!Mud::instance().addWriting(writing))
             {
                 throw SQLiteException("Error during writing insertion.");
-            }
-        }
-        catch (SQLiteException & e)
-        {
-            Logger::log(LogLevel::Error, std::string(e.what()));
-            return false;
-        }
-    }
-    return true;
-}
-
-bool LoadContinent(ResultSet * result)
-{
-    while (result->next())
-    {
-        try
-        {
-            auto continent = new Continent();
-            // Initialize the continent.
-            continent->vnum = result->getNextInteger();
-            continent->name = result->getNextString();
-            continent->builder = result->getNextString();
-            continent->width = result->getNextInteger();
-            continent->height = result->getNextInteger();
-            continent->txtMap = result->getNextString();
-            // Add the continent to the map.
-            continent->init();
-            // Check the correctness.
-            if (!continent->check())
-            {
-                throw SQLiteException("Error during error checking.");
-            }
-            if (!Mud::instance().addContinent(continent))
-            {
-                throw SQLiteException("Error during continent insertion.");
             }
         }
         catch (SQLiteException & e)
@@ -1322,7 +1287,7 @@ bool LoadLiquid(ResultSet * result)
             // Create an empty Liquid.
             auto liquid = new Liquid();
             // Load the liquid.
-            liquid->vnum = result->getNextInteger();
+            liquid->vnum = result->getNextUnsignedInteger();
             liquid->type = LiquidType(result->getNextUnsignedInteger());
             liquid->name = result->getNextString();
             liquid->description = result->getNextString();
@@ -1354,21 +1319,25 @@ bool LoadContentLiq(ResultSet * result)
     {
         try
         {
-            auto container = Mud::instance().findItem(result->getNextInteger());
-            auto liquid = Mud::instance().findLiquid(result->getNextInteger());
-            auto quantity = result->getNextDouble();
+            auto containerVnum = result->getNextInteger();
+            auto container = Mud::instance().findItem(containerVnum);
             if (container == nullptr)
             {
-                throw SQLiteException("Can't find container item.");
+                throw SQLiteException(
+                    "Can't find the container " + ToString(containerVnum));
             }
             if (container->getType() != ModelType::LiquidContainer)
             {
                 throw SQLiteException("Wrong container for liquids.");
             }
+            auto liquidVnum = result->getNextUnsignedInteger();
+            auto liquid = Mud::instance().findLiquid(liquidVnum);
             if (liquid == nullptr)
             {
-                throw SQLiteException("Can't find liquid.");
+                throw SQLiteException(
+                    "Can't find the liquid " + ToString(liquidVnum));
             }
+            auto quantity = result->getNextDouble();
             // Cast the item to liquid container.
             auto liquidContainer = static_cast<LiquidContainerItem *>(container);
             // Pour in the liquid.
@@ -1563,17 +1532,93 @@ bool LoadTerrain(ResultSet * result)
     {
         try
         {
-            std::shared_ptr<Terrain> terrain = std::make_shared<Terrain>();
+            auto terrain = std::make_shared<terrain::Terrain>();
             terrain->vnum = result->getNextUnsignedInteger();
             terrain->name = result->getNextString();
             terrain->flags = result->getNextUnsignedInteger();
+            terrain->generationFlags = result->getNextUnsignedInteger();
             terrain->space = result->getNextUnsignedInteger();
+            terrain->symbol = result->getNextString();
             if (!Mud::instance().addTerrain(terrain))
             {
                 throw SQLiteException(
                     "Can't add the terrain " + ToString(terrain->vnum) + " - " +
                     terrain->name);
             }
+            Logger::log(LogLevel::Debug, "\t%s%s",
+                        AlignString(terrain->vnum, StringAlign::Left, 25),
+                        AlignString(terrain->name, StringAlign::Left, 25));
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadTerrainLiquid(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto terrainVnum = result->getNextUnsignedInteger();
+            auto terrain = Mud::instance().findTerrain(terrainVnum);
+            if (terrain == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the terrain " + ToString(terrainVnum));
+            }
+            auto liquidVnum = result->getNextUnsignedInteger();
+            auto liquid = Mud::instance().findLiquid(liquidVnum);
+            if (liquid == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the liquid " + ToString(liquidVnum));
+            }
+            terrain->liquidContent = liquid;
+            Logger::log(LogLevel::Debug, "\t%s%s",
+                        AlignString(terrain->name, StringAlign::Left, 25),
+                        AlignString(liquid->name, StringAlign::Left, 25));
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadTerrainLiquidSources(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto terrainVnum = result->getNextUnsignedInteger();
+            auto terrain = Mud::instance().findTerrain(terrainVnum);
+            if (terrain == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the terrain " + ToString(terrainVnum));
+            }
+            auto liquidVnum = result->getNextUnsignedInteger();
+            auto liquid = Mud::instance().findLiquid(liquidVnum);
+            if (liquid == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the liquid " + ToString(liquidVnum));
+            }
+            auto probability = result->getNextUnsignedInteger();
+            // Add the liquid source.
+            terrain->addLiquidSource(liquid, probability);
+            Logger::log(LogLevel::Debug, "\t%s%s%s",
+                        AlignString(terrain->name, StringAlign::Left, 25),
+                        AlignString(liquid->name, StringAlign::Left, 25),
+                        AlignString(probability, StringAlign::Left, 25));
         }
         catch (SQLiteException & e)
         {
@@ -1595,9 +1640,10 @@ bool LoadBodyPart(ResultSet * result)
             bodyPart->name = result->getNextString();
             bodyPart->description = result->getNextString();
             bodyPart->flags = result->getNextUnsignedInteger();
-            if (bodyPart->check())
+            if (!Mud::instance().addBodyPart(bodyPart))
             {
-                Mud::instance().mudBodyParts.emplace_back(bodyPart);
+                throw SQLiteException(
+                    "Can't add the body part" + bodyPart->name);
             }
         }
         catch (SQLiteException & e)
@@ -1684,6 +1730,77 @@ bool LoadBodyPartWeapon(ResultSet * result)
             bodyWeapon->maxDamage = result->getNextUnsignedInteger();
             bodyWeapon->range = result->getNextInteger();
             bodyPart->weapon = bodyWeapon;
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadHeightMap(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto vnum = result->getNextUnsignedInteger();
+            auto name = result->getNextString();
+            auto seaLevelVnum = result->getNextUnsignedInteger();
+            auto seaLevel = Mud::instance().findTerrain(seaLevelVnum);
+            if (seaLevel == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the terrain " + ToString(seaLevelVnum));
+            }
+            auto heightMap = std::make_shared<HeightMap>(vnum, name, seaLevel);
+            if (!Mud::instance().addHeightMap(heightMap))
+            {
+                throw SQLiteException(
+                    "Can't add the height map " + name);
+            }
+            Logger::log(LogLevel::Debug, "\t%s%s%s",
+                        AlignString(vnum, StringAlign::Left, 25),
+                        AlignString(name, StringAlign::Left, 25),
+                        AlignString(seaLevel->name, StringAlign::Left, 25));
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadHeightMapThreshold(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto heightMapVnum = result->getNextUnsignedInteger();
+            auto heightMap = Mud::instance().findHeightMap(heightMapVnum);
+            if (heightMap == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the height map " + ToString(heightMapVnum));
+            }
+            auto terrainVnum = result->getNextUnsignedInteger();
+            auto terrain = Mud::instance().findTerrain(terrainVnum);
+            if (terrain == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the terrain " + ToString(terrainVnum));
+            }
+            auto threshold = result->getNextInteger();
+            heightMap->addThreshold(terrain, threshold);
+            Logger::log(LogLevel::Debug, "\t%s%s%s",
+                        AlignString(heightMap->name, StringAlign::Left, 25),
+                        AlignString(terrain->name, StringAlign::Left, 25),
+                        AlignString(threshold, StringAlign::Left, 25));
         }
         catch (SQLiteException & e)
         {

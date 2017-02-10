@@ -30,7 +30,7 @@ bool DoLiquidInfo(Character * character, ArgumentHandler & args)
         character->sendMsg("You must provide a liquid vnum.\n");
         return false;
     }
-    auto liquidVnum = ToNumber<int>(args[0].getContent());
+    auto liquidVnum = ToNumber<unsigned int>(args[0].getContent());
     auto liquid = Mud::instance().findLiquid(liquidVnum);
     if (liquid == nullptr)
     {
@@ -89,7 +89,7 @@ bool DoLiquidCreate(Character * character, ArgumentHandler & args)
         return false;
     }
     // Find the liquid.
-    auto liquidVnum = ToNumber<int>(args[1].getContent());
+    auto liquidVnum = ToNumber<unsigned int>(args[1].getContent());
     auto liquid = Mud::instance().findLiquid(liquidVnum);
     if (liquid == nullptr)
     {

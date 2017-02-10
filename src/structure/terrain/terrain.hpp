@@ -24,13 +24,27 @@
 
 #include <string>
 #include <lua.hpp>
+#include <vector>
 
-/// Used to determine the flag of the room.
+class Liquid;
+
+namespace terrain
+{
+
+/// Used to determine the flag of the terrain.
 using TerrainFlag = enum class TerrainFlags
 {
     None = 0,           ///< No flag.
-    Indoor = 2,         ///< The terrain is indoor.
-    NaturalLight = 4,   ///< There is natural light on this terrain.
+    Indoor = 1,         ///< The terrain is indoor.
+    NaturalLight = 2    ///< There is natural light on this terrain.
+};
+
+/// Used to determine the generation flag of the terrain.
+using TerrainGenerationFlag = enum class TerrainGenerationFlags
+{
+    None = 0,                   ///< No flag.
+    CanHostLiquidSource = 2,    ///< The terrain can host a liquid source.
+    CanHostForest = 4,          ///< The terrain can host a forest.
     //8
 };
 
@@ -44,21 +58,38 @@ public:
     std::string name;
     /// The flags of the terrain.
     unsigned int flags;
+    /// The flags used during map generation.
+    unsigned int generationFlags;
     /// The available space inside the terrain.
     unsigned int space;
+    /// The symbol describing the terrain.
+    std::string symbol;
     /// The lua_State associated with this terrain.
     lua_State * L;
+    /// The liquid which fills the terrain by default.
+    Liquid * liquidContent;
+    /// The list of liquids which can generate from this terrain.
+    struct LiquidSource
+    {
+        Liquid * liquid;
+        unsigned int assignedProbability;
+        unsigned int cumulativeProbability;
+    };
+    std::vector<LiquidSource> liquidSources;
 
     /// @brief Constructor.
     Terrain();
 
-    /// @brief Constructor.
-    Terrain(unsigned int _vnum,
-            std::string _name,
-            unsigned int _flags,
-            unsigned int _space);
+    /// @brief Adds a liquid source to the terrain.
+    void addLiquidSource(Liquid * _liquid,
+                         const unsigned int & _assignedProbability);
+
+    /// @brief Provides a random liquid source based on their probabilities.
+    Liquid * getRandomLiquidSource() const;
 
     /// @brief Function used to register inside the lua environment the class.
     /// @param L The lua environment.
     static void luaRegister(lua_State * L);
 };
+
+}

@@ -52,6 +52,18 @@ void LoadGodCommands()
         "Generate a map.",
         true, true, false));
     Mud::instance().addCommand(std::make_shared<Command>(
+        DoShowGenerateMap, "mud_show_generated_map", "",
+        "Shows a generated map.",
+        true, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoDeleteGenerateMap, "mud_delete_generated_map", "",
+        "Deletes a generated map.",
+        true, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoBuildGenerateMap, "mud_build_generated_map", "",
+        "Builds a generated map.",
+        true, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
         DoFactionInfo, "faction_information", "(faction vnum)",
         "Provide all the information regarding the given faction.",
         true, true, false));
@@ -153,10 +165,6 @@ void LoadGodCommands()
     Mud::instance().addCommand(std::make_shared<Command>(
         DoAreaList, "area_list", "",
         "List all the areas.",
-        true, true, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoContinentList, "continent_list", "",
-        "List all the continents.",
         true, true, false));
 
     // ////////////////////////////////////////////////////////////////////////

@@ -1,6 +1,6 @@
-/// @file   heightMapper.hpp
+/// @file   terrainFactory.hpp
 /// @author Enrico Fraccaroli
-/// @date   Jan 05 2017
+/// @date   feb 07 2017
 /// @copyright
 /// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -21,28 +21,13 @@
 
 #pragma once
 
-#include "mapTile.hpp"
-#include "mapCell.hpp"
+#include "terrain.hpp"
+#include <memory>
 
-/// @brief Class which maps the values of an height-map to types of terrain.
-class HeightMapper
+/// @brief Factory which allows to create predefined terrains.
+class TerrainFactory
 {
-private:
-    /// The current thresholds.
-    std::map<MapTile, double> thresholdMap;
-
 public:
-    /// @brief Constructor.
-    HeightMapper();
+    static std::shared_ptr<terrain::Terrain> getAir();
 
-    /// @brief Reset the thresholds to default values.
-    void reset();
-
-    /// @brief Returns the MapTile associated with the given height w.r.t.
-    /// the current thresholds.
-    MapTile getHeightMap(const double & height);
-
-    /// @brief Returns the threshold associated with the given MapTile w.r.t.
-    /// the current set thresholds.
-    double getThreshold(const MapTile & heightMap);
 };
