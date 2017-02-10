@@ -22,6 +22,7 @@
 
 #include "general.hpp"
 
+#include "nameGenerator.hpp"
 #include "logger.hpp"
 #include "mud.hpp"
 
@@ -74,6 +75,10 @@ void LoadGeneralCommands()
     Mud::instance().addCommand(std::make_shared<Command>(
         DoServer, "server", "",
         "Shows the server statistics.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoGenerateName, "generate_name", "",
+        "Generates a random name.",
         false, true, false));
 }
 
@@ -680,5 +685,54 @@ bool DoServer(Character * character, ArgumentHandler & /*args*/)
     msg += "    Commands    : ";
     msg += ToString(Mud::instance().mudCommands.size()) + "\n";
     character->sendMsg(msg);
+    return true;
+}
+
+bool DoGenerateName(Character * character, ArgumentHandler & args)
+{
+    if (args.size() != 1)
+    {
+        std::string help;
+        help += "You must provide a pattern.\n";
+        help += "Guide\n";
+        help += "\ts - generic syllable\n";
+        help += "\tv - vowel\n";
+        help += "\tV - vowel or vowel combination\n";
+        help += "\tc - consonant\n";
+        help += "\tB - consonant or consonant combination suitable for beginning a word\n";
+        help += "\tC - consonant or consonant combination suitable anywhere in a word\n";
+        help += "\ti - insult\n";
+        help += "\tm - mushy name\n";
+        help += "\tM - mushy name ending\n";
+        help += "\tD - consonant suited for a stupid person's name\n";
+        help += "\td - syllable suited for a stupid person's name (begins with a vowel)\n";
+        help += "\n";
+        help += "All characters between parenthesis () are emitted literally.\n";
+        help += "  For example, the pattern 's(dim)', emits a random generic\n";
+        help += "  syllable followed by 'dim'.\n";
+        help += "Characters between angle brackets <> emit patterns from\n";
+        help += "  the table above. Imagine the entire pattern is wrapped in\n";
+        help += "  one of these.\n";
+        help += "In both types of groupings, a vertical bar | denotes a\n";
+        help += "  random choice. Empty groups are allowed.\n";
+        help += "  For example, '(foo|bar)' emits either 'foo' or 'bar'.\n";
+        help += "  The pattern '<c|v|>' emits a constant, vowel, or\n";
+        help += "  nothing at all.\n";
+        help += "An exclamation point ! means to capitalize the component \n";
+        help += "  that follows it. For example, '!(foo)' will emit 'Foo'\n";
+        help += "  and 'v!s' will emit a lowercase vowel followed by a\n";
+        help += "  capitalized syllable, like 'eRod'.\n";
+        help += "A tilde ~ means to reverse the letters of the component\n";
+        help += "  that follows it. For example, '~(foo)' will emit 'oof'.\n";
+        help += "  To reverse an entire template, wrap it in brackets.\n";
+        help += "  For example, to reverse 'sV'i' as a whole use '~<sV'i>'.\n";
+        help += "  The template '~sV'i' will only reverse the initial\n";
+        help += "  syllable.\n";
+        character->sendMsg(help + "\n");
+        return false;
+    }
+    namegen::NameGenerator nameGenerator(args[0].getContent());
+    character->sendMsg("Combinations : %s\n", nameGenerator.combinations());
+    character->sendMsg("Names : %s\n\n", nameGenerator.toString());
     return true;
 }

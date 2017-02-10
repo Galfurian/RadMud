@@ -69,4 +69,7 @@ bool DoSkills(Character * character, ArgumentHandler & args);
 /// Show server informations and statistics.
 bool DoServer(Character * character, ArgumentHandler & args);
 
+/// Generates a random name.
+bool DoGenerateName(Character * character, ArgumentHandler & args);
+
 ///@}
