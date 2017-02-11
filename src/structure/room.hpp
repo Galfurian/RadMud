@@ -229,10 +229,6 @@ public:
     /// @brief Check if the room is lit or not.
     bool isLit();
 
-    /// @brief Provides the list of directions where an exit is present.
-    /// @return Vector of directions.
-    std::vector<Direction> getAvailableDirections();
-
     /// @brief Provide a detailed description of the room.
     /// @param actor The one who is looking.
     /// @return A detailed description of the room.

@@ -482,16 +482,6 @@ bool Room::isLit()
     return false;
 }
 
-std::vector<Direction> Room::getAvailableDirections()
-{
-    std::vector<Direction> directions;
-    for (auto it : exits)
-    {
-        directions.push_back(it->direction);
-    }
-    return directions;
-}
-
 bool Room::addExit(const std::shared_ptr<Exit> & exit)
 {
     if (this->findExit(exit->direction))

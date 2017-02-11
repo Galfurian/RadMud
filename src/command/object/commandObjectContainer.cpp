@@ -20,6 +20,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "commandObjectContainer.hpp"
+#include "roomUtilityFunctions.hpp"
 #include "command.hpp"
 #include "room.hpp"
 
@@ -127,7 +128,7 @@ bool DoOpen(Character * character, ArgumentHandler & args)
     if (direction != Direction::None)
     {
         // If the room is NOT lit and HAS some exits, pick a random direction.
-        auto directions = character->room->getAvailableDirections();
+        auto directions = GetAvailableDirections(character->room);
         if (!character->room->isLit() && !directions.empty())
         {
             auto it = TRandInteger<size_t>(0, directions.size() - 1);
@@ -282,7 +283,7 @@ bool DoClose(Character * character, ArgumentHandler & args)
     if (direction != Direction::None)
     {
         // If the room is NOT lit and HAS some exits, pick a random direction.
-        auto directions = character->room->getAvailableDirections();
+        auto directions = GetAvailableDirections(character->room);
         if (!character->room->isLit() && !directions.empty())
         {
             auto it = TRandInteger<size_t>(0, directions.size() - 1);

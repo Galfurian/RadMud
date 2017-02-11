@@ -22,6 +22,8 @@
 
 #include "character.hpp"
 
+#include "roomUtilityFunctions.hpp"
+#include "characterUtilities.hpp"
 #include "lightItem.hpp"
 #include "armorItem.hpp"
 #include "logger.hpp"
@@ -1221,41 +1223,27 @@ luabridge::LuaRef Character::luaGetItemsInSight()
 
 luabridge::LuaRef Character::luaGetPathTo(Room * destination)
 {
-    auto checkFunction = [&](Room * from, Room * to)
+    auto RoomCheckFunction = [&](Room * from, Room * to)
     {
-        // Get the direction.
+        // Prepare the error string.
+        std::string error;
+        // Evaluate the direction from the current room to the next.
         auto direction = Area::getDirection(from->coord, to->coord);
-        // Get the exit;
-        auto destExit = from->findExit(direction);
-        // If the direction is upstairs, check if there is a stair.
-        if (direction == Direction::Up)
-        {
-            if (!HasFlag(destExit->flags, ExitFlag::Stairs)) return false;
-        }
-        // Check if the destination is correct.
-        if (destExit->destination == nullptr) return false;
-        // Check if the destination is bocked by a door.
-        auto door = destExit->destination->findDoor();
-        if (door != nullptr)
-        {
-            if (HasFlag(door->flags, ItemFlag::Closed)) return false;
-        }
-        // Check if the destination has a floor.
-        auto destDown = destExit->destination->findExit(Direction::Down);
-        if (destDown != nullptr)
-        {
-            if (!HasFlag(destDown->flags, ExitFlag::Stairs)) return false;
-        }
-        // Check if the destination is forbidden for mobiles.
-        return !(this->isMobile() && HasFlag(destExit->flags, ExitFlag::NoMob));
+        // Set the required stamina to 0.
+        unsigned int requiredStam = 0;
+        return CanMoveCharacterTo(this, direction, error, requiredStam, true);
     };
-    AStar<Room *> aStar;
-    std::vector<Room *> path;
-
+    // TODO: Fix with new AStar algorithm.
     luabridge::LuaRef luaRef(L, luabridge::LuaRef::newTable(L));
+    // Find the path from the actor to the target.
+    AStar<Room *> aStar(RoomCheckFunction,
+                        RoomGetDistance,
+                        RoomAreEqual,
+                        RoomGetNeighbours);
+    std::vector<Room *> path;
     if (this->room != nullptr)
     {
-        if (aStar.findPath(this->room, destination, path, checkFunction))
+        if (aStar.findPath(this->room, destination, path))
         {
             Coordinates previous = this->room->coord;
             for (auto node : path)

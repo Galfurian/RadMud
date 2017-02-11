@@ -23,6 +23,7 @@
 
 #include "flee.hpp"
 
+#include "roomUtilityFunctions.hpp"
 #include "characterUtilities.hpp"
 #include "basicAttack.hpp"
 #include "moveAction.hpp"
@@ -108,7 +109,7 @@ ActionStatus Flee::perform()
     {
         // Get the list of available directions.
         std::vector<Direction> directions;
-        for (auto it : actor->room->getAvailableDirections())
+        for (auto it : GetAvailableDirections(actor->room))
         {
             if (CanMoveCharacterTo(actor, it, error, consumedStamina, true))
             {
@@ -124,7 +125,7 @@ ActionStatus Flee::perform()
         if (selected == nullptr)
         {
             Logger::log(LogLevel::Error, "Selected null exit while fleeing.");
-            actor->sendMsg("You were not able to escape.\n");
+            actor->sendMsg("You were not able to escape.\n\n");
         }
         else
         {

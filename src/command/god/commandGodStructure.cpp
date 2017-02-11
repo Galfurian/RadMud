@@ -20,6 +20,8 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "commandGodStructure.hpp"
+#include "roomUtilityFunctions.hpp"
+#include "characterUtilities.hpp"
 #include "aStar.hpp"
 #include "mud.hpp"
 
@@ -37,38 +39,26 @@ bool DoFindPath(Character * character, ArgumentHandler & args)
         character->sendMsg("The room %s doesn't exists.\n", roomVnum);
         return false;
     }
-    AStar<Room *> aStar;
-    std::vector<Room *> path;
-    auto checkFunction = [&character](Room * from, Room * to)
+    auto RoomCheckFunction = [&](Room * from, Room * to)
     {
-        // Get the direction.
+        // Prepare the error string.
+        std::string error;
+        // Evaluate the direction from the current room to the next.
         auto direction = Area::getDirection(from->coord, to->coord);
-        // Get the exit;
-        auto destExit = from->findExit(direction);
-        // If the direction is upstairs, check if there is a stair.
-        if (direction == Direction::Up)
-        {
-            if (!HasFlag(destExit->flags, ExitFlag::Stairs)) return false;
-        }
-        // Check if the destination is correct.
-        if (destExit->destination == nullptr) return false;
-        // Check if the destination is bocked by a door.
-        auto door = destExit->destination->findDoor();
-        if (door != nullptr)
-        {
-            if (HasFlag(door->flags, ItemFlag::Closed)) return false;
-        }
-        // Check if the destination has a floor.
-        auto destDown = destExit->destination->findExit(Direction::Down);
-        if (destDown != nullptr)
-        {
-            if (!HasFlag(destDown->flags, ExitFlag::Stairs)) return false;
-        }
-        // Check if the destination is forbidden for mobiles.
-        return !(character->isMobile() &&
-                 HasFlag(destExit->flags, ExitFlag::NoMob));
+        // Set the required stamina to 0.
+        unsigned int requiredStam = 0;
+        return CanMoveCharacterTo(character,
+                                  direction,
+                                  error,
+                                  requiredStam,
+                                  true);
     };
-    if (!aStar.findPath(character->room, room, path, checkFunction))
+    AStar<Room *> aStar(RoomCheckFunction,
+                        RoomGetDistance,
+                        RoomAreEqual,
+                        RoomGetNeighbours);
+    std::vector<Room *> path;
+    if (!aStar.findPath(character->room, room, path))
     {
         character->sendMsg("There is no path to that room.\n\n");
         return false;

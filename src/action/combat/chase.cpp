@@ -22,6 +22,7 @@
 
 #include "chase.hpp"
 
+#include "roomUtilityFunctions.hpp"
 #include "characterUtilities.hpp"
 #include "effectFactory.hpp"
 #include "moveAction.hpp"
@@ -35,8 +36,7 @@ Chase::Chase(Character * _actor, Character * _target) :
     CombatAction(_actor),
     target(_target),
     lastRoom(_target->room),
-    valid(),
-    checkFunction()
+    RoomCheckFunction()
 {
     // Debugging message.
     Logger::log(LogLevel::Debug, "Created Chase.");
@@ -53,11 +53,6 @@ bool Chase::check(std::string & error) const
 {
     if (!CombatAction::check(error))
     {
-        return false;
-    }
-    if (!valid)
-    {
-        error = "You are not able to chase your target.";
         return false;
     }
     if (target == nullptr)
@@ -190,37 +185,42 @@ unsigned int Chase::getCooldown(Character * character)
 bool Chase::updatePath()
 {
     // Set the check function.
-    if (checkFunction == nullptr)
+    if (RoomCheckFunction == nullptr)
     {
-        checkFunction = [&](Room * from, Room * to)
+        RoomCheckFunction = [&](Room * from, Room * to)
         {
             // Prepare the error string.
             std::string error;
             // Evaluate the direction from the current room to the next.
             auto direction = Area::getDirection(from->coord, to->coord);
-            // Get the required stamina.
-            auto requiredStamina = MoveAction::getConsumedStamina(actor);
+            // Set the required stamina to 0.
+            unsigned int requiredStam = 0;
             return CanMoveCharacterTo(actor,
                                       direction,
                                       error,
-                                      requiredStamina,
+                                      requiredStam,
                                       true);
         };
     }
     // Find the path from the actor to the target.
-    AStar<Room *> aStar;
-    return aStar.findPath(actor->room, target->room, path, checkFunction);
+    AStar<Room *> aStar(RoomCheckFunction,
+                        RoomGetDistance,
+                        RoomAreEqual,
+                        RoomGetNeighbours);
+    return aStar.findPath(actor->room, target->room, path);
 }
 
 bool Chase::moveTowardsTarget()
 {
     if (path.empty())
     {
+        Logger::log(LogLevel::Debug, "Path is empty.");
         return false;
     }
     Room * nextRoom = path.front();
     if (nextRoom == nullptr)
     {
+        Logger::log(LogLevel::Debug, "Next room is a nullptr.");
         return false;
     }
     // Get the direction of the next room.
@@ -234,6 +234,7 @@ bool Chase::moveTowardsTarget()
         actor->getNameCapital() + " arrives from " +
         direction.getOpposite().toString() + ".\n"))
     {
+        Logger::log(LogLevel::Debug, "Cannot move to the next room.");
         return false;
     }
     // Apply the disturbed aim effect.

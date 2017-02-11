@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "pathFinderNode.hpp"
 #include <memory>
 #include <vector>
 
@@ -34,13 +35,10 @@ using AStarNodeState = enum class AStarNodeState_t
 };
 
 /// @brief A supporting node for the AStart algorithm.
-template<typename ElementType>
-class AStarNode
+template<typename T>
+class AStarNode :
+    public PathFinderNode<T>
 {
-public:
-    /// Wrapped element.
-    ElementType element;
-
 private:
     /// Node state.
     AStarNodeState nodeState;
@@ -53,67 +51,81 @@ private:
 
     /// The previous node in path. It is used when recontructing the path
     ///  from the end node to the beginning.
-    std::shared_ptr<AStarNode<ElementType>> parentNode;
+    std::shared_ptr<AStarNode<T>> parentNode;
 
     /// Identifies the end node.
     bool endNodeFlag;
 
 public:
     /// @brief Constructor.
-    AStarNode(ElementType _element);
-
-    /// @brief Allows to set the wrapped element.
-    void setElement(ElementType _element);
+    AStarNode(T _element) :
+        PathFinderNode<T>(_element),
+        nodeState(),
+        g(),
+        h(),
+        parentNode(),
+        endNodeFlag()
+    {
+        // Nothing to do.
+    }
 
     /// @brief Allows to set the state of the node.
-    void setNodeState(const AStarNodeState & _nodeState);
+    void setNodeState(const AStarNodeState & _nodeState)
+    {
+        nodeState = _nodeState;
+    }
 
     /// @brief Allows to set the 'g' value.
-    void setG(const int & _g);
+    void setG(const int & _g)
+    {
+        g = _g;
+    }
 
     /// @brief Allows to set the 'h' value.
-    void setH(const int & _h);
+    void setH(const int & _h)
+    {
+        h = _h;
+    }
 
     /// @brief Allows to set the parent node.
-    void setParentNode(std::shared_ptr<AStarNode<ElementType>> _parentNode);
+    void setParentNode(std::shared_ptr<AStarNode<T>> _parentNode)
+    {
+        parentNode = _parentNode;
+    }
 
     /// @brief Allows to set if this node is the end node.
-    void setIsEndNode();
-
-    /// @brief Provides the wrapped element.
-    ElementType getElement();
+    void setIsEndNode()
+    {
+        endNodeFlag = true;
+    }
 
     /// @brief Provides the state of the node.
-    AStarNodeState getNodeState() const;
+    AStarNodeState getNodeState() const
+    {
+        return nodeState;
+    }
 
     /// @brief Provides the 'g' value.
-    int getG() const;
+    int getG() const
+    {
+        return g;
+    }
 
     /// @brief Provides the 'f' value.
-    int getF() const;
+    int getF() const
+    {
+        return g + h;
+    }
 
     /// @brief Privdes the parent node.
-    std::shared_ptr<AStarNode<ElementType>> getParentNode();
+    std::shared_ptr<AStarNode<T>> getParentNode()
+    {
+        return parentNode;
+    }
 
     /// @brief Gives information if this node is the end node.
-    bool isEndNode() const;
-
-    /// @brief Equality between this and the 'other' AStar node.
-    bool isEqualTo(std::shared_ptr<AStarNode<ElementType>> other);
-
-    /// @brief Provides the distance between this and the 'other' AStar node.
-    int getDistance(std::shared_ptr<AStarNode<ElementType>> other);
-
-    /// @brief Provides all the neighbours of this node.
-    /// @param nodes         The nodes of the AStar algorithm.
-    /// @param endNode       The end node.
-    /// @param checkFunction The checking function.
-    /// @return A vector containing all the 'valid' neighbours.
-    std::vector<std::shared_ptr<AStarNode<ElementType>>> getNeighbours(
-        std::vector<std::shared_ptr<AStarNode<ElementType>>> & nodes,
-        std::shared_ptr<AStarNode<ElementType>> endNode,
-        const std::function<bool(ElementType from,
-                                 ElementType to)> & checkFunction);
+    bool isEndNode() const
+    {
+        return endNodeFlag;
+    }
 };
-
-#include "aStarNode.i.hpp"

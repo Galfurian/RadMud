@@ -37,10 +37,8 @@ private:
     Room * lastRoom;
     /// The path which leads to the target.
     std::vector<Room *> path;
-    /// Validity flag.
-    bool valid;
     /// Checking function.
-    std::function<bool(Room *, Room *)> checkFunction;
+    std::function<bool(Room *, Room *)> RoomCheckFunction;
 
 public:
     /// @brief Constructor.
