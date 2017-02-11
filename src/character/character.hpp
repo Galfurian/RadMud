@@ -32,6 +32,7 @@
 #include "faction.hpp"
 #include "bodyPart.hpp"
 #include "luaBridge.hpp"
+#include "stringBuilder.hpp"
 #include "effectManager.hpp"
 #include "processInput.hpp"
 #include "combatAction.hpp"
@@ -550,49 +551,9 @@ public:
     /// @param first The first unpacked argument.
     /// @param args  Packed arguments.
     template<typename ... Args>
-    void sendMsg(const std::string & msg,
-                 const std::string & first,
-                 const Args & ... args)
+    void sendMsg(const std::string & msg, const Args & ... args)
     {
-        std::string::size_type pos = msg.find("%s");
-        if (pos == std::string::npos)
-        {
-            sendMsg(msg);
-        }
-        else
-        {
-            std::string working(msg);
-            working.replace(pos, 2, first);
-            sendMsg(working, args ...);
-        }
-    }
-
-    /// @brief Sends a message to the character.
-    /// This one in particular handles unsigned integer.
-    template<typename ... Args>
-    void sendMsg(const std::string & msg,
-                 const unsigned int & first,
-                 const Args & ... args)
-    {
-        this->sendMsg(msg, ToString(first), args ...);
-    }
-
-    /// @brief Sends a message to the character. This one in particular handles unsigned integer.
-    template<typename ... Args>
-    void sendMsg(const std::string & msg,
-                 const int & first,
-                 const Args & ... args)
-    {
-        this->sendMsg(msg, ToString(first), args ...);
-    }
-
-    /// @brief Sends a message to the character. This one in particular handles unsigned integer.
-    template<typename ... Args>
-    void sendMsg(const std::string & msg,
-                 const size_t & first,
-                 const Args & ... args)
-    {
-        this->sendMsg(msg, ToString(first), args ...);
+        sendMsg(StringBuilder::build(msg, args ...));
     }
 
 protected:
