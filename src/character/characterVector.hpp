@@ -1,4 +1,4 @@
-/// @file   characterContainer.hpp
+/// @file   characterVector.hpp
 /// @author Enrico Fraccaroli
 /// @date   Oct 11 2016
 /// @copyright
@@ -27,12 +27,12 @@ class Character;
 #include <string>
 
 /// @brief Custom vector of characters.
-class CharacterContainer :
+class CharacterVector :
     public std::vector<Character *>
 {
 public:
     /// @brief Constructor.
-    CharacterContainer();
+    CharacterVector();
 
     /// @brief Search the character.
     /// @param target       The character to search.
@@ -64,5 +64,5 @@ public:
     /// @brief Allows to add the characters contained inside another
     ///         container into this one.
     /// @param other The other container.
-    void addUnique(const CharacterContainer & other);
+    void addUnique(const CharacterVector & other);
 };

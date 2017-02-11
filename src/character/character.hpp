@@ -39,7 +39,7 @@
 #include "meleeWeaponItem.hpp"
 #include "rangedWeaponItem.hpp"
 #include "characterPosture.hpp"
-#include "characterContainer.hpp"
+#include "characterVector.hpp"
 
 #include <deque>
 #include <mutex>

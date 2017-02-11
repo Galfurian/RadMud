@@ -112,7 +112,7 @@ set(PROJECT_SRC
         ${CMAKE_SOURCE_DIR}/src/character/bodyPart.cpp
         ${CMAKE_SOURCE_DIR}/src/character/character.cpp
         ${CMAKE_SOURCE_DIR}/src/character/characterUtilities.cpp
-        ${CMAKE_SOURCE_DIR}/src/character/characterContainer.cpp
+        ${CMAKE_SOURCE_DIR}/src/character/characterVector.cpp
         ${CMAKE_SOURCE_DIR}/src/character/mobile.cpp
         ${CMAKE_SOURCE_DIR}/src/character/player.cpp
         ${CMAKE_SOURCE_DIR}/src/character/faction.cpp

@@ -113,10 +113,10 @@ Direction Area::getDirection(const Coordinates & source,
     return Direction::None;
 }
 
-CharacterContainer Area::getCharactersAt(const CharacterContainer & exceptions,
+CharacterVector Area::getCharactersAt(const CharacterVector & exceptions,
                                          const Coordinates & coordinates)
 {
-    CharacterContainer characterContainer;
+    CharacterVector characterContainer;
     if (this->isValid(coordinates))
     {
         for (auto it : this->getRoom(coordinates)->characters)
@@ -510,11 +510,11 @@ std::string Area::drawASCIIFov(Room * centerRoom, const int & radius)
     return result;
 }
 
-CharacterContainer Area::getCharactersInSight(CharacterContainer & exceptions,
+CharacterVector Area::getCharactersInSight(CharacterVector & exceptions,
                                               Coordinates & origin,
                                               const int & radius)
 {
-    CharacterContainer characterContainer;
+    CharacterVector characterContainer;
     auto validCoordinates = this->fov(origin, radius);
     for (auto coordinates : validCoordinates)
     {

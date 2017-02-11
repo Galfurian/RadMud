@@ -30,7 +30,7 @@
 #include "item.hpp"
 #include "lua_script.hpp"
 #include "mobile.hpp"
-#include "characterContainer.hpp"
+#include "characterVector.hpp"
 #include "itemVector.hpp"
 #include "terrain.hpp"
 
@@ -70,7 +70,7 @@ public:
     /// List of items in the room.
     ItemVector items;
     /// List of characters in the room.
-    CharacterContainer characters;
+    CharacterVector characters;
     /// Integer that describe the flags of the room.
     unsigned int flags;
     /// The liquid which fills the room.

@@ -443,9 +443,9 @@ bool DoAim(Character * character, ArgumentHandler & args)
     }
     // Prepare a pointer to the aimed character.
     Character * aimedCharacter = nullptr;
-    // Create a single CharacterContainer which contains
+    // Create a single CharacterVector which contains
     //  a unique list of all the targets.
-    CharacterContainer targets = character->room->characters;
+    CharacterVector targets = character->room->characters;
     targets.addUnique(character->combatHandler.charactersInSight);
     // First try to search the target inside the same room.
     aimedCharacter = targets.findCharacter(args[0].getContent(),
@@ -475,7 +475,7 @@ bool DoAim(Character * character, ArgumentHandler & args)
     auto newAction = std::make_shared<AimAction>(character, aimedCharacter);
     // Check the new action.
     std::string error;
-    if (newAction->check(error))
+    if (!newAction->check(error))
     {
         character->sendMsg("%s\n", error);
         return false;

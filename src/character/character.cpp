@@ -1175,7 +1175,7 @@ luabridge::LuaRef Character::luaGetRoomsInSight()
     luabridge::LuaRef luaRef(L, luabridge::newTable(L));
     if (room != nullptr)
     {
-        CharacterContainer characterContainer;
+        CharacterVector characterContainer;
         auto validCoordinates = room->area->fov(room->coord,
                                                 this->getViewDistance());
         for (auto coordinates : validCoordinates)
@@ -1191,7 +1191,7 @@ luabridge::LuaRef Character::luaGetCharactersInSight()
     luabridge::LuaRef luaRef(L, luabridge::newTable(L));
     if (room != nullptr)
     {
-        CharacterContainer exceptions;
+        CharacterVector exceptions;
         exceptions.emplace_back_character(this);
         for (auto it : room->area->getCharactersInSight(exceptions,
                                                         room->coord,

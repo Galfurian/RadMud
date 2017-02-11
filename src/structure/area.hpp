@@ -114,7 +114,7 @@ public:
     /// @param exceptions  The exceptions.
     /// @param coordinates The desired coordinates.
     /// @return The list of characters at the given coordinates.
-    CharacterContainer getCharactersAt(const CharacterContainer & exceptions,
+    CharacterVector getCharactersAt(const CharacterVector & exceptions,
                                        const Coordinates & coordinates);
 
     /// @brief Provides all the items inside the room at the given coordinates.
@@ -167,7 +167,7 @@ public:
     /// @param origin The coordinate of the central room.
     /// @param radius     The radius of visibility.
     /// @return The list containing the targets.
-    CharacterContainer getCharactersInSight(CharacterContainer & exceptions,
+    CharacterVector getCharactersInSight(CharacterVector & exceptions,
                                             Coordinates & origin,
                                             const int & radius);
 

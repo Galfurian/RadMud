@@ -1,4 +1,4 @@
-/// @file   characterContainer.cpp
+/// @file   characterVector.cpp
 /// @author Enrico Fraccaroli
 /// @date   Oct 11 2016
 /// @copyright
@@ -19,17 +19,17 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "characterContainer.hpp"
+#include "characterVector.hpp"
 #include "character.hpp"
 #include "player.hpp"
 #include "mobile.hpp"
 
-CharacterContainer::CharacterContainer()
+CharacterVector::CharacterVector()
 {
     // Nothing to do.
 }
 
-Character * CharacterContainer::findCharacter(const std::string & target,
+Character * CharacterVector::findCharacter(const std::string & target,
                                               int & number,
                                               const std::vector<Character *> & exceptions,
                                               bool skipMobile,
@@ -100,7 +100,7 @@ Character * CharacterContainer::findCharacter(const std::string & target,
     return nullptr;
 }
 
-bool CharacterContainer::containsCharacter(Character * character) const
+bool CharacterVector::containsCharacter(Character * character) const
 {
     for (const_iterator it = this->begin(); it != this->end(); ++it)
     {
@@ -117,7 +117,7 @@ bool CharacterContainer::containsCharacter(Character * character) const
 }
 
 
-void CharacterContainer::emplace_back_character(Character * character)
+void CharacterVector::emplace_back_character(Character * character)
 {
     for (const_iterator it = this->begin(); it != this->end(); ++it)
     {
@@ -133,7 +133,7 @@ void CharacterContainer::emplace_back_character(Character * character)
     this->emplace_back(character);
 }
 
-void CharacterContainer::addUnique(const CharacterContainer & other)
+void CharacterVector::addUnique(const CharacterVector & other)
 {
     for (auto character : other)
     {

@@ -127,7 +127,7 @@ bool CombatHandler::hasOpponent(Character * character)
 void CombatHandler::updateCharactersInSight()
 {
     // Get the characters in sight.
-    CharacterContainer exceptions;
+    CharacterVector exceptions;
     exceptions.emplace_back(owner);
     charactersInSight = owner->room->area->getCharactersInSight(
         exceptions,

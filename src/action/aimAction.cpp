@@ -47,6 +47,8 @@ bool AimAction::check(std::string & error) const
 {
     if (!GeneralAction::check(error))
     {
+        Logger::log(LogLevel::Error, "Error with the general action.");
+        error = "You failed your action.";
         return false;
     }
     if (target == nullptr)

@@ -224,7 +224,7 @@ std::string Collapser::toString()
         {
             cnt = 0;
         }
-        int mch = 2;
+        int mch;
         switch (ch)
         {
             case 'a':
@@ -238,6 +238,10 @@ std::string Collapser::toString()
             case 'x':
             case 'y':
                 mch = 1;
+                break;
+            default:
+                mch = 2;
+                break;
         }
         if (cnt < mch)
         {
@@ -338,14 +342,13 @@ void NameGenerator::Group::add(std::unique_ptr<NameGenerator> && g)
 {
     while (!wrappers.empty())
     {
-        switch (wrappers.top())
+        if (wrappers.top() == reverser)
         {
-            case reverser:
-                g = make_unique<Reverser>(std::move(g));
-                break;
-            case capitalizer:
-                g = make_unique<Capitalizer>(std::move(g));
-                break;
+            g = make_unique<Reverser>(std::move(g));
+        }
+        else if (wrappers.top() == capitalizer)
+        {
+            g = make_unique<Capitalizer>(std::move(g));
         }
         wrappers.pop();
     }
@@ -897,4 +900,4 @@ const NameGenerator::SymbolMap & NameGenerator::GetSymbolMap()
     return *symbols;
 }
 
-};
+}
