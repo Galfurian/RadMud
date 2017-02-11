@@ -22,6 +22,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 class Room;
 
@@ -45,13 +46,6 @@ std::vector<Room *> GetConnectedRooms(Room * r);
 /// @return If there is a connection between the two rooms.
 bool RoomCheckConnection(Room * r1, Room * r2);
 
-/// @brief Checks if the two given room are connected.
-/// @param r1        The first room.
-/// @param r2        The second room.
-/// @param character The character who wants to go from r1 to r2.
-/// @return If there is a connection between the two rooms.
-bool RoomCharacterCanMove(Room * r1, Room * r2, Character * character);
-
 /// Functions used to get the distance between two rooms.
 int RoomGetDistance(Room * r1, Room * r2);
 
@@ -60,3 +54,45 @@ bool RoomAreEqual(Room * r1, Room * r2);
 
 /// Function used to get the neighbours of the given room.
 std::vector<Room *> RoomGetNeighbours(Room * r);
+
+/// @brief Structure which contains options used to check rooms connections.
+struct MovementOptions
+{
+public:
+    /// Allows the function to check if the character can perform the move.
+    Character * character;
+    /// Allows to set if the given character can perform the move during
+    /// close combat.
+    bool allowedInCloseCombat;
+    /// Allows to set the required amount of stamina required to move.
+    unsigned int requiredStamina;
+
+    /// @brief Constructor.
+    MovementOptions();
+
+    /// @brief Copy constructor.
+    MovementOptions(const MovementOptions & other);
+
+    /// @brief Destructor.
+    ~MovementOptions();
+};
+
+/// @brief Check the connection between the two given rooms and the given
+///         options.
+/// @param options  The character that wants to move.
+/// @param r1       The first room.
+/// @param r2       The second room.
+/// @param error    A reference to a string which will contain error
+///                 message in case of failure.
+/// @return <b>True</b> if there is a valid connection between the rooms,<br>
+///         <b>False</b> otherwise.
+bool CheckConnection(const MovementOptions & options,
+                     Room * r1,
+                     Room * r2,
+                     std::string & error);
+
+/// @brief Checks if there is a valid connection on the given direction.
+bool CheckConnection(const MovementOptions & options,
+                     Room * r1,
+                     const Direction & direction,
+                     std::string & error);

@@ -22,6 +22,7 @@
 
 #include "moveAction.hpp"
 
+#include "roomUtilityFunctions.hpp"
 #include "characterUtilities.hpp"
 #include "effectFactory.hpp"
 #include "character.hpp"
@@ -105,11 +106,12 @@ ActionStatus MoveAction::perform()
     }
     // Evaluate the amount of required stamina.
     auto consumedStamina = this->getConsumedStamina(actor);
-    if (!CanMoveCharacterTo(actor,
-                            direction,
-                            error,
-                            consumedStamina,
-                            false))
+    // Prepare the movement options.
+    MovementOptions options;
+    options.character = actor;
+    options.requiredStamina = consumedStamina;
+    // Check if the character can move to the given room.
+    if (!CheckConnection(options, actor->room, destination, error))
     {
         // Notify that the actor can't move because too tired.
         actor->sendMsg(error + "\n");

@@ -1225,13 +1225,12 @@ luabridge::LuaRef Character::luaGetPathTo(Room * destination)
 {
     auto RoomCheckFunction = [&](Room * from, Room * to)
     {
+        // Preapre the options.
+        MovementOptions options;
+        options.character = this;
         // Prepare the error string.
         std::string error;
-        // Evaluate the direction from the current room to the next.
-        auto direction = Area::getDirection(from->coord, to->coord);
-        // Set the required stamina to 0.
-        unsigned int requiredStam = 0;
-        return CanMoveCharacterTo(this, direction, error, requiredStam, true);
+        return CheckConnection(options, from, to, error);
     };
     // TODO: Fix with new AStar algorithm.
     luabridge::LuaRef luaRef(L, luabridge::LuaRef::newTable(L));

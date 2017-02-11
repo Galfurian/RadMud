@@ -20,6 +20,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "movement.hpp"
+#include "roomUtilityFunctions.hpp"
 #include "characterUtilities.hpp"
 #include "moveAction.hpp"
 #include "logger.hpp"
@@ -69,23 +70,26 @@ bool DoDirection(Character * character, Direction direction)
 {
     // Stop any action the character is executing.
     StopAction(character);
+    // Prepare the movement options.
+    MovementOptions options;
+    options.character = character;
+    options.allowedInCloseCombat = false;
+    options.requiredStamina = MoveAction::getConsumedStamina(character);
     // Prepare a string for the error.
     std::string error;
-    // Evaluate the required stamina.
-    auto reqStamina = MoveAction::getConsumedStamina(character);
     // Check if the character can move to the destination.
-    if (!CanMoveCharacterTo(character, direction, error, reqStamina, false))
+    if (!CheckConnection(options, character->room, direction, error))
     {
         character->sendMsg(error + "\n");
         return false;
     }
     // Get the destination.
     auto destination = character->room->findExit(direction)->destination;
+    // Create the move action.
     auto moveAction = std::make_shared<MoveAction>(character,
                                                    destination,
                                                    direction);
     // Check the new action.
-    error = std::string();
     if (moveAction->check(error))
     {
         // Set the new action.

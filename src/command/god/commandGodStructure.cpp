@@ -41,17 +41,12 @@ bool DoFindPath(Character * character, ArgumentHandler & args)
     }
     auto RoomCheckFunction = [&](Room * from, Room * to)
     {
+        // Prepare the movement options.
+        MovementOptions options;
+        options.character = character;
         // Prepare the error string.
         std::string error;
-        // Evaluate the direction from the current room to the next.
-        auto direction = Area::getDirection(from->coord, to->coord);
-        // Set the required stamina to 0.
-        unsigned int requiredStam = 0;
-        return CanMoveCharacterTo(character,
-                                  direction,
-                                  error,
-                                  requiredStam,
-                                  true);
+        return CheckConnection(options, from, to, error);
     };
     AStar<Room *> aStar(RoomCheckFunction,
                         RoomGetDistance,

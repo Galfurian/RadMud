@@ -189,17 +189,12 @@ bool Chase::updatePath()
     {
         RoomCheckFunction = [&](Room * from, Room * to)
         {
+            // Prepare the movement options.
+            MovementOptions options;
+            options.character = actor;
             // Prepare the error string.
             std::string error;
-            // Evaluate the direction from the current room to the next.
-            auto direction = Area::getDirection(from->coord, to->coord);
-            // Set the required stamina to 0.
-            unsigned int requiredStam = 0;
-            return CanMoveCharacterTo(actor,
-                                      direction,
-                                      error,
-                                      requiredStam,
-                                      true);
+            return CheckConnection(options, from, to, error);
         };
     }
     // Find the path from the actor to the target.

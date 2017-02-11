@@ -26,7 +26,6 @@
 #include "roomUtilityFunctions.hpp"
 #include "characterUtilities.hpp"
 #include "basicAttack.hpp"
-#include "moveAction.hpp"
 #include "logger.hpp"
 #include "room.hpp"
 
@@ -107,24 +106,26 @@ ActionStatus Flee::perform()
     }
     else
     {
-        // Get the list of available directions.
-        std::vector<Direction> directions;
-        for (auto it : GetAvailableDirections(actor->room))
+        // Get the list of available destinations.
+        std::vector<Room *> destinations;
+        for (auto it : GetConnectedRooms(actor->room))
         {
-            if (CanMoveCharacterTo(actor, it, error, consumedStamina, true))
+            // Prepare the movement options.
+            MovementOptions options;
+            options.character = actor;
+            if (CheckConnection(options, actor->room, it, error))
             {
-                directions.emplace_back(it);
+                destinations.emplace_back(it);
             }
         }
         // Pick a random direction, from the poll of the available ones.
-        auto randomDirValue = TRandInteger<size_t>(0, directions.size() - 1);
-        auto randomDirection = directions.at(randomDirValue);
-        // Get the selected exit.
-        auto selected = actor->room->findExit(randomDirection);
-        // Check that the picked exit is not a null pointer.
-        if (selected == nullptr)
+        auto destination = destinations.at(
+            TRandInteger<size_t>(
+                0, destinations.size() - 1));
+        // Check that the picked destination is not a null pointer.
+        if (destination == nullptr)
         {
-            Logger::log(LogLevel::Error, "Selected null exit while fleeing.");
+            Logger::log(LogLevel::Error, "Flee selected null destination.");
             actor->sendMsg("You were not able to escape.\n\n");
         }
         else
@@ -136,7 +137,7 @@ ActionStatus Flee::perform()
             // Move the actor to the random direction.
             MoveCharacterTo(
                 actor,
-                selected->destination,
+                destination,
                 actor->getName() + " flees from the battlefield.\n\n",
                 actor->getName() + " arives fleeing.\n\n",
                 "You flee from the battlefield.\n");

@@ -125,22 +125,6 @@ bool FindNearbyTools(
     ItemVector & foundTools,
     const SearchOptionsCharacter & searchOptions);
 
-/// @brief Check if the character can move in the given direction.
-/// @param character        The character that wants to move.
-/// @param direction        The direction where the character whats to move.
-/// @param error            A reference to a string which will contain error
-///                         message in case of failure.
-/// @param consumedStamina  The amount of consumed stamina.
-/// @param allowInCombat    If true, the function does not check if the
-///                         character is in close-combat.
-/// @return <b>True</b> if the character can move to the given direction,<br>
-///         <b>False</b> otherwise.
-bool CanMoveCharacterTo(Character * character,
-                        const Direction & direction,
-                        std::string & error,
-                        unsigned int & consumedStamina,
-                        bool allowInCombat);
-
 /// @brief Move the character to another room.
 /// @param character   The target character.
 /// @param destination The destination room.
