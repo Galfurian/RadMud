@@ -72,4 +72,10 @@ public:
     /// @param character The character which has to execute the action.
     /// @return Th required time.
     static unsigned int getCooldown(Character * character);
+
+private:
+
+    bool updatePath();
+
+    bool moveTowardsTarget();
 };
