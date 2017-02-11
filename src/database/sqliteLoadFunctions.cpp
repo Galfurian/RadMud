@@ -753,9 +753,7 @@ bool LoadMobile(ResultSet * result)
                 throw SQLiteException("Error during mobile insertion.");
             }
             // Load the script.
-            mobile->loadScript(
-                Mud::instance().getMudSystemDirectory() + "lua/" +
-                mobile->lua_script);
+            LoadLuaEnvironmet(mobile->L, mobile->lua_script);
             // Respawn it.
             mobile->respawn(true);
         }

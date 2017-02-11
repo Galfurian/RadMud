@@ -22,7 +22,6 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "lua_script.hpp"
-
 #include "logger.hpp"
 #include "mud.hpp"
 
@@ -61,4 +60,44 @@ void LuaRegisterUtils(lua_State * L)
         .addFunction("random", LuaRandom)
         .addFunction("stop", LuaStopScript)
         .endNamespace();
+}
+
+void LoadLuaEnvironmet(lua_State * L, const std::string & scriptFile)
+{
+    // -------------------------------------------------------------------------
+    // Open lua libraries.
+    luaL_openlibs(L);
+    // Register utility functions.
+    LuaRegisterUtils(L);
+
+    // -------------------------------------------------------------------------
+    // Register all the base classes.
+    Character::luaRegister(L);
+    Area::luaRegister(L);
+    Faction::luaRegister(L);
+    ItemModel::luaRegister(L);
+    Item::luaRegister(L);
+    Material::luaRegister(L);
+    Race::luaRegister(L);
+    Coordinates::luaRegister(L);
+    Exit::luaRegister(L);
+    terrain::Terrain::luaRegister(L);
+    Room::luaRegister(L);
+
+    // -------------------------------------------------------------------------
+    // The enumerators.
+    Direction::luaRegister(L);
+    ModelType::luaRegister(L);
+    ToolType::luaRegister(L);
+    ResourceType::luaRegister(L);
+
+    // -------------------------------------------------------------------------
+    // Load the script.
+    auto path = Mud::instance().getMudSystemDirectory() + "lua/" + scriptFile;
+    if (luaL_dofile(L, path.c_str()) != LUABRIDGE_LUA_OK)
+    {
+        Logger::log(LogLevel::Error, "Can't open script %s.", scriptFile);
+        Logger::log(LogLevel::Error, "Error :%s",
+                    std::string(lua_tostring(L, -1)));
+    }
 }

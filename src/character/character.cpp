@@ -1117,41 +1117,6 @@ Mobile * Character::toMobile()
     return static_cast<Mobile *>(this);
 }
 
-void Character::loadScript(const std::string & scriptFilename)
-{
-    //Logger::log(LogLevel::Debug, "Loading script '%s'...", scriptFilename);
-    // Open lua libraries.
-    luaL_openlibs(L);
-
-    // Register utilities functions.
-    LuaRegisterUtils(L);
-
-    // Register all the classes.
-    Character::luaRegister(L);
-    Area::luaRegister(L);
-    Faction::luaRegister(L);
-    ItemModel::luaRegister(L);
-    Item::luaRegister(L);
-    Material::luaRegister(L);
-    Race::luaRegister(L);
-    Coordinates::luaRegister(L);
-    Exit::luaRegister(L);
-    terrain::Terrain::luaRegister(L);
-    Room::luaRegister(L);
-
-    Direction::luaRegister(L);
-    ModelType::luaRegister(L);
-    ToolType::luaRegister(L);
-
-    if (luaL_dofile(L, scriptFilename.c_str()) != LUABRIDGE_LUA_OK)
-    {
-        Logger::log(LogLevel::Error, "Can't open script %s.", scriptFilename);
-        Logger::log(LogLevel::Error,
-                    "Error :%s",
-                    std::string(lua_tostring(L, -1)));
-    }
-}
-
 luabridge::LuaRef Character::luaGetEquipmentItems()
 {
     luabridge::LuaRef luaRef(L, luabridge::newTable(L));

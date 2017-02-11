@@ -52,8 +52,8 @@
 #define LUABRIDGE_MINOR_VERSION   0
 #define LUABRIDGE_VERSION       200
 
-#include "stack.hpp"
 #include "luaHelpers.hpp"
+#include "stack.hpp"
 #include "typeTraits.hpp"
 #include "typeList.hpp"
 #include "funcTraits.hpp"

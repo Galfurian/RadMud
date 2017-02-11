@@ -21,6 +21,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "resourceType.hpp"
+#include "luaBridge.hpp"
 #include "utils.hpp"
 
 ResourceType::ResourceType() :
@@ -82,32 +83,6 @@ ResourceType::ResourceType(const std::string & _resourceType) :
     else resourceType = None;
 }
 
-bool ResourceType::isValid(const unsigned int & _resourceType)
-{
-    return (_resourceType >= 1) && (_resourceType <= 17);
-}
-
-bool ResourceType::isValid(const std::string & _resourceType)
-{
-    if (ToLower(_resourceType) == "coal") return true;
-    if (ToLower(_resourceType) == "ore") return true;
-    if (ToLower(_resourceType) == "bar") return true;
-    if (ToLower(_resourceType) == "log") return true;
-    if (ToLower(_resourceType) == "plank") return true;
-    if (ToLower(_resourceType) == "tree") return true;
-    if (ToLower(_resourceType) == "fastener") return true;
-    if (ToLower(_resourceType) == "leather") return true;
-    if (ToLower(_resourceType) == "cloth") return true;
-    if (ToLower(_resourceType) == "stoneblock") return true;
-    if (ToLower(_resourceType) == "metalvein") return true;
-    if (ToLower(_resourceType) == "stonemonolith") return true;
-    if (ToLower(_resourceType) == "pen") return true;
-    if (ToLower(_resourceType) == "meat") return true;
-    if (ToLower(_resourceType) == "bone") return true;
-    if (ToLower(_resourceType) == "skull") return true;
-    return (ToLower(_resourceType) == "trash");
-}
-
 std::string ResourceType::toString() const
 {
     if (resourceType == ResourceType::Coal) return "Natural Coal";
@@ -148,4 +123,33 @@ bool ResourceType::operator!=(const ResourceType & rhs) const
 bool ResourceType::operator<(const ResourceType & rhs) const
 {
     return resourceType < rhs.resourceType;
+}
+
+void ResourceType::luaRegister(lua_State * L)
+{
+    luabridge::getGlobalNamespace(L)
+        .beginClass<ResourceType>("ResourceType")
+        .addFunction("toUInt", &ResourceType::toUInt)
+        .addFunction("toString", &ResourceType::toString)
+        .endClass()
+        .beginEnum<ResourceType>("ResourceType")
+        .addEnum("None", None)
+        .addEnum("Coal", Coal)
+        .addEnum("Ore", Ore)
+        .addEnum("Bar", Bar)
+        .addEnum("Log", Log)
+        .addEnum("Plank", Plank)
+        .addEnum("Tree", Tree)
+        .addEnum("Fastener", Fastener)
+        .addEnum("Leather", Leather)
+        .addEnum("Cloth", Cloth)
+        .addEnum("StoneBlock", StoneBlock)
+        .addEnum("MetalVein", MetalVein)
+        .addEnum("StoneMonolith", StoneMonolith)
+        .addEnum("Pen", Pen)
+        .addEnum("Trash", Trash)
+        .addEnum("Meat", Meat)
+        .addEnum("Bone", Bone)
+        .addEnum("Skull", Skull)
+        .endEnum();
 }

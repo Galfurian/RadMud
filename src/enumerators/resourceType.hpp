@@ -24,6 +24,8 @@
 
 #include <string>
 
+struct lua_State;
+
 /// Represents a type of resource.
 class ResourceType
 {
@@ -63,12 +65,6 @@ public:
     /// @brief Constructor from string.
     ResourceType(const std::string & _resourceType);
 
-    /// @brief Check is the given number is a valid resource.
-    static bool isValid(const unsigned int & _resourceType);
-
-    /// @brief Check is the given string is a valid resource.
-    static bool isValid(const std::string & _resourceType);
-
     /// @brief Returns the resource as string.
     std::string toString() const;
 
@@ -83,6 +79,10 @@ public:
 
     /// @brief Lesser operator.
     bool operator<(const ResourceType & rhs) const;
+
+    /// @brief Function used to register inside the lua environment the class.
+    /// @param L The lua environment.
+    static void luaRegister(lua_State * L);
 
 private:
     /// Internal value.

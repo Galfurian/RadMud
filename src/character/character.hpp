@@ -489,10 +489,6 @@ public:
     /// @return The mobile version of the character.
     Mobile * toMobile();
 
-    /// @brief Starts a lua environment and loads the given script.
-    /// @param scriptFilename The name of the script that has to be loaded.
-    void loadScript(const std::string & scriptFilename);
-
     /// @brief Returns the list of equipped items.
     luabridge::LuaRef luaGetEquipmentItems();
 

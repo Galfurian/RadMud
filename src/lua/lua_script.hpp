@@ -23,15 +23,8 @@
 #pragma once
 
 #include <string>
-#include <vector>
-#include <cassert>
 
-extern "C"
-{
-#include "lua.h"
-#include "lauxlib.h"
-#include "lualib.h"
-}
+struct lua_State;
 
 /// @brief Allow from lua code, to log a string.
 /// @param message The message to log.
@@ -54,3 +47,6 @@ void LuaStopScript();
 /// @brief Register in Lua all the functions.
 /// @param L The lua state.
 void LuaRegisterUtils(lua_State * L);
+
+void LoadLuaEnvironmet(lua_State * L, const std::string & scriptFile);
+

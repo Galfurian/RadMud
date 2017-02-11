@@ -4,6 +4,7 @@
 /// Copyright 2007, Nathan Reed
 /// Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
 /// Copyright 2016, Robin Gareus <robin@gareus.org>
+/// Copyright 2017, Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 ///
 /// License: The MIT License (http://www.opensource.org/licenses/mit-license.php)
 ///
@@ -678,41 +679,10 @@ private:
          Add or replace a lua_CFunction.
          */
         Class<T> &
-        addStaticCFunction(char const * name, int (* const fp)(lua_State *)
-
-        )
+        addStaticCFunction(char const * name, int (* const fp)(lua_State *))
         {
             lua_pushcfunction(L, fp);
             rawsetfield(L, -2, name);
-            return *this;
-        }
-
-        //----------------------------------------------------------------------------
-        /// @brief Add a value.
-        /// @param name  The name of the value.
-        /// @param value The value to add.
-        /// @return A reference to the current namespace.
-        template<class U>
-        Class<T> & addIntegral(char const * name, U value)
-        {
-            static_assert(std::is_integral<U>::value, "Integer required.");
-            assert(lua_istable(L, -1));
-            lua_pushnumber(L, value);
-            rawsetfield(L, -2, name);
-            return *this;
-        }
-
-        /// @brief Add an enum value.
-        /// @param name  The name of the value.
-        /// @param value The value to add.
-        /// @return A reference to the current namespace.
-        template<class U>
-        Class<T> & addEnum(char const * name, U value)
-        {
-            static_assert(std::is_enum<U>::value, "Enum required.");
-            lua_pushnumber(L, static_cast<unsigned int>(value));
-            rawsetfield(L, -2, name);
-            lua_pop(L, 2);
             return *this;
         }
 
@@ -1386,6 +1356,42 @@ private:
         Class<std::shared_ptr<T> > shared;
     };
 
+    /// @brief Class used to register an enumerator inside the lua environment.
+    template<class T>
+    class EnumToLua
+    {
+    protected:
+        friend class Namespace;
+
+        lua_State * const L;
+
+    public:
+        /// @brief Constructor.
+        EnumToLua(char const * name, Namespace const * parent) :
+            L(parent->L)
+        {
+            // Get the entity inside the lua environment.
+            lua_getglobal(L, name);
+        }
+
+        /// @brief Add an enumerator.
+        template<class EnumValue>
+        EnumToLua<T> & addEnum(char const * name, EnumValue value)
+        {
+            // Push the name of the enum.
+            lua_pushstring(L, name);
+            // Push the value.
+            lua_pushinteger(L, value);
+            lua_rawset(L, -3);
+            return *this;
+        }
+
+        /// Continue registration in the enclosing namespace.
+        Namespace endEnum()
+        {
+            return Namespace(L);
+        }
+    };
 
 private:
     //----------------------------------------------------------------------------
@@ -1523,35 +1529,6 @@ public:
     Namespace endNamespace()
     {
         return Namespace(this);
-    }
-
-    //----------------------------------------------------------------------------
-    /// @brief Add a value.
-    /// @param name  The name of the value.
-    /// @param value The value to add.
-    /// @return A reference to the current namespace.
-    template<class IntType>
-    Namespace & addIntegral(char const * name, IntType value)
-    {
-        static_assert(std::is_integral<IntType>::value, "Integer required.");
-        assert(lua_istable(L, -1));
-        lua_pushnumber(L, value);
-        rawsetfield(L, -2, name);
-        return *this;
-    }
-
-    /// @brief Add an enum value.
-    /// @param name  The name of the value.
-    /// @param value The value to add.
-    /// @return A reference to the current namespace.
-    template<class EnumType>
-    Namespace & addEnum(char const * name, EnumType value)
-    {
-        static_assert(std::is_enum<EnumType>::value, "Enum required.");
-        assert(lua_istable(L, -1));
-        lua_pushnumber(L, static_cast<unsigned int>(value));
-        rawsetfield(L, -2, name);
-        return *this;
     }
 
     //----------------------------------------------------------------------------
@@ -1837,6 +1814,14 @@ public:
             .addExtCFunction("add", &CFunc::ptrTableToList<T, LT>)
             .addExtCFunction("iter", &CFunc::ptrListIter<T, LT>)
             .addExtCFunction("table", &CFunc::ptrListToTable<T, LT>);
+    }
+
+    //----------------------------------------------------------------------------
+    /// Open a new or existing enum for registrations.
+    template<class T>
+    EnumToLua<T> beginEnum(char const * name)
+    {
+        return EnumToLua<T>(name, this);
     }
 
     //----------------------------------------------------------------------------

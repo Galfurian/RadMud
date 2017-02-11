@@ -56,8 +56,6 @@ bool DoTake(Character * character, ArgumentHandler & args)
             }
             // Make a temporary copy of the character's inventory.
             auto originalList = room->items;
-            // Start a transaction.
-            SQLiteDbms::instance().beginTransaction();
             // Used to determine if the character has picked up something.
             auto pickedUpSomething = false;
             for (auto iterator : originalList)
@@ -84,8 +82,6 @@ bool DoTake(Character * character, ArgumentHandler & args)
                 // Set that he has picked up something.
                 pickedUpSomething = true;
             }
-            // Conclude the transaction.
-            SQLiteDbms::instance().endTransaction();
             // Handle output only if the player has really taken something.
             if (pickedUpSomething)
             {
@@ -158,8 +154,6 @@ bool DoTake(Character * character, ArgumentHandler & args)
             character->sendMsg("You can't carry %s!\n", item->getName(true));
             return false;
         }
-        // Start a transaction.
-        SQLiteDbms::instance().beginTransaction();
         if (item->quantity <= quantity)
         {
             // Remove the item from the room.
@@ -181,8 +175,6 @@ bool DoTake(Character * character, ArgumentHandler & args)
             {
                 character->sendMsg("You failed to drop %s.\n",
                                    item->getName(true));
-                // Rollback the transaction.
-                SQLiteDbms::instance().rollbackTransection();
                 return false;
             }
             // Add the item to the player's inventory.
@@ -194,8 +186,6 @@ bool DoTake(Character * character, ArgumentHandler & args)
                             character->getNameCapital(),
                             item->getName(true));
         }
-        // Conclude the transaction.
-        SQLiteDbms::instance().endTransaction();
     }
     else
     {
@@ -255,8 +245,6 @@ bool DoTake(Character * character, ArgumentHandler & args)
             }
             // Make a temporary copy of the character's inventory.
             auto originalList = container->content;
-            // Start a transaction.
-            SQLiteDbms::instance().beginTransaction();
             // Used to determine if the character has picked up something.
             auto takenSomething = false;
             for (auto iterator : originalList)
@@ -278,8 +266,6 @@ bool DoTake(Character * character, ArgumentHandler & args)
                 // Set that he has picked up something.
                 takenSomething = true;
             }
-            // Conclude the transaction.
-            SQLiteDbms::instance().endTransaction();
             // Handle output only if the player has really taken something.
             if (takenSomething)
             {
@@ -327,8 +313,6 @@ bool DoTake(Character * character, ArgumentHandler & args)
                 "You are not strong enough to carry that object.\n");
             return false;
         }
-        // Start a transaction.
-        SQLiteDbms::instance().beginTransaction();
         if (item->quantity <= quantity)
         {
             // Remove the item from the container.
@@ -353,8 +337,6 @@ bool DoTake(Character * character, ArgumentHandler & args)
             {
                 character->sendMsg("You failed to take part of %s.\n",
                                    item->getName(true));
-                // Rollback the transaction.
-                SQLiteDbms::instance().rollbackTransection();
                 return false;
             }
             // Add the item to the player's inventory.
@@ -369,8 +351,6 @@ bool DoTake(Character * character, ArgumentHandler & args)
                             item->getName(true),
                             container->getName(true));
         }
-        // Conclude the transaction.
-        SQLiteDbms::instance().endTransaction();
     }
     return true;
 }
@@ -405,8 +385,6 @@ bool DoDrop(Character * character, ArgumentHandler & args)
     {
         // Make a temporary copy of the character's inventory.
         auto originalList = character->inventory;
-        // Start a transaction.
-        SQLiteDbms::instance().beginTransaction();
         for (auto iterator : originalList)
         {
             // Remove the item from the player's inventory.
@@ -414,8 +392,6 @@ bool DoDrop(Character * character, ArgumentHandler & args)
             // Add the item to the room.
             character->room->addItem(iterator);
         }
-        // Conclude the transaction.
-        SQLiteDbms::instance().endTransaction();
         // Send the messages.
         character->sendMsg("You dropped all.\n");
         character->room->sendToAll("%s has dropped all %s items.\n",
@@ -449,8 +425,6 @@ bool DoDrop(Character * character, ArgumentHandler & args)
     {
         quantity = item->quantity;
     }
-    // Start a transaction.
-    SQLiteDbms::instance().beginTransaction();
     if (item->quantity <= quantity)
     {
         // Remove the item from the player's inventory.
@@ -471,8 +445,6 @@ bool DoDrop(Character * character, ArgumentHandler & args)
         if (newStack == nullptr)
         {
             character->sendMsg("You failed to drop %s.\n", item->getName(true));
-            // Rollback the transaction.
-            SQLiteDbms::instance().rollbackTransection();
             return false;
         }
         // Put the item inside the room.
@@ -484,8 +456,6 @@ bool DoDrop(Character * character, ArgumentHandler & args)
                                    character->getNameCapital(),
                                    item->getName(true));
     }
-    // Conclude the transaction.
-    SQLiteDbms::instance().endTransaction();
     return true;
 }
 
@@ -546,8 +516,6 @@ bool DoPut(Character * character, ArgumentHandler & args)
     {
         // Make a temporary copy of the character's inventory.
         auto originalList = character->inventory;
-        // Start a transaction.
-        SQLiteDbms::instance().beginTransaction();
         // Move all the items inside the container.
         for (auto iterator : originalList)
         {
@@ -560,8 +528,6 @@ bool DoPut(Character * character, ArgumentHandler & args)
             // Put the item inside the container.
             container->putInside(iterator);
         }
-        // Conclude the transaction.
-        SQLiteDbms::instance().endTransaction();
         // Send the messages.
         character->sendMsg("You put everything you could in %s.\n",
                            container->getName(true));
@@ -603,8 +569,6 @@ bool DoPut(Character * character, ArgumentHandler & args)
                            container->getNameCapital());
         return false;
     }
-    // Start a transaction.
-    SQLiteDbms::instance().beginTransaction();
     if (item->quantity <= quantity)
     {
         // Remove the item from the player's inventory.
@@ -630,8 +594,6 @@ bool DoPut(Character * character, ArgumentHandler & args)
             character->sendMsg("You failed to put part of %s inside %s.\n",
                                item->getName(true),
                                container->getName(true));
-            // Rollback the transaction.
-            SQLiteDbms::instance().rollbackTransection();
             return false;
         }
         // Put the stack inside the container.
@@ -646,8 +608,6 @@ bool DoPut(Character * character, ArgumentHandler & args)
                                    item->getName(true),
                                    container->getName(true));
     }
-    // Conclude the transaction.
-    SQLiteDbms::instance().endTransaction();
     return true;
 }
 
@@ -706,8 +666,6 @@ bool DoGive(Character * character, ArgumentHandler & args)
     {
         quantity = item->quantity;
     }
-    // Start a transaction.
-    SQLiteDbms::instance().beginTransaction();
     if (item->quantity <= quantity)
     {
         // Remove the item from the character inventory.
@@ -736,8 +694,6 @@ bool DoGive(Character * character, ArgumentHandler & args)
             character->sendMsg("You failed to give part of %s to %s.\n",
                                item->getName(true),
                                target->getName());
-            // Rollback the transaction.
-            SQLiteDbms::instance().rollbackTransection();
             return false;
         }
         // Add the stack to the target inventory.
@@ -755,7 +711,5 @@ bool DoGive(Character * character, ArgumentHandler & args)
                                    item->getName(true),
                                    target->getName());
     }
-    // Conclude the transaction.
-    SQLiteDbms::instance().endTransaction();
     return true;
 }
