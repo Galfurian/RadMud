@@ -178,8 +178,7 @@ ItemVector CurrencyModel::generateCurrency(
     {
         for (auto generated : coins)
         {
-            generated->removeOnDB();
-            delete (generated);
+            MudUpdater::instance().addItemToDestroy(generated);
         }
         coins.clear();
         SQLiteDbms::instance().rollbackTransection();

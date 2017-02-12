@@ -267,14 +267,19 @@ void Mobile::reloadLua()
     // Delete the models loaded as equipment.
     for (auto item : equipment)
     {
-        delete (item);
+        if (HasFlag(item->flags, ItemFlag::Temporary))
+        {
+            delete (item);
+        }
     }
     equipment.clear();
-
     // Delete the models loaded in the inventory.
     for (auto item : inventory)
     {
-        delete (item);
+        if (HasFlag(item->flags, ItemFlag::Temporary))
+        {
+            delete (item);
+        }
     }
     inventory.clear();
 

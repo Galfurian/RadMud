@@ -370,7 +370,7 @@ bool DoSell(Character * character, ArgumentHandler & args)
                                shop->getName(true));
             for (auto coin : coins)
             {
-                delete (coin);
+                MudUpdater::instance().addItemToDestroy(coin);
             }
             // Rollback the transaction.
             SQLiteDbms::instance().rollbackTransection();
