@@ -71,17 +71,3 @@ double Material::getLightnessModifier() const
 {
     return 1 + (0.1 * this->lightness);
 }
-
-void Material::luaRegister(lua_State * L)
-{
-    luabridge::getGlobalNamespace(L)
-        .beginClass<Material>("Material")
-        .addData("vnum", &Material::vnum, false)
-        .addData("name", &Material::name, false)
-        .addData("article", &Material::article, false)
-        .addData("type", &Material::type, false)
-        .addData("worth", &Material::worth, false)
-        .addData("hardness", &Material::hardness, false)
-        .addData("lightness", &Material::lightness, false)
-        .endClass();
-}

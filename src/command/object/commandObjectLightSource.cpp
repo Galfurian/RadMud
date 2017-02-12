@@ -199,7 +199,8 @@ bool DoKindle(Character * character, ArgumentHandler & args)
         // Check if the ignition source is active AND is a light source which
         // is activated through manual kindling.
         if (lightItem->isActive() &&
-            HasFlag(lightModel->lightSourceFlags, LightModelFlags::NeedToKindle))
+            HasFlag(lightModel->lightSourceFlags,
+                    LightModelFlags::NeedToKindle))
         {
             canUseToIgnite = true;
         }

@@ -90,16 +90,6 @@ bool Exit::operator==(const Exit & right) const
     return (this->direction == right.direction);
 }
 
-void Exit::luaRegister(lua_State * L)
-{
-    luabridge::getGlobalNamespace(L)
-        .beginWSPtrClass<Exit>("Exit")
-        .addData("source", &Exit::source)
-        .addData("destination", &Exit::destination)
-        .addData("direction", &Exit::direction)
-        .endClass();
-}
-
 std::string GetExitFlagString(unsigned int flags)
 {
     std::string flagList;

@@ -97,7 +97,7 @@ bool CombatHandler::remOpponent(Character * character)
             if (this->empty())
             {
                 auto action = owner->getAction();
-                if(action->getType() == ActionType::Combat)
+                if (action->getType() == ActionType::Combat)
                 {
                     auto combatAction = action->toCombatAction();
                     combatAction->handleStop();

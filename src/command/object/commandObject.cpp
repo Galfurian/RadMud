@@ -28,7 +28,6 @@
 #include "commandObjectProcess.hpp"
 #include "commandObjectLiquids.hpp"
 #include "commandObjectShop.hpp"
-#include "commandObjectFood.hpp"
 #include "mud.hpp"
 
 void LoadObjectCommands()

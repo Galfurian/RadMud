@@ -130,6 +130,7 @@ ItemVector FindPosessedCoins(Character * character)
     return foundCoins;
 }
 
+// -----------------------------------------------------------------------------
 SearchOptionsCharacter::SearchOptionsCharacter() :
     searchInRoom(),
     searchInInventory(),
@@ -151,15 +152,7 @@ SearchOptionsCharacter::~SearchOptionsCharacter()
 {
     // Nothing to do.
 }
-
-SearchOptionsCharacter & SearchOptionsCharacter::operator=(
-    const SearchOptionsCharacter & right)
-{
-    searchInRoom = right.searchInRoom;
-    searchInInventory = right.searchInInventory;
-    searchInEquipment = right.searchInEquipment;
-    return *this;
-}
+// -----------------------------------------------------------------------------
 
 bool FindNearbyResouces(
     Character * character,

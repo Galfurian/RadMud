@@ -1530,7 +1530,7 @@ bool LoadTerrain(ResultSet * result)
     {
         try
         {
-            auto terrain = std::make_shared<terrain::Terrain>();
+            auto terrain = std::make_shared<Terrain>();
             terrain->vnum = result->getNextUnsignedInteger();
             terrain->name = result->getNextString();
             terrain->flags = result->getNextUnsignedInteger();

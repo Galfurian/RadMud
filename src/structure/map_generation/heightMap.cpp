@@ -23,7 +23,7 @@
 
 HeightMap::HeightMap(const unsigned int & _vnum,
                      const std::string & _name,
-                     const std::shared_ptr<terrain::Terrain> & _seaLevelTerrain) :
+                     const std::shared_ptr<Terrain> & _seaLevelTerrain) :
     vnum(_vnum),
     name(_name),
     seaLevelTerrain(_seaLevelTerrain),
@@ -33,19 +33,19 @@ HeightMap::HeightMap(const unsigned int & _vnum,
 }
 
 void HeightMap::addThreshold(
-    const std::shared_ptr<terrain::Terrain> & terrain,
+    const std::shared_ptr<Terrain> & terrain,
     const int & threshold)
 {
     thresholds.emplace_back(std::make_pair(threshold, terrain));
     std::sort(thresholds.begin(), thresholds.end(), [](
-        const std::pair<int, std::shared_ptr<terrain::Terrain>> & left,
-        const std::pair<int, std::shared_ptr<terrain::Terrain>> & right)
+        const std::pair<int, std::shared_ptr<Terrain>> & left,
+        const std::pair<int, std::shared_ptr<Terrain>> & right)
     {
         return left.first < right.first;
     });
 }
 
-std::shared_ptr<terrain::Terrain> HeightMap::getTerrain(
+std::shared_ptr<Terrain> HeightMap::getTerrain(
     const int & height)
 {
     for (auto it : thresholds)
@@ -59,7 +59,7 @@ std::shared_ptr<terrain::Terrain> HeightMap::getTerrain(
 }
 
 int HeightMap::getOffset(
-    const std::shared_ptr<terrain::Terrain> & terrain) const
+    const std::shared_ptr<Terrain> & terrain) const
 {
     int terrainLevel = 0;
     for (auto it : thresholds)

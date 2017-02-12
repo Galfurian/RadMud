@@ -28,10 +28,6 @@
 #include "corpseItem.hpp"
 #include "currencyItem.hpp"
 #include "resourceItem.hpp"
-#include "magazineItem.hpp"
-#include "containerItem.hpp"
-#include "meleeWeaponItem.hpp"
-#include "rangedWeaponItem.hpp"
 #include "liquidContainerItem.hpp"
 
 Item * ItemFactory::newItem(const ModelType & type)

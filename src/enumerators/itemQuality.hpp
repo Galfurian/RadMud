@@ -31,6 +31,7 @@ public:
     /// List of possible quality values.
     enum Enum
     {
+        None,
         Disastrous,
         Poor,
         Normal,
@@ -43,9 +44,6 @@ public:
 
     /// @brief Constructor from enum.
     ItemQuality(const Enum & _quality);
-
-    /// @brief Check is the given number is a valid quality.
-    static bool isValid(const unsigned int & _quality);
 
     /// @brief Returns the quality as string.
     std::string toString() const;

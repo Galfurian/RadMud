@@ -28,9 +28,6 @@
 
 class Liquid;
 
-namespace terrain
-{
-
 /// Used to determine the flag of the terrain.
 using TerrainFlag = enum class TerrainFlags
 {
@@ -86,10 +83,4 @@ public:
 
     /// @brief Provides a random liquid source based on their probabilities.
     Liquid * getRandomLiquidSource() const;
-
-    /// @brief Function used to register inside the lua environment the class.
-    /// @param L The lua environment.
-    static void luaRegister(lua_State * L);
 };
-
-}

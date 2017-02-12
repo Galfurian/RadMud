@@ -36,7 +36,7 @@ public:
     /// The cell coordinates.
     Coordinates coordinates;
     /// Associated tile.
-    std::shared_ptr<terrain::Terrain> terrain;
+    std::shared_ptr<Terrain> terrain;
     /// List of neighbours.
     std::map<Direction, MapCell *> neighbours;
     /// The flags of the room.

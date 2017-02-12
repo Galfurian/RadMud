@@ -225,12 +225,12 @@ bool Player::updateOnDB()
         Logger::log(LogLevel::Error, "Creating player on DB.");
         return false;
     }
-    if(!SavePlayerSkills(this))
+    if (!SavePlayerSkills(this))
     {
         Logger::log(LogLevel::Error, "Saving player skills on DB.");
         return false;
     }
-    if(!SavePlayerLuaVariables(this))
+    if (!SavePlayerLuaVariables(this))
     {
         Logger::log(LogLevel::Error, "Saving player lua variables on DB.");
         return false;
@@ -463,27 +463,6 @@ void Player::processException()
 void Player::sendMsg(const std::string & msg)
 {
     outbuf += msg;
-}
-
-void Player::setLuaVariable(std::string variableName, std::string variableValue)
-{
-    luaVariables[variableName] = variableValue;
-}
-
-std::string Player::getLuaVariable(std::string variableName)
-{
-    return luaVariables[variableName];
-}
-
-bool Player::removeLuaVariable(std::string variableName)
-{
-    auto it = luaVariables.find(variableName);
-    if (it == luaVariables.end())
-    {
-        return false;
-    }
-    it->second = "";
-    return true;
 }
 
 void Player::updateTicImpl()

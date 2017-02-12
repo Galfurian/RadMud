@@ -26,9 +26,9 @@ end
 FindPathAndMoveToDestination = function(self, room, minDelay, maxDelay)
     print("Moving to location " .. room.vnum)
     -- Get the path to the given room.
-    local path = self:luaGetPathTo(room)
+    local path = Mud.findPath(self, room)
     -- If the path is not empty, then move to destination.
-    if next(path) ~= nil then
+    if (not path:empty()) then
         -- Try to move to the destination.
         if (GetToDestination(self, path, minDelay, maxDelay)) then
             return true
@@ -41,7 +41,7 @@ end
 -- @param self The character to move.
 -- @param path The path to follow.
 GetToDestination = function(self, path, minDelay, maxDelay)
-    for directionKey, direction in pairs(path) do
+    for direction in path:iter() do
         -- Movind to direction.
         if (not self:doCommand(direction:toString())) then
             return false

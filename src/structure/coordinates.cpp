@@ -90,14 +90,3 @@ std::string Coordinates::toString() const
            " Y:" + ToString(y) + ";" +
            " Z:" + ToString(z) + "]";
 }
-
-void Coordinates::luaRegister(lua_State * L)
-{
-    luabridge::getGlobalNamespace(L)
-        .beginClass<Coordinates>("Coordinates")
-        .addFunction("toString", &Coordinates::toString)
-        .addData("x", &Coordinates::x, false)
-        .addData("y", &Coordinates::y, false)
-        .addData("z", &Coordinates::z, false)
-        .endClass();
-}

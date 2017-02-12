@@ -80,8 +80,4 @@ public:
     /// @brief Return the name of the faction with the first letter capitalized.
     /// @return The name of the faction.
     std::string getNameCapital();
-
-    /// @brief Function used to register inside the lua environment the class.
-    /// @param L The lua environment.
-    static void luaRegister(lua_State * L);
 };

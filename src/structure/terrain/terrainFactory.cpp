@@ -21,12 +21,12 @@
 
 #include "terrainFactory.hpp"
 
-std::shared_ptr<terrain::Terrain> TerrainFactory::getAir()
+std::shared_ptr<Terrain> TerrainFactory::getAir()
 {
-    static std::shared_ptr<terrain::Terrain> airTerrain;
+    static std::shared_ptr<Terrain> airTerrain;
     if (airTerrain == nullptr)
     {
-        airTerrain = std::make_shared<terrain::Terrain>();
+        airTerrain = std::make_shared<Terrain>();
         airTerrain->name = "Air";
         airTerrain->flags = 0;
         airTerrain->generationFlags = 0;

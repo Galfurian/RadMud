@@ -30,10 +30,10 @@ CharacterVector::CharacterVector()
 }
 
 Character * CharacterVector::findCharacter(const std::string & target,
-                                              int & number,
-                                              const std::vector<Character *> & exceptions,
-                                              bool skipMobile,
-                                              bool skipPlayer) const
+                                           int & number,
+                                           const std::vector<Character *> & exceptions,
+                                           bool skipMobile,
+                                           bool skipPlayer) const
 {
     auto isAnException = [&](Character * character)
     {

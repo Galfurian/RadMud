@@ -21,11 +21,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "terrain.hpp"
-#include "luaBridge.hpp"
 #include "utils.hpp"
-
-namespace terrain
-{
 
 Terrain::Terrain() :
     vnum(),
@@ -74,17 +70,4 @@ Liquid * Terrain::getRandomLiquidSource() const
         }
     }
     return nullptr;
-}
-
-void Terrain::luaRegister(lua_State * L)
-{
-    luabridge::getGlobalNamespace(L)
-        .beginClass<Terrain>("Terrain")
-        .addData("vnum", &Terrain::vnum, false)
-        .addData("name", &Terrain::name, false)
-        .addData("flags", &Terrain::flags, false)
-        .addData("space", &Terrain::space, false)
-        .endClass();
-}
-
 }

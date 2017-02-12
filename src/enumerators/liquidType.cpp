@@ -86,12 +86,3 @@ bool LiquidType::operator!=(const LiquidType & rhs) const
 {
     return liquidType != rhs.liquidType;
 }
-
-void LiquidType::luaRegister(lua_State * L)
-{
-    luabridge::getGlobalNamespace(L)
-        .beginClass<LiquidType>("LiquidType")
-        .addConstructor < void(*)(const std::string &)>()
-        .addFunction("toString", &LiquidType::toString)
-        .endClass();
-}

@@ -489,33 +489,6 @@ public:
     /// @return The mobile version of the character.
     Mobile * toMobile();
 
-    /// @brief Returns the list of equipped items.
-    luabridge::LuaRef luaGetEquipmentItems();
-
-    /// @brief Returns the list of items inside the inventory.
-    luabridge::LuaRef luaGetInventoryItems();
-
-    /// @brief Returns the list of rooms in sight.
-    luabridge::LuaRef luaGetRoomsInSight();
-
-    /// @brief Returns the list of characters in sight.
-    luabridge::LuaRef luaGetCharactersInSight();
-
-    /// @brief Returns the list of items in sight.
-    luabridge::LuaRef luaGetItemsInSight();
-
-    /// @brief Returns the list of items in sight.
-    luabridge::LuaRef luaGetPathTo(Room * destination);
-
-    /// @brief Allow from lua to load an item.
-    /// @param vnumModel    The vnum of the model.
-    /// @param vnumMaterial The vnum of the material.
-    /// @param qualityValue The initial quality of the item.
-    /// @return The newly created item.
-    Item * luaLoadItem(int vnumModel,
-                       int vnumMaterial,
-                       unsigned int qualityValue);
-
     /// @brief Specific function used by lua to add an equipment item.
     void luaAddEquipment(Item * item);
 
@@ -527,10 +500,6 @@ public:
 
     /// @brief Specific function used by lua to remove an inventory item.
     bool luaRemInventory(Item * item);
-
-    /// @brief Function used to register inside the lua environment the class.
-    /// @param L The lua environment.
-    static void luaRegister(lua_State * L);
 
     /// @brief Operator used to order the character based on their name.
     bool operator<(const class Character & source) const;

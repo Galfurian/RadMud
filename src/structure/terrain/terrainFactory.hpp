@@ -28,6 +28,6 @@
 class TerrainFactory
 {
 public:
-    static std::shared_ptr<terrain::Terrain> getAir();
+    static std::shared_ptr<Terrain> getAir();
 
 };

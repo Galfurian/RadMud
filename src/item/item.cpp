@@ -24,10 +24,6 @@
 
 #include "mud.hpp"
 #include "logger.hpp"
-#include "shopItem.hpp"
-#include "armorItem.hpp"
-#include "corpseItem.hpp"
-#include "currencyItem.hpp"
 
 Item::Item() :
     vnum(),
@@ -567,40 +563,6 @@ void Item::setOccupiedBodyParts(
 {
     // Set the new list of occupied body parts.
     occupiedBodyParts = _occupiedBodyParts;
-}
-
-void Item::luaRegister(lua_State * L)
-{
-    luabridge::getGlobalNamespace(L)
-        .beginClass<Item>("Item")
-        .addData("vnum", &Item::vnum)
-        .addData("model", &Item::model)
-        .addFunction("getName", &Item::getName)
-        .addFunction("hasKey", &Item::hasKey)
-        .addFunction("getType", &Item::getType)
-        .addFunction("getTypeName", &Item::getTypeName)
-        .addData("maker", &Item::maker)
-        .addData("condition", &Item::condition)
-        .addData("weight", &Item::weight)
-        .addData("price", &Item::price)
-        .addData("composition", &Item::composition)
-        .addData("room", &Item::room)
-        .addData("owner", &Item::owner)
-        .addData("container", &Item::container)
-        .endClass()
-        .deriveClass<ArmorItem, Item>("ArmorItem")
-        .addFunction("getAC", &ArmorItem::getArmorClass)
-        .endClass()
-        .deriveClass<CorpseItem, Item>("CorpseItem")
-        .endClass()
-        .deriveClass<CurrencyItem, Item>("CurrencyItem")
-        .endClass()
-        .deriveClass<ShopItem, Item>("ShopItem")
-        .endClass()
-        .deriveClass<MeleeWeaponItem, Item>("MeleeWeaponItem")
-        .endClass()
-        .deriveClass<RangedWeaponItem, Item>("RangedWeaponItem")
-        .endClass();
 }
 
 bool Item::operator<(Item & rhs) const

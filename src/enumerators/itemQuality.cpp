@@ -25,23 +25,23 @@
 ItemQuality::ItemQuality(const unsigned int & _quality) :
     quality()
 {
-    if (_quality == 0) quality = Disastrous;
-    else if (_quality == 1) quality = Poor;
-    else if (_quality == 2) quality = Normal;
-    else if (_quality == 3) quality = Fine;
-    else if (_quality == 4) quality = Masterful;
-    else quality = Normal;
+    if (_quality == static_cast<unsigned int>(Disastrous))
+        quality = Disastrous;
+    else if (_quality == static_cast<unsigned int>(Poor))
+        quality = Poor;
+    else if (_quality == static_cast<unsigned int>(Normal))
+        quality = Normal;
+    else if (_quality == static_cast<unsigned int>(Fine))
+        quality = Fine;
+    else if (_quality == static_cast<unsigned int>(Masterful))
+        quality = Masterful;
+    else quality = None;
 }
 
 ItemQuality::ItemQuality(const Enum & _quality) :
     quality(_quality)
 {
     // Nothing to do.
-}
-
-bool ItemQuality::isValid(const unsigned int & _quality)
-{
-    return (_quality <= 4);
 }
 
 std::string ItemQuality::toString() const

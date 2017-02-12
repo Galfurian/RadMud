@@ -83,8 +83,4 @@ public:
     /// @brief Provides the string version of the coordinates.
     /// @return A string representing the coordinates.
     std::string toString() const;
-
-    /// @brief Function used to register inside the lua environment the class.
-    /// @param L The lua environment.
-    static void luaRegister(lua_State * L);
 };

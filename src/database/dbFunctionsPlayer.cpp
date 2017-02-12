@@ -362,7 +362,7 @@ bool SQLiteDbms::loadPlayerLuaVariables(Player * player)
     {
         std::string variableName = result->getNextString();
         std::string variableValue = result->getNextString();
-        player->setLuaVariable(variableName, variableValue);
+        player->luaVariables[variableName] = variableValue;
         Logger::log(LogLevel::Debug,
                     variableName + " = " + variableValue + ";");
     }

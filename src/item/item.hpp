@@ -265,10 +265,6 @@ public:
     void setOccupiedBodyParts(
         std::vector<std::shared_ptr<BodyPart>> _occupiedBodyParts);
 
-    /// @brief Function used to register inside the lua environment the class.
-    /// @param L The lua environment.
-    static void luaRegister(lua_State * L);
-
     /// @brief Operator used to order the items based on their name.
     bool operator<(Item & rhs) const;
 

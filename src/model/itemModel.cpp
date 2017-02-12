@@ -135,7 +135,10 @@ Item * ItemModel::createItem(
     // If the item is for a mobile, set the vnum to -1.
     if (isForMobile)
     {
+        // Set a fake vnum.
         newItem->vnum = -1;
+        // Set the item a temporary.
+        SetFlag(newItem->flags, ItemFlag::Temporary);
     }
     else
     {
@@ -296,65 +299,6 @@ std::vector<std::shared_ptr<BodyPart>> ItemModel::getBodyParts(Race * race)
         }
     }
     return filteredBodyParts;
-}
-
-void ItemModel::luaRegister(lua_State * L)
-{
-    luabridge::getGlobalNamespace(L)
-        .beginWSPtrClass<ItemModel>("ItemModel")
-        .addData("vnum", &ItemModel::vnum)
-        .addData("condition", &ItemModel::condition)
-        .addFunction("getType", &ItemModel::getType)
-        .addFunction("toTool", &ItemModel::toTool)
-        .endClass()
-        .deriveWSPtrClass<ToolModel, ItemModel>("ToolModel")
-        .addData("toolType", &ToolModel::toolType)
-        .addFunction("getTypeName", &ToolModel::getTypeName)
-        .endClass()
-        .deriveWSPtrClass<ArmorModel, ItemModel>("ArmorModel")
-        .endClass()
-        .deriveWSPtrClass<BookModel, ItemModel>("BookModel")
-        .endClass()
-        .deriveWSPtrClass<ContainerModel, ItemModel>("ContainerModel")
-        .endClass()
-        .deriveWSPtrClass<CorpseModel, ItemModel>("CorpseModel")
-        .endClass()
-        .deriveWSPtrClass<CurrencyModel, ItemModel>("CurrencyModel")
-        .endClass()
-        .deriveWSPtrClass<FoodModel, ItemModel>("FoodModel")
-        .endClass()
-        .deriveWSPtrClass<FurnitureModel, ItemModel>("FurnitureModel")
-        .endClass()
-        .deriveWSPtrClass<KeyModel, ItemModel>("KeyModel")
-        .endClass()
-        .deriveWSPtrClass<LightModel, ItemModel>("LightModel")
-        .endClass()
-        .deriveWSPtrClass<LiquidContainerModel, ItemModel>("LiquidContainerModel")
-        .endClass()
-        .deriveWSPtrClass<MagazineItem, ItemModel>("MagazineItem")
-        .endClass()
-        .deriveWSPtrClass<MechanismModel, ItemModel>("MechanismModel")
-        .endClass()
-        .deriveWSPtrClass<MeleeWeaponModel, ItemModel>("MeleeWeaponModel")
-        .endClass()
-        .deriveWSPtrClass<NodeModel, ItemModel>("NodeModel")
-        .endClass()
-        .deriveWSPtrClass<ProjectileModel, ItemModel>("ProjectileModel")
-        .endClass()
-        .deriveWSPtrClass<RangedWeaponModel, ItemModel>("RangedWeaponModel")
-        .endClass()
-        .deriveWSPtrClass<ResourceModel, ItemModel>("ResourceModel")
-        .endClass()
-        .deriveWSPtrClass<RopeModel, ItemModel>("RopeModel")
-        .endClass()
-        .deriveWSPtrClass<SeedModel, ItemModel>("SeedModel")
-        .endClass()
-        .deriveWSPtrClass<ShieldModel, ItemModel>("ShieldModel")
-        .endClass()
-        .deriveWSPtrClass<ShopModel, ItemModel>("ShopModel")
-        .endClass()
-        .deriveWSPtrClass<VehicleModel, ItemModel>("VehicleModel")
-        .endClass();
 }
 
 std::string ItemModel::getTile(int offset)

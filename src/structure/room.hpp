@@ -60,7 +60,7 @@ public:
     /// The current room coordinates.
     Coordinates coord;
     /// The type of terrain of the room.
-    std::shared_ptr<terrain::Terrain> terrain;
+    std::shared_ptr<Terrain> terrain;
     /// The name of the room.
     std::string name;
     /// A long description of the room.
@@ -274,17 +274,6 @@ public:
     {
         funcSendToAll(StringBuilder::build(message, args...), checkException);
     }
-
-    /// @brief Returns the list of available exits from the current room
-    ///         using the vector structure made for lua environment.
-    int luaGetExits(lua_State * L);
-
-    /// @brief Returns the list of items inside the room.
-    int luaGetItems(lua_State * L);
-
-    /// @brief Function used to register inside the lua environment the class.
-    /// @param L The lua environment.
-    static void luaRegister(lua_State * L);
 
     /// @brief Define operator lesser than.
     /// @param right The comparison room.

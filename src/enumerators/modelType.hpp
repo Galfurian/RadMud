@@ -98,10 +98,6 @@ public:
     /// @brief Equality operator w.r.t. a type of model object.
     bool operator<(const ModelType & rhs) const;
 
-    /// @brief Function used to register inside the lua environment the class.
-    /// @param L The lua environment.
-    static void luaRegister(lua_State * L);
-
 private:
     /// Internal type of model.
     Enum modelType;

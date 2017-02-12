@@ -168,17 +168,6 @@ public:
     /// @param msg String to sent.
     void sendMsg(const std::string & msg) override;
 
-    /// @brief Adds a variable to the list of LUA-Visible variables.
-    /// @param variableName  The name of the variable.
-    /// @param variableValue The value of the variable.
-    void setLuaVariable(std::string variableName, std::string variableValue);
-
-    /// @brief Provides the value of the given LUA-Visible variable.
-    std::string getLuaVariable(std::string variableName);
-
-    /// @brief Removes the variable from the list of LUA-Visible variables.
-    bool removeLuaVariable(std::string variableName);
-
 protected:
     void updateTicImpl() override;
 

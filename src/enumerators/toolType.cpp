@@ -119,27 +119,3 @@ bool ToolType::operator<(const ToolType & rhs) const
 {
     return toolType < rhs.toolType;
 }
-
-void ToolType::luaRegister(lua_State * L)
-{
-    luabridge::getGlobalNamespace(L)
-        .beginClass<ToolType>("ToolType")
-        .addFunction("toUInt", &ToolType::toUInt)
-        .addFunction("toString", &ToolType::toString)
-        .endClass()
-        .beginEnum<ToolType>("ToolType")
-        .addEnum("None", None)
-        .addEnum("Pickaxe", Pickaxe)
-        .addEnum("WoodcutterAxe", WoodcutterAxe)
-        .addEnum("Saw", Saw)
-        .addEnum("PrecisionChisel", PrecisionChisel)
-        .addEnum("Hammer", Hammer)
-        .addEnum("PlaneChisel", PlaneChisel)
-        .addEnum("Forge", Forge)
-        .addEnum("Anvil", Anvil)
-        .addEnum("BlacksmithHammer", BlacksmithHammer)
-        .addEnum("Bellows", Bellows)
-        .addEnum("Crucible", Crucible)
-        .addEnum("Firelighter", Firelighter)
-        .endEnum();
-}

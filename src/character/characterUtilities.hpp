@@ -82,9 +82,6 @@ public:
 
     /// @brief Destructor.
     ~SearchOptionsCharacter();
-
-    /// @brief Assign operator.
-    SearchOptionsCharacter & operator=(const SearchOptionsCharacter & right);
 };
 
 /// @brief Search the list of ingredients nearby the character.

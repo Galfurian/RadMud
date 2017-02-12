@@ -124,32 +124,3 @@ bool ResourceType::operator<(const ResourceType & rhs) const
 {
     return resourceType < rhs.resourceType;
 }
-
-void ResourceType::luaRegister(lua_State * L)
-{
-    luabridge::getGlobalNamespace(L)
-        .beginClass<ResourceType>("ResourceType")
-        .addFunction("toUInt", &ResourceType::toUInt)
-        .addFunction("toString", &ResourceType::toString)
-        .endClass()
-        .beginEnum<ResourceType>("ResourceType")
-        .addEnum("None", None)
-        .addEnum("Coal", Coal)
-        .addEnum("Ore", Ore)
-        .addEnum("Bar", Bar)
-        .addEnum("Log", Log)
-        .addEnum("Plank", Plank)
-        .addEnum("Tree", Tree)
-        .addEnum("Fastener", Fastener)
-        .addEnum("Leather", Leather)
-        .addEnum("Cloth", Cloth)
-        .addEnum("StoneBlock", StoneBlock)
-        .addEnum("MetalVein", MetalVein)
-        .addEnum("StoneMonolith", StoneMonolith)
-        .addEnum("Pen", Pen)
-        .addEnum("Trash", Trash)
-        .addEnum("Meat", Meat)
-        .addEnum("Bone", Bone)
-        .addEnum("Skull", Skull)
-        .endEnum();
-}

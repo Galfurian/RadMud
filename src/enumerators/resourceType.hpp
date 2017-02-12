@@ -80,10 +80,6 @@ public:
     /// @brief Lesser operator.
     bool operator<(const ResourceType & rhs) const;
 
-    /// @brief Function used to register inside the lua environment the class.
-    /// @param L The lua environment.
-    static void luaRegister(lua_State * L);
-
 private:
     /// Internal value.
     Enum resourceType;

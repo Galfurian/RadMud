@@ -67,10 +67,6 @@ public:
     /// @brief Inequality operator w.r.t. a type of model object.
     bool operator!=(const LiquidType & rhs) const;
 
-    /// @brief Function used to register inside the lua environment the class.
-    /// @param L The lua environment.
-    static void luaRegister(lua_State * L);
-
 private:
     /// Internal type of liquid.
     Enum liquidType;

@@ -226,10 +226,6 @@ public:
     /// @return The body parts in common between the model and the race.
     std::vector<std::shared_ptr<BodyPart>> getBodyParts(Race * race);
 
-    /// @brief Function used to register inside the lua environment the class.
-    /// @param L The lua environment.
-    static void luaRegister(lua_State * L);
-
     /// @brief Returns the tile of the model.
     /// @param offset The ofset of the tile.
     /// @return The string which contains the code of the tile.

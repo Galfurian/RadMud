@@ -95,15 +95,6 @@ public:
     /// @return The overall ability value.
     unsigned int getAbility(const Ability & ability) const;
 
-    /// @brief Provides the value of the given ability.
-    /// @param abilityNumber The ability to retrieve.
-    /// @return The overall ability value (if not valid it returns 0).
-    unsigned int getAbilityLua(const unsigned int & abilityNumber);
-
-    /// @brief Function used to register inside the lua environment the class.
-    /// @param L The lua environment.
-    static void luaRegister(lua_State * L);
-
     /// @brief Returns the tile of the race.
     /// @return The string which contains the code of the race's tile.
     std::string getTile();

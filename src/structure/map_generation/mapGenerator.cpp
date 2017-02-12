@@ -22,7 +22,6 @@
 #include "mapGenerator.hpp"
 #include "logger.hpp"
 #include "area.hpp"
-#include "terrainFactory.hpp"
 
 MapGenerator::MapGenerator(const MapGeneratorConfiguration & _configuration,
                            const std::shared_ptr<HeightMap> & _heightMap) :
@@ -350,7 +349,7 @@ bool MapGenerator::generateForests(const std::shared_ptr<MapWrapper> & map)
     {
         // Check if the cell can host a forest.
         if (!HasFlag(cell->terrain->generationFlags,
-                     terrain::TerrainGenerationFlags::CanHostForest))
+                     TerrainGenerationFlags::CanHostForest))
         {
             return false;
         }
@@ -390,7 +389,7 @@ bool MapGenerator::generateForests(const std::shared_ptr<MapWrapper> & map)
         if (HasFlag(cell->flags, RoomFlags::SpawnTree)) return true;
         // Check if the cell can host a forest.
         if (!HasFlag(cell->terrain->generationFlags,
-                     terrain::TerrainGenerationFlags::CanHostForest))
+                     TerrainGenerationFlags::CanHostForest))
         {
             return true;
         }

@@ -93,10 +93,6 @@ public:
     ///                      same direction,<br>
     ///         <b>False</b> otherwise.
     bool operator==(const Exit & right) const;
-
-    /// @brief Function used to register inside the lua environment the class.
-    /// @param L The lua environment.
-    static void luaRegister(lua_State * L);
 };
 
 /// @addtogroup FlagsToList

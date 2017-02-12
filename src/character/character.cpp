@@ -27,7 +27,6 @@
 #include "lightItem.hpp"
 #include "armorItem.hpp"
 #include "logger.hpp"
-#include "aStar.hpp"
 #include "mud.hpp"
 
 Character::Character() :
@@ -1117,139 +1116,6 @@ Mobile * Character::toMobile()
     return static_cast<Mobile *>(this);
 }
 
-luabridge::LuaRef Character::luaGetEquipmentItems()
-{
-    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
-    for (auto item : equipment)
-    {
-        luaRef.append(item);
-    }
-    return luaRef;
-}
-
-luabridge::LuaRef Character::luaGetInventoryItems()
-{
-    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
-    for (auto item : inventory)
-    {
-        luaRef.append(item);
-    }
-    return luaRef;
-}
-
-luabridge::LuaRef Character::luaGetRoomsInSight()
-{
-    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
-    if (room != nullptr)
-    {
-        CharacterVector characterContainer;
-        auto validCoordinates = room->area->fov(room->coord,
-                                                this->getViewDistance());
-        for (auto coordinates : validCoordinates)
-        {
-            luaRef.append(room->area->getRoom(coordinates));
-        }
-    }
-    return luaRef;
-}
-
-luabridge::LuaRef Character::luaGetCharactersInSight()
-{
-    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
-    if (room != nullptr)
-    {
-        CharacterVector exceptions;
-        exceptions.emplace_back_character(this);
-        for (auto it : room->area->getCharactersInSight(exceptions,
-                                                        room->coord,
-                                                        this->getViewDistance()))
-        {
-            luaRef.append(it);
-        }
-    }
-    return luaRef;
-}
-
-luabridge::LuaRef Character::luaGetItemsInSight()
-{
-    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
-    if (room != nullptr)
-    {
-        ItemVector exceptions;
-        for (auto it : room->area->getItemsInSight(exceptions,
-                                                   room->coord,
-                                                   this->getViewDistance()))
-        {
-            luaRef.append(it);
-        }
-    }
-    return luaRef;
-}
-
-luabridge::LuaRef Character::luaGetPathTo(Room * destination)
-{
-    auto RoomCheckFunction = [&](Room * from, Room * to)
-    {
-        // Preapre the options.
-        MovementOptions options;
-        options.character = this;
-        // Prepare the error string.
-        std::string error;
-        return CheckConnection(options, from, to, error);
-    };
-    // TODO: Fix with new AStar algorithm.
-    luabridge::LuaRef luaRef(L, luabridge::LuaRef::newTable(L));
-    // Find the path from the actor to the target.
-    AStar<Room *> aStar(RoomCheckFunction,
-                        RoomGetDistance,
-                        RoomAreEqual,
-                        RoomGetNeighbours);
-    std::vector<Room *> path;
-    if (this->room != nullptr)
-    {
-        if (aStar.findPath(this->room, destination, path))
-        {
-            Coordinates previous = this->room->coord;
-            for (auto node : path)
-            {
-                luaRef.append(Area::getDirection(previous, node->coord));
-                previous = node->coord;
-            }
-        }
-    }
-    return luaRef;
-}
-
-Item * Character::luaLoadItem(int vnumModel,
-                              int vnumMaterial,
-                              unsigned int qualityValue)
-{
-    auto model = Mud::instance().findItemModel(vnumModel);
-    if (model == nullptr)
-    {
-        Logger::log(LogLevel::Error,
-                    "Can't find model :" + ToString(vnumModel));
-        return nullptr;
-    }
-    auto composition = Mud::instance().findMaterial(vnumMaterial);
-    if (composition == nullptr)
-    {
-        Logger::log(LogLevel::Error,
-                    "Can't find material :" + ToString(vnumMaterial));
-        return nullptr;
-    }
-    ItemQuality quality = ItemQuality::Normal;
-    if (ItemQuality::isValid(qualityValue))
-    {
-        quality = ItemQuality(qualityValue);
-    }
-    // Create the item.
-    auto item = model->createItem(this->getName(), composition, true, quality);
-    // Set the item a temporary.
-    SetFlag(item->flags, ItemFlag::Temporary);
-    return item;
-}
-
 void Character::luaAddEquipment(Item * item)
 {
     std::string error;
@@ -1283,58 +1149,6 @@ void Character::luaAddInventory(Item * item)
 bool Character::luaRemInventory(Item * item)
 {
     return this->remInventoryItem(item);
-}
-
-void Character::luaRegister(lua_State * L)
-{
-    luabridge::getGlobalNamespace(L)
-        .beginClass<Character>("Character")
-        .addData("name", &Character::name)
-        .addData("race", &Character::race)
-        .addData("faction", &Character::faction)
-        .addData("room", &Character::room)
-        .addFunction("getName", &Character::getName)
-        .addFunction("getNameCapital", &Character::getNameCapital)
-        .addFunction("inventoryAdd", &Character::luaAddInventory)
-        .addFunction("inventoryRem", &Character::luaRemInventory)
-        .addFunction("equipmentAdd", &Character::luaAddEquipment)
-        .addFunction("equipmentRem", &Character::luaRemEquipment)
-        .addFunction("doCommand", &Character::doCommand)
-        .addFunction("getEquipmentItems", &Character::luaGetEquipmentItems)
-        .addFunction("getInventoryItems", &Character::luaGetInventoryItems)
-        .addFunction("getRoomsInSight", &Character::luaGetRoomsInSight)
-        .addFunction("getCharactersInSight",
-                     &Character::luaGetCharactersInSight)
-        .addFunction("getItemsInSight", &Character::luaGetItemsInSight)
-        .addFunction("luaGetPathTo", &Character::luaGetPathTo)
-        .addFunction("loadItem", &Character::luaLoadItem)
-        .addFunction("isMobile", &Character::isMobile)
-        .addFunction("isPlayer", &Character::isPlayer)
-        .addFunction("toMobile", &Character::toMobile)
-        .addFunction("toPlayer", &Character::toPlayer)
-        .endClass()
-        .deriveClass<Mobile, Character>("Mobile")
-        .addData("id", &Mobile::id)
-        .addData("spawnRoom", &Mobile::respawnRoom)
-        .addData("shortdesc", &Mobile::shortdesc)
-        .addData("staticdesc", &Mobile::staticdesc)
-        .addData("message_buffer", &Mobile::message_buffer)
-        .addData("controller", &Mobile::controller)
-        .addFunction("isMobile", &Mobile::isMobile)
-        .addFunction("isAlive", &Mobile::isAlive)
-        .endClass()
-        .deriveClass<Player, Character>("Player")
-        .addData("age", &Player::age, false)
-        .addData("experience", &Player::experience, false)
-        .addData("prompt", &Player::prompt, false)
-        .addData("rent_room", &Player::rent_room, false)
-        .addData("remaining_points", &Player::remaining_points, false)
-        .addData("rent_room", &Player::rent_room, false)
-        .addFunction("setVariable", &Player::setLuaVariable)
-        .addFunction("getVariable", &Player::getLuaVariable)
-        .addFunction("removeVariable", &Player::removeLuaVariable)
-        .addFunction("isPlayer", &Player::isPlayer)
-        .endClass();
 }
 
 bool Character::operator<(const class Character & source) const

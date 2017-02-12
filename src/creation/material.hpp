@@ -79,8 +79,4 @@ public:
 
     /// @brief Provides the modifier w.r.t. the material lightness value.
     double getLightnessModifier() const;
-
-    /// @brief Function used to register inside the lua environment the class.
-    /// @param L The lua environment.
-    static void luaRegister(lua_State * L);
 };

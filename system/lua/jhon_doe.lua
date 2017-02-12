@@ -137,7 +137,7 @@ end
 --- Search for an axe inside the given room.
 SearchAxeNearby = function(self)
     -- Iterate through all the rooms in sight.
-    for roomKey, room in pairs(self:getRoomsInSight()) do
+    for room in Mud.getRoomsInSight(self):iter() do
         -- Check if the room contains an axe.
         local axe = SearchAxeRoom(room)
         -- If we have found an axe, move where it is.
@@ -165,7 +165,7 @@ end
 --- Search for an axe inside the given room.
 SearchAxeRoom = function(room)
     -- Get the list of items inside the current room.
-    for key, item in pairs(room:getItems()) do
+    for item in room.items:iter() do
         if (IsAnAxe(item)) then
             print("Found axe inside room " .. room.vnum)
             return item
@@ -177,7 +177,7 @@ end
 --- Search for a tree inside the given room.
 SearchTreeRoom = function(room)
     -- Get the list of items inside the current room.
-    for key, item in pairs(room:getItems()) do
+    for item in room.items:iter() do
         if (IsATree(item)) then return item end
     end
     return nil
@@ -206,11 +206,11 @@ end
 --- Try to equip a posessed axe.
 EquipPosessedAxe = function(self)
     -- Check if the character already has equipped an axe.
-    for key, item in pairs(self:getEquipmentItems()) do
+    for item in self.equipment:iter() do
         if (IsAnAxe(item)) then return true end
     end
     -- Check if the character posesses an axe inside the inventory.
-    for key, item in pairs(self:getInventoryItems()) do
+    for item in self.inventory:iter() do
         if (IsAnAxe(item)) then return self:doCommand("wield axe") end
     end
     return false
@@ -219,7 +219,7 @@ end
 MoveToLocation = function(self, room)
     print("Moving to location " .. room.vnum)
     -- Get the path to the given room.
-    local pathToNextRoom = self:luaGetPathTo(room)
+    local pathToNextRoom = Mud.findPath(self, room)
     -- If the path is not empty, then move to destination.
     if next(pathToNextRoom) ~= nil then
         -- Try to move to the destination.

@@ -78,25 +78,6 @@ unsigned int Race::getAbility(const Ability & ability) const
     return 0;
 }
 
-unsigned int Race::getAbilityLua(const unsigned int & abilityNumber)
-{
-    if (Ability::isValid(abilityNumber))
-    {
-        return this->getAbility(Ability(abilityNumber));
-    }
-    return 0;
-}
-
-void Race::luaRegister(lua_State * L)
-{
-    luabridge::getGlobalNamespace(L)
-        .beginClass<Race>("Race")
-        .addData("vnum", &Race::vnum)
-        .addData("name", &Race::name)
-        .addFunction("getAbility", &Race::getAbilityLua)
-        .endClass();
-}
-
 std::string Race::getTile()
 {
     if (Formatter::getFormat() == Formatter::CLIENT)

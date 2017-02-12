@@ -114,7 +114,7 @@ Direction Area::getDirection(const Coordinates & source,
 }
 
 CharacterVector Area::getCharactersAt(const CharacterVector & exceptions,
-                                         const Coordinates & coordinates)
+                                      const Coordinates & coordinates)
 {
     CharacterVector characterContainer;
     if (this->isValid(coordinates))
@@ -511,8 +511,8 @@ std::string Area::drawASCIIFov(Room * centerRoom, const int & radius)
 }
 
 CharacterVector Area::getCharactersInSight(CharacterVector & exceptions,
-                                              Coordinates & origin,
-                                              const int & radius)
+                                           Coordinates & origin,
+                                           const int & radius)
 {
     CharacterVector characterContainer;
     auto validCoordinates = this->fov(origin, radius);
@@ -684,17 +684,4 @@ bool Area::los(const Coordinates & source,
         z += unitz;
     }
     return false;
-}
-
-void Area::luaRegister(lua_State * L)
-{
-    luabridge::getGlobalNamespace(L)
-        .beginClass<Area>("Area")
-        .addData("vnum", &Area::vnum, false)
-        .addData("name", &Area::name, false)
-        .addData("builder", &Area::builder, false)
-        .addData("width", &Area::width, false)
-        .addData("height", &Area::height, false)
-        .addData("elevation", &Area::elevation, false)
-        .endClass();
 }

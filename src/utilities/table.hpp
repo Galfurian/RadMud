@@ -141,7 +141,7 @@ private:
 /// @param alignment The kind of alignment.
 /// @param width     The total width of the string.
 /// @return The aligned string.
-template <typename ValueType>
+template<typename ValueType>
 std::string AlignString(
     const ValueType & source,
     const StringAlign & alignment,

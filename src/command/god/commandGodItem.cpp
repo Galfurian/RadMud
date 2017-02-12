@@ -55,13 +55,12 @@ bool DoItemCreate(Character * character, ArgumentHandler & args)
     auto quality = ItemQuality(ItemQuality::Normal);
     if (args.size() == 3)
     {
-        auto itemQualityValue = ToNumber<unsigned int>(args[2].getContent());
-        if (!ItemQuality::isValid(itemQualityValue))
+        quality = ItemQuality(ToNumber<unsigned int>(args[2].getContent()));
+        if (quality == ItemQuality::None)
         {
             character->sendMsg("Not a valid quality.\n");
             return false;
         }
-        quality = ItemQuality(itemQualityValue);
     }
     // Create the item.
     auto item = itemModel->createItem(character->getName(), material, false,

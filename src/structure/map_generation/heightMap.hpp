@@ -24,11 +24,6 @@
 #include "mapTile.hpp"
 #include "mapCell.hpp"
 
-namespace terrain
-{
-class Terrain;
-}
-
 /// @brief Class which maps the values of an height-map to types of terrain.
 class HeightMap
 {
@@ -38,24 +33,24 @@ public:
     /// The name of the mapper.
     std::string name;
     /// The sea level.
-    std::shared_ptr<terrain::Terrain> seaLevelTerrain;
+    std::shared_ptr<Terrain> seaLevelTerrain;
     /// The current thresholds.
-    std::vector<std::pair<int, std::shared_ptr<terrain::Terrain>>> thresholds;
+    std::vector<std::pair<int, std::shared_ptr<Terrain>>> thresholds;
 
     /// @brief Constructor.
     HeightMap(const unsigned int & _vnum,
               const std::string & _name,
-              const std::shared_ptr<terrain::Terrain> & _seaLevelTerrain);
+              const std::shared_ptr<Terrain> & _seaLevelTerrain);
 
     /// @brief Add a new threshold.
     /// @param terrain      The terrain associated with the new threshold.
     /// @param threshold    The threshold value.
-    void addThreshold(const std::shared_ptr<terrain::Terrain> & terrain,
+    void addThreshold(const std::shared_ptr<Terrain> & terrain,
                       const int & threshold);
 
     /// @brief Returns the terrain associated with the given height w.r.t.
     /// the current thresholds.
-    std::shared_ptr<terrain::Terrain> getTerrain(const int & height);
+    std::shared_ptr<Terrain> getTerrain(const int & height);
 
-    int getOffset(const std::shared_ptr<terrain::Terrain> & terrain) const;
+    int getOffset(const std::shared_ptr<Terrain> & terrain) const;
 };

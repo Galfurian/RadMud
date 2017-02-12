@@ -366,7 +366,7 @@ bool Mud::addBuilding(Building & building)
     return mudBuildings.insert(std::make_pair(building.vnum, building)).second;
 }
 
-bool Mud::addTerrain(const std::shared_ptr<terrain::Terrain> & terrain)
+bool Mud::addTerrain(const std::shared_ptr<Terrain> & terrain)
 {
     return mudTerrains.insert(std::make_pair(terrain->vnum, terrain)).second;
 }
@@ -634,7 +634,7 @@ Building * Mud::findBuilding(int vnum)
     return nullptr;
 }
 
-std::shared_ptr<terrain::Terrain> Mud::findTerrain(unsigned int vnum)
+std::shared_ptr<Terrain> Mud::findTerrain(unsigned int vnum)
 {
     auto it = mudTerrains.find(vnum);
     if (it == mudTerrains.end()) return nullptr;

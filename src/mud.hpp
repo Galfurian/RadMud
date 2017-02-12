@@ -206,7 +206,7 @@ public:
     /// Map of buildings schematic.
     std::map<int, Building> mudBuildings;
     /// Map of buildings schematic.
-    std::map<unsigned int, std::shared_ptr<terrain::Terrain>> mudTerrains;
+    std::map<unsigned int, std::shared_ptr<Terrain>> mudTerrains;
     /// List of all the bodyparts.
     std::map<unsigned int, std::shared_ptr<BodyPart>> mudBodyParts;
     /// List of all the bodyparts.
@@ -309,7 +309,7 @@ public:
     bool addBuilding(Building & building);
 
     /// Add a terrain to the mud.
-    bool addTerrain(const std::shared_ptr<terrain::Terrain> & terrain);
+    bool addTerrain(const std::shared_ptr<Terrain> & terrain);
 
     /// Add a body part to the mud.
     bool addBodyPart(const std::shared_ptr<BodyPart> & bodyPart);
@@ -393,7 +393,7 @@ public:
     Building * findBuilding(int vnum);
 
     /// Find a terrain given its vnum.
-    std::shared_ptr<terrain::Terrain> findTerrain(unsigned int vnum);
+    std::shared_ptr<Terrain> findTerrain(unsigned int vnum);
 
     /// Find a body part.
     std::shared_ptr<BodyPart> findBodyPart(unsigned int vnum);

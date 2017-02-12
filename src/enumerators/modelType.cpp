@@ -177,38 +177,3 @@ bool ModelType::operator<(const ModelType & rhs) const
 {
     return modelType < rhs.modelType;
 }
-
-void ModelType::luaRegister(lua_State * L)
-{
-    luabridge::getGlobalNamespace(L)
-        .beginClass<ModelType>("ModelType")
-        .addFunction("toUInt", &ModelType::toUInt)
-        .addFunction("toString", &ModelType::toString)
-        .endClass()
-        .beginEnum<ModelType>("ModelType")
-        .addEnum("None", None)
-        .addEnum("Corpse", Corpse)
-        .addEnum("MeleeWeapon", MeleeWeapon)
-        .addEnum("RangedWeapon", RangedWeapon)
-        .addEnum("Armor", Armor)
-        .addEnum("Shield", Shield)
-        .addEnum("Projectile", Projectile)
-        .addEnum("Container", Container)
-        .addEnum("LiquidContainer", LiquidContainer)
-        .addEnum("Tool", Tool)
-        .addEnum("Node", Node)
-        .addEnum("Resource", Resource)
-        .addEnum("Seed", Seed)
-        .addEnum("Key", Key)
-        .addEnum("Furniture", Furniture)
-        .addEnum("Food", Food)
-        .addEnum("Light", Light)
-        .addEnum("Vehicle", Vehicle)
-        .addEnum("Book", Book)
-        .addEnum("Rope", Rope)
-        .addEnum("Mechanism", Mechanism)
-        .addEnum("Currency", Currency)
-        .addEnum("Shop", Shop)
-        .addEnum("Magazine", Magazine)
-        .endEnum();
-}

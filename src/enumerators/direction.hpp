@@ -88,10 +88,6 @@ public:
     /// @brief Lesser operator w.r.t. a direction enum.
     bool operator<(const Direction & rhs) const;
 
-    /// @brief Function used to register inside the lua environment the class.
-    /// @param L The lua environment.
-    static void luaRegister(lua_State * L);
-
 private:
     /// Internal direction value.
     Enum direction;

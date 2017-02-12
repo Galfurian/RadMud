@@ -115,7 +115,7 @@ public:
     /// @param coordinates The desired coordinates.
     /// @return The list of characters at the given coordinates.
     CharacterVector getCharactersAt(const CharacterVector & exceptions,
-                                       const Coordinates & coordinates);
+                                    const Coordinates & coordinates);
 
     /// @brief Provides all the items inside the room at the given coordinates.
     /// @param exceptions  The exceptions.
@@ -168,8 +168,8 @@ public:
     /// @param radius     The radius of visibility.
     /// @return The list containing the targets.
     CharacterVector getCharactersInSight(CharacterVector & exceptions,
-                                            Coordinates & origin,
-                                            const int & radius);
+                                         Coordinates & origin,
+                                         const int & radius);
 
     /// @brief Provides a list of items which are in sight.
     /// @param exceptions A list of excections.
@@ -196,8 +196,4 @@ public:
     bool los(const Coordinates & source,
              const Coordinates & target,
              const int & radius);
-
-    /// @brief Function used to register inside the lua environment the class.
-    /// @param L The lua environment.
-    static void luaRegister(lua_State * L);
 };

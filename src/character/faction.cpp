@@ -74,12 +74,3 @@ std::string Faction::getNameCapital()
 {
     return name;
 }
-
-void Faction::luaRegister(lua_State * L)
-{
-    luabridge::getGlobalNamespace(L)
-        .beginClass<Faction>("Faction")
-        .addData("vnum", &Faction::vnum)
-        .addData("name", &Faction::name)
-        .endClass();
-}

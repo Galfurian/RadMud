@@ -20,7 +20,6 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "commandObjectManagement.hpp"
-#include "sqliteDbms.hpp"
 #include "command.hpp"
 #include "room.hpp"
 
@@ -196,13 +195,13 @@ bool DoTake(Character * character, ArgumentHandler & args)
         if (roomIsLit)
         {
             container = character->findNearbyItem(args[1].getContent(),
-                                                       args[1].getIndex());
+                                                  args[1].getIndex());
         }
         else if (character->inventoryIsLit())
         {
             // If the room is not lit but the inventory is.
             container = character->findInventoryItem(args[1].getContent(),
-                                                          args[1].getIndex());
+                                                     args[1].getIndex());
         }
         else
         {

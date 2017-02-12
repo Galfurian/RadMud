@@ -446,13 +446,13 @@ bool Room::isLit()
         return false;
     };
     // If the room has a natural light.
-    if (HasFlag(terrain->flags, terrain::TerrainFlag::NaturalLight))
+    if (HasFlag(terrain->flags, TerrainFlag::NaturalLight))
     {
         return true;
     }
     // Get the day phase.
     auto dayPhase = MudUpdater::instance().getDayPhase();
-    if (!HasFlag(terrain->flags, terrain::TerrainFlag::Indoor) &&
+    if (!HasFlag(terrain->flags, TerrainFlag::Indoor) &&
         (dayPhase != DayPhase::Night))
     {
 //        Logger::log(LogLevel::Debug,
@@ -630,41 +630,6 @@ void Room::funcSendToAll(const std::string & message,
         }
         iterator->sendMsg(message + "\n");
     }
-}
-
-int Room::luaGetExits(lua_State * L)
-{
-    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
-    for (auto it : exits)
-    {
-        luaRef.append(it);
-    }
-    luabridge::push(L, luaRef);
-    return 1;
-}
-
-int Room::luaGetItems(lua_State * L)
-{
-    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
-    for (auto it : items)
-    {
-        luaRef.append(it);
-    }
-    luabridge::push(L, luaRef);
-    return 1;
-}
-
-void Room::luaRegister(lua_State * L)
-{
-    luabridge::getGlobalNamespace(L)
-        .beginClass<Room>("Room")
-        .addData("vnum", &Room::vnum, false)
-        .addData("name", &Room::name, false)
-        .addData("coord", &Room::coord, false)
-        .addData("terrain", &Room::terrain, false)
-        .addCFunction("getExits", &Room::luaGetExits)
-        .addCFunction("getItems", &Room::luaGetItems)
-        .endClass();
 }
 
 bool Room::operator<(const Room & right) const
