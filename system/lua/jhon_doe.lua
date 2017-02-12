@@ -142,10 +142,12 @@ SearchAxeNearby = function(self)
         local axe = SearchAxeRoom(room)
         -- If we have found an axe, move where it is.
         if (axe ~= nil) then
-            if (FindPathAndMoveToDestination(self, axe.room, 0, 1)) then
+            if (FindPathAndMoveToDestination(self, axe.room, 2, 4)) then
                 print("Destination reached")
-                if (self:doCommand("take axe")) then
+                if (self:doCommand("take " .. axe.vnum)) then
                     return true
+                else
+                    print("Cannot take the axe")
                 end
             else
                 -- Cannot find a path to nextRoom

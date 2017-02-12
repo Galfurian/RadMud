@@ -103,7 +103,7 @@ void Room::addItem(Item *& item, bool updateDB)
 void Room::addBuilding(Item * item, bool updateDB)
 {
     // Set the item as built.
-    SetFlag(&item->flags, ItemFlag::Built);
+    SetFlag(item->flags, ItemFlag::Built);
     // Check if the item is already inside the room.
     for (auto iterator : items)
     {
@@ -150,7 +150,7 @@ bool Room::removeBuilding(Item * item, bool updateDB)
     if (this->removeItem(item, updateDB))
     {
         // Clear the built flag from the item.
-        ClearFlag(&item->flags, ItemFlag::Built);
+        ClearFlag(item->flags, ItemFlag::Built);
         return true;
     }
     return false;
@@ -808,8 +808,8 @@ bool ConnectRoom(Room * room)
             // In case the connection is Up/Down set the presence of stairs.
             if (direction == Direction::Up || direction == Direction::Down)
             {
-                SetFlag(&forward->flags, ExitFlag::Stairs);
-                SetFlag(&backward->flags, ExitFlag::Stairs);
+                SetFlag(forward->flags, ExitFlag::Stairs);
+                SetFlag(backward->flags, ExitFlag::Stairs);
             }
             // Insert in both the rooms exits the connection.
             room->addExit(forward);

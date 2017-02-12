@@ -48,7 +48,8 @@ using ItemFlag = enum class ItemFlag_t
     None = 0,
     Closed = 1,
     Locked = 2,
-    Built = 4
+    Built = 4,
+    Temporary = 8
 };
 
 /// @brief Holds details about items.

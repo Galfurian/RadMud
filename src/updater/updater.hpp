@@ -28,6 +28,8 @@
 // Forward declarations.
 class Item;
 
+class Room;
+
 /// @brief Enumerator which identifies the day phase.
 using DayPhase = enum class DayPhase_t
 {
@@ -105,6 +107,10 @@ public:
     /// @brief Add the item to the list of items that will be destroyed at
     /// the end of the MUD TIC.
     void addItemToDestroy(Item * item);
+
+    /// @brief Add the room to the list of rooms that will be destroyed at
+    /// the end of the MUD TIC.
+    void addRoomToDestroy(Room * room);
 
     /// @brief Provides the dimension of the TIC.
     unsigned int getTicSize() const;

@@ -163,7 +163,7 @@ MagazineItem * RangedWeaponItem::getAlreadyLoadedMagazine() const
     {
         return nullptr;
     }
-    Item * magazine = this->content.front();
+    auto magazine = this->content.front();
     if (magazine == nullptr)
     {
         return nullptr;

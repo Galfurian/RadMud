@@ -1243,7 +1243,11 @@ Item * Character::luaLoadItem(int vnumModel,
     {
         quality = ItemQuality(qualityValue);
     }
-    return model->createItem(this->getName(), composition, true, quality);
+    // Create the item.
+    auto item = model->createItem(this->getName(), composition, true, quality);
+    // Set the item a temporary.
+    SetFlag(item->flags, ItemFlag::Temporary);
+    return item;
 }
 
 void Character::luaAddEquipment(Item * item)

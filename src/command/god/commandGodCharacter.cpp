@@ -209,7 +209,7 @@ bool DoInvisible(Character * character, ArgumentHandler & /*args*/)
         return false;
     }
     // Set the character invisible.
-    SetFlag(&character->flags, CharacterFlag::Invisible);
+    SetFlag(character->flags, CharacterFlag::Invisible);
     character->sendMsg("You are invisible now.\n");
     return true;
 }
@@ -223,7 +223,7 @@ bool DoVisible(Character * character, ArgumentHandler & /*args*/)
         return false;
     }
     // Set the character visible.
-    ClearFlag(&character->flags, CharacterFlag::Invisible);
+    ClearFlag(character->flags, CharacterFlag::Invisible);
     character->sendMsg("You are no more invisible.\n");
     return true;
 }
@@ -285,7 +285,7 @@ bool DoPlayerSetFlag(Character * character, ArgumentHandler & args)
         return false;
     }
     // Set the flag.
-    SetFlag(&target->flags, flag);
+    SetFlag(target->flags, flag);
     // Send confirmation to the player.
     character->sendMsg("You set the flag '%s' for %s\n",
                        GetCharacterFlagName(flag), target->getName());
@@ -319,7 +319,7 @@ bool DoPlayerClearFlag(Character * character, ArgumentHandler & args)
         return false;
     }
     // Set the flag.
-    ClearFlag(&target->flags, flag);
+    ClearFlag(target->flags, flag);
     // Send confirmation to the player.
     character->sendMsg("You clear the flag '%s' for %s\n",
                        GetCharacterFlagName(flag), target->getName());

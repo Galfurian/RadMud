@@ -397,7 +397,7 @@ bool MapGenerator::generateForests(const std::shared_ptr<MapWrapper> & map)
         auto normalized = Normalize(iterationLeft, 0, iterationTotal, 0,
                                     100);
         if (TRandInteger<int>(0, 100) >= normalized) return true;
-        SetFlag(&cell->flags, RoomFlags::SpawnTree);
+        SetFlag(cell->flags, RoomFlags::SpawnTree);
         iterationLeft--;
         if (!FloodFill(std::max(x - 1, 0), y, iterationTotal, iterationLeft))
         {

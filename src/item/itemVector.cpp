@@ -32,7 +32,7 @@ void ItemVector::push_back_item(Item *& item)
 {
     for (auto it = this->begin(); it != this->end(); ++it)
     {
-        Item * content = (*it);
+        auto content = (*it);
         if (item->canStackWith(content))
         {
             content->quantity += item->quantity;
@@ -49,7 +49,7 @@ bool ItemVector::removeItem(Item * item)
 {
     for (auto it = this->begin(); it != this->end(); ++it)
     {
-        Item * contained = (*it);
+        auto contained = (*it);
         if (contained->vnum == item->vnum)
         {
             this->erase(it);

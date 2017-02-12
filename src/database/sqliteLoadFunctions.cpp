@@ -1386,8 +1386,8 @@ bool LoadTravelPoint(ResultSet * result)
             {
                 throw SQLiteException("Error during TravelPoint insertion.");
             }
-            SetFlag(&sourceRoom->flags, RoomFlag::TravelPoint);
-            SetFlag(&targetRoom->flags, RoomFlag::TravelPoint);
+            SetFlag(sourceRoom->flags, RoomFlag::TravelPoint);
+            SetFlag(targetRoom->flags, RoomFlag::TravelPoint);
         }
         catch (SQLiteException & e)
         {

@@ -93,7 +93,7 @@ bool MagazineItem::canLoadWith(Item * _projectile, std::string & error) const
         return false;
     }
     // Retrieve any already loaded projectiles.
-    Item * loadedProjectile = this->getAlreadyLoadedProjectile();
+    auto loadedProjectile = this->getAlreadyLoadedProjectile();
     if (loadedProjectile != nullptr)
     {
         // If there are projectiles inside, check if the two types of
@@ -120,7 +120,7 @@ bool MagazineItem::getAmountToLoad(Item * _projectile,
     amount = this->model->toMagazine()->maxAmount;
     unsigned int amountAlreadyLoaded = 0;
     // Retrieve any already loaded projectiles.
-    Item * loadedProjectile = this->getAlreadyLoadedProjectile();
+    auto loadedProjectile = this->getAlreadyLoadedProjectile();
     if (loadedProjectile != nullptr)
     {
         // Set the amount of already loaded projectiles.

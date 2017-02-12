@@ -102,22 +102,22 @@ bool HasFlag(const unsigned int & flags, Enum flag)
 /// @param flags The destination value.
 /// @param flag  The flag to set.
 template<typename Enum>
-void SetFlag(unsigned int * flags, Enum flag)
+void SetFlag(unsigned int & flags, Enum flag)
 {
     static_assert(std::is_enum<Enum>::value,
                   "template parameter is not an enum type");
-    (*flags) |= static_cast<unsigned int>(flag);
+    flags |= static_cast<unsigned int>(flag);
 }
 
 /// @brief Clear the passed flag to the value.
 /// @param flags The destination value.
 /// @param flag  The flag to clear.
 template<typename Enum>
-void ClearFlag(unsigned int * flags, Enum flag)
+void ClearFlag(unsigned int & flags, Enum flag)
 {
     static_assert(std::is_enum<Enum>::value,
                   "template parameter is not an enum type");
-    (*flags) &= ~static_cast<unsigned int>(flag);
+    flags &= ~static_cast<unsigned int>(flag);
 }
 
 /// @brief Check if the source string begin with a given prefix.

@@ -45,13 +45,20 @@ Mobile::Mobile() :
 
 Mobile::~Mobile()
 {
+    // Delete only the temporary items.
     for (auto item : equipment)
     {
-        delete (item);
+        if (HasFlag(item->flags, ItemFlag::Temporary))
+        {
+            delete (item);
+        }
     }
     for (auto item : inventory)
     {
-        delete (item);
+        if (HasFlag(item->flags, ItemFlag::Temporary))
+        {
+            delete (item);
+        }
     }
     if (this->isAlive())
     {

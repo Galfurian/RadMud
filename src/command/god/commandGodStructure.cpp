@@ -233,12 +233,12 @@ bool DoRoomEdit(Character * character, ArgumentHandler & args)
         {
             if (input == "R")
             {
-                SetFlag(&character->room->flags, RoomFlag::Rent);
+                SetFlag(character->room->flags, RoomFlag::Rent);
                 return true;
             }
             else if (input == "P")
             {
-                SetFlag(&character->room->flags, RoomFlag::Peaceful);
+                SetFlag(character->room->flags, RoomFlag::Peaceful);
                 return true;
             }
             character->sendMsg("Not a valid flag.\n");
@@ -255,12 +255,12 @@ bool DoRoomEdit(Character * character, ArgumentHandler & args)
         {
             if (input == "R")
             {
-                ClearFlag(&character->room->flags, RoomFlag::Rent);
+                ClearFlag(character->room->flags, RoomFlag::Rent);
                 return true;
             }
             else if (input == "P")
             {
-                ClearFlag(&character->room->flags, RoomFlag::Peaceful);
+                ClearFlag(character->room->flags, RoomFlag::Peaceful);
                 return true;
             }
             character->sendMsg("Not a valid flag.\n");

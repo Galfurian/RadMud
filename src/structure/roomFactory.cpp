@@ -31,6 +31,6 @@ Room * RoomFactory::createRoomAir()
     airRoom->terrain = TerrainFactory::getAir();
     airRoom->name = "Air";
     airRoom->description = "You are floating in the air";
-    SetFlag(&airRoom->flags, RoomFlags::Air);
+    SetFlag(airRoom->flags, RoomFlags::Air);
     return airRoom;
 }

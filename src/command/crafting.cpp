@@ -327,7 +327,7 @@ bool DoDeconstruct(Character * character, ArgumentHandler & args)
     {
         character->sendMsg("You deconstruct %s.\n", item->getName(true));
         // Reset item flags.
-        ClearFlag(&item->flags, ItemFlag::Built);
+        ClearFlag(item->flags, ItemFlag::Built);
         return true;
     }
     character->sendMsg(error + "\n");

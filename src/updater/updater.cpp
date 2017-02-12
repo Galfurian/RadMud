@@ -41,7 +41,8 @@ MudUpdater::MudUpdater() :
     hourTicSize(2),
     hourTicCounter(),
     mudHour(),
-    mudDayPhase(DayPhase::Morning)
+    mudDayPhase(DayPhase::Morning),
+    itemToDestroy()
 {
     // Nothing to do.
 }
