@@ -98,11 +98,6 @@ std::string UnloadAction::stop()
 
 ActionStatus UnloadAction::perform()
 {
-    // Check if the cooldown is ended.
-    if (!this->checkElapsed())
-    {
-        return ActionStatus::Running;
-    }
     std::string error;
     if (!this->check(error))
     {

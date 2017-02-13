@@ -37,7 +37,6 @@ MudUpdater::MudUpdater() :
     bandwidth_uncompressed(),
     ticTime(std::chrono::system_clock::now()),
     ticSize(10),
-    //hourTicSize(18),
     hourTicSize(2),
     hourTicCounter(),
     mudHour(),
@@ -262,12 +261,16 @@ void MudUpdater::performActions()
         {
             continue;
         }
-        ActionStatus actionStatus = iterator->getAction()->perform();
-        if ((actionStatus == ActionStatus::Finished) ||
-            (actionStatus == ActionStatus::Error))
+        auto & action = iterator->getAction();
+        if (action->checkElapsed())
         {
-            // Remove the from action.
-            iterator->popAction();
+            auto status = action->perform();
+            if ((status == ActionStatus::Finished) ||
+                (status == ActionStatus::Error))
+            {
+                // Remove the from action.
+                iterator->popAction();
+            }
         }
     }
     for (auto iterator : Mud::instance().mudMobiles)
@@ -290,12 +293,16 @@ void MudUpdater::performActions()
         {
             continue;
         }
-        ActionStatus actionStatus = mobile->getAction()->perform();
-        if ((actionStatus == ActionStatus::Finished) ||
-            (actionStatus == ActionStatus::Error))
+        auto & action = mobile->getAction();
+        if (action->checkElapsed())
         {
-            // Remove the last action.
-            mobile->popAction();
+            auto status = action->perform();
+            if ((status == ActionStatus::Finished) ||
+                (status == ActionStatus::Error))
+            {
+                // Remove the from action.
+                mobile->popAction();
+            }
         }
     }
 }

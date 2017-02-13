@@ -102,11 +102,6 @@ std::string LoadAction::stop()
 
 ActionStatus LoadAction::perform()
 {
-    // Check if the cooldown is ended.
-    if (!this->checkElapsed())
-    {
-        return ActionStatus::Running;
-    }
     std::string error;
     if (!this->check(error))
     {

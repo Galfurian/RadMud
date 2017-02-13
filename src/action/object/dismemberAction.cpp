@@ -78,11 +78,6 @@ std::string DismemberAction::stop()
 
 ActionStatus DismemberAction::perform()
 {
-    // Check if the cooldown is ended.
-    if (!this->checkElapsed())
-    {
-        return ActionStatus::Running;
-    }
     // First try to remove the body part.
     if (!corpse->removeBodyPart(bodyPart))
     {

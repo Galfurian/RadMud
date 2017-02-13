@@ -161,11 +161,6 @@ std::string CraftAction::stop()
 
 ActionStatus CraftAction::perform()
 {
-    // Check if the cooldown is ended.
-    if (!this->checkElapsed())
-    {
-        return ActionStatus::Running;
-    }
     // Check the values of the action.
     std::string error;
     if (!this->check(error))
