@@ -22,6 +22,7 @@
 
 #include "buildAction.hpp"
 
+#include "resourceModel.hpp"
 #include "formatter.hpp"
 #include "updater.hpp"
 #include "logger.hpp"

@@ -23,6 +23,7 @@
 #include "general.hpp"
 
 #include "nameGenerator.hpp"
+#include "skillRank.hpp"
 #include "logger.hpp"
 #include "mud.hpp"
 

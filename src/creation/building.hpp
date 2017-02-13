@@ -24,12 +24,15 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 #include <map>
 
-#include "toolModel.hpp"
-#include "resourceModel.hpp"
+// Forward declarations.
+class ToolType;
 
 class ItemModel;
+
+class ResourceType;
 
 /// @brief Holds details about a building.
 class Building

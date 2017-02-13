@@ -22,6 +22,7 @@
 #include "commandObjectLightSource.hpp"
 #include "sqliteDbms.hpp"
 #include "lightModel.hpp"
+#include "toolModel.hpp"
 #include "lightItem.hpp"
 #include "command.hpp"
 #include "room.hpp"

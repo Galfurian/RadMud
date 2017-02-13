@@ -22,8 +22,6 @@
 
 #include "material.hpp"
 
-#include "logger.hpp"
-
 Material::Material() :
     vnum(),
     type(MaterialType::None),

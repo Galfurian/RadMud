@@ -74,7 +74,7 @@ bool DoProfession(Character * character,
                            args[0].getContent());
         return false;
     }
-    if (!production->hasRequiredKnowledge(character))
+    if (!HasRequiredKnowledge(character, production))
     {
         character->sendMsg("%s '%s'.\n", profession->notFoundMessage,
                            args[0].getContent());

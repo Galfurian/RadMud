@@ -21,8 +21,6 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "liquid.hpp"
-
-#include "logger.hpp"
 #include "utils.hpp"
 
 Liquid::Liquid() :

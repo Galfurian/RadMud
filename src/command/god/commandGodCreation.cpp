@@ -20,6 +20,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "commandGodCreation.hpp"
+#include "toolModel.hpp"
 #include "mud.hpp"
 
 bool DoMaterialInfo(Character * character, ArgumentHandler & args)

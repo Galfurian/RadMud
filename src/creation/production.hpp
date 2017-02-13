@@ -26,15 +26,16 @@ class Profession;
 
 class Character;
 
-#include <string>
-#include <map>
+class ItemModel;
 
-#include "itemModel.hpp"
-#include "toolModel.hpp"
-#include "resourceModel.hpp"
-
+#include "resourceType.hpp"
 #include "knowledge.hpp"
-#include "skillRank.hpp"
+#include "toolType.hpp"
+
+#include <string>
+#include <vector>
+#include <memory>
+#include <map>
 
 /// @brief Holds details about a production.
 class Production
@@ -95,11 +96,4 @@ public:
     /// @brief Return the name with the first letter capitalized.
     /// @return The name of the production capitalized.
     std::string getNameCapital();
-
-    /// @brief Checks if the character has the required knowledge.
-    /// @param character Tha target character.
-    /// @return <b>True</b> has the required knowledge,<br>
-    ///         <b>False</b> otherwise.
-    bool hasRequiredKnowledge(Character * character);
-
 };

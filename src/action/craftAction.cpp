@@ -22,6 +22,7 @@
 
 #include "craftAction.hpp"
 
+#include "resourceModel.hpp"
 #include "updater.hpp"
 #include "logger.hpp"
 #include "room.hpp"

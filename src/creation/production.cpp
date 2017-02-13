@@ -22,9 +22,8 @@
 
 #include "production.hpp"
 
+#include "itemModel.hpp"
 #include "character.hpp"
-#include "logger.hpp"
-#include "mud.hpp"
 
 Production::Production() :
     vnum(-1),
@@ -81,18 +80,4 @@ std::string Production::getName()
 std::string Production::getNameCapital()
 {
     return name;
-}
-
-bool Production::hasRequiredKnowledge(Character * character)
-{
-    for (auto knowledge : requiredKnowledge)
-    {
-        Logger::log(LogLevel::Debug, "Required :%s", knowledge.toString());
-        auto knowledgeLevel = character->effects.getKnowledge(knowledge);
-        if (knowledgeLevel <= 0)
-        {
-            return false;
-        }
-    }
-    return true;
 }

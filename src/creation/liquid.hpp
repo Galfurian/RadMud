@@ -23,7 +23,6 @@
 #pragma once
 
 #include "liquidType.hpp"
-#include <map>
 
 /// Flags of a liquid.
 using LiquidFlags = enum class LiquidFlags_t

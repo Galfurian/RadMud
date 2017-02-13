@@ -22,7 +22,6 @@
 
 #include "itemModel.hpp"
 
-#include "mud.hpp"
 #include "armorModel.hpp"
 #include "bookModel.hpp"
 #include "containerModel.hpp"
@@ -41,8 +40,12 @@
 #include "vehicleModel.hpp"
 #include "magazineModel.hpp"
 #include "meleeWeaponModel.hpp"
+#include "resourceModel.hpp"
+#include "toolModel.hpp"
+
 #include "itemFactory.hpp"
 #include "logger.hpp"
+#include "mud.hpp"
 
 ItemModel::ItemModel() :
     vnum(),

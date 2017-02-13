@@ -22,7 +22,8 @@
 #include "characterUtilities.hpp"
 #include "rangedWeaponItem.hpp"
 #include "meleeWeaponItem.hpp"
-#include "resourceType.hpp"
+#include "resourceModel.hpp"
+#include "toolModel.hpp"
 #include "character.hpp"
 #include "logger.hpp"
 #include "room.hpp"
@@ -350,6 +351,17 @@ bool MoveCharacterTo(
         {
             mobile->triggerEventEnter(character);
         }
+    }
+    return true;
+}
+
+bool HasRequiredKnowledge(Character * character, Production * production)
+{
+    if (WrongAssert(character == nullptr)) return false;
+    if (WrongAssert(production == nullptr)) return false;
+    for (auto knowledge : production->requiredKnowledge)
+    {
+        if (character->effects.getKnowledge(knowledge) <= 0) return false;
     }
     return true;
 }

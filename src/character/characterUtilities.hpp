@@ -42,6 +42,8 @@ class Room;
 
 class Direction;
 
+class Production;
+
 /// @brief Provides the list of active melee weapons (Left and Right hands).
 /// @param character The target character.
 /// @return Vector of melee weapons.
@@ -136,3 +138,10 @@ bool MoveCharacterTo(
     const std::string & msgDepart,
     const std::string & msgArrive,
     const std::string & msgChar = "");
+
+/// @brief Checks if the character has the required knowledge for the
+///         production.
+/// @param character Tha target character.
+/// @return <b>True</b> has the required knowledge,<br>
+///         <b>False</b> otherwise.
+bool HasRequiredKnowledge(Character * character, Production * production);

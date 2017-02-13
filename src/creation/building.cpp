@@ -1,5 +1,5 @@
 /// @file   building.cpp
-/// @brief  Implmement building variables and methods.
+/// @brief  Implement a building.
 /// @author Enrico Fraccaroli
 /// @date   Feb 24 2016
 /// @copyright
@@ -20,11 +20,11 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-// Basic Include.
 #include "building.hpp"
 
+#include "resourceModel.hpp"
+#include "toolModel.hpp"
 #include "logger.hpp"
-#include "room.hpp"
 
 Building::Building() :
     vnum(),

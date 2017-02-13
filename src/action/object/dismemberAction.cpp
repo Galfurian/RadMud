@@ -20,6 +20,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "dismemberAction.hpp"
+#include "resourceModel.hpp"
 #include "character.hpp"
 #include "logger.hpp"
 #include "room.hpp"

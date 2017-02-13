@@ -27,6 +27,7 @@
 #include "armorItem.hpp"
 #include "corpseItem.hpp"
 #include "currencyItem.hpp"
+#include "toolModel.hpp"
 #include "shopItem.hpp"
 #include "logger.hpp"
 #include "aStar.hpp"
