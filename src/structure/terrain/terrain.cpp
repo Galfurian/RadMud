@@ -39,34 +39,29 @@ Terrain::Terrain() :
 void Terrain::addLiquidSource(Liquid * _liquid,
                               const unsigned int & _assignedProbability)
 {
-    LiquidSource liquidSource;
-    liquidSource.liquid = _liquid;
-    liquidSource.assignedProbability = _assignedProbability;
-    if (liquidSources.empty())
+    LiquidSource ls;
+    ls.liquid = _liquid;
+    ls.assignedProbability = _assignedProbability;
+    ls.cumulativeProbability = _assignedProbability;
+    if (!liquidSources.empty())
     {
-        liquidSource.cumulativeProbability = _assignedProbability;
+        ls.cumulativeProbability += liquidSources.back().cumulativeProbability;
     }
-    else
-    {
-        liquidSource.cumulativeProbability =
-            _assignedProbability + liquidSources.back().cumulativeProbability;
-    }
-    liquidSources.emplace_back(liquidSource);
+    liquidSources.emplace_back(std::move(ls));
 }
 
 Liquid * Terrain::getRandomLiquidSource() const
 {
-    if (liquidSources.empty())
+    if (!liquidSources.empty())
     {
-        return nullptr;
-    }
-    auto pickedValue = TRandInteger<unsigned int>(
-        0, liquidSources.back().cumulativeProbability - 1);
-    for (auto liquidSource : liquidSources)
-    {
-        if (pickedValue <= liquidSource.cumulativeProbability)
+        auto pickedValue = TRandInteger<unsigned int>(
+            0, liquidSources.back().cumulativeProbability - 1);
+        for (auto liquidSource : liquidSources)
         {
-            return liquidSource.liquid;
+            if (pickedValue <= liquidSource.cumulativeProbability)
+            {
+                return liquidSource.liquid;
+            }
         }
     }
     return nullptr;
