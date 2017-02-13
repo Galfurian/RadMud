@@ -101,7 +101,7 @@ bool DoWield(Character * character, ArgumentHandler & args)
         // If the inventory is NOT lit and NOT empty, pick a random item.
         if (!character->inventoryIsLit() && !character->inventory.empty())
         {
-            auto it = TRandInteger<size_t>(0, character->inventory.size() - 1);
+            auto it = TRand<size_t>(0, character->inventory.size() - 1);
             item = character->inventory[it];
         }
     }
@@ -235,7 +235,7 @@ bool DoWear(Character * character, ArgumentHandler & args)
         // If the inventory is NOT lit and NOT empty, pick a random item.
         if (!character->inventoryIsLit() && !character->inventory.empty())
         {
-            auto it = TRandInteger<size_t>(0, character->inventory.size() - 1);
+            auto it = TRand<size_t>(0, character->inventory.size() - 1);
             item = character->inventory[it];
         }
     }
@@ -365,7 +365,7 @@ bool DoRemove(Character * character, ArgumentHandler & args)
     // If the room is NOT lit and NOT empty, pick a random item.
     if (!character->room->isLit() && !character->equipment.empty())
     {
-        auto it = TRandInteger<size_t>(0, character->equipment.size() - 1);
+        auto it = TRand<size_t>(0, character->equipment.size() - 1);
         item = character->equipment[it];
     }
     // Check if the player has the item equipped.

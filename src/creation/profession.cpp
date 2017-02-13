@@ -21,7 +21,6 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "profession.hpp"
-#include "logger.hpp"
 
 Profession::Profession() :
     vnum(),

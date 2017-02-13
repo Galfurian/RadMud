@@ -19,10 +19,11 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include <climits>
 #include "argumentHandler.hpp"
-
 #include "logger.hpp"
+#include "utils.hpp"
+
+#include <climits>
 
 Argument::Argument(const std::string & _original) :
     original(_original),

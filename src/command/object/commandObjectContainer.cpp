@@ -131,7 +131,7 @@ bool DoOpen(Character * character, ArgumentHandler & args)
         auto directions = GetAvailableDirections(character->room);
         if (!character->room->isLit() && !directions.empty())
         {
-            auto it = TRandInteger<size_t>(0, directions.size() - 1);
+            auto it = TRand<size_t>(0, directions.size() - 1);
             direction = directions[it];
         }
         // Check if the direction exists.
@@ -286,7 +286,7 @@ bool DoClose(Character * character, ArgumentHandler & args)
         auto directions = GetAvailableDirections(character->room);
         if (!character->room->isLit() && !directions.empty())
         {
-            auto it = TRandInteger<size_t>(0, directions.size() - 1);
+            auto it = TRand<size_t>(0, directions.size() - 1);
             direction = directions[it];
         }
         // Check if the direction exists.

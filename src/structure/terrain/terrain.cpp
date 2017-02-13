@@ -54,7 +54,7 @@ Liquid * Terrain::getRandomLiquidSource() const
 {
     if (!liquidSources.empty())
     {
-        auto pickedValue = TRandInteger<unsigned int>(
+        auto pickedValue = TRand<unsigned int>(
             0, liquidSources.back().cumulativeProbability - 1);
         for (auto liquidSource : liquidSources)
         {

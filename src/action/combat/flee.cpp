@@ -88,7 +88,7 @@ ActionStatus Flee::perform()
         return ActionStatus::Error;
     }
     // Get the character chance of fleeing (D20).
-    size_t fleeChance = TRandInteger<size_t>(0, 20) +
+    size_t fleeChance = TRand<size_t>(0, 20) +
                         actor->getAbilityModifier(Ability::Agility);
     // Get the required stamina.
     auto consumedStamina = this->getConsumedStamina(actor);
@@ -115,7 +115,7 @@ ActionStatus Flee::perform()
         }
         // Pick a random direction, from the poll of the available ones.
         auto destination = destinations.at(
-            TRandInteger<size_t>(
+            TRand<size_t>(
                 0, destinations.size() - 1));
         // Check that the picked destination is not a null pointer.
         if (destination == nullptr)

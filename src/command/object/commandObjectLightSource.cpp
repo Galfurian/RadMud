@@ -64,7 +64,7 @@ bool DoTurn(Character * character, ArgumentHandler & args)
         else if (!character->inventory.empty())
         {
             // If the inventory is NOT empty, pick a random item.
-            auto it = TRandInteger<size_t>(0, character->inventory.size() - 1);
+            auto it = TRand<size_t>(0, character->inventory.size() - 1);
             item = character->inventory[it];
         }
     }

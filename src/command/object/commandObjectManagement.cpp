@@ -102,7 +102,7 @@ bool DoTake(Character * character, ArgumentHandler & args)
         if (!roomIsLit && !room->items.empty())
         {
             // Pick from the items.
-            item = room->items[TRandInteger<size_t>(0, room->items.size() - 1)];
+            item = room->items[TRand<size_t>(0, room->items.size() - 1)];
         }
         else
         {
@@ -408,7 +408,7 @@ bool DoDrop(Character * character, ArgumentHandler & args)
         // If the inventory is NOT lit and NOT empty, pick a random item.
         if (!character->inventoryIsLit() && !character->inventory.empty())
         {
-            auto it = TRandInteger<size_t>(0, character->inventory.size() - 1);
+            auto it = TRand<size_t>(0, character->inventory.size() - 1);
             item = character->inventory[it];
         }
     }
@@ -546,7 +546,7 @@ bool DoPut(Character * character, ArgumentHandler & args)
         // If the inventory is NOT lit and NOT empty, pick a random item.
         if (!character->inventoryIsLit() && !character->inventory.empty())
         {
-            auto it = TRandInteger<size_t>(0, character->inventory.size() - 1);
+            auto it = TRand<size_t>(0, character->inventory.size() - 1);
             item = character->inventory[it];
         }
     }
@@ -635,7 +635,7 @@ bool DoGive(Character * character, ArgumentHandler & args)
         // If the inventory is NOT lit and NOT empty, pick a random item.
         if (!character->inventoryIsLit() && !character->inventory.empty())
         {
-            auto it = TRandInteger<size_t>(0, character->inventory.size() - 1);
+            auto it = TRand<size_t>(0, character->inventory.size() - 1);
             item = character->inventory[it];
         }
     }

@@ -132,7 +132,7 @@ bool DoRaceList(Character * character, ArgumentHandler & /*args*/)
         TableRow row;
         row.push_back(ToString(race->vnum));
         row.push_back(race->name);
-        row.push_back(BoolToString(race->player_allow));
+        row.push_back(ToString(race->player_allow));
         row.push_back(ToString(race->getAbility(Ability::Strength)));
         row.push_back(ToString(race->getAbility(Ability::Agility)));
         row.push_back(ToString(race->getAbility(Ability::Perception)));

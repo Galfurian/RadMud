@@ -21,8 +21,8 @@
 
 #pragma once
 
-#include "coordinates.hpp"
-#include "utils.hpp"
+#include <type_traits>
+#include <sstream>
 
 /// @brief Allows to build a string from a series of arguments.
 class StringBuilder
@@ -67,48 +67,17 @@ public:
     }
 
     /// @brief Cover the case in which the first argument is a signed value.
-    template<typename ... Args>
+    template<
+        typename T,
+        typename ... Args,
+        typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
     static std::string build(const std::string & str,
-                             const int & first,
+                             const T & first,
                              const Args & ... args)
     {
-        return build(str, ToString(first), args ...);
-    }
-
-    /// @brief Cover the case in which the first argument is an unsigned value.
-    template<typename ... Args>
-    static std::string build(const std::string & str,
-                             const unsigned int & first,
-                             const Args & ... args)
-    {
-        return build(str, ToString(first), args ...);
-    }
-
-    /// @brief Cover the case in which the first argument is an unsigned value.
-    template<typename ... Args>
-    static std::string build(const std::string & str,
-                             const long unsigned int & first,
-                             const Args & ... args)
-    {
-        return build(str, ToString(first), args ...);
-    }
-
-    /// @brief Cover the case in which the first argument is a double.
-    template<typename ... Args>
-    static std::string build(const std::string & str,
-                             const double & first,
-                             const Args & ... args)
-    {
-        return build(str, ToString(first), args ...);
-    }
-
-    /// @brief Cover the case in which the first argument are coordiantes.
-    template<typename ... Args>
-    static std::string build(const std::string & str,
-                             const Coordinates & first,
-                             const Args & ... args)
-    {
-        return build(str, first.toString(), args ...);
+        std::stringstream ss;
+        ss << first;
+        return build(str, ss.str(), args ...);
     }
 
 };

@@ -61,7 +61,7 @@ bool DoDrink(Character * character, ArgumentHandler & args)
         // If the inventory is NOT empty, pick a random item.
         if (!character->inventory.empty())
         {
-            auto it = TRandInteger<size_t>(0, character->inventory.size() - 1);
+            auto it = TRand<size_t>(0, character->inventory.size() - 1);
             source = character->inventory[it];
         }
     }

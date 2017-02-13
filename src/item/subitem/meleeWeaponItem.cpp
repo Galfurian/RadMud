@@ -45,7 +45,7 @@ void MeleeWeaponItem::getSheet(Table & sheet) const
 
 unsigned int MeleeWeaponItem::rollDamage() const
 {
-    return TRandInteger<unsigned int>(this->getMinDamage(),
+    return TRand<unsigned int>(this->getMinDamage(),
                                       this->getMaxDamage());
 }
 

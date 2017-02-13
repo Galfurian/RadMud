@@ -16,9 +16,11 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+#include "logger.hpp"
+#include "utils.hpp"
+
 #include <thread>
 #include <mutex>
-#include "logger.hpp"
 
 Logger::Logger()
 {

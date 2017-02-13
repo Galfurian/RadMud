@@ -21,7 +21,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "coordinates.hpp"
-#include "logger.hpp"
+#include "utils.hpp"
 
 Coordinates::Coordinates() :
     x(),

@@ -139,7 +139,7 @@ std::string Random::toString()
     {
         return "";
     }
-    auto rnd = TRandInteger<size_t>(0, generators.size() - 1);
+    auto rnd = TRand<size_t>(0, generators.size() - 1);
     return generators[rnd]->toString();
 }
 

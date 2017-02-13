@@ -154,9 +154,9 @@ Generator & Generator::instance()
 std::string
 Generator::generateName(const AreaType & type, const AreaStatus & status)
 {
-    size_t nameSelector = TRandInteger<size_t>(
+    size_t nameSelector = TRand<size_t>(
         0, mapBase[type].names.size() - 1);
-    size_t nameStatus = TRandInteger<size_t>(
+    size_t nameStatus = TRand<size_t>(
         0, mapStatus[status].namesStatus.size() - 1);
     return mapBase[type].names[nameSelector] +
            mapStatus[status].namesStatus[nameStatus];
@@ -167,9 +167,9 @@ Generator::generateDescription(const AreaType & type,
                                const AreaStatus & status,
                                const std::string & roomName)
 {
-    size_t nameSelector = TRandInteger<size_t>(
+    size_t nameSelector = TRand<size_t>(
         0, mapBase[type].descriptions.size() - 1);
-    size_t nameStatus = TRandInteger<size_t>(
+    size_t nameStatus = TRand<size_t>(
         0, mapStatus[status].descriptionStatus.size() - 1);
     std::string result = mapBase[type].descriptions[nameSelector] +
                          mapStatus[status].descriptionStatus[nameStatus];

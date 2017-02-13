@@ -189,8 +189,8 @@ bool SaveArea(Area * area)
     args.push_back(ToString(area->height));
     args.push_back(ToString(area->elevation));
     args.push_back("0");
-    args.push_back(EnumToString(area->type));
-    args.push_back(EnumToString(area->status));
+    args.push_back(ToString(static_cast<unsigned int>(area->type)));
+    args.push_back(ToString(static_cast<unsigned int>(area->status)));
     // Start a transaction.
     SQLiteDbms::instance().beginTransaction();
     if (!SQLiteDbms::instance().insertInto("Area", args, false, true))

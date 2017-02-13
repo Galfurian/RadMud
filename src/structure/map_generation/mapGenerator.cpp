@@ -151,11 +151,11 @@ bool MapGenerator::generateMountains(const std::shared_ptr<MapWrapper> & map)
     for (int i = 0; i < configuration.numMountains; ++i)
     {
         // Generate a random dimension for the mountain.
-        auto radius = TRandInteger<int>(configuration.minMountainRadius,
+        auto radius = TRand<int>(configuration.minMountainRadius,
                                         configuration.maxMountainRadius);
         // Generate a random place for the mountain.
-        auto xCenter = TRandInteger<int>(-radius, map->getWidth() + radius);
-        auto yCenter = TRandInteger<int>(-radius, map->getHeight() + radius);
+        auto xCenter = TRand<int>(-radius, map->getWidth() + radius);
+        auto yCenter = TRand<int>(-radius, map->getHeight() + radius);
         // Determine the boundaries.
         auto xMin = std::max(xCenter - radius - 1, 0);
         auto xMax = std::min(xCenter + radius + 1, map->getWidth() - 1);
@@ -395,7 +395,7 @@ bool MapGenerator::generateForests(const std::shared_ptr<MapWrapper> & map)
         }
         auto normalized = Normalize(iterationLeft, 0, iterationTotal, 0,
                                     100);
-        if (TRandInteger<int>(0, 100) >= normalized) return true;
+        if (TRand<int>(0, 100) >= normalized) return true;
         SetFlag(cell->flags, RoomFlags::SpawnTree);
         iterationLeft--;
         if (!FloodFill(std::max(x - 1, 0), y, iterationTotal, iterationLeft))
@@ -416,7 +416,7 @@ bool MapGenerator::generateForests(const std::shared_ptr<MapWrapper> & map)
                          iterationTotal,
                          iterationLeft);
     };
-    auto maxForestExpansion = TRandInteger(3,
+    auto maxForestExpansion = TRand(3,
                                            configuration.minForestDistance - 1);
     // Number of dropped rivers.
     auto iterations = std::min(static_cast<size_t>(configuration.numForests),
@@ -426,7 +426,7 @@ bool MapGenerator::generateForests(const std::shared_ptr<MapWrapper> & map)
         // Pick a random forest drop point.
         auto dpIt = forestDropPoints.begin();
         std::advance(dpIt,
-                     TRandInteger<size_t>(0, forestDropPoints.size() - 1));
+                     TRand<size_t>(0, forestDropPoints.size() - 1));
         MapCell * cell = (*dpIt);
         forestDropPoints.erase(dpIt);
         // Create the forest.

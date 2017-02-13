@@ -161,14 +161,14 @@ bool Area::addRoom(Room * room)
         {
             Logger::log(LogLevel::Error,
                         "Room's insertion could not be completed %s.",
-                        room->coord);
+                        room->coord.toString());
         }
     }
     else
     {
         Logger::log(LogLevel::Error,
                     "Room's coordinates are not inside the boundaries %s.",
-                    room->coord);
+                    room->coord.toString());
     }
     return false;
 }

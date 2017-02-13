@@ -84,5 +84,5 @@ std::string BodyPart::BodyWeapon::getName(bool colored) const
 
 unsigned int BodyPart::BodyWeapon::rollDamage() const
 {
-    return TRandInteger<unsigned int>(minDamage, maxDamage);
+    return TRand<unsigned int>(minDamage, maxDamage);
 }

@@ -21,8 +21,6 @@
 #include <iostream>
 #include <fstream>
 
-#include "utils.hpp"
-#include "coordinates.hpp"
 #include "stringBuilder.hpp"
 
 /// @brief Enumerator which identifies the severity of the log entry.

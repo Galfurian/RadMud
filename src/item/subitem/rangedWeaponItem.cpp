@@ -76,7 +76,7 @@ bool RangedWeaponItem::isAContainer() const
 
 unsigned int RangedWeaponItem::rollDamage() const
 {
-    return TRandInteger<unsigned int>(this->getMinDamage(),
+    return TRand<unsigned int>(this->getMinDamage(),
                                       this->getMaxDamage());
 }
 

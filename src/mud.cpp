@@ -781,7 +781,7 @@ int Mud::getUniqueAreaVnum() const
     int vnum;
     do
     {
-        vnum = TRandInteger<int>(0, INT8_MAX);
+        vnum = TRand<int>(0, INT8_MAX);
     } while (mudAreas.find(vnum) != mudAreas.end());
     return vnum;
 }

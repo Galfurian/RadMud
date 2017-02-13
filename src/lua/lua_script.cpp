@@ -50,7 +50,7 @@ void LuaSleep(int sleepTime)
 
 int LuaRandom(int min, int max)
 {
-    return TRandInteger<int>(min, max);
+    return TRand<int>(min, max);
 }
 
 void LuaStopScript()

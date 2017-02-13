@@ -384,7 +384,7 @@ void BasicAttack::performAttackNaturalWeapon(
     // Phase 2: Roll the hit and damage.
     // -------------------------------------------------------------------------
     // Evaluate the natural roll for the attack.
-    unsigned int hitRoll = TRandInteger<unsigned int>(1, 20);
+    unsigned int hitRoll = TRand<unsigned int>(1, 20);
     // Boolean variable which identifies if the hit is a critical hit.
     bool isCritical = (hitRoll == 20);
     // Apply the penalty due to multi-wield, check if:
@@ -510,7 +510,7 @@ void BasicAttack::performMeleeAttack(Character * target,
     // Phase 2: Roll the hit and damage.
     // -------------------------------------------------------------------------
     // Evaluate the natural roll for the attack.
-    unsigned int hitRoll = TRandInteger<unsigned int>(1, 20);
+    unsigned int hitRoll = TRand<unsigned int>(1, 20);
     // Boolean variable which identifies if the hit is a critical hit.
     bool isCritical = (hitRoll == 20);
     // Apply the penalty due to multi-wield, check if:
@@ -640,7 +640,7 @@ void BasicAttack::performRangedAttack(Character * target,
     // Phase 3: Roll the hit and damage.
     // -------------------------------------------------------------------------
     // Evaluate the natural roll for the attack.
-    unsigned int hitRoll = TRandInteger<unsigned int>(1, 20);
+    unsigned int hitRoll = TRand<unsigned int>(1, 20);
     // Boolean variable which identifies if the hit is a critical hit.
     bool isCritical = (hitRoll == 20);
     // Apply the penalty due to multi-wield, check if:

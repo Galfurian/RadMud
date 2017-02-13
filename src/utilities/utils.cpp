@@ -193,11 +193,6 @@ std::vector<std::string> GetAllFilesInFolder(
     return files_name;
 }
 
-std::string BoolToString(const bool & value)
-{
-    return ((value) ? "Yes" : "No");
-}
-
 bool IsNumber(const std::string & source)
 {
     for (auto c : source)

@@ -21,8 +21,9 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "sqliteWrapper.hpp"
-#include "logger.hpp"
 #include "sqliteException.hpp"
+#include "logger.hpp"
+#include "utils.hpp"
 
 SQLiteWrapper::SQLiteWrapper() :
     dbDetails(),
