@@ -24,11 +24,6 @@
 
 #include "materialType.hpp"
 
-extern "C"
-{
-#include "lua.h"
-}
-
 /// @brief Holds details about a material.
 class Material
 {

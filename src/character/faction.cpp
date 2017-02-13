@@ -43,10 +43,10 @@ Faction::~Faction()
 
 bool Faction::check()
 {
-    assert(vnum > 0);
-    assert(!name.empty());
-    assert(!description.empty());
-    assert(currency != nullptr);
+    if (vnum <= 0) return false;
+    if (name.empty()) return false;
+    if (description.empty()) return false;
+    if (currency == nullptr) return false;
     return true;
 }
 

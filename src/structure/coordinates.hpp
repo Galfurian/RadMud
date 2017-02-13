@@ -25,14 +25,7 @@
 
 #pragma once
 
-extern "C"
-{
-#include "lua.h"
-#include "lauxlib.h"
-#include "lualib.h"
-}
-
-#include "luaBridge.hpp"
+#include <string>
 
 /// Used to create and manage a tridimensional coordinates.
 class Coordinates

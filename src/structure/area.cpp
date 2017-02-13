@@ -49,12 +49,12 @@ Area::~Area()
 
 bool Area::check()
 {
-    assert(vnum > 0);
-    assert(!name.empty());
-    assert(!builder.empty());
-    assert(width > 0);
-    assert(height > 0);
-    assert(elevation > 0);
+    if (vnum <= 0) return false;
+    if (name.empty()) return false;
+    if (builder.empty()) return false;
+    if (width <= 0) return false;
+    if (height <= 0) return false;
+    if (elevation <= 0) return false;
     return true;
 }
 

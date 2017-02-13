@@ -28,7 +28,6 @@
 #include "coordinates.hpp"
 #include "utils.hpp"
 #include "item.hpp"
-#include "lua_script.hpp"
 #include "mobile.hpp"
 #include "characterVector.hpp"
 #include "itemVector.hpp"

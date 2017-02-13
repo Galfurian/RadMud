@@ -31,7 +31,6 @@
 #include "item.hpp"
 #include "faction.hpp"
 #include "bodyPart.hpp"
-#include "luaBridge.hpp"
 #include "stringBuilder.hpp"
 #include "effectManager.hpp"
 #include "processInput.hpp"

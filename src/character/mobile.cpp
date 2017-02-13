@@ -22,6 +22,8 @@
 
 #include "mobile.hpp"
 
+#include "luaBridge.hpp"
+#include "lua_script.hpp"
 #include "logger.hpp"
 #include "mud.hpp"
 
@@ -104,6 +106,28 @@ bool Mobile::setAbilities(const std::string & source)
 
 void Mobile::respawn(bool actNow)
 {
+    // Delete the models loaded as equipment.
+    for (auto item : equipment)
+    {
+        if (HasFlag(item->flags, ItemFlag::Temporary))
+        {
+            delete (item);
+        }
+    }
+    equipment.clear();
+    // Delete the models loaded in the inventory.
+    for (auto item : inventory)
+    {
+        if (HasFlag(item->flags, ItemFlag::Temporary))
+        {
+            delete (item);
+        }
+    }
+    inventory.clear();
+    // Intialize the lua state.
+    L = luaL_newstate();
+    // Load the lua environment.
+    LoadLuaEnvironmet(L, lua_script);
     // Set the mobile to Alive.
     this->setHealth(this->getMaxHealth(), true);
     this->setStamina(this->getMaxStamina(), true);
@@ -282,11 +306,10 @@ void Mobile::reloadLua()
         }
     }
     inventory.clear();
-
+    // Reset the lua state.
     L = luaL_newstate();
-
+    // Load the lua environment.
     LoadLuaEnvironmet(L, lua_script);
-
     // Call the LUA function: Event_Init in order to prepare the mobile.
     this->triggerEventInit();
 }

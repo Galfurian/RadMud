@@ -53,22 +53,22 @@ Production::~Production()
 
 bool Production::check()
 {
-    assert(vnum >= 0);
-    assert(!name.empty());
-    assert(profession != nullptr);
-    assert(difficulty > 0);
-    assert(time > 0);
-    assert(outcome != nullptr);
-    assert(quantity > 0);
-    assert(!tools.empty());
+    if (vnum <= 0) return false;
+    if (name.empty()) return false;
+    if (profession == nullptr) return false;
+    if (difficulty <= 0) return false;
+    if (time <= 0) return false;
+    if (outcome == nullptr) return false;
+    if (quantity <= 0) return false;
+    if (tools.empty()) return false;
     for (auto it : tools)
     {
-        assert(it != ToolType::None);
+        if (it == ToolType::None) return false;
     }
     for (auto it : ingredients)
     {
-        assert(it.first != ResourceType::None);
-        assert(it.second > 0);
+        if (it.first == ResourceType::None) return false;
+        if (it.second <= 0) return false;
     }
     return true;
 }

@@ -23,7 +23,6 @@
 #pragma once
 
 #include "itemQuality.hpp"
-#include "lua_script.hpp"
 #include "modelType.hpp"
 #include "bodyPart.hpp"
 #include "material.hpp"

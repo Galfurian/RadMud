@@ -21,7 +21,6 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "resourceType.hpp"
-#include "luaBridge.hpp"
 #include "utils.hpp"
 
 ResourceType::ResourceType() :

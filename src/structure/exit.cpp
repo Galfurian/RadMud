@@ -52,9 +52,9 @@ Exit::~Exit()
 
 bool Exit::check() const
 {
-    assert(source != nullptr);
-    assert(destination != nullptr);
-    assert(direction != Direction::None);
+    if (source == nullptr) return false;
+    if (destination == nullptr) return false;
+    if (direction == Direction::None) return false;
     return true;
 }
 

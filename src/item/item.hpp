@@ -30,7 +30,6 @@
 #include "updateInterface.hpp"
 #include "itemVector.hpp"
 #include "itemQuality.hpp"
-#include "lua_script.hpp"
 #include "itemModel.hpp"
 #include "nodeModel.hpp"
 #include "liquid.hpp"

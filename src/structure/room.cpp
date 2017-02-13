@@ -68,16 +68,16 @@ Room::~Room()
 
 bool Room::check(bool complete)
 {
-    assert(vnum > 0);
+    if (vnum <= 0) return false;
     if (complete)
     {
-        assert(area != nullptr);
+        if (area == nullptr) return false;
     }
-    assert(coord.x <= 100);
-    assert(coord.y <= 100);
-    assert(coord.z <= 100);
-    assert(terrain != nullptr);
-    assert(!name.empty());
+    if (coord.x > 100) return false;
+    if (coord.y > 100) return false;
+    if (coord.z > 100) return false;
+    if (terrain == nullptr) return false;
+    if (name.empty()) return false;
     return true;
 }
 

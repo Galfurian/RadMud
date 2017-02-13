@@ -24,11 +24,6 @@
 
 #include <string>
 
-extern "C"
-{
-#include "lua.h"
-}
-
 class Coordinates;
 
 /// Provides a complete controll on directions.

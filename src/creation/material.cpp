@@ -22,7 +22,6 @@
 
 #include "material.hpp"
 
-#include "luaBridge.hpp"
 #include "logger.hpp"
 
 Material::Material() :
@@ -47,13 +46,13 @@ Material::~Material()
 
 bool Material::check()
 {
-    assert(vnum > 0);
-    assert(!name.empty());
-    assert(!article.empty());
-    assert(type != MaterialType::None);
-    assert(worth > 0);
-    assert(hardness > 0);
-    assert(lightness > 0);
+    if (vnum <= 0) return false;
+    if (name.empty()) return false;
+    if (article.empty()) return false;
+    if (type == MaterialType::None) return false;
+    if (worth <= 0) return false;
+    if (hardness <= 0) return false;
+    if (lightness <= 0) return false;
     return true;
 }
 

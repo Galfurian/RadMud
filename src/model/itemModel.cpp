@@ -220,16 +220,16 @@ Item * ItemModel::createItem(
 
 bool ItemModel::check()
 {
-    assert(vnum > 0);
-    assert(!name.empty());
-    assert(!article.empty());
-    assert(!shortdesc.empty());
-    assert(!keys.empty());
-    assert(!description.empty());
-    assert(condition > 0);
-    assert(this->material != MaterialType::None);
-    assert(tileSet >= 0);
-    assert(tileId >= 0);
+    if (vnum <= 0) return false;
+    if (name.empty()) return false;
+    if (article.empty()) return false;
+    if (shortdesc.empty()) return false;
+    if (keys.empty()) return false;
+    if (description.empty()) return false;
+    if (condition <= 0) return false;
+    if (this->material == MaterialType::None) return false;
+    if (tileSet < 0) return false;
+    if (tileId < 0) return false;
     return true;
 }
 

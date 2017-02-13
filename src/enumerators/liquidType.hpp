@@ -23,11 +23,6 @@
 
 #include <string>
 
-extern "C"
-{
-#include "lua.h"
-}
-
 /// @brief Used to determine the type of the model.
 class LiquidType
 {

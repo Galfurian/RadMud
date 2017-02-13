@@ -86,13 +86,6 @@ class Direction;
 
 #endif
 
-extern "C"
-{
-#include "lua.h"
-#include "lauxlib.h"
-#include "lualib.h"
-}
-
 /// @brief The main class of the entire mud.
 /// @details
 /// <h3>General</h3>

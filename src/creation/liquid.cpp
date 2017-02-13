@@ -45,11 +45,11 @@ Liquid::~Liquid()
 
 bool Liquid::check()
 {
-    assert(vnum > 0);
-    assert(type != LiquidType::None);
-    assert(!name.empty());
-    assert(!description.empty());
-    assert(worth > 0);
+    if (vnum <= 0) return false;
+    if (type == LiquidType::None) return false;
+    if (name.empty()) return false;
+    if (description.empty()) return false;
+    if (worth <= 0) return false;
     return true;
 }
 

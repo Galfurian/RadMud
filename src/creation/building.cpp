@@ -61,20 +61,20 @@ Building::~Building()
 
 bool Building::check()
 {
-    assert(vnum > 0);
-    assert(!name.empty());
-    assert(difficulty > 0);
-    assert(time > 0);
-    assert(buildingModel != nullptr);
-    assert(!tools.empty());
+    if (vnum <= 0) return false;
+    if (name.empty()) return false;
+    if (difficulty <= 0) return false;
+    if (time <= 0) return false;
+    if (buildingModel == nullptr) return false;
+    if (tools.empty()) return false;
     for (auto it : tools)
     {
-        assert(it != ToolType::None);
+        if (it == ToolType::None) return false;
     }
     for (auto it : ingredients)
     {
-        assert(it.first != ResourceType::None);
-        assert(it.second > 0);
+        if (it.first == ResourceType::None) return false;
+        if (it.second <= 0) return false;
     }
     return true;
 }

@@ -53,11 +53,11 @@ Skill::~Skill()
 
 bool Skill::check()
 {
-    assert(vnum > 0);
-    assert(!name.empty());
-    assert(!description.empty());
-    assert(ability != Ability::None);
-    assert(stage > 0);
+    if (vnum <= 0) return false;
+    if (name.empty())return false;
+    if (description.empty())return false;
+    if (ability == Ability::None)return false;
+    if (stage <= 0)return false;
     return true;
 }
 

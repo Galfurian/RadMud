@@ -28,7 +28,6 @@
 #include <map>
 #include <memory>
 
-#include "lua_script.hpp"
 #include "table.hpp"
 
 class CurrencyModel;

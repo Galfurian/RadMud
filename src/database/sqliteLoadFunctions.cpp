@@ -752,9 +752,7 @@ bool LoadMobile(ResultSet * result)
                 delete (mobile);
                 throw SQLiteException("Error during mobile insertion.");
             }
-            // Load the script.
-            LoadLuaEnvironmet(mobile->L, mobile->lua_script);
-            // Respawn it.
+            // Respawn the mobile.
             mobile->respawn(true);
         }
         catch (SQLiteException & e)
@@ -1659,12 +1657,20 @@ bool LoadModelBodyPart(ResultSet * result)
     {
         try
         {
-            auto model = Mud::instance().findItemModel(
-                result->getNextInteger());
-            auto bodyPart = Mud::instance().findBodyPart(
-                result->getNextUnsignedInteger());
-            assert(model != nullptr);
-            assert(bodyPart != nullptr);
+            auto modelVnum = result->getNextInteger();
+            auto model = Mud::instance().findItemModel(modelVnum);
+            if (model == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the model " + ToString(modelVnum));
+            }
+            auto bodyPartVnum = result->getNextUnsignedInteger();
+            auto bodyPart = Mud::instance().findBodyPart(bodyPartVnum);
+            if (bodyPart == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the body part " + ToString(bodyPartVnum));
+            }
             model->bodyParts.emplace_back(bodyPart);
         }
         catch (SQLiteException & e)
@@ -1682,16 +1688,32 @@ bool LoadBodyPartResources(ResultSet * result)
     {
         try
         {
-            auto bodyPart = Mud::instance().findBodyPart(
-                result->getNextUnsignedInteger());
-            assert(bodyPart != nullptr);
-            auto model = Mud::instance().findItemModel(
-                result->getNextInteger());
-            assert(model != nullptr);
-            assert(model->getType() == ModelType::Resource);
-            auto material = Mud::instance().findMaterial(
-                result->getNextInteger());
-            assert(material != nullptr);
+            auto bodyPartVnum = result->getNextUnsignedInteger();
+            auto bodyPart = Mud::instance().findBodyPart(bodyPartVnum);
+            if (bodyPart == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the body part " + ToString(bodyPartVnum));
+            }
+            auto modelVnum = result->getNextInteger();
+            auto model = Mud::instance().findItemModel(modelVnum);
+            if (model == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the model " + ToString(modelVnum));
+            }
+            if (model->getType() != ModelType::Resource)
+            {
+                throw SQLiteException(
+                    "The model is not a resource " + ToString(modelVnum));
+            }
+            auto materialVnum = result->getNextInteger();
+            auto material = Mud::instance().findMaterial(materialVnum);
+            if (material == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the material " + ToString(materialVnum));
+            }
             auto quantity = result->getNextInteger();
             BodyPart::BodyResource resource;
             resource.material = material;

@@ -23,6 +23,7 @@
 
 #include "lua_script.hpp"
 #include "roomUtilityFunctions.hpp"
+#include "luaBridge.hpp"
 #include "armorItem.hpp"
 #include "corpseItem.hpp"
 #include "currencyItem.hpp"

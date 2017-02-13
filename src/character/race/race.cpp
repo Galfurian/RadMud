@@ -50,9 +50,9 @@ Race::~Race()
 
 bool Race::check()
 {
-    assert(vnum > 0);
-    assert(!name.empty());
-    assert(!description.empty());
+    if (vnum <= 0) return false;
+    if (name.empty()) return false;
+    if (description.empty()) return false;
     return true;
 }
 

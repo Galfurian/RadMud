@@ -22,11 +22,6 @@
 
 #pragma once
 
-extern "C"
-{
-#include "lua.h"
-}
-
 #include "direction.hpp"
 
 #include <string>

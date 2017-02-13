@@ -48,15 +48,15 @@ Profession::~Profession()
 
 bool Profession::check()
 {
-    assert(vnum != 0);
-    assert(!command.empty());
-    assert(!description.empty());
-    assert(!action.empty());
-    assert(!startMessage.empty());
-    assert(!finishMessage.empty());
-    assert(!successMessage.empty());
-    assert(!failureMessage.empty());
-    assert(!interruptMessage.empty());
-    assert(!notFoundMessage.empty());
+    if (vnum <= 0) return false;
+    if (command.empty()) return false;
+    if (description.empty()) return false;
+    if (action.empty()) return false;
+    if (startMessage.empty()) return false;
+    if (finishMessage.empty()) return false;
+    if (successMessage.empty()) return false;
+    if (failureMessage.empty()) return false;
+    if (interruptMessage.empty()) return false;
+    if (notFoundMessage.empty()) return false;
     return true;
 }
