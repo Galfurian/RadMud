@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include "mapTile.hpp"
 #include "mapCell.hpp"
 
 /// @brief Class which maps the values of an height-map to types of terrain.

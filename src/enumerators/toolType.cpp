@@ -22,99 +22,19 @@
 
 #include "toolType.hpp"
 
-ToolType::ToolType() :
-    toolType(None)
-{
-    // Nothing to do.
-}
-
-ToolType::ToolType(const unsigned int & _toolType) :
-    toolType()
-{
-    if (_toolType == static_cast<unsigned int>(Pickaxe))
-        toolType = Pickaxe;
-    else if (_toolType == static_cast<unsigned int>(WoodcutterAxe))
-        toolType = WoodcutterAxe;
-    else if (_toolType == static_cast<unsigned int>(Saw))
-        toolType = Saw;
-    else if (_toolType == static_cast<unsigned int>(PrecisionChisel))
-        toolType = PrecisionChisel;
-    else if (_toolType == static_cast<unsigned int>(Hammer))
-        toolType = Hammer;
-    else if (_toolType == static_cast<unsigned int>(PlaneChisel))
-        toolType = PlaneChisel;
-    else if (_toolType == static_cast<unsigned int>(Forge))
-        toolType = Forge;
-    else if (_toolType == static_cast<unsigned int>(Anvil))
-        toolType = Anvil;
-    else if (_toolType == static_cast<unsigned int>(BlacksmithHammer))
-        toolType = BlacksmithHammer;
-    else if (_toolType == static_cast<unsigned int>(Bellows))
-        toolType = Bellows;
-    else if (_toolType == static_cast<unsigned int>(Crucible))
-        toolType = Crucible;
-    else if (_toolType == static_cast<unsigned int>(Firelighter))
-        toolType = Firelighter;
-    else toolType = None;
-}
-
-ToolType::ToolType(const Enum & _toolType) :
-    toolType(_toolType)
-{
-    // Nothing to do.
-}
-
-ToolType::ToolType(const std::string & _toolType) :
-    toolType()
-{
-    if (_toolType == "Pickaxe") toolType = Pickaxe;
-    else if (_toolType == "WoodcutterAxe") toolType = WoodcutterAxe;
-    else if (_toolType == "Saw") toolType = Saw;
-    else if (_toolType == "PrecisionChisel") toolType = PrecisionChisel;
-    else if (_toolType == "Hammer") toolType = Hammer;
-    else if (_toolType == "PlaneChisel") toolType = PlaneChisel;
-    else if (_toolType == "Forge") toolType = Forge;
-    else if (_toolType == "Anvil") toolType = Anvil;
-    else if (_toolType == "BlacksmithHammer") toolType = BlacksmithHammer;
-    else if (_toolType == "Bellows") toolType = Bellows;
-    else if (_toolType == "Crucible") toolType = Crucible;
-    else if (_toolType == "Firelighter") toolType = Firelighter;
-    else toolType = None;
-}
-
 std::string ToolType::toString() const
 {
-    if (toolType == Pickaxe) return "Pickaxe";
-    if (toolType == WoodcutterAxe) return "WoodcutterAxe";
-    if (toolType == Saw) return "Saw";
-    if (toolType == PrecisionChisel) return "PrecisionChisel";
-    if (toolType == Hammer) return "Hammer";
-    if (toolType == PlaneChisel) return "PlaneChisel";
-    if (toolType == Forge) return "Forge";
-    if (toolType == Anvil) return "Anvil";
-    if (toolType == BlacksmithHammer) return "BlacksmithHammer";
-    if (toolType == Bellows) return "Bellows";
-    if (toolType == Crucible) return "Crucible";
-    if (toolType == Firelighter) return "Firelighter";
+    if (value == Pickaxe) return "Pickaxe";
+    if (value == WoodcutterAxe) return "WoodcutterAxe";
+    if (value == Saw) return "Saw";
+    if (value == PrecisionChisel) return "PrecisionChisel";
+    if (value == Hammer) return "Hammer";
+    if (value == PlaneChisel) return "PlaneChisel";
+    if (value == Forge) return "Forge";
+    if (value == Anvil) return "Anvil";
+    if (value == BlacksmithHammer) return "BlacksmithHammer";
+    if (value == Bellows) return "Bellows";
+    if (value == Crucible) return "Crucible";
+    if (value == Firelighter) return "Firelighter";
     return "None";
-}
-
-unsigned int ToolType::toUInt() const
-{
-    return static_cast<unsigned int>(toolType);
-}
-
-bool ToolType::operator==(const ToolType & rhs) const
-{
-    return toolType == rhs.toolType;
-}
-
-bool ToolType::operator!=(const ToolType & rhs) const
-{
-    return toolType != rhs.toolType;
-}
-
-bool ToolType::operator<(const ToolType & rhs) const
-{
-    return toolType < rhs.toolType;
 }

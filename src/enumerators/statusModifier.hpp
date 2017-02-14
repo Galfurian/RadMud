@@ -21,10 +21,11 @@
 
 #pragma once
 
-#include <string>
+#include "baseEnumerator.hpp"
 
 /// @brief The list of status modifiers.
-class StatusModifier
+class StatusModifier :
+    public BaseEnumerator
 {
 public:
     /// The possible status modifiers.
@@ -37,43 +38,27 @@ public:
         StaminaRegeneration,
     };
 
-    /// @brief Constructor from unsigned ind.
-    StatusModifier();
+    /// @brief Constructor.
+    StatusModifier() :
+        BaseEnumerator()
+    {
+        // Nothing to do.
+    }
 
-    /// @brief Constructor from unsigned ind.
-    StatusModifier(const unsigned int & _value);
+    /// @brief Constructor from unsigned int.
+    StatusModifier(const unsigned int & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Constructor from enum.
-    StatusModifier(const Enum & _value);
-
-    /// @brief Check is the given number is a valid enum.
-    static bool isValid(const unsigned int & _value);
+    StatusModifier(const Enum & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Returns the enumerator as string.
-    std::string toString() const;
-
-    /// @brief Returns the enumerator as number.
-    unsigned int toUInt() const;
-
-    /// @brief Equality operator.
-    bool operator==(const StatusModifier & right) const
-    {
-        return this->value == right.value;
-    }
-
-    /// @brief Inequality operator.
-    bool operator!=(const StatusModifier & right) const
-    {
-        return this->value != right.value;
-    }
-
-    /// @brief Equality operator.
-    bool operator<(const StatusModifier & right) const
-    {
-        return this->value < right.value;
-    }
-
-private:
-    /// Internal value.
-    Enum value;
+    std::string toString() const override;
 };

@@ -159,8 +159,8 @@ set(PROJECT_SRC
         ${CMAKE_SOURCE_DIR}/src/database/sqliteLoadFunctions.cpp
         ${CMAKE_SOURCE_DIR}/src/database/sqliteWriteFunctions.cpp
         ${CMAKE_SOURCE_DIR}/src/database/dbFunctionsPlayer.cpp
+        ${CMAKE_SOURCE_DIR}/src/enumerators/baseEnumerator.cpp
         ${CMAKE_SOURCE_DIR}/src/enumerators/ability.cpp
-        ${CMAKE_SOURCE_DIR}/src/enumerators/mapTile.cpp
         ${CMAKE_SOURCE_DIR}/src/enumerators/toolType.cpp
         ${CMAKE_SOURCE_DIR}/src/enumerators/knowledge.cpp
         ${CMAKE_SOURCE_DIR}/src/enumerators/direction.cpp

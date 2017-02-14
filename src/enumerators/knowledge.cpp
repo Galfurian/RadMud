@@ -21,69 +21,6 @@
 
 #include "knowledge.hpp"
 
-Knowledge::Knowledge() :
-    value(None)
-{
-    // Nothing to do.
-}
-
-Knowledge::Knowledge(const unsigned int & _value) :
-    value()
-{
-    if (_value == static_cast<unsigned int>(GatherHerbs))
-        value = GatherHerbs;
-    else if (_value == static_cast<unsigned int>(GatherPlant))
-        value = GatherPlant;
-    else if (_value == static_cast<unsigned int>(Butchery))
-        value = Butchery;
-    else if (_value == static_cast<unsigned int>(SkinAnimal))
-        value = SkinAnimal;
-    else if (_value == static_cast<unsigned int>(TanHide))
-        value = TanHide;
-    else if (_value == static_cast<unsigned int>(ReadBook))
-        value = ReadBook;
-    else if (_value == static_cast<unsigned int>(Climb))
-        value = Climb;
-    else if (_value == static_cast<unsigned int>(Run))
-        value = Run;
-    else if (_value == static_cast<unsigned int>(Dash))
-        value = Dash;
-    else if (_value == static_cast<unsigned int>(Woodcutting))
-        value = Woodcutting;
-    else if (_value == static_cast<unsigned int>(Carpentry))
-        value = Carpentry;
-    else if (_value == static_cast<unsigned int>(Woodcarving))
-        value = Woodcarving;
-    else if (_value == static_cast<unsigned int>(Mining))
-        value = Mining;
-    else if (_value == static_cast<unsigned int>(Smelting))
-        value = Smelting;
-    else if (_value == static_cast<unsigned int>(Blacksmithing))
-        value = Blacksmithing;
-    else if (_value == static_cast<unsigned int>(MetalWeaponCrafting))
-        value = MetalWeaponCrafting;
-    else if (_value == static_cast<unsigned int>(MetalArmorCrafting))
-        value = MetalArmorCrafting;
-    else if (_value == static_cast<unsigned int>(Scavenge))
-        value = Scavenge;
-    else if (_value == static_cast<unsigned int>(CraftSurvivalTool))
-        value = CraftSurvivalTool;
-    else if (_value == static_cast<unsigned int>(BasicArmorProficiency))
-        value = BasicArmorProficiency;
-    else value = None;
-}
-
-Knowledge::Knowledge(const Enum & _value) :
-    value(_value)
-{
-    // Nothing to do.
-}
-
-bool Knowledge::isValid(const unsigned int & _value)
-{
-    return (_value >= 1) && (_value <= 8);
-}
-
 std::string Knowledge::toString() const
 {
     if (value == Knowledge::GatherHerbs)
@@ -127,9 +64,4 @@ std::string Knowledge::toString() const
     if (value == Knowledge::BasicArmorProficiency)
         return "BasicArmorProficiency";
     else return "None";
-}
-
-unsigned int Knowledge::toUInt() const
-{
-    return static_cast<unsigned int>(value);
 }

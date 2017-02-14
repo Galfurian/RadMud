@@ -22,10 +22,11 @@
 
 #pragma once
 
-#include <string>
+#include "baseEnumerator.hpp"
 
 /// @brief Used to determine the type of the tools.
-class ToolType
+class ToolType :
+    public BaseEnumerator
 {
 public:
     /// The possible types of tools.
@@ -46,34 +47,27 @@ public:
         Firelighter = 40
     };
 
-    /// @brief Constructor from uint.
-    ToolType();
+    /// @brief Constructor.
+    ToolType() :
+        BaseEnumerator()
+    {
+        // Nothing to do.
+    }
 
-    /// @brief Constructor from uint.
-    ToolType(const unsigned int & _toolType);
+    /// @brief Constructor from unsigned int.
+    ToolType(const unsigned int & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Constructor from enum.
-    ToolType(const Enum & _toolType);
-
-    /// @brief Constructor from string.
-    ToolType(const std::string & _toolType);
+    ToolType(const Enum & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Returns the type of model as string.
-    std::string toString() const;
-
-    /// @brief Returns the type of model as number.
-    unsigned int toUInt() const;
-
-    /// @brief Equality operator w.r.t. a type of model object.
-    bool operator==(const ToolType & rhs) const;
-
-    /// @brief Inequality operator w.r.t. a type of model enum.
-    bool operator!=(const ToolType & rhs) const;
-
-    /// @brief Equality operator w.r.t. a type of model object.
-    bool operator<(const ToolType & rhs) const;
-
-private:
-    /// Internal type of model.
-    Enum toolType;
+    std::string toString() const override;
 };

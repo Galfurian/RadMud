@@ -22,7 +22,6 @@
 #pragma once
 
 #include "terrain.hpp"
-#include "mapTile.hpp"
 #include "room.hpp"
 
 #include <vector>

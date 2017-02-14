@@ -21,10 +21,11 @@
 
 #pragma once
 
-#include <string>
+#include "baseEnumerator.hpp"
 
 /// Represents the ranks of a skill.
-class SkillRank
+class SkillRank :
+    public BaseEnumerator
 {
 public:
     /// The ranks of a skill.
@@ -48,47 +49,32 @@ public:
     };
 
     /// @brief Constructor.
-    SkillRank();
-
-    /// @brief Constructor.
-    SkillRank(const unsigned int & _value);
-
-    /// @brief Constructor.
-    SkillRank(const Enum & _value);
-
-    /// @brief Check is the given number is a valid skill rank.
-    static bool isValid(const unsigned int & _value);
-
-    /// @brief Returns the skill rank as string.
-    std::string toString() const;
-
-    /// @brief Returns the skill rank as number.
-    unsigned int toUInt() const;
-
-    template<typename ValueType>
-    ValueType cast_to() const
+    SkillRank() :
+        BaseEnumerator()
     {
-        static_assert((std::is_same<ValueType, int>::value ||
-                       std::is_same<ValueType, unsigned int>::value ||
-                       std::is_same<ValueType, double>::value),
-                      "template parameter is of the wrong type");
-        return static_cast<ValueType>(value);
+        // Nothing to do.
     }
 
+    /// @brief Constructor from unsigned int.
+    SkillRank(const unsigned int & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
+
+    /// @brief Constructor from enum.
+    SkillRank(const Enum & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
+
+    /// @brief Returns the skill rank as string.
+    std::string toString() const override;
+
+    /// @brief Given a value, provides the corresponding skill rank.
     static SkillRank getSkillRank(unsigned int & _value);
 
+    /// @brief Provides the maximum skill value.
     static unsigned int getSkillCap();
-
-    /// @brief Equality operator.
-    bool operator==(const SkillRank & rhs) const;
-
-    /// @brief Inequality operator.
-    bool operator!=(const SkillRank & rhs) const;
-
-    /// @brief Lesser operator.
-    bool operator<(const SkillRank & rhs) const;
-
-private:
-    /// Internal value.
-    Enum value;
 };

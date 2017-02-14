@@ -22,10 +22,11 @@
 
 #pragma once
 
-#include <string>
+#include "baseEnumerator.hpp"
 
 /// The postures of a character.
-class CharacterPosture
+class CharacterPosture :
+    public BaseEnumerator
 {
 public:
     /// List of possible character's posture.
@@ -40,40 +41,30 @@ public:
         Sleep,  ///< The character is sleeping.
     };
 
-    /// @brief Constructor from uint.
-    CharacterPosture();
+    /// @brief Constructor.
+    CharacterPosture() :
+        BaseEnumerator()
+    {
+        // Nothing to do.
+    }
 
-    /// @brief Constructor from number.
-    CharacterPosture(const unsigned int & _characterPosture);
+    /// @brief Constructor from unsigned int.
+    CharacterPosture(const unsigned int & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Constructor from enum.
-    CharacterPosture(const Enum & _characterPosture);
-
-    /// @brief Check is the given number is a valid character posture.
-    static bool isValid(const unsigned int & _characterPosture);
+    CharacterPosture(const Enum & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Returns the character posture as string.
-    std::string toString() const;
-
-    /// @brief Returns the character posture as number.
-    unsigned int toUInt() const;
+    std::string toString() const override;
 
     /// @brief Returns the action describing the posture.
     std::string getAction() const;
-
-    /// @brief Equality operator.
-    bool operator==(const CharacterPosture & rhs) const;
-
-    /// @brief Inequality operator.
-    bool operator!=(const CharacterPosture & rhs) const;
-
-    /// @brief Lesser-Equal operator.
-    bool operator<=(const CharacterPosture & rhs) const;
-
-    /// @brief Greater-Equal operator.
-    bool operator>=(const CharacterPosture & rhs) const;
-
-private:
-    /// Internal character posture value.
-    Enum characterPosture;
 };

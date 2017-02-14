@@ -21,33 +21,6 @@
 
 #include "statusModifier.hpp"
 
-StatusModifier::StatusModifier() :
-    value(None)
-{
-    // Nothing to do.
-}
-
-StatusModifier::StatusModifier(const unsigned int & _value) :
-    value()
-{
-    if (_value == 1) value = Health;
-    else if (_value == 2) value = HealthRegeneration;
-    else if (_value == 3) value = Stamina;
-    else if (_value == 4) value = StaminaRegeneration;
-    else value = None;
-}
-
-StatusModifier::StatusModifier(const Enum & _value) :
-    value(_value)
-{
-    // Nothing to do.
-}
-
-bool StatusModifier::isValid(const unsigned int & _value)
-{
-    return (_value >= 1) && (_value <= 8);
-}
-
 std::string StatusModifier::toString() const
 {
     if (value == StatusModifier::Health)
@@ -59,9 +32,4 @@ std::string StatusModifier::toString() const
     if (value == StatusModifier::StaminaRegeneration)
         return "StaminaRegeneration";
     else return "None";
-}
-
-unsigned int StatusModifier::toUInt() const
-{
-    return static_cast<unsigned int>(value);
 }

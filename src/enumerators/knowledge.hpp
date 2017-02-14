@@ -21,10 +21,11 @@
 
 #pragma once
 
-#include <string>
+#include "baseEnumerator.hpp"
 
 /// @brief The list of notions a character can learn.
-class Knowledge
+class Knowledge :
+    public BaseEnumerator
 {
 public:
     /// The possible notions a character can learn.
@@ -53,43 +54,27 @@ public:
         BasicArmorProficiency = 40      /// < Basic Armor Proficiency
     };
 
-    /// @brief Constructor from unsigned ind.
-    Knowledge();
+    /// @brief Constructor.
+    Knowledge() :
+        BaseEnumerator()
+    {
+        // Nothing to do.
+    }
 
-    /// @brief Constructor from unsigned ind.
-    Knowledge(const unsigned int & _value);
+    /// @brief Constructor from unsigned int.
+    Knowledge(const unsigned int & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Constructor from enum.
-    Knowledge(const Enum & _value);
-
-    /// @brief Check is the given number is a valid enum.
-    static bool isValid(const unsigned int & _value);
+    Knowledge(const Enum & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Returns the enumerator as string.
-    std::string toString() const;
-
-    /// @brief Returns the enumerator as number.
-    unsigned int toUInt() const;
-
-    /// @brief Equality operator.
-    bool operator==(const Knowledge & right) const
-    {
-        return this->value == right.value;
-    }
-
-    /// @brief Inequality operator.
-    bool operator!=(const Knowledge & right) const
-    {
-        return this->value != right.value;
-    }
-
-    /// @brief Equality operator.
-    bool operator<(const Knowledge & right) const
-    {
-        return this->value < right.value;
-    }
-
-private:
-    /// Internal value.
-    Enum value;
+    std::string toString() const override;
 };

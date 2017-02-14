@@ -21,43 +21,6 @@
 
 #include "skillRank.hpp"
 
-SkillRank::SkillRank() :
-    value(None)
-{
-    // Nothing to do.
-}
-
-SkillRank::SkillRank(const unsigned int & _value) :
-    value(None)
-{
-    if (_value == 1) value = Newbie;
-    else if (_value == 2) value = Novice;
-    else if (_value == 3) value = Rookie;
-    else if (_value == 4) value = Beginner;
-    else if (_value == 5) value = Talented;
-    else if (_value == 6) value = Skilled;
-    else if (_value == 7) value = Intermediate;
-    else if (_value == 8) value = Seasoned;
-    else if (_value == 9) value = Proficient;
-    else if (_value == 10) value = Experienced;
-    else if (_value == 11) value = Advanced;
-    else if (_value == 12) value = Expert;
-    else if (_value == 13) value = Specialist;
-    else if (_value == 14) value = Master;
-    else value = None;
-}
-
-SkillRank::SkillRank(const Enum & _value) :
-    value(_value)
-{
-    // Nothing to do.
-}
-
-bool SkillRank::isValid(const unsigned int & _value)
-{
-    return (_value >= 1) && (_value <= 14);
-}
-
 std::string SkillRank::toString() const
 {
     if (value == Newbie) return "Newbie";
@@ -75,11 +38,6 @@ std::string SkillRank::toString() const
     if (value == Specialist) return "Specialist";
     if (value == Master) return "Master";
     return "None";
-}
-
-unsigned int SkillRank::toUInt() const
-{
-    return static_cast<unsigned int>(value);
 }
 
 SkillRank SkillRank::getSkillRank(unsigned int & _value)
@@ -133,19 +91,4 @@ SkillRank SkillRank::getSkillRank(unsigned int & _value)
 unsigned int SkillRank::getSkillCap()
 {
     return 119000;
-}
-
-bool SkillRank::operator==(const SkillRank & rhs) const
-{
-    return value == rhs.value;
-}
-
-bool SkillRank::operator!=(const SkillRank & rhs) const
-{
-    return value != rhs.value;
-}
-
-bool SkillRank::operator<(const SkillRank & rhs) const
-{
-    return value < rhs.value;
 }

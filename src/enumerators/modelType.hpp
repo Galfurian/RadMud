@@ -22,10 +22,11 @@
 
 #pragma once
 
-#include <string>
+#include "baseEnumerator.hpp"
 
 /// @brief Used to determine the type of the model.
-class ModelType
+class ModelType :
+    public BaseEnumerator
 {
 public:
     /// The possible types of model.
@@ -57,43 +58,27 @@ public:
         Magazine         ///< [23] A magazine for ammunitions.
     };
 
-    /// @brief Constructor from uint.
-    ModelType();
+    /// @brief Constructor.
+    ModelType() :
+        BaseEnumerator()
+    {
+        // Nothing to do.
+    }
 
-    /// @brief Constructor from uint.
-    ModelType(const unsigned int & _modelType);
+    /// @brief Constructor from unsigned int.
+    ModelType(const unsigned int & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Constructor from enum.
-    ModelType(const Enum & _modelType);
-
-    /// @brief Constructor from string.
-    ModelType(const std::string & _modelType);
-
-    /// @brief Check is the given number is a valid type of model.
-    static bool isValid(const unsigned int & _modelType);
-
-    /// @brief Check is the given string is a valid type of model.
-    static bool isValid(const std::string & _modelType);
+    ModelType(const Enum & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Returns the type of model as string.
-    std::string toString() const;
-
-    /// @brief Returns the type of model as number.
-    unsigned int toUInt() const;
-
-    /// @brief Equality operator w.r.t. a type of model object.
-    bool operator==(const ModelType & rhs) const;
-
-    /// @brief Equality operator w.r.t. a type of model enum.
-    bool operator==(const ModelType::Enum & rhs) const;
-
-    /// @brief Inequality operator w.r.t. a type of model enum.
-    bool operator!=(const ModelType::Enum & rhs) const;
-
-    /// @brief Equality operator w.r.t. a type of model object.
-    bool operator<(const ModelType & rhs) const;
-
-private:
-    /// Internal type of model.
-    Enum modelType;
+    std::string toString() const override;
 };

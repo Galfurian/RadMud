@@ -497,7 +497,7 @@ bool DoStatistics(Character * character, ArgumentHandler & /*args*/)
     // STRENGTH
     for (auto const & ability:player->abilities)
     {
-        msg += "    " + MAG(ability.first.getAbbreviation(true)) + "    ";
+        msg += "    " + MAG(ability.first.getAbbreviation()) + "    ";
         msg += AlignString(player->getAbility(ability.first),
                            StringAlign::Right, 5) + "(";
         msg += AlignString(player->getAbilityModifier(ability.first),

@@ -1,9 +1,8 @@
-/// @file   itemQuality.hpp
-/// @brief  Define the item quality class.
+/// @file   baseEnumerator.cpp
 /// @author Enrico Fraccaroli
-/// @date   Nov 19 2016
+/// @date   Feb 14 2017
 /// @copyright
-/// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
+/// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
 /// copy of this software and associated documentation files (the "Software"),
 /// to deal in the Software without restriction, including without limitation
@@ -20,50 +19,42 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#pragma once
-
 #include "baseEnumerator.hpp"
+#include <sstream>
 
-/// The quality of an item.
-class ItemQuality :
-    public BaseEnumerator
+/// @brief Constructor from uint.
+BaseEnumerator::BaseEnumerator() :
+    value()
 {
-public:
-    /// List of possible quality values.
-    enum Enum
-    {
-        None,       ///< No quality.
-        Disastrous, ///< Disastrous quality.
-        Poor,       ///< Poor quality.
-        Normal,     ///< Normal quality.
-        Fine,       ///< Fine quality.
-        Masterful   ///< Masterful quality.
-    };
+    // Nothing to do.
+}
 
-    /// @brief Constructor.
-    ItemQuality() :
-        BaseEnumerator()
-    {
-        // Nothing to do.
-    }
+BaseEnumerator::BaseEnumerator(const unsigned int & _value) :
+    value(_value)
+{
+    // Nothing to do.
+}
 
-    /// @brief Constructor from unsigned int.
-    ItemQuality(const unsigned int & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
+BaseEnumerator::BaseEnumerator(const BaseEnumerator & other) :
+    value(other.value)
+{
+    // Nothing to do.
+}
 
-    /// @brief Constructor from enum.
-    ItemQuality(const Enum & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
+BaseEnumerator::~BaseEnumerator()
+{
+    // Nothing to do.
+}
 
-    /// @brief Returns the quality as string.
-    std::string toString() const override;
+std::string BaseEnumerator::toString() const
+{
+    std::stringstream ss;
+    ss << value;
+    return ss.str();
+}
 
-    /// @brief Returns the quality modifier.
-    double getModifier() const;
-};
+std::ostream & operator<<(std::ostream & os, const BaseEnumerator & enumerator)
+{
+    os << enumerator.toString();
+    return os;
+}

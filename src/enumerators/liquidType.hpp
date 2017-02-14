@@ -21,10 +21,11 @@
 
 #pragma once
 
-#include <string>
+#include "baseEnumerator.hpp"
 
 /// @brief Used to determine the type of the model.
-class LiquidType
+class LiquidType :
+    public BaseEnumerator
 {
 public:
     /// The possible types of model.
@@ -39,30 +40,26 @@ public:
     };
 
     /// @brief Constructor.
-    LiquidType();
+    LiquidType() :
+        BaseEnumerator()
+    {
+        // Nothing to do.
+    }
 
-    /// @brief Constructor.
-    LiquidType(const unsigned int & _liquidType);
+    /// @brief Constructor from unsigned int.
+    LiquidType(const unsigned int & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
-    /// @brief Constructor.
-    LiquidType(const Enum & _liquidType);
-
-    /// @brief Constructor.
-    LiquidType(const std::string & _liquidType);
+    /// @brief Constructor from enum.
+    LiquidType(const Enum & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Returns the type of model as string.
-    std::string toString() const;
-
-    /// @brief Returns the type of model as number.
-    unsigned int toUInt() const;
-
-    /// @brief Equality operator w.r.t. a type of model object.
-    bool operator==(const LiquidType & rhs) const;
-
-    /// @brief Inequality operator w.r.t. a type of model object.
-    bool operator!=(const LiquidType & rhs) const;
-
-private:
-    /// Internal type of liquid.
-    Enum liquidType;
+    std::string toString() const override;
 };

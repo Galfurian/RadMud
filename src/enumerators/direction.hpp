@@ -22,68 +22,59 @@
 
 #pragma once
 
-#include <string>
+#include "baseEnumerator.hpp"
 
 class Coordinates;
 
-/// Provides a complete controll on directions.
-class Direction
+/// Provides a complete control on directions.
+class Direction :
+    public BaseEnumerator
 {
 public:
     /// The possible directions.
     enum Enum
     {
-        None,
-        North,
-        South,
-        West,
-        East,
-        Up,
-        Down
+        None,   ///< No direction.
+        North,  ///< North.
+        South,  ///< South.
+        West,   ///< West.
+        East,   ///< East.
+        Up,     ///< Up.
+        Down    ///< Down.
     };
 
-    /// @brief Constructor from uint.
-    Direction();
+    /// @brief Constructor.
+    Direction() :
+        BaseEnumerator()
+    {
+        // Nothing to do.
+    }
 
-    /// @brief Constructor from uint.
-    Direction(unsigned int & _direction);
+    /// @brief Constructor from unsigned int.
+    Direction(const unsigned int & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Constructor from enum.
-    Direction(Enum _direction);
+    Direction(const Enum & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Constructor from string.
     /// @param _direction The string representing the direction.
     /// @param exact      If the string must be the exact name of the direction.
     Direction(const std::string & _direction, const bool & exact = true);
 
-    /// @brief Check is the given number is a valid direction.
-    static bool isValid(const unsigned int & _direction);
-
-    /// @brief Check is the given string is a valid direction.
-    static bool isValid(const std::string & _direction);
-
     /// @brief Returns the direction as string.
-    std::string toString() const;
-
-    /// @brief Returns the direction as number.
-    unsigned int toUInt() const;
+    std::string toString() const override;
 
     /// @brief Returns the opposite direction.
     Direction getOpposite() const;
 
     /// @brief Returns the direction in terms of coordinates.
     Coordinates getCoordinates() const;
-
-    /// @brief Equality operator w.r.t. a direction object.
-    bool operator==(const Direction & rhs) const;
-
-    /// @brief Inequality operator w.r.t. a direction enum.
-    bool operator!=(const Direction & rhs) const;
-
-    /// @brief Lesser operator w.r.t. a direction enum.
-    bool operator<(const Direction & rhs) const;
-
-private:
-    /// Internal direction value.
-    Enum direction;
 };

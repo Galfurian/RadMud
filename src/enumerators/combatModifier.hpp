@@ -21,10 +21,11 @@
 
 #pragma once
 
-#include <string>
+#include "baseEnumerator.hpp"
 
 /// @brief The list of combat modifiers.
-class CombatModifier
+class CombatModifier :
+    public BaseEnumerator
 {
 public:
     /// The possible combat modifiers.
@@ -41,43 +42,27 @@ public:
         ArmorClass = 30,            /// < Armor Class
     };
 
-    /// @brief Constructor from unsigned ind.
-    CombatModifier();
+    /// @brief Constructor.
+    CombatModifier() :
+        BaseEnumerator()
+    {
+        // Nothing to do.
+    }
 
-    /// @brief Constructor from unsigned ind.
-    CombatModifier(const unsigned int & _value);
+    /// @brief Constructor from unsigned int.
+    CombatModifier(const unsigned int & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Constructor from enum.
-    CombatModifier(const Enum & _value);
-
-    /// @brief Check is the given number is a valid enum.
-    static bool isValid(const unsigned int & _value);
+    CombatModifier(const Enum & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Returns the enumerator as string.
-    std::string toString() const;
-
-    /// @brief Returns the enumerator as number.
-    unsigned int toUInt() const;
-
-    /// @brief Equality operator.
-    bool operator==(const CombatModifier & right) const
-    {
-        return this->value == right.value;
-    }
-
-    /// @brief Inequality operator.
-    bool operator!=(const CombatModifier & right) const
-    {
-        return this->value != right.value;
-    }
-
-    /// @brief Equality operator.
-    bool operator<(const CombatModifier & right) const
-    {
-        return this->value < right.value;
-    }
-
-private:
-    /// Internal value.
-    Enum value;
+    std::string toString() const override;
 };

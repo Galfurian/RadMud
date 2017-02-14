@@ -22,10 +22,11 @@
 
 #pragma once
 
-#include <string>
+#include "baseEnumerator.hpp"
 
 /// Represents a type of material.
-class MaterialType
+class MaterialType :
+    public BaseEnumerator
 {
 public:
     /// The possible type of materials.
@@ -45,49 +46,27 @@ public:
         Bone        ///< [11] Coal
     };
 
-    /// @brief Constructor from uint.
-    MaterialType();
+    /// @brief Constructor.
+    MaterialType() :
+        BaseEnumerator()
+    {
+        // Nothing to do.
+    }
 
-    /// @brief Constructor from uint.
-    MaterialType(const unsigned int & _materialType);
+    /// @brief Constructor from unsigned int.
+    MaterialType(const unsigned int & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Constructor from enum.
-    MaterialType(const Enum & _materialType);
-
-    /// @brief Constructor from string.
-    MaterialType(const std::string & _materialType);
-
-    /// @brief Check is the given number is a valid material.
-    static bool isValid(const unsigned int & _materialType);
-
-    /// @brief Check is the given string is a valid material.
-    static bool isValid(const std::string & _materialType);
+    MaterialType(const Enum & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Returns the material as string.
-    std::string toString() const;
-
-    /// @brief Returns the material as number.
-    unsigned int toUInt() const;
-
-    /// @brief Equality operator.
-    bool operator==(const MaterialType & rhs) const;
-
-    /// @brief Equality operator.
-    bool operator==(const MaterialType::Enum & rhs) const;
-
-    /// @brief Inequality operator.
-    bool operator!=(const MaterialType & rhs) const;
-
-    /// @brief Inequality operator.
-    bool operator!=(const MaterialType::Enum & rhs) const;
-
-    /// @brief Lesser operator.
-    bool operator<(const MaterialType & rhs) const;
-
-    /// @brief Lesser operator.
-    bool operator<(const MaterialType::Enum & rhs) const;
-
-private:
-    /// Internal value.
-    Enum materialType;
+    std::string toString() const override;
 };

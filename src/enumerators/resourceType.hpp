@@ -22,12 +22,11 @@
 
 #pragma once
 
-#include <string>
-
-struct lua_State;
+#include "baseEnumerator.hpp"
 
 /// Represents a type of resource.
-class ResourceType
+class ResourceType :
+    public BaseEnumerator
 {
 public:
     /// The possible type of resources.
@@ -53,34 +52,27 @@ public:
         Skull           ///< [17] SKULL
     };
 
-    /// @brief Constructor from uint.
-    ResourceType();
+    /// @brief Constructor.
+    ResourceType() :
+        BaseEnumerator()
+    {
+        // Nothing to do.
+    }
 
-    /// @brief Constructor from uint.
-    ResourceType(const unsigned int & _resourceType);
+    /// @brief Constructor from unsigned int.
+    ResourceType(const unsigned int & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Constructor from enum.
-    ResourceType(const Enum & _resourceType);
-
-    /// @brief Constructor from string.
-    ResourceType(const std::string & _resourceType);
+    ResourceType(const Enum & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Returns the resource as string.
-    std::string toString() const;
-
-    /// @brief Returns the resource as number.
-    unsigned int toUInt() const;
-
-    /// @brief Equality operator.
-    bool operator==(const ResourceType & rhs) const;
-
-    /// @brief Inequality operator.
-    bool operator!=(const ResourceType & rhs) const;
-
-    /// @brief Lesser operator.
-    bool operator<(const ResourceType & rhs) const;
-
-private:
-    /// Internal value.
-    Enum resourceType;
+    std::string toString() const override;
 };

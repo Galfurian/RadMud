@@ -81,7 +81,8 @@ void Skill::updateSkillEffects(Character * character)
             continue;
         }
         // Save the skill rank.
-        auto skillRank = SkillRank::getSkillRank(it.second).cast_to<int>();
+        auto skillRank = static_cast<int>(
+            SkillRank::getSkillRank(it.second).toUInt());
         // Create a new skill effect.
         auto skillEffect = EffectFactory::skillEffect(character,
                                                       skill->name);

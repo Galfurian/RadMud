@@ -831,12 +831,13 @@ bool LoadExit(ResultSet * result)
                 throw SQLiteException(
                     "Can't find destination " + ToString(destinationVnum));
             }
-            if (!Direction::isValid(directionValue))
+            Direction direction(directionValue);
+            if (direction == Direction::None)
             {
                 throw SQLiteException(
                     "Direction si not valid " + ToString(directionValue));
             }
-            newExit->direction = Direction(directionValue);
+            newExit->direction = direction;
             newExit->flags = flagValue;
             if (!newExit->check())
             {

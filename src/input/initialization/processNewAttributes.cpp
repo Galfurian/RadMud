@@ -84,7 +84,7 @@ ProcessNewAttributes::process(Character * character, ArgumentHandler & args)
             return false;
         }
         std::string help;
-        help += "Help about " + ability.toString(true) + ".\n";
+        help += "Help about " + ability.toString() + ".\n";
         help += Formatter::italic() + ability.getDescription() + "\n";
         this->advance(character, help);
         return true;
@@ -167,7 +167,7 @@ ProcessNewAttributes::advance(Character * character, const std::string & error)
     for (auto ability : player->abilities)
     {
         msg += "#    [" + ToString(ability.first.toUInt()) + "]";
-        msg += AlignString(ability.first.toString(true),
+        msg += AlignString(ability.first.toString(),
                            StringAlign::Left, 15);
         msg += " : ";
         msg += ToString(player->getAbility(Ability::Strength, false));

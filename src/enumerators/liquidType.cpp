@@ -20,68 +20,13 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "liquidType.hpp"
-#include "utils.hpp"
-
-LiquidType::LiquidType() :
-    liquidType()
-{
-    // Nothing to do.
-}
-
-LiquidType::LiquidType(const unsigned int & _liquidType) :
-    liquidType()
-{
-    if (_liquidType == static_cast<unsigned int>(Normal))
-        liquidType = Normal;
-    else if (_liquidType == static_cast<unsigned int>(Alcohol))
-        liquidType = Alcohol;
-    else if (_liquidType == static_cast<unsigned int>(Poison))
-        liquidType = Poison;
-    else if (_liquidType == static_cast<unsigned int>(Blood))
-        liquidType = Blood;
-    else if (_liquidType == static_cast<unsigned int>(Lava))
-        liquidType = Lava;
-    else liquidType = None;
-}
-
-LiquidType::LiquidType(const Enum & _liquidType) :
-    liquidType(_liquidType)
-{
-    // Nothing to do.
-}
-
-LiquidType::LiquidType(const std::string & _liquidType) :
-    liquidType()
-{
-    if (ToLower(_liquidType) == "normal") liquidType = Normal;
-    else if (ToLower(_liquidType) == "alcohol") liquidType = Alcohol;
-    else if (ToLower(_liquidType) == "poison") liquidType = Poison;
-    else if (ToLower(_liquidType) == "blood") liquidType = Blood;
-    else if (ToLower(_liquidType) == "lava") liquidType = Lava;
-    else liquidType = None;
-}
 
 std::string LiquidType::toString() const
 {
-    if (liquidType == Normal) return "Normal";
-    if (liquidType == Alcohol) return "Alcohol";
-    if (liquidType == Poison) return "Poison";
-    if (liquidType == Blood) return "Blood";
-    if (liquidType == Lava) return "Lava";
+    if (value == Normal) return "Normal";
+    if (value == Alcohol) return "Alcohol";
+    if (value == Poison) return "Poison";
+    if (value == Blood) return "Blood";
+    if (value == Lava) return "Lava";
     return "None";
-}
-
-unsigned int LiquidType::toUInt() const
-{
-    return static_cast<unsigned int>(liquidType);
-}
-
-bool LiquidType::operator==(const LiquidType & rhs) const
-{
-    return liquidType == rhs.liquidType;
-}
-
-bool LiquidType::operator!=(const LiquidType & rhs) const
-{
-    return liquidType != rhs.liquidType;
 }

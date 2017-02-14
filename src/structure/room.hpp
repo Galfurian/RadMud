@@ -211,16 +211,6 @@ public:
     /// @return The desired exit.
     std::shared_ptr<Exit> findExit(Direction direction);
 
-    /// @brief Search for the desired exit in a direction, provided as a string.
-    /// @param direction The direction to search.
-    /// @return The desired exit.
-    std::shared_ptr<Exit> findExit(const std::string & direction);
-
-    /// @brief Search for the desired exit of this room.
-    /// @param destination The destination room.
-    /// @return The desired exit.
-    std::shared_ptr<Exit> findExit(Room * destination);
-
     /// @brief Search for a built door inside the room.
     /// @return The contained door if there is one.
     Item * findDoor();

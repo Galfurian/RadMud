@@ -22,10 +22,11 @@
 
 #pragma once
 
-#include <string>
+#include "baseEnumerator.hpp"
 
 /// List of telnet commands.
-class TelnetChar
+class TelnetChar :
+    public BaseEnumerator
 {
 public:
     // OPTIONS
@@ -76,31 +77,27 @@ public:
         IAC = 255                       ///< Interpret As Command
     };
 
-    /// @brief Constructor from number.
-    TelnetChar(unsigned int & _telnetChar);
+    /// @brief Constructor.
+    TelnetChar() :
+        BaseEnumerator()
+    {
+        // Nothing to do.
+    }
+
+    /// @brief Constructor from unsigned int.
+    TelnetChar(const unsigned int & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Constructor from enum.
-    TelnetChar(const Enum & _telnetChar);
-
-    /// @brief Check is the given number is a valid telnet character.
-    static bool isValid(const unsigned int & _telnetChar);
+    TelnetChar(const Enum & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Returns the telnet character as string.
-    std::string toString() const;
-
-    /// @brief Returns the telnet character as number.
-    unsigned int toUInt() const;
-
-    /// @brief Returns the telnet character as char.
-    char toChar() const;
-
-    /// @brief EtelnetChar operator w.r.t. a telnet character enum.
-    bool operator==(const TelnetChar::Enum & rhs) const;
-
-    /// @brief InetelnetChar operator w.r.t. a telnet character enum.
-    bool operator!=(const TelnetChar::Enum & rhs) const;
-
-private:
-    /// Internal telnet character value.
-    Enum telnetChar;
+    std::string toString() const override;
 };

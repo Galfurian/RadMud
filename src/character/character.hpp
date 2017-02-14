@@ -50,6 +50,8 @@ class Player;
 
 class Mobile;
 
+struct lua_State;
+
 /// The list of possible actions.
 using GenderType = enum class GenderType_t
 {

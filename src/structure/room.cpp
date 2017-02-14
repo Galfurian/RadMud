@@ -363,27 +363,6 @@ std::shared_ptr<Exit> Room::findExit(Direction direction)
     return nullptr;
 }
 
-std::shared_ptr<Exit> Room::findExit(const std::string & direction)
-{
-    if (Direction::isValid(direction))
-    {
-        return this->findExit(Direction(direction));
-    }
-    return nullptr;
-}
-
-std::shared_ptr<Exit> Room::findExit(Room * destination)
-{
-    for (auto it : exits)
-    {
-        if (it->destination == destination)
-        {
-            return it;
-        }
-    }
-    return nullptr;
-}
-
 Item * Room::findDoor()
 {
     for (auto iterator : items)

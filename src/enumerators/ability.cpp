@@ -22,152 +22,69 @@
 
 #include "ability.hpp"
 
-Ability::Ability() :
-    ability(None)
+std::string Ability::toString() const
 {
-    // Nothing to do.
-}
-
-Ability::Ability(const unsigned int & _ability) :
-    ability()
-{
-    if (_ability == 1) ability = Strength;
-    else if (_ability == 2) ability = Agility;
-    else if (_ability == 3) ability = Perception;
-    else if (_ability == 4) ability = Constitution;
-    else if (_ability == 5) ability = Intelligence;
-    else ability = None;
-}
-
-Ability::Ability(const Enum & _ability) :
-    ability(_ability)
-{
-    // Nothing to do.
-}
-
-Ability::Ability(const std::string & _ability) :
-    ability()
-{
-    if (_ability == "strength") ability = Strength;
-    else if (_ability == "agility") ability = Agility;
-    else if (_ability == "perception") ability = Perception;
-    else if (_ability == "constitution") ability = Constitution;
-    else if (_ability == "intelligence") ability = Intelligence;
-    else ability = None;
-}
-
-bool Ability::isValid(const unsigned int & _ability)
-{
-    return (_ability >= 1) && (_ability <= 5);
-}
-
-bool Ability::isValid(const std::string & _ability)
-{
-    if (_ability == "strength") return true;
-    if (_ability == "agility") return true;
-    if (_ability == "perception") return true;
-    if (_ability == "constitution") return true;
-    return (_ability == "intelligence");
-}
-
-std::string Ability::toString(const bool & caps) const
-{
-    if (ability == Ability::Strength)
-        if (caps) return "Strength"; else return "strength";
-    else if (ability == Ability::Agility)
-        if (caps) return "Agility"; else return "agility";
-    else if (ability == Ability::Perception)
-        if (caps) return "Perception"; else return "perception";
-    else if (ability == Ability::Constitution)
-        if (caps) return "Constitution"; else return "constitution";
-    else if (ability == Ability::Intelligence)
-        if (caps) return "Intelligence"; else return "intelligence";
+    if (value == Ability::Strength) return "Strength";
+    else if (value == Ability::Agility) return "Agility";
+    else if (value == Ability::Perception) return "Perception";
+    else if (value == Ability::Constitution) return "Constitution";
+    else if (value == Ability::Intelligence) return "Intelligence";
     else return "none";
 }
 
-std::string Ability::getAbbreviation(const bool & caps) const
+std::string Ability::getAbbreviation() const
 {
-    if (ability == Ability::Strength)
-        if (caps) return "Str"; else return "str";
-    else if (ability == Ability::Agility)
-        if (caps) return "Agi"; else return "agi";
-    else if (ability == Ability::Perception)
-        if (caps) return "Per"; else return "per";
-    else if (ability == Ability::Constitution)
-        if (caps) return "Con"; else return "con";
-    else if (ability == Ability::Intelligence)
-        if (caps) return "Int"; else return "int";
+    if (value == Ability::Strength) return "Str";
+    else if (value == Ability::Agility) return "Agi";
+    else if (value == Ability::Perception) return "Per";
+    else if (value == Ability::Constitution) return "Con";
+    else if (value == Ability::Intelligence) return "Int";
     else return "Nil";
 }
 
 std::string Ability::getDescription() const
 {
-    if (ability == Ability::Strength)
+    if (value == Ability::Strength)
     {
         return std::string() +
                "Strength is important for increasing the" +
                " Carrying Weight and satisfying the minimum" +
                " Strength requirements for some weapons and armors.";
     }
-    if (ability == Ability::Agility)
+    if (value == Ability::Agility)
     {
         return std::string() +
                "Besides increasing mobility in combat, it increases" +
                " the recharge speed of all the weapons, as well as" +
                " the ability to use light armor.";
     }
-    if (ability == Ability::Perception)
+    if (value == Ability::Perception)
     {
         return std::string() +
                "The ability to see, hear, taste and notice unusual" +
                " things. A high Perception is important for a" +
                " sharpshooter.";
     }
-    if (ability == Ability::Constitution)
+    if (value == Ability::Constitution)
     {
         return std::string() +
                "Stamina and physical toughness. A character with" +
                " a high Endurance will survive where others may not.";
     }
-    if (ability == Ability::Intelligence)
+    if (value == Ability::Intelligence)
     {
         return std::string() +
-               "Knowledge, wisdom and the ability to think quickly," +
+               "Knowledge, wisdom and the value to think quickly," +
                " this attribute is important for any character.";
     }
     return "none";
 }
 
-unsigned int Ability::toUInt() const
+unsigned int Ability::getModifier(const unsigned int & _value)
 {
-    return static_cast<unsigned int>(ability);
-}
-
-unsigned int Ability::getModifier(const unsigned int & value)
-{
-    if (value <= 10)
+    if (_value <= 10)
     {
         return 0;
     }
-    return (value - 10) / 2;
-}
-
-bool Ability::operator==(const Ability & rhs) const
-{
-    return ability == rhs.ability;
-}
-
-bool Ability::operator==(const Ability::Enum & rhs) const
-{
-    return ability == rhs;
-}
-
-bool Ability::operator!=(const Ability::Enum & rhs) const
-{
-    return ability != rhs;
-}
-
-bool Ability::operator<(const Ability & rhs) const
-{
-    return ability < rhs.ability;
+    return (_value - 10) / 2;
 }

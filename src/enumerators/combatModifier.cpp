@@ -21,45 +21,6 @@
 
 #include "combatModifier.hpp"
 
-CombatModifier::CombatModifier() :
-    value(None)
-{
-    // Nothing to do.
-}
-
-CombatModifier::CombatModifier(const unsigned int & _value) :
-    value()
-{
-    if (_value == static_cast<unsigned int>(UnarmedHitRoll))
-        value = UnarmedHitRoll;
-    else if (_value == static_cast<unsigned int>(UnarmedDamage))
-        value = UnarmedDamage;
-    else if (_value == static_cast<unsigned int>(MeleeWeaponHitRoll))
-        value = MeleeWeaponHitRoll;
-    else if (_value == static_cast<unsigned int>(MeleeWeaponDamage))
-        value = MeleeWeaponDamage;
-    else if (_value == static_cast<unsigned int>(RangedWeaponHitRoll))
-        value = RangedWeaponHitRoll;
-    else if (_value == static_cast<unsigned int>(RangedWeaponDamage))
-        value = RangedWeaponDamage;
-    else if (_value == static_cast<unsigned int>(RangedAimSpeed))
-        value = RangedAimSpeed;
-    else if (_value == static_cast<unsigned int>(ArmorClass))
-        value = ArmorClass;
-    else value = None;
-}
-
-CombatModifier::CombatModifier(const Enum & _value) :
-    value(_value)
-{
-    // Nothing to do.
-}
-
-bool CombatModifier::isValid(const unsigned int & _value)
-{
-    return (_value >= 1) && (_value <= 7);
-}
-
 std::string CombatModifier::toString() const
 {
     if (value == CombatModifier::UnarmedHitRoll)
@@ -79,9 +40,4 @@ std::string CombatModifier::toString() const
     if (value == CombatModifier::ArmorClass)
         return "ArmorClass";
     else return "None";
-}
-
-unsigned int CombatModifier::toUInt() const
-{
-    return static_cast<unsigned int>(value);
 }
