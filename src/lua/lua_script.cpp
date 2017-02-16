@@ -446,13 +446,44 @@ void LoadLuaEnvironmet(lua_State * L, const std::string & scriptFile)
     // -------------------------------------------------------------------------
     // The Enumerators.
     // -------------------------------------------------------------------------
+    // BASE_ENUMERATOR
+    luabridge::getGlobalNamespace(L)
+        .beginClass<BaseEnumerator>("BaseEnumerator")
+        .addFunction("toUInt", &BaseEnumerator::toUInt)
+        .addFunction("toString", &BaseEnumerator::toString)
+        .endClass();
+    // -------------------------------------------------------------------------
+    // ABILITY
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<Ability, BaseEnumerator>("Ability")
+        .endClass()
+        .beginEnum<Ability>("Ability")
+        .addEnum("Strength", Ability::Strength)
+        .addEnum("Agility", Ability::Agility)
+        .addEnum("Perception", Ability::Perception)
+        .addEnum("Constitution", Ability::Constitution)
+        .addEnum("Intelligence", Ability::Intelligence)
+        .endEnum();
+    // -------------------------------------------------------------------------
+    // CHARACTER_POSTURE
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<CharacterPosture, BaseEnumerator>("CharacterPosture")
+        .endClass()
+        .beginEnum<CharacterPosture>("CharacterPosture")
+        .addEnum("None", CharacterPosture::None)
+        .addEnum("Stand", CharacterPosture::Stand)
+        .addEnum("Crouch", CharacterPosture::Crouch)
+        .addEnum("Sit", CharacterPosture::Sit)
+        .addEnum("Prone", CharacterPosture::Prone)
+        .addEnum("Rest", CharacterPosture::Rest)
+        .addEnum("Sleep", CharacterPosture::Sleep)
+        .endEnum();
+    // -------------------------------------------------------------------------
     // DIRECTION
     luabridge::getGlobalNamespace(L)
-        .beginClass<Direction>("Direction")
-        .addFunction("toUInt", &Direction::toUInt)
-        .addFunction("toString", &Direction::toString)
-        .endClass()
+        .deriveClass<Direction, BaseEnumerator>("Direction").endClass()
         .beginEnum<Direction>("Direction")
+        .addEnum("None", Direction::None)
         .addEnum("North", Direction::North)
         .addEnum("South", Direction::South)
         .addEnum("West", Direction::West)
@@ -461,12 +492,80 @@ void LoadLuaEnvironmet(lua_State * L, const std::string & scriptFile)
         .addEnum("Down", Direction::Down)
         .endEnum();
     // -------------------------------------------------------------------------
+    // ITEM_QUALITY
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<ItemQuality, BaseEnumerator>("ItemQuality")
+        .endClass()
+        .beginEnum<ItemQuality>("ItemQuality")
+        .addEnum("None", ItemQuality::None)
+        .addEnum("Disastrous", ItemQuality::Disastrous)
+        .addEnum("Poor", ItemQuality::Poor)
+        .addEnum("Normal", ItemQuality::Normal)
+        .addEnum("Fine", ItemQuality::Fine)
+        .addEnum("Masterful", ItemQuality::Masterful)
+        .endEnum();
+    // -------------------------------------------------------------------------
+    // KNOWLEDGE
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<Knowledge, BaseEnumerator>("Knowledge")
+        .endClass()
+        .beginEnum<Knowledge>("Knowledge")
+        .addEnum("None", Knowledge::None)
+        .addEnum("GatherHerbs", Knowledge::GatherHerbs)
+        .addEnum("GatherPlant", Knowledge::GatherPlant)
+        .addEnum("Butchery", Knowledge::Butchery)
+        .addEnum("SkinAnimal", Knowledge::SkinAnimal)
+        .addEnum("TanHide", Knowledge::TanHide)
+        .addEnum("ReadBook", Knowledge::ReadBook)
+        .addEnum("Climb", Knowledge::Climb)
+        .addEnum("Run", Knowledge::Run)
+        .addEnum("Dash", Knowledge::Dash)
+        .addEnum("Carpentry", Knowledge::Carpentry)
+        .addEnum("Woodcutting", Knowledge::Woodcutting)
+        .addEnum("Woodcarving", Knowledge::Woodcarving)
+        .addEnum("Mining", Knowledge::Mining)
+        .addEnum("Smelting", Knowledge::Smelting)
+        .addEnum("Blacksmithing", Knowledge::Blacksmithing)
+        .addEnum("MetalWeaponCrafting", Knowledge::MetalWeaponCrafting)
+        .addEnum("MetalArmorCrafting", Knowledge::MetalArmorCrafting)
+        .addEnum("CraftSurvivalTool", Knowledge::CraftSurvivalTool)
+        .addEnum("Scavenge", Knowledge::Scavenge)
+        .addEnum("BasicArmorProficiency", Knowledge::BasicArmorProficiency)
+        .endEnum();
+    // -------------------------------------------------------------------------
+    // LIQUID_TYPE
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<LiquidType, BaseEnumerator>("LiquidType").endClass()
+        .beginEnum<LiquidType>("LiquidType")
+        .addEnum("None", LiquidType::None)
+        .addEnum("Normal", LiquidType::Normal)
+        .addEnum("Alcohol", LiquidType::Alcohol)
+        .addEnum("Poison", LiquidType::Poison)
+        .addEnum("Blood", LiquidType::Blood)
+        .addEnum("Lava", LiquidType::Lava)
+        .endEnum();
+    // -------------------------------------------------------------------------
+    // MATERIAL_TYPE
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<MaterialType, BaseEnumerator>("MaterialType").endClass()
+        .beginEnum<MaterialType>("MaterialType")
+        .addEnum("None", MaterialType::None)
+        .addEnum("Metal", MaterialType::Metal)
+        .addEnum("Stone", MaterialType::Stone)
+        .addEnum("Wood", MaterialType::Wood)
+        .addEnum("Skin", MaterialType::Skin)
+        .addEnum("Cloth", MaterialType::Cloth)
+        .addEnum("Vegetable", MaterialType::Vegetable)
+        .addEnum("Meat", MaterialType::Meat)
+        .addEnum("Glass", MaterialType::Glass)
+        .addEnum("Paper", MaterialType::Paper)
+        .addEnum("Coal", MaterialType::Coal)
+        .addEnum("Bone", MaterialType::Bone)
+        .endEnum();
+    // -------------------------------------------------------------------------
     // MODEL_TYPE
     luabridge::getGlobalNamespace(L)
-        .beginClass<ModelType>("ModelType")
-        .addFunction("toUInt", &ModelType::toUInt)
-        .addFunction("toString", &ModelType::toString)
-        .endClass()
+        .deriveClass<ModelType, BaseEnumerator>("ModelType").endClass()
         .beginEnum<ModelType>("ModelType")
         .addEnum("None", ModelType::None)
         .addEnum("Corpse", ModelType::Corpse)
@@ -494,34 +593,9 @@ void LoadLuaEnvironmet(lua_State * L, const std::string & scriptFile)
         .addEnum("Magazine", ModelType::Magazine)
         .endEnum();
     // -------------------------------------------------------------------------
-    // TOOL_TYPE
-    luabridge::getGlobalNamespace(L)
-        .beginClass<ToolType>("ToolType")
-        .addFunction("toUInt", &ToolType::toUInt)
-        .addFunction("toString", &ToolType::toString)
-        .endClass()
-        .beginEnum<ToolType>("ToolType")
-        .addEnum("None", ToolType::None)
-        .addEnum("Pickaxe", ToolType::Pickaxe)
-        .addEnum("WoodcutterAxe", ToolType::WoodcutterAxe)
-        .addEnum("Saw", ToolType::Saw)
-        .addEnum("PrecisionChisel", ToolType::PrecisionChisel)
-        .addEnum("Hammer", ToolType::Hammer)
-        .addEnum("PlaneChisel", ToolType::PlaneChisel)
-        .addEnum("Forge", ToolType::Forge)
-        .addEnum("Anvil", ToolType::Anvil)
-        .addEnum("BlacksmithHammer", ToolType::BlacksmithHammer)
-        .addEnum("Bellows", ToolType::Bellows)
-        .addEnum("Crucible", ToolType::Crucible)
-        .addEnum("Firelighter", ToolType::Firelighter)
-        .endEnum();
-    // -------------------------------------------------------------------------
     // RESOURCE_TYPE
     luabridge::getGlobalNamespace(L)
-        .beginClass<ResourceType>("ResourceType")
-        .addFunction("toUInt", &ResourceType::toUInt)
-        .addFunction("toString", &ResourceType::toString)
-        .endClass()
+        .deriveClass<ResourceType, BaseEnumerator>("ResourceType").endClass()
         .beginEnum<ResourceType>("ResourceType")
         .addEnum("None", ResourceType::None)
         .addEnum("Coal", ResourceType::Coal)
@@ -543,35 +617,23 @@ void LoadLuaEnvironmet(lua_State * L, const std::string & scriptFile)
         .addEnum("Skull", ResourceType::Skull)
         .endEnum();
     // -------------------------------------------------------------------------
-    // LIQUID_TYPE
+    // TOOL_TYPE
     luabridge::getGlobalNamespace(L)
-        .beginClass<LiquidType>("LiquidType")
-        .addFunction("toUInt", &LiquidType::toUInt)
-        .addFunction("toString", &LiquidType::toString)
-        .endClass()
-        .beginEnum<LiquidType>("LiquidType")
-        .addEnum("None", LiquidType::None)
-        .addEnum("Normal", LiquidType::Normal)
-        .addEnum("Alcohol", LiquidType::Alcohol)
-        .addEnum("Poison", LiquidType::Poison)
-        .addEnum("Blood", LiquidType::Blood)
-        .addEnum("Lava", LiquidType::Lava)
-        .endEnum();
-    // -------------------------------------------------------------------------
-    // CHARACTER_POSTURE
-    luabridge::getGlobalNamespace(L)
-        .beginClass<CharacterPosture>("CharacterPosture")
-        .addFunction("toUInt", &CharacterPosture::toUInt)
-        .addFunction("toString", &CharacterPosture::toString)
-        .endClass()
-        .beginEnum<CharacterPosture>("CharacterPosture")
-        .addEnum("None", CharacterPosture::None)
-        .addEnum("Stand", CharacterPosture::Stand)
-        .addEnum("Crouch", CharacterPosture::Crouch)
-        .addEnum("Sit", CharacterPosture::Sit)
-        .addEnum("Prone", CharacterPosture::Prone)
-        .addEnum("Rest", CharacterPosture::Rest)
-        .addEnum("Sleep", CharacterPosture::Sleep)
+        .deriveClass<ToolType, BaseEnumerator>("ToolType").endClass()
+        .beginEnum<ToolType>("ToolType")
+        .addEnum("None", ToolType::None)
+        .addEnum("Pickaxe", ToolType::Pickaxe)
+        .addEnum("WoodcutterAxe", ToolType::WoodcutterAxe)
+        .addEnum("Saw", ToolType::Saw)
+        .addEnum("PrecisionChisel", ToolType::PrecisionChisel)
+        .addEnum("Hammer", ToolType::Hammer)
+        .addEnum("PlaneChisel", ToolType::PlaneChisel)
+        .addEnum("Forge", ToolType::Forge)
+        .addEnum("Anvil", ToolType::Anvil)
+        .addEnum("BlacksmithHammer", ToolType::BlacksmithHammer)
+        .addEnum("Bellows", ToolType::Bellows)
+        .addEnum("Crucible", ToolType::Crucible)
+        .addEnum("Firelighter", ToolType::Firelighter)
         .endEnum();
     // -------------------------------------------------------------------------
     // Load the script.
