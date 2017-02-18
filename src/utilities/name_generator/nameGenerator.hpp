@@ -1,7 +1,7 @@
 /// @file  nameGenerator.hpp
 /// @brief A fantasy name generator library.
 /// @version 1.0.1
-/// @license Public Domain
+/// @copyright Public Domain
 /// @author German M. Bravo (Kronuz)
 /// This library is designed after the RinkWorks Fantasy Name Generator.
 /// @see http://www.rinkworks.com/namegen/
@@ -78,219 +78,204 @@
 namespace namegen
 {
 
+/// @brief Used to generate random names given a pattern.
 class NameGenerator
 {
-    typedef enum wrappers
+public:
+    /// @brief Constructor.
+    NameGenerator();
+
+    /// @brief Constructor.
+    NameGenerator(const std::string & pattern, bool collapse_triples = true);
+
+    /// @brief Constructor.
+    NameGenerator(std::vector<std::unique_ptr<NameGenerator>> && _generators);
+
+    /// @brief Destructor.
+    virtual ~NameGenerator() = default;
+
+    /// @brief Returns the total number of combinations.
+    virtual size_t combinations();
+
+    /// @brief Returns the minimum length of the generated name.
+    virtual size_t min();
+
+    /// @brief Returns the maximum length of the generated name.
+    virtual size_t max();
+
+    /// @brief Prints the generated name.
+    virtual std::string toString();
+
+    /// @brief Adds a new generator to the list of generators.
+    void add(std::unique_ptr<NameGenerator> && g);
+
+protected:
+    /// The internal list of generators.
+    std::vector<std::unique_ptr<NameGenerator>> generators;
+
+    /// The type of the map of symbols.
+    using SymbolMap = std::unordered_map<std::string, const std::vector<std::string>>;
+
+    /// @brief Returns the symbol map.
+    static const SymbolMap & getSymbolMap();
+
+private:
+
+    /// Allows to manipulate an element.
+    using Manipulator = enum class Manipulators
     {
-        capitalizer,
-        reverser
-    } wrappers_t;
-
-    typedef enum group_types
-    {
-        symbol,
-        literal
-    } group_types_t;
-
-
-    class Group
-    {
-        std::stack<wrappers_t> wrappers;
-        std::vector<std::unique_ptr<NameGenerator>> set;
-
-    public:
-        group_types_t type;
-
-        Group(group_types_t type_);
-
-        std::unique_ptr<NameGenerator> emit();
-
-        void split();
-
-        void wrap(const wrappers_t & _type);
-
-        void add(std::unique_ptr<NameGenerator> && g);
-
-        virtual void add(char c);
+        None,       ///< No manipulation
+        Capitalize, ///< Capitalize the next element.
+        Reverse     ///< Reverse the next element.
     };
 
+    /// Determines the type of a group of letters.
+    using GroupType = enum class GroupTypes
+    {
+        None,       ///< No manipulation
+        Symbol,     ///< Capitalize the next element.
+        Literal     ///< Reverse the next element.
+    };
 
+    /// @brief Class used to group letters.
+    class Group
+    {
+    public:
+        /// @brief The type of the group.
+        GroupType groupType;
+
+        /// @brief Constructor.
+        Group(const GroupType & _groupType);
+
+        /// @brief Returns the content of the group.
+        std::unique_ptr<NameGenerator> emit();
+
+        /// @brief Split the group.
+        void split();
+
+        /// @brief Wrap the group with the given manipulator.
+        void wrap(const Manipulator & manipulator);
+
+        /// @brief Add a generator to the internal set.
+        void add(std::unique_ptr<NameGenerator> && g);
+
+        /// @brief Creates a new generator with a single Literal in it (i.e. c).
+        virtual void add(char c);
+
+    private:
+        /// @brief List of manipulators which need to be applied.
+        std::stack<Manipulator> manipulators;
+        /// @brief A vectors of generators.
+        std::vector<std::unique_ptr<NameGenerator>> set;
+    };
+
+    /// @brief A group of symbols.
     class GroupSymbol :
         public Group
     {
     public:
+        /// @brief Constructor.
         GroupSymbol();
 
+        /// @brief Retrieves the set of strings associated with the given
+        /// symbol and add all of them as Literals to the list of generators.
         void add(char c);
     };
 
-
+    /// @brief A group of literals.
     class GroupLiteral :
         public Group
     {
     public:
+        /// @brief Constructor.
         GroupLiteral();
     };
-
-protected:
-    std::vector<std::unique_ptr<NameGenerator>> generators;
-
-private:
-    using SymbolMap = std::unordered_map<std::string, const std::vector<std::string>>;
-
-public:
-    static const SymbolMap & GetSymbolMap();
-
-    NameGenerator();
-
-    NameGenerator(const std::string & pattern, bool collapse_triples = true);
-
-    NameGenerator(std::vector<std::unique_ptr<NameGenerator>> && generators_);
-
-    virtual ~NameGenerator() = default;
-
-    virtual size_t combinations();
-
-    virtual size_t min();
-
-    virtual size_t max();
-
-    virtual std::string toString();
-
-    void add(std::unique_ptr<NameGenerator> && g);
 };
 
-
+/// @brief Used to pick a generator randomly from the internal list of
+/// generator.
 class Random :
     public NameGenerator
 {
 public:
+    /// @brief Constructor.
     Random();
 
+    /// @brief Constructor which takes a list of generators.
     Random(std::vector<std::unique_ptr<NameGenerator>> && generators_);
 
-    size_t combinations();
+    size_t combinations() override;
 
-    size_t min();
+    size_t min() override;
 
-    size_t max();
+    size_t max() override;
 
-    std::string toString();
+    std::string toString() override;
 };
 
-
+/// @brief Class used to store a sequence of generators.
 class Sequence :
     public NameGenerator
 {
 public:
+    /// @brief Constructor.
     Sequence();
 
+    /// @brief Constructor which takes a list of generators.
     Sequence(std::vector<std::unique_ptr<NameGenerator>> && generators_);
 };
 
-
+/// @brief Class used to store a literal.
 class Literal :
     public NameGenerator
 {
+    /// The string containing the single literal.
     std::string value;
 
 public:
+    /// @brief Constructor which takes the string containing the literal.
     Literal(const std::string & value_);
 
-    size_t combinations();
+    size_t combinations() override;
 
-    size_t min();
+    size_t min() override;
 
-    size_t max();
+    size_t max() override;
 
-    std::string toString();
+    std::string toString() override;
 };
 
-
+/// @brief Class used to reverse a string.
 class Reverser :
     public NameGenerator
 {
 public:
+    /// @brief Constructor which takes a generator.
     Reverser(std::unique_ptr<NameGenerator> && g);
 
-    std::string toString();
+    std::string toString() override;
 };
 
-
+/// @brief Class used to capitalize a string.
 class Capitalizer :
     public NameGenerator
 {
 public:
+    /// @brief Constructor which takes a generator.
     Capitalizer(std::unique_ptr<NameGenerator> && g);
 
-    std::string toString();
+    std::string toString() override;
 };
 
-
+/// @brief Class used to collapse a string.
 class Collapser :
     public NameGenerator
 {
 public:
+    /// @brief Constructor which takes a generator.
     Collapser(std::unique_ptr<NameGenerator> && g);
 
-    std::string toString();
+    std::string toString() override;
 };
-
-// Middle Earth
-#define MIDDLE_EARTH "(bil|bal|ban|hil|ham|hal|hol|hob|wil|me|or|ol|od|gor|for|fos|tol|ar|fin|ere|leo|vi|bi|bren|thor)(|go|orbis|apol|adur|mos|ri|i|na|ole|n)(|tur|axia|and|bo|gil|bin|bras|las|mac|grim|wise|l|lo|fo|co|ra|via|da|ne|ta|y|wen|thiel|phin|dir|dor|tor|rod|on|rdo|dis)"
-
-// Japanese Names (Constrained)
-#define JAPANESE_NAMES_CONSTRAINED "(aka|aki|bashi|gawa|kawa|furu|fuku|fuji|hana|hara|haru|hashi|hira|hon|hoshi|ichi|iwa|kami|kawa|ki|kita|kuchi|kuro|marui|matsu|miya|mori|moto|mura|nabe|naka|nishi|no|da|ta|o|oo|oka|saka|saki|sawa|shita|shima|i|suzu|taka|take|to|toku|toyo|ue|wa|wara|wata|yama|yoshi|kei|ko|zawa|zen|sen|ao|gin|kin|ken|shiro|zaki|yuki|asa)(||||||||||bashi|gawa|kawa|furu|fuku|fuji|hana|hara|haru|hashi|hira|hon|hoshi|chi|wa|ka|kami|kawa|ki|kita|kuchi|kuro|marui|matsu|miya|mori|moto|mura|nabe|naka|nishi|no|da|ta|o|oo|oka|saka|saki|sawa|shita|shima|suzu|taka|take|to|toku|toyo|ue|wa|wara|wata|yama|yoshi|kei|ko|zawa|zen|sen|ao|gin|kin|ken|shiro|zaki|yuki|sa)"
-
-// Japanese Names (Diverse)
-#define JAPANESE_NAMES_DIVERSE "(a|i|u|e|o|||||)(ka|ki|ki|ku|ku|ke|ke|ko|ko|sa|sa|sa|shi|shi|shi|su|su|se|so|ta|ta|chi|chi|tsu|te|to|na|ni|ni|nu|nu|ne|no|no|ha|hi|fu|fu|he|ho|ma|ma|ma|mi|mi|mi|mu|mu|mu|mu|me|mo|mo|mo|ya|yu|yu|yu|yo|ra|ra|ra|ri|ru|ru|ru|re|ro|ro|ro|wa|wa|wa|wa|wo|wo)(ka|ki|ki|ku|ku|ke|ke|ko|ko|sa|sa|sa|shi|shi|shi|su|su|se|so|ta|ta|chi|chi|tsu|te|to|na|ni|ni|nu|nu|ne|no|no|ha|hi|fu|fu|he|ho|ma|ma|ma|mi|mi|mi|mu|mu|mu|mu|me|mo|mo|mo|ya|yu|yu|yu|yo|ra|ra|ra|ri|ru|ru|ru|re|ro|ro|ro|wa|wa|wa|wa|wo|wo)(|(ka|ki|ki|ku|ku|ke|ke|ko|ko|sa|sa|sa|shi|shi|shi|su|su|se|so|ta|ta|chi|chi|tsu|te|to|na|ni|ni|nu|nu|ne|no|no|ha|hi|fu|fu|he|ho|ma|ma|ma|mi|mi|mi|mu|mu|mu|mu|me|mo|mo|mo|ya|yu|yu|yu|yo|ra|ra|ra|ri|ru|ru|ru|re|ro|ro|ro|wa|wa|wa|wa|wo|wo)|(ka|ki|ki|ku|ku|ke|ke|ko|ko|sa|sa|sa|shi|shi|shi|su|su|se|so|ta|ta|chi|chi|tsu|te|to|na|ni|ni|nu|nu|ne|no|no|ha|hi|fu|fu|he|ho|ma|ma|ma|mi|mi|mi|mu|mu|mu|mu|me|mo|mo|mo|ya|yu|yu|yu|yo|ra|ra|ra|ri|ru|ru|ru|re|ro|ro|ro|wa|wa|wa|wa|wo|wo)(|(ka|ki|ki|ku|ku|ke|ke|ko|ko|sa|sa|sa|shi|shi|shi|su|su|se|so|ta|ta|chi|chi|tsu|te|to|na|ni|ni|nu|nu|ne|no|no|ha|hi|fu|fu|he|ho|ma|ma|ma|mi|mi|mi|mu|mu|mu|mu|me|mo|mo|mo|ya|yu|yu|yu|yo|ra|ra|ra|ri|ru|ru|ru|re|ro|ro|ro|wa|wa|wa|wa|wo|wo)))(|||n)"
-
-// Chinese Names
-#define CHINESE_NAMES "(zh|x|q|sh|h)(ao|ian|uo|ou|ia)(|(l|w|c|p|b|m)(ao|ian|uo|ou|ia)(|n)|-(l|w|c|p|b|m)(ao|ian|uo|ou|ia)(|(d|j|q|l)(a|ai|iu|ao|i)))"
-
-// Greek Names
-#define GREEK_NAMES "<s<v|V>(tia)|s<v|V>(os)|B<v|V>c(ios)|B<v|V><c|C>v(ios|os)>"
-
-// Hawaiian Names (1)
-#define HAWAIIAN_NAMES_1 "((h|k|l|m|n|p|w|')|)(a|e|i|o|u)((h|k|l|m|n|p|w|')|)(a|e|i|o|u)(((h|k|l|m|n|p|w|')|)(a|e|i|o|u)|)(((h|k|l|m|n|p|w|')|)(a|e|i|o|u)|)(((h|k|l|m|n|p|w|')|)(a|e|i|o|u)|)(((h|k|l|m|n|p|w|')|)(a|e|i|o|u)|)"
-
-// Hawaiian Names (2)
-#define HAWAIIAN_NAMES_2 "((h|k|l|m|n|p|w|)(a|e|i|o|u|a'|e'|i'|o'|u'|ae|ai|ao|au|oi|ou|eu|ei)(k|l|m|n|p|)|)(h|k|l|m|n|p|w|)(a|e|i|o|u|a'|e'|i'|o'|u'|ae|ai|ao|au|oi|ou|eu|ei)(k|l|m|n|p|)"
-
-// Old Latin Place Names
-#define OLD_LATIN_PLACE_NAMES "sv(nia|lia|cia|sia)"
-
-// Dragons (Pern)
-#define DRAGONS_PERN "<<s|ss>|<VC|vC|B|BVs|Vs>><v|V|v|<v(l|n|r)|vc>>(th)"
-
-// Dragon Riders
-#define DRAGON_RIDERS "c'<s|cvc>"
-
-// Pokemon
-#define POKEMON "<i|s>v(mon|chu|zard|rtle)"
-
-// Fantasy (Vowels, R, etc.)
-#define FANTASY_VOWELS_R "(|(<B>|s|h|ty|ph|r))(i|ae|ya|ae|eu|ia|i|eo|ai|a)(lo|la|sri|da|dai|the|sty|lae|due|li|lly|ri|na|ral|sur|rith)(|(su|nu|sti|llo|ria|))(|(n|ra|p|m|lis|cal|deu|dil|suir|phos|ru|dru|rin|raap|rgue))"
-
-// Fantasy (S, A, etc.)
-#define FANTASY_S_A "(cham|chan|jisk|lis|frich|isk|lass|mind|sond|sund|ass|chad|lirt|und|mar|lis|il|<BVC>)(jask|ast|ista|adar|irra|im|ossa|assa|osia|ilsa|<vCv>)(|(an|ya|la|sta|sda|sya|st|nya))"
-
-// Fantasy (H, L, etc.)
-#define FANTASY_H_L "(ch|ch't|sh|cal|val|ell|har|shar|shal|rel|laen|ral|jh't|alr|ch|ch't|av)(|(is|al|ow|ish|ul|el|ar|iel))(aren|aeish|aith|even|adur|ulash|alith|atar|aia|erin|aera|ael|ira|iel|ahur|ishul)"
-
-// Fantasy (N, L, etc.)
-#define FANTASY_N_L "(ethr|qil|mal|er|eal|far|fil|fir|ing|ind|il|lam|quel|quar|quan|qar|pal|mal|yar|um|ard|enn|ey)(|(<vc>|on|us|un|ar|as|en|ir|ur|at|ol|al|an))(uard|wen|arn|on|il|ie|on|iel|rion|rian|an|ista|rion|rian|cil|mol|yon)"
-
-// Fantasy (K, N, etc.)
-#define FANTASY_K_N "(taith|kach|chak|kank|kjar|rak|kan|kaj|tach|rskal|kjol|jok|jor|jad|kot|kon|knir|kror|kol|tul|rhaok|rhak|krol|jan|kag|ryr)(<vc>|in|or|an|ar|och|un|mar|yk|ja|arn|ir|ros|ror)(|(mund|ard|arn|karr|chim|kos|rir|arl|kni|var|an|in|ir|a|i|as))"
-
-// Fantasy (J, G, Z, etc.)
-#define FANTASY_J_G_Z "(aj|ch|etz|etzl|tz|kal|gahn|kab|aj|izl|ts|jaj|lan|kach|chaj|qaq|jol|ix|az|biq|nam)(|(<vc>|aw|al|yes|il|ay|en|tom||oj|im|ol|aj|an|as))(aj|am|al|aqa|ende|elja|ich|ak|ix|in|ak|al|il|ek|ij|os|al|im)"
-
-// Fantasy (K, J, Y, etc.)
-#define FANTASY_K_J_Y "(yi|shu|a|be|na|chi|cha|cho|ksa|yi|shu)(th|dd|jj|sh|rr|mk|n|rk|y|jj|th)(us|ash|eni|akra|nai|ral|ect|are|el|urru|aja|al|uz|ict|arja|ichi|ural|iru|aki|esh)"
-
-// Fantasy (S, E, etc.)
-#define FANTASY_S_E "(syth|sith|srr|sen|yth|ssen|then|fen|ssth|kel|syn|est|bess|inth|nen|tin|cor|sv|iss|ith|sen|slar|ssil|sthen|svis|s|ss|s|ss)(|(tys|eus|yn|of|es|en|ath|elth|al|ell|ka|ith|yrrl|is|isl|yr|ast|iy))(us|yn|en|ens|ra|rg|le|en|ith|ast|zon|in|yn|ys)"
 
 }

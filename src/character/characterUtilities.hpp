@@ -140,8 +140,9 @@ bool MoveCharacterTo(
     const std::string & msgChar = "");
 
 /// @brief Checks if the character has the required knowledge for the
-///         production.
-/// @param character Tha target character.
+///         given production.
+/// @param character    The target character.
+/// @param production   The production to check.
 /// @return <b>True</b> has the required knowledge,<br>
 ///         <b>False</b> otherwise.
 bool HasRequiredKnowledge(Character * character, Production * production);

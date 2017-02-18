@@ -28,6 +28,7 @@
 class TerrainFactory
 {
 public:
+    /// @brief Produces a terrain representing an empty tile.
     static std::shared_ptr<Terrain> getAir();
 
 };

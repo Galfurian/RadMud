@@ -158,6 +158,8 @@ private:
         return false;
     }
 
+    /// @brief Provides the list of neighbours of the given node wrapped by
+    /// an AStarNode.
     std::vector<std::shared_ptr<AStarNode<T>>> getAStarNeighbours(
         std::shared_ptr<AStarNode<T>> currentNode)
     {

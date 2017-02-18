@@ -514,12 +514,11 @@ public:
 
     /// @brief Sends a message to the character.
     /// @param msg   The message to send
-    /// @param first The first unpacked argument.
     /// @param args  Packed arguments.
     template<typename ... Args>
     void sendMsg(const std::string & msg, const Args & ... args)
     {
-        sendMsg(StringBuilder::build(msg, args ...));
+        this->sendMsg(StringBuilder::build(msg, args ...));
     }
 
 protected:

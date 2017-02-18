@@ -13,8 +13,14 @@ namespace namegen
 using std::make_unique;
 #else
 
-// make_unique is not available in c++11, so we use this template function
-// to maintain full c++11 compatibility; std::make_unique is part of C++14.
+/// @brief Creates an unique pointer.
+/// @details The make_unique functions is not available in c++11, so we use
+/// this template function to maintain full c++11 compatibility;
+/// std::make_unique is part of C++14.
+/// @tparam T       The type of the new instance.
+/// @tparam Args    The list of arguments of the function.
+/// @param args     Arguments with which an instance of T will be constructed.
+/// @return The std::unique_ptr of an instance of type T.
 template<typename T, typename... Args>
 std::unique_ptr<T> make_unique(Args && ... args)
 {
@@ -23,17 +29,99 @@ std::unique_ptr<T> make_unique(Args && ... args)
 
 #endif
 
+// -----------------------------------------------------------------------------
+// NAME GENERATOR
 
 NameGenerator::NameGenerator()
 {
+    // Nothing to do.
 }
 
+NameGenerator::NameGenerator(const std::string & pattern, bool collapse_triples)
+{
+    std::unique_ptr<NameGenerator> last;
 
-NameGenerator::NameGenerator(std::vector<std::unique_ptr<NameGenerator>> && generators_) :
-    generators(std::move(generators_))
+    std::stack<std::unique_ptr<Group>> stack;
+    std::unique_ptr<Group> top = make_unique<GroupSymbol>();
+
+    for (auto c : pattern)
+    {
+        switch (c)
+        {
+            case '<':
+                stack.push(std::move(top));
+                top = make_unique<GroupSymbol>();
+                break;
+            case '(':
+                stack.push(std::move(top));
+                top = make_unique<GroupLiteral>();
+                break;
+            case '>':
+            case ')':
+                if (stack.size() == 0)
+                {
+                    throw std::invalid_argument("Unbalanced brackets");
+                }
+                else if (c == '>' && top->groupType != GroupType::Symbol)
+                {
+                    throw std::invalid_argument("Unexpected '>' in pattern");
+                }
+                else if (c == ')' && top->groupType != GroupType::Literal)
+                {
+                    throw std::invalid_argument("Unexpected ')' in pattern");
+                }
+                last = top->emit();
+                top = std::move(stack.top());
+                stack.pop();
+                top->add(std::move(last));
+                break;
+            case '|':
+                top->split();
+                break;
+            case '!':
+                if (top->groupType == GroupType::Symbol)
+                {
+                    top->wrap(Manipulator::Capitalize);
+                }
+                else
+                {
+                    top->add(c);
+                }
+                break;
+            case '~':
+                if (top->groupType == GroupType::Symbol)
+                {
+                    top->wrap(Manipulator::Reverse);
+                }
+                else
+                {
+                    top->add(c);
+                }
+                break;
+            default:
+                top->add(c);
+                break;
+        }
+    }
+
+    if (stack.size() != 0)
+    {
+        throw std::invalid_argument("Missing closing bracket");
+    }
+
+    std::unique_ptr<NameGenerator> g = top->emit();
+    if (collapse_triples)
+    {
+        g = make_unique<Collapser>(std::move(g));
+    }
+    add(std::move(g));
+}
+
+NameGenerator::NameGenerator(
+    std::vector<std::unique_ptr<NameGenerator>> && _generators) :
+    generators(std::move(_generators))
 {
 }
-
 
 size_t NameGenerator::combinations()
 {
@@ -45,7 +133,6 @@ size_t NameGenerator::combinations()
     return total;
 }
 
-
 size_t NameGenerator::min()
 {
     size_t final = 0;
@@ -55,7 +142,6 @@ size_t NameGenerator::min()
     }
     return final;
 }
-
 
 size_t NameGenerator::max()
 {
@@ -67,7 +153,6 @@ size_t NameGenerator::max()
     return final;
 }
 
-
 std::string NameGenerator::toString()
 {
     std::string str;
@@ -78,20 +163,125 @@ std::string NameGenerator::toString()
     return str;
 }
 
-
 void NameGenerator::add(std::unique_ptr<NameGenerator> && g)
 {
-    generators.push_back(std::move(g));
+    generators.emplace_back(std::move(g));
 }
 
+// -----------------------------------------------------------------------------
+// GROUP
+
+NameGenerator::Group::Group(const GroupType & _groupType) :
+    groupType(_groupType)
+{
+    // Nothing to do.
+}
+
+std::unique_ptr<NameGenerator> NameGenerator::Group::emit()
+{
+    switch (set.size())
+    {
+        case 0:
+            return make_unique<Literal>("");
+        case 1:
+            return std::move(*set.begin());
+        default:
+            return make_unique<Random>(std::move(set));
+    }
+}
+
+void NameGenerator::Group::split()
+{
+    if (set.size() == 0)
+    {
+        set.push_back(make_unique<Sequence>());
+    }
+    set.push_back(make_unique<Sequence>());
+}
+
+void NameGenerator::Group::wrap(const Manipulator & manipulator)
+{
+    manipulators.push(manipulator);
+}
+
+void NameGenerator::Group::add(std::unique_ptr<NameGenerator> && g)
+{
+    while (!manipulators.empty())
+    {
+        if (manipulators.top() == Manipulator::Reverse)
+        {
+            g = make_unique<Reverser>(std::move(g));
+        }
+        else if (manipulators.top() == Manipulator::Capitalize)
+        {
+            g = make_unique<Capitalizer>(std::move(g));
+        }
+        manipulators.pop();
+    }
+    if (set.size() == 0)
+    {
+        set.push_back(make_unique<Sequence>());
+    }
+    set.back()->add(std::move(g));
+}
+
+void NameGenerator::Group::add(char c)
+{
+    std::unique_ptr<NameGenerator> g = make_unique<Random>();
+    g->add(make_unique<Literal>(std::string(1, c)));
+    Group::add(std::move(g));
+}
+
+// -----------------------------------------------------------------------------
+// GROUP SYMBOL
+
+NameGenerator::GroupSymbol::GroupSymbol() :
+    Group(GroupType::Symbol)
+{
+    // Nothing to do.
+}
+
+void NameGenerator::GroupSymbol::add(char c)
+{
+    // Transform the character into a string.
+    std::string value(1, c);
+    // Create a new
+    auto g = make_unique<Random>();
+    try
+    {
+        static const auto & symbols = NameGenerator::getSymbolMap();
+        for (const auto & s : symbols.at(value))
+        {
+            g->add(make_unique<Literal>(s));
+        }
+    } catch (const std::out_of_range &)
+    {
+        g->add(make_unique<Literal>(value));
+    }
+    Group::add(std::move(g));
+}
+
+// -----------------------------------------------------------------------------
+// GROUP LITERAL
+
+NameGenerator::GroupLiteral::GroupLiteral() :
+    Group(GroupType::Literal)
+{
+    // Nothing to do.
+}
+
+// -----------------------------------------------------------------------------
+// RANDOM
 
 Random::Random()
 {
+    // Nothing to do.
 }
 
 Random::Random(std::vector<std::unique_ptr<NameGenerator>> && generators_) :
     NameGenerator(std::move(generators_))
 {
+    // Nothing to do.
 }
 
 size_t Random::combinations()
@@ -132,29 +322,36 @@ size_t Random::max()
     return final;
 }
 
-
 std::string Random::toString()
 {
     if (!generators.size())
     {
         return "";
     }
-    auto rnd = TRand<size_t>(0, generators.size() - 1);
-    return generators[rnd]->toString();
+    return generators[TRand<size_t>(0, generators.size() - 1)]->toString();
 }
+
+// -----------------------------------------------------------------------------
+// SEQUENCE
 
 Sequence::Sequence()
 {
+    // Nothing to do.
 }
 
 Sequence::Sequence(std::vector<std::unique_ptr<NameGenerator>> && generators_) :
     NameGenerator(std::move(generators_))
 {
+    // Nothing to do.
 }
+
+// -----------------------------------------------------------------------------
+// LITERAL
 
 Literal::Literal(const std::string & value_) :
     value(value_)
 {
+    // Nothing to do.
 }
 
 size_t Literal::combinations()
@@ -177,11 +374,13 @@ std::string Literal::toString()
     return value;
 }
 
+// -----------------------------------------------------------------------------
+// REVERSER
+
 Reverser::Reverser(std::unique_ptr<NameGenerator> && g)
 {
-    add(std::move(g));
+    this->add(std::move(g));
 }
-
 
 std::string Reverser::toString()
 {
@@ -190,9 +389,12 @@ std::string Reverser::toString()
     return str;
 }
 
+// -----------------------------------------------------------------------------
+// CAPITALIZER
+
 Capitalizer::Capitalizer(std::unique_ptr<NameGenerator> && g)
 {
-    add(std::move(g));
+    this->add(std::move(g));
 }
 
 std::string Capitalizer::toString()
@@ -202,28 +404,23 @@ std::string Capitalizer::toString()
     return str;
 }
 
+// -----------------------------------------------------------------------------
+// COLLAPSER
 
 Collapser::Collapser(std::unique_ptr<NameGenerator> && g)
 {
-    add(std::move(g));
+    this->add(std::move(g));
 }
 
 std::string Collapser::toString()
 {
-    auto str(NameGenerator::toString());
+    // Prepare a variable for the output string.
     std::string out;
-    int cnt = 0;
+    // Prepare a counter variable.
+    int counter = 0;
     wchar_t pch = L'\0';
-    for (auto ch : str)
+    for (auto ch : NameGenerator::toString())
     {
-        if (ch == pch)
-        {
-            cnt++;
-        }
-        else
-        {
-            cnt = 0;
-        }
         int mch;
         switch (ch)
         {
@@ -243,7 +440,9 @@ std::string Collapser::toString()
                 mch = 2;
                 break;
         }
-        if (cnt < mch)
+        if (ch == pch) ++counter;
+        else counter = 0;
+        if (counter < mch)
         {
             out.push_back(ch);
         }
@@ -252,179 +451,9 @@ std::string Collapser::toString()
     return out;
 }
 
-NameGenerator::NameGenerator(const std::string & pattern, bool collapse_triples)
-{
-    std::unique_ptr<NameGenerator> last;
-
-    std::stack<std::unique_ptr<Group>> stack;
-    std::unique_ptr<Group> top = make_unique<GroupSymbol>();
-
-    for (auto c : pattern)
-    {
-        switch (c)
-        {
-            case '<':
-                stack.push(std::move(top));
-                top = make_unique<GroupSymbol>();
-                break;
-            case '(':
-                stack.push(std::move(top));
-                top = make_unique<GroupLiteral>();
-                break;
-            case '>':
-            case ')':
-                if (stack.size() == 0)
-                {
-                    throw std::invalid_argument("Unbalanced brackets");
-                }
-                else if (c == '>' && top->type != group_types::symbol)
-                {
-                    throw std::invalid_argument("Unexpected '>' in pattern");
-                }
-                else if (c == ')' && top->type != group_types::literal)
-                {
-                    throw std::invalid_argument("Unexpected ')' in pattern");
-                }
-                last = top->emit();
-                top = std::move(stack.top());
-                stack.pop();
-                top->add(std::move(last));
-                break;
-            case '|':
-                top->split();
-                break;
-            case '!':
-                if (top->type == group_types::symbol)
-                {
-                    top->wrap(wrappers::capitalizer);
-                }
-                else
-                {
-                    top->add(c);
-                }
-                break;
-            case '~':
-                if (top->type == group_types::symbol)
-                {
-                    top->wrap(wrappers::reverser);
-                }
-                else
-                {
-                    top->add(c);
-                }
-                break;
-            default:
-                top->add(c);
-                break;
-        }
-    }
-
-    if (stack.size() != 0)
-    {
-        throw std::invalid_argument("Missing closing bracket");
-    }
-
-    std::unique_ptr<NameGenerator> g = top->emit();
-    if (collapse_triples)
-    {
-        g = make_unique<Collapser>(std::move(g));
-    }
-    add(std::move(g));
-}
-
-
-NameGenerator::Group::Group(group_types_t type_) :
-    type(type_)
-{
-}
-
-void NameGenerator::Group::add(std::unique_ptr<NameGenerator> && g)
-{
-    while (!wrappers.empty())
-    {
-        if (wrappers.top() == reverser)
-        {
-            g = make_unique<Reverser>(std::move(g));
-        }
-        else if (wrappers.top() == capitalizer)
-        {
-            g = make_unique<Capitalizer>(std::move(g));
-        }
-        wrappers.pop();
-    }
-    if (set.size() == 0)
-    {
-        set.push_back(make_unique<Sequence>());
-    }
-    set.back()->add(std::move(g));
-}
-
-void NameGenerator::Group::add(char c)
-{
-    std::string value(1, c);
-    std::unique_ptr<NameGenerator> g = make_unique<Random>();
-    g->add(make_unique<Literal>(value));
-    Group::add(std::move(g));
-}
-
-std::unique_ptr<NameGenerator> NameGenerator::Group::emit()
-{
-    switch (set.size())
-    {
-        case 0:
-            return make_unique<Literal>("");
-        case 1:
-            return std::move(*set.begin());
-        default:
-            return make_unique<Random>(std::move(set));
-    }
-}
-
-void NameGenerator::Group::split()
-{
-    if (set.size() == 0)
-    {
-        set.push_back(make_unique<Sequence>());
-    }
-    set.push_back(make_unique<Sequence>());
-}
-
-void NameGenerator::Group::wrap(const wrappers_t & _type)
-{
-    wrappers.push(_type);
-}
-
-NameGenerator::GroupSymbol::GroupSymbol() :
-    Group(group_types::symbol)
-{
-}
-
-void NameGenerator::GroupSymbol::add(char c)
-{
-    std::string value(1, c);
-    std::unique_ptr<NameGenerator> g = make_unique<Random>();
-    try
-    {
-        static const auto & symbols = GetSymbolMap();
-        for (const auto & s : symbols.at(value))
-        {
-            g->add(make_unique<Literal>(s));
-        }
-    } catch (const std::out_of_range &)
-    {
-        g->add(make_unique<Literal>(value));
-    }
-    Group::add(std::move(g));
-}
-
-NameGenerator::GroupLiteral::GroupLiteral() :
-    Group(group_types::literal)
-{
-}
-
 // https://isocpp.org/wiki/faq/ctors#static-init-order
 // Avoid the "static initialization order fiasco"
-const NameGenerator::SymbolMap & NameGenerator::GetSymbolMap()
+const NameGenerator::SymbolMap & NameGenerator::getSymbolMap()
 {
     static auto * const symbols = new SymbolMap(
         {

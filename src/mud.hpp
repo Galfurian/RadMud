@@ -391,6 +391,7 @@ public:
     /// Find a body part.
     std::shared_ptr<BodyPart> findBodyPart(unsigned int vnum);
 
+    /// Find a height map.
     std::shared_ptr<HeightMap> findHeightMap(const unsigned int & vnum);
     ///@}
 

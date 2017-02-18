@@ -28,6 +28,8 @@
 class RoomFactory
 {
 public:
+    /// @brief Creates a room representing an empty area.
+    /// @return
     static Room * createRoomAir();
 
 };

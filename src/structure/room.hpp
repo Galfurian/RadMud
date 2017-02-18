@@ -233,7 +233,6 @@ public:
     /// @brief Sends a message to all the characters inside the room.
     /// @param message    The message to send.
     /// @param exceptions The list of exceptions.
-    /// @param first The first unpacked argument.
     /// @param args  Packed arguments.
     template<typename ... Args>
     void sendToAll(const std::string & message,
@@ -254,7 +253,6 @@ public:
     ///         which pass the checking function.
     /// @param message        The message to send.
     /// @param checkException The checking function.
-    /// @param first          The first value to unpack.
     /// @param args           The rest of the arguments.
     template<typename ... Args>
     void funcSendToAll(const std::string & message,

@@ -88,7 +88,6 @@ public:
     /// @brief Print to consol and to logging file the given string.
     /// @param level The category of the message.
     /// @param msg   The message to log.
-    /// @param first The first unpacked argument.
     /// @param args  Packed arguments.
     template<typename ... Args>
     static void log(const LogLevel & level,

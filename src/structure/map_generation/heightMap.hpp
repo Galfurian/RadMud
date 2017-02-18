@@ -51,5 +51,6 @@ public:
     /// the current thresholds.
     std::shared_ptr<Terrain> getTerrain(const int & height);
 
+    /// @brief Provides the offset associated with the given terrain.
     int getOffset(const std::shared_ptr<Terrain> & terrain) const;
 };

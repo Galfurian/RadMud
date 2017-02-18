@@ -24,6 +24,7 @@
 #include "mapCell.hpp"
 #include <vector>
 
+/// @brief Class which contains (wrap) an under-construction map.
 class MapWrapper
 {
 public:
@@ -135,10 +136,9 @@ public:
     }
 
     /// @brief Set the object at the given Coordinates2D.
-    /// @param x     Coordinate on x-axis.
-    /// @param y     Coordinate on y-axis.
-    /// @param z     Coordinate on z-axis.
-    /// @param value The value that has to be set.
+    /// @param x       Coordinate on x-axis.
+    /// @param y       Coordinate on y-axis.
+    /// @param mapCell The map cell which has to be set.
     inline void set(int x,
                     int y,
                     const MapCell & mapCell)

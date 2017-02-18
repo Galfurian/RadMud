@@ -1,4 +1,4 @@
-/// @file   effectList.hpp
+/// @file   effectManager.hpp
 /// @brief  Define a container for effects.
 /// @author Enrico Fraccaroli
 /// @date   Oct 22 2016

@@ -32,8 +32,7 @@ template<typename T>
 class PathFinder
 {
 protected:
-    /// Function used to check if there is a connection between the two
-    /// elements.
+    /// Checks if there is a connection between the two elements.
     std::function<bool(T e1, T e2)> checkConnection;
     /// Functions used to get the distance between the two elements.
     std::function<int(T e1, T e2)> getDistance;
@@ -43,6 +42,15 @@ protected:
     std::function<std::vector<T>(T e)> getNeighbours;
 
 public:
+    /// @brief Constructor.
+    /// @param _checkConnection Function used to check if there is a valid
+    ///                         connection between two elements.
+    /// @param _getDistance     Function which provides the distance between
+    ///                         two elements.
+    /// @param _areEqual        Function which checks if two elements are the
+    ///                         same.
+    /// @param _getNeighbours   Function which provides the list of
+    ///                         neighbours of an element.
     PathFinder(const std::function<bool(T e1, T e2)> & _checkConnection,
                const std::function<int(T e1, T e2)> & _getDistance,
                const std::function<bool(T e1, T e2)> & _areEqual,

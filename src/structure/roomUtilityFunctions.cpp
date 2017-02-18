@@ -69,60 +69,6 @@ bool RoomCheckConnection(Room * r1, Room * r2)
     return false;
 }
 
-bool RoomCharacterCanMove(Room * r1, Room * r2, Character * character)
-{
-    if ((r1 == nullptr) || (r2 == nullptr) || (character == nullptr))
-    {
-        return false;
-    }
-    if (!RoomCheckConnection(r1, r2))
-    {
-        return false;
-    }
-    // Get the direction from the first to the second room.
-    auto direction = Area::getDirection(r1->coord, r2->coord);
-    // Get the connection between the two.
-    auto connection = r1->findExit(direction);
-    if (connection == nullptr)
-    {
-        return false;
-    }
-    // If the direction is upstairs, check if there is a stair.
-    if (direction == Direction::Up)
-    {
-        if (!HasFlag(connection->flags, ExitFlag::Stairs))
-        {
-            return false;
-        }
-    }
-    // Check if the destination is correct.
-    if (connection->destination == nullptr)
-    {
-        return false;
-    }
-    // Check if the destination is bocked by a door.
-    auto door = connection->destination->findDoor();
-    if (door != nullptr)
-    {
-        if (HasFlag(door->flags, ItemFlag::Closed))
-        {
-            return false;
-        }
-    }
-    // Check if the destination has a floor.
-    auto destDown = connection->destination->findExit(Direction::Down);
-    if (destDown != nullptr)
-    {
-        if (!HasFlag(destDown->flags, ExitFlag::Stairs))
-        {
-            return false;
-        }
-    }
-    // Check if the destination is forbidden for mobiles.
-    return !(character->isMobile() &&
-             HasFlag(connection->flags, ExitFlag::NoMob));
-}
-
 int RoomGetDistance(Room * r1, Room * r2)
 {
     if ((r1 == nullptr) || (r2 == nullptr)) return INT_MAX;

@@ -73,7 +73,11 @@ public:
 
 private:
 
+    /// @brief Updates the path between the actor and the target.
+    /// @return If there is a valid path.
     bool updatePath();
 
+    /// @brief Advance on the next tile towards the target.
+    /// @return If the move has been performed.
     bool moveTowardsTarget();
 };

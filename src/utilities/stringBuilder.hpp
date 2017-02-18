@@ -28,6 +28,7 @@
 class StringBuilder
 {
 private:
+    /// @brief Constructor.
     StringBuilder()
     {
         // Nothing to do.
@@ -48,6 +49,7 @@ public:
     /// @param str   The string that has to be built.
     /// @param first The first unpacked argument.
     /// @param args  Packed arguments.
+    /// @return The customized string.
     template<typename ... Args>
     static std::string build(const std::string & str,
                              const std::string & first,

@@ -244,9 +244,10 @@ T Normalize(T v, T from_lb, T from_ub, T to_lb, T to_ub)
 /// @return <b>True</b> if the string it's a number, <b>False</b> otherwise.
 bool IsNumber(const std::string & source);
 
-/// @brief  Retrieve the content of a file.
-/// @param  filename The path and name of the file to read.
-/// @return The content of the file.
+/// @brief Retrieve the content of a file.
+/// @param filename The path and name of the file to read.
+/// @param contents Where the content will be put.
+/// @return If the content has been correctly retrieved.
 bool GetFileContents(const char * filename, std::string & contents);
 
 /// @brief It creates a compressed strem of data.

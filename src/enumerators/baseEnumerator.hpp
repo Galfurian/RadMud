@@ -90,4 +90,5 @@ public:
     }
 };
 
+/// @brief Operator which allows to print the base enumerator in a stream.
 std::ostream & operator<<(std::ostream & os, const BaseEnumerator & enumerator);

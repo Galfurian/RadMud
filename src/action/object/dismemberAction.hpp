@@ -55,6 +55,7 @@ public:
 
     /// @brief Given an action, it returns the necessary cooldown.
     /// @param character The actor.
+    /// @param _bodyPart The body part which has to be extracted.
     /// @return The non-decreasing value of the cooldown.
     static unsigned int getCooldown(Character * character,
                                     const std::shared_ptr<BodyPart> & _bodyPart);

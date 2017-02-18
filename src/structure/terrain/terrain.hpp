@@ -48,6 +48,18 @@ using TerrainGenerationFlag = enum class TerrainGenerationFlags
 /// @brief Holds information about a type of terrain.
 class Terrain
 {
+protected:
+    /// The list of liquids which can generate from this terrain.
+    struct LiquidSource
+    {
+        /// The liquid.
+        Liquid * liquid;
+        /// The nominal probability.
+        unsigned int assignedProbability;
+        /// The complexive probability.
+        unsigned int cumulativeProbability;
+    };
+
 public:
     /// The vnum.
     unsigned int vnum;
@@ -65,13 +77,7 @@ public:
     lua_State * L;
     /// The liquid which fills the terrain by default.
     Liquid * liquidContent;
-    /// The list of liquids which can generate from this terrain.
-    struct LiquidSource
-    {
-        Liquid * liquid;
-        unsigned int assignedProbability;
-        unsigned int cumulativeProbability;
-    };
+    /// A list of liquid sources.
     std::vector<LiquidSource> liquidSources;
 
     /// @brief Constructor.
