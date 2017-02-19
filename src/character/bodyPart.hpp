@@ -57,6 +57,8 @@ public:
         Material * material;
         /// The quantity.
         int quantity;
+        /// The difficulty (DC) associated with the resources.
+        int difficulty;
     };
 
     /// @brief A structure which holds information about the attack which can

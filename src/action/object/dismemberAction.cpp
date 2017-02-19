@@ -85,10 +85,22 @@ ActionStatus DismemberAction::perform()
         actor->sendMsg("You fail to dismember %s.", corpse->getName(true));
         return ActionStatus::Error;
     }
+    // Get the skill rank of the actor.
+    auto butchery = actor->effects.getKnowledge(Knowledge::Butchery);
     // Create the resources of the given body part.
     bool dismemberedSomthing = false;
     for (auto resources : bodyPart->resources)
     {
+        // Roll the DC and check if the action is a success. However, the
+        // actor can keep all the things he has dismembered til now.
+        auto DCRoll = TRand<int>(1, 20) + butchery;
+        Logger::log(LogLevel::Debug, "DC: %s vs %s", DCRoll,
+                    resources.difficulty);
+        if (DCRoll < resources.difficulty)
+        {
+            actor->sendMsg("You stop to dismember %s.", corpse->getName(true));
+            return ActionStatus::Error;
+        }
         auto item = resources.resource->createItem(
             actor->getName(),
             resources.material,

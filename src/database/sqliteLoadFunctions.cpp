@@ -1716,11 +1716,13 @@ bool LoadBodyPartResources(ResultSet * result)
                     "Can't find the material " + ToString(materialVnum));
             }
             auto quantity = result->getNextInteger();
+            auto difficulty = result->getNextInteger();
             BodyPart::BodyResource resource;
             resource.material = material;
             resource.resource = model->toResource();
             resource.quantity = quantity;
-            bodyPart->resources.emplace_back(resource);
+            resource.difficulty = difficulty;
+            bodyPart->resources.emplace_back(std::move(resource));
         }
         catch (SQLiteException & e)
         {
