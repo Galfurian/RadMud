@@ -125,12 +125,20 @@ bool CheckConnection(const MovementOptions & options,
         return false;
     }
     // -------------------------------------------------------------------------
-    // Check fi there is a connection between the two rooms.
+    // Check if there is a connection between the two rooms.
     if (!RoomCheckConnection(r1, r2))
     {
         error = "You cannot go that way.";
         return false;
     }
+    // -------------------------------------------------------------------------
+    // Check if there is water inside the destination room.
+    if (r2->liquid.first != nullptr)
+    {
+        error = "Do you want to swim maybe?";
+        return false;
+    }
+    // -------------------------------------------------------------------------
     // Get the direction from the first to the second room.
     auto direction = Area::getDirection(r1->coord, r2->coord);
     // Get the connection between the two.
@@ -144,6 +152,7 @@ bool CheckConnection(const MovementOptions & options,
             return false;
         }
     }
+    // -------------------------------------------------------------------------
     // Check if the destination has a floor.
     auto destDown = connection->destination->findExit(Direction::Down);
     if (destDown != nullptr)
@@ -154,6 +163,7 @@ bool CheckConnection(const MovementOptions & options,
             return false;
         }
     }
+    // -------------------------------------------------------------------------
     // Check if the destination is bocked by a door.
     auto door = connection->destination->findDoor();
     if (door != nullptr)

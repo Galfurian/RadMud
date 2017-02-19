@@ -238,13 +238,17 @@ bool MapGenerator::applyTerrain(const std::shared_ptr<MapWrapper> & map)
     {
         for (auto y = 0; y < map->getHeight(); ++y)
         {
+            // Get the cell.
             auto cell = map->getCell(x, y);
-            cell->terrain = heightMap->getTerrain(cell->coordinates.z);
-            if (cell->terrain == nullptr)
+            // Get the terrain associated with the cell height.
+            auto terrain = heightMap->getTerrain(cell->coordinates.z);
+            if (terrain == nullptr)
             {
                 Logger::log(LogLevel::Error, "Applying a terrain.");
                 return false;
             }
+            cell->terrain = terrain;
+            cell->liquid = terrain->liquidContent;
         }
     }
     return true;
@@ -330,10 +334,10 @@ bool MapGenerator::generateRivers(const std::shared_ptr<MapWrapper> & map)
             auto riverCell = (*it2);
             if (it2 == river.begin())
             {
-                riverCell->liquid = std::make_pair(liquid, 100);
+                riverCell->liquid = std::make_pair(liquid, 20);
                 continue;
             }
-            riverCell->liquid = std::make_pair(liquid, 100);
+            riverCell->liquid = std::make_pair(liquid, 5);
         }
     }
     return true;

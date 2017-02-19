@@ -89,6 +89,9 @@ bool LoadMobile(ResultSet * result);
 /// @brief Function used to retrieve information about all the rooms.
 bool LoadRoom(ResultSet * result);
 
+/// @brief Retrieves the liquids inside rooms.
+bool LoadRoomLiquid(ResultSet * result);
+
 /// @brief Function used to retrieve information about exits of rooms.
 bool LoadExit(ResultSet * result);
 

@@ -805,6 +805,41 @@ bool LoadRoom(ResultSet * result)
     return true;
 }
 
+bool LoadRoomLiquid(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto roomVnum = result->getNextInteger();
+            auto room = Mud::instance().findRoom(roomVnum);
+            if (room == nullptr)
+            {
+                throw SQLiteException(
+                    "Cannot find the room: " + ToString(roomVnum));
+            }
+            auto liquidVnum = result->getNextUnsignedInteger();
+            auto liquid = Mud::instance().findLiquid(liquidVnum);
+            if (liquid == nullptr)
+            {
+                throw SQLiteException(
+                    "Cannot find the liquid: " + ToString(liquidVnum));
+            }
+            auto quantity = result->getNextInteger();
+            if (quantity > 0)
+            {
+                room->liquid = std::make_pair(liquid, quantity);
+            }
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
 bool LoadExit(ResultSet * result)
 {
     while (result->next())
@@ -1575,7 +1610,8 @@ bool LoadTerrainLiquid(ResultSet * result)
                 throw SQLiteException(
                     "Can't find the liquid " + ToString(liquidVnum));
             }
-            terrain->liquidContent = liquid;
+            auto quantity = result->getNextInteger();
+            terrain->liquidContent = std::make_pair(liquid, quantity);
             Logger::log(LogLevel::Debug, "\t%s%s",
                         AlignString(terrain->name, StringAlign::Left, 25),
                         AlignString(liquid->name, StringAlign::Left, 25));

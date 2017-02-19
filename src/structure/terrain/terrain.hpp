@@ -76,7 +76,7 @@ public:
     /// The lua_State associated with this terrain.
     lua_State * L;
     /// The liquid which fills the terrain by default.
-    Liquid * liquidContent;
+    std::pair<Liquid *, unsigned int> liquidContent;
     /// A list of liquid sources.
     std::vector<LiquidSource> liquidSources;
 
