@@ -49,7 +49,8 @@ public:
         Trash,          ///< [14] Trash (Anything which has no specific use)
         Meat,           ///< [15] MEAT
         Bone,           ///< [16] BONE
-        Skull           ///< [17] SKULL
+        Skull,          ///< [17] SKULL
+        Nail            ///< [18] NAIL
     };
 
     /// @brief Constructor.

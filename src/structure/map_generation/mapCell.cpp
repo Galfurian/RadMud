@@ -28,7 +28,7 @@ MapCell::MapCell() :
     terrain(),
     neighbours(),
     flags(),
-    liquid()
+    liquidContent()
 {
     // Nothing to do.
 }
@@ -58,7 +58,7 @@ MapCell * MapCell::findLowestNearbyCell()
 
 std::string MapCell::getTile() const
 {
-    if (liquid.first != nullptr)
+    if (liquidContent.first != nullptr)
     {
         return "w";
     }

@@ -250,7 +250,7 @@ bool MoveAction::canMoveTo(Character * character,
         return false;
     }
     // Check if the destination is bocked by a door.
-    auto door = destExit->destination->findDoor();
+    auto door = FindDoor(destExit->destination);
     if (door != nullptr)
     {
         if (HasFlag(door->flags, ItemFlag::Closed))

@@ -30,7 +30,7 @@ class BuildAction :
 {
 private:
     /// The schematics associated with the action.
-    Building * schematics;
+    std::shared_ptr<Building> schematics;
     /// The item, target of the action.
     Item * building;
     /// The tool used by the actor for the action.
@@ -47,7 +47,7 @@ public:
     /// @param _ingredients The list of used ingredients.
     BuildAction(
         Character * _actor,
-        Building * _schematics,
+        const std::shared_ptr<Building> & _schematics,
         Item * _building,
         ItemVector & _tools,
         std::vector<std::pair<Item *, unsigned int>> & _ingredients);
@@ -74,6 +74,7 @@ public:
     /// @param character   The actor.
     /// @param _schematics The schematics used to performe the action.
     /// @return The non-decreasing value of the cooldown.
-    static unsigned int getCooldown(Character * character,
-                                    Building * _schematics);
+    static unsigned int getCooldown(
+        Character * character,
+        const std::shared_ptr<Building> & _schematics);
 };

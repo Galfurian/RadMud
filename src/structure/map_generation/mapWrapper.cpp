@@ -90,7 +90,7 @@ bool MapWrapper::buildMap(const std::string & mapName,
             cell->room->coord = cell->coordinates;
             cell->room->terrain = cell->terrain;
             cell->room->name = cell->terrain->name;
-            cell->room->liquid = cell->liquid;
+            cell->room->liquidContent = cell->liquidContent;
             cell->room->description = "";
             cell->room->flags = cell->flags;
             // Add the created room to the room_map.

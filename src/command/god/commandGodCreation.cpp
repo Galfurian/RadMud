@@ -108,7 +108,6 @@ bool DoBuildingInfo(Character * character, ArgumentHandler & args)
         msg += "    " + iterator.first.toString();
         msg += "(" + ToString(iterator.second) + ")\n";
     }
-    msg += "Unique      : " + ToString(building->unique) + "\n";
     character->sendMsg(msg);
     return true;
 }
@@ -121,16 +120,14 @@ bool DoBuildingList(Character * character, ArgumentHandler & /*args*/)
     table.addColumn("DIFFICULTY", StringAlign::Left);
     table.addColumn("TIME", StringAlign::Center);
     table.addColumn("UNIQUE", StringAlign::Center);
-    for (auto iterator : Mud::instance().mudBuildings)
+    for (auto it : Mud::instance().mudBuildings)
     {
-        auto building = &(iterator.second);
         // Prepare the row.
         TableRow row;
-        row.push_back(ToString(building->vnum));
-        row.push_back(building->name);
-        row.push_back(ToString(building->difficulty));
-        row.push_back(ToString(building->time));
-        row.push_back(ToString(building->unique));
+        row.push_back(ToString(it.second->vnum));
+        row.push_back(it.second->name);
+        row.push_back(ToString(it.second->difficulty));
+        row.push_back(ToString(it.second->time));
         // Add the row to the table.
         table.addRow(row);
     }

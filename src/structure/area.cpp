@@ -22,6 +22,7 @@
 
 #include "area.hpp"
 
+#include "roomUtilityFunctions.hpp"
 #include "logger.hpp"
 #include "room.hpp"
 
@@ -73,7 +74,7 @@ bool Area::isValid(const Coordinates & coordinates)
     auto room = this->getRoom(coordinates);
     if (room == nullptr) return false;
     // Check if there is a door.
-    auto door = room->findDoor();
+    auto door = FindDoor(room);
     if (door != nullptr)
     {
         // Check if the door is closed.
@@ -314,7 +315,7 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, const int & radius)
                 Room * room = this->getRoom(coordinates);
                 if (room != nullptr)
                 {
-                    Item * door = room->findDoor();
+                    Item * door = FindDoor(room);
                     if (!room->items.empty())
                     {
                         tileCode = room->items.back()->model->getTile();
@@ -429,7 +430,7 @@ std::string Area::drawASCIIFov(Room * centerRoom, const int & radius)
             auto up = room->findExit(Direction::Up);
             auto down = room->findExit(Direction::Down);
             // VI  - WALKABLE
-            if (room->liquid.first != nullptr)
+            if (room->liquidContent.first != nullptr)
             {
                 tile = 'w';
             }
@@ -442,7 +443,7 @@ std::string Area::drawASCIIFov(Room * centerRoom, const int & radius)
                 tile = room->terrain->symbol;
             }
             // V   - OPEN DOOR
-            auto door = room->findDoor();
+            auto door = FindDoor(room);
             if (door != nullptr)
             {
                 if (HasFlag(door->flags, ItemFlag::Closed))
@@ -608,20 +609,11 @@ bool Area::los(const Coordinates & source,
                const int & radius)
 {
     // Deal with the easiest case.
-    if (source == target)
-    {
-        return true;
-    }
+    if (source == target) return true;
     // Check if there is a room at the given coordinates.
-    if (this->getRoom(target) == nullptr)
-    {
-        return false;
-    }
+    if (this->getRoom(target) == nullptr) return false;
     // Ensure that the line will not extend too long.
-    if (Area::getDistance(source, target) > radius)
-    {
-        return false;
-    }
+    if (Area::getDistance(source, target) > radius) return false;
     // Evaluates the difference.
     double dx = target.x - source.x;
     double dy = target.y - source.y;

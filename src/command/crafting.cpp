@@ -171,6 +171,16 @@ bool DoBuild(Character * character, ArgumentHandler & args)
     }
     // Stop any action the character is executing.
     StopAction(character);
+    // -------------------------------------------------------------------------
+    // If the argument list is empty show what the character can build.
+    if (args.empty())
+    {
+        for (auto it : Mud::instance().mudBuildings)
+        {
+            auto building = it.second;
+        }
+        return true;
+    }
     if (args.size() != 1)
     {
         character->sendMsg("What do you want to build?\n");
@@ -219,59 +229,20 @@ bool DoBuild(Character * character, ArgumentHandler & args)
         character->sendMsg("You don't have enough material.\n");
         return false;
     }
-    // Search the model that has to be built.
-    auto it = std::find_if(character->inventory.begin(),
-                           character->inventory.end(),
-                           [&schematics](Item * item)
-                           {
-                               return (item->model->vnum ==
-                                       schematics->buildingModel->vnum);
-                           });
-    if (it == character->inventory.end())
+    // Keep the previous search options and search the building.
+    auto building = FindNearbyBuilding(character,
+                                       schematics->buildingModel,
+                                       searchOptions);
+    if (building == nullptr)
     {
-        it = std::find_if(character->room->items.begin(),
-                          character->room->items.end(),
-                          [&schematics](Item * item)
-                          {
-                              return (item->model->vnum ==
-                                      schematics->buildingModel->vnum);
-                          });
-        if (it == character->room->items.end())
-        {
-            // Otherwise notify the missing item.
-            character->sendMsg("You don't have the main building item.\n");
-            return false;
-        }
-    }
-    auto building = (*it);
-    // Check if there is already something built inside the room
-    //  with the Unique flag.
-    for (auto iterator : character->room->items)
-    {
-        if (HasFlag(iterator->flags, ItemFlag::Built))
-        {
-            if (schematics->unique)
-            {
-                // Otherwise notify the missing item.
-                character->sendMsg("There are already something built here.\n");
-                return false;
-            }
-            auto builtSchematics = Mud::instance().findBuilding(
-                iterator->model->vnum);
-            if (builtSchematics)
-            {
-                if (builtSchematics->unique)
-                {
-                    // Otherwise notify the missing item.
-                    character->sendMsg("You cannot build something here.\n");
-                    return false;
-                }
-            }
-        }
+        character->sendMsg("You don't have the required item.\n");
+        return false;
     }
     // Prepare the action.
-    auto buildAction = std::make_shared<BuildAction>(character, schematics,
-                                                     building, usedTools,
+    auto buildAction = std::make_shared<BuildAction>(character,
+                                                     schematics,
+                                                     building,
+                                                     usedTools,
                                                      usedIngredients);
     // Check the new action.
     std::string error;

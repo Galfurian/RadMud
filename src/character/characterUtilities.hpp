@@ -44,6 +44,8 @@ class Direction;
 
 class Production;
 
+class ItemModel;
+
 /// @brief Provides the list of active melee weapons (Left and Right hands).
 /// @param character The target character.
 /// @return Vector of melee weapons.
@@ -122,6 +124,17 @@ bool FindNearbyTools(
     Character * character,
     std::vector<ToolType> requiredTools,
     ItemVector & foundTools,
+    const SearchOptionsCharacter & searchOptions);
+
+/// @brief Search the required building.
+/// @param character        The target character.
+/// @param buildingModel    The building.
+/// @param searchOptions    The search options.
+/// @return <b>True</b> if the operation goes well,<br>
+///         <b>False</b> otherwise.
+Item * FindNearbyBuilding(
+    Character * character,
+    std::shared_ptr<ItemModel> buildingModel,
     const SearchOptionsCharacter & searchOptions);
 
 /// @brief Move the character to another room.

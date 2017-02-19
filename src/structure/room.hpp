@@ -73,7 +73,7 @@ public:
     /// Integer that describe the flags of the room.
     unsigned int flags;
     /// The liquid which fills the room.
-    std::pair<Liquid *, unsigned int> liquid;
+    std::pair<Liquid *, unsigned int> liquidContent;
 
     /// @brief Constructor.
     Room();
@@ -210,10 +210,6 @@ public:
     /// @param direction The direction to search.
     /// @return The desired exit.
     std::shared_ptr<Exit> findExit(Direction direction);
-
-    /// @brief Search for a built door inside the room.
-    /// @return The contained door if there is one.
-    Item * findDoor();
 
     /// @brief Check if the room is lit or not.
     bool isLit();

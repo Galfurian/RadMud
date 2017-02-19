@@ -40,7 +40,7 @@ Room::Room() :
     items(),
     characters(),
     flags(),
-    liquid()
+    liquidContent()
 {
     // Nothing to do.
 }
@@ -358,25 +358,6 @@ std::shared_ptr<Exit> Room::findExit(Direction direction)
         if ((*it)->direction == direction)
         {
             return *it;
-        }
-    }
-    return nullptr;
-}
-
-Item * Room::findDoor()
-{
-    for (auto iterator : items)
-    {
-        if (iterator->model->getType() == ModelType::Mechanism)
-        {
-            if (HasFlag(iterator->flags, ItemFlag::Built))
-            {
-                if (iterator->model->toMechanism()->mechanismType ==
-                    MechanismType::Door)
-                {
-                    return iterator;
-                }
-            }
         }
     }
     return nullptr;

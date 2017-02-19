@@ -41,5 +41,6 @@ std::string ResourceType::toString() const
     if (value == ResourceType::Meat) return "Meat";
     if (value == ResourceType::Bone) return "Bone";
     if (value == ResourceType::Skull) return "Skull";
+    if (value == ResourceType::Nail) return "Nail";
     return "None";
 }

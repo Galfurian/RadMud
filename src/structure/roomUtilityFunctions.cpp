@@ -20,6 +20,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "roomUtilityFunctions.hpp"
+#include "mechanismModel.hpp"
 #include "character.hpp"
 #include "area.hpp"
 #include "room.hpp"
@@ -133,7 +134,7 @@ bool CheckConnection(const MovementOptions & options,
     }
     // -------------------------------------------------------------------------
     // Check if there is water inside the destination room.
-    if (r2->liquid.first != nullptr)
+    if (r2->liquidContent.first != nullptr)
     {
         error = "Do you want to swim maybe?";
         return false;
@@ -165,7 +166,7 @@ bool CheckConnection(const MovementOptions & options,
     }
     // -------------------------------------------------------------------------
     // Check if the destination is bocked by a door.
-    auto door = connection->destination->findDoor();
+    auto door = FindDoor(connection->destination);
     if (door != nullptr)
     {
         if (HasFlag(door->flags, ItemFlag::Closed))
@@ -250,20 +251,40 @@ bool CheckConnection(const MovementOptions & options,
                      const Direction & direction,
                      std::string & error)
 {
-    if ((r1 == nullptr) || (direction == Direction::None))
-    {
-        return false;
-    }
+    // Check the room and the direction.
+    if ((r1 == nullptr) || (direction == Direction::None)) return false;
+    // Get the exit in the given direction.
     auto foundExit = r1->findExit(direction);
+    // Check if there is an exit.
     if (foundExit == nullptr)
     {
         error = "You cannot go that way.";
         return false;
     }
+    // Check if the destination is set.
     if (foundExit->destination == nullptr)
     {
         error = "You cannot go that way.";
         return false;
     }
     return CheckConnection(options, r1, foundExit->destination, error);
+}
+
+Item * FindDoor(Room * room)
+{
+    // Check the room.
+    if (room == nullptr) return nullptr;
+    // Search the door.
+    for (auto it : room->items)
+    {
+        // Check if the item is a mechanism.
+        if (it->model->getType() != ModelType::Mechanism) continue;
+        // Check if the item is built.
+        if (HasFlag(it->flags, ItemFlag::Built)) continue;
+        // Cast the model to mechanism.
+        auto mechanism = std::static_pointer_cast<MechanismModel>(it->model);
+        // Check if the mechanism is a door.
+        if (mechanism->mechanismType == MechanismType::Door) return it;
+    }
+    return nullptr;
 }

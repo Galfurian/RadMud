@@ -361,9 +361,9 @@ void Mud::addCommand(const std::shared_ptr<Command> & command)
     mudCommands.push_back(command);
 }
 
-bool Mud::addBuilding(Building & building)
+bool Mud::addBuilding(const std::shared_ptr<Building> & building)
 {
-    return mudBuildings.insert(std::make_pair(building.vnum, building)).second;
+    return mudBuildings.insert(std::make_pair(building->vnum, building)).second;
 }
 
 bool Mud::addTerrain(const std::shared_ptr<Terrain> & terrain)
@@ -529,19 +529,19 @@ Room * Mud::findTravelPoint(Room * room)
     return (it == mudTravelPoints.end()) ? nullptr : it->second;
 }
 
-Building * Mud::findBuilding(std::string name)
+std::shared_ptr<Building> Mud::findBuilding(std::string name)
 {
     for (auto & it : mudBuildings)
     {
-        if (ToLower(it.second.name) == ToLower(name)) return &(it.second);
+        if (ToLower(it.second->name) == ToLower(name)) return it.second;
     }
     return nullptr;
 }
 
-Building * Mud::findBuilding(int vnum)
+std::shared_ptr<Building> Mud::findBuilding(int vnum)
 {
     auto it = mudBuildings.find(vnum);
-    return (it == mudBuildings.end()) ? nullptr : &(it->second);
+    return (it == mudBuildings.end()) ? nullptr : it->second;
 }
 
 std::shared_ptr<Terrain> Mud::findTerrain(unsigned int vnum)

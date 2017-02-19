@@ -197,7 +197,7 @@ public:
     /// List of commands (eg. look, quit, north etc.).
     std::vector<std::shared_ptr<Command> > mudCommands;
     /// Map of buildings schematic.
-    std::map<int, Building> mudBuildings;
+    std::map<int, std::shared_ptr<Building>> mudBuildings;
     /// Map of buildings schematic.
     std::map<unsigned int, std::shared_ptr<Terrain>> mudTerrains;
     /// List of all the bodyparts.
@@ -299,7 +299,7 @@ public:
     void addCommand(const std::shared_ptr<Command> & command);
 
     /// Add a building to the mud.
-    bool addBuilding(Building & building);
+    bool addBuilding(const std::shared_ptr<Building> & building);
 
     /// Add a terrain to the mud.
     bool addTerrain(const std::shared_ptr<Terrain> & terrain);
@@ -380,10 +380,10 @@ public:
     Room * findTravelPoint(Room * room);
 
     /// Find a building given its name.
-    Building * findBuilding(std::string name);
+    std::shared_ptr<Building> findBuilding(std::string name);
 
     /// Find a building given the vnum of the model to build.
-    Building * findBuilding(int vnum);
+    std::shared_ptr<Building> findBuilding(int vnum);
 
     /// Find a terrain given its vnum.
     std::shared_ptr<Terrain> findTerrain(unsigned int vnum);

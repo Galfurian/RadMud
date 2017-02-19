@@ -41,7 +41,7 @@ public:
     /// The flags of the room.
     unsigned int flags;
     /// The liquid which will fill the room.
-    std::pair<Liquid *, unsigned int> liquid;
+    std::pair<Liquid *, unsigned int> liquidContent;
 
     /// @brief Constructor.
     MapCell();

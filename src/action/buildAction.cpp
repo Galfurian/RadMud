@@ -29,7 +29,7 @@
 #include "room.hpp"
 
 BuildAction::BuildAction(Character * _actor,
-                         Building * _schematics,
+                         const std::shared_ptr<Building> & _schematics,
                          Item * _building,
                          ItemVector & _tools,
                          std::vector<std::pair<Item *, unsigned int>> & _ingredients) :
@@ -102,7 +102,7 @@ bool BuildAction::check(std::string & error) const
         error = "You are too tired right now.";
         return false;
     }
-    // Add the ingredients to the list of items to destroy.
+    // Check if the actor has enough ingredients.
     for (auto it : schematics->ingredients)
     {
         auto required = it.second;
@@ -204,7 +204,17 @@ unsigned int BuildAction::getConsumedStamina(Character * character)
     return consumedStamina;
 }
 
-unsigned int BuildAction::getCooldown(Character *, Building * _schematics)
+unsigned int BuildAction::getCooldown(
+    Character * character,
+    const std::shared_ptr<Building> & _schematics)
 {
-    return _schematics->time;
+    double requiredTime = _schematics->time;
+    Logger::log(LogLevel::Debug, "Base time  :%s", requiredTime);
+    for (auto knowledge : _schematics->requiredKnowledge)
+    {
+        requiredTime -= (requiredTime *
+                         character->effects.getKnowledge(knowledge)) / 100;
+    }
+    Logger::log(LogLevel::Debug, "With skill :%s", requiredTime);
+    return static_cast<unsigned int>(requiredTime);
 }

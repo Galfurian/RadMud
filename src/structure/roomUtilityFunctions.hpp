@@ -24,6 +24,8 @@
 #include <vector>
 #include <string>
 
+class Item;
+
 class Room;
 
 class Character;
@@ -96,3 +98,7 @@ bool CheckConnection(const MovementOptions & options,
                      Room * r1,
                      const Direction & direction,
                      std::string & error);
+
+/// @brief Search for a built door inside the room.
+/// @return The contained door if there is one.
+Item * FindDoor(Room * room);

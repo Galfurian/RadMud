@@ -147,7 +147,7 @@ bool DoOpen(Character * character, ArgumentHandler & args)
             character->sendMsg("There is nothing in that direction.\n");
             return false;
         }
-        auto door = destination->findDoor();
+        auto door = FindDoor(destination);
         if (door == nullptr)
         {
             character->sendMsg("There is no door in that direction.\n");
@@ -302,7 +302,7 @@ bool DoClose(Character * character, ArgumentHandler & args)
             character->sendMsg("There is nothing in that direction.\n");
             return false;
         }
-        auto door = destination->findDoor();
+        auto door = FindDoor(destination);
         if (door == nullptr)
         {
             character->sendMsg("There is no door in that direction.\n");

@@ -89,8 +89,6 @@ SQLiteDbms::SQLiteDbms() :
         std::move(TableLoader("ProductionKnowledge",
                               LoadProductionKnowledge)));
     loaders.emplace_back(
-        std::move(TableLoader("Building", LoadBuilding)));
-    loaders.emplace_back(
         std::move(TableLoader("Shop", LoadShop)));
     loaders.emplace_back(
         std::move(TableLoader("Currency", LoadCurrency)));
@@ -134,6 +132,14 @@ SQLiteDbms::SQLiteDbms() :
                               LoadTerrainLiquidSources)));
     loaders.emplace_back(
         std::move(TableLoader("RoomLiquid", LoadRoomLiquid)));
+    loaders.emplace_back(
+        std::move(TableLoader("Building", LoadBuilding)));
+    loaders.emplace_back(
+        std::move(TableLoader("BuildingIngredient", LoadBuildingIngredient)));
+    loaders.emplace_back(
+        std::move(TableLoader("BuildingKnowledge", LoadBuildingKnowledge)));
+    loaders.emplace_back(
+        std::move(TableLoader("BuildingTool", LoadBuildingTool)));
 }
 
 SQLiteDbms::~SQLiteDbms()

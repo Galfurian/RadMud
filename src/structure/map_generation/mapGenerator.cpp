@@ -248,7 +248,7 @@ bool MapGenerator::applyTerrain(const std::shared_ptr<MapWrapper> & map)
                 return false;
             }
             cell->terrain = terrain;
-            cell->liquid = terrain->liquidContent;
+            cell->liquidContent = terrain->liquidContent;
         }
     }
     return true;
@@ -319,7 +319,7 @@ bool MapGenerator::generateRivers(const std::shared_ptr<MapWrapper> & map)
                 break;
             }
             // If a liquid is reached stop.
-            if (nextCell->liquid.first != nullptr)
+            if (nextCell->liquidContent.first != nullptr)
             {
                 break;
             }
@@ -334,10 +334,10 @@ bool MapGenerator::generateRivers(const std::shared_ptr<MapWrapper> & map)
             auto riverCell = (*it2);
             if (it2 == river.begin())
             {
-                riverCell->liquid = std::make_pair(liquid, 20);
+                riverCell->liquidContent = std::make_pair(liquid, 20);
                 continue;
             }
-            riverCell->liquid = std::make_pair(liquid, 5);
+            riverCell->liquidContent = std::make_pair(liquid, 5);
         }
     }
     return true;

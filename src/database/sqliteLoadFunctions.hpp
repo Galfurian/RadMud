@@ -147,6 +147,18 @@ bool LoadTravelPoint(ResultSet * result);
 /// @brief Function used to retrieve information about all the buildings.
 bool LoadBuilding(ResultSet * result);
 
+/// @brief Function used to retrieve information about the tools
+/// required by productions.
+bool LoadBuildingTool(ResultSet * result);
+
+/// @brief Function used to retrieve information about the ingredients
+/// required by productions.
+bool LoadBuildingIngredient(ResultSet * result);
+
+/// @brief Function used to retrieve information about the knowledge
+/// required by productions.
+bool LoadBuildingKnowledge(ResultSet * result);
+
 /// @brief Function used to load shops.
 bool LoadShop(ResultSet * result);
 

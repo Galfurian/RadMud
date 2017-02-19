@@ -828,7 +828,7 @@ bool LoadRoomLiquid(ResultSet * result)
             auto quantity = result->getNextInteger();
             if (quantity > 0)
             {
-                room->liquid = std::make_pair(liquid, quantity);
+                room->liquidContent = std::make_pair(liquid, quantity);
             }
         }
         catch (SQLiteException & e)
@@ -1439,30 +1439,138 @@ bool LoadBuilding(ResultSet * result)
         try
         {
             // Create an empty Building.
-            Building building;
+            auto building = std::make_shared<Building>();
             // Initialize the Production.
-            building.vnum = result->getNextInteger();
-            building.name = result->getNextString();
-            building.difficulty = result->getNextUnsignedInteger();
-            building.time = result->getNextUnsignedInteger();
-            building.assisted = result->getNextInteger();
-            building.setTool(result->getNextString());
-            building.buildingModel = Mud::instance().findItemModel(
-                result->getNextInteger());
-            building.setIngredient(result->getNextString());
-            building.unique = static_cast<bool>(result->getNextInteger());
-            if (building.buildingModel == nullptr)
+            building->vnum = result->getNextInteger();
+            building->name = result->getNextString();
+            building->difficulty = result->getNextUnsignedInteger();
+            building->time = result->getNextUnsignedInteger();
+            building->assisted = static_cast<bool>(result->getNextInteger());
+            auto modelVnum = result->getNextInteger();
+            building->buildingModel = Mud::instance().findItemModel(modelVnum);
+            if (building->buildingModel == nullptr)
             {
-                throw SQLiteException("Can't find the building itemModel.");
-            }
-            if (!building.check())
-            {
-                throw SQLiteException("Error during error checking.");
+                throw SQLiteException(
+                    "Can't find the building model: " + ToString(modelVnum));
             }
             if (!Mud::instance().addBuilding(building))
             {
                 throw SQLiteException("Error during building insertion.");
             }
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s",
+                        AlignString(building->vnum, StringAlign::Left, 25),
+                        AlignString(building->name, StringAlign::Left, 35));
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadBuildingTool(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto buildingVnum = result->getNextInteger();
+            auto building = Mud::instance().findBuilding(buildingVnum);
+            if (building == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the building: " + ToString(buildingVnum));
+            }
+            auto toolId = result->getNextUnsignedInteger();
+            ToolType tool(toolId);
+            if (tool == ToolType::None)
+            {
+                throw SQLiteException(
+                    "Can't find the type of tool : " + ToString(toolId));
+            }
+            building->tools.emplace_back(tool);
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s",
+                        AlignString(building->name, StringAlign::Left, 25),
+                        AlignString(tool.toString(), StringAlign::Left, 35));
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadBuildingIngredient(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto buildingVnum = result->getNextInteger();
+            auto building = Mud::instance().findBuilding(buildingVnum);
+            if (building == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the building: " + ToString(buildingVnum));
+            }
+            auto ingredientId = result->getNextUnsignedInteger();
+            ResourceType ingredient(ingredientId);
+            if (ingredient == ResourceType::None)
+            {
+                throw SQLiteException(
+                    "Can't find the type of resource: " +
+                    ToString(ingredientId));
+            }
+            auto quantity = result->getNextUnsignedInteger();
+            building->ingredients.insert(std::make_pair(ingredient, quantity));
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s%s",
+                        AlignString(building->name, StringAlign::Left, 25),
+                        AlignString(ingredient.toString(),
+                                    StringAlign::Left, 35),
+                        AlignString(quantity, StringAlign::Left, 35));
+        }
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            return false;
+        }
+    }
+    return true;
+}
+
+bool LoadBuildingKnowledge(ResultSet * result)
+{
+    while (result->next())
+    {
+        try
+        {
+            auto buildingVnum = result->getNextInteger();
+            auto building = Mud::instance().findBuilding(buildingVnum);
+            if (building == nullptr)
+            {
+                throw SQLiteException(
+                    "Can't find the building: " + ToString(buildingVnum));
+            }
+            auto knowledgeId = result->getNextUnsignedInteger();
+            Knowledge knowledge(knowledgeId);
+            if (knowledge == Knowledge::None)
+            {
+                throw SQLiteException(
+                    "Can't find the knowledge: " + ToString(knowledgeId));
+            }
+            building->requiredKnowledge.emplace_back(knowledge);
+            Logger::log(LogLevel::Debug,
+                        "\t%s%s",
+                        AlignString(building->name, StringAlign::Left, 25),
+                        AlignString(knowledge.toString(),
+                                    StringAlign::Left, 35));
         }
         catch (SQLiteException & e)
         {

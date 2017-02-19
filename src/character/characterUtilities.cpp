@@ -281,7 +281,6 @@ Item * FindNearbyTool(
             if (IsValidTool(item)) return item;
         }
     }
-
     if (searchOptions.searchInInventory)
     {
         for (auto item : character->inventory)
@@ -309,6 +308,45 @@ bool FindNearbyTools(
         foundTools.emplace_back(tool);
     }
     return true;
+}
+
+Item * FindNearbyBuilding(
+    Character * character,
+    std::shared_ptr<ItemModel> buildingModel,
+    const SearchOptionsCharacter & searchOptions)
+{
+    // Create a function which checks if the given item is of the required type.
+    auto IsValidBuilding = [buildingModel](Item * item)
+    {
+        // Check the pointer to the model.
+        if (item->model == nullptr) return false;
+        return buildingModel->vnum == item->model->vnum;
+    };
+    if (searchOptions.searchInRoom)
+    {
+        for (auto item : character->room->items)
+        {
+            // Check if it is a valid item.
+            if (IsValidBuilding(item)) return item;
+        }
+    }
+    if (searchOptions.searchInEquipment)
+    {
+        for (auto item : character->equipment)
+        {
+            // Check if it is a valid item.
+            if (IsValidBuilding(item)) return item;
+        }
+    }
+    if (searchOptions.searchInInventory)
+    {
+        for (auto item : character->inventory)
+        {
+            // Check if it is a valid item.
+            if (IsValidBuilding(item)) return item;
+        }
+    }
+    return nullptr;
 }
 
 bool MoveCharacterTo(
