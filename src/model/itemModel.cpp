@@ -22,27 +22,7 @@
 
 #include "itemModel.hpp"
 
-#include "armorModel.hpp"
-#include "bookModel.hpp"
-#include "containerModel.hpp"
 #include "currencyModel.hpp"
-#include "foodModel.hpp"
-#include "furnitureModel.hpp"
-#include "keyModel.hpp"
-#include "lightModel.hpp"
-#include "liquidContainerModel.hpp"
-#include "mechanismModel.hpp"
-#include "projectileModel.hpp"
-#include "ropeModel.hpp"
-#include "seedModel.hpp"
-#include "shieldModel.hpp"
-#include "shopModel.hpp"
-#include "vehicleModel.hpp"
-#include "magazineModel.hpp"
-#include "meleeWeaponModel.hpp"
-#include "resourceModel.hpp"
-#include "toolModel.hpp"
-
 #include "itemFactory.hpp"
 #include "logger.hpp"
 #include "mud.hpp"
@@ -85,28 +65,28 @@ void ItemModel::getSheet(Table & sheet) const
     sheet.addColumn("Attribute", StringAlign::Left);
     sheet.addColumn("Value", StringAlign::Left);
     // Set the values.
-    sheet.addRow({"Vnum", ToString(this->vnum)});
-    sheet.addRow({"Name", this->name});
-    sheet.addRow({"Article", this->article});
-    sheet.addRow({"Short Description", this->shortdesc});
+    sheet.addRow({"Vnum", ToString(vnum)});
+    sheet.addRow({"Name", name});
+    sheet.addRow({"Article", article});
+    sheet.addRow({"Short Description", shortdesc});
     std::string keyGroup;
-    for (auto it : this->keys)
+    for (auto it : keys)
     {
         keyGroup += " " + it;
     }
     sheet.addRow({"Keys", keyGroup});
-    sheet.addRow({"Description", this->description});
+    sheet.addRow({"Description", description});
     sheet.addRow({"Type", this->getTypeName()});
     for (auto bodyPart : bodyParts)
     {
         sheet.addRow({"Body Part", bodyPart->name});
     }
-    sheet.addRow({"Flags", GetModelFlagString(this->modelFlags)});
-    sheet.addRow({"Condition", ToString(this->condition)});
-    sheet.addRow({"Material", this->material.toString()});
-    sheet.addRow({"Tile", ToString(this->condition)});
-    sheet.addRow({"Condition", ToString(this->tileSet) + ":" +
-                               ToString(this->tileId)});
+    sheet.addRow({"Flags", GetModelFlagString(modelFlags)});
+    sheet.addRow({"Condition", ToString(condition)});
+    sheet.addRow({"Material", material.toString()});
+    sheet.addRow({"Tile", ToString(condition)});
+    sheet.addRow({"Condition", ToString(tileSet) + ":" +
+                               ToString(tileId)});
 }
 
 Item * ItemModel::createItem(
@@ -121,7 +101,7 @@ Item * ItemModel::createItem(
         Logger::log(LogLevel::Error, "Received nullptr material.");
         return nullptr;
     }
-    if (composition->type != this->material)
+    if (composition->type != material)
     {
         Logger::log(LogLevel::Error, "Wrong type of material.");
         return nullptr;
@@ -155,7 +135,7 @@ Item * ItemModel::createItem(
     // Then set the rest.
     {
         // Evaluate the base value.
-        auto valBase = this->basePrice;
+        auto valBase = basePrice;
         // Evaluate the modifier due to item's quality.
         auto valQuality = static_cast<unsigned int>(valBase *
                                                     itemQuality.getModifier());
@@ -167,7 +147,7 @@ Item * ItemModel::createItem(
     }
     {
         // Evaluate the base value.
-        auto valBase = this->baseWeight;
+        auto valBase = baseWeight;
         // Evaluate the modifier due to item's quality.
         auto valQuality = valBase * (1.0 / itemQuality.getModifier());
         // Evaluate the modifier due to item's material.
@@ -177,7 +157,7 @@ Item * ItemModel::createItem(
     }
     {
         // Evaluate the base value.
-        auto valBase = this->condition;
+        auto valBase = condition;
         // Evaluate the modifier due to item's quality.
         auto valQuality = valBase * itemQuality.getModifier();
         // Evaluate the modifier due to item's material.
@@ -322,123 +302,6 @@ std::string ItemModel::getTile(int offset)
     }
     return "i";
 
-}
-
-std::shared_ptr<ArmorModel> ItemModel::toArmor()
-{
-    return std::static_pointer_cast<ArmorModel>(this->shared_from_this());
-}
-
-std::shared_ptr<BookModel> ItemModel::toBook()
-{
-    return std::static_pointer_cast<BookModel>(this->shared_from_this());
-}
-
-std::shared_ptr<ContainerModel> ItemModel::toContainer()
-{
-    return std::static_pointer_cast<ContainerModel>(this->shared_from_this());
-}
-
-std::shared_ptr<CorpseModel> ItemModel::toCorpse()
-{
-    return std::static_pointer_cast<CorpseModel>(this->shared_from_this());
-}
-
-std::shared_ptr<CurrencyModel> ItemModel::toCurrency()
-{
-    return std::static_pointer_cast<CurrencyModel>(this->shared_from_this());
-}
-
-std::shared_ptr<FoodModel> ItemModel::toFood()
-{
-    return std::static_pointer_cast<FoodModel>(this->shared_from_this());
-}
-
-std::shared_ptr<FurnitureModel> ItemModel::toFurniture()
-{
-    return std::static_pointer_cast<FurnitureModel>(this->shared_from_this());
-}
-
-std::shared_ptr<KeyModel> ItemModel::toKey()
-{
-    return std::static_pointer_cast<KeyModel>(this->shared_from_this());
-}
-
-std::shared_ptr<LightModel> ItemModel::toLight()
-{
-    return std::static_pointer_cast<LightModel>(this->shared_from_this());
-}
-
-std::shared_ptr<LiquidContainerModel> ItemModel::toLiquidContainer()
-{
-    return std::static_pointer_cast<LiquidContainerModel>(
-        this->shared_from_this());
-}
-
-std::shared_ptr<MechanismModel> ItemModel::toMechanism()
-{
-    return std::static_pointer_cast<MechanismModel>(this->shared_from_this());
-}
-
-std::shared_ptr<NodeModel> ItemModel::toNode()
-{
-    return std::static_pointer_cast<NodeModel>(this->shared_from_this());
-}
-
-std::shared_ptr<ProjectileModel> ItemModel::toProjectile()
-{
-    return std::static_pointer_cast<ProjectileModel>(this->shared_from_this());
-}
-
-std::shared_ptr<ResourceModel> ItemModel::toResource()
-{
-    return std::static_pointer_cast<ResourceModel>(this->shared_from_this());
-}
-
-std::shared_ptr<RopeModel> ItemModel::toRope()
-{
-    return std::static_pointer_cast<RopeModel>(this->shared_from_this());
-}
-
-std::shared_ptr<SeedModel> ItemModel::toSeed()
-{
-    return std::static_pointer_cast<SeedModel>(this->shared_from_this());
-}
-
-std::shared_ptr<ShieldModel> ItemModel::toShield()
-{
-    return std::static_pointer_cast<ShieldModel>(this->shared_from_this());
-}
-
-std::shared_ptr<ShopModel> ItemModel::toShop()
-{
-    return std::static_pointer_cast<ShopModel>(this->shared_from_this());
-}
-
-std::shared_ptr<ToolModel> ItemModel::toTool()
-{
-    return std::static_pointer_cast<ToolModel>(this->shared_from_this());
-}
-
-std::shared_ptr<VehicleModel> ItemModel::toVehicle()
-{
-    return std::static_pointer_cast<VehicleModel>(this->shared_from_this());
-}
-
-std::shared_ptr<MeleeWeaponModel> ItemModel::toMeleeWeapon()
-{
-    return std::static_pointer_cast<MeleeWeaponModel>(this->shared_from_this());
-}
-
-std::shared_ptr<RangedWeaponModel> ItemModel::toRangedWeapon()
-{
-    return std::static_pointer_cast<RangedWeaponModel>(
-        this->shared_from_this());
-}
-
-std::shared_ptr<MagazineModel> ItemModel::toMagazine()
-{
-    return std::static_pointer_cast<MagazineModel>(this->shared_from_this());
 }
 
 std::string GetModelFlagString(unsigned int flags)

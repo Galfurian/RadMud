@@ -55,8 +55,10 @@ bool ContainerItem::isEmpty() const
 
 double ContainerItem::getTotalSpace() const
 {
+    // Cast the model to container.
+    auto containerModel = std::static_pointer_cast<ContainerModel>(model);
     // The base space.
-    double spaceBase = model->toContainer()->maxWeight;
+    double spaceBase = containerModel->maxWeight;
     // Evaluate the result.
     return ((spaceBase + (spaceBase * quality.getModifier())) / 2);
 }

@@ -102,11 +102,11 @@ ActionStatus DismemberAction::perform()
             return ActionStatus::Error;
         }
         auto item = resources.resource->createItem(
-            actor->getName(),
-            resources.material,
-            false,
-            ItemQuality::Normal,
-            static_cast<unsigned int>(resources.quantity));
+                               actor->getName(),
+                               resources.material,
+                               false,
+                               ItemQuality::Normal,
+                               static_cast<unsigned int>(resources.quantity));
         if (item == nullptr)
         {
             actor->sendMsg("You fail to dismember %s.", corpse->getName(true));

@@ -168,8 +168,9 @@ bool FindNearbyResouces(
         if (item->model == nullptr) return false;
         // Check if the item is a resource.
         if (item->model->getType() != ModelType::Resource) return false;
-        // Cast the model to ResourceModel.
-        auto resourceModel = item->model->toResource();
+        // Cast the model to resources.
+        auto resourceModel =
+            std::static_pointer_cast<ResourceModel>(item->model);
         // Check if the type of resource is the same.
         return (resourceModel->resourceType == resourceType);
     };
@@ -253,8 +254,8 @@ Item * FindNearbyTool(
         if (item->model == nullptr) return false;
         // Check if the item is a resource.
         if (item->model->getType() != ModelType::Tool) return false;
-        // Cast the model to ResourceModel.
-        auto toolModel = item->model->toTool();
+        // Cast the model to tool.
+        auto toolModel = std::static_pointer_cast<ToolModel>(item->model);
         // Check if the type of resource is the same.
         if (toolModel->toolType != toolType) return false;
         // Check if the item is inside the exception list.

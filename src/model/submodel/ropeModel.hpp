@@ -46,3 +46,13 @@ public:
 
     void getSheet(Table & sheet) const override;
 };
+
+/// @brief Casts a pointer from ItemModel to RopeModel.
+inline std::shared_ptr<RopeModel> ModelToRope(
+    const std::shared_ptr<ItemModel> & itemModel)
+{
+    if (itemModel == nullptr) return nullptr;
+    if (itemModel->getType() != ModelType::Rope) return nullptr;
+    return std::static_pointer_cast<RopeModel>(itemModel);
+}
+

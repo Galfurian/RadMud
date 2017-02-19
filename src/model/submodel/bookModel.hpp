@@ -44,3 +44,12 @@ public:
 
     void getSheet(Table & sheet) const override;
 };
+
+/// @brief Casts a pointer from ItemModel to BookModel.
+inline std::shared_ptr<BookModel> ModelToBook(
+    const std::shared_ptr<ItemModel> & itemModel)
+{
+    if (itemModel == nullptr) return nullptr;
+    if (itemModel->getType() != ModelType::Book) return nullptr;
+    return std::static_pointer_cast<BookModel>(itemModel);
+}

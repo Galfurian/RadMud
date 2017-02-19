@@ -52,7 +52,9 @@ unsigned int CurrencyItem::getPrice(bool entireStack) const
                     this->getName());
         return customPrice;
     }
-    if (!model->toCurrency()->findPrice(this->composition->vnum, customPrice))
+    // Cast the model to currency.
+    auto currencyModel = std::static_pointer_cast<CurrencyModel>(model);
+    if (!currencyModel->findPrice(this->composition->vnum, customPrice))
     {
         Logger::log(
             LogLevel::Error,

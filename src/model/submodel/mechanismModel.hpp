@@ -65,6 +65,15 @@ public:
     void getSheet(Table & sheet) const override;
 };
 
+/// @brief Casts a pointer from ItemModel to MechanismModel.
+inline std::shared_ptr<MechanismModel> ModelToMechanism(
+    const std::shared_ptr<ItemModel> & itemModel)
+{
+    if (itemModel == nullptr) return nullptr;
+    if (itemModel->getType() != ModelType::Mechanism) return nullptr;
+    return std::static_pointer_cast<MechanismModel>(itemModel);
+}
+
 /// @addtogroup EnumToString
 /// @{
 

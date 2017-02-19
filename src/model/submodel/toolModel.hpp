@@ -46,10 +46,11 @@ public:
     void getSheet(Table & sheet) const override;
 };
 
-/// @addtogroup EnumToString
-/// @{
-
-/// Return the string describing the type of a Tool.
-std::string GetToolTypeName(ToolType type);
-
-///@}
+/// @brief Casts a pointer from ItemModel to ToolModel.
+inline std::shared_ptr<ToolModel> ModelToTool(
+    const std::shared_ptr<ItemModel> & itemModel)
+{
+    if (itemModel == nullptr) return nullptr;
+    if (itemModel->getType() != ModelType::Tool) return nullptr;
+    return std::static_pointer_cast<ToolModel>(itemModel);
+}

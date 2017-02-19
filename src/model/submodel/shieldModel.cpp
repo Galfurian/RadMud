@@ -77,15 +77,6 @@ void ShieldModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow({"Size", GetShieldSizeName(this->size)});
-    sheet.addRow({"Parry Change", ToString(this->parryChance)});
-}
-
-std::string GetShieldSizeName(ShieldSize shieldSize)
-{
-    if (shieldSize == ShieldSize::All) return "Universal Shield";
-    if (shieldSize == ShieldSize::Light) return "Light Shield";
-    if (shieldSize == ShieldSize::Medium) return "Medium Shield";
-    if (shieldSize == ShieldSize::Heavy) return "Heavy Shield";
-    return "No Armor Size";
+    sheet.addRow({"Size", ToString(static_cast<unsigned int>(size))});
+    sheet.addRow({"Parry Change", ToString(parryChance)});
 }

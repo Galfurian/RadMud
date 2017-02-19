@@ -27,11 +27,31 @@
 #include "armorItem.hpp"
 #include "corpseItem.hpp"
 #include "currencyItem.hpp"
-#include "toolModel.hpp"
 #include "shopItem.hpp"
 #include "logger.hpp"
 #include "aStar.hpp"
 #include "mud.hpp"
+// MODELS
+#include "toolModel.hpp"
+#include "armorModel.hpp"
+#include "bookModel.hpp"
+#include "containerModel.hpp"
+#include "foodModel.hpp"
+#include "furnitureModel.hpp"
+#include "keyModel.hpp"
+#include "lightModel.hpp"
+#include "liquidContainerModel.hpp"
+#include "mechanismModel.hpp"
+#include "projectileModel.hpp"
+#include "meleeWeaponModel.hpp"
+#include "shieldModel.hpp"
+#include "shopModel.hpp"
+#include "vehicleModel.hpp"
+#include "ropeModel.hpp"
+#include "seedModel.hpp"
+#include "currencyModel.hpp"
+#include "magazineModel.hpp"
+#include "resourceModel.hpp"
 
 void LuaLog(std::string message)
 {
@@ -299,7 +319,6 @@ void LoadLuaEnvironmet(lua_State * L, const std::string & scriptFile)
         .addData("vnum", &ItemModel::vnum)
         .addData("condition", &ItemModel::condition)
         .addFunction("getType", &ItemModel::getType)
-        .addFunction("toTool", &ItemModel::toTool)
         .endClass()
         .deriveWSPtrClass<ToolModel, ItemModel>("ToolModel")
         .addData("toolType", &ToolModel::toolType)
@@ -350,6 +369,32 @@ void LoadLuaEnvironmet(lua_State * L, const std::string & scriptFile)
         .endClass()
         .deriveWSPtrClass<VehicleModel, ItemModel>("VehicleModel")
         .endClass();
+    // -------------------------------------------------------------------------
+    // ITEM MODEL CAST FUNCTIONS
+    luabridge::getGlobalNamespace(L)
+        .addFunction("ModelToArmor", &ModelToArmor)
+        .addFunction("ModelToBook", &ModelToBook)
+        .addFunction("ModelToContainer", &ModelToContainer)
+        .addFunction("ModelToCorpse", &ModelToCorpse)
+        .addFunction("ModelToCurrency", &ModelToCurrency)
+        .addFunction("ModelToFood", &ModelToFood)
+        .addFunction("ModelToFurniture", &ModelToFurniture)
+        .addFunction("ModelToKey", &ModelToKey)
+        .addFunction("ModelToLight", &ModelToLight)
+        .addFunction("ModelToLiquidContainer", &ModelToLiquidContainer)
+        .addFunction("ModelToMagazine", &ModelToMagazine)
+        .addFunction("ModelToMechanism", &ModelToMechanism)
+        .addFunction("ModelToMeleeWeapon", &ModelToMeleeWeapon)
+        .addFunction("ModelToNode", &ModelToNode)
+        .addFunction("ModelToProjectile", &ModelToProjectile)
+        .addFunction("ModelToRangedWeapon", &ModelToRangedWeapon)
+        .addFunction("ModelToResource", &ModelToResource)
+        .addFunction("ModelToRope", &ModelToRope)
+        .addFunction("ModelToSeed", &ModelToSeed)
+        .addFunction("ModelToShield", &ModelToShield)
+        .addFunction("ModelToShop", &ModelToShop)
+        .addFunction("ModelToVehicle", &ModelToVehicle)
+        .addFunction("ModelToTool", &ModelToTool);
     // -------------------------------------------------------------------------
     // ITEM
     luabridge::getGlobalNamespace(L)

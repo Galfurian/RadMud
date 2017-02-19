@@ -125,7 +125,9 @@ bool CraftAction::check(std::string & error) const
             auto item = it2.first;
             if (item->getType() == ModelType::Resource)
             {
-                auto resourceModel = item->model->toResource();
+                // Cast the model to resources.
+                auto resourceModel =
+                    std::static_pointer_cast<ResourceModel>(item->model);
                 if (resourceModel->resourceType == it.first)
                 {
                     required -= item->quantity;

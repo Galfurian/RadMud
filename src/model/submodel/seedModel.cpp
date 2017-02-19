@@ -74,12 +74,5 @@ void SeedModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow({"Seed Type", GetSeedTypeName(this->seedType)});
-}
-
-std::string GetSeedTypeName(SeedType type)
-{
-    if (type == SeedType::Plant) return "Plant Seed";
-    if (type == SeedType::Tree) return "Tree Seed";
-    return "No Seed Type";
+    sheet.addRow({"Seed Type", ToString(static_cast<unsigned int>(seedType))});
 }

@@ -56,10 +56,11 @@ public:
     void getSheet(Table & sheet) const override;
 };
 
-/// @addtogroup EnumToString
-/// @{
-
-/// Return the string describing the size of a Shield.
-std::string GetShieldSizeName(ShieldSize shieldSize);
-
-///@}
+/// @brief Casts a pointer from ItemModel to ShieldModel.
+inline std::shared_ptr<ShieldModel> ModelToShield(
+    const std::shared_ptr<ItemModel> & itemModel)
+{
+    if (itemModel == nullptr) return nullptr;
+    if (itemModel->getType() != ModelType::Shield) return nullptr;
+    return std::static_pointer_cast<ShieldModel>(itemModel);
+}

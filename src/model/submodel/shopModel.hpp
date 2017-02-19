@@ -44,3 +44,12 @@ public:
 
     void getSheet(Table & sheet) const override;
 };
+
+/// @brief Casts a pointer from ItemModel to ShopModel.
+inline std::shared_ptr<ShopModel> ModelToShop(
+    const std::shared_ptr<ItemModel> & itemModel)
+{
+    if (itemModel == nullptr) return nullptr;
+    if (itemModel->getType() != ModelType::Shop) return nullptr;
+    return std::static_pointer_cast<ShopModel>(itemModel);
+}

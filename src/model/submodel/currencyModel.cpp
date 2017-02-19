@@ -107,11 +107,11 @@ Item * CurrencyModel::createItem(
     auto it = std::find(prices.begin(), prices.end(), composition->vnum);
     if (it != prices.end())
     {
-        return ItemModel::createItem(maker,
-                                     composition,
-                                     isForMobile,
-                                     itemQuality,
-                                     quantity);
+        return this->createItem(maker,
+                                composition,
+                                isForMobile,
+                                itemQuality,
+                                quantity);
     }
     else
     {
@@ -161,8 +161,11 @@ ItemVector CurrencyModel::generateCurrency(
         {
             continue;
         }
-        auto coin = this->createItem(maker, coinMaterial, false,
-                                     ItemQuality::Normal, coinQuantity);
+        auto coin = this->createItem(maker,
+                                     coinMaterial,
+                                     false,
+                                     ItemQuality::Normal,
+                                     coinQuantity);
         if (coin != nullptr)
         {
             coins.push_back(coin);

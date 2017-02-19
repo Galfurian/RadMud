@@ -109,3 +109,12 @@ private:
     /// @brief Sort the list of prices.
     void sortList();
 };
+
+/// @brief Casts a pointer from ItemModel to CurrencyModel.
+inline std::shared_ptr<CurrencyModel> ModelToCurrency(
+    const std::shared_ptr<ItemModel> & itemModel)
+{
+    if (itemModel == nullptr) return nullptr;
+    if (itemModel->getType() != ModelType::Currency) return nullptr;
+    return std::static_pointer_cast<CurrencyModel>(itemModel);
+}

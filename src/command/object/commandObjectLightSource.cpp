@@ -84,7 +84,7 @@ bool DoTurn(Character * character, ArgumentHandler & args)
     // Cast the item to light.
     auto lightItem = static_cast<LightItem *>(item);
     // Get the model.
-    auto lightModel = lightItem->model->toLight();
+    auto lightModel = std::static_pointer_cast<LightModel>(lightItem->model);
     // Check if the item can be simply turned on and off.
     if (HasFlag(lightModel->lightSourceFlags, LightModelFlags::NeedToKindle))
     {
@@ -185,7 +185,9 @@ bool DoKindle(Character * character, ArgumentHandler & args)
     // Check if the ignition source is a firelighter or an active light source.
     if (ignitionSource->getType() == ModelType::Tool)
     {
-        auto toolModel = ignitionSource->model->toTool();
+        // Cast the model to tool.
+        auto toolModel =
+            std::static_pointer_cast<ToolModel>(ignitionSource->model);
         if (toolModel->toolType == ToolType::Firelighter)
         {
             canUseToIgnite = true;
@@ -196,7 +198,8 @@ bool DoKindle(Character * character, ArgumentHandler & args)
         // Cast the ignition source to light.
         auto lightItem = static_cast<LightItem *>(ignitionSource);
         // Get the model of the ignition source.
-        auto lightModel = lightItem->model->toLight();
+        auto lightModel =
+            std::static_pointer_cast<LightModel>(lightItem->model);
         // Check if the ignition source is active AND is a light source which
         // is activated through manual kindling.
         if (lightItem->isActive() &&
@@ -216,7 +219,7 @@ bool DoKindle(Character * character, ArgumentHandler & args)
     // Cast the item to light.
     auto lightItem = static_cast<LightItem *>(lightSource);
     // Get the model.
-    auto lightModel = lightItem->model->toLight();
+    auto lightModel = std::static_pointer_cast<LightModel>(lightItem->model);
     // Check if the item can be simply turned on and off.
     if (!HasFlag(lightModel->lightSourceFlags, LightModelFlags::NeedToKindle)
         || HasFlag(lightModel->lightSourceFlags, LightModelFlags::AlwaysActive))

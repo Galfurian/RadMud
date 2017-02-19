@@ -22,7 +22,6 @@
 
 #include "room.hpp"
 
-#include "mechanismModel.hpp"
 #include "lightModel.hpp"
 #include "lightItem.hpp"
 #include "generator.hpp"
@@ -366,79 +365,61 @@ std::shared_ptr<Exit> Room::findExit(Direction direction)
 bool Room::isLit()
 {
 //    Stopwatch<std::chrono::microseconds> stopwatch("isList");
+    // -------------------------------------------------------------------------
+    // Check if the room has a natural light.
+    if (HasFlag(terrain->flags, TerrainFlag::NaturalLight)) return true;
+    // -------------------------------------------------------------------------
+    // Check if the terrain is an outdoor terrain and the sun is shining.
+    auto dayPhase = MudUpdater::instance().getDayPhase();
+    if (!HasFlag(terrain->flags, TerrainFlag::Indoor) &&
+        (dayPhase != DayPhase::Night))
+    {
+        return true;
+    }
+    // -------------------------------------------------------------------------
+    // Prepare a function which checks if there is a light inside the room.
     auto CheckRoomForLights = [this](Room * room)
     {
-        auto LightIsActiveAndInRange = [this, room](Item * item)
+        // Get the distance between the current room and the target room.
+        auto distance = Area::getDistance(coord, room->coord);
+        // Prepare a function which checks if the given item is an active
+        // light in range.
+        auto LightIsActiveAndInRange = [distance](Item * item)
         {
-            if (item != nullptr)
-            {
-                if (item->getType() == ModelType::Light)
-                {
-                    if (static_cast<LightItem *>(item)->isActive())
-                    {
-                        if (Area::getDistance(coord, room->coord) <=
-                            item->model->toLight()->radius)
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
+            // Check the item.
+            if (item == nullptr) return false;
+            // Check if the item is a light.
+            if (item->getType() != ModelType::Light) return false;
+            // Cast the item to light.
+            auto lightItem = static_cast<LightItem *>(item);
+            // Check if the light is active.
+            if (!lightItem->isActive()) return false;
+            // Cast the model to light.
+            auto lightModel = std::static_pointer_cast<LightModel>(item->model);
+            // Check if the light radius is enough.
+            return (distance <= lightModel->radius);
         };
         for (auto it : room->items)
         {
-            if (LightIsActiveAndInRange(it))
-            {
-                return true;
-            }
+            if (LightIsActiveAndInRange(it)) return true;
         }
         for (auto it: room->characters)
         {
             for (auto it2: it->equipment)
             {
-                if (LightIsActiveAndInRange(it2))
-                {
-                    return true;
-                }
+                if (LightIsActiveAndInRange(it2)) return true;
             }
         }
         return false;
     };
-    // If the room has a natural light.
-    if (HasFlag(terrain->flags, TerrainFlag::NaturalLight))
-    {
-        return true;
-    }
-    // Get the day phase.
-    auto dayPhase = MudUpdater::instance().getDayPhase();
-    if (!HasFlag(terrain->flags, TerrainFlag::Indoor) &&
-        (dayPhase != DayPhase::Night))
-    {
-//        Logger::log(LogLevel::Debug,
-//                    "Room is lit (outside)(!night)(%s us)",
-//                    stopwatch.stop());
-        return true;
-    }
-    // First check inside the current room.
+    // -------------------------------------------------------------------------
+    // Check all the nearby rooms with a radius of 10.
     auto validCoordinates = area->fov(coord, 10);
     for (auto coordinates : validCoordinates)
     {
         auto room = area->getRoom(coordinates);
-        if (room != nullptr)
-        {
-            if (CheckRoomForLights(room))
-            {
-//                Logger::log(LogLevel::Debug,
-//                            "Room is lit (LitByLight)     (%s us)",
-//                            stopwatch.stop());
-                return true;
-            }
-        }
+        if (room != nullptr) if (CheckRoomForLights(room)) return true;
     }
-//    Logger::log(LogLevel::Debug,
-//                "Room is not lit              (%s us)",
-//                stopwatch.stop());
     return false;
 }
 

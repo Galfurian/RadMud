@@ -52,11 +52,11 @@ public:
     void getSheet(Table & sheet) const override;
 };
 
-/// @addtogroup EnumToString
-/// @{
-
-/// Return the string describing the type of a Seed.
-std::string GetSeedTypeName(SeedType type);
-
-///@}
-
+/// @brief Casts a pointer from ItemModel to SeedModel.
+inline std::shared_ptr<SeedModel> ModelToSeed(
+    const std::shared_ptr<ItemModel> & itemModel)
+{
+    if (itemModel == nullptr) return nullptr;
+    if (itemModel->getType() != ModelType::Seed) return nullptr;
+    return std::static_pointer_cast<SeedModel>(itemModel);
+}

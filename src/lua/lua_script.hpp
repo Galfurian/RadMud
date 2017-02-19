@@ -35,6 +35,8 @@ class Room;
 
 class Direction;
 
+class ItemModel;
+
 namespace luabridge
 {
 class LuaRef;

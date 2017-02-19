@@ -230,8 +230,10 @@ bool ShopItem::isAContainer() const
 
 double ShopItem::getTotalSpace() const
 {
+    // Cast the model to shop.
+    auto shopModel = std::static_pointer_cast<ShopModel>(model);
     // The base space.
-    double spaceBase = model->toShop()->maxWeight;
+    double spaceBase = shopModel->maxWeight;
     // Evaluate the result.
     return ((spaceBase + (spaceBase * quality.getModifier())) / 2);
 }

@@ -81,9 +81,11 @@ std::string LiquidContainerItem::lookContent()
     }
     else
     {
+        // Cast the model to liquid container.
+        auto containerModel =
+            std::static_pointer_cast<LiquidContainerModel>(model);
         int percent = 0;
-        if (HasFlag(this->model->toLiquidContainer()->liquidFlags,
-                    LiqContainerFlag::Endless))
+        if (HasFlag(containerModel->liquidFlags, LiqContainerFlag::Endless))
         {
             percent = 100;
         }
@@ -117,8 +119,10 @@ bool LiquidContainerItem::isEmpty() const
 
 double LiquidContainerItem::getTotalSpace() const
 {
+    // Cast the model to liquid container.
+    auto containerModel = std::static_pointer_cast<LiquidContainerModel>(model);
     // The base space.
-    double spaceBase = model->toLiquidContainer()->maxWeight;
+    double spaceBase = containerModel->maxWeight;
     // Evaluate the result.
     return ((spaceBase + (spaceBase * quality.getModifier())) / 2);
 }
@@ -182,9 +186,10 @@ LiquidContainerItem::pourOut(const double & quantityToPourOut, bool updateDB)
     {
         return false;
     }
+    // Cast the model to liquid container.
+    auto containerModel = std::static_pointer_cast<LiquidContainerModel>(model);
     // If the item has an Endless provision of liquid, don't do any check.
-    if (HasFlag(model->toLiquidContainer()->liquidFlags,
-                LiqContainerFlag::Endless))
+    if (HasFlag(containerModel->liquidFlags, LiqContainerFlag::Endless))
     {
         return true;
     }

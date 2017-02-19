@@ -71,11 +71,13 @@ void LightItem::getSheet(Table & sheet) const
 
 std::string LightItem::lookContent()
 {
+    // Cast the model to light.
+    auto lightModel = std::static_pointer_cast<LightModel>(model);
     std::string output;
     auto autonomyInHour = this->getAutonomy() /
                           MudUpdater::instance().getHourTicSize();
     output += Formatter::italic();
-    if (model->toLight()->fuelType == ResourceType::None)
+    if (lightModel->fuelType == ResourceType::None)
     {
         if (!HasFlag(model->modelFlags, ModelFlag::Unbreakable))
         {
@@ -109,15 +111,19 @@ std::string LightItem::lookContent()
 
 double LightItem::getTotalSpace() const
 {
+    // Cast the model to light.
+    auto lightModel = std::static_pointer_cast<LightModel>(model);
     // The base space.
-    double spaceBase = model->toLight()->maxWeight;
+    double spaceBase = lightModel->maxWeight;
     // Evaluate the result.
     return ((spaceBase + (spaceBase * quality.getModifier())) / 2);
 }
 
 bool LightItem::isActive() const
 {
-    return active || HasFlag(model->toLight()->lightSourceFlags,
+    // Cast the model to light.
+    auto lightModel = std::static_pointer_cast<LightModel>(model);
+    return active || HasFlag(lightModel->lightSourceFlags,
                              LightModelFlags::AlwaysActive);
 }
 
@@ -140,12 +146,16 @@ bool LightItem::canRefillWith(Item * item, std::string & error) const
                 item->getName(true);
         return false;
     }
-    if (model->toLight()->fuelType == ResourceType::None)
+    // Cast the model to light.
+    auto lightModel = std::static_pointer_cast<LightModel>(model);
+    if (lightModel->fuelType == ResourceType::None)
     {
         error = this->getNameCapital(true) + " is not meant to be refilled.";
         return false;
     }
-    if (model->toLight()->fuelType != item->model->toResource()->resourceType)
+    // Cast the model to resource.
+    auto resourceModel = std::static_pointer_cast<ResourceModel>(item->model);
+    if (lightModel->fuelType != resourceModel->resourceType)
     {
         error = "You can't refill " + this->getName(true) + " with " +
                 item->getName(true);
@@ -163,8 +173,10 @@ bool LightItem::getAmountToRefill(Item * item, unsigned int & amount,
     }
     // Get the weight of the fuel.
     auto fuelWeight = item->getWeight(false);
+    // Cast the model to light.
+    auto lightModel = std::static_pointer_cast<LightModel>(model);
     // Set by default the amount to the maximum.
-    auto maxWeight = this->model->toLight()->maxWeight;
+    auto maxWeight = lightModel->maxWeight;
     // Evaluate the weight of the content.
     auto contentWeight = 0.0;
     for (auto it : content)
@@ -191,8 +203,10 @@ bool LightItem::getAmountToRefill(Item * item, unsigned int & amount,
 
 ItemVector LightItem::getAlreadyLoadedFuel() const
 {
+    // Cast the model to light.
+    auto lightModel = std::static_pointer_cast<LightModel>(model);
     ItemVector fuel;
-    if (model->toLight()->fuelType != ResourceType::None)
+    if (lightModel->fuelType != ResourceType::None)
     {
         for (auto it : content)
         {
@@ -204,8 +218,10 @@ ItemVector LightItem::getAlreadyLoadedFuel() const
 
 double LightItem::getAutonomy() const
 {
+    // Cast the model to light.
+    auto lightModel = std::static_pointer_cast<LightModel>(model);
     double autonomy = 0;
-    if (model->toLight()->fuelType == ResourceType::None)
+    if (lightModel->fuelType == ResourceType::None)
     {
         autonomy = (condition / this->getDecayRate());
     }
@@ -225,9 +241,11 @@ double LightItem::getAutonomy() const
 
 void LightItem::updateTicImpl()
 {
+    // Cast the model to light.
+    auto lightModel = std::static_pointer_cast<LightModel>(model);
     if (this->isActive())
     {
-        if (model->toLight()->fuelType == ResourceType::None)
+        if (lightModel->fuelType == ResourceType::None)
         {
             // Trigger the dacay.
             this->triggerDecay();

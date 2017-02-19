@@ -222,8 +222,10 @@ unsigned int BasicAttack::getConsumedStamina(Character * character,
     }
     else if (weapon->getType() == ModelType::RangedWeapon)
     {
-        if (weapon->model->toRangedWeapon()->rangedWeaponType !=
-            RangedWeaponType::Thrown)
+        // Cast the model to ranged weapon.
+        auto rangedWeaponModel =
+            std::static_pointer_cast<RangedWeaponModel>(weapon->model);
+        if (rangedWeaponModel->rangedWeaponType != RangedWeaponType::Thrown)
         {
             return 0;
         }

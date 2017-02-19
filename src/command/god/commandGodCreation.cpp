@@ -99,7 +99,7 @@ bool DoBuildingInfo(Character * character, ArgumentHandler & args)
     msg += "Tools       :\n";
     for (auto iterator : building->tools)
     {
-        msg += "                  " + GetToolTypeName(iterator) + "\n";
+        msg += "                  " + iterator.toString() + "\n";
     }
     msg += "Building    : " + building->buildingModel->name + "\n";
     msg += "Ingredients :\n";
@@ -207,7 +207,7 @@ bool DoProductionInfo(Character * character, ArgumentHandler & args)
     msg += "Tools       :\n";
     for (auto iterator : production->tools)
     {
-        msg += "                  " + GetToolTypeName(iterator) + "\n";
+        msg += "                  " + iterator.toString() + "\n";
     }
     msg += "Ingredients :\n";
     for (auto iterator : production->ingredients)
@@ -215,7 +215,7 @@ bool DoProductionInfo(Character * character, ArgumentHandler & args)
         msg += "    " + iterator.first.toString();
         msg += "(" + ToString(iterator.second) + ")\n";
     }
-    msg += "Workbench   :" + GetToolTypeName(production->workbench) + "\n";
+    msg += "Workbench   :" + production->workbench.toString() + "\n";
     character->sendMsg(msg);
     return true;
 }

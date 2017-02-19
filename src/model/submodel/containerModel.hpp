@@ -60,6 +60,15 @@ public:
     void getSheet(Table & sheet) const override;
 };
 
+/// @brief Casts a pointer from ItemModel to ContainerModel.
+inline std::shared_ptr<ContainerModel> ModelToContainer(
+    const std::shared_ptr<ItemModel> & itemModel)
+{
+    if (itemModel == nullptr) return nullptr;
+    if (itemModel->getType() != ModelType::Container) return nullptr;
+    return std::static_pointer_cast<ContainerModel>(itemModel);
+}
+
 /// @addtogroup FlagsToList
 /// @{
 
