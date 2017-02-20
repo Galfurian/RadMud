@@ -77,15 +77,13 @@ bool RangedWeaponItem::isAContainer() const
 unsigned int RangedWeaponItem::rollDamage() const
 {
     return TRand<unsigned int>(this->getMinDamage(),
-                               this->getMaxDamage());
+                                      this->getMaxDamage());
 }
 
 unsigned int RangedWeaponItem::getMinDamage() const
 {
-    // Cast the model to ranged weapon.
-    auto rangedWeaponModel = std::static_pointer_cast<RangedWeaponModel>(model);
     // Add the base value.
-    auto valBase = rangedWeaponModel->minDamage;
+    auto valBase = this->model->toRangedWeapon()->minDamage;
     // Evaluate the modifier due to item's quality.
     valBase = SafeSum(valBase, valBase * quality.getModifier());
     // Evaluate the modifier due to item's condition.
@@ -94,25 +92,19 @@ unsigned int RangedWeaponItem::getMinDamage() const
     valBase = (valBase / 3);
     // Add the bonus from the contained projectiles.
     std::string error;
-    // Get the loaded projectile.
     auto projectile = this->retrieveProjectile(error);
     if (projectile != nullptr)
     {
-        // Cast the model to projectile.
-        auto projectileModel =
-            std::static_pointer_cast<ProjectileModel>(projectile->model);
-        // Add the bonus due to the projectiles.
-        valBase = SafeSum(valBase, projectileModel->damageBonus);
+        valBase = SafeSum(valBase,
+                          projectile->model->toProjectile()->damageBonus);
     }
     return valBase;
 }
 
 unsigned int RangedWeaponItem::getMaxDamage() const
 {
-    // Cast the model to ranged weapon.
-    auto rangedWeaponModel = std::static_pointer_cast<RangedWeaponModel>(model);
     // Add the base value.
-    auto valBase = rangedWeaponModel->maxDamage;
+    auto valBase = this->model->toRangedWeapon()->maxDamage;
     // Evaluate the modifier due to item's quality.
     valBase = SafeSum(valBase, valBase * quality.getModifier());
     // Evaluate the modifier due to item's condition.
@@ -121,25 +113,19 @@ unsigned int RangedWeaponItem::getMaxDamage() const
     valBase = (valBase / 3);
     // Add the bonus from the contained projectiles.
     std::string error;
-    // Get the loaded projectile.
     auto projectile = this->retrieveProjectile(error);
     if (projectile != nullptr)
     {
-        // Cast the model to projectile.
-        auto projectileModel =
-            std::static_pointer_cast<ProjectileModel>(projectile->model);
-        // Add the bonus due to the projectiles.
-        valBase = SafeSum(valBase, projectileModel->damageBonus);
+        valBase = SafeSum(valBase,
+                          projectile->model->toProjectile()->damageBonus);
     }
     return valBase;
 }
 
 int RangedWeaponItem::getRange() const
 {
-    // Cast the model to ranged weapon.
-    auto rangedWeaponModel = std::static_pointer_cast<RangedWeaponModel>(model);
     // Add the base value.
-    auto valBase = rangedWeaponModel->range;
+    auto valBase = this->model->toRangedWeapon()->range;
     // Evaluate the modifier due to item's quality.
     valBase += static_cast<int>(valBase * quality.getModifier());
     // Evaluate the modifier due to item's condition.
@@ -148,15 +134,10 @@ int RangedWeaponItem::getRange() const
     valBase /= 3;
     // Add the bonus from the contained projectiles.
     std::string error;
-    // Get the loaded projectile.
     auto projectile = this->retrieveProjectile(error);
     if (projectile != nullptr)
     {
-        // Cast the model to projectile.
-        auto projectileModel =
-            std::static_pointer_cast<ProjectileModel>(projectile->model);
-        // Add the bonus due to the projectiles.
-        valBase = SafeSum(valBase, projectileModel->rangeBonus);
+        valBase += projectile->model->toProjectile()->rangeBonus;
     }
     return valBase;
 }
@@ -171,14 +152,8 @@ bool RangedWeaponItem::canBeReloadedWith(Item * magazine) const
     {
         return false;
     }
-    // Cast the model to magazine.
-    auto magazineModel =
-        std::static_pointer_cast<MagazineModel>(magazine->model);
-    // Cast the model to ranged weapon.
-    auto rangedWeaponModel =
-        std::static_pointer_cast<RangedWeaponModel>(model);
-    return (magazineModel->projectileType ==
-            rangedWeaponModel->rangedWeaponType);
+    return (magazine->model->toMagazine()->projectileType ==
+            model->toRangedWeapon()->rangedWeaponType);
 }
 
 

@@ -56,15 +56,6 @@ public:
     void getSheet(Table & sheet) const override;
 };
 
-/// @brief Casts a pointer from ItemModel to NodeModel.
-inline std::shared_ptr<NodeModel> ModelToNode(
-    const std::shared_ptr<ItemModel> & itemModel)
-{
-    if (itemModel == nullptr) return nullptr;
-    if (itemModel->getType() != ModelType::Node) return nullptr;
-    return std::static_pointer_cast<NodeModel>(itemModel);
-}
-
 /// @addtogroup EnumToString
 /// @{
 

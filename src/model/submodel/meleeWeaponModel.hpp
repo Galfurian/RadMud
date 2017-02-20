@@ -59,15 +59,6 @@ public:
     void getSheet(Table & sheet) const override;
 };
 
-/// @brief Casts a pointer from ItemModel to MeleeWeaponModel.
-inline std::shared_ptr<MeleeWeaponModel> ModelToMeleeWeapon(
-    const std::shared_ptr<ItemModel> & itemModel)
-{
-    if (itemModel == nullptr) return nullptr;
-    if (itemModel->getType() != ModelType::MeleeWeapon) return nullptr;
-    return std::static_pointer_cast<MeleeWeaponModel>(itemModel);
-}
-
 /// @addtogroup EnumToString
 /// @{
 

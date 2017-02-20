@@ -111,9 +111,7 @@ bool BuildAction::check(std::string & error) const
             auto item = it2.first;
             if (item->getType() == ModelType::Resource)
             {
-                // Cast the model to resources.
-                auto resourceModel =
-                    std::static_pointer_cast<ResourceModel>(item->model);
+                auto resourceModel = item->model->toResource();
                 if (resourceModel->resourceType == it.first)
                 {
                     required -= item->quantity;

@@ -59,12 +59,3 @@ public:
     /// @return The created corpse.
     Item * createCorpse(std::string maker, const double & weight);
 };
-
-/// @brief Casts a pointer from ItemModel to CorpseModel.
-inline std::shared_ptr<CorpseModel> ModelToCorpse(
-    const std::shared_ptr<ItemModel> & itemModel)
-{
-    if (itemModel == nullptr) return nullptr;
-    if (itemModel->getType() != ModelType::Corpse) return nullptr;
-    return std::static_pointer_cast<CorpseModel>(itemModel);
-}

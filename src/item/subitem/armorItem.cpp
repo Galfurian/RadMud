@@ -44,10 +44,8 @@ void ArmorItem::getSheet(Table & sheet) const
 
 unsigned int ArmorItem::getArmorClass() const
 {
-    // Cast the model to armor.
-    auto armorModel = std::static_pointer_cast<ArmorModel>(model);
     // Add the base armor class.
-    auto acBase = armorModel->armorClass;
+    auto acBase = this->model->toArmor()->armorClass;
     // Evaluate the modifier due to item's quality.
     auto acQuality = static_cast<unsigned int>(acBase * quality.getModifier());
     // Evaluate the modifier due to item's condition.

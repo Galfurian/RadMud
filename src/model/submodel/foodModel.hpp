@@ -55,15 +55,6 @@ public:
     void getSheet(Table & sheet) const override;
 };
 
-/// @brief Casts a pointer from ItemModel to FoodModel.
-inline std::shared_ptr<FoodModel> ModelToFood(
-    const std::shared_ptr<ItemModel> & itemModel)
-{
-    if (itemModel == nullptr) return nullptr;
-    if (itemModel->getType() != ModelType::Food) return nullptr;
-    return std::static_pointer_cast<FoodModel>(itemModel);
-}
-
 /// @addtogroup FlagsToList
 /// @{
 

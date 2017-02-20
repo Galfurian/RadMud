@@ -46,15 +46,13 @@ void MeleeWeaponItem::getSheet(Table & sheet) const
 unsigned int MeleeWeaponItem::rollDamage() const
 {
     return TRand<unsigned int>(this->getMinDamage(),
-                               this->getMaxDamage());
+                                      this->getMaxDamage());
 }
 
 unsigned int MeleeWeaponItem::getMinDamage() const
 {
-    // Cast the model to melee weapon.
-    auto meleeWeapon = std::static_pointer_cast<MeleeWeaponModel>(model);
     // Add the base value.
-    auto valBase = meleeWeapon->minDamage;
+    auto valBase = this->model->toMeleeWeapon()->minDamage;
     // Evaluate the modifier due to item's quality.
     auto valQuality = static_cast<unsigned int>(valBase *
                                                 quality.getModifier());
@@ -67,10 +65,8 @@ unsigned int MeleeWeaponItem::getMinDamage() const
 
 unsigned int MeleeWeaponItem::getMaxDamage() const
 {
-    // Cast the model to melee weapon.
-    auto meleeWeapon = std::static_pointer_cast<MeleeWeaponModel>(model);
     // Add the base value.
-    auto valBase = meleeWeapon->maxDamage;
+    auto valBase = this->model->toMeleeWeapon()->maxDamage;
     // Evaluate the modifier due to item's quality.
     auto valQuality = static_cast<unsigned int>(valBase *
                                                 quality.getModifier());

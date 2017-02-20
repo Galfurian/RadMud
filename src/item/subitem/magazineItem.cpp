@@ -116,10 +116,8 @@ bool MagazineItem::getAmountToLoad(Item * _projectile,
     {
         return false;
     }
-    // Cast the model to magazine.
-    auto magazineModel = std::static_pointer_cast<MagazineModel>(model);
     // Set by default the amount to load to the maximum.
-    amount = magazineModel->maxAmount;
+    amount = this->model->toMagazine()->maxAmount;
     unsigned int amountAlreadyLoaded = 0;
     // Retrieve any already loaded projectiles.
     auto loadedProjectile = this->getAlreadyLoadedProjectile();

@@ -31,107 +31,115 @@ SQLiteDbms::SQLiteDbms() :
     loaders()
 {
     loaders.emplace_back(
-        TableLoader("BadName", LoadBadName));
+        std::move(TableLoader("BadName", LoadBadName)));
     loaders.emplace_back(
-        TableLoader("BlockedIp", LoadBlockedIp));
+        std::move(TableLoader("BlockedIp", LoadBlockedIp)));
     loaders.emplace_back(
-        TableLoader("News", LoadNews));
+        std::move(TableLoader("News", LoadNews)));
     loaders.emplace_back(
-        TableLoader("Terrain", LoadTerrain));
+        std::move(TableLoader("Terrain", LoadTerrain)));
     loaders.emplace_back(
-        TableLoader("Material", LoadMaterial));
+        std::move(TableLoader("Material", LoadMaterial)));
     loaders.emplace_back(
-        TableLoader("Area", LoadArea));
+        std::move(TableLoader("Area", LoadArea)));
     loaders.emplace_back(
-        TableLoader("Room", LoadRoom));
+        std::move(TableLoader("Room", LoadRoom)));
     loaders.emplace_back(
-        TableLoader("Exit", LoadExit));
+        std::move(TableLoader("Exit", LoadExit)));
     loaders.emplace_back(
-        TableLoader("AreaList", LoadAreaList));
+        std::move(TableLoader("AreaList", LoadAreaList)));
     loaders.emplace_back(
-        TableLoader("TravelPoint", LoadTravelPoint));
+        std::move(TableLoader("TravelPoint", LoadTravelPoint)));
     loaders.emplace_back(
-        TableLoader("BodyPart", LoadBodyPart));
+        std::move(TableLoader("BodyPart", LoadBodyPart)));
     loaders.emplace_back(
-        TableLoader("Model", LoadModel));
+        std::move(TableLoader("Model", LoadModel)));
     loaders.emplace_back(
-        TableLoader("Faction", LoadFaction));
+        std::move(TableLoader("Faction", LoadFaction)));
     loaders.emplace_back(
-        TableLoader("Race", LoadRace));
+        std::move(TableLoader("Race", LoadRace)));
     loaders.emplace_back(
-        TableLoader("RaceBodyPart", LoadRaceBodyPart));
+        std::move(TableLoader("RaceBodyPart", LoadRaceBodyPart)));
     loaders.emplace_back(
-        TableLoader("RaceCorpse", LoadRaceCorpse));
+        std::move(TableLoader("RaceCorpse", LoadRaceCorpse)));
     loaders.emplace_back(
-        TableLoader("Liquid", LoadLiquid));
+        std::move(TableLoader("Liquid", LoadLiquid)));
     loaders.emplace_back(
-        TableLoader("Item", LoadItem));
+        std::move(TableLoader("Item", LoadItem)));
     loaders.emplace_back(
-        TableLoader("ItemContent", LoadContent));
+        std::move(TableLoader("ItemContent", LoadContent)));
     loaders.emplace_back(
-        TableLoader("ItemContentLiq", LoadContentLiq));
+        std::move(TableLoader("ItemContentLiq", LoadContentLiq)));
     loaders.emplace_back(
-        TableLoader("ItemRoom", LoadItemRoom));
+        std::move(TableLoader("ItemRoom", LoadItemRoom)));
     loaders.emplace_back(
-        TableLoader("Writings", LoadWriting));
+        std::move(TableLoader("Writings", LoadWriting)));
     loaders.emplace_back(
-        TableLoader("Profession", LoadProfession));
+        std::move(TableLoader("Profession", LoadProfession)));
     loaders.emplace_back(
-        TableLoader("Production", LoadProduction));
+        std::move(TableLoader("Production", LoadProduction)));
     loaders.emplace_back(
-        TableLoader("ProductionTool", LoadProductionTool));
+        std::move(TableLoader("ProductionTool", LoadProductionTool)));
     loaders.emplace_back(
-        TableLoader("ProductionOutcome", LoadProductionOutcome));
+        std::move(TableLoader("ProductionOutcome", LoadProductionOutcome)));
     loaders.emplace_back(
-        TableLoader("ProductionIngredient", LoadProductionIngredient));
+        std::move(TableLoader("ProductionIngredient",
+                              LoadProductionIngredient)));
     loaders.emplace_back(
-        TableLoader("ProductionKnowledge", LoadProductionKnowledge));
+        std::move(TableLoader("ProductionKnowledge",
+                              LoadProductionKnowledge)));
     loaders.emplace_back(
-        TableLoader("Shop", LoadShop));
+        std::move(TableLoader("Shop", LoadShop)));
     loaders.emplace_back(
-        TableLoader("Currency", LoadCurrency));
+        std::move(TableLoader("Currency", LoadCurrency)));
     loaders.emplace_back(
-        TableLoader("ModelBodyPart", LoadModelBodyPart));
+        std::move(TableLoader("ModelBodyPart", LoadModelBodyPart)));
     loaders.emplace_back(
-        TableLoader("Mobile", LoadMobile));
+        std::move(TableLoader("Mobile", LoadMobile)));
     loaders.emplace_back(
-        TableLoader("Skill", LoadSkill));
+        std::move(TableLoader("Skill", LoadSkill)));
     loaders.emplace_back(
-        TableLoader("SkillPrerequisite", LoadSkillPrerequisite));
+        std::move(TableLoader("SkillPrerequisite", LoadSkillPrerequisite)));
     loaders.emplace_back(
-        TableLoader("SkillAbilityModifier", LoadSkillAbilityModifier));
+        std::move(TableLoader("SkillAbilityModifier",
+                              LoadSkillAbilityModifier)));
     loaders.emplace_back(
-        TableLoader("SkillStatusModifier", LoadSkillStatusModifier));
+        std::move(TableLoader("SkillStatusModifier",
+                              LoadSkillStatusModifier)));
     loaders.emplace_back(
-        TableLoader("SkillCombatModifier", LoadSkillCombatModifier));
+        std::move(TableLoader("SkillCombatModifier",
+                              LoadSkillCombatModifier)));
     loaders.emplace_back(
-        TableLoader("SkillKnowledge", LoadSkillKnowledge));
+        std::move(TableLoader("SkillKnowledge",
+                              LoadSkillKnowledge)));
     loaders.emplace_back(
-        TableLoader("BodyPartResources", LoadBodyPartResources));
+        std::move(TableLoader("BodyPartResources", LoadBodyPartResources)));
     loaders.emplace_back(
-        TableLoader("BodyPartWeapon", LoadBodyPartWeapon));
+        std::move(TableLoader("BodyPartWeapon", LoadBodyPartWeapon)));
     loaders.emplace_back(
-        TableLoader("RaceBaseSkill", LoadRaceBaseSkill));
+        std::move(TableLoader("RaceBaseSkill", LoadRaceBaseSkill)));
     loaders.emplace_back(
-        TableLoader("RaceBaseAbility", LoadRaceBaseAbility));
+        std::move(TableLoader("RaceBaseAbility", LoadRaceBaseAbility)));
     loaders.emplace_back(
-        TableLoader("HeightMap", LoadHeightMap));
+        std::move(TableLoader("HeightMap", LoadHeightMap)));
     loaders.emplace_back(
-        TableLoader("HeightMapThreshold", LoadHeightMapThreshold));
+        std::move(TableLoader("HeightMapThreshold",
+                              LoadHeightMapThreshold)));
     loaders.emplace_back(
-        TableLoader("TerrainLiquid", LoadTerrainLiquid));
+        std::move(TableLoader("TerrainLiquid", LoadTerrainLiquid)));
     loaders.emplace_back(
-        TableLoader("TerrainLiquidSources", LoadTerrainLiquidSources));
+        std::move(TableLoader("TerrainLiquidSources",
+                              LoadTerrainLiquidSources)));
     loaders.emplace_back(
-        TableLoader("RoomLiquid", LoadRoomLiquid));
+        std::move(TableLoader("RoomLiquid", LoadRoomLiquid)));
     loaders.emplace_back(
-        TableLoader("Building", LoadBuilding));
+        std::move(TableLoader("Building", LoadBuilding)));
     loaders.emplace_back(
-        TableLoader("BuildingIngredient", LoadBuildingIngredient));
+        std::move(TableLoader("BuildingIngredient", LoadBuildingIngredient)));
     loaders.emplace_back(
-        TableLoader("BuildingKnowledge", LoadBuildingKnowledge));
+        std::move(TableLoader("BuildingKnowledge", LoadBuildingKnowledge)));
     loaders.emplace_back(
-        TableLoader("BuildingTool", LoadBuildingTool));
+        std::move(TableLoader("BuildingTool", LoadBuildingTool)));
 }
 
 SQLiteDbms::~SQLiteDbms()

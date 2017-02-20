@@ -188,8 +188,7 @@ IsAnAxe = function(item)
     -- Check the item is a tool.
     if (item:getType():toUInt() == ModelType.Tool) then
         print("Is a tool " .. item:getName())
-        local toolModel = ModelToTool(item.model)
-        return (toolModel.toolType:toUInt() == ToolType.WoodcutterAxe)
+        return (item.model:toTool().toolType:toUInt() == ToolType.WoodcutterAxe)
     end
     return false
 end
@@ -199,8 +198,7 @@ IsATree = function(item)
     -- Check the item is a tree.
     if (item:getType():toUInt() == ModelType.Resource) then
         print("Is a resource " .. item:getName())
-        local resourceModel = ModelToResource(item.model)
-        return (resourceModel.resourceType:toUInt() == ResourceType.Tree)
+        return (item.model:toResource().resourceType:toUInt() == ResourceType.Tree)
     end
     return false
 end

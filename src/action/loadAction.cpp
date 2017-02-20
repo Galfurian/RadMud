@@ -75,10 +75,8 @@ bool LoadAction::check(std::string & error) const
             error = "You cannot stack the item with the one inside.";
             return false;
         }
-        // Cast the model to magazine.
-        auto magazineModel =
-            std::static_pointer_cast<MagazineModel>(magazine->model);
-        if (magazineModel->maxAmount <= loadedProjectile->quantity)
+        if (magazine->model->toMagazine()->maxAmount <=
+            loadedProjectile->quantity)
         {
             error = "The item is already at full capacity.";
             return false;

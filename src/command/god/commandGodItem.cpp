@@ -63,11 +63,8 @@ bool DoItemCreate(Character * character, ArgumentHandler & args)
         }
     }
     // Create the item.
-    auto item = itemModel->createItem(character->getName(),
-                                      material,
-                                      false,
-                                      quality,
-                                      quantity);
+    auto item = itemModel->createItem(character->getName(), material, false,
+                                      quality, quantity);
     if (item == nullptr)
     {
         character->sendMsg("Creation failed.\n");

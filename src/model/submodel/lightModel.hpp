@@ -66,12 +66,3 @@ public:
 
     void getSheet(Table & sheet) const override;
 };
-
-/// @brief Casts a pointer from ItemModel to LightModel.
-inline std::shared_ptr<LightModel> ModelToLight(
-    const std::shared_ptr<ItemModel> & itemModel)
-{
-    if (itemModel == nullptr) return nullptr;
-    if (itemModel->getType() != ModelType::Light) return nullptr;
-    return std::static_pointer_cast<LightModel>(itemModel);
-}

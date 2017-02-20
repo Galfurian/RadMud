@@ -48,12 +48,3 @@ public:
 
     void getSheet(Table & sheet) const override;
 };
-
-/// @brief Casts a pointer from ItemModel to ProjectileModel.
-inline std::shared_ptr<ProjectileModel> ModelToProjectile(
-    const std::shared_ptr<ItemModel> & itemModel)
-{
-    if (itemModel == nullptr) return nullptr;
-    if (itemModel->getType() != ModelType::Projectile) return nullptr;
-    return std::static_pointer_cast<ProjectileModel>(itemModel);
-}

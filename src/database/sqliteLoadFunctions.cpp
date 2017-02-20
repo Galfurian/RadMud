@@ -23,7 +23,6 @@
 #include "sqliteException.hpp"
 
 #include "liquidContainerItem.hpp"
-#include "resourceModel.hpp"
 #include "currencyModel.hpp"
 #include "modelFactory.hpp"
 #include "itemFactory.hpp"
@@ -426,8 +425,7 @@ bool LoadFaction(ResultSet * result)
                 throw SQLiteException(
                     "Model is not currency " + ToString(currencyVnum));
             }
-            faction->currency =
-                std::static_pointer_cast<CurrencyModel>(currencyModel);
+            faction->currency = currencyModel->toCurrency();
             // Translate new_line.
             FindAndReplace(&faction->description, "%r", "\n");
             // Check the correctness.
@@ -1652,8 +1650,7 @@ bool LoadCurrency(ResultSet * result)
                 throw SQLiteException(
                     "Can't find the material " + ToString(materialVnum));
             }
-            // Cast the model to currency.
-            auto currency = std::static_pointer_cast<CurrencyModel>(model);
+            auto currency = model->toCurrency();
             if (!currency->addPrice(materialVnum, worth))
             {
                 throw SQLiteException(
@@ -1779,7 +1776,7 @@ bool LoadBodyPart(ResultSet * result)
     {
         try
         {
-            auto bodyPart = std::make_shared<BodyPart>();
+            std::shared_ptr<BodyPart> bodyPart = std::make_shared<BodyPart>();
             bodyPart->vnum = result->getNextUnsignedInteger();
             bodyPart->name = result->getNextString();
             bodyPart->description = result->getNextString();
@@ -1866,7 +1863,7 @@ bool LoadBodyPartResources(ResultSet * result)
             auto difficulty = result->getNextInteger();
             BodyPart::BodyResource resource;
             resource.material = material;
-            resource.resource = std::static_pointer_cast<ResourceModel>(model);
+            resource.resource = model->toResource();
             resource.quantity = quantity;
             resource.difficulty = difficulty;
             bodyPart->resources.emplace_back(std::move(resource));
