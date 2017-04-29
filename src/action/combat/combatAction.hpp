@@ -56,15 +56,12 @@ public:
 
     ActionStatus perform() override;
 
+    unsigned int getCooldown() override;
+
     /// @brief Unset all the variables used for combat.
     void handleStop();
 
     /// @brief Provides the type of combat action.
     /// @return The type of combat action.
     virtual CombatActionType getCombatActionType() const = 0;
-
-    /// @brief Given an action, it returns the necessary cooldown.
-    /// @param character The actor.
-    /// @return The non-decreasing value of the cooldown.
-    static unsigned int getCooldown(Character * character);
 };

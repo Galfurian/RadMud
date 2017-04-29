@@ -59,17 +59,14 @@ public:
 
     ActionStatus perform() override;
 
+    unsigned int getCooldown() override;
+
     CombatActionType getCombatActionType() const override;
 
     /// @brief Returns the stamina required to execute the action.
     /// @param character The character.
     /// @return The required stamina.
     static unsigned int getConsumedStamina(Character * character);
-
-    /// @brief Provides the cooldown required to execute this action.
-    /// @param character The character which has to execute the action.
-    /// @return Th required time.
-    static unsigned int getCooldown(Character * character);
 
 private:
 

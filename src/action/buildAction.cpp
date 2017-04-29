@@ -27,6 +27,7 @@
 #include "updater.hpp"
 #include "logger.hpp"
 #include "room.hpp"
+#include <cassert>
 
 BuildAction::BuildAction(Character * _actor,
                          const std::shared_ptr<Building> & _schematics,
@@ -42,7 +43,7 @@ BuildAction::BuildAction(Character * _actor,
     // Debugging message.
     Logger::log(LogLevel::Debug, "Created BuildAction.");
     // Reset the cooldown of the action.
-    this->resetCooldown(BuildAction::getCooldown(_actor, _schematics));
+    this->resetCooldown(this->getCooldown());
 }
 
 BuildAction::~BuildAction()
@@ -190,6 +191,21 @@ ActionStatus BuildAction::perform()
     return ActionStatus::Finished;
 }
 
+unsigned int BuildAction::getCooldown()
+{
+    assert(actor && "Actor is nullptr");
+    assert(schematics && "Schematics is nullptr");
+    double requiredTime = schematics->time;
+    Logger::log(LogLevel::Debug, "Base time  :%s", requiredTime);
+    for (auto knowledge : schematics->requiredKnowledge)
+    {
+        requiredTime -= (requiredTime *
+                         actor->effects.getKnowledge(knowledge)) / 100;
+    }
+    Logger::log(LogLevel::Debug, "With skill :%s", requiredTime);
+    return static_cast<unsigned int>(requiredTime);
+}
+
 unsigned int BuildAction::getConsumedStamina(Character * character)
 {
     // BASE     [+1.0]
@@ -202,19 +218,4 @@ unsigned int BuildAction::getConsumedStamina(Character * character)
     consumedStamina = SafeSum(consumedStamina,
                               SafeLog10(character->getCarryingWeight()));
     return consumedStamina;
-}
-
-unsigned int BuildAction::getCooldown(
-    Character * character,
-    const std::shared_ptr<Building> & _schematics)
-{
-    double requiredTime = _schematics->time;
-    Logger::log(LogLevel::Debug, "Base time  :%s", requiredTime);
-    for (auto knowledge : _schematics->requiredKnowledge)
-    {
-        requiredTime -= (requiredTime *
-                         character->effects.getKnowledge(knowledge)) / 100;
-    }
-    Logger::log(LogLevel::Debug, "With skill :%s", requiredTime);
-    return static_cast<unsigned int>(requiredTime);
 }

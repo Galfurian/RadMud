@@ -27,6 +27,7 @@
 #include "logger.hpp"
 #include "area.hpp"
 #include "room.hpp"
+#include <cassert>
 
 AimAction::AimAction(Character * _actor, Character * _target) :
     GeneralAction(_actor),
@@ -35,7 +36,7 @@ AimAction::AimAction(Character * _actor, Character * _target) :
     // Debugging message.
     Logger::log(LogLevel::Debug, "Created aim action.");
     // Reset the cooldown of the action.
-    this->resetCooldown(AimAction::getAimTime(_actor, _target));
+    this->resetCooldown(this->getCooldown());
 }
 
 AimAction::~AimAction()
@@ -104,15 +105,17 @@ ActionStatus AimAction::perform()
     return ActionStatus::Finished;
 }
 
-unsigned int AimAction::getAimTime(Character * source, Character * target)
+unsigned int AimAction::getCooldown()
 {
+    assert(actor && "Actor is nullptr");
+    assert(target && "Projectile is nullptr");
     unsigned int requiredTime = 2;
-    if ((source != nullptr) && (target != nullptr))
+    if ((actor != nullptr) && (target != nullptr))
     {
-        if ((source->room != nullptr) && (target->room != nullptr))
+        if ((actor->room != nullptr) && (target->room != nullptr))
         {
             requiredTime = SafeSum(requiredTime,
-                                   Area::getDistance(source->room->coord,
+                                   Area::getDistance(actor->room->coord,
                                                      target->room->coord));
         }
     }

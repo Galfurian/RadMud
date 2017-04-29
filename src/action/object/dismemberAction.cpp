@@ -25,6 +25,8 @@
 #include "logger.hpp"
 #include "room.hpp"
 
+#include <cassert>
+
 DismemberAction::DismemberAction(Character * _actor,
                                  CorpseItem * _corpse,
                                  const std::shared_ptr<BodyPart> & _bodyPart) :
@@ -35,7 +37,7 @@ DismemberAction::DismemberAction(Character * _actor,
     // Debugging message.
     Logger::log(LogLevel::Debug, "Created DismemberAction.");
     // Reset the cooldown of the action.
-    this->resetCooldown(DismemberAction::getCooldown(_actor, _bodyPart));
+    this->resetCooldown(this->getCooldown());
 }
 
 DismemberAction::~DismemberAction()
@@ -141,14 +143,15 @@ ActionStatus DismemberAction::perform()
     return ActionStatus::Finished;
 }
 
-unsigned int DismemberAction::getCooldown(
-    Character * character,
-    const std::shared_ptr<BodyPart> & /*_bodyPart*/)
+unsigned int DismemberAction::getCooldown()
 {
+    assert(actor && "Actor is nullptr");
+    assert(corpse && "Corpse is nullptr");
+    assert(bodyPart && "BodyPart is nullptr");
     double required = 6;
     Logger::log(LogLevel::Debug, "Base time  :%s", required);
-    required -= (required *
-                 character->effects.getKnowledge(Knowledge::Butchery)) / 100;
+    required -=
+        (required * actor->effects.getKnowledge(Knowledge::Butchery)) / 100;
     Logger::log(LogLevel::Debug, "With skill :%s", required);
     return static_cast<unsigned int>(required);
 }

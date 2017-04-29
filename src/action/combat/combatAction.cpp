@@ -25,6 +25,7 @@
 
 #include "logger.hpp"
 #include "room.hpp"
+#include <cassert>
 
 CombatAction::CombatAction(Character * _actor) :
     GeneralAction(_actor)
@@ -62,16 +63,9 @@ ActionStatus CombatAction::perform()
     return ActionStatus::Running;
 }
 
-void CombatAction::handleStop()
+unsigned int CombatAction::getCooldown()
 {
-    // Send the stop message.
-    actor->sendMsg(this->stop() + "\n\n");
-    // Reset the list of aggressors.
-    actor->combatHandler.resetList();
-}
-
-unsigned int CombatAction::getCooldown(Character * character)
-{
+    assert(actor && "Actor is nullptr");
     // BASE     [+5.0]
     // STRENGTH [-0.0 to -1.40]
     // AGILITY  [-0.0 to -1.40]
@@ -79,17 +73,17 @@ unsigned int CombatAction::getCooldown(Character * character)
     // CARRIED  [+0.0 to +2.48]
     // WEAPON   [+0.0 to +1.60]
     unsigned int cooldown = 5;
-    cooldown = SafeSum(cooldown, -character->getAbilityLog(Ability::Strength));
-    cooldown = SafeSum(cooldown, -character->getAbilityLog(Ability::Agility));
-    cooldown = SafeSum(cooldown, SafeLog10(character->weight));
-    cooldown = SafeSum(cooldown, SafeLog10(character->getCarryingWeight()));
-    for (auto bodyPart : character->race->bodyParts)
+    cooldown = SafeSum(cooldown, -actor->getAbilityLog(Ability::Strength));
+    cooldown = SafeSum(cooldown, -actor->getAbilityLog(Ability::Agility));
+    cooldown = SafeSum(cooldown, SafeLog10(actor->weight));
+    cooldown = SafeSum(cooldown, SafeLog10(actor->getCarryingWeight()));
+    for (auto bodyPart : actor->race->bodyParts)
     {
         if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
         {
             continue;
         }
-        auto wpn = character->findItemAtBodyPart(bodyPart);
+        auto wpn = actor->findItemAtBodyPart(bodyPart);
         if (wpn == nullptr)
         {
             continue;
@@ -101,4 +95,13 @@ unsigned int CombatAction::getCooldown(Character * character)
         }
     }
     return cooldown;
+}
+
+
+void CombatAction::handleStop()
+{
+    // Send the stop message.
+    actor->sendMsg(this->stop() + "\n\n");
+    // Reset the list of aggressors.
+    actor->combatHandler.resetList();
 }

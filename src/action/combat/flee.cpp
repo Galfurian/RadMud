@@ -25,9 +25,9 @@
 
 #include "roomUtilityFunctions.hpp"
 #include "characterUtilities.hpp"
-#include "basicAttack.hpp"
 #include "logger.hpp"
 #include "room.hpp"
+#include <cassert>
 
 Flee::Flee(Character * _actor) :
     CombatAction(_actor)
@@ -35,7 +35,7 @@ Flee::Flee(Character * _actor) :
     // Debugging message.
     Logger::log(LogLevel::Debug, "Created Flee.");
     // Reset the cooldown of the action.
-    this->resetCooldown(Flee::getCooldown(_actor));
+    this->resetCooldown(this->getCooldown());
 }
 
 Flee::~Flee()
@@ -140,9 +140,25 @@ ActionStatus Flee::perform()
         }
     }
     // Reset the cooldown.
-    actor->getAction()->resetCooldown(BasicAttack::getCooldown(actor));
+    actor->getAction()->resetCooldown();
     // Return that the action is still running.
     return ActionStatus::Running;
+}
+
+unsigned int Flee::getCooldown()
+{
+    assert(actor && "Actor is nullptr");
+    // BASE     [+5.0]
+    // STRENGTH [-0.0 to -1.40]
+    // AGILITY  [-0.0 to -1.40]
+    // WEIGHT   [+1.6 to +2.51]
+    // CARRIED  [+0.0 to +2.48]
+    unsigned int cooldown = 5;
+    cooldown = SafeSum(cooldown, -actor->getAbilityLog(Ability::Strength));
+    cooldown = SafeSum(cooldown, -actor->getAbilityLog(Ability::Agility));
+    cooldown = SafeSum(cooldown, SafeLog10(actor->weight));
+    cooldown = SafeSum(cooldown, SafeLog10(actor->getCarryingWeight()));
+    return cooldown;
 }
 
 CombatActionType Flee::getCombatActionType() const
@@ -163,19 +179,4 @@ unsigned int Flee::getConsumedStamina(Character * character)
     consumedStamina = SafeSum(consumedStamina,
                               SafeLog10(character->getCarryingWeight()));
     return consumedStamina;
-}
-
-unsigned int Flee::getCooldown(Character * character)
-{
-    // BASE     [+5.0]
-    // STRENGTH [-0.0 to -1.40]
-    // AGILITY  [-0.0 to -1.40]
-    // WEIGHT   [+1.6 to +2.51]
-    // CARRIED  [+0.0 to +2.48]
-    unsigned int cooldown = 5;
-    cooldown = SafeSum(cooldown, -character->getAbilityLog(Ability::Strength));
-    cooldown = SafeSum(cooldown, -character->getAbilityLog(Ability::Agility));
-    cooldown = SafeSum(cooldown, SafeLog10(character->weight));
-    cooldown = SafeSum(cooldown, SafeLog10(character->getCarryingWeight()));
-    return cooldown;
 }

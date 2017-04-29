@@ -31,6 +31,7 @@
 #include "area.hpp"
 #include "room.hpp"
 #include <queue>
+#include <cassert>
 
 Chase::Chase(Character * _actor, Character * _target) :
     CombatAction(_actor),
@@ -41,7 +42,7 @@ Chase::Chase(Character * _actor, Character * _target) :
     // Debugging message.
     Logger::log(LogLevel::Debug, "Created Chase.");
     // Reset the cooldown of the action.
-    this->resetCooldown(Chase::getCooldown(_actor));
+    this->resetCooldown(this->getCooldown());
 }
 
 Chase::~Chase()
@@ -128,9 +129,26 @@ ActionStatus Chase::perform()
         }
     }
     // Reset the cooldown.
-    actor->getAction()->resetCooldown(Chase::getCooldown(actor));
+    actor->getAction()->resetCooldown();
     // Return that the action is still running.
     return ActionStatus::Running;
+}
+
+unsigned int Chase::getCooldown()
+{
+    assert(actor && "Actor is nullptr");
+    // BASE     [+4.0]
+    // STRENGTH [-0.0 to -1.40]
+    // AGILITY  [-0.0 to -1.40]
+    // WEIGHT   [+1.6 to +2.51]
+    // CARRIED  [+0.0 to +2.48]
+    // WEAPON   [+0.0 to +1.60]
+    unsigned int cooldown = 4;
+    cooldown = SafeSum(cooldown, -actor->getAbilityLog(Ability::Strength));
+    cooldown = SafeSum(cooldown, -actor->getAbilityLog(Ability::Agility));
+    cooldown = SafeSum(cooldown, SafeLog10(actor->weight));
+    cooldown = SafeSum(cooldown, SafeLog10(actor->getCarryingWeight()));
+    return cooldown;
 }
 
 CombatActionType Chase::getCombatActionType() const
@@ -159,22 +177,6 @@ unsigned int Chase::getConsumedStamina(Character * character)
     consumedStamina = SafeSum(consumedStamina,
                               SafeLog10(character->getCarryingWeight()));
     return static_cast<unsigned int>(consumedStamina * multiplier);
-}
-
-unsigned int Chase::getCooldown(Character * character)
-{
-    // BASE     [+4.0]
-    // STRENGTH [-0.0 to -1.40]
-    // AGILITY  [-0.0 to -1.40]
-    // WEIGHT   [+1.6 to +2.51]
-    // CARRIED  [+0.0 to +2.48]
-    // WEAPON   [+0.0 to +1.60]
-    unsigned int cooldown = 4;
-    cooldown = SafeSum(cooldown, -character->getAbilityLog(Ability::Strength));
-    cooldown = SafeSum(cooldown, -character->getAbilityLog(Ability::Agility));
-    cooldown = SafeSum(cooldown, SafeLog10(character->weight));
-    cooldown = SafeSum(cooldown, SafeLog10(character->getCarryingWeight()));
-    return cooldown;
 }
 
 bool Chase::updatePath()

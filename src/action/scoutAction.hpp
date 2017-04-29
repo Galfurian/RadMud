@@ -46,11 +46,10 @@ public:
 
     ActionStatus perform() override;
 
+    unsigned int getCooldown() override;
+
     /// @brief Returns the stamina required to execute the action.
     /// @param character The actor.
     /// @return The required stamina.
     static unsigned int getConsumedStamina(Character * character);
-
-    /// @brief Provides the required time for scouting the area.
-    static unsigned int getScoutTime(Character * character);
 };

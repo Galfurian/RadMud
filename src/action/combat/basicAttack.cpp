@@ -38,7 +38,7 @@ BasicAttack::BasicAttack(Character * _actor) :
     // Debugging message.
     Logger::log(LogLevel::Debug, "Created BasicAttack.");
     // Reset the cooldown of the action.
-    this->resetCooldown(CombatAction::getCooldown(_actor));
+    this->resetCooldown(this->getCooldown());
 }
 
 BasicAttack::~BasicAttack()
@@ -189,7 +189,7 @@ ActionStatus BasicAttack::perform()
         actor->sendMsg("Try to get closer to your enemy.\n\n");
     }
     // Reset the cooldown.
-    actor->getAction()->resetCooldown(CombatAction::getCooldown(actor));
+    actor->getAction()->resetCooldown();
     // Return that the action is still running.
     return ActionStatus::Running;
 }

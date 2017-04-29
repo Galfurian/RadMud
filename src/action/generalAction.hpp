@@ -109,12 +109,12 @@ public:
     /// @return the status after performing the action.
     virtual ActionStatus perform();
 
+    /// @brief Provides the remaining time before the action can be triggered.
+    virtual unsigned int getCooldown();
+
     /// @brief Allows to set the remaining time before the action can be triggered.
     /// @param _actionCooldown The cooldown that has to be set.
-    void resetCooldown(const unsigned int & _actionCooldown);
-
-    /// @brief Provides the remaining time before the action can be triggered.
-    unsigned int getCooldown();
+    void resetCooldown(const unsigned int & _actionCooldown = 0);
 
     /// @brief Returns the action <b>statically</b> casted to CombatAction.
     std::shared_ptr<CombatAction> toCombatAction();

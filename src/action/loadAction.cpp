@@ -27,6 +27,8 @@
 #include "character.hpp"
 #include "logger.hpp"
 
+#include <cassert>
+
 LoadAction::LoadAction(Character * _actor,
                        MagazineItem * _magazine,
                        Item * _projectile,
@@ -39,7 +41,7 @@ LoadAction::LoadAction(Character * _actor,
     // Debugging message.
     Logger::log(LogLevel::Debug, "Created LoadAction.");
     // Reset the cooldown of the action.
-    this->resetCooldown(LoadAction::getLoadTime(_projectile, _amount));
+    this->resetCooldown(this->getCooldown());
 }
 
 LoadAction::~LoadAction()
@@ -157,10 +159,9 @@ ActionStatus LoadAction::perform()
     return ActionStatus::Finished;
 }
 
-unsigned int LoadAction::getLoadTime(Item * projectile,
-                                     const unsigned int & amountToLoad)
+unsigned int LoadAction::getCooldown()
 {
-    // Evaluates the required time for loading the magazine.
-    return static_cast<unsigned int>(
-        projectile->getWeight(false) * amountToLoad);
+    assert(actor && "Actor is nullptr");
+    assert(projectile && "Projectile is nullptr");
+    return static_cast<unsigned int>(projectile->getWeight(false) * amount);
 }

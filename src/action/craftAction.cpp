@@ -26,6 +26,7 @@
 #include "updater.hpp"
 #include "logger.hpp"
 #include "room.hpp"
+#include <cassert>
 
 CraftAction::CraftAction(Character * _actor,
                          Production * _production,
@@ -43,7 +44,7 @@ CraftAction::CraftAction(Character * _actor,
     // single involved item.
     this->determineMaterial();
     // Reset the cooldown of the action.
-    this->resetCooldown(CraftAction::getCooldown(_actor, _production));
+    this->resetCooldown(this->getCooldown());
 }
 
 CraftAction::~CraftAction()
@@ -264,6 +265,21 @@ ActionStatus CraftAction::perform()
     return ActionStatus::Finished;
 }
 
+unsigned int CraftAction::getCooldown()
+{
+    assert(actor && "Actor is nullptr");
+    assert(production && "Production is nullptr");
+    double requiredTime = production->time;
+    Logger::log(LogLevel::Debug, "Base time  :%s", requiredTime);
+    for (auto knowledge : production->requiredKnowledge)
+    {
+        requiredTime -=
+            (requiredTime * actor->effects.getKnowledge(knowledge)) / 100;
+    }
+    Logger::log(LogLevel::Debug, "With skill :%s", requiredTime);
+    return static_cast<unsigned int>(requiredTime);
+}
+
 void CraftAction::determineMaterial()
 {
     /// TODO: Simplify...
@@ -342,18 +358,4 @@ unsigned int CraftAction::getConsumedStamina(Character * character)
     consumedStamina = SafeSum(consumedStamina,
                               SafeLog10(character->getCarryingWeight()));
     return consumedStamina;
-}
-
-unsigned int CraftAction::getCooldown(Character * character,
-                                      Production * _production)
-{
-    double requiredTime = _production->time;
-    Logger::log(LogLevel::Debug, "Base time  :%s", requiredTime);
-    for (auto knowledge : _production->requiredKnowledge)
-    {
-        requiredTime -= (requiredTime *
-                         character->effects.getKnowledge(knowledge)) / 100;
-    }
-    Logger::log(LogLevel::Debug, "With skill :%s", requiredTime);
-    return static_cast<unsigned int>(requiredTime);
 }

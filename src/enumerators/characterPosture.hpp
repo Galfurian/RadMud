@@ -35,8 +35,8 @@ public:
         None,   ///< The character has no posture.
         Stand,  ///< The character it's standing.
         Crouch, ///< The character it's crouched.
-        Sit,    ///< The character it's sitting.
         Prone,  ///< The character it's prone.
+        Sit,    ///< The character it's sitting.
         Rest,   ///< The character it's lying down.
         Sleep,  ///< The character is sleeping.
     };
@@ -67,4 +67,6 @@ public:
 
     /// @brief Returns the action describing the posture.
     std::string getAction() const;
+
+    uint32_t getSpeed() const;
 };

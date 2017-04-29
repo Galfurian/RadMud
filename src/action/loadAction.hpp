@@ -57,8 +57,5 @@ public:
 
     ActionStatus perform() override;
 
-    /// @brief Provides the required time for the item to be loaded to
-    ///         aim the target.
-    static unsigned int getLoadTime(Item * projectile,
-                                    const unsigned int & amountToLoad);
+    unsigned int getCooldown() override;
 };

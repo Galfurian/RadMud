@@ -26,6 +26,7 @@
 #include "logger.hpp"
 #include "room.hpp"
 #include "area.hpp"
+#include <cassert>
 
 ScoutAction::ScoutAction(Character * _actor) :
     GeneralAction(_actor)
@@ -33,7 +34,7 @@ ScoutAction::ScoutAction(Character * _actor) :
     // Debugging message.
     Logger::log(LogLevel::Debug, "Created ScoutAction.");
     // Reset the cooldown of the action.
-    this->resetCooldown(ScoutAction::getScoutTime(_actor));
+    this->resetCooldown(this->getCooldown());
 }
 
 ScoutAction::~ScoutAction()
@@ -111,6 +112,17 @@ ActionStatus ScoutAction::perform()
     return ActionStatus::Finished;
 }
 
+unsigned int ScoutAction::getCooldown()
+{
+    assert(actor && "Actor is nullptr");
+    // BASE       [+3.0]
+    // PERCEPTION [-0.0 to -2.80]
+    unsigned int requiredTime = 3;
+    requiredTime = SafeSum(requiredTime,
+                           -actor->getAbilityLog(Ability::Perception));
+    return requiredTime;
+}
+
 unsigned int ScoutAction::getConsumedStamina(Character * character)
 {
     // BASE     [+1.0]
@@ -124,14 +136,4 @@ unsigned int ScoutAction::getConsumedStamina(Character * character)
     consumedStamina = SafeSum(consumedStamina,
                               SafeLog10(character->getCarryingWeight()));
     return consumedStamina;
-}
-
-unsigned int ScoutAction::getScoutTime(Character * character)
-{
-    // BASE       [+3.0]
-    // PERCEPTION [-0.0 to -2.80]
-    unsigned int requiredTime = 3;
-    requiredTime = SafeSum(requiredTime,
-                           -character->getAbilityLog(Ability::Perception));
-    return requiredTime;
 }

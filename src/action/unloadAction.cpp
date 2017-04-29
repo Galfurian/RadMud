@@ -25,6 +25,7 @@
 #include "sqliteDbms.hpp"
 #include "character.hpp"
 #include "logger.hpp"
+#include <cassert>
 
 UnloadAction::UnloadAction(Character * _actor, Item * _item) :
     GeneralAction(_actor),
@@ -33,7 +34,7 @@ UnloadAction::UnloadAction(Character * _actor, Item * _item) :
     // Debugging message.
     Logger::log(LogLevel::Debug, "Created UnloadAction.");
     // Reset the cooldown of the action.
-    this->resetCooldown(UnloadAction::getUnloadTime(_item));
+    this->resetCooldown(this->getCooldown());
 }
 
 UnloadAction::~UnloadAction()
@@ -133,12 +134,14 @@ ActionStatus UnloadAction::perform()
     return ActionStatus::Finished;
 }
 
-unsigned int UnloadAction::getUnloadTime(Item * _item)
+unsigned int UnloadAction::getCooldown()
 {
-    if (_item->getType() == ModelType::Magazine)
+    assert(actor && "Actor is nullptr");
+    assert(item && "Item is nullptr");
+    if (item->getType() == ModelType::Magazine)
     {
         // Transform the item to magazine.
-        auto magazine = static_cast<MagazineItem *>(_item);
+        auto magazine = static_cast<MagazineItem *>(item);
         // Get the loaded projectile.
         auto loadedProjectile = magazine->getAlreadyLoadedProjectile();
         if (loadedProjectile != nullptr)

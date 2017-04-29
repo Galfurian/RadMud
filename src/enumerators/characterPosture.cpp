@@ -26,8 +26,8 @@ std::string CharacterPosture::toString() const
 {
     if (value == Stand) return "Stand";
     else if (value == Crouch) return "Crouch";
-    else if (value == Sit) return "Sit";
     else if (value == Prone) return "Prone";
+    else if (value == Sit) return "Sit";
     else if (value == Rest) return "Rest";
     else if (value == Sleep) return "Sleep";
     else return "None";
@@ -37,9 +37,17 @@ std::string CharacterPosture::getAction() const
 {
     if (value == Stand) return "standing";
     else if (value == Crouch) return "crouched";
-    else if (value == Sit) return "sitting";
     else if (value == Prone) return "prone";
+    else if (value == Sit) return "sitting";
     else if (value == Rest) return "resting";
     else if (value == Sleep) return "sleeping";
     else return "none";
+}
+
+uint32_t CharacterPosture::getSpeed() const
+{
+    if (value == Stand) return 2;
+    else if (value == Crouch) return 4;
+    else if (value == Prone) return 6;
+    return 0;
 }

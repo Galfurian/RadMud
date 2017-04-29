@@ -54,7 +54,5 @@ public:
 
     ActionStatus perform() override;
 
-    /// @brief Provides the required time for the weapon to be reloaded.
-    static unsigned int getReloadTime(RangedWeaponItem * _weapon,
-                                      Item * _magazine);
+    unsigned int getCooldown() override;
 };

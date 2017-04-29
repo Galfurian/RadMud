@@ -28,6 +28,7 @@
 #include "character.hpp"
 #include "logger.hpp"
 #include "room.hpp"
+#include <cassert>
 
 MoveAction::MoveAction(Character * _actor,
                        Room * _destination,
@@ -39,7 +40,7 @@ MoveAction::MoveAction(Character * _actor,
     // Debugging message.
     Logger::log(LogLevel::Debug, "Created MoveAction.");
     // Reset the cooldown of the action.
-    this->resetCooldown(MoveAction::getCooldown(_actor));
+    this->resetCooldown(this->getCooldown());
 }
 
 MoveAction::~MoveAction()
@@ -130,6 +131,12 @@ ActionStatus MoveAction::perform()
     return ActionStatus::Finished;
 }
 
+unsigned int MoveAction::getCooldown()
+{
+    assert(actor && "Actor is nullptr");
+    return actor->posture.getSpeed();
+}
+
 unsigned int MoveAction::getConsumedStamina(Character * character)
 {
     auto multiplier = 1.0;
@@ -151,20 +158,6 @@ unsigned int MoveAction::getConsumedStamina(Character * character)
     consumedStamina = SafeSum(consumedStamina,
                               SafeLog10(character->getCarryingWeight()));
     return static_cast<unsigned int>(consumedStamina * multiplier);
-}
-
-unsigned int MoveAction::getCooldown(const Character * character)
-{
-    unsigned int cooldown = 2;
-    if (character->posture == CharacterPosture::Crouch)
-    {
-        cooldown = 4;
-    }
-    else if (character->posture == CharacterPosture::Prone)
-    {
-        cooldown = 6;
-    }
-    return cooldown;
 }
 
 bool MoveAction::canMoveTo(Character * character,
