@@ -32,6 +32,49 @@ class Character;
 
 class Direction;
 
+class Terrain;
+
+class Area;
+
+/// @brief Structure which contains options used to check rooms connections.
+struct MovementOptions
+{
+public:
+    /// Allows the function to check if the character can perform the move.
+    Character * character;
+    /// Allows to set if the given character can perform the move during
+    /// close combat.
+    bool allowedInCloseCombat;
+    /// Allows to set the required amount of stamina required to move.
+    unsigned int requiredStamina;
+
+    /// @brief Constructor.
+    MovementOptions();
+
+    /// @brief Copy constructor.
+    MovementOptions(const MovementOptions & other);
+
+    /// @brief Destructor.
+    ~MovementOptions();
+};
+
+/// @brief Structure which contains options used to select specific rooms.
+struct RoomSelectionOptions
+{
+public:
+    /// The selected terrain.
+    Terrain * terrain;
+
+    /// @brief Constructor.
+    RoomSelectionOptions();
+
+    /// @brief Copy constructor.
+    RoomSelectionOptions(const RoomSelectionOptions & other);
+
+    /// @brief Destructor.
+    ~RoomSelectionOptions();
+};
+
 /// @brief Provides the list of directions where an exit is present.
 /// @param r The room from which the check must be performed.
 /// @return Vector of directions.
@@ -57,28 +100,6 @@ bool RoomAreEqual(Room * r1, Room * r2);
 /// Function used to get the neighbours of the given room.
 std::vector<Room *> RoomGetNeighbours(Room * r);
 
-/// @brief Structure which contains options used to check rooms connections.
-struct MovementOptions
-{
-public:
-    /// Allows the function to check if the character can perform the move.
-    Character * character;
-    /// Allows to set if the given character can perform the move during
-    /// close combat.
-    bool allowedInCloseCombat;
-    /// Allows to set the required amount of stamina required to move.
-    unsigned int requiredStamina;
-
-    /// @brief Constructor.
-    MovementOptions();
-
-    /// @brief Copy constructor.
-    MovementOptions(const MovementOptions & other);
-
-    /// @brief Destructor.
-    ~MovementOptions();
-};
-
 /// @brief Check the connection between the two given rooms and the given
 ///         options.
 /// @param options  The character that wants to move.
@@ -102,3 +123,7 @@ bool CheckConnection(const MovementOptions & options,
 /// @brief Search for a built door inside the room.
 /// @return The contained door if there is one.
 Item * FindDoor(Room * room);
+
+std::vector<Room *> SelectRooms(Area * area,
+                                Room * startingRoom,
+                                RoomSelectionOptions options);

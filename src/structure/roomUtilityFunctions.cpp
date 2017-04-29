@@ -25,6 +25,44 @@
 #include "area.hpp"
 #include "room.hpp"
 
+MovementOptions::MovementOptions() :
+    character(),
+    allowedInCloseCombat(),
+    requiredStamina()
+{
+    // Nothing to do.
+}
+
+MovementOptions::MovementOptions(const MovementOptions & other) :
+    character(other.character),
+    allowedInCloseCombat(other.allowedInCloseCombat),
+    requiredStamina(other.requiredStamina)
+{
+    // Nothing to do.
+}
+
+MovementOptions::~MovementOptions()
+{
+    // Nothing to do.
+}
+
+RoomSelectionOptions::RoomSelectionOptions() :
+    terrain()
+{
+    // Nothing to do.
+}
+
+RoomSelectionOptions::RoomSelectionOptions(const RoomSelectionOptions & other) :
+    terrain(other.terrain)
+{
+    // Nothing to do.
+}
+
+RoomSelectionOptions::~RoomSelectionOptions()
+{
+    // Nothing to do.
+}
+
 std::vector<Direction> GetAvailableDirections(Room * r)
 {
     std::vector<Direction> directions;
@@ -93,27 +131,6 @@ std::vector<Room *> RoomGetNeighbours(Room * r)
         }
     }
     return neighbours;
-}
-
-MovementOptions::MovementOptions() :
-    character(),
-    allowedInCloseCombat(),
-    requiredStamina()
-{
-    // Nothing to do.
-}
-
-MovementOptions::MovementOptions(const MovementOptions & other) :
-    character(other.character),
-    allowedInCloseCombat(other.allowedInCloseCombat),
-    requiredStamina(other.requiredStamina)
-{
-    // Nothing to do.
-}
-
-MovementOptions::~MovementOptions()
-{
-    // Nothing to do.
 }
 
 bool CheckConnection(const MovementOptions & options,
@@ -287,4 +304,33 @@ Item * FindDoor(Room * room)
         if (mechanism->mechanismType == MechanismType::Door) return it;
     }
     return nullptr;
+}
+
+std::vector<Room *> SelectRooms(Area * area,
+                                Room * startingRoom,
+                                RoomSelectionOptions options)
+{
+    std::vector<Room *> selectedRooms;
+    std::function<void(Room *)> RecursiveSelectRooms;
+    RecursiveSelectRooms = [&](Room * room)
+    {
+        for (auto it : selectedRooms)
+        {
+            if (room->vnum == it->vnum) return;
+        }
+        if (options.terrain)
+        {
+            if (room->terrain->vnum != options.terrain->vnum) return;
+        }
+        for (auto dir : Direction::getAllDirections())
+        {
+            auto next(area->getRoom(room->coord + dir));
+            if (next)
+            {
+                RecursiveSelectRooms(next);
+            }
+        }
+    };
+    RecursiveSelectRooms(startingRoom);
+    return selectedRooms;
 }
