@@ -92,3 +92,15 @@ Coordinates Direction::getCoordinates() const
     if (value == Direction::Down) return Coordinates(0, 0, -1);
     return Coordinates(0, 0, 0);
 }
+
+std::vector<Direction> Direction::getAllDirections()
+{
+    std::vector<Direction> directions;
+    directions.emplace_back(Direction::North);
+    directions.emplace_back(Direction::South);
+    directions.emplace_back(Direction::West);
+    directions.emplace_back(Direction::East);
+    directions.emplace_back(Direction::Up);
+    directions.emplace_back(Direction::Down);
+    return directions;
+}

@@ -21,6 +21,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "coordinates.hpp"
+#include "direction.hpp"
 #include "utils.hpp"
 
 Coordinates::Coordinates() :
@@ -77,6 +78,11 @@ bool Coordinates::operator<(const Coordinates & right) const
 Coordinates Coordinates::operator+(const Coordinates & right) const
 {
     return Coordinates(x + right.x, y + right.y, z + right.z);
+}
+
+Coordinates Coordinates::operator+(const Direction & right) const
+{
+    return Coordinates(x, y, z) + right.getCoordinates();
 }
 
 int Coordinates::square() const

@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include <vector>
 #include "baseEnumerator.hpp"
 
 class Coordinates;
@@ -77,4 +78,7 @@ public:
 
     /// @brief Returns the direction in terms of coordinates.
     Coordinates getCoordinates() const;
+
+    /// Vector with all the possible directions.
+    static std::vector<Direction> getAllDirections();
 };

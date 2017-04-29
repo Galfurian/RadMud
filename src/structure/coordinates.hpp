@@ -27,6 +27,8 @@
 
 #include <string>
 
+class Direction;
+
 /// Used to create and manage a tridimensional coordinates.
 class Coordinates
 {
@@ -68,6 +70,8 @@ public:
     /// @param right The right parameter.
     /// @return The new Coordinates.
     Coordinates operator+(const Coordinates & right) const;
+
+    Coordinates operator+(const Direction & right) const;
 
     /// @brief Evaluates the square.
     /// @return The square.
