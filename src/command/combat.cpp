@@ -60,7 +60,8 @@ void LoadCombatCommands()
         DoAim, "aim", "(target)",
         "Allows to aim a target in sight.\n"
             "If the target is not inside the same room,"
-            "you have first to scout the area.",
+            "you have first to scout the area.\n"
+            "If no arguments is provided it lists the available targets.",
         false, true, false));
     Mud::instance().addCommand(std::make_shared<Command>(
         DoFire, "fire", "(firearm) (magazine)",
@@ -431,9 +432,30 @@ bool DoAim(Character * character, ArgumentHandler & args)
     }
     // Stop any action the character is executing.
     StopAction(character);
-    if (args.size() != 1)
+    if (args.size() == 0)
     {
-        character->sendMsg("Who or what do you want to aim?\n");
+        if (character->combatHandler.charactersInSight.empty())
+        {
+            character->sendMsg("Who or what do you want to aim?\n");
+        }
+        else
+        {
+            character->sendMsg("You are able to aim at:\n");
+            for (auto it : character->combatHandler.charactersInSight)
+            {
+                if (!it) continue;
+                if (!it->room) continue;
+                character->sendMsg("  [%s] %s\n",
+                                   Area::getDistance(character->room->coord,
+                                                     it->room->coord),
+                                   it->getName());
+            }
+        }
+        return true;
+    }
+    else if (args.size() > 1)
+    {
+        character->sendMsg("Too many arguments.\n");
         return false;
     }
     if (GetActiveRangedWeapons(character).empty())
