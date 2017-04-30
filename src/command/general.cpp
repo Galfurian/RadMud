@@ -74,6 +74,10 @@ void LoadGeneralCommands()
         "Shows the playes skills and their level.",
         false, true, false));
     Mud::instance().addCommand(std::make_shared<Command>(
+        DoActions, "actions", "",
+        "Shows the list of actions.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
         DoServer, "server", "",
         "Shows the server statistics.",
         false, true, false));
@@ -636,6 +640,26 @@ bool DoSkills(Character * character, ArgumentHandler & /*args*/)
         }
     }
     character->sendMsg(table.getTable());
+    return true;
+}
+
+bool DoActions(Character * character, ArgumentHandler & /*args*/)
+{
+    std::string msg = "You are planning to...\n";
+    character->actionQueueMutex.lock();
+    bool first = true;
+    for (auto it : character->actionQueue)
+    {
+        if (first)
+        {
+            msg += "  [Performing] ";
+            first = false;
+        }
+        else msg += "  [Queued    ] ";
+        msg += it->getDescription() + "\n";
+    }
+    character->actionQueueMutex.unlock();
+    character->sendMsg(msg);
     return true;
 }
 

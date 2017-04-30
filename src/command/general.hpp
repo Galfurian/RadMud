@@ -66,6 +66,9 @@ bool DoRent(Character * character, ArgumentHandler & args);
 /// Show player skills.
 bool DoSkills(Character * character, ArgumentHandler & args);
 
+/// Show player list of actions.
+bool DoActions(Character * character, ArgumentHandler & args);
+
 /// Show server informations and statistics.
 bool DoServer(Character * character, ArgumentHandler & args);
 
