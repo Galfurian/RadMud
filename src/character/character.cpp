@@ -860,36 +860,22 @@ std::string Character::getHungerCondition() const
 
 void Character::updateHealth()
 {
-    auto logModifier = this->getAbilityLog(Ability::Constitution);
-    // Set the modifier due to the posture.
-    unsigned int posModifier = 0;
-    if (posture == CharacterPosture::Sit) posModifier = 2;
-    else if (posture == CharacterPosture::Rest) posModifier = 4;
-    else if (posture == CharacterPosture::Rest) posModifier = 8;
-    // Set the modifier due to effects.
-    auto effModifier = static_cast<unsigned int>(
-        effects.getStatusModifier(StatusModifier::HealthRegeneration));
-    // Add the health.
-    this->addHealth((1 + 3 * logModifier) *
-                    (1 + 2 * posModifier) +
-                    (1 + 2 * effModifier), true);
+    auto constMod(this->getAbilityModifier(Ability::Constitution));
+    auto regainMod(posture.getRegainModifier());
+    auto effectMod(static_cast<unsigned int>(
+                       effects.getStatusModifier(
+                           StatusModifier::HealthRegeneration)));
+    this->addHealth((constMod * regainMod) + effectMod, true);
 }
 
 void Character::updateStamina()
 {
-    auto logModifier = this->getAbilityLog(Ability::Constitution);
-    // Set the modifier due to the posture.
-    unsigned int posModifier = 0;
-    if (posture == CharacterPosture::Sit) posModifier = 3;
-    else if (posture == CharacterPosture::Rest) posModifier = 5;
-    else if (posture == CharacterPosture::Rest) posModifier = 10;
-    // Set the modifier due to effects.
-    auto effModifier = static_cast<unsigned int>(
-        effects.getStatusModifier(StatusModifier::StaminaRegeneration));
-    // Add the stamina.
-    this->addHealth((1 + 4 * logModifier) *
-                    (1 + 3 * posModifier) +
-                    (1 + 2 * effModifier), true);
+    auto constMod(this->getAbilityModifier(Ability::Constitution));
+    auto regainMod(posture.getRegainModifier());
+    auto effectMod(static_cast<unsigned int>(
+                       effects.getStatusModifier(
+                           StatusModifier::HealthRegeneration)));
+    this->addHealth(((2 * constMod) * regainMod) + effectMod, true);
 }
 
 void Character::updateHunger()

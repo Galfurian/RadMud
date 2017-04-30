@@ -69,4 +69,6 @@ public:
     std::string getAction() const;
 
     uint32_t getSpeed() const;
+
+    uint32_t getRegainModifier() const;
 };

@@ -47,7 +47,15 @@ std::string CharacterPosture::getAction() const
 uint32_t CharacterPosture::getSpeed() const
 {
     if (value == Stand) return 2;
-    else if (value == Crouch) return 4;
-    else if (value == Prone) return 6;
+    if (value == Crouch) return 4;
+    if (value == Prone) return 6;
+    return 0;
+}
+
+uint32_t CharacterPosture::getRegainModifier() const
+{
+    if (value == Sit) return 1;
+    if (value == Rest) return 2;
+    if (value == Sleep) return 4;
     return 0;
 }
