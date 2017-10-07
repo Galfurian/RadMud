@@ -169,7 +169,7 @@ bool MoveAction::canMoveTo(Character * character,
     {
         return false;
     }
-    if ((character->getAction()->getType() == ActionType::Combat) &&
+    if ((character->getAction() == ActionType::Combat) &&
         !allowInCombat)
     {
         // Check if the character is locked into close combat.

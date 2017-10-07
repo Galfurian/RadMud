@@ -119,3 +119,15 @@ public:
     /// @brief Returns the action <b>statically</b> casted to CombatAction.
     std::shared_ptr<CombatAction> toCombatAction();
 };
+
+inline bool operator==(const std::shared_ptr<GeneralAction> & _generalAction,
+                       const ActionType & _actionType)
+{
+    return (_generalAction->getType() == _actionType);
+}
+
+inline bool operator!=(const std::shared_ptr<GeneralAction> & _generalAction,
+                       const ActionType & _actionType)
+{
+    return (_generalAction->getType() != _actionType);
+}

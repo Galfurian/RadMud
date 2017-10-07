@@ -474,7 +474,7 @@ void BasicAttack::performAttackNaturalWeapon(
         target->combatHandler.addOpponent(actor);
         // If the target is not already fighting, add a new basic attack
         // action to its queue.
-        if (target->getAction()->getType() != ActionType::Combat)
+        if (target->getAction() != ActionType::Combat)
         {
             target->pushAction(std::make_shared<BasicAttack>(target));
         }
@@ -597,7 +597,7 @@ void BasicAttack::performMeleeAttack(Character * target,
     if (!target->combatHandler.hasOpponent(actor))
     {
         target->combatHandler.addOpponent(actor);
-        if (target->getAction()->getType() != ActionType::Combat)
+        if (target->getAction() != ActionType::Combat)
         {
             target->pushAction(std::make_shared<BasicAttack>(target));
         }
@@ -734,7 +734,7 @@ void BasicAttack::performRangedAttack(Character * target,
     if (!target->combatHandler.hasOpponent(actor))
     {
         target->combatHandler.addOpponent(actor);
-        if (target->getAction()->getType() != ActionType::Combat)
+        if (target->getAction() != ActionType::Combat)
         {
             target->pushAction(std::make_shared<BasicAttack>(target));
         }

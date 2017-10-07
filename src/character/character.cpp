@@ -265,7 +265,7 @@ std::string Character::getStaticDesc() const
         desc += " " + posture.getAction();
     }
     desc += " here";
-    if (this->getAction()->getType() != ActionType::Wait)
+    if (this->getAction() != ActionType::Wait)
     {
         desc += ", " + this->getSubjectPronoun() + " is ";
         desc += this->getAction()->getDescription();

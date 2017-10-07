@@ -103,7 +103,7 @@ bool DoKill(Character * character, ArgumentHandler & args)
         return false;
     }
     // Check if the two characters are both already in combat.
-    if (character->getAction()->getType() == ActionType::Combat)
+    if (character->getAction() == ActionType::Combat)
     {
         // Check if the character is trying to attack a target
         //  with which is not in combat.
@@ -159,13 +159,13 @@ bool DoKill(Character * character, ArgumentHandler & args)
 bool DoFlee(Character * character, ArgumentHandler & /*args*/)
 {
     // Check if the character is in combat.
-    if (character->getAction()->getType() != ActionType::Combat)
+    if (character->getAction() != ActionType::Combat)
     {
         character->sendMsg("You are not fighting.\n");
         return false;
     }
     // Check if the actor is already trying to flee.
-    if (character->getAction()->getType() == ActionType::Combat)
+    if (character->getAction() == ActionType::Combat)
     {
         // Check if the character is already trying to flee.
         if (character->getAction()->toCombatAction()->getCombatActionType() ==
