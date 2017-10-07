@@ -544,18 +544,18 @@ int Character::getViewDistance() const
 void Character::pushAction(const std::shared_ptr<GeneralAction> & _action)
 {
     std::lock_guard<std::mutex> lock(actionQueueMutex);
-    if (_action->getType() != ActionType::Wait)
-    {
-        actionQueue.push_front(_action);
-    }
+    actionQueue.push_front(_action);
 }
 
 void Character::popAction()
 {
     std::lock_guard<std::mutex> lock(actionQueueMutex);
-    if (actionQueue.size() > 1)
+    if (!actionQueue.empty())
     {
-        actionQueue.pop_front();
+        if (!actionQueue.front()->isLastAction())
+        {
+            actionQueue.pop_front();
+        }
     }
 }
 
@@ -574,8 +574,10 @@ std::shared_ptr<GeneralAction> const & Character::getAction() const
 void Character::resetActionQueue()
 {
     std::lock_guard<std::mutex> lock(actionQueueMutex);
+    // Clear the action queue.
     actionQueue.clear();
-    actionQueue.emplace_back(std::make_shared<GeneralAction>(this));
+    // Add a general action and set it as the last action of the action queue.
+    actionQueue.emplace_back(std::make_shared<GeneralAction>(this, true));
 }
 
 Item * Character::findInventoryItem(std::string search_parameter, int & number)

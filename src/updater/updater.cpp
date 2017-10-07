@@ -257,7 +257,7 @@ void MudUpdater::performActions()
         {
             continue;
         }
-        if (iterator->getAction() == ActionType::Wait)
+        if (iterator->getAction()->isLastAction())
         {
             continue;
         }
@@ -289,7 +289,7 @@ void MudUpdater::performActions()
             mobile->nextActionCooldown = end + std::chrono::seconds(
                 TRand<int>(30, 60));
         }
-        if (mobile->getAction() == ActionType::Wait)
+        if (mobile->getAction()->isLastAction())
         {
             continue;
         }

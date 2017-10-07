@@ -22,10 +22,15 @@
 
 #include "generalAction.hpp"
 #include "character.hpp"
+#include "mobile.hpp"
 #include "logger.hpp"
+#include <lua.hpp>
+#include <cassert>
 
-GeneralAction::GeneralAction(Character * _actor) :
+GeneralAction::GeneralAction(Character * _actor,
+                             const bool & _lastAction) :
     actor(_actor),
+    lastAction(_lastAction),
     actionCooldown()
 {
     // Debugging message.
