@@ -38,7 +38,6 @@ Mobile::Mobile() :
     nextRespawn(),
     controller(),
     lua_script(),
-    lua_mutex(),
     nextActionCooldown(std::chrono::system_clock::now()),
     managedItem()
 {
@@ -326,13 +325,71 @@ void Mobile::sendMsg(const std::string & msg)
     }
 }
 
+void Mobile::triggerEventInit()
+{
+    this->mobileThread("EventInit", nullptr, "");
+}
+
+void Mobile::triggerEventFight(Character * character)
+{
+    this->mobileThread("EventFight", character, "");
+}
+
+void Mobile::triggerEventEnter(Character * character)
+{
+    this->mobileThread("EventEnter", character, "");
+}
+
+void Mobile::triggerEventExit(Character * character)
+{
+    this->mobileThread("EventExit", character, "");
+}
+
+void Mobile::triggerEventMessage(Character * character, std::string message)
+{
+    this->mobileThread("EventMessage", character, message);
+}
+
+void Mobile::triggerEventRandom()
+{
+    this->mobileThread("EventRandom", nullptr, "");
+}
+
+void Mobile::triggerEventMorning()
+{
+    this->mobileThread("EventMorning", nullptr, "");
+}
+
+void Mobile::triggerEventDay()
+{
+    this->mobileThread("EventDay", nullptr, "");
+}
+
+void Mobile::triggerEventDusk()
+{
+    this->mobileThread("EventDusk", nullptr, "");
+}
+
+void Mobile::triggerEventNight()
+{
+    this->mobileThread("EventNight", nullptr, "");
+}
+
+void Mobile::triggerEventDeath()
+{
+    this->mobileThread("EventDeath", nullptr, "");
+}
+
+void Mobile::triggerEventMain()
+{
+    this->mobileThread("EventMain", nullptr, "");
+}
+
 bool Mobile::mobileThread(std::string event,
                           Character * character,
                           std::string message)
 {
-    // Lock to the mutex.
-    lua_mutex.lock();
-    //Logger::log(LogLevel::Trace, "Starting thread for event '%s'", event);
+    Logger::log(LogLevel::Trace, "Starting event '%s'", event);
     try
     {
         luabridge::LuaRef f = luabridge::getGlobal(L, event.c_str());
@@ -363,83 +420,8 @@ bool Mobile::mobileThread(std::string event,
     {
         Logger::log(LogLevel::Error, e.what());
     }
-    //Logger::log(LogLevel::Trace, "Ending   thread for event '%s'", event);
-    // Unlock the mutex.
-    lua_mutex.unlock();
+    Logger::log(LogLevel::Trace, "Ending   event '%s'", event);
     return true;
-}
-
-void Mobile::triggerEventInit()
-{
-    t = std::thread(&Mobile::mobileThread, this, "EventInit", nullptr, "");
-    t.detach();
-}
-
-void Mobile::triggerEventFight(Character * character)
-{
-    t = std::thread(&Mobile::mobileThread, this, "EventFight", character, "");
-    t.detach();
-}
-
-void Mobile::triggerEventEnter(Character * character)
-{
-    t = std::thread(&Mobile::mobileThread, this, "EventEnter", character, "");
-    t.detach();
-}
-
-void Mobile::triggerEventExit(Character * character)
-{
-    t = std::thread(&Mobile::mobileThread, this, "EventExit", character, "");
-    t.detach();
-}
-
-void Mobile::triggerEventMessage(Character * character, std::string message)
-{
-    t = std::thread(&Mobile::mobileThread, this, "EventMessage", character,
-                    message);
-    t.detach();
-}
-
-void Mobile::triggerEventRandom()
-{
-    t = std::thread(&Mobile::mobileThread, this, "EventRandom", nullptr, "");
-    t.detach();
-}
-
-void Mobile::triggerEventMorning()
-{
-    t = std::thread(&Mobile::mobileThread, this, "EventMorning", nullptr, "");
-    t.detach();
-}
-
-void Mobile::triggerEventDay()
-{
-    t = std::thread(&Mobile::mobileThread, this, "EventDay", nullptr, "");
-    t.detach();
-}
-
-void Mobile::triggerEventDusk()
-{
-    t = std::thread(&Mobile::mobileThread, this, "EventDusk", nullptr, "");
-    t.detach();
-}
-
-void Mobile::triggerEventNight()
-{
-    t = std::thread(&Mobile::mobileThread, this, "EventNight", nullptr, "");
-    t.detach();
-}
-
-void Mobile::triggerEventDeath()
-{
-    t = std::thread(&Mobile::mobileThread, this, "EventDeath", nullptr, "");
-    t.detach();
-}
-
-void Mobile::triggerEventMain()
-{
-    t = std::thread(&Mobile::mobileThread, this, "EventMain", nullptr, "");
-    t.detach();
 }
 
 void Mobile::updateTicImpl()

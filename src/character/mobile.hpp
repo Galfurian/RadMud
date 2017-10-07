@@ -56,14 +56,10 @@ public:
     Character * controller;
     /// The file that contains the behaviour of this mobile.
     std::string lua_script;
-    /// The mutex for this mobile.
-    std::mutex lua_mutex;
     /// Seconds until next action.
     std::chrono::time_point<std::chrono::system_clock> nextActionCooldown;
     /// The item of which this mobile is the manager.
     Item * managedItem;
-    /// The thread used to execute the LUA code.
-    std::thread t;
 
     /// @brief Constructor.
     Mobile();
@@ -124,15 +120,6 @@ public:
     /// @param msg The string to sent.
     void sendMsg(const std::string & msg) override;
 
-    /// @brief A thread used to handle mobile actions.
-    /// @param event     The event name.
-    /// @param character The target character.
-    /// @param message   The received message.
-    /// @return <b>True</b> if the operations succeeded,<br>
-    ///         <b>False</b> Otherwise.
-    bool mobileThread(std::string event, Character * character,
-                      std::string message);
-
     /// @defgroup MobileLuaEvent Mobile Lua Events Function
     /// @brief All the functions necessary to call the correspondent Function on Lua file,
     /// in order to react to a particular event.
@@ -178,6 +165,16 @@ public:
     ///@}
 
 protected:
+
+    /// @brief A thread used to handle mobile actions.
+    /// @param event     The event name.
+    /// @param character The target character.
+    /// @param message   The received message.
+    /// @return <b>True</b> if the operations succeeded,<br>
+    ///         <b>False</b> Otherwise.
+    bool mobileThread(std::string event, Character * character,
+                      std::string message);
+
     void updateTicImpl() override;
 
     void updateHourImpl() override;
