@@ -43,10 +43,11 @@ void LuaLog(std::string message)
 
 void LuaSleep(int sleepTime)
 {
-    if ((sleepTime > 0) && (sleepTime <= 20))
-    {
-        std::this_thread::sleep_for(std::chrono::seconds(sleepTime));
-    }
+    (void) sleepTime;
+//    if ((sleepTime > 0) && (sleepTime <= 20))
+//    {
+//        std::this_thread::sleep_for(std::chrono::seconds(sleepTime));
+//    }
 }
 
 int LuaRandom(int min, int max)
