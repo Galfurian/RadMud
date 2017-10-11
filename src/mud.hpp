@@ -159,7 +159,7 @@ public:
     /// List of all connected players.
     std::list<Player *> mudPlayers;
     /// List all the mobile.
-    std::map<std::string, Mobile *> mudMobiles;
+    std::vector<Mobile *> mudMobiles;
     /// List of all items.
     std::map<int, Item *> mudItems;
     /// List of all the rooms.

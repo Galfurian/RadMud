@@ -52,9 +52,8 @@ bool DoMobileList(Character * character, ArgumentHandler & /*args*/)
     table.addColumn("ID", StringAlign::Left);
     table.addColumn("NAME", StringAlign::Left);
     table.addColumn("LOCATION", StringAlign::Right);
-    for (auto iterator : Mud::instance().mudMobiles)
+    for (auto mobile : Mud::instance().mudMobiles)
     {
-        auto mobile = iterator.second;
         // Prepare the row.
         TableRow row;
         row.push_back((mobile->isAlive()) ? "Yes" : "No");

@@ -128,7 +128,7 @@ void MudUpdater::advanceTime()
         // [TIC] Update the Mobiles.
         for (auto iterator : Mud::instance().mudMobiles)
         {
-            iterator.second->updateTic();
+            iterator->updateTic();
         }
         // [TIC] Update the Items.
         for (auto iterator : Mud::instance().mudItems)
@@ -153,7 +153,7 @@ void MudUpdater::advanceTime()
             // [HOUR] Update the Mobiles.
             for (auto iterator : Mud::instance().mudMobiles)
             {
-                iterator.second->updateHour();
+                iterator->updateHour();
             }
             // [HOUR] Update the Corpses.
             for (auto it : Mud::instance().mudCorpses)
@@ -273,9 +273,8 @@ void MudUpdater::performActions()
             }
         }
     }
-    for (auto iterator : Mud::instance().mudMobiles)
+    for (auto mobile : Mud::instance().mudMobiles)
     {
-        auto mobile = iterator.second;
         if (!mobile->isAlive())
         {
             continue;

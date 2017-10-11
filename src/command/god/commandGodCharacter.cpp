@@ -40,13 +40,13 @@ bool DoGodInfo(Character * character, ArgumentHandler & args)
             std::string msgFound;
             for (auto it : Mud::instance().mudMobiles)
             {
-                if (BeginWith(it.first, args[0].getContent()))
+                if (BeginWith(it->id, args[0].getContent()))
                 {
                     if (msgFound.empty())
                     {
                         msgFound += "Maybe you mean:\n";
                     }
-                    msgFound += "    " + it.first + "\n";
+                    msgFound += "    " + it->id + "\n";
                 }
             }
             character->sendMsg("Mobile not found.\n" + msgFound);

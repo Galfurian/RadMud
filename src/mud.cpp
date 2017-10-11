@@ -93,7 +93,7 @@ Mud::~Mud()
     Logger::log(LogLevel::Global, "Freeing memory occupied by mobiles...");
     for (auto iterator : Mud::instance().mudMobiles)
     {
-        delete (iterator.second);
+        delete (iterator);
     }
     Logger::log(LogLevel::Global, "Freeing memory occupied by items...");
     for (auto iterator : Mud::instance().mudItems)
@@ -211,14 +211,22 @@ bool Mud::remPlayer(Player * player)
 
 bool Mud::addMobile(Mobile * mobile)
 {
-    return mudMobiles.insert(std::make_pair(mobile->id, mobile)).second;
+    for (auto it : mudMobiles)
+    {
+        if(it->id == mobile->id)
+        {
+            return false;
+        }
+    }
+    mudMobiles.emplace_back(mobile);
+    return true;
 }
 
 bool Mud::remMobile(Mobile * mobile)
 {
     for (auto it = mudMobiles.begin(); it != mudMobiles.end(); ++it)
     {
-        if (it->second->id == mobile->id)
+        if ((*it)->id == mobile->id)
         {
             mudMobiles.erase(it);
             return true;
@@ -405,8 +413,14 @@ Player * Mud::findPlayer(const std::string & name)
 
 Mobile * Mud::findMobile(std::string id)
 {
-    auto it = mudMobiles.find(id);
-    return (it == mudMobiles.end()) ? nullptr : it->second;
+    for (auto it : mudMobiles)
+    {
+        if(it->id == id)
+        {
+            return it;
+        }
+    }
+    return nullptr;
 }
 
 std::shared_ptr<ItemModel> Mud::findItemModel(int vnum)
