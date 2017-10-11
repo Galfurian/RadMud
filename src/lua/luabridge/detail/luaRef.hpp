@@ -897,6 +897,11 @@ public:
         return type() == LUA_TNIL;
     }
 
+    inline bool isBool() const
+    {
+        return type() == LUA_TBOOLEAN;
+    }
+
     inline bool isNumber() const
     {
         return type() == LUA_TNUMBER;
