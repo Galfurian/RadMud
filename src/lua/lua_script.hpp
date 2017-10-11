@@ -44,10 +44,6 @@ class LuaRef;
 /// @param message The message to log.
 void LuaLog(std::string message);
 
-/// @brief Allow from lua to call the sleep function.
-/// @param sleepTime The amount of seconds.
-void LuaSleep(int sleepTime);
-
 /// @brief Allow from lua coden to generate a random integer.
 /// @param min Lower bound.
 /// @param max Upper bound.

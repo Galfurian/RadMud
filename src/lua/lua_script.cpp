@@ -41,15 +41,6 @@ void LuaLog(std::string message)
     }
 }
 
-void LuaSleep(int sleepTime)
-{
-    (void) sleepTime;
-//    if ((sleepTime > 0) && (sleepTime <= 20))
-//    {
-//        std::this_thread::sleep_for(std::chrono::seconds(sleepTime));
-//    }
-}
-
 int LuaRandom(int min, int max)
 {
     return TRand<int>(min, max);
@@ -188,7 +179,6 @@ void LoadLuaEnvironmet(lua_State * L, const std::string & scriptFile)
     luabridge::getGlobalNamespace(L)
         .beginNamespace("Mud")
         .addFunction("log", LuaLog)
-        .addFunction("sleep", LuaSleep)
         .addFunction("random", LuaRandom)
         .addFunction("stop", LuaStopScript)
         .addFunction("loadItem", LuaLoadItem)
