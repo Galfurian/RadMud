@@ -22,7 +22,7 @@
 
 #include "mobile.hpp"
 
-#include "luaBridge.hpp"
+#include "generalBehaviour.hpp"
 #include "lua_script.hpp"
 #include "logger.hpp"
 #include "mud.hpp"
@@ -38,8 +38,10 @@ Mobile::Mobile() :
     nextRespawn(),
     controller(),
     lua_script(),
-    nextActionCooldown(std::chrono::system_clock::now()),
-    managedItem()
+    managedItem(),
+    behaviourQueue(),
+    behaviourTimer(std::chrono::system_clock::now()),
+    behaviourDelay(500000)
 {
     // Nothing to do.
 }
@@ -103,7 +105,7 @@ bool Mobile::setAbilities(const std::string & source)
     return true;
 }
 
-void Mobile::respawn(bool actNow)
+void Mobile::respawn()
 {
     // Delete the models loaded as equipment.
     for (auto item : equipment)
@@ -142,15 +144,8 @@ void Mobile::respawn(bool actNow)
                           exceptions,
                           this->getNameCapital());
     // Set the next action time.
-    if (actNow)
-    {
-        nextActionCooldown = std::chrono::system_clock::now();
-    }
-    else
-    {
-        nextActionCooldown = std::chrono::system_clock::now() +
-                             std::chrono::seconds(10 * level);
-    }
+    behaviourTimer = std::chrono::system_clock::now() +
+                     std::chrono::seconds(level);
     // Log to the mud.
     //Logger::log(LogLevel::Debug, "Respawning " + this->id);
 }
@@ -325,6 +320,35 @@ void Mobile::sendMsg(const std::string & msg)
     }
 }
 
+void Mobile::performBehaviour()
+{
+    if (behaviourQueue.empty())
+    {
+        this->triggerEventMain();
+    }
+    if (this->checkBehaviourTimer())
+    {
+        auto status = behaviourQueue.front()->perform();
+        if ((status == BehaviourStatus::Finished) ||
+            (status == BehaviourStatus::Error))
+        {
+            behaviourQueue.pop_front();
+        }
+    }
+}
+
+bool Mobile::checkBehaviourTimer()
+{
+    // Check if the tic is passed.
+    if (std::chrono::duration_cast<std::chrono::seconds>(
+        std::chrono::system_clock::now() - behaviourTimer) >= behaviourDelay)
+    {
+        behaviourTimer = std::chrono::system_clock::now();
+        return true;
+    }
+    return false;
+}
+
 void Mobile::triggerEventInit()
 {
     this->mobileThread("EventInit", nullptr, "");
@@ -337,7 +361,10 @@ void Mobile::triggerEventFight(Character * character)
 
 void Mobile::triggerEventEnter(Character * character)
 {
+    Logger::log(LogLevel::Trace, "Activating EventEnter.");
     this->mobileThread("EventEnter", character, "");
+    behaviourTimer = std::chrono::system_clock::now() -
+                     std::chrono::seconds(1);
 }
 
 void Mobile::triggerEventExit(Character * character)
@@ -389,26 +416,47 @@ bool Mobile::mobileThread(std::string event,
                           Character * character,
                           std::string message)
 {
-    Logger::log(LogLevel::Trace, "Starting event '%s'", event);
-    try
+    if (!event.empty())
     {
-        luabridge::LuaRef f = luabridge::getGlobal(L, event.c_str());
         try
         {
-            if (character != nullptr)
+            luabridge::LuaRef func = luabridge::getGlobal(L, event.c_str());
+            if (func.isFunction())
             {
-                if (!message.empty())
+                if (character != nullptr)
                 {
-                    f(this, character, message);
+                    if (!message.empty())
+                    {
+                        behaviourQueue.emplace_back(
+                            std::make_shared<BehaviourP3<
+                                Character *,
+                                Character *,
+                                std::string>>(event,
+                                              func,
+                                              this,
+                                              character,
+                                              message));
+                    }
+                    else
+                    {
+                        behaviourQueue.emplace_back(
+                            std::make_shared<
+                                BehaviourP2<
+                                    Character *,
+                                    Character *>>(event,
+                                                  func,
+                                                  this,
+                                                  character));
+                    }
                 }
                 else
                 {
-                    f(this, character);
+                    behaviourQueue.emplace_back(
+                        std::make_shared<
+                            BehaviourP1<Character *>>(event,
+                                                      func,
+                                                      this));
                 }
-            }
-            else
-            {
-                f(this);
             }
         }
         catch (luabridge::LuaException const & e)
@@ -416,11 +464,6 @@ bool Mobile::mobileThread(std::string event,
             Logger::log(LogLevel::Error, e.what());
         }
     }
-    catch (luabridge::LuaException const & e)
-    {
-        Logger::log(LogLevel::Error, e.what());
-    }
-    Logger::log(LogLevel::Trace, "Ending   event '%s'", event);
     return true;
 }
 

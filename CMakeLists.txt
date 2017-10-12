@@ -264,6 +264,7 @@ set(PROJECT_INC
         ${CMAKE_SOURCE_DIR}/src/character/effect
         ${CMAKE_SOURCE_DIR}/src/character/race
         ${CMAKE_SOURCE_DIR}/src/character/skill
+        ${CMAKE_SOURCE_DIR}/src/character/behaviour
         ${CMAKE_SOURCE_DIR}/src/command
         ${CMAKE_SOURCE_DIR}/src/command/god
         ${CMAKE_SOURCE_DIR}/src/command/object

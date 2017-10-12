@@ -20,8 +20,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
+#include <utilities/logger.hpp>
 #include "updater.hpp"
-#include "logger.hpp"
+#include "generalBehaviour.hpp"
 #include "mud.hpp"
 
 // //////////////////////////////////////////////////////////
@@ -279,15 +280,7 @@ void MudUpdater::performActions()
         {
             continue;
         }
-        auto end = std::chrono::system_clock::now();
-        auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
-            mobile->nextActionCooldown - end).count();
-        if (elapsed < 0)
-        {
-            mobile->triggerEventRandom();
-            mobile->nextActionCooldown = end + std::chrono::seconds(
-                TRand<int>(30, 60));
-        }
+        mobile->performBehaviour();
         if (mobile->getAction()->isLastAction())
         {
             continue;

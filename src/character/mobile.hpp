@@ -31,6 +31,8 @@
 
 #include "character.hpp"
 
+class GeneralBehaviour;
+
 /// @brief Holds details about mobile: mob, vendor, quest npcs.
 class Mobile :
     public Character
@@ -56,10 +58,14 @@ public:
     Character * controller;
     /// The file that contains the behaviour of this mobile.
     std::string lua_script;
-    /// Seconds until next action.
-    std::chrono::time_point<std::chrono::system_clock> nextActionCooldown;
     /// The item of which this mobile is the manager.
     Item * managedItem;
+    /// Character current action.
+    std::deque<std::shared_ptr<GeneralBehaviour>> behaviourQueue;
+    /// Seconds until next action.
+    std::chrono::time_point<std::chrono::system_clock> behaviourTimer;
+    ///
+    std::chrono::microseconds behaviourDelay;
 
     /// @brief Constructor.
     Mobile();
@@ -82,7 +88,7 @@ public:
     bool setAbilities(const std::string & source);
 
     /// @brief Initialize mobile.
-    void respawn(bool actNow = false);
+    void respawn();
 
     /// @brief Checks if the mobile is alive.
     /// @return <b>True</b> if is alive,<br>
@@ -119,6 +125,10 @@ public:
     /// @brief Output to player (any type).
     /// @param msg The string to sent.
     void sendMsg(const std::string & msg) override;
+
+    void performBehaviour();
+
+    bool checkBehaviourTimer();
 
     /// @defgroup MobileLuaEvent Mobile Lua Events Function
     /// @brief All the functions necessary to call the correspondent Function on Lua file,

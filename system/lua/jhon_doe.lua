@@ -128,7 +128,7 @@ SearchAxe = function(self)
             --  Cannot find a path to nextRoom
             JhonExplorer.invalidRooms:pushfirst(nextRoom)
         end
-        Mud.sleep(4)
+--        Mud.sleep(4)
     end
     return nil
 end

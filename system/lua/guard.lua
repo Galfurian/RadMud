@@ -24,22 +24,28 @@ EventFight = function(self, character)
     -- Put event code here.
 end
 
+local EventEnterState = 0
+local EventEnterCounter = 0
 -- Handle the actions when a character enters the room.
 EventEnter = function(self, character)
-    -- Put event code here.
-    if (Mud.random(1, 10) > 7) then
-        self:doCommand("look " .. character.name)
-        Mud.sleep(2)
-        self:doCommand("say " .. character.name .. " Stand aside, citizen!")
-        if (character:isPlayer()) then
-            local variable = character:toPlayer():getVariable("seen_by_guard")
-            if variable then
-                print("Previous :" .. variable)
-            end
-            character:toPlayer():setVariable("seen_by_guard", "" .. Mud.random(1, 10))
-            print("New : " .. character:toPlayer():getVariable("seen_by_guard"))
+    if (EventEnterState == 0) then
+        if (Mud.random(1, 10) < 7) then
+            return true
         end
+        self:doCommand("look " .. character.name)
+    elseif (EventEnterState == 1) then
+        self:doCommand("say " .. character.name .. " Stand aside, citizen!")
+    elseif (EventEnterState == 2) then
+        if (EventEnterCounter >= 3) then
+            self:doCommand("say " .. character.name .. " Are you still here?!?")
+            EventEnterState = 0
+            EventEnterCounter = 0
+            return true
+        end
+        EventEnterCounter = EventEnterCounter + 1
     end
+    EventEnterState = EventEnterState + 1
+    return false
 end
 
 -- Handle the actions when a character exits the room.

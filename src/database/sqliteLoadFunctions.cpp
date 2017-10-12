@@ -753,7 +753,7 @@ bool LoadMobile(ResultSet * result)
                 throw SQLiteException("Error during mobile insertion.");
             }
             // Respawn the mobile.
-            mobile->respawn(true);
+            mobile->respawn();
         }
         catch (SQLiteException & e)
         {
