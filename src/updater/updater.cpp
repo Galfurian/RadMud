@@ -251,50 +251,26 @@ void MudUpdater::updateDayPhase()
 
 void MudUpdater::performActions()
 {
-    for (auto iterator : Mud::instance().mudPlayers)
+    for (auto player : Mud::instance().mudPlayers)
     {
         // If the player is not playing, continue.
-        if (!iterator->isPlaying())
+        if (!player->isPlaying())
         {
             continue;
         }
-        if (iterator->getAction()->isLastAction())
-        {
-            continue;
-        }
-        auto & action = iterator->getAction();
-        if (action->checkElapsed())
-        {
-            auto status = action->perform();
-            if ((status == ActionStatus::Finished) ||
-                (status == ActionStatus::Error))
-            {
-                // Remove the from action.
-                iterator->popAction();
-            }
-        }
+        // Perform the action.
+        player->performAction();
     }
     for (auto mobile : Mud::instance().mudMobiles)
     {
+        // If the mobile is not alive, continue.
         if (!mobile->isAlive())
         {
             continue;
         }
+        // Perform the behaviour.
         mobile->performBehaviour();
-        if (mobile->getAction()->isLastAction())
-        {
-            continue;
-        }
-        auto & action = mobile->getAction();
-        if (action->checkElapsed())
-        {
-            auto status = action->perform();
-            if ((status == ActionStatus::Finished) ||
-                (status == ActionStatus::Error))
-            {
-                // Remove the from action.
-                mobile->popAction();
-            }
-        }
+        // Perform the action.
+        mobile->performAction();
     }
 }

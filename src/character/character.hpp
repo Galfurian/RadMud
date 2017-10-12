@@ -326,6 +326,9 @@ public:
     /// @brief Provides a pointer to the current action.
     std::shared_ptr<GeneralAction> const & getAction() const;
 
+    /// @brief Performs any pending action.
+    void performAction();
+
     /// @brief Allows to reset the entire action queue.
     void resetActionQueue();
 

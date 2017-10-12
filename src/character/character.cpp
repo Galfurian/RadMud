@@ -571,6 +571,25 @@ std::shared_ptr<GeneralAction> const & Character::getAction() const
     return actionQueue.front();
 }
 
+void Character::performAction()
+{
+    auto & action = this->getAction();
+    if (action->isLastAction())
+    {
+        return;
+    }
+    if (action->checkElapsed())
+    {
+        auto status = action->perform();
+        if ((status == ActionStatus::Finished) ||
+            (status == ActionStatus::Error))
+        {
+            // Remove the from action.
+            this->popAction();
+        }
+    }
+}
+
 void Character::resetActionQueue()
 {
     std::lock_guard<std::mutex> lock(actionQueueMutex);
