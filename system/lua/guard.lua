@@ -28,13 +28,17 @@ local EventEnterState = 0
 local EventEnterCounter = 0
 -- Handle the actions when a character enters the room.
 EventEnter = function(self, character)
+    print("EventEnterState " .. EventEnterState)
+    print("EventEnterCounter " .. EventEnterCounter)
     if (EventEnterState == 0) then
         if (Mud.random(1, 10) < 7) then
             return true
         end
         self:doCommand("look " .. character.name)
+        EventEnterState = 1
     elseif (EventEnterState == 1) then
         self:doCommand("say " .. character.name .. " Stand aside, citizen!")
+        EventEnterState = 2
     elseif (EventEnterState == 2) then
         if (EventEnterCounter >= 3) then
             self:doCommand("say " .. character.name .. " Are you still here?!?")
@@ -44,7 +48,6 @@ EventEnter = function(self, character)
         end
         EventEnterCounter = EventEnterCounter + 1
     end
-    EventEnterState = EventEnterState + 1
     return false
 end
 
