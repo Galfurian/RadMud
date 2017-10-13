@@ -302,6 +302,8 @@ void Mobile::reloadLua()
     inventory.clear();
     // Completely clear the stack.
     lua_settop(L, 0);
+    // Empty the behaviours queue.
+    behaviourQueue.clear();
     // Reset the lua state.
     L = luaL_newstate();
     // Load the lua environment.
