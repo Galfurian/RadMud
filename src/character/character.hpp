@@ -40,6 +40,7 @@
 #include "rangedWeaponItem.hpp"
 #include "characterPosture.hpp"
 #include "characterVector.hpp"
+#include "skillManager.hpp"
 
 #include <deque>
 #include <mutex>
@@ -105,7 +106,7 @@ public:
     /// Character abilities.
     std::map<Ability, unsigned int> abilities;
     /// The player's list of skills.
-    std::map<int, unsigned int> skills;
+    SkillManager skillManager;
     /// The current room the character is in.
     Room * room;
     /// Character's inventory.

@@ -327,7 +327,7 @@ bool SQLiteDbms::loadPlayerSkill(Player * player)
     bool status = true;
     while (result->next())
     {
-        auto skill = Mud::instance().findSkill(result->getNextInteger());
+        auto skill = Mud::instance().findSkill(result->getNextUnsignedInteger());
         auto value = result->getNextUnsignedInteger();
         if (skill == nullptr)
         {
@@ -335,7 +335,7 @@ bool SQLiteDbms::loadPlayerSkill(Player * player)
             status = false;
             break;
         }
-        player->skills[skill->vnum] = value;
+        player->skillManager.addSkill(skill, value);
     }
     // release the resource.
     result->release();

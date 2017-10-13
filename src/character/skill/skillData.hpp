@@ -1,6 +1,6 @@
-/// @file   skillRank.cpp
+/// @file   skillData.hpp
 /// @author Enrico Fraccaroli
-/// @date   Jan 16 2017
+/// @date   ott 13 2017
 /// @copyright
 /// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -19,28 +19,45 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
+#pragma once
+
+#include "skill.hpp"
 #include "skillRank.hpp"
+#include "radMudTypes.hpp"
 
-std::string SkillRank::toString() const
+class SkillData
 {
-    if (value == Newbie) return "Newbie";
-    if (value == Novice) return "Novice";
-    if (value == Rookie) return "Rookie";
-    if (value == Beginner) return "Beginner";
-    if (value == Talented) return "Talented";
-    if (value == Skilled) return "Skilled";
-    if (value == Intermediate) return "Intermediate";
-    if (value == Seasoned) return "Seasoned";
-    if (value == Proficient) return "Proficient";
-    if (value == Experienced) return "Experienced";
-    if (value == Advanced) return "Advanced";
-    if (value == Expert) return "Expert";
-    if (value == Specialist) return "Specialist";
-    if (value == Master) return "Master";
-    return "None";
-}
+public:
+    /// The skill vnum.
+    VnumType skillVnum;
+    /// The skill level.
+    unsigned int skillLevel;
+    /// A pointer to the skill.
+    std::shared_ptr<Skill> skill;
 
-unsigned int SkillRank::getSkillCap()
-{
-    return 119000;
-}
+    /// @brief Constructor.
+    SkillData(const VnumType & _skillVnum,
+              const unsigned int & _skillLevel,
+              const std::shared_ptr<Skill> & _skill) :
+        skillVnum(_skillVnum),
+        skillLevel(_skillLevel),
+        skill(_skill)
+    {
+        // Nothing to do.
+    }
+
+    /// @brief Constructor.
+    SkillData(const std::shared_ptr<Skill> & _skill,
+              const unsigned int & _skillLevel) :
+        skillVnum(_skill->vnum),
+        skillLevel(_skillLevel),
+        skill(_skill)
+    {
+        // Nothing to do.
+    }
+
+    inline SkillRank getSkillRank() const
+    {
+        return SkillRank::getSkillRank(skillLevel);
+    }
+};

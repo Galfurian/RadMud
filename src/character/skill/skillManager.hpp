@@ -1,6 +1,6 @@
-/// @file   skillRank.cpp
+/// @file   skillManager.hpp
 /// @author Enrico Fraccaroli
-/// @date   Jan 16 2017
+/// @date   ott 13 2017
 /// @copyright
 /// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -19,28 +19,45 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "skillRank.hpp"
+#pragma once
 
-std::string SkillRank::toString() const
-{
-    if (value == Newbie) return "Newbie";
-    if (value == Novice) return "Novice";
-    if (value == Rookie) return "Rookie";
-    if (value == Beginner) return "Beginner";
-    if (value == Talented) return "Talented";
-    if (value == Skilled) return "Skilled";
-    if (value == Intermediate) return "Intermediate";
-    if (value == Seasoned) return "Seasoned";
-    if (value == Proficient) return "Proficient";
-    if (value == Experienced) return "Experienced";
-    if (value == Advanced) return "Advanced";
-    if (value == Expert) return "Expert";
-    if (value == Specialist) return "Specialist";
-    if (value == Master) return "Master";
-    return "None";
-}
+#include <vector>
+#include "skillData.hpp"
+#include "radMudTypes.hpp"
 
-unsigned int SkillRank::getSkillCap()
+class SkillManager
 {
-    return 119000;
-}
+public:
+    /// The player's list of skills.
+    std::vector<std::shared_ptr<SkillData>> skills;
+
+    SkillManager() :
+        skills()
+    {
+        // Nothing to do.
+    }
+
+    inline bool addSkill(const std::shared_ptr<Skill> & skill,
+                         const unsigned int & skillLevel = 1)
+    {
+        if (this->findSkill(skill->vnum) != nullptr)
+        {
+            return false;
+        }
+        skills.emplace_back(std::make_shared<SkillData>(skill, skillLevel));
+        return true;
+    }
+
+    inline std::shared_ptr<SkillData> findSkill(const VnumType & vnum)
+    {
+        for (auto skillData : skills)
+        {
+            if (skillData->skillVnum == vnum)
+            {
+                return skillData;
+            }
+        }
+        return nullptr;
+    }
+
+};

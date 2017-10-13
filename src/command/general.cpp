@@ -23,7 +23,6 @@
 #include "general.hpp"
 
 #include "nameGenerator.hpp"
-#include "skillRank.hpp"
 #include "logger.hpp"
 #include "mud.hpp"
 
@@ -630,14 +629,10 @@ bool DoSkills(Character * character, ArgumentHandler & /*args*/)
     Table table = Table();
     table.addColumn("LvL", StringAlign::Left);
     table.addColumn("Skill", StringAlign::Left);
-    for (auto it : player->skills)
+    for (const auto & skillData : player->skillManager.skills)
     {
-        auto skill = Mud::instance().findSkill(it.first);
-        if (skill)
-        {
-            table.addRow({skill->name,
-                          SkillRank::getSkillRank(it.second).toString()});
-        }
+        table.addRow({skillData->skill->name,
+                      skillData->getSkillRank().toString()});
     }
     character->sendMsg(table.getTable());
     return true;

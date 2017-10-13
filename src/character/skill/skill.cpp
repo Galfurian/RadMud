@@ -69,23 +69,17 @@ void Skill::updateSkillEffects(Character * character)
     // Phase 1: Deactivate all the passive effects.
     character->effects.removeAllPassiveEffect();
     // Iterate the character's skills.
-    for (auto it : character->skills)
+    for (const auto & skillData : character->skillManager.skills)
     {
         // ---------------------------------------------------------------------
         // Phase 2: Activate all the passive effects due to the skill.
-        // Save the skill.
-        auto skill = Mud::instance().findSkill(it.first);
-        if (skill == nullptr)
-        {
-            Logger::log(LogLevel::Error, "Can't find the skill '%s'", it.first);
-            continue;
-        }
+        // Get the skill.
+        const auto & skill = skillData->skill;
         // Save the skill rank.
-        auto skillRank = static_cast<int>(
-            SkillRank::getSkillRank(it.second).toUInt());
+        auto skillRank = skillData->getSkillRank().to<int>();
         // Create a new skill effect.
-        auto skillEffect = EffectFactory::skillEffect(character,
-                                                      skill->name);
+        auto skillEffect =
+            EffectFactory::skillEffect(character, skill->name);
         // Iterate through the modifiers of the skill.
         for (auto it2 : skill->abilityModifier)
         {
@@ -160,35 +154,25 @@ void Skill::updateSkillEffects(Character * character)
 
 void Skill::checkIfUnlockedSkills(Character * character)
 {
-    std::vector<int> masterSkills;
-    for (auto it : character->skills)
+    std::vector<VnumType> masterSkills;
+    for (const auto & skillData : character->skillManager.skills)
     {
-        // Get the skill.
-        auto skill = Mud::instance().findSkill(it.first);
-        if (skill == nullptr)
-        {
-            Logger::log(LogLevel::Error, "Can't find the skill '%s'", it.first);
-            continue;
-        }
         // Get the current skill rank.
-        auto skillRank = SkillRank::getSkillRank(it.second);
-        if (skillRank == SkillRank::Master)
+        if (skillData->getSkillRank() == SkillRank::Master)
         {
-            masterSkills.emplace_back(skill->vnum);
+            masterSkills.emplace_back(skillData->skillVnum);
         }
     }
-    for (auto it : Mud::instance().mudSkills)
+    for (const auto & skill : Mud::instance().mudSkills)
     {
-        // Get the skill.
-        auto skill = it.second;
         // Check if the character posses the skill.
-        if (character->skills.find(skill->vnum) != character->skills.end())
+        if (character->skillManager.findSkill(skill->vnum) != nullptr)
         {
             continue;
         }
         // Check if the character has the pre-requisite for the skill.
-        bool hasRequiredSkill = true;
-        for (auto requiredSkill : skill->requiredSkills)
+        auto hasRequiredSkill = true;
+        for (const auto & requiredSkill : skill->requiredSkills)
         {
             auto findIt = std::find(masterSkills.begin(),
                                     masterSkills.end(),
@@ -202,7 +186,7 @@ void Skill::checkIfUnlockedSkills(Character * character)
         // Add the new skill to the character.
         if (hasRequiredSkill)
         {
-            character->skills.insert(std::make_pair(skill->vnum, 1));
+            character->skillManager.addSkill(skill);
         }
     }
 }
@@ -210,15 +194,10 @@ void Skill::checkIfUnlockedSkills(Character * character)
 void Skill::improveSkillAbilityModifier(Character * character,
                                         const Ability & abilityModifier)
 {
-    for (auto & it : character->skills)
+    for (auto & skillData : character->skillManager.skills)
     {
         // Get the skill.
-        auto skill = Mud::instance().findSkill(it.first);
-        if (skill == nullptr)
-        {
-            Logger::log(LogLevel::Error, "Can't find the skill '%s'", it.first);
-            continue;
-        }
+        const auto & skill = skillData->skill;
         // Check if the skill provides the given modifier.
         if (skill->abilityModifier.find(abilityModifier) ==
             skill->abilityModifier.end())
@@ -226,10 +205,11 @@ void Skill::improveSkillAbilityModifier(Character * character,
             continue;
         }
         // Get the current skill rank.
-        auto skillRank = SkillRank::getSkillRank(it.second);
-        it.second += 50;
+        auto skillRank = skillData->getSkillRank();
+        // Improve the skill.
+        skillData->skillLevel += 50;
         // Get the new skill rank.
-        auto newSkillRank = SkillRank::getSkillRank(it.second);
+        auto newSkillRank = skillData->getSkillRank();
         // Check if the skill has advanced on the ranking.
         if (skillRank < newSkillRank)
         {
@@ -248,15 +228,10 @@ void Skill::improveSkillAbilityModifier(Character * character,
 void Skill::improveSkillStatusModifier(Character * character,
                                        const StatusModifier & statusModifier)
 {
-    for (auto & it : character->skills)
+    for (auto & skillData : character->skillManager.skills)
     {
         // Get the skill.
-        auto skill = Mud::instance().findSkill(it.first);
-        if (skill == nullptr)
-        {
-            Logger::log(LogLevel::Error, "Can't find the skill '%s'", it.first);
-            continue;
-        }
+        const auto & skill = skillData->skill;
         // Check if the skill provides the given modifier.
         if (skill->statusModifier.find(statusModifier) ==
             skill->statusModifier.end())
@@ -264,10 +239,11 @@ void Skill::improveSkillStatusModifier(Character * character,
             continue;
         }
         // Get the current skill rank.
-        auto skillRank = SkillRank::getSkillRank(it.second);
-        it.second += 50;
+        auto skillRank = skillData->getSkillRank();
+        // Improve the skill.
+        skillData->skillLevel += 50;
         // Get the new skill rank.
-        auto newSkillRank = SkillRank::getSkillRank(it.second);
+        auto newSkillRank = skillData->getSkillRank();
         // Check if the skill has advanced on the ranking.
         if (skillRank < newSkillRank)
         {
@@ -286,15 +262,10 @@ void Skill::improveSkillStatusModifier(Character * character,
 void Skill::improveSkillCombatModifier(Character * character,
                                        const CombatModifier & combatModifier)
 {
-    for (auto & it : character->skills)
+    for (auto & skillData : character->skillManager.skills)
     {
         // Get the skill.
-        auto skill = Mud::instance().findSkill(it.first);
-        if (skill == nullptr)
-        {
-            Logger::log(LogLevel::Error, "Can't find the skill '%s'", it.first);
-            continue;
-        }
+        const auto & skill = skillData->skill;
         // Check if the skill provides the given modifier.
         if (skill->combatModifier.find(combatModifier) ==
             skill->combatModifier.end())
@@ -302,10 +273,11 @@ void Skill::improveSkillCombatModifier(Character * character,
             continue;
         }
         // Get the current skill rank.
-        auto skillRank = SkillRank::getSkillRank(it.second);
-        it.second += 50;
+        auto skillRank = skillData->getSkillRank();
+        // Improve the skill.
+        skillData->skillLevel += 50;
         // Get the new skill rank.
-        auto newSkillRank = SkillRank::getSkillRank(it.second);
+        auto newSkillRank = skillData->getSkillRank();
         // Check if the skill has advanced on the ranking.
         if (skillRank < newSkillRank)
         {
@@ -324,25 +296,21 @@ void Skill::improveSkillCombatModifier(Character * character,
 void Skill::improveSkillKnowledge(Character * character,
                                   const Knowledge & knowledge)
 {
-    for (auto & it : character->skills)
+    for (auto & skillData : character->skillManager.skills)
     {
         // Get the skill.
-        auto skill = Mud::instance().findSkill(it.first);
-        if (skill == nullptr)
-        {
-            Logger::log(LogLevel::Error, "Can't find the skill '%s'", it.first);
-            continue;
-        }
+        const auto & skill = skillData->skill;
         // Check if the skill provides the given knowledge.
         if (skill->knowledge.find(knowledge) == skill->knowledge.end())
         {
             continue;
         }
         // Get the current skill rank.
-        auto skillRank = SkillRank::getSkillRank(it.second);
-        it.second += 50;
+        auto skillRank = skillData->getSkillRank();
+        // Improve the skill.
+        skillData->skillLevel += 50;
         // Get the new skill rank.
-        auto newSkillRank = SkillRank::getSkillRank(it.second);
+        auto newSkillRank = skillData->getSkillRank();
         // Check if the skill has advanced on the ranking.
         if (skillRank < newSkillRank)
         {

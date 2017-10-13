@@ -21,7 +21,6 @@
 
 #include "commandGodCharacter.hpp"
 #include "characterUtilities.hpp"
-#include "skillRank.hpp"
 #include "mud.hpp"
 
 bool DoGodInfo(Character * character, ArgumentHandler & args)
@@ -341,7 +340,8 @@ bool DoPlayerModSkill(Character * character, ArgumentHandler & args)
         character->sendMsg("Target not found.\n");
         return false;
     }
-    auto skill = Mud::instance().findSkill(ToNumber<int>(args[1].getContent()));
+    auto skill = Mud::instance().findSkill(
+        ToNumber<VnumType>(args[1].getContent()));
     if (skill == nullptr)
     {
         character->sendMsg("Cannot find the desired skill.\n");
@@ -353,14 +353,14 @@ bool DoPlayerModSkill(Character * character, ArgumentHandler & args)
         character->sendMsg("You must insert a valid modifier.\n");
         return false;
     }
-    auto skillEntry = target->skills.find(skill->vnum);
-    if (skillEntry == target->skills.end())
+    auto skillData = target->skillManager.findSkill(skill->vnum);
+    if (skillData == nullptr)
     {
         character->sendMsg("%s does not possess that skill.\n",
                            target->getNameCapital());
         return false;
     }
-    auto modified = static_cast<int>(skillEntry->second) + modifier;
+    auto modified = static_cast<int>(skillData->skillLevel) + modifier;
     if (modified <= 0)
     {
         character->sendMsg("You cannot reduce the skill <= 0 (%s).\n",
@@ -373,14 +373,14 @@ bool DoPlayerModSkill(Character * character, ArgumentHandler & args)
         modified = static_cast<int>(skillCap);
     }
     // Change the skill value.
-    skillEntry->second = static_cast<unsigned int>(modified);
+    skillData->skillLevel = static_cast<unsigned int>(modified);
     // Notify.
     character->sendMsg("You have successfully %s by %s the \"%s\" skill,"
                            "the new level is %s.\n",
                        ((modifier > 0) ? "increased " : "decreased"),
                        modifier,
                        skill->name,
-                       skillEntry->second);
+                       skillData->skillLevel);
     Skill::updateSkillEffects(character);
     Skill::checkIfUnlockedSkills(character);
     return true;

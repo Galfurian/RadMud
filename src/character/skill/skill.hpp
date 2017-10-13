@@ -30,6 +30,7 @@
 #include "combatModifier.hpp"
 #include "statusModifier.hpp"
 #include "knowledge.hpp"
+#include "radMudTypes.hpp"
 
 class Character;
 
@@ -38,7 +39,7 @@ class Skill
 {
 public:
     /// The skill virtual number.
-    int vnum;
+    VnumType vnum;
     /// The name of the skill.
     std::string name;
     /// The description of the skill.

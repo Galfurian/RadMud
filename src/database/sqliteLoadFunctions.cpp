@@ -179,7 +179,7 @@ bool LoadSkill(ResultSet * result)
         {
             // Create an empty Skill.
             auto skill = std::make_shared<Skill>();
-            skill->vnum = result->getNextInteger();
+            skill->vnum = result->getNextUnsignedInteger();
             skill->name = result->getNextString();
             skill->description = result->getNextString();
             skill->ability = Ability(result->getNextUnsignedInteger());
@@ -215,14 +215,14 @@ bool LoadSkillPrerequisite(ResultSet * result)
     {
         try
         {
-            auto skillVnum = result->getNextInteger();
+            auto skillVnum = result->getNextUnsignedInteger();
             auto skill = Mud::instance().findSkill(skillVnum);
             if (skill == nullptr)
             {
                 throw SQLiteException("Can't find the skill " +
                                       ToString(skillVnum));
             }
-            auto requiredSkillVnum = result->getNextInteger();
+            auto requiredSkillVnum = result->getNextUnsignedInteger();
             auto requiredSkill = Mud::instance().findSkill(requiredSkillVnum);
             if (requiredSkill == nullptr)
             {
@@ -253,7 +253,7 @@ bool LoadSkillAbilityModifier(ResultSet * result)
     {
         try
         {
-            auto skillVnum = result->getNextInteger();
+            auto skillVnum = result->getNextUnsignedInteger();
             auto skill = Mud::instance().findSkill(skillVnum);
             if (skill == nullptr)
             {
@@ -291,7 +291,7 @@ bool LoadSkillStatusModifier(ResultSet * result)
     {
         try
         {
-            auto skillVnum = result->getNextInteger();
+            auto skillVnum = result->getNextUnsignedInteger();
             auto skill = Mud::instance().findSkill(skillVnum);
             if (skill == nullptr)
             {
@@ -331,7 +331,7 @@ bool LoadSkillCombatModifier(ResultSet * result)
     {
         try
         {
-            auto skillVnum = result->getNextInteger();
+            auto skillVnum = result->getNextUnsignedInteger();
             auto skill = Mud::instance().findSkill(skillVnum);
             if (skill == nullptr)
             {
@@ -371,7 +371,7 @@ bool LoadSkillKnowledge(ResultSet * result)
     {
         try
         {
-            auto skillVnum = result->getNextInteger();
+            auto skillVnum = result->getNextUnsignedInteger();
             auto skill = Mud::instance().findSkill(skillVnum);
             if (skill == nullptr)
             {
@@ -638,7 +638,7 @@ bool LoadRaceBaseSkill(ResultSet * result)
                 throw SQLiteException("Cannot find the race " +
                                       ToString(raceVnum));
             }
-            auto skillVnum = result->getNextInteger();
+            auto skillVnum = result->getNextUnsignedInteger();
             auto skill = Mud::instance().findSkill(skillVnum);
             if (skill == nullptr)
             {
@@ -647,7 +647,7 @@ bool LoadRaceBaseSkill(ResultSet * result)
             }
             auto rank = result->getNextUnsignedInteger();
             // Set the base skill of the race.
-            race->baseSkills.insert(std::make_pair(skillVnum, rank));
+            race->skillManager.addSkill(skill,rank);
             // Log the skill.
             Logger::log(LogLevel::Debug,
                         "\t%s%s%s",

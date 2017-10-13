@@ -42,7 +42,7 @@ Character::Character() :
     stamina(),
     hunger(100),
     thirst(100),
-    skills(),
+    skillManager(),
     room(),
     inventory(),
     equipment(),
@@ -186,13 +186,9 @@ void Character::getSheet(Table & sheet) const
                 Ability::Intelligence)) +
             "]"});
     sheet.addRow({"## Skill", "## Points"});
-    for (auto it : skills)
+    for (const auto & skillData : skillManager.skills)
     {
-        auto skill = Mud::instance().findSkill(it.first);
-        if (skill)
-        {
-            sheet.addRow({skill->name, ToString(it.second)});
-        }
+        sheet.addRow({skillData->skill->name, ToString(skillData->skillLevel)});
     }
     if (CorrectAssert(this->room != nullptr))
     {

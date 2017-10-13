@@ -328,7 +328,9 @@ bool Mud::addFaction(Faction * faction)
 
 bool Mud::addSkill(std::shared_ptr<Skill> skill)
 {
-    return mudSkills.insert(std::make_pair(skill->vnum, skill)).second;
+    if(this->findSkill(skill->vnum)) return false;
+    mudSkills.emplace_back(skill);
+    return true;
 }
 
 bool Mud::addWriting(Writing * writing)
@@ -477,10 +479,13 @@ Faction * Mud::findFaction(std::string name)
     return nullptr;
 }
 
-std::shared_ptr<Skill> Mud::findSkill(int vnum)
+std::shared_ptr<Skill> Mud::findSkill(const VnumType & vnum)
 {
-    auto it = mudSkills.find(vnum);
-    return (it == mudSkills.end()) ? nullptr : it->second;
+    for(const auto & skill : mudSkills)
+    {
+        if(skill->vnum == vnum) return skill;
+    }
+    return nullptr;
 }
 
 Writing * Mud::findWriting(int vnum)

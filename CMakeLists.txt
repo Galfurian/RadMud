@@ -121,6 +121,8 @@ set(PROJECT_SRC
         ${CMAKE_SOURCE_DIR}/src/character/effect/effectFactory.cpp
         ${CMAKE_SOURCE_DIR}/src/character/race/race.cpp
         ${CMAKE_SOURCE_DIR}/src/character/skill/skill.cpp
+        ${CMAKE_SOURCE_DIR}/src/character/skill/skillData.cpp
+        ${CMAKE_SOURCE_DIR}/src/character/skill/skillManager.cpp
         ${CMAKE_SOURCE_DIR}/src/command/command.cpp
         ${CMAKE_SOURCE_DIR}/src/command/combat.cpp
         ${CMAKE_SOURCE_DIR}/src/command/communication.cpp

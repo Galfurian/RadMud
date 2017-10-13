@@ -173,7 +173,7 @@ public:
     /// List of all the factions.
     std::map<int, Faction *> mudFactions;
     /// List of all the skills.
-    std::map<int, std::shared_ptr<Skill>> mudSkills;
+    std::vector<std::shared_ptr<Skill>> mudSkills;
     /// List of all the writings.
     std::map<int, Writing *> mudWritings;
     /// List of all the corpses.
@@ -350,7 +350,7 @@ public:
     Faction * findFaction(std::string name);
 
     /// Find a skill given its vnum.
-    std::shared_ptr<Skill> findSkill(int vnum);
+    std::shared_ptr<Skill> findSkill(const VnumType & vnum);
 
     /// Find a writing given its vnum.
     Writing * findWriting(int vnum);

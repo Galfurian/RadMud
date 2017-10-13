@@ -73,7 +73,38 @@ public:
     std::string toString() const override;
 
     /// @brief Given a value, provides the corresponding skill rank.
-    static SkillRank getSkillRank(unsigned int & _value);
+    static inline SkillRank getSkillRank(const unsigned int & _value)
+    {
+        unsigned int rankThreshold = (1000 + (1000 * Newbie));
+        if (_value <= rankThreshold) return Newbie;         // 2000
+        rankThreshold += (1000 + (1000 * Novice));
+        if (_value <= rankThreshold) return Novice;         // 5000
+        rankThreshold += (1000 + (1000 * Rookie));
+        if (_value <= rankThreshold) return Rookie;         // 9000
+        rankThreshold += (1000 + (1000 * Beginner));
+        if (_value <= rankThreshold) return Beginner;       // 14000
+        rankThreshold += (1000 + (1000 * Talented));
+        if (_value <= rankThreshold) return Talented;       // 20000
+        rankThreshold += (1000 + (1000 * Skilled));
+        if (_value <= rankThreshold) return Skilled;        // 27000
+        rankThreshold += (1000 + (1000 * Intermediate));
+        if (_value <= rankThreshold) return Intermediate;   // 35000
+        rankThreshold += (1000 + (1000 * Seasoned));
+        if (_value <= rankThreshold) return Seasoned;       // 44000
+        rankThreshold += (1000 + (1000 * Proficient));
+        if (_value <= rankThreshold) return Proficient;     // 54000
+        rankThreshold += (1000 + (1000 * Experienced));
+        if (_value <= rankThreshold) return Experienced;    // 65000
+        rankThreshold += (1000 + (1000 * Advanced));
+        if (_value <= rankThreshold) return Advanced;       // 77000
+        rankThreshold += (1000 + (1000 * Expert));
+        if (_value <= rankThreshold) return Expert;         // 90000
+        rankThreshold += (1000 + (1000 * Specialist));
+        if (_value <= rankThreshold) return Specialist;     // 104000
+        rankThreshold += (1000 + (1000 * Master));
+        if (_value <= rankThreshold) return Master;         // 119000
+        return Newbie;
+    }
 
     /// @brief Provides the maximum skill value.
     static unsigned int getSkillCap();
