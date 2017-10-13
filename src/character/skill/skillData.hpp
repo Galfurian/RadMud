@@ -60,4 +60,13 @@ public:
     {
         return SkillRank::getSkillRank(skillLevel);
     }
+
+    inline void improveSkill(const unsigned int & skillImprovement)
+    {
+        skillLevel += skillImprovement;
+        if(skillLevel > SkillRank::getSkillCap())
+        {
+            skillLevel = SkillRank::getSkillCap();
+        }
+    }
 };

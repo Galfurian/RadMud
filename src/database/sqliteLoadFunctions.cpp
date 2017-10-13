@@ -647,7 +647,7 @@ bool LoadRaceBaseSkill(ResultSet * result)
             }
             auto rank = result->getNextUnsignedInteger();
             // Set the base skill of the race.
-            race->skillManager.addSkill(skill,rank);
+            race->skills.emplace_back(std::make_shared<SkillData>(skill,rank));
             // Log the skill.
             Logger::log(LogLevel::Debug,
                         "\t%s%s%s",

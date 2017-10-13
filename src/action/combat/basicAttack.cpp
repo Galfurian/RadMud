@@ -402,8 +402,7 @@ void BasicAttack::performAttackNaturalWeapon(
                       actor->effects.getCombatModifier(
                           CombatModifier::UnarmedHitRoll));
     // Improve the skills which has contributed to the hit roll.
-    Skill::improveSkillCombatModifier(actor,
-                                      CombatModifier::UnarmedHitRoll);
+    actor->skillManager.improveCombat(CombatModifier::UnarmedHitRoll);
     // -------------------------------------------------------------------------
     // Phase 3: Check if the target is hit.
     // -------------------------------------------------------------------------
@@ -432,8 +431,7 @@ void BasicAttack::performAttackNaturalWeapon(
                              actor->effects.getCombatModifier(
                                  CombatModifier::UnarmedDamage));
         // Improve the skills which has contributed to the damage roll.
-        Skill::improveSkillCombatModifier(actor,
-                                          CombatModifier::UnarmedDamage);
+        actor->skillManager.improveCombat(CombatModifier::UnarmedDamage);
         // Show hit messages.
         this->handleNaturalWeaponHit(target, weapon);
         // Consume the stamina.
@@ -528,8 +526,7 @@ void BasicAttack::performMeleeAttack(Character * target,
                       actor->effects.getCombatModifier(
                           CombatModifier::MeleeWeaponHitRoll));
     // Improve the skills which has contributed to the hit roll.
-    Skill::improveSkillCombatModifier(actor,
-                                      CombatModifier::MeleeWeaponHitRoll);
+    actor->skillManager.improveCombat(CombatModifier::MeleeWeaponHitRoll);
     // -------------------------------------------------------------------------
     // Phase 3: Check if the target is hit.
     // -------------------------------------------------------------------------
@@ -562,8 +559,7 @@ void BasicAttack::performMeleeAttack(Character * target,
                              actor->effects.getCombatModifier(
                                  CombatModifier::MeleeWeaponDamage));
         // Improve the skills which has contributed to the damage roll.
-        Skill::improveSkillCombatModifier(
-            actor, CombatModifier::MeleeWeaponDamage);
+        actor->skillManager.improveCombat(CombatModifier::MeleeWeaponDamage);
         // Show hit messages.
         this->handleMeleeHit(target, weapon);
         // Consume the stamina.
@@ -658,8 +654,7 @@ void BasicAttack::performRangedAttack(Character * target,
                       actor->effects.getCombatModifier(
                           CombatModifier::RangedWeaponHitRoll));
     // Improve the skills which has contributed to the hit roll.
-    Skill::improveSkillCombatModifier(actor,
-                                      CombatModifier::RangedWeaponHitRoll);
+    actor->skillManager.improveCombat(CombatModifier::RangedWeaponHitRoll);
     // -------------------------------------------------------------------------
     // Phase 3: Consume the projectiles.
     // -------------------------------------------------------------------------
@@ -695,8 +690,7 @@ void BasicAttack::performRangedAttack(Character * target,
                              actor->effects.getCombatModifier(
                                  CombatModifier::RangedWeaponDamage));
         // Improve the skills which has contributed to the damage roll.
-        Skill::improveSkillCombatModifier(actor,
-                                          CombatModifier::RangedWeaponDamage);
+        actor->skillManager.improveCombat(CombatModifier::RangedWeaponDamage);
         // Show the message.
         this->handleRangedHit(target, weapon);
         // Consume the stamina.

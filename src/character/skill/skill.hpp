@@ -26,6 +26,7 @@
 #include <vector>
 #include <memory>
 #include <map>
+
 #include "ability.hpp"
 #include "combatModifier.hpp"
 #include "statusModifier.hpp"
@@ -82,26 +83,4 @@ public:
     /// @return <b>True</b> if it has correct values,<br>
     ///         <b>False</b> otherwise.
     bool check();
-
-    /// @brief Activate the effects on the character based on its skill ranks.
-    static void updateSkillEffects(Character * character);
-
-    /// @brief Checks if the given character has unlocked new skills.
-    static void checkIfUnlockedSkills(Character * character);
-
-    /// @brief Improves the skills which provides the given ability modifier.
-    static void improveSkillAbilityModifier(Character * character,
-                                            const Ability & abilityModifier);
-
-    /// @brief Improves the skills which provides the given status modifier.
-    static void improveSkillStatusModifier(Character * character,
-                                           const StatusModifier & statusModifier);
-
-    /// @brief Improves the skills which provides the given combat modifier.
-    static void improveSkillCombatModifier(Character * character,
-                                           const CombatModifier & combatModifier);
-
-    /// @brief Improves the skills which provides the given knowledge.
-    static void improveSkillKnowledge(Character * character,
-                                      const Knowledge & knowledge);
 };

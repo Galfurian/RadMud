@@ -25,13 +25,18 @@
 #include "skillData.hpp"
 #include "radMudTypes.hpp"
 
+class Character;
+
 class SkillManager
 {
 public:
+    /// The owner of the manager.
+    Character * owner;
     /// The player's list of skills.
     std::vector<std::shared_ptr<SkillData>> skills;
 
-    SkillManager() :
+    explicit SkillManager(Character * _owner) :
+        owner(_owner),
         skills()
     {
         // Nothing to do.
@@ -59,5 +64,23 @@ public:
         }
         return nullptr;
     }
+
+    /// @brief Activate the effects on the character based on its skill ranks.
+    void updateSkillEffects();
+
+    /// @brief Checks if the given character has unlocked new skills.
+    void checkIfUnlockedSkills();
+
+    /// @brief Improves the skills which provides the given ability modifier.
+    void improveAbility(const Ability & abilityModifier);
+
+    /// @brief Improves the skills which provides the given status modifier.
+    void improveStatus(const StatusModifier & statusModifier);
+
+    /// @brief Improves the skills which provides the given combat modifier.
+    void improveCombat(const CombatModifier & combatModifier);
+
+    /// @brief Improves the skills which provides the given knowledge.
+    void improveKnowledge(const Knowledge & knowledge);
 
 };

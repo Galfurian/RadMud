@@ -61,7 +61,7 @@ public:
     /// The list of body parts.
     std::vector<std::shared_ptr<BodyPart>> bodyParts;
     /// Base skills.
-    SkillManager skillManager;
+    std::vector<std::shared_ptr<SkillData>> skills;
 
     /// @brief Constructor.
     Race();

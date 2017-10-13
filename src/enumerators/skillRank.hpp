@@ -107,5 +107,8 @@ public:
     }
 
     /// @brief Provides the maximum skill value.
-    static unsigned int getSkillCap();
+    static inline unsigned int getSkillCap()
+    {
+        return 119000;
+    }
 };

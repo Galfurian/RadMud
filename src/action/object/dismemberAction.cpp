@@ -114,7 +114,7 @@ ActionStatus DismemberAction::perform()
             actor->sendMsg("You fail to dismember %s.", corpse->getName(true));
             return ActionStatus::Error;
         }
-        Skill::improveSkillKnowledge(actor, Knowledge::Butchery);
+        actor->skillManager.improveKnowledge(Knowledge::Butchery);
         actor->sendMsg("You successfully butcher %s and produce %s.\n\n",
                        corpse->getName(true),
                        item->getName(true));

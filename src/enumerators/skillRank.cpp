@@ -39,8 +39,3 @@ std::string SkillRank::toString() const
     if (value == Master) return "Master";
     return "None";
 }
-
-unsigned int SkillRank::getSkillCap()
-{
-    return 119000;
-}

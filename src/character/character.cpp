@@ -42,7 +42,7 @@ Character::Character() :
     stamina(),
     hunger(100),
     thirst(100),
-    skillManager(),
+    skillManager(this),
     room(),
     inventory(),
     equipment(),
@@ -225,7 +225,8 @@ void Character::getSheet(Table & sheet) const
 
 void Character::initialize()
 {
-    Skill::updateSkillEffects(this);
+    // Update the skill effects.
+    skillManager.updateSkillEffects();
 }
 
 //std::string Character::getName() const

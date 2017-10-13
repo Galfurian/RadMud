@@ -47,7 +47,7 @@ bool ProcessNewConfirm::process(Character * character, ArgumentHandler & args)
         player->experience = 0;
         player->flags = 0;
         player->rent_room = 1000;
-        for (const auto & skillData : player->race->skillManager.skills)
+        for (const auto & skillData : player->race->skills)
         {
             player->skillManager.addSkill(skillData->skill,
                                           skillData->skillLevel);

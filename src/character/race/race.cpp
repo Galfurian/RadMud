@@ -35,7 +35,7 @@ Race::Race() :
     tileId(),
     corpse(),
     bodyParts(),
-    skillManager()
+    skills()
 {
     // Nothing to do.
 }
