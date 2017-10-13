@@ -300,6 +300,8 @@ void Mobile::reloadLua()
         }
     }
     inventory.clear();
+    // Completely clear the stack.
+    lua_settop(L, 0);
     // Reset the lua state.
     L = luaL_newstate();
     // Load the lua environment.
