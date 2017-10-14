@@ -47,7 +47,7 @@ Character::Character() :
     inventory(),
     equipment(),
     posture(CharacterPosture::Stand),
-    effects(),
+    effectManager(),
     L(luaL_newstate()),
     combatHandler(this),
     actionQueue(),
@@ -136,10 +136,10 @@ void Character::getSheet(Table & sheet) const
             ToString(this->getAbility(Ability::Strength, false)) +
             " [" +
             ToString(
-                effects.getAbilityModifier(Ability::Strength)) +
+                effectManager.getAbilityModifier(Ability::Strength)) +
             "][" +
             ToString(
-                effects.getAbilityModifier(Ability::Strength)) +
+                effectManager.getAbilityModifier(Ability::Strength)) +
             "]"});
     sheet.addRow(
         {
@@ -147,20 +147,20 @@ void Character::getSheet(Table & sheet) const
             ToString(this->getAbility(Ability::Agility, false)) +
             " [" +
             ToString(
-                effects.getAbilityModifier(Ability::Agility)) +
+                effectManager.getAbilityModifier(Ability::Agility)) +
             "][" +
             ToString(
-                effects.getAbilityModifier(Ability::Agility)) +
+                effectManager.getAbilityModifier(Ability::Agility)) +
             "]"});
     sheet.addRow(
         {
             "Perception",
             ToString(this->getAbility(Ability::Perception, false)) +
             " [" +
-            ToString(effects.getAbilityModifier(
+            ToString(effectManager.getAbilityModifier(
                 Ability::Perception)) +
             "][" +
-            ToString(effects.getAbilityModifier(
+            ToString(effectManager.getAbilityModifier(
                 Ability::Perception)) +
             "]"});
     sheet.addRow(
@@ -168,10 +168,10 @@ void Character::getSheet(Table & sheet) const
             "Constitution",
             ToString(this->getAbility(Ability::Constitution, false)) +
             " [" +
-            ToString(effects.getAbilityModifier(
+            ToString(effectManager.getAbilityModifier(
                 Ability::Constitution)) +
             "][" +
-            ToString(effects.getAbilityModifier(
+            ToString(effectManager.getAbilityModifier(
                 Ability::Constitution)) +
             "]"});
     sheet.addRow(
@@ -179,10 +179,10 @@ void Character::getSheet(Table & sheet) const
             "Intelligence",
             ToString(this->getAbility(Ability::Intelligence, false)) +
             " [" +
-            ToString(effects.getAbilityModifier(
+            ToString(effectManager.getAbilityModifier(
                 Ability::Intelligence)) +
             "][" +
-            ToString(effects.getAbilityModifier(
+            ToString(effectManager.getAbilityModifier(
                 Ability::Intelligence)) +
             "]"});
     sheet.addRow({"## Skill", "## Points"});
@@ -217,7 +217,7 @@ void Character::getSheet(Table & sheet) const
     }
     sheet.addDivider();
     sheet.addRow({"## Effect Name", "## Remaining TIC"});
-    for (const auto & it : effects)
+    for (const auto & it : effectManager)
     {
         sheet.addRow({it.name, ToString(it.remainingTic)});
     }
@@ -316,7 +316,7 @@ unsigned int Character::getAbility(const Ability & ability,
     if (withEffects)
     {
         // Add the effects which increase the ability.
-        overall += effects.getAbilityModifier(ability);
+        overall += effectManager.getAbilityModifier(ability);
         // Prune the value if exceed the boundaries.
         if (overall < 0)
         {
@@ -411,7 +411,7 @@ unsigned int Character::getMaxHealth(bool withEffects) const
     if (!withEffects) return BASE;
     // Otherwise evaluate the overall max health with the effects.
     int overall = static_cast<int>(BASE);
-    overall += effects.getStatusModifier(StatusModifier::Health);
+    overall += effectManager.getStatusModifier(StatusModifier::Health);
     // If the maximum value is lesser than zero, return zero.
     if (overall < 0) return 0;
     return static_cast<unsigned int>(overall);
@@ -511,7 +511,7 @@ unsigned int Character::getMaxStamina(bool withEffects) const
     if (!withEffects) return BASE;
     // Otherwise evaluate the overall max stamina with the effects.
     int overall = static_cast<int>(BASE);
-    overall += effects.getStatusModifier(StatusModifier::Stamina);
+    overall += effectManager.getStatusModifier(StatusModifier::Stamina);
     // If the maximum value is lesser than zero, return zero.
     if (overall < 0) return 0;
     return static_cast<unsigned int>(overall);
@@ -881,7 +881,7 @@ void Character::updateHealth()
     auto constMod(this->getAbilityModifier(Ability::Constitution));
     auto regainMod(posture.getRegainModifier());
     auto effectMod(static_cast<unsigned int>(
-                       effects.getStatusModifier(
+                       effectManager.getStatusModifier(
                            StatusModifier::HealthRegeneration)));
     this->addHealth((constMod * regainMod) + effectMod, true);
 }
@@ -891,7 +891,7 @@ void Character::updateStamina()
     auto constMod(this->getAbilityModifier(Ability::Constitution));
     auto regainMod(posture.getRegainModifier());
     auto effectMod(static_cast<unsigned int>(
-                       effects.getStatusModifier(
+                       effectManager.getStatusModifier(
                            StatusModifier::HealthRegeneration)));
     this->addHealth(((2 * constMod) * regainMod) + effectMod, true);
 }
@@ -909,7 +909,7 @@ void Character::updateThirst()
 void Character::updateExpiredEffects()
 {
     std::vector<std::string> messages;
-    if (this->effects.effectUpdate(messages))
+    if (this->effectManager.effectUpdate(messages))
     {
         for (auto message : messages)
         {
@@ -921,7 +921,7 @@ void Character::updateExpiredEffects()
 void Character::updateActivatedEffects()
 {
     std::vector<std::string> messages;
-    if (this->effects.effectActivate(messages))
+    if (this->effectManager.effectActivate(messages))
     {
         for (auto message : messages)
         {

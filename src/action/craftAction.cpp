@@ -274,7 +274,7 @@ unsigned int CraftAction::getCooldown()
     for (auto knowledge : production->requiredKnowledge)
     {
         requiredTime -=
-            (requiredTime * actor->effects.getKnowledge(knowledge)) / 100;
+            (requiredTime * actor->effectManager.getKnowledge(knowledge)) / 100;
     }
     Logger::log(LogLevel::Debug, "With skill :%s", requiredTime);
     return static_cast<unsigned int>(requiredTime);

@@ -552,33 +552,33 @@ bool DoStatistics(Character * character, ArgumentHandler & /*args*/)
 bool DoEffects(Character * character, ArgumentHandler &)
 {
     std::string msg;
-    for (auto const & effect : character->effects.getActiveEffects())
+    for (auto const & effect : character->effectManager.getActiveEffects())
     {
         msg += AlignString(effect.name, StringAlign::Left, 30) + "\n";
     }
-    for (auto const & effect : character->effects.getPassiveEffects())
+    for (auto const & effect : character->effectManager.getPassiveEffects())
     {
         msg += AlignString(effect.name, StringAlign::Left, 30) + "\n";
     }
-    for (auto const & effect : character->effects.getActiveAbilityModifier())
+    for (auto const & effect : character->effectManager.getActiveAbilityModifier())
     {
         msg += AlignString(effect.first.getAbbreviation(),
                            StringAlign::Left, 30);
         msg += AlignString(effect.second, StringAlign::Right, 5) + "\n";
     }
-    for (auto const & effect : character->effects.getActiveCombatModifier())
+    for (auto const & effect : character->effectManager.getActiveCombatModifier())
     {
         msg += AlignString(effect.first.toString(),
                            StringAlign::Left, 30);
         msg += AlignString(effect.second, StringAlign::Right, 5) + "\n";
     }
-    for (auto const & effect : character->effects.getActiveStatusModifier())
+    for (auto const & effect : character->effectManager.getActiveStatusModifier())
     {
         msg += AlignString(effect.first.toString(),
                            StringAlign::Left, 30);
         msg += AlignString(effect.second, StringAlign::Right, 5) + "\n";
     }
-    for (auto const & effect : character->effects.getActiveKnowledge())
+    for (auto const & effect : character->effectManager.getActiveKnowledge())
     {
         msg += AlignString(effect.first.toString(),
                            StringAlign::Left, 30);

@@ -30,7 +30,7 @@ void SkillManager::updateSkillEffects()
     // TODO: Right now the modifier is based on the rank of the skill.
     // -------------------------------------------------------------------------
     // Phase 1: Deactivate all the passive effects.
-    owner->effects.removeAllPassiveEffect();
+    owner->effectManager.removeAllPassiveEffect();
     // Iterate the character's skills.
     for (const auto & skillData : skills)
     {
@@ -110,7 +110,7 @@ void SkillManager::updateSkillEffects()
         }
         // ---------------------------------------------------------------------
         // Phase 3: Add the passive effect to the character.
-        owner->effects.addPassiveEffect(skillEffect);
+        owner->effectManager.addPassiveEffect(skillEffect);
     }
 }
 

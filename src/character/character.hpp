@@ -116,7 +116,7 @@ public:
     /// Character's posture.
     CharacterPosture posture;
     /// Active effects on player.
-    EffectManager effects;
+    EffectManager effectManager;
     /// The lua_State associated with this character.
     lua_State * L;
     /// List of opponents.

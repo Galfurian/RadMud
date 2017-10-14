@@ -399,7 +399,7 @@ void BasicAttack::performAttackNaturalWeapon(
     }
     // Apply the modifier to the hit roll when unarmed fighting.
     hitRoll = SafeSum(hitRoll,
-                      actor->effects.getCombatModifier(
+                      actor->effectManager.getCombatModifier(
                           CombatModifier::UnarmedHitRoll));
     // Improve the skills which has contributed to the hit roll.
     actor->skillManager.improveCombat(CombatModifier::UnarmedHitRoll);
@@ -428,7 +428,7 @@ void BasicAttack::performAttackNaturalWeapon(
         damageRoll += strengthMod;
         // Apply the modifier to the damage roll when unarmed fighting.
         damageRoll = SafeSum(damageRoll,
-                             actor->effects.getCombatModifier(
+                             actor->effectManager.getCombatModifier(
                                  CombatModifier::UnarmedDamage));
         // Improve the skills which has contributed to the damage roll.
         actor->skillManager.improveCombat(CombatModifier::UnarmedDamage);
@@ -523,7 +523,7 @@ void BasicAttack::performMeleeAttack(Character * target,
     }
     // Apply the modifier to the hit roll with melee weapons.
     hitRoll = SafeSum(hitRoll,
-                      actor->effects.getCombatModifier(
+                      actor->effectManager.getCombatModifier(
                           CombatModifier::MeleeWeaponHitRoll));
     // Improve the skills which has contributed to the hit roll.
     actor->skillManager.improveCombat(CombatModifier::MeleeWeaponHitRoll);
@@ -556,7 +556,7 @@ void BasicAttack::performMeleeAttack(Character * target,
         }
         // Apply the modifier to the damage roll with melee weapons.
         damageRoll = SafeSum(damageRoll,
-                             actor->effects.getCombatModifier(
+                             actor->effectManager.getCombatModifier(
                                  CombatModifier::MeleeWeaponDamage));
         // Improve the skills which has contributed to the damage roll.
         actor->skillManager.improveCombat(CombatModifier::MeleeWeaponDamage);
@@ -651,7 +651,7 @@ void BasicAttack::performRangedAttack(Character * target,
     }
     // Apply the modifier to the hit roll with ranged weapons.
     hitRoll = SafeSum(hitRoll,
-                      actor->effects.getCombatModifier(
+                      actor->effectManager.getCombatModifier(
                           CombatModifier::RangedWeaponHitRoll));
     // Improve the skills which has contributed to the hit roll.
     actor->skillManager.improveCombat(CombatModifier::RangedWeaponHitRoll);
@@ -687,7 +687,7 @@ void BasicAttack::performRangedAttack(Character * target,
         unsigned int damageRoll = weapon->rollDamage();
         // Apply the modifier to the damage roll with ranged weapons.
         damageRoll = SafeSum(damageRoll,
-                             actor->effects.getCombatModifier(
+                             actor->effectManager.getCombatModifier(
                                  CombatModifier::RangedWeaponDamage));
         // Improve the skills which has contributed to the damage roll.
         actor->skillManager.improveCombat(CombatModifier::RangedWeaponDamage);
