@@ -42,17 +42,17 @@ Character::Character() :
     stamina(),
     hunger(100),
     thirst(100),
-    skillManager(this),
     room(),
     inventory(),
     equipment(),
     posture(CharacterPosture::Stand),
-    effectManager(),
     L(luaL_newstate()),
-    combatHandler(this),
     actionQueue(),
     actionQueueMutex(),
-    inputProcessor(std::make_shared<ProcessInput>())
+    inputProcessor(std::make_shared<ProcessInput>()),
+    effectManager(),
+    skillManager(this),
+    combatHandler(this)
 {
     // Initialize the action queue.
     this->resetActionQueue();
