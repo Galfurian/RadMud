@@ -34,32 +34,36 @@
 
 #include "effect.hpp"
 
+#include <memory>
+
 /// @brief Factory which allows to create predefined effects.
-class EffectFactory
+namespace EffectFactory
 {
-public:
-    /// @brief Generates an effect which clears the target of a character.
-    /// @param actor    The character affected by the effect.
-    /// @param duration THe duration in TIC of the effect.
-    /// @return The created effect.
-    static Effect clearTargets(Character * actor,
-                               const unsigned int & duration);
 
-    /// @brief Generates an effect which clears the target of a character.
-    /// @details
-    /// If a character which is aiming to a target moves, then it suffers
-    ///  a penality to hit.
-    /// @param actor             The character affected by the effect.
-    /// @param duration          The duration in TIC of the effect.
-    /// @param negativeMagnitude The magnitude of the disturbance.
-    /// @return The created effect.
-    static Effect disturbedAim(Character * actor,
-                               const unsigned int & duration,
-                               const int & negativeMagnitude);
+/// @brief Generates an effect which clears the target of a character.
+/// @param actor    The character affected by the effect.
+/// @param duration THe duration in TIC of the effect.
+/// @return The created effect.
+Effect clearTargets(Character * actor,
+                    const unsigned int & duration);
 
-    /// @brief Creates an effect which has the name of the given skill.
-    /// @param actor        The affected character.
-    /// @param skillName    The name of the skill.
-    /// @return The created effect.
-    static Effect skillEffect(Character * actor, const std::string & skillName);
-};
+/// @brief Generates an effect which clears the target of a character.
+/// @details
+/// If a character which is aiming to a target moves, then it suffers
+///  a penality to hit.
+/// @param actor             The character affected by the effect.
+/// @param duration          The duration in TIC of the effect.
+/// @param negativeMagnitude The magnitude of the disturbance.
+/// @return The created effect.
+Effect disturbedAim(Character * actor,
+                    const unsigned int & duration,
+                    const int & negativeMagnitude);
+
+/// @brief Creates an effect which has the name of the given skill.
+/// @param actor        The affected character.
+/// @param skillName    The name of the skill.
+/// @return The created effect.
+std::shared_ptr<SkillEffect> skillEffect(Character * actor,
+                                         const std::shared_ptr<Skill> & skill);
+
+}

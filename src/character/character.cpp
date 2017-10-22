@@ -133,57 +133,36 @@ void Character::getSheet(Table & sheet) const
     sheet.addRow(
         {
             "Strength",
-            ToString(this->getAbility(Ability::Strength, false)) +
-            " [" +
-            ToString(
-                effectManager.getAbilityModifier(Ability::Strength)) +
-            "][" +
-            ToString(
-                effectManager.getAbilityModifier(Ability::Strength)) +
-            "]"});
+            ToString(this->getAbility(Ability::Strength, false)) + " [" +
+            ToString(effectManager.getAbilityMod(Ability::Strength)) + "][" +
+            ToString(effectManager.getAbilityMod(Ability::Strength)) + "]"});
     sheet.addRow(
         {
             "Agility",
-            ToString(this->getAbility(Ability::Agility, false)) +
-            " [" +
-            ToString(
-                effectManager.getAbilityModifier(Ability::Agility)) +
-            "][" +
-            ToString(
-                effectManager.getAbilityModifier(Ability::Agility)) +
-            "]"});
+            ToString(this->getAbility(Ability::Agility, false)) + " [" +
+            ToString(effectManager.getAbilityMod(Ability::Agility)) + "][" +
+            ToString(effectManager.getAbilityMod(Ability::Agility)) + "]"});
     sheet.addRow(
         {
             "Perception",
-            ToString(this->getAbility(Ability::Perception, false)) +
-            " [" +
-            ToString(effectManager.getAbilityModifier(
-                Ability::Perception)) +
-            "][" +
-            ToString(effectManager.getAbilityModifier(
-                Ability::Perception)) +
-            "]"});
+            ToString(this->getAbility(Ability::Perception, false)) + " [" +
+            ToString(effectManager.getAbilityMod(Ability::Perception)) + "][" +
+            ToString(effectManager.getAbilityMod(Ability::Perception)) + "]"});
     sheet.addRow(
         {
             "Constitution",
-            ToString(this->getAbility(Ability::Constitution, false)) +
-            " [" +
-            ToString(effectManager.getAbilityModifier(
-                Ability::Constitution)) +
+            ToString(this->getAbility(Ability::Constitution, false)) + " [" +
+            ToString(effectManager.getAbilityMod(Ability::Constitution)) +
             "][" +
-            ToString(effectManager.getAbilityModifier(
-                Ability::Constitution)) +
+            ToString(effectManager.getAbilityMod(Ability::Constitution)) +
             "]"});
     sheet.addRow(
         {
             "Intelligence",
-            ToString(this->getAbility(Ability::Intelligence, false)) +
-            " [" +
-            ToString(effectManager.getAbilityModifier(
-                Ability::Intelligence)) +
+            ToString(this->getAbility(Ability::Intelligence, false)) + " [" +
+            ToString(effectManager.getAbilityMod(Ability::Intelligence)) +
             "][" +
-            ToString(effectManager.getAbilityModifier(
-                Ability::Intelligence)) +
+            ToString(effectManager.getAbilityMod(Ability::Intelligence)) +
             "]"});
     sheet.addRow({"## Skill", "## Points"});
     for (const auto & skillData : skillManager.skills)
@@ -217,7 +196,7 @@ void Character::getSheet(Table & sheet) const
     }
     sheet.addDivider();
     sheet.addRow({"## Effect Name", "## Remaining TIC"});
-    for (const auto & it : effectManager)
+    for (const auto & it : effectManager.getActiveEffects())
     {
         sheet.addRow({it.name, ToString(it.remainingTic)});
     }
@@ -225,8 +204,7 @@ void Character::getSheet(Table & sheet) const
 
 void Character::initialize()
 {
-    // Update the skill effects.
-    skillManager.updateSkillEffects();
+    // Nothing to do.
 }
 
 //std::string Character::getName() const
@@ -316,7 +294,7 @@ unsigned int Character::getAbility(const Ability & ability,
     if (withEffects)
     {
         // Add the effects which increase the ability.
-        overall += effectManager.getAbilityModifier(ability);
+        overall += effectManager.getAbilityMod(ability);
         // Prune the value if exceed the boundaries.
         if (overall < 0)
         {
@@ -410,8 +388,8 @@ unsigned int Character::getMaxHealth(bool withEffects) const
     // Return it, if the maximum health is required without the effects.
     if (!withEffects) return BASE;
     // Otherwise evaluate the overall max health with the effects.
-    int overall = static_cast<int>(BASE);
-    overall += effectManager.getStatusModifier(StatusModifier::Health);
+    auto overall = static_cast<int>(BASE);
+    overall += effectManager.getStatusMod(StatusModifier::Health);
     // If the maximum value is lesser than zero, return zero.
     if (overall < 0) return 0;
     return static_cast<unsigned int>(overall);
@@ -510,8 +488,8 @@ unsigned int Character::getMaxStamina(bool withEffects) const
     // Return it, if the maximum stamina is required without the effects.
     if (!withEffects) return BASE;
     // Otherwise evaluate the overall max stamina with the effects.
-    int overall = static_cast<int>(BASE);
-    overall += effectManager.getStatusModifier(StatusModifier::Stamina);
+    auto overall = static_cast<int>(BASE);
+    overall += effectManager.getStatusMod(StatusModifier::Stamina);
     // If the maximum value is lesser than zero, return zero.
     if (overall < 0) return 0;
     return static_cast<unsigned int>(overall);
@@ -880,9 +858,9 @@ void Character::updateHealth()
 {
     auto constMod(this->getAbilityModifier(Ability::Constitution));
     auto regainMod(posture.getRegainModifier());
-    auto effectMod(static_cast<unsigned int>(
-                       effectManager.getStatusModifier(
-                           StatusModifier::HealthRegeneration)));
+    auto effectMod(
+        static_cast<unsigned int>(
+            effectManager.getStatusMod(StatusModifier::HealthRegeneration)));
     this->addHealth((constMod * regainMod) + effectMod, true);
 }
 
@@ -890,9 +868,9 @@ void Character::updateStamina()
 {
     auto constMod(this->getAbilityModifier(Ability::Constitution));
     auto regainMod(posture.getRegainModifier());
-    auto effectMod(static_cast<unsigned int>(
-                       effectManager.getStatusModifier(
-                           StatusModifier::HealthRegeneration)));
+    auto effectMod(
+        static_cast<unsigned int>(
+            effectManager.getStatusMod(StatusModifier::HealthRegeneration)));
     this->addHealth(((2 * constMod) * regainMod) + effectMod, true);
 }
 
@@ -911,7 +889,7 @@ void Character::updateExpiredEffects()
     std::vector<std::string> messages;
     if (this->effectManager.effectUpdate(messages))
     {
-        for (auto message : messages)
+        for (const auto & message : messages)
         {
             this->sendMsg(message + "\n");
         }
@@ -923,7 +901,7 @@ void Character::updateActivatedEffects()
     std::vector<std::string> messages;
     if (this->effectManager.effectActivate(messages))
     {
-        for (auto message : messages)
+        for (const auto & message : messages)
         {
             this->sendMsg(message + "\n");
         }

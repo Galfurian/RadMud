@@ -552,37 +552,43 @@ bool DoStatistics(Character * character, ArgumentHandler & /*args*/)
 bool DoEffects(Character * character, ArgumentHandler &)
 {
     std::string msg;
-    for (auto const & effect : character->effectManager.getActiveEffects())
+    msg += "Active Effects\n";
+    for (auto const & it : character->effectManager.getActiveEffects())
     {
-        msg += AlignString(effect.name, StringAlign::Left, 30) + "\n";
+        msg += "\t" + AlignString(it.name, StringAlign::Left, 30) + "\n";
     }
-    for (auto const & effect : character->effectManager.getPassiveEffects())
+    msg += "Passive Effects\n";
+    for (auto const & it : character->effectManager.getPassiveEffects())
     {
-        msg += AlignString(effect.name, StringAlign::Left, 30) + "\n";
+        msg += "\t" + AlignString(it.name, StringAlign::Left, 30) + "\n";
     }
-    for (auto const & effect : character->effectManager.getActiveAbilityModifier())
+    msg += "Ability Modifiers\n";
+    for (auto const & it : character->effectManager.getAbilityMod())
     {
-        msg += AlignString(effect.first.getAbbreviation(),
-                           StringAlign::Left, 30);
-        msg += AlignString(effect.second, StringAlign::Right, 5) + "\n";
+        msg += "\t";
+        msg += AlignString(it.first.getAbbreviation(), StringAlign::Left, 30);
+        msg += AlignString(it.second, StringAlign::Right, 5) + "\n";
     }
-    for (auto const & effect : character->effectManager.getActiveCombatModifier())
+    msg += "Combat Modifiers\n";
+    for (auto const & it : character->effectManager.getCombatMod())
     {
-        msg += AlignString(effect.first.toString(),
-                           StringAlign::Left, 30);
-        msg += AlignString(effect.second, StringAlign::Right, 5) + "\n";
+        msg += "\t";
+        msg += AlignString(it.first.toString(), StringAlign::Left, 30);
+        msg += AlignString(it.second, StringAlign::Right, 5) + "\n";
     }
-    for (auto const & effect : character->effectManager.getActiveStatusModifier())
+    msg += "Status Modifiers\n";
+    for (auto const & it : character->effectManager.getStatusMod())
     {
-        msg += AlignString(effect.first.toString(),
-                           StringAlign::Left, 30);
-        msg += AlignString(effect.second, StringAlign::Right, 5) + "\n";
+        msg += "\t";
+        msg += AlignString(it.first.toString(), StringAlign::Left, 30);
+        msg += AlignString(it.second, StringAlign::Right, 5) + "\n";
     }
-    for (auto const & effect : character->effectManager.getActiveKnowledge())
+    msg += "Knowledges\n";
+    for (auto const & it : character->effectManager.getKnowledge())
     {
-        msg += AlignString(effect.first.toString(),
-                           StringAlign::Left, 30);
-        msg += AlignString(effect.second, StringAlign::Right, 5) + "\n";
+        msg += "\t";
+        msg += AlignString(it.first.toString(), StringAlign::Left, 30);
+        msg += AlignString(it.second, StringAlign::Right, 5) + "\n";
     }
     character->sendMsg(msg);
     return true;

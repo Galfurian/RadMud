@@ -23,24 +23,20 @@
 #pragma once
 
 #include "effect.hpp"
+#include "modifierManager.hpp"
 
-/// @brief A class which allows to manage a buffer of effects.
-class EffectManager
+#include <memory>
+
+/// @brief A class which allows to manage effects.
+class EffectManager :
+    public ModifierManager
 {
 private:
-    /// The overall ability modifier.
-    std::map<Ability, int> activeAbilityModifier;
-    /// The overall combat modifier.
-    std::map<CombatModifier, int> activeCombatModifier;
-    /// The overall status modifier.
-    std::map<StatusModifier, int> activeStatusModifier;
-    /// The overall knowledge.
-    std::map<Knowledge, int> activeKnowledge;
-    /// The vector of active effects.
+    /// The list of active effects.
     std::vector<Effect> activeEffects;
-    /// The vector of pending effects.
+    /// The list of pending effects.
     std::vector<Effect> pendingEffects;
-    /// The vector of passive effects.
+    /// The list of passive effects.
     std::vector<Effect> passiveEffects;
 
 public:
@@ -50,12 +46,9 @@ public:
     /// @brief Destructor.
     ~EffectManager();
 
-    // -------------------------------------------------------------------------
-    // Management functions
-
     /// @brief Allows to add a passive effect.
     /// @param effect The effect that has to be added.
-    void addPassiveEffect(const Effect & effect);
+    bool addPassiveEffect(const Effect & effect);
 
     /// @brief Allows to remove a passive effect.
     /// @param effect The effect that has to be added.
@@ -87,74 +80,29 @@ public:
     ///         <b>False</b> otherwise.
     bool effectUpdate(std::vector<std::string> & messages);
 
-    // -------------------------------------------------------------------------
-    // Iterators
-
-    /// @brief Provides an iterator to the begin of the list of active effects.
-    std::vector<Effect>::iterator begin();
-
-    /// @brief Provides an iterator to the end of the list of active effects.
-    std::vector<Effect>::iterator end();
-
-    /// @brief Provides a const_iterator to the begin of the list of
-    ///         active effects.
-    std::vector<Effect>::const_iterator begin() const;
-
-    /// @brief Provides a const_iterator to the end of the list of
-    ///         active effects.
-    std::vector<Effect>::const_iterator end() const;
-
-    /// @brief Retrieve the overall ability modifier.
-    /// @param modifier The modifier to retrieve.
-    /// @return The overall value of the given modifier.
-    int getAbilityModifier(const Ability & modifier) const;
-
-    /// @brief Retrieve the overall combat modifier.
-    /// @param modifier The modifier to retrieve.
-    /// @return The overall value of the given modifier.
-    int getCombatModifier(const CombatModifier & modifier) const;
-
-    /// @brief Retrieve the overall status modifier.
-    /// @param modifier The modifier to retrieve.
-    /// @return The overall value of the given modifier.
-    int getStatusModifier(const StatusModifier & modifier) const;
-
-    /// @brief Retrieve the knowledge.
-    /// @param knowledge The knowledge to retrieve.
-    /// @return The status of the given knowledge.
-    int getKnowledge(const Knowledge & knowledge) const;
-
-    /// @brief Provides the list of active ability modifiers.
-    std::map<Ability, int> getActiveAbilityModifier() const;
-
-    /// @brief Provides the list of active combat modifiers.
-    std::map<CombatModifier, int> getActiveCombatModifier() const;
-
-    /// @brief Provides the list of active status modifiers.
-    std::map<StatusModifier, int> getActiveStatusModifier() const;
-
-    /// @brief Provides the list of active knowledge.
-    std::map<Knowledge, int> getActiveKnowledge() const;
-
     /// @brief Provides the list of active effects.
-    std::vector<Effect> getActiveEffects() const;
+    inline std::vector<Effect> getActiveEffects() const
+    {
+        return activeEffects;
+    }
 
     /// @brief Provides the list of pending effects.
-    std::vector<Effect> getPendingEffects() const;
+    inline std::vector<Effect> getPendingEffects() const
+    {
+        return pendingEffects;
+    }
 
     /// @brief Provides the list of passive effects.
-    std::vector<Effect> getPassiveEffects() const;
+    inline std::vector<Effect> getPassiveEffects() const
+    {
+        return passiveEffects;
+    }
 
 private:
 
-    /// @brief Activate an effect by adding all the modifiers brought by the
-    /// effect.
-    void activateEffect(const Effect & effect);
-
-    /// @brief Deactivate an effect by removing all the modifiers brought by
-    /// the effect.
-    void deactivateEffect(const Effect & effect);
-
     /// @brief Sort the list of active effects.
-    void sortList();
+    inline void sortEffects(std::vector<Effect> & effects)
+    {
+        std::sort(effects.begin(), effects.end(), std::less<Effect>());
+    }
 };

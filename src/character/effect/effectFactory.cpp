@@ -23,38 +23,57 @@
 #include "effectFactory.hpp"
 #include "character.hpp"
 
-Effect EffectFactory::clearTargets(Character * actor,
-                                   const unsigned int & duration)
+namespace EffectFactory
 {
-    return Effect(actor,
-                  "ClearTargets",
-                  duration,
-                  "",
-                  "",
-                  [](Character * character)
-                  {
-                      if (character != nullptr)
-                      {
-                          character->combatHandler.charactersInSight.clear();
-                      }
-                  });
+
+Effect clearTargets(Character * actor,
+                    const unsigned int & duration)
+{
+    auto effect = Effect(
+        actor,
+        "ClearTargets",
+        duration,
+        "",
+        "",
+        [](Character * character)
+        {
+            if (character != nullptr)
+            {
+                character->combatHandler
+                         .charactersInSight
+                         .clear();
+            }
+        });
+    return std::move(effect);
 }
 
-Effect EffectFactory::disturbedAim(Character * actor,
-                                   const unsigned int & duration,
-                                   const int & negativeMagnitude)
+Effect disturbedAim(Character * actor,
+                    const unsigned int & duration,
+                    const int & negativeMagnitude)
 {
-    auto effect = Effect(actor, "DisturbedAim", duration, "", "", nullptr);
+    auto effect = Effect(actor,
+                         "DisturbedAim",
+                         duration,
+                         "",
+                         "",
+                         nullptr);
     effect.effectCombatModifier.insert(
         std::make_pair(CombatModifier::RangedWeaponHitRoll,
-                       negativeMagnitude
-        )
-    );
-    return effect;
+                       negativeMagnitude));
+    return std::move(effect);
 }
 
-Effect EffectFactory::skillEffect(Character * actor,
-                                  const std::string & skillName)
+std::shared_ptr<SkillEffect> skillEffect(Character * actor,
+                                         const std::shared_ptr<Skill> & skill)
 {
-    return Effect(actor, skillName, 0, "", "", nullptr);
+    auto effect = std::make_shared<SkillEffect>(actor,
+                                                skill->name,
+                                                0,
+                                                "",
+                                                "",
+                                                nullptr,
+                                                skill);
+    return std::move(effect);
+}
+
 }

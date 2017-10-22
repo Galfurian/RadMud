@@ -29,10 +29,7 @@ Skill::Skill() :
     ability(),
     stage(),
     requiredSkills(),
-    abilityModifier(),
-    combatModifier(),
-    statusModifier(),
-    knowledge()
+    modifierManager(std::make_shared<ModifierManager>())
 {
     // Nothing to do.
 }

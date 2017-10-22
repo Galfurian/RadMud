@@ -32,6 +32,7 @@
 #include "statusModifier.hpp"
 #include "knowledge.hpp"
 #include "radMudTypes.hpp"
+#include "modifierManager.hpp"
 
 class Character;
 
@@ -51,15 +52,8 @@ public:
     int stage;
     /// The list of required skills.
     std::vector<int> requiredSkills;
-    /// The list of abilities modifiers and the rank at which they became
-    /// activate.
-    std::map<Ability, int> abilityModifier;
-    /// The list of combat modifiers and the rank at which they became activate.
-    std::map<CombatModifier, int> combatModifier;
-    /// The list of status modifiers and the rank at which they became activate.
-    std::map<StatusModifier, int> statusModifier;
-    /// The list of knowledge and the rank at which they became activate.
-    std::map<Knowledge, bool> knowledge;
+    /// The internal modifier manager.
+    std::shared_ptr<ModifierManager> modifierManager;
 
     /// @brief Constructor.
     Skill();

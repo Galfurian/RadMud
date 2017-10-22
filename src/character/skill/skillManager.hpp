@@ -22,8 +22,12 @@
 #pragma once
 
 #include <vector>
+
+#include "effect.hpp"
 #include "skillData.hpp"
 #include "radMudTypes.hpp"
+#include "modifierManager.hpp"
+#include "effectFactory.hpp"
 
 class Character;
 
@@ -34,10 +38,16 @@ public:
     Character * owner;
     /// The player's list of skills.
     std::vector<std::shared_ptr<SkillData>> skills;
+    /// The vector of effects related to the skills.
+    std::vector<std::shared_ptr<SkillEffect>> skillEffects;
+    /// The internal modifier manager.
+    std::shared_ptr<ModifierManager> modifierManager;
 
     explicit SkillManager(Character * _owner) :
         owner(_owner),
-        skills()
+        skills(),
+        skillEffects(),
+        modifierManager(std::make_shared<ModifierManager>())
     {
         // Nothing to do.
     }
@@ -45,11 +55,17 @@ public:
     inline bool addSkill(const std::shared_ptr<Skill> & skill,
                          const unsigned int & skillLevel = 1)
     {
+        // Check if the skill is already present.
         if (this->findSkill(skill->vnum) != nullptr)
         {
             return false;
         }
-        skills.emplace_back(std::make_shared<SkillData>(skill, skillLevel));
+        // Create a new skill data for the given skill.
+        auto skillData = std::make_shared<SkillData>(skill, skillLevel);
+        // Add the new skill data to the list of skills.
+        skills.emplace_back(skillData);
+        // Update the effects due to the new skill.
+        this->updateSkillEffect(skillData);
         return true;
     }
 
@@ -65,11 +81,8 @@ public:
         return nullptr;
     }
 
-    /// @brief Activate the effects on the character based on its skill ranks.
-    void updateSkillEffects();
-
-    /// @brief Checks if the given character has unlocked new skills.
-    void checkIfUnlockedSkills();
+    /// @brief Activate the effects on the character based on the skill rank.
+    void updateSkillEffect(std::shared_ptr<SkillData> & skillData);
 
     /// @brief Improves the skills which provides the given ability modifier.
     void improveAbility(const Ability & abilityModifier);
@@ -83,4 +96,33 @@ public:
     /// @brief Improves the skills which provides the given knowledge.
     void improveKnowledge(const Knowledge & knowledge);
 
+private:
+
+    /// @brief Checks if the given character has unlocked new skills.
+    void checkIfUnlockedSkills();
+
+    std::shared_ptr<SkillEffect> getSkillEffect(
+        const std::shared_ptr<Skill> & skill)
+    {
+        for (const auto & it : skillEffects)
+        {
+            if (it->skill == skill)
+            {
+                return it;
+            }
+        }
+        return nullptr;
+    }
+
+    std::shared_ptr<SkillEffect> createSkillEffect(
+        const std::shared_ptr<Skill> & skill)
+    {
+        auto skillEffect = this->getSkillEffect(skill);
+        if (skillEffect != nullptr)
+        {
+            return skillEffect;
+        }
+        skillEffects.emplace_back(EffectFactory::skillEffect(owner, skill));
+        return skillEffects.back();
+    }
 };

@@ -22,6 +22,7 @@
 #pragma once
 
 #include "skill.hpp"
+#include "effect.hpp"
 #include "skillRank.hpp"
 #include "radMudTypes.hpp"
 
@@ -64,7 +65,7 @@ public:
     inline void improveSkill(const unsigned int & skillImprovement)
     {
         skillLevel += skillImprovement;
-        if(skillLevel > SkillRank::getSkillCap())
+        if (skillLevel > SkillRank::getSkillCap())
         {
             skillLevel = SkillRank::getSkillCap();
         }
