@@ -69,7 +69,6 @@ inline std::map<Knowledge, int> & operator+=(
     return left;
 }
 
-
 /// @brief Subtraction-Assignment operator for two Ability Modifier maps.
 template<typename ModifierType>
 inline std::map<ModifierType, int> & operator-=(
@@ -91,32 +90,6 @@ inline std::map<ModifierType, int> & operator-=(
     return left;
 }
 
-/// @brief
-/// @param modifier The modifier to retrieve.
-/// @return The total value of the given modifier.
-template<typename ModifierType>
-inline void ApplyModifier(std::map<ModifierType, int> & receiver,
-                          std::map<ModifierType, int> & provider,
-                          const int & multiplier)
-{
-    // Iterate through the modifiers of the skill.
-    for (const auto & providerIt : provider)
-    {
-        // Evaluate the modifier.
-        auto modifier = providerIt.second * multiplier;
-        // Otherwise add the modifier based on the skill rank.
-        auto receiverIt = receiver.find(providerIt.first);
-        if (receiverIt == receiver.end())
-        {
-            receiver.insert(std::make_pair(providerIt.first, modifier));
-        }
-        else
-        {
-            receiverIt->second += modifier;
-        }
-    }
-}
-
 class ModifierManager
 {
 protected:
@@ -131,6 +104,32 @@ protected:
 
 private:
 
+    /// @brief
+    /// @param modifier The modifier to retrieve.
+    /// @return The total value of the given modifier.
+    template<typename ModifierType>
+    inline void applyModifier(std::map<ModifierType, int> & receiver,
+                              std::map<ModifierType, int> & provider,
+                              const int & multiplier)
+    {
+        typename std::map<ModifierType, int>::iterator receiverIt;
+        // Iterate through the modifiers of the skill.
+        for (std::pair<const ModifierType, int> & providerIt : provider)
+        {
+            // Evaluate the modifier.
+            auto modifier = providerIt.second * multiplier;
+            // Otherwise add the modifier based on the skill rank.
+            receiverIt = receiver.find(providerIt.first);
+            if (receiverIt == receiver.end())
+            {
+                receiver.insert(std::make_pair(providerIt.first, modifier));
+            }
+            else
+            {
+                receiverIt->second += modifier;
+            }
+        }
+    }
 
 public:
     /// @brief Constructor.
@@ -254,10 +253,10 @@ public:
     inline void applyModifier(const std::shared_ptr<ModifierManager> & provider,
                               const int & multiplier)
     {
-        ApplyModifier(modAbility, provider->modAbility, multiplier);
-        ApplyModifier(modCombat, provider->modCombat, multiplier);
-        ApplyModifier(modStatus, provider->modStatus, multiplier);
-        ApplyModifier(modKnowledge, provider->modKnowledge, multiplier);
+        this->applyModifier(modAbility, provider->modAbility, multiplier);
+        this->applyModifier(modCombat, provider->modCombat, multiplier);
+        this->applyModifier(modStatus, provider->modStatus, multiplier);
+        this->applyModifier(modKnowledge, provider->modKnowledge, multiplier);
     }
 
     friend inline std::shared_ptr<ModifierManager> & operator-=(

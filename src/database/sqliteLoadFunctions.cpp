@@ -231,7 +231,8 @@ bool LoadSkillPrerequisite(ResultSet * result)
                                       " required by the skill " +
                                       ToString(skillVnum));
             }
-            skill->requiredSkills.emplace_back(requiredSkillVnum);
+            skill->requiredSkill.emplace_back(requiredSkillVnum);
+            requiredSkill->usedForSkill.emplace_back(skillVnum);
             Logger::log(LogLevel::Debug,
                         "\t%s requires %s",
                         AlignString(skill->name, StringAlign::Left, 25),
@@ -643,15 +644,16 @@ bool LoadRaceBaseSkill(ResultSet * result)
                 throw SQLiteException("Cannot find the skill " +
                                       ToString(skillVnum));
             }
-            auto rank = result->getNextUnsignedInteger();
+            auto skillLevel = result->getNextUnsignedInteger();
             // Set the base skill of the race.
-            race->skills.emplace_back(std::make_shared<SkillData>(skill, rank));
+            race->skills.emplace_back(
+                std::make_shared<SkillData>(skill, skillLevel));
             // Log the skill.
             Logger::log(LogLevel::Debug,
                         "\t%s%s%s",
                         AlignString(race->name, StringAlign::Left, 25),
                         AlignString(skill->name, StringAlign::Left, 25),
-                        rank);
+                        skillLevel);
         }
         catch (SQLiteException & e)
         {

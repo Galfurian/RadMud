@@ -28,7 +28,8 @@ Skill::Skill() :
     description(),
     ability(),
     stage(),
-    requiredSkills(),
+    requiredSkill(),
+    usedForSkill(),
     modifierManager(std::make_shared<ModifierManager>())
 {
     // Nothing to do.

@@ -51,7 +51,9 @@ public:
     /// The overall stage of the skill.
     int stage;
     /// The list of required skills.
-    std::vector<int> requiredSkills;
+    std::vector<VnumType> requiredSkill;
+    /// The list of required skills.
+    std::vector<VnumType> usedForSkill;
     /// The internal modifier manager.
     std::shared_ptr<ModifierManager> modifierManager;
 

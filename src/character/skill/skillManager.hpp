@@ -43,15 +43,14 @@ public:
     /// The internal modifier manager.
     std::shared_ptr<ModifierManager> modifierManager;
 
-    explicit SkillManager(Character * _owner) :
-        owner(_owner),
-        skills(),
-        skillEffects(),
-        modifierManager(std::make_shared<ModifierManager>())
-    {
-        // Nothing to do.
-    }
+    /// @brief Constructor.
+    /// @param _owner The owner of the manager.
+    explicit SkillManager(Character * _owner);
 
+    /// @brief Add the given skill to the list of skills.
+    /// @param skill        A pointer to the skill.
+    /// @param skillLevel   The initial level of the skill.
+    /// @return The outcome.
     inline bool addSkill(const std::shared_ptr<Skill> & skill,
                          const unsigned int & skillLevel = 1)
     {
@@ -69,6 +68,9 @@ public:
         return true;
     }
 
+    /// @brief Finds the given skill data.
+    /// @param vnum The vnum of the skill.
+    /// @return A pointer to the skill data.
     inline std::shared_ptr<SkillData> findSkill(const VnumType & vnum)
     {
         for (auto skillData : skills)
@@ -80,6 +82,9 @@ public:
         }
         return nullptr;
     }
+
+    /// @brief Checks if the given character has unlocked new skills.
+    void checkIfUnlockedSkills();
 
     /// @brief Activate the effects on the character based on the skill rank.
     void updateSkillEffect(std::shared_ptr<SkillData> & skillData);
@@ -98,10 +103,7 @@ public:
 
 private:
 
-    /// @brief Checks if the given character has unlocked new skills.
-    void checkIfUnlockedSkills();
-
-    std::shared_ptr<SkillEffect> getSkillEffect(
+    inline std::shared_ptr<SkillEffect> getSkillEffect(
         const std::shared_ptr<Skill> & skill)
     {
         for (const auto & it : skillEffects)
@@ -114,7 +116,7 @@ private:
         return nullptr;
     }
 
-    std::shared_ptr<SkillEffect> createSkillEffect(
+    inline std::shared_ptr<SkillEffect> createSkillEffect(
         const std::shared_ptr<Skill> & skill)
     {
         auto skillEffect = this->getSkillEffect(skill);

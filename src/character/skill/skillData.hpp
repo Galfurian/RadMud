@@ -39,20 +39,20 @@ public:
     /// @brief Constructor.
     SkillData(const VnumType & _skillVnum,
               const unsigned int & _skillLevel,
-              const std::shared_ptr<Skill> & _skill) :
+              std::shared_ptr<Skill> _skill) :
         skillVnum(_skillVnum),
         skillLevel(_skillLevel),
-        skill(_skill)
+        skill(std::move(_skill))
     {
         // Nothing to do.
     }
 
     /// @brief Constructor.
-    SkillData(const std::shared_ptr<Skill> & _skill,
+    SkillData(std::shared_ptr<Skill> _skill,
               const unsigned int & _skillLevel) :
         skillVnum(_skill->vnum),
         skillLevel(_skillLevel),
-        skill(_skill)
+        skill(std::move(_skill))
     {
         // Nothing to do.
     }

@@ -382,6 +382,7 @@ bool DoPlayerModSkill(Character * character, ArgumentHandler & args)
                        skill->name,
                        skillData->skillLevel);
     character->skillManager.updateSkillEffect(skillData);
+    character->skillManager.checkIfUnlockedSkills();
     return true;
 }
 
