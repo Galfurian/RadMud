@@ -44,7 +44,7 @@ Effect clearTargets(Character * actor,
                          .clear();
             }
         });
-    return std::move(effect);
+    return effect;
 }
 
 Effect disturbedAim(Character * actor,
@@ -60,7 +60,7 @@ Effect disturbedAim(Character * actor,
     effect.effectCombatModifier.insert(
         std::make_pair(CombatModifier::RangedWeaponHitRoll,
                        negativeMagnitude));
-    return std::move(effect);
+    return effect;
 }
 
 std::shared_ptr<SkillEffect> skillEffect(Character * actor,
@@ -73,7 +73,7 @@ std::shared_ptr<SkillEffect> skillEffect(Character * actor,
                                                 "",
                                                 nullptr,
                                                 skill);
-    return std::move(effect);
+    return effect;
 }
 
 }
