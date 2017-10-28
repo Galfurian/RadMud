@@ -51,14 +51,6 @@ public:
     std::string messageExpire;
     /// Function executed when the effect expires.
     std::function<void(Character * character)> expireFunction;
-    /// The map of abilities modifiers.
-    std::map<Ability, int> effectAbilityModifier;
-    /// The map of combat modifiers.
-    std::map<CombatModifier, int> effectCombatModifier;
-    /// The map of status modifiers.
-    std::map<StatusModifier, int> effectStatusModifier;
-    /// The map of knowledge.
-    std::map<Knowledge, int> effectKnowledge;
 
     /// @brief Constructor.
     Effect(Character * _affected,
@@ -67,6 +59,9 @@ public:
            std::string _messageActivate,
            std::string _messageExpire,
            std::function<void(Character * character)> _expireFunction);
+
+    /// @brief Destructor.
+    ~Effect();
 
     /// @brief Update the cooldown of the effect.
     /// @return <b>True</b> if the effect is expired,<br>

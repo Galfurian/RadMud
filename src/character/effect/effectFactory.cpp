@@ -57,9 +57,7 @@ Effect disturbedAim(Character * actor,
                          "",
                          "",
                          nullptr);
-    effect.effectCombatModifier.insert(
-        std::make_pair(CombatModifier::RangedWeaponHitRoll,
-                       negativeMagnitude));
+    effect.setCombatMod(CombatModifier::RangedWeaponHitRoll, negativeMagnitude);
     return effect;
 }
 

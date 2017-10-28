@@ -35,12 +35,13 @@ Effect::Effect(Character * _affected,
     remainingTic(_remainingTic),
     messageActivate(std::move(_messageActivate)),
     messageExpire(std::move(_messageExpire)),
-    expireFunction(std::move(_expireFunction)),
-    effectAbilityModifier(),
-    effectCombatModifier(),
-    effectStatusModifier(),
-    effectKnowledge()
+    expireFunction(std::move(_expireFunction))
 {
     Logger::log(LogLevel::Debug, "Created effect %s.", name);
-    // Nothing to do.
+}
+
+
+Effect::~Effect()
+{
+    Logger::log(LogLevel::Debug, "Deleted effect %s.", name);
 }
