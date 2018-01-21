@@ -31,7 +31,8 @@
 
 class Character;
 
-class SkillManager
+class SkillManager :
+    public ModifierManager
 {
 public:
     /// The owner of the manager.
@@ -40,8 +41,6 @@ public:
     std::vector<std::shared_ptr<SkillData>> skills;
     /// The vector of effects related to the skills.
     std::vector<std::shared_ptr<SkillEffect>> skillEffects;
-    /// The internal modifier manager.
-    std::shared_ptr<ModifierManager> modifierManager;
 
     /// @brief Constructor.
     /// @param _owner The owner of the manager.
@@ -120,14 +119,13 @@ private:
         const std::shared_ptr<SkillData> & skillData)
     {
         auto skillEffect = this->getSkillEffect(skillData);
-        if (skillEffect != nullptr)
+        if (skillEffect == nullptr)
         {
-            return skillEffect;
+            skillEffect = std::make_shared<SkillEffect>(owner,
+                                                        skillData->skill->name,
+                                                        skillData);
+            skillEffects.emplace_back(skillEffect);
         }
-        skillEffects.emplace_back(
-            std::make_shared<SkillEffect>(owner,
-                                          skillData->skill->name,
-                                          skillData));
-        return skillEffects.back();
+        return skillEffect;
     }
 };

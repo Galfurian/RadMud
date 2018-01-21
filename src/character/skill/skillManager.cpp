@@ -29,8 +29,7 @@
 SkillManager::SkillManager(Character * _owner) :
     owner(_owner),
     skills(),
-    skillEffects(),
-    modifierManager(std::make_shared<ModifierManager>())
+    skillEffects()
 {
     assert(_owner);
     // Nothing to do.
@@ -86,17 +85,14 @@ void SkillManager::updateSkillEffect(std::shared_ptr<SkillData> & skillData)
     if (skillEffect == nullptr)
     {
         skillEffect = this->createSkillEffect(skillData);
-    }
-    else
+    } else
     {
-        modifierManager -= skillEffect->skillData->skill->modifierManager;
-        skillEffect->modifierManager->reset();
+        *(this) -= (*(skillEffect.get()));
+        skillEffect->reset();
     }
     // Update the skill effect.
-    skillEffect->modifierManager->applyModifier(skill->modifierManager,
-                                                skillRank);
-    // Apply the skill effect modifiers.
-    modifierManager += skillEffect->modifierManager;
+    skillEffect->applyModifier(skill->modifierManager, skillRank);
+    *(this) += (*(skillEffect.get()));
 }
 
 void SkillManager::improveAbility(const Ability & abilityModifier)

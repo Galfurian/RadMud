@@ -28,6 +28,8 @@
 #include "utils.hpp"
 
 #include <memory>
+#include <utilities/logger.hpp>
+#include "alignString.hpp"
 
 /// @brief Addition-Assignment operator for two Ability Modifier maps.
 template<typename ModifierType>
@@ -41,8 +43,7 @@ inline std::map<ModifierType, int> & operator+=(
         if (leftModifier != left.end())
         {
             leftModifier->second += rightModifier.second;
-        }
-        else
+        } else
         {
             left.insert(rightModifier);
         }
@@ -60,8 +61,7 @@ inline std::map<Knowledge, int> & operator+=(
         if (leftModifier != left.end())
         {
             leftModifier->second = true;
-        }
-        else
+        } else
         {
             left.insert(rightModifier);
         }
@@ -123,8 +123,7 @@ private:
             if (receiverIt == receiver.end())
             {
                 receiver.insert(std::make_pair(providerIt.first, modifier));
-            }
-            else
+            } else
             {
                 receiverIt->second += modifier;
             }
@@ -266,6 +265,53 @@ public:
     friend inline std::shared_ptr<ModifierManager> & operator+=(
         std::shared_ptr<ModifierManager> & left,
         const std::shared_ptr<ModifierManager> & right);
+
+    inline void dump()
+    {
+        std::string msg;
+        if (!modAbility.empty())
+        {
+            msg += "\tAbility Modifiers\n";
+            for (auto const & it2 : modAbility)
+            {
+                msg += "\t\t";
+                msg += AlignString(it2.first.getAbbreviation(),
+                                   StringAlign::Left, 30);
+                msg += AlignString(it2.second, StringAlign::Right, 5) + "\n";
+            }
+        }
+        if (!modCombat.empty())
+        {
+            msg += "\tCombat Modifiers\n";
+            for (auto const & it2 : modCombat)
+            {
+                msg += "\t";
+                msg += AlignString(it2.first.toString(), StringAlign::Left, 30);
+                msg += AlignString(it2.second, StringAlign::Right, 5) + "\n";
+            }
+        }
+        if (!modStatus.empty())
+        {
+            msg += "\tStatus Modifiers\n";
+            for (auto const & it2 : modStatus)
+            {
+                msg += "\t";
+                msg += AlignString(it2.first.toString(), StringAlign::Left, 30);
+                msg += AlignString(it2.second, StringAlign::Right, 5) + "\n";
+            }
+        }
+        if (!modKnowledge.empty())
+        {
+            msg += "\tKnowledges\n";
+            for (auto const & it2 : modKnowledge)
+            {
+                msg += "\t";
+                msg += AlignString(it2.first.toString(), StringAlign::Left, 30);
+                msg += AlignString(it2.second, StringAlign::Right, 5) + "\n";
+            }
+        }
+        Logger::log(LogLevel::Debug, msg);
+    }
 };
 
 /// @brief Adds the modifiers of another manager.
