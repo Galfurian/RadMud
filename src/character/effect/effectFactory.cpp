@@ -61,17 +61,4 @@ Effect disturbedAim(Character * actor,
     return effect;
 }
 
-std::shared_ptr<SkillEffect> skillEffect(Character * actor,
-                                         const std::shared_ptr<Skill> & skill)
-{
-    auto effect = std::make_shared<SkillEffect>(actor,
-                                                skill->name,
-                                                0,
-                                                "",
-                                                "",
-                                                nullptr,
-                                                skill);
-    return effect;
-}
-
 }

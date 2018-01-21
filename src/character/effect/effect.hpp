@@ -91,26 +91,3 @@ public:
         return name == right.name;
     }
 };
-
-class SkillEffect :
-    public Effect
-{
-public:
-    /// The skill which produces the effect.
-    std::shared_ptr<Skill> skill;
-
-    /// @brief Constructor.
-    SkillEffect(Character * _affected,
-                std::string _name,
-                unsigned int _remainingTic,
-                std::string _messageActivate,
-                std::string _messageExpire,
-                std::function<void(Character * character)> _expireFunction,
-                const std::shared_ptr<Skill> & _skill) :
-        Effect(_affected, _name, _remainingTic, _messageActivate,
-               _messageExpire, _expireFunction),
-        skill(_skill)
-    {
-        // Nothing to do.
-    }
-};

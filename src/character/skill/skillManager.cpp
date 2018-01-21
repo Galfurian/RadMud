@@ -82,20 +82,21 @@ void SkillManager::updateSkillEffect(std::shared_ptr<SkillData> & skillData)
     // Save the skill rank.
     auto skillRank = skillData->getSkillRank().to<int>();
     // Try to find the skill effect.
-    auto skillEffect = this->getSkillEffect(skill);
+    auto skillEffect = this->getSkillEffect(skillData);
     if (skillEffect == nullptr)
     {
-        skillEffect = this->createSkillEffect(skill);
+        skillEffect = this->createSkillEffect(skillData);
     }
     else
     {
-        modifierManager -= skillEffect;
-        skillEffect->reset();
+        modifierManager -= skillEffect->skillData->skill->modifierManager;
+        skillEffect->modifierManager->reset();
     }
     // Update the skill effect.
-    skillEffect->applyModifier(skill->modifierManager, skillRank);
+    skillEffect->modifierManager->applyModifier(skill->modifierManager,
+                                                skillRank);
     // Apply the skill effect modifiers.
-    modifierManager += skillEffect;
+    modifierManager += skillEffect->modifierManager;
 }
 
 void SkillManager::improveAbility(const Ability & abilityModifier)

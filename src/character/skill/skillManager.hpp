@@ -104,11 +104,11 @@ public:
 private:
 
     inline std::shared_ptr<SkillEffect> getSkillEffect(
-        const std::shared_ptr<Skill> & skill)
+        const std::shared_ptr<SkillData> & skillData)
     {
         for (const auto & it : skillEffects)
         {
-            if (it->skill == skill)
+            if (it->skillData == skillData)
             {
                 return it;
             }
@@ -117,14 +117,17 @@ private:
     }
 
     inline std::shared_ptr<SkillEffect> createSkillEffect(
-        const std::shared_ptr<Skill> & skill)
+        const std::shared_ptr<SkillData> & skillData)
     {
-        auto skillEffect = this->getSkillEffect(skill);
+        auto skillEffect = this->getSkillEffect(skillData);
         if (skillEffect != nullptr)
         {
             return skillEffect;
         }
-        skillEffects.emplace_back(EffectFactory::skillEffect(owner, skill));
+        skillEffects.emplace_back(
+            std::make_shared<SkillEffect>(owner,
+                                          skillData->skill->name,
+                                          skillData));
         return skillEffects.back();
     }
 };

@@ -590,6 +590,12 @@ bool DoEffects(Character * character, ArgumentHandler &)
         msg += AlignString(it.first.toString(), StringAlign::Left, 30);
         msg += AlignString(it.second, StringAlign::Right, 5) + "\n";
     }
+    for (auto const & it : character->skillManager.skillEffects)
+    {
+        msg += "\t";
+        msg += AlignString(it->name, StringAlign::Left, 30);
+        msg += AlignString(it.second, StringAlign::Right, 5) + "\n";
+    }
     character->sendMsg(msg);
     return true;
 }

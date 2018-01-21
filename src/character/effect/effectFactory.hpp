@@ -59,11 +59,4 @@ Effect disturbedAim(Character * actor,
                     const unsigned int & duration,
                     const int & negativeMagnitude);
 
-/// @brief Creates an effect which has the name of the given skill.
-/// @param actor        The affected character.
-/// @param skillName    The name of the skill.
-/// @return The created effect.
-std::shared_ptr<SkillEffect> skillEffect(Character * actor,
-                                         const std::shared_ptr<Skill> & skill);
-
 }

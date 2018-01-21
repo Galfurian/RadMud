@@ -71,3 +71,28 @@ public:
         }
     }
 };
+
+class SkillEffect
+{
+public:
+    /// The character affected by the effect.
+    Character * affected;
+    /// Name of the modifier.
+    std::string name;
+    /// The skill which produces the effect.
+    std::shared_ptr<SkillData> skillData;
+    /// The internal modifier manager.
+    std::shared_ptr<ModifierManager> modifierManager;
+
+    /// @brief Constructor.
+    SkillEffect(Character * _affected,
+                std::string _name,
+                std::shared_ptr<SkillData> _skillData) :
+        affected(_affected),
+        name(std::move(_name)),
+        skillData(std::move(_skillData)),
+        modifierManager(std::make_shared<ModifierManager>())
+    {
+        // Nothing to do.
+    }
+};
