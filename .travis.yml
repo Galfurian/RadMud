@@ -1,7 +1,6 @@
 sudo      : required
-dist      : precise
+dist      : trusty
 language  : cpp
-
 matrix:
   include:
     - compiler: gcc
@@ -11,21 +10,21 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
-      env: COMPILER=g++-5
+      env:
+        - COMPILER=g++-5
     - compiler: clang
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.7
+            - llvm-toolchain-trusty-4.0
           packages:
-            - clang-3.7
-      env: COMPILER=clang++-3.7
-
+            - clang-4.0
+      env:
+        - COMPILER=clang++-4.0
 before_install:
-  - sudo apt-get update -qq
+  - sudo apt-get update  -qq
   - sudo apt-get install -qq libpthread-stubs0-dev libsqlite3-dev lua5.2-dev zlib1g-dev
-
 script:
   - mkdir build
   - cd build

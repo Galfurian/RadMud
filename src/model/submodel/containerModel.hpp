@@ -63,8 +63,8 @@ public:
 /// @addtogroup FlagsToList
 /// @{
 
-/// Return a list of string contain the Container flags
-///  contained inside the value.
+/// @brief Return a list of string contain the Container flags contained
+/// inside the value.
 std::string GetContainerFlagString(unsigned int flags);
 
 /// @}

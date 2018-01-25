@@ -30,8 +30,8 @@ class LoadAction :
     public GeneralAction
 {
 private:
-    /// The item which has to be loaded.
-    Item * itemToBeLoaded;
+    /// The magazine which has to be loaded.
+    MagazineItem * magazine;
     /// The projectile used to load the item.
     Item * projectile;
     /// The amount that has to be loaded.
@@ -40,7 +40,7 @@ private:
 public:
     /// @brief Constructor.
     LoadAction(Character * _actor,
-               Item * _itemToBeLoaded,
+               MagazineItem * _magazine,
                Item * _projectile,
                const unsigned int & _amount);
 
@@ -57,8 +57,5 @@ public:
 
     ActionStatus perform() override;
 
-    /// @brief Provides the required time for the item to be loaded to
-    ///         aim the target.
-    static unsigned int getLoadTime(Item * projectile,
-                                    const unsigned int & amountToLoad);
+    unsigned int getCooldown() override;
 };

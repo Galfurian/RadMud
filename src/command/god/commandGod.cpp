@@ -1,4 +1,4 @@
-/// @file   god.cpp
+/// @file   commandGod.cpp
 /// @brief  Implements the methods used by <b>gods</b>.
 /// @author Enrico Fraccaroli
 /// @date   Aug 23 2014
@@ -46,6 +46,22 @@ void LoadGodCommands()
     Mud::instance().addCommand(std::make_shared<Command>(
         DoGoTo, "mud_goto", "(room vnum)",
         "Go to another room.",
+        true, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoGenerateMap, "mud_generate_map", "",
+        "Generate a map.",
+        true, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoShowGenerateMap, "mud_show_generated_map", "",
+        "Shows a generated map.",
+        true, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoDeleteGenerateMap, "mud_delete_generated_map", "",
+        "Deletes a generated map.",
+        true, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoBuildGenerateMap, "mud_build_generated_map", "",
+        "Builds a generated map.",
         true, true, false));
     Mud::instance().addCommand(std::make_shared<Command>(
         DoFactionInfo, "faction_information", "(faction vnum)",
@@ -150,10 +166,6 @@ void LoadGodCommands()
         DoAreaList, "area_list", "",
         "List all the areas.",
         true, true, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoContinentList, "continent_list", "",
-        "List all the continents.",
-        true, true, false));
 
     // ////////////////////////////////////////////////////////////////////////
     // COMMAND GOD ITEM
@@ -246,6 +258,14 @@ void LoadGodCommands()
     Mud::instance().addCommand(std::make_shared<Command>(
         DoProductionList, "production_list", "",
         "Get the list of all the productions.",
+        true, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoBodyPartList, "body_part_list", "",
+        "Get the list of all the body parts.",
+        true, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoBodyPartInfo, "body_part_information", "",
+        "Get information about a body part.",
         true, true, false));
 
     // ////////////////////////////////////////////////////////////////////////

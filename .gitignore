@@ -6,3 +6,4 @@ build-clang
 Default
 cmake-build-debug/
 cmake-build-default/
+build-gcc/

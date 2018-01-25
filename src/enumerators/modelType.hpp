@@ -22,15 +22,11 @@
 
 #pragma once
 
-#include <string>
-
-extern "C"
-{
-#include "lua.h"
-}
+#include "baseEnumerator.hpp"
 
 /// @brief Used to determine the type of the model.
-class ModelType
+class ModelType :
+    public BaseEnumerator
 {
 public:
     /// The possible types of model.
@@ -50,11 +46,11 @@ public:
         Resource,        ///< [11] A resource.
         Seed,            ///< [12] Any kind of seed.
         Key,             ///< [13] A key.
-        Furniture,       ///< [14] A forniture (eg. chair, bed, painting, table and so on).
+        Furniture,       ///< [14] A furniture (eg. chair, bed, painting, table and so on).
         Food,            ///< [15] A food.
         Light,           ///< [16] A source of light ((eg. torch, lamp, candle and so on).
         Vehicle,         ///< [17] Any kind of vehicle.
-        Book,            ///< [18] Container of parchements.
+        Book,            ///< [18] Container of parchments.
         Rope,            ///< [19] A generic rope.
         Mechanism,       ///< [20] Any kind of mechanism.
         Currency,        ///< [21] Any kind of currency.
@@ -62,47 +58,27 @@ public:
         Magazine         ///< [23] A magazine for ammunitions.
     };
 
-    /// @brief Constructor from uint.
-    ModelType();
+    /// @brief Constructor.
+    ModelType() :
+        BaseEnumerator()
+    {
+        // Nothing to do.
+    }
 
-    /// @brief Constructor from uint.
-    ModelType(const unsigned int & _modelType);
+    /// @brief Constructor from unsigned int.
+    ModelType(const unsigned int & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Constructor from enum.
-    ModelType(const Enum & _modelType);
-
-    /// @brief Constructor from string.
-    ModelType(const std::string & _modelType);
-
-    /// @brief Check is the given number is a valid type of model.
-    static bool isValid(const unsigned int & _modelType);
-
-    /// @brief Check is the given string is a valid type of model.
-    static bool isValid(const std::string & _modelType);
+    ModelType(const Enum & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Returns the type of model as string.
-    std::string toString() const;
-
-    /// @brief Returns the type of model as number.
-    unsigned int toUInt() const;
-
-    /// @brief Equality operator w.r.t. a type of model object.
-    bool operator==(const ModelType & rhs) const;
-
-    /// @brief Equality operator w.r.t. a type of model enum.
-    bool operator==(const ModelType::Enum & rhs) const;
-
-    /// @brief Inequality operator w.r.t. a type of model enum.
-    bool operator!=(const ModelType::Enum & rhs) const;
-
-    /// @brief Equality operator w.r.t. a type of model object.
-    bool operator<(const ModelType & rhs) const;
-
-    /// @brief Function used to register inside the lua environment the class.
-    /// @param L The lua environment.
-    static void luaRegister(lua_State * L);
-
-private:
-    /// Internal type of model.
-    Enum modelType;
+    std::string toString() const override;
 };

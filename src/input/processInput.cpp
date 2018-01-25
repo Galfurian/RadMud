@@ -22,7 +22,7 @@
 #include "processInput.hpp"
 #include "character.hpp"
 #include "crafting.hpp"
-#include "general.hpp"
+#include "movement.hpp"
 #include "mud.hpp"
 
 ProcessInput::ProcessInput()
@@ -79,7 +79,7 @@ bool ProcessInput::process(Character * character, ArgumentHandler & args)
             // Check if the command can be used in combat and if the
             //  character is actually in combat.
             if ((!iterator->canUseInCombat) &&
-                (character->getAction()->getType() == ActionType::Combat))
+                (character->getAction() == ActionType::Combat))
             {
                 character->sendMsg("You cannot do that in combat.\n");
                 break;

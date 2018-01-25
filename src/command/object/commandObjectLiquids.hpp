@@ -1,4 +1,4 @@
-/// @file   commObjectLiquids.hpp
+/// @file   commandObjectLiquids.hpp
 /// @author Enrico Fraccaroli
 /// @date   29/12/2016
 /// @copyright

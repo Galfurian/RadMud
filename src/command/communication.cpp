@@ -55,6 +55,12 @@ void LoadCommunicationCommands()
 
 bool DoSay(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     if (args.empty())
     {
         character->sendMsg("My dear friend, say what?\n");
@@ -116,6 +122,12 @@ bool DoSay(Character * character, ArgumentHandler & args)
 
 bool DoWhisper(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     if (args.empty())
     {
         character->sendMsg("Whisper to whom?\n");
@@ -156,6 +168,12 @@ bool DoWhisper(Character * character, ArgumentHandler & args)
 
 bool DoEmote(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     if (args.empty())
     {
         character->sendMsg("My dear friend, emote what?\n");

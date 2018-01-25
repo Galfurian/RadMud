@@ -27,6 +27,7 @@
 #include "unloadAction.hpp"
 #include "aimAction.hpp"
 #include "basicAttack.hpp"
+#include "characterUtilities.hpp"
 #include "flee.hpp"
 
 void LoadCombatCommands()
@@ -59,7 +60,8 @@ void LoadCombatCommands()
         DoAim, "aim", "(target)",
         "Allows to aim a target in sight.\n"
             "If the target is not inside the same room,"
-            "you have first to scout the area.",
+            "you have first to scout the area.\n"
+            "If no arguments is provided it lists the available targets.",
         false, true, false));
     Mud::instance().addCommand(std::make_shared<Command>(
         DoFire, "fire", "(firearm) (magazine)",
@@ -69,6 +71,12 @@ void LoadCombatCommands()
 
 bool DoKill(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     // If there are no arguments, show the room.
@@ -95,7 +103,7 @@ bool DoKill(Character * character, ArgumentHandler & args)
         return false;
     }
     // Check if the two characters are both already in combat.
-    if (character->getAction()->getType() == ActionType::Combat)
+    if (character->getAction() == ActionType::Combat)
     {
         // Check if the character is trying to attack a target
         //  with which is not in combat.
@@ -121,10 +129,7 @@ bool DoKill(Character * character, ArgumentHandler & args)
                                target->getName());
             return true;
         }
-        else
-        {
-            character->sendMsg("You have already your share of troubles!\n");
-        }
+        character->sendMsg("You have already your share of troubles!\n");
     }
     else
     {
@@ -138,18 +143,15 @@ bool DoKill(Character * character, ArgumentHandler & args)
             // Add the target to the list of opponents.
             character->combatHandler.addOpponent(target);
             // Add the action to the character's combat queue.
-            character->setAction(basicAttack);
+            character->pushAction(basicAttack);
             // Set the predefined target.
             character->combatHandler.setPredefinedTarget(target);
             // Notify the character.
             character->sendMsg("You attack %s.\n", target->getName());
             return true;
         }
-        else
-        {
-            character->sendMsg("You were not able to attack %s.\n",
-                               target->getName());
-        }
+        character->sendMsg("You were not able to attack %s.\n",
+                           target->getName());
     }
     return false;
 }
@@ -157,13 +159,13 @@ bool DoKill(Character * character, ArgumentHandler & args)
 bool DoFlee(Character * character, ArgumentHandler & /*args*/)
 {
     // Check if the character is in combat.
-    if (character->getAction()->getType() != ActionType::Combat)
+    if (character->getAction() != ActionType::Combat)
     {
         character->sendMsg("You are not fighting.\n");
         return false;
     }
     // Check if the actor is already trying to flee.
-    if (character->getAction()->getType() == ActionType::Combat)
+    if (character->getAction() == ActionType::Combat)
     {
         // Check if the character is already trying to flee.
         if (character->getAction()->toCombatAction()->getCombatActionType() ==
@@ -178,7 +180,7 @@ bool DoFlee(Character * character, ArgumentHandler & /*args*/)
     if (flee->check(error))
     {
         // Add the action to the character's combat queue.
-        character->setAction(flee);
+        character->pushAction(flee);
         // Notify the character.
         character->sendMsg("You prepare to flee...\n");
         return true;
@@ -189,6 +191,12 @@ bool DoFlee(Character * character, ArgumentHandler & /*args*/)
 
 bool DoScout(Character * character, ArgumentHandler & /*args*/)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     auto newAction = std::make_shared<ScoutAction>(character);
@@ -199,7 +207,7 @@ bool DoScout(Character * character, ArgumentHandler & /*args*/)
         // Send the starting message.
         character->sendMsg("You start scouting the area...\n");
         // Set the new action.
-        character->setAction(newAction);
+        character->pushAction(newAction);
         return true;
     }
     character->sendMsg("%s\n", error);
@@ -208,6 +216,12 @@ bool DoScout(Character * character, ArgumentHandler & /*args*/)
 
 bool DoLoad(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     if (args.size() != 2)
@@ -235,7 +249,7 @@ bool DoLoad(Character * character, ArgumentHandler & args)
         return false;
     }
     // Transform the item into a magazine.
-    auto magazine = itemToLoad->toMagazineItem();
+    auto magazine = static_cast<MagazineItem *>(itemToLoad);
     // Search the projectiles.
     auto projectile = character->findEquipmentItem(args[1].getContent(),
                                                    args[1].getIndex());
@@ -269,7 +283,7 @@ bool DoLoad(Character * character, ArgumentHandler & args)
                            magazine->getName(true),
                            projectile->getName(true));
         // Set the new action.
-        character->setAction(newAction);
+        character->pushAction(newAction);
         return true;
     }
     character->sendMsg("%s\n", error);
@@ -278,6 +292,12 @@ bool DoLoad(Character * character, ArgumentHandler & args)
 
 bool DoUnload(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     if (args.size() != 1)
@@ -312,19 +332,6 @@ bool DoUnload(Character * character, ArgumentHandler & args)
                            itemToUnload->getNameCapital(true));
         return false;
     }
-    // Set the required time to unloaded the item.
-    if (itemToUnload->getType() == ModelType::Magazine)
-    {
-        auto loadedItem = itemToUnload->toMagazineItem()
-                                      ->getAlreadyLoadedProjectile();
-        if (loadedItem == nullptr)
-        {
-            character->sendMsg(
-                "Something is gone wrong while you were unloading %s...\n\n",
-                itemToUnload->getName(true));
-            return false;
-        }
-    }
     // Create the unload action.
     auto newAction = std::make_shared<UnloadAction>(character, itemToUnload);
     std::string error;
@@ -335,7 +342,7 @@ bool DoUnload(Character * character, ArgumentHandler & args)
         character->sendMsg("You start unloading %s.\n",
                            itemToUnload->getName(true));
         // Set the new action.
-        character->setAction(newAction);
+        character->pushAction(newAction);
         return true;
     }
     character->sendMsg("%s\n", error);
@@ -344,6 +351,12 @@ bool DoUnload(Character * character, ArgumentHandler & args)
 
 bool DoReload(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     if (args.size() != 2)
@@ -370,7 +383,7 @@ bool DoReload(Character * character, ArgumentHandler & args)
         return false;
     }
     // Transform the item into a ranged weapons.
-    auto rangedWeapon = itemToReload->toRangedWeaponItem();
+    auto rangedWeapon = static_cast<RangedWeaponItem *>(itemToReload);
     // Search the magazine.
     auto magazine = character->findEquipmentItem(args[1].getContent(),
                                                  args[1].getIndex());
@@ -402,7 +415,7 @@ bool DoReload(Character * character, ArgumentHandler & args)
                            rangedWeapon->getName(true),
                            magazine->getName(true));
         // Set the new action.
-        character->setAction(newAction);
+        character->pushAction(newAction);
         return true;
     }
     character->sendMsg("%s\n", error);
@@ -411,23 +424,50 @@ bool DoReload(Character * character, ArgumentHandler & args)
 
 bool DoAim(Character * character, ArgumentHandler & args)
 {
-    // Stop any action the character is executing.
-    StopAction(character);
-    if (args.size() != 1)
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
     {
-        character->sendMsg("Who or what do you want to aim?\n");
+        character->sendMsg("Not while you're sleeping.\n");
         return false;
     }
-    if (character->getActiveRangedWeapons().empty())
+    // Stop any action the character is executing.
+    StopAction(character);
+    if (args.size() == 0)
+    {
+        if (character->combatHandler.charactersInSight.empty())
+        {
+            character->sendMsg("Who or what do you want to aim?\n");
+        }
+        else
+        {
+            character->sendMsg("You are able to aim at:\n");
+            for (auto it : character->combatHandler.charactersInSight)
+            {
+                if (!it) continue;
+                if (!it->room) continue;
+                character->sendMsg("  [%s] %s\n",
+                                   Area::getDistance(character->room->coord,
+                                                     it->room->coord),
+                                   it->getName());
+            }
+        }
+        return true;
+    }
+    else if (args.size() > 1)
+    {
+        character->sendMsg("Too many arguments.\n");
+        return false;
+    }
+    if (GetActiveRangedWeapons(character).empty())
     {
         character->sendMsg("You don't have a ranged weapon equipped.\n");
         return false;
     }
     // Prepare a pointer to the aimed character.
     Character * aimedCharacter = nullptr;
-    // Create a single CharacterContainer which contains
+    // Create a single CharacterVector which contains
     //  a unique list of all the targets.
-    CharacterContainer targets = character->room->characters;
+    CharacterVector targets = character->room->characters;
     targets.addUnique(character->combatHandler.charactersInSight);
     // First try to search the target inside the same room.
     aimedCharacter = targets.findCharacter(args[0].getContent(),
@@ -457,7 +497,7 @@ bool DoAim(Character * character, ArgumentHandler & args)
     auto newAction = std::make_shared<AimAction>(character, aimedCharacter);
     // Check the new action.
     std::string error;
-    if (newAction->check(error))
+    if (!newAction->check(error))
     {
         character->sendMsg("%s\n", error);
         return false;
@@ -466,12 +506,18 @@ bool DoAim(Character * character, ArgumentHandler & args)
     character->sendMsg("You start aiming at %s...\n",
                        aimedCharacter->getName());
     // Set the new action.
-    character->setAction(newAction);
+    character->pushAction(newAction);
     return true;
 }
 
 bool DoFire(Character * character, ArgumentHandler & /*args*/)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     // Check if the pointer to the aimed target is still valid.
@@ -490,7 +536,7 @@ bool DoFire(Character * character, ArgumentHandler & /*args*/)
         return false;
     }
     // Retrieve the active ranged weapons.
-    auto rangedWeapons = character->getActiveRangedWeapons();
+    auto rangedWeapons = GetActiveRangedWeapons(character);
     // Check if the character has some ranged weapons equipped.
     if (rangedWeapons.empty())
     {
@@ -536,7 +582,7 @@ bool DoFire(Character * character, ArgumentHandler & /*args*/)
     // Add the aimedTarget to the list of opponents.
     character->combatHandler.addOpponent(aimedTarget);
     // Add the action to the character's combat queue.
-    character->setAction(basicAttack);
+    character->pushAction(basicAttack);
     // Set the predefined target.
     character->combatHandler.setPredefinedTarget(aimedTarget);
     character->sendMsg("You start firing at %s...\n",

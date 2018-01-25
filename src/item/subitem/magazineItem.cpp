@@ -42,18 +42,15 @@ void MagazineItem::getSheet(Table & sheet) const
     // Set the values.
     if (!this->isEmpty())
     {
-        Item * projectile = this->content.front();
-        if (projectile == nullptr)
-        {
-            sheet.addRow({"Projectile", "NULL"});
-        }
-        else if (projectile->getType() != ModelType::Projectile)
+        // Get the already loaded projectile.
+        auto loadedProjectile = this->getAlreadyLoadedProjectile();
+        if (loadedProjectile == nullptr)
         {
             sheet.addRow({"Projectile", "NULL"});
         }
         else
         {
-            sheet.addRow({"Projectile", projectile->getName(false)});
+            sheet.addRow({"Projectile", loadedProjectile->getName(false)});
         }
     }
 }
@@ -69,33 +66,39 @@ std::string MagazineItem::lookContent()
     }
     else
     {
-        auto loadedProjectiles = this->getAlreadyLoadedProjectile();
-        if (loadedProjectiles != nullptr)
+        // Get the already loaded projectile.
+        auto loadedProjectile = this->getAlreadyLoadedProjectile();
+        if (loadedProjectile != nullptr)
         {
             output += Formatter::italic();
-            output += "It contains " + loadedProjectiles->getName(true) + "[";
-            output += ToString(loadedProjectiles->quantity) + "].\n";
+            output += "It contains " + loadedProjectile->getName(true) + "[";
+            output += ToString(loadedProjectile->quantity) + "].\n";
             output += Formatter::reset();
         }
     }
     return output;
 }
 
-bool MagazineItem::canLoadWith(Item * projectile, std::string & error) const
+bool MagazineItem::isAContainer() const
 {
-    if (projectile->getType() != ModelType::Projectile)
+    return true;
+}
+
+bool MagazineItem::canLoadWith(Item * _projectile, std::string & error) const
+{
+    if (_projectile->getType() != ModelType::Projectile)
     {
         error = "You can't load " + this->getName(true) + " with " +
-                projectile->getName(true);
+                _projectile->getName(true);
         return false;
     }
     // Retrieve any already loaded projectiles.
-    Item * alreadyLoaded = this->getAlreadyLoadedProjectile();
-    if (alreadyLoaded != nullptr)
+    auto loadedProjectile = this->getAlreadyLoadedProjectile();
+    if (loadedProjectile != nullptr)
     {
         // If there are projectiles inside, check if the two types of
         //  projectiles are compatible.
-        if (!alreadyLoaded->canStackWith(projectile))
+        if (!loadedProjectile->canStackWith(_projectile))
         {
             error = "The magazine already contains a different"
                 " type of projectiles";
@@ -105,23 +108,23 @@ bool MagazineItem::canLoadWith(Item * projectile, std::string & error) const
     return true;
 }
 
-bool MagazineItem::getAmountToLoad(Item * projectile,
+bool MagazineItem::getAmountToLoad(Item * _projectile,
                                    unsigned int & amount,
                                    std::string & error) const
 {
-    if (!this->canLoadWith(projectile, error))
+    if (!this->canLoadWith(_projectile, error))
     {
         return false;
     }
-    // Set by default the ammout to load to the maximum.
+    // Set by default the amount to load to the maximum.
     amount = this->model->toMagazine()->maxAmount;
     unsigned int amountAlreadyLoaded = 0;
     // Retrieve any already loaded projectiles.
-    Item * alreadyLoaded = this->getAlreadyLoadedProjectile();
-    if (alreadyLoaded != nullptr)
+    auto loadedProjectile = this->getAlreadyLoadedProjectile();
+    if (loadedProjectile != nullptr)
     {
         // Set the amount of already loaded projectiles.
-        amountAlreadyLoaded = alreadyLoaded->quantity;
+        amountAlreadyLoaded = loadedProjectile->quantity;
         if (amount <= amountAlreadyLoaded)
         {
             error = this->getNameCapital(true) +
@@ -137,7 +140,8 @@ Item * MagazineItem::getAlreadyLoadedProjectile() const
 {
     if (!this->isEmpty())
     {
-        Item * projectile = this->content.front();
+        // Get the first element of the content.
+        auto projectile = content.front();
         if (projectile != nullptr)
         {
             if (projectile->getType() == ModelType::Projectile)

@@ -41,7 +41,6 @@
 #include "material.hpp"
 #include "area.hpp"
 #include "room.hpp"
-#include "continent.hpp"
 #include "mobile.hpp"
 #include "player.hpp"
 #include "command.hpp"
@@ -49,6 +48,9 @@
 #include "table.hpp"
 #include "formatter.hpp"
 #include "terrain.hpp"
+#include "bodyPart.hpp"
+#include "heightMap.hpp"
+#include "mapWrapper.hpp"
 
 class Direction;
 
@@ -83,13 +85,6 @@ class Direction;
 #include <windows.h>
 
 #endif
-
-extern "C"
-{
-#include "lua.h"
-#include "lauxlib.h"
-#include "lualib.h"
-}
 
 /// @brief The main class of the entire mud.
 /// @details
@@ -164,13 +159,13 @@ public:
     /// List of all connected players.
     std::list<Player *> mudPlayers;
     /// List all the mobile.
-    std::map<std::string, Mobile *> mudMobiles;
+    std::vector<Mobile *> mudMobiles;
     /// List of all items.
     std::map<int, Item *> mudItems;
     /// List of all the rooms.
     std::map<int, Room *> mudRooms;
     /// List all the items model.
-    std::map<int, ItemModel *> mudItemModels;
+    std::map<int, std::shared_ptr<ItemModel>> mudItemModels;
     /// List of all the areas.
     std::map<int, Area *> mudAreas;
     /// List of all the races.
@@ -178,13 +173,11 @@ public:
     /// List of all the factions.
     std::map<int, Faction *> mudFactions;
     /// List of all the skills.
-    std::map<int, Skill *> mudSkills;
+    std::vector<std::shared_ptr<Skill>> mudSkills;
     /// List of all the writings.
     std::map<int, Writing *> mudWritings;
     /// List of all the corpses.
     std::map<int, Item *> mudCorpses;
-    /// List of all the continents.
-    std::map<int, Continent *> mudContinents;
     /// List of all the materials.
     std::map<int, Material *> mudMaterials;
     /// List of all the professions.
@@ -192,7 +185,7 @@ public:
     /// List of all the productions.
     std::map<int, Production *> mudProductions;
     /// List of all the liquids.
-    std::map<int, Liquid *> mudLiquids;
+    std::map<unsigned int, Liquid *> mudLiquids;
     /// List of all the travelling points.
     std::map<Room *, Room *> mudTravelPoints;
     /// Blocked IP addresses.
@@ -204,9 +197,15 @@ public:
     /// List of commands (eg. look, quit, north etc.).
     std::vector<std::shared_ptr<Command> > mudCommands;
     /// Map of buildings schematic.
-    std::map<int, Building> mudBuildings;
+    std::map<int, std::shared_ptr<Building>> mudBuildings;
     /// Map of buildings schematic.
     std::map<unsigned int, std::shared_ptr<Terrain>> mudTerrains;
+    /// List of all the bodyparts.
+    std::map<unsigned int, std::shared_ptr<BodyPart>> mudBodyParts;
+    /// List of all the bodyparts.
+    std::map<unsigned int, std::shared_ptr<HeightMap>> mudHeightMaps;
+    /// List of generated maps.
+    std::map<unsigned int, std::shared_ptr<MapWrapper>> mudGeneratedMaps;
 
     /// @brief Update all the player on the database.
     /// @return <b>True</b> if the operations succeeded,<br>
@@ -264,7 +263,7 @@ public:
     bool remCorpse(Item * corpse);
 
     /// Add the given item model to the mud.
-    bool addItemModel(ItemModel * model);
+    bool addItemModel(std::shared_ptr<ItemModel> model);
 
     /// Add the given area to the mud.
     bool addArea(Area * area);
@@ -276,13 +275,10 @@ public:
     bool addFaction(Faction * faction);
 
     /// Add the given skill to the mud.
-    bool addSkill(Skill * skill);
+    bool addSkill(std::shared_ptr<Skill> skill);
 
     /// Add the given writing to the mud.
     bool addWriting(Writing * writing);
-
-    /// Add the given continent to the mud.
-    bool addContinent(Continent * continent);
 
     /// Add the given material to the mud.
     bool addMaterial(Material * material);
@@ -300,13 +296,22 @@ public:
     bool addTravelPoint(Room * source, Room * target);
 
     /// Add a command to the mud.
-    void addCommand(std::shared_ptr<Command> command);
+    void addCommand(const std::shared_ptr<Command> & command);
 
     /// Add a building to the mud.
-    bool addBuilding(Building & building);
+    bool addBuilding(const std::shared_ptr<Building> & building);
 
     /// Add a terrain to the mud.
-    bool addTerrain(std::shared_ptr<Terrain> terrain);
+    bool addTerrain(const std::shared_ptr<Terrain> & terrain);
+
+    /// Add a body part to the mud.
+    bool addBodyPart(const std::shared_ptr<BodyPart> & bodyPart);
+
+    /// @brief Add an height map.
+    bool addHeightMap(const std::shared_ptr<HeightMap> & heightMap);
+
+    /// @brief Add a generated map.
+    bool addGeneratedMap(const std::shared_ptr<MapWrapper> & mapWrapper);
     ///@}
 
     /// @defgroup GlobalFind Global Find Functions
@@ -318,7 +323,7 @@ public:
     Item * findItem(int vnum);
 
     /// Find an item model given its vnum.
-    ItemModel * findItemModel(int vnum);
+    std::shared_ptr<ItemModel> findItemModel(int vnum);
 
     /// Find a mobile given his id.
     Mobile * findMobile(std::string id);
@@ -345,16 +350,13 @@ public:
     Faction * findFaction(std::string name);
 
     /// Find a skill given its vnum.
-    Skill * findSkill(int vnum);
+    std::shared_ptr<Skill> findSkill(const VnumType & vnum);
 
     /// Find a writing given its vnum.
     Writing * findWriting(int vnum);
 
     /// Find a corpse given its vnum.
     Item * findCorpse(int vnum);
-
-    /// Find a continent given its vnum.
-    Continent * findContinent(int vnum);
 
     /// Find a material given its vnum.
     Material * findMaterial(int vnum);
@@ -372,19 +374,25 @@ public:
     Production * findProduction(std::string name);
 
     /// Find a liquid given its vnum.
-    Liquid * findLiquid(int vnum);
+    Liquid * findLiquid(const unsigned int & vnum);
 
     /// Find the destination room of a travel point, given its starting room.
     Room * findTravelPoint(Room * room);
 
     /// Find a building given its name.
-    Building * findBuilding(std::string name);
+    std::shared_ptr<Building> findBuilding(std::string name);
 
     /// Find a building given the vnum of the model to build.
-    Building * findBuilding(int vnum);
+    std::shared_ptr<Building> findBuilding(int vnum);
 
     /// Find a terrain given its vnum.
     std::shared_ptr<Terrain> findTerrain(unsigned int vnum);
+
+    /// Find a body part.
+    std::shared_ptr<BodyPart> findBodyPart(unsigned int vnum);
+
+    /// Find a height map.
+    std::shared_ptr<HeightMap> findHeightMap(const unsigned int & vnum);
     ///@}
 
     /// @brief Main processing loop.
@@ -422,6 +430,9 @@ public:
     /// @brief Returns the current minimum vnum used for corpses.
     /// @return The minimum corpses vnum.
     int getMinVnumCorpse() const;
+
+    /// @brief Provides an unique vnum for an area.
+    int getUniqueAreaVnum() const;
 
     /// @brief Send message to all connected players.
     /// @param level   The level of the player: 0 normal, 1 admin.

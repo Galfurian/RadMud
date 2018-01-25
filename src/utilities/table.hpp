@@ -19,20 +19,11 @@
 
 #pragma once
 
-#include <cstddef>
-#include <string>
+#include "alignString.hpp"
 #include <vector>
 
 /// The structure used to provide a row.
 using TableRow = std::vector<std::string>;
-
-/// Kinds of string alignment.
-using StringAlign = enum class StringAlign_t
-{
-    Left,
-    Center,
-    Right,
-};
 
 /// @brief A class which provide access and means to manage a table column.
 class TableColumn
@@ -133,13 +124,3 @@ private:
     /// @return The total width.
     size_t getTotalWidth();
 };
-
-/// @brief Align the given string.
-/// @param source    The source string.
-/// @param alignment The kind of alignment.
-/// @param width     The total width of the string.
-/// @return The aligned string.
-std::string AlignString(
-    const std::string & source,
-    const StringAlign & alignment,
-    const size_t & width);

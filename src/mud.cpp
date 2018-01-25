@@ -34,7 +34,7 @@
 static fd_set in_set;
 /// Output file descriptor.
 static fd_set out_set;
-/// Exceptino file descriptor.
+/// Exception file descriptor.
 static fd_set exc_set;
 
 void Bailout(int signal)
@@ -67,7 +67,6 @@ Mud::Mud() :
     mudSkills(),
     mudWritings(),
     mudCorpses(),
-    mudContinents(),
     mudMaterials(),
     mudProfessions(),
     mudProductions(),
@@ -78,7 +77,8 @@ Mud::Mud() :
     mudNews(),
     mudCommands(),
     mudBuildings(),
-    mudTerrains()
+    mudTerrains(),
+    mudBodyParts()
 {
     // Nothing to do.
 }
@@ -93,7 +93,7 @@ Mud::~Mud()
     Logger::log(LogLevel::Global, "Freeing memory occupied by mobiles...");
     for (auto iterator : Mud::instance().mudMobiles)
     {
-        delete (iterator.second);
+        delete (iterator);
     }
     Logger::log(LogLevel::Global, "Freeing memory occupied by items...");
     for (auto iterator : Mud::instance().mudItems)
@@ -117,11 +117,6 @@ Mud::~Mud()
     }
     Logger::log(LogLevel::Global, "Freeing memory occupied by corpses...");
     for (auto iterator : Mud::instance().mudCorpses)
-    {
-        delete (iterator.second);
-    }
-    Logger::log(LogLevel::Global, "Freeing memory occupied by item models...");
-    for (auto iterator : Mud::instance().mudItemModels)
     {
         delete (iterator.second);
     }
@@ -152,16 +147,6 @@ Mud::~Mud()
     }
     Logger::log(LogLevel::Global, "Freeing memory occupied by materials...");
     for (auto iterator : Mud::instance().mudMaterials)
-    {
-        delete (iterator.second);
-    }
-    Logger::log(LogLevel::Global, "Freeing memory occupied by continents...");
-    for (auto iterator : Mud::instance().mudContinents)
-    {
-        delete (iterator.second);
-    }
-    Logger::log(LogLevel::Global, "Freeing memory occupied by skills...");
-    for (auto iterator : Mud::instance().mudSkills)
     {
         delete (iterator.second);
     }
@@ -226,12 +211,28 @@ bool Mud::remPlayer(Player * player)
 
 bool Mud::addMobile(Mobile * mobile)
 {
-    return mudMobiles.insert(std::make_pair(mobile->id, mobile)).second;
+    for (auto it : mudMobiles)
+    {
+        if(it->id == mobile->id)
+        {
+            return false;
+        }
+    }
+    mudMobiles.emplace_back(mobile);
+    return true;
 }
 
 bool Mud::remMobile(Mobile * mobile)
 {
-    return (FindErase(mudMobiles, mobile->id) != mudMobiles.end());
+    for (auto it = mudMobiles.begin(); it != mudMobiles.end(); ++it)
+    {
+        if ((*it)->id == mobile->id)
+        {
+            mudMobiles.erase(it);
+            return true;
+        }
+    }
+    return false;
 }
 
 bool Mud::addItem(Item * item)
@@ -269,7 +270,15 @@ bool Mud::addRoom(Room * room)
 
 bool Mud::remRoom(Room * room)
 {
-    return (FindErase(mudRooms, room->vnum) != mudRooms.end());
+    for (auto it = mudRooms.begin(); it != mudRooms.end(); ++it)
+    {
+        if (it->second->vnum == room->vnum)
+        {
+            mudRooms.erase(it);
+            return true;
+        }
+    }
+    return false;
 }
 
 bool Mud::addCorpse(Item * corpse)
@@ -295,10 +304,9 @@ bool Mud::remCorpse(Item * corpse)
     return false;
 }
 
-bool Mud::addItemModel(ItemModel * model)
+bool Mud::addItemModel(std::shared_ptr<ItemModel> model)
 {
-    return (model == nullptr) ? false : mudItemModels.insert(
-        std::make_pair(model->vnum, model)).second;
+    return mudItemModels.insert(std::make_pair(model->vnum, model)).second;
 }
 
 bool Mud::addArea(Area * area)
@@ -318,21 +326,16 @@ bool Mud::addFaction(Faction * faction)
         std::make_pair(faction->vnum, faction)).second;
 }
 
-bool Mud::addSkill(Skill * skill)
+bool Mud::addSkill(std::shared_ptr<Skill> skill)
 {
-    return (skill == nullptr) ? false : mudSkills.insert(
-        std::make_pair(skill->vnum, skill)).second;
+    if(this->findSkill(skill->vnum)) return false;
+    mudSkills.emplace_back(skill);
+    return true;
 }
 
 bool Mud::addWriting(Writing * writing)
 {
     return mudWritings.insert(std::make_pair(writing->vnum, writing)).second;
-}
-
-bool Mud::addContinent(Continent * continent)
-{
-    return mudContinents.insert(
-        std::make_pair(continent->vnum, continent)).second;
 }
 
 bool Mud::addMaterial(Material * material)
@@ -355,8 +358,7 @@ bool Mud::addProduction(Production * production)
 
 bool Mud::addLiquid(Liquid * liquid)
 {
-    return (liquid == nullptr) ? false : mudLiquids.insert(
-        std::make_pair(liquid->vnum, liquid)).second;
+    return mudLiquids.insert(std::make_pair(liquid->vnum, liquid)).second;
 }
 
 bool Mud::addTravelPoint(Room * source, Room * target)
@@ -364,287 +366,220 @@ bool Mud::addTravelPoint(Room * source, Room * target)
     return mudTravelPoints.insert(std::make_pair(source, target)).second;
 }
 
-void Mud::addCommand(std::shared_ptr<Command> command)
+void Mud::addCommand(const std::shared_ptr<Command> & command)
 {
     mudCommands.push_back(command);
 }
 
-bool Mud::addBuilding(Building & building)
+bool Mud::addBuilding(const std::shared_ptr<Building> & building)
 {
-    return mudBuildings.insert(std::make_pair(building.vnum, building)).second;
+    return mudBuildings.insert(std::make_pair(building->vnum, building)).second;
 }
 
-bool Mud::addTerrain(std::shared_ptr<Terrain> terrain)
+bool Mud::addTerrain(const std::shared_ptr<Terrain> & terrain)
 {
     return mudTerrains.insert(std::make_pair(terrain->vnum, terrain)).second;
 }
 
+bool Mud::addBodyPart(const std::shared_ptr<BodyPart> & bodyPart)
+{
+    return mudBodyParts.insert(std::make_pair(bodyPart->vnum, bodyPart)).second;
+}
+
+bool Mud::addHeightMap(const std::shared_ptr<HeightMap> & heightMap)
+{
+    return mudHeightMaps.insert(std::make_pair(heightMap->vnum,
+                                               heightMap)).second;
+}
+
+bool Mud::addGeneratedMap(const std::shared_ptr<MapWrapper> & mapWrapper)
+{
+    while (!mudGeneratedMaps.insert(std::make_pair(mapWrapper->vnum,
+                                                   mapWrapper)).second)
+    {
+        mapWrapper->vnum++;
+    }
+    return true;
+}
+
 Player * Mud::findPlayer(const std::string & name)
 {
-    for (auto iterator : mudPlayers)
+    for (auto it : mudPlayers)
     {
         // If the player is not playing, continue.
-        if (!iterator->isPlaying())
-        {
-            continue;
-        }
-        if (ToLower(iterator->getName()) == ToLower(name))
-        {
-            return iterator;
-        }
+        if (!it->isPlaying()) continue;
+        if (ToLower(it->getName()) == ToLower(name)) return it;
     }
     return nullptr;
 }
 
 Mobile * Mud::findMobile(std::string id)
 {
-    std::map<std::string, Mobile *>::iterator iterator = mudMobiles.find(id);
-    if (iterator != mudMobiles.end())
+    for (auto it : mudMobiles)
     {
-        return iterator->second;
+        if(it->id == id)
+        {
+            return it;
+        }
     }
     return nullptr;
 }
 
-ItemModel * Mud::findItemModel(int vnum)
+std::shared_ptr<ItemModel> Mud::findItemModel(int vnum)
 {
-    auto iterator = mudItemModels.find(vnum);
-    if (iterator != mudItemModels.end())
-    {
-        return iterator->second;
-    }
-    return nullptr;
+    auto it = mudItemModels.find(vnum);
+    return (it == mudItemModels.end()) ? nullptr : it->second;
 }
 
 Item * Mud::findItem(int vnum)
 {
-    std::map<int, Item *>::iterator iterator = mudItems.find(vnum);
-    if (iterator != mudItems.end())
-    {
-        return iterator->second;
-    }
-    return nullptr;
+    auto it = mudItems.find(vnum);
+    return (it == mudItems.end()) ? nullptr : it->second;
 }
 
 Area * Mud::findArea(int vnum)
 {
-    auto iterator = mudAreas.find(vnum);
-    if (iterator != mudAreas.end())
-    {
-        return iterator->second;
-    }
-    return nullptr;
+    auto it = mudAreas.find(vnum);
+    return (it == mudAreas.end()) ? nullptr : it->second;
 }
 
 Room * Mud::findRoom(int vnum)
 {
-    std::map<int, Room *>::iterator iterator = mudRooms.find(vnum);
-    if (iterator != mudRooms.end())
-    {
-        return iterator->second;
-    }
-    return nullptr;
+    auto it = mudRooms.find(vnum);
+    return (it == mudRooms.end()) ? nullptr : it->second;
 }
 
 Race * Mud::findRace(int vnum)
 {
-    std::map<int, Race *>::iterator iterator = mudRaces.find(vnum);
-    if (iterator != mudRaces.end())
-    {
-        return iterator->second;
-    }
-    return nullptr;
+    auto it = mudRaces.find(vnum);
+    return (it == mudRaces.end()) ? nullptr : it->second;
 }
 
 Race * Mud::findRace(std::string name)
 {
-    for (std::map<int, Race *>::iterator iterator = mudRaces.begin();
-         iterator != mudRaces.end();
-         ++iterator)
+    for (auto & it : mudRaces)
     {
-        if (ToLower(iterator->second->name) == ToLower(name))
-        {
-            return iterator->second;
-        }
+        if (ToLower(it.second->name) == ToLower(name)) return it.second;
     }
     return nullptr;
 }
 
 Faction * Mud::findFaction(int vnum)
 {
-    std::map<int, Faction *>::iterator iterator = mudFactions.find(vnum);
-    if (iterator != mudFactions.end())
-    {
-        return iterator->second;
-    }
-    return nullptr;
+    auto it = mudFactions.find(vnum);
+    return (it == mudFactions.end()) ? nullptr : it->second;
 }
 
 Faction * Mud::findFaction(std::string name)
 {
-    for (std::map<int, Faction *>::iterator iterator = mudFactions.begin();
-         iterator != mudFactions.end(); ++iterator)
+    for (auto & it : mudFactions)
     {
-        if (ToLower(iterator->second->name) == ToLower(name))
-        {
-            return iterator->second;
-        }
+        if (ToLower(it.second->name) == ToLower(name)) return it.second;
     }
     return nullptr;
 }
 
-Skill * Mud::findSkill(int vnum)
+std::shared_ptr<Skill> Mud::findSkill(const VnumType & vnum)
 {
-    std::map<int, Skill *>::iterator iterator = mudSkills.find(vnum);
-    if (iterator != mudSkills.end())
+    for(const auto & skill : mudSkills)
     {
-        return iterator->second;
+        if(skill->vnum == vnum) return skill;
     }
     return nullptr;
 }
 
 Writing * Mud::findWriting(int vnum)
 {
-    std::map<int, Writing *>::iterator iterator = mudWritings.find(vnum);
-    if (iterator != mudWritings.end())
-    {
-        return iterator->second;
-    }
-    return nullptr;
+    auto it = mudWritings.find(vnum);
+    return (it == mudWritings.end()) ? nullptr : it->second;
 }
 
 Item * Mud::findCorpse(int vnum)
 {
-    std::map<int, Item *>::iterator iterator = mudCorpses.find(vnum);
-    if (iterator != mudCorpses.end())
-    {
-        return iterator->second;
-    }
-    return nullptr;
-}
-
-Continent * Mud::findContinent(int vnum)
-{
-    std::map<int, Continent *>::iterator iterator = mudContinents.find(vnum);
-    if (iterator != mudContinents.end())
-    {
-        return iterator->second;
-    }
-    return nullptr;
+    auto it = mudCorpses.find(vnum);
+    return (it == mudCorpses.end()) ? nullptr : it->second;
 }
 
 Material * Mud::findMaterial(int vnum)
 {
-    std::map<int, Material *>::iterator iterator = mudMaterials.find(vnum);
-    if (iterator != mudMaterials.end())
-    {
-        return iterator->second;
-    }
-    return nullptr;
+    auto it = mudMaterials.find(vnum);
+    return (it == mudMaterials.end()) ? nullptr : it->second;
 }
 
 Profession * Mud::findProfession(unsigned int vnum)
 {
-    auto iterator = mudProfessions.find(vnum);
-    if (iterator != mudProfessions.end())
-    {
-        return iterator->second;
-    }
-    return nullptr;
+    auto it = mudProfessions.find(vnum);
+    return (it == mudProfessions.end()) ? nullptr : it->second;
 }
 
 Profession * Mud::findProfession(std::string command)
 {
-    for (auto iterator = mudProfessions.begin();
-         iterator != mudProfessions.end(); ++iterator)
+    for (auto & it : mudProfessions)
     {
-        if (ToLower(iterator->second->command) == ToLower(command))
-        {
-            return iterator->second;
-        }
+        if (ToLower(it.second->command) == ToLower(command)) return it.second;
     }
     return nullptr;
 }
 
 Production * Mud::findProduction(int vnum)
 {
-    std::map<int, Production *>::iterator iterator = mudProductions.find(vnum);
-    if (iterator != mudProductions.end())
-    {
-        return iterator->second;
-    }
-    return nullptr;
+    auto it = mudProductions.find(vnum);
+    return (it == mudProductions.end()) ? nullptr : it->second;
 }
 
 Production * Mud::findProduction(std::string name)
 {
-    for (auto iterator = mudProductions.begin();
-         iterator != mudProductions.end(); ++iterator)
+    for (auto & it : mudProductions)
     {
-        if (ToLower(iterator->second->name) == ToLower(name))
-        {
-            return iterator->second;
-        }
+        if (ToLower(it.second->name) == ToLower(name)) return it.second;
     }
     return nullptr;
 }
 
-Liquid * Mud::findLiquid(int vnum)
+Liquid * Mud::findLiquid(const unsigned int & vnum)
 {
-    std::map<int, Liquid *>::iterator iterator = mudLiquids.find(vnum);
-    if (iterator != mudLiquids.end())
-    {
-        return iterator->second;
-    }
-    return nullptr;
+    auto it = mudLiquids.find(vnum);
+    return (it == mudLiquids.end()) ? nullptr : it->second;
 }
 
 Room * Mud::findTravelPoint(Room * room)
 {
-    std::map<Room *, Room *>::iterator iterator = mudTravelPoints.find(room);
-    if (iterator != mudTravelPoints.end())
+    auto it = mudTravelPoints.find(room);
+    return (it == mudTravelPoints.end()) ? nullptr : it->second;
+}
+
+std::shared_ptr<Building> Mud::findBuilding(std::string name)
+{
+    for (auto & it : mudBuildings)
     {
-        return iterator->second;
+        if (ToLower(it.second->name) == ToLower(name)) return it.second;
     }
     return nullptr;
 }
 
-Building * Mud::findBuilding(std::string name)
+std::shared_ptr<Building> Mud::findBuilding(int vnum)
 {
-    for (std::map<int, Building>::iterator iterator = mudBuildings.begin();
-         iterator != mudBuildings.end(); ++iterator)
-    {
-        if (ToLower(iterator->second.name) == ToLower(name))
-        {
-            return &(iterator->second);
-        }
-    }
-    return nullptr;
-}
-
-Building * Mud::findBuilding(int vnum)
-{
-    for (std::map<int, Building>::iterator iterator = mudBuildings.begin();
-         iterator != mudBuildings.end(); ++iterator)
-    {
-        if (iterator->second.buildingModel->vnum == vnum)
-        {
-            return &(iterator->second);
-        }
-    }
-    return nullptr;
+    auto it = mudBuildings.find(vnum);
+    return (it == mudBuildings.end()) ? nullptr : it->second;
 }
 
 std::shared_ptr<Terrain> Mud::findTerrain(unsigned int vnum)
 {
-    for (auto it : mudTerrains)
-    {
-        if (it.second->vnum == vnum)
-        {
-            return it.second;
-        }
-    }
-    return nullptr;
+    auto it = mudTerrains.find(vnum);
+    return (it == mudTerrains.end()) ? nullptr : it->second;
+}
+
+std::shared_ptr<BodyPart> Mud::findBodyPart(unsigned int vnum)
+{
+    auto it = mudBodyParts.find(vnum);
+    return (it == mudBodyParts.end()) ? nullptr : it->second;
+}
+
+
+std::shared_ptr<HeightMap> Mud::findHeightMap(const unsigned int & vnum)
+{
+    auto it = mudHeightMaps.find(vnum);
+    return (it == mudHeightMaps.end()) ? nullptr : it->second;
 }
 
 bool Mud::runMud()
@@ -767,6 +702,16 @@ int Mud::getMinVnumCorpse() const
     return _minVnumCorpses;
 }
 
+int Mud::getUniqueAreaVnum() const
+{
+    int vnum;
+    do
+    {
+        vnum = TRand<int>(0, INT8_MAX);
+    } while (mudAreas.find(vnum) != mudAreas.end());
+    return vnum;
+}
+
 void Mud::broadcastMsg(const int & level, const std::string & message) const
 {
     for (auto iterator : mudPlayers)
@@ -826,7 +771,10 @@ void Mud::removeInactivePlayers()
         if (player->logged_in)
         {
             SQLiteDbms::instance().beginTransaction();
-            player->updateOnDB();
+            if (!player->updateOnDB())
+            {
+                SQLiteDbms::instance().rollbackTransection();
+            }
             SQLiteDbms::instance().endTransaction();
         }
         // Remove the player from the list of players.
@@ -1187,7 +1135,6 @@ bool Mud::stopMud()
     size_t bIn = MudUpdater::instance().getBandIn();
     size_t bOut = MudUpdater::instance().getBandOut();
     size_t bUnc = MudUpdater::instance().getBandUncompressed();
-
     // Print some statistics.
     Logger::log(LogLevel::Info, "");
     Logger::log(LogLevel::Info, "Statistics");
@@ -1197,8 +1144,6 @@ bool Mud::stopMud()
                 "    Output        = " + ToString(bOut) + " Bytes.");
     Logger::log(LogLevel::Info,
                 "    Uncompressed  = " + ToString(bUnc) + " Bytes.");
-    Logger::log(LogLevel::Info,
-                "    Band. Saved   = " + ToString(bUnc - bOut) + " Bytes.");
     Logger::log(LogLevel::Info, "");
     return true;
 }

@@ -45,19 +45,6 @@
     std::cerr << "Line      :"<<ToString(__LINE__)<<"\n",\
     true) : false)
 
-/// @struct CommandHelp
-/// @brief  Contains the string for showing a command help.
-struct CommandHelp
-{
-public:
-    /// The name of the command.
-    std::string command;
-    /// The arguemtns of the command.
-    std::string arguments;
-    /// The help message of the command.
-    std::string help;
-};
-
 /// @brief Checks the equality between two doubles.
 /// @param a The first value.
 /// @param b The second value.
@@ -102,22 +89,22 @@ bool HasFlag(const unsigned int & flags, Enum flag)
 /// @param flags The destination value.
 /// @param flag  The flag to set.
 template<typename Enum>
-void SetFlag(unsigned int * flags, Enum flag)
+void SetFlag(unsigned int & flags, Enum flag)
 {
     static_assert(std::is_enum<Enum>::value,
                   "template parameter is not an enum type");
-    (*flags) |= static_cast<unsigned int>(flag);
+    flags |= static_cast<unsigned int>(flag);
 }
 
 /// @brief Clear the passed flag to the value.
 /// @param flags The destination value.
 /// @param flag  The flag to clear.
 template<typename Enum>
-void ClearFlag(unsigned int * flags, Enum flag)
+void ClearFlag(unsigned int & flags, Enum flag)
 {
     static_assert(std::is_enum<Enum>::value,
                   "template parameter is not an enum type");
-    (*flags) &= ~static_cast<unsigned int>(flag);
+    flags &= ~static_cast<unsigned int>(flag);
 }
 
 /// @brief Check if the source string begin with a given prefix.
@@ -172,30 +159,6 @@ std::vector<std::string> SplitString(const std::string & source,
 /// @return A vector containing the words of the source string.
 std::vector<std::string> GetWords(const std::string & source);
 
-/// @brief Get all the integral values inside the source string.
-/// @param source The source string.
-/// @return A vector containing the retrieved integral values.
-template<typename ValueType>
-std::vector<ValueType> GetNumberVect(const std::string & source)
-{
-    static_assert((
-                      std::is_same<ValueType, bool>::value ||
-                      std::is_same<ValueType, int>::value ||
-                      std::is_same<ValueType, long int>::value ||
-                      std::is_same<ValueType, unsigned int>::value ||
-                      std::is_same<ValueType, long unsigned int>::value ||
-                      std::is_same<ValueType, double>::value),
-                  "template parameter is of the wrong type");
-    std::stringstream line(source);
-    std::vector<ValueType> output_vector;
-    ValueType buffer;
-    while (line >> buffer)
-    {
-        output_vector.push_back(buffer);
-    }
-    return output_vector;
-}
-
 /// @brief Return the current timestamp as "Hours:Minute".
 /// @return The current timestamp.
 std::string GetFormattedTime();
@@ -212,77 +175,38 @@ std::string GetDate();
 std::vector<std::string> GetAllFilesInFolder(const std::string & folder,
                                              const std::string & extension);
 
-/// @brief Transform a boolean into Yes or No.
-/// @param value The value to turn into string.
-/// @return The value turned into string.
-std::string BoolToString(const bool & value);
-
 /// @brief Transform a string into a numeric value.
 /// @param source The string to turn into a number.
 /// @return The number.
-template<typename ValueType>
-ValueType ToNumber(const std::string & source)
+template<typename T,
+    typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
+T ToNumber(const std::string & source)
 {
-    static_assert((
-                      std::is_same<ValueType, bool>::value ||
-                      std::is_same<ValueType, int>::value ||
-                      std::is_same<ValueType, int64_t>::value ||
-                      std::is_same<ValueType, unsigned int>::value ||
-                      std::is_same<ValueType, uint64_t>::value ||
-                      std::is_same<ValueType, double>::value),
-                  "template parameter is of the wrong type");
     char * pEnd;
-    return static_cast<ValueType>(strtol(source.c_str(), &pEnd, 10));
+    return static_cast<T>(strtol(source.c_str(), &pEnd, 10));
 }
 
 /// @brief Transform a numeric value into a string.
 /// @param value The value to turn into a string.
 /// @return The resulting string.
-template<typename ValueType>
-std::string ToString(const ValueType & value)
+template<typename T,
+    typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
+std::string ToString(const T & value)
 {
-    static_assert((
-                      std::is_same<ValueType, bool>::value ||
-                      std::is_same<ValueType, int>::value ||
-                      std::is_same<ValueType, int64_t>::value ||
-                      std::is_same<ValueType, unsigned int>::value ||
-                      std::is_same<ValueType, uint64_t>::value ||
-                      std::is_same<ValueType, double>::value),
-                  "template parameter is of the wrong type");
-    std::ostringstream stm;
-    stm << value;
-    return stm.str();
-}
-
-/// @brief Transform a numeric value into a string.
-/// @param value The value to turn into a string.
-/// @return The resulting string.
-template<typename ValueType>
-std::string EnumToString(const ValueType & value)
-{
-    static_assert((std::is_enum<ValueType>::value),
-                  "template parameter is not an enum type");
-    std::ostringstream stm;
-    stm << static_cast<unsigned int>(value);
-    return stm.str();
+    std::stringstream ss;
+    ss << value;
+    return ss.str();
 }
 
 /// @brief Generate a random integral value between the defined range.
 /// @param lowerBound The lower bound for the random value.
 /// @param upperBound The upper bound for the random value.
 /// @return The generated random value.
-template<typename ValueType>
-ValueType TRandInteger(const ValueType & lowerBound,
-                       const ValueType & upperBound)
+template<typename T,
+    typename = typename std::enable_if<std::is_integral<T>::value>::type>
+T TRand(const T & lowerBound, const T & upperBound)
 {
-    static_assert((std::is_same<ValueType, bool>::value ||
-                   std::is_same<ValueType, int>::value ||
-                   std::is_same<ValueType, int64_t>::value ||
-                   std::is_same<ValueType, unsigned int>::value ||
-                   std::is_same<ValueType, uint64_t>::value),
-                  "template parameter is of the wrong type");
-    std::uniform_int_distribution<ValueType> distribution(lowerBound,
-                                                          upperBound);
+    std::uniform_int_distribution<T> distribution(lowerBound, upperBound);
     std::random_device randomDevice;
     std::default_random_engine generator(randomDevice());
     return distribution(generator);
@@ -292,17 +216,27 @@ ValueType TRandInteger(const ValueType & lowerBound,
 /// @param lowerBound The lower bound for the random value.
 /// @param upperBound The upper bound for the random value.
 /// @return The generated random value.
-template<typename ValueType>
-ValueType TRandReal(const ValueType & lowerBound, const ValueType & upperBound)
+template<typename T,
+    typename = typename std::enable_if<std::is_floating_point<T>::value>::type>
+T TRandReal(const T & lowerBound, const T & upperBound)
 {
-    static_assert((std::is_same<ValueType, double>::value ||
-                   std::is_same<ValueType, float>::value),
-                  "template parameter is of the wrong type");
-    std::uniform_real_distribution<ValueType> distribution(lowerBound,
-                                                           upperBound);
+    std::uniform_real_distribution<T> distribution(lowerBound, upperBound);
     std::random_device randomDevice;
     std::default_random_engine generator(randomDevice());
     return distribution(generator);
+}
+
+/// @brief Normalizes the value from a range to another.
+/// @param v        The value that has to be normalized.
+/// @param from_lb  The lower bound of the original range.
+/// @param from_ub  The upper bound of the original range.
+/// @param to_lb    The lower bound of the destination range.
+/// @param to_ub    The upper bound of the destination range.
+/// @return The normalized value.
+template<typename T>
+T Normalize(T v, T from_lb, T from_ub, T to_lb, T to_ub)
+{
+    return (((to_ub - to_lb) * (v - from_lb)) / ((from_ub - from_lb))) + to_lb;
 }
 
 /// @brief Check if the string is a number.
@@ -310,16 +244,11 @@ ValueType TRandReal(const ValueType & lowerBound, const ValueType & upperBound)
 /// @return <b>True</b> if the string it's a number, <b>False</b> otherwise.
 bool IsNumber(const std::string & source);
 
-/// @brief  Retrieve the content of a file.
-/// @param  filename The path and name of the file to read.
-/// @return The content of the file.
-std::string GetFileContents(const char * filename);
-
-/// @brief  Return the string of the attribute.
-/// @param  id          The id of the attribute.
-/// @param  abbreviated If <b>true</b> abbreviate the name of the attribute.
-/// @return The name of the attribute.
-std::string GetAttributeName(const int & id, const bool & abbreviated = false);
+/// @brief Retrieve the content of a file.
+/// @param filename The path and name of the file to read.
+/// @param contents Where the content will be put.
+/// @return If the content has been correctly retrieved.
+bool GetFileContents(const char * filename, std::string & contents);
 
 /// @brief It creates a compressed strem of data.
 /// @param uncompressed The input non-compressed stream of data.

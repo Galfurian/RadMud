@@ -23,23 +23,24 @@
 
 #include "flee.hpp"
 
-#include "basicAttack.hpp"
-#include "moveAction.hpp"
+#include "roomUtilityFunctions.hpp"
+#include "characterUtilities.hpp"
 #include "logger.hpp"
 #include "room.hpp"
+#include <cassert>
 
 Flee::Flee(Character * _actor) :
     CombatAction(_actor)
 {
     // Debugging message.
-    //Logger::log(LogLevel::Debug, "Created Flee.");
+    Logger::log(LogLevel::Debug, "Created Flee.");
     // Reset the cooldown of the action.
-    this->resetCooldown(Flee::getCooldown(_actor));
+    this->resetCooldown(this->getCooldown());
 }
 
 Flee::~Flee()
 {
-    //Logger::log(LogLevel::Debug, "Deleted Flee.");
+    Logger::log(LogLevel::Debug, "Deleted Flee.");
 }
 
 bool Flee::check(std::string & error) const
@@ -79,11 +80,6 @@ std::string Flee::stop()
 
 ActionStatus Flee::perform()
 {
-    // Check if the cooldown is ended.
-    if (!this->checkElapsed())
-    {
-        return ActionStatus::Running;
-    }
     // Check the values of the action.
     std::string error;
     if (!this->check(error))
@@ -92,7 +88,7 @@ ActionStatus Flee::perform()
         return ActionStatus::Error;
     }
     // Get the character chance of fleeing (D20).
-    size_t fleeChance = TRandInteger<size_t>(0, 20) +
+    size_t fleeChance = TRand<size_t>(0, 20) +
                         actor->getAbilityModifier(Ability::Agility);
     // Get the required stamina.
     auto consumedStamina = this->getConsumedStamina(actor);
@@ -105,25 +101,27 @@ ActionStatus Flee::perform()
     }
     else
     {
-        // Get the list of available directions.
-        std::vector<Direction> directions;
-        for (auto it : actor->room->getAvailableDirections())
+        // Get the list of available destinations.
+        std::vector<Room *> destinations;
+        for (auto it : GetConnectedRooms(actor->room))
         {
-            if (MoveAction::canMoveTo(actor, it, error, true))
+            // Prepare the movement options.
+            MovementOptions options;
+            options.character = actor;
+            if (CheckConnection(options, actor->room, it, error))
             {
-                directions.emplace_back(it);
+                destinations.emplace_back(it);
             }
         }
         // Pick a random direction, from the poll of the available ones.
-        auto randomDirValue = TRandInteger<size_t>(0, directions.size() - 1);
-        auto randomDirection = directions.at(randomDirValue);
-        // Get the selected exit.
-        auto selected = actor->room->findExit(randomDirection);
-        // Check that the picked exit is not a null pointer.
-        if (selected == nullptr)
+        auto destination = destinations.at(
+            TRand<size_t>(
+                0, destinations.size() - 1));
+        // Check that the picked destination is not a null pointer.
+        if (destination == nullptr)
         {
-            Logger::log(LogLevel::Error, "Selected null exit while fleeing.");
-            actor->sendMsg("You were not able to escape.\n");
+            Logger::log(LogLevel::Error, "Flee selected null destination.");
+            actor->sendMsg("You were not able to escape.\n\n");
         }
         else
         {
@@ -132,8 +130,9 @@ ActionStatus Flee::perform()
             // Stop the current action.
             actor->sendMsg(this->stop() + "\n\n");
             // Move the actor to the random direction.
-            actor->moveTo(
-                selected->destination,
+            MoveCharacterTo(
+                actor,
+                destination,
                 actor->getName() + " flees from the battlefield.\n\n",
                 actor->getName() + " arives fleeing.\n\n",
                 "You flee from the battlefield.\n");
@@ -141,9 +140,25 @@ ActionStatus Flee::perform()
         }
     }
     // Reset the cooldown.
-    actor->getAction()->resetCooldown(BasicAttack::getCooldown(actor));
+    actor->getAction()->resetCooldown();
     // Return that the action is still running.
     return ActionStatus::Running;
+}
+
+unsigned int Flee::getCooldown()
+{
+    assert(actor && "Actor is nullptr");
+    // BASE     [+5.0]
+    // STRENGTH [-0.0 to -1.40]
+    // AGILITY  [-0.0 to -1.40]
+    // WEIGHT   [+1.6 to +2.51]
+    // CARRIED  [+0.0 to +2.48]
+    unsigned int cooldown = 5;
+    cooldown = SafeSum(cooldown, -actor->getAbilityLog(Ability::Strength));
+    cooldown = SafeSum(cooldown, -actor->getAbilityLog(Ability::Agility));
+    cooldown = SafeSum(cooldown, SafeLog10(actor->weight));
+    cooldown = SafeSum(cooldown, SafeLog10(actor->getCarryingWeight()));
+    return cooldown;
 }
 
 CombatActionType Flee::getCombatActionType() const
@@ -164,30 +179,4 @@ unsigned int Flee::getConsumedStamina(Character * character)
     consumedStamina = SafeSum(consumedStamina,
                               SafeLog10(character->getCarryingWeight()));
     return consumedStamina;
-}
-
-unsigned int Flee::getCooldown(Character * character)
-{
-    // BASE     [+5.0]
-    // STRENGTH [-0.0 to -1.40]
-    // AGILITY  [-0.0 to -1.40]
-    // WEIGHT   [+1.6 to +2.51]
-    // CARRIED  [+0.0 to +2.48]
-    // WEAPON   [+0.0 to +1.60]
-    unsigned int cooldown = 5;
-    cooldown -= character->getAbilityLog(Ability::Strength);
-    cooldown -= character->getAbilityLog(Ability::Agility);
-    cooldown = SafeSum(cooldown, SafeLog10(character->weight));
-    cooldown = SafeSum(cooldown, SafeLog10(character->getCarryingWeight()));
-    if (character->canAttackWith(EquipmentSlot::RightHand))
-    {
-        auto wnp = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
-        cooldown = SafeSum(cooldown, SafeLog10(wnp->getWeight(true)));
-    }
-    if (character->canAttackWith(EquipmentSlot::LeftHand))
-    {
-        auto wnp = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
-        cooldown = SafeSum(cooldown, SafeLog10(wnp->getWeight(true)));
-    }
-    return cooldown;
 }

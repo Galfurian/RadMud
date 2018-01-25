@@ -22,6 +22,7 @@
 
 #include "area.hpp"
 
+#include "roomUtilityFunctions.hpp"
 #include "logger.hpp"
 #include "room.hpp"
 
@@ -49,13 +50,12 @@ Area::~Area()
 
 bool Area::check()
 {
-    assert(vnum > 0);
-    assert(!name.empty());
-    assert(!builder.empty());
-    assert(width > 0);
-    assert(height > 0);
-    assert(elevation > 0);
-    assert(type != AreaType::NoType);
+    if (vnum <= 0) return false;
+    if (name.empty()) return false;
+    if (builder.empty()) return false;
+    if (width <= 0) return false;
+    if (height <= 0) return false;
+    if (elevation <= 0) return false;
     return true;
 }
 
@@ -74,7 +74,7 @@ bool Area::isValid(const Coordinates & coordinates)
     auto room = this->getRoom(coordinates);
     if (room == nullptr) return false;
     // Check if there is a door.
-    auto door = room->findDoor();
+    auto door = FindDoor(room);
     if (door != nullptr)
     {
         // Check if the door is closed.
@@ -99,25 +99,25 @@ Direction Area::getDirection(const Coordinates & source,
     if ((dx > dy) && (dx > dz))
     {
         if (source.x > target.x) return Direction::West;
-        else if (source.x < target.x) return Direction::East;
+        if (source.x < target.x) return Direction::East;
     }
-    else if ((dy > dx) && (dy > dz))
+    if ((dy > dx) && (dy > dz))
     {
         if (source.y > target.y) return Direction::South;
-        else if (source.y < target.y) return Direction::North;
+        if (source.y < target.y) return Direction::North;
     }
-    else if ((dz > dx) && (dz > dy))
+    if ((dz > dx) && (dz > dy))
     {
         if (source.z > target.z) return Direction::Down;
-        else if (source.z < target.z) return Direction::Up;
+        if (source.z < target.z) return Direction::Up;
     }
     return Direction::None;
 }
 
-CharacterContainer Area::getCharactersAt(const CharacterContainer & exceptions,
-                                         const Coordinates & coordinates)
+CharacterVector Area::getCharactersAt(const CharacterVector & exceptions,
+                                      const Coordinates & coordinates)
 {
-    CharacterContainer characterContainer;
+    CharacterVector characterContainer;
     if (this->isValid(coordinates))
     {
         for (auto it : this->getRoom(coordinates)->characters)
@@ -131,10 +131,10 @@ CharacterContainer Area::getCharactersAt(const CharacterContainer & exceptions,
     return characterContainer;
 }
 
-ItemContainer Area::getItemsAt(const ItemContainer & exceptions,
-                               const Coordinates & coordinates)
+ItemVector Area::getItemsAt(const ItemVector & exceptions,
+                            const Coordinates & coordinates)
 {
-    ItemContainer itemContainer;
+    ItemVector itemContainer;
     if (this->isValid(coordinates))
     {
         for (auto it : this->getRoom(coordinates)->items)
@@ -162,14 +162,14 @@ bool Area::addRoom(Room * room)
         {
             Logger::log(LogLevel::Error,
                         "Room's insertion could not be completed %s.",
-                        room->coord);
+                        room->coord.toString());
         }
     }
     else
     {
         Logger::log(LogLevel::Error,
                     "Room's coordinates are not inside the boundaries %s.",
-                    room->coord);
+                    room->coord.toString());
     }
     return false;
 }
@@ -247,9 +247,9 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, const int & radius)
             }
             if (found)
             {
-                Room * room = this->getRoom(Coordinates(x, y, origin_z));
-                std::shared_ptr<Exit> up = room->findExit(Direction::Up);
-                std::shared_ptr<Exit> down = room->findExit(Direction::Down);
+                auto room = this->getRoom(Coordinates(x, y, origin_z));
+                auto up = room->findExit(Direction::Up);
+                auto down = room->findExit(Direction::Down);
 
                 // By default set it to walkable tile.
                 tileCode = ToString(15) + ":" + ToString(this->tileSet + 0);
@@ -315,7 +315,7 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, const int & radius)
                 Room * room = this->getRoom(coordinates);
                 if (room != nullptr)
                 {
-                    Item * door = room->findDoor();
+                    Item * door = FindDoor(room);
                     if (!room->items.empty())
                     {
                         tileCode = room->items.back()->model->getTile();
@@ -391,114 +391,131 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, const int & radius)
 
 std::string Area::drawASCIIFov(Room * centerRoom, const int & radius)
 {
-    std::string result;
     if (!this->inBoundaries(centerRoom->coord))
     {
-        return result;
+        return "";
     }
+    std::string result;
+    result.reserve(static_cast<size_t >(radius * radius));
     // Evaluate the minimum and maximum value for x and y.
     int min_x = (centerRoom->coord.x - radius);
     int max_x = (centerRoom->coord.x + radius);
     int min_y = (centerRoom->coord.y - radius);
     int max_y = (centerRoom->coord.y + radius);
     // Evaluate the field of view.
-    auto validFov = this->fov(centerRoom->coord, radius);
+    auto view = this->fov(centerRoom->coord, radius);
     // Draw the fov.
     Coordinates point = centerRoom->coord;
     for (point.y = max_y; point.y >= min_y; --point.y)
     {
         for (point.x = min_x; point.x <= max_x; ++point.x)
         {
-            std::string tile = " ";
-            if (std::find(validFov.begin(), validFov.end(), point)
-                != validFov.end())
+            if (std::find(view.begin(), view.end(), point) == view.end())
             {
-                Room * room = this->getRoom(point);
-                if (room != nullptr)
+                result += ' ';
+                continue;
+            }
+            Room * room = this->getRoom(point);
+            if (room == nullptr)
+            {
+                result += ' ';
+                continue;
+            }
+            if (!room->isLit())
+            {
+                result += ' ';
+                continue;
+            }
+            std::string tile;
+            auto up = room->findExit(Direction::Up);
+            auto down = room->findExit(Direction::Down);
+            // VI  - WALKABLE
+            if (room->liquidContent.first != nullptr)
+            {
+                tile = 'w';
+            }
+            else if (HasFlag(room->flags, RoomFlags::SpawnTree))
+            {
+                tile = 't';
+            }
+            else
+            {
+                tile = room->terrain->symbol;
+            }
+            // V   - OPEN DOOR
+            auto door = FindDoor(room);
+            if (door != nullptr)
+            {
+                if (HasFlag(door->flags, ItemFlag::Closed))
                 {
-                    if (room->isLit())
+                    tile = 'D';
+                }
+                else
+                {
+                    tile = 'O';
+                }
+            }
+            // IV  - STAIRS
+            if ((up != nullptr) && (down != nullptr))
+            {
+                if (HasFlag(up->flags, ExitFlag::Stairs)
+                    && HasFlag(down->flags, ExitFlag::Stairs))
+                {
+                    tile = 'X';
+                }
+            }
+            else if (up != nullptr)
+            {
+                if (HasFlag(up->flags, ExitFlag::Stairs))
+                {
+                    tile = '>';
+                }
+            }
+            else if (down != nullptr)
+            {
+                if (HasFlag(down->flags, ExitFlag::Stairs))
+                {
+                    tile = '<';
+                }
+                else
+                {
+                    tile = ' ';
+                }
+            }
+            // III - ITEMS
+            if (room->items.size() > 0)
+            {
+                tile = room->items.back()->model->getTile();
+            }
+            // II  - CHARACTERS
+            if (room->characters.size() > 0)
+            {
+                for (auto iterator : room->characters)
+                {
+                    if (!HasFlag(iterator->flags,
+                                 CharacterFlag::Invisible))
                     {
-                        auto up = room->findExit(Direction::Up);
-                        auto down = room->findExit(Direction::Down);
-                        // VI  - WALKABLE
-                        tile = ".";
-                        // V   - OPEN DOOR
-                        Item * door = room->findDoor();
-                        if (door != nullptr)
-                        {
-                            if (HasFlag(door->flags, ItemFlag::Closed))
-                            {
-                                tile = 'D';
-                            }
-                            else
-                            {
-                                tile = 'O';
-                            }
-                        }
-                        // IV  - STAIRS
-                        if ((up != nullptr) && (down != nullptr))
-                        {
-                            if (HasFlag(up->flags, ExitFlag::Stairs)
-                                && HasFlag(down->flags, ExitFlag::Stairs))
-                            {
-                                tile = "X";
-                            }
-                        }
-                        else if (up != nullptr)
-                        {
-                            if (HasFlag(up->flags, ExitFlag::Stairs))
-                            {
-                                tile = ">";
-                            }
-                        }
-                        else if (down != nullptr)
-                        {
-                            if (HasFlag(down->flags, ExitFlag::Stairs))
-                            {
-                                tile = "<";
-                            }
-                            else
-                            {
-                                tile = " ";
-                            }
-                        }
-                        // III - ITEMS
-                        if (room->items.size() > 0)
-                        {
-                            tile = room->items.back()->model->getTile();
-                        }
-                        // II  - CHARACTERS
-                        if (room->characters.size() > 0)
-                        {
-                            for (auto iterator : room->characters)
-                            {
-                                if (!HasFlag(iterator->flags,
-                                             CharacterFlag::Invisible))
-                                {
-                                    tile = iterator->race->getTile();
-                                }
-                            }
-                        }
-                        // I   - PLAYER
-                        if (centerRoom->coord == point)
-                        {
-                            tile = "@";
-                        }
+                        tile = iterator->race->getTile();
                     }
                 }
             }
+            // I   - PLAYER
+            if (centerRoom->coord == point)
+            {
+                tile = '@';
+            }
             result += tile;
         }
-        result += "\n";
+        result += '\n';
     }
     return result;
 }
 
-CharacterContainer Area::getCharactersInSight(CharacterContainer & exceptions,
-                                              Coordinates & origin,
-                                              const int & radius)
+CharacterVector Area::getCharactersInSight(CharacterVector & exceptions,
+                                           Coordinates & origin,
+                                           const int & radius)
 {
-    CharacterContainer characterContainer;
+    CharacterVector characterContainer;
     auto validCoordinates = this->fov(origin, radius);
     for (auto coordinates : validCoordinates)
     {
@@ -508,11 +525,11 @@ CharacterContainer Area::getCharactersInSight(CharacterContainer & exceptions,
     return characterContainer;
 }
 
-ItemContainer Area::getItemsInSight(ItemContainer & exceptions,
-                                    Coordinates & origin,
-                                    const int & radius)
+ItemVector Area::getItemsInSight(ItemVector & exceptions,
+                                 Coordinates & origin,
+                                 const int & radius)
 {
-    ItemContainer foundItems;
+    ItemVector foundItems;
     auto validCoordinates = this->fov(origin, radius);
     for (auto coordinates : validCoordinates)
     {
@@ -526,57 +543,65 @@ ItemContainer Area::getItemsInSight(ItemContainer & exceptions,
 
 std::vector<Coordinates> Area::fov(Coordinates & origin, const int & radius)
 {
-    std::vector<Coordinates> fovCoordinates;
-    Coordinates target, point;
+    std::vector<Coordinates> cfov;
+    auto CheckCoordinates = [&](const Coordinates & coordinates)
+    {
+        if (std::find(cfov.begin(), cfov.end(), coordinates) == cfov.end())
+        {
+            if (origin == coordinates)
+            {
+                cfov.emplace_back(coordinates);
+            }
+            else if (this->los(origin, coordinates, radius))
+            {
+                cfov.emplace_back(coordinates);
+            }
+        }
+    };
+    Coordinates point;
     while (point.x <= radius)
     {
         while ((point.y <= point.x) && (point.square() <= pow(radius, 2)))
         {
-            target = Coordinates(origin.x + point.x,
-                                 origin.y + point.y, origin.z);
-            if ((target.x == origin.x) && (target.y == origin.y))
-            {
-                fovCoordinates.emplace_back(target);
-            }
-            else
-            {
-                if (this->los(origin, target, radius))
-                    fovCoordinates.emplace_back(target);
-                target = Coordinates(origin.x - point.x,
-                                     origin.y + point.y, origin.z);
-                if (this->los(origin, target, radius))
-                    fovCoordinates.emplace_back(target);
-                target = Coordinates(origin.x + point.x,
-                                     origin.y - point.y, origin.z);
-                if (this->los(origin, target, radius))
-                    fovCoordinates.emplace_back(target);
-                target = Coordinates(origin.x - point.x,
-                                     origin.y - point.y, origin.z);
-                if (this->los(origin, target, radius))
-                    fovCoordinates.emplace_back(target);
-                target = Coordinates(origin.x + point.y,
-                                     origin.y + point.x, origin.z);
-                if (this->los(origin, target, radius))
-                    fovCoordinates.emplace_back(target);
-                target = Coordinates(origin.x - point.y,
-                                     origin.y + point.x, origin.z);
-                if (this->los(origin, target, radius))
-                    fovCoordinates.emplace_back(target);
-                target = Coordinates(origin.x + point.y,
-                                     origin.y - point.x, origin.z);
-                if (this->los(origin, target, radius))
-                    fovCoordinates.emplace_back(target);
-                target = Coordinates(origin.x - point.y,
-                                     origin.y - point.x, origin.z);
-                if (this->los(origin, target, radius))
-                    fovCoordinates.emplace_back(target);
-            }
+            // ---------------------------------------------------------
+            CheckCoordinates(Coordinates(origin.x + point.x,
+                                         origin.y + point.y,
+                                         origin.z + point.z));
+            // ---------------------------------------------------------
+            CheckCoordinates(Coordinates(origin.x - point.x,
+                                         origin.y + point.y,
+                                         origin.z + point.z));
+            // ---------------------------------------------------------
+            CheckCoordinates(Coordinates(origin.x + point.x,
+                                         origin.y - point.y,
+                                         origin.z + point.z));
+            // ---------------------------------------------------------
+            CheckCoordinates(Coordinates(origin.x - point.x,
+                                         origin.y - point.y,
+                                         origin.z + point.z));
+            // ---------------------------------------------------------
+            CheckCoordinates(Coordinates(origin.x + point.y,
+                                         origin.y + point.x,
+                                         origin.z + point.z));
+            // ---------------------------------------------------------
+            CheckCoordinates(Coordinates(origin.x - point.y,
+                                         origin.y + point.x,
+                                         origin.z + point.z));
+            // ---------------------------------------------------------
+            CheckCoordinates(Coordinates(origin.x + point.y,
+                                         origin.y - point.x,
+                                         origin.z + point.z));
+            // ---------------------------------------------------------
+            CheckCoordinates(Coordinates(origin.x - point.y,
+                                         origin.y - point.x,
+                                         origin.z + point.z));
+            // ---------------------------------------------------------
             ++point.y;
         }
-        point.y = 0;
         ++point.x;
+        point.y = 0;
     }
-    return fovCoordinates;
+    return cfov;
 }
 
 bool Area::los(const Coordinates & source,
@@ -584,68 +609,71 @@ bool Area::los(const Coordinates & source,
                const int & radius)
 {
     // Deal with the easiest case.
-    if (source == target)
-    {
-        return true;
-    }
+    if (source == target) return true;
     // Check if there is a room at the given coordinates.
-    if (this->getRoom(target) == nullptr)
-    {
-        return false;
-    }
+    if (this->getRoom(target) == nullptr) return false;
     // Ensure that the line will not extend too long.
-    if (Area::getDistance(source, target) > radius)
-    {
-        return false;
-    }
+    if (Area::getDistance(source, target) > radius) return false;
     // Evaluates the difference.
     double dx = target.x - source.x;
     double dy = target.y - source.y;
+    double dz = target.z - source.z;
     // Evaluate the distance between the
-    double distance = std::sqrt((dx * dx) + (dy * dy));
+    double distance = std::sqrt((dx * dx) + (dy * dy) + (dz * dz));
     // Evaluate the unit increment for both X and Y.
     // Decrease the value of precision for a faster execution with
     //  a worsening in terms of accuracy (default 6).
-    double precision = 10;
+    double precision = 5;
     double unitx = dx / (distance * precision);
     double unity = dy / (distance * precision);
+    double unitz = dz / (distance * precision);
     // Evaluate the minimum value of increment.
-    double min = std::min(unitx, unity);
+    double min = 0.1;
+    auto absX = std::abs(unitx);
+    auto absY = std::abs(unity);
+    auto absZ = std::abs(unitz);
+    if (absX > 0.0) min = std::min(min, absX);
+    if (absY > 0.0) min = std::min(min, absY);
+    if (absZ > 0.0) min = std::min(min, absZ);
     // Set the initial values for X and Y.
     double x = source.x + 0.5;
     double y = source.y + 0.5;
+    double z = source.z + 0.5;
     Coordinates coordinates(source.x, source.y, source.z);
+    Coordinates previous = coordinates;
     for (double i = 0; i <= distance; i += min)
     {
         // Evaluate the integer version of the coordinates
         //  using the floor value.
-        int floor_x = static_cast<int>(std::floor(x));
-        int floor_y = static_cast<int>(std::floor(y));
-        coordinates = Coordinates(floor_x, floor_y, source.z);
-        if (coordinates == target)
-        {
-            return true;
-        }
+        coordinates = Coordinates(std::floor(x), std::floor(y), std::floor(z));
         if (!this->isValid(coordinates))
         {
             return false;
         }
-        // Increment both x and y.
+        if (coordinates.z > previous.z)
+        {
+            auto downstair = this->getRoom(previous);
+            if (!downstair->findExit(Direction::Up))
+            {
+                return false;
+            }
+        }
+        if (coordinates.z < previous.z)
+        {
+            auto upstair = this->getRoom(previous);
+            if (!upstair->findExit(Direction::Down))
+            {
+                return false;
+            }
+        }
+        if (coordinates == target)
+        {
+            return true;
+        }
+        // Increment the coordinates.
         x += unitx;
         y += unity;
+        z += unitz;
     }
     return false;
-}
-
-void Area::luaRegister(lua_State * L)
-{
-    luabridge::getGlobalNamespace(L)
-        .beginClass<Area>("Area")
-        .addData("vnum", &Area::vnum, false)
-        .addData("name", &Area::name, false)
-        .addData("builder", &Area::builder, false)
-        .addData("width", &Area::width, false)
-        .addData("height", &Area::height, false)
-        .addData("elevation", &Area::elevation, false)
-        .endClass();
 }

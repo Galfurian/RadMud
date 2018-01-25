@@ -25,14 +25,9 @@
 
 #pragma once
 
-extern "C"
-{
-#include "lua.h"
-#include "lauxlib.h"
-#include "lualib.h"
-}
+#include <string>
 
-#include "LuaBridge.hpp"
+class Direction;
 
 /// Used to create and manage a tridimensional coordinates.
 class Coordinates
@@ -52,6 +47,9 @@ public:
     /// @param _y Coordinate on heigth axis.
     /// @param _z Coordinate on altitude axis.
     Coordinates(const int & _x, const int & _y, const int & _z);
+
+    /// @brief Constructor.
+    Coordinates(const double & _x, const double & _y, const double & _z);
 
     /// @brief Define operator ==, equal.
     /// @param right The right parameter.
@@ -73,6 +71,8 @@ public:
     /// @return The new Coordinates.
     Coordinates operator+(const Coordinates & right) const;
 
+    Coordinates operator+(const Direction & right) const;
+
     /// @brief Evaluates the square.
     /// @return The square.
     int square() const;
@@ -80,15 +80,4 @@ public:
     /// @brief Provides the string version of the coordinates.
     /// @return A string representing the coordinates.
     std::string toString() const;
-
-    /// @brief Evaluates the round of the given coordinates.
-    /// @param x The coordinate on the x axis.
-    /// @param y The coordinate on the y axis.
-    /// @param z The coordinate on the z axis.
-    /// @return The interger version of the coordinates.
-    static Coordinates round(double x, double y, double z);
-
-    /// @brief Function used to register inside the lua environment the class.
-    /// @param L The lua environment.
-    static void luaRegister(lua_State * L);
 };

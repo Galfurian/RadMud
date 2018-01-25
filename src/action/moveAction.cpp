@@ -22,10 +22,13 @@
 
 #include "moveAction.hpp"
 
+#include "roomUtilityFunctions.hpp"
+#include "characterUtilities.hpp"
 #include "effectFactory.hpp"
 #include "character.hpp"
 #include "logger.hpp"
 #include "room.hpp"
+#include <cassert>
 
 MoveAction::MoveAction(Character * _actor,
                        Room * _destination,
@@ -35,14 +38,14 @@ MoveAction::MoveAction(Character * _actor,
     direction(_direction)
 {
     // Debugging message.
-    //Logger::log(LogLevel::Debug, "Created MoveAction.");
+    Logger::log(LogLevel::Debug, "Created MoveAction.");
     // Reset the cooldown of the action.
-    this->resetCooldown(MoveAction::getCooldown(_actor));
+    this->resetCooldown(this->getCooldown());
 }
 
 MoveAction::~MoveAction()
 {
-    //Logger::log(LogLevel::Debug, "Deleted move action.");
+    Logger::log(LogLevel::Debug, "Deleted MoveAction.");
 }
 
 bool MoveAction::check(std::string & error) const
@@ -91,35 +94,36 @@ std::string MoveAction::stop()
 
 ActionStatus MoveAction::perform()
 {
-    // Check if the cooldown is ended.
-    if (!this->checkElapsed())
-    {
-        return ActionStatus::Running;
-    }
     std::string error;
     if (!this->check(error))
     {
         actor->sendMsg(error + "\n\n");
         return ActionStatus::Error;
     }
-    if (!MoveAction::canMoveTo(actor, direction, error, false))
+    // Evaluate the amount of required stamina.
+    auto consumedStamina = this->getConsumedStamina(actor);
+    // Prepare the movement options.
+    MovementOptions options;
+    options.character = actor;
+    options.requiredStamina = consumedStamina;
+    // Check if the character can move to the given room.
+    if (!CheckConnection(options, actor->room, destination, error))
     {
         // Notify that the actor can't move because too tired.
         actor->sendMsg(error + "\n");
         return ActionStatus::Error;
     }
-    // Get the amount of required stamina.
-    auto consumedStamina = this->getConsumedStamina(actor, actor->posture);
     // Consume the stamina.
     actor->remStamina(consumedStamina, true);
     // Check if the actor was aiming.
     if (actor->combatHandler.getAimedTarget() != nullptr)
     {
-        actor->effects.forceAddEffect(
+        actor->effectManager.forceAddEffect(
             EffectFactory::disturbedAim(actor, 1, -3));
     }
     // Move character.
-    actor->moveTo(
+    MoveCharacterTo(
+        actor,
         destination,
         actor->getNameCapital() + " goes " + direction.toString() + ".\n",
         actor->getNameCapital() + " arrives from " +
@@ -127,15 +131,20 @@ ActionStatus MoveAction::perform()
     return ActionStatus::Finished;
 }
 
-unsigned int MoveAction::getConsumedStamina(const Character * character,
-                                            const CharacterPosture & posture)
+unsigned int MoveAction::getCooldown()
+{
+    assert(actor && "Actor is nullptr");
+    return actor->posture.getSpeed();
+}
+
+unsigned int MoveAction::getConsumedStamina(Character * character)
 {
     auto multiplier = 1.0;
-    if (posture == CharacterPosture::Crouch)
+    if (character->posture == CharacterPosture::Crouch)
     {
         multiplier = 0.75;
     }
-    else if (posture == CharacterPosture::Prone)
+    else if (character->posture == CharacterPosture::Prone)
     {
         multiplier = 0.50;
     }
@@ -151,20 +160,6 @@ unsigned int MoveAction::getConsumedStamina(const Character * character,
     return static_cast<unsigned int>(consumedStamina * multiplier);
 }
 
-unsigned int MoveAction::getCooldown(const Character * character)
-{
-    unsigned int cooldown = 2;
-    if (character->posture == CharacterPosture::Crouch)
-    {
-        cooldown = 4;
-    }
-    else if (character->posture == CharacterPosture::Prone)
-    {
-        cooldown = 6;
-    }
-    return cooldown;
-}
-
 bool MoveAction::canMoveTo(Character * character,
                            const Direction & direction,
                            std::string & error,
@@ -174,7 +169,7 @@ bool MoveAction::canMoveTo(Character * character,
     {
         return false;
     }
-    if ((character->getAction()->getType() == ActionType::Combat) &&
+    if ((character->getAction() == ActionType::Combat) &&
         !allowInCombat)
     {
         // Check if the character is locked into close combat.
@@ -207,11 +202,15 @@ bool MoveAction::canMoveTo(Character * character,
         return !lockedInCombat;
     }
     // Check if the character is in a no-walk position.
-    if ((character->posture != CharacterPosture::Stand) &&
-        (character->posture != CharacterPosture::Crouch) &&
-        (character->posture != CharacterPosture::Prone))
+    if ((character->posture >= CharacterPosture::Sit) &&
+        (character->posture <= CharacterPosture::Rest))
     {
         error = "You first need to stand up.";
+        return false;
+    }
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        error = "You first need to wake up.";
         return false;
     }
     // Find the exit to the destination.
@@ -222,7 +221,7 @@ bool MoveAction::canMoveTo(Character * character,
         return false;
     }
     // Check if the actor has enough stamina to execute the action.
-    if (MoveAction::getConsumedStamina(character, character->posture) >
+    if (MoveAction::getConsumedStamina(character) >
         character->stamina)
     {
         error = "You are too tired to move.\n";
@@ -244,7 +243,7 @@ bool MoveAction::canMoveTo(Character * character,
         return false;
     }
     // Check if the destination is bocked by a door.
-    auto door = destExit->destination->findDoor();
+    auto door = FindDoor(destExit->destination);
     if (door != nullptr)
     {
         if (HasFlag(door->flags, ItemFlag::Closed))

@@ -23,29 +23,33 @@
 #include "aimAction.hpp"
 
 #include "character.hpp"
+#include "characterUtilities.hpp"
 #include "logger.hpp"
 #include "area.hpp"
 #include "room.hpp"
+#include <cassert>
 
 AimAction::AimAction(Character * _actor, Character * _target) :
     GeneralAction(_actor),
     target(_target)
 {
     // Debugging message.
-    //Logger::log(LogLevel::Debug, "Created aim action.");
+    Logger::log(LogLevel::Debug, "Created aim action.");
     // Reset the cooldown of the action.
-    this->resetCooldown(AimAction::getAimTime(_actor, _target));
+    this->resetCooldown(this->getCooldown());
 }
 
 AimAction::~AimAction()
 {
-    //Logger::log(LogLevel::Debug, "Deleted aim action.");
+    Logger::log(LogLevel::Debug, "Deleted aim action.");
 }
 
 bool AimAction::check(std::string & error) const
 {
     if (!GeneralAction::check(error))
     {
+        Logger::log(LogLevel::Error, "Error with the general action.");
+        error = "You failed your action.";
         return false;
     }
     if (target == nullptr)
@@ -83,18 +87,13 @@ std::string AimAction::stop()
 
 ActionStatus AimAction::perform()
 {
-    // Check if the cooldown is ended.
-    if (!this->checkElapsed())
-    {
-        return ActionStatus::Running;
-    }
     std::string error;
     if (!this->check(error))
     {
         actor->sendMsg(error + "\n\n");
         return ActionStatus::Error;
     }
-    if (actor->getActiveRangedWeapons().empty())
+    if (GetActiveRangedWeapons(actor).empty())
     {
         actor->sendMsg("You don't have a ranged weapon equipped.\n\n");
         return ActionStatus::Error;
@@ -106,15 +105,17 @@ ActionStatus AimAction::perform()
     return ActionStatus::Finished;
 }
 
-unsigned int AimAction::getAimTime(Character * source, Character * target)
+unsigned int AimAction::getCooldown()
 {
+    assert(actor && "Actor is nullptr");
+    assert(target && "Projectile is nullptr");
     unsigned int requiredTime = 2;
-    if ((source != nullptr) && (target != nullptr))
+    if ((actor != nullptr) && (target != nullptr))
     {
-        if ((source->room != nullptr) && (target->room != nullptr))
+        if ((actor->room != nullptr) && (target->room != nullptr))
         {
             requiredTime = SafeSum(requiredTime,
-                                   Area::getDistance(source->room->coord,
+                                   Area::getDistance(actor->room->coord,
                                                      target->room->coord));
         }
     }

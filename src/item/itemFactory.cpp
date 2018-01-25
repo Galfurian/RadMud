@@ -28,56 +28,104 @@
 #include "corpseItem.hpp"
 #include "currencyItem.hpp"
 #include "resourceItem.hpp"
-#include "magazineItem.hpp"
-#include "meleeWeaponItem.hpp"
-#include "rangedWeaponItem.hpp"
 #include "liquidContainerItem.hpp"
 
 Item * ItemFactory::newItem(const ModelType & type)
 {
+    // [0] No type.
     if (type == ModelType::None)
     {
         return nullptr;
     }
-    if (type == ModelType::Armor)
-    {
-        return new ArmorItem();
-    }
+
+    // [1] A corpse.
     if (type == ModelType::Corpse)
     {
         return new CorpseItem();
     }
-    if (type == ModelType::Currency)
-    {
-        return new CurrencyItem();
-    }
-    if (type == ModelType::Light)
-    {
-        return new LightItem();
-    }
-    if (type == ModelType::Magazine)
-    {
-        return new MagazineItem();
-    }
+
+    // [2] Any melee weapon.
     if (type == ModelType::MeleeWeapon)
     {
         return new MeleeWeaponItem();
     }
+
+    // [3] Any ranged weapon.
     if (type == ModelType::RangedWeapon)
     {
         return new RangedWeaponItem();
     }
-    if (type == ModelType::Shop)
+
+    // [4] Any armor.
+    if (type == ModelType::Armor)
     {
-        return new ShopItem();
+        return new ArmorItem();
     }
+
+    // [5] A shield.
+
+    // [6] Projectiles.
+
+    // [7] A container for items.
+    if (type == ModelType::Container)
+    {
+        return new ContainerItem();
+    }
+
+    // [8] A container for liquids.
+    if (type == ModelType::LiquidContainer)
+    {
+        return new LiquidContainerItem();
+    }
+
+    // [9] Any tool.
+
+    // [10] Any node of resources.
+
+    // [11] A resource.
     if (type == ModelType::Resource)
     {
         return new ResourceItem();
     }
-    if (type == ModelType::LiquidContainer)
+
+    // [12] Any kind of seed.
+
+    // [13] A key.
+
+    // [14] A furniture (eg. chair, bed, painting, table and so on).
+
+    // [15] A food.
+
+    // [16] A source of light ((eg. torch, lamp, candle and so on).
+    if (type == ModelType::Light)
     {
-        return new LiquidContainerItem();
+        return new LightItem();
+    }
+
+    // [17] Any kind of vehicle.
+
+    // [18] Container of parchments.
+
+    // [19] A generic rope.
+
+    // [20] Any kind of mechanism.
+
+    // [21] Any kind of currency.
+    if (type == ModelType::Currency)
+    {
+        return new CurrencyItem();
+    }
+
+    // [22] A shop.
+    if (type == ModelType::Shop)
+    {
+        return new ShopItem();
+    }
+
+    // [23] A magazine for ammunitions.
+    if (type == ModelType::Magazine)
+    {
+        return new MagazineItem();
     }
     return new Item();
 }

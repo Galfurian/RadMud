@@ -27,7 +27,7 @@
 #include <string>
 #include <memory>
 
-#include "characterContainer.hpp"
+#include "characterVector.hpp"
 
 /// @brief Data structure used to store an ordered list of opponents
 ///         during a combat.
@@ -71,7 +71,7 @@ private:
 
 public:
     /// List of characters in sight.
-    CharacterContainer charactersInSight;
+    CharacterVector charactersInSight;
 
     /// @brief Constructor.
     CombatHandler(Character * _owner);

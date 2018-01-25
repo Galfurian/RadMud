@@ -20,15 +20,18 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "commandObjectContainer.hpp"
-
-#include "sqliteDbms.hpp"
-#include "lightModel.hpp"
-#include "lightItem.hpp"
+#include "roomUtilityFunctions.hpp"
 #include "command.hpp"
 #include "room.hpp"
 
 bool DoOrganize(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     // Check if the room is lit.
@@ -43,20 +46,20 @@ bool DoOrganize(Character * character, ArgumentHandler & args)
         character->sendMsg("Organize what?\n");
         return false;
     }
-    auto order = ItemContainer::Order::ByName;
+    auto order = ItemVector::Order::ByName;
     if (BeginWith("name", ToLower(args[0].getContent())))
     {
-        order = ItemContainer::Order::ByName;
+        order = ItemVector::Order::ByName;
     }
     else if (BeginWith("weight", ToLower(args[0].getContent())))
     {
-        order = ItemContainer::Order::ByWeight;
+        order = ItemVector::Order::ByWeight;
     }
     else if (BeginWith("price", ToLower(args[0].getContent())))
     {
-        order = ItemContainer::Order::ByPrice;
+        order = ItemVector::Order::ByPrice;
     }
-    auto name = ItemContainer::orderToString(order);
+    auto name = ItemVector::orderToString(order);
     if (args.size() == 1)
     {
         character->room->items.orderBy(order);
@@ -64,23 +67,28 @@ bool DoOrganize(Character * character, ArgumentHandler & args)
     }
     else if (args.size() == 2)
     {
-        auto container = character->findNearbyItem(args[1].getContent(),
-                                                   args[1].getIndex());
-        if (container != nullptr)
+        auto item = character->findNearbyItem(args[1].getContent(),
+                                              args[1].getIndex());
+        if (item != nullptr)
         {
-            if (container->content.empty())
+            if (item->isAContainer())
             {
-                character->sendMsg(
-                    "You can't organize " + container->getName(true) + "\n");
-            }
-            else
-            {
-                container->content.orderBy(order);
+                // Cast the item to container.
+                if (item->isEmpty())
+                {
+                    character->sendMsg("%s is empty\n",
+                                       item->getNameCapital(true));
+                    return false;
+                }
+                // Order the content of the container.
+                item->content.orderBy(order);
                 // Organize the target container.
                 character->sendMsg("You have organized %s, by %s.\n",
-                                   container->getName(true), name);
+                                   item->getName(true), name);
                 return true;
             }
+            character->sendMsg("You can't organize %s\n", item->getName(true));
+            return false;
         }
         else if (BeginWith("inventory", args[1].getContent()))
         {
@@ -90,10 +98,7 @@ bool DoOrganize(Character * character, ArgumentHandler & args)
                                name);
             return true;
         }
-        else
-        {
-            character->sendMsg("What do you want to organize?\n");
-        }
+        character->sendMsg("What do you want to organize?\n");
     }
     else
     {
@@ -104,6 +109,12 @@ bool DoOrganize(Character * character, ArgumentHandler & args)
 
 bool DoOpen(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     // Check the arguments.
@@ -117,10 +128,10 @@ bool DoOpen(Character * character, ArgumentHandler & args)
     if (direction != Direction::None)
     {
         // If the room is NOT lit and HAS some exits, pick a random direction.
-        auto directions = character->room->getAvailableDirections();
+        auto directions = GetAvailableDirections(character->room);
         if (!character->room->isLit() && !directions.empty())
         {
-            auto it = TRandInteger<size_t>(0, directions.size() - 1);
+            auto it = TRand<size_t>(0, directions.size() - 1);
             direction = directions[it];
         }
         // Check if the direction exists.
@@ -136,7 +147,7 @@ bool DoOpen(Character * character, ArgumentHandler & args)
             character->sendMsg("There is nothing in that direction.\n");
             return false;
         }
-        auto door = destination->findDoor();
+        auto door = FindDoor(destination);
         if (door == nullptr)
         {
             character->sendMsg("There is no door in that direction.\n");
@@ -153,7 +164,7 @@ bool DoOpen(Character * character, ArgumentHandler & args)
             return false;
         }
 
-        ClearFlag(&door->flags, ItemFlag::Closed);
+        ClearFlag(door->flags, ItemFlag::Closed);
 
         // Display message.
         if (HasFlag(roomExit->flags, ExitFlag::Hidden))
@@ -239,7 +250,7 @@ bool DoOpen(Character * character, ArgumentHandler & args)
             character->sendMsg("It is already opened.\n");
             return false;
         }
-        ClearFlag(&container->flags, ItemFlag::Closed);
+        ClearFlag(container->flags, ItemFlag::Closed);
         // Send the message to the character.
         character->sendMsg("You open %s.\n", container->getName(true));
         // Send the message inside the room.
@@ -253,6 +264,12 @@ bool DoOpen(Character * character, ArgumentHandler & args)
 
 bool DoClose(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     // Check the arguments.
@@ -266,10 +283,10 @@ bool DoClose(Character * character, ArgumentHandler & args)
     if (direction != Direction::None)
     {
         // If the room is NOT lit and HAS some exits, pick a random direction.
-        auto directions = character->room->getAvailableDirections();
+        auto directions = GetAvailableDirections(character->room);
         if (!character->room->isLit() && !directions.empty())
         {
-            auto it = TRandInteger<size_t>(0, directions.size() - 1);
+            auto it = TRand<size_t>(0, directions.size() - 1);
             direction = directions[it];
         }
         // Check if the direction exists.
@@ -285,7 +302,7 @@ bool DoClose(Character * character, ArgumentHandler & args)
             character->sendMsg("There is nothing in that direction.\n");
             return false;
         }
-        auto door = destination->findDoor();
+        auto door = FindDoor(destination);
         if (door == nullptr)
         {
             character->sendMsg("There is no door in that direction.\n");
@@ -308,7 +325,7 @@ bool DoClose(Character * character, ArgumentHandler & args)
                 "There are someone on the way, you can't close the door.\n");
             return false;
         }
-        SetFlag(&door->flags, ItemFlag::Closed);
+        SetFlag(door->flags, ItemFlag::Closed);
         // Display message.
         if (HasFlag(roomExit->flags, ExitFlag::Hidden))
         {
@@ -394,7 +411,7 @@ bool DoClose(Character * character, ArgumentHandler & args)
             character->sendMsg("It cannot be closed.\n");
             return false;
         }
-        SetFlag(&container->flags, ItemFlag::Closed);
+        SetFlag(container->flags, ItemFlag::Closed);
         // Send the message to the character.
         character->sendMsg("You close %s.\n", container->getName(true));
         // Send the message inside the room.
@@ -403,199 +420,5 @@ bool DoClose(Character * character, ArgumentHandler & args)
                                    character->getNameCapital(),
                                    container->getName(true));
     }
-    return true;
-}
-
-bool DoTurn(Character * character, ArgumentHandler & args)
-{
-    // Stop any action the character is executing.
-    StopAction(character);
-    // Check the number of arguments.
-    if (args.size() != 1)
-    {
-        character->sendMsg("What do you want to turn on/off?\n");
-        return false;
-    }
-    Item * item = nullptr;
-    // Check if the room is lit.
-    bool roomIsLit = character->room->isLit();
-    // Check if the inventory is lit.
-    auto inventoryIsLit = character->inventoryIsLit();
-    // If the room is lit.
-    if (roomIsLit)
-    {
-        item = character->findNearbyItem(args[0].getContent(),
-                                         args[0].getIndex());
-    }
-    else
-    {
-        // If the room is not lit but the inventory is.
-        if (inventoryIsLit)
-        {
-            item = character->findInventoryItem(args[0].getContent(),
-                                                args[0].getIndex());
-        }
-        else if (!character->inventory.empty())
-        {
-            // If the inventory is NOT empty, pick a random item.
-            auto it = TRandInteger<size_t>(0, character->inventory.size() - 1);
-            item = character->inventory[it];
-        }
-    }
-    if (item == nullptr)
-    {
-        character->sendMsg("You don't see '%s' anywhere.\n",
-                           args[0].getContent());
-        return false;
-    }
-    if (item->getType() == ModelType::Light)
-    {
-        auto lightItem = item->toLightItem();
-        if (lightItem->active)
-        {
-            if (lightItem->model->toLight()->alwaysActive)
-            {
-                character->sendMsg("You cannot turn off %s.\n",
-                                   item->getName(true));
-                return false;
-            }
-            character->sendMsg("You turn off %s.\n", item->getName(true));
-            lightItem->active = false;
-            return true;
-        }
-        else
-        {
-            if (lightItem->model->toLight()->alwaysActive)
-            {
-                character->sendMsg("You cannot turn on %s.\n",
-                                   item->getName(true));
-                return false;
-            }
-            if (lightItem->getAutonomy() > 0)
-            {
-                character->sendMsg("You turn on %s.\n", item->getName(true));
-                lightItem->active = true;
-                return true;
-            }
-            else
-            {
-                character->sendMsg("You cannot turn on %s.\n",
-                                   item->getName(true));
-            }
-        }
-    }
-    else
-    {
-        character->sendMsg("%s is not a light source.\n",
-                           item->getNameCapital(true));
-    }
-    return false;
-}
-
-bool DoRefill(Character * character, ArgumentHandler & args)
-{
-    // Stop any action the character is executing.
-    StopAction(character);
-    // Check the number of arguments.
-    if (args.size() != 2)
-    {
-        character->sendMsg("What do you want to refill with what?\n");
-        return false;
-    }
-    Item * itemToRefill = nullptr;
-    Item * fuel = nullptr;
-    // Check if the room is lit.
-    bool roomIsLit = character->room->isLit();
-    // Check if the inventory is lit.
-    auto inventoryIsLit = character->inventoryIsLit();
-    // If the room is lit.
-    if (roomIsLit)
-    {
-        itemToRefill = character->findNearbyItem(args[0].getContent(),
-                                                 args[0].getIndex());
-        fuel = character->findNearbyItem(args[1].getContent(),
-                                         args[1].getIndex());
-    }
-    else
-    {
-        // If the room is not lit but the inventory is.
-        if (inventoryIsLit)
-        {
-            itemToRefill = character->findInventoryItem(args[0].getContent(),
-                                                        args[0].getIndex());
-            fuel = character->findInventoryItem(args[1].getContent(),
-                                                args[1].getIndex());
-        }
-        else
-        {
-            character->sendMsg("You can't do that without seeing,"
-                                   "you could waste most of the fuel.\n");
-            return false;
-        }
-    }
-    if (itemToRefill == nullptr)
-    {
-        character->sendMsg("You don't have '%s'.\n", args[0].getContent());
-        return false;
-    }
-    if (fuel == nullptr)
-    {
-        character->sendMsg("You don't have '%s'.\n", args[1].getContent());
-        return false;
-    }
-    std::string error;
-    unsigned int amountToLoad = 0;
-    if (!itemToRefill->toLightItem()->getAmountToRefill(fuel,
-                                                        amountToLoad,
-                                                        error))
-    {
-        character->sendMsg(error + "\n");
-        return false;
-    }
-    // Start a transaction.
-    SQLiteDbms::instance().beginTransaction();
-    if (fuel->quantity <= amountToLoad)
-    {
-        // Remove the item from the player's inventory.
-        character->remInventoryItem(fuel);
-        // Put the item inside the container.
-        itemToRefill->putInside(fuel);
-        // Send the messages.
-        character->sendMsg("You refill %s with %s.\n",
-                           itemToRefill->getName(true),
-                           fuel->getName(true));
-        character->room->sendToAll("%s refills %s with %s.\n",
-                                   {character},
-                                   character->getNameCapital(),
-                                   itemToRefill->getName(true),
-                                   fuel->getName(true));
-    }
-    else
-    {
-        // Remove from the stack.
-        auto newStack = fuel->removeFromStack(character, amountToLoad);
-        if (newStack == nullptr)
-        {
-            character->sendMsg("You failed to refill %s with part of %s.\n",
-                               itemToRefill->getName(true),
-                               fuel->getName(true));
-            // Rollback the transaction.
-            SQLiteDbms::instance().rollbackTransection();
-            return false;
-        }
-        // Put the stack inside the container.
-        itemToRefill->putInside(newStack);
-        // Send the messages.
-        character->sendMsg("You put refill %s with part of %s.\n",
-                           itemToRefill->getName(true),
-                           fuel->getName(true));
-        character->room->sendToAll("%s refills %s with part of %s.\n",
-                                   {character},
-                                   character->getNameCapital(),
-                                   itemToRefill->getName(true),
-                                   fuel->getName(true));
-    }
-    // Conclude the transaction.
-    SQLiteDbms::instance().endTransaction();
     return true;
 }

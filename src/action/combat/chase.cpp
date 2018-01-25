@@ -22,6 +22,8 @@
 
 #include "chase.hpp"
 
+#include "roomUtilityFunctions.hpp"
+#include "characterUtilities.hpp"
 #include "effectFactory.hpp"
 #include "moveAction.hpp"
 #include "logger.hpp"
@@ -29,48 +31,29 @@
 #include "area.hpp"
 #include "room.hpp"
 #include <queue>
+#include <cassert>
 
 Chase::Chase(Character * _actor, Character * _target) :
     CombatAction(_actor),
     target(_target),
     lastRoom(_target->room),
-    valid(),
-    checkFunction(
-        [&](Room * from, Room * to)
-        {
-            // Get the direction.
-            std::string error;
-            auto direction = Area::getDirection(from->coord, to->coord);
-            return MoveAction::canMoveTo(actor, direction, error, true);
-        })
+    RoomCheckFunction()
 {
     // Debugging message.
-    //Logger::log(LogLevel::Debug, "Created Chase.");
+    Logger::log(LogLevel::Debug, "Created Chase.");
     // Reset the cooldown of the action.
-    this->resetCooldown(Chase::getCooldown(_actor));
-    // Find the path from the actor to the target.
-    AStar<Room *> aStar;
-    valid = aStar.findPath(actor->room, target->room, path, checkFunction);
-    if (!valid)
-    {
-        Logger::log(LogLevel::Debug, "There is no path to the target.");
-    }
+    this->resetCooldown(this->getCooldown());
 }
 
 Chase::~Chase()
 {
-    //Logger::log(LogLevel::Debug, "Deleted Chase.");
+    Logger::log(LogLevel::Debug, "Deleted Chase.");
 }
 
 bool Chase::check(std::string & error) const
 {
     if (!CombatAction::check(error))
     {
-        return false;
-    }
-    if (!valid)
-    {
-        error = "You are not able to chase your target.";
         return false;
     }
     if (target == nullptr)
@@ -103,11 +86,6 @@ std::string Chase::stop()
 
 ActionStatus Chase::perform()
 {
-    // Check if the cooldown is ended.
-    if (!this->checkElapsed())
-    {
-        return ActionStatus::Running;
-    }
     // Check the values of the action.
     std::string error;
     if (!this->check(error))
@@ -127,90 +105,50 @@ ActionStatus Chase::perform()
     }
     else
     {
-        // First check if the target has changed room.
-        if (target->room->vnum == lastRoom->vnum)
+        // If the path to the target is empty or the target has changed room.
+        if (path.empty() || (target->room->vnum != lastRoom->vnum))
         {
-            Logger::log(LogLevel::Debug, "The target didn't move.");
-            Room * nextRoom = path.front();
-            if (nextRoom != nullptr)
-            {
-                // Get the direction of the next room.
-                Direction direction = Area::getDirection(actor->room->coord,
-                                                         nextRoom->coord);
-                // Check if the actor was aiming.
-                if (actor->combatHandler.getAimedTarget() != nullptr)
-                {
-                    actor->effects.forceAddEffect(
-                        EffectFactory::disturbedAim(actor, 1, -3));
-                }
-                // Consume the stamina.
-                actor->remStamina(consumedStamina, true);
-                // Move character.
-                actor->moveTo(
-                    nextRoom,
-                    actor->getNameCapital() + " goes " +
-                    direction.toString() + ".\n",
-                    actor->getNameCapital() + " arrives from " +
-                    direction.getOpposite().toString() + ".\n");
-                // Pop the room.
-                path.erase(path.begin());
-            }
-            else
-            {
-                Logger::log(LogLevel::Debug, "The next room is not valid.");
-            }
-        }
-        else
-        {
-            Logger::log(LogLevel::Debug, "The target moved.");
+            Logger::log(LogLevel::Debug, "Evaluating the path...");
             // Find the path from the actor to the target.
-            AStar<Room *> aStar;
-            valid = aStar.findPath(actor->room,
-                                   target->room,
-                                   path,
-                                   checkFunction);
-            if (valid)
+            if (!this->updatePath())
             {
-                Room * nextRoom = path.front();
-                if (nextRoom != nullptr)
-                {
-                    // Get the direction of the next room.
-                    Direction direction = Area::getDirection(actor->room->coord,
-                                                             nextRoom->coord);
-                    // Check if the actor was aiming.
-                    if (actor->combatHandler.getAimedTarget() != nullptr)
-                    {
-                        actor->effects.forceAddEffect(
-                            EffectFactory::disturbedAim(actor, 1, -3));
-                    }
-                    // Consume the stamina.
-                    actor->remStamina(consumedStamina, true);
-                    // Move character.
-                    actor->moveTo(
-                        nextRoom,
-                        actor->getNameCapital() + " goes " +
-                        direction.toString() + ".\n",
-                        actor->getNameCapital() + " arrives from " +
-                        direction.getOpposite().toString() + ".\n");
-                    // Pop the room.
-                    path.erase(path.begin());
-                }
-                else
-                {
-                    Logger::log(LogLevel::Debug, "The next room is not valid.");
-                }
-            }
-            else
-            {
-                actor->sendMsg("You are not able to chase your target.\n\n");
+                actor->sendMsg("There is no path to your target.\n\n");
                 return ActionStatus::Error;
             }
         }
+        // Move towards the target.
+        if (this->moveTowardsTarget())
+        {
+            // Consume the stamina.
+            actor->remStamina(consumedStamina, true);
+        }
+        else
+        {
+            actor->sendMsg("You are not able to chase your target.\n\n");
+            return ActionStatus::Error;
+        }
     }
     // Reset the cooldown.
-    actor->getAction()->resetCooldown(Chase::getCooldown(actor));
+    actor->getAction()->resetCooldown();
     // Return that the action is still running.
     return ActionStatus::Running;
+}
+
+unsigned int Chase::getCooldown()
+{
+    assert(actor && "Actor is nullptr");
+    // BASE     [+4.0]
+    // STRENGTH [-0.0 to -1.40]
+    // AGILITY  [-0.0 to -1.40]
+    // WEIGHT   [+1.6 to +2.51]
+    // CARRIED  [+0.0 to +2.48]
+    // WEAPON   [+0.0 to +1.60]
+    unsigned int cooldown = 4;
+    cooldown = SafeSum(cooldown, -actor->getAbilityLog(Ability::Strength));
+    cooldown = SafeSum(cooldown, -actor->getAbilityLog(Ability::Agility));
+    cooldown = SafeSum(cooldown, SafeLog10(actor->weight));
+    cooldown = SafeSum(cooldown, SafeLog10(actor->getCarryingWeight()));
+    return cooldown;
 }
 
 CombatActionType Chase::getCombatActionType() const
@@ -241,18 +179,59 @@ unsigned int Chase::getConsumedStamina(Character * character)
     return static_cast<unsigned int>(consumedStamina * multiplier);
 }
 
-unsigned int Chase::getCooldown(Character * character)
+bool Chase::updatePath()
 {
-    // BASE     [+4.0]
-    // STRENGTH [-0.0 to -1.40]
-    // AGILITY  [-0.0 to -1.40]
-    // WEIGHT   [+1.6 to +2.51]
-    // CARRIED  [+0.0 to +2.48]
-    // WEAPON   [+0.0 to +1.60]
-    unsigned int cooldown = 4;
-    cooldown = SafeSum(cooldown, -character->getAbilityLog(Ability::Strength));
-    cooldown = SafeSum(cooldown, -character->getAbilityLog(Ability::Agility));
-    cooldown = SafeSum(cooldown, SafeLog10(character->weight));
-    cooldown = SafeSum(cooldown, SafeLog10(character->getCarryingWeight()));
-    return cooldown;
+    // Set the check function.
+    if (RoomCheckFunction == nullptr)
+    {
+        RoomCheckFunction = [&](Room * from, Room * to)
+        {
+            // Prepare the movement options.
+            MovementOptions options;
+            options.character = actor;
+            // Prepare the error string.
+            std::string error;
+            return CheckConnection(options, from, to, error);
+        };
+    }
+    // Find the path from the actor to the target.
+    AStar<Room *> aStar(RoomCheckFunction,
+                        RoomGetDistance,
+                        RoomAreEqual,
+                        RoomGetNeighbours);
+    return aStar.findPath(actor->room, target->room, path);
+}
+
+bool Chase::moveTowardsTarget()
+{
+    if (path.empty())
+    {
+        Logger::log(LogLevel::Debug, "Path is empty.");
+        return false;
+    }
+    Room * nextRoom = path.front();
+    if (nextRoom == nullptr)
+    {
+        Logger::log(LogLevel::Debug, "Next room is a nullptr.");
+        return false;
+    }
+    // Get the direction of the next room.
+    auto direction = Area::getDirection(actor->room->coord, nextRoom->coord);
+    // Move character.
+    if (!MoveCharacterTo(
+        actor,
+        nextRoom,
+        actor->getNameCapital() + " goes " +
+        direction.toString() + ".\n",
+        actor->getNameCapital() + " arrives from " +
+        direction.getOpposite().toString() + ".\n"))
+    {
+        Logger::log(LogLevel::Debug, "Cannot move to the next room.");
+        return false;
+    }
+    // Apply the disturbed aim effect.
+    actor->effectManager.forceAddEffect(EffectFactory::disturbedAim(actor, 1, -3));
+    // Pop the room.
+    path.erase(path.begin());
+    return true;
 }

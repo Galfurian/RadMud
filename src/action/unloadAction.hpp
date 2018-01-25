@@ -31,11 +31,11 @@ class UnloadAction :
 {
 private:
     /// The item which has to be unloaded.
-    Item * itemToBeUnloaded;
+    Item * item;
 
 public:
     /// @brief Constructor.
-    UnloadAction(Character * _actor, Item * _itemToBeUnloaded);
+    UnloadAction(Character * _actor, Item * _item);
 
     /// @brief Destructor.
     virtual ~UnloadAction();
@@ -50,6 +50,5 @@ public:
 
     ActionStatus perform() override;
 
-    /// @brief Provides the required time for the item to be unloaded.
-    static unsigned int getUnloadTime(Item * _itemToBeUnloaded);
+    unsigned int getCooldown() override;
 };

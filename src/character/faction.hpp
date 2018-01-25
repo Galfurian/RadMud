@@ -26,8 +26,8 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <memory>
 
-#include "lua_script.hpp"
 #include "table.hpp"
 
 class CurrencyModel;
@@ -43,7 +43,7 @@ public:
     /// The description of the faction.
     std::string description;
     /// The currency used by this faction.
-    CurrencyModel * currency;
+    std::shared_ptr<CurrencyModel> currency;
 
     /// @brief Contructor.
     Faction();
@@ -79,8 +79,4 @@ public:
     /// @brief Return the name of the faction with the first letter capitalized.
     /// @return The name of the faction.
     std::string getNameCapital();
-
-    /// @brief Function used to register inside the lua environment the class.
-    /// @param L The lua environment.
-    static void luaRegister(lua_State * L);
 };

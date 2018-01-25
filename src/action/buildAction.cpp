@@ -22,15 +22,17 @@
 
 #include "buildAction.hpp"
 
+#include "resourceModel.hpp"
 #include "formatter.hpp"
 #include "updater.hpp"
 #include "logger.hpp"
 #include "room.hpp"
+#include <cassert>
 
 BuildAction::BuildAction(Character * _actor,
-                         Building * _schematics,
+                         const std::shared_ptr<Building> & _schematics,
                          Item * _building,
-                         std::vector<Item *> & _tools,
+                         ItemVector & _tools,
                          std::vector<std::pair<Item *, unsigned int>> & _ingredients) :
     GeneralAction(_actor),
     schematics(_schematics),
@@ -39,14 +41,14 @@ BuildAction::BuildAction(Character * _actor,
     ingredients(_ingredients)
 {
     // Debugging message.
-    //Logger::log(LogLevel::Debug, "Created BuildAction.");
+    Logger::log(LogLevel::Debug, "Created BuildAction.");
     // Reset the cooldown of the action.
-    this->resetCooldown(BuildAction::getCooldown(_actor, _schematics));
+    this->resetCooldown(this->getCooldown());
 }
 
 BuildAction::~BuildAction()
 {
-    //Logger::log(LogLevel::Debug, "Deleted building action.");
+    Logger::log(LogLevel::Debug, "Deleted building action.");
 }
 
 bool BuildAction::check(std::string & error) const
@@ -101,7 +103,7 @@ bool BuildAction::check(std::string & error) const
         error = "You are too tired right now.";
         return false;
     }
-    // Add the ingredients to the list of items to destroy.
+    // Check if the actor has enough ingredients.
     for (auto it : schematics->ingredients)
     {
         auto required = it.second;
@@ -110,7 +112,7 @@ bool BuildAction::check(std::string & error) const
             auto item = it2.first;
             if (item->getType() == ModelType::Resource)
             {
-                ResourceModel * resourceModel = item->model->toResource();
+                auto resourceModel = item->model->toResource();
                 if (resourceModel->resourceType == it.first)
                 {
                     required -= item->quantity;
@@ -147,11 +149,6 @@ std::string BuildAction::stop()
 
 ActionStatus BuildAction::perform()
 {
-    // Check if the cooldown is ended.
-    if (!this->checkElapsed())
-    {
-        return ActionStatus::Running;
-    }
     // Check the values of the action.
     std::string error;
     if (!this->check(error))
@@ -194,6 +191,21 @@ ActionStatus BuildAction::perform()
     return ActionStatus::Finished;
 }
 
+unsigned int BuildAction::getCooldown()
+{
+    assert(actor && "Actor is nullptr");
+    assert(schematics && "Schematics is nullptr");
+    double requiredTime = schematics->time;
+    Logger::log(LogLevel::Debug, "Base time  :%s", requiredTime);
+    for (auto knowledge : schematics->requiredKnowledge)
+    {
+        requiredTime -= (requiredTime *
+                         actor->effectManager.getKnowledge(knowledge)) / 100;
+    }
+    Logger::log(LogLevel::Debug, "With skill :%s", requiredTime);
+    return static_cast<unsigned int>(requiredTime);
+}
+
 unsigned int BuildAction::getConsumedStamina(Character * character)
 {
     // BASE     [+1.0]
@@ -206,9 +218,4 @@ unsigned int BuildAction::getConsumedStamina(Character * character)
     consumedStamina = SafeSum(consumedStamina,
                               SafeLog10(character->getCarryingWeight()));
     return consumedStamina;
-}
-
-unsigned int BuildAction::getCooldown(Character *, Building * _schematics)
-{
-    return _schematics->time;
 }

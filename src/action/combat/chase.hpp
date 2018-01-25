@@ -37,10 +37,8 @@ private:
     Room * lastRoom;
     /// The path which leads to the target.
     std::vector<Room *> path;
-    /// Validity flag.
-    bool valid;
     /// Checking function.
-    std::function<bool(Room *, Room *)> checkFunction;
+    std::function<bool(Room *, Room *)> RoomCheckFunction;
 
 public:
     /// @brief Constructor.
@@ -61,6 +59,8 @@ public:
 
     ActionStatus perform() override;
 
+    unsigned int getCooldown() override;
+
     CombatActionType getCombatActionType() const override;
 
     /// @brief Returns the stamina required to execute the action.
@@ -68,8 +68,13 @@ public:
     /// @return The required stamina.
     static unsigned int getConsumedStamina(Character * character);
 
-    /// @brief Provides the cooldown required to execute this action.
-    /// @param character The character which has to execute the action.
-    /// @return Th required time.
-    static unsigned int getCooldown(Character * character);
+private:
+
+    /// @brief Updates the path between the actor and the target.
+    /// @return If there is a valid path.
+    bool updatePath();
+
+    /// @brief Advance on the next tile towards the target.
+    /// @return If the move has been performed.
+    bool moveTowardsTarget();
 };

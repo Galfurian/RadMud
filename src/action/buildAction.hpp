@@ -30,11 +30,11 @@ class BuildAction :
 {
 private:
     /// The schematics associated with the action.
-    Building * schematics;
+    std::shared_ptr<Building> schematics;
     /// The item, target of the action.
     Item * building;
     /// The tool used by the actor for the action.
-    std::vector<Item *> tools;
+    ItemVector tools;
     /// The ingredients used by the actor for the action.
     std::vector<std::pair<Item *, unsigned int>> ingredients;
 
@@ -47,9 +47,9 @@ public:
     /// @param _ingredients The list of used ingredients.
     BuildAction(
         Character * _actor,
-        Building * _schematics,
+        const std::shared_ptr<Building> & _schematics,
         Item * _building,
-        std::vector<Item *> & _tools,
+        ItemVector & _tools,
         std::vector<std::pair<Item *, unsigned int>> & _ingredients);
 
     /// @brief Destructor.
@@ -65,15 +65,10 @@ public:
 
     ActionStatus perform() override;
 
+    unsigned int getCooldown() override;
+
     /// @brief Returns the stamina required to execute the action.
     /// @param character The actor.
     /// @return The required stamina.
     static unsigned int getConsumedStamina(Character * character);
-
-    /// @brief Given an action, it returns the necessary cooldown.
-    /// @param character   The actor.
-    /// @param _schematics The schematics used to performe the action.
-    /// @return The non-decreasing value of the cooldown.
-    static unsigned int getCooldown(Character * character,
-                                    Building * _schematics);
 };

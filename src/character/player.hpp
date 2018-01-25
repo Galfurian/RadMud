@@ -65,8 +65,6 @@ public:
     std::string prompt;
     /// The place where the player has slept last time.
     int rent_room;
-    /// The player's list of skills.
-    std::map<int, unsigned int> skills;
     /// Points that could be spent during character creation.
     int remaining_points;
     /// Connection state.
@@ -114,6 +112,8 @@ public:
     bool remInventoryItem(Item * item) override;
 
     bool remEquipmentItem(Item * item) override;
+
+    void initialize() override;
 
     /// @brief Return player socket.
     /// @return Player sockec.
@@ -167,17 +167,6 @@ public:
     /// @brief Output to player (any type).
     /// @param msg String to sent.
     void sendMsg(const std::string & msg) override;
-
-    /// @brief Adds a variable to the list of LUA-Visible variables.
-    /// @param variableName  The name of the variable.
-    /// @param variableValue The value of the variable.
-    void setLuaVariable(std::string variableName, std::string variableValue);
-
-    /// @brief Provides the value of the given LUA-Visible variable.
-    std::string getLuaVariable(std::string variableName);
-
-    /// @brief Removes the variable from the list of LUA-Visible variables.
-    bool removeLuaVariable(std::string variableName);
 
 protected:
     void updateTicImpl() override;

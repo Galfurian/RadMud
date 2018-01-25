@@ -20,8 +20,10 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "argumentHandler.hpp"
-
 #include "logger.hpp"
+#include "utils.hpp"
+
+#include <climits>
 
 Argument::Argument(const std::string & _original) :
     original(_original),

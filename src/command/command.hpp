@@ -73,9 +73,6 @@ public:
     bool canUse(Character * character) const;
 };
 
-/// @brief Check if the executer of this command is a player.
-void NoMobile(Character * character);
-
 /// @brief Stop any action the character is executing.
 void StopAction(Character * character);
 

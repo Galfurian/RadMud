@@ -21,7 +21,6 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "faction.hpp"
-
 #include "currencyModel.hpp"
 #include "logger.hpp"
 
@@ -44,10 +43,10 @@ Faction::~Faction()
 
 bool Faction::check()
 {
-    assert(vnum > 0);
-    assert(!name.empty());
-    assert(!description.empty());
-    assert(currency != nullptr);
+    if (vnum <= 0) return false;
+    if (name.empty()) return false;
+    if (description.empty()) return false;
+    if (currency == nullptr) return false;
     return true;
 }
 
@@ -74,13 +73,4 @@ std::string Faction::getName()
 std::string Faction::getNameCapital()
 {
     return name;
-}
-
-void Faction::luaRegister(lua_State * L)
-{
-    luabridge::getGlobalNamespace(L)
-        .beginClass<Faction>("Faction")
-        .addData("vnum", &Faction::vnum)
-        .addData("name", &Faction::name)
-        .endClass();
 }

@@ -24,8 +24,6 @@
 
 bool DoItemCreate(Character * character, ArgumentHandler & args)
 {
-    // Prevent mobiles to execute this command.
-    NoMobile(character);
     // Stop any ongoing action.
     StopAction(character);
     // Check the number of arguments.
@@ -57,13 +55,12 @@ bool DoItemCreate(Character * character, ArgumentHandler & args)
     auto quality = ItemQuality(ItemQuality::Normal);
     if (args.size() == 3)
     {
-        auto itemQualityValue = ToNumber<unsigned int>(args[2].getContent());
-        if (!ItemQuality::isValid(itemQualityValue))
+        quality = ItemQuality(ToNumber<unsigned int>(args[2].getContent()));
+        if (quality == ItemQuality::None)
         {
             character->sendMsg("Not a valid quality.\n");
             return false;
         }
-        quality = ItemQuality(itemQualityValue);
     }
     // Create the item.
     auto item = itemModel->createItem(character->getName(), material, false,
@@ -343,11 +340,11 @@ bool DoModelList(Character * character, ArgumentHandler & args)
     table.addColumn("VNUM", StringAlign::Right);
     table.addColumn("NAME", StringAlign::Left);
     table.addColumn("TYPE", StringAlign::Left);
-    table.addColumn("SLOT", StringAlign::Left);
+    table.addColumn("BODY PARTS", StringAlign::Left);
     table.addColumn("FLAGS", StringAlign::Right);
     for (auto iterator : Mud::instance().mudItemModels)
     {
-        ItemModel * itemModel = iterator.second;
+        auto itemModel = iterator.second;
         if (!modelName.empty())
         {
             if (itemModel->name.find(modelName) == std::string::npos)
@@ -372,7 +369,12 @@ bool DoModelList(Character * character, ArgumentHandler & args)
         row.push_back(ToString(itemModel->vnum));
         row.push_back(itemModel->name);
         row.push_back(itemModel->getTypeName());
-        row.push_back(itemModel->slot.toString());
+        std::string bodyParts;
+        for (auto bodyPart : itemModel->bodyParts)
+        {
+            bodyParts += bodyPart->name + " ";
+        }
+        row.push_back(bodyParts);
         row.push_back(ToString(itemModel->modelFlags));
         // Add the row to the table.
         table.addRow(row);

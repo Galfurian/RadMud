@@ -20,6 +20,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "commandGodCharacter.hpp"
+#include "characterUtilities.hpp"
 #include "mud.hpp"
 
 bool DoGodInfo(Character * character, ArgumentHandler & args)
@@ -38,13 +39,13 @@ bool DoGodInfo(Character * character, ArgumentHandler & args)
             std::string msgFound;
             for (auto it : Mud::instance().mudMobiles)
             {
-                if (BeginWith(it.first, args[0].getContent()))
+                if (BeginWith(it->id, args[0].getContent()))
                 {
                     if (msgFound.empty())
                     {
                         msgFound += "Maybe you mean:\n";
                     }
-                    msgFound += "    " + it.first + "\n";
+                    msgFound += "    " + it->id + "\n";
                 }
             }
             character->sendMsg("Mobile not found.\n" + msgFound);
@@ -102,7 +103,8 @@ bool DoTransfer(Character * character, ArgumentHandler & args)
     StopAction(target);
     // Prepare messages.
     // Move player.
-    target->moveTo(
+    MoveCharacterTo(
+        target,
         destination,
         target->getNameCapital() + " is yanked away by unseen forces!",
         target->getNameCapital() + " appears breathlessly!",
@@ -207,7 +209,7 @@ bool DoInvisible(Character * character, ArgumentHandler & /*args*/)
         return false;
     }
     // Set the character invisible.
-    SetFlag(&character->flags, CharacterFlag::Invisible);
+    SetFlag(character->flags, CharacterFlag::Invisible);
     character->sendMsg("You are invisible now.\n");
     return true;
 }
@@ -221,7 +223,7 @@ bool DoVisible(Character * character, ArgumentHandler & /*args*/)
         return false;
     }
     // Set the character visible.
-    ClearFlag(&character->flags, CharacterFlag::Invisible);
+    ClearFlag(character->flags, CharacterFlag::Invisible);
     character->sendMsg("You are no more invisible.\n");
     return true;
 }
@@ -283,7 +285,7 @@ bool DoPlayerSetFlag(Character * character, ArgumentHandler & args)
         return false;
     }
     // Set the flag.
-    SetFlag(&target->flags, flag);
+    SetFlag(target->flags, flag);
     // Send confirmation to the player.
     character->sendMsg("You set the flag '%s' for %s\n",
                        GetCharacterFlagName(flag), target->getName());
@@ -317,7 +319,7 @@ bool DoPlayerClearFlag(Character * character, ArgumentHandler & args)
         return false;
     }
     // Set the flag.
-    ClearFlag(&target->flags, flag);
+    ClearFlag(target->flags, flag);
     // Send confirmation to the player.
     character->sendMsg("You clear the flag '%s' for %s\n",
                        GetCharacterFlagName(flag), target->getName());
@@ -338,38 +340,49 @@ bool DoPlayerModSkill(Character * character, ArgumentHandler & args)
         character->sendMsg("Target not found.\n");
         return false;
     }
-    auto skill = Mud::instance().findSkill(ToNumber<int>(args[1].getContent()));
+    auto skill = Mud::instance().findSkill(
+        ToNumber<VnumType>(args[1].getContent()));
     if (skill == nullptr)
     {
         character->sendMsg("Cannot find the desired skill.\n");
         return false;
     }
     int modifier = ToNumber<int>(args[2].getContent());
-    if ((modifier == 0) || (modifier < -100) || (modifier > 100))
+    if (modifier == 0)
     {
         character->sendMsg("You must insert a valid modifier.\n");
         return false;
     }
-    auto modified = static_cast<int>(target->skills[skill->vnum]) + modifier;
+    auto skillData = target->skillManager.findSkill(skill->vnum);
+    if (skillData == nullptr)
+    {
+        character->sendMsg("%s does not possess that skill.\n",
+                           target->getNameCapital());
+        return false;
+    }
+    auto modified = static_cast<int>(skillData->skillLevel) + modifier;
     if (modified <= 0)
     {
-        character->sendMsg("You cannot reduce the skill level <= 0.\n");
+        character->sendMsg("You cannot reduce the skill <= 0 (%s).\n",
+                           modified);
         return false;
     }
-    if (modified >= 100)
+    auto skillCap = SkillRank::getSkillCap();
+    if (modified >= static_cast<int>(skillCap))
     {
-        character->sendMsg("You cannot increase the skill to 100 or above.\n");
-        return false;
+        modified = static_cast<int>(skillCap);
     }
     // Change the skill value.
-    target->skills[skill->vnum] = static_cast<unsigned int>(modified);
+    skillData->skillLevel = static_cast<unsigned int>(modified);
     // Notify.
     character->sendMsg("You have successfully %s by %s the \"%s\" skill,"
                            "the new level is %s.\n",
                        ((modifier > 0) ? "increased " : "decreased"),
-                       ToString(modifier),
+                       modifier,
                        skill->name,
-                       ToString(target->skills[skill->vnum]));
+                       skillData->skillLevel);
+    character->skillManager.updateSkillEffect(skillData);
+    character->skillManager.checkIfUnlockedSkills();
     return true;
 }
 

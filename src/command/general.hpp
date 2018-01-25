@@ -32,12 +32,6 @@ void LoadGeneralCommands();
 ///         can execute.
 /// @{
 
-/// Execute character movement.
-bool DoDirection(Character * character, Direction direction);
-
-/// Allow the character to mote the continental map.
-bool DoTravel(Character * character, ArgumentHandler & args);
-
 /// Disconnect the player from the Mud.
 bool DoQuit(Character * character, ArgumentHandler & args);
 
@@ -47,11 +41,8 @@ bool DoWho(Character * character, ArgumentHandler & args);
 /// Allow to modify the character informations.
 bool DoSet(Character * character, ArgumentHandler & args);
 
-/// Stop the current action of the character.
-bool DoStop(Character * character, ArgumentHandler & args);
-
-/// The character look at: the current room, the near rooms, an object,
-///  a player, a character, and so on.
+/// @brief The character look at: the current room, the near rooms, an
+/// object, a player, a character, and so on.
 bool DoLook(Character * character, ArgumentHandler & args);
 
 /// Provide a complete help on the mud.
@@ -63,23 +54,11 @@ bool DoPrompt(Character * character, ArgumentHandler & args);
 /// Report the current day phase.
 bool DoTime(Character * character, ArgumentHandler & args);
 
-/// Make the player stand up.
-bool DoStand(Character * character, ArgumentHandler & args);
-
-/// Make the player crouch.
-bool DoCrouch(Character * character, ArgumentHandler & args);
-
-/// Make the player sit.
-bool DoSit(Character * character, ArgumentHandler & args);
-
-/// Make the player prone.
-bool DoProne(Character * character, ArgumentHandler & args);
-
-/// Make the player lie down and rest.
-bool DoRest(Character * character, ArgumentHandler & args);
-
 /// Show player statistics.
 bool DoStatistics(Character * character, ArgumentHandler & args);
+
+/// Show player effects.
+bool DoEffects(Character * character, ArgumentHandler & args);
 
 /// Allow player to rent and disconnect.
 bool DoRent(Character * character, ArgumentHandler & args);
@@ -87,7 +66,13 @@ bool DoRent(Character * character, ArgumentHandler & args);
 /// Show player skills.
 bool DoSkills(Character * character, ArgumentHandler & args);
 
+/// Show player list of actions.
+bool DoActions(Character * character, ArgumentHandler & args);
+
 /// Show server informations and statistics.
 bool DoServer(Character * character, ArgumentHandler & args);
+
+/// Generates a random name.
+bool DoGenerateName(Character * character, ArgumentHandler & args);
 
 ///@}

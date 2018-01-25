@@ -23,6 +23,9 @@
 
 #include "commandGod.hpp"
 
+/// @addtogroup ComInterfaces
+/// @{
+
 /// Get the path to the given room.
 bool DoFindPath(Character * character, ArgumentHandler & args);
 
@@ -47,5 +50,4 @@ bool DoAreaInfo(Character * character, ArgumentHandler & args);
 /// List all the areas.
 bool DoAreaList(Character * character, ArgumentHandler & args);
 
-/// List all the continents.
-bool DoContinentList(Character * character, ArgumentHandler & args);
+/// @}

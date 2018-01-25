@@ -33,16 +33,12 @@ class Profession
 public:
     /// The virtual number of the profession.
     unsigned int vnum;
-    /// The name of the profession.
-    std::string name;
-    /// A simple descroption of the profession.
-    std::string description;
     /// The command used in this profession.
     std::string command;
-    /// The posture which the character must have to perform this profession.
-    CharacterPosture posture;
     /// The verb describing the action performed in this profession.
     std::string action;
+    /// A simple description of the profession.
+    std::string description;
     /// The message shown at the beginning of the process of production.
     std::string startMessage;
     /// The message shown at the end of the process of production.
@@ -78,12 +74,4 @@ public:
     /// @return <b>True</b> if the profession has correct values,<br>
     ///         <b>False</b> otherwise.
     bool check();
-
-    /// @brief Return the name of the profession.
-    /// @return The name of the profession.
-    std::string getName();
-
-    /// @brief Returns the name with the first letter capitalized.
-    /// @return The name of the profession.
-    std::string getNameCapital();
 };

@@ -24,22 +24,25 @@
 
 #include <string>
 #include <vector>
-#include <cassert>
 
-extern "C"
+struct lua_State;
+
+class Item;
+
+class Character;
+
+class Room;
+
+class Direction;
+
+namespace luabridge
 {
-#include "lua.h"
-#include "lauxlib.h"
-#include "lualib.h"
+class LuaRef;
 }
 
 /// @brief Allow from lua code, to log a string.
 /// @param message The message to log.
 void LuaLog(std::string message);
-
-/// @brief Allow from lua to call the sleep function.
-/// @param sleepTime The amount of seconds.
-void LuaSleep(int sleepTime);
 
 /// @brief Allow from lua coden to generate a random integer.
 /// @param min Lower bound.
@@ -51,6 +54,34 @@ int LuaRandom(int min, int max);
 /// Environment.
 void LuaStopScript();
 
-/// @brief Register in Lua all the functions.
-/// @param L The lua state.
-void LuaRegisterUtils(lua_State * L);
+/// @brief Allow from lua to load an item.
+/// @param character    The character creating the item.
+/// @param vnumModel    The vnum of the model.
+/// @param vnumMaterial The vnum of the material.
+/// @param qualityValue The initial quality of the item.
+/// @return The newly created item.
+Item * LuaLoadItem(Character * character,
+                   int vnumModel,
+                   int vnumMaterial,
+                   unsigned int qualityValue);
+
+/// @brief Provides the path from the character to the destination.
+/// @param character    The character which has to move.
+/// @param destination  The destination to reach.
+/// @return The path (as list of directions) to the destination.
+std::vector<Direction> LuaFindPath(
+    Character * character,
+    Room * destination);
+
+/// @brief Returns the list of rooms in sight.
+std::vector<Room *> LuaGetRoomsInSight(Character * character);
+
+/// @brief Returns the list of characters in sight.
+std::vector<Character *> LuaGetCharactersInSight(Character * character);
+
+/// @brief Returns the list of items in sight.
+std::vector<Item *> LuaGetItemsInSight(Character * character);
+
+/// @brief Register every mud element inside the Lua environment.
+void LoadLuaEnvironmet(lua_State * L, const std::string & scriptFile);
+

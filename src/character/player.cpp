@@ -22,6 +22,7 @@
 
 #include "player.hpp"
 
+#include "sqliteWriteFunctions.hpp"
 #include "logger.hpp"
 #include "mud.hpp"
 
@@ -38,7 +39,6 @@ Player::Player(const int & _socket,
     experience(),
     prompt(),
     rent_room(),
-    skills(),
     remaining_points(),
     connectionState(ConnectionState::LoggingIn),
     password_attempts(),
@@ -92,17 +92,6 @@ bool Player::check() const
     safe &= CorrectAssert(age > 0);
     safe &= CorrectAssert(experience >= 0);
     safe &= CorrectAssert(rent_room >= 0);
-    //safe &= CorrectAssert(!skills.empty());
-    //safe &= CorrectAssert(skills.size() == Mud::instance().mudSkills.size());
-    for (auto iterator : Mud::instance().mudSkills)
-    {
-        if (skills.find(iterator.first) == skills.end())
-        {
-            Logger::log(LogLevel::Error, "The skill %s has been set.",
-                        iterator.second->name);
-            safe &= false;
-        }
-    }
     safe &= CorrectAssert(password_attempts >= 0);
     safe &= CorrectAssert(!closing);
     safe &= CorrectAssert(!logged_in);
@@ -125,20 +114,6 @@ void Player::getSheet(Table & sheet) const
     sheet.addRow({"Experience", ToString(this->experience)});
     sheet.addRow({"Prompt", this->prompt});
     sheet.addRow({"Rent Room", ToString(this->rent_room)});
-    sheet.addDivider();
-    sheet.addRow({"## Skill", "## Points"});
-    for (auto it : Mud::instance().mudSkills)
-    {
-        if (this->skills.find(it.first) != this->skills.end())
-        {
-            sheet.addRow({it.second->name,
-                          ToString(this->skills.at(it.first))});
-        }
-        else
-        {
-            sheet.addRow({it.second->name, "0"});
-        }
-    }
 }
 
 std::string Player::getName() const
@@ -152,11 +127,7 @@ void Player::addInventoryItem(Item *& item)
     // Update on database.
     if (item->getType() != ModelType::Corpse)
     {
-        SQLiteDbms::instance().insertInto(
-            "ItemPlayer",
-            {name, ToString(item->vnum), EnumToString(EquipmentSlot::None)},
-            false,
-            true);
+        SaveItemPlayer(this, item, 0);
     }
 }
 
@@ -166,15 +137,10 @@ void Player::addEquipmentItem(Item *& item)
     // Update on database.
     if (item->getType() != ModelType::Corpse)
     {
-        SQLiteDbms::instance().insertInto(
-            "ItemPlayer",
-            {
-                name,
-                ToString(item->vnum),
-                ToString(item->getCurrentSlot().toUInt())
-            },
-            false,
-            true);
+        for (auto bodyPart : item->occupiedBodyParts)
+        {
+            SaveItemPlayer(this, item, bodyPart->vnum);
+        }
     }
 }
 
@@ -214,6 +180,11 @@ bool Player::remEquipmentItem(Item * item)
     return false;
 }
 
+void Player::initialize()
+{
+    Character::initialize();
+}
+
 int Player::getSocket() const
 {
     return psocket;
@@ -249,70 +220,20 @@ bool Player::hasPendingOutput() const
 
 bool Player::updateOnDB()
 {
-    std::vector<std::string> args;
-    // Prepare the arguments of the query.
-    args.push_back(name);
-    args.push_back(password);
-    args.push_back(ToString(race->vnum));
-    args.push_back(ToString(this->getAbility(Ability::Strength, false)));
-    args.push_back(ToString(this->getAbility(Ability::Agility, false)));
-    args.push_back(ToString(this->getAbility(Ability::Perception, false)));
-    args.push_back(ToString(this->getAbility(Ability::Constitution, false)));
-    args.push_back(ToString(this->getAbility(Ability::Intelligence, false)));
-    args.push_back(ToString(static_cast<int>(gender)));
-    args.push_back(ToString(age));
-    args.push_back(description);
-    args.push_back(ToString(weight));
-    args.push_back(ToString(faction->vnum));
-    args.push_back(ToString(level));
-    args.push_back(ToString(experience));
-    args.push_back(ToString(room->vnum));
-    args.push_back(prompt);
-    args.push_back(ToString(flags));
-    args.push_back(ToString(health));
-    args.push_back(ToString(stamina));
-    args.push_back(ToString(hunger));
-    args.push_back(ToString(thirst));
-    args.push_back(ToString(rent_room));
-    if (!SQLiteDbms::instance().insertInto("Player", args, false, true))
+    if (!SavePlayer(this))
     {
-        Logger::log(LogLevel::Error,
-                    "Error during player creation on DB.");
+        Logger::log(LogLevel::Error, "Creating player on DB.");
         return false;
     }
-    // Prepare the arguments of the query for skill table.
-    for (auto iterator : skills)
+    if (!SavePlayerSkills(this))
     {
-        args.clear();
-        args.push_back(name);
-        args.push_back(ToString(iterator.first));
-        args.push_back(ToString(iterator.second));
-        if (!SQLiteDbms::instance().insertInto("Advancement",
-                                               args,
-                                               false,
-                                               true))
-        {
-            Logger::log(LogLevel::Error,
-                        "Error during player Skill creation on DB.");
-            return false;
-        }
+        Logger::log(LogLevel::Error, "Saving player skills on DB.");
+        return false;
     }
-    // Prepare the arguments of the query for lua variables table.
-    for (auto iterator : luaVariables)
+    if (!SavePlayerLuaVariables(this))
     {
-        args.clear();
-        args.push_back(name);
-        args.push_back(iterator.first);
-        args.push_back(iterator.second);
-        if (!SQLiteDbms::instance().insertInto("PlayerVariable",
-                                               args,
-                                               false,
-                                               true))
-        {
-            Logger::log(LogLevel::Error,
-                        "Error during player Lua Variables creation on DB.");
-            return false;
-        }
+        Logger::log(LogLevel::Error, "Saving player lua variables on DB.");
+        return false;
     }
     return true;
 }
@@ -375,12 +296,14 @@ void Player::kill()
 
 void Player::enterGame()
 {
+    // -------------------------------------------------------------------------
+    // Phase 1: Clear the screen and show the welcome message.
     this->sendMsg(Formatter::clearScreen());
     // Greet them.
-    Character::sendMsg("%sWelcome, " + name + "!%s\n",
-                       Formatter::bold(),
+    Character::sendMsg("%sWelcome, %s!%s\n", Formatter::bold(), name,
                        Formatter::reset());
-    // Load the news.
+    // -------------------------------------------------------------------------
+    // Phase 2: Show the news.
     this->sendMsg("#---------------- Global News ----------------#\n");
     for (auto it = Mud::instance().mudNews.rbegin();
          it != Mud::instance().mudNews.rend(); ++it)
@@ -389,6 +312,8 @@ void Player::enterGame()
         this->sendMsg(it->second + "\n");
     }
     this->sendMsg("#---------------------------------------------#\n\n");
+    // -------------------------------------------------------------------------
+    // Phase 3: Place the player.
     this->sendMsg("You walked through the mist and came into the world...\n\n");
     // Notice all the players in the same room.
     if (room != nullptr)
@@ -399,14 +324,16 @@ void Player::enterGame()
     }
     else
     {
-        closeConnection();
+        this->closeConnection();
     }
-
     // Set the player as logged in.
     logged_in = true;
-
-    // New player looks around.
-    doCommand("look");
+    // -------------------------------------------------------------------------
+    // Phase 4: Initialize the player.
+    this->initialize();
+    // -------------------------------------------------------------------------
+    // Phase 5: Look around.
+    this->doCommand("look");
 }
 
 /// Size of buffers used for communications.
@@ -536,27 +463,6 @@ void Player::processException()
 void Player::sendMsg(const std::string & msg)
 {
     outbuf += msg;
-}
-
-void Player::setLuaVariable(std::string variableName, std::string variableValue)
-{
-    luaVariables[variableName] = variableValue;
-}
-
-std::string Player::getLuaVariable(std::string variableName)
-{
-    return luaVariables[variableName];
-}
-
-bool Player::removeLuaVariable(std::string variableName)
-{
-    auto it = luaVariables.find(variableName);
-    if (it == luaVariables.end())
-    {
-        return false;
-    }
-    it->second = "";
-    return true;
 }
 
 void Player::updateTicImpl()

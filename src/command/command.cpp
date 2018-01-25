@@ -23,7 +23,6 @@
 // Basic Include.
 #include "command.hpp"
 #include "mud.hpp"
-
 #include "combat.hpp"
 #include "communication.hpp"
 #include "crafting.hpp"
@@ -32,6 +31,7 @@
 #include "commandObject.hpp"
 #include "logger.hpp"
 #include "commandGod.hpp"
+#include "movement.hpp"
 
 Command::Command() :
     handler(),
@@ -69,20 +69,11 @@ bool Command::canUse(Character * character) const
     return (gods && HasFlag(character->flags, CharacterFlag::IsGod)) || (!gods);
 }
 
-void NoMobile(Character * character)
-{
-    if (character->isMobile())
-    {
-        throw std::runtime_error(
-            "Npcs are not allowed to execute this command.\n");
-    }
-}
-
 void StopAction(Character * character)
 {
-    if ((character->getAction()->getType() != ActionType::Wait))
+    if ((character->getAction() != ActionType::Wait))
     {
-        if (character->getAction()->getType() != ActionType::Combat)
+        if (character->getAction() != ActionType::Combat)
         {
             character->doCommand("stop");
         }
@@ -96,6 +87,7 @@ void LoadCommands()
     //  execution of the Mud, but...
     // If a player just types 'l' or 'lo' in order to 'look'
     //  the first command which get hit is the 'load' command.
+    LoadMovementCommands();
     LoadGeneralCommands();
     LoadObjectCommands();
     LoadCommunicationCommands();

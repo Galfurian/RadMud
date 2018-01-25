@@ -21,7 +21,6 @@
 
 #include "shopItem.hpp"
 
-#include "currencyItem.hpp"
 #include "shopModel.hpp"
 #include "logger.hpp"
 #include "mud.hpp"
@@ -31,7 +30,9 @@ ShopItem::ShopItem() :
     shopBuyTax(1),
     shopSellTax(1),
     balance(),
-    shopKeeper()
+    shopKeeper(),
+    openingHour(6),
+    closingHour(18)
 {
     // Nothing to do.
 }
@@ -39,11 +40,6 @@ ShopItem::ShopItem() :
 ShopItem::~ShopItem()
 {
     // Nothing to do.
-}
-
-bool ShopItem::check(bool complete)
-{
-    return Item::check(complete);
 }
 
 bool ShopItem::updateOnDB()
@@ -65,6 +61,8 @@ bool ShopItem::updateOnDB()
         {
             arguments.push_back("");
         }
+        arguments.push_back(ToString(this->openingHour));
+        arguments.push_back(ToString(this->closingHour));
         return SQLiteDbms::instance().insertInto("Shop", arguments, false,
                                                  true);
     }
@@ -75,11 +73,8 @@ bool ShopItem::removeOnDB()
 {
     if (Item::removeOnDB())
     {
-        if (SQLiteDbms::instance().deleteFrom("Shop",
-                                              {
-                                                  std::make_pair("vnum",
-                                                                 ToString(vnum))
-                                              }))
+        if (SQLiteDbms::instance().deleteFrom(
+            "Shop", {std::make_pair("vnum", ToString(vnum))}))
         {
             return true;
         }
@@ -107,6 +102,8 @@ void ShopItem::getSheet(Table & sheet) const
     {
         sheet.addRow({"ShopKeeper", "Nobody"});
     }
+    sheet.addRow({"Opening Hour", ToString(openingHour)});
+    sheet.addRow({"Closing Hour", ToString(closingHour)});
 }
 
 bool ShopItem::canDeconstruct(std::string & error) const
@@ -123,6 +120,108 @@ bool ShopItem::canDeconstruct(std::string & error) const
     return true;
 }
 
+std::string ShopItem::lookContent()
+{
+    auto Italic = [](const std::string & s)
+    {
+        return Formatter::italic() + s + Formatter::reset();
+    };
+    auto Yellow = [](const std::string & s)
+    {
+        return Formatter::yellow() + s + Formatter::reset();
+    };
+    // If the shop is not built, show the item normal content.
+    if (!HasFlag(this->flags, ItemFlag::Built))
+    {
+        return Item::lookContent();
+    }
+    std::string output, error;
+    if (HasFlag(this->flags, ItemFlag::Closed))
+    {
+        output += Italic("It is closed.\n");
+    }
+    if (!this->canUse(error))
+    {
+        // Show the error.
+        output += Italic(error) + "\n\n";
+        // Show the content.
+        output += "Looking inside you see:\n";
+        Table table = Table();
+        table.addColumn("Item", StringAlign::Left);
+        table.addColumn("Quantity", StringAlign::Right);
+        table.addColumn("Weight", StringAlign::Right);
+        // List all the contained items.
+        for (auto it : content)
+        {
+            table.addRow(
+                {
+                    it->getNameCapital(),
+                    ToString(it->quantity),
+                    ToString(it->getWeight(true))
+                });
+        }
+        output += table.getTable();
+    }
+    else
+    {
+        // Show who is managing the shop.
+        output += this->shopKeeper->getNameCapital();
+        output += " is currently managing the shop.\n";
+        if (content.empty())
+        {
+            output += Italic("There is nothing on sale.\n");
+        }
+        else
+        {
+            Table saleTable(shopName);
+            saleTable.addColumn("Good", StringAlign::Left);
+            saleTable.addColumn("Quantity", StringAlign::Center);
+            saleTable.addColumn("Weight (Single)", StringAlign::Right);
+            saleTable.addColumn("Weight (stack)", StringAlign::Right);
+            saleTable.addColumn("Buy", StringAlign::Right);
+            saleTable.addColumn("Sell (Single)", StringAlign::Right);
+            saleTable.addColumn("Sell (stack)", StringAlign::Right);
+            for (auto iterator : content)
+            {
+                // Prepare the row.
+                TableRow row;
+                row.push_back(iterator->getNameCapital());
+                row.push_back(ToString(iterator->quantity));
+                row.push_back(ToString(iterator->getWeight(false)));
+                if (iterator->quantity > 1)
+                {
+                    row.push_back(ToString(iterator->getWeight(true)));
+                }
+                else
+                {
+                    row.push_back("");
+                }
+                row.push_back(ToString(this->evaluateBuyPrice(iterator)));
+                row.push_back(ToString(this->evaluateSellPrice(iterator)));
+                if (iterator->quantity > 1)
+                {
+                    row.push_back(ToString(
+                        this->evaluateSellPrice(iterator) *
+                        iterator->quantity));
+                }
+                else
+                {
+                    row.push_back("");
+                }
+                // Add the row to the table.
+                saleTable.addRow(row);
+            }
+            output += saleTable.getTable();
+        }
+    }
+    // Show the free/used space.
+    output += "Has been used " + Yellow(ToString(this->getUsedSpace()));
+    output += " out of " + Yellow(ToString(this->getTotalSpace()));
+    output += " " + Mud::instance().getWeightMeasure() + ".\n";
+    output += "\n";
+    return output;
+}
+
 bool ShopItem::isAContainer() const
 {
     // The shop can be considered a container only if built.
@@ -135,74 +234,6 @@ double ShopItem::getTotalSpace() const
     double spaceBase = model->toShop()->maxWeight;
     // Evaluate the result.
     return ((spaceBase + (spaceBase * quality.getModifier())) / 2);
-}
-
-std::string ShopItem::lookContent()
-{
-    std::string output, error;
-    if (!this->canUse(error))
-    {
-        output += Formatter::italic() + error + "\n\n" + Formatter::reset();
-        output += Item::lookContent();
-        return output;
-    }
-    output += this->shopKeeper->getNameCapital() +
-              " is currently managing the shop.\n";
-    if (content.empty())
-    {
-        return Formatter::italic() + "There is nothing on sale.\n" +
-               Formatter::reset();
-    }
-    else
-    {
-        Table saleTable(shopName);
-        saleTable.addColumn("Good", StringAlign::Left);
-        saleTable.addColumn("Quantity", StringAlign::Center);
-        saleTable.addColumn("Weight (Single)", StringAlign::Right);
-        saleTable.addColumn("Weight (stack)", StringAlign::Right);
-        saleTable.addColumn("Buy", StringAlign::Right);
-        saleTable.addColumn("Sell (Single)", StringAlign::Right);
-        saleTable.addColumn("Sell (stack)", StringAlign::Right);
-        for (auto iterator : content)
-        {
-            // Prepare the row.
-            TableRow row;
-            row.push_back(iterator->getNameCapital());
-            row.push_back(ToString(iterator->quantity));
-            row.push_back(ToString(iterator->getWeight(false)));
-            if (iterator->quantity > 1)
-            {
-                row.push_back(ToString(iterator->getWeight(true)));
-            }
-            else
-            {
-                row.push_back("");
-            }
-            row.push_back(ToString(this->evaluateBuyPrice(iterator)));
-            row.push_back(ToString(this->evaluateSellPrice(iterator)));
-            if (iterator->quantity > 1)
-            {
-                row.push_back(ToString(
-                    this->evaluateSellPrice(iterator) * iterator->quantity));
-            }
-            else
-            {
-                row.push_back("");
-            }
-            // Add the row to the table.
-            saleTable.addRow(row);
-        }
-        output += saleTable.getTable();
-        output += "Has been used ";
-        output += Formatter::yellow() + ToString(this->getUsedSpace()) +
-                  Formatter::reset();
-        output += " out of ";
-        output += Formatter::yellow() + ToString(this->getTotalSpace()) +
-                  Formatter::reset();
-        output += " " + Mud::instance().getWeightMeasure() + ".\n";
-    }
-    output += "\n";
-    return output;
 }
 
 void ShopItem::setNewShopKeeper(Mobile * _shopKeeper)
@@ -242,6 +273,15 @@ bool ShopItem::canUse(std::string & error)
     if (this->room->vnum != this->shopKeeper->room->vnum)
     {
         error = "The shopkeeper's is elsewhere.";
+        return false;
+    }
+    auto hour = MudUpdater::instance().getMudHour();
+    if (((openingHour < closingHour) && ((hour < openingHour) ||
+                                         (hour > closingHour))) ||
+        ((closingHour < openingHour) && ((hour < closingHour) ||
+                                         (hour > openingHour))))
+    {
+        error = "The shopkeeper's probably taking a nap.";
         return false;
     }
     return true;

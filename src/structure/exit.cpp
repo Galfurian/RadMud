@@ -22,6 +22,7 @@
 
 #include "exit.hpp"
 #include "room.hpp"
+#include "logger.hpp"
 
 Exit::Exit() :
     source(),
@@ -46,20 +47,15 @@ Exit::Exit(Room * _source,
 
 Exit::~Exit()
 {
-    //Logger::log(LogLevel::Debug, "Deleted: Exit.");
+//    Logger::log(LogLevel::Debug, "Deleted: Exit.");
 }
 
 bool Exit::check() const
 {
-    assert(source != nullptr);
-    assert(destination != nullptr);
-    assert(direction != Direction::None);
+    if (source == nullptr) return false;
+    if (destination == nullptr) return false;
+    if (direction == Direction::None) return false;
     return true;
-}
-
-Direction Exit::getOppositeDirection() const
-{
-    return direction.getOpposite();
 }
 
 std::shared_ptr<Exit> Exit::getOppositeExit() const
@@ -92,16 +88,6 @@ bool Exit::unlink() const
 bool Exit::operator==(const Exit & right) const
 {
     return (this->direction == right.direction);
-}
-
-void Exit::luaRegister(lua_State * L)
-{
-    luabridge::getGlobalNamespace(L)
-        .beginClass<Exit>("Exit")
-        .addData("source", &Exit::source)
-        .addData("destination", &Exit::destination)
-        .addData("direction", &Exit::direction)
-        .endClass();
 }
 
 std::string GetExitFlagString(unsigned int flags)

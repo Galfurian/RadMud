@@ -23,6 +23,9 @@
 
 #include "commandGod.hpp"
 
+/// @addtogroup ComInterfaces
+/// @{
+
 /// Transfer a character from room to room.
 bool DoTransfer(Character * character, ArgumentHandler & args);
 
@@ -59,3 +62,4 @@ bool DoPlayerModSkill(Character * character, ArgumentHandler & args);
 /// Modify the value of the player attribute.
 bool DoPlayerModAttr(Character * character, ArgumentHandler & args);
 
+/// @}

@@ -22,30 +22,34 @@
 
 #include "craftAction.hpp"
 
+#include "resourceModel.hpp"
 #include "updater.hpp"
 #include "logger.hpp"
 #include "room.hpp"
+#include <cassert>
 
 CraftAction::CraftAction(Character * _actor,
                          Production * _production,
-                         Material * _material,
-                         std::vector<Item *> & _tools,
+                         ItemVector & _tools,
                          std::vector<std::pair<Item *, unsigned int>> & _ingredients) :
     GeneralAction(_actor),
     production(_production),
-    material(_material),
     tools(_tools),
-    ingredients(_ingredients)
+    ingredients(_ingredients),
+    material()
 {
     // Debugging message.
-    //Logger::log(LogLevel::Debug, "Created CraftAction.");
+    Logger::log(LogLevel::Debug, "Created CraftAction.");
+    // Determine the material of the creation based on the ammount of each
+    // single involved item.
+    this->determineMaterial();
     // Reset the cooldown of the action.
-    this->resetCooldown(CraftAction::getCooldown(_actor, _production));
+    this->resetCooldown(this->getCooldown());
 }
 
 CraftAction::~CraftAction()
 {
-    //Logger::log(LogLevel::Debug, "Deleted crafting action.");
+    Logger::log(LogLevel::Debug, "Deleted crafting action.");
 }
 
 bool CraftAction::check(std::string & error) const
@@ -122,7 +126,7 @@ bool CraftAction::check(std::string & error) const
             auto item = it2.first;
             if (item->getType() == ModelType::Resource)
             {
-                ResourceModel * resourceModel = item->model->toResource();
+                auto resourceModel = item->model->toResource();
                 if (resourceModel->resourceType == it.first)
                 {
                     required -= item->quantity;
@@ -159,11 +163,6 @@ std::string CraftAction::stop()
 
 ActionStatus CraftAction::perform()
 {
-    // Check if the cooldown is ended.
-    if (!this->checkElapsed())
-    {
-        return ActionStatus::Running;
-    }
     // Check the values of the action.
     std::string error;
     if (!this->check(error))
@@ -175,7 +174,7 @@ ActionStatus CraftAction::perform()
     auto consumedStamina = this->getConsumedStamina(actor);
     actor->remStamina(consumedStamina, true);
     // Vector which will contain the list of created items and items to destroy.
-    std::vector<Item *> createdItems;
+    ItemVector createdItems;
     // Add the ingredients to the list of items to destroy.
     for (auto it : ingredients)
     {
@@ -266,6 +265,87 @@ ActionStatus CraftAction::perform()
     return ActionStatus::Finished;
 }
 
+unsigned int CraftAction::getCooldown()
+{
+    assert(actor && "Actor is nullptr");
+    assert(production && "Production is nullptr");
+    double requiredTime = production->time;
+    Logger::log(LogLevel::Debug, "Base time  :%s", requiredTime);
+    for (auto knowledge : production->requiredKnowledge)
+    {
+        requiredTime -=
+            (requiredTime * actor->effectManager.getKnowledge(knowledge)) / 100;
+    }
+    Logger::log(LogLevel::Debug, "With skill :%s", requiredTime);
+    return static_cast<unsigned int>(requiredTime);
+}
+
+void CraftAction::determineMaterial()
+{
+    /// TODO: Simplify...
+    // The material of the outcome is determined by summing the weights of
+    // the items with the same material. Then, the material with the highest
+    // weight is chosen.
+    struct MaterialEntry
+    {
+        /// The material.
+        Material * material;
+        /// The accumulated weight for the material.
+        double weight;
+
+        /// @brief Constructor.
+        MaterialEntry() :
+            material(),
+            weight()
+        {
+            // Nothing to do.
+        }
+
+        /// @brief Constructor.
+        MaterialEntry(Material * _material, double _weight) :
+            material(_material),
+            weight(_weight)
+        {
+            // Nothing to do.
+        }
+    };
+    std::vector<MaterialEntry> materials;
+    for (auto ingr : ingredients)
+    {
+        // Check if the ingredient has a material.
+        if (ingr.first->composition == nullptr)
+        {
+            continue;
+        }
+        // Create a new material entry.
+        MaterialEntry entry(ingr.first->composition,
+                            ingr.first->getWeight(false) * ingr.second);
+        bool found = false;
+        for (auto it : materials)
+        {
+            if (it.material->vnum == entry.material->vnum)
+            {
+                found = true;
+                it.weight += entry.weight;
+                break;
+            }
+        }
+        if (!found)
+        {
+            materials.emplace_back(entry);
+        }
+    }
+    double weight = 0;
+    for (auto it : materials)
+    {
+        if (it.weight > weight)
+        {
+            material = it.material;
+            weight = it.weight;
+        }
+    }
+}
+
 unsigned int CraftAction::getConsumedStamina(Character * character)
 {
     // BASE     [+1.0]
@@ -278,9 +358,4 @@ unsigned int CraftAction::getConsumedStamina(Character * character)
     consumedStamina = SafeSum(consumedStamina,
                               SafeLog10(character->getCarryingWeight()));
     return consumedStamina;
-}
-
-unsigned int CraftAction::getCooldown(Character *, Production * _production)
-{
-    return _production->time;
 }

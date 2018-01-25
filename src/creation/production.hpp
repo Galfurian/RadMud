@@ -26,12 +26,16 @@ class Profession;
 
 class Character;
 
-#include <string>
-#include <map>
+class ItemModel;
 
-#include "itemModel.hpp"
-#include "toolModel.hpp"
-#include "resourceModel.hpp"
+#include "resourceType.hpp"
+#include "knowledge.hpp"
+#include "toolType.hpp"
+
+#include <string>
+#include <vector>
+#include <memory>
+#include <map>
 
 /// @brief Holds details about a production.
 class Production
@@ -46,21 +50,21 @@ public:
     /// The difficulty of the production.
     unsigned int difficulty;
     /// The time required to perform the production.
-    unsigned int time;
+    double time;
     /// A flag which indicates if the maker can be assisted by someone.
     bool assisted;
     /// A pointer to the outcome model.
-    ItemModel * outcome;
+    std::shared_ptr<ItemModel> outcome;
     /// The quantity of the outcome.
     unsigned int quantity;
     /// The list of needed type of tools.
-    std::set<ToolType> tools;
+    std::vector<ToolType> tools;
     /// The list of needed type of ingredients and their quantity.
     std::map<ResourceType, unsigned int> ingredients;
     /// The type of the workbench.
     ToolType workbench;
-    /// The ingredient from which the material of the production is choosen.
-    ResourceType material;
+    /// The required knowledge levels for the given production.
+    std::vector<Knowledge> requiredKnowledge;
 
     /// @brief Constructor.
     Production();
@@ -80,24 +84,6 @@ public:
     /// @brief Destructor.
     ~Production();
 
-    /// @brief Given a predefined formatted string, it sets the outcome.
-    /// @param source The source string.
-    /// @return <b>True</b> if the operation concluded successfully,<br>
-    ///         <b>False</b> otherwise.
-    bool setOutcome(const std::string & source);
-
-    /// @brief Given a predefined formatted string, it sets the tools.
-    /// @param source The source string.
-    /// @return <b>True</b> if the operation concluded successfully,<br>
-    ///         <b>False</b> otherwise.
-    bool setTool(const std::string & source);
-
-    /// @brief Given a predefined formatted string, it sets the ingredients.
-    /// @param source The source string.
-    /// @return <b>True</b> if the operation concluded successfully,<br>
-    ///         <b>False</b> otherwise.
-    bool setIngredient(const std::string & source);
-
     /// @brief Check the correctness of the production.
     /// @return <b>True</b> if the profession has correct values,<br>
     ///         <b>False</b> otherwise.
@@ -110,5 +96,4 @@ public:
     /// @brief Return the name with the first letter capitalized.
     /// @return The name of the production capitalized.
     std::string getNameCapital();
-
 };

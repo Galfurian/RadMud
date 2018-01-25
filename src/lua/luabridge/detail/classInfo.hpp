@@ -24,6 +24,9 @@
 
 #pragma once
 
+namespace luabridge
+{
+
 /// @brief Unique Lua registry keys for a class.
 /// @details
 /// Each registered class inserts three keys into the registry, whose
@@ -37,20 +40,32 @@ public:
     /// @details
     /// The static table holds the static data members, static properties,
     ///  and static member functions for a class.
-    static void const * getStaticKey();
+    static void const * getStaticKey()
+    {
+        static char value;
+        return &value;
+    }
 
     /// @brief Get the key for the class table.
     /// @details
     /// The class table holds the data members, properties, and member functions
     ///  of a class. Read-only data and properties, and const member functions are
     ///  also placed here (to save a lookup in the const table).
-    static void const * getClassKey();
+    static void const * getClassKey()
+    {
+        static char value;
+        return &value;
+    }
 
     /// @brief Get the key for the const table.
     /// @details
     /// The const table holds read-only data members and properties, and const
     ///  member functions of a class.
-    static void const * getConstKey();
+    static void const * getConstKey()
+    {
+        static char value;
+        return &value;
+    }
 };
 
-#include "classInfo.i.hpp"
+}

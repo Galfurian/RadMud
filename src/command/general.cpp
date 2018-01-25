@@ -22,7 +22,7 @@
 
 #include "general.hpp"
 
-#include "moveAction.hpp"
+#include "nameGenerator.hpp"
 #include "logger.hpp"
 #include "mud.hpp"
 
@@ -41,10 +41,6 @@ void LoadGeneralCommands()
         "Set some character texts(eg. descr).",
         false, false, false));
     Mud::instance().addCommand(std::make_shared<Command>(
-        DoStop, "stop", "",
-        "Stop the current character action.",
-        false, true, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
         DoLook, "look", "[(something) or (someone)]",
         "Look at something or someone.",
         false, true, false));
@@ -61,28 +57,12 @@ void LoadGeneralCommands()
         "Give the current day phase.",
         false, true, false));
     Mud::instance().addCommand(std::make_shared<Command>(
-        DoStand, "stand", "",
-        "Stand up.",
-        false, true, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoCrouch, "crouch", "",
-        "The character crouches down himself, it's a good stance for hiding.",
-        false, true, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoSit, "sit", "",
-        "The player sits down, ideal for a quick break.",
-        false, false, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoProne, "prone", "",
-        "The player starts prone, a perfect position to shoot long distance.",
-        false, true, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoRest, "rest", "",
-        "The player lies down and begin to rest.",
-        false, false, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
         DoStatistics, "statistics", "",
         "Show player statistics.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoEffects, "effects", "",
+        "Show player active effects.",
         false, true, false));
     Mud::instance().addCommand(std::make_shared<Command>(
         DoRent, "rent", "",
@@ -93,85 +73,27 @@ void LoadGeneralCommands()
         "Shows the playes skills and their level.",
         false, true, false));
     Mud::instance().addCommand(std::make_shared<Command>(
+        DoActions, "actions", "",
+        "Shows the list of actions.",
+        false, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
         DoServer, "server", "",
         "Shows the server statistics.",
         false, true, false));
     Mud::instance().addCommand(std::make_shared<Command>(
-        DoTravel, "travel", "",
-        "Allow the character to travel between areas.",
+        DoGenerateName, "generate_name", "",
+        "Generates a random name.",
         false, true, false));
-}
-
-bool DoDirection(Character * character, Direction direction)
-{
-    // Stop any action the character is executing.
-    StopAction(character);
-    std::string error;
-    if (!MoveAction::canMoveTo(character, direction, error, false))
-    {
-        character->sendMsg(error + "\n");
-        return false;
-    }
-    // Get the destination.
-    auto destination = character->room->findExit(direction)->destination;
-    auto moveAction = std::make_shared<MoveAction>(character, destination,
-                                                   direction);
-    // Check the new action.
-    error = std::string();
-    if (moveAction->check(error))
-    {
-        // Set the new action.
-        character->setAction(moveAction);
-        // Calculate the time needed to move.
-        if (character->posture == CharacterPosture::Stand)
-        {
-            character->sendMsg("You start to go %s...\n",
-                               direction.toString());
-        }
-        else if (character->posture == CharacterPosture::Crouch)
-        {
-            character->sendMsg("You move crouching towards %s...\n",
-                               direction.toString());
-        }
-        else if (character->posture == CharacterPosture::Prone)
-        {
-            character->sendMsg("You begin to crawl to %s...\n",
-                               direction.toString());
-        }
-        return true;
-    }
-    character->sendMsg("%s\n", error);
-    return false;
-}
-
-bool DoTravel(Character * character, ArgumentHandler & /*args*/)
-{
-    // Stop any ongoing action.
-    StopAction(character);
-    // Check if the room is a travel point.
-    if (!HasFlag(character->room->flags, RoomFlag::TravelPoint))
-    {
-        character->sendMsg("You can't travel from here.\n");
-        return false;
-    }
-    auto destination = Mud::instance().findTravelPoint(character->room);
-    if (destination == nullptr)
-    {
-        character->sendMsg("You can't find an exit from here.\n");
-        return false;
-    }
-    auto msgDepart = character->getNameCapital() + " goes outside.\n";
-    auto msgArrive = character->getNameCapital() + " enter the room.\n";
-    auto msgChar = "You begin to travel...";
-    // Move character.
-    character->moveTo(destination, msgDepart, msgArrive, msgChar);
-    return true;
 }
 
 bool DoQuit(Character * character, ArgumentHandler & /*args*/)
 {
-    // Prevent mobiles to execute this command.
-    NoMobile(character);
+    // Check if the character is a mobile.
+    if (character->isMobile())
+    {
+        character->sendMsg("Npcs are not allowed to execute this command.\n");
+        return false;
+    }
     // Stop any ongoing action.
     StopAction(character);
     auto player = character->toPlayer();
@@ -231,8 +153,7 @@ bool DoSet(Character * character, ArgumentHandler & args)
     if (args.empty())
     {
         character->sendMsg("What do you want to set?");
-    }
-    else
+    } else
     {
         if (args[0].getContent() == "des")
         {
@@ -240,8 +161,7 @@ bool DoSet(Character * character, ArgumentHandler & args)
             if (newDescription.empty())
             {
                 character->sendMsg("You can't set an empty description.\n");
-            }
-            else
+            } else
             {
                 character->description = newDescription;
                 character->sendMsg("You had set your description:\n");
@@ -256,19 +176,14 @@ bool DoSet(Character * character, ArgumentHandler & args)
     return false;
 }
 
-bool DoStop(Character * character, ArgumentHandler & /*args*/)
-{
-    if (character->getAction()->getType() != ActionType::Combat)
-    {
-        character->sendMsg(character->getAction()->stop() + "\n");
-        character->popAction();
-        return true;
-    }
-    return false;
-}
-
 bool DoLook(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("You can't see anything, you're sleeping.\n");
+        return false;
+    }
     // If there are no arguments, show the room.
     if (args.empty())
     {
@@ -278,7 +193,7 @@ bool DoLook(Character * character, ArgumentHandler & args)
     if (args.size() == 1)
     {
         // Check if the room is lit by a light.
-        if(!character->room->isLit())
+        if (!character->room->isLit())
         {
             character->sendMsg("You can't see.\n");
             return false;
@@ -317,7 +232,7 @@ bool DoLook(Character * character, ArgumentHandler & args)
     if (args.size() == 2)
     {
         // Check if the room is lit by a light.
-        if(!character->room->isLit())
+        if (!character->room->isLit())
         {
             character->sendMsg("You can't see.\n");
             return false;
@@ -401,8 +316,7 @@ bool DoHelp(Character * character, ArgumentHandler & args)
                         godsCommands.addRow(godsRow);
                         godsRow.clear();
                     }
-                }
-                else
+                } else
                 {
                     baseRow.push_back(it->name);
                     if (baseRow.size() == numColumns)
@@ -431,8 +345,7 @@ bool DoHelp(Character * character, ArgumentHandler & args)
         }
         character->sendMsg(baseCommands.getTable(true));
         character->sendMsg(godsCommands.getTable(true));
-    }
-    else if (args.size() == 1)
+    } else if (args.size() == 1)
     {
         auto command = args[0].getContent();
         for (auto it : Mud::instance().mudCommands)
@@ -468,7 +381,12 @@ bool DoHelp(Character * character, ArgumentHandler & args)
 
 bool DoPrompt(Character * character, ArgumentHandler & args)
 {
-    NoMobile(character);
+    // Check if the character is a mobile.
+    if (character->isMobile())
+    {
+        character->sendMsg("Npcs are not allowed to execute this command.\n");
+        return false;
+    }
     auto player = character->toPlayer();
     if (args.empty())
     {
@@ -476,8 +394,7 @@ bool DoPrompt(Character * character, ArgumentHandler & args)
         character->sendMsg("    %s\n", player->prompt);
         character->sendMsg("Type %sprompt help %sto read the guide.\n",
                            Formatter::yellow(), Formatter::reset());
-    }
-    else
+    } else
     {
         if (args[0].getContent() == "help")
         {
@@ -491,7 +408,8 @@ bool DoPrompt(Character * character, ArgumentHandler & args)
             };
             std::string msg;
             msg += yellow("Prompt Help") + "\n";
-            msg += "You can set the prompt you prefer, respectfully to this constraints:\n";
+            msg +=
+                "You can set the prompt you prefer, respectfully to this constraints:\n";
             msg += " - Not more than 15 characters.\n";
             msg += "\n";
             msg += "You can use the following shortcuts in you prompt:\n";
@@ -503,8 +421,7 @@ bool DoPrompt(Character * character, ArgumentHandler & args)
             msg += "    " + italic("&S") + " - Player maximum stamina.\n";
             msg += "    " + italic("&T") + " - Currently aimed character.\n";
             player->sendMsg(msg);
-        }
-        else
+        } else
         {
             player->prompt = args.substr(0);
         }
@@ -514,26 +431,29 @@ bool DoPrompt(Character * character, ArgumentHandler & args)
 
 bool DoTime(Character * character, ArgumentHandler & /*args*/)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("You can't see anything, you're sleeping.\n");
+        return false;
+    }
     if (MudUpdater::instance().getDayPhase() == DayPhase::Morning)
     {
         character->sendMsg("%sThe sun has just risen.%s\n",
                            Formatter::yellow(),
                            Formatter::reset());
-    }
-    else if (MudUpdater::instance().getDayPhase() == DayPhase::Day)
+    } else if (MudUpdater::instance().getDayPhase() == DayPhase::Day)
     {
         character->sendMsg("%sThe sun is high in the sky.%s\n",
                            Formatter::yellow(),
                            Formatter::reset());
-    }
-    else if (MudUpdater::instance().getDayPhase() == DayPhase::Dusk)
+    } else if (MudUpdater::instance().getDayPhase() == DayPhase::Dusk)
     {
         character->sendMsg(
             "%sThe sun is setting, the shadows begin to prevail.%s\n",
             Formatter::cyan(),
             Formatter::reset());
-    }
-    else if (MudUpdater::instance().getDayPhase() == DayPhase::Night)
+    } else if (MudUpdater::instance().getDayPhase() == DayPhase::Night)
     {
         character->sendMsg("%sThe darkness surrounds you.%s\n",
                            Formatter::blue(),
@@ -542,79 +462,14 @@ bool DoTime(Character * character, ArgumentHandler & /*args*/)
     return true;
 }
 
-bool DoStand(Character * character, ArgumentHandler & /*args*/)
-{
-    // Stop any action the character is executing.
-    StopAction(character);
-    if (character->posture == CharacterPosture::Stand)
-    {
-        character->sendMsg("You are already standing.\n");
-        return false;
-    }
-    character->posture = CharacterPosture::Stand;
-    character->sendMsg("You stand up.\n");
-    return true;
-}
-
-bool DoCrouch(Character * character, ArgumentHandler & /*args*/)
-{
-    // Stop any action the character is executing.
-    StopAction(character);
-    if (character->posture == CharacterPosture::Crouch)
-    {
-        character->sendMsg("You are already crouched.\n");
-        return false;
-    }
-    character->posture = CharacterPosture::Crouch;
-    character->sendMsg("You put yourself crouched.\n");
-    return true;
-}
-
-bool DoSit(Character * character, ArgumentHandler & /*args*/)
-{
-    // Stop any action the character is executing.
-    StopAction(character);
-    if (character->posture == CharacterPosture::Sit)
-    {
-        character->sendMsg("You are already seated.\n");
-        return false;
-    }
-    character->posture = CharacterPosture::Sit;
-    character->sendMsg("You sit down.\n");
-    return true;
-}
-
-bool DoProne(Character * character, ArgumentHandler & /*args*/)
-{
-    // Stop any action the character is executing.
-    StopAction(character);
-    if (character->posture == CharacterPosture::Prone)
-    {
-        character->sendMsg("You are already prone.\n");
-        return false;
-    }
-    character->posture = CharacterPosture::Prone;
-    character->sendMsg("You put yourself prone.\n");
-    return true;
-}
-
-bool DoRest(Character * character, ArgumentHandler & /*args*/)
-{
-    // Stop any action the character is executing.
-    StopAction(character);
-    if (character->posture == CharacterPosture::Rest)
-    {
-        character->sendMsg("You are already resting.\n");
-        return false;
-    }
-    character->posture = CharacterPosture::Rest;
-    character->sendMsg("You lie down.\n");
-    return true;
-}
-
 bool DoStatistics(Character * character, ArgumentHandler & /*args*/)
 {
-    NoMobile(character);
+    // Check if the character is a mobile.
+    if (character->isMobile())
+    {
+        character->sendMsg("Npcs are not allowed to execute this command.\n");
+        return false;
+    }
     auto player = character->toPlayer();
 
     auto BLD = [](std::string s)
@@ -634,40 +489,25 @@ bool DoStatistics(Character * character, ArgumentHandler & /*args*/)
     msg += MAG("Affiliation : ") + player->faction->name + "\n";
     msg += MAG("Experience  : ") + ToString(player->experience) + " px\n";
     // Add the abilities.
-    msg += MAG("    Str       ");
-    msg += ToString(player->getAbility(Ability::Strength, false)) + "(";
-    msg += ToString(player->effects.getAbilityModifier(Ability::Strength));
-    msg += ")[";
-    msg += ToString(player->getAbilityModifier(Ability::Strength)) + "]\n";
-    msg += MAG("    Agi       ");
-    msg += ToString(player->getAbility(Ability::Agility, false)) + "(";
-    msg += ToString(player->effects.getAbilityModifier(Ability::Agility));
-    msg += ")[";
-    msg += ToString(player->getAbilityModifier(Ability::Agility)) + "]\n";
-    msg += MAG("    Per       ");
-    msg += ToString(player->getAbility(Ability::Perception, false)) + "(";
-    msg += ToString(player->effects.getAbilityModifier(Ability::Perception));
-    msg += ")[";
-    msg += ToString(player->getAbilityModifier(Ability::Perception)) + "]\n";
-    msg += MAG("    Con       ");
-    msg += ToString(player->getAbility(Ability::Constitution, false)) + "(";
-    msg += ToString(player->effects.getAbilityModifier(Ability::Constitution));
-    msg += ")[";
-    msg += ToString(player->getAbilityModifier(Ability::Constitution)) + "]\n";
-    msg += MAG("    Int       ");
-    msg += ToString(player->getAbility(Ability::Intelligence, false)) + "(";
-    msg += ToString(player->effects.getAbilityModifier(Ability::Intelligence));
-    msg += ")[";
-    // Add the health and the stamina.
-    msg += ToString(player->getAbilityModifier(Ability::Intelligence)) + "]\n";
-    msg += MAG("    Health    ");
+    // STRENGTH
+    for (auto const & ability:player->abilities)
+    {
+        msg += "    " + MAG(ability.first.getAbbreviation()) + "    ";
+        msg += AlignString(player->getAbility(ability.first),
+                           StringAlign::Right, 5) + "(";
+        msg += AlignString(player->getAbilityModifier(ability.first),
+                           StringAlign::Right, 3) + ")\n";
+    }
+    // HEALTH
+    msg += "    " + MAG("Health  ");
     msg += ToString(player->health) + "/" + ToString(player->getMaxHealth());
-    msg += "(" + ToString(player->effects.getHealthMod()) + ")\n";
-    msg += MAG("    Stamina   ");
+    msg += "\n";
+    msg += "    " + MAG("Stamina ");
     msg += ToString(player->stamina) + "/" + ToString(player->getMaxStamina());
-    msg += "(" + ToString(player->effects.getHealthMod()) + ")\n";
+    msg += "\n";
     // Add the Armor Class.
-    msg += MAG("Armor Class : ") + ToString(player->getArmorClass()) + "\n";
+    msg += "    " + MAG("Armor Class ") + ToString(player->getArmorClass());
+    msg += "\n";
     // Add the health and stamina conditions.
     msg += "You " + BLD(player->getHealthCondition(true)) + ".\n";
     msg += "You " + BLD(player->getStaminaCondition()) + ".\n";
@@ -675,9 +515,9 @@ bool DoStatistics(Character * character, ArgumentHandler & /*args*/)
     msg += "You " + BLD(player->getHungerCondition()) + ".\n";
     msg += "You " + BLD(player->getThirstCondition()) + ".\n";
     // Add the posture.
-    msg += "You are " + BLD(player->posture.toString()) + ".\n\n";
+    msg += "You are " + BLD(player->posture.getAction()) + ".\n\n";
     // [IF EXIST] Add the current action.
-    if (player->getAction()->getType() != ActionType::Wait)
+    if (player->getAction() != ActionType::Wait)
     {
         msg += "You are ";
         msg += BLD(player->getAction()->getDescription());
@@ -701,17 +541,72 @@ bool DoStatistics(Character * character, ArgumentHandler & /*args*/)
     return true;
 }
 
+bool DoEffects(Character * character, ArgumentHandler &)
+{
+    std::string msg;
+    msg += "Active Effects\n";
+    for (auto const & it : character->effectManager.getActiveEffects())
+    {
+        msg += "\t" + AlignString(it.name, StringAlign::Left, 30) + "\n";
+    }
+    msg += "Passive Effects\n";
+    for (auto const & it : character->effectManager.getPassiveEffects())
+    {
+        msg += "\t" + AlignString(it.name, StringAlign::Left, 30) + "\n";
+    }
+    msg += "Ability Modifiers\n";
+    for (auto const & it : character->effectManager.getAbilityMod())
+    {
+        msg += "\t";
+        msg += AlignString(it.first.getAbbreviation(), StringAlign::Left, 30);
+        msg += AlignString(it.second, StringAlign::Right, 5) + "\n";
+    }
+    msg += "Combat Modifiers\n";
+    for (auto const & it : character->effectManager.getCombatMod())
+    {
+        msg += "\t";
+        msg += AlignString(it.first.toString(), StringAlign::Left, 30);
+        msg += AlignString(it.second, StringAlign::Right, 5) + "\n";
+    }
+    msg += "Status Modifiers\n";
+    for (auto const & it : character->effectManager.getStatusMod())
+    {
+        msg += "\t";
+        msg += AlignString(it.first.toString(), StringAlign::Left, 30);
+        msg += AlignString(it.second, StringAlign::Right, 5) + "\n";
+    }
+    msg += "Knowledges\n";
+    for (auto const & it : character->effectManager.getKnowledge())
+    {
+        msg += "\t";
+        msg += AlignString(it.first.toString(), StringAlign::Left, 30);
+        msg += AlignString(it.second, StringAlign::Right, 5) + "\n";
+    }
+    character->sendMsg(msg);
+    return true;
+}
+
 bool DoRent(Character * character, ArgumentHandler & /*args*/)
 {
-    NoMobile(character);
+    // Check if the character is a mobile.
+    if (character->isMobile())
+    {
+        character->sendMsg("Npcs are not allowed to execute this command.\n");
+        return false;
+    }
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("You can't see anything, you're sleeping.\n");
+        return false;
+    }
     auto player = character->toPlayer();
     // Check if the room allow to rent.
     if (!HasFlag(player->room->flags, RoomFlag::Rent))
     {
         character->sendMsg("You can't rent here.\n");
         return false;
-    }
-    else
+    } else
     {
         player->rent_room = player->room->vnum;
         player->doCommand("quit");
@@ -721,20 +616,41 @@ bool DoRent(Character * character, ArgumentHandler & /*args*/)
 
 bool DoSkills(Character * character, ArgumentHandler & /*args*/)
 {
-    NoMobile(character);
+    // Check if the character is a mobile.
+    if (character->isMobile())
+    {
+        character->sendMsg("Npcs are not allowed to execute this command.\n");
+        return false;
+    }
     auto player = character->toPlayer();
     Table table = Table();
     table.addColumn("LvL", StringAlign::Left);
     table.addColumn("Skill", StringAlign::Left);
-    for (auto iterator : player->skills)
+    for (const auto & skillData : player->skillManager.skills)
     {
-        Skill * skill = Mud::instance().findSkill(iterator.first);
-        if (skill)
-        {
-            table.addRow({skill->name, ToString(iterator.second)});
-        }
+        table.addRow({skillData->skill->name,
+                      skillData->getSkillRank().toString()});
     }
     character->sendMsg(table.getTable());
+    return true;
+}
+
+bool DoActions(Character * character, ArgumentHandler & /*args*/)
+{
+    std::string msg = "You are planning to...\n";
+    character->actionQueueMutex.lock();
+    bool first = true;
+    for (auto it : character->actionQueue)
+    {
+        if (first)
+        {
+            msg += "  [Performing] ";
+            first = false;
+        } else msg += "  [Queued    ] ";
+        msg += it->getDescription() + "\n";
+    }
+    character->actionQueueMutex.unlock();
+    character->sendMsg(msg);
     return true;
 }
 
@@ -758,8 +674,6 @@ bool DoServer(Character * character, ArgumentHandler & /*args*/)
     msg += ToString(Mud::instance().mudItems.size()) + "\n";
     msg += "    Corpses     : ";
     msg += ToString(Mud::instance().mudCorpses.size()) + "\n";
-    msg += "    Continents  : ";
-    msg += ToString(Mud::instance().mudContinents.size()) + "\n";
     msg += "    Areas       : ";
     msg += ToString(Mud::instance().mudAreas.size()) + "\n";
     msg += "    Rooms       : ";
@@ -787,5 +701,58 @@ bool DoServer(Character * character, ArgumentHandler & /*args*/)
     msg += "    Commands    : ";
     msg += ToString(Mud::instance().mudCommands.size()) + "\n";
     character->sendMsg(msg);
+    return true;
+}
+
+bool DoGenerateName(Character * character, ArgumentHandler & args)
+{
+    if (args.size() != 1)
+    {
+        std::string help;
+        help += "You must provide a pattern.\n";
+        help += "Guide\n";
+        help += "\ts - generic syllable\n";
+        help += "\tv - vowel\n";
+        help += "\tV - vowel or vowel combination\n";
+        help += "\tc - consonant\n";
+        help +=
+            "\tB - consonant or consonant combination suitable for beginning a word\n";
+        help +=
+            "\tC - consonant or consonant combination suitable anywhere in a word\n";
+        help += "\ti - insult\n";
+        help += "\tm - mushy name\n";
+        help += "\tM - mushy name ending\n";
+        help += "\tD - consonant suited for a stupid person's name\n";
+        help +=
+            "\td - syllable suited for a stupid person's name (begins with a vowel)\n";
+        help += "\n";
+        help +=
+            "All characters between parenthesis () are emitted literally.\n";
+        help += "  For example, the pattern 's(dim)', emits a random generic\n";
+        help += "  syllable followed by 'dim'.\n";
+        help += "Characters between angle brackets <> emit patterns from\n";
+        help += "  the table above. Imagine the entire pattern is wrapped in\n";
+        help += "  one of these.\n";
+        help += "In both types of groupings, a vertical bar | denotes a\n";
+        help += "  random choice. Empty groups are allowed.\n";
+        help += "  For example, '(foo|bar)' emits either 'foo' or 'bar'.\n";
+        help += "  The pattern '<c|v|>' emits a constant, vowel, or\n";
+        help += "  nothing at all.\n";
+        help += "An exclamation point ! means to capitalize the component \n";
+        help += "  that follows it. For example, '!(foo)' will emit 'Foo'\n";
+        help += "  and 'v!s' will emit a lowercase vowel followed by a\n";
+        help += "  capitalized syllable, like 'eRod'.\n";
+        help += "A tilde ~ means to reverse the letters of the component\n";
+        help += "  that follows it. For example, '~(foo)' will emit 'oof'.\n";
+        help += "  To reverse an entire template, wrap it in brackets.\n";
+        help += "  For example, to reverse 'sV'i' as a whole use '~<sV'i>'.\n";
+        help += "  The template '~sV'i' will only reverse the initial\n";
+        help += "  syllable.\n";
+        character->sendMsg(help + "\n");
+        return false;
+    }
+    namegen::NameGenerator nameGenerator(args[0].getContent());
+    character->sendMsg("Combinations : %s\n", nameGenerator.combinations());
+    character->sendMsg("Names : %s\n\n", nameGenerator.toString());
     return true;
 }

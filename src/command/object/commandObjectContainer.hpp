@@ -35,10 +35,4 @@ bool DoOpen(Character * character, ArgumentHandler & args);
 /// Close a door.
 bool DoClose(Character * character, ArgumentHandler & args);
 
-/// Allows to turn on and off an activatable item.
-bool DoTurn(Character * character, ArgumentHandler & args);
-
-/// Allows to refill a light source.
-bool DoRefill(Character * character, ArgumentHandler & args);
-
 ///@}

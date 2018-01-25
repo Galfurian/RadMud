@@ -30,7 +30,7 @@ bool DoLiquidInfo(Character * character, ArgumentHandler & args)
         character->sendMsg("You must provide a liquid vnum.\n");
         return false;
     }
-    auto liquidVnum = ToNumber<int>(args[0].getContent());
+    auto liquidVnum = ToNumber<unsigned int>(args[0].getContent());
     auto liquid = Mud::instance().findLiquid(liquidVnum);
     if (liquid == nullptr)
     {
@@ -39,7 +39,9 @@ bool DoLiquidInfo(Character * character, ArgumentHandler & args)
     }
     std::string msg;
     msg += "Vnum  : " + ToString(liquid->vnum) + "\n";
+    msg += "Type  : " + liquid->type.toString() + "\n";
     msg += "Name  : " + liquid->getNameCapital() + "\n";
+    msg += "Descr : " + liquid->description + "\n";
     msg += "Worth : " + ToString(liquid->worth) + "\n";
     character->sendMsg(msg);
     return true;
@@ -87,7 +89,7 @@ bool DoLiquidCreate(Character * character, ArgumentHandler & args)
         return false;
     }
     // Find the liquid.
-    auto liquidVnum = ToNumber<int>(args[1].getContent());
+    auto liquidVnum = ToNumber<unsigned int>(args[1].getContent());
     auto liquid = Mud::instance().findLiquid(liquidVnum);
     if (liquid == nullptr)
     {
@@ -101,7 +103,8 @@ bool DoLiquidCreate(Character * character, ArgumentHandler & args)
         character->sendMsg("Accepted quantity of liquids (from 1 to 99).\n");
         return false;
     }
-    auto liquidContainer = item->toLiquidContainerItem();
+    // Cast the item to liquid container.
+    auto liquidContainer = static_cast<LiquidContainerItem *>(item);
     if (!liquidContainer->pourIn(liquid, quantity))
     {
         character->sendMsg("Item can't contain that quantity of liquid.\n");

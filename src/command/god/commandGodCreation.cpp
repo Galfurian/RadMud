@@ -20,6 +20,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "commandGodCreation.hpp"
+#include "toolModel.hpp"
 #include "mud.hpp"
 
 bool DoMaterialInfo(Character * character, ArgumentHandler & args)
@@ -107,7 +108,6 @@ bool DoBuildingInfo(Character * character, ArgumentHandler & args)
         msg += "    " + iterator.first.toString();
         msg += "(" + ToString(iterator.second) + ")\n";
     }
-    msg += "Unique      : " + ToString(building->unique) + "\n";
     character->sendMsg(msg);
     return true;
 }
@@ -120,16 +120,14 @@ bool DoBuildingList(Character * character, ArgumentHandler & /*args*/)
     table.addColumn("DIFFICULTY", StringAlign::Left);
     table.addColumn("TIME", StringAlign::Center);
     table.addColumn("UNIQUE", StringAlign::Center);
-    for (auto iterator : Mud::instance().mudBuildings)
+    for (auto it : Mud::instance().mudBuildings)
     {
-        auto building = &(iterator.second);
         // Prepare the row.
         TableRow row;
-        row.push_back(ToString(building->vnum));
-        row.push_back(building->name);
-        row.push_back(ToString(building->difficulty));
-        row.push_back(ToString(building->time));
-        row.push_back(ToString(building->unique));
+        row.push_back(ToString(it.second->vnum));
+        row.push_back(it.second->name);
+        row.push_back(ToString(it.second->difficulty));
+        row.push_back(ToString(it.second->time));
         // Add the row to the table.
         table.addRow(row);
     }
@@ -151,10 +149,8 @@ bool DoProfessionInfo(Character * character, ArgumentHandler & args)
         return false;
     }
     std::string msg;
-    msg += "Name          : " + profession->name + "\n";
     msg += "Description   : " + profession->description + "\n";
     msg += "Command       : " + profession->command + "\n";
-    msg += "Posture       : " + profession->posture.toString() + "\n";
     msg += "Action        : " + profession->action + "\n";
     msg += "    Start     : " + profession->startMessage + "\n";
     msg += "    Finish    : " + profession->finishMessage + "\n";
@@ -169,17 +165,13 @@ bool DoProfessionInfo(Character * character, ArgumentHandler & args)
 bool DoProfessionList(Character * character, ArgumentHandler & /*args*/)
 {
     Table table;
-    table.addColumn("NAME", StringAlign::Center);
     table.addColumn("COMMAND", StringAlign::Center);
-    table.addColumn("POSTURE", StringAlign::Center);
     table.addColumn("ACTION", StringAlign::Center);
     for (auto iterator : Mud::instance().mudProfessions)
     {
         // Prepare the row.
         TableRow row;
-        row.push_back(iterator.second->name);
         row.push_back(iterator.second->command);
-        row.push_back(iterator.second->posture.toString());
         row.push_back(iterator.second->action);
         // Add the row to the table.
         table.addRow(row);
@@ -246,6 +238,44 @@ bool DoProductionList(Character * character, ArgumentHandler & /*args*/)
         // Add the row to the table.
         table.addRow(row);
     }
+    character->sendMsg(table.getTable());
+    return true;
+}
+
+bool DoBodyPartList(Character * character, ArgumentHandler &)
+{
+    Table table;
+    table.addColumn("VNUM", StringAlign::Center);
+    table.addColumn("NAME", StringAlign::Left);
+    for (auto it : Mud::instance().mudBodyParts)
+    {
+        // Prepare the row.
+        TableRow row;
+        row.push_back(ToString(it.first));
+        row.push_back(it.second->name);
+        // Add the row to the table.
+        table.addRow(row);
+    }
+    character->sendMsg(table.getTable());
+    return true;
+}
+
+bool DoBodyPartInfo(Character * character, ArgumentHandler & args)
+{
+    if (args.size() != 1)
+    {
+        character->sendMsg("You must insert a valid body part vnum.\n");
+        return false;
+    }
+    auto vnum = ToNumber<unsigned int>(args[0].getContent());
+    auto bodyPart = Mud::instance().findBodyPart(vnum);
+    if (bodyPart == nullptr)
+    {
+        character->sendMsg("Can't find the desire body part %s.\n", vnum);
+        return false;
+    }
+    Table table;
+    bodyPart->getSheet(table);
     character->sendMsg(table.getTable());
     return true;
 }

@@ -32,7 +32,6 @@
 Room::Room() :
     vnum(),
     area(),
-    continent(),
     coord(),
     terrain(),
     name(),
@@ -40,7 +39,8 @@ Room::Room() :
     exits(),
     items(),
     characters(),
-    flags()
+    flags(),
+    liquidContent()
 {
     // Nothing to do.
 }
@@ -49,7 +49,7 @@ Room::~Room()
 {
     for (auto it : exits)
     {
-        std::shared_ptr<Exit> oppositeExit = it->getOppositeExit();
+        auto oppositeExit = it->getOppositeExit();
         if (oppositeExit != nullptr)
         {
             oppositeExit->unlink();
@@ -62,24 +62,22 @@ Room::~Room()
     }
 //    Logger::log(LogLevel::Debug,
 //                "Deleted room\t\t[%s]\t\t(%s)",
-//                ToString(this->vnum),
-//                this->name);
+//                ToString(vnum),
+//                name);
 }
 
 bool Room::check(bool complete)
 {
-    assert(vnum > 0);
+    if (vnum <= 0) return false;
     if (complete)
     {
-        assert((area != nullptr) || (continent != nullptr));
-        assert(!((area != nullptr) && (continent != nullptr)));
+        if (area == nullptr) return false;
     }
-    assert(coord.x <= 100);
-    assert(coord.y <= 100);
-    assert(coord.z <= 100);
-    assert(terrain != nullptr);
-    assert(!name.empty());
-    assert(!description.empty());
+    if (coord.x > 100) return false;
+    if (coord.y > 100) return false;
+    if (coord.z > 100) return false;
+    if (terrain == nullptr) return false;
+    if (name.empty()) return false;
     return true;
 }
 
@@ -95,19 +93,19 @@ void Room::addItem(Item *& item, bool updateDB)
         SQLiteDbms::instance().insertInto(
             "ItemRoom",
             {
-                ToString(this->vnum), ToString(item->vnum)
+                ToString(vnum), ToString(item->vnum)
             }, false, true);
     }
     Logger::log(LogLevel::Debug,
-                "Item '%s' added to '%s';", item->getName(), this->name);
+                "Item '%s' added to '%s';", item->getName(), name);
 }
 
 void Room::addBuilding(Item * item, bool updateDB)
 {
     // Set the item as built.
-    SetFlag(&item->flags, ItemFlag::Built);
+    SetFlag(item->flags, ItemFlag::Built);
     // Check if the item is already inside the room.
-    for (auto iterator : this->items)
+    for (auto iterator : items)
     {
         if (iterator->vnum == item->vnum)
         {
@@ -141,7 +139,7 @@ bool Room::removeItem(Item * item, bool updateDB)
         // Log it.
         Logger::log(LogLevel::Debug, "Item '%s' removed from '%s';",
                     item->getName(),
-                    this->name);
+                    name);
         return true;
     }
     return false;
@@ -152,7 +150,7 @@ bool Room::removeBuilding(Item * item, bool updateDB)
     if (this->removeItem(item, updateDB))
     {
         // Clear the built flag from the item.
-        ClearFlag(&item->flags, ItemFlag::Built);
+        ClearFlag(item->flags, ItemFlag::Built);
         return true;
     }
     return false;
@@ -160,15 +158,16 @@ bool Room::removeBuilding(Item * item, bool updateDB)
 
 void Room::removeCharacter(Character * character)
 {
-    if (FindErase(characters, character))
+    for (auto it = characters.begin(); it != characters.end(); ++it)
     {
-        character->room = nullptr;
+        if ((*it)->name == character->name)
+        {
+            characters.erase(it);
+            character->room = nullptr;
+            return;
+        }
     }
-    else
-    {
-        Logger::log(LogLevel::Error,
-                    "Error during character removal from room.");
-    }
+    Logger::log(LogLevel::Error, "Error during character removal from room.");
 }
 
 std::set<Player *> Room::getAllPlayer(Character * exception)
@@ -220,14 +219,14 @@ std::vector<Mobile *> Room::getAllMobile(Character * exception)
 bool Room::updateOnDB()
 {
     std::vector<std::string> arguments;
-    arguments.push_back(ToString(this->vnum));
-    arguments.push_back(ToString(this->coord.x));
-    arguments.push_back(ToString(this->coord.y));
-    arguments.push_back(ToString(this->coord.z));
-    arguments.push_back(ToString(this->terrain->vnum));
-    arguments.push_back(this->name);
-    arguments.push_back(this->description);
-    arguments.push_back(ToString(this->flags));
+    arguments.push_back(ToString(vnum));
+    arguments.push_back(ToString(coord.x));
+    arguments.push_back(ToString(coord.y));
+    arguments.push_back(ToString(coord.z));
+    arguments.push_back(ToString(terrain->vnum));
+    arguments.push_back(name);
+    arguments.push_back(description);
+    arguments.push_back(ToString(flags));
     return SQLiteDbms::instance().insertInto("Room", arguments, false, true);
 }
 
@@ -297,9 +296,9 @@ Item * Room::findBuilding(int buildingVnum)
     return nullptr;
 }
 
-std::vector<Item *> Room::findBuildings(ModelType type)
+ItemVector Room::findBuildings(ModelType type)
 {
-    std::vector<Item *> buildingsList;
+    ItemVector buildingsList;
     for (auto iterator : items)
     {
         if ((iterator->model->getType() == type) &&
@@ -354,51 +353,11 @@ Mobile * Room::findMobile(
 
 std::shared_ptr<Exit> Room::findExit(Direction direction)
 {
-    for (auto it : exits)
+    for (auto it = exits.begin(); it != exits.end(); ++it)
     {
-        if (it->direction == direction)
+        if ((*it)->direction == direction)
         {
-            return it;
-        }
-    }
-    return nullptr;
-}
-
-std::shared_ptr<Exit> Room::findExit(const std::string & direction)
-{
-    if (Direction::isValid(direction))
-    {
-        return this->findExit(Direction(direction));
-    }
-    return nullptr;
-}
-
-std::shared_ptr<Exit> Room::findExit(Room * destination)
-{
-    for (auto it : exits)
-    {
-        if (it->destination == destination)
-        {
-            return it;
-        }
-    }
-    return nullptr;
-}
-
-Item * Room::findDoor()
-{
-    for (auto iterator : items)
-    {
-        if (iterator->model->getType() == ModelType::Mechanism)
-        {
-            if (HasFlag(iterator->flags, ItemFlag::Built))
-            {
-                if (iterator->model->toMechanism()->mechanismType ==
-                    MechanismType::Door)
-                {
-                    return iterator;
-                }
-            }
+            return *it;
         }
     }
     return nullptr;
@@ -415,7 +374,7 @@ bool Room::isLit()
             {
                 if (item->getType() == ModelType::Light)
                 {
-                    if (item->toLightItem()->isActive())
+                    if (static_cast<LightItem *>(item)->isActive())
                     {
                         if (Area::getDistance(coord, room->coord) <=
                             item->model->toLight()->radius)
@@ -446,9 +405,15 @@ bool Room::isLit()
         }
         return false;
     };
+    // If the room has a natural light.
+    if (HasFlag(terrain->flags, TerrainFlag::NaturalLight))
+    {
+        return true;
+    }
     // Get the day phase.
     auto dayPhase = MudUpdater::instance().getDayPhase();
-    if ((!terrain->indoor) && (dayPhase != DayPhase::Night))
+    if (!HasFlag(terrain->flags, TerrainFlag::Indoor) &&
+        (dayPhase != DayPhase::Night))
     {
 //        Logger::log(LogLevel::Debug,
 //                    "Room is lit (outside)(!night)(%s us)",
@@ -477,33 +442,23 @@ bool Room::isLit()
     return false;
 }
 
-std::vector<Direction> Room::getAvailableDirections()
-{
-    std::vector<Direction> directions;
-    for (auto it : exits)
-    {
-        directions.push_back(it->direction);
-    }
-    return directions;
-}
-
-bool Room::addExit(std::shared_ptr<Exit> exit)
+bool Room::addExit(const std::shared_ptr<Exit> & exit)
 {
     if (this->findExit(exit->direction))
     {
         return false;
     }
-    this->exits.push_back(std::move(exit));
+    exits.emplace_back(exit);
     return true;
 }
 
 bool Room::removeExit(const Direction & direction)
 {
-    for (auto it : exits)
+    for (auto it = exits.begin(); it != exits.end(); ++it)
     {
-        if (it->direction == direction)
+        if ((*it)->direction == direction)
         {
-            FindErase(this->exits, it);
+            exits.erase(it);
             return true;
         }
     }
@@ -549,17 +504,6 @@ std::string Room::getLook(Character * actor)
             {
                 output += area->drawASCIIFov(this,
                                              actor->getViewDistance());
-            }
-        }
-        else if (continent != nullptr)
-        {
-            output += Formatter::doClearMap();
-            for (auto layer : continent->drawFov(this,
-                                                 actor->getViewDistance()))
-            {
-                output += Formatter::doDrawMap();
-                output += layer;
-                output += Formatter::dontDrawMap();
             }
         }
     }
@@ -646,41 +590,6 @@ void Room::funcSendToAll(const std::string & message,
         }
         iterator->sendMsg(message + "\n");
     }
-}
-
-int Room::luaGetExits(lua_State * L)
-{
-    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
-    for (auto it : this->exits)
-    {
-        luaRef.append(it.get());
-    }
-    luabridge::push(L, luaRef);
-    return 1;
-}
-
-int Room::luaGetItems(lua_State * L)
-{
-    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
-    for (auto it : this->items)
-    {
-        luaRef.append(it);
-    }
-    luabridge::push(L, luaRef);
-    return 1;
-}
-
-void Room::luaRegister(lua_State * L)
-{
-    luabridge::getGlobalNamespace(L)
-        .beginClass<Room>("Room")
-        .addData("vnum", &Room::vnum, false)
-        .addData("name", &Room::name, false)
-        .addData("coord", &Room::coord, false)
-        .addData("terrain", &Room::terrain, false)
-        .addCFunction("getExits", &Room::luaGetExits)
-        .addCFunction("getItems", &Room::luaGetItems)
-        .endClass();
 }
 
 bool Room::operator<(const Room & right) const
@@ -803,10 +712,10 @@ bool ConnectRoom(Room * room)
         Direction::Up,
         Direction::Down
     };
-    for (auto iterator : directions)
+    for (auto direction : directions)
     {
         // Get the coordinate modifier.
-        auto coordinates = room->coord + iterator.getCoordinates();
+        auto coordinates = room->coord + direction.getCoordinates();
         // Get the room at the given coordinates.
         auto near = room->area->getRoom(coordinates);
         if (near != nullptr)
@@ -814,18 +723,18 @@ bool ConnectRoom(Room * room)
             // Create the two exits.
             auto forward = std::make_shared<Exit>(room,
                                                   near,
-                                                  iterator, 0);
+                                                  direction, 0);
             auto backward = std::make_shared<Exit>(near,
                                                    room,
-                                                   forward->getOppositeDirection(),
+                                                   direction.getOpposite(),
                                                    0);
             generatedExits.push_back(forward);
             generatedExits.push_back(backward);
             // In case the connection is Up/Down set the presence of stairs.
-            if (iterator == Direction::Up || iterator == Direction::Down)
+            if (direction == Direction::Up || direction == Direction::Down)
             {
-                SetFlag(&forward->flags, ExitFlag::Stairs);
-                SetFlag(&backward->flags, ExitFlag::Stairs);
+                SetFlag(forward->flags, ExitFlag::Stairs);
+                SetFlag(backward->flags, ExitFlag::Stairs);
             }
             // Insert in both the rooms exits the connection.
             room->addExit(forward);
@@ -876,7 +785,7 @@ std::string GetRoomFlagString(unsigned int flags)
     if (HasFlag(flags, RoomFlag::Rent)) flagList += "|Rent";
     if (HasFlag(flags, RoomFlag::Peaceful)) flagList += "|Peaceful";
     if (HasFlag(flags, RoomFlag::TravelPoint)) flagList += "|TravelPoint";
-    if (HasFlag(flags, RoomFlag::SpawnPoint)) flagList += "|SpawnPoint";
+    if (HasFlag(flags, RoomFlag::SpawnTree)) flagList += "|SpawnTree";
     flagList += "|";
     return flagList;
 }

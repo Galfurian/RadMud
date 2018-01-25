@@ -25,29 +25,56 @@
 #include <vector>
 #include <functional>
 
+#include "pathFinderNode.hpp"
+
 /// @brief The abstract class used to implement a pathfinding algorithm.
-template<typename ElementType>
+template<typename T>
 class PathFinder
 {
+protected:
+    /// Checks if there is a connection between the two elements.
+    std::function<bool(T e1, T e2)> checkConnection;
+    /// Functions used to get the distance between the two elements.
+    std::function<int(T e1, T e2)> getDistance;
+    /// Function used to check the equality between two elements.
+    std::function<bool(T e1, T e2)> areEqual;
+    /// Function used to get the neighbours of the given element.
+    std::function<std::vector<T>(T e)> getNeighbours;
+
 public:
+    /// @brief Constructor.
+    /// @param _checkConnection Function used to check if there is a valid
+    ///                         connection between two elements.
+    /// @param _getDistance     Function which provides the distance between
+    ///                         two elements.
+    /// @param _areEqual        Function which checks if two elements are the
+    ///                         same.
+    /// @param _getNeighbours   Function which provides the list of
+    ///                         neighbours of an element.
+    PathFinder(const std::function<bool(T e1, T e2)> & _checkConnection,
+               const std::function<int(T e1, T e2)> & _getDistance,
+               const std::function<bool(T e1, T e2)> & _areEqual,
+               const std::function<std::vector<T>(T e)> & _getNeighbours) :
+        checkConnection(_checkConnection),
+        getDistance(_getDistance),
+        areEqual(_areEqual),
+        getNeighbours(_getNeighbours)
+    {
+        // Nothing to do.
+    }
+
     /// @brief Constructor.
     virtual ~PathFinder()
     {
         // Nothing to do.
     }
 
-    /// @brief Functions which allows to find a path between the "start" and "end" element.
-    /// @param start    The starting position.
-    /// @param end      The ending position.
-    /// @param path     Where the found path is stored.
-    /// @param _checkFunction The function which is used to determine if,
-    ///                        during the exploration, the algorithm can move
-    ///                        from the element "from" and "to".
+    /// @brief Functions which allows to find a path between the "start"
+    ///         and "end" element.
+    /// @param start The starting position.
+    /// @param end   The ending position.
+    /// @param path  Where the found path is stored.
     /// @return <b>True</b> if there is a path between the positions,<br>
     ///         <b>False</b> otherwise.
-    virtual bool findPath(ElementType start,
-                          ElementType end,
-                          std::vector<ElementType> & path,
-                          const std::function<bool(ElementType from,
-                                                   ElementType to)> & _checkFunction) = 0;
+    virtual bool findPath(T start, T end, std::vector<T> & path) = 0;
 };

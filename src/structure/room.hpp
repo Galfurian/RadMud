@@ -28,17 +28,14 @@
 #include "coordinates.hpp"
 #include "utils.hpp"
 #include "item.hpp"
-#include "lua_script.hpp"
 #include "mobile.hpp"
-#include "characterContainer.hpp"
-#include "itemContainer.hpp"
+#include "characterVector.hpp"
+#include "itemVector.hpp"
 #include "terrain.hpp"
 
 class Item;
 
 class Area;
-
-class Continent;
 
 /// Used to determine the flag of the room.
 using RoomFlag = enum class RoomFlags
@@ -46,7 +43,8 @@ using RoomFlag = enum class RoomFlags
     Rent = 1,           ///< A player can rent and disconnect.
     Peaceful = 2,       ///< Everyone here can't be harmful.
     TravelPoint = 4,    ///< From here a player can travel to another location.
-    SpawnPoint = 8      ///< It is a spawn room for players.
+    SpawnTree = 8,      ///< The room spawns trees.
+    Air = 16,           ///< The room has no structure is just air.
 };
 
 /// @brief Holds details about room.
@@ -58,8 +56,6 @@ public:
     int vnum;
     /// The area where is located the room.
     Area * area;
-    /// The continent where is located the room.
-    Continent * continent;
     /// The current room coordinates.
     Coordinates coord;
     /// The type of terrain of the room.
@@ -71,11 +67,13 @@ public:
     /// List of exits.
     std::vector<std::shared_ptr<Exit> > exits;
     /// List of items in the room.
-    ItemContainer items;
+    ItemVector items;
     /// List of characters in the room.
-    CharacterContainer characters;
+    CharacterVector characters;
     /// Integer that describe the flags of the room.
     unsigned int flags;
+    /// The liquid which fills the room.
+    std::pair<Liquid *, unsigned int> liquidContent;
 
     /// @brief Constructor.
     Room();
@@ -85,7 +83,7 @@ public:
 
     /// @brief Function used to check the correctness of the room.
     /// @param complete If set to true, the function check if the room has
-    ///                  been placed inside an area or a continent.
+    ///                  been placed inside an area.
     /// @return <b>True</b> if the room values are correct,<br>
     ///         <b>False</b> otherwise.
     bool check(bool complete = false);
@@ -162,7 +160,7 @@ public:
     /// @brief Search for the buildings of the given type inside the room.
     /// @param type The type of the buildings.
     /// @return The buildings list.
-    std::vector<Item *> findBuildings(ModelType type);
+    ItemVector findBuildings(ModelType type);
 
     /// @brief Search for the character in the room.
     /// @param target    The character to search.
@@ -199,7 +197,7 @@ public:
     /// @return <b>True</b> if there is NO other exits
     ///                      in the same direction,<br>
     ///         <b>False</b> otherwise.
-    bool addExit(std::shared_ptr<Exit> exit);
+    bool addExit(const std::shared_ptr<Exit> & exit);
 
     /// @brief Remove from the list of exits the one on the given direction.
     /// @param direction The direction to removed.
@@ -213,26 +211,8 @@ public:
     /// @return The desired exit.
     std::shared_ptr<Exit> findExit(Direction direction);
 
-    /// @brief Search for the desired exit in a direction, provided as a string.
-    /// @param direction The direction to search.
-    /// @return The desired exit.
-    std::shared_ptr<Exit> findExit(const std::string & direction);
-
-    /// @brief Search for the desired exit of this room.
-    /// @param destination The destination room.
-    /// @return The desired exit.
-    std::shared_ptr<Exit> findExit(Room * destination);
-
-    /// @brief Search for a built door inside the room.
-    /// @return The contained door if there is one.
-    Item * findDoor();
-
     /// @brief Check if the room is lit or not.
     bool isLit();
-
-    /// @brief Provides the list of directions where an exit is present.
-    /// @return Vector of directions.
-    std::vector<Direction> getAvailableDirections();
 
     /// @brief Provide a detailed description of the room.
     /// @param actor The one who is looking.
@@ -249,36 +229,13 @@ public:
     /// @brief Sends a message to all the characters inside the room.
     /// @param message    The message to send.
     /// @param exceptions The list of exceptions.
-    /// @param first The first unpacked argument.
     /// @param args  Packed arguments.
     template<typename ... Args>
     void sendToAll(const std::string & message,
                    const std::vector<Character *> & exceptions,
-                   const std::string & first,
                    const Args & ... args)
     {
-        std::string::size_type pos = message.find("%s");
-        if (pos == std::string::npos)
-        {
-            this->sendToAll(message, exceptions);
-        }
-        else
-        {
-            std::string working(message);
-            working.replace(pos, 2, first);
-            this->sendToAll(working, exceptions, args ...);
-        }
-    }
-
-    /// @brief Sends a message to all the characters inside the room.
-    ///         This one in particular handles integers.
-    template<typename ... Args>
-    void sendToAll(const std::string & message,
-                   const std::vector<Character *> & exceptions,
-                   const unsigned int & first,
-                   const Args & ... args)
-    {
-        this->sendToAll(message, exceptions, ToString(first), args ...);
+        sendToAll(StringBuilder::build(message, args...), exceptions);
     }
 
     /// @brief Send a message to all the characters inside the room which
@@ -292,37 +249,14 @@ public:
     ///         which pass the checking function.
     /// @param message        The message to send.
     /// @param checkException The checking function.
-    /// @param first          The first value to unpack.
     /// @param args           The rest of the arguments.
     template<typename ... Args>
     void funcSendToAll(const std::string & message,
                        std::function<bool(Character * character)> checkException,
-                       const std::string & first,
                        const Args & ... args)
     {
-        std::string::size_type pos = message.find("%s");
-        if (pos == std::string::npos)
-        {
-            this->funcSendToAll(message, checkException);
-        }
-        else
-        {
-            std::string working(message);
-            working.replace(pos, 2, first);
-            this->funcSendToAll(working, checkException, args ...);
-        }
+        funcSendToAll(StringBuilder::build(message, args...), checkException);
     }
-
-    /// @brief Returns the list of available exits from the current room
-    ///         using the vector structure made for lua environment.
-    int luaGetExits(lua_State * L);
-
-    /// @brief Returns the list of items inside the room.
-    int luaGetItems(lua_State * L);
-
-    /// @brief Function used to register inside the lua environment the class.
-    /// @param L The lua environment.
-    static void luaRegister(lua_State * L);
 
     /// @brief Define operator lesser than.
     /// @param right The comparison room.

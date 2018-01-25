@@ -39,9 +39,11 @@ public:
 
     void getSheet(Table & sheet) const override;
 
+    double getWeight(bool entireStack) const override;
+
     std::string lookContent() override;
 
-    double getWeight(bool entireStack) const override;
+    bool isAContainer() const override;
 
     bool isEmpty() const override;
 
@@ -50,8 +52,8 @@ public:
     double getUsedSpace() const override;
 
     /// @brief Check if this item can contain the passed one.
-    /// @param newLiquidContent  The liquid to pour in.
-    /// @param newLiquidQuantity The amount of liquid.
+    /// @param newLiquidContent The liquid to pour in.
+    /// @param newLiquidAmount  The amount of liquid.
     /// @return <b>True</b> if it can be contained,<br>
     ///         <b>False</b> otherwise.
     bool canContainLiquid(Liquid * newLiquidContent,

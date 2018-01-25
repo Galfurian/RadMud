@@ -1,21 +1,21 @@
 -- Handle the actions when the character is created.
 EventInit = function(self)
     -- Put event code here.
-    local helm = self.loadItem(self, 1500, 10, Mud.random(1, 5));
+    local helm = Mud.loadItem(self, 1500, 10, Mud.random(1, 5))
     if (helm ~= nil) then
-        if (not self:equipmentAdd(helm)) then return end
+        self:equipmentAdd(helm)
     end
-    local cuirass = self.loadItem(self, 1501, 10, Mud.random(1, 5));
+    local cuirass = Mud.loadItem(self, 1501, 10, Mud.random(1, 5))
     if (cuirass ~= nil) then
-        if (not self:equipmentAdd(cuirass)) then return end
+        self:equipmentAdd(cuirass)
     end
-    local greave = self.loadItem(self, 1502, 10, Mud.random(1, 5));
+    local greave = Mud.loadItem(self, 1502, 10, Mud.random(1, 5))
     if (greave ~= nil) then
-        if (not self:equipmentAdd(greave)) then return end
+        self:equipmentAdd(greave)
     end
-    local boots = self.loadItem(self, 1503, 10, Mud.random(1, 5));
+    local boots = Mud.loadItem(self, 1503, 10, Mud.random(1, 5))
     if (boots ~= nil) then
-        if (not self:equipmentAdd(boots)) then return end
+        self:equipmentAdd(boots)
     end
 end
 
@@ -24,23 +24,31 @@ EventFight = function(self, character)
     -- Put event code here.
 end
 
+local EventEnterState = 0
+local EventEnterCounter = 0
 -- Handle the actions when a character enters the room.
 EventEnter = function(self, character)
-    -- Put event code here.
-    if (Mud.random(1, 10) > 7)
-    then
-        self:doCommand("look " .. character.name);
-        Mud.sleep(2);
-        self:doCommand("say " .. character.name .. " Stand aside, citizen!")
-        if (character:isPlayer()) then
-            local variable = character:toPlayer():getVariable("seen_by_guard")
-            if variable then
-                print("Previous :" .. variable)
-            end
-            character:toPlayer():setVariable("seen_by_guard", "" .. Mud.random(1, 10))
-            print("New : " .. character:toPlayer():getVariable("seen_by_guard"))
+    print("EventEnterState " .. EventEnterState)
+    print("EventEnterCounter " .. EventEnterCounter)
+    if (EventEnterState == 0) then
+        if (Mud.random(1, 10) < 7) then
+            return true
         end
+        self:doCommand("look " .. character.name)
+        EventEnterState = 1
+    elseif (EventEnterState == 1) then
+        self:doCommand("say " .. character.name .. " Stand aside, citizen!")
+        EventEnterState = 2
+    elseif (EventEnterState == 2) then
+        if (EventEnterCounter >= 3) then
+            self:doCommand("say " .. character.name .. " Are you still here?!?")
+            EventEnterState = 0
+            EventEnterCounter = 0
+            return true
+        end
+        EventEnterCounter = EventEnterCounter + 1
     end
+    return false
 end
 
 -- Handle the actions when a character exits the room.

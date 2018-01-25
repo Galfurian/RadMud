@@ -25,16 +25,17 @@
 
 #include "logger.hpp"
 #include "room.hpp"
+#include <cassert>
 
 CombatAction::CombatAction(Character * _actor) :
     GeneralAction(_actor)
 {
-    //Logger::log(LogLevel::Debug, "Created CombatAction.");
+    Logger::log(LogLevel::Debug, "Created CombatAction.");
 }
 
 CombatAction::~CombatAction()
 {
-    //Logger::log(LogLevel::Debug, "Deleted CombatAction.");
+    Logger::log(LogLevel::Debug, "Deleted CombatAction.");
 }
 
 bool CombatAction::check(std::string & error) const
@@ -62,8 +63,9 @@ ActionStatus CombatAction::perform()
     return ActionStatus::Running;
 }
 
-unsigned int CombatAction::getCooldown(Character * character)
+unsigned int CombatAction::getCooldown()
 {
+    assert(actor && "Actor is nullptr");
     // BASE     [+5.0]
     // STRENGTH [-0.0 to -1.40]
     // AGILITY  [-0.0 to -1.40]
@@ -71,19 +73,35 @@ unsigned int CombatAction::getCooldown(Character * character)
     // CARRIED  [+0.0 to +2.48]
     // WEAPON   [+0.0 to +1.60]
     unsigned int cooldown = 5;
-    cooldown -= character->getAbilityLog(Ability::Strength);
-    cooldown -= character->getAbilityLog(Ability::Agility);
-    cooldown = SafeSum(cooldown, SafeLog10(character->weight));
-    cooldown = SafeSum(cooldown, SafeLog10(character->getCarryingWeight()));
-    if (character->canAttackWith(EquipmentSlot::RightHand))
+    cooldown = SafeSum(cooldown, -actor->getAbilityLog(Ability::Strength));
+    cooldown = SafeSum(cooldown, -actor->getAbilityLog(Ability::Agility));
+    cooldown = SafeSum(cooldown, SafeLog10(actor->weight));
+    cooldown = SafeSum(cooldown, SafeLog10(actor->getCarryingWeight()));
+    for (auto bodyPart : actor->race->bodyParts)
     {
-        auto wpn = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
-        cooldown = SafeSum(cooldown, SafeLog10(wpn->getWeight(true)));
-    }
-    if (character->canAttackWith(EquipmentSlot::LeftHand))
-    {
-        auto wpn = character->findEquipmentSlotItem(EquipmentSlot::RightHand);
-        cooldown = SafeSum(cooldown, SafeLog10(wpn->getWeight(true)));
+        if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
+        {
+            continue;
+        }
+        auto wpn = actor->findItemAtBodyPart(bodyPart);
+        if (wpn == nullptr)
+        {
+            continue;
+        }
+        if ((wpn->getType() == ModelType::MeleeWeapon) ||
+            (wpn->getType() == ModelType::RangedWeapon))
+        {
+            cooldown = SafeSum(cooldown, SafeLog10(wpn->getWeight(true)));
+        }
     }
     return cooldown;
+}
+
+
+void CombatAction::handleStop()
+{
+    // Send the stop message.
+    actor->sendMsg(this->stop() + "\n\n");
+    // Reset the list of aggressors.
+    actor->combatHandler.resetList();
 }

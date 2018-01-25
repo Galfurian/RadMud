@@ -22,10 +22,11 @@
 
 #pragma once
 
-#include <string>
+#include "baseEnumerator.hpp"
 
 /// Represents a type of resource.
-class ResourceType
+class ResourceType :
+    public BaseEnumerator
 {
 public:
     /// The possible type of resources.
@@ -45,52 +46,34 @@ public:
         MetalVein,      ///< [11] METAL_VEIN
         StoneMonolith,  ///< [12] STONE_MONOLITH
         Pen,            ///< [13] Pen
-        Trash           ///< [14] Trash (Anything which has no specific use)
+        Trash,          ///< [14] Trash (Anything which has no specific use)
+        Meat,           ///< [15] MEAT
+        Bone,           ///< [16] BONE
+        Skull,          ///< [17] SKULL
+        Nail            ///< [18] NAIL
     };
 
-    /// @brief Constructor from uint.
-    ResourceType();
+    /// @brief Constructor.
+    ResourceType() :
+        BaseEnumerator()
+    {
+        // Nothing to do.
+    }
 
-    /// @brief Constructor from uint.
-    ResourceType(const unsigned int & _resourceType);
+    /// @brief Constructor from unsigned int.
+    ResourceType(const unsigned int & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Constructor from enum.
-    ResourceType(const Enum & _resourceType);
-
-    /// @brief Constructor from string.
-    ResourceType(const std::string & _resourceType);
-
-    /// @brief Check is the given number is a valid resource.
-    static bool isValid(const unsigned int & _resourceType);
-
-    /// @brief Check is the given string is a valid resource.
-    static bool isValid(const std::string & _resourceType);
+    ResourceType(const Enum & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Returns the resource as string.
-    std::string toString() const;
-
-    /// @brief Returns the resource as number.
-    unsigned int toUInt() const;
-
-    /// @brief Equality operator.
-    bool operator==(const ResourceType & rhs) const;
-
-    /// @brief Equality operator.
-    bool operator==(const ResourceType::Enum & rhs) const;
-
-    /// @brief Inequality operator.
-    bool operator!=(const ResourceType & rhs) const;
-
-    /// @brief Inequality operator.
-    bool operator!=(const ResourceType::Enum & rhs) const;
-
-    /// @brief Lesser operator.
-    bool operator<(const ResourceType & rhs) const;
-
-    /// @brief Lesser operator.
-    bool operator<(const ResourceType::Enum & rhs) const;
-
-private:
-    /// Internal value.
-    Enum resourceType;
+    std::string toString() const override;
 };

@@ -16,9 +16,11 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+#include "logger.hpp"
+#include "utils.hpp"
+
 #include <thread>
 #include <mutex>
-#include "logger.hpp"
 
 Logger::Logger()
 {
@@ -87,8 +89,7 @@ void Logger::log(const LogLevel & level, const std::string & msg)
 {
     // Define a mutex for the log function.
     static std::mutex logMutex;
-    // Lock the mutex.
-    logMutex.lock();
+    std::lock_guard<std::mutex> lock(logMutex);
     if (Logger::getStream().is_open())
     {
         // Write the log message inside the file.
@@ -103,8 +104,6 @@ void Logger::log(const LogLevel & level, const std::string & msg)
         << "[" << Logger::levelToString(level) << "]"
         << "[" << Logger::getDateTime() << "] "
         << msg << "\n";
-    // Unlock the mutex.
-    logMutex.unlock();
 }
 
 std::fstream & Logger::getStream()

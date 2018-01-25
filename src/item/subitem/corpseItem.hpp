@@ -28,6 +28,10 @@ class CorpseItem :
     public Item
 {
 public:
+    /// Store the remaining body parts not yet processed.
+    std::vector<std::shared_ptr<BodyPart>> remainingBodyParts;
+
+    /// @brief Constructor.
     CorpseItem();
 
     virtual ~CorpseItem();
@@ -41,4 +45,10 @@ public:
     void getSheet(Table & sheet) const override;
 
     bool isAContainer() const override;
+
+    /// @brief Provides the remaining body parts.
+    std::shared_ptr<BodyPart> getAvailableBodyPart();
+
+    /// @brief Removes the given body part from the pool.
+    bool removeBodyPart(const std::shared_ptr<BodyPart> & bodyPart);
 };

@@ -22,10 +22,11 @@
 
 #pragma once
 
-#include <string>
+#include "baseEnumerator.hpp"
 
 /// The postures of a character.
-class CharacterPosture
+class CharacterPosture :
+    public BaseEnumerator
 {
 public:
     /// List of possible character's posture.
@@ -34,37 +35,40 @@ public:
         None,   ///< The character has no posture.
         Stand,  ///< The character it's standing.
         Crouch, ///< The character it's crouched.
-        Sit,    ///< The character it's sitting.
         Prone,  ///< The character it's prone.
+        Sit,    ///< The character it's sitting.
         Rest,   ///< The character it's lying down.
+        Sleep,  ///< The character is sleeping.
     };
 
-    /// @brief Constructor from uint.
-    CharacterPosture();
+    /// @brief Constructor.
+    CharacterPosture() :
+        BaseEnumerator()
+    {
+        // Nothing to do.
+    }
 
-    /// @brief Constructor from number.
-    CharacterPosture(const unsigned int & _characterPosture);
+    /// @brief Constructor from unsigned int.
+    CharacterPosture(const unsigned int & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Constructor from enum.
-    CharacterPosture(const Enum & _characterPosture);
-
-    /// @brief Check is the given number is a valid character posture.
-    static bool isValid(const unsigned int & _characterPosture);
+    CharacterPosture(const Enum & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Returns the character posture as string.
-    std::string toString() const;
+    std::string toString() const override;
 
-    /// @brief Returns the character posture as number.
-    unsigned int toUInt() const;
+    /// @brief Returns the action describing the posture.
+    std::string getAction() const;
 
-    /// @brief EcharacterPosture operator w.r.t. a character posture enum.
-    bool operator==(const CharacterPosture::Enum & rhs) const;
+    uint32_t getSpeed() const;
 
-    /// @brief InecharacterPosture operator w.r.t. a character posture enum.
-    bool operator!=(const CharacterPosture::Enum & rhs) const;
-
-private:
-    /// Internal character posture value.
-    Enum characterPosture;
+    uint32_t getRegainModifier() const;
 };
-

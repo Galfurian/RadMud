@@ -30,7 +30,6 @@ EventMessage = function(self, character, message)
     -- Put event code here.
     if (MessageContains(message, "hi"))
     then
-        Mud.sleep(1);
         self:doCommand("say " .. character.name .. " hi to you!");
     end
 end

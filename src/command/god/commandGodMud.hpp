@@ -1,4 +1,4 @@
-/// @file   commandGodsMud.hpp
+/// @file   commandGodMud.hpp
 /// @author Enrico Fraccaroli
 /// @date   Jan 02 2017
 /// @copyright
@@ -23,6 +23,11 @@
 
 #include "commandGod.hpp"
 
+/// @defgroup ComInterfaces Commands List Interface.
+/// @brief All the functions necessary to handle the commands that a player
+///         can execute.
+/// @{
+
 /// Shutdown the Mud.
 bool DoShutdown(Character * character, ArgumentHandler & args);
 
@@ -43,3 +48,17 @@ bool DoRaceList(Character * character, ArgumentHandler & args);
 
 /// List all the skills.
 bool DoSkillList(Character * character, ArgumentHandler & args);
+
+/// Generate a new map.
+bool DoGenerateMap(Character * character, ArgumentHandler & args);
+
+/// Shows a generated map.
+bool DoShowGenerateMap(Character * character, ArgumentHandler & args);
+
+/// Deletes a generated map.
+bool DoDeleteGenerateMap(Character * character, ArgumentHandler & args);
+
+/// Builds a generated map.
+bool DoBuildGenerateMap(Character * character, ArgumentHandler & args);
+
+///@}

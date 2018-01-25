@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "itemModel.hpp"
 #include "resourceType.hpp"
+#include "itemModel.hpp"
 
 /// @brief Model of resources.
 class ResourceModel :

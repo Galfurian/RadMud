@@ -39,13 +39,15 @@ public:
     unsigned int balance;
     /// The mobile which is managing the shop.
     Mobile * shopKeeper;
+    /// The opening hour.
+    unsigned int openingHour;
+    /// The closing hour.
+    unsigned int closingHour;
 
     /// @brief Constructor.
     ShopItem();
 
     virtual ~ShopItem();
-
-    bool check(bool complete = false) override;
 
     bool updateOnDB() override;
 
@@ -55,11 +57,11 @@ public:
 
     bool canDeconstruct(std::string & error) const override;
 
+    std::string lookContent() override;
+
     bool isAContainer() const override;
 
     double getTotalSpace() const override;
-
-    std::string lookContent() override;
 
     /// @brief Allows to set the new shop keeper.
     /// @param _shopKeeper The new shop keeper.

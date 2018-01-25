@@ -50,7 +50,8 @@ using ActionType = enum class ActionType_t
     Reload,     ///< The character is reloading a firearm.
     Load,       ///< The character is loading something.
     Unload,     ///< The character is unloading something.
-    Aim         ///< The character is aiming a target.
+    Aim,        ///< The character is aiming a target.
+    Dismember   ///< The character is dismembering a corpse.
 };
 
 /// The list of possible actions.
@@ -68,15 +69,25 @@ class GeneralAction :
 protected:
     /// Actor of the action.
     Character * actor;
+    /// Determines if this is the last action of the action queue.
+    bool lastAction;
     /// The time point in the future needed by the action to complete.
     std::chrono::time_point<std::chrono::system_clock> actionCooldown;
 
 public:
     /// @brief Constructor.
-    GeneralAction(Character * _actor);
+    explicit GeneralAction(Character * _actor,
+                           const bool & _lastAction = false);
 
     /// @brief Destructor.
     virtual ~GeneralAction();
+
+    /// @brief Determines if this is the last action of the action queue.
+    /// @return
+    inline bool isLastAction() const
+    {
+        return lastAction;
+    }
 
     /// @brief Check if the cooldown of the action is elapsed.
     /// @return <b>True</b> if the time has passed,<br>
@@ -108,13 +119,25 @@ public:
     /// @return the status after performing the action.
     virtual ActionStatus perform();
 
+    /// @brief Provides the remaining time before the action can be triggered.
+    virtual unsigned int getCooldown();
+
     /// @brief Allows to set the remaining time before the action can be triggered.
     /// @param _actionCooldown The cooldown that has to be set.
-    void resetCooldown(const unsigned int & _actionCooldown);
-
-    /// @brief Provides the remaining time before the action can be triggered.
-    unsigned int getCooldown();
+    void resetCooldown(const unsigned int & _actionCooldown = 0);
 
     /// @brief Returns the action <b>statically</b> casted to CombatAction.
     std::shared_ptr<CombatAction> toCombatAction();
 };
+
+inline bool operator==(const std::shared_ptr<GeneralAction> & _generalAction,
+                       const ActionType & _actionType)
+{
+    return (_generalAction->getType() == _actionType);
+}
+
+inline bool operator!=(const std::shared_ptr<GeneralAction> & _generalAction,
+                       const ActionType & _actionType)
+{
+    return (_generalAction->getType() != _actionType);
+}

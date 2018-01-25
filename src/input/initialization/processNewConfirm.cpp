@@ -40,11 +40,19 @@ bool ProcessNewConfirm::process(Character * character, ArgumentHandler & args)
     }
     else if (ToLower(input) == "confirm")
     {
-        // Set the last variables.
+        // Initialize the player.
+        player->initialize();
+        // Set the base variables for the player.
         player->level = 0;
         player->experience = 0;
         player->flags = 0;
         player->rent_room = 1000;
+        for (const auto & skillData : player->race->skills)
+        {
+            player->skillManager.addSkill(skillData->skill,
+                                          skillData->skillLevel);
+        }
+        // Update the player on the database.
         SQLiteDbms::instance().beginTransaction();
         if (player->updateOnDB())
         {
@@ -55,6 +63,10 @@ bool ProcessNewConfirm::process(Character * character, ArgumentHandler & args)
             // Set the connection state to playing.
             player->connectionState = ConnectionState::Playing;
             return true;
+        }
+        else
+        {
+            SQLiteDbms::instance().rollbackTransection();
         }
         player->closeConnection();
         SQLiteDbms::instance().endTransaction();

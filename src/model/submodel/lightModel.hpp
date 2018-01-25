@@ -25,7 +25,22 @@
 #include "resourceType.hpp"
 #include "itemModel.hpp"
 
-/// @brief Model of a light.
+/// Flags of a light source.
+using LightModelFlags = enum class LightModelFlags_t :
+    unsigned int
+{
+    None,             ///< [0]   No flag.
+    AlwaysActive = 1, ///< [1]   The light source is always active.
+    CanUseToCook = 2, ///< [2]   The light source can be used to cook.
+    NeedToKindle = 4  ///< [4]
+    ///< [8]
+    ///< [16]
+    ///< [32]
+    ///< [64]
+    ///< [128]
+};
+
+/// @brief Model of a light source.
 class LightModel :
     public ItemModel
 {
@@ -34,10 +49,10 @@ public:
     ResourceType fuelType;
     /// The maximum radius of the light.
     int radius;
-    /// If the light is always active.
-    bool alwaysActive;
     /// Maximum contained weight.
     double maxWeight;
+    /// The flags of the light source.
+    unsigned int lightSourceFlags;
 
     LightModel();
 

@@ -35,7 +35,7 @@ class Room;
 /// Used to determine the type of Zone.
 using AreaType = enum class AreaType_t
 {
-    NoType,     ///< No type.
+    Normal,     ///< The area is quite normal.
     Cavern,     ///< Identifies a cavern.
     Underdark   ///< Identifies a region of the underdark.
 };
@@ -114,15 +114,15 @@ public:
     /// @param exceptions  The exceptions.
     /// @param coordinates The desired coordinates.
     /// @return The list of characters at the given coordinates.
-    CharacterContainer getCharactersAt(const CharacterContainer & exceptions,
-                                       const Coordinates & coordinates);
+    CharacterVector getCharactersAt(const CharacterVector & exceptions,
+                                    const Coordinates & coordinates);
 
     /// @brief Provides all the items inside the room at the given coordinates.
     /// @param exceptions  The exceptions.
     /// @param coordinates The desired coordinates.
     /// @return The list of items at the given coordinates.
-    ItemContainer getItemsAt(const ItemContainer & exceptions,
-                             const Coordinates & coordinates);
+    ItemVector getItemsAt(const ItemVector & exceptions,
+                          const Coordinates & coordinates);
 
     /// @brief Add the passed room to its coordinates inside the area.
     /// @param room The room that has to be added.
@@ -167,18 +167,18 @@ public:
     /// @param origin The coordinate of the central room.
     /// @param radius     The radius of visibility.
     /// @return The list containing the targets.
-    CharacterContainer getCharactersInSight(CharacterContainer & exceptions,
-                                            Coordinates & origin,
-                                            const int & radius);
+    CharacterVector getCharactersInSight(CharacterVector & exceptions,
+                                         Coordinates & origin,
+                                         const int & radius);
 
     /// @brief Provides a list of items which are in sight.
     /// @param exceptions A list of excections.
     /// @param origin The coordinate of the central room.
     /// @param radius     The radius of visibility.
     /// @return The list containing the items.
-    ItemContainer getItemsInSight(ItemContainer & exceptions,
-                                  Coordinates & origin,
-                                  const int & radius);
+    ItemVector getItemsInSight(ItemVector & exceptions,
+                               Coordinates & origin,
+                               const int & radius);
 
     /// @brief A Field of View algorithm which provides all the rooms
     ///         which are inside the radius of the field of view.
@@ -196,8 +196,4 @@ public:
     bool los(const Coordinates & source,
              const Coordinates & target,
              const int & radius);
-
-    /// @brief Function used to register inside the lua environment the class.
-    /// @param L The lua environment.
-    static void luaRegister(lua_State * L);
 };

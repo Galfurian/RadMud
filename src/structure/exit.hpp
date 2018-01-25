@@ -22,11 +22,6 @@
 
 #pragma once
 
-extern "C"
-{
-#include "lua.h"
-}
-
 #include "direction.hpp"
 
 #include <string>
@@ -78,10 +73,6 @@ public:
     ///         <b>False</b> otherwise.
     bool check() const;
 
-    /// @brief Get the opposite direction.
-    /// @return The opposite direction.
-    Direction getOppositeDirection() const;
-
     /// @brief Get the exit on the opposite side.
     /// @return The opposite exit.
     std::shared_ptr<Exit> getOppositeExit() const;
@@ -97,10 +88,6 @@ public:
     ///                      same direction,<br>
     ///         <b>False</b> otherwise.
     bool operator==(const Exit & right) const;
-
-    /// @brief Function used to register inside the lua environment the class.
-    /// @param L The lua environment.
-    static void luaRegister(lua_State * L);
 };
 
 /// @addtogroup FlagsToList

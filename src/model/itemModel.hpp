@@ -22,18 +22,18 @@
 
 #pragma once
 
+#include "itemQuality.hpp"
+#include "modelType.hpp"
+#include "bodyPart.hpp"
+#include "material.hpp"
+#include "table.hpp"
+#include "utils.hpp"
+
 #include <string>
 #include <vector>
 #include <set>
 #include <map>
-
-#include "equipmentSlot.hpp"
-#include "itemQuality.hpp"
-#include "lua_script.hpp"
-#include "modelType.hpp"
-#include "material.hpp"
-#include "table.hpp"
-#include "utils.hpp"
+#include <memory>
 
 /// Used to determine the flag of the model.
 using ModelFlag = enum class ModelFlag_t
@@ -48,6 +48,8 @@ using ModelFlag = enum class ModelFlag_t
     CanSeeThrough = 64, ///< [64]  Can see through it, even if closed.
     CanBeStacked = 128  ///< [128] The items with this flag can be stacked.
 };
+
+class Race;
 
 class Item;
 
@@ -100,7 +102,8 @@ class RangedWeaponModel;
 class MagazineModel;
 
 /// @brief Holds details about a model of item.
-class ItemModel
+class ItemModel :
+    public std::enable_shared_from_this<ItemModel>
 {
 public:
     /// Unique vnum.
@@ -116,7 +119,7 @@ public:
     /// The model description.
     std::string description;
     /// Store here the position where the model can be equipped.
-    EquipmentSlot slot;
+    std::vector<std::shared_ptr<BodyPart>> bodyParts;
     /// The model flags.
     unsigned int modelFlags;
     /// The model base weight.
@@ -217,14 +220,10 @@ public:
         Material * itemMaterial = nullptr,
         const ItemQuality & itemQuality = ItemQuality::Normal);
 
-    /// @brief Check if the item must be wielded.
-    /// @return <b>True</b> if the item must be wielded,<br>
-    ///         <b>False</b> Otherwise.
-    bool mustBeWielded();
-
-    /// @brief Function used to register inside the lua environment the class.
-    /// @param L The lua environment.
-    static void luaRegister(lua_State * L);
+    /// @brief Gets the body parts in common between the model and the race.
+    /// @param race The race with which the check must be performed.
+    /// @return The body parts in common between the model and the race.
+    std::vector<std::shared_ptr<BodyPart>> getBodyParts(Race * race);
 
     /// @brief Returns the tile of the model.
     /// @param offset The ofset of the tile.
@@ -233,73 +232,73 @@ public:
 
 public:
     /// @brief Returns the model <b>statically</b> casted to Armor.
-    ArmorModel * toArmor();
+    std::shared_ptr<ArmorModel> toArmor();
 
     /// @brief Returns the model <b>statically</b> casted to Book.
-    BookModel * toBook();
+    std::shared_ptr<BookModel> toBook();
 
     /// @brief Returns the model <b>statically</b> casted to Container.
-    ContainerModel * toContainer();
+    std::shared_ptr<ContainerModel> toContainer();
 
     /// @brief Returns the model <b>statically</b> casted to Corpse.
-    CorpseModel * toCorpse();
+    std::shared_ptr<CorpseModel> toCorpse();
 
     /// @brief Returns the model <b>statically</b> casted to Currency.
-    CurrencyModel * toCurrency();
+    std::shared_ptr<CurrencyModel> toCurrency();
 
     /// @brief Returns the model <b>statically</b> casted to Food.
-    FoodModel * toFood();
+    std::shared_ptr<FoodModel> toFood();
 
     /// @brief Returns the model <b>statically</b> casted to Furniture.
-    FurnitureModel * toFurniture();
+    std::shared_ptr<FurnitureModel> toFurniture();
 
     /// @brief Returns the model <b>statically</b> casted to Key.
-    KeyModel * toKey();
+    std::shared_ptr<KeyModel> toKey();
 
     /// @brief Returns the model <b>statically</b> casted to Light.
-    LightModel * toLight();
+    std::shared_ptr<LightModel> toLight();
 
     /// @brief Returns the model <b>statically</b> casted to Liquid Container.
-    LiquidContainerModel * toLiquidContainer();
+    std::shared_ptr<LiquidContainerModel> toLiquidContainer();
 
     /// @brief Returns the model <b>statically</b> casted to Mechanism.
-    MechanismModel * toMechanism();
+    std::shared_ptr<MechanismModel> toMechanism();
 
     /// @brief Returns the model <b>statically</b> casted to Node.
-    NodeModel * toNode();
+    std::shared_ptr<NodeModel> toNode();
 
     /// @brief Returns the model <b>statically</b> casted to Projectile.
-    ProjectileModel * toProjectile();
+    std::shared_ptr<ProjectileModel> toProjectile();
 
     /// @brief Returns the model <b>statically</b> casted to Resource.
-    ResourceModel * toResource();
+    std::shared_ptr<ResourceModel> toResource();
 
     /// @brief Returns the model <b>statically</b> casted to Rope.
-    RopeModel * toRope();
+    std::shared_ptr<RopeModel> toRope();
 
     /// @brief Returns the model <b>statically</b> casted to Seed.
-    SeedModel * toSeed();
+    std::shared_ptr<SeedModel> toSeed();
 
     /// @brief Returns the model <b>statically</b> casted to Shield.
-    ShieldModel * toShield();
+    std::shared_ptr<ShieldModel> toShield();
 
     /// @brief Returns the model <b>statically</b> casted to shop.
-    ShopModel * toShop();
+    std::shared_ptr<ShopModel> toShop();
 
     /// @brief Returns the model <b>statically</b> casted to Tool.
-    ToolModel * toTool();
+    std::shared_ptr<ToolModel> toTool();
 
     /// @brief Returns the model <b>statically</b> casted to Vehicle.
-    VehicleModel * toVehicle();
+    std::shared_ptr<VehicleModel> toVehicle();
 
     /// @brief Returns the model <b>statically</b> casted to Melee Weapon.
-    MeleeWeaponModel * toMeleeWeapon();
+    std::shared_ptr<MeleeWeaponModel> toMeleeWeapon();
 
     /// @brief Returns the model <b>statically</b> casted to Ranged Weapon.
-    RangedWeaponModel * toRangedWeapon();
+    std::shared_ptr<RangedWeaponModel> toRangedWeapon();
 
     /// @brief Returns the model <b>statically</b> casted to Magazine.
-    MagazineModel * toMagazine();
+    std::shared_ptr<MagazineModel> toMagazine();
 };
 
 /// @defgroup FlagsToList Flags to List of Strings.

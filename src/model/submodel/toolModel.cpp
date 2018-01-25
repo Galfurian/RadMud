@@ -90,6 +90,6 @@ std::string GetToolTypeName(ToolType type)
     if (type == ToolType::BlacksmithHammer) return "Blacksmith Hammer";
     if (type == ToolType::Bellows) return "Bellows";
     if (type == ToolType::Crucible) return "Crucible";
-    if (type == ToolType::Tinderbox) return "Tinderbox";
+    if (type == ToolType::Firelighter) return "Firelighter";
     return "No Tool Type";
 }

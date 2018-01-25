@@ -26,25 +26,32 @@
 #pragma once
 
 #include "ability.hpp"
-#include "characterPosture.hpp"
 #include "exit.hpp"
 #include "race.hpp"
 #include "item.hpp"
 #include "faction.hpp"
-#include "effectList.hpp"
+#include "bodyPart.hpp"
+#include "stringBuilder.hpp"
+#include "effectManager.hpp"
 #include "processInput.hpp"
 #include "combatAction.hpp"
 #include "argumentHandler.hpp"
-#include "characterContainer.hpp"
-#include "LuaBridge.hpp"
+#include "meleeWeaponItem.hpp"
+#include "rangedWeaponItem.hpp"
+#include "characterPosture.hpp"
+#include "characterVector.hpp"
+#include "skillManager.hpp"
 
 #include <deque>
+#include <mutex>
 
 class Room;
 
 class Player;
 
 class Mobile;
+
+struct lua_State;
 
 /// The list of possible actions.
 using GenderType = enum class GenderType_t
@@ -101,21 +108,26 @@ public:
     /// The current room the character is in.
     Room * room;
     /// Character's inventory.
-    ItemContainer inventory;
+    ItemVector inventory;
     /// Character's equipment.
-    ItemContainer equipment;
+    ItemVector equipment;
     /// Character's posture.
     CharacterPosture posture;
-    /// Active effects on player.
-    EffectList effects;
     /// The lua_State associated with this character.
     lua_State * L;
-    /// List of opponents.
-    CombatHandler combatHandler;
     /// Character current action.
-    std::deque<std::shared_ptr<GeneralAction> > actionQueue;
+    std::deque<std::shared_ptr<GeneralAction>> actionQueue;
+    /// Mutex for the action queue.
+    mutable std::mutex actionQueueMutex;
     /// The input handler.
     std::shared_ptr<ProcessInput> inputProcessor;
+
+    /// Active effects on player.
+    EffectManager effectManager;
+    /// The player's list of skills.
+    SkillManager skillManager;
+    /// List of opponents.
+    CombatHandler combatHandler;
 
     /// @brief Constructor.
     Character();
@@ -148,6 +160,9 @@ public:
     ///         character.
     /// @param sheet The table that has to be filled.
     virtual void getSheet(Table & sheet) const;
+
+    /// @brief Initializes the variables of the chracter.
+    virtual void initialize();
 
     /// @brief Return the name of the character with all lowercase characters.
     /// @return The name of the character.
@@ -301,26 +316,23 @@ public:
 
     /// @brief Allows to set an action.
     /// @param _action The action that has to be set.
-    void setAction(std::shared_ptr<GeneralAction> _action);
-
-    /// @brief Provides a pointer to the action object associated to this character.
-    /// @return A pointer to action.
-    std::shared_ptr<GeneralAction> getAction() const;
+    void pushAction(const std::shared_ptr<GeneralAction> & _action);
 
     /// @brief Provides a pointer to the action at the front position and
     ///         then remove it from the queue.
     void popAction();
 
-    /// @brief Move the character to another room.
-    /// @param destination Destination room.
-    /// @param msgDepart   Tell people in original room.
-    /// @param msgArrive   Tell people in new room.
-    /// @param msgChar     What to tell the character.
-    void moveTo(
-        Room * destination,
-        const std::string & msgDepart,
-        const std::string & msgArrive,
-        const std::string & msgChar = "");
+    /// @brief Provides a pointer to the current action.
+    std::shared_ptr<GeneralAction> & getAction();
+
+    /// @brief Provides a pointer to the current action.
+    std::shared_ptr<GeneralAction> const & getAction() const;
+
+    /// @brief Performs any pending action.
+    void performAction();
+
+    /// @brief Allows to reset the entire action queue.
+    void resetActionQueue();
 
     /// @brief Search for the item in the inventory.
     /// @param search_parameter The item to search.
@@ -334,64 +346,16 @@ public:
     /// @return The item, if it's in the character's equipment.
     Item * findEquipmentItem(std::string search_parameter, int & number);
 
-    /// @brief Search the item at given position and return it.
-    /// @param slot The slot where the method need to search the item.
-    /// @return The item, if it's in the character's equipment.
-    Item * findEquipmentSlotItem(EquipmentSlot slot) const;
-
-    /// @brief Search the tool in the given equipment slot.
-    /// @param slot The slot where the tool can be found.
-    /// @param type The type of the tool we are looking for.
-    /// @return The tool, if it's in the given slot.
-    Item * findEquipmentSlotTool(EquipmentSlot slot, ToolType type);
-
     /// @brief Search an item nearby, (eq, inv, room).
     /// @param itemName The name of the item.
     /// @param number   Position of the item we want to look for.
     /// @return The item, if it's found.
     Item * findNearbyItem(const std::string & itemName, int & number);
 
-    /// @brief Search the given type of tool in the proximity of the character.
-    /// @param toolType        The type of tool that has to be searched.
-    /// @param exceptions      Items which cannot be selected.
-    /// @param searchRoom      Search inside the room.
-    /// @param searchInventory Search inside the character's inventory.
-    /// @param searchEquipment Search inside the character's equipment.
-    /// @return The searched tool.
-    Item * findNearbyTool(
-        const ToolType & toolType,
-        const std::vector<Item *> & exceptions,
-        bool searchRoom,
-        bool searchInventory,
-        bool searchEquipment);
-
-    /// @brief Search the list of tools nearby the character.
-    /// @param tools           The list of tools and their quantities.
-    /// @param foundOnes       The list of found tools.
-    /// @param searchRoom      Search inside the room.
-    /// @param searchInventory Search inside the character's inventory.
-    /// @param searchEquipment Search inside the character's equipment.
-    /// @return <b>True</b> if the operation goes well,<br>
-    ///         <b>False</b> otherwise.
-    bool findNearbyTools(
-        std::set<ToolType> tools,
-        std::vector<Item *> & foundOnes,
-        bool searchRoom,
-        bool searchInventory,
-        bool searchEquipment);
-
-    /// @brief Search the list of ingredients nearby the character.
-    /// @param ingredients The list of ingredients and their quantities.
-    /// @param foundOnes   The list of found ingredients.
-    /// @return <b>True</b> if the operation goes well,<br>
-    ///         <b>False</b> otherwise.
-    bool findNearbyResouces(
-        std::map<ResourceType, unsigned int> ingredients,
-        std::vector<std::pair<Item *, unsigned int>> & foundOnes);
-
-    /// @brief Search the coins on the character.
-    /// @return List of found coins.
-    std::vector<Item *> findCoins();
+    /// @brief Search the item at given position and return it.
+    /// @param bodyPart The body part where the method need to search the item.
+    /// @return The item, if it's in the character's equipment.
+    Item * findItemAtBodyPart(const std::shared_ptr<BodyPart> & bodyPart) const;
 
     /// @brief Add the passed item to character's inventory.
     /// @param item The item to add to inventory.
@@ -431,19 +395,16 @@ public:
     /// @brief Check if the character can wield a given item.
     /// @param item  The item to wield.
     /// @param error The error message.
-    /// @param where Where the item has been wielded.
-    /// @return <b>True</b> if the operation goes well,<br>
-    ///         <b>False</b> otherwise.
-    bool canWield(Item * item,
-                  std::string & error,
-                  EquipmentSlot & where) const;
+    /// @return Where the item can be wielded.
+    std::vector<std::shared_ptr<BodyPart>> canWield(Item * item,
+                                                    std::string & error) const;
 
     /// @brief Check if the character can wear a given item.
     /// @param item  The item to wear.
     /// @param error The error message.
-    /// @return <b>True</b> if the operation goes well,<br>
-    ///         <b>False</b> otherwise.
-    bool canWear(Item * item, std::string & error) const;
+    /// @return Where the item can be worn.
+    std::vector<std::shared_ptr<BodyPart>> canWear(Item * item,
+                                                   std::string & error) const;
 
     /// @brief Checks if inside the inventory there is a light source.
     /// @return <b>True</b> if there is a light source,<br>
@@ -499,12 +460,12 @@ public:
     /// @return The armor class.
     unsigned int getArmorClass() const;
 
-    /// @brief Function which checks if the character can attack with a weapon equipped
-    ///         in the given slot.
-    /// @param slot The slot in which the weapon should be.
+    /// @brief Function which checks if the character can attack
+    ///         with a weapon equipped at the given body part.
+    /// @param bodyPart The body part at which the weapon could be.
     /// @return <b>True</b> if the item is there,<br>
     ///         <b>False</b> otherwise.
-    bool canAttackWith(const EquipmentSlot & slot) const;
+    bool canAttackWith(const std::shared_ptr<BodyPart> & bodyPart) const;
 
     /// @brief Checks if the given target is both In Sight and within the Range of Sight.
     /// @param target The target character.
@@ -512,14 +473,6 @@ public:
     /// @return <b>True</b> if the target is in sight,<br>
     ///         <b>False</b> otherwise.
     bool isAtRange(Character * target, const int & range);
-
-    /// @brief Provides the list of active melee weapons (Left and Right hands).
-    /// @return Vector of melee weapons.
-    std::vector<MeleeWeaponItem *> getActiveMeleeWeapons();
-
-    /// @brief Provides the list of active ranged weapons (Left and Right hands).
-    /// @return Vector of ranged weapons.
-    std::vector<RangedWeaponItem *> getActiveRangedWeapons();
 
     /// @brief Handle what happend when this character die.
     virtual void kill();
@@ -542,37 +495,6 @@ public:
     /// @return The mobile version of the character.
     Mobile * toMobile();
 
-    /// @brief Starts a lua environment and loads the given script.
-    /// @param scriptFilename The name of the script that has to be loaded.
-    void loadScript(const std::string & scriptFilename);
-
-    /// @brief Returns the list of equipped items.
-    luabridge::LuaRef luaGetEquipmentItems();
-
-    /// @brief Returns the list of items inside the inventory.
-    luabridge::LuaRef luaGetInventoryItems();
-
-    /// @brief Returns the list of rooms in sight.
-    luabridge::LuaRef luaGetRoomsInSight();
-
-    /// @brief Returns the list of characters in sight.
-    luabridge::LuaRef luaGetCharactersInSight();
-
-    /// @brief Returns the list of items in sight.
-    luabridge::LuaRef luaGetItemsInSight();
-
-    /// @brief Returns the list of items in sight.
-    luabridge::LuaRef luaGetPathTo(Room * destination);
-
-    /// @brief Allow from lua to load an item.
-    /// @param vnumModel    The vnum of the model.
-    /// @param vnumMaterial The vnum of the material.
-    /// @param qualityValue The initial quality of the item.
-    /// @return The newly created item.
-    Item * luaLoadItem(int vnumModel,
-                       int vnumMaterial,
-                       unsigned int qualityValue);
-
     /// @brief Specific function used by lua to add an equipment item.
     void luaAddEquipment(Item * item);
 
@@ -584,10 +506,6 @@ public:
 
     /// @brief Specific function used by lua to remove an inventory item.
     bool luaRemInventory(Item * item);
-
-    /// @brief Function used to register inside the lua environment the class.
-    /// @param L The lua environment.
-    static void luaRegister(lua_State * L);
 
     /// @brief Operator used to order the character based on their name.
     bool operator<(const class Character & source) const;
@@ -601,43 +519,11 @@ public:
 
     /// @brief Sends a message to the character.
     /// @param msg   The message to send
-    /// @param first The first unpacked argument.
     /// @param args  Packed arguments.
     template<typename ... Args>
-    void sendMsg(const std::string & msg,
-                 const std::string & first,
-                 const Args & ... args)
+    void sendMsg(const std::string & msg, const Args & ... args)
     {
-        std::string::size_type pos = msg.find("%s");
-        if (pos == std::string::npos)
-        {
-            sendMsg(msg);
-        }
-        else
-        {
-            std::string working(msg);
-            working.replace(pos, 2, first);
-            sendMsg(working, args ...);
-        }
-    }
-
-    /// @brief Sends a message to the character.
-    /// This one in particular handles unsigned integer.
-    template<typename ... Args>
-    void sendMsg(const std::string & msg,
-                 const unsigned int & first,
-                 const Args & ... args)
-    {
-        this->sendMsg(msg, ToString(first), args ...);
-    }
-
-    /// @brief Sends a message to the character. This one in particular handles unsigned integer.
-    template<typename ... Args>
-    void sendMsg(const std::string & msg,
-                 const int & first,
-                 const Args & ... args)
-    {
-        this->sendMsg(msg, ToString(first), args ...);
+        this->sendMsg(StringBuilder::build(msg, args ...));
     }
 
 protected:

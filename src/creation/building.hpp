@@ -22,13 +22,19 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
+#include <vector>
 #include <map>
 
-#include "toolModel.hpp"
-#include "resourceModel.hpp"
+// Forward declarations.
+class ToolType;
 
 class ItemModel;
+
+class ResourceType;
+
+class Knowledge;
 
 /// @brief Holds details about a building.
 class Building
@@ -44,15 +50,14 @@ public:
     unsigned int time;
     /// A flag which indicates if the maker can be assisted by someone.
     bool assisted;
-    /// The list of needed type of tools.
-    std::set<ToolType> tools;
     /// The model that has to be built.
-    ItemModel * buildingModel;
+    std::shared_ptr<ItemModel> buildingModel;
+    /// The list of needed type of tools.
+    std::vector<ToolType> tools;
     /// The list of needed type of ingredients and their quantity.
     std::map<ResourceType, unsigned int> ingredients;
-    /// Flag which determine if in the same room only one of this building
-    ///  can be present.
-    bool unique;
+    /// The required knowledge levels for the given building.
+    std::vector<Knowledge> requiredKnowledge;
 
     /// @brief Constructor.
     Building();
@@ -63,11 +68,6 @@ public:
     /// @brief Destructor.
     ~Building();
 
-    /// @brief Check the correctness of the building.
-    /// @return <b>True</b> if the profession has correct values,<br>
-    ///         <b>False</b> otherwise.
-    bool check();
-
     /// @brief Return the name of the building.
     /// @return The name of the building.
     std::string getName();
@@ -75,18 +75,4 @@ public:
     /// @brief Return the name with the first letter capitalized.
     /// @return The name of the building capitalized.
     std::string getNameCapital();
-
-    /// @brief Given a source string, this function parse the string
-    ///         and sets the tool.
-    /// @param source Contains the list of tools.
-    /// @return <b>True</b> if the operation succeeded,<br>
-    ///         <b>False</b> otherwise.
-    bool setTool(const std::string & source);
-
-    /// @brief Given a source string, this function parse the string
-    ///         and sets the tool.
-    /// @param source Contains the list of tools.
-    /// @return <b>True</b> if the operation succeeded,<br>
-    ///         <b>False</b> otherwise.
-    bool setIngredient(const std::string & source);
 };

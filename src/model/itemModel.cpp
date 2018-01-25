@@ -22,7 +22,6 @@
 
 #include "itemModel.hpp"
 
-#include "mud.hpp"
 #include "armorModel.hpp"
 #include "bookModel.hpp"
 #include "containerModel.hpp"
@@ -41,8 +40,12 @@
 #include "vehicleModel.hpp"
 #include "magazineModel.hpp"
 #include "meleeWeaponModel.hpp"
+#include "resourceModel.hpp"
+#include "toolModel.hpp"
+
 #include "itemFactory.hpp"
 #include "logger.hpp"
+#include "mud.hpp"
 
 ItemModel::ItemModel() :
     vnum(),
@@ -51,7 +54,7 @@ ItemModel::ItemModel() :
     shortdesc(),
     keys(),
     description(),
-    slot(),
+    bodyParts(),
     modelFlags(),
     baseWeight(),
     basePrice(),
@@ -65,10 +68,10 @@ ItemModel::ItemModel() :
 
 ItemModel::~ItemModel()
 {
-    Logger::log(LogLevel::Debug,
-                "Deleted model\t\t[%s]\t\t(%s)",
-                ToString(this->vnum),
-                this->name);
+//    Logger::log(LogLevel::Debug,
+//                "Deleted model\t\t[%s]\t\t(%s)",
+//                ToString(this->vnum),
+//                this->name);
 }
 
 ModelType ItemModel::getType() const
@@ -94,7 +97,10 @@ void ItemModel::getSheet(Table & sheet) const
     sheet.addRow({"Keys", keyGroup});
     sheet.addRow({"Description", this->description});
     sheet.addRow({"Type", this->getTypeName()});
-    sheet.addRow({"Slot", this->slot.toString()});
+    for (auto bodyPart : bodyParts)
+    {
+        sheet.addRow({"Body Part", bodyPart->name});
+    }
     sheet.addRow({"Flags", GetModelFlagString(this->modelFlags)});
     sheet.addRow({"Condition", ToString(this->condition)});
     sheet.addRow({"Material", this->material.toString()});
@@ -110,13 +116,16 @@ Item * ItemModel::createItem(
     const ItemQuality & itemQuality,
     const unsigned int & quantity)
 {
+    if (composition == nullptr)
+    {
+        Logger::log(LogLevel::Error, "Received nullptr material.");
+        return nullptr;
+    }
     if (composition->type != this->material)
     {
         Logger::log(LogLevel::Error, "Wrong type of material.");
-        // Return pointer to nothing.
         return nullptr;
     }
-
     // Instantiate the new item.
     auto newItem = ItemFactory::newItem(this->getType());
     if (newItem == nullptr)
@@ -125,23 +134,24 @@ Item * ItemModel::createItem(
         // Return pointer to nothing.
         return nullptr;
     }
-
     // First set: Vnum, Model, Maker, Composition, Quality.
     // If the item is for a mobile, set the vnum to -1.
     if (isForMobile)
     {
+        // Set a fake vnum.
         newItem->vnum = -1;
+        // Set the item a temporary.
+        SetFlag(newItem->flags, ItemFlag::Temporary);
     }
     else
     {
         newItem->vnum = Mud::instance().getMaxVnumItem() + 1;
     }
-    newItem->model = this;
+    newItem->model = this->shared_from_this();
     newItem->quantity = quantity;
     newItem->maker = maker;
     newItem->composition = composition;
     newItem->quality = itemQuality;
-
     // Then set the rest.
     {
         // Evaluate the base value.
@@ -176,8 +186,6 @@ Item * ItemModel::createItem(
         newItem->maxCondition = ((valBase + valQuality + valMaterial) / 3);
         newItem->condition = newItem->maxCondition;
     }
-    newItem->currentSlot = slot;
-
     // If the item is for a mobile, do not add the item to the MUD nor to the
     //  DB and do not check its correctness.
     if (isForMobile)
@@ -215,22 +223,16 @@ Item * ItemModel::createItem(
 
 bool ItemModel::check()
 {
-    assert(vnum > 0);
-    assert(!name.empty());
-    assert(!article.empty());
-    assert(!shortdesc.empty());
-    assert(!keys.empty());
-    assert(!description.empty());
-    if ((this->getType() == ModelType::Armor) ||
-        (this->getType() == ModelType::MeleeWeapon) ||
-        (this->getType() == ModelType::RangedWeapon))
-    {
-        assert(slot != EquipmentSlot::None);
-    }
-    assert(condition > 0);
-    assert(this->material != MaterialType::None);
-    assert(tileSet >= 0);
-    assert(tileId >= 0);
+    if (vnum <= 0) return false;
+    if (name.empty()) return false;
+    if (article.empty()) return false;
+    if (shortdesc.empty()) return false;
+    if (keys.empty()) return false;
+    if (description.empty()) return false;
+    if (condition <= 0) return false;
+    if (this->material == MaterialType::None) return false;
+    if (tileSet < 0) return false;
+    if (tileId < 0) return false;
     return true;
 }
 
@@ -286,69 +288,20 @@ std::string ItemModel::getDescription(Material * itemMaterial,
     return output;
 }
 
-bool ItemModel::mustBeWielded()
+std::vector<std::shared_ptr<BodyPart>> ItemModel::getBodyParts(Race * race)
 {
-    return ((slot == EquipmentSlot::RightHand) ||
-            (slot == EquipmentSlot::LeftHand));
-}
-
-void ItemModel::luaRegister(lua_State * L)
-{
-    luabridge::getGlobalNamespace(L)
-        .beginClass<ItemModel>("ItemModel")
-        .addData("vnum", &ItemModel::vnum)
-        .addData("condition", &ItemModel::condition)
-        .addFunction("toTool", &ItemModel::toTool)
-        .addFunction("getType", &ItemModel::getType)
-        .endClass()
-        .deriveClass<ToolModel, ItemModel>("ToolModel")
-        .addData("toolType", &ToolModel::toolType)
-        .addFunction("getTypeName", &ToolModel::getTypeName)
-        .endClass()
-        .deriveClass<ArmorModel, ItemModel>("ArmorModel")
-        .endClass()
-        .deriveClass<BookModel, ItemModel>("BookModel")
-        .endClass()
-        .deriveClass<ContainerModel, ItemModel>("ContainerModel")
-        .endClass()
-        .deriveClass<CorpseModel, ItemModel>("CorpseModel")
-        .endClass()
-        .deriveClass<CurrencyModel, ItemModel>("CurrencyModel")
-        .endClass()
-        .deriveClass<FoodModel, ItemModel>("FoodModel")
-        .endClass()
-        .deriveClass<FurnitureModel, ItemModel>("FurnitureModel")
-        .endClass()
-        .deriveClass<KeyModel, ItemModel>("KeyModel")
-        .endClass()
-        .deriveClass<LightModel, ItemModel>("LightModel")
-        .endClass()
-        .deriveClass<LiquidContainerModel, ItemModel>("LiquidContainerModel")
-        .endClass()
-        .deriveClass<MagazineItem, ItemModel>("MagazineItem")
-        .endClass()
-        .deriveClass<MechanismModel, ItemModel>("MechanismModel")
-        .endClass()
-        .deriveClass<MeleeWeaponModel, ItemModel>("MeleeWeaponModel")
-        .endClass()
-        .deriveClass<NodeModel, ItemModel>("NodeModel")
-        .endClass()
-        .deriveClass<ProjectileModel, ItemModel>("ProjectileModel")
-        .endClass()
-        .deriveClass<RangedWeaponModel, ItemModel>("RangedWeaponModel")
-        .endClass()
-        .deriveClass<ResourceModel, ItemModel>("ResourceModel")
-        .endClass()
-        .deriveClass<RopeModel, ItemModel>("RopeModel")
-        .endClass()
-        .deriveClass<SeedModel, ItemModel>("SeedModel")
-        .endClass()
-        .deriveClass<ShieldModel, ItemModel>("ShieldModel")
-        .endClass()
-        .deriveClass<ShopModel, ItemModel>("ShopModel")
-        .endClass()
-        .deriveClass<VehicleModel, ItemModel>("VehicleModel")
-        .endClass();
+    std::vector<std::shared_ptr<BodyPart>> filteredBodyParts;
+    for (auto raceBodyPart: race->bodyParts)
+    {
+        for (auto bodyPart : bodyParts)
+        {
+            if (raceBodyPart->vnum == bodyPart->vnum)
+            {
+                filteredBodyParts.emplace_back(bodyPart);
+            }
+        }
+    }
+    return filteredBodyParts;
 }
 
 std::string ItemModel::getTile(int offset)
@@ -371,119 +324,121 @@ std::string ItemModel::getTile(int offset)
 
 }
 
-ArmorModel * ItemModel::toArmor()
+std::shared_ptr<ArmorModel> ItemModel::toArmor()
 {
-    return static_cast<ArmorModel *>(this);
+    return std::static_pointer_cast<ArmorModel>(this->shared_from_this());
 }
 
-BookModel * ItemModel::toBook()
+std::shared_ptr<BookModel> ItemModel::toBook()
 {
-    return static_cast<BookModel *>(this);
+    return std::static_pointer_cast<BookModel>(this->shared_from_this());
 }
 
-ContainerModel * ItemModel::toContainer()
+std::shared_ptr<ContainerModel> ItemModel::toContainer()
 {
-    return static_cast<ContainerModel *>(this);
+    return std::static_pointer_cast<ContainerModel>(this->shared_from_this());
 }
 
-CorpseModel * ItemModel::toCorpse()
+std::shared_ptr<CorpseModel> ItemModel::toCorpse()
 {
-    return static_cast<CorpseModel *>(this);
+    return std::static_pointer_cast<CorpseModel>(this->shared_from_this());
 }
 
-CurrencyModel * ItemModel::toCurrency()
+std::shared_ptr<CurrencyModel> ItemModel::toCurrency()
 {
-    return static_cast<CurrencyModel *>(this);
+    return std::static_pointer_cast<CurrencyModel>(this->shared_from_this());
 }
 
-FoodModel * ItemModel::toFood()
+std::shared_ptr<FoodModel> ItemModel::toFood()
 {
-    return static_cast<FoodModel *>(this);
+    return std::static_pointer_cast<FoodModel>(this->shared_from_this());
 }
 
-FurnitureModel * ItemModel::toFurniture()
+std::shared_ptr<FurnitureModel> ItemModel::toFurniture()
 {
-    return static_cast<FurnitureModel *>(this);
+    return std::static_pointer_cast<FurnitureModel>(this->shared_from_this());
 }
 
-KeyModel * ItemModel::toKey()
+std::shared_ptr<KeyModel> ItemModel::toKey()
 {
-    return static_cast<KeyModel *>(this);
+    return std::static_pointer_cast<KeyModel>(this->shared_from_this());
 }
 
-LightModel * ItemModel::toLight()
+std::shared_ptr<LightModel> ItemModel::toLight()
 {
-    return static_cast<LightModel *>(this);
+    return std::static_pointer_cast<LightModel>(this->shared_from_this());
 }
 
-LiquidContainerModel * ItemModel::toLiquidContainer()
+std::shared_ptr<LiquidContainerModel> ItemModel::toLiquidContainer()
 {
-    return static_cast<LiquidContainerModel *>(this);
+    return std::static_pointer_cast<LiquidContainerModel>(
+        this->shared_from_this());
 }
 
-MechanismModel * ItemModel::toMechanism()
+std::shared_ptr<MechanismModel> ItemModel::toMechanism()
 {
-    return static_cast<MechanismModel *>(this);
+    return std::static_pointer_cast<MechanismModel>(this->shared_from_this());
 }
 
-NodeModel * ItemModel::toNode()
+std::shared_ptr<NodeModel> ItemModel::toNode()
 {
-    return static_cast<NodeModel *>(this);
+    return std::static_pointer_cast<NodeModel>(this->shared_from_this());
 }
 
-ProjectileModel * ItemModel::toProjectile()
+std::shared_ptr<ProjectileModel> ItemModel::toProjectile()
 {
-    return static_cast<ProjectileModel *>(this);
+    return std::static_pointer_cast<ProjectileModel>(this->shared_from_this());
 }
 
-ResourceModel * ItemModel::toResource()
+std::shared_ptr<ResourceModel> ItemModel::toResource()
 {
-    return static_cast<ResourceModel *>(this);
+    return std::static_pointer_cast<ResourceModel>(this->shared_from_this());
 }
 
-RopeModel * ItemModel::toRope()
+std::shared_ptr<RopeModel> ItemModel::toRope()
 {
-    return static_cast<RopeModel *>(this);
+    return std::static_pointer_cast<RopeModel>(this->shared_from_this());
 }
 
-SeedModel * ItemModel::toSeed()
+std::shared_ptr<SeedModel> ItemModel::toSeed()
 {
-    return static_cast<SeedModel *>(this);
+    return std::static_pointer_cast<SeedModel>(this->shared_from_this());
 }
 
-ShieldModel * ItemModel::toShield()
+std::shared_ptr<ShieldModel> ItemModel::toShield()
 {
-    return static_cast<ShieldModel *>(this);
+    return std::static_pointer_cast<ShieldModel>(this->shared_from_this());
 }
 
-ShopModel * ItemModel::toShop()
+std::shared_ptr<ShopModel> ItemModel::toShop()
 {
-    return static_cast<ShopModel *>(this);
+    return std::static_pointer_cast<ShopModel>(this->shared_from_this());
 }
 
-ToolModel * ItemModel::toTool()
+std::shared_ptr<ToolModel> ItemModel::toTool()
 {
-    return static_cast<ToolModel *>(this);
+    return std::static_pointer_cast<ToolModel>(this->shared_from_this());
 }
 
-VehicleModel * ItemModel::toVehicle()
+std::shared_ptr<VehicleModel> ItemModel::toVehicle()
 {
-    return static_cast<VehicleModel *>(this);
+    return std::static_pointer_cast<VehicleModel>(this->shared_from_this());
 }
 
-MeleeWeaponModel * ItemModel::toMeleeWeapon()
+std::shared_ptr<MeleeWeaponModel> ItemModel::toMeleeWeapon()
 {
-    return static_cast<MeleeWeaponModel *>(this);
+    return std::static_pointer_cast<MeleeWeaponModel>(this->shared_from_this());
 }
 
-RangedWeaponModel * ItemModel::toRangedWeapon()
+std::shared_ptr<RangedWeaponModel> ItemModel::toRangedWeapon()
 {
-    return static_cast<RangedWeaponModel *>(this);
+    return std::static_pointer_cast<RangedWeaponModel>(
+        this->shared_from_this());
 }
 
-MagazineModel * ItemModel::toMagazine()
+std::shared_ptr<MagazineModel> ItemModel::toMagazine()
 {
-    return static_cast<MagazineModel *>(this);
+    return std::static_pointer_cast<MagazineModel>(this->shared_from_this());
 }
 
 std::string GetModelFlagString(unsigned int flags)

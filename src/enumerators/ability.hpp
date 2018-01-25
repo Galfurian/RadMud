@@ -22,10 +22,11 @@
 
 #pragma once
 
-#include <string>
+#include "baseEnumerator.hpp"
 
 /// @brief The list of character's abilities.
-class Ability
+class Ability :
+    public BaseEnumerator
 {
 public:
     /// The possible abilities.
@@ -39,51 +40,38 @@ public:
         Intelligence
     };
 
-    /// @brief Constructor from uint.
-    Ability();
+    /// @brief Constructor.
+    Ability() :
+        BaseEnumerator()
+    {
+        // Nothing to do.
+    }
 
-    /// @brief Constructor from uint.
-    Ability(const unsigned int & _ability);
+    /// @brief Constructor from unsigned int.
+    Ability(const unsigned int & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Constructor from enum.
-    Ability(const Enum & _ability);
-
-    /// @brief Constructor from string.
-    Ability(const std::string & _ability);
-
-    /// @brief Check is the given number is a valid ability.
-    static bool isValid(const unsigned int & _ability);
-
-    /// @brief Check is the given string is a valid ability.
-    static bool isValid(const std::string & _ability);
+    Ability(const Enum & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Returns the ability as string.
-    std::string toString() const;
+    std::string toString() const override;
+
+    /// @brief Returns the abbreviation of the ability name.
+    std::string getAbbreviation() const;
 
     /// @brief Returns the description of the ability.
     std::string getDescription() const;
 
-    /// @brief Returns the ability as number.
-    unsigned int toUInt() const;
-
     /// @brief Return the modifier of the given ability.
-    /// @param value The total ability value.
+    /// @param _value The total ability value.
     /// @return The ability modifier.
-    static unsigned int getModifier(const unsigned int & value);
-
-    /// @brief Equality operator w.r.t. a ability object.
-    bool operator==(const Ability & rhs) const;
-
-    /// @brief Equality operator w.r.t. a ability enum.
-    bool operator==(const Ability::Enum & rhs) const;
-
-    /// @brief Inequality operator w.r.t. a ability enum.
-    bool operator!=(const Ability::Enum & rhs) const;
-
-    /// @brief Equality operator w.r.t. a ability object.
-    bool operator<(const Ability & rhs) const;
-
-private:
-    /// Internal ability value.
-    Enum ability;
+    static unsigned int getModifier(const unsigned int & _value);
 };

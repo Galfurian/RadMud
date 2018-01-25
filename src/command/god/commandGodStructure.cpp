@@ -20,6 +20,8 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "commandGodStructure.hpp"
+#include "roomUtilityFunctions.hpp"
+#include "characterUtilities.hpp"
 #include "aStar.hpp"
 #include "mud.hpp"
 
@@ -37,38 +39,21 @@ bool DoFindPath(Character * character, ArgumentHandler & args)
         character->sendMsg("The room %s doesn't exists.\n", roomVnum);
         return false;
     }
-    AStar<Room *> aStar;
-    std::vector<Room *> path;
-    auto checkFunction = [&character](Room * from, Room * to)
+    auto RoomCheckFunction = [&](Room * from, Room * to)
     {
-        // Get the direction.
-        auto direction = Area::getDirection(from->coord, to->coord);
-        // Get the exit;
-        auto destExit = from->findExit(direction);
-        // If the direction is upstairs, check if there is a stair.
-        if (direction == Direction::Up)
-        {
-            if (!HasFlag(destExit->flags, ExitFlag::Stairs)) return false;
-        }
-        // Check if the destination is correct.
-        if (destExit->destination == nullptr) return false;
-        // Check if the destination is bocked by a door.
-        auto door = destExit->destination->findDoor();
-        if (door != nullptr)
-        {
-            if (HasFlag(door->flags, ItemFlag::Closed)) return false;
-        }
-        // Check if the destination has a floor.
-        auto destDown = destExit->destination->findExit(Direction::Down);
-        if (destDown != nullptr)
-        {
-            if (!HasFlag(destDown->flags, ExitFlag::Stairs)) return false;
-        }
-        // Check if the destination is forbidden for mobiles.
-        return !(character->isMobile() &&
-                 HasFlag(destExit->flags, ExitFlag::NoMob));
+        // Prepare the movement options.
+        MovementOptions options;
+        options.character = character;
+        // Prepare the error string.
+        std::string error;
+        return CheckConnection(options, from, to, error);
     };
-    if (!aStar.findPath(character->room, room, path, checkFunction))
+    AStar<Room *> aStar(RoomCheckFunction,
+                        RoomGetDistance,
+                        RoomAreEqual,
+                        RoomGetNeighbours);
+    std::vector<Room *> path;
+    if (!aStar.findPath(character->room, room, path))
     {
         character->sendMsg("There is no path to that room.\n\n");
         return false;
@@ -248,12 +233,12 @@ bool DoRoomEdit(Character * character, ArgumentHandler & args)
         {
             if (input == "R")
             {
-                SetFlag(&character->room->flags, RoomFlag::Rent);
+                SetFlag(character->room->flags, RoomFlag::Rent);
                 return true;
             }
             else if (input == "P")
             {
-                SetFlag(&character->room->flags, RoomFlag::Peaceful);
+                SetFlag(character->room->flags, RoomFlag::Peaceful);
                 return true;
             }
             character->sendMsg("Not a valid flag.\n");
@@ -270,12 +255,12 @@ bool DoRoomEdit(Character * character, ArgumentHandler & args)
         {
             if (input == "R")
             {
-                ClearFlag(&character->room->flags, RoomFlag::Rent);
+                ClearFlag(character->room->flags, RoomFlag::Rent);
                 return true;
             }
             else if (input == "P")
             {
-                ClearFlag(&character->room->flags, RoomFlag::Peaceful);
+                ClearFlag(character->room->flags, RoomFlag::Peaceful);
                 return true;
             }
             character->sendMsg("Not a valid flag.\n");
@@ -339,8 +324,23 @@ bool DoRoomInfo(Character * character, ArgumentHandler & args)
     return true;
 }
 
-bool DoRoomList(Character * character, ArgumentHandler & /*args*/)
+bool DoRoomList(Character * character, ArgumentHandler & args)
 {
+    Area * area = nullptr;
+    if (args.size() == 1)
+    {
+        auto areaVnum = ToNumber<int>(args[0].getOriginal());
+        area = Mud::instance().findArea(areaVnum);
+    }
+    if (area == nullptr)
+    {
+        character->sendMsg("You must provide the vnum of a valid area:\n");
+        for (auto it: Mud::instance().mudAreas)
+        {
+            character->sendMsg("[%s] %s.\n", it.first, it.second->name);
+        }
+        return false;
+    }
     Table table;
     table.addColumn("VNUM", StringAlign::Center);
     table.addColumn("AREA", StringAlign::Left);
@@ -350,6 +350,7 @@ bool DoRoomList(Character * character, ArgumentHandler & /*args*/)
     for (auto iterator : Mud::instance().mudRooms)
     {
         Room * room = iterator.second;
+        if (room->area->vnum != area->vnum) continue;
         // Prepare the row.
         TableRow row;
         row.push_back(ToString(room->vnum));
@@ -419,10 +420,5 @@ bool DoAreaList(Character * character, ArgumentHandler & /*args*/)
         table.addRow(row);
     }
     character->sendMsg(table.getTable());
-    return true;
-}
-
-bool DoContinentList(Character * /*character*/, ArgumentHandler & /*args*/)
-{
     return true;
 }

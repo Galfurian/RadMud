@@ -21,6 +21,7 @@
 
 #include "commandObjectShop.hpp"
 
+#include "characterUtilities.hpp"
 #include "currencyModel.hpp"
 #include "sqliteDbms.hpp"
 #include "shopItem.hpp"
@@ -30,6 +31,12 @@
 
 bool DoDeposit(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     // Check the number of arguments.
@@ -73,21 +80,29 @@ bool DoDeposit(Character * character, ArgumentHandler & args)
     }
     // Set the quantity.
     auto quantity = args[0].getMultiplier();
+    // Cast the building to shop.
+    auto shopBuilding = static_cast<ShopItem *>(building);
     if (item->quantity <= quantity)
     {
-        building->toShopItem()->balance += item->getPrice(true);
+        shopBuilding->balance += item->getPrice(true);
         MudUpdater::instance().addItemToDestroy(item);
     }
     else
     {
         item->quantity -= quantity;
-        building->toShopItem()->balance += item->getPrice(false) * quantity;
+        shopBuilding->balance += item->getPrice(false) * quantity;
     }
     return true;
 }
 
 bool DoBuy(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     // Check the number of arguments.
@@ -117,7 +132,7 @@ bool DoBuy(Character * character, ArgumentHandler & args)
     }
 
     // Get the shop.
-    auto shop = target->toShopItem();
+    auto shop = static_cast<ShopItem *>(target);
     std::string error;
     if (!shop->canUse(error))
     {
@@ -150,8 +165,8 @@ bool DoBuy(Character * character, ArgumentHandler & args)
     }
 
     // Check if the character has enough coins.
-    auto availableCoins = character->findCoins();
-    std::vector<Item *> changedCoins;
+    auto availableCoins = FindPosessedCoins(character);
+    ItemVector changedCoins;
     std::vector<std::pair<Item *, unsigned int>> givenCoins;
     unsigned int requiredValue = shop->evaluateBuyPrice(item) * quantity;
     unsigned int providedValue = 0;
@@ -240,6 +255,12 @@ bool DoBuy(Character * character, ArgumentHandler & args)
 
 bool DoSell(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     // Check the number of arguments.
@@ -282,15 +303,15 @@ bool DoSell(Character * character, ArgumentHandler & args)
         character->sendMsg("%s is not a shop.\n", target->getNameCapital());
         return false;
     }
-
     // Set the quantity.
     auto quantity = args[0].getMultiplier();
     if (item->quantity < quantity)
     {
         quantity = item->quantity;
     }
-
-    auto shop = target->toShopItem();
+    // Cast the item to shop.
+    auto shop = static_cast<ShopItem *>(target);
+    // Check if the shop can be used.
     std::string error;
     if (!shop->canUse(error))
     {
@@ -349,7 +370,7 @@ bool DoSell(Character * character, ArgumentHandler & args)
                                shop->getName(true));
             for (auto coin : coins)
             {
-                delete (coin);
+                MudUpdater::instance().addItemToDestroy(coin);
             }
             // Rollback the transaction.
             SQLiteDbms::instance().rollbackTransection();
@@ -374,6 +395,12 @@ bool DoSell(Character * character, ArgumentHandler & args)
 
 bool DoBalance(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Check the number of arguments.
     if (!args.empty())
     {
@@ -387,7 +414,7 @@ bool DoBalance(Character * character, ArgumentHandler & args)
         return false;
     }
     unsigned int balance = 0;
-    for (auto coin : character->findCoins())
+    for (auto coin : FindPosessedCoins(character))
     {
         balance += coin->getPrice(true);
     }

@@ -21,12 +21,13 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "liquid.hpp"
-
-#include "logger.hpp"
+#include "utils.hpp"
 
 Liquid::Liquid() :
     vnum(),
+    type(),
     name(),
+    description(),
     worth(),
     quench()
 {
@@ -43,9 +44,11 @@ Liquid::~Liquid()
 
 bool Liquid::check()
 {
-    assert(vnum > 0);
-    assert(!name.empty());
-    assert(worth > 0);
+    if (vnum <= 0) return false;
+    if (type == LiquidType::None) return false;
+    if (name.empty()) return false;
+    if (description.empty()) return false;
+    if (worth <= 0) return false;
     return true;
 }
 

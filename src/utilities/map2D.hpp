@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "coordinates.hpp"
 #include <map>
 
 /// @brief Used to create and manage a bidimensional map.
@@ -30,6 +31,8 @@ private:
     int width;
     /// Height of th map.
     int height;
+    /// Null value.
+    T nullValue;
     /// Data contained inside the map.
     std::map<std::tuple<int, int>, T> data;
 
@@ -39,29 +42,37 @@ public:
     Map2D() :
         width(),
         height(),
+        nullValue(),
         data()
     {
         // Nothing to do.
     }
 
     /// @brief Constructor.
-    /// @param _width  The width of the 2D map.
-    /// @param _height The height of the 2D map.
-    Map2D(int _width, int _height) :
+    Map2D(const int & _width, const int & _height) :
         width(_width),
         height(_height),
+        nullValue(),
         data()
     {
         // Nothing to do.
     }
 
     /// @brief Constructor.
-    /// @param _width  The width of the 2D map.
-    /// @param _height The height of the 2D map.
-    /// @param value  The initial value of the cells.
-    Map2D(int _width, int _height, T value) :
+    Map2D(int _width, int _height, T _nullValue) :
         width(_width),
         height(_height),
+        nullValue(_nullValue),
+        data()
+    {
+        // Nothing to do.
+    }
+
+    /// @brief Constructor.
+    Map2D(int _width, int _height, T _nullValue, T value) :
+        width(_width),
+        height(_height),
+        nullValue(_nullValue),
         data()
     {
         for (int y = 0; y < width; y++)
@@ -73,15 +84,52 @@ public:
         }
     }
 
+    /// @brief Move constructor.
+    Map2D(const Map2D<T> && other) :
+        width(std::move(other.width)),
+        height(std::move(other.height)),
+        nullValue(std::move(other.nullValue)),
+        data(std::move(other.data))
+    {
+        // Nothing to do.
+    }
+
+    /// @brief Disable Copy Constructor.
+    Map2D(const Map2D<T> &) = delete;
+
     /// @brief Destructor.
     ~Map2D()
     {
         // Nothing to do.
     }
 
+    /// @brief Allows to set the width of the map.
+    void setWidth(const int & _width)
+    {
+        width = _width;
+    }
+
+    /// @brief Allows to set the height of the map.
+    void setHeight(const int & _height)
+    {
+        height = _height;
+    }
+
+    /// @brief Provide the width of the map.
+    int getWidth() const
+    {
+        return width;
+    }
+
+    /// @brief Provide the height of the map.
+    int getHeight() const
+    {
+        return height;
+    }
+
     /// @brief Give an access to an object of given Coordinates2D.
     /// @param x Coordinate on width axis.
-    /// @param y Coordinate on heigth axis.
+    /// @param y Coordinate on height axis.
     /// @return The object at the given Coordinates2D.
     T & operator()(int x, int y)
     {
@@ -90,7 +138,7 @@ public:
 
     /// @brief Set the object at the given Coordinates2D.
     /// @param x     Coordinate on width axis.
-    /// @param y     Coordinate on heigth axis.
+    /// @param y     Coordinate on height axis.
     /// @param value The value that has to be set.
     void set(int x, int y, T value)
     {
@@ -107,24 +155,37 @@ public:
 
     /// @brief Retrieve the object at the given Coordinates2D.
     /// @param x Coordinate on width axis.
-    /// @param y Coordinate on heigth axis.
+    /// @param y Coordinate on height axis.
     /// @return The object at the given Coordinates2D.
     T & get(int x, int y)
     {
         return data[std::make_tuple(x, y)];
     }
 
-    /// @brief Erase the object at the given Coordinates2D.
+    /// @brief Retrieve the object at the given Coordinates2D.
     /// @param x Coordinate on width axis.
-    /// @param y Coordinate on heigth axis.
-    void erase(int x, int y)
+    /// @param y Coordinate on height axis.
+    /// @return The object at the given Coordinates2D.
+    T get(int x, int y) const
     {
-        set(x, y, nullptr);
+        return data.at(std::make_tuple(x, y));
     }
 
-    /// Disable copy constructor.
-    Map2D(const Map2D<T> &) = delete;
+    /// @brief Erase the object at the given Coordinates2D.
+    /// @param x Coordinate on width axis.
+    /// @param y Coordinate on height axis.
+    void erase(int x, int y)
+    {
+        set(x, y, nullValue);
+    }
 
-    /// Disable assignment.
+    /// Disable assign operator.
     Map2D & operator=(const Map2D<T> &) = delete;
+
+    /// @brief Move operator.
+    Map2D & operator=(const Map2D<T> && right)
+    {
+        data = std::move(right.data);
+        return (*this);
+    }
 };

@@ -22,6 +22,8 @@
 
 #include "mobile.hpp"
 
+#include "generalBehaviour.hpp"
+#include "lua_script.hpp"
 #include "logger.hpp"
 #include "mud.hpp"
 
@@ -36,22 +38,30 @@ Mobile::Mobile() :
     nextRespawn(),
     controller(),
     lua_script(),
-    lua_mutex(),
-    nextActionCooldown(std::chrono::system_clock::now()),
-    managedItem()
+    managedItem(),
+    behaviourQueue(),
+    behaviourTimer(std::chrono::system_clock::now()),
+    behaviourDelay(500000)
 {
     // Nothing to do.
 }
 
 Mobile::~Mobile()
 {
+    // Delete only the temporary items.
     for (auto item : equipment)
     {
-        delete (item);
+        if (HasFlag(item->flags, ItemFlag::Temporary))
+        {
+            delete (item);
+        }
     }
     for (auto item : inventory)
     {
-        delete (item);
+        if (HasFlag(item->flags, ItemFlag::Temporary))
+        {
+            delete (item);
+        }
     }
     if (this->isAlive())
     {
@@ -95,8 +105,30 @@ bool Mobile::setAbilities(const std::string & source)
     return true;
 }
 
-void Mobile::respawn(bool actNow)
+void Mobile::respawn()
 {
+    // Delete the models loaded as equipment.
+    for (auto item : equipment)
+    {
+        if (HasFlag(item->flags, ItemFlag::Temporary))
+        {
+            delete (item);
+        }
+    }
+    equipment.clear();
+    // Delete the models loaded in the inventory.
+    for (auto item : inventory)
+    {
+        if (HasFlag(item->flags, ItemFlag::Temporary))
+        {
+            delete (item);
+        }
+    }
+    inventory.clear();
+    // Intialize the lua state.
+    L = luaL_newstate();
+    // Load the lua environment.
+    LoadLuaEnvironmet(L, lua_script);
     // Set the mobile to Alive.
     this->setHealth(this->getMaxHealth(), true);
     this->setStamina(this->getMaxStamina(), true);
@@ -112,15 +144,8 @@ void Mobile::respawn(bool actNow)
                           exceptions,
                           this->getNameCapital());
     // Set the next action time.
-    if (actNow)
-    {
-        nextActionCooldown = std::chrono::system_clock::now();
-    }
-    else
-    {
-        nextActionCooldown = std::chrono::system_clock::now() +
-                             std::chrono::seconds(10 * level);
-    }
+    behaviourTimer = std::chrono::system_clock::now() +
+                     std::chrono::seconds(level);
     // Log to the mud.
     //Logger::log(LogLevel::Debug, "Respawning " + this->id);
 }
@@ -260,22 +285,29 @@ void Mobile::reloadLua()
     // Delete the models loaded as equipment.
     for (auto item : equipment)
     {
-        delete (item);
+        if (HasFlag(item->flags, ItemFlag::Temporary))
+        {
+            delete (item);
+        }
     }
     equipment.clear();
-
     // Delete the models loaded in the inventory.
     for (auto item : inventory)
     {
-        delete (item);
+        if (HasFlag(item->flags, ItemFlag::Temporary))
+        {
+            delete (item);
+        }
     }
     inventory.clear();
-
+    // Completely clear the stack.
+    lua_settop(L, 0);
+    // Empty the behaviours queue.
+    behaviourQueue.clear();
+    // Reset the lua state.
     L = luaL_newstate();
-
-    this->loadScript(Mud::instance().getMudSystemDirectory() +
-                     "lua/" + lua_script);
-
+    // Load the lua environment.
+    LoadLuaEnvironmet(L, lua_script);
     // Call the LUA function: Event_Init in order to prepare the mobile.
     this->triggerEventInit();
 }
@@ -292,32 +324,143 @@ void Mobile::sendMsg(const std::string & msg)
     }
 }
 
+void Mobile::performBehaviour()
+{
+    if (behaviourQueue.empty())
+    {
+        this->triggerEventMain();
+    }
+    if (this->checkBehaviourTimer())
+    {
+        auto status = behaviourQueue.front()->perform();
+        if ((status == BehaviourStatus::Finished) ||
+            (status == BehaviourStatus::Error))
+        {
+            behaviourQueue.pop_front();
+        }
+    }
+}
+
+bool Mobile::checkBehaviourTimer()
+{
+    // Check if the tic is passed.
+    if (std::chrono::duration_cast<std::chrono::seconds>(
+        std::chrono::system_clock::now() - behaviourTimer) >= behaviourDelay)
+    {
+        behaviourTimer = std::chrono::system_clock::now();
+        return true;
+    }
+    return false;
+}
+
+void Mobile::triggerEventInit()
+{
+    this->mobileThread("EventInit", nullptr, "");
+}
+
+void Mobile::triggerEventFight(Character * character)
+{
+    this->mobileThread("EventFight", character, "");
+}
+
+void Mobile::triggerEventEnter(Character * character)
+{
+    Logger::log(LogLevel::Trace, "Activating EventEnter.");
+    this->mobileThread("EventEnter", character, "");
+    behaviourTimer = std::chrono::system_clock::now() -
+                     std::chrono::seconds(1);
+}
+
+void Mobile::triggerEventExit(Character * character)
+{
+    this->mobileThread("EventExit", character, "");
+}
+
+void Mobile::triggerEventMessage(Character * character, std::string message)
+{
+    this->mobileThread("EventMessage", character, message);
+}
+
+void Mobile::triggerEventRandom()
+{
+    this->mobileThread("EventRandom", nullptr, "");
+}
+
+void Mobile::triggerEventMorning()
+{
+    this->mobileThread("EventMorning", nullptr, "");
+}
+
+void Mobile::triggerEventDay()
+{
+    this->mobileThread("EventDay", nullptr, "");
+}
+
+void Mobile::triggerEventDusk()
+{
+    this->mobileThread("EventDusk", nullptr, "");
+}
+
+void Mobile::triggerEventNight()
+{
+    this->mobileThread("EventNight", nullptr, "");
+}
+
+void Mobile::triggerEventDeath()
+{
+    this->mobileThread("EventDeath", nullptr, "");
+}
+
+void Mobile::triggerEventMain()
+{
+    this->mobileThread("EventMain", nullptr, "");
+}
+
 bool Mobile::mobileThread(std::string event,
                           Character * character,
                           std::string message)
 {
-    // Lock to the mutex.
-    lua_mutex.lock();
-    //Logger::log(LogLevel::Trace, "Starting thread for event '%s'", event);
-    try
+    if (!event.empty())
     {
-        luabridge::LuaRef f = luabridge::getGlobal(L, event.c_str());
         try
         {
-            if (character != nullptr)
+            luabridge::LuaRef func = luabridge::getGlobal(L, event.c_str());
+            if (func.isFunction())
             {
-                if (!message.empty())
+                if (character != nullptr)
                 {
-                    f(this, character, message);
+                    if (!message.empty())
+                    {
+                        behaviourQueue.emplace_back(
+                            std::make_shared<BehaviourP3<
+                                Character *,
+                                Character *,
+                                std::string>>(event,
+                                              func,
+                                              this,
+                                              character,
+                                              message));
+                    }
+                    else
+                    {
+                        behaviourQueue.emplace_back(
+                            std::make_shared<
+                                BehaviourP2<
+                                    Character *,
+                                    Character *>>(event,
+                                                  func,
+                                                  this,
+                                                  character));
+                    }
                 }
                 else
                 {
-                    f(this, character);
+                    behaviourQueue.emplace_back(
+                        std::make_shared<
+                            BehaviourP1<Character *>>(event,
+                                                      func,
+                                                      this));
                 }
-            }
-            else
-            {
-                f(this);
             }
         }
         catch (luabridge::LuaException const & e)
@@ -325,87 +468,7 @@ bool Mobile::mobileThread(std::string event,
             Logger::log(LogLevel::Error, e.what());
         }
     }
-    catch (luabridge::LuaException const & e)
-    {
-        Logger::log(LogLevel::Error, e.what());
-    }
-    //Logger::log(LogLevel::Trace, "Ending   thread for event '%s'", event);
-    // Unlock the mutex.
-    lua_mutex.unlock();
     return true;
-}
-
-void Mobile::triggerEventInit()
-{
-    t = std::thread(&Mobile::mobileThread, this, "EventInit", nullptr, "");
-    t.detach();
-}
-
-void Mobile::triggerEventFight(Character * character)
-{
-    t = std::thread(&Mobile::mobileThread, this, "EventFight", character, "");
-    t.detach();
-}
-
-void Mobile::triggerEventEnter(Character * character)
-{
-    t = std::thread(&Mobile::mobileThread, this, "EventEnter", character, "");
-    t.detach();
-}
-
-void Mobile::triggerEventExit(Character * character)
-{
-    t = std::thread(&Mobile::mobileThread, this, "EventExit", character, "");
-    t.detach();
-}
-
-void Mobile::triggerEventMessage(Character * character, std::string message)
-{
-    t = std::thread(&Mobile::mobileThread, this, "EventMessage", character,
-                    message);
-    t.detach();
-}
-
-void Mobile::triggerEventRandom()
-{
-    t = std::thread(&Mobile::mobileThread, this, "EventRandom", nullptr, "");
-    t.detach();
-}
-
-void Mobile::triggerEventMorning()
-{
-    t = std::thread(&Mobile::mobileThread, this, "EventMorning", nullptr, "");
-    t.detach();
-}
-
-void Mobile::triggerEventDay()
-{
-    t = std::thread(&Mobile::mobileThread, this, "EventDay", nullptr, "");
-    t.detach();
-}
-
-void Mobile::triggerEventDusk()
-{
-    t = std::thread(&Mobile::mobileThread, this, "EventDusk", nullptr, "");
-    t.detach();
-}
-
-void Mobile::triggerEventNight()
-{
-    t = std::thread(&Mobile::mobileThread, this, "EventNight", nullptr, "");
-    t.detach();
-}
-
-void Mobile::triggerEventDeath()
-{
-    t = std::thread(&Mobile::mobileThread, this, "EventDeath", nullptr, "");
-    t.detach();
-}
-
-void Mobile::triggerEventMain()
-{
-    t = std::thread(&Mobile::mobileThread, this, "EventMain", nullptr, "");
-    t.detach();
 }
 
 void Mobile::updateTicImpl()

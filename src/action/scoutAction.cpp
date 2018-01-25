@@ -26,19 +26,20 @@
 #include "logger.hpp"
 #include "room.hpp"
 #include "area.hpp"
+#include <cassert>
 
 ScoutAction::ScoutAction(Character * _actor) :
     GeneralAction(_actor)
 {
     // Debugging message.
-    //Logger::log(LogLevel::Debug, "Created ScoutAction.");
+    Logger::log(LogLevel::Debug, "Created ScoutAction.");
     // Reset the cooldown of the action.
-    this->resetCooldown(ScoutAction::getScoutTime(_actor));
+    this->resetCooldown(this->getCooldown());
 }
 
 ScoutAction::~ScoutAction()
 {
-    //Logger::log(LogLevel::Debug, "Deleted scout action.");
+    Logger::log(LogLevel::Debug, "Deleted scout action.");
 }
 
 bool ScoutAction::check(std::string & error) const
@@ -82,11 +83,6 @@ std::string ScoutAction::stop()
 
 ActionStatus ScoutAction::perform()
 {
-    // Check if the cooldown is ended.
-    if (!this->checkElapsed())
-    {
-        return ActionStatus::Running;
-    }
     std::string error;
     if (!this->check(error))
     {
@@ -111,9 +107,20 @@ ActionStatus ScoutAction::perform()
     actor->sendMsg("\n");
     // Add the effect.
     unsigned int modifier = actor->getAbilityModifier(Ability::Perception);
-    actor->effects.forceAddEffect(EffectFactory::clearTargets(actor,
+    actor->effectManager.forceAddEffect(EffectFactory::clearTargets(actor,
                                                               2 + modifier));
     return ActionStatus::Finished;
+}
+
+unsigned int ScoutAction::getCooldown()
+{
+    assert(actor && "Actor is nullptr");
+    // BASE       [+3.0]
+    // PERCEPTION [-0.0 to -2.80]
+    unsigned int requiredTime = 3;
+    requiredTime = SafeSum(requiredTime,
+                           -actor->getAbilityLog(Ability::Perception));
+    return requiredTime;
 }
 
 unsigned int ScoutAction::getConsumedStamina(Character * character)
@@ -129,14 +136,4 @@ unsigned int ScoutAction::getConsumedStamina(Character * character)
     consumedStamina = SafeSum(consumedStamina,
                               SafeLog10(character->getCarryingWeight()));
     return consumedStamina;
-}
-
-unsigned int ScoutAction::getScoutTime(Character * character)
-{
-    // BASE       [+3.0]
-    // PERCEPTION [-0.0 to -2.80]
-    unsigned int requiredTime = 3;
-    requiredTime = SafeSum(requiredTime,
-                           -character->getAbilityLog(Ability::Perception));
-    return requiredTime;
 }

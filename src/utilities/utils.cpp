@@ -193,11 +193,6 @@ std::vector<std::string> GetAllFilesInFolder(
     return files_name;
 }
 
-std::string BoolToString(const bool & value)
-{
-    return ((value) ? "Yes" : "No");
-}
-
 bool IsNumber(const std::string & source)
 {
     for (auto c : source)
@@ -210,9 +205,8 @@ bool IsNumber(const std::string & source)
     return true;
 }
 
-std::string GetFileContents(const char * filename)
+bool GetFileContents(const char * filename, std::string & contents)
 {
-    std::string contents;
     std::ifstream in(filename, std::ios::in | std::ios::binary);
     if (in.good())
     {
@@ -225,38 +219,10 @@ std::string GetFileContents(const char * filename)
             in.read(&contents[0], totalSize);
             in.close();
         }
+        return true;
     }
-    else
-    {
-        contents = "";
-        Logger::log(LogLevel::Error, "Can't open :" + std::string(filename));
-    }
-    return (contents);
-}
-
-std::string GetAttributeName(const int & id, const bool & abbreviated)
-{
-    if (id == 1)
-    {
-        return (abbreviated) ? "Str" : "Strength";
-    }
-    if (id == 2)
-    {
-        return (abbreviated) ? "Agi" : "Agility";
-    }
-    if (id == 3)
-    {
-        return (abbreviated) ? "Per" : "Perception";
-    }
-    if (id == 4)
-    {
-        return (abbreviated) ? "Con" : "Constitution";
-    }
-    if (id == 5)
-    {
-        return (abbreviated) ? "Int" : "Intelligence";
-    }
-    return (abbreviated) ? "Err:" + ToString(id) : "Error:" + ToString(id);
+    Logger::log(LogLevel::Error, "Can't open :" + std::string(filename));
+    return false;
 }
 
 /// Check if the return code from Zlib is an error.

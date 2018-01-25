@@ -65,7 +65,7 @@ end
 --- Retrieve the rooms which have to be visited.
 function Explorer:updateNotVisitedRooms()
     for roomKey, room in pairs(self.alreadyVisited.elements) do
-        for eKey, e in pairs(room:getExits()) do
+        for e in room.exits:iter() do
             local destination = e.destination;
             if (not self:findRoomInTable(self.notVisited.elements, destination)) then
                 if (not self:findRoomInTable(self.alreadyVisited.elements, destination)) then

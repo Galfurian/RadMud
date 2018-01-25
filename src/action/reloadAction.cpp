@@ -25,6 +25,7 @@
 #include "sqliteDbms.hpp"
 #include "character.hpp"
 #include "logger.hpp"
+#include <cassert>
 
 ReloadAction::ReloadAction(Character * _actor,
                            RangedWeaponItem * _weapon,
@@ -34,14 +35,14 @@ ReloadAction::ReloadAction(Character * _actor,
     magazine(_magazine)
 {
     // Debugging message.
-    //Logger::log(LogLevel::Debug, "Created ReloadAction.");
+    Logger::log(LogLevel::Debug, "Created ReloadAction.");
     // Reset the cooldown of the action.
-    this->resetCooldown(ReloadAction::getReloadTime(_weapon, _magazine));
+    this->resetCooldown(this->getCooldown());
 }
 
 ReloadAction::~ReloadAction()
 {
-    //Logger::log(LogLevel::Debug, "Deleted reload action.");
+    Logger::log(LogLevel::Debug, "Deleted reload action.");
 }
 
 bool ReloadAction::check(std::string & error) const
@@ -93,11 +94,6 @@ std::string ReloadAction::stop()
 
 ActionStatus ReloadAction::perform()
 {
-    // Check if the cooldown is ended.
-    if (!this->checkElapsed())
-    {
-        return ActionStatus::Running;
-    }
     std::string error;
     if (!this->check(error))
     {
@@ -122,11 +118,12 @@ ActionStatus ReloadAction::perform()
     return ActionStatus::Finished;
 }
 
-unsigned int ReloadAction::getReloadTime(RangedWeaponItem * _weapon,
-                                         Item * _magazine)
+unsigned int ReloadAction::getCooldown()
 {
-    // Evaluates the required time for loading the magazine.
+    assert(actor && "Actor is nullptr");
+    assert(weapon && "Weapon is nullptr");
+    assert(magazine && "Magazine is nullptr");
     return static_cast<unsigned int>(1 +
-                                     SafeLog10(_weapon->getWeight(false)) +
-                                     SafeLog10(_magazine->getWeight(false)));
+                                     SafeLog10(weapon->getWeight(false)) +
+                                     SafeLog10(magazine->getWeight(false)));
 }

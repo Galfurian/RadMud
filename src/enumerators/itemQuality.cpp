@@ -22,57 +22,22 @@
 
 #include "itemQuality.hpp"
 
-ItemQuality::ItemQuality(const unsigned int & _quality) :
-    quality()
-{
-    if (_quality == 0) quality = Disastrous;
-    else if (_quality == 1) quality = Poor;
-    else if (_quality == 2) quality = Normal;
-    else if (_quality == 3) quality = Fine;
-    else if (_quality == 4) quality = Masterful;
-    else quality = Normal;
-}
-
-ItemQuality::ItemQuality(const Enum & _quality) :
-    quality(_quality)
-{
-    // Nothing to do.
-}
-
-bool ItemQuality::isValid(const unsigned int & _quality)
-{
-    return (_quality <= 4);
-}
-
 std::string ItemQuality::toString() const
 {
-    if (quality == ItemQuality::Disastrous) return "Disastrous";
-    if (quality == ItemQuality::Poor) return "Poor";
-    if (quality == ItemQuality::Normal) return "Normal";
-    if (quality == ItemQuality::Fine) return "Fine";
-    else return "Masterful";
-}
-
-unsigned int ItemQuality::toUInt() const
-{
-    return static_cast<unsigned int>(quality);
+    if (value == ItemQuality::Disastrous) return "Disastrous";
+    if (value == ItemQuality::Poor) return "Poor";
+    if (value == ItemQuality::Normal) return "Normal";
+    if (value == ItemQuality::Fine) return "Fine";
+    if (value == ItemQuality::Masterful) return "Masterful";
+    else return "None";
 }
 
 double ItemQuality::getModifier() const
 {
-    if (quality == ItemQuality::Disastrous) return 0.5;
-    if (quality == ItemQuality::Poor) return 0.75;
-    if (quality == ItemQuality::Normal) return 1.0;
-    if (quality == ItemQuality::Fine) return 1.50;
-    return 2.00;
-}
-
-bool ItemQuality::operator==(const ItemQuality::Enum & rhs) const
-{
-    return quality == rhs;
-}
-
-bool ItemQuality::operator!=(const ItemQuality::Enum & rhs) const
-{
-    return quality != rhs;
+    if (value == ItemQuality::Disastrous) return 0.5;
+    if (value == ItemQuality::Poor) return 0.75;
+    if (value == ItemQuality::Normal) return 1.0;
+    if (value == ItemQuality::Fine) return 1.50;
+    if (value == ItemQuality::Masterful) return 2.00;
+    return 0.25;
 }

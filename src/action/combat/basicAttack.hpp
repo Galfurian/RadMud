@@ -23,6 +23,8 @@
 #pragma once
 
 #include "combatAction.hpp"
+#include "meleeWeaponItem.hpp"
+#include "rangedWeaponItem.hpp"
 
 /// @brief An action executed by characters when fighting at close range.
 class BasicAttack :
@@ -55,6 +57,14 @@ public:
     static unsigned int getConsumedStamina(Character * character,
                                            Item * weapon);
 
+    /// @brief Returns the stamina required to execute the action.
+    /// @param character The actor.
+    /// @param weapon    The weapon used to performe the action.
+    /// @return The required stamina.
+    static unsigned int getConsumedStamina(
+        Character * character,
+        const std::shared_ptr<BodyPart::BodyWeapon> & weapon);
+
 private:
 
     /// @brief Sets the predefined target. If there is already one, it checks
@@ -70,24 +80,37 @@ private:
     ///         <b>False</b> otherwise.
     bool checkTarget(Character * target);
 
-    /// @brief Unset all the variables used for combat.
-    void handleStop();
+    /// @brief Performs an attack with a natural weapon.
+    /// @param target       The character to attack.
+    /// @param weapon       The melee weapon used to attack.
+    /// @param attackNumber The number of already executed attacks.
+    void performAttackNaturalWeapon(
+        Character * target,
+        const std::shared_ptr<BodyPart::BodyWeapon> & weapon,
+        unsigned int attackNumber);
 
     /// @brief Performs a melee attack with the given weapon.
-    /// @param target The character to attack.
-    /// @param weapon The melee weapon used to attack.
-    /// @param dualWielding If the actor is dual wielding.
+    /// @param target       The character to attack.
+    /// @param weapon       The melee weapon used to attack.
+    /// @param attackNumber The number of already executed attacks.
     void performMeleeAttack(Character * target,
                             MeleeWeaponItem * weapon,
-                            const bool dualWielding);
+                            unsigned int attackNumber);
 
     /// @brief Performs a ranged attack with the given weapon.
-    /// @param target The character to attack.
-    /// @param weapon The ranged weapon used to attack.
-    /// @param dualWielding If the actor is dual wielding.
+    /// @param target       The character to attack.
+    /// @param weapon       The ranged weapon used to attack.
+    /// @param attackNumber The number of already executed attacks.
     void performRangedAttack(Character * target,
                              RangedWeaponItem * weapon,
-                             const bool dualWielding);
+                             unsigned int attackNumber);
+
+    /// @brief Send the messages when the actor hits with a natural weapon.
+    /// @param target The character which is involved in the attack.
+    /// @param weapon The weapon used to attack.
+    void handleNaturalWeaponHit(
+        Character * target,
+        const std::shared_ptr<BodyPart::BodyWeapon> & weapon);
 
     /// @brief Send the messages when the actor hits with a close ranged attack.
     /// @param target The character which is involved in the attack.
@@ -98,6 +121,14 @@ private:
     /// @param target The character which is involved in the attack.
     /// @param weapon The weapon used to attack.
     void handleRangedHit(Character * target, RangedWeaponItem * weapon);
+
+    /// @brief Send the messages when the actor misses the target with
+    ///         a natural weapon.
+    /// @param target The character which is involved in the attack.
+    /// @param weapon The weapon used to attack.
+    void handleNaturalWeaponMiss(
+        Character * target,
+        const std::shared_ptr<BodyPart::BodyWeapon> & weapon);
 
     /// @brief Send the messages when the actor misses the target with
     ///         a close ranged attack.

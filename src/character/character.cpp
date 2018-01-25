@@ -22,12 +22,11 @@
 
 #include "character.hpp"
 
-#include "rangedWeaponItem.hpp"
-#include "meleeWeaponItem.hpp"
+#include "roomUtilityFunctions.hpp"
+#include "characterUtilities.hpp"
 #include "lightItem.hpp"
 #include "armorItem.hpp"
 #include "logger.hpp"
-#include "aStar.hpp"
 #include "mud.hpp"
 
 Character::Character() :
@@ -47,14 +46,16 @@ Character::Character() :
     inventory(),
     equipment(),
     posture(CharacterPosture::Stand),
-    effects(),
     L(luaL_newstate()),
-    combatHandler(this),
     actionQueue(),
-    inputProcessor(std::make_shared<ProcessInput>())
+    actionQueueMutex(),
+    inputProcessor(std::make_shared<ProcessInput>()),
+    effectManager(),
+    skillManager(this),
+    combatHandler(this)
 {
-    actionQueue.push_back(std::make_shared<GeneralAction>(this));
-    // Nothing to do.
+    // Initialize the action queue.
+    this->resetActionQueue();
 }
 
 Character::~Character()
@@ -132,38 +133,42 @@ void Character::getSheet(Table & sheet) const
     sheet.addRow(
         {
             "Strength",
-            ToString(this->getAbility(Ability::Strength, false)) +
-            " [" +
-            ToString(effects.getAbilityModifier(Ability::Strength)) +
-            "]"});
+            ToString(this->getAbility(Ability::Strength, false)) + " [" +
+            ToString(effectManager.getAbilityMod(Ability::Strength)) + "][" +
+            ToString(effectManager.getAbilityMod(Ability::Strength)) + "]"});
     sheet.addRow(
         {
             "Agility",
-            ToString(this->getAbility(Ability::Agility, false)) +
-            " [" +
-            ToString(effects.getAbilityModifier(Ability::Agility)) +
-            "]"});
+            ToString(this->getAbility(Ability::Agility, false)) + " [" +
+            ToString(effectManager.getAbilityMod(Ability::Agility)) + "][" +
+            ToString(effectManager.getAbilityMod(Ability::Agility)) + "]"});
     sheet.addRow(
         {
             "Perception",
-            ToString(this->getAbility(Ability::Perception, false)) +
-            " [" +
-            ToString(effects.getAbilityModifier(Ability::Perception)) +
-            "]"});
+            ToString(this->getAbility(Ability::Perception, false)) + " [" +
+            ToString(effectManager.getAbilityMod(Ability::Perception)) + "][" +
+            ToString(effectManager.getAbilityMod(Ability::Perception)) + "]"});
     sheet.addRow(
         {
             "Constitution",
-            ToString(this->getAbility(Ability::Constitution, false)) +
-            " [" +
-            ToString(effects.getAbilityModifier(Ability::Constitution)) +
+            ToString(this->getAbility(Ability::Constitution, false)) + " [" +
+            ToString(effectManager.getAbilityMod(Ability::Constitution)) +
+            "][" +
+            ToString(effectManager.getAbilityMod(Ability::Constitution)) +
             "]"});
     sheet.addRow(
         {
             "Intelligence",
-            ToString(this->getAbility(Ability::Intelligence, false)) +
-            " [" +
-            ToString(effects.getAbilityModifier(Ability::Intelligence)) +
+            ToString(this->getAbility(Ability::Intelligence, false)) + " [" +
+            ToString(effectManager.getAbilityMod(Ability::Intelligence)) +
+            "][" +
+            ToString(effectManager.getAbilityMod(Ability::Intelligence)) +
             "]"});
+    sheet.addRow({"## Skill", "## Points"});
+    for (const auto & skillData : skillManager.skills)
+    {
+        sheet.addRow({skillData->skill->name, ToString(skillData->skillLevel)});
+    }
     if (CorrectAssert(this->room != nullptr))
     {
         sheet.addRow({"Room", room->name + " [" + ToString(room->vnum) + "]"});
@@ -191,10 +196,15 @@ void Character::getSheet(Table & sheet) const
     }
     sheet.addDivider();
     sheet.addRow({"## Effect Name", "## Remaining TIC"});
-    for (const auto & it : effects)
+    for (const auto & it : effectManager.getActiveEffects())
     {
         sheet.addRow({it.name, ToString(it.remainingTic)});
     }
+}
+
+void Character::initialize()
+{
+    // Nothing to do.
 }
 
 //std::string Character::getName() const
@@ -227,10 +237,10 @@ std::string Character::getStaticDesc() const
     desc += " is";
     if (posture != CharacterPosture::Stand)
     {
-        desc += " " + posture.toString();
+        desc += " " + posture.getAction();
     }
     desc += " here";
-    if (this->getAction()->getType() != ActionType::Wait)
+    if (this->getAction() != ActionType::Wait)
     {
         desc += ", " + this->getSubjectPronoun() + " is ";
         desc += this->getAction()->getDescription();
@@ -270,8 +280,8 @@ bool Character::setAbility(const Ability & ability, const unsigned int & value)
     return false;
 }
 
-unsigned int
-Character::getAbility(const Ability & ability, bool withEffects) const
+unsigned int Character::getAbility(const Ability & ability,
+                                   bool withEffects) const
 {
     auto overall = 0;
     // Try to find the ability value.
@@ -283,9 +293,10 @@ Character::getAbility(const Ability & ability, bool withEffects) const
     // Add the effects if needed.
     if (withEffects)
     {
-        overall += effects.getAbilityModifier(ability);
+        // Add the effects which increase the ability.
+        overall += effectManager.getAbilityMod(ability);
         // Prune the value if exceed the boundaries.
-        if (overall <= 0)
+        if (overall < 0)
         {
             overall = 0;
         }
@@ -297,8 +308,8 @@ Character::getAbility(const Ability & ability, bool withEffects) const
     return static_cast<unsigned int>(overall);
 }
 
-unsigned int
-Character::getAbilityModifier(const Ability & ability, bool withEffects) const
+unsigned int Character::getAbilityModifier(const Ability & ability,
+                                           bool withEffects) const
 {
     return Ability::getModifier(this->getAbility(ability, withEffects));
 }
@@ -374,19 +385,14 @@ unsigned int Character::getMaxHealth(bool withEffects) const
 {
     // Value = 5 + (5 * AbilityModifier(Constitution))
     unsigned int BASE = 5 + (5 * this->getAbility(Ability::Constitution));
-    if (!withEffects)
-    {
-        return BASE;
-    }
-    int overall = static_cast<int>(BASE) + effects.getHealthMod();
-    if (overall <= 0)
-    {
-        return 0;
-    }
-    else
-    {
-        return static_cast<unsigned int>(overall);
-    }
+    // Return it, if the maximum health is required without the effects.
+    if (!withEffects) return BASE;
+    // Otherwise evaluate the overall max health with the effects.
+    auto overall = static_cast<int>(BASE);
+    overall += effectManager.getStatusMod(StatusModifier::Health);
+    // If the maximum value is lesser than zero, return zero.
+    if (overall < 0) return 0;
+    return static_cast<unsigned int>(overall);
 }
 
 std::string Character::getHealthCondition(const bool & self)
@@ -479,19 +485,14 @@ unsigned int Character::getMaxStamina(bool withEffects) const
 {
     // Value = 10 + (10 * Ability(Constitution))
     unsigned int BASE = 10 + (10 * this->getAbility(Ability::Constitution));
-    if (!withEffects)
-    {
-        return BASE;
-    }
-    int overall = static_cast<int>(BASE) + effects.getStaminaMod();
-    if (overall <= 0)
-    {
-        return 0;
-    }
-    else
-    {
-        return static_cast<unsigned int>(overall);
-    }
+    // Return it, if the maximum stamina is required without the effects.
+    if (!withEffects) return BASE;
+    // Otherwise evaluate the overall max stamina with the effects.
+    auto overall = static_cast<int>(BASE);
+    overall += effectManager.getStatusMod(StatusModifier::Stamina);
+    // If the maximum value is lesser than zero, return zero.
+    if (overall < 0) return 0;
+    return static_cast<unsigned int>(overall);
 }
 
 std::string Character::getStaminaCondition()
@@ -515,96 +516,62 @@ int Character::getViewDistance() const
     return 4 + static_cast<int>(this->getAbilityLog(Ability::Perception));
 }
 
-void Character::setAction(std::shared_ptr<GeneralAction> _action)
+void Character::pushAction(const std::shared_ptr<GeneralAction> & _action)
 {
-    if (_action->getType() != ActionType::Wait)
-    {
-        actionQueue.push_front(_action);
-    }
-}
-
-std::shared_ptr<GeneralAction> Character::getAction() const
-{
-    return actionQueue.front();
+    std::lock_guard<std::mutex> lock(actionQueueMutex);
+    actionQueue.push_front(_action);
 }
 
 void Character::popAction()
 {
-    if (actionQueue.front()->getType() != ActionType::Wait)
+    std::lock_guard<std::mutex> lock(actionQueueMutex);
+    if (!actionQueue.empty())
     {
-        actionQueue.pop_front();
+        if (!actionQueue.front()->isLastAction())
+        {
+            actionQueue.pop_front();
+        }
     }
 }
 
-void Character::moveTo(
-    Room * destination,
-    const std::string & msgDepart,
-    const std::string & msgArrive,
-    const std::string & msgChar)
+std::shared_ptr<GeneralAction> & Character::getAction()
 {
-    // Check if the current room exist.
-    if (room == nullptr)
+    std::lock_guard<std::mutex> lock(actionQueueMutex);
+    return actionQueue.front();
+}
+
+std::shared_ptr<GeneralAction> const & Character::getAction() const
+{
+    std::lock_guard<std::mutex> lock(actionQueueMutex);
+    return actionQueue.front();
+}
+
+void Character::performAction()
+{
+    auto & action = this->getAction();
+    if (action->isLastAction())
     {
-        Logger::log(LogLevel::Error, "Character::moveTo: room is a NULLPTR.");
         return;
     }
-    // Check if the destination exist.
-    if (destination == nullptr)
+    if (action->checkElapsed())
     {
-        Logger::log(LogLevel::Error,
-                    "Character::moveTo: DESTINATION is a NULLPTR.");
-        return;
-    }
-
-    // Activate the entrance event for every mobile in the room.
-    for (auto mobile : room->getAllMobile(this))
-    {
-        if (mobile == this)
+        auto status = action->perform();
+        if ((status == ActionStatus::Finished) ||
+            (status == ActionStatus::Error))
         {
-            continue;
-        }
-        if (mobile->canSee(this))
-        {
-            mobile->triggerEventExit(this);
+            // Remove the from action.
+            this->popAction();
         }
     }
+}
 
-    // Show a message to the character, if is set.
-    if (!msgChar.empty())
-    {
-        this->sendMsg(msgChar);
-    }
-
-    // Set the list of exceptions.
-    std::vector<Character *> exceptions;
-    exceptions.push_back(this);
-    // Tell others where the character went and remove s/he from the old room.
-    room->sendToAll(msgDepart, exceptions);
-
-    // Remove the player from the current room.
-    room->removeCharacter(this);
-
-    // Add the character to the destionation room.
-    destination->addCharacter(this);
-
-    // Look around new room.
-    this->doCommand("look");
-
-    // Tell others s/he has arrived and move the character to the new room.
-    destination->sendToAll(msgArrive, exceptions);
-
-    // Activate the entrance event for every mobile in the room.
-    for (auto mobile : room->getAllMobile(this))
-    {
-        if (mobile == this)
-        {
-            continue;
-        }
-        if (mobile->canSee(this))
-        {
-            mobile->triggerEventEnter(this);
-        }
-    }
+void Character::resetActionQueue()
+{
+    std::lock_guard<std::mutex> lock(actionQueueMutex);
+    // Clear the action queue.
+    actionQueue.clear();
+    // Add a general action and set it as the last action of the action queue.
+    actionQueue.emplace_back(std::make_shared<GeneralAction>(this, true));
 }
 
 Item * Character::findInventoryItem(std::string search_parameter, int & number)
@@ -639,38 +606,6 @@ Item * Character::findEquipmentItem(std::string search_parameter, int & number)
     return nullptr;
 }
 
-Item * Character::findEquipmentSlotItem(EquipmentSlot slot) const
-{
-    for (auto iterator : equipment)
-    {
-        if (iterator->getCurrentSlot() == slot)
-        {
-            return iterator;
-        }
-    }
-    return nullptr;
-}
-
-Item * Character::findEquipmentSlotTool(EquipmentSlot slot, ToolType type)
-{
-    auto tool = findEquipmentSlotItem(slot);
-    if (tool != nullptr)
-    {
-        if (tool->model != nullptr)
-        {
-            if (tool->model->getType() == ModelType::Tool)
-            {
-                ToolModel * toolModel = tool->model->toTool();
-                if (toolModel->toolType == type)
-                {
-                    return tool;
-                }
-            }
-        }
-    }
-    return nullptr;
-}
-
 Item * Character::findNearbyItem(const std::string & itemName, int & number)
 {
     auto item = this->findInventoryItem(itemName, number);
@@ -688,212 +623,20 @@ Item * Character::findNearbyItem(const std::string & itemName, int & number)
     return item;
 }
 
-Item * Character::findNearbyTool(
-    const ToolType & toolType,
-    const std::vector<Item *> & exceptions,
-    bool searchRoom,
-    bool searchInventory,
-    bool searchEquipment)
+Item * Character::findItemAtBodyPart(
+    const std::shared_ptr<BodyPart> & bodyPart) const
 {
-    if (searchRoom)
+    for (auto item : equipment)
     {
-        for (auto iterator : room->items)
+        for (auto occupiedBodyPart : item->occupiedBodyParts)
         {
-            if (iterator->model->getType() == ModelType::Tool)
+            if (occupiedBodyPart->vnum == bodyPart->vnum)
             {
-                ToolModel * toolModel = iterator->model->toTool();
-                if (toolModel->toolType == toolType)
-                {
-                    // Check if the item is inside the exception list.
-                    auto findIt = std::find_if(exceptions.begin(),
-                                               exceptions.end(),
-                                               [&iterator](Item * item)
-                                               {
-                                                   return (item->vnum ==
-                                                           iterator->vnum);
-                                               });
-                    // If not, return the item.
-                    if (findIt == exceptions.end())
-                    {
-                        return iterator;
-                    }
-                }
-            }
-        }
-    }
-    if (searchInventory)
-    {
-        for (auto iterator : inventory)
-        {
-            if (iterator->model->getType() == ModelType::Tool)
-            {
-                ToolModel * toolModel = iterator->model->toTool();
-                if (toolModel->toolType == toolType)
-                {
-                    auto findIt = std::find(exceptions.begin(),
-                                            exceptions.end(), iterator);
-                    if (findIt == exceptions.end())
-                    {
-                        return iterator;
-                    }
-                }
-            }
-        }
-    }
-    if (searchEquipment)
-    {
-        for (auto iterator : equipment)
-        {
-            if (iterator->model->getType() == ModelType::Tool)
-            {
-                ToolModel * toolModel = iterator->model->toTool();
-                if (toolModel->toolType == toolType)
-                {
-                    auto findIt = std::find(exceptions.begin(),
-                                            exceptions.end(), iterator);
-                    if (findIt == exceptions.end())
-                    {
-                        return iterator;
-                    }
-                }
+                return item;
             }
         }
     }
     return nullptr;
-}
-
-bool Character::findNearbyTools(
-    std::set<ToolType> tools,
-    std::vector<Item *> & foundOnes,
-    bool searchRoom,
-    bool searchInventory,
-    bool searchEquipment)
-{
-    // TODO: Prepare a map with key the tool type and as value:
-    //  Option A: A bool which determine if the tool has been found.
-    //  Option B: A pointer to the found tool (more interesting, can pass to
-    //              this function as reference the map and then update it with
-    //              the found tools inside this function).
-    for (auto toolType : tools)
-    {
-        auto tool = this->findNearbyTool(
-            toolType,
-            foundOnes,
-            searchRoom,
-            searchInventory,
-            searchEquipment);
-        if (tool == nullptr)
-        {
-            return false;
-        }
-        else
-        {
-            foundOnes.push_back(tool);
-        }
-    }
-    return true;
-}
-
-bool Character::findNearbyResouces(
-    std::map<ResourceType, unsigned int> ingredients,
-    std::vector<std::pair<Item *, unsigned int>> & foundOnes)
-{
-    for (auto ingredient : ingredients)
-    {
-        // Quantity of ingredients that has to be found.
-        auto quantityNeeded = ingredient.second;
-        for (auto item : inventory)
-        {
-            auto model = item->model;
-            if (model->getType() == ModelType::Resource)
-            {
-                auto resourceModel = model->toResource();
-                if (resourceModel->resourceType == ingredient.first)
-                {
-                    auto quantityAvailable = item->quantity;
-                    auto quantityUsed = quantityAvailable;
-                    if (quantityAvailable > quantityNeeded)
-                    {
-                        quantityUsed = (quantityAvailable - quantityNeeded);
-                    }
-                    foundOnes.push_back(std::make_pair(item, quantityUsed));
-                    quantityNeeded -= quantityUsed;
-                    if (quantityNeeded == 0)
-                    {
-                        break;
-                    }
-                }
-            }
-        }
-        // If the ingredients are not enough, search even in the room.
-        if (quantityNeeded > 0)
-        {
-            for (auto item : room->items)
-            {
-                auto model = item->model;
-                if (model->getType() == ModelType::Resource)
-                {
-                    auto resourceModel = model->toResource();
-                    if (resourceModel->resourceType == ingredient.first)
-                    {
-                        auto quantityAvailable = item->quantity;
-                        auto quantityUsed = quantityAvailable;
-                        if (quantityAvailable > quantityNeeded)
-                        {
-                            quantityUsed = (quantityAvailable - quantityNeeded);
-                        }
-                        foundOnes.push_back(std::make_pair(item, quantityUsed));
-                        quantityNeeded -= quantityUsed;
-                        if (quantityNeeded == 0)
-                        {
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        // If the ingredients are still not enough, return false.
-        if (quantityNeeded > 0)
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-std::vector<Item *> Character::findCoins()
-{
-    ItemContainer foundCoins;
-    auto findCointInContainer = [&](Item * item)
-    {
-        if (item->isAContainer() && !item->isEmpty())
-        {
-            for (auto content : item->content)
-            {
-                if (content->getType() == ModelType::Currency)
-                {
-                    foundCoins.emplace_back(content);
-                }
-            }
-        }
-    };
-    for (auto it : equipment)
-    {
-        findCointInContainer(it);
-    }
-    for (auto it : inventory)
-    {
-        if (it->getType() == ModelType::Currency)
-        {
-            foundCoins.emplace_back(it);
-        }
-        else
-        {
-            findCointInContainer(it);
-        }
-    }
-    foundCoins.orderBy(ItemContainer::ByPrice);
-    return foundCoins;
 }
 
 void Character::addInventoryItem(Item *& item)
@@ -912,7 +655,7 @@ void Character::addInventoryItem(Item *& item)
 void Character::addEquipmentItem(Item *& item)
 {
     // Add the item to the equipment.
-    equipment.push_back(item);
+    equipment.push_back_item(item);
     // Set the owner of the item.
     item->owner = this;
     // Log it.
@@ -946,6 +689,8 @@ bool Character::remEquipmentItem(Item * item)
     }
     // Clear the owner of the item.
     item->owner = nullptr;
+    // Empty the occupied body parts.
+    item->occupiedBodyParts.clear();
     // Log it.
     Logger::log(LogLevel::Debug,
                 "Item '%s' removed from '%s';",
@@ -975,87 +720,91 @@ double Character::getCarryingWeight() const
 
 double Character::getMaxCarryingWeight() const
 {
-    // Value = 50 + (AbilMod(STR) * 10)
-    // MIN   =  50
-    // MAX   = 300
-    return 50 + (this->getAbilityModifier(Ability::Strength) * 10);
+    // Value = 100 + (AbilMod(STR) * 10)
+    // MIN   = 100
+    // MAX   = 350
+    return 100 + (this->getAbilityModifier(Ability::Strength) * 10);
 }
 
-bool Character::canWield(Item * item,
-                         std::string & error,
-                         EquipmentSlot & where) const
+std::vector<std::shared_ptr<BodyPart>> Character::canWield(
+    Item * item,
+    std::string & error) const
 {
-    // Gather the item in the right hand, if there is one.
-    auto rightHand = findEquipmentSlotItem(EquipmentSlot::RightHand);
-    // Gather the item in the left hand, if there is one.
-    auto leftHand = findEquipmentSlotItem(EquipmentSlot::LeftHand);
-    if (HasFlag(item->model->modelFlags, ModelFlag::TwoHand))
+    // Prepare the list of occupied body parts.
+    std::vector<std::shared_ptr<BodyPart>> occupiedBodyParts;
+    // Get the compatible body parts.
+    auto compatibleBodyParts = item->model->getBodyParts(race);
+    if (compatibleBodyParts.empty())
     {
-        if ((rightHand != nullptr) || (leftHand != nullptr))
-        {
-            error = "You must have both your hand free to wield it.\n";
-            return false;
-        }
-        where = EquipmentSlot::RightHand;
+        error = "It is not designed for your fisionomy.";
+        return occupiedBodyParts;
     }
-    else
+    for (auto bodyPart : compatibleBodyParts)
     {
-        if ((rightHand != nullptr) && (leftHand != nullptr))
+        if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
         {
-            error = "You have both your hand occupied.\n";
-            return false;
+            continue;
         }
-        else if ((rightHand == nullptr) && (leftHand != nullptr))
+        if (this->findItemAtBodyPart(bodyPart) != nullptr)
         {
-            if (HasFlag(leftHand->model->modelFlags, ModelFlag::TwoHand))
-            {
-                error = "You have both your hand occupied.\n";
-                return false;
-            }
-            where = EquipmentSlot::RightHand;
+            continue;
         }
-        else if ((rightHand != nullptr) && (leftHand == nullptr))
+        occupiedBodyParts.emplace_back(bodyPart);
+        if (!HasFlag(item->model->modelFlags, ModelFlag::TwoHand))
         {
-            if (HasFlag(rightHand->model->modelFlags, ModelFlag::TwoHand))
-            {
-                error = "You have both your hand occupied.\n";
-                return false;
-            }
-            where = EquipmentSlot::LeftHand;
+            break;
         }
         else
         {
-            where = EquipmentSlot::RightHand;
+            if (occupiedBodyParts.size() == 2)
+            {
+                break;
+            }
         }
     }
-    return true;
+    if (HasFlag(item->model->modelFlags, ModelFlag::TwoHand) &&
+        (occupiedBodyParts.size() != 2))
+    {
+        occupiedBodyParts.clear();
+    }
+    if (occupiedBodyParts.empty())
+    {
+        error = "There is no room where it can be wielded.";
+    }
+    return occupiedBodyParts;
 }
 
-bool Character::canWear(Item * item, std::string & error) const
+std::vector<std::shared_ptr<BodyPart>> Character::canWear(
+    Item * item,
+    std::string & error) const
 {
-    bool result = false;
-    if (item->model->getType() == ModelType::Armor)
+    // Prepare the list of occupied body parts.
+    std::vector<std::shared_ptr<BodyPart>> occupiedBodyParts;
+    // Get the compatible body parts.
+    auto compatibleBodyParts = item->model->getBodyParts(race);
+    if (compatibleBodyParts.empty())
     {
-        result = true;
+        error = "It is not designed for your fisionomy.";
+        return occupiedBodyParts;
     }
-    else if (item->model->getType() == ModelType::Container)
+    for (auto bodyPart : compatibleBodyParts)
     {
-        if (item->getCurrentSlot() != EquipmentSlot::None)
+        if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWear))
         {
-            result = true;
+            continue;
         }
+        if (this->findItemAtBodyPart(bodyPart) != nullptr)
+        {
+            continue;
+        }
+        occupiedBodyParts.emplace_back(bodyPart);
+        break;
     }
-    if (!result)
+    if (occupiedBodyParts.empty())
     {
-        error = "The item is not meant to be worn.\n";
-        return false;
+        error = "There is no room where it can be worn.";
     }
-    if (findEquipmentSlotItem(item->getCurrentSlot()) != nullptr)
-    {
-        error = "There is already something in that location.\n";
-        return false;
-    }
-    return true;
+    return occupiedBodyParts;
 }
 
 bool Character::inventoryIsLit() const
@@ -1064,7 +813,7 @@ bool Character::inventoryIsLit() const
     {
         if (it->getType() == ModelType::Light)
         {
-            if (it->toLightItem()->isActive())
+            if (static_cast<LightItem *>(it)->isActive())
             {
                 return true;
             }
@@ -1107,38 +856,22 @@ std::string Character::getHungerCondition() const
 
 void Character::updateHealth()
 {
-    unsigned int posModifier = 0;
-    auto logModifier = this->getAbilityLog(Ability::Constitution);
-    if (posture == CharacterPosture::Sit)
-    {
-        posModifier = 2;
-    }
-    else if (posture == CharacterPosture::Rest)
-    {
-        posModifier = 4;
-    }
-    if (this->health < this->getMaxHealth())
-    {
-        this->addHealth((1 + 3 * logModifier) * (1 + 2 * posModifier), true);
-    }
+    auto constMod(this->getAbilityModifier(Ability::Constitution));
+    auto regainMod(posture.getRegainModifier());
+    auto effectMod(
+        static_cast<unsigned int>(
+            effectManager.getStatusMod(StatusModifier::HealthRegeneration)));
+    this->addHealth((constMod * regainMod) + effectMod, true);
 }
 
 void Character::updateStamina()
 {
-    unsigned int posModifier = 0;
-    auto logModifier = this->getAbilityLog(Ability::Constitution);
-    if (posture == CharacterPosture::Sit)
-    {
-        posModifier = 3;
-    }
-    else if (posture == CharacterPosture::Rest)
-    {
-        posModifier = 5;
-    }
-    if (stamina < this->getMaxStamina())
-    {
-        this->addStamina((1 + 4 * logModifier) * (1 + 3 * posModifier), true);
-    }
+    auto constMod(this->getAbilityModifier(Ability::Constitution));
+    auto regainMod(posture.getRegainModifier());
+    auto effectMod(
+        static_cast<unsigned int>(
+            effectManager.getStatusMod(StatusModifier::HealthRegeneration)));
+    this->addHealth(((2 * constMod) * regainMod) + effectMod, true);
 }
 
 void Character::updateHunger()
@@ -1154,9 +887,9 @@ void Character::updateThirst()
 void Character::updateExpiredEffects()
 {
     std::vector<std::string> messages;
-    if (this->effects.effectUpdate(messages))
+    if (this->effectManager.effectUpdate(messages))
     {
-        for (auto message : messages)
+        for (const auto & message : messages)
         {
             this->sendMsg(message + "\n");
         }
@@ -1166,9 +899,9 @@ void Character::updateExpiredEffects()
 void Character::updateActivatedEffects()
 {
     std::vector<std::string> messages;
-    if (this->effects.effectActivate(messages))
+    if (this->effectManager.effectActivate(messages))
     {
-        for (auto message : messages)
+        for (const auto & message : messages)
         {
             this->sendMsg(message + "\n");
         }
@@ -1177,6 +910,12 @@ void Character::updateActivatedEffects()
 
 std::string Character::getLook()
 {
+    // Check if the room is lit.
+    bool roomIsLit = false;
+    if (this->room != nullptr)
+    {
+        roomIsLit = this->room->isLit();
+    }
     std::string output;
     output += "You look at " + this->getName() + ".\n";
     // Add the condition.
@@ -1184,59 +923,62 @@ std::string Character::getLook()
     output += " " + this->getHealthCondition() + ".\n";
     // Add the description.
     output += description + "\n";
-    // Add what the target is wearing.
-    if (equipment.empty())
+
+    for (auto bodyPart : this->race->bodyParts)
     {
-        output += Formatter::italic();
-        output += ToCapitals(this->getSubjectPronoun());
-        output += " is wearing nothing.\n";
-        output += Formatter::reset();
-        return output;
-    }
-    output += ToCapitals(this->getSubjectPronoun()) + " is wearing:\n";
-    // Retrieve the equipment.
-    auto head = this->findEquipmentSlotItem(EquipmentSlot::Head);
-    auto back = this->findEquipmentSlotItem(EquipmentSlot::Back);
-    auto torso = this->findEquipmentSlotItem(EquipmentSlot::Torso);
-    auto legs = this->findEquipmentSlotItem(EquipmentSlot::Legs);
-    auto feet = this->findEquipmentSlotItem(EquipmentSlot::Feet);
-    auto right = this->findEquipmentSlotItem(EquipmentSlot::RightHand);
-    auto left = this->findEquipmentSlotItem(EquipmentSlot::LeftHand);
-    if (head != nullptr)
-    {
-        output += "\tHead       : " + head->getNameCapital(true) + "\n";
-    }
-    if (back != nullptr)
-    {
-        output += "\tBack       : " + back->getNameCapital(true) + "\n";
-    }
-    if (torso != nullptr)
-    {
-        output += "\tTorso      : " + torso->getNameCapital(true) + "\n";
-    }
-    if (legs != nullptr)
-    {
-        output += "\tLegs       : " + legs->getNameCapital(true) + "\n";
-    }
-    if (feet != nullptr)
-    {
-        output += "\tFeet       : " + feet->getNameCapital(true) + "\n";
-    }
-    if (right != nullptr)
-    {
-        if (HasFlag(right->model->modelFlags, ModelFlag::TwoHand))
+#if 0 // Tabular version
+        // Add the body part name to the row.
+        output += AlignString(bodyPart->getDescription(true),
+                              StringAlign::Left, 15);
+        auto item = this->findItemAtBodyPart(bodyPart);
+        if (item != nullptr)
         {
-            output += "\tBoth Hands : ";
+            if (roomIsLit)
+            {
+                output += " - " + item->getNameCapital(true);
+            }
+            else
+            {
+                output += " - Something";
+            }
+        }
+        output += "\n";
+#else
+        auto item = this->findItemAtBodyPart(bodyPart);
+        if (item == nullptr)
+        {
+            continue;
+        }
+        output += ToCapitals(this->getSubjectPronoun()) + " is ";
+        if (HasFlag(bodyPart->flags, BodyPartFlag::CanWear))
+        {
+            output += "wearing ";
         }
         else
         {
-            output += "\tRight Hand : ";
+            output += "wielding ";
         }
-        output += right->getNameCapital() + "\n";
-    }
-    if (left != nullptr)
-    {
-        output += "\tLeft Hand  : " + left->getNameCapital(true) + "\n";
+        if (roomIsLit)
+        {
+            output += item->getName(true) + " ";
+        }
+        else
+        {
+            output += "something ";
+        }
+        if (HasFlag(bodyPart->flags, BodyPartFlag::CanWear))
+        {
+            output += "on ";
+        }
+        else
+        {
+            output += "with ";
+        }
+        output += this->getPossessivePronoun() + " ";
+        output += Formatter::yellow();
+        output += bodyPart->getDescription(false);
+        output += Formatter::reset() + ". ";
+#endif
     }
     return output;
 }
@@ -1257,20 +999,21 @@ unsigned int Character::getArmorClass() const
     {
         if (item->model->getType() == ModelType::Armor)
         {
-            result += item->toArmorItem()->getArmorClass();
+            // Cast the item to armor.
+            result += static_cast<ArmorItem *>(item)->getArmorClass();
         }
     }
     return result;
 }
 
-bool Character::canAttackWith(const EquipmentSlot & slot) const
+bool Character::canAttackWith(const std::shared_ptr<BodyPart> & bodyPart) const
 {
-    if ((slot == EquipmentSlot::RightHand) || (slot == EquipmentSlot::LeftHand))
+    if (HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
     {
-        auto wpn = this->findEquipmentSlotItem(slot);
+        auto wpn = this->findItemAtBodyPart(bodyPart);
         if (wpn != nullptr)
         {
-            // Check if there is actually a weapon equiped.
+            // Check if there is actually a weapon equipped.
             if ((wpn->model->getType() == ModelType::MeleeWeapon) ||
                 (wpn->model->getType() == ModelType::RangedWeapon))
             {
@@ -1293,46 +1036,6 @@ bool Character::isAtRange(Character * target, const int & range)
         if (WrongAssert(!target->toMobile()->isAlive())) return false;
     }
     return this->room->area->los(this->room->coord, target->room->coord, range);
-}
-
-std::vector<MeleeWeaponItem *> Character::getActiveMeleeWeapons()
-{
-    std::vector<MeleeWeaponItem *> gatheredWeapons;
-    auto RetrieveWeapon = [&](const EquipmentSlot & slot)
-    {
-        // First get the item at the given position.
-        auto wpn = this->findEquipmentSlotItem(slot);
-        if (wpn != nullptr)
-        {
-            if (wpn->getType() == ModelType::MeleeWeapon)
-            {
-                gatheredWeapons.emplace_back(wpn->toMeleeWeaponItem());
-            }
-        }
-    };
-    RetrieveWeapon(EquipmentSlot::RightHand);
-    RetrieveWeapon(EquipmentSlot::LeftHand);
-    return gatheredWeapons;
-}
-
-std::vector<RangedWeaponItem *> Character::getActiveRangedWeapons()
-{
-    std::vector<RangedWeaponItem *> gatheredWeapons;
-    auto RetrieveWeapon = [&](const EquipmentSlot & slot)
-    {
-        // First get the item at the given position.
-        auto wpn = this->findEquipmentSlotItem(slot);
-        if (wpn != nullptr)
-        {
-            if (wpn->getType() == ModelType::RangedWeapon)
-            {
-                gatheredWeapons.emplace_back(wpn->toRangedWeaponItem());
-            }
-        }
-    };
-    RetrieveWeapon(EquipmentSlot::RightHand);
-    RetrieveWeapon(EquipmentSlot::LeftHand);
-    return gatheredWeapons;
 }
 
 void Character::kill()
@@ -1359,8 +1062,7 @@ void Character::kill()
         corpse->putInside(item);
     }
     // Reset the action of the character.
-    actionQueue.clear();
-    this->setAction(std::make_shared<GeneralAction>(this));
+    this->resetActionQueue();
     // Reset the list of opponents.
     this->combatHandler.resetList();
     // Remove the character from the current room.
@@ -1373,7 +1075,7 @@ void Character::kill()
 Item * Character::createCorpse()
 {
     // Create the corpse.
-    auto corpse = race->corpse.createCorpse(name, race->material, weight);
+    auto corpse = race->corpse->createCorpse(name, weight);
     // Add the corpse to the room.
     room->addItem(corpse);
     // Return the corpse.
@@ -1396,265 +1098,39 @@ Mobile * Character::toMobile()
     return static_cast<Mobile *>(this);
 }
 
-void Character::loadScript(const std::string & scriptFilename)
-{
-    //Logger::log(LogLevel::Debug, "Loading script '%s'...", scriptFilename);
-    // Open lua libraries.
-    luaL_openlibs(L);
-
-    // Register utilities functions.
-    LuaRegisterUtils(L);
-
-    // Register all the classes.
-    Character::luaRegister(L);
-    Area::luaRegister(L);
-    Faction::luaRegister(L);
-    ItemModel::luaRegister(L);
-    Item::luaRegister(L);
-    Material::luaRegister(L);
-    Race::luaRegister(L);
-    Coordinates::luaRegister(L);
-    Exit::luaRegister(L);
-    Terrain::luaRegister(L);
-    Room::luaRegister(L);
-
-    Direction::luaRegister(L);
-    ModelType::luaRegister(L);
-    ToolType::luaRegister(L);
-
-    if (luaL_dofile(L, scriptFilename.c_str()) != LUABRIDGE_LUA_OK)
-    {
-        Logger::log(LogLevel::Error, "Can't open script %s.", scriptFilename);
-        Logger::log(LogLevel::Error,
-                    "Error :%s",
-                    std::string(lua_tostring(L, -1)));
-    }
-}
-
-luabridge::LuaRef Character::luaGetEquipmentItems()
-{
-    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
-    for (auto item : equipment)
-    {
-        luaRef.append(item);
-    }
-    return luaRef;
-}
-
-luabridge::LuaRef Character::luaGetInventoryItems()
-{
-    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
-    for (auto item : inventory)
-    {
-        luaRef.append(item);
-    }
-    return luaRef;
-}
-
-luabridge::LuaRef Character::luaGetRoomsInSight()
-{
-    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
-    if (room != nullptr)
-    {
-        CharacterContainer characterContainer;
-        auto validCoordinates = room->area->fov(room->coord,
-                                                this->getViewDistance());
-        for (auto coordinates : validCoordinates)
-        {
-            luaRef.append(room->area->getRoom(coordinates));
-        }
-    }
-    return luaRef;
-}
-
-luabridge::LuaRef Character::luaGetCharactersInSight()
-{
-    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
-    if (room != nullptr)
-    {
-        CharacterContainer exceptions;
-        exceptions.emplace_back_character(this);
-        for (auto it : room->area->getCharactersInSight(exceptions,
-                                                        room->coord,
-                                                        this->getViewDistance()))
-        {
-            luaRef.append(it);
-        }
-    }
-    return luaRef;
-}
-
-luabridge::LuaRef Character::luaGetItemsInSight()
-{
-    luabridge::LuaRef luaRef(L, luabridge::newTable(L));
-    if (room != nullptr)
-    {
-        ItemContainer exceptions;
-        for (auto it : room->area->getItemsInSight(exceptions,
-                                                   room->coord,
-                                                   this->getViewDistance()))
-        {
-            luaRef.append(it);
-        }
-    }
-    return luaRef;
-}
-
-luabridge::LuaRef Character::luaGetPathTo(Room * destination)
-{
-    auto checkFunction = [&](Room * from, Room * to)
-    {
-        // Get the direction.
-        auto direction = Area::getDirection(from->coord, to->coord);
-        // Get the exit;
-        auto destExit = from->findExit(direction);
-        // If the direction is upstairs, check if there is a stair.
-        if (direction == Direction::Up)
-        {
-            if (!HasFlag(destExit->flags, ExitFlag::Stairs)) return false;
-        }
-        // Check if the destination is correct.
-        if (destExit->destination == nullptr) return false;
-        // Check if the destination is bocked by a door.
-        auto door = destExit->destination->findDoor();
-        if (door != nullptr)
-        {
-            if (HasFlag(door->flags, ItemFlag::Closed)) return false;
-        }
-        // Check if the destination has a floor.
-        auto destDown = destExit->destination->findExit(Direction::Down);
-        if (destDown != nullptr)
-        {
-            if (!HasFlag(destDown->flags, ExitFlag::Stairs)) return false;
-        }
-        // Check if the destination is forbidden for mobiles.
-        return !(this->isMobile() && HasFlag(destExit->flags, ExitFlag::NoMob));
-    };
-    AStar<Room *> aStar;
-    std::vector<Room *> path;
-
-    luabridge::LuaRef luaRef(L, luabridge::LuaRef::newTable(L));
-    if (this->room != nullptr)
-    {
-        if (aStar.findPath(this->room, destination, path, checkFunction))
-        {
-            Coordinates previous = this->room->coord;
-            for (auto node : path)
-            {
-                luaRef.append(Area::getDirection(previous, node->coord));
-                previous = node->coord;
-            }
-        }
-    }
-    return luaRef;
-}
-
-Item * Character::luaLoadItem(int vnumModel,
-                              int vnumMaterial,
-                              unsigned int qualityValue)
-{
-    auto model = Mud::instance().findItemModel(vnumModel);
-    if (model == nullptr)
-    {
-        Logger::log(LogLevel::Error,
-                    "Can't find model :" + ToString(vnumModel));
-        return nullptr;
-    }
-    auto composition = Mud::instance().findMaterial(vnumMaterial);
-    if (composition == nullptr)
-    {
-        Logger::log(LogLevel::Error,
-                    "Can't find material :" + ToString(vnumMaterial));
-        return nullptr;
-    }
-    ItemQuality quality = ItemQuality::Normal;
-    if (ItemQuality::isValid(qualityValue))
-    {
-        quality = ItemQuality(qualityValue);
-    }
-    return model->createItem(this->getName(), composition, true, quality);
-}
-
 void Character::luaAddEquipment(Item * item)
 {
-    equipment.push_back(item);
+    std::string error;
+    auto occupiedBodyParts = this->canWear(item, error);
+    if (occupiedBodyParts.empty())
+    {
+        Logger::log(LogLevel::Error,
+                    "The mobile %s cannot equip %s.",
+                    this->getName(),
+                    item->getName());
+        Logger::log(LogLevel::Error, "Error: %s", error);
+        return;
+    }
+    else
+    {
+        item->setOccupiedBodyParts(occupiedBodyParts);
+        this->addEquipmentItem(item);
+    }
 }
 
 bool Character::luaRemEquipment(Item * item)
 {
-    if (equipment.removeItem(item))
-    {
-        item->owner = nullptr;
-        return true;
-    }
-    return false;
+    return this->remEquipmentItem(item);
 }
 
 void Character::luaAddInventory(Item * item)
 {
-    equipment.push_back(item);
+    this->addInventoryItem(item);
 }
 
 bool Character::luaRemInventory(Item * item)
 {
-    if (inventory.removeItem(item))
-    {
-        item->owner = nullptr;
-        return true;
-    }
-    return false;
-}
-
-void Character::luaRegister(lua_State * L)
-{
-    luabridge::getGlobalNamespace(L)
-        .beginClass<Character>("Character")
-        .addData("name", &Character::name)
-        .addData("race", &Character::race)
-        .addData("faction", &Character::faction)
-        .addData("room", &Character::room)
-        .addFunction("getName", &Character::getName)
-        .addFunction("getNameCapital", &Character::getNameCapital)
-        .addFunction("inventoryAdd", &Character::luaAddInventory)
-        .addFunction("inventoryRem", &Character::luaRemInventory)
-        .addFunction("equipmentAdd", &Character::luaAddEquipment)
-        .addFunction("equipmentRem", &Character::luaRemEquipment)
-        .addFunction("doCommand", &Character::doCommand)
-        .addFunction("getEquipmentItems", &Character::luaGetEquipmentItems)
-        .addFunction("getInventoryItems", &Character::luaGetInventoryItems)
-        .addFunction("getRoomsInSight", &Character::luaGetRoomsInSight)
-        .addFunction("getCharactersInSight",
-                     &Character::luaGetCharactersInSight)
-        .addFunction("getItemsInSight", &Character::luaGetItemsInSight)
-        .addFunction("luaGetPathTo", &Character::luaGetPathTo)
-        .addFunction("loadItem", &Character::luaLoadItem)
-        .addFunction("isMobile", &Character::isMobile)
-        .addFunction("isPlayer", &Character::isPlayer)
-        .addFunction("toMobile", &Character::toMobile)
-        .addFunction("toPlayer", &Character::toPlayer)
-        .endClass()
-        .deriveClass<Mobile, Character>("Mobile")
-        .addData("id", &Mobile::id)
-        .addData("spawnRoom", &Mobile::respawnRoom)
-        .addData("shortdesc", &Mobile::shortdesc)
-        .addData("staticdesc", &Mobile::staticdesc)
-        .addData("message_buffer", &Mobile::message_buffer)
-        .addData("controller", &Mobile::controller)
-        .addFunction("isMobile", &Mobile::isMobile)
-        .addFunction("isAlive", &Mobile::isAlive)
-        .endClass()
-        .deriveClass<Player, Character>("Player")
-        .addData("age", &Player::age, false)
-        .addData("experience", &Player::experience, false)
-        .addData("prompt", &Player::prompt, false)
-        .addData("rent_room", &Player::rent_room, false)
-        .addData("remaining_points", &Player::remaining_points, false)
-        .addData("rent_room", &Player::rent_room, false)
-        .addFunction("setVariable", &Player::setLuaVariable)
-        .addFunction("getVariable", &Player::getLuaVariable)
-        .addFunction("removeVariable", &Player::removeLuaVariable)
-        .addFunction("isPlayer", &Player::isPlayer)
-        .endClass();
+    return this->remInventoryItem(item);
 }
 
 bool Character::operator<(const class Character & source) const

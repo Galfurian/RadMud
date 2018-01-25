@@ -25,20 +25,21 @@
 #include "sqliteDbms.hpp"
 #include "character.hpp"
 #include "logger.hpp"
+#include <cassert>
 
-UnloadAction::UnloadAction(Character * _actor, Item * _itemToBeUnloaded) :
+UnloadAction::UnloadAction(Character * _actor, Item * _item) :
     GeneralAction(_actor),
-    itemToBeUnloaded(_itemToBeUnloaded)
+    item(_item)
 {
     // Debugging message.
-    //Logger::log(LogLevel::Debug, "Created UnloadAction.");
+    Logger::log(LogLevel::Debug, "Created UnloadAction.");
     // Reset the cooldown of the action.
-    this->resetCooldown(UnloadAction::getUnloadTime(_itemToBeUnloaded));
+    this->resetCooldown(this->getCooldown());
 }
 
 UnloadAction::~UnloadAction()
 {
-    //Logger::log(LogLevel::Debug, "Deleted unload action.");
+    Logger::log(LogLevel::Debug, "Deleted unload action.");
 }
 
 bool UnloadAction::check(std::string & error) const
@@ -47,26 +48,30 @@ bool UnloadAction::check(std::string & error) const
     {
         return false;
     }
-    if (itemToBeUnloaded == nullptr)
+    if (item == nullptr)
     {
-        Logger::log(LogLevel::Error, "The item is a null pointer.");
         error = "The item you want to unload is missing.";
         return false;
     }
-    if (itemToBeUnloaded->isEmpty())
+    if (item->getType() == ModelType::Magazine)
     {
-        error = itemToBeUnloaded->getNameCapital(true) + " is already empty.";
-        return false;
-    }
-    if (!itemToBeUnloaded->isEmpty())
-    {
-        auto loadedItem = itemToBeUnloaded->content.front();
-        if (loadedItem == nullptr)
+        // Cast the item to magazine.
+        auto magazine = static_cast<MagazineItem *>(item);
+        // Get the loaded projectile.
+        if (magazine->getAlreadyLoadedProjectile() == nullptr)
         {
-            Logger::log(LogLevel::Error,
-                        "The item does not contain any loaded item.");
-            error = "Something is gone wrong while you were unloading " +
-                    itemToBeUnloaded->getName(true) + ".";
+            error = item->getNameCapital(true) + " is already empty.";
+            return false;
+        }
+    }
+    if (item->getType() == ModelType::RangedWeapon)
+    {
+        // Cast the item to ranged weapon.
+        auto magazine = static_cast<RangedWeaponItem *>(item);
+        // Get the loaded magazine.
+        if (magazine->getAlreadyLoadedMagazine() == nullptr)
+        {
+            error = item->getNameCapital(true) + " is already empty.";
             return false;
         }
     }
@@ -85,46 +90,65 @@ std::string UnloadAction::getDescription() const
 
 std::string UnloadAction::stop()
 {
-    if (itemToBeUnloaded != nullptr)
+    if (item != nullptr)
     {
-        return "You stop unloading " + itemToBeUnloaded->getName(true) + ".";
+        return "You stop unloading " + item->getName(true) + ".";
     }
     return "You stop unloading.";
 }
 
 ActionStatus UnloadAction::perform()
 {
-    // Check if the cooldown is ended.
-    if (!this->checkElapsed())
-    {
-        return ActionStatus::Running;
-    }
     std::string error;
     if (!this->check(error))
     {
         actor->sendMsg(error + "\n\n");
         return ActionStatus::Error;
     }
-    auto loadedItem = itemToBeUnloaded->content.front();
+    // Prepare a variable for the loaded item.
+    Item * loadedItem = nullptr;
+    if (item->getType() == ModelType::Magazine)
+    {
+        // Cast the item to magazine.
+        auto magazine = static_cast<MagazineItem *>(item);
+        // Get the loaded projectile.
+        loadedItem = magazine->getAlreadyLoadedProjectile();
+    }
+    if (item->getType() == ModelType::RangedWeapon)
+    {
+        // Cast the item to ranged weapon.
+        auto magazine = static_cast<RangedWeaponItem *>(item);
+        // Get the loaded magazine.
+        loadedItem = magazine->getAlreadyLoadedMagazine();
+    }
+    // Start a transaction.
     SQLiteDbms::instance().beginTransaction();
-    itemToBeUnloaded->takeOut(loadedItem);
+    // Take out the item.
+    item->takeOut(loadedItem);
+    // Add the item to the inventory of the actor.
     actor->addInventoryItem(loadedItem);
+    // End the transaction.
     SQLiteDbms::instance().endTransaction();
-    actor->sendMsg("You have finished unloading %s...\n\n",
-                   itemToBeUnloaded->getName(true));
+    // Show a message.
+    actor->sendMsg("You finish unloading %s.\n\n", item->getName(true));
     return ActionStatus::Finished;
 }
 
-unsigned int UnloadAction::getUnloadTime(Item * _itemToBeUnloaded)
+unsigned int UnloadAction::getCooldown()
 {
-    if (_itemToBeUnloaded->getType() == ModelType::Magazine)
+    assert(actor && "Actor is nullptr");
+    assert(item && "Item is nullptr");
+    if (item->getType() == ModelType::Magazine)
     {
-        auto loadedItem = _itemToBeUnloaded->toMagazineItem()
-                                           ->getAlreadyLoadedProjectile();
-        if (loadedItem != nullptr)
+        // Transform the item to magazine.
+        auto magazine = static_cast<MagazineItem *>(item);
+        // Get the loaded projectile.
+        auto loadedProjectile = magazine->getAlreadyLoadedProjectile();
+        if (loadedProjectile != nullptr)
         {
-            return static_cast<unsigned int>(loadedItem->getWeight(false) *
-                                             loadedItem->quantity);
+            return static_cast<unsigned int>(
+                loadedProjectile->getWeight(false) *
+                loadedProjectile->quantity);
         }
     }
     return 1;

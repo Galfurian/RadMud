@@ -33,26 +33,23 @@ class CraftAction :
 private:
     /// The production associated with the action.
     Production * production;
-    /// The material of which the production will be made of.
-    Material * material;
     /// The tool used by the actor for the action.
-    std::vector<Item *> tools;
+    ItemVector tools;
     /// The ingredients used by the actor for the action.
     std::vector<std::pair<Item *, unsigned int>> ingredients;
+    /// The material of which the production will be made of.
+    Material * material;
 
 public:
     /// @brief Constructor.
     /// @param _actor       The actor who is doing the action.
     /// @param _production  A pointer to the production to craft.
-    /// @param _material    The material of the outcome.
     /// @param _tools       The list of used tools.
     /// @param _ingredients The list of used ingredients.
-    CraftAction(
-        Character * _actor,
-        Production * _production,
-        Material * _material,
-        std::vector<Item *> & _tools,
-        std::vector<std::pair<Item *, unsigned int>> & _ingredients);
+    CraftAction(Character * _actor,
+                Production * _production,
+                ItemVector & _tools,
+                std::vector<std::pair<Item *, unsigned int>> & _ingredients);
 
     /// @brief Destructor.
     virtual ~CraftAction();
@@ -67,15 +64,13 @@ public:
 
     ActionStatus perform() override;
 
+    unsigned int getCooldown() override;
+
+    /// @brief Checks the ingredients and determine the material of the outcome.
+    void determineMaterial();
+
     /// @brief Returns the stamina required to execute the action.
     /// @param character The actor.
     /// @return The required stamina.
     static unsigned int getConsumedStamina(Character * character);
-
-    /// @brief Given an action, it returns the necessary cooldown.
-    /// @param character   The actor.
-    /// @param _production The production used to performe the action.
-    /// @return The non-decreasing value of the cooldown.
-    static unsigned int getCooldown(Character * character,
-                                    Production * _production);
 };

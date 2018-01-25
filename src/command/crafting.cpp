@@ -25,6 +25,7 @@
 #include "mud.hpp"
 #include "buildAction.hpp"
 #include "craftAction.hpp"
+#include "characterUtilities.hpp"
 
 void LoadCraftingCommands()
 {
@@ -46,6 +47,12 @@ bool DoProfession(Character * character,
                   Profession * profession,
                   ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     if (args.size() != 1)
@@ -67,6 +74,12 @@ bool DoProfession(Character * character,
                            args[0].getContent());
         return false;
     }
+    if (!HasRequiredKnowledge(character, production))
+    {
+        character->sendMsg("%s '%s'.\n", profession->notFoundMessage,
+                           args[0].getContent());
+        return false;
+    }
     // Check if the actor has enough stamina to execute the action.
     if (CraftAction::getConsumedStamina(character) > character->stamina)
     {
@@ -74,17 +87,31 @@ bool DoProfession(Character * character,
         return false;
     }
     // Search the needed tools.
-    std::vector<Item *> usedTools;
-    if (!character->findNearbyTools(production->tools, usedTools, false, true,
-                                    true))
+    ItemVector usedTools;
+    // Prepare a structure to set the options of the search.
+    SearchOptionsCharacter searchOptions;
+    searchOptions.searchInRoom = true;
+    searchOptions.searchInEquipment = true;
+    searchOptions.searchInInventory = true;
+    if (!FindNearbyTools(character,
+                         production->tools,
+                         usedTools,
+                         searchOptions))
     {
         character->sendMsg("You don't have the right tools.\n");
         return false;
     }
     // Search the needed ingredients.
     std::vector<std::pair<Item *, unsigned int>> usedIngredients;
-    if (!character->findNearbyResouces(production->ingredients,
-                                       usedIngredients))
+    // Do not search the ingredients inside the equipment.
+    searchOptions.searchInRoom = true;
+    searchOptions.searchInEquipment = false;
+    searchOptions.searchInInventory = true;
+    // Search the resources nearby.
+    if (!FindNearbyResouces(character,
+                            production->ingredients,
+                            usedIngredients,
+                            searchOptions))
     {
         character->sendMsg("You don't have enough material.\n");
         return false;
@@ -92,41 +119,23 @@ bool DoProfession(Character * character,
     // Search the needed workbench.
     if (production->workbench != ToolType::None)
     {
-        auto workbench = character->findNearbyTool(production->workbench,
-                                                   std::vector<Item *>(),
-                                                   true,
-                                                   false,
-                                                   false);
+        // Just check inside the room.
+        searchOptions.searchInRoom = true;
+        searchOptions.searchInEquipment = false;
+        searchOptions.searchInInventory = false;
+        auto workbench = FindNearbyTool(character,
+                                        production->workbench,
+                                        ItemVector(),
+                                        searchOptions);
         if (workbench == nullptr)
         {
             character->sendMsg("The proper workbench is not present.\n");
             return false;
         }
     }
-    // Search the production material among the selected ingredients.
-    Material * craftMaterial = nullptr;
-    for (auto iterator : usedIngredients)
-    {
-        auto item = iterator.first;
-        if (item->model->getType() == ModelType::Resource)
-        {
-            ResourceModel * resourceModel = item->model->toResource();
-            if (resourceModel->resourceType == production->material)
-            {
-                craftMaterial = item->composition;
-                break;
-            }
-        }
-    }
-    if (craftMaterial == nullptr)
-    {
-        character->sendMsg("You cannot decide which will be the material.\n");
-        return false;
-    }
     // Prepare the action.
     auto craftAction = std::make_shared<CraftAction>(character,
                                                      production,
-                                                     craftMaterial,
                                                      usedTools,
                                                      usedIngredients);
     // Check the new action.
@@ -134,7 +143,7 @@ bool DoProfession(Character * character,
     if (craftAction->check(error))
     {
         // Set the new action.
-        character->setAction(craftAction);
+        character->pushAction(craftAction);
         // Send the messages.
         character->sendMsg(
             "%s %s.\n",
@@ -154,8 +163,24 @@ bool DoProfession(Character * character,
 
 bool DoBuild(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
+    // -------------------------------------------------------------------------
+    // If the argument list is empty show what the character can build.
+    if (args.empty())
+    {
+        for (auto it : Mud::instance().mudBuildings)
+        {
+            auto building = it.second;
+        }
+        return true;
+    }
     if (args.size() != 1)
     {
         character->sendMsg("What do you want to build?\n");
@@ -175,81 +200,56 @@ bool DoBuild(Character * character, ArgumentHandler & args)
         return false;
     }
     // Search the needed tools.
-    std::vector<Item *> usedTools;
-    if (!character->findNearbyTools(schematics->tools,
-                                    usedTools, true, true, true))
+    ItemVector usedTools;
+    // Prepare a structure to set the options of the search.
+    SearchOptionsCharacter searchOptions;
+    searchOptions.searchInRoom = true;
+    searchOptions.searchInEquipment = true;
+    searchOptions.searchInInventory = true;
+    if (!FindNearbyTools(character,
+                         schematics->tools,
+                         usedTools,
+                         searchOptions))
     {
         character->sendMsg("You don't have the right tools.\n");
         return false;
     }
     // Search the needed ingredients.
     std::vector<std::pair<Item *, unsigned int>> usedIngredients;
-    if (!character->findNearbyResouces(schematics->ingredients,
-                                       usedIngredients))
+    // Do not search the ingredients inside the equipment.
+    searchOptions.searchInRoom = true;
+    searchOptions.searchInEquipment = false;
+    searchOptions.searchInInventory = true;
+    // Search the resources nearby.
+    if (!FindNearbyResouces(character,
+                            schematics->ingredients,
+                            usedIngredients,
+                            searchOptions))
     {
         character->sendMsg("You don't have enough material.\n");
         return false;
     }
-    // Search the model that has to be built.
-    auto it = std::find_if(character->inventory.begin(),
-                           character->inventory.end(),
-                           [&schematics](Item * item)
-                           {
-                               return (item->model->vnum ==
-                                       schematics->buildingModel->vnum);
-                           });
-    if (it == character->inventory.end())
+    // Keep the previous search options and search the building.
+    auto building = FindNearbyBuilding(character,
+                                       schematics->buildingModel,
+                                       searchOptions);
+    if (building == nullptr)
     {
-        it = std::find_if(character->room->items.begin(),
-                          character->room->items.end(),
-                          [&schematics](Item * item)
-                          {
-                              return (item->model->vnum ==
-                                      schematics->buildingModel->vnum);
-                          });
-        if (it == character->room->items.end())
-        {
-            // Otherwise notify the missing item.
-            character->sendMsg("You don't have the main building item.\n");
-            return false;
-        }
-    }
-    auto building = (*it);
-    // Check if there is already something built inside the room
-    //  with the Unique flag.
-    for (auto iterator : character->room->items)
-    {
-        if (HasFlag(iterator->flags, ItemFlag::Built))
-        {
-            if (schematics->unique)
-            {
-                // Otherwise notify the missing item.
-                character->sendMsg("There are already something built here.\n");
-                return false;
-            }
-            auto builtSchematics = Mud::instance().findBuilding(
-                iterator->model->vnum);
-            if (builtSchematics)
-            {
-                if (builtSchematics->unique)
-                {
-                    // Otherwise notify the missing item.
-                    character->sendMsg("You cannot build something here.\n");
-                    return false;
-                }
-            }
-        }
+        character->sendMsg("You don't have the required item.\n");
+        return false;
     }
     // Prepare the action.
-    auto buildAction = std::make_shared<BuildAction>(character, schematics,
-                                                     building, usedTools,
+    auto buildAction = std::make_shared<BuildAction>(character,
+                                                     schematics,
+                                                     building,
+                                                     usedTools,
                                                      usedIngredients);
     // Check the new action.
     std::string error;
     if (buildAction->check(error))
     {
         // Set the new action.
-        character->setAction(buildAction);
+        character->pushAction(buildAction);
         character->sendMsg(
             "You start building %s.\n",
             Formatter::yellow() + schematics->buildingModel->getName() +
@@ -267,6 +267,12 @@ bool DoBuild(Character * character, ArgumentHandler & args)
 
 bool DoDeconstruct(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     if (args.size() != 1)
@@ -292,7 +298,7 @@ bool DoDeconstruct(Character * character, ArgumentHandler & args)
     {
         character->sendMsg("You deconstruct %s.\n", item->getName(true));
         // Reset item flags.
-        ClearFlag(&item->flags, ItemFlag::Built);
+        ClearFlag(item->flags, ItemFlag::Built);
         return true;
     }
     character->sendMsg(error + "\n");
@@ -301,6 +307,12 @@ bool DoDeconstruct(Character * character, ArgumentHandler & args)
 
 bool DoRead(Character * character, ArgumentHandler & args)
 {
+    // Check if the character is sleeping.
+    if (character->posture == CharacterPosture::Sleep)
+    {
+        character->sendMsg("Not while you're sleeping.\n");
+        return false;
+    }
     // Stop any action the character is executing.
     StopAction(character);
     if (args.size() != 1)

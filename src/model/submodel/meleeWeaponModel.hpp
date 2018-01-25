@@ -28,10 +28,10 @@
 using MeleeWeaponType = enum class MeleeWeaponType_t
 {
     None,
-    Unarmed, ///< [1] Weapon to enanche unarmed fight
+    Unarmed, ///< [1] Weapon to enhance unarmed fight
     Bladed,  ///< [2] All sort of blades
     Blunt,   ///< [3] All sort of blunt weapons
-    Placed,  ///< [4]  Placeble explosives
+    Placed,  ///< [4] Placed explosives
 };
 
 /// @brief Model of a weapon.

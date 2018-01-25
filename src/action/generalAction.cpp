@@ -22,17 +22,24 @@
 
 #include "generalAction.hpp"
 #include "character.hpp"
+#include "mobile.hpp"
+#include "logger.hpp"
+#include <lua.hpp>
+#include <cassert>
 
-GeneralAction::GeneralAction(Character * _actor) :
+GeneralAction::GeneralAction(Character * _actor,
+                             const bool & _lastAction) :
     actor(_actor),
+    lastAction(_lastAction),
     actionCooldown()
 {
-    // Nothing to do.
+    // Debugging message.
+    Logger::log(LogLevel::Debug, "Created GeneralAction.");
 }
 
 GeneralAction::~GeneralAction()
 {
-    // Nothing to do.
+    Logger::log(LogLevel::Debug, "Deleted GeneralAction.");
 }
 
 bool GeneralAction::checkElapsed() const
@@ -82,17 +89,24 @@ ActionStatus GeneralAction::perform()
     return ActionStatus::Finished;
 }
 
-void GeneralAction::resetCooldown(const unsigned int & _actionCooldown)
-{
-    this->actionCooldown = std::chrono::system_clock::now() +
-                           std::chrono::seconds(_actionCooldown);
-}
-
 unsigned int GeneralAction::getCooldown()
 {
     return static_cast<unsigned int>(
         std::chrono::duration_cast<std::chrono::seconds>(
             actionCooldown - std::chrono::system_clock::now()).count());
+}
+
+void GeneralAction::resetCooldown(const unsigned int & _actionCooldown)
+{
+    actionCooldown = std::chrono::system_clock::now();
+    if (_actionCooldown == 0)
+    {
+        actionCooldown += std::chrono::seconds(this->getCooldown());
+    }
+    else
+    {
+        actionCooldown += std::chrono::seconds(_actionCooldown);
+    }
 }
 
 std::shared_ptr<CombatAction> GeneralAction::toCombatAction()

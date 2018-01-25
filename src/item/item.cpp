@@ -24,15 +24,6 @@
 
 #include "mud.hpp"
 #include "logger.hpp"
-#include "shopItem.hpp"
-#include "lightItem.hpp"
-#include "armorItem.hpp"
-#include "corpseItem.hpp"
-#include "currencyItem.hpp"
-#include "containerModel.hpp"
-#include "meleeWeaponItem.hpp"
-#include "rangedWeaponItem.hpp"
-#include "liquidContainerItem.hpp"
 
 Item::Item() :
     vnum(),
@@ -49,20 +40,21 @@ Item::Item() :
     room(),
     owner(),
     container(),
-    currentSlot(EquipmentSlot::None),
-    content()
+    occupiedBodyParts(),
+    content(),
+    itemMutex()
 {
 }
 
 Item::~Item()
 {
-//    Logger::log(LogLevel::Debug,
-//                "Deleted item\t\t[%s]\t\t(%s)",
-//                ToString(this->vnum),
-//                this->getNameCapital());
+    Logger::log(LogLevel::Debug,
+                "Deleted item\t\t[%s]\t\t(%s)",
+                ToString(this->vnum),
+                this->getNameCapital());
 }
 
-bool Item::check(bool complete)
+bool Item::check()
 {
     bool safe = true;
     safe &= CorrectAssert(vnum > 0);
@@ -71,20 +63,6 @@ bool Item::check(bool complete)
     safe &= CorrectAssert(!maker.empty());
     safe &= CorrectAssert(condition > 0);
     safe &= CorrectAssert(composition != nullptr);
-    if (complete)
-    {
-        safe &= CorrectAssert(!((room != nullptr) && (owner != nullptr)));
-        safe &= CorrectAssert(!((room != nullptr) && (container != nullptr)));
-        safe &= CorrectAssert(!((owner != nullptr) && (container != nullptr)));
-        safe &= CorrectAssert((room != nullptr) ||
-                              (owner != nullptr) ||
-                              (container != nullptr));
-    }
-    //safe &= CorrectAssert(currentSlot != EquipmentSlot::kNoEquipSlot);
-    if (!safe)
-    {
-        Logger::log(LogLevel::Error, "Item :" + ToString(vnum));
-    }
     return safe;
 }
 
@@ -163,15 +141,20 @@ bool Item::updateOnDB()
 
 bool Item::removeOnDB()
 {
-    Logger::log(LogLevel::Debug, "Removing %s from DB...", this->getName());
-    QueryList where = {std::make_pair("vnum", ToString(vnum))};
-    // Prepare the where clause.
-    if (SQLiteDbms::instance().deleteFrom("Item", where))
+    Logger::log(LogLevel::Debug, "Removing '%s' from DB...",
+                this->getName(true));
+    if (SQLiteDbms::instance().deleteFrom(
+        "Item", {std::make_pair("vnum", ToString(vnum))}))
     {
         // Remove the item from everywhere.
-        SQLiteDbms::instance().deleteFrom("ItemPlayer", where);
-        SQLiteDbms::instance().deleteFrom("ItemRoom", where);
-        SQLiteDbms::instance().deleteFrom("ItemContent", where);
+        SQLiteDbms::instance().deleteFrom(
+            "ItemPlayer", {std::make_pair("item", ToString(vnum))});
+        SQLiteDbms::instance().deleteFrom(
+            "ItemRoom", {std::make_pair("item", ToString(vnum))});
+        SQLiteDbms::instance().deleteFrom(
+            "ItemContent", {std::make_pair("container", ToString(vnum))});
+        SQLiteDbms::instance().deleteFrom(
+            "ItemContent", {std::make_pair("item", ToString(vnum))});
         return true;
     }
     Logger::log(LogLevel::Error, "Can't delete the item from the database!");
@@ -216,7 +199,10 @@ void Item::getSheet(Table & sheet) const
         locationRow.push_back("Nowhere");
     }
     sheet.addRow(locationRow);
-    sheet.addRow({"Equipment Slot", currentSlot.toString()});
+    for (auto bodyPart : occupiedBodyParts)
+    {
+        sheet.addRow({"Body Part", bodyPart->getDescription()});
+    }
     if (!content.empty())
     {
         sheet.addDivider();
@@ -264,9 +250,13 @@ std::string Item::getTypeName() const
 
 bool Item::canStackWith(Item * item) const
 {
+    if (model == nullptr) return false;
+    if (composition == nullptr) return false;
+    if (item->model == nullptr) return false;
+    if (item->composition == nullptr) return false;
     return HasFlag(this->model->modelFlags, ModelFlag::CanBeStacked)
-           && (this->model->vnum == item->model->vnum)
-           && (this->composition->vnum == item->composition->vnum);
+           && (model->vnum == item->model->vnum)
+           && (composition->vnum == item->composition->vnum);
 }
 
 Item * Item::removeFromStack(Character * actor, unsigned int & _quantity)
@@ -275,9 +265,9 @@ Item * Item::removeFromStack(Character * actor, unsigned int & _quantity)
     {
         // Generate a copty of this item with the given quantity.
         auto newStack = this->model->createItem(actor->getName(),
-                                                this->composition,
+                                                composition,
                                                 false,
-                                                this->quality,
+                                                quality,
                                                 _quantity);
         if (newStack != nullptr)
         {
@@ -453,32 +443,23 @@ std::string Item::getLook()
     return output;
 }
 
+std::string Item::lookContent()
+{
+    return "";
+}
+
 bool Item::isAContainer() const
 {
-    return (model->getType() == ModelType::Container);
+    return false;
 }
 
 bool Item::isEmpty() const
 {
-    if (this->isAContainer() ||
-        (model->getType() == ModelType::Magazine) ||
-        (model->getType() == ModelType::RangedWeapon) ||
-        (model->getType() == ModelType::Light))
-    {
-        return content.empty();
-    }
-    return true;
+    return (!this->isAContainer() || content.empty());
 }
 
 double Item::getTotalSpace() const
 {
-    if (model->getType() == ModelType::Container)
-    {
-        // The base space.
-        double spaceBase = model->toContainer()->maxWeight;
-        // Evaluate the result.
-        return ((spaceBase + (spaceBase * quality.getModifier())) / 2);
-    }
     return 0.0;
 }
 
@@ -497,18 +478,20 @@ double Item::getUsedSpace() const
 
 double Item::getFreeSpace() const
 {
-    auto totalSpace = this->getTotalSpace();
-    auto usedSpace = this->getUsedSpace();
-    if (totalSpace < usedSpace)
+    if (this->isAContainer())
     {
-        return 0.0;
+        return this->getTotalSpace() - this->getUsedSpace();
     }
-    return totalSpace - usedSpace;
+    return 0.0;
 }
 
 bool Item::canContain(Item * item, const unsigned int & amount) const
 {
-    return (item->getWeight(false) * amount) <= this->getFreeSpace();
+    if (this->isAContainer())
+    {
+        return (item->getWeight(false) * amount) <= this->getFreeSpace();
+    }
+    return false;
 }
 
 void Item::putInside(Item *& item, bool updateDB)
@@ -521,11 +504,10 @@ void Item::putInside(Item *& item, bool updateDB)
     if (updateDB && (this->getType() != ModelType::Corpse))
     {
         SQLiteDbms::instance().insertInto(
-            "ItemContent", {
+            "ItemContent",
+            {
                 ToString(this->vnum), ToString(item->vnum)
-            },
-            false,
-            true);
+            }, false, true);
     }
     // Log it.
     Logger::log(LogLevel::Debug,
@@ -559,173 +541,28 @@ bool Item::takeOut(Item * item, bool updateDB)
 
 Item * Item::findContent(std::string search_parameter, int & number)
 {
-    if (this->isEmpty())
+    if (this->isAContainer())
     {
-        return nullptr;
-    }
-    for (auto iterator : content)
-    {
-        if (iterator->hasKey(ToLower(search_parameter)))
+        for (auto iterator : content)
         {
-            if (number == 1)
+            if (iterator->hasKey(ToLower(search_parameter)))
             {
-                return iterator;
+                if (number == 1)
+                {
+                    return iterator;
+                }
+                number -= 1;
             }
-            number -= 1;
         }
     }
     return nullptr;
 }
 
-std::string Item::lookContent()
+void Item::setOccupiedBodyParts(
+    std::vector<std::shared_ptr<BodyPart>> _occupiedBodyParts)
 {
-    if (!this->isAContainer())
-    {
-        return "";
-    }
-    std::string output;
-    auto Italic = [](const std::string & s)
-    {
-        return Formatter::italic() + s + Formatter::reset();
-    };
-    auto Yellow = [](const std::string & s)
-    {
-        return Formatter::yellow() + s + Formatter::reset();
-    };
-    if (HasFlag(this->flags, ItemFlag::Closed))
-    {
-        output += Italic("It is closed.\n");
-        if (!HasFlag(this->model->modelFlags, ModelFlag::CanSeeThrough))
-        {
-            return output + "\n";
-        }
-    }
-    if (content.empty())
-    {
-        output += Italic("It's empty.\n");
-    }
-    else
-    {
-        output += "Looking inside you see:\n";
-        Table table = Table();
-        table.addColumn("Item", StringAlign::Left);
-        table.addColumn("Quantity", StringAlign::Right);
-        table.addColumn("Weight", StringAlign::Right);
-        // List all the contained items.
-        for (auto it : content)
-        {
-            table.addRow(
-                {
-                    it->getNameCapital(),
-                    ToString(it->quantity),
-                    ToString(it->getWeight(true))
-                });
-        }
-        output += table.getTable();
-        output += "Has been used " + Yellow(ToString(getUsedSpace()));
-        output += " out of " + Yellow(ToString(getTotalSpace())) +
-                  " " + Mud::instance().getWeightMeasure() + ".\n";
-    }
-    return output;
-}
-
-void Item::setCurrentSlot(EquipmentSlot _currentSlot)
-{
-    currentSlot = _currentSlot;
-}
-
-EquipmentSlot Item::getCurrentSlot()
-{
-    if (currentSlot == EquipmentSlot::None)
-    {
-        return model->slot;
-    }
-    return currentSlot;
-}
-
-std::string Item::getCurrentSlotName()
-{
-    return getCurrentSlot().toString();
-}
-
-ShopItem * Item::toShopItem()
-{
-    return static_cast<ShopItem *>(this);
-}
-
-ArmorItem * Item::toArmorItem()
-{
-    return static_cast<ArmorItem *>(this);
-}
-
-MeleeWeaponItem * Item::toMeleeWeaponItem()
-{
-    return static_cast<MeleeWeaponItem *>(this);
-}
-
-RangedWeaponItem * Item::toRangedWeaponItem()
-{
-    return static_cast<RangedWeaponItem *>(this);
-}
-
-CurrencyItem * Item::toCurrencyItem()
-{
-    return static_cast<CurrencyItem *>(this);
-}
-
-CorpseItem * Item::toCorpseItem()
-{
-    return static_cast<CorpseItem *>(this);
-}
-
-MagazineItem * Item::toMagazineItem()
-{
-    return static_cast<MagazineItem *>(this);
-}
-
-LightItem * Item::toLightItem()
-{
-    return static_cast<LightItem *>(this);
-}
-
-LiquidContainerItem * Item::toLiquidContainerItem()
-{
-    return static_cast<LiquidContainerItem *>(this);
-}
-
-void Item::luaRegister(lua_State * L)
-{
-    luabridge::getGlobalNamespace(L)
-        .beginClass<Item>("Item")
-        .addData("vnum", &Item::vnum)
-        .addData("model", &Item::model)
-        .addFunction("getName", &Item::getName)
-        .addFunction("hasKey", &Item::hasKey)
-        .addFunction("getType", &Item::getType)
-        .addFunction("getTypeName", &Item::getTypeName)
-        .addData("maker", &Item::maker)
-        .addData("condition", &Item::condition)
-        .addData("weight", &Item::weight)
-        .addData("price", &Item::price)
-        .addData("composition", &Item::composition)
-        .addData("room", &Item::room)
-        .addData("owner", &Item::owner)
-        .addData("container", &Item::container)
-        .addData("container", &Item::container)
-        .endClass()
-        .deriveClass<ArmorItem, Item>("ArmorItem")
-        .addFunction("getAC", &ArmorItem::getArmorClass)
-        .endClass()
-        .deriveClass<CorpseItem, Item>("CorpseItem")
-        .endClass()
-        .deriveClass<CurrencyItem, Item>("CurrencyItem")
-        .endClass()
-        .deriveClass<ShopItem, Item>("ShopItem")
-        .endClass()
-        .deriveClass<MeleeWeaponItem, Item>("MeleeWeaponItem")
-        .endClass()
-        .deriveClass<RangedWeaponItem, Item>("RangedWeaponItem")
-        .endClass();
+    // Set the new list of occupied body parts.
+    occupiedBodyParts = _occupiedBodyParts;
 }
 
 bool Item::operator<(Item & rhs) const

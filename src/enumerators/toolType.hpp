@@ -22,16 +22,11 @@
 
 #pragma once
 
-
-#include <string>
-
-extern "C"
-{
-#include "lua.h"
-}
+#include "baseEnumerator.hpp"
 
 /// @brief Used to determine the type of the tools.
-class ToolType
+class ToolType :
+    public BaseEnumerator
 {
 public:
     /// The possible types of tools.
@@ -49,50 +44,30 @@ public:
         BlacksmithHammer = 32,
         Bellows = 33,
         Crucible = 34,
-        Tinderbox = 40
+        Firelighter = 40
     };
 
-    /// @brief Constructor from uint.
-    ToolType();
+    /// @brief Constructor.
+    ToolType() :
+        BaseEnumerator()
+    {
+        // Nothing to do.
+    }
 
-    /// @brief Constructor from uint.
-    ToolType(const unsigned int & _toolType);
+    /// @brief Constructor from unsigned int.
+    ToolType(const unsigned int & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Constructor from enum.
-    ToolType(const Enum & _toolType);
-
-    /// @brief Constructor from string.
-    ToolType(const std::string & _toolType);
-
-    /// @brief Check is the given number is a valid type of model.
-    static bool isValid(const unsigned int & _toolType);
-
-    /// @brief Check is the given string is a valid type of model.
-    static bool isValid(const std::string & _toolType);
+    ToolType(const Enum & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Returns the type of model as string.
-    std::string toString() const;
-
-    /// @brief Returns the type of model as number.
-    unsigned int toUInt() const;
-
-    /// @brief Equality operator w.r.t. a type of model object.
-    bool operator==(const ToolType & rhs) const;
-
-    /// @brief Equality operator w.r.t. a type of model enum.
-    bool operator==(const ToolType::Enum & rhs) const;
-
-    /// @brief Inequality operator w.r.t. a type of model enum.
-    bool operator!=(const ToolType::Enum & rhs) const;
-
-    /// @brief Equality operator w.r.t. a type of model object.
-    bool operator<(const ToolType & rhs) const;
-
-    /// @brief Function used to register inside the lua environment the class.
-    /// @param L The lua environment.
-    static void luaRegister(lua_State * L);
-
-private:
-    /// Internal type of model.
-    Enum toolType;
+    std::string toString() const override;
 };

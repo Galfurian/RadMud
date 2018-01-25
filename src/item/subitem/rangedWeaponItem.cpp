@@ -69,9 +69,14 @@ std::string RangedWeaponItem::lookContent()
     return output;
 }
 
+bool RangedWeaponItem::isAContainer() const
+{
+    return true;
+}
+
 unsigned int RangedWeaponItem::rollDamage() const
 {
-    return TRandInteger<unsigned int>(this->getMinDamage(),
+    return TRand<unsigned int>(this->getMinDamage(),
                                       this->getMaxDamage());
 }
 
@@ -158,7 +163,7 @@ MagazineItem * RangedWeaponItem::getAlreadyLoadedMagazine() const
     {
         return nullptr;
     }
-    Item * magazine = this->content.front();
+    auto magazine = this->content.front();
     if (magazine == nullptr)
     {
         return nullptr;
@@ -167,7 +172,7 @@ MagazineItem * RangedWeaponItem::getAlreadyLoadedMagazine() const
     {
         return nullptr;
     }
-    return magazine->toMagazineItem();
+    return static_cast<MagazineItem *>(magazine);
 }
 
 Item * RangedWeaponItem::retrieveProjectile(std::string & error) const

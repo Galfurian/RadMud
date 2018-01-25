@@ -20,8 +20,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
+#include <utilities/logger.hpp>
 #include "updater.hpp"
-#include "logger.hpp"
+#include "generalBehaviour.hpp"
 #include "mud.hpp"
 
 // //////////////////////////////////////////////////////////
@@ -37,11 +38,11 @@ MudUpdater::MudUpdater() :
     bandwidth_uncompressed(),
     ticTime(std::chrono::system_clock::now()),
     ticSize(10),
-    //hourTicSize(18),
     hourTicSize(2),
     hourTicCounter(),
     mudHour(),
-    mudDayPhase(DayPhase::Morning)
+    mudDayPhase(DayPhase::Morning),
+    itemToDestroy()
 {
     // Nothing to do.
 }
@@ -128,7 +129,7 @@ void MudUpdater::advanceTime()
         // [TIC] Update the Mobiles.
         for (auto iterator : Mud::instance().mudMobiles)
         {
-            iterator.second->updateTic();
+            iterator->updateTic();
         }
         // [TIC] Update the Items.
         for (auto iterator : Mud::instance().mudItems)
@@ -153,7 +154,7 @@ void MudUpdater::advanceTime()
             // [HOUR] Update the Mobiles.
             for (auto iterator : Mud::instance().mudMobiles)
             {
-                iterator.second->updateHour();
+                iterator->updateHour();
             }
             // [HOUR] Update the Corpses.
             for (auto it : Mud::instance().mudCorpses)
@@ -250,51 +251,26 @@ void MudUpdater::updateDayPhase()
 
 void MudUpdater::performActions()
 {
-    for (auto iterator : Mud::instance().mudPlayers)
+    for (auto player : Mud::instance().mudPlayers)
     {
         // If the player is not playing, continue.
-        if (!iterator->isPlaying())
+        if (!player->isPlaying())
         {
             continue;
         }
-        if (iterator->getAction()->getType() == ActionType::Wait)
-        {
-            continue;
-        }
-        ActionStatus actionStatus = iterator->getAction()->perform();
-        if ((actionStatus == ActionStatus::Finished) ||
-            (actionStatus == ActionStatus::Error))
-        {
-            // Remove the from action.
-            iterator->popAction();
-        }
+        // Perform the action.
+        player->performAction();
     }
-    for (auto iterator : Mud::instance().mudMobiles)
+    for (auto mobile : Mud::instance().mudMobiles)
     {
-        auto mobile = iterator.second;
+        // If the mobile is not alive, continue.
         if (!mobile->isAlive())
         {
             continue;
         }
-        auto end = std::chrono::system_clock::now();
-        auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
-            mobile->nextActionCooldown - end).count();
-        if (elapsed < 0)
-        {
-            mobile->triggerEventRandom();
-            mobile->nextActionCooldown = end + std::chrono::seconds(
-                TRandInteger<int>(30, 60));
-        }
-        if (mobile->getAction()->getType() == ActionType::Wait)
-        {
-            continue;
-        }
-        ActionStatus actionStatus = mobile->getAction()->perform();
-        if ((actionStatus == ActionStatus::Finished) ||
-            (actionStatus == ActionStatus::Error))
-        {
-            // Remove the last action.
-            mobile->popAction();
-        }
+        // Perform the behaviour.
+        mobile->performBehaviour();
+        // Perform the action.
+        mobile->performAction();
     }
 }

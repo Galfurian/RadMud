@@ -22,47 +22,48 @@
 
 #pragma once
 
-#include <string>
+#include "baseEnumerator.hpp"
 
 /// The quality of an item.
-class ItemQuality
+class ItemQuality :
+    public BaseEnumerator
 {
 public:
     /// List of possible quality values.
     enum Enum
     {
-        Disastrous,
-        Poor,
-        Normal,
-        Fine,
-        Masterful
+        None,       ///< No quality.
+        Disastrous, ///< Disastrous quality.
+        Poor,       ///< Poor quality.
+        Normal,     ///< Normal quality.
+        Fine,       ///< Fine quality.
+        Masterful   ///< Masterful quality.
     };
 
-    /// @brief Constructor from number.
-    ItemQuality(const unsigned int & _quality);
+    /// @brief Constructor.
+    ItemQuality() :
+        BaseEnumerator()
+    {
+        // Nothing to do.
+    }
+
+    /// @brief Constructor from unsigned int.
+    ItemQuality(const unsigned int & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Constructor from enum.
-    ItemQuality(const Enum & _quality);
-
-    /// @brief Check is the given number is a valid quality.
-    static bool isValid(const unsigned int & _quality);
+    ItemQuality(const Enum & _value) :
+        BaseEnumerator(_value)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Returns the quality as string.
-    std::string toString() const;
-
-    /// @brief Returns the quality as number.
-    unsigned int toUInt() const;
+    std::string toString() const override;
 
     /// @brief Returns the quality modifier.
     double getModifier() const;
-
-    /// @brief Equality operator w.r.t. a quality enum.
-    bool operator==(const ItemQuality::Enum & rhs) const;
-
-    /// @brief Inequality operator w.r.t. a quality enum.
-    bool operator!=(const ItemQuality::Enum & rhs) const;
-
-private:
-    /// Internal quality value.
-    Enum quality;
 };

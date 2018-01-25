@@ -47,6 +47,17 @@ void LiquidContainerItem::getSheet(Table & sheet) const
     sheet.addDivider();
 }
 
+double LiquidContainerItem::getWeight(bool) const
+{
+    // Add the default weight of the model.
+    auto totalWeight = this->weight;
+    if (!this->isEmpty())
+    {
+        totalWeight += liquidQuantity;
+    }
+    return totalWeight;
+}
+
 std::string LiquidContainerItem::lookContent()
 {
     auto Italic = [](const std::string & s)
@@ -94,15 +105,9 @@ std::string LiquidContainerItem::lookContent()
     return output;
 }
 
-double LiquidContainerItem::getWeight(bool) const
+bool LiquidContainerItem::isAContainer() const
 {
-    // Add the default weight of the model.
-    auto totalWeight = this->weight;
-    if (!this->isEmpty())
-    {
-        totalWeight += liquidQuantity;
-    }
-    return totalWeight;
+    return true;
 }
 
 bool LiquidContainerItem::isEmpty() const
