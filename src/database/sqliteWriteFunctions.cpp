@@ -63,12 +63,12 @@ bool SavePlayer(Player * player)
 
 bool SavePlayerSkills(Player * player)
 {
-    for (auto skill : player->skills)
+    for (const auto & skillData : player->skillManager.skills)
     {
         std::vector<std::string> args;
         args.push_back(player->name);
-        args.push_back(ToString(skill.first));
-        args.push_back(ToString(skill.second));
+        args.push_back(ToString(skillData->skillVnum));
+        args.push_back(ToString(skillData->skillLevel));
         if (!SQLiteDbms::instance().insertInto("PlayerSkill", args, false,
                                                true))
         {

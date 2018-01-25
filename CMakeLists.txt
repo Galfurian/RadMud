@@ -68,6 +68,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-non-virtual-dtor")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-switch-default")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-noexcept-type")
 
 #################################################
 # Activate compiler-specific C++11...
@@ -121,6 +122,8 @@ set(PROJECT_SRC
         ${CMAKE_SOURCE_DIR}/src/character/effect/effectFactory.cpp
         ${CMAKE_SOURCE_DIR}/src/character/race/race.cpp
         ${CMAKE_SOURCE_DIR}/src/character/skill/skill.cpp
+        ${CMAKE_SOURCE_DIR}/src/character/skill/skillData.cpp
+        ${CMAKE_SOURCE_DIR}/src/character/skill/skillManager.cpp
         ${CMAKE_SOURCE_DIR}/src/command/command.cpp
         ${CMAKE_SOURCE_DIR}/src/command/combat.cpp
         ${CMAKE_SOURCE_DIR}/src/command/communication.cpp

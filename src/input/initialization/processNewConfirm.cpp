@@ -47,9 +47,10 @@ bool ProcessNewConfirm::process(Character * character, ArgumentHandler & args)
         player->experience = 0;
         player->flags = 0;
         player->rent_room = 1000;
-        for (auto it : player->race->baseSkills)
+        for (const auto & skillData : player->race->skills)
         {
-            player->skills.insert(it);
+            player->skillManager.addSkill(skillData->skill,
+                                          skillData->skillLevel);
         }
         // Update the player on the database.
         SQLiteDbms::instance().beginTransaction();

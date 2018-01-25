@@ -27,6 +27,7 @@
 #include <vector>
 #include <memory>
 
+#include "skillManager.hpp"
 #include "corpseModel.hpp"
 #include "ability.hpp"
 #include "faction.hpp"
@@ -60,7 +61,7 @@ public:
     /// The list of body parts.
     std::vector<std::shared_ptr<BodyPart>> bodyParts;
     /// Base skills.
-    std::map<int, unsigned int> baseSkills;
+    std::vector<std::shared_ptr<SkillData>> skills;
 
     /// @brief Constructor.
     Race();

@@ -43,7 +43,7 @@ bool DoDismember(Character * character, ArgumentHandler & args)
         // Transform the character to player.
         auto player = character->toPlayer();
         // Check if the player can butcher animals.
-        if (!player->effects.getKnowledge(Knowledge::Butchery))
+        if (!player->effectManager.getKnowledge(Knowledge::Butchery))
         {
             character->sendMsg("You don't know how to dismember corpses.\n");
             return false;

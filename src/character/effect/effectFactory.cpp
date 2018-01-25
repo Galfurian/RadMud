@@ -23,38 +23,42 @@
 #include "effectFactory.hpp"
 #include "character.hpp"
 
-Effect EffectFactory::clearTargets(Character * actor,
-                                   const unsigned int & duration)
+namespace EffectFactory
 {
-    return Effect(actor,
-                  "ClearTargets",
-                  duration,
-                  "",
-                  "",
-                  [](Character * character)
-                  {
-                      if (character != nullptr)
-                      {
-                          character->combatHandler.charactersInSight.clear();
-                      }
-                  });
-}
 
-Effect EffectFactory::disturbedAim(Character * actor,
-                                   const unsigned int & duration,
-                                   const int & negativeMagnitude)
+Effect clearTargets(Character * actor,
+                    const unsigned int & duration)
 {
-    auto effect = Effect(actor, "DisturbedAim", duration, "", "", nullptr);
-    effect.effectCombatModifier.insert(
-        std::make_pair(CombatModifier::RangedWeaponHitRoll,
-                       negativeMagnitude
-        )
-    );
+    auto effect = Effect(
+        actor,
+        "ClearTargets",
+        duration,
+        "",
+        "",
+        [](Character * character)
+        {
+            if (character != nullptr)
+            {
+                character->combatHandler
+                         .charactersInSight
+                         .clear();
+            }
+        });
     return effect;
 }
 
-Effect EffectFactory::skillEffect(Character * actor,
-                                  const std::string & skillName)
+Effect disturbedAim(Character * actor,
+                    const unsigned int & duration,
+                    const int & negativeMagnitude)
 {
-    return Effect(actor, skillName, 0, "", "", nullptr);
+    auto effect = Effect(actor,
+                         "DisturbedAim",
+                         duration,
+                         "",
+                         "",
+                         nullptr);
+    effect.setCombatMod(CombatModifier::RangedWeaponHitRoll, negativeMagnitude);
+    return effect;
+}
+
 }

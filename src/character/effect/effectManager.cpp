@@ -23,10 +23,6 @@
 #include "effectManager.hpp"
 
 EffectManager::EffectManager() :
-    activeAbilityModifier(),
-    activeCombatModifier(),
-    activeStatusModifier(),
-    activeKnowledge(),
     activeEffects(),
     pendingEffects(),
     passiveEffects()
@@ -39,38 +35,44 @@ EffectManager::~EffectManager()
     // Nothing to do.
 }
 
-void EffectManager::addPassiveEffect(const Effect & effect)
+bool EffectManager::addPassiveEffect(const Effect & effect)
 {
     // First check if the same effect is already active.
-    for (auto & iterator : passiveEffects)
+    for (auto & it : passiveEffects)
     {
         // Check the equality between the effects.
-        if (iterator == effect)
+        if (it == effect)
         {
-            // If the effect is already active, set the remaining time to the
-            // longest one.
-            if (iterator.remainingTic < effect.remainingTic)
+            // Set the remaining time to the longest one.
+            if (it.remainingTic < effect.remainingTic)
             {
-                iterator.remainingTic = effect.remainingTic;
+                it.remainingTic = effect.remainingTic;
+                return true;
             }
-            return;
+            else
+            {
+                return false;
+            }
         }
     }
     // Add the effect to the active effects.
     passiveEffects.push_back(effect);
     // Activate the effect.
-    this->activateEffect(effect);
+//    this->addEffectMod(effect);
+    (*this) += effect;
+    return true;
 }
 
 void EffectManager::removePassiveEffect(const Effect & effect)
 {
-    // Iterate trough the active effects.
+    // Try to find the effect.
     for (auto it = passiveEffects.begin(); it != passiveEffects.end(); ++it)
     {
-        if (it->name == effect.name)
+        if ((*it).name == effect.name)
         {
             // Deactivate the effect.
-            this->deactivateEffect(*it);
+//            this->remEffectMod(*it);
+            (*this) -= (*it);
             // Remove the effect from the list of active effects.
             passiveEffects.erase(it);
             // Stop the loop.
@@ -85,7 +87,8 @@ void EffectManager::removeAllPassiveEffect()
     for (auto it = passiveEffects.begin(); it != passiveEffects.end();)
     {
         // Deactivate the effect.
-        this->deactivateEffect(*it);
+//        this->remEffectMod(*it);
+        (*this) -= (*it);
         // Remove the effect from the list of active effects.
         it = passiveEffects.erase(it);
     }
@@ -111,9 +114,10 @@ void EffectManager::forceAddEffect(const Effect & effect)
     // Add the effect to the active effects.
     activeEffects.push_back(effect);
     // Activate the effect.
-    this->activateEffect(effect);
+//    this->addEffectMod(effect);
+    (*this) += effect;
     // Sort the list of active effects.
-    this->sortList();
+    this->sortEffects(activeEffects);
 }
 
 void EffectManager::addPendingEffect(const Effect & effect)
@@ -161,13 +165,14 @@ bool EffectManager::effectActivate(std::vector<std::string> & messages)
                 messages.push_back(pendingEffect.messageActivate);
             }
             // Add the effect to the active effects.
-            activeEffects.push_back(pendingEffect);
+            activeEffects.emplace_back(pendingEffect);
             // Activate the effect.
-            this->activateEffect(pendingEffect);
-            // Sort the list of active effects.
-            this->sortList();
+            (*this) += pendingEffect;
+//            this->addEffectMod(pendingEffect);
         }
     }
+    // Sort the list of active effects.
+    this->sortEffects(activeEffects);
     // Empty out the list of pending effects.
     pendingEffects.clear();
     return !messages.empty();
@@ -180,147 +185,26 @@ bool EffectManager::effectUpdate(std::vector<std::string> & messages)
     while (it != activeEffects.end())
     {
         // If the effect is expired, remove it.
-        if (it->update())
+        if ((*it).update())
         {
             // If the effect has an expiration message, add it to the list of
             // output messages.
-            if (!it->messageExpire.empty())
+            if (!(*it).messageExpire.empty())
             {
-                messages.push_back(it->messageExpire);
+                messages.push_back((*it).messageExpire);
             }
             // Deactivate the effect.
-            this->deactivateEffect(*it);
+//            this->remEffectMod(*it);
+            (*this) -= (*it);
             // Remove the effect from the list of active effects.
             it = activeEffects.erase(it);
-            // Sort the list of active effects.
-            this->sortList();
-            continue;
         }
-        ++it;
+        else
+        {
+            ++it;
+        }
     }
+    // Sort the list of active effects.
+    this->sortEffects(activeEffects);
     return !messages.empty();
-}
-
-std::vector<Effect>::iterator EffectManager::begin()
-{
-    return activeEffects.begin();
-}
-
-std::vector<Effect>::const_iterator EffectManager::begin() const
-{
-    return activeEffects.begin();
-}
-
-std::vector<Effect>::iterator EffectManager::end()
-{
-    return activeEffects.end();
-}
-
-std::vector<Effect>::const_iterator EffectManager::end() const
-{
-    return activeEffects.end();
-}
-
-int EffectManager::getAbilityModifier(const Ability & modifier) const
-{
-    auto it = activeAbilityModifier.find(modifier);
-    if (it != activeAbilityModifier.end())
-    {
-        return it->second;
-    }
-    return 0;
-}
-
-int EffectManager::getCombatModifier(const CombatModifier & modifier) const
-{
-    auto it = activeCombatModifier.find(modifier);
-    if (it != activeCombatModifier.end())
-    {
-        return it->second;
-    }
-    return 0;
-}
-
-int EffectManager::getStatusModifier(const StatusModifier & modifier) const
-{
-    auto it = activeStatusModifier.find(modifier);
-    if (it != activeStatusModifier.end())
-    {
-        return it->second;
-    }
-    return 0;
-}
-
-int EffectManager::getKnowledge(const Knowledge & knowledge) const
-{
-    auto it = activeKnowledge.find(knowledge);
-    if (it != activeKnowledge.end())
-    {
-        return it->second;
-    }
-    return 0;
-}
-
-std::map<Ability, int> EffectManager::getActiveAbilityModifier() const
-{
-    return activeAbilityModifier;
-}
-
-std::map<CombatModifier, int> EffectManager::getActiveCombatModifier() const
-{
-    return activeCombatModifier;
-}
-
-std::map<StatusModifier, int> EffectManager::getActiveStatusModifier() const
-{
-    return activeStatusModifier;
-}
-
-std::map<Knowledge, int> EffectManager::getActiveKnowledge() const
-{
-    return activeKnowledge;
-}
-
-std::vector<Effect> EffectManager::getActiveEffects() const
-{
-    return activeEffects;
-}
-
-std::vector<Effect> EffectManager::getPendingEffects() const
-{
-    return pendingEffects;
-}
-
-std::vector<Effect> EffectManager::getPassiveEffects() const
-{
-    return passiveEffects;
-}
-
-void EffectManager::activateEffect(const Effect & effect)
-{
-    // Add the ability modifier of the effect to the pool.
-    activeAbilityModifier += effect.effectAbilityModifier;
-    // Add the combat modifier of the effect to the pool.
-    activeCombatModifier += effect.effectCombatModifier;
-    // Add the status modifier of the effect to the pool.
-    activeStatusModifier += effect.effectStatusModifier;
-    // Add the knowledge of the effect to the pool.
-    activeKnowledge += effect.effectKnowledge;
-}
-
-void EffectManager::deactivateEffect(const Effect & effect)
-{
-    // Remove the ability modifier of the effect to the pool.
-    activeAbilityModifier -= effect.effectAbilityModifier;
-    // Remove the combat modifier of the effect to the pool.
-    activeCombatModifier -= effect.effectCombatModifier;
-    // Remove the status modifier of the effect to the pool.
-    activeStatusModifier -= effect.effectStatusModifier;
-    // Remove the knowledge of the effect to the pool.
-    activeKnowledge -= effect.effectKnowledge;
-}
-
-void EffectManager::sortList()
-{
-    std::sort(activeEffects.begin(), activeEffects.end(), std::less<Effect>());
 }

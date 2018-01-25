@@ -53,6 +53,13 @@ public:
         return value;
     }
 
+    /// @brief Returns the value as number.
+    template<typename T>
+    T to() const
+    {
+        return static_cast<T>(value);
+    }
+
     /// @brief Equality operator.
     bool operator==(const BaseEnumerator & rhs) const
     {

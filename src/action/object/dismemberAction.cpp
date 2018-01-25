@@ -88,7 +88,7 @@ ActionStatus DismemberAction::perform()
         return ActionStatus::Error;
     }
     // Get the skill rank of the actor.
-    auto butchery = actor->effects.getKnowledge(Knowledge::Butchery);
+    auto butchery = actor->effectManager.getKnowledge(Knowledge::Butchery);
     // Create the resources of the given body part.
     bool dismemberedSomthing = false;
     for (auto resources : bodyPart->resources)
@@ -114,7 +114,7 @@ ActionStatus DismemberAction::perform()
             actor->sendMsg("You fail to dismember %s.", corpse->getName(true));
             return ActionStatus::Error;
         }
-        Skill::improveSkillKnowledge(actor, Knowledge::Butchery);
+        actor->skillManager.improveKnowledge(Knowledge::Butchery);
         actor->sendMsg("You successfully butcher %s and produce %s.\n\n",
                        corpse->getName(true),
                        item->getName(true));
@@ -151,7 +151,7 @@ unsigned int DismemberAction::getCooldown()
     double required = 6;
     Logger::log(LogLevel::Debug, "Base time  :%s", required);
     required -=
-        (required * actor->effects.getKnowledge(Knowledge::Butchery)) / 100;
+        (required * actor->effectManager.getKnowledge(Knowledge::Butchery)) / 100;
     Logger::log(LogLevel::Debug, "With skill :%s", required);
     return static_cast<unsigned int>(required);
 }

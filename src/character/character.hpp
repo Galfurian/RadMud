@@ -40,6 +40,7 @@
 #include "rangedWeaponItem.hpp"
 #include "characterPosture.hpp"
 #include "characterVector.hpp"
+#include "skillManager.hpp"
 
 #include <deque>
 #include <mutex>
@@ -104,8 +105,6 @@ public:
     int thirst;
     /// Character abilities.
     std::map<Ability, unsigned int> abilities;
-    /// The player's list of skills.
-    std::map<int, unsigned int> skills;
     /// The current room the character is in.
     Room * room;
     /// Character's inventory.
@@ -114,18 +113,21 @@ public:
     ItemVector equipment;
     /// Character's posture.
     CharacterPosture posture;
-    /// Active effects on player.
-    EffectManager effects;
     /// The lua_State associated with this character.
     lua_State * L;
-    /// List of opponents.
-    CombatHandler combatHandler;
     /// Character current action.
     std::deque<std::shared_ptr<GeneralAction>> actionQueue;
     /// Mutex for the action queue.
     mutable std::mutex actionQueueMutex;
     /// The input handler.
     std::shared_ptr<ProcessInput> inputProcessor;
+
+    /// Active effects on player.
+    EffectManager effectManager;
+    /// The player's list of skills.
+    SkillManager skillManager;
+    /// List of opponents.
+    CombatHandler combatHandler;
 
     /// @brief Constructor.
     Character();

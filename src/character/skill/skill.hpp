@@ -26,10 +26,13 @@
 #include <vector>
 #include <memory>
 #include <map>
+
 #include "ability.hpp"
 #include "combatModifier.hpp"
 #include "statusModifier.hpp"
 #include "knowledge.hpp"
+#include "radMudTypes.hpp"
+#include "modifierManager.hpp"
 
 class Character;
 
@@ -38,7 +41,7 @@ class Skill
 {
 public:
     /// The skill virtual number.
-    int vnum;
+    VnumType vnum;
     /// The name of the skill.
     std::string name;
     /// The description of the skill.
@@ -48,16 +51,11 @@ public:
     /// The overall stage of the skill.
     int stage;
     /// The list of required skills.
-    std::vector<int> requiredSkills;
-    /// The list of abilities modifiers and the rank at which they became
-    /// activate.
-    std::map<Ability, int> abilityModifier;
-    /// The list of combat modifiers and the rank at which they became activate.
-    std::map<CombatModifier, int> combatModifier;
-    /// The list of status modifiers and the rank at which they became activate.
-    std::map<StatusModifier, int> statusModifier;
-    /// The list of knowledge and the rank at which they became activate.
-    std::map<Knowledge, bool> knowledge;
+    std::vector<VnumType> requiredSkill;
+    /// The list of required skills.
+    std::vector<VnumType> usedForSkill;
+    /// The internal modifier manager.
+    std::shared_ptr<ModifierManager> modifierManager;
 
     /// @brief Constructor.
     Skill();
@@ -81,26 +79,4 @@ public:
     /// @return <b>True</b> if it has correct values,<br>
     ///         <b>False</b> otherwise.
     bool check();
-
-    /// @brief Activate the effects on the character based on its skill ranks.
-    static void updateSkillEffects(Character * character);
-
-    /// @brief Checks if the given character has unlocked new skills.
-    static void checkIfUnlockedSkills(Character * character);
-
-    /// @brief Improves the skills which provides the given ability modifier.
-    static void improveSkillAbilityModifier(Character * character,
-                                            const Ability & abilityModifier);
-
-    /// @brief Improves the skills which provides the given status modifier.
-    static void improveSkillStatusModifier(Character * character,
-                                           const StatusModifier & statusModifier);
-
-    /// @brief Improves the skills which provides the given combat modifier.
-    static void improveSkillCombatModifier(Character * character,
-                                           const CombatModifier & combatModifier);
-
-    /// @brief Improves the skills which provides the given knowledge.
-    static void improveSkillKnowledge(Character * character,
-                                      const Knowledge & knowledge);
 };

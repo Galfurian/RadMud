@@ -151,13 +151,13 @@ bool DoSkillList(Character * character, ArgumentHandler & /*args*/)
     table.addColumn("VNUM", StringAlign::Center);
     table.addColumn("NAME", StringAlign::Left);
     table.addColumn("ATTRIBUTE", StringAlign::Left);
-    for (auto iterator : Mud::instance().mudSkills)
+    for (auto skill : Mud::instance().mudSkills)
     {
         // Prepare the row.
         TableRow row;
-        row.push_back(ToString(iterator.first));
-        row.push_back(iterator.second->name);
-        row.push_back(iterator.second->ability.toString());
+        row.push_back(ToString(skill->vnum));
+        row.push_back(skill->name);
+        row.push_back(skill->ability.toString());
         // Add the row to the table.
         table.addRow(row);
     }

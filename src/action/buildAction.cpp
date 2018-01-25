@@ -200,7 +200,7 @@ unsigned int BuildAction::getCooldown()
     for (auto knowledge : schematics->requiredKnowledge)
     {
         requiredTime -= (requiredTime *
-                         actor->effects.getKnowledge(knowledge)) / 100;
+                         actor->effectManager.getKnowledge(knowledge)) / 100;
     }
     Logger::log(LogLevel::Debug, "With skill :%s", requiredTime);
     return static_cast<unsigned int>(requiredTime);

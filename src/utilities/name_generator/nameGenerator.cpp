@@ -418,8 +418,8 @@ std::string Collapser::toString()
     std::string out;
     // Prepare a counter variable.
     int counter = 0;
-    wchar_t pch = L'\0';
-    for (auto ch : NameGenerator::toString())
+    char pch = '\0';
+    for (char ch : NameGenerator::toString())
     {
         int mch;
         switch (ch)

@@ -23,7 +23,6 @@
 #include "general.hpp"
 
 #include "nameGenerator.hpp"
-#include "skillRank.hpp"
 #include "logger.hpp"
 #include "mud.hpp"
 
@@ -154,8 +153,7 @@ bool DoSet(Character * character, ArgumentHandler & args)
     if (args.empty())
     {
         character->sendMsg("What do you want to set?");
-    }
-    else
+    } else
     {
         if (args[0].getContent() == "des")
         {
@@ -163,8 +161,7 @@ bool DoSet(Character * character, ArgumentHandler & args)
             if (newDescription.empty())
             {
                 character->sendMsg("You can't set an empty description.\n");
-            }
-            else
+            } else
             {
                 character->description = newDescription;
                 character->sendMsg("You had set your description:\n");
@@ -319,8 +316,7 @@ bool DoHelp(Character * character, ArgumentHandler & args)
                         godsCommands.addRow(godsRow);
                         godsRow.clear();
                     }
-                }
-                else
+                } else
                 {
                     baseRow.push_back(it->name);
                     if (baseRow.size() == numColumns)
@@ -349,8 +345,7 @@ bool DoHelp(Character * character, ArgumentHandler & args)
         }
         character->sendMsg(baseCommands.getTable(true));
         character->sendMsg(godsCommands.getTable(true));
-    }
-    else if (args.size() == 1)
+    } else if (args.size() == 1)
     {
         auto command = args[0].getContent();
         for (auto it : Mud::instance().mudCommands)
@@ -399,8 +394,7 @@ bool DoPrompt(Character * character, ArgumentHandler & args)
         character->sendMsg("    %s\n", player->prompt);
         character->sendMsg("Type %sprompt help %sto read the guide.\n",
                            Formatter::yellow(), Formatter::reset());
-    }
-    else
+    } else
     {
         if (args[0].getContent() == "help")
         {
@@ -414,7 +408,8 @@ bool DoPrompt(Character * character, ArgumentHandler & args)
             };
             std::string msg;
             msg += yellow("Prompt Help") + "\n";
-            msg += "You can set the prompt you prefer, respectfully to this constraints:\n";
+            msg +=
+                "You can set the prompt you prefer, respectfully to this constraints:\n";
             msg += " - Not more than 15 characters.\n";
             msg += "\n";
             msg += "You can use the following shortcuts in you prompt:\n";
@@ -426,8 +421,7 @@ bool DoPrompt(Character * character, ArgumentHandler & args)
             msg += "    " + italic("&S") + " - Player maximum stamina.\n";
             msg += "    " + italic("&T") + " - Currently aimed character.\n";
             player->sendMsg(msg);
-        }
-        else
+        } else
         {
             player->prompt = args.substr(0);
         }
@@ -448,21 +442,18 @@ bool DoTime(Character * character, ArgumentHandler & /*args*/)
         character->sendMsg("%sThe sun has just risen.%s\n",
                            Formatter::yellow(),
                            Formatter::reset());
-    }
-    else if (MudUpdater::instance().getDayPhase() == DayPhase::Day)
+    } else if (MudUpdater::instance().getDayPhase() == DayPhase::Day)
     {
         character->sendMsg("%sThe sun is high in the sky.%s\n",
                            Formatter::yellow(),
                            Formatter::reset());
-    }
-    else if (MudUpdater::instance().getDayPhase() == DayPhase::Dusk)
+    } else if (MudUpdater::instance().getDayPhase() == DayPhase::Dusk)
     {
         character->sendMsg(
             "%sThe sun is setting, the shadows begin to prevail.%s\n",
             Formatter::cyan(),
             Formatter::reset());
-    }
-    else if (MudUpdater::instance().getDayPhase() == DayPhase::Night)
+    } else if (MudUpdater::instance().getDayPhase() == DayPhase::Night)
     {
         character->sendMsg("%sThe darkness surrounds you.%s\n",
                            Formatter::blue(),
@@ -553,37 +544,43 @@ bool DoStatistics(Character * character, ArgumentHandler & /*args*/)
 bool DoEffects(Character * character, ArgumentHandler &)
 {
     std::string msg;
-    for (auto const & effect : character->effects.getActiveEffects())
+    msg += "Active Effects\n";
+    for (auto const & it : character->effectManager.getActiveEffects())
     {
-        msg += AlignString(effect.name, StringAlign::Left, 30) + "\n";
+        msg += "\t" + AlignString(it.name, StringAlign::Left, 30) + "\n";
     }
-    for (auto const & effect : character->effects.getPassiveEffects())
+    msg += "Passive Effects\n";
+    for (auto const & it : character->effectManager.getPassiveEffects())
     {
-        msg += AlignString(effect.name, StringAlign::Left, 30) + "\n";
+        msg += "\t" + AlignString(it.name, StringAlign::Left, 30) + "\n";
     }
-    for (auto const & effect : character->effects.getActiveAbilityModifier())
+    msg += "Ability Modifiers\n";
+    for (auto const & it : character->effectManager.getAbilityMod())
     {
-        msg += AlignString(effect.first.getAbbreviation(),
-                           StringAlign::Left, 30);
-        msg += AlignString(effect.second, StringAlign::Right, 5) + "\n";
+        msg += "\t";
+        msg += AlignString(it.first.getAbbreviation(), StringAlign::Left, 30);
+        msg += AlignString(it.second, StringAlign::Right, 5) + "\n";
     }
-    for (auto const & effect : character->effects.getActiveCombatModifier())
+    msg += "Combat Modifiers\n";
+    for (auto const & it : character->effectManager.getCombatMod())
     {
-        msg += AlignString(effect.first.toString(),
-                           StringAlign::Left, 30);
-        msg += AlignString(effect.second, StringAlign::Right, 5) + "\n";
+        msg += "\t";
+        msg += AlignString(it.first.toString(), StringAlign::Left, 30);
+        msg += AlignString(it.second, StringAlign::Right, 5) + "\n";
     }
-    for (auto const & effect : character->effects.getActiveStatusModifier())
+    msg += "Status Modifiers\n";
+    for (auto const & it : character->effectManager.getStatusMod())
     {
-        msg += AlignString(effect.first.toString(),
-                           StringAlign::Left, 30);
-        msg += AlignString(effect.second, StringAlign::Right, 5) + "\n";
+        msg += "\t";
+        msg += AlignString(it.first.toString(), StringAlign::Left, 30);
+        msg += AlignString(it.second, StringAlign::Right, 5) + "\n";
     }
-    for (auto const & effect : character->effects.getActiveKnowledge())
+    msg += "Knowledges\n";
+    for (auto const & it : character->effectManager.getKnowledge())
     {
-        msg += AlignString(effect.first.toString(),
-                           StringAlign::Left, 30);
-        msg += AlignString(effect.second, StringAlign::Right, 5) + "\n";
+        msg += "\t";
+        msg += AlignString(it.first.toString(), StringAlign::Left, 30);
+        msg += AlignString(it.second, StringAlign::Right, 5) + "\n";
     }
     character->sendMsg(msg);
     return true;
@@ -609,8 +606,7 @@ bool DoRent(Character * character, ArgumentHandler & /*args*/)
     {
         character->sendMsg("You can't rent here.\n");
         return false;
-    }
-    else
+    } else
     {
         player->rent_room = player->room->vnum;
         player->doCommand("quit");
@@ -630,14 +626,10 @@ bool DoSkills(Character * character, ArgumentHandler & /*args*/)
     Table table = Table();
     table.addColumn("LvL", StringAlign::Left);
     table.addColumn("Skill", StringAlign::Left);
-    for (auto it : player->skills)
+    for (const auto & skillData : player->skillManager.skills)
     {
-        auto skill = Mud::instance().findSkill(it.first);
-        if (skill)
-        {
-            table.addRow({skill->name,
-                          SkillRank::getSkillRank(it.second).toString()});
-        }
+        table.addRow({skillData->skill->name,
+                      skillData->getSkillRank().toString()});
     }
     character->sendMsg(table.getTable());
     return true;
@@ -654,8 +646,7 @@ bool DoActions(Character * character, ArgumentHandler & /*args*/)
         {
             msg += "  [Performing] ";
             first = false;
-        }
-        else msg += "  [Queued    ] ";
+        } else msg += "  [Queued    ] ";
         msg += it->getDescription() + "\n";
     }
     character->actionQueueMutex.unlock();
@@ -724,15 +715,19 @@ bool DoGenerateName(Character * character, ArgumentHandler & args)
         help += "\tv - vowel\n";
         help += "\tV - vowel or vowel combination\n";
         help += "\tc - consonant\n";
-        help += "\tB - consonant or consonant combination suitable for beginning a word\n";
-        help += "\tC - consonant or consonant combination suitable anywhere in a word\n";
+        help +=
+            "\tB - consonant or consonant combination suitable for beginning a word\n";
+        help +=
+            "\tC - consonant or consonant combination suitable anywhere in a word\n";
         help += "\ti - insult\n";
         help += "\tm - mushy name\n";
         help += "\tM - mushy name ending\n";
         help += "\tD - consonant suited for a stupid person's name\n";
-        help += "\td - syllable suited for a stupid person's name (begins with a vowel)\n";
+        help +=
+            "\td - syllable suited for a stupid person's name (begins with a vowel)\n";
         help += "\n";
-        help += "All characters between parenthesis () are emitted literally.\n";
+        help +=
+            "All characters between parenthesis () are emitted literally.\n";
         help += "  For example, the pattern 's(dim)', emits a random generic\n";
         help += "  syllable followed by 'dim'.\n";
         help += "Characters between angle brackets <> emit patterns from\n";
