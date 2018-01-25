@@ -130,8 +130,7 @@ bool DoKill(Character * character, ArgumentHandler & args)
             return true;
         }
         character->sendMsg("You have already your share of troubles!\n");
-    }
-    else
+    } else
     {
         // Check if the character is attacking a target
         //  which is already in combat.
@@ -437,8 +436,7 @@ bool DoAim(Character * character, ArgumentHandler & args)
         if (character->combatHandler.charactersInSight.empty())
         {
             character->sendMsg("Who or what do you want to aim?\n");
-        }
-        else
+        } else
         {
             character->sendMsg("You are able to aim at:\n");
             for (auto it : character->combatHandler.charactersInSight)
@@ -452,8 +450,7 @@ bool DoAim(Character * character, ArgumentHandler & args)
             }
         }
         return true;
-    }
-    else if (args.size() > 1)
+    } else if (args.size() > 1)
     {
         character->sendMsg("Too many arguments.\n");
         return false;
@@ -544,27 +541,12 @@ bool DoFire(Character * character, ArgumentHandler & /*args*/)
         return false;
     }
     // For each ranged weapon check if it is able to reach the target.
-//    bool canAttack = std::find_if(
-//        rangedWeapons.begin(),
-//        rangedWeapons.end(),
-//        [&](RangedWeaponItem * weapon)
-//        {
-//            if (character->isAtRange(aimedTarget,
-//                                     weapon->getRange()))
-//            {
-//                return true;
-//            }
-//        }) != rangedWeapons.end();
-    bool canAttack = false;
-    for (auto weapon : rangedWeapons)
-    {
-        if (character->isAtRange(aimedTarget, weapon->getRange()))
+    if (std::find_if(
+        rangedWeapons.begin(), rangedWeapons.end(),
+        [&](RangedWeaponItem * weapon)
         {
-            canAttack = true;
-            break;
-        }
-    }
-    if (!canAttack)
+            return (character->isAtRange(aimedTarget, weapon->getRange()));
+        }) == rangedWeapons.end())
     {
         character->sendMsg("%s is out of your reach...\n",
                            aimedTarget->getNameCapital());
@@ -578,7 +560,6 @@ bool DoFire(Character * character, ArgumentHandler & /*args*/)
                            aimedTarget->getName());
         return false;
     }
-
     // Add the aimedTarget to the list of opponents.
     character->combatHandler.addOpponent(aimedTarget);
     // Add the action to the character's combat queue.

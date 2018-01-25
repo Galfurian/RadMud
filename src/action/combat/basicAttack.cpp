@@ -87,73 +87,58 @@ ActionStatus BasicAttack::perform()
     // Find a valid predefined target.
     if (this->setPredefinedTarget())
     {
+        // Set the progressive number of the attack to 0.
+        unsigned int attackNumber = 0;
         // Get the predefined target.
         Character * predefined = actor->combatHandler.getPredefinedTarget();
         // If the actor and the pred-target are in the same room,
-        //  then use the melee weapons, otherwise use the ranged ones.
+        //  first use the melee weapons.
         if (actor->room->coord == predefined->room->coord)
         {
-            // Since at melee weapon.
-            hasAttackedTheTarget = true;
             // Retrieve all the melee weapons.
             auto meleeWeapons = GetActiveMeleeWeapons(actor);
-            // Retrieve all the natural weapons.
-            auto naturalWeapon = GetActiveNaturalWeapons(actor);
-            // Set the progressive number of the attack to 0.
-            unsigned int attackNumber = 0;
             // Perform the attack for each melee weapon.
             for (auto weapon : meleeWeapons)
             {
                 // Perform the attack passing the melee weapon.
-                this->performMeleeAttack(predefined, weapon, attackNumber);
+                hasAttackedTheTarget |=
+                    this->performMeleeAttack(predefined, weapon, attackNumber);
                 // Increment the number of executed attacks.
-                attackNumber++;
-            }
-            // Perform the attack for each natural weapon.
-            for (auto weapon : naturalWeapon)
-            {
-                // Perform the attack passing the melee weapon.
-                this->performAttackNaturalWeapon(predefined, weapon,
-                                                 attackNumber);
-                // Increment the number of executed attacks.
-                attackNumber++;
+                ++attackNumber;
             }
         }
-        else
+        // Retrieve all the ranged weapons.
+        auto rangedWeapons = GetActiveRangedWeapons(actor);
+        // Perform the attack for each weapon.
+        for (auto weapon : rangedWeapons)
         {
-            // Retrieve all the ranged weapons.
-            auto rangedWeapons = GetActiveRangedWeapons(actor);
-            // Retrieve all the natural weapons.
-            auto naturalWeapon = GetActiveNaturalWeapons(actor);
-            // Set the progressive number of the attack to 0.
-            unsigned int attackNumber = 0;
-            // Perform the attack for each weapon.
-            for (auto weapon : rangedWeapons)
+            // Check if the target is at range of the weapon.
+            if (actor->isAtRange(predefined, weapon->getRange()))
             {
-                // Check if the target is at range of the weapon.
-                if (actor->isAtRange(predefined, weapon->getRange()))
-                {
-                    // Set that the actor has actually attacked the target.
-                    hasAttackedTheTarget = true;
-                    // Perform the attack passing the ranged weapon.
+                // Set that the actor has actually attacked the target.
+                // Perform the attack passing the ranged weapon.
+                hasAttackedTheTarget |=
                     this->performRangedAttack(predefined, weapon, attackNumber);
-                    // Increment the number of executed attacks.
-                    attackNumber++;
-                }
+                // Increment the number of executed attacks.
+                ++attackNumber;
             }
-            // Perform the attack for each natural weapon.
-            for (auto weapon : naturalWeapon)
+        }
+        // Retrieve all the natural weapons.
+        auto naturalWeapon = GetActiveNaturalWeapons(actor);
+        // Perform the attack for each natural weapon.
+        for (auto const & weapon : naturalWeapon)
+        {
+            // Check if the target is at range of the weapon.
+            if (actor->isAtRange(predefined, weapon->range))
             {
-                // Check if the target is at range of the weapon.
-                if (actor->isAtRange(predefined, weapon->range))
-                {
-                    // Perform the attack passing the melee weapon.
+                // Set that the actor has actually attacked the target.
+                // Perform the attack passing the melee weapon.
+                hasAttackedTheTarget |=
                     this->performAttackNaturalWeapon(predefined,
                                                      weapon,
                                                      attackNumber);
-                    // Increment the number of executed attacks.
-                    attackNumber++;
-                }
+                // Increment the number of executed attacks.
+                ++attackNumber;
             }
         }
     }
@@ -187,6 +172,10 @@ ActionStatus BasicAttack::perform()
             }
         }
         actor->sendMsg("Try to get closer to your enemy.\n\n");
+        // Stop the combat.
+        this->handleStop();
+        // Return that the action is finished.
+        return ActionStatus::Finished;
     }
     // Reset the cooldown.
     actor->getAction()->resetCooldown();
@@ -274,7 +263,7 @@ bool BasicAttack::setPredefinedTarget()
                     actor->getNameCapital());
     }
     // Take a valid target.
-    for (auto it : actor->combatHandler)
+    for (auto const & it : actor->combatHandler)
     {
         if (this->checkTarget(it->aggressor))
         {
@@ -359,7 +348,7 @@ bool BasicAttack::checkTarget(Character * target)
     return false;
 }
 
-void BasicAttack::performAttackNaturalWeapon(
+bool BasicAttack::performAttackNaturalWeapon(
     Character * target,
     const std::shared_ptr<BodyPart::BodyWeapon> & weapon,
     unsigned int attackNumber)
@@ -378,7 +367,7 @@ void BasicAttack::performAttackNaturalWeapon(
     {
         actor->sendMsg("You are too tired to attack with %s.\n",
                        weapon->getName(true));
-        return;
+        return false;
     }
     // -------------------------------------------------------------------------
     // Phase 2: Roll the hit and damage.
@@ -455,7 +444,7 @@ void BasicAttack::performAttackNaturalWeapon(
                 actor->combatHandler.remOpponent(target);
             }
             // Interrupt the function.
-            return;
+            return true;
         }
         // Update the aggro of the target towards the actor.
         auto aggro = target->combatHandler.getAggro(actor);
@@ -482,9 +471,10 @@ void BasicAttack::performAttackNaturalWeapon(
     {
         actor->combatHandler.addOpponent(target);
     }
+    return true;
 }
 
-void BasicAttack::performMeleeAttack(Character * target,
+bool BasicAttack::performMeleeAttack(Character * target,
                                      MeleeWeaponItem * weapon,
                                      unsigned int attackNumber)
 {
@@ -502,7 +492,7 @@ void BasicAttack::performMeleeAttack(Character * target,
     {
         actor->sendMsg("You are too tired to attack with %s.\n",
                        weapon->getName(true));
-        return;
+        return false;
     }
     // -------------------------------------------------------------------------
     // Phase 2: Roll the hit and damage.
@@ -583,7 +573,7 @@ void BasicAttack::performMeleeAttack(Character * target,
                 actor->combatHandler.remOpponent(target);
             }
             // Interrupt the function.
-            return;
+            return true;
         }
         // Update the aggro of the target towards the actor.
         auto aggro = target->combatHandler.getAggro(actor);
@@ -602,9 +592,10 @@ void BasicAttack::performMeleeAttack(Character * target,
     {
         actor->combatHandler.addOpponent(target);
     }
+    return true;
 }
 
-void BasicAttack::performRangedAttack(Character * target,
+bool BasicAttack::performRangedAttack(Character * target,
                                       RangedWeaponItem * weapon,
                                       unsigned int attackNumber)
 {
@@ -620,7 +611,7 @@ void BasicAttack::performRangedAttack(Character * target,
     {
         actor->sendMsg("You are too tired to attack with %s.\n",
                        weapon->getName(true));
-        return;
+        return false;
     }
     // -------------------------------------------------------------------------
     // Phase 2: Check if the ranged weapon has enough projectiles.
@@ -630,7 +621,7 @@ void BasicAttack::performRangedAttack(Character * target,
     if (projectile == nullptr)
     {
         actor->sendMsg(error + ".\n\n");
-        return;
+        return false;
     }
     // -------------------------------------------------------------------------
     // Phase 3: Roll the hit and damage.
@@ -714,7 +705,7 @@ void BasicAttack::performRangedAttack(Character * target,
                 actor->combatHandler.remOpponent(target);
             }
             // Interrupt the function.
-            return;
+            return true;
         }
         // Update the aggro of the target towards the actor.
         auto aggro = target->combatHandler.getAggro(actor);
@@ -737,6 +728,7 @@ void BasicAttack::performRangedAttack(Character * target,
     {
         actor->combatHandler.addOpponent(target);
     }
+    return true;
 }
 
 void BasicAttack::handleNaturalWeaponHit(
