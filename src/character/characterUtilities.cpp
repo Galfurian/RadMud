@@ -397,9 +397,13 @@ bool HasRequiredKnowledge(Character * character, Production * production)
 {
     if (WrongAssert(character == nullptr)) return false;
     if (WrongAssert(production == nullptr)) return false;
-    for (auto knowledge : production->requiredKnowledge)
+    for (auto const & it : production->requiredKnowledge)
     {
-        if (character->effectManager.getKnowledge(knowledge) <= 0) return false;
+        if ((character->skillManager.getKnowledge(it) <= 0) &&
+            (character->effectManager.getKnowledge(it) <= 0))
+        {
+            return false;
+        }
     }
     return true;
 }
