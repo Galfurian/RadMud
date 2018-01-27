@@ -49,24 +49,13 @@ void RangedWeaponItem::getSheet(Table & sheet) const
 
 std::string RangedWeaponItem::lookContent()
 {
-    std::string output;
-    if (content.empty())
+    auto containedMagazine = this->getAlreadyLoadedMagazine();
+    if (content.empty() || (containedMagazine == nullptr))
     {
-        output += Formatter::italic() + "It does not contain any magazine.\n" +
-                  Formatter::reset();
+        return Formatter::italic("It does not contain any magazine.\n");
     }
-    else
-    {
-        auto containedMagazine = this->getAlreadyLoadedMagazine();
-        if (containedMagazine != nullptr)
-        {
-            output += Formatter::italic();
-            output +=
-                "It is loaded with " + containedMagazine->getName(true) + "\n";
-            output += Formatter::reset();
-        }
-    }
-    return output;
+    return Formatter::italic("It is loaded with " +
+                             containedMagazine->getName(true)) + "\n";
 }
 
 bool RangedWeaponItem::isAContainer() const
@@ -77,7 +66,7 @@ bool RangedWeaponItem::isAContainer() const
 unsigned int RangedWeaponItem::rollDamage() const
 {
     return TRand<unsigned int>(this->getMinDamage(),
-                                      this->getMaxDamage());
+                               this->getMaxDamage());
 }
 
 unsigned int RangedWeaponItem::getMinDamage() const
@@ -155,7 +144,6 @@ bool RangedWeaponItem::canBeReloadedWith(Item * magazine) const
     return (magazine->model->toMagazine()->projectileType ==
             model->toRangedWeapon()->rangedWeaponType);
 }
-
 
 MagazineItem * RangedWeaponItem::getAlreadyLoadedMagazine() const
 {

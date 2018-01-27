@@ -122,104 +122,83 @@ bool ShopItem::canDeconstruct(std::string & error) const
 
 std::string ShopItem::lookContent()
 {
-    auto Italic = [](const std::string & s)
-    {
-        return Formatter::italic() + s + Formatter::reset();
-    };
-    auto Yellow = [](const std::string & s)
-    {
-        return Formatter::yellow() + s + Formatter::reset();
-    };
     // If the shop is not built, show the item normal content.
     if (!HasFlag(this->flags, ItemFlag::Built))
     {
-        return Item::lookContent();
+        return "";
     }
-    std::string output, error;
+    std::stringstream ss;
     if (HasFlag(this->flags, ItemFlag::Closed))
     {
-        output += Italic("It is closed.\n");
+        ss << Formatter::italic("It is closed.\n");
     }
+    std::string error;
     if (!this->canUse(error))
     {
         // Show the error.
-        output += Italic(error) + "\n\n";
+        ss << Formatter::italic(error) + "\n\n";
         // Show the content.
-        output += "Looking inside you see:\n";
-        Table table = Table();
-        table.addColumn("Item", StringAlign::Left);
-        table.addColumn("Quantity", StringAlign::Right);
-        table.addColumn("Weight", StringAlign::Right);
-        // List all the contained items.
+        ss << "Looking inside you see:\n";
         for (auto it : content)
         {
-            table.addRow(
-                {
-                    it->getNameCapital(),
-                    ToString(it->quantity),
-                    ToString(it->getWeight(true))
-                });
+            ss << " [" << std::right << std::setw(3) << it->quantity << "] ";
+            ss << it->getNameCapital() << "\n";
         }
-        output += table.getTable();
     }
     else
     {
         // Show who is managing the shop.
-        output += this->shopKeeper->getNameCapital();
-        output += " is currently managing the shop.\n";
+        ss << shopKeeper->getNameCapital();
+        ss << " is currently managing the shop.\n";
         if (content.empty())
         {
-            output += Italic("There is nothing on sale.\n");
+            ss << Formatter::italic("There is nothing on sale.\n\n");
+            return ss.str();
         }
-        else
+        Table saleTable(shopName);
+        saleTable.addColumn("Good", StringAlign::Left);
+        saleTable.addColumn("Quantity", StringAlign::Center);
+        saleTable.addColumn("Weight (Single)", StringAlign::Right);
+        saleTable.addColumn("Weight (stack)", StringAlign::Right);
+        saleTable.addColumn("Buy", StringAlign::Right);
+        saleTable.addColumn("Sell (Single)", StringAlign::Right);
+        saleTable.addColumn("Sell (stack)", StringAlign::Right);
+        for (auto iterator : content)
         {
-            Table saleTable(shopName);
-            saleTable.addColumn("Good", StringAlign::Left);
-            saleTable.addColumn("Quantity", StringAlign::Center);
-            saleTable.addColumn("Weight (Single)", StringAlign::Right);
-            saleTable.addColumn("Weight (stack)", StringAlign::Right);
-            saleTable.addColumn("Buy", StringAlign::Right);
-            saleTable.addColumn("Sell (Single)", StringAlign::Right);
-            saleTable.addColumn("Sell (stack)", StringAlign::Right);
-            for (auto iterator : content)
+            // Prepare the row.
+            TableRow row;
+            row.push_back(iterator->getNameCapital());
+            row.push_back(ToString(iterator->quantity));
+            row.push_back(ToString(iterator->getWeight(false)));
+            if (iterator->quantity > 1)
             {
-                // Prepare the row.
-                TableRow row;
-                row.push_back(iterator->getNameCapital());
-                row.push_back(ToString(iterator->quantity));
-                row.push_back(ToString(iterator->getWeight(false)));
-                if (iterator->quantity > 1)
-                {
-                    row.push_back(ToString(iterator->getWeight(true)));
-                }
-                else
-                {
-                    row.push_back("");
-                }
-                row.push_back(ToString(this->evaluateBuyPrice(iterator)));
-                row.push_back(ToString(this->evaluateSellPrice(iterator)));
-                if (iterator->quantity > 1)
-                {
-                    row.push_back(ToString(
-                        this->evaluateSellPrice(iterator) *
-                        iterator->quantity));
-                }
-                else
-                {
-                    row.push_back("");
-                }
-                // Add the row to the table.
-                saleTable.addRow(row);
+                row.push_back(ToString(iterator->getWeight(true)));
             }
-            output += saleTable.getTable();
+            else
+            {
+                row.push_back("");
+            }
+            row.push_back(ToString(this->evaluateBuyPrice(iterator)));
+            row.push_back(ToString(this->evaluateSellPrice(iterator)));
+            if (iterator->quantity > 1)
+            {
+                row.push_back(ToString(
+                    this->evaluateSellPrice(iterator) *
+                    iterator->quantity));
+            }
+            else
+            {
+                row.push_back("");
+            }
+            // Add the row to the table.
+            saleTable.addRow(row);
         }
+        ss << saleTable.getTable();
     }
-    // Show the free/used space.
-    output += "Has been used " + Yellow(ToString(this->getUsedSpace()));
-    output += " out of " + Yellow(ToString(this->getTotalSpace()));
-    output += " " + Mud::instance().getWeightMeasure() + ".\n";
-    output += "\n";
-    return output;
+    ss << "Has been used " << Formatter::yellow(ToString(getUsedSpace()));
+    ss << " out of " << Formatter::yellow(ToString(getTotalSpace())) << ' ';
+    ss << Mud::instance().getWeightMeasure() << ".\n";
+    return ss.str();
 }
 
 bool ShopItem::isAContainer() const

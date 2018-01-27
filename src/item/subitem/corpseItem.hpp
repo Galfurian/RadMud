@@ -44,6 +44,8 @@ public:
 
     void getSheet(Table & sheet) const override;
 
+    std::string lookContent() override;
+
     bool isAContainer() const override;
 
     /// @brief Provides the remaining body parts.
