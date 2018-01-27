@@ -397,13 +397,12 @@ bool HasRequiredKnowledge(Character * character, Production * production)
 {
     if (WrongAssert(character == nullptr)) return false;
     if (WrongAssert(production == nullptr)) return false;
-    for (auto const & it : production->requiredKnowledge)
-    {
-        if ((character->skillManager.getKnowledge(it) <= 0) &&
-            (character->effectManager.getKnowledge(it) <= 0))
+    return std::find_if(
+        production->requiredKnowledge.begin(),
+        production->requiredKnowledge.end(),
+        [&character](Knowledge const & k)
         {
-            return false;
-        }
-    }
-    return true;
+            return (character->skillManager.getKnowledge(k) > 0) ||
+                   (character->effectManager.getKnowledge(k) > 0);
+        }) != production->requiredKnowledge.end();
 }
