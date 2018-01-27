@@ -113,16 +113,14 @@ void Character::getSheet(Table & sheet) const
     if (CorrectAssert(race != nullptr))
     {
         sheet.addRow({"Race", race->name});
-    }
-    else
+    } else
     {
         sheet.addRow({"Race", "NONE"});
     }
     if (CorrectAssert(faction != nullptr))
     {
         sheet.addRow({"Faction", faction->name});
-    }
-    else
+    } else
     {
         sheet.addRow({"Faction", "NONE"});
     }
@@ -172,8 +170,7 @@ void Character::getSheet(Table & sheet) const
     if (CorrectAssert(this->room != nullptr))
     {
         sheet.addRow({"Room", room->name + " [" + ToString(room->vnum) + "]"});
-    }
-    else
+    } else
     {
         sheet.addRow({"Room", "NONE"});
     }
@@ -299,8 +296,7 @@ unsigned int Character::getAbility(const Ability & ability,
         if (overall < 0)
         {
             overall = 0;
-        }
-        else if (overall > 60)
+        } else if (overall > 60)
         {
             overall = 60;
         }
@@ -334,8 +330,7 @@ bool Character::setHealth(const unsigned int & value, const bool & force)
         {
             this->health = maximum;
             return true;
-        }
-        else
+        } else
         {
             return false;
         }
@@ -353,8 +348,7 @@ bool Character::addHealth(const unsigned int & value, const bool & force)
         if (force)
         {
             result = maximum;
-        }
-        else
+        } else
         {
             return false;
         }
@@ -371,8 +365,7 @@ bool Character::remHealth(const unsigned int & value, const bool & force)
         if (force)
         {
             result = 0;
-        }
-        else
+        } else
         {
             return false;
         }
@@ -403,8 +396,7 @@ std::string Character::getHealthCondition(const bool & self)
     {
         sent_be = "are";
         sent_have = "have";
-    }
-    else
+    } else
     {
         sent_be = "is";
         sent_have = "has";
@@ -434,8 +426,7 @@ bool Character::setStamina(const unsigned int & value, const bool & force)
         {
             stamina = maximum;
             return true;
-        }
-        else
+        } else
         {
             return false;
         }
@@ -453,8 +444,7 @@ bool Character::addStamina(const unsigned int & value, const bool & force)
         if (force)
         {
             result = maximum;
-        }
-        else
+        } else
         {
             return false;
         }
@@ -471,8 +461,7 @@ bool Character::remStamina(const unsigned int & value, const bool & force)
         if (force)
         {
             result = 0;
-        }
-        else
+        } else
         {
             return false;
         }
@@ -513,7 +502,7 @@ int Character::getViewDistance() const
     // Value = 4 + LogMod(PER)
     // MIN   = 4.0
     // MAX   = 7.2
-    return 4 + static_cast<int>(this->getAbilityLog(Ability::Perception));
+    return 4 + static_cast<int>(this->getAbilityModifier(Ability::Perception));
 }
 
 void Character::pushAction(const std::shared_ptr<GeneralAction> & _action)
@@ -753,8 +742,7 @@ std::vector<std::shared_ptr<BodyPart>> Character::canWield(
         if (!HasFlag(item->model->modelFlags, ModelFlag::TwoHand))
         {
             break;
-        }
-        else
+        } else
         {
             if (occupiedBodyParts.size() == 2)
             {
@@ -953,24 +941,21 @@ std::string Character::getLook()
         if (HasFlag(bodyPart->flags, BodyPartFlag::CanWear))
         {
             output += "wearing ";
-        }
-        else
+        } else
         {
             output += "wielding ";
         }
         if (roomIsLit)
         {
             output += item->getName(true) + " ";
-        }
-        else
+        } else
         {
             output += "something ";
         }
         if (HasFlag(bodyPart->flags, BodyPartFlag::CanWear))
         {
             output += "on ";
-        }
-        else
+        } else
         {
             output += "with ";
         }
@@ -1110,8 +1095,7 @@ void Character::luaAddEquipment(Item * item)
                     item->getName());
         Logger::log(LogLevel::Error, "Error: %s", error);
         return;
-    }
-    else
+    } else
     {
         item->setOccupiedBodyParts(occupiedBodyParts);
         this->addEquipmentItem(item);

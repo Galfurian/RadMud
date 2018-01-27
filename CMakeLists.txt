@@ -1,24 +1,27 @@
-#################################################
+# -----------------------------------------------------------------------------
+# Author: Enrico Fraccaroli
+# Date  : 27/01/2018
+# -----------------------------------------------------------------------------
 # Check CMAKE Version.
+# -----------------------------------------------------------------------------
 cmake_minimum_required(VERSION 2.8.4 FATAL_ERROR)
 
-#################################################
-# Create the project...
+# -----------------------------------------------------------------------------
+# Project INFORMATION
+# -----------------------------------------------------------------------------
 project(RadMud CXX)
-
-#################################################
-# Set the project name...
 SET(PROJECT_NAME RadMud)
 SET(PROJECT_SOURCE_DIR src)
 
-#################################################
-# Initialize CXXFLAGS...
+# -----------------------------------------------------------------------------
+# Project compiler FLAGS
+# -----------------------------------------------------------------------------
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weffc++")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpedantic")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic-errors")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wconversion")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcast-align")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcast-qual")
@@ -36,9 +39,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-long-long")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wmissing-field-initializers")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wmissing-format-attribute")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wmissing-include-dirs")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wmissing-noreturn")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpacked")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpadded")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpointer-arith")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wredundant-decls")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wshadow")
@@ -59,39 +60,74 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wwrite-strings")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wsign-compare")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wsign-conversion")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wuninitialized")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmessage-length=0")
+
+# Debugging flags.
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -da")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Q")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -v")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-non-virtual-dtor")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-switch-default")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-noexcept-type")
 
-#################################################
-# Activate compiler-specific C++11...
-include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-if (COMPILER_SUPPORTS_CXX11)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-elseif (COMPILER_SUPPORTS_CXX0X)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-else ()
-    message(FATAL_ERROR "Compiler ${CMAKE_CXX_COMPILER} has no C++11 support.")
-endif ()
+# Enable c++11
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-#################################################
-# Add cmake modules folder...
+# If the compiler is GNU, disable noexcept-type warnings.
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-noexcept-type")
+endif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+
+# -----------------------------------------------------------------------------
+# Project MODULES
+# -----------------------------------------------------------------------------
+# Add cmake modules folder.
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+
+# Find the required packages.
 find_package(Lua REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(Sqlite3 REQUIRED)
 
-#################################################
-# Add root project sources...
+# -----------------------------------------------------------------------------
+# Project INCLUDES
+# -----------------------------------------------------------------------------
+include_directories(
+        ${LUA_INCLUDE_DIR}
+        ${ZLIB_INCLUDE_DIR}
+        ${SQLITE3_INCLUDE_DIR}
+        ${CMAKE_SOURCE_DIR}/src
+        ${CMAKE_SOURCE_DIR}/src/action
+        ${CMAKE_SOURCE_DIR}/src/action/combat
+        ${CMAKE_SOURCE_DIR}/src/action/object
+        ${CMAKE_SOURCE_DIR}/src/character
+        ${CMAKE_SOURCE_DIR}/src/character/effect
+        ${CMAKE_SOURCE_DIR}/src/character/race
+        ${CMAKE_SOURCE_DIR}/src/character/skill
+        ${CMAKE_SOURCE_DIR}/src/character/behaviour
+        ${CMAKE_SOURCE_DIR}/src/command
+        ${CMAKE_SOURCE_DIR}/src/command/god
+        ${CMAKE_SOURCE_DIR}/src/command/object
+        ${CMAKE_SOURCE_DIR}/src/creation
+        ${CMAKE_SOURCE_DIR}/src/database
+        ${CMAKE_SOURCE_DIR}/src/enumerators
+        ${CMAKE_SOURCE_DIR}/src/input
+        ${CMAKE_SOURCE_DIR}/src/input/initialization
+        ${CMAKE_SOURCE_DIR}/src/item
+        ${CMAKE_SOURCE_DIR}/src/item/subitem
+        ${CMAKE_SOURCE_DIR}/src/lua
+        ${CMAKE_SOURCE_DIR}/src/lua/luabridge
+        ${CMAKE_SOURCE_DIR}/src/lua/luabridge/detail
+        ${CMAKE_SOURCE_DIR}/src/model
+        ${CMAKE_SOURCE_DIR}/src/model/submodel
+        ${CMAKE_SOURCE_DIR}/src/structure
+        ${CMAKE_SOURCE_DIR}/src/structure/algorithms
+        ${CMAKE_SOURCE_DIR}/src/structure/algorithms/AStar
+        ${CMAKE_SOURCE_DIR}/src/structure/map_generation
+        ${CMAKE_SOURCE_DIR}/src/structure/terrain
+        ${CMAKE_SOURCE_DIR}/src/updater
+        ${CMAKE_SOURCE_DIR}/src/utilities/
+        ${CMAKE_SOURCE_DIR}/src/utilities/name_generator
+)
+
+# -----------------------------------------------------------------------------
+# Project SOURCES
+# -----------------------------------------------------------------------------
 set(PROJECT_SRC
         ${CMAKE_SOURCE_DIR}/src/main.cpp
         ${CMAKE_SOURCE_DIR}/src/mud.cpp
@@ -258,59 +294,17 @@ set(PROJECT_SRC
         ${CMAKE_SOURCE_DIR}/src/utilities/name_generator/nameGenerator.cpp
         )
 
-set(PROJECT_INC
-        ${CMAKE_SOURCE_DIR}/src
-        ${CMAKE_SOURCE_DIR}/src/action
-        ${CMAKE_SOURCE_DIR}/src/action/combat
-        ${CMAKE_SOURCE_DIR}/src/action/object
-        ${CMAKE_SOURCE_DIR}/src/character
-        ${CMAKE_SOURCE_DIR}/src/character/effect
-        ${CMAKE_SOURCE_DIR}/src/character/race
-        ${CMAKE_SOURCE_DIR}/src/character/skill
-        ${CMAKE_SOURCE_DIR}/src/character/behaviour
-        ${CMAKE_SOURCE_DIR}/src/command
-        ${CMAKE_SOURCE_DIR}/src/command/god
-        ${CMAKE_SOURCE_DIR}/src/command/object
-        ${CMAKE_SOURCE_DIR}/src/creation
-        ${CMAKE_SOURCE_DIR}/src/database
-        ${CMAKE_SOURCE_DIR}/src/enumerators
-        ${CMAKE_SOURCE_DIR}/src/input
-        ${CMAKE_SOURCE_DIR}/src/input/initialization
-        ${CMAKE_SOURCE_DIR}/src/item
-        ${CMAKE_SOURCE_DIR}/src/item/subitem
-        ${CMAKE_SOURCE_DIR}/src/lua
-        ${CMAKE_SOURCE_DIR}/src/lua/luabridge
-        ${CMAKE_SOURCE_DIR}/src/lua/luabridge/detail
-        ${CMAKE_SOURCE_DIR}/src/model
-        ${CMAKE_SOURCE_DIR}/src/model/submodel
-        ${CMAKE_SOURCE_DIR}/src/structure
-        ${CMAKE_SOURCE_DIR}/src/structure/algorithms
-        ${CMAKE_SOURCE_DIR}/src/structure/algorithms/AStar
-        ${CMAKE_SOURCE_DIR}/src/structure/map_generation
-        ${CMAKE_SOURCE_DIR}/src/structure/terrain
-        ${CMAKE_SOURCE_DIR}/src/updater
-        ${CMAKE_SOURCE_DIR}/src/utilities/
-        ${CMAKE_SOURCE_DIR}/src/utilities/name_generator
-        )
-
-#################################################
-# Add project includes...
-include_directories(
-        ${PROJECT_INC}
-        ${LUA_INCLUDE_DIR}
-        ${ZLIB_INCLUDE_DIR}
-        ${SQLITE3_INCLUDE_DIR}
-)
-
-#################################################
-# Add the executable...
+# -----------------------------------------------------------------------------
+# Project EXECUTABLE
+# -----------------------------------------------------------------------------
 add_executable(
         ${PROJECT_NAME}
         ${PROJECT_SRC}
 )
 
-#################################################
-# Link the libraries...
+# -----------------------------------------------------------------------------
+# Link the Libraries
+# -----------------------------------------------------------------------------
 target_link_libraries(
         ${PROJECT_NAME}
         ${LUA_LIBRARIES}

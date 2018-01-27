@@ -84,7 +84,7 @@ private:
     /// @param target       The character to attack.
     /// @param weapon       The melee weapon used to attack.
     /// @param attackNumber The number of already executed attacks.
-    void performAttackNaturalWeapon(
+    bool performAttackNaturalWeapon(
         Character * target,
         const std::shared_ptr<BodyPart::BodyWeapon> & weapon,
         unsigned int attackNumber);
@@ -93,7 +93,7 @@ private:
     /// @param target       The character to attack.
     /// @param weapon       The melee weapon used to attack.
     /// @param attackNumber The number of already executed attacks.
-    void performMeleeAttack(Character * target,
+    bool performMeleeAttack(Character * target,
                             MeleeWeaponItem * weapon,
                             unsigned int attackNumber);
 
@@ -101,7 +101,7 @@ private:
     /// @param target       The character to attack.
     /// @param weapon       The ranged weapon used to attack.
     /// @param attackNumber The number of already executed attacks.
-    void performRangedAttack(Character * target,
+    bool performRangedAttack(Character * target,
                              RangedWeaponItem * weapon,
                              unsigned int attackNumber);
 
