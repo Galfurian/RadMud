@@ -159,7 +159,7 @@ private:
         std::string output;
         for (const auto & column : columns)
         {
-            output += "#" + std::string(colcumn.getWidth(), '#');
+            output += "#" + std::string(column.getWidth(), '#');
         }
         return output += "#\n";
     }
