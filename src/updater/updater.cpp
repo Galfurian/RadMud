@@ -41,7 +41,7 @@ MudUpdater::MudUpdater() :
     hourTicSize(2),
     hourTicCounter(),
     mudHour(),
-    mudDayPhase(DayPhase::Morning),
+    mudDayPhase(DayPhase::Day),
     itemToDestroy()
 {
     // Nothing to do.
@@ -210,7 +210,7 @@ void MudUpdater::updateDayPhase()
 {
     // Increment the current mud hour.
     mudHour++;
-    if (mudHour == 6)
+    if (mudHour == DayPhase::Morning)
     {
         Mud::instance().broadcastMsg(0,
                                      Formatter::yellow() +
@@ -218,21 +218,21 @@ void MudUpdater::updateDayPhase()
                                      Formatter::reset());
         mudDayPhase = DayPhase::Morning;
     }
-    else if (mudHour == 12)
+    else if (mudHour == DayPhase::Day)
     {
         Mud::instance().broadcastMsg(0, Formatter::yellow() +
                                         "The sun is just above you.\n" +
                                         Formatter::reset());
         mudDayPhase = DayPhase::Day;
     }
-    else if (mudHour == 18)
+    else if (mudHour == DayPhase::Dusk)
     {
         Mud::instance().broadcastMsg(0, Formatter::yellow() +
                                         "The sun begins to set.\n" +
                                         Formatter::reset());
         mudDayPhase = DayPhase::Dusk;
     }
-    else if (mudHour == 24)
+    else if (mudHour == DayPhase::Night)
     {
         Mud::instance().broadcastMsg(0, Formatter::yellow() +
                                         "Darkness engulfs you.\n" +

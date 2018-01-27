@@ -33,10 +33,10 @@ class Room;
 /// @brief Enumerator which identifies the day phase.
 using DayPhase = enum class DayPhase_t
 {
-    Morning,    ///< General logging level.
-    Day,        ///< Log events useful for back-tracing.
-    Dusk,       ///< Log events useful for developers.
-    Night,      ///< Log events which may lead to errors.
+    Morning = 6,    ///< The first lights of the day.
+    Day = 12,       ///< The sun is high in the sky.
+    Dusk = 18,      ///< The sun begin to set.
+    Night = 24,     ///< The darkness, and nothing more.
 };
 
 /// @brief Handle everything that it's considered dynamic inside the mud,
