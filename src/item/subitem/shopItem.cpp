@@ -246,7 +246,7 @@ bool ShopItem::canUse(std::string & error)
     }
     if (!this->shopKeeper->isAlive())
     {
-        error = "The shopkeeper's probably taking a nap.";
+        error = "The shopkeeper's probably ill.";
         return false;
     }
     if (this->room->vnum != this->shopKeeper->room->vnum)
