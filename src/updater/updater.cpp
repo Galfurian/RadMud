@@ -210,7 +210,7 @@ void MudUpdater::updateDayPhase()
 {
     // Increment the current mud hour.
     mudHour++;
-    if (mudHour == DayPhase::Morning)
+    if (mudHour == static_cast<unsigned int>(DayPhase::Morning))
     {
         Mud::instance().broadcastMsg(0,
                                      Formatter::yellow() +
@@ -218,21 +218,21 @@ void MudUpdater::updateDayPhase()
                                      Formatter::reset());
         mudDayPhase = DayPhase::Morning;
     }
-    else if (mudHour == DayPhase::Day)
+    else if (mudHour == static_cast<unsigned int>(DayPhase::Day))
     {
         Mud::instance().broadcastMsg(0, Formatter::yellow() +
                                         "The sun is just above you.\n" +
                                         Formatter::reset());
         mudDayPhase = DayPhase::Day;
     }
-    else if (mudHour == DayPhase::Dusk)
+    else if (mudHour == static_cast<unsigned int>(DayPhase::Dusk))
     {
         Mud::instance().broadcastMsg(0, Formatter::yellow() +
                                         "The sun begins to set.\n" +
                                         Formatter::reset());
         mudDayPhase = DayPhase::Dusk;
     }
-    else if (mudHour == DayPhase::Night)
+    else if (mudHour == static_cast<unsigned int>(DayPhase::Night))
     {
         Mud::instance().broadcastMsg(0, Formatter::yellow() +
                                         "Darkness engulfs you.\n" +
