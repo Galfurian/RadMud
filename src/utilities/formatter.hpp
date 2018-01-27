@@ -40,14 +40,14 @@ public:
     /// @brief Provides the format used by the Mud for the output.
     static inline Format getFormat()
     {
-        return Format::ASCII;
+        return ASCII;
     }
 
     /// @brief Returns the string which identifies the command which clears the map.
     /// @return The IAC:DO:CLR_MAP command.
     static inline std::string doClearMap()
     {
-        if (getFormat() != Format::CLIENT) return "";
+        if (getFormat() != CLIENT) return "";
         std::string o;
         o.push_back('\0');
         o.push_back(static_cast<char>(TelnetChar::IAC));
@@ -61,7 +61,7 @@ public:
     /// @return The IAC:DO:DRAW_MAP command.
     static inline std::string doDrawMap()
     {
-        if (getFormat() != Format::CLIENT) return "";
+        if (getFormat() != CLIENT) return "";
         std::string o;
         o.push_back('\0');
         o.push_back(static_cast<char>(TelnetChar::IAC));
@@ -75,7 +75,7 @@ public:
     /// @return The IAC:DONT:DRAW_MAP command.
     static inline std::string dontDrawMap()
     {
-        if (getFormat() != Format::CLIENT) return "";
+        if (getFormat() != CLIENT) return "";
         std::string o;
         o.push_back('\0');
         o.push_back(static_cast<char>(TelnetChar::IAC));
@@ -92,28 +92,28 @@ public:
     /// @brief Returns the string which comands to reset any kind of change on the font.
     static inline std::string reset()
     {
-        if (getFormat() == Format::ASCII) return "\u001B[0m";
+        if (getFormat() == ASCII) return "\u001B[0m";
         return doFormat() + "RESET" + dontFormat();
     }
 
     /// @brief Allows to return the cursor to the beginning of the line.
     static inline std::string cursorHome()
     {
-        if (getFormat() == Format::ASCII) return "\u001b[H";
+        if (getFormat() == ASCII) return "\u001b[H";
         return doFormat() + "CURSOR-HOME" + dontFormat();
     }
 
     /// @brief Clears the entire scree.
     static inline std::string clearScreen()
     {
-        if (getFormat() == Format::ASCII) return "\u001B[2J";
+        if (getFormat() == ASCII) return "\u001B[2J";
         return doFormat() + "CLEAR-SCREEN" + dontFormat();
     }
 
     /// @brief Turn the font into Bold from now on.
     static inline std::string bold()
     {
-        if (getFormat() == Format::ASCII) return "\u001B[1m";
+        if (getFormat() == ASCII) return "\u001B[1m";
         return doFormat() + "BOLD" + dontFormat();
     }
 
@@ -126,7 +126,7 @@ public:
     /// @brief Turn the font into Italic from now on.
     static inline std::string italic()
     {
-        if (getFormat() == Format::ASCII) return "\u001B[3m";
+        if (getFormat() == ASCII) return "\u001B[3m";
         return doFormat() + "ITALIC" + dontFormat();
     }
 
@@ -139,7 +139,7 @@ public:
     /// @brief Change the font color to Black from now on.
     static inline std::string black()
     {
-        if (getFormat() == Format::ASCII) return "\u001B[0;30m";
+        if (getFormat() == ASCII) return "\u001B[0;30m";
         return doFormat() + "BLACK" + dontFormat();
     }
 
@@ -152,7 +152,7 @@ public:
     /// @brief Change the font color to Black from now on.
     static inline std::string red()
     {
-        if (getFormat() == Format::ASCII) return "\u001B[0;31m";
+        if (getFormat() == ASCII) return "\u001B[0;31m";
         return doFormat() + "RED" + dontFormat();
     }
 
@@ -165,7 +165,7 @@ public:
     /// @brief Change the font color to Green from now on.
     static inline std::string green()
     {
-        if (getFormat() == Format::ASCII) return "\u001B[0;32m";
+        if (getFormat() == ASCII) return "\u001B[0;32m";
         return doFormat() + "GREEN" + dontFormat();
     }
 
@@ -178,7 +178,7 @@ public:
     /// @brief Change the font color to Brown from now on.
     static inline std::string brown()
     {
-        if (getFormat() == Format::ASCII) return "\u001B[0;33m";
+        if (getFormat() == ASCII) return "\u001B[0;33m";
         return doFormat() + "BROWN" + dontFormat();
     }
 
@@ -191,7 +191,7 @@ public:
     /// @brief Change the font color to Yellow from now on.
     static inline std::string yellow()
     {
-        if (getFormat() == Format::ASCII) return "\u001B[1;33m";
+        if (getFormat() == ASCII) return "\u001B[1;33m";
         return doFormat() + "YELLOW" + dontFormat();
     }
 
@@ -204,7 +204,7 @@ public:
     /// @brief Change the font color to Blue from now on.
     static inline std::string blue()
     {
-        if (getFormat() == Format::ASCII) return "\u001B[0;34m";
+        if (getFormat() == ASCII) return "\u001B[0;34m";
         return doFormat() + "BLUE" + dontFormat();
     }
 
@@ -217,7 +217,7 @@ public:
     /// @brief Change the font color to Magenta from now on.
     static inline std::string magenta()
     {
-        if (getFormat() == Format::CLIENT) return "\u001B[0;35m";
+        if (getFormat() == ASCII) return "\u001B[0;35m";
         return doFormat() + "MAGENTA" + dontFormat();
     }
 
@@ -230,7 +230,7 @@ public:
     /// @brief Change the font color to Cyan from now on.
     static inline std::string cyan()
     {
-        if (getFormat() == Format::ASCII) return "\u001B[0;36m";
+        if (getFormat() == ASCII) return "\u001B[0;36m";
         return doFormat() + "CYAN" + dontFormat();
     }
 
@@ -243,7 +243,7 @@ public:
     /// @brief Change the font color to Gray from now on.
     static inline std::string gray()
     {
-        if (getFormat() == Format::ASCII) return "\u001B[0;37m";
+        if (getFormat() == ASCII) return "\u001B[0;37m";
         return doFormat() + "GRAY" + dontFormat();
     }
 
@@ -256,7 +256,7 @@ public:
     /// @brief Change the font color to DarkGray from now on.
     static inline std::string darkGray()
     {
-        if (getFormat() == Format::ASCII) return "\u001B[1;30m";
+        if (getFormat() == ASCII) return "\u001B[1;30m";
         return doFormat() + "DARK-GRAY" + dontFormat();
     }
 
@@ -274,7 +274,7 @@ private:
     /// @return The IAC:DO:FORMAT command.
     static inline std::string doFormat()
     {
-        if (getFormat() != Format::CLIENT) return "";
+        if (getFormat() != CLIENT) return "";
         std::string o;
         o.push_back('\0');
         o.push_back(static_cast<char>(TelnetChar::IAC));
@@ -288,7 +288,7 @@ private:
     /// @return The IAC:DONT:FORMAT command.
     static inline std::string dontFormat()
     {
-        if (getFormat() != Format::CLIENT) return "";
+        if (getFormat() != CLIENT) return "";
         std::string o;
         o.push_back('\0');
         o.push_back(static_cast<char>(TelnetChar::IAC));
