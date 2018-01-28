@@ -149,7 +149,8 @@ public:
     /// @brief Provides the table.
     /// @param withoutHeaders Allows to hide the header of the columns.
     /// @return The table.
-    std::string getTable(bool withoutHeaders = false);
+    std::string getTable(bool withoutHeaders = false,
+                         bool withoutDividers = false);
 
 private:
     /// @brief Provides a divided of the same width of the table.

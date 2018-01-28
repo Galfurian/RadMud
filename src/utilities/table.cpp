@@ -19,15 +19,18 @@
 #include "table.hpp"
 #include "logger.hpp"
 
-std::string Table::getTable(bool withoutHeaders)
+std::string Table::getTable(bool withoutHeaders,
+                            bool withoutDividers)
 {
     std::string output;
     // Add the title, if necessary.
-    if (!title.empty()) output += getDivider() + getTitle();
+    if (!title.empty())
+        output += ((withoutDividers) ? "" : getDivider()) + getTitle();
     // Add the headers, if necessary.
-    if (!withoutHeaders) output += getDivider() + getHeaders();
+    if (!withoutHeaders)
+        output += ((withoutDividers) ? "" : getDivider()) + getHeaders();
     // Star with the table.
-    output += getDivider();
+    output += ((withoutDividers) ? "" : getDivider());
     for (auto const & row : rows)
     {
         for (size_t i = 0; i < row.size(); ++i)
@@ -39,6 +42,6 @@ std::string Table::getTable(bool withoutHeaders)
         }
         output += "|\n";
     }
-    output += getDivider();
+    output += ((withoutDividers) ? "" : getDivider());
     return output;
 }

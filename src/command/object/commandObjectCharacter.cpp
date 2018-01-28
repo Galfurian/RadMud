@@ -429,16 +429,15 @@ bool DoInventory(Character * character, ArgumentHandler & /*args*/)
     }
     if (character->inventory.empty())
     {
-        character->sendMsg(
-            Formatter::gray() + "    You are carrying anything.\n" +
-            Formatter::reset());
+        character->sendMsg(Formatter::gray("    You are carrying anything.\n"));
+        return true;
     }
     // Check if the room is lit.
     bool roomIsLit = character->room->isLit();
     // Check if the inventory contains a lit light source.
     bool inventoryIsLit = character->inventoryIsLit();
     // Prepare the table for the inventory.
-    Table table = Table("Inventory");
+    Table table;
     table.addColumn("Item", StringAlign::Left);
     table.addColumn("Quantity", StringAlign::Right);
     table.addColumn("Weight", StringAlign::Right);
@@ -446,34 +445,33 @@ bool DoInventory(Character * character, ArgumentHandler & /*args*/)
     for (auto it : character->inventory)
     {
         TableRow row;
-        row.emplace_back((roomIsLit || inventoryIsLit) ?
-                         it->getNameCapital() : "Something");
         if (roomIsLit || inventoryIsLit)
         {
+            row.emplace_back(it->getNameCapital());
             row.emplace_back(ToString(it->quantity));
+            row.emplace_back(ToString(it->getWeight(true)));
         }
         else
         {
-            if (it->quantity == 1)
-            {
-                row.emplace_back((roomIsLit || inventoryIsLit) ?
-                                 it->getNameCapital() : "One");
-            }
-            else
-            {
-                row.emplace_back((roomIsLit || inventoryIsLit) ?
-                                 it->getNameCapital() : "Some");
-            }
+            row.emplace_back("Something");
+            row.emplace_back((it->quantity == 1) ? "One" : "Some");
+            row.emplace_back("???");
         }
-        row.emplace_back(ToString(it->getWeight(true)));
         table.addRow(row);
     }
-    character->sendMsg(table.getTable());
-    character->sendMsg("\n%sTotal carrying weight%s: %s of %s %s.\n",
-                       Formatter::yellow(),
-                       Formatter::reset(),
-                       ToString(character->getCarryingWeight()),
-                       ToString(character->getMaxCarryingWeight()),
-                       Mud::instance().getWeightMeasure());
+    character->sendMsg(table.getTable(false, true) + "\n");
+    if (roomIsLit || inventoryIsLit)
+    {
+        character->sendMsg(
+            Formatter::yellow("Total carrying weight") + ": %s of %s %s.\n",
+            ToString(character->getCarryingWeight()),
+            ToString(character->getMaxCarryingWeight()),
+            Mud::instance().getWeightMeasure());
+    }
+    else
+    {
+        character->sendMsg(
+            Formatter::red("You don't know how much you are carrying.\n"));
+    }
     return true;
 }
