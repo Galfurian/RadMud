@@ -46,13 +46,13 @@ void CurrencyItem::getSheet(Table & sheet) const
 unsigned int CurrencyItem::getPrice(bool entireStack) const
 {
     auto customPrice = Item::getPrice(entireStack);
-    if (composition != nullptr)
+    if (composition == nullptr)
     {
         Logger::log(LogLevel::Error, "The item %s has no composition.",
                     this->getName());
         return customPrice;
     }
-    if (!model->toCurrency()->findPrice(this->composition->vnum, customPrice))
+    if (!model->toCurrency()->findPrice(composition->vnum, customPrice))
     {
         Logger::log(
             LogLevel::Error,
