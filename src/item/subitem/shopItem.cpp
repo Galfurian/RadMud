@@ -44,29 +44,21 @@ ShopItem::~ShopItem()
 
 bool ShopItem::updateOnDB()
 {
-    if (Item::updateOnDB())
+    if (!Item::updateOnDB())
     {
-        // Prepare the vector used to insert into the database.
-        std::vector<std::string> arguments;
-        arguments.push_back(ToString(this->vnum));
-        arguments.push_back(this->shopName);
-        arguments.push_back(ToString(this->shopBuyTax));
-        arguments.push_back(ToString(this->shopSellTax));
-        arguments.push_back(ToString(this->balance));
-        if (this->shopKeeper != nullptr)
-        {
-            arguments.push_back(this->shopKeeper->id);
-        }
-        else
-        {
-            arguments.push_back("");
-        }
-        arguments.push_back(ToString(this->openingHour));
-        arguments.push_back(ToString(this->closingHour));
-        return SQLiteDbms::instance().insertInto("Shop", arguments, false,
-                                                 true);
+        return false;
     }
-    return false;
+    // Prepare the vector used to insert into the database.
+    std::vector<std::string> arguments;
+    arguments.emplace_back(ToString(vnum));
+    arguments.emplace_back(shopName);
+    arguments.emplace_back(ToString(shopBuyTax));
+    arguments.emplace_back(ToString(shopSellTax));
+    arguments.emplace_back(ToString(balance));
+    arguments.emplace_back((shopKeeper != nullptr) ? shopKeeper->id, "");
+    arguments.emplace_back(ToString(openingHour));
+    arguments.emplace_back(ToString(closingHour));
+    return SQLiteDbms::instance().insertInto("Shop", arguments, false, true);
 }
 
 bool ShopItem::removeOnDB()
@@ -123,12 +115,12 @@ bool ShopItem::canDeconstruct(std::string & error) const
 std::string ShopItem::lookContent()
 {
     // If the shop is not built, show the item normal content.
-    if (!HasFlag(this->flags, ItemFlag::Built))
+    if (!HasFlag(flags, ItemFlag::Built))
     {
         return "";
     }
     std::stringstream ss;
-    if (HasFlag(this->flags, ItemFlag::Closed))
+    if (HasFlag(flags, ItemFlag::Closed))
     {
         ss << Formatter::italic("It is closed.\n");
     }
@@ -167,28 +159,28 @@ std::string ShopItem::lookContent()
         {
             // Prepare the row.
             TableRow row;
-            row.push_back(iterator->getNameCapital());
-            row.push_back(ToString(iterator->quantity));
-            row.push_back(ToString(iterator->getWeight(false)));
+            row.emplace_back(iterator->getNameCapital());
+            row.emplace_back(ToString(iterator->quantity));
+            row.emplace_back(ToString(iterator->getWeight(false)));
             if (iterator->quantity > 1)
             {
-                row.push_back(ToString(iterator->getWeight(true)));
+                row.emplace_back(ToString(iterator->getWeight(true)));
             }
             else
             {
-                row.push_back("");
+                row.emplace_back("");
             }
-            row.push_back(ToString(this->evaluateBuyPrice(iterator)));
-            row.push_back(ToString(this->evaluateSellPrice(iterator)));
+            row.emplace_back(ToString(this->evaluateBuyPrice(iterator)));
+            row.emplace_back(ToString(this->evaluateSellPrice(iterator)));
             if (iterator->quantity > 1)
             {
-                row.push_back(ToString(
+                row.emplace_back(ToString(
                     this->evaluateSellPrice(iterator) *
                     iterator->quantity));
             }
             else
             {
-                row.push_back("");
+                row.emplace_back("");
             }
             // Add the row to the table.
             saleTable.addRow(row);
@@ -204,7 +196,7 @@ std::string ShopItem::lookContent()
 bool ShopItem::isAContainer() const
 {
     // The shop can be considered a container only if built.
-    return HasFlag(this->flags, ItemFlag::Built);
+    return HasFlag(flags, ItemFlag::Built);
 }
 
 double ShopItem::getTotalSpace() const
@@ -217,39 +209,36 @@ double ShopItem::getTotalSpace() const
 
 void ShopItem::setNewShopKeeper(Mobile * _shopKeeper)
 {
-    if (this->shopKeeper == nullptr)
+    if (shopKeeper == nullptr)
     {
         _shopKeeper->doCommand("say let's get to work!");
     }
-    else
+    else if (shopKeeper != _shopKeeper)
     {
-        if (this->shopKeeper != _shopKeeper)
-        {
-            _shopKeeper->doCommand("say let's get to work!");
-            this->shopKeeper->doCommand("say let's get some rest.");
-        }
+        _shopKeeper->doCommand("say let's get to work!");
+        shopKeeper->doCommand("say let's get some rest.");
     }
-    this->shopKeeper = _shopKeeper;
+    shopKeeper = _shopKeeper;
 }
 
 unsigned int ShopItem::getBalance() const
 {
-    return this->balance;
+    return balance;
 }
 
 bool ShopItem::canUse(std::string & error)
 {
-    if (this->shopKeeper == nullptr)
+    if (shopKeeper == nullptr)
     {
         error = "Nobody is managing the shop.";
         return false;
     }
-    if (!this->shopKeeper->isAlive())
+    if (!shopKeeper->isAlive())
     {
         error = "The shopkeeper's probably ill.";
         return false;
     }
-    if (this->room->vnum != this->shopKeeper->room->vnum)
+    if (room->vnum != shopKeeper->room->vnum)
     {
         error = "The shopkeeper's is elsewhere.";
         return false;
@@ -268,10 +257,10 @@ bool ShopItem::canUse(std::string & error)
 
 unsigned int ShopItem::evaluateBuyPrice(Item * item)
 {
-    return this->shopBuyTax * item->getPrice(false);
+    return shopBuyTax * item->getPrice(false);
 }
 
 unsigned int ShopItem::evaluateSellPrice(Item * item)
 {
-    return this->shopSellTax * item->getPrice(false);
+    return shopSellTax * item->getPrice(false);
 }
