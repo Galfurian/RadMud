@@ -55,7 +55,7 @@ bool ShopItem::updateOnDB()
     arguments.emplace_back(ToString(shopBuyTax));
     arguments.emplace_back(ToString(shopSellTax));
     arguments.emplace_back(ToString(balance));
-    arguments.emplace_back((shopKeeper != nullptr) ? shopKeeper->id, "");
+    arguments.emplace_back((shopKeeper != nullptr) ? shopKeeper->id : "");
     arguments.emplace_back(ToString(openingHour));
     arguments.emplace_back(ToString(closingHour));
     return SQLiteDbms::instance().insertInto("Shop", arguments, false, true);
@@ -86,14 +86,8 @@ void ShopItem::getSheet(Table & sheet) const
     sheet.addRow({"Buy Tax", ToString(shopBuyTax)});
     sheet.addRow({"Sell Tax", ToString(shopSellTax)});
     sheet.addRow({"Balance", ToString(this->getBalance())});
-    if (shopKeeper)
-    {
-        sheet.addRow({"ShopKeeper", shopKeeper->getNameCapital()});
-    }
-    else
-    {
-        sheet.addRow({"ShopKeeper", "Nobody"});
-    }
+    sheet.addRow({"ShopKeeper",
+                  (shopKeeper) ? shopKeeper->getNameCapital() : "None"});
     sheet.addRow({"Opening Hour", ToString(openingHour)});
     sheet.addRow({"Closing Hour", ToString(closingHour)});
 }
