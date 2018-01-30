@@ -58,7 +58,7 @@ NameGenerator::NameGenerator(const std::string & pattern, bool collapse_triples)
                 break;
             case '>':
             case ')':
-                if (stack.size() == 0)
+                if (stack.empty())
                 {
                     throw std::invalid_argument("Unbalanced brackets");
                 }
@@ -192,7 +192,7 @@ std::unique_ptr<NameGenerator> NameGenerator::Group::emit()
 
 void NameGenerator::Group::split()
 {
-    if (set.size() == 0)
+    if (set.empty())
     {
         set.push_back(make_unique<Sequence>());
     }
@@ -218,7 +218,7 @@ void NameGenerator::Group::add(std::unique_ptr<NameGenerator> && g)
         }
         manipulators.pop();
     }
-    if (set.size() == 0)
+    if (set.empty())
     {
         set.push_back(make_unique<Sequence>());
     }

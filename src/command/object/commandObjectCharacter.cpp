@@ -181,7 +181,7 @@ bool DoWear(Character * character, ArgumentHandler & args)
     // Stop any action the character is executing.
     StopAction(character);
     // Check the arguments.
-    if (args.size() == 0)
+    if (args.empty())
     {
         character->sendMsg("Wear what?\n");
         return false;
@@ -315,7 +315,7 @@ bool DoRemove(Character * character, ArgumentHandler & args)
     // Stop any action the character is executing.
     StopAction(character);
     // Check the arguments.
-    if (args.size() == 0)
+    if (args.empty())
     {
         character->sendMsg("Remove what?\n");
         return false;

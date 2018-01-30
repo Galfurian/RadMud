@@ -431,7 +431,7 @@ bool DoAim(Character * character, ArgumentHandler & args)
     }
     // Stop any action the character is executing.
     StopAction(character);
-    if (args.size() == 0)
+    if (args.empty())
     {
         if (character->combatHandler.charactersInSight.empty())
         {
