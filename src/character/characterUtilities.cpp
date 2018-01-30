@@ -33,21 +33,20 @@ std::vector<MeleeWeaponItem *> GetActiveMeleeWeapons(Character * character)
     std::vector<MeleeWeaponItem *> weapons;
     for (auto item : character->equipment)
     {
+        // Skip non-weapons.
+        if (item->getType() != ModelType::MeleeWeapon) continue;
+        // Cast the item to weapon.
+        auto wpn = dynamic_cast<MeleeWeaponItem *>(item);
         // If at least one of the occupied body parts can be used to wield
         // a weapon, consider it an active weapon.
-        for (auto bodyPart : item->occupiedBodyParts)
+        for (auto const & bodyPart : item->occupiedBodyParts)
         {
-            if (HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
-            {
-                if (item->getType() == ModelType::MeleeWeapon)
-                {
-                    auto wpn = static_cast<MeleeWeaponItem *>(item);
-                    weapons.emplace_back(wpn);
-                    // Break the loop otherwise the weapon would be added
-                    // for each occupied body part.
-                    break;
-                }
-            }
+            // Skip bodyparts which cannot wield.
+            if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWield)) continue;
+            // Store the item and break the loop otherwise the weapon would be
+            // added for each occupied body part.
+            weapons.emplace_back(wpn);
+            break;
         }
     }
     return weapons;
@@ -58,21 +57,20 @@ std::vector<RangedWeaponItem *> GetActiveRangedWeapons(Character * character)
     std::vector<RangedWeaponItem *> weapons;
     for (auto item : character->equipment)
     {
+        // Skip non-ranged-weapons.
+        if (item->getType() != ModelType::RangedWeapon) continue;
+        // Cast the item to weapon.
+        auto wpn = dynamic_cast<RangedWeaponItem *>(item);
         // If at least one of the occupied body parts can be used to wield
         // a range weapon, consider it an active weapon.
-        for (auto bodyPart : item->occupiedBodyParts)
+        for (auto const & bodyPart : item->occupiedBodyParts)
         {
-            if (HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
-            {
-                if (item->getType() == ModelType::RangedWeapon)
-                {
-                    auto wpn = static_cast<RangedWeaponItem *>(item);
-                    weapons.emplace_back(wpn);
-                    // Break the loop otherwise the weapon would be added
-                    // for each occupied body part.
-                    break;
-                }
-            }
+            // Skip bodyparts which cannot wield.
+            if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWield)) continue;
+            // Store the item and break the loop otherwise the weapon would be
+            // added for each occupied body part.
+            weapons.emplace_back(wpn);
+            break;
         }
     }
     return weapons;
@@ -82,7 +80,7 @@ std::vector<std::shared_ptr<BodyPart::BodyWeapon>> GetActiveNaturalWeapons(
     Character * character)
 {
     std::vector<std::shared_ptr<BodyPart::BodyWeapon>> naturalWeapons;
-    for (auto bodyPart : character->race->bodyParts)
+    for (auto const & bodyPart : character->race->bodyParts)
     {
         // If the body part is holding an item, skip it.
         if (character->findItemAtBodyPart(bodyPart) != nullptr) continue;
@@ -94,39 +92,37 @@ std::vector<std::shared_ptr<BodyPart::BodyWeapon>> GetActiveNaturalWeapons(
     return naturalWeapons;
 }
 
+void FindCoinsInContainer(ItemVector const & container,
+                          ItemVector & foundCoins,
+                          const bool iterative)
+{
+    // Analyze the content.
+    for (auto item : container)
+    {
+        if (item->getType() == ModelType::Currency)
+        {
+            foundCoins.emplace_back(item);
+        }
+        else if (iterative)
+        {
+            if (item->getType() == ModelType::Container)
+            {
+                // Cast the item to container.
+                auto containerItem = dynamic_cast<ContainerItem *>(item);
+                // Iterate inside the container's content.
+                FindCoinsInContainer(containerItem->content,
+                                     foundCoins,
+                                     iterative);
+            }
+        }
+    }
+}
+
 ItemVector FindPosessedCoins(Character * character)
 {
     ItemVector foundCoins;
-    auto FindCoinInContainer = [&](Item * item)
-    {
-        if (item->getType() == ModelType::Container)
-        {
-            // Cast the item to container.
-            auto containerItem = static_cast<ContainerItem *>(item);
-            for (auto content : containerItem->content)
-            {
-                if (content->getType() == ModelType::Currency)
-                {
-                    foundCoins.emplace_back(content);
-                }
-            }
-        }
-    };
-    for (auto it : character->equipment)
-    {
-        FindCoinInContainer(it);
-    }
-    for (auto it : character->inventory)
-    {
-        if (it->getType() == ModelType::Currency)
-        {
-            foundCoins.emplace_back(it);
-        }
-        else
-        {
-            FindCoinInContainer(it);
-        }
-    }
+    FindCoinsInContainer(character->equipment, foundCoins, false);
+    FindCoinsInContainer(character->inventory, foundCoins, false);
     foundCoins.orderBy(ItemVector::ByPrice);
     return foundCoins;
 }
@@ -298,7 +294,7 @@ bool FindNearbyTools(
     ItemVector & foundTools,
     const SearchOptionsCharacter & searchOptions)
 {
-    for (auto requiredTool : requiredTools)
+    for (auto const & requiredTool : requiredTools)
     {
         auto tool = FindNearbyTool(character,
                                    requiredTool,

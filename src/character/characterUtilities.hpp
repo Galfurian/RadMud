@@ -62,6 +62,13 @@ std::vector<RangedWeaponItem *> GetActiveRangedWeapons(Character * character);
 std::vector<std::shared_ptr<BodyPart::BodyWeapon>> GetActiveNaturalWeapons(
     Character * character);
 
+/// @brief Search the coins inside the given container.
+/// @param character The target character.
+/// @return List of found coins.
+void FindCoinsInContainer(ItemVector const & container,
+                          ItemVector & foundCoins,
+                          bool iterative = false);
+
 /// @brief Search the coins on the character.
 /// @param character The target character.
 /// @return List of found coins.
