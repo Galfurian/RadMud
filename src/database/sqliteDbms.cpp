@@ -87,8 +87,6 @@ SQLiteDbms::SQLiteDbms() :
     loaders.emplace_back(
         TableLoader("ProductionKnowledge", LoadProductionKnowledge));
     loaders.emplace_back(
-        TableLoader("Shop", LoadShop));
-    loaders.emplace_back(
         TableLoader("Currency", LoadCurrency));
     loaders.emplace_back(
         TableLoader("ModelBodyPart", LoadModelBodyPart));
@@ -132,6 +130,8 @@ SQLiteDbms::SQLiteDbms() :
         TableLoader("BuildingKnowledge", LoadBuildingKnowledge));
     loaders.emplace_back(
         TableLoader("BuildingTool", LoadBuildingTool));
+    loaders.emplace_back(
+        TableLoader("Shop", LoadShop));
 }
 
 SQLiteDbms::~SQLiteDbms()

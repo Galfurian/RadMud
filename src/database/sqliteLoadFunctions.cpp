@@ -1599,7 +1599,7 @@ bool LoadShop(ResultSet * result)
                 throw SQLiteException("Wrong type of item " + ToString(vnum));
             }
             // Cast the item to shop.
-            auto shop = static_cast<ShopItem *>(item);
+            auto shop = dynamic_cast<ShopItem *>(item);
             shop->shopName = result->getNextString();
             shop->shopBuyTax = result->getNextUnsignedInteger();
             shop->shopSellTax = result->getNextUnsignedInteger();
