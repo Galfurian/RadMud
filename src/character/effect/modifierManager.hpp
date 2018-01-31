@@ -275,9 +275,9 @@ public:
             for (auto const & it2 : modAbility)
             {
                 msg += "\t\t";
-                msg += AlignString(it2.first.getAbbreviation(),
-                                   StringAlign::Left, 30);
-                msg += AlignString(it2.second, StringAlign::Right, 5) + "\n";
+                msg += Align(it2.first.getAbbreviation(),
+                                   align::left, 30);
+                msg += Align(it2.second, align::right, 5) + "\n";
             }
         }
         if (!modCombat.empty())
@@ -286,8 +286,8 @@ public:
             for (auto const & it2 : modCombat)
             {
                 msg += "\t";
-                msg += AlignString(it2.first.toString(), StringAlign::Left, 30);
-                msg += AlignString(it2.second, StringAlign::Right, 5) + "\n";
+                msg += Align(it2.first.toString(), align::left, 30);
+                msg += Align(it2.second, align::right, 5) + "\n";
             }
         }
         if (!modStatus.empty())
@@ -296,8 +296,8 @@ public:
             for (auto const & it2 : modStatus)
             {
                 msg += "\t";
-                msg += AlignString(it2.first.toString(), StringAlign::Left, 30);
-                msg += AlignString(it2.second, StringAlign::Right, 5) + "\n";
+                msg += Align(it2.first.toString(), align::left, 30);
+                msg += Align(it2.second, align::right, 5) + "\n";
             }
         }
         if (!modKnowledge.empty())
@@ -306,8 +306,8 @@ public:
             for (auto const & it2 : modKnowledge)
             {
                 msg += "\t";
-                msg += AlignString(it2.first.toString(), StringAlign::Left, 30);
-                msg += AlignString(it2.second, StringAlign::Right, 5) + "\n";
+                msg += Align(it2.first.toString(), align::left, 30);
+                msg += Align(it2.second, align::right, 5) + "\n";
             }
         }
         Logger::log(LogLevel::Debug, msg);

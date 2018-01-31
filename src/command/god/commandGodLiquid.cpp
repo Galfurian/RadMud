@@ -50,9 +50,9 @@ bool DoLiquidInfo(Character * character, ArgumentHandler & args)
 bool DoLiquidList(Character * character, ArgumentHandler & /*args*/)
 {
     Table table;
-    table.addColumn("VNUM", StringAlign::Center);
-    table.addColumn("NAME", StringAlign::Right);
-    table.addColumn("WORTH", StringAlign::Right);
+    table.addColumn("VNUM", align::center);
+    table.addColumn("NAME", align::right);
+    table.addColumn("WORTH", align::right);
     for (auto iterator : Mud::instance().mudLiquids)
     {
         // Prepare the row.

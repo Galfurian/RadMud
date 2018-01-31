@@ -101,8 +101,8 @@ bool Character::isPlayer() const
 void Character::getSheet(Table & sheet) const
 {
     // Add the columns.
-    sheet.addColumn("Attribute", StringAlign::Left);
-    sheet.addColumn("Value", StringAlign::Left);
+    sheet.addColumn("Attribute", align::left);
+    sheet.addColumn("Value", align::left);
     // Set the values.
     sheet.addRow({"Proper Noun", name});
     sheet.addRow({"Description", description});
@@ -916,8 +916,8 @@ std::string Character::getLook()
     {
 #if 0 // Tabular version
         // Add the body part name to the row.
-        output += AlignString(bodyPart->getDescription(true),
-                              StringAlign::Left, 15);
+        output += Align(bodyPart->getDescription(true),
+                              align::left, 15);
         auto item = this->findItemAtBodyPart(bodyPart);
         if (item != nullptr)
         {

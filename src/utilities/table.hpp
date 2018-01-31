@@ -32,7 +32,7 @@ private:
     /// Column Title.
     std::string title;
     /// Column alignment.
-    StringAlign alignment;
+    align::align_t alignment;
     /// Column width.
     size_t width;
 
@@ -41,7 +41,9 @@ public:
     /// @param _title     The column title.
     /// @param _alignment The column alignment.
     /// @param _width     The column width.
-    TableColumn(std::string _title, StringAlign _alignment, size_t _width = 0) :
+    TableColumn(std::string _title,
+                align::align_t _alignment,
+                size_t _width = 0) :
         title(std::move(_title)),
         alignment(_alignment),
         width(_width)
@@ -65,7 +67,7 @@ public:
 
     /// @brief Provides access to the allignment of the column.
     /// @return The allignment of the column.
-    inline StringAlign getAlignment()
+    inline align::align_t getAlignment()
     {
         return alignment;
     }
@@ -108,7 +110,7 @@ public:
     /// @param columnAlignment The column alignment.
     /// @param columnWidth     The column width.
     inline void addColumn(std::string _title,
-                          StringAlign _align,
+                          align::align_t _align,
                           size_t _width = 0)
     {
         columns.emplace_back(TableColumn(std::move(_title), _align, _width));
@@ -170,8 +172,8 @@ private:
     inline std::string getTitle() const
     {
         return "#" +
-               AlignString(title, StringAlign::Center,
-                           getTotalWidth() + (columns.size() - 1)) + "#\n";
+               Align(title, align::center,
+                     getTotalWidth() + (columns.size() - 1)) + "#\n";
     }
 
     /// @brief Provides the columns headers.
@@ -182,9 +184,9 @@ private:
         for (const auto & it : columns)
         {
             output += "|" +
-                      AlignString(it.getTitle(),
-                                  StringAlign::Center,
-                                  it.getWidth());
+                      Align(it.getTitle(),
+                            align::center,
+                            it.getWidth());
         }
         return output + "|\n";
     }

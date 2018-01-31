@@ -35,7 +35,7 @@ std::string Table::getTable(bool withoutHeaders,
     {
         for (size_t i = 0; i < row.size(); ++i)
         {
-            output += "|" + AlignString(
+            output += "|" + Align(
                 row.at(i),
                 columns.at(i).getAlignment(),
                 columns.at(i).getWidth());

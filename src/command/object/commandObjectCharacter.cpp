@@ -52,8 +52,8 @@ bool DoEquipments(Character * character, ArgumentHandler & /*args*/)
             continue;
         }
         // Add the body part name to the row.
-        output += AlignString(bodyPart->getDescription(true),
-                              StringAlign::Left, 15);
+        output += Align(bodyPart->getDescription(true),
+                              align::left, 15);
         auto item = character->findItemAtBodyPart(bodyPart);
         if (item != nullptr)
         {
@@ -438,9 +438,9 @@ bool DoInventory(Character * character, ArgumentHandler & /*args*/)
     bool inventoryIsLit = character->inventoryIsLit();
     // Prepare the table for the inventory.
     Table table;
-    table.addColumn("Item", StringAlign::Left);
-    table.addColumn("Quantity", StringAlign::Right);
-    table.addColumn("Weight", StringAlign::Right);
+    table.addColumn("Item", align::left);
+    table.addColumn("Quantity", align::right);
+    table.addColumn("Weight", align::right);
     // List all the items in inventory
     for (auto it : character->inventory)
     {

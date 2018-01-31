@@ -342,11 +342,11 @@ bool DoRoomList(Character * character, ArgumentHandler & args)
         return false;
     }
     Table table;
-    table.addColumn("VNUM", StringAlign::Center);
-    table.addColumn("AREA", StringAlign::Left);
-    table.addColumn("COORD", StringAlign::Center);
-    table.addColumn("TERRAIN", StringAlign::Center);
-    table.addColumn("NAME", StringAlign::Left);
+    table.addColumn("VNUM", align::center);
+    table.addColumn("AREA", align::left);
+    table.addColumn("COORD", align::center);
+    table.addColumn("TERRAIN", align::center);
+    table.addColumn("NAME", align::left);
     for (auto iterator : Mud::instance().mudRooms)
     {
         Room * room = iterator.second;
@@ -403,10 +403,10 @@ bool DoAreaInfo(Character * character, ArgumentHandler & args)
 bool DoAreaList(Character * character, ArgumentHandler & /*args*/)
 {
     Table table;
-    table.addColumn("VNUM", StringAlign::Center);
-    table.addColumn("NAME", StringAlign::Left);
-    table.addColumn("BUILDER", StringAlign::Left);
-    table.addColumn("ROOMS", StringAlign::Center);
+    table.addColumn("VNUM", align::center);
+    table.addColumn("NAME", align::left);
+    table.addColumn("BUILDER", align::left);
+    table.addColumn("ROOMS", align::center);
     for (auto iterator : Mud::instance().mudAreas)
     {
         Area * area = iterator.second;

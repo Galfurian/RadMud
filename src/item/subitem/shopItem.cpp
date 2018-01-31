@@ -142,13 +142,13 @@ std::string ShopItem::lookContent()
             return ss.str();
         }
         Table saleTable(shopName);
-        saleTable.addColumn("Good", StringAlign::Left);
-        saleTable.addColumn("Quantity", StringAlign::Center);
-        saleTable.addColumn("Weight (Single)", StringAlign::Right);
-        saleTable.addColumn("Weight (stack)", StringAlign::Right);
-        saleTable.addColumn("Buy", StringAlign::Right);
-        saleTable.addColumn("Sell (Single)", StringAlign::Right);
-        saleTable.addColumn("Sell (stack)", StringAlign::Right);
+        saleTable.addColumn("Good", align::left);
+        saleTable.addColumn("Quantity", align::center);
+        saleTable.addColumn("Weight (Single)", align::right);
+        saleTable.addColumn("Weight (stack)", align::right);
+        saleTable.addColumn("Buy", align::right);
+        saleTable.addColumn("Sell (Single)", align::right);
+        saleTable.addColumn("Sell (stack)", align::right);
         for (auto iterator : content)
         {
             // Prepare the row.

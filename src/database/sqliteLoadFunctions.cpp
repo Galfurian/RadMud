@@ -195,9 +195,9 @@ bool LoadSkill(ResultSet * result)
             }
             Logger::log(LogLevel::Debug,
                         "\t%s%s%s",
-                        AlignString(skill->name, StringAlign::Left, 25),
-                        AlignString(skill->ability.toString(),
-                                    StringAlign::Left, 15),
+                        Align(skill->name, align::left, 25),
+                        Align(skill->ability.toString(),
+                                    align::left, 15),
                         skill->description);
         }
         catch (SQLiteException & e)
@@ -235,9 +235,9 @@ bool LoadSkillPrerequisite(ResultSet * result)
             requiredSkill->usedForSkill.emplace_back(skillVnum);
             Logger::log(LogLevel::Debug,
                         "\t%s requires %s",
-                        AlignString(skill->name, StringAlign::Left, 25),
-                        AlignString(requiredSkill->name,
-                                    StringAlign::Left, 25));
+                        Align(skill->name, align::left, 25),
+                        Align(requiredSkill->name,
+                                    align::left, 25));
         }
         catch (SQLiteException & e)
         {
@@ -273,9 +273,9 @@ bool LoadSkillAbilityModifier(ResultSet * result)
             // Log it.
             Logger::log(LogLevel::Debug,
                         "\t%s%s%s",
-                        AlignString(skill->name, StringAlign::Left, 25),
-                        AlignString(ability.toString(), StringAlign::Left, 35),
-                        AlignString(modifier, StringAlign::Left, 35));
+                        Align(skill->name, align::left, 25),
+                        Align(ability.toString(), align::left, 35),
+                        Align(modifier, align::left, 35));
         }
         catch (SQLiteException & e)
         {
@@ -311,10 +311,10 @@ bool LoadSkillStatusModifier(ResultSet * result)
             // Log it.
             Logger::log(LogLevel::Debug,
                         "\t%s%s%s",
-                        AlignString(skill->name, StringAlign::Left, 25),
-                        AlignString(statusModifier.toString(),
-                                    StringAlign::Left, 35),
-                        AlignString(modifier, StringAlign::Left, 35));
+                        Align(skill->name, align::left, 25),
+                        Align(statusModifier.toString(),
+                                    align::left, 35),
+                        Align(modifier, align::left, 35));
         }
         catch (SQLiteException & e)
         {
@@ -350,10 +350,10 @@ bool LoadSkillCombatModifier(ResultSet * result)
             // Log it.
             Logger::log(LogLevel::Debug,
                         "\t%s%s%s",
-                        AlignString(skill->name, StringAlign::Left, 25),
-                        AlignString(combatModifier.toString(),
-                                    StringAlign::Left, 35),
-                        AlignString(modifier, StringAlign::Left, 35));
+                        Align(skill->name, align::left, 25),
+                        Align(combatModifier.toString(),
+                                    align::left, 35),
+                        Align(modifier, align::left, 35));
         }
         catch (SQLiteException & e)
         {
@@ -388,9 +388,9 @@ bool LoadSkillKnowledge(ResultSet * result)
             // Log it.
             Logger::log(LogLevel::Debug,
                         "\t%s%s",
-                        AlignString(skill->name, StringAlign::Left, 25),
-                        AlignString(knowledge.toString(),
-                                    StringAlign::Left, 35));
+                        Align(skill->name, align::left, 25),
+                        Align(knowledge.toString(),
+                                    align::left, 35));
         }
         catch (SQLiteException & e)
         {
@@ -561,8 +561,8 @@ bool LoadRaceBodyPart(ResultSet * result)
             race->bodyParts.emplace_back(bodyPart);
             // Log the body part.
             Logger::log(LogLevel::Debug, "\t%s%s",
-                        AlignString(race->name, StringAlign::Left, 25),
-                        AlignString(bodyPart->name, StringAlign::Left, 25));
+                        Align(race->name, align::left, 25),
+                        Align(bodyPart->name, align::left, 25));
         }
         catch (SQLiteException & e)
         {
@@ -651,8 +651,8 @@ bool LoadRaceBaseSkill(ResultSet * result)
             // Log the skill.
             Logger::log(LogLevel::Debug,
                         "\t%s%s%s",
-                        AlignString(race->name, StringAlign::Left, 25),
-                        AlignString(skill->name, StringAlign::Left, 25),
+                        Align(race->name, align::left, 25),
+                        Align(skill->name, align::left, 25),
                         skillLevel);
         }
         catch (SQLiteException & e)
@@ -690,8 +690,8 @@ bool LoadRaceBaseAbility(ResultSet * result)
             // Log the ability.
             Logger::log(LogLevel::Debug,
                         "\t%s%s%s",
-                        AlignString(race->name, StringAlign::Left, 25),
-                        AlignString(ability.toString(), StringAlign::Left, 25),
+                        Align(race->name, align::left, 25),
+                        Align(ability.toString(), align::left, 25),
                         value);
         }
         catch (SQLiteException & e)
@@ -1138,9 +1138,9 @@ bool LoadProduction(ResultSet * result)
             // Log it.
             Logger::log(LogLevel::Debug,
                         "\t%s%s",
-                        AlignString(production->name, StringAlign::Left, 25),
-                        AlignString(profession->command,
-                                    StringAlign::Left, 35));
+                        Align(production->name, align::left, 25),
+                        Align(profession->command,
+                                    align::left, 35));
         }
         catch (SQLiteException & e)
         {
@@ -1175,9 +1175,9 @@ bool LoadProductionTool(ResultSet * result)
             // Log it.
             Logger::log(LogLevel::Debug,
                         "\t%s%s",
-                        AlignString(production->name, StringAlign::Left, 25),
-                        AlignString(toolType.toString(),
-                                    StringAlign::Left, 35));
+                        Align(production->name, align::left, 25),
+                        Align(toolType.toString(),
+                                    align::left, 35));
         }
         catch (SQLiteException & e)
         {
@@ -1213,10 +1213,10 @@ bool LoadProductionOutcome(ResultSet * result)
             // Log it.
             Logger::log(LogLevel::Debug,
                         "\t%s%s%s",
-                        AlignString(production->name, StringAlign::Left, 25),
-                        AlignString(outcome->name, StringAlign::Left, 35),
-                        AlignString(production->quantity,
-                                    StringAlign::Left, 35));
+                        Align(production->name, align::left, 25),
+                        Align(outcome->name, align::left, 35),
+                        Align(production->quantity,
+                                    align::left, 35));
         }
         catch (SQLiteException & e)
         {
@@ -1259,10 +1259,10 @@ bool LoadProductionIngredient(ResultSet * result)
             // Log it.
             Logger::log(LogLevel::Debug,
                         "\t%s%s%s",
-                        AlignString(production->name, StringAlign::Left, 25),
-                        AlignString(ingredient.toString(), StringAlign::Left,
+                        Align(production->name, align::left, 25),
+                        Align(ingredient.toString(), align::left,
                                     35),
-                        AlignString(quantity, StringAlign::Left, 35));
+                        Align(quantity, align::left, 35));
         }
         catch (SQLiteException & e)
         {
@@ -1297,9 +1297,9 @@ bool LoadProductionKnowledge(ResultSet * result)
             // Log it.
             Logger::log(LogLevel::Debug,
                         "\t%s%s",
-                        AlignString(production->name, StringAlign::Left, 25),
-                        AlignString(knowledge.toString(),
-                                    StringAlign::Left, 35));
+                        Align(production->name, align::left, 25),
+                        Align(knowledge.toString(),
+                                    align::left, 35));
         }
         catch (SQLiteException & e)
         {
@@ -1459,8 +1459,8 @@ bool LoadBuilding(ResultSet * result)
             }
             Logger::log(LogLevel::Debug,
                         "\t%s%s",
-                        AlignString(building->vnum, StringAlign::Left, 25),
-                        AlignString(building->name, StringAlign::Left, 35));
+                        Align(building->vnum, align::left, 25),
+                        Align(building->name, align::left, 35));
         }
         catch (SQLiteException & e)
         {
@@ -1494,8 +1494,8 @@ bool LoadBuildingTool(ResultSet * result)
             building->tools.emplace_back(tool);
             Logger::log(LogLevel::Debug,
                         "\t%s%s",
-                        AlignString(building->name, StringAlign::Left, 25),
-                        AlignString(tool.toString(), StringAlign::Left, 35));
+                        Align(building->name, align::left, 25),
+                        Align(tool.toString(), align::left, 35));
         }
         catch (SQLiteException & e)
         {
@@ -1531,10 +1531,10 @@ bool LoadBuildingIngredient(ResultSet * result)
             building->ingredients.insert(std::make_pair(ingredient, quantity));
             Logger::log(LogLevel::Debug,
                         "\t%s%s%s",
-                        AlignString(building->name, StringAlign::Left, 25),
-                        AlignString(ingredient.toString(),
-                                    StringAlign::Left, 35),
-                        AlignString(quantity, StringAlign::Left, 35));
+                        Align(building->name, align::left, 25),
+                        Align(ingredient.toString(),
+                                    align::left, 35),
+                        Align(quantity, align::left, 35));
         }
         catch (SQLiteException & e)
         {
@@ -1568,9 +1568,9 @@ bool LoadBuildingKnowledge(ResultSet * result)
             building->requiredKnowledge.emplace_back(knowledge);
             Logger::log(LogLevel::Debug,
                         "\t%s%s",
-                        AlignString(building->name, StringAlign::Left, 25),
-                        AlignString(knowledge.toString(),
-                                    StringAlign::Left, 35));
+                        Align(building->name, align::left, 25),
+                        Align(knowledge.toString(),
+                                    align::left, 35));
         }
         catch (SQLiteException & e)
         {
@@ -1686,8 +1686,8 @@ bool LoadTerrain(ResultSet * result)
                     terrain->name);
             }
             Logger::log(LogLevel::Debug, "\t%s%s",
-                        AlignString(terrain->vnum, StringAlign::Left, 25),
-                        AlignString(terrain->name, StringAlign::Left, 25));
+                        Align(terrain->vnum, align::left, 25),
+                        Align(terrain->name, align::left, 25));
         }
         catch (SQLiteException & e)
         {
@@ -1721,8 +1721,8 @@ bool LoadTerrainLiquid(ResultSet * result)
             auto quantity = result->getNextInteger();
             terrain->liquidContent = std::make_pair(liquid, quantity);
             Logger::log(LogLevel::Debug, "\t%s%s",
-                        AlignString(terrain->name, StringAlign::Left, 25),
-                        AlignString(liquid->name, StringAlign::Left, 25));
+                        Align(terrain->name, align::left, 25),
+                        Align(liquid->name, align::left, 25));
         }
         catch (SQLiteException & e)
         {
@@ -1757,9 +1757,9 @@ bool LoadTerrainLiquidSources(ResultSet * result)
             // Add the liquid source.
             terrain->addLiquidSource(liquid, probability);
             Logger::log(LogLevel::Debug, "\t%s%s%s",
-                        AlignString(terrain->name, StringAlign::Left, 25),
-                        AlignString(liquid->name, StringAlign::Left, 25),
-                        AlignString(probability, StringAlign::Left, 25));
+                        Align(terrain->name, align::left, 25),
+                        Align(liquid->name, align::left, 25),
+                        Align(probability, align::left, 25));
         }
         catch (SQLiteException & e)
         {
@@ -1929,9 +1929,9 @@ bool LoadHeightMap(ResultSet * result)
                     "Can't add the height map " + name);
             }
             Logger::log(LogLevel::Debug, "\t%s%s%s",
-                        AlignString(vnum, StringAlign::Left, 25),
-                        AlignString(name, StringAlign::Left, 25),
-                        AlignString(seaLevel->name, StringAlign::Left, 25));
+                        Align(vnum, align::left, 25),
+                        Align(name, align::left, 25),
+                        Align(seaLevel->name, align::left, 25));
         }
         catch (SQLiteException & e)
         {
@@ -1965,9 +1965,9 @@ bool LoadHeightMapThreshold(ResultSet * result)
             auto threshold = result->getNextInteger();
             heightMap->addThreshold(terrain, threshold);
             Logger::log(LogLevel::Debug, "\t%s%s%s",
-                        AlignString(heightMap->name, StringAlign::Left, 25),
-                        AlignString(terrain->name, StringAlign::Left, 25),
-                        AlignString(threshold, StringAlign::Left, 25));
+                        Align(heightMap->name, align::left, 25),
+                        Align(terrain->name, align::left, 25),
+                        Align(threshold, align::left, 25));
         }
         catch (SQLiteException & e)
         {

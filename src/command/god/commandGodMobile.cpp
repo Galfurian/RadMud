@@ -48,10 +48,10 @@ bool DoMobileKill(Character * character, ArgumentHandler & args)
 bool DoMobileList(Character * character, ArgumentHandler & /*args*/)
 {
     Table table;
-    table.addColumn("ALIVE", StringAlign::Center);
-    table.addColumn("ID", StringAlign::Left);
-    table.addColumn("NAME", StringAlign::Left);
-    table.addColumn("LOCATION", StringAlign::Right);
+    table.addColumn("ALIVE", align::center);
+    table.addColumn("ID", align::left);
+    table.addColumn("NAME", align::left);
+    table.addColumn("LOCATION", align::right);
     for (auto mobile : Mud::instance().mudMobiles)
     {
         // Prepare the row.
