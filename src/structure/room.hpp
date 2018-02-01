@@ -141,10 +141,13 @@ public:
     bool removeOnDB();
 
     /// @brief Search for the item in the room.
-    /// @param search_parameter The item to search.
-    /// @param number           Position of the item we want to look for.
+    /// @param key    The item to search.
+    /// @param number Position of the item we want to look for.
     /// @return The item, if it's in the room.
-    Item * findItem(std::string search_parameter, int & number);
+    inline Item * findItem(std::string const & key, int & number)
+    {
+        return ItemUtils::FindItemIn(items, key, number);
+    }
 
     /// @brief Search for the building in the room.
     /// @param target The building to search.
@@ -167,10 +170,13 @@ public:
     /// @param number    Number of the player we are looking for.
     /// @param exceptions The list of exceptions.
     /// @return The character, if it's in the room.
-    Character * findCharacter(std::string target,
-                              int & number,
-                              const std::vector<Character *> & exceptions =
-                              std::vector<Character *>()) const;
+    inline Character * findCharacter(
+        std::string const & target,
+        int & number,
+        std::vector<Character *> const & exceptions = std::vector<Character *>()) const
+    {
+        return characters.findCharacter(target, number, exceptions);
+    }
 
     /// @brief Search for the player in the room.
     /// @param target    The player to search.

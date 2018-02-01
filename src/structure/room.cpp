@@ -251,22 +251,6 @@ bool Room::removeOnDB()
     return true;
 }
 
-Item * Room::findItem(std::string search_parameter, int & number)
-{
-    for (auto iterator : items)
-    {
-        if (iterator->hasKey(ToLower(search_parameter)))
-        {
-            if (number == 1)
-            {
-                return iterator;
-            }
-            number -= 1;
-        }
-    }
-    return nullptr;
-}
-
 Item * Room::findBuilding(std::string target, int & number)
 {
     for (auto iterator : items)
@@ -308,14 +292,6 @@ ItemVector Room::findBuildings(ModelType type)
         }
     }
     return buildingsList;
-}
-
-Character * Room::findCharacter(
-    std::string target,
-    int & number,
-    const std::vector<Character *> & exceptions) const
-{
-    return characters.findCharacter(target, number, exceptions);
 }
 
 Player * Room::findPlayer(
