@@ -349,7 +349,7 @@ bool DoRemove(Character * character, ArgumentHandler & args)
         // Check if we have just removed ALL the USED Ranged Weapons.
         if (character->combatHandler.getAimedTarget() != nullptr)
         {
-            if (GetActiveRangedWeapons(character).empty())
+            if (GetActiveWeapons<RangedWeaponItem>(character).empty())
             {
                 character->sendMsg("You stop aiming %s.\n",
                                    character->combatHandler
@@ -407,7 +407,7 @@ bool DoRemove(Character * character, ArgumentHandler & args)
     // Check if we have just removed ALL the USED Ranged Weapons.
     if (character->combatHandler.getAimedTarget() != nullptr)
     {
-        if (GetActiveRangedWeapons(character).empty())
+        if (GetActiveWeapons<RangedWeaponItem>(character).empty())
         {
             character->sendMsg("You stop aiming %s.\n",
                                character->combatHandler

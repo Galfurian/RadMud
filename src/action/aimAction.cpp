@@ -93,7 +93,7 @@ ActionStatus AimAction::perform()
         actor->sendMsg(error + "\n\n");
         return ActionStatus::Error;
     }
-    if (GetActiveRangedWeapons(actor).empty())
+    if (GetActiveWeapons<RangedWeaponItem>(actor).empty())
     {
         actor->sendMsg("You don't have a ranged weapon equipped.\n\n");
         return ActionStatus::Error;

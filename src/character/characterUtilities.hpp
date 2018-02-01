@@ -28,6 +28,9 @@
 #include "bodyPart.hpp"
 #include "itemVector.hpp"
 
+#include "item.hpp"
+#include "character.hpp"
+
 class MeleeWeaponItem;
 
 class RangedWeaponItem;
@@ -46,15 +49,29 @@ class Production;
 
 class ItemModel;
 
-/// @brief Provides the list of active melee weapons (Left and Right hands).
-/// @param character The target character.
-/// @return Vector of melee weapons.
-std::vector<MeleeWeaponItem *> GetActiveMeleeWeapons(Character * character);
-
-/// @brief Provides the list of active ranged weapons (Left and Right hands).
-/// @param character The target character.
-/// @return Vector of ranged weapons.
-std::vector<RangedWeaponItem *> GetActiveRangedWeapons(Character * character);
+template<typename WeaponItemType>
+std::vector<WeaponItemType *> GetActiveWeapons(Character * character)
+{
+    std::vector<WeaponItemType *> weapons;
+    for (auto item : character->equipment)
+    {
+        // Cast the item to the desired type of weapon.
+        auto wpn(dynamic_cast<WeaponItemType *>(item));
+        if (wpn == nullptr) continue;
+        // If at least one of the occupied body parts can be used to wield
+        // a weapon, consider it an active weapon.
+        for (auto const & bodyPart : item->occupiedBodyParts)
+        {
+            // Skip bodyparts which cannot wield.
+            if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWield)) continue;
+            // Store the item and break the loop otherwise the weapon would be
+            // added for each occupied body part.
+            weapons.emplace_back(wpn);
+            break;
+        }
+    }
+    return weapons;
+}
 
 /// @brief Provides the list of active natural weapons.
 /// @param character The target character.

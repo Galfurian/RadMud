@@ -28,54 +28,6 @@
 #include "logger.hpp"
 #include "room.hpp"
 
-std::vector<MeleeWeaponItem *> GetActiveMeleeWeapons(Character * character)
-{
-    std::vector<MeleeWeaponItem *> weapons;
-    for (auto item : character->equipment)
-    {
-        // Skip non-weapons.
-        if (item->getType() != ModelType::MeleeWeapon) continue;
-        // Cast the item to weapon.
-        auto wpn = dynamic_cast<MeleeWeaponItem *>(item);
-        // If at least one of the occupied body parts can be used to wield
-        // a weapon, consider it an active weapon.
-        for (auto const & bodyPart : item->occupiedBodyParts)
-        {
-            // Skip bodyparts which cannot wield.
-            if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWield)) continue;
-            // Store the item and break the loop otherwise the weapon would be
-            // added for each occupied body part.
-            weapons.emplace_back(wpn);
-            break;
-        }
-    }
-    return weapons;
-}
-
-std::vector<RangedWeaponItem *> GetActiveRangedWeapons(Character * character)
-{
-    std::vector<RangedWeaponItem *> weapons;
-    for (auto item : character->equipment)
-    {
-        // Skip non-ranged-weapons.
-        if (item->getType() != ModelType::RangedWeapon) continue;
-        // Cast the item to weapon.
-        auto wpn = dynamic_cast<RangedWeaponItem *>(item);
-        // If at least one of the occupied body parts can be used to wield
-        // a range weapon, consider it an active weapon.
-        for (auto const & bodyPart : item->occupiedBodyParts)
-        {
-            // Skip bodyparts which cannot wield.
-            if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWield)) continue;
-            // Store the item and break the loop otherwise the weapon would be
-            // added for each occupied body part.
-            weapons.emplace_back(wpn);
-            break;
-        }
-    }
-    return weapons;
-}
-
 std::vector<std::shared_ptr<BodyPart::BodyWeapon>> GetActiveNaturalWeapons(
     Character * character)
 {

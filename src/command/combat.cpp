@@ -455,7 +455,7 @@ bool DoAim(Character * character, ArgumentHandler & args)
         character->sendMsg("Too many arguments.\n");
         return false;
     }
-    if (GetActiveRangedWeapons(character).empty())
+    if (GetActiveWeapons<RangedWeaponItem>(character).empty())
     {
         character->sendMsg("You don't have a ranged weapon equipped.\n");
         return false;
@@ -533,7 +533,7 @@ bool DoFire(Character * character, ArgumentHandler & /*args*/)
         return false;
     }
     // Retrieve the active ranged weapons.
-    auto rangedWeapons = GetActiveRangedWeapons(character);
+    auto rangedWeapons = GetActiveWeapons<RangedWeaponItem>(character);
     // Check if the character has some ranged weapons equipped.
     if (rangedWeapons.empty())
     {
