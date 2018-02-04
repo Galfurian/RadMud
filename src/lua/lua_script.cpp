@@ -96,20 +96,20 @@ std::vector<Direction> LuaFindPath(
         options.character = character;
         // Prepare the error string.
         std::string error;
-        return CheckConnection(options, from, to, error);
+        return StructUtils::checkConnection(options, from, to, error);
     };
     // Find the path from the actor to the target.
     AStar<Room *> aStar(RoomCheckFunction,
-                        RoomGetDistance,
-                        RoomAreEqual,
-                        RoomGetNeighbours);
+                        StructUtils::getRoomDistance,
+                        StructUtils::roomsAreEqual,
+                        StructUtils::getNeighbours);
     std::vector<Room *> visitedRooms;
     if (aStar.findPath(character->room, destination, visitedRooms))
     {
         Coordinates previous = character->room->coord;
         for (auto node : visitedRooms)
         {
-            path.emplace_back(Area::getDirection(previous, node->coord));
+            path.emplace_back(StructUtils::getDirection(previous, node->coord));
             previous = node->coord;
         }
     }
@@ -206,13 +206,13 @@ void LoadLuaEnvironmet(lua_State * L, const std::string & scriptFile)
     // CHARACTER_VECTOR derived from 'std::vector<Character *>'
     luabridge::getGlobalNamespace(L)
         .deriveClass<CharacterVector,
-            std::vector<Character *>>("CharacterVector")
+                     std::vector<Character *>>("CharacterVector")
         .endClass();
     // -------------------------------------------------------------------------
     // ITEM_VECTOR derived from 'std::vector<Item *>'
     luabridge::getGlobalNamespace(L)
         .deriveClass<ItemVector,
-            std::vector<Item *>>("ItemVector")
+                     std::vector<Item *>>("ItemVector")
         .endClass();
     // -------------------------------------------------------------------------
     // CHARACTER
@@ -636,6 +636,6 @@ void LoadLuaEnvironmet(lua_State * L, const std::string & scriptFile)
         Logger::log(LogLevel::Error,
                     "Error :%s",
                     std::string(lua_tostring(L, -1))
-        );
+                   );
     }
 }

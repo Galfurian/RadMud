@@ -78,7 +78,7 @@ bool DoDirection(Character * character, Direction direction)
     // Prepare a string for the error.
     std::string error;
     // Check if the character can move to the destination.
-    if (!CheckConnection(options, character->room, direction, error))
+    if (!StructUtils::checkConnection(options, character->room, direction, error))
     {
         character->sendMsg(error + "\n");
         return false;

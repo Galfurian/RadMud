@@ -103,12 +103,12 @@ ActionStatus Flee::perform()
     {
         // Get the list of available destinations.
         std::vector<Room *> destinations;
-        for (auto it : GetConnectedRooms(actor->room))
+        for (auto it : StructUtils::getConnectedRooms(actor->room))
         {
             // Prepare the movement options.
             MovementOptions options;
             options.character = actor;
-            if (CheckConnection(options, actor->room, it, error))
+            if (StructUtils::checkConnection(options, actor->room, it, error))
             {
                 destinations.emplace_back(it);
             }

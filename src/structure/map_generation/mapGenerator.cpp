@@ -22,6 +22,7 @@
 #include "mapGenerator.hpp"
 #include "logger.hpp"
 #include "area.hpp"
+#include "structureUtils.hpp"
 
 MapGenerator::MapGenerator(const MapGeneratorConfiguration & _configuration,
                            const std::shared_ptr<HeightMap> & _heightMap) :
@@ -152,7 +153,7 @@ bool MapGenerator::generateMountains(const std::shared_ptr<MapWrapper> & map)
     {
         // Generate a random dimension for the mountain.
         auto radius = TRand<int>(configuration.minMountainRadius,
-                                        configuration.maxMountainRadius);
+                                 configuration.maxMountainRadius);
         // Generate a random place for the mountain.
         auto xCenter = TRand<int>(-radius, map->getWidth() + radius);
         auto yCenter = TRand<int>(-radius, map->getHeight() + radius);
@@ -268,8 +269,8 @@ bool MapGenerator::generateRivers(const std::shared_ptr<MapWrapper> & map)
         }
         for (auto point : startingPoints)
         {
-            auto distance = Area::getDistance(cell->coordinates,
-                                              point->coordinates);
+            auto distance = StructUtils::getDistance(cell->coordinates,
+                                                          point->coordinates);
             if (distance <= configuration.minRiverDistance)
             {
                 return false;
@@ -360,8 +361,8 @@ bool MapGenerator::generateForests(const std::shared_ptr<MapWrapper> & map)
         // Check the distance from another forest drop point.
         for (auto point : forestDropPoints)
         {
-            auto distance = Area::getDistance(cell->coordinates,
-                                              point->coordinates);
+            auto distance = StructUtils::getDistance(cell->coordinates,
+                                                          point->coordinates);
             if (distance <= configuration.minForestDistance)
             {
                 return false;
@@ -421,7 +422,7 @@ bool MapGenerator::generateForests(const std::shared_ptr<MapWrapper> & map)
                          iterationLeft);
     };
     auto maxForestExpansion = TRand(3,
-                                           configuration.minForestDistance - 1);
+                                    configuration.minForestDistance - 1);
     // Number of dropped rivers.
     auto iterations = std::min(static_cast<size_t>(configuration.numForests),
                                forestDropPoints.size());

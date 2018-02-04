@@ -28,6 +28,7 @@
 #include "area.hpp"
 #include "room.hpp"
 #include <cassert>
+#include "structureUtils.hpp"
 
 AimAction::AimAction(Character * _actor, Character * _target) :
     GeneralAction(_actor),
@@ -114,9 +115,9 @@ unsigned int AimAction::getCooldown()
     {
         if ((actor->room != nullptr) && (target->room != nullptr))
         {
-            requiredTime = SafeSum(requiredTime,
-                                   Area::getDistance(actor->room->coord,
-                                                     target->room->coord));
+            requiredTime = SafeSum(
+                requiredTime,
+                StructUtils::getRoomDistance(actor->room, target->room));
         }
     }
     return requiredTime;

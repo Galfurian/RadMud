@@ -46,12 +46,12 @@ bool DoFindPath(Character * character, ArgumentHandler & args)
         options.character = character;
         // Prepare the error string.
         std::string error;
-        return CheckConnection(options, from, to, error);
+        return StructUtils::checkConnection(options, from, to, error);
     };
     AStar<Room *> aStar(RoomCheckFunction,
-                        RoomGetDistance,
-                        RoomAreEqual,
-                        RoomGetNeighbours);
+                        StructUtils::getRoomDistance,
+                        StructUtils::roomsAreEqual,
+                        StructUtils::getNeighbours);
     std::vector<Room *> path;
     if (!aStar.findPath(character->room, room, path))
     {
@@ -62,7 +62,7 @@ bool DoFindPath(Character * character, ArgumentHandler & args)
     Coordinates previous = character->room->coord;
     for (auto node : path)
     {
-        auto direction = Area::getDirection(previous, node->coord);
+        auto direction = StructUtils::getDirection(previous, node->coord);
         previous = node->coord;
         character->sendMsg("    %s\n", direction.toString());
     }

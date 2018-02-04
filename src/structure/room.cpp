@@ -28,6 +28,7 @@
 #include "generator.hpp"
 #include "logger.hpp"
 #include "mud.hpp"
+#include "structureUtils.hpp"
 
 Room::Room() :
     vnum(),
@@ -352,8 +353,8 @@ bool Room::isLit()
                 {
                     if (static_cast<LightItem *>(item)->isActive())
                     {
-                        if (Area::getDistance(coord, room->coord) <=
-                            item->model->toLight()->radius)
+                        if (StructUtils::getDistance(coord, room->coord)
+                            <= item->model->toLight()->radius)
                         {
                             return true;
                         }
