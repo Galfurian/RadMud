@@ -22,7 +22,7 @@
 
 #include "moveAction.hpp"
 
-#include "roomUtilityFunctions.hpp"
+#include "structureUtils.hpp"
 #include "characterUtilities.hpp"
 #include "effectFactory.hpp"
 #include "character.hpp"

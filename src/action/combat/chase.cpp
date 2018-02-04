@@ -22,7 +22,7 @@
 
 #include "chase.hpp"
 
-#include "roomUtilityFunctions.hpp"
+#include "structureUtils.hpp"
 #include "characterUtilities.hpp"
 #include "effectFactory.hpp"
 #include "moveAction.hpp"

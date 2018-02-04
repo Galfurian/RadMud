@@ -23,7 +23,7 @@
 
 #include "flee.hpp"
 
-#include "roomUtilityFunctions.hpp"
+#include "structureUtils.hpp"
 #include "characterUtilities.hpp"
 #include "logger.hpp"
 #include "room.hpp"

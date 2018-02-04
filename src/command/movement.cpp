@@ -20,7 +20,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "movement.hpp"
-#include "roomUtilityFunctions.hpp"
+#include "structureUtils.hpp"
 #include "characterUtilities.hpp"
 #include "moveAction.hpp"
 #include "logger.hpp"

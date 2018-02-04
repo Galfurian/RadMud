@@ -22,7 +22,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "lua_script.hpp"
-#include "roomUtilityFunctions.hpp"
+#include "structureUtils.hpp"
 #include "luaBridge.hpp"
 #include "armorItem.hpp"
 #include "corpseItem.hpp"

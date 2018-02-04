@@ -1,4 +1,4 @@
-/// @file   roomUtilityFunctions.hpp
+/// @file   structureUtils.hpp
 /// @author Enrico Fraccaroli
 /// @date   Feb 11 2017
 /// @copyright

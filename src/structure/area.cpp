@@ -22,7 +22,7 @@
 
 #include "area.hpp"
 
-#include "roomUtilityFunctions.hpp"
+#include "structureUtils.hpp"
 #include "logger.hpp"
 #include "room.hpp"
 

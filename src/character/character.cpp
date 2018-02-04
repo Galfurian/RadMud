@@ -22,7 +22,7 @@
 
 #include "character.hpp"
 
-#include "roomUtilityFunctions.hpp"
+#include "structureUtils.hpp"
 #include "characterUtilities.hpp"
 
 #include "lightItem.hpp"

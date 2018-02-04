@@ -20,7 +20,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "commandGodStructure.hpp"
-#include "roomUtilityFunctions.hpp"
+#include "structureUtils.hpp"
 #include "characterUtilities.hpp"
 #include "aStar.hpp"
 #include "mud.hpp"

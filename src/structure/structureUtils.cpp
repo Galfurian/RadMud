@@ -19,7 +19,7 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "roomUtilityFunctions.hpp"
+#include "structureUtils.hpp"
 #include "mechanismModel.hpp"
 #include "character.hpp"
 #include "area.hpp"

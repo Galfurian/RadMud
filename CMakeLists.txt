@@ -276,7 +276,7 @@ set(PROJECT_SRC
         ${CMAKE_SOURCE_DIR}/src/structure/generator.cpp
         ${CMAKE_SOURCE_DIR}/src/structure/coordinates.cpp
         ${CMAKE_SOURCE_DIR}/src/structure/roomFactory.cpp
-        ${CMAKE_SOURCE_DIR}/src/structure/roomUtilityFunctions.cpp
+        ${CMAKE_SOURCE_DIR}/src/structure/structureUtils.cpp
         ${CMAKE_SOURCE_DIR}/src/structure/map_generation/mapCell.cpp
         ${CMAKE_SOURCE_DIR}/src/structure/map_generation/heightMap.cpp
         ${CMAKE_SOURCE_DIR}/src/structure/map_generation/mapWrapper.cpp

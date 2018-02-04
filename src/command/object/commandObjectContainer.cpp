@@ -20,7 +20,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "commandObjectContainer.hpp"
-#include "roomUtilityFunctions.hpp"
+#include "structureUtils.hpp"
 #include "command.hpp"
 #include "room.hpp"
 
