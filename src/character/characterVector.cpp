@@ -24,6 +24,16 @@
 #include "player.hpp"
 #include "mobile.hpp"
 
+static inline bool IsAnException(
+    Character * character,
+    std::vector<Character *> const & ex)
+{
+    return
+        std::find_if(
+            ex.begin(), ex.end(), [&character](Character * other)
+            { return other->getName() == character->getName(); }) != ex.end();
+}
+
 CharacterVector::CharacterVector()
 {
     // Nothing to do.
@@ -35,47 +45,21 @@ Character * CharacterVector::findCharacter(const std::string & target,
                                            bool skipMobile,
                                            bool skipPlayer) const
 {
-    auto isAnException = [&](Character * character)
+    for (auto character : (*this))
     {
-        // Check exceptions.
-        if (!exceptions.empty())
-        {
-            for (auto exception : exceptions)
-            {
-                if (exception->getName() == character->getName())
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
-    };
-
-    for (const_iterator it = this->begin(); it != this->end(); ++it)
-    {
-        Character * character = (*it);
         if ((skipMobile && character->isMobile()) ||
             (skipPlayer && character->isPlayer()))
         {
             continue;
         }
-        if (isAnException(character))
-        {
-            continue;
-        }
+        if (IsAnException(character, exceptions)) continue;
         // Check if the character is a mobile or a player.
         if (character->isMobile())
         {
             if (character->toMobile()->hasKey(ToLower(target)))
             {
-                if (number > 1)
-                {
-                    number -= 1;
-                }
-                else
-                {
-                    return character->toMobile();
-                }
+                if (number == 1) return character->toMobile();
+                --number;
             }
         }
         else
@@ -85,14 +69,8 @@ Character * CharacterVector::findCharacter(const std::string & target,
                 if (BeginWith(character->toPlayer()->getName(),
                               ToLower(target)))
                 {
-                    if (number > 1)
-                    {
-                        number -= 1;
-                    }
-                    else
-                    {
-                        return character->toPlayer();
-                    }
+                    if (number == 1) return character->toPlayer();
+                    --number;
                 }
             }
         }
@@ -102,41 +80,19 @@ Character * CharacterVector::findCharacter(const std::string & target,
 
 bool CharacterVector::containsCharacter(Character * character) const
 {
-    for (const_iterator it = this->begin(); it != this->end(); ++it)
+    for (auto it : (*this))
     {
-        Character * contained = (*it);
-        if (contained != nullptr)
-        {
-            if (contained->getName() == character->getName())
-            {
-                return true;
-            }
-        }
+        if (it->getName() == character->getName()) return true;
     }
     return false;
 }
 
-
 void CharacterVector::emplace_back_character(Character * character)
 {
-    for (const_iterator it = this->begin(); it != this->end(); ++it)
-    {
-        Character * contained = (*it);
-        if (contained != nullptr)
-        {
-            if (contained->getName() == character->getName())
-            {
-                return;
-            }
-        }
-    }
-    this->emplace_back(character);
+    if (!this->containsCharacter(character)) emplace_back(character);
 }
 
 void CharacterVector::addUnique(const CharacterVector & other)
 {
-    for (auto character : other)
-    {
-        this->emplace_back_character(character);
-    }
+    for (auto character : other) emplace_back_character(character);
 }

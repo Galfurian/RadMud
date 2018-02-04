@@ -25,6 +25,7 @@
 #include "sqliteLoadFunctions.hpp"
 #include "logger.hpp"
 #include "mud.hpp"
+#include "sqliteException.hpp"
 
 SQLiteDbms::SQLiteDbms() :
     dbConnection(),
@@ -87,8 +88,6 @@ SQLiteDbms::SQLiteDbms() :
     loaders.emplace_back(
         TableLoader("ProductionKnowledge", LoadProductionKnowledge));
     loaders.emplace_back(
-        TableLoader("Shop", LoadShop));
-    loaders.emplace_back(
         TableLoader("Currency", LoadCurrency));
     loaders.emplace_back(
         TableLoader("ModelBodyPart", LoadModelBodyPart));
@@ -132,6 +131,8 @@ SQLiteDbms::SQLiteDbms() :
         TableLoader("BuildingKnowledge", LoadBuildingKnowledge));
     loaders.emplace_back(
         TableLoader("BuildingTool", LoadBuildingTool));
+    loaders.emplace_back(
+        TableLoader("Shop", LoadShop));
 }
 
 SQLiteDbms::~SQLiteDbms()
@@ -185,17 +186,25 @@ bool SQLiteDbms::loadTables()
         {
             return false;
         }
-        // Call the rows parsing function.
-        if (!iterator.loadFunction(result))
+        try
         {
-            // Log an error.
-            Logger::log(LogLevel::Error,
-                        "Error when loading table: " + iterator.table);
-            status = false;
+            // Iterate through the rows.
+            while (result->next())
+            {
+                // Call the row parsing function.
+                iterator.loadFunction(result);
+            }
         }
-        // release the resource.
+        catch (SQLiteException & e)
+        {
+            Logger::log(LogLevel::Error, std::string(e.what()));
+            // Release the resource.
+            result->release();
+            status = false;
+            break;
+        }
+        // Release the resource.
         result->release();
-        if (!status) break;
     }
     return status;
 }

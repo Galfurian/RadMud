@@ -22,7 +22,7 @@
 
 #include "area.hpp"
 
-#include "roomUtilityFunctions.hpp"
+#include "structureUtils.hpp"
 #include "logger.hpp"
 #include "room.hpp"
 
@@ -74,44 +74,13 @@ bool Area::isValid(const Coordinates & coordinates)
     auto room = this->getRoom(coordinates);
     if (room == nullptr) return false;
     // Check if there is a door.
-    auto door = FindDoor(room);
+    auto door = StructUtils::findDoor(room);
     if (door != nullptr)
     {
         // Check if the door is closed.
         if (HasFlag(door->flags, ItemFlag::Closed)) return false;
     }
     return true;
-}
-
-int Area::getDistance(const Coordinates & source, const Coordinates & target)
-{
-    return static_cast<int>(std::sqrt(pow(source.x - target.x, 2) +
-                                      pow(source.y - target.y, 2) +
-                                      pow(source.z - target.z, 2)));
-}
-
-Direction Area::getDirection(const Coordinates & source,
-                             const Coordinates & target)
-{
-    auto dx = std::abs(source.x - target.x);
-    auto dy = std::abs(source.y - target.y);
-    auto dz = std::abs(source.z - target.z);
-    if ((dx > dy) && (dx > dz))
-    {
-        if (source.x > target.x) return Direction::West;
-        if (source.x < target.x) return Direction::East;
-    }
-    if ((dy > dx) && (dy > dz))
-    {
-        if (source.y > target.y) return Direction::South;
-        if (source.y < target.y) return Direction::North;
-    }
-    if ((dz > dx) && (dz > dy))
-    {
-        if (source.z > target.z) return Direction::Down;
-        if (source.z < target.z) return Direction::Up;
-    }
-    return Direction::None;
 }
 
 CharacterVector Area::getCharactersAt(const CharacterVector & exceptions,
@@ -315,7 +284,7 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, const int & radius)
                 Room * room = this->getRoom(coordinates);
                 if (room != nullptr)
                 {
-                    Item * door = FindDoor(room);
+                    Item * door = StructUtils::findDoor(room);
                     if (!room->items.empty())
                     {
                         tileCode = room->items.back()->model->getTile();
@@ -443,7 +412,7 @@ std::string Area::drawASCIIFov(Room * centerRoom, const int & radius)
                 tile = room->terrain->symbol;
             }
             // V   - OPEN DOOR
-            auto door = FindDoor(room);
+            auto door = StructUtils::findDoor(room);
             if (door != nullptr)
             {
                 if (HasFlag(door->flags, ItemFlag::Closed))
@@ -613,7 +582,7 @@ bool Area::los(const Coordinates & source,
     // Check if there is a room at the given coordinates.
     if (this->getRoom(target) == nullptr) return false;
     // Ensure that the line will not extend too long.
-    if (Area::getDistance(source, target) > radius) return false;
+    if (StructUtils::getDistance(source, target) > radius) return false;
     // Evaluates the difference.
     double dx = target.x - source.x;
     double dy = target.y - source.y;

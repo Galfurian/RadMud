@@ -52,12 +52,12 @@ bool DoMaterialInfo(Character * character, ArgumentHandler & args)
 bool DoMaterialList(Character * character, ArgumentHandler & /*args*/)
 {
     Table table;
-    table.addColumn("VNUM", StringAlign::Right);
-    table.addColumn("TYPE", StringAlign::Center);
-    table.addColumn("NAME", StringAlign::Left);
-    table.addColumn("WORTH", StringAlign::Right);
-    table.addColumn("HARDNESS", StringAlign::Right);
-    table.addColumn("LIGHTNESS", StringAlign::Right);
+    table.addColumn("VNUM", align::right);
+    table.addColumn("TYPE", align::center);
+    table.addColumn("NAME", align::left);
+    table.addColumn("WORTH", align::right);
+    table.addColumn("HARDNESS", align::right);
+    table.addColumn("LIGHTNESS", align::right);
     for (auto iterator : Mud::instance().mudMaterials)
     {
         // Prepare the row.
@@ -115,11 +115,11 @@ bool DoBuildingInfo(Character * character, ArgumentHandler & args)
 bool DoBuildingList(Character * character, ArgumentHandler & /*args*/)
 {
     Table table;
-    table.addColumn("VNUM", StringAlign::Center);
-    table.addColumn("NAME", StringAlign::Center);
-    table.addColumn("DIFFICULTY", StringAlign::Left);
-    table.addColumn("TIME", StringAlign::Center);
-    table.addColumn("UNIQUE", StringAlign::Center);
+    table.addColumn("VNUM", align::center);
+    table.addColumn("NAME", align::center);
+    table.addColumn("DIFFICULTY", align::left);
+    table.addColumn("TIME", align::center);
+    table.addColumn("UNIQUE", align::center);
     for (auto it : Mud::instance().mudBuildings)
     {
         // Prepare the row.
@@ -165,8 +165,8 @@ bool DoProfessionInfo(Character * character, ArgumentHandler & args)
 bool DoProfessionList(Character * character, ArgumentHandler & /*args*/)
 {
     Table table;
-    table.addColumn("COMMAND", StringAlign::Center);
-    table.addColumn("ACTION", StringAlign::Center);
+    table.addColumn("COMMAND", align::center);
+    table.addColumn("ACTION", align::center);
     for (auto iterator : Mud::instance().mudProfessions)
     {
         // Prepare the row.
@@ -223,10 +223,10 @@ bool DoProductionInfo(Character * character, ArgumentHandler & args)
 bool DoProductionList(Character * character, ArgumentHandler & /*args*/)
 {
     Table table;
-    table.addColumn("VNUM", StringAlign::Center);
-    table.addColumn("NAME", StringAlign::Center);
-    table.addColumn("PROFESSION", StringAlign::Center);
-    table.addColumn("DIFFICULTY", StringAlign::Left);
+    table.addColumn("VNUM", align::center);
+    table.addColumn("NAME", align::center);
+    table.addColumn("PROFESSION", align::center);
+    table.addColumn("DIFFICULTY", align::left);
     for (auto iterator : Mud::instance().mudProductions)
     {
         // Prepare the row.
@@ -245,8 +245,8 @@ bool DoProductionList(Character * character, ArgumentHandler & /*args*/)
 bool DoBodyPartList(Character * character, ArgumentHandler &)
 {
     Table table;
-    table.addColumn("VNUM", StringAlign::Center);
-    table.addColumn("NAME", StringAlign::Left);
+    table.addColumn("VNUM", align::center);
+    table.addColumn("NAME", align::left);
     for (auto it : Mud::instance().mudBodyParts)
     {
         // Prepare the row.

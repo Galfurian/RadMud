@@ -60,49 +60,39 @@ double LiquidContainerItem::getWeight(bool) const
 
 std::string LiquidContainerItem::lookContent()
 {
-    auto Italic = [](const std::string & s)
-    {
-        return Formatter::italic() + s + Formatter::reset();
-    };
-    std::string output;
+    std::stringstream ss;
     if (HasFlag(this->flags, ItemFlag::Closed))
     {
-        output += Italic("It is closed.\n");
+        ss << Formatter::italic("It is closed.\n\n");
         if (!HasFlag(this->model->modelFlags, ModelFlag::CanSeeThrough))
         {
-            return output + "\n";
+            return ss.str();
         }
     }
     if (liquidContent == nullptr)
     {
-        output += Formatter::italic() +
-                  "It does not contain any liquid.\n" +
-                  Formatter::reset();
+        ss << Formatter::italic("It does not contain any liquid.\n");
+        return ss.str();
     }
-    else
+    int percent = 0;
+    if (HasFlag(model->toLiquidContainer()->liquidFlags,
+                LiqContainerFlag::Endless))
     {
-        int percent = 0;
-        if (HasFlag(this->model->toLiquidContainer()->liquidFlags,
-                    LiqContainerFlag::Endless))
-        {
-            percent = 100;
-        }
-        else if (this->getUsedSpace() > 0)
-        {
-            percent = static_cast<int>((100.0 * this->getUsedSpace()) /
-                                       this->getTotalSpace());
-        }
-        if (percent >= 100) output += "It's full of ";
-        else if (percent >= 75) output += "It's half full of ";
-        else if (percent >= 50) output += "Contains a discrete amount of ";
-        else if (percent >= 25) output += "It contains a little bit of ";
-        else if (percent >= 0) output += "It contains some drops of ";
-        else output += "It's empty, but you can see some ";
-        output += Formatter::cyan() +
-                  liquidContent->getName() +
-                  Formatter::reset() + ".\n";
+        percent = 100;
     }
-    return output;
+    else if (this->getUsedSpace() > 0)
+    {
+        percent = static_cast<int>(
+            (100.0 * this->getUsedSpace()) / this->getTotalSpace());
+    }
+    ss << ((percent >= 100) ? "It's full of " :
+           (percent >= 75) ? "It's half full of " :
+           (percent >= 50) ? "Contains a discrete amount of " :
+           (percent >= 25) ? "It contains a little bit of " :
+           (percent >= 0) ? "It contains some drops of " :
+           "It's empty, but you can see some ")
+       << Formatter::cyan(liquidContent->getName()) << ".\n";
+    return ss.str();
 }
 
 bool LiquidContainerItem::isAContainer() const
@@ -153,7 +143,7 @@ bool LiquidContainerItem::pourIn(Liquid * newLiquidContent,
     if (liquidContent == nullptr)
     {
         // Set the liquid and the amount.
-        liquidContent = newLiquidContent;
+        liquidContent  = newLiquidContent;
         liquidQuantity = quantityToPourIn;
     }
     else if (liquidContent->vnum == newLiquidContent->vnum)
@@ -207,7 +197,7 @@ LiquidContainerItem::pourOut(const double & quantityToPourOut, bool updateDB)
                 //  the liquid contained table.
                 SQLiteDbms::instance().deleteFrom("ItemContentLiq", where);
                 // Erase the key of the liquid.
-                liquidContent = nullptr;
+                liquidContent  = nullptr;
                 liquidQuantity = 0.0;
             }
             else

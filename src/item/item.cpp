@@ -165,8 +165,8 @@ bool Item::removeOnDB()
 void Item::getSheet(Table & sheet) const
 {
     // Add the columns.
-    sheet.addColumn("Attribute", StringAlign::Left);
-    sheet.addColumn("Value", StringAlign::Left);
+    sheet.addColumn("Attribute", align::left);
+    sheet.addColumn("Value", align::left);
     // Set the values.
     sheet.addRow({"vnum", ToString(vnum)});
     sheet.addRow({"type", this->getTypeName()});

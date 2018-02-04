@@ -63,48 +63,28 @@ double ContainerItem::getTotalSpace() const
 
 std::string ContainerItem::lookContent()
 {
-    std::string output;
-    auto Italic = [](const std::string & s)
-    {
-        return Formatter::italic() + s + Formatter::reset();
-    };
-    auto Yellow = [](const std::string & s)
-    {
-        return Formatter::yellow() + s + Formatter::reset();
-    };
+    std::stringstream ss;
     if (HasFlag(this->flags, ItemFlag::Closed))
     {
-        output += Italic("It is closed.\n");
+        ss << Formatter::italic("It is closed.\n\n");
         if (!HasFlag(this->model->modelFlags, ModelFlag::CanSeeThrough))
         {
-            return output + "\n";
+            return ss.str();
         }
     }
     if (content.empty())
     {
-        output += Italic("It's empty.\n");
+        ss << Formatter::italic("It's empty.\n\n");
+        return ss.str();
     }
-    else
+    ss << "Looking inside you see:\n";
+    for (auto it : content)
     {
-        output += "Looking inside you see:\n";
-        Table table = Table();
-        table.addColumn("Item", StringAlign::Left);
-        table.addColumn("Quantity", StringAlign::Right);
-        table.addColumn("Weight", StringAlign::Right);
-        // List all the contained items.
-        for (auto it : content)
-        {
-            table.addRow(
-                {
-                    it->getNameCapital(),
-                    ToString(it->quantity),
-                    ToString(it->getWeight(true))
-                });
-        }
-        output += table.getTable();
-        output += "Has been used " + Yellow(ToString(getUsedSpace()));
-        output += " out of " + Yellow(ToString(getTotalSpace())) +
-                  " " + Mud::instance().getWeightMeasure() + ".\n";
+        ss << " [" << std::right << std::setw(3) << it->quantity << "] ";
+        ss << it->getNameCapital() << "\n";
     }
-    return output;
+    ss << "Has been used " << Formatter::yellow(ToString(getUsedSpace()));
+    ss << " out of " << Formatter::yellow(ToString(getTotalSpace())) << ' ';
+    ss << Mud::instance().getWeightMeasure() << ".\n";
+    return ss.str();
 }

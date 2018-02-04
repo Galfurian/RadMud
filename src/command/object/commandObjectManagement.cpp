@@ -365,7 +365,7 @@ bool DoDrop(Character * character, ArgumentHandler & args)
     // Stop any action the character is executing.
     StopAction(character);
     // Check the number of arguments.
-    if (args.size() == 0)
+    if (args.empty())
     {
         character->sendMsg("Drop what?\n");
         return false;

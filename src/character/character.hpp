@@ -41,6 +41,7 @@
 #include "characterPosture.hpp"
 #include "characterVector.hpp"
 #include "skillManager.hpp"
+#include "itemUtils.hpp"
 
 #include <deque>
 #include <mutex>
@@ -335,22 +336,28 @@ public:
     void resetActionQueue();
 
     /// @brief Search for the item in the inventory.
-    /// @param search_parameter The item to search.
-    /// @param number           Position of the item we want to look for.
+    /// @param key    The item to search.
+    /// @param number Position of the item we want to look for.
     /// @return The item, if it's in the character's inventory.
-    Item * findInventoryItem(std::string search_parameter, int & number);
+    inline Item * findInventoryItem(std::string const & key, int & number)
+    {
+        return ItemUtils::FindItemIn(inventory, key, number);
+    }
 
     /// @brief Search for the item in equipment.
-    /// @param search_parameter The item to search.
-    /// @param number           Position of the item we want to look for.
+    /// @param key    The item to search.
+    /// @param number Position of the item we want to look for.
     /// @return The item, if it's in the character's equipment.
-    Item * findEquipmentItem(std::string search_parameter, int & number);
+    Item * findEquipmentItem(std::string const & key, int & number)
+    {
+        return ItemUtils::FindItemIn(equipment, key, number);
+    }
 
     /// @brief Search an item nearby, (eq, inv, room).
-    /// @param itemName The name of the item.
-    /// @param number   Position of the item we want to look for.
+    /// @param key    The item to search.
+    /// @param number Position of the item we want to look for.
     /// @return The item, if it's found.
-    Item * findNearbyItem(const std::string & itemName, int & number);
+    Item * findNearbyItem(std::string const & key, int & number);
 
     /// @brief Search the item at given position and return it.
     /// @param bodyPart The body part where the method need to search the item.

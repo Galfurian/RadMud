@@ -96,7 +96,7 @@ ActionStatus BasicAttack::perform()
         if (actor->room->coord == predefined->room->coord)
         {
             // Retrieve all the melee weapons.
-            auto meleeWeapons = GetActiveMeleeWeapons(actor);
+            auto meleeWeapons = GetActiveWeapons<MeleeWeaponItem>(actor);
             // Perform the attack for each melee weapon.
             for (auto weapon : meleeWeapons)
             {
@@ -108,7 +108,7 @@ ActionStatus BasicAttack::perform()
             }
         }
         // Retrieve all the ranged weapons.
-        auto rangedWeapons = GetActiveRangedWeapons(actor);
+        auto rangedWeapons = GetActiveWeapons<RangedWeaponItem>(actor);
         // Perform the attack for each weapon.
         for (auto weapon : rangedWeapons)
         {
@@ -318,7 +318,7 @@ bool BasicAttack::checkTarget(Character * target)
                     "[%s] The aimed character and the target are the same character.",
                     actor->getNameCapital());
         // Retrieve all the ranged weapons.
-        auto rangedWeapons = GetActiveRangedWeapons(actor);
+        auto rangedWeapons = GetActiveWeapons<RangedWeaponItem>(actor);
         // Check if the actor has no ranged weapon equipped.
         if (rangedWeapons.empty())
         {

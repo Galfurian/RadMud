@@ -57,26 +57,18 @@ void MagazineItem::getSheet(Table & sheet) const
 
 std::string MagazineItem::lookContent()
 {
-    std::string output;
-    if (content.empty())
+    // Get the already loaded projectile.
+    auto loadedProjectile = this->getAlreadyLoadedProjectile();
+    if (content.empty() || (loadedProjectile == nullptr))
     {
-        output +=
-            Formatter::italic() + "It does not contain any projectiles.\n" +
-            Formatter::reset();
+        return Formatter::italic("It does not contain any projectiles.\n");
     }
-    else
-    {
-        // Get the already loaded projectile.
-        auto loadedProjectile = this->getAlreadyLoadedProjectile();
-        if (loadedProjectile != nullptr)
-        {
-            output += Formatter::italic();
-            output += "It contains " + loadedProjectile->getName(true) + "[";
-            output += ToString(loadedProjectile->quantity) + "].\n";
-            output += Formatter::reset();
-        }
-    }
-    return output;
+    std::stringstream ss;
+    ss << Formatter::italic();
+    ss << "It contains " << loadedProjectile->getName(true);
+    ss << "[" << ToString(loadedProjectile->quantity) + "].\n";
+    ss << Formatter::reset();
+    return ss.str();
 }
 
 bool MagazineItem::isAContainer() const
