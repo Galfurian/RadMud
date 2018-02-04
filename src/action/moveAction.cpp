@@ -22,7 +22,7 @@
 
 #include "moveAction.hpp"
 
-#include "roomUtilityFunctions.hpp"
+#include "structureUtils.hpp"
 #include "characterUtilities.hpp"
 #include "effectFactory.hpp"
 #include "character.hpp"
@@ -107,7 +107,7 @@ ActionStatus MoveAction::perform()
     options.character = actor;
     options.requiredStamina = consumedStamina;
     // Check if the character can move to the given room.
-    if (!CheckConnection(options, actor->room, destination, error))
+    if (!StructUtils::checkConnection(options, actor->room, destination, error))
     {
         // Notify that the actor can't move because too tired.
         actor->sendMsg(error + "\n");
@@ -243,7 +243,7 @@ bool MoveAction::canMoveTo(Character * character,
         return false;
     }
     // Check if the destination is bocked by a door.
-    auto door = FindDoor(destExit->destination);
+    auto door = StructUtils::findDoor(destExit->destination);
     if (door != nullptr)
     {
         if (HasFlag(door->flags, ItemFlag::Closed))

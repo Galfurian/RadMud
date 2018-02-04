@@ -19,170 +19,29 @@
 #include "table.hpp"
 #include "logger.hpp"
 
-TableColumn::TableColumn(std::string _title,
-                         StringAlign _alignment,
-                         size_t _width) :
-    title(std::move(_title)),
-    alignment(std::move(_alignment)),
-    width(std::move(_width))
-{
-    if (width == 0)
-    {
-        width = static_cast<size_t>(title.size()) + 2;
-    }
-}
-
-std::string TableColumn::getTitle() const
-{
-    return title;
-}
-
-size_t TableColumn::getWidth() const
-{
-    return width;
-}
-
-StringAlign TableColumn::getAlignment()
-{
-    return alignment;
-}
-
-void TableColumn::setWidth(size_t _width)
-{
-    if ((_width + 2) > width)
-    {
-        width = (_width + 2);
-    }
-}
-
-Table::Table() :
-    title(),
-    columns(),
-    rows()
-{
-    // Nothing to do.
-}
-
-Table::Table(std::string _title) :
-    title(std::move(_title)),
-    columns(),
-    rows()
-{
-    // Nothing to do.
-}
-
-void Table::addColumn(std::string columnTitle,
-                      const StringAlign & columnAlignment,
-                      size_t columnWidth)
-{
-    columns.emplace_back(
-        TableColumn(columnTitle, columnAlignment, columnWidth));
-}
-
-void Table::addRow(TableRow row)
-{
-    if (row.size() != columns.size())
-    {
-        Logger::log(LogLevel::Warning,
-                    "Column number and provided row cells are different.");
-        return;
-    }
-    for (size_t idx = 0; idx < columns.size(); ++idx)
-    {
-        columns[idx].setWidth(row[idx].size());
-    }
-    rows.push_back(row);
-}
-
-std::string Table::getTable(bool withoutHeaders)
+std::string Table::getTable(bool withoutHeaders,
+                            bool withoutDividers)
 {
     std::string output;
+    // Add the title, if necessary.
     if (!title.empty())
-    {
-        output += getDivider();
-        output += getTitle();
-    }
+        output += ((withoutDividers) ? "" : getDivider()) + getTitle();
+    // Add the headers, if necessary.
     if (!withoutHeaders)
+        output += ((withoutDividers) ? "" : getDivider()) + getHeaders();
+    // Star with the table.
+    output += ((withoutDividers) ? "" : getDivider());
+    for (auto const & row : rows)
     {
-        output += getDivider();
-        output += getHeaders();
-    }
-    output += getDivider();
-    for (const auto & row : rows)
-    {
-        unsigned int column = 0;
-        for (const auto & cell : row)
+        for (size_t i = 0; i < row.size(); ++i)
         {
-            output += "#" + AlignString(cell,
-                                        columns[column].getAlignment(),
-                                        columns[column].getWidth());
-            column++;
+            output += "|" + Align(
+                row.at(i),
+                columns.at(i).getAlignment(),
+                columns.at(i).getWidth());
         }
-        output += "#\n";
+        output += "|\n";
     }
-    output += getDivider();
+    output += ((withoutDividers) ? "" : getDivider());
     return output;
-}
-
-size_t Table::getNumRows()
-{
-    return rows.size();
-}
-
-void Table::addDivider()
-{
-    std::vector<std::string> divider;
-    for (size_t w = 0; w < columns.size(); ++w)
-    {
-        divider.emplace_back("");
-    }
-    this->addRow(divider);
-}
-
-void Table::popRow()
-{
-    this->rows.pop_back();
-}
-
-std::string Table::getDivider()
-{
-    std::string output;
-    for (const auto & column : columns)
-    {
-        output += "#";
-        for (size_t w = 0; w < column.getWidth(); ++w)
-        {
-            output += '-';
-        }
-    }
-    return output += "#\n";
-}
-
-std::string Table::getTitle()
-{
-    return "#" + AlignString(title,
-                             StringAlign::Center,
-                             getTotalWidth() + (columns.size() - 1)) + "#\n";
-}
-
-std::string Table::getHeaders()
-{
-    std::string output;
-    for (const auto & it : columns)
-    {
-        output += "#" + AlignString(it.getTitle(), StringAlign::Center,
-                                    it.getWidth());
-    }
-    output += "#\n";
-    return output;
-}
-
-size_t Table::getTotalWidth()
-{
-    size_t totalWidth = 0;
-    for (const auto & it : columns)
-    {
-        totalWidth += it.getWidth();
-    }
-    return totalWidth;
 }

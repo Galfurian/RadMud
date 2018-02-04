@@ -222,11 +222,11 @@ bool DoItemList(Character * character, ArgumentHandler & args)
         }
     }
     Table table;
-    table.addColumn("Vnum", StringAlign::Right);
-    table.addColumn("Name", StringAlign::Left);
-    table.addColumn("Type", StringAlign::Left);
-    table.addColumn("Model", StringAlign::Left);
-    table.addColumn("Location", StringAlign::Left);
+    table.addColumn("Vnum", align::right);
+    table.addColumn("Name", align::left);
+    table.addColumn("Type", align::left);
+    table.addColumn("Model", align::left);
+    table.addColumn("Location", align::left);
     for (auto iterator : Mud::instance().mudItems)
     {
         auto item = iterator.second;
@@ -337,11 +337,11 @@ bool DoModelList(Character * character, ArgumentHandler & args)
         }
     }
     Table table;
-    table.addColumn("VNUM", StringAlign::Right);
-    table.addColumn("NAME", StringAlign::Left);
-    table.addColumn("TYPE", StringAlign::Left);
-    table.addColumn("BODY PARTS", StringAlign::Left);
-    table.addColumn("FLAGS", StringAlign::Right);
+    table.addColumn("VNUM", align::right);
+    table.addColumn("NAME", align::left);
+    table.addColumn("TYPE", align::left);
+    table.addColumn("BODY PARTS", align::left);
+    table.addColumn("FLAGS", align::right);
     for (auto iterator : Mud::instance().mudItemModels)
     {
         auto itemModel = iterator.second;
@@ -386,9 +386,9 @@ bool DoModelList(Character * character, ArgumentHandler & args)
 bool DoWritingList(Character * character, ArgumentHandler & /*args*/)
 {
     Table table;
-    table.addColumn("VNUM", StringAlign::Center);
-    table.addColumn("AUTHOR", StringAlign::Left);
-    table.addColumn("TITLE", StringAlign::Left);
+    table.addColumn("VNUM", align::center);
+    table.addColumn("AUTHOR", align::left);
+    table.addColumn("TITLE", align::left);
     for (auto iterator : Mud::instance().mudWritings)
     {
         Writing * writing = iterator.second;

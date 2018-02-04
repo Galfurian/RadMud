@@ -29,6 +29,7 @@
 #include "basicAttack.hpp"
 #include "characterUtilities.hpp"
 #include "flee.hpp"
+#include "structureUtils.hpp"
 
 void LoadCombatCommands()
 {
@@ -130,7 +131,8 @@ bool DoKill(Character * character, ArgumentHandler & args)
             return true;
         }
         character->sendMsg("You have already your share of troubles!\n");
-    } else
+    }
+    else
     {
         // Check if the character is attacking a target
         //  which is already in combat.
@@ -431,31 +433,33 @@ bool DoAim(Character * character, ArgumentHandler & args)
     }
     // Stop any action the character is executing.
     StopAction(character);
-    if (args.size() == 0)
+    if (args.empty())
     {
         if (character->combatHandler.charactersInSight.empty())
         {
             character->sendMsg("Who or what do you want to aim?\n");
-        } else
+        }
+        else
         {
             character->sendMsg("You are able to aim at:\n");
             for (auto it : character->combatHandler.charactersInSight)
             {
                 if (!it) continue;
                 if (!it->room) continue;
-                character->sendMsg("  [%s] %s\n",
-                                   Area::getDistance(character->room->coord,
-                                                     it->room->coord),
-                                   it->getName());
+                character->sendMsg(
+                    "  [%s] %s\n",
+                    StructUtils::getRoomDistance(character->room, it->room),
+                    it->getName());
             }
         }
         return true;
-    } else if (args.size() > 1)
+    }
+    else if (args.size() > 1)
     {
         character->sendMsg("Too many arguments.\n");
         return false;
     }
-    if (GetActiveRangedWeapons(character).empty())
+    if (GetActiveWeapons<RangedWeaponItem>(character).empty())
     {
         character->sendMsg("You don't have a ranged weapon equipped.\n");
         return false;
@@ -533,7 +537,7 @@ bool DoFire(Character * character, ArgumentHandler & /*args*/)
         return false;
     }
     // Retrieve the active ranged weapons.
-    auto rangedWeapons = GetActiveRangedWeapons(character);
+    auto rangedWeapons = GetActiveWeapons<RangedWeaponItem>(character);
     // Check if the character has some ranged weapons equipped.
     if (rangedWeapons.empty())
     {

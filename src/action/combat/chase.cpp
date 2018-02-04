@@ -22,7 +22,7 @@
 
 #include "chase.hpp"
 
-#include "roomUtilityFunctions.hpp"
+#include "structureUtils.hpp"
 #include "characterUtilities.hpp"
 #include "effectFactory.hpp"
 #include "moveAction.hpp"
@@ -191,14 +191,14 @@ bool Chase::updatePath()
             options.character = actor;
             // Prepare the error string.
             std::string error;
-            return CheckConnection(options, from, to, error);
+            return StructUtils::checkConnection(options, from, to, error);
         };
     }
     // Find the path from the actor to the target.
     AStar<Room *> aStar(RoomCheckFunction,
-                        RoomGetDistance,
-                        RoomAreEqual,
-                        RoomGetNeighbours);
+                        StructUtils::getRoomDistance,
+                        StructUtils::roomsAreEqual,
+                        StructUtils::getNeighbours);
     return aStar.findPath(actor->room, target->room, path);
 }
 
@@ -216,7 +216,8 @@ bool Chase::moveTowardsTarget()
         return false;
     }
     // Get the direction of the next room.
-    auto direction = Area::getDirection(actor->room->coord, nextRoom->coord);
+    auto direction =
+        StructUtils::getDirection(actor->room->coord, nextRoom->coord);
     // Move character.
     if (!MoveCharacterTo(
         actor,
@@ -230,7 +231,8 @@ bool Chase::moveTowardsTarget()
         return false;
     }
     // Apply the disturbed aim effect.
-    actor->effectManager.forceAddEffect(EffectFactory::disturbedAim(actor, 1, -3));
+    actor->effectManager
+         .forceAddEffect(EffectFactory::disturbedAim(actor, 1, -3));
     // Pop the room.
     path.erase(path.begin());
     return true;

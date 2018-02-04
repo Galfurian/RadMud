@@ -122,8 +122,8 @@ bool DoQuit(Character * character, ArgumentHandler & /*args*/)
 bool DoWho(Character * character, ArgumentHandler & /*args*/)
 {
     Table table = Table();
-    table.addColumn("Player", StringAlign::Left);
-    table.addColumn("Location", StringAlign::Left);
+    table.addColumn("Player", align::left);
+    table.addColumn("Location", align::left);
     std::string output;
     for (auto iterator : Mud::instance().mudPlayers)
     {
@@ -301,8 +301,8 @@ bool DoHelp(Character * character, ArgumentHandler & args)
         Table baseCommands("Commands"), godsCommands("Management");
         for (size_t it = 0; it < numColumns; ++it)
         {
-            baseCommands.addColumn("", StringAlign::Left, 15);
-            godsCommands.addColumn("", StringAlign::Left, 15);
+            baseCommands.addColumn("", align::left, 15);
+            godsCommands.addColumn("", align::left, 15);
         }
         for (auto it : Mud::instance().mudCommands)
         {
@@ -493,10 +493,10 @@ bool DoStatistics(Character * character, ArgumentHandler & /*args*/)
     for (auto const & ability:player->abilities)
     {
         msg += "    " + MAG(ability.first.getAbbreviation()) + "    ";
-        msg += AlignString(player->getAbility(ability.first),
-                           StringAlign::Right, 5) + "(";
-        msg += AlignString(player->getAbilityModifier(ability.first),
-                           StringAlign::Right, 3) + ")\n";
+        msg += Align(player->getAbility(ability.first),
+                           align::right, 5) + "(";
+        msg += Align(player->getAbilityModifier(ability.first),
+                           align::right, 3) + ")\n";
     }
     // HEALTH
     msg += "    " + MAG("Health  ");
@@ -547,40 +547,40 @@ bool DoEffects(Character * character, ArgumentHandler &)
     msg += "Active Effects\n";
     for (auto const & it : character->effectManager.getActiveEffects())
     {
-        msg += "\t" + AlignString(it.name, StringAlign::Left, 30) + "\n";
+        msg += "\t" + Align(it.name, align::left, 30) + "\n";
     }
     msg += "Passive Effects\n";
     for (auto const & it : character->effectManager.getPassiveEffects())
     {
-        msg += "\t" + AlignString(it.name, StringAlign::Left, 30) + "\n";
+        msg += "\t" + Align(it.name, align::left, 30) + "\n";
     }
     msg += "Ability Modifiers\n";
     for (auto const & it : character->effectManager.getAbilityMod())
     {
         msg += "\t";
-        msg += AlignString(it.first.getAbbreviation(), StringAlign::Left, 30);
-        msg += AlignString(it.second, StringAlign::Right, 5) + "\n";
+        msg += Align(it.first.getAbbreviation(), align::left, 30);
+        msg += Align(it.second, align::right, 5) + "\n";
     }
     msg += "Combat Modifiers\n";
     for (auto const & it : character->effectManager.getCombatMod())
     {
         msg += "\t";
-        msg += AlignString(it.first.toString(), StringAlign::Left, 30);
-        msg += AlignString(it.second, StringAlign::Right, 5) + "\n";
+        msg += Align(it.first.toString(), align::left, 30);
+        msg += Align(it.second, align::right, 5) + "\n";
     }
     msg += "Status Modifiers\n";
     for (auto const & it : character->effectManager.getStatusMod())
     {
         msg += "\t";
-        msg += AlignString(it.first.toString(), StringAlign::Left, 30);
-        msg += AlignString(it.second, StringAlign::Right, 5) + "\n";
+        msg += Align(it.first.toString(), align::left, 30);
+        msg += Align(it.second, align::right, 5) + "\n";
     }
     msg += "Knowledges\n";
     for (auto const & it : character->effectManager.getKnowledge())
     {
         msg += "\t";
-        msg += AlignString(it.first.toString(), StringAlign::Left, 30);
-        msg += AlignString(it.second, StringAlign::Right, 5) + "\n";
+        msg += Align(it.first.toString(), align::left, 30);
+        msg += Align(it.second, align::right, 5) + "\n";
     }
     character->sendMsg(msg);
     return true;
@@ -624,8 +624,8 @@ bool DoSkills(Character * character, ArgumentHandler & /*args*/)
     }
     auto player = character->toPlayer();
     Table table = Table();
-    table.addColumn("LvL", StringAlign::Left);
-    table.addColumn("Skill", StringAlign::Left);
+    table.addColumn("LvL", align::left);
+    table.addColumn("Skill", align::left);
     for (const auto & skillData : player->skillManager.skills)
     {
         table.addRow({skillData->skill->name,

@@ -1,8 +1,9 @@
-/// @file   corpseItem.hpp
+/// @file   itemUtils.hpp
+/// @brief  Define utility function for items.
 /// @author Enrico Fraccaroli
-/// @date   Aug 17 2016
+/// @date   02 01 2018
 /// @copyright
-/// Copyright (c) 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
+/// Copyright (c) 2018 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
 /// copy of this software and associated documentation files (the "Software"),
 /// to deal in the Software without restriction, including without limitation
@@ -23,34 +24,25 @@
 
 #include "item.hpp"
 
-/// @brief Holds details about a corpse.
-class CorpseItem :
-    public Item
+namespace ItemUtils
 {
-public:
-    /// Store the remaining body parts not yet processed.
-    std::vector<std::shared_ptr<BodyPart>> remainingBodyParts;
 
-    /// @brief Constructor.
-    CorpseItem();
+/// @brief Search for the item inside the given container.
+/// @param container The container.
+/// @param key       The key of the item to search.
+/// @param number    Position of the item we want to look for.
+/// @return The item, if it's in the character's inventory.
+inline Item * FindItemIn(std::vector<Item *> const & container,
+                         std::string const & key,
+                         int & number)
+{
+    for (auto item : container)
+    {
+        if (!item->hasKey(ToLower(key))) continue;
+        if (number == 1) return item;
+        --number;
+    }
+    return nullptr;
+}
 
-    virtual ~CorpseItem();
-
-    void removeFromMud() override;
-
-    bool updateOnDB() override;
-
-    bool removeOnDB() override;
-
-    void getSheet(Table & sheet) const override;
-
-    std::string lookContent() override;
-
-    bool isAContainer() const override;
-
-    /// @brief Provides the remaining body parts.
-    std::shared_ptr<BodyPart> getAvailableBodyPart();
-
-    /// @brief Removes the given body part from the pool.
-    bool removeBodyPart(const std::shared_ptr<BodyPart> & bodyPart);
-};
+}

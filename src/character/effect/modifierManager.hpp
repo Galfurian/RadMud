@@ -43,7 +43,8 @@ inline std::map<ModifierType, int> & operator+=(
         if (leftModifier != left.end())
         {
             leftModifier->second += rightModifier.second;
-        } else
+        }
+        else
         {
             left.insert(rightModifier);
         }
@@ -61,7 +62,8 @@ inline std::map<Knowledge, int> & operator+=(
         if (leftModifier != left.end())
         {
             leftModifier->second = true;
-        } else
+        }
+        else
         {
             left.insert(rightModifier);
         }
@@ -90,6 +92,35 @@ inline std::map<ModifierType, int> & operator-=(
     return left;
 }
 
+/// @brief Sums the provider values multiplied.
+/// @tparam ModifierType The type of modifier.
+/// @param receiver The receiver map.
+/// @param provider The provider map.
+/// @param multiplier The multiplying factor.
+template<typename ModifierType>
+inline void ApplyModifier(std::map<ModifierType, int> & receiver,
+                          std::map<ModifierType, int> & provider,
+                          const int & multiplier)
+{
+    typename std::map<ModifierType, int>::iterator receiverIt;
+    // Iterate through the modifiers of the skill.
+    for (std::pair<const ModifierType, int> & providerIt : provider)
+    {
+        // Evaluate the modifier.
+        auto modifier = providerIt.second * multiplier;
+        // Otherwise add the modifier based on the skill rank.
+        receiverIt = receiver.find(providerIt.first);
+        if (receiverIt == receiver.end())
+        {
+            receiver.insert(std::make_pair(providerIt.first, modifier));
+        }
+        else
+        {
+            receiverIt->second += modifier;
+        }
+    }
+}
+
 class ModifierManager
 {
 protected:
@@ -103,32 +134,6 @@ protected:
     std::map<Knowledge, int> modKnowledge;
 
 private:
-
-    /// @brief
-    /// @param modifier The modifier to retrieve.
-    /// @return The total value of the given modifier.
-    template<typename ModifierType>
-    inline void applyModifier(std::map<ModifierType, int> & receiver,
-                              std::map<ModifierType, int> & provider,
-                              const int & multiplier)
-    {
-        typename std::map<ModifierType, int>::iterator receiverIt;
-        // Iterate through the modifiers of the skill.
-        for (std::pair<const ModifierType, int> & providerIt : provider)
-        {
-            // Evaluate the modifier.
-            auto modifier = providerIt.second * multiplier;
-            // Otherwise add the modifier based on the skill rank.
-            receiverIt = receiver.find(providerIt.first);
-            if (receiverIt == receiver.end())
-            {
-                receiver.insert(std::make_pair(providerIt.first, modifier));
-            } else
-            {
-                receiverIt->second += modifier;
-            }
-        }
-    }
 
 public:
     /// @brief Constructor.
@@ -252,10 +257,10 @@ public:
     inline void applyModifier(const std::shared_ptr<ModifierManager> & provider,
                               const int & multiplier)
     {
-        this->applyModifier(modAbility, provider->modAbility, multiplier);
-        this->applyModifier(modCombat, provider->modCombat, multiplier);
-        this->applyModifier(modStatus, provider->modStatus, multiplier);
-        this->applyModifier(modKnowledge, provider->modKnowledge, multiplier);
+        ApplyModifier(modAbility, provider->modAbility, multiplier);
+        ApplyModifier(modCombat, provider->modCombat, multiplier);
+        ApplyModifier(modStatus, provider->modStatus, multiplier);
+        ApplyModifier(modKnowledge, provider->modKnowledge, multiplier);
     }
 
     friend inline std::shared_ptr<ModifierManager> & operator-=(
@@ -275,9 +280,9 @@ public:
             for (auto const & it2 : modAbility)
             {
                 msg += "\t\t";
-                msg += AlignString(it2.first.getAbbreviation(),
-                                   StringAlign::Left, 30);
-                msg += AlignString(it2.second, StringAlign::Right, 5) + "\n";
+                msg += Align(it2.first.getAbbreviation(),
+                             align::left, 30);
+                msg += Align(it2.second, align::right, 5) + "\n";
             }
         }
         if (!modCombat.empty())
@@ -286,8 +291,8 @@ public:
             for (auto const & it2 : modCombat)
             {
                 msg += "\t";
-                msg += AlignString(it2.first.toString(), StringAlign::Left, 30);
-                msg += AlignString(it2.second, StringAlign::Right, 5) + "\n";
+                msg += Align(it2.first.toString(), align::left, 30);
+                msg += Align(it2.second, align::right, 5) + "\n";
             }
         }
         if (!modStatus.empty())
@@ -296,8 +301,8 @@ public:
             for (auto const & it2 : modStatus)
             {
                 msg += "\t";
-                msg += AlignString(it2.first.toString(), StringAlign::Left, 30);
-                msg += AlignString(it2.second, StringAlign::Right, 5) + "\n";
+                msg += Align(it2.first.toString(), align::left, 30);
+                msg += Align(it2.second, align::right, 5) + "\n";
             }
         }
         if (!modKnowledge.empty())
@@ -306,8 +311,8 @@ public:
             for (auto const & it2 : modKnowledge)
             {
                 msg += "\t";
-                msg += AlignString(it2.first.toString(), StringAlign::Left, 30);
-                msg += AlignString(it2.second, StringAlign::Right, 5) + "\n";
+                msg += Align(it2.first.toString(), align::left, 30);
+                msg += Align(it2.second, align::right, 5) + "\n";
             }
         }
         Logger::log(LogLevel::Debug, msg);

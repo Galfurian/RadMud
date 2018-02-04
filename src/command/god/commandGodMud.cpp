@@ -99,8 +99,8 @@ bool DoFactionInfo(Character * character, ArgumentHandler & args)
 bool DoFactionList(Character * character, ArgumentHandler & /*args*/)
 {
     Table table;
-    table.addColumn("VNUM", StringAlign::Center);
-    table.addColumn("NAME", StringAlign::Left);
+    table.addColumn("VNUM", align::center);
+    table.addColumn("NAME", align::left);
     for (auto iterator : Mud::instance().mudFactions)
     {
         // Prepare the row.
@@ -117,14 +117,14 @@ bool DoFactionList(Character * character, ArgumentHandler & /*args*/)
 bool DoRaceList(Character * character, ArgumentHandler & /*args*/)
 {
     Table table;
-    table.addColumn("VNUM", StringAlign::Center);
-    table.addColumn("NAME", StringAlign::Left);
-    table.addColumn("ALLOWED", StringAlign::Left);
-    table.addColumn("STRENGTH", StringAlign::Right);
-    table.addColumn("AGILITY", StringAlign::Right);
-    table.addColumn("PERCEPTION", StringAlign::Right);
-    table.addColumn("CONSTITUTION", StringAlign::Right);
-    table.addColumn("INTELLIGENCE", StringAlign::Right);
+    table.addColumn("VNUM", align::center);
+    table.addColumn("NAME", align::left);
+    table.addColumn("ALLOWED", align::left);
+    table.addColumn("STRENGTH", align::right);
+    table.addColumn("AGILITY", align::right);
+    table.addColumn("PERCEPTION", align::right);
+    table.addColumn("CONSTITUTION", align::right);
+    table.addColumn("INTELLIGENCE", align::right);
     for (auto iterator : Mud::instance().mudRaces)
     {
         Race * race = iterator.second;
@@ -148,9 +148,9 @@ bool DoRaceList(Character * character, ArgumentHandler & /*args*/)
 bool DoSkillList(Character * character, ArgumentHandler & /*args*/)
 {
     Table table;
-    table.addColumn("VNUM", StringAlign::Center);
-    table.addColumn("NAME", StringAlign::Left);
-    table.addColumn("ATTRIBUTE", StringAlign::Left);
+    table.addColumn("VNUM", align::center);
+    table.addColumn("NAME", align::left);
+    table.addColumn("ATTRIBUTE", align::left);
     for (auto skill : Mud::instance().mudSkills)
     {
         // Prepare the row.

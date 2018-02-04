@@ -167,8 +167,7 @@ ProcessNewAttributes::advance(Character * character, const std::string & error)
     for (auto ability : player->abilities)
     {
         msg += "#    [" + ToString(ability.first.toUInt()) + "]";
-        msg += AlignString(ability.first.toString(),
-                           StringAlign::Left, 15);
+        msg += Align(ability.first.toString(), align::left, 15);
         msg += " : ";
         msg += ToString(player->getAbility(Ability::Strength, false));
     }

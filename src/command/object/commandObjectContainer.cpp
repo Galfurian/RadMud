@@ -20,7 +20,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "commandObjectContainer.hpp"
-#include "roomUtilityFunctions.hpp"
+#include "structureUtils.hpp"
 #include "command.hpp"
 #include "room.hpp"
 
@@ -128,7 +128,7 @@ bool DoOpen(Character * character, ArgumentHandler & args)
     if (direction != Direction::None)
     {
         // If the room is NOT lit and HAS some exits, pick a random direction.
-        auto directions = GetAvailableDirections(character->room);
+        auto directions = StructUtils::getDirections(character->room);
         if (!character->room->isLit() && !directions.empty())
         {
             auto it = TRand<size_t>(0, directions.size() - 1);
@@ -147,7 +147,7 @@ bool DoOpen(Character * character, ArgumentHandler & args)
             character->sendMsg("There is nothing in that direction.\n");
             return false;
         }
-        auto door = FindDoor(destination);
+        auto door = StructUtils::findDoor(destination);
         if (door == nullptr)
         {
             character->sendMsg("There is no door in that direction.\n");
@@ -283,7 +283,7 @@ bool DoClose(Character * character, ArgumentHandler & args)
     if (direction != Direction::None)
     {
         // If the room is NOT lit and HAS some exits, pick a random direction.
-        auto directions = GetAvailableDirections(character->room);
+        auto directions = StructUtils::getDirections(character->room);
         if (!character->room->isLit() && !directions.empty())
         {
             auto it = TRand<size_t>(0, directions.size() - 1);
@@ -302,7 +302,7 @@ bool DoClose(Character * character, ArgumentHandler & args)
             character->sendMsg("There is nothing in that direction.\n");
             return false;
         }
-        auto door = FindDoor(destination);
+        auto door = StructUtils::findDoor(destination);
         if (door == nullptr)
         {
             character->sendMsg("There is no door in that direction.\n");

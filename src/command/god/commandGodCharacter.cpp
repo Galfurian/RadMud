@@ -231,8 +231,8 @@ bool DoVisible(Character * character, ArgumentHandler & /*args*/)
 bool DoPlayerList(Character * character, ArgumentHandler & /*args*/)
 {
     Table table;
-    table.addColumn("NAME", StringAlign::Left);
-    table.addColumn("ROOM", StringAlign::Left);
+    table.addColumn("NAME", align::left);
+    table.addColumn("ROOM", align::left);
     for (auto iterator : Mud::instance().mudPlayers)
     {
         // If the player is not playing, continue.

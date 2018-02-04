@@ -98,17 +98,6 @@ public:
     ///         <b>False</b> otherwise.
     bool isValid(const Coordinates & coordinates);
 
-    /// @brief Provides the distance between the source and the target.
-    /// @param source The source coordinates.
-    /// @param target The target coordinates.
-    /// @return The distance between the two coordinates.
-    static int getDistance(const Coordinates & source,
-                           const Coordinates & target);
-
-    /// @brief Provides the direction of the target w.r.t. the source.
-    static Direction getDirection(const Coordinates & source,
-                                  const Coordinates & target);
-
     /// @brief Provides all the characters inside the room at
     ///         the given coordinates.
     /// @param exceptions  The exceptions.

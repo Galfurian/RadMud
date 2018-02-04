@@ -19,132 +19,91 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "roomUtilityFunctions.hpp"
+#include "structureUtils.hpp"
 #include "mechanismModel.hpp"
 #include "character.hpp"
 #include "area.hpp"
 #include "room.hpp"
 
-MovementOptions::MovementOptions() :
-    character(),
-    allowedInCloseCombat(),
-    requiredStamina()
+namespace StructUtils
 {
-    // Nothing to do.
-}
 
-MovementOptions::MovementOptions(const MovementOptions & other) :
-    character(other.character),
-    allowedInCloseCombat(other.allowedInCloseCombat),
-    requiredStamina(other.requiredStamina)
+Direction getDirection(const Coordinates & source,
+                       const Coordinates & target)
 {
-    // Nothing to do.
-}
-
-MovementOptions::~MovementOptions()
-{
-    // Nothing to do.
-}
-
-RoomSelectionOptions::RoomSelectionOptions() :
-    terrain()
-{
-    // Nothing to do.
-}
-
-RoomSelectionOptions::RoomSelectionOptions(const RoomSelectionOptions & other) :
-    terrain(other.terrain)
-{
-    // Nothing to do.
-}
-
-RoomSelectionOptions::~RoomSelectionOptions()
-{
-    // Nothing to do.
-}
-
-std::vector<Direction> GetAvailableDirections(Room * r)
-{
-    std::vector<Direction> directions;
-    if (r != nullptr)
+    auto dx = std::abs(source.x - target.x);
+    auto dy = std::abs(source.y - target.y);
+    auto dz = std::abs(source.z - target.z);
+    if ((dx > dy) && (dx > dz))
     {
-        for (auto it : r->exits)
-        {
-            if (it->destination != nullptr)
-            {
-                directions.push_back(it->direction);
-            }
-        }
+        if (source.x > target.x) return Direction::West;
+        if (source.x < target.x) return Direction::East;
     }
-    return directions;
-}
-
-std::vector<Room *> GetConnectedRooms(Room * r)
-{
-    std::vector<Room *> connectedRooms;
-    if (r != nullptr)
+    if ((dy > dx) && (dy > dz))
     {
-        for (auto it : r->exits)
-        {
-            if (it->destination != nullptr)
-            {
-                connectedRooms.push_back(it->destination);
-            }
-        }
+        if (source.y > target.y) return Direction::South;
+        if (source.y < target.y) return Direction::North;
     }
-    return connectedRooms;
+    if ((dz > dx) && (dz > dy))
+    {
+        if (source.z > target.z) return Direction::Down;
+        if (source.z < target.z) return Direction::Up;
+    }
+    return Direction::None;
 }
 
-bool RoomCheckConnection(Room * r1, Room * r2)
+std::vector<Direction> getDirections(Room * room)
 {
-    if ((r1 == nullptr) || (r2 == nullptr)) return false;
-    for (auto destination : GetConnectedRooms(r1))
+    std::vector<Direction> result;
+    if (room == nullptr) return result;
+    for (auto const & it : room->exits)
     {
-        if (destination->vnum == r2->vnum)
-        {
-            return true;
-        }
+        if (it->destination != nullptr) result.emplace_back(it->direction);
+    }
+    return result;
+}
+
+std::vector<Room *> getConnectedRooms(Room * room)
+{
+    std::vector<Room *> result;
+    if (room == nullptr) return result;
+    for (auto const & it : room->exits)
+    {
+        if (it->destination != nullptr) result.emplace_back(it->destination);
+    }
+    return result;
+}
+
+bool checkConnectionBetween(Room * from, Room * to)
+{
+    if ((from == nullptr) || (to == nullptr)) return false;
+    for (auto destination : StructUtils::getConnectedRooms(from))
+    {
+        if (destination->vnum == to->vnum) return true;
     }
     return false;
 }
 
-int RoomGetDistance(Room * r1, Room * r2)
+std::vector<Room *> getNeighbours(Room * room)
 {
-    if ((r1 == nullptr) || (r2 == nullptr)) return INT_MAX;
-    return Area::getDistance(r1->coord, r2->coord);
-}
-
-bool RoomAreEqual(Room * r1, Room * r2)
-{
-    if ((r1 == nullptr) || (r2 == nullptr)) return false;
-    return (r1->vnum == r2->vnum);
-}
-
-std::vector<Room *> RoomGetNeighbours(Room * r)
-{
-    std::vector<Room *> neighbours;
-    for (auto neighbour : r->exits)
+    std::vector<Room *> result;
+    if (room == nullptr) return result;
+    for (auto const & it : room->exits)
     {
-        if (neighbour->destination != nullptr)
-        {
-            neighbours.emplace_back(neighbour->destination);
-        }
+        if (it->destination != nullptr) result.emplace_back(it->destination);
     }
-    return neighbours;
+    return result;
 }
 
-bool CheckConnection(const MovementOptions & options,
+bool checkConnection(const MovementOptions & options,
                      Room * r1,
                      Room * r2,
                      std::string & error)
 {
-    if ((r1 == nullptr) || (r2 == nullptr))
-    {
-        return false;
-    }
+    if ((r1 == nullptr) || (r2 == nullptr)) return false;
     // -------------------------------------------------------------------------
     // Check if there is a connection between the two rooms.
-    if (!RoomCheckConnection(r1, r2))
+    if (!StructUtils::checkConnectionBetween(r1, r2))
     {
         error = "You cannot go that way.";
         return false;
@@ -158,7 +117,7 @@ bool CheckConnection(const MovementOptions & options,
     }
     // -------------------------------------------------------------------------
     // Get the direction from the first to the second room.
-    auto direction = Area::getDirection(r1->coord, r2->coord);
+    auto direction = StructUtils::getDirection(r1->coord, r2->coord);
     // Get the connection between the two.
     auto connection = r1->findExit(direction);
     // If the direction is upstairs, check if there is a stair.
@@ -183,7 +142,7 @@ bool CheckConnection(const MovementOptions & options,
     }
     // -------------------------------------------------------------------------
     // Check if the destination is bocked by a door.
-    auto door = FindDoor(connection->destination);
+    auto door = StructUtils::findDoor(connection->destination);
     if (door != nullptr)
     {
         if (HasFlag(door->flags, ItemFlag::Closed))
@@ -263,7 +222,7 @@ bool CheckConnection(const MovementOptions & options,
     return true;
 }
 
-bool CheckConnection(const MovementOptions & options,
+bool checkConnection(const MovementOptions & options,
                      Room * r1,
                      const Direction & direction,
                      std::string & error)
@@ -284,10 +243,13 @@ bool CheckConnection(const MovementOptions & options,
         error = "You cannot go that way.";
         return false;
     }
-    return CheckConnection(options, r1, foundExit->destination, error);
+    return StructUtils::checkConnection(options,
+                                        r1,
+                                        foundExit->destination,
+                                        error);
 }
 
-Item * FindDoor(Room * room)
+Item * findDoor(Room * room)
 {
     // Check the room.
     if (room == nullptr) return nullptr;
@@ -306,7 +268,7 @@ Item * FindDoor(Room * room)
     return nullptr;
 }
 
-std::vector<Room *> SelectRooms(Area * area,
+std::vector<Room *> selectRooms(Area * area,
                                 Room * startingRoom,
                                 RoomSelectionOptions options)
 {
@@ -333,4 +295,6 @@ std::vector<Room *> SelectRooms(Area * area,
     };
     RecursiveSelectRooms(startingRoom);
     return selectedRooms;
+}
+
 }

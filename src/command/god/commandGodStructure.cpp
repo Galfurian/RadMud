@@ -20,7 +20,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "commandGodStructure.hpp"
-#include "roomUtilityFunctions.hpp"
+#include "structureUtils.hpp"
 #include "characterUtilities.hpp"
 #include "aStar.hpp"
 #include "mud.hpp"
@@ -46,12 +46,12 @@ bool DoFindPath(Character * character, ArgumentHandler & args)
         options.character = character;
         // Prepare the error string.
         std::string error;
-        return CheckConnection(options, from, to, error);
+        return StructUtils::checkConnection(options, from, to, error);
     };
     AStar<Room *> aStar(RoomCheckFunction,
-                        RoomGetDistance,
-                        RoomAreEqual,
-                        RoomGetNeighbours);
+                        StructUtils::getRoomDistance,
+                        StructUtils::roomsAreEqual,
+                        StructUtils::getNeighbours);
     std::vector<Room *> path;
     if (!aStar.findPath(character->room, room, path))
     {
@@ -62,7 +62,7 @@ bool DoFindPath(Character * character, ArgumentHandler & args)
     Coordinates previous = character->room->coord;
     for (auto node : path)
     {
-        auto direction = Area::getDirection(previous, node->coord);
+        auto direction = StructUtils::getDirection(previous, node->coord);
         previous = node->coord;
         character->sendMsg("    %s\n", direction.toString());
     }
@@ -342,11 +342,11 @@ bool DoRoomList(Character * character, ArgumentHandler & args)
         return false;
     }
     Table table;
-    table.addColumn("VNUM", StringAlign::Center);
-    table.addColumn("AREA", StringAlign::Left);
-    table.addColumn("COORD", StringAlign::Center);
-    table.addColumn("TERRAIN", StringAlign::Center);
-    table.addColumn("NAME", StringAlign::Left);
+    table.addColumn("VNUM", align::center);
+    table.addColumn("AREA", align::left);
+    table.addColumn("COORD", align::center);
+    table.addColumn("TERRAIN", align::center);
+    table.addColumn("NAME", align::left);
     for (auto iterator : Mud::instance().mudRooms)
     {
         Room * room = iterator.second;
@@ -403,10 +403,10 @@ bool DoAreaInfo(Character * character, ArgumentHandler & args)
 bool DoAreaList(Character * character, ArgumentHandler & /*args*/)
 {
     Table table;
-    table.addColumn("VNUM", StringAlign::Center);
-    table.addColumn("NAME", StringAlign::Left);
-    table.addColumn("BUILDER", StringAlign::Left);
-    table.addColumn("ROOMS", StringAlign::Center);
+    table.addColumn("VNUM", align::center);
+    table.addColumn("NAME", align::left);
+    table.addColumn("BUILDER", align::left);
+    table.addColumn("ROOMS", align::center);
     for (auto iterator : Mud::instance().mudAreas)
     {
         Area * area = iterator.second;

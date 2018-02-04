@@ -69,6 +69,22 @@ void CorpseItem::getSheet(Table & sheet) const
     }
 }
 
+std::string CorpseItem::lookContent()
+{
+    if (content.empty())
+    {
+        return Formatter::italic("The corpse does not contain anything.\n");
+    }
+    std::stringstream ss;
+    ss << "Looking inside the corpse you see:\n";
+    for (auto it : content)
+    {
+        ss << " [" << std::right << std::setw(3) << it->quantity << "] ";
+        ss << it->getNameCapital() << "\n";
+    }
+    return ss.str();
+}
+
 bool CorpseItem::isAContainer() const
 {
     return true;
