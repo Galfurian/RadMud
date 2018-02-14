@@ -101,8 +101,10 @@ ActionStatus BasicAttack::perform()
             for (auto weapon : meleeWeapons)
             {
                 // Perform the attack passing the melee weapon.
-                hasAttackedTheTarget |=
-                    this->performMeleeAttack(predefined, weapon, attackNumber);
+                this->performMeleeAttack(predefined,
+                                         weapon,
+                                         attackNumber);
+
                 // Increment the number of executed attacks.
                 ++attackNumber;
             }
@@ -117,8 +119,9 @@ ActionStatus BasicAttack::perform()
             {
                 // Set that the actor has actually attacked the target.
                 // Perform the attack passing the ranged weapon.
-                hasAttackedTheTarget |=
-                    this->performRangedAttack(predefined, weapon, attackNumber);
+                this->performRangedAttack(predefined,
+                                          weapon,
+                                          attackNumber);
                 // Increment the number of executed attacks.
                 ++attackNumber;
             }
@@ -133,10 +136,9 @@ ActionStatus BasicAttack::perform()
             {
                 // Set that the actor has actually attacked the target.
                 // Perform the attack passing the melee weapon.
-                hasAttackedTheTarget |=
-                    this->performAttackNaturalWeapon(predefined,
-                                                     weapon,
-                                                     attackNumber);
+                this->performAttackNaturalWeapon(predefined,
+                                                 weapon,
+                                                 attackNumber);
                 // Increment the number of executed attacks.
                 ++attackNumber;
             }
@@ -348,7 +350,7 @@ bool BasicAttack::checkTarget(Character * target)
     return false;
 }
 
-bool BasicAttack::performAttackNaturalWeapon(
+BasicAttack::AttackStatus BasicAttack::performAttackNaturalWeapon(
     Character * target,
     const std::shared_ptr<BodyPart::BodyWeapon> & weapon,
     unsigned int attackNumber)
@@ -367,7 +369,7 @@ bool BasicAttack::performAttackNaturalWeapon(
     {
         actor->sendMsg("You are too tired to attack with %s.\n",
                        weapon->getName(true));
-        return false;
+        return AttackStatus::Failed;
     }
     // -------------------------------------------------------------------------
     // Phase 2: Roll the hit and damage.
@@ -403,7 +405,7 @@ bool BasicAttack::performAttackNaturalWeapon(
     if ((hitRoll < armorClass) && (!isCritical))
     {
         // Show miss messages.
-        this->handleNaturalWeaponMiss(target, weapon);
+        this->handleNaturalWeaponMiss(target, weapon, hitRoll, armorClass);
         // Consume half the stamina.
         actor->remStamina(consumedStamina / 2, true);
     }
@@ -422,7 +424,11 @@ bool BasicAttack::performAttackNaturalWeapon(
         // Improve the skills which has contributed to the damage roll.
         actor->skillManager.improveCombat(CombatModifier::UnarmedDamage);
         // Show hit messages.
-        this->handleNaturalWeaponHit(target, weapon);
+        this->handleNaturalWeaponHit(target,
+                                     weapon,
+                                     hitRoll,
+                                     armorClass,
+                                     damageRoll);
         // Consume the stamina.
         actor->remStamina(consumedStamina, true);
         // If the character has rolled a critical: multiply the damage by two.
@@ -444,7 +450,7 @@ bool BasicAttack::performAttackNaturalWeapon(
                 actor->combatHandler.remOpponent(target);
             }
             // Interrupt the function.
-            return true;
+            return AttackStatus::Killed;
         }
         // Update the aggro of the target towards the actor.
         auto aggro = target->combatHandler.getAggro(actor);
@@ -471,12 +477,13 @@ bool BasicAttack::performAttackNaturalWeapon(
     {
         actor->combatHandler.addOpponent(target);
     }
-    return true;
+    return AttackStatus::Success;
 }
 
-bool BasicAttack::performMeleeAttack(Character * target,
-                                     MeleeWeaponItem * weapon,
-                                     unsigned int attackNumber)
+BasicAttack::AttackStatus BasicAttack::performMeleeAttack(
+    Character * target,
+    MeleeWeaponItem * weapon,
+    unsigned int attackNumber)
 {
     // -------------------------------------------------------------------------
     // Preamble: Evaluate all the values which are required by the function.
@@ -492,7 +499,7 @@ bool BasicAttack::performMeleeAttack(Character * target,
     {
         actor->sendMsg("You are too tired to attack with %s.\n",
                        weapon->getName(true));
-        return false;
+        return AttackStatus::Failed;
     }
     // -------------------------------------------------------------------------
     // Phase 2: Roll the hit and damage.
@@ -528,7 +535,7 @@ bool BasicAttack::performMeleeAttack(Character * target,
     if ((hitRoll < armorClass) && (!isCritical))
     {
         // Show miss messages.
-        this->handleMeleeMiss(target, weapon);
+        this->handleMeleeMiss(target, weapon, hitRoll, armorClass);
         // Consume half the stamina.
         actor->remStamina(consumedStamina / 2, true);
     }
@@ -550,12 +557,12 @@ bool BasicAttack::performMeleeAttack(Character * target,
                                  CombatModifier::MeleeWeaponDamage));
         // Improve the skills which has contributed to the damage roll.
         actor->skillManager.improveCombat(CombatModifier::MeleeWeaponDamage);
-        // Show hit messages.
-        this->handleMeleeHit(target, weapon);
         // Consume the stamina.
         actor->remStamina(consumedStamina, true);
         // If the character has rolled a critical: multiply the damage by two.
         if (isCritical) damageRoll *= 2;
+        // Show hit messages.
+        this->handleMeleeHit(target, weapon, hitRoll, armorClass, damageRoll);
         // Proceed and remove the damage from the health of the target.
         if (!target->remHealth(damageRoll))
         {
@@ -573,7 +580,7 @@ bool BasicAttack::performMeleeAttack(Character * target,
                 actor->combatHandler.remOpponent(target);
             }
             // Interrupt the function.
-            return true;
+            return AttackStatus::Killed;
         }
         // Update the aggro of the target towards the actor.
         auto aggro = target->combatHandler.getAggro(actor);
@@ -592,12 +599,13 @@ bool BasicAttack::performMeleeAttack(Character * target,
     {
         actor->combatHandler.addOpponent(target);
     }
-    return true;
+    return AttackStatus::Success;
 }
 
-bool BasicAttack::performRangedAttack(Character * target,
-                                      RangedWeaponItem * weapon,
-                                      unsigned int attackNumber)
+BasicAttack::AttackStatus BasicAttack::performRangedAttack(
+    Character * target,
+    RangedWeaponItem * weapon,
+    unsigned int attackNumber)
 {
     // -------------------------------------------------------------------------
     // Preamble: Evaluate all the values which are required by the function.
@@ -611,7 +619,7 @@ bool BasicAttack::performRangedAttack(Character * target,
     {
         actor->sendMsg("You are too tired to attack with %s.\n",
                        weapon->getName(true));
-        return false;
+        return AttackStatus::Failed;
     }
     // -------------------------------------------------------------------------
     // Phase 2: Check if the ranged weapon has enough projectiles.
@@ -621,13 +629,13 @@ bool BasicAttack::performRangedAttack(Character * target,
     if (projectile == nullptr)
     {
         actor->sendMsg(error + ".\n\n");
-        return false;
+        return AttackStatus::Failed;
     }
     // -------------------------------------------------------------------------
     // Phase 3: Roll the hit and damage.
     // -------------------------------------------------------------------------
     // Evaluate the natural roll for the attack.
-    unsigned int hitRoll = TRand<unsigned int>(1, 20);
+    auto hitRoll = TRand<unsigned int>(1, 20);
     // Boolean variable which identifies if the hit is a critical hit.
     bool isCritical = (hitRoll == 20);
     // Apply the penalty due to multi-wield, check if:
@@ -668,7 +676,7 @@ bool BasicAttack::performRangedAttack(Character * target,
     //  2. The hit roll is not a natural 20.
     if ((hitRoll < armorClass) && (!isCritical))
     {
-        this->handleRangedMiss(target, weapon);
+        this->handleRangedMiss(target, weapon, hitRoll, armorClass);
         // Consume half the stamina.
         actor->remStamina(consumedStamina / 2, true);
     }
@@ -682,12 +690,12 @@ bool BasicAttack::performRangedAttack(Character * target,
                                  CombatModifier::RangedWeaponDamage));
         // Improve the skills which has contributed to the damage roll.
         actor->skillManager.improveCombat(CombatModifier::RangedWeaponDamage);
-        // Show the message.
-        this->handleRangedHit(target, weapon);
         // Consume the stamina.
         actor->remStamina(consumedStamina, true);
         // If the character has rolled a critical: multiply the damage by two.
         if (isCritical) damageRoll *= 2;
+        // Show the message.
+        this->handleRangedHit(target, weapon, hitRoll, armorClass, damageRoll);
         // Proceed and remove the damage from the health of the target.
         if (!target->remHealth(damageRoll))
         {
@@ -705,7 +713,7 @@ bool BasicAttack::performRangedAttack(Character * target,
                 actor->combatHandler.remOpponent(target);
             }
             // Interrupt the function.
-            return true;
+            return AttackStatus::Killed;
         }
         // Update the aggro of the target towards the actor.
         auto aggro = target->combatHandler.getAggro(actor);
@@ -728,25 +736,30 @@ bool BasicAttack::performRangedAttack(Character * target,
     {
         actor->combatHandler.addOpponent(target);
     }
-    return true;
+    return AttackStatus::Success;
 }
 
 void BasicAttack::handleNaturalWeaponHit(
     Character * target,
-    const std::shared_ptr<BodyPart::BodyWeapon> & weapon)
+    const std::shared_ptr<BodyPart::BodyWeapon> & weapon,
+    unsigned int hitRoll,
+    unsigned int armorClass,
+    unsigned int damageRoll)
 {
     // The target has received the damage but it is still alive.
-    actor->sendMsg("You hit %s with your %s.\n\n",
-                   target->getName(), weapon->getName(true));
+    actor->sendMsg("You hit %s with your %s (%s vs %s for %s).\n\n",
+                   target->getName(), weapon->getName(true),
+                   hitRoll, armorClass, damageRoll);
     // Notify the target.
     target->sendMsg(
-        "%s hits you with %s %s.\n\n",
+        "%s hits you with %s %s (%s vs %s for %s).\n\n",
         actor->getNameCapital(),
         actor->getPossessivePronoun(),
-        weapon->getName(true));
+        weapon->getName(true),
+        hitRoll, armorClass, damageRoll);
     // Notify the other characters.
     target->room->funcSendToAll(
-        "%s hits %s with %s %s.\n",
+        "%s hits %s with %s %s (%s vs %s for %s).\n",
         [&](Character * character)
         {
             return !((character == actor) || (character == target));
@@ -754,64 +767,77 @@ void BasicAttack::handleNaturalWeaponHit(
         actor->getNameCapital(),
         target->getName(),
         actor->getPossessivePronoun(),
-        weapon->getName(true));
+        weapon->getName(true),
+        hitRoll, armorClass, damageRoll);
 }
 
 void BasicAttack::handleMeleeHit(Character * target,
-                                 MeleeWeaponItem * weapon)
+                                 MeleeWeaponItem * weapon,
+                                 unsigned int hitRoll,
+                                 unsigned int armorClass,
+                                 unsigned int damageRoll)
 {
     // The target has received the damage but it is still alive.
-    actor->sendMsg("You hit %s with %s.\n\n",
-                   target->getName(), weapon->getName(true));
+    actor->sendMsg("You hit %s with %s (%s vs %s for %s).\n\n",
+                   target->getName(), weapon->getName(true),
+                   hitRoll, armorClass, damageRoll);
     // Notify the target.
-    target->sendMsg("%s hits you with %s.\n\n",
-                    actor->getNameCapital(), weapon->getName(true));
-    // Notify the other characters.
+    target->sendMsg("%s hits you with %s (%s vs %s for %s).\n\n",
+                    actor->getNameCapital(), weapon->getName(true),
+                    hitRoll, armorClass, damageRoll);
     target->room->funcSendToAll(
-        "%s hits %s with %s.\n",
+        "%s hits %s with %s (%s vs %s for %s).\n",
         [&](Character * character)
         {
             return !((character == actor) || (character == target));
         },
-        actor->getNameCapital(),
-        target->getName(),
-        weapon->getName(true));
+        actor->getNameCapital(), target->getName(), weapon->getName(true),
+        hitRoll, armorClass, damageRoll);
 }
 
-void BasicAttack::handleRangedHit(Character * target, RangedWeaponItem * weapon)
+void BasicAttack::handleRangedHit(Character * target,
+                                  RangedWeaponItem * weapon,
+                                  unsigned int hitRoll,
+                                  unsigned int armorClass,
+                                  unsigned int damageRoll)
 {
     // The enemy has received the damage but it is still alive.
-    actor->sendMsg("You hit %s with %s.\n\n",
-                   target->getName(),
-                   weapon->getName(true));
+    actor->sendMsg("You hit %s with %s (%s vs %s for %s).\n\n",
+                   target->getName(), weapon->getName(true),
+                   hitRoll, armorClass, damageRoll);
     // Notify the other characters.
     if (actor->room == target->room)
     {
-        target->sendMsg("%s fires a projectile which hits you.\n\n",
-                        actor->getNameCapital());
+        target->sendMsg(
+            "%s fires a projectile which hits you (%s vs %s for %s).\n\n",
+            actor->getNameCapital(),
+            hitRoll, armorClass, damageRoll);
         actor->room->funcSendToAll(
-            "%s fires and hits %s with %s.\n",
+            "%s fires and hits %s with %s (%s vs %s for %s).\n",
             [&](Character * character)
             {
                 return !((character == actor) || (character == target));
             },
-            actor->getNameCapital(),
-            target->getName(),
-            weapon->getName(true));
+            actor->getNameCapital(), target->getName(), weapon->getName(true),
+            hitRoll, armorClass, damageRoll);
         return;
     }
     // Notify the enemy.
     if (target->combatHandler.getAimedTarget() == actor)
     {
-        target->sendMsg("%s fires a projectile which hits you.\n\n",
-                        actor->getNameCapital());
+        target->sendMsg(
+            "%s fires a projectile which hits you (%s vs %s for %s).\n\n",
+            actor->getNameCapital(),
+            hitRoll, armorClass, damageRoll);
     }
     else
     {
-        target->sendMsg("Someone fires a projectile that hits you.\n\n");
+        target->sendMsg(
+            "Someone fires a projectile that hits you (%s vs %s for %s).\n\n",
+            hitRoll, armorClass, damageRoll);
     }
     actor->room->funcSendToAll(
-        "%s fires and hits %s with %s.\n",
+        "%s fires and hits %s with %s (%s vs %s for %s).\n",
         [&](Character * character)
         {
             if ((character == actor) || (character == target)) return false;
@@ -819,11 +845,11 @@ void BasicAttack::handleRangedHit(Character * target, RangedWeaponItem * weapon)
                 target))
                 return true;
             return character->combatHandler.getAimedTarget() == target;
-        }, actor->getNameCapital(), target->getName(),
-        weapon->getName(true));
+        }, actor->getNameCapital(), target->getName(), weapon->getName(true),
+        hitRoll, armorClass, damageRoll);
 
     actor->room->funcSendToAll(
-        "%s fires at someone or something with %s.\n",
+        "%s fires at someone or something with %s (%s vs %s for %s).\n",
         [&](Character * character)
         {
             if ((character == actor) || (character == target)) return false;
@@ -831,10 +857,11 @@ void BasicAttack::handleRangedHit(Character * target, RangedWeaponItem * weapon)
                 target))
                 return false;
             return character->combatHandler.getAimedTarget() != target;
-        }, actor->getNameCapital(), weapon->getName(true));
+        }, actor->getNameCapital(), weapon->getName(true),
+        hitRoll, armorClass, damageRoll);
 
     target->room->funcSendToAll(
-        "%s fires a projectile which hits %s.\n",
+        "%s fires a projectile which hits %s (%s vs %s for %s).\n",
         [&](Character * character)
         {
             if ((character == actor) || (character == target)) return false;
@@ -842,10 +869,11 @@ void BasicAttack::handleRangedHit(Character * target, RangedWeaponItem * weapon)
                 actor))
                 return true;
             return character->combatHandler.getAimedTarget() == actor;
-        }, actor->getNameCapital(), target->getName(), weapon->getName(true));
+        }, actor->getNameCapital(), target->getName(), weapon->getName(true),
+        hitRoll, armorClass, damageRoll);
 
     target->room->funcSendToAll(
-        "Someone fires a projectile which hits %s.\n",
+        "Someone fires a projectile which hits %s (%s vs %s for %s).\n",
         [&](Character * character)
         {
             if ((character == actor) || (character == target)) return false;
@@ -853,75 +881,97 @@ void BasicAttack::handleRangedHit(Character * target, RangedWeaponItem * weapon)
                 actor))
                 return false;
             return character->combatHandler.getAimedTarget() != actor;
-        }, target->getName());
+        }, target->getName(),
+        hitRoll, armorClass, damageRoll);
 }
 
 void BasicAttack::handleNaturalWeaponMiss(
     Character * target,
-    const std::shared_ptr<BodyPart::BodyWeapon> & weapon)
+    const std::shared_ptr<BodyPart::BodyWeapon> & weapon,
+    unsigned int hitRoll,
+    unsigned int armorClass)
 {
-    actor->sendMsg("You miss %s with your %s.\n\n",
+    actor->sendMsg("You miss %s with your %s (%s vs %s).\n\n",
                    target->getName(),
-                   weapon->getName(true));
-    target->sendMsg("%s misses you with %s %s.\n\n",
+                   weapon->getName(true),
+                   hitRoll, armorClass);
+    target->sendMsg("%s misses you with %s %s (%s vs %s).\n\n",
                     actor->getNameCapital(),
                     actor->getPossessivePronoun(),
-                    weapon->getName(true));
-    target->room->sendToAll("%s misses %s with %s %s.\n", {actor, target},
-                            actor->getNameCapital(),
-                            target->getName(),
-                            actor->getPossessivePronoun(),
-                            weapon->getName(true));
-}
-
-void BasicAttack::handleMeleeMiss(Character * target, MeleeWeaponItem * weapon)
-{
-    // Notify the actor, enemy and others.
-    actor->sendMsg("You miss %s with %s.\n\n",
-                   target->getName(),
-                   weapon->getName(true));
-    target->sendMsg("%s misses you with %s.\n\n",
-                    actor->getNameCapital(),
-                    weapon->getName(true));
-    target->room->sendToAll("%s misses %s with %s.\n",
+                    weapon->getName(true),
+                    hitRoll, armorClass);
+    target->room->sendToAll("%s misses %s with %s %s (%s vs %s).\n",
                             {actor, target},
                             actor->getNameCapital(),
                             target->getName(),
-                            weapon->getName(true));
+                            actor->getPossessivePronoun(),
+                            weapon->getName(true),
+                            hitRoll, armorClass);
+}
+
+void BasicAttack::handleMeleeMiss(Character * target,
+                                  MeleeWeaponItem * weapon,
+                                  unsigned int hitRoll,
+                                  unsigned int armorClass)
+{
+    // Notify the actor, enemy and others.
+    actor->sendMsg("You miss %s with %s (%s vs %s).\n\n",
+                   target->getName(),
+                   weapon->getName(true),
+                   hitRoll, armorClass);
+    target->sendMsg("%s misses you with %s (%s vs %s).\n\n",
+                    actor->getNameCapital(),
+                    weapon->getName(true),
+                    hitRoll, armorClass);
+    target->room->sendToAll("%s misses %s with %s (%s vs %s).\n",
+                            {actor, target},
+                            actor->getNameCapital(),
+                            target->getName(),
+                            weapon->getName(true),
+                            hitRoll, armorClass);
 }
 
 void
-BasicAttack::handleRangedMiss(Character * target, RangedWeaponItem * weapon)
+BasicAttack::handleRangedMiss(Character * target,
+                              RangedWeaponItem * weapon,
+                              unsigned int hitRoll,
+                              unsigned int armorClass)
 {
     // Notify the actor.
-    actor->sendMsg("You fire and miss %s with %s.\n\n",
+    actor->sendMsg("You fire and miss %s with %s (%s vs %s).\n\n",
                    target->getName(),
-                   weapon->getName(true));
+                   weapon->getName(true),
+                   hitRoll, armorClass);
     // Notify the other characters.
     if (actor->room == target->room)
     {
-        target->sendMsg("%s fires an misses you.\n\n",
-                        actor->getName());
+        target->sendMsg("%s fires an misses you (%s vs %s).\n\n",
+                        actor->getName(),
+                        hitRoll, armorClass);
         actor->room->funcSendToAll(
-            "%s fires and misses %s with %s.\n",
+            "%s fires and misses %s with %s (%s vs %s).\n",
             [&](Character * character)
             {
                 return !((character == actor) || (character == target));
             }, actor->getNameCapital(), target->getName(),
-            weapon->getName(true));
+            weapon->getName(true),
+            hitRoll, armorClass);
         return;
     }
     // Notify the enemy.
     if (target->combatHandler.getAimedTarget() == actor)
     {
-        target->sendMsg("%s fires an misses you.\n\n", actor->getName());
+        target->sendMsg("%s fires an misses you (%s vs %s).\n\n",
+                        actor->getName(),
+                        hitRoll, armorClass);
     }
     else
     {
-        target->sendMsg("Someone fired at you, but missed.\n\n");
+        target->sendMsg("Someone fired at you, but missed (%s vs %s).\n\n",
+                        hitRoll, armorClass);
     }
     actor->room->funcSendToAll(
-        "%s fires and misses %s with %s.\n",
+        "%s fires and misses %s with %s (%s vs %s).\n",
         [&](Character * character)
         {
             if ((character == actor) || (character == target)) return false;
@@ -929,10 +979,11 @@ BasicAttack::handleRangedMiss(Character * target, RangedWeaponItem * weapon)
                 target))
                 return true;
             return character->combatHandler.getAimedTarget() == target;
-        }, actor->getNameCapital(), target->getName(), weapon->getName(true));
+        }, actor->getNameCapital(), target->getName(), weapon->getName(true),
+        hitRoll, armorClass);
 
     actor->room->funcSendToAll(
-        "%s fires at someone or something with %s.\n",
+        "%s fires at someone or something with %s (%s vs %s).\n",
         [&](Character * character)
         {
             if ((character == actor) || (character == target)) return false;
@@ -940,10 +991,11 @@ BasicAttack::handleRangedMiss(Character * target, RangedWeaponItem * weapon)
                 target))
                 return false;
             return character->combatHandler.getAimedTarget() != target;
-        }, actor->getNameCapital(), weapon->getName(true));
+        }, actor->getNameCapital(), weapon->getName(true),
+        hitRoll, armorClass);
 
     target->room->funcSendToAll(
-        "%s fires a projectile which whizzes nearby %s.\n",
+        "%s fires a projectile which whizzes nearby %s (%s vs %s).\n",
         [&](Character * character)
         {
             if ((character == actor) || (character == target)) return false;
@@ -951,10 +1003,11 @@ BasicAttack::handleRangedMiss(Character * target, RangedWeaponItem * weapon)
                 actor))
                 return true;
             return character->combatHandler.getAimedTarget() == actor;
-        }, actor->getNameCapital(), target->getName(), weapon->getName(true));
+        }, actor->getNameCapital(), target->getName(), weapon->getName(true),
+        hitRoll, armorClass);
 
     target->room->funcSendToAll(
-        "Something whizzes nearby %s.\n",
+        "Something whizzes nearby %s (%s vs %s).\n",
         [&](Character * character)
         {
             if ((character == actor) || (character == target)) return false;
@@ -962,5 +1015,6 @@ BasicAttack::handleRangedMiss(Character * target, RangedWeaponItem * weapon)
                 actor))
                 return false;
             return character->combatHandler.getAimedTarget() != actor;
-        }, target->getName());
+        }, target->getName(),
+        hitRoll, armorClass);
 }

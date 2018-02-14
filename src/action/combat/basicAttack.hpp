@@ -67,6 +67,13 @@ public:
 
 private:
 
+    enum class AttackStatus
+    {
+        Failed,
+        Success,
+        Killed
+    };
+
     /// @brief Sets the predefined target. If there is already one, it checks
     ///         if it is a valid target.
     /// @return <b>True</b> if there is a valid target,<br>
@@ -84,7 +91,7 @@ private:
     /// @param target       The character to attack.
     /// @param weapon       The melee weapon used to attack.
     /// @param attackNumber The number of already executed attacks.
-    bool performAttackNaturalWeapon(
+    AttackStatus performAttackNaturalWeapon(
         Character * target,
         const std::shared_ptr<BodyPart::BodyWeapon> & weapon,
         unsigned int attackNumber);
@@ -93,34 +100,47 @@ private:
     /// @param target       The character to attack.
     /// @param weapon       The melee weapon used to attack.
     /// @param attackNumber The number of already executed attacks.
-    bool performMeleeAttack(Character * target,
-                            MeleeWeaponItem * weapon,
-                            unsigned int attackNumber);
+    AttackStatus performMeleeAttack(Character * target,
+                                    MeleeWeaponItem * weapon,
+                                    unsigned int attackNumber);
 
     /// @brief Performs a ranged attack with the given weapon.
     /// @param target       The character to attack.
     /// @param weapon       The ranged weapon used to attack.
     /// @param attackNumber The number of already executed attacks.
-    bool performRangedAttack(Character * target,
-                             RangedWeaponItem * weapon,
-                             unsigned int attackNumber);
+    AttackStatus performRangedAttack(Character * target,
+                                     RangedWeaponItem * weapon,
+                                     unsigned int attackNumber);
 
     /// @brief Send the messages when the actor hits with a natural weapon.
     /// @param target The character which is involved in the attack.
     /// @param weapon The weapon used to attack.
     void handleNaturalWeaponHit(
         Character * target,
-        const std::shared_ptr<BodyPart::BodyWeapon> & weapon);
+        const std::shared_ptr<BodyPart::BodyWeapon> & weapon,
+        unsigned int hitRoll,
+        unsigned int armorClass,
+        unsigned int damageRoll);
 
     /// @brief Send the messages when the actor hits with a close ranged attack.
     /// @param target The character which is involved in the attack.
     /// @param weapon The weapon used to attack.
-    void handleMeleeHit(Character * target, MeleeWeaponItem * weapon);
+    void handleMeleeHit(
+        Character * target,
+        MeleeWeaponItem * weapon,
+        unsigned int hitRoll,
+        unsigned int armorClass,
+        unsigned int damageRoll);
 
     /// @brief Send the messages when the actor hits with a long range attack.
     /// @param target The character which is involved in the attack.
     /// @param weapon The weapon used to attack.
-    void handleRangedHit(Character * target, RangedWeaponItem * weapon);
+    void handleRangedHit(
+        Character * target,
+        RangedWeaponItem * weapon,
+        unsigned int hitRoll,
+        unsigned int armorClass,
+        unsigned int damageRoll);
 
     /// @brief Send the messages when the actor misses the target with
     ///         a natural weapon.
@@ -128,17 +148,27 @@ private:
     /// @param weapon The weapon used to attack.
     void handleNaturalWeaponMiss(
         Character * target,
-        const std::shared_ptr<BodyPart::BodyWeapon> & weapon);
+        const std::shared_ptr<BodyPart::BodyWeapon> & weapon,
+        unsigned int hitRoll,
+        unsigned int armorClass);
 
     /// @brief Send the messages when the actor misses the target with
     ///         a close ranged attack.
     /// @param target The character which is involved in the attack.
     /// @param weapon The weapon used to attack.
-    void handleMeleeMiss(Character * target, MeleeWeaponItem * weapon);
+    void handleMeleeMiss(
+        Character * target,
+        MeleeWeaponItem * weapon,
+        unsigned int hitRoll,
+        unsigned int armorClass);
 
     /// @brief Send the messages when the actor misses the target with
     ///         a long range attack.
     /// @param target The character which is involved in the attack.
     /// @param weapon The weapon used to attack.
-    void handleRangedMiss(Character * target, RangedWeaponItem * weapon);
+    void handleRangedMiss(
+        Character * target,
+        RangedWeaponItem * weapon,
+        unsigned int hitRoll,
+        unsigned int armorClass);
 };
