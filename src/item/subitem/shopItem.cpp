@@ -22,7 +22,6 @@
 #include "shopItem.hpp"
 
 #include "shopModel.hpp"
-#include "logger.hpp"
 #include "mud.hpp"
 
 ShopItem::ShopItem() :

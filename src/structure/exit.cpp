@@ -22,7 +22,6 @@
 
 #include "exit.hpp"
 #include "room.hpp"
-#include "logger.hpp"
 
 Exit::Exit() :
     source(),

@@ -27,7 +27,6 @@
 #include "modelFactory.hpp"
 #include "itemFactory.hpp"
 #include "shopItem.hpp"
-#include "logger.hpp"
 #include "mud.hpp"
 
 bool LoadBadName(ResultSet * result)

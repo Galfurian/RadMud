@@ -22,7 +22,6 @@
 
 #include "race.hpp"
 
-#include "logger.hpp"
 #include "mud.hpp"
 
 Race::Race() :

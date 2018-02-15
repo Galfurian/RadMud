@@ -23,7 +23,6 @@
 #include "player.hpp"
 
 #include "sqliteWriteFunctions.hpp"
-#include "logger.hpp"
 #include "mud.hpp"
 
 Player::Player(const int & _socket,

@@ -21,8 +21,8 @@
 
 #include "dismemberAction.hpp"
 #include "resourceModel.hpp"
+#include "corpseItem.hpp"
 #include "character.hpp"
-#include "logger.hpp"
 #include "room.hpp"
 
 #include <cassert>

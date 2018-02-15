@@ -22,7 +22,6 @@
 #include "commandObjectContainer.hpp"
 #include "structureUtils.hpp"
 #include "command.hpp"
-#include "room.hpp"
 
 bool DoOrganize(Character * character, ArgumentHandler & args)
 {

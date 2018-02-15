@@ -23,7 +23,6 @@
 
 #include "skillManager.hpp"
 #include "character.hpp"
-#include "logger.hpp"
 #include "mud.hpp"
 
 SkillManager::SkillManager(Character * _owner) :

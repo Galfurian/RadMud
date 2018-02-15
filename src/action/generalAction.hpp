@@ -22,13 +22,10 @@
 
 #pragma once
 
-#include "production.hpp"
-#include "building.hpp"
-#include "combatHandler.hpp"
-#include "item.hpp"
-
 #include <memory>
 #include <chrono>
+
+class Character;
 
 class BuildAction;
 
@@ -130,14 +127,8 @@ public:
     std::shared_ptr<CombatAction> toCombatAction();
 };
 
-inline bool operator==(const std::shared_ptr<GeneralAction> & _generalAction,
-                       const ActionType & _actionType)
-{
-    return (_generalAction->getType() == _actionType);
-}
+bool operator==(const std::shared_ptr<GeneralAction> & _generalAction,
+                const ActionType & _actionType);
 
-inline bool operator!=(const std::shared_ptr<GeneralAction> & _generalAction,
-                       const ActionType & _actionType)
-{
-    return (_generalAction->getType() != _actionType);
-}
+bool operator!=(const std::shared_ptr<GeneralAction> & _generalAction,
+                const ActionType & _actionType);

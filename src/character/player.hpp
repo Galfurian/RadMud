@@ -29,7 +29,6 @@
 #include <string>
 
 #include "character.hpp"
-#include "skill.hpp"
 
 /// Handle all the player's phases during login.
 using ConnectionState = enum class ConnectionState_t

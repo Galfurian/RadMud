@@ -23,7 +23,9 @@
 #pragma once
 
 #include "generalAction.hpp"
-#include "rangedWeaponItem.hpp"
+
+class Item;
+class RangedWeaponItem;
 
 /// @brief Allows to scout the surrounding area.
 class ReloadAction :

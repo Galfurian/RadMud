@@ -28,9 +28,8 @@
 #include <map>
 #include <memory>
 
-#include "table.hpp"
-
 class CurrencyModel;
+class Table;
 
 /// @brief Holds details about a faction.
 class Faction

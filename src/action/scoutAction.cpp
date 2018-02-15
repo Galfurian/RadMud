@@ -23,7 +23,6 @@
 #include "scoutAction.hpp"
 
 #include "effectFactory.hpp"
-#include "logger.hpp"
 #include "room.hpp"
 #include "area.hpp"
 #include <cassert>

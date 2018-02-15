@@ -25,8 +25,6 @@
 
 #include "structureUtils.hpp"
 #include "characterUtilities.hpp"
-#include "logger.hpp"
-#include "room.hpp"
 #include <cassert>
 
 Flee::Flee(Character * _actor) :

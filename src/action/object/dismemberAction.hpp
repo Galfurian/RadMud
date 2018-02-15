@@ -22,7 +22,9 @@
 #pragma once
 
 #include "generalAction.hpp"
-#include "corpseItem.hpp"
+#include "bodyPart.hpp"
+
+class CorpseItem;
 
 /// @brief An action which allows to dismember corpses.
 class DismemberAction :

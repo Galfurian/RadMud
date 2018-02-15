@@ -23,7 +23,9 @@
 #pragma once
 
 #include "generalAction.hpp"
-#include "rangedWeaponItem.hpp"
+
+class MagazineItem;
+class Item;
 
 /// @brief Allows to load something.
 class LoadAction :

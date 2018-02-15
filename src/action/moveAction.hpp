@@ -22,9 +22,10 @@
 
 #pragma once
 
-#include "characterPosture.hpp"
 #include "generalAction.hpp"
 #include "direction.hpp"
+
+class Room;
 
 /// @brief An action which allows to move characters.
 class MoveAction :

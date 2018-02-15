@@ -24,7 +24,7 @@
 
 #include "sqliteDbms.hpp"
 #include "character.hpp"
-#include "logger.hpp"
+
 #include <cassert>
 
 UnloadAction::UnloadAction(Character * _actor, Item * _item) :

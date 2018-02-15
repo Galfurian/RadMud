@@ -21,9 +21,7 @@
 
 #include "structureUtils.hpp"
 #include "mechanismModel.hpp"
-#include "character.hpp"
 #include "area.hpp"
-#include "room.hpp"
 
 namespace StructUtils
 {

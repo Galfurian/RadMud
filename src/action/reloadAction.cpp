@@ -24,7 +24,6 @@
 
 #include "sqliteDbms.hpp"
 #include "character.hpp"
-#include "logger.hpp"
 #include <cassert>
 
 ReloadAction::ReloadAction(Character * _actor,

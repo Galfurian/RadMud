@@ -23,8 +23,10 @@
 #pragma once
 
 #include "generalAction.hpp"
-#include "profession.hpp"
-#include "production.hpp"
+#include "itemVector.hpp"
+
+class Production;
+class Material;
 
 /// @brief An action executed by characters when crafting new objects.
 class CraftAction :

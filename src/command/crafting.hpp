@@ -24,6 +24,8 @@
 #include "argumentHandler.hpp"
 #include "character.hpp"
 
+class Profession;
+
 /// Loads all the crafring commands.
 void LoadCraftingCommands();
 

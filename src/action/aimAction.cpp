@@ -24,7 +24,6 @@
 
 #include "character.hpp"
 #include "characterUtilities.hpp"
-#include "logger.hpp"
 #include "area.hpp"
 #include "room.hpp"
 #include <cassert>

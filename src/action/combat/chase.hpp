@@ -22,9 +22,12 @@
 
 #pragma once
 
-#include "characterPosture.hpp"
 #include "combatAction.hpp"
+
 #include <functional>
+#include <vector>
+
+class Room;
 
 /// @brief An action executed by characters when fighting at close range.
 class Chase :

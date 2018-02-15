@@ -22,10 +22,11 @@
 
 #include "generalAction.hpp"
 #include "character.hpp"
+#include "production.hpp"
+#include "building.hpp"
+#include "combatHandler.hpp"
+#include "item.hpp"
 #include "mobile.hpp"
-#include "logger.hpp"
-#include <lua.hpp>
-#include <cassert>
 
 GeneralAction::GeneralAction(Character * _actor,
                              const bool & _lastAction) :
@@ -112,4 +113,16 @@ void GeneralAction::resetCooldown(const unsigned int & _actionCooldown)
 std::shared_ptr<CombatAction> GeneralAction::toCombatAction()
 {
     return std::static_pointer_cast<CombatAction>(this->shared_from_this());
+}
+
+bool operator==(const std::shared_ptr<GeneralAction> & _generalAction,
+                const ActionType & _actionType)
+{
+    return (_generalAction->getType() == _actionType);
+}
+
+bool operator!=(const std::shared_ptr<GeneralAction> & _generalAction,
+                       const ActionType & _actionType)
+{
+    return (_generalAction->getType() != _actionType);
 }

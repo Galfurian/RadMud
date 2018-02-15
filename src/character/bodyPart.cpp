@@ -20,8 +20,10 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "bodyPart.hpp"
+
 #include "resourceModel.hpp"
 #include "formatter.hpp"
+
 #include <cassert>
 
 BodyPart::BodyPart() :

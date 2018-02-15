@@ -21,13 +21,13 @@
 
 #pragma once
 
-#include "table.hpp"
-#include "material.hpp"
 #include <string>
 #include <vector>
 #include <memory>
 
 class ResourceModel;
+class Table;
+class Material;
 
 /// The flags of a body part.
 using BodyPartFlag = enum class BodyPartFlag_t

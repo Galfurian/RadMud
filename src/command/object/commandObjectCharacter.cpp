@@ -22,7 +22,6 @@
 #include "commandObjectCharacter.hpp"
 
 #include "characterUtilities.hpp"
-#include "skillRank.hpp"
 #include "formatter.hpp"
 #include "command.hpp"
 #include "room.hpp"

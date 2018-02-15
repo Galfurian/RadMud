@@ -20,7 +20,6 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "mapCell.hpp"
-#include "logger.hpp"
 
 MapCell::MapCell() :
     room(),

@@ -24,6 +24,7 @@
 
 #include "resourceModel.hpp"
 #include "formatter.hpp"
+#include "building.hpp"
 #include "updater.hpp"
 #include "logger.hpp"
 #include "room.hpp"

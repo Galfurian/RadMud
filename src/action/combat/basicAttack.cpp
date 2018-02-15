@@ -25,9 +25,10 @@
 
 #include "characterUtilities.hpp"
 #include "rangedWeaponModel.hpp"
+#include "rangedWeaponItem.hpp"
+#include "meleeWeaponItem.hpp"
 #include "formatter.hpp"
 #include "updater.hpp"
-#include "logger.hpp"
 #include "chase.hpp"
 #include "room.hpp"
 #include "area.hpp"

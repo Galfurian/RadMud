@@ -23,8 +23,6 @@
 #include "area.hpp"
 
 #include "structureUtils.hpp"
-#include "logger.hpp"
-#include "room.hpp"
 
 Area::Area() :
     vnum(),

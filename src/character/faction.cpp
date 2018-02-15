@@ -21,6 +21,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "faction.hpp"
+
 #include "currencyModel.hpp"
 #include "logger.hpp"
 

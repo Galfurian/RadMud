@@ -42,6 +42,7 @@
 #include "characterVector.hpp"
 #include "skillManager.hpp"
 #include "itemUtils.hpp"
+#include "combatHandler.hpp"
 
 #include <deque>
 #include <mutex>

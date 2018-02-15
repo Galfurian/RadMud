@@ -23,7 +23,6 @@
 #include "structureUtils.hpp"
 #include "characterUtilities.hpp"
 #include "moveAction.hpp"
-#include "logger.hpp"
 #include "mud.hpp"
 
 void LoadMovementCommands()

@@ -23,7 +23,6 @@
 #include "general.hpp"
 
 #include "nameGenerator.hpp"
-#include "logger.hpp"
 #include "mud.hpp"
 
 void LoadGeneralCommands()

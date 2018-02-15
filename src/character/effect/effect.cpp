@@ -22,8 +22,6 @@
 
 #include "effect.hpp"
 
-#include "logger.hpp"
-
 Effect::Effect(Character * _affected,
                std::string _name,
                unsigned int _remainingTic,

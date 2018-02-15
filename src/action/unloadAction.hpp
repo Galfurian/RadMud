@@ -23,7 +23,8 @@
 #pragma once
 
 #include "generalAction.hpp"
-#include "rangedWeaponItem.hpp"
+
+class Item;
 
 /// @brief Allows to load something.
 class UnloadAction :

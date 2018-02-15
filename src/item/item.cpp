@@ -23,7 +23,6 @@
 #include "item.hpp"
 
 #include "mud.hpp"
-#include "logger.hpp"
 
 Item::Item() :
     vnum(),

@@ -23,9 +23,12 @@
 #include "craftAction.hpp"
 
 #include "resourceModel.hpp"
+#include "profession.hpp"
+#include "production.hpp"
 #include "updater.hpp"
 #include "logger.hpp"
 #include "room.hpp"
+
 #include <cassert>
 
 CraftAction::CraftAction(Character * _actor,

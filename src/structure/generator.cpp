@@ -22,8 +22,6 @@
 
 #include "generator.hpp"
 
-#include "logger.hpp"
-
 Generator::Generator()
 {
     // NAMES

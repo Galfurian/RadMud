@@ -24,7 +24,6 @@
 
 #include "room.hpp"
 #include "area.hpp"
-#include "logger.hpp"
 
 CombatHandler::CombatHandler(Character * _owner) :
     owner(_owner),

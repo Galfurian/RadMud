@@ -29,7 +29,6 @@
 #include "general.hpp"
 #include "manager.hpp"
 #include "commandObject.hpp"
-#include "logger.hpp"
 #include "commandGod.hpp"
 #include "movement.hpp"
 

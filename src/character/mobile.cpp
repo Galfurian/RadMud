@@ -24,7 +24,6 @@
 
 #include "generalBehaviour.hpp"
 #include "lua_script.hpp"
-#include "logger.hpp"
 #include "mud.hpp"
 
 Mobile::Mobile() :

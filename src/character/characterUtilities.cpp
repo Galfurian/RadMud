@@ -20,12 +20,9 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "characterUtilities.hpp"
-#include "rangedWeaponItem.hpp"
-#include "meleeWeaponItem.hpp"
 #include "resourceModel.hpp"
+#include "production.hpp"
 #include "toolModel.hpp"
-#include "character.hpp"
-#include "logger.hpp"
 #include "room.hpp"
 
 std::vector<std::shared_ptr<BodyPart::BodyWeapon>> GetActiveNaturalWeapons(

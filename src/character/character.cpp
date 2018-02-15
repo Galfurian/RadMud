@@ -27,7 +27,6 @@
 
 #include "lightItem.hpp"
 #include "armorItem.hpp"
-#include "logger.hpp"
 #include "mud.hpp"
 
 Character::Character() :

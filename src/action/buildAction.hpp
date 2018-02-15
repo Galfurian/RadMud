@@ -23,6 +23,10 @@
 #pragma once
 
 #include "generalAction.hpp"
+#include "itemVector.hpp"
+
+class Building;
+class Item;
 
 /// @brief An action executed by characters during building.
 class BuildAction :

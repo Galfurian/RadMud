@@ -20,8 +20,6 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "mapGenerator.hpp"
-#include "logger.hpp"
-#include "area.hpp"
 #include "structureUtils.hpp"
 
 MapGenerator::MapGenerator(const MapGeneratorConfiguration & _configuration,

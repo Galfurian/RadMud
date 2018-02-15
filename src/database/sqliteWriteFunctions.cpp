@@ -21,7 +21,6 @@
 
 #include "sqliteWriteFunctions.hpp"
 #include "sqliteDbms.hpp"
-#include "logger.hpp"
 #include "player.hpp"
 #include "area.hpp"
 #include "room.hpp"

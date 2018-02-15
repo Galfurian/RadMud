@@ -24,10 +24,6 @@
 
 #include "structureUtils.hpp"
 #include "characterUtilities.hpp"
-#include "effectFactory.hpp"
-#include "character.hpp"
-#include "logger.hpp"
-#include "room.hpp"
 #include <cassert>
 
 MoveAction::MoveAction(Character * _actor,

@@ -25,7 +25,6 @@
 #include "magazineModel.hpp"
 #include "sqliteDbms.hpp"
 #include "character.hpp"
-#include "logger.hpp"
 
 #include <cassert>
 
