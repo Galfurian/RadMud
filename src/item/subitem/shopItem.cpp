@@ -21,6 +21,7 @@
 
 #include "shopItem.hpp"
 
+#include "formatter.hpp"
 #include "shopModel.hpp"
 #include "mud.hpp"
 

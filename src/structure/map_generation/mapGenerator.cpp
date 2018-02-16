@@ -21,6 +21,8 @@
 
 #include "mapGenerator.hpp"
 #include "structureUtils.hpp"
+#include "mapWrapper.hpp"
+#include "heightMap.hpp"
 
 MapGenerator::MapGenerator(const MapGeneratorConfiguration & _configuration,
                            const std::shared_ptr<HeightMap> & _heightMap) :

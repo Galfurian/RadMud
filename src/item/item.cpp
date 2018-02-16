@@ -22,6 +22,7 @@
 
 #include "item.hpp"
 
+#include "formatter.hpp"
 #include "mud.hpp"
 
 Item::Item() :

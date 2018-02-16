@@ -22,6 +22,7 @@
 
 #include "communication.hpp"
 
+#include "formatter.hpp"
 #include "command.hpp"
 #include "mud.hpp"
 

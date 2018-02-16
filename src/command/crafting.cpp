@@ -26,6 +26,7 @@
 #include "buildAction.hpp"
 #include "craftAction.hpp"
 #include "characterUtilities.hpp"
+#include "formatter.hpp"
 
 void LoadCraftingCommands()
 {

@@ -21,11 +21,12 @@
 
 #pragma once
 
-#include "mapWrapper.hpp"
-#include "heightMap.hpp"
 #include "mapGeneratorConfiguration.hpp"
 
 #include <memory>
+
+class MapWrapper;
+class HeightMap;
 
 /// @brief Automatic generator of maps.
 class MapGenerator

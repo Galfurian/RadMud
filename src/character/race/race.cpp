@@ -23,6 +23,7 @@
 #include "race.hpp"
 
 #include "mud.hpp"
+#include "formatter.hpp"
 
 Race::Race() :
     vnum(),

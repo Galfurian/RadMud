@@ -24,7 +24,7 @@
 
 #include "structureUtils.hpp"
 #include "characterUtilities.hpp"
-
+#include "formatter.hpp"
 #include "lightItem.hpp"
 #include "armorItem.hpp"
 #include "mud.hpp"

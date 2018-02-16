@@ -20,10 +20,11 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "processNewDescription.hpp"
+#include "processNewWeight.hpp"
+#include "processNewAge.hpp"
+#include "formatter.hpp"
 #include "player.hpp"
 #include "mud.hpp"
-#include "processNewAge.hpp"
-#include "processNewWeight.hpp"
 
 bool
 ProcessNewDescription::process(Character * character, ArgumentHandler & args)

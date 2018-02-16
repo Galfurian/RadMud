@@ -20,10 +20,11 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "processNewAttributes.hpp"
+#include "processNewGender.hpp"
+#include "processNewRace.hpp"
+#include "formatter.hpp"
 #include "player.hpp"
 #include "mud.hpp"
-#include "processNewRace.hpp"
-#include "processNewGender.hpp"
 
 bool
 ProcessNewAttributes::process(Character * character, ArgumentHandler & args)

@@ -20,6 +20,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "terrainFactory.hpp"
+#include "terrain.hpp"
 
 std::shared_ptr<Terrain> TerrainFactory::getAir()
 {

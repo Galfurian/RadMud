@@ -22,6 +22,7 @@
 #include "processNewPasswordConfirm.hpp"
 #include "processNewPassword.hpp"
 #include "processNewStory.hpp"
+#include "formatter.hpp"
 
 bool ProcessNewPasswordConfirm::process(Character * character,
                                         ArgumentHandler & args)

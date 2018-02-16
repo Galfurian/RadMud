@@ -22,6 +22,9 @@
 #include "commandGodMud.hpp"
 #include "characterUtilities.hpp"
 #include "mapGenerator.hpp"
+#include "mapWrapper.hpp"
+#include "heightMap.hpp"
+#include "formatter.hpp"
 #include "mud.hpp"
 
 bool DoShutdown(Character * character, ArgumentHandler &)

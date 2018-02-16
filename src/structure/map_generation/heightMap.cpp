@@ -20,6 +20,9 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "heightMap.hpp"
+#include "terrain.hpp"
+
+#include <algorithm>
 
 HeightMap::HeightMap(const unsigned int & _vnum,
                      const std::string & _name,

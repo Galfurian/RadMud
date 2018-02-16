@@ -22,6 +22,7 @@
 #include "processNewStory.hpp"
 #include "processNewPassword.hpp"
 #include "processNewRace.hpp"
+#include "formatter.hpp"
 
 bool ProcessNewStory::process(Character * character, ArgumentHandler & args)
 {

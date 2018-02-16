@@ -20,10 +20,11 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "processNewName.hpp"
+#include "processNewPassword.hpp"
+#include "processPlayerName.hpp"
+#include "formatter.hpp"
 #include "player.hpp"
 #include "mud.hpp"
-#include "processPlayerName.hpp"
-#include "processNewPassword.hpp"
 
 bool ProcessNewName::process(Character * character, ArgumentHandler & args)
 {

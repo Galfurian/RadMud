@@ -21,6 +21,7 @@
 
 #include "commandGodCharacter.hpp"
 #include "characterUtilities.hpp"
+#include "formatter.hpp"
 #include "mud.hpp"
 
 bool DoGodInfo(Character * character, ArgumentHandler & args)

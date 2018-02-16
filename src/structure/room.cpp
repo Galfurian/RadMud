@@ -27,6 +27,7 @@
 #include "generator.hpp"
 #include "mud.hpp"
 #include "structureUtils.hpp"
+#include "formatter.hpp"
 
 Room::Room() :
     vnum(),

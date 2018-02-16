@@ -23,6 +23,7 @@
 #include "general.hpp"
 
 #include "nameGenerator.hpp"
+#include "formatter.hpp"
 #include "mud.hpp"
 
 void LoadGeneralCommands()

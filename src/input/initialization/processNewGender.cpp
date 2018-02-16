@@ -20,10 +20,11 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "processNewGender.hpp"
-#include "player.hpp"
-#include "mud.hpp"
 #include "processNewAttributes.hpp"
 #include "processNewAge.hpp"
+#include "formatter.hpp"
+#include "player.hpp"
+#include "mud.hpp"
 
 bool ProcessNewGender::process(Character * character, ArgumentHandler & args)
 {

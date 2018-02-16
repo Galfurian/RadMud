@@ -46,13 +46,12 @@
 #include "command.hpp"
 #include "sqliteDbms.hpp"
 #include "table.hpp"
-#include "formatter.hpp"
 #include "terrain.hpp"
 #include "bodyPart.hpp"
-#include "heightMap.hpp"
-#include "mapWrapper.hpp"
 
 class Direction;
+class HeightMap;
+class MapWrapper;
 
 #ifdef __linux__
 

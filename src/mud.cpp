@@ -22,12 +22,14 @@
 
 #include "mud.hpp"
 
-#include <unistd.h>
-#include <signal.h>
-
 #include "processPlayerName.hpp"
 #include "CMacroWrapper.hpp"
 #include "stopwatch.hpp"
+#include "heightMap.hpp"
+
+#include <unistd.h>
+#include <signal.h>
+#include "mapWrapper.hpp"
 
 /// Input file descriptor.
 static fd_set in_set;

@@ -26,6 +26,7 @@
 #include "currencyModel.hpp"
 #include "modelFactory.hpp"
 #include "itemFactory.hpp"
+#include "heightMap.hpp"
 #include "shopItem.hpp"
 #include "mud.hpp"
 

@@ -21,10 +21,16 @@
 
 #pragma once
 
-#include "terrain.hpp"
-#include "room.hpp"
+#include "coordinates.hpp"
 
 #include <vector>
+#include <string>
+#include <memory>
+#include <map>
+
+class Room;
+class Terrain;
+class Liquid;
 
 /// @brief Holds information about the cell of an automatically generated map.
 class MapCell

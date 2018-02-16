@@ -42,6 +42,7 @@
 #include "meleeWeaponModel.hpp"
 #include "resourceModel.hpp"
 #include "toolModel.hpp"
+#include "formatter.hpp"
 
 #include "itemFactory.hpp"
 #include "logger.hpp"

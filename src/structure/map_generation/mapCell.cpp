@@ -20,6 +20,8 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "mapCell.hpp"
+#include "terrain.hpp"
+#include "room.hpp"
 
 MapCell::MapCell() :
     room(),

@@ -21,8 +21,9 @@
 
 #pragma once
 
-#include "terrain.hpp"
 #include <memory>
+
+class Terrain;
 
 /// @brief Factory which allows to create predefined terrains.
 class TerrainFactory

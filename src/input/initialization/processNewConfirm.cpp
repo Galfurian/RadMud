@@ -20,9 +20,11 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "processNewConfirm.hpp"
+
+#include "processNewWeight.hpp"
+#include "formatter.hpp"
 #include "player.hpp"
 #include "mud.hpp"
-#include "processNewWeight.hpp"
 
 bool ProcessNewConfirm::process(Character * character, ArgumentHandler & args)
 {

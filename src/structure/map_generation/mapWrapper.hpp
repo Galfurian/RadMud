@@ -22,6 +22,7 @@
 #pragma once
 
 #include "mapCell.hpp"
+
 #include <vector>
 
 /// @brief Class which contains (wrap) an under-construction map.

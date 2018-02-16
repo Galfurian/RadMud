@@ -20,10 +20,11 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "processNewWeight.hpp"
-#include "player.hpp"
-#include "mud.hpp"
 #include "processNewDescription.hpp"
 #include "processNewConfirm.hpp"
+#include "formatter.hpp"
+#include "player.hpp"
+#include "mud.hpp"
 
 bool ProcessNewWeight::process(Character * character, ArgumentHandler & args)
 {
