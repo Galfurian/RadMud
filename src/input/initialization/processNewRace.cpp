@@ -23,8 +23,6 @@
 #include "processNewAttributes.hpp"
 #include "processNewStory.hpp"
 #include "formatter.hpp"
-#include "player.hpp"
-#include "mud.hpp"
 
 bool ProcessNewRace::process(Character * character, ArgumentHandler & args)
 {

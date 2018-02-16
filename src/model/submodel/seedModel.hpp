@@ -25,7 +25,7 @@
 #include "itemModel.hpp"
 
 /// Used to determine the type of the resource.
-using SeedType = enum class SeedType_t
+enum class SeedType
 {
     Plant,  ///< A generic seed.
     Tree,   ///< A seed used to plant a tree.

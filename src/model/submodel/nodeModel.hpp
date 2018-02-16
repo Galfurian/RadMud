@@ -25,7 +25,7 @@
 #include "itemModel.hpp"
 
 /// Used to determine the type of the node.
-using NodeType = enum class NodeType_t
+enum class NodeType
 {
     NoType, ///< [0] No type.
     Metal,  ///< [1] Metal vein.

@@ -25,7 +25,7 @@
 #include "itemModel.hpp"
 
 /// Used to determine the flag of the container.
-using ContainerFlag = enum class ContainerFlag_t
+enum class ContainerFlag
 {
     None = 0,       ///< No flag.
     CanClose = 1,   ///< Can be closed.

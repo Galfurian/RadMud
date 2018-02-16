@@ -25,8 +25,6 @@
 
 #include "characterUtilities.hpp"
 #include "rangedWeaponModel.hpp"
-#include "rangedWeaponItem.hpp"
-#include "meleeWeaponItem.hpp"
 #include "formatter.hpp"
 #include "updater.hpp"
 #include "chase.hpp"

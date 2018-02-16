@@ -33,7 +33,7 @@
 class Room;
 
 /// Used to determine the type of Zone.
-using AreaType = enum class AreaType_t
+enum class AreaType
 {
     Normal,     ///< The area is quite normal.
     Cavern,     ///< Identifies a cavern.
@@ -41,7 +41,7 @@ using AreaType = enum class AreaType_t
 };
 
 /// Used to determine the status of a Zone.
-using AreaStatus = enum class AreaStatus_t
+enum class AreaStatus
 {
     Normal,     ///< The area has no environmental status.
     Iced,       ///< The area is freezing.

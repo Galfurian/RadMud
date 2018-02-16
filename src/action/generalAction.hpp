@@ -36,7 +36,7 @@ class MoveAction;
 class CombatAction;
 
 /// The list of possible actions.
-using ActionType = enum class ActionType_t
+enum class ActionType
 {
     Wait,       ///< The character is doing common action.
     Move,       ///< The character is moving to another location.
@@ -52,7 +52,7 @@ using ActionType = enum class ActionType_t
 };
 
 /// The list of possible actions.
-using ActionStatus = enum class ActionStatus_t
+enum class ActionStatus
 {
     Finished,   ///< The action is finished.
     Running,    ///< The action is still running.

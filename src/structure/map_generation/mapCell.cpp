@@ -63,7 +63,7 @@ std::string MapCell::getTile() const
     {
         return "w";
     }
-    if (HasFlag(flags, RoomFlags::SpawnTree))
+    if (HasFlag(flags, RoomFlag::SpawnTree))
     {
         return "t";
     }

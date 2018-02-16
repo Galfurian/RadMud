@@ -24,7 +24,7 @@
 #include "stringBuilder.hpp"
 
 /// @brief Enumerator which identifies the severity of the log entry.
-using LogLevel = enum class LogLevel_t
+enum class LogLevel
 {
     Global = 1,     ///< General logging level.
     Trace = 2,      ///< Log events useful for back-tracing.

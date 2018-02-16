@@ -56,7 +56,7 @@ class Mobile;
 struct lua_State;
 
 /// The list of possible actions.
-using GenderType = enum class GenderType_t
+enum class GenderType
 {
     None,   ///< The character has no gender (robot).
     Female, ///< The character is a female.
@@ -64,7 +64,7 @@ using GenderType = enum class GenderType_t
 };
 
 /// Used to determine the flag of the character.
-using CharacterFlag = enum class CharacterFlag_t
+enum class CharacterFlag
 {
     None = 0,       ///< No flag.
     IsGod = 1,      ///< The character is a GOD.

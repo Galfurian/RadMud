@@ -122,7 +122,7 @@ protected:
 private:
 
     /// Allows to manipulate an element.
-    using Manipulator = enum class Manipulators
+    enum class Manipulator
     {
         None,       ///< No manipulation
         Capitalize, ///< Capitalize the next element.
@@ -130,7 +130,7 @@ private:
     };
 
     /// Determines the type of a group of letters.
-    using GroupType = enum class GroupTypes
+    enum class GroupType
     {
         None,       ///< No manipulation
         Symbol,     ///< Capitalize the next element.

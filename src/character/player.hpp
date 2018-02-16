@@ -31,7 +31,7 @@
 #include "character.hpp"
 
 /// Handle all the player's phases during login.
-using ConnectionState = enum class ConnectionState_t
+enum class ConnectionState
 {
     LoggingIn, ///< The player is logging in.
     Playing    ///< The player is playing.

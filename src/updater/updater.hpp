@@ -31,7 +31,7 @@ class Item;
 class Room;
 
 /// @brief Enumerator which identifies the day phase.
-using DayPhase = enum class DayPhase_t
+enum class DayPhase
 {
     Morning = 6,    ///< The first lights of the day.
     Day = 12,       ///< The sun is high in the sky.

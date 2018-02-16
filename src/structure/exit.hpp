@@ -31,7 +31,7 @@
 class Room;
 
 /// Used to determine the flag of the exit.
-using ExitFlag = enum class ExitFlag_t
+enum class ExitFlag
 {
     None = 0,   ///< No flag.
     NoMob = 1,  ///< A mob can't move through this exit.

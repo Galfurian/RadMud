@@ -42,7 +42,7 @@ class Character;
 class Material;
 
 /// Used to determine the flag of the item.
-using ItemFlag = enum class ItemFlag_t
+enum class ItemFlag
 {
     None = 0,
     Closed = 1,

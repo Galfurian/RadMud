@@ -27,7 +27,7 @@
 #include <vector>
 
 /// @brief The states of an AStar node.
-using AStarNodeState = enum class AStarNodeState_t
+enum class AStarNodeState
 {
     Untested,   /// <! The node has not been tested yet.
     Open,       /// <! The node is on the 'open' state.

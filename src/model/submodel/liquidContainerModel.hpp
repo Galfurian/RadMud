@@ -25,7 +25,7 @@
 #include "itemModel.hpp"
 
 /// Used to determine the flag of the container of liquid.
-using LiqContainerFlag = enum class LiqContainerFlag_t
+enum class LiqContainerFlag
 {
     None = 0,       ///< No flag.
     Endless = 1,    ///< Content never ends.

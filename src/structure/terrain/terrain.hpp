@@ -29,7 +29,7 @@
 class Liquid;
 
 /// Used to determine the flag of the terrain.
-using TerrainFlag = enum class TerrainFlags
+enum class TerrainFlag
 {
     None = 0,           ///< No flag.
     Indoor = 1,         ///< The terrain is indoor.
@@ -37,7 +37,7 @@ using TerrainFlag = enum class TerrainFlags
 };
 
 /// Used to determine the generation flag of the terrain.
-using TerrainGenerationFlag = enum class TerrainGenerationFlags
+enum class TerrainGenerationFlag
 {
     None = 0,                   ///< No flag.
     CanHostLiquidSource = 2,    ///< The terrain can host a liquid source.

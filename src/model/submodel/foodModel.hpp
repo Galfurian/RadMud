@@ -25,7 +25,7 @@
 #include "itemModel.hpp"
 
 /// Used to determine the flag of the food.
-using FoodFlag = enum class FoodFlag_t
+enum class FoodFlag
 {
     None = 0,       ///< No flag.
     Poisoned = 1,   ///< Food is poisoned.

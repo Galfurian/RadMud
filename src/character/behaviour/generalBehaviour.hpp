@@ -28,7 +28,7 @@
 #include "luaBridge.hpp"
 
 /// The list of possible behaviours.
-using BehaviourStatus = enum class BehaviourStatus_t
+enum class BehaviourStatus
 {
     Finished,   ///< The behaviour is finished.
     Running,    ///< The behaviour is still running.

@@ -401,7 +401,7 @@ std::string Area::drawASCIIFov(Room * centerRoom, const int & radius)
             {
                 tile = 'w';
             }
-            else if (HasFlag(room->flags, RoomFlags::SpawnTree))
+            else if (HasFlag(room->flags, RoomFlag::SpawnTree))
             {
                 tile = 't';
             }

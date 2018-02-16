@@ -38,7 +38,7 @@ class Item;
 class Area;
 
 /// Used to determine the flag of the room.
-using RoomFlag = enum class RoomFlags
+enum class RoomFlag
 {
     Rent = 1,           ///< A player can rent and disconnect.
     Peaceful = 2,       ///< Everyone here can't be harmful.

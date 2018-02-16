@@ -30,7 +30,7 @@ class Table;
 class Material;
 
 /// The flags of a body part.
-using BodyPartFlag = enum class BodyPartFlag_t
+enum class BodyPartFlag
 {
     None = 0,     ///< [0]   No flag.
     CanWear = 1,  ///< [1]   The equipment can be worn on the the body part.

@@ -25,7 +25,7 @@
 #include "liquidType.hpp"
 
 /// Flags of a liquid.
-using LiquidFlags = enum class LiquidFlags_t
+enum class LiquidFlags
 {
     None,               ///< [0]   No flag.
     Inflammable = 1,    ///< [1]   The liquid is inflammable.

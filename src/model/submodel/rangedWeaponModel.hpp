@@ -25,7 +25,7 @@
 #include "itemModel.hpp"
 
 /// Types of ranged weapons.
-using RangedWeaponType = enum class RangedWeaponType_t
+enum class RangedWeaponType
 {
     None,
     Pistol,             ///< [1] Normal Pistols

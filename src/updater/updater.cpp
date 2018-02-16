@@ -23,7 +23,6 @@
 #include "updater.hpp"
 #include "generalBehaviour.hpp"
 #include "formatter.hpp"
-#include "logger.hpp"
 #include "mud.hpp"
 
 // //////////////////////////////////////////////////////////

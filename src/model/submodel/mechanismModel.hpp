@@ -25,7 +25,7 @@
 #include "itemModel.hpp"
 
 /// Used to determine the type of the resource.
-using MechanismType = enum class MechanismType_t
+enum class MechanismType
 {
     None,
     Door,

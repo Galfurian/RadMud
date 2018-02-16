@@ -36,7 +36,7 @@
 #include <memory>
 
 /// Used to determine the flag of the model.
-using ModelFlag = enum class ModelFlag_t
+enum class ModelFlag
 {
     None = 0,           ///< [0]   No flag.
     Static = 1,         ///< [1]   The item can't be moved.

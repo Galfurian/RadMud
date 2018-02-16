@@ -26,8 +26,7 @@
 #include "itemModel.hpp"
 
 /// Flags of a light source.
-using LightModelFlags = enum class LightModelFlags_t :
-    unsigned int
+enum class LightModelFlags
 {
     None,             ///< [0]   No flag.
     AlwaysActive = 1, ///< [1]   The light source is always active.

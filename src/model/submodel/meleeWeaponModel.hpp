@@ -25,7 +25,7 @@
 #include "itemModel.hpp"
 
 /// Types of weapons.
-using MeleeWeaponType = enum class MeleeWeaponType_t
+enum class MeleeWeaponType
 {
     None,
     Unarmed, ///< [1] Weapon to enhance unarmed fight

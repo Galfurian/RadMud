@@ -26,7 +26,7 @@
 #include "generalAction.hpp"
 
 /// The list of possible combat actions.
-using CombatActionType = enum class CombatActionType_t
+enum class CombatActionType
 {
     NoAction,    ///< The combat move is to do nothing.
     BasicAttack, ///< The action is a basic melee attack.

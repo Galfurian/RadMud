@@ -24,8 +24,6 @@
 #include "character.hpp"
 #include "production.hpp"
 #include "building.hpp"
-#include "combatHandler.hpp"
-#include "item.hpp"
 #include "mobile.hpp"
 
 GeneralAction::GeneralAction(Character * _actor,

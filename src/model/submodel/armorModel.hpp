@@ -25,7 +25,7 @@
 #include "itemModel.hpp"
 
 /// Sizes of armor.
-using ArmorSize = enum class ArmorSize_t
+enum class ArmorSize
 {
     All,    ///< [0] All kind of size.
     Light,  ///< [1] Light Armor

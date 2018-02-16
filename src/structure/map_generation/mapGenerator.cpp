@@ -354,7 +354,7 @@ bool MapGenerator::generateForests(const std::shared_ptr<MapWrapper> & map)
     {
         // Check if the cell can host a forest.
         if (!HasFlag(cell->terrain->generationFlags,
-                     TerrainGenerationFlags::CanHostForest))
+                     TerrainGenerationFlag::CanHostForest))
         {
             return false;
         }
@@ -391,17 +391,17 @@ bool MapGenerator::generateForests(const std::shared_ptr<MapWrapper> & map)
     {
         auto cell = map->getCell(x, y);
         if (iterationLeft == 0) return true;
-        if (HasFlag(cell->flags, RoomFlags::SpawnTree)) return true;
+        if (HasFlag(cell->flags, RoomFlag::SpawnTree)) return true;
         // Check if the cell can host a forest.
         if (!HasFlag(cell->terrain->generationFlags,
-                     TerrainGenerationFlags::CanHostForest))
+                     TerrainGenerationFlag::CanHostForest))
         {
             return true;
         }
         auto normalized = Normalize(iterationLeft, 0, iterationTotal, 0,
                                     100);
         if (TRand<int>(0, 100) >= normalized) return true;
-        SetFlag(cell->flags, RoomFlags::SpawnTree);
+        SetFlag(cell->flags, RoomFlag::SpawnTree);
         iterationLeft--;
         if (!FloodFill(std::max(x - 1, 0), y, iterationTotal, iterationLeft))
         {
