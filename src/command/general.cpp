@@ -624,8 +624,8 @@ bool DoSkills(Character * character, ArgumentHandler & /*args*/)
     }
     auto player = character->toPlayer();
     Table table = Table();
-    table.addColumn("LvL", align::left);
     table.addColumn("Skill", align::left);
+    table.addColumn("Level", align::left);
     for (const auto & skillData : player->skillManager.skills)
     {
         table.addRow({skillData->skill->name,
