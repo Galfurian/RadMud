@@ -32,7 +32,6 @@ Player::Player(const int & _socket,
     psocket(_socket),
     port(_port),
     address(_address),
-    outbuf(),
     inbuf(),
     password(),
     age(),
@@ -215,7 +214,7 @@ bool Player::isPlaying() const
 
 bool Player::hasPendingOutput() const
 {
-    return !outbuf.empty();
+    return !outbuffer.empty();
 }
 
 bool Player::updateOnDB()
@@ -384,21 +383,21 @@ void Player::processWrite()
     std::vector<unsigned char> compressed;
     //std::vector<unsigned char> check;
     // We will loop attempting to write all in buffer, until write blocks.
-    while ((psocket != NO_SOCKET_COMMUNICATION) && !outbuf.empty())
+    while ((psocket != NO_SOCKET_COMMUNICATION) && !outbuffer.empty())
     {
         // We attach to the message the player prompt.
         this->sendPrompt();
 
         // For portability I replace \n with \r\n.
-        FindAndReplace(&outbuf, "\n", "\r\n");
+        FindAndReplace(&outbuffer, "\n", "\r\n");
 
         // Send a maximum of 4096 at a time.
-        size_t iLength = std::min<size_t>(outbuf.size(), BUFSIZE);
+        size_t iLength = std::min<size_t>(outbuffer.size(), BUFSIZE);
 
 #if 0
         // Compress the data.
-        for (unsigned int i = 0; i < outbuf.size(); i++)
-        uncompressed.push_back(outbuf[i]);
+        for (unsigned int i = 0; i < outbuffer.size(); i++)
+        uncompressed.push_back(outbuffer[i]);
 
         // Create compressed Buffer from input data.
         DeflateStream(uncompressed, compressed);
@@ -413,8 +412,9 @@ void Player::processWrite()
         Mud::instance().getUpdater().updateBandWidth(2, uncompressed.size());
 #else
         // Send to player.
-        ssize_t nWrite = send(psocket, outbuf.c_str(), outbuf.size(),
-                              MSG_NOSIGNAL);
+        auto nWrite = send(psocket, outbuffer.c_str(), outbuffer.size(),
+                           MSG_NOSIGNAL);
+        auto uWritten = static_cast<std::size_t>(nWrite);
 #endif
 #if 0
         // Decompress the sent data for checking.
@@ -440,12 +440,10 @@ void Player::processWrite()
             }
             return;
         }
-        std::size_t uWritten = static_cast<std::size_t>(nWrite);
+        // Update the output band.
         MudUpdater::instance().updateBandOut(uWritten);
-
         // Remove what we successfully sent from the buffer.
-        outbuf.erase(0, outbuf.size());
-
+        outbuffer.erase(0, uWritten);
         // If partial write, exit
         if (uWritten < iLength)
         {
@@ -458,11 +456,6 @@ void Player::processException()
 {
     // Signals can cause exceptions, don't get too excited. :)
     std::cerr << "Exception on socket " << psocket << std::endl << std::endl;
-}
-
-void Player::sendMsg(const std::string & msg)
-{
-    outbuf += msg;
 }
 
 void Player::updateTicImpl()

@@ -34,7 +34,6 @@ Mobile::Mobile() :
     shortdesc(),
     staticdesc(),
     actions(),
-    message_buffer(),
     nextRespawn(),
     controller(),
     lua_script(),
@@ -314,14 +313,8 @@ void Mobile::reloadLua()
 
 void Mobile::sendMsg(const std::string & msg)
 {
-    if (controller != NULL)
-    {
-        controller->sendMsg(msg);
-    }
-    else
-    {
-        message_buffer += msg;
-    }
+    Character::sendMsg(msg);
+    if (controller != nullptr) controller->sendMsg(msg);
 }
 
 void Mobile::performBehaviour()

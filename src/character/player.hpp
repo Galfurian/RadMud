@@ -49,8 +49,6 @@ private:
     int port;
     /// Address player is from.
     std::string address;
-    /// Pending output.
-    std::string outbuf;
     /// Pending input.
     std::string inbuf;
 
@@ -163,10 +161,6 @@ public:
 
     /// @brief Handle player exception on socket.
     void processException();
-
-    /// @brief Output to player (any type).
-    /// @param msg String to sent.
-    void sendMsg(const std::string & msg) override;
 
 protected:
     void updateTicImpl() override;

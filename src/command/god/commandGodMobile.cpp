@@ -136,6 +136,6 @@ bool DoMobileLog(Character * character, ArgumentHandler & args)
     }
     // Notify.
     character->sendMsg("Target(%s)\n", mobile->getName());
-    character->sendMsg("Log:\n%s\n", mobile->message_buffer);
+    character->sendMsg("Log:\n%s\n", mobile->outbuffer);
     return true;
 }
