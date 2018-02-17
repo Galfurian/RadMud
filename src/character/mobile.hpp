@@ -50,8 +50,6 @@ public:
     std::string staticdesc;
     /// Default actions that the mobile execute.
     std::vector<std::string> actions;
-    /// Mobile buffer of received message.
-    std::string message_buffer;
     /// How many seconds before respawn.
     std::chrono::time_point<std::chrono::system_clock> nextRespawn;
     /// The character that is controlling this one.

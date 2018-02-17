@@ -50,6 +50,8 @@ Character::Character() :
     actionQueue(),
     actionQueueMutex(),
     inputProcessor(std::make_shared<ProcessInput>()),
+    outbuffer(),
+    outstream(outbuffer),
     effectManager(),
     skillManager(this),
     combatHandler(this)
@@ -1106,7 +1108,7 @@ bool Character::operator==(const class Character & source) const
 
 void Character::sendMsg(const std::string & msg)
 {
-    Logger::log(LogLevel::Error, "[SEND_MESSAGE] Msg :" + msg);
+    outbuffer += msg;
 }
 
 void Character::updateTicImpl()
