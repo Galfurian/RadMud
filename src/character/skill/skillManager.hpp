@@ -25,7 +25,6 @@
 
 #include "effect.hpp"
 #include "skillData.hpp"
-#include "radMudTypes.hpp"
 #include "modifierManager.hpp"
 #include "effectFactory.hpp"
 
@@ -70,7 +69,7 @@ public:
     /// @brief Finds the given skill data.
     /// @param vnum The vnum of the skill.
     /// @return A pointer to the skill data.
-    inline std::shared_ptr<SkillData> findSkill(const VnumType & vnum)
+    inline std::shared_ptr<SkillData> findSkill(const unsigned int & vnum)
     {
         for (auto skillData : skills)
         {

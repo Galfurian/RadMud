@@ -24,20 +24,19 @@
 #include "skill.hpp"
 #include "effect.hpp"
 #include "skillRank.hpp"
-#include "radMudTypes.hpp"
 
 class SkillData
 {
 public:
     /// The skill vnum.
-    VnumType skillVnum;
+    unsigned int skillVnum;
     /// The skill level.
     unsigned int skillLevel;
     /// A pointer to the skill.
     std::shared_ptr<Skill> skill;
 
     /// @brief Constructor.
-    SkillData(const VnumType & _skillVnum,
+    SkillData(const unsigned int & _skillVnum,
               const unsigned int & _skillLevel,
               std::shared_ptr<Skill> _skill) :
         skillVnum(_skillVnum),

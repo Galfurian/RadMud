@@ -342,7 +342,7 @@ bool DoPlayerModSkill(Character * character, ArgumentHandler & args)
         return false;
     }
     auto skill = Mud::instance().findSkill(
-        ToNumber<VnumType>(args[1].getContent()));
+        ToNumber<unsigned int>(args[1].getContent()));
     if (skill == nullptr)
     {
         character->sendMsg("Cannot find the desired skill.\n");

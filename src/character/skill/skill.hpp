@@ -31,7 +31,6 @@
 #include "combatModifier.hpp"
 #include "statusModifier.hpp"
 #include "knowledge.hpp"
-#include "radMudTypes.hpp"
 #include "modifierManager.hpp"
 
 class Character;
@@ -41,7 +40,7 @@ class Skill
 {
 public:
     /// The skill virtual number.
-    VnumType vnum;
+    unsigned int vnum;
     /// The name of the skill.
     std::string name;
     /// The description of the skill.
@@ -51,9 +50,9 @@ public:
     /// The overall stage of the skill.
     int stage;
     /// The list of required skills.
-    std::vector<VnumType> requiredSkill;
+    std::vector<unsigned int> requiredSkill;
     /// The list of required skills.
-    std::vector<VnumType> usedForSkill;
+    std::vector<unsigned int> usedForSkill;
     /// The internal modifier manager.
     std::shared_ptr<ModifierManager> modifierManager;
 

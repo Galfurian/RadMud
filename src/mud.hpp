@@ -349,7 +349,7 @@ public:
     Faction * findFaction(std::string name);
 
     /// Find a skill given its vnum.
-    std::shared_ptr<Skill> findSkill(const VnumType & vnum);
+    std::shared_ptr<Skill> findSkill(const unsigned int & vnum);
 
     /// Find a writing given its vnum.
     Writing * findWriting(int vnum);

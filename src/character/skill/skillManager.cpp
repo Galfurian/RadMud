@@ -36,7 +36,7 @@ SkillManager::SkillManager(Character * _owner) :
 
 void SkillManager::checkIfUnlockedSkills()
 {
-    std::vector<VnumType> masterSkills;
+    std::vector<unsigned int> masterSkills;
     // Create a list for all the master skills.
     for (const auto & it : skills)
     {

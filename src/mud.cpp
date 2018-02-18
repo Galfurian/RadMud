@@ -51,8 +51,8 @@ Mud::Mud() :
     _maxDesc(-1),
     _shutdownSignal(),
     _bootTime(time(NULL)),
-    _maxVnumRoom(),
-    _maxVnumItem(),
+    _maxVnumRoom(1),
+    _maxVnumItem(1),
     _minVnumCorpses(),
     _mudMeasure("stones"),
     _mudDatabaseName("radmud.db"),
@@ -480,7 +480,7 @@ Faction * Mud::findFaction(std::string name)
     return nullptr;
 }
 
-std::shared_ptr<Skill> Mud::findSkill(const VnumType & vnum)
+std::shared_ptr<Skill> Mud::findSkill(const unsigned int & vnum)
 {
     for(const auto & skill : mudSkills)
     {
