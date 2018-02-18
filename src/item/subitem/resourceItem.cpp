@@ -31,9 +31,3 @@ ResourceItem::~ResourceItem()
 {
     // Nothing to do.
 }
-
-
-double ResourceItem::getDecayRate() const
-{
-    return SafeLog10(maxCondition) / composition->hardness;
-}

@@ -33,6 +33,4 @@ public:
     ResourceItem();
 
     virtual ~ResourceItem();
-
-    double getDecayRate() const override;
 };

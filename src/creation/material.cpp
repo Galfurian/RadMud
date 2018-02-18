@@ -53,18 +53,3 @@ bool Material::check()
     if (lightness <= 0) return false;
     return true;
 }
-
-double Material::getWorthModifier() const
-{
-    return 1 + (0.1 * this->worth);
-}
-
-double Material::getHardnessModifier() const
-{
-    return 1 + (0.1 * this->hardness);
-}
-
-double Material::getLightnessModifier() const
-{
-    return 1 + (0.1 * this->lightness);
-}

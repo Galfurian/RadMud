@@ -64,12 +64,8 @@ public:
     unsigned int quantity;
     /// The player that created the item.
     std::string maker;
-    /// The item's weight.
-    double weight;
     /// The item's condition.
     double condition;
-    /// The maximum condition.
-    double maxCondition;
     /// The composing material of the item.
     Material * composition;
     /// The quality of the item.
@@ -186,6 +182,9 @@ public:
     ///                     the weight of the entire stack.
     /// @return The total weight of the item.
     virtual double getWeight(bool entireStack) const;
+
+    /// @brief Get the item maximum condition.
+    virtual unsigned int getMaxCondition() const;
 
     /// @brief Return the name of the item.
     /// @param colored If <b>true</b> the name also include formatting color.

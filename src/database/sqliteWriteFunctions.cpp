@@ -157,9 +157,7 @@ bool SaveItem(Item * item,
     args.push_back(ToString(item->model->vnum));
     args.push_back(ToString(item->quantity));
     args.push_back(item->maker);
-    args.push_back(ToString(item->weight));
     args.push_back(ToString(item->condition));
-    args.push_back(ToString(item->maxCondition));
     args.push_back(ToString(item->composition->vnum));
     args.push_back(ToString(item->quality.toUInt()));
     args.push_back(ToString(item->flags));

@@ -247,8 +247,8 @@ void Mobile::kill()
         // Add the item to the mud.
         Mud::instance().addItem(item);
         // Evaluate the minimum and maximum condition.
-        auto min = (item->maxCondition / 100) * 10;
-        auto max = (item->maxCondition / 100) * 50;
+        auto min = (item->getMaxCondition() / 100) * 10;
+        auto max = (item->getMaxCondition() / 100) * 50;
         // Set a random condition for the new item.
         item->condition = TRandReal<double>(min, max);
     };

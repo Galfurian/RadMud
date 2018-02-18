@@ -109,9 +109,7 @@ Item * CorpseModel::createCorpse(
     newCorpse->maker = maker;
     newCorpse->quality = ItemQuality::Normal;
     // Then set the rest.
-    newCorpse->weight = weight;
     newCorpse->condition = static_cast<unsigned int>(weight);
-    newCorpse->maxCondition = static_cast<unsigned int>(weight);
     newCorpse->composition = corpseComposition;
     newCorpse->remainingBodyParts = corpseRace->bodyParts;
 

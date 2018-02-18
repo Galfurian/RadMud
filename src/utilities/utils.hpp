@@ -30,6 +30,7 @@
 #include <type_traits>
 #include <vector>
 #include <iostream>
+#include <iomanip>
 
 /// Allows to define a non-aborting assertion for correct guards.
 #define CorrectAssert(e) ( (e) ? true : (\
@@ -175,11 +176,16 @@ std::string GetDate();
 std::vector<std::string> GetAllFilesInFolder(const std::string & folder,
                                              const std::string & extension);
 
+inline double RoundTo(double value, int digits)
+{
+    return (std::round(value * std::pow(10, digits))) / std::pow(10, digits);
+}
+
 /// @brief Transform a string into a numeric value.
 /// @param source The string to turn into a number.
 /// @return The number.
 template<typename T,
-    typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
+         typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
 T ToNumber(const std::string & source)
 {
     char * pEnd;
@@ -190,7 +196,7 @@ T ToNumber(const std::string & source)
 /// @param value The value to turn into a string.
 /// @return The resulting string.
 template<typename T,
-    typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
+         typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
 std::string ToString(const T & value)
 {
     std::stringstream ss;
@@ -203,7 +209,7 @@ std::string ToString(const T & value)
 /// @param upperBound The upper bound for the random value.
 /// @return The generated random value.
 template<typename T,
-    typename = typename std::enable_if<std::is_integral<T>::value>::type>
+         typename = typename std::enable_if<std::is_integral<T>::value>::type>
 T TRand(const T & lowerBound, const T & upperBound)
 {
     std::uniform_int_distribution<T> distribution(lowerBound, upperBound);
@@ -217,7 +223,7 @@ T TRand(const T & lowerBound, const T & upperBound)
 /// @param upperBound The upper bound for the random value.
 /// @return The generated random value.
 template<typename T,
-    typename = typename std::enable_if<std::is_floating_point<T>::value>::type>
+         typename = typename std::enable_if<std::is_floating_point<T>::value>::type>
 T TRandReal(const T & lowerBound, const T & upperBound)
 {
     std::uniform_real_distribution<T> distribution(lowerBound, upperBound);
@@ -237,6 +243,12 @@ template<typename T>
 T Normalize(T v, T from_lb, T from_ub, T to_lb, T to_ub)
 {
     return (((to_ub - to_lb) * (v - from_lb)) / ((from_ub - from_lb))) + to_lb;
+}
+
+template<typename T, typename TPercentage>
+inline T Percent(T total, TPercentage percentage)
+{
+    return static_cast<T>((total / 100) * percentage);
 }
 
 /// @brief Check if the string is a number.
@@ -279,7 +291,6 @@ bool FindErase(std::vector<T> & v, const T & item)
     }
     return false;
 }
-
 
 /// @brief Remove an element from a list.
 /// @param l    The list.

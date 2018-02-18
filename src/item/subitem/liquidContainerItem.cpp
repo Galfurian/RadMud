@@ -47,15 +47,12 @@ void LiquidContainerItem::getSheet(Table & sheet) const
     sheet.addDivider();
 }
 
-double LiquidContainerItem::getWeight(bool) const
+double LiquidContainerItem::getWeight(bool entireStack) const
 {
     // Add the default weight of the model.
-    auto totalWeight = this->weight;
-    if (!this->isEmpty())
-    {
-        totalWeight += liquidQuantity;
-    }
-    return totalWeight;
+    auto result = Item::getWeight(entireStack);
+    if (!this->isEmpty()) result += liquidQuantity;
+    return result;
 }
 
 std::string LiquidContainerItem::lookContent()
@@ -143,7 +140,7 @@ bool LiquidContainerItem::pourIn(Liquid * newLiquidContent,
     if (liquidContent == nullptr)
     {
         // Set the liquid and the amount.
-        liquidContent  = newLiquidContent;
+        liquidContent = newLiquidContent;
         liquidQuantity = quantityToPourIn;
     }
     else if (liquidContent->vnum == newLiquidContent->vnum)
@@ -197,7 +194,7 @@ LiquidContainerItem::pourOut(const double & quantityToPourOut, bool updateDB)
                 //  the liquid contained table.
                 SQLiteDbms::instance().deleteFrom("ItemContentLiq", where);
                 // Erase the key of the liquid.
-                liquidContent  = nullptr;
+                liquidContent = nullptr;
                 liquidQuantity = 0.0;
             }
             else

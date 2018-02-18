@@ -55,8 +55,8 @@ unsigned int ArmorItem::getArmorClass() const
     unsigned int acMaterial = 0;
     if (composition != nullptr)
     {
-        acMaterial = static_cast<unsigned int>(acBase *
-                                               composition->getHardnessModifier());
+        acMaterial = static_cast<unsigned int>(
+            acBase * composition->hardness);
     }
     // The resulting armor class.
     return ((acBase + acQuality + acCondition + acMaterial) / 4);

@@ -153,27 +153,7 @@ Item * ItemModel::createItem(
     newItem->maker = maker;
     newItem->composition = composition;
     newItem->quality = itemQuality;
-    {
-        // Evaluate the base value.
-        auto valBase = this->baseWeight;
-        // Evaluate the modifier due to item's quality.
-        auto valQuality = valBase * (1.0 / itemQuality.getModifier());
-        // Evaluate the modifier due to item's material.
-        auto valMaterial = valBase * composition->getLightnessModifier();
-        // Evaluate the result.
-        newItem->weight = ((valBase + valQuality + valMaterial) / 3.0);
-    }
-    {
-        // Evaluate the base value.
-        auto valBase = this->condition;
-        // Evaluate the modifier due to item's quality.
-        auto valQuality = valBase * itemQuality.getModifier();
-        // Evaluate the modifier due to item's material.
-        auto valMaterial = valBase * composition->getHardnessModifier();
-        // Evaluate the result.
-        newItem->maxCondition = ((valBase + valQuality + valMaterial) / 3);
-        newItem->condition = newItem->maxCondition;
-    }
+    newItem->condition = newItem->getMaxCondition();
     // If the item is for a mobile, do not add the item to the MUD nor to the
     //  DB and do not check its correctness.
     if (isForMobile)

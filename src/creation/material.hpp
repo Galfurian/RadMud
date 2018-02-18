@@ -37,11 +37,11 @@ public:
     /// Material's article.
     std::string article;
     /// Material's value on market.
-    unsigned int worth;
+    double worth;
     /// Material's hardness.
-    unsigned int hardness;
+    double hardness;
     /// Material's lightness.
-    unsigned int lightness;
+    double lightness;
 
     /// @brief Constructor.
     Material();
@@ -65,13 +65,4 @@ public:
     /// @return <b>True</b> if the material has correct values,<br>
     ///         <b>False</b> otherwise.
     bool check();
-
-    /// @brief Provides the modifier w.r.t. the material worth value.
-    double getWorthModifier() const;
-
-    /// @brief Provides the modifier w.r.t. the material hardness value.
-    double getHardnessModifier() const;
-
-    /// @brief Provides the modifier w.r.t. the material lightness value.
-    double getLightnessModifier() const;
 };

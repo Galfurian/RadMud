@@ -30,9 +30,7 @@ Item::Item() :
     model(),
     quantity(),
     maker(),
-    weight(),
     condition(),
-    maxCondition(),
     composition(),
     quality(ItemQuality::Normal),
     flags(),
@@ -128,9 +126,7 @@ bool Item::updateOnDB()
     arguments.push_back(ToString(model->vnum));
     arguments.push_back(ToString(this->quantity));
     arguments.push_back(this->maker);
-    arguments.push_back(ToString(this->weight));
     arguments.push_back(ToString(this->condition));
-    arguments.push_back(ToString(this->maxCondition));
     arguments.push_back(ToString(this->composition->vnum));
     arguments.push_back(ToString(this->quality.toUInt()));
     arguments.push_back(ToString(this->flags));
@@ -172,7 +168,7 @@ void Item::getSheet(Table & sheet) const
     sheet.addRow({"quantity", ToString(quantity)});
     sheet.addRow({"maker", maker});
     sheet.addRow({"condition", ToString(condition) + "/" +
-                               ToString(maxCondition)});
+                               ToString(this->getMaxCondition())});
     sheet.addRow({"Material", composition->name});
     sheet.addRow({"Quality", quality.toString()});
     sheet.addRow({"Weight", ToString(this->getWeight(true))});
@@ -299,8 +295,7 @@ bool Item::hasKey(std::string key)
 
 double Item::getDecayRate() const
 {
-    return (SafeLog10(maxCondition) / (composition->hardness * 10)) /
-           quality.getModifier();
+    return ((1 / composition->hardness) / quality.getModifier());
 }
 
 void Item::triggerDecay()
@@ -326,7 +321,7 @@ void Item::triggerDecay()
 
 double Item::getConditionModifier() const
 {
-    auto percent = ((100 * condition) / maxCondition);
+    auto percent = ((100 * condition) / this->getMaxCondition());
     if (percent >= 75) return 1.00;
     if (percent >= 50) return 0.75;
     if (percent >= 25) return 0.50;
@@ -335,7 +330,7 @@ double Item::getConditionModifier() const
 
 std::string Item::getConditionDescription()
 {
-    auto percent = ((100 * condition) / maxCondition);
+    auto percent = ((100 * condition) / this->getMaxCondition());
     if (percent >= 100) return "is in perfect condition";
     if (percent >= 75) return "is scratched";
     if (percent >= 50) return "is ruined";
@@ -346,10 +341,9 @@ std::string Item::getConditionDescription()
 
 unsigned int Item::getPrice(bool entireStack) const
 {
-    auto result = (model->basePrice *
-                   quality.getModifier() *
-                   composition->getWorthModifier() *
-                   this->getConditionModifier());
+    auto result = ((model->basePrice * quality.getModifier()) +
+                   (model->basePrice * composition->worth) +
+                   (model->basePrice * this->getConditionModifier())) / 3;
     // Evaluate for the entire stack.
     if (entireStack) result *= this->quantity;
     // Cast and return the result.
@@ -358,21 +352,26 @@ unsigned int Item::getPrice(bool entireStack) const
 
 double Item::getWeight(bool entireStack) const
 {
-    // Add the default weight of the model.
-    auto totalWeight = this->weight;
-    // If not single, multiply for the quantity.
-    if (entireStack)
-    {
-        totalWeight *= this->quantity;
-    }
+    auto result = ((model->baseWeight * (1 / quality.getModifier())) +
+                   (model->baseWeight * composition->lightness)) / 2;
+    // Evaluate for the entire stack.
+    if (entireStack) result *= this->quantity;
+    // Get also the weight of the content.
     if (!this->isEmpty())
     {
         for (auto iterator : content)
         {
-            totalWeight += iterator->getWeight(true);
+            result += iterator->getWeight(true);
         }
     }
-    return totalWeight;
+    // Cast and return the result.
+    return RoundTo(result, 2);
+}
+
+unsigned int Item::getMaxCondition() const
+{
+    return static_cast<unsigned int>((100 * (1 / quality.getModifier()) +
+                                      100 * composition->hardness) / 2);
 }
 
 std::string Item::getName(bool colored) const

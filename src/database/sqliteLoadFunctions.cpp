@@ -90,9 +90,7 @@ bool LoadItem(ResultSet * result)
     item->model = itemModel;
     item->quantity = result->getNextUnsignedInteger();
     item->maker = result->getNextString();
-    item->weight = result->getNextDouble();
     item->condition = result->getNextDouble();
-    item->maxCondition = result->getNextDouble();
     item->composition = Mud::instance().findMaterial(result->getNextInteger());
     item->quality = ItemQuality(result->getNextUnsignedInteger());
     item->flags = result->getNextUnsignedInteger();
@@ -741,9 +739,9 @@ bool LoadMaterial(ResultSet * result)
     material->type = MaterialType(result->getNextUnsignedInteger());
     material->name = result->getNextString();
     material->article = result->getNextString();
-    material->worth = result->getNextUnsignedInteger();
-    material->hardness = result->getNextUnsignedInteger();
-    material->lightness = result->getNextUnsignedInteger();
+    material->worth = result->getNextDouble();
+    material->hardness = result->getNextDouble();
+    material->lightness = result->getNextDouble();
     // Check the correctness.
     if (!material->check())
     {
