@@ -35,5 +35,6 @@ std::string MaterialType::toString() const
     if (value == MaterialType::Paper) return "Paper";
     if (value == MaterialType::Coal) return "Coal";
     if (value == MaterialType::Bone) return "Bone";
+    if (value == MaterialType::Cereal) return "Cereal";
     return "None";
 }

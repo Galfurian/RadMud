@@ -43,7 +43,8 @@ public:
         Glass,      ///< [8] Glass
         Paper,      ///< [9] Paper
         Coal,       ///< [10] Coal
-        Bone        ///< [11] Coal
+        Bone,       ///< [11] Bone
+        Cereal      ///< [12] Cereal
     };
 
     /// @brief Constructor.

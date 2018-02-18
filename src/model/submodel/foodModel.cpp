@@ -51,7 +51,7 @@ bool FoodModel::setModel(const std::string & source)
     if (source.empty())
     {
         Logger::log(LogLevel::Error, "Function list is empty (%s).",
-                    this->name);
+                    name);
         return false;
     }
     std::vector<std::string> functionList = SplitString(source, " ");
@@ -59,11 +59,11 @@ bool FoodModel::setModel(const std::string & source)
     {
         Logger::log(LogLevel::Error,
                     "Wrong number of parameters for Food Model (%s).",
-                    this->name);
+                    name);
         return false;
     }
-    this->hours = ToNumber<unsigned int>(functionList[0]);
-    this->foodFlags = ToNumber<unsigned int>(functionList[1]);
+    hours = ToNumber<unsigned int>(functionList[0]);
+    foodFlags = ToNumber<unsigned int>(functionList[1]);
     return true;
 }
 
@@ -74,8 +74,8 @@ void FoodModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow({"Hours", ToString(this->hours)});
-    sheet.addRow({"Flags", GetFoodFlagString(this->foodFlags)});
+    sheet.addRow({"Hours", ToString(hours)});
+    sheet.addRow({"Flags", GetFoodFlagString(foodFlags)});
 }
 
 std::string GetFoodFlagString(unsigned int flags)
