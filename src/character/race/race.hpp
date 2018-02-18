@@ -40,7 +40,7 @@ class Race
 {
 public:
     /// The race virtual number.
-    int vnum;
+    unsigned int vnum;
     /// The article for the race.
     std::string article;
     /// The name of the race.

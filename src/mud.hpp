@@ -117,11 +117,9 @@ private:
     /// Contains the time when the mud has been booted.
     time_t _bootTime;
     /// Highest value of vnum for rooms.
-    int _maxVnumRoom;
+    unsigned int _maxVnumRoom;
     /// Highest value of vnum for items.
-    int _maxVnumItem;
-    /// Lowest value of vnum for corpses.
-    int _minVnumCorpses;
+    unsigned int _maxVnumItem;
 
     /// Mud weight measure.
     const std::string _mudMeasure;
@@ -160,29 +158,29 @@ public:
     /// List all the mobile.
     std::vector<Mobile *> mudMobiles;
     /// List of all items.
-    std::map<int, Item *> mudItems;
+    std::map<unsigned int, Item *> mudItems;
     /// List of all the rooms.
-    std::map<int, Room *> mudRooms;
+    std::map<unsigned int, Room *> mudRooms;
     /// List all the items model.
-    std::map<int, std::shared_ptr<ItemModel>> mudItemModels;
+    std::map<unsigned int, std::shared_ptr<ItemModel>> mudItemModels;
     /// List of all the areas.
-    std::map<int, Area *> mudAreas;
+    std::map<unsigned int, Area *> mudAreas;
     /// List of all the races.
-    std::map<int, Race *> mudRaces;
+    std::map<unsigned int, Race *> mudRaces;
     /// List of all the factions.
-    std::map<int, Faction *> mudFactions;
+    std::map<unsigned int, Faction *> mudFactions;
     /// List of all the skills.
     std::vector<std::shared_ptr<Skill>> mudSkills;
     /// List of all the writings.
-    std::map<int, Writing *> mudWritings;
+    std::map<unsigned int, Writing *> mudWritings;
     /// List of all the corpses.
-    std::map<int, Item *> mudCorpses;
+    std::vector<Item *> mudCorpses;
     /// List of all the materials.
-    std::map<int, Material *> mudMaterials;
+    std::map<unsigned int, Material *> mudMaterials;
     /// List of all the professions.
     std::map<unsigned int, Profession *> mudProfessions;
     /// List of all the productions.
-    std::map<int, Production *> mudProductions;
+    std::map<unsigned int, Production *> mudProductions;
     /// List of all the liquids.
     std::map<unsigned int, Liquid *> mudLiquids;
     /// List of all the travelling points.
@@ -196,7 +194,7 @@ public:
     /// List of commands (eg. look, quit, north etc.).
     std::vector<std::shared_ptr<Command> > mudCommands;
     /// Map of buildings schematic.
-    std::map<int, std::shared_ptr<Building>> mudBuildings;
+    std::map<unsigned int, std::shared_ptr<Building>> mudBuildings;
     /// Map of buildings schematic.
     std::map<unsigned int, std::shared_ptr<Terrain>> mudTerrains;
     /// List of all the bodyparts.
@@ -319,10 +317,10 @@ public:
     /// @{
 
     /// Find an item given its vnum.
-    Item * findItem(int vnum);
+    Item * findItem(unsigned int vnum);
 
     /// Find an item model given its vnum.
-    std::shared_ptr<ItemModel> findItemModel(int vnum);
+    std::shared_ptr<ItemModel> findItemModel(unsigned int vnum);
 
     /// Find a mobile given his id.
     Mobile * findMobile(std::string id);
@@ -331,19 +329,19 @@ public:
     Player * findPlayer(const std::string & name);
 
     /// Find an area given its vnum.
-    Area * findArea(int vnum);
+    Area * findArea(unsigned int vnum);
 
     /// Find a room given its vnum.
-    Room * findRoom(int vnum);
+    Room * findRoom(unsigned int vnum);
 
     /// Find a race given its vnum.
-    Race * findRace(int vnum);
+    Race * findRace(unsigned int vnum);
 
     /// Find a race given its name.
     Race * findRace(std::string name);
 
     /// Find a faction given its vnum.
-    Faction * findFaction(int vnum);
+    Faction * findFaction(unsigned int vnum);
 
     /// Find a faction given its name.
     Faction * findFaction(std::string name);
@@ -352,13 +350,13 @@ public:
     std::shared_ptr<Skill> findSkill(const unsigned int & vnum);
 
     /// Find a writing given its vnum.
-    Writing * findWriting(int vnum);
+    Writing * findWriting(unsigned int vnum);
 
     /// Find a corpse given its vnum.
-    Item * findCorpse(int vnum);
+    Item * findCorpse(unsigned int vnum);
 
     /// Find a material given its vnum.
-    Material * findMaterial(int vnum);
+    Material * findMaterial(unsigned int vnum);
 
     /// Find a profession given its vnum.
     Profession * findProfession(unsigned int vnum);
@@ -367,7 +365,7 @@ public:
     Profession * findProfession(std::string command);
 
     /// Find a production given its vnum.
-    Production * findProduction(int vnum);
+    Production * findProduction(unsigned int vnum);
 
     /// Find a production given its name.
     Production * findProduction(std::string name);
@@ -382,7 +380,7 @@ public:
     std::shared_ptr<Building> findBuilding(std::string name);
 
     /// Find a building given the vnum of the model to build.
-    std::shared_ptr<Building> findBuilding(int vnum);
+    std::shared_ptr<Building> findBuilding(unsigned int vnum);
 
     /// Find a terrain given its vnum.
     std::shared_ptr<Terrain> findTerrain(unsigned int vnum);
@@ -420,18 +418,14 @@ public:
 
     /// @brief Returns the current maximum vnum used for rooms.
     /// @return The maximum rooms vnum.
-    int getMaxVnumRoom() const;
+    unsigned int getMaxVnumRoom() const;
 
     /// @brief Returns the current maximum vnum used for items.
     /// @return The maximum items vnum.
-    int getMaxVnumItem() const;
-
-    /// @brief Returns the current minimum vnum used for corpses.
-    /// @return The minimum corpses vnum.
-    int getMinVnumCorpse() const;
+    unsigned int getMaxVnumItem() const;
 
     /// @brief Provides an unique vnum for an area.
-    int getUniqueAreaVnum() const;
+    unsigned int getUniqueAreaVnum() const;
 
     /// @brief Send message to all connected players.
     /// @param level   The level of the player: 0 normal, 1 admin.

@@ -53,7 +53,7 @@ class Room :
 {
 public:
     /// The current room vnum.
-    int vnum;
+    unsigned int vnum;
     /// The area where is located the room.
     Area * area;
     /// The current room coordinates.
@@ -158,7 +158,7 @@ public:
     /// @brief Search for the building in the room.
     /// @param buildingVnum The vnum of the building to search.
     /// @return The building, if it's in the room.
-    Item * findBuilding(int buildingVnum);
+    Item * findBuilding(unsigned int buildingVnum);
 
     /// @brief Search for the buildings of the given type inside the room.
     /// @param type The type of the buildings.

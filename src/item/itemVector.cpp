@@ -59,7 +59,7 @@ bool ItemVector::removeItem(Item * item)
     return false;
 }
 
-Item * ItemVector::findItem(const int & vnum) const
+Item * ItemVector::findItem(const unsigned int & vnum) const
 {
     for (const_iterator it = this->begin(); it != this->end(); ++it)
     {

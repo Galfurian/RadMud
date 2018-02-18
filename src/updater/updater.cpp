@@ -159,7 +159,7 @@ void MudUpdater::advanceTime()
             // [HOUR] Update the Corpses.
             for (auto it : Mud::instance().mudCorpses)
             {
-                it.second->updateHour();
+                it->updateHour();
             }
             // [HOUR] Update the Items.
             for (auto it : Mud::instance().mudItems)

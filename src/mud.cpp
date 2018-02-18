@@ -53,7 +53,6 @@ Mud::Mud() :
     _bootTime(time(NULL)),
     _maxVnumRoom(1),
     _maxVnumItem(1),
-    _minVnumCorpses(),
     _mudMeasure("stones"),
     _mudDatabaseName("radmud.db"),
     _mudSystemDirectory("../system/"),
@@ -119,7 +118,7 @@ Mud::~Mud()
     Logger::log(LogLevel::Global, "Freeing memory occupied by corpses...");
     for (auto iterator : Mud::instance().mudCorpses)
     {
-        delete (iterator.second);
+        delete (iterator);
     }
     Logger::log(LogLevel::Global, "Freeing memory occupied by races...");
     for (auto iterator : Mud::instance().mudRaces)
@@ -214,7 +213,7 @@ bool Mud::addMobile(Mobile * mobile)
 {
     for (auto it : mudMobiles)
     {
-        if(it->id == mobile->id)
+        if (it->id == mobile->id)
         {
             return false;
         }
@@ -284,19 +283,15 @@ bool Mud::remRoom(Room * room)
 
 bool Mud::addCorpse(Item * corpse)
 {
-    if (mudCorpses.insert(std::make_pair(corpse->vnum, corpse)).second)
-    {
-        _minVnumCorpses = std::min(_minVnumCorpses, corpse->vnum);
-        return true;
-    }
-    return false;
+    mudCorpses.emplace_back(corpse);
+    return true;
 }
 
 bool Mud::remCorpse(Item * corpse)
 {
     for (auto it = mudCorpses.begin(); it != mudCorpses.end(); ++it)
     {
-        if (it->second->vnum == corpse->vnum)
+        if ((*it)->vnum == corpse->vnum)
         {
             mudCorpses.erase(it);
             return true;
@@ -329,7 +324,7 @@ bool Mud::addFaction(Faction * faction)
 
 bool Mud::addSkill(std::shared_ptr<Skill> skill)
 {
-    if(this->findSkill(skill->vnum)) return false;
+    if (this->findSkill(skill->vnum)) return false;
     mudSkills.emplace_back(skill);
     return true;
 }
@@ -418,7 +413,7 @@ Mobile * Mud::findMobile(std::string id)
 {
     for (auto it : mudMobiles)
     {
-        if(it->id == id)
+        if (it->id == id)
         {
             return it;
         }
@@ -426,31 +421,31 @@ Mobile * Mud::findMobile(std::string id)
     return nullptr;
 }
 
-std::shared_ptr<ItemModel> Mud::findItemModel(int vnum)
+std::shared_ptr<ItemModel> Mud::findItemModel(unsigned int vnum)
 {
     auto it = mudItemModels.find(vnum);
     return (it == mudItemModels.end()) ? nullptr : it->second;
 }
 
-Item * Mud::findItem(int vnum)
+Item * Mud::findItem(unsigned int vnum)
 {
     auto it = mudItems.find(vnum);
     return (it == mudItems.end()) ? nullptr : it->second;
 }
 
-Area * Mud::findArea(int vnum)
+Area * Mud::findArea(unsigned int vnum)
 {
     auto it = mudAreas.find(vnum);
     return (it == mudAreas.end()) ? nullptr : it->second;
 }
 
-Room * Mud::findRoom(int vnum)
+Room * Mud::findRoom(unsigned int vnum)
 {
     auto it = mudRooms.find(vnum);
     return (it == mudRooms.end()) ? nullptr : it->second;
 }
 
-Race * Mud::findRace(int vnum)
+Race * Mud::findRace(unsigned int vnum)
 {
     auto it = mudRaces.find(vnum);
     return (it == mudRaces.end()) ? nullptr : it->second;
@@ -465,7 +460,7 @@ Race * Mud::findRace(std::string name)
     return nullptr;
 }
 
-Faction * Mud::findFaction(int vnum)
+Faction * Mud::findFaction(unsigned int vnum)
 {
     auto it = mudFactions.find(vnum);
     return (it == mudFactions.end()) ? nullptr : it->second;
@@ -482,26 +477,29 @@ Faction * Mud::findFaction(std::string name)
 
 std::shared_ptr<Skill> Mud::findSkill(const unsigned int & vnum)
 {
-    for(const auto & skill : mudSkills)
+    for (const auto & skill : mudSkills)
     {
-        if(skill->vnum == vnum) return skill;
+        if (skill->vnum == vnum) return skill;
     }
     return nullptr;
 }
 
-Writing * Mud::findWriting(int vnum)
+Writing * Mud::findWriting(unsigned int vnum)
 {
     auto it = mudWritings.find(vnum);
     return (it == mudWritings.end()) ? nullptr : it->second;
 }
 
-Item * Mud::findCorpse(int vnum)
+Item * Mud::findCorpse(unsigned int vnum)
 {
-    auto it = mudCorpses.find(vnum);
-    return (it == mudCorpses.end()) ? nullptr : it->second;
+    for (const auto & corpse : mudCorpses)
+    {
+        if (corpse->vnum == vnum) return corpse;
+    }
+    return nullptr;
 }
 
-Material * Mud::findMaterial(int vnum)
+Material * Mud::findMaterial(unsigned int vnum)
 {
     auto it = mudMaterials.find(vnum);
     return (it == mudMaterials.end()) ? nullptr : it->second;
@@ -522,7 +520,7 @@ Profession * Mud::findProfession(std::string command)
     return nullptr;
 }
 
-Production * Mud::findProduction(int vnum)
+Production * Mud::findProduction(unsigned int vnum)
 {
     auto it = mudProductions.find(vnum);
     return (it == mudProductions.end()) ? nullptr : it->second;
@@ -558,7 +556,7 @@ std::shared_ptr<Building> Mud::findBuilding(std::string name)
     return nullptr;
 }
 
-std::shared_ptr<Building> Mud::findBuilding(int vnum)
+std::shared_ptr<Building> Mud::findBuilding(unsigned int vnum)
 {
     auto it = mudBuildings.find(vnum);
     return (it == mudBuildings.end()) ? nullptr : it->second;
@@ -575,7 +573,6 @@ std::shared_ptr<BodyPart> Mud::findBodyPart(unsigned int vnum)
     auto it = mudBodyParts.find(vnum);
     return (it == mudBodyParts.end()) ? nullptr : it->second;
 }
-
 
 std::shared_ptr<HeightMap> Mud::findHeightMap(const unsigned int & vnum)
 {
@@ -688,27 +685,22 @@ double Mud::getUpTime() const
     return difftime(time(NULL), _bootTime);
 }
 
-int Mud::getMaxVnumRoom() const
+unsigned int Mud::getMaxVnumRoom() const
 {
     return _maxVnumRoom;
 }
 
-int Mud::getMaxVnumItem() const
+unsigned int Mud::getMaxVnumItem() const
 {
     return _maxVnumItem;
 }
 
-int Mud::getMinVnumCorpse() const
+unsigned int Mud::getUniqueAreaVnum() const
 {
-    return _minVnumCorpses;
-}
-
-int Mud::getUniqueAreaVnum() const
-{
-    int vnum;
+    unsigned int vnum;
     do
     {
-        vnum = TRand<int>(0, INT8_MAX);
+        vnum = TRand<unsigned int>(0, INT8_MAX);
     } while (mudAreas.find(vnum) != mudAreas.end());
     return vnum;
 }

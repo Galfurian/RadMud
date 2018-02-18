@@ -54,7 +54,7 @@ class Area
 {
 public:
     /// The virtual number of the area.
-    int vnum;
+    unsigned int vnum;
     /// The name of the area.
     std::string name;
     /// The name of the original builder of this area.
@@ -128,7 +128,7 @@ public:
     /// @brief Find a room  given its vnum.
     /// @param room_vnum The vnum of the room.
     /// @return The desired room.
-    Room * getRoom(int room_vnum);
+    Room * getRoom(unsigned int room_vnum);
 
     /// @brief Find a room in a precise spot.
     /// @param coordinates The coordiantes where search the room.

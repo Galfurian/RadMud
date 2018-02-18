@@ -268,7 +268,7 @@ Item * Room::findBuilding(std::string target, int & number)
     return nullptr;
 }
 
-Item * Room::findBuilding(int buildingVnum)
+Item * Room::findBuilding(unsigned int buildingVnum)
 {
     for (auto iterator : items)
     {

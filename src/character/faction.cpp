@@ -44,7 +44,7 @@ Faction::~Faction()
 
 bool Faction::check()
 {
-    if (vnum <= 0) return false;
+    if (vnum == 0) return false;
     if (name.empty()) return false;
     if (description.empty()) return false;
     if (currency == nullptr) return false;

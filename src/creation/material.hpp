@@ -29,7 +29,7 @@ class Material
 {
 public:
     /// Virtual number.
-    int vnum;
+    unsigned int vnum;
     /// Type of material.
     MaterialType type;
     /// Material's name.

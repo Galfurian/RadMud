@@ -51,7 +51,7 @@ bool ProcessNewRace::process(Character * character, ArgumentHandler & args)
             return false;
         }
         // Retrieve the number of the race.
-        auto raceVnum = ToNumber<int>(args[1].getContent());
+        auto raceVnum = ToNumber<unsigned int>(args[1].getContent());
         // Get the race.
         auto race = Mud::instance().findRace(raceVnum);
         if (race == nullptr)
@@ -81,7 +81,8 @@ bool ProcessNewRace::process(Character * character, ArgumentHandler & args)
         return true;
     }
     // Get the race.
-    auto race = Mud::instance().findRace(ToNumber<int>(args[0].getContent()));
+    auto race = Mud::instance().findRace(
+        ToNumber<unsigned int>(args[0].getContent()));
     if (race == nullptr)
     {
         this->advance(character, "Not a valid race.");
@@ -143,7 +144,8 @@ void ProcessNewRace::advance(Character * character,
         }
     }
     msg += "#\n";
-    msg += "# Choose one of the above race by typing the correspondent number.\n";
+    msg +=
+        "# Choose one of the above race by typing the correspondent number.\n";
     msg += "#\n";
     msg += "# Type [" + Magenta("help [Number]");
     msg += "] to read a brief description of the race.\n";

@@ -35,7 +35,7 @@ bool DoItemCreate(Character * character, ArgumentHandler & args)
     // Get the quantity.
     auto quantity = args[0].getMultiplier();
     // Get the model.
-    auto modeVnum = ToNumber<int>(args[0].getContent());
+    auto modeVnum = ToNumber<unsigned int>(args[0].getContent());
     auto itemModel = Mud::instance().findItemModel(modeVnum);
     if (itemModel == nullptr)
     {
@@ -43,7 +43,7 @@ bool DoItemCreate(Character * character, ArgumentHandler & args)
         return false;
     }
     // Get the material.
-    auto materialVnum = ToNumber<int>(args[1].getContent());
+    auto materialVnum = ToNumber<unsigned int>(args[1].getContent());
     auto material = Mud::instance().findMaterial(materialVnum);
     if (material == nullptr)
     {
@@ -84,10 +84,11 @@ bool DoItemDestroy(Character * character, ArgumentHandler & args)
         character->sendMsg("You must instert an item vnum.\n");
         return false;
     }
-    auto item = Mud::instance().findItem(ToNumber<int>(args[0].getContent()));
+    auto itemVnum = ToNumber<unsigned int>(args[0].getContent());
+    auto item = Mud::instance().findItem(itemVnum);
     if (item == nullptr)
     {
-        character->sendMsg("Invalid vnum.\n");
+        character->sendMsg("Invalid vnum (%s).\n", ToString(itemVnum));
         return false;
     }
     if (!item->isEmpty())
@@ -107,7 +108,7 @@ bool DoItemGet(Character * character, ArgumentHandler & args)
         character->sendMsg("You must instert an item vnum.\n");
         return false;
     }
-    auto itemVnum = ToNumber<int>(args[0].getContent());
+    auto itemVnum = ToNumber<unsigned int>(args[0].getContent());
     auto item = Mud::instance().findItem(itemVnum);
     if (item == nullptr)
     {
@@ -162,16 +163,15 @@ bool DoItemInfo(Character * character, ArgumentHandler & args)
                                " of the item inside the room.\n");
         return false;
     }
-    auto item = Mud::instance().findItem(ToNumber<int>(args[0].getContent()));
+    auto itemVnum = ToNumber<unsigned int>(args[0].getContent());
+    auto item = Mud::instance().findItem(itemVnum);
     if (item == nullptr)
     {
         item = character->findNearbyItem(args[0].getContent(),
                                          args[0].getIndex());
         if (item == nullptr)
         {
-
-            character->sendMsg("Cannot find the target"
-                                   " item (provide vnum or item name).\n");
+            character->sendMsg("Cannot find the target item.\n");
             return false;
         }
     }
@@ -189,7 +189,7 @@ bool DoItemList(Character * character, ArgumentHandler & args)
     // Variables used to filter the listed items.
     std::string itemName;
     std::string typeName;
-    int modelVnum = -1;
+    unsigned int modelVnum = 0;
     for (size_t argIt = 0; argIt < args.size(); ++argIt)
     {
         if (args[argIt].getContent() == "--help")
@@ -217,7 +217,8 @@ bool DoItemList(Character * character, ArgumentHandler & args)
             }
             if (args[argIt].getContent() == "-m")
             {
-                modelVnum = ToNumber<int>(args[argIt + 1].getContent());
+                modelVnum =
+                    ToNumber<unsigned int>(args[argIt + 1].getContent());
             }
         }
     }
@@ -244,31 +245,31 @@ bool DoItemList(Character * character, ArgumentHandler & args)
                 continue;
             }
         }
-        if (modelVnum != -1)
+        if (modelVnum != 0)
         {
             if (item->model->vnum != modelVnum) continue;
         }
         // Prepare the row.
         TableRow row;
-        row.push_back(ToString(item->vnum));
-        row.push_back(item->getNameCapital());
-        row.push_back(item->getTypeName());
-        row.push_back(ToString(item->model->vnum));
+        row.emplace_back(ToString(item->vnum));
+        row.emplace_back(item->getNameCapital());
+        row.emplace_back(item->getTypeName());
+        row.emplace_back(ToString(item->model->vnum));
         if (item->owner != nullptr)
         {
-            row.push_back(" Owner  : " + item->owner->getName());
+            row.emplace_back(" Owner  : " + item->owner->getName());
         }
         else if (item->room != nullptr)
         {
-            row.push_back(" Room   : " + ToString(item->room->vnum));
+            row.emplace_back(" Room   : " + ToString(item->room->vnum));
         }
         else if (item->container != nullptr)
         {
-            row.push_back(" Inside : " + ToString(item->container->vnum));
+            row.emplace_back(" Inside : " + ToString(item->container->vnum));
         }
         else
         {
-            row.push_back(" Is nowhere.");
+            row.emplace_back(" Is nowhere.");
         }
         // Add the row to the table.
         table.addRow(row);
@@ -284,7 +285,7 @@ bool DoModelInfo(Character * character, ArgumentHandler & args)
         character->sendMsg("You must insert a model vnum.\n");
         return false;
     }
-    auto modelVnum = ToNumber<int>(args[0].getContent());
+    auto modelVnum = ToNumber<unsigned int>(args[0].getContent());
     auto itemModel = Mud::instance().findItemModel(modelVnum);
     if (itemModel == nullptr)
     {
@@ -305,7 +306,7 @@ bool DoModelList(Character * character, ArgumentHandler & args)
     // Variables used to filter the listed items.
     std::string modelName;
     std::string modelType;
-    int modelVnum = -1;
+    unsigned int modelVnum = 0;
     for (size_t argIt = 0; argIt < args.size(); ++argIt)
     {
         if (args[argIt].getContent() == "--help")
@@ -332,7 +333,7 @@ bool DoModelList(Character * character, ArgumentHandler & args)
             }
             if (args[argIt].getContent() == "-m")
             {
-                modelVnum = ToNumber<int>(args[argIt + 1].getContent());
+                modelVnum = ToNumber<unsigned int>(args[argIt + 1].getContent());
             }
         }
     }
@@ -359,16 +360,16 @@ bool DoModelList(Character * character, ArgumentHandler & args)
                 continue;
             }
         }
-        if (modelVnum != -1)
+        if (modelVnum != 0)
         {
             if (itemModel->vnum != modelVnum) continue;
         }
         // Prepare the row.
         TableRow row;
-        row.push_back(ToString(itemModel->vnum));
-        row.push_back(itemModel->name);
-        row.push_back(itemModel->getTypeName());
-        row.push_back(ToString(itemModel->modelFlags));
+        row.emplace_back(ToString(itemModel->vnum));
+        row.emplace_back(itemModel->name);
+        row.emplace_back(itemModel->getTypeName());
+        row.emplace_back(ToString(itemModel->modelFlags));
         // Add the row to the table.
         table.addRow(row);
     }
@@ -387,9 +388,9 @@ bool DoWritingList(Character * character, ArgumentHandler & /*args*/)
         Writing * writing = iterator.second;
         // Prepare the row.
         TableRow row;
-        row.push_back(ToString(writing->vnum));
-        row.push_back(writing->author);
-        row.push_back(writing->title);
+        row.emplace_back(ToString(writing->vnum));
+        row.emplace_back(writing->author);
+        row.emplace_back(writing->title);
         // Add the row to the table.
         table.addRow(row);
     }

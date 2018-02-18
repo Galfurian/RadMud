@@ -36,7 +36,7 @@ class Faction
 {
 public:
     /// The faction identification number.
-    int vnum;
+    unsigned int vnum;
     /// The name of the faction.
     std::string name;
     /// The description of the faction.

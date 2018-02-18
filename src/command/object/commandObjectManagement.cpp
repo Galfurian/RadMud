@@ -117,7 +117,8 @@ bool DoTake(Character * character, ArgumentHandler & args)
             {
                 for (auto it : room->items)
                 {
-                    if (it->vnum == ToNumber<int>(args[0].getContent()))
+                    if (it->vnum
+                        == ToNumber<unsigned int>(args[0].getContent()))
                     {
                         item = it;
                     }

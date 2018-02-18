@@ -30,7 +30,7 @@ bool DoMaterialInfo(Character * character, ArgumentHandler & args)
         character->sendMsg("You must insert a valide material vnum.\n");
         return false;
     }
-    auto materialVnum = ToNumber<int>(args[0].getContent());
+    auto materialVnum = ToNumber<unsigned int>(args[0].getContent());
     auto material = Mud::instance().findMaterial(materialVnum);
     if (material == nullptr)
     {
@@ -82,7 +82,7 @@ bool DoBuildingInfo(Character * character, ArgumentHandler & args)
         character->sendMsg("You must provide a building vnum.\n");
         return false;
     }
-    auto buildingVnum = ToNumber<int>(args[0].getContent());
+    auto buildingVnum = ToNumber<unsigned int>(args[0].getContent());
     auto building = Mud::instance().findBuilding(buildingVnum);
     if (building == nullptr)
     {
@@ -187,7 +187,7 @@ bool DoProductionInfo(Character * character, ArgumentHandler & args)
         character->sendMsg("You must provide a production vnum.\n");
         return false;
     }
-    auto productionVnum = ToNumber<int>(args[0].getContent());
+    auto productionVnum = ToNumber<unsigned int>(args[0].getContent());
     auto production = Mud::instance().findProduction(productionVnum);
     if (production == nullptr)
     {

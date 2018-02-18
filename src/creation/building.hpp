@@ -41,7 +41,7 @@ class Building
 {
 public:
     /// The virtual number of the building.
-    int vnum;
+    unsigned int vnum;
     /// The name of the building.
     std::string name;
     /// The difficulty of the building.

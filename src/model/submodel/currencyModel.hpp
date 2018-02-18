@@ -36,26 +36,45 @@ private:
     {
     public:
         /// Material vnum.
-        int material;
+        unsigned int material;
         /// The associated price.
         unsigned int price;
 
         /// @brief Constructor.
-        Price();
+        Price() :
+            material(),
+            price()
+        {
+            // Nothing to do.
+        }
 
         /// @brief Constructor.
         /// @param _material The material.
         /// @param _price    The price associated to the material.
-        Price(const int & _material, const unsigned int & _price);
+        Price(const unsigned int & _material, const unsigned int & _price) :
+            material(_material),
+            price(_price)
+        {
+            // Nothing to do.
+        }
 
         /// @brief Operator used to order the prices.
-        bool operator>(const Price & rhs) const;
+        inline bool operator>(const Price & rhs) const
+        {
+            return price > rhs.price;
+        }
 
         /// @brief Operator used to order the prices.
-        bool operator==(const Price & rhs) const;
+        inline bool operator==(const Price & rhs) const
+        {
+            return price == rhs.price;
+        }
 
         /// @brief Operator used to order the prices.
-        bool operator==(const int & _rhs) const;
+        inline bool operator==(const unsigned int & _rhs) const
+        {
+            return material == _rhs;
+        }
     };
 
 public:
@@ -86,7 +105,8 @@ public:
     /// @param price        The price associated to the material.
     /// @return <b>True</b> if the price has been added,<br>
     ///         <b>False</b> otherwise.
-    bool addPrice(const int & materialVnum, const unsigned int & price);
+    bool addPrice(const unsigned int & materialVnum,
+                  const unsigned int & price);
 
     /// @brief Given a specific material, this function returns the
     ///         associated price.
@@ -94,7 +114,8 @@ public:
     /// @param price        Variable where the found price is saved.
     /// @return <b>True</b> if the price has been found,<br>
     ///         <b>False</b> otherwise.
-    bool findPrice(const int & materialVnum, unsigned int & price) const;
+    bool findPrice(const unsigned int & materialVnum,
+                   unsigned int & price) const;
 
     /// @brief Generates an amount of currency with a worth equal to
     ///         the variable value.

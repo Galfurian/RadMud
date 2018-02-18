@@ -90,7 +90,6 @@ bool Player::check() const
     safe &= CorrectAssert(!password.empty());
     safe &= CorrectAssert(age > 0);
     safe &= CorrectAssert(experience >= 0);
-    safe &= CorrectAssert(rent_room >= 0);
     safe &= CorrectAssert(password_attempts >= 0);
     safe &= CorrectAssert(!closing);
     safe &= CorrectAssert(!logged_in);

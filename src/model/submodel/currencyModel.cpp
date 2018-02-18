@@ -25,36 +25,6 @@
 #include "logger.hpp"
 #include "mud.hpp"
 
-CurrencyModel::Price::Price() :
-    material(),
-    price()
-{
-    // Nothing to do.
-}
-
-CurrencyModel::Price::Price(const int & _material,
-                            const unsigned int & _price) :
-    material(_material),
-    price(_price)
-{
-    // Nothing to do.
-}
-
-bool CurrencyModel::Price::operator>(const Price & rhs) const
-{
-    return price > rhs.price;
-}
-
-bool CurrencyModel::Price::operator==(const Price & rhs) const
-{
-    return price == rhs.price;
-}
-
-bool CurrencyModel::Price::operator==(const int & _rhs) const
-{
-    return material == _rhs;
-}
-
 CurrencyModel::CurrencyModel()
 {
 // Nothing to do.
@@ -121,7 +91,8 @@ Item * CurrencyModel::createItem(
 }
 
 bool
-CurrencyModel::addPrice(const int & materialVnum, const unsigned int & price)
+CurrencyModel::addPrice(const unsigned int & materialVnum,
+                        const unsigned int & price)
 {
     auto it = std::find(prices.begin(), prices.end(), materialVnum);
     if (it == prices.end())
@@ -133,8 +104,8 @@ CurrencyModel::addPrice(const int & materialVnum, const unsigned int & price)
     return false;
 }
 
-bool
-CurrencyModel::findPrice(const int & materialVnum, unsigned int & price) const
+bool CurrencyModel::findPrice(const unsigned int & materialVnum,
+                              unsigned int & price) const
 {
     auto it = std::find(prices.begin(), prices.end(), materialVnum);
     if (it != prices.end())

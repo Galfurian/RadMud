@@ -29,7 +29,7 @@ class Writing
 {
 public:
     /// The virtual number of the writing.
-    int vnum;
+    unsigned int vnum;
     /// The title of the writing.
     std::string title;
     /// The author of the writing.

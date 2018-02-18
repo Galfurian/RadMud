@@ -26,7 +26,7 @@
 #include "character.hpp"
 
 Production::Production() :
-    vnum(-1),
+    vnum(),
     name(),
     profession(),
     difficulty(),
@@ -52,7 +52,7 @@ Production::~Production()
 
 bool Production::check()
 {
-    if (vnum <= 0) return false;
+    if (vnum == 0) return false;
     if (name.empty()) return false;
     if (profession == nullptr) return false;
     if (difficulty <= 0) return false;
@@ -60,11 +60,11 @@ bool Production::check()
     if (outcome == nullptr) return false;
     if (quantity <= 0) return false;
     if (tools.empty()) return false;
-    for (auto it : tools)
+    for (auto const & it : tools)
     {
         if (it == ToolType::None) return false;
     }
-    for (auto it : ingredients)
+    for (auto const & it : ingredients)
     {
         if (it.first == ResourceType::None) return false;
         if (it.second <= 0) return false;

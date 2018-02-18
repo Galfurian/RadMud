@@ -114,7 +114,7 @@ bool DoWield(Character * character, ArgumentHandler & args)
         {
             for (auto it : character->inventory)
             {
-                if (it->vnum == ToNumber<int>(args[0].getContent()))
+                if (it->vnum == ToNumber<unsigned int>(args[0].getContent()))
                 {
                     item = it;
                 }
@@ -248,7 +248,7 @@ bool DoWear(Character * character, ArgumentHandler & args)
         {
             for (auto it : character->inventory)
             {
-                if (it->vnum == ToNumber<int>(args[0].getContent()))
+                if (it->vnum == ToNumber<unsigned int>(args[0].getContent()))
                 {
                     item = it;
                     break;

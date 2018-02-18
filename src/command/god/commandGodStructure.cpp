@@ -32,7 +32,7 @@ bool DoFindPath(Character * character, ArgumentHandler & args)
         character->sendMsg("You have to provide a room vnum.\n\n");
         return false;
     }
-    auto roomVnum = ToNumber<int>(args[0].getContent());
+    auto roomVnum = ToNumber<unsigned int>(args[0].getContent());
     auto room = character->room->area->getRoom(roomVnum);
     if (room == nullptr)
     {
@@ -296,10 +296,12 @@ bool DoRoomInfo(Character * character, ArgumentHandler & args)
     }
     else if (args.size() == 1)
     {
-        room = Mud::instance().findRoom(ToNumber<int>(args[0].getContent()));
+        auto roomVnum = ToNumber<unsigned int>(args[0].getContent());
+        room = Mud::instance().findRoom(roomVnum);
         if (room == nullptr)
         {
-            character->sendMsg("Can't find the desired room.\n");
+            character->sendMsg("Can't find the desired room (%s).\n",
+                               roomVnum);
             return false;
         }
     }
@@ -329,7 +331,7 @@ bool DoRoomList(Character * character, ArgumentHandler & args)
     Area * area = nullptr;
     if (args.size() == 1)
     {
-        auto areaVnum = ToNumber<int>(args[0].getOriginal());
+        auto areaVnum = ToNumber<unsigned int>(args[0].getOriginal());
         area = Mud::instance().findArea(areaVnum);
     }
     if (area == nullptr)
@@ -353,20 +355,20 @@ bool DoRoomList(Character * character, ArgumentHandler & args)
         if (room->area->vnum != area->vnum) continue;
         // Prepare the row.
         TableRow row;
-        row.push_back(ToString(room->vnum));
+        row.emplace_back(ToString(room->vnum));
         if (room->area != nullptr)
         {
-            row.push_back(room->area->name);
+            row.emplace_back(room->area->name);
         }
         else
         {
-            row.push_back("None");
+            row.emplace_back("None");
         }
-        row.push_back(
+        row.emplace_back(
             ToString(room->coord.x) + ' ' + ToString(room->coord.y) + ' '
             + ToString(room->coord.z));
-        row.push_back(room->terrain->name);
-        row.push_back(room->name);
+        row.emplace_back(room->terrain->name);
+        row.emplace_back(room->name);
         // Add the row to the table.
         table.addRow(row);
     }
@@ -381,7 +383,8 @@ bool DoAreaInfo(Character * character, ArgumentHandler & args)
         character->sendMsg("You must instert an area vnum.\n");
         return false;
     }
-    auto area = Mud::instance().findArea(ToNumber<int>(args[0].getContent()));
+    auto areaVnum = ToNumber<unsigned int>(args[0].getContent());
+    auto area = Mud::instance().findArea(areaVnum);
     if (area == nullptr)
     {
         character->sendMsg("The selected area does not exist.");
@@ -412,10 +415,10 @@ bool DoAreaList(Character * character, ArgumentHandler & /*args*/)
         Area * area = iterator.second;
         // Prepare the row.
         TableRow row;
-        row.push_back(ToString(area->vnum));
-        row.push_back(area->name);
-        row.push_back(area->builder);
-        row.push_back(ToString(area->map.size()));
+        row.emplace_back(ToString(area->vnum));
+        row.emplace_back(area->name);
+        row.emplace_back(area->builder);
+        row.emplace_back(ToString(area->map.size()));
         // Add the row to the table.
         table.addRow(row);
     }

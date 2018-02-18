@@ -146,7 +146,7 @@ bool Area::remRoom(Room * room)
     return map.erase(room->coord.x, room->coord.y, room->coord.z);
 }
 
-Room * Area::getRoom(int room_vnum)
+Room * Area::getRoom(unsigned int room_vnum)
 {
     for (auto it : map)
     {

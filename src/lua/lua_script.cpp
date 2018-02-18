@@ -51,8 +51,8 @@ void LuaStopScript()
 }
 
 Item * LuaLoadItem(Character * character,
-                   int vnumModel,
-                   int vnumMaterial,
+                   unsigned int vnumModel,
+                   unsigned int vnumMaterial,
                    unsigned int qualityValue)
 {
     auto model = Mud::instance().findItemModel(vnumModel);

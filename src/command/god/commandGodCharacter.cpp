@@ -91,7 +91,7 @@ bool DoTransfer(Character * character, ArgumentHandler & args)
     auto destination = character->room;
     if (args.size() == 2)
     {
-        auto roomVnum = ToNumber<int>(args[1].getContent());
+        auto roomVnum = ToNumber<unsigned int>(args[1].getContent());
         destination = character->room->area->getRoom(roomVnum);
         if (destination == nullptr)
         {

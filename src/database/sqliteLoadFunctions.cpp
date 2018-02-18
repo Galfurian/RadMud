@@ -61,12 +61,12 @@ bool LoadNews(ResultSet * result)
 
 bool LoadContent(ResultSet * result)
 {
-    auto container = Mud::instance().findItem(result->getNextInteger());
+    auto container = Mud::instance().findItem(result->getNextUnsignedInteger());
     if (container == nullptr)
     {
         throw SQLiteException("Can't find container item.");
     }
-    auto contained = Mud::instance().findItem(result->getNextInteger());
+    auto contained = Mud::instance().findItem(result->getNextUnsignedInteger());
     if (contained == nullptr)
     {
         throw SQLiteException("Can't find contained item.");
@@ -77,8 +77,9 @@ bool LoadContent(ResultSet * result)
 
 bool LoadItem(ResultSet * result)
 {
-    auto itemVnum = result->getNextInteger();
-    auto itemModel = Mud::instance().findItemModel(result->getNextInteger());
+    auto itemVnum = result->getNextUnsignedInteger();
+    auto itemModel = Mud::instance().findItemModel(
+        result->getNextUnsignedInteger());
     if (itemModel == nullptr)
     {
         throw SQLiteException(
@@ -91,7 +92,8 @@ bool LoadItem(ResultSet * result)
     item->quantity = result->getNextUnsignedInteger();
     item->maker = result->getNextString();
     item->condition = result->getNextDouble();
-    item->composition = Mud::instance().findMaterial(result->getNextInteger());
+    item->composition = Mud::instance().findMaterial(
+        result->getNextUnsignedInteger());
     item->quality = ItemQuality(result->getNextUnsignedInteger());
     item->flags = result->getNextUnsignedInteger();
     // Check correctness of attributes.
@@ -266,10 +268,10 @@ bool LoadFaction(ResultSet * result)
 {
     // Create an empty Faction.
     auto faction = new Faction();
-    faction->vnum = result->getNextInteger();
+    faction->vnum = result->getNextUnsignedInteger();
     faction->name = result->getNextString();
     faction->description = result->getNextString();
-    auto currencyVnum = result->getNextInteger();
+    auto currencyVnum = result->getNextUnsignedInteger();
     auto currencyModel = Mud::instance().findItemModel(currencyVnum);
     if (currencyModel == nullptr)
     {
@@ -299,7 +301,7 @@ bool LoadFaction(ResultSet * result)
 bool LoadModel(ResultSet * result)
 {
     // Retrieve the vnum and the type of model.
-    auto vnum = result->getNextInteger();
+    auto vnum = result->getNextUnsignedInteger();
     // Create a pointer to the new item model.
     auto itemModel = ModelFactory::newModel(
         ModelType(result->getNextUnsignedInteger()));
@@ -344,11 +346,11 @@ bool LoadRace(ResultSet * result)
 {
     // Create an empty Race.
     auto race = new Race();
-    race->vnum = result->getNextInteger();
+    race->vnum = result->getNextUnsignedInteger();
     race->article = result->getNextString();
     race->name = result->getNextString();
     race->description = result->getNextString();
-    race->player_allow = result->getNextInteger();
+    race->player_allow = (result->getNextInteger() == 1);
     race->tileSet = result->getNextInteger();
     race->tileId = result->getNextInteger();
     // Translate new_line.
@@ -367,7 +369,7 @@ bool LoadRace(ResultSet * result)
 
 bool LoadRaceBodyPart(ResultSet * result)
 {
-    auto raceVnum = result->getNextInteger();
+    auto raceVnum = result->getNextUnsignedInteger();
     auto race = Mud::instance().findRace(raceVnum);
     if (race == nullptr)
     {
@@ -392,7 +394,7 @@ bool LoadRaceBodyPart(ResultSet * result)
 
 bool LoadRaceCorpse(ResultSet * result)
 {
-    auto raceVnum = result->getNextInteger();
+    auto raceVnum = result->getNextUnsignedInteger();
     auto race = Mud::instance().findRace(raceVnum);
     if (race == nullptr)
     {
@@ -416,7 +418,7 @@ bool LoadRaceCorpse(ResultSet * result)
     corpse->description = result->getNextString();
     // Retrieve and set the values.
     corpse->corpseRace = race;
-    auto corpseCompositionVnum = result->getNextInteger();
+    auto corpseCompositionVnum = result->getNextUnsignedInteger();
     auto corpseComposition = Mud::instance().findMaterial(
         corpseCompositionVnum);
     if (corpseComposition == nullptr)
@@ -432,7 +434,7 @@ bool LoadRaceCorpse(ResultSet * result)
 
 bool LoadRaceBaseSkill(ResultSet * result)
 {
-    auto raceVnum = result->getNextInteger();
+    auto raceVnum = result->getNextUnsignedInteger();
     auto race = Mud::instance().findRace(raceVnum);
     if (race == nullptr)
     {
@@ -461,7 +463,7 @@ bool LoadRaceBaseSkill(ResultSet * result)
 
 bool LoadRaceBaseAbility(ResultSet * result)
 {
-    auto raceVnum = result->getNextInteger();
+    auto raceVnum = result->getNextUnsignedInteger();
     auto race = Mud::instance().findRace(raceVnum);
     if (race == nullptr)
     {
@@ -494,16 +496,16 @@ bool LoadMobile(ResultSet * result)
     // Initialize the mobile.
     mobile->id = result->getNextString();
     mobile->respawnRoom = Mud::instance().findRoom(
-        result->getNextInteger());
+        result->getNextUnsignedInteger());
     mobile->room = mobile->respawnRoom;
     mobile->name = result->getNextString();
     mobile->keys = GetWords(result->getNextString());
     mobile->shortdesc = result->getNextString();
     mobile->staticdesc = result->getNextString();
     mobile->description = result->getNextString();
-    mobile->race = Mud::instance().findRace(result->getNextInteger());
+    mobile->race = Mud::instance().findRace(result->getNextUnsignedInteger());
     mobile->faction = Mud::instance().findFaction(
-        result->getNextInteger());
+        result->getNextUnsignedInteger());
     mobile->gender = static_cast<GenderType>(result->getNextInteger());
     mobile->weight = result->getNextDouble();
     mobile->actions = GetWords(result->getNextString());
@@ -540,7 +542,7 @@ bool LoadRoom(ResultSet * result)
     // Create an empty Room.
     auto room = new Room();
     // Initialize the Room.
-    room->vnum = result->getNextInteger();
+    room->vnum = result->getNextUnsignedInteger();
     room->coord.x = result->getNextInteger();
     room->coord.y = result->getNextInteger();
     room->coord.z = result->getNextInteger();
@@ -567,7 +569,7 @@ bool LoadRoom(ResultSet * result)
 
 bool LoadRoomLiquid(ResultSet * result)
 {
-    auto roomVnum = result->getNextInteger();
+    auto roomVnum = result->getNextUnsignedInteger();
     auto room = Mud::instance().findRoom(roomVnum);
     if (room == nullptr)
     {
@@ -594,8 +596,8 @@ bool LoadExit(ResultSet * result)
     // Create an empty exit.
     auto newExit = std::make_shared<Exit>();
     // Retrieve the values.
-    auto sourceVnum = result->getNextInteger();
-    auto destinationVnum = result->getNextInteger();
+    auto sourceVnum = result->getNextUnsignedInteger();
+    auto destinationVnum = result->getNextUnsignedInteger();
     auto directionValue = result->getNextUnsignedInteger();
     auto flagValue = result->getNextUnsignedInteger();
     // Check the correctness.
@@ -630,8 +632,8 @@ bool LoadExit(ResultSet * result)
 
 bool LoadItemRoom(ResultSet * result)
 {
-    auto room = Mud::instance().findRoom(result->getNextInteger());
-    auto item = Mud::instance().findItem(result->getNextInteger());
+    auto room = Mud::instance().findRoom(result->getNextUnsignedInteger());
+    auto item = Mud::instance().findItem(result->getNextUnsignedInteger());
     // Check the correctness.
     if (room == nullptr)
     {
@@ -658,7 +660,7 @@ bool LoadArea(ResultSet * result)
     // Create an empty area.
     auto area = new Area();
     // Initialize the area.
-    area->vnum = result->getNextInteger();
+    area->vnum = result->getNextUnsignedInteger();
     area->name = result->getNextString();
     area->builder = result->getNextString();
     area->width = result->getNextInteger();
@@ -683,8 +685,8 @@ bool LoadArea(ResultSet * result)
 
 bool LoadAreaList(ResultSet * result)
 {
-    int areaVnum = result->getNextInteger();
-    int roomVnum = result->getNextInteger();
+    auto areaVnum = result->getNextUnsignedInteger();
+    auto roomVnum = result->getNextUnsignedInteger();
     auto area = Mud::instance().findArea(areaVnum);
     auto room = Mud::instance().findRoom(roomVnum);
     // Check the correctness.
@@ -712,7 +714,7 @@ bool LoadWriting(ResultSet * result)
     // Create an empty Writing.
     auto writing = new Writing();
     // Initialize the Writing.
-    writing->vnum = result->getNextInteger();
+    writing->vnum = result->getNextUnsignedInteger();
     writing->title = result->getNextString();
     writing->author = result->getNextString();
     writing->content = result->getNextString();
@@ -735,7 +737,7 @@ bool LoadMaterial(ResultSet * result)
     // Create an empty Material.
     auto material = new Material();
     // Intialize the material.
-    material->vnum = result->getNextInteger();
+    material->vnum = result->getNextUnsignedInteger();
     material->type = MaterialType(result->getNextUnsignedInteger());
     material->name = result->getNextString();
     material->article = result->getNextString();
@@ -786,7 +788,7 @@ bool LoadProduction(ResultSet * result)
     // Create an empty Production.
     auto production = new Production();
     // Initialize the Production.
-    production->vnum = result->getNextInteger();
+    production->vnum = result->getNextUnsignedInteger();
     production->name = result->getNextString();
     auto professionVnum = result->getNextUnsignedInteger();
     auto profession = Mud::instance().findProfession(professionVnum);
@@ -816,7 +818,7 @@ bool LoadProduction(ResultSet * result)
 
 bool LoadProductionTool(ResultSet * result)
 {
-    auto productionVnum = result->getNextInteger();
+    auto productionVnum = result->getNextUnsignedInteger();
     auto production = Mud::instance().findProduction(productionVnum);
     if (production == nullptr)
     {
@@ -842,14 +844,14 @@ bool LoadProductionTool(ResultSet * result)
 
 bool LoadProductionOutcome(ResultSet * result)
 {
-    auto productionVnum = result->getNextInteger();
+    auto productionVnum = result->getNextUnsignedInteger();
     auto production = Mud::instance().findProduction(productionVnum);
     if (production == nullptr)
     {
         throw SQLiteException(
             "Can't find the production " + ToString(productionVnum));
     }
-    auto outcomeVnum = result->getNextInteger();
+    auto outcomeVnum = result->getNextUnsignedInteger();
     auto outcome = Mud::instance().findItemModel(outcomeVnum);
     if (outcome == nullptr)
     {
@@ -870,7 +872,7 @@ bool LoadProductionOutcome(ResultSet * result)
 
 bool LoadProductionIngredient(ResultSet * result)
 {
-    auto productionVnum = result->getNextInteger();
+    auto productionVnum = result->getNextUnsignedInteger();
     auto production = Mud::instance().findProduction(productionVnum);
     if (production == nullptr)
     {
@@ -905,7 +907,7 @@ bool LoadProductionIngredient(ResultSet * result)
 
 bool LoadProductionKnowledge(ResultSet * result)
 {
-    auto productionVnum = result->getNextInteger();
+    auto productionVnum = result->getNextUnsignedInteger();
     auto production = Mud::instance().findProduction(productionVnum);
     if (production == nullptr)
     {
@@ -955,7 +957,7 @@ bool LoadLiquid(ResultSet * result)
 
 bool LoadContentLiq(ResultSet * result)
 {
-    auto containerVnum = result->getNextInteger();
+    auto containerVnum = result->getNextUnsignedInteger();
     auto container = Mud::instance().findItem(containerVnum);
     if (container == nullptr)
     {
@@ -975,8 +977,7 @@ bool LoadContentLiq(ResultSet * result)
     }
     auto quantity = result->getNextDouble();
     // Cast the item to liquid container.
-    auto
-        liquidContainer = static_cast<LiquidContainerItem *>(container);
+    auto liquidContainer = dynamic_cast<LiquidContainerItem *>(container);
     // Pour in the liquid.
     liquidContainer->pourIn(liquid, quantity, false);
     return true;
@@ -985,23 +986,23 @@ bool LoadContentLiq(ResultSet * result)
 bool LoadTravelPoint(ResultSet * result)
 {
     auto sourceArea = Mud::instance().findArea(
-        result->getNextInteger());
+        result->getNextUnsignedInteger());
     if (sourceArea == nullptr)
     {
         throw SQLiteException("Can't find the source area.");
     }
-    auto sourceRoom = sourceArea->getRoom(result->getNextInteger());
+    auto sourceRoom = sourceArea->getRoom(result->getNextUnsignedInteger());
     if (sourceRoom == nullptr)
     {
         throw SQLiteException("Can't find the source room.");
     }
     auto targetArea = Mud::instance().findArea(
-        result->getNextInteger());
+        result->getNextUnsignedInteger());
     if (targetArea == nullptr)
     {
         throw SQLiteException("Can't find the target area.");
     }
-    auto targetRoom = targetArea->getRoom(result->getNextInteger());
+    auto targetRoom = targetArea->getRoom(result->getNextUnsignedInteger());
     if (targetRoom == nullptr)
     {
         throw SQLiteException("Can't find the target room.");
@@ -1024,12 +1025,12 @@ bool LoadBuilding(ResultSet * result)
     // Create an empty Building.
     auto building = std::make_shared<Building>();
     // Initialize the Production.
-    building->vnum = result->getNextInteger();
+    building->vnum = result->getNextUnsignedInteger();
     building->name = result->getNextString();
     building->difficulty = result->getNextUnsignedInteger();
     building->time = result->getNextUnsignedInteger();
     building->assisted = static_cast<bool>(result->getNextInteger());
-    auto modelVnum = result->getNextInteger();
+    auto modelVnum = result->getNextUnsignedInteger();
     building->buildingModel = Mud::instance().findItemModel(modelVnum);
     if (building->buildingModel == nullptr)
     {
@@ -1049,7 +1050,7 @@ bool LoadBuilding(ResultSet * result)
 
 bool LoadBuildingTool(ResultSet * result)
 {
-    auto buildingVnum = result->getNextInteger();
+    auto buildingVnum = result->getNextUnsignedInteger();
     auto building = Mud::instance().findBuilding(buildingVnum);
     if (building == nullptr)
     {
@@ -1073,7 +1074,7 @@ bool LoadBuildingTool(ResultSet * result)
 
 bool LoadBuildingIngredient(ResultSet * result)
 {
-    auto buildingVnum = result->getNextInteger();
+    auto buildingVnum = result->getNextUnsignedInteger();
     auto building = Mud::instance().findBuilding(buildingVnum);
     if (building == nullptr)
     {
@@ -1101,7 +1102,7 @@ bool LoadBuildingIngredient(ResultSet * result)
 
 bool LoadBuildingKnowledge(ResultSet * result)
 {
-    auto buildingVnum = result->getNextInteger();
+    auto buildingVnum = result->getNextUnsignedInteger();
     auto building = Mud::instance().findBuilding(buildingVnum);
     if (building == nullptr)
     {
@@ -1127,7 +1128,7 @@ bool LoadBuildingKnowledge(ResultSet * result)
 bool LoadShop(ResultSet * result)
 {
     // Retrieve the item vnum.
-    auto vnum = result->getNextInteger();
+    auto vnum = result->getNextUnsignedInteger();
     auto item = Mud::instance().findItem(vnum);
     if (item == nullptr)
     {
@@ -1157,8 +1158,8 @@ bool LoadShop(ResultSet * result)
 bool LoadCurrency(ResultSet * result)
 {
     // Retrieve the item vnum.
-    auto modelVnum = result->getNextInteger();
-    auto materialVnum = result->getNextInteger();
+    auto modelVnum = result->getNextUnsignedInteger();
+    auto materialVnum = result->getNextUnsignedInteger();
     auto worth = result->getNextUnsignedInteger();
     auto model = Mud::instance().findItemModel(modelVnum);
     if (model == nullptr)
@@ -1223,7 +1224,7 @@ bool LoadTerrainLiquid(ResultSet * result)
         throw SQLiteException(
             "Can't find the liquid " + ToString(liquidVnum));
     }
-    auto quantity = result->getNextInteger();
+    auto quantity = result->getNextUnsignedInteger();
     terrain->liquidContent = std::make_pair(liquid, quantity);
     Logger::log(LogLevel::Debug, "\t%s%s",
                 Align(terrain->name, align::left, 25),
@@ -1274,7 +1275,7 @@ bool LoadBodyPart(ResultSet * result)
 
 bool LoadModelBodyPart(ResultSet * result)
 {
-    auto modelVnum = result->getNextInteger();
+    auto modelVnum = result->getNextUnsignedInteger();
     auto model = Mud::instance().findItemModel(modelVnum);
     if (model == nullptr)
     {
@@ -1301,7 +1302,7 @@ bool LoadBodyPartResources(ResultSet * result)
         throw SQLiteException(
             "Can't find the body part " + ToString(bodyPartVnum));
     }
-    auto modelVnum = result->getNextInteger();
+    auto modelVnum = result->getNextUnsignedInteger();
     auto model = Mud::instance().findItemModel(modelVnum);
     if (model == nullptr)
     {
@@ -1313,7 +1314,7 @@ bool LoadBodyPartResources(ResultSet * result)
         throw SQLiteException(
             "The model is not a resource " + ToString(modelVnum));
     }
-    auto materialVnum = result->getNextInteger();
+    auto materialVnum = result->getNextUnsignedInteger();
     auto material = Mud::instance().findMaterial(materialVnum);
     if (material == nullptr)
     {

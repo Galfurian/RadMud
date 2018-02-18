@@ -104,7 +104,7 @@ Item * CorpseModel::createCorpse(
     }
 
     // First set: Vnum, Model, Maker, Composition, Quality.
-    newCorpse->vnum = Mud::instance().getMinVnumCorpse() - 1;
+    newCorpse->vnum = 0;
     newCorpse->model = this->shared_from_this();
     newCorpse->maker = maker;
     newCorpse->quality = ItemQuality::Normal;

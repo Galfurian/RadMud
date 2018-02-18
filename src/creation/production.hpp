@@ -42,7 +42,7 @@ class Production
 {
 public:
     /// The virtual number of the production.
-    int vnum;
+    unsigned int vnum;
     /// The name of the production.
     std::string name;
     /// The profession needed to perform the production.

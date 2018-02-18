@@ -61,7 +61,7 @@ public:
     /// The current prompt.
     std::string prompt;
     /// The place where the player has slept last time.
-    int rent_room;
+    unsigned int rent_room;
     /// Points that could be spent during character creation.
     int remaining_points;
     /// Connection state.

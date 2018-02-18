@@ -107,7 +107,7 @@ class ItemModel :
 {
 public:
     /// Unique vnum.
-    int vnum;
+    unsigned int vnum;
     /// The model name.
     std::string name;
     /// The model article.

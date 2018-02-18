@@ -140,7 +140,7 @@ Item * ItemModel::createItem(
     if (isForMobile)
     {
         // Set a fake vnum.
-        newItem->vnum = -1;
+        newItem->vnum = 0;
         // Set the item a temporary.
         SetFlag(newItem->flags, ItemFlag::Temporary);
     }

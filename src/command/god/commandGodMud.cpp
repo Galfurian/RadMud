@@ -57,7 +57,7 @@ bool DoGoTo(Character * character, ArgumentHandler & args)
         character->sendMsg("You have to provide a room vnum.");
         return false;
     }
-    auto roomVnum = ToNumber<int>(args[0].getContent());
+    auto roomVnum = ToNumber<unsigned int>(args[0].getContent());
     auto destination = Mud::instance().findRoom(roomVnum);
     if (destination == nullptr)
     {
@@ -83,7 +83,7 @@ bool DoFactionInfo(Character * character, ArgumentHandler & args)
         character->sendMsg("You must insert a valide faction vnum.\n");
         return false;
     }
-    auto factionVnum = ToNumber<int>(args[0].getContent());
+    auto factionVnum = ToNumber<unsigned int>(args[0].getContent());
     auto faction = Mud::instance().findFaction(factionVnum);
     if (faction == nullptr)
     {
@@ -154,7 +154,7 @@ bool DoSkillList(Character * character, ArgumentHandler & /*args*/)
     table.addColumn("VNUM", align::center);
     table.addColumn("NAME", align::left);
     table.addColumn("ATTRIBUTE", align::left);
-    for (auto skill : Mud::instance().mudSkills)
+    for (auto const & skill : Mud::instance().mudSkills)
     {
         // Prepare the row.
         TableRow row;

@@ -59,7 +59,7 @@ public:
     /// Search the item with the same vnum of the provided one.
     /// @param vnum The vnum of the item to be searched.
     /// @return The item, if found.
-    Item * findItem(const int & vnum) const;
+    Item * findItem(const unsigned int & vnum) const;
 
     /// @brief Returns a stacked version of the content.
     /// @details

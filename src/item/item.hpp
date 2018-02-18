@@ -57,7 +57,7 @@ class Item :
 {
 public:
     /// Item vnum.
-    int vnum;
+    unsigned int vnum;
     /// Item model.
     std::shared_ptr<ItemModel> model;
     /// The number of stacked items.

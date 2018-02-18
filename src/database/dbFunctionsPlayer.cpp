@@ -119,8 +119,8 @@ bool SQLiteDbms::loadPlayerInformation(ResultSet * result, Player * player)
     if (!result->getDataString(column++, player->password))return false;
     // Race
     {
-        int value;
-        if (!result->getDataInteger(column++, value)) return false;
+        unsigned int value;
+        if (!result->getDataUnsignedInteger(column++, value)) return false;
         if ((player->race = Mud::instance().findRace(value)) == nullptr)
             return false;
     }
@@ -168,8 +168,8 @@ bool SQLiteDbms::loadPlayerInformation(ResultSet * result, Player * player)
     if (!result->getDataDouble(column++, player->weight)) return false;
     // Race
     {
-        int value;
-        if (!result->getDataInteger(column++, value)) return false;
+        unsigned int value;
+        if (!result->getDataUnsignedInteger(column++, value)) return false;
         if ((player->faction = Mud::instance().findFaction(value)) ==
             nullptr)
             return false;
@@ -180,8 +180,8 @@ bool SQLiteDbms::loadPlayerInformation(ResultSet * result, Player * player)
     if (!result->getDataInteger(column++, player->experience)) return false;
     // Room
     {
-        int value;
-        if (!result->getDataInteger(column++, value)) return false;
+        unsigned int value;
+        if (!result->getDataUnsignedInteger(column++, value)) return false;
         if ((player->room = Mud::instance().findRoom(value)) == nullptr)
             return false;
     }
@@ -214,7 +214,10 @@ bool SQLiteDbms::loadPlayerInformation(ResultSet * result, Player * player)
         player->thirst = value;
     }
     // Rent Room
-    if (!result->getDataInteger(column++, player->rent_room)) return false;
+    if (!result->getDataUnsignedInteger(column++, player->rent_room))
+    {
+        return false;
+    }
     // Check the room.
     if (player->room == nullptr)
     {
@@ -250,7 +253,7 @@ bool SQLiteDbms::loadPlayerItems(Player * player)
     while (result->next())
     {
         // The pointer to the object.
-        auto item = Mud::instance().findItem(result->getNextInteger());
+        auto item = Mud::instance().findItem(result->getNextUnsignedInteger());
         auto bodyPart = Mud::instance().findBodyPart(
             result->getNextUnsignedInteger());
         if (item == nullptr)
@@ -327,7 +330,8 @@ bool SQLiteDbms::loadPlayerSkill(Player * player)
     bool status = true;
     while (result->next())
     {
-        auto skill = Mud::instance().findSkill(result->getNextUnsignedInteger());
+        auto
+            skill = Mud::instance().findSkill(result->getNextUnsignedInteger());
         auto value = result->getNextUnsignedInteger();
         if (skill == nullptr)
         {
