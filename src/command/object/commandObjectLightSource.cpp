@@ -65,8 +65,8 @@ bool DoTurn(Character * character, ArgumentHandler & args)
         else if (!character->inventory.empty())
         {
             // If the inventory is NOT empty, pick a random item.
-            auto it = TRand<size_t>(0, character->inventory.size() - 1);
-            item = character->inventory[it];
+            item = character->inventory.at(
+                TRand<size_t>(0, character->inventory.size() - 1));
         }
     }
     if (item == nullptr)
@@ -85,13 +85,6 @@ bool DoTurn(Character * character, ArgumentHandler & args)
     auto lightItem = static_cast<LightItem *>(item);
     // Get the model.
     auto lightModel = lightItem->model->toLight();
-    // Check if the item can be simply turned on and off.
-    if (HasFlag(lightModel->lightSourceFlags, LightModelFlags::NeedToKindle))
-    {
-        character->sendMsg("You cannot simply turn on/off %s.\n",
-                           item->getName(true));
-        return false;
-    }
     if (HasFlag(lightModel->lightSourceFlags, LightModelFlags::AlwaysActive))
     {
         character->sendMsg("You cannot turn on/off %s.\n",
@@ -102,20 +95,25 @@ bool DoTurn(Character * character, ArgumentHandler & args)
     {
         character->sendMsg("You turn off %s.\n", item->getName(true));
         lightItem->active = false;
+        return true;
+    }
+    // Check if the item can be simply turned on and off.
+    if (HasFlag(lightModel->lightSourceFlags, LightModelFlags::NeedToKindle))
+    {
+        character->sendMsg("You cannot simply turn on %s.\n",
+                           item->getName(true));
+        return false;
+    }
+    if (lightItem->getAutonomy() > 0)
+    {
+        character->sendMsg("You turn on %s.\n", item->getName(true));
+        lightItem->active = true;
     }
     else
     {
-        if (lightItem->getAutonomy() > 0)
-        {
-            character->sendMsg("You turn on %s.\n", item->getName(true));
-            lightItem->active = true;
-        }
-        else
-        {
-            character->sendMsg("You cannot turn on %s.\n",
-                               item->getName(true));
-            return false;
-        }
+        character->sendMsg("You cannot turn on %s.\n",
+                           item->getName(true));
+        return false;
     }
     return true;
 }
@@ -133,7 +131,7 @@ bool DoKindle(Character * character, ArgumentHandler & args)
     // Check the number of arguments.
     if (args.size() != 2)
     {
-        character->sendMsg("What do you want to turn kidle and with what?\n");
+        character->sendMsg("What do you want to kindle and with what?\n");
         return false;
     }
     // Prepare a variable for the light source.
@@ -152,16 +150,22 @@ bool DoKindle(Character * character, ArgumentHandler & args)
         ignitionSource = character->findNearbyItem(args[1].getContent(),
                                                    args[1].getIndex());
     }
-    else
+    else if (inventoryIsLit)
     {
         // If the room is not lit but the inventory is.
-        if (inventoryIsLit)
-        {
-            lightSource = character->findInventoryItem(args[0].getContent(),
-                                                       args[0].getIndex());
-            ignitionSource = character->findInventoryItem(args[1].getContent(),
-                                                          args[1].getIndex());
-        }
+        lightSource = character->findInventoryItem(args[0].getContent(),
+                                                   args[0].getIndex());
+        ignitionSource = character->findInventoryItem(args[1].getContent(),
+                                                      args[1].getIndex());
+    }
+    else if (!character->inventory.empty())
+    {
+        // If its pitch black, get random items from the inventory.
+        auto inventorySize(character->inventory.size() - 1);
+        lightSource = character->inventory.at(
+            TRand<size_t>(0, inventorySize));
+        ignitionSource = character->inventory.at(
+            TRand<size_t>(0, inventorySize));
     }
     if (lightSource == nullptr)
     {
