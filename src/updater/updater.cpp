@@ -40,7 +40,7 @@ MudUpdater::MudUpdater() :
     ticSize(10),
     hourTicSize(2),
     hourTicCounter(),
-    mudHour(),
+    mudHour(static_cast<unsigned int>(DayPhase::Day)),
     mudDayPhase(DayPhase::Day),
     itemToDestroy()
 {
