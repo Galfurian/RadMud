@@ -153,19 +153,6 @@ Item * ItemModel::createItem(
     newItem->maker = maker;
     newItem->composition = composition;
     newItem->quality = itemQuality;
-    // Then set the rest.
-    {
-        // Evaluate the base value.
-        auto valBase = this->basePrice;
-        // Evaluate the modifier due to item's quality.
-        auto valQuality = static_cast<unsigned int>(valBase *
-                                                    itemQuality.getModifier());
-        // Evaluate the modifier due to item's material.
-        auto valMaterial = static_cast<unsigned int>(valBase *
-                                                     composition->getWorthModifier());
-        // Evaluate the result.
-        newItem->price = ((valBase + valQuality + valMaterial) / 3);
-    }
     {
         // Evaluate the base value.
         auto valBase = this->baseWeight;

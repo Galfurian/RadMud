@@ -30,7 +30,6 @@ Item::Item() :
     model(),
     quantity(),
     maker(),
-    price(),
     weight(),
     condition(),
     maxCondition(),
@@ -129,7 +128,6 @@ bool Item::updateOnDB()
     arguments.push_back(ToString(model->vnum));
     arguments.push_back(ToString(this->quantity));
     arguments.push_back(this->maker);
-    arguments.push_back(ToString(this->price));
     arguments.push_back(ToString(this->weight));
     arguments.push_back(ToString(this->condition));
     arguments.push_back(ToString(this->maxCondition));
@@ -348,19 +346,14 @@ std::string Item::getConditionDescription()
 
 unsigned int Item::getPrice(bool entireStack) const
 {
-    // Add the base price.
-    auto pcBase = this->price;
-    // Evaluate the modifier due to item's condition.
-    auto pcCondition = static_cast<unsigned int>(pcBase *
-                                                 this->getConditionModifier());
-    // The resulting price.
-    auto itemPrice = ((pcBase + pcCondition) / 2);
+    auto result = (model->basePrice *
+                   quality.getModifier() *
+                   composition->getWorthModifier() *
+                   this->getConditionModifier());
     // Evaluate for the entire stack.
-    if (entireStack)
-    {
-        itemPrice *= this->quantity;
-    }
-    return itemPrice;
+    if (entireStack) result *= this->quantity;
+    // Cast and return the result.
+    return static_cast<unsigned int>(result);
 }
 
 double Item::getWeight(bool entireStack) const

@@ -90,7 +90,6 @@ bool LoadItem(ResultSet * result)
     item->model = itemModel;
     item->quantity = result->getNextUnsignedInteger();
     item->maker = result->getNextString();
-    item->price = result->getNextUnsignedInteger();
     item->weight = result->getNextDouble();
     item->condition = result->getNextDouble();
     item->maxCondition = result->getNextDouble();

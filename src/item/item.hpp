@@ -64,8 +64,6 @@ public:
     unsigned int quantity;
     /// The player that created the item.
     std::string maker;
-    /// The item's price.
-    unsigned int price;
     /// The item's weight.
     double weight;
     /// The item's condition.
