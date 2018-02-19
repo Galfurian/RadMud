@@ -66,7 +66,7 @@ bool ShopItem::removeOnDB()
     if (Item::removeOnDB())
     {
         if (SQLiteDbms::instance().deleteFrom(
-            "Shop", {std::make_pair("vnum", ToString(vnum))}))
+            "Shop", {std::make_pair("item", ToString(vnum))}))
         {
             return true;
         }
