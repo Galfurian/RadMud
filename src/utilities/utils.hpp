@@ -160,6 +160,13 @@ std::vector<std::string> SplitString(const std::string & source,
 /// @return A vector containing the words of the source string.
 std::vector<std::string> GetWords(const std::string & source);
 
+/// @brief Wrapts the text into multiple lines.
+/// @param text  The text to wrap.
+/// @param width The desired width.
+/// @return The wrapped lines.
+std::vector<std::string> TextWrap(std::string const & text,
+                                  std::string::size_type const & width);
+
 /// @brief Return the current timestamp as "Hours:Minute".
 /// @return The current timestamp.
 std::string GetFormattedTime();

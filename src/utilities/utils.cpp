@@ -149,6 +149,34 @@ std::vector<std::string> GetWords(const std::string & source)
     return working;
 }
 
+std::vector<std::string> TextWrap(std::string const & text,
+                                  std::string::size_type const & width)
+{
+    auto words = SplitString(text, " ");
+    std::vector<std::string> out;
+    std::string tmp;
+    for (auto it = words.begin(); it != words.end(); ++it)
+    {
+        auto word = (*it);
+        if ((tmp.size() + word.size()) > width)
+        {
+            out.emplace_back(tmp);
+            tmp.clear();
+        }
+        tmp += word;
+        if ((std::next(it) != words.end()) &&
+            (tmp.size() < width))
+        {
+            tmp.push_back(' ');
+        }
+    }
+    if (!tmp.empty())
+    {
+        out.emplace_back(tmp);
+    }
+    return out;
+}
+
 std::string GetFormattedTime()
 {
     time_t now = time(nullptr);
