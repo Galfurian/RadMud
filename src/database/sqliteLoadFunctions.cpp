@@ -1155,6 +1155,39 @@ bool LoadShop(ResultSet * result)
     return true;
 }
 
+bool LoadShopDefaultStock(ResultSet * result)
+{
+    auto shopVnum = result->getNextUnsignedInteger();
+    auto shopItem = Mud::instance().findItem(shopVnum);
+    if (shopItem == nullptr)
+    {
+        throw SQLiteException("Wrong shop (" + ToString(shopVnum) + ")");
+    }
+    if (shopItem->getType() != ModelType::Shop)
+    {
+        throw SQLiteException(
+            "Wrong type (" + shopItem->getType().toString() + ")");
+    }
+    auto shop = dynamic_cast<ShopItem *>(shopItem);
+    auto modelVnum = result->getNextUnsignedInteger();
+    auto model = Mud::instance().findItemModel(modelVnum);
+    if (model == nullptr)
+    {
+        throw SQLiteException("Wrong model (" + ToString(modelVnum) + ")");
+    }
+    auto compositionVnum = result->getNextUnsignedInteger();
+    auto composition = Mud::instance().findMaterial(compositionVnum);
+    if (composition == nullptr)
+    {
+        throw SQLiteException("Wrong composition (" +
+                              ToString(compositionVnum) + ")");
+    }
+    auto quality = ItemQuality(result->getNextUnsignedInteger());
+    auto quantity = result->getNextUnsignedInteger();
+    shop->addDefaultStock(model, composition, quality, quantity);
+    return true;
+}
+
 bool LoadCurrency(ResultSet * result)
 {
     // Retrieve the item vnum.

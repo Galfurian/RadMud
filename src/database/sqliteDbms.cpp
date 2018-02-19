@@ -133,6 +133,8 @@ SQLiteDbms::SQLiteDbms() :
         TableLoader("BuildingTool", LoadBuildingTool));
     loaders.emplace_back(
         TableLoader("Shop", LoadShop));
+    loaders.emplace_back(
+        TableLoader("ShopDefaultStock", LoadShopDefaultStock));
 }
 
 SQLiteDbms::~SQLiteDbms()

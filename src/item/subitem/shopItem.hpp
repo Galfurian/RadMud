@@ -28,6 +28,15 @@
 class ShopItem :
     public Item
 {
+private:
+    struct default_stock_t
+    {
+        std::shared_ptr<ItemModel> model;
+        Material * material;
+        ItemQuality quality;
+        unsigned int quantity;
+    };
+
 public:
     /// The name of the shop.
     std::string shopName;
@@ -43,6 +52,8 @@ public:
     unsigned int openingHour;
     /// The closing hour.
     unsigned int closingHour;
+    /// The list of default stocks.
+    std::vector<default_stock_t> defaultStock;
 
     /// @brief Constructor.
     ShopItem();
@@ -62,6 +73,20 @@ public:
     bool isAContainer() const override;
 
     double getTotalSpace() const override;
+
+    inline void addDefaultStock(
+        std::shared_ptr<ItemModel> const & _model,
+        Material * _material,
+        ItemQuality const & _quality,
+        unsigned int const & _quantity)
+    {
+        default_stock_t new_default_stock;
+        new_default_stock.model = _model;
+        new_default_stock.material = _material;
+        new_default_stock.quality = _quality;
+        new_default_stock.quantity = _quantity;
+        defaultStock.emplace_back(new_default_stock);
+    }
 
     /// @brief Allows to set the new shop keeper.
     /// @param _shopKeeper The new shop keeper.

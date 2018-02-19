@@ -162,6 +162,9 @@ bool LoadBuildingKnowledge(ResultSet * result);
 /// @brief Function used to load shops.
 bool LoadShop(ResultSet * result);
 
+/// @brief Function used to load shops default items.
+bool LoadShopDefaultStock(ResultSet * result);
+
 /// @brief Function used to load currencies.
 bool LoadCurrency(ResultSet * result);
 
