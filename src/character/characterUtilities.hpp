@@ -182,4 +182,5 @@ bool MoveCharacterTo(
 /// @param production   The production to check.
 /// @return <b>True</b> has the required knowledge,<br>
 ///         <b>False</b> otherwise.
-bool HasRequiredKnowledge(Character * character, Production * production);
+bool HasRequiredKnowledge(Character * character,
+                          std::vector<Knowledge> const & required);

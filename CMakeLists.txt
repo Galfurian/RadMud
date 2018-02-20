@@ -287,7 +287,6 @@ set(PROJECT_SRC
         ${CMAKE_SOURCE_DIR}/src/updater/updater.cpp
         ${CMAKE_SOURCE_DIR}/src/updater/updateInterface.cpp
         ${CMAKE_SOURCE_DIR}/src/utilities/CMacroWrapper.cpp
-        ${CMAKE_SOURCE_DIR}/src/utilities/table.cpp
         ${CMAKE_SOURCE_DIR}/src/utilities/logger.cpp
         ${CMAKE_SOURCE_DIR}/src/utilities/utils.cpp
         ${CMAKE_SOURCE_DIR}/src/utilities/name_generator/nameGenerator.cpp

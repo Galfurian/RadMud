@@ -75,7 +75,7 @@ bool DoProfession(Character * character,
                            args[0].getContent());
         return false;
     }
-    if (!HasRequiredKnowledge(character, production))
+    if (!HasRequiredKnowledge(character, production->requiredKnowledge))
     {
         character->sendMsg("%s '%s'.\n", profession->notFoundMessage,
                            args[0].getContent());
@@ -176,9 +176,16 @@ bool DoBuild(Character * character, ArgumentHandler & args)
     // If the argument list is empty show what the character can build.
     if (args.empty())
     {
+        (*character) << "You know how to build:\n";
         for (auto it : Mud::instance().mudBuildings)
         {
             auto building = it.second;
+            if (!HasRequiredKnowledge(character, building->requiredKnowledge))
+            {
+                continue;
+            }
+            (*character) << "[" << std::setw(3) << building->difficulty << "] "
+                         << building->getNameCapital() << "\n";
         }
         return true;
     }
@@ -189,6 +196,12 @@ bool DoBuild(Character * character, ArgumentHandler & args)
     }
     auto schematics = Mud::instance().findBuilding(args[0].getContent());
     if (schematics == nullptr)
+    {
+        character->sendMsg("You don't know how to build '%s'.\n",
+                           args[0].getContent());
+        return false;
+    }
+    if (!HasRequiredKnowledge(character, schematics->requiredKnowledge))
     {
         character->sendMsg("You don't know how to build '%s'.\n",
                            args[0].getContent());

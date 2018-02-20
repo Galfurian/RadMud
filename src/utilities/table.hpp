@@ -4,7 +4,8 @@
 /// @author  Enrico Fraccaroli
 /// @date    Dec 15 2015
 /// @copyright
-/// Copyright (c) 2015, 2016 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
+/// Copyright (c) 2015, 2016, 2017, 2018
+///  Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission to use, copy, modify, and distribute this software for any
 /// purpose with or without fee is hereby granted, provided that the above
 /// copyright notice and this permission notice appear in all copies.
@@ -20,35 +21,89 @@
 #pragma once
 
 #include "alignString.hpp"
-#include <vector>
+#include "utils.hpp"
 
-/// The structure used to provide a row.
-using TableRow = std::vector<std::string>;
+#include <vector>
+#include <sstream>
+#include <iomanip>
+#include <map>
+
+/// @brief Structure used to manage a row of the table.
+class TableRow :
+    public std::vector<std::string>
+{
+public:
+    TableRow() :
+        divider(),
+        header()
+    {
+        // Nothing to do.
+    }
+
+    TableRow(std::vector<std::string>::size_type const & size,
+             std::string const & initializer) :
+        std::vector<std::string>(size, initializer),
+        divider(),
+        header()
+    {
+        // Nothing to do.
+    }
+
+    TableRow(std::initializer_list<std::string> const & initializer) :
+        std::vector<std::string>(initializer),
+        divider(),
+        header()
+    {
+        // Nothing to do.
+    }
+
+    virtual inline bool isDivider() const
+    {
+        return divider;
+    }
+
+    virtual inline bool isHeader() const
+    {
+        return header;
+    }
+
+private:
+    bool divider;
+    bool header;
+
+    friend class Table;
+};
 
 /// @brief A class which provide access and means to manage a table column.
 class TableColumn
 {
-private:
+public:
     /// Column Title.
     std::string title;
     /// Column alignment.
     align::align_t alignment;
     /// Column width.
-    size_t width;
+    std::string::size_type width;
+    /// If the column needs to autoadjust to the lenght of the content.
+    const bool autoAdjust;
 
-public:
     /// @brief Constructor.
     /// @param _title     The column title.
     /// @param _alignment The column alignment.
     /// @param _width     The column width.
     TableColumn(std::string _title,
                 align::align_t _alignment,
-                size_t _width = 0) :
+                std::string::size_type _width = 0,
+                const bool _autoAdjust = true) :
         title(std::move(_title)),
         alignment(_alignment),
-        width(_width)
+        width(_width),
+        autoAdjust(_autoAdjust)
     {
-        if (width == 0) width = static_cast<size_t>(title.size()) + 2;
+        if (autoAdjust)
+        {
+            this->adjust(title);
+        }
     }
 
     /// @brief Provide access to the title of the column.
@@ -60,7 +115,7 @@ public:
 
     /// @brief Provides the width of the column.
     /// @return The width of the column.
-    inline size_t getWidth() const
+    inline std::string::size_type getWidth() const
     {
         return width;
     }
@@ -72,134 +127,253 @@ public:
         return alignment;
     }
 
-    /// @brief Allows to set the width of the column.
-    /// @param _width The new width.
-    inline void setWidth(size_t _width)
+    inline void adjust(std::string const & reference)
     {
-        if (width < (_width + 2)) width = (_width + 2);
+        if (autoAdjust)
+        {
+            auto _width = reference.size();
+            if (_width > width) width = _width;
+        }
     }
 };
 
 /// @brief A simple formatted table.
 class Table
 {
-private:
-    /// Title of the table.
-    std::string title;
-    /// List of columns of the table.
-    std::vector<TableColumn> columns;
-    /// List of rows of the table.
-    std::vector<TableRow> rows;
-
 public:
-    /// @brief Constructor.
-    Table() = default;
+    enum SymbolType
+    {
+        HorizontalDivider,
+        VerticalDivider,
+        Crossings,
+    };
 
     /// @brief Constructor.
-    /// @param _title The title of the table.
-    explicit Table(std::string _title) :
-        title(std::move(_title)),
+    explicit Table() :
         columns(),
-        rows()
+        rows(),
+        marginSize(1),
+        symbols()
     {
-        // Nothing to do.
+        // Set the default symbols.
+        this->resetSymbols();
+    }
+
+    /// @brief Allows to set the margins.
+    inline void setMarginSize(std::string::size_type const & s)
+    {
+        marginSize = s;
+    }
+
+    /// @brief Allows to set a character to use for a specific place.
+    inline void setSymbol(SymbolType type, char symbol)
+    {
+        symbols[type] = symbol;
+    }
+
+    /// @brief Sets the default the symbols.
+    inline void resetSymbols()
+    {
+        symbols[HorizontalDivider] = '-';
+        symbols[VerticalDivider] = '|';
+        symbols[Crossings] = '+';
     }
 
     /// @brief Allows to add a column.
     /// @param columnTitle     The column title.
     /// @param columnAlignment The column alignment.
     /// @param columnWidth     The column width.
-    inline void addColumn(std::string _title,
-                          align::align_t _align,
-                          size_t _width = 0)
+    inline void addColumn(TableColumn column)
     {
-        columns.emplace_back(TableColumn(std::move(_title), _align, _width));
+        columns.emplace_back(column);
+    }
+
+    /// @brief Allows to add a column.
+    /// @param columnTitle     The column title.
+    /// @param columnAlignment The column alignment.
+    /// @param columnWidth     The column width.
+    inline void addColumn(std::string const & _title,
+                          align::align_t _alignment,
+                          std::string::size_type _width = 0,
+                          const bool _autoAdjust = true)
+    {
+        columns.emplace_back(
+            TableColumn(_title, _alignment, _width, _autoAdjust));
     }
 
     /// @brief Allows to add a row of values.
     /// @param row The vector which containts the row values.
     inline void addRow(TableRow row)
     {
-        if (row.size() == columns.size())
+        if (row.size() != columns.size())
         {
-            for (size_t i = 0; i < columns.size(); ++i)
+            return;
+        }
+        std::vector<TableRow> new_rows;
+        new_rows.emplace_back(row);
+
+        unsigned int row_it = 0;
+        auto column_it = columns.begin();
+        for (; row_it < row.size(); ++row_it, ++column_it)
+        {
+            auto cell = row[row_it];
+
+            if (column_it->autoAdjust)
             {
-                columns[i].setWidth(row[i].size());
+                column_it->adjust(cell);
             }
-            rows.push_back(row);
+            else if (cell.size() > column_it->width)
+            {
+                auto wrappedText = TextWrap(cell, column_it->width);
+                if (wrappedText.size() > new_rows.size())
+                {
+                    new_rows.resize(wrappedText.size(),
+                                    TableRow(row.size(), ""));
+                }
+                size_t index = 0;
+                for (auto const & wrappedLine : wrappedText)
+                {
+                    new_rows[index++][row_it] = wrappedLine;
+                }
+            }
+        }
+        for (auto & new_row : new_rows)
+        {
+            rows.emplace_back(new_row);
         }
     }
-    /// @brief Provides the number of rows inside the table.
-    /// @return The number of rows.
-    inline size_t getNumRows() const
+
+    /// @brief Adds the column headers.
+    inline void addColumnHeaders()
     {
-        return rows.size();
+        TableRow new_row;
+        for (auto const & column : columns)
+        {
+            new_row.emplace_back(column.getTitle());
+        }
+        rows.emplace_back(new_row);
     }
 
-    /// @brief Adds an empty row as divider.
+    /// @brief Adds a divider.
     inline void addDivider()
     {
-        this->addRow(std::vector<std::string>(columns.size(), ""));
+        TableRow new_row;
+        new_row.divider = true;
+        rows.emplace_back(new_row);
+    }
+
+    /// @brief Adds an header with the given text.
+    inline void addHeader(std::string header)
+    {
+        TableRow new_row;
+        new_row.header = true;
+        new_row.emplace_back(header);
+        rows.emplace_back(new_row);
     }
 
     /// @brief Removes the last row.
     inline void popRow()
     {
-        this->rows.pop_back();
+        rows.pop_back();
     }
 
     /// @brief Provides the table.
     /// @param withoutHeaders Allows to hide the header of the columns.
     /// @return The table.
-    std::string getTable(bool withoutHeaders = false,
-                         bool withoutDividers = false);
+    std::string getTable()
+    {
+        auto margin = std::string(marginSize, ' ');
+        auto hdiv = symbols[HorizontalDivider];
+        auto vdiv = symbols[VerticalDivider];
+        auto cross = symbols[Crossings];
+
+        std::stringstream ss;
+        for (auto row_it = rows.begin(); row_it != rows.end(); ++row_it)
+        {
+            auto row = (*row_it);
+            if (row.isDivider())
+            {
+                ss << cross;
+                if ((row_it == rows.begin()) ||
+                    (std::next(row_it) == rows.end()))
+                {
+                    ss << std::string(
+                        this->getTotalWidth()
+                        + (marginSize * 2 + 1) * (columns.size() - 1),
+                        hdiv);
+                    ss << cross;
+                }
+                else
+                {
+                    for (auto column : columns)
+                    {
+                        ss << std::string(column.width + marginSize * 2, hdiv)
+                           << cross;
+                    }
+                }
+                ss << "\n";
+                continue;
+            }
+            if (row.isHeader())
+            {
+                ss << vdiv;
+                ss << margin;
+                ss << std::setw(
+                    static_cast<int>(this->getTotalWidth()
+                                     + (marginSize * 2 + 1)
+                                       * (columns.size() - 1)));
+                ss << std::right << align::centtered(row[0]);
+                ss << margin;
+                ss << vdiv;
+                ss << "\n";
+                continue;
+            }
+            ss << vdiv;
+            for (size_t i = 0; i < row.size(); ++i)
+            {
+                auto const & column = columns[i];
+                ss << margin;
+                ss << std::setw(static_cast<int>(column.width));
+                if (column.alignment == align::left)
+                {
+                    ss << std::left << row[i];
+                }
+                else if (column.alignment == align::right)
+                {
+                    ss << std::right << row[i];
+                }
+                else
+                {
+                    ss << std::right << align::centtered(row[i]);
+                }
+                ss << margin;
+                ss << vdiv;
+            }
+            ss << "\n";
+        }
+        return ss.str();
+    }
 
 private:
-    /// @brief Provides a divided of the same width of the table.
-    /// @return The divider.
-    inline std::string getDivider() const
-    {
-        std::string output;
-        for (const auto & column : columns)
-        {
-            output += "#" + std::string(column.getWidth(), '#');
-        }
-        return output += "#\n";
-    }
-
-    /// @brief Provides the table title.
-    /// @return The table title.
-    inline std::string getTitle() const
-    {
-        return "#" +
-               Align(title, align::center,
-                     getTotalWidth() + (columns.size() - 1)) + "#\n";
-    }
-
-    /// @brief Provides the columns headers.
-    /// @return The headers.
-    inline std::string getHeaders() const
-    {
-        std::string output;
-        for (const auto & it : columns)
-        {
-            output += "|" +
-                      Align(it.getTitle(),
-                            align::center,
-                            it.getWidth());
-        }
-        return output + "|\n";
-    }
 
     /// @brief Provides the total width of th table.
     /// @return The total width.
-    inline size_t getTotalWidth() const
+    inline std::string::size_type getTotalWidth() const
     {
-        size_t totalWidth = 0;
+        std::string::size_type totalWidth = 0;
         for (auto const & it : columns)
         {
             totalWidth += it.getWidth();
         }
         return totalWidth;
     }
+
+    /// List of columns of the table.
+    std::vector<TableColumn> columns;
+    /// List of rows of the table.
+    std::vector<TableRow> rows;
+    /// The internal margins.
+    std::string::size_type marginSize;
+    /// Map of symbols;
+    std::map<SymbolType, char> symbols;
 };

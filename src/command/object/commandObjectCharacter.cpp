@@ -458,7 +458,7 @@ bool DoInventory(Character * character, ArgumentHandler & /*args*/)
         }
         table.addRow(row);
     }
-    character->sendMsg(table.getTable(false, true) + "\n");
+    character->sendMsg(table.getTable() + "\n");
     if (roomIsLit || inventoryIsLit)
     {
         character->sendMsg(

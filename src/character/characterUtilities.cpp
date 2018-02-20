@@ -338,16 +338,15 @@ bool MoveCharacterTo(
     return true;
 }
 
-bool HasRequiredKnowledge(Character * character, Production * production)
+bool HasRequiredKnowledge(Character * character,
+                          std::vector<Knowledge> const & required)
 {
     if (WrongAssert(character == nullptr)) return false;
-    if (WrongAssert(production == nullptr)) return false;
     return std::find_if(
-        production->requiredKnowledge.begin(),
-        production->requiredKnowledge.end(),
+        required.begin(), required.end(),
         [&character](Knowledge const & k)
         {
             return (character->skillManager.getKnowledge(k) > 0) ||
                    (character->effectManager.getKnowledge(k) > 0);
-        }) != production->requiredKnowledge.end();
+        }) != required.end();
 }

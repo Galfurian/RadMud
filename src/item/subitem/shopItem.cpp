@@ -141,7 +141,7 @@ std::string ShopItem::lookContent()
             ss << Formatter::italic("There is nothing on sale.\n\n");
             return ss.str();
         }
-        Table saleTable(shopName);
+        Table saleTable;
         saleTable.addColumn("Good", align::left);
         saleTable.addColumn("Quantity", align::center);
         saleTable.addColumn("Weight (Single)", align::right);
@@ -149,6 +149,8 @@ std::string ShopItem::lookContent()
         saleTable.addColumn("Buy", align::right);
         saleTable.addColumn("Sell (Single)", align::right);
         saleTable.addColumn("Sell (stack)", align::right);
+
+        saleTable.addHeader(shopName);
         for (auto iterator : content)
         {
             // Prepare the row.

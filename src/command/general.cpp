@@ -125,6 +125,7 @@ bool DoWho(Character * character, ArgumentHandler & /*args*/)
     table.addColumn("Player", align::left);
     table.addColumn("Location", align::left);
     std::string output;
+    size_t totalPlayers = 0;
     for (auto iterator : Mud::instance().mudPlayers)
     {
         // If the player is not playing, continue.
@@ -138,13 +139,14 @@ bool DoWho(Character * character, ArgumentHandler & /*args*/)
             location = iterator->room->name;
         }
         table.addRow({iterator->getName(), location});
+        ++totalPlayers;
     }
     character->sendMsg(table.getTable());
     character->sendMsg(
         "# Total %sPlayers%s: %s\n",
         Formatter::yellow(),
         Formatter::reset(),
-        ToString(table.getNumRows()));
+        totalPlayers);
     return true;
 }
 
@@ -153,7 +155,8 @@ bool DoSet(Character * character, ArgumentHandler & args)
     if (args.empty())
     {
         character->sendMsg("What do you want to set?");
-    } else
+    }
+    else
     {
         if (args[0].getContent() == "des")
         {
@@ -161,7 +164,8 @@ bool DoSet(Character * character, ArgumentHandler & args)
             if (newDescription.empty())
             {
                 character->sendMsg("You can't set an empty description.\n");
-            } else
+            }
+            else
             {
                 character->description = newDescription;
                 character->sendMsg("You had set your description:\n");
@@ -298,13 +302,15 @@ bool DoHelp(Character * character, ArgumentHandler & args)
     {
         size_t numColumns = 4;
         TableRow baseRow, godsRow;
-        Table baseCommands("Commands"), godsCommands("Management");
+        Table baseCommands, godsCommands;
+        baseCommands.addHeader("Commands");
+        godsCommands.addHeader("Management");
         for (size_t it = 0; it < numColumns; ++it)
         {
             baseCommands.addColumn("", align::left, 15);
             godsCommands.addColumn("", align::left, 15);
         }
-        for (auto it : Mud::instance().mudCommands)
+        for (auto const & it : Mud::instance().mudCommands)
         {
             if (it->canUse(character))
             {
@@ -316,7 +322,8 @@ bool DoHelp(Character * character, ArgumentHandler & args)
                         godsCommands.addRow(godsRow);
                         godsRow.clear();
                     }
-                } else
+                }
+                else
                 {
                     baseRow.push_back(it->name);
                     if (baseRow.size() == numColumns)
@@ -343,9 +350,10 @@ bool DoHelp(Character * character, ArgumentHandler & args)
             }
             baseCommands.addRow(baseRow);
         }
-        character->sendMsg(baseCommands.getTable(true));
-        character->sendMsg(godsCommands.getTable(true));
-    } else if (args.size() == 1)
+        character->sendMsg(baseCommands.getTable());
+        character->sendMsg(godsCommands.getTable());
+    }
+    else if (args.size() == 1)
     {
         auto command = args[0].getContent();
         for (auto it : Mud::instance().mudCommands)
@@ -394,7 +402,8 @@ bool DoPrompt(Character * character, ArgumentHandler & args)
         character->sendMsg("    %s\n", player->prompt);
         character->sendMsg("Type %sprompt help %sto read the guide.\n",
                            Formatter::yellow(), Formatter::reset());
-    } else
+    }
+    else
     {
         if (args[0].getContent() == "help")
         {
@@ -421,7 +430,8 @@ bool DoPrompt(Character * character, ArgumentHandler & args)
             msg += "    " + italic("&S") + " - Player maximum stamina.\n";
             msg += "    " + italic("&T") + " - Currently aimed character.\n";
             player->sendMsg(msg);
-        } else
+        }
+        else
         {
             player->prompt = args.substr(0);
         }
@@ -442,18 +452,21 @@ bool DoTime(Character * character, ArgumentHandler & /*args*/)
         character->sendMsg("%sThe sun has just risen.%s\n",
                            Formatter::yellow(),
                            Formatter::reset());
-    } else if (MudUpdater::instance().getDayPhase() == DayPhase::Day)
+    }
+    else if (MudUpdater::instance().getDayPhase() == DayPhase::Day)
     {
         character->sendMsg("%sThe sun is high in the sky.%s\n",
                            Formatter::yellow(),
                            Formatter::reset());
-    } else if (MudUpdater::instance().getDayPhase() == DayPhase::Dusk)
+    }
+    else if (MudUpdater::instance().getDayPhase() == DayPhase::Dusk)
     {
         character->sendMsg(
             "%sThe sun is setting, the shadows begin to prevail.%s\n",
             Formatter::cyan(),
             Formatter::reset());
-    } else if (MudUpdater::instance().getDayPhase() == DayPhase::Night)
+    }
+    else if (MudUpdater::instance().getDayPhase() == DayPhase::Night)
     {
         character->sendMsg("%sThe darkness surrounds you.%s\n",
                            Formatter::blue(),
@@ -494,9 +507,9 @@ bool DoStatistics(Character * character, ArgumentHandler & /*args*/)
     {
         msg += "    " + MAG(ability.first.getAbbreviation()) + "    ";
         msg += Align(player->getAbility(ability.first),
-                           align::right, 5) + "(";
+                     align::right, 5) + "(";
         msg += Align(player->getAbilityModifier(ability.first),
-                           align::right, 3) + ")\n";
+                     align::right, 3) + ")\n";
     }
     // HEALTH
     msg += "    " + MAG("Health  ");
@@ -606,7 +619,8 @@ bool DoRent(Character * character, ArgumentHandler & /*args*/)
     {
         character->sendMsg("You can't rent here.\n");
         return false;
-    } else
+    }
+    else
     {
         player->rent_room = player->room->vnum;
         player->doCommand("quit");
@@ -646,7 +660,8 @@ bool DoActions(Character * character, ArgumentHandler & /*args*/)
         {
             msg += "  [Performing] ";
             first = false;
-        } else msg += "  [Queued    ] ";
+        }
+        else msg += "  [Queued    ] ";
         msg += it->getDescription() + "\n";
     }
     character->actionQueueMutex.unlock();

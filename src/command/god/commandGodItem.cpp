@@ -176,7 +176,8 @@ bool DoItemInfo(Character * character, ArgumentHandler & args)
         }
     }
     // Create a table.
-    Table sheet(item->getNameCapital());
+    Table sheet;
+    sheet.addHeader(item->getNameCapital());
     // Get the sheet.
     item->getSheet(sheet);
     // Show the seet to character.
