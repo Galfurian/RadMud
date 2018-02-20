@@ -299,7 +299,7 @@ public:
                 {
                     ss << std::string(
                         this->getTotalWidth()
-                        + (marginSize * 2 + 1) * (columns.size() - 1),
+                        + (marginSize * 2 + 1) * (columns.size()) - 1,
                         hdiv);
                     ss << cross;
                 }

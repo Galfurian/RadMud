@@ -177,6 +177,12 @@ bool DoBuild(Character * character, ArgumentHandler & args)
     if (args.empty())
     {
         (*character) << "You know how to build:\n";
+        Table buildingTable;
+        buildingTable.addDivider();
+        buildingTable.addHeader("Known Buildings");
+        buildingTable.addDivider();
+        buildingTable.addColumn("Building", align::left);
+        buildingTable.addColumn("Difficulty", align::right);
         for (auto it : Mud::instance().mudBuildings)
         {
             auto building = it.second;
@@ -184,9 +190,10 @@ bool DoBuild(Character * character, ArgumentHandler & args)
             {
                 continue;
             }
-            (*character) << "[" << std::setw(3) << building->difficulty << "] "
-                         << building->getNameCapital() << "\n";
+            buildingTable.addRow({building->getNameCapital(),
+                                  std::to_string(building->difficulty)});
         }
+        (*character) << buildingTable.getTable() << "\n";
         return true;
     }
     if (args.size() != 1)
