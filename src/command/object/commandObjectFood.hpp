@@ -20,3 +20,13 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #pragma once
+
+#include "commandObject.hpp"
+
+/// @addtogroup ComInterfaces
+/// @{
+
+/// Eats food.
+bool DoEat(Character * character, ArgumentHandler & args);
+
+///@}

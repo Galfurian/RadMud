@@ -28,6 +28,7 @@
 #include "commandObjectProcess.hpp"
 #include "commandObjectLiquids.hpp"
 #include "commandObjectShop.hpp"
+#include "commandObjectFood.hpp"
 #include "mud.hpp"
 
 void LoadObjectCommands()
@@ -64,6 +65,13 @@ void LoadObjectCommands()
     Mud::instance().addCommand(std::make_shared<Command>(
         DoPour, "pour", "(liquid container) [liquid container]",
         "Pour the content of the container into another one or on the ground.",
+        false, false, false));
+
+    // ////////////////////////////////////////////////////////////////////////
+    // Commands for food.
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoEat, "eat", "(food)",
+        "Eats the provided food.",
         false, false, false));
 
     // ////////////////////////////////////////////////////////////////////////

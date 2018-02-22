@@ -83,7 +83,6 @@ bool Character::check() const
     safe &= CorrectAssert(this->getAbility(Ability::Constitution, false) <= 60);
     safe &= CorrectAssert(this->getAbility(Ability::Intelligence, false) > 0);
     safe &= CorrectAssert(this->getAbility(Ability::Intelligence, false) <= 60);
-    safe &= CorrectAssert(hunger >= 0);
     safe &= CorrectAssert(thirst >= 0);
     safe &= CorrectAssert(room != nullptr);
     safe &= CorrectAssert(L != nullptr);
@@ -803,9 +802,10 @@ std::string Character::getThirstCondition() const
 
 void Character::addHunger(const int & value)
 {
-    hunger += value;
-    if (hunger < 0) hunger = 0;
-    else if (hunger > 100) hunger = 100;
+    auto sigHunger = static_cast<int>(hunger) + value;
+    if (sigHunger < 0) hunger = 0;
+    else if (sigHunger > 100) hunger = 100;
+    else hunger = static_cast<unsigned int>(sigHunger);
 }
 
 std::string Character::getHungerCondition() const
@@ -839,12 +839,12 @@ void Character::updateStamina()
 
 void Character::updateHunger()
 {
-    hunger = ((hunger - 1) < 0) ? 0 : hunger - 1;
+    hunger = (hunger > 0) ? hunger - 1 : 0;
 }
 
 void Character::updateThirst()
 {
-    thirst = ((thirst - 1) < 0) ? 0 : thirst - 1;
+    thirst = (thirst > 0) ? thirst - 1 : 0;
 }
 
 void Character::updateExpiredEffects()

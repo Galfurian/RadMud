@@ -37,8 +37,8 @@ class FoodModel :
     public ItemModel
 {
 public:
-    /// Hours of feeding.
-    unsigned int hours;
+    /// Percentage restored.
+    unsigned int nurishment;
     /// The food flags.
     unsigned int foodFlags;
 

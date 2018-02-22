@@ -102,7 +102,7 @@ public:
     /// Character stamina value.
     unsigned int stamina;
     /// Character level of hunger
-    int hunger;
+    unsigned int hunger;
     /// Character level of thirst.
     int thirst;
     /// Character abilities.

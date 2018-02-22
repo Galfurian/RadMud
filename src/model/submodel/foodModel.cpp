@@ -25,7 +25,7 @@
 #include "logger.hpp"
 
 FoodModel::FoodModel() :
-    hours(),
+    nurishment(),
     foodFlags()
 {
     // Nothing to do.
@@ -62,7 +62,7 @@ bool FoodModel::setModel(const std::string & source)
                     name);
         return false;
     }
-    hours = ToNumber<unsigned int>(functionList[0]);
+    nurishment = ToNumber<unsigned int>(functionList[0]);
     foodFlags = ToNumber<unsigned int>(functionList[1]);
     return true;
 }
@@ -74,7 +74,7 @@ void FoodModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow({"Hours", ToString(hours)});
+    sheet.addRow({"Nurishment", ToString(nurishment)});
     sheet.addRow({"Flags", GetFoodFlagString(foodFlags)});
 }
 

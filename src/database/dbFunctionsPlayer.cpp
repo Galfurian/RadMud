@@ -203,8 +203,8 @@ bool SQLiteDbms::loadPlayerInformation(ResultSet * result, Player * player)
     }
     // Hunger
     {
-        int value;
-        if (!result->getDataInteger(column++, value)) return false;
+        unsigned int value;
+        if (!result->getDataUnsignedInteger(column++, value)) return false;
         player->hunger = value;
     }
     // Thirst
