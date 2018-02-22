@@ -51,7 +51,6 @@ Character::Character() :
     actionQueueMutex(),
     inputProcessor(std::make_shared<ProcessInput>()),
     outbuffer(),
-    outstream(outbuffer),
     effectManager(),
     skillManager(this),
     combatHandler(this)
@@ -199,7 +198,7 @@ void Character::getSheet(Table & sheet) const
     sheet.addRow({"## Effect Name", "## Remaining TIC"});
     for (const auto & it : effectManager.getActiveEffects())
     {
-        sheet.addRow({it.name, ToString(it.remainingTic)});
+        sheet.addRow({it.getName(), ToString(it.getRemainingTics())});
     }
 }
 
@@ -849,26 +848,12 @@ void Character::updateThirst()
 
 void Character::updateExpiredEffects()
 {
-    std::vector<std::string> messages;
-    if (this->effectManager.effectUpdate(messages))
-    {
-        for (const auto & message : messages)
-        {
-            this->sendMsg(message + "\n");
-        }
-    }
+    effectManager.effectUpdate();
 }
 
 void Character::updateActivatedEffects()
 {
-    std::vector<std::string> messages;
-    if (this->effectManager.effectActivate(messages))
-    {
-        for (const auto & message : messages)
-        {
-            this->sendMsg(message + "\n");
-        }
-    }
+    effectManager.effectActivate();
 }
 
 std::string Character::getLook()

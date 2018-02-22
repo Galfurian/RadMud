@@ -114,8 +114,8 @@ ActionStatus MoveAction::perform()
     // Check if the actor was aiming.
     if (actor->combatHandler.getAimedTarget() != nullptr)
     {
-        actor->effectManager.forceAddEffect(
-            EffectFactory::disturbedAim(actor, 1, -3));
+        actor->effectManager.addEffect(
+            EffectFactory::disturbedAim(actor, 1, -3), true);
     }
     // Move character.
     MoveCharacterTo(

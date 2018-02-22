@@ -560,12 +560,7 @@ bool DoEffects(Character * character, ArgumentHandler &)
     msg += "Active Effects\n";
     for (auto const & it : character->effectManager.getActiveEffects())
     {
-        msg += "\t" + Align(it.name, align::left, 30) + "\n";
-    }
-    msg += "Passive Effects\n";
-    for (auto const & it : character->effectManager.getPassiveEffects())
-    {
-        msg += "\t" + Align(it.name, align::left, 30) + "\n";
+        msg += "\t" + Align(it.getName(), align::left, 30) + "\n";
     }
     msg += "Ability Modifiers\n";
     for (auto const & it : character->effectManager.getAbilityMod())

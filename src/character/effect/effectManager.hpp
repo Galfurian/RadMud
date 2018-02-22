@@ -36,8 +36,6 @@ private:
     std::vector<Effect> activeEffects;
     /// The list of pending effects.
     std::vector<Effect> pendingEffects;
-    /// The list of passive effects.
-    std::vector<Effect> passiveEffects;
 
 public:
     /// @brief Constructor.
@@ -46,56 +44,27 @@ public:
     /// @brief Destructor.
     ~EffectManager();
 
-    /// @brief Allows to add a passive effect.
-    /// @param effect The effect that has to be added.
-    bool addPassiveEffect(const Effect & effect);
-
-    /// @brief Allows to remove a passive effect.
-    /// @param effect The effect that has to be added.
-    void removePassiveEffect(const Effect & effect);
-
-    /// @brief Allows to remove all the passive effects.
-    void removeAllPassiveEffect();
-
-    /// @brief Allows to add an effect.
-    /// @param effect The effect that has to be added.
-    void forceAddEffect(const Effect & effect);
-
     /// @brief Allows to add an effect to the buffer of pending effects.
-    /// @param effect The one which has to be added to the buffer.
-    void addPendingEffect(const Effect & effect);
+    /// @param effect    The one which has to be added to the buffer.
+    /// @param immediate If specified the effect is immediately activated.
+    void addEffect(Effect const & effect, bool immediate = false);
 
-    /// @brief One by one moves the pending effects inside the buffer of
-    ///         Active effects.
-    /// @param messages A vector of messages which is populated with the logs
-    ///                  of the pending effects.
-    /// @return <b>True</b> if there is a message to show,<br>
-    ///         <b>False</b> otherwise.
-    bool effectActivate(std::vector<std::string> & messages);
+    /// @brief Activate pending effects.
+    void effectActivate();
 
-    /// @brief One by one updates the active effects.
-    /// @param messages A vector of messages which is populated with the logs
-    ///                  of the effects.
-    /// @return <b>True</b> if there is a message to show,<br>
-    ///         <b>False</b> otherwise.
-    bool effectUpdate(std::vector<std::string> & messages);
+    /// @brief Updates the active effects.
+    void effectUpdate();
 
     /// @brief Provides the list of active effects.
-    inline std::vector<Effect> getActiveEffects() const
+    inline std::vector<Effect> const & getActiveEffects() const
     {
         return activeEffects;
     }
 
     /// @brief Provides the list of pending effects.
-    inline std::vector<Effect> getPendingEffects() const
+    inline std::vector<Effect> const & getPendingEffects() const
     {
         return pendingEffects;
-    }
-
-    /// @brief Provides the list of passive effects.
-    inline std::vector<Effect> getPassiveEffects() const
-    {
-        return passiveEffects;
     }
 
 private:

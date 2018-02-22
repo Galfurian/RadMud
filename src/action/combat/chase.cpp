@@ -227,8 +227,8 @@ bool Chase::moveTowardsTarget()
         return false;
     }
     // Apply the disturbed aim effect.
-    actor->effectManager
-         .forceAddEffect(EffectFactory::disturbedAim(actor, 1, -3));
+    actor->effectManager.addEffect(
+        EffectFactory::disturbedAim(actor, 1, -3), true);
     // Pop the room.
     path.erase(path.begin());
     return true;

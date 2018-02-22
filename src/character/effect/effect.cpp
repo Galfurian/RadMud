@@ -21,25 +21,3 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "effect.hpp"
-
-Effect::Effect(Character * _affected,
-               std::string _name,
-               unsigned int _remainingTic,
-               std::string _messageActivate,
-               std::string _messageExpire,
-               std::function<void(Character * character)> _expireFunction) :
-    affected(_affected),
-    name(std::move(_name)),
-    remainingTic(_remainingTic),
-    messageActivate(std::move(_messageActivate)),
-    messageExpire(std::move(_messageExpire)),
-    expireFunction(std::move(_expireFunction))
-{
-    Logger::log(LogLevel::Debug, "Created effect %s.", name);
-}
-
-
-Effect::~Effect()
-{
-    Logger::log(LogLevel::Debug, "Deleted effect %s.", name);
-}

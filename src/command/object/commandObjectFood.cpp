@@ -30,14 +30,14 @@ bool DoEat(Character * character, ArgumentHandler & args)
     // Check if the character is sleeping.
     if (character->posture == CharacterPosture::Sleep)
     {
-        (*character) << "Not while you're sleeping.\n";
+        character->sendMsg("Not while you're sleeping.\n");
         return false;
     }
     // Stop any action the character is executing.
     StopAction(character);
     if (args.empty())
     {
-        (*character) << "Drink from what?\n";
+        character->sendMsg("Drink from what?\n");
         return false;
     }
     Item * source = nullptr;
@@ -65,23 +65,42 @@ bool DoEat(Character * character, ArgumentHandler & args)
     // Check the source container.
     if (source == nullptr)
     {
-        (*character) << "You don't see '" << args[0].getContent() << "'.\n";
+        character->sendMsg("You don't see '%s'.\n", args[0].getContent());
         return false;
     }
     if (source->model->getType() != ModelType::Food)
     {
-        (*character) << "You cannot eat " << source->getName(true) << ".\n";
+        character->sendMsg("You cannot eat %s.\n", source->getName(true));
         return false;
     }
     auto foodModel = std::dynamic_pointer_cast<FoodModel>(source->model);
     auto finalHunger = character->hunger + foodModel->nurishment;
     if (finalHunger > 100)
     {
-        (*character) << "You cannot eat more food.\n";
+        character->sendMsg("You cannot eat more food.\n");
         return false;
     }
-    (*character) << "You eat " << source->getName(true) << ".\n";
+    character->sendMsg("You eat %s.\n", source->getName(true));
+    // Update the hunger.
     character->hunger = finalHunger;
+    // Destroy the food.
     MudUpdater::instance().addItemToDestroy(source);
+    // Apply effects due to food.
+    if (HasFlag(foodModel->foodFlags, FoodFlag::Raw))
+    {
+        character->effectManager.addEffect(
+            EffectFactory::poisonDamage(
+                character,
+                "Food Poisoning",
+                1,
+                foodModel->nurishment,
+                "Your stomach complains...",
+                "The pain in your guts is excruciating!",
+                "Your stomach is calm now.",
+                "The pain in your guts is excruciating, your body collapses "
+                    "and death find you very quickly.",
+                25));
+    }
+
     return true;
 }

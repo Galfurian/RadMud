@@ -176,7 +176,7 @@ bool DoBuild(Character * character, ArgumentHandler & args)
     // If the argument list is empty show what the character can build.
     if (args.empty())
     {
-        (*character) << "You know how to build:\n";
+        character->sendMsg("You know how to build:\n");
         Table buildingTable;
         buildingTable.addDivider();
         buildingTable.addHeader("Known Buildings");
@@ -193,7 +193,7 @@ bool DoBuild(Character * character, ArgumentHandler & args)
             buildingTable.addRow({building->getNameCapital(),
                                   std::to_string(building->difficulty)});
         }
-        (*character) << buildingTable.getTable() << "\n";
+        character->sendMsg(buildingTable.getTable() + "\n");
         return true;
     }
     if (args.size() != 1)

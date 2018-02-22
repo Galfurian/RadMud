@@ -21,11 +21,11 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "effectManager.hpp"
+#include "effect.hpp"
 
 EffectManager::EffectManager() :
     activeEffects(),
-    pendingEffects(),
-    passiveEffects()
+    pendingEffects()
 {
     // Nothing to do.
 }
@@ -35,104 +35,46 @@ EffectManager::~EffectManager()
     // Nothing to do.
 }
 
-bool EffectManager::addPassiveEffect(const Effect & effect)
+void EffectManager::addEffect(Effect const & effect, bool immediate)
 {
-    // First check if the same effect is already active.
-    for (auto & it : passiveEffects)
+    if (immediate)
     {
-        // Check the equality between the effects.
-        if (it == effect)
+        // Check if the effect is already active.
+        auto active = std::find_if(activeEffects.begin(), activeEffects.end(),
+                                   [effect](Effect const & e)
+                                   {
+                                       return (effect.getName() == e.getName());
+                                   });
+        // If the same effect is already active, replace it.
+        if (active != activeEffects.end())
         {
-            // Set the remaining time to the longest one.
-            if (it.remainingTic < effect.remainingTic)
-            {
-                it.remainingTic = effect.remainingTic;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            // Remove the modifiers due to the old effect.
+            (*this) -= (*active);
+            // Replace the active effect with the new one.
+            (*active) = effect;
         }
-    }
-    // Add the effect to the active effects.
-    passiveEffects.push_back(effect);
-    // Activate the effect.
-//    this->addEffectMod(effect);
-    (*this) += effect;
-    return true;
-}
-
-void EffectManager::removePassiveEffect(const Effect & effect)
-{
-    // Try to find the effect.
-    for (auto it = passiveEffects.begin(); it != passiveEffects.end(); ++it)
-    {
-        if ((*it).name == effect.name)
+        else
         {
-            // Deactivate the effect.
-//            this->remEffectMod(*it);
-            (*this) -= (*it);
-            // Remove the effect from the list of active effects.
-            passiveEffects.erase(it);
-            // Stop the loop.
-            break;
+            // Add the effect to the active effects.
+            activeEffects.emplace_back(effect);
         }
+        // Add the modifiers due to the effect.
+        (*this) += effect;
+        // Sort the list of active effects.
+        this->sortEffects(activeEffects);
+        return;
     }
-}
-
-void EffectManager::removeAllPassiveEffect()
-{
-    // Iterate trough the active effects.
-    for (auto it = passiveEffects.begin(); it != passiveEffects.end();)
-    {
-        // Deactivate the effect.
-//        this->remEffectMod(*it);
-        (*this) -= (*it);
-        // Remove the effect from the list of active effects.
-        it = passiveEffects.erase(it);
-    }
-}
-
-void EffectManager::forceAddEffect(const Effect & effect)
-{
-    // First check if the same effect is already active.
-    for (auto & iterator : pendingEffects)
-    {
-        // Check the equality between the effects.
-        if (iterator == effect)
-        {
-            // If the effect is already active, set the remaining time to the
-            // longest one.
-            if (iterator.remainingTic < effect.remainingTic)
-            {
-                iterator.remainingTic = effect.remainingTic;
-            }
-            return;
-        }
-    }
-    // Add the effect to the active effects.
-    activeEffects.push_back(effect);
-    // Activate the effect.
-//    this->addEffectMod(effect);
-    (*this) += effect;
-    // Sort the list of active effects.
-    this->sortEffects(activeEffects);
-}
-
-void EffectManager::addPendingEffect(const Effect & effect)
-{
     // First check if the same effect is already in the pending queue.
-    for (auto & iterator : pendingEffects)
+    for (auto & pending : pendingEffects)
     {
         // Check the equality between the effects.
-        if (iterator == effect)
+        if (pending == effect)
         {
             // If the effect is already active, set the remaining time to the
             // longest one.
-            if (iterator.remainingTic < effect.remainingTic)
+            if (pending.getRemainingTics() < effect.getRemainingTics())
             {
-                iterator.remainingTic = effect.remainingTic;
+                pending.setRemainingTics(effect.getRemainingTics());
             }
             return;
         }
@@ -141,44 +83,48 @@ void EffectManager::addPendingEffect(const Effect & effect)
     pendingEffects.push_back(effect);
 }
 
-bool EffectManager::effectActivate(std::vector<std::string> & messages)
+void EffectManager::effectActivate()
 {
-    // Define a function which checks if an effect is already active.
-    auto CheckEffectPresence = [&](Effect & effect)
-    {
-        for (auto & activeEffect : activeEffects)
-        {
-            if (effect == activeEffect)
-            {
-                return true;
-            }
-        }
-        return false;
-    };
     // First check if the same effect is already active.
-    for (auto & pendingEffect : pendingEffects)
+    auto it = pendingEffects.begin();
+    while (it != pendingEffects.end())
     {
-        if (!CheckEffectPresence(pendingEffect))
+        if (it->getDelay() > 0)
         {
-            if (!pendingEffect.messageActivate.empty())
+            // Skip if the effect is delayed and keep it inside the pending list.
+            it->decreaseDelay();
+            // Move the iterator.
+            ++it;
+        }
+        else if (std::find_if(activeEffects.begin(), activeEffects.end(),
+                              [it](Effect const & e)
+                              {
+                                  return (it->getName() == e.getName());
+                              }) != activeEffects.end())
+        {
+            // Remove the pending effect if already active.
+            it = pendingEffects.erase(it);
+        }
+        else
+        {
+            // Execute the activation functionality if present.
+            if (it->functions.activate)
             {
-                messages.push_back(pendingEffect.messageActivate);
+                it->functions.activate(it->affected);
             }
+            // Add the modifiers due to the effect.
+            (*this) += (*it);
             // Add the effect to the active effects.
-            activeEffects.emplace_back(pendingEffect);
-            // Activate the effect.
-            (*this) += pendingEffect;
-//            this->addEffectMod(pendingEffect);
+            activeEffects.emplace_back(*it);
+            // Remove the activated effect.
+            it = pendingEffects.erase(it);
         }
     }
     // Sort the list of active effects.
     this->sortEffects(activeEffects);
-    // Empty out the list of pending effects.
-    pendingEffects.clear();
-    return !messages.empty();
 }
 
-bool EffectManager::effectUpdate(std::vector<std::string> & messages)
+void EffectManager::effectUpdate()
 {
     // Iterate trough the active effects.
     auto it = activeEffects.begin();
@@ -187,24 +133,26 @@ bool EffectManager::effectUpdate(std::vector<std::string> & messages)
         // If the effect is expired, remove it.
         if ((*it).update())
         {
-            // If the effect has an expiration message, add it to the list of
-            // output messages.
-            if (!(*it).messageExpire.empty())
+            // If the effect has an expiration function, execute it.
+            if (it->functions.expire)
             {
-                messages.push_back((*it).messageExpire);
+                it->functions.expire(it->affected);
             }
-            // Deactivate the effect.
-//            this->remEffectMod(*it);
+            // Remove the modifiers due to the effect.
             (*this) -= (*it);
             // Remove the effect from the list of active effects.
             it = activeEffects.erase(it);
         }
         else
         {
+            // If the effect has a periodic function, execute it.
+            if (it->functions.periodic)
+            {
+                it->functions.periodic(it->affected);
+            }
             ++it;
         }
     }
     // Sort the list of active effects.
     this->sortEffects(activeEffects);
-    return !messages.empty();
 }

@@ -125,8 +125,6 @@ public:
     std::shared_ptr<ProcessInput> inputProcessor;
     /// The output buffer.
     std::string outbuffer;
-    /// Stream used to handle the output buffer.
-    std::stringstream outstream;
 
     /// Active effects on player.
     EffectManager effectManager;
@@ -536,15 +534,6 @@ public:
     void sendMsg(const std::string & msg, const Args & ... args)
     {
         this->sendMsg(StringBuilder::build(msg, args ...));
-    }
-
-    template<typename T>
-    Character & operator<<(T stream)
-    {
-        outstream.str("");
-        outstream << stream;
-        outbuffer += outstream.str();
-        return (*this);
     }
 
 protected:

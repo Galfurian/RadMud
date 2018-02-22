@@ -39,54 +39,95 @@ class Effect :
     public ModifierManager
 {
 public:
+    /// Functions associated with precise moments of the lifespan of an effect.
+    typedef struct
+    {
+        /// Function executed when the effect expires.
+        std::function<void(Character * character)> activate;
+        /// Function executed at each tic.
+        std::function<void(Character * character)> periodic;
+        /// Function executed when the effect expires.
+        std::function<void(Character * character)> expire;
+    } Functionality;
+
     /// The character affected by the effect.
     Character * affected;
     /// Name of the modifier.
     std::string name;
+    /// How many tic before activation.
+    unsigned int tdelay;
     /// How many tic until it expires.
-    unsigned int remainingTic;
-    /// Message to show when the effect begins.
-    std::string messageActivate;
-    /// Message to show when the effect ends.
-    std::string messageExpire;
-    /// Function executed when the effect expires.
-    std::function<void(Character * character)> expireFunction;
+    unsigned int tremain;
+    /// The functionality of the effet.
+    Functionality functions;
 
     /// @brief Constructor.
     Effect(Character * _affected,
            std::string _name,
-           unsigned int _remainingTic,
-           std::string _messageActivate,
-           std::string _messageExpire,
-           std::function<void(Character * character)> _expireFunction);
+           unsigned int _tdelay,
+           unsigned int _tremain,
+           Functionality _functions) :
+        affected(_affected),
+        name(std::move(_name)),
+        tdelay(_tdelay),
+        tremain(_tremain),
+        functions(std::move(_functions))
+    {
+        Logger::log(LogLevel::Debug, "Created effect %s.", name);
+    }
 
     /// @brief Destructor.
-    ~Effect();
+    ~Effect()
+    {
+        Logger::log(LogLevel::Debug, "Deleted effect %s.", name);
+    }
 
-    /// @brief Update the cooldown of the effect.
+    /// @brief Update the remaining tics of the effect.
     /// @return <b>True</b> if the effect is expired,<br>
     ///         <b>False</b> otherwise.
     inline bool update()
     {
-        if ((--remainingTic) == 0)
+        if (tremain == 0)
         {
-            if (expireFunction)
-            {
-                expireFunction(affected);
-            }
             return true;
         }
+        --tremain;
         return false;
     }
 
-    /// @brief Operator used to order the effect based on the remaining time.
-    bool operator<(const Effect & right) const
+    inline std::string getName() const
     {
-        return remainingTic < right.remainingTic;
+        return name;
+    }
+
+    inline unsigned int getDelay() const
+    {
+        return tdelay;
+    }
+
+    inline unsigned int getRemainingTics() const
+    {
+        return tremain;
+    }
+
+    inline void setRemainingTics(unsigned int _tremain)
+    {
+        tremain = _tremain;
+    }
+
+    inline void decreaseDelay()
+    {
+        --tdelay;
+    }
+
+    /// @brief Operator used to order the effect based on the remaining time.
+    inline bool operator<(const Effect & right) const
+    {
+        return tremain < right.tremain;
     }
 
     /// @brief Equality operator between the names of two effects.
-    bool operator==(const Effect & right) const
+    inline bool operator==(const Effect & right) const
     {
         return name == right.name;
     }
