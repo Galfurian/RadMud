@@ -21,6 +21,8 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "profession.hpp"
+#include "production.hpp"
+#include "utils.hpp"
 
 Profession::Profession() :
     vnum(),
@@ -32,7 +34,8 @@ Profession::Profession() :
     successMessage(),
     failureMessage(),
     interruptMessage(),
-    notFoundMessage()
+    notFoundMessage(),
+    productions()
 {
     // Nothing to do.
 }
@@ -58,4 +61,16 @@ bool Profession::check()
     if (interruptMessage.empty()) return false;
     if (notFoundMessage.empty()) return false;
     return true;
+}
+
+Production * Profession::findProduction(std::string const & name)
+{
+    for (auto production : productions)
+    {
+        if (BeginWith(ToLower(production->name), ToLower(name)))
+        {
+            return production;
+        }
+    }
+    return nullptr;
 }

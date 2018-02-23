@@ -807,6 +807,7 @@ bool LoadProduction(ResultSet * result)
     {
         throw SQLiteException("Error during production insertion.");
     }
+    profession->productions.emplace_back(production);
     // Log it.
     Logger::log(LogLevel::Debug,
                 "\t%s%s",

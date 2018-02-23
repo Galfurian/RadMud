@@ -62,7 +62,7 @@ bool DoProfession(Character * character,
         return false;
     }
     // Search the production.
-    auto production = Mud::instance().findProduction(args[0].getContent());
+    auto production = profession->findProduction(args[0].getContent());
     if (production == nullptr)
     {
         character->sendMsg("%s '%s'.\n", profession->notFoundMessage,

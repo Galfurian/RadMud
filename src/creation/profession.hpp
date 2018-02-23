@@ -24,8 +24,11 @@
 
 #include <string>
 #include <map>
+#include <vector>
 
 #include "characterPosture.hpp"
+
+class Production;
 
 /// @brief Holds details about a profession.
 class Profession
@@ -51,6 +54,8 @@ public:
     std::string interruptMessage;
     /// The message shown if the desired production has not been found.
     std::string notFoundMessage;
+    /// The list of associated productions.
+    std::vector<Production *> productions;
 
     /// @brief Constructor.
     Profession();
@@ -74,4 +79,6 @@ public:
     /// @return <b>True</b> if the profession has correct values,<br>
     ///         <b>False</b> otherwise.
     bool check();
+
+    Production * findProduction(std::string const & name);
 };
