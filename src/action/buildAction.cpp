@@ -82,12 +82,14 @@ bool BuildAction::check(std::string & error) const
             return false;
         }
     }
+#if 0
     if (tools.empty())
     {
         Logger::log(LogLevel::Error, "No used tools have been set.");
         error = "One or more tools are missing.";
         return false;
     }
+#endif
     for (auto iterator : tools)
     {
         // Check if the tool has been deleted.
