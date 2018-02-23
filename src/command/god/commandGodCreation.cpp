@@ -97,13 +97,13 @@ bool DoBuildingInfo(Character * character, ArgumentHandler & args)
     msg += "Time        : " + ToString(building->time) + "\n";
     msg += "Assisted    : " + ToString(building->assisted) + "\n";
     msg += "Tools       :\n";
-    for (auto iterator : building->tools)
+    for (auto const & iterator : building->tools)
     {
-        msg += "                  " + GetToolTypeName(iterator) + "\n";
+        msg += "                  " + iterator.toString() + "\n";
     }
     msg += "Building    : " + building->buildingModel->name + "\n";
     msg += "Ingredients :\n";
-    for (auto iterator : building->ingredients)
+    for (auto const & iterator : building->ingredients)
     {
         msg += "    " + iterator.first.toString();
         msg += "(" + ToString(iterator.second) + ")\n";
@@ -205,17 +205,17 @@ bool DoProductionInfo(Character * character, ArgumentHandler & args)
     msg += "Outcome     : " + production->outcome->name + "*";
     msg += ToString(production->quantity) + "\n";
     msg += "Tools       :\n";
-    for (auto iterator : production->tools)
+    for (auto const & iterator : production->tools)
     {
-        msg += "                  " + GetToolTypeName(iterator) + "\n";
+        msg += "                  " + iterator.toString() + "\n";
     }
     msg += "Ingredients :\n";
-    for (auto iterator : production->ingredients)
+    for (auto const & iterator : production->ingredients)
     {
         msg += "    " + iterator.first.toString();
         msg += "(" + ToString(iterator.second) + ")\n";
     }
-    msg += "Workbench   :" + GetToolTypeName(production->workbench) + "\n";
+    msg += "Workbench   :" + production->workbench.toString() + "\n";
     character->sendMsg(msg);
     return true;
 }

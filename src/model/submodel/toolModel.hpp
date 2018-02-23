@@ -45,11 +45,3 @@ public:
 
     void getSheet(Table & sheet) const override;
 };
-
-/// @addtogroup EnumToString
-/// @{
-
-/// Return the string describing the type of a Tool.
-std::string GetToolTypeName(ToolType type);
-
-///@}

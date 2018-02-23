@@ -56,6 +56,28 @@ bool DoProfession(Character * character,
     }
     // Stop any action the character is executing.
     StopAction(character);
+    // If the argument list is empty show what the character can craft.
+    if (args.empty())
+    {
+        character->sendMsg("You know how to %s:\n", profession->command);
+        Table buildingTable;
+        buildingTable.addDivider();
+        buildingTable.addHeader(profession->action);
+        buildingTable.addDivider();
+        buildingTable.addColumn("Product", align::left);
+        buildingTable.addColumn("Difficulty", align::right);
+        for (auto production : profession->productions)
+        {
+            if (!HasRequiredKnowledge(character, production->requiredKnowledge))
+            {
+                continue;
+            }
+            buildingTable.addRow({production->getNameCapital(),
+                                  std::to_string(production->difficulty)});
+        }
+        character->sendMsg(buildingTable.getTable() + "\n");
+        return true;
+    }
     if (args.size() != 1)
     {
         character->sendMsg("What do you want to produce?\n");
@@ -179,7 +201,7 @@ bool DoBuild(Character * character, ArgumentHandler & args)
         character->sendMsg("You know how to build:\n");
         Table buildingTable;
         buildingTable.addDivider();
-        buildingTable.addHeader("Known Buildings");
+        buildingTable.addHeader("Buildings");
         buildingTable.addDivider();
         buildingTable.addColumn("Building", align::left);
         buildingTable.addColumn("Difficulty", align::right);
