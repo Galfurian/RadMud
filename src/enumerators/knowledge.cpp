@@ -57,10 +57,12 @@ std::string Knowledge::toString() const
         return "MetalWeaponCrafting";
     if (value == Knowledge::MetalArmorCrafting)
         return "MetalArmorCrafting";
-    if (value == Knowledge::Scavenge)
-        return "Scavenge";
     if (value == Knowledge::CraftSurvivalTool)
         return "CraftSurvivalTool";
+    if (value == Knowledge::Cooking)
+        return "Cooking";
+    if (value == Knowledge::Scavenge)
+        return "Scavenge";
     if (value == Knowledge::BasicArmorProficiency)
         return "BasicArmorProficiency";
     else return "None";
