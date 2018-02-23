@@ -23,6 +23,8 @@
 #pragma once
 
 #include "item.hpp"
+#include "toolType.hpp"
+#include "resourceType.hpp"
 
 namespace ItemUtils
 {
@@ -32,17 +34,22 @@ namespace ItemUtils
 /// @param key       The key of the item to search.
 /// @param number    Position of the item we want to look for.
 /// @return The item, if it's in the character's inventory.
-inline Item * FindItemIn(std::vector<Item *> const & container,
-                         std::string const & key,
-                         int & number)
-{
-    for (auto item : container)
-    {
-        if (!item->hasKey(ToLower(key))) continue;
-        if (number == 1) return item;
-        --number;
-    }
-    return nullptr;
-}
+Item * FindItemIn(std::vector<Item *> const & container,
+                  std::string const & key,
+                  int & number);
+
+/// @brief Properly check if the given item can be used as tool.
+/// @param item         The item to check.
+/// @param exceptions   The exceptions.
+/// @param toolType     The type of tool.
+/// @return If the item can be used as tool.
+bool IsValidTool(Item * item,
+                 ItemVector const & exceptions,
+                 ToolType const & toolType);
+
+
+// Create a function which checks if the given item is of the required type.
+bool IsValidResource(Item * item,
+                     const ResourceType & resourceType);
 
 }

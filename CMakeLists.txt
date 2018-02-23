@@ -233,6 +233,7 @@ set(PROJECT_SRC
         ${CMAKE_SOURCE_DIR}/src/item/writing.cpp
         ${CMAKE_SOURCE_DIR}/src/item/itemFactory.cpp
         ${CMAKE_SOURCE_DIR}/src/item/itemVector.cpp
+        ${CMAKE_SOURCE_DIR}/src/item/itemUtils.cpp
         ${CMAKE_SOURCE_DIR}/src/item/subitem/shopItem.cpp
         ${CMAKE_SOURCE_DIR}/src/item/subitem/lightItem.cpp
         ${CMAKE_SOURCE_DIR}/src/item/subitem/armorItem.cpp
