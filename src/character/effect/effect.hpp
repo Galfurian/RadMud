@@ -82,42 +82,24 @@ public:
         Logger::log(LogLevel::Debug, "Deleted effect %s.", name);
     }
 
-    /// @brief Update the remaining tics of the effect.
+    /// @brief Update the remaining tics.
     /// @return <b>True</b> if the effect is expired,<br>
     ///         <b>False</b> otherwise.
-    inline bool update()
+    inline bool updateRemainingTime()
     {
-        if (tremain == 0)
-        {
-            return true;
-        }
+        if (tremain == 0) return true;
         --tremain;
         return false;
     }
 
-    inline std::string getName() const
+    /// @brief Update the delay.
+    /// @return <b>True</b> if the delay has expired,<br>
+    ///         <b>False</b> otherwise.
+    inline bool updateDelayTime()
     {
-        return name;
-    }
-
-    inline unsigned int getDelay() const
-    {
-        return tdelay;
-    }
-
-    inline unsigned int getRemainingTics() const
-    {
-        return tremain;
-    }
-
-    inline void setRemainingTics(unsigned int _tremain)
-    {
-        tremain = _tremain;
-    }
-
-    inline void decreaseDelay()
-    {
+        if (tdelay == 0) return true;
         --tdelay;
+        return false;
     }
 
     /// @brief Operator used to order the effect based on the remaining time.

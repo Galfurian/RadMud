@@ -199,11 +199,11 @@ bool DoBug(Character * character, ArgumentHandler & args)
         return false;
     }
     std::vector<std::string> arguments;
-    arguments.push_back(character->getName()); // Author
-    arguments.push_back(GetDate()); // Date.
-    arguments.push_back("0"); // Type
-    arguments.push_back(ToString(character->room->vnum)); // Location
-    arguments.push_back(args.getOriginal());
+    arguments.emplace_back(character->getName()); // Author
+    arguments.emplace_back(GetDate()); // Date.
+    arguments.emplace_back("0"); // Type
+    arguments.emplace_back(ToString(character->room->vnum)); // Location
+    arguments.emplace_back(args.getOriginal());
     SQLiteDbms::instance().beginTransaction();
     if (!SQLiteDbms::instance().insertInto("Board", arguments))
     {
@@ -228,11 +228,11 @@ bool DoIdea(Character * character, ArgumentHandler & args)
         return false;
     }
     std::vector<std::string> arguments;
-    arguments.push_back(character->getName()); // Author
-    arguments.push_back(GetDate()); // Date.
-    arguments.push_back("1"); // Type
-    arguments.push_back(ToString(character->room->vnum)); // Location
-    arguments.push_back(args.getOriginal());
+    arguments.emplace_back(character->getName()); // Author
+    arguments.emplace_back(GetDate()); // Date.
+    arguments.emplace_back("1"); // Type
+    arguments.emplace_back(ToString(character->room->vnum)); // Location
+    arguments.emplace_back(args.getOriginal());
     SQLiteDbms::instance().beginTransaction();
     if (!SQLiteDbms::instance().insertInto("Board", arguments))
     {
@@ -255,11 +255,11 @@ bool DoTypo(Character * character, ArgumentHandler & args)
         return false;
     }
     std::vector<std::string> arguments;
-    arguments.push_back(character->getName()); // Author
-    arguments.push_back(GetDate()); // Date.
-    arguments.push_back("2"); // Type
-    arguments.push_back(ToString(character->room->vnum)); // Location
-    arguments.push_back(args.getOriginal());
+    arguments.emplace_back(character->getName()); // Author
+    arguments.emplace_back(GetDate()); // Date.
+    arguments.emplace_back("2"); // Type
+    arguments.emplace_back(ToString(character->room->vnum)); // Location
+    arguments.emplace_back(args.getOriginal());
 
     SQLiteDbms::instance().beginTransaction();
     if (!SQLiteDbms::instance().insertInto("Board", arguments))

@@ -243,14 +243,14 @@ bool DoPlayerList(Character * character, ArgumentHandler & /*args*/)
         }
         // Prepare the row.
         TableRow row;
-        row.push_back(iterator->name);
+        row.emplace_back(iterator->name);
         if (iterator->room != nullptr)
         {
-            row.push_back(iterator->room->name);
+            row.emplace_back(iterator->room->name);
         }
         else
         {
-            row.push_back("Nowhere!");
+            row.emplace_back("Nowhere!");
         }
         // Add the row to the table.
         table.addRow(row);

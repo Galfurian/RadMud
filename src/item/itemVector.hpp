@@ -49,7 +49,7 @@ public:
     ///  item already contained inside this container, the pushed item is
     ///  deleted and its pointer is modifier and pointed to the target item.
     /// @param item The reference to the pointer of the pushed item.
-    void push_back_item(Item *& item);
+    void emplace_back_item(Item *& item);
 
     /// Allows to remove the given item.
     /// @param item The item that has to be removed from the container.

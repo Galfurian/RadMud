@@ -43,7 +43,7 @@ void EffectManager::addEffect(Effect const & effect, bool immediate)
         auto active = std::find_if(activeEffects.begin(), activeEffects.end(),
                                    [effect](Effect const & e)
                                    {
-                                       return (effect.getName() == e.getName());
+                                       return (effect.name == e.name);
                                    });
         // If the same effect is already active, replace it.
         if (active != activeEffects.end())
@@ -72,15 +72,15 @@ void EffectManager::addEffect(Effect const & effect, bool immediate)
         {
             // If the effect is already active, set the remaining time to the
             // longest one.
-            if (pending.getRemainingTics() < effect.getRemainingTics())
+            if (pending.tremain < effect.tremain)
             {
-                pending.setRemainingTics(effect.getRemainingTics());
+                pending.tremain = effect.tremain;
             }
             return;
         }
     }
     // Add the effect to the pending effects.
-    pendingEffects.push_back(effect);
+    pendingEffects.emplace_back(effect);
 }
 
 void EffectManager::effectActivate()
@@ -89,36 +89,35 @@ void EffectManager::effectActivate()
     auto it = pendingEffects.begin();
     while (it != pendingEffects.end())
     {
-        if (it->getDelay() > 0)
+        // Check if the effect is still delayed.
+        if (!it->updateDelayTime())
         {
-            // Skip if the effect is delayed and keep it inside the pending list.
-            it->decreaseDelay();
             // Move the iterator.
             ++it;
+            continue;
         }
-        else if (std::find_if(activeEffects.begin(), activeEffects.end(),
-                              [it](Effect const & e)
-                              {
-                                  return (it->getName() == e.getName());
-                              }) != activeEffects.end())
+        // Check if there is the same effect already active.
+        if (std::find_if(activeEffects.begin(), activeEffects.end(),
+                         [it](Effect const & e)
+                         {
+                             return (it->name == e.name);
+                         }) != activeEffects.end())
         {
             // Remove the pending effect if already active.
             it = pendingEffects.erase(it);
+            continue;
         }
-        else
+        // Execute the activation functionality if present.
+        if (it->functions.activate)
         {
-            // Execute the activation functionality if present.
-            if (it->functions.activate)
-            {
-                it->functions.activate(it->affected);
-            }
-            // Add the modifiers due to the effect.
-            (*this) += (*it);
-            // Add the effect to the active effects.
-            activeEffects.emplace_back(*it);
-            // Remove the activated effect.
-            it = pendingEffects.erase(it);
+            it->functions.activate(it->affected);
         }
+        // Add the modifiers due to the effect.
+        (*this) += (*it);
+        // Add the effect to the active effects.
+        activeEffects.emplace_back(std::move(*it));
+        // Remove the activated effect.
+        it = pendingEffects.erase(it);
     }
     // Sort the list of active effects.
     this->sortEffects(activeEffects);
@@ -131,7 +130,7 @@ void EffectManager::effectUpdate()
     while (it != activeEffects.end())
     {
         // If the effect is expired, remove it.
-        if ((*it).update())
+        if ((*it).updateRemainingTime())
         {
             // If the effect has an expiration function, execute it.
             if (it->functions.expire)

@@ -316,7 +316,7 @@ bool DoHelp(Character * character, ArgumentHandler & args)
             {
                 if (it->gods)
                 {
-                    godsRow.push_back(it->name);
+                    godsRow.emplace_back(it->name);
                     if (godsRow.size() == numColumns)
                     {
                         godsCommands.addRow(godsRow);
@@ -325,7 +325,7 @@ bool DoHelp(Character * character, ArgumentHandler & args)
                 }
                 else
                 {
-                    baseRow.push_back(it->name);
+                    baseRow.emplace_back(it->name);
                     if (baseRow.size() == numColumns)
                     {
                         baseCommands.addRow(baseRow);
@@ -560,7 +560,7 @@ bool DoEffects(Character * character, ArgumentHandler &)
     msg += "Active Effects\n";
     for (auto const & it : character->effectManager.getActiveEffects())
     {
-        msg += "\t" + Align(it.getName(), align::left, 30) + "\n";
+        msg += "\t" + Align(it.name, align::left, 30) + "\n";
     }
     msg += "Ability Modifiers\n";
     for (auto const & it : character->effectManager.getAbilityMod())

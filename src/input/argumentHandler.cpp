@@ -51,7 +51,7 @@ void ArgumentHandler::evaluateArguments()
     auto words = GetWords(original);
     for (auto it : words)
     {
-        arguments.push_back(Argument(it));
+        arguments.emplace_back(Argument(it));
     }
 }
 

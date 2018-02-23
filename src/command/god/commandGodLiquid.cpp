@@ -57,9 +57,9 @@ bool DoLiquidList(Character * character, ArgumentHandler & /*args*/)
     {
         // Prepare the row.
         TableRow row;
-        row.push_back(ToString(iterator.second->vnum));
-        row.push_back(iterator.second->getNameCapital());
-        row.push_back(ToString(iterator.second->worth));
+        row.emplace_back(ToString(iterator.second->vnum));
+        row.emplace_back(iterator.second->getNameCapital());
+        row.emplace_back(ToString(iterator.second->worth));
         // Add the row to the table.
         table.addRow(row);
     }

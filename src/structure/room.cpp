@@ -84,7 +84,7 @@ bool Room::check(bool complete)
 void Room::addItem(Item *& item, bool updateDB)
 {
     // Add the item.
-    items.push_back_item(item);
+    items.emplace_back_item(item);
     // Set the room attribute of the item.
     item->room = this;
     // Update the database.

@@ -198,7 +198,7 @@ void Character::getSheet(Table & sheet) const
     sheet.addRow({"## Effect Name", "## Remaining TIC"});
     for (const auto & it : effectManager.getActiveEffects())
     {
-        sheet.addRow({it.getName(), ToString(it.getRemainingTics())});
+        sheet.addRow({it.name, ToString(it.tremain)});
     }
 }
 
@@ -603,7 +603,7 @@ Item * Character::findItemAtBodyPart(
 void Character::addInventoryItem(Item *& item)
 {
     // Add the item to the inventory.
-    inventory.push_back_item(item);
+    inventory.emplace_back_item(item);
     // Set the owner of the item.
     item->owner = this;
     // Log it.
@@ -616,7 +616,7 @@ void Character::addInventoryItem(Item *& item)
 void Character::addEquipmentItem(Item *& item)
 {
     // Add the item to the equipment.
-    equipment.push_back_item(item);
+    equipment.emplace_back_item(item);
     // Set the owner of the item.
     item->owner = this;
     // Log it.

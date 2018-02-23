@@ -122,14 +122,14 @@ bool Item::updateOnDB()
 {
     // Prepare the vector used to insert into the database.
     std::vector<std::string> arguments;
-    arguments.push_back(ToString(this->vnum));
-    arguments.push_back(ToString(model->vnum));
-    arguments.push_back(ToString(this->quantity));
-    arguments.push_back(this->maker);
-    arguments.push_back(ToString(this->condition));
-    arguments.push_back(ToString(this->composition->vnum));
-    arguments.push_back(ToString(this->quality.toUInt()));
-    arguments.push_back(ToString(this->flags));
+    arguments.emplace_back(ToString(this->vnum));
+    arguments.emplace_back(ToString(model->vnum));
+    arguments.emplace_back(ToString(this->quantity));
+    arguments.emplace_back(this->maker);
+    arguments.emplace_back(ToString(this->condition));
+    arguments.emplace_back(ToString(this->composition->vnum));
+    arguments.emplace_back(ToString(this->quality.toUInt()));
+    arguments.emplace_back(ToString(this->flags));
     return SQLiteDbms::instance().insertInto("Item", arguments, false, true);
 }
 
@@ -177,20 +177,20 @@ void Item::getSheet(Table & sheet) const
     TableRow locationRow = {"Location"};
     if (room != nullptr)
     {
-        locationRow.push_back(room->name);
+        locationRow.emplace_back(room->name);
     }
     else if (owner != nullptr)
     {
-        locationRow.push_back(owner->getNameCapital());
+        locationRow.emplace_back(owner->getNameCapital());
     }
     else if (container != nullptr)
     {
-        locationRow.push_back(container->getNameCapital() + " " +
+        locationRow.emplace_back(container->getNameCapital() + " " +
                               ToString(container->vnum));
     }
     else
     {
-        locationRow.push_back("Nowhere");
+        locationRow.emplace_back("Nowhere");
     }
     sheet.addRow(locationRow);
     for (auto bodyPart : occupiedBodyParts)
@@ -489,7 +489,7 @@ bool Item::canContain(Item * item, const unsigned int & amount) const
 void Item::putInside(Item *& item, bool updateDB)
 {
     // Put the item inside the container.
-    content.push_back_item(item);
+    content.emplace_back_item(item);
     // Set the container value to the content item.
     item->container = this;
     // Update the database.

@@ -20,6 +20,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "commandObjectLightSource.hpp"
+#include "characterUtilities.hpp"
 #include "sqliteDbms.hpp"
 #include "lightModel.hpp"
 #include "toolModel.hpp"
@@ -43,32 +44,10 @@ bool DoTurn(Character * character, ArgumentHandler & args)
         character->sendMsg("What do you want to turn on/off?\n");
         return false;
     }
-    Item * item = nullptr;
-    // Check if the room is lit.
-    bool roomIsLit = character->room->isLit();
-    // Check if the inventory is lit.
-    auto inventoryIsLit = character->inventoryIsLit();
-    // If the room is lit.
-    if (roomIsLit)
-    {
-        item = character->findNearbyItem(args[0].getContent(),
-                                         args[0].getIndex());
-    }
-    else
-    {
-        // If the room is not lit but the inventory is.
-        if (inventoryIsLit)
-        {
-            item = character->findInventoryItem(args[0].getContent(),
-                                                args[0].getIndex());
-        }
-        else if (!character->inventory.empty())
-        {
-            // If the inventory is NOT empty, pick a random item.
-            item = character->inventory.at(
-                TRand<size_t>(0, character->inventory.size() - 1));
-        }
-    }
+    auto searchOptions = SearchOptionsCharacter::allOptions();
+    auto item = FindNearbyItem(character,
+                               args[0].getContent(), args[0].getIndex(),
+                               searchOptions);
     if (item == nullptr)
     {
         character->sendMsg("You don't see '%s' anywhere.\n",

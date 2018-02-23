@@ -108,8 +108,8 @@ bool DoFactionList(Character * character, ArgumentHandler & /*args*/)
     {
         // Prepare the row.
         TableRow row;
-        row.push_back(ToString(iterator.second->vnum));
-        row.push_back(iterator.second->name);
+        row.emplace_back(ToString(iterator.second->vnum));
+        row.emplace_back(iterator.second->name);
         // Add the row to the table.
         table.addRow(row);
     }
@@ -133,14 +133,14 @@ bool DoRaceList(Character * character, ArgumentHandler & /*args*/)
         Race * race = iterator.second;
         // Prepare the row.
         TableRow row;
-        row.push_back(ToString(race->vnum));
-        row.push_back(race->name);
-        row.push_back(ToString(race->player_allow));
-        row.push_back(ToString(race->getAbility(Ability::Strength)));
-        row.push_back(ToString(race->getAbility(Ability::Agility)));
-        row.push_back(ToString(race->getAbility(Ability::Perception)));
-        row.push_back(ToString(race->getAbility(Ability::Constitution)));
-        row.push_back(ToString(race->getAbility(Ability::Intelligence)));
+        row.emplace_back(ToString(race->vnum));
+        row.emplace_back(race->name);
+        row.emplace_back(ToString(race->player_allow));
+        row.emplace_back(ToString(race->getAbility(Ability::Strength)));
+        row.emplace_back(ToString(race->getAbility(Ability::Agility)));
+        row.emplace_back(ToString(race->getAbility(Ability::Perception)));
+        row.emplace_back(ToString(race->getAbility(Ability::Constitution)));
+        row.emplace_back(ToString(race->getAbility(Ability::Intelligence)));
         // Add the row to the table.
         table.addRow(row);
     }
@@ -158,9 +158,9 @@ bool DoSkillList(Character * character, ArgumentHandler & /*args*/)
     {
         // Prepare the row.
         TableRow row;
-        row.push_back(ToString(skill->vnum));
-        row.push_back(skill->name);
-        row.push_back(skill->ability.toString());
+        row.emplace_back(ToString(skill->vnum));
+        row.emplace_back(skill->name);
+        row.emplace_back(skill->ability.toString());
         // Add the row to the table.
         table.addRow(row);
     }

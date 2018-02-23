@@ -186,9 +186,9 @@ LiquidContainerItem::pourOut(const double & quantityToPourOut, bool updateDB)
             if (liquidQuantity < 0.1)
             {
                 QueryList where;
-                where.push_back(std::make_pair("container",
+                where.emplace_back(std::make_pair("container",
                                                ToString(vnum)));
-                where.push_back(std::make_pair("content",
+                where.emplace_back(std::make_pair("content",
                                                ToString(liquidContent->vnum)));
                 // If the container is empty, remove the entry from
                 //  the liquid contained table.

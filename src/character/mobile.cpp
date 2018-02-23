@@ -136,7 +136,7 @@ void Mobile::respawn()
     this->respawnRoom->addCharacter(this);
     // Set the list of exceptions.
     std::vector<Character *> exceptions;
-    exceptions.push_back(this);
+    exceptions.emplace_back(this);
     // Send the message inside the room.
     this->room->sendToAll("%s apear from somewhere.\n",
                           exceptions,

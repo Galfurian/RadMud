@@ -56,16 +56,16 @@ bool DoMobileList(Character * character, ArgumentHandler & /*args*/)
     {
         // Prepare the row.
         TableRow row;
-        row.push_back((mobile->isAlive()) ? "Yes" : "No");
-        row.push_back(mobile->id);
-        row.push_back(mobile->getName());
+        row.emplace_back((mobile->isAlive()) ? "Yes" : "No");
+        row.emplace_back(mobile->id);
+        row.emplace_back(mobile->getName());
         if (mobile->room != nullptr)
         {
-            row.push_back("Room : " + ToString(mobile->room->vnum));
+            row.emplace_back("Room : " + ToString(mobile->room->vnum));
         }
         else
         {
-            row.push_back("Is nowhere.");
+            row.emplace_back("Is nowhere.");
         }
         // Add the row to the table.
         table.addRow(row);

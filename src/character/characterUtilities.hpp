@@ -108,10 +108,29 @@ public:
     bool randomIfNoLight;
 
     /// @brief Constructor.
-    SearchOptionsCharacter() = default;
+    explicit SearchOptionsCharacter() :
+        searchInRoom(),
+        searchInInventory(),
+        searchInEquipment(),
+        checkLightLevels(),
+        randomIfNoLight()
+    {
+        // Nothing to do.
+    }
 
     /// @brief Destructor.
     ~SearchOptionsCharacter() = default;
+
+    static SearchOptionsCharacter allOptions()
+    {
+        SearchOptionsCharacter searchOptions;
+        searchOptions.searchInRoom = true;
+        searchOptions.searchInInventory = true;
+        searchOptions.searchInEquipment = true;
+        searchOptions.checkLightLevels = true;
+        searchOptions.randomIfNoLight = true;
+        return searchOptions;
+    }
 };
 
 /// @brief Search the given item name nearby the character.

@@ -28,7 +28,7 @@ ItemVector::ItemVector()
     // Nothing to do.
 }
 
-void ItemVector::push_back_item(Item *& item)
+void ItemVector::emplace_back_item(Item *& item)
 {
     for (auto it = this->begin(); it != this->end(); ++it)
     {

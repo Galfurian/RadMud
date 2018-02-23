@@ -280,7 +280,7 @@ bool SQLiteDbms::loadPlayerItems(Player * player)
         if (bodyPart == nullptr)
         {
             // Add the item to the inventory.
-            player->inventory.push_back_item(item);
+            player->inventory.emplace_back_item(item);
             // Set the owner of the item.
             item->owner = player;
         }
@@ -300,7 +300,7 @@ bool SQLiteDbms::loadPlayerItems(Player * player)
             }
             if (!alreadyPresent)
             {
-                player->equipment.push_back_item(item);
+                player->equipment.emplace_back_item(item);
                 // Set the owner of the item.
                 item->owner = player;
             }

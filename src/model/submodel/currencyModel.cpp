@@ -97,7 +97,7 @@ CurrencyModel::addPrice(const unsigned int & materialVnum,
     auto it = std::find(prices.begin(), prices.end(), materialVnum);
     if (it == prices.end())
     {
-        prices.push_back(Price(materialVnum, price));
+        prices.emplace_back(Price(materialVnum, price));
         this->sortList();
         return true;
     }
@@ -136,7 +136,7 @@ ItemVector CurrencyModel::generateCurrency(
                                      ItemQuality::Normal, coinQuantity);
         if (coin != nullptr)
         {
-            coins.push_back(coin);
+            coins.emplace_back(coin);
         }
         else
         {

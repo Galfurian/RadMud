@@ -62,12 +62,12 @@ bool DoMaterialList(Character * character, ArgumentHandler & /*args*/)
     {
         // Prepare the row.
         TableRow row;
-        row.push_back(ToString(iterator.second->vnum));
-        row.push_back(iterator.second->type.toString());
-        row.push_back(iterator.second->name);
-        row.push_back(ToString(iterator.second->worth));
-        row.push_back(ToString(iterator.second->hardness));
-        row.push_back(ToString(iterator.second->lightness));
+        row.emplace_back(ToString(iterator.second->vnum));
+        row.emplace_back(iterator.second->type.toString());
+        row.emplace_back(iterator.second->name);
+        row.emplace_back(ToString(iterator.second->worth));
+        row.emplace_back(ToString(iterator.second->hardness));
+        row.emplace_back(ToString(iterator.second->lightness));
         // Add the row to the table.
         table.addRow(row);
     }
@@ -124,10 +124,10 @@ bool DoBuildingList(Character * character, ArgumentHandler & /*args*/)
     {
         // Prepare the row.
         TableRow row;
-        row.push_back(ToString(it.second->vnum));
-        row.push_back(it.second->name);
-        row.push_back(ToString(it.second->difficulty));
-        row.push_back(ToString(it.second->time));
+        row.emplace_back(ToString(it.second->vnum));
+        row.emplace_back(it.second->name);
+        row.emplace_back(ToString(it.second->difficulty));
+        row.emplace_back(ToString(it.second->time));
         // Add the row to the table.
         table.addRow(row);
     }
@@ -171,8 +171,8 @@ bool DoProfessionList(Character * character, ArgumentHandler & /*args*/)
     {
         // Prepare the row.
         TableRow row;
-        row.push_back(iterator.second->command);
-        row.push_back(iterator.second->action);
+        row.emplace_back(iterator.second->command);
+        row.emplace_back(iterator.second->action);
         // Add the row to the table.
         table.addRow(row);
     }
@@ -231,10 +231,10 @@ bool DoProductionList(Character * character, ArgumentHandler & /*args*/)
     {
         // Prepare the row.
         TableRow row;
-        row.push_back(ToString(iterator.second->vnum));
-        row.push_back(iterator.second->name);
-        row.push_back(iterator.second->profession->command);
-        row.push_back(ToString(iterator.second->difficulty));
+        row.emplace_back(ToString(iterator.second->vnum));
+        row.emplace_back(iterator.second->name);
+        row.emplace_back(iterator.second->profession->command);
+        row.emplace_back(ToString(iterator.second->difficulty));
         // Add the row to the table.
         table.addRow(row);
     }
@@ -251,8 +251,8 @@ bool DoBodyPartList(Character * character, ArgumentHandler &)
     {
         // Prepare the row.
         TableRow row;
-        row.push_back(ToString(it.first));
-        row.push_back(it.second->name);
+        row.emplace_back(ToString(it.first));
+        row.emplace_back(it.second->name);
         // Add the row to the table.
         table.addRow(row);
     }

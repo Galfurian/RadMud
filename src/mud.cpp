@@ -364,7 +364,7 @@ bool Mud::addTravelPoint(Room * source, Room * target)
 
 void Mud::addCommand(const std::shared_ptr<Command> & command)
 {
-    mudCommands.push_back(command);
+    mudCommands.emplace_back(command);
 }
 
 bool Mud::addBuilding(const std::shared_ptr<Building> & building)

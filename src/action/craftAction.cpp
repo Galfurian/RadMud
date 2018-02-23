@@ -209,7 +209,7 @@ ActionStatus CraftAction::perform()
             actor->sendMsg("\nYou have failed your action.\n");
             return ActionStatus::Error;
         }
-        createdItems.push_back(newItem);
+        createdItems.emplace_back(newItem);
     }
     else
     {
@@ -229,7 +229,7 @@ ActionStatus CraftAction::perform()
                 actor->sendMsg("\nYou have failed your action.\n");
                 return ActionStatus::Error;
             }
-            createdItems.push_back(newItem);
+            createdItems.emplace_back(newItem);
         }
     }
     // Flag which will become true if some items are dropped to the ground.

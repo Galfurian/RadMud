@@ -196,7 +196,7 @@ ItemVector LightItem::getAlreadyLoadedFuel() const
     {
         for (auto it : content)
         {
-            fuel.push_back(it);
+            fuel.emplace_back(it);
         }
     }
     return fuel;
