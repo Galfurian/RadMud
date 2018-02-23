@@ -98,12 +98,14 @@ bool CraftAction::check(std::string & error) const
             return false;
         }
     }
+#if 0
     if (tools.empty())
     {
         Logger::log(LogLevel::Error, "No used tools have been set.");
         error = "One or more tools are missing.";
         return false;
     }
+#endif
     for (auto iterator : tools)
     {
         // Check if the tool has been deleted.
@@ -127,17 +129,10 @@ bool CraftAction::check(std::string & error) const
         for (auto it2 : ingredients)
         {
             auto item = it2.first;
-            if (item->getType() == ModelType::Resource)
+            required -= item->quantity;
+            if (required <= 0)
             {
-                auto resourceModel = item->model->toResource();
-                if (resourceModel->resourceType == it.first)
-                {
-                    required -= item->quantity;
-                    if (required <= 0)
-                    {
-                        break;
-                    }
-                }
+                break;
             }
         }
         if (required > 0)
