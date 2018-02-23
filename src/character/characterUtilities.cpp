@@ -76,29 +76,59 @@ ItemVector FindPosessedCoins(Character * character)
     return foundCoins;
 }
 
-// -----------------------------------------------------------------------------
-SearchOptionsCharacter::SearchOptionsCharacter() :
-    searchInRoom(),
-    searchInInventory(),
-    searchInEquipment()
+Item * FindNearbyItem(
+    Character * character,
+    std::string const & key, int & number,
+    const SearchOptionsCharacter & searchOptions)
 {
-    // Nothing to do.
+    Item * item = nullptr;
+    if (searchOptions.searchInRoom && (character->room != nullptr))
+    {
+        if (!searchOptions.checkLightLevels)
+        {
+            item = character->room->findItem(key, number);
+        }
+        else if (character->room->isLit())
+        {
+            item = character->room->findItem(key, number);
+        }
+    }
+    if (searchOptions.searchInEquipment && (item == nullptr))
+    {
+        if (!searchOptions.checkLightLevels)
+        {
+            item = ItemUtils::FindItemIn(character->equipment, key, number);
+        }
+        else if (character->inventoryIsLit())
+        {
+            item = ItemUtils::FindItemIn(character->equipment, key, number);
+        }
+        else if (searchOptions.randomIfNoLight &&
+                 (!character->equipment.empty()))
+        {
+            auto it = TRand<size_t>(0, character->equipment.size() - 1);
+            item = character->equipment[it];
+        }
+    }
+    if (searchOptions.searchInInventory && (item == nullptr))
+    {
+        if (!searchOptions.checkLightLevels)
+        {
+            item = ItemUtils::FindItemIn(character->inventory, key, number);
+        }
+        else if (character->inventoryIsLit())
+        {
+            item = ItemUtils::FindItemIn(character->inventory, key, number);
+        }
+        else if (searchOptions.randomIfNoLight &&
+                 (!character->inventory.empty()))
+        {
+            auto it = TRand<size_t>(0, character->inventory.size() - 1);
+            item = character->inventory[it];
+        }
+    }
+    return item;
 }
-
-SearchOptionsCharacter::SearchOptionsCharacter(
-    const SearchOptionsCharacter & other) :
-    searchInRoom(other.searchInRoom),
-    searchInInventory(other.searchInInventory),
-    searchInEquipment(other.searchInEquipment)
-{
-    // Nothing to do.
-}
-
-SearchOptionsCharacter::~SearchOptionsCharacter()
-{
-    // Nothing to do.
-}
-// -----------------------------------------------------------------------------
 
 bool FindNearbyResouces(
     Character * character,

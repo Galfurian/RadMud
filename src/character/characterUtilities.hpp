@@ -101,16 +101,24 @@ public:
     bool searchInInventory;
     /// Allows the function to search inside the character's equipment.
     bool searchInEquipment;
+    /// Checks if the lights is present.
+    bool checkLightLevels;
+    /// If there is no light it will pick a random item from inventory
+    /// and equipment.
+    bool randomIfNoLight;
 
     /// @brief Constructor.
-    SearchOptionsCharacter();
-
-    /// @brief Copy constructor.
-    SearchOptionsCharacter(const SearchOptionsCharacter & other);
+    SearchOptionsCharacter() = default;
 
     /// @brief Destructor.
-    ~SearchOptionsCharacter();
+    ~SearchOptionsCharacter() = default;
 };
+
+/// @brief Search the given item name nearby the character.
+Item * FindNearbyItem(
+    Character * character,
+    std::string const & key, int & number,
+    const SearchOptionsCharacter & searchOptions);
 
 /// @brief Search the list of ingredients nearby the character.
 /// @param character            The target character.
