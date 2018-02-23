@@ -44,7 +44,8 @@ public:
         BlacksmithHammer = 32,
         Bellows = 33,
         Crucible = 34,
-        Firelighter = 40
+        Firelighter = 40,
+        CookingFire = 41
     };
 
     /// @brief Constructor.

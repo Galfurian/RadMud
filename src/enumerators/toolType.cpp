@@ -36,5 +36,6 @@ std::string ToolType::toString() const
     if (value == Bellows) return "Bellows";
     if (value == Crucible) return "Crucible";
     if (value == Firelighter) return "Firelighter";
+    if (value == CookingFire) return "CookingFire";
     return "None";
 }
