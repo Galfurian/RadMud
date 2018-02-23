@@ -93,13 +93,13 @@ bool DoEat(Character * character, ArgumentHandler & args)
                 character,
                 "Food Poisoning",
                 1,
-                foodModel->nurishment,
+                TRand<unsigned int>(1, 5),
                 "Your stomach complains...",
                 "The pain in your guts is excruciating!",
                 "Your stomach is calm now.",
                 "The pain in your guts is excruciating, your body collapses "
-                    "and death find you very quickly.",
-                25));
+                    "and our merciful friend, Death, finds you very quickly.",
+                foodModel->nurishment));
     }
 
     return true;
