@@ -136,18 +136,6 @@ bool FindNearbyResouces(
     std::vector<std::pair<Item *, unsigned int>> & foundResources,
     const SearchOptionsCharacter & searchOptions)
 {
-    // Create a function which checks if the given item is of the required type.
-    auto IsValidResource = [](Item * item, const ResourceType & resourceType)
-    {
-        // Check the pointer to the model.
-        if (item->model == nullptr) return false;
-        // Check if the item is a resource.
-        if (item->model->getType() != ModelType::Resource) return false;
-        // Cast the model to ResourceModel.
-        auto resourceModel = item->model->toResource();
-        // Check if the type of resource is the same.
-        return (resourceModel->resourceType == resourceType);
-    };
     // Create a function which reduces the required quantity and checks if
     // the zero has been reached.
     auto DecrementRequired = [&foundResources](Item * item,
@@ -179,7 +167,7 @@ bool FindNearbyResouces(
             for (auto item : character->room->items)
             {
                 // Check if the item is a valid resource.
-                if (!IsValidResource(item, resource.first)) continue;
+                if (!ItemUtils::IsValidResource(item, resource.first)) continue;
                 // Decrement the required quantity. If we've reached the
                 // needed quantity stop the loop.
                 if (DecrementRequired(item, quantityNeeded)) break;
@@ -191,7 +179,7 @@ bool FindNearbyResouces(
             for (auto item : character->equipment)
             {
                 // Check if the item is a valid resource.
-                if (!IsValidResource(item, resource.first)) continue;
+                if (!ItemUtils::IsValidResource(item, resource.first)) continue;
                 // Decrement the required quantity. If we've reached the
                 // needed quantity stop the loop.
                 if (DecrementRequired(item, quantityNeeded)) break;
@@ -203,7 +191,7 @@ bool FindNearbyResouces(
             for (auto item : character->inventory)
             {
                 // Check if the item is a valid resource.
-                if (!IsValidResource(item, resource.first)) continue;
+                if (!ItemUtils::IsValidResource(item, resource.first)) continue;
                 // Decrement the required quantity. If we've reached the
                 // needed quantity stop the loop.
                 if (DecrementRequired(item, quantityNeeded)) break;
@@ -221,47 +209,25 @@ Item * FindNearbyTool(
     const ItemVector & exceptions,
     const SearchOptionsCharacter & searchOptions)
 {
-    // Create a function which checks if the given item is of the required type.
-    auto IsValidTool = [toolType, exceptions](Item * item)
-    {
-        // Check the pointer to the model.
-        if (item->model == nullptr) return false;
-        // Check if the item is a resource.
-        if (item->model->getType() != ModelType::Tool) return false;
-        // Cast the model to ResourceModel.
-        auto toolModel = item->model->toTool();
-        // Check if the type of resource is the same.
-        if (toolModel->toolType != toolType) return false;
-        // Check if the item is inside the exception list.
-        return std::find_if(exceptions.begin(),
-                            exceptions.end(),
-                            [item](Item * exception)
-                            {
-                                return (item->vnum == exception->vnum);
-                            }) == exceptions.end();
-    };
     if (searchOptions.searchInRoom)
     {
         for (auto item : character->room->items)
         {
-            // Check if it is a valid item.
-            if (IsValidTool(item)) return item;
+            if (ItemUtils::IsValidTool(item, exceptions, toolType)) return item;
         }
     }
     if (searchOptions.searchInEquipment)
     {
         for (auto item : character->equipment)
         {
-            // Check if it is a valid item.
-            if (IsValidTool(item)) return item;
+            if (ItemUtils::IsValidTool(item, exceptions, toolType)) return item;
         }
     }
     if (searchOptions.searchInInventory)
     {
         for (auto item : character->inventory)
         {
-            // Check if it is a valid item.
-            if (IsValidTool(item)) return item;
+            if (ItemUtils::IsValidTool(item, exceptions, toolType)) return item;
         }
     }
     return nullptr;
