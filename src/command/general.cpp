@@ -22,6 +22,7 @@
 
 #include "general.hpp"
 
+#include "characterUtilities.hpp"
 #include "nameGenerator.hpp"
 #include "formatter.hpp"
 #include "mud.hpp"
@@ -184,37 +185,45 @@ bool DoLook(Character * character, ArgumentHandler & args)
         character->sendMsg(character->room->getLook(character));
         return true;
     }
+    // The accepted number of arguemnts is 0, 1 or 2.
+    if (args.size() > 2)
+    {
+        character->sendMsg("You don't remember how to look?\n");
+        return false;
+    }
+    // If only one argument is provided, it wants to look at something.
     if (args.size() == 1)
     {
-        // Check if the room is lit by a light.
-        if (!character->room->isLit())
+        // Check if the room is lit by a light. In that case, maybe the
+        // player is looking at someone.
+        if (character->room->isLit())
         {
-            character->sendMsg("You can't see.\n");
-            return false;
-        }
-        // Check if the character is looking at another character.
-        auto target = character->room->findCharacter(args[0].getContent(),
-                                                     args[0].getIndex(),
-                                                     {character});
-        if (target)
-        {
-            if (character->canSee(target))
+            // Check if the character is looking at another character.
+            auto target = character->room->findCharacter(
+                args[0].getContent(), args[0].getIndex(), {character});
+            if (target)
             {
-                // Show the target.
-                character->sendMsg(target->getLook());
-                // Notify the target.
-                if (target->canSee(character))
+                if (character->canSee(target))
                 {
-                    // Notify to other character, that this one are looking at him.
-                    target->sendMsg("%s looks at you.\n\n",
-                                    character->getNameCapital());
+                    // Show the target.
+                    character->sendMsg(target->getLook());
+                    // Notify the target.
+                    if (target->canSee(character))
+                    {
+                        // Notify to other character, that this one are
+                        // looking at him.
+                        target->sendMsg("%s looks at you.\n\n",
+                                        character->getNameCapital());
+                    }
+                    return true;
                 }
-                return true;
             }
         }
-        // Check if the character is looking at an item.
-        auto item = character->findNearbyItem(args[0].getContent(),
-                                              args[0].getIndex());
+        // Otherwise, check if the character is looking at an item.
+        auto options = SearchOptionsCharacter::allOptions();
+        options.randomIfNoLight = false;
+        auto item = FindNearbyItem(
+            character, args[0].getContent(), args[0].getIndex(), options);
         if (item)
         {
             character->sendMsg(item->getLook());
@@ -223,65 +232,65 @@ bool DoLook(Character * character, ArgumentHandler & args)
         character->sendMsg("You don't see '%s' anywhere.\n",
                            args[0].getContent());
     }
-    if (args.size() == 2)
+    else if (args.size() == 2)
     {
-        // Check if the room is lit by a light.
-        if (!character->room->isLit())
+        // Check if the room is lit by a light. In that case, maybe the
+        // player is looking at the equipment of someone.
+        if (character->room->isLit())
         {
-            character->sendMsg("You can't see.\n");
-            return false;
-        }
-        auto target = character->room->findCharacter(args[1].getContent(),
-                                                     args[1].getIndex(),
-                                                     {character});
-        if (target != nullptr)
-        {
-            if (character->canSee(target))
+            auto target = character->room->findCharacter(args[1].getContent(),
+                                                         args[1].getIndex(),
+                                                         {character});
+            if (target != nullptr)
             {
-                auto item = target->findEquipmentItem(args[0].getContent(),
-                                                      args[0].getIndex());
-                if (item != nullptr)
+                if (character->canSee(target))
                 {
-                    character->sendMsg(item->getLook());
-                    return true;
+                    auto item = target->findEquipmentItem(args[0].getContent(),
+                                                          args[0].getIndex());
+                    if (item != nullptr)
+                    {
+                        character->sendMsg(item->getLook());
+                        return true;
+                    }
+                    character->sendMsg("You don't see %s on %s.\n",
+                                       args[0].getContent(),
+                                       target->getName());
+                    return false;
                 }
-                character->sendMsg("You don't see %s on %s.\n",
-                                   args[0].getContent(),
-                                   target->getName());
+                character->sendMsg(
+                    "You don't see the container '%s' anywhere.\n",
+                    args[1].getContent());
                 return false;
             }
-            character->sendMsg(
-                "You don't see the container '%s' anywhere.\n",
-                args[1].getContent());
+        }
+        // Otherwise, check if the character is looking at an item inside a
+        // container.
+        auto options = SearchOptionsCharacter::allOptions();
+        options.randomIfNoLight = false;
+        auto container = FindNearbyItem(character,
+                                        args[1].getContent(),
+                                        args[1].getIndex(),
+                                        options);
+        if (container == nullptr)
+        {
+            character->sendMsg("You don't see the container '%s' anywhere.\n",
+                               args[1].getContent());
             return false;
         }
-        auto container = character->findNearbyItem(args[1].getContent(),
-                                                   args[1].getIndex());
-        if (container)
+        if (!container->isAContainer())
         {
-            if (container->isAContainer())
-            {
-                auto item = container->findContent(args[0].getContent(),
-                                                   args[0].getIndex());
-                if (item)
-                {
-                    character->sendMsg(item->getLook());
-                    return true;
-                }
-                character->sendMsg("It's not inside %s.\n",
-                                   container->getName(true));
-                return false;
-            }
             character->sendMsg("%s is not a container.\n",
                                container->getNameCapital(true));
             return false;
         }
-        character->sendMsg("You don't see the container '%s' anywhere.\n",
-                           args[1].getContent());
-    }
-    if (args.size() > 2)
-    {
-        character->sendMsg("You don't remember how to look?\n");
+        auto item = container->findContent(args[0].getContent(),
+                                           args[0].getIndex());
+        if (item)
+        {
+            character->sendMsg(item->getLook());
+            return true;
+        }
+        character->sendMsg("It's not inside %s.\n", container->getName(true));
     }
     return false;
 }
