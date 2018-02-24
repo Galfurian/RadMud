@@ -81,25 +81,23 @@ Item * FindNearbyItem(
     std::string const & key, int & number,
     const SearchOptionsCharacter & searchOptions)
 {
-    Item * item = nullptr;
-    if (searchOptions.searchInRoom && (character->room != nullptr))
+    // Check the lights.
+    bool roomLit = true;
+    bool inventoryLit = true;
+    if (searchOptions.checkLightLevels)
     {
-        if (!searchOptions.checkLightLevels)
-        {
-            item = character->room->findItem(key, number);
-        }
-        else if (character->room->isLit())
-        {
-            item = character->room->findItem(key, number);
-        }
+        roomLit = character->room->isLit();
+        inventoryLit = character->inventoryIsLit();
+    }
+    // Get the item.
+    Item * item = nullptr;
+    if (searchOptions.searchInRoom && (character->room != nullptr) && roomLit)
+    {
+        item = character->room->findItem(key, number);
     }
     if (searchOptions.searchInEquipment && (item == nullptr))
     {
-        if (!searchOptions.checkLightLevels)
-        {
-            item = ItemUtils::FindItemIn(character->equipment, key, number);
-        }
-        else if (character->inventoryIsLit())
+        if (roomLit || inventoryLit)
         {
             item = ItemUtils::FindItemIn(character->equipment, key, number);
         }
@@ -112,11 +110,7 @@ Item * FindNearbyItem(
     }
     if (searchOptions.searchInInventory && (item == nullptr))
     {
-        if (!searchOptions.checkLightLevels)
-        {
-            item = ItemUtils::FindItemIn(character->inventory, key, number);
-        }
-        else if (character->inventoryIsLit())
+        if (roomLit || inventoryLit)
         {
             item = ItemUtils::FindItemIn(character->inventory, key, number);
         }
