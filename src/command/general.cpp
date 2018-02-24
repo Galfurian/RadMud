@@ -125,28 +125,18 @@ bool DoWho(Character * character, ArgumentHandler & /*args*/)
     table.addColumn("Player", align::left);
     table.addColumn("Location", align::left);
     std::string output;
-    size_t totalPlayers = 0;
+    size_t total = 0;
     for (auto iterator : Mud::instance().mudPlayers)
     {
         // If the player is not playing, continue.
-        if (!iterator->isPlaying())
-        {
-            continue;
-        }
-        std::string location = "Nowhere";
-        if (iterator->room != nullptr)
-        {
-            location = iterator->room->name;
-        }
-        table.addRow({iterator->getName(), location});
-        ++totalPlayers;
+        if (!iterator->isPlaying()) continue;
+        table.addRow({iterator->getName(),
+                      (iterator->room != nullptr) ? iterator->room->name :
+                      "Nowhere"});
+        ++total;
     }
     character->sendMsg(table.getTable());
-    character->sendMsg(
-        "# Total %sPlayers%s: %s\n",
-        Formatter::yellow(),
-        Formatter::reset(),
-        totalPlayers);
+    character->sendMsg("# Total %s: %s\n", Formatter::yellow("Players"), total);
     return true;
 }
 
