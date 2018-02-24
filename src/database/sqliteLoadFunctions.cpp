@@ -23,9 +23,11 @@
 #include "sqliteException.hpp"
 
 #include "liquidContainerItem.hpp"
+#include "characterUtilities.hpp"
 #include "currencyModel.hpp"
 #include "modelFactory.hpp"
 #include "itemFactory.hpp"
+#include "mobileModel.hpp"
 #include "heightMap.hpp"
 #include "shopItem.hpp"
 #include "mud.hpp"
@@ -489,10 +491,35 @@ bool LoadRaceBaseAbility(ResultSet * result)
     return true;
 }
 
-bool LoadMobile(ResultSet * result)
+bool LoadMobileModel(ResultSet * result)
 {
-    // Create an empty Mobile.
-    auto mobile = new Mobile();
+    (void) result;
+    // Create an empty Mobile model.
+    auto mm = std::make_shared<MobileModel>();
+    mm->vnum = result->getNextUnsignedInteger();
+    mm->propnoun = result->getNextString();
+    mm->keys = GetWords(result->getNextString());
+    mm->shortdesc = result->getNextString();
+    mm->staticdesc = result->getNextString();
+    mm->description = result->getNextString();
+    mm->race = Mud::instance().findRace(result->getNextUnsignedInteger());
+    mm->faction = Mud::instance().findFaction(result->getNextUnsignedInteger());
+    mm->gender = static_cast<GenderType>(result->getNextInteger());
+    mm->weight = result->getNextDouble();
+    mm->actions = GetWords(result->getNextString());
+    mm->flags = result->getNextUnsignedInteger();
+    mm->level = result->getNextUnsignedInteger();
+    if (!ParseAbilities(mm->abilities, result->getNextString()))
+    {
+        throw SQLiteException("Wrong characteristics.");
+    }
+    mm->lua_script = result->getNextString();
+    if (!Mud::instance().mudMobileModels.insert(std::make_pair(mm->vnum,
+                                                               mm)).second)
+    {
+        throw SQLiteException("Failed to store mobile model.");
+    }
+#if 0
     // Initialize the mobile.
     mobile->id = result->getNextString();
     mobile->respawnRoom = Mud::instance().findRoom(
@@ -534,6 +561,7 @@ bool LoadMobile(ResultSet * result)
     }
     // Respawn the mobile.
     mobile->respawn();
+#endif
     return true;
 }
 

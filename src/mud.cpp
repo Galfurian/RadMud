@@ -24,12 +24,13 @@
 
 #include "processPlayerName.hpp"
 #include "CMacroWrapper.hpp"
+#include "mobileModel.hpp"
+#include "mapWrapper.hpp"
 #include "stopwatch.hpp"
 #include "heightMap.hpp"
 
 #include <unistd.h>
 #include <signal.h>
-#include "mapWrapper.hpp"
 
 /// Input file descriptor.
 static fd_set in_set;
@@ -58,6 +59,7 @@ Mud::Mud() :
     _mudSystemDirectory("../system/"),
     mudPlayers(),
     mudMobiles(),
+    mudMobileModels(),
     mudItems(),
     mudRooms(),
     mudItemModels(),

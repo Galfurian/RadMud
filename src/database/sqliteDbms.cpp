@@ -92,7 +92,7 @@ SQLiteDbms::SQLiteDbms() :
     loaders.emplace_back(
         TableLoader("ModelBodyPart", LoadModelBodyPart));
     loaders.emplace_back(
-        TableLoader("Mobile", LoadMobile));
+        TableLoader("MobileModel", LoadMobileModel));
     loaders.emplace_back(
         TableLoader("Skill", LoadSkill));
     loaders.emplace_back(

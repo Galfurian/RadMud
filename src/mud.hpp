@@ -52,6 +52,7 @@
 class Direction;
 class HeightMap;
 class MapWrapper;
+class MobileModel;
 
 #ifdef __linux__
 
@@ -157,6 +158,8 @@ public:
     std::list<Player *> mudPlayers;
     /// List all the mobile.
     std::vector<Mobile *> mudMobiles;
+    /// List of mobile models.
+    std::map<unsigned int, std::shared_ptr<MobileModel>> mudMobileModels;
     /// List of all items.
     std::map<unsigned int, Item *> mudItems;
     /// List of all the rooms.
