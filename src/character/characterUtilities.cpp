@@ -340,3 +340,26 @@ bool HasRequiredKnowledge(Character * character,
                    (character->effectManager.getKnowledge(k) > 0);
         }) != required.end();
 }
+
+bool ParseAbilities(std::map<Ability, unsigned int> & abilities,
+                    std::string const & source)
+{
+    if (source.empty()) return false;
+    std::vector<std::string> charList = SplitString(source, ";");
+    if (charList.size() != 5) return false;
+    // Support function.
+    auto SetAbilityScore = [](std::string const & s)
+    {
+        auto value = ToNumber<unsigned int>(s);
+        return (value <= 60) ? value : 60;
+    };
+    // Clean the map.
+    abilities.clear();
+    // Set the abilities.
+    abilities[Ability::Strength] = SetAbilityScore(charList[0]);
+    abilities[Ability::Agility] = SetAbilityScore(charList[1]);
+    abilities[Ability::Perception] = SetAbilityScore(charList[2]);
+    abilities[Ability::Constitution] = SetAbilityScore(charList[3]);
+    abilities[Ability::Intelligence] = SetAbilityScore(charList[4]);
+    return true;
+}

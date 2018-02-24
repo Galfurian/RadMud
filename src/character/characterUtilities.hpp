@@ -211,3 +211,11 @@ bool MoveCharacterTo(
 ///         <b>False</b> otherwise.
 bool HasRequiredKnowledge(Character * character,
                           std::vector<Knowledge> const & required);
+
+/// @brief Parse the abilities from the given string.
+/// @param abilities The map where the abilities should be stored.
+/// @param source    The string which containts the values
+/// @return <b>True</b> if the string is correct,<br>
+///         <b>False</b> otherwise.
+bool ParseAbilities(std::map<Ability, unsigned int> & abilities,
+                    std::string const & source);
