@@ -31,6 +31,7 @@
 
 #include "character.hpp"
 
+class MobileModel;
 class GeneralBehaviour;
 
 /// @brief Holds details about mobile: mob, vendor, quest npcs.
@@ -38,8 +39,10 @@ class Mobile :
     public Character
 {
 public:
-    /// An identifier of the mobile.
-    std::string id;
+    /// Pointer to the mobile model.
+    std::shared_ptr<MobileModel> model;
+    /// The virtual number of the mobile.
+    unsigned int vnum;
     /// The room where the mobile must respawn.
     Room * respawnRoom;
     /// List of keys used to target this mobile.

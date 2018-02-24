@@ -27,7 +27,8 @@
 #include "mud.hpp"
 
 Mobile::Mobile() :
-    id(),
+    model(),
+    vnum(),
     respawnRoom(),
     keys(),
     shortdesc(),
@@ -156,7 +157,7 @@ bool Mobile::isAlive() const
 bool Mobile::check() const
 {
     bool safe = Character::check();
-    safe &= CorrectAssert(!id.empty());
+    safe &= CorrectAssert(vnum > 0);
     safe &= CorrectAssert(respawnRoom != nullptr);
     safe &= CorrectAssert(!keys.empty());
     safe &= CorrectAssert(!shortdesc.empty());
@@ -178,7 +179,7 @@ void Mobile::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow({"Id", this->id});
+    sheet.addRow({"Vnum", ToString(vnum)});
     sheet.addRow({"Respawn Room", ToString(this->respawnRoom->vnum)});
     std::string keyGroup;
     for (auto it : this->keys)

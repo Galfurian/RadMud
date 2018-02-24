@@ -34,6 +34,7 @@ bool DoGodInfo(Character * character, ArgumentHandler & args)
     Character * target = Mud::instance().findPlayer(args[0].getContent());
     if (target == nullptr)
     {
+#if 0
         target = Mud::instance().findMobile(args[0].getContent());
         if (target == nullptr)
         {
@@ -52,6 +53,9 @@ bool DoGodInfo(Character * character, ArgumentHandler & args)
             character->sendMsg("Mobile not found.\n" + msgFound);
             return false;
         }
+#endif
+        character->sendMsg("Character not found.\n");
+        return false;
     }
     // Create a table.
     Table sheet;
@@ -73,12 +77,8 @@ bool DoTransfer(Character * character, ArgumentHandler & args)
     Character * target = Mud::instance().findPlayer(args[0].getContent());
     if (target == nullptr)
     {
-        target = Mud::instance().findMobile(args[0].getContent());
-        if (target == nullptr)
-        {
-            character->sendMsg("Can't find the target character.\n");
-            return false;
-        }
+        character->sendMsg("Can't find the target character.\n");
+        return false;
     }
     if (target->isMobile())
     {
@@ -157,14 +157,10 @@ bool DoAggroList(Character * character, ArgumentHandler & args)
     Character * targer = Mud::instance().findPlayer(args[0].getContent());
     if (targer == nullptr)
     {
-        targer = Mud::instance().findMobile(args[0].getContent());
-        if (targer == nullptr)
-        {
-            character->sendMsg("Character not found.\n");
-            return false;
-        }
+        character->sendMsg("Character not found.\n");
+        return false;
     }
-    for (auto aggressor : targer->combatHandler)
+    for (auto const & aggressor : targer->combatHandler)
     {
         if (aggressor->aggressor != nullptr)
         {

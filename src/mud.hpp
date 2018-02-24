@@ -242,7 +242,7 @@ public:
     bool addMobile(Mobile * mobile);
 
     /// Remove the given mobile from the mud.
-    bool remMobile(Mobile * mobile);
+    bool remMobile(unsigned int vnum);
 
     /// Add the given item to the mud.
     bool addItem(Item * item);
@@ -325,8 +325,11 @@ public:
     /// Find an item model given its vnum.
     std::shared_ptr<ItemModel> findItemModel(unsigned int vnum);
 
-    /// Find a mobile given his id.
-    Mobile * findMobile(std::string id);
+    /// Find a mobile given his vnum.
+    Mobile * findMobile(unsigned int vnum);
+
+    /// Find a mobile model given his vnum.
+    std::shared_ptr<MobileModel> findMobileModel(unsigned int vnum);
 
     /// Find a player given his name.
     Player * findPlayer(const std::string & name);

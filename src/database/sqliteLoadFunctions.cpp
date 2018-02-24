@@ -565,6 +565,33 @@ bool LoadMobileModel(ResultSet * result)
     return true;
 }
 
+bool LoadMobileSpawn(ResultSet * result)
+{
+    // Retrive the values.
+    auto vnum = result->getNextUnsignedInteger();
+    auto modelVnum = result->getNextUnsignedInteger();
+    auto roomVnum = result->getNextUnsignedInteger();
+    // Retrive the data.
+    auto mm = Mud::instance().findMobileModel(modelVnum);
+    if (mm == nullptr)
+    {
+        throw SQLiteException("Cannot find mobile model " +
+                              ToString(modelVnum) + ".");
+    }
+    auto room = Mud::instance().findRoom(roomVnum);
+    if (room == nullptr)
+    {
+        throw SQLiteException("Cannot find the room " +
+                              ToString(roomVnum) + ".");
+    }
+    if (mm->spawn(room, vnum) == nullptr)
+    {
+        //throw SQLiteException("Cannot spawn mobile " +
+        //                      ToString(vnum) + ".");
+    }
+    return true;
+}
+
 bool LoadRoom(ResultSet * result)
 {
     // Create an empty Room.
@@ -1174,7 +1201,7 @@ bool LoadShop(ResultSet * result)
     shop->shopSellTax = result->getNextUnsignedInteger();
     shop->balance = result->getNextUnsignedInteger();
     shop->shopKeeper = Mud::instance().findMobile(
-        result->getNextString());
+        result->getNextUnsignedInteger());
     shop->openingHour = result->getNextUnsignedInteger();
     shop->closingHour = result->getNextUnsignedInteger();
     if (shop->shopKeeper != nullptr)

@@ -86,6 +86,9 @@ bool LoadRaceBaseAbility(ResultSet * result);
 /// @brief Function used to retrieve information about all the mobiles.
 bool LoadMobileModel(ResultSet * result);
 
+/// @brief Load default mobiles.
+bool LoadMobileSpawn(ResultSet * result);
+
 /// @brief Function used to retrieve information about all the rooms.
 bool LoadRoom(ResultSet * result);
 

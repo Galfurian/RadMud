@@ -215,7 +215,7 @@ bool Mud::addMobile(Mobile * mobile)
 {
     for (auto it : mudMobiles)
     {
-        if (it->id == mobile->id)
+        if (it->vnum == mobile->vnum)
         {
             return false;
         }
@@ -224,11 +224,11 @@ bool Mud::addMobile(Mobile * mobile)
     return true;
 }
 
-bool Mud::remMobile(Mobile * mobile)
+bool Mud::remMobile(unsigned int vnum)
 {
     for (auto it = mudMobiles.begin(); it != mudMobiles.end(); ++it)
     {
-        if ((*it)->id == mobile->id)
+        if ((*it)->vnum == vnum)
         {
             mudMobiles.erase(it);
             return true;
@@ -411,16 +411,20 @@ Player * Mud::findPlayer(const std::string & name)
     return nullptr;
 }
 
-Mobile * Mud::findMobile(std::string id)
+Mobile * Mud::findMobile(unsigned int vnum)
 {
     for (auto it : mudMobiles)
     {
-        if (it->id == id)
-        {
-            return it;
-        }
+        if (it->vnum == vnum) return it;
     }
     return nullptr;
+}
+
+std::shared_ptr<MobileModel> Mud::findMobileModel(unsigned int vnum)
+{
+    auto it = mudMobileModels.find(vnum);
+    if (it == mudMobileModels.end()) return nullptr;
+    return it->second;
 }
 
 std::shared_ptr<ItemModel> Mud::findItemModel(unsigned int vnum)

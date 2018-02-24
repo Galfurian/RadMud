@@ -49,7 +49,7 @@ bool DoMobileList(Character * character, ArgumentHandler & /*args*/)
 {
     Table table;
     table.addColumn("ALIVE", align::center);
-    table.addColumn("ID", align::left);
+    table.addColumn("VNUM", align::left);
     table.addColumn("NAME", align::left);
     table.addColumn("LOCATION", align::right);
     for (auto mobile : Mud::instance().mudMobiles)
@@ -57,7 +57,7 @@ bool DoMobileList(Character * character, ArgumentHandler & /*args*/)
         // Prepare the row.
         TableRow row;
         row.emplace_back((mobile->isAlive()) ? "Yes" : "No");
-        row.emplace_back(mobile->id);
+        row.emplace_back(ToString(mobile->vnum));
         row.emplace_back(mobile->getName());
         if (mobile->room != nullptr)
         {
@@ -128,7 +128,8 @@ bool DoMobileLog(Character * character, ArgumentHandler & args)
         character->sendMsg("You must provide a mobile id.\n");
         return false;
     }
-    auto mobile = Mud::instance().findMobile(args[0].getContent());
+    auto mobile = Mud::instance().findMobile(
+        ToNumber<unsigned int>(args[0].getContent()));
     if (mobile == nullptr)
     {
         character->sendMsg("Mobile not found.\n");

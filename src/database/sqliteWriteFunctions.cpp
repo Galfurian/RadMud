@@ -126,7 +126,7 @@ bool SaveShopItem(ShopItem * item,
     args.push_back(ToString(item->balance));
     if (item->shopKeeper != nullptr)
     {
-        args.push_back(item->shopKeeper->id);
+        args.push_back(ToString(item->shopKeeper->vnum));
     }
     else
     {

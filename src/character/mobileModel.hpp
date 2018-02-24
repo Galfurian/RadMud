@@ -58,7 +58,7 @@ public:
     std::map<Ability, unsigned int> abilities;
     /// The original file that contains the behaviour of this mobile.
     std::string lua_script;
-    
+
     MobileModel() :
         vnum(),
         propnoun(),
@@ -76,5 +76,60 @@ public:
         lua_script()
     {
         // Nothing to do.
+    }
+
+    /// @brief Creates a mobile using this model.
+    /// @return A pointer to the newly create mobile.
+    Mobile * spawn(Room * spawnRoom, unsigned int mobileVnum)
+    {
+        (void) spawnRoom;
+        (void) mobileVnum;
+        if (spawnRoom == nullptr) return nullptr;
+        return nullptr;
+#if 0
+        // Initialize the mobile.
+        auto mob = new Mobile();
+        mob->id = result->getNextString();
+        mob->respawnRoom = Mud::instance().findRoom(
+            result->getNextUnsignedInteger());
+        mob->room = mob->respawnRoom;
+        mob->name = result->getNextString();
+        mob->keys = GetWords(result->getNextString());
+        mob->shortdesc = result->getNextString();
+        mob->staticdesc = result->getNextString();
+        mob->description = result->getNextString();
+        mob->race =
+            Mud::instance().findRace(result->getNextUnsignedInteger());
+        mob->faction = Mud::instance().findFaction(
+            result->getNextUnsignedInteger());
+        mob->gender = static_cast<GenderType>(result->getNextInteger());
+        mob->weight = result->getNextDouble();
+        mob->actions = GetWords(result->getNextString());
+        mob->flags = result->getNextUnsignedInteger();
+        mob->level = result->getNextUnsignedInteger();
+        if (!mob->setAbilities(result->getNextString()))
+        {
+            delete (mob);
+            throw SQLiteException("Wrong characteristics.");
+        }
+        mob->lua_script = result->getNextString();
+        mob->setHealth(mob->getMaxHealth(), true);
+        mob->setStamina(mob->getMaxStamina(), true);
+        // Translate new_line.
+        FindAndReplace(&mob->description, "%r", "\n");
+        // Check the correctness.
+        if (!mob->check())
+        {
+            delete (mob);
+            throw SQLiteException("Error during error checking.");
+        }
+        if (!Mud::instance().addMobile(mob))
+        {
+            delete (mob);
+            throw SQLiteException("Error during mob insertion.");
+        }
+        // Respawn the mob.
+        mob->respawn();
+#endif
     }
 };

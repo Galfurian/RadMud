@@ -94,6 +94,8 @@ SQLiteDbms::SQLiteDbms() :
     loaders.emplace_back(
         TableLoader("MobileModel", LoadMobileModel));
     loaders.emplace_back(
+        TableLoader("MobileSpawn", LoadMobileSpawn));
+    loaders.emplace_back(
         TableLoader("Skill", LoadSkill));
     loaders.emplace_back(
         TableLoader("SkillPrerequisite", LoadSkillPrerequisite));
