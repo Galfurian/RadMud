@@ -205,6 +205,14 @@ void LoadGodCommands()
     // ////////////////////////////////////////////////////////////////////////
     // COMMAND GOD MOBILE
     Mud::instance().addCommand(std::make_shared<Command>(
+        DoMobileModelList, "@mob_model_list", "",
+        "List all the mobiles.",
+        true, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoMobileSpawn, "@mob_spawn", "",
+        "Spawn the given mobile in the current room.",
+        true, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
         DoMobileKill, "@mob_kill", "(mobile name)",
         "Kill the desired mobile, in the same room.",
         true, true, false));

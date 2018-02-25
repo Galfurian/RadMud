@@ -20,7 +20,53 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "commandGodMobile.hpp"
+#include "mobileModel.hpp"
 #include "mud.hpp"
+
+bool DoMobileModelList(Character * character, ArgumentHandler & /*args*/)
+{
+    Table table;
+    table.addColumn("VNUM", align::left);
+    table.addColumn("NAME", align::left);
+    for (auto const & it : Mud::instance().mudMobileModels)
+    {
+        // Prepare the row.
+        TableRow row;
+        row.emplace_back(ToString(it.second->vnum));
+        row.emplace_back(it.second->propnoun);
+        // Add the row to the table.
+        table.addRow(row);
+    }
+    character->sendMsg(table.getTable());
+    return true;
+}
+
+bool DoMobileSpawn(Character * character, ArgumentHandler & args)
+{
+    if (args.size() != 1)
+    {
+        character->sendMsg("You must specify the vnum of a mobile model.\n");
+        return false;
+    }
+    if (character->room == nullptr)
+    {
+        character->sendMsg("You are not in valid room.\n");
+        return false;
+    }
+    auto mobileModel = Mud::instance().findMobileModel(
+        ToNumber<unsigned int>(args[0].getContent()));
+    if (mobileModel == nullptr)
+    {
+        character->sendMsg("Mobile model not found.\n");
+        return false;
+    }
+    if (mobileModel->spawn(character->room, 0) == nullptr)
+    {
+        character->sendMsg("You failed to spawn the mobile.\n");
+        return false;
+    }
+    return true;
+}
 
 bool DoMobileKill(Character * character, ArgumentHandler & args)
 {
