@@ -503,15 +503,31 @@ bool LoadMobileModel(ResultSet * result)
     mm->staticdesc = result->getNextString();
     mm->description = result->getNextString();
     mm->race = Mud::instance().findRace(result->getNextUnsignedInteger());
+    if (mm->race == nullptr)
+    {
+        throw SQLiteException("Cannot find the race for the mobile model.");
+    }
     mm->faction = Mud::instance().findFaction(result->getNextUnsignedInteger());
+    if (mm->faction == nullptr)
+    {
+        throw SQLiteException("Cannot find the faction for the mobile model.");
+    }
     mm->gender = static_cast<GenderType>(result->getNextInteger());
     mm->weight = result->getNextDouble();
     mm->actions = GetWords(result->getNextString());
     mm->flags = result->getNextUnsignedInteger();
     mm->level = result->getNextUnsignedInteger();
-    if (!ParseAbilities(mm->abilities, result->getNextString()))
+    auto abilities_str = result->getNextString();
+    if (!abilities_str.empty())
     {
-        throw SQLiteException("Wrong characteristics.");
+        if (!ParseAbilities(mm->abilities, abilities_str))
+        {
+            throw SQLiteException("Wrong characteristics.");
+        }
+    }
+    else
+    {
+        mm->abilities = mm->race->abilities;
     }
     mm->lua_script = result->getNextString();
     if (!Mud::instance().mudMobileModels.insert(std::make_pair(mm->vnum,
