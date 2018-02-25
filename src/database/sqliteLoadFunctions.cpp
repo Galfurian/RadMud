@@ -502,6 +502,7 @@ bool LoadMobileModel(ResultSet * result)
     mm->shortdesc = result->getNextString();
     mm->staticdesc = result->getNextString();
     mm->description = result->getNextString();
+    FindAndReplace(&mm->description, "%r", "\n");
     mm->race = Mud::instance().findRace(result->getNextUnsignedInteger());
     if (mm->race == nullptr)
     {

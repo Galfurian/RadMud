@@ -68,6 +68,23 @@ bool DoMobileSpawn(Character * character, ArgumentHandler & args)
     return true;
 }
 
+bool DoMobileSave(Character * character, ArgumentHandler & args)
+{
+    auto mobile = character->room->findMobile(args[0].getContent(),
+                                              args[0].getIndex());
+    if (mobile == nullptr)
+    {
+        character->sendMsg("Mobile not found.\n");
+        return false;
+    }
+    if (!mobile->saveOnDB())
+    {
+        character->sendMsg("Error while saving the mobile.\n");
+        return false;
+    }
+    return true;
+}
+
 bool DoMobileKill(Character * character, ArgumentHandler & args)
 {
     if (args.size() != 1)

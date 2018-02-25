@@ -213,6 +213,10 @@ void LoadGodCommands()
         "Spawn the given mobile in the current room.",
         true, true, false));
     Mud::instance().addCommand(std::make_shared<Command>(
+        DoMobileSave, "@mob_spawn_save", "",
+        "Save the spawn point for the given mobile.",
+        true, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
         DoMobileKill, "@mob_kill", "(mobile name)",
         "Kill the desired mobile, in the same room.",
         true, true, false));

@@ -69,7 +69,7 @@ public:
     std::chrono::microseconds behaviourDelay;
 
     /// @brief Constructor.
-    Mobile();
+    Mobile(std::shared_ptr<MobileModel> const & _model);
 
     /// @brief Destructor.
     ~Mobile();
@@ -126,6 +126,11 @@ public:
     /// @brief Output to player (any type).
     /// @param msg The string to sent.
     void sendMsg(const std::string & msg) override;
+
+    /// @brief Permanently save the mobile on the database.
+    /// @return <b>True</b> if the save goes well,<br>
+    ///         <b>False</b> otherwise.
+    bool saveOnDB();
 
     void performBehaviour();
 

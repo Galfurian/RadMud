@@ -32,6 +32,10 @@ bool DoMobileModelList(Character * character, ArgumentHandler & args);
 /// Allows to spawn new mobile.
 bool DoMobileSpawn(Character * character, ArgumentHandler & args);
 
+/// Allows to save the mobile and automatically spawn it in the same room at
+/// the next boot.
+bool DoMobileSave(Character * character, ArgumentHandler & args);
+
 /// Kill the desired mobile, in the same room.
 bool DoMobileKill(Character * character, ArgumentHandler & args);
 

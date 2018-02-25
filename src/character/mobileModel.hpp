@@ -25,7 +25,8 @@
 #include "character.hpp"
 
 /// @brief Holds details about a Mobile OBject.
-class MobileModel
+class MobileModel :
+    public std::enable_shared_from_this<MobileModel>
 {
 public:
     /// The virtual number of the mobile object.

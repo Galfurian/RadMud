@@ -34,7 +34,7 @@ Mobile * MobileModel::spawn(Room * spawnRoom, unsigned int mobileVnum)
         mobileVnum = Mud::instance().getMaxVnumMobile() + 1;
     }
     // Initialize the mobile.
-    auto mob = new Mobile();
+    auto mob = new Mobile(shared_from_this());
     mob->vnum = mobileVnum;
     mob->respawnRoom = spawnRoom;
     mob->room = mob->respawnRoom;
@@ -43,7 +43,6 @@ Mobile * MobileModel::spawn(Room * spawnRoom, unsigned int mobileVnum)
     mob->shortdesc = shortdesc;
     mob->staticdesc = staticdesc;
     mob->description = description;
-    FindAndReplace(&mob->description, "%r", "\n");
     mob->race = race;
     mob->faction = faction;
     mob->gender = gender;
