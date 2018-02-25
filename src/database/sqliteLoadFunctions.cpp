@@ -519,49 +519,6 @@ bool LoadMobileModel(ResultSet * result)
     {
         throw SQLiteException("Failed to store mobile model.");
     }
-#if 0
-    // Initialize the mobile.
-    mobile->id = result->getNextString();
-    mobile->respawnRoom = Mud::instance().findRoom(
-        result->getNextUnsignedInteger());
-    mobile->room = mobile->respawnRoom;
-    mobile->name = result->getNextString();
-    mobile->keys = GetWords(result->getNextString());
-    mobile->shortdesc = result->getNextString();
-    mobile->staticdesc = result->getNextString();
-    mobile->description = result->getNextString();
-    mobile->race = Mud::instance().findRace(result->getNextUnsignedInteger());
-    mobile->faction = Mud::instance().findFaction(
-        result->getNextUnsignedInteger());
-    mobile->gender = static_cast<GenderType>(result->getNextInteger());
-    mobile->weight = result->getNextDouble();
-    mobile->actions = GetWords(result->getNextString());
-    mobile->flags = result->getNextUnsignedInteger();
-    mobile->level = result->getNextUnsignedInteger();
-    if (!mobile->setAbilities(result->getNextString()))
-    {
-        delete (mobile);
-        throw SQLiteException("Wrong characteristics.");
-    }
-    mobile->lua_script = result->getNextString();
-    mobile->setHealth(mobile->getMaxHealth(), true);
-    mobile->setStamina(mobile->getMaxStamina(), true);
-    // Translate new_line.
-    FindAndReplace(&mobile->description, "%r", "\n");
-    // Check the correctness.
-    if (!mobile->check())
-    {
-        delete (mobile);
-        throw SQLiteException("Error during error checking.");
-    }
-    if (!Mud::instance().addMobile(mobile))
-    {
-        delete (mobile);
-        throw SQLiteException("Error during mobile insertion.");
-    }
-    // Respawn the mobile.
-    mobile->respawn();
-#endif
     return true;
 }
 
@@ -586,8 +543,7 @@ bool LoadMobileSpawn(ResultSet * result)
     }
     if (mm->spawn(room, vnum) == nullptr)
     {
-        //throw SQLiteException("Cannot spawn mobile " +
-        //                      ToString(vnum) + ".");
+        throw SQLiteException("Cannot spawn mobile " + ToString(vnum) + ".");
     }
     return true;
 }

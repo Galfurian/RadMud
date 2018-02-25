@@ -121,6 +121,8 @@ private:
     unsigned int _maxVnumRoom;
     /// Highest value of vnum for items.
     unsigned int _maxVnumItem;
+    /// Highest value of vnum for mobiles.
+    unsigned int _maxVnumMobile;
 
     /// Mud weight measure.
     const std::string _mudMeasure;
@@ -429,6 +431,13 @@ public:
     /// @brief Returns the current maximum vnum used for items.
     /// @return The maximum items vnum.
     unsigned int getMaxVnumItem() const;
+
+    /// @brief Returns the current maximum vnum used for mobiles.
+    /// @return The maximum mobiles vnum.
+    inline unsigned int getMaxVnumMobile() const
+    {
+        return _maxVnumMobile;
+    }
 
     /// @brief Provides an unique vnum for an area.
     unsigned int getUniqueAreaVnum() const;

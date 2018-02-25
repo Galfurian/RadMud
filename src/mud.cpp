@@ -54,6 +54,7 @@ Mud::Mud() :
     _bootTime(time(NULL)),
     _maxVnumRoom(1),
     _maxVnumItem(1),
+    _maxVnumMobile(1),
     _mudMeasure("stones"),
     _mudDatabaseName("radmud.db"),
     _mudSystemDirectory("../system/"),
@@ -220,6 +221,7 @@ bool Mud::addMobile(Mobile * mobile)
             return false;
         }
     }
+    _maxVnumMobile = std::max(mobile->vnum, _maxVnumMobile);
     mudMobiles.emplace_back(mobile);
     return true;
 }
