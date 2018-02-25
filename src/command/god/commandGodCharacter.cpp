@@ -34,28 +34,18 @@ bool DoGodInfo(Character * character, ArgumentHandler & args)
     Character * target = Mud::instance().findPlayer(args[0].getContent());
     if (target == nullptr)
     {
-#if 0
-        target = Mud::instance().findMobile(args[0].getContent());
+        target = Mud::instance().findMobile(
+            ToNumber<unsigned int>(args[0].getContent()));
         if (target == nullptr)
         {
-            std::string msgFound;
-            for (auto it : Mud::instance().mudMobiles)
+            target = character->room->findCharacter(
+                args[0].getContent(), args[0].getIndex());
+            if (target == nullptr)
             {
-                if (BeginWith(it->id, args[0].getContent()))
-                {
-                    if (msgFound.empty())
-                    {
-                        msgFound += "Maybe you mean:\n";
-                    }
-                    msgFound += "    " + it->id + "\n";
-                }
+                character->sendMsg("Character not found.\n");
+                return false;
             }
-            character->sendMsg("Mobile not found.\n" + msgFound);
-            return false;
         }
-#endif
-        character->sendMsg("Character not found.\n");
-        return false;
     }
     // Create a table.
     Table sheet;
