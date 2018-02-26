@@ -55,7 +55,8 @@ bool ShopItem::updateOnDB()
     arguments.emplace_back(ToString(shopBuyTax));
     arguments.emplace_back(ToString(shopSellTax));
     arguments.emplace_back(ToString(balance));
-    arguments.emplace_back((shopKeeper != nullptr) ? shopKeeper->id : "");
+    arguments.emplace_back((shopKeeper != nullptr) ?
+                           ToString(shopKeeper->vnum) : "");
     arguments.emplace_back(ToString(openingHour));
     arguments.emplace_back(ToString(closingHour));
     return SQLiteDbms::instance().insertInto("Shop", arguments, false, true);

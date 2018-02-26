@@ -24,12 +24,13 @@
 
 #include "processPlayerName.hpp"
 #include "CMacroWrapper.hpp"
+#include "mobileModel.hpp"
+#include "mapWrapper.hpp"
 #include "stopwatch.hpp"
 #include "heightMap.hpp"
 
 #include <unistd.h>
 #include <signal.h>
-#include "mapWrapper.hpp"
 
 /// Input file descriptor.
 static fd_set in_set;
@@ -53,11 +54,13 @@ Mud::Mud() :
     _bootTime(time(NULL)),
     _maxVnumRoom(1),
     _maxVnumItem(1),
+    _maxVnumMobile(1),
     _mudMeasure("stones"),
     _mudDatabaseName("radmud.db"),
     _mudSystemDirectory("../system/"),
     mudPlayers(),
     mudMobiles(),
+    mudMobileModels(),
     mudItems(),
     mudRooms(),
     mudItemModels(),
@@ -213,20 +216,21 @@ bool Mud::addMobile(Mobile * mobile)
 {
     for (auto it : mudMobiles)
     {
-        if (it->id == mobile->id)
+        if (it->vnum == mobile->vnum)
         {
             return false;
         }
     }
+    _maxVnumMobile = std::max(mobile->vnum, _maxVnumMobile);
     mudMobiles.emplace_back(mobile);
     return true;
 }
 
-bool Mud::remMobile(Mobile * mobile)
+bool Mud::remMobile(unsigned int vnum)
 {
     for (auto it = mudMobiles.begin(); it != mudMobiles.end(); ++it)
     {
-        if ((*it)->id == mobile->id)
+        if ((*it)->vnum == vnum)
         {
             mudMobiles.erase(it);
             return true;
@@ -409,16 +413,20 @@ Player * Mud::findPlayer(const std::string & name)
     return nullptr;
 }
 
-Mobile * Mud::findMobile(std::string id)
+Mobile * Mud::findMobile(unsigned int vnum)
 {
     for (auto it : mudMobiles)
     {
-        if (it->id == id)
-        {
-            return it;
-        }
+        if (it->vnum == vnum) return it;
     }
     return nullptr;
+}
+
+std::shared_ptr<MobileModel> Mud::findMobileModel(unsigned int vnum)
+{
+    auto it = mudMobileModels.find(vnum);
+    if (it == mudMobileModels.end()) return nullptr;
+    return it->second;
 }
 
 std::shared_ptr<ItemModel> Mud::findItemModel(unsigned int vnum)

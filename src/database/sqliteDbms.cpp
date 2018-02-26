@@ -51,6 +51,20 @@ SQLiteDbms::SQLiteDbms() :
         TableLoader("AreaList", LoadAreaList));
     loaders.emplace_back(
         TableLoader("TravelPoint", LoadTravelPoint));
+
+    loaders.emplace_back(
+        TableLoader("Skill", LoadSkill));
+    loaders.emplace_back(
+        TableLoader("SkillPrerequisite", LoadSkillPrerequisite));
+    loaders.emplace_back(
+        TableLoader("SkillAbilityModifier", LoadSkillAbilityModifier));
+    loaders.emplace_back(
+        TableLoader("SkillStatusModifier", LoadSkillStatusModifier));
+    loaders.emplace_back(
+        TableLoader("SkillCombatModifier", LoadSkillCombatModifier));
+    loaders.emplace_back(
+        TableLoader("SkillKnowledge", LoadSkillKnowledge));
+
     loaders.emplace_back(
         TableLoader("BodyPart", LoadBodyPart));
     loaders.emplace_back(
@@ -59,6 +73,10 @@ SQLiteDbms::SQLiteDbms() :
         TableLoader("Faction", LoadFaction));
     loaders.emplace_back(
         TableLoader("Race", LoadRace));
+    loaders.emplace_back(
+        TableLoader("RaceBaseSkill", LoadRaceBaseSkill));
+    loaders.emplace_back(
+        TableLoader("RaceBaseAbility", LoadRaceBaseAbility));
     loaders.emplace_back(
         TableLoader("RaceBodyPart", LoadRaceBodyPart));
     loaders.emplace_back(
@@ -92,27 +110,13 @@ SQLiteDbms::SQLiteDbms() :
     loaders.emplace_back(
         TableLoader("ModelBodyPart", LoadModelBodyPart));
     loaders.emplace_back(
-        TableLoader("Mobile", LoadMobile));
+        TableLoader("MobileModel", LoadMobileModel));
     loaders.emplace_back(
-        TableLoader("Skill", LoadSkill));
-    loaders.emplace_back(
-        TableLoader("SkillPrerequisite", LoadSkillPrerequisite));
-    loaders.emplace_back(
-        TableLoader("SkillAbilityModifier", LoadSkillAbilityModifier));
-    loaders.emplace_back(
-        TableLoader("SkillStatusModifier", LoadSkillStatusModifier));
-    loaders.emplace_back(
-        TableLoader("SkillCombatModifier", LoadSkillCombatModifier));
-    loaders.emplace_back(
-        TableLoader("SkillKnowledge", LoadSkillKnowledge));
+        TableLoader("MobileSpawn", LoadMobileSpawn));
     loaders.emplace_back(
         TableLoader("BodyPartResources", LoadBodyPartResources));
     loaders.emplace_back(
         TableLoader("BodyPartWeapon", LoadBodyPartWeapon));
-    loaders.emplace_back(
-        TableLoader("RaceBaseSkill", LoadRaceBaseSkill));
-    loaders.emplace_back(
-        TableLoader("RaceBaseAbility", LoadRaceBaseAbility));
     loaders.emplace_back(
         TableLoader("HeightMap", LoadHeightMap));
     loaders.emplace_back(

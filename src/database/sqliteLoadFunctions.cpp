@@ -23,9 +23,11 @@
 #include "sqliteException.hpp"
 
 #include "liquidContainerItem.hpp"
+#include "characterUtilities.hpp"
 #include "currencyModel.hpp"
 #include "modelFactory.hpp"
 #include "itemFactory.hpp"
+#include "mobileModel.hpp"
 #include "heightMap.hpp"
 #include "shopItem.hpp"
 #include "mud.hpp"
@@ -489,51 +491,77 @@ bool LoadRaceBaseAbility(ResultSet * result)
     return true;
 }
 
-bool LoadMobile(ResultSet * result)
+bool LoadMobileModel(ResultSet * result)
 {
-    // Create an empty Mobile.
-    auto mobile = new Mobile();
-    // Initialize the mobile.
-    mobile->id = result->getNextString();
-    mobile->respawnRoom = Mud::instance().findRoom(
-        result->getNextUnsignedInteger());
-    mobile->room = mobile->respawnRoom;
-    mobile->name = result->getNextString();
-    mobile->keys = GetWords(result->getNextString());
-    mobile->shortdesc = result->getNextString();
-    mobile->staticdesc = result->getNextString();
-    mobile->description = result->getNextString();
-    mobile->race = Mud::instance().findRace(result->getNextUnsignedInteger());
-    mobile->faction = Mud::instance().findFaction(
-        result->getNextUnsignedInteger());
-    mobile->gender = static_cast<GenderType>(result->getNextInteger());
-    mobile->weight = result->getNextDouble();
-    mobile->actions = GetWords(result->getNextString());
-    mobile->flags = result->getNextUnsignedInteger();
-    mobile->level = result->getNextUnsignedInteger();
-    if (!mobile->setAbilities(result->getNextString()))
+    (void) result;
+    // Create an empty Mobile model.
+    auto mm = std::make_shared<MobileModel>();
+    mm->vnum = result->getNextUnsignedInteger();
+    mm->propnoun = result->getNextString();
+    mm->keys = GetWords(result->getNextString());
+    mm->shortdesc = result->getNextString();
+    mm->staticdesc = result->getNextString();
+    mm->description = result->getNextString();
+    FindAndReplace(&mm->description, "%r", "\n");
+    mm->race = Mud::instance().findRace(result->getNextUnsignedInteger());
+    if (mm->race == nullptr)
     {
-        delete (mobile);
-        throw SQLiteException("Wrong characteristics.");
+        throw SQLiteException("Cannot find the race for the mobile model.");
     }
-    mobile->lua_script = result->getNextString();
-    mobile->setHealth(mobile->getMaxHealth(), true);
-    mobile->setStamina(mobile->getMaxStamina(), true);
-    // Translate new_line.
-    FindAndReplace(&mobile->description, "%r", "\n");
-    // Check the correctness.
-    if (!mobile->check())
+    mm->faction = Mud::instance().findFaction(result->getNextUnsignedInteger());
+    if (mm->faction == nullptr)
     {
-        delete (mobile);
-        throw SQLiteException("Error during error checking.");
+        throw SQLiteException("Cannot find the faction for the mobile model.");
     }
-    if (!Mud::instance().addMobile(mobile))
+    mm->gender = static_cast<GenderType>(result->getNextInteger());
+    mm->weight = result->getNextDouble();
+    mm->actions = GetWords(result->getNextString());
+    mm->flags = result->getNextUnsignedInteger();
+    mm->level = result->getNextUnsignedInteger();
+    auto abilities_str = result->getNextString();
+    if (!abilities_str.empty())
     {
-        delete (mobile);
-        throw SQLiteException("Error during mobile insertion.");
+        if (!ParseAbilities(mm->abilities, abilities_str))
+        {
+            throw SQLiteException("Wrong characteristics.");
+        }
     }
-    // Respawn the mobile.
-    mobile->respawn();
+    else
+    {
+        mm->abilities = mm->race->abilities;
+    }
+    mm->lua_script = result->getNextString();
+    if (!Mud::instance().mudMobileModels.insert(std::make_pair(mm->vnum,
+                                                               mm)).second)
+    {
+        throw SQLiteException("Failed to store mobile model.");
+    }
+    return true;
+}
+
+bool LoadMobileSpawn(ResultSet * result)
+{
+    // Retrive the values.
+    auto vnum = result->getNextUnsignedInteger();
+    auto modelVnum = result->getNextUnsignedInteger();
+    auto roomVnum = result->getNextUnsignedInteger();
+    // Retrive the data.
+    auto mm = Mud::instance().findMobileModel(modelVnum);
+    if (mm == nullptr)
+    {
+        throw SQLiteException("Cannot find mobile model " +
+                              ToString(modelVnum) + ".");
+    }
+    auto room = Mud::instance().findRoom(roomVnum);
+    if (room == nullptr)
+    {
+        throw SQLiteException("Cannot find the room " +
+                              ToString(roomVnum) + ".");
+    }
+    if (mm->spawn(room, vnum) == nullptr)
+    {
+        throw SQLiteException("Cannot spawn mobile " + ToString(vnum) + ".");
+    }
     return true;
 }
 
@@ -1146,7 +1174,7 @@ bool LoadShop(ResultSet * result)
     shop->shopSellTax = result->getNextUnsignedInteger();
     shop->balance = result->getNextUnsignedInteger();
     shop->shopKeeper = Mud::instance().findMobile(
-        result->getNextString());
+        result->getNextUnsignedInteger());
     shop->openingHour = result->getNextUnsignedInteger();
     shop->closingHour = result->getNextUnsignedInteger();
     if (shop->shopKeeper != nullptr)

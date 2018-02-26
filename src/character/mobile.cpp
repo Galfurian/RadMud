@@ -25,9 +25,11 @@
 #include "generalBehaviour.hpp"
 #include "lua_script.hpp"
 #include "mud.hpp"
+#include "mobileModel.hpp"
 
-Mobile::Mobile() :
-    id(),
+Mobile::Mobile(std::shared_ptr<MobileModel> const & _model) :
+    model(_model),
+    vnum(),
     respawnRoom(),
     keys(),
     shortdesc(),
@@ -156,7 +158,7 @@ bool Mobile::isAlive() const
 bool Mobile::check() const
 {
     bool safe = Character::check();
-    safe &= CorrectAssert(!id.empty());
+    safe &= CorrectAssert(vnum > 0);
     safe &= CorrectAssert(respawnRoom != nullptr);
     safe &= CorrectAssert(!keys.empty());
     safe &= CorrectAssert(!shortdesc.empty());
@@ -178,7 +180,7 @@ void Mobile::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow({"Id", this->id});
+    sheet.addRow({"Vnum", ToString(vnum)});
     sheet.addRow({"Respawn Room", ToString(this->respawnRoom->vnum)});
     std::string keyGroup;
     for (auto it : this->keys)
@@ -314,6 +316,26 @@ void Mobile::sendMsg(const std::string & msg)
 {
     Character::sendMsg(msg);
     if (controller != nullptr) controller->sendMsg(msg);
+}
+
+bool Mobile::saveOnDB()
+{
+    if (model == nullptr)
+    {
+        Logger::log(LogLevel::Error, "No model set for mobile.");
+        return false;
+    }
+    if (room == nullptr)
+    {
+        Logger::log(LogLevel::Error,
+                    "Trying to save mobile while it is in no room.");
+        return false;
+    }
+    std::vector<std::string> args;
+    args.emplace_back(ToString(vnum));
+    args.emplace_back(ToString(model->vnum));
+    args.emplace_back(ToString(room->vnum));
+    return SQLiteDbms::instance().insertInto("MobileSpawn", args, false, true);
 }
 
 void Mobile::performBehaviour()

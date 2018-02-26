@@ -26,10 +26,13 @@ bool DoItemCreate(Character * character, ArgumentHandler & args)
 {
     // Stop any ongoing action.
     StopAction(character);
-    // Check the number of arguments.
-    if ((args.size() != 2) && (args.size() != 3))
+    // Get the number of arguments.
+    auto argv(args.size());
+    // If no argument is provided show the list of models.
+    if (argv == 0)
     {
         character->sendMsg("What do you want to create?\n");
+        DoModelList(character, args);
         return false;
     }
     // Get the quantity.
@@ -40,6 +43,21 @@ bool DoItemCreate(Character * character, ArgumentHandler & args)
     if (itemModel == nullptr)
     {
         character->sendMsg("Cannot find model '%s'.\n", args[0].getContent());
+        return false;
+    }
+    // If no more arguments are provided, show the materials for the model.
+    if (argv == 1)
+    {
+        character->sendMsg("You can make %s out of:\n", itemModel->getName());
+        for (auto const & it : Mud::instance().mudMaterials)
+        {
+            if (it.second->type == itemModel->material)
+            {
+                character->sendMsg("    [%s] %s\n",
+                                   Align(it.first, align::right, 4),
+                                   it.second->name);
+            }
+        }
         return false;
     }
     // Get the material.
@@ -53,7 +71,7 @@ bool DoItemCreate(Character * character, ArgumentHandler & args)
     }
     // Get the quality.
     auto quality = ItemQuality(ItemQuality::Normal);
-    if (args.size() == 3)
+    if (argv >= 3)
     {
         quality = ItemQuality(ToNumber<unsigned int>(args[2].getContent()));
         if (quality == ItemQuality::None)
@@ -334,7 +352,8 @@ bool DoModelList(Character * character, ArgumentHandler & args)
             }
             if (args[argIt].getContent() == "-m")
             {
-                modelVnum = ToNumber<unsigned int>(args[argIt + 1].getContent());
+                modelVnum =
+                    ToNumber<unsigned int>(args[argIt + 1].getContent());
             }
         }
     }

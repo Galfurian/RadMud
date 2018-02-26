@@ -150,6 +150,7 @@ set(PROJECT_SRC
         ${CMAKE_SOURCE_DIR}/src/character/characterUtilities.cpp
         ${CMAKE_SOURCE_DIR}/src/character/characterVector.cpp
         ${CMAKE_SOURCE_DIR}/src/character/mobile.cpp
+        ${CMAKE_SOURCE_DIR}/src/character/mobileModel.cpp
         ${CMAKE_SOURCE_DIR}/src/character/player.cpp
         ${CMAKE_SOURCE_DIR}/src/character/faction.cpp
         ${CMAKE_SOURCE_DIR}/src/character/combatHandler.cpp

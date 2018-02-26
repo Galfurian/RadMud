@@ -20,7 +20,70 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "commandGodMobile.hpp"
+#include "mobileModel.hpp"
 #include "mud.hpp"
+
+bool DoMobileModelList(Character * character, ArgumentHandler & /*args*/)
+{
+    Table table;
+    table.addColumn("VNUM", align::left);
+    table.addColumn("NAME", align::left);
+    for (auto const & it : Mud::instance().mudMobileModels)
+    {
+        // Prepare the row.
+        TableRow row;
+        row.emplace_back(ToString(it.second->vnum));
+        row.emplace_back(it.second->propnoun);
+        // Add the row to the table.
+        table.addRow(row);
+    }
+    character->sendMsg(table.getTable());
+    return true;
+}
+
+bool DoMobileSpawn(Character * character, ArgumentHandler & args)
+{
+    if (args.size() != 1)
+    {
+        character->sendMsg("You must specify the vnum of a mobile model.\n");
+        return false;
+    }
+    if (character->room == nullptr)
+    {
+        character->sendMsg("You are not in valid room.\n");
+        return false;
+    }
+    auto mobileModel = Mud::instance().findMobileModel(
+        ToNumber<unsigned int>(args[0].getContent()));
+    if (mobileModel == nullptr)
+    {
+        character->sendMsg("Mobile model not found.\n");
+        return false;
+    }
+    if (mobileModel->spawn(character->room, 0) == nullptr)
+    {
+        character->sendMsg("You failed to spawn the mobile.\n");
+        return false;
+    }
+    return true;
+}
+
+bool DoMobileSave(Character * character, ArgumentHandler & args)
+{
+    auto mobile = character->room->findMobile(args[0].getContent(),
+                                              args[0].getIndex());
+    if (mobile == nullptr)
+    {
+        character->sendMsg("Mobile not found.\n");
+        return false;
+    }
+    if (!mobile->saveOnDB())
+    {
+        character->sendMsg("Error while saving the mobile.\n");
+        return false;
+    }
+    return true;
+}
 
 bool DoMobileKill(Character * character, ArgumentHandler & args)
 {
@@ -49,7 +112,7 @@ bool DoMobileList(Character * character, ArgumentHandler & /*args*/)
 {
     Table table;
     table.addColumn("ALIVE", align::center);
-    table.addColumn("ID", align::left);
+    table.addColumn("VNUM", align::left);
     table.addColumn("NAME", align::left);
     table.addColumn("LOCATION", align::right);
     for (auto mobile : Mud::instance().mudMobiles)
@@ -57,7 +120,7 @@ bool DoMobileList(Character * character, ArgumentHandler & /*args*/)
         // Prepare the row.
         TableRow row;
         row.emplace_back((mobile->isAlive()) ? "Yes" : "No");
-        row.emplace_back(mobile->id);
+        row.emplace_back(ToString(mobile->vnum));
         row.emplace_back(mobile->getName());
         if (mobile->room != nullptr)
         {
@@ -128,7 +191,8 @@ bool DoMobileLog(Character * character, ArgumentHandler & args)
         character->sendMsg("You must provide a mobile id.\n");
         return false;
     }
-    auto mobile = Mud::instance().findMobile(args[0].getContent());
+    auto mobile = Mud::instance().findMobile(
+        ToNumber<unsigned int>(args[0].getContent()));
     if (mobile == nullptr)
     {
         character->sendMsg("Mobile not found.\n");

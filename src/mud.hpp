@@ -52,6 +52,7 @@
 class Direction;
 class HeightMap;
 class MapWrapper;
+class MobileModel;
 
 #ifdef __linux__
 
@@ -120,6 +121,8 @@ private:
     unsigned int _maxVnumRoom;
     /// Highest value of vnum for items.
     unsigned int _maxVnumItem;
+    /// Highest value of vnum for mobiles.
+    unsigned int _maxVnumMobile;
 
     /// Mud weight measure.
     const std::string _mudMeasure;
@@ -157,6 +160,8 @@ public:
     std::list<Player *> mudPlayers;
     /// List all the mobile.
     std::vector<Mobile *> mudMobiles;
+    /// List of mobile models.
+    std::map<unsigned int, std::shared_ptr<MobileModel>> mudMobileModels;
     /// List of all items.
     std::map<unsigned int, Item *> mudItems;
     /// List of all the rooms.
@@ -239,7 +244,7 @@ public:
     bool addMobile(Mobile * mobile);
 
     /// Remove the given mobile from the mud.
-    bool remMobile(Mobile * mobile);
+    bool remMobile(unsigned int vnum);
 
     /// Add the given item to the mud.
     bool addItem(Item * item);
@@ -322,8 +327,11 @@ public:
     /// Find an item model given its vnum.
     std::shared_ptr<ItemModel> findItemModel(unsigned int vnum);
 
-    /// Find a mobile given his id.
-    Mobile * findMobile(std::string id);
+    /// Find a mobile given his vnum.
+    Mobile * findMobile(unsigned int vnum);
+
+    /// Find a mobile model given his vnum.
+    std::shared_ptr<MobileModel> findMobileModel(unsigned int vnum);
 
     /// Find a player given his name.
     Player * findPlayer(const std::string & name);
@@ -423,6 +431,13 @@ public:
     /// @brief Returns the current maximum vnum used for items.
     /// @return The maximum items vnum.
     unsigned int getMaxVnumItem() const;
+
+    /// @brief Returns the current maximum vnum used for mobiles.
+    /// @return The maximum mobiles vnum.
+    inline unsigned int getMaxVnumMobile() const
+    {
+        return _maxVnumMobile;
+    }
 
     /// @brief Provides an unique vnum for an area.
     unsigned int getUniqueAreaVnum() const;
