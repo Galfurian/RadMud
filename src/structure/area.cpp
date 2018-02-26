@@ -23,6 +23,8 @@
 #include "area.hpp"
 
 #include "structureUtils.hpp"
+#include "formatter.hpp"
+#include "structureDefines.hpp"
 
 Area::Area() :
     vnum(),
@@ -399,11 +401,18 @@ std::string Area::drawASCIIFov(Room * centerRoom, const int & radius)
             // VI  - WALKABLE
             if (room->liquidContent.first != nullptr)
             {
-                tile = 'w';
+                if (room->liquidContent.second <= (MAX_WATER_LEVEL / 2))
+                {
+                    tile = Formatter::cyan("w");
+                }
+                else
+                {
+                    tile = Formatter::blue("w");
+                }
             }
             else if (HasFlag(room->flags, RoomFlag::SpawnTree))
             {
-                tile = 't';
+                tile = Formatter::green("t");
             }
             else
             {

@@ -20,6 +20,7 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "mapGenerator.hpp"
+#include "structureDefines.hpp"
 #include "structureUtils.hpp"
 #include "mapWrapper.hpp"
 #include "heightMap.hpp"
@@ -270,7 +271,7 @@ bool MapGenerator::generateRivers(const std::shared_ptr<MapWrapper> & map)
         for (auto point : startingPoints)
         {
             auto distance = StructUtils::getDistance(cell->coordinates,
-                                                          point->coordinates);
+                                                     point->coordinates);
             if (distance <= configuration.minRiverDistance)
             {
                 return false;
@@ -335,10 +336,12 @@ bool MapGenerator::generateRivers(const std::shared_ptr<MapWrapper> & map)
             auto riverCell = (*it2);
             if (it2 == river.begin())
             {
-                riverCell->liquidContent = std::make_pair(liquid, 20);
+                riverCell->liquidContent = std::make_pair(liquid,
+                                                          MAX_WATER_LEVEL);
                 continue;
             }
-            riverCell->liquidContent = std::make_pair(liquid, 5);
+            riverCell->liquidContent = std::make_pair(liquid,
+                                                      MAX_WATER_LEVEL / 4);
         }
     }
     return true;
@@ -362,7 +365,7 @@ bool MapGenerator::generateForests(const std::shared_ptr<MapWrapper> & map)
         for (auto point : forestDropPoints)
         {
             auto distance = StructUtils::getDistance(cell->coordinates,
-                                                          point->coordinates);
+                                                     point->coordinates);
             if (distance <= configuration.minForestDistance)
             {
                 return false;
