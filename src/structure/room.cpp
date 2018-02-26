@@ -483,6 +483,10 @@ std::string Room::getLook(Character * actor)
             }
         }
     }
+    if (HasFlag(flags, RoomFlag::TravelPoint))
+    {
+        output += "[" + Formatter::italic("Travel Point") + "]\n";
+    }
     // Show the characters/items inside the room only if it is lit.
     if (roomIsLit)
     {
