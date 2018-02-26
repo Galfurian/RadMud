@@ -90,13 +90,13 @@ bool DoSay(Character * character, ArgumentHandler & args)
                            Formatter::reset());
         // Target receive.
         receiver->sendMsg("%s say to you, \"%s\"\n\n",
-                          character->getName(),
+                          character->getNameCapital(),
                           Formatter::cyan() + Formatter::italic() + message +
                           Formatter::reset());
         // Send the message inside the room.
         character->room->sendToAll("%s says to %s, \"%s\".\n",
                                    {character, receiver},
-                                   character->getName(),
+                                   character->getNameCapital(),
                                    receiver->getName(),
                                    Formatter::cyan() + Formatter::italic() +
                                    message + Formatter::reset());
@@ -114,7 +114,7 @@ bool DoSay(Character * character, ArgumentHandler & args)
         // Send the message inside the room.
         character->room->sendToAll("%s says \"%s\".\n",
                                    {character},
-                                   character->getName(),
+                                   character->getNameCapital(),
                                    Formatter::cyan() + Formatter::italic() +
                                    args.getOriginal() + Formatter::reset());
     }
