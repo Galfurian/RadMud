@@ -126,8 +126,6 @@ public:
     double baseWeight;
     /// The model base price.
     unsigned int basePrice;
-    /// The model maximum condition.
-    double condition;
     /// The model's material.
     MaterialType material;
     /// TileSet of the icon.

@@ -321,7 +321,6 @@ bool LoadModel(ResultSet * result)
     itemModel->modelFlags = result->getNextUnsignedInteger();
     itemModel->baseWeight = result->getNextDouble();
     itemModel->basePrice = result->getNextUnsignedInteger();
-    itemModel->condition = result->getNextDouble();
     itemModel->material = MaterialType(
         result->getNextUnsignedInteger());
     itemModel->tileSet = result->getNextInteger();
@@ -414,7 +413,6 @@ bool LoadRaceCorpse(ResultSet * result)
     }
     corpse->keys.emplace_back("corpse");
     corpse->modelFlags = 0;
-    corpse->condition = 10;
     corpse->tileSet = race->tileSet;
     corpse->tileId = race->tileId;
     corpse->description = result->getNextString();

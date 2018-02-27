@@ -59,7 +59,6 @@ ItemModel::ItemModel() :
     modelFlags(),
     baseWeight(),
     basePrice(),
-    condition(),
     material(),
     tileSet(),
     tileId()
@@ -103,9 +102,9 @@ void ItemModel::getSheet(Table & sheet) const
         sheet.addRow({"Body Part", bodyPart->name});
     }
     sheet.addRow({"Flags", GetModelFlagString(this->modelFlags)});
-    sheet.addRow({"Condition", ToString(this->condition)});
     sheet.addRow({"Material", this->material.toString()});
-    sheet.addRow({"Tile", ToString(this->condition)});
+    sheet.addRow({"TileSet", ToString(tileSet)});
+    sheet.addRow({"TileId", ToString(tileId)});
     sheet.addRow({"Condition", ToString(this->tileSet) + ":" +
                                ToString(this->tileId)});
 }
@@ -197,8 +196,7 @@ bool ItemModel::check()
     if (shortdesc.empty()) return false;
     if (keys.empty()) return false;
     if (description.empty()) return false;
-    if (condition <= 0) return false;
-    if (this->material == MaterialType::None) return false;
+    if (material == MaterialType::None) return false;
     if (tileSet < 0) return false;
     if (tileId < 0) return false;
     return true;
