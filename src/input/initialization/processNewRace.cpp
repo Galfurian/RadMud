@@ -66,7 +66,10 @@ bool ProcessNewRace::process(Character * character, ArgumentHandler & args)
         }
         std::string help;
         help += "Help about '" + race->name + "'.\n";
-        help += race->description + "\n";
+        for (auto const & it : TextWrap(race->description, 60))
+        {
+            help += it + "\n";
+        }
         help += "  Strength     " +
                 ToString(race->getAbility(Ability::Strength)) + "\n";
         help += "  Agility      " +

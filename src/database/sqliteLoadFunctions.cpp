@@ -356,7 +356,7 @@ bool LoadRace(ResultSet * result)
     race->tileSet = result->getNextInteger();
     race->tileId = result->getNextInteger();
     // Translate new_line.
-    FindAndReplace(&race->description, "%r", "\n");
+    FindAndReplace(&race->description, "\n", " ");
     // Check the correctness.
     if (!race->check())
     {

@@ -99,4 +99,8 @@ public:
     /// @brief Returns the tile of the race.
     /// @return The string which contains the code of the race's tile.
     std::string getTile();
+
+    /// @brief Fills the provided table with the faction informations.
+    /// @param sheet The table that has to be filled.
+    void getSheet(Table & sheet) const;
 };

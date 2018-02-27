@@ -43,6 +43,9 @@ bool DoFactionInfo(Character * character, ArgumentHandler & args);
 /// List all the factions.
 bool DoFactionList(Character * character, ArgumentHandler & args);
 
+/// Shows the information about a race.
+bool DoRaceInfo(Character * character, ArgumentHandler & args);
+
 /// List all the races.
 bool DoRaceList(Character * character, ArgumentHandler & args);
 

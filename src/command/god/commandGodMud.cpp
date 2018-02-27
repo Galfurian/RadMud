@@ -104,6 +104,9 @@ bool DoFactionList(Character * character, ArgumentHandler & /*args*/)
     Table table;
     table.addColumn("VNUM", align::center);
     table.addColumn("NAME", align::left);
+    table.addDivider();
+    table.addColumnHeaders();
+    table.addDivider();
     for (auto iterator : Mud::instance().mudFactions)
     {
         // Prepare the row.
@@ -114,6 +117,29 @@ bool DoFactionList(Character * character, ArgumentHandler & /*args*/)
         table.addRow(row);
     }
     character->sendMsg(table.getTable());
+    return true;
+}
+
+bool DoRaceInfo(Character * character, ArgumentHandler & args)
+{
+    if (args.size() != 1)
+    {
+        character->sendMsg("You must insert a valide race vnum.\n");
+        return false;
+    }
+    auto vnum = ToNumber<unsigned int>(args[0].getContent());
+    auto race = Mud::instance().findRace(vnum);
+    if (race == nullptr)
+    {
+        character->sendMsg("Race not found.\n");
+        return false;
+    }
+    // Create a table.
+    Table sheet;
+    // Get the sheet.
+    race->getSheet(sheet);
+    // Show the seet to character.
+    character->sendMsg(sheet.getTable());
     return true;
 }
 
@@ -128,6 +154,9 @@ bool DoRaceList(Character * character, ArgumentHandler & /*args*/)
     table.addColumn("PERCEPTION", align::right);
     table.addColumn("CONSTITUTION", align::right);
     table.addColumn("INTELLIGENCE", align::right);
+    table.addDivider();
+    table.addColumnHeaders();
+    table.addDivider();
     for (auto iterator : Mud::instance().mudRaces)
     {
         Race * race = iterator.second;
@@ -154,6 +183,9 @@ bool DoSkillList(Character * character, ArgumentHandler & /*args*/)
     table.addColumn("VNUM", align::center);
     table.addColumn("NAME", align::left);
     table.addColumn("ATTRIBUTE", align::left);
+    table.addDivider();
+    table.addColumnHeaders();
+    table.addDivider();
     for (auto const & skill : Mud::instance().mudSkills)
     {
         // Prepare the row.

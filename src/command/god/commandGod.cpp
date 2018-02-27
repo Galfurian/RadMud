@@ -72,6 +72,10 @@ void LoadGodCommands()
         "List all the factions.",
         true, true, false));
     Mud::instance().addCommand(std::make_shared<Command>(
+        DoRaceInfo, "@race_info", "",
+        "Provide all the information regarding the given race.",
+        true, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
         DoRaceList, "@race_list", "",
         "List all the races.",
         true, true, false));

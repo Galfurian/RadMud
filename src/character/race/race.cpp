@@ -86,3 +86,36 @@ std::string Race::getTile()
     }
     return "c";
 }
+
+void Race::getSheet(Table & sheet) const
+{
+    // Add the columns.
+    sheet.addColumn("Attribute", align::left);
+    sheet.addColumn("Value", align::left, 60, false);
+    sheet.addColumnHeaders();
+    sheet.addDivider();
+    // Set the values.
+    sheet.addRow({"vnum", ToString(vnum)});
+    sheet.addRow({"article", article});
+    sheet.addRow({"name", name});
+    sheet.addRow({"description", description});
+    sheet.addRow({"player_allow", ToString(player_allow)});
+    sheet.addRow({"tileSet", ToString(tileSet)});
+    sheet.addRow({"tileId", ToString(tileId)});
+    sheet.addRow({"CorpseModel", (corpse) ? ToString(corpse->vnum) : "NULL"});
+    sheet.addHeader("Base Abilities");
+    for (auto const & it : abilities)
+    {
+        sheet.addRow({it.first.toString(), ToString(it.second)});
+    }
+    sheet.addHeader("Body Parts");
+    for (auto const & it : bodyParts)
+    {
+        sheet.addRow({it->name, ToString(it->vnum)});
+    }
+    sheet.addHeader("Base Skills");
+    for (auto const & it : skills)
+    {
+        sheet.addRow({it->skill->name, ToString(it->skillLevel)});
+    }
+}
