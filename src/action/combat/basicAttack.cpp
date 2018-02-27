@@ -212,7 +212,7 @@ unsigned int BasicAttack::getConsumedStamina(Character * character,
     }
     else if (weapon->getType() == ModelType::RangedWeapon)
     {
-        if (weapon->model->toRangedWeapon()->rangedWeaponType !=
+        if (weapon->model->to<RangedWeaponModel>()->rangedWeaponType !=
             RangedWeaponType::Thrown)
         {
             return 0;

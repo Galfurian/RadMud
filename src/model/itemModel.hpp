@@ -228,75 +228,15 @@ public:
     /// @return The string which contains the code of the tile.
     std::string getTile(int offset = 0);
 
-public:
-    /// @brief Returns the model <b>statically</b> casted to Armor.
-    std::shared_ptr<ArmorModel> toArmor();
 
-    /// @brief Returns the model <b>statically</b> casted to Book.
-    std::shared_ptr<BookModel> toBook();
-
-    /// @brief Returns the model <b>statically</b> casted to Container.
-    std::shared_ptr<ContainerModel> toContainer();
-
-    /// @brief Returns the model <b>statically</b> casted to Corpse.
-    std::shared_ptr<CorpseModel> toCorpse();
-
-    /// @brief Returns the model <b>statically</b> casted to Currency.
-    std::shared_ptr<CurrencyModel> toCurrency();
-
-    /// @brief Returns the model <b>statically</b> casted to Food.
-    std::shared_ptr<FoodModel> toFood();
-
-    /// @brief Returns the model <b>statically</b> casted to Furniture.
-    std::shared_ptr<FurnitureModel> toFurniture();
-
-    /// @brief Returns the model <b>statically</b> casted to Key.
-    std::shared_ptr<KeyModel> toKey();
-
-    /// @brief Returns the model <b>statically</b> casted to Light.
-    std::shared_ptr<LightModel> toLight();
-
-    /// @brief Returns the model <b>statically</b> casted to Liquid Container.
-    std::shared_ptr<LiquidContainerModel> toLiquidContainer();
-
-    /// @brief Returns the model <b>statically</b> casted to Mechanism.
-    std::shared_ptr<MechanismModel> toMechanism();
-
-    /// @brief Returns the model <b>statically</b> casted to Node.
-    std::shared_ptr<NodeModel> toNode();
-
-    /// @brief Returns the model <b>statically</b> casted to Projectile.
-    std::shared_ptr<ProjectileModel> toProjectile();
-
-    /// @brief Returns the model <b>statically</b> casted to Resource.
-    std::shared_ptr<ResourceModel> toResource();
-
-    /// @brief Returns the model <b>statically</b> casted to Rope.
-    std::shared_ptr<RopeModel> toRope();
-
-    /// @brief Returns the model <b>statically</b> casted to Seed.
-    std::shared_ptr<SeedModel> toSeed();
-
-    /// @brief Returns the model <b>statically</b> casted to Shield.
-    std::shared_ptr<ShieldModel> toShield();
-
-    /// @brief Returns the model <b>statically</b> casted to shop.
-    std::shared_ptr<ShopModel> toShop();
-
-    /// @brief Returns the model <b>statically</b> casted to Tool.
-    std::shared_ptr<ToolModel> toTool();
-
-    /// @brief Returns the model <b>statically</b> casted to Vehicle.
-    std::shared_ptr<VehicleModel> toVehicle();
-
-    /// @brief Returns the model <b>statically</b> casted to Melee Weapon.
-    std::shared_ptr<MeleeWeaponModel> toMeleeWeapon();
-
-    /// @brief Returns the model <b>statically</b> casted to Ranged Weapon.
-    std::shared_ptr<RangedWeaponModel> toRangedWeapon();
-
-    /// @brief Returns the model <b>statically</b> casted to Magazine.
-    std::shared_ptr<MagazineModel> toMagazine();
+    /// @brief Casts the model to the given type.
+    /// @tparam T The type to which the model must be casted.
+    /// @return The resulting model.
+    template<typename T>
+    std::shared_ptr<T> to()
+    {
+        return std::dynamic_pointer_cast<T>(shared_from_this());
+    }
 };
 
 /// @defgroup FlagsToList Flags to List of Strings.

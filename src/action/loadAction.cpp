@@ -76,7 +76,7 @@ bool LoadAction::check(std::string & error) const
             error = "You cannot stack the item with the one inside.";
             return false;
         }
-        if (magazine->model->toMagazine()->maxAmount <=
+        if (magazine->model->to<MagazineModel>()->maxAmount <=
             loadedProjectile->quantity)
         {
             error = "The item is already at full capacity.";

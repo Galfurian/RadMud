@@ -106,7 +106,7 @@ bool DoDrink(Character * character, ArgumentHandler & args)
     // Evaluate the amount needed to quench the thirst of the character.
     auto quantity = (100 - character->thirst) / liquidContent->quench;
     // Get the model of the liquid container.
-    auto liquidModelSource = source->model->toLiquidContainer();
+    auto liquidModelSource = source->model->to<LiquidContainerModel>();
     if (!HasFlag(liquidModelSource->liquidFlags, LiqContainerFlag::Endless))
     {
         if (liqConSrc->liquidQuantity < quantity)
@@ -251,7 +251,7 @@ bool DoFill(Character * character, ArgumentHandler & args)
         }
     }
     // Get the model of the liquid container.
-    auto liquidModelSource = source->model->toLiquidContainer();
+    auto liquidModelSource = source->model->to<LiquidContainerModel>();
     // Fill the destination from the source.
     auto quantity = destination->getFreeSpace();
     if (!HasFlag(liquidModelSource->liquidFlags, LiqContainerFlag::Endless))
@@ -408,7 +408,7 @@ bool DoPour(Character * character, ArgumentHandler & args)
         // Cast the destination to light source.
         auto lightItem = static_cast<LightItem *>(destination);
         // Cast the model of the destination to light source.
-        auto lightModel = destination->model->toLight();
+        auto lightModel = destination->model->to<LightModel>();
         if (!lightItem->isActive() ||
             !HasFlag(lightModel->lightSourceFlags,
                      LightModelFlags::NeedToKindle))
@@ -515,7 +515,7 @@ bool DoPour(Character * character, ArgumentHandler & args)
         }
     }
     // Fill the destination from the source.
-    auto liquidModelSource = source->model->toLiquidContainer();
+    auto liquidModelSource = source->model->to<LiquidContainerModel>();
     auto quantity = destination->getFreeSpace();
     if (!HasFlag(liquidModelSource->liquidFlags, LiqContainerFlag::Endless))
     {

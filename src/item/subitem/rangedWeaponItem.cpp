@@ -72,7 +72,7 @@ unsigned int RangedWeaponItem::rollDamage() const
 unsigned int RangedWeaponItem::getMinDamage() const
 {
     // Add the base value.
-    auto valBase = this->model->toRangedWeapon()->minDamage;
+    auto valBase = this->model->to<RangedWeaponModel>()->minDamage;
     // Evaluate the modifier due to item's quality.
     valBase = SafeSum(valBase, valBase * quality.getModifier());
     // Evaluate the modifier due to item's condition.
@@ -85,7 +85,7 @@ unsigned int RangedWeaponItem::getMinDamage() const
     if (projectile != nullptr)
     {
         valBase = SafeSum(valBase,
-                          projectile->model->toProjectile()->damageBonus);
+                          projectile->model->to<ProjectileModel>()->damageBonus);
     }
     return valBase;
 }
@@ -93,7 +93,7 @@ unsigned int RangedWeaponItem::getMinDamage() const
 unsigned int RangedWeaponItem::getMaxDamage() const
 {
     // Add the base value.
-    auto valBase = this->model->toRangedWeapon()->maxDamage;
+    auto valBase = this->model->to<RangedWeaponModel>()->maxDamage;
     // Evaluate the modifier due to item's quality.
     valBase = SafeSum(valBase, valBase * quality.getModifier());
     // Evaluate the modifier due to item's condition.
@@ -106,7 +106,7 @@ unsigned int RangedWeaponItem::getMaxDamage() const
     if (projectile != nullptr)
     {
         valBase = SafeSum(valBase,
-                          projectile->model->toProjectile()->damageBonus);
+                          projectile->model->to<ProjectileModel>()->damageBonus);
     }
     return valBase;
 }
@@ -114,7 +114,7 @@ unsigned int RangedWeaponItem::getMaxDamage() const
 int RangedWeaponItem::getRange() const
 {
     // Add the base value.
-    auto valBase = this->model->toRangedWeapon()->range;
+    auto valBase = this->model->to<RangedWeaponModel>()->range;
     // Evaluate the modifier due to item's quality.
     valBase += static_cast<int>(valBase * quality.getModifier());
     // Evaluate the modifier due to item's condition.
@@ -126,7 +126,7 @@ int RangedWeaponItem::getRange() const
     auto projectile = this->retrieveProjectile(error);
     if (projectile != nullptr)
     {
-        valBase += projectile->model->toProjectile()->rangeBonus;
+        valBase += projectile->model->to<ProjectileModel>()->rangeBonus;
     }
     return valBase;
 }
@@ -141,8 +141,8 @@ bool RangedWeaponItem::canBeReloadedWith(Item * magazine) const
     {
         return false;
     }
-    return (magazine->model->toMagazine()->projectileType ==
-            model->toRangedWeapon()->rangedWeaponType);
+    return (magazine->model->to<MagazineModel>()->projectileType ==
+            model->to<RangedWeaponModel>()->rangedWeaponType);
 }
 
 MagazineItem * RangedWeaponItem::getAlreadyLoadedMagazine() const

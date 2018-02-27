@@ -199,7 +199,7 @@ bool ShopItem::isAContainer() const
 double ShopItem::getTotalSpace() const
 {
     // The base space.
-    double spaceBase = model->toShop()->maxWeight;
+    double spaceBase = model->to<ShopModel>()->maxWeight;
     // Evaluate the result.
     return ((spaceBase + (spaceBase * quality.getModifier())) / 2);
 }

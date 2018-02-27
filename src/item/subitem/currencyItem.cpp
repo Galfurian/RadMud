@@ -48,7 +48,7 @@ unsigned int CurrencyItem::getPrice(bool entireStack) const
     auto customPrice = Item::getPrice(entireStack);
     if (composition != nullptr)
     {
-        if (model->toCurrency()->findPrice(composition->vnum, customPrice))
+        if (model->to<CurrencyModel>()->findPrice(composition->vnum, customPrice))
         {
             return customPrice * quantity;
         }

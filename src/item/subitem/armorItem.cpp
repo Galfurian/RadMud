@@ -45,7 +45,7 @@ void ArmorItem::getSheet(Table & sheet) const
 unsigned int ArmorItem::getArmorClass() const
 {
     // Add the base armor class.
-    auto acBase = this->model->toArmor()->armorClass;
+    auto acBase = this->model->to<ArmorModel>()->armorClass;
     // Evaluate the modifier due to item's quality.
     auto acQuality = static_cast<unsigned int>(acBase * quality.getModifier());
     // Evaluate the modifier due to item's condition.

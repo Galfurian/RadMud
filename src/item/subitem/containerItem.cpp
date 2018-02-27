@@ -56,7 +56,7 @@ bool ContainerItem::isEmpty() const
 double ContainerItem::getTotalSpace() const
 {
     // The base space.
-    double spaceBase = model->toContainer()->maxWeight;
+    double spaceBase = model->to<ContainerModel>()->maxWeight;
     // Evaluate the result.
     return ((spaceBase + (spaceBase * quality.getModifier())) / 2);
 }

@@ -69,13 +69,13 @@ bool IsValidTool(Item * item,
     if (item->model->getType() == ModelType::Tool)
     {
         // Check if the type of tool is the same.
-        return item->model->toTool()->toolType == toolType;
+        return item->model->to<ToolModel>()->toolType == toolType;
     }
     if ((toolType == ToolType::CookingFire) &&
         (item->model->getType() == ModelType::Light))
     {
         // Check if the light source can be used to cook.
-        return HasFlag(item->model->toLight()->lightSourceFlags,
+        return HasFlag(item->model->to<LightModel>()->lightSourceFlags,
                        LightModelFlags::CanUseToCook);
     }
     return false;
@@ -93,13 +93,13 @@ bool IsValidResource(Item * item,
     if (item->model->getType() == ModelType::Resource)
     {
         // Check if the type of resource is the same.
-        return (item->model->toResource()->resourceType == resourceType);
+        return (item->model->to<ResourceModel>()->resourceType == resourceType);
     }
     else if ((resourceType == ResourceType::Meat) &&
              (item->model->getType() == ModelType::Food))
     {
         // Check if the type of resource is the same.
-        return HasFlag(item->model->toFood()->foodFlags, FoodFlag::Raw);
+        return HasFlag(item->model->to<FoodModel>()->foodFlags, FoodFlag::Raw);
     }
     return false;
 }

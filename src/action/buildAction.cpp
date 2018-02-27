@@ -115,7 +115,7 @@ bool BuildAction::check(std::string & error) const
             auto item = it2.first;
             if (item->getType() == ModelType::Resource)
             {
-                auto resourceModel = item->model->toResource();
+                auto resourceModel = item->model->to<ResourceModel>();
                 if (resourceModel->resourceType == it.first)
                 {
                     required -= item->quantity;

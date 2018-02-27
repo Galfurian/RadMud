@@ -353,7 +353,7 @@ bool Room::isLit()
                     if (static_cast<LightItem *>(item)->isActive())
                     {
                         if (StructUtils::getDistance(coord, room->coord)
-                            <= item->model->toLight()->radius)
+                            <= item->model->to<LightModel>()->radius)
                         {
                             return true;
                         }

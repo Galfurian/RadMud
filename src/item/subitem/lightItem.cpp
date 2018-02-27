@@ -75,7 +75,7 @@ std::string LightItem::lookContent()
     auto autonomyInHour = this->getAutonomy() /
                           MudUpdater::instance().getHourTicSize();
     output += Formatter::italic();
-    if (model->toLight()->fuelType == ResourceType::None)
+    if (model->to<LightModel>()->fuelType == ResourceType::None)
     {
         if (!HasFlag(model->modelFlags, ModelFlag::Unbreakable))
         {
@@ -110,14 +110,14 @@ std::string LightItem::lookContent()
 double LightItem::getTotalSpace() const
 {
     // The base space.
-    double spaceBase = model->toLight()->maxWeight;
+    double spaceBase = model->to<LightModel>()->maxWeight;
     // Evaluate the result.
     return ((spaceBase + (spaceBase * quality.getModifier())) / 2);
 }
 
 bool LightItem::isActive() const
 {
-    return active || HasFlag(model->toLight()->lightSourceFlags,
+    return active || HasFlag(model->to<LightModel>()->lightSourceFlags,
                              LightModelFlags::AlwaysActive);
 }
 
@@ -140,12 +140,12 @@ bool LightItem::canRefillWith(Item * item, std::string & error) const
                 item->getName(true);
         return false;
     }
-    if (model->toLight()->fuelType == ResourceType::None)
+    if (model->to<LightModel>()->fuelType == ResourceType::None)
     {
         error = this->getNameCapital(true) + " is not meant to be refilled.";
         return false;
     }
-    if (model->toLight()->fuelType != item->model->toResource()->resourceType)
+    if (model->to<LightModel>()->fuelType != item->model->to<ResourceModel>()->resourceType)
     {
         error = "You can't refill " + this->getName(true) + " with " +
                 item->getName(true);
@@ -164,7 +164,7 @@ bool LightItem::getAmountToRefill(Item * item, unsigned int & amount,
     // Get the weight of the fuel.
     auto fuelWeight = item->getWeight(false);
     // Set by default the amount to the maximum.
-    auto maxWeight = this->model->toLight()->maxWeight;
+    auto maxWeight = this->model->to<LightModel>()->maxWeight;
     // Evaluate the weight of the content.
     auto contentWeight = 0.0;
     for (auto it : content)
@@ -192,7 +192,7 @@ bool LightItem::getAmountToRefill(Item * item, unsigned int & amount,
 ItemVector LightItem::getAlreadyLoadedFuel() const
 {
     ItemVector fuel;
-    if (model->toLight()->fuelType != ResourceType::None)
+    if (model->to<LightModel>()->fuelType != ResourceType::None)
     {
         for (auto it : content)
         {
@@ -205,7 +205,7 @@ ItemVector LightItem::getAlreadyLoadedFuel() const
 double LightItem::getAutonomy() const
 {
     double autonomy = 0;
-    if (model->toLight()->fuelType == ResourceType::None)
+    if (model->to<LightModel>()->fuelType == ResourceType::None)
     {
         autonomy = (condition / this->getDecayRate());
     }
@@ -227,7 +227,7 @@ void LightItem::updateTicImpl()
 {
     if (this->isActive())
     {
-        if (model->toLight()->fuelType == ResourceType::None)
+        if (model->to<LightModel>()->fuelType == ResourceType::None)
         {
             // Trigger the dacay.
             this->triggerDecay();

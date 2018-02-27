@@ -52,7 +52,7 @@ unsigned int MeleeWeaponItem::rollDamage() const
 unsigned int MeleeWeaponItem::getMinDamage() const
 {
     // Add the base value.
-    auto valBase = this->model->toMeleeWeapon()->minDamage;
+    auto valBase = this->model->to<MeleeWeaponModel>()->minDamage;
     // Evaluate the modifier due to item's quality.
     auto valQuality = static_cast<unsigned int>(valBase *
                                                 quality.getModifier());
@@ -66,7 +66,7 @@ unsigned int MeleeWeaponItem::getMinDamage() const
 unsigned int MeleeWeaponItem::getMaxDamage() const
 {
     // Add the base value.
-    auto valBase = this->model->toMeleeWeapon()->maxDamage;
+    auto valBase = this->model->to<MeleeWeaponModel>()->maxDamage;
     // Evaluate the modifier due to item's quality.
     auto valQuality = static_cast<unsigned int>(valBase *
                                                 quality.getModifier());

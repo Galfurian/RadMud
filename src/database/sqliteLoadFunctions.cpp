@@ -31,6 +31,7 @@
 #include "heightMap.hpp"
 #include "shopItem.hpp"
 #include "mud.hpp"
+#include "resourceModel.hpp"
 
 bool LoadBadName(ResultSet * result)
 {
@@ -285,7 +286,7 @@ bool LoadFaction(ResultSet * result)
         throw SQLiteException(
             "Model is not currency " + ToString(currencyVnum));
     }
-    faction->currency = currencyModel->toCurrency();
+    faction->currency = currencyModel->to<CurrencyModel>();
     // Translate new_line.
     FindAndReplace(&faction->description, "%r", "\n");
     // Check the correctness.
@@ -1238,7 +1239,7 @@ bool LoadCurrency(ResultSet * result)
         throw SQLiteException(
             "Can't find the material " + ToString(materialVnum));
     }
-    auto currency = model->toCurrency();
+    auto currency = model->to<CurrencyModel>();
     if (!currency->addPrice(materialVnum, worth))
     {
         throw SQLiteException(
@@ -1385,7 +1386,7 @@ bool LoadBodyPartResources(ResultSet * result)
     auto difficulty = result->getNextInteger();
     BodyPart::BodyResource resource;
     resource.material = material;
-    resource.resource = model->toResource();
+    resource.resource = model->to<ResourceModel>();
     resource.quantity = quantity;
     resource.difficulty = difficulty;
     bodyPart->resources.emplace_back(std::move(resource));

@@ -109,7 +109,7 @@ bool MagazineItem::getAmountToLoad(Item * _projectile,
         return false;
     }
     // Set by default the amount to load to the maximum.
-    amount = this->model->toMagazine()->maxAmount;
+    amount = this->model->to<MagazineModel>()->maxAmount;
     unsigned int amountAlreadyLoaded = 0;
     // Retrieve any already loaded projectiles.
     auto loadedProjectile = this->getAlreadyLoadedProjectile();
