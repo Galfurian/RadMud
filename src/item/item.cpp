@@ -195,7 +195,7 @@ void Item::getSheet(Table & sheet) const
     sheet.addRow(locationRow);
     for (auto bodyPart : occupiedBodyParts)
     {
-        sheet.addRow({"Body Part", bodyPart->getDescription()});
+        sheet.addRow({"Body Part", bodyPart->getName()});
     }
     if (!content.empty())
     {

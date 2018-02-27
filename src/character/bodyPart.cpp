@@ -21,10 +21,11 @@
 
 #include "bodyPart.hpp"
 
+#include <cassert>
+
 #include "resourceModel.hpp"
 #include "formatter.hpp"
-
-#include <cassert>
+#include "race.hpp"
 
 BodyPart::BodyPart() :
     vnum(),
@@ -49,9 +50,18 @@ bool BodyPart::check()
     return true;
 }
 
-std::string BodyPart::getDescription(bool capital) const
+std::string BodyPart::getName(bool capital) const
 {
-    return (capital) ? ToCapitals(description) : description;
+    return (capital) ? ToCapitals(name) : name;
+}
+
+std::string BodyPart::getDescription(Race * race, bool capital) const
+{
+    std::string result = description;
+    FindAndReplace(&result, "&m", (race) ? ToLower(race->name) : "");
+    FindAndReplace(&result, "&M", (race) ? ToLower(race->article +
+                                                   ' ' + race->name) : "");
+    return (capital) ? ToCapitals(result) : result;
 }
 
 void BodyPart::getSheet(Table & sheet) const
@@ -67,7 +77,7 @@ void BodyPart::getSheet(Table & sheet) const
     if (!resources.empty())
     {
         sheet.addDivider();
-        sheet.addRow({"Resource", "Quantity"});
+        sheet.addRow({"Resource", "Base Quantity"});
         for (auto it : resources)
         {
             sheet.addRow({it.resource->name, ToString(it.quantity)});

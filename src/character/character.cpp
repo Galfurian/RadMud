@@ -924,7 +924,7 @@ std::string Character::getLook()
         }
         output += this->getPossessivePronoun() + " ";
         output += Formatter::yellow();
-        output += bodyPart->getDescription(false);
+        output += bodyPart->getName(false);
         output += Formatter::reset() + ". ";
 #endif
     }

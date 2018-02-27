@@ -51,7 +51,7 @@ bool DoEquipments(Character * character, ArgumentHandler & /*args*/)
             continue;
         }
         // Add the body part name to the row.
-        output += Align(bodyPart->getDescription(true),
+        output += Align(bodyPart->getName(true),
                               align::left, 15);
         auto item = character->findItemAtBodyPart(bodyPart);
         if (item != nullptr)
@@ -147,9 +147,9 @@ bool DoWield(Character * character, ArgumentHandler & args)
     std::string where, whereOthers;
     for (auto it = bodyParts.begin(); it != bodyParts.end();)
     {
-        where += "your " + (*it)->getDescription();
+        where += "your " + (*it)->getName();
         whereOthers += character->getPossessivePronoun() + " ";
-        whereOthers += (*it)->getDescription();
+        whereOthers += (*it)->getName();
         it++;
         if (it != bodyParts.end())
         {
@@ -280,9 +280,9 @@ bool DoWear(Character * character, ArgumentHandler & args)
     std::string where, whereOthers;
     for (auto it = bodyParts.begin(); it != bodyParts.end();)
     {
-        where += "your " + (*it)->getDescription();
+        where += "your " + (*it)->getName();
         whereOthers += character->getPossessivePronoun() + " ";
-        whereOthers += (*it)->getDescription();
+        whereOthers += (*it)->getName();
         it++;
         if (it != bodyParts.end())
         {
@@ -379,9 +379,9 @@ bool DoRemove(Character * character, ArgumentHandler & args)
     for (auto it = item->occupiedBodyParts.begin();
          it != item->occupiedBodyParts.end();)
     {
-        where += "your " + (*it)->getDescription();
+        where += "your " + (*it)->getName();
         whereOthers += character->getPossessivePronoun() + " ";
-        whereOthers += (*it)->getDescription();
+        whereOthers += (*it)->getName();
         it++;
         if (it != item->occupiedBodyParts.end())
         {

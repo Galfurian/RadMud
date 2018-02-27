@@ -28,6 +28,7 @@
 class ResourceModel;
 class Table;
 class Material;
+class Race;
 
 /// The flags of a body part.
 enum class BodyPartFlag
@@ -107,11 +108,15 @@ public:
     ///         <b>False</b> otherwise.
     bool check();
 
-    /// @brief Return the name of the body part with all lowercase characters.
-    /// @param capital If true the first letters of the description are
-    ///                 changed to upper case.
+    /// @brief Return the name of the body part.
+    /// @param capital If true, capitalize first letters.
     /// @return The name of the character.
-    std::string getDescription(bool capital = false) const;
+    std::string getName(bool capital = false) const;
+
+    /// @brief Return the description of the body part.
+    /// @param capital If true, capitalize first letters.
+    /// @return The description of the body part.
+    std::string getDescription(Race * race, bool capital = false) const;
 
     /// @brief Fills the provided table with the information concerning
     ///         the body part.
