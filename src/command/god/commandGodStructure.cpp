@@ -425,3 +425,43 @@ bool DoAreaList(Character * character, ArgumentHandler & /*args*/)
     character->sendMsg(table.getTable());
     return true;
 }
+
+bool DoAreaMap(Character * character, ArgumentHandler & args)
+{
+    if (character->room == nullptr) return false;
+    if (character->room->area == nullptr) return false;
+    auto area = character->room->area;
+    auto level = character->room->coord.z;
+    if (args.size() == 2)
+    {
+        auto areaVnum = ToNumber<unsigned int>(args[0].getContent());
+        area = Mud::instance().findArea(areaVnum);
+        if (area == nullptr)
+        {
+            character->sendMsg("The selected area does not exist.");
+            return false;
+        }
+        level = ToNumber<int>(args[1].getContent());
+    }
+    // Draw the fov.
+    Coordinates point = Coordinates(0, 0, level);
+    std::string result;
+    for (point.y = area->height - 1; point.y >= 0; --point.y)
+    {
+        for (point.x = 0; point.x < area->width; ++point.x)
+        {
+            auto room = area->getRoom(point);
+            if (room != nullptr)
+            {
+                result += area->getASCIICell(room);
+            }
+            else
+            {
+                result.push_back(' ');
+            }
+        }
+        result.push_back('\n');
+    }
+    character->sendMsg(result);
+    return true;
+}

@@ -170,6 +170,10 @@ void LoadGodCommands()
         DoAreaList, "@area_list", "",
         "List all the areas.",
         true, true, false));
+    Mud::instance().addCommand(std::make_shared<Command>(
+        DoAreaMap, "@area_map", "(area vnum)(level)",
+        "Shows the map of the level of an area.",
+        true, true, false));
 
     // ////////////////////////////////////////////////////////////////////////
     // COMMAND GOD ITEM

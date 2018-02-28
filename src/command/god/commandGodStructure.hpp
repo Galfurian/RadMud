@@ -50,4 +50,7 @@ bool DoAreaInfo(Character * character, ArgumentHandler & args);
 /// List all the areas.
 bool DoAreaList(Character * character, ArgumentHandler & args);
 
+/// Show the map of the area.
+bool DoAreaMap(Character * character, ArgumentHandler & args);
+
 /// @}
