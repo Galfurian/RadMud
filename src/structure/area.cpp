@@ -395,87 +395,7 @@ std::string Area::drawASCIIFov(Room * centerRoom, const int & radius)
                 result += ' ';
                 continue;
             }
-            std::string tile;
-            auto up = room->findExit(Direction::Up);
-            auto down = room->findExit(Direction::Down);
-            // VI  - WALKABLE
-            if (room->liquidContent.first != nullptr)
-            {
-                if (room->liquidContent.second <= (MAX_WATER_LEVEL / 2))
-                {
-                    tile = Formatter::cyan("w");
-                }
-                else
-                {
-                    tile = Formatter::blue("w");
-                }
-            }
-            else if (HasFlag(room->flags, RoomFlag::SpawnTree))
-            {
-                tile = Formatter::green("t");
-            }
-            else
-            {
-                tile = room->terrain->symbol;
-            }
-            // V   - OPEN DOOR
-            auto door = StructUtils::findDoor(room);
-            if (door != nullptr)
-            {
-                if (HasFlag(door->flags, ItemFlag::Closed))
-                {
-                    tile = 'D';
-                }
-                else
-                {
-                    tile = 'O';
-                }
-            }
-            // IV  - STAIRS
-            if ((up != nullptr) && (down != nullptr))
-            {
-                if (HasFlag(up->flags, ExitFlag::Stairs)
-                    && HasFlag(down->flags, ExitFlag::Stairs))
-                {
-                    tile = 'X';
-                }
-            }
-            else if (up != nullptr)
-            {
-                if (HasFlag(up->flags, ExitFlag::Stairs))
-                {
-                    tile = '>';
-                }
-            }
-            else if (down != nullptr)
-            {
-                if (HasFlag(down->flags, ExitFlag::Stairs))
-                {
-                    tile = '<';
-                }
-                else
-                {
-                    tile = ' ';
-                }
-            }
-            // III - ITEMS
-            if (room->items.size() > 0)
-            {
-                tile = room->items.back()->model->getTile();
-            }
-            // II  - CHARACTERS
-            if (room->characters.size() > 0)
-            {
-                for (auto iterator : room->characters)
-                {
-                    if (!HasFlag(iterator->flags,
-                                 CharacterFlag::Invisible))
-                    {
-                        tile = iterator->race->getTile();
-                    }
-                }
-            }
-            // I   - PLAYER
+            auto tile = this->getASCIICell(room);
             if (centerRoom->coord == point)
             {
                 tile = '@';
@@ -485,6 +405,91 @@ std::string Area::drawASCIIFov(Room * centerRoom, const int & radius)
         result += '\n';
     }
     return result;
+}
+
+std::string Area::getASCIICell(Room * room)
+{
+    std::string tile;
+    // VI  - WALKABLE
+    if (room->liquidContent.first != nullptr)
+    {
+        if (room->liquidContent.second <= (MAX_WATER_LEVEL / 2))
+        {
+            tile = Formatter::cyan("w");
+        }
+        else
+        {
+            tile = Formatter::blue("w");
+        }
+    }
+    else if (HasFlag(room->flags, RoomFlag::SpawnTree))
+    {
+        tile = Formatter::green("t");
+    }
+    else
+    {
+        tile = room->terrain->symbol;
+    }
+    // V   - OPEN DOOR
+    auto door = StructUtils::findDoor(room);
+    if (door != nullptr)
+    {
+        if (HasFlag(door->flags, ItemFlag::Closed))
+        {
+            tile = 'D';
+        }
+        else
+        {
+            tile = 'O';
+        }
+    }
+    // IV  - STAIRS
+    auto up = room->findExit(Direction::Up);
+    auto down = room->findExit(Direction::Down);
+    if ((up != nullptr) && (down != nullptr))
+    {
+        if (HasFlag(up->flags, ExitFlag::Stairs)
+            && HasFlag(down->flags, ExitFlag::Stairs))
+        {
+            tile = 'X';
+        }
+    }
+    else if (up != nullptr)
+    {
+        if (HasFlag(up->flags, ExitFlag::Stairs))
+        {
+            tile = '>';
+        }
+    }
+    else if (down != nullptr)
+    {
+        if (HasFlag(down->flags, ExitFlag::Stairs))
+        {
+            tile = '<';
+        }
+        else
+        {
+            tile = ' ';
+        }
+    }
+    // III - ITEMS
+    if (!room->items.empty())
+    {
+        tile = room->items.back()->model->getTile();
+    }
+    // II  - CHARACTERS
+    if (!room->characters.empty())
+    {
+        for (auto iterator : room->characters)
+        {
+            if (!HasFlag(iterator->flags,
+                         CharacterFlag::Invisible))
+            {
+                tile = iterator->race->getTile();
+            }
+        }
+    }
+    return tile;
 }
 
 CharacterVector Area::getCharactersInSight(CharacterVector & exceptions,
