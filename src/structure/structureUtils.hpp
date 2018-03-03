@@ -64,17 +64,15 @@ namespace StructUtils
 inline int getDistance(Coordinates const & source,
                        Coordinates const & target)
 {
-    return static_cast<int>(std::sqrt(std::pow(source.x - target.x, 2) +
-                                      std::pow(source.y - target.y, 2) +
-                                      std::pow(source.z - target.z, 2)));
+    return static_cast<int>(
+        std::sqrt(
+            std::pow(source.x - target.x, 2) +
+            std::pow(source.y - target.y, 2) +
+            std::pow(source.z - target.z, 2)));
 }
 
 /// Functions used to get the distance between two rooms.
-inline int getRoomDistance(Room * from, Room * to)
-{
-    if ((from == nullptr) || (to == nullptr)) return INT_MAX;
-    return getDistance(from->coord, to->coord);
-}
+int getRoomDistance(Room * from, Room * to);
 
 /// @brief Provides the direction of the target w.r.t. the source.
 /// @param source The source coordinates.
@@ -92,11 +90,11 @@ std::vector<Direction> getDirections(Room * room);
 /// @return Vector of connected rooms.
 std::vector<Room *> getConnectedRooms(Room * room);
 
-/// @brief Checks if the first room is connected to the second one.
+/// @brief Returns the exit which connects the first room to the second one.
 /// @param from The starting room.
 /// @param to   The target room.
-/// @return If there is a connection between the first and second room.
-bool checkConnectionBetween(Room * from, Room * to);
+/// @return The connection between the first and second room.
+std::shared_ptr<Exit> getConnection(Room * from, Room * to);
 
 /// Function used to check the equality between two rooms.
 inline bool roomsAreEqual(Room * r1, Room * r2)

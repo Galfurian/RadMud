@@ -26,6 +26,12 @@
 namespace StructUtils
 {
 
+int getRoomDistance(Room * from, Room * to)
+{
+    if ((from == nullptr) || (to == nullptr)) return INT_MAX;
+    return getDistance(from->coord, to->coord);
+}
+
 Direction getDirection(const Coordinates & source,
                        const Coordinates & target)
 {
@@ -72,14 +78,17 @@ std::vector<Room *> getConnectedRooms(Room * room)
     return result;
 }
 
-bool checkConnectionBetween(Room * from, Room * to)
+std::shared_ptr<Exit> getConnection(Room * from, Room * to)
 {
-    if ((from == nullptr) || (to == nullptr)) return false;
-    for (auto destination : StructUtils::getConnectedRooms(from))
+    if ((from == nullptr) || (to == nullptr)) return nullptr;
+    for (auto const & it : from->exits)
     {
-        if (destination->vnum == to->vnum) return true;
+        if (it->destination != nullptr)
+        {
+            if (it->destination->vnum == to->vnum) return it;
+        }
     }
-    return false;
+    return nullptr;
 }
 
 std::vector<Room *> getNeighbours(Room * room)
@@ -99,25 +108,22 @@ bool checkConnection(const MovementOptions & options,
                      std::string & error)
 {
     if ((r1 == nullptr) || (r2 == nullptr)) return false;
-    // -------------------------------------------------------------------------
+    // Get the connection between the two.
+    auto connection = StructUtils::getConnection(r1, r2);
     // Check if there is a connection between the two rooms.
-    if (!StructUtils::checkConnectionBetween(r1, r2))
+    if (connection == nullptr)
     {
         error = "You cannot go that way.";
         return false;
     }
-    // -------------------------------------------------------------------------
     // Check if there is water inside the destination room.
     if (r2->liquidContent.first != nullptr)
     {
         error = "Do you want to swim maybe?";
         return false;
     }
-    // -------------------------------------------------------------------------
     // Get the direction from the first to the second room.
     auto direction = StructUtils::getDirection(r1->coord, r2->coord);
-    // Get the connection between the two.
-    auto connection = r1->findExit(direction);
     // If the direction is upstairs, check if there is a stair.
     if (direction == Direction::Up)
     {
@@ -127,7 +133,6 @@ bool checkConnection(const MovementOptions & options,
             return false;
         }
     }
-    // -------------------------------------------------------------------------
     // Check if the destination has a floor.
     auto destDown = connection->destination->findExit(Direction::Down);
     if (destDown != nullptr)
@@ -165,7 +170,7 @@ bool checkConnection(const MovementOptions & options,
             // Check if the character is locked into close combat.
             bool lockedInCombat = false;
             // Check if he is in the same room of one of its aggressors.
-            for (auto iterator : character->combatHandler)
+            for (auto const & iterator : character->combatHandler)
             {
                 if (iterator->aggressor != nullptr)
                 {
@@ -282,7 +287,7 @@ std::vector<Room *> selectRooms(Area * area,
         {
             if (room->terrain->vnum != options.terrain->vnum) return;
         }
-        for (auto dir : Direction::getAllDirections())
+        for (auto const & dir : Direction::getAllDirections())
         {
             auto next(area->getRoom(room->coord + dir));
             if (next)
