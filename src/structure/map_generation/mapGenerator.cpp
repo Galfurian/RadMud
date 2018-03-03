@@ -457,7 +457,9 @@ bool MapGenerator::resetZCoordinates(const std::shared_ptr<MapWrapper> & map)
         for (auto y = 0; y < map->getHeight(); ++y)
         {
             auto cell = map->getCell(x, y);
-            cell->coordinates.z = 50;
+            auto cellOffset = heightMap->getOffset(cell->terrain);
+            cell->coordinates.z = 50 + ((cellOffset < 0) ? 0 : cellOffset);
+            std::cout << cell->coordinates.z << " " << cellOffset << "\n";
         }
     }
     return true;
