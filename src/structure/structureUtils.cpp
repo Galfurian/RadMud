@@ -321,6 +321,7 @@ std::vector<Coordinates> fov(Coordinates & origin,
         }
     };
     Coordinates point;
+
     while (point.x <= radius)
     {
         while ((point.y <= point.x) && (point.square() <= pow(radius, 2)))
@@ -366,6 +367,61 @@ std::vector<Coordinates> fov(Coordinates & origin,
     return cfov;
 }
 
+std::vector<Coordinates> fov3d(Coordinates & origin,
+                               const int & radius,
+                               Area * area)
+{
+    int x0 = origin.x, y0 = origin.y, z0 = origin.z;
+    std::vector<Coordinates> fov_coords;
+    auto isinside = [&](int x, int y, int z)
+    {
+        return (x * x) + (y * y) + (z * z) <= (radius * radius);
+    };
+    auto check = [&](int x, int y, int z)
+    {
+        Coordinates coord(x, y, z);
+        if (origin == coord)
+        {
+            fov_coords.emplace_back(coord);
+        }
+        else if (los(origin, coord, radius, area))
+        {
+            fov_coords.emplace_back(coord);
+        }
+    };
+    for (int z = 0; z < (radius * 2); ++z)
+    {
+        if (!isinside(0, 0, z)) continue;
+        for (int y = 0; y < (radius * 2); ++y)
+        {
+            if (!isinside(0, y, z)) continue;
+            for (int x = 0; x < (radius * 2); ++x)
+            {
+                if (!isinside(x, y, z)) continue;
+                // Upper-Half.
+                // Lower Right.
+                check(x0 + x, y0 + y, z0 + z);
+                // Lower Left.
+                check(x0 + x, y0 - y, z0 + z);
+                // Upper Right.
+                check(x0 - x, y0 + y, z0 + z);
+                // Upper Left.
+                check(x0 - x, y0 - y, z0 + z);
+                // Lower-Half.
+                // Lower Right.
+                check(x0 + x, y0 + y, z0 - z);
+                // Lower Left.
+                check(x0 + x, y0 - y, z0 - z);
+                // Upper Right.
+                check(x0 - x, y0 + y, z0 - z);
+                // Upper Left.
+                check(x0 - x, y0 - y, z0 - z);
+            }
+        }
+    }
+    return fov_coords;
+}
+
 bool los(const Coordinates & source,
          const Coordinates & target,
          const int & radius,
@@ -377,6 +433,7 @@ bool los(const Coordinates & source,
     if (area->getRoom(target) == nullptr) return false;
     // Ensure that the line will not extend too long.
     if (StructUtils::getDistance(source, target) > radius) return false;
+    std::cout << target.toString() << " : ";
     // Evaluates the difference.
     double dx = target.x - source.x;
     double dy = target.y - source.y;
@@ -403,7 +460,7 @@ bool los(const Coordinates & source,
     double y = source.y + 0.5;
     double z = source.z + 0.5;
     Coordinates coordinates(source.x, source.y, source.z);
-    Coordinates previous = coordinates;
+    //Coordinates previous = coordinates;
     for (double i = 0; IsLEqual(i, distance); i += min)
     {
         // Evaluate the integer version of the coordinates
@@ -411,13 +468,16 @@ bool los(const Coordinates & source,
         coordinates = Coordinates(std::floor(x), std::floor(y), std::floor(z));
         if (!area->isValid(coordinates))
         {
+            std::cout << " cannot reach.\n";
             return false;
         }
+#if 0
         if (coordinates.z > previous.z)
         {
             auto downstair = area->getRoom(previous);
             if (!downstair->findExit(Direction::Up))
             {
+                std::cout << " no z connection up.\n";
                 return false;
             }
         }
@@ -426,11 +486,14 @@ bool los(const Coordinates & source,
             auto upstair = area->getRoom(previous);
             if (!upstair->findExit(Direction::Down))
             {
+                std::cout << " no z connection down.\n";
                 return false;
             }
         }
+#endif
         if (coordinates == target)
         {
+            std::cout << " found.\n";
             return true;
         }
         // Increment the coordinates.

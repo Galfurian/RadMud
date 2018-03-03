@@ -371,36 +371,42 @@ std::string Area::drawASCIIFov(Room * centerRoom, const int & radius)
     int max_x = (centerRoom->coord.x + radius);
     int min_y = (centerRoom->coord.y - radius);
     int max_y = (centerRoom->coord.y + radius);
+    int min_z = (centerRoom->coord.z - radius);
+    int max_z = (centerRoom->coord.z + radius);
     // Evaluate the field of view.
-    auto view = StructUtils::fov(centerRoom->coord, radius, this);
+    auto view = StructUtils::fov3d(centerRoom->coord, radius, this);
     // Draw the fov.
     Coordinates point = centerRoom->coord;
     for (point.y = max_y; point.y >= min_y; --point.y)
     {
         for (point.x = min_x; point.x <= max_x; ++point.x)
         {
-            if (std::find(view.begin(), view.end(), point) == view.end())
-            {
-                result += ' ';
-                continue;
-            }
-            Room * room = this->getRoom(point);
-            if (room == nullptr)
-            {
-                result += ' ';
-                continue;
-            }
-            if (!room->isLit())
-            {
-                result += ' ';
-                continue;
-            }
-            auto tile = this->getASCIICell(room);
+            point.z = centerRoom->coord.z;
             if (centerRoom->coord == point)
             {
-                tile = '@';
+                result += '@';
+                continue;
             }
-            result += tile;
+            Room * lowestRoom = nullptr;
+            for (point.z = min_z; point.z <= max_z; ++point.z)
+            {
+                if (std::find(view.begin(), view.end(), point) != view.end())
+                {
+                    lowestRoom = this->getRoom(point);
+                    break;
+                }
+            }
+            if (lowestRoom == nullptr)
+            {
+                result += ' ';
+                continue;
+            }
+            if (!lowestRoom->isLit())
+            {
+                result += ' ';
+                continue;
+            }
+            result += getASCIICell(lowestRoom);
         }
         result += '\n';
     }

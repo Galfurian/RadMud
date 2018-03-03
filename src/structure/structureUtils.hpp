@@ -143,6 +143,15 @@ std::vector<Coordinates> fov(Coordinates & origin,
                              const int & radius,
                              Area * area);
 
+/// @brief A Field of View algorithm which provides all the rooms
+///         which are inside the radius of the field of view.
+/// @param origin The coordinate of the central room.
+/// @param radius The radius of visibility of the character.
+/// @return A vector containing all the coordinates of valid rooms.
+std::vector<Coordinates> fov3d(Coordinates & origin,
+                               const int & radius,
+                               Area * area);
+
 /// @brief Determine if a coordinate is in sight from a starting one.
 /// @param source The coordinates of the origin.
 /// @param target The coordinates of the target room.
