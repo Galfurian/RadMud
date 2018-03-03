@@ -255,14 +255,14 @@ bool DoShowGenerateMap(Character * character, ArgumentHandler & args)
         {
             character->sendMsg("    %s\n", generatedMap.second->vnum);
         }
+        character->sendMsg("Arguments:\n");
+        character->sendMsg("    [vnum] The vnum of the map.\n");
+        character->sendMsg("    [type] The type of view.\n");
         return true;
     }
-    if (args.size() != 1)
-    {
-        character->sendMsg("You must provide the vnum of a generated map.");
-        return false;
-    }
     auto vnum = ToNumber<unsigned int>(args[0].getContent());
+    auto type = (args.size() >= 2) ?
+                ToNumber<unsigned int>(args[1].getContent()) : 0;
     auto generatedMap = Mud::instance().mudGeneratedMaps.find(vnum);
     if (generatedMap == Mud::instance().mudGeneratedMaps.end())
     {
@@ -276,7 +276,22 @@ bool DoShowGenerateMap(Character * character, ArgumentHandler & args)
     {
         for (int x = 0; x < map->getWidth(); ++x)
         {
-            drawnMap += map->getCell(x, y)->getTile();
+            if (type == 0)
+            {
+                drawnMap += map->getCell(x, y)->getTile();
+            }
+            else if (type == 1)
+            {
+                drawnMap.push_back(
+                    map->getCell(x, y)->terrain->liquidContent.first ? 'w'
+                                                                     : ' ');
+            }
+            else if (type == 2)
+            {
+                drawnMap +=
+                    Align(ToString(map->getCell(x, y)->coordinates.z),
+                          align::center, 2);
+            }
         }
         drawnMap += "\n";
     }
