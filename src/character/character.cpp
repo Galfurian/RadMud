@@ -983,7 +983,10 @@ bool Character::isAtRange(Character * target, const int & range)
     {
         if (WrongAssert(!target->toMobile()->isAlive())) return false;
     }
-    return this->room->area->los(this->room->coord, target->room->coord, range);
+    return StructUtils::los(room->coord,
+                            target->room->coord,
+                            range,
+                            room->area);
 }
 
 void Character::kill()

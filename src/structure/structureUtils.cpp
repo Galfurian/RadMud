@@ -21,6 +21,7 @@
 
 #include "structureUtils.hpp"
 #include "mechanismModel.hpp"
+#include "doubleOperators.hpp"
 #include "area.hpp"
 
 namespace StructUtils
@@ -298,6 +299,146 @@ std::vector<Room *> selectRooms(Area * area,
     };
     RecursiveSelectRooms(startingRoom);
     return selectedRooms;
+}
+
+std::vector<Coordinates> fov(Coordinates & origin,
+                             const int & radius,
+                             Area * area)
+{
+    std::vector<Coordinates> cfov;
+    auto CheckCoordinates = [&](const Coordinates & coordinates)
+    {
+        if (std::find(cfov.begin(), cfov.end(), coordinates) == cfov.end())
+        {
+            if (origin == coordinates)
+            {
+                cfov.emplace_back(coordinates);
+            }
+            else if (los(origin, coordinates, radius, area))
+            {
+                cfov.emplace_back(coordinates);
+            }
+        }
+    };
+    Coordinates point;
+    while (point.x <= radius)
+    {
+        while ((point.y <= point.x) && (point.square() <= pow(radius, 2)))
+        {
+            // ---------------------------------------------------------
+            CheckCoordinates(Coordinates(origin.x + point.x,
+                                         origin.y + point.y,
+                                         origin.z + point.z));
+            // ---------------------------------------------------------
+            CheckCoordinates(Coordinates(origin.x - point.x,
+                                         origin.y + point.y,
+                                         origin.z + point.z));
+            // ---------------------------------------------------------
+            CheckCoordinates(Coordinates(origin.x + point.x,
+                                         origin.y - point.y,
+                                         origin.z + point.z));
+            // ---------------------------------------------------------
+            CheckCoordinates(Coordinates(origin.x - point.x,
+                                         origin.y - point.y,
+                                         origin.z + point.z));
+            // ---------------------------------------------------------
+            CheckCoordinates(Coordinates(origin.x + point.y,
+                                         origin.y + point.x,
+                                         origin.z + point.z));
+            // ---------------------------------------------------------
+            CheckCoordinates(Coordinates(origin.x - point.y,
+                                         origin.y + point.x,
+                                         origin.z + point.z));
+            // ---------------------------------------------------------
+            CheckCoordinates(Coordinates(origin.x + point.y,
+                                         origin.y - point.x,
+                                         origin.z + point.z));
+            // ---------------------------------------------------------
+            CheckCoordinates(Coordinates(origin.x - point.y,
+                                         origin.y - point.x,
+                                         origin.z + point.z));
+            // ---------------------------------------------------------
+            ++point.y;
+        }
+        ++point.x;
+        point.y = 0;
+    }
+    return cfov;
+}
+
+bool los(const Coordinates & source,
+         const Coordinates & target,
+         const int & radius,
+         Area * area)
+{
+    // Deal with the easiest case.
+    if (source == target) return true;
+    // Check if there is a room at the given coordinates.
+    if (area->getRoom(target) == nullptr) return false;
+    // Ensure that the line will not extend too long.
+    if (StructUtils::getDistance(source, target) > radius) return false;
+    // Evaluates the difference.
+    double dx = target.x - source.x;
+    double dy = target.y - source.y;
+    double dz = target.z - source.z;
+    // Evaluate the distance between the
+    double distance = std::sqrt((dx * dx) + (dy * dy) + (dz * dz));
+    // Evaluate the unit increment for both X and Y.
+    // Decrease the value of precision for a faster execution with
+    //  a worsening in terms of accuracy (default 6).
+    double precision = 5;
+    double unitx = dx / (distance * precision);
+    double unity = dy / (distance * precision);
+    double unitz = dz / (distance * precision);
+    // Evaluate the minimum value of increment.
+    double min = 0.1;
+    auto absX = std::abs(unitx);
+    auto absY = std::abs(unity);
+    auto absZ = std::abs(unitz);
+    if (absX > 0.0) min = std::min(min, absX);
+    if (absY > 0.0) min = std::min(min, absY);
+    if (absZ > 0.0) min = std::min(min, absZ);
+    // Set the initial values for X and Y.
+    double x = source.x + 0.5;
+    double y = source.y + 0.5;
+    double z = source.z + 0.5;
+    Coordinates coordinates(source.x, source.y, source.z);
+    Coordinates previous = coordinates;
+    for (double i = 0; IsLEqual(i, distance); i += min)
+    {
+        // Evaluate the integer version of the coordinates
+        //  using the floor value.
+        coordinates = Coordinates(std::floor(x), std::floor(y), std::floor(z));
+        if (!area->isValid(coordinates))
+        {
+            return false;
+        }
+        if (coordinates.z > previous.z)
+        {
+            auto downstair = area->getRoom(previous);
+            if (!downstair->findExit(Direction::Up))
+            {
+                return false;
+            }
+        }
+        if (coordinates.z < previous.z)
+        {
+            auto upstair = area->getRoom(previous);
+            if (!upstair->findExit(Direction::Down))
+            {
+                return false;
+            }
+        }
+        if (coordinates == target)
+        {
+            return true;
+        }
+        // Increment the coordinates.
+        x += unitx;
+        y += unity;
+        z += unitz;
+    }
+    return false;
 }
 
 }

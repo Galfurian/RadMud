@@ -24,6 +24,7 @@
 #include "structureUtils.hpp"
 #include "mapWrapper.hpp"
 #include "heightMap.hpp"
+#include "doubleOperators.hpp"
 
 MapGenerator::MapGenerator(const MapGeneratorConfiguration & _configuration,
                            const std::shared_ptr<HeightMap> & _heightMap) :
@@ -206,7 +207,7 @@ bool MapGenerator::normalizeMap(const std::shared_ptr<MapWrapper> & map)
         }
     }
     // Drop the map if it is quite plain.
-    if (DoubleEquality(maxHeight, minHeight))
+    if (IsEqual(maxHeight, minHeight))
     {
         Logger::log(LogLevel::Error, "Min and max height are the same.");
         // Clear the map.

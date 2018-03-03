@@ -176,21 +176,4 @@ public:
     ItemVector getItemsInSight(ItemVector & exceptions,
                                Coordinates & origin,
                                const int & radius);
-
-    /// @brief A Field of View algorithm which provides all the rooms
-    ///         which are inside the radius of the field of view.
-    /// @param origin The coordinate of the central room.
-    /// @param radius The radius of visibility of the character.
-    /// @return A vector containing all the coordinates of valid rooms.
-    std::vector<Coordinates> fov(Coordinates & origin, const int & radius);
-
-    /// @brief Determine if a coordinate is in sight from a starting one.
-    /// @param source The coordinates of the origin.
-    /// @param target The coordinates of the target room.
-    /// @param radius   The radius of visibility.
-    /// @return <b>True</b> if the target room is in sight,<br>
-    ///         <b>False</b> otherwise.
-    bool los(const Coordinates & source,
-             const Coordinates & target,
-             const int & radius);
 };

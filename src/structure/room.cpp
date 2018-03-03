@@ -397,7 +397,7 @@ bool Room::isLit()
         return true;
     }
     // First check inside the current room.
-    auto validCoordinates = area->fov(coord, 10);
+    auto validCoordinates = StructUtils::fov(coord, 10, area);
     for (auto coordinates : validCoordinates)
     {
         auto room = area->getRoom(coordinates);

@@ -46,13 +46,6 @@
     std::cerr << "Line      :"<<ToString(__LINE__)<<"\n",\
     true) : false)
 
-/// @brief Checks the equality between two doubles.
-/// @param a The first value.
-/// @param b The second value.
-/// @return <b>True</b> if they are the same value, <br>
-///         <b>False</b> otherwise.
-bool DoubleEquality(double a, double b);
-
 /// @brief Transform a string into a numeric value.
 /// @param source The string to turn into a number.
 /// @return The number.

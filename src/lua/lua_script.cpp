@@ -120,10 +120,11 @@ std::vector<Room *> LuaGetRoomsInSight(Character * character)
     std::vector<Room *> result;
     if (character == nullptr) return result;
     if (character->room == nullptr) return result;
-    auto validCoordinates =
-        character->room->area->fov(
-            character->room->coord,
-            character->getViewDistance());
+    if (character->room->area == nullptr) return result;
+    auto validCoordinates = StructUtils::fov(
+        character->room->coord,
+        character->getViewDistance(),
+        character->room->area);
     for (auto coordinates : validCoordinates)
     {
         result.emplace_back(character->room->area->getRoom(coordinates));

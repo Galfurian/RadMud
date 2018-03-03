@@ -29,11 +29,6 @@
 
 #include "logger.hpp"
 
-bool DoubleEquality(double a, double b)
-{
-    return std::fabs(a - b) < std::numeric_limits<double>::epsilon();
-}
-
 double SafeLog10(const double & source)
 {
     if (source > 0)
