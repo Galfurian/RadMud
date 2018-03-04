@@ -433,7 +433,6 @@ bool los(const Coordinates & source,
     if (area->getRoom(target) == nullptr) return false;
     // Ensure that the line will not extend too long.
     if (StructUtils::getDistance(source, target) > radius) return false;
-    std::cout << target.toString() << " : ";
     // Evaluates the difference.
     double dx = target.x - source.x;
     double dy = target.y - source.y;
@@ -468,7 +467,6 @@ bool los(const Coordinates & source,
         coordinates = Coordinates(std::floor(x), std::floor(y), std::floor(z));
         if (!area->isValid(coordinates))
         {
-            std::cout << " cannot reach.\n";
             return false;
         }
 #if 0
@@ -493,7 +491,6 @@ bool los(const Coordinates & source,
 #endif
         if (coordinates == target)
         {
-            std::cout << " found.\n";
             return true;
         }
         // Increment the coordinates.
