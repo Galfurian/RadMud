@@ -31,6 +31,8 @@ public:
     int width;
     /// The height of the map.
     int height;
+    /// The elevation of the map.
+    int elevation;
     /// The number of mountains that has to be created.
     int numMountains;
     /// The minimum radius of each mountain.

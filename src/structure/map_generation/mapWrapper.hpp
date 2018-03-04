@@ -35,6 +35,8 @@ public:
     int width;
     /// Height of the map.
     int height;
+    /// Elevation of the map.
+    int elevation;
     /// The map.
     std::map<int, std::map<int, MapCell>> map;
     /// The air map.
@@ -58,6 +60,12 @@ public:
         height = _height;
     }
 
+    /// @brief Allows to set the elevation of the map.
+    inline void setElevation(const int & _elevation)
+    {
+        elevation = _elevation;
+    }
+
     /// @brief Provide the width of the map.
     inline int getWidth() const
     {
@@ -68,6 +76,12 @@ public:
     inline int getHeight() const
     {
         return height;
+    }
+
+    /// @brief Provide the elevation of the map.
+    inline int getElevation() const
+    {
+        return elevation;
     }
 
     /// @brief Returns the cell at the given position.

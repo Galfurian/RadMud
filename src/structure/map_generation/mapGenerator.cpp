@@ -48,7 +48,9 @@ bool MapGenerator::generateMap(const std::shared_ptr<MapWrapper> & map)
         Logger::log(LogLevel::Error, "While generating the mountains.");
         return false;
     }
-    // Normalize the map in order to have values between 0 and 100.
+    // Normalize the map in order to have values between 0 and 100, this
+    // range is required to have a differentiation between different
+    // levels of the map.
     if (!this->normalizeMap(map))
     {
         Logger::log(LogLevel::Error, "While normalizing the map.");
@@ -86,6 +88,7 @@ bool MapGenerator::initializeMap(const std::shared_ptr<MapWrapper> & map)
     // Set the dimension of the map.
     map->setWidth(configuration.width);
     map->setHeight(configuration.height);
+    map->setElevation(configuration.elevation);
     // Set the coordinates.
     for (int x = 0; x < map->getWidth(); ++x)
     {
@@ -214,17 +217,15 @@ bool MapGenerator::normalizeMap(const std::shared_ptr<MapWrapper> & map)
         map->destroy();
         return false;
     }
-    // Normalize the heights to values between 0 and 10.
+    // Normalize the heights to values between 0 and 100.
     for (int x = 0; x < map->getWidth(); ++x)
     {
         for (int y = 0; y < map->getHeight(); ++y)
         {
             auto cell = map->getCell(x, y);
             cell->coordinates.z = Normalize(cell->coordinates.z,
-                                            minHeight,
-                                            maxHeight,
-                                            0,
-                                            100);
+                                            minHeight, maxHeight,
+                                            0, 100);
         }
     }
     return true;
@@ -459,7 +460,8 @@ bool MapGenerator::resetZCoordinates(const std::shared_ptr<MapWrapper> & map)
         {
             auto cell = map->getCell(x, y);
             auto cellOffset = heightMap->getOffset(cell->terrain);
-            cell->coordinates.z = 50 + ((cellOffset < 0) ? 0 : cellOffset);
+            cell->coordinates.z = (map->elevation / 2) +
+                                  ((cellOffset < 0) ? 0 : cellOffset);
             std::cout << cell->coordinates.z << " " << cellOffset << "\n";
         }
     }

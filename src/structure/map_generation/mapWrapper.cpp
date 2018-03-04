@@ -28,6 +28,7 @@ MapWrapper::MapWrapper() :
     vnum(),
     width(),
     height(),
+    elevation(),
     map()
 {
     // Nothing to do.
@@ -63,7 +64,7 @@ bool MapWrapper::buildMap(const std::string & mapName,
     area->builder = builder;
     area->width = width;
     area->height = height;
-    area->elevation = 100;
+    area->elevation = elevation;
     area->tileSet = 1;
     area->type = AreaType::Normal;
     area->status = AreaStatus::Normal;

@@ -25,6 +25,7 @@
 MapGeneratorConfiguration::MapGeneratorConfiguration() :
     width(60),
     height(30),
+    elevation(40),
     numMountains(50),
     minMountainRadius(5),
     maxMountainRadius(15),
