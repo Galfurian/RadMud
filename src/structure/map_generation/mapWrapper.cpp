@@ -21,6 +21,7 @@
 
 #include "mapWrapper.hpp"
 #include "sqliteWriteFunctions.hpp"
+#include "roomFactory.hpp"
 #include "mud.hpp"
 
 MapWrapper::MapWrapper() :
@@ -76,13 +77,13 @@ bool MapWrapper::buildMap(const std::string & mapName,
         Logger::log(LogLevel::Error, "While saving the area on the DB.\n");
         return false;
     }
-    // -------------------------------------------------------------------------
     // Generate the normal rooms.
     for (int x = 0; x < width; ++x)
     {
         for (int y = 0; y < height; ++y)
         {
             auto cell = this->getCell(x, y);
+            // Create the room.
             cell->room = new Room();
             cell->room->vnum = Mud::instance().getMaxVnumRoom() + 1;
             cell->room->area = area;
@@ -121,7 +122,6 @@ bool MapWrapper::buildMap(const std::string & mapName,
                         cell->room->coord.toString());
         }
     }
-    // -------------------------------------------------------------------------
     // Generate the exits.
     for (int x = 0; x < width; ++x)
     {
@@ -176,6 +176,52 @@ bool MapWrapper::buildMap(const std::string & mapName,
                         return false;
                     }
                 }
+            }
+        }
+    }
+    // Generate the air
+    for (int x = 0; x < width; ++x)
+    {
+        for (int y = 0; y < height; ++y)
+        {
+            auto cell = this->getCell(x, y);
+            auto maxHeight = (cell->findHighestNearbyCell()->coordinates.z + 1);
+            for (int z = (cell->coordinates.z + 1);
+                 (z < maxHeight) && (z < area->elevation); ++z)
+            {
+                // Create the room.
+                cell->room = RoomFactory::createRoomAir();
+                cell->room->vnum = Mud::instance().getMaxVnumRoom() + 1;
+                cell->room->area = area;
+                cell->room->coord = cell->coordinates;
+                cell->room->coord.z = z;
+                // Add the created room to the room_map.
+                if (!Mud::instance().addRoom(cell->room))
+                {
+                    Logger::log(LogLevel::Error,
+                                "Cannot add the air room to the mud.\n");
+                    return false;
+                }
+                if (!cell->room->area->addRoom(cell->room))
+                {
+                    Logger::log(LogLevel::Error,
+                                "Cannot add the air room to the area.\n");
+                    return false;
+                }
+                if (!SaveRoom(cell->room))
+                {
+                    Logger::log(LogLevel::Error,
+                                "While saving the air room on DB.\n");
+                    return false;
+                }
+                if (!SaveAreaList(area, cell->room))
+                {
+                    Logger::log(LogLevel::Error,
+                                "While saving the air room in Area List.\n");
+                    return false;
+                }
+                Logger::log(LogLevel::Debug, "Created air room at %s",
+                            cell->room->coord.toString());
             }
         }
     }
