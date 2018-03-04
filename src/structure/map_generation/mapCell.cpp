@@ -57,6 +57,19 @@ MapCell * MapCell::findLowestNearbyCell()
     return selectedCell;
 }
 
+MapCell * MapCell::findHighestNearbyCell()
+{
+    MapCell * selectedCell = this;
+    for (auto neighbour : neighbours)
+    {
+        if (neighbour.second->coordinates.z > selectedCell->coordinates.z)
+        {
+            selectedCell = neighbour.second;
+        }
+    }
+    return selectedCell;
+}
+
 std::string MapCell::getTile() const
 {
     if (liquidContent.first != nullptr)

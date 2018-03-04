@@ -59,6 +59,10 @@ public:
     /// @return The found cell.
     MapCell * findLowestNearbyCell();
 
+    /// @brief Find the lowest nearby cell.
+    /// @return The found cell.
+    MapCell * findHighestNearbyCell();
+
     /// @brief Returns the tile describing the cell.
     std::string getTile() const;
 
