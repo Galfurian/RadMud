@@ -478,8 +478,10 @@ std::string Room::getLook(Character * actor)
             }
             else
             {
-                output += area->drawASCIIFov(this,
-                                             actor->getViewDistance());
+                output += area->drawASCIIFov(
+                    this,
+                    actor->getViewDistance(),
+                    actor->race->height);
             }
         }
     }

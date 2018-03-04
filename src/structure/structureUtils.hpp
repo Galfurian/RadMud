@@ -149,8 +149,9 @@ std::vector<Coordinates> fov(Coordinates & origin,
 /// @param radius The radius of visibility of the character.
 /// @return A vector containing all the coordinates of valid rooms.
 std::vector<Coordinates> fov3d(Coordinates & origin,
+                               Area * area,
                                const int & radius,
-                               Area * area);
+                               double const & height = 0.5);
 
 /// @brief Determine if a coordinate is in sight from a starting one.
 /// @param source The coordinates of the origin.
@@ -158,9 +159,10 @@ std::vector<Coordinates> fov3d(Coordinates & origin,
 /// @param radius   The radius of visibility.
 /// @return <b>True</b> if the target room is in sight,<br>
 ///         <b>False</b> otherwise.
-bool los(const Coordinates & source,
-         const Coordinates & target,
-         const int & radius,
-         Area * area);
+bool los(Coordinates const & source,
+         Coordinates const & target,
+         Area * area,
+         int const & radius,
+         double const & height = 0.5);
 
 }

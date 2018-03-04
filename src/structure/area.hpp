@@ -149,7 +149,9 @@ public:
     /// @param radius     The radius of visibility of the character.
     /// @return The map containing all the Information about the
     ///          Field of View of a character.
-    std::string drawASCIIFov(Room * centerRoom, const int & radius);
+    std::string drawASCIIFov(Room * centerRoom,
+                             const int & radius,
+                             double const & origin_height);
 
     /// @brief Draw the Filed of View for a character (ASCII).
     /// @param centerRoom The room from where the algorithm has to

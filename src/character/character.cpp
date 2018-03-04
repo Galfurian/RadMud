@@ -985,8 +985,9 @@ bool Character::isAtRange(Character * target, const int & range)
     }
     return StructUtils::los(room->coord,
                             target->room->coord,
+                            room->area,
                             range,
-                            room->area);
+                            race->height);
 }
 
 void Character::kill()

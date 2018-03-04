@@ -314,7 +314,7 @@ std::vector<Coordinates> fov(Coordinates & origin,
             {
                 cfov.emplace_back(coordinates);
             }
-            else if (los(origin, coordinates, radius, area))
+            else if (los(origin, coordinates, area, radius))
             {
                 cfov.emplace_back(coordinates);
             }
@@ -368,8 +368,9 @@ std::vector<Coordinates> fov(Coordinates & origin,
 }
 
 std::vector<Coordinates> fov3d(Coordinates & origin,
+                               Area * area,
                                const int & radius,
-                               Area * area)
+                               double const & height)
 {
     int x0 = origin.x, y0 = origin.y, z0 = origin.z;
     std::vector<Coordinates> fov_coords;
@@ -384,7 +385,7 @@ std::vector<Coordinates> fov3d(Coordinates & origin,
         {
             fov_coords.emplace_back(coord);
         }
-        else if (los(origin, coord, radius, area))
+        else if (los(origin, coord, area, radius, height))
         {
             fov_coords.emplace_back(coord);
         }
@@ -422,10 +423,11 @@ std::vector<Coordinates> fov3d(Coordinates & origin,
     return fov_coords;
 }
 
-bool los(const Coordinates & source,
-         const Coordinates & target,
-         const int & radius,
-         Area * area)
+bool los(Coordinates const & source,
+         Coordinates const & target,
+         Area * area,
+         int const & radius,
+         double const & height)
 {
     // Deal with the easiest case.
     if (source == target) return true;
@@ -457,7 +459,7 @@ bool los(const Coordinates & source,
     // Set the initial values for X and Y.
     double x = source.x + 0.5;
     double y = source.y + 0.5;
-    double z = source.z + 0.5;
+    double z = source.z + height;
     Coordinates coordinates(source.x, source.y, source.z);
     //Coordinates previous = coordinates;
     for (double i = 0; IsLEqual(i, distance); i += min)

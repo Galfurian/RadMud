@@ -358,7 +358,9 @@ std::vector<std::string> Area::drawFov(Room * centerRoom, const int & radius)
     return layers;
 }
 
-std::string Area::drawASCIIFov(Room * centerRoom, const int & radius)
+std::string Area::drawASCIIFov(Room * centerRoom,
+                               const int & radius,
+                               double const & origin_height)
 {
     if (!this->inBoundaries(centerRoom->coord))
     {
@@ -374,7 +376,10 @@ std::string Area::drawASCIIFov(Room * centerRoom, const int & radius)
     int min_z = (centerRoom->coord.z - radius);
     int max_z = (centerRoom->coord.z + radius);
     // Evaluate the field of view.
-    auto view = StructUtils::fov3d(centerRoom->coord, radius, this);
+    auto view = StructUtils::fov3d(centerRoom->coord,
+                                   this,
+                                   radius,
+                                   origin_height);
     // Draw the fov.
     Coordinates point = centerRoom->coord;
     for (point.y = max_y; point.y >= min_y; --point.y)

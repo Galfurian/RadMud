@@ -352,6 +352,7 @@ bool LoadRace(ResultSet * result)
     race->article = result->getNextString();
     race->name = result->getNextString();
     race->description = result->getNextString();
+    race->height = result->getNextDouble();
     race->player_allow = (result->getNextInteger() == 1);
     race->tileSet = result->getNextInteger();
     race->tileId = result->getNextInteger();

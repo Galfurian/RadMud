@@ -47,6 +47,8 @@ public:
     std::string name;
     /// The description of the race.
     std::string description;
+    /// The base height of the race.
+    double height;
     /// Base race abilities.
     std::map<Ability, unsigned int> abilities;
     /// The flag that indicates if the race is selectable by the player during
