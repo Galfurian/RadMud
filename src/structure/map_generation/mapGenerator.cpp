@@ -26,147 +26,65 @@
 #include "heightMap.hpp"
 #include "doubleOperators.hpp"
 
-MapGenerator::MapGenerator(const MapGeneratorConfiguration & _configuration,
+MapGenerator::MapGenerator(const MapGeneratorConfiguration & _config,
                            const std::shared_ptr<HeightMap> & _heightMap) :
-    configuration(_configuration),
+    config(_config),
     heightMap(_heightMap)
 {
     // Nothing to do.
 }
 
-bool MapGenerator::generateMap(const std::shared_ptr<MapWrapper> & map)
+bool MapGenerator::generateMap(std::shared_ptr<MapWrapper> const & map)
 {
+    if (map == nullptr)
+    {
+        Logger::log(LogLevel::Error, "No map provided.");
+        return false;
+    }
+    if (heightMap == nullptr)
+    {
+        Logger::log(LogLevel::Error, "HeightMap not set.");
+        return false;
+    }
     // Initialize the map.
-    if (!this->initializeMap(map))
-    {
-        Logger::log(LogLevel::Error, "While initializing the map.");
-        return false;
-    }
+    map->initialize(config.width, config.height, config.elevation);
+
+    // ------------------------------------------------------------------------
+    // Phase I : use a 2d map to generate the terrain layer.
+    // The heights of the map.
+    std::map<int, std::map<int, HeightCell>> heights;
     // Generate the mountains.
-    if (!this->generateMountains(map))
-    {
-        Logger::log(LogLevel::Error, "While generating the mountains.");
-        return false;
-    }
-    // Normalize the map in order to have values between 0 and 100, this
-    // range is required to have a differentiation between different
-    // levels of the map.
-    if (!this->normalizeMap(map))
-    {
-        Logger::log(LogLevel::Error, "While normalizing the map.");
-        return false;
-    }
+    if (!this->generateMountains(heights)) return false;
+    // Normalize the map in order to have values between 0 and 100.
+    if (!this->normalizeMap(heights)) return false;
     // Apply the heights to the map.
-    if (!this->applyTerrain(map))
-    {
-        Logger::log(LogLevel::Error, "While applying the terrains to the map.");
-        return false;
-    }
-    // Generate the rivers.
-    if (!this->generateRivers(map))
-    {
-        Logger::log(LogLevel::Error, "While generating the rivers.");
-        return false;
-    }
-    // Generate the forests.
-    if (!this->generateForests(map))
-    {
-        Logger::log(LogLevel::Error, "While generating the forests.");
-        return false;
-    }
-    // Reset the z coordinates.
-    if (!this->resetZCoordinates(map))
-    {
-        Logger::log(LogLevel::Error, "While setting the z coordinates.");
-        return false;
-    }
-    return true;
+    if (!this->applyTerrain(heights)) return false;
+    // Flat out the mainland.
+    if (!this->flatOutMainland(heights)) return false;
+
+    // ------------------------------------------------------------------------
+    //Phase II: Use the 2d map to generate the 3d map.
+    // Apply the heights to the real map.
+    return this->applyHeightsToMap(heights, map);
 }
 
-bool MapGenerator::initializeMap(const std::shared_ptr<MapWrapper> & map)
+bool MapGenerator::generateMountains(
+    std::map<int, std::map<int, HeightCell>> & heights)
 {
-    // Set the dimension of the map.
-    map->setWidth(configuration.width);
-    map->setHeight(configuration.height);
-    map->setElevation(configuration.elevation);
-    // Set the coordinates.
-    for (int x = 0; x < map->getWidth(); ++x)
-    {
-        for (int y = 0; y < map->getHeight(); ++y)
-        {
-            // Get the cell.
-            auto cell = map->getCell(x, y);
-            // Set the coordinates.
-            cell->coordinates = Coordinates(x, y, 0);
-        }
-    }
-    // Connects the cells.
-    for (int x = 0; x < map->getWidth(); ++x)
-    {
-        for (int y = 0; y < map->getHeight(); ++y)
-        {
-            // Get the cell.
-            auto cell = map->getCell(x, y);
-            if (x - 1 >= 0)
-            {
-                auto neighbour = map->getCell(x - 1, y);
-                if (neighbour == nullptr)
-                {
-                    Logger::log(LogLevel::Error, "Found nullptr neighbour");
-                    return false;
-                }
-                cell->addNeighbour(Direction::West, neighbour);
-            }
-            if (x + 1 < map->getWidth())
-            {
-                auto neighbour = map->getCell(x + 1, y);
-                if (neighbour == nullptr)
-                {
-                    Logger::log(LogLevel::Error, "Found nullptr neighbour");
-                    return false;
-                }
-                cell->addNeighbour(Direction::East, neighbour);
-            }
-            if (y - 1 >= 0)
-            {
-                auto neighbour = map->getCell(x, y - 1);
-                if (neighbour == nullptr)
-                {
-                    Logger::log(LogLevel::Error, "Found nullptr neighbour");
-                    return false;
-                }
-                cell->addNeighbour(Direction::South, neighbour);
-            }
-            if (y + 1 < map->getHeight())
-            {
-                auto neighbour = map->getCell(x, y + 1);
-                if (neighbour == nullptr)
-                {
-                    Logger::log(LogLevel::Error, "Found nullptr neighbour");
-                    return false;
-                }
-                cell->addNeighbour(Direction::North, neighbour);
-            }
-        }
-    }
-    return true;
-}
-
-bool MapGenerator::generateMountains(const std::shared_ptr<MapWrapper> & map)
-{
-    for (int i = 0; i < configuration.numMountains; ++i)
+    Logger::log(LogLevel::Debug, "Generating the mountains.");
+    for (int i = 0; i < config.numMountains; ++i)
     {
         // Generate a random dimension for the mountain.
-        auto radius = TRand<int>(configuration.minMountainRadius,
-                                 configuration.maxMountainRadius);
+        auto radius = TRand<int>(config.minMountainRadius,
+                                 config.maxMountainRadius);
         // Generate a random place for the mountain.
-        auto xCenter = TRand<int>(-radius, map->getWidth() + radius);
-        auto yCenter = TRand<int>(-radius, map->getHeight() + radius);
+        auto xCenter = TRand<int>(-radius, config.width + radius);
+        auto yCenter = TRand<int>(-radius, config.height + radius);
         // Determine the boundaries.
         auto xMin = std::max(xCenter - radius - 1, 0);
-        auto xMax = std::min(xCenter + radius + 1, map->getWidth() - 1);
+        auto xMax = std::min(xCenter + radius + 1, config.width - 1);
         auto yMin = std::max(yCenter - radius - 1, 0);
-        auto yMax = std::min(yCenter + radius + 1, map->getHeight() - 1);
+        auto yMax = std::min(yCenter + radius + 1, config.height - 1);
         // Evaluate the square of the radius.
         auto squareRadius = radius * radius;
         // Evaluate the height of each cell inside the boundaries.
@@ -177,35 +95,45 @@ bool MapGenerator::generateMountains(const std::shared_ptr<MapWrapper> & map)
                 // Determine the distance between the cell and the center.
                 auto distance = pow(xCenter - x, 2) + pow(yCenter - y, 2);
                 // Determine the height of the cell based on the distance.
-                auto cellHeight = squareRadius - distance;
+                auto cellHeight = std::ceil(squareRadius - distance);
                 // Set the height value on the map.
                 if (cellHeight > 0)
                 {
-                    map->getCell(x, y)->coordinates.z +=
-                        static_cast<int>(std::ceil(cellHeight));
+                    heights[x][y].height += static_cast<int>(cellHeight);
                 }
             }
         }
     }
+    // Print the map for debug purpose.
+    for (int y = 0; y < config.height; ++y)
+    {
+        std::string debug;
+        for (int x = 0; x < config.width; ++x)
+        {
+            debug += Align(ToString(heights[x][y].height), align::center, 2);
+        }
+        Logger::log(LogLevel::Debug, debug);
+    }
     return true;
 }
 
-bool MapGenerator::normalizeMap(const std::shared_ptr<MapWrapper> & map)
+bool MapGenerator::normalizeMap(
+    std::map<int, std::map<int, HeightCell>> & heights)
 {
+    Logger::log(LogLevel::Debug, "Normalizing the map betweem 0 and 100.");
     auto minHeight = 0, maxHeight = 0;
     // Find the minimum and maximum heights.
-    for (auto x = 0; x < map->getWidth(); ++x)
+    for (auto x = 0; x < config.width; ++x)
     {
-        for (auto y = 0; y < map->getHeight(); ++y)
+        for (auto y = 0; y < config.height; ++y)
         {
-            auto cell = map->getCell(x, y);
-            if (cell->coordinates.z < minHeight)
+            if (heights[x][y].height < minHeight)
             {
-                minHeight = cell->coordinates.z;
+                minHeight = heights[x][y].height;
             }
-            if (cell->coordinates.z > maxHeight)
+            if (heights[x][y].height > maxHeight)
             {
-                maxHeight = cell->coordinates.z;
+                maxHeight = heights[x][y].height;
             }
         }
     }
@@ -213,257 +141,109 @@ bool MapGenerator::normalizeMap(const std::shared_ptr<MapWrapper> & map)
     if (IsEqual(maxHeight, minHeight))
     {
         Logger::log(LogLevel::Error, "Min and max height are the same.");
-        // Clear the map.
-        map->destroy();
         return false;
     }
     // Normalize the heights to values between 0 and 100.
-    for (int x = 0; x < map->getWidth(); ++x)
+    for (int x = 0; x < config.width; ++x)
     {
-        for (int y = 0; y < map->getHeight(); ++y)
+        for (int y = 0; y < config.height; ++y)
         {
-            auto cell = map->getCell(x, y);
-            cell->coordinates.z = Normalize(cell->coordinates.z,
-                                            minHeight, maxHeight,
-                                            0, 100);
+            heights[x][y].height = Normalize(heights[x][y].height,
+                                             minHeight, maxHeight,
+                                             0, 100);
         }
+    }
+    // Print the map for debug purpose.
+    for (int y = 0; y < config.height; ++y)
+    {
+        std::string debug;
+        for (int x = 0; x < config.width; ++x)
+        {
+            debug += Align(ToString(heights[x][y].height), align::center, 2);
+        }
+        Logger::log(LogLevel::Debug, debug);
     }
     return true;
 }
 
-bool MapGenerator::applyTerrain(const std::shared_ptr<MapWrapper> & map)
+bool MapGenerator::applyTerrain(
+    std::map<int, std::map<int, HeightCell>> & heights)
 {
-    if (heightMap == nullptr)
+    Logger::log(LogLevel::Debug, "Applying the terrain to the map.");
+    for (auto x = 0; x < config.width; ++x)
     {
-        Logger::log(LogLevel::Error, "HeightMap not set.");
-        return false;
-    }
-    for (auto x = 0; x < map->getWidth(); ++x)
-    {
-        for (auto y = 0; y < map->getHeight(); ++y)
+        for (auto y = 0; y < config.height; ++y)
         {
-            // Get the cell.
-            auto cell = map->getCell(x, y);
             // Get the terrain associated with the cell height.
-            auto terrain = heightMap->getTerrain(cell->coordinates.z);
+            auto terrain = heightMap->getTerrain(heights[x][y].height);
             if (terrain == nullptr)
             {
                 Logger::log(LogLevel::Error, "Applying a terrain.");
                 return false;
             }
-            cell->terrain = terrain;
-            cell->liquidContent = terrain->liquidContent;
+            heights[x][y].terrain = terrain;
+        }
+    }
+    // Print the map for debug purpose.
+    for (int y = 0; y < config.height; ++y)
+    {
+        std::string debug;
+        for (int x = 0; x < config.width; ++x)
+        {
+            debug += heights[x][y].terrain->symbol;
+        }
+        Logger::log(LogLevel::Debug, debug);
+    }
+    return true;
+}
+
+bool MapGenerator::flatOutMainland(
+    std::map<int, std::map<int, HeightCell>> & heights)
+{
+    Logger::log(LogLevel::Debug, "Levelling mainland terrains.\n");
+    for (auto x = 0; x < config.width; ++x)
+    {
+        for (auto y = 0; y < config.height; ++y)
+        {
+            if (heightMap->isAboveSeaLevel(heights[x][y].terrain))
+            {
+                auto cellOffset = heightMap->getOffset(heights[x][y].terrain);
+                heights[x][y].height = (config.elevation / 2) +
+                                       ((cellOffset < 0) ? 0 : cellOffset);
+            }
+        }
+    }
+    // Print the map for debug purpose.
+    for (int y = 0; y < config.height; ++y)
+    {
+        std::string debug;
+        for (int x = 0; x < config.width; ++x)
+        {
+            debug += Align(ToString(heights[x][y].height), align::center, 2);
+        }
+        Logger::log(LogLevel::Debug, debug);
+    }
+    return true;
+}
+
+bool MapGenerator::applyHeightsToMap(
+    std::map<int, std::map<int, HeightCell>> & heights,
+    std::shared_ptr<MapWrapper> const & map)
+{
+    Logger::log(LogLevel::Debug, "Applying heights to the real map.\n");
+    for (auto x = 0; x < config.width; ++x)
+    {
+        for (auto y = 0; y < config.height; ++y)
+        {
+            MapCell cell;
+            cell.terrain = heights[x][y].terrain;
+            map->set(x, y, heights[x][y].height, cell);
         }
     }
     return true;
 }
 
-bool MapGenerator::generateRivers(const std::shared_ptr<MapWrapper> & map)
+bool MapGenerator::generateSea(std::shared_ptr<MapWrapper> const & /*map*/)
 {
-    // List of possible starting points for a river.
-    std::list<MapCell *> startingPoints;
-    // Lamba used to check if a cell is far away from pre-existing starting
-    // points and if it is a mountain.
-    auto IsSuitable = [&](MapCell * cell)
-    {
-        if (cell->terrain->liquidSources.empty())
-        {
-            return false;
-        }
-        for (auto point : startingPoints)
-        {
-            auto distance = StructUtils::getDistance(cell->coordinates,
-                                                     point->coordinates);
-            if (distance <= configuration.minRiverDistance)
-            {
-                return false;
-            }
-        }
-        return true;
-    };
-    // Retrieve all the starting points for rivers.
-    for (auto x = 0; x < map->getWidth(); ++x)
-    {
-        for (auto y = 0; y < map->getHeight(); ++y)
-        {
-            auto cell = map->getCell(x, y);
-            // Check if it is a suitable cell.
-            if (IsSuitable(cell))
-            {
-                startingPoints.emplace_back(cell);
-            }
-        }
-    }
-    // Number of dropped rivers.
-    auto iterations = std::min(static_cast<size_t >(configuration.numRivers),
-                               startingPoints.size());
-    for (unsigned int it = 0; it < iterations; ++it)
-    {
-        // Prepare a vector for the river.
-        std::vector<MapCell *> river;
-        // Set the starting cell.
-        MapCell * cell = startingPoints.front();
-        startingPoints.pop_front();
-        // Pick from the available liquids of the starting cell.
-        auto liquid = cell->terrain->getRandomLiquidSource();
-        if (liquid == nullptr)
-        {
-            Logger::log(LogLevel::Error, "No liquid source.");
-            return false;
-        }
-        // Add the starting cell to the river.
-        river.push_back(cell);
-        while (true)
-        {
-            // Get the lowest nearby cell.
-            auto nextCell = cell->findLowestNearbyCell();
-            // Check if the lowest is the current cell itself.
-            if (nextCell->coordinates == cell->coordinates)
-            {
-                break;
-            }
-            // If a liquid is reached stop.
-            if (nextCell->liquidContent.first != nullptr)
-            {
-                break;
-            }
-            // Add the next cell to the path of the river.
-            river.push_back(nextCell);
-            // Set the current cell to the next cell.
-            cell = nextCell;
-        }
-        // Drop the river on the map.
-        for (auto it2 = river.begin(); it2 != river.end(); ++it2)
-        {
-            auto riverCell = (*it2);
-            if (it2 == river.begin())
-            {
-                riverCell->liquidContent = std::make_pair(liquid,
-                                                          MAX_WATER_LEVEL);
-                continue;
-            }
-            riverCell->liquidContent = std::make_pair(liquid,
-                                                      MAX_WATER_LEVEL / 4);
-        }
-    }
-    return true;
-}
-
-bool MapGenerator::generateForests(const std::shared_ptr<MapWrapper> & map)
-{
-    // List of locations for forests.
-    std::list<MapCell *> forestDropPoints;
-    // Lamba used to check if a cell is far away from pre-existing drop points
-    // and if it is nearby a source of water.
-    auto IsSuitable = [&](MapCell * cell)
-    {
-        // Check if the cell can host a forest.
-        if (!HasFlag(cell->terrain->generationFlags,
-                     TerrainGenerationFlag::CanHostForest))
-        {
-            return false;
-        }
-        // Check the distance from another forest drop point.
-        for (auto point : forestDropPoints)
-        {
-            auto distance = StructUtils::getDistance(cell->coordinates,
-                                                     point->coordinates);
-            if (distance <= configuration.minForestDistance)
-            {
-                return false;
-            }
-        }
-        return true;
-    };
-    // Retrieve all the starting points for rivers.
-    for (auto x = 0; x < map->getWidth(); ++x)
-    {
-        for (auto y = 0; y < map->getHeight(); ++y)
-        {
-            auto cell = map->getCell(x, y);
-            // Check if it is a suitable cell.
-            if (IsSuitable(cell))
-            {
-                forestDropPoints.emplace_back(cell);
-            }
-        }
-    }
-    std::function<bool(const int &, const int &, const int &, int)> FloodFill;
-    FloodFill = [&](const int & x,
-                    const int & y,
-                    const int & iterationTotal,
-                    int iterationLeft)
-    {
-        auto cell = map->getCell(x, y);
-        if (iterationLeft == 0) return true;
-        if (HasFlag(cell->flags, RoomFlag::SpawnTree)) return true;
-        // Check if the cell can host a forest.
-        if (!HasFlag(cell->terrain->generationFlags,
-                     TerrainGenerationFlag::CanHostForest))
-        {
-            return true;
-        }
-        auto normalized = Normalize(iterationLeft, 0, iterationTotal, 0,
-                                    100);
-        if (TRand<int>(0, 100) >= normalized) return true;
-        SetFlag(cell->flags, RoomFlag::SpawnTree);
-        iterationLeft--;
-        if (!FloodFill(std::max(x - 1, 0), y, iterationTotal, iterationLeft))
-        {
-            return false;
-        }
-        if (!FloodFill(std::min(x + 1, map->getWidth() - 1), y,
-                       iterationTotal,
-                       iterationLeft))
-        {
-            return false;
-        }
-        if (!FloodFill(x, std::max(y - 1, 0), iterationTotal, iterationLeft))
-        {
-            return false;
-        }
-        return FloodFill(x, std::min(y + 1, map->getHeight() - 1),
-                         iterationTotal,
-                         iterationLeft);
-    };
-    auto maxForestExpansion = TRand(3,
-                                    configuration.minForestDistance - 1);
-    // Number of dropped rivers.
-    auto iterations = std::min(static_cast<size_t>(configuration.numForests),
-                               forestDropPoints.size());
-    for (unsigned int it = 0; it < iterations; ++it)
-    {
-        // Pick a random forest drop point.
-        auto dpIt = forestDropPoints.begin();
-        std::advance(dpIt,
-                     TRand<size_t>(0, forestDropPoints.size() - 1));
-        MapCell * cell = (*dpIt);
-        forestDropPoints.erase(dpIt);
-        // Create the forest.
-        if (!FloodFill(cell->coordinates.x,
-                       cell->coordinates.y,
-                       maxForestExpansion,
-                       maxForestExpansion))
-        {
-            Logger::log(LogLevel::Error, "Found nullptr room.");
-            return false;
-        }
-    }
-    return true;
-}
-
-bool MapGenerator::resetZCoordinates(const std::shared_ptr<MapWrapper> & map)
-{
-    for (auto x = 0; x < map->getWidth(); ++x)
-    {
-        for (auto y = 0; y < map->getHeight(); ++y)
-        {
-            auto cell = map->getCell(x, y);
-            auto cellOffset = heightMap->getOffset(cell->terrain);
-            cell->coordinates.z = (map->elevation / 2) +
-                                  ((cellOffset < 0) ? 0 : cellOffset);
-            std::cout << cell->coordinates.z << " " << cellOffset << "\n";
-        }
-    }
     return true;
 }

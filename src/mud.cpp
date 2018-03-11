@@ -1098,9 +1098,13 @@ bool Mud::startMud()
                     "Something gone wrong during initialization of comunication.");
         return false;
     }
-
     Logger::log(LogLevel::Global,
                 "Booting Done (" + ToString(stopwatch.elapsed()) + ").");
+    if (!this->afterBootActions())
+    {
+        Logger::log(LogLevel::Error, "Afterboot actions went wrong.");
+        return false;
+    }
     return true;
 }
 
@@ -1146,5 +1150,27 @@ bool Mud::stopMud()
     Logger::log(LogLevel::Info,
                 "    Uncompressed  = " + ToString(bUnc) + " Bytes.");
     Logger::log(LogLevel::Info, "");
+    return true;
+}
+
+#include "mapGenerator.hpp"
+
+bool Mud::afterBootActions()
+{
+    std::shared_ptr<HeightMap> heightMap = nullptr;
+    heightMap = Mud::instance().findHeightMap(1);
+    if (heightMap == nullptr)
+    {
+        return false;
+    }
+    MapGeneratorConfiguration configuration;
+    // Instantiate the map generator.
+    MapGenerator mapGenerator(configuration, heightMap);
+    // Generate the map.
+    auto map = std::make_shared<MapWrapper>();
+    if (!mapGenerator.generateMap(map))
+    {
+        return false;
+    }
     return true;
 }

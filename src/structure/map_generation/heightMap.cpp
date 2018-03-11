@@ -84,3 +84,15 @@ int HeightMap::getOffset(
     }
     return terrainLevel - seaLevel;
 }
+
+int HeightMap::getSeaLevelHeight() const
+{
+    for (auto const & it : thresholds)
+    {
+        if (it.second->vnum == seaLevelTerrain->vnum)
+        {
+            return it.first;
+        }
+    }
+    return -1;
+}

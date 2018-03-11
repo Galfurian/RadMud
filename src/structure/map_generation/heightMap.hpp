@@ -53,4 +53,13 @@ public:
 
     /// @brief Provides the offset associated with the given terrain.
     int getOffset(const std::shared_ptr<Terrain> & terrain) const;
+
+    /// @brief Provides the offset associated with the given terrain.
+    inline bool isAboveSeaLevel(const std::shared_ptr<Terrain> & terrain) const
+    {
+        return (getOffset(terrain) > 0);
+    }
+
+    /// @brief Provides the offset associated with the given terrain.
+    int getSeaLevelHeight() const;
 };

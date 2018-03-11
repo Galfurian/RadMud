@@ -459,8 +459,10 @@ bool los(Coordinates const & source,
     // Set the initial values for X and Y.
     double x = source.x + 0.5;
     double y = source.y + 0.5;
-    double z = source.z + height;
+    double z = source.z + 0.5;
+    (void) height;
     Coordinates coordinates(source.x, source.y, source.z);
+    //auto previous = coordinates;
     //Coordinates previous = coordinates;
     for (double i = 0; IsLEqual(i, distance); i += min)
     {
@@ -472,24 +474,39 @@ bool los(Coordinates const & source,
             return false;
         }
 #if 0
+        auto currentRoom = area->getRoom(coordinates);
         if (coordinates.z > previous.z)
         {
-            auto downstair = area->getRoom(previous);
-            if (!downstair->findExit(Direction::Up))
+            if (!HasFlag(currentRoom->flags, RoomFlag::Air))
             {
-                std::cout << " no z connection up.\n";
-                return false;
+                auto downstair = area->getRoom(previous);
+                if (!downstair->findExit(Direction::Up))
+                {
+                    std::cout << " no z connection up.\n";
+                    return false;
+                }
             }
         }
-        if (coordinates.z < previous.z)
+        else if (coordinates.z < previous.z)
         {
-            auto upstair = area->getRoom(previous);
-            if (!upstair->findExit(Direction::Down))
+            auto upcoord = coordinates;
+            ++upcoord.z;
+            auto upstair = area->getRoom(upcoord);
+            if (upstair == nullptr)
             {
-                std::cout << " no z connection down.\n";
+                std::cout << "No room (z+1) in connection down.\n";
                 return false;
             }
+            if (!HasFlag(upstair->flags, RoomFlag::Air))
+            {
+                if (!upstair->findExit(Direction::Down))
+                {
+                    std::cout << "No z connection down.\n";
+                    return false;
+                }
+            }
         }
+        previous = coordinates;
 #endif
         if (coordinates == target)
         {

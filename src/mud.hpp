@@ -486,6 +486,8 @@ private:
     ///         <b>False</b> otherwise.
     bool closeComunications();
 
+    bool afterBootActions();
+
     /// @brief Boot up the mud.
     /// @return <b>True</b> if there are no errors,<br>
     ///         <b>False</b> otherwise.

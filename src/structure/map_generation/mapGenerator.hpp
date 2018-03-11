@@ -24,48 +24,73 @@
 #include "mapGeneratorConfiguration.hpp"
 
 #include <memory>
+#include <map>
 
 class MapWrapper;
 class HeightMap;
+class Terrain;
 
 /// @brief Automatic generator of maps.
 class MapGenerator
 {
 private:
     /// Generator configuration.
-    MapGeneratorConfiguration configuration;
+    MapGeneratorConfiguration config;
     /// Height map.
     std::shared_ptr<HeightMap> heightMap;
 
 public:
 
     /// @brief Constructor.
-    MapGenerator(const MapGeneratorConfiguration & _configuration,
+    MapGenerator(const MapGeneratorConfiguration & _config,
                  const std::shared_ptr<HeightMap> & _heightMap);
 
     /// @brief Generates a new map.
-    bool generateMap(const std::shared_ptr<MapWrapper> & map);
+    bool generateMap(std::shared_ptr<MapWrapper> const & map);
 
 private:
-    /// @brief Initializes the map.
-    bool initializeMap(const std::shared_ptr<MapWrapper> & map);
+    struct HeightCell
+    {
+        int height;
+        std::shared_ptr<Terrain> terrain;
+    };
 
     /// @brief Creates the mountains on the map.
-    bool generateMountains(const std::shared_ptr<MapWrapper> & map);
+    /// @param heights The heights.
+    /// @return the error state.
+    bool generateMountains(
+        std::map<int, std::map<int, HeightCell>> & heights);
 
     /// @brief Normalizes the map with values between a specific range
     /// according to the HeightMap.
-    bool normalizeMap(const std::shared_ptr<MapWrapper> & map);
+    /// @param heights The heights.
+    /// @return the error state.
+    bool normalizeMap(
+        std::map<int, std::map<int, HeightCell>> & heights);
 
     /// @brief Apply the terrain on the map based on the height map.
-    bool applyTerrain(const std::shared_ptr<MapWrapper> & map);
+    /// @param heights The heights.
+    /// @return the error state.
+    bool applyTerrain(
+        std::map<int, std::map<int, HeightCell>> & heights);
 
-    /// @brief Creates the rivers on the map.
-    bool generateRivers(const std::shared_ptr<MapWrapper> & map);
+    /// @brief Finalizes the z coordinates of the cells inside the map around
+    /// the mid-value of the altitude.
+    /// @param heights The heights.
+    /// @return the error state.
+    bool flatOutMainland(
+        std::map<int, std::map<int, HeightCell>> & heights);
 
-    /// @brief Add the forests to the map.
-    bool generateForests(const std::shared_ptr<MapWrapper> & map);
+    /// @brief Applies the terrains and computed heights to the map.
+    /// @param heights The heights.
+    /// @param map     The map to modify.
+    /// @return the error state.
+    bool applyHeightsToMap(
+        std::map<int, std::map<int, HeightCell>> & heights,
+        std::shared_ptr<MapWrapper> const & map);
 
-    /// @brief Resets the z coordinates of the cells inside the map to 50.
-    bool resetZCoordinates(const std::shared_ptr<MapWrapper> & map);
+    /// @brief Fills the sea cells.
+    /// @param map The map to modify.
+    /// @return the error state.
+    bool generateSea(std::shared_ptr<MapWrapper> const & map);
 };

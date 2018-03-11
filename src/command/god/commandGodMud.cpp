@@ -227,6 +227,7 @@ bool DoGenerateMap(Character * character, ArgumentHandler & args)
         character->sendMsg("Error while generating the map.");
         return false;
     }
+#if 0
     // Draw the map.
     std::string drawnMap;
     for (int y = 0; y < map->getHeight(); ++y)
@@ -243,6 +244,7 @@ bool DoGenerateMap(Character * character, ArgumentHandler & args)
     character->sendMsg(Formatter::reset());
     // Add the map to the list of generated maps.
     Mud::instance().addGeneratedMap(map);
+#endif
     return true;
 }
 
@@ -261,14 +263,15 @@ bool DoShowGenerateMap(Character * character, ArgumentHandler & args)
         return true;
     }
     auto vnum = ToNumber<unsigned int>(args[0].getContent());
-    auto type = (args.size() >= 2) ?
-                ToNumber<unsigned int>(args[1].getContent()) : 0;
+    //auto type = (args.size() >= 2) ?
+    //            ToNumber<unsigned int>(args[1].getContent()) : 0;
     auto generatedMap = Mud::instance().mudGeneratedMaps.find(vnum);
     if (generatedMap == Mud::instance().mudGeneratedMaps.end())
     {
         character->sendMsg("Can't find the generated map '%s'.", vnum);
         return false;
     }
+#if 0
     auto map = generatedMap->second;
     // Draw the map.
     std::string drawnMap;
@@ -298,6 +301,7 @@ bool DoShowGenerateMap(Character * character, ArgumentHandler & args)
     // First send the configuration.
     character->sendMsg(drawnMap);
     character->sendMsg(Formatter::reset());
+#endif
     return true;
 }
 

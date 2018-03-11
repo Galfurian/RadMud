@@ -39,23 +39,82 @@ MapWrapper::~MapWrapper()
     Logger::log(LogLevel::Trace, "Deleting map wrapper:%s", vnum);
 }
 
+void MapWrapper::initialize(const int & _width,
+                            const int & _height,
+                            const int & _elevation)
+{
+    width = _width;
+    height = _height;
+    elevation = _elevation;
+    // Set the coordinates.
+    for (int x = 0; x < width; ++x)
+    {
+        for (int y = 0; y < height; ++y)
+        {
+            for (int z = 0; z < elevation; ++z)
+            {
+                auto cell = getCell(x, y, z);
+                // Set the coordinates.
+                cell->coordinates = Coordinates(x, y, z);
+                // Set neighbours.
+                auto n_west = getCell(x - 1, y, z);
+                if (n_west != nullptr)
+                {
+                    cell->addNeighbour(Direction::West, n_west);
+                }
+                auto n_east = getCell(x + 1, y, z);
+                if (n_east != nullptr)
+                {
+                    cell->addNeighbour(Direction::East, n_east);
+                }
+                auto n_south = getCell(x, y - 1, z);
+                if (n_south != nullptr)
+                {
+                    cell->addNeighbour(Direction::South, n_south);
+                }
+                auto n_north = getCell(x, y + 1, z);
+                if (n_north != nullptr)
+                {
+                    cell->addNeighbour(Direction::North, n_north);
+                }
+#if 0
+                auto n_up = getCell(x, y, z + 1);
+                if (n_up != nullptr)
+                {
+                    cell->addNeighbour(Direction::Up, n_up);
+                }
+                auto n_down = getCell(x, y, z - 1);
+                if (n_down != nullptr)
+                {
+                    cell->addNeighbour(Direction::Down, n_down);
+                }
+#endif
+            }
+        }
+    }
+}
+
 void MapWrapper::destroy()
 {
     for (int x = 0; x < width; ++x)
     {
         for (int y = 0; y < height; ++y)
         {
-            auto cell = this->getCell(x, y);
-            cell->coordinates = Coordinates(0, 0, 0);
-            cell->terrain = nullptr;
-            cell->neighbours.clear();
+            for (int z = 0; z < elevation; ++z)
+            {
+                auto cell = this->getCell(x, y, z);
+                cell->coordinates = Coordinates(0, 0, 0);
+                cell->terrain = nullptr;
+                cell->neighbours.clear();
+            }
         }
     }
 }
 
-bool MapWrapper::buildMap(const std::string & mapName,
-                          const std::string & builder)
+bool MapWrapper::buildMap(const std::string & /*mapName*/,
+                          const std::string & /*builder*/)
 {
+#if 0
     // -------------------------------------------------------------------------
     // First create a new area.
     auto area = new Area();
@@ -226,5 +285,6 @@ bool MapWrapper::buildMap(const std::string & mapName,
             }
         }
     }
+#endif
     return true;
 }

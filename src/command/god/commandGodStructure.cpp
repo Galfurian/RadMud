@@ -353,6 +353,7 @@ bool DoRoomList(Character * character, ArgumentHandler & args)
     {
         Room * room = iterator.second;
         if (room->area->vnum != area->vnum) continue;
+        if (HasFlag(room->flags, RoomFlag::Air)) continue;
         // Prepare the row.
         TableRow row;
         row.emplace_back(ToString(room->vnum));

@@ -38,15 +38,17 @@ public:
     /// Elevation of the map.
     int elevation;
     /// The map.
-    std::map<int, std::map<int, MapCell>> map;
-    /// The air map.
-    std::map<int, std::map<int, std::vector<MapCell>>> airMap;
+    std::map<int, std::map<int, std::map<int, MapCell>>> map;
 
     /// @brief Constructor.
     MapWrapper();
 
     /// @brief Destructor.
     ~MapWrapper();
+
+    void initialize(const int & _width,
+                           const int & _height,
+                           const int & _elevation);
 
     /// @brief Allows to set the width of the map.
     inline void setWidth(const int & _width)
@@ -85,69 +87,12 @@ public:
     }
 
     /// @brief Returns the cell at the given position.
-    inline MapCell * getCell(int x, int y)
+    inline MapCell * getCell(int x, int y, int z)
     {
         if ((x < 0) || (x >= width)) return nullptr;
         if ((y < 0) || (y >= height)) return nullptr;
-        return &map[x][y];
-    }
-
-    /// @brief Returns the cell at the given position.
-    inline std::vector<MapCell> * getAirStack(int x, int y)
-    {
-        if ((x < 0) || (x >= width)) return nullptr;
-        if ((y < 0) || (y >= height)) return nullptr;
-        auto it = airMap.find(x);
-        if (it != airMap.end())
-        {
-            auto it2 = it->second.find(y);
-            if (it2 != it->second.end())
-            {
-                return &it2->second;
-            }
-        }
-        return &(airMap[x][y] = std::vector<MapCell>());
-    }
-
-    /// @brief Returns the cell at the given position.
-    inline MapCell * findCell(int x, int y)
-    {
-        if ((x < 0) || (x >= width)) return nullptr;
-        if ((y < 0) || (y >= height)) return nullptr;
-        auto it = map.find(x);
-        if (it != map.end())
-        {
-            auto it2 = it->second.find(y);
-            if (it2 != it->second.end())
-            {
-                return &it2->second;
-            }
-        }
-        return nullptr;
-    }
-
-    /// @brief Returns the cell at the given position.
-    inline MapCell * findCell(int x, int y, int z)
-    {
-        if ((x < 0) || (x >= width)) return nullptr;
-        if ((y < 0) || (y >= height)) return nullptr;
-        auto it = airMap.find(x);
-        if (it != airMap.end())
-        {
-            auto it2 = it->second.find(y);
-            if (it2 != it->second.end())
-            {
-                for (auto it3 = it2->second.begin(); it3 != it2->second.end();
-                     ++it3)
-                {
-                    if (it3->coordinates.z == z)
-                    {
-                        return &(*it3);
-                    }
-                }
-            }
-        }
-        return nullptr;
+        if ((z < 0) || (z >= elevation)) return nullptr;
+        return &map[x][y][z];
     }
 
     /// @brief Set the object at the given Coordinates2D.
@@ -156,9 +101,10 @@ public:
     /// @param mapCell The map cell which has to be set.
     inline void set(int x,
                     int y,
+                    int z,
                     const MapCell & mapCell)
     {
-        map[x][y] = mapCell;
+        map[x][y][z] = mapCell;
     }
 
     /// @brief Destroy the map.
