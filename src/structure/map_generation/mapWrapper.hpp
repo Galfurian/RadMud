@@ -47,8 +47,8 @@ public:
     ~MapWrapper();
 
     void initialize(const int & _width,
-                           const int & _height,
-                           const int & _elevation);
+                    const int & _height,
+                    const int & _elevation);
 
     /// @brief Allows to set the width of the map.
     inline void setWidth(const int & _width)
@@ -99,12 +99,15 @@ public:
     /// @param x       Coordinate on x-axis.
     /// @param y       Coordinate on y-axis.
     /// @param mapCell The map cell which has to be set.
-    inline void set(int x,
-                    int y,
-                    int z,
-                    const MapCell & mapCell)
+    inline void set(int x, int y, int z,
+                    std::shared_ptr<Terrain> const & terrain,
+                    unsigned int const & flags,
+                    std::pair<Liquid *, unsigned int> const & liquidContent)
     {
-        map[x][y][z] = mapCell;
+        map[x][y][z].terrain = terrain;
+        map[x][y][z].flags = flags;
+        map[x][y][z].liquidContent = liquidContent;
+
     }
 
     /// @brief Destroy the map.

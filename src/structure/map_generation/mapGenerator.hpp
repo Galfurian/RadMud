@@ -92,5 +92,7 @@ private:
     /// @brief Fills the sea cells.
     /// @param map The map to modify.
     /// @return the error state.
-    bool generateSea(std::shared_ptr<MapWrapper> const & map);
+    bool generateSea(
+        std::map<int, std::map<int, HeightCell>> & heights,
+        std::shared_ptr<MapWrapper> const & map);
 };

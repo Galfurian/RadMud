@@ -65,7 +65,10 @@ bool MapGenerator::generateMap(std::shared_ptr<MapWrapper> const & map)
     // ------------------------------------------------------------------------
     //Phase II: Use the 2d map to generate the 3d map.
     // Apply the heights to the real map.
-    return this->applyHeightsToMap(heights, map);
+    if (!this->applyHeightsToMap(heights, map)) return false;
+    // Generate the sea tiles.
+    if (!this->generateSea(heights, map)) return false;
+    return true;
 }
 
 bool MapGenerator::generateMountains(
@@ -110,7 +113,7 @@ bool MapGenerator::generateMountains(
         std::string debug;
         for (int x = 0; x < config.width; ++x)
         {
-            debug += Align(ToString(heights[x][y].height), align::center, 2);
+            debug += Align(ToString(heights[x][y].height), align::center, 3);
         }
         Logger::log(LogLevel::Debug, debug);
     }
@@ -159,7 +162,7 @@ bool MapGenerator::normalizeMap(
         std::string debug;
         for (int x = 0; x < config.width; ++x)
         {
-            debug += Align(ToString(heights[x][y].height), align::center, 2);
+            debug += Align(ToString(heights[x][y].height), align::center, 3);
         }
         Logger::log(LogLevel::Debug, debug);
     }
@@ -200,6 +203,7 @@ bool MapGenerator::applyTerrain(
 bool MapGenerator::flatOutMainland(
     std::map<int, std::map<int, HeightCell>> & heights)
 {
+    auto seaLevel = heightMap->getSeaLevelHeight();
     Logger::log(LogLevel::Debug, "Levelling mainland terrains.\n");
     for (auto x = 0; x < config.width; ++x)
     {
@@ -219,7 +223,7 @@ bool MapGenerator::flatOutMainland(
         std::string debug;
         for (int x = 0; x < config.width; ++x)
         {
-            debug += Align(ToString(heights[x][y].height), align::center, 2);
+            debug += Align(ToString(heights[x][y].height), align::center, 3);
         }
         Logger::log(LogLevel::Debug, debug);
     }
@@ -230,20 +234,49 @@ bool MapGenerator::applyHeightsToMap(
     std::map<int, std::map<int, HeightCell>> & heights,
     std::shared_ptr<MapWrapper> const & map)
 {
-    Logger::log(LogLevel::Debug, "Applying heights to the real map.\n");
+    Logger::log(LogLevel::Debug, "Applying heights to the real map.");
     for (auto x = 0; x < config.width; ++x)
     {
         for (auto y = 0; y < config.height; ++y)
         {
-            MapCell cell;
-            cell.terrain = heights[x][y].terrain;
-            map->set(x, y, heights[x][y].height, cell);
+            map->set(x, y, heights[x][y].height,
+                     heights[x][y].terrain,
+                     0,
+                     heights[x][y].terrain->liquidContent);
         }
+    }
+    // Print the map for debug purpose.
+    for (int y = 0; y < config.height; ++y)
+    {
+        std::string debug;
+        for (int x = 0; x < config.width; ++x)
+        {
+            debug += map->getCell(x, y, heights[x][y].height)->getTile();
+        }
+        Logger::log(LogLevel::Debug, debug);
     }
     return true;
 }
 
-bool MapGenerator::generateSea(std::shared_ptr<MapWrapper> const & /*map*/)
+bool MapGenerator::generateSea(
+    std::map<int, std::map<int, HeightCell>> & heights,
+    std::shared_ptr<MapWrapper> const & map)
 {
+    Logger::log(LogLevel::Debug, "Generating sea (Height:%s).\n",
+                heightMap->getSeaLevelHeight());
+    for (auto x = 0; x < config.width; ++x)
+    {
+        for (auto y = 0; y < config.height; ++y)
+        {
+            if (heightMap->isAboveSeaLevel(heights[x][y].terrain)) continue;
+            for (auto z = heights[x][y].height + 1;
+                 z < heightMap->getSeaLevelHeight(); ++z)
+            {
+                map->set(x, y, z,
+                         heights[x][y].terrain, 0,
+                         heights[x][y].terrain->liquidContent);
+            }
+        }
+    }
     return true;
 }
