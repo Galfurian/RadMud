@@ -1153,24 +1153,7 @@ bool Mud::stopMud()
     return true;
 }
 
-#include "mapGenerator.hpp"
-
 bool Mud::afterBootActions()
 {
-    std::shared_ptr<HeightMap> heightMap = nullptr;
-    heightMap = Mud::instance().findHeightMap(1);
-    if (heightMap == nullptr)
-    {
-        return false;
-    }
-    MapGeneratorConfiguration configuration;
-    // Instantiate the map generator.
-    MapGenerator mapGenerator(configuration, heightMap);
-    // Generate the map.
-    auto map = std::make_shared<MapWrapper>();
-    if (!mapGenerator.generateMap(map))
-    {
-        return false;
-    }
     return true;
 }

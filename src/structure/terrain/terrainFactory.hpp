@@ -26,10 +26,16 @@
 class Terrain;
 
 /// @brief Factory which allows to create predefined terrains.
-class TerrainFactory
+namespace TerrainFactory
 {
-public:
-    /// @brief Produces a terrain representing an empty tile.
-    static std::shared_ptr<Terrain> getAir();
 
-};
+/// @brief Produces a terrain representing an empty tile.
+std::shared_ptr<Terrain> getAir();
+
+/// @brief Produces a terrain representing a cave.
+std::shared_ptr<Terrain> getCave();
+
+/// @brief Produces a terrain representing soil.
+std::shared_ptr<Terrain> getSoil();
+
+} // namespace TerrainFactory

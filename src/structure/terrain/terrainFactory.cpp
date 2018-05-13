@@ -20,14 +20,19 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "terrainFactory.hpp"
+#include "formatter.hpp"
 #include "terrain.hpp"
 
-std::shared_ptr<Terrain> TerrainFactory::getAir()
+namespace TerrainFactory
+{
+
+std::shared_ptr<Terrain> getAir()
 {
     static std::shared_ptr<Terrain> airTerrain;
     if (airTerrain == nullptr)
     {
         airTerrain = std::make_shared<Terrain>();
+        airTerrain->vnum = 1;
         airTerrain->name = "Air";
         airTerrain->flags = 0;
         airTerrain->generationFlags = 0;
@@ -36,3 +41,38 @@ std::shared_ptr<Terrain> TerrainFactory::getAir()
     }
     return airTerrain;
 }
+
+std::shared_ptr<Terrain> getCave()
+{
+    static std::shared_ptr<Terrain> terrain;
+    if (terrain == nullptr)
+    {
+        terrain = std::make_shared<Terrain>();
+        terrain->vnum = 9;
+        terrain->name = "Cave";
+        terrain->flags = static_cast<unsigned int>(TerrainFlag::Indoor);
+        terrain->generationFlags = 0;
+        terrain->space = 500;
+        terrain->symbol = Formatter::darkGray(".");
+    }
+    return terrain;
+}
+
+std::shared_ptr<Terrain> getSoil()
+{
+    static std::shared_ptr<Terrain> terrain;
+    if (terrain == nullptr)
+    {
+        terrain = std::make_shared<Terrain>();
+        terrain->vnum = 10;
+        terrain->name = "Soil";
+        terrain->flags = static_cast<unsigned int>(TerrainFlag::Indoor);
+        terrain->generationFlags = 0;
+        terrain->space = 0;
+        terrain->symbol = Formatter::darkGray(" ");
+    }
+    return terrain;
+}
+
+}
+

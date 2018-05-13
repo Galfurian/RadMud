@@ -29,7 +29,7 @@
 
 #include <memory>
 #include <utilities/logger.hpp>
-#include "alignString.hpp"
+#include "align.hpp"
 
 /// @brief Addition-Assignment operator for two Ability Modifier maps.
 template<typename ModifierType>

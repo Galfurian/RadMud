@@ -219,10 +219,10 @@ bool DoGenerateMap(Character * character, ArgumentHandler & args)
     }
     MapGeneratorConfiguration configuration;
     // Instantiate the map generator.
-    MapGenerator mapGenerator(configuration, heightMap);
+    MapGen::MapGenerator mapGenerator(configuration, heightMap);
     // Generate the map.
     auto map = std::make_shared<MapWrapper>();
-    if (!mapGenerator.generateMap(map))
+    if (!mapGenerator.generateMap())
     {
         character->sendMsg("Error while generating the map.");
         return false;
