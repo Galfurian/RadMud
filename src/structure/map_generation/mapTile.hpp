@@ -25,11 +25,11 @@
 #include <map>
 
 #include "mapConfiguration.hpp"
-#include "alignString.hpp"
 #include "formatter.hpp"
 #include "terrain.hpp"
 #include "liquid.hpp"
 #include "utils.hpp"
+#include "align.hpp"
 #include "room.hpp"
 
 namespace MapGen
