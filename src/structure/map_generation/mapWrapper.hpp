@@ -21,9 +21,12 @@
 
 #pragma once
 
-#include "mapCell.hpp"
+#include "mapTile.hpp"
 
 #include <vector>
+
+namespace MapGen
+{
 
 /// @brief Class which contains (wrap) an under-construction map.
 class MapWrapper
@@ -38,7 +41,7 @@ public:
     /// Elevation of the map.
     int elevation;
     /// The map.
-    std::map<int, std::map<int, std::map<int, MapCell>>> map;
+    std::map<int, std::map<int, std::map<int, MapTile>>> map;
 
     /// @brief Constructor.
     MapWrapper();
@@ -87,7 +90,7 @@ public:
     }
 
     /// @brief Returns the cell at the given position.
-    inline MapCell * getCell(int x, int y, int z)
+    inline MapTile * getCell(int x, int y, int z)
     {
         if ((x < 0) || (x >= width)) return nullptr;
         if ((y < 0) || (y >= height)) return nullptr;
@@ -101,11 +104,11 @@ public:
     /// @param mapCell The map cell which has to be set.
     inline void set(int x, int y, int z,
                     std::shared_ptr<Terrain> const & terrain,
-                    unsigned int const & flags,
+                    unsigned int const & /*flags*/,
                     std::pair<Liquid *, unsigned int> const & liquidContent)
     {
         map[x][y][z].terrain = terrain;
-        map[x][y][z].flags = flags;
+        //map[x][y][z].flags = flags;
         map[x][y][z].liquidContent = liquidContent;
 
     }
@@ -117,3 +120,5 @@ public:
     bool buildMap(const std::string & mapName,
                   const std::string & builder);
 };
+
+}

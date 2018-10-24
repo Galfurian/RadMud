@@ -51,7 +51,10 @@
 
 class Direction;
 class HeightMap;
+namespace MapGen
+{
 class MapWrapper;
+}
 class MobileModel;
 
 #ifdef __linux__
@@ -207,7 +210,7 @@ public:
     /// List of all the bodyparts.
     std::map<unsigned int, std::shared_ptr<HeightMap>> mudHeightMaps;
     /// List of generated maps.
-    std::map<unsigned int, std::shared_ptr<MapWrapper>> mudGeneratedMaps;
+    std::map<unsigned int, std::shared_ptr<MapGen::MapWrapper>> mudGeneratedMaps;
 
     /// @brief Update all the player on the database.
     /// @return <b>True</b> if the operations succeeded,<br>
@@ -313,7 +316,7 @@ public:
     bool addHeightMap(const std::shared_ptr<HeightMap> & heightMap);
 
     /// @brief Add a generated map.
-    bool addGeneratedMap(const std::shared_ptr<MapWrapper> & mapWrapper);
+    bool addGeneratedMap(const std::shared_ptr<MapGen::MapWrapper> & mapWrapper);
     ///@}
 
     /// @defgroup GlobalFind Global Find Functions

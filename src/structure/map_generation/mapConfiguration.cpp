@@ -1,6 +1,6 @@
-/// @file   terrainFactory.hpp
+/// @file   mapGeneratorConfiguration.cpp
 /// @author Enrico Fraccaroli
-/// @date   feb 07 2017
+/// @date   Jan 06 2017
 /// @copyright
 /// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -19,23 +19,4 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#pragma once
-
-#include <memory>
-
-class Terrain;
-
-/// @brief Factory which allows to create predefined terrains.
-class TerrainFactory
-{
-public:
-    /// @brief Produces a terrain representing an empty tile.
-    static std::shared_ptr<Terrain> getAir();
-
-    /// @brief Produces a terrain representing a cave.
-    static std::shared_ptr<Terrain> getCave();
-
-    /// @brief Produces a terrain representing soil.
-    static std::shared_ptr<Terrain> getSoil();
-
-};
+#include "mapConfiguration.hpp"

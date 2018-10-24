@@ -392,7 +392,7 @@ bool Mud::addHeightMap(const std::shared_ptr<HeightMap> & heightMap)
                                                heightMap)).second;
 }
 
-bool Mud::addGeneratedMap(const std::shared_ptr<MapWrapper> & mapWrapper)
+bool Mud::addGeneratedMap(const std::shared_ptr<MapGen::MapWrapper> & mapWrapper)
 {
     while (!mudGeneratedMaps.insert(std::make_pair(mapWrapper->vnum,
                                                    mapWrapper)).second)
@@ -1157,20 +1157,20 @@ bool Mud::stopMud()
 
 bool Mud::afterBootActions()
 {
-    std::shared_ptr<HeightMap> heightMap = nullptr;
-    heightMap = Mud::instance().findHeightMap(1);
+#if 0
+    auto heightMap = Mud::instance().findHeightMap(1);
     if (heightMap == nullptr)
     {
         return false;
     }
-    MapGeneratorConfiguration configuration;
+    MapGen::MapConfiguration configuration(60, 30, 40);
     // Instantiate the map generator.
-    MapGenerator mapGenerator(configuration, heightMap);
+    MapGen::MapGenerator mapGenerator(configuration, heightMap);
     // Generate the map.
-    auto map = std::make_shared<MapWrapper>();
-    if (!mapGenerator.generateMap(map))
+    if (!mapGenerator.generateMap())
     {
         return false;
     }
+#endif
     return true;
 }

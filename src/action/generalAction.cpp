@@ -33,12 +33,12 @@ GeneralAction::GeneralAction(Character * _actor,
     actionCooldown()
 {
     // Debugging message.
-    Logger::log(LogLevel::Debug, "Created GeneralAction.");
+    //Logger::log(LogLevel::Debug, "Created GeneralAction.");
 }
 
 GeneralAction::~GeneralAction()
 {
-    Logger::log(LogLevel::Debug, "Deleted GeneralAction.");
+    //Logger::log(LogLevel::Debug, "Deleted GeneralAction.");
 }
 
 bool GeneralAction::checkElapsed() const

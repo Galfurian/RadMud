@@ -24,6 +24,9 @@
 #include "roomFactory.hpp"
 #include "mud.hpp"
 
+namespace MapGen
+{
+
 MapWrapper::MapWrapper() :
     vnum(),
     width(),
@@ -53,6 +56,7 @@ void MapWrapper::initialize(const int & _width,
         {
             for (int z = 0; z < elevation; ++z)
             {
+#if 0
                 auto cell = getCell(x, y, z);
                 // Set the coordinates.
                 cell->coordinates = Coordinates(x, y, z);
@@ -77,7 +81,6 @@ void MapWrapper::initialize(const int & _width,
                 {
                     cell->addNeighbour(Direction::North, n_north);
                 }
-#if 0
                 auto n_up = getCell(x, y, z + 1);
                 if (n_up != nullptr)
                 {
@@ -96,6 +99,7 @@ void MapWrapper::initialize(const int & _width,
 
 void MapWrapper::destroy()
 {
+#if 0
     for (int x = 0; x < width; ++x)
     {
         for (int y = 0; y < height; ++y)
@@ -109,6 +113,7 @@ void MapWrapper::destroy()
             }
         }
     }
+#endif
 }
 
 bool MapWrapper::buildMap(const std::string & /*mapName*/,
@@ -119,8 +124,8 @@ bool MapWrapper::buildMap(const std::string & /*mapName*/,
     // First create a new area.
     auto area = new Area();
     area->vnum = Mud::instance().getUniqueAreaVnum();
-    area->name = mapName;
-    area->builder = builder;
+    area->name = "";//mapName;
+    area->builder = "";//builder;
     area->width = width;
     area->height = height;
     area->elevation = elevation;
@@ -138,108 +143,119 @@ bool MapWrapper::buildMap(const std::string & /*mapName*/,
         return false;
     }
     // Generate the normal rooms.
+#if 0
     for (int x = 0; x < width; ++x)
     {
         for (int y = 0; y < height; ++y)
         {
-            auto cell = this->getCell(x, y);
-            // Create the room.
-            cell->room = new Room();
-            cell->room->vnum = Mud::instance().getMaxVnumRoom() + 1;
-            cell->room->area = area;
-            cell->room->coord = cell->coordinates;
-            cell->room->terrain = cell->terrain;
-            cell->room->name = cell->terrain->name;
-            cell->room->liquidContent = cell->liquidContent;
-            cell->room->description = "";
-            cell->room->flags = cell->flags;
-            // Add the created room to the room_map.
-            if (!Mud::instance().addRoom(cell->room))
+            for (int z = 0; z < elevation; ++z)
             {
-                Logger::log(LogLevel::Error,
-                            "Cannot add the room to the mud.\n");
-                return false;
-            }
-            if (!cell->room->area->addRoom(cell->room))
-            {
-                Logger::log(LogLevel::Error,
-                            "Cannot add the room to the area.\n");
-                return false;
-            }
-            if (!SaveRoom(cell->room))
-            {
-                Logger::log(LogLevel::Error,
-                            "While saving the room on DB.\n");
-                return false;
-            }
-            if (!SaveAreaList(area, cell->room))
-            {
-                Logger::log(LogLevel::Error,
-                            "While saving the Area List.\n");
-                return false;
-            }
-            Logger::log(LogLevel::Debug, "Created room at %s",
-                        cell->room->coord.toString());
-        }
-    }
-    // Generate the exits.
-    for (int x = 0; x < width; ++x)
-    {
-        for (int y = 0; y < height; ++y)
-        {
-            auto cell = this->getCell(x, y);
-            if (cell->room == nullptr)
-            {
-                Logger::log(LogLevel::Error,
-                            "A cell has a nullptr room at %s.\n",
-                            cell->coordinates.toString());
-                return false;
-            }
-            for (auto neighbour : cell->neighbours)
-            {
-                // Get the room of the neighbour.
-                if (neighbour.second->room == nullptr)
+                auto cell = this->getCell(x, y, z);
+                // Create the room.
+                cell->room = new Room();
+                cell->room->vnum = Mud::instance().getMaxVnumRoom() + 1;
+                cell->room->area = area;
+                cell->room->coord = Coordinates(x, y, z);
+                cell->room->terrain = cell->terrain;
+                cell->room->name = cell->terrain->name;
+                cell->room->liquidContent = cell->liquidContent;
+                cell->room->description = "";
+                cell->room->flags = 0;//cell->flags;
+                // Add the created room to the room_map.
+                if (!Mud::instance().addRoom(cell->room))
                 {
                     Logger::log(LogLevel::Error,
-                                "A neighbour has a nullptr room %s->%s.\n",
-                                cell->coordinates.toString(),
-                                neighbour.second->coordinates.toString());
+                                "Cannot add the room to the mud.\n");
                     return false;
                 }
-                // Create the two exits.
-                auto forward = std::make_shared<Exit>(
-                    cell->room,
-                    neighbour.second->room,
-                    neighbour.first,
-                    0);
-                auto backward = std::make_shared<Exit>(
-                    neighbour.second->room,
-                    cell->room,
-                    neighbour.first.getOpposite(),
-                    0);
-                // Insert in both the rooms exits the connection.
-                if (cell->room->addExit(forward))
+                if (!cell->room->area->addRoom(cell->room))
                 {
-                    if (!SaveRoomExit(forward))
+                    Logger::log(LogLevel::Error,
+                                "Cannot add the room to the area.\n");
+                    return false;
+                }
+                if (!SaveRoom(cell->room))
+                {
+                    Logger::log(LogLevel::Error,
+                                "While saving the room on DB.\n");
+                    return false;
+                }
+                if (!SaveAreaList(area, cell->room))
+                {
+                    Logger::log(LogLevel::Error,
+                                "While saving the Area List.\n");
+                    return false;
+                }
+                Logger::log(LogLevel::Debug, "Created room at %s",
+                            cell->room->coord.toString());
+            }
+        }
+    }
+#endif
+    // Generate the exits.
+#if 0
+    for (int x = 0; x < width; ++x)
+    {
+        for (int y = 0; y < height; ++y)
+        {
+            for (int z = 0; z < elevation; ++z)
+            {
+                auto cell = this->getCell(x, y, z);
+                if (cell->room == nullptr)
+                {
+                    Logger::log(LogLevel::Error,
+                                "A cell has a nullptr room at %s.\n",
+                                cell->coordinates.toString());
+                    return false;
+                }
+                for (auto neighbour : get_neighbours(map,cell))
+                {
+                    // Get the room of the neighbour.
+                    if (neighbour.second->room == nullptr)
                     {
                         Logger::log(LogLevel::Error,
-                                    "While saving the exit on DB.\n");
+                                    "A neighbour has a nullptr room %s->%s.\n",
+                                    cell->coordinates.toString(),
+                                    neighbour.second->coordinates.toString());
                         return false;
                     }
-                }
-                if (neighbour.second->room->addExit(backward))
-                {
-                    if (!SaveRoomExit(backward))
+                    // Create the two exits.
+                    auto forward = std::make_shared<Exit>(
+                        cell->room,
+                        neighbour.second->room,
+                        neighbour.first,
+                        0);
+                    auto backward = std::make_shared<Exit>(
+                        neighbour.second->room,
+                        cell->room,
+                        neighbour.first.getOpposite(),
+                        0);
+                    // Insert in both the rooms exits the connection.
+                    if (cell->room->addExit(forward))
                     {
-                        Logger::log(LogLevel::Error,
-                                    "While saving the exit on DB.\n");
-                        return false;
+                        if (!SaveRoomExit(forward))
+                        {
+                            Logger::log(LogLevel::Error,
+                                        "While saving the exit on DB.\n");
+                            return false;
+                        }
+                    }
+                    if (neighbour.second->room->addExit(backward))
+                    {
+                        if (!SaveRoomExit(backward))
+                        {
+                            Logger::log(LogLevel::Error,
+                                        "While saving the exit on DB.\n");
+                            return false;
+                        }
                     }
                 }
             }
         }
     }
+#endif
     // Generate the air
+#if 0
     for (int x = 0; x < width; ++x)
     {
         for (int y = 0; y < height; ++y)
@@ -286,5 +302,8 @@ bool MapWrapper::buildMap(const std::string & /*mapName*/,
         }
     }
 #endif
+#endif
     return true;
+}
+
 }

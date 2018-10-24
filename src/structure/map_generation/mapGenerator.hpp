@@ -21,78 +21,79 @@
 
 #pragma once
 
-#include "mapGeneratorConfiguration.hpp"
+#include "undergroundGenerator.hpp"
+#include "surfaceGenerator.hpp"
+#include "mapConfiguration.hpp"
+#include "heightMap.hpp"
+#include "formatter.hpp"
+#include "mapRoom.hpp"
+#include "utils.hpp"
+#include "noiseGenerator.hpp"
+#include "mapTile.hpp"
 
 #include <memory>
 #include <map>
+#include <iostream>
+#include <list>
+#include <cassert>
 
-class MapWrapper;
-class HeightMap;
-class Terrain;
+namespace MapGen
+{
 
 /// @brief Automatic generator of maps.
 class MapGenerator
 {
 private:
     /// Generator configuration.
-    MapGeneratorConfiguration config;
+    MapConfiguration config;
     /// Height map.
     std::shared_ptr<HeightMap> heightMap;
 
 public:
 
     /// @brief Constructor.
-    MapGenerator(const MapGeneratorConfiguration & _config,
-                 const std::shared_ptr<HeightMap> & _heightMap);
+    MapGenerator(MapConfiguration const & _config,
+                 std::shared_ptr<HeightMap> const & _heightMap) :
+        config(_config),
+        heightMap(_heightMap)
+    {
+        // Nothing to do.
+    }
 
     /// @brief Generates a new map.
-    bool generateMap(std::shared_ptr<MapWrapper> const & map);
-
-private:
-    struct HeightCell
+    bool generateMap()
     {
-        int height;
-        std::shared_ptr<Terrain> terrain;
-    };
+        Map2D map;
+        Map2D underground;
+        RoomList roomList;
 
-    /// @brief Creates the mountains on the map.
-    /// @param heights The heights.
-    /// @return the error state.
-    bool generateMountains(
-        std::map<int, std::map<int, HeightCell>> & heights);
+        // --------------------------------------------------------------------
+        // Phase 0 : Initialize the map.
+        init_map(map, config.width, config.height);
+        init_map(underground, config.width, config.height);
 
-    /// @brief Normalizes the map with values between a specific range
-    /// according to the HeightMap.
-    /// @param heights The heights.
-    /// @return the error state.
-    bool normalizeMap(
-        std::map<int, std::map<int, HeightCell>> & heights);
+        // --------------------------------------------------------------------
+        // Phase I : use a 2d map to generate the terrain layer.
+        // Generate the mountains.
+        if (!generate_mountains(map, config)) return false;
+        // Normalize the map in order to have values between 0 and 100.
+        if (!normalize_map(map, config)) return false;
+        // Add noise to the map.
+        if (!generate_noise(map, config)) return false;
+        // Normalize the map in order to have values between 0 and 100.
+        if (!normalize_map(map, config)) return false;
+        // Apply the terrain to the map.
+        if (!apply_terrain(map, config, heightMap)) return false;
+        // Generate the rivers.
+        if (!generate_rivers(map, config)) return false;
+        // Flat out the mainland.
+        if (!flat_out_mainland(map, config, heightMap)) return false;
 
-    /// @brief Apply the terrain on the map based on the height map.
-    /// @param heights The heights.
-    /// @return the error state.
-    bool applyTerrain(
-        std::map<int, std::map<int, HeightCell>> & heights);
-
-    /// @brief Finalizes the z coordinates of the cells inside the map around
-    /// the mid-value of the altitude.
-    /// @param heights The heights.
-    /// @return the error state.
-    bool flatOutMainland(
-        std::map<int, std::map<int, HeightCell>> & heights);
-
-    /// @brief Applies the terrains and computed heights to the map.
-    /// @param heights The heights.
-    /// @param map     The map to modify.
-    /// @return the error state.
-    bool applyHeightsToMap(
-        std::map<int, std::map<int, HeightCell>> & heights,
-        std::shared_ptr<MapWrapper> const & map);
-
-    /// @brief Fills the sea cells.
-    /// @param map The map to modify.
-    /// @return the error state.
-    bool generateSea(
-        std::map<int, std::map<int, HeightCell>> & heights,
-        std::shared_ptr<MapWrapper> const & map);
+        // --------------------------------------------------------------------
+        // Phase II : undeground caves.
+        //generate_rooms(underground, config, roomList);
+        generate_caves(config, underground);
+        return true;
+    }
 };
+} // namespace MapGen

@@ -1,6 +1,6 @@
-/// @file   mapGeneratorConfiguration.cpp
+/// @file   undegroundGenerator.hpp
 /// @author Enrico Fraccaroli
-/// @date   Jan 06 2017
+/// @date   Mar 18 2018
 /// @copyright
 /// Copyright (c) 2017 Enrico Fraccaroli <enrico.fraccaroli@gmail.com>
 /// Permission is hereby granted, free of charge, to any person obtaining a
@@ -19,35 +19,31 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "mapGeneratorConfiguration.hpp"
-#include "utils.hpp"
+#pragma once
 
-MapGeneratorConfiguration::MapGeneratorConfiguration() :
-    width(60),
-    height(30),
-    elevation(40),
-    numMountains(50),
-    minMountainRadius(5),
-    maxMountainRadius(15),
-    numRivers(4),
-    minRiverDistance(8),
-    numForests(12),
-    minForestDistance(12)
-{
-    // Nothing to do.
-}
+#include <iostream>
+#include <list>
 
-std::string MapGeneratorConfiguration::toString() const
+#include "mapConfiguration.hpp"
+#include "mapRoom.hpp"
+#include "mapTile.hpp"
+
+namespace MapGen
 {
-    std::string output;
-    output += "Width             :" + ToString(width) + ";\n";
-    output += "Height            :" + ToString(height) + ";\n";
-    output += "NumMountains      :" + ToString(numMountains) + ";\n";
-    output += "MinMountainRadius :" + ToString(minMountainRadius) + ";\n";
-    output += "MaxMountainRadius :" + ToString(maxMountainRadius) + ";\n";
-    output += "NumRivers         :" + ToString(numRivers) + ";\n";
-    output += "MinRiverDistance  :" + ToString(minRiverDistance) + ";\n";
-    output += "NumForests        :" + ToString(numForests) + ";\n";
-    output += "MinForestDistance :" + ToString(minForestDistance) + ";\n";
-    return output;
-}
+
+inline std::shared_ptr<Terrain> get_random_terrain();
+
+bool create_room(Map2D & map, std::shared_ptr<MapRoom> const & room);
+
+bool generate_rooms(Map2D & map,
+                    MapConfiguration const & config,
+                    RoomList & roomList);
+
+void init_undeground_map(MapConfiguration const & config,
+                         Map2D & map,
+                         Map2D & support_map);
+
+void generate_caves(MapConfiguration const & config,
+                    Map2D & map);
+
+} // namespace MapGen

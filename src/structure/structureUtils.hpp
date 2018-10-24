@@ -57,6 +57,22 @@ struct RoomSelectionOptions
 
 namespace StructUtils
 {
+
+/// @brief Provides the distance between the source and the target.
+template<typename T>
+inline T getDistance(
+    T const & source_x, T const & target_x,
+    T const & source_y = 0, T const & target_y = 0,
+    T const & source_z = 0, T const & target_z = 0)
+{
+    return static_cast<int>(
+        std::sqrt(
+            std::pow(source_x - target_x, 2) +
+            std::pow(source_y - target_y, 2) +
+            std::pow(source_z - target_z, 2)));
+}
+
+
 /// @brief Provides the distance between the source and the target.
 /// @param source The source coordinates.
 /// @param target The target coordinates.
@@ -64,11 +80,9 @@ namespace StructUtils
 inline int getDistance(Coordinates const & source,
                        Coordinates const & target)
 {
-    return static_cast<int>(
-        std::sqrt(
-            std::pow(source.x - target.x, 2) +
-            std::pow(source.y - target.y, 2) +
-            std::pow(source.z - target.z, 2)));
+    return getDistance(source.x, target.x,
+                       source.y, target.y,
+                       source.z, target.z);
 }
 
 /// Functions used to get the distance between two rooms.

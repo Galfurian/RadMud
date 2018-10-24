@@ -21,11 +21,14 @@
 
 #pragma once
 
-#include "mapCell.hpp"
+#include <memory>
+#include <algorithm>
+#include <iostream>
+
+#include "terrain.hpp"
 
 /// @brief Class which maps the values of an height-map to types of terrain.
-class HeightMap
-{
+class HeightMap {
 public:
     /// The vnum of the mapper.
     unsigned int vnum;
@@ -37,28 +40,25 @@ public:
     std::vector<std::pair<int, std::shared_ptr<Terrain>>> thresholds;
 
     /// @brief Constructor.
-    HeightMap(const unsigned int & _vnum,
-              const std::string & _name,
-              const std::shared_ptr<Terrain> & _seaLevelTerrain);
+    HeightMap(const unsigned int &_vnum,
+              const std::string &_name,
+              const std::shared_ptr<Terrain> &_seaLevelTerrain);
 
     /// @brief Add a new threshold.
     /// @param terrain      The terrain associated with the new threshold.
     /// @param threshold    The threshold value.
-    void addThreshold(const std::shared_ptr<Terrain> & terrain,
-                      const int & threshold);
+    void addThreshold(const std::shared_ptr<Terrain> &terrain,
+                      const int &threshold);
 
     /// @brief Returns the terrain associated with the given height w.r.t.
     /// the current thresholds.
-    std::shared_ptr<Terrain> getTerrain(const int & height);
+    std::shared_ptr<Terrain> getTerrain(const int &height);
 
     /// @brief Provides the offset associated with the given terrain.
-    int getOffset(const std::shared_ptr<Terrain> & terrain) const;
+    int getOffset(const std::shared_ptr<Terrain> &terrain) const;
 
     /// @brief Provides the offset associated with the given terrain.
-    inline bool isAboveSeaLevel(const std::shared_ptr<Terrain> & terrain) const
-    {
-        return (getOffset(terrain) > 0);
-    }
+    bool isAboveSeaLevel(const std::shared_ptr<Terrain> &terrain) const;
 
     /// @brief Provides the offset associated with the given terrain.
     int getSeaLevelHeight() const;

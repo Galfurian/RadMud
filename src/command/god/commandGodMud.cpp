@@ -217,12 +217,11 @@ bool DoGenerateMap(Character * character, ArgumentHandler & args)
         }
         return false;
     }
-    MapGeneratorConfiguration configuration;
+    MapGen::MapConfiguration configuration(60, 30, 40);
     // Instantiate the map generator.
-    MapGenerator mapGenerator(configuration, heightMap);
+    MapGen::MapGenerator generator(configuration, heightMap);
     // Generate the map.
-    auto map = std::make_shared<MapWrapper>();
-    if (!mapGenerator.generateMap(map))
+    if (!generator.generateMap())
     {
         character->sendMsg("Error while generating the map.");
         return false;
@@ -330,7 +329,7 @@ bool DoBuildGenerateMap(Character * character, ArgumentHandler & args)
     if (args.size() != 2)
     {
         character->sendMsg("You must provide the vnum of a generated map and "
-                               "the name of the new map.");
+                           "the name of the new map.");
         return false;
     }
     auto vnum = ToNumber<unsigned int>(args[0].getContent());

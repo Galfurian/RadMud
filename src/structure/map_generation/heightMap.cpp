@@ -22,34 +22,30 @@
 #include "heightMap.hpp"
 #include "terrain.hpp"
 
-#include <algorithm>
-
 HeightMap::HeightMap(const unsigned int & _vnum,
-                     const std::string & _name,
-                     const std::shared_ptr<Terrain> & _seaLevelTerrain) :
-    vnum(_vnum),
-    name(_name),
-    seaLevelTerrain(_seaLevelTerrain),
-    thresholds()
+          const std::string & _name,
+          const std::shared_ptr<Terrain> & _seaLevelTerrain) :
+        vnum(_vnum),
+        name(_name),
+        seaLevelTerrain(_seaLevelTerrain),
+        thresholds()
 {
     // Nothing to do.
 }
 
-void HeightMap::addThreshold(
-    const std::shared_ptr<Terrain> & terrain,
-    const int & threshold)
+void HeightMap::addThreshold(const std::shared_ptr<Terrain> & terrain,
+                  const int & threshold)
 {
     thresholds.emplace_back(std::make_pair(threshold, terrain));
     std::sort(thresholds.begin(), thresholds.end(), [](
-        const std::pair<int, std::shared_ptr<Terrain>> & left,
-        const std::pair<int, std::shared_ptr<Terrain>> & right)
+            const std::pair<int, std::shared_ptr<Terrain>> & left,
+            const std::pair<int, std::shared_ptr<Terrain>> & right)
     {
         return left.first < right.first;
     });
 }
 
-std::shared_ptr<Terrain> HeightMap::getTerrain(
-    const int & height)
+std::shared_ptr<Terrain> HeightMap::getTerrain(const int & height)
 {
     for (auto it : thresholds)
     {
@@ -58,11 +54,11 @@ std::shared_ptr<Terrain> HeightMap::getTerrain(
             return it.second;
         }
     }
+    std::cerr << "There is no terrain below:" << height << ".\n";
     return nullptr;
 }
 
-int HeightMap::getOffset(
-    const std::shared_ptr<Terrain> & terrain) const
+int HeightMap::getOffset(const std::shared_ptr<Terrain> & terrain) const
 {
     int terrainLevel = 0;
     for (auto it : thresholds)
@@ -83,6 +79,11 @@ int HeightMap::getOffset(
         ++seaLevel;
     }
     return terrainLevel - seaLevel;
+}
+
+bool HeightMap::isAboveSeaLevel(const std::shared_ptr<Terrain> & terrain) const
+{
+    return (getOffset(terrain) > 0);
 }
 
 int HeightMap::getSeaLevelHeight() const
