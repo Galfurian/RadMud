@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "alignString.hpp"
+#include "align.hpp"
 #include "utils.hpp"
 
 #include <vector>

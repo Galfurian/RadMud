@@ -1,4 +1,4 @@
-/// @file   alignString.hpp
+/// @file   align.hpp
 /// @author Enrico Fraccaroli
 /// @date   Feb 13 2017
 

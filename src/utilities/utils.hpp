@@ -46,6 +46,25 @@
     std::cerr << "Line      :"<<ToString(__LINE__)<<"\n",\
     true) : false)
 
+#define Abs(x)    ((x) < 0 ? -(x) : (x))
+#define Max(a, b) ((a) > (b) ? (a) : (b))
+
+inline bool is_equal(double a, double b, double tolerance = 1e-09)
+{
+    double d = Max(Abs(a), Abs(b));
+    return (Abs(a - b) / d) <= tolerance;
+}
+
+inline bool is_lequal(double a, double b, double tolerance = 1e-09)
+{
+    return is_equal(a, b, tolerance) || (a < b);
+}
+
+inline bool is_gequal(double a, double b, double tolerance = 1e-09)
+{
+    return is_equal(a, b, tolerance) || (a > b);
+}
+
 /// @brief Transform a string into a numeric value.
 /// @param source The string to turn into a number.
 /// @return The number.
@@ -185,7 +204,7 @@ inline double RoundTo(double value, int digits)
 /// @param source The string to turn into a number.
 /// @return The number.
 template<typename T,
-         typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
+    typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
 T ToNumber(const std::string & source)
 {
     char * pEnd;
@@ -196,7 +215,7 @@ T ToNumber(const std::string & source)
 /// @param value The value to turn into a string.
 /// @return The resulting string.
 template<typename T,
-         typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
+    typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
 std::string ToString(const T & value)
 {
     std::stringstream ss;
@@ -209,7 +228,7 @@ std::string ToString(const T & value)
 /// @param upperBound The upper bound for the random value.
 /// @return The generated random value.
 template<typename T,
-         typename = typename std::enable_if<std::is_integral<T>::value>::type>
+    typename = typename std::enable_if<std::is_integral<T>::value>::type>
 T TRand(const T & lowerBound, const T & upperBound)
 {
     std::uniform_int_distribution<T> distribution(lowerBound, upperBound);
@@ -223,7 +242,7 @@ T TRand(const T & lowerBound, const T & upperBound)
 /// @param upperBound The upper bound for the random value.
 /// @return The generated random value.
 template<typename T,
-         typename = typename std::enable_if<std::is_floating_point<T>::value>::type>
+    typename = typename std::enable_if<std::is_floating_point<T>::value>::type>
 T TRandReal(const T & lowerBound, const T & upperBound)
 {
     std::uniform_real_distribution<T> distribution(lowerBound, upperBound);
@@ -243,6 +262,22 @@ template<typename T>
 T Normalize(T v, T from_lb, T from_ub, T to_lb, T to_ub)
 {
     return (((to_ub - to_lb) * (v - from_lb)) / ((from_ub - from_lb))) + to_lb;
+}
+
+/// @brief Provides the distance between the source and the target.
+template<typename T>
+inline T GetDistance(
+    T const & source_x, T const & target_x,
+    T const & source_y = 0, T const & target_y = 0,
+    T const & source_z = 0, T const & target_z = 0)
+{
+    auto diff_x = source_x - target_x;
+    diff_x *= diff_x;
+    auto diff_y = source_y - target_y;
+    diff_y *= diff_y;
+    auto diff_z = source_z - target_z;
+    diff_z *= diff_z;
+    return static_cast<T>(std::sqrt(diff_x + diff_y + diff_z));
 }
 
 template<typename T, typename TPercentage>
