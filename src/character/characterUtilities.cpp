@@ -132,21 +132,14 @@ bool FindNearbyResouces(
 {
     // Create a function which reduces the required quantity and checks if
     // the zero has been reached.
-    auto DecrementRequired = [&foundResources](Item * item,
-                                               unsigned int & requiredQuantity)
+    auto DecrementRequired = [&](Item * item, unsigned int & requiredQuantity)
     {
-        // Get the available quantity.
-        auto quantityAvailable = item->quantity;
         // Set the used quantity.
-        auto quantityUsed = quantityAvailable;
-        if (quantityAvailable > requiredQuantity)
-        {
-            quantityUsed = (quantityAvailable - requiredQuantity);
-        }
+        auto used = std::min(item->quantity, requiredQuantity);
         // Add the item to the list of used resources.
-        foundResources.emplace_back(std::make_pair(item, quantityUsed));
+        foundResources.emplace_back(std::make_pair(item, used));
         // Reduce the quantity needed.
-        requiredQuantity -= quantityUsed;
+        requiredQuantity -= used;
         // Returns if we've reached the needed quantity.
         return (requiredQuantity == 0);
     };
@@ -156,7 +149,7 @@ bool FindNearbyResouces(
         auto quantityNeeded = resource.second;
         // Check if we need to search inside the room.
         // TODO: Probably I need to check if a given item is not selected twice.
-        if (searchOptions.searchInRoom)
+        if (searchOptions.searchInRoom && (quantityNeeded > 0))
         {
             for (auto item : character->room->items)
             {
@@ -168,7 +161,7 @@ bool FindNearbyResouces(
             }
         }
         // Check if we need to search inside the character's equipment.
-        if (searchOptions.searchInEquipment)
+        if (searchOptions.searchInEquipment && (quantityNeeded > 0))
         {
             for (auto item : character->equipment)
             {
@@ -180,7 +173,7 @@ bool FindNearbyResouces(
             }
         }
         // Check if we need to search inside the character's inventory.
-        if (searchOptions.searchInInventory)
+        if (searchOptions.searchInInventory && (quantityNeeded > 0))
         {
             for (auto item : character->inventory)
             {
@@ -192,7 +185,8 @@ bool FindNearbyResouces(
             }
         }
         // If the ingredients are still not enough, return false.
-        if (quantityNeeded > 0) return false;
+        if (quantityNeeded > 0)
+            return false;
     }
     return true;
 }

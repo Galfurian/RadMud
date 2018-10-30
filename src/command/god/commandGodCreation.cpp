@@ -119,7 +119,6 @@ bool DoBuildingList(Character * character, ArgumentHandler & /*args*/)
     table.addColumn("NAME", align::center);
     table.addColumn("DIFFICULTY", align::left);
     table.addColumn("TIME", align::center);
-    table.addColumn("UNIQUE", align::center);
     for (auto it : Mud::instance().mudBuildings)
     {
         // Prepare the row.

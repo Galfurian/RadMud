@@ -128,12 +128,10 @@ bool CraftAction::check(std::string & error) const
         auto required = it.second;
         for (auto it2 : ingredients)
         {
-            auto item = it2.first;
-            required -= item->quantity;
-            if (required <= 0)
-            {
-                break;
-            }
+            // Check the type.
+            if (!ItemUtils::IsValidResource(it2.first, it.first)) continue;
+            // Reduce the quantity.
+            required -= it2.second;
         }
         if (required > 0)
         {
@@ -176,16 +174,11 @@ ActionStatus CraftAction::perform()
     // Add the ingredients to the list of items to destroy.
     for (auto it : ingredients)
     {
-        auto ingredient = it.first;
-        if (ingredient->quantity == it.second)
-        {
-            // Add the ingredient to the list of items that has to be deleted.
-            MudUpdater::instance().addItemToDestroy(ingredient);
-        }
+        // If the ingredient is completely depleted, destroy it.
+        if (it.first->quantity == it.second)
+            MudUpdater::instance().addItemToDestroy(it.first);
         else
-        {
-            ingredient->quantity -= it.second;
-        }
+            it.first->quantity -= it.second;
     }
     // Get the outcome model.
     auto outcomeModel = production->outcome;
