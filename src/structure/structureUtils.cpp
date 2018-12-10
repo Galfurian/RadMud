@@ -306,58 +306,58 @@ std::vector<Coordinates> fov(Coordinates & origin,
                              Area * area)
 {
     std::vector<Coordinates> cfov;
-    auto CheckCoordinates = [&](const Coordinates & coordinates)
+    auto CheckCoord = [&](int x, int y, int z)
     {
-        if (std::find(cfov.begin(), cfov.end(), coordinates) == cfov.end())
+        Coordinates coord(x, y, z);
+        if (std::find(cfov.begin(), cfov.end(), coord) == cfov.end())
         {
-            if (origin == coordinates)
+            if (origin == coord)
             {
-                cfov.emplace_back(coordinates);
+                cfov.emplace_back(coord);
             }
-            else if (los(origin, coordinates, area, radius))
+            else if (los(origin, coord, area, radius))
             {
-                cfov.emplace_back(coordinates);
+                cfov.emplace_back(coord);
             }
         }
     };
     Coordinates point;
-
     while (point.x <= radius)
     {
         while ((point.y <= point.x) && (point.square() <= pow(radius, 2)))
         {
             // ---------------------------------------------------------
-            CheckCoordinates(Coordinates(origin.x + point.x,
-                                         origin.y + point.y,
-                                         origin.z + point.z));
+            CheckCoord(origin.x + point.x,
+                       origin.y + point.y,
+                       origin.z + point.z);
             // ---------------------------------------------------------
-            CheckCoordinates(Coordinates(origin.x - point.x,
-                                         origin.y + point.y,
-                                         origin.z + point.z));
+            CheckCoord(origin.x - point.x,
+                       origin.y + point.y,
+                       origin.z + point.z);
             // ---------------------------------------------------------
-            CheckCoordinates(Coordinates(origin.x + point.x,
-                                         origin.y - point.y,
-                                         origin.z + point.z));
+            CheckCoord(origin.x + point.x,
+                       origin.y - point.y,
+                       origin.z + point.z);
             // ---------------------------------------------------------
-            CheckCoordinates(Coordinates(origin.x - point.x,
-                                         origin.y - point.y,
-                                         origin.z + point.z));
+            CheckCoord(origin.x - point.x,
+                       origin.y - point.y,
+                       origin.z + point.z);
             // ---------------------------------------------------------
-            CheckCoordinates(Coordinates(origin.x + point.y,
-                                         origin.y + point.x,
-                                         origin.z + point.z));
+            CheckCoord(origin.x + point.y,
+                       origin.y + point.x,
+                       origin.z + point.z);
             // ---------------------------------------------------------
-            CheckCoordinates(Coordinates(origin.x - point.y,
-                                         origin.y + point.x,
-                                         origin.z + point.z));
+            CheckCoord(origin.x - point.y,
+                       origin.y + point.x,
+                       origin.z + point.z);
             // ---------------------------------------------------------
-            CheckCoordinates(Coordinates(origin.x + point.y,
-                                         origin.y - point.x,
-                                         origin.z + point.z));
+            CheckCoord(origin.x + point.y,
+                       origin.y - point.x,
+                       origin.z + point.z);
             // ---------------------------------------------------------
-            CheckCoordinates(Coordinates(origin.x - point.y,
-                                         origin.y - point.x,
-                                         origin.z + point.z));
+            CheckCoord(origin.x - point.y,
+                       origin.y - point.x,
+                       origin.z + point.z);
             // ---------------------------------------------------------
             ++point.y;
         }

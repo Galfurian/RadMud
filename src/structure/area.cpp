@@ -373,8 +373,8 @@ std::string Area::drawASCIIFov(Room * centerRoom,
     int max_x = (centerRoom->coord.x + radius);
     int min_y = (centerRoom->coord.y - radius);
     int max_y = (centerRoom->coord.y + radius);
-    int min_z = (centerRoom->coord.z - radius);
-    int max_z = (centerRoom->coord.z + radius);
+    //int min_z = (centerRoom->coord.z - radius);
+    //int max_z = (centerRoom->coord.z + radius);
     // Evaluate the field of view.
     auto view = StructUtils::fov3d(centerRoom->coord,
                                    this,
@@ -392,26 +392,34 @@ std::string Area::drawASCIIFov(Room * centerRoom,
                 result += '@';
                 continue;
             }
-            Room * lowestRoom = nullptr;
-            for (point.z = min_z; point.z <= max_z; ++point.z)
+#if 0
+            Room * room = nullptr;
+            for (point.z = max_z; point.z >= min_z; --point.z)
             {
                 if (std::find(view.begin(), view.end(), point) != view.end())
                 {
-                    lowestRoom = this->getRoom(point);
+                    room = this->getRoom(point);
                     break;
                 }
             }
-            if (lowestRoom == nullptr)
+#else
+            Room * room = nullptr;
+            if (std::find(view.begin(), view.end(), point) != view.end())
+            {
+                room = this->getRoom(point);
+            }
+#endif
+            if (room == nullptr)
             {
                 result += ' ';
                 continue;
             }
-            if (!lowestRoom->isLit())
+            if (!room->isLit())
             {
-                result += ' ';
+                result += Formatter::darkGray() + '~' + Formatter::reset();
                 continue;
             }
-            result += getASCIICell(lowestRoom);
+            result += getASCIICell(room);
         }
         result += '\n';
     }
