@@ -27,98 +27,82 @@
 
 namespace MapGen
 {
-
 /// @brief Class which contains (wrap) an under-construction map.
-class MapWrapper
-{
+class MapWrapper {
 public:
-    /// The unique virtual number.
-    unsigned int vnum;
-    /// Width of the map.
-    int width;
-    /// Height of the map.
-    int height;
-    /// Elevation of the map.
-    int elevation;
-    /// The map.
-    std::map<int, std::map<int, std::map<int, MapTile>>> map;
+	/// The unique virtual number.
+	unsigned int vnum;
+	/// Width of the map.
+	int width;
+	/// Height of the map.
+	int height;
+	/// Elevation of the map.
+	int elevation;
+	/// The map.
+	Map2D<MapTile> map;
 
-    /// @brief Constructor.
-    MapWrapper();
+	/// @brief Constructor.
+	MapWrapper();
 
-    /// @brief Destructor.
-    ~MapWrapper();
+	/// @brief Destructor.
+	~MapWrapper();
 
-    void initialize(const int & _width,
-                    const int & _height,
-                    const int & _elevation);
+	void initialize(const int &_width, const int &_height,
+					const int &_elevation)
+	{
+		(void)_width;
+		(void)_height;
+		(void)_elevation;
+	}
 
-    /// @brief Allows to set the width of the map.
-    inline void setWidth(const int & _width)
-    {
-        width = _width;
-    }
+	/// @brief Allows to set the width of the map.
+	inline void setWidth(const int &_width)
+	{
+		width = _width;
+	}
 
-    /// @brief Allows to set the height of the map.
-    inline void setHeight(const int & _height)
-    {
-        height = _height;
-    }
+	/// @brief Allows to set the height of the map.
+	inline void setHeight(const int &_height)
+	{
+		height = _height;
+	}
 
-    /// @brief Allows to set the elevation of the map.
-    inline void setElevation(const int & _elevation)
-    {
-        elevation = _elevation;
-    }
+	/// @brief Allows to set the elevation of the map.
+	inline void setElevation(const int &_elevation)
+	{
+		elevation = _elevation;
+	}
 
-    /// @brief Provide the width of the map.
-    inline int getWidth() const
-    {
-        return width;
-    }
+	/// @brief Provide the width of the map.
+	inline int getWidth() const
+	{
+		return width;
+	}
 
-    /// @brief Provide the height of the map.
-    inline int getHeight() const
-    {
-        return height;
-    }
+	/// @brief Provide the height of the map.
+	inline int getHeight() const
+	{
+		return height;
+	}
 
-    /// @brief Provide the elevation of the map.
-    inline int getElevation() const
-    {
-        return elevation;
-    }
+	/// @brief Provide the elevation of the map.
+	inline int getElevation() const
+	{
+		return elevation;
+	}
 
-    /// @brief Returns the cell at the given position.
-    inline MapTile * getCell(int x, int y, int z)
-    {
-        if ((x < 0) || (x >= width)) return nullptr;
-        if ((y < 0) || (y >= height)) return nullptr;
-        if ((z < 0) || (z >= elevation)) return nullptr;
-        return &map[x][y][z];
-    }
+	/// @brief Destroy the map.
+	void destroy()
+	{
+	}
 
-    /// @brief Set the object at the given Coordinates2D.
-    /// @param x       Coordinate on x-axis.
-    /// @param y       Coordinate on y-axis.
-    /// @param mapCell The map cell which has to be set.
-    inline void set(int x, int y, int z,
-                    std::shared_ptr<Terrain> const & terrain,
-                    unsigned int const & /*flags*/,
-                    std::pair<Liquid *, unsigned int> const & liquidContent)
-    {
-        map[x][y][z].terrain = terrain;
-        //map[x][y][z].flags = flags;
-        map[x][y][z].liquidContent = liquidContent;
-
-    }
-
-    /// @brief Destroy the map.
-    void destroy();
-
-    /// @brief Build the map.
-    bool buildMap(const std::string & mapName,
-                  const std::string & builder);
+	/// @brief Build the map.
+	bool buildMap(const std::string &mapName, const std::string &builder)
+	{
+		(void)mapName;
+		(void)builder;
+		return true;
+	}
 };
 
 }

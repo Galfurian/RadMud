@@ -34,188 +34,193 @@
 
 namespace MapGen
 {
-
 /// @brief A single tile of the map.
-class MapTile
-{
+class MapTile {
 public:
-    /// The associated room.
-    Room * room;
-    /// The x-axis coorinates.
-    int x;
-    /// The y-axis coorinates.
-    int y;
-    /// The z-axis coorinates.
-    int z;
-    /// The terrain applied to the tile.
-    std::shared_ptr<Terrain> terrain;
-    /// The liquid which fills the terrain by default.
-    std::pair<Liquid *, unsigned int> liquidContent;
+	/// The associated room.
+	Room *room;
+	/// The x-axis coorinates.
+	int x;
+	/// The y-axis coorinates.
+	int y;
+	/// The z-axis coorinates.
+	int z;
+	/// The terrain applied to the tile.
+	std::shared_ptr<Terrain> terrain;
+	/// The liquid which fills the terrain by default.
+	std::pair<Liquid *, unsigned int> liquidContent;
 
-    /// @brief Constructor.
-    MapTile() :
-        room(),
-        x(),
-        y(),
-        z(),
-        terrain(),
-        liquidContent()
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor.
+	MapTile() : room(), x(), y(), z(), terrain(), liquidContent()
+	{
+		// Nothing to do.
+	}
 };
 
-/// A 2d map of tiles.
-typedef std::map<int, std::map<int, std::shared_ptr<MapTile>>> Map2D;
-/// A list of tiles.
-typedef std::list<std::shared_ptr<MapTile>> TileList;
+/// A generic 2d map.
+template <typename T> class Map2D {
+private:
+	std::vector<T> map;
 
-inline void init_map(Map2D & map, int width, int height)
+public:
+	int width;
+	int height;
+
+	Map2D() : map(), width(), height()
+	{
+	}
+
+	Map2D(int _width, int _height) : map(), width(_width), height(_height)
+	{
+		map.reserve(width * height);
+	}
+
+	inline void set_size(int _width, int _height)
+	{
+		assert(map.empty());
+		assert(_width >= 0);
+		assert(_height >= 0);
+		width = _width;
+		height = _height;
+		map.reserve(static_cast<unsigned int>(width * height));
+	}
+
+	inline T *operator()(int x, int y)
+	{
+		assert(x >= 0);
+		assert(x < width);
+		assert(y >= 0);
+		assert(y < height);
+		return &map[static_cast<unsigned int>(y * width + x)];
+	}
+
+	inline T const *operator()(int x, int y) const
+	{
+		assert(x >= 0);
+		assert(x < width);
+		assert(y >= 0);
+		assert(y < height);
+		return &map[static_cast<unsigned int>(y * width + x)];
+	}
+};
+
+inline void init_map(Map2D<MapTile> &map, int width, int height)
 {
-    for (auto x = 0; x < width; ++x)
-    {
-        for (auto y = 0; y < height; ++y)
-        {
-            auto tile = std::make_shared<MapTile>();
-            tile->x = x;
-            tile->y = y;
-            tile->z = 0;
-            map[x][y] = tile;
-        }
-    }
+	map.set_size(width, height);
+	for (int x = 0; x < width; ++x) {
+		for (int y = 0; y < height; ++y) {
+			MapTile *tile = map(x, y);
+			tile->x = x;
+			tile->y = y;
+			tile->z = 0;
+		}
+	}
 }
 
-inline void dump_map(Map2D & map,
-                     int width,
-                     int height,
-                     int layer)
+inline std::string dump_map(Map2D<MapTile> &map, int layer)
 {
-    std::cout << std::string(static_cast<size_t>(width), '-') << "\n";
-    for (int y = 0; y < height; ++y)
-    {
-        std::string debug;
-        for (int x = 0; x < width; ++x)
-        {
-            if (layer == 0)
-            {
-                std::string tile = " ";
-                if (map[x][y]->terrain)
-                {
-                    if ((map[x][y]->terrain->liquidContent.first == nullptr) &&
-                        map[x][y]->liquidContent.first)
-                    {
-                        tile = Formatter::blue("r");
-                    }
-                    else
-                    {
-                        tile = map[x][y]->terrain->symbol;
-                    }
-                }
-                debug += tile;
-            }
-            else
-            {
-                debug += Align(ToString(map[x][y]->z), align::center, 2);
-            }
-        }
-        std::cout << debug << "\n";
-    }
-    std::cout << std::string(static_cast<size_t>(width), '-') << "\n";
+	std::string s;
+	s += std::string(static_cast<size_t>(map.width), '-') + "\n";
+	for (int y = 0; y < map.height; ++y) {
+		std::string line;
+		for (int x = 0; x < map.width; ++x) {
+			MapTile *tile = map(x, y);
+			if (layer == 0) {
+				line += Align(ToString(tile->z), align::center, 4) + ", ";
+			} else if (layer == 1) {
+				if (tile->terrain) {
+					if ((tile->terrain->liquidContent.first == nullptr) &&
+						tile->liquidContent.first) {
+						line += Formatter::blue("r");
+					} else {
+						line += tile->terrain->symbol;
+					}
+				}
+			}
+		}
+		s += line + "\n";
+	}
+	s += std::string(static_cast<size_t>(map.width), '-') + "\n";
+	return s;
 }
 
-inline bool get_extremes(Map2D & map,
-                         int width,
-                         int height,
-                         int & lowest,
-                         int & highest)
+inline bool get_extremes(Map2D<MapTile> &map, int width, int height,
+						 int &lowest, int &highest)
 {
-    for (int x = 0; x < width; ++x)
-    {
-        for (int y = 0; y < height; ++y)
-        {
-            if (map[x][y]->z < lowest)
-            {
-                lowest = map[x][y]->z;
-            }
-            if (map[x][y]->z > highest)
-            {
-                highest = map[x][y]->z;
-            }
-        }
-    }
-    return lowest != highest;
+	for (int x = 0; x < width; ++x) {
+		for (int y = 0; y < height; ++y) {
+			MapTile *map_tile = map(x, y);
+			if (map_tile->z < lowest)
+				lowest = map_tile->z;
+			if (map_tile->z > highest)
+				highest = map_tile->z;
+		}
+	}
+	return lowest != highest;
 }
 
 /// @brief Checks if the given tile is valid.
-inline bool is_valid(MapConfiguration const & config,
-                     int x, int y, int z = 0)
+inline bool is_valid(MapConfiguration const &config, int x, int y, int z = 0)
 {
-    return (x >= 0) && (x < config.width) &&
-           (y >= 0) && (y < config.height) &&
-           (z >= 0) && (z < config.elevation);
+	return (x >= 0) && (x < config.width) && (y >= 0) && (y < config.height) &&
+		   (z >= 0) && (z < config.elevation);
 }
 
-inline std::shared_ptr<MapTile> get_tile(
-    Map2D & map,
-    MapConfiguration const & config,
-    int x, int y, int z = 0)
+inline MapTile *get_tile(Map2D<MapTile> &map, MapConfiguration const &config,
+						 int x, int y, int z = 0)
 {
-    if (is_valid(config, x, y, z)) return map[x][y];
-    return nullptr;
+	if (is_valid(config, x, y, z))
+		return map(x, y);
+	return nullptr;
 }
 
-inline std::vector<std::shared_ptr<MapTile>> get_neighbours(
-    Map2D & map,
-    MapConfiguration const & config,
-    std::shared_ptr<MapTile> const & tile)
+inline std::vector<MapTile *> get_neighbours(Map2D<MapTile> &map,
+											 MapConfiguration const &config,
+											 MapTile *tile)
 {
-    std::vector<std::shared_ptr<MapTile>> neighbours;
-    auto north = get_tile(map, config, tile->x, tile->y + 1);
-    if (north) neighbours.emplace_back(north);
-    auto south = get_tile(map, config, tile->x, tile->y - 1);
-    if (south) neighbours.emplace_back(south);
-    auto west = get_tile(map, config, tile->x - 1, tile->y);
-    if (west) neighbours.emplace_back(west);
-    auto east = get_tile(map, config, tile->x + 1, tile->y);
-    if (east) neighbours.emplace_back(east);
-    return neighbours;
+	std::vector<MapTile *> neighbours;
+	auto north = get_tile(map, config, tile->x, tile->y + 1);
+	if (north)
+		neighbours.emplace_back(north);
+	auto south = get_tile(map, config, tile->x, tile->y - 1);
+	if (south)
+		neighbours.emplace_back(south);
+	auto west = get_tile(map, config, tile->x - 1, tile->y);
+	if (west)
+		neighbours.emplace_back(west);
+	auto east = get_tile(map, config, tile->x + 1, tile->y);
+	if (east)
+		neighbours.emplace_back(east);
+	return neighbours;
 }
 
-inline std::shared_ptr<MapTile> find_lowest_nearby_tile(
-    Map2D & map,
-    MapConfiguration const & config,
-    std::shared_ptr<MapTile> const & tile)
+inline MapTile *find_lowest_nearby_tile(Map2D<MapTile> &map,
+										MapConfiguration const &config,
+										MapTile *tile)
 {
-    auto lowest = tile;
-    auto neighbours = get_neighbours(map, config, tile);
-    std::random_device rd;
-    std::mt19937 g(rd());
-    std::shuffle(neighbours.begin(), neighbours.end(), g);
-    for (auto const & neighbour : neighbours)
-    {
-        if (neighbour->z < lowest->z)
-        {
-            lowest = neighbour;
-        }
-    }
-    return (lowest == tile) ? nullptr : lowest;
+	auto lowest = tile;
+	auto neighbours = get_neighbours(map, config, tile);
+	std::random_device rd;
+	std::mt19937 g(rd());
+	std::shuffle(neighbours.begin(), neighbours.end(), g);
+	for (auto const &neighbour : neighbours)
+		if (neighbour->z < lowest->z)
+			lowest = neighbour;
+	return (lowest == tile) ? nullptr : lowest;
 }
 
-inline void decrese_nearby_tiles(
-    Map2D & map,
-    MapConfiguration const & config,
-    std::shared_ptr<MapTile> const & tile,
-    int amplitude)
+inline void decrese_nearby_tiles(Map2D<MapTile> &map,
+								 MapConfiguration const &config, MapTile *tile,
+								 int amplitude)
 {
-    auto neighbours = get_neighbours(map, config, tile);
-    std::random_device rd;
-    std::mt19937 g(rd());
-    std::shuffle(neighbours.begin(), neighbours.end(), g);
-    std::uniform_int_distribution<int> dis(0, amplitude);
-    for (auto const & neighbour : neighbours)
-    {
-        neighbour->z -= dis(g);
-    }
+	auto neighbours = get_neighbours(map, config, tile);
+	std::random_device rd;
+	std::mt19937 g(rd());
+	std::shuffle(neighbours.begin(), neighbours.end(), g);
+	std::uniform_int_distribution<int> dis(0, amplitude);
+	for (auto const &neighbour : neighbours) {
+		neighbour->z -= dis(g);
+	}
 }
 
 } // namespace MapGen

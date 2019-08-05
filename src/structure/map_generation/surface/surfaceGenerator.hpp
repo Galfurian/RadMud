@@ -27,42 +27,38 @@
 
 namespace MapGen
 {
-
 /// @brief Creates the mountains on the map.
 /// @param map      The map.
 /// @param config   The configuration file.
 /// @return Error state.
-bool generate_mountains(Map2D & map, MapConfiguration const & config);
+bool generate_mountains(Map2D<MapTile> &map, MapConfiguration const &config);
 
 /// @brief Generates noise on the map.
 /// @param map      The map.
 /// @param config   The configuration file.
 /// @return Error state.
-bool generate_noise(Map2D & map, MapConfiguration const & config);
+bool generate_noise(Map2D<MapTile> &map, MapConfiguration const &config);
 
 /// @brief Normalizes the map with values between a specific range
 /// according to the HeightMap.
 /// @param map      The map.
 /// @param config   The configuration file.
 /// @return Error state.
-bool normalize_map(Map2D & map, MapConfiguration const & config);
+bool normalize_map(Map2D<MapTile> &map, MapConfiguration const &config);
 
-bool generate_rivers(Map2D & map,
-                     MapConfiguration const & config);
+bool generate_rivers(Map2D<MapTile> &map, MapConfiguration const &config);
 
 /// @brief Apply the terrain on the map based on the height map.
 /// @param map The map.
 /// @return the error state.
-bool apply_terrain(Map2D & map,
-                   MapConfiguration const & config,
-                   std::shared_ptr<HeightMap> const & heightMap);
+bool apply_terrain(Map2D<MapTile> &map, MapConfiguration const &config,
+				   std::shared_ptr<HeightMap> const &heightMap);
 
 /// @brief Finalizes the z coordinates of the tiles inside the map around
 /// the mid-value of the altitude.
 /// @param map The map.
 /// @return the error state.
-bool flat_out_mainland(Map2D & map,
-                       MapConfiguration const & config,
-                       std::shared_ptr<HeightMap> const & heightMap);
+bool flat_out_mainland(Map2D<MapTile> &map, MapConfiguration const &config,
+					   std::shared_ptr<HeightMap> const &heightMap);
 
 } // namespace MapGen

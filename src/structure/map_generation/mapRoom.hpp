@@ -48,8 +48,6 @@ public:
 
     int center_x;
     int center_y;
-    /// The list of tiles which belong to this room.
-    TileList tileList;
 
     MapRoom(int x, int y, int _width, int _height) :
         x1(x),
@@ -59,8 +57,7 @@ public:
         width(_width),
         height(_height),
         center_x(static_cast<int>(std::floor((x1 + x2) / 2))),
-        center_y(static_cast<int>(std::floor((y1 + y2) / 2))),
-        tileList()
+        center_y(static_cast<int>(std::floor((y1 + y2) / 2)))
     {
         // Nothing to do.
     }

@@ -30,6 +30,7 @@
 #include "utils.hpp"
 #include "noiseGenerator.hpp"
 #include "mapTile.hpp"
+#include "mapWrapper.hpp"
 
 #include <memory>
 #include <map>
@@ -39,61 +40,65 @@
 
 namespace MapGen
 {
-
 /// @brief Automatic generator of maps.
-class MapGenerator
-{
+class MapGenerator {
 private:
-    /// Generator configuration.
-    MapConfiguration config;
-    /// Height map.
-    std::shared_ptr<HeightMap> heightMap;
+	/// Generator configuration.
+	MapConfiguration config;
+	/// Height map.
+	std::shared_ptr<HeightMap> heightMap;
 
 public:
+	/// @brief Constructor.
+	MapGenerator(MapConfiguration const &_config,
+				 std::shared_ptr<HeightMap> const &_heightMap) :
+		config(_config),
+		heightMap(_heightMap)
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Constructor.
-    MapGenerator(MapConfiguration const & _config,
-                 std::shared_ptr<HeightMap> const & _heightMap) :
-        config(_config),
-        heightMap(_heightMap)
-    {
-        // Nothing to do.
-    }
+	/// @brief Generates a new map.
+	std::shared_ptr<MapWrapper> generateMap()
+	{
+		auto wrapper = std::make_shared<MapWrapper>();
+		//Map2D<MapTile> underground;
+		//RoomList roomList;
 
-    /// @brief Generates a new map.
-    bool generateMap()
-    {
-        Map2D map;
-        Map2D underground;
-        RoomList roomList;
+		// --------------------------------------------------------------------
+		// Phase 0 : Initialize the map.
+		init_map(wrapper->map, config.width, config.height);
+		//init_map(underground, config.width, config.height);
 
-        // --------------------------------------------------------------------
-        // Phase 0 : Initialize the map.
-        init_map(map, config.width, config.height);
-        init_map(underground, config.width, config.height);
+		// --------------------------------------------------------------------
+		// Phase I : use a 2d map to generate the terrain layer.
+		// Generate the mountains.
+		if (!generate_mountains(wrapper->map, config))
+			return nullptr;
+		// Normalize the map in order to have values between 0 and 100.
+		if (!normalize_map(wrapper->map, config))
+			return nullptr;
+		// Add noise to the map.
+		if (!generate_noise(wrapper->map, config))
+			return nullptr;
+		// Normalize the map in order to have values between 0 and 100.
+		if (!normalize_map(wrapper->map, config))
+			return nullptr;
+		// Apply the terrain to the map.
+		if (!apply_terrain(wrapper->map, config, heightMap))
+			return nullptr;
+		// Generate the rivers.
+		if (!generate_rivers(wrapper->map, config))
+			return nullptr;
+		// Flat out the mainland.
+		if (!flat_out_mainland(wrapper->map, config, heightMap))
+			return nullptr;
 
-        // --------------------------------------------------------------------
-        // Phase I : use a 2d map to generate the terrain layer.
-        // Generate the mountains.
-        if (!generate_mountains(map, config)) return false;
-        // Normalize the map in order to have values between 0 and 100.
-        if (!normalize_map(map, config)) return false;
-        // Add noise to the map.
-        if (!generate_noise(map, config)) return false;
-        // Normalize the map in order to have values between 0 and 100.
-        if (!normalize_map(map, config)) return false;
-        // Apply the terrain to the map.
-        if (!apply_terrain(map, config, heightMap)) return false;
-        // Generate the rivers.
-        if (!generate_rivers(map, config)) return false;
-        // Flat out the mainland.
-        if (!flat_out_mainland(map, config, heightMap)) return false;
-
-        // --------------------------------------------------------------------
-        // Phase II : undeground caves.
-        //generate_rooms(underground, config, roomList);
-        generate_caves(config, underground);
-        return true;
-    }
+		// --------------------------------------------------------------------
+		// Phase II : undeground caves.
+		//generate_rooms(underground, config, roomList);
+		//generate_caves(config, underground);
+		return wrapper;
+	}
 };
 } // namespace MapGen

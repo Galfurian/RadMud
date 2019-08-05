@@ -30,20 +30,19 @@
 
 namespace MapGen
 {
+#if 0
 
 inline std::shared_ptr<Terrain> get_random_terrain();
 
-bool create_room(Map2D & map, std::shared_ptr<MapRoom> const & room);
+bool create_room(Map2D<MapTile> &map, std::shared_ptr<MapRoom> const &room);
 
-bool generate_rooms(Map2D & map,
-                    MapConfiguration const & config,
-                    RoomList & roomList);
+bool generate_rooms(Map2D<MapTile> &map, MapConfiguration const &config,
+					RoomList &roomList);
 
-void init_undeground_map(MapConfiguration const & config,
-                         Map2D & map,
-                         Map2D & support_map);
+void init_undeground_map(MapConfiguration const &config, Map2D<MapTile> &map,
+						 Map2D<MapTile> &support_map);
 
-void generate_caves(MapConfiguration const & config,
-                    Map2D & map);
+void generate_caves(MapConfiguration const &config, Map2D<MapTile> &map);
 
+#endif
 } // namespace MapGen
